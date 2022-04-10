@@ -1,4 +1,5 @@
 #include "Configuration.h"
+#include "WiFiSettings.h"
 #include "defaults.h"
 #include <Arduino.h>
 #include <LittleFS.h>
@@ -39,9 +40,12 @@ void setup()
 
     // Initialize WiFi
     Serial.print(F("Initialize WiFi... "));
+    WiFiSettings.init();
+    Serial.println(F("done"));
+    WiFiSettings.applyConfig();
 }
 
 void loop()
 {
-    // put your main code here, to run repeatedly:
+    WiFiSettings.loop();
 }

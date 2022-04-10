@@ -1,3 +1,16 @@
 #pragma once
 
 #define SERIAL_BAUDRATE 115200
+
+#define APP_HOSTNAME "OpenDTU-%06X"
+
+#define ACCESS_POINT_NAME "OpenDTU-"
+#define ACCESS_POINT_PASSWORD "openDTU"
+
+#define ADMIN_TIMEOUT 180
+#define WIFI_RECONNECT_TIMEOUT 15
+#define WIFI_RECONNECT_REDO_TIMEOUT 600
+
+#define WIFI_SSID ""
+#define WIFI_PASSWORD ""
+#define WIFI_DHCP true
