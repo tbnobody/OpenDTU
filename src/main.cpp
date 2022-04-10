@@ -1,3 +1,4 @@
+#include "Configuration.h"
 #include "defaults.h"
 #include <Arduino.h>
 #include <LittleFS.h>
@@ -18,6 +19,26 @@ void setup()
     } else {
         Serial.println(F("done"));
     }
+
+    // Read configuration values
+    Serial.print(F("Reading configuration... "));
+    if (!Configuration.read()) {
+        Serial.print(F("initializing... "));
+        Configuration.init();
+        if (Configuration.write()) {
+            Serial.print(F("written... "));
+        } else {
+            Serial.print(F("failed... "));
+        }
+    }
+    if (Configuration.get().Cfg_Version != CONFIG_VERSION) {
+        Serial.print(F("migrated... "));
+        Configuration.migrate();
+    }
+    Serial.println(F("done"));
+
+    // Initialize WiFi
+    Serial.print(F("Initialize WiFi... "));
 }
 
 void loop()
