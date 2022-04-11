@@ -18,7 +18,7 @@ void WebApiClass::init()
 
     _ws.onEvent(std::bind(&WebApiClass::onWebsocketEvent, this, _1, _2, _3, _4, _5, _6));
 
-    _server.serveStatic("/", LITTLEFS, "/", "max-age=86400").setDefaultFile("index.htm");
+    _server.serveStatic("/", LITTLEFS, "/", "max-age=86400").setDefaultFile("index.html");
     _server.onNotFound(std::bind(&WebApiClass::onNotFound, this, _1));
     _server.begin();
 }
