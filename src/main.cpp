@@ -1,4 +1,5 @@
 #include "Configuration.h"
+#include "WebApi.h"
 #include "WiFiSettings.h"
 #include "defaults.h"
 #include <Arduino.h>
@@ -43,6 +44,11 @@ void setup()
     WiFiSettings.init();
     Serial.println(F("done"));
     WiFiSettings.applyConfig();
+
+    // Initialize WebApi
+    Serial.print(F("Initialize WebApi... "));
+    WebApi.init();
+    Serial.println(F("done"));
 }
 
 void loop()

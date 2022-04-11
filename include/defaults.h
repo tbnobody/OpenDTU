@@ -4,6 +4,8 @@
 
 #define APP_HOSTNAME "OpenDTU-%06X"
 
+#define HTTP_PORT 80
+
 #define ACCESS_POINT_NAME "OpenDTU-"
 #define ACCESS_POINT_PASSWORD "openDTU"
 
