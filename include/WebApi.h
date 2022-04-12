@@ -17,6 +17,7 @@ private:
     void onNotFound(AsyncWebServerRequest* request);
 
     void onNetworkStatus(AsyncWebServerRequest* request);
+    void onSystemStatus(AsyncWebServerRequest* request);
 };
 
 extern WebApiClass WebApi;

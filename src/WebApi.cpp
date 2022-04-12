@@ -22,6 +22,7 @@ void WebApiClass::init()
     _ws.onEvent(std::bind(&WebApiClass::onWebsocketEvent, this, _1, _2, _3, _4, _5, _6));
 
     _server.on("/api/network/status", HTTP_GET, std::bind(&WebApiClass::onNetworkStatus, this, _1));
+    _server.on("/api/system/status", HTTP_GET, std::bind(&WebApiClass::onSystemStatus, this, _1));
 
     _server.serveStatic("/", LITTLEFS, "/", "max-age=86400").setDefaultFile("index.html");
     _server.onNotFound(std::bind(&WebApiClass::onNotFound, this, _1));
@@ -66,6 +67,23 @@ void WebApiClass::onNetworkStatus(AsyncWebServerRequest* request)
     root[F("ap_ip")] = WiFi.softAPIP().toString();
     root[F("ap_mac")] = WiFi.softAPmacAddress();
     root[F("ap_stationnum")] = WiFi.softAPgetStationNum();
+
+    response->setLength();
+    request->send(response);
+}
+
+void WebApiClass::onSystemStatus(AsyncWebServerRequest* request)
+{
+    AsyncJsonResponse* response = new AsyncJsonResponse();
+    JsonObject root = response->getRoot();
+
+    root[F("hostname")] = WiFi.getHostname();
+    root[F("heapfree")] = ESP.getFreeHeap();
+    root[F("heaptotal")] = ESP.getHeapSize();
+    root[F("sdkversion")] = ESP.getSdkVersion();
+    root[F("cpufreq")] = ESP.getCpuFreqMHz();
+    root[F("sketchtotal")] = ESP.getSketchSize() + ESP.getFreeSketchSpace();
+    root[F("sketchused")] = ESP.getSketchSize();
 
     response->setLength();
     request->send(response);
