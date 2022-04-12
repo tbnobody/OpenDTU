@@ -1,4 +1,7 @@
 #include "WebApi.h"
+#include "ArduinoJson.h"
+#include "AsyncJson.h"
+#include "WiFiSettings.h"
 #include "defaults.h"
 #include <LittleFS.h>
 
@@ -17,6 +20,8 @@ void WebApiClass::init()
     _server.addHandler(&_events);
 
     _ws.onEvent(std::bind(&WebApiClass::onWebsocketEvent, this, _1, _2, _3, _4, _5, _6));
+
+    _server.on("/api/network/status", HTTP_GET, std::bind(&WebApiClass::onNetworkStatus, this, _1));
 
     _server.serveStatic("/", LITTLEFS, "/", "max-age=86400").setDefaultFile("index.html");
     _server.onNotFound(std::bind(&WebApiClass::onNotFound, this, _1));
@@ -40,6 +45,30 @@ void WebApiClass::onWebsocketEvent(AsyncWebSocket* server, AsyncWebSocketClient*
         sprintf(str, "Websocket: [%s][%u] disconnect", server->url(), client->id());
         Serial.println(str);
     }
+}
+
+void WebApiClass::onNetworkStatus(AsyncWebServerRequest* request)
+{
+    AsyncJsonResponse* response = new AsyncJsonResponse();
+    JsonObject root = response->getRoot();
+
+    root[F("sta_status")] = ((WiFi.getMode() & WIFI_STA) != 0);
+    root[F("sta_ssid")] = WiFi.SSID();
+    root[F("sta_ip")] = WiFi.localIP().toString();
+    root[F("sta_netmask")] = WiFi.subnetMask().toString();
+    root[F("sta_gateway")] = WiFi.gatewayIP().toString();
+    root[F("sta_dns1")] = WiFi.dnsIP(0).toString();
+    root[F("sta_dns2")] = WiFi.dnsIP(1).toString();
+    root[F("sta_mac")] = WiFi.macAddress();
+    root[F("sta_rssi")] = WiFi.RSSI();
+    root[F("ap_status")] = ((WiFi.getMode() & WIFI_AP) != 0);
+    root[F("ap_ssid")] = WiFiSettings.getApName();
+    root[F("ap_ip")] = WiFi.softAPIP().toString();
+    root[F("ap_mac")] = WiFi.softAPmacAddress();
+    root[F("ap_stationnum")] = WiFi.softAPgetStationNum();
+
+    response->setLength();
+    request->send(response);
 }
 
 WebApiClass WebApi;

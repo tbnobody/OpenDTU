@@ -15,6 +15,8 @@ private:
     void onWebsocketEvent(AsyncWebSocket* server, AsyncWebSocketClient* client, AwsEventType type, void* arg, uint8_t* data, size_t len);
 
     void onNotFound(AsyncWebServerRequest* request);
+
+    void onNetworkStatus(AsyncWebServerRequest* request);
 };
 
 extern WebApiClass WebApi;
