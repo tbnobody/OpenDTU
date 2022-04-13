@@ -5,8 +5,8 @@
     </div>
     <div class="card-body">
       <div class="table-responsive">
-        <table id="wifi_sta" class="table table-hover table-condensed">
-          <tbody id="wifi_sta-data">
+        <table class="table table-hover table-condensed">
+          <tbody>
             <tr>
               <th>IP Address</th>
               <td>{{ networkDataList.sta_ip }}</td>
@@ -53,19 +53,6 @@ export default {
       fetch("/api/network/status")
         .then((response) => response.json())
         .then((data) => (this.networkDataList = data));
-    },
-    getRSSIasQuality(rssi) {
-      var quality = 0;
-
-      if (rssi <= -100) {
-        quality = 0;
-      } else if (rssi >= -50) {
-        quality = 100;
-      } else {
-        quality = 2 * (rssi + 100);
-      }
-
-      return quality;
     },
   },
 };

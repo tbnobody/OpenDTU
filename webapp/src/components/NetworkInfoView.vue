@@ -14,9 +14,9 @@
 
 <script>
 import WifiStationInfo from "./partials/WifiStationInfo.vue";
-import WifiApInfo from "./partials/WifiApInfo.vue"
-import InterfaceStationInfo from "./partials/InterfaceStationInfo.vue"
-import InterfaceApInfo from "./partials/InterfaceApInfo.vue"
+import WifiApInfo from "./partials/WifiApInfo.vue";
+import InterfaceStationInfo from "./partials/InterfaceStationInfo.vue";
+import InterfaceApInfo from "./partials/InterfaceApInfo.vue";
 
 export default {
   components: {

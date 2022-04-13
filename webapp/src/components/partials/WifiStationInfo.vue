@@ -5,8 +5,8 @@
     </div>
     <div class="card-body">
       <div class="table-responsive">
-        <table id="wifi_sta" class="table table-hover table-condensed">
-          <tbody id="wifi_sta-data">
+        <table class="table table-hover table-condensed">
+          <tbody>
             <tr>
               <th>Status</th>
               <td
