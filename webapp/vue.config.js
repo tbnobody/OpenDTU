@@ -21,5 +21,8 @@ module.exports = defineConfig({
         minRatio: 0.8,
       }
     }
+  },
+  devServer: {
+    proxy: 'http://172.217.28.1/'
   }
 })
