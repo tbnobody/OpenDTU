@@ -3,7 +3,7 @@
 #include "AsyncJson.h"
 #include "WiFiSettings.h"
 #include "defaults.h"
-#include <LittleFS.h>
+#include <LITTLEFS.h>
 
 WebApiClass::WebApiClass()
     : _server(HTTP_PORT)

@@ -3,7 +3,7 @@
 #include "WiFiSettings.h"
 #include "defaults.h"
 #include <Arduino.h>
-#include <LittleFS.h>
+#include <LITTLEFS.h>
 
 void setup()
 {

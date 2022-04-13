@@ -1,6 +1,6 @@
 #include "Configuration.h"
 #include "defaults.h"
-#include <LittleFS.h>
+#include <LITTLEFS.h>
 
 CONFIG_T config;
 
