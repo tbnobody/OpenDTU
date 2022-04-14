@@ -2,6 +2,7 @@ import { createWebHistory, createRouter } from 'vue-router';
 import HomeView from '@/components/HomeView'
 import AboutView from '@/components/AboutView'
 import NetworkInfoView from '@/components/NetworkInfoView'
+import SystemInfoView from '@/components/SystemInfoView'
 
 const routes = [
     {
@@ -18,6 +19,11 @@ const routes = [
         path: '/info/network',
         name: 'Network',
         component: NetworkInfoView
+    },
+    {
+        path: '/info/system',
+        name: 'System',
+        component: SystemInfoView
     }
 ];
 

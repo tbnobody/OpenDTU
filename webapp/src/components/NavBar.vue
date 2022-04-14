@@ -30,6 +30,7 @@
               Info
             </a>
             <ul class="dropdown-menu" aria-labelledby="navbarScrollingDropdown">
+              <li><router-link class="dropdown-item" to="/info/system">System</router-link></li>
               <li><router-link class="dropdown-item" to="/info/network">Network</router-link></li>
             </ul>
           </li>
