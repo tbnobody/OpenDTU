@@ -1,9 +1,11 @@
 #include "WebApi.h"
 #include "ArduinoJson.h"
 #include "AsyncJson.h"
+#include "Configuration.h"
 #include "WiFiSettings.h"
 #include "defaults.h"
 #include <LITTLEFS.h>
+#include <ResetReason.h>
 
 WebApiClass::WebApiClass()
     : _server(HTTP_PORT)
@@ -78,12 +80,33 @@ void WebApiClass::onSystemStatus(AsyncWebServerRequest* request)
     JsonObject root = response->getRoot();
 
     root[F("hostname")] = WiFi.getHostname();
-    root[F("heapfree")] = ESP.getFreeHeap();
-    root[F("heaptotal")] = ESP.getHeapSize();
+
     root[F("sdkversion")] = ESP.getSdkVersion();
     root[F("cpufreq")] = ESP.getCpuFreqMHz();
-    root[F("sketchtotal")] = ESP.getSketchSize() + ESP.getFreeSketchSpace();
-    root[F("sketchused")] = ESP.getSketchSize();
+
+    root[F("heap_total")] = ESP.getHeapSize();
+    root[F("heap_used")] = ESP.getHeapSize() - ESP.getFreeHeap();
+    root[F("sketch_total")] = ESP.getSketchSize() + ESP.getFreeSketchSpace();
+    root[F("sketch_used")] = ESP.getSketchSize();
+    root[F("littlefs_total")] = LITTLEFS.totalBytes();
+    root[F("littlefs_used")] = LITTLEFS.usedBytes();
+
+    root[F("chiprevision")] = ESP.getChipRevision();
+    root[F("chipmodel")] = ESP.getChipModel();
+    root[F("chipcores")] = ESP.getChipCores();
+
+    String reason;
+    reason = ResetReason.get_reset_reason_verbose(0);
+    root[F("resetreason_0")] = reason;
+
+    reason = ResetReason.get_reset_reason_verbose(1);
+    root[F("resetreason_1")] = reason;
+
+    root[F("cfgsavecount")] = Configuration.get().Cfg_SaveCount;
+
+    char version[16];
+    sprintf(version, "%d.%d.%d", CONFIG_VERSION >> 24 & 0xff, CONFIG_VERSION >> 16 & 0xff, CONFIG_VERSION >> 8 & 0xff);
+    root[F("firmware_version")] = version;
 
     response->setLength();
     request->send(response);
