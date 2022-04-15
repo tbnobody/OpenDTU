@@ -23,8 +23,11 @@ void WebApiClass::init()
 
     _ws.onEvent(std::bind(&WebApiClass::onWebsocketEvent, this, _1, _2, _3, _4, _5, _6));
 
-    _server.on("/api/network/status", HTTP_GET, std::bind(&WebApiClass::onNetworkStatus, this, _1));
     _server.on("/api/system/status", HTTP_GET, std::bind(&WebApiClass::onSystemStatus, this, _1));
+
+    _server.on("/api/network/status", HTTP_GET, std::bind(&WebApiClass::onNetworkStatus, this, _1));
+    _server.on("/api/network/config", HTTP_GET, std::bind(&WebApiClass::onNetworkAdminGet, this, _1));
+    _server.on("/api/network/config", HTTP_POST, std::bind(&WebApiClass::onNetworkAdminPost, this, _1));
 
     _server.serveStatic("/", LITTLEFS, "/", "max-age=86400").setDefaultFile("index.html");
     _server.onNotFound(std::bind(&WebApiClass::onNotFound, this, _1));
@@ -110,6 +113,67 @@ void WebApiClass::onSystemStatus(AsyncWebServerRequest* request)
 
     response->setLength();
     request->send(response);
+}
+
+void WebApiClass::onNetworkAdminGet(AsyncWebServerRequest* request)
+{
+    AsyncJsonResponse* response = new AsyncJsonResponse();
+    JsonObject root = response->getRoot();
+    CONFIG_T& config = Configuration.get();
+
+    root[F("hostname")] = config.WiFi_Hostname;
+    root[F("dhcp")] = config.WiFi_Dhcp;
+    root[F("ipaddress")] = IPAddress(
+        config.WiFi_Ip[0],
+        config.WiFi_Ip[1],
+        config.WiFi_Ip[2],
+        config.WiFi_Ip[3])
+                               .toString();
+    root[F("netmask")] = IPAddress(
+        config.WiFi_Netmask[0],
+        config.WiFi_Netmask[1],
+        config.WiFi_Netmask[2],
+        config.WiFi_Netmask[3])
+                             .toString();
+    root[F("gateway")] = IPAddress(
+        config.WiFi_Gateway[0],
+        config.WiFi_Gateway[1],
+        config.WiFi_Gateway[2],
+        config.WiFi_Gateway[3])
+                             .toString();
+    root[F("dns1")] = IPAddress(
+        config.WiFi_Dns1[0],
+        config.WiFi_Dns1[1],
+        config.WiFi_Dns1[2],
+        config.WiFi_Dns1[3])
+                          .toString();
+    root[F("dns2")] = IPAddress(
+        config.WiFi_Dns2[0],
+        config.WiFi_Dns2[1],
+        config.WiFi_Dns2[2],
+        config.WiFi_Dns2[3])
+                          .toString();
+    root[F("ssid")] = config.WiFi_Ssid;
+    root[F("password")] = config.WiFi_Password;
+
+    response->setLength();
+    request->send(response);
+}
+
+void WebApiClass::onNetworkAdminPost(AsyncWebServerRequest* request)
+{
+    AsyncJsonResponse* response = new AsyncJsonResponse();
+    JsonObject retMsg = response->getRoot();
+    retMsg[F("type")] = F("warning");
+
+    if (!request->hasParam("data", true)) {
+        retMsg[F("message")] = F("No values found!");
+        response->setLength();
+        request->send(response);
+        return;
+    }
+
+    String json = request->getParam("data", true)->value();
 }
 
 WebApiClass WebApi;
