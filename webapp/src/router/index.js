@@ -3,6 +3,7 @@ import HomeView from '@/components/HomeView'
 import AboutView from '@/components/AboutView'
 import NetworkInfoView from '@/components/NetworkInfoView'
 import SystemInfoView from '@/components/SystemInfoView'
+import NetworkAdminView from '@/components/NetworkAdminView'
 
 const routes = [
     {
@@ -24,6 +25,11 @@ const routes = [
         path: '/info/system',
         name: 'System',
         component: SystemInfoView
+    },
+    {
+        path: '/settings/network',
+        name: 'Network Settings',
+        component: NetworkAdminView
     }
 ];
 

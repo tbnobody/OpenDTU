@@ -27,11 +27,38 @@
               data-bs-toggle="dropdown"
               aria-expanded="false"
             >
+              Settings
+            </a>
+            <ul class="dropdown-menu" aria-labelledby="navbarScrollingDropdown">
+              <li>
+                <router-link class="dropdown-item" to="/settings/network"
+                  >Network Settings</router-link
+                >
+              </li>
+            </ul>
+          </li>
+          <li class="nav-item dropdown">
+            <a
+              class="nav-link dropdown-toggle"
+              href="#"
+              id="navbarScrollingDropdown"
+              role="button"
+              data-bs-toggle="dropdown"
+              aria-expanded="false"
+            >
               Info
             </a>
             <ul class="dropdown-menu" aria-labelledby="navbarScrollingDropdown">
-              <li><router-link class="dropdown-item" to="/info/system">System</router-link></li>
-              <li><router-link class="dropdown-item" to="/info/network">Network</router-link></li>
+              <li>
+                <router-link class="dropdown-item" to="/info/system"
+                  >System</router-link
+                >
+              </li>
+              <li>
+                <router-link class="dropdown-item" to="/info/network"
+                  >Network</router-link
+                >
+              </li>
             </ul>
           </li>
           <li class="nav-item">
