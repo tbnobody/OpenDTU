@@ -4,7 +4,7 @@
 #include <WiFi.h>
 
 WiFiSettingsClass::WiFiSettingsClass()
-    : apIp(172, 217, 28, 1)
+    : apIp(192, 168, 4, 1)
     , apNetmask(255, 255, 255, 0)
 {
     dnsServer.reset(new DNSServer());
