@@ -3,10 +3,10 @@ import HomeView from '@/components/HomeView'
 import AboutView from '@/components/AboutView'
 import NetworkInfoView from '@/components/NetworkInfoView'
 import SystemInfoView from '@/components/SystemInfoView'
+import NtpInfoView from '@/components/NtpInfoView'
 import NetworkAdminView from '@/components/NetworkAdminView'
 
-const routes = [
-    {
+const routes = [{
         path: '/',
         name: 'Home',
         component: HomeView
@@ -25,6 +25,11 @@ const routes = [
         path: '/info/system',
         name: 'System',
         component: SystemInfoView
+    },
+    {
+        path: '/info/ntp',
+        name: 'NTP',
+        component: NtpInfoView
     },
     {
         path: '/settings/network',

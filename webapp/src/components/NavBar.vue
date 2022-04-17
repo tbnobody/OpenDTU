@@ -59,6 +59,11 @@
                   >Network</router-link
                 >
               </li>
+              <li>
+                <router-link class="dropdown-item" to="/info/ntp"
+                  >NTP</router-link
+                >
+              </li>
             </ul>
           </li>
           <li class="nav-item">
