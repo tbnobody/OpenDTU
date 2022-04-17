@@ -3,7 +3,10 @@
     <div class="page-header">
       <h1>Network Settings</h1>
     </div>
-    <form>
+    <!--<BootstrapAlert v-bind:variant="this.infoType" v-bind:show="this.infoShow">-->
+      {{ this.infoMessage }}
+    <!--</BootstrapAlert>-->
+    <form @submit="saveNetworkConfig">
       <div class="card">
         <div class="card-header text-white bg-primary">WiFi Configuration</div>
         <div class="card-body">
@@ -153,16 +156,25 @@
           </div>
         </div>
       </div>
+      <button type="submit" class="btn btn-primary mb-3">Save</button>
     </form>
-    {{ networkConfigList }}
   </div>
 </template>
 
 <script>
+import BootstrapAlert from "@/components/partials/BootstrapAlert.vue";
+
 export default {
+  components: {
+    BootstrapAlert,
+  },
   data() {
     return {
       networkConfigList: [],
+      test: {},
+      infoMessage: "",
+      infoType: "info",
+      infoShow: false,
     };
   },
   created() {
@@ -173,6 +185,33 @@ export default {
       fetch("/api/network/config")
         .then((response) => response.json())
         .then((data) => (this.networkConfigList = data));
+    },
+    saveNetworkConfig(e) {
+      e.preventDefault();
+
+      let formData = new FormData();
+      formData.append("data", JSON.stringify(this.networkConfigList));
+
+      fetch("/api/network/config", {
+        method: "POST",
+        body: formData,
+      })
+        .then(
+          function (response) {
+            if (response.status != 200) {
+              throw response.status;
+            } else {
+              return response.json();
+            }
+          }.bind(this)
+        )
+        .then(
+          function (response) {
+            this.infoMessage = response.message;
+            this.infoType = response.type;
+            this.infoShow = true;
+          }.bind(this)
+        );
     },
   },
 };
