@@ -11,6 +11,7 @@
 
 #define NTP_MAX_SERVER_STRLEN 31
 #define NTP_MAX_TIMEZONE_STRLEN 50
+#define NTP_MAX_TIMEZONEDESCR_STRLEN 50
 
 struct CONFIG_T {
     uint32_t Cfg_Version;
@@ -28,6 +29,7 @@ struct CONFIG_T {
 
     char Ntp_Server[NTP_MAX_SERVER_STRLEN + 1];
     char Ntp_Timezone[NTP_MAX_TIMEZONE_STRLEN + 1];
+    char Ntp_TimezoneDescr[NTP_MAX_TIMEZONEDESCR_STRLEN + 1];
 };
 
 class ConfigurationClass {

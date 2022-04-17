@@ -19,6 +19,7 @@ void ConfigurationClass::init()
     // NTP Settings
     strlcpy(config.Ntp_Server, NTP_SERVER, sizeof(config.Ntp_Server));
     strlcpy(config.Ntp_Timezone, NTP_TIMEZONE, sizeof(config.Ntp_Timezone));
+    strlcpy(config.Ntp_TimezoneDescr, NTP_TIMEZONEDESCR, sizeof(config.Ntp_TimezoneDescr));
 }
 
 bool ConfigurationClass::write()
@@ -55,6 +56,7 @@ void ConfigurationClass::migrate()
     if (config.Cfg_Version < 0x00010400) {
         strlcpy(config.Ntp_Server, NTP_SERVER, sizeof(config.Ntp_Server));
         strlcpy(config.Ntp_Timezone, NTP_TIMEZONE, sizeof(config.Ntp_Timezone));
+        strlcpy(config.Ntp_TimezoneDescr, NTP_TIMEZONEDESCR, sizeof(config.Ntp_TimezoneDescr));
     }
     config.Cfg_Version = CONFIG_VERSION;
     write();

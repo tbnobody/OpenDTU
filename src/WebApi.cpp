@@ -307,6 +307,7 @@ void WebApiClass::onNtpAdminGet(AsyncWebServerRequest* request)
 
     root[F("ntp_server")] = config.Ntp_Server;
     root[F("ntp_timezone")] = config.Ntp_Timezone;
+    root[F("ntp_timezone_descr")] = config.Ntp_TimezoneDescr;
 
     response->setLength();
     request->send(response);
@@ -365,9 +366,17 @@ void WebApiClass::onNtpAdminPost(AsyncWebServerRequest* request)
         return;
     }
 
+    if (root[F("ntp_timezone_descr")].as<String>().length() == 0 || root[F("ntp_timezone_descr")].as<String>().length() > NTP_MAX_TIMEZONEDESCR_STRLEN) {
+        retMsg[F("message")] = F("Timezone description must between 1 and " STR(NTP_MAX_TIMEZONEDESCR_STRLEN) " characters long!");
+        response->setLength();
+        request->send(response);
+        return;
+    }
+
     CONFIG_T& config = Configuration.get();
     strcpy(config.Ntp_Server, root[F("ntp_server")].as<String>().c_str());
     strcpy(config.Ntp_Timezone, root[F("ntp_timezone")].as<String>().c_str());
+    strcpy(config.Ntp_TimezoneDescr, root[F("ntp_timezone_descr")].as<String>().c_str());
     Configuration.write();
 
     retMsg[F("type")] = F("success");
