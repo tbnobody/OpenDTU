@@ -284,6 +284,7 @@ void WebApiClass::onNtpStatus(AsyncWebServerRequest* request)
 
     root[F("ntp_server")] = config.Ntp_Server;
     root[F("ntp_timezone")] = config.Ntp_Timezone;
+    root[F("ntp_timezone_descr")] = config.Ntp_TimezoneDescr;
 
     struct tm timeinfo;
     if (!getLocalTime(&timeinfo)) {
