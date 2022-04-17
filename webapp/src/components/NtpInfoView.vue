@@ -20,6 +20,10 @@
                   <th>Timezone</th>
                   <td>{{ ntpDataList.ntp_timezone }}</td>
                 </tr>
+                <tr>
+                  <th>Timezone Description</th>
+                  <td>{{ ntpDataList.ntp_timezone_descr }}</td>
+                </tr>
               </tbody>
             </table>
           </div>
