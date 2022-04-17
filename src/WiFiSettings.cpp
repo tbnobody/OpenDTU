@@ -24,8 +24,10 @@ void WiFiSettingsClass::setupMode()
         WiFi.softAP((const char*)ssidString.c_str(), ACCESS_POINT_PASSWORD);
         dnsServer->setErrorReplyCode(DNSReplyCode::NoError);
         dnsServer->start(DNS_PORT, "*", WiFi.softAPIP());
+        dnsServerStatus = true;
     } else {
         dnsServer->stop();
+        dnsServerStatus = false;
         WiFi.mode(WIFI_STA);
     }
 }
@@ -90,7 +92,9 @@ void WiFiSettingsClass::loop()
             }
         }
     }
-    dnsServer->processNextRequest();
+    if (dnsServerStatus) {
+        dnsServer->processNextRequest();
+    }
 }
 
 void WiFiSettingsClass::applyConfig()

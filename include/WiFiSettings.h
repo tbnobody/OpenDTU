@@ -26,6 +26,7 @@ private:
     IPAddress apIp;
     IPAddress apNetmask;
     std::unique_ptr<DNSServer> dnsServer;
+    bool dnsServerStatus = false;
 };
 
 extern WiFiSettingsClass WiFiSettings;
