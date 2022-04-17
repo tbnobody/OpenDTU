@@ -15,6 +15,10 @@ void ConfigurationClass::init()
     strlcpy(config.WiFi_Password, WIFI_PASSWORD, sizeof(config.WiFi_Password));
     config.WiFi_Dhcp = WIFI_DHCP;
     strlcpy(config.WiFi_Hostname, APP_HOSTNAME, sizeof(config.WiFi_Hostname));
+
+    // NTP Settings
+    strlcpy(config.Ntp_Server, NTP_SERVER, sizeof(config.Ntp_Server));
+    strlcpy(config.Ntp_Timezone, NTP_TIMEZONE, sizeof(config.Ntp_Timezone));
 }
 
 bool ConfigurationClass::write()
@@ -48,6 +52,10 @@ bool ConfigurationClass::read()
 
 void ConfigurationClass::migrate()
 {
+    if (config.Cfg_Version < 0x00010400) {
+        strlcpy(config.Ntp_Server, NTP_SERVER, sizeof(config.Ntp_Server));
+        strlcpy(config.Ntp_Timezone, NTP_TIMEZONE, sizeof(config.Ntp_Timezone));
+    }
     config.Cfg_Version = CONFIG_VERSION;
     write();
 }

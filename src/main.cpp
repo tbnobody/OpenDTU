@@ -1,4 +1,5 @@
 #include "Configuration.h"
+#include "NtpSettings.h"
 #include "WebApi.h"
 #include "WiFiSettings.h"
 #include "defaults.h"
@@ -44,6 +45,11 @@ void setup()
     WiFiSettings.init();
     Serial.println(F("done"));
     WiFiSettings.applyConfig();
+
+    // Initialize NTP
+    Serial.print(F("Initialize NTP... "));
+    NtpSettings.init();
+    Serial.println(F("done"));
 
     // Initialize WebApi
     Serial.print(F("Initialize WebApi... "));

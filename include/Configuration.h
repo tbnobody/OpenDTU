@@ -3,11 +3,14 @@
 #include <Arduino.h>
 
 #define CONFIG_FILENAME "/config.bin"
-#define CONFIG_VERSION 0x00010000 // 0.1.0
+#define CONFIG_VERSION 0x00010400 // 0.1.4 // make sure to clean all after change
 
 #define WIFI_MAX_SSID_STRLEN 31
 #define WIFI_MAX_PASSWORD_STRLEN 31
 #define WIFI_MAX_HOSTNAME_STRLEN 31
+
+#define NTP_MAX_SERVER_STRLEN 31
+#define NTP_MAX_TIMEZONE_STRLEN 50
 
 struct CONFIG_T {
     uint32_t Cfg_Version;
@@ -22,6 +25,9 @@ struct CONFIG_T {
     byte WiFi_Dns2[4];
     bool WiFi_Dhcp;
     char WiFi_Hostname[WIFI_MAX_HOSTNAME_STRLEN + 1];
+
+    char Ntp_Server[NTP_MAX_SERVER_STRLEN + 1];
+    char Ntp_Timezone[NTP_MAX_TIMEZONE_STRLEN + 1];
 };
 
 class ConfigurationClass {

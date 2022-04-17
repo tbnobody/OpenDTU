@@ -18,9 +18,12 @@ private:
 
     void onNetworkStatus(AsyncWebServerRequest* request);
     void onSystemStatus(AsyncWebServerRequest* request);
+    void onNtpStatus(AsyncWebServerRequest* request);
 
     void onNetworkAdminGet(AsyncWebServerRequest* request);
     void onNetworkAdminPost(AsyncWebServerRequest* request);
+
+    void onNtpAdminGet(AsyncWebServerRequest* request);
 };
 
 extern WebApiClass WebApi;

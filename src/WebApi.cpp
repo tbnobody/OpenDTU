@@ -30,6 +30,9 @@ void WebApiClass::init()
     _server.on("/api/network/config", HTTP_GET, std::bind(&WebApiClass::onNetworkAdminGet, this, _1));
     _server.on("/api/network/config", HTTP_POST, std::bind(&WebApiClass::onNetworkAdminPost, this, _1));
 
+    _server.on("/api/ntp/status", HTTP_GET, std::bind(&WebApiClass::onNtpStatus, this, _1));
+    _server.on("/api/ntp/config", HTTP_GET, std::bind(&WebApiClass::onNtpAdminGet, this, _1));
+
     _server.serveStatic("/", LITTLEFS, "/", "max-age=86400").setDefaultFile("index.html");
     _server.onNotFound(std::bind(&WebApiClass::onNotFound, this, _1));
     _server.begin();
@@ -269,6 +272,42 @@ void WebApiClass::onNetworkAdminPost(AsyncWebServerRequest* request)
 
     WiFiSettings.enableAdminMode();
     WiFiSettings.applyConfig();
+}
+
+void WebApiClass::onNtpStatus(AsyncWebServerRequest* request)
+{
+    AsyncJsonResponse* response = new AsyncJsonResponse();
+    JsonObject root = response->getRoot();
+    CONFIG_T& config = Configuration.get();
+
+    root[F("ntp_server")] = config.Ntp_Server;
+    root[F("ntp_timezone")] = config.Ntp_Timezone;
+
+    struct tm timeinfo;
+    if (!getLocalTime(&timeinfo)) {
+        root[F("ntp_status")] = false;
+    } else {
+        root[F("ntp_status")] = true;
+    }
+    char timeStringBuff[50];
+    strftime(timeStringBuff, sizeof(timeStringBuff), "%A, %B %d %Y %H:%M:%S", &timeinfo);
+    root[F("ntp_localtime")] = timeStringBuff;
+
+    response->setLength();
+    request->send(response);
+}
+
+void WebApiClass::onNtpAdminGet(AsyncWebServerRequest* request)
+{
+    AsyncJsonResponse* response = new AsyncJsonResponse();
+    JsonObject root = response->getRoot();
+    CONFIG_T& config = Configuration.get();
+
+    root[F("ntp_server")] = config.Ntp_Server;
+    root[F("ntp_timezone")] = config.Ntp_Timezone;
+
+    response->setLength();
+    request->send(response);
 }
 
 WebApiClass WebApi;
