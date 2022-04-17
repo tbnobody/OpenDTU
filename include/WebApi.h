@@ -24,6 +24,7 @@ private:
     void onNetworkAdminPost(AsyncWebServerRequest* request);
 
     void onNtpAdminGet(AsyncWebServerRequest* request);
+    void onNtpAdminPost(AsyncWebServerRequest* request);
 };
 
 extern WebApiClass WebApi;

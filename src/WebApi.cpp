@@ -2,6 +2,7 @@
 #include "ArduinoJson.h"
 #include "AsyncJson.h"
 #include "Configuration.h"
+#include "NtpSettings.h"
 #include "WiFiSettings.h"
 #include "defaults.h"
 #include "helper.h"
@@ -32,6 +33,7 @@ void WebApiClass::init()
 
     _server.on("/api/ntp/status", HTTP_GET, std::bind(&WebApiClass::onNtpStatus, this, _1));
     _server.on("/api/ntp/config", HTTP_GET, std::bind(&WebApiClass::onNtpAdminGet, this, _1));
+    _server.on("/api/ntp/config", HTTP_POST, std::bind(&WebApiClass::onNtpAdminPost, this, _1));
 
     _server.serveStatic("/", LITTLEFS, "/", "max-age=86400").setDefaultFile("index.html");
     _server.onNotFound(std::bind(&WebApiClass::onNotFound, this, _1));
@@ -308,6 +310,74 @@ void WebApiClass::onNtpAdminGet(AsyncWebServerRequest* request)
 
     response->setLength();
     request->send(response);
+}
+
+void WebApiClass::onNtpAdminPost(AsyncWebServerRequest* request)
+{
+    AsyncJsonResponse* response = new AsyncJsonResponse();
+    JsonObject retMsg = response->getRoot();
+    retMsg[F("type")] = F("warning");
+
+    if (!request->hasParam("data", true)) {
+        retMsg[F("message")] = F("No values found!");
+        response->setLength();
+        request->send(response);
+        return;
+    }
+
+    String json = request->getParam("data", true)->value();
+
+    if (json.length() > 1024) {
+        retMsg[F("message")] = F("Data too large!");
+        response->setLength();
+        request->send(response);
+        return;
+    }
+
+    DynamicJsonDocument root(1024);
+    DeserializationError error = deserializeJson(root, json);
+
+    if (error) {
+        retMsg[F("message")] = F("Failed to parse data!");
+        response->setLength();
+        request->send(response);
+        return;
+    }
+
+    if (!(root.containsKey("ntp_server") && root.containsKey("ntp_timezone"))) {
+        retMsg[F("message")] = F("Values are missing!");
+        response->setLength();
+        request->send(response);
+        return;
+    }
+
+    if (root[F("ntp_server")].as<String>().length() == 0 || root[F("ntp_server")].as<String>().length() > NTP_MAX_SERVER_STRLEN) {
+        retMsg[F("message")] = F("NTP Server must between 1 and " STR(NTP_MAX_SERVER_STRLEN) " characters long!");
+        response->setLength();
+        request->send(response);
+        return;
+    }
+
+    if (root[F("ntp_timezone")].as<String>().length() == 0 || root[F("ntp_timezone")].as<String>().length() > NTP_MAX_TIMEZONE_STRLEN) {
+        retMsg[F("message")] = F("Timezone must between 1 and " STR(NTP_MAX_TIMEZONE_STRLEN) " characters long!");
+        response->setLength();
+        request->send(response);
+        return;
+    }
+
+    CONFIG_T& config = Configuration.get();
+    strcpy(config.Ntp_Server, root[F("ntp_server")].as<String>().c_str());
+    strcpy(config.Ntp_Timezone, root[F("ntp_timezone")].as<String>().c_str());
+    Configuration.write();
+
+    retMsg[F("type")] = F("success");
+    retMsg[F("message")] = F("Settings saved!");
+
+    response->setLength();
+    request->send(response);
+
+    NtpSettings.setServer();
+    NtpSettings.setTimezone();
 }
 
 WebApiClass WebApi;
