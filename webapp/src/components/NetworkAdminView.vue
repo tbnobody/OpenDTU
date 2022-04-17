@@ -3,9 +3,9 @@
     <div class="page-header">
       <h1>Network Settings</h1>
     </div>
-    <!--<BootstrapAlert v-bind:variant="this.infoType" v-bind:show="this.infoShow">-->
-      {{ this.infoMessage }}
-    <!--</BootstrapAlert>-->
+    <BootstrapAlert v-model="showAlert" dismissible :variant="alertType">
+      {{ this.alertMessage }}
+    </BootstrapAlert>
     <form @submit="saveNetworkConfig">
       <div class="card">
         <div class="card-header text-white bg-primary">WiFi Configuration</div>
@@ -172,9 +172,9 @@ export default {
     return {
       networkConfigList: [],
       test: {},
-      infoMessage: "",
-      infoType: "info",
-      infoShow: false,
+      alertMessage: "",
+      alertType: "info",
+      showAlert: false,
     };
   },
   created() {
@@ -196,20 +196,18 @@ export default {
         method: "POST",
         body: formData,
       })
+        .then(function (response) {
+          if (response.status != 200) {
+            throw response.status;
+          } else {
+            return response.json();
+          }
+        })
         .then(
           function (response) {
-            if (response.status != 200) {
-              throw response.status;
-            } else {
-              return response.json();
-            }
-          }.bind(this)
-        )
-        .then(
-          function (response) {
-            this.infoMessage = response.message;
-            this.infoType = response.type;
-            this.infoShow = true;
+            this.alertMessage = response.message;
+            this.alertType = response.type;
+            this.showAlert = true;
           }.bind(this)
         );
     },
