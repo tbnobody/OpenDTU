@@ -5,6 +5,7 @@ import NetworkInfoView from '@/components/NetworkInfoView'
 import SystemInfoView from '@/components/SystemInfoView'
 import NtpInfoView from '@/components/NtpInfoView'
 import NetworkAdminView from '@/components/NetworkAdminView'
+import NtpAdminView from '@/components/NtpAdminView'
 
 const routes = [{
         path: '/',
@@ -35,6 +36,11 @@ const routes = [{
         path: '/settings/network',
         name: 'Network Settings',
         component: NetworkAdminView
+    },
+    {
+        path: '/settings/ntp',
+        name: 'NTP Settings',
+        component: NtpAdminView
     }
 ];
 
