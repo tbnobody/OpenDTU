@@ -31,13 +31,31 @@
               >Timezone:</label
             >
             <div class="col-sm-10">
+              <select class="form-select" v-model="timezoneSelect">
+                <option
+                  v-for="(config, name) in timezoneList"
+                  :key="name + '---' + config"
+                  :value="name + '---' + config"
+                >
+                  {{ name }}
+                </option>
+              </select>
+            </div>
+          </div>
+
+          <div class="row mb-3">
+            <label for="inputTimezoneConfig" class="col-sm-2 col-form-label"
+              >Timezone Config:</label
+            >
+            <div class="col-sm-10">
               <input
                 type="text"
                 class="form-control"
-                id="inputTimezone"
+                id="inputTimezoneConfig"
                 maxlength="32"
                 placeholder="Timezone"
                 v-model="ntpConfigList.ntp_timezone"
+                disabled
               />
             </div>
           </div>
@@ -58,19 +76,41 @@ export default {
   data() {
     return {
       ntpConfigList: [],
+      timezoneList: {},
+      timezoneSelect: "",
       alertMessage: "",
       alertType: "info",
       showAlert: false,
     };
   },
+  watch: {
+    timezoneSelect: function (newValue) {
+      this.ntpConfigList.ntp_timezone = newValue.split("---")[1];
+      this.ntpConfigList.ntp_timezone_descr = newValue.split("---")[0];
+    },
+  },
   created() {
+    this.getTimezoneList();
     this.getNtpConfig();
   },
   methods: {
+    getTimezoneList() {
+      fetch("/zones.json")
+        .then((response) => response.json())
+        .then((data) => (this.timezoneList = data));
+    },
     getNtpConfig() {
       fetch("/api/ntp/config")
         .then((response) => response.json())
-        .then((data) => (this.ntpConfigList = data));
+        .then(
+          function (data) {
+            this.ntpConfigList = data;
+            this.timezoneSelect =
+              this.ntpConfigList.ntp_timezone_descr +
+              "---" +
+              this.ntpConfigList.ntp_timezone;
+          }.bind(this)
+        );
     },
     saveNtpConfig(e) {
       e.preventDefault();
