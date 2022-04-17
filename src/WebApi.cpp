@@ -174,6 +174,12 @@ void WebApiClass::onNetworkAdminPost(AsyncWebServerRequest* request)
     }
 
     String json = request->getParam("data", true)->value();
+
+    retMsg[F("type")] = F("success");
+    retMsg[F("message")] = F("Settings saved!");
+
+    response->setLength();
+    request->send(response);
 }
 
 WebApiClass WebApi;
