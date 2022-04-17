@@ -171,7 +171,6 @@ export default {
   data() {
     return {
       networkConfigList: [],
-      test: {},
       alertMessage: "",
       alertType: "info",
       showAlert: false,
