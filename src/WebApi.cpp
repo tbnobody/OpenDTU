@@ -6,7 +6,7 @@
 #include "WiFiSettings.h"
 #include "defaults.h"
 #include "helper.h"
-#include <LITTLEFS.h>
+#include <LittleFS.h>
 #include <ResetReason.h>
 
 WebApiClass::WebApiClass()
@@ -35,7 +35,7 @@ void WebApiClass::init()
     _server.on("/api/ntp/config", HTTP_GET, std::bind(&WebApiClass::onNtpAdminGet, this, _1));
     _server.on("/api/ntp/config", HTTP_POST, std::bind(&WebApiClass::onNtpAdminPost, this, _1));
 
-    _server.serveStatic("/", LITTLEFS, "/", "max-age=86400").setDefaultFile("index.html");
+    _server.serveStatic("/", LittleFS, "/", "max-age=86400").setDefaultFile("index.html");
     _server.onNotFound(std::bind(&WebApiClass::onNotFound, this, _1));
     _server.begin();
 }
@@ -97,8 +97,8 @@ void WebApiClass::onSystemStatus(AsyncWebServerRequest* request)
     root[F("heap_used")] = ESP.getHeapSize() - ESP.getFreeHeap();
     root[F("sketch_total")] = ESP.getSketchSize() + ESP.getFreeSketchSpace();
     root[F("sketch_used")] = ESP.getSketchSize();
-    root[F("littlefs_total")] = LITTLEFS.totalBytes();
-    root[F("littlefs_used")] = LITTLEFS.usedBytes();
+    root[F("littlefs_total")] = LittleFS.totalBytes();
+    root[F("littlefs_used")] = LittleFS.usedBytes();
 
     root[F("chiprevision")] = ESP.getChipRevision();
     root[F("chipmodel")] = ESP.getChipModel();

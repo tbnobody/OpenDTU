@@ -1,6 +1,6 @@
 #include "Configuration.h"
 #include "defaults.h"
-#include <LITTLEFS.h>
+#include <LittleFS.h>
 
 CONFIG_T config;
 
@@ -24,7 +24,7 @@ void ConfigurationClass::init()
 
 bool ConfigurationClass::write()
 {
-    File f = LITTLEFS.open(CONFIG_FILENAME, "w");
+    File f = LittleFS.open(CONFIG_FILENAME, "w");
     if (!f) {
         return false;
     }
@@ -39,7 +39,7 @@ bool ConfigurationClass::write()
 
 bool ConfigurationClass::read()
 {
-    File f = LITTLEFS.open(CONFIG_FILENAME, "r");
+    File f = LittleFS.open(CONFIG_FILENAME, "r");
     if (!f) {
         return false;
     }

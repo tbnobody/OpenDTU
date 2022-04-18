@@ -4,7 +4,7 @@
 #include "WiFiSettings.h"
 #include "defaults.h"
 #include <Arduino.h>
-#include <LITTLEFS.h>
+#include <LittleFS.h>
 
 void setup()
 {
@@ -17,7 +17,7 @@ void setup()
 
     // Initialize file system
     Serial.print(F("Initialize FS... "));
-    if (!LITTLEFS.begin()) {
+    if (!LittleFS.begin()) {
         Serial.println(F("failed"));
     } else {
         Serial.println(F("done"));
