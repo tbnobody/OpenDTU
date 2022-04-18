@@ -35,6 +35,10 @@ void WebApiClass::init()
     _server.on("/api/ntp/config", HTTP_GET, std::bind(&WebApiClass::onNtpAdminGet, this, _1));
     _server.on("/api/ntp/config", HTTP_POST, std::bind(&WebApiClass::onNtpAdminPost, this, _1));
 
+    _server.on("/api/mqtt/status", HTTP_GET, std::bind(&WebApiClass::onMqttStatus, this, _1));
+    _server.on("/api/mqtt/config", HTTP_GET, std::bind(&WebApiClass::onMqttAdminGet, this, _1));
+    _server.on("/api/mqtt/config", HTTP_POST, std::bind(&WebApiClass::onMqttAdminPost, this, _1));
+
     _server.serveStatic("/", LittleFS, "/", "max-age=86400").setDefaultFile("index.html");
     _server.onNotFound(std::bind(&WebApiClass::onNotFound, this, _1));
     _server.begin();
@@ -388,6 +392,82 @@ void WebApiClass::onNtpAdminPost(AsyncWebServerRequest* request)
 
     NtpSettings.setServer();
     NtpSettings.setTimezone();
+}
+
+void WebApiClass::onMqttStatus(AsyncWebServerRequest* request)
+{
+    AsyncJsonResponse* response = new AsyncJsonResponse();
+    JsonObject root = response->getRoot();
+    CONFIG_T& config = Configuration.get();
+
+    root[F("mqtt_enabled")] = config.Mqtt_Enabled;
+    root[F("mqtt_hostname")] = config.Mqtt_Hostname;
+    root[F("mqtt_port")] = config.Mqtt_Port;
+    root[F("mqtt_username")] = config.Mqtt_Username;
+    root[F("mqtt_topic")] = config.Mqtt_Topic;
+
+    response->setLength();
+    request->send(response);
+}
+
+void WebApiClass::onMqttAdminGet(AsyncWebServerRequest* request)
+{
+    AsyncJsonResponse* response = new AsyncJsonResponse();
+    JsonObject root = response->getRoot();
+    CONFIG_T& config = Configuration.get();
+
+    root[F("mqtt_enabled")] = config.Mqtt_Enabled;
+    root[F("mqtt_hostname")] = config.Mqtt_Hostname;
+    root[F("mqtt_port")] = config.Mqtt_Port;
+    root[F("mqtt_username")] = config.Mqtt_Username;
+    root[F("mqtt_password")] = config.Mqtt_Password;
+    root[F("mqtt_topic")] = config.Mqtt_Topic;
+
+    response->setLength();
+    request->send(response);
+}
+
+void WebApiClass::onMqttAdminPost(AsyncWebServerRequest* request)
+{
+    AsyncJsonResponse* response = new AsyncJsonResponse();
+    JsonObject retMsg = response->getRoot();
+    retMsg[F("type")] = F("warning");
+
+    if (!request->hasParam("data", true)) {
+        retMsg[F("message")] = F("No values found!");
+        response->setLength();
+        request->send(response);
+        return;
+    }
+
+    String json = request->getParam("data", true)->value();
+
+    if (json.length() > 1024) {
+        retMsg[F("message")] = F("Data too large!");
+        response->setLength();
+        request->send(response);
+        return;
+    }
+
+    DynamicJsonDocument root(1024);
+    DeserializationError error = deserializeJson(root, json);
+
+    if (error) {
+        retMsg[F("message")] = F("Failed to parse data!");
+        response->setLength();
+        request->send(response);
+        return;
+    }
+
+    CONFIG_T& config = Configuration.get();
+
+    // Configuration.write();
+
+    retMsg[F("type")] = F("success");
+    retMsg[F("message")] = F("Settings saved!");
+
+    response->setLength();
+    request->send(response);
 }
 
 WebApiClass WebApi;
