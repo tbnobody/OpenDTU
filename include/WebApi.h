@@ -15,14 +15,13 @@ private:
     void onWebsocketEvent(AsyncWebSocket* server, AsyncWebSocketClient* client, AwsEventType type, void* arg, uint8_t* data, size_t len);
 
     void onNotFound(AsyncWebServerRequest* request);
+    void onSystemStatus(AsyncWebServerRequest* request);
 
     void onNetworkStatus(AsyncWebServerRequest* request);
-    void onSystemStatus(AsyncWebServerRequest* request);
-    void onNtpStatus(AsyncWebServerRequest* request);
-
     void onNetworkAdminGet(AsyncWebServerRequest* request);
     void onNetworkAdminPost(AsyncWebServerRequest* request);
 
+    void onNtpStatus(AsyncWebServerRequest* request);
     void onNtpAdminGet(AsyncWebServerRequest* request);
     void onNtpAdminPost(AsyncWebServerRequest* request);
 };
