@@ -20,3 +20,10 @@
 #define NTP_SERVER "pool.ntp.org"
 #define NTP_TIMEZONE "CET-1CEST,M3.5.0,M10.5.0/3"
 #define NTP_TIMEZONEDESCR "Europe/Berlin"
+
+#define MQTT_ENABLED false
+#define MQTT_HOST ""
+#define MQTT_PORT 1883
+#define MQTT_USER ""
+#define MQTT_PASSWORD ""
+#define MQTT_TOPIC "stripe/"

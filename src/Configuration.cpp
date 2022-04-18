@@ -20,6 +20,14 @@ void ConfigurationClass::init()
     strlcpy(config.Ntp_Server, NTP_SERVER, sizeof(config.Ntp_Server));
     strlcpy(config.Ntp_Timezone, NTP_TIMEZONE, sizeof(config.Ntp_Timezone));
     strlcpy(config.Ntp_TimezoneDescr, NTP_TIMEZONEDESCR, sizeof(config.Ntp_TimezoneDescr));
+
+    // MqTT Settings
+    config.Mqtt_Enabled = MQTT_ENABLED;
+    strlcpy(config.Mqtt_Hostname, MQTT_HOST, sizeof(config.Mqtt_Hostname));
+    config.Mqtt_Port = MQTT_PORT;
+    strlcpy(config.Mqtt_Username, MQTT_USER, sizeof(config.Mqtt_Username));
+    strlcpy(config.Mqtt_Password, MQTT_PASSWORD, sizeof(config.Mqtt_Password));
+    strlcpy(config.Mqtt_Topic, MQTT_TOPIC, sizeof(config.Mqtt_Topic));
 }
 
 bool ConfigurationClass::write()
@@ -58,6 +66,16 @@ void ConfigurationClass::migrate()
         strlcpy(config.Ntp_Timezone, NTP_TIMEZONE, sizeof(config.Ntp_Timezone));
         strlcpy(config.Ntp_TimezoneDescr, NTP_TIMEZONEDESCR, sizeof(config.Ntp_TimezoneDescr));
     }
+
+    if (config.Cfg_Version < 0x00010500) {
+        config.Mqtt_Enabled = MQTT_ENABLED;
+        strlcpy(config.Mqtt_Hostname, MQTT_HOST, sizeof(config.Mqtt_Hostname));
+        config.Mqtt_Port = MQTT_PORT;
+        strlcpy(config.Mqtt_Username, MQTT_USER, sizeof(config.Mqtt_Username));
+        strlcpy(config.Mqtt_Password, MQTT_PASSWORD, sizeof(config.Mqtt_Password));
+        strlcpy(config.Mqtt_Topic, MQTT_TOPIC, sizeof(config.Mqtt_Topic));
+    }
+
     config.Cfg_Version = CONFIG_VERSION;
     write();
 }

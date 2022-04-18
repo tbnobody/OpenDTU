@@ -1,4 +1,5 @@
 #include "Configuration.h"
+#include "MqttSettings.h"
 #include "NtpSettings.h"
 #include "WebApi.h"
 #include "WiFiSettings.h"
@@ -49,6 +50,11 @@ void setup()
     // Initialize NTP
     Serial.print(F("Initialize NTP... "));
     NtpSettings.init();
+    Serial.println(F("done"));
+
+    // Initialize MqTT
+    Serial.print(F("Initialize MqTT... "));
+    MqttSettings.init();
     Serial.println(F("done"));
 
     // Initialize WebApi
