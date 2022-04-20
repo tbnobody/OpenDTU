@@ -1,0 +1,167 @@
+<template>
+  <div class="container" role="main">
+    <div class="page-header">
+      <h1>MqTT Settings</h1>
+    </div>
+    <BootstrapAlert v-model="showAlert" dismissible :variant="alertType">
+      {{ this.alertMessage }}
+    </BootstrapAlert>
+    <form @submit="saveMqttConfig">
+      <div class="card">
+        <div class="card-header text-white bg-primary">MqTT Configuration</div>
+        <div class="card-body">
+          <div class="form-check form-switch">
+            <input
+              class="form-check-input"
+              type="checkbox"
+              id="inputMqtt"
+              v-model="mqttConfigList.mqtt_enabled"
+            />
+            <label class="form-check-label" for="inputMqtt">Enable MqTT</label>
+          </div>
+        </div>
+      </div>
+      <div class="card" v-show="mqttConfigList.mqtt_enabled">
+        <div class="card-header text-white bg-primary">MqTT Broker Parameter</div>
+        <div class="card-body">
+
+          <div class="row mb-3">
+            <label for="inputHostname" class="col-sm-2 col-form-label"
+              >Hostname:</label
+            >
+            <div class="col-sm-10">
+              <input
+                type="text"
+                class="form-control"
+                id="inputHostname"
+                maxlength="32"
+                placeholder="Hostname or IP address"
+                v-model="mqttConfigList.mqtt_hostname"
+              />
+            </div>
+          </div>
+
+          <div class="row mb-3">
+            <label for="inputPort" class="col-sm-2 col-form-label"
+              >Port:</label
+            >
+            <div class="col-sm-10">
+              <input
+                type="number"
+                class="form-control"
+                id="inputPort"
+                min="1"
+                max="65535"
+                placeholder="Port number"
+                v-model="mqttConfigList.mqtt_port"
+              />
+            </div>
+          </div>
+
+          <div class="row mb-3">
+            <label for="inputUsername" class="col-sm-2 col-form-label"
+              >Username:</label
+            >
+            <div class="col-sm-10">
+              <input
+                type="text"
+                class="form-control"
+                id="inputUsername"
+                maxlength="32"
+                placeholder="Username, leave empty for anonymous connection"
+                v-model="mqttConfigList.mqtt_username"
+              />
+            </div>
+          </div>
+
+          <div class="row mb-3">
+            <label for="inputPassword" class="col-sm-2 col-form-label"
+              >Password:</label
+            >
+            <div class="col-sm-10">
+              <input
+                type="text"
+                class="form-control"
+                id="inputPassword"
+                maxlength="32"
+                placeholder="Password, leave empty for anonymous connection"
+                v-model="mqttConfigList.mqtt_password"
+              />
+            </div>
+          </div>
+
+          <div class="row mb-3">
+            <label for="inputTopic" class="col-sm-2 col-form-label"
+              >Base Topic:</label
+            >
+            <div class="col-sm-10">
+              <input
+                type="text"
+                class="form-control"
+                id="inputTopic"
+                maxlength="32"
+                placeholder="Base topic, will be prepend to all published topics (e.g. inverter/)"
+                v-model="mqttConfigList.mqtt_topic"
+              />
+            </div>
+          </div>
+
+        </div>
+      </div>
+      <button type="submit" class="btn btn-primary mb-3">Save</button>
+    </form>
+  </div>
+</template>
+
+<script>
+import BootstrapAlert from "@/components/partials/BootstrapAlert.vue";
+
+export default {
+  components: {
+    BootstrapAlert,
+  },
+  data() {
+    return {
+      mqttConfigList: [],
+      alertMessage: "",
+      alertType: "info",
+      showAlert: false,
+    };
+  },
+  created() {
+    this.getMqttConfig();
+  },
+  methods: {
+    getMqttConfig() {
+      fetch("/api/mqtt/config")
+        .then((response) => response.json())
+        .then((data) => (this.mqttConfigList = data));
+    },
+    saveMqttConfig(e) {
+      e.preventDefault();
+
+      let formData = new FormData();
+      formData.append("data", JSON.stringify(this.mqttConfigList));
+
+      fetch("/api/mqtt/config", {
+        method: "POST",
+        body: formData,
+      })
+        .then(function (response) {
+          if (response.status != 200) {
+            throw response.status;
+          } else {
+            return response.json();
+          }
+        })
+        .then(
+          function (response) {
+            this.alertMessage = response.message;
+            this.alertType = response.type;
+            this.showAlert = true;
+          }.bind(this)
+        );
+    },
+  },
+};
+</script>

@@ -40,6 +40,11 @@
                   >NTP Settings</router-link
                 >
               </li>
+              <li>
+                <router-link class="dropdown-item" to="/settings/mqtt"
+                  >MqTT Settings</router-link
+                >
+              </li>
             </ul>
           </li>
           <li class="nav-item dropdown">
