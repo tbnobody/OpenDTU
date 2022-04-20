@@ -7,6 +7,7 @@ import NtpInfoView from '@/components/NtpInfoView'
 import NetworkAdminView from '@/components/NetworkAdminView'
 import NtpAdminView from '@/components/NtpAdminView'
 import MqttAdminView from '@/components/MqttAdminView'
+import MqttInfoView from '@/components/MqttInfoView'
 
 const routes = [{
         path: '/',
@@ -32,6 +33,11 @@ const routes = [{
         path: '/info/ntp',
         name: 'NTP',
         component: NtpInfoView
+    },
+    {
+        path: '/info/mqtt',
+        name: 'MqTT',
+        component: MqttInfoView
     },
     {
         path: '/settings/network',

@@ -74,6 +74,11 @@
                   >NTP</router-link
                 >
               </li>
+              <li>
+                <router-link class="dropdown-item" to="/info/mqtt"
+                  >MqTT</router-link
+                >
+              </li>
             </ul>
           </li>
           <li class="nav-item">
