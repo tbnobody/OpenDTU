@@ -41,8 +41,48 @@
                   <th>Base Topic</th>
                   <td>{{ mqttDataList.mqtt_topic }}</td>
                 </tr>
+                <tr>
+                  <th>Retain</th>
+                  <td
+                    class="badge"
+                    :class="{
+                      'bg-danger': !mqttDataList.mqtt_retain,
+                      'bg-success': mqttDataList.mqtt_retain,
+                    }"
+                  >
+                    <span v-if="mqttDataList.mqtt_retain">enabled</span>
+                    <span v-else>disabled</span>
+                  </td>
+                </tr>
               </tbody>
             </table>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header text-white bg-primary">
+            Runtime Summary
+          </div>
+          <div class="card-body">
+            <div class="table-responsive">
+              <table class="table table-hover table-condensed">
+                <tbody>
+                  <tr>
+                    <th>Connection Status</th>
+                    <td
+                      class="badge"
+                      :class="{
+                        'bg-danger': !mqttDataList.mqtt_connected,
+                        'bg-success': mqttDataList.mqtt_connected,
+                      }"
+                    >
+                      <span v-if="mqttDataList.mqtt_connected">connected</span>
+                      <span v-else>disconnected</span>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
       </div>

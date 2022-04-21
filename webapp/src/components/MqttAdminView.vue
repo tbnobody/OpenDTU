@@ -22,9 +22,10 @@
         </div>
       </div>
       <div class="card" v-show="mqttConfigList.mqtt_enabled">
-        <div class="card-header text-white bg-primary">MqTT Broker Parameter</div>
+        <div class="card-header text-white bg-primary">
+          MqTT Broker Parameter
+        </div>
         <div class="card-body">
-
           <div class="row mb-3">
             <label for="inputHostname" class="col-sm-2 col-form-label"
               >Hostname:</label
@@ -42,9 +43,7 @@
           </div>
 
           <div class="row mb-3">
-            <label for="inputPort" class="col-sm-2 col-form-label"
-              >Port:</label
-            >
+            <label for="inputPort" class="col-sm-2 col-form-label">Port:</label>
             <div class="col-sm-10">
               <input
                 type="number"
@@ -106,6 +105,21 @@
             </div>
           </div>
 
+          <div class="row mb-3">
+            <label class="col-sm-2 form-check-label" for="inputRetain"
+              >Enable Retain Flag</label
+            >
+            <div class="col-sm-10">
+              <div class="form-check form-switch">
+                <input
+                  class="form-check-input"
+                  type="checkbox"
+                  id="inputRetain"
+                  v-model="mqttConfigList.mqtt_retain"
+                />
+              </div>
+            </div>
+          </div>
         </div>
       </div>
       <button type="submit" class="btn btn-primary mb-3">Save</button>
