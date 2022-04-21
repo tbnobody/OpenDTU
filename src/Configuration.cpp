@@ -28,6 +28,7 @@ void ConfigurationClass::init()
     strlcpy(config.Mqtt_Username, MQTT_USER, sizeof(config.Mqtt_Username));
     strlcpy(config.Mqtt_Password, MQTT_PASSWORD, sizeof(config.Mqtt_Password));
     strlcpy(config.Mqtt_Topic, MQTT_TOPIC, sizeof(config.Mqtt_Topic));
+    config.Mqtt_Retain = true;
 }
 
 bool ConfigurationClass::write()
@@ -74,6 +75,10 @@ void ConfigurationClass::migrate()
         strlcpy(config.Mqtt_Username, MQTT_USER, sizeof(config.Mqtt_Username));
         strlcpy(config.Mqtt_Password, MQTT_PASSWORD, sizeof(config.Mqtt_Password));
         strlcpy(config.Mqtt_Topic, MQTT_TOPIC, sizeof(config.Mqtt_Topic));
+    }
+
+    if (config.Cfg_Version < 0x00010600) {
+        config.Mqtt_Retain = true;
     }
 
     config.Cfg_Version = CONFIG_VERSION;
