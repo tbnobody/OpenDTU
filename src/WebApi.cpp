@@ -406,6 +406,8 @@ void WebApiClass::onMqttStatus(AsyncWebServerRequest* request)
     root[F("mqtt_port")] = config.Mqtt_Port;
     root[F("mqtt_username")] = config.Mqtt_Username;
     root[F("mqtt_topic")] = config.Mqtt_Topic;
+    root[F("mqtt_connected")] = MqttSettings.getConnected();
+    root[F("mqtt_retain")] = config.Mqtt_Retain;
 
     response->setLength();
     request->send(response);
@@ -423,6 +425,7 @@ void WebApiClass::onMqttAdminGet(AsyncWebServerRequest* request)
     root[F("mqtt_username")] = config.Mqtt_Username;
     root[F("mqtt_password")] = config.Mqtt_Password;
     root[F("mqtt_topic")] = config.Mqtt_Topic;
+    root[F("mqtt_retain")] = config.Mqtt_Retain;
 
     response->setLength();
     request->send(response);
@@ -460,7 +463,7 @@ void WebApiClass::onMqttAdminPost(AsyncWebServerRequest* request)
         return;
     }
 
-    if (!(root.containsKey("mqtt_enabled") && root.containsKey("mqtt_hostname") && root.containsKey("mqtt_port") && root.containsKey("mqtt_username") && root.containsKey("mqtt_password") && root.containsKey("mqtt_topic"))) {
+    if (!(root.containsKey("mqtt_enabled") && root.containsKey("mqtt_hostname") && root.containsKey("mqtt_port") && root.containsKey("mqtt_username") && root.containsKey("mqtt_password") && root.containsKey("mqtt_topic") && root.containsKey("mqtt_retain"))) {
         retMsg[F("message")] = F("Values are missing!");
         response->setLength();
         request->send(response);
@@ -504,6 +507,7 @@ void WebApiClass::onMqttAdminPost(AsyncWebServerRequest* request)
 
     CONFIG_T& config = Configuration.get();
     config.Mqtt_Enabled = root[F("mqtt_enabled")].as<bool>();
+    config.Mqtt_Retain = root[F("mqtt_retain")].as<bool>();
     config.Mqtt_Port = root[F("mqtt_port")].as<uint>();
     strcpy(config.Mqtt_Hostname, root[F("mqtt_hostname")].as<String>().c_str());
     strcpy(config.Mqtt_Username, root[F("mqtt_username")].as<String>().c_str());
