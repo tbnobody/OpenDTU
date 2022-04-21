@@ -2,6 +2,7 @@
 #include "ArduinoJson.h"
 #include "AsyncJson.h"
 #include "Configuration.h"
+#include "MqttSettings.h"
 #include "NtpSettings.h"
 #include "WiFiSettings.h"
 #include "defaults.h"
@@ -459,15 +460,64 @@ void WebApiClass::onMqttAdminPost(AsyncWebServerRequest* request)
         return;
     }
 
-    CONFIG_T& config = Configuration.get();
+    if (!(root.containsKey("mqtt_enabled") && root.containsKey("mqtt_hostname") && root.containsKey("mqtt_port") && root.containsKey("mqtt_username") && root.containsKey("mqtt_password") && root.containsKey("mqtt_topic"))) {
+        retMsg[F("message")] = F("Values are missing!");
+        response->setLength();
+        request->send(response);
+        return;
+    }
 
-    // Configuration.write();
+    if (root[F("mqtt_enabled")].as<bool>()) {
+        if (root[F("mqtt_hostname")].as<String>().length() == 0 || root[F("mqtt_hostname")].as<String>().length() > MQTT_MAX_HOSTNAME_STRLEN) {
+            retMsg[F("message")] = F("MqTT Server must between 1 and " STR(MQTT_MAX_HOSTNAME_STRLEN) " characters long!");
+            response->setLength();
+            request->send(response);
+            return;
+        }
+
+        if (root[F("mqtt_username")].as<String>().length() > MQTT_MAX_USERNAME_STRLEN) {
+            retMsg[F("message")] = F("Username must not longer then " STR(MQTT_MAX_USERNAME_STRLEN) " characters!");
+            response->setLength();
+            request->send(response);
+            return;
+        }
+        if (root[F("mqtt_password")].as<String>().length() > MQTT_MAX_PASSWORD_STRLEN) {
+            retMsg[F("message")] = F("Password must not longer then " STR(MQTT_MAX_PASSWORD_STRLEN) " characters!");
+            response->setLength();
+            request->send(response);
+            return;
+        }
+        if (root[F("mqtt_topic")].as<String>().length() > MQTT_MAX_TOPIC_STRLEN) {
+            retMsg[F("message")] = F("Topic must not longer then " STR(MQTT_MAX_TOPIC_STRLEN) " characters!");
+            response->setLength();
+            request->send(response);
+            return;
+        }
+
+        if (root[F("mqtt_port")].as<uint>() == 0 || root[F("mqtt_port")].as<uint>() > 65535) {
+            retMsg[F("message")] = F("Port must be a number between 1 and 65535!");
+            response->setLength();
+            request->send(response);
+            return;
+        }
+    }
+
+    CONFIG_T& config = Configuration.get();
+    config.Mqtt_Enabled = root[F("mqtt_enabled")].as<bool>();
+    config.Mqtt_Port = root[F("mqtt_port")].as<uint>();
+    strcpy(config.Mqtt_Hostname, root[F("mqtt_hostname")].as<String>().c_str());
+    strcpy(config.Mqtt_Username, root[F("mqtt_username")].as<String>().c_str());
+    strcpy(config.Mqtt_Password, root[F("mqtt_password")].as<String>().c_str());
+    strcpy(config.Mqtt_Topic, root[F("mqtt_topic")].as<String>().c_str());
+    Configuration.write();
 
     retMsg[F("type")] = F("success");
     retMsg[F("message")] = F("Settings saved!");
 
     response->setLength();
     request->send(response);
+
+    MqttSettings.performReconnect();
 }
 
 WebApiClass WebApi;
