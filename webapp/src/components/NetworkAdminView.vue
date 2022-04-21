@@ -58,14 +58,20 @@
             </div>
           </div>
 
-          <div class="form-check form-switch">
-            <input
-              class="form-check-input"
-              type="checkbox"
-              id="inputDHCP"
-              v-model="networkConfigList.dhcp"
-            />
-            <label class="form-check-label" for="inputDHCP">Enable DHCP</label>
+          <div class="row mb-3">
+            <label class="col-sm-2 form-check-label" for="inputDHCP"
+              >Enable DHCP</label
+            >
+            <div class="col-sm-10">
+              <div class="form-check form-switch">
+                <input
+                  class="form-check-input"
+                  type="checkbox"
+                  id="inputDHCP"
+                  v-model="networkConfigList.dhcp"
+                />
+              </div>
+            </div>
           </div>
         </div>
       </div>
