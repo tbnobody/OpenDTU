@@ -27,7 +27,8 @@ void MqttSettingsClass::WiFiEvent(WiFiEvent_t event)
 void MqttSettingsClass::onMqttConnect(bool sessionPresent)
 {
     Serial.println(F("Connected to MQTT."));
-    mqttClient.publish(willTopic.c_str(), 2, Configuration.get().Mqtt_Retain, "online");
+    CONFIG_T& config = Configuration.get();
+    publish(config.Mqtt_LwtTopic, config.Mqtt_LwtValue_Online);
 }
 
 void MqttSettingsClass::onMqttDisconnect(AsyncMqttClientDisconnectReason reason)
@@ -46,8 +47,8 @@ void MqttSettingsClass::performConnect()
         mqttClient.setServer(config.Mqtt_Hostname, config.Mqtt_Port);
         mqttClient.setCredentials(config.Mqtt_Username, config.Mqtt_Password);
 
-        willTopic = String(config.Mqtt_Topic) + "status";
-        mqttClient.setWill(willTopic.c_str(), 2, Configuration.get().Mqtt_Retain, "offline");
+        willTopic = String(config.Mqtt_Topic) + config.Mqtt_LwtTopic;
+        mqttClient.setWill(willTopic.c_str(), 2, config.Mqtt_Retain, config.Mqtt_LwtValue_Offline);
 
         clientId = WiFiSettings.getApName();
         mqttClient.setClientId(clientId.c_str());
@@ -58,7 +59,8 @@ void MqttSettingsClass::performConnect()
 
 void MqttSettingsClass::performDisconnect()
 {
-    mqttClient.publish(willTopic.c_str(), 2, Configuration.get().Mqtt_Retain, "offline");
+    CONFIG_T& config = Configuration.get();
+    publish(config.Mqtt_LwtTopic, config.Mqtt_LwtValue_Offline);
     mqttClient.disconnect();
 }
 

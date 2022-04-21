@@ -28,7 +28,10 @@ void ConfigurationClass::init()
     strlcpy(config.Mqtt_Username, MQTT_USER, sizeof(config.Mqtt_Username));
     strlcpy(config.Mqtt_Password, MQTT_PASSWORD, sizeof(config.Mqtt_Password));
     strlcpy(config.Mqtt_Topic, MQTT_TOPIC, sizeof(config.Mqtt_Topic));
-    config.Mqtt_Retain = true;
+    config.Mqtt_Retain = MQTT_RETAIN;
+    strlcpy(config.Mqtt_LwtTopic, MQTT_LWT_TOPIC, sizeof(config.Mqtt_LwtTopic));
+    strlcpy(config.Mqtt_LwtValue_Online, MQTT_LWT_ONLINE, sizeof(config.Mqtt_LwtValue_Online));
+    strlcpy(config.Mqtt_LwtValue_Offline, MQTT_LWT_OFFLINE, sizeof(config.Mqtt_LwtValue_Offline));
 }
 
 bool ConfigurationClass::write()
@@ -78,7 +81,13 @@ void ConfigurationClass::migrate()
     }
 
     if (config.Cfg_Version < 0x00010600) {
-        config.Mqtt_Retain = true;
+        config.Mqtt_Retain = MQTT_RETAIN;
+    }
+
+    if (config.Cfg_Version < 0x00010700) {
+        strlcpy(config.Mqtt_LwtTopic, MQTT_LWT_TOPIC, sizeof(config.Mqtt_LwtTopic));
+        strlcpy(config.Mqtt_LwtValue_Online, MQTT_LWT_ONLINE, sizeof(config.Mqtt_LwtValue_Online));
+        strlcpy(config.Mqtt_LwtValue_Offline, MQTT_LWT_OFFLINE, sizeof(config.Mqtt_LwtValue_Offline));
     }
 
     config.Cfg_Version = CONFIG_VERSION;
