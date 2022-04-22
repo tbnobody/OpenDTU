@@ -122,6 +122,63 @@
           </div>
         </div>
       </div>
+
+      <div class="card" v-show="mqttConfigList.mqtt_enabled">
+        <div class="card-header text-white bg-primary">LWT Parameters</div>
+        <div class="card-body">
+          <div class="row mb-3">
+            <label for="inputLwtTopic" class="col-sm-2 col-form-label"
+              >LWT Topic:</label
+            >
+            <div class="input-group col-sm-10">
+              <span class="input-group-text" id="basic-addon3"
+                >{{ mqttConfigList.mqtt_topic }}</span
+              >
+                <input
+                  type="text"
+                  class="form-control"
+                  id="inputLwtTopic"
+                  maxlength="32"
+                  placeholder="LWT topic, will be append base topic"
+                  v-model="mqttConfigList.mqtt_lwt_topic"
+                  aria-describedby="basic-addon3"
+                />
+            </div>
+          </div>
+
+          <div class="row mb-3">
+            <label for="inputLwtOnline" class="col-sm-2 col-form-label"
+              >LWT Online message:</label
+            >
+            <div class="col-sm-10">
+              <input
+                type="text"
+                class="form-control"
+                id="inputLwtOnline"
+                maxlength="20"
+                placeholder="Message that will be published to LWT topic when online"
+                v-model="mqttConfigList.mqtt_lwt_online"
+              />
+            </div>
+          </div>
+
+          <div class="row mb-3">
+            <label for="inputLwtOffline" class="col-sm-2 col-form-label"
+              >LWT Offline message:</label
+            >
+            <div class="col-sm-10">
+              <input
+                type="text"
+                class="form-control"
+                id="inputLwtOffline"
+                maxlength="20"
+                placeholder="Message that will be published to LWT topic when offline"
+                v-model="mqttConfigList.mqtt_lwt_offline"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
       <button type="submit" class="btn btn-primary mb-3">Save</button>
     </form>
   </div>
