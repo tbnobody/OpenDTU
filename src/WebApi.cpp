@@ -408,6 +408,7 @@ void WebApiClass::onMqttStatus(AsyncWebServerRequest* request)
     root[F("mqtt_topic")] = config.Mqtt_Topic;
     root[F("mqtt_connected")] = MqttSettings.getConnected();
     root[F("mqtt_retain")] = config.Mqtt_Retain;
+    root[F("mqtt_lwt_topic")] = String(config.Mqtt_Topic) + config.Mqtt_LwtTopic;
 
     response->setLength();
     request->send(response);
@@ -426,6 +427,9 @@ void WebApiClass::onMqttAdminGet(AsyncWebServerRequest* request)
     root[F("mqtt_password")] = config.Mqtt_Password;
     root[F("mqtt_topic")] = config.Mqtt_Topic;
     root[F("mqtt_retain")] = config.Mqtt_Retain;
+    root[F("mqtt_lwt_topic")] = config.Mqtt_LwtTopic;
+    root[F("mqtt_lwt_online")] = config.Mqtt_LwtValue_Online;
+    root[F("mqtt_lwt_offline")] = config.Mqtt_LwtValue_Offline;
 
     response->setLength();
     request->send(response);
@@ -463,7 +467,7 @@ void WebApiClass::onMqttAdminPost(AsyncWebServerRequest* request)
         return;
     }
 
-    if (!(root.containsKey("mqtt_enabled") && root.containsKey("mqtt_hostname") && root.containsKey("mqtt_port") && root.containsKey("mqtt_username") && root.containsKey("mqtt_password") && root.containsKey("mqtt_topic") && root.containsKey("mqtt_retain"))) {
+    if (!(root.containsKey("mqtt_enabled") && root.containsKey("mqtt_hostname") && root.containsKey("mqtt_port") && root.containsKey("mqtt_username") && root.containsKey("mqtt_password") && root.containsKey("mqtt_topic") && root.containsKey("mqtt_retain") && root.containsKey("mqtt_lwt_topic") && root.containsKey("mqtt_lwt_online") && root.containsKey("mqtt_lwt_offline"))) {
         retMsg[F("message")] = F("Values are missing!");
         response->setLength();
         request->send(response);
@@ -503,6 +507,27 @@ void WebApiClass::onMqttAdminPost(AsyncWebServerRequest* request)
             request->send(response);
             return;
         }
+
+        if (root[F("mqtt_lwt_topic")].as<String>().length() > MQTT_MAX_TOPIC_STRLEN) {
+            retMsg[F("message")] = F("LWT topic must not longer then " STR(MQTT_MAX_TOPIC_STRLEN) " characters!");
+            response->setLength();
+            request->send(response);
+            return;
+        }
+
+        if (root[F("mqtt_lwt_online")].as<String>().length() > MQTT_MAX_LWTVALUE_STRLEN) {
+            retMsg[F("message")] = F("LWT online value must not longer then " STR(MQTT_MAX_LWTVALUE_STRLEN) " characters!");
+            response->setLength();
+            request->send(response);
+            return;
+        }
+
+        if (root[F("mqtt_lwt_offline")].as<String>().length() > MQTT_MAX_LWTVALUE_STRLEN) {
+            retMsg[F("message")] = F("LWT offline value must not longer then " STR(MQTT_MAX_LWTVALUE_STRLEN) " characters!");
+            response->setLength();
+            request->send(response);
+            return;
+        }
     }
 
     CONFIG_T& config = Configuration.get();
@@ -513,6 +538,9 @@ void WebApiClass::onMqttAdminPost(AsyncWebServerRequest* request)
     strcpy(config.Mqtt_Username, root[F("mqtt_username")].as<String>().c_str());
     strcpy(config.Mqtt_Password, root[F("mqtt_password")].as<String>().c_str());
     strcpy(config.Mqtt_Topic, root[F("mqtt_topic")].as<String>().c_str());
+    strcpy(config.Mqtt_LwtTopic, root[F("mqtt_lwt_topic")].as<String>().c_str());
+    strcpy(config.Mqtt_LwtValue_Online, root[F("mqtt_lwt_online")].as<String>().c_str());
+    strcpy(config.Mqtt_LwtValue_Offline, root[F("mqtt_lwt_offline")].as<String>().c_str());
     Configuration.write();
 
     retMsg[F("type")] = F("success");
