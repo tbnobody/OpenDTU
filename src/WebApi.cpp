@@ -122,6 +122,8 @@ void WebApiClass::onSystemStatus(AsyncWebServerRequest* request)
     sprintf(version, "%d.%d.%d", CONFIG_VERSION >> 24 & 0xff, CONFIG_VERSION >> 16 & 0xff, CONFIG_VERSION >> 8 & 0xff);
     root[F("firmware_version")] = version;
 
+    root[F("uptime")] = esp_timer_get_time() / 1000000;
+
     response->setLength();
     request->send(response);
 }
