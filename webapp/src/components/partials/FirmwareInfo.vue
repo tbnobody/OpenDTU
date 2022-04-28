@@ -55,7 +55,8 @@ export default {
   computed: {
     timeInHours() {
       return (value) => {
-        let hours = parseInt(Math.floor(value / 3600));
+        let days = parseInt(Math.floor(value / 3600 / 24));
+        let hours = parseInt(Math.floor((value - days * 3600 * 24) / 3600));
         let minutes = parseInt(Math.floor((value - hours * 3600) / 60));
         let seconds = parseInt((value - (hours * 3600 + minutes * 60)) % 60);
 
@@ -63,7 +64,7 @@ export default {
         let dMins = minutes > 9 ? minutes : "0" + minutes;
         let dSecs = seconds > 9 ? seconds : "0" + seconds;
 
-        return dHours + ":" + dMins + ":" + dSecs;
+        return days + " days " + dHours + ":" + dMins + ":" + dSecs;
       };
     },
   },
