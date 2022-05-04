@@ -3,7 +3,7 @@
 #include <Arduino.h>
 
 #define CONFIG_FILENAME "/config.bin"
-#define CONFIG_VERSION 0x00010700 // 0.1.7 // make sure to clean all after change
+#define CONFIG_VERSION 0x00010800 // 0.1.8 // make sure to clean all after change
 
 #define WIFI_MAX_SSID_STRLEN 31
 #define WIFI_MAX_PASSWORD_STRLEN 31
@@ -18,6 +18,14 @@
 #define MQTT_MAX_PASSWORD_STRLEN 32
 #define MQTT_MAX_TOPIC_STRLEN 32
 #define MQTT_MAX_LWTVALUE_STRLEN 20
+
+#define INV_MAX_NAME_STRLEN 31
+#define INV_MAX_COUNT 10
+
+struct INVERTER_CONFIG_T {
+    uint64_t Serial;
+    char Name[INV_MAX_NAME_STRLEN + 1];
+};
 
 struct CONFIG_T {
     uint32_t Cfg_Version;
@@ -47,6 +55,8 @@ struct CONFIG_T {
     char Mqtt_LwtTopic[MQTT_MAX_TOPIC_STRLEN + 1];
     char Mqtt_LwtValue_Online[MQTT_MAX_LWTVALUE_STRLEN + 1];
     char Mqtt_LwtValue_Offline[MQTT_MAX_LWTVALUE_STRLEN + 1];
+
+    INVERTER_CONFIG_T Inverter[INV_MAX_COUNT];
 };
 
 class ConfigurationClass {
@@ -56,6 +66,8 @@ public:
     bool write();
     void migrate();
     CONFIG_T& get();
+
+    INVERTER_CONFIG_T* getFreeInverterSlot();
 };
 
 extern ConfigurationClass Configuration;

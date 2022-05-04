@@ -40,6 +40,11 @@ void WebApiClass::init()
     _server.on("/api/mqtt/config", HTTP_GET, std::bind(&WebApiClass::onMqttAdminGet, this, _1));
     _server.on("/api/mqtt/config", HTTP_POST, std::bind(&WebApiClass::onMqttAdminPost, this, _1));
 
+    _server.on("/api/inverter/list", HTTP_GET, std::bind(&WebApiClass::onInverterList, this, _1));
+    _server.on("/api/inverter/add", HTTP_POST, std::bind(&WebApiClass::onInverterAdd, this, _1));
+    _server.on("/api/inverter/edit", HTTP_POST, std::bind(&WebApiClass::onInverterEdit, this, _1));
+    _server.on("/api/inverter/del", HTTP_POST, std::bind(&WebApiClass::onInverterDelete, this, _1));
+
     _server.serveStatic("/", LittleFS, "/", "max-age=86400").setDefaultFile("index.html");
     _server.onNotFound(std::bind(&WebApiClass::onNotFound, this, _1));
     _server.begin();
@@ -552,6 +557,230 @@ void WebApiClass::onMqttAdminPost(AsyncWebServerRequest* request)
     request->send(response);
 
     MqttSettings.performReconnect();
+}
+
+void WebApiClass::onInverterList(AsyncWebServerRequest* request)
+{
+    AsyncJsonResponse* response = new AsyncJsonResponse();
+    JsonObject root = response->getRoot();
+    JsonArray data = root.createNestedArray(F("inverter"));
+
+    CONFIG_T& config = Configuration.get();
+
+    for (uint8_t i = 0; i < INV_MAX_COUNT; i++) {
+        if (config.Inverter[i].Serial > 0) {
+            JsonObject obj = data.createNestedObject();
+            obj[F("id")] = i;
+            obj[F("serial")] = config.Inverter[i].Serial;
+            obj[F("name")] = String(config.Inverter[i].Name);
+        }
+    }
+
+    response->setLength();
+    request->send(response);
+}
+
+void WebApiClass::onInverterAdd(AsyncWebServerRequest* request)
+{
+    AsyncJsonResponse* response = new AsyncJsonResponse();
+    JsonObject retMsg = response->getRoot();
+    retMsg[F("type")] = F("warning");
+
+    if (!request->hasParam("data", true)) {
+        retMsg[F("message")] = F("No values found!");
+        response->setLength();
+        request->send(response);
+        return;
+    }
+
+    String json = request->getParam("data", true)->value();
+
+    if (json.length() > 1024) {
+        retMsg[F("message")] = F("Data too large!");
+        response->setLength();
+        request->send(response);
+        return;
+    }
+
+    DynamicJsonDocument root(1024);
+    DeserializationError error = deserializeJson(root, json);
+
+    if (error) {
+        retMsg[F("message")] = F("Failed to parse data!");
+        response->setLength();
+        request->send(response);
+        return;
+    }
+
+    if (!(root.containsKey("serial") && root.containsKey("name"))) {
+        retMsg[F("message")] = F("Values are missing!");
+        response->setLength();
+        request->send(response);
+        return;
+    }
+
+    if (root[F("serial")].as<uint64_t>() == 0) {
+        retMsg[F("message")] = F("Serial must be a number > 0!");
+        response->setLength();
+        request->send(response);
+        return;
+    }
+
+    if (root[F("name")].as<String>().length() == 0 || root[F("name")].as<String>().length() > INV_MAX_NAME_STRLEN) {
+        retMsg[F("message")] = F("Name must between 1 and " STR(INV_MAX_NAME_STRLEN) " characters long!");
+        response->setLength();
+        request->send(response);
+        return;
+    }
+
+    INVERTER_CONFIG_T* inverter = Configuration.getFreeInverterSlot();
+
+    if (!inverter) {
+        retMsg[F("message")] = F("Only " STR(INV_MAX_COUNT) " inverters are supported!");
+        response->setLength();
+        request->send(response);
+        return;
+    }
+
+    inverter->Serial = root[F("serial")].as<uint64_t>();
+    strncpy(inverter->Name, root[F("name")].as<String>().c_str(), INV_MAX_NAME_STRLEN);
+    Configuration.write();
+
+    retMsg[F("type")] = F("success");
+    retMsg[F("message")] = F("Inverter created!");
+
+    response->setLength();
+    request->send(response);
+}
+
+void WebApiClass::onInverterEdit(AsyncWebServerRequest* request)
+{
+    AsyncJsonResponse* response = new AsyncJsonResponse();
+    JsonObject retMsg = response->getRoot();
+    retMsg[F("type")] = F("warning");
+
+    if (!request->hasParam("data", true)) {
+        retMsg[F("message")] = F("No values found!");
+        response->setLength();
+        request->send(response);
+        return;
+    }
+
+    String json = request->getParam("data", true)->value();
+
+    if (json.length() > 1024) {
+        retMsg[F("message")] = F("Data too large!");
+        response->setLength();
+        request->send(response);
+        return;
+    }
+
+    DynamicJsonDocument root(1024);
+    DeserializationError error = deserializeJson(root, json);
+
+    if (error) {
+        retMsg[F("message")] = F("Failed to parse data!");
+        response->setLength();
+        request->send(response);
+        return;
+    }
+
+    if (!(root.containsKey("id") && root.containsKey("serial") && root.containsKey("name"))) {
+        retMsg[F("message")] = F("Values are missing!");
+        response->setLength();
+        request->send(response);
+        return;
+    }
+
+    if (root[F("id")].as<uint64_t>() > INV_MAX_COUNT - 1) {
+        retMsg[F("message")] = F("Invalid ID specified!");
+        response->setLength();
+        request->send(response);
+        return;
+    }
+
+    if (root[F("serial")].as<uint64_t>() == 0) {
+        retMsg[F("message")] = F("Serial must be a number > 0!");
+        response->setLength();
+        request->send(response);
+        return;
+    }
+
+    if (root[F("name")].as<String>().length() == 0 || root[F("name")].as<String>().length() > INV_MAX_NAME_STRLEN) {
+        retMsg[F("message")] = F("Name must between 1 and " STR(INV_MAX_NAME_STRLEN) " characters long!");
+        response->setLength();
+        request->send(response);
+        return;
+    }
+
+    INVERTER_CONFIG_T& inverter = Configuration.get().Inverter[root[F("id")].as<uint64_t>()];
+    inverter.Serial = root[F("serial")].as<uint64_t>();
+    strncpy(inverter.Name, root[F("name")].as<String>().c_str(), INV_MAX_NAME_STRLEN);
+    Configuration.write();
+
+    retMsg[F("type")] = F("success");
+    retMsg[F("message")] = F("Inverter changed!");
+
+    response->setLength();
+    request->send(response);
+}
+
+void WebApiClass::onInverterDelete(AsyncWebServerRequest* request)
+{
+    AsyncJsonResponse* response = new AsyncJsonResponse();
+    JsonObject retMsg = response->getRoot();
+    retMsg[F("type")] = F("warning");
+
+    if (!request->hasParam("data", true)) {
+        retMsg[F("message")] = F("No values found!");
+        response->setLength();
+        request->send(response);
+        return;
+    }
+
+    String json = request->getParam("data", true)->value();
+
+    if (json.length() > 1024) {
+        retMsg[F("message")] = F("Data too large!");
+        response->setLength();
+        request->send(response);
+        return;
+    }
+
+    DynamicJsonDocument root(1024);
+    DeserializationError error = deserializeJson(root, json);
+
+    if (error) {
+        retMsg[F("message")] = F("Failed to parse data!");
+        response->setLength();
+        request->send(response);
+        return;
+    }
+
+    if (!(root.containsKey("id"))) {
+        retMsg[F("message")] = F("Values are missing!");
+        response->setLength();
+        request->send(response);
+        return;
+    }
+
+    if (root[F("id")].as<uint64_t>() > INV_MAX_COUNT - 1) {
+        retMsg[F("message")] = F("Invalid ID specified!");
+        response->setLength();
+        request->send(response);
+        return;
+    }
+
+    INVERTER_CONFIG_T& inverter = Configuration.get().Inverter[root[F("id")].as<uint64_t>()];
+    inverter.Serial = 0;
+    strncpy(inverter.Name, "", 0);
+    Configuration.write();
+
+    retMsg[F("type")] = F("success");
+    retMsg[F("message")] = F("Inverter deleted!");
+
+    response->setLength();
+    request->send(response);
 }
 
 WebApiClass WebApi;

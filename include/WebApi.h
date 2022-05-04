@@ -28,6 +28,11 @@ private:
     void onMqttStatus(AsyncWebServerRequest* request);
     void onMqttAdminGet(AsyncWebServerRequest* request);
     void onMqttAdminPost(AsyncWebServerRequest* request);
+
+    void onInverterList(AsyncWebServerRequest* request);
+    void onInverterAdd(AsyncWebServerRequest* request);
+    void onInverterEdit(AsyncWebServerRequest* request);
+    void onInverterDelete(AsyncWebServerRequest* request);
 };
 
 extern WebApiClass WebApi;

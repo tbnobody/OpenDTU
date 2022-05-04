@@ -32,6 +32,11 @@ void ConfigurationClass::init()
     strlcpy(config.Mqtt_LwtTopic, MQTT_LWT_TOPIC, sizeof(config.Mqtt_LwtTopic));
     strlcpy(config.Mqtt_LwtValue_Online, MQTT_LWT_ONLINE, sizeof(config.Mqtt_LwtValue_Online));
     strlcpy(config.Mqtt_LwtValue_Offline, MQTT_LWT_OFFLINE, sizeof(config.Mqtt_LwtValue_Offline));
+
+    for (uint8_t i = 0; i < INV_MAX_COUNT; i++) {
+        config.Inverter[i].Serial = 0;
+        strlcpy(config.Inverter[i].Name, "", 0);
+    }
 }
 
 bool ConfigurationClass::write()
@@ -90,6 +95,13 @@ void ConfigurationClass::migrate()
         strlcpy(config.Mqtt_LwtValue_Offline, MQTT_LWT_OFFLINE, sizeof(config.Mqtt_LwtValue_Offline));
     }
 
+    if (config.Cfg_Version < 0x00010800) {
+        for (uint8_t i = 0; i < INV_MAX_COUNT; i++) {
+            config.Inverter[i].Serial = 0;
+            strlcpy(config.Inverter[i].Name, "", 0);
+        }
+    }
+
     config.Cfg_Version = CONFIG_VERSION;
     write();
 }
@@ -97,6 +109,17 @@ void ConfigurationClass::migrate()
 CONFIG_T& ConfigurationClass::get()
 {
     return config;
+}
+
+INVERTER_CONFIG_T* ConfigurationClass::getFreeInverterSlot()
+{
+    for (uint8_t i = 0; i < INV_MAX_COUNT; i++) {
+        if (config.Inverter[i].Serial == 0) {
+            return &config.Inverter[i];
+        }
+    }
+
+    return NULL;
 }
 
 ConfigurationClass Configuration;
