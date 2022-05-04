@@ -8,53 +8,58 @@ import NetworkAdminView from '@/components/NetworkAdminView'
 import NtpAdminView from '@/components/NtpAdminView'
 import MqttAdminView from '@/components/MqttAdminView'
 import MqttInfoView from '@/components/MqttInfoView'
+import InverterAdminView from '@/components/InverterAdminView'
 
 const routes = [{
-        path: '/',
-        name: 'Home',
-        component: HomeView
-    },
-    {
-        path: '/about',
-        name: 'About',
-        component: AboutView
-    },
-    {
-        path: '/info/network',
-        name: 'Network',
-        component: NetworkInfoView
-    },
-    {
-        path: '/info/system',
-        name: 'System',
-        component: SystemInfoView
-    },
-    {
-        path: '/info/ntp',
-        name: 'NTP',
-        component: NtpInfoView
-    },
-    {
-        path: '/info/mqtt',
-        name: 'MqTT',
-        component: MqttInfoView
-    },
-    {
-        path: '/settings/network',
-        name: 'Network Settings',
-        component: NetworkAdminView
-    },
-    {
-        path: '/settings/ntp',
-        name: 'NTP Settings',
-        component: NtpAdminView
-    },
-    {
-        path: '/settings/mqtt',
-        name: 'MqTT Settings',
-        component: MqttAdminView
-    }
-];
+    path: '/',
+    name: 'Home',
+    component: HomeView
+},
+{
+    path: '/about',
+    name: 'About',
+    component: AboutView
+},
+{
+    path: '/info/network',
+    name: 'Network',
+    component: NetworkInfoView
+},
+{
+    path: '/info/system',
+    name: 'System',
+    component: SystemInfoView
+},
+{
+    path: '/info/ntp',
+    name: 'NTP',
+    component: NtpInfoView
+},
+{
+    path: '/info/mqtt',
+    name: 'MqTT',
+    component: MqttInfoView
+},
+{
+    path: '/settings/network',
+    name: 'Network Settings',
+    component: NetworkAdminView
+},
+{
+    path: '/settings/ntp',
+    name: 'NTP Settings',
+    component: NtpAdminView
+},
+{
+    path: '/settings/mqtt',
+    name: 'MqTT Settings',
+    component: MqttAdminView
+},
+{
+    path: '/settings/inverter',
+    name: 'Inverter Settings',
+    component: InverterAdminView
+}];
 
 const router = createRouter({
     history: createWebHistory(),

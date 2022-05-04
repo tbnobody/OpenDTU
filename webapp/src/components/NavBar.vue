@@ -45,6 +45,11 @@
                   >MqTT Settings</router-link
                 >
               </li>
+              <li>
+                <router-link class="dropdown-item" to="/settings/inverter"
+                  >Inverter Settings</router-link
+                >
+              </li>
             </ul>
           </li>
           <li class="nav-item dropdown">
