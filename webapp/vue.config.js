@@ -3,6 +3,7 @@ module.exports = defineConfig({
     transpileDependencies: true,
     productionSourceMap: false,
     outputDir: '../data',
+    filenameHashing: false,
     css: {
         extract: false,
     },
@@ -23,6 +24,6 @@ module.exports = defineConfig({
         }
     },
     devServer: {
-        proxy: 'http://192.168.4.1/'
+        proxy: 'http://192.168.20.110/'
     }
 })
