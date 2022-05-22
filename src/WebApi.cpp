@@ -144,7 +144,7 @@ void WebApiClass::onSystemStatus(AsyncWebServerRequest* request)
 
     root[F("heap_total")] = ESP.getHeapSize();
     root[F("heap_used")] = ESP.getHeapSize() - ESP.getFreeHeap();
-    root[F("sketch_total")] = ESP.getSketchSize() + ESP.getFreeSketchSpace();
+    root[F("sketch_total")] = ESP.getFreeSketchSpace();
     root[F("sketch_used")] = ESP.getSketchSize();
     root[F("littlefs_total")] = LittleFS.totalBytes();
     root[F("littlefs_used")] = LittleFS.usedBytes();
