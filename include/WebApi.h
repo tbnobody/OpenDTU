@@ -33,6 +33,9 @@ private:
     void onInverterAdd(AsyncWebServerRequest* request);
     void onInverterEdit(AsyncWebServerRequest* request);
     void onInverterDelete(AsyncWebServerRequest* request);
+
+    void onFirmwareUpdateFinish(AsyncWebServerRequest* request);
+    void onFirmwareUpdateUpload(AsyncWebServerRequest* request, String filename, size_t index, uint8_t *data, size_t len, bool final);
 };
 
 extern WebApiClass WebApi;

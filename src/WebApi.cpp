@@ -4,6 +4,7 @@
 #include "Configuration.h"
 #include "MqttSettings.h"
 #include "NtpSettings.h"
+#include "Update.h"
 #include "WiFiSettings.h"
 #include "defaults.h"
 #include "helper.h"
@@ -55,32 +56,36 @@ void WebApiClass::init()
     _server.on("/api/inverter/edit", HTTP_POST, std::bind(&WebApiClass::onInverterEdit, this, _1));
     _server.on("/api/inverter/del", HTTP_POST, std::bind(&WebApiClass::onInverterDelete, this, _1));
 
+    _server.on("/api/firmware/update", HTTP_POST,
+        std::bind(&WebApiClass::onFirmwareUpdateFinish, this, _1),
+        std::bind(&WebApiClass::onFirmwareUpdateUpload, this, _1, _2, _3, _4, _5, _6));
+
     _server.on("/", HTTP_GET, [](AsyncWebServerRequest* request) {
-        AsyncWebServerResponse *response = request->beginResponse_P(200, "text/html", file_index_html_start, file_index_html_end - file_index_html_start);
+        AsyncWebServerResponse* response = request->beginResponse_P(200, "text/html", file_index_html_start, file_index_html_end - file_index_html_start);
         response->addHeader("Content-Encoding", "gzip");
         request->send(response);
     });
 
     _server.on("/index.html", HTTP_GET, [](AsyncWebServerRequest* request) {
-        AsyncWebServerResponse *response = request->beginResponse_P(200, "text/html", file_index_html_start, file_index_html_end - file_index_html_start);
+        AsyncWebServerResponse* response = request->beginResponse_P(200, "text/html", file_index_html_start, file_index_html_end - file_index_html_start);
         response->addHeader("Content-Encoding", "gzip");
         request->send(response);
     });
 
     _server.on("/favicon.ico", HTTP_GET, [](AsyncWebServerRequest* request) {
-        AsyncWebServerResponse *response = request->beginResponse_P(200, "image/x-icon", file_favicon_ico_start, file_favicon_ico_end - file_favicon_ico_start);
+        AsyncWebServerResponse* response = request->beginResponse_P(200, "image/x-icon", file_favicon_ico_start, file_favicon_ico_end - file_favicon_ico_start);
         response->addHeader("Content-Encoding", "gzip");
         request->send(response);
     });
 
     _server.on("/zones.json", HTTP_GET, [](AsyncWebServerRequest* request) {
-        AsyncWebServerResponse *response = request->beginResponse_P(200, "application/json", file_zones_json_start, file_zones_json_end - file_zones_json_start);
+        AsyncWebServerResponse* response = request->beginResponse_P(200, "application/json", file_zones_json_start, file_zones_json_end - file_zones_json_start);
         response->addHeader("Content-Encoding", "gzip");
         request->send(response);
     });
 
     _server.on("/js/app.js", HTTP_GET, [](AsyncWebServerRequest* request) {
-        AsyncWebServerResponse *response = request->beginResponse_P(200, "text/javascript", file_app_js_start, file_app_js_end - file_app_js_start);
+        AsyncWebServerResponse* response = request->beginResponse_P(200, "text/javascript", file_app_js_start, file_app_js_end - file_app_js_start);
         response->addHeader("Content-Encoding", "gzip");
         request->send(response);
     });
@@ -820,6 +825,56 @@ void WebApiClass::onInverterDelete(AsyncWebServerRequest* request)
 
     response->setLength();
     request->send(response);
+}
+
+void WebApiClass::onFirmwareUpdateFinish(AsyncWebServerRequest* request)
+{
+    // the request handler is triggered after the upload has finished...
+    // create the response, add header, and send response
+
+    AsyncWebServerResponse* response = request->beginResponse((Update.hasError()) ? 500 : 200, "text/plain", (Update.hasError()) ? "FAIL" : "OK");
+    response->addHeader("Connection", "close");
+    response->addHeader("Access-Control-Allow-Origin", "*");
+    request->send(response);
+    yield();
+    delay(1000);
+    yield();
+    ESP.restart();
+}
+
+void WebApiClass::onFirmwareUpdateUpload(AsyncWebServerRequest* request, String filename, size_t index, uint8_t* data, size_t len, bool final)
+{
+    // Upload handler chunks in data
+    if (!index) {
+        if (!request->hasParam("MD5", true)) {
+            return request->send(400, "text/plain", "MD5 parameter missing");
+        }
+
+        if (!Update.setMD5(request->getParam("MD5", true)->value().c_str())) {
+            return request->send(400, "text/plain", "MD5 parameter invalid");
+        }
+
+        if (!Update.begin(UPDATE_SIZE_UNKNOWN, U_FLASH)) { // Start with max available size
+            Update.printError(Serial);
+            return request->send(400, "text/plain", "OTA could not begin");
+        }
+    }
+
+    // Write chunked data to the free sketch space
+    if (len) {
+        if (Update.write(data, len) != len) {
+            return request->send(400, "text/plain", "OTA could not begin");
+        }
+    }
+
+    if (final) { // if the final flag is set then this is the last frame of data
+        if (!Update.end(true)) { // true to set the size to the current progress
+            Update.printError(Serial);
+            return request->send(400, "text/plain", "Could not end OTA");
+        }
+    } else {
+        return;
+    }
 }
 
 WebApiClass WebApi;
