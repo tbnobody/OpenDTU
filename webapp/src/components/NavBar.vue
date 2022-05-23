@@ -50,6 +50,12 @@
                   >Inverter Settings</router-link
                 >
               </li>
+              <li><hr class="dropdown-divider" /></li>
+              <li>
+                <router-link class="dropdown-item" to="/firmware/upgrade"
+                  >Firmware Upgrade</router-link
+                >
+              </li>
             </ul>
           </li>
           <li class="nav-item dropdown">
