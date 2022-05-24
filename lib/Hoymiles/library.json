@@ -1,0 +1,21 @@
+{
+    "name": "Hoymiles",
+    "keywords": "solar, inverter",
+    "description": "An Arduino for ESP32 solar inverter implementation",
+    "authors": {
+        "name": "Thomas Basler"
+    },
+    "version": "0.0.1",
+    "frameworks": "arduino",
+    "platforms": [
+        "espressif32"
+    ],
+    "dependencies": [
+        {
+            "owner": "nrf24",
+            "name": "RF24",
+            "version": ">=1.4.2",
+            "platforms": "espressif32"
+        }
+    ]
+}
