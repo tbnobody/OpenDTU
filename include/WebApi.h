@@ -34,6 +34,9 @@ private:
     void onInverterEdit(AsyncWebServerRequest* request);
     void onInverterDelete(AsyncWebServerRequest* request);
 
+    void onDtuAdminGet(AsyncWebServerRequest* request);
+    void onDtuAdminPost(AsyncWebServerRequest* request);
+
     void onFirmwareUpdateFinish(AsyncWebServerRequest* request);
     void onFirmwareUpdateUpload(AsyncWebServerRequest* request, String filename, size_t index, uint8_t *data, size_t len, bool final);
 };

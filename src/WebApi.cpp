@@ -56,6 +56,9 @@ void WebApiClass::init()
     _server.on("/api/inverter/edit", HTTP_POST, std::bind(&WebApiClass::onInverterEdit, this, _1));
     _server.on("/api/inverter/del", HTTP_POST, std::bind(&WebApiClass::onInverterDelete, this, _1));
 
+    _server.on("/api/dtu/config", HTTP_GET, std::bind(&WebApiClass::onDtuAdminGet, this, _1));
+    _server.on("/api/dtu/config", HTTP_POST, std::bind(&WebApiClass::onDtuAdminPost, this, _1));
+
     _server.on("/api/firmware/update", HTTP_POST,
         std::bind(&WebApiClass::onFirmwareUpdateFinish, this, _1),
         std::bind(&WebApiClass::onFirmwareUpdateUpload, this, _1, _2, _3, _4, _5, _6));
@@ -875,6 +878,93 @@ void WebApiClass::onFirmwareUpdateUpload(AsyncWebServerRequest* request, String 
     } else {
         return;
     }
+}
+
+void WebApiClass::onDtuAdminGet(AsyncWebServerRequest* request)
+{
+    AsyncJsonResponse* response = new AsyncJsonResponse();
+    JsonObject root = response->getRoot();
+    CONFIG_T& config = Configuration.get();
+
+    root[F("dtu_serial")] = config.Dtu_Serial;
+    root[F("dtu_pollinterval")] = config.Dtu_PollInterval;
+    root[F("dtu_palevel")] = config.Dtu_PaLevel;
+
+    response->setLength();
+    request->send(response);
+}
+
+void WebApiClass::onDtuAdminPost(AsyncWebServerRequest* request)
+{
+    AsyncJsonResponse* response = new AsyncJsonResponse();
+    JsonObject retMsg = response->getRoot();
+    retMsg[F("type")] = F("warning");
+
+    if (!request->hasParam("data", true)) {
+        retMsg[F("message")] = F("No values found!");
+        response->setLength();
+        request->send(response);
+        return;
+    }
+
+    String json = request->getParam("data", true)->value();
+
+    if (json.length() > 1024) {
+        retMsg[F("message")] = F("Data too large!");
+        response->setLength();
+        request->send(response);
+        return;
+    }
+
+    DynamicJsonDocument root(1024);
+    DeserializationError error = deserializeJson(root, json);
+
+    if (error) {
+        retMsg[F("message")] = F("Failed to parse data!");
+        response->setLength();
+        request->send(response);
+        return;
+    }
+
+    if (!(root.containsKey("dtu_serial") && root.containsKey("dtu_pollinterval") && root.containsKey("dtu_palevel"))) {
+        retMsg[F("message")] = F("Values are missing!");
+        response->setLength();
+        request->send(response);
+        return;
+    }
+
+    if (root[F("dtu_serial")].as<uint64_t>() == 0) {
+        retMsg[F("message")] = F("Serial cannot be zero!");
+        response->setLength();
+        request->send(response);
+        return;
+    }
+
+    if (root[F("dtu_pollinterval")].as<uint32_t>() == 0) {
+        retMsg[F("message")] = F("Poll intervall must be greater zero!");
+        response->setLength();
+        request->send(response);
+        return;
+    }
+
+    if (root[F("dtu_palevel")].as<uint8_t>() > 3) {
+        retMsg[F("message")] = F("Invalid power level setting!");
+        response->setLength();
+        request->send(response);
+        return;
+    }
+
+    CONFIG_T& config = Configuration.get();
+    config.Dtu_Serial = root[F("dtu_serial")].as<uint64_t>();
+    config.Dtu_PollInterval = root[F("dtu_pollinterval")].as<uint32_t>();
+    config.Dtu_PaLevel = root[F("dtu_palevel")].as<uint8_t>();
+    Configuration.write();
+
+    retMsg[F("type")] = F("success");
+    retMsg[F("message")] = F("Settings saved!");
+
+    response->setLength();
+    request->send(response);
 }
 
 WebApiClass WebApi;
