@@ -3,7 +3,7 @@
 #include <Arduino.h>
 
 #define CONFIG_FILENAME "/config.bin"
-#define CONFIG_VERSION 0x00010800 // 0.1.8 // make sure to clean all after change
+#define CONFIG_VERSION 0x00010900 // 0.1.9 // make sure to clean all after change
 
 #define WIFI_MAX_SSID_STRLEN 31
 #define WIFI_MAX_PASSWORD_STRLEN 31
@@ -57,6 +57,10 @@ struct CONFIG_T {
     char Mqtt_LwtValue_Offline[MQTT_MAX_LWTVALUE_STRLEN + 1];
 
     INVERTER_CONFIG_T Inverter[INV_MAX_COUNT];
+
+    uint64_t Dtu_Serial;
+    uint32_t Dtu_PollInterval;
+    uint8_t Dtu_PaLevel;
 };
 
 class ConfigurationClass {

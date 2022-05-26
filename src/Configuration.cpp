@@ -102,6 +102,12 @@ void ConfigurationClass::migrate()
         }
     }
 
+    if (config.Cfg_Version < 0x00010900) {
+        config.Dtu_Serial = DTU_SERIAL;
+        config.Dtu_PollInterval = DTU_POLL_INTERVAL;
+        config.Dtu_PaLevel = DTU_PA_LEVEL;
+    }
+
     config.Cfg_Version = CONFIG_VERSION;
     write();
 }
