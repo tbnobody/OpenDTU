@@ -130,10 +130,11 @@
             <label for="inputLwtTopic" class="col-sm-2 col-form-label"
               >LWT Topic:</label
             >
-            <div class="input-group col-sm-10">
-              <span class="input-group-text" id="basic-addon3"
-                >{{ mqttConfigList.mqtt_topic }}</span
-              >
+            <div class="col-sm-10">
+              <div class="input-group">
+                <span class="input-group-text" id="basic-addon3">{{
+                  mqttConfigList.mqtt_topic
+                }}</span>
                 <input
                   type="text"
                   class="form-control"
@@ -143,6 +144,7 @@
                   v-model="mqttConfigList.mqtt_lwt_topic"
                   aria-describedby="basic-addon3"
                 />
+              </div>
             </div>
           </div>
 
