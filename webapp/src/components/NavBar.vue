@@ -50,6 +50,11 @@
                   >Inverter Settings</router-link
                 >
               </li>
+              <li>
+                <router-link class="dropdown-item" to="/settings/dtu"
+                  >DTU Settings</router-link
+                >
+              </li>
               <li><hr class="dropdown-divider" /></li>
               <li>
                 <router-link class="dropdown-item" to="/firmware/upgrade"

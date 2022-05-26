@@ -9,6 +9,7 @@ import NtpAdminView from '@/components/NtpAdminView'
 import MqttAdminView from '@/components/MqttAdminView'
 import MqttInfoView from '@/components/MqttInfoView'
 import InverterAdminView from '@/components/InverterAdminView'
+import DtuAdminView from '@/components/DtuAdminView'
 import FirmwareUpgradeView from '@/components/FirmwareUpgradeView'
 
 const routes = [{
@@ -60,6 +61,11 @@ const routes = [{
     path: '/settings/inverter',
     name: 'Inverter Settings',
     component: InverterAdminView
+},
+{
+    path: '/settings/dtu',
+    name: 'DTU Settings',
+    component: DtuAdminView
 },
 {
     path: '/firmware/upgrade',
