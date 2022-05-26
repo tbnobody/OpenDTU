@@ -941,7 +941,7 @@ void WebApiClass::onDtuAdminPost(AsyncWebServerRequest* request)
     }
 
     if (root[F("dtu_pollinterval")].as<uint32_t>() == 0) {
-        retMsg[F("message")] = F("Poll intervall must be greater zero!");
+        retMsg[F("message")] = F("Poll interval must be greater zero!");
         response->setLength();
         request->send(response);
         return;
