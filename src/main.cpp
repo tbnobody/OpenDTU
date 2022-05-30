@@ -1,4 +1,5 @@
 #include "Configuration.h"
+#include "Hoymiles.h"
 #include "MqttSettings.h"
 #include "NtpSettings.h"
 #include "WebApi.h"
@@ -61,9 +62,28 @@ void setup()
     Serial.print(F("Initialize WebApi... "));
     WebApi.init();
     Serial.println(F("done"));
+
+    // Initialize inverter communication
+    Serial.print(F("Initialize Hoymiles interface... "));
+    CONFIG_T& config = Configuration.get();
+    Hoymiles.init();
+    Hoymiles.getRadio()->setPALevel((rf24_pa_dbm_e)config.Dtu_PaLevel);
+    Hoymiles.getRadio()->setDtuSerial(config.Dtu_Serial);
+    Hoymiles.setPollInterval(config.Dtu_PollInterval);
+
+    for (uint8_t i = 0; i < INV_MAX_COUNT; i++) {
+        if (config.Inverter[i].Serial > 0) {
+            Hoymiles.addInverter(
+                config.Inverter[i].Name,
+                config.Inverter[i].Serial);
+        }
+    }
+    Serial.println(F("done"));
 }
 
 void loop()
 {
     WiFiSettings.loop();
+
+    Hoymiles.loop();
 }

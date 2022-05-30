@@ -2,6 +2,7 @@
 #include "ArduinoJson.h"
 #include "AsyncJson.h"
 #include "Configuration.h"
+#include "Hoymiles.h"
 #include "MqttSettings.h"
 #include "NtpSettings.h"
 #include "Update.h"
@@ -698,6 +699,8 @@ void WebApiClass::onInverterAdd(AsyncWebServerRequest* request)
 
     response->setLength();
     request->send(response);
+
+    Hoymiles.addInverter(inverter->Name, inverter->Serial);
 }
 
 void WebApiClass::onInverterEdit(AsyncWebServerRequest* request)
@@ -739,7 +742,7 @@ void WebApiClass::onInverterEdit(AsyncWebServerRequest* request)
         return;
     }
 
-    if (root[F("id")].as<uint64_t>() > INV_MAX_COUNT - 1) {
+    if (root[F("id")].as<uint8_t>() > INV_MAX_COUNT - 1) {
         retMsg[F("message")] = F("Invalid ID specified!");
         response->setLength();
         request->send(response);
@@ -760,7 +763,7 @@ void WebApiClass::onInverterEdit(AsyncWebServerRequest* request)
         return;
     }
 
-    INVERTER_CONFIG_T& inverter = Configuration.get().Inverter[root[F("id")].as<uint64_t>()];
+    INVERTER_CONFIG_T& inverter = Configuration.get().Inverter[root[F("id")].as<uint8_t>()];
     inverter.Serial = root[F("serial")].as<uint64_t>();
     strncpy(inverter.Name, root[F("name")].as<String>().c_str(), INV_MAX_NAME_STRLEN);
     Configuration.write();
@@ -770,6 +773,10 @@ void WebApiClass::onInverterEdit(AsyncWebServerRequest* request)
 
     response->setLength();
     request->send(response);
+
+    std::shared_ptr<InverterAbstract> inv = Hoymiles.getInverterByPos(root[F("id")].as<uint64_t>());
+    inv->setName(inverter.Name);
+    inv->setSerial(inverter.Serial);
 }
 
 void WebApiClass::onInverterDelete(AsyncWebServerRequest* request)
@@ -811,14 +818,15 @@ void WebApiClass::onInverterDelete(AsyncWebServerRequest* request)
         return;
     }
 
-    if (root[F("id")].as<uint64_t>() > INV_MAX_COUNT - 1) {
+    if (root[F("id")].as<uint8_t>() > INV_MAX_COUNT - 1) {
         retMsg[F("message")] = F("Invalid ID specified!");
         response->setLength();
         request->send(response);
         return;
     }
 
-    INVERTER_CONFIG_T& inverter = Configuration.get().Inverter[root[F("id")].as<uint64_t>()];
+    uint8_t inverter_id = root[F("id")].as<uint8_t>();
+    INVERTER_CONFIG_T& inverter = Configuration.get().Inverter[inverter_id];
     inverter.Serial = 0;
     strncpy(inverter.Name, "", 0);
     Configuration.write();
@@ -828,6 +836,8 @@ void WebApiClass::onInverterDelete(AsyncWebServerRequest* request)
 
     response->setLength();
     request->send(response);
+
+    Hoymiles.removeInverterByPos(inverter_id);
 }
 
 void WebApiClass::onFirmwareUpdateFinish(AsyncWebServerRequest* request)
@@ -886,7 +896,12 @@ void WebApiClass::onDtuAdminGet(AsyncWebServerRequest* request)
     JsonObject root = response->getRoot();
     CONFIG_T& config = Configuration.get();
 
-    root[F("dtu_serial")] = config.Dtu_Serial;
+    // DTU Serial is read as HEX
+    char buffer[sizeof(uint64_t) * 8 + 1];
+    sprintf(buffer, "%0lx%08lx",
+        ((uint32_t)((config.Dtu_Serial >> 32) & 0xFFFFFFFF)),
+        ((uint32_t)(config.Dtu_Serial & 0xFFFFFFFF)));
+    root[F("dtu_serial")] = buffer;
     root[F("dtu_pollinterval")] = config.Dtu_PollInterval;
     root[F("dtu_palevel")] = config.Dtu_PaLevel;
 
@@ -955,7 +970,9 @@ void WebApiClass::onDtuAdminPost(AsyncWebServerRequest* request)
     }
 
     CONFIG_T& config = Configuration.get();
-    config.Dtu_Serial = root[F("dtu_serial")].as<uint64_t>();
+    char* t;
+    // Interpret the string as a hex value and convert it to uint64_t
+    config.Dtu_Serial = strtoll(root[F("dtu_serial")].as<String>().c_str(), &t, 16);
     config.Dtu_PollInterval = root[F("dtu_pollinterval")].as<uint32_t>();
     config.Dtu_PaLevel = root[F("dtu_palevel")].as<uint8_t>();
     Configuration.write();
@@ -965,6 +982,10 @@ void WebApiClass::onDtuAdminPost(AsyncWebServerRequest* request)
 
     response->setLength();
     request->send(response);
+
+    Hoymiles.getRadio()->setPALevel((rf24_pa_dbm_e)config.Dtu_PaLevel);
+    Hoymiles.getRadio()->setDtuSerial(config.Dtu_Serial);
+    Hoymiles.setPollInterval(config.Dtu_PollInterval);
 }
 
 WebApiClass WebApi;
