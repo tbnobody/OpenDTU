@@ -78,7 +78,6 @@ void WebApiClass::init()
 
     _server.on("/favicon.ico", HTTP_GET, [](AsyncWebServerRequest* request) {
         AsyncWebServerResponse* response = request->beginResponse_P(200, "image/x-icon", file_favicon_ico_start, file_favicon_ico_end - file_favicon_ico_start);
-        response->addHeader("Content-Encoding", "gzip");
         request->send(response);
     });
 
