@@ -15,7 +15,7 @@ public:
     std::shared_ptr<InverterAbstract> addInverter(const char* name, uint64_t serial);
     std::shared_ptr<InverterAbstract> getInverterByPos(uint8_t pos);
     std::shared_ptr<InverterAbstract> getInverterBySerial(uint64_t serial);
-    std::shared_ptr<InverterAbstract> getInverterByTelegram(uint8_t buf[]);
+    std::shared_ptr<InverterAbstract> getInverterByFragment(fragment_t* fragment);
     void removeInverterByPos(uint8_t pos);
     size_t getNumInverters();
 
