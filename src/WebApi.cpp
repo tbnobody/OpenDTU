@@ -618,8 +618,14 @@ void WebApiClass::onInverterList(AsyncWebServerRequest* request)
         if (config.Inverter[i].Serial > 0) {
             JsonObject obj = data.createNestedObject();
             obj[F("id")] = i;
-            obj[F("serial")] = config.Inverter[i].Serial;
             obj[F("name")] = String(config.Inverter[i].Name);
+
+            // Inverter Serial is read as HEX
+            char buffer[sizeof(uint64_t) * 8 + 1];
+            sprintf(buffer, "%0lx%08lx",
+                ((uint32_t)((config.Inverter[i].Serial >> 32) & 0xFFFFFFFF)),
+                ((uint32_t)(config.Inverter[i].Serial & 0xFFFFFFFF)));
+            obj[F("serial")] = buffer;
         }
     }
 
@@ -689,7 +695,10 @@ void WebApiClass::onInverterAdd(AsyncWebServerRequest* request)
         return;
     }
 
-    inverter->Serial = root[F("serial")].as<uint64_t>();
+    char* t;
+    // Interpret the string as a hex value and convert it to uint64_t
+    inverter->Serial = strtoll(root[F("serial")].as<String>().c_str(), &t, 16);
+
     strncpy(inverter->Name, root[F("name")].as<String>().c_str(), INV_MAX_NAME_STRLEN);
     Configuration.write();
 
@@ -763,7 +772,10 @@ void WebApiClass::onInverterEdit(AsyncWebServerRequest* request)
     }
 
     INVERTER_CONFIG_T& inverter = Configuration.get().Inverter[root[F("id")].as<uint8_t>()];
-    inverter.Serial = root[F("serial")].as<uint64_t>();
+
+    char* t;
+    // Interpret the string as a hex value and convert it to uint64_t
+    inverter.Serial = strtoll(root[F("serial")].as<String>().c_str(), &t, 16);
     strncpy(inverter.Name, root[F("name")].as<String>().c_str(), INV_MAX_NAME_STRLEN);
     Configuration.write();
 
