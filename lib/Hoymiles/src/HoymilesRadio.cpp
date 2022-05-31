@@ -1,4 +1,5 @@
 #include "HoymilesRadio.h"
+#include "crc.h"
 #include <Every.h>
 #include <FunctionalInterrupt.h>
 
@@ -12,9 +13,7 @@ void HoymilesRadio::init()
     _radio->enableDynamicPayloads();
     _radio->setCRCLength(RF24_CRC_16);
     _radio->setAddressWidth(5);
-    _radio->setAutoAck(false);
     _radio->setRetries(0, 0);
-    _radio->setPALevel(RF_PWR_LOW);
     _radio->maskIRQ(true, true, false); // enable only receiving interrupts
     if (_radio->isChipConnected()) {
         Serial.println(F("Connection successfull"));
@@ -22,9 +21,9 @@ void HoymilesRadio::init()
         Serial.println(F("Connection error!!"));
     }
 
-    setDtuSerial(_dtuSerial.u64);
-
     attachInterrupt(digitalPinToInterrupt(16), std::bind(&HoymilesRadio::handleIntr, this), FALLING);
+
+    openReadingPipe();
     _radio->startListening();
 }
 
@@ -42,24 +41,36 @@ void HoymilesRadio::loop()
         Serial.println(F("Interrupt received"));
         while (_radio->available()) {
             if (!_rxBuffer.full()) {
-                packet_t* p;
-                uint8_t len;
-                p = _rxBuffer.getFront();
-                memset(p->packet, 0xcc, MAX_RF_PAYLOAD_SIZE);
-                p->rxCh = _rxChLst[_rxChIdx];
-                len = _radio->getPayloadSize();
-                if (len > MAX_RF_PAYLOAD_SIZE)
-                    len = MAX_RF_PAYLOAD_SIZE;
+                fragment_t* f;
+                f = _rxBuffer.getFront();
+                memset(f->fragment, 0xcc, MAX_RF_PAYLOAD_SIZE);
+                f->rxCh = _rxChLst[_rxChIdx];
+                f->len = _radio->getDynamicPayloadSize();
+                if (f->len > MAX_RF_PAYLOAD_SIZE)
+                    f->len = MAX_RF_PAYLOAD_SIZE;
 
-                _radio->read(p->packet, len);
-                _rxBuffer.pushFront(p);
+                _radio->read(f->fragment, f->len);
+                _rxBuffer.pushFront(f);
             } else {
                 Serial.println(F("Buffer full"));
                 _radio->flush_rx();
             }
         }
-
         _packetReceived = false;
+
+    } else {
+        // Perform package parsing only if no packages are received
+        if (!_rxBuffer.empty()) {
+            fragment_t* f = _rxBuffer.getBack();
+            if (checkFragmentCrc(f)) {
+                Serial.println("Frame Ok");
+            } else {
+                Serial.println("Frame kaputt");
+            }
+
+            // Remove paket from buffer even it was corrupted
+            _rxBuffer.popBack();
+        }
     }
 }
 
@@ -75,8 +86,13 @@ serial_u HoymilesRadio::DtuSerial()
 
 void HoymilesRadio::setDtuSerial(uint64_t serial)
 {
-    serial_u s;
     _dtuSerial.u64 = serial;
+    openReadingPipe();
+}
+
+void HoymilesRadio::openReadingPipe()
+{
+    serial_u s;
     s = convertSerialToRadioId(_dtuSerial);
     _radio->openReadingPipe(1, s.u64);
 }
@@ -110,10 +126,17 @@ bool HoymilesRadio::switchRxCh(uint8_t addLoop)
 serial_u HoymilesRadio::convertSerialToRadioId(serial_u serial)
 {
     serial_u radioId;
+    radioId.u64 = 0;
     radioId.b[4] = serial.b[0];
     radioId.b[3] = serial.b[1];
     radioId.b[2] = serial.b[2];
     radioId.b[1] = serial.b[3];
     radioId.b[0] = 0x01;
     return radioId;
+}
+
+bool HoymilesRadio::checkFragmentCrc(fragment_t* fragment)
+{
+    uint8_t crc = crc8(fragment->fragment, fragment->len - 1);
+    return (crc == fragment->fragment[fragment->len - 1]);
 }

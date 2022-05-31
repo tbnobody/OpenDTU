@@ -9,13 +9,14 @@
 // maximum buffer length of packet received / sent to RF24 module
 #define MAX_RF_PAYLOAD_SIZE 32
 
-// number of packets hold in buffer
-#define PACKET_BUFFER_SIZE 30
+// number of fragments hold in buffer
+#define FRAGMENT_BUFFER_SIZE 30
 
 typedef struct {
     uint8_t rxCh;
-    uint8_t packet[MAX_RF_PAYLOAD_SIZE];
-} packet_t;
+    uint8_t fragment[MAX_RF_PAYLOAD_SIZE];
+    uint8_t len;
+} fragment_t;
 
 class HoymilesRadio {
 public:
@@ -31,6 +32,8 @@ private:
     static serial_u convertSerialToRadioId(serial_u serial);
     uint8_t getRxNxtChannel();
     bool switchRxCh(uint8_t addLoop = 0);
+    void openReadingPipe();
+    bool checkFragmentCrc(fragment_t* fragment);
 
     std::unique_ptr<RF24> _radio;
     uint8_t _rxChLst[4] = { 3, 23, 61, 75 };
@@ -39,7 +42,7 @@ private:
 
     volatile bool _packetReceived;
 
-    CircularBuffer<packet_t, PACKET_BUFFER_SIZE> _rxBuffer;
+    CircularBuffer<fragment_t, FRAGMENT_BUFFER_SIZE> _rxBuffer;
 
     serial_u _dtuSerial;
 };
