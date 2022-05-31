@@ -1,4 +1,5 @@
 #include "HoymilesRadio.h"
+#include "Hoymiles.h"
 #include "crc.h"
 #include <Every.h>
 #include <FunctionalInterrupt.h>
@@ -64,6 +65,14 @@ void HoymilesRadio::loop()
             fragment_t* f = _rxBuffer.getBack();
             if (checkFragmentCrc(f)) {
                 Serial.println("Frame Ok");
+                std::shared_ptr<InverterAbstract> inv = Hoymiles.getInverterByFragment(f);
+
+                if (nullptr != inv) {
+                    Serial.println("Found Inverter");
+                } else {
+                    Serial.println("Inverter Not found!");
+                }
+
             } else {
                 Serial.println("Frame kaputt");
             }
