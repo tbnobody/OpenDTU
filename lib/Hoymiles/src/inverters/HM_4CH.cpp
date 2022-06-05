@@ -2,7 +2,7 @@
 
 bool HM_4CH::isValidSerial(uint64_t serial)
 {
-    return serial >= 116100000000 && serial <= 116199999999;
+    return serial >= 0x116100000000 && serial <= 0x116199999999;
 }
 
 String HM_4CH::typeName()
