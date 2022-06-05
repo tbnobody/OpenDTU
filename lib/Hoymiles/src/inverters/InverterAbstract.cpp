@@ -21,3 +21,8 @@ const char* InverterAbstract::name()
 {
     return _name;
 }
+
+void InverterAbstract::clearRxFragmentBuffer()
+{
+
+}

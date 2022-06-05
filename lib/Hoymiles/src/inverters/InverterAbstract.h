@@ -4,7 +4,7 @@
 #include <Arduino.h>
 #include <cstdint>
 
-#define MAX_NAME_LENGTH 16
+#define MAX_NAME_LENGTH 32
 
 // units
 enum { UNIT_V = 0,
@@ -68,6 +68,7 @@ public:
     const char* name();
     virtual String typeName() = 0;
     virtual const byteAssign_t* getByteAssignment() = 0;
+    void clearRxFragmentBuffer();
 
 private:
     serial_u _serial;
