@@ -20,8 +20,13 @@ void setup()
 
     // Initialize file system
     Serial.print(F("Initialize FS... "));
-    if (!LittleFS.begin()) {
-        Serial.println(F("failed"));
+    if (!LittleFS.begin(false)) { // Do not format if mount failed
+        Serial.print(F("failed... trying to format..."));
+        if (!LittleFS.begin(true)) {
+            Serial.print("success");
+        } else {
+            Serial.print("failed");
+        }
     } else {
         Serial.println(F("done"));
     }
