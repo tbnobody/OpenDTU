@@ -28,7 +28,7 @@
 #define MQTT_PASSWORD ""
 #define MQTT_TOPIC "solar/"
 #define MQTT_RETAIN true
-#define MQTT_LWT_TOPIC "status"
+#define MQTT_LWT_TOPIC "dtu/status"
 #define MQTT_LWT_ONLINE "online"
 #define MQTT_LWT_OFFLINE "offline"
 
