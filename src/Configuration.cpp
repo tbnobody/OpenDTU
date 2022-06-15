@@ -37,6 +37,10 @@ void ConfigurationClass::init()
         config.Inverter[i].Serial = 0;
         strlcpy(config.Inverter[i].Name, "", 0);
     }
+
+    config.Dtu_Serial = DTU_SERIAL;
+    config.Dtu_PollInterval = DTU_POLL_INTERVAL;
+    config.Dtu_PaLevel = DTU_PA_LEVEL;
 }
 
 bool ConfigurationClass::write()
