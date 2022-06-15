@@ -1,4 +1,6 @@
 #include "Hoymiles.h"
+#include "inverters/HM_1CH.h"
+#include "inverters/HM_2CH.h"
 #include "inverters/HM_4CH.h"
 #include <Arduino.h>
 #include <Every.h>
@@ -15,6 +17,33 @@ void HoymilesClass::init()
 void HoymilesClass::loop()
 {
     _radio->loop();
+
+    if (getNumInverters() > 0) {
+        EVERY_N_SECONDS(_pollInterval)
+        {
+            static uint8_t inverterPos = 0;
+
+            std::shared_ptr<InverterAbstract> iv = getInverterByPos(inverterPos);
+            if (iv != nullptr && _radio->isIdle()) {
+                Serial.print("Fetch inverter: ");
+                Serial.println(iv->serial());
+
+                iv->clearRxFragmentBuffer();
+
+                time_t now;
+                time(&now);
+                if (now > 0) {
+                    _radio->sendTimePacket(iv, now);
+                } else {
+                    Serial.println("Cancled. Time not yet synced.");
+                }
+            }
+
+            if (++inverterPos >= getNumInverters()) {
+                inverterPos = 0;
+            }
+        }
+    }
 }
 
 std::shared_ptr<InverterAbstract> HoymilesClass::addInverter(const char* name, uint64_t serial)
@@ -22,6 +51,12 @@ std::shared_ptr<InverterAbstract> HoymilesClass::addInverter(const char* name, u
     std::shared_ptr<InverterAbstract> i;
     if (HM_4CH::isValidSerial(serial)) {
         i = std::make_shared<HM_4CH>();
+    }
+    else if (HM_2CH::isValidSerial(serial)) {
+        i = std::make_shared<HM_2CH>();
+    }
+    else if (HM_1CH::isValidSerial(serial)) {
+        i = std::make_shared<HM_1CH>();
     }
 
     if (i) {
@@ -78,7 +113,9 @@ std::shared_ptr<InverterAbstract> HoymilesClass::getInverterByFragment(fragment_
 
 void HoymilesClass::removeInverterByPos(uint8_t pos)
 {
-    _inverters.erase(_inverters.begin() + pos);
+    if (pos < _inverters.size()) {
+        _inverters.erase(_inverters.begin() + pos);
+    }
 }
 
 size_t HoymilesClass::getNumInverters()

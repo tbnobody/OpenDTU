@@ -60,6 +60,35 @@ typedef struct {
     uint16_t div; // divisor / calc command
 } byteAssign_t;
 
+#define MAX_RF_FRAGMENT_COUNT 5
+#define MAX_RETRANSMIT_COUNT 5
+
+class InverterAbstract;
+
+// prototypes
+static float calcYieldTotalCh0(InverterAbstract* iv, uint8_t arg0);
+static float calcYieldDayCh0(InverterAbstract* iv, uint8_t arg0);
+static float calcUdcCh(InverterAbstract* iv, uint8_t arg0);
+static float calcPowerDcCh0(InverterAbstract* iv, uint8_t arg0);
+static float calcEffiencyCh0(InverterAbstract* iv, uint8_t arg0);
+static float calcIrradiation(InverterAbstract* iv, uint8_t arg0);
+
+using func_t = float(InverterAbstract*, uint8_t);
+
+struct calcFunc_t {
+    uint8_t funcId; // unique id
+    func_t* func; // function pointer
+};
+
+const calcFunc_t calcFunctions[] = {
+    { CALC_YT_CH0, &calcYieldTotalCh0 },
+    { CALC_YD_CH0, &calcYieldDayCh0 },
+    { CALC_UDC_CH, &calcUdcCh },
+    { CALC_PDC_CH0, &calcPowerDcCh0 },
+    { CALC_EFF_CH0, &calcEffiencyCh0 },
+    { CALC_IRR_CH, &calcIrradiation }
+};
+
 class InverterAbstract {
 public:
     void setSerial(uint64_t serial);
@@ -68,9 +97,26 @@ public:
     const char* name();
     virtual String typeName() = 0;
     virtual const byteAssign_t* getByteAssignment() = 0;
+    uint8_t getChannelCount();
+    uint16_t getChannelMaxPower(uint8_t channel);
+
     void clearRxFragmentBuffer();
+    void addRxFragment(uint8_t fragment[], uint8_t len);
+    uint8_t verifyAllFragments();
+
+    uint8_t getAssignIdxByChannelField(uint8_t channel, uint8_t fieldId);
+    float getValue(uint8_t channel, uint8_t fieldId);
+    bool hasValue(uint8_t channel, uint8_t fieldId);
+    const char* getUnit(uint8_t channel, uint8_t fieldId);
+    const char* getName(uint8_t channel, uint8_t fieldId);
 
 private:
     serial_u _serial;
     char _name[MAX_NAME_LENGTH];
+    fragment_t _rxFragmentBuffer[MAX_RF_FRAGMENT_COUNT];
+    uint8_t _rxFragmentMaxPacketId = 0;
+    uint8_t _rxFragmentLastPacketId = 0;
+    uint8_t _rxFragmentRetransmitCnt = 0;
+
+    uint8_t _payloadStats[MAX_RF_FRAGMENT_COUNT * MAX_RF_PAYLOAD_SIZE];
 };
