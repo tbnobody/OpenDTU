@@ -21,7 +21,8 @@
           </div>
         </div>
       </div>
-      <div class="card" v-show="mqttConfigList.mqtt_enabled">
+
+      <div class="card mt-5" v-show="mqttConfigList.mqtt_enabled">
         <div class="card-header text-white bg-primary">
           MqTT Broker Parameter
         </div>
@@ -123,7 +124,7 @@
         </div>
       </div>
 
-      <div class="card" v-show="mqttConfigList.mqtt_enabled">
+      <div class="card mt-5" v-show="mqttConfigList.mqtt_enabled">
         <div class="card-header text-white bg-primary">LWT Parameters</div>
         <div class="card-body">
           <div class="row mb-3">

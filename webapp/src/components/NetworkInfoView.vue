@@ -3,12 +3,14 @@
     <div class="page-header">
       <h1>Network Info</h1>
     </div>
-    <div class="bg-light p-5 rounded">
-      <WifiStationInfo />
-      <WifiApInfo />
-      <InterfaceStationInfo />
-      <InterfaceApInfo />
-    </div>
+    <WifiStationInfo />
+    <div class="mt-5"></div>
+    <WifiApInfo />
+    <div class="mt-5"></div>
+    <InterfaceStationInfo />
+    <div class="mt-5"></div>
+    <InterfaceApInfo />
+    <div class="mt-5"></div>
   </div>
 </template>
 

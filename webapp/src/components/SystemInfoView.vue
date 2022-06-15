@@ -3,11 +3,12 @@
     <div class="page-header">
       <h1>System Info</h1>
     </div>
-    <div class="bg-light p-5 rounded">
-      <FirmwareInfo />
-      <HardwareInfo />
-      <MemoryInfo />
-    </div>
+    <FirmwareInfo />
+    <div class="mt-5"></div>
+    <HardwareInfo />
+    <div class="mt-5"></div>
+    <MemoryInfo />
+    <div class="mt-5"></div>
   </div>
 </template>
 
