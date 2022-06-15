@@ -29,6 +29,7 @@ private:
     std::unique_ptr<HoymilesRadio> _radio;
 
     uint32_t _pollInterval;
+    uint32_t _lastPoll = 0;
 };
 
 extern HoymilesClass Hoymiles;

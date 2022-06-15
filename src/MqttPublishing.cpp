@@ -16,8 +16,7 @@ void MqttPublishingClass::loop()
 
     CONFIG_T& config = Configuration.get();
 
-    EVERY_N_SECONDS(config.Dtu_PollInterval)
-    {
+    if (millis() - _lastPublish > (config.Dtu_PollInterval * 1000)) {
         MqttSettings.publish("dtu/uptime", String(millis() / 1000));
         MqttSettings.publish("dtu/ip", WiFi.localIP().toString());
 
@@ -58,6 +57,8 @@ void MqttPublishingClass::loop()
 
             yield();
         }
+
+        _lastPublish = millis();
     }
 }
 
