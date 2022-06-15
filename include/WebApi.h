@@ -1,5 +1,13 @@
 #pragma once
 
+#include "WebApi_dtu.h"
+#include "WebApi_firmware.h"
+#include "WebApi_inverter.h"
+#include "WebApi_mqtt.h"
+#include "WebApi_network.h"
+#include "WebApi_ntp.h"
+#include "WebApi_sysstatus.h"
+#include "WebApi_webapp.h"
 #include <ESPAsyncWebServer.h>
 
 class WebApiClass {
@@ -13,33 +21,18 @@ private:
     AsyncWebSocket _ws;
     AsyncEventSource _events;
 
+    WebApiDtuClass _webApiDtu;
+    WebApiFirmwareClass _webApiFirmware;
+    WebApiInverterClass _webApiInverter;
+    WebApiMqttClass _webApiMqtt;
+    WebApiNetworkClass _webApiNetwork;
+    WebApiNtpClass _webApiNtp;
+    WebApiSysstatusClass _webApiSysstatus;
+    WebApiWebappClass _webApiWebapp;
+
     void onWebsocketEvent(AsyncWebSocket* server, AsyncWebSocketClient* client, AwsEventType type, void* arg, uint8_t* data, size_t len);
 
     void onNotFound(AsyncWebServerRequest* request);
-    void onSystemStatus(AsyncWebServerRequest* request);
-
-    void onNetworkStatus(AsyncWebServerRequest* request);
-    void onNetworkAdminGet(AsyncWebServerRequest* request);
-    void onNetworkAdminPost(AsyncWebServerRequest* request);
-
-    void onNtpStatus(AsyncWebServerRequest* request);
-    void onNtpAdminGet(AsyncWebServerRequest* request);
-    void onNtpAdminPost(AsyncWebServerRequest* request);
-
-    void onMqttStatus(AsyncWebServerRequest* request);
-    void onMqttAdminGet(AsyncWebServerRequest* request);
-    void onMqttAdminPost(AsyncWebServerRequest* request);
-
-    void onInverterList(AsyncWebServerRequest* request);
-    void onInverterAdd(AsyncWebServerRequest* request);
-    void onInverterEdit(AsyncWebServerRequest* request);
-    void onInverterDelete(AsyncWebServerRequest* request);
-
-    void onDtuAdminGet(AsyncWebServerRequest* request);
-    void onDtuAdminPost(AsyncWebServerRequest* request);
-
-    void onFirmwareUpdateFinish(AsyncWebServerRequest* request);
-    void onFirmwareUpdateUpload(AsyncWebServerRequest* request, String filename, size_t index, uint8_t *data, size_t len, bool final);
 };
 
 extern WebApiClass WebApi;
