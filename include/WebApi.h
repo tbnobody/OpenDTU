@@ -8,6 +8,7 @@
 #include "WebApi_ntp.h"
 #include "WebApi_sysstatus.h"
 #include "WebApi_webapp.h"
+#include "WebApi_ws_live.h"
 #include <ESPAsyncWebServer.h>
 
 class WebApiClass {
@@ -29,6 +30,7 @@ private:
     WebApiNtpClass _webApiNtp;
     WebApiSysstatusClass _webApiSysstatus;
     WebApiWebappClass _webApiWebapp;
+    WebApiWsLiveClass _webApiWsLive;
 
     void onWebsocketEvent(AsyncWebSocket* server, AsyncWebSocketClient* client, AwsEventType type, void* arg, uint8_t* data, size_t len);
 

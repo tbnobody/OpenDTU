@@ -28,6 +28,8 @@ void WebApiClass::init()
     _webApiSysstatus.init(&_server);
     _webApiWebapp.init(&_server);
 
+    _webApiWsLive.init(&_ws);
+
     _server.onNotFound(std::bind(&WebApiClass::onNotFound, this, _1));
     _server.begin();
 }
@@ -42,6 +44,8 @@ void WebApiClass::loop()
     _webApiNtp.loop();
     _webApiSysstatus.loop();
     _webApiWebapp.loop();
+
+    _webApiWsLive.loop();
 
     // see: https://github.com/me-no-dev/ESPAsyncWebServer#limiting-the-number-of-web-socket-clients
     _ws.cleanupClients();
