@@ -111,6 +111,8 @@ public:
     const char* getUnit(uint8_t channel, uint8_t fieldId);
     const char* getName(uint8_t channel, uint8_t fieldId);
 
+    uint32_t getLastStatsUpdate();
+
 private:
     serial_u _serial;
     char _name[MAX_NAME_LENGTH];
@@ -120,4 +122,5 @@ private:
     uint8_t _rxFragmentRetransmitCnt = 0;
 
     uint8_t _payloadStats[MAX_RF_FRAGMENT_COUNT * MAX_RF_PAYLOAD_SIZE];
+    uint32_t _lastStatsUpdate = 0;
 };

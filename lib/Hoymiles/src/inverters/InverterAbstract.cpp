@@ -111,8 +111,14 @@ uint8_t InverterAbstract::verifyAllFragments()
         memcpy(&_payloadStats[offs], _rxFragmentBuffer[i].fragment, _rxFragmentBuffer[i].len);
         offs += (_rxFragmentBuffer[i].len);
     }
+    _lastStatsUpdate = millis();
 
     return 0;
+}
+
+uint32_t InverterAbstract::getLastStatsUpdate()
+{
+    return _lastStatsUpdate;
 }
 
 uint8_t InverterAbstract::getChannelCount()

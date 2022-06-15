@@ -1,5 +1,4 @@
 #include "MqttPublishing.h"
-#include "Configuration.h"
 #include "MqttSettings.h"
 #include <Every.h>
 
@@ -34,22 +33,27 @@ void MqttPublishingClass::loop()
 
             MqttSettings.publish(subtopic + "/name", inv->name());
 
-            // Loop all channels
-            for (uint8_t c = 0; c <= inv->getChannelCount(); c++) {
-                publishField(subtopic, inv, c, FLD_UDC);
-                publishField(subtopic, inv, c, FLD_IDC);
-                publishField(subtopic, inv, c, FLD_PDC);
-                publishField(subtopic, inv, c, FLD_YD);
-                publishField(subtopic, inv, c, FLD_YW);
-                publishField(subtopic, inv, c, FLD_YT);
-                publishField(subtopic, inv, c, FLD_UAC);
-                publishField(subtopic, inv, c, FLD_IAC);
-                publishField(subtopic, inv, c, FLD_PAC);
-                publishField(subtopic, inv, c, FLD_F);
-                publishField(subtopic, inv, c, FLD_T);
-                publishField(subtopic, inv, c, FLD_PCT);
-                publishField(subtopic, inv, c, FLD_EFF);
-                publishField(subtopic, inv, c, FLD_IRR);
+            uint32_t lastUpdate = inv->getLastStatsUpdate();
+            if (lastUpdate > 0 && lastUpdate != _lastPublishStats[i]) {
+                _lastPublishStats[i] = lastUpdate;
+
+                // Loop all channels
+                for (uint8_t c = 0; c <= inv->getChannelCount(); c++) {
+                    publishField(subtopic, inv, c, FLD_UDC);
+                    publishField(subtopic, inv, c, FLD_IDC);
+                    publishField(subtopic, inv, c, FLD_PDC);
+                    publishField(subtopic, inv, c, FLD_YD);
+                    publishField(subtopic, inv, c, FLD_YW);
+                    publishField(subtopic, inv, c, FLD_YT);
+                    publishField(subtopic, inv, c, FLD_UAC);
+                    publishField(subtopic, inv, c, FLD_IAC);
+                    publishField(subtopic, inv, c, FLD_PAC);
+                    publishField(subtopic, inv, c, FLD_F);
+                    publishField(subtopic, inv, c, FLD_T);
+                    publishField(subtopic, inv, c, FLD_PCT);
+                    publishField(subtopic, inv, c, FLD_EFF);
+                    publishField(subtopic, inv, c, FLD_IRR);
+                }
             }
 
             yield();
