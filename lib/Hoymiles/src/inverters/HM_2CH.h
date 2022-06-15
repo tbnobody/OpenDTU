@@ -7,6 +7,7 @@ public:
     static bool isValidSerial(uint64_t serial);
     String typeName();
     const byteAssign_t* getByteAssignment();
+    const uint8_t getAssignmentCount();
 
 private:
     const byteAssign_t byteAssignment[21] = {

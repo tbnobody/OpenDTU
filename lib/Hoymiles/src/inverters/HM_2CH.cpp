@@ -14,3 +14,8 @@ const byteAssign_t* HM_2CH::getByteAssignment()
 {
     return byteAssignment;
 }
+
+const uint8_t HM_2CH::getAssignmentCount()
+{
+    return sizeof(byteAssignment) / sizeof(byteAssign_t);
+}

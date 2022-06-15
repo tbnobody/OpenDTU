@@ -119,7 +119,8 @@ uint8_t InverterAbstract::getChannelCount()
 {
     const byteAssign_t* b = getByteAssignment();
     uint8_t cnt = 0;
-    for (uint8_t pos = 0; pos < sizeof(b) / sizeof(byteAssign_t); pos++) {
+    for (uint8_t pos = 0; pos < getAssignmentCount(); pos++) {
+        Serial.println(b[pos].ch);
         if (b[pos].ch > cnt) {
             cnt = b[pos].ch;
         }
@@ -139,7 +140,7 @@ uint8_t InverterAbstract::getAssignIdxByChannelField(uint8_t channel, uint8_t fi
     const byteAssign_t* b = getByteAssignment();
 
     uint8_t pos;
-    for (pos = 0; pos < sizeof(b) / sizeof(byteAssign_t); pos++) {
+    for (pos = 0; pos < getAssignmentCount(); pos++) {
         if (b[pos].ch == channel && b[pos].fieldId == fieldId) {
             return pos;
         }
