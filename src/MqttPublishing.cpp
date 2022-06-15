@@ -25,8 +25,8 @@ void MqttPublishingClass::loop()
 
             char buffer[sizeof(uint64_t) * 8 + 1];
             sprintf(buffer, "%0lx%08lx",
-                ((uint32_t)((config.Inverter[i].Serial >> 32) & 0xFFFFFFFF)),
-                ((uint32_t)(config.Inverter[i].Serial & 0xFFFFFFFF)));
+                ((uint32_t)((inv->serial() >> 32) & 0xFFFFFFFF)),
+                ((uint32_t)(inv->serial() & 0xFFFFFFFF)));
             String subtopic = String(buffer);
 
             MqttSettings.publish(subtopic + "/name", inv->name());
