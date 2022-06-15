@@ -113,7 +113,7 @@ void WiFiSettingsClass::applyConfig()
         Serial.print(F("existing credentials... "));
         WiFi.begin();
     }
-    Serial.println("done");
+    Serial.println(F("done"));
     setStaticIp();
 }
 

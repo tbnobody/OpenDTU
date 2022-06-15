@@ -80,22 +80,22 @@ void HoymilesRadio::loop()
     }
 
     if (_busyFlag && _rxTimeout.occured()) {
-        Serial.println("Timeout");
+        Serial.println(F("RX Period End"));
         std::shared_ptr<InverterAbstract> inv = Hoymiles.getInverterBySerial(_activeSerial.u64);
 
         if (nullptr != inv) {
             uint8_t verifyResult = inv->verifyAllFragments();
             if (verifyResult == 255) {
-                Serial.println("Should Retransmit whole thing");
+                Serial.println(F("Should Retransmit whole thing"));
                 // todo: irgendwas tun wenn garnichts ankam....
                 _busyFlag = false;
 
             } else if (verifyResult == 254) {
-                Serial.println("Retransmit timeout");
+                Serial.println(F("Retransmit timeout"));
                 _busyFlag = false;
 
             } else if (verifyResult == 253) {
-                Serial.println("Packet CRC error");
+                Serial.println(F("Packet CRC error"));
                 _busyFlag = false;
 
             } else if (verifyResult > 0) {
@@ -106,6 +106,7 @@ void HoymilesRadio::loop()
 
             } else {
                 // Successfull received all packages
+                Serial.println(F("Success"));
                 _busyFlag = false;
             }
         }
@@ -227,7 +228,7 @@ void HoymilesRadio::sendEsbPacket(serial_u target, uint8_t mainCmd, uint8_t subC
     openWritingPipe(target);
     _radio->setRetries(3, 15);
 
-    dumpBuf(NULL, txBuffer, 10 + len + 1);
+    dumpBuf("TX ", txBuffer, 10 + len + 1);
     _radio->write(txBuffer, 10 + len + 1);
 
     _radio->setRetries(0, 0);
@@ -255,7 +256,7 @@ void HoymilesRadio::sendTimePacket(std::shared_ptr<InverterAbstract> iv, time_t 
     s.u64 = iv->serial();
     _activeSerial.u64 = iv->serial();
 
-    sendEsbPacket(s, 0x15, 0x80, payload, 16, 60);
+    sendEsbPacket(s, 0x15, 0x80, payload, sizeof(payload) / sizeof(uint8_t), 200);
 }
 
 void HoymilesRadio::sendRetransmitPacket(uint8_t fragment_id)
@@ -286,5 +287,5 @@ void HoymilesRadio::dumpBuf(const char* info, uint8_t buf[], uint8_t len)
         Serial.print(buf[i], 16);
         Serial.print(" ");
     }
-    Serial.println("");
+    Serial.println(F(""));
 }

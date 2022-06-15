@@ -24,7 +24,7 @@ void HoymilesClass::loop()
 
             std::shared_ptr<InverterAbstract> iv = getInverterByPos(inverterPos);
             if (iv != nullptr && _radio->isIdle()) {
-                Serial.print("Fetch inverter: ");
+                Serial.print(F("Fetch inverter: "));
                 Serial.println(iv->serial());
 
                 iv->clearRxFragmentBuffer();
@@ -34,7 +34,7 @@ void HoymilesClass::loop()
                 if (now > 0) {
                     _radio->sendTimePacket(iv, now);
                 } else {
-                    Serial.println("Cancled. Time not yet synced.");
+                    Serial.println(F("Cancled. Time not yet synced."));
                 }
             }
 

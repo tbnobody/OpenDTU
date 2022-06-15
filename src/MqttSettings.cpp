@@ -42,7 +42,7 @@ void MqttSettingsClass::onMqttDisconnect(AsyncMqttClientDisconnectReason reason)
 void MqttSettingsClass::performConnect()
 {
     if (WiFi.isConnected() && Configuration.get().Mqtt_Enabled) {
-        Serial.println("Connecting to MQTT...");
+        Serial.println(F("Connecting to MQTT..."));
         CONFIG_T& config = Configuration.get();
         mqttClient.setServer(config.Mqtt_Hostname, config.Mqtt_Port);
         mqttClient.setCredentials(config.Mqtt_Username, config.Mqtt_Password);
