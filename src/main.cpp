@@ -1,5 +1,6 @@
 #include "Configuration.h"
 #include "Hoymiles.h"
+#include "MqttPublishing.h"
 #include "MqttSettings.h"
 #include "NtpSettings.h"
 #include "WebApi.h"
@@ -56,6 +57,7 @@ void setup()
     // Initialize MqTT
     Serial.print(F("Initialize MqTT... "));
     MqttSettings.init();
+    MqttPublishing.init();
     Serial.println(F("done"));
 
     // Initialize WebApi
@@ -84,6 +86,9 @@ void setup()
 void loop()
 {
     WiFiSettings.loop();
-
+    yield();
     Hoymiles.loop();
+    yield();
+    MqttPublishing.loop();
+    yield();
 }
