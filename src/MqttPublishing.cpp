@@ -1,6 +1,5 @@
 #include "MqttPublishing.h"
 #include "MqttSettings.h"
-#include <Every.h>
 
 MqttPublishingClass MqttPublishing;
 
