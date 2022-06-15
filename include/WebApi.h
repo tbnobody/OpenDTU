@@ -6,6 +6,7 @@ class WebApiClass {
 public:
     WebApiClass();
     void init();
+    void loop();
 
 private:
     AsyncWebServer _server;

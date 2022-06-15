@@ -97,6 +97,12 @@ void WebApiClass::init()
     _server.begin();
 }
 
+void WebApiClass::loop()
+{
+    // see: https://github.com/me-no-dev/ESPAsyncWebServer#limiting-the-number-of-web-socket-clients
+    _ws.cleanupClients();
+}
+
 void WebApiClass::onNotFound(AsyncWebServerRequest* request)
 {
     // Handle Unknown Request

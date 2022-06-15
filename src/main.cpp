@@ -96,4 +96,6 @@ void loop()
     yield();
     MqttPublishing.loop();
     yield();
+    WebApi.loop();
+    yield();
 }
