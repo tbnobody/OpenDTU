@@ -41,7 +41,6 @@ void MqttPublishingClass::loop()
                     publishField(subtopic, inv, c, FLD_IDC);
                     publishField(subtopic, inv, c, FLD_PDC);
                     publishField(subtopic, inv, c, FLD_YD);
-                    publishField(subtopic, inv, c, FLD_YW);
                     publishField(subtopic, inv, c, FLD_YT);
                     publishField(subtopic, inv, c, FLD_UAC);
                     publishField(subtopic, inv, c, FLD_IAC);
