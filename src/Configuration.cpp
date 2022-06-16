@@ -32,6 +32,7 @@ void ConfigurationClass::init()
     strlcpy(config.Mqtt_LwtTopic, MQTT_LWT_TOPIC, sizeof(config.Mqtt_LwtTopic));
     strlcpy(config.Mqtt_LwtValue_Online, MQTT_LWT_ONLINE, sizeof(config.Mqtt_LwtValue_Online));
     strlcpy(config.Mqtt_LwtValue_Offline, MQTT_LWT_OFFLINE, sizeof(config.Mqtt_LwtValue_Offline));
+    config.Mqtt_PublishInterval = MQTT_PUBLISH_INTERVAL;
 
     for (uint8_t i = 0; i < INV_MAX_COUNT; i++) {
         config.Inverter[i].Serial = 0;
@@ -110,6 +111,10 @@ void ConfigurationClass::migrate()
         config.Dtu_Serial = DTU_SERIAL;
         config.Dtu_PollInterval = DTU_POLL_INTERVAL;
         config.Dtu_PaLevel = DTU_PA_LEVEL;
+    }
+
+    if (config.Cfg_Version < 0x00011000) {
+        config.Mqtt_PublishInterval = MQTT_PUBLISH_INTERVAL;
     }
 
     config.Cfg_Version = CONFIG_VERSION;

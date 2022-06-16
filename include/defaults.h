@@ -31,6 +31,7 @@
 #define MQTT_LWT_TOPIC "dtu/status"
 #define MQTT_LWT_ONLINE "online"
 #define MQTT_LWT_OFFLINE "offline"
+#define MQTT_PUBLISH_INTERVAL 5
 
 #define DTU_SERIAL 99978563412
 #define DTU_POLL_INTERVAL 5

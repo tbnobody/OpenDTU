@@ -15,7 +15,7 @@ void MqttPublishingClass::loop()
 
     CONFIG_T& config = Configuration.get();
 
-    if (millis() - _lastPublish > (config.Dtu_PollInterval * 1000)) {
+    if (millis() - _lastPublish > (config.Mqtt_PublishInterval * 1000)) {
         MqttSettings.publish("dtu/uptime", String(millis() / 1000));
         MqttSettings.publish("dtu/ip", WiFi.localIP().toString());
 

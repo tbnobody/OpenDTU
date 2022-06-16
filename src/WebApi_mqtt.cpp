@@ -34,6 +34,7 @@ void WebApiMqttClass::onMqttStatus(AsyncWebServerRequest* request)
     root[F("mqtt_connected")] = MqttSettings.getConnected();
     root[F("mqtt_retain")] = config.Mqtt_Retain;
     root[F("mqtt_lwt_topic")] = String(config.Mqtt_Topic) + config.Mqtt_LwtTopic;
+    root[F("mqtt_publish_interval")] = config.Mqtt_PublishInterval;
 
     response->setLength();
     request->send(response);
@@ -55,6 +56,7 @@ void WebApiMqttClass::onMqttAdminGet(AsyncWebServerRequest* request)
     root[F("mqtt_lwt_topic")] = config.Mqtt_LwtTopic;
     root[F("mqtt_lwt_online")] = config.Mqtt_LwtValue_Online;
     root[F("mqtt_lwt_offline")] = config.Mqtt_LwtValue_Offline;
+    root[F("mqtt_publish_interval")] = config.Mqtt_PublishInterval;
 
     response->setLength();
     request->send(response);
@@ -92,7 +94,7 @@ void WebApiMqttClass::onMqttAdminPost(AsyncWebServerRequest* request)
         return;
     }
 
-    if (!(root.containsKey("mqtt_enabled") && root.containsKey("mqtt_hostname") && root.containsKey("mqtt_port") && root.containsKey("mqtt_username") && root.containsKey("mqtt_password") && root.containsKey("mqtt_topic") && root.containsKey("mqtt_retain") && root.containsKey("mqtt_lwt_topic") && root.containsKey("mqtt_lwt_online") && root.containsKey("mqtt_lwt_offline"))) {
+    if (!(root.containsKey("mqtt_enabled") && root.containsKey("mqtt_hostname") && root.containsKey("mqtt_port") && root.containsKey("mqtt_username") && root.containsKey("mqtt_password") && root.containsKey("mqtt_topic") && root.containsKey("mqtt_retain") && root.containsKey("mqtt_lwt_topic") && root.containsKey("mqtt_lwt_online") && root.containsKey("mqtt_lwt_offline") && root.containsKey("mqtt_publish_interval"))) {
         retMsg[F("message")] = F("Values are missing!");
         response->setLength();
         request->send(response);
@@ -153,6 +155,13 @@ void WebApiMqttClass::onMqttAdminPost(AsyncWebServerRequest* request)
             request->send(response);
             return;
         }
+
+        if (root[F("mqtt_publish_interval")].as<uint32_t>() < 5 || root[F("mqtt_publish_interval")].as<uint32_t>() > 65535) {
+            retMsg[F("message")] = F("Publish interval must be a number between 5 and 65535!");
+            response->setLength();
+            request->send(response);
+            return;
+        }
     }
 
     CONFIG_T& config = Configuration.get();
@@ -166,6 +175,7 @@ void WebApiMqttClass::onMqttAdminPost(AsyncWebServerRequest* request)
     strcpy(config.Mqtt_LwtTopic, root[F("mqtt_lwt_topic")].as<String>().c_str());
     strcpy(config.Mqtt_LwtValue_Online, root[F("mqtt_lwt_online")].as<String>().c_str());
     strcpy(config.Mqtt_LwtValue_Offline, root[F("mqtt_lwt_offline")].as<String>().c_str());
+    config.Mqtt_PublishInterval = root[F("mqtt_publish_interval")].as<uint32_t>();
     Configuration.write();
 
     retMsg[F("type")] = F("success");
