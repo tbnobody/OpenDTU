@@ -1,5 +1,6 @@
 #include "WebApi_ws_live.h"
 #include "AsyncJson.h"
+#include "Configuration.h"
 #include <Every.h>
 
 void WebApiWsLiveClass::init(AsyncWebSocket* ws)
@@ -28,22 +29,24 @@ void WebApiWsLiveClass::loop()
 
             root[i]["serial"] = String(buffer);
             root[i]["name"] = inv->name();
+            root[i]["data_age"] = (millis() - inv->getLastStatsUpdate()) / 1000;
+            root[i]["age_critical"] = ((millis() - inv->getLastStatsUpdate()) / 1000) > Configuration.get().Dtu_PollInterval * 5;
 
             // Loop all channels
             for (uint8_t c = 0; c <= inv->getChannelCount(); c++) {
-                 addField(root, i, inv, c, FLD_UDC);
-                 addField(root, i, inv, c, FLD_IDC);
-                 addField(root, i, inv, c, FLD_PDC);
-                 addField(root, i, inv, c, FLD_YD);
-                 addField(root, i, inv, c, FLD_YT);
-                 addField(root, i, inv, c, FLD_UAC);
-                 addField(root, i, inv, c, FLD_IAC);
-                 addField(root, i, inv, c, FLD_PAC);
-                 addField(root, i, inv, c, FLD_F);
-                 addField(root, i, inv, c, FLD_T);
-                 addField(root, i, inv, c, FLD_PCT);
-                 addField(root, i, inv, c, FLD_EFF);
-                 addField(root, i, inv, c, FLD_IRR);
+                addField(root, i, inv, c, FLD_UDC);
+                addField(root, i, inv, c, FLD_IDC);
+                addField(root, i, inv, c, FLD_PDC);
+                addField(root, i, inv, c, FLD_YD);
+                addField(root, i, inv, c, FLD_YT);
+                addField(root, i, inv, c, FLD_UAC);
+                addField(root, i, inv, c, FLD_IAC);
+                addField(root, i, inv, c, FLD_PAC);
+                addField(root, i, inv, c, FLD_F);
+                addField(root, i, inv, c, FLD_T);
+                addField(root, i, inv, c, FLD_PCT);
+                addField(root, i, inv, c, FLD_EFF);
+                addField(root, i, inv, c, FLD_IRR);
             }
         }
 
