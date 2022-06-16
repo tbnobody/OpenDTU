@@ -10,6 +10,10 @@ It was the goal to replace the original Hoymiles DTU (Telemetry Gateway) with th
 * Multi-Inverter support
 * MQTT support
 * Nice and fancy WebApp with visualisation of current data
+* Firmware upgrade using the web UI
+* Default source supports up to 10 inverters
+* Timezone support
+
 
 ## Features for developers
 * The mikrocontroller part
@@ -18,6 +22,14 @@ It was the goal to replace the original Hoymiles DTU (Telemetry Gateway) with th
 
 * The WebApp part
     * Build with [Vue.js](https://vuejs.org)
+
+## Flashing and starting up
+
+## First configuration
+* After the initial flashing of the mikrocontroller, a Access Point called "OpenDTU-*" is opened. The default password is "openDTU42".
+* Use a webbrowser to open the address [http://192.168.4.1](http://192.168.4.1)
+* Navigate to Settings --> Network Settings and enter your WiFi credentials
+* Currently you have to look at your router to determine the IP of the newly connected device
 
 ## Building
 * Building the WebApp
