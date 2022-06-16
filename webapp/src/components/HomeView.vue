@@ -38,8 +38,16 @@
               tabindex="0"
             >
               <div class="card">
-                <div class="card-header text-white bg-primary">
-                  {{ inverter.name }} ({{ inverter.serial }})
+                <div
+                  class="card-header text-white bg-primary"
+                  :class="{
+                    'bg-danger': inverter.age_critical,
+                    'bg-primary': !inverter.age_critical,
+                  }"
+                >
+                  {{ inverter.name }} (Inverter Serial Number:
+                  {{ inverter.serial }}) (Data Age:
+                  {{ inverter.data_age }} seconds)
                 </div>
                 <div class="card-body">
                   <div class="row row-cols-1 row-cols-md-3 g-4">
@@ -80,8 +88,8 @@ export default {
 
     const socketProtocol =
       window.location.protocol === "https:" ? "wss:" : "ws:";
-    const port = window.location.port;
-    const host = window.location.hostname;
+    const port = 80; // window.location.port;
+    const host = "192.168.20.110"; //window.location.hostname;
     const webSocketUrl = socketProtocol + "//" + host + ":" + port + "/ws";
 
     this.connection = new WebSocket(webSocketUrl);
