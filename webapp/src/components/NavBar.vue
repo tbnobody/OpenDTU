@@ -16,7 +16,7 @@
       <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
         <div class="navbar-nav">
           <li class="nav-item">
-            <router-link class="nav-link" to="/">Home</router-link>
+            <router-link class="nav-link" to="/">Live Data</router-link>
           </li>
           <li class="nav-item dropdown">
             <a
