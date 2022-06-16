@@ -88,8 +88,8 @@ export default {
 
     const socketProtocol =
       window.location.protocol === "https:" ? "wss:" : "ws:";
-    const port = 80; // window.location.port;
-    const host = "192.168.20.110"; //window.location.hostname;
+    const port = window.location.port;
+    const host = window.location.hostname;
     const webSocketUrl = socketProtocol + "//" + host + ":" + port + "/ws";
 
     this.connection = new WebSocket(webSocketUrl);
