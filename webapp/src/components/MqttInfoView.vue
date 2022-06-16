@@ -40,6 +40,10 @@
                 <td>{{ mqttDataList.mqtt_topic }}</td>
               </tr>
               <tr>
+                <th>Publish Tnterval</th>
+                <td>{{ mqttDataList.mqtt_publish_interval }} seconds</td>
+              </tr>
+              <tr>
                 <th>Retain</th>
                 <td
                   class="badge"

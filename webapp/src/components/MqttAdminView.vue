@@ -107,6 +107,29 @@
           </div>
 
           <div class="row mb-3">
+            <label for="inputPublishInterval" class="col-sm-2 col-form-label"
+              >Publish Interval:</label
+            >
+            <div class="col-sm-10">
+              <div class="input-group">
+                <input
+                  type="number"
+                  class="form-control"
+                  id="inputPublishInterval"
+                  min="5"
+                  max="86400"
+                  placeholder="Publish Interval in Seconds"
+                  v-model="mqttConfigList.mqtt_publish_interval"
+                  aria-describedby="publishIntervalDescription"
+                />
+                <span class="input-group-text" id="publishIntervalDescription"
+                  >seconds</span
+                >
+              </div>
+            </div>
+          </div>
+
+          <div class="row mb-3">
             <label class="col-sm-2 form-check-label" for="inputRetain"
               >Enable Retain Flag</label
             >
