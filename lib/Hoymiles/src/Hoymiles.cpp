@@ -3,7 +3,6 @@
 #include "inverters/HM_2CH.h"
 #include "inverters/HM_4CH.h"
 #include <Arduino.h>
-#include <Every.h>
 
 HoymilesClass Hoymiles;
 
