@@ -90,7 +90,7 @@ export default {
       window.location.protocol === "https:" ? "wss:" : "ws:";
     const port = window.location.port;
     const host = window.location.hostname;
-    const webSocketUrl = socketProtocol + "//" + host + ":" + port + "/ws";
+    const webSocketUrl = socketProtocol + "//" + host + ":" + port + "/livedata";
 
     this.connection = new WebSocket(webSocketUrl);
 

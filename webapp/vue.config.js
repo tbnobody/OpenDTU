@@ -24,6 +24,15 @@ module.exports = defineConfig({
         }
     },
     devServer: {
-        proxy: 'http://192.168.20.110/'
+        proxy: {
+            '^/api': {
+                target: 'http://192.168.20.110/'
+            },
+            '^/livedata': {
+                target: 'ws://192.168.20.110/',
+                ws: true,
+                changeOrigin: true
+            }
+        }
     }
 })

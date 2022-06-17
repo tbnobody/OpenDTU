@@ -5,7 +5,7 @@
 
 WebApiClass::WebApiClass()
     : _server(HTTP_PORT)
-    , _ws("/ws")
+    , _ws("/livedata")
     , _events("/events")
 {
 }
