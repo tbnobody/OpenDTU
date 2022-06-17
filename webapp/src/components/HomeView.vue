@@ -78,32 +78,63 @@ export default {
   },
   data() {
     return {
-      connection: null,
+      socket: null,
+      heartInterval: null,
       waitForData: true,
       inverterData: [],
     };
   },
   created() {
-    console.log("Starting connection to WebSocket Server");
+    this.initSocket();
+  },
+  unmounted() {
+    this.closeSocket();
+  },
+  methods: {
+    initSocket() {
+      console.log("Starting connection to WebSocket Server");
 
-    const socketProtocol =
-      window.location.protocol === "https:" ? "wss:" : "ws:";
-    const port = window.location.port;
-    const host = window.location.hostname;
-    const webSocketUrl = socketProtocol + "//" + host + ":" + port + "/livedata";
+      const { protocol, host } = location;
+      const webSocketUrl = `${
+        protocol === "https" ? "wss" : "ws"
+      }://${host}/livedata`;
 
-    this.connection = new WebSocket(webSocketUrl);
+      this.socket = new WebSocket(webSocketUrl);
 
-    this.connection.onmessage = function (event) {
-      console.log(event);
-      this.inverterData = JSON.parse(event.data);
-      this.waitForData = false;
-    }.bind(this);
+      this.socket.onmessage = function (event) {
+        console.log(event);
+        this.inverterData = JSON.parse(event.data);
+        this.waitForData = false;
+        this.heartCheck(); // Reset heartbeat detection
+      }.bind(this);
 
-    this.connection.onopen = function (event) {
-      console.log(event);
-      console.log("Successfully connected to the echo websocket server...");
-    };
+      this.socket.onopen = function (event) {
+        console.log(event);
+        console.log("Successfully connected to the echo websocket server...");
+      };
+
+      // Listen to window events , When the window closes , Take the initiative to disconnect websocket Connect
+      window.onbeforeunload = () => {
+        this.closeSocket();
+      };
+    },
+    // Send heartbeat packets regularly * 59s Send a heartbeat
+    heartCheck() {
+      this.heartInterval && clearTimeout(this.heartInterval);
+      this.heartInterval = setInterval(() => {
+        if (this.socket.readyState === 1) {
+          // Connection status
+          this.socket.send("ping");
+        } else {
+            this.initSocket(); // Breakpoint reconnection 5 Time
+        }
+      }, 59 * 1000);
+    },
+    /** To break off websocket Connect */
+    closeSocket() {
+      this.socket.close();
+      this.heartInterval && clearTimeout(this.heartInterval);
+    },
   },
 };
 </script>
