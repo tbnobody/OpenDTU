@@ -41,6 +41,13 @@ void WebApiInverterClass::onInverterList(AsyncWebServerRequest* request)
                 ((uint32_t)((config.Inverter[i].Serial >> 32) & 0xFFFFFFFF)),
                 ((uint32_t)(config.Inverter[i].Serial & 0xFFFFFFFF)));
             obj[F("serial")] = buffer;
+
+            auto inv = Hoymiles.getInverterBySerial(config.Inverter[i].Serial);
+            if (inv == nullptr) {
+                obj[F("type")] = F("Unknown");
+            } else {
+                obj[F("type")] = inv->typeName();
+            }
         }
     }
 

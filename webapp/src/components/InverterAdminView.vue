@@ -47,6 +47,7 @@
               <tr>
                 <th scope="col">Serial</th>
                 <th>Name</th>
+                <th>Type</th>
                 <th>Action</th>
               </tr>
             </thead>
@@ -69,6 +70,9 @@
                     />
                   </td>
                   <td>
+                    {{ editInverterData.type }}
+                  </td>
+                  <td>
                     <a href="#" class="icon">
                       <BIconCheck v-on:click="onEditSubmit(inverter.id)" />
                     </a>
@@ -83,6 +87,9 @@
                   </td>
                   <td>
                     {{ inverter.name }}
+                  </td>
+                  <td>
+                    {{ inverter.type }}
                   </td>
                   <td>
                     <a href="#" class="icon">
@@ -121,6 +128,7 @@ export default {
         id: "",
         serial: "",
         name: "",
+        type: "",
       },
       inverters: [],
       alertMessage: "",
@@ -199,6 +207,7 @@ export default {
       this.editId = inverter.id;
       this.editInverterData.serial = inverter.serial;
       this.editInverterData.name = inverter.name;
+      this.editInverterData.type = inverter.type;
     },
     onCancel() {
       this.editId = "-1";
@@ -233,6 +242,7 @@ export default {
       this.editId = "-1";
       this.editInverterData.serial = "";
       this.editInverterData.name = "";
+      this.editInverterData.type = "";
     },
   },
 };
