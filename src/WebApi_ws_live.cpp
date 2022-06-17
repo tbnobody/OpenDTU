@@ -1,7 +1,6 @@
 #include "WebApi_ws_live.h"
 #include "AsyncJson.h"
 #include "Configuration.h"
-#include <Every.h>
 
 void WebApiWsLiveClass::init(AsyncWebSocket* ws)
 {
@@ -10,12 +9,27 @@ void WebApiWsLiveClass::init(AsyncWebSocket* ws)
 
 void WebApiWsLiveClass::loop()
 {
-    EVERY_N_SECONDS(10)
-    {
-        // do nothing if no WS client is connected
-        if (_ws->count() == 0) {
-            return;
+    // do nothing if no WS client is connected
+    if (_ws->count() == 0) {
+        return;
+    }
+
+    if (millis() - _lastInvUpdateCheck < 1000) {
+        return;
+    }
+    _lastInvUpdateCheck = millis();
+
+    uint32_t maxTimeStamp = 0;
+    for (uint8_t i = 0; i < Hoymiles.getNumInverters(); i++) {
+        auto inv = Hoymiles.getInverterByPos(i);
+
+        if (inv->getLastStatsUpdate() > maxTimeStamp) {
+            maxTimeStamp = inv->getLastStatsUpdate();
         }
+    }
+
+    // Update on every inverter change or at least after 10 seconds
+    if (millis() - _lastWsPublish > (10 * 1000) || (maxTimeStamp != _newestInverterTimestamp)) {
 
         DynamicJsonDocument root(40960);
         // Loop all inverters
@@ -48,6 +62,10 @@ void WebApiWsLiveClass::loop()
                 addField(root, i, inv, c, FLD_EFF);
                 addField(root, i, inv, c, FLD_IRR);
             }
+
+            if (inv->getLastStatsUpdate() > _newestInverterTimestamp) {
+                _newestInverterTimestamp = inv->getLastStatsUpdate();
+            }
         }
 
         size_t len = measureJson(root);
@@ -56,6 +74,8 @@ void WebApiWsLiveClass::loop()
             serializeJson(root, (char*)buffer->get(), len + 1);
             _ws->textAll(buffer);
         }
+
+        _lastWsPublish = millis();
     }
 }
 
