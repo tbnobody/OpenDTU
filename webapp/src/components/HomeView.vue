@@ -71,6 +71,7 @@
 
 <script>
 import InverterChannelInfo from "@/components/partials/InverterChannelInfo";
+import bootstrap from "bootstrap/dist/js/bootstrap.js";
 
 export default {
   components: {
@@ -82,6 +83,7 @@ export default {
       heartInterval: null,
       waitForData: true,
       inverterData: [],
+      isFirstFetchAfterConnect: true,
     };
   },
   created() {
@@ -89,6 +91,20 @@ export default {
   },
   unmounted() {
     this.closeSocket();
+  },
+  updated() {
+    // Select first tab
+    if (this.isFirstFetchAfterConnect) {
+      this.isFirstFetchAfterConnect = false;
+
+      var firstTabEl = this.$el.querySelector(
+        "#v-pills-tab:first-child button"
+      );
+      if (firstTabEl != null) {
+        var firstTab = new bootstrap.Tab(firstTabEl);
+        firstTab.show();
+      }
+    }
   },
   methods: {
     initSocket() {
@@ -126,7 +142,7 @@ export default {
           // Connection status
           this.socket.send("ping");
         } else {
-            this.initSocket(); // Breakpoint reconnection 5 Time
+          this.initSocket(); // Breakpoint reconnection 5 Time
         }
       }, 59 * 1000);
     },
@@ -134,6 +150,7 @@ export default {
     closeSocket() {
       this.socket.close();
       this.heartInterval && clearTimeout(this.heartInterval);
+      this.isFirstFetchAfterConnect = true;
     },
   },
 };
