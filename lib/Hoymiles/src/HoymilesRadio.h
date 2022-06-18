@@ -34,7 +34,7 @@ private:
     static void convertSerialToPacketId(uint8_t buffer[], serial_u serial);
     uint8_t getRxNxtChannel();
     uint8_t getTxNxtChannel();
-    bool switchRxCh(uint8_t addLoop = 0);
+    void switchRxCh();
     void openReadingPipe();
     void openWritingPipe(serial_u serial);
     bool checkFragmentCrc(fragment_t* fragment);
@@ -44,7 +44,6 @@ private:
     std::unique_ptr<RF24> _radio;
     uint8_t _rxChLst[4] = { 3, 23, 61, 75 };
     uint8_t _rxChIdx;
-    uint16_t _rxLoopCnt;
 
     uint8_t _txChLst[1] = { 40 };
     uint8_t _txChIdx;

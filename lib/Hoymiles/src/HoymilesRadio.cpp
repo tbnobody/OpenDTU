@@ -32,7 +32,7 @@ void HoymilesRadio::loop()
 {
     EVERY_N_MILLIS(4)
     {
-        switchRxCh(1);
+        switchRxCh();
     }
 
     if (_packetReceived) {
@@ -167,18 +167,14 @@ uint8_t HoymilesRadio::getTxNxtChannel()
     return _txChLst[_txChIdx];
 }
 
-bool HoymilesRadio::switchRxCh(uint8_t addLoop)
+void HoymilesRadio::switchRxCh()
 {
-    _rxLoopCnt += addLoop;
-    if (_rxLoopCnt != 0) {
-        _rxLoopCnt--;
-        // portDISABLE_INTERRUPTS();
-        _radio->stopListening();
-        _radio->setChannel(getRxNxtChannel());
-        _radio->startListening();
-        // portENABLE_INTERRUPTS();
-    }
-    return (0 == _rxLoopCnt); // receive finished
+
+    // portDISABLE_INTERRUPTS();
+    _radio->stopListening();
+    _radio->setChannel(getRxNxtChannel());
+    _radio->startListening();
+    // portENABLE_INTERRUPTS();
 }
 
 serial_u HoymilesRadio::convertSerialToRadioId(serial_u serial)
