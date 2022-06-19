@@ -11,8 +11,6 @@
 // number of fragments hold in buffer
 #define FRAGMENT_BUFFER_SIZE 30
 
-
-
 class HoymilesRadio {
 public:
     void init();
@@ -42,7 +40,7 @@ private:
     void u32CpyLittleEndian(uint8_t dest[], uint32_t src);
 
     std::unique_ptr<RF24> _radio;
-    uint8_t _rxChLst[4] = { 3, 23, 61, 75 };
+    uint8_t _rxChLst[5] = { 3, 23, 40, 61, 75 };
     uint8_t _rxChIdx;
 
     uint8_t _txChLst[1] = { 40 };

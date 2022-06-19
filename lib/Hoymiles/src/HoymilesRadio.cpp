@@ -155,14 +155,14 @@ void ARDUINO_ISR_ATTR HoymilesRadio::handleIntr()
 
 uint8_t HoymilesRadio::getRxNxtChannel()
 {
-    if (++_rxChIdx >= 4)
+    if (++_rxChIdx >= sizeof(_rxChLst))
         _rxChIdx = 0;
     return _rxChLst[_rxChIdx];
 }
 
 uint8_t HoymilesRadio::getTxNxtChannel()
 {
-    if (++_txChIdx >= 1)
+    if (++_txChIdx >= sizeof(_txChLst))
         _txChIdx = 0;
     return _txChLst[_txChIdx];
 }
