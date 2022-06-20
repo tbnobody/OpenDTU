@@ -86,9 +86,13 @@ void HoymilesRadio::loop()
         if (nullptr != inv) {
             uint8_t verifyResult = inv->verifyAllFragments();
             if (verifyResult == 255) {
-                Serial.println(F("Should Retransmit whole thing"));
-                // todo: irgendwas tun wenn garnichts ankam....
-                _busyFlag = false;
+                if (currentTransaction.sendCount < MAX_RESEND_COUNT) {
+                    Serial.println(F("Nothing received, resend whole request"));
+                    sendEsbPacket(currentTransaction.target, currentTransaction.mainCmd, currentTransaction.subCmd, currentTransaction.payload, currentTransaction.len, currentTransaction.timeout, true);
+                } else {
+                    Serial.println(F("Nothing received, resend count exeeded"));
+                    _busyFlag = false;
+                }
 
             } else if (verifyResult == 254) {
                 Serial.println(F("Retransmit timeout"));
@@ -208,16 +212,27 @@ void HoymilesRadio::sendEsbPacket(serial_u target, uint8_t mainCmd, uint8_t subC
     static uint8_t txBuffer[MAX_RF_PAYLOAD_SIZE];
 
     if (!resend) {
-        memset(txBuffer, 0, MAX_RF_PAYLOAD_SIZE);
-
-        txBuffer[0] = mainCmd;
-        convertSerialToPacketId(&txBuffer[1], target); // 4 byte long
-        convertSerialToPacketId(&txBuffer[5], DtuSerial()); // 4 byte long
-        txBuffer[9] = subCmd;
-
-        memcpy(&txBuffer[10], payload, len);
-        txBuffer[10 + len] = crc8(txBuffer, 10 + len);
+        currentTransaction.sendCount = 0;
+    } else {
+        currentTransaction.sendCount++;
     }
+
+    memset(txBuffer, 0, MAX_RF_PAYLOAD_SIZE);
+
+    txBuffer[0] = mainCmd;
+    convertSerialToPacketId(&txBuffer[1], target); // 4 byte long
+    convertSerialToPacketId(&txBuffer[5], DtuSerial()); // 4 byte long
+    txBuffer[9] = subCmd;
+
+    memcpy(&txBuffer[10], payload, len);
+    txBuffer[10 + len] = crc8(txBuffer, 10 + len);
+
+    currentTransaction.mainCmd = mainCmd;
+    currentTransaction.target = target;
+    currentTransaction.subCmd = subCmd;
+    memcpy(currentTransaction.payload, payload, len);
+    currentTransaction.len = len;
+    currentTransaction.timeout = timeout;
 
     _radio->stopListening();
     _radio->setChannel(getTxNxtChannel());

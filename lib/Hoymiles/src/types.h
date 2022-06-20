@@ -14,3 +14,13 @@ typedef struct {
     uint8_t fragment[MAX_RF_PAYLOAD_SIZE];
     uint8_t len;
 } fragment_t;
+
+typedef struct {
+    serial_u target;
+    uint8_t mainCmd;
+    uint8_t subCmd;
+    uint8_t payload[MAX_RF_PAYLOAD_SIZE];
+    uint8_t len;
+    uint32_t timeout;
+    uint8_t sendCount;
+} inverter_transaction_t;

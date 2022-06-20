@@ -11,6 +11,8 @@
 // number of fragments hold in buffer
 #define FRAGMENT_BUFFER_SIZE 30
 
+#define MAX_RESEND_COUNT 3
+
 class HoymilesRadio {
 public:
     void init();
@@ -55,4 +57,6 @@ private:
     serial_u _activeSerial;
 
     bool _busyFlag = false;
+
+    inverter_transaction_t currentTransaction;
 };
