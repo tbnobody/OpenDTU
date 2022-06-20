@@ -5,6 +5,10 @@
 #include <LittleFS.h>
 #include <ResetReason.h>
 
+#ifndef AUTO_GIT_HASH
+#define AUTO_GIT_HASH ""
+#endif
+
 void WebApiSysstatusClass::init(AsyncWebServer* server)
 {
     using namespace std::placeholders;
@@ -51,6 +55,7 @@ void WebApiSysstatusClass::onSystemStatus(AsyncWebServerRequest* request)
     char version[16];
     sprintf(version, "%d.%d.%d", CONFIG_VERSION >> 24 & 0xff, CONFIG_VERSION >> 16 & 0xff, CONFIG_VERSION >> 8 & 0xff);
     root[F("firmware_version")] = version;
+    root[F("git_hash")] = AUTO_GIT_HASH;
 
     root[F("uptime")] = esp_timer_get_time() / 1000000;
 

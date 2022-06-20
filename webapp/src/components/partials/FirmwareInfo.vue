@@ -20,6 +20,10 @@
               <td>{{ systemDataList.firmware_version }}</td>
             </tr>
             <tr>
+              <th>Git Hash</th>
+              <td>{{ systemDataList.git_hash }}</td>
+            </tr>
+            <tr>
               <th>Reset Reason CPU 0</th>
               <td>{{ systemDataList.resetreason_0 }}</td>
             </tr>
