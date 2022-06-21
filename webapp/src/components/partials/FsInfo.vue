@@ -3,9 +3,9 @@
         <th>{{ name }}</th>
         <td>
             <div class="progress">
-                <div class="progress-bar" role="progressbar" :style="{ width: this.getPercent() + '%' }"
-                    v-bind:aria-valuenow="this.getPercent()" aria-valuemin="0" aria-valuemax="100">
-                    {{ this.getPercent() }}%
+                <div class="progress-bar" role="progressbar" :style="{ width: getPercent() + '%' }"
+                    v-bind:aria-valuenow="getPercent()" aria-valuemin="0" aria-valuemax="100">
+                    {{ getPercent() }}%
                 </div>
             </div>
         </td>
@@ -18,14 +18,14 @@
     </tr>
 </template>
 
-<script>
+<script lang="ts">
 import { defineComponent } from 'vue';
 
 export default defineComponent({
     props: {
         name: String,
-        total: Number,
-        used: Number,
+        total: { type: Number, required: true },
+        used: { type: Number, required: true },
     },
     methods: {
         getPercent() {

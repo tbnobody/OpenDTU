@@ -80,13 +80,22 @@
     </div>
 </template>
 
-<script>
+<script lang="ts">
 import { defineComponent } from 'vue';
 
 export default defineComponent({
     data() {
         return {
-            mqttDataList: [],
+            mqttDataList: {
+                mqtt_enabled: false,
+                mqtt_hostname: "",
+                mqtt_port: 0,
+                mqtt_username: "",
+                mqtt_topic: "",
+                mqtt_publish_interval: 0,
+                mqtt_retain: false,
+                mqtt_connected: false
+            },
         };
     },
     created() {

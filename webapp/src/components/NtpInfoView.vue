@@ -56,13 +56,19 @@
     </div>
 </template>
 
-<script>
+<script lang="ts">
 import { defineComponent } from 'vue';
 
 export default defineComponent({
     data() {
         return {
-            ntpDataList: [],
+            ntpDataList: {
+                ntp_server: "",
+                ntp_timezone: "",
+                ntp_timezone_descr: "",
+                ntp_status: false,
+                ntp_localtime: ""
+            },
         };
     },
     created() {

@@ -5,7 +5,7 @@
         </div>
 
         <BootstrapAlert v-model="showAlert" dismissible :variant="alertType">
-            {{ this.alertMessage }}
+            {{ alertMessage }}
         </BootstrapAlert>
 
         <div class="card">
@@ -92,9 +92,16 @@
     </div>
 </template>
 
-<script>
+<script lang="ts">
 import { defineComponent } from 'vue';
 import BootstrapAlert from "@/components/partials/BootstrapAlert.vue";
+
+declare interface Inverter {
+    id: string,
+    serial: number,
+    name: string,
+    type: string
+}
 
 export default defineComponent({
     components: {
@@ -103,18 +110,9 @@ export default defineComponent({
     data() {
         return {
             editId: "-1",
-            inverterData: {
-                id: "",
-                serial: "",
-                name: "",
-            },
-            editInverterData: {
-                id: "",
-                serial: "",
-                name: "",
-                type: "",
-            },
-            inverters: [],
+            inverterData: {} as Inverter,
+            editInverterData: {} as Inverter,
+            inverters: [] as Inverter[],
             alertMessage: "",
             alertType: "info",
             showAlert: false,
@@ -152,18 +150,18 @@ export default defineComponent({
                     }
                 })
                 .then(
-                    function (response) {
+                    (response) => {
                         this.alertMessage = response.message;
                         this.alertType = response.type;
                         this.showAlert = true;
-                    }.bind(this)
+                    }
                 )
-                .then(this.getInverters());
+                .then(() => { this.getInverters() });
 
-            this.inverterData.serial = "";
+            this.inverterData.serial = 0;
             this.inverterData.name = "";
         },
-        onDelete(id) {
+        onDelete(id: string) {
             const formData = new FormData();
             formData.append("data", JSON.stringify({ id: id }));
 
@@ -179,15 +177,15 @@ export default defineComponent({
                     }
                 })
                 .then(
-                    function (response) {
+                    (response) => {
                         this.alertMessage = response.message;
                         this.alertType = response.type;
                         this.showAlert = true;
-                    }.bind(this)
+                    }
                 )
-                .then(this.getInverters());
+                .then(() => { this.getInverters() });
         },
-        onEdit(inverter) {
+        onEdit(inverter: Inverter) {
             this.editId = inverter.id;
             this.editInverterData.serial = inverter.serial;
             this.editInverterData.name = inverter.name;
@@ -195,10 +193,10 @@ export default defineComponent({
         },
         onCancel() {
             this.editId = "-1";
-            this.editInverterData.serial = "";
+            this.editInverterData.serial = 0;
             this.editInverterData.name = "";
         },
-        onEditSubmit(id) {
+        onEditSubmit(id: string) {
             const formData = new FormData();
             this.editInverterData.id = id;
             formData.append("data", JSON.stringify(this.editInverterData));
@@ -215,16 +213,16 @@ export default defineComponent({
                     }
                 })
                 .then(
-                    function (response) {
+                    (response) => {
                         this.alertMessage = response.message;
                         this.alertType = response.type;
                         this.showAlert = true;
-                    }.bind(this)
+                    }
                 )
-                .then(this.getInverters());
+                .then(() => { this.getInverters() });
 
             this.editId = "-1";
-            this.editInverterData.serial = "";
+            this.editInverterData.serial = 0;
             this.editInverterData.name = "";
             this.editInverterData.type = "";
         },

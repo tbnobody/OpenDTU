@@ -22,13 +22,16 @@
     </div>
 </template>
 
-<script>
+<script lang="ts">
 import { defineComponent } from 'vue';
 
 export default defineComponent({
     data() {
         return {
-            networkDataList: [],
+            networkDataList: {
+                ap_ip: "",
+                ap_mac: ""
+            },
         };
     },
     created() {

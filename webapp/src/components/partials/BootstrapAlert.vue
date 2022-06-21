@@ -15,7 +15,7 @@ export const toInteger = (value, defaultValue = NaN) => {
 };
 
 export default defineComponent({
-    name: "BAlert",
+    name: "BootstrapAlert",
     props: {
         dismissLabel: { type: String, default: "Close" },
         dismissible: { type: Boolean, default: false },

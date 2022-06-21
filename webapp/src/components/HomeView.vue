@@ -45,10 +45,17 @@
     </div>
 </template>
 
-<script>
+<script lang="ts">
 import { defineComponent } from 'vue';
-import InverterChannelInfo from "@/components/partials/InverterChannelInfo";
-import bootstrap from "bootstrap/dist/js/bootstrap.js";
+import InverterChannelInfo from "@/components/partials/InverterChannelInfo.vue";
+import * as bootstrap from 'bootstrap';
+
+declare interface Inverter {
+    serial: number,
+    name: string,
+    age_critical: boolean,
+    data_age: 0
+}
 
 export default defineComponent({
     components: {
@@ -56,10 +63,10 @@ export default defineComponent({
     },
     data() {
         return {
-            socket: null,
-            heartInterval: null,
+            socket: {} as WebSocket,
+            heartInterval: 0,
             waitForData: true,
-            inverterData: [],
+            inverterData: [] as Inverter[],
             isFirstFetchAfterConnect: true,
         };
     },
@@ -93,12 +100,12 @@ export default defineComponent({
 
             this.socket = new WebSocket(webSocketUrl);
 
-            this.socket.onmessage = function (event) {
+            this.socket.onmessage = (event) => {
                 console.log(event);
                 this.inverterData = JSON.parse(event.data);
                 this.waitForData = false;
                 this.heartCheck(); // Reset heartbeat detection
-            }.bind(this);
+            };
 
             this.socket.onopen = function (event) {
                 console.log(event);

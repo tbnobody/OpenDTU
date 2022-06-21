@@ -32,13 +32,17 @@
     </div>
 </template>
 
-<script>
+<script lang="ts">
 import { defineComponent } from 'vue';
 
 export default defineComponent({
     data() {
         return {
-            networkDataList: [],
+            networkDataList: {
+                ap_status: false,
+                ap_ssid: "",
+                ap_stationnum: 0
+            },
         };
     },
     created() {

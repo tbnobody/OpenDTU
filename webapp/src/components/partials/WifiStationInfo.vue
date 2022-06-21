@@ -23,7 +23,7 @@
                         </tr>
                         <tr>
                             <th>Quality</th>
-                            <td>{{ this.getRSSIasQuality(networkDataList.sta_rssi) }} %</td>
+                            <td>{{ getRSSIasQuality(networkDataList.sta_rssi) }} %</td>
                         </tr>
                         <tr>
                             <th>RSSI</th>
@@ -36,13 +36,17 @@
     </div>
 </template>
 
-<script>
+<script lang="ts">
 import { defineComponent } from 'vue';
 
 export default defineComponent({
     data() {
         return {
-            networkDataList: [],
+            networkDataList: {
+                sta_status: false,
+                sta_ssid: "",
+                sta_rssi: 0
+            },
         };
     },
     created() {
@@ -54,7 +58,7 @@ export default defineComponent({
                 .then((response) => response.json())
                 .then((data) => (this.networkDataList = data));
         },
-        getRSSIasQuality(rssi) {
+        getRSSIasQuality(rssi: number) {
             let quality = 0;
 
             if (rssi <= -100) {

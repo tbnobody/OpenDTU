@@ -24,7 +24,7 @@
     </div>
 </template>
 
-<script>
+<script lang="ts">
 import { defineComponent } from 'vue';
 
 export default defineComponent({
@@ -33,7 +33,7 @@ export default defineComponent({
         channelNumber: Number,
     },
     methods: {
-        formatNumber(num) {
+        formatNumber(num: string) {
             return parseFloat(num).toFixed(2);
         },
     },

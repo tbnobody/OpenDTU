@@ -12,7 +12,7 @@
     </div>
 </template>
 
-<script>
+<script lang="ts">
 import { defineComponent } from 'vue';
 import HardwareInfo from "@/components/partials/HardwareInfo.vue";
 import FirmwareInfo from "@/components/partials/FirmwareInfo.vue";

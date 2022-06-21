@@ -4,7 +4,7 @@
             <h1>MqTT Settings</h1>
         </div>
         <BootstrapAlert v-model="showAlert" dismissible :variant="alertType">
-            {{ this.alertMessage }}
+            {{ alertMessage }}
         </BootstrapAlert>
         <form @submit="saveMqttConfig">
             <div class="card">
@@ -132,7 +132,7 @@
     </div>
 </template>
 
-<script>
+<script lang="ts">
 import { defineComponent } from 'vue';
 import BootstrapAlert from "@/components/partials/BootstrapAlert.vue";
 
@@ -142,7 +142,19 @@ export default defineComponent({
     },
     data() {
         return {
-            mqttConfigList: [],
+            mqttConfigList: {
+                mqtt_enabled: false,
+                mqtt_hostname: "",
+                mqtt_port: 0,
+                mqtt_username: "",
+                mqtt_password: "",
+                mqtt_topic: "",
+                mqtt_publish_interval: 0,
+                mqtt_retain: false,
+                mqtt_lwt_topic: "",
+                mqtt_lwt_online: "",
+                mqtt_lwt_offline: ""
+            },
             alertMessage: "",
             alertType: "info",
             showAlert: false,
@@ -157,7 +169,7 @@ export default defineComponent({
                 .then((response) => response.json())
                 .then((data) => (this.mqttConfigList = data));
         },
-        saveMqttConfig(e) {
+        saveMqttConfig(e: Event) {
             e.preventDefault();
 
             const formData = new FormData();
@@ -175,11 +187,11 @@ export default defineComponent({
                     }
                 })
                 .then(
-                    function (response) {
+                    (response) => {
                         this.alertMessage = response.message;
                         this.alertType = response.type;
                         this.showAlert = true;
-                    }.bind(this)
+                    }
                 );
         },
     },

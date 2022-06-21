@@ -20,6 +20,8 @@
   "devDependencies": {
     "@babel/core": "^7.18.5",
     "@babel/eslint-parser": "^7.18.2",
+    "@types/bootstrap": "^5.1.12",
+    "@types/node": "^18.0.0",
     "@typescript-eslint/parser": "^5.29.0",
     "@vue/cli-plugin-babel": "~5.0.0",
     "@vue/cli-plugin-eslint": "~5.0.0",

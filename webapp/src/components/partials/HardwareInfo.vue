@@ -30,13 +30,18 @@
     </div>
 </template>
 
-<script>
+<script lang="ts">
 import { defineComponent } from 'vue';
 
 export default defineComponent({
     data() {
         return {
-            systemDataList: [],
+            systemDataList: {
+                chipmodel: "",
+                chiprevision: "",
+                chipcores: "",
+                cpufreq: ""
+            },
         };
     },
     created() {

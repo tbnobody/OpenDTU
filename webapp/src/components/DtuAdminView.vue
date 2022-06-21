@@ -4,7 +4,7 @@
             <h1>DTU Settings</h1>
         </div>
         <BootstrapAlert v-model="showAlert" dismissible :variant="alertType">
-            {{ this.alertMessage }}
+            {{ alertMessage }}
         </BootstrapAlert>
         <form @submit="saveDtuConfig">
             <div class="card">
@@ -47,7 +47,7 @@
     </div>
 </template>
 
-<script>
+<script lang="ts">
 import { defineComponent } from 'vue';
 import BootstrapAlert from "@/components/partials/BootstrapAlert.vue";
 
@@ -57,7 +57,11 @@ export default defineComponent({
     },
     data() {
         return {
-            dtuConfigList: [],
+            dtuConfigList: {
+                dtu_serial: 0,
+                dtu_pollinterval: 0,
+                dtu_palevel: 0
+            },
             palevelList: [
                 { key: 0, value: "Minimum (-18 dBm)" },
                 { key: 1, value: "Low (-12 dBm)" },
@@ -77,12 +81,12 @@ export default defineComponent({
             fetch("/api/dtu/config")
                 .then((response) => response.json())
                 .then(
-                    function (data) {
+                    (data) => {
                         this.dtuConfigList = data;
-                    }.bind(this)
+                    }
                 );
         },
-        saveDtuConfig(e) {
+        saveDtuConfig(e: Event) {
             e.preventDefault();
 
             const formData = new FormData();
@@ -100,11 +104,11 @@ export default defineComponent({
                     }
                 })
                 .then(
-                    function (response) {
+                    (response) => {
                         this.alertMessage = response.message;
                         this.alertType = response.type;
                         this.showAlert = true;
-                    }.bind(this)
+                    }
                 );
         },
     },

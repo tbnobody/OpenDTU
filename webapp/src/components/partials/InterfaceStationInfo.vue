@@ -38,13 +38,20 @@
     </div>
 </template>
 
-<script>
+<script lang="ts">
 import { defineComponent } from 'vue';
 
 export default defineComponent({
     data() {
         return {
-            networkDataList: [],
+            networkDataList: {
+                sta_ip: "",
+                sta_netmask: "",
+                sta_gateway: "",
+                sta_dns1: "",
+                sta_dns2: "",
+                sta_mac: ""
+            },
         };
     },
     created() {

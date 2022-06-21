@@ -25,7 +25,7 @@
     </div>
 </template>
 
-<script>
+<script lang="ts">
 import { defineComponent } from 'vue';
 import FsInfo from "@/components/partials/FsInfo.vue";
 
@@ -35,7 +35,14 @@ export default defineComponent({
     },
     data() {
         return {
-            systemDataList: [],
+            systemDataList: {
+                heap_total: 0,
+                heap_used: 0,
+                littlefs_total: 0,
+                littlefs_used: 0,
+                sketch_total: 0,
+                sketch_used: 0
+            },
         };
     },
     created() {

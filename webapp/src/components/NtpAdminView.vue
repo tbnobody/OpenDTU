@@ -4,7 +4,7 @@
             <h1>NTP Settings</h1>
         </div>
         <BootstrapAlert v-model="showAlert" dismissible :variant="alertType">
-            {{ this.alertMessage }}
+            {{ alertMessage }}
         </BootstrapAlert>
         <form @submit="saveNtpConfig">
             <div class="card">
@@ -44,7 +44,7 @@
     </div>
 </template>
 
-<script>
+<script lang="ts">
 import { defineComponent } from 'vue';
 import BootstrapAlert from "@/components/partials/BootstrapAlert.vue";
 
@@ -54,7 +54,11 @@ export default defineComponent({
     },
     data() {
         return {
-            ntpConfigList: [],
+            ntpConfigList: {
+                ntp_server: "",
+                ntp_timezone: "",
+                ntp_timezone_descr: ""
+            },
             timezoneList: {},
             timezoneSelect: "",
             alertMessage: "",
@@ -82,16 +86,16 @@ export default defineComponent({
             fetch("/api/ntp/config")
                 .then((response) => response.json())
                 .then(
-                    function (data) {
+                    (data) => {
                         this.ntpConfigList = data;
                         this.timezoneSelect =
                             this.ntpConfigList.ntp_timezone_descr +
                             "---" +
                             this.ntpConfigList.ntp_timezone;
-                    }.bind(this)
+                    }
                 );
         },
-        saveNtpConfig(e) {
+        saveNtpConfig(e: Event) {
             e.preventDefault();
 
             const formData = new FormData();
@@ -109,11 +113,11 @@ export default defineComponent({
                     }
                 })
                 .then(
-                    function (response) {
+                    (response) => {
                         this.alertMessage = response.message;
                         this.alertType = response.type;
                         this.showAlert = true;
-                    }.bind(this)
+                    }
                 );
         },
     },

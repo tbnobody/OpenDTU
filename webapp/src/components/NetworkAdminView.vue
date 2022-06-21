@@ -4,7 +4,7 @@
             <h1>Network Settings</h1>
         </div>
         <BootstrapAlert v-model="showAlert" dismissible :variant="alertType">
-            {{ this.alertMessage }}
+            {{ alertMessage }}
         </BootstrapAlert>
         <form @submit="saveNetworkConfig">
             <div class="card">
@@ -97,7 +97,7 @@
     </div>
 </template>
 
-<script>
+<script lang="ts">
 import { defineComponent } from 'vue';
 import BootstrapAlert from "@/components/partials/BootstrapAlert.vue";
 
@@ -107,7 +107,17 @@ export default defineComponent({
     },
     data() {
         return {
-            networkConfigList: [],
+            networkConfigList: {
+                ssid: "",
+                password: "",
+                hostname: "",
+                dhcp: false,
+                ipaddress: "",
+                netmask: "",
+                gateway: "",
+                dns1: "",
+                dns2: ""
+            },
             alertMessage: "",
             alertType: "info",
             showAlert: false,
@@ -122,7 +132,7 @@ export default defineComponent({
                 .then((response) => response.json())
                 .then((data) => (this.networkConfigList = data));
         },
-        saveNetworkConfig(e) {
+        saveNetworkConfig(e: Event) {
             e.preventDefault();
 
             const formData = new FormData();
@@ -140,11 +150,11 @@ export default defineComponent({
                     }
                 })
                 .then(
-                    function (response) {
+                    (response) => {
                         this.alertMessage = response.message;
                         this.alertType = response.type;
                         this.showAlert = true;
-                    }.bind(this)
+                    }
                 );
         },
     },

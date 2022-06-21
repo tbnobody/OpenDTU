@@ -14,7 +14,7 @@
     </div>
 </template>
 
-<script>
+<script lang="ts">
 import { defineComponent } from 'vue';
 import WifiStationInfo from "./partials/WifiStationInfo.vue";
 import WifiApInfo from "./partials/WifiApInfo.vue";
