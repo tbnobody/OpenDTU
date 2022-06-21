@@ -1,17 +1,17 @@
 <template>
-  <div class="container" role="main">
-    <div class="page-header">
-      <h1>Network Info</h1>
+    <div class="container" role="main">
+        <div class="page-header">
+            <h1>Network Info</h1>
+        </div>
+        <WifiStationInfo />
+        <div class="mt-5"></div>
+        <WifiApInfo />
+        <div class="mt-5"></div>
+        <InterfaceStationInfo />
+        <div class="mt-5"></div>
+        <InterfaceApInfo />
+        <div class="mt-5"></div>
     </div>
-    <WifiStationInfo />
-    <div class="mt-5"></div>
-    <WifiApInfo />
-    <div class="mt-5"></div>
-    <InterfaceStationInfo />
-    <div class="mt-5"></div>
-    <InterfaceApInfo />
-    <div class="mt-5"></div>
-  </div>
 </template>
 
 <script>
@@ -22,11 +22,11 @@ import InterfaceStationInfo from "./partials/InterfaceStationInfo.vue";
 import InterfaceApInfo from "./partials/InterfaceApInfo.vue";
 
 export default defineComponent({
-  components: {
-    WifiStationInfo,
-    WifiApInfo,
-    InterfaceStationInfo,
-    InterfaceApInfo,
-  },
+    components: {
+        WifiStationInfo,
+        WifiApInfo,
+        InterfaceStationInfo,
+        InterfaceApInfo,
+    },
 });
 </script>
