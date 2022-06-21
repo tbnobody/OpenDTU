@@ -106,7 +106,6 @@ export default {
         const spark = new SparkMD5.ArrayBuffer();
         const fileReader = new FileReader();
         let currentChunk = 0;
-        let loadNext;
         fileReader.onload = (e) => {
           spark.append(e.target.result); // Append array buffer
           currentChunk += 1;
@@ -120,7 +119,7 @@ export default {
         fileReader.onerror = (e) => {
           reject(e);
         };
-        loadNext = () => {
+        const loadNext = () => {
           const start = currentChunk * chunkSize;
           const end =
             start + chunkSize >= file.size ? file.size : start + chunkSize;

@@ -115,7 +115,7 @@ export default {
     saveNtpConfig(e) {
       e.preventDefault();
 
-      let formData = new FormData();
+      const formData = new FormData();
       formData.append("data", JSON.stringify(this.ntpConfigList));
 
       fetch("/api/ntp/config", {

@@ -56,7 +56,7 @@ export default {
         .then((data) => (this.networkDataList = data));
     },
     getRSSIasQuality(rssi) {
-      var quality = 0;
+      let quality = 0;
 
       if (rssi <= -100) {
         quality = 0;

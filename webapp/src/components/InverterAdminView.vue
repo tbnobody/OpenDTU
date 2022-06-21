@@ -153,7 +153,7 @@ export default {
         .then((data) => (this.inverters = data.inverter));
     },
     onSubmit() {
-      let formData = new FormData();
+      const formData = new FormData();
       formData.append("data", JSON.stringify(this.inverterData));
 
       fetch("/api/inverter/add", {
@@ -180,7 +180,7 @@ export default {
       this.inverterData.name = "";
     },
     onDelete(id) {
-      let formData = new FormData();
+      const formData = new FormData();
       formData.append("data", JSON.stringify({ id: id }));
 
       fetch("/api/inverter/del", {
@@ -215,7 +215,7 @@ export default {
       this.editInverterData.name = "";
     },
     onEditSubmit(id) {
-      let formData = new FormData();
+      const formData = new FormData();
       this.editInverterData.id = id;
       formData.append("data", JSON.stringify(this.editInverterData));
 

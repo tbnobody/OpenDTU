@@ -97,11 +97,11 @@ export default {
     if (this.isFirstFetchAfterConnect) {
       this.isFirstFetchAfterConnect = false;
 
-      var firstTabEl = this.$el.querySelector(
+      const firstTabEl = this.$el.querySelector(
         "#v-pills-tab:first-child button"
       );
       if (firstTabEl != null) {
-        var firstTab = new bootstrap.Tab(firstTabEl);
+        const firstTab = new bootstrap.Tab(firstTabEl);
         firstTab.show();
       }
     }

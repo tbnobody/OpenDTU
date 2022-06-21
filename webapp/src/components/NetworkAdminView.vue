@@ -194,7 +194,7 @@ export default {
     saveNetworkConfig(e) {
       e.preventDefault();
 
-      let formData = new FormData();
+      const formData = new FormData();
       formData.append("data", JSON.stringify(this.networkConfigList));
 
       fetch("/api/network/config", {
