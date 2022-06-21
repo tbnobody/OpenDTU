@@ -168,9 +168,10 @@
 </template>
 
 <script>
+import { defineComponent } from 'vue';
 import BootstrapAlert from "@/components/partials/BootstrapAlert.vue";
 
-export default {
+export default defineComponent({
   components: {
     BootstrapAlert,
   },
@@ -217,5 +218,5 @@ export default {
         );
     },
   },
-};
+});
 </script>

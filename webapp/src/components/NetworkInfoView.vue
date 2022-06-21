@@ -15,17 +15,18 @@
 </template>
 
 <script>
+import { defineComponent } from 'vue';
 import WifiStationInfo from "./partials/WifiStationInfo.vue";
 import WifiApInfo from "./partials/WifiApInfo.vue";
 import InterfaceStationInfo from "./partials/InterfaceStationInfo.vue";
 import InterfaceApInfo from "./partials/InterfaceApInfo.vue";
 
-export default {
+export default defineComponent({
   components: {
     WifiStationInfo,
     WifiApInfo,
     InterfaceStationInfo,
     InterfaceApInfo,
   },
-};
+});
 </script>

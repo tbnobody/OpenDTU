@@ -25,7 +25,9 @@
 </template>
 
 <script>
-export default {
+import { defineComponent } from 'vue';
+
+export default defineComponent({
   props: {
     channelData: Object,
     channelNumber: Number,
@@ -35,5 +37,5 @@ export default {
       return parseFloat(num).toFixed(2);
     },
   },
-};
+});
 </script>

@@ -25,7 +25,9 @@
 </template>
 
 <script>
-export default {
+import { defineComponent } from 'vue';
+
+export default defineComponent({
   props: {
     name: String,
     total: Number,
@@ -36,5 +38,5 @@ export default {
       return Math.round((this.used / this.total) * 100);
     },
   },
-};
+});
 </script>

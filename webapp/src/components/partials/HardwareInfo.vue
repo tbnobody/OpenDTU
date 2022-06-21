@@ -31,7 +31,9 @@
 </template>
 
 <script>
-export default {
+import { defineComponent } from 'vue';
+
+export default defineComponent({
   data() {
     return {
       systemDataList: [],
@@ -47,5 +49,5 @@ export default {
         .then((data) => (this.systemDataList = data));
     },
   },
-};
+});
 </script>

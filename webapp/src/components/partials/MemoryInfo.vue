@@ -25,9 +25,10 @@
 </template>
 
 <script>
+import { defineComponent } from 'vue';
 import FsInfo from "@/components/partials/FsInfo.vue";
 
-export default {
+export default defineComponent({
   components: {
     FsInfo,
   },
@@ -46,5 +47,5 @@ export default {
         .then((data) => (this.systemDataList = data));
     },
   },
-};
+});
 </script>

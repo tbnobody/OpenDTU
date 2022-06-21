@@ -70,10 +70,11 @@
 </template>
 
 <script>
+import { defineComponent } from 'vue';
 import InverterChannelInfo from "@/components/partials/InverterChannelInfo";
 import bootstrap from "bootstrap/dist/js/bootstrap.js";
 
-export default {
+export default defineComponent({
   components: {
     InverterChannelInfo,
   },
@@ -153,5 +154,5 @@ export default {
       this.isFirstFetchAfterConnect = true;
     },
   },
-};
+});
 </script>

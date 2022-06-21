@@ -60,7 +60,9 @@
 </template>
 
 <script>
-export default {
+import { defineComponent } from 'vue';
+
+export default defineComponent({
   data() {
     return {
       ntpDataList: [],
@@ -76,5 +78,5 @@ export default {
         .then((data) => (this.ntpDataList = data));
     },
   },
-};
+});
 </script>

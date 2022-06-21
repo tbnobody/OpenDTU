@@ -13,15 +13,16 @@
 </template>
 
 <script>
+import { defineComponent } from 'vue';
 import HardwareInfo from "@/components/partials/HardwareInfo.vue";
 import FirmwareInfo from "@/components/partials/FirmwareInfo.vue";
 import MemoryInfo from "@/components/partials/MemoryInfo.vue";
 
-export default {
+export default defineComponent({
   components: {
     HardwareInfo,
     FirmwareInfo,
     MemoryInfo,
   },
-};
+});
 </script>

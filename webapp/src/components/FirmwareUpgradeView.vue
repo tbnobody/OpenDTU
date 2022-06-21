@@ -80,9 +80,10 @@
 </template>
 
 <script>
+import { defineComponent } from 'vue';
 import SparkMD5 from "spark-md5";
 
-export default {
+export default defineComponent({
   data() {
     return {
       loading: true,
@@ -179,5 +180,5 @@ export default {
   mounted() {
     this.loading = false;
   },
-};
+});
 </script>

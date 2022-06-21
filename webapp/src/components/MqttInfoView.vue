@@ -90,7 +90,9 @@
 </template>
 
 <script>
-export default {
+import { defineComponent } from 'vue';
+
+export default defineComponent({
   data() {
     return {
       mqttDataList: [],
@@ -106,5 +108,5 @@ export default {
         .then((data) => (this.mqttDataList = data));
     },
   },
-};
+});
 </script>

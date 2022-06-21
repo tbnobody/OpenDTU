@@ -39,7 +39,9 @@
 </template>
 
 <script>
-export default {
+import { defineComponent } from 'vue';
+
+export default defineComponent({
   data() {
     return {
       networkDataList: [],
@@ -55,5 +57,5 @@ export default {
         .then((data) => (this.networkDataList = data));
     },
   },
-};
+});
 </script>
