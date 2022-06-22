@@ -1,7 +1,8 @@
 <template>
     <div class="col">
         <div class="card">
-            <div class="card-header">Channel {{ channelNumber }}</div>
+            <div v-if="channelNumber >= 1" class="card-header">String {{ channelNumber }}</div>
+            <div v-if="channelNumber == 0" class="card-header">Phase {{ channelNumber + 1 }}</div>
             <div class="card-body">
                 <table class="table table-striped table-hover">
                     <thead>
@@ -30,7 +31,7 @@ import { defineComponent } from 'vue';
 export default defineComponent({
     props: {
         channelData: Object,
-        channelNumber: Number,
+        channelNumber: { type: Number, required: true },
     },
     methods: {
         formatNumber(num: string) {
