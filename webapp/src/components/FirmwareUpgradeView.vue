@@ -12,7 +12,7 @@
             </div>
         </div>
 
-        <div v-if="!loading && !uploading && OTAError !== null" class="card">
+        <div v-if="!loading && !uploading && OTAError != ''" class="card">
             <div class="card-header text-white bg-danger">OTA Error</div>
             <div class="card-body text-center">
                 <p class="h1 mb-2">
@@ -61,8 +61,8 @@
             <div class="card-header text-white bg-primary">Upload Progress</div>
             <div class="card-body text-center">
                 <div class="progress">
-                    <div class="progress-bar" role="progressbar" :style="{ width: this.progress + '%' }"
-                        v-bind:aria-valuenow="this.progress" aria-valuemin="0" aria-valuemax="100">
+                    <div class="progress-bar" role="progressbar" :style="{ width: progress + '%' }"
+                        v-bind:aria-valuenow="progress" aria-valuemin="0" aria-valuemax="100">
                         {{ progress }}%
                     </div>
                 </div>
@@ -71,7 +71,7 @@
     </div>
 </template>
 
-<script>
+<script lang="ts">
 import { defineComponent } from 'vue';
 import SparkMD5 from "spark-md5";
 
@@ -81,26 +81,23 @@ export default defineComponent({
             loading: true,
             uploading: false,
             progress: 0,
-            OTAError: null,
+            OTAError: "",
             OTASuccess: false,
             type: "firmware",
-            file: null,
+            file: {} as Blob,
         };
     },
     methods: {
-        fileMD5(file) {
+        fileMD5(file: Blob) {
             return new Promise((resolve, reject) => {
-                const blobSlice =
-                    File.prototype.slice ||
-                    File.prototype.mozSlice ||
-                    File.prototype.webkitSlice;
+                const blobSlice = File.prototype.slice;
                 const chunkSize = 2097152; // Read in chunks of 2MB
                 const chunks = Math.ceil(file.size / chunkSize);
                 const spark = new SparkMD5.ArrayBuffer();
                 const fileReader = new FileReader();
                 let currentChunk = 0;
-                fileReader.onload = (e) => {
-                    spark.append(e.target.result); // Append array buffer
+                fileReader.onload = (e: Event) => {
+                    spark.append(fileReader.result as ArrayBuffer); // Append array buffer
                     currentChunk += 1;
                     if (currentChunk < chunks) {
                         loadNext();
@@ -121,11 +118,14 @@ export default defineComponent({
                 loadNext();
             });
         },
-        uploadOTA(event) {
+        uploadOTA(event: Event | null) {
             this.uploading = true;
             const formData = new FormData();
             if (event !== null) {
-                [this.file] = event.target.files;
+                const target= event.target as HTMLInputElement;
+                if (target.files !== null) {
+                    this.file = target.files[0];
+                }
             }
             const request = new XMLHttpRequest();
             request.addEventListener("load", () => {
@@ -147,7 +147,7 @@ export default defineComponent({
             request.withCredentials = true;
             this.fileMD5(this.file)
                 .then((md5) => {
-                    formData.append("MD5", md5);
+                    formData.append("MD5", (md5 as string));
                     formData.append("firmware", this.file, "firmware");
                     request.open("post", "/api/firmware/update");
                     request.send(formData);
@@ -160,12 +160,12 @@ export default defineComponent({
                 });
         },
         retryOTA() {
-            this.OTAError = null;
+            this.OTAError = "";
             this.OTASuccess = false;
             this.uploadOTA(null);
         },
         clear() {
-            this.OTAError = null;
+            this.OTAError = "";
             this.OTASuccess = false;
         },
     },
