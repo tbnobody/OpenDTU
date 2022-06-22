@@ -22,8 +22,24 @@ It was the goal to replace the original Hoymiles DTU (Telemetry Gateway) with th
 
 * The WebApp part
     * Build with [Vue.js](https://vuejs.org)
+    * Source is written in TypeScript
+
+## Wiring up
+### Schematic
+![Schematic](docs/Wiring_ESP32_Schematic.png)
+
+### Symbolic view
+![Symbolic](docs/Wiring_ESP32_Symbol.png)
 
 ## Flashing and starting up
+* Install [Visual Studio Code](https://code.visualstudio.com/download)
+* In Visual Studio Code, install the [PlatformIO Extension](https://marketplace.visualstudio.com/items?itemName=platformio.platformio-ide)
+* Download or clone this repository
+* In Visual Studio Code, choose File --> Open Folder and select the previously downladed source code. (You have to select the folder which contains the "platformio.ini" file)
+* Adjust the COM port in the file "platfrmio.ini". It occours twice:
+    * upload_port
+    * monitor_port
+* Select the arrow button in the status bar (PlatformIO: Upload) to compile and upload the firmware. During the compilation, all required libraries are downloaded automatically.
 
 ## First configuration
 * After the initial flashing of the mikrocontroller, a Access Point called "OpenDTU-*" is opened. The default password is "openDTU42".
