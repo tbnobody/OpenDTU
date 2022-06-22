@@ -3,10 +3,10 @@
 #include <Arduino.h>
 
 #define CONFIG_FILENAME "/config.bin"
-#define CONFIG_VERSION 0x00011000 // 0.1.10 // make sure to clean all after change
+#define CONFIG_VERSION 0x00011100 // 0.1.17 // make sure to clean all after change
 
 #define WIFI_MAX_SSID_STRLEN 31
-#define WIFI_MAX_PASSWORD_STRLEN 31
+#define WIFI_MAX_PASSWORD_STRLEN 64
 #define WIFI_MAX_HOSTNAME_STRLEN 31
 
 #define NTP_MAX_SERVER_STRLEN 31
@@ -21,10 +21,12 @@
 
 #define INV_MAX_NAME_STRLEN 31
 #define INV_MAX_COUNT 10
+#define INV_MAX_CHAN_COUNT 4
 
 struct INVERTER_CONFIG_T {
     uint64_t Serial;
     char Name[INV_MAX_NAME_STRLEN + 1];
+    uint16_t MaxChannelPower[INV_MAX_CHAN_COUNT];
 };
 
 struct CONFIG_T {
@@ -55,14 +57,13 @@ struct CONFIG_T {
     char Mqtt_LwtTopic[MQTT_MAX_TOPIC_STRLEN + 1];
     char Mqtt_LwtValue_Online[MQTT_MAX_LWTVALUE_STRLEN + 1];
     char Mqtt_LwtValue_Offline[MQTT_MAX_LWTVALUE_STRLEN + 1];
+    uint32_t Mqtt_PublishInterval;
 
     INVERTER_CONFIG_T Inverter[INV_MAX_COUNT];
 
     uint64_t Dtu_Serial;
     uint32_t Dtu_PollInterval;
     uint8_t Dtu_PaLevel;
-
-    uint32_t Mqtt_PublishInterval;
 };
 
 class ConfigurationClass {

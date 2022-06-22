@@ -37,6 +37,9 @@ void ConfigurationClass::init()
     for (uint8_t i = 0; i < INV_MAX_COUNT; i++) {
         config.Inverter[i].Serial = 0;
         strlcpy(config.Inverter[i].Name, "", 0);
+        for (uint8_t c = 0; c < INV_MAX_CHAN_COUNT; c++) {
+            config.Inverter[0].MaxChannelPower[c] = 0;
+        }
     }
 
     config.Dtu_Serial = DTU_SERIAL;
@@ -115,6 +118,10 @@ void ConfigurationClass::migrate()
 
     if (config.Cfg_Version < 0x00011000) {
         config.Mqtt_PublishInterval = MQTT_PUBLISH_INTERVAL;
+    }
+
+    if (config.Cfg_Version < 0x00011100) {
+        init(); // Config will be completly incompatible after this update
     }
 
     config.Cfg_Version = CONFIG_VERSION;
