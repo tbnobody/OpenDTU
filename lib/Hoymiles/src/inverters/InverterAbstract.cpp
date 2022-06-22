@@ -5,6 +5,7 @@
 InverterAbstract::InverterAbstract(uint64_t serial)
 {
     _serial.u64 = serial;
+    memset(_payloadStats, 0, MAX_RF_FRAGMENT_COUNT * MAX_RF_PAYLOAD_SIZE);
 }
 
 uint64_t InverterAbstract::serial()
