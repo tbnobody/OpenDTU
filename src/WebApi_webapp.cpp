@@ -1,14 +1,14 @@
 #include "WebApi_webapp.h"
 
-extern const uint8_t file_index_html_start[] asm("_binary_data_index_html_gz_start");
-extern const uint8_t file_favicon_ico_start[] asm("_binary_data_favicon_ico_start");
-extern const uint8_t file_zones_json_start[] asm("_binary_data_zones_json_gz_start");
-extern const uint8_t file_app_js_start[] asm("_binary_data_js_app_js_gz_start");
+extern const uint8_t file_index_html_start[] asm("_binary_webapp_dist_index_html_gz_start");
+extern const uint8_t file_favicon_ico_start[] asm("_binary_webapp_dist_favicon_ico_start");
+extern const uint8_t file_zones_json_start[] asm("_binary_webapp_dist_zones_json_gz_start");
+extern const uint8_t file_app_js_start[] asm("_binary_webapp_dist_js_app_js_gz_start");
 
-extern const uint8_t file_index_html_end[] asm("_binary_data_index_html_gz_end");
-extern const uint8_t file_favicon_ico_end[] asm("_binary_data_favicon_ico_end");
-extern const uint8_t file_zones_json_end[] asm("_binary_data_zones_json_gz_end");
-extern const uint8_t file_app_js_end[] asm("_binary_data_js_app_js_gz_end");
+extern const uint8_t file_index_html_end[] asm("_binary_webapp_dist_index_html_gz_end");
+extern const uint8_t file_favicon_ico_end[] asm("_binary_webapp_dist_favicon_ico_end");
+extern const uint8_t file_zones_json_end[] asm("_binary_webapp_dist_zones_json_gz_end");
+extern const uint8_t file_app_js_end[] asm("_binary_webapp_dist_js_app_js_gz_end");
 
 void WebApiWebappClass::init(AsyncWebServer* server)
 {

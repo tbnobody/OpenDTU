@@ -2,7 +2,7 @@ const { defineConfig } = require('@vue/cli-service')
 module.exports = defineConfig({
     transpileDependencies: true,
     productionSourceMap: false,
-    outputDir: '../data',
+    outputDir: '../webapp_dist',
     filenameHashing: false,
     css: {
         extract: false,
