@@ -80,9 +80,13 @@ void setup()
 
     for (uint8_t i = 0; i < INV_MAX_COUNT; i++) {
         if (config.Inverter[i].Serial > 0) {
-            Hoymiles.addInverter(
+            auto inv = Hoymiles.addInverter(
                 config.Inverter[i].Name,
                 config.Inverter[i].Serial);
+
+            for (uint8_t c = 0; c < INV_MAX_CHAN_COUNT; c++) {
+                inv->setChannelMaxPower(c, config.Inverter[i].MaxChannelPower[c]);
+            }
         }
     }
     Serial.println(F("done"));

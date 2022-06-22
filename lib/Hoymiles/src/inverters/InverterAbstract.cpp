@@ -136,8 +136,14 @@ uint8_t InverterAbstract::getChannelCount()
 
 uint16_t InverterAbstract::getChannelMaxPower(uint8_t channel)
 {
-    // todo;
-    return 0;
+    return _chanMaxPower[channel];
+}
+
+void InverterAbstract::setChannelMaxPower(uint8_t channel, uint16_t power)
+{
+    if (channel < CH4) {
+        _chanMaxPower[channel] = power;
+    }
 }
 
 uint8_t InverterAbstract::getAssignIdxByChannelField(uint8_t channel, uint8_t fieldId)

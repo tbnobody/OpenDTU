@@ -99,6 +99,7 @@ public:
     virtual const uint8_t getAssignmentCount() = 0;
     uint8_t getChannelCount();
     uint16_t getChannelMaxPower(uint8_t channel);
+    void setChannelMaxPower(uint8_t channel, uint16_t power);
 
     void clearRxFragmentBuffer();
     void addRxFragment(uint8_t fragment[], uint8_t len);
@@ -122,4 +123,5 @@ private:
 
     uint8_t _payloadStats[MAX_RF_FRAGMENT_COUNT * MAX_RF_PAYLOAD_SIZE];
     uint32_t _lastStatsUpdate = 0;
+    uint16_t _chanMaxPower[CH4];
 };
