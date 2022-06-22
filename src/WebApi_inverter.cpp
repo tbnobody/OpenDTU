@@ -48,6 +48,10 @@ void WebApiInverterClass::onInverterList(AsyncWebServerRequest* request)
             } else {
                 obj[F("type")] = inv->typeName();
             }
+
+            for (uint8_t c = 0; c < INV_MAX_CHAN_COUNT; c++) {
+                obj[F("max_power")][c] = config.Inverter[i].MaxChannelPower[c];
+            }
         }
     }
 
