@@ -90,7 +90,7 @@ const calcFunc_t calcFunctions[] = {
 
 class InverterAbstract {
 public:
-    void setSerial(uint64_t serial);
+    InverterAbstract(uint64_t serial);
     uint64_t serial();
     void setName(const char* name);
     const char* name();

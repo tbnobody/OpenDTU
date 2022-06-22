@@ -4,6 +4,7 @@
 
 class HM_2CH : public InverterAbstract {
 public:
+    HM_2CH(uint64_t serial);
     static bool isValidSerial(uint64_t serial);
     String typeName();
     const byteAssign_t* getByteAssignment();

@@ -212,8 +212,12 @@ void WebApiInverterClass::onInverterEdit(AsyncWebServerRequest* request)
     request->send(response);
 
     std::shared_ptr<InverterAbstract> inv = Hoymiles.getInverterByPos(root[F("id")].as<uint64_t>());
-    inv->setName(inverter.Name);
-    inv->setSerial(inverter.Serial);
+
+    if (inv->serial() != inverter.Serial) {
+        // Serial was changed
+        Hoymiles.removeInverterByPos(root[F("id")].as<uint64_t>());
+        inv = Hoymiles.addInverter(inverter.Name, inverter.Serial);
+    }
 
     for (uint8_t c = 0; c < INV_MAX_CHAN_COUNT; c++) {
         inv->setChannelMaxPower(c, inverter.MaxChannelPower[c]);

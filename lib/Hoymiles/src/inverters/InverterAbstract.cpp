@@ -2,7 +2,7 @@
 #include "crc.h"
 #include <cstring>
 
-void InverterAbstract::setSerial(uint64_t serial)
+InverterAbstract::InverterAbstract(uint64_t serial)
 {
     _serial.u64 = serial;
 }

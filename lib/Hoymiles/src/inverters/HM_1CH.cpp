@@ -1,5 +1,8 @@
 #include "HM_1CH.h"
 
+HM_1CH::HM_1CH(uint64_t serial)
+    : InverterAbstract(serial) {};
+
 bool HM_1CH::isValidSerial(uint64_t serial)
 {
     return serial >= 0x112100000000 && serial <= 0x112199999999;

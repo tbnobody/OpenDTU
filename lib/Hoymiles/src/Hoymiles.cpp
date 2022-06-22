@@ -50,17 +50,16 @@ std::shared_ptr<InverterAbstract> HoymilesClass::addInverter(const char* name, u
 {
     std::shared_ptr<InverterAbstract> i;
     if (HM_4CH::isValidSerial(serial)) {
-        i = std::make_shared<HM_4CH>();
+        i = std::make_shared<HM_4CH>(serial);
     }
     else if (HM_2CH::isValidSerial(serial)) {
-        i = std::make_shared<HM_2CH>();
+        i = std::make_shared<HM_2CH>(serial);
     }
     else if (HM_1CH::isValidSerial(serial)) {
-        i = std::make_shared<HM_1CH>();
+        i = std::make_shared<HM_1CH>(serial);
     }
 
     if (i) {
-        i->setSerial(serial);
         i->setName(name);
         _inverters.push_back(std::move(i));
         return _inverters.back();
