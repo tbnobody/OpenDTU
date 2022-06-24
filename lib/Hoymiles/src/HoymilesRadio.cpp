@@ -250,29 +250,21 @@ void HoymilesRadio::sendEsbPacket(serial_u target, uint8_t mainCmd, uint8_t subC
     _rxTimeout.set(timeout);
 }
 
-void HoymilesRadio::sendTimePacket(std::shared_ptr<InverterAbstract> iv, time_t ts)
+void HoymilesRadio::sendTimePacket(std::shared_ptr<InverterAbstract> iv)
 {
-    uint8_t payload[16] = { 0 };
+    inverter_transaction_t payload;
+    if (iv->getStatsRequest(&payload)) {
+        serial_u s;
+        s.u64 = iv->serial();
+        _activeSerial.u64 = iv->serial();
 
-    payload[0] = 0x0b;
-    payload[1] = 0x00;
-    u32CpyLittleEndian(&payload[2], ts); // sets the 4 following elements {2, 3, 4, 5}
-    payload[9] = 0x05;
-
-    uint16_t crc = crc16(&payload[0], 14);
-    payload[14] = (crc >> 8) & 0xff;
-    payload[15] = (crc)&0xff;
-
-    serial_u s;
-    s.u64 = iv->serial();
-    _activeSerial.u64 = iv->serial();
-
-    sendEsbPacket(s, 0x15, 0x80, payload, sizeof(payload) / sizeof(uint8_t), 200);
+        sendEsbPacket(s, payload.mainCmd, payload.subCmd, payload.payload, payload.len, payload.timeout);
+    }
 }
 
 void HoymilesRadio::sendRetransmitPacket(uint8_t fragment_id)
 {
-    sendEsbPacket(_activeSerial, 0x15, (uint8_t)(0x80 + fragment_id), 0, 0, 60);
+    sendEsbPacket(_activeSerial, currentTransaction.mainCmd, (uint8_t)(0x80 + fragment_id), 0, 0, 60);
 }
 
 void HoymilesRadio::sendLastPacketAgain()

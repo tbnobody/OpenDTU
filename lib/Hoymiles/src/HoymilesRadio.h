@@ -24,9 +24,11 @@ public:
 
     bool isIdle();
     void sendEsbPacket(serial_u target, uint8_t mainCmd, uint8_t subCmd, uint8_t payload[], uint8_t len, uint32_t timeout, bool resend = false);
-    void sendTimePacket(std::shared_ptr<InverterAbstract> iv, time_t ts);
+    void sendTimePacket(std::shared_ptr<InverterAbstract> iv);
     void sendRetransmitPacket(uint8_t fragment_id);
     void sendLastPacketAgain();
+
+    static void u32CpyLittleEndian(uint8_t dest[], uint32_t src);
 
 private:
     void ARDUINO_ISR_ATTR handleIntr();
@@ -39,7 +41,6 @@ private:
     void openWritingPipe(serial_u serial);
     bool checkFragmentCrc(fragment_t* fragment);
     void dumpBuf(const char* info, uint8_t buf[], uint8_t len);
-    void u32CpyLittleEndian(uint8_t dest[], uint32_t src);
 
     std::unique_ptr<RF24> _radio;
     uint8_t _rxChLst[5] = { 3, 23, 40, 61, 75 };

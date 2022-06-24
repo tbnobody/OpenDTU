@@ -1,8 +1,8 @@
 #pragma once
 
-#include "InverterAbstract.h"
+#include "HM_Abstract.h"
 
-class HM_2CH : public InverterAbstract {
+class HM_2CH : public HM_Abstract {
 public:
     HM_2CH(uint64_t serial);
     static bool isValidSerial(uint64_t serial);

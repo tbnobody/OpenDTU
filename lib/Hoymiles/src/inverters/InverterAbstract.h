@@ -111,6 +111,7 @@ public:
     const char* getUnit(uint8_t channel, uint8_t fieldId);
     const char* getName(uint8_t channel, uint8_t fieldId);
 
+    virtual bool getStatsRequest(inverter_transaction_t* payload) = 0;
     uint32_t getLastStatsUpdate();
 
 private:

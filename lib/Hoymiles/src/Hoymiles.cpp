@@ -27,14 +27,7 @@ void HoymilesClass::loop()
                 Serial.println(iv->serial());
 
                 iv->clearRxFragmentBuffer();
-
-                time_t now;
-                time(&now);
-                if (now > 0) {
-                    _radio->sendTimePacket(iv, now);
-                } else {
-                    Serial.println(F("Cancled. Time not yet synced."));
-                }
+                _radio->sendTimePacket(iv);
             }
 
             if (++inverterPos >= getNumInverters()) {
