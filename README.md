@@ -6,17 +6,17 @@ It was the goal to replace the original Hoymiles DTU (Telemetry Gateway) with th
 
 
 ## Features for end users
-* Uses ESP32 mikrocontroller and NRF24L01+
+* Uses ESP32 microcontroller and NRF24L01+
 * Multi-Inverter support
 * MQTT support
-* Nice and fancy WebApp with visualisation of current data
+* Nice and fancy WebApp with visualization of current data
 * Firmware upgrade using the web UI
 * Default source supports up to 10 inverters
-* Timezone support
+* Time zone support
 
 
 ## Features for developers
-* The mikrocontroller part
+* The microcontroller part
     * Build with Arduino PlatformIO Framework for the ESP32
     * Uses [ESPAsyncWebserver](https://github.com/me-no-dev/ESPAsyncWebServer) and [Async MQTT client](https://github.com/marvinroger/async-mqtt-client)
 
@@ -35,15 +35,15 @@ It was the goal to replace the original Hoymiles DTU (Telemetry Gateway) with th
 * Install [Visual Studio Code](https://code.visualstudio.com/download)
 * In Visual Studio Code, install the [PlatformIO Extension](https://marketplace.visualstudio.com/items?itemName=platformio.platformio-ide)
 * Download or clone this repository
-* In Visual Studio Code, choose File --> Open Folder and select the previously downladed source code. (You have to select the folder which contains the "platformio.ini" file)
-* Adjust the COM port in the file "platfrmio.ini". It occours twice:
+* In Visual Studio Code, choose File --> Open Folder and select the previously downloaded source code. (You have to select the folder which contains the "platformio.ini" file)
+* Adjust the COM port in the file "platformio.ini". It occurs twice:
     * upload_port
     * monitor_port
 * Select the arrow button in the status bar (PlatformIO: Upload) to compile and upload the firmware. During the compilation, all required libraries are downloaded automatically.
 
 ## First configuration
-* After the initial flashing of the mikrocontroller, a Access Point called "OpenDTU-*" is opened. The default password is "openDTU42".
-* Use a webbrowser to open the address [http://192.168.4.1](http://192.168.4.1)
+* After the initial flashing of the microcontroller, a Access Point called "OpenDTU-*" is opened. The default password is "openDTU42".
+* Use a web browser to open the address [http://192.168.4.1](http://192.168.4.1)
 * Navigate to Settings --> Network Settings and enter your WiFi credentials
 * Currently you have to look at your router to determine the IP of the newly connected device
 
@@ -56,5 +56,5 @@ It was the goal to replace the original Hoymiles DTU (Telemetry Gateway) with th
     ```
     * The updated output is placed in the 'data' directory
 
-* Building the mikrocontroller firmware
+* Building the microcontroller firmware
     * Visual Studio Code with the PlatformIO Extension is required for building
