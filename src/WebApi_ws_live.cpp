@@ -81,8 +81,8 @@ void WebApiWsLiveClass::loop()
 
 void WebApiWsLiveClass::addField(JsonDocument& root, uint8_t idx, std::shared_ptr<InverterAbstract> inv, uint8_t channel, uint8_t fieldId)
 {
-    if (inv->hasValue(channel, fieldId)) {
-        root[idx][String(channel)][inv->getName(channel, fieldId)]["v"] = inv->getValue(channel, fieldId);
-        root[idx][String(channel)][inv->getName(channel, fieldId)]["u"] = inv->getUnit(channel, fieldId);
+    if (inv->hasChannelFieldValue(channel, fieldId)) {
+        root[idx][String(channel)][inv->getChannelFieldName(channel, fieldId)]["v"] = inv->getChannelFieldValue(channel, fieldId);
+        root[idx][String(channel)][inv->getChannelFieldName(channel, fieldId)]["u"] = inv->getChannelFieldUnit(channel, fieldId);
     }
 }

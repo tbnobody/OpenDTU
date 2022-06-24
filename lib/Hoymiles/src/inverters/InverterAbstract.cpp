@@ -160,7 +160,7 @@ uint8_t InverterAbstract::getAssignIdxByChannelField(uint8_t channel, uint8_t fi
     return 0xff;
 }
 
-float InverterAbstract::getValue(uint8_t channel, uint8_t fieldId)
+float InverterAbstract::getChannelFieldValue(uint8_t channel, uint8_t fieldId)
 {
     uint8_t pos = getAssignIdxByChannelField(channel, fieldId);
     if (pos == 0xff) {
@@ -190,13 +190,13 @@ float InverterAbstract::getValue(uint8_t channel, uint8_t fieldId)
     return 0;
 }
 
-bool InverterAbstract::hasValue(uint8_t channel, uint8_t fieldId)
+bool InverterAbstract::hasChannelFieldValue(uint8_t channel, uint8_t fieldId)
 {
     uint8_t pos = getAssignIdxByChannelField(channel, fieldId);
     return pos != 0xff;
 }
 
-const char* InverterAbstract::getUnit(uint8_t channel, uint8_t fieldId)
+const char* InverterAbstract::getChannelFieldUnit(uint8_t channel, uint8_t fieldId)
 {
     uint8_t pos = getAssignIdxByChannelField(channel, fieldId);
     const byteAssign_t* b = getByteAssignment();
@@ -204,7 +204,7 @@ const char* InverterAbstract::getUnit(uint8_t channel, uint8_t fieldId)
     return units[b[pos].unitId];
 }
 
-const char* InverterAbstract::getName(uint8_t channel, uint8_t fieldId)
+const char* InverterAbstract::getChannelFieldName(uint8_t channel, uint8_t fieldId)
 {
     uint8_t pos = getAssignIdxByChannelField(channel, fieldId);
     const byteAssign_t* b = getByteAssignment();
@@ -216,7 +216,7 @@ static float calcYieldTotalCh0(InverterAbstract* iv, uint8_t arg0)
 {
     float yield = 0;
     for (uint8_t i = 1; i <= iv->getChannelCount(); i++) {
-        yield += iv->getValue(i, FLD_YT);
+        yield += iv->getChannelFieldValue(i, FLD_YT);
     }
     return yield;
 }
@@ -225,7 +225,7 @@ static float calcYieldDayCh0(InverterAbstract* iv, uint8_t arg0)
 {
     float yield = 0;
     for (uint8_t i = 1; i <= iv->getChannelCount(); i++) {
-        yield += iv->getValue(i, FLD_YD);
+        yield += iv->getChannelFieldValue(i, FLD_YD);
     }
     return yield;
 }
@@ -233,14 +233,14 @@ static float calcYieldDayCh0(InverterAbstract* iv, uint8_t arg0)
 // arg0 = channel of source
 static float calcUdcCh(InverterAbstract* iv, uint8_t arg0)
 {
-    return iv->getValue(arg0, FLD_UDC);
+    return iv->getChannelFieldValue(arg0, FLD_UDC);
 }
 
 static float calcPowerDcCh0(InverterAbstract* iv, uint8_t arg0)
 {
     float dcPower = 0;
     for (uint8_t i = 1; i <= iv->getChannelCount(); i++) {
-        dcPower += iv->getValue(i, FLD_PDC);
+        dcPower += iv->getChannelFieldValue(i, FLD_PDC);
     }
     return dcPower;
 }
@@ -248,10 +248,10 @@ static float calcPowerDcCh0(InverterAbstract* iv, uint8_t arg0)
 // arg0 = channel
 static float calcEffiencyCh0(InverterAbstract* iv, uint8_t arg0)
 {
-    float acPower = iv->getValue(CH0, FLD_PAC);
+    float acPower = iv->getChannelFieldValue(CH0, FLD_PAC);
     float dcPower = 0;
     for (uint8_t i = 1; i <= iv->getChannelCount(); i++) {
-        dcPower += iv->getValue(i, FLD_PDC);
+        dcPower += iv->getChannelFieldValue(i, FLD_PDC);
     }
     if (dcPower > 0) {
         return acPower / dcPower * 100.0f;
@@ -265,7 +265,7 @@ static float calcIrradiation(InverterAbstract* iv, uint8_t arg0)
 {
     if (NULL != iv) {
         if (iv->getChannelMaxPower(arg0) > 0)
-            return iv->getValue(arg0, FLD_PDC) / iv->getChannelMaxPower(arg0) * 100.0f;
+            return iv->getChannelFieldValue(arg0, FLD_PDC) / iv->getChannelMaxPower(arg0) * 100.0f;
     }
     return 0.0;
 }

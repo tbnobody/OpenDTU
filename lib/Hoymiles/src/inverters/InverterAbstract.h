@@ -106,10 +106,10 @@ public:
     uint8_t verifyAllFragments();
 
     uint8_t getAssignIdxByChannelField(uint8_t channel, uint8_t fieldId);
-    float getValue(uint8_t channel, uint8_t fieldId);
-    bool hasValue(uint8_t channel, uint8_t fieldId);
-    const char* getUnit(uint8_t channel, uint8_t fieldId);
-    const char* getName(uint8_t channel, uint8_t fieldId);
+    float getChannelFieldValue(uint8_t channel, uint8_t fieldId);
+    bool hasChannelFieldValue(uint8_t channel, uint8_t fieldId);
+    const char* getChannelFieldUnit(uint8_t channel, uint8_t fieldId);
+    const char* getChannelFieldName(uint8_t channel, uint8_t fieldId);
 
     virtual bool getStatsRequest(inverter_transaction_t* payload) = 0;
     uint32_t getLastStatsUpdate();
