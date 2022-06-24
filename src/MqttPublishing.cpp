@@ -63,6 +63,8 @@ void MqttPublishingClass::loop()
 void MqttPublishingClass::publishField(String subtopic, std::shared_ptr<InverterAbstract> inv, uint8_t channel, uint8_t fieldId)
 {
     if (inv->hasChannelFieldValue(channel, fieldId)) {
-        MqttSettings.publish(subtopic + "/" + String(channel) + "/" + inv->getChannelFieldName(channel, fieldId), String(inv->getChannelFieldValue(channel, fieldId)));
+        String chanName(inv->getChannelFieldName(channel, fieldId));
+        chanName.toLowerCase();
+        MqttSettings.publish(subtopic + "/" + String(channel) + "/" + chanName, String(inv->getChannelFieldValue(channel, fieldId)));
     }
 }

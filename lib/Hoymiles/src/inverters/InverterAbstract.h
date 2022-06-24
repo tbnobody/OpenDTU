@@ -31,8 +31,8 @@ enum { FLD_UDC = 0,
     FLD_PCT,
     FLD_EFF,
     FLD_IRR };
-const char* const fields[] = { "U_DC", "I_DC", "P_DC", "YieldDay", "YieldTotal",
-    "U_AC", "I_AC", "P_AC", "Freq", "Temp", "Pct", "Effiency", "Irradiation" };
+const char* const fields[] = { "Voltage", "Current", "Power", "YieldDay", "YieldTotal",
+    "Voltage", "Current", "Power", "Frequency", "Temperature", "PowerFactor", "Effiency", "Irradiation" };
 
 // indices to calculation functions, defined in hmInverter.h
 enum { CALC_YT_CH0 = 0,
