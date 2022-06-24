@@ -44,56 +44,82 @@
                         </thead>
                         <tbody>
                             <tr v-for="inverter in sortedInverters" v-bind:key="inverter.id">
-                                <template v-if="editId == inverter.id">
-                                    <td>
-                                        <input v-model="editInverterData.serial" type="number" class="form-control" />
-                                    </td>
-                                    <td>
-                                        <input v-model="editInverterData.name" type="text" class="form-control"
-                                            maxlength="31" />
-                                    </td>
-                                    <td>
-                                        {{ editInverterData.type }}
-                                    </td>
-                                    <td>
-                                        <a href="#" class="icon">
-                                            <BIconCheck v-on:click="onEditSubmit(inverter.id)" />
-                                        </a>
-                                        <a href="#" class="icon">
-                                            <BIconX v-on:click="onCancel" />
-                                        </a>
-                                    </td>
-                                </template>
-                                <template v-else>
-                                    <td>
-                                        {{ inverter.serial }}
-                                    </td>
-                                    <td>
-                                        {{ inverter.name }}
-                                    </td>
-                                    <td>
-                                        {{ inverter.type }}
-                                    </td>
-                                    <td>
-                                        <a href="#" class="icon">
-                                            <BIconTrash v-on:click="onDelete(inverter.id)" />
-                                        </a>
-                                        <a href="#" class="icon">
-                                            <BIconPencil v-on:click="onEdit(inverter)" />
-                                        </a>
-                                    </td>
-                                </template>
+
+                                <td>
+                                    {{ inverter.serial }}
+                                </td>
+                                <td>
+                                    {{ inverter.name }}
+                                </td>
+                                <td>
+                                    {{ inverter.type }}
+                                </td>
+                                <td>
+                                    <a href="#" class="icon">
+                                        <BIconTrash v-on:click="onDelete(inverter.id)" />
+                                    </a>
+                                    <a href="#" class="icon">
+                                        <BIconPencil v-on:click="onEdit(inverter)" />
+                                    </a>
+                                </td>
                             </tr>
                         </tbody>
                     </table>
                 </div>
             </div>
         </div>
+
+        <div class="modal" id="inverterEdit" tabindex="-1">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Edit Inverter</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+
+                        <form>
+                            <div class="mb-3">
+                                <label for="inverter-serial" class="col-form-label">Serial:</label>
+                                <input v-model="editInverterData.serial" type="number" id="inverter-serial"
+                                    class="form-control" />
+                            </div>
+                            <div class="mb-3">
+                                <label for="inverter-name" class="col-form-label">Name:</label>
+                                <input v-model="editInverterData.name" type="text" id="inverter-name"
+                                    class="form-control" maxlength="31" />
+                            </div>
+
+                            <div class="mb-3" v-for="(max, index) in editInverterData.max_power" :key="`${index}`">
+                                <label :for="`inverter-max_${index}`" class="col-form-label">Max power string {{ index +
+                                        1
+                                }}:</label>
+                                <div class="input-group">
+                                    <input type="number" class="form-control" :id="`inverter-max_${index}`" min="0"
+                                        v-model="editInverterData.max_power[index]"
+                                        :aria-describedby="`inverter-maxDescription_${index}`" />
+                                    <span class="input-group-text" :id="`inverter-maxDescription_${index}`">W</span>
+                                </div>
+                            </div>
+                        </form>
+
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" @click="onCancel"
+                            data-bs-dismiss="modal">Cancel</button>
+                        <button type="button" class="btn btn-primary" @click="onEditSubmit(editId)">Save
+                            changes</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
     </div>
 </template>
 
 <script lang="ts">
 import { defineComponent } from 'vue';
+import * as bootstrap from 'bootstrap';
 import BootstrapAlert from "@/components/partials/BootstrapAlert.vue";
 
 declare interface Inverter {
@@ -101,6 +127,7 @@ declare interface Inverter {
     serial: number,
     name: string,
     type: string
+    max_power: number[]
 }
 
 export default defineComponent({
@@ -109,6 +136,7 @@ export default defineComponent({
     },
     data() {
         return {
+            modal: {} as bootstrap.Modal,
             editId: "-1",
             inverterData: {} as Inverter,
             editInverterData: {} as Inverter,
@@ -117,6 +145,9 @@ export default defineComponent({
             alertType: "info",
             showAlert: false,
         };
+    },
+    mounted() {
+        this.modal = new bootstrap.Modal('#inverterEdit');
     },
     created() {
         this.getInverters();
@@ -186,15 +217,19 @@ export default defineComponent({
                 .then(() => { this.getInverters() });
         },
         onEdit(inverter: Inverter) {
+            this.modal.show();
             this.editId = inverter.id;
             this.editInverterData.serial = inverter.serial;
             this.editInverterData.name = inverter.name;
             this.editInverterData.type = inverter.type;
+            this.editInverterData.max_power = inverter.max_power;
         },
         onCancel() {
             this.editId = "-1";
             this.editInverterData.serial = 0;
             this.editInverterData.name = "";
+            this.editInverterData.max_power = [];
+            this.modal.hide();
         },
         onEditSubmit(id: string) {
             const formData = new FormData();
@@ -225,6 +260,8 @@ export default defineComponent({
             this.editInverterData.serial = 0;
             this.editInverterData.name = "";
             this.editInverterData.type = "";
+            this.editInverterData.max_power = [];
+            this.modal.hide();
         },
     },
 });

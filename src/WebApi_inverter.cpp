@@ -173,7 +173,7 @@ void WebApiInverterClass::onInverterEdit(AsyncWebServerRequest* request)
         return;
     }
 
-    if (!(root.containsKey("id") && root.containsKey("serial") && root.containsKey("name"))) {
+    if (!(root.containsKey("id") && root.containsKey("serial") && root.containsKey("name") && root.containsKey("max_power"))) {
         retMsg[F("message")] = F("Values are missing!");
         response->setLength();
         request->send(response);
@@ -201,12 +201,32 @@ void WebApiInverterClass::onInverterEdit(AsyncWebServerRequest* request)
         return;
     }
 
+    JsonArray maxPowerArray = root[F("max_power")].as<JsonArray>();
+    uint8_t arrayCount = 0;
+    for (JsonVariant maxPower : maxPowerArray) {
+        arrayCount++;
+    }
+    if (arrayCount != INV_MAX_CHAN_COUNT) {
+        retMsg[F("message")] = F("Invalid amount of max channel setting given!");
+        response->setLength();
+        request->send(response);
+        return;
+    }
+
+
     INVERTER_CONFIG_T& inverter = Configuration.get().Inverter[root[F("id")].as<uint8_t>()];
 
     char* t;
     // Interpret the string as a hex value and convert it to uint64_t
     inverter.Serial = strtoll(root[F("serial")].as<String>().c_str(), &t, 16);
     strncpy(inverter.Name, root[F("name")].as<String>().c_str(), INV_MAX_NAME_STRLEN);
+
+    arrayCount = 0;
+    for (JsonVariant maxPower : maxPowerArray) {
+        inverter.MaxChannelPower[arrayCount] = maxPower.as<uint16_t>();
+        arrayCount++;
+    }
+
     Configuration.write();
 
     retMsg[F("type")] = F("success");
