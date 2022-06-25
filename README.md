@@ -54,7 +54,7 @@ It was the goal to replace the original Hoymiles DTU (Telemetry Gateway) with th
     $ yarn install
     $ yarn build
     ```
-    * The updated output is placed in the 'data' directory
+    * The updated output is placed in the 'webapp_dist' directory
 
 * Building the microcontroller firmware
     * Visual Studio Code with the PlatformIO Extension is required for building
