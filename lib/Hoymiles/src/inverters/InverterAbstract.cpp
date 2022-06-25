@@ -264,8 +264,8 @@ static float calcEffiencyCh0(InverterAbstract* iv, uint8_t arg0)
 static float calcIrradiation(InverterAbstract* iv, uint8_t arg0)
 {
     if (NULL != iv) {
-        if (iv->getChannelMaxPower(arg0) > 0)
-            return iv->getChannelFieldValue(arg0, FLD_PDC) / iv->getChannelMaxPower(arg0) * 100.0f;
+        if (iv->getChannelMaxPower(arg0 - 1) > 0)
+            return iv->getChannelFieldValue(arg0, FLD_PDC) / iv->getChannelMaxPower(arg0 - 1) * 100.0f;
     }
     return 0.0;
 }
