@@ -114,6 +114,13 @@ void HoymilesRadio::loop()
                 _busyFlag = false;
             }
         }
+    } else if (!_busyFlag) {
+        // Currently in idle mode --> send packet if one is in the queue
+        if (!_txBuffer.empty()) {
+            inverter_transaction_t* t = _txBuffer.getBack();
+            sendEsbPacket(t->target, t->mainCmd, t->subCmd, t->payload, t->len, t->timeout);
+            _txBuffer.popBack();
+        }
     }
 }
 
@@ -246,19 +253,31 @@ void HoymilesRadio::sendEsbPacket(serial_u target, uint8_t mainCmd, uint8_t subC
     openReadingPipe();
     _radio->setChannel(getRxNxtChannel());
     _radio->startListening();
+    _activeSerial = target;
     _busyFlag = true;
     _rxTimeout.set(timeout);
+}
+
+bool HoymilesRadio::enqueTransaction(inverter_transaction_t* transaction)
+{
+    if (!_txBuffer.full()) {
+        inverter_transaction_t* t;
+        t = _txBuffer.getFront();
+        memcpy(t, transaction, sizeof(inverter_transaction_t));
+        _txBuffer.pushFront(t);
+        return true;
+    } else {
+        Serial.println(F("TX Buffer full"));
+    }
+
+    return false;
 }
 
 void HoymilesRadio::sendTimePacket(std::shared_ptr<InverterAbstract> iv)
 {
     inverter_transaction_t payload;
     if (iv->getStatsRequest(&payload)) {
-        serial_u s;
-        s.u64 = iv->serial();
-        _activeSerial.u64 = iv->serial();
-
-        sendEsbPacket(s, payload.mainCmd, payload.subCmd, payload.payload, payload.len, payload.timeout);
+        enqueTransaction(&payload);
     }
 }
 

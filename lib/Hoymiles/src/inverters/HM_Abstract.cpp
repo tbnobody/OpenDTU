@@ -12,6 +12,7 @@ bool HM_Abstract::getStatsRequest(inverter_transaction_t* payload)
 
     memset(payload->payload, 0, MAX_RF_PAYLOAD_SIZE);
 
+    payload->target.u64 = serial();
     payload->mainCmd = 0x15;
     payload->subCmd = 0x80;
     payload->timeout = 200;

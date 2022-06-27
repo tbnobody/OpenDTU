@@ -11,6 +11,8 @@
 // number of fragments hold in buffer
 #define FRAGMENT_BUFFER_SIZE 30
 
+#define TX_BUFFER_SIZE 5
+
 #define MAX_RESEND_COUNT 3
 
 class HoymilesRadio {
@@ -27,6 +29,7 @@ public:
     void sendTimePacket(std::shared_ptr<InverterAbstract> iv);
     void sendRetransmitPacket(uint8_t fragment_id);
     void sendLastPacketAgain();
+    bool enqueTransaction(inverter_transaction_t* transaction);
 
     static void u32CpyLittleEndian(uint8_t dest[], uint32_t src);
 
@@ -60,4 +63,5 @@ private:
     bool _busyFlag = false;
 
     inverter_transaction_t currentTransaction;
+    CircularBuffer<inverter_transaction_t, TX_BUFFER_SIZE> _txBuffer;
 };
