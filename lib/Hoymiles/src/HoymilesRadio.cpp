@@ -273,14 +273,6 @@ bool HoymilesRadio::enqueTransaction(inverter_transaction_t* transaction)
     return false;
 }
 
-void HoymilesRadio::sendTimePacket(std::shared_ptr<InverterAbstract> iv)
-{
-    inverter_transaction_t payload;
-    if (iv->getStatsRequest(&payload)) {
-        enqueTransaction(&payload);
-    }
-}
-
 void HoymilesRadio::sendRetransmitPacket(uint8_t fragment_id)
 {
     sendEsbPacket(_activeSerial, currentTransaction.mainCmd, (uint8_t)(0x80 + fragment_id), 0, 0, 60);

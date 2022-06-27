@@ -2,7 +2,6 @@
 
 #include "CircularBuffer.h"
 #include "TimeoutHelper.h"
-#include "inverters/InverterAbstract.h"
 #include "types.h"
 #include <RF24.h>
 #include <memory>
@@ -26,7 +25,6 @@ public:
 
     bool isIdle();
     void sendEsbPacket(serial_u target, uint8_t mainCmd, uint8_t subCmd, uint8_t payload[], uint8_t len, uint32_t timeout, bool resend = false);
-    void sendTimePacket(std::shared_ptr<InverterAbstract> iv);
     void sendRetransmitPacket(uint8_t fragment_id);
     void sendLastPacketAgain();
     bool enqueTransaction(inverter_transaction_t* transaction);

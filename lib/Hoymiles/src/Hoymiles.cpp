@@ -26,8 +26,7 @@ void HoymilesClass::loop()
                 Serial.print(F("Fetch inverter: "));
                 Serial.println(iv->serial());
 
-                iv->clearRxFragmentBuffer();
-                _radio->sendTimePacket(iv);
+                iv->sendStatsRequest(_radio.get());
             }
 
             if (++inverterPos >= getNumInverters()) {

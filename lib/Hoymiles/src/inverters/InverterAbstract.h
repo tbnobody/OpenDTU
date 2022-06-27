@@ -1,5 +1,6 @@
 #pragma once
 
+#include "HoymilesRadio.h"
 #include "types.h"
 #include <Arduino.h>
 #include <cstdint>
@@ -111,7 +112,7 @@ public:
     const char* getChannelFieldUnit(uint8_t channel, uint8_t fieldId);
     const char* getChannelFieldName(uint8_t channel, uint8_t fieldId);
 
-    virtual bool getStatsRequest(inverter_transaction_t* payload) = 0;
+    virtual bool sendStatsRequest(HoymilesRadio* radio) = 0;
     uint32_t getLastStatsUpdate();
 
 private:
