@@ -56,7 +56,6 @@ private:
     TimeoutHelper _rxTimeout;
 
     serial_u _dtuSerial;
-    serial_u _activeSerial;
 
     bool _busyFlag = false;
 

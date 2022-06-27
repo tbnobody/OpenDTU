@@ -81,7 +81,7 @@ void HoymilesRadio::loop()
 
     if (_busyFlag && _rxTimeout.occured()) {
         Serial.println(F("RX Period End"));
-        std::shared_ptr<InverterAbstract> inv = Hoymiles.getInverterBySerial(_activeSerial.u64);
+        std::shared_ptr<InverterAbstract> inv = Hoymiles.getInverterBySerial(currentTransaction.target.u64);
 
         if (nullptr != inv) {
             uint8_t verifyResult = inv->verifyAllFragments();
@@ -244,7 +244,6 @@ void HoymilesRadio::sendEsbPacket(serial_u target, uint8_t mainCmd, uint8_t subC
     _radio->stopListening();
     _radio->setChannel(getTxNxtChannel());
     openWritingPipe(currentTransaction.target);
-    _activeSerial = currentTransaction.target;
     _radio->setRetries(3, 15);
 
     dumpBuf("TX ", txBuffer, 10 + currentTransaction.len + 1);
@@ -275,12 +274,15 @@ bool HoymilesRadio::enqueTransaction(inverter_transaction_t* transaction)
 
 void HoymilesRadio::sendRetransmitPacket(uint8_t fragment_id)
 {
-    sendEsbPacket(_activeSerial, currentTransaction.mainCmd, (uint8_t)(0x80 + fragment_id), 0, 0, 60);
+    sendEsbPacket(
+        currentTransaction.target,
+        currentTransaction.mainCmd,
+        (uint8_t)(0x80 + fragment_id), 0, 0, 60);
 }
 
 void HoymilesRadio::sendLastPacketAgain()
 {
-    sendEsbPacket(_activeSerial, 0, 0, 0, 0, 60, true);
+    sendEsbPacket(currentTransaction.target, 0, 0, 0, 0, 60, true);
 }
 
 void HoymilesRadio::u32CpyLittleEndian(uint8_t dest[], uint32_t src)
