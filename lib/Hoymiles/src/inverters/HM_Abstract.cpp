@@ -7,6 +7,11 @@ HM_Abstract::HM_Abstract(uint64_t serial)
 
 bool HM_Abstract::sendStatsRequest(HoymilesRadio* radio)
 {
+    struct tm timeinfo;
+    if (!getLocalTime(&timeinfo)) {
+        return false;
+    }
+
     time_t now;
     time(&now);
 
@@ -30,11 +35,7 @@ bool HM_Abstract::sendStatsRequest(HoymilesRadio* radio)
     payload.payload[14] = (crc >> 8) & 0xff;
     payload.payload[15] = (crc)&0xff;
 
-    if (now > 0) {
-        clearRxFragmentBuffer();
-        radio->enqueTransaction(&payload);
-        return true;
-    }
-
-    return false;
+    clearRxFragmentBuffer();
+    radio->enqueTransaction(&payload);
+    return true;
 }
