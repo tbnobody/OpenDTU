@@ -88,7 +88,7 @@ void HoymilesRadio::loop()
             if (verifyResult == 255) {
                 if (currentTransaction.sendCount < MAX_RESEND_COUNT) {
                     Serial.println(F("Nothing received, resend whole request"));
-                    sendEsbPacket(currentTransaction.target, currentTransaction.mainCmd, currentTransaction.subCmd, currentTransaction.payload, currentTransaction.len, currentTransaction.timeout, true);
+                    sendLastPacketAgain();
                 } else {
                     Serial.println(F("Nothing received, resend count exeeded"));
                     _busyFlag = false;
@@ -220,42 +220,42 @@ void HoymilesRadio::sendEsbPacket(serial_u target, uint8_t mainCmd, uint8_t subC
 
     if (!resend) {
         currentTransaction.sendCount = 0;
+        currentTransaction.target = target;
+        currentTransaction.mainCmd = mainCmd;
+        currentTransaction.target = target;
+        currentTransaction.subCmd = subCmd;
+        memcpy(currentTransaction.payload, payload, len);
+        currentTransaction.len = len;
+        currentTransaction.timeout = timeout;
     } else {
         currentTransaction.sendCount++;
     }
 
     memset(txBuffer, 0, MAX_RF_PAYLOAD_SIZE);
 
-    txBuffer[0] = mainCmd;
-    convertSerialToPacketId(&txBuffer[1], target); // 4 byte long
+    txBuffer[0] = currentTransaction.mainCmd;
+    convertSerialToPacketId(&txBuffer[1], currentTransaction.target); // 4 byte long
     convertSerialToPacketId(&txBuffer[5], DtuSerial()); // 4 byte long
-    txBuffer[9] = subCmd;
+    txBuffer[9] = currentTransaction.subCmd;
 
-    memcpy(&txBuffer[10], payload, len);
-    txBuffer[10 + len] = crc8(txBuffer, 10 + len);
-
-    currentTransaction.mainCmd = mainCmd;
-    currentTransaction.target = target;
-    currentTransaction.subCmd = subCmd;
-    memcpy(currentTransaction.payload, payload, len);
-    currentTransaction.len = len;
-    currentTransaction.timeout = timeout;
+    memcpy(&txBuffer[10], currentTransaction.payload, currentTransaction.len);
+    txBuffer[10 + currentTransaction.len] = crc8(txBuffer, 10 + currentTransaction.len);
 
     _radio->stopListening();
     _radio->setChannel(getTxNxtChannel());
-    openWritingPipe(target);
+    openWritingPipe(currentTransaction.target);
+    _activeSerial = currentTransaction.target;
     _radio->setRetries(3, 15);
 
-    dumpBuf("TX ", txBuffer, 10 + len + 1);
-    _radio->write(txBuffer, 10 + len + 1);
+    dumpBuf("TX ", txBuffer, 10 + currentTransaction.len + 1);
+    _radio->write(txBuffer, 10 + currentTransaction.len + 1);
 
     _radio->setRetries(0, 0);
     openReadingPipe();
     _radio->setChannel(getRxNxtChannel());
     _radio->startListening();
-    _activeSerial = target;
     _busyFlag = true;
-    _rxTimeout.set(timeout);
+    _rxTimeout.set(currentTransaction.timeout);
 }
 
 bool HoymilesRadio::enqueTransaction(inverter_transaction_t* transaction)
