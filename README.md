@@ -34,7 +34,7 @@ It was the goal to replace the original Hoymiles DTU (Telemetry Gateway) with th
 ## Flashing and starting up
 * Install [Visual Studio Code](https://code.visualstudio.com/download)
 * In Visual Studio Code, install the [PlatformIO Extension](https://marketplace.visualstudio.com/items?itemName=platformio.platformio-ide)
-* Download or clone this repository
+* Clone this repository (you really have to clone it, don't just download the ZIP file. During the build process the git hash gets embedded into the firmware. If you download the ZIP file a build error will occur)
 * In Visual Studio Code, choose File --> Open Folder and select the previously downloaded source code. (You have to select the folder which contains the "platformio.ini" file)
 * Adjust the COM port in the file "platformio.ini". It occurs twice:
     * upload_port
