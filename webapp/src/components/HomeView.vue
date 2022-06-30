@@ -95,7 +95,7 @@ export default defineComponent({
             console.log("Starting connection to WebSocket Server");
 
             const { protocol, host } = location;
-            const webSocketUrl = `${protocol === "https" ? "wss" : "ws"
+            const webSocketUrl = `${protocol === "https:" ? "wss" : "ws"
                 }://${host}/livedata`;
 
             this.socket = new WebSocket(webSocketUrl);
