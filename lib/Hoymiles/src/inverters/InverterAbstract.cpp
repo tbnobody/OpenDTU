@@ -61,7 +61,7 @@ uint8_t InverterAbstract::verifyAllFragments()
     // All missing
     if (_rxFragmentLastPacketId == 0) {
         Serial.println(F("All missing"));
-        return 255;
+        return FRAGMENT_ALL_MISSING;
     }
 
     // Last fragment is missing (thte one with 0x80)
@@ -70,7 +70,7 @@ uint8_t InverterAbstract::verifyAllFragments()
         if (_rxFragmentRetransmitCnt++ < MAX_RETRANSMIT_COUNT) {
             return _rxFragmentLastPacketId + 1;
         } else {
-            return 254;
+            return FRAGMENT_RETRANSMIT_TIMEOUT;
         }
     }
 
@@ -81,7 +81,7 @@ uint8_t InverterAbstract::verifyAllFragments()
             if (_rxFragmentRetransmitCnt++ < MAX_RETRANSMIT_COUNT) {
                 return i + 1;
             } else {
-                return 254;
+                return FRAGMENT_RETRANSMIT_TIMEOUT;
             }
         }
     }
@@ -101,7 +101,7 @@ uint8_t InverterAbstract::verifyAllFragments()
     }
 
     if (crc != crcRcv) {
-        return 253;
+        return FRAGMENT_CRC_ERROR;
     }
 
     // todo: hier muss noch ein check bzgl. packet type usw rein (ist ja nicht alles statistik)
@@ -114,7 +114,7 @@ uint8_t InverterAbstract::verifyAllFragments()
     }
     _lastStatsUpdate = millis();
 
-    return 0;
+    return FRAGMENT_OK;
 }
 
 uint32_t InverterAbstract::getLastStatsUpdate()

@@ -85,7 +85,7 @@ void HoymilesRadio::loop()
 
         if (nullptr != inv) {
             uint8_t verifyResult = inv->verifyAllFragments();
-            if (verifyResult == 255) {
+            if (verifyResult == FRAGMENT_ALL_MISSING) {
                 if (currentTransaction.sendCount < MAX_RESEND_COUNT) {
                     Serial.println(F("Nothing received, resend whole request"));
                     sendLastPacketAgain();
@@ -94,11 +94,11 @@ void HoymilesRadio::loop()
                     _busyFlag = false;
                 }
 
-            } else if (verifyResult == 254) {
+            } else if (verifyResult == FRAGMENT_RETRANSMIT_TIMEOUT) {
                 Serial.println(F("Retransmit timeout"));
                 _busyFlag = false;
 
-            } else if (verifyResult == 253) {
+            } else if (verifyResult == FRAGMENT_CRC_ERROR) {
                 Serial.println(F("Packet CRC error"));
                 _busyFlag = false;
 

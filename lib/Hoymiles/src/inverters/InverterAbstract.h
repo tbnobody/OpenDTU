@@ -8,18 +8,21 @@
 #define MAX_NAME_LENGTH 32
 
 // units
-enum { UNIT_V = 0,
+enum {
+    UNIT_V = 0,
     UNIT_A,
     UNIT_W,
     UNIT_WH,
     UNIT_KWH,
     UNIT_HZ,
     UNIT_C,
-    UNIT_PCT };
+    UNIT_PCT
+};
 const char* const units[] = { "V", "A", "W", "Wh", "kWh", "Hz", "°C", "%" };
 
 // field types
-enum { FLD_UDC = 0,
+enum {
+    FLD_UDC = 0,
     FLD_IDC,
     FLD_PDC,
     FLD_YD,
@@ -31,25 +34,37 @@ enum { FLD_UDC = 0,
     FLD_T,
     FLD_PCT,
     FLD_EFF,
-    FLD_IRR };
+    FLD_IRR
+};
 const char* const fields[] = { "Voltage", "Current", "Power", "YieldDay", "YieldTotal",
     "Voltage", "Current", "Power", "Frequency", "Temperature", "PowerFactor", "Effiency", "Irradiation" };
 
 // indices to calculation functions, defined in hmInverter.h
-enum { CALC_YT_CH0 = 0,
+enum {
+    CALC_YT_CH0 = 0,
     CALC_YD_CH0,
     CALC_UDC_CH,
     CALC_PDC_CH0,
     CALC_EFF_CH0,
-    CALC_IRR_CH };
+    CALC_IRR_CH
+};
 enum { CMD_CALC = 0xffff };
 
 // CH0 is default channel (freq, ac, temp)
-enum { CH0 = 0,
+enum {
+    CH0 = 0,
     CH1,
     CH2,
     CH3,
-    CH4 };
+    CH4
+};
+
+enum {
+    FRAGMENT_ALL_MISSING = 255,
+    FRAGMENT_RETRANSMIT_TIMEOUT = 254,
+    FRAGMENT_CRC_ERROR = 253,
+    FRAGMENT_OK = 0
+};
 
 typedef struct {
     uint8_t fieldId; // field id
