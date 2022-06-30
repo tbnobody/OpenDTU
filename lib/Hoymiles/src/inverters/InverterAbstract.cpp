@@ -104,15 +104,16 @@ uint8_t InverterAbstract::verifyAllFragments()
         return FRAGMENT_CRC_ERROR;
     }
 
-    // todo: hier muss noch ein check bzgl. packet type usw rein (ist ja nicht alles statistik)
-    // Move all fragments into target buffer
-    memset(_payloadStats, 0, MAX_RF_FRAGMENT_COUNT * MAX_RF_PAYLOAD_SIZE);
-    uint8_t offs = 0;
-    for (uint8_t i = 0; i < _rxFragmentMaxPacketId; i++) {
-        memcpy(&_payloadStats[offs], _rxFragmentBuffer[i].fragment, _rxFragmentBuffer[i].len);
-        offs += (_rxFragmentBuffer[i].len);
+    if (getLastRequest() == RequestType::Stats) {
+        // Move all fragments into target buffer
+        memset(_payloadStats, 0, MAX_RF_FRAGMENT_COUNT * MAX_RF_PAYLOAD_SIZE);
+        uint8_t offs = 0;
+        for (uint8_t i = 0; i < _rxFragmentMaxPacketId; i++) {
+            memcpy(&_payloadStats[offs], _rxFragmentBuffer[i].fragment, _rxFragmentBuffer[i].len);
+            offs += (_rxFragmentBuffer[i].len);
+        }
+        _lastStatsUpdate = millis();
     }
-    _lastStatsUpdate = millis();
 
     return FRAGMENT_OK;
 }
@@ -120,6 +121,16 @@ uint8_t InverterAbstract::verifyAllFragments()
 uint32_t InverterAbstract::getLastStatsUpdate()
 {
     return _lastStatsUpdate;
+}
+
+void InverterAbstract::setLastRequest(RequestType request)
+{
+    _lastRequest = request;
+}
+
+RequestType InverterAbstract::getLastRequest()
+{
+    return _lastRequest;
 }
 
 uint8_t InverterAbstract::getChannelCount()

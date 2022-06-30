@@ -66,6 +66,10 @@ enum {
     FRAGMENT_OK = 0
 };
 
+enum class RequestType {
+    Stats
+};
+
 typedef struct {
     uint8_t fieldId; // field id
     uint8_t unitId; // uint id
@@ -130,6 +134,10 @@ public:
     virtual bool sendStatsRequest(HoymilesRadio* radio) = 0;
     uint32_t getLastStatsUpdate();
 
+protected:
+    void setLastRequest(RequestType request);
+    RequestType getLastRequest();
+
 private:
     serial_u _serial;
     char _name[MAX_NAME_LENGTH];
@@ -141,4 +149,6 @@ private:
     uint8_t _payloadStats[MAX_RF_FRAGMENT_COUNT * MAX_RF_PAYLOAD_SIZE];
     uint32_t _lastStatsUpdate = 0;
     uint16_t _chanMaxPower[CH4];
+
+    RequestType _lastRequest;
 };

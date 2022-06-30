@@ -37,5 +37,6 @@ bool HM_Abstract::sendStatsRequest(HoymilesRadio* radio)
 
     clearRxFragmentBuffer();
     radio->enqueTransaction(&payload);
+    setLastRequest(RequestType::Stats);
     return true;
 }
