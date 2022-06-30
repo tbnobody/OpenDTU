@@ -24,7 +24,7 @@ void HoymilesClass::loop()
             std::shared_ptr<InverterAbstract> iv = getInverterByPos(inverterPos);
             if (iv != nullptr && _radio->isIdle()) {
                 Serial.print(F("Fetch inverter: "));
-                Serial.println(iv->serial());
+                Serial.println(iv->serial(), HEX);
 
                 iv->sendStatsRequest(_radio.get());
             }
