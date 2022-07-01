@@ -40,7 +40,7 @@ void MqttPublishingClass::loop()
                     publishField(subtopic, inv, c, FLD_UDC);
                     publishField(subtopic, inv, c, FLD_IDC);
                     if (c == 0) {
-                        publishField(subtopic, inv, c, FLD_PDC, "dcpower");
+                        publishField(subtopic, inv, c, FLD_PDC, "powerdc");
                     } else {
                         publishField(subtopic, inv, c, FLD_PDC);
                     }
