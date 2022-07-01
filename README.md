@@ -4,6 +4,17 @@
 This project was started from [this](https://www.mikrocontroller.net/topic/525778) discussion (Mikrocontroller.net).
 It was the goal to replace the original Hoymiles DTU (Telemetry Gateway) with their cloud access. With a lot of reverse engineering the Hoymiles protocol was decrypted and analyzed.
 
+## Currently supported Inverters
+* Hoymiles HM-300
+* Hoymiles HM-350
+* Hoymiles HM-400
+* Hoymiles HM-600
+* Hoymiles HM-700
+* Hoymiles HM-800
+* Hoymiles HM-1000
+* Hoymiles HM-1200
+* Hoymiles HM-1500
+* TSUN TSOL-M800 (Maybe depending on firmware on the inverter)
 
 ## Features for end users
 * Uses ESP32 microcontroller and NRF24L01+
