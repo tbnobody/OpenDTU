@@ -30,7 +30,6 @@ void WebApiClass::init()
 
     _webApiWsLive.init(&_ws);
 
-    _server.onNotFound(std::bind(&WebApiClass::onNotFound, this, _1));
     _server.begin();
 }
 
@@ -51,11 +50,7 @@ void WebApiClass::loop()
     _ws.cleanupClients();
 }
 
-void WebApiClass::onNotFound(AsyncWebServerRequest* request)
-{
-    // Handle Unknown Request
-    request->send(404, "text/plain", "404 Not Found");
-}
+
 
 void WebApiClass::onWebsocketEvent(AsyncWebSocket* server, AsyncWebSocketClient* client, AwsEventType type, void* arg, uint8_t* data, size_t len)
 {

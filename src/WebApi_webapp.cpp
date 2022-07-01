@@ -22,6 +22,12 @@ void WebApiWebappClass::init(AsyncWebServer* server)
         request->send(response);
     });
 
+    _server->onNotFound([](AsyncWebServerRequest* request) {
+        AsyncWebServerResponse* response = request->beginResponse_P(200, "text/html", file_index_html_start, file_index_html_end - file_index_html_start);
+        response->addHeader("Content-Encoding", "gzip");
+        request->send(response);
+    });
+
     _server->on("/index.html", HTTP_GET, [](AsyncWebServerRequest* request) {
         AsyncWebServerResponse* response = request->beginResponse_P(200, "text/html", file_index_html_start, file_index_html_end - file_index_html_start);
         response->addHeader("Content-Encoding", "gzip");
