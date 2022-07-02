@@ -14,6 +14,10 @@
 
 #define MAX_RESEND_COUNT 3
 
+#define PIN_IRQ 16
+#define PIN_CE 4
+#define PIN_CS 5
+
 class HoymilesRadio {
 public:
     void init();

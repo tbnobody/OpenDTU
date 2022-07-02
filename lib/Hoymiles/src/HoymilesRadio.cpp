@@ -8,7 +8,7 @@ void HoymilesRadio::init()
 {
     _dtuSerial.u64 = 0;
 
-    _radio.reset(new RF24(4, 5));
+    _radio.reset(new RF24(PIN_CE, PIN_CS));
     _radio->begin();
     _radio->setDataRate(RF24_250KBPS);
     _radio->enableDynamicPayloads();
@@ -22,7 +22,7 @@ void HoymilesRadio::init()
         Serial.println(F("Connection error!!"));
     }
 
-    attachInterrupt(digitalPinToInterrupt(16), std::bind(&HoymilesRadio::handleIntr, this), FALLING);
+    attachInterrupt(digitalPinToInterrupt(PIN_IRQ), std::bind(&HoymilesRadio::handleIntr, this), FALLING);
 
     openReadingPipe();
     _radio->startListening();
