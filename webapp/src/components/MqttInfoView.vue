@@ -37,7 +37,7 @@
                                 <td>{{ mqttDataList.mqtt_topic }}</td>
                             </tr>
                             <tr>
-                                <th>Publish Tnterval</th>
+                                <th>Publish Interval</th>
                                 <td>{{ mqttDataList.mqtt_publish_interval }} seconds</td>
                             </tr>
                             <tr>
