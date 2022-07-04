@@ -46,8 +46,31 @@ void WebApiWebappClass::init(AsyncWebServer* server)
     });
 
     _server->on("/js/app.js", HTTP_GET, [](AsyncWebServerRequest* request) {
+#ifdef AUTO_GIT_HASH
+        // check client If-None-Match header vs ETag/AUTO_GIT_HASH
+        bool eTagMatch = false;
+        if(request->hasHeader("If-None-Match")){
+            AsyncWebHeader* h = request->getHeader("If-None-Match");
+            if (strncmp(AUTO_GIT_HASH, h->value().c_str(), strlen(AUTO_GIT_HASH)) == 0) {
+                eTagMatch = true;
+            }
+        }
+
+        // begin response 200 or 304
+        AsyncWebServerResponse* response;
+        if (eTagMatch) {
+            response = request->beginResponse(304);
+        } else {
+            response = request->beginResponse_P(200, "text/javascript", file_app_js_start, file_app_js_end - file_app_js_start);
+            response->addHeader("Content-Encoding", "gzip");
+        }
+        // HTTP requires cache headers in 200 and 304 to be identical
+        response->addHeader("Cache-Control", "public, must-revalidate");
+        response->addHeader("ETag", AUTO_GIT_HASH);
+#else
         AsyncWebServerResponse* response = request->beginResponse_P(200, "text/javascript", file_app_js_start, file_app_js_end - file_app_js_start);
         response->addHeader("Content-Encoding", "gzip");
+#endif
         request->send(response);
     });
 }
