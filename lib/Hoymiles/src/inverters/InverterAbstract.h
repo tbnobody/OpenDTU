@@ -16,9 +16,10 @@ enum {
     UNIT_KWH,
     UNIT_HZ,
     UNIT_C,
-    UNIT_PCT
+    UNIT_PCT,
+    UNIT_CNT
 };
-const char* const units[] = { "V", "A", "W", "Wh", "kWh", "Hz", "°C", "%" };
+const char* const units[] = { "V", "A", "W", "Wh", "kWh", "Hz", "°C", "%", "" };
 
 // field types
 enum {
@@ -34,10 +35,11 @@ enum {
     FLD_T,
     FLD_PCT,
     FLD_EFF,
-    FLD_IRR
+    FLD_IRR,
+    FLD_EVT_LOG
 };
 const char* const fields[] = { "Voltage", "Current", "Power", "YieldDay", "YieldTotal",
-    "Voltage", "Current", "Power", "Frequency", "Temperature", "PowerFactor", "Effiency", "Irradiation" };
+    "Voltage", "Current", "Power", "Frequency", "Temperature", "PowerFactor", "Effiency", "Irradiation", "EventLogCount" };
 
 // indices to calculation functions, defined in hmInverter.h
 enum {
@@ -64,10 +66,6 @@ enum {
     FRAGMENT_RETRANSMIT_TIMEOUT = 254,
     FRAGMENT_CRC_ERROR = 253,
     FRAGMENT_OK = 0
-};
-
-enum class RequestType {
-    Stats
 };
 
 typedef struct {
@@ -134,8 +132,9 @@ public:
     virtual bool sendStatsRequest(HoymilesRadio* radio) = 0;
     uint32_t getLastStatsUpdate();
 
-protected:
     void setLastRequest(RequestType request);
+
+protected:
     RequestType getLastRequest();
 
 private:
@@ -150,5 +149,5 @@ private:
     uint32_t _lastStatsUpdate = 0;
     uint16_t _chanMaxPower[CH4];
 
-    RequestType _lastRequest;
+    RequestType _lastRequest = RequestType::None;
 };

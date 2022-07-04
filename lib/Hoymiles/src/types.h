@@ -15,8 +15,14 @@ typedef struct {
     uint8_t len;
 } fragment_t;
 
+enum class RequestType {
+    None,
+    Stats
+};
+
 typedef struct {
     serial_u target;
+    RequestType requestType = RequestType::None;
     uint8_t mainCmd;
     uint8_t subCmd;
     uint8_t payload[MAX_RF_PAYLOAD_SIZE];

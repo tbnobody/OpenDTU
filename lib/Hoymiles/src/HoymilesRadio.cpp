@@ -118,6 +118,8 @@ void HoymilesRadio::loop()
         // Currently in idle mode --> send packet if one is in the queue
         if (!_txBuffer.empty()) {
             inverter_transaction_t* t = _txBuffer.getBack();
+            auto inv = Hoymiles.getInverterBySerial(t->target.u64);
+            inv->setLastRequest(t->requestType);
             sendEsbPacket(t->target, t->mainCmd, t->subCmd, t->payload, t->len, t->timeout);
             _txBuffer.popBack();
         }

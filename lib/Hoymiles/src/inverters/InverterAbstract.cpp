@@ -113,8 +113,11 @@ uint8_t InverterAbstract::verifyAllFragments()
             offs += (_rxFragmentBuffer[i].len);
         }
         _lastStatsUpdate = millis();
+    } else {
+        Serial.println("Unkown response received");
     }
 
+    setLastRequest(RequestType::None);
     return FRAGMENT_OK;
 }
 
