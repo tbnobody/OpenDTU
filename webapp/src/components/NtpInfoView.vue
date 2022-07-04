@@ -1,5 +1,5 @@
 <template>
-    <div class="container" role="main">
+    <div class="container-xxl" role="main">
         <div class="page-header">
             <h1>NTP Info</h1>
         </div>
