@@ -10,24 +10,24 @@
                         <tr>
                             <th>Status</th>
                             <td class="badge" :class="{
-                                'bg-danger': !networkDataList.sta_status,
-                                'bg-success': networkDataList.sta_status,
+                                'bg-danger': !sta_status,
+                                'bg-success': sta_status,
                             }">
-                                <span v-if="networkDataList.sta_status">enabled</span>
+                                <span v-if="sta_status">enabled</span>
                                 <span v-else>disabled</span>
                             </td>
                         </tr>
                         <tr>
                             <th>SSID</th>
-                            <td>{{ networkDataList.sta_ssid }}</td>
+                            <td>{{ sta_ssid }}</td>
                         </tr>
                         <tr>
                             <th>Quality</th>
-                            <td>{{ getRSSIasQuality(networkDataList.sta_rssi) }} %</td>
+                            <td>{{ getRSSIasQuality(sta_rssi) }} %</td>
                         </tr>
                         <tr>
                             <th>RSSI</th>
-                            <td>{{ networkDataList.sta_rssi }}</td>
+                            <td>{{ sta_rssi }}</td>
                         </tr>
                     </tbody>
                 </table>
@@ -40,24 +40,12 @@
 import { defineComponent } from 'vue';
 
 export default defineComponent({
-    data() {
-        return {
-            networkDataList: {
-                sta_status: false,
-                sta_ssid: "",
-                sta_rssi: 0
-            },
-        };
-    },
-    created() {
-        this.getNetworkInfo();
+    props: {
+        sta_status: { type: Boolean, required: true },
+        sta_ssid: String,
+        sta_rssi: { type: Number, required: true },
     },
     methods: {
-        getNetworkInfo() {
-            fetch("/api/network/status")
-                .then((response) => response.json())
-                .then((data) => (this.networkDataList = data));
-        },
         getRSSIasQuality(rssi: number) {
             let quality = 0;
 

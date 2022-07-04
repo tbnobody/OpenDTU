@@ -3,13 +3,13 @@
         <div class="page-header">
             <h1>Network Info</h1>
         </div>
-        <WifiStationInfo />
+        <WifiStationInfo v-bind="networkDataList"/>
         <div class="mt-5"></div>
-        <WifiApInfo />
+        <WifiApInfo v-bind="networkDataList"/>
         <div class="mt-5"></div>
-        <InterfaceStationInfo />
+        <InterfaceStationInfo v-bind="networkDataList"/>
         <div class="mt-5"></div>
-        <InterfaceApInfo />
+        <InterfaceApInfo v-bind="networkDataList"/>
         <div class="mt-5"></div>
     </div>
 </template>
@@ -27,6 +27,40 @@ export default defineComponent({
         WifiApInfo,
         InterfaceStationInfo,
         InterfaceApInfo,
+    },
+    data() {
+        return {
+            networkDataList: {
+                // WifiStationInfo
+                sta_status: false,
+                sta_ssid: "",
+                sta_rssi: 0,
+                // WifiApInfo
+                ap_status: false,
+                ap_ssid: "",
+                ap_stationnum: 0,
+                // InterfaceStationInfo
+                sta_ip: "",
+                sta_netmask: "",
+                sta_gateway: "",
+                sta_dns1: "",
+                sta_dns2: "",
+                sta_mac: "",
+                // InterfaceApInfo
+                ap_ip: "",
+                ap_mac: "",
+            }
+        }
+    },
+    created() {
+        this.getNetworkInfo();
+    },
+    methods: {
+        getNetworkInfo() {
+            fetch("/api/network/status")
+                .then((response) => response.json())
+                .then((data) => (this.networkDataList = data));
+        },
     },
 });
 </script>

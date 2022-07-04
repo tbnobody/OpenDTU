@@ -9,19 +9,19 @@
                     <tbody>
                         <tr>
                             <th>Chip Model</th>
-                            <td>{{ systemDataList.chipmodel }}</td>
+                            <td>{{ chipmodel }}</td>
                         </tr>
                         <tr>
                             <th>Chip Revision</th>
-                            <td>{{ systemDataList.chiprevision }}</td>
+                            <td>{{ chiprevision }}</td>
                         </tr>
                         <tr>
                             <th>Chip Cores</th>
-                            <td>{{ systemDataList.chipcores }}</td>
+                            <td>{{ chipcores }}</td>
                         </tr>
                         <tr>
                             <th>CPU Frequency</th>
-                            <td>{{ systemDataList.cpufreq }} MHz</td>
+                            <td>{{ cpufreq }} MHz</td>
                         </tr>
                     </tbody>
                 </table>
@@ -34,25 +34,11 @@
 import { defineComponent } from 'vue';
 
 export default defineComponent({
-    data() {
-        return {
-            systemDataList: {
-                chipmodel: "",
-                chiprevision: "",
-                chipcores: "",
-                cpufreq: ""
-            },
-        };
-    },
-    created() {
-        this.getSystemInfo();
-    },
-    methods: {
-        getSystemInfo() {
-            fetch("/api/system/status")
-                .then((response) => response.json())
-                .then((data) => (this.systemDataList = data));
-        },
+    props: {
+        chipmodel: String,
+        chiprevision: String,
+        chipcores: String,
+        cpufreq: String,
     },
 });
 </script>

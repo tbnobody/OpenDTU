@@ -9,11 +9,11 @@
                     <tbody>
                         <tr>
                             <th>IP Address</th>
-                            <td>{{ networkDataList.ap_ip }}</td>
+                            <td>{{ ap_ip }}</td>
                         </tr>
                         <tr>
                             <th>MAC Address</th>
-                            <td>{{ networkDataList.ap_mac }}</td>
+                            <td>{{ ap_mac }}</td>
                         </tr>
                     </tbody>
                 </table>
@@ -26,23 +26,9 @@
 import { defineComponent } from 'vue';
 
 export default defineComponent({
-    data() {
-        return {
-            networkDataList: {
-                ap_ip: "",
-                ap_mac: ""
-            },
-        };
-    },
-    created() {
-        this.getNetworkInfo();
-    },
-    methods: {
-        getNetworkInfo() {
-            fetch("/api/network/status")
-                .then((response) => response.json())
-                .then((data) => (this.networkDataList = data));
-        },
+    props: {
+        ap_ip: String,
+        ap_mac: String,
     },
 });
 </script>

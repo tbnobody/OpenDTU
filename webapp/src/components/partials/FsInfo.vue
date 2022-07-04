@@ -29,7 +29,7 @@ export default defineComponent({
     },
     methods: {
         getPercent() {
-            return Math.round((this.used / this.total) * 100);
+            return this.total === 0 ? 0 : Math.round((this.used / this.total) * 100);
         },
     },
 });
