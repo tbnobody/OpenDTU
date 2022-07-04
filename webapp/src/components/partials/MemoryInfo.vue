@@ -14,10 +14,10 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <FsInfo name="Heap" :total="systemDataList.heap_total" :used="systemDataList.heap_used" />
-                        <FsInfo name="LittleFs" :total="systemDataList.littlefs_total"
-                            :used="systemDataList.littlefs_used" />
-                        <FsInfo name="Sketch" :total="systemDataList.sketch_total" :used="systemDataList.sketch_used" />
+                        <FsInfo name="Heap" :total="heap_total" :used="heap_used" />
+                        <FsInfo name="LittleFs" :total="littlefs_total"
+                            :used="littlefs_used" />
+                        <FsInfo name="Sketch" :total="sketch_total" :used="sketch_used" />
                     </tbody>
                 </table>
             </div>
@@ -33,27 +33,13 @@ export default defineComponent({
     components: {
         FsInfo,
     },
-    data() {
-        return {
-            systemDataList: {
-                heap_total: 0,
-                heap_used: 0,
-                littlefs_total: 0,
-                littlefs_used: 0,
-                sketch_total: 0,
-                sketch_used: 0
-            },
-        };
-    },
-    created() {
-        this.getSystemInfo();
-    },
-    methods: {
-        getSystemInfo() {
-            fetch("/api/system/status")
-                .then((response) => response.json())
-                .then((data) => (this.systemDataList = data));
-        },
+    props: {
+        heap_total: { type: Number, required: true },
+        heap_used: { type: Number, required: true },
+        littlefs_total: { type: Number, required: true },
+        littlefs_used: { type: Number, required: true },
+        sketch_total: { type: Number, required: true },
+        sketch_used: { type: Number, required: true },
     },
 });
 </script>

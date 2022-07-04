@@ -10,20 +10,20 @@
                         <tr>
                             <th>Status</th>
                             <td class="badge" :class="{
-                                'bg-danger': !networkDataList.ap_status,
-                                'bg-success': networkDataList.ap_status,
+                                'bg-danger': !ap_status,
+                                'bg-success': ap_status,
                             }">
-                                <span v-if="networkDataList.ap_status">enabled</span>
+                                <span v-if="ap_status">enabled</span>
                                 <span v-else>disabled</span>
                             </td>
                         </tr>
                         <tr>
                             <th>SSID</th>
-                            <td>{{ networkDataList.ap_ssid }}</td>
+                            <td>{{ ap_ssid }}</td>
                         </tr>
                         <tr>
                             <th># Stations</th>
-                            <td>{{ networkDataList.ap_stationnum }}</td>
+                            <td>{{ ap_stationnum }}</td>
                         </tr>
                     </tbody>
                 </table>
@@ -36,24 +36,10 @@
 import { defineComponent } from 'vue';
 
 export default defineComponent({
-    data() {
-        return {
-            networkDataList: {
-                ap_status: false,
-                ap_ssid: "",
-                ap_stationnum: 0
-            },
-        };
-    },
-    created() {
-        this.getNetworkInfo();
-    },
-    methods: {
-        getNetworkInfo() {
-            fetch("/api/network/status")
-                .then((response) => response.json())
-                .then((data) => (this.networkDataList = data));
-        },
+    props: {
+        ap_status: { type: Boolean, required: true },
+        ap_ssid: String,
+        ap_stationnum: { type: Number, required: true },
     },
 });
 </script>

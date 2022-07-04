@@ -9,27 +9,27 @@
                     <tbody>
                         <tr>
                             <th>IP Address</th>
-                            <td>{{ networkDataList.sta_ip }}</td>
+                            <td>{{ sta_ip }}</td>
                         </tr>
                         <tr>
                             <th>Netmask</th>
-                            <td>{{ networkDataList.sta_netmask }}</td>
+                            <td>{{ sta_netmask }}</td>
                         </tr>
                         <tr>
                             <th>Default Gateway</th>
-                            <td>{{ networkDataList.sta_gateway }}</td>
+                            <td>{{ sta_gateway }}</td>
                         </tr>
                         <tr>
                             <th>DNS 1</th>
-                            <td>{{ networkDataList.sta_dns1 }}</td>
+                            <td>{{ sta_dns1 }}</td>
                         </tr>
                         <tr>
                             <th>DNS 2</th>
-                            <td>{{ networkDataList.sta_dns2 }}</td>
+                            <td>{{ sta_dns2 }}</td>
                         </tr>
                         <tr>
                             <th>MAC Address</th>
-                            <td>{{ networkDataList.sta_mac }}</td>
+                            <td>{{ sta_mac }}</td>
                         </tr>
                     </tbody>
                 </table>
@@ -42,27 +42,13 @@
 import { defineComponent } from 'vue';
 
 export default defineComponent({
-    data() {
-        return {
-            networkDataList: {
-                sta_ip: "",
-                sta_netmask: "",
-                sta_gateway: "",
-                sta_dns1: "",
-                sta_dns2: "",
-                sta_mac: ""
-            },
-        };
-    },
-    created() {
-        this.getNetworkInfo();
-    },
-    methods: {
-        getNetworkInfo() {
-            fetch("/api/network/status")
-                .then((response) => response.json())
-                .then((data) => (this.networkDataList = data));
-        },
+    props: {
+        sta_ip: String,
+        sta_netmask: String,
+        sta_gateway: String,
+        sta_dns1: String,
+        sta_dns2: String,
+        sta_mac: String,
     },
 });
 </script>

@@ -9,35 +9,35 @@
                     <tbody>
                         <tr>
                             <th>Hostname</th>
-                            <td>{{ systemDataList.hostname }}</td>
+                            <td>{{ hostname }}</td>
                         </tr>
                         <tr>
                             <th>SDK Version</th>
-                            <td>{{ systemDataList.sdkversion }}</td>
+                            <td>{{ sdkversion }}</td>
                         </tr>
                         <tr>
                             <th>Firmware Version</th>
-                            <td>{{ systemDataList.firmware_version }}</td>
+                            <td>{{ firmware_version }}</td>
                         </tr>
                         <tr>
                             <th>Git Hash</th>
-                            <td>{{ systemDataList.git_hash }}</td>
+                            <td>{{ git_hash }}</td>
                         </tr>
                         <tr>
                             <th>Reset Reason CPU 0</th>
-                            <td>{{ systemDataList.resetreason_0 }}</td>
+                            <td>{{ resetreason_0 }}</td>
                         </tr>
                         <tr>
                             <th>Reset Reason CPU 1</th>
-                            <td>{{ systemDataList.resetreason_1 }}</td>
+                            <td>{{ resetreason_1 }}</td>
                         </tr>
                         <tr>
                             <th>Config save count</th>
-                            <td>{{ systemDataList.cfgsavecount }}</td>
+                            <td>{{ cfgsavecount }}</td>
                         </tr>
                         <tr>
                             <th>Uptime</th>
-                            <td>{{ timeInHours(systemDataList.uptime) }}</td>
+                            <td>{{ timeInHours(uptime) }}</td>
                         </tr>
                     </tbody>
                 </table>
@@ -50,22 +50,15 @@
 import { defineComponent } from 'vue';
 
 export default defineComponent({
-    data() {
-        return {
-            systemDataList: {
-                hostname: "",
-                sdkversion: "",
-                firmware_version: "",
-                git_hash: "",
-                resetreason_0: "",
-                resetreason_1: "",
-                cfgsavecount: 0,
-                uptime: 0
-            },
-        };
-    },
-    created() {
-        this.getSystemInfo();
+    props: {
+        hostname: String,
+        sdkversion: String,
+        firmware_version: String,
+        git_hash: String,
+        resetreason_0: String,
+        resetreason_1: String,
+        cfgsavecount: { type: Number, required: true },
+        uptime: { type: Number, required: true },
     },
     computed: {
         timeInHours() {
@@ -81,13 +74,6 @@ export default defineComponent({
 
                 return days + " days " + dHours + ":" + dMins + ":" + dSecs;
             };
-        },
-    },
-    methods: {
-        getSystemInfo() {
-            fetch("/api/system/status")
-                .then((response) => response.json())
-                .then((data) => (this.systemDataList = data));
         },
     },
 });
