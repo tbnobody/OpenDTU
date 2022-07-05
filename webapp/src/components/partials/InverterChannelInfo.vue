@@ -7,7 +7,7 @@
                 <thead>
                     <tr>
                         <th scope="col">Property</th>
-                        <th scope="col">Value</th>
+                        <th style="text-align: right" scope="col">Value</th>
                         <th scope="col">Unit</th>
                     </tr>
                 </thead>
