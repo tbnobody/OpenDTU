@@ -1,5 +1,6 @@
 #pragma once
 
+#include "../parser/AlarmLogParser.h"
 #include "HoymilesRadio.h"
 #include "types.h"
 #include <Arduino.h>
@@ -130,9 +131,12 @@ public:
     const char* getChannelFieldName(uint8_t channel, uint8_t fieldId);
 
     virtual bool sendStatsRequest(HoymilesRadio* radio) = 0;
+    virtual bool sendAlarmLogRequest(HoymilesRadio* radio) = 0;
     uint32_t getLastStatsUpdate();
 
     void setLastRequest(RequestType request);
+
+    AlarmLogParser* EventLog();
 
 protected:
     RequestType getLastRequest();
@@ -147,7 +151,10 @@ private:
 
     uint8_t _payloadStats[MAX_RF_FRAGMENT_COUNT * MAX_RF_PAYLOAD_SIZE];
     uint32_t _lastStatsUpdate = 0;
+    uint32_t _lastAlarmLogUpdate = 0;
     uint16_t _chanMaxPower[CH4];
 
     RequestType _lastRequest = RequestType::None;
+
+    std::unique_ptr<AlarmLogParser> _alarmLogParser;
 };

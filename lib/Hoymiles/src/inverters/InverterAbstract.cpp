@@ -5,6 +5,7 @@
 InverterAbstract::InverterAbstract(uint64_t serial)
 {
     _serial.u64 = serial;
+    _alarmLogParser.reset(new AlarmLogParser());
     memset(_payloadStats, 0, MAX_RF_FRAGMENT_COUNT * MAX_RF_PAYLOAD_SIZE);
 }
 
@@ -26,6 +27,11 @@ void InverterAbstract::setName(const char* name)
 const char* InverterAbstract::name()
 {
     return _name;
+}
+
+AlarmLogParser* InverterAbstract::EventLog()
+{
+    return _alarmLogParser.get();
 }
 
 void InverterAbstract::clearRxFragmentBuffer()
@@ -113,6 +119,17 @@ uint8_t InverterAbstract::verifyAllFragments()
             offs += (_rxFragmentBuffer[i].len);
         }
         _lastStatsUpdate = millis();
+
+    } else if (getLastRequest() == RequestType::AlarmLog) {
+        // Move all fragments into target buffer
+        uint8_t offs = 0;
+        _alarmLogParser.get()->clearBuffer();
+        for (uint8_t i = 0; i < _rxFragmentMaxPacketId; i++) {
+            _alarmLogParser.get()->appendFragment(offs, _rxFragmentBuffer[i].fragment, _rxFragmentBuffer[i].len);
+            offs += (_rxFragmentBuffer[i].len);
+        }
+        _lastAlarmLogUpdate = millis();
+
     } else {
         Serial.println("Unkown response received");
     }

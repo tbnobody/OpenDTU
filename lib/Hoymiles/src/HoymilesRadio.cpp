@@ -120,6 +120,7 @@ void HoymilesRadio::loop()
             inverter_transaction_t* t = _txBuffer.getBack();
             auto inv = Hoymiles.getInverterBySerial(t->target.u64);
             inv->setLastRequest(t->requestType);
+            inv->clearRxFragmentBuffer();
             sendEsbPacket(t->target, t->mainCmd, t->subCmd, t->payload, t->len, t->timeout);
             _txBuffer.popBack();
         }

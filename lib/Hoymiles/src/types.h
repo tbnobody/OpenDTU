@@ -17,7 +17,8 @@ typedef struct {
 
 enum class RequestType {
     None,
-    Stats
+    Stats,
+    AlarmLog
 };
 
 typedef struct {

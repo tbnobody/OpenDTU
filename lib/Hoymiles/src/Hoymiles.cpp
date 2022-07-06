@@ -27,6 +27,9 @@ void HoymilesClass::loop()
                 Serial.println(iv->serial(), HEX);
 
                 iv->sendStatsRequest(_radio.get());
+
+                // Fetch event log
+                iv->sendAlarmLogRequest(_radio.get());
             }
 
             if (++inverterPos >= getNumInverters()) {
