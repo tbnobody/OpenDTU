@@ -21,7 +21,7 @@
                     <div class="row mb-3">
                         <label for="inputPassword" class="col-sm-2 col-form-label">WiFi Password:</label>
                         <div class="col-sm-10">
-                            <input type="password" class="form-control" id="inputPassword" maxlength="32"
+                            <input type="password" class="form-control" id="inputPassword" maxlength="64"
                                 placeholder="PSK" v-model="networkConfigList.password" />
                         </div>
                     </div>
