@@ -31,6 +31,7 @@ private:
     WebApiSysstatusClass _webApiSysstatus;
     WebApiWebappClass _webApiWebapp;
     WebApiWsLiveClass _webApiWsLive;
+    unsigned long lastTimerCall = 0;
 
     void onWebsocketEvent(AsyncWebSocket* server, AsyncWebSocketClient* client, AwsEventType type, void* arg, uint8_t* data, size_t len);
 };
