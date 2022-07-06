@@ -47,9 +47,9 @@ void WebApiClass::loop()
     _webApiWsLive.loop();
 
     // see: https://github.com/me-no-dev/ESPAsyncWebServer#limiting-the-number-of-web-socket-clients
-    if (millis() - lastTimerCall > 1000) {
+    if (millis() - _lastWsCleanup > 1000) {
         _ws.cleanupClients();
-        lastTimerCall = millis();
+        _lastWsCleanup = millis();
     }
 }
 
