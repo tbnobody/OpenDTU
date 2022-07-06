@@ -36,9 +36,9 @@ import { defineComponent } from 'vue';
 export default defineComponent({
     props: {
         chipmodel: String,
-        chiprevision: String,
-        chipcores: String,
-        cpufreq: String,
+        chiprevision: { type: Number, required: true },
+        chipcores: { type: Number, required: true },
+        cpufreq: { type: Number, required: true },
     },
 });
 </script>
