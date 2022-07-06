@@ -1,22 +1,24 @@
 <template>
-    <div class="container" role="main">
+    <div class="container-xxl" role="main">
         <div class="page-header">
             <h1>Live Data</h1>
         </div>
         <template v-if="waitForData == true">Waiting for data... </template>
         <template v-else>
-            <div class="d-flex align-items-start">
-                <div class="nav flex-column nav-pills me-3" id="v-pills-tab" role="tablist"
-                    aria-orientation="vertical">
-                    <button v-for="inverter in inverterData" :key="inverter.serial" class="nav-link"
-                        :id="'v-pills-' + inverter.serial + '-tab'" data-bs-toggle="pill"
-                        :data-bs-target="'#v-pills-' + inverter.serial" type="button" role="tab"
-                        aria-controls="'v-pills-' + inverter.serial" aria-selected="true">
-                        {{ inverter.name }}
-                    </button>
+            <div class="row gy-3">
+                <div class="col-sm-3 col-md-2">
+                    <div class="nav nav-pills row-cols-sm-1" id="v-pills-tab" role="tablist"
+                        aria-orientation="vertical">
+                        <button v-for="inverter in inverterData" :key="inverter.serial" class="nav-link"
+                            :id="'v-pills-' + inverter.serial + '-tab'" data-bs-toggle="pill"
+                            :data-bs-target="'#v-pills-' + inverter.serial" type="button" role="tab"
+                            aria-controls="'v-pills-' + inverter.serial" aria-selected="true">
+                            {{ inverter.name }}
+                        </button>
+                    </div>
                 </div>
 
-                <div class="tab-content" id="v-pills-tabContent">
+                <div class="tab-content col-sm-9 col-md-10" id="v-pills-tabContent">
                     <div v-for="inverter in inverterData" :key="inverter.serial" class="tab-pane fade show"
                         :id="'v-pills-' + inverter.serial" role="tabpanel"
                         :aria-labelledby="'v-pills-' + inverter.serial + '-tab'" tabindex="0">
@@ -30,11 +32,14 @@
                                 {{ inverter.data_age }} seconds)
                             </div>
                             <div class="card-body">
-                                <div class="row row-cols-1 row-cols-md-3 g-4">
-                                    <div v-for="channel in 5" :key="channel">
-                                        <InverterChannelInfo v-if="inverter[channel - 1]"
-                                            :channelData="inverter[channel - 1]" :channelNumber="channel - 1" />
-                                    </div>
+                                <div class="row g-3">
+                                    <template v-for="channel in 5" :key="channel">
+                                        <div v-if="inverter[channel - 1]" class="col">
+                                            <InverterChannelInfo
+                                                :channelData="inverter[channel - 1]"
+                                                :channelNumber="channel - 1" />
+                                        </div>
+                                    </template>
                                 </div>
                             </div>
                         </div>
