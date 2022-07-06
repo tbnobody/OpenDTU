@@ -1,6 +1,7 @@
 #pragma once
 
 #include "WebApi_dtu.h"
+#include "WebApi_eventlog.h"
 #include "WebApi_firmware.h"
 #include "WebApi_inverter.h"
 #include "WebApi_mqtt.h"
@@ -23,6 +24,7 @@ private:
     AsyncEventSource _events;
 
     WebApiDtuClass _webApiDtu;
+    WebApiEventlogClass _webApiEventlog;
     WebApiFirmwareClass _webApiFirmware;
     WebApiInverterClass _webApiInverter;
     WebApiMqttClass _webApiMqtt;

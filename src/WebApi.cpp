@@ -20,6 +20,7 @@ void WebApiClass::init()
     _ws.onEvent(std::bind(&WebApiClass::onWebsocketEvent, this, _1, _2, _3, _4, _5, _6));
 
     _webApiDtu.init(&_server);
+    _webApiEventlog.init(&_server);
     _webApiFirmware.init(&_server);
     _webApiInverter.init(&_server);
     _webApiMqtt.init(&_server);
@@ -36,6 +37,7 @@ void WebApiClass::init()
 void WebApiClass::loop()
 {
     _webApiDtu.loop();
+    _webApiEventlog.loop();
     _webApiFirmware.loop();
     _webApiInverter.loop();
     _webApiMqtt.loop();

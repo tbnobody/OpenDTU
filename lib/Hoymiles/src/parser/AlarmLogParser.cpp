@@ -18,11 +18,15 @@ uint8_t AlarmLogParser::getEntryCount()
     return (_alarmLogLength - 2) / ALARM_LOG_ENTRY_SIZE;
 }
 
-void AlarmLogParser::getLogEntry(uint8_t entryId, AlarmLogEntry* entry)
+void AlarmLogParser::getLogEntry(uint8_t entryId, AlarmLogEntry_t* entry)
 {
     uint8_t entryStartOffset = 2 + entryId * ALARM_LOG_ENTRY_SIZE;
 
+    int timezoneOffset = getTimezoneOffset();
+
     entry->MessageId = _payloadAlarmLog[entryStartOffset + 1];
+    entry->StartTime = ((uint16_t)_payloadAlarmLog[entryStartOffset + 4] << 8) | ((uint16_t)_payloadAlarmLog[entryStartOffset + 5]) + timezoneOffset;
+    entry->EndTime = ((uint16_t)_payloadAlarmLog[entryStartOffset + 6] << 8) | ((uint16_t)_payloadAlarmLog[entryStartOffset + 7]) + timezoneOffset;
 
     switch (entry->MessageId) {
     case 1:
@@ -233,4 +237,21 @@ void AlarmLogParser::getLogEntry(uint8_t entryId, AlarmLogEntry* entry)
         entry->Message = String(F("Unknown"));
         break;
     }
+}
+
+int AlarmLogParser::getTimezoneOffset()
+{
+    // see: https://stackoverflow.com/questions/13804095/get-the-time-zone-gmt-offset-in-c/44063597#44063597
+
+    time_t gmt, rawtime = time(NULL);
+    struct tm *ptm;
+
+    struct tm gbuf;
+    ptm = gmtime_r(&rawtime, &gbuf);
+
+    // Request that mktime() looksup dst in timezone database
+    ptm->tm_isdst = -1;
+    gmt = mktime(ptm);
+
+    return (int)difftime(rawtime, gmt);
 }
