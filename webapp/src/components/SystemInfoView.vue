@@ -29,9 +29,9 @@ export default defineComponent({
             systemDataList: {
                 // HardwareInfo
                 chipmodel: "",
-                chiprevision: "",
-                chipcores: "",
-                cpufreq: "",
+                chiprevision: 0,
+                chipcores: 0,
+                cpufreq: 0,
                 // FirmwareInfo
                 hostname: "",
                 sdkversion: "",
