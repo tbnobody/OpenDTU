@@ -26,7 +26,11 @@ void AlarmLogParser::getLogEntry(uint8_t entryId, AlarmLogEntry_t* entry)
 
     entry->MessageId = _payloadAlarmLog[entryStartOffset + 1];
     entry->StartTime = ((uint16_t)_payloadAlarmLog[entryStartOffset + 4] << 8) | ((uint16_t)_payloadAlarmLog[entryStartOffset + 5]) + timezoneOffset;
-    entry->EndTime = ((uint16_t)_payloadAlarmLog[entryStartOffset + 6] << 8) | ((uint16_t)_payloadAlarmLog[entryStartOffset + 7]) + timezoneOffset;
+    entry->EndTime = ((uint16_t)_payloadAlarmLog[entryStartOffset + 6] << 8) | ((uint16_t)_payloadAlarmLog[entryStartOffset + 7]);
+
+    if (entry->EndTime > 0) {
+        entry->EndTime += timezoneOffset;
+    }
 
     switch (entry->MessageId) {
     case 1:
