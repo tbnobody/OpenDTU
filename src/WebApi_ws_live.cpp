@@ -50,7 +50,11 @@ void WebApiWsLiveClass::loop()
             for (uint8_t c = 0; c <= inv->getChannelCount(); c++) {
                 addField(root, i, inv, c, FLD_UDC);
                 addField(root, i, inv, c, FLD_IDC);
-                addField(root, i, inv, c, FLD_PDC);
+                if (c == 0) {
+                    addField(root, i, inv, c, FLD_PDC, F("Power DC"));
+                } else {
+                    addField(root, i, inv, c, FLD_PDC);
+                }
                 addField(root, i, inv, c, FLD_YD);
                 addField(root, i, inv, c, FLD_YT);
                 addField(root, i, inv, c, FLD_UAC);
@@ -79,10 +83,16 @@ void WebApiWsLiveClass::loop()
     }
 }
 
-void WebApiWsLiveClass::addField(JsonDocument& root, uint8_t idx, std::shared_ptr<InverterAbstract> inv, uint8_t channel, uint8_t fieldId)
+void WebApiWsLiveClass::addField(JsonDocument& root, uint8_t idx, std::shared_ptr<InverterAbstract> inv, uint8_t channel, uint8_t fieldId, String topic)
 {
     if (inv->hasChannelFieldValue(channel, fieldId)) {
-        root[idx][String(channel)][inv->getChannelFieldName(channel, fieldId)]["v"] = inv->getChannelFieldValue(channel, fieldId);
-        root[idx][String(channel)][inv->getChannelFieldName(channel, fieldId)]["u"] = inv->getChannelFieldUnit(channel, fieldId);
+        String chanName;
+        if (topic == "") {
+            chanName = inv->getChannelFieldName(channel, fieldId);
+        } else {
+            chanName = topic;
+        }
+        root[idx][String(channel)][chanName]["v"] = inv->getChannelFieldValue(channel, fieldId);
+        root[idx][String(channel)][chanName]["u"] = inv->getChannelFieldUnit(channel, fieldId);
     }
 }
