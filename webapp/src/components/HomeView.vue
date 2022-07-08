@@ -1,5 +1,5 @@
 <template>
-    <div class="container-xxl" role="main">
+    <div class="container-fluid" role="main">
         <div class="page-header">
             <h1>Live Data</h1>
         </div>
@@ -32,9 +32,9 @@
                                 {{ inverter.data_age }} seconds)
                             </div>
                             <div class="card-body">
-                                <div class="row g-3">
+                                <div class="row flex-row-reverse flex-wrap-reverse align-items-end g-3">
                                     <template v-for="channel in 5" :key="channel">
-                                        <div v-if="inverter[channel - 1]" class="col">
+                                        <div v-if="inverter[channel - 1]" :class="`col order-${5 - channel}`">
                                             <InverterChannelInfo
                                                 :channelData="inverter[channel - 1]"
                                                 :channelNumber="channel - 1" />
