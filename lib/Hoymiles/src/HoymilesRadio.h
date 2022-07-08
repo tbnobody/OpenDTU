@@ -14,9 +14,17 @@
 
 #define MAX_RESEND_COUNT 3
 
-#define PIN_IRQ 16
-#define PIN_CE 4
-#define PIN_CS 5
+#ifndef HOYMILES_PIN_IRQ
+#define HOYMILES_PIN_IRQ 16
+#endif
+
+#ifndef HOYMILES_PIN_CE
+#define HOYMILES_PIN_CE 4
+#endif
+
+#ifndef HOYMILES_PIN_CS
+#define HOYMILES_PIN_CS 5
+#endif
 
 class HoymilesRadio {
 public:

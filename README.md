@@ -42,6 +42,19 @@ It was the goal to replace the original Hoymiles DTU (Telemetry Gateway) with th
 ### Symbolic view
 ![Symbolic](docs/Wiring_ESP32_Symbol.png)
 
+### Change pin assignment
+Its possible to change the pin assignment for the following pins:
+* CE
+* CS
+* IRQ
+
+This can be achieved by editing the 'platformio.ini' file and add one or more of the following lines to the 'build_flags' parameter:
+```
+-DHOYMILES_PIN_CE=4
+-DHOYMILES_PIN_CS=5
+-DHOYMILES_PIN_IRQ=16
+```
+
 ## Flashing and starting up
 * Install [Visual Studio Code](https://code.visualstudio.com/download)
 * In Visual Studio Code, install the [PlatformIO Extension](https://marketplace.visualstudio.com/items?itemName=platformio.platformio-ide)
