@@ -41,10 +41,10 @@ void WebApiWsLiveClass::loop()
                 ((uint32_t)((inv->serial() >> 32) & 0xFFFFFFFF)),
                 ((uint32_t)(inv->serial() & 0xFFFFFFFF)));
 
-            root[i]["serial"] = String(buffer);
-            root[i]["name"] = inv->name();
-            root[i]["data_age"] = (millis() - inv->getLastStatsUpdate()) / 1000;
-            root[i]["age_critical"] = ((millis() - inv->getLastStatsUpdate()) / 1000) > Configuration.get().Dtu_PollInterval * 5;
+            root[i][F("serial")] = String(buffer);
+            root[i][F("name")] = inv->name();
+            root[i][F("data_age")] = (millis() - inv->getLastStatsUpdate()) / 1000;
+            root[i][F("age_critical")] = ((millis() - inv->getLastStatsUpdate()) / 1000) > Configuration.get().Dtu_PollInterval * 5;
 
             // Loop all channels
             for (uint8_t c = 0; c <= inv->getChannelCount(); c++) {
