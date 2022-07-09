@@ -17,6 +17,8 @@ It was the goal to replace the original Hoymiles DTU (Telemetry Gateway) with th
 * TSUN TSOL-M800 (Maybe depending on firmware on the inverter)
 
 ## Features for end users
+* Read live data from inverter
+* Show inverters internal event log
 * Uses ESP32 microcontroller and NRF24L01+
 * Multi-Inverter support
 * MQTT support
