@@ -33,15 +33,18 @@ void WebApiEventlogClass::onEventlogStatus(AsyncWebServerRequest* request)
         uint8_t logEntryCount = inv->EventLog()->getEntryCount();
 
         root[buffer]["count"] = logEntryCount;
+        JsonArray eventsArray = root[buffer].createNestedArray(F("events"));
 
         for (uint8_t logEntry = 0; logEntry < logEntryCount; logEntry++) {
+            JsonObject eventsObject = eventsArray.createNestedObject();
+
             AlarmLogEntry_t entry;
             inv->EventLog()->getLogEntry(logEntry, &entry);
 
-            root[buffer][String(logEntry)][F("message_id")] = entry.MessageId;
-            root[buffer][String(logEntry)][F("message")] = entry.Message;
-            root[buffer][String(logEntry)][F("start_time")] = entry.StartTime;
-            root[buffer][String(logEntry)][F("end_time")] = entry.EndTime;
+            eventsObject[F("message_id")] = entry.MessageId;
+            eventsObject[F("message")] = entry.Message;
+            eventsObject[F("start_time")] = entry.StartTime;
+            eventsObject[F("end_time")] = entry.EndTime;
         }
     }
 
