@@ -8,8 +8,12 @@ void HoymilesRadio::init()
 {
     _dtuSerial.u64 = 0;
 
+    _hspi.reset(new SPIClass(HSPI));
     _radio.reset(new RF24(HOYMILES_PIN_CE, HOYMILES_PIN_CS));
-    _radio->begin();
+
+    _hspi->begin(HOYMILES_PIN_SCLK, HOYMILES_PIN_MISO, HOYMILES_PIN_MOSI, HOYMILES_PIN_CS);
+    _radio->begin(_hspi.get());
+
     _radio->setDataRate(RF24_250KBPS);
     _radio->enableDynamicPayloads();
     _radio->setCRCLength(RF24_CRC_16);

@@ -14,6 +14,18 @@
 
 #define MAX_RESEND_COUNT 3
 
+#ifndef HOYMILES_PIN_MISO
+#define HOYMILES_PIN_MISO 19
+#endif
+
+#ifndef HOYMILES_PIN_MOSI
+#define HOYMILES_PIN_MOSI 23
+#endif
+
+#ifndef HOYMILES_PIN_SCLK
+#define HOYMILES_PIN_SCLK 18
+#endif
+
 #ifndef HOYMILES_PIN_IRQ
 #define HOYMILES_PIN_IRQ 16
 #endif
@@ -55,6 +67,7 @@ private:
     bool checkFragmentCrc(fragment_t* fragment);
     void dumpBuf(const char* info, uint8_t buf[], uint8_t len);
 
+    std::unique_ptr<SPIClass> _hspi;
     std::unique_ptr<RF24> _radio;
     uint8_t _rxChLst[5] = { 3, 23, 40, 61, 75 };
     uint8_t _rxChIdx;
