@@ -6,44 +6,53 @@
         <BootstrapAlert v-model="showAlert" dismissible :variant="alertType">
             {{ alertMessage }}
         </BootstrapAlert>
-        <form @submit="saveDtuConfig">
-            <div class="card">
-                <div class="card-header text-white bg-primary">DTU Configuration</div>
-                <div class="card-body">
-                    <div class="row mb-3">
-                        <label for="inputDtuSerial" class="col-sm-2 col-form-label">Serial:</label>
-                        <div class="col-sm-10">
-                            <input type="number" class="form-control" id="inputDtuSerial" min="1" max="99999999999"
-                                placeholder="DTU Serial" v-model="dtuConfigList.dtu_serial" />
-                        </div>
-                    </div>
 
-                    <div class="row mb-3">
-                        <label for="inputPollInterval" class="col-sm-2 col-form-label">Poll Interval:</label>
-                        <div class="col-sm-10">
-                            <div class="input-group">
-                                <input type="number" class="form-control" id="inputPollInterval" min="1" max="86400"
-                                    placeholder="Poll Interval in Seconds" v-model="dtuConfigList.dtu_pollinterval"
-                                    aria-describedby="pollIntervalDescription" />
-                                <span class="input-group-text" id="pollIntervalDescription">seconds</span>
+        <div class="text-center" v-if="dataLoading">
+            <div class="spinner-border" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+        </div>
+
+        <template v-if="!dataLoading">
+            <form @submit="saveDtuConfig">
+                <div class="card">
+                    <div class="card-header text-white bg-primary">DTU Configuration</div>
+                    <div class="card-body">
+                        <div class="row mb-3">
+                            <label for="inputDtuSerial" class="col-sm-2 col-form-label">Serial:</label>
+                            <div class="col-sm-10">
+                                <input type="number" class="form-control" id="inputDtuSerial" min="1" max="99999999999"
+                                    placeholder="DTU Serial" v-model="dtuConfigList.dtu_serial" />
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <label for="inputPollInterval" class="col-sm-2 col-form-label">Poll Interval:</label>
+                            <div class="col-sm-10">
+                                <div class="input-group">
+                                    <input type="number" class="form-control" id="inputPollInterval" min="1" max="86400"
+                                        placeholder="Poll Interval in Seconds" v-model="dtuConfigList.dtu_pollinterval"
+                                        aria-describedby="pollIntervalDescription" />
+                                    <span class="input-group-text" id="pollIntervalDescription">seconds</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <label for="inputTimezone" class="col-sm-2 col-form-label">PA Level:</label>
+                            <div class="col-sm-10">
+                                <select class="form-select" v-model="dtuConfigList.dtu_palevel">
+                                    <option v-for="palevel in palevelList" :key="palevel.key" :value="palevel.key">
+                                        {{ palevel.value }}
+                                    </option>
+                                </select>
                             </div>
                         </div>
                     </div>
-
-                    <div class="row mb-3">
-                        <label for="inputTimezone" class="col-sm-2 col-form-label">PA Level:</label>
-                        <div class="col-sm-10">
-                            <select class="form-select" v-model="dtuConfigList.dtu_palevel">
-                                <option v-for="palevel in palevelList" :key="palevel.key" :value="palevel.key">
-                                    {{ palevel.value }}
-                                </option>
-                            </select>
-                        </div>
-                    </div>
                 </div>
-            </div>
-            <button type="submit" class="btn btn-primary mb-3">Save</button>
-        </form>
+                <button type="submit" class="btn btn-primary mb-3">Save</button>
+            </form>
+        </template>
     </div>
 </template>
 
@@ -57,6 +66,7 @@ export default defineComponent({
     },
     data() {
         return {
+            dataLoading: true,
             dtuConfigList: {
                 dtu_serial: 0,
                 dtu_pollinterval: 0,
@@ -78,11 +88,13 @@ export default defineComponent({
     },
     methods: {
         getDtuConfig() {
+            this.dataLoading = true;
             fetch("/api/dtu/config")
                 .then((response) => response.json())
                 .then(
                     (data) => {
                         this.dtuConfigList = data;
+                        this.dataLoading = false;
                     }
                 );
         },

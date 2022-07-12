@@ -3,14 +3,22 @@
         <div class="page-header">
             <h1>Network Info</h1>
         </div>
-        <WifiStationInfo v-bind="networkDataList"/>
-        <div class="mt-5"></div>
-        <WifiApInfo v-bind="networkDataList"/>
-        <div class="mt-5"></div>
-        <InterfaceStationInfo v-bind="networkDataList"/>
-        <div class="mt-5"></div>
-        <InterfaceApInfo v-bind="networkDataList"/>
-        <div class="mt-5"></div>
+        <div class="text-center" v-if="dataLoading">
+            <div class="spinner-border" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+        </div>
+
+        <template v-if="!dataLoading">
+            <WifiStationInfo v-bind="networkDataList" />
+            <div class="mt-5"></div>
+            <WifiApInfo v-bind="networkDataList" />
+            <div class="mt-5"></div>
+            <InterfaceStationInfo v-bind="networkDataList" />
+            <div class="mt-5"></div>
+            <InterfaceApInfo v-bind="networkDataList" />
+            <div class="mt-5"></div>
+        </template>
     </div>
 </template>
 
@@ -30,6 +38,7 @@ export default defineComponent({
     },
     data() {
         return {
+            dataLoading: true,
             networkDataList: {
                 // WifiStationInfo
                 sta_status: false,
@@ -57,9 +66,13 @@ export default defineComponent({
     },
     methods: {
         getNetworkInfo() {
+            this.dataLoading = true;
             fetch("/api/network/status")
                 .then((response) => response.json())
-                .then((data) => (this.networkDataList = data));
+                .then((data) => {
+                    this.networkDataList = data;
+                    this.dataLoading = false;
+                });
         },
     },
 });

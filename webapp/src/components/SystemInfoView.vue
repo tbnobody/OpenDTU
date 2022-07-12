@@ -3,12 +3,21 @@
         <div class="page-header">
             <h1>System Info</h1>
         </div>
-        <FirmwareInfo v-bind="systemDataList"/>
-        <div class="mt-5"></div>
-        <HardwareInfo v-bind="systemDataList"/>
-        <div class="mt-5"></div>
-        <MemoryInfo v-bind="systemDataList"/>
-        <div class="mt-5"></div>
+
+        <div class="text-center" v-if="dataLoading">
+            <div class="spinner-border" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+        </div>
+
+        <template v-if="!dataLoading">
+            <FirmwareInfo v-bind="systemDataList" />
+            <div class="mt-5"></div>
+            <HardwareInfo v-bind="systemDataList" />
+            <div class="mt-5"></div>
+            <MemoryInfo v-bind="systemDataList" />
+            <div class="mt-5"></div>
+        </template>
     </div>
 </template>
 
@@ -26,6 +35,7 @@ export default defineComponent({
     },
     data() {
         return {
+            dataLoading: true,
             systemDataList: {
                 // HardwareInfo
                 chipmodel: "",
@@ -56,9 +66,13 @@ export default defineComponent({
     },
     methods: {
         getSystemInfo() {
+            this.dataLoading = true;
             fetch("/api/system/status")
                 .then((response) => response.json())
-                .then((data) => (this.systemDataList = data));
+                .then((data) => {
+                    this.systemDataList = data;
+                    this.dataLoading = false;
+                })
         },
     },
 });
