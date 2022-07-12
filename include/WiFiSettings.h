@@ -16,7 +16,11 @@ private:
     void setHostname();
     void setStaticIp();
     void setupMode();
+#ifdef OLIMEX_ESP32_POE_LAN
+    bool adminEnabled = false;
+#else
     bool adminEnabled = true;
+#endif
     bool forceDisconnection = false;
     int adminTimeoutCounter = 0;
     int connectTimeoutTimer = 0;
