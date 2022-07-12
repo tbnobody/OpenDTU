@@ -36,7 +36,7 @@ void MqttPublishingClass::loop()
                 _lastPublishStats[i] = lastUpdate;
 
                 // Loop all channels
-                for (uint8_t c = 0; c <= inv->getChannelCount(); c++) {
+                for (uint8_t c = 0; c <= inv->Statistics()->getChannelCount(); c++) {
                     publishField(subtopic, inv, c, FLD_UDC);
                     publishField(subtopic, inv, c, FLD_IDC);
                     if (c == 0) {
@@ -66,14 +66,14 @@ void MqttPublishingClass::loop()
 
 void MqttPublishingClass::publishField(String subtopic, std::shared_ptr<InverterAbstract> inv, uint8_t channel, uint8_t fieldId, String topic)
 {
-    if (inv->hasChannelFieldValue(channel, fieldId)) {
+    if (inv->Statistics()->hasChannelFieldValue(channel, fieldId)) {
         String chanName;
         if (topic == "") {
-            chanName = inv->getChannelFieldName(channel, fieldId);
+            chanName = inv->Statistics()->getChannelFieldName(channel, fieldId);
         } else {
             chanName = topic;
         }
         chanName.toLowerCase();
-        MqttSettings.publish(subtopic + "/" + String(channel) + "/" + chanName, String(inv->getChannelFieldValue(channel, fieldId)));
+        MqttSettings.publish(subtopic + "/" + String(channel) + "/" + chanName, String(inv->Statistics()->getChannelFieldValue(channel, fieldId)));
     }
 }

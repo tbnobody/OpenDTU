@@ -6,7 +6,7 @@ InverterAbstract::InverterAbstract(uint64_t serial)
 {
     _serial.u64 = serial;
     _alarmLogParser.reset(new AlarmLogParser());
-    memset(_payloadStats, 0, MAX_RF_FRAGMENT_COUNT * MAX_RF_PAYLOAD_SIZE);
+    _statisticsParser.reset(new StatisticsParser());
 }
 
 uint64_t InverterAbstract::serial()
@@ -32,6 +32,11 @@ const char* InverterAbstract::name()
 AlarmLogParser* InverterAbstract::EventLog()
 {
     return _alarmLogParser.get();
+}
+
+StatisticsParser* InverterAbstract::Statistics()
+{
+    return _statisticsParser.get();
 }
 
 void InverterAbstract::clearRxFragmentBuffer()
@@ -112,10 +117,11 @@ uint8_t InverterAbstract::verifyAllFragments()
 
     if (getLastRequest() == RequestType::Stats) {
         // Move all fragments into target buffer
-        memset(_payloadStats, 0, MAX_RF_FRAGMENT_COUNT * MAX_RF_PAYLOAD_SIZE);
         uint8_t offs = 0;
+        _statisticsParser.get()->setByteAssignment(getByteAssignment(), getAssignmentCount());
+        _statisticsParser.get()->clearBuffer();
         for (uint8_t i = 0; i < _rxFragmentMaxPacketId; i++) {
-            memcpy(&_payloadStats[offs], _rxFragmentBuffer[i].fragment, _rxFragmentBuffer[i].len);
+            _statisticsParser.get()->appendFragment(offs, _rxFragmentBuffer[i].fragment, _rxFragmentBuffer[i].len);
             offs += (_rxFragmentBuffer[i].len);
         }
         _lastStatsUpdate = millis();
@@ -151,152 +157,4 @@ void InverterAbstract::setLastRequest(RequestType request)
 RequestType InverterAbstract::getLastRequest()
 {
     return _lastRequest;
-}
-
-uint8_t InverterAbstract::getChannelCount()
-{
-    const byteAssign_t* b = getByteAssignment();
-    uint8_t cnt = 0;
-    for (uint8_t pos = 0; pos < getAssignmentCount(); pos++) {
-        if (b[pos].ch > cnt) {
-            cnt = b[pos].ch;
-        }
-    }
-
-    return cnt;
-}
-
-uint16_t InverterAbstract::getChannelMaxPower(uint8_t channel)
-{
-    return _chanMaxPower[channel];
-}
-
-void InverterAbstract::setChannelMaxPower(uint8_t channel, uint16_t power)
-{
-    if (channel < CH4) {
-        _chanMaxPower[channel] = power;
-    }
-}
-
-uint8_t InverterAbstract::getAssignIdxByChannelField(uint8_t channel, uint8_t fieldId)
-{
-    const byteAssign_t* b = getByteAssignment();
-
-    uint8_t pos;
-    for (pos = 0; pos < getAssignmentCount(); pos++) {
-        if (b[pos].ch == channel && b[pos].fieldId == fieldId) {
-            return pos;
-        }
-    }
-    return 0xff;
-}
-
-float InverterAbstract::getChannelFieldValue(uint8_t channel, uint8_t fieldId)
-{
-    uint8_t pos = getAssignIdxByChannelField(channel, fieldId);
-    if (pos == 0xff) {
-        return 0;
-    }
-
-    const byteAssign_t* b = getByteAssignment();
-
-    uint8_t ptr = b[pos].start;
-    uint8_t end = ptr + b[pos].num;
-    uint16_t div = b[pos].div;
-
-    if (CMD_CALC != div) {
-        // Value is a static value
-        uint32_t val = 0;
-        do {
-            val <<= 8;
-            val |= _payloadStats[ptr];
-        } while (++ptr != end);
-
-        return (float)(val) / (float)(div);
-    } else {
-        // Value has to be calculated
-        return calcFunctions[b[pos].start].func(this, b[pos].num);
-    }
-
-    return 0;
-}
-
-bool InverterAbstract::hasChannelFieldValue(uint8_t channel, uint8_t fieldId)
-{
-    uint8_t pos = getAssignIdxByChannelField(channel, fieldId);
-    return pos != 0xff;
-}
-
-const char* InverterAbstract::getChannelFieldUnit(uint8_t channel, uint8_t fieldId)
-{
-    uint8_t pos = getAssignIdxByChannelField(channel, fieldId);
-    const byteAssign_t* b = getByteAssignment();
-
-    return units[b[pos].unitId];
-}
-
-const char* InverterAbstract::getChannelFieldName(uint8_t channel, uint8_t fieldId)
-{
-    uint8_t pos = getAssignIdxByChannelField(channel, fieldId);
-    const byteAssign_t* b = getByteAssignment();
-
-    return fields[b[pos].fieldId];
-}
-
-static float calcYieldTotalCh0(InverterAbstract* iv, uint8_t arg0)
-{
-    float yield = 0;
-    for (uint8_t i = 1; i <= iv->getChannelCount(); i++) {
-        yield += iv->getChannelFieldValue(i, FLD_YT);
-    }
-    return yield;
-}
-
-static float calcYieldDayCh0(InverterAbstract* iv, uint8_t arg0)
-{
-    float yield = 0;
-    for (uint8_t i = 1; i <= iv->getChannelCount(); i++) {
-        yield += iv->getChannelFieldValue(i, FLD_YD);
-    }
-    return yield;
-}
-
-// arg0 = channel of source
-static float calcUdcCh(InverterAbstract* iv, uint8_t arg0)
-{
-    return iv->getChannelFieldValue(arg0, FLD_UDC);
-}
-
-static float calcPowerDcCh0(InverterAbstract* iv, uint8_t arg0)
-{
-    float dcPower = 0;
-    for (uint8_t i = 1; i <= iv->getChannelCount(); i++) {
-        dcPower += iv->getChannelFieldValue(i, FLD_PDC);
-    }
-    return dcPower;
-}
-
-// arg0 = channel
-static float calcEffiencyCh0(InverterAbstract* iv, uint8_t arg0)
-{
-    float acPower = iv->getChannelFieldValue(CH0, FLD_PAC);
-    float dcPower = 0;
-    for (uint8_t i = 1; i <= iv->getChannelCount(); i++) {
-        dcPower += iv->getChannelFieldValue(i, FLD_PDC);
-    }
-    if (dcPower > 0) {
-        return acPower / dcPower * 100.0f;
-    }
-
-    return 0.0;
-}
-
-// arg0 = channel
-static float calcIrradiation(InverterAbstract* iv, uint8_t arg0)
-{
-    if (NULL != iv) {
-        if (iv->getChannelMaxPower(arg0 - 1) > 0)
-            return iv->getChannelFieldValue(arg0, FLD_PDC) / iv->getChannelMaxPower(arg0 - 1) * 100.0f;
-    }
-    return 0.0;
 }

@@ -137,7 +137,7 @@ void WebApiInverterClass::onInverterAdd(AsyncWebServerRequest* request)
     auto inv = Hoymiles.addInverter(inverter->Name, inverter->Serial);
 
     for (uint8_t c = 0; c < INV_MAX_CHAN_COUNT; c++) {
-        inv->setChannelMaxPower(c, inverter->MaxChannelPower[c]);
+        inv->Statistics()->setChannelMaxPower(c, inverter->MaxChannelPower[c]);
     }
 }
 
@@ -244,7 +244,7 @@ void WebApiInverterClass::onInverterEdit(AsyncWebServerRequest* request)
     }
 
     for (uint8_t c = 0; c < INV_MAX_CHAN_COUNT; c++) {
-        inv->setChannelMaxPower(c, inverter.MaxChannelPower[c]);
+        inv->Statistics()->setChannelMaxPower(c, inverter.MaxChannelPower[c]);
     }
 }
 

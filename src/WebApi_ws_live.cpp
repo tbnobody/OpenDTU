@@ -47,7 +47,7 @@ void WebApiWsLiveClass::loop()
             root[i][F("age_critical")] = ((millis() - inv->getLastStatsUpdate()) / 1000) > Configuration.get().Dtu_PollInterval * 5;
 
             // Loop all channels
-            for (uint8_t c = 0; c <= inv->getChannelCount(); c++) {
+            for (uint8_t c = 0; c <= inv->Statistics()->getChannelCount(); c++) {
                 addField(root, i, inv, c, FLD_PAC);
                 addField(root, i, inv, c, FLD_UAC);
                 addField(root, i, inv, c, FLD_IAC);
@@ -67,7 +67,7 @@ void WebApiWsLiveClass::loop()
                 addField(root, i, inv, c, FLD_IRR);
             }
 
-            if (inv->hasChannelFieldValue(CH0, FLD_EVT_LOG)) {
+            if (inv->Statistics()->hasChannelFieldValue(CH0, FLD_EVT_LOG)) {
                 root[i][F("events")] = inv->EventLog()->getEntryCount();
             } else {
                 root[i][F("events")] = -1;
@@ -91,14 +91,14 @@ void WebApiWsLiveClass::loop()
 
 void WebApiWsLiveClass::addField(JsonDocument& root, uint8_t idx, std::shared_ptr<InverterAbstract> inv, uint8_t channel, uint8_t fieldId, String topic)
 {
-    if (inv->hasChannelFieldValue(channel, fieldId)) {
+    if (inv->Statistics()->hasChannelFieldValue(channel, fieldId)) {
         String chanName;
         if (topic == "") {
-            chanName = inv->getChannelFieldName(channel, fieldId);
+            chanName = inv->Statistics()->getChannelFieldName(channel, fieldId);
         } else {
             chanName = topic;
         }
-        root[idx][String(channel)][chanName]["v"] = inv->getChannelFieldValue(channel, fieldId);
-        root[idx][String(channel)][chanName]["u"] = inv->getChannelFieldUnit(channel, fieldId);
+        root[idx][String(channel)][chanName]["v"] = inv->Statistics()->getChannelFieldValue(channel, fieldId);
+        root[idx][String(channel)][chanName]["u"] = inv->Statistics()->getChannelFieldUnit(channel, fieldId);
     }
 }

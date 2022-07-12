@@ -85,7 +85,7 @@ void setup()
                 config.Inverter[i].Serial);
 
             for (uint8_t c = 0; c < INV_MAX_CHAN_COUNT; c++) {
-                inv->setChannelMaxPower(c, config.Inverter[i].MaxChannelPower[c]);
+                inv->Statistics()->setChannelMaxPower(c, config.Inverter[i].MaxChannelPower[c]);
             }
         }
     }
