@@ -45,6 +45,12 @@ void InverterAbstract::clearRxFragmentBuffer()
     _rxFragmentMaxPacketId = 0;
     _rxFragmentLastPacketId = 0;
     _rxFragmentRetransmitCnt = 0;
+
+    // This has to be done here because:
+    // Not possible in constructor --> virtual function
+    // Not possible in verifyAllFragments --> Because no data if nothing is ever received
+    // It has to be executed because otherwise the getChannelCount method in stats always returns 0
+    _statisticsParser.get()->setByteAssignment(getByteAssignment(), getAssignmentCount());
 }
 
 void InverterAbstract::addRxFragment(uint8_t fragment[], uint8_t len)
@@ -118,7 +124,6 @@ uint8_t InverterAbstract::verifyAllFragments()
     if (getLastRequest() == RequestType::Stats) {
         // Move all fragments into target buffer
         uint8_t offs = 0;
-        _statisticsParser.get()->setByteAssignment(getByteAssignment(), getAssignmentCount());
         _statisticsParser.get()->clearBuffer();
         for (uint8_t i = 0; i < _rxFragmentMaxPacketId; i++) {
             _statisticsParser.get()->appendFragment(offs, _rxFragmentBuffer[i].fragment, _rxFragmentBuffer[i].len);
