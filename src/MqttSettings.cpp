@@ -13,6 +13,16 @@ MqttSettingsClass::MqttSettingsClass()
 void MqttSettingsClass::WiFiEvent(WiFiEvent_t event)
 {
     switch (event) {
+#ifdef OLIMEX_ESP32_POE_LAN
+    case ARDUINO_EVENT_ETH_GOT_IP:
+        Serial.println(F("MQTT: ETH connected"));
+        performConnect();
+        break;
+    case ARDUINO_EVENT_ETH_DISCONNECTED:
+        Serial.println(F("MQTT: ETH lost connection"));
+        mqttReconnectTimer.detach(); // ensure we don't reconnect to MQTT while reconnecting to Wi-Fi
+        break;
+#else    
     case SYSTEM_EVENT_STA_GOT_IP:
         Serial.println(F("WiFi connected"));
         performConnect();
@@ -21,6 +31,7 @@ void MqttSettingsClass::WiFiEvent(WiFiEvent_t event)
         Serial.println(F("WiFi lost connection"));
         mqttReconnectTimer.detach(); // ensure we don't reconnect to MQTT while reconnecting to Wi-Fi
         break;
+#endif
     }
 }
 
@@ -41,7 +52,11 @@ void MqttSettingsClass::onMqttDisconnect(AsyncMqttClientDisconnectReason reason)
 
 void MqttSettingsClass::performConnect()
 {
+#ifdef OLIMEX_ESP32_POE_LAN
+    if (Lan.isConnected() && Configuration.get().Mqtt_Enabled) {
+#else
     if (WiFi.isConnected() && Configuration.get().Mqtt_Enabled) {
+#endif
         Serial.println(F("Connecting to MQTT..."));
         CONFIG_T& config = Configuration.get();
         mqttClient.setServer(config.Mqtt_Hostname, config.Mqtt_Port);
