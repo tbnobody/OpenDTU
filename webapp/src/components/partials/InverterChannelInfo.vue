@@ -1,5 +1,5 @@
 <template>
-    <div class="card" :class="{'border-info': channelNumber == 0}">
+    <div class="card" :class="{ 'border-info': channelNumber == 0 }">
         <div v-if="channelNumber >= 1" class="card-header">String {{ channelNumber }}</div>
         <div v-if="channelNumber == 0" class="card-header bg-info">Phase {{ channelNumber + 1 }}</div>
         <div class="card-body">
@@ -33,7 +33,9 @@ export default defineComponent({
     },
     methods: {
         formatNumber(num: string) {
-            return parseFloat(num).toFixed(2);
+            return new Intl.NumberFormat(
+                undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }
+            ).format(parseFloat(num));
         },
     },
 });
