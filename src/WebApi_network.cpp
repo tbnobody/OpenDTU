@@ -58,7 +58,7 @@ void WebApiNetworkClass::onNetworkAdminGet(AsyncWebServerRequest* request)
     root[F("dns1")] = IPAddress(config.WiFi_Dns1).toString();
     root[F("dns2")] = IPAddress(config.WiFi_Dns2).toString();
     root[F("ssid")] = config.WiFi_Ssid;
-    root[F("password")] = config.WiFi_Password;
+    root[F("password")] = "****"; // config.WiFi_Password;
 
     response->setLength();
     request->send(response);
