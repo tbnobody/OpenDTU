@@ -5,6 +5,9 @@
 #include "NtpSettings.h"
 #include "WebApi.h"
 #include "WiFiSettings.h"
+#ifdef OLIMEX_ESP32_POE_LAN
+    #include "LanSettings.h"
+#endif
 #include "defaults.h"
 #include <Arduino.h>
 #include <LittleFS.h>
@@ -54,6 +57,13 @@ void setup()
     Serial.println(F("done"));
     WiFiSettings.applyConfig();
 
+#ifdef OLIMEX_ESP32_POE_LAN
+    // Initialize Lan
+    Serial.print(F("Initialize Lan... "));
+    Lan.init();
+    Serial.println(F("done"));
+#endif
+    
     // Initialize NTP
     Serial.print(F("Initialize NTP... "));
     NtpSettings.init();
@@ -96,6 +106,10 @@ void loop()
 {
     WiFiSettings.loop();
     yield();
+#ifdef OLIMEX_ESP32_POE_LAN
+    Lan.loop();
+    yield();
+#endif
     Hoymiles.loop();
     yield();
     MqttPublishing.loop();
