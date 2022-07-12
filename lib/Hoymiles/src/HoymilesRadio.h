@@ -14,16 +14,30 @@
 
 #define MAX_RESEND_COUNT 3
 
-#ifndef HOYMILES_PIN_IRQ
-#define HOYMILES_PIN_IRQ 16
-#endif
+#ifdef OLIMEX_UEXT_MOD_NRF24LR
+    // look @ https://nrf24.github.io/RF24/md_docs_arduino.html
+    
+    #define HOYMILES_PIN_MISO 15
+    #define HOYMILES_PIN_MOSI 2
+    #define HOYMILES_PIN_SCLK 14 
+    #define HOYMILES_PIN_IRQ 13
+    #define HOYMILES_PIN_CE 16
+    #define HOYMILES_PIN_CS 5
 
-#ifndef HOYMILES_PIN_CE
-#define HOYMILES_PIN_CE 4
-#endif
+#else
 
-#ifndef HOYMILES_PIN_CS
-#define HOYMILES_PIN_CS 5
+    #ifndef HOYMILES_PIN_IRQ
+    #define HOYMILES_PIN_IRQ 16
+    #endif
+
+    #ifndef HOYMILES_PIN_CE
+    #define HOYMILES_PIN_CE 4
+    #endif
+
+    #ifndef HOYMILES_PIN_CS
+    #define HOYMILES_PIN_CS 5
+    #endif
+
 #endif
 
 class HoymilesRadio {
@@ -55,6 +69,9 @@ private:
     bool checkFragmentCrc(fragment_t* fragment);
     void dumpBuf(const char* info, uint8_t buf[], uint8_t len);
 
+#ifdef OLIMEX_UEXT_MOD_NRF24LR
+    std::unique_ptr<SPIClass> _hspi;
+#endif
     std::unique_ptr<RF24> _radio;
     uint8_t _rxChLst[5] = { 3, 23, 40, 61, 75 };
     uint8_t _rxChIdx;
