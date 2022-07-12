@@ -9,7 +9,15 @@ void HoymilesRadio::init()
     _dtuSerial.u64 = 0;
 
     _radio.reset(new RF24(HOYMILES_PIN_CE, HOYMILES_PIN_CS));
+#ifdef OLIMEX_UEXT_MOD_NRF24LR
+    // look @ https://nrf24.github.io/RF24/md_docs_arduino.html
+    _hspi.reset(new SPIClass(HSPI));
+    _hspi->begin(HOYMILES_PIN_SCLK, HOYMILES_PIN_MISO, HOYMILES_PIN_MOSI, HOYMILES_PIN_CS);
+//    _radio->begin(_hspi.release());
+    _radio->begin(_hspi.get());
+#else
     _radio->begin();
+#endif
     _radio->setDataRate(RF24_250KBPS);
     _radio->enableDynamicPayloads();
     _radio->setCRCLength(RF24_CRC_16);
