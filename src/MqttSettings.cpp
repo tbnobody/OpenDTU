@@ -1,6 +1,9 @@
 #include "MqttSettings.h"
 #include "Configuration.h"
 #include "WiFiSettings.h"
+#ifdef OLIMEX_ESP32_POE_LAN
+    #include "LanSettings.h"
+#endif
 #include <AsyncMqttClient.h>
 #include <Ticker.h>
 #include <WiFi.h>
