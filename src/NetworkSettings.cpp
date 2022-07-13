@@ -2,24 +2,66 @@
 /*
  * Copyright (C) 2022 Thomas Basler and others
  */
-#include "WiFiSettings.h"
+#include "NetworkSettings.h"
 #include "Configuration.h"
 #include "defaults.h"
 #include <WiFi.h>
+#ifdef OPENDTU_ETHERNET
+#include <ETH.h>
+#endif
 
-WiFiSettingsClass::WiFiSettingsClass()
+NetworkSettingsClass::NetworkSettingsClass()
     : apIp(192, 168, 4, 1)
     , apNetmask(255, 255, 255, 0)
 {
     dnsServer.reset(new DNSServer());
 }
 
-void WiFiSettingsClass::init()
+void NetworkSettingsClass::init()
 {
+    using namespace std::placeholders;
+
+    WiFi.onEvent(std::bind(&NetworkSettingsClass::NetworkEvent, this, _1));
     setupMode();
 }
 
-void WiFiSettingsClass::setupMode()
+void NetworkSettingsClass::NetworkEvent(WiFiEvent_t event)
+{
+    switch (event) {
+#ifdef OPENDTU_ETHERNET
+    case ARDUINO_EVENT_ETH_START:
+        Serial.println("ETH start");
+        ETH.setHostname("esp32-ethernet");
+        break;
+    case ARDUINO_EVENT_ETH_STOP:
+        Serial.println("ETH stop");
+        break;
+    case ARDUINO_EVENT_ETH_CONNECTED:
+        Serial.println("ETH connected");
+        ETH.config(INADDR_NONE, INADDR_NONE, INADDR_NONE, INADDR_NONE);
+        break;
+    case ARDUINO_EVENT_ETH_GOT_IP:
+        Serial.println("ETH got IP");
+        break;
+    case ARDUINO_EVENT_ETH_DISCONNECTED:
+        Serial.println("ETH disconnected");
+        break;
+#endif
+    case ARDUINO_EVENT_WIFI_STA_CONNECTED:
+        Serial.println("WiFi connected");
+        break;
+    case ARDUINO_EVENT_WIFI_STA_DISCONNECTED:
+        Serial.println("WiFi disconnected");
+        break;
+    case ARDUINO_EVENT_WIFI_STA_GOT_IP:
+        Serial.println("WiFi got ip");
+        break;
+    default:
+        Serial.printf("Event: %d\n", event);
+    }
+}
+
+void NetworkSettingsClass::setupMode()
 {
     if (adminEnabled) {
         WiFi.mode(WIFI_AP_STA);
@@ -34,16 +76,19 @@ void WiFiSettingsClass::setupMode()
         dnsServerStatus = false;
         WiFi.mode(WIFI_STA);
     }
+#ifdef OPENDTU_ETHERNET
+    ETH.begin();
+#endif
 }
 
-void WiFiSettingsClass::enableAdminMode()
+void NetworkSettingsClass::enableAdminMode()
 {
     adminEnabled = true;
     adminTimeoutCounter = 0;
     setupMode();
 }
 
-String WiFiSettingsClass::getApName()
+String NetworkSettingsClass::getApName()
 {
     uint32_t chipId = 0;
     for (int i = 0; i < 17; i += 8) {
@@ -52,7 +97,7 @@ String WiFiSettingsClass::getApName()
     return String(ACCESS_POINT_NAME + String(chipId));
 }
 
-void WiFiSettingsClass::loop()
+void NetworkSettingsClass::loop()
 {
     if (millis() - lastTimerCall > 1000) {
         adminTimeoutCounter++;
@@ -101,7 +146,7 @@ void WiFiSettingsClass::loop()
     }
 }
 
-void WiFiSettingsClass::applyConfig()
+void NetworkSettingsClass::applyConfig()
 {
     setHostname();
     if (!strcmp(Configuration.get().WiFi_Ssid, "")) {
@@ -121,7 +166,7 @@ void WiFiSettingsClass::applyConfig()
     setStaticIp();
 }
 
-void WiFiSettingsClass::setHostname()
+void NetworkSettingsClass::setHostname()
 {
     Serial.print(F("Setting Hostname... "));
     if (strcmp(Configuration.get().WiFi_Hostname, "")) {
@@ -135,7 +180,7 @@ void WiFiSettingsClass::setHostname()
     }
 }
 
-void WiFiSettingsClass::setStaticIp()
+void NetworkSettingsClass::setStaticIp()
 {
     if (!Configuration.get().WiFi_Dhcp) {
         Serial.print(F("Configuring WiFi STA static IP... "));
@@ -149,4 +194,4 @@ void WiFiSettingsClass::setStaticIp()
     }
 }
 
-WiFiSettingsClass WiFiSettings;
+NetworkSettingsClass NetworkSettings;

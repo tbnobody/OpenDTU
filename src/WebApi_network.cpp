@@ -6,7 +6,7 @@
 #include "ArduinoJson.h"
 #include "AsyncJson.h"
 #include "Configuration.h"
-#include "WiFiSettings.h"
+#include "NetworkSettings.h"
 #include "helper.h"
 
 void WebApiNetworkClass::init(AsyncWebServer* server)
@@ -39,7 +39,7 @@ void WebApiNetworkClass::onNetworkStatus(AsyncWebServerRequest* request)
     root[F("sta_mac")] = WiFi.macAddress();
     root[F("sta_rssi")] = WiFi.RSSI();
     root[F("ap_status")] = ((WiFi.getMode() & WIFI_AP) != 0);
-    root[F("ap_ssid")] = WiFiSettings.getApName();
+    root[F("ap_ssid")] = NetworkSettings.getApName();
     root[F("ap_ip")] = WiFi.softAPIP().toString();
     root[F("ap_mac")] = WiFi.softAPmacAddress();
     root[F("ap_stationnum")] = WiFi.softAPgetStationNum();
@@ -199,6 +199,6 @@ void WebApiNetworkClass::onNetworkAdminPost(AsyncWebServerRequest* request)
     response->setLength();
     request->send(response);
 
-    WiFiSettings.enableAdminMode();
-    WiFiSettings.applyConfig();
+    NetworkSettings.enableAdminMode();
+    NetworkSettings.applyConfig();
 }

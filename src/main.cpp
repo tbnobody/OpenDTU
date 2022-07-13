@@ -9,7 +9,7 @@
 #include "MqttSettings.h"
 #include "NtpSettings.h"
 #include "WebApi.h"
-#include "WiFiSettings.h"
+#include "NetworkSettings.h"
 #include "defaults.h"
 #include <Arduino.h>
 #include <LittleFS.h>
@@ -55,9 +55,9 @@ void setup()
 
     // Initialize WiFi
     Serial.print(F("Initialize WiFi... "));
-    WiFiSettings.init();
+    NetworkSettings.init();
     Serial.println(F("done"));
-    WiFiSettings.applyConfig();
+    NetworkSettings.applyConfig();
 
     // Initialize NTP
     Serial.print(F("Initialize NTP... "));
@@ -100,7 +100,7 @@ void setup()
 
 void loop()
 {
-    WiFiSettings.loop();
+    NetworkSettings.loop();
     yield();
     Hoymiles.loop();
     yield();

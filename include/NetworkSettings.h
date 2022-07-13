@@ -2,11 +2,12 @@
 #pragma once
 
 #include <DNSServer.h>
+#include <WiFi.h>
 #include <memory>
 
-class WiFiSettingsClass {
+class NetworkSettingsClass {
 public:
-    WiFiSettingsClass();
+    NetworkSettingsClass();
     void init();
     void loop();
     void applyConfig();
@@ -17,6 +18,7 @@ private:
     void setHostname();
     void setStaticIp();
     void setupMode();
+    void NetworkEvent(WiFiEvent_t event);
     bool adminEnabled = true;
     bool forceDisconnection = false;
     int adminTimeoutCounter = 0;
@@ -30,4 +32,4 @@ private:
     bool dnsServerStatus = false;
 };
 
-extern WiFiSettingsClass WiFiSettings;
+extern NetworkSettingsClass NetworkSettings;

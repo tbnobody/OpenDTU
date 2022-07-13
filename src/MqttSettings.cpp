@@ -4,7 +4,7 @@
  */
 #include "MqttSettings.h"
 #include "Configuration.h"
-#include "WiFiSettings.h"
+#include "NetworkSettings.h"
 #include <AsyncMqttClient.h>
 #include <Ticker.h>
 #include <WiFi.h>
@@ -54,7 +54,7 @@ void MqttSettingsClass::performConnect()
         willTopic = getPrefix() + config.Mqtt_LwtTopic;
         mqttClient.setWill(willTopic.c_str(), 2, config.Mqtt_Retain, config.Mqtt_LwtValue_Offline);
 
-        clientId = WiFiSettings.getApName();
+        clientId = NetworkSettings.getApName();
         mqttClient.setClientId(clientId.c_str());
 
         mqttClient.connect();
