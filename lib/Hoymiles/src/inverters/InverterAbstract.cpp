@@ -41,7 +41,7 @@ StatisticsParser* InverterAbstract::Statistics()
 
 void InverterAbstract::clearRxFragmentBuffer()
 {
-    memset(_rxFragmentBuffer, 0, MAX_RF_FRAGMENT_COUNT * MAX_RF_PAYLOAD_SIZE);
+    memset(_rxFragmentBuffer, 0, MAX_RF_FRAGMENT_COUNT * sizeof(fragment_t));
     _rxFragmentMaxPacketId = 0;
     _rxFragmentLastPacketId = 0;
     _rxFragmentRetransmitCnt = 0;
@@ -55,6 +55,16 @@ void InverterAbstract::clearRxFragmentBuffer()
 
 void InverterAbstract::addRxFragment(uint8_t fragment[], uint8_t len)
 {
+    if (len < 11 + 1) {
+        Serial.printf("FATAL: (%s, %d) fragment too short\n", __FILE__, __LINE__);
+        return;
+    }
+
+    if (len - 11 > MAX_RF_PAYLOAD_SIZE) {
+        Serial.printf("FATAL: (%s, %d) fragment too large\n", __FILE__, __LINE__);
+        return;
+    }
+
     uint8_t fragmentCount = fragment[9];
     if ((fragmentCount & 0b01111111) < MAX_RF_FRAGMENT_COUNT) {
         // Packets with 0x81 will be seen as 1

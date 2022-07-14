@@ -14,6 +14,10 @@ void StatisticsParser::clearBuffer()
 
 void StatisticsParser::appendFragment(uint8_t offset, uint8_t* payload, uint8_t len)
 {
+    if (offset + len > STATISTIC_PACKET_SIZE) {
+        Serial.printf("FATAL: (%s, %d) stats packet too large for buffer\n", __FILE__, __LINE__);
+        return;
+    }
     memcpy(&_payloadStatistic[offset], payload, len);
     _statisticLength += len;
 }

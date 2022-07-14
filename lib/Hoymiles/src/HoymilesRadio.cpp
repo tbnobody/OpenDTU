@@ -225,6 +225,11 @@ void HoymilesRadio::sendEsbPacket(serial_u target, uint8_t mainCmd, uint8_t subC
 {
     static uint8_t txBuffer[MAX_RF_PAYLOAD_SIZE];
 
+    if (10 + currentTransaction.len + 1 > MAX_RF_PAYLOAD_SIZE) {
+        Serial.printf("FATAL: (%s, %d) payload too large\n", __FILE__, __LINE__);
+        return;
+    }
+
     if (!resend) {
         currentTransaction.sendCount = 0;
         currentTransaction.target = target;

@@ -9,6 +9,10 @@ void AlarmLogParser::clearBuffer()
 
 void AlarmLogParser::appendFragment(uint8_t offset, uint8_t* payload, uint8_t len)
 {
+    if (offset + len > (ALARM_LOG_ENTRY_COUNT * ALARM_LOG_ENTRY_SIZE)) {
+        Serial.printf("FATAL: (%s, %d) stats packet too large for buffer\n", __FILE__, __LINE__);
+        return;
+    }
     memcpy(&_payloadAlarmLog[offset], payload, len);
     _alarmLogLength += len;
 }
