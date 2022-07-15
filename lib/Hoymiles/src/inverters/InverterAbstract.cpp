@@ -66,6 +66,11 @@ void InverterAbstract::addRxFragment(uint8_t fragment[], uint8_t len)
     }
 
     uint8_t fragmentCount = fragment[9];
+    if (fragmentCount == 0) {
+        Serial.println("ERROR: fragment number zero received and ignored");
+        return;
+    }
+
     if ((fragmentCount & 0b01111111) < MAX_RF_FRAGMENT_COUNT) {
         // Packets with 0x81 will be seen as 1
         memcpy(_rxFragmentBuffer[(fragmentCount & 0b01111111) - 1].fragment, &fragment[10], len - 11);
