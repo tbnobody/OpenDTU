@@ -41,7 +41,7 @@ void NetworkSettingsClass::NetworkEvent(WiFiEvent_t event)
         ETH.config(INADDR_NONE, INADDR_NONE, INADDR_NONE, INADDR_NONE);
         break;
     case ARDUINO_EVENT_ETH_GOT_IP:
-        Serial.println("ETH got IP");
+        Serial.printf("ETH got IP: %s\n", ETH.localIP().toString().c_str());
         break;
     case ARDUINO_EVENT_ETH_DISCONNECTED:
         Serial.println("ETH disconnected");
@@ -54,7 +54,7 @@ void NetworkSettingsClass::NetworkEvent(WiFiEvent_t event)
         Serial.println("WiFi disconnected");
         break;
     case ARDUINO_EVENT_WIFI_STA_GOT_IP:
-        Serial.println("WiFi got ip");
+        Serial.printf("WiFi got ip: %s\n", WiFi.localIP().toString().c_str());
         break;
     default:
         Serial.printf("Event: %d\n", event);
