@@ -1,3 +1,7 @@
+// SPDX-License-Identifier: GPL-2.0-or-later
+/*
+ * Copyright (C) 2022 Thomas Basler and others
+ */
 #include "WebApi_dtu.h"
 #include "ArduinoJson.h"
 #include "AsyncJson.h"

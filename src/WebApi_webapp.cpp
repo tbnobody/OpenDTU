@@ -1,3 +1,7 @@
+// SPDX-License-Identifier: GPL-2.0-or-later
+/*
+ * Copyright (C) 2022 Thomas Basler and others
+ */
 #include "WebApi_webapp.h"
 
 extern const uint8_t file_index_html_start[] asm("_binary_webapp_dist_index_html_gz_start");

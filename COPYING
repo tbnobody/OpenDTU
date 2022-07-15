@@ -1,0 +1,12 @@
+OpenDTU - ESP32 firmware to control HoyMiles Inverter
+
+Copyright (C) 2022 Thomas Basler and others
+
+OpenDTU is provided under:
+
+    SPDX-License-Identifier: GPL-2.0-or-later
+
+Being under the terms of the GNU General Public License version 2 only,
+according with:
+
+    LICENSE
