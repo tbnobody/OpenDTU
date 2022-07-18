@@ -16,6 +16,11 @@ void MqttHassPublishingClass::init()
 
 void MqttHassPublishingClass::loop()
 {
+    if (_updateForced) {
+        publishConfig();
+        _updateForced = false;
+    }
+
     if (MqttSettings.getConnected() && !_wasConnected) {
         // Connection established
         _wasConnected = true;
@@ -24,6 +29,11 @@ void MqttHassPublishingClass::loop()
         // Connection lost
         _wasConnected = false;
     }
+}
+
+void MqttHassPublishingClass::forceUpdate()
+{
+    _updateForced = true;
 }
 
 void MqttHassPublishingClass::publishConfig()

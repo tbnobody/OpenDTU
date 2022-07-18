@@ -53,11 +53,13 @@ public:
     void init();
     void loop();
     void publishConfig();
+    void forceUpdate();
 
 private:
     void publishField(std::shared_ptr<InverterAbstract> inv, uint8_t channel, byteAssign_fieldDeviceClass_t fieldType, bool clear = false);
 
     bool _wasConnected = false;
+    bool _updateForced = false;
 };
 
 extern MqttHassPublishingClass MqttHassPublishing;

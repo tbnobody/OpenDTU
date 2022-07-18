@@ -7,6 +7,7 @@
 #include "AsyncJson.h"
 #include "Configuration.h"
 #include "Hoymiles.h"
+#include "MqttHassPublishing.h"
 #include "helper.h"
 
 void WebApiInverterClass::init(AsyncWebServer* server)
@@ -143,6 +144,8 @@ void WebApiInverterClass::onInverterAdd(AsyncWebServerRequest* request)
     for (uint8_t c = 0; c < INV_MAX_CHAN_COUNT; c++) {
         inv->Statistics()->setChannelMaxPower(c, inverter->MaxChannelPower[c]);
     }
+
+    MqttHassPublishing.forceUpdate();
 }
 
 void WebApiInverterClass::onInverterEdit(AsyncWebServerRequest* request)
@@ -217,7 +220,6 @@ void WebApiInverterClass::onInverterEdit(AsyncWebServerRequest* request)
         return;
     }
 
-
     INVERTER_CONFIG_T& inverter = Configuration.get().Inverter[root[F("id")].as<uint8_t>()];
 
     char* t;
@@ -250,6 +252,8 @@ void WebApiInverterClass::onInverterEdit(AsyncWebServerRequest* request)
     for (uint8_t c = 0; c < INV_MAX_CHAN_COUNT; c++) {
         inv->Statistics()->setChannelMaxPower(c, inverter.MaxChannelPower[c]);
     }
+
+    MqttHassPublishing.forceUpdate();
 }
 
 void WebApiInverterClass::onInverterDelete(AsyncWebServerRequest* request)
@@ -311,4 +315,6 @@ void WebApiInverterClass::onInverterDelete(AsyncWebServerRequest* request)
     request->send(response);
 
     Hoymiles.removeInverterByPos(inverter_id);
+
+    MqttHassPublishing.forceUpdate();
 }

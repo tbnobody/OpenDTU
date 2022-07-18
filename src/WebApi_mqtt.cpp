@@ -211,5 +211,5 @@ void WebApiMqttClass::onMqttAdminPost(AsyncWebServerRequest* request)
     request->send(response);
 
     MqttSettings.performReconnect();
-    MqttHassPublishing.publishConfig();
+    MqttHassPublishing.forceUpdate();
 }
