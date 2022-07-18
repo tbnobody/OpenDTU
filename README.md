@@ -22,6 +22,7 @@ It was the goal to replace the original Hoymiles DTU (Telemetry Gateway) with th
 * Uses ESP32 microcontroller and NRF24L01+
 * Multi-Inverter support
 * MQTT support
+* Home Assistant MQTT Auto Discovery support
 * Nice and fancy WebApp with visualization of current data
 * Firmware upgrade using the web UI
 * Default source supports up to 10 inverters
@@ -45,16 +46,15 @@ It was the goal to replace the original Hoymiles DTU (Telemetry Gateway) with th
 ![Symbolic](docs/Wiring_ESP32_Symbol.png)
 
 ### Change pin assignment
-Its possible to change the pin assignment for the following pins:
-* CE
-* CS
-* IRQ
-
+Its possible to change all the pins of the NRF24L01+ module.
 This can be achieved by editing the 'platformio.ini' file and add one or more of the following lines to the 'build_flags' parameter:
 ```
--DHOYMILES_PIN_CE=4
+-DHOYMILES_PIN_MISO=15
+-DHOYMILES_PIN_MOSI=2
+-DHOYMILES_PIN_SCLK=14
+-DHOYMILES_PIN_IRQ=13
+-DHOYMILES_PIN_CE=16
 -DHOYMILES_PIN_CS=5
--DHOYMILES_PIN_IRQ=16
 ```
 
 ## Flashing and starting up
