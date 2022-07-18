@@ -73,6 +73,9 @@ This can be achieved by editing the 'platformio.ini' file and add one or more of
 * Navigate to Settings --> Network Settings and enter your WiFi credentials
 * Currently you have to look at your router to determine the IP of the newly connected device
 
+## Available cases
+* [https://www.thingiverse.com/thing:5435911](https://www.thingiverse.com/thing:5435911)
+
 ## Building
 * Building the WebApp
     * The WebApp can be build using yarn
