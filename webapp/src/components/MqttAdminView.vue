@@ -18,10 +18,25 @@
                 <div class="card">
                     <div class="card-header text-white bg-primary">MqTT Configuration</div>
                     <div class="card-body">
-                        <div class="form-check form-switch">
-                            <input class="form-check-input" type="checkbox" id="inputMqtt"
-                                v-model="mqttConfigList.mqtt_enabled" />
-                            <label class="form-check-label" for="inputMqtt">Enable MqTT</label>
+                        <div class="row mb-3">
+                            <label class="col-sm-4 form-check-label" for="inputMqtt">Enable MqTT</label>
+                            <div class="col-sm-8">
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" id="inputMqtt"
+                                        v-model="mqttConfigList.mqtt_enabled" />
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row mb-3" v-show="mqttConfigList.mqtt_enabled">
+                            <label class="col-sm-4 form-check-label" for="inputMqttHass">Enable Home Assistant MQTT Auto
+                                    Discovery</label>
+                            <div class="col-sm-8">
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" id="inputMqttHass"
+                                        v-model="mqttConfigList.mqtt_hass_enabled" />
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -135,6 +150,42 @@
                         </div>
                     </div>
                 </div>
+
+                <div class="card mt-5" v-show="mqttConfigList.mqtt_enabled && mqttConfigList.mqtt_hass_enabled">
+                    <div class="card-header text-white bg-primary">Home Assistant MQTT Auto Discovery Parameters</div>
+                    <div class="card-body">
+                        <div class="row mb-3">
+                            <label for="inputHassTopic" class="col-sm-2 col-form-label">Prefix Topic:</label>
+                            <div class="col-sm-10">
+                                <input type="text" class="form-control" id="inputHassTopic" maxlength="32"
+                                    placeholder="The prefix for the discovery topic"
+                                    v-model="mqttConfigList.mqtt_hass_topic" />
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <label class="col-sm-2 form-check-label" for="inputHassRetain">Enable Retain Flag</label>
+                            <div class="col-sm-10">
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" id="inputHassRetain"
+                                        v-model="mqttConfigList.mqtt_hass_retain" />
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <label class="col-sm-2 form-check-label" for="inputIndividualPanels">Individual Panels:</label>
+                            <div class="col-sm-10">
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" id="inputIndividualPanels"
+                                        v-model="mqttConfigList.mqtt_hass_individualpanels" />
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
                 <button type="submit" class="btn btn-primary mb-3">Save</button>
             </form>
         </template>
@@ -163,7 +214,11 @@ export default defineComponent({
                 mqtt_retain: false,
                 mqtt_lwt_topic: "",
                 mqtt_lwt_online: "",
-                mqtt_lwt_offline: ""
+                mqtt_lwt_offline: "",
+                mqtt_hass_enabled: false,
+                mqtt_hass_retain: false,
+                mqtt_hass_topic: "",
+                mqtt_hass_individualpanels: false
             },
             alertMessage: "",
             alertType: "info",

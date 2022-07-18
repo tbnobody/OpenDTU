@@ -4,7 +4,7 @@
 #include <Arduino.h>
 
 #define CONFIG_FILENAME "/config.bin"
-#define CONFIG_VERSION 0x00011100 // 0.1.17 // make sure to clean all after change
+#define CONFIG_VERSION 0x00011200 // 0.1.18 // make sure to clean all after change
 
 #define WIFI_MAX_SSID_STRLEN 31
 #define WIFI_MAX_PASSWORD_STRLEN 64
@@ -65,6 +65,11 @@ struct CONFIG_T {
     uint64_t Dtu_Serial;
     uint32_t Dtu_PollInterval;
     uint8_t Dtu_PaLevel;
+
+    bool Mqtt_Hass_Enabled;
+    bool Mqtt_Hass_Retain;
+    char Mqtt_Hass_Topic[MQTT_MAX_TOPIC_STRLEN + 1];
+    bool Mqtt_Hass_IndividualPanels;
 };
 
 class ConfigurationClass {

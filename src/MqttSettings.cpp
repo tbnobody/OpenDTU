@@ -93,6 +93,13 @@ void MqttSettingsClass::publish(String subtopic, String payload)
     mqttClient.publish(topic.c_str(), 0, Configuration.get().Mqtt_Retain, payload.c_str());
 }
 
+void MqttSettingsClass::publishHass(String subtopic, String payload)
+{
+    String topic = Configuration.get().Mqtt_Hass_Topic;
+    topic += subtopic;
+    mqttClient.publish(topic.c_str(), 0, Configuration.get().Mqtt_Hass_Retain, payload.c_str());
+}
+
 void MqttSettingsClass::init()
 {
     using namespace std::placeholders;

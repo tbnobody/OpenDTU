@@ -49,6 +49,11 @@ void ConfigurationClass::init()
     config.Dtu_Serial = DTU_SERIAL;
     config.Dtu_PollInterval = DTU_POLL_INTERVAL;
     config.Dtu_PaLevel = DTU_PA_LEVEL;
+
+    config.Mqtt_Hass_Enabled = MQTT_HASS_ENABLED;
+    config.Mqtt_Hass_Retain = MQTT_HASS_RETAIN;
+    strlcpy(config.Mqtt_Hass_Topic, MQTT_TOPIC, sizeof(config.Mqtt_Hass_Topic));
+    config.Mqtt_Hass_IndividualPanels = MQTT_HASS_INDIVIDUALPANELS;
 }
 
 bool ConfigurationClass::write()
@@ -126,6 +131,13 @@ void ConfigurationClass::migrate()
 
     if (config.Cfg_Version < 0x00011100) {
         init(); // Config will be completly incompatible after this update
+    }
+
+    if (config.Cfg_Version < 0x00011200) {
+        config.Mqtt_Hass_Enabled = MQTT_HASS_ENABLED;
+        config.Mqtt_Hass_Retain = MQTT_HASS_RETAIN;
+        strlcpy(config.Mqtt_Hass_Topic, MQTT_HASS_TOPIC, sizeof(config.Mqtt_Hass_Topic));
+        config.Mqtt_Hass_IndividualPanels = MQTT_HASS_INDIVIDUALPANELS;
     }
 
     config.Cfg_Version = CONFIG_VERSION;

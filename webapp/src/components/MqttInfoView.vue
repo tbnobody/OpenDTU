@@ -64,6 +64,52 @@
             </div>
 
             <div class="card mt-5">
+                <div class="card-header text-white bg-primary">Home Assistant MQTT Auto Discovery Configuration Summary</div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover table-condensed">
+                            <tbody>
+                                <tr>
+                                    <th>Status</th>
+                                    <td class="badge" :class="{
+                                        'bg-danger': !mqttDataList.mqtt_hass_enabled,
+                                        'bg-success': mqttDataList.mqtt_hass_enabled,
+                                    }">
+                                        <span v-if="mqttDataList.mqtt_hass_enabled">enabled</span>
+                                        <span v-else>disabled</span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>Base Topic</th>
+                                    <td>{{ mqttDataList.mqtt_hass_topic }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Retain</th>
+                                    <td class="badge" :class="{
+                                        'bg-danger': !mqttDataList.mqtt_hass_retain,
+                                        'bg-success': mqttDataList.mqtt_hass_retain,
+                                    }">
+                                        <span v-if="mqttDataList.mqtt_hass_retain">enabled</span>
+                                        <span v-else>disabled</span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>Individual Panels</th>
+                                    <td class="badge" :class="{
+                                        'bg-danger': !mqttDataList.mqtt_hass_individualpanels,
+                                        'bg-success': mqttDataList.mqtt_hass_individualpanels,
+                                    }">
+                                        <span v-if="mqttDataList.mqtt_hass_individualpanels">enabled</span>
+                                        <span v-else>disabled</span>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card mt-5">
                 <div class="card-header text-white bg-primary">Runtime Summary</div>
                 <div class="card-body">
                     <div class="table-responsive">
@@ -103,7 +149,11 @@ export default defineComponent({
                 mqtt_topic: "",
                 mqtt_publish_interval: 0,
                 mqtt_retain: false,
-                mqtt_connected: false
+                mqtt_connected: false,
+                mqtt_hass_enabled: false,
+                mqtt_hass_retain: false,
+                mqtt_hass_topic: "",
+                mqtt_hass_individualpanels: false
             },
         };
     },

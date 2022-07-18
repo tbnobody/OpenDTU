@@ -14,6 +14,7 @@ public:
     void performReconnect();
     bool getConnected();
     void publish(String subtopic, String payload);
+    void publishHass(String subtopic, String payload);
 
     String getPrefix();
 

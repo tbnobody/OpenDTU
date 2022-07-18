@@ -6,6 +6,7 @@
 #include "ArduinoJson.h"
 #include "AsyncJson.h"
 #include "Configuration.h"
+#include "MqttHassPublishing.h"
 #include "MqttSettings.h"
 #include "helper.h"
 
@@ -39,6 +40,10 @@ void WebApiMqttClass::onMqttStatus(AsyncWebServerRequest* request)
     root[F("mqtt_retain")] = config.Mqtt_Retain;
     root[F("mqtt_lwt_topic")] = String(config.Mqtt_Topic) + config.Mqtt_LwtTopic;
     root[F("mqtt_publish_interval")] = config.Mqtt_PublishInterval;
+    root[F("mqtt_hass_enabled")] = config.Mqtt_Hass_Enabled;
+    root[F("mqtt_hass_retain")] = config.Mqtt_Hass_Retain;
+    root[F("mqtt_hass_topic")] = config.Mqtt_Hass_Topic;
+    root[F("mqtt_hass_individualpanels")] = config.Mqtt_Hass_IndividualPanels;
 
     response->setLength();
     request->send(response);
@@ -61,6 +66,10 @@ void WebApiMqttClass::onMqttAdminGet(AsyncWebServerRequest* request)
     root[F("mqtt_lwt_online")] = config.Mqtt_LwtValue_Online;
     root[F("mqtt_lwt_offline")] = config.Mqtt_LwtValue_Offline;
     root[F("mqtt_publish_interval")] = config.Mqtt_PublishInterval;
+    root[F("mqtt_hass_enabled")] = config.Mqtt_Hass_Enabled;
+    root[F("mqtt_hass_retain")] = config.Mqtt_Hass_Retain;
+    root[F("mqtt_hass_topic")] = config.Mqtt_Hass_Topic;
+    root[F("mqtt_hass_individualpanels")] = config.Mqtt_Hass_IndividualPanels;
 
     response->setLength();
     request->send(response);
@@ -98,7 +107,7 @@ void WebApiMqttClass::onMqttAdminPost(AsyncWebServerRequest* request)
         return;
     }
 
-    if (!(root.containsKey("mqtt_enabled") && root.containsKey("mqtt_hostname") && root.containsKey("mqtt_port") && root.containsKey("mqtt_username") && root.containsKey("mqtt_password") && root.containsKey("mqtt_topic") && root.containsKey("mqtt_retain") && root.containsKey("mqtt_lwt_topic") && root.containsKey("mqtt_lwt_online") && root.containsKey("mqtt_lwt_offline") && root.containsKey("mqtt_publish_interval"))) {
+    if (!(root.containsKey("mqtt_enabled") && root.containsKey("mqtt_hostname") && root.containsKey("mqtt_port") && root.containsKey("mqtt_username") && root.containsKey("mqtt_password") && root.containsKey("mqtt_topic") && root.containsKey("mqtt_retain") && root.containsKey("mqtt_lwt_topic") && root.containsKey("mqtt_lwt_online") && root.containsKey("mqtt_lwt_offline") && root.containsKey("mqtt_publish_interval") && root.containsKey("mqtt_hass_enabled") && root.containsKey("mqtt_hass_retain") && root.containsKey("mqtt_hass_topic") && root.containsKey("mqtt_hass_individualpanels"))) {
         retMsg[F("message")] = F("Values are missing!");
         response->setLength();
         request->send(response);
@@ -166,6 +175,15 @@ void WebApiMqttClass::onMqttAdminPost(AsyncWebServerRequest* request)
             request->send(response);
             return;
         }
+
+        if (root[F("mqtt_hass_enabled")].as<bool>()) {
+            if (root[F("mqtt_hass_topic")].as<String>().length() > MQTT_MAX_TOPIC_STRLEN) {
+                retMsg[F("message")] = F("Hass topic must not longer then " STR(MQTT_MAX_TOPIC_STRLEN) " characters!");
+                response->setLength();
+                request->send(response);
+                return;
+            }
+        }
     }
 
     CONFIG_T& config = Configuration.get();
@@ -180,6 +198,10 @@ void WebApiMqttClass::onMqttAdminPost(AsyncWebServerRequest* request)
     strcpy(config.Mqtt_LwtValue_Online, root[F("mqtt_lwt_online")].as<String>().c_str());
     strcpy(config.Mqtt_LwtValue_Offline, root[F("mqtt_lwt_offline")].as<String>().c_str());
     config.Mqtt_PublishInterval = root[F("mqtt_publish_interval")].as<uint32_t>();
+    config.Mqtt_Hass_Enabled = root[F("mqtt_hass_enabled")].as<bool>();
+    config.Mqtt_Hass_Retain = root[F("mqtt_hass_retain")].as<bool>();
+    config.Mqtt_Hass_IndividualPanels = root[F("mqtt_hass_individualpanels")].as<bool>();
+    strcpy(config.Mqtt_Hass_Topic, root[F("mqtt_hass_topic")].as<String>().c_str());
     Configuration.write();
 
     retMsg[F("type")] = F("success");
@@ -189,4 +211,5 @@ void WebApiMqttClass::onMqttAdminPost(AsyncWebServerRequest* request)
     request->send(response);
 
     MqttSettings.performReconnect();
+    MqttHassPublishing.publishConfig();
 }

@@ -37,3 +37,8 @@
 #define DTU_SERIAL 0x99978563412
 #define DTU_POLL_INTERVAL 5
 #define DTU_PA_LEVEL 0
+
+#define MQTT_HASS_ENABLED false
+#define MQTT_HASS_RETAIN true
+#define MQTT_HASS_TOPIC "homeassistant/"
+#define MQTT_HASS_INDIVIDUALPANELS false
