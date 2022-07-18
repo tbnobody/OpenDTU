@@ -51,7 +51,7 @@ void MqttSettingsClass::performConnect()
         mqttClient.setServer(config.Mqtt_Hostname, config.Mqtt_Port);
         mqttClient.setCredentials(config.Mqtt_Username, config.Mqtt_Password);
 
-        willTopic = String(config.Mqtt_Topic) + config.Mqtt_LwtTopic;
+        willTopic = getPrefix() + config.Mqtt_LwtTopic;
         mqttClient.setWill(willTopic.c_str(), 2, config.Mqtt_Retain, config.Mqtt_LwtValue_Offline);
 
         clientId = WiFiSettings.getApName();
@@ -81,9 +81,14 @@ bool MqttSettingsClass::getConnected()
     return mqttClient.connected();
 }
 
+String MqttSettingsClass::getPrefix()
+{
+    return Configuration.get().Mqtt_Topic;
+}
+
 void MqttSettingsClass::publish(String subtopic, String payload)
 {
-    String topic = Configuration.get().Mqtt_Topic;
+    String topic = getPrefix();
     topic += subtopic;
     mqttClient.publish(topic.c_str(), 0, Configuration.get().Mqtt_Retain, payload.c_str());
 }

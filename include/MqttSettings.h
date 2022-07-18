@@ -15,6 +15,8 @@ public:
     bool getConnected();
     void publish(String subtopic, String payload);
 
+    String getPrefix();
+
 private:
     void WiFiEvent(WiFiEvent_t event);
 
