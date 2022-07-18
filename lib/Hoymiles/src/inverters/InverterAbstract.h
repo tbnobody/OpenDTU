@@ -22,6 +22,7 @@ enum {
 class InverterAbstract {
 public:
     InverterAbstract(uint64_t serial);
+    void init();
     uint64_t serial();
     void setName(const char* name);
     const char* name();

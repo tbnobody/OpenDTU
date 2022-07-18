@@ -9,6 +9,15 @@ InverterAbstract::InverterAbstract(uint64_t serial)
     _statisticsParser.reset(new StatisticsParser());
 }
 
+void InverterAbstract::init()
+{
+    // This has to be done here because:
+    // Not possible in constructor --> virtual function
+    // Not possible in verifyAllFragments --> Because no data if nothing is ever received
+    // It has to be executed because otherwise the getChannelCount method in stats always returns 0
+    _statisticsParser.get()->setByteAssignment(getByteAssignment(), getAssignmentCount());
+}
+
 uint64_t InverterAbstract::serial()
 {
     return _serial.u64;
@@ -45,12 +54,6 @@ void InverterAbstract::clearRxFragmentBuffer()
     _rxFragmentMaxPacketId = 0;
     _rxFragmentLastPacketId = 0;
     _rxFragmentRetransmitCnt = 0;
-
-    // This has to be done here because:
-    // Not possible in constructor --> virtual function
-    // Not possible in verifyAllFragments --> Because no data if nothing is ever received
-    // It has to be executed because otherwise the getChannelCount method in stats always returns 0
-    _statisticsParser.get()->setByteAssignment(getByteAssignment(), getAssignmentCount());
 }
 
 void InverterAbstract::addRxFragment(uint8_t fragment[], uint8_t len)

@@ -56,6 +56,7 @@ std::shared_ptr<InverterAbstract> HoymilesClass::addInverter(const char* name, u
 
     if (i) {
         i->setName(name);
+        i->init();
         _inverters.push_back(std::move(i));
         return _inverters.back();
     }
