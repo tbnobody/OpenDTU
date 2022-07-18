@@ -41,23 +41,9 @@ void MqttPublishingClass::loop()
 
                 // Loop all channels
                 for (uint8_t c = 0; c <= inv->Statistics()->getChannelCount(); c++) {
-                    publishField(subtopic, inv, c, FLD_UDC);
-                    publishField(subtopic, inv, c, FLD_IDC);
-                    if (c == 0) {
-                        publishField(subtopic, inv, c, FLD_PDC, "powerdc");
-                    } else {
-                        publishField(subtopic, inv, c, FLD_PDC);
+                    for (uint8_t f = 0; f < sizeof(_publishFields); f++) {
+                        publishField(inv, c, _publishFields[f]);
                     }
-                    publishField(subtopic, inv, c, FLD_YD);
-                    publishField(subtopic, inv, c, FLD_YT);
-                    publishField(subtopic, inv, c, FLD_UAC);
-                    publishField(subtopic, inv, c, FLD_IAC);
-                    publishField(subtopic, inv, c, FLD_PAC);
-                    publishField(subtopic, inv, c, FLD_F);
-                    publishField(subtopic, inv, c, FLD_T);
-                    publishField(subtopic, inv, c, FLD_PCT);
-                    publishField(subtopic, inv, c, FLD_EFF);
-                    publishField(subtopic, inv, c, FLD_IRR);
                 }
             }
 
@@ -68,16 +54,35 @@ void MqttPublishingClass::loop()
     }
 }
 
-void MqttPublishingClass::publishField(String subtopic, std::shared_ptr<InverterAbstract> inv, uint8_t channel, uint8_t fieldId, String topic)
+void MqttPublishingClass::publishField(std::shared_ptr<InverterAbstract> inv, uint8_t channel, uint8_t fieldId)
 {
-    if (inv->Statistics()->hasChannelFieldValue(channel, fieldId)) {
-        String chanName;
-        if (topic == "") {
-            chanName = inv->Statistics()->getChannelFieldName(channel, fieldId);
-        } else {
-            chanName = topic;
-        }
-        chanName.toLowerCase();
-        MqttSettings.publish(subtopic + "/" + String(channel) + "/" + chanName, String(inv->Statistics()->getChannelFieldValue(channel, fieldId)));
+    String topic = getTopic(inv, channel, fieldId);
+    if (topic == "") {
+        return;
     }
+
+    MqttSettings.publish(topic, String(inv->Statistics()->getChannelFieldValue(channel, fieldId)));
+}
+
+String MqttPublishingClass::getTopic(std::shared_ptr<InverterAbstract> inv, uint8_t channel, uint8_t fieldId)
+{
+    if (!inv->Statistics()->hasChannelFieldValue(channel, fieldId)) {
+        return String("");
+    }
+
+    char buffer[sizeof(uint64_t) * 8 + 1];
+    sprintf(buffer, "%0lx%08lx",
+        ((uint32_t)((inv->serial() >> 32) & 0xFFFFFFFF)),
+        ((uint32_t)(inv->serial() & 0xFFFFFFFF)));
+    String invSerial = String(buffer);
+
+    String chanName;
+    if (channel == 0 && fieldId == FLD_PDC) {
+        chanName = "powerdc";
+    } else {
+        chanName = inv->Statistics()->getChannelFieldName(channel, fieldId);
+        chanName.toLowerCase();
+    }
+
+    return invSerial + "/" + String(channel) + "/" + chanName;
 }
