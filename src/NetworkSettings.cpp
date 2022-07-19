@@ -30,19 +30,19 @@ void NetworkSettingsClass::NetworkEvent(WiFiEvent_t event)
     switch (event) {
 #ifdef OPENDTU_ETHERNET
     case ARDUINO_EVENT_ETH_START:
-        Serial.println("ETH start");
+        Serial.println(F("ETH start"));
         if (_networkMode == network_mode::Ethernet) {
             raiseEvent(network_event::NETWORK_START);
         }
         break;
     case ARDUINO_EVENT_ETH_STOP:
-        Serial.println("ETH stop");
+        Serial.println(F("ETH stop"));
         if (_networkMode == network_mode::Ethernet) {
             raiseEvent(network_event::NETWORK_STOP);
         }
         break;
     case ARDUINO_EVENT_ETH_CONNECTED:
-        Serial.println("ETH connected");
+        Serial.println(F("ETH connected"));
         _ethConnected = true;
         raiseEvent(network_event::NETWORK_CONNECTED);
         break;
@@ -53,7 +53,7 @@ void NetworkSettingsClass::NetworkEvent(WiFiEvent_t event)
         }
         break;
     case ARDUINO_EVENT_ETH_DISCONNECTED:
-        Serial.println("ETH disconnected");
+        Serial.println(F("ETH disconnected"));
         _ethConnected = false;
         if (_networkMode == network_mode::Ethernet) {
             raiseEvent(network_event::NETWORK_DISCONNECTED);
@@ -61,14 +61,15 @@ void NetworkSettingsClass::NetworkEvent(WiFiEvent_t event)
         break;
 #endif
     case ARDUINO_EVENT_WIFI_STA_CONNECTED:
-        Serial.println("WiFi connected");
+        Serial.println(F("WiFi connected"));
         if (_networkMode == network_mode::WiFi) {
             raiseEvent(network_event::NETWORK_CONNECTED);
         }
         break;
     case ARDUINO_EVENT_WIFI_STA_DISCONNECTED:
-        Serial.println("WiFi disconnected");
+        Serial.println(F("WiFi disconnected"));
         if (_networkMode == network_mode::WiFi) {
+            Serial.println(F("Try reconnecting"));
             WiFi.reconnect();
             raiseEvent(network_event::NETWORK_DISCONNECTED);
         }
@@ -80,7 +81,7 @@ void NetworkSettingsClass::NetworkEvent(WiFiEvent_t event)
         }
         break;
     default:
-        Serial.printf("Event: %d\n", event);
+        break;
     }
 }
 
