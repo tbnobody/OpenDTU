@@ -28,12 +28,23 @@ void AlarmLogParser::getLogEntry(uint8_t entryId, AlarmLogEntry_t* entry)
 
     int timezoneOffset = getTimezoneOffset();
 
+    uint32_t wcode = (uint16_t)_payloadAlarmLog[entryStartOffset] << 8 | _payloadAlarmLog[entryStartOffset + 1];
+    uint32_t startTimeOffset = 0;
+    if ((wcode >> 13) & 0x01 == 1) {
+        startTimeOffset = 12 * 60 * 60;
+    }
+
+    uint32_t endTimeOffset = 0;
+    if ((wcode >> 12) & 0x01 == 1) {
+        endTimeOffset = 12 * 60 * 60;
+    }
+
     entry->MessageId = _payloadAlarmLog[entryStartOffset + 1];
-    entry->StartTime = ((uint16_t)_payloadAlarmLog[entryStartOffset + 4] << 8) | ((uint16_t)_payloadAlarmLog[entryStartOffset + 5]) + timezoneOffset;
+    entry->StartTime = (((uint16_t)_payloadAlarmLog[entryStartOffset + 4] << 8) | ((uint16_t)_payloadAlarmLog[entryStartOffset + 5])) + startTimeOffset + timezoneOffset;
     entry->EndTime = ((uint16_t)_payloadAlarmLog[entryStartOffset + 6] << 8) | ((uint16_t)_payloadAlarmLog[entryStartOffset + 7]);
 
     if (entry->EndTime > 0) {
-        entry->EndTime += timezoneOffset;
+        entry->EndTime += (endTimeOffset + timezoneOffset);
     }
 
     switch (entry->MessageId) {
@@ -252,7 +263,7 @@ int AlarmLogParser::getTimezoneOffset()
     // see: https://stackoverflow.com/questions/13804095/get-the-time-zone-gmt-offset-in-c/44063597#44063597
 
     time_t gmt, rawtime = time(NULL);
-    struct tm *ptm;
+    struct tm* ptm;
 
     struct tm gbuf;
     ptm = gmtime_r(&rawtime, &gbuf);
