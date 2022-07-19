@@ -4,6 +4,7 @@
  */
 #include "MqttPublishing.h"
 #include "MqttSettings.h"
+#include "NetworkSettings.h"
 
 MqttPublishingClass MqttPublishing;
 
@@ -21,7 +22,7 @@ void MqttPublishingClass::loop()
 
     if (millis() - _lastPublish > (config.Mqtt_PublishInterval * 1000)) {
         MqttSettings.publish("dtu/uptime", String(millis() / 1000));
-        MqttSettings.publish("dtu/ip", WiFi.localIP().toString());
+        MqttSettings.publish("dtu/ip", NetworkSettings.localIP().toString());
 
         // Loop all inverters
         for (uint8_t i = 0; i < Hoymiles.getNumInverters(); i++) {

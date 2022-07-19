@@ -6,6 +6,7 @@
 #include "ArduinoJson.h"
 #include "AsyncJson.h"
 #include "Configuration.h"
+#include "NetworkSettings.h"
 #include <LittleFS.h>
 #include <ResetReason.h>
 
@@ -31,7 +32,7 @@ void WebApiSysstatusClass::onSystemStatus(AsyncWebServerRequest* request)
     AsyncJsonResponse* response = new AsyncJsonResponse();
     JsonObject root = response->getRoot();
 
-    root[F("hostname")] = WiFi.getHostname();
+    root[F("hostname")] = NetworkSettings.getHostname();
 
     root[F("sdkversion")] = ESP.getSdkVersion();
     root[F("cpufreq")] = ESP.getCpuFreqMHz();

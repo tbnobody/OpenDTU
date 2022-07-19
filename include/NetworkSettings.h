@@ -4,6 +4,37 @@
 #include <DNSServer.h>
 #include <WiFi.h>
 #include <memory>
+#include <vector>
+
+enum class network_mode {
+    WiFi,
+    Ethernet,
+    Undefined
+};
+
+enum class network_event {
+    NETWORK_UNKNOWN,
+    NETWORK_START,
+    NETWORK_STOP,
+    NETWORK_CONNECTED,
+    NETWORK_DISCONNECTED,
+    NETWORK_GOT_IP,
+    NETWORK_LOST_IP,
+    NETWORK_EVENT_MAX
+};
+
+typedef std::function<void(network_event event)> NetworkEventCb;
+
+typedef struct NetworkEventCbList {
+    NetworkEventCb cb;
+    network_event event;
+
+    NetworkEventCbList()
+        : cb(NULL)
+        , event(network_event::NETWORK_UNKNOWN)
+    {
+    }
+} NetworkEventCbList_t;
 
 class NetworkSettingsClass {
 public:
@@ -13,6 +44,18 @@ public:
     void applyConfig();
     void enableAdminMode();
     String getApName();
+
+    IPAddress localIP();
+    IPAddress subnetMask();
+    IPAddress gatewayIP();
+    IPAddress dnsIP(uint8_t dns_no = 0);
+    String macAddress();
+    const char* getHostname();
+    bool isConnected();
+    network_mode NetworkMode();
+
+    bool onEvent(NetworkEventCb cbEvent, network_event event = network_event::NETWORK_EVENT_MAX);
+    void raiseEvent(network_event event);
 
 private:
     void setHostname();
@@ -30,6 +73,9 @@ private:
     IPAddress apNetmask;
     std::unique_ptr<DNSServer> dnsServer;
     bool dnsServerStatus = false;
+    network_mode _networkMode = network_mode::Undefined;
+    bool _ethConnected = false;
+    std::vector<NetworkEventCbList_t> _cbEventList;
 };
 
 extern NetworkSettingsClass NetworkSettings;

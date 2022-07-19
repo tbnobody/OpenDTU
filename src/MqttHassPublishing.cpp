@@ -6,7 +6,7 @@
 #include "ArduinoJson.h"
 #include "MqttPublishing.h"
 #include "MqttSettings.h"
-#include "WiFiSettings.h"
+#include "NetworkSettings.h"
 
 MqttHassPublishingClass MqttHassPublishing;
 

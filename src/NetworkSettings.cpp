@@ -31,33 +31,80 @@ void NetworkSettingsClass::NetworkEvent(WiFiEvent_t event)
 #ifdef OPENDTU_ETHERNET
     case ARDUINO_EVENT_ETH_START:
         Serial.println("ETH start");
-        ETH.setHostname("esp32-ethernet");
+        if (_networkMode == network_mode::Ethernet) {
+            raiseEvent(network_event::NETWORK_START);
+        }
         break;
     case ARDUINO_EVENT_ETH_STOP:
         Serial.println("ETH stop");
+        if (_networkMode == network_mode::Ethernet) {
+            raiseEvent(network_event::NETWORK_STOP);
+        }
         break;
     case ARDUINO_EVENT_ETH_CONNECTED:
         Serial.println("ETH connected");
-        ETH.config(INADDR_NONE, INADDR_NONE, INADDR_NONE, INADDR_NONE);
+        _ethConnected = true;
+        raiseEvent(network_event::NETWORK_CONNECTED);
         break;
     case ARDUINO_EVENT_ETH_GOT_IP:
         Serial.printf("ETH got IP: %s\n", ETH.localIP().toString().c_str());
+        if (_networkMode == network_mode::Ethernet) {
+            raiseEvent(network_event::NETWORK_GOT_IP);
+        }
         break;
     case ARDUINO_EVENT_ETH_DISCONNECTED:
         Serial.println("ETH disconnected");
+        _ethConnected = false;
+        if (_networkMode == network_mode::Ethernet) {
+            raiseEvent(network_event::NETWORK_DISCONNECTED);
+        }
         break;
 #endif
     case ARDUINO_EVENT_WIFI_STA_CONNECTED:
         Serial.println("WiFi connected");
+        if (_networkMode == network_mode::WiFi) {
+            raiseEvent(network_event::NETWORK_CONNECTED);
+        }
         break;
     case ARDUINO_EVENT_WIFI_STA_DISCONNECTED:
         Serial.println("WiFi disconnected");
+        if (_networkMode == network_mode::WiFi) {
+            WiFi.reconnect();
+            raiseEvent(network_event::NETWORK_DISCONNECTED);
+        }
         break;
     case ARDUINO_EVENT_WIFI_STA_GOT_IP:
         Serial.printf("WiFi got ip: %s\n", WiFi.localIP().toString().c_str());
+        if (_networkMode == network_mode::WiFi) {
+            raiseEvent(network_event::NETWORK_GOT_IP);
+        }
         break;
     default:
         Serial.printf("Event: %d\n", event);
+    }
+}
+
+bool NetworkSettingsClass::onEvent(NetworkEventCb cbEvent, network_event event)
+{
+    if (!cbEvent) {
+        return pdFALSE;
+    }
+    NetworkEventCbList_t newEventHandler;
+    newEventHandler.cb = cbEvent;
+    newEventHandler.event = event;
+    _cbEventList.push_back(newEventHandler);
+    return true;
+}
+
+void NetworkSettingsClass::raiseEvent(network_event event)
+{
+    for (uint32_t i = 0; i < _cbEventList.size(); i++) {
+        NetworkEventCbList_t entry = _cbEventList[i];
+        if (entry.cb) {
+            if (entry.event == event || entry.event == network_event::NETWORK_EVENT_MAX) {
+                entry.cb(event);
+            }
+        }
     }
 }
 
@@ -74,7 +121,11 @@ void NetworkSettingsClass::setupMode()
     } else {
         dnsServer->stop();
         dnsServerStatus = false;
-        WiFi.mode(WIFI_STA);
+        if (_networkMode == network_mode::WiFi) {
+            WiFi.mode(WIFI_STA);
+        } else {
+            WiFi.mode(WIFI_MODE_NULL);
+        }
     }
 #ifdef OPENDTU_ETHERNET
     ETH.begin();
@@ -99,6 +150,26 @@ String NetworkSettingsClass::getApName()
 
 void NetworkSettingsClass::loop()
 {
+#ifdef OPENDTU_ETHERNET
+    if (_ethConnected) {
+        if (_networkMode != network_mode::Ethernet) {
+            // Do stuff when switching to Ethernet mode
+            Serial.println(F("Switch to Ethernet mode"));
+            _networkMode = network_mode::Ethernet;
+            WiFi.mode(WIFI_MODE_NULL);
+            setStaticIp();
+            setHostname();
+        }
+    } else
+#endif
+        if (_networkMode != network_mode::WiFi) {
+        // Do stuff when switching to Ethernet mode
+        Serial.println(F("Switch to WiFi mode"));
+        _networkMode = network_mode::WiFi;
+        enableAdminMode();
+        applyConfig();
+    }
+
     if (millis() - lastTimerCall > 1000) {
         adminTimeoutCounter++;
         connectTimeoutTimer++;
@@ -106,8 +177,8 @@ void NetworkSettingsClass::loop()
         lastTimerCall = millis();
     }
     if (adminEnabled) {
-        // Don't disable the admin mode when WiFi is not available
-        if (WiFi.status() != WL_CONNECTED) {
+        // Don't disable the admin mode when network is not available
+        if (!isConnected()) {
             adminTimeoutCounter = 0;
         }
         // If WiFi is connected to AP for more than ADMIN_TIMEOUT
@@ -120,7 +191,7 @@ void NetworkSettingsClass::loop()
         // It's nearly not possible to use the internal AP if the
         // WiFi is searching for an AP. So disable searching afer
         // WIFI_RECONNECT_TIMEOUT and repeat after WIFI_RECONNECT_REDO_TIMEOUT
-        if (WiFi.status() == WL_CONNECTED) {
+        if (isConnected()) {
             connectTimeoutTimer = 0;
             connectRedoTimer = 0;
         } else {
@@ -170,11 +241,22 @@ void NetworkSettingsClass::setHostname()
 {
     Serial.print(F("Setting Hostname... "));
     if (strcmp(Configuration.get().WiFi_Hostname, "")) {
-        if (WiFi.hostname(Configuration.get().WiFi_Hostname)) {
-            Serial.println(F("done"));
-        } else {
-            Serial.println(F("failed"));
+        if (_networkMode == network_mode::WiFi) {
+            if (WiFi.hostname(Configuration.get().WiFi_Hostname)) {
+                Serial.println(F("done"));
+            } else {
+                Serial.println(F("failed"));
+            }
         }
+#ifdef OPENDTU_ETHERNET
+        else if (_networkMode == network_mode::Ethernet) {
+            if (ETH.setHostname(Configuration.get().WiFi_Hostname)) {
+                Serial.println(F("done"));
+            } else {
+                Serial.println(F("failed"));
+            }
+        }
+#endif
     } else {
         Serial.println(F("failed (Hostname empty)"));
     }
@@ -182,16 +264,138 @@ void NetworkSettingsClass::setHostname()
 
 void NetworkSettingsClass::setStaticIp()
 {
-    if (!Configuration.get().WiFi_Dhcp) {
-        Serial.print(F("Configuring WiFi STA static IP... "));
-        WiFi.config(
-            IPAddress(Configuration.get().WiFi_Ip),
-            IPAddress(Configuration.get().WiFi_Gateway),
-            IPAddress(Configuration.get().WiFi_Netmask),
-            IPAddress(Configuration.get().WiFi_Dns1),
-            IPAddress(Configuration.get().WiFi_Dns2));
-        Serial.println(F("done"));
+    if (_networkMode == network_mode::WiFi) {
+        if (!Configuration.get().WiFi_Dhcp) {
+            Serial.print(F("Configuring WiFi STA static IP... "));
+            WiFi.config(
+                IPAddress(Configuration.get().WiFi_Ip),
+                IPAddress(Configuration.get().WiFi_Gateway),
+                IPAddress(Configuration.get().WiFi_Netmask),
+                IPAddress(Configuration.get().WiFi_Dns1),
+                IPAddress(Configuration.get().WiFi_Dns2));
+            Serial.println(F("done"));
+        }
     }
+#ifdef OPENDTU_ETHERNET
+    else if (_networkMode == network_mode::Ethernet) {
+        if (Configuration.get().WiFi_Dhcp) {
+            ETH.config(INADDR_NONE, INADDR_NONE, INADDR_NONE, INADDR_NONE);
+        } else {
+            Serial.print(F("Configuring Ethernet static IP... "));
+            ETH.config(
+                IPAddress(Configuration.get().WiFi_Ip),
+                IPAddress(Configuration.get().WiFi_Gateway),
+                IPAddress(Configuration.get().WiFi_Netmask),
+                IPAddress(Configuration.get().WiFi_Dns1),
+                IPAddress(Configuration.get().WiFi_Dns2));
+            Serial.println(F("done"));
+        }
+    }
+#endif
+}
+
+IPAddress NetworkSettingsClass::localIP()
+{
+    switch (_networkMode) {
+#ifdef OPENDTU_ETHERNET
+    case network_mode::Ethernet:
+        return ETH.localIP();
+        break;
+#endif
+    case network_mode::WiFi:
+        return WiFi.localIP();
+        break;
+    default:
+        return INADDR_NONE;
+    }
+}
+
+IPAddress NetworkSettingsClass::subnetMask()
+{
+    switch (_networkMode) {
+#ifdef OPENDTU_ETHERNET
+    case network_mode::Ethernet:
+        return ETH.subnetMask();
+        break;
+#endif
+    case network_mode::WiFi:
+        return WiFi.subnetMask();
+        break;
+    default:
+        return IPAddress(255, 255, 255, 0);
+    }
+}
+
+IPAddress NetworkSettingsClass::gatewayIP()
+{
+    switch (_networkMode) {
+#ifdef OPENDTU_ETHERNET
+    case network_mode::Ethernet:
+        return ETH.gatewayIP();
+        break;
+#endif
+    case network_mode::WiFi:
+        return WiFi.gatewayIP();
+        break;
+    default:
+        return INADDR_NONE;
+    }
+}
+
+IPAddress NetworkSettingsClass::dnsIP(uint8_t dns_no)
+{
+    switch (_networkMode) {
+#ifdef OPENDTU_ETHERNET
+    case network_mode::Ethernet:
+        return ETH.dnsIP(dns_no);
+        break;
+#endif
+    case network_mode::WiFi:
+        return WiFi.dnsIP(dns_no);
+        break;
+    default:
+        return INADDR_NONE;
+    }
+}
+
+String NetworkSettingsClass::macAddress()
+{
+    switch (_networkMode) {
+#ifdef OPENDTU_ETHERNET
+    case network_mode::Ethernet:
+        return ETH.macAddress();
+        break;
+#endif
+    case network_mode::WiFi:
+        return WiFi.macAddress();
+        break;
+    default:
+        return String("");
+    }
+}
+
+const char* NetworkSettingsClass::getHostname()
+{
+#ifdef OPENDTU_ETHERNET
+    if (_networkMode == network_mode::Ethernet) {
+        return ETH.getHostname();
+    }
+#endif
+    return WiFi.getHostname();
+}
+
+bool NetworkSettingsClass::isConnected()
+{
+#ifndef OPENDTU_ETHERNET
+    return WiFi.localIP()[0] != 0;
+#else
+    return WiFi.localIP()[0] != 0 || ETH.localIP()[0] != 0;
+#endif
+}
+
+network_mode NetworkSettingsClass::NetworkMode()
+{
+    return _networkMode;
 }
 
 NetworkSettingsClass NetworkSettings;

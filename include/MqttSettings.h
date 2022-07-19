@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 #pragma once
 
+#include "NetworkSettings.h"
 #include <Arduino.h>
 #include <AsyncMqttClient.h>
 #include <Ticker.h>
-#include <WiFi.h>
 #include <memory>
 
 class MqttSettingsClass {
@@ -19,7 +19,7 @@ public:
     String getPrefix();
 
 private:
-    void WiFiEvent(WiFiEvent_t event);
+    void NetworkEvent(network_event event);
 
     void onMqttDisconnect(AsyncMqttClientDisconnectReason reason);
     void onMqttConnect(bool sessionPresent);

@@ -54,7 +54,7 @@ void setup()
     Serial.println(F("done"));
 
     // Initialize WiFi
-    Serial.print(F("Initialize WiFi... "));
+    Serial.print(F("Initialize Network... "));
     NetworkSettings.init();
     Serial.println(F("done"));
     NetworkSettings.applyConfig();
