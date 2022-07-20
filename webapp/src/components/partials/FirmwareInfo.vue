@@ -21,7 +21,7 @@
                         </tr>
                         <tr>
                             <th>Git Hash</th>
-                            <td>{{ git_hash }}</td>
+                            <td><a :href="'https://github.com/tbnobody/OpenDTU/commits/' + git_hash?.substring(1)" target="_blank">{{ git_hash?.substring(1) }}</a></td>
                         </tr>
                         <tr>
                             <th>Reset Reason CPU 0</th>
