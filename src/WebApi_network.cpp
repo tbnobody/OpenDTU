@@ -31,13 +31,14 @@ void WebApiNetworkClass::onNetworkStatus(AsyncWebServerRequest* request)
 
     root[F("sta_status")] = ((WiFi.getMode() & WIFI_STA) != 0);
     root[F("sta_ssid")] = WiFi.SSID();
-    root[F("sta_ip")] = NetworkSettings.localIP().toString();
-    root[F("sta_netmask")] = NetworkSettings.subnetMask().toString();
-    root[F("sta_gateway")] = NetworkSettings.gatewayIP().toString();
-    root[F("sta_dns1")] = NetworkSettings.dnsIP(0).toString();
-    root[F("sta_dns2")] = NetworkSettings.dnsIP(1).toString();
-    root[F("sta_mac")] = NetworkSettings.macAddress();
     root[F("sta_rssi")] = WiFi.RSSI();
+    root[F("network_ip")] = NetworkSettings.localIP().toString();
+    root[F("network_netmask")] = NetworkSettings.subnetMask().toString();
+    root[F("network_gateway")] = NetworkSettings.gatewayIP().toString();
+    root[F("network_dns1")] = NetworkSettings.dnsIP(0).toString();
+    root[F("network_dns2")] = NetworkSettings.dnsIP(1).toString();
+    root[F("network_mac")] = NetworkSettings.macAddress();
+    root[F("network_mode")] = NetworkSettings.NetworkMode() == network_mode::WiFi ? F("Station") : F("Ethernet");
     root[F("ap_status")] = ((WiFi.getMode() & WIFI_AP) != 0);
     root[F("ap_ssid")] = NetworkSettings.getApName();
     root[F("ap_ip")] = WiFi.softAPIP().toString();

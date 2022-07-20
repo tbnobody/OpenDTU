@@ -14,7 +14,7 @@
             <div class="mt-5"></div>
             <WifiApInfo v-bind="networkDataList" />
             <div class="mt-5"></div>
-            <InterfaceStationInfo v-bind="networkDataList" />
+            <InterfaceNetworkInfo v-bind="networkDataList" />
             <div class="mt-5"></div>
             <InterfaceApInfo v-bind="networkDataList" />
             <div class="mt-5"></div>
@@ -26,14 +26,14 @@
 import { defineComponent } from 'vue';
 import WifiStationInfo from "./partials/WifiStationInfo.vue";
 import WifiApInfo from "./partials/WifiApInfo.vue";
-import InterfaceStationInfo from "./partials/InterfaceStationInfo.vue";
+import InterfaceNetworkInfo from "./partials/InterfaceNetworkInfo.vue";
 import InterfaceApInfo from "./partials/InterfaceApInfo.vue";
 
 export default defineComponent({
     components: {
         WifiStationInfo,
         WifiApInfo,
-        InterfaceStationInfo,
+        InterfaceNetworkInfo,
         InterfaceApInfo,
     },
     data() {
@@ -48,13 +48,14 @@ export default defineComponent({
                 ap_status: false,
                 ap_ssid: "",
                 ap_stationnum: 0,
-                // InterfaceStationInfo
-                sta_ip: "",
-                sta_netmask: "",
-                sta_gateway: "",
-                sta_dns1: "",
-                sta_dns2: "",
-                sta_mac: "",
+                // InterfaceNetworkInfo
+                network_ip: "",
+                network_netmask: "",
+                network_gateway: "",
+                network_dns1: "",
+                network_dns2: "",
+                network_mac: "",
+                network_mode: "",
                 // InterfaceApInfo
                 ap_ip: "",
                 ap_mac: "",
