@@ -3,7 +3,13 @@
         <div class="page-header">
             <h1>Live Data</h1>
         </div>
-        <template v-if="waitForData == true">Waiting for data... </template>
+
+        <div class="text-center" v-if="dataLoading">
+            <div class="spinner-border" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+        </div>
+
         <template v-else>
             <div class="row gy-3">
                 <div class="col-sm-3 col-md-2">
@@ -113,7 +119,8 @@ export default defineComponent({
         return {
             socket: {} as WebSocket,
             heartInterval: 0,
-            waitForData: true,
+            dataAgeInterval: 0,
+            dataLoading: true,
             inverterData: [] as Inverter[],
             isFirstFetchAfterConnect: true,
             eventLogView: {} as bootstrap.Modal,
@@ -122,7 +129,9 @@ export default defineComponent({
         };
     },
     created() {
+        this.getInitialData();
         this.initSocket();
+        this.initDataAgeing();
     },
     mounted() {
         this.eventLogView = new bootstrap.Modal('#eventView');
@@ -145,6 +154,15 @@ export default defineComponent({
         }
     },
     methods: {
+        getInitialData() {
+            this.dataLoading = true;
+            fetch("/api/livedata/status")
+                .then((response) => response.json())
+                .then((data) => {
+                    this.inverterData = data;
+                    this.dataLoading = false;
+                });
+        },
         initSocket() {
             console.log("Starting connection to WebSocket Server");
 
@@ -157,7 +175,7 @@ export default defineComponent({
             this.socket.onmessage = (event) => {
                 console.log(event);
                 this.inverterData = JSON.parse(event.data);
-                this.waitForData = false;
+                this.dataLoading = false;
                 this.heartCheck(); // Reset heartbeat detection
             };
 
@@ -170,6 +188,13 @@ export default defineComponent({
             window.onbeforeunload = () => {
                 this.closeSocket();
             };
+        },
+        initDataAgeing() {
+            this.dataAgeInterval = setInterval(() => {
+                this.inverterData.forEach(element => {
+                    element.data_age++;
+                });
+            }, 1000);
         },
         // Send heartbeat packets regularly * 59s Send a heartbeat
         heartCheck() {
