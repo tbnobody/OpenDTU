@@ -21,7 +21,6 @@ public:
 
 private:
     AsyncWebServer _server;
-    AsyncWebSocket _ws;
     AsyncEventSource _events;
 
     WebApiDtuClass _webApiDtu;
@@ -34,9 +33,6 @@ private:
     WebApiSysstatusClass _webApiSysstatus;
     WebApiWebappClass _webApiWebapp;
     WebApiWsLiveClass _webApiWsLive;
-    unsigned long _lastWsCleanup = 0;
-
-    void onWebsocketEvent(AsyncWebSocket* server, AsyncWebSocketClient* client, AwsEventType type, void* arg, uint8_t* data, size_t len);
 };
 
 extern WebApiClass WebApi;

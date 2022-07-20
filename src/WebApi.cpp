@@ -9,7 +9,6 @@
 
 WebApiClass::WebApiClass()
     : _server(HTTP_PORT)
-    , _ws("/livedata")
     , _events("/events")
 {
 }
@@ -18,10 +17,7 @@ void WebApiClass::init()
 {
     using namespace std::placeholders;
 
-    _server.addHandler(&_ws);
     _server.addHandler(&_events);
-
-    _ws.onEvent(std::bind(&WebApiClass::onWebsocketEvent, this, _1, _2, _3, _4, _5, _6));
 
     _webApiDtu.init(&_server);
     _webApiEventlog.init(&_server);
@@ -32,8 +28,7 @@ void WebApiClass::init()
     _webApiNtp.init(&_server);
     _webApiSysstatus.init(&_server);
     _webApiWebapp.init(&_server);
-
-    _webApiWsLive.init(&_ws);
+    _webApiWsLive.init(&_server);
 
     _server.begin();
 }
@@ -49,27 +44,7 @@ void WebApiClass::loop()
     _webApiNtp.loop();
     _webApiSysstatus.loop();
     _webApiWebapp.loop();
-
     _webApiWsLive.loop();
-
-    // see: https://github.com/me-no-dev/ESPAsyncWebServer#limiting-the-number-of-web-socket-clients
-    if (millis() - _lastWsCleanup > 1000) {
-        _ws.cleanupClients();
-        _lastWsCleanup = millis();
-    }
-}
-
-void WebApiClass::onWebsocketEvent(AsyncWebSocket* server, AsyncWebSocketClient* client, AwsEventType type, void* arg, uint8_t* data, size_t len)
-{
-    if (type == WS_EVT_CONNECT) {
-        char str[64];
-        sprintf(str, "Websocket: [%s][%u] connect", server->url(), client->id());
-        Serial.println(str);
-    } else if (type == WS_EVT_DISCONNECT) {
-        char str[64];
-        sprintf(str, "Websocket: [%s][%u] disconnect", server->url(), client->id());
-        Serial.println(str);
-    }
 }
 
 WebApiClass WebApi;

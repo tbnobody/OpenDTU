@@ -6,15 +6,31 @@
 #include "AsyncJson.h"
 #include "Configuration.h"
 
-void WebApiWsLiveClass::init(AsyncWebSocket* ws)
+WebApiWsLiveClass::WebApiWsLiveClass()
+    : _ws("/livedata")
 {
-    _ws = ws;
+}
+
+void WebApiWsLiveClass::init(AsyncWebServer* server)
+{
+    using namespace std::placeholders;
+
+    _server = server;
+
+    _server->addHandler(&_ws);
+    _ws.onEvent(std::bind(&WebApiWsLiveClass::onWebsocketEvent, this, _1, _2, _3, _4, _5, _6));
 }
 
 void WebApiWsLiveClass::loop()
 {
+    // see: https://github.com/me-no-dev/ESPAsyncWebServer#limiting-the-number-of-web-socket-clients
+    if (millis() - _lastWsCleanup > 1000) {
+        _ws.cleanupClients();
+        _lastWsCleanup = millis();
+    }
+
     // do nothing if no WS client is connected
-    if (_ws->count() == 0) {
+    if (_ws.count() == 0) {
         return;
     }
 
@@ -83,10 +99,10 @@ void WebApiWsLiveClass::loop()
         }
 
         size_t len = measureJson(root);
-        AsyncWebSocketMessageBuffer* buffer = _ws->makeBuffer(len); //  creates a buffer (len + 1) for you.
+        AsyncWebSocketMessageBuffer* buffer = _ws.makeBuffer(len); //  creates a buffer (len + 1) for you.
         if (buffer) {
             serializeJson(root, (char*)buffer->get(), len + 1);
-            _ws->textAll(buffer);
+            _ws.textAll(buffer);
         }
 
         _lastWsPublish = millis();
@@ -104,5 +120,18 @@ void WebApiWsLiveClass::addField(JsonDocument& root, uint8_t idx, std::shared_pt
         }
         root[idx][String(channel)][chanName]["v"] = inv->Statistics()->getChannelFieldValue(channel, fieldId);
         root[idx][String(channel)][chanName]["u"] = inv->Statistics()->getChannelFieldUnit(channel, fieldId);
+    }
+}
+
+void WebApiWsLiveClass::onWebsocketEvent(AsyncWebSocket* server, AsyncWebSocketClient* client, AwsEventType type, void* arg, uint8_t* data, size_t len)
+{
+    if (type == WS_EVT_CONNECT) {
+        char str[64];
+        sprintf(str, "Websocket: [%s][%u] connect", server->url(), client->id());
+        Serial.println(str);
+    } else if (type == WS_EVT_DISCONNECT) {
+        char str[64];
+        sprintf(str, "Websocket: [%s][%u] disconnect", server->url(), client->id());
+        Serial.println(str);
     }
 }
