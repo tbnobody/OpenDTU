@@ -25,6 +25,10 @@
                     <div class="ml-auto text-right">
                         <button type="submit" class="btn btn-primary my-2">Add</button>
                     </div>
+                    <div class="alert alert-secondary" role="alert">
+                        <b>Hint:</b> You can set additional parameters after you have created the inverter. Use the pen
+                        icon in the inverter list.
+                    </div>
                 </form>
             </div>
         </div>
