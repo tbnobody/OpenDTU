@@ -101,9 +101,10 @@
                                 <div class="input-group">
                                     <input type="number" class="form-control" :id="`inverter-max_${index}`" min="0"
                                         v-model="editInverterData.max_power[index]"
-                                        :aria-describedby="`inverter-maxDescription_${index}`" />
+                                        :aria-describedby="`inverter-maxDescription_${index} inverter-maxHelpText_${index}`" />
                                     <span class="input-group-text" :id="`inverter-maxDescription_${index}`">W</span>
                                 </div>
+                                <div :id="`inverter-maxHelpText_${index}`" class="form-text">This value is used to calculate the Irradiation.</div>
                             </div>
                         </form>
 
