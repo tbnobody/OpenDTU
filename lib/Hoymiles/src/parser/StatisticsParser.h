@@ -36,7 +36,7 @@ enum {
     FLD_EVT_LOG
 };
 const char* const fields[] = { "Voltage", "Current", "Power", "YieldDay", "YieldTotal",
-    "Voltage", "Current", "Power", "Frequency", "Temperature", "PowerFactor", "Effiency", "Irradiation", "EventLogCount" };
+    "Voltage", "Current", "Power", "Frequency", "Temperature", "PowerFactor", "Efficiency", "Irradiation", "EventLogCount" };
 
 // indices to calculation functions, defined in hmInverter.h
 enum {
