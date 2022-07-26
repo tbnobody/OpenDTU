@@ -111,6 +111,26 @@
                                 </div>
                             </div>
                         </div>
+
+                        <div class="row mb-3">
+                            <label class="col-sm-2 form-check-label" for="inputTls">Enable TLS</label>
+                            <div class="col-sm-10">
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" id="inputTls"
+                                        v-model="mqttConfigList.mqtt_tls" />
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row mb-3" v-show="mqttConfigList.mqtt_tls">
+                            <label for="inputTopic" class="col-sm-2 col-form-label">CA-Root-Certificate (default Letsencrypt):</label>
+                            <div class="col-sm-10">
+                                <input type="text" class="form-control" id="inputTopic" maxlength="102"
+                                    placeholder="Root CA Certificate from Letsencrypt"
+                                    v-model="mqttConfigList.mqtt_root_ca_cert" />
+                            </div>
+                        </div>
+
                     </div>
                 </div>
 
@@ -212,6 +232,8 @@ export default defineComponent({
                 mqtt_topic: "",
                 mqtt_publish_interval: 0,
                 mqtt_retain: false,
+                mqtt_tls: false,
+                mqtt_root_ca_cert: "",
                 mqtt_lwt_topic: "",
                 mqtt_lwt_online: "",
                 mqtt_lwt_offline: "",

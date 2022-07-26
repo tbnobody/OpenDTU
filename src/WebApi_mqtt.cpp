@@ -38,6 +38,8 @@ void WebApiMqttClass::onMqttStatus(AsyncWebServerRequest* request)
     root[F("mqtt_topic")] = config.Mqtt_Topic;
     root[F("mqtt_connected")] = MqttSettings.getConnected();
     root[F("mqtt_retain")] = config.Mqtt_Retain;
+    root[F("mqtt_tls")] = config.Mqtt_Tls;
+    root[F("mqtt_root_ca_cert")] = config.Mqtt_RootCaCert;
     root[F("mqtt_lwt_topic")] = String(config.Mqtt_Topic) + config.Mqtt_LwtTopic;
     root[F("mqtt_publish_interval")] = config.Mqtt_PublishInterval;
     root[F("mqtt_hass_enabled")] = config.Mqtt_Hass_Enabled;
@@ -62,6 +64,8 @@ void WebApiMqttClass::onMqttAdminGet(AsyncWebServerRequest* request)
     root[F("mqtt_password")] = config.Mqtt_Password;
     root[F("mqtt_topic")] = config.Mqtt_Topic;
     root[F("mqtt_retain")] = config.Mqtt_Retain;
+    root[F("mqtt_tls")] = config.Mqtt_Tls;
+    root[F("mqtt_root_ca_cert")] = config.Mqtt_RootCaCert;
     root[F("mqtt_lwt_topic")] = config.Mqtt_LwtTopic;
     root[F("mqtt_lwt_online")] = config.Mqtt_LwtValue_Online;
     root[F("mqtt_lwt_offline")] = config.Mqtt_LwtValue_Offline;
@@ -189,6 +193,8 @@ void WebApiMqttClass::onMqttAdminPost(AsyncWebServerRequest* request)
     CONFIG_T& config = Configuration.get();
     config.Mqtt_Enabled = root[F("mqtt_enabled")].as<bool>();
     config.Mqtt_Retain = root[F("mqtt_retain")].as<bool>();
+    config.Mqtt_Tls = root[F("mqtt_tls")].as<bool>();
+    strcpy(config.Mqtt_RootCaCert, root[F("mqtt_root_ca_cert")].as<String>().c_str());
     config.Mqtt_Port = root[F("mqtt_port")].as<uint>();
     strcpy(config.Mqtt_Hostname, root[F("mqtt_hostname")].as<String>().c_str());
     strcpy(config.Mqtt_Username, root[F("mqtt_username")].as<String>().c_str());
