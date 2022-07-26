@@ -3,8 +3,8 @@
 
 #include "NetworkSettings.h"
 #include <Arduino.h>
-#include <AsyncMqttClient.h>
 #include <Ticker.h>
+#include <espMqttClient.h>
 #include <memory>
 
 class MqttSettingsClass {
@@ -21,13 +21,15 @@ public:
 private:
     void NetworkEvent(network_event event);
 
-    void onMqttDisconnect(AsyncMqttClientDisconnectReason reason);
+    void onMqttDisconnect(espMqttClientTypes::DisconnectReason reason);
     void onMqttConnect(bool sessionPresent);
 
     void performConnect();
     void performDisconnect();
 
-    AsyncMqttClient mqttClient;
+    void createMqttClientObject();
+
+    MqttClient* mqttClient = nullptr;
     String clientId;
     String willTopic;
     Ticker mqttReconnectTimer;

@@ -4,7 +4,7 @@
 #include <Arduino.h>
 
 #define CONFIG_FILENAME "/config.bin"
-#define CONFIG_VERSION 0x00011200 // 0.1.18 // make sure to clean all after change
+#define CONFIG_VERSION 0x00011300 // 0.1.19 // make sure to clean all after change
 
 #define WIFI_MAX_SSID_STRLEN 31
 #define WIFI_MAX_PASSWORD_STRLEN 64
@@ -19,6 +19,7 @@
 #define MQTT_MAX_PASSWORD_STRLEN 32
 #define MQTT_MAX_TOPIC_STRLEN 32
 #define MQTT_MAX_LWTVALUE_STRLEN 20
+#define MQTT_MAX_ROOT_CA_CERT_STRLEN 2048
 
 #define INV_MAX_NAME_STRLEN 31
 #define INV_MAX_COUNT 10
@@ -70,6 +71,8 @@ struct CONFIG_T {
     bool Mqtt_Hass_Retain;
     char Mqtt_Hass_Topic[MQTT_MAX_TOPIC_STRLEN + 1];
     bool Mqtt_Hass_IndividualPanels;
+    bool Mqtt_Tls;
+    char Mqtt_RootCaCert[MQTT_MAX_ROOT_CA_CERT_STRLEN + 1];
 };
 
 class ConfigurationClass {

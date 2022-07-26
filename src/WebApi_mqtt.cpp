@@ -27,7 +27,7 @@ void WebApiMqttClass::loop()
 
 void WebApiMqttClass::onMqttStatus(AsyncWebServerRequest* request)
 {
-    AsyncJsonResponse* response = new AsyncJsonResponse();
+    AsyncJsonResponse* response = new AsyncJsonResponse(false, MQTT_JSON_DOC_SIZE);
     JsonObject root = response->getRoot();
     CONFIG_T& config = Configuration.get();
 
@@ -38,6 +38,8 @@ void WebApiMqttClass::onMqttStatus(AsyncWebServerRequest* request)
     root[F("mqtt_topic")] = config.Mqtt_Topic;
     root[F("mqtt_connected")] = MqttSettings.getConnected();
     root[F("mqtt_retain")] = config.Mqtt_Retain;
+    root[F("mqtt_tls")] = config.Mqtt_Tls;
+    root[F("mqtt_root_ca_cert_info")] = getRootCaCertInfo(config.Mqtt_RootCaCert);
     root[F("mqtt_lwt_topic")] = String(config.Mqtt_Topic) + config.Mqtt_LwtTopic;
     root[F("mqtt_publish_interval")] = config.Mqtt_PublishInterval;
     root[F("mqtt_hass_enabled")] = config.Mqtt_Hass_Enabled;
@@ -51,7 +53,7 @@ void WebApiMqttClass::onMqttStatus(AsyncWebServerRequest* request)
 
 void WebApiMqttClass::onMqttAdminGet(AsyncWebServerRequest* request)
 {
-    AsyncJsonResponse* response = new AsyncJsonResponse();
+    AsyncJsonResponse* response = new AsyncJsonResponse(false, MQTT_JSON_DOC_SIZE);
     JsonObject root = response->getRoot();
     CONFIG_T& config = Configuration.get();
 
@@ -62,6 +64,8 @@ void WebApiMqttClass::onMqttAdminGet(AsyncWebServerRequest* request)
     root[F("mqtt_password")] = config.Mqtt_Password;
     root[F("mqtt_topic")] = config.Mqtt_Topic;
     root[F("mqtt_retain")] = config.Mqtt_Retain;
+    root[F("mqtt_tls")] = config.Mqtt_Tls;
+    root[F("mqtt_root_ca_cert")] = config.Mqtt_RootCaCert;
     root[F("mqtt_lwt_topic")] = config.Mqtt_LwtTopic;
     root[F("mqtt_lwt_online")] = config.Mqtt_LwtValue_Online;
     root[F("mqtt_lwt_offline")] = config.Mqtt_LwtValue_Offline;
@@ -77,7 +81,7 @@ void WebApiMqttClass::onMqttAdminGet(AsyncWebServerRequest* request)
 
 void WebApiMqttClass::onMqttAdminPost(AsyncWebServerRequest* request)
 {
-    AsyncJsonResponse* response = new AsyncJsonResponse();
+    AsyncJsonResponse* response = new AsyncJsonResponse(false, MQTT_JSON_DOC_SIZE);
     JsonObject retMsg = response->getRoot();
     retMsg[F("type")] = F("warning");
 
@@ -90,14 +94,14 @@ void WebApiMqttClass::onMqttAdminPost(AsyncWebServerRequest* request)
 
     String json = request->getParam("data", true)->value();
 
-    if (json.length() > 1024) {
+    if (json.length() > MQTT_JSON_DOC_SIZE) {
         retMsg[F("message")] = F("Data too large!");
         response->setLength();
         request->send(response);
         return;
     }
 
-    DynamicJsonDocument root(1024);
+    DynamicJsonDocument root(MQTT_JSON_DOC_SIZE);
     DeserializationError error = deserializeJson(root, json);
 
     if (error) {
@@ -107,7 +111,7 @@ void WebApiMqttClass::onMqttAdminPost(AsyncWebServerRequest* request)
         return;
     }
 
-    if (!(root.containsKey("mqtt_enabled") && root.containsKey("mqtt_hostname") && root.containsKey("mqtt_port") && root.containsKey("mqtt_username") && root.containsKey("mqtt_password") && root.containsKey("mqtt_topic") && root.containsKey("mqtt_retain") && root.containsKey("mqtt_lwt_topic") && root.containsKey("mqtt_lwt_online") && root.containsKey("mqtt_lwt_offline") && root.containsKey("mqtt_publish_interval") && root.containsKey("mqtt_hass_enabled") && root.containsKey("mqtt_hass_retain") && root.containsKey("mqtt_hass_topic") && root.containsKey("mqtt_hass_individualpanels"))) {
+    if (!(root.containsKey("mqtt_enabled") && root.containsKey("mqtt_hostname") && root.containsKey("mqtt_port") && root.containsKey("mqtt_username") && root.containsKey("mqtt_password") && root.containsKey("mqtt_topic") && root.containsKey("mqtt_retain") && root.containsKey("mqtt_tls") && root.containsKey("mqtt_lwt_topic") && root.containsKey("mqtt_lwt_online") && root.containsKey("mqtt_lwt_offline") && root.containsKey("mqtt_publish_interval") && root.containsKey("mqtt_hass_enabled") && root.containsKey("mqtt_hass_retain") && root.containsKey("mqtt_hass_topic") && root.containsKey("mqtt_hass_individualpanels"))) {
         retMsg[F("message")] = F("Values are missing!");
         response->setLength();
         request->send(response);
@@ -150,6 +154,13 @@ void WebApiMqttClass::onMqttAdminPost(AsyncWebServerRequest* request)
 
         if (root[F("mqtt_port")].as<uint>() == 0 || root[F("mqtt_port")].as<uint>() > 65535) {
             retMsg[F("message")] = F("Port must be a number between 1 and 65535!");
+            response->setLength();
+            request->send(response);
+            return;
+        }
+
+        if (root[F("mqtt_root_ca_cert")].as<String>().length() > MQTT_MAX_ROOT_CA_CERT_STRLEN) {
+            retMsg[F("message")] = F("Certificate must not longer then " STR(MQTT_MAX_ROOT_CA_CERT_STRLEN) " characters!");
             response->setLength();
             request->send(response);
             return;
@@ -210,6 +221,8 @@ void WebApiMqttClass::onMqttAdminPost(AsyncWebServerRequest* request)
     CONFIG_T& config = Configuration.get();
     config.Mqtt_Enabled = root[F("mqtt_enabled")].as<bool>();
     config.Mqtt_Retain = root[F("mqtt_retain")].as<bool>();
+    config.Mqtt_Tls = root[F("mqtt_tls")].as<bool>();
+    strcpy(config.Mqtt_RootCaCert, root[F("mqtt_root_ca_cert")].as<String>().c_str());
     config.Mqtt_Port = root[F("mqtt_port")].as<uint>();
     strcpy(config.Mqtt_Hostname, root[F("mqtt_hostname")].as<String>().c_str());
     strcpy(config.Mqtt_Username, root[F("mqtt_username")].as<String>().c_str());
@@ -233,4 +246,25 @@ void WebApiMqttClass::onMqttAdminPost(AsyncWebServerRequest* request)
 
     MqttSettings.performReconnect();
     MqttHassPublishing.forceUpdate();
+}
+
+String WebApiMqttClass::getRootCaCertInfo(char* cert)
+{
+    char rootCaCertInfo[1024] = "";
+
+    mbedtls_x509_crt global_cacert;
+
+    strcpy(rootCaCertInfo, "Can't parse root ca");
+
+    mbedtls_x509_crt_init(&global_cacert);
+    int ret = mbedtls_x509_crt_parse(&global_cacert, const_cast<unsigned char*>((unsigned char*)cert), 1 + strlen(cert));
+    if (ret < 0) {
+        sprintf(rootCaCertInfo, "Can't parse root ca: mbedtls_x509_crt_parse returned -0x%x\n\n", -ret);
+        mbedtls_x509_crt_free(&global_cacert);
+        return "";
+    }
+    mbedtls_x509_crt_info(rootCaCertInfo, sizeof(rootCaCertInfo) - 1, "", &global_cacert);
+    mbedtls_x509_crt_free(&global_cacert);
+
+    return rootCaCertInfo;
 }

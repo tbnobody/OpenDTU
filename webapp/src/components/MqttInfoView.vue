@@ -57,6 +57,20 @@
                                         <span v-else>disabled</span>
                                     </td>
                                 </tr>
+                                <tr>
+                                    <th>TLS</th>
+                                    <td class="badge" :class="{
+                                        'bg-danger': !mqttDataList.mqtt_tls,
+                                        'bg-success': mqttDataList.mqtt_tls,
+                                    }">
+                                        <span v-if="mqttDataList.mqtt_tls">enabled</span>
+                                        <span v-else>disabled</span>
+                                    </td>
+                                </tr>
+                                 <tr v-show="mqttDataList.mqtt_tls">
+                                    <th>Root CA Certifcate Info</th>
+                                    <td>{{ mqttDataList.mqtt_root_ca_cert_info }}</td>
+                                </tr>
                             </tbody>
                         </table>
                     </div>
@@ -149,6 +163,8 @@ export default defineComponent({
                 mqtt_topic: "",
                 mqtt_publish_interval: 0,
                 mqtt_retain: false,
+                mqtt_tls: false,
+                mqtt_root_ca_cert_info: "",
                 mqtt_connected: false,
                 mqtt_hass_enabled: false,
                 mqtt_hass_retain: false,

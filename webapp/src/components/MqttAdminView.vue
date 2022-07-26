@@ -30,7 +30,7 @@
 
                         <div class="row mb-3" v-show="mqttConfigList.mqtt_enabled">
                             <label class="col-sm-4 form-check-label" for="inputMqttHass">Enable Home Assistant MQTT Auto
-                                    Discovery</label>
+                                Discovery</label>
                             <div class="col-sm-8">
                                 <div class="form-check form-switch">
                                     <input class="form-check-input" type="checkbox" id="inputMqttHass"
@@ -111,6 +111,28 @@
                                 </div>
                             </div>
                         </div>
+
+                        <div class="row mb-3">
+                            <label class="col-sm-2 form-check-label" for="inputTls">Enable TLS</label>
+                            <div class="col-sm-10">
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" id="inputTls"
+                                        v-model="mqttConfigList.mqtt_tls" />
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row mb-3" v-show="mqttConfigList.mqtt_tls">
+                            <label for="inputCert" class="col-sm-2 col-form-label">CA-Root-Certificate (default
+                                Letsencrypt):</label>
+                            <div class="col-sm-10">
+                                <textarea class="form-control" id="inputCert" maxlength="2048" rows="10"
+                                    placeholder="Root CA Certificate from Letsencrypt"
+                                    v-model="mqttConfigList.mqtt_root_ca_cert">
+                                </textarea>
+                            </div>
+                        </div>
+
                     </div>
                 </div>
 
@@ -174,7 +196,8 @@
                         </div>
 
                         <div class="row mb-3">
-                            <label class="col-sm-2 form-check-label" for="inputIndividualPanels">Individual Panels:</label>
+                            <label class="col-sm-2 form-check-label" for="inputIndividualPanels">Individual
+                                Panels:</label>
                             <div class="col-sm-10">
                                 <div class="form-check form-switch">
                                     <input class="form-check-input" type="checkbox" id="inputIndividualPanels"
@@ -212,6 +235,8 @@ export default defineComponent({
                 mqtt_topic: "",
                 mqtt_publish_interval: 0,
                 mqtt_retain: false,
+                mqtt_tls: false,
+                mqtt_root_ca_cert: "",
                 mqtt_lwt_topic: "",
                 mqtt_lwt_online: "",
                 mqtt_lwt_offline: "",
