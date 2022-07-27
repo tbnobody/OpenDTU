@@ -68,7 +68,7 @@ This can be achieved by editing the 'platformio.ini' file and add one or more of
 * Select the arrow button in the status bar (PlatformIO: Upload) to compile and upload the firmware. During the compilation, all required libraries are downloaded automatically.
 
 ## First configuration
-* After the initial flashing of the microcontroller, a Access Point called "OpenDTU-*" is opened. The default password is "openDTU42".
+* After the initial flashing of the microcontroller, an Access Point called "OpenDTU-*" is opened. The default password is "openDTU42".
 * Use a web browser to open the address [http://192.168.4.1](http://192.168.4.1)
 * Navigate to Settings --> Network Settings and enter your WiFi credentials
 * Currently you have to look at your router to determine the IP of the newly connected device
