@@ -123,11 +123,12 @@
                         </div>
 
                         <div class="row mb-3" v-show="mqttConfigList.mqtt_tls">
-                            <label for="inputTopic" class="col-sm-2 col-form-label">CA-Root-Certificate (default Letsencrypt):</label>
+                            <label for="inputCert" class="col-sm-2 col-form-label">CA-Root-Certificate (default Letsencrypt):</label>
                             <div class="col-sm-10">
-                                <input type="text" class="form-control" id="inputTopic" maxlength="102"
+                                <textarea class="form-control" id="inputCert" maxlength="2048" rows="10"
                                     placeholder="Root CA Certificate from Letsencrypt"
-                                    v-model="mqttConfigList.mqtt_root_ca_cert" />
+                                    v-model="mqttConfigList.mqtt_root_ca_cert">
+                                </textarea>
                             </div>
                         </div>
 

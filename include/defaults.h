@@ -31,7 +31,7 @@
 #define MQTT_RETAIN true
 #define MQTT_TLS false
 // ISRG_Root_X1.crt -- Root CA for Letsencrypt
-//#define MQTT_ROOT_CA_CERT "-----BEGIN CERTIFICATE-----\n" \
+#define MQTT_ROOT_CA_CERT "-----BEGIN CERTIFICATE-----\n" \
                             "MIIFazCCA1OgAwIBAgIRAIIQz7DSQONZRGPgu2OCiwAwDQYJKoZIhvcNAQELBQAw\n" \
                             "TzELMAkGA1UEBhMCVVMxKTAnBgNVBAoTIEludGVybmV0IFNlY3VyaXR5IFJlc2Vh\n" \
                             "cmNoIEdyb3VwMRUwEwYDVQQDEwxJU1JHIFJvb3QgWDEwHhcNMTUwNjA0MTEwNDM4\n" \
@@ -62,7 +62,6 @@
                             "mRGunUHBcnWEvgJBQl9nJEiU0Zsnvgc/ubhPgXRR4Xq37Z0j4r7g1SgEEzwxA57d\n" \
                             "emyPxgcYxn/eR44/KJ4EBs+lVDR3veyJm+kXQ99b21/+jh5Xos1AnX5iItreGCc=\n" \
                             "-----END CERTIFICATE-----\n"
-#define MQTT_ROOT_CA_CERT "-----BEGIN CERTIFICATE-----\n" 
 #define MQTT_LWT_TOPIC "dtu/status"
 #define MQTT_LWT_ONLINE "online"
 #define MQTT_LWT_OFFLINE "offline"

@@ -94,14 +94,14 @@ void WebApiMqttClass::onMqttAdminPost(AsyncWebServerRequest* request)
 
     String json = request->getParam("data", true)->value();
 
-    if (json.length() > 1024) {
+    if (json.length() > 3072) { //TODO check size was 1024 + 2048 for cert
         retMsg[F("message")] = F("Data too large!");
         response->setLength();
         request->send(response);
         return;
     }
 
-    DynamicJsonDocument root(1024);
+    DynamicJsonDocument root(3072); //TODO check size was 1024 + 2048 for cert
     DeserializationError error = deserializeJson(root, json);
 
     if (error) {
@@ -111,7 +111,7 @@ void WebApiMqttClass::onMqttAdminPost(AsyncWebServerRequest* request)
         return;
     }
 
-    if (!(root.containsKey("mqtt_enabled") && root.containsKey("mqtt_hostname") && root.containsKey("mqtt_port") && root.containsKey("mqtt_username") && root.containsKey("mqtt_password") && root.containsKey("mqtt_topic") && root.containsKey("mqtt_retain") && root.containsKey("mqtt_lwt_topic") && root.containsKey("mqtt_lwt_online") && root.containsKey("mqtt_lwt_offline") && root.containsKey("mqtt_publish_interval") && root.containsKey("mqtt_hass_enabled") && root.containsKey("mqtt_hass_retain") && root.containsKey("mqtt_hass_topic") && root.containsKey("mqtt_hass_individualpanels"))) {
+    if (!(root.containsKey("mqtt_enabled") && root.containsKey("mqtt_hostname") && root.containsKey("mqtt_port") && root.containsKey("mqtt_username") && root.containsKey("mqtt_password") && root.containsKey("mqtt_topic") && root.containsKey("mqtt_retain") && root.containsKey("mqtt_tls") && root.containsKey("mqtt_lwt_topic") && root.containsKey("mqtt_lwt_online") && root.containsKey("mqtt_lwt_offline") && root.containsKey("mqtt_publish_interval") && root.containsKey("mqtt_hass_enabled") && root.containsKey("mqtt_hass_retain") && root.containsKey("mqtt_hass_topic") && root.containsKey("mqtt_hass_individualpanels"))) {
         retMsg[F("message")] = F("Values are missing!");
         response->setLength();
         request->send(response);
@@ -151,6 +151,8 @@ void WebApiMqttClass::onMqttAdminPost(AsyncWebServerRequest* request)
             request->send(response);
             return;
         }
+
+        //TODO iff ssl, check cert and size
 
         if (root[F("mqtt_lwt_topic")].as<String>().length() > MQTT_MAX_TOPIC_STRLEN) {
             retMsg[F("message")] = F("LWT topic must not longer then " STR(MQTT_MAX_TOPIC_STRLEN) " characters!");
