@@ -11,7 +11,6 @@
 
 MqttSettingsClass::MqttSettingsClass()
 {
-    createMqttClientObject();
 }
 
 void MqttSettingsClass::NetworkEvent(network_event event)
@@ -139,6 +138,8 @@ void MqttSettingsClass::init()
 {
     using namespace std::placeholders;
     NetworkSettings.onEvent(std::bind(&MqttSettingsClass::NetworkEvent, this, _1));
+
+    createMqttClientObject();
 }
 
 void MqttSettingsClass::createMqttClientObject()

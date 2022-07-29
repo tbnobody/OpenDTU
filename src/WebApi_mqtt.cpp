@@ -27,7 +27,7 @@ void WebApiMqttClass::loop()
 
 void WebApiMqttClass::onMqttStatus(AsyncWebServerRequest* request)
 {
-    AsyncJsonResponse* response = new AsyncJsonResponse();
+    AsyncJsonResponse* response = new AsyncJsonResponse(false, 3072);
     JsonObject root = response->getRoot();
     CONFIG_T& config = Configuration.get();
 
@@ -53,7 +53,7 @@ void WebApiMqttClass::onMqttStatus(AsyncWebServerRequest* request)
 
 void WebApiMqttClass::onMqttAdminGet(AsyncWebServerRequest* request)
 {
-    AsyncJsonResponse* response = new AsyncJsonResponse();
+    AsyncJsonResponse* response = new AsyncJsonResponse(false, 3072);
     JsonObject root = response->getRoot();
     CONFIG_T& config = Configuration.get();
 
@@ -81,7 +81,7 @@ void WebApiMqttClass::onMqttAdminGet(AsyncWebServerRequest* request)
 
 void WebApiMqttClass::onMqttAdminPost(AsyncWebServerRequest* request)
 {
-    AsyncJsonResponse* response = new AsyncJsonResponse();
+    AsyncJsonResponse* response = new AsyncJsonResponse(false, 3072);
     JsonObject retMsg = response->getRoot();
     retMsg[F("type")] = F("warning");
 
