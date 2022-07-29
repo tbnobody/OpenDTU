@@ -2,15 +2,17 @@
 
 #include "CircularBuffer.h"
 #include "TimeoutHelper.h"
+#include "commands/CommandAbstract.h"
 #include "types.h"
 #include <RF24.h>
 #include <memory>
 #include <nRF24L01.h>
+#include <queue>
+
+using namespace std;
 
 // number of fragments hold in buffer
 #define FRAGMENT_BUFFER_SIZE 30
-
-#define TX_BUFFER_SIZE 5
 
 #define MAX_RESEND_COUNT 3
 
@@ -48,17 +50,20 @@ public:
     void setDtuSerial(uint64_t serial);
 
     bool isIdle();
-    void sendEsbPacket(serial_u target, uint8_t mainCmd, uint8_t subCmd, uint8_t payload[], uint8_t len, uint32_t timeout, bool resend = false);
+    void sendEsbPacket(CommandAbstract* cmd);
     void sendRetransmitPacket(uint8_t fragment_id);
     void sendLastPacketAgain();
-    bool enqueTransaction(inverter_transaction_t* transaction);
 
-    static void u32CpyLittleEndian(uint8_t dest[], uint32_t src);
+    template <typename T>
+    T* enqueCommand()
+    {
+        _commandQueue.push(make_shared<T>());
+        return static_cast<T*>(_commandQueue.back().get());
+    }
 
 private:
     void ARDUINO_ISR_ATTR handleIntr();
     static serial_u convertSerialToRadioId(serial_u serial);
-    static void convertSerialToPacketId(uint8_t buffer[], serial_u serial);
     uint8_t getRxNxtChannel();
     uint8_t getTxNxtChannel();
     void switchRxCh();
@@ -84,6 +89,5 @@ private:
 
     bool _busyFlag = false;
 
-    inverter_transaction_t currentTransaction;
-    CircularBuffer<inverter_transaction_t, TX_BUFFER_SIZE> _txBuffer;
+    queue<shared_ptr<CommandAbstract>> _commandQueue;
 };

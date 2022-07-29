@@ -20,14 +20,3 @@ enum class RequestType {
     Stats,
     AlarmLog
 };
-
-typedef struct {
-    serial_u target;
-    RequestType requestType = RequestType::None;
-    uint8_t mainCmd;
-    uint8_t subCmd;
-    uint8_t payload[MAX_RF_PAYLOAD_SIZE];
-    uint8_t len;
-    uint32_t timeout;
-    uint8_t sendCount;
-} inverter_transaction_t;
