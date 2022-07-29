@@ -38,6 +38,8 @@ void WebApiMqttClass::onMqttStatus(AsyncWebServerRequest* request)
     root[F("mqtt_topic")] = config.Mqtt_Topic;
     root[F("mqtt_connected")] = MqttSettings.getConnected();
     root[F("mqtt_retain")] = config.Mqtt_Retain;
+    root[F("mqtt_tls")] = config.Mqtt_Tls;
+    root[F("mqtt_root_ca_cert")] = config.Mqtt_RootCaCert;
     root[F("mqtt_lwt_topic")] = String(config.Mqtt_Topic) + config.Mqtt_LwtTopic;
     root[F("mqtt_publish_interval")] = config.Mqtt_PublishInterval;
     root[F("mqtt_hass_enabled")] = config.Mqtt_Hass_Enabled;
@@ -62,6 +64,8 @@ void WebApiMqttClass::onMqttAdminGet(AsyncWebServerRequest* request)
     root[F("mqtt_password")] = config.Mqtt_Password;
     root[F("mqtt_topic")] = config.Mqtt_Topic;
     root[F("mqtt_retain")] = config.Mqtt_Retain;
+    root[F("mqtt_tls")] = config.Mqtt_Tls;
+    root[F("mqtt_root_ca_cert")] = config.Mqtt_RootCaCert;
     root[F("mqtt_lwt_topic")] = config.Mqtt_LwtTopic;
     root[F("mqtt_lwt_online")] = config.Mqtt_LwtValue_Online;
     root[F("mqtt_lwt_offline")] = config.Mqtt_LwtValue_Offline;
@@ -90,14 +94,14 @@ void WebApiMqttClass::onMqttAdminPost(AsyncWebServerRequest* request)
 
     String json = request->getParam("data", true)->value();
 
-    if (json.length() > 1024) {
+    if (json.length() > 3072) { //TODO check size was 1024 + 2048 for cert
         retMsg[F("message")] = F("Data too large!");
         response->setLength();
         request->send(response);
         return;
     }
 
-    DynamicJsonDocument root(1024);
+    DynamicJsonDocument root(3072); //TODO check size was 1024 + 2048 for cert
     DeserializationError error = deserializeJson(root, json);
 
     if (error) {
@@ -107,7 +111,7 @@ void WebApiMqttClass::onMqttAdminPost(AsyncWebServerRequest* request)
         return;
     }
 
-    if (!(root.containsKey("mqtt_enabled") && root.containsKey("mqtt_hostname") && root.containsKey("mqtt_port") && root.containsKey("mqtt_username") && root.containsKey("mqtt_password") && root.containsKey("mqtt_topic") && root.containsKey("mqtt_retain") && root.containsKey("mqtt_lwt_topic") && root.containsKey("mqtt_lwt_online") && root.containsKey("mqtt_lwt_offline") && root.containsKey("mqtt_publish_interval") && root.containsKey("mqtt_hass_enabled") && root.containsKey("mqtt_hass_retain") && root.containsKey("mqtt_hass_topic") && root.containsKey("mqtt_hass_individualpanels"))) {
+    if (!(root.containsKey("mqtt_enabled") && root.containsKey("mqtt_hostname") && root.containsKey("mqtt_port") && root.containsKey("mqtt_username") && root.containsKey("mqtt_password") && root.containsKey("mqtt_topic") && root.containsKey("mqtt_retain") && root.containsKey("mqtt_tls") && root.containsKey("mqtt_lwt_topic") && root.containsKey("mqtt_lwt_online") && root.containsKey("mqtt_lwt_offline") && root.containsKey("mqtt_publish_interval") && root.containsKey("mqtt_hass_enabled") && root.containsKey("mqtt_hass_retain") && root.containsKey("mqtt_hass_topic") && root.containsKey("mqtt_hass_individualpanels"))) {
         retMsg[F("message")] = F("Values are missing!");
         response->setLength();
         request->send(response);
@@ -147,6 +151,8 @@ void WebApiMqttClass::onMqttAdminPost(AsyncWebServerRequest* request)
             request->send(response);
             return;
         }
+
+        //TODO iff ssl, check cert and size
 
         if (root[F("mqtt_lwt_topic")].as<String>().length() > MQTT_MAX_TOPIC_STRLEN) {
             retMsg[F("message")] = F("LWT topic must not longer then " STR(MQTT_MAX_TOPIC_STRLEN) " characters!");
@@ -189,6 +195,8 @@ void WebApiMqttClass::onMqttAdminPost(AsyncWebServerRequest* request)
     CONFIG_T& config = Configuration.get();
     config.Mqtt_Enabled = root[F("mqtt_enabled")].as<bool>();
     config.Mqtt_Retain = root[F("mqtt_retain")].as<bool>();
+    config.Mqtt_Tls = root[F("mqtt_tls")].as<bool>();
+    strcpy(config.Mqtt_RootCaCert, root[F("mqtt_root_ca_cert")].as<String>().c_str());
     config.Mqtt_Port = root[F("mqtt_port")].as<uint>();
     strcpy(config.Mqtt_Hostname, root[F("mqtt_hostname")].as<String>().c_str());
     strcpy(config.Mqtt_Username, root[F("mqtt_username")].as<String>().c_str());
