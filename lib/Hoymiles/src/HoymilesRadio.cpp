@@ -91,7 +91,7 @@ void HoymilesRadio::loop()
         if (nullptr != inv) {
             uint8_t verifyResult = inv->verifyAllFragments();
             if (verifyResult == FRAGMENT_ALL_MISSING) {
-                if (_commandQueue.front().get()->getSendCount() < MAX_RESEND_COUNT) {
+                if (_commandQueue.front().get()->getSendCount() <= MAX_RESEND_COUNT) {
                     Serial.println(F("Nothing received, resend whole request"));
                     sendLastPacketAgain();
                 } else {
