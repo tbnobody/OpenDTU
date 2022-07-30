@@ -9,6 +9,7 @@ CommandAbstract::CommandAbstract(uint64_t target_address, uint64_t router_addres
 
     setTargetAddress(target_address);
     setRouterAddress(router_address);
+    setSendCount(0);
 }
 
 template <typename T>
@@ -41,6 +42,7 @@ uint8_t CommandAbstract::getDataSize()
 void CommandAbstract::setTargetAddress(uint64_t address)
 {
     convertSerialToPacketId(&_payload[1], address);
+    _targetAddress = address;
 }
 const uint64_t CommandAbstract::getTargetAddress()
 {
@@ -50,6 +52,7 @@ const uint64_t CommandAbstract::getTargetAddress()
 void CommandAbstract::setRouterAddress(uint64_t address)
 {
     convertSerialToPacketId(&_payload[5], address);
+    _routerAddress = address;
 }
 
 const uint64_t CommandAbstract::getRouterAddress()
