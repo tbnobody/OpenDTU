@@ -13,4 +13,5 @@ public:
 protected:
     void setDataType(uint8_t data_type);
     uint8_t getDataType();
+    void udpateCRC();
 };

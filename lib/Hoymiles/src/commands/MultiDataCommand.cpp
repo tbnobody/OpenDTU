@@ -18,9 +18,7 @@ MultiDataCommand::MultiDataCommand(uint64_t target_address, uint64_t router_addr
     _payload[22] = 0x00; // Password
     _payload[23] = 0x00; // Password
 
-    uint16_t crc = crc16(&_payload[10], 14); // From data_type till password
-    _payload[24] = (uint8_t)(crc >> 8);
-    _payload[25] = (uint8_t)(crc);
+    udpateCRC();
 
     _payload_size = 26;
 }
@@ -28,6 +26,7 @@ MultiDataCommand::MultiDataCommand(uint64_t target_address, uint64_t router_addr
 void MultiDataCommand::setDataType(uint8_t data_type)
 {
     _payload[10] = data_type;
+    udpateCRC();
 }
 uint8_t MultiDataCommand::getDataType()
 {
@@ -40,6 +39,7 @@ void MultiDataCommand::setTime(time_t time)
     _payload[13] = (uint8_t)(time >> 16);
     _payload[14] = (uint8_t)(time >> 8);
     _payload[15] = (uint8_t)(time);
+    udpateCRC();
 }
 
 time_t MultiDataCommand::getTime()
@@ -48,4 +48,11 @@ time_t MultiDataCommand::getTime()
         | (time_t)(_payload[13] << 16)
         | (time_t)(_payload[14] << 8)
         | (time_t)(_payload[15]);
+}
+
+void MultiDataCommand::udpateCRC()
+{
+    uint16_t crc = crc16(&_payload[10], 14); // From data_type till password
+    _payload[24] = (uint8_t)(crc >> 8);
+    _payload[25] = (uint8_t)(crc);
 }
