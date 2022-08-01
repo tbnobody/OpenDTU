@@ -27,7 +27,7 @@ void WebApiMqttClass::loop()
 
 void WebApiMqttClass::onMqttStatus(AsyncWebServerRequest* request)
 {
-    AsyncJsonResponse* response = new AsyncJsonResponse(false, 3072);
+    AsyncJsonResponse* response = new AsyncJsonResponse(false, MQTT_JSON_DOC_SIZE);
     JsonObject root = response->getRoot();
     CONFIG_T& config = Configuration.get();
 
@@ -53,7 +53,7 @@ void WebApiMqttClass::onMqttStatus(AsyncWebServerRequest* request)
 
 void WebApiMqttClass::onMqttAdminGet(AsyncWebServerRequest* request)
 {
-    AsyncJsonResponse* response = new AsyncJsonResponse(false, 3072);
+    AsyncJsonResponse* response = new AsyncJsonResponse(false, MQTT_JSON_DOC_SIZE);
     JsonObject root = response->getRoot();
     CONFIG_T& config = Configuration.get();
 
@@ -81,7 +81,7 @@ void WebApiMqttClass::onMqttAdminGet(AsyncWebServerRequest* request)
 
 void WebApiMqttClass::onMqttAdminPost(AsyncWebServerRequest* request)
 {
-    AsyncJsonResponse* response = new AsyncJsonResponse(false, 3072);
+    AsyncJsonResponse* response = new AsyncJsonResponse(false, MQTT_JSON_DOC_SIZE);
     JsonObject retMsg = response->getRoot();
     retMsg[F("type")] = F("warning");
 
@@ -94,14 +94,14 @@ void WebApiMqttClass::onMqttAdminPost(AsyncWebServerRequest* request)
 
     String json = request->getParam("data", true)->value();
 
-    if (json.length() > 3072) { //TODO check size was 1024 + 2048 for cert
+    if (json.length() > MQTT_JSON_DOC_SIZE) { 
         retMsg[F("message")] = F("Data too large!");
         response->setLength();
         request->send(response);
         return;
     }
 
-    DynamicJsonDocument root(3072); //TODO check size was 1024 + 2048 for cert
+    DynamicJsonDocument root(MQTT_JSON_DOC_SIZE); 
     DeserializationError error = deserializeJson(root, json);
 
     if (error) {
@@ -152,7 +152,12 @@ void WebApiMqttClass::onMqttAdminPost(AsyncWebServerRequest* request)
             return;
         }
 
-        //TODO iff ssl, check cert and size
+        if (root[F("mqtt_root_ca_cert")].as<String>().length() > MQTT_MAX_ROOT_CA_CERT_STRLEN) { 
+            retMsg[F("message")] = F("Certificate must not longer then " STR(MQTT_MAX_ROOT_CA_CERT_STRLEN) " characters!");
+            response->setLength();
+            request->send(response);
+            return;
+        }
 
         if (root[F("mqtt_lwt_topic")].as<String>().length() > MQTT_MAX_TOPIC_STRLEN) {
             retMsg[F("message")] = F("LWT topic must not longer then " STR(MQTT_MAX_TOPIC_STRLEN) " characters!");

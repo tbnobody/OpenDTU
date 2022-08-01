@@ -56,8 +56,6 @@ struct CONFIG_T {
     char Mqtt_Password[MQTT_MAX_PASSWORD_STRLEN + 1];
     char Mqtt_Topic[MQTT_MAX_TOPIC_STRLEN + 1];
     bool Mqtt_Retain;
-    bool Mqtt_Tls;
-    char Mqtt_RootCaCert[MQTT_MAX_ROOT_CA_CERT_STRLEN +1];
     char Mqtt_LwtTopic[MQTT_MAX_TOPIC_STRLEN + 1];
     char Mqtt_LwtValue_Online[MQTT_MAX_LWTVALUE_STRLEN + 1];
     char Mqtt_LwtValue_Offline[MQTT_MAX_LWTVALUE_STRLEN + 1];
@@ -73,6 +71,8 @@ struct CONFIG_T {
     bool Mqtt_Hass_Retain;
     char Mqtt_Hass_Topic[MQTT_MAX_TOPIC_STRLEN + 1];
     bool Mqtt_Hass_IndividualPanels;
+    bool Mqtt_Tls;
+    char Mqtt_RootCaCert[MQTT_MAX_ROOT_CA_CERT_STRLEN +1];
 };
 
 class ConfigurationClass {
