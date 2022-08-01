@@ -39,7 +39,7 @@ void WebApiMqttClass::onMqttStatus(AsyncWebServerRequest* request)
     root[F("mqtt_connected")] = MqttSettings.getConnected();
     root[F("mqtt_retain")] = config.Mqtt_Retain;
     root[F("mqtt_tls")] = config.Mqtt_Tls;
-    root[F("mqtt_root_ca_cert")] = config.Mqtt_RootCaCert;
+    root[F("mqtt_root_ca_cert_info")] = getRootCaCertInfo();
     root[F("mqtt_lwt_topic")] = String(config.Mqtt_Topic) + config.Mqtt_LwtTopic;
     root[F("mqtt_publish_interval")] = config.Mqtt_PublishInterval;
     root[F("mqtt_hass_enabled")] = config.Mqtt_Hass_Enabled;
@@ -202,6 +202,7 @@ void WebApiMqttClass::onMqttAdminPost(AsyncWebServerRequest* request)
     config.Mqtt_Retain = root[F("mqtt_retain")].as<bool>();
     config.Mqtt_Tls = root[F("mqtt_tls")].as<bool>();
     strcpy(config.Mqtt_RootCaCert, root[F("mqtt_root_ca_cert")].as<String>().c_str());
+    setRootCaCertInfo(config.Mqtt_RootCaCert); 
     config.Mqtt_Port = root[F("mqtt_port")].as<uint>();
     strcpy(config.Mqtt_Hostname, root[F("mqtt_hostname")].as<String>().c_str());
     strcpy(config.Mqtt_Username, root[F("mqtt_username")].as<String>().c_str());
@@ -225,4 +226,26 @@ void WebApiMqttClass::onMqttAdminPost(AsyncWebServerRequest* request)
 
     MqttSettings.performReconnect();
     MqttHassPublishing.forceUpdate();
+}
+
+void WebApiMqttClass::setRootCaCertInfo(char* cert)
+{
+    mbedtls_x509_crt global_cacert;
+
+    strcpy(_rootCaCertInfo, "Can't parse root ca");
+  
+    mbedtls_x509_crt_init(&global_cacert);
+    int ret = mbedtls_x509_crt_parse(&global_cacert, const_cast<unsigned char*>((unsigned char*)cert), 1 + strlen( cert )) ;
+    if (ret < 0) {
+        sprintf(_rootCaCertInfo,  "Can't parse root ca: mbedtls_x509_crt_parse returned -0x%x\n\n", -ret);
+        mbedtls_x509_crt_free(&global_cacert);
+        return;
+    }
+    mbedtls_x509_crt_info( _rootCaCertInfo, sizeof( _rootCaCertInfo ) - 1, "", &global_cacert );
+    mbedtls_x509_crt_free(&global_cacert);
+}
+
+char* WebApiMqttClass::getRootCaCertInfo()
+{
+    return _rootCaCertInfo;
 }

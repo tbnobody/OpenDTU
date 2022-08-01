@@ -14,6 +14,9 @@ private:
     void onMqttStatus(AsyncWebServerRequest* request);
     void onMqttAdminGet(AsyncWebServerRequest* request);
     void onMqttAdminPost(AsyncWebServerRequest* request);
+    void setRootCaCertInfo(char* cert);
+    char* getRootCaCertInfo();
 
     AsyncWebServer* _server;
+    char _rootCaCertInfo[1024] ="";
 };
