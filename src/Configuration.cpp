@@ -33,6 +33,8 @@ void ConfigurationClass::init()
     strlcpy(config.Mqtt_Password, MQTT_PASSWORD, sizeof(config.Mqtt_Password));
     strlcpy(config.Mqtt_Topic, MQTT_TOPIC, sizeof(config.Mqtt_Topic));
     config.Mqtt_Retain = MQTT_RETAIN;
+    config.Mqtt_Tls = MQTT_TLS;
+    strlcpy(config.Mqtt_RootCaCert, MQTT_ROOT_CA_CERT, sizeof(config.Mqtt_RootCaCert));
     strlcpy(config.Mqtt_LwtTopic, MQTT_LWT_TOPIC, sizeof(config.Mqtt_LwtTopic));
     strlcpy(config.Mqtt_LwtValue_Online, MQTT_LWT_ONLINE, sizeof(config.Mqtt_LwtValue_Online));
     strlcpy(config.Mqtt_LwtValue_Offline, MQTT_LWT_OFFLINE, sizeof(config.Mqtt_LwtValue_Offline));
@@ -138,6 +140,11 @@ void ConfigurationClass::migrate()
         config.Mqtt_Hass_Retain = MQTT_HASS_RETAIN;
         strlcpy(config.Mqtt_Hass_Topic, MQTT_HASS_TOPIC, sizeof(config.Mqtt_Hass_Topic));
         config.Mqtt_Hass_IndividualPanels = MQTT_HASS_INDIVIDUALPANELS;
+    }
+
+    if (config.Cfg_Version < 0x00011300) {
+        config.Mqtt_Tls = MQTT_TLS;
+        strlcpy(config.Mqtt_RootCaCert, MQTT_ROOT_CA_CERT, sizeof(config.Mqtt_RootCaCert));
     }
 
     config.Cfg_Version = CONFIG_VERSION;
