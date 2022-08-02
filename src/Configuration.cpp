@@ -56,6 +56,9 @@ void ConfigurationClass::init()
     config.Mqtt_Hass_Retain = MQTT_HASS_RETAIN;
     strlcpy(config.Mqtt_Hass_Topic, MQTT_TOPIC, sizeof(config.Mqtt_Hass_Topic));
     config.Mqtt_Hass_IndividualPanels = MQTT_HASS_INDIVIDUALPANELS;
+
+    config.Vedirect_Enabled = VEDIRECT_ENABLED;
+    config.Vedirect_UpdatesOnly = VEDIRECT_UPDATESONLY;
 }
 
 bool ConfigurationClass::write()
@@ -145,6 +148,8 @@ void ConfigurationClass::migrate()
     if (config.Cfg_Version < 0x00011300) {
         config.Mqtt_Tls = MQTT_TLS;
         strlcpy(config.Mqtt_RootCaCert, MQTT_ROOT_CA_CERT, sizeof(config.Mqtt_RootCaCert));
+        config.Vedirect_Enabled = VEDIRECT_ENABLED;
+        config.Vedirect_UpdatesOnly = VEDIRECT_UPDATESONLY;
     }
 
     if (config.Cfg_Version < 0x00011400) {

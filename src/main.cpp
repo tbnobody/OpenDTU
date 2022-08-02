@@ -6,6 +6,7 @@
 #include "Hoymiles.h"
 #include "MqttHassPublishing.h"
 #include "MqttPublishing.h"
+#include "MqttVedirectPublishing.h"
 #include "MqttSettings.h"
 #include "NtpSettings.h"
 #include "WebApi.h"
@@ -68,6 +69,7 @@ void setup()
     Serial.print(F("Initialize MqTT... "));
     MqttSettings.init();
     MqttPublishing.init();
+    MqttVedirectPublishing.init();
     MqttHassPublishing.init();
     Serial.println(F("done"));
 
@@ -105,6 +107,8 @@ void loop()
     Hoymiles.loop();
     yield();
     MqttPublishing.loop();
+    yield();
+    MqttVedirectPublishing.loop();
     yield();
     MqttHassPublishing.loop();
     yield();
