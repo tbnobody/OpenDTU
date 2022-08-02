@@ -11,6 +11,7 @@
 #include "WebApi_sysstatus.h"
 #include "WebApi_webapp.h"
 #include "WebApi_ws_live.h"
+#include "WebApi_vedirect.h"
 #include <ESPAsyncWebServer.h>
 
 class WebApiClass {
@@ -33,6 +34,7 @@ private:
     WebApiSysstatusClass _webApiSysstatus;
     WebApiWebappClass _webApiWebapp;
     WebApiWsLiveClass _webApiWsLive;
+    WebApiVedirectClass _webApiVedirect;
 };
 
 extern WebApiClass WebApi;

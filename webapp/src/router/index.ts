@@ -11,6 +11,8 @@ import MqttInfoView from '@/components/MqttInfoView.vue'
 import InverterAdminView from '@/components/InverterAdminView.vue'
 import DtuAdminView from '@/components/DtuAdminView.vue'
 import FirmwareUpgradeView from '@/components/FirmwareUpgradeView.vue'
+import VedirectAdminView from '@/components/VedirectAdminView.vue'
+import VedirectInfoView from '@/components/VedirectInfoView.vue'
 
 const routes: Array<RouteRecordRaw> = [
     {
@@ -44,6 +46,11 @@ const routes: Array<RouteRecordRaw> = [
         component: MqttInfoView
     },
     {
+        path: '/info/vedirect',
+        name: 'Ve.direct',
+        component: VedirectInfoView
+    },
+    {
         path: '/settings/network',
         name: 'Network Settings',
         component: NetworkAdminView
@@ -52,6 +59,11 @@ const routes: Array<RouteRecordRaw> = [
         path: '/settings/ntp',
         name: 'NTP Settings',
         component: NtpAdminView
+    },
+    {
+        path: '/settings/vedirect',
+        name: 'Ve.direct Settings',
+        component: VedirectAdminView
     },
     {
         path: '/settings/mqtt',
