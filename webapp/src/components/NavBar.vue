@@ -33,6 +33,9 @@
                             <li>
                                 <router-link @click="onClick" class="dropdown-item" to="/settings/dtu">DTU Settings</router-link>
                             </li>
+                             <li>
+                                <router-link @click="onClick" class="dropdown-item" to="/settings/vedirect">Ve.direct Settings</router-link>
+                            </li>
                             <li>
                                 <hr class="dropdown-divider" />
                             </li>
@@ -58,6 +61,9 @@
                             </li>
                             <li>
                                 <router-link @click="onClick" class="dropdown-item" to="/info/mqtt">MqTT</router-link>
+                            </li>
+                             <li>
+                                <router-link @click="onClick" class="dropdown-item" to="/info/vedirect">Ve.direct</router-link>
                             </li>
                         </ul>
                     </li>
