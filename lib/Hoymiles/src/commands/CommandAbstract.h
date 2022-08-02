@@ -32,6 +32,8 @@ public:
     uint8_t getSendCount();
     uint8_t incrementSendCount();
 
+    virtual CommandAbstract* getRequestFrameCommand(uint8_t frame_no);
+
     virtual RequestType getRequestType() = 0;
 
 protected:

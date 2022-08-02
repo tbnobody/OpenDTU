@@ -243,12 +243,13 @@ void HoymilesRadio::sendEsbPacket(CommandAbstract* cmd)
 
 void HoymilesRadio::sendRetransmitPacket(uint8_t fragment_id)
 {
-    RequestFrameCommand cmd(
-        _commandQueue.front().get()->getTargetAddress(),
-        DtuSerial().u64,
-        fragment_id);
+    CommandAbstract* cmd = _commandQueue.front().get();
 
-    sendEsbPacket(&cmd);
+    CommandAbstract* requestCmd = cmd->getRequestFrameCommand(fragment_id);
+
+    if (requestCmd != nullptr) {
+        sendEsbPacket(requestCmd);
+    }
 }
 
 void HoymilesRadio::sendLastPacketAgain()

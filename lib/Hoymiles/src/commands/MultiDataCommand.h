@@ -1,6 +1,7 @@
 #pragma once
 
 #include "CommandAbstract.h"
+#include "RequestFrameCommand.h"
 #include <sys/time.h>
 
 class MultiDataCommand : public CommandAbstract {
@@ -10,8 +11,12 @@ public:
     void setTime(time_t time);
     time_t getTime();
 
+    CommandAbstract* getRequestFrameCommand(uint8_t frame_no);
+
 protected:
     void setDataType(uint8_t data_type);
     uint8_t getDataType();
     void udpateCRC();
+
+    RequestFrameCommand _cmdRequestFrame;
 };

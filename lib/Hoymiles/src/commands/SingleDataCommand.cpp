@@ -4,4 +4,5 @@ SingleDataCommand::SingleDataCommand(uint64_t target_address, uint64_t router_ad
     : CommandAbstract(target_address, router_address)
 {
     _payload[0] = 0x15;
+    setTimeout(100);
 }

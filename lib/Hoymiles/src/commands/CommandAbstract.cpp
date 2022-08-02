@@ -10,6 +10,7 @@ CommandAbstract::CommandAbstract(uint64_t target_address, uint64_t router_addres
     setTargetAddress(target_address);
     setRouterAddress(router_address);
     setSendCount(0);
+    setTimeout(0);
 }
 
 template <typename T>
@@ -83,6 +84,11 @@ uint8_t CommandAbstract::getSendCount()
 uint8_t CommandAbstract::incrementSendCount()
 {
     return _sendCount++;
+}
+
+CommandAbstract* CommandAbstract::getRequestFrameCommand(uint8_t frame_no)
+{
+    return nullptr;
 }
 
 void CommandAbstract::convertSerialToPacketId(uint8_t buffer[], uint64_t serial)

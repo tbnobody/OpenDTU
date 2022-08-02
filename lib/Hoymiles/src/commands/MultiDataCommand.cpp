@@ -50,6 +50,14 @@ time_t MultiDataCommand::getTime()
         | (time_t)(_payload[15]);
 }
 
+CommandAbstract* MultiDataCommand::getRequestFrameCommand(uint8_t frame_no)
+{
+    _cmdRequestFrame.setTargetAddress(getTargetAddress());
+    _cmdRequestFrame.setFrameNo(frame_no);
+
+    return &_cmdRequestFrame;
+}
+
 void MultiDataCommand::udpateCRC()
 {
     uint16_t crc = crc16(&_payload[10], 14); // From data_type till password
