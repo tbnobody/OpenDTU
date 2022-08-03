@@ -20,9 +20,14 @@ public:
     uint8_t getEntryCount();
     void getLogEntry(uint8_t entryId, AlarmLogEntry_t* entry);
 
+    uint32_t getLastUpdate();
+    void setLastUpdate(uint32_t lastUpdate);
+
 private:
     static int getTimezoneOffset();
 
     uint8_t _payloadAlarmLog[ALARM_LOG_ENTRY_SIZE * ALARM_LOG_ENTRY_COUNT];
     uint8_t _alarmLogLength;
+
+    uint32_t _lastUpdate = 0;
 };

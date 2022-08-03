@@ -19,3 +19,7 @@ uint8_t RequestFrameCommand::getFrameNo()
 {
     return _payload[9] & (~0x80);
 }
+
+void RequestFrameCommand::handleResponse(InverterAbstract* inverter, fragment_t fragment[], uint8_t max_fragment_id)
+{
+}

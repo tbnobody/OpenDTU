@@ -19,6 +19,8 @@ enum {
 #define MAX_RF_FRAGMENT_COUNT 5
 #define MAX_RETRANSMIT_COUNT 5
 
+class CommandAbstract;
+
 class InverterAbstract {
 public:
     InverterAbstract(uint64_t serial);
@@ -32,19 +34,13 @@ public:
 
     void clearRxFragmentBuffer();
     void addRxFragment(uint8_t fragment[], uint8_t len);
-    uint8_t verifyAllFragments();
+    uint8_t verifyAllFragments(CommandAbstract* cmd);
 
     virtual bool sendStatsRequest(HoymilesRadio* radio) = 0;
     virtual bool sendAlarmLogRequest(HoymilesRadio* radio) = 0;
-    uint32_t getLastStatsUpdate();
-
-    void setLastRequest(RequestType request);
 
     AlarmLogParser* EventLog();
     StatisticsParser* Statistics();
-
-protected:
-    RequestType getLastRequest();
 
 private:
     serial_u _serial;
@@ -53,11 +49,6 @@ private:
     uint8_t _rxFragmentMaxPacketId = 0;
     uint8_t _rxFragmentLastPacketId = 0;
     uint8_t _rxFragmentRetransmitCnt = 0;
-
-    uint32_t _lastStatsUpdate = 0;
-    uint32_t _lastAlarmLogUpdate = 0;
-
-    RequestType _lastRequest = RequestType::None;
 
     std::unique_ptr<AlarmLogParser> _alarmLogParser;
     std::unique_ptr<StatisticsParser> _statisticsParser;

@@ -91,7 +91,7 @@ void InverterAbstract::addRxFragment(uint8_t fragment[], uint8_t len)
 }
 
 // Returns Zero on Success or the Fragment ID for retransmit or error code
-uint8_t InverterAbstract::verifyAllFragments()
+uint8_t InverterAbstract::verifyAllFragments(CommandAbstract* cmd)
 {
     // All missing
     if (_rxFragmentLastPacketId == 0) {
@@ -139,45 +139,7 @@ uint8_t InverterAbstract::verifyAllFragments()
         return FRAGMENT_CRC_ERROR;
     }
 
-    if (getLastRequest() == RequestType::Stats) {
-        // Move all fragments into target buffer
-        uint8_t offs = 0;
-        _statisticsParser.get()->clearBuffer();
-        for (uint8_t i = 0; i < _rxFragmentMaxPacketId; i++) {
-            _statisticsParser.get()->appendFragment(offs, _rxFragmentBuffer[i].fragment, _rxFragmentBuffer[i].len);
-            offs += (_rxFragmentBuffer[i].len);
-        }
-        _lastStatsUpdate = millis();
+    cmd->handleResponse(this, _rxFragmentBuffer, _rxFragmentMaxPacketId);
 
-    } else if (getLastRequest() == RequestType::AlarmLog) {
-        // Move all fragments into target buffer
-        uint8_t offs = 0;
-        _alarmLogParser.get()->clearBuffer();
-        for (uint8_t i = 0; i < _rxFragmentMaxPacketId; i++) {
-            _alarmLogParser.get()->appendFragment(offs, _rxFragmentBuffer[i].fragment, _rxFragmentBuffer[i].len);
-            offs += (_rxFragmentBuffer[i].len);
-        }
-        _lastAlarmLogUpdate = millis();
-
-    } else {
-        Serial.println("Unkown response received");
-    }
-
-    setLastRequest(RequestType::None);
     return FRAGMENT_OK;
-}
-
-uint32_t InverterAbstract::getLastStatsUpdate()
-{
-    return _lastStatsUpdate;
-}
-
-void InverterAbstract::setLastRequest(RequestType request)
-{
-    _lastRequest = request;
-}
-
-RequestType InverterAbstract::getLastRequest()
-{
-    return _lastRequest;
 }

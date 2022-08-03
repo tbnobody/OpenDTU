@@ -110,6 +110,9 @@ public:
     uint16_t getChannelMaxPower(uint8_t channel);
     void setChannelMaxPower(uint8_t channel, uint16_t power);
 
+    uint32_t getLastUpdate();
+    void setLastUpdate(uint32_t lastUpdate);
+
 private:
     uint8_t _payloadStatistic[STATISTIC_PACKET_SIZE];
     uint8_t _statisticLength;
@@ -117,4 +120,6 @@ private:
 
     const byteAssign_t* _byteAssignment;
     uint8_t _byteAssignmentCount;
+
+    uint32_t _lastUpdate = 0;
 };

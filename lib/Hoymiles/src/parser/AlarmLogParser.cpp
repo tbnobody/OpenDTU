@@ -258,6 +258,16 @@ void AlarmLogParser::getLogEntry(uint8_t entryId, AlarmLogEntry_t* entry)
     }
 }
 
+uint32_t AlarmLogParser::getLastUpdate()
+{
+    return _lastUpdate;
+}
+
+void AlarmLogParser::setLastUpdate(uint32_t lastUpdate)
+{
+    _lastUpdate = lastUpdate;
+}
+
 int AlarmLogParser::getTimezoneOffset()
 {
     // see: https://stackoverflow.com/questions/13804095/get-the-time-zone-gmt-offset-in-c/44063597#44063597

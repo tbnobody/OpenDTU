@@ -36,7 +36,7 @@ void MqttPublishingClass::loop()
 
             MqttSettings.publish(subtopic + "/name", inv->name());
 
-            uint32_t lastUpdate = inv->getLastStatsUpdate();
+            uint32_t lastUpdate = inv->Statistics()->getLastUpdate();
             if (lastUpdate > 0 && lastUpdate != _lastPublishStats[i]) {
                 _lastPublishStats[i] = lastUpdate;
 

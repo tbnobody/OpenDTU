@@ -89,7 +89,8 @@ void HoymilesRadio::loop()
         std::shared_ptr<InverterAbstract> inv = Hoymiles.getInverterBySerial(_commandQueue.front().get()->getTargetAddress());
 
         if (nullptr != inv) {
-            uint8_t verifyResult = inv->verifyAllFragments();
+            CommandAbstract* cmd = _commandQueue.front().get();
+            uint8_t verifyResult = inv->verifyAllFragments(cmd);
             if (verifyResult == FRAGMENT_ALL_MISSING) {
                 if (_commandQueue.front().get()->getSendCount() <= MAX_RESEND_COUNT) {
                     Serial.println(F("Nothing received, resend whole request"));
@@ -127,7 +128,6 @@ void HoymilesRadio::loop()
             CommandAbstract* cmd = _commandQueue.front().get();
 
             auto inv = Hoymiles.getInverterBySerial(cmd->getTargetAddress());
-            inv->setLastRequest(cmd->getRequestType());
             inv->clearRxFragmentBuffer();
             sendEsbPacket(cmd);
         }

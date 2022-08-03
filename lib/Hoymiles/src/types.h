@@ -14,9 +14,3 @@ typedef struct {
     uint8_t fragment[MAX_RF_PAYLOAD_SIZE];
     uint8_t len;
 } fragment_t;
-
-enum class RequestType {
-    None,
-    Stats,
-    AlarmLog
-};

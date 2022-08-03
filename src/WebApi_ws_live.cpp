@@ -44,8 +44,8 @@ void WebApiWsLiveClass::loop()
     for (uint8_t i = 0; i < Hoymiles.getNumInverters(); i++) {
         auto inv = Hoymiles.getInverterByPos(i);
 
-        if (inv->getLastStatsUpdate() > maxTimeStamp) {
-            maxTimeStamp = inv->getLastStatsUpdate();
+        if (inv->Statistics()->getLastUpdate() > maxTimeStamp) {
+            maxTimeStamp = inv->Statistics()->getLastUpdate();
         }
     }
 
@@ -80,8 +80,8 @@ void WebApiWsLiveClass::generateJsonResponse(JsonVariant& root)
 
         root[i][F("serial")] = String(buffer);
         root[i][F("name")] = inv->name();
-        root[i][F("data_age")] = (millis() - inv->getLastStatsUpdate()) / 1000;
-        root[i][F("age_critical")] = ((millis() - inv->getLastStatsUpdate()) / 1000) > Configuration.get().Dtu_PollInterval * 5;
+        root[i][F("data_age")] = (millis() - inv->Statistics()->getLastUpdate()) / 1000;
+        root[i][F("age_critical")] = ((millis() - inv->Statistics()->getLastUpdate()) / 1000) > Configuration.get().Dtu_PollInterval * 5;
 
         // Loop all channels
         for (uint8_t c = 0; c <= inv->Statistics()->getChannelCount(); c++) {
@@ -110,8 +110,8 @@ void WebApiWsLiveClass::generateJsonResponse(JsonVariant& root)
             root[i][F("events")] = -1;
         }
 
-        if (inv->getLastStatsUpdate() > _newestInverterTimestamp) {
-            _newestInverterTimestamp = inv->getLastStatsUpdate();
+        if (inv->Statistics()->getLastUpdate() > _newestInverterTimestamp) {
+            _newestInverterTimestamp = inv->Statistics()->getLastUpdate();
         }
     }
 }
