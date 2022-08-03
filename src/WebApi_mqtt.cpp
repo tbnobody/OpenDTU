@@ -141,6 +141,13 @@ void WebApiMqttClass::onMqttAdminPost(AsyncWebServerRequest* request)
             return;
         }
 
+        if (root[F("mqtt_topic")].as<String>().indexOf(' ') != -1) {
+            retMsg[F("message")] = F("Topic must not contain space characters!");
+            response->setLength();
+            request->send(response);
+            return;
+        }
+
         if (root[F("mqtt_port")].as<uint>() == 0 || root[F("mqtt_port")].as<uint>() > 65535) {
             retMsg[F("message")] = F("Port must be a number between 1 and 65535!");
             response->setLength();
@@ -150,6 +157,13 @@ void WebApiMqttClass::onMqttAdminPost(AsyncWebServerRequest* request)
 
         if (root[F("mqtt_lwt_topic")].as<String>().length() > MQTT_MAX_TOPIC_STRLEN) {
             retMsg[F("message")] = F("LWT topic must not longer then " STR(MQTT_MAX_TOPIC_STRLEN) " characters!");
+            response->setLength();
+            request->send(response);
+            return;
+        }
+
+        if (root[F("mqtt_lwt_topic")].as<String>().indexOf(' ') != -1) {
+            retMsg[F("message")] = F("LWT topic must not contain space characters!");
             response->setLength();
             request->send(response);
             return;
@@ -179,6 +193,13 @@ void WebApiMqttClass::onMqttAdminPost(AsyncWebServerRequest* request)
         if (root[F("mqtt_hass_enabled")].as<bool>()) {
             if (root[F("mqtt_hass_topic")].as<String>().length() > MQTT_MAX_TOPIC_STRLEN) {
                 retMsg[F("message")] = F("Hass topic must not longer then " STR(MQTT_MAX_TOPIC_STRLEN) " characters!");
+                response->setLength();
+                request->send(response);
+                return;
+            }
+
+            if (root[F("mqtt_hass_topic")].as<String>().indexOf(' ') != -1) {
+                retMsg[F("message")] = F("Hass topic must not contain space characters!");
                 response->setLength();
                 request->send(response);
                 return;
