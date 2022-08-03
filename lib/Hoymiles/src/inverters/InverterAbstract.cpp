@@ -58,7 +58,7 @@ void InverterAbstract::clearRxFragmentBuffer()
 
 void InverterAbstract::addRxFragment(uint8_t fragment[], uint8_t len)
 {
-    if (len < 11 + 1) {
+    if (len < 11) {
         Serial.printf("FATAL: (%s, %d) fragment too short\n", __FILE__, __LINE__);
         return;
     }
@@ -78,6 +78,7 @@ void InverterAbstract::addRxFragment(uint8_t fragment[], uint8_t len)
         // Packets with 0x81 will be seen as 1
         memcpy(_rxFragmentBuffer[(fragmentCount & 0b01111111) - 1].fragment, &fragment[10], len - 11);
         _rxFragmentBuffer[(fragmentCount & 0b01111111) - 1].len = len - 11;
+        _rxFragmentBuffer[(fragmentCount & 0b01111111) - 1].wasReceived = true;
 
         if ((fragmentCount & 0b01111111) > _rxFragmentLastPacketId) {
             _rxFragmentLastPacketId = fragmentCount & 0b01111111;
@@ -111,7 +112,7 @@ uint8_t InverterAbstract::verifyAllFragments(CommandAbstract* cmd)
 
     // Middle fragment is missing
     for (uint8_t i = 0; i < _rxFragmentMaxPacketId - 1; i++) {
-        if (_rxFragmentBuffer[i].len == 0) {
+        if (!_rxFragmentBuffer[i].wasReceived) {
             Serial.println(F("Middle missing"));
             if (_rxFragmentRetransmitCnt++ < MAX_RETRANSMIT_COUNT) {
                 return i + 1;

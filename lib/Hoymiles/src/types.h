@@ -13,4 +13,5 @@ union serial_u {
 typedef struct {
     uint8_t fragment[MAX_RF_PAYLOAD_SIZE];
     uint8_t len;
+    bool wasReceived;
 } fragment_t;
