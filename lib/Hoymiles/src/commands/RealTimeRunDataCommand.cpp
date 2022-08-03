@@ -9,8 +9,13 @@ RealTimeRunDataCommand::RealTimeRunDataCommand(uint64_t target_address, uint64_t
     setTimeout(200);
 }
 
-void RealTimeRunDataCommand::handleResponse(InverterAbstract* inverter, fragment_t fragment[], uint8_t max_fragment_id)
+bool RealTimeRunDataCommand::handleResponse(InverterAbstract* inverter, fragment_t fragment[], uint8_t max_fragment_id)
 {
+    // Check CRC of whole payload
+    if (!MultiDataCommand::handleResponse(inverter, fragment, max_fragment_id)) {
+        return false;
+    }
+
     // Move all fragments into target buffer
     uint8_t offs = 0;
     inverter->Statistics()->clearBuffer();
@@ -19,4 +24,5 @@ void RealTimeRunDataCommand::handleResponse(InverterAbstract* inverter, fragment
         offs += (fragment[i].len);
     }
     inverter->Statistics()->setLastUpdate(millis());
+    return true;
 }

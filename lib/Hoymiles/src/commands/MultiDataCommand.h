@@ -13,6 +13,8 @@ public:
 
     CommandAbstract* getRequestFrameCommand(uint8_t frame_no);
 
+    virtual bool handleResponse(InverterAbstract* inverter, fragment_t fragment[], uint8_t max_fragment_id);
+
 protected:
     void setDataType(uint8_t data_type);
     uint8_t getDataType();

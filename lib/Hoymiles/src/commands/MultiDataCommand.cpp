@@ -58,6 +58,25 @@ CommandAbstract* MultiDataCommand::getRequestFrameCommand(uint8_t frame_no)
     return &_cmdRequestFrame;
 }
 
+bool MultiDataCommand::handleResponse(InverterAbstract* inverter, fragment_t fragment[], uint8_t max_fragment_id)
+{
+    // All fragments are available --> Check CRC
+    uint16_t crc = 0xffff, crcRcv;
+
+    for (uint8_t i = 0; i < max_fragment_id; i++) {
+        if (i == max_fragment_id - 1) {
+            // Last packet
+            crc = crc16(fragment[i].fragment, fragment[i].len - 2, crc);
+            crcRcv = (fragment[i].fragment[fragment[i].len - 2] << 8)
+                | (fragment[i].fragment[fragment[i].len - 1]);
+        } else {
+            crc = crc16(fragment[i].fragment, fragment[i].len, crc);
+        }
+    }
+
+    return crc == crcRcv;
+}
+
 void MultiDataCommand::udpateCRC()
 {
     uint16_t crc = crc16(&_payload[10], 14); // From data_type till password

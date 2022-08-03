@@ -9,8 +9,13 @@ AlarmDataCommand::AlarmDataCommand(uint64_t target_address, uint64_t router_addr
     setTimeout(200);
 }
 
-void AlarmDataCommand::handleResponse(InverterAbstract* inverter, fragment_t fragment[], uint8_t max_fragment_id)
+bool AlarmDataCommand::handleResponse(InverterAbstract* inverter, fragment_t fragment[], uint8_t max_fragment_id)
 {
+    // Check CRC of whole payload
+    if (!MultiDataCommand::handleResponse(inverter, fragment, max_fragment_id)) {
+        return false;
+    }
+
     // Move all fragments into target buffer
     uint8_t offs = 0;
     inverter->EventLog()->clearBuffer();
@@ -19,4 +24,5 @@ void AlarmDataCommand::handleResponse(InverterAbstract* inverter, fragment_t fra
         offs += (fragment[i].len);
     }
     inverter->EventLog()->setLastUpdate(millis());
+    return true;
 }

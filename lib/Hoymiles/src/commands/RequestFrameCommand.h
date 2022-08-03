@@ -9,5 +9,5 @@ public:
     void setFrameNo(uint8_t frame_no);
     uint8_t getFrameNo();
 
-    virtual void handleResponse(InverterAbstract* inverter, fragment_t fragment[], uint8_t max_fragment_id);
+    virtual bool handleResponse(InverterAbstract* inverter, fragment_t fragment[], uint8_t max_fragment_id);
 };

@@ -103,10 +103,12 @@ void HoymilesRadio::loop()
 
             } else if (verifyResult == FRAGMENT_RETRANSMIT_TIMEOUT) {
                 Serial.println(F("Retransmit timeout"));
+                _commandQueue.pop();
                 _busyFlag = false;
 
-            } else if (verifyResult == FRAGMENT_CRC_ERROR) {
-                Serial.println(F("Packet CRC error"));
+            } else if (verifyResult == FRAGMENT_HANDLE_ERROR) {
+                Serial.println(F("Packet handling error"));
+                _commandQueue.pop();
                 _busyFlag = false;
 
             } else if (verifyResult > 0) {

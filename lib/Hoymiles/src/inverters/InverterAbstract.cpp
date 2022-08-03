@@ -122,25 +122,9 @@ uint8_t InverterAbstract::verifyAllFragments(CommandAbstract* cmd)
         }
     }
 
-    // All fragments are available --> Check CRC
-    uint16_t crc = 0xffff, crcRcv;
-
-    for (uint8_t i = 0; i < _rxFragmentMaxPacketId; i++) {
-        if (i == _rxFragmentMaxPacketId - 1) {
-            // Last packet
-            crc = crc16(_rxFragmentBuffer[i].fragment, _rxFragmentBuffer[i].len - 2, crc);
-            crcRcv = (_rxFragmentBuffer[i].fragment[_rxFragmentBuffer[i].len - 2] << 8)
-                | (_rxFragmentBuffer[i].fragment[_rxFragmentBuffer[i].len - 1]);
-        } else {
-            crc = crc16(_rxFragmentBuffer[i].fragment, _rxFragmentBuffer[i].len, crc);
-        }
+    if (!cmd->handleResponse(this, _rxFragmentBuffer, _rxFragmentMaxPacketId)) {
+        return FRAGMENT_HANDLE_ERROR;
     }
-
-    if (crc != crcRcv) {
-        return FRAGMENT_CRC_ERROR;
-    }
-
-    cmd->handleResponse(this, _rxFragmentBuffer, _rxFragmentMaxPacketId);
 
     return FRAGMENT_OK;
 }
