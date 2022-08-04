@@ -77,7 +77,7 @@ private:
     uint8_t _rxChLst[5] = { 3, 23, 40, 61, 75 };
     uint8_t _rxChIdx;
 
-    uint8_t _txChLst[1] = { 40 };
+    uint8_t _txChLst[5] = { 3, 23, 40, 61, 75 };
     uint8_t _txChIdx;
 
     volatile bool _packetReceived;
