@@ -24,7 +24,7 @@
     "@types/node": "^18.0.0",
     "@types/spark-md5": "^3.0.2",
     "@typescript-eslint/parser": "^5.32.0",
-    "@vue/cli-plugin-babel": "~5.0.6",
+    "@vue/cli-plugin-babel": "~5.0.8",
     "@vue/cli-plugin-eslint": "~5.0.8",
     "@vue/cli-plugin-router": "^5.0.6",
     "@vue/cli-plugin-typescript": "^5.0.6",
