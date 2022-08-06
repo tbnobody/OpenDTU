@@ -27,7 +27,7 @@
     "@vue/cli-plugin-babel": "~5.0.8",
     "@vue/cli-plugin-eslint": "~5.0.8",
     "@vue/cli-plugin-router": "^5.0.6",
-    "@vue/cli-plugin-typescript": "^5.0.6",
+    "@vue/cli-plugin-typescript": "^5.0.8",
     "@vue/cli-service": "~5.0.8",
     "@vue/eslint-config-typescript": "^11.0.0",
     "eslint": "^8.18.0",
