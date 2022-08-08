@@ -6,6 +6,7 @@ InverterAbstract::InverterAbstract(uint64_t serial)
 {
     _serial.u64 = serial;
     _alarmLogParser.reset(new AlarmLogParser());
+    _devInfoParser.reset(new DevInfoParser());
     _statisticsParser.reset(new StatisticsParser());
 }
 
@@ -41,6 +42,11 @@ const char* InverterAbstract::name()
 AlarmLogParser* InverterAbstract::EventLog()
 {
     return _alarmLogParser.get();
+}
+
+DevInfoParser* InverterAbstract::DevInfo()
+{
+    return _devInfoParser.get();
 }
 
 StatisticsParser* InverterAbstract::Statistics()

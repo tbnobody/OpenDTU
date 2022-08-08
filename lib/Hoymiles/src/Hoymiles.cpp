@@ -3,6 +3,7 @@
 #include "inverters/HM_2CH.h"
 #include "inverters/HM_4CH.h"
 #include <Arduino.h>
+#include <Every.h>
 
 HoymilesClass Hoymiles;
 
@@ -30,6 +31,15 @@ void HoymilesClass::loop()
 
                 // Fetch event log
                 iv->sendAlarmLogRequest(_radio.get());
+
+                // Fetch dev info
+                if (iv->DevInfo()->getLastUpdate() == 0) {
+                    EVERY_N_MINUTES(10)
+                    {
+                        Serial.println(F("Request device info"));
+                        iv->sendDevInfoRequest(_radio.get());
+                    }
+                }
             }
 
             if (++inverterPos >= getNumInverters()) {
@@ -46,11 +56,9 @@ std::shared_ptr<InverterAbstract> HoymilesClass::addInverter(const char* name, u
     std::shared_ptr<InverterAbstract> i;
     if (HM_4CH::isValidSerial(serial)) {
         i = std::make_shared<HM_4CH>(serial);
-    }
-    else if (HM_2CH::isValidSerial(serial)) {
+    } else if (HM_2CH::isValidSerial(serial)) {
         i = std::make_shared<HM_2CH>(serial);
-    }
-    else if (HM_1CH::isValidSerial(serial)) {
+    } else if (HM_1CH::isValidSerial(serial)) {
         i = std::make_shared<HM_1CH>(serial);
     }
 

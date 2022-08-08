@@ -2,6 +2,7 @@
 
 #include "../parser/AlarmLogParser.h"
 #include "../parser/StatisticsParser.h"
+#include "../parser/DevInfoParser.h"
 #include "HoymilesRadio.h"
 #include "types.h"
 #include <Arduino.h>
@@ -38,8 +39,10 @@ public:
 
     virtual bool sendStatsRequest(HoymilesRadio* radio) = 0;
     virtual bool sendAlarmLogRequest(HoymilesRadio* radio) = 0;
+    virtual bool sendDevInfoRequest(HoymilesRadio* radio) = 0;
 
     AlarmLogParser* EventLog();
+    DevInfoParser* DevInfo();
     StatisticsParser* Statistics();
 
 private:
@@ -51,5 +54,6 @@ private:
     uint8_t _rxFragmentRetransmitCnt = 0;
 
     std::unique_ptr<AlarmLogParser> _alarmLogParser;
+    std::unique_ptr<DevInfoParser> _devInfoParser;
     std::unique_ptr<StatisticsParser> _statisticsParser;
 };
