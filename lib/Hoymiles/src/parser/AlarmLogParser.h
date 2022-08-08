@@ -1,4 +1,5 @@
 #pragma once
+#include "Parser.h"
 #include <cstdint>
 #include <Arduino.h>
 
@@ -12,7 +13,7 @@ struct AlarmLogEntry_t {
     time_t EndTime;
 };
 
-class AlarmLogParser {
+class AlarmLogParser : public Parser {
 public:
     void clearBuffer();
     void appendFragment(uint8_t offset, uint8_t* payload, uint8_t len);
@@ -20,14 +21,9 @@ public:
     uint8_t getEntryCount();
     void getLogEntry(uint8_t entryId, AlarmLogEntry_t* entry);
 
-    uint32_t getLastUpdate();
-    void setLastUpdate(uint32_t lastUpdate);
-
 private:
     static int getTimezoneOffset();
 
     uint8_t _payloadAlarmLog[ALARM_LOG_ENTRY_SIZE * ALARM_LOG_ENTRY_COUNT];
     uint8_t _alarmLogLength;
-
-    uint32_t _lastUpdate = 0;
 };

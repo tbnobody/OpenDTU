@@ -112,16 +112,6 @@ void StatisticsParser::setChannelMaxPower(uint8_t channel, uint16_t power)
     }
 }
 
-uint32_t StatisticsParser::getLastUpdate()
-{
-    return _lastUpdate;
-}
-
-void StatisticsParser::setLastUpdate(uint32_t lastUpdate)
-{
-    _lastUpdate = lastUpdate;
-}
-
 static float calcYieldTotalCh0(StatisticsParser* iv, uint8_t arg0)
 {
     float yield = 0;
