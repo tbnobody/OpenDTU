@@ -5,6 +5,7 @@
 #include "MqttPublishing.h"
 #include "MqttSettings.h"
 #include "NetworkSettings.h"
+#include <ctime>
 
 MqttPublishingClass MqttPublishing;
 
@@ -34,7 +35,22 @@ void MqttPublishingClass::loop()
                 ((uint32_t)(inv->serial() & 0xFFFFFFFF)));
             String subtopic = String(buffer);
 
+            // Name
             MqttSettings.publish(subtopic + "/name", inv->name());
+
+            if (inv->DevInfo()->getLastUpdate() > 0) {
+                // Bootloader Version
+                MqttSettings.publish(subtopic + "/firmware/bootloaderversion", String(inv->DevInfo()->getFwBootloaderVersion()));
+
+                // Firmware Version
+                MqttSettings.publish(subtopic + "/firmware/buildversion", String(inv->DevInfo()->getFwBuildVersion()));
+
+                // Firmware Build DateTime
+                char timebuffer[32];
+                const time_t t = inv->DevInfo()->getFwBuildDateTime();
+                std::strftime(buffer, sizeof(buffer), "%Y-%m-%d %H:%M:%S", gmtime(&t));
+                MqttSettings.publish(subtopic + "/firmware/builddatetime", String(buffer));
+            }
 
             uint32_t lastUpdate = inv->Statistics()->getLastUpdate();
             if (lastUpdate > 0 && lastUpdate != _lastPublishStats[i]) {
