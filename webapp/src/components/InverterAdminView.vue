@@ -60,7 +60,7 @@
                                 </td>
                                 <td>
                                     <a href="#" class="icon text-danger" title="Delete inverter">
-                                        <BIconTrash v-on:click="onDelete(inverter.id)" />
+                                        <BIconTrash v-on:click="onDeleteModal(inverter)" />
                                     </a>&nbsp;
                                     <a href="#" class="icon" title="Edit inverter">
                                         <BIconPencil v-on:click="onEdit(inverter)" />
@@ -104,7 +104,8 @@
                                         :aria-describedby="`inverter-maxDescription_${index} inverter-maxHelpText_${index}`" />
                                     <span class="input-group-text" :id="`inverter-maxDescription_${index}`">W</span>
                                 </div>
-                                <div :id="`inverter-maxHelpText_${index}`" class="form-text">This value is used to calculate the Irradiation.</div>
+                                <div :id="`inverter-maxHelpText_${index}`" class="form-text">This value is used to
+                                    calculate the Irradiation.</div>
                             </div>
                         </form>
 
@@ -114,6 +115,27 @@
                             data-bs-dismiss="modal">Cancel</button>
                         <button type="button" class="btn btn-primary" @click="onEditSubmit(editId)">Save
                             changes</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal" id="inverterDelete" tabindex="-1">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Delete Inverter</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        Are you sure you want to delete the inverter "{{ deleteInverterData.name }}" with serial number
+                        {{ deleteInverterData.serial }}?
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" @click="onDeleteCancel"
+                            data-bs-dismiss="modal">Cancel</button>
+                        <button type="button" class="btn btn-danger"
+                            @click="onDelete(deleteId.toString())">Delete</button>
                     </div>
                 </div>
             </div>
@@ -142,9 +164,12 @@ export default defineComponent({
     data() {
         return {
             modal: {} as bootstrap.Modal,
+            modalDelete: {} as bootstrap.Modal,
+            deleteId: -1,
             editId: "-1",
             inverterData: {} as Inverter,
             editInverterData: {} as Inverter,
+            deleteInverterData: {} as Inverter,
             inverters: [] as Inverter[],
             alertMessage: "",
             alertType: "info",
@@ -153,6 +178,7 @@ export default defineComponent({
     },
     mounted() {
         this.modal = new bootstrap.Modal('#inverterEdit');
+        this.modalDelete = new bootstrap.Modal('#inverterDelete');
     },
     created() {
         this.getInverters();
@@ -197,6 +223,20 @@ export default defineComponent({
             this.inverterData.serial = 0;
             this.inverterData.name = "";
         },
+        onDeleteModal(inverter: Inverter) {
+            this.modalDelete.show();
+            this.deleteInverterData.serial = inverter.serial;
+            this.deleteInverterData.name = inverter.name;
+            this.deleteInverterData.type = inverter.type;
+            this.deleteId = +inverter.id;
+        },
+        onDeleteCancel() {
+            this.deleteId = -1;
+            this.deleteInverterData.serial = 0;
+            this.deleteInverterData.name = "";
+            this.deleteInverterData.max_power = [];
+            this.modalDelete.hide();
+        },
         onDelete(id: string) {
             const formData = new FormData();
             formData.append("data", JSON.stringify({ id: id }));
@@ -220,6 +260,11 @@ export default defineComponent({
                     }
                 )
                 .then(() => { this.getInverters() });
+            this.deleteId = -1;
+            this.deleteInverterData.serial = 0;
+            this.deleteInverterData.name = "";
+            this.deleteInverterData.max_power = [];
+            this.modalDelete.hide();
         },
         onEdit(inverter: Inverter) {
             this.modal.show();
