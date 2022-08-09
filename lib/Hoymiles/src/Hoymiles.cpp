@@ -3,7 +3,6 @@
 #include "inverters/HM_2CH.h"
 #include "inverters/HM_4CH.h"
 #include <Arduino.h>
-#include <Every.h>
 
 HoymilesClass Hoymiles;
 
@@ -32,13 +31,10 @@ void HoymilesClass::loop()
                 // Fetch event log
                 iv->sendAlarmLogRequest(_radio.get());
 
-                // Fetch dev info
-                if (iv->DevInfo()->getLastUpdate() == 0) {
-                    EVERY_N_MINUTES(10)
-                    {
-                        Serial.println(F("Request device info"));
-                        iv->sendDevInfoRequest(_radio.get());
-                    }
+                // Fetch dev info (but first fetch stats)
+                if (iv->Statistics()->getLastUpdate() > 0 && iv->DevInfo()->getLastUpdate() == 0) {
+                    Serial.println(F("Request device info"));
+                    iv->sendDevInfoRequest(_radio.get());
                 }
             }
 
