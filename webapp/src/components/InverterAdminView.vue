@@ -59,10 +59,10 @@
                                     {{ inverter.type }}
                                 </td>
                                 <td>
-                                    <a href="#" class="icon">
+                                    <a href="#" class="icon text-danger" title="Delete inverter">
                                         <BIconTrash v-on:click="onDelete(inverter.id)" />
-                                    </a>
-                                    <a href="#" class="icon">
+                                    </a>&nbsp;
+                                    <a href="#" class="icon" title="Edit inverter">
                                         <BIconPencil v-on:click="onEdit(inverter)" />
                                     </a>
                                 </td>
