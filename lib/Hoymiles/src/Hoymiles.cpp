@@ -66,7 +66,7 @@ std::shared_ptr<InverterAbstract> HoymilesClass::addInverter(const char* name, u
 
 std::shared_ptr<InverterAbstract> HoymilesClass::getInverterByPos(uint8_t pos)
 {
-    if (pos > _inverters.size()) {
+    if (pos >= _inverters.size()) {
         return nullptr;
     } else {
         return _inverters[pos];
