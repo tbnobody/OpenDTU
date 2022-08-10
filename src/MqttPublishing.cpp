@@ -14,7 +14,7 @@ void MqttPublishingClass::init()
 
 void MqttPublishingClass::loop()
 {
-    if (!MqttSettings.getConnected() && Hoymiles.getRadio()->isIdle()) {
+    if (!MqttSettings.getConnected() || !Hoymiles.getRadio()->isIdle()) {
         return;
     }
 
