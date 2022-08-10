@@ -40,16 +40,22 @@ void MqttPublishingClass::loop()
 
             if (inv->DevInfo()->getLastUpdate() > 0) {
                 // Bootloader Version
-                MqttSettings.publish(subtopic + "/firmware/bootloaderversion", String(inv->DevInfo()->getFwBootloaderVersion()));
+                MqttSettings.publish(subtopic + "/device/bootloaderversion", String(inv->DevInfo()->getFwBootloaderVersion()));
 
                 // Firmware Version
-                MqttSettings.publish(subtopic + "/firmware/buildversion", String(inv->DevInfo()->getFwBuildVersion()));
+                MqttSettings.publish(subtopic + "/device/fwbuildversion", String(inv->DevInfo()->getFwBuildVersion()));
 
                 // Firmware Build DateTime
                 char timebuffer[32];
                 const time_t t = inv->DevInfo()->getFwBuildDateTime();
                 std::strftime(buffer, sizeof(buffer), "%Y-%m-%d %H:%M:%S", gmtime(&t));
-                MqttSettings.publish(subtopic + "/firmware/builddatetime", String(buffer));
+                MqttSettings.publish(subtopic + "/device/fwbuilddatetime", String(buffer));
+
+                // Hardware part number
+                MqttSettings.publish(subtopic + "/device/hwpartnumber", String(inv->DevInfo()->getHwPartNumber()));
+
+                // Hardware version
+                MqttSettings.publish(subtopic + "/device/hwversion", String(inv->DevInfo()->getHwVersion()));
             }
 
             uint32_t lastUpdate = inv->Statistics()->getLastUpdate();
