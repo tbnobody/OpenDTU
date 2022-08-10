@@ -19,7 +19,7 @@ private:
     uint32_t _lastPublishStats[INV_MAX_COUNT];
     uint32_t _lastPublish;
 
-    uint8_t _publishFields[13] = {
+    uint8_t _publishFields[14] = {
         FLD_UDC,
         FLD_IDC,
         FLD_PDC,
@@ -32,7 +32,8 @@ private:
         FLD_T,
         FLD_PCT,
         FLD_EFF,
-        FLD_IRR
+        FLD_IRR,
+        FLD_PRA
     };
 };
 

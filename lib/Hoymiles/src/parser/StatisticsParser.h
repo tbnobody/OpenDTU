@@ -15,9 +15,10 @@ enum {
     UNIT_HZ,
     UNIT_C,
     UNIT_PCT,
+    UNIT_VA,
     UNIT_CNT
 };
-const char* const units[] = { "V", "A", "W", "Wh", "kWh", "Hz", "°C", "%", "" };
+const char* const units[] = { "V", "A", "W", "Wh", "kWh", "Hz", "°C", "%", "var", "" };
 
 // field types
 enum {
@@ -34,10 +35,11 @@ enum {
     FLD_PCT,
     FLD_EFF,
     FLD_IRR,
+    FLD_PRA,
     FLD_EVT_LOG
 };
 const char* const fields[] = { "Voltage", "Current", "Power", "YieldDay", "YieldTotal",
-    "Voltage", "Current", "Power", "Frequency", "Temperature", "PowerFactor", "Efficiency", "Irradiation", "EventLogCount" };
+    "Voltage", "Current", "Power", "Frequency", "Temperature", "PowerFactor", "Efficiency", "Irradiation", "ReactivePower", "EventLogCount" };
 
 // indices to calculation functions, defined in hmInverter.h
 enum {

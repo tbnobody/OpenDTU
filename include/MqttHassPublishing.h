@@ -15,9 +15,10 @@ enum {
     DEVICE_CLS_VOLTAGE,
     DEVICE_CLS_FREQ,
     DEVICE_CLS_TEMP,
-    DEVICE_CLS_POWER_FACTOR
+    DEVICE_CLS_POWER_FACTOR,
+    DEVICE_CLS_REACTIVE_POWER
 };
-const char* const deviceClasses[] = { 0, "current", "energy", "power", "voltage", "frequency", "temperature", "power_factor" };
+const char* const deviceClasses[] = { 0, "current", "energy", "power", "voltage", "frequency", "temperature", "power_factor", "reactive_power" };
 enum {
     STATE_CLS_NONE = 0,
     STATE_CLS_MEASUREMENT,
@@ -44,7 +45,8 @@ const byteAssign_fieldDeviceClass_t deviceFieldAssignment[] = {
     { FLD_T, DEVICE_CLS_TEMP, STATE_CLS_MEASUREMENT },
     { FLD_PCT, DEVICE_CLS_POWER_FACTOR, STATE_CLS_MEASUREMENT },
     { FLD_EFF, DEVICE_CLS_NONE, STATE_CLS_NONE },
-    { FLD_IRR, DEVICE_CLS_NONE, STATE_CLS_NONE }
+    { FLD_IRR, DEVICE_CLS_NONE, STATE_CLS_NONE },
+    { FLD_PRA, DEVICE_CLS_REACTIVE_POWER, STATE_CLS_MEASUREMENT }
 };
 #define DEVICE_CLS_ASSIGN_LIST_LEN (sizeof(deviceFieldAssignment) / sizeof(byteAssign_fieldDeviceClass_t))
 

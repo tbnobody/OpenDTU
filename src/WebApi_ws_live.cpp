@@ -100,6 +100,7 @@ void WebApiWsLiveClass::generateJsonResponse(JsonVariant& root)
             addField(root, i, inv, c, FLD_F);
             addField(root, i, inv, c, FLD_T);
             addField(root, i, inv, c, FLD_PCT);
+            addField(root, i, inv, c, FLD_PRA);
             addField(root, i, inv, c, FLD_EFF);
             addField(root, i, inv, c, FLD_IRR);
         }
