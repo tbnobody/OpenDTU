@@ -49,7 +49,7 @@
                         <div class="row mb-3">
                             <label for="inputHostname" class="col-sm-2 col-form-label">Hostname:</label>
                             <div class="col-sm-10">
-                                <input type="text" class="form-control" id="inputHostname" maxlength="32"
+                                <input type="text" class="form-control" id="inputHostname" maxlength="128"
                                     placeholder="Hostname or IP address" v-model="mqttConfigList.mqtt_hostname" />
                             </div>
                         </div>

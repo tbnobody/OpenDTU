@@ -147,6 +147,10 @@ void ConfigurationClass::migrate()
         strlcpy(config.Mqtt_RootCaCert, MQTT_ROOT_CA_CERT, sizeof(config.Mqtt_RootCaCert));
     }
 
+    if (config.Cfg_Version < 0x00011400) {
+        strlcpy(config.Mqtt_Hostname, config.Mqtt_Hostname_Short, sizeof(config.Mqtt_Hostname_Short));
+    }
+
     config.Cfg_Version = CONFIG_VERSION;
     write();
 }

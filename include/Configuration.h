@@ -4,7 +4,7 @@
 #include <Arduino.h>
 
 #define CONFIG_FILENAME "/config.bin"
-#define CONFIG_VERSION 0x00011300 // 0.1.19 // make sure to clean all after change
+#define CONFIG_VERSION 0x00011400 // 0.1.20 // make sure to clean all after change
 
 #define WIFI_MAX_SSID_STRLEN 31
 #define WIFI_MAX_PASSWORD_STRLEN 64
@@ -14,7 +14,8 @@
 #define NTP_MAX_TIMEZONE_STRLEN 50
 #define NTP_MAX_TIMEZONEDESCR_STRLEN 50
 
-#define MQTT_MAX_HOSTNAME_STRLEN 31
+#define MQTT_MAX_HOSTNAME_OLD_STRLEN 31
+#define MQTT_MAX_HOSTNAME_STRLEN 128
 #define MQTT_MAX_USERNAME_STRLEN 32
 #define MQTT_MAX_PASSWORD_STRLEN 32
 #define MQTT_MAX_TOPIC_STRLEN 32
@@ -50,7 +51,7 @@ struct CONFIG_T {
     char Ntp_TimezoneDescr[NTP_MAX_TIMEZONEDESCR_STRLEN + 1];
 
     bool Mqtt_Enabled;
-    char Mqtt_Hostname[MQTT_MAX_HOSTNAME_STRLEN + 1];
+    char Mqtt_Hostname_Short[MQTT_MAX_HOSTNAME_OLD_STRLEN + 1]; // Deprecated but for config compatibility
     uint Mqtt_Port;
     char Mqtt_Username[MQTT_MAX_USERNAME_STRLEN + 1];
     char Mqtt_Password[MQTT_MAX_PASSWORD_STRLEN + 1];
@@ -73,6 +74,8 @@ struct CONFIG_T {
     bool Mqtt_Hass_IndividualPanels;
     bool Mqtt_Tls;
     char Mqtt_RootCaCert[MQTT_MAX_ROOT_CA_CERT_STRLEN + 1];
+
+    char Mqtt_Hostname[MQTT_MAX_HOSTNAME_STRLEN + 1];
 };
 
 class ConfigurationClass {
