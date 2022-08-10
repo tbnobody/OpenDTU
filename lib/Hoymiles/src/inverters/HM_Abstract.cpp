@@ -2,6 +2,7 @@
 #include "HoymilesRadio.h"
 #include "commands/AlarmDataCommand.h"
 #include "commands/DevInfoAllCommand.h"
+#include "commands/DevInfoSampleCommand.h"
 #include "commands/RealTimeRunDataCommand.h"
 
 HM_Abstract::HM_Abstract(uint64_t serial)
@@ -59,9 +60,13 @@ bool HM_Abstract::sendDevInfoRequest(HoymilesRadio* radio)
     time_t now;
     time(&now);
 
-    DevInfoAllCommand* cmd = radio->enqueCommand<DevInfoAllCommand>();
-    cmd->setTime(now);
-    cmd->setTargetAddress(serial());
+    DevInfoAllCommand* cmdAll = radio->enqueCommand<DevInfoAllCommand>();
+    cmdAll->setTime(now);
+    cmdAll->setTargetAddress(serial());
+
+    DevInfoSampleCommand* cmdSample = radio->enqueCommand<DevInfoSampleCommand>();
+    cmdSample->setTime(now);
+    cmdSample->setTargetAddress(serial());
 
     return true;
 }

@@ -1,44 +1,98 @@
 #include "DevInfoParser.h"
 #include <cstring>
 
-void DevInfoParser::clearBuffer()
+void DevInfoParser::clearBufferAll()
 {
-    memset(_payloadDevInfo, 0, DEV_INFO_SIZE);
-    _devInfoLength = 0;
+    memset(_payloadDevInfoAll, 0, DEV_INFO_SIZE);
+    _devInfoAllLength = 0;
 }
 
-void DevInfoParser::appendFragment(uint8_t offset, uint8_t* payload, uint8_t len)
+void DevInfoParser::appendFragmentAll(uint8_t offset, uint8_t* payload, uint8_t len)
 {
     if (offset + len > DEV_INFO_SIZE) {
-        Serial.printf("FATAL: (%s, %d) dev info packet too large for buffer\n", __FILE__, __LINE__);
+        Serial.printf("FATAL: (%s, %d) dev info all packet too large for buffer\n", __FILE__, __LINE__);
         return;
     }
-    memcpy(&_payloadDevInfo[offset], payload, len);
-    _devInfoLength += len;
+    memcpy(&_payloadDevInfoAll[offset], payload, len);
+    _devInfoAllLength += len;
+}
+
+void DevInfoParser::clearBufferSample()
+{
+    memset(_payloadDevInfoSample, 0, DEV_INFO_SIZE);
+    _devInfoSampleLength = 0;
+}
+
+void DevInfoParser::appendFragmentSample(uint8_t offset, uint8_t* payload, uint8_t len)
+{
+    if (offset + len > DEV_INFO_SIZE) {
+        Serial.printf("FATAL: (%s, %d) dev info Sample packet too large for buffer\n", __FILE__, __LINE__);
+        return;
+    }
+    memcpy(&_payloadDevInfoSample[offset], payload, len);
+    _devInfoSampleLength += len;
+}
+
+uint32_t DevInfoParser::getLastUpdateAll()
+{
+    return _lastUpdateAll;
+}
+
+void DevInfoParser::setLastUpdateAll(uint32_t lastUpdate)
+{
+    _lastUpdateAll = lastUpdate;
+    setLastUpdate(lastUpdate);
+}
+
+uint32_t DevInfoParser::getLastUpdateSample()
+{
+    return _lastUpdateSample;
+}
+
+void DevInfoParser::setLastUpdateSample(uint32_t lastUpdate)
+{
+    _lastUpdateSample = lastUpdate;
+    setLastUpdate(lastUpdate);
 }
 
 uint16_t DevInfoParser::getFwBuildVersion()
 {
-    return (((uint16_t)_payloadDevInfo[0]) << 8) | _payloadDevInfo[1];
+    return (((uint16_t)_payloadDevInfoAll[0]) << 8) | _payloadDevInfoAll[1];
 }
 
 time_t DevInfoParser::getFwBuildDateTime()
 {
     struct tm timeinfo = { 0 };
-    timeinfo.tm_year = ((((uint16_t)_payloadDevInfo[2]) << 8) | _payloadDevInfo[3]) - 1900;
+    timeinfo.tm_year = ((((uint16_t)_payloadDevInfoAll[2]) << 8) | _payloadDevInfoAll[3]) - 1900;
 
-    timeinfo.tm_mon = ((((uint16_t)_payloadDevInfo[4]) << 8) | _payloadDevInfo[5]) / 100 - 1;
-    timeinfo.tm_mday = ((((uint16_t)_payloadDevInfo[4]) << 8) | _payloadDevInfo[5]) % 100;
+    timeinfo.tm_mon = ((((uint16_t)_payloadDevInfoAll[4]) << 8) | _payloadDevInfoAll[5]) / 100 - 1;
+    timeinfo.tm_mday = ((((uint16_t)_payloadDevInfoAll[4]) << 8) | _payloadDevInfoAll[5]) % 100;
 
-    timeinfo.tm_hour = ((((uint16_t)_payloadDevInfo[6]) << 8) | _payloadDevInfo[7]) / 100;
-    timeinfo.tm_min = ((((uint16_t)_payloadDevInfo[6]) << 8) | _payloadDevInfo[7]) % 100;
+    timeinfo.tm_hour = ((((uint16_t)_payloadDevInfoAll[6]) << 8) | _payloadDevInfoAll[7]) / 100;
+    timeinfo.tm_min = ((((uint16_t)_payloadDevInfoAll[6]) << 8) | _payloadDevInfoAll[7]) % 100;
 
     return timegm(&timeinfo);
 }
 
 uint16_t DevInfoParser::getFwBootloaderVersion()
 {
-    return (((uint16_t)_payloadDevInfo[8]) << 8) | _payloadDevInfo[9];
+    return (((uint16_t)_payloadDevInfoAll[8]) << 8) | _payloadDevInfoAll[9];
+}
+
+uint32_t DevInfoParser::getHwPartNumber()
+{
+    uint16_t hwpn_h;
+    uint16_t hwpn_l;
+
+    hwpn_h = (((uint16_t)_payloadDevInfoSample[2]) << 8) | _payloadDevInfoSample[3];
+    hwpn_l = (((uint16_t)_payloadDevInfoSample[4]) << 8) | _payloadDevInfoSample[5];
+
+    return ((uint32_t)hwpn_h << 16) | ((uint32_t)hwpn_l);
+}
+
+uint16_t DevInfoParser::getHwVersion()
+{
+    return (((uint16_t)_payloadDevInfoSample[6]) << 8) | _payloadDevInfoSample[7];
 }
 
 /* struct tm to seconds since Unix epoch */
