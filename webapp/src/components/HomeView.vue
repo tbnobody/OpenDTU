@@ -38,24 +38,34 @@
                                 {{ inverter.serial }}) (Data Age:
                                 {{ inverter.data_age }} seconds)
 
-                                <button v-if="inverter.events >= 0" type="button"
-                                    class="btn btn-sm btn-secondary position-relative"
-                                    @click="onShowEventlog(inverter.serial)"
-                                    title="Show Eventlog">
-                                    <BIconJournalText style="font-size:24px;" />
-                                    <span
-                                        class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
-                                        {{ inverter.events }}
-                                        <span class="visually-hidden">unread messages</span>
-                                    </span>
-                                </button>
+                                <div class="btn-toolbar" role="toolbar">
+                                    <div class="btn-group me-2" role="group">
+                                        <button type="button" class="btn btn-sm btn-info"
+                                            @click="onShowDevInfo(inverter.serial)" title="Show Inverter Info">
+                                            <BIconCpu style="font-size:24px;" />
+
+                                        </button>
+                                    </div>
+
+                                    <div class="btn-group" role="group">
+                                        <button v-if="inverter.events >= 0" type="button"
+                                            class="btn btn-sm btn-secondary position-relative"
+                                            @click="onShowEventlog(inverter.serial)" title="Show Eventlog">
+                                            <BIconJournalText style="font-size:24px;" />
+                                            <span
+                                                class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                                                {{ inverter.events }}
+                                                <span class="visually-hidden">unread messages</span>
+                                            </span>
+                                        </button>
+                                    </div>
+                                </div>
                             </div>
                             <div class="card-body">
                                 <div class="row flex-row-reverse flex-wrap-reverse align-items-end g-3">
                                     <template v-for="channel in 5" :key="channel">
                                         <div v-if="inverter[channel - 1]" :class="`col order-${5 - channel}`">
-                                            <InverterChannelInfo
-                                                :channelData="inverter[channel - 1]"
+                                            <InverterChannelInfo :channelData="inverter[channel - 1]"
                                                 :channelNumber="channel - 1" />
                                         </div>
                                     </template>
@@ -93,6 +103,31 @@
             </div>
         </div>
 
+        <div class="modal" id="devInfoView" tabindex="-1">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Inverter Info</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="text-center" v-if="devInfoLoading">
+                            <div class="spinner-border" role="status">
+                                <span class="visually-hidden">Loading...</span>
+                            </div>
+                        </div>
+
+                        <DevInfo v-if="!devInfoLoading" :devInfoList="devInfoList" />
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" @click="onHideDevInfo"
+                            data-bs-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
     </div>
 </template>
 
@@ -101,6 +136,7 @@ import { defineComponent } from 'vue';
 import InverterChannelInfo from "@/components/partials/InverterChannelInfo.vue";
 import * as bootstrap from 'bootstrap';
 import EventLog from '@/components/partials/EventLog.vue';
+import DevInfo from '@/components/partials/DevInfo.vue';
 
 declare interface Inverter {
     serial: number,
@@ -113,7 +149,8 @@ declare interface Inverter {
 export default defineComponent({
     components: {
         InverterChannelInfo,
-        EventLog
+        EventLog,
+        DevInfo
     },
     data() {
         return {
@@ -125,7 +162,10 @@ export default defineComponent({
             isFirstFetchAfterConnect: true,
             eventLogView: {} as bootstrap.Modal,
             eventLogList: {},
-            eventLogLoading: true
+            eventLogLoading: true,
+            devInfoView: {} as bootstrap.Modal,
+            devInfoList: {},
+            devInfoLoading: true
         };
     },
     created() {
@@ -135,6 +175,7 @@ export default defineComponent({
     },
     mounted() {
         this.eventLogView = new bootstrap.Modal('#eventView');
+        this.devInfoView = new bootstrap.Modal('#devInfoView');
     },
     unmounted() {
         this.closeSocket();
@@ -227,6 +268,20 @@ export default defineComponent({
                 });
 
             this.eventLogView.show();
+        },
+        onHideDevInfo() {
+            this.devInfoView.hide();
+        },
+        onShowDevInfo(serial: number) {
+            this.devInfoLoading = true;
+            fetch("/api/devinfo/status")
+                .then((response) => response.json())
+                .then((data) => {
+                    this.devInfoList = data[serial][0];
+                    this.devInfoLoading = false;
+                });
+
+            this.devInfoView.show();
         },
     },
 });

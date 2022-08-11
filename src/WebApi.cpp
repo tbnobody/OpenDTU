@@ -19,6 +19,7 @@ void WebApiClass::init()
 
     _server.addHandler(&_events);
 
+    _webApiDevInfo.init(&_server);
     _webApiDtu.init(&_server);
     _webApiEventlog.init(&_server);
     _webApiFirmware.init(&_server);
@@ -35,6 +36,7 @@ void WebApiClass::init()
 
 void WebApiClass::loop()
 {
+    _webApiDevInfo.loop();
     _webApiDtu.loop();
     _webApiEventlog.loop();
     _webApiFirmware.loop();
