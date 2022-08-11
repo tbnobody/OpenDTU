@@ -28,8 +28,9 @@ void MqttVedirectPublishingClass::loop()
         String key;
         String value;
         bool bChanged;
+        unsigned long now = millis();
 
-        while ( Serial2.available() ) {
+        while ( Serial2.available() && ((millis() - now) < 500)) {
             _myve.rxData(Serial2.read());
         }
         yield();
