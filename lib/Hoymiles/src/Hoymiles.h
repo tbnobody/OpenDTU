@@ -4,7 +4,7 @@
 #include "inverters/InverterAbstract.h"
 #include "types.h"
 #include <SPI.h>
-#include <memory>
+#include "mp_memory.h"
 #include <vector>
 
 #define HOY_SYSTEM_CONFIG_PARA_POLL_INTERVAL (10 * 60 * 1000) // 10 minutes

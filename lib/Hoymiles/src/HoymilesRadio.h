@@ -5,7 +5,7 @@
 #include "commands/CommandAbstract.h"
 #include "types.h"
 #include <RF24.h>
-#include <memory>
+#include "mp_memory.h"
 #include <nRF24L01.h>
 #include "mp_queue.h"
 
