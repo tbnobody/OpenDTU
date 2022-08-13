@@ -5,7 +5,7 @@
 #include "types.h"
 #include <SPI.h>
 #include "mp_memory.h"
-#include <vector>
+#include "mp_vector.h"
 
 #define HOY_SYSTEM_CONFIG_PARA_POLL_INTERVAL (10 * 60 * 1000) // 10 minutes
 
