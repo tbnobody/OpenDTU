@@ -19,6 +19,7 @@ It was the goal to replace the original Hoymiles DTU (Telemetry Gateway) with th
 ## Features for end users
 * Read live data from inverter
 * Show inverters internal event log
+* Show inverter information like firmware version, firmware build date, hardware revision and hardware version
 * Uses ESP32 microcontroller and NRF24L01+
 * Multi-Inverter support
 * MQTT support (with TLS)
