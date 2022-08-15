@@ -41,6 +41,8 @@ char MODULE[] = "VE.Frame";	// Victron seems to use this to find out where loggi
 // The name of the record that contains the checksum.
 static constexpr char checksumTagName[] = "CHECKSUM";
 
+VeDirectFrameHandler VeDirect;
+
 VeDirectFrameHandler::VeDirectFrameHandler() :
 	//mStop(false),	// don't know what Victron uses this for, not using
 	veName(),
@@ -53,6 +55,25 @@ VeDirectFrameHandler::VeDirectFrameHandler() :
   	tempName(),
 	tempValue()
 {
+}
+
+void VeDirectFrameHandler::init()
+{
+    Serial2.begin(19200, SERIAL_8N1, VICTRON_PIN_RX, VICTRON_PIN_TX);
+    Serial2.flush();
+}
+
+void VeDirectFrameHandler::loop()
+{
+	unsigned long now = millis();
+
+	while ( Serial2.available()) {
+		if ((millis() - now) > 500) {
+			now = millis();
+			yield();
+		}
+		rxData(Serial2.read());
+	}
 }
 
 /*

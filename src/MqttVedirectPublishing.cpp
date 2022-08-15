@@ -2,9 +2,10 @@
 /*
  * Copyright (C) 2022 Helge Erbe and others
  */
-#include "MqttVedirectPublishing.h"
 #include "VeDirectFrameHandler.h"
+#include "MqttVedirectPublishing.h"
 #include "MqttSettings.h"
+
 
 
 
@@ -12,15 +13,13 @@ MqttVedirectPublishingClass MqttVedirectPublishing;
 
 void MqttVedirectPublishingClass::init()
 {
-    Serial2.begin(19200, SERIAL_8N1, VICTRON_PIN_RX, VICTRON_PIN_TX);
-    Serial2.flush();
 }
 
 void MqttVedirectPublishingClass::loop()
 {
     CONFIG_T& config = Configuration.get();
 
-    if (!MqttSettings.getConnected() && !config.Vedirect_Enabled) {
+    if (!MqttSettings.getConnected() || !config.Vedirect_Enabled) {
         return;
     }    
 
@@ -28,27 +27,12 @@ void MqttVedirectPublishingClass::loop()
         String key;
         String value;
         bool bChanged;
-        unsigned long now = millis();
-
-        while ( Serial2.available()) {
-            if ((millis() - now) > 100) {
-                now = millis();
-                yield();
-            }
-            _myve.rxData(Serial2.read());
-        }
-        yield();
 
         String topic = "";
-        for ( int i = 0; i < _myve.veEnd; i++ ) {
-            key = _myve.veName[i];
-            value = _myve.veValue[i];
+        for ( int i = 0; i < VeDirect.veEnd; i++ ) {
+            key = VeDirect.veName[i];
+            value = VeDirect.veValue[i];
             
-            // just for debug
-            Serial.print(key.c_str());
-            Serial.print("= ");
-            Serial.println(value.c_str()); 
-
             // Add new key, value pairs to map and update changed values.
             // Mark changed values
             auto a = _kv_map.find(key);

@@ -4,6 +4,7 @@
  */
 #include "Configuration.h"
 #include "Hoymiles.h"
+#include "VeDirectFrameHandler.h"
 #include "MqttHassPublishing.h"
 #include "MqttPublishing.h"
 #include "MqttVedirectPublishing.h"
@@ -98,6 +99,11 @@ void setup()
         }
     }
     Serial.println(F("done"));
+
+    // Initialize ve.direct communication
+    Serial.print(F("Initialize ve.direct interface... "));
+    VeDirect.init();
+    Serial.println(F("done"));
 }
 
 void loop()
@@ -106,10 +112,16 @@ void loop()
     yield();
     Hoymiles.loop();
     yield();
+    if (Configuration.get().Vedirect_Enabled) {
+        VeDirect.loop();
+        yield();
+    }
     MqttPublishing.loop();
     yield();
-    MqttVedirectPublishing.loop();
-    yield();
+    if (Configuration.get().Vedirect_Enabled) {
+        MqttVedirectPublishing.loop();
+        yield();
+    }
     MqttHassPublishing.loop();
     yield();
     WebApi.loop();

@@ -7,9 +7,7 @@
  * 2021.02.23 - 0.3 - change frameLen to 22 per VE.Direct Protocol version 3.30
  * 
  */
-
-#ifndef FRAMEHANDLER_H_
-#define FRAMEHANDLER_H_
+#pragma once
 
 #include <Arduino.h>
 
@@ -18,12 +16,21 @@ const byte nameLen = 9;                         // VE.Direct Protocol: max name 
 const byte valueLen = 33;                       // VE.Direct Protocol: max value size is 33 including /0
 const byte buffLen = 40;                        // Maximum number of lines possible from the device. Current protocol shows this to be the BMV700 at 33 lines.
 
+#ifndef VICTRON_PIN_TX
+#define VICTRON_PIN_TX 21
+#endif
+
+#ifndef VICTRON_PIN_RX
+#define VICTRON_PIN_RX 22
+#endif
 
 class VeDirectFrameHandler {
 
 public:
+
     VeDirectFrameHandler();
-    void rxData(uint8_t inbyte);                // byte of serial data to be passed by the application
+    void init();
+    void loop();
 
     char veName[buffLen][nameLen] = { };        // public buffer for received names
     char veValue[buffLen][valueLen] = { };      // public buffer for received values
@@ -54,10 +61,12 @@ private:
     char tempName[frameLen][nameLen];           // private buffer for received names
     char tempValue[frameLen][valueLen];         // private buffer for received values
 
+    void rxData(uint8_t inbyte);                // byte of serial data to be passed by the application
     void textRxEvent(char *, char *);
     void frameEndEvent(bool);
     void logE(const char *, const char *);
     bool hexRxEvent(uint8_t);
 };
 
-#endif // FRAMEHANDLER_H_
+extern VeDirectFrameHandler VeDirect;
+

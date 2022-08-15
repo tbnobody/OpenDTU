@@ -20,7 +20,6 @@ public:
     void loop();
 private:
     std::map<String, String> _kv_map;
-    VeDirectFrameHandler _myve;
     uint32_t _lastPublish;
 };
 
