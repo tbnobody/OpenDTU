@@ -7,6 +7,7 @@
 #include "AsyncJson.h"
 #include "Configuration.h"
 #include "Hoymiles.h"
+#include <Esp.h>
 
 void WebApiDtuClass::init(AsyncWebServer* server)
 {
@@ -132,7 +133,6 @@ void WebApiDtuClass::onDtuAdminRestartPost(AsyncWebServerRequest* request)
 
     response->setLength();
     request->send(response);
-
-    resetFunc();
+    ESP.restart();
 }
 

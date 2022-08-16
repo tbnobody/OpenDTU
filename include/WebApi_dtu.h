@@ -12,6 +12,5 @@ private:
     void onDtuAdminGet(AsyncWebServerRequest* request);
     void onDtuAdminPost(AsyncWebServerRequest* request);
     void onDtuAdminRestartPost(AsyncWebServerRequest* request);
-    void(* resetFunc) (void) = 0;
     AsyncWebServer* _server;
 };
