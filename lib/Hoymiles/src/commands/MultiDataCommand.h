@@ -2,7 +2,7 @@
 
 #include "CommandAbstract.h"
 #include "RequestFrameCommand.h"
-#include <sys/time.h>
+#include <time.h>
 
 class MultiDataCommand : public CommandAbstract {
 public:

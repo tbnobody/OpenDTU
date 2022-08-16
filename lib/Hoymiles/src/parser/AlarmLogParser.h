@@ -2,6 +2,7 @@
 #include "Parser.h"
 #include <cstdint>
 #include <WString.h>
+#include <time.h>
 
 #define ALARM_LOG_ENTRY_COUNT 15
 #define ALARM_LOG_ENTRY_SIZE 12

@@ -1,5 +1,6 @@
 #pragma once
 #include "Parser.h"
+#include <time.h>
 
 #define DEV_INFO_SIZE 20
 
