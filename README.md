@@ -59,6 +59,7 @@ This can be achieved by editing the 'platformio.ini' file and add/change one or 
 ```
 
 ## Flashing and starting up
+### with Visual Studio Code
 * Install [Visual Studio Code](https://code.visualstudio.com/download)
 * In Visual Studio Code, install the [PlatformIO Extension](https://marketplace.visualstudio.com/items?itemName=platformio.platformio-ide)
 * Clone this repository (you really have to clone it, don't just download the ZIP file. During the build process the git hash gets embedded into the firmware. If you download the ZIP file a build error will occur)
@@ -67,6 +68,17 @@ This can be achieved by editing the 'platformio.ini' file and add/change one or 
     * upload_port
     * monitor_port
 * Select the arrow button in the status bar (PlatformIO: Upload) to compile and upload the firmware. During the compilation, all required libraries are downloaded automatically.
+### on the commandline with PlatformIO Core
+* Install [PlatformIO Core](https://platformio.org/install/cli)
+* Clone this repository (you really have to clone it, don't just download the ZIP file. During the build process the git hash gets embedded into the firmware. If you download the ZIP file a build error will occur)
+* Adjust the COM port in the file "platformio.ini". It occurs twice:
+    * upload_port
+    * monitor_port
+* build: `platformio run -e generic`
+* upload to esp module: `platformio run -e generic -t upload`
+* other options:
+  * clean the sources:  `platformio run -e generic -t clean`
+  * erase flash: `platformio run -e generic -t erase`
 
 ## First configuration
 * After the initial flashing of the microcontroller, an Access Point called "OpenDTU-*" is opened. The default password is "openDTU42".
@@ -81,10 +93,12 @@ This can be achieved by editing the 'platformio.ini' file and add/change one or 
 * Building the WebApp
     * The WebApp can be build using yarn
     ```
+    $ cd webapp
     $ yarn install
     $ yarn build
     ```
     * The updated output is placed in the 'webapp_dist' directory
+    * It is only necessary to build the webapp when you made changes to it
 
 * Building the microcontroller firmware
     * Visual Studio Code with the PlatformIO Extension is required for building
