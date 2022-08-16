@@ -129,7 +129,7 @@ void WebApiDtuClass::onDtuAdminRestartPost(AsyncWebServerRequest* request)
     JsonObject retMsg = response->getRoot();
 
     retMsg[F("type")] = F("success");
-    retMsg[F("message")] = F("Settings saved!");
+    retMsg[F("message")] = F("restarting!");
 
     response->setLength();
     request->send(response);
