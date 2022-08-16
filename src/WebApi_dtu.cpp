@@ -16,6 +16,7 @@ void WebApiDtuClass::init(AsyncWebServer* server)
 
     _server->on("/api/dtu/config", HTTP_GET, std::bind(&WebApiDtuClass::onDtuAdminGet, this, _1));
     _server->on("/api/dtu/config", HTTP_POST, std::bind(&WebApiDtuClass::onDtuAdminPost, this, _1));
+    _server->on("/api/dtu/restart", HTTP_POST, std::bind(&WebApiDtuClass::onDtuAdminRestartPost, this, _1));
 }
 
 void WebApiDtuClass::loop()
@@ -119,3 +120,19 @@ void WebApiDtuClass::onDtuAdminPost(AsyncWebServerRequest* request)
     Hoymiles.getRadio()->setDtuSerial(config.Dtu_Serial);
     Hoymiles.setPollInterval(config.Dtu_PollInterval);
 }
+
+
+void WebApiDtuClass::onDtuAdminRestartPost(AsyncWebServerRequest* request)
+{
+    AsyncJsonResponse* response = new AsyncJsonResponse();
+    JsonObject retMsg = response->getRoot();
+
+    retMsg[F("type")] = F("success");
+    retMsg[F("message")] = F("Settings saved!");
+
+    response->setLength();
+    request->send(response);
+
+    resetFunc();
+}
+
