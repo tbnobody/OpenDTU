@@ -63,16 +63,27 @@ void VeDirectFrameHandler::init()
     Serial2.flush();
 }
 
+void VeDirectFrameHandler::setPollInterval(uint32_t interval)
+{
+    _pollInterval = interval;
+}
+
 void VeDirectFrameHandler::loop()
 {
 	unsigned long now = millis();
 
-	while ( Serial2.available()) {
-		if ((millis() - now) > 500) {
-			now = millis();
-			yield();
+	 if (millis() - _lastPoll > (_pollInterval * 1000)) {
+		Serial.print(F("Start polling ve.direct interface... "));
+
+		while ( Serial2.available()) {
+			if ((millis() - now) > 500) {
+				now = millis();
+				yield();
+			}
+			rxData(Serial2.read());
 		}
-		rxData(Serial2.read());
+		_lastPoll = millis();
+		Serial.println(F("done"));
 	}
 }
 

@@ -30,6 +30,7 @@ public:
 
     VeDirectFrameHandler();
     void init();
+    void setPollInterval(uint32_t interval);
     void loop();
     uint32_t getLastUpdate();
     void setLastUpdate();
@@ -74,6 +75,8 @@ private:
     void logE(const char *, const char *);
     bool hexRxEvent(uint8_t);
     uint32_t _lastUpdate = 0;
+    uint32_t _pollInterval;
+    uint32_t _lastPoll = 0;
 };
 
 extern VeDirectFrameHandler VeDirect;

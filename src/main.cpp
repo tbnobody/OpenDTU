@@ -103,6 +103,7 @@ void setup()
     // Initialize ve.direct communication
     Serial.print(F("Initialize ve.direct interface... "));
     VeDirect.init();
+    VeDirect.setPollInterval(config.Vedirect_PollInterval);
     Serial.println(F("done"));
 }
 

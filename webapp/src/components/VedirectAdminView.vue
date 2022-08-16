@@ -18,11 +18,22 @@
                     <div class="card-header text-white bg-primary">Ve.direct Configuration</div>
                     <div class="card-body">
                         <div class="row mb-3">
-                            <label class="col-sm-4 form-check-label" for="inputVedirect">Enable Ve.direct</label>
-                            <div class="col-sm-8">
+                            <label class="col-sm-2 form-check-label" for="inputVedirect">Enable Ve.direct</label>
+                            <div class="col-sm-10">
                                 <div class="form-check form-switch">
                                     <input class="form-check-input" type="checkbox" id="inputVedirect"
                                         v-model="vedirectConfigList.vedirect_enabled" />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row mb-3" v-show="vedirectConfigList.vedirect_enabled">
+                            <label for="inputPollInterval" class="col-sm-2 col-form-label">Poll Interval:</label>
+                            <div class="col-sm-10">
+                                <div class="input-group">
+                                    <input type="number" class="form-control" id="inputPollInterval" min="1" max="86400"
+                                        placeholder="Poll Interval in Seconds" v-model="vedirectConfigList.vedirect_pollinterval"
+                                        aria-describedby="pollIntervalDescription" />
+                                    <span class="input-group-text" id="pollIntervalDescription">seconds</span>
                                 </div>
                             </div>
                         </div>
@@ -57,6 +68,7 @@ export default defineComponent({
             dataLoading: true,
             vedirectConfigList: {
                 vedirect_enabled: false,
+                vedirect_pollinterval: 0,
                 vedirect_updatesonly: true,
             },
             alertMessage: "",

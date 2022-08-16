@@ -59,6 +59,7 @@ void ConfigurationClass::init()
 
     config.Vedirect_Enabled = VEDIRECT_ENABLED;
     config.Vedirect_UpdatesOnly = VEDIRECT_UPDATESONLY;
+    config.Vedirect_PollInterval = VEDIRECT_POLL_INTERVAL;
 }
 
 bool ConfigurationClass::write()
@@ -150,6 +151,7 @@ void ConfigurationClass::migrate()
         strlcpy(config.Mqtt_RootCaCert, MQTT_ROOT_CA_CERT, sizeof(config.Mqtt_RootCaCert));
         config.Vedirect_Enabled = VEDIRECT_ENABLED;
         config.Vedirect_UpdatesOnly = VEDIRECT_UPDATESONLY;
+        config.Vedirect_PollInterval = VEDIRECT_POLL_INTERVAL;
     }
 
     if (config.Cfg_Version < 0x00011400) {

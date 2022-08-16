@@ -105,6 +105,8 @@ void WebApiWsVedirectLiveClass::generateJsonResponse(JsonVariant& root)
             root[F(VeDirect.veName[i])] = VeDirect.veValue[i];
         }
     }
+    root[F("data_age")] = (millis() - VeDirect.getLastUpdate() ) / 1000;
+    root[F("age_critical")] = ((millis() - VeDirect.getLastUpdate()) / 1000) > Configuration.get().Vedirect_PollInterval * 5;
 
     if (VeDirect.getLastUpdate() > _newestVedirectTimestamp) {
         _newestVedirectTimestamp = VeDirect.getLastUpdate();
