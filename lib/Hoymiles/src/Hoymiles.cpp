@@ -49,7 +49,7 @@ void HoymilesClass::loop()
 
 std::shared_ptr<InverterAbstract> HoymilesClass::addInverter(const char* name, uint64_t serial)
 {
-    std::shared_ptr<InverterAbstract> i;
+    std::shared_ptr<InverterAbstract> i = nullptr;
     if (HM_4CH::isValidSerial(serial)) {
         i = std::make_shared<HM_4CH>(serial);
     } else if (HM_2CH::isValidSerial(serial)) {

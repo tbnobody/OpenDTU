@@ -141,8 +141,10 @@ void WebApiInverterClass::onInverterAdd(AsyncWebServerRequest* request)
 
     auto inv = Hoymiles.addInverter(inverter->Name, inverter->Serial);
 
-    for (uint8_t c = 0; c < INV_MAX_CHAN_COUNT; c++) {
-        inv->Statistics()->setChannelMaxPower(c, inverter->MaxChannelPower[c]);
+    if (inv != nullptr) {
+        for (uint8_t c = 0; c < INV_MAX_CHAN_COUNT; c++) {
+            inv->Statistics()->setChannelMaxPower(c, inverter->MaxChannelPower[c]);
+        }
     }
 
     MqttHassPublishing.forceUpdate();
@@ -243,14 +245,18 @@ void WebApiInverterClass::onInverterEdit(AsyncWebServerRequest* request)
 
     std::shared_ptr<InverterAbstract> inv = Hoymiles.getInverterByPos(root[F("id")].as<uint64_t>());
 
-    if (inv->serial() != inverter.Serial) {
+    if (inv != nullptr && inv->serial() != inverter.Serial) {
         // Serial was changed
         Hoymiles.removeInverterByPos(root[F("id")].as<uint64_t>());
         inv = Hoymiles.addInverter(inverter.Name, inverter.Serial);
+    } else if (inv == nullptr) {
+        inv = Hoymiles.addInverter(inverter.Name, inverter.Serial);
     }
 
-    for (uint8_t c = 0; c < INV_MAX_CHAN_COUNT; c++) {
-        inv->Statistics()->setChannelMaxPower(c, inverter.MaxChannelPower[c]);
+    if (inv != nullptr) {
+        for (uint8_t c = 0; c < INV_MAX_CHAN_COUNT; c++) {
+            inv->Statistics()->setChannelMaxPower(c, inverter.MaxChannelPower[c]);
+        }
     }
 
     MqttHassPublishing.forceUpdate();

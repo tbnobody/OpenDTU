@@ -100,8 +100,10 @@ void setup()
                 config.Inverter[i].Name,
                 config.Inverter[i].Serial);
 
-            for (uint8_t c = 0; c < INV_MAX_CHAN_COUNT; c++) {
-                inv->Statistics()->setChannelMaxPower(c, config.Inverter[i].MaxChannelPower[c]);
+            if (inv != nullptr) {
+                for (uint8_t c = 0; c < INV_MAX_CHAN_COUNT; c++) {
+                    inv->Statistics()->setChannelMaxPower(c, config.Inverter[i].MaxChannelPower[c]);
+                }
             }
             Serial.println(F(" done"));
         }
