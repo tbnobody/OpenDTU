@@ -12,6 +12,7 @@
 #include "WebApi_sysstatus.h"
 #include "WebApi_webapp.h"
 #include "WebApi_ws_live.h"
+#include "WebApi_ws_vedirect_live.h"
 #include "WebApi_vedirect.h"
 #include <ESPAsyncWebServer.h>
 
@@ -36,6 +37,7 @@ private:
     WebApiSysstatusClass _webApiSysstatus;
     WebApiWebappClass _webApiWebapp;
     WebApiWsLiveClass _webApiWsLive;
+    WebApiWsVedirectLiveClass _webApiWsVedirectLive;
     WebApiVedirectClass _webApiVedirect;
 };
 

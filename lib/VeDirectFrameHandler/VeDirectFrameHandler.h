@@ -31,6 +31,13 @@ public:
     VeDirectFrameHandler();
     void init();
     void loop();
+    uint32_t getLastUpdate();
+    void setLastUpdate();
+    String getPidAsString(const char* pid);
+    String getCsAsString(const char* pid);
+    String getErrAsString(const char* err);
+    String getOrAsString(const char* offReason);
+    String getMpptAsString(const char* mppt);
 
     char veName[buffLen][nameLen] = { };        // public buffer for received names
     char veValue[buffLen][valueLen] = { };      // public buffer for received values
@@ -66,6 +73,7 @@ private:
     void frameEndEvent(bool);
     void logE(const char *, const char *);
     bool hexRxEvent(uint8_t);
+    uint32_t _lastUpdate = 0;
 };
 
 extern VeDirectFrameHandler VeDirect;
