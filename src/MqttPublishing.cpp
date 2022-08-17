@@ -48,8 +48,8 @@ void MqttPublishingClass::loop()
                 // Firmware Build DateTime
                 char timebuffer[32];
                 const time_t t = inv->DevInfo()->getFwBuildDateTime();
-                std::strftime(buffer, sizeof(buffer), "%Y-%m-%d %H:%M:%S", gmtime(&t));
-                MqttSettings.publish(subtopic + "/device/fwbuilddatetime", String(buffer));
+                std::strftime(timebuffer, sizeof(timebuffer), "%Y-%m-%d %H:%M:%S", gmtime(&t));
+                MqttSettings.publish(subtopic + "/device/fwbuilddatetime", String(timebuffer));
 
                 // Hardware part number
                 MqttSettings.publish(subtopic + "/device/hwpartnumber", String(inv->DevInfo()->getHwPartNumber()));
