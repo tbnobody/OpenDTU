@@ -72,9 +72,7 @@ void VeDirectFrameHandler::loop()
 {
 	unsigned long now = millis();
 
-	 if (millis() - _lastPoll > (_pollInterval * 1000)) {
-		Serial.print(F("Start polling ve.direct interface... "));
-
+	 if (millis() - getLastUpdate() > (_pollInterval * 1000)) {
 		while ( Serial2.available()) {
 			if ((millis() - now) > 500) {
 				now = millis();
@@ -82,8 +80,6 @@ void VeDirectFrameHandler::loop()
 			}
 			rxData(Serial2.read());
 		}
-		_lastPoll = millis();
-		Serial.println(F("done"));
 	}
 }
 
@@ -244,7 +240,7 @@ bool VeDirectFrameHandler::hexRxEvent(uint8_t inbyte) {
 
 uint32_t VeDirectFrameHandler::getLastUpdate()
 {
-    return _lastUpdate;
+    return _lastPoll;
 }
 
 /*
@@ -253,7 +249,7 @@ uint32_t VeDirectFrameHandler::getLastUpdate()
  */
 void VeDirectFrameHandler::setLastUpdate()
 {
-    _lastUpdate = millis();
+    _lastPoll = millis();
 }
 
 /*

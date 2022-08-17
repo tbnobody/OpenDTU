@@ -74,7 +74,6 @@ private:
     void frameEndEvent(bool);
     void logE(const char *, const char *);
     bool hexRxEvent(uint8_t);
-    uint32_t _lastUpdate = 0;
     uint32_t _pollInterval;
     uint32_t _lastPoll = 0;
 };
