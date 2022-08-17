@@ -72,6 +72,9 @@ void WebApiWsVedirectLiveClass::generateJsonResponse(JsonVariant& root)
         if(strcmp(VeDirect.veName[i], "PID") == 0) {
             root[F(VeDirect.veName[i])] = VeDirect.getPidAsString(VeDirect.veValue[i]);
         }
+        else if(strcmp(VeDirect.veName[i], "SER#") == 0) {
+            root[F("SER")] = VeDirect.veValue[i];
+        } 
         else if(strcmp(VeDirect.veName[i], "CS") == 0) {
             root[F(VeDirect.veName[i])] = VeDirect.getCsAsString(VeDirect.veValue[i]);
         } 
