@@ -65,6 +65,9 @@ void WebApiWsVedirectLiveClass::loop()
 
 void WebApiWsVedirectLiveClass::generateJsonResponse(JsonVariant& root)
 {
+    root[F("data_age")] = (millis() - VeDirect.getLastUpdate() ) / 1000;
+    root[F("age_critical")] = ((millis() - VeDirect.getLastUpdate()) / 1000) > Configuration.get().Vedirect_PollInterval * 5;
+
     for ( int i = 0; i < VeDirect.veEnd; i++ ) {
         if(strcmp(VeDirect.veName[i], "PID") == 0) {
             root[F(VeDirect.veName[i])] = VeDirect.getPidAsString(VeDirect.veValue[i]);
@@ -105,9 +108,6 @@ void WebApiWsVedirectLiveClass::generateJsonResponse(JsonVariant& root)
             root[F(VeDirect.veName[i])] = VeDirect.veValue[i];
         }
     }
-    root[F("data_age")] = (millis() - VeDirect.getLastUpdate() ) / 1000;
-    root[F("age_critical")] = ((millis() - VeDirect.getLastUpdate()) / 1000) > Configuration.get().Vedirect_PollInterval * 5;
-    root[F("poll_intervall")] = Configuration.get().Vedirect_PollInterval;
 
     if (VeDirect.getLastUpdate() > _newestVedirectTimestamp) {
         _newestVedirectTimestamp = VeDirect.getLastUpdate();
