@@ -76,6 +76,7 @@ private:
     bool hexRxEvent(uint8_t);
     uint32_t _pollInterval;
     uint32_t _lastPoll = 0;
+    bool _frameEnd = false;
 };
 
 extern VeDirectFrameHandler VeDirect;

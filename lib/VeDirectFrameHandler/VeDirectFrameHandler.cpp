@@ -71,9 +71,10 @@ void VeDirectFrameHandler::setPollInterval(uint32_t interval)
 void VeDirectFrameHandler::loop()
 {
 	unsigned long now = millis();
+	_frameEnd = false;
 
 	 if ((millis() - getLastUpdate()) > (_pollInterval * 1000)) {
-		while ( Serial2.available() && (getLastUpdate() < now)) {
+		while ( Serial2.available() && (!_frameEnd) && (millis() - now < 500)) {
 			rxData(Serial2.read());
 		}
 	}
@@ -212,6 +213,7 @@ void VeDirectFrameHandler::frameEndEvent(bool valid) {
 		setLastUpdate();
 	}
 	frameIndex = 0;	// reset frame
+	_frameEnd = true;
 }
 
 /*
