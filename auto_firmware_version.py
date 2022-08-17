@@ -16,7 +16,10 @@ if missing_pkgs:
 from dulwich import porcelain
 
 def get_firmware_specifier_build_flag():
-    build_version = porcelain.describe('.')  # '.' refers to the repository root dir
+    try:
+        build_version = porcelain.describe('.')  # '.' refers to the repository root dir
+    except:
+        build_version = "g0000000"
     build_flag = "-D AUTO_GIT_HASH=\\\"" + build_version + "\\\""
     print ("Firmware Revision: " + build_version)
     return (build_flag)

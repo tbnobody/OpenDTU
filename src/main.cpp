@@ -83,19 +83,32 @@ void setup()
     Serial.print(F("Initialize Hoymiles interface... "));
     CONFIG_T& config = Configuration.get();
     Hoymiles.init();
+
+    Serial.println(F("  Setting radio PA level... "));
     Hoymiles.getRadio()->setPALevel((rf24_pa_dbm_e)config.Dtu_PaLevel);
+
+    Serial.println(F("  Setting DTU serial... "));
     Hoymiles.getRadio()->setDtuSerial(config.Dtu_Serial);
+
+    Serial.println(F("  Setting poll interval... "));
     Hoymiles.setPollInterval(config.Dtu_PollInterval);
 
     for (uint8_t i = 0; i < INV_MAX_COUNT; i++) {
         if (config.Inverter[i].Serial > 0) {
+            Serial.print(F("  Adding inverter: "));
+            Serial.print(config.Inverter[i].Serial, HEX);
+            Serial.print(F(" - "));
+            Serial.print(config.Inverter[i].Name);
             auto inv = Hoymiles.addInverter(
                 config.Inverter[i].Name,
                 config.Inverter[i].Serial);
 
-            for (uint8_t c = 0; c < INV_MAX_CHAN_COUNT; c++) {
-                inv->Statistics()->setChannelMaxPower(c, config.Inverter[i].MaxChannelPower[c]);
+            if (inv != nullptr) {
+                for (uint8_t c = 0; c < INV_MAX_CHAN_COUNT; c++) {
+                    inv->Statistics()->setChannelMaxPower(c, config.Inverter[i].MaxChannelPower[c]);
+                }
             }
+            Serial.println(F(" done"));
         }
     }
     Serial.println(F("done"));
