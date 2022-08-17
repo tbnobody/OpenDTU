@@ -72,7 +72,7 @@ void VeDirectFrameHandler::loop()
 {
 	unsigned long now = millis();
 
-	 if (millis() - getLastUpdate() > (_pollInterval * 1000)) {
+	 if ((millis() - getLastUpdate()) > (_pollInterval * 1000)) {
 		while ( Serial2.available()) {
 			if ((millis() - now) > 500) {
 				now = millis();
