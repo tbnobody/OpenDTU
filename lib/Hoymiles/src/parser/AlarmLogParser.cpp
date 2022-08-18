@@ -1,5 +1,6 @@
 #include "AlarmLogParser.h"
 #include <cstring>
+#include <HardwareSerial.h>
 
 void AlarmLogParser::clearBuffer()
 {

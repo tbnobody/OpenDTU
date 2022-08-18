@@ -1,7 +1,7 @@
 #pragma once
 #include "Parser.h"
 #include <cstdint>
-#include <Arduino.h>
+#include <WString.h>
 
 #define ALARM_LOG_ENTRY_COUNT 15
 #define ALARM_LOG_ENTRY_SIZE 12

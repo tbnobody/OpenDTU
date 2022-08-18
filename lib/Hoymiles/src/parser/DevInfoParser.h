@@ -1,6 +1,5 @@
 #pragma once
 #include "Parser.h"
-#include <Arduino.h>
 
 #define DEV_INFO_SIZE 20
 
