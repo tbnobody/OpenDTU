@@ -1,6 +1,7 @@
 #pragma once
 
 #include "InverterAbstract.h"
+#include "commands/MultiDataCommand.h"
 #include "Clock.h"
 
 class HM_Abstract : public InverterAbstract {
@@ -14,4 +15,5 @@ public:
 private:
     uint8_t _lastAlarmLogCnt = 0;
     Clock* _clock;
+    void setCmdTimeAndSerial(MultiDataCommand* cmd, time_t* now);
 };

@@ -1,6 +1,8 @@
 
 #include <time.h>
 #include "Clock_Impl.h"
+#include <stdexcept>
+#include <Arduino.h>
 
 int Clock_Impl::getTimezoneOffset()
 {
@@ -17,4 +19,15 @@ int Clock_Impl::getTimezoneOffset()
     gmt = mktime(ptm);
 
     return static_cast<int>(difftime(rawtime, gmt));
+}
+
+bool Clock_Impl::getNow(time_t* nowPtr)
+{
+    struct tm timeinfo;
+    if (!getLocalTime(&timeinfo)) {
+        return false;
+    }
+
+    time(nowPtr);
+    return true;
 }

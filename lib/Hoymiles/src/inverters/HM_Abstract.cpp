@@ -11,25 +11,20 @@ HM_Abstract::HM_Abstract(uint64_t serial, Clock* clock)
 
 bool HM_Abstract::sendStatsRequest(HoymilesRadio* radio)
 {
-    struct tm timeinfo;
-    if (!getLocalTime(&timeinfo, 0)) {
+    time_t now;
+    if (!_clock->getNow(&now)) {
         return false;
     }
 
-    time_t now;
-    time(&now);
-
     RealTimeRunDataCommand* cmd = radio->enqueCommand<RealTimeRunDataCommand>();
-    cmd->setTime(now);
-    cmd->setTargetAddress(serial());
-
+    setCmdTimeAndSerial(cmd, &now);
     return true;
 }
 
 bool HM_Abstract::sendAlarmLogRequest(HoymilesRadio* radio)
 {
-    struct tm timeinfo;
-    if (!getLocalTime(&timeinfo, 0)) {
+    time_t now;
+    if (!_clock->getNow(&now)) {
         return false;
     }
 
@@ -41,50 +36,42 @@ bool HM_Abstract::sendAlarmLogRequest(HoymilesRadio* radio)
 
     _lastAlarmLogCnt = (uint8_t)Statistics()->getChannelFieldValue(CH0, FLD_EVT_LOG);
 
-    time_t now;
-    time(&now);
-
     AlarmDataCommand* cmd = radio->enqueCommand<AlarmDataCommand>();
-    cmd->setTime(now);
-    cmd->setTargetAddress(serial());
-
+    setCmdTimeAndSerial(cmd, &now);
     return true;
 }
 
 bool HM_Abstract::sendDevInfoRequest(HoymilesRadio* radio)
 {
-    struct tm timeinfo;
-    if (!getLocalTime(&timeinfo, 0)) {
+    time_t now;
+    if (!_clock->getNow(&now)) {
         return false;
     }
 
-    time_t now;
-    time(&now);
-
     DevInfoAllCommand* cmdAll = radio->enqueCommand<DevInfoAllCommand>();
-    cmdAll->setTime(now);
-    cmdAll->setTargetAddress(serial());
+    setCmdTimeAndSerial(cmdAll, &now);
 
     DevInfoSampleCommand* cmdSample = radio->enqueCommand<DevInfoSampleCommand>();
-    cmdSample->setTime(now);
-    cmdSample->setTargetAddress(serial());
+    setCmdTimeAndSerial(cmdSample, &now);
 
     return true;
 }
 
 bool HM_Abstract::sendSystemConfigParaRequest(HoymilesRadio* radio)
 {
-    struct tm timeinfo;
-    if (!getLocalTime(&timeinfo, 0)) {
+    time_t now;
+    if (!_clock->getNow(&now)) {
         return false;
     }
 
-    time_t now;
-    time(&now);
-
     SystemConfigParaCommand* cmd = radio->enqueCommand<SystemConfigParaCommand>();
-    cmd->setTime(now);
-    cmd->setTargetAddress(serial());
+    setCmdTimeAndSerial(cmd, &now);
 
     return true;
+}
+
+void HM_Abstract::setCmdTimeAndSerial(MultiDataCommand* cmd, time_t* now)
+{
+    cmd->setTime(*now);
+    cmd->setTargetAddress(serial());
 }
