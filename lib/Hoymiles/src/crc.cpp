@@ -1,6 +1,6 @@
 #include "crc.h"
 
-uint8_t crc8(uint8_t buf[], uint8_t len)
+uint8_t crc8(const uint8_t buf[], uint8_t len)
 {
     uint8_t crc = CRC8_INIT;
     for (uint8_t i = 0; i < len; i++) {
@@ -12,10 +12,10 @@ uint8_t crc8(uint8_t buf[], uint8_t len)
     return crc;
 }
 
-uint16_t crc16(uint8_t buf[], uint8_t len, uint16_t start)
+uint16_t crc16(const uint8_t buf[], uint8_t len, uint16_t start)
 {
     uint16_t crc = start;
-    uint8_t shift = 0;
+    uint8_t shift;
 
     for (uint8_t i = 0; i < len; i++) {
         crc = crc ^ buf[i];
@@ -29,7 +29,7 @@ uint16_t crc16(uint8_t buf[], uint8_t len, uint16_t start)
     return crc;
 }
 
-uint16_t crc16nrf24(uint8_t buf[], uint16_t lenBits, uint16_t startBit, uint16_t crcIn)
+uint16_t crc16nrf24(const uint8_t buf[], uint16_t lenBits, uint16_t startBit, uint16_t crcIn)
 {
     uint16_t crc = crcIn;
     uint8_t idx, val = buf[(startBit >> 3)];

@@ -6,9 +6,9 @@ class HM_2CH : public HM_Abstract {
 public:
     HM_2CH(uint64_t serial);
     static bool isValidSerial(uint64_t serial);
-    String typeName();
-    const byteAssign_t* getByteAssignment();
-    const uint8_t getAssignmentCount();
+    String typeName() override;
+    const byteAssign_t* getByteAssignment() override;
+    const uint8_t getAssignmentCount() override;
 
 private:
     const byteAssign_t byteAssignment[23] = {

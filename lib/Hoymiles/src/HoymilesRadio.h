@@ -75,12 +75,12 @@ private:
     std::unique_ptr<SPIClass> _hspi;
     std::unique_ptr<RF24> _radio;
     uint8_t _rxChLst[5] = { 3, 23, 40, 61, 75 };
-    uint8_t _rxChIdx;
+    uint8_t _rxChIdx = 0;
 
     uint8_t _txChLst[5] = { 3, 23, 40, 61, 75 };
-    uint8_t _txChIdx;
+    uint8_t _txChIdx = 0;
 
-    volatile bool _packetReceived;
+    volatile bool _packetReceived = false;
 
     CircularBuffer<fragment_t, FRAGMENT_BUFFER_SIZE> _rxBuffer;
     TimeoutHelper _rxTimeout;

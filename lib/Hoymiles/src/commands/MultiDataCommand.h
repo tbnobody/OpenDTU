@@ -11,9 +11,9 @@ public:
     void setTime(time_t time);
     time_t getTime();
 
-    CommandAbstract* getRequestFrameCommand(uint8_t frame_no);
+    CommandAbstract* getRequestFrameCommand(uint8_t frame_no) override;
 
-    virtual bool handleResponse(InverterAbstract* inverter, fragment_t fragment[], uint8_t max_fragment_id);
+    virtual bool handleResponse(InverterAbstract* inverter, fragment_t fragment[], uint8_t max_fragment_id) override;
 
 protected:
     void setDataType(uint8_t data_type);
