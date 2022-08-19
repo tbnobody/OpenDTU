@@ -13,6 +13,7 @@
 #include "defaults.h"
 #include <Arduino.h>
 #include <LittleFS.h>
+#include "Clock_Impl.h"
 
 void setup()
 {
@@ -79,7 +80,8 @@ void setup()
     // Initialize inverter communication
     Serial.print(F("Initialize Hoymiles interface... "));
     const CONFIG_T& config = Configuration.get();
-    Hoymiles.init();
+    Clock_Impl clock;
+    Hoymiles.init(&clock);
 
     Serial.println(F("  Setting radio PA level... "));
     Hoymiles.getRadio()->setPALevel((rf24_pa_dbm_e)config.Dtu_PaLevel);

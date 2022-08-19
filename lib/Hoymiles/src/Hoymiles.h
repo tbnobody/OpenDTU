@@ -6,12 +6,13 @@
 #include <SPI.h>
 #include "mp_memory.h"
 #include "mp_vector.h"
+#include "Clock.h"
 
 #define HOY_SYSTEM_CONFIG_PARA_POLL_INTERVAL ((uint32_t) 10 * 60 * 1000) // 10 minutes
 
 class HoymilesClass {
 public:
-    void init();
+    void init(Clock* clock);
     void loop();
 
     std::shared_ptr<InverterAbstract> addInverter(const char* name, uint64_t serial);
@@ -30,6 +31,7 @@ private:
     std::vector<std::shared_ptr<InverterAbstract>> _inverters;
     std::unique_ptr<HoymilesRadio> _radio;
 
+    Clock* _clock;
     uint32_t _pollInterval = 0;
     uint32_t _lastPoll = 0;
 };

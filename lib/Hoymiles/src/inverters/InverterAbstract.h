@@ -8,6 +8,7 @@
 #include "types.h"
 #include <Arduino.h>
 #include <cstdint>
+#include "Clock.h"
 
 #define MAX_NAME_LENGTH 32
 
@@ -25,7 +26,7 @@ class CommandAbstract;
 
 class InverterAbstract {
 public:
-    explicit InverterAbstract(uint64_t serial);
+    explicit InverterAbstract(uint64_t serial, Clock* clock);
     void init();
     uint64_t serial();
     void setName(const char* name);
@@ -51,6 +52,7 @@ public:
 private:
     serial_u _serial;
     char _name[MAX_NAME_LENGTH] = "";
+    Clock* _clock;
     fragment_t _rxFragmentBuffer[MAX_RF_FRAGMENT_COUNT];
     uint8_t _rxFragmentMaxPacketId = 0;
     uint8_t _rxFragmentLastPacketId = 0;

@@ -6,8 +6,8 @@
 #include "commands/RealTimeRunDataCommand.h"
 #include "commands/SystemConfigParaCommand.h"
 
-HM_Abstract::HM_Abstract(uint64_t serial)
-    : InverterAbstract(serial) {};
+HM_Abstract::HM_Abstract(uint64_t serial, Clock* clock)
+    : InverterAbstract(serial, clock) {};
 
 bool HM_Abstract::sendStatsRequest(HoymilesRadio* radio)
 {

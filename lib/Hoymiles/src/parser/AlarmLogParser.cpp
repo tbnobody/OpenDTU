@@ -2,6 +2,11 @@
 #include <cstring>
 #include <HardwareSerial.h>
 
+AlarmLogParser::AlarmLogParser(Clock* clock) 
+{
+    _clock = clock;
+}
+
 void AlarmLogParser::clearBuffer()
 {
     memset(_payloadAlarmLog, 0, ALARM_LOG_ENTRY_COUNT * ALARM_LOG_ENTRY_SIZE);
@@ -27,7 +32,7 @@ void AlarmLogParser::getLogEntry(uint8_t entryId, AlarmLogEntry_t* entry)
 {
     uint8_t entryStartOffset = 2 + entryId * ALARM_LOG_ENTRY_SIZE;
 
-    int timezoneOffset = getTimezoneOffset();
+    int timezoneOffset = _clock->getTimezoneOffset();
 
     uint32_t wcode = (uint16_t)_payloadAlarmLog[entryStartOffset] << 8 | _payloadAlarmLog[entryStartOffset + 1];
     uint32_t startTimeOffset = 0;
@@ -257,21 +262,4 @@ void AlarmLogParser::getLogEntry(uint8_t entryId, AlarmLogEntry_t* entry)
         entry->Message = String(F("Unknown"));
         break;
     }
-}
-
-int AlarmLogParser::getTimezoneOffset()
-{
-    // see: https://stackoverflow.com/questions/13804095/get-the-time-zone-gmt-offset-in-c/44063597#44063597
-
-    time_t gmt, rawtime = time(NULL);
-    struct tm* ptm;
-
-    struct tm gbuf;
-    ptm = gmtime_r(&rawtime, &gbuf);
-
-    // Request that mktime() looksup dst in timezone database
-    ptm->tm_isdst = -1;
-    gmt = mktime(ptm);
-
-    return static_cast<int>(difftime(rawtime, gmt));
 }

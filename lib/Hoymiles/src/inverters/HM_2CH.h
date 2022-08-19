@@ -4,7 +4,7 @@
 
 class HM_2CH : public HM_Abstract {
 public:
-    explicit HM_2CH(uint64_t serial);
+    explicit HM_2CH(uint64_t serial, Clock* clock);
     static bool isValidSerial(uint64_t serial);
     String typeName();
     const byteAssign_t* getByteAssignment();
@@ -38,4 +38,5 @@ private:
         { FLD_PDC, UNIT_W, CH0, CALC_PDC_CH0, 0, CMD_CALC },
         { FLD_EFF, UNIT_PCT, CH0, CALC_EFF_CH0, 0, CMD_CALC }
     };
+    Clock* _clock;
 };
