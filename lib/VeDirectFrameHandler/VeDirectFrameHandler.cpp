@@ -41,6 +41,8 @@ char MODULE[] = "VE.Frame";	// Victron seems to use this to find out where loggi
 // The name of the record that contains the checksum.
 static constexpr char checksumTagName[] = "CHECKSUM";
 
+HardwareSerial VedirectSerial(1);
+
 VeDirectFrameHandler VeDirect;
 
 VeDirectFrameHandler::VeDirectFrameHandler() :
@@ -51,32 +53,35 @@ VeDirectFrameHandler::VeDirectFrameHandler() :
 	veEnd(0),
 	mState(IDLE),
 	mChecksum(0),
-	mTextPointer(0),
+	idx(0),
   	tempName(),
-	tempValue()
+	tempValue(),
+	_pollInterval(5),
+	_lastPoll(0)
 {
 }
 
 void VeDirectFrameHandler::init()
 {
-    Serial2.begin(19200, SERIAL_8N1, VICTRON_PIN_RX, VICTRON_PIN_TX);
-    Serial2.flush();
+    VedirectSerial.begin(19200, SERIAL_8N1, VICTRON_PIN_RX, VICTRON_PIN_TX);
+    VedirectSerial.flush();
 }
 
-void VeDirectFrameHandler::setPollInterval(uint32_t interval)
+void VeDirectFrameHandler::setPollInterval(unsigned long interval)
 {
     _pollInterval = interval;
 }
 
 void VeDirectFrameHandler::loop()
 {
-	unsigned long now = millis();
-	_frameEnd = false;
+	polltime = _pollInterval;
 
-	 if ((millis() - getLastUpdate()) > (_pollInterval * 1000)) {
-		while ( Serial2.available() && (!_frameEnd) && (millis() - now < 500)) {
-			rxData(Serial2.read());
-		}
+	if ((millis() - getLastUpdate()) < _pollInterval * 1000) {
+		return;
+	}
+	
+	while ( VedirectSerial.available()) {
+		rxData(VedirectSerial.read());
 	}
 }
 
@@ -109,8 +114,8 @@ void VeDirectFrameHandler::rxData(uint8_t inbyte)
 		}
 		break;
 	case RECORD_BEGIN:
-		mTextPointer = mName;
-		*mTextPointer++ = inbyte;
+	    idx = 0;
+		mName[idx++] = inbyte;
 		mState = RECORD_NAME;
 		break;
 	case RECORD_NAME:
@@ -118,20 +123,20 @@ void VeDirectFrameHandler::rxData(uint8_t inbyte)
 		switch(inbyte) {
 		case '\t':
 			// the Checksum record indicates a EOR
-			if ( mTextPointer < (mName + sizeof(mName)) ) {
-				*mTextPointer = 0; /* Zero terminate */
+			if ( idx < sizeof(mName) ) {
+				mName[idx] = 0; /* Zero terminate */
 				if (strcmp(mName, checksumTagName) == 0) {
 					mState = CHECKSUM;
 					break;
 				}
 			}
-			mTextPointer = mValue; /* Reset value pointer */
+			idx = 0; /* Reset value pointer */
 			mState = RECORD_VALUE;
 			break;
 		default:
 			// add byte to name, but do no overflow
-			if ( mTextPointer < (mName + sizeof(mName)) )
-				*mTextPointer++ = inbyte;
+			if ( idx < sizeof(mName) )
+				mName[idx++] = inbyte;
 			break;
 		}
 		break;
@@ -140,8 +145,8 @@ void VeDirectFrameHandler::rxData(uint8_t inbyte)
 		switch(inbyte) {
 		case '\n':
 			// forward record, only if it could be stored completely
-			if ( mTextPointer < (mValue + sizeof(mValue)) ) {
-				*mTextPointer = 0; // make zero ended
+			if ( idx < sizeof(mValue) ) {
+				mValue[idx] = 0; // make zero ended
 				textRxEvent(mName, mValue);
 			}
 			mState = RECORD_BEGIN;
@@ -150,8 +155,8 @@ void VeDirectFrameHandler::rxData(uint8_t inbyte)
 			break;
 		default:
 			// add byte to value, but do no overflow
-			if ( mTextPointer < (mValue + sizeof(mValue)) )
-				*mTextPointer++ = inbyte;
+			if ( idx < sizeof(mValue) )
+				mValue[idx++] = inbyte;
 			break;
 		}
 		break;
@@ -213,7 +218,6 @@ void VeDirectFrameHandler::frameEndEvent(bool valid) {
 		setLastUpdate();
 	}
 	frameIndex = 0;	// reset frame
-	_frameEnd = true;
 }
 
 /*
@@ -236,7 +240,7 @@ bool VeDirectFrameHandler::hexRxEvent(uint8_t inbyte) {
 	return true;		// stubbed out for future
 }
 
-uint32_t VeDirectFrameHandler::getLastUpdate()
+unsigned long VeDirectFrameHandler::getLastUpdate()
 {
     return _lastPoll;
 }

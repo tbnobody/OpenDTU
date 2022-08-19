@@ -24,15 +24,17 @@ const byte buffLen = 40;                        // Maximum number of lines possi
 #define VICTRON_PIN_RX 22
 #endif
 
+
+
 class VeDirectFrameHandler {
 
 public:
 
     VeDirectFrameHandler();
     void init();
-    void setPollInterval(uint32_t interval);
+    void setPollInterval(unsigned long interval);
     void loop();
-    uint32_t getLastUpdate();
+    unsigned long getLastUpdate();
     void setLastUpdate();
     String getPidAsString(const char* pid);
     String getCsAsString(const char* pid);
@@ -45,6 +47,7 @@ public:
 
     int frameIndex;                             // which line of the frame are we on
     int veEnd;                                  // current size (end) of the public buffer
+    unsigned long polltime=0;
 
 private:
     //bool mStop;                               // not sure what Victron uses this for, not using
@@ -62,7 +65,7 @@ private:
 
     uint8_t	mChecksum;                          // checksum value
 
-    char * mTextPointer;                        // pointer to the private buffer we're writing to, name or value
+    int idx;                                    // index to the private buffer we're writing to, name or value
 
     char mName[9];                              // buffer for the field name
     char mValue[33];                            // buffer for the field value
@@ -74,9 +77,8 @@ private:
     void frameEndEvent(bool);
     void logE(const char *, const char *);
     bool hexRxEvent(uint8_t);
-    uint32_t _pollInterval;
-    uint32_t _lastPoll = 0;
-    bool _frameEnd = false;
+    unsigned long _pollInterval;
+    unsigned long _lastPoll;
 };
 
 extern VeDirectFrameHandler VeDirect;

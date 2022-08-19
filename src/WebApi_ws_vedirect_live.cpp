@@ -48,7 +48,7 @@ void WebApiWsVedirectLiveClass::loop()
     // Update on ve.direct change or at least after 10 seconds
     if (millis() - _lastWsPublish > (10 * 1000) || (maxTimeStamp != _newestVedirectTimestamp)) {
 
-        DynamicJsonDocument root(40960);
+        DynamicJsonDocument root(1024);
         JsonVariant var = root;
         generateJsonResponse(var);
 
@@ -111,7 +111,8 @@ void WebApiWsVedirectLiveClass::generateJsonResponse(JsonVariant& root)
             root[F(VeDirect.veName[i])] = VeDirect.veValue[i];
         }
     }
-
+     root[F("polltime")] = VeDirect.polltime;
+     root[F("VE.end")] = VeDirect.veEnd;
     if (VeDirect.getLastUpdate() > _newestVedirectTimestamp) {
         _newestVedirectTimestamp = VeDirect.getLastUpdate();
     }
@@ -132,7 +133,7 @@ void WebApiWsVedirectLiveClass::onWebsocketEvent(AsyncWebSocket* server, AsyncWe
 
 void WebApiWsVedirectLiveClass::onLivedataStatus(AsyncWebServerRequest* request)
 {
-    AsyncJsonResponse* response = new AsyncJsonResponse(false, 40960U);
+    AsyncJsonResponse* response = new AsyncJsonResponse(false, 1024U);
     JsonVariant root = response->getRoot().as<JsonVariant>();
     generateJsonResponse(root);
 
