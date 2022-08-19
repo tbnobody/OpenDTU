@@ -30,7 +30,7 @@ void WebApiDtuClass::onDtuAdminGet(AsyncWebServerRequest* request)
 
     // DTU Serial is read as HEX
     char buffer[sizeof(uint64_t) * 8 + 1];
-    sprintf(buffer, "%0lx%08lx",
+    sprintf(buffer, "%0ux%08ux",
         ((uint32_t)((config.Dtu_Serial >> 32) & 0xFFFFFFFF)),
         ((uint32_t)(config.Dtu_Serial & 0xFFFFFFFF)));
     root[F("dtu_serial")] = buffer;

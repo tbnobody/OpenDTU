@@ -30,7 +30,7 @@ void MqttPublishingClass::loop()
             auto inv = Hoymiles.getInverterByPos(i);
 
             char buffer[sizeof(uint64_t) * 8 + 1];
-            sprintf(buffer, "%0lx%08lx",
+            sprintf(buffer, "%0x%08x",
                 ((uint32_t)((inv->serial() >> 32) & 0xFFFFFFFF)),
                 ((uint32_t)(inv->serial() & 0xFFFFFFFF)));
             String subtopic = String(buffer);
@@ -94,7 +94,7 @@ String MqttPublishingClass::getTopic(std::shared_ptr<InverterAbstract> inv, uint
     }
 
     char buffer[sizeof(uint64_t) * 8 + 1];
-    sprintf(buffer, "%0lx%08lx",
+    sprintf(buffer, "%0x%08x",
         ((uint32_t)((inv->serial() >> 32) & 0xFFFFFFFF)),
         ((uint32_t)(inv->serial() & 0xFFFFFFFF)));
     String invSerial = String(buffer);
