@@ -70,6 +70,7 @@ void WebApiWsVedirectLiveClass::generateJsonResponse(JsonVariant& root)
     root[F("PID")] = VeDirect.getPidAsString(VeDirect.veMap["PID"].c_str());
     root[F("SER")] = VeDirect.veMap["SER"];
     root[F("FW")] = VeDirect.veMap["FW"];
+    root[F("LOAD")] = VeDirect.veMap["LOAD"];
     root[F("CS")] = VeDirect.getCsAsString(VeDirect.veMap["CS"].c_str());
     root[F("ERR")] = VeDirect.getErrAsString(VeDirect.veMap["ERR"].c_str());
     root[F("OR")] = VeDirect.getOrAsString(VeDirect.veMap["OR"].c_str());
