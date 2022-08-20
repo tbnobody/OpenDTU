@@ -29,9 +29,9 @@ void MqttVedirectPublishingClass::loop()
         bool bChanged;
 
         String topic = "";
-        for ( int i = 0; i < VeDirect.veEnd; i++ ) {
-            key = VeDirect.veName[i];
-            value = VeDirect.veValue[i];
+        for (auto it = VeDirect.veMap.begin(); it != VeDirect.veMap.end(); ++it) {
+            key = it->first;
+            value = it->second;
             
             // Add new key, value pairs to map and update changed values.
             // Mark changed values
@@ -54,7 +54,6 @@ void MqttVedirectPublishingClass::loop()
             if (!config.Vedirect_UpdatesOnly || (bChanged && config.Vedirect_UpdatesOnly)) {
                 topic = "victron/";
                 topic.concat(key);  
-                topic.replace("#",""); // # is a no go in mqtt topic
                 MqttSettings.publish(topic.c_str(), value.c_str()); 
             }
         }

@@ -5,23 +5,21 @@
  * 
  * 2020.05.05 - 0.2 - initial release
  * 2021.02.23 - 0.3 - change frameLen to 22 per VE.Direct Protocol version 3.30
+ * 2022.08.20 - 0.4 - changes for OpenDTU
  * 
  */
+
 #pragma once
 
 #include <Arduino.h>
-
-const byte frameLen = 22;                       // VE.Direct Protocol: max frame size is 18
-const byte nameLen = 9;                         // VE.Direct Protocol: max name size is 9 including /0
-const byte valueLen = 33;                       // VE.Direct Protocol: max value size is 33 including /0
-const byte buffLen = 40;                        // Maximum number of lines possible from the device. Current protocol shows this to be the BMV700 at 33 lines.
+#include <map>
 
 #ifndef VICTRON_PIN_TX
-#define VICTRON_PIN_TX 21
+#define VICTRON_PIN_TX 21      // HardwareSerial TX Pin
 #endif
 
 #ifndef VICTRON_PIN_RX
-#define VICTRON_PIN_RX 22
+#define VICTRON_PIN_RX 22      // HardwareSerial RX Pin
 #endif
 
 
@@ -31,25 +29,25 @@ class VeDirectFrameHandler {
 public:
 
     VeDirectFrameHandler();
-    void init();
-    void setPollInterval(unsigned long interval);
-    void loop();
-    unsigned long getLastUpdate();
-    void setLastUpdate();
-    String getPidAsString(const char* pid);
-    String getCsAsString(const char* pid);
-    String getErrAsString(const char* err);
-    String getOrAsString(const char* offReason);
-    String getMpptAsString(const char* mppt);
+    void init();                                  // initialize HardewareSerial
+    void setPollInterval(unsigned long interval); // set poll intervall in seconds
+    void loop();                                 // main loop to read ve.direct data
+    unsigned long getLastUpdate();               // timestamp of last successful frame read
+    String getPidAsString(const char* pid);      // product id as string  
+    String getCsAsString(const char* cs);        // current state as string
+    String getErrAsString(const char* err);      // errer state as string
+    String getOrAsString(const char* offReason); // off reason as string
+    String getMpptAsString(const char* mppt);    // state of mppt as string
 
-    char veName[buffLen][nameLen] = { };        // public buffer for received names
-    char veValue[buffLen][valueLen] = { };      // public buffer for received values
-
-    int frameIndex;                             // which line of the frame are we on
-    int veEnd;                                  // current size (end) of the public buffer
-    unsigned long polltime=0;
+    std::map<String, String> veMap;              // public map for received name and value pairs
 
 private:
+    void setLastUpdate();                     // set timestampt after successful frame read
+    void rxData(uint8_t inbyte);              // byte of serial data
+    void frameEndEvent(bool);                 // copy temp map to public map
+    void logE(const char *, const char *);    
+    bool hexRxEvent(uint8_t);
+
     //bool mStop;                               // not sure what Victron uses this for, not using
 
     enum States {                               // state machine
@@ -61,22 +59,11 @@ private:
         RECORD_HEX
     };
 
-    int mState;                                 // current state
-
-    uint8_t	mChecksum;                          // checksum value
-
-    int idx;                                    // index to the private buffer we're writing to, name or value
-
-    char mName[9];                              // buffer for the field name
-    char mValue[33];                            // buffer for the field value
-    char tempName[frameLen][nameLen];           // private buffer for received names
-    char tempValue[frameLen][valueLen];         // private buffer for received values
-
-    void rxData(uint8_t inbyte);                // byte of serial data to be passed by the application
-    void textRxEvent(char *, char *);
-    void frameEndEvent(bool);
-    void logE(const char *, const char *);
-    bool hexRxEvent(uint8_t);
+    int _state;                                // current state
+    uint8_t	_checksum;                         // checksum value
+    String _name;                              // buffer for the field name
+    String _value;                             // buffer for the field value
+    std::map<String, String> _tmpMap;          // private map for received name and value pairs
     unsigned long _pollInterval;
     unsigned long _lastPoll;
 };
