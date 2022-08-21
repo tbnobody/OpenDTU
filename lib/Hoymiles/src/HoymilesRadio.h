@@ -40,7 +40,7 @@
 
 class HoymilesRadio {
 public:
-    void init();
+    void init(_SPI* initialisedSpiBus);
     void loop();
     void setPALevel(rf24_pa_dbm_e paLevel);
 
@@ -70,7 +70,7 @@ private:
     bool checkFragmentCrc(fragment_t* fragment);
     void dumpBuf(const char* info, uint8_t buf[], uint8_t len);
 
-    std::unique_ptr<SPIClass> _hspi;
+    std::unique_ptr<_SPI> _spiPtr;
     std::unique_ptr<RF24> _radio;
     uint8_t _rxChLst[5] = { 3, 23, 40, 61, 75 };
     uint8_t _rxChIdx = 0;

@@ -7,11 +7,11 @@
 
 HoymilesClass Hoymiles;
 
-void HoymilesClass::init(Clock* clock)
+void HoymilesClass::init(_SPI* initialisedSpiBus, Clock* clock)
 {
     _pollInterval = 0;
     _radio.reset(new HoymilesRadio());
-    _radio->init();
+    _radio->init(initialisedSpiBus);
     _clock = clock;
 }
 

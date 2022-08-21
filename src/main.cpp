@@ -80,8 +80,10 @@ void setup()
     // Initialize inverter communication
     Serial.print(F("Initialize Hoymiles interface... "));
     const CONFIG_T& config = Configuration.get();
+    SPIClass* spiClass = new SPIClass(HSPI);
+    spiClass->begin(HOYMILES_PIN_SCLK, HOYMILES_PIN_MISO, HOYMILES_PIN_MOSI, HOYMILES_PIN_CS);
     Clock_Impl clock;
-    Hoymiles.init(&clock);
+    Hoymiles.init(spiClass, &clock);
 
     Serial.println(F("  Setting radio PA level... "));
     Hoymiles.getRadio()->setPALevel((rf24_pa_dbm_e)config.Dtu_PaLevel);

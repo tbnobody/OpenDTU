@@ -12,7 +12,7 @@
 
 class HoymilesClass {
 public:
-    void init(Clock* clock);
+    void init(_SPI* initialisedSpiBus, Clock* clock);
     void loop();
 
     std::shared_ptr<InverterAbstract> addInverter(const char* name, uint64_t serial);
