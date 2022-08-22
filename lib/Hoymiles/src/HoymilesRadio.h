@@ -9,6 +9,10 @@
 #include <nRF24L01.h>
 #include "mp_queue.h"
 
+#ifdef __AVR__
+#define ARDUINO_ISR_ATTR
+#endif
+
 // number of fragments hold in buffer
 #define FRAGMENT_BUFFER_SIZE 30
 
@@ -59,8 +63,10 @@ public:
         return static_cast<T*>(_commandQueue.back().get());
     }
 
+    volatile static bool _packetReceived;
+
 private:
-    void ARDUINO_ISR_ATTR handleIntr();
+    static void ARDUINO_ISR_ATTR handleIntr();
     static serial_u convertSerialToRadioId(serial_u serial);
     uint8_t getRxNxtChannel();
     uint8_t getTxNxtChannel();
@@ -77,8 +83,6 @@ private:
 
     uint8_t _txChLst[5] = { 3, 23, 40, 61, 75 };
     uint8_t _txChIdx = 0;
-
-    volatile bool _packetReceived = false;
 
     CircularBuffer<fragment_t, FRAGMENT_BUFFER_SIZE> _rxBuffer;
     TimeoutHelper _rxTimeout;

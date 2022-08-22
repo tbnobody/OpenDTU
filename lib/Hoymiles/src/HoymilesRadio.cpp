@@ -3,7 +3,8 @@
 #include "commands/RequestFrameCommand.h"
 #include "crc.h"
 #include <Every.h>
-#include <FunctionalInterrupt.h>
+
+volatile bool HoymilesRadio::_packetReceived = false;
 
 void HoymilesRadio::init(_SPI* initialisedSpiBus)
 {
@@ -29,7 +30,7 @@ void HoymilesRadio::init(_SPI* initialisedSpiBus)
         Serial.println(F("Connection error!!"));
     }
 
-    attachInterrupt(digitalPinToInterrupt(HOYMILES_PIN_IRQ), std::bind(&HoymilesRadio::handleIntr, this), FALLING);
+    attachInterrupt(digitalPinToInterrupt(HOYMILES_PIN_IRQ), handleIntr, FALLING);
 
     openReadingPipe();
     _radio->startListening();
@@ -180,7 +181,7 @@ void HoymilesRadio::openWritingPipe(serial_u serial)
 
 void ARDUINO_ISR_ATTR HoymilesRadio::handleIntr()
 {
-    _packetReceived = true;
+    HoymilesRadio::_packetReceived = true;
 }
 
 uint8_t HoymilesRadio::getRxNxtChannel()
