@@ -77,6 +77,8 @@
             </div>
         </template>
 
+        <VedirectView />
+
         <div class="modal" id="eventView" tabindex="-1">
             <div class="modal-dialog modal-lg">
                 <div class="modal-content">
@@ -137,6 +139,7 @@ import InverterChannelInfo from "@/components/partials/InverterChannelInfo.vue";
 import * as bootstrap from 'bootstrap';
 import EventLog from '@/components/partials/EventLog.vue';
 import DevInfo from '@/components/partials/DevInfo.vue';
+import VedirectView from '@/components/partials/VedirectView.vue';
 
 declare interface Inverter {
     serial: number,
@@ -150,7 +153,8 @@ export default defineComponent({
     components: {
         InverterChannelInfo,
         EventLog,
-        DevInfo
+        DevInfo,
+        VedirectView
     },
     data() {
         return {
