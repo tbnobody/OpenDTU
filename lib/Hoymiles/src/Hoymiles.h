@@ -7,7 +7,7 @@
 #include "mp_memory.h"
 #include "mp_vector.h"
 
-#define HOY_SYSTEM_CONFIG_PARA_POLL_INTERVAL (10 * 60 * 1000) // 10 minutes
+#define HOY_SYSTEM_CONFIG_PARA_POLL_INTERVAL ((uint32_t) 10 * 60 * 1000) // 10 minutes
 
 class HoymilesClass {
 public:

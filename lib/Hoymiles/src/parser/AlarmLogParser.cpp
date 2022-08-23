@@ -30,12 +30,12 @@ void AlarmLogParser::getLogEntry(uint8_t entryId, AlarmLogEntry_t* entry)
 
     uint32_t wcode = (uint16_t)_payloadAlarmLog[entryStartOffset] << 8 | _payloadAlarmLog[entryStartOffset + 1];
     uint32_t startTimeOffset = 0;
-    if ((wcode >> 13) & 0x01 == 1) {
+    if ((wcode >> 13) & (0x01 == 1)) {
         startTimeOffset = 12 * 60 * 60;
     }
 
     uint32_t endTimeOffset = 0;
-    if ((wcode >> 12) & 0x01 == 1) {
+    if ((wcode >> 12) & (0x01 == 1)) {
         endTimeOffset = 12 * 60 * 60;
     }
 
