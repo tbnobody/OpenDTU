@@ -65,36 +65,42 @@ void WebApiWsVedirectLiveClass::loop()
 
 void WebApiWsVedirectLiveClass::generateJsonResponse(JsonVariant& root)
 {
-    root[F("data_age")] = (millis() - VeDirect.getLastUpdate() ) / 1000;
-    root[F("age_critical")] = ((millis() - VeDirect.getLastUpdate()) / 1000) > Configuration.get().Vedirect_PollInterval * 5;
-    root[F("PID")] = VeDirect.getPidAsString(VeDirect.veMap["PID"].c_str());
-    root[F("SER")] = VeDirect.veMap["SER"];
-    root[F("FW")] = VeDirect.veMap["FW"];
-    root[F("LOAD")] = VeDirect.veMap["LOAD"];
-    root[F("CS")] = VeDirect.getCsAsString(VeDirect.veMap["CS"].c_str());
-    root[F("ERR")] = VeDirect.getErrAsString(VeDirect.veMap["ERR"].c_str());
-    root[F("OR")] = VeDirect.getOrAsString(VeDirect.veMap["OR"].c_str());
-    root[F("MPPT")] = VeDirect.getMpptAsString(VeDirect.veMap["MPPT"].c_str());    
-    root[F("VPV")]["v"] = round(VeDirect.veMap["VPV"].toDouble() / 10.0) / 100.0;
-    root[F("VPV")]["u"] = "V";
-    root[F("V")]["v"] = round(VeDirect.veMap["V"].toDouble() / 10.0) / 100.0;
-    root[F("V")]["u"] = "V";
-    root[F("I")]["v"] = round(VeDirect.veMap["I"].toDouble() / 10.0) / 100.0;
-    root[F("I")]["u"] = "A";
-    root[F("PPV")]["v"] = VeDirect.veMap["PPV"].toInt();
-    root[F("PPV")]["u"] = "W";
-    root[F("H21")]["v"] = VeDirect.veMap["H21"].toInt();
-    root[F("H21")]["u"] = "W";
-    root[F("H23")]["v"] = VeDirect.veMap["H23"].toInt();
-    root[F("H23")]["u"] = "W";
-    root[F("H19")]["v"] = VeDirect.veMap["H19"].toDouble() / 100.0;
-    root[F("H19")]["u"] = "kWh";
-    root[F("H20")]["v"] = VeDirect.veMap["H20"].toDouble() / 100.0;
-    root[F("H20")]["u"] = "kWh";
-    root[F("H22")]["v"] = VeDirect.veMap["H22"].toDouble() / 100.0;
-    root[F("H22")]["u"] = "kWh";
-    root[F("HSDS")]["v"] = VeDirect.veMap["HSDS"].toInt();
-    root[F("HSDS")]["u"] = "Days";
+    // device info
+    root[0][F("data_age")] = (millis() - VeDirect.getLastUpdate() ) / 1000;
+    root[0][F("age_critical")] = ((millis() - VeDirect.getLastUpdate()) / 1000) > Configuration.get().Vedirect_PollInterval * 5;
+    root[0][F("PID")] = VeDirect.getPidAsString(VeDirect.veMap["PID"].c_str());
+    root[0][F("SER")] = VeDirect.veMap["SER"];
+    root[0][F("FW")] = VeDirect.veMap["FW"];
+    root[0][F("LOAD")] = VeDirect.veMap["LOAD"];
+    root[0][F("CS")] = VeDirect.getCsAsString(VeDirect.veMap["CS"].c_str());
+    root[0][F("ERR")] = VeDirect.getErrAsString(VeDirect.veMap["ERR"].c_str());
+    root[0][F("OR")] = VeDirect.getOrAsString(VeDirect.veMap["OR"].c_str());
+    root[0][F("MPPT")] = VeDirect.getMpptAsString(VeDirect.veMap["MPPT"].c_str());
+    root[0][F("HSDS")]["v"] = VeDirect.veMap["HSDS"].toInt();
+    root[0][F("HSDS")]["u"] = "Days";
+
+    // battery info    
+    root[1][F("V")]["v"] = round(VeDirect.veMap["V"].toDouble() / 10.0) / 100.0;
+    root[1][F("V")]["u"] = "V";
+    root[1][F("I")]["v"] = round(VeDirect.veMap["I"].toDouble() / 10.0) / 100.0;
+    root[1][F("I")]["u"] = "A";
+
+    // panel info
+    root[2][F("VPV")]["v"] = round(VeDirect.veMap["VPV"].toDouble() / 10.0) / 100.0;
+    root[2][F("VPV")]["u"] = "V";
+    root[2][F("PPV")]["v"] = VeDirect.veMap["PPV"].toInt();
+    root[2][F("PPV")]["u"] = "W";
+    root[2][F("H19")]["v"] = VeDirect.veMap["H19"].toDouble() / 100.0;
+    root[2][F("H19")]["u"] = "kWh";
+    root[2][F("H20")]["v"] = VeDirect.veMap["H20"].toDouble() / 100.0;
+    root[2][F("H20")]["u"] = "kWh";
+    root[2][F("H21")]["v"] = VeDirect.veMap["H21"].toInt();
+    root[2][F("H21")]["u"] = "W";
+    root[2][F("H22")]["v"] = VeDirect.veMap["H22"].toDouble() / 100.0;
+    root[2][F("H22")]["u"] = "kWh";
+    root[2][F("H23")]["v"] = VeDirect.veMap["H23"].toInt();
+    root[2][F("H23")]["u"] = "W";
+
     if (VeDirect.getLastUpdate() > _newestVedirectTimestamp) {
         _newestVedirectTimestamp = VeDirect.getLastUpdate();
     }
@@ -115,7 +121,7 @@ void WebApiWsVedirectLiveClass::onWebsocketEvent(AsyncWebSocket* server, AsyncWe
 
 void WebApiWsVedirectLiveClass::onLivedataStatus(AsyncWebServerRequest* request)
 {
-    AsyncJsonResponse* response = new AsyncJsonResponse(false, 1024U);
+    AsyncJsonResponse* response = new AsyncJsonResponse(true, 1024U);
     JsonVariant root = response->getRoot().as<JsonVariant>();
     generateJsonResponse(root);
 
