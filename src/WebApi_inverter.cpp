@@ -225,8 +225,11 @@ void WebApiInverterClass::onInverterEdit(AsyncWebServerRequest* request)
     INVERTER_CONFIG_T& inverter = Configuration.get().Inverter[root[F("id")].as<uint8_t>()];
 
     char* t;
+    uint64_t new_serial = strtoll(root[F("serial")].as<String>().c_str(), &t, 16);
+    uint64_t old_serial = inverter.Serial;
+
     // Interpret the string as a hex value and convert it to uint64_t
-    inverter.Serial = strtoll(root[F("serial")].as<String>().c_str(), &t, 16);
+    inverter.Serial = new_serial;
     strncpy(inverter.Name, root[F("name")].as<String>().c_str(), INV_MAX_NAME_STRLEN);
 
     arrayCount = 0;
@@ -243,13 +246,17 @@ void WebApiInverterClass::onInverterEdit(AsyncWebServerRequest* request)
     response->setLength();
     request->send(response);
 
-    std::shared_ptr<InverterAbstract> inv = Hoymiles.getInverterByPos(root[F("id")].as<uint64_t>());
+    std::shared_ptr<InverterAbstract> inv = Hoymiles.getInverterBySerial(old_serial);
 
-    if (inv != nullptr && inv->serial() != inverter.Serial) {
-        // Serial was changed
-        Hoymiles.removeInverterByPos(root[F("id")].as<uint64_t>());
+    if (inv != nullptr && new_serial != old_serial) {
+        // Valid inverter exists but serial changed --> remove it and insert new one
+        Hoymiles.removeInverterBySerial(old_serial);
         inv = Hoymiles.addInverter(inverter.Name, inverter.Serial);
+    } else if (inv != nullptr && new_serial == old_serial) {
+        // Valid inverter exists and serial stays the same --> update name
+        inv->setName(inverter.Name);
     } else if (inv == nullptr) {
+        // Valid inverter did not exist --> try to create one
         inv = Hoymiles.addInverter(inverter.Name, inverter.Serial);
     }
 
@@ -310,6 +317,9 @@ void WebApiInverterClass::onInverterDelete(AsyncWebServerRequest* request)
 
     uint8_t inverter_id = root[F("id")].as<uint8_t>();
     INVERTER_CONFIG_T& inverter = Configuration.get().Inverter[inverter_id];
+
+    Hoymiles.removeInverterBySerial(inverter.Serial);
+
     inverter.Serial = 0;
     strncpy(inverter.Name, "", 0);
     Configuration.write();
@@ -319,8 +329,6 @@ void WebApiInverterClass::onInverterDelete(AsyncWebServerRequest* request)
 
     response->setLength();
     request->send(response);
-
-    Hoymiles.removeInverterByPos(inverter_id);
 
     MqttHassPublishing.forceUpdate();
 }
