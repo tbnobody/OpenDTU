@@ -123,6 +123,11 @@ void HoymilesRadio::loop()
                 _commandQueue.pop();
                 _busyFlag = false;
             }
+        } else {
+            // If inverter was not found, assume the command is invalid
+            Serial.println(F("Invalid inverter found"));
+            _commandQueue.pop();
+            _busyFlag = false;
         }
     } else if (!_busyFlag) {
         // Currently in idle mode --> send packet if one is in the queue

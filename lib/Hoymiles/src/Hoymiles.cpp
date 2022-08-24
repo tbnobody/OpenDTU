@@ -110,10 +110,13 @@ std::shared_ptr<InverterAbstract> HoymilesClass::getInverterByFragment(fragment_
     return nullptr;
 }
 
-void HoymilesClass::removeInverterByPos(uint8_t pos)
+void HoymilesClass::removeInverterBySerial(uint64_t serial)
 {
-    if (pos < _inverters.size()) {
-        _inverters.erase(_inverters.begin() + pos);
+    for (uint8_t i = 0; i < _inverters.size(); i++) {
+        if (_inverters[i]->serial() == serial) {
+            _inverters.erase(_inverters.begin() + i);
+            return;
+        }
     }
 }
 
