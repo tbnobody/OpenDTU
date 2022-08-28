@@ -242,6 +242,20 @@ void NetworkSettingsClass::setHostname()
 {
     Serial.print(F("Setting Hostname... "));
     if (strcmp(Configuration.get().WiFi_Hostname, "")) {
+
+        // check if WiFi_Hostname has default value from config init
+        if (strcmp(Configuration.get().WiFi_Hostname, APP_HOSTNAME) == 0) {
+            // create new unique hostname by replace "%06X" with last three bytes from mac address
+            CONFIG_T& config = Configuration.get();
+            uint32_t chipId = 0;
+            for (int i = 0; i < 17; i += 8) {
+                chipId |= ((ESP.getEfuseMac() >> (40 - i)) & 0xff) << i;
+            }
+            snprintf(config.WiFi_Hostname, WIFI_MAX_HOSTNAME_STRLEN + 1, APP_HOSTNAME, chipId);
+            Serial.printf(" -> create unique hostname %s -> ", config.WiFi_Hostname);
+            Configuration.write();
+        }
+
         if (_networkMode == network_mode::WiFi) {
             if (WiFi.hostname(Configuration.get().WiFi_Hostname)) {
                 Serial.println(F("done"));
