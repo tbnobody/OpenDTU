@@ -54,7 +54,7 @@ void ConfigurationClass::init()
 
     config.Mqtt_Hass_Enabled = MQTT_HASS_ENABLED;
     config.Mqtt_Hass_Retain = MQTT_HASS_RETAIN;
-    strlcpy(config.Mqtt_Hass_Topic, MQTT_TOPIC, sizeof(config.Mqtt_Hass_Topic));
+    strlcpy(config.Mqtt_Hass_Topic, MQTT_HASS_TOPIC, sizeof(config.Mqtt_Hass_Topic));
     config.Mqtt_Hass_IndividualPanels = MQTT_HASS_INDIVIDUALPANELS;
 
     config.Vedirect_Enabled = VEDIRECT_ENABLED;
