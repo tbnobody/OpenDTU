@@ -4,7 +4,7 @@
 This project was started from [this](https://www.mikrocontroller.net/topic/525778) discussion (Mikrocontroller.net).
 It was the goal to replace the original Hoymiles DTU (Telemetry Gateway) with their cloud access. With a lot of reverse engineering the Hoymiles protocol was decrypted and analyzed.
 
-I extended the original OpenDTU software to support also Victron's Ve.Direct protocol on the same chip. Additional information Ve.direct can be downloaded from https://www.victronenergy.com/support-and-downloads/technical-information.
+I extended the original OpenDTU software to support also Victron's Ve.Direct protocol on the same chip. Additional information about Ve.direct can be downloaded from https://www.victronenergy.com/support-and-downloads/technical-information.
 
 Web-Live-Interface:
 ![image](https://user-images.githubusercontent.com/59169507/187224107-4e0d0cab-2e1b-4e47-9410-a49f80aa6789.png)
