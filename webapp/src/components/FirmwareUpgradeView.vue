@@ -96,7 +96,7 @@ export default defineComponent({
                 const spark = new SparkMD5.ArrayBuffer();
                 const fileReader = new FileReader();
                 let currentChunk = 0;
-                fileReader.onload = (e: Event) => {
+                fileReader.onload = () => {
                     spark.append(fileReader.result as ArrayBuffer); // Append array buffer
                     currentChunk += 1;
                     if (currentChunk < chunks) {
