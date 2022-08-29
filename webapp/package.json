@@ -15,7 +15,7 @@
     "spark-md5": "^3.0.2",
     "vue": "^3.2.27",
     "vue-class-component": "^8.0.0-0",
-    "vue-router": "^4.1.3"
+    "vue-router": "^4.1.5"
   },
   "devDependencies": {
     "@babel/core": "^7.18.10",
