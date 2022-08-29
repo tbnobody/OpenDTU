@@ -1,8 +1,43 @@
-# OpenDTU
+# OpenDTU_VeDirect
 
 ## Background
 This project was started from [this](https://www.mikrocontroller.net/topic/525778) discussion (Mikrocontroller.net).
 It was the goal to replace the original Hoymiles DTU (Telemetry Gateway) with their cloud access. With a lot of reverse engineering the Hoymiles protocol was decrypted and analyzed.
+
+I extended the original OpenDTU software to support also Victron's Ve.Direct protocol on the same chip. Additional information Ve.direct can be downloaded from https://www.victronenergy.com/support-and-downloads/technical-information.
+
+Web-Live-Interface:
+![image](https://user-images.githubusercontent.com/59169507/187224107-4e0d0cab-2e1b-4e47-9410-a49f80aa6789.png)
+
+REST-API (/api/verdirectlivedata/status):
+````JSON
+{
+"data_age":0,
+"age_critical":false,
+"PID":"SmartSolar MPPT 100|30",
+"SER":"XXX",
+"FW":"159",
+"LOAD":"ON",
+"CS":"Bulk",
+"ERR":"No error",
+"OR":"Not off",
+"MPPT":"MPP Tracker active",
+"HSDS":{"v":46,"u":"Days"},
+"V":{"v":26.36,"u":"V"},
+"I":{"v":3.4,"u":"A"},
+"VPV":{"v":37.13,"u":"V"},
+"PPV":{"v":93,"u":"W"},
+"H19":{"v":83.16,"u":"kWh"},
+"H20":{"v":1.39,"u":"kWh"},
+"H21":{"v":719,"u":"W"},
+"H22":{"v":1.43,"u":"kWh"},
+"H23":{"v":737,"u":"W"}
+}
+````
+
+MQTT:
+
+Sends text raw data as difined in VE.Direct spec.
 
 ## Currently supported Inverters
 * Hoymiles HM-300
@@ -28,6 +63,7 @@ It was the goal to replace the original Hoymiles DTU (Telemetry Gateway) with th
 * Firmware upgrade using the web UI
 * Default source supports up to 10 inverters
 * Time zone support
+* Ve.Direct interface (via web-interface, REST-api, or MQTT)
 
 
 ## Features for developers
@@ -56,6 +92,8 @@ This can be achieved by editing the 'platformio.ini' file and add/change one or 
 -DHOYMILES_PIN_IRQ=16
 -DHOYMILES_PIN_CE=4
 -DHOYMILES_PIN_CS=5
+-DVICTRON_PIN_TX=21
+-DVICTRON_PIN_RX=22 
 ```
 
 ## Flashing and starting up
