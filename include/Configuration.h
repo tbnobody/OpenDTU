@@ -4,7 +4,7 @@
 #include <Arduino.h>
 
 #define CONFIG_FILENAME "/config.bin"
-#define CONFIG_VERSION 0x00011400 // 0.1.20 // make sure to clean all after change
+#define CONFIG_VERSION 0x00011500 // 0.1.21 // make sure to clean all after change
 
 #define WIFI_MAX_SSID_STRLEN 31
 #define WIFI_MAX_PASSWORD_STRLEN 64
@@ -76,6 +76,8 @@ struct CONFIG_T {
     char Mqtt_RootCaCert[MQTT_MAX_ROOT_CA_CERT_STRLEN + 1];
 
     char Mqtt_Hostname[MQTT_MAX_HOSTNAME_STRLEN + 1];
+
+    bool Mqtt_Hass_Expire;
 };
 
 class ConfigurationClass {

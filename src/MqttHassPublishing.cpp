@@ -116,7 +116,9 @@ void MqttHassPublishingClass::publishField(std::shared_ptr<InverterAbstract> inv
         root[F("unit_of_meas")] = inv->Statistics()->getChannelFieldUnit(channel, fieldType.fieldId);
         root[F("uniq_id")] = String(serial) + "_ch" + String(channel) + "_" + fieldName;
         root[F("dev")] = deviceObj;
-        root[F("exp_aft")] = Hoymiles.getNumInverters() * Configuration.get().Mqtt_PublishInterval * 2;
+        if (Configuration.get().Mqtt_Hass_Expire) {
+            root[F("exp_aft")] = Hoymiles.getNumInverters() * Configuration.get().Mqtt_PublishInterval * 2;
+        }
         if (devCls != 0) {
             root[F("dev_cla")] = devCls;
         }

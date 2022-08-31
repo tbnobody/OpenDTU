@@ -43,6 +43,7 @@ void WebApiMqttClass::onMqttStatus(AsyncWebServerRequest* request)
     root[F("mqtt_lwt_topic")] = String(config.Mqtt_Topic) + config.Mqtt_LwtTopic;
     root[F("mqtt_publish_interval")] = config.Mqtt_PublishInterval;
     root[F("mqtt_hass_enabled")] = config.Mqtt_Hass_Enabled;
+    root[F("mqtt_hass_expire")] = config.Mqtt_Hass_Expire;
     root[F("mqtt_hass_retain")] = config.Mqtt_Hass_Retain;
     root[F("mqtt_hass_topic")] = config.Mqtt_Hass_Topic;
     root[F("mqtt_hass_individualpanels")] = config.Mqtt_Hass_IndividualPanels;
@@ -71,6 +72,7 @@ void WebApiMqttClass::onMqttAdminGet(AsyncWebServerRequest* request)
     root[F("mqtt_lwt_offline")] = config.Mqtt_LwtValue_Offline;
     root[F("mqtt_publish_interval")] = config.Mqtt_PublishInterval;
     root[F("mqtt_hass_enabled")] = config.Mqtt_Hass_Enabled;
+    root[F("mqtt_hass_expire")] = config.Mqtt_Hass_Expire;
     root[F("mqtt_hass_retain")] = config.Mqtt_Hass_Retain;
     root[F("mqtt_hass_topic")] = config.Mqtt_Hass_Topic;
     root[F("mqtt_hass_individualpanels")] = config.Mqtt_Hass_IndividualPanels;
@@ -111,7 +113,23 @@ void WebApiMqttClass::onMqttAdminPost(AsyncWebServerRequest* request)
         return;
     }
 
-    if (!(root.containsKey("mqtt_enabled") && root.containsKey("mqtt_hostname") && root.containsKey("mqtt_port") && root.containsKey("mqtt_username") && root.containsKey("mqtt_password") && root.containsKey("mqtt_topic") && root.containsKey("mqtt_retain") && root.containsKey("mqtt_tls") && root.containsKey("mqtt_lwt_topic") && root.containsKey("mqtt_lwt_online") && root.containsKey("mqtt_lwt_offline") && root.containsKey("mqtt_publish_interval") && root.containsKey("mqtt_hass_enabled") && root.containsKey("mqtt_hass_retain") && root.containsKey("mqtt_hass_topic") && root.containsKey("mqtt_hass_individualpanels"))) {
+    if (!(root.containsKey("mqtt_enabled") && 
+            root.containsKey("mqtt_hostname") && 
+            root.containsKey("mqtt_port") && 
+            root.containsKey("mqtt_username") && 
+            root.containsKey("mqtt_password") && 
+            root.containsKey("mqtt_topic") && 
+            root.containsKey("mqtt_retain") && 
+            root.containsKey("mqtt_tls") && 
+            root.containsKey("mqtt_lwt_topic") && 
+            root.containsKey("mqtt_lwt_online") && 
+            root.containsKey("mqtt_lwt_offline") && 
+            root.containsKey("mqtt_publish_interval") && 
+            root.containsKey("mqtt_hass_enabled") && 
+            root.containsKey("mqtt_hass_expire") && 
+            root.containsKey("mqtt_hass_retain") && 
+            root.containsKey("mqtt_hass_topic") && 
+            root.containsKey("mqtt_hass_individualpanels"))) {
         retMsg[F("message")] = F("Values are missing!");
         response->setLength();
         request->send(response);
@@ -233,6 +251,7 @@ void WebApiMqttClass::onMqttAdminPost(AsyncWebServerRequest* request)
     strcpy(config.Mqtt_LwtValue_Offline, root[F("mqtt_lwt_offline")].as<String>().c_str());
     config.Mqtt_PublishInterval = root[F("mqtt_publish_interval")].as<uint32_t>();
     config.Mqtt_Hass_Enabled = root[F("mqtt_hass_enabled")].as<bool>();
+    config.Mqtt_Hass_Expire = root[F("mqtt_hass_expire")].as<bool>();
     config.Mqtt_Hass_Retain = root[F("mqtt_hass_retain")].as<bool>();
     config.Mqtt_Hass_IndividualPanels = root[F("mqtt_hass_individualpanels")].as<bool>();
     strcpy(config.Mqtt_Hass_Topic, root[F("mqtt_hass_topic")].as<String>().c_str());

@@ -53,6 +53,7 @@ void ConfigurationClass::init()
     config.Dtu_PaLevel = DTU_PA_LEVEL;
 
     config.Mqtt_Hass_Enabled = MQTT_HASS_ENABLED;
+    config.Mqtt_Hass_Expire = MQTT_HASS_EXPIRE;
     config.Mqtt_Hass_Retain = MQTT_HASS_RETAIN;
     strlcpy(config.Mqtt_Hass_Topic, MQTT_HASS_TOPIC, sizeof(config.Mqtt_Hass_Topic));
     config.Mqtt_Hass_IndividualPanels = MQTT_HASS_INDIVIDUALPANELS;
@@ -149,6 +150,10 @@ void ConfigurationClass::migrate()
 
     if (config.Cfg_Version < 0x00011400) {
         strlcpy(config.Mqtt_Hostname, config.Mqtt_Hostname_Short, sizeof(config.Mqtt_Hostname_Short));
+    }
+
+    if (config.Cfg_Version < 0x00011500) {
+        config.Mqtt_Hass_Expire = MQTT_HASS_EXPIRE;
     }
 
     config.Cfg_Version = CONFIG_VERSION;
