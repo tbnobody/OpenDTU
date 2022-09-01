@@ -124,6 +124,15 @@ This can be achieved by editing the 'platformio.ini' file and add/change one or 
 * Navigate to Settings --> Network Settings and enter your WiFi credentials
 * Currently you have to look at your router to determine the IP of the newly connected device
 
+## Flashing an Update using "Over The Air" OTA Update
+Once you have your OpenDTU running and connected to WLAN, you can do further updates through the web interface.
+Navigate to Settings --> Firmware upgrade and press the browse button. Select the firmware file from your local computer.
+
+You'll find the firmware file (after a successfull build process) under `.pio/build/generic/firmware.elf`.
+
+After the successful upload, the OpenDTU immediately restarts into the new firmware.
+
+
 ## Available cases
 * [https://www.thingiverse.com/thing:5435911](https://www.thingiverse.com/thing:5435911)
 
