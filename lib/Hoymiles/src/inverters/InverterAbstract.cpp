@@ -8,6 +8,7 @@ InverterAbstract::InverterAbstract(uint64_t serial)
     _alarmLogParser.reset(new AlarmLogParser());
     _devInfoParser.reset(new DevInfoParser());
     _statisticsParser.reset(new StatisticsParser());
+    _systemConfigParaParser.reset(new SystemConfigParaParser());
 }
 
 void InverterAbstract::init()
@@ -52,6 +53,11 @@ DevInfoParser* InverterAbstract::DevInfo()
 StatisticsParser* InverterAbstract::Statistics()
 {
     return _statisticsParser.get();
+}
+
+SystemConfigParaParser* InverterAbstract::SystemConfigPara()
+{
+    return _systemConfigParaParser.get();
 }
 
 void InverterAbstract::clearRxFragmentBuffer()

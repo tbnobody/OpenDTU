@@ -1,8 +1,9 @@
 #pragma once
 
 #include "../parser/AlarmLogParser.h"
-#include "../parser/StatisticsParser.h"
 #include "../parser/DevInfoParser.h"
+#include "../parser/StatisticsParser.h"
+#include "../parser/SystemConfigParaParser.h"
 #include "HoymilesRadio.h"
 #include "types.h"
 #include <Arduino.h>
@@ -44,6 +45,7 @@ public:
     AlarmLogParser* EventLog();
     DevInfoParser* DevInfo();
     StatisticsParser* Statistics();
+    SystemConfigParaParser* SystemConfigPara();
 
 private:
     serial_u _serial;
@@ -56,4 +58,5 @@ private:
     std::unique_ptr<AlarmLogParser> _alarmLogParser;
     std::unique_ptr<DevInfoParser> _devInfoParser;
     std::unique_ptr<StatisticsParser> _statisticsParser;
+    std::unique_ptr<SystemConfigParaParser> _systemConfigParaParser;
 };
