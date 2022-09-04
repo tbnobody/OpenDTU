@@ -84,13 +84,14 @@ This can be achieved by editing the 'platformio.ini' file and add/change one or 
 * After the initial flashing of the microcontroller, an Access Point called "OpenDTU-*" is opened. The default password is "openDTU42".
 * Use a web browser to open the address [http://192.168.4.1](http://192.168.4.1)
 * Navigate to Settings --> Network Settings and enter your WiFi credentials
-* Currently you have to look at your router to determine the IP of the newly connected device
+* OpenDTU then simultaneously connects to your WiFi AP with this credentials. Navigate to Info --> Network and look into section "Network Interface (Station)" for the IP address received via DHCP.
+* When OpenDTU is connected to a configured WiFI AP, the "OpenDTU-*" Access Point is closed after 3 minutes.
 
 ## Flashing an Update using "Over The Air" OTA Update
 Once you have your OpenDTU running and connected to WLAN, you can do further updates through the web interface.
 Navigate to Settings --> Firmware upgrade and press the browse button. Select the firmware file from your local computer.
 
-You'll find the firmware file (after a successfull build process) under `.pio/build/generic/firmware.elf`.
+You'll find the firmware file (after a successfull build process) under `.pio/build/generic/firmware.bin`.
 
 After the successful upload, the OpenDTU immediately restarts into the new firmware.
 
