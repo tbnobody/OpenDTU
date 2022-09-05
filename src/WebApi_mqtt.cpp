@@ -29,7 +29,7 @@ void WebApiMqttClass::onMqttStatus(AsyncWebServerRequest* request)
 {
     AsyncJsonResponse* response = new AsyncJsonResponse(false, MQTT_JSON_DOC_SIZE);
     JsonObject root = response->getRoot();
-    CONFIG_T& config = Configuration.get();
+    const CONFIG_T& config = Configuration.get();
 
     root[F("mqtt_enabled")] = config.Mqtt_Enabled;
     root[F("mqtt_hostname")] = config.Mqtt_Hostname;
@@ -56,7 +56,7 @@ void WebApiMqttClass::onMqttAdminGet(AsyncWebServerRequest* request)
 {
     AsyncJsonResponse* response = new AsyncJsonResponse(false, MQTT_JSON_DOC_SIZE);
     JsonObject root = response->getRoot();
-    CONFIG_T& config = Configuration.get();
+    const CONFIG_T& config = Configuration.get();
 
     root[F("mqtt_enabled")] = config.Mqtt_Enabled;
     root[F("mqtt_hostname")] = config.Mqtt_Hostname;
@@ -267,7 +267,7 @@ void WebApiMqttClass::onMqttAdminPost(AsyncWebServerRequest* request)
     MqttHassPublishing.forceUpdate();
 }
 
-String WebApiMqttClass::getRootCaCertInfo(char* cert)
+String WebApiMqttClass::getRootCaCertInfo(const char* cert)
 {
     char rootCaCertInfo[1024] = "";
 

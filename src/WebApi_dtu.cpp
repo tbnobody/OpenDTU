@@ -26,7 +26,7 @@ void WebApiDtuClass::onDtuAdminGet(AsyncWebServerRequest* request)
 {
     AsyncJsonResponse* response = new AsyncJsonResponse();
     JsonObject root = response->getRoot();
-    CONFIG_T& config = Configuration.get();
+    const CONFIG_T& config = Configuration.get();
 
     // DTU Serial is read as HEX
     char buffer[sizeof(uint64_t) * 8 + 1];

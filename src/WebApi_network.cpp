@@ -53,7 +53,7 @@ void WebApiNetworkClass::onNetworkAdminGet(AsyncWebServerRequest* request)
 {
     AsyncJsonResponse* response = new AsyncJsonResponse();
     JsonObject root = response->getRoot();
-    CONFIG_T& config = Configuration.get();
+    const CONFIG_T& config = Configuration.get();
 
     root[F("hostname")] = config.WiFi_Hostname;
     root[F("dhcp")] = config.WiFi_Dhcp;

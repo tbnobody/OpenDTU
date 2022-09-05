@@ -19,7 +19,7 @@ void MqttPublishingClass::loop()
         return;
     }
 
-    CONFIG_T& config = Configuration.get();
+    const CONFIG_T& config = Configuration.get();
 
     if (millis() - _lastPublish > (config.Mqtt_PublishInterval * 1000)) {
         MqttSettings.publish("dtu/uptime", String(millis() / 1000));

@@ -32,7 +32,7 @@ void WebApiInverterClass::onInverterList(AsyncWebServerRequest* request)
     JsonObject root = response->getRoot();
     JsonArray data = root.createNestedArray(F("inverter"));
 
-    CONFIG_T& config = Configuration.get();
+    const CONFIG_T& config = Configuration.get();
 
     for (uint8_t i = 0; i < INV_MAX_COUNT; i++) {
         if (config.Inverter[i].Serial > 0) {

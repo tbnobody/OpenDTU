@@ -46,7 +46,7 @@ void MqttHassPublishingClass::publishConfig()
         return;
     }
 
-    CONFIG_T& config = Configuration.get();
+    const CONFIG_T& config = Configuration.get();
 
     // Loop all inverters
     for (uint8_t i = 0; i < Hoymiles.getNumInverters(); i++) {
