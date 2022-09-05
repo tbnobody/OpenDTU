@@ -24,6 +24,6 @@ public:
 private:
     static int getTimezoneOffset();
 
-    uint8_t _payloadAlarmLog[ALARM_LOG_ENTRY_SIZE * ALARM_LOG_ENTRY_COUNT];
-    uint8_t _alarmLogLength;
+    uint8_t _payloadAlarmLog[ALARM_LOG_ENTRY_SIZE * ALARM_LOG_ENTRY_COUNT] = {};
+    uint8_t _alarmLogLength = 0;
 };
