@@ -47,7 +47,7 @@ public:
 
 private:
     serial_u _serial;
-    char _name[MAX_NAME_LENGTH];
+    char _name[MAX_NAME_LENGTH] = "";
     fragment_t _rxFragmentBuffer[MAX_RF_FRAGMENT_COUNT];
     uint8_t _rxFragmentMaxPacketId = 0;
     uint8_t _rxFragmentLastPacketId = 0;

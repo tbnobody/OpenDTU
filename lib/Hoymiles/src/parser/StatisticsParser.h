@@ -114,8 +114,8 @@ public:
     void setChannelMaxPower(uint8_t channel, uint16_t power);
 
 private:
-    uint8_t _payloadStatistic[STATISTIC_PACKET_SIZE];
-    uint8_t _statisticLength;
+    uint8_t _payloadStatistic[STATISTIC_PACKET_SIZE] = {};
+    uint8_t _statisticLength = 0;
     uint16_t _chanMaxPower[CH4];
 
     const byteAssign_t* _byteAssignment;
