@@ -86,6 +86,8 @@ This can be achieved by editing the 'platformio.ini' file and add/change one or 
 * Navigate to Settings --> Network Settings and enter your WiFi credentials
 * OpenDTU then simultaneously connects to your WiFi AP with this credentials. Navigate to Info --> Network and look into section "Network Interface (Station)" for the IP address received via DHCP.
 * When OpenDTU is connected to a configured WiFI AP, the "OpenDTU-*" Access Point is closed after 3 minutes.
+* OpenDTU needs access to a working NTP server to get the current date & time. Both are sent to the inverter with each request. Default NTP server is pool.ntp.org. If your network has different requirements please change accordingly (Settings --> NTP Settings).
+* Add your inverter in the inverter settings (Settings --> Inverter Settings)
 
 ## Flashing an Update using "Over The Air" OTA Update
 Once you have your OpenDTU running and connected to WLAN, you can do further updates through the web interface.
