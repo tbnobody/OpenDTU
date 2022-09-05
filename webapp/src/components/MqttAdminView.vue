@@ -196,6 +196,16 @@
                         </div>
 
                         <div class="row mb-3">
+                            <label class="col-sm-2 form-check-label" for="inputHassExpire">Enable Expiration</label>
+                            <div class="col-sm-10">
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" id="inputHassExpire"
+                                        v-model="mqttConfigList.mqtt_hass_expire" />
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
                             <label class="col-sm-2 form-check-label" for="inputIndividualPanels">Individual
                                 Panels:</label>
                             <div class="col-sm-10">
@@ -241,6 +251,7 @@ export default defineComponent({
                 mqtt_lwt_online: "",
                 mqtt_lwt_offline: "",
                 mqtt_hass_enabled: false,
+                mqtt_hass_expire: false,
                 mqtt_hass_retain: false,
                 mqtt_hass_topic: "",
                 mqtt_hass_individualpanels: false

@@ -108,6 +108,16 @@
                                     </td>
                                 </tr>
                                 <tr>
+                                    <th>Expire</th>
+                                    <td class="badge" :class="{
+                                        'bg-danger': !mqttDataList.mqtt_hass_expire,
+                                        'bg-success': mqttDataList.mqtt_hass_expire,
+                                    }">
+                                        <span v-if="mqttDataList.mqtt_hass_expire">enabled</span>
+                                        <span v-else>disabled</span>
+                                    </td>
+                                </tr>
+                                <tr>
                                     <th>Individual Panels</th>
                                     <td class="badge" :class="{
                                         'bg-danger': !mqttDataList.mqtt_hass_individualpanels,
