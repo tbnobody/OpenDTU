@@ -39,6 +39,11 @@
                             <div class="col-sm-10">
                                 <input type="text" class="form-control" id="inputHostname" maxlength="32"
                                     placeholder="Hostname" v-model="networkConfigList.hostname" />
+
+                                <div class="alert alert-secondary" role="alert">
+                                    <b>Hint:</b> The text <span class="font-monospace">%06X</span> will be replaced
+                                    with the last 6 digits of the ESP ChipID in hex format.
+                                </div>
                             </div>
                         </div>
 
