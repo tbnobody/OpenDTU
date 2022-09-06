@@ -41,6 +41,7 @@ public:
     virtual bool sendStatsRequest(HoymilesRadio* radio) = 0;
     virtual bool sendAlarmLogRequest(HoymilesRadio* radio) = 0;
     virtual bool sendDevInfoRequest(HoymilesRadio* radio) = 0;
+    virtual bool sendSystemConfigParaRequest(HoymilesRadio* radio) = 0;
 
     AlarmLogParser* EventLog();
     DevInfoParser* DevInfo();
