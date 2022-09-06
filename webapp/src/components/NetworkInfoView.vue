@@ -49,6 +49,7 @@ export default defineComponent({
                 ap_ssid: "",
                 ap_stationnum: 0,
                 // InterfaceNetworkInfo
+                network_hostname: "",
                 network_ip: "",
                 network_netmask: "",
                 network_gateway: "",

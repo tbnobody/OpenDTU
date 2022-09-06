@@ -8,6 +8,10 @@
                 <table class="table table-hover table-condensed">
                     <tbody>
                         <tr>
+                            <th>Hostname</th>
+                            <td>{{ network_hostname }}</td>
+                        </tr>
+                        <tr>
                             <th>IP Address</th>
                             <td>{{ network_ip }}</td>
                         </tr>
@@ -43,6 +47,7 @@ import { defineComponent } from 'vue';
 
 export default defineComponent({
     props: {
+        network_hostname: String,
         network_ip: String,
         network_netmask: String,
         network_gateway: String,
