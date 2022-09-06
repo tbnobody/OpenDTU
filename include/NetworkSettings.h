@@ -50,7 +50,7 @@ public:
     IPAddress gatewayIP();
     IPAddress dnsIP(uint8_t dns_no = 0);
     String macAddress();
-    const char* getHostname();
+    static String getHostname();
     bool isConnected();
     network_mode NetworkMode();
 
@@ -62,6 +62,7 @@ private:
     void setStaticIp();
     void setupMode();
     void NetworkEvent(WiFiEvent_t event);
+    static uint32_t getChipId();
     bool adminEnabled = true;
     bool forceDisconnection = false;
     int adminTimeoutCounter = 0;
