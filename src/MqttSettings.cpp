@@ -32,6 +32,9 @@ void MqttSettingsClass::onMqttConnect(bool sessionPresent)
     Serial.println(F("Connected to MQTT."));
     const CONFIG_T& config = Configuration.get();
     publish(config.Mqtt_LwtTopic, config.Mqtt_LwtValue_Online);
+
+    String topic = getPrefix();
+    mqttClient->subscribe(String(topic + "+/limit/set").c_str(), 0);
 }
 
 void MqttSettingsClass::onMqttDisconnect(espMqttClientTypes::DisconnectReason reason)
@@ -65,10 +68,21 @@ void MqttSettingsClass::onMqttDisconnect(espMqttClientTypes::DisconnectReason re
         2, +[](MqttSettingsClass* instance) { instance->performConnect(); }, this);
 }
 
+void MqttSettingsClass::onMqttMessage(const espMqttClientTypes::MessageProperties& properties, const char* topic, const uint8_t* payload, size_t len, size_t index, size_t total)
+{
+    Serial.print(F("Received MQTT message on topic: "));
+    Serial.println(topic);
+}
+
 void MqttSettingsClass::performConnect()
 {
     if (NetworkSettings.isConnected() && Configuration.get().Mqtt_Enabled) {
         using std::placeholders::_1;
+        using std::placeholders::_2;
+        using std::placeholders::_3;
+        using std::placeholders::_4;
+        using std::placeholders::_5;
+        using std::placeholders::_6;
         Serial.println(F("Connecting to MQTT..."));
         const CONFIG_T& config = Configuration.get();
         willTopic = getPrefix() + config.Mqtt_LwtTopic;
@@ -81,6 +95,7 @@ void MqttSettingsClass::performConnect()
             static_cast<espMqttClientSecure*>(mqttClient)->setClientId(clientId.c_str());
             static_cast<espMqttClientSecure*>(mqttClient)->onConnect(std::bind(&MqttSettingsClass::onMqttConnect, this, _1));
             static_cast<espMqttClientSecure*>(mqttClient)->onDisconnect(std::bind(&MqttSettingsClass::onMqttDisconnect, this, _1));
+            static_cast<espMqttClientSecure*>(mqttClient)->onMessage(std::bind(&MqttSettingsClass::onMqttMessage, this, _1, _2, _3, _4, _5, _6));
         } else {
             static_cast<espMqttClient*>(mqttClient)->setServer(config.Mqtt_Hostname, config.Mqtt_Port);
             static_cast<espMqttClient*>(mqttClient)->setCredentials(config.Mqtt_Username, config.Mqtt_Password);
@@ -88,6 +103,7 @@ void MqttSettingsClass::performConnect()
             static_cast<espMqttClient*>(mqttClient)->setClientId(clientId.c_str());
             static_cast<espMqttClient*>(mqttClient)->onConnect(std::bind(&MqttSettingsClass::onMqttConnect, this, _1));
             static_cast<espMqttClient*>(mqttClient)->onDisconnect(std::bind(&MqttSettingsClass::onMqttDisconnect, this, _1));
+            static_cast<espMqttClient*>(mqttClient)->onMessage(std::bind(&MqttSettingsClass::onMqttMessage, this, _1, _2, _3, _4, _5, _6));
         }
         mqttClient->connect();
     }
