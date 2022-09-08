@@ -114,3 +114,7 @@ After the successful upload, the OpenDTU immediately restarts into the new firmw
 
 * Building the microcontroller firmware
     * Visual Studio Code with the PlatformIO Extension is required for building
+
+## Related Projects
+- [Ahoy](https://github.com/grindylow/ahoy)
+- [DTU Simulator](https://github.com/Ziyatoe/DTUsimMI1x00-Hoymiles)
