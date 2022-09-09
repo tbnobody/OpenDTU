@@ -7,6 +7,8 @@
 #include <memory>
 #include <vector>
 
+#define HOY_SYSTEM_CONFIG_PARA_POLL_INTERVAL (10 * 60 * 1000) // 10 minutes
+
 class HoymilesClass {
 public:
     void init();
