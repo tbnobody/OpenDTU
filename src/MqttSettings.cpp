@@ -5,9 +5,15 @@
 #include "MqttSettings.h"
 #include "Configuration.h"
 #include "NetworkSettings.h"
+#include <Hoymiles.h>
 #include <MqttClientSetup.h>
 #include <Ticker.h>
 #include <espMqttClient.h>
+
+#define TOPIC_SUB_LIMIT_PERSISTENT_RELATIVE "limit_persistent_relative"
+#define TOPIC_SUB_LIMIT_PERSISTENT_ABSOLUTE "limit_persistent_absolute"
+#define TOPIC_SUB_LIMIT_NONPERSISTENT_RELATIVE "limit_nonpersistent_relative"
+#define TOPIC_SUB_LIMIT_NONPERSISTENT_ABSOLUTE "limit_nonpersistent_absolute"
 
 MqttSettingsClass::MqttSettingsClass()
 {
@@ -34,7 +40,10 @@ void MqttSettingsClass::onMqttConnect(bool sessionPresent)
     publish(config.Mqtt_LwtTopic, config.Mqtt_LwtValue_Online);
 
     String topic = getPrefix();
-    mqttClient->subscribe(String(topic + "+/limit/set").c_str(), 0);
+    mqttClient->subscribe(String(topic + "+/cmd/" + TOPIC_SUB_LIMIT_PERSISTENT_RELATIVE).c_str(), 0);
+    mqttClient->subscribe(String(topic + "+/cmd/" + TOPIC_SUB_LIMIT_PERSISTENT_ABSOLUTE).c_str(), 0);
+    mqttClient->subscribe(String(topic + "+/cmd/" + TOPIC_SUB_LIMIT_NONPERSISTENT_RELATIVE).c_str(), 0);
+    mqttClient->subscribe(String(topic + "+/cmd/" + TOPIC_SUB_LIMIT_NONPERSISTENT_ABSOLUTE).c_str(), 0);
 }
 
 void MqttSettingsClass::onMqttDisconnect(espMqttClientTypes::DisconnectReason reason)
@@ -70,8 +79,65 @@ void MqttSettingsClass::onMqttDisconnect(espMqttClientTypes::DisconnectReason re
 
 void MqttSettingsClass::onMqttMessage(const espMqttClientTypes::MessageProperties& properties, const char* topic, const uint8_t* payload, size_t len, size_t index, size_t total)
 {
+    const CONFIG_T& config = Configuration.get();
+
     Serial.print(F("Received MQTT message on topic: "));
     Serial.println(topic);
+
+    char token_topic[MQTT_MAX_TOPIC_STRLEN + 40]; // respect all subtopics
+    strncpy(token_topic, topic, MQTT_MAX_TOPIC_STRLEN + 40); // convert const char* to char*
+
+    char* serial_str;
+    char* subtopic;
+    char* setting;
+
+    serial_str = strtok(&token_topic[strlen(config.Mqtt_Topic)], "/");
+    subtopic = strtok(NULL, "/");
+    setting = strtok(NULL, "/");
+
+    if (serial_str == NULL || subtopic == NULL || setting == NULL) {
+        return;
+    }
+
+    uint64_t serial;
+    serial = strtoull(serial_str, 0, 16);
+
+    auto inv = Hoymiles.getInverterBySerial(serial);
+
+    if (inv == nullptr) {
+        Serial.println(F("Inverter not found"));
+        return;
+    }
+
+    // check if subtopic is unequal cmd
+    if (strcmp(subtopic, "cmd")) {
+        return;
+    }
+
+    char* strlimit = new char[len + 1];
+    memcpy(strlimit, payload, len);
+    strlimit[len] = '\0';
+    uint32_t limit = strtol(strlimit, NULL, 10);
+    delete[] strlimit;
+
+    if (!strcmp(setting, TOPIC_SUB_LIMIT_PERSISTENT_RELATIVE)) {
+        // Set inverter limit relative persistent
+        limit = min<uint32_t>(100, limit);
+        Serial.printf("Limit Persistent: %d %%\n", limit);
+
+    } else if (!strcmp(setting, TOPIC_SUB_LIMIT_PERSISTENT_ABSOLUTE)) {
+        // Set inverter limit absolute persistent
+        Serial.printf("Limit Persistent: %d W\n", limit);
+
+    } else if (!strcmp(setting, TOPIC_SUB_LIMIT_NONPERSISTENT_RELATIVE)) {
+        // Set inverter limit relative non persistent
+        limit = min<uint32_t>(100, limit);
+        Serial.printf("Limit Non-Persistent: %d %%\n", limit);
+
+    } else if (!strcmp(setting, TOPIC_SUB_LIMIT_NONPERSISTENT_ABSOLUTE)) {
+        // Set inverter limit absolute non persistent
+        Serial.printf("Limit Non-Persistent: %d W\n", limit);
+    }
 }
 
 void MqttSettingsClass::performConnect()
