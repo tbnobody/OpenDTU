@@ -6,6 +6,7 @@
 #include "WebApi_eventlog.h"
 #include "WebApi_firmware.h"
 #include "WebApi_inverter.h"
+#include "WebApi_limit.h"
 #include "WebApi_mqtt.h"
 #include "WebApi_network.h"
 #include "WebApi_ntp.h"
@@ -29,6 +30,7 @@ private:
     WebApiEventlogClass _webApiEventlog;
     WebApiFirmwareClass _webApiFirmware;
     WebApiInverterClass _webApiInverter;
+    WebApiLimitClass _webApiLimit;
     WebApiMqttClass _webApiMqtt;
     WebApiNetworkClass _webApiNetwork;
     WebApiNtpClass _webApiNtp;
