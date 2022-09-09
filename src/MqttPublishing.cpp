@@ -61,6 +61,11 @@ void MqttPublishingClass::loop()
                 MqttSettings.publish(subtopic + "/device/hwversion", String(inv->DevInfo()->getHwVersion()));
             }
 
+            if (inv->SystemConfigPara()->getLastUpdate() > 0) {
+                // Limit
+                MqttSettings.publish(subtopic + "/settings/limit", String(inv->SystemConfigPara()->getLimitPercent()));
+            }
+
             uint32_t lastUpdate = inv->Statistics()->getLastUpdate();
             if (lastUpdate > 0 && lastUpdate != _lastPublishStats[i]) {
                 _lastPublishStats[i] = lastUpdate;
