@@ -40,6 +40,14 @@
 
                                 <div class="btn-toolbar" role="toolbar">
                                     <div class="btn-group me-2" role="group">
+                                        <button type="button" class="btn btn-sm btn-danger"
+                                            @click="onShowLimitSettings(inverter.serial)" title="Show / Set Inverter Limit">
+                                            <BIconSpeedometer style="font-size:24px;" />
+
+                                        </button>
+                                    </div>
+
+                                    <div class="btn-group me-2" role="group">
                                         <button type="button" class="btn btn-sm btn-info"
                                             @click="onShowDevInfo(inverter.serial)" title="Show Inverter Info">
                                             <BIconCpu style="font-size:24px;" />
@@ -128,6 +136,30 @@
             </div>
         </div>
 
+        <div class="modal" id="limitSettingView" tabindex="-1">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Limit Settings</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="text-center" v-if="limitSettingLoading">
+                            <div class="spinner-border" role="status">
+                                <span class="visually-hidden">Loading...</span>
+                            </div>
+                        </div>
+
+                        <LimitSettingsCurrent v-if="!limitSettingLoading" :limitData="limitSettingList" />
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" @click="onHideLimitSettings"
+                            data-bs-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </template>
 
@@ -137,6 +169,7 @@ import InverterChannelInfo from "@/components/partials/InverterChannelInfo.vue";
 import * as bootstrap from 'bootstrap';
 import EventLog from '@/components/partials/EventLog.vue';
 import DevInfo from '@/components/partials/DevInfo.vue';
+import LimitSettingsCurrent from '@/components/partials/LimitSettingsCurrent.vue';
 
 declare interface Inverter {
     serial: number,
@@ -150,7 +183,8 @@ export default defineComponent({
     components: {
         InverterChannelInfo,
         EventLog,
-        DevInfo
+        DevInfo,
+        LimitSettingsCurrent
     },
     data() {
         return {
@@ -165,7 +199,10 @@ export default defineComponent({
             eventLogLoading: true,
             devInfoView: {} as bootstrap.Modal,
             devInfoList: {},
-            devInfoLoading: true
+            devInfoLoading: true,
+            limitSettingView: {} as bootstrap.Modal,
+            limitSettingList: {},
+            limitSettingLoading: true,
         };
     },
     created() {
@@ -176,6 +213,7 @@ export default defineComponent({
     mounted() {
         this.eventLogView = new bootstrap.Modal('#eventView');
         this.devInfoView = new bootstrap.Modal('#devInfoView');
+        this.limitSettingView = new bootstrap.Modal('#limitSettingView');
     },
     unmounted() {
         this.closeSocket();
@@ -282,6 +320,20 @@ export default defineComponent({
                 });
 
             this.devInfoView.show();
+        },
+        onHideLimitSettings() {
+            this.limitSettingView.hide();
+        },
+        onShowLimitSettings(serial: number) {
+            this.limitSettingLoading = true;
+            fetch("/api/limit/status")
+                .then((response) => response.json())
+                .then((data) => {
+                    this.limitSettingList = data[serial];
+                    this.limitSettingLoading = false;
+                });
+
+            this.limitSettingView.show();
         },
     },
 });
