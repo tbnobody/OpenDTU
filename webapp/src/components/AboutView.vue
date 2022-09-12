@@ -27,7 +27,8 @@
                             The Hoymiles protocol was decrypted through the voluntary efforts of many participants.
                             OpenDTU,
                             among others, was developed based on this work. The project is licensed under an Open Source
-                            License (<a href="https://www.gnu.de/documents/gpl-2.0.de.html" target="_blank">GNU General Public License version 2</a>).
+                            License (<a href="https://www.gnu.de/documents/gpl-2.0.de.html" target="_blank">GNU General
+                                Public License version 2</a>).
                         </p>
                         <p class="fw-normal">
                             The software was developed to the best of our knowledge and belief. Nevertheless, no
@@ -87,7 +88,8 @@
                 <div id="collapseFour" class="accordion-collapse collapse" aria-labelledby="headingFour"
                     data-bs-parent="#accordionExample">
                     <div class="accordion-body">
-                        Discuss with us on <a href="https://discord.gg/WzhxEY62mB">Discord</a>
+                        Discuss with us on <a href="https://discord.gg/WzhxEY62mB" target="_blank">Discord</a> or <a
+                            href="https://github.com/tbnobody/OpenDTU/discussions" target="_blank">Github</a>
                     </div>
                 </div>
             </div>
