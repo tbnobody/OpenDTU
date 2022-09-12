@@ -298,7 +298,7 @@ export default defineComponent({
         },
         onShowEventlog(serial: number) {
             this.eventLogLoading = true;
-            fetch("/api/eventlog/status")
+            fetch("/api/eventlog/status?inv=" + serial)
                 .then((response) => response.json())
                 .then((data) => {
                     this.eventLogList = data[serial];
