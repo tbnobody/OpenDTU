@@ -9,7 +9,7 @@
   },
   "dependencies": {
     "@popperjs/core": "^2.11.6",
-    "bootstrap": "^5.2.0",
+    "bootstrap": "^5.2.1",
     "bootstrap-icons-vue": "^1.8.1",
     "core-js": "^3.25.0",
     "spark-md5": "^3.0.2",
@@ -20,7 +20,7 @@
   "devDependencies": {
     "@babel/core": "^7.18.13",
     "@babel/eslint-parser": "^7.18.9",
-    "@types/bootstrap": "^5.2.2",
+    "@types/bootstrap": "^5.2.4",
     "@types/node": "^18.7.15",
     "@types/spark-md5": "^3.0.2",
     "@typescript-eslint/parser": "^5.36.1",
