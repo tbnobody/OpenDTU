@@ -123,9 +123,9 @@ void WebApiNtpClass::onNtpAdminPost(AsyncWebServerRequest* request)
     }
 
     CONFIG_T& config = Configuration.get();
-    strcpy(config.Ntp_Server, root[F("ntp_server")].as<String>().c_str());
-    strcpy(config.Ntp_Timezone, root[F("ntp_timezone")].as<String>().c_str());
-    strcpy(config.Ntp_TimezoneDescr, root[F("ntp_timezone_descr")].as<String>().c_str());
+    strlcpy(config.Ntp_Server, root[F("ntp_server")].as<String>().c_str(), sizeof(config.Ntp_Server));
+    strlcpy(config.Ntp_Timezone, root[F("ntp_timezone")].as<String>().c_str(), sizeof(config.Ntp_Timezone));
+    strlcpy(config.Ntp_TimezoneDescr, root[F("ntp_timezone_descr")].as<String>().c_str(), sizeof(config.Ntp_TimezoneDescr));
     Configuration.write();
 
     retMsg[F("type")] = F("success");

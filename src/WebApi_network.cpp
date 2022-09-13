@@ -185,9 +185,9 @@ void WebApiNetworkClass::onNetworkAdminPost(AsyncWebServerRequest* request)
     config.WiFi_Dns2[1] = dns2[1];
     config.WiFi_Dns2[2] = dns2[2];
     config.WiFi_Dns2[3] = dns2[3];
-    strcpy(config.WiFi_Ssid, root[F("ssid")].as<String>().c_str());
-    strcpy(config.WiFi_Password, root[F("password")].as<String>().c_str());
-    strcpy(config.WiFi_Hostname, root[F("hostname")].as<String>().c_str());
+    strlcpy(config.WiFi_Ssid, root[F("ssid")].as<String>().c_str(), sizeof(config.WiFi_Ssid));
+    strlcpy(config.WiFi_Password, root[F("password")].as<String>().c_str(), sizeof(config.WiFi_Password));
+    strlcpy(config.WiFi_Hostname, root[F("hostname")].as<String>().c_str(), sizeof(config.WiFi_Hostname));
     if (root[F("dhcp")].as<bool>()) {
         config.WiFi_Dhcp = true;
     } else {

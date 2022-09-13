@@ -240,21 +240,21 @@ void WebApiMqttClass::onMqttAdminPost(AsyncWebServerRequest* request)
     config.Mqtt_Enabled = root[F("mqtt_enabled")].as<bool>();
     config.Mqtt_Retain = root[F("mqtt_retain")].as<bool>();
     config.Mqtt_Tls = root[F("mqtt_tls")].as<bool>();
-    strcpy(config.Mqtt_RootCaCert, root[F("mqtt_root_ca_cert")].as<String>().c_str());
+    strlcpy(config.Mqtt_RootCaCert, root[F("mqtt_root_ca_cert")].as<String>().c_str(), sizeof(config.Mqtt_RootCaCert));
     config.Mqtt_Port = root[F("mqtt_port")].as<uint>();
-    strcpy(config.Mqtt_Hostname, root[F("mqtt_hostname")].as<String>().c_str());
-    strcpy(config.Mqtt_Username, root[F("mqtt_username")].as<String>().c_str());
-    strcpy(config.Mqtt_Password, root[F("mqtt_password")].as<String>().c_str());
-    strcpy(config.Mqtt_Topic, root[F("mqtt_topic")].as<String>().c_str());
-    strcpy(config.Mqtt_LwtTopic, root[F("mqtt_lwt_topic")].as<String>().c_str());
-    strcpy(config.Mqtt_LwtValue_Online, root[F("mqtt_lwt_online")].as<String>().c_str());
-    strcpy(config.Mqtt_LwtValue_Offline, root[F("mqtt_lwt_offline")].as<String>().c_str());
+    strlcpy(config.Mqtt_Hostname, root[F("mqtt_hostname")].as<String>().c_str(), sizeof(config.Mqtt_Hostname));
+    strlcpy(config.Mqtt_Username, root[F("mqtt_username")].as<String>().c_str(), sizeof(config.Mqtt_Username));
+    strlcpy(config.Mqtt_Password, root[F("mqtt_password")].as<String>().c_str(), sizeof(config.Mqtt_Password));
+    strlcpy(config.Mqtt_Topic, root[F("mqtt_topic")].as<String>().c_str(), sizeof(config.Mqtt_Topic));
+    strlcpy(config.Mqtt_LwtTopic, root[F("mqtt_lwt_topic")].as<String>().c_str(), sizeof(config.Mqtt_LwtTopic));
+    strlcpy(config.Mqtt_LwtValue_Online, root[F("mqtt_lwt_online")].as<String>().c_str(), sizeof(config.Mqtt_LwtValue_Online));
+    strlcpy(config.Mqtt_LwtValue_Offline, root[F("mqtt_lwt_offline")].as<String>().c_str(), sizeof(config.Mqtt_LwtValue_Offline));
     config.Mqtt_PublishInterval = root[F("mqtt_publish_interval")].as<uint32_t>();
     config.Mqtt_Hass_Enabled = root[F("mqtt_hass_enabled")].as<bool>();
     config.Mqtt_Hass_Expire = root[F("mqtt_hass_expire")].as<bool>();
     config.Mqtt_Hass_Retain = root[F("mqtt_hass_retain")].as<bool>();
     config.Mqtt_Hass_IndividualPanels = root[F("mqtt_hass_individualpanels")].as<bool>();
-    strcpy(config.Mqtt_Hass_Topic, root[F("mqtt_hass_topic")].as<String>().c_str());
+    strlcpy(config.Mqtt_Hass_Topic, root[F("mqtt_hass_topic")].as<String>().c_str(), sizeof(config.Mqtt_Hass_Topic));
     Configuration.write();
 
     retMsg[F("type")] = F("success");
@@ -273,7 +273,7 @@ String WebApiMqttClass::getRootCaCertInfo(const char* cert)
 
     mbedtls_x509_crt global_cacert;
 
-    strcpy(rootCaCertInfo, "Can't parse root ca");
+    strlcpy(rootCaCertInfo, "Can't parse root ca", sizeof(rootCaCertInfo));
 
     mbedtls_x509_crt_init(&global_cacert);
     int ret = mbedtls_x509_crt_parse(&global_cacert, const_cast<unsigned char*>((unsigned char*)cert), 1 + strlen(cert));
