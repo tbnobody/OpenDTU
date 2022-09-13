@@ -1,6 +1,14 @@
 name: OpenDTU Build
 
-on: [push, pull_request]
+on:
+  push:
+    paths-ignore:
+    - docs/**
+    - '**/*.md'
+  pull_request:
+    paths-ignore:
+    - docs/**
+    - '**/*.md'
 
 jobs:
   get_default_envs:
