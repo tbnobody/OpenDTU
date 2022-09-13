@@ -1,3 +1,4 @@
+#pragma once
 #include "Parser.h"
 #include <Arduino.h>
 
