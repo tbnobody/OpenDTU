@@ -30,7 +30,7 @@ void WebApiLimitClass::onLimitStatus(AsyncWebServerRequest* request)
 
         // Inverter Serial is read as HEX
         char buffer[sizeof(uint64_t) * 8 + 1];
-        sprintf(buffer, "%0lx%08lx",
+        snprintf(buffer, sizeof(buffer), "%0lx%08lx",
             ((uint32_t)((inv->serial() >> 32) & 0xFFFFFFFF)),
             ((uint32_t)(inv->serial() & 0xFFFFFFFF)));
 

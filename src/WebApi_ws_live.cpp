@@ -74,7 +74,7 @@ void WebApiWsLiveClass::generateJsonResponse(JsonVariant& root)
         auto inv = Hoymiles.getInverterByPos(i);
 
         char buffer[sizeof(uint64_t) * 8 + 1];
-        sprintf(buffer, "%0lx%08lx",
+        snprintf(buffer, sizeof(buffer), "%0lx%08lx",
             ((uint32_t)((inv->serial() >> 32) & 0xFFFFFFFF)),
             ((uint32_t)(inv->serial() & 0xFFFFFFFF)));
 
@@ -135,11 +135,11 @@ void WebApiWsLiveClass::onWebsocketEvent(AsyncWebSocket* server, AsyncWebSocketC
 {
     if (type == WS_EVT_CONNECT) {
         char str[64];
-        sprintf(str, "Websocket: [%s][%u] connect", server->url(), client->id());
+        snprintf(str, sizeof(str), "Websocket: [%s][%u] connect", server->url(), client->id());
         Serial.println(str);
     } else if (type == WS_EVT_DISCONNECT) {
         char str[64];
-        sprintf(str, "Websocket: [%s][%u] disconnect", server->url(), client->id());
+        snprintf(str, sizeof(str), "Websocket: [%s][%u] disconnect", server->url(), client->id());
         Serial.println(str);
     }
 }

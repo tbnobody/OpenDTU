@@ -74,7 +74,7 @@ void MqttHassPublishingClass::publishField(std::shared_ptr<InverterAbstract> inv
     }
 
     char serial[sizeof(uint64_t) * 8 + 1];
-    sprintf(serial, "%0lx%08lx",
+    snprintf(serial, sizeof(serial), "%0lx%08lx",
         ((uint32_t)((inv->serial() >> 32) & 0xFFFFFFFF)),
         ((uint32_t)(inv->serial() & 0xFFFFFFFF)));
 

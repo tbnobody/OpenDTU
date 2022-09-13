@@ -278,7 +278,7 @@ String WebApiMqttClass::getRootCaCertInfo(const char* cert)
     mbedtls_x509_crt_init(&global_cacert);
     int ret = mbedtls_x509_crt_parse(&global_cacert, const_cast<unsigned char*>((unsigned char*)cert), 1 + strlen(cert));
     if (ret < 0) {
-        sprintf(rootCaCertInfo, "Can't parse root ca: mbedtls_x509_crt_parse returned -0x%x\n\n", -ret);
+        snprintf(rootCaCertInfo, sizeof(rootCaCertInfo), "Can't parse root ca: mbedtls_x509_crt_parse returned -0x%x\n\n", -ret);
         mbedtls_x509_crt_free(&global_cacert);
         return "";
     }
