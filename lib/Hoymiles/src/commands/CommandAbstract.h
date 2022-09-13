@@ -10,7 +10,7 @@ class InverterAbstract;
 
 class CommandAbstract {
 public:
-    CommandAbstract(uint64_t target_address = 0, uint64_t router_address = 0);
+    explicit CommandAbstract(uint64_t target_address = 0, uint64_t router_address = 0);
     virtual ~CommandAbstract() {};
 
     template <typename T>
