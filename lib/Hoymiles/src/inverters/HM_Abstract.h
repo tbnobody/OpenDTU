@@ -9,6 +9,7 @@ public:
     bool sendAlarmLogRequest(HoymilesRadio* radio);
     bool sendDevInfoRequest(HoymilesRadio* radio);
     bool sendSystemConfigParaRequest(HoymilesRadio* radio);
+    bool sendActivePowerControlRequest(HoymilesRadio* radio, float limit, PowerLimitControlType type);
 
 private:
     uint8_t _lastAlarmLogCnt = 0;

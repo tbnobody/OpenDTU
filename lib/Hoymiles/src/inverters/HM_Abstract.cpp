@@ -1,5 +1,6 @@
 #include "HM_Abstract.h"
 #include "HoymilesRadio.h"
+#include "commands/ActivePowerControlCommand.h"
 #include "commands/AlarmDataCommand.h"
 #include "commands/DevInfoAllCommand.h"
 #include "commands/DevInfoSampleCommand.h"
@@ -85,6 +86,18 @@ bool HM_Abstract::sendSystemConfigParaRequest(HoymilesRadio* radio)
     SystemConfigParaCommand* cmd = radio->enqueCommand<SystemConfigParaCommand>();
     cmd->setTime(now);
     cmd->setTargetAddress(serial());
+
+    return true;
+}
+
+bool HM_Abstract::sendActivePowerControlRequest(HoymilesRadio* radio, float limit, PowerLimitControlType type)
+{
+    ActivePowerControlCommand* cmd = radio->enqueCommand<ActivePowerControlCommand>();
+    cmd->setActivePowerLimit(limit, type);
+    cmd->setTargetAddress(serial());
+
+    // request updated limits
+    sendSystemConfigParaRequest(radio);
 
     return true;
 }

@@ -1,5 +1,6 @@
 #pragma once
 
+#include "../commands/ActivePowerControlCommand.h"
 #include "../parser/AlarmLogParser.h"
 #include "../parser/DevInfoParser.h"
 #include "../parser/StatisticsParser.h"
@@ -42,6 +43,7 @@ public:
     virtual bool sendAlarmLogRequest(HoymilesRadio* radio) = 0;
     virtual bool sendDevInfoRequest(HoymilesRadio* radio) = 0;
     virtual bool sendSystemConfigParaRequest(HoymilesRadio* radio) = 0;
+    virtual bool sendActivePowerControlRequest(HoymilesRadio* radio, float limit, PowerLimitControlType type) = 0;
 
     AlarmLogParser* EventLog();
     DevInfoParser* DevInfo();
