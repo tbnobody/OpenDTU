@@ -22,6 +22,6 @@ private:
 
     uint32_t _lastWsPublish = 0;
     uint32_t _lastInvUpdateCheck = 0;
-    unsigned long _lastWsCleanup = 0;
+    uint32_t _lastWsCleanup = 0;
     uint32_t _newestInverterTimestamp = 0;
 };

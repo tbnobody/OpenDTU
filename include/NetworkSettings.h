@@ -68,7 +68,7 @@ private:
     int adminTimeoutCounter = 0;
     int connectTimeoutTimer = 0;
     int connectRedoTimer = 0;
-    unsigned long lastTimerCall = 0;
+    uint32_t lastTimerCall = 0;
     const byte DNS_PORT = 53;
     IPAddress apIp;
     IPAddress apNetmask;
