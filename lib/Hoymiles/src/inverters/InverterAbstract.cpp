@@ -90,6 +90,7 @@ void InverterAbstract::addRxFragment(uint8_t fragment[], uint8_t len)
         // Packets with 0x81 will be seen as 1
         memcpy(_rxFragmentBuffer[(fragmentCount & 0b01111111) - 1].fragment, &fragment[10], len - 11);
         _rxFragmentBuffer[(fragmentCount & 0b01111111) - 1].len = len - 11;
+        _rxFragmentBuffer[(fragmentCount & 0b01111111) - 1].mainCmd = fragment[0];
         _rxFragmentBuffer[(fragmentCount & 0b01111111) - 1].wasReceived = true;
 
         if ((fragmentCount & 0b01111111) > _rxFragmentLastPacketId) {

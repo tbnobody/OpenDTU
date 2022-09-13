@@ -42,8 +42,3 @@ PowerLimitControlType ActivePowerControlCommand::getType()
 {
     return (PowerLimitControlType)(((uint16_t)_payload[14] << 8) | _payload[15]);
 }
-
-bool ActivePowerControlCommand::handleResponse(InverterAbstract* inverter, fragment_t fragment[], uint8_t max_fragment_id)
-{
-    return true;
-}

@@ -16,6 +16,4 @@ public:
     void setActivePowerLimit(float limit, PowerLimitControlType type = RelativNonPersistent);
     float getLimit();
     PowerLimitControlType getType();
-
-    virtual bool handleResponse(InverterAbstract* inverter, fragment_t fragment[], uint8_t max_fragment_id);
 };

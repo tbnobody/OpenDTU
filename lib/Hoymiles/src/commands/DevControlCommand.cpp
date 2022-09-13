@@ -14,3 +14,14 @@ void DevControlCommand::udpateCRC(uint8_t len)
     _payload[10 + len] = (uint8_t)(crc >> 8);
     _payload[10 + len + 1] = (uint8_t)(crc);
 }
+
+bool DevControlCommand::handleResponse(InverterAbstract* inverter, fragment_t fragment[], uint8_t max_fragment_id)
+{
+    for (uint8_t i = 0; i < max_fragment_id; i++) {
+        if (fragment[i].mainCmd != (_payload[0] | 0x80)) {
+            return false;
+        }
+    }
+
+    return true;
+}
