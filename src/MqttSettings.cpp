@@ -68,7 +68,7 @@ void MqttSettingsClass::onMqttDisconnect(espMqttClientTypes::DisconnectReason re
 void MqttSettingsClass::performConnect()
 {
     if (NetworkSettings.isConnected() && Configuration.get().Mqtt_Enabled) {
-        using namespace std::placeholders;
+        using std::placeholders::_1;
         Serial.println(F("Connecting to MQTT..."));
         const CONFIG_T& config = Configuration.get();
         willTopic = getPrefix() + config.Mqtt_LwtTopic;
@@ -136,7 +136,7 @@ void MqttSettingsClass::publishHass(String subtopic, String payload)
 
 void MqttSettingsClass::init()
 {
-    using namespace std::placeholders;
+    using std::placeholders::_1;
     NetworkSettings.onEvent(std::bind(&MqttSettingsClass::NetworkEvent, this, _1));
 
     createMqttClientObject();

@@ -11,7 +11,7 @@
 
 void WebApiNetworkClass::init(AsyncWebServer* server)
 {
-    using namespace std::placeholders;
+    using std::placeholders::_1;
 
     _server = server;
 

@@ -15,8 +15,6 @@ WebApiClass::WebApiClass()
 
 void WebApiClass::init()
 {
-    using namespace std::placeholders;
-
     _server.addHandler(&_events);
 
     _webApiDevInfo.init(&_server);

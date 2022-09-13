@@ -19,7 +19,7 @@ NetworkSettingsClass::NetworkSettingsClass()
 
 void NetworkSettingsClass::init()
 {
-    using namespace std::placeholders;
+    using std::placeholders::_1;
 
     WiFi.onEvent(std::bind(&NetworkSettingsClass::NetworkEvent, this, _1));
     setupMode();

@@ -9,8 +9,6 @@
 #include <nRF24L01.h>
 #include <queue>
 
-using namespace std;
-
 // number of fragments hold in buffer
 #define FRAGMENT_BUFFER_SIZE 30
 
@@ -57,7 +55,7 @@ public:
     template <typename T>
     T* enqueCommand()
     {
-        _commandQueue.push(make_shared<T>());
+        _commandQueue.push(std::make_shared<T>());
         return static_cast<T*>(_commandQueue.back().get());
     }
 
@@ -89,5 +87,5 @@ private:
 
     bool _busyFlag = false;
 
-    queue<shared_ptr<CommandAbstract>> _commandQueue;
+    std::queue<std::shared_ptr<CommandAbstract>> _commandQueue;
 };
