@@ -64,7 +64,7 @@ void WebApiWsLiveClass::loop()
         size_t len = measureJson(root);
         AsyncWebSocketMessageBuffer* buffer = _ws.makeBuffer(len); //  creates a buffer (len + 1) for you.
         if (buffer) {
-            serializeJson(root, (char*)buffer->get(), len + 1);
+            serializeJson(root, reinterpret_cast<char*>(buffer->get()), len + 1);
             _ws.textAll(buffer);
         }
 
