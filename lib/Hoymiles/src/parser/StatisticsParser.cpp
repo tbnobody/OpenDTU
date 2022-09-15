@@ -56,7 +56,7 @@ float StatisticsParser::getChannelFieldValue(uint8_t channel, uint8_t fieldId)
             val |= _payloadStatistic[ptr];
         } while (++ptr != end);
 
-        return (float)(val) / (float)(div);
+        return static_cast<float>(val) / static_cast<float>(div);
     } else {
         // Value has to be calculated
         return calcFunctions[b[pos].start].func(this, b[pos].num);
