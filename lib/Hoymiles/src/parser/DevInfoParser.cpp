@@ -98,7 +98,7 @@ uint16_t DevInfoParser::getHwVersion()
 /* struct tm to seconds since Unix epoch */
 time_t DevInfoParser::timegm(struct tm* t)
 {
-    register long year;
+    register uint32_t year;
     register time_t result;
 #define MONTHSPERYEAR 12 /* months per calendar year */
     static const int cumdays[MONTHSPERYEAR] = { 0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334 };
