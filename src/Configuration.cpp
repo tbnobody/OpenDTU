@@ -66,7 +66,7 @@ bool ConfigurationClass::write()
         return false;
     }
     config.Cfg_SaveCount++;
-    uint8_t* bytes = (uint8_t*)&config;
+    uint8_t* bytes = reinterpret_cast<uint8_t*>(&config);
     for (unsigned int i = 0; i < sizeof(CONFIG_T); i++) {
         f.write(bytes[i]);
     }
@@ -80,7 +80,7 @@ bool ConfigurationClass::read()
     if (!f) {
         return false;
     }
-    uint8_t* bytes = (uint8_t*)&config;
+    uint8_t* bytes = reinterpret_cast<uint8_t*>(&config);
     for (unsigned int i = 0; i < sizeof(CONFIG_T); i++) {
         bytes[i] = f.read();
     }
