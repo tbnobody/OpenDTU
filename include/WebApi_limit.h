@@ -10,6 +10,7 @@ public:
 
 private:
     void onLimitStatus(AsyncWebServerRequest* request);
+    void onLimitPost(AsyncWebServerRequest* request);
 
     AsyncWebServer* _server;
 };
