@@ -126,9 +126,8 @@ void WebApiInverterClass::onInverterAdd(AsyncWebServerRequest* request)
         return;
     }
 
-    char* t;
     // Interpret the string as a hex value and convert it to uint64_t
-    inverter->Serial = strtoll(root[F("serial")].as<String>().c_str(), &t, 16);
+    inverter->Serial = strtoll(root[F("serial")].as<String>().c_str(), NULL, 16);
 
     strncpy(inverter->Name, root[F("name")].as<String>().c_str(), INV_MAX_NAME_STRLEN);
     Configuration.write();
@@ -224,8 +223,7 @@ void WebApiInverterClass::onInverterEdit(AsyncWebServerRequest* request)
 
     INVERTER_CONFIG_T& inverter = Configuration.get().Inverter[root[F("id")].as<uint8_t>()];
 
-    char* t;
-    uint64_t new_serial = strtoll(root[F("serial")].as<String>().c_str(), &t, 16);
+    uint64_t new_serial = strtoll(root[F("serial")].as<String>().c_str(), NULL, 16);
     uint64_t old_serial = inverter.Serial;
 
     // Interpret the string as a hex value and convert it to uint64_t

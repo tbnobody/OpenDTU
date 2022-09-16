@@ -28,8 +28,7 @@ void WebApiEventlogClass::onEventlogStatus(AsyncWebServerRequest* request)
     uint64_t serial = 0;
     if (request->hasParam("inv")) {
         String s = request->getParam("inv")->value();
-        char* t;
-        serial = strtoll(s.c_str(), &t, 16);
+        serial = strtoll(s.c_str(), NULL, 16);
     }
 
     auto inv = Hoymiles.getInverterBySerial(serial);

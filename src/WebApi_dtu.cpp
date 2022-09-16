@@ -102,9 +102,9 @@ void WebApiDtuClass::onDtuAdminPost(AsyncWebServerRequest* request)
     }
 
     CONFIG_T& config = Configuration.get();
-    char* t;
+
     // Interpret the string as a hex value and convert it to uint64_t
-    config.Dtu_Serial = strtoll(root[F("dtu_serial")].as<String>().c_str(), &t, 16);
+    config.Dtu_Serial = strtoll(root[F("dtu_serial")].as<String>().c_str(), NULL, 16);
     config.Dtu_PollInterval = root[F("dtu_pollinterval")].as<uint32_t>();
     config.Dtu_PaLevel = root[F("dtu_palevel")].as<uint8_t>();
     Configuration.write();
