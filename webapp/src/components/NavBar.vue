@@ -37,6 +37,9 @@
                                 <hr class="dropdown-divider" />
                             </li>
                             <li>
+                                <router-link @click="onClick" class="dropdown-item" to="/settings/config">Config Management</router-link>
+                            </li>
+                            <li>
                                 <router-link @click="onClick" class="dropdown-item" to="/firmware/upgrade">Firmware Upgrade</router-link>
                             </li>
                         </ul>
