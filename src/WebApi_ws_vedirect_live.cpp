@@ -52,10 +52,9 @@ void WebApiWsVedirectLiveClass::loop()
         JsonVariant var = root;
         generateJsonResponse(var);
 
-        size_t len = measureJson(root);
-        AsyncWebSocketMessageBuffer* buffer = _ws.makeBuffer(len); //  creates a buffer (len + 1) for you.
+        String buffer;
         if (buffer) {
-            serializeJson(root, (char*)buffer->get(), len + 1);
+            serializeJson(root, buffer);
             _ws.textAll(buffer);
         }
 
