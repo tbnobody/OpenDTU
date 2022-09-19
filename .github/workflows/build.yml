@@ -109,6 +109,8 @@ jobs:
           path: |
             .pio/build/${{ matrix.environment }}/opendtu-${{ matrix.environment }}.bin
             .pio/build/${{ matrix.environment }}/partitions.bin
+            ~/.platformio\packages\framework-arduinoespressif32\tools\sdk\esp32\bin\bootloader_dio_40m.bin
+            ~/.platformio\packages\framework-arduinoespressif32\tools\partitions\boot_app0.bin
 
   release:
     name: Create Release
