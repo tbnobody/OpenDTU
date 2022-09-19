@@ -35,7 +35,7 @@ void WebApiNtpClass::onNtpStatus(AsyncWebServerRequest* request)
     root[F("ntp_timezone_descr")] = config.Ntp_TimezoneDescr;
 
     struct tm timeinfo;
-    if (!getLocalTime(&timeinfo)) {
+    if (!getLocalTime(&timeinfo, 0)) {
         root[F("ntp_status")] = false;
     } else {
         root[F("ntp_status")] = true;
