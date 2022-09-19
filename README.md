@@ -37,7 +37,7 @@ It was the goal to replace the original Hoymiles DTU (Telemetry Gateway) with th
 ## Features for developers
 * The microcontroller part
     * Build with Arduino PlatformIO Framework for the ESP32
-    * Uses [ESPAsyncWebserver](https://github.com/me-no-dev/ESPAsyncWebServer) and [Async MQTT client](https://github.com/marvinroger/async-mqtt-client)
+    * Uses a fork of [ESPAsyncWebserver](https://github.com/yubox-node-org/ESPAsyncWebServer) and [espMqttClient](https://github.com/bertmelis/espMqttClient)
 
 * The WebApp part
     * Build with [Vue.js](https://vuejs.org)
