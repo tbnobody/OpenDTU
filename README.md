@@ -128,7 +128,7 @@ Use a ESP32 flash tool of your choice and flash the .bin files to the right addr
 | 0xe000   | boot_app0.bin          |
 | 0x10000  | firmware.bin           |
 
-Make sure too uncheck the DoNotChgBbin option. Otherwise you will maybe get errors like "invalid header"
+Make sure too uncheck the DoNotChgBin option. Otherwise you will maybe get errors like "invalid header"
 
 ## First configuration
 * After the initial flashing of the microcontroller, an Access Point called "OpenDTU-*" is opened. The default password is "openDTU42".
