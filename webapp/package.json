@@ -19,7 +19,7 @@
   },
   "devDependencies": {
     "@babel/core": "^7.19.0",
-    "@babel/eslint-parser": "^7.18.9",
+    "@babel/eslint-parser": "^7.19.1",
     "@types/bootstrap": "^5.2.4",
     "@types/node": "^18.7.16",
     "@types/spark-md5": "^3.0.2",
