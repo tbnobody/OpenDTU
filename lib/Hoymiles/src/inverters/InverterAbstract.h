@@ -1,8 +1,9 @@
 #pragma once
 
 #include "../parser/AlarmLogParser.h"
-#include "../parser/StatisticsParser.h"
 #include "../parser/DevInfoParser.h"
+#include "../parser/StatisticsParser.h"
+#include "../parser/SystemConfigParaParser.h"
 #include "HoymilesRadio.h"
 #include "types.h"
 #include <Arduino.h>
@@ -24,7 +25,7 @@ class CommandAbstract;
 
 class InverterAbstract {
 public:
-    InverterAbstract(uint64_t serial);
+    explicit InverterAbstract(uint64_t serial);
     void init();
     uint64_t serial();
     void setName(const char* name);
@@ -40,14 +41,16 @@ public:
     virtual bool sendStatsRequest(HoymilesRadio* radio) = 0;
     virtual bool sendAlarmLogRequest(HoymilesRadio* radio) = 0;
     virtual bool sendDevInfoRequest(HoymilesRadio* radio) = 0;
+    virtual bool sendSystemConfigParaRequest(HoymilesRadio* radio) = 0;
 
     AlarmLogParser* EventLog();
     DevInfoParser* DevInfo();
     StatisticsParser* Statistics();
+    SystemConfigParaParser* SystemConfigPara();
 
 private:
     serial_u _serial;
-    char _name[MAX_NAME_LENGTH];
+    char _name[MAX_NAME_LENGTH] = "";
     fragment_t _rxFragmentBuffer[MAX_RF_FRAGMENT_COUNT];
     uint8_t _rxFragmentMaxPacketId = 0;
     uint8_t _rxFragmentLastPacketId = 0;
@@ -56,4 +59,5 @@ private:
     std::unique_ptr<AlarmLogParser> _alarmLogParser;
     std::unique_ptr<DevInfoParser> _devInfoParser;
     std::unique_ptr<StatisticsParser> _statisticsParser;
+    std::unique_ptr<SystemConfigParaParser> _systemConfigParaParser;
 };

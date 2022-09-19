@@ -9,7 +9,7 @@
 
 void WebApiEventlogClass::init(AsyncWebServer* server)
 {
-    using namespace std::placeholders;
+    using std::placeholders::_1;
 
     _server = server;
 
@@ -22,15 +22,21 @@ void WebApiEventlogClass::loop()
 
 void WebApiEventlogClass::onEventlogStatus(AsyncWebServerRequest* request)
 {
-    AsyncJsonResponse* response = new AsyncJsonResponse();
+    AsyncJsonResponse* response = new AsyncJsonResponse(false, 2048);
     JsonObject root = response->getRoot();
 
-    for (uint8_t i = 0; i < Hoymiles.getNumInverters(); i++) {
-        auto inv = Hoymiles.getInverterByPos(i);
+    uint64_t serial = 0;
+    if (request->hasParam("inv")) {
+        String s = request->getParam("inv")->value();
+        serial = strtoll(s.c_str(), NULL, 16);
+    }
 
+    auto inv = Hoymiles.getInverterBySerial(serial);
+
+    if (inv != nullptr) {
         // Inverter Serial is read as HEX
         char buffer[sizeof(uint64_t) * 8 + 1];
-        sprintf(buffer, "%0lx%08lx",
+        snprintf(buffer, sizeof(buffer), "%0lx%08lx",
             ((uint32_t)((inv->serial() >> 32) & 0xFFFFFFFF)),
             ((uint32_t)(inv->serial() & 0xFFFFFFFF)));
 

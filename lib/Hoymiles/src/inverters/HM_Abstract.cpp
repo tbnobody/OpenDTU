@@ -4,6 +4,7 @@
 #include "commands/DevInfoAllCommand.h"
 #include "commands/DevInfoSampleCommand.h"
 #include "commands/RealTimeRunDataCommand.h"
+#include "commands/SystemConfigParaCommand.h"
 
 HM_Abstract::HM_Abstract(uint64_t serial)
     : InverterAbstract(serial) {};
@@ -67,6 +68,23 @@ bool HM_Abstract::sendDevInfoRequest(HoymilesRadio* radio)
     DevInfoSampleCommand* cmdSample = radio->enqueCommand<DevInfoSampleCommand>();
     cmdSample->setTime(now);
     cmdSample->setTargetAddress(serial());
+
+    return true;
+}
+
+bool HM_Abstract::sendSystemConfigParaRequest(HoymilesRadio* radio)
+{
+    struct tm timeinfo;
+    if (!getLocalTime(&timeinfo)) {
+        return false;
+    }
+
+    time_t now;
+    time(&now);
+
+    SystemConfigParaCommand* cmd = radio->enqueCommand<SystemConfigParaCommand>();
+    cmd->setTime(now);
+    cmd->setTargetAddress(serial());
 
     return true;
 }

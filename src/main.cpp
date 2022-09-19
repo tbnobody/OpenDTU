@@ -81,7 +81,7 @@ void setup()
 
     // Initialize inverter communication
     Serial.print(F("Initialize Hoymiles interface... "));
-    CONFIG_T& config = Configuration.get();
+    const CONFIG_T& config = Configuration.get();
     Hoymiles.init();
 
     Serial.println(F("  Setting radio PA level... "));

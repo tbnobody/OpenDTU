@@ -19,7 +19,7 @@ NetworkSettingsClass::NetworkSettingsClass()
 
 void NetworkSettingsClass::init()
 {
-    using namespace std::placeholders;
+    using std::placeholders::_1;
 
     WiFi.onEvent(std::bind(&NetworkSettingsClass::NetworkEvent, this, _1));
     setupMode();
@@ -142,11 +142,7 @@ void NetworkSettingsClass::enableAdminMode()
 
 String NetworkSettingsClass::getApName()
 {
-    uint32_t chipId = 0;
-    for (int i = 0; i < 17; i += 8) {
-        chipId |= ((ESP.getEfuseMac() >> (40 - i)) & 0xff) << i;
-    }
-    return String(ACCESS_POINT_NAME + String(chipId));
+    return String(ACCESS_POINT_NAME + String(getChipId()));
 }
 
 void NetworkSettingsClass::loop()
@@ -241,32 +237,37 @@ void NetworkSettingsClass::applyConfig()
 void NetworkSettingsClass::setHostname()
 {
     Serial.print(F("Setting Hostname... "));
-    if (strcmp(Configuration.get().WiFi_Hostname, "")) {
-        if (_networkMode == network_mode::WiFi) {
-            if (WiFi.hostname(Configuration.get().WiFi_Hostname)) {
-                Serial.println(F("done"));
-            } else {
-                Serial.println(F("failed"));
-            }
+    if (_networkMode == network_mode::WiFi) {
+        if (WiFi.hostname(getHostname())) {
+            Serial.println(F("done"));
+        } else {
+            Serial.println(F("failed"));
         }
-#ifdef OPENDTU_ETHERNET
-        else if (_networkMode == network_mode::Ethernet) {
-            if (ETH.setHostname(Configuration.get().WiFi_Hostname)) {
-                Serial.println(F("done"));
-            } else {
-                Serial.println(F("failed"));
-            }
-        }
-#endif
-    } else {
-        Serial.println(F("failed (Hostname empty)"));
+
+        // Evil bad hack to get the hostname set up correctly
+        WiFi.mode(WIFI_MODE_APSTA);
+        WiFi.mode(WIFI_MODE_STA);
+        setupMode();
     }
+#ifdef OPENDTU_ETHERNET
+    else if (_networkMode == network_mode::Ethernet) {
+        if (ETH.setHostname(getHostname().c_str())) {
+            Serial.println(F("done"));
+        } else {
+            Serial.println(F("failed"));
+        }
+    }
+#endif
 }
 
 void NetworkSettingsClass::setStaticIp()
 {
     if (_networkMode == network_mode::WiFi) {
-        if (!Configuration.get().WiFi_Dhcp) {
+        if (Configuration.get().WiFi_Dhcp) {
+            Serial.print(F("Configuring WiFi STA DHCP IP... "));
+            WiFi.config(INADDR_NONE, INADDR_NONE, INADDR_NONE);
+            Serial.println(F("done"));
+        } else {
             Serial.print(F("Configuring WiFi STA static IP... "));
             WiFi.config(
                 IPAddress(Configuration.get().WiFi_Ip),
@@ -280,7 +281,9 @@ void NetworkSettingsClass::setStaticIp()
 #ifdef OPENDTU_ETHERNET
     else if (_networkMode == network_mode::Ethernet) {
         if (Configuration.get().WiFi_Dhcp) {
+            Serial.print(F("Configuring Ethernet DHCP IP... "));
             ETH.config(INADDR_NONE, INADDR_NONE, INADDR_NONE, INADDR_NONE);
+            Serial.println(F("done"));
         } else {
             Serial.print(F("Configuring Ethernet static IP... "));
             ETH.config(
@@ -375,14 +378,43 @@ String NetworkSettingsClass::macAddress()
     }
 }
 
-const char* NetworkSettingsClass::getHostname()
+String NetworkSettingsClass::getHostname()
 {
-#ifdef OPENDTU_ETHERNET
-    if (_networkMode == network_mode::Ethernet) {
-        return ETH.getHostname();
+    const CONFIG_T& config = Configuration.get();
+    char preparedHostname[WIFI_MAX_HOSTNAME_STRLEN + 1];
+    char resultHostname[WIFI_MAX_HOSTNAME_STRLEN + 1];
+    uint8_t pos = 0;
+
+    uint32_t chipId = getChipId();
+    snprintf(preparedHostname, WIFI_MAX_HOSTNAME_STRLEN + 1, config.WiFi_Hostname, chipId);
+
+    const char* pC = preparedHostname;
+    while (*pC && pos < WIFI_MAX_HOSTNAME_STRLEN) { // while !null and not over length
+        if (isalnum(*pC)) { // if the current char is alpha-numeric append it to the hostname
+            resultHostname[pos] = *pC;
+            pos++;
+        } else if (*pC == ' ' || *pC == '_' || *pC == '-' || *pC == '+' || *pC == '!' || *pC == '?' || *pC == '*') {
+            resultHostname[pos] = '-';
+            pos++;
+        }
+        // else do nothing - no leading hyphens and do not include hyphens for all other characters.
+        pC++;
     }
-#endif
-    return WiFi.getHostname();
+
+    resultHostname[pos] = '\0'; // terminate string
+
+    // last character must not be hyphen
+    while (pos > 0 && resultHostname[pos - 1] == '-') {
+        resultHostname[pos - 1] = '\0';
+        pos--;
+    }
+
+    // Fallback if no other rule applied
+    if (strlen(resultHostname) == 0) {
+        snprintf(resultHostname, WIFI_MAX_HOSTNAME_STRLEN + 1, APP_HOSTNAME, chipId);
+    }
+
+    return resultHostname;
 }
 
 bool NetworkSettingsClass::isConnected()
@@ -397,6 +429,15 @@ bool NetworkSettingsClass::isConnected()
 network_mode NetworkSettingsClass::NetworkMode()
 {
     return _networkMode;
+}
+
+uint32_t NetworkSettingsClass::getChipId()
+{
+    uint32_t chipId = 0;
+    for (int i = 0; i < 17; i += 8) {
+        chipId |= ((ESP.getEfuseMac() >> (40 - i)) & 0xff) << i;
+    }
+    return chipId;
 }
 
 NetworkSettingsClass NetworkSettings;

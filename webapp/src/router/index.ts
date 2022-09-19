@@ -11,6 +11,7 @@ import MqttInfoView from '@/components/MqttInfoView.vue'
 import InverterAdminView from '@/components/InverterAdminView.vue'
 import DtuAdminView from '@/components/DtuAdminView.vue'
 import FirmwareUpgradeView from '@/components/FirmwareUpgradeView.vue'
+import ConfigAdminView from '@/components/ConfigAdminView.vue'
 import VedirectAdminView from '@/components/VedirectAdminView.vue'
 import VedirectInfoView from '@/components/VedirectInfoView.vue'
 
@@ -84,6 +85,11 @@ const routes: Array<RouteRecordRaw> = [
         path: '/firmware/upgrade',
         name: 'Firmware Upgrade',
         component: FirmwareUpgradeView
+    },
+    {
+        path: '/settings/config',
+        name: 'Config Management',
+        component: ConfigAdminView
     }
 ];
 

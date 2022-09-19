@@ -1,3 +1,4 @@
+#pragma once
 #include "Parser.h"
 #include <Arduino.h>
 
@@ -30,9 +31,9 @@ private:
     uint32_t _lastUpdateAll = 0;
     uint32_t _lastUpdateSample = 0;
 
-    uint8_t _payloadDevInfoAll[DEV_INFO_SIZE];
-    uint8_t _devInfoAllLength;
+    uint8_t _payloadDevInfoAll[DEV_INFO_SIZE] = {};
+    uint8_t _devInfoAllLength = 0;
 
-    uint8_t _payloadDevInfoSample[DEV_INFO_SIZE];
-    uint8_t _devInfoSampleLength;
+    uint8_t _payloadDevInfoSample[DEV_INFO_SIZE] = {};
+    uint8_t _devInfoSampleLength = 0;
 };

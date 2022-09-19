@@ -7,6 +7,8 @@
 #include <memory>
 #include <vector>
 
+#define HOY_SYSTEM_CONFIG_PARA_POLL_INTERVAL (10 * 60 * 1000) // 10 minutes
+
 class HoymilesClass {
 public:
     void init();
@@ -28,7 +30,7 @@ private:
     std::vector<std::shared_ptr<InverterAbstract>> _inverters;
     std::unique_ptr<HoymilesRadio> _radio;
 
-    uint32_t _pollInterval;
+    uint32_t _pollInterval = 0;
     uint32_t _lastPoll = 0;
 };
 

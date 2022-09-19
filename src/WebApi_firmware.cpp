@@ -11,7 +11,12 @@
 
 void WebApiFirmwareClass::init(AsyncWebServer* server)
 {
-    using namespace std::placeholders;
+    using std::placeholders::_1;
+    using std::placeholders::_2;
+    using std::placeholders::_3;
+    using std::placeholders::_4;
+    using std::placeholders::_5;
+    using std::placeholders::_6;
 
     _server = server;
 

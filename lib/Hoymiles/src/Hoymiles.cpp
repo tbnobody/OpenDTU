@@ -31,6 +31,12 @@ void HoymilesClass::loop()
                 // Fetch event log
                 iv->sendAlarmLogRequest(_radio.get());
 
+                // Fetch limit
+                if ((iv->SystemConfigPara()->getLastUpdate() == 0) || (millis() - iv->SystemConfigPara()->getLastUpdate() > HOY_SYSTEM_CONFIG_PARA_POLL_INTERVAL)) {
+                    Serial.println("Request SystemConfigPara");
+                    iv->sendSystemConfigParaRequest(_radio.get());
+                }
+
                 // Fetch dev info (but first fetch stats)
                 if (iv->Statistics()->getLastUpdate() > 0 && (iv->DevInfo()->getLastUpdateAll() == 0 || iv->DevInfo()->getLastUpdateSample() == 0)) {
                     Serial.println(F("Request device info"));

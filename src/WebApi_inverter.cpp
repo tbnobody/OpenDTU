@@ -12,7 +12,7 @@
 
 void WebApiInverterClass::init(AsyncWebServer* server)
 {
-    using namespace std::placeholders;
+    using std::placeholders::_1;
 
     _server = server;
 
@@ -32,7 +32,7 @@ void WebApiInverterClass::onInverterList(AsyncWebServerRequest* request)
     JsonObject root = response->getRoot();
     JsonArray data = root.createNestedArray(F("inverter"));
 
-    CONFIG_T& config = Configuration.get();
+    const CONFIG_T& config = Configuration.get();
 
     for (uint8_t i = 0; i < INV_MAX_COUNT; i++) {
         if (config.Inverter[i].Serial > 0) {
@@ -42,7 +42,7 @@ void WebApiInverterClass::onInverterList(AsyncWebServerRequest* request)
 
             // Inverter Serial is read as HEX
             char buffer[sizeof(uint64_t) * 8 + 1];
-            sprintf(buffer, "%0lx%08lx",
+            snprintf(buffer, sizeof(buffer), "%0lx%08lx",
                 ((uint32_t)((config.Inverter[i].Serial >> 32) & 0xFFFFFFFF)),
                 ((uint32_t)(config.Inverter[i].Serial & 0xFFFFFFFF)));
             obj[F("serial")] = buffer;
@@ -126,9 +126,8 @@ void WebApiInverterClass::onInverterAdd(AsyncWebServerRequest* request)
         return;
     }
 
-    char* t;
     // Interpret the string as a hex value and convert it to uint64_t
-    inverter->Serial = strtoll(root[F("serial")].as<String>().c_str(), &t, 16);
+    inverter->Serial = strtoll(root[F("serial")].as<String>().c_str(), NULL, 16);
 
     strncpy(inverter->Name, root[F("name")].as<String>().c_str(), INV_MAX_NAME_STRLEN);
     Configuration.write();
@@ -224,8 +223,7 @@ void WebApiInverterClass::onInverterEdit(AsyncWebServerRequest* request)
 
     INVERTER_CONFIG_T& inverter = Configuration.get().Inverter[root[F("id")].as<uint8_t>()];
 
-    char* t;
-    uint64_t new_serial = strtoll(root[F("serial")].as<String>().c_str(), &t, 16);
+    uint64_t new_serial = strtoll(root[F("serial")].as<String>().c_str(), NULL, 16);
     uint64_t old_serial = inverter.Serial;
 
     // Interpret the string as a hex value and convert it to uint64_t

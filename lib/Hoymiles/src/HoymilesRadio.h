@@ -9,8 +9,6 @@
 #include <nRF24L01.h>
 #include <queue>
 
-using namespace std;
-
 // number of fragments hold in buffer
 #define FRAGMENT_BUFFER_SIZE 30
 
@@ -57,7 +55,7 @@ public:
     template <typename T>
     T* enqueCommand()
     {
-        _commandQueue.push(make_shared<T>());
+        _commandQueue.push(std::make_shared<T>());
         return static_cast<T*>(_commandQueue.back().get());
     }
 
@@ -75,12 +73,12 @@ private:
     std::unique_ptr<SPIClass> _hspi;
     std::unique_ptr<RF24> _radio;
     uint8_t _rxChLst[5] = { 3, 23, 40, 61, 75 };
-    uint8_t _rxChIdx;
+    uint8_t _rxChIdx = 0;
 
     uint8_t _txChLst[5] = { 3, 23, 40, 61, 75 };
-    uint8_t _txChIdx;
+    uint8_t _txChIdx = 0;
 
-    volatile bool _packetReceived;
+    volatile bool _packetReceived = false;
 
     CircularBuffer<fragment_t, FRAGMENT_BUFFER_SIZE> _rxBuffer;
     TimeoutHelper _rxTimeout;
@@ -89,5 +87,5 @@ private:
 
     bool _busyFlag = false;
 
-    queue<shared_ptr<CommandAbstract>> _commandQueue;
+    std::queue<std::shared_ptr<CommandAbstract>> _commandQueue;
 };

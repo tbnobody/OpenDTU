@@ -30,7 +30,7 @@ void MqttSettingsClass::NetworkEvent(network_event event)
 void MqttSettingsClass::onMqttConnect(bool sessionPresent)
 {
     Serial.println(F("Connected to MQTT."));
-    CONFIG_T& config = Configuration.get();
+    const CONFIG_T& config = Configuration.get();
     publish(config.Mqtt_LwtTopic, config.Mqtt_LwtValue_Online);
 }
 
@@ -68,9 +68,9 @@ void MqttSettingsClass::onMqttDisconnect(espMqttClientTypes::DisconnectReason re
 void MqttSettingsClass::performConnect()
 {
     if (NetworkSettings.isConnected() && Configuration.get().Mqtt_Enabled) {
-        using namespace std::placeholders;
+        using std::placeholders::_1;
         Serial.println(F("Connecting to MQTT..."));
-        CONFIG_T& config = Configuration.get();
+        const CONFIG_T& config = Configuration.get();
         willTopic = getPrefix() + config.Mqtt_LwtTopic;
         clientId = NetworkSettings.getApName();
         if (config.Mqtt_Tls) {
@@ -95,7 +95,7 @@ void MqttSettingsClass::performConnect()
 
 void MqttSettingsClass::performDisconnect()
 {
-    CONFIG_T& config = Configuration.get();
+    const CONFIG_T& config = Configuration.get();
     publish(config.Mqtt_LwtTopic, config.Mqtt_LwtValue_Offline);
     mqttClient->disconnect();
 }
@@ -136,7 +136,7 @@ void MqttSettingsClass::publishHass(String subtopic, String payload)
 
 void MqttSettingsClass::init()
 {
-    using namespace std::placeholders;
+    using std::placeholders::_1;
     NetworkSettings.onEvent(std::bind(&MqttSettingsClass::NetworkEvent, this, _1));
 
     createMqttClientObject();
@@ -146,7 +146,7 @@ void MqttSettingsClass::createMqttClientObject()
 {
     if (mqttClient != nullptr)
         delete mqttClient;
-    CONFIG_T& config = Configuration.get();
+    const CONFIG_T& config = Configuration.get();
     if (config.Mqtt_Tls) {
         mqttClient = static_cast<MqttClient*>(new espMqttClientSecure);
     } else {

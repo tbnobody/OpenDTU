@@ -10,7 +10,7 @@
 
 void WebApiDtuClass::init(AsyncWebServer* server)
 {
-    using namespace std::placeholders;
+    using std::placeholders::_1;
 
     _server = server;
 
@@ -26,11 +26,11 @@ void WebApiDtuClass::onDtuAdminGet(AsyncWebServerRequest* request)
 {
     AsyncJsonResponse* response = new AsyncJsonResponse();
     JsonObject root = response->getRoot();
-    CONFIG_T& config = Configuration.get();
+    const CONFIG_T& config = Configuration.get();
 
     // DTU Serial is read as HEX
     char buffer[sizeof(uint64_t) * 8 + 1];
-    sprintf(buffer, "%0lx%08lx",
+    snprintf(buffer, sizeof(buffer), "%0lx%08lx",
         ((uint32_t)((config.Dtu_Serial >> 32) & 0xFFFFFFFF)),
         ((uint32_t)(config.Dtu_Serial & 0xFFFFFFFF)));
     root[F("dtu_serial")] = buffer;
@@ -102,9 +102,9 @@ void WebApiDtuClass::onDtuAdminPost(AsyncWebServerRequest* request)
     }
 
     CONFIG_T& config = Configuration.get();
-    char* t;
+
     // Interpret the string as a hex value and convert it to uint64_t
-    config.Dtu_Serial = strtoll(root[F("dtu_serial")].as<String>().c_str(), &t, 16);
+    config.Dtu_Serial = strtoll(root[F("dtu_serial")].as<String>().c_str(), NULL, 16);
     config.Dtu_PollInterval = root[F("dtu_pollinterval")].as<uint32_t>();
     config.Dtu_PaLevel = root[F("dtu_palevel")].as<uint8_t>();
     Configuration.write();

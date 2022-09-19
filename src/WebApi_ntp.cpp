@@ -11,7 +11,7 @@
 
 void WebApiNtpClass::init(AsyncWebServer* server)
 {
-    using namespace std::placeholders;
+    using std::placeholders::_1;
 
     _server = server;
 
@@ -28,7 +28,7 @@ void WebApiNtpClass::onNtpStatus(AsyncWebServerRequest* request)
 {
     AsyncJsonResponse* response = new AsyncJsonResponse();
     JsonObject root = response->getRoot();
-    CONFIG_T& config = Configuration.get();
+    const CONFIG_T& config = Configuration.get();
 
     root[F("ntp_server")] = config.Ntp_Server;
     root[F("ntp_timezone")] = config.Ntp_Timezone;
@@ -52,7 +52,7 @@ void WebApiNtpClass::onNtpAdminGet(AsyncWebServerRequest* request)
 {
     AsyncJsonResponse* response = new AsyncJsonResponse();
     JsonObject root = response->getRoot();
-    CONFIG_T& config = Configuration.get();
+    const CONFIG_T& config = Configuration.get();
 
     root[F("ntp_server")] = config.Ntp_Server;
     root[F("ntp_timezone")] = config.Ntp_Timezone;
@@ -123,9 +123,9 @@ void WebApiNtpClass::onNtpAdminPost(AsyncWebServerRequest* request)
     }
 
     CONFIG_T& config = Configuration.get();
-    strcpy(config.Ntp_Server, root[F("ntp_server")].as<String>().c_str());
-    strcpy(config.Ntp_Timezone, root[F("ntp_timezone")].as<String>().c_str());
-    strcpy(config.Ntp_TimezoneDescr, root[F("ntp_timezone_descr")].as<String>().c_str());
+    strlcpy(config.Ntp_Server, root[F("ntp_server")].as<String>().c_str(), sizeof(config.Ntp_Server));
+    strlcpy(config.Ntp_Timezone, root[F("ntp_timezone")].as<String>().c_str(), sizeof(config.Ntp_Timezone));
+    strlcpy(config.Ntp_TimezoneDescr, root[F("ntp_timezone_descr")].as<String>().c_str(), sizeof(config.Ntp_TimezoneDescr));
     Configuration.write();
 
     retMsg[F("type")] = F("success");

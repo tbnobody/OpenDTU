@@ -1,6 +1,14 @@
 name: OpenDTU Build
 
-on: [push, pull_request]
+on:
+  push:
+    paths-ignore:
+      - docs/**
+      - '**/*.md'
+  pull_request:
+    paths-ignore:
+      - docs/**
+      - '**/*.md'
 
 jobs:
   get_default_envs:
@@ -92,12 +100,15 @@ jobs:
           name: opendtu-${{ matrix.environment }}
           path: |
             .pio/build/${{ matrix.environment }}/opendtu-${{ matrix.environment }}.bin
+            .pio/build/${{ matrix.environment }}/partitions.bin
 
       - uses: actions/upload-artifact@v3
         if: startsWith(github.ref, 'refs/tags/')
         with:
           name: opendtu-release
-          path: .pio/build/${{ matrix.environment }}/opendtu-${{ matrix.environment }}.bin
+          path: |
+            .pio/build/${{ matrix.environment }}/opendtu-${{ matrix.environment }}.bin
+            .pio/build/${{ matrix.environment }}/partitions.bin
 
   release:
     name: Create Release

@@ -272,5 +272,5 @@ int AlarmLogParser::getTimezoneOffset()
     ptm->tm_isdst = -1;
     gmt = mktime(ptm);
 
-    return (int)difftime(rawtime, gmt);
+    return static_cast<int>(difftime(rawtime, gmt));
 }

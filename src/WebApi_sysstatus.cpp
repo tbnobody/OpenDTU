@@ -16,7 +16,7 @@
 
 void WebApiSysstatusClass::init(AsyncWebServer* server)
 {
-    using namespace std::placeholders;
+    using std::placeholders::_1;
 
     _server = server;
 
@@ -58,7 +58,7 @@ void WebApiSysstatusClass::onSystemStatus(AsyncWebServerRequest* request)
     root[F("cfgsavecount")] = Configuration.get().Cfg_SaveCount;
 
     char version[16];
-    sprintf(version, "%d.%d.%d", CONFIG_VERSION >> 24 & 0xff, CONFIG_VERSION >> 16 & 0xff, CONFIG_VERSION >> 8 & 0xff);
+    snprintf(version, sizeof(version), "%d.%d.%d", CONFIG_VERSION >> 24 & 0xff, CONFIG_VERSION >> 16 & 0xff, CONFIG_VERSION >> 8 & 0xff);
     root[F("firmware_version")] = version;
     root[F("git_hash")] = AUTO_GIT_HASH;
 

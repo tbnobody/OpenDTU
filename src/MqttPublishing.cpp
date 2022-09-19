@@ -19,18 +19,21 @@ void MqttPublishingClass::loop()
         return;
     }
 
-    CONFIG_T& config = Configuration.get();
+    const CONFIG_T& config = Configuration.get();
 
     if (millis() - _lastPublish > (config.Mqtt_PublishInterval * 1000)) {
         MqttSettings.publish("dtu/uptime", String(millis() / 1000));
         MqttSettings.publish("dtu/ip", NetworkSettings.localIP().toString());
+        if (NetworkSettings.NetworkMode() == network_mode::WiFi) {
+            MqttSettings.publish("dtu/rssi", String(WiFi.RSSI()));
+        }
 
         // Loop all inverters
         for (uint8_t i = 0; i < Hoymiles.getNumInverters(); i++) {
             auto inv = Hoymiles.getInverterByPos(i);
 
             char buffer[sizeof(uint64_t) * 8 + 1];
-            sprintf(buffer, "%0lx%08lx",
+            snprintf(buffer, sizeof(buffer), "%0lx%08lx",
                 ((uint32_t)((inv->serial() >> 32) & 0xFFFFFFFF)),
                 ((uint32_t)(inv->serial() & 0xFFFFFFFF)));
             String subtopic = String(buffer);
@@ -56,6 +59,11 @@ void MqttPublishingClass::loop()
 
                 // Hardware version
                 MqttSettings.publish(subtopic + "/device/hwversion", String(inv->DevInfo()->getHwVersion()));
+            }
+
+            if (inv->SystemConfigPara()->getLastUpdate() > 0) {
+                // Limit
+                MqttSettings.publish(subtopic + "/settings/limit", String(inv->SystemConfigPara()->getLimitPercent()));
             }
 
             uint32_t lastUpdate = inv->Statistics()->getLastUpdate();
@@ -94,7 +102,7 @@ String MqttPublishingClass::getTopic(std::shared_ptr<InverterAbstract> inv, uint
     }
 
     char buffer[sizeof(uint64_t) * 8 + 1];
-    sprintf(buffer, "%0lx%08lx",
+    snprintf(buffer, sizeof(buffer), "%0lx%08lx",
         ((uint32_t)((inv->serial() >> 32) & 0xFFFFFFFF)),
         ((uint32_t)(inv->serial() & 0xFFFFFFFF)));
     String invSerial = String(buffer);

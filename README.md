@@ -1,5 +1,8 @@
 # OpenDTU_VeDirect
 
+[![OpenDTU Build](https://github.com/tbnobody/OpenDTU/actions/workflows/build.yml/badge.svg)](https://github.com/tbnobody/OpenDTU/actions/workflows/build.yml)
+[![cpplint](https://github.com/tbnobody/OpenDTU/actions/workflows/cpplint.yml/badge.svg)](https://github.com/tbnobody/OpenDTU/actions/workflows/cpplint.yml)
+
 ## Background
 This project was started from [this](https://www.mikrocontroller.net/topic/525778) discussion (Mikrocontroller.net).
 It was the goal to replace the original Hoymiles DTU (Telemetry Gateway) with their cloud access. With a lot of reverse engineering the Hoymiles protocol was decrypted and analyzed.
@@ -55,6 +58,7 @@ Sends text raw data as difined in VE.Direct spec.
 * Read live data from inverter
 * Show inverters internal event log
 * Show inverter information like firmware version, firmware build date, hardware revision and hardware version
+* Show current inverter limit (setting the limit is not yet implemented)
 * Uses ESP32 microcontroller and NRF24L01+
 * Multi-Inverter support
 * MQTT support (with TLS)
@@ -74,6 +78,39 @@ Sends text raw data as difined in VE.Direct spec.
 * The WebApp part
     * Build with [Vue.js](https://vuejs.org)
     * Source is written in TypeScript
+
+## Hardware you need
+
+### ESP32 board
+For ease of use, buy a "ESP32 DEVKIT DOIT" or "ESP32 NodeMCU Development Board" with an ESP32-S3 or ESP-WROOM-32 chipset on it.
+
+Sample Picture:
+
+![NodeMCU-ESP32](docs/nodemcu-esp32.png)
+
+Also supported: Board with Ethernet-Connector and Power-over-Ethernet [Olimex ESP32-POE](https://www.olimex.com/Products/IoT/ESP32/ESP32-POE/open-source-hardware)
+
+#### NRF24L01+ radio board
+The PLUS sign is IMPORTANT! There are different variants available, with antenna on the printed circuit board or external antenna.
+
+Sample picture:
+
+![nrf24l01plus](docs/nrf24l01plus.png)
+
+Buy your hardware from a trusted source, at best from a dealer/online shop in your country where you have support and the right to return non-functional hardware.
+When you want to buy from Amazon, AliExpress, eBay etc., take note that there is a lot of low-quality or fake hardware offered. Read customer comments and ratings carefully!
+
+A heavily incomplete list of trusted hardware shops in germany is:
+
+* [AZ-Delivery](https://www.az-delivery.de/)
+* [Makershop](https://www.makershop.de/)
+* [Berrybase](https://www.berrybase.de/)
+
+This list is for your convenience only, the project is not related to any of these shops.
+
+#### Power supply
+Use a power suppy with 5V and 1A. The USB cable connected to your PC/Notebook may be powerful enough or may be not.
+
 
 ## Wiring up
 ### Schematic
@@ -98,11 +135,13 @@ This can be achieved by editing the 'platformio.ini' file and add/change one or 
 
 ## Flashing and starting up
 ### with Visual Studio Code
-* Install [Visual Studio Code](https://code.visualstudio.com/download)
+* Install [Visual Studio Code](https://code.visualstudio.com/download) (from now named "vscode")
 * In Visual Studio Code, install the [PlatformIO Extension](https://marketplace.visualstudio.com/items?itemName=platformio.platformio-ide)
-* Clone this repository (you really have to clone it, don't just download the ZIP file. During the build process the git hash gets embedded into the firmware. If you download the ZIP file a build error will occur)
-* In Visual Studio Code, choose File --> Open Folder and select the previously downloaded source code. (You have to select the folder which contains the "platformio.ini" file)
-* Adjust the COM port in the file "platformio.ini". It occurs twice:
+* Install git and enable git in vscode - [git download](https://git-scm.com/downloads/) - [Instructions](https://www.jcchouinard.com/install-git-in-vscode/)
+* Clone this repository (you really have to clone it, don't just download the ZIP file. During the build process the git hash gets embedded into the firmware. If you download the ZIP file a build error will occur): Inside vscode open the command palette by pressing `CTRL` + `SHIFT` + `P`. Enter `git clone`, add the repository-URL `https://github.com/tbnobody/OpenDTU`. Next you have to choose (or create) a target directory.
+* In vscode, choose File --> Open Folder and select the previously downloaded source code. (You have to select the folder which contains the "platformio.ini" file)
+* There is a short [Video](https://youtu.be/9cA_esv3zeA) showing these steps.
+* Adjust the COM port in the file "platformio.ini" for your USB-serial-converter. It occurs twice:
     * upload_port
     * monitor_port
 * Select the arrow button in the status bar (PlatformIO: Upload) to compile and upload the firmware. During the compilation, all required libraries are downloaded automatically.
@@ -152,3 +191,21 @@ After the successful upload, the OpenDTU immediately restarts into the new firmw
 
 * Building the microcontroller firmware
     * Visual Studio Code with the PlatformIO Extension is required for building
+
+## Troubleshooting
+* First: When there is no light on the solar panels, the inverter completely turns off and does not answer to OpenDTU! So if you assembled your OpenDTU in the evening, wait until tomorrow.
+* When there is no data received from the inverter(s) - try to reduce the distance between the openDTU and the inverter (e.g. move it to the window towards the roof)
+* Under Settings -> DTU Settings you can increase the transmit power "PA level". Default is "minimum".
+* The NRF24L01+ needs relatively much current. With bad power supply (and especially bad cables!) a 10uF capacitor soldered directly to the NRF24L01+ board connector brings more stability (pin 1+2 are the power supply). Note the polarity of the capacitor....
+* You can try to use an USB power supply with 1A or more instead of connecting the ESP32 to the computer.
+* Try a different USB cable. Once again, a stable power source is important. Some USB cables are made of much plastic and very little copper inside.
+* Double-Check that you have a radio module NRF24L01+ with a plus sign at the end. NRF24L01 module without the plus are not compatible with this project.
+* There is no possibility of auto-discovering the inverters. Double-Check you have entered the serial numbers of the inverters correctly.
+* OpenDTU needs access to a working NTP server to get the current date & time.
+* If your problem persists, check the  [Issues on Github](https://github.com/tbnobody/OpenDTU/issues). Please inspect not only the open issues, also the closed issues contain useful information.
+* Another source of information are the [Discussions](https://github.com/tbnobody/OpenDTU/discussions/)
+
+## Related Projects
+- [Ahoy](https://github.com/grindylow/ahoy)
+- [DTU Simulator](https://github.com/Ziyatoe/DTUsimMI1x00-Hoymiles)
+- [OpenDTU extended to talk to Victrons MPPT battery chargers (Ve.Direct)](https://github.com/helgeerbe/OpenDTU_VeDirect)

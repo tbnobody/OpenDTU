@@ -16,8 +16,6 @@ extern const uint8_t file_app_js_end[] asm("_binary_webapp_dist_js_app_js_gz_end
 
 void WebApiWebappClass::init(AsyncWebServer* server)
 {
-    using namespace std::placeholders;
-
     _server = server;
 
     _server->on("/", HTTP_GET, [](AsyncWebServerRequest* request) {

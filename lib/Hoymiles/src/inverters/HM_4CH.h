@@ -4,7 +4,7 @@
 
 class HM_4CH : public HM_Abstract {
 public:
-    HM_4CH(uint64_t serial);
+    explicit HM_4CH(uint64_t serial);
     static bool isValidSerial(uint64_t serial);
     String typeName();
     const byteAssign_t* getByteAssignment();

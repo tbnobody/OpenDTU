@@ -11,7 +11,7 @@
 
 void WebApiNetworkClass::init(AsyncWebServer* server)
 {
-    using namespace std::placeholders;
+    using std::placeholders::_1;
 
     _server = server;
 
@@ -32,6 +32,7 @@ void WebApiNetworkClass::onNetworkStatus(AsyncWebServerRequest* request)
     root[F("sta_status")] = ((WiFi.getMode() & WIFI_STA) != 0);
     root[F("sta_ssid")] = WiFi.SSID();
     root[F("sta_rssi")] = WiFi.RSSI();
+    root[F("network_hostname")] = NetworkSettings.getHostname();
     root[F("network_ip")] = NetworkSettings.localIP().toString();
     root[F("network_netmask")] = NetworkSettings.subnetMask().toString();
     root[F("network_gateway")] = NetworkSettings.gatewayIP().toString();
@@ -53,7 +54,7 @@ void WebApiNetworkClass::onNetworkAdminGet(AsyncWebServerRequest* request)
 {
     AsyncJsonResponse* response = new AsyncJsonResponse();
     JsonObject root = response->getRoot();
-    CONFIG_T& config = Configuration.get();
+    const CONFIG_T& config = Configuration.get();
 
     root[F("hostname")] = config.WiFi_Hostname;
     root[F("dhcp")] = config.WiFi_Dhcp;
@@ -184,9 +185,9 @@ void WebApiNetworkClass::onNetworkAdminPost(AsyncWebServerRequest* request)
     config.WiFi_Dns2[1] = dns2[1];
     config.WiFi_Dns2[2] = dns2[2];
     config.WiFi_Dns2[3] = dns2[3];
-    strcpy(config.WiFi_Ssid, root[F("ssid")].as<String>().c_str());
-    strcpy(config.WiFi_Password, root[F("password")].as<String>().c_str());
-    strcpy(config.WiFi_Hostname, root[F("hostname")].as<String>().c_str());
+    strlcpy(config.WiFi_Ssid, root[F("ssid")].as<String>().c_str(), sizeof(config.WiFi_Ssid));
+    strlcpy(config.WiFi_Password, root[F("password")].as<String>().c_str(), sizeof(config.WiFi_Password));
+    strlcpy(config.WiFi_Hostname, root[F("hostname")].as<String>().c_str(), sizeof(config.WiFi_Hostname));
     if (root[F("dhcp")].as<bool>()) {
         config.WiFi_Dhcp = true;
     } else {
