@@ -32,7 +32,7 @@ It was the goal to replace the original Hoymiles DTU (Telemetry Gateway) with th
 * Firmware upgrade using the web UI
 * Default source supports up to 10 inverters
 * Time zone support
-
+* Ethernet support
 
 ## Features for developers
 * The microcontroller part
@@ -126,7 +126,7 @@ Use a ESP32 flash tool of your choice and flash the .bin files to the right addr
 | 0x1000   | bootloader_dio_40m.bin |
 | 0x8000   | partitions.bin         |
 | 0xe000   | boot_app0.bin          |
-| 0x10000  | firmware.bin           |
+| 0x10000  | opendtu-*.bin          |
 
 Make sure too uncheck the DoNotChgBin option. Otherwise you will maybe get errors like "invalid header"
 
