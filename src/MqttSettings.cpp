@@ -124,19 +124,23 @@ void MqttSettingsClass::onMqttMessage(const espMqttClientTypes::MessagePropertie
         // Set inverter limit relative persistent
         limit = min<uint32_t>(100, limit);
         Serial.printf("Limit Persistent: %d %%\n", limit);
+        inv->sendActivePowerControlRequest(Hoymiles.getRadio(), limit, PowerLimitControlType::RelativPersistent);
 
     } else if (!strcmp(setting, TOPIC_SUB_LIMIT_PERSISTENT_ABSOLUTE)) {
         // Set inverter limit absolute persistent
         Serial.printf("Limit Persistent: %d W\n", limit);
+        inv->sendActivePowerControlRequest(Hoymiles.getRadio(), limit, PowerLimitControlType::AbsolutPersistent);
 
     } else if (!strcmp(setting, TOPIC_SUB_LIMIT_NONPERSISTENT_RELATIVE)) {
         // Set inverter limit relative non persistent
         limit = min<uint32_t>(100, limit);
         Serial.printf("Limit Non-Persistent: %d %%\n", limit);
+        inv->sendActivePowerControlRequest(Hoymiles.getRadio(), limit, PowerLimitControlType::RelativNonPersistent);
 
     } else if (!strcmp(setting, TOPIC_SUB_LIMIT_NONPERSISTENT_ABSOLUTE)) {
         // Set inverter limit absolute non persistent
         Serial.printf("Limit Non-Persistent: %d W\n", limit);
+        inv->sendActivePowerControlRequest(Hoymiles.getRadio(), limit, PowerLimitControlType::AbsolutNonPersistent);
     }
 }
 
