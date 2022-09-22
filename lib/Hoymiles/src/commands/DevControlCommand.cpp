@@ -6,6 +6,8 @@ DevControlCommand::DevControlCommand(uint64_t target_address, uint64_t router_ad
 {
     _payload[0] = 0x51;
     _payload[9] = 0x81;
+
+    setTimeout(1000);
 }
 
 void DevControlCommand::udpateCRC(uint8_t len)

@@ -15,6 +15,8 @@ ActivePowerControlCommand::ActivePowerControlCommand(uint64_t target_address, ui
     udpateCRC(CRC_SIZE); // 2 byte crc
 
     _payload_size = 18;
+
+    setTimeout(2000);
 }
 
 void ActivePowerControlCommand::setActivePowerLimit(float limit, PowerLimitControlType type)
