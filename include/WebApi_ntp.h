@@ -12,6 +12,8 @@ private:
     void onNtpStatus(AsyncWebServerRequest* request);
     void onNtpAdminGet(AsyncWebServerRequest* request);
     void onNtpAdminPost(AsyncWebServerRequest* request);
+    void onNtpTimeGet(AsyncWebServerRequest* request);
+    void onNtpTimePost(AsyncWebServerRequest* request);
 
     AsyncWebServer* _server;
 };

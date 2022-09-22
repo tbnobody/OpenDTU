@@ -12,7 +12,7 @@ HM_Abstract::HM_Abstract(uint64_t serial)
 bool HM_Abstract::sendStatsRequest(HoymilesRadio* radio)
 {
     struct tm timeinfo;
-    if (!getLocalTime(&timeinfo)) {
+    if (!getLocalTime(&timeinfo, 0)) {
         return false;
     }
 
@@ -29,7 +29,7 @@ bool HM_Abstract::sendStatsRequest(HoymilesRadio* radio)
 bool HM_Abstract::sendAlarmLogRequest(HoymilesRadio* radio)
 {
     struct tm timeinfo;
-    if (!getLocalTime(&timeinfo)) {
+    if (!getLocalTime(&timeinfo, 0)) {
         return false;
     }
 
@@ -54,7 +54,7 @@ bool HM_Abstract::sendAlarmLogRequest(HoymilesRadio* radio)
 bool HM_Abstract::sendDevInfoRequest(HoymilesRadio* radio)
 {
     struct tm timeinfo;
-    if (!getLocalTime(&timeinfo)) {
+    if (!getLocalTime(&timeinfo, 0)) {
         return false;
     }
 
@@ -75,7 +75,7 @@ bool HM_Abstract::sendDevInfoRequest(HoymilesRadio* radio)
 bool HM_Abstract::sendSystemConfigParaRequest(HoymilesRadio* radio)
 {
     struct tm timeinfo;
-    if (!getLocalTime(&timeinfo)) {
+    if (!getLocalTime(&timeinfo, 0)) {
         return false;
     }
 

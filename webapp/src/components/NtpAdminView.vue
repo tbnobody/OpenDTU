@@ -50,6 +50,38 @@
                 <button type="submit" class="btn btn-primary mb-3">Save</button>
             </form>
         </template>
+
+        <template v-if="!dataLoading && !timezoneLoading">
+            <div class="card">
+                <div class="card-header text-white bg-primary">Manual Time Synchronization</div>
+                <div class="card-body">
+                    <div class="row mb-3">
+                        <label for="currentMcuTime" class="col-sm-2 col-form-label">Current OpenDTU Time:</label>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" id="currentMcuTime" v-model="mcuTime" disabled />
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <label for="currentLocalTime" class="col-sm-2 col-form-label">Current Local Time:</label>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" id="currentLocalTime" v-model="localTime"
+                                disabled />
+                        </div>
+                    </div>
+                    <div class="text-center mb-3">
+                        <button type="button" class="btn btn-danger" @click="setCurrentTime()"
+                            title="Synchronize Time">Synchronize Time
+                        </button>
+                    </div>
+                    <div class="alert alert-secondary" role="alert">
+                        <b>Hint:</b> You can use the manual time synchronization to set the current time of OpenDTU if
+                        no NTP server is available. But be aware, that in case of power cycle the time gets lost. Also
+                        the time accurancy can be very bad as it is not resynchronised regularly.
+                    </div>
+
+                </div>
+            </div>
+        </template>
     </div>
 </template>
 
@@ -72,6 +104,9 @@ export default defineComponent({
             },
             timezoneList: {},
             timezoneSelect: "",
+            mcuTime: new Date(),
+            localTime: new Date(),
+            dataAgeInterval: 0,
             alertMessage: "",
             alertType: "info",
             showAlert: false,
@@ -86,8 +121,16 @@ export default defineComponent({
     created() {
         this.getTimezoneList();
         this.getNtpConfig();
+        this.getCurrentTime();
+        this.initDataAgeing();
     },
     methods: {
+        initDataAgeing() {
+            this.dataAgeInterval = setInterval(() => {
+                this.mcuTime = new Date(this.mcuTime.setSeconds(this.mcuTime.getSeconds() + 1));
+                this.localTime = new Date(this.localTime.setSeconds(this.localTime.getSeconds() + 1));
+            }, 1000);
+        },
         getTimezoneList() {
             this.timezoneLoading = true;
             fetch("/zones.json")
@@ -111,6 +154,54 @@ export default defineComponent({
                         this.dataLoading = false;
                     }
                 );
+        },
+        getCurrentTime() {
+            this.dataLoading = true;
+            fetch("/api/ntp/time")
+                .then((response) => response.json())
+                .then(
+                    (data) => {
+                        this.mcuTime = new Date(
+                            data.year, data.month - 1, data.day,
+                            data.hour, data.minute, data.second);
+                        this.dataLoading = false;
+                    }
+                );
+        },
+        setCurrentTime() {
+            const formData = new FormData();
+            const time = {
+                year: this.localTime.getFullYear(),
+                month: this.localTime.getMonth() + 1,
+                day: this.localTime.getDate(),
+                hour: this.localTime.getHours(),
+                minute: this.localTime.getMinutes(),
+                second: this.localTime.getSeconds(),
+            };
+            console.log(time);
+            formData.append("data", JSON.stringify(time));
+
+            fetch("/api/ntp/time", {
+                method: "POST",
+                body: formData,
+            })
+                .then(function (response) {
+                    if (response.status != 200) {
+                        throw response.status;
+                    } else {
+                        return response.json();
+                    }
+                })
+                .then(
+                    (response) => {
+                        this.alertMessage = response.message;
+                        this.alertType = response.type;
+                        this.showAlert = true;
+                    }
+                )
+                .then(() => {
+                    this.getCurrentTime();
+                });
         },
         saveNtpConfig(e: Event) {
             e.preventDefault();

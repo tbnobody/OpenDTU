@@ -95,12 +95,20 @@ jobs:
       - name: Rename Firmware
         run: mv .pio/build/${{ matrix.environment }}/firmware.bin .pio/build/${{ matrix.environment }}/opendtu-${{ matrix.environment }}.bin
 
+      - name: Copy boot_app0.bin
+        run: cp ~/.platformio/packages/framework-arduinoespressif32/tools/partitions/boot_app0.bin .pio/build/${{ matrix.environment }}/boot_app0.bin
+
+      - name: Copy bootloader_dio_40m.bin
+        run: cp ~/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32/bin/bootloader_dio_40m.bin .pio/build/${{ matrix.environment }}/bootloader_dio_40m.bin
+
       - uses: actions/upload-artifact@v3
         with:
           name: opendtu-${{ matrix.environment }}
           path: |
             .pio/build/${{ matrix.environment }}/opendtu-${{ matrix.environment }}.bin
             .pio/build/${{ matrix.environment }}/partitions.bin
+            .pio/build/${{ matrix.environment }}/bootloader_dio_40m.bin
+            .pio/build/${{ matrix.environment }}/boot_app0.bin
 
       - uses: actions/upload-artifact@v3
         if: startsWith(github.ref, 'refs/tags/')
@@ -109,6 +117,8 @@ jobs:
           path: |
             .pio/build/${{ matrix.environment }}/opendtu-${{ matrix.environment }}.bin
             .pio/build/${{ matrix.environment }}/partitions.bin
+            .pio/build/${{ matrix.environment }}/bootloader_dio_40m.bin
+            .pio/build/${{ matrix.environment }}/boot_app0.bin
 
   release:
     name: Create Release
