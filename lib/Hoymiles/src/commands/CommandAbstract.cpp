@@ -100,3 +100,7 @@ void CommandAbstract::convertSerialToPacketId(uint8_t buffer[], uint64_t serial)
     buffer[1] = s.b[2];
     buffer[0] = s.b[3];
 }
+
+void CommandAbstract::gotTimeout(InverterAbstract* inverter)
+{
+}

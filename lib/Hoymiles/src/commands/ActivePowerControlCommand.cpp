@@ -1,4 +1,5 @@
 #include "ActivePowerControlCommand.h"
+#include "inverters/InverterAbstract.h"
 
 #define CRC_SIZE 6
 
@@ -34,6 +35,16 @@ void ActivePowerControlCommand::setActivePowerLimit(float limit, PowerLimitContr
     udpateCRC(CRC_SIZE);
 }
 
+bool ActivePowerControlCommand::handleResponse(InverterAbstract* inverter, fragment_t fragment[], uint8_t max_fragment_id)
+{
+    if (!DevControlCommand::handleResponse(inverter, fragment, max_fragment_id)) {
+        return false;
+    }
+
+    inverter->SystemConfigPara()->setLastLimitCommandSuccess(CMD_OK);
+    return true;
+}
+
 float ActivePowerControlCommand::getLimit()
 {
     uint16_t l = (((uint16_t)_payload[12] << 8) | _payload[13]);
@@ -43,4 +54,9 @@ float ActivePowerControlCommand::getLimit()
 PowerLimitControlType ActivePowerControlCommand::getType()
 {
     return (PowerLimitControlType)(((uint16_t)_payload[14] << 8) | _payload[15]);
+}
+
+void ActivePowerControlCommand::gotTimeout(InverterAbstract* inverter)
+{
+    inverter->SystemConfigPara()->setLastLimitCommandSuccess(CMD_NOK);
 }

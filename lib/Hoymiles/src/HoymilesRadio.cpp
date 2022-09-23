@@ -91,15 +91,14 @@ void HoymilesRadio::loop()
         if (nullptr != inv) {
             CommandAbstract* cmd = _commandQueue.front().get();
             uint8_t verifyResult = inv->verifyAllFragments(cmd);
-            if (verifyResult == FRAGMENT_ALL_MISSING) {
-                if (_commandQueue.front().get()->getSendCount() <= MAX_RESEND_COUNT) {
-                    Serial.println(F("Nothing received, resend whole request"));
-                    sendLastPacketAgain();
-                } else {
-                    Serial.println(F("Nothing received, resend count exeeded"));
-                    _commandQueue.pop();
-                    _busyFlag = false;
-                }
+            if (verifyResult == FRAGMENT_ALL_MISSING_RESEND) {
+                Serial.println(F("Nothing received, resend whole request"));
+                sendLastPacketAgain();
+
+            } else if (verifyResult == FRAGMENT_ALL_MISSING_TIMEOUT) {
+                Serial.println(F("Nothing received, resend count exeeded"));
+                _commandQueue.pop();
+                _busyFlag = false;
 
             } else if (verifyResult == FRAGMENT_RETRANSMIT_TIMEOUT) {
                 Serial.println(F("Retransmit timeout"));

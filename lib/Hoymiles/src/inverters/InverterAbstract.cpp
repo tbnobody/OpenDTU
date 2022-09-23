@@ -110,7 +110,13 @@ uint8_t InverterAbstract::verifyAllFragments(CommandAbstract* cmd)
     // All missing
     if (_rxFragmentLastPacketId == 0) {
         Serial.println(F("All missing"));
-        return FRAGMENT_ALL_MISSING;
+        if (cmd->getSendCount() <= MAX_RESEND_COUNT) {
+            return FRAGMENT_ALL_MISSING_RESEND;
+        }
+        else {
+            cmd->gotTimeout(this);
+            return FRAGMENT_ALL_MISSING_TIMEOUT;
+        }
     }
 
     // Last fragment is missing (thte one with 0x80)
@@ -119,6 +125,7 @@ uint8_t InverterAbstract::verifyAllFragments(CommandAbstract* cmd)
         if (_rxFragmentRetransmitCnt++ < MAX_RETRANSMIT_COUNT) {
             return _rxFragmentLastPacketId + 1;
         } else {
+            cmd->gotTimeout(this);
             return FRAGMENT_RETRANSMIT_TIMEOUT;
         }
     }
@@ -130,12 +137,14 @@ uint8_t InverterAbstract::verifyAllFragments(CommandAbstract* cmd)
             if (_rxFragmentRetransmitCnt++ < MAX_RETRANSMIT_COUNT) {
                 return i + 1;
             } else {
+                cmd->gotTimeout(this);
                 return FRAGMENT_RETRANSMIT_TIMEOUT;
             }
         }
     }
 
     if (!cmd->handleResponse(this, _rxFragmentBuffer, _rxFragmentMaxPacketId)) {
+        cmd->gotTimeout(this);
         return FRAGMENT_HANDLE_ERROR;
     }
 

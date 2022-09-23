@@ -13,14 +13,16 @@
 #define MAX_NAME_LENGTH 32
 
 enum {
-    FRAGMENT_ALL_MISSING = 255,
-    FRAGMENT_RETRANSMIT_TIMEOUT = 254,
-    FRAGMENT_HANDLE_ERROR = 253,
+    FRAGMENT_ALL_MISSING_RESEND = 255,
+    FRAGMENT_ALL_MISSING_TIMEOUT = 254,
+    FRAGMENT_RETRANSMIT_TIMEOUT = 253,
+    FRAGMENT_HANDLE_ERROR = 252,
     FRAGMENT_OK = 0
 };
 
 #define MAX_RF_FRAGMENT_COUNT 13
-#define MAX_RETRANSMIT_COUNT 5
+#define MAX_RETRANSMIT_COUNT 5 // Used to send the retransmit package
+#define MAX_RESEND_COUNT 4 // Used if all packages are missing
 
 class CommandAbstract;
 
@@ -44,6 +46,7 @@ public:
     virtual bool sendDevInfoRequest(HoymilesRadio* radio) = 0;
     virtual bool sendSystemConfigParaRequest(HoymilesRadio* radio) = 0;
     virtual bool sendActivePowerControlRequest(HoymilesRadio* radio, float limit, PowerLimitControlType type) = 0;
+    virtual bool resendActivePowerControlRequest(HoymilesRadio* radio) = 0;
 
     AlarmLogParser* EventLog();
     DevInfoParser* DevInfo();

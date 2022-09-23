@@ -86,18 +86,28 @@ bool HM_Abstract::sendSystemConfigParaRequest(HoymilesRadio* radio)
     SystemConfigParaCommand* cmd = radio->enqueCommand<SystemConfigParaCommand>();
     cmd->setTime(now);
     cmd->setTargetAddress(serial());
+    SystemConfigPara()->setLastLimitRequestSuccess(CMD_PENDING);
 
     return true;
 }
 
 bool HM_Abstract::sendActivePowerControlRequest(HoymilesRadio* radio, float limit, PowerLimitControlType type)
 {
+    _activePowerControlLimit = limit;
+    _activePowerControlType = type;
+
     ActivePowerControlCommand* cmd = radio->enqueCommand<ActivePowerControlCommand>();
     cmd->setActivePowerLimit(limit, type);
     cmd->setTargetAddress(serial());
+    SystemConfigPara()->setLastLimitCommandSuccess(CMD_PENDING);
 
     // request updated limits
     sendSystemConfigParaRequest(radio);
 
     return true;
+}
+
+bool HM_Abstract::resendActivePowerControlRequest(HoymilesRadio* radio)
+{
+    return sendActivePowerControlRequest(radio, _activePowerControlLimit, _activePowerControlType);
 }

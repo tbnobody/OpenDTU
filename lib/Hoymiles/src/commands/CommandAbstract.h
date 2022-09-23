@@ -37,6 +37,7 @@ public:
     virtual CommandAbstract* getRequestFrameCommand(uint8_t frame_no);
 
     virtual bool handleResponse(InverterAbstract* inverter, fragment_t fragment[], uint8_t max_fragment_id) = 0;
+    virtual void gotTimeout(InverterAbstract* inverter);
 
 protected:
     uint8_t _payload[RF_LEN];

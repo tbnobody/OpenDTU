@@ -32,9 +32,15 @@ void HoymilesClass::loop()
                 iv->sendAlarmLogRequest(_radio.get());
 
                 // Fetch limit
-                if ((iv->SystemConfigPara()->getLastUpdate() == 0) || (millis() - iv->SystemConfigPara()->getLastUpdate() > HOY_SYSTEM_CONFIG_PARA_POLL_INTERVAL)) {
+                if ((iv->SystemConfigPara()->getLastLimitRequestSuccess() == CMD_NOK) || (millis() - iv->SystemConfigPara()->getLastUpdate() > HOY_SYSTEM_CONFIG_PARA_POLL_INTERVAL)) {
                     Serial.println("Request SystemConfigPara");
                     iv->sendSystemConfigParaRequest(_radio.get());
+                }
+
+                // Set limit if required
+                if (iv->SystemConfigPara()->getLastLimitCommandSuccess() == CMD_NOK) {
+                    Serial.println(F("Resend ActivePowerControl"));
+                    iv->resendActivePowerControlRequest(_radio.get());
                 }
 
                 // Fetch dev info (but first fetch stats)
