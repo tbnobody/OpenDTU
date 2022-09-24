@@ -24,6 +24,7 @@ void MqttPublishingClass::loop()
     if (millis() - _lastPublish > (config.Mqtt_PublishInterval * 1000)) {
         MqttSettings.publish("dtu/uptime", String(millis() / 1000));
         MqttSettings.publish("dtu/ip", NetworkSettings.localIP().toString());
+        MqttSettings.publish("dtu/hostname", String(NetworkSettings.getHostname()));
         if (NetworkSettings.NetworkMode() == network_mode::WiFi) {
             MqttSettings.publish("dtu/rssi", String(WiFi.RSSI()));
         }
@@ -40,6 +41,10 @@ void MqttPublishingClass::loop()
 
             // Name
             MqttSettings.publish(subtopic + "/name", inv->name());
+            
+            // Data Age Critical Flag
+            bool data_age_critical = (((millis() - inv->Statistics()->getLastUpdate()) / 1000) > Configuration.get().Dtu_PollInterval * 5);
+            MqttSettings.publish(subtopic + "/dataagecritical", String(data_age_critical));
 
             if (inv->DevInfo()->getLastUpdate() > 0) {
                 // Bootloader Version
