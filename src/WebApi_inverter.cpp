@@ -28,7 +28,7 @@ void WebApiInverterClass::loop()
 
 void WebApiInverterClass::onInverterList(AsyncWebServerRequest* request)
 {
-    AsyncJsonResponse* response = new AsyncJsonResponse();
+    AsyncJsonResponse* response = new AsyncJsonResponse(false, 4096U);
     JsonObject root = response->getRoot();
     JsonArray data = root.createNestedArray(F("inverter"));
 
