@@ -44,10 +44,10 @@ void MultiDataCommand::setTime(time_t time)
 
 time_t MultiDataCommand::getTime()
 {
-    return (time_t)(_payload[12] << 24)
-        | (time_t)(_payload[13] << 16)
-        | (time_t)(_payload[14] << 8)
-        | (time_t)(_payload[15]);
+    return ((time_t) _payload[12] << 24)
+        | ((time_t) _payload[13] << 16)
+        | ((time_t) _payload[14] << 8)
+        | ((time_t) _payload[15]);
 }
 
 CommandAbstract* MultiDataCommand::getRequestFrameCommand(uint8_t frame_no)

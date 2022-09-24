@@ -3,14 +3,16 @@
 #include "inverters/HM_2CH.h"
 #include "inverters/HM_4CH.h"
 #include <Arduino.h>
+#include "Clock.h"
 
 HoymilesClass Hoymiles;
 
-void HoymilesClass::init()
+void HoymilesClass::init(_SPI* initialisedSpiBus, Clock* clock)
 {
     _pollInterval = 0;
     _radio.reset(new HoymilesRadio());
-    _radio->init();
+    _radio->init(initialisedSpiBus);
+    _clock = clock;
 }
 
 void HoymilesClass::loop()
@@ -57,11 +59,11 @@ std::shared_ptr<InverterAbstract> HoymilesClass::addInverter(const char* name, u
 {
     std::shared_ptr<InverterAbstract> i = nullptr;
     if (HM_4CH::isValidSerial(serial)) {
-        i = std::make_shared<HM_4CH>(serial);
+        i = std::make_shared<HM_4CH>(serial, _clock);
     } else if (HM_2CH::isValidSerial(serial)) {
-        i = std::make_shared<HM_2CH>(serial);
+        i = std::make_shared<HM_2CH>(serial, _clock);
     } else if (HM_1CH::isValidSerial(serial)) {
-        i = std::make_shared<HM_1CH>(serial);
+        i = std::make_shared<HM_1CH>(serial, _clock);
     }
 
     if (i) {

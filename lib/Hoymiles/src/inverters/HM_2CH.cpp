@@ -1,7 +1,7 @@
 #include "HM_2CH.h"
 
-HM_2CH::HM_2CH(uint64_t serial)
-    : HM_Abstract(serial) {};
+HM_2CH::HM_2CH(uint64_t serial, Clock* clock)
+    : HM_Abstract(serial, clock) {};
 
 bool HM_2CH::isValidSerial(uint64_t serial)
 {

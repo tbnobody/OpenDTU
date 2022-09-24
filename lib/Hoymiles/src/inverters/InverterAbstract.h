@@ -8,6 +8,7 @@
 #include "types.h"
 #include <Arduino.h>
 #include <cstdint>
+#include "Clock.h"
 
 #define MAX_NAME_LENGTH 32
 
@@ -25,7 +26,7 @@ class CommandAbstract;
 
 class InverterAbstract {
 public:
-    explicit InverterAbstract(uint64_t serial);
+    explicit InverterAbstract(uint64_t serial, Clock* clock);
     void init();
     uint64_t serial();
     void setName(const char* name);
@@ -47,6 +48,9 @@ public:
     DevInfoParser* DevInfo();
     StatisticsParser* Statistics();
     SystemConfigParaParser* SystemConfigPara();
+
+protected:
+    Clock* _clock;
 
 private:
     serial_u _serial;

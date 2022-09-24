@@ -1,5 +1,21 @@
 #include "StatisticsParser.h"
 
+static float calcYieldTotalCh0(StatisticsParser* iv, uint8_t arg0);
+static float calcYieldDayCh0(StatisticsParser* iv, uint8_t arg0);
+static float calcUdcCh(StatisticsParser* iv, uint8_t arg0);
+static float calcPowerDcCh0(StatisticsParser* iv, uint8_t arg0);
+static float calcEffiencyCh0(StatisticsParser* iv, uint8_t arg0);
+static float calcIrradiation(StatisticsParser* iv, uint8_t arg0);
+
+const calcFunc_t calcFunctions[] = {
+    { CALC_YT_CH0, &calcYieldTotalCh0 },
+    { CALC_YD_CH0, &calcYieldDayCh0 },
+    { CALC_UDC_CH, &calcUdcCh },
+    { CALC_PDC_CH0, &calcPowerDcCh0 },
+    { CALC_EFF_CH0, &calcEffiencyCh0 },
+    { CALC_IRR_CH, &calcIrradiation }
+};
+
 void StatisticsParser::setByteAssignment(const byteAssign_t* byteAssignment, const uint8_t count)
 {
     _byteAssignment = byteAssignment;

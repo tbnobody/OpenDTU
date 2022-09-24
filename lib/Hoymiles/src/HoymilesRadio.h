@@ -5,9 +5,13 @@
 #include "commands/CommandAbstract.h"
 #include "types.h"
 #include <RF24.h>
-#include <memory>
+#include "mp_memory.h"
 #include <nRF24L01.h>
-#include <queue>
+#include "mp_queue.h"
+
+#ifdef __AVR__
+#define ARDUINO_ISR_ATTR
+#endif
 
 // number of fragments hold in buffer
 #define FRAGMENT_BUFFER_SIZE 30
@@ -40,7 +44,7 @@
 
 class HoymilesRadio {
 public:
-    void init();
+    void init(_SPI* initialisedSpiBus);
     void loop();
     void setPALevel(rf24_pa_dbm_e paLevel);
 
@@ -59,8 +63,10 @@ public:
         return static_cast<T*>(_commandQueue.back().get());
     }
 
+    volatile static bool _packetReceived;
+
 private:
-    void ARDUINO_ISR_ATTR handleIntr();
+    static void ARDUINO_ISR_ATTR handleIntr();
     static serial_u convertSerialToRadioId(serial_u serial);
     uint8_t getRxNxtChannel();
     uint8_t getTxNxtChannel();
@@ -70,15 +76,13 @@ private:
     bool checkFragmentCrc(fragment_t* fragment);
     void dumpBuf(const char* info, uint8_t buf[], uint8_t len);
 
-    std::unique_ptr<SPIClass> _hspi;
+    std::unique_ptr<_SPI> _spiPtr;
     std::unique_ptr<RF24> _radio;
     uint8_t _rxChLst[5] = { 3, 23, 40, 61, 75 };
     uint8_t _rxChIdx = 0;
 
     uint8_t _txChLst[5] = { 3, 23, 40, 61, 75 };
     uint8_t _txChIdx = 0;
-
-    volatile bool _packetReceived = false;
 
     CircularBuffer<fragment_t, FRAGMENT_BUFFER_SIZE> _rxBuffer;
     TimeoutHelper _rxTimeout;

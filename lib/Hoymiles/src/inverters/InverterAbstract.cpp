@@ -2,10 +2,11 @@
 #include "crc.h"
 #include <cstring>
 
-InverterAbstract::InverterAbstract(uint64_t serial)
+InverterAbstract::InverterAbstract(uint64_t serial, Clock* clock)
 {
     _serial.u64 = serial;
-    _alarmLogParser.reset(new AlarmLogParser());
+    _clock = clock;
+    _alarmLogParser.reset(new AlarmLogParser(_clock));
     _devInfoParser.reset(new DevInfoParser());
     _statisticsParser.reset(new StatisticsParser());
     _systemConfigParaParser.reset(new SystemConfigParaParser());

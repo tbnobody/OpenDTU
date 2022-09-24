@@ -3,17 +3,20 @@
 #include "commands/RequestFrameCommand.h"
 #include "crc.h"
 #include <Every.h>
-#include <FunctionalInterrupt.h>
 
-void HoymilesRadio::init()
+volatile bool HoymilesRadio::_packetReceived = false;
+
+void HoymilesRadio::init(_SPI* initialisedSpiBus)
 {
     _dtuSerial.u64 = 0;
 
-    _hspi.reset(new SPIClass(HSPI));
+    _spiPtr.reset(initialisedSpiBus);
+    // https://www.reddit.com/r/embedded/comments/k8zix6/comment/gf18kbs/?utm_source=share&utm_medium=web2x&context=3
+    // Only for nRF Lib:
+    // > The chip enable pin (together with a few register settings) is used to change between RX and TX mode
     _radio.reset(new RF24(HOYMILES_PIN_CE, HOYMILES_PIN_CS));
 
-    _hspi->begin(HOYMILES_PIN_SCLK, HOYMILES_PIN_MISO, HOYMILES_PIN_MOSI, HOYMILES_PIN_CS);
-    _radio->begin(_hspi.get());
+    _radio->begin(_spiPtr.get());
 
     _radio->setDataRate(RF24_250KBPS);
     _radio->enableDynamicPayloads();
@@ -27,7 +30,7 @@ void HoymilesRadio::init()
         Serial.println(F("Connection error!!"));
     }
 
-    attachInterrupt(digitalPinToInterrupt(HOYMILES_PIN_IRQ), std::bind(&HoymilesRadio::handleIntr, this), FALLING);
+    attachInterrupt(digitalPinToInterrupt(HOYMILES_PIN_IRQ), handleIntr, FALLING);
 
     openReadingPipe();
     _radio->startListening();
@@ -178,7 +181,7 @@ void HoymilesRadio::openWritingPipe(serial_u serial)
 
 void ARDUINO_ISR_ATTR HoymilesRadio::handleIntr()
 {
-    _packetReceived = true;
+    HoymilesRadio::_packetReceived = true;
 }
 
 uint8_t HoymilesRadio::getRxNxtChannel()

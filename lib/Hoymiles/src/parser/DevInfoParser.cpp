@@ -1,5 +1,6 @@
 #include "DevInfoParser.h"
 #include <cstring>
+#include <HardwareSerial.h>
 
 void DevInfoParser::clearBufferAll()
 {
