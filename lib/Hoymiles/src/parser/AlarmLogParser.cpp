@@ -22,6 +22,16 @@ uint8_t AlarmLogParser::getEntryCount()
     return (_alarmLogLength - 2) / ALARM_LOG_ENTRY_SIZE;
 }
 
+void AlarmLogParser::setLastAlarmRequestSuccess(LastCommandSuccess status)
+{
+    _lastAlarmRequestSuccess = status;
+}
+
+LastCommandSuccess AlarmLogParser::getLastAlarmRequestSuccess()
+{
+    return _lastAlarmRequestSuccess;
+}
+
 void AlarmLogParser::getLogEntry(uint8_t entryId, AlarmLogEntry_t* entry)
 {
     uint8_t entryStartOffset = 2 + entryId * ALARM_LOG_ENTRY_SIZE;

@@ -42,7 +42,7 @@ public:
     uint8_t verifyAllFragments(CommandAbstract* cmd);
 
     virtual bool sendStatsRequest(HoymilesRadio* radio) = 0;
-    virtual bool sendAlarmLogRequest(HoymilesRadio* radio) = 0;
+    virtual bool sendAlarmLogRequest(HoymilesRadio* radio, bool force = false) = 0;
     virtual bool sendDevInfoRequest(HoymilesRadio* radio) = 0;
     virtual bool sendSystemConfigParaRequest(HoymilesRadio* radio) = 0;
     virtual bool sendActivePowerControlRequest(HoymilesRadio* radio, float limit, PowerLimitControlType type) = 0;

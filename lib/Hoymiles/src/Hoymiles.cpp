@@ -29,7 +29,8 @@ void HoymilesClass::loop()
                 iv->sendStatsRequest(_radio.get());
 
                 // Fetch event log
-                iv->sendAlarmLogRequest(_radio.get());
+                bool force = iv->EventLog()->getLastAlarmRequestSuccess() == CMD_NOK;
+                iv->sendAlarmLogRequest(_radio.get(), force);
 
                 // Fetch limit
                 if ((iv->SystemConfigPara()->getLastLimitRequestSuccess() == CMD_NOK) || (millis() - iv->SystemConfigPara()->getLastUpdate() > HOY_SYSTEM_CONFIG_PARA_POLL_INTERVAL)) {

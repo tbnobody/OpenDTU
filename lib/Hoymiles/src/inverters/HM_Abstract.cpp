@@ -27,16 +27,18 @@ bool HM_Abstract::sendStatsRequest(HoymilesRadio* radio)
     return true;
 }
 
-bool HM_Abstract::sendAlarmLogRequest(HoymilesRadio* radio)
+bool HM_Abstract::sendAlarmLogRequest(HoymilesRadio* radio, bool force)
 {
     struct tm timeinfo;
     if (!getLocalTime(&timeinfo, 0)) {
         return false;
     }
 
-    if (Statistics()->hasChannelFieldValue(CH0, FLD_EVT_LOG)) {
-        if ((uint8_t)Statistics()->getChannelFieldValue(CH0, FLD_EVT_LOG) == _lastAlarmLogCnt) {
-            return false;
+    if (!force) {
+        if (Statistics()->hasChannelFieldValue(CH0, FLD_EVT_LOG)) {
+            if ((uint8_t)Statistics()->getChannelFieldValue(CH0, FLD_EVT_LOG) == _lastAlarmLogCnt) {
+                return false;
+            }
         }
     }
 
@@ -48,6 +50,7 @@ bool HM_Abstract::sendAlarmLogRequest(HoymilesRadio* radio)
     AlarmDataCommand* cmd = radio->enqueCommand<AlarmDataCommand>();
     cmd->setTime(now);
     cmd->setTargetAddress(serial());
+    EventLog()->setLastAlarmRequestSuccess(CMD_PENDING);
 
     return true;
 }

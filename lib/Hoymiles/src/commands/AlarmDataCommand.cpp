@@ -23,6 +23,12 @@ bool AlarmDataCommand::handleResponse(InverterAbstract* inverter, fragment_t fra
         inverter->EventLog()->appendFragment(offs, fragment[i].fragment, fragment[i].len);
         offs += (fragment[i].len);
     }
+    inverter->EventLog()->setLastAlarmRequestSuccess(CMD_OK);
     inverter->EventLog()->setLastUpdate(millis());
     return true;
+}
+
+void AlarmDataCommand::gotTimeout(InverterAbstract* inverter)
+{
+    inverter->EventLog()->setLastAlarmRequestSuccess(CMD_NOK);
 }
