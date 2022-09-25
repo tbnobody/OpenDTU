@@ -18,7 +18,7 @@ enum {
     FRAGMENT_OK = 0
 };
 
-#define MAX_RF_FRAGMENT_COUNT 12
+#define MAX_RF_FRAGMENT_COUNT 13
 #define MAX_RETRANSMIT_COUNT 5
 
 class CommandAbstract;
