@@ -33,7 +33,9 @@ void HoymilesClass::loop()
                 iv->sendAlarmLogRequest(_radio.get(), force);
 
                 // Fetch limit
-                if ((iv->SystemConfigPara()->getLastLimitRequestSuccess() == CMD_NOK) || (millis() - iv->SystemConfigPara()->getLastUpdate() > HOY_SYSTEM_CONFIG_PARA_POLL_INTERVAL)) {
+                if ((iv->SystemConfigPara()->getLastLimitRequestSuccess() == CMD_NOK)
+                    || ((millis() - iv->SystemConfigPara()->getLastUpdateRequest() > HOY_SYSTEM_CONFIG_PARA_POLL_INTERVAL)
+                        && (millis() - iv->SystemConfigPara()->getLastUpdateCommand() > HOY_SYSTEM_CONFIG_PARA_POLL_MIN_DURATION))) {
                     Serial.println("Request SystemConfigPara");
                     iv->sendSystemConfigParaRequest(_radio.get());
                 }

@@ -104,9 +104,6 @@ bool HM_Abstract::sendActivePowerControlRequest(HoymilesRadio* radio, float limi
     cmd->setTargetAddress(serial());
     SystemConfigPara()->setLastLimitCommandSuccess(CMD_PENDING);
 
-    // request updated limits
-    sendSystemConfigParaRequest(radio);
-
     return true;
 }
 
