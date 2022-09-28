@@ -90,19 +90,37 @@ void WebApiLimitClass::onLimitPost(AsyncWebServerRequest* request)
         return;
     }
 
-    if (root[F("limit_value")].as<uint32_t>() == 0 || root[F("limit_value")].as<uint32_t>() > 1500) {
+    if (root[F("limit_value")].as<uint16_t>() == 0 || root[F("limit_value")].as<uint16_t>() > 1500) {
         retMsg[F("message")] = F("Limit must between 1 and 1500!");
         response->setLength();
         request->send(response);
         return;
     }
 
+    if (!((root[F("limit_type")].as<uint16_t>() == PowerLimitControlType::AbsolutNonPersistent)
+            || (root[F("limit_type")].as<uint16_t>() == PowerLimitControlType::AbsolutPersistent)
+            || (root[F("limit_type")].as<uint16_t>() == PowerLimitControlType::RelativNonPersistent)
+            || (root[F("limit_type")].as<uint16_t>() == PowerLimitControlType::RelativPersistent))) {
+
+        retMsg[F("message")] = F("Invalid type specified!");
+        response->setLength();
+        request->send(response);
+        return;
+    }
+
     uint64_t serial = strtoll(root[F("serial")].as<String>().c_str(), NULL, 16);
-    uint64_t limit = root[F("serial")].as<uint64_t>();
+    uint16_t limit = root[F("limit_value")].as<uint16_t>();
+    PowerLimitControlType type = root[F("limit_type")].as<PowerLimitControlType>();
 
     auto inv = Hoymiles.getInverterBySerial(serial);
+    if (inv == nullptr) {
+        retMsg[F("message")] = F("Invalid inverter specified!");
+        response->setLength();
+        request->send(response);
+        return;
+    }
 
-    inv->sendActivePowerControlRequest(Hoymiles.getRadio(), limit, PowerLimitControlType::RelativNonPersistent);
+    inv->sendActivePowerControlRequest(Hoymiles.getRadio(), limit, type);
 
     retMsg[F("type")] = F("success");
     retMsg[F("message")] = F("Settings saved!");
