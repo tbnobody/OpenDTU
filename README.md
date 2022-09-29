@@ -18,6 +18,7 @@ It was the goal to replace the original Hoymiles DTU (Telemetry Gateway) with th
 * Hoymiles HM-1200
 * Hoymiles HM-1500
 * TSUN TSOL-M800 (Maybe depending on firmware on the inverter)
+* TSUN TSOL-M1600 (Maybe depending on firmware on the inverter)
 
 ## Features for end users
 * Read live data from inverter
