@@ -41,7 +41,8 @@
                                 <div class="btn-toolbar" role="toolbar">
                                     <div class="btn-group me-2" role="group">
                                         <button type="button" class="btn btn-sm btn-danger"
-                                            @click="onShowLimitSettings(inverter.serial)" title="Show / Set Inverter Limit">
+                                            @click="onShowLimitSettings(inverter.serial)"
+                                            title="Show / Set Inverter Limit">
                                             <BIconSpeedometer style="font-size:24px;" />
 
                                         </button>
@@ -136,27 +137,77 @@
             </div>
         </div>
 
-        <div class="modal" id="limitSettingView" tabindex="-1">
+        <div class="modal" id="limitSettingView" ref="limitSettingView" tabindex="-1">
             <div class="modal-dialog modal-lg">
                 <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title">Limit Settings</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body">
-                        <div class="text-center" v-if="limitSettingLoading">
-                            <div class="spinner-border" role="status">
-                                <span class="visually-hidden">Loading...</span>
+                    <form @submit="onSubmitLimit">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Limit Settings</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+
+                            <BootstrapAlert v-model="showAlertLimit" :variant="alertTypeLimit">
+                                {{ alertMessageLimit }}
+                            </BootstrapAlert>
+                            <div class="text-center" v-if="limitSettingLoading">
+                                <div class="spinner-border" role="status">
+                                    <span class="visually-hidden">Loading...</span>
+                                </div>
                             </div>
+
+                            <template v-if="!limitSettingLoading">
+
+                                <div class="row mb-3">
+                                    <label for="inputCurrentLimit" class="col-sm-2 col-form-label">Current
+                                        Limit:</label>
+                                    <div class="col-sm-10">
+                                        <div class="input-group">
+                                            <input type="number" class="form-control" id="inputCurrentLimit"
+                                                aria-describedby="currentLimitType" v-model="currentLimit" disabled />
+                                            <span class="input-group-text" id="currentLimitType">%</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row mb-3">
+                                    <label for="inputTargetLimit" class="col-sm-2 col-form-label">Set Limit:</label>
+                                    <div class="col-sm-10">
+                                        <div class="input-group">
+                                            <input type="number" name="inputTargetLimit" class="form-control"
+                                                id="inputTargetLimit" :min="targetLimitMin" :max="targetLimitMax"
+                                                v-model="targetLimit">
+                                            <button class="btn btn-primary dropdown-toggle" type="button"
+                                                data-bs-toggle="dropdown" aria-expanded="false">{{ targetLimitTypeText
+                                                }}</button>
+                                            <ul class="dropdown-menu dropdown-menu-end">
+                                                <li><a class="dropdown-item" @click="onSelectType(1)" href="#">Relative
+                                                        (%)</a></li>
+                                                <li><a class="dropdown-item" @click="onSelectType(0)" href="#">Absolute
+                                                        (W)</a></li>
+                                            </ul>
+                                        </div>
+                                        <div v-if="targetLimitType == 0" class="alert alert-secondary mt-3"
+                                            role="alert">
+                                            <b>Hint:</b> If you set the limit as absolute value the display of the
+                                            current value will only be updated after ~4 minutes.
+                                        </div>
+                                    </div>
+                                </div>
+                            </template>
+
                         </div>
 
-                        <LimitSettingsCurrent v-if="!limitSettingLoading" :limitData="limitSettingList" />
-                    </div>
+                        <div class="modal-footer">
+                            <button type="submit" class="btn btn-danger" @click="onSetLimitSettings(true)">Set Limit
+                                Persistent</button>
 
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" @click="onHideLimitSettings"
-                            data-bs-dismiss="modal">Close</button>
-                    </div>
+                            <button type="submit" class="btn btn-danger" @click="onSetLimitSettings(false)">Set Limit
+                                Non-Persistent</button>
+
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        </div>
+                    </form>
                 </div>
             </div>
         </div>
@@ -169,7 +220,7 @@ import InverterChannelInfo from "@/components/partials/InverterChannelInfo.vue";
 import * as bootstrap from 'bootstrap';
 import EventLog from '@/components/partials/EventLog.vue';
 import DevInfo from '@/components/partials/DevInfo.vue';
-import LimitSettingsCurrent from '@/components/partials/LimitSettingsCurrent.vue';
+import BootstrapAlert from '@/components/partials/BootstrapAlert.vue';
 
 declare interface Inverter {
     serial: number,
@@ -184,7 +235,7 @@ export default defineComponent({
         InverterChannelInfo,
         EventLog,
         DevInfo,
-        LimitSettingsCurrent
+        BootstrapAlert,
     },
     data() {
         return {
@@ -200,9 +251,22 @@ export default defineComponent({
             devInfoView: {} as bootstrap.Modal,
             devInfoList: {},
             devInfoLoading: true,
+
             limitSettingView: {} as bootstrap.Modal,
-            limitSettingList: {},
+            limitSettingSerial: 0,
             limitSettingLoading: true,
+
+            currentLimit: 0,
+            targetLimit: 0,
+            targetLimitMin: 10,
+            targetLimitMax: 100,
+            targetLimitTypeText: "Relative (%)",
+            targetLimitType: 1,
+            targetLimitPersistent: false,
+
+            alertMessageLimit: "",
+            alertTypeLimit: "info",
+            showAlertLimit: false,
         };
     },
     created() {
@@ -214,6 +278,8 @@ export default defineComponent({
         this.eventLogView = new bootstrap.Modal('#eventView');
         this.devInfoView = new bootstrap.Modal('#devInfoView');
         this.limitSettingView = new bootstrap.Modal('#limitSettingView');
+
+        (this.$refs.limitSettingView as HTMLElement).addEventListener("hide.bs.modal", this.onHideLimitSettings);
     },
     unmounted() {
         this.closeSocket();
@@ -322,18 +388,74 @@ export default defineComponent({
             this.devInfoView.show();
         },
         onHideLimitSettings() {
-            this.limitSettingView.hide();
+            this.limitSettingSerial = 0;
+            this.targetLimit = 0;
+            this.targetLimitType = 1;
+            this.targetLimitTypeText = "Relative (%)";
+            this.showAlertLimit = false;
         },
         onShowLimitSettings(serial: number) {
             this.limitSettingLoading = true;
             fetch("/api/limit/status")
                 .then((response) => response.json())
                 .then((data) => {
-                    this.limitSettingList = data[serial];
+                    this.currentLimit = data[serial].limit;
+                    this.limitSettingSerial = serial;
                     this.limitSettingLoading = false;
                 });
 
             this.limitSettingView.show();
+        },
+        onSubmitLimit(e: Event) {
+            e.preventDefault();
+
+            const data = {
+                serial: this.limitSettingSerial,
+                limit_value: this.targetLimit,
+                limit_type: (this.targetLimitPersistent ? 256 : 0) + this.targetLimitType,
+            };
+            const formData = new FormData();
+            formData.append("data", JSON.stringify(data));
+
+            console.log(data);
+
+            fetch("/api/limit/config", {
+                method: "POST",
+                body: formData,
+            })
+                .then(function (response) {
+                    if (response.status != 200) {
+                        throw response.status;
+                    } else {
+                        return response.json();
+                    }
+                })
+                .then(
+                    (response) => {
+                        if (response.type == "success") {
+                            this.limitSettingView.hide();
+                        } else {
+                            this.alertMessageLimit = response.message;
+                            this.alertTypeLimit = response.type;
+                            this.showAlertLimit = true;
+                        }
+                    }
+                )
+        },
+        onSetLimitSettings(setPersistent: boolean) {
+            this.targetLimitPersistent = setPersistent;
+        },
+        onSelectType(type: number) {
+            if (type == 1) {
+                this.targetLimitTypeText = "Relative (%)";
+                this.targetLimitMin = 10;
+                this.targetLimitMax = 100;
+            } else {
+                this.targetLimitTypeText = "Absolute (W)";
+                this.targetLimitMin = 10;
+                this.targetLimitMax = 1500;
+            }
+            this.targetLimitType = type;
         },
     },
 });
