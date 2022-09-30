@@ -159,9 +159,9 @@
                             <template v-if="!limitSettingLoading">
 
                                 <div class="row mb-3">
-                                    <label for="inputCurrentLimit" class="col-sm-2 col-form-label">Current
+                                    <label for="inputCurrentLimit" class="col-sm-3 col-form-label">Current
                                         Limit:</label>
-                                    <div class="col-sm-10">
+                                    <div class="col-sm-9">
                                         <div class="input-group">
                                             <input type="number" class="form-control" id="inputCurrentLimit"
                                                 aria-describedby="currentLimitType" v-model="currentLimit" disabled />
@@ -170,9 +170,24 @@
                                     </div>
                                 </div>
 
+                                <div class="row mb-3 align-items-center">
+                                    <label for="inputLastLimitSet" class="col-sm-3 col-form-label">Last Limit Set
+                                        Status:</label>
+                                    <div class="col-sm-9">
+                                        <span class="badge" :class="{
+                                            'bg-danger': successCommandLimit == 'Failure',
+                                            'bg-warning': successCommandLimit == 'Pending',
+                                            'bg-success': successCommandLimit == 'Ok',
+                                            'bg-secondary': successCommandLimit == 'Unknown',
+                                        }">
+                                            {{ successCommandLimit }}
+                                        </span>
+                                    </div>
+                                </div>
+
                                 <div class="row mb-3">
-                                    <label for="inputTargetLimit" class="col-sm-2 col-form-label">Set Limit:</label>
-                                    <div class="col-sm-10">
+                                    <label for="inputTargetLimit" class="col-sm-3 col-form-label">Set Limit:</label>
+                                    <div class="col-sm-9">
                                         <div class="input-group">
                                             <input type="number" name="inputTargetLimit" class="form-control"
                                                 id="inputTargetLimit" :min="targetLimitMin" :max="targetLimitMax"
@@ -257,6 +272,7 @@ export default defineComponent({
             limitSettingLoading: true,
 
             currentLimit: 0,
+            successCommandLimit: "",
             targetLimit: 0,
             targetLimitMin: 10,
             targetLimitMax: 100,
@@ -400,6 +416,7 @@ export default defineComponent({
                 .then((response) => response.json())
                 .then((data) => {
                     this.currentLimit = data[serial].limit;
+                    this.successCommandLimit = data[serial].limit_set_status;
                     this.limitSettingSerial = serial;
                     this.limitSettingLoading = false;
                 });
