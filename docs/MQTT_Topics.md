@@ -55,11 +55,11 @@ serial will be replaced with the serial number of the inverter.
 
 ### Inverter limit specific topics
 
-cmd topics are used to set values. Settings topics are updated from values set in the inverter.
+cmd topics are used to set values. Status topics are updated from values set in the inverter.
 
 | Topic                                     | R / W | Description                                          | Value / Unit               |
 | ----------------------------------------- | ----- | ---------------------------------------------------- | -------------------------- |
-| [serial]/settings/limit                   | R     | Current applied production limit of the inverter     | % of total possible output |
+| [serial]/status/limit_relative            | R     | Current applied production limit of the inverter     | % of total possible output |
 | [serial]/cmd/limit_persistent_relative    | W     | Set the inverter limit as a percentage of total production capability. The  value will survive the night without power | %                          |
 | [serial]/cmd/limit_persistent_absolute    | W     | Set the inverter limit as a absolute value. The  value will survive the night without power | Watt (W)                   |
 | [serial]/cmd/limit_nonpersistent_relative | W     | Set the inverter limit as a percentage of total production capability. The  value will reset to the last persistent value at night without power | %                          |

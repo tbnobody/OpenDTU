@@ -63,7 +63,7 @@ void MqttPublishingClass::loop()
 
             if (inv->SystemConfigPara()->getLastUpdate() > 0) {
                 // Limit
-                MqttSettings.publish(subtopic + "/settings/limit", String(inv->SystemConfigPara()->getLimitPercent()));
+                MqttSettings.publish(subtopic + "/status/limit_relative", String(inv->SystemConfigPara()->getLimitPercent()));
             }
 
             uint32_t lastUpdate = inv->Statistics()->getLastUpdate();
