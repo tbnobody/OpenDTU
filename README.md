@@ -149,6 +149,8 @@ You'll find the firmware file (after a successfull build process) under `.pio/bu
 
 After the successful upload, the OpenDTU immediately restarts into the new firmware.
 
+## MQTT Topic Documentation
+A documentation of all available MQTT Topics can be found here: [MQTT Documentation](docs/MQTT_Topics.md)
 
 ## Available cases
 * [https://www.thingiverse.com/thing:5435911](https://www.thingiverse.com/thing:5435911)
