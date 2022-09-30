@@ -530,7 +530,7 @@ String VeDirectFrameHandler::getErrAsString(const char* err)
 			strERR =  "Input";
 			break;
 		case 65:
-			strERR =  "39Lost communication with one of devices";
+			strERR =  "Lost communication with one of devices";
 			break;
 		case 67:
 			strERR =  "Synchronisedcharging device configuration issue";
