@@ -19,6 +19,9 @@
                             :id="'v-pills-' + inverter.serial + '-tab'" data-bs-toggle="pill"
                             :data-bs-target="'#v-pills-' + inverter.serial" type="button" role="tab"
                             aria-controls="'v-pills-' + inverter.serial" aria-selected="true">
+                            <BIconXCircleFill class="fs-4" v-if="!inverter.reachable" />
+                            <BIconExclamationCircleFill class="fs-4" v-if="inverter.reachable && !inverter.producing" />
+                            <BIconCheckCircleFill class="fs-4" v-if="inverter.reachable && inverter.producing" />
                             {{ inverter.name }}
                         </button>
                     </div>
@@ -31,8 +34,9 @@
                         <div class="card">
                             <div class="card-header text-white bg-primary d-flex justify-content-between align-items-center"
                                 :class="{
-                                    'bg-danger': inverter.reachable,
-                                    'bg-primary': !inverter.reachable,
+                                    'bg-danger': !inverter.reachable,
+                                    'bg-warning': inverter.reachable && !inverter.producing,
+                                    'bg-primary': inverter.reachable && inverter.producing,
                                 }">
                                 {{ inverter.name }} (Inverter Serial Number:
                                 {{ inverter.serial }}) (Data Age:
@@ -241,6 +245,7 @@ declare interface Inverter {
     serial: number,
     name: string,
     reachable: boolean,
+    producing: boolean,
     data_age: 0,
     events: 0
 }
