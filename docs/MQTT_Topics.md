@@ -60,6 +60,8 @@ cmd topics are used to set values. Status topics are updated from values set in 
 | Topic                                     | R / W | Description                                          | Value / Unit               |
 | ----------------------------------------- | ----- | ---------------------------------------------------- | -------------------------- |
 | [serial]/status/limit_relative            | R     | Current applied production limit of the inverter     | % of total possible output |
+| [serial]/status/reachable                 | R     | Indicates whether the inverter is reachable          | 0 or 1                     |
+| [serial]/status/producing                 | R     | Indicates whether the inverter is producing AC power | 0 or 1                     |
 | [serial]/cmd/limit_persistent_relative    | W     | Set the inverter limit as a percentage of total production capability. The  value will survive the night without power | %                          |
 | [serial]/cmd/limit_persistent_absolute    | W     | Set the inverter limit as a absolute value. The  value will survive the night without power | Watt (W)                   |
 | [serial]/cmd/limit_nonpersistent_relative | W     | Set the inverter limit as a percentage of total production capability. The  value will reset to the last persistent value at night without power | %                          |

@@ -66,6 +66,9 @@ void MqttPublishingClass::loop()
                 MqttSettings.publish(subtopic + "/status/limit_relative", String(inv->SystemConfigPara()->getLimitPercent()));
             }
 
+            MqttSettings.publish(subtopic + "/status/reachable", String(inv->isReachable()));
+            MqttSettings.publish(subtopic + "/status/producing", String(inv->isProducing()));
+
             uint32_t lastUpdate = inv->Statistics()->getLastUpdate();
             if (lastUpdate > 0 && lastUpdate != _lastPublishStats[i]) {
                 _lastPublishStats[i] = lastUpdate;
