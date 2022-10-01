@@ -49,6 +49,11 @@ bool InverterAbstract::isProducing()
     return Statistics()->getChannelFieldValue(CH0, FLD_PAC) > 0;
 }
 
+bool InverterAbstract::isReachable()
+{
+    return Statistics()->getRxFailureCount() <= MAX_ONLINE_FAILURE_COUNT;
+}
+
 AlarmLogParser* InverterAbstract::EventLog()
 {
     return _alarmLogParser.get();

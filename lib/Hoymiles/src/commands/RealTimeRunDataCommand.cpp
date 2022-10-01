@@ -23,6 +23,12 @@ bool RealTimeRunDataCommand::handleResponse(InverterAbstract* inverter, fragment
         inverter->Statistics()->appendFragment(offs, fragment[i].fragment, fragment[i].len);
         offs += (fragment[i].len);
     }
+    inverter->Statistics()->resetRxFailureCount();
     inverter->Statistics()->setLastUpdate(millis());
     return true;
+}
+
+void RealTimeRunDataCommand::gotTimeout(InverterAbstract* inverter)
+{
+    inverter->Statistics()->incrementRxFailureCount();
 }
