@@ -85,7 +85,7 @@ void WebApiWsLiveClass::generateJsonResponse(JsonVariant& root)
         root[i][F("serial")] = String(buffer);
         root[i][F("name")] = inv->name();
         root[i][F("data_age")] = (millis() - inv->Statistics()->getLastUpdate()) / 1000;
-        root[i][F("age_critical")] = ((millis() - inv->Statistics()->getLastUpdate()) / 1000) > Configuration.get().Dtu_PollInterval * 5;
+        root[i][F("reachable")] = !inv->isReachable();
 
         // Loop all channels
         for (uint8_t c = 0; c <= inv->Statistics()->getChannelCount(); c++) {

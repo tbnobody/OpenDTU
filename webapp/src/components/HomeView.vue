@@ -31,8 +31,8 @@
                         <div class="card">
                             <div class="card-header text-white bg-primary d-flex justify-content-between align-items-center"
                                 :class="{
-                                    'bg-danger': inverter.age_critical,
-                                    'bg-primary': !inverter.age_critical,
+                                    'bg-danger': inverter.reachable,
+                                    'bg-primary': !inverter.reachable,
                                 }">
                                 {{ inverter.name }} (Inverter Serial Number:
                                 {{ inverter.serial }}) (Data Age:
@@ -240,7 +240,7 @@ import BootstrapAlert from '@/components/partials/BootstrapAlert.vue';
 declare interface Inverter {
     serial: number,
     name: string,
-    age_critical: boolean,
+    reachable: boolean,
     data_age: 0,
     events: 0
 }
