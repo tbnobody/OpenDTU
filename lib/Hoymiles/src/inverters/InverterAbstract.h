@@ -37,6 +37,8 @@ public:
     virtual const byteAssign_t* getByteAssignment() = 0;
     virtual const uint8_t getAssignmentCount() = 0;
 
+    bool isProducing();
+
     void clearRxFragmentBuffer();
     void addRxFragment(uint8_t fragment[], uint8_t len);
     uint8_t verifyAllFragments(CommandAbstract* cmd);

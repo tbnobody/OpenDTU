@@ -40,6 +40,15 @@ const char* InverterAbstract::name()
     return _name;
 }
 
+bool InverterAbstract::isProducing()
+{
+    if (!Statistics()->hasChannelFieldValue(CH0, FLD_PAC)) {
+        return false;
+    }
+
+    return Statistics()->getChannelFieldValue(CH0, FLD_PAC) > 0;
+}
+
 AlarmLogParser* InverterAbstract::EventLog()
 {
     return _alarmLogParser.get();
@@ -112,8 +121,7 @@ uint8_t InverterAbstract::verifyAllFragments(CommandAbstract* cmd)
         Serial.println(F("All missing"));
         if (cmd->getSendCount() <= MAX_RESEND_COUNT) {
             return FRAGMENT_ALL_MISSING_RESEND;
-        }
-        else {
+        } else {
             cmd->gotTimeout(this);
             return FRAGMENT_ALL_MISSING_TIMEOUT;
         }
