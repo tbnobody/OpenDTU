@@ -44,7 +44,7 @@ bool ActivePowerControlCommand::handleResponse(InverterAbstract* inverter, fragm
     if ((getType() == PowerLimitControlType::RelativNonPersistent) || (getType() == PowerLimitControlType::RelativPersistent)) {
         inverter->SystemConfigPara()->setLimitPercent(getLimit());
     } else {
-        // TODO: Not implemented yet because we only can publish the percentage value
+        // TODO(tbnobody): Not implemented yet because we only can publish the percentage value
     }
     inverter->SystemConfigPara()->setLastUpdateCommand(millis());
     inverter->SystemConfigPara()->setLastLimitCommandSuccess(CMD_OK);
