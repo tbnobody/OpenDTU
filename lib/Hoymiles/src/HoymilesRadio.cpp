@@ -196,12 +196,9 @@ uint8_t HoymilesRadio::getTxNxtChannel()
 
 void HoymilesRadio::switchRxCh()
 {
-
-    // portDISABLE_INTERRUPTS();
     _radio->stopListening();
     _radio->setChannel(getRxNxtChannel());
     _radio->startListening();
-    // portENABLE_INTERRUPTS();
 }
 
 serial_u HoymilesRadio::convertSerialToRadioId(serial_u serial)
