@@ -90,10 +90,11 @@ void MqttSettingsClass::onMqttMessage(const espMqttClientTypes::MessagePropertie
     char* serial_str;
     char* subtopic;
     char* setting;
+    char* rest = &token_topic[strlen(config.Mqtt_Topic)];
 
-    serial_str = strtok(&token_topic[strlen(config.Mqtt_Topic)], "/");
-    subtopic = strtok(NULL, "/");
-    setting = strtok(NULL, "/");
+    serial_str = strtok_r(rest, "/", &rest);
+    subtopic = strtok_r(rest, "/", &rest);
+    setting = strtok_r(rest, "/", &rest);
 
     if (serial_str == NULL || subtopic == NULL || setting == NULL) {
         return;
