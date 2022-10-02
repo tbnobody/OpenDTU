@@ -273,8 +273,7 @@ void HoymilesRadio::dumpBuf(const char* info, uint8_t buf[], uint8_t len)
         Serial.print(String(info));
 
     for (uint8_t i = 0; i < len; i++) {
-        Serial.print(buf[i], 16);
-        Serial.print(" ");
+        Serial.printf("%02X ", buf[i]);
     }
     Serial.println(F(""));
 }

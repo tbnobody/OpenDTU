@@ -23,8 +23,7 @@ void CommandAbstract::dumpDataPayload(Stream& stream)
 {
     const uint8_t* payload = getDataPayload();
     for (uint8_t i = 0; i < getDataSize(); i++) {
-        stream.print(payload[i], HEX);
-        stream.print(" ");
+        stream.printf("%02X ", payload[i]);
     }
     stream.println("");
 }
