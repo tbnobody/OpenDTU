@@ -6,7 +6,7 @@
     * MultiDataCommand
         * AlarmDataCommand
         * DevInfoAllCommand
-        * DevInfoSampleCommand
+        * DevInfoSimpleCommand
         * RealTimeRunDataCommand
         * SystemConfigParaCommand
     * ParaSetCommand

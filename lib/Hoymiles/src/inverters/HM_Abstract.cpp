@@ -3,7 +3,7 @@
 #include "commands/ActivePowerControlCommand.h"
 #include "commands/AlarmDataCommand.h"
 #include "commands/DevInfoAllCommand.h"
-#include "commands/DevInfoSampleCommand.h"
+#include "commands/DevInfoSimpleCommand.h"
 #include "commands/RealTimeRunDataCommand.h"
 #include "commands/SystemConfigParaCommand.h"
 
@@ -69,7 +69,7 @@ bool HM_Abstract::sendDevInfoRequest(HoymilesRadio* radio)
     cmdAll->setTime(now);
     cmdAll->setTargetAddress(serial());
 
-    DevInfoSampleCommand* cmdSample = radio->enqueCommand<DevInfoSampleCommand>();
+    DevInfoSimpleCommand* cmdSample = radio->enqueCommand<DevInfoSimpleCommand>();
     cmdSample->setTime(now);
     cmdSample->setTargetAddress(serial());
 
