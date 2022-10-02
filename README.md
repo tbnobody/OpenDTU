@@ -28,7 +28,7 @@ Several screenshots of the frontend can be found here: [Screenshots](docs/screen
 * Read live data from inverter
 * Show inverters internal event log
 * Show inverter information like firmware version, firmware build date, hardware revision and hardware version
-* Show current inverter limit (setting the limit is not yet implemented)
+* Show and set the current inverter limit
 * Uses ESP32 microcontroller and NRF24L01+
 * Multi-Inverter support
 * MQTT support (with TLS)
