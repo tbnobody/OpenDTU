@@ -67,6 +67,9 @@ void AlarmLogParser::getLogEntry(uint8_t entryId, AlarmLogEntry_t* entry)
     case 121:
         entry->Message = String(F("Over temperature protection"));
         break;
+    case 124:
+        entry->Message = String(F("Shut down by remote control"));
+        break;
     case 125:
         entry->Message = String(F("Grid configuration parameter error"));
         break;
@@ -80,91 +83,91 @@ void AlarmLogParser::getLogEntry(uint8_t entryId, AlarmLogEntry_t* entry)
         entry->Message = String(F("Software error code 128"));
         break;
     case 129:
-        entry->Message = String(F("Software error code 129"));
+        entry->Message = String(F("Abnormal bias"));
         break;
     case 130:
         entry->Message = String(F("Offline"));
         break;
     case 141:
-        entry->Message = String(F("Grid overvoltage"));
+        entry->Message = String(F("Grid: Grid overvoltage"));
         break;
     case 142:
-        entry->Message = String(F("Average grid overvoltage"));
+        entry->Message = String(F("Grid: 10 min value grid overvoltage"));
         break;
     case 143:
-        entry->Message = String(F("Grid undervoltage"));
+        entry->Message = String(F("Grid: Grid undervoltage"));
         break;
     case 144:
-        entry->Message = String(F("Grid overfrequency"));
+        entry->Message = String(F("Grid: Grid overfrequency"));
         break;
     case 145:
-        entry->Message = String(F("Grid underfrequency"));
+        entry->Message = String(F("Grid: Grid underfrequency"));
         break;
     case 146:
-        entry->Message = String(F("Rapid grid frequency change"));
+        entry->Message = String(F("Grid: Rapid grid frequency change rate"));
         break;
     case 147:
-        entry->Message = String(F("Power grid outage"));
+        entry->Message = String(F("Grid: Power grid outage"));
         break;
     case 148:
-        entry->Message = String(F("Grid disconnection"));
+        entry->Message = String(F("Grid: Grid disconnection"));
         break;
     case 149:
-        entry->Message = String(F("Island detected"));
+        entry->Message = String(F("Grid: Island detected"));
         break;
     case 205:
-        entry->Message = String(F("Input port 1 & 2 overvoltage"));
+        entry->Message = String(F("MPPT-A: Input overvoltage"));
         break;
     case 206:
-        entry->Message = String(F("Input port 3 & 4 overvoltage"));
+        entry->Message = String(F("MPPT-B: Input overvoltage"));
         break;
     case 207:
-        entry->Message = String(F("Input port 1 & 2 undervoltage"));
+        entry->Message = String(F("MPPT-A: Input undervoltage"));
         break;
     case 208:
-        entry->Message = String(F("Input port 3 & 4 undervoltage"));
+        entry->Message = String(F("MPPT-B: Input undervoltage"));
         break;
     case 209:
-        entry->Message = String(F("Port 1 no input"));
+        entry->Message = String(F("PV-1: No input"));
         break;
     case 210:
-        entry->Message = String(F("Port 2 no input"));
+        entry->Message = String(F("PV-2: No input"));
         break;
     case 211:
-        entry->Message = String(F("Port 3 no input"));
+        entry->Message = String(F("PV-3: No input"));
         break;
     case 212:
-        entry->Message = String(F("Port 4 no input"));
+        entry->Message = String(F("PV-4: No input"));
         break;
     case 213:
-        entry->Message = String(F("PV-1 & PV-2 abnormal wiring"));
+        entry->Message = String(F("MPPT-A: PV-1 & PV-2 abnormal wiring"));
         break;
     case 214:
-        entry->Message = String(F("PV-3 & PV-4 abnormal wiring"));
+        entry->Message = String(F("MPPT-B: PV-3 & PV-4 abnormal wiring"));
         break;
     case 215:
-        entry->Message = String(F("PV-1 Input overvoltage"));
+        entry->Message = String(F("PV-1: Input overvoltage"));
         break;
     case 216:
-        entry->Message = String(F("PV-1 Input undervoltage"));
+        entry->Message = String(F("PV-1: Input undervoltage"));
         break;
     case 217:
-        entry->Message = String(F("PV-2 Input overvoltage"));
+        entry->Message = String(F("PV-2: Input overvoltage"));
         break;
     case 218:
-        entry->Message = String(F("PV-2 Input undervoltage"));
+        entry->Message = String(F("PV-2: Input undervoltage"));
         break;
     case 219:
-        entry->Message = String(F("PV-3 Input overvoltage"));
+        entry->Message = String(F("PV-3: Input overvoltage"));
         break;
     case 220:
-        entry->Message = String(F("PV-3 Input undervoltage"));
+        entry->Message = String(F("PV-3: Input undervoltage"));
         break;
     case 221:
-        entry->Message = String(F("PV-4 Input overvoltage"));
+        entry->Message = String(F("PV-4: Input overvoltage"));
         break;
     case 222:
-        entry->Message = String(F("PV-4 Input undervoltage"));
+        entry->Message = String(F("PV-4: Input undervoltage"));
         break;
     case 301:
         entry->Message = String(F("Hardware error code 301"));
