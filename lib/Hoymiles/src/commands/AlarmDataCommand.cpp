@@ -9,6 +9,11 @@ AlarmDataCommand::AlarmDataCommand(uint64_t target_address, uint64_t router_addr
     setTimeout(500);
 }
 
+String AlarmDataCommand::getCommandName()
+{
+    return "AlarmData";
+}
+
 bool AlarmDataCommand::handleResponse(InverterAbstract* inverter, fragment_t fragment[], uint8_t max_fragment_id)
 {
     // Check CRC of whole payload

@@ -9,6 +9,11 @@ RealTimeRunDataCommand::RealTimeRunDataCommand(uint64_t target_address, uint64_t
     setTimeout(200);
 }
 
+String RealTimeRunDataCommand::getCommandName()
+{
+    return "RealTimeRunData";
+}
+
 bool RealTimeRunDataCommand::handleResponse(InverterAbstract* inverter, fragment_t fragment[], uint8_t max_fragment_id)
 {
     // Check CRC of whole payload

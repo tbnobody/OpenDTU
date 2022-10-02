@@ -20,6 +20,11 @@ ActivePowerControlCommand::ActivePowerControlCommand(uint64_t target_address, ui
     setTimeout(2000);
 }
 
+String ActivePowerControlCommand::getCommandName()
+{
+    return "ActivePowerControl";
+}
+
 void ActivePowerControlCommand::setActivePowerLimit(float limit, PowerLimitControlType type)
 {
     uint16_t l = limit * 10;

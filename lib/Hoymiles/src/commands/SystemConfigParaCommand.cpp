@@ -9,6 +9,11 @@ SystemConfigParaCommand::SystemConfigParaCommand(uint64_t target_address, uint64
     setTimeout(200);
 }
 
+String SystemConfigParaCommand::getCommandName()
+{
+    return "SystemConfigPara";
+}
+
 bool SystemConfigParaCommand::handleResponse(InverterAbstract* inverter, fragment_t fragment[], uint8_t max_fragment_id)
 {
     // Check CRC of whole payload

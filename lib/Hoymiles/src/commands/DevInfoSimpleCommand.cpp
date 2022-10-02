@@ -9,6 +9,11 @@ DevInfoSimpleCommand::DevInfoSimpleCommand(uint64_t target_address, uint64_t rou
     setTimeout(200);
 }
 
+String DevInfoSimpleCommand::getCommandName()
+{
+    return "DevInfoSimple";
+}
+
 bool DevInfoSimpleCommand::handleResponse(InverterAbstract* inverter, fragment_t fragment[], uint8_t max_fragment_id)
 {
     // Check CRC of whole payload

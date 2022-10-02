@@ -233,7 +233,9 @@ void HoymilesRadio::sendEsbPacket(CommandAbstract* cmd)
     openWritingPipe(s);
     _radio->setRetries(3, 15);
 
-    Serial.print(F("TX Channel: "));
+    Serial.print(F("TX "));
+    Serial.print(cmd->getCommandName());
+    Serial.print(F(" Channel: "));
     Serial.print(_radio->getChannel());
     Serial.print(F(" --> "));
     cmd->dumpDataPayload(Serial);

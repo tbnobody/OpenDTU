@@ -27,6 +27,8 @@ public:
     void setTimeout(uint32_t timeout);
     uint32_t getTimeout();
 
+    virtual String getCommandName() = 0;
+
     void setSendCount(uint8_t count);
     uint8_t getSendCount();
     uint8_t incrementSendCount();
