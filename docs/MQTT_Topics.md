@@ -7,6 +7,7 @@ The base topic, as configured in the web GUI is prepended to all follwing topics
 | Topic                                   | R / W | Description                                          | Value / Unit               |
 | --------------------------------------- | ----- | ---------------------------------------------------- | -------------------------- |
 | dtu/ip                                  | R     | IP address of OpenDTU                                | IP address                 |
+| dtu/hostname                            | R     | Current hostname of the dtu (as set in web GUI)      |                            |
 | dtu/rssi                                | R     | WiFi network quality                                 | db value                   |
 | dtu/status                              | R     | Indicates whether OpenDTU network is reachable       | online /  offline          |
 | dtu/uptime                              | R     | Time in seconds since startup                        | seconds                    |
