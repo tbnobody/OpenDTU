@@ -258,7 +258,7 @@ export default defineComponent({
         InverterChannelInfo,
         EventLog,
         DevInfo,
-        BootstrapAlert,,
+        BootstrapAlert,
         VedirectView
     },
     data() {
