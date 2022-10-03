@@ -9,6 +9,11 @@ SystemConfigParaCommand::SystemConfigParaCommand(uint64_t target_address, uint64
     setTimeout(200);
 }
 
+String SystemConfigParaCommand::getCommandName()
+{
+    return "SystemConfigPara";
+}
+
 bool SystemConfigParaCommand::handleResponse(InverterAbstract* inverter, fragment_t fragment[], uint8_t max_fragment_id)
 {
     // Check CRC of whole payload
@@ -23,6 +28,12 @@ bool SystemConfigParaCommand::handleResponse(InverterAbstract* inverter, fragmen
         inverter->SystemConfigPara()->appendFragment(offs, fragment[i].fragment, fragment[i].len);
         offs += (fragment[i].len);
     }
-    inverter->SystemConfigPara()->setLastUpdate(millis());
+    inverter->SystemConfigPara()->setLastUpdateRequest(millis());
+    inverter->SystemConfigPara()->setLastLimitRequestSuccess(CMD_OK);
     return true;
+}
+
+void SystemConfigParaCommand::gotTimeout(InverterAbstract* inverter)
+{
+    inverter->SystemConfigPara()->setLastLimitRequestSuccess(CMD_NOK);
 }

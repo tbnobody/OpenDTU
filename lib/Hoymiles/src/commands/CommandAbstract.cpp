@@ -13,12 +13,6 @@ CommandAbstract::CommandAbstract(uint64_t target_address, uint64_t router_addres
     setTimeout(0);
 }
 
-template <typename T>
-bool CommandAbstract::isA()
-{
-    return dynamic_cast<T*>(this) != NULL;
-}
-
 const uint8_t* CommandAbstract::getDataPayload()
 {
     _payload[_payload_size] = crc8(_payload, _payload_size);
@@ -29,8 +23,7 @@ void CommandAbstract::dumpDataPayload(Stream& stream)
 {
     const uint8_t* payload = getDataPayload();
     for (uint8_t i = 0; i < getDataSize(); i++) {
-        stream.print(payload[i], HEX);
-        stream.print(" ");
+        stream.printf("%02X ", payload[i]);
     }
     stream.println("");
 }
@@ -99,4 +92,8 @@ void CommandAbstract::convertSerialToPacketId(uint8_t buffer[], uint64_t serial)
     buffer[2] = s.b[1];
     buffer[1] = s.b[2];
     buffer[0] = s.b[3];
+}
+
+void CommandAbstract::gotTimeout(InverterAbstract* inverter)
+{
 }

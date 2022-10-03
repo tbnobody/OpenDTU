@@ -112,6 +112,21 @@ void StatisticsParser::setChannelMaxPower(uint8_t channel, uint16_t power)
     }
 }
 
+void StatisticsParser::resetRxFailureCount()
+{
+    _rxFailureCount = 0;
+}
+
+void StatisticsParser::incrementRxFailureCount()
+{
+    _rxFailureCount++;
+}
+
+uint32_t StatisticsParser::getRxFailureCount()
+{
+    return _rxFailureCount;
+}
+
 static float calcYieldTotalCh0(StatisticsParser* iv, uint8_t arg0)
 {
     float yield = 0;

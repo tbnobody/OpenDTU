@@ -11,7 +11,7 @@ public:
     const uint8_t getAssignmentCount();
 
 private:
-    const byteAssign_t byteAssignment[23] = {
+    const byteAssign_t byteAssignment[24] = {
         { FLD_UDC, UNIT_V, CH1, 2, 2, 10 },
         { FLD_IDC, UNIT_A, CH1, 4, 2, 100 },
         { FLD_PDC, UNIT_W, CH1, 6, 2, 10 },
@@ -31,6 +31,7 @@ private:
         { FLD_PAC, UNIT_W, CH0, 30, 2, 10 },
         { FLD_PRA, UNIT_VA, CH0, 32, 2, 10 },
         { FLD_F, UNIT_HZ, CH0, 28, 2, 100 },
+        { FLD_PCT, UNIT_PCT, CH0, 36, 2, 10 },
         { FLD_T, UNIT_C, CH0, 38, 2, 10 },
         { FLD_EVT_LOG, UNIT_CNT, CH0, 40, 2, 1 },
         { FLD_YD, UNIT_WH, CH0, CALC_YD_CH0, 0, CMD_CALC },

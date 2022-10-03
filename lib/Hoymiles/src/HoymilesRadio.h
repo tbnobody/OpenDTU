@@ -12,8 +12,6 @@
 // number of fragments hold in buffer
 #define FRAGMENT_BUFFER_SIZE 30
 
-#define MAX_RESEND_COUNT 4
-
 #ifndef HOYMILES_PIN_MISO
 #define HOYMILES_PIN_MISO 19
 #endif

@@ -17,20 +17,20 @@ void DevInfoParser::appendFragmentAll(uint8_t offset, uint8_t* payload, uint8_t 
     _devInfoAllLength += len;
 }
 
-void DevInfoParser::clearBufferSample()
+void DevInfoParser::clearBufferSimple()
 {
-    memset(_payloadDevInfoSample, 0, DEV_INFO_SIZE);
-    _devInfoSampleLength = 0;
+    memset(_payloadDevInfoSimple, 0, DEV_INFO_SIZE);
+    _devInfoSimpleLength = 0;
 }
 
-void DevInfoParser::appendFragmentSample(uint8_t offset, uint8_t* payload, uint8_t len)
+void DevInfoParser::appendFragmentSimple(uint8_t offset, uint8_t* payload, uint8_t len)
 {
     if (offset + len > DEV_INFO_SIZE) {
         Serial.printf("FATAL: (%s, %d) dev info Sample packet too large for buffer\n", __FILE__, __LINE__);
         return;
     }
-    memcpy(&_payloadDevInfoSample[offset], payload, len);
-    _devInfoSampleLength += len;
+    memcpy(&_payloadDevInfoSimple[offset], payload, len);
+    _devInfoSimpleLength += len;
 }
 
 uint32_t DevInfoParser::getLastUpdateAll()
@@ -84,15 +84,15 @@ uint32_t DevInfoParser::getHwPartNumber()
     uint16_t hwpn_h;
     uint16_t hwpn_l;
 
-    hwpn_h = (((uint16_t)_payloadDevInfoSample[2]) << 8) | _payloadDevInfoSample[3];
-    hwpn_l = (((uint16_t)_payloadDevInfoSample[4]) << 8) | _payloadDevInfoSample[5];
+    hwpn_h = (((uint16_t)_payloadDevInfoSimple[2]) << 8) | _payloadDevInfoSimple[3];
+    hwpn_l = (((uint16_t)_payloadDevInfoSimple[4]) << 8) | _payloadDevInfoSimple[5];
 
     return ((uint32_t)hwpn_h << 16) | ((uint32_t)hwpn_l);
 }
 
 uint16_t DevInfoParser::getHwVersion()
 {
-    return (((uint16_t)_payloadDevInfoSample[6]) << 8) | _payloadDevInfoSample[7];
+    return (((uint16_t)_payloadDevInfoSimple[6]) << 8) | _payloadDevInfoSimple[7];
 }
 
 /* struct tm to seconds since Unix epoch */

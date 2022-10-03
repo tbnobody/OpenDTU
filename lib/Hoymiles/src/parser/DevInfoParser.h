@@ -9,8 +9,8 @@ public:
     void clearBufferAll();
     void appendFragmentAll(uint8_t offset, uint8_t* payload, uint8_t len);
 
-    void clearBufferSample();
-    void appendFragmentSample(uint8_t offset, uint8_t* payload, uint8_t len);
+    void clearBufferSimple();
+    void appendFragmentSimple(uint8_t offset, uint8_t* payload, uint8_t len);
 
     uint32_t getLastUpdateAll();
     void setLastUpdateAll(uint32_t lastUpdate);
@@ -34,6 +34,6 @@ private:
     uint8_t _payloadDevInfoAll[DEV_INFO_SIZE] = {};
     uint8_t _devInfoAllLength = 0;
 
-    uint8_t _payloadDevInfoSample[DEV_INFO_SIZE] = {};
-    uint8_t _devInfoSampleLength = 0;
+    uint8_t _payloadDevInfoSimple[DEV_INFO_SIZE] = {};
+    uint8_t _devInfoSimpleLength = 0;
 };

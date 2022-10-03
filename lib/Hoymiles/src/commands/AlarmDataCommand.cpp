@@ -6,7 +6,12 @@ AlarmDataCommand::AlarmDataCommand(uint64_t target_address, uint64_t router_addr
 {
     setTime(time);
     setDataType(0x11);
-    setTimeout(400);
+    setTimeout(500);
+}
+
+String AlarmDataCommand::getCommandName()
+{
+    return "AlarmData";
 }
 
 bool AlarmDataCommand::handleResponse(InverterAbstract* inverter, fragment_t fragment[], uint8_t max_fragment_id)
@@ -23,6 +28,12 @@ bool AlarmDataCommand::handleResponse(InverterAbstract* inverter, fragment_t fra
         inverter->EventLog()->appendFragment(offs, fragment[i].fragment, fragment[i].len);
         offs += (fragment[i].len);
     }
+    inverter->EventLog()->setLastAlarmRequestSuccess(CMD_OK);
     inverter->EventLog()->setLastUpdate(millis());
     return true;
+}
+
+void AlarmDataCommand::gotTimeout(InverterAbstract* inverter)
+{
+    inverter->EventLog()->setLastAlarmRequestSuccess(CMD_NOK);
 }
