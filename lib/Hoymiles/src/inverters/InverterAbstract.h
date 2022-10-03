@@ -53,6 +53,7 @@ public:
     virtual bool sendActivePowerControlRequest(HoymilesRadio* radio, float limit, PowerLimitControlType type) = 0;
     virtual bool resendActivePowerControlRequest(HoymilesRadio* radio) = 0;
     virtual bool sendPowerControlRequest(HoymilesRadio* radio, bool turnOn) = 0;
+    virtual bool resendPowerControlRequest(HoymilesRadio* radio) = 0;
 
     AlarmLogParser* EventLog();
     DevInfoParser* DevInfo();
