@@ -90,9 +90,11 @@ uint32_t DevInfoParser::getHwPartNumber()
     return ((uint32_t)hwpn_h << 16) | ((uint32_t)hwpn_l);
 }
 
-uint16_t DevInfoParser::getHwVersion()
+String DevInfoParser::getHwVersion()
 {
-    return (((uint16_t)_payloadDevInfoSimple[6]) << 8) | _payloadDevInfoSimple[7];
+    char buf[6];
+    snprintf(buf, sizeof(buf), "%02X.%02X", _payloadDevInfoSimple[6], _payloadDevInfoSimple[7]);
+    return String(buf);
 }
 
 /* struct tm to seconds since Unix epoch */

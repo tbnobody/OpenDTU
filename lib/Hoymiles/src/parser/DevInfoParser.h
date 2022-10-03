@@ -23,7 +23,7 @@ public:
     uint16_t getFwBootloaderVersion();
 
     uint32_t getHwPartNumber();
-    uint16_t getHwVersion();
+    String getHwVersion();
 
 private:
     time_t timegm(struct tm* tm);

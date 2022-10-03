@@ -59,7 +59,7 @@ void MqttPublishingClass::loop()
                 MqttSettings.publish(subtopic + "/device/hwpartnumber", String(inv->DevInfo()->getHwPartNumber()));
 
                 // Hardware version
-                MqttSettings.publish(subtopic + "/device/hwversion", String(inv->DevInfo()->getHwVersion()));
+                MqttSettings.publish(subtopic + "/device/hwversion", inv->DevInfo()->getHwVersion());
             }
 
             if (inv->SystemConfigPara()->getLastUpdate() > 0) {
