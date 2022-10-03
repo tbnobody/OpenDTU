@@ -15,8 +15,8 @@ public:
     uint32_t getLastUpdateAll();
     void setLastUpdateAll(uint32_t lastUpdate);
 
-    uint32_t getLastUpdateSample();
-    void setLastUpdateSample(uint32_t lastUpdate);
+    uint32_t getLastUpdateSimple();
+    void setLastUpdateSimple(uint32_t lastUpdate);
 
     uint16_t getFwBuildVersion();
     time_t getFwBuildDateTime();
@@ -29,7 +29,7 @@ private:
     time_t timegm(struct tm* tm);
 
     uint32_t _lastUpdateAll = 0;
-    uint32_t _lastUpdateSample = 0;
+    uint32_t _lastUpdateSimple = 0;
 
     uint8_t _payloadDevInfoAll[DEV_INFO_SIZE] = {};
     uint8_t _devInfoAllLength = 0;

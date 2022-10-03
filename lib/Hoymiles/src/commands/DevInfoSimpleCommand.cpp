@@ -28,6 +28,6 @@ bool DevInfoSimpleCommand::handleResponse(InverterAbstract* inverter, fragment_t
         inverter->DevInfo()->appendFragmentSimple(offs, fragment[i].fragment, fragment[i].len);
         offs += (fragment[i].len);
     }
-    inverter->DevInfo()->setLastUpdateSample(millis());
+    inverter->DevInfo()->setLastUpdateSimple(millis());
     return true;
 }

@@ -69,9 +69,9 @@ bool HM_Abstract::sendDevInfoRequest(HoymilesRadio* radio)
     cmdAll->setTime(now);
     cmdAll->setTargetAddress(serial());
 
-    DevInfoSimpleCommand* cmdSample = radio->enqueCommand<DevInfoSimpleCommand>();
-    cmdSample->setTime(now);
-    cmdSample->setTargetAddress(serial());
+    DevInfoSimpleCommand* cmdSimple = radio->enqueCommand<DevInfoSimpleCommand>();
+    cmdSimple->setTime(now);
+    cmdSimple->setTargetAddress(serial());
 
     return true;
 }

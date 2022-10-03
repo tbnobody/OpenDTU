@@ -47,7 +47,7 @@ void HoymilesClass::loop()
                 }
 
                 // Fetch dev info (but first fetch stats)
-                if (iv->Statistics()->getLastUpdate() > 0 && (iv->DevInfo()->getLastUpdateAll() == 0 || iv->DevInfo()->getLastUpdateSample() == 0)) {
+                if (iv->Statistics()->getLastUpdate() > 0 && (iv->DevInfo()->getLastUpdateAll() == 0 || iv->DevInfo()->getLastUpdateSimple() == 0)) {
                     Serial.println(F("Request device info"));
                     iv->sendDevInfoRequest(_radio.get());
                 }

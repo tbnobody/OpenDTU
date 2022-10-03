@@ -26,7 +26,7 @@ void DevInfoParser::clearBufferSimple()
 void DevInfoParser::appendFragmentSimple(uint8_t offset, uint8_t* payload, uint8_t len)
 {
     if (offset + len > DEV_INFO_SIZE) {
-        Serial.printf("FATAL: (%s, %d) dev info Sample packet too large for buffer\n", __FILE__, __LINE__);
+        Serial.printf("FATAL: (%s, %d) dev info Simple packet too large for buffer\n", __FILE__, __LINE__);
         return;
     }
     memcpy(&_payloadDevInfoSimple[offset], payload, len);
@@ -44,14 +44,14 @@ void DevInfoParser::setLastUpdateAll(uint32_t lastUpdate)
     setLastUpdate(lastUpdate);
 }
 
-uint32_t DevInfoParser::getLastUpdateSample()
+uint32_t DevInfoParser::getLastUpdateSimple()
 {
-    return _lastUpdateSample;
+    return _lastUpdateSimple;
 }
 
-void DevInfoParser::setLastUpdateSample(uint32_t lastUpdate)
+void DevInfoParser::setLastUpdateSimple(uint32_t lastUpdate)
 {
-    _lastUpdateSample = lastUpdate;
+    _lastUpdateSimple = lastUpdate;
     setLastUpdate(lastUpdate);
 }
 
