@@ -53,6 +53,14 @@
                                     </div>
 
                                     <div class="btn-group me-2" role="group">
+                                        <button type="button" class="btn btn-sm btn-danger"
+                                            @click="onShowPowerSettings(inverter.serial)" title="Turn Inverter on/off">
+                                            <BIconPower style="font-size:24px;" />
+
+                                        </button>
+                                    </div>
+
+                                    <div class="btn-group me-2" role="group">
                                         <button type="button" class="btn btn-sm btn-info"
                                             @click="onShowDevInfo(inverter.serial)" title="Show Inverter Info">
                                             <BIconCpu style="font-size:24px;" />
@@ -230,6 +238,59 @@
                 </div>
             </div>
         </div>
+
+        <div class="modal" id="powerSettingView" ref="powerSettingView" tabindex="-1">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Power Settings</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+
+                        <BootstrapAlert v-model="showAlertPower" :variant="alertTypePower">
+                            {{ alertMessagePower }}
+                        </BootstrapAlert>
+                        <div class="text-center" v-if="powerSettingLoading">
+                            <div class="spinner-border" role="status">
+                                <span class="visually-hidden">Loading...</span>
+                            </div>
+                        </div>
+
+                        <template v-if="!powerSettingLoading">
+                            <div class="row mb-3 align-items-center">
+                                <label for="inputLastPowerSet" class="col col-form-label">Last Power Set
+                                    Status:</label>
+                                <div class="col">
+                                    <span class="badge" :class="{
+                                        'bg-danger': successCommandPower == 'Failure',
+                                        'bg-warning': successCommandPower == 'Pending',
+                                        'bg-success': successCommandPower == 'Ok',
+                                        'bg-secondary': successCommandPower == 'Unknown',
+                                    }">
+                                        {{ successCommandPower }}
+                                    </span>
+                                </div>
+                            </div>
+
+                            <div class="d-grid gap-2 col-6 mx-auto">
+                                <button type="button" class="btn btn-success" @click="onSetPowerSettings(true)">
+                                    <BIconToggleOn class="fs-4" />&nbsp;Turn On
+                                </button>
+                                <button type="button" class="btn btn-danger" @click="onSetPowerSettings(false)">
+                                    <BIconToggleOff class="fs-4" />&nbsp;Turn Off
+                                </button>
+                            </div>
+                        </template>
+
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </template>
 
@@ -288,6 +349,14 @@ export default defineComponent({
             alertMessageLimit: "",
             alertTypeLimit: "info",
             showAlertLimit: false,
+
+            powerSettingView: {} as bootstrap.Modal,
+            powerSettingSerial: 0,
+            powerSettingLoading: true,
+            alertMessagePower: "",
+            alertTypePower: "info",
+            showAlertPower: false,
+            successCommandPower: "",
         };
     },
     created() {
@@ -299,8 +368,10 @@ export default defineComponent({
         this.eventLogView = new bootstrap.Modal('#eventView');
         this.devInfoView = new bootstrap.Modal('#devInfoView');
         this.limitSettingView = new bootstrap.Modal('#limitSettingView');
+        this.powerSettingView = new bootstrap.Modal('#powerSettingView');
 
         (this.$refs.limitSettingView as HTMLElement).addEventListener("hide.bs.modal", this.onHideLimitSettings);
+        (this.$refs.powerSettingView as HTMLElement).addEventListener("hide.bs.modal", this.onHidePowerSettings);
     },
     unmounted() {
         this.closeSocket();
@@ -478,6 +549,57 @@ export default defineComponent({
                 this.targetLimitMax = 1500;
             }
             this.targetLimitType = type;
+        },
+
+        onShowPowerSettings(serial: number) {
+            this.powerSettingLoading = true;
+            fetch("/api/power/status")
+                .then((response) => response.json())
+                .then((data) => {
+                    this.successCommandPower = data[serial].power_set_status;
+                    this.powerSettingSerial = serial;
+                    this.powerSettingLoading = false;
+                });
+            this.powerSettingView.show();
+        },
+
+        onHidePowerSettings() {
+            this.powerSettingSerial = 0;
+            this.showAlertPower = false;
+        },
+
+        onSetPowerSettings(turnOn: boolean) {
+            const data = {
+                serial: this.powerSettingSerial,
+                power: turnOn,
+            };
+            const formData = new FormData();
+            formData.append("data", JSON.stringify(data));
+
+            console.log(data);
+
+            fetch("/api/power/config", {
+                method: "POST",
+                body: formData,
+            })
+                .then(function (response) {
+                    if (response.status != 200) {
+                        throw response.status;
+                    } else {
+                        return response.json();
+                    }
+                })
+                .then(
+                    (response) => {
+                        if (response.type == "success") {
+                            this.powerSettingView.hide();
+                        } else {
+                            this.alertMessagePower = response.message;
+                            this.alertTypePower = response.type;
+                            this.showAlertPower = true;
+                        }
+                    }
+                )
         },
     },
 });
