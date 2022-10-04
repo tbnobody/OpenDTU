@@ -36,6 +36,7 @@ void WebApiDevInfoClass::onDevInfoStatus(AsyncWebServerRequest* request)
             ((uint32_t)(inv->serial() & 0xFFFFFFFF)));
 
         JsonObject devInfoObj = root[buffer].createNestedObject();
+        devInfoObj[F("valid_data")] = inv->DevInfo()->getLastUpdate() > 0;
         devInfoObj[F("fw_bootloader_version")] = inv->DevInfo()->getFwBootloaderVersion();
         devInfoObj[F("fw_build_version")] = inv->DevInfo()->getFwBuildVersion();
         devInfoObj[F("hw_part_number")] = inv->DevInfo()->getHwPartNumber();
