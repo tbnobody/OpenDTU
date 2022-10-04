@@ -1367,10 +1367,10 @@
   dependencies:
     "@types/node" "*"
 
-"@types/bootstrap@^5.2.4":
-  version "5.2.4"
-  resolved "https://registry.yarnpkg.com/@types/bootstrap/-/bootstrap-5.2.4.tgz#7f4f4af8e22af8247385549bd2f687088d00d2d3"
-  integrity sha512-jGNB81zuDHu1DPvBV7Ox3Z3eyzdWPNguYwrt0j7X90VExA8H7c6qxJh0cz5j3xp0XvSy1TYaP2pkyXCHeo8CaA==
+"@types/bootstrap@^5.2.5":
+  version "5.2.5"
+  resolved "https://registry.yarnpkg.com/@types/bootstrap/-/bootstrap-5.2.5.tgz#0bb5dea7720611b2bb7ba16bd8a64fafd86fb658"
+  integrity sha512-VnalUJ3E/oaV3DYrauEc/sSPpaEPxTV09twSEzY4KFRvyuGlrZUSqG95XZ6ReAi0YMZIs7rXxdngDK2X1YONQA==
   dependencies:
     "@popperjs/core" "^2.9.2"
 
@@ -1469,10 +1469,10 @@
   resolved "https://registry.yarnpkg.com/@types/node/-/node-18.6.4.tgz#fd26723a8a3f8f46729812a7f9b4fc2d1608ed39"
   integrity sha512-I4BD3L+6AWiUobfxZ49DlU43gtI+FTHSv9pE2Zekg6KjMpre4ByusaljW3vYSLJrvQ1ck1hUaeVu8HVlY3vzHg==
 
-"@types/node@^18.8.0":
-  version "18.8.0"
-  resolved "https://registry.yarnpkg.com/@types/node/-/node-18.8.0.tgz#b8ee8d83a99470c0661bd899417fcd77060682fe"
-  integrity sha512-u+h43R6U8xXDt2vzUaVP3VwjjLyOJk6uEciZS8OSyziUQGOwmk+l+4drxcsDboHXwyTaqS1INebghmWMRxq3LA==
+"@types/node@^18.8.2":
+  version "18.8.2"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-18.8.2.tgz#17d42c6322d917764dd3d2d3a10d7884925de067"
+  integrity sha512-cRMwIgdDN43GO4xMWAfJAecYn8wV4JbsOGHNfNUIDiuYkUYAR5ec4Rj7IO2SAhFPEfpPtLtUTbbny/TCT7aDwA==
 
 "@types/normalize-package-data@^2.4.0":
   version "2.4.1"
@@ -2510,10 +2510,10 @@ bootstrap-icons-vue@^1.8.1:
   resolved "https://registry.yarnpkg.com/bootstrap-icons-vue/-/bootstrap-icons-vue-1.8.1.tgz#ce4a0c1f6efe41dabcc1341f2cb191d307fbaf50"
   integrity sha512-uItRULwQz0epETi9x/RBEqfjHmTAmkIIczpH1R6L9T6yyaaijk0826PzTWnWNm15tw66JT/8GNuXjB0HI5PHLw==
 
-bootstrap@^5.2.1:
-  version "5.2.1"
-  resolved "https://registry.yarnpkg.com/bootstrap/-/bootstrap-5.2.1.tgz#45f97ff05cbe828bad807b014d8425f3aeb8ec3a"
-  integrity sha512-UQi3v2NpVPEi1n35dmRRzBJFlgvWHYwyem6yHhuT6afYF+sziEt46McRbT//kVXZ7b1YUYEVGdXEH74Nx3xzGA==
+bootstrap@^5.2.2:
+  version "5.2.2"
+  resolved "https://registry.yarnpkg.com/bootstrap/-/bootstrap-5.2.2.tgz#834e053eed584a65e244d8aa112a6959f56e27a0"
+  integrity sha512-dEtzMTV71n6Fhmbg4fYJzQsw1N29hJKO1js5ackCgIpDcGid2ETMGC6zwSYw09v05Y+oRdQ9loC54zB1La3hHQ==
 
 brace-expansion@^1.1.7:
   version "1.1.11"
@@ -2903,10 +2903,10 @@ core-js-compat@^3.21.0, core-js-compat@^3.22.1, core-js-compat@^3.8.3:
     browserslist "^4.20.3"
     semver "7.0.0"
 
-core-js@^3.25.3:
-  version "3.25.3"
-  resolved "https://registry.yarnpkg.com/core-js/-/core-js-3.25.3.tgz#cbc2be50b5ddfa7981837bd8c41639f27b166593"
-  integrity sha512-y1hvKXmPHvm5B7w4ln1S4uc9eV/O5+iFExSRUimnvIph11uaizFR8LFMdONN8hG3P2pipUfX4Y/fR8rAEtcHcQ==
+core-js@^3.25.5:
+  version "3.25.5"
+  resolved "https://registry.yarnpkg.com/core-js/-/core-js-3.25.5.tgz#e86f651a2ca8a0237a5f064c2fe56cef89646e27"
+  integrity sha512-nbm6eZSjm+ZuBQxCUPQKQCoUEfFOXjUZ8dTTyikyKaWrTYmAVbykQfwsKE5dBK88u3QCkCrzsx/PPlKfhsvgpw==
 
 core-js@^3.8.3:
   version "3.24.1"
@@ -3353,10 +3353,10 @@ escape-string-regexp@^4.0.0:
   resolved "https://registry.yarnpkg.com/escape-string-regexp/-/escape-string-regexp-4.0.0.tgz#14ba83a5d373e3d311e5afca29cf5bfad965bf34"
   integrity sha512-TtpcNJ3XAzx3Gq8sWRzJaVajRs0uVxA2YAkdb1jm2YkPz4G6egUFAyA3n5vtEIZefPk5Wa4UXbKuS5fKkJWdgA==
 
-eslint-plugin-vue@^9.5.1:
-  version "9.5.1"
-  resolved "https://registry.yarnpkg.com/eslint-plugin-vue/-/eslint-plugin-vue-9.5.1.tgz#87ce075882cf7d824b95f46c224f91495fafcc54"
-  integrity sha512-Y0sL2RY7Xc9S8kNih9lbwHIDmewUg9bfas6WSzsOWRgDXhIHKxRBZYNAnVcXBFfE+bMWHUA5GLChl7TcTYUI8w==
+eslint-plugin-vue@^9.6.0:
+  version "9.6.0"
+  resolved "https://registry.yarnpkg.com/eslint-plugin-vue/-/eslint-plugin-vue-9.6.0.tgz#5d1825b93d54595b1ba97106843e1d28cf3bb291"
+  integrity sha512-zzySkJgVbFCylnG2+9MDF7N+2Rjze2y0bF8GyUNpFOnT8mCMfqqtLDJkHBuYu9N/psW1A6DVbQhPkP92E+qakA==
   dependencies:
     eslint-utils "^3.0.0"
     natural-compare "^1.4.0"
