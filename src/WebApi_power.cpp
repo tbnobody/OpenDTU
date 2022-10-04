@@ -13,11 +13,44 @@ void WebApiPowerClass::init(AsyncWebServer* server)
 
     _server = server;
 
+    _server->on("/api/power/status", HTTP_GET, std::bind(&WebApiPowerClass::onPowerStatus, this, _1));
     _server->on("/api/power/config", HTTP_POST, std::bind(&WebApiPowerClass::onPowerPost, this, _1));
 }
 
 void WebApiPowerClass::loop()
 {
+}
+
+void WebApiPowerClass::onPowerStatus(AsyncWebServerRequest* request)
+{
+    AsyncJsonResponse* response = new AsyncJsonResponse();
+    JsonObject root = response->getRoot();
+
+    for (uint8_t i = 0; i < Hoymiles.getNumInverters(); i++) {
+        auto inv = Hoymiles.getInverterByPos(i);
+
+        // Inverter Serial is read as HEX
+        char buffer[sizeof(uint64_t) * 8 + 1];
+        snprintf(buffer, sizeof(buffer), "%0lx%08lx",
+            ((uint32_t)((inv->serial() >> 32) & 0xFFFFFFFF)),
+            ((uint32_t)(inv->serial() & 0xFFFFFFFF)));
+
+        LastCommandSuccess status = inv->PowerCommand()->getLastPowerCommandSuccess();
+        String limitStatus = "Unknown";
+        if (status == LastCommandSuccess::CMD_OK) {
+            limitStatus = "Ok";
+        }
+        else if (status == LastCommandSuccess::CMD_NOK) {
+            limitStatus = "Failure";
+        }
+        else if (status == LastCommandSuccess::CMD_PENDING) {
+            limitStatus = "Pending";
+        }
+        root[buffer]["power_set_status"] = limitStatus;
+    }
+
+    response->setLength();
+    request->send(response);
 }
 
 void WebApiPowerClass::onPowerPost(AsyncWebServerRequest* request)

@@ -9,6 +9,7 @@ public:
     void loop();
 
 private:
+    void onPowerStatus(AsyncWebServerRequest* request);
     void onPowerPost(AsyncWebServerRequest* request);
 
     AsyncWebServer* _server;
