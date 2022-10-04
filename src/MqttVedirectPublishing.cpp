@@ -33,21 +33,13 @@ void MqttVedirectPublishingClass::loop()
             key = it->first;
             value = it->second;
             
-            // Add new key, value pairs to map and update changed values.
             // Mark changed values
             auto a = _kv_map.find(key);
+            bChanged = true;
             if (a !=  _kv_map.end()) {
                 if (_kv_map[key] == value) {
                     bChanged = false;
-                }
-                else {
-                    _kv_map[key] = value;
-                    bChanged = true;
-                }
-            }
-            else {	
-                _kv_map.insert(std::make_pair(key, value));
-                bChanged = true;
+                }   
             }
         
             // publish only changed key, values pairs
@@ -57,6 +49,7 @@ void MqttVedirectPublishingClass::loop()
                 MqttSettings.publish(topic.c_str(), value.c_str()); 
             }
         }
+        _kv_map = VeDirect.veMap;
         _lastPublish = millis();
     }
 }
