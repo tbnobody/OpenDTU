@@ -1,6 +1,5 @@
 #pragma once
 
-#include "CircularBuffer.h"
 #include "TimeoutHelper.h"
 #include "commands/CommandAbstract.h"
 #include "types.h"
@@ -57,7 +56,7 @@ private:
 
     volatile bool _packetReceived = false;
 
-    CircularBuffer<fragment_t, FRAGMENT_BUFFER_SIZE> _rxBuffer;
+    std::queue<fragment_t> _rxBuffer;
     TimeoutHelper _rxTimeout;
 
     serial_u _dtuSerial;
