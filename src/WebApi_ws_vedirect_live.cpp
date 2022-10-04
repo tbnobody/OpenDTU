@@ -13,7 +13,12 @@ WebApiWsVedirectLiveClass::WebApiWsVedirectLiveClass()
 
 void WebApiWsVedirectLiveClass::init(AsyncWebServer* server)
 {
-    using namespace std::placeholders;
+    using std::placeholders::_1;
+    using std::placeholders::_2;
+    using std::placeholders::_3;
+    using std::placeholders::_4;
+    using std::placeholders::_5;
+    using std::placeholders::_6;
 
     _server = server;
     _server->on("/api/vedirectlivedata/status", HTTP_GET, std::bind(&WebApiWsVedirectLiveClass::onLivedataStatus, this, _1));
@@ -109,11 +114,11 @@ void WebApiWsVedirectLiveClass::onWebsocketEvent(AsyncWebSocket* server, AsyncWe
 {
     if (type == WS_EVT_CONNECT) {
         char str[64];
-        sprintf(str, "Websocket: [%s][%u] connect", server->url(), client->id());
+        snprintf(str, sizeof(str), "Websocket: [%s][%u] connect", server->url(), client->id());
         Serial.println(str);
     } else if (type == WS_EVT_DISCONNECT) {
         char str[64];
-        sprintf(str, "Websocket: [%s][%u] disconnect", server->url(), client->id());
+        snprintf(str, sizeof(str), "Websocket: [%s][%u] disconnect", server->url(), client->id());
         Serial.println(str);
     }
 }
