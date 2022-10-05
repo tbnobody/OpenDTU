@@ -45,7 +45,7 @@ export default defineComponent({
                 // FirmwareInfo
                 hostname: "",
                 sdkversion: "",
-                firmware_version: "",
+                config_version: "",
                 git_hash: "",
                 resetreason_0: "",
                 resetreason_1: "",

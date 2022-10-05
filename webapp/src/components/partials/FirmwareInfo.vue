@@ -16,11 +16,11 @@
                             <td>{{ sdkversion }}</td>
                         </tr>
                         <tr>
-                            <th>Firmware Version</th>
-                            <td>{{ firmware_version }}</td>
+                            <th>Config Version</th>
+                            <td>{{ config_version }}</td>
                         </tr>
                         <tr>
-                            <th>Git Hash</th>
+                            <th>Firmware Version / Git Hash</th>
                             <td><a :href="'https://github.com/tbnobody/OpenDTU/commits/' + git_hash?.substring(1)" target="_blank">{{ git_hash?.substring(1) }}</a></td>
                         </tr>
                         <tr>
@@ -53,7 +53,7 @@ export default defineComponent({
     props: {
         hostname: String,
         sdkversion: String,
-        firmware_version: String,
+        config_version: String,
         git_hash: String,
         resetreason_0: String,
         resetreason_1: String,
