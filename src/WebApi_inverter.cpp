@@ -319,7 +319,7 @@ void WebApiInverterClass::onInverterDelete(AsyncWebServerRequest* request)
     Hoymiles.removeInverterBySerial(inverter.Serial);
 
     inverter.Serial = 0;
-    strncpy(inverter.Name, "", 0);
+    strncpy(inverter.Name, "", sizeof(inverter.Name));
     Configuration.write();
 
     retMsg[F("type")] = F("success");
