@@ -21,7 +21,13 @@
                         </tr>
                         <tr>
                             <th>Firmware Version / Git Hash</th>
-                            <td><a :href="'https://github.com/tbnobody/OpenDTU/commits/' + git_hash?.substring(1)" target="_blank">{{ git_hash?.substring(1) }}</a></td>
+                            <td><a :href="'https://github.com/tbnobody/OpenDTU/commits/' + git_hash?.substring(1)"
+                                    target="_blank">{{ git_hash?.substring(1) }}</a></td>
+                        </tr>
+                        <tr>
+                            <th>Firmware Update</th>
+                            <td><a :href="update_url" target="_blank"><span class="badge" :class="update_status">{{
+                            update_text }}</span></a></td>
                         </tr>
                         <tr>
                             <th>Reset Reason CPU 0</th>
@@ -59,6 +65,9 @@ export default defineComponent({
         resetreason_1: String,
         cfgsavecount: { type: Number, required: true },
         uptime: { type: Number, required: true },
+        update_text: String,
+        update_url: String,
+        update_status: String,
     },
     computed: {
         timeInHours() {
