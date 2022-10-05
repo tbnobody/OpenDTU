@@ -31,6 +31,8 @@ void MqttSettingsClass::NetworkEvent(network_event event)
         Serial.println(F("Network lost connection"));
         mqttReconnectTimer.detach(); // ensure we don't reconnect to MQTT while reconnecting to Wi-Fi
         break;
+    default:
+        break;
     }
 }
 
