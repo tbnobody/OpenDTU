@@ -210,11 +210,7 @@ void WebApiInverterClass::onInverterEdit(AsyncWebServerRequest* request)
     }
 
     JsonArray maxPowerArray = root[F("max_power")].as<JsonArray>();
-    uint8_t arrayCount = 0;
-    for (JsonVariant maxPower : maxPowerArray) {
-        arrayCount++;
-    }
-    if (arrayCount != INV_MAX_CHAN_COUNT) {
+    if (maxPowerArray.size() != INV_MAX_CHAN_COUNT) {
         retMsg[F("message")] = F("Invalid amount of max channel setting given!");
         response->setLength();
         request->send(response);
@@ -230,7 +226,7 @@ void WebApiInverterClass::onInverterEdit(AsyncWebServerRequest* request)
     inverter.Serial = new_serial;
     strncpy(inverter.Name, root[F("name")].as<String>().c_str(), INV_MAX_NAME_STRLEN);
 
-    arrayCount = 0;
+    uint8_t arrayCount = 0;
     for (JsonVariant maxPower : maxPowerArray) {
         inverter.MaxChannelPower[arrayCount] = maxPower.as<uint16_t>();
         arrayCount++;
