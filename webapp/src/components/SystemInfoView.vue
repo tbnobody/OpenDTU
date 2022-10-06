@@ -17,6 +17,8 @@
             <div class="mt-5"></div>
             <MemoryInfo v-bind="systemDataList" />
             <div class="mt-5"></div>
+            <RadioInfo v-bind="systemDataList" />
+            <div class="mt-5"></div>
         </template>
     </div>
 </template>
@@ -26,12 +28,14 @@ import { defineComponent } from 'vue';
 import HardwareInfo from "@/components/partials/HardwareInfo.vue";
 import FirmwareInfo from "@/components/partials/FirmwareInfo.vue";
 import MemoryInfo from "@/components/partials/MemoryInfo.vue";
+import RadioInfo from "@/components/partials/RadioInfo.vue";
 
 export default defineComponent({
     components: {
         HardwareInfo,
         FirmwareInfo,
         MemoryInfo,
+        RadioInfo,
     },
     data() {
         return {
@@ -60,7 +64,9 @@ export default defineComponent({
                 littlefs_total: 0,
                 littlefs_used: 0,
                 sketch_total: 0,
-                sketch_used: 0
+                sketch_used: 0,
+                // RadioInfo
+                radio_connected: false,
             }
         }
     },

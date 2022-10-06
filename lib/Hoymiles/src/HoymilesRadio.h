@@ -46,6 +46,7 @@ public:
     void setDtuSerial(uint64_t serial);
 
     bool isIdle();
+    bool isConnected();
 
     template <typename T>
     T* enqueCommand()

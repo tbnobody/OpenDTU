@@ -161,6 +161,11 @@ bool HoymilesRadio::isIdle()
     return !_busyFlag;
 }
 
+bool HoymilesRadio::isConnected()
+{
+    return _radio->isChipConnected();
+}
+
 void HoymilesRadio::openReadingPipe()
 {
     serial_u s;
