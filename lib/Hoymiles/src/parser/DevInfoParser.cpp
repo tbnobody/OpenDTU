@@ -1,6 +1,22 @@
 #include "DevInfoParser.h"
 #include <cstring>
 
+typedef struct {
+    uint8_t hwPart[3];
+    uint16_t maxPower;
+    const char* modelName;
+} devInfo_t;
+
+const devInfo_t devInfo[] = {
+    { { 0x10, 0x10, 0x10 }, 300, "HM-300" },
+    { { 0x10, 0x10, 0x40 }, 400, "HM-400" },
+    { { 0x10, 0x11, 0x10 }, 600, "HM-600" },
+    { { 0x10, 0x11, 0x20 }, 700, "HM-700" },
+    { { 0x10, 0x11, 0x40 }, 800, "HM-800" },
+    { { 0x10, 0x12, 0x10 }, 1200, "HM-1200" },
+    { { 0x10, 0x12, 0x30 }, 1500, "HM-1500" }
+};
+
 void DevInfoParser::clearBufferAll()
 {
     memset(_payloadDevInfoAll, 0, DEV_INFO_SIZE);
@@ -95,6 +111,37 @@ String DevInfoParser::getHwVersion()
     char buf[6];
     snprintf(buf, sizeof(buf), "%02X.%02X", _payloadDevInfoSimple[6], _payloadDevInfoSimple[7]);
     return String(buf);
+}
+
+uint16_t DevInfoParser::getMaxPower()
+{
+    uint8_t idx = getDevIdx();
+    if (idx == 0xff) {
+        return 0;
+    }
+    return devInfo[idx].maxPower;
+}
+
+String DevInfoParser::getHwModelName()
+{
+    uint8_t idx = getDevIdx();
+    if (idx == 0xff) {
+        return "";
+    }
+    return devInfo[idx].modelName;
+}
+
+uint8_t DevInfoParser::getDevIdx()
+{
+     uint8_t pos;
+    for (pos = 0; pos < sizeof(devInfo) / sizeof(devInfo_t); pos++) {
+         if (devInfo[pos].hwPart[0] == _payloadDevInfoSimple[2]
+            && devInfo[pos].hwPart[1] == _payloadDevInfoSimple[3]
+            && devInfo[pos].hwPart[2] == _payloadDevInfoSimple[4]) {
+            return pos;
+        }
+    }
+    return 0xff;
 }
 
 /* struct tm to seconds since Unix epoch */

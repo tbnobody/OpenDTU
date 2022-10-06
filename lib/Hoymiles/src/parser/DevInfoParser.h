@@ -25,8 +25,12 @@ public:
     uint32_t getHwPartNumber();
     String getHwVersion();
 
+    uint16_t getMaxPower();
+    String getHwModelName();
+
 private:
     time_t timegm(struct tm* tm);
+    uint8_t getDevIdx();
 
     uint32_t _lastUpdateAll = 0;
     uint32_t _lastUpdateSimple = 0;
