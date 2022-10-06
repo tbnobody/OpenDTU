@@ -108,8 +108,8 @@ uint32_t DevInfoParser::getHwPartNumber()
 
 String DevInfoParser::getHwVersion()
 {
-    char buf[6];
-    snprintf(buf, sizeof(buf), "%02X.%02X", _payloadDevInfoSimple[6], _payloadDevInfoSimple[7]);
+    char buf[8];
+    snprintf(buf, sizeof(buf), "%02d.%02d", _payloadDevInfoSimple[6], _payloadDevInfoSimple[7]);
     return String(buf);
 }
 
