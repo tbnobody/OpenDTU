@@ -7,6 +7,12 @@
     <table v-if="devInfoList.valid_data" class="table table-hover">
         <tbody>
             <tr>
+                <td>Model</td>
+                <td v-if="devInfoList.hw_model_name != ''">{{ devInfoList.hw_model_name }}</td>
+                <td v-else>Unknown model! Please report the "Hardware Part Number" and model (e.g. HM-350) as an issue
+                    <a href="https://github.com/tbnobody/OpenDTU/issues" target="_blank">here</a>.</td>
+            </tr>
+            <tr>
                 <td>Bootloader Version</td>
                 <td>{{ formatVersion(devInfoList.fw_bootloader_version) }}</td>
             </tr>
@@ -40,7 +46,8 @@ declare interface DevInfoData {
     fw_build_version: number,
     fw_build_datetime: Date,
     hw_part_number: number,
-    hw_version: number
+    hw_version: number,
+    hw_model_name: string,
 }
 
 export default defineComponent({

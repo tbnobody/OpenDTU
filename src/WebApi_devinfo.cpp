@@ -41,6 +41,7 @@ void WebApiDevInfoClass::onDevInfoStatus(AsyncWebServerRequest* request)
         devInfoObj[F("fw_build_version")] = inv->DevInfo()->getFwBuildVersion();
         devInfoObj[F("hw_part_number")] = inv->DevInfo()->getHwPartNumber();
         devInfoObj[F("hw_version")] = inv->DevInfo()->getHwVersion();
+        devInfoObj[F("hw_model_name")] = inv->DevInfo()->getHwModelName();
 
         char timebuffer[32];
         const time_t t = inv->DevInfo()->getFwBuildDateTime();
