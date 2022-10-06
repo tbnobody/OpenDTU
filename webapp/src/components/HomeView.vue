@@ -491,7 +491,7 @@ export default defineComponent({
             fetch("/api/limit/status")
                 .then((response) => response.json())
                 .then((data) => {
-                    this.currentLimit = data[serial].limit;
+                    this.currentLimit = data[serial].limit_relative;
                     this.successCommandLimit = data[serial].limit_set_status;
                     this.limitSettingSerial = serial;
                     this.limitSettingLoading = false;
