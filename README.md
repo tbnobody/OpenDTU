@@ -29,7 +29,7 @@ Several screenshots of the frontend can be found here: [Screenshots](docs/screen
 * Show inverters internal event log
 * Show inverter information like firmware version, firmware build date, hardware revision and hardware version
 * Show and set the current inverter limit
-* Function to turn the inverter off an on
+* Function to turn the inverter off and on
 * Uses ESP32 microcontroller and NRF24L01+
 * Multi-Inverter support
 * MQTT support (with TLS)
