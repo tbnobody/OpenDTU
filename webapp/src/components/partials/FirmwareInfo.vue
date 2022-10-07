@@ -16,12 +16,18 @@
                             <td>{{ sdkversion }}</td>
                         </tr>
                         <tr>
-                            <th>Firmware Version</th>
-                            <td>{{ firmware_version }}</td>
+                            <th>Config Version</th>
+                            <td>{{ config_version }}</td>
                         </tr>
                         <tr>
-                            <th>Git Hash</th>
-                            <td><a :href="'https://github.com/tbnobody/OpenDTU/commits/' + git_hash?.substring(1)" target="_blank">{{ git_hash?.substring(1) }}</a></td>
+                            <th>Firmware Version / Git Hash</th>
+                            <td><a :href="'https://github.com/tbnobody/OpenDTU/commits/' + git_hash?.substring(1)"
+                                    target="_blank">{{ git_hash?.substring(1) }}</a></td>
+                        </tr>
+                        <tr>
+                            <th>Firmware Update</th>
+                            <td><a :href="update_url" target="_blank"><span class="badge" :class="update_status">{{
+                            update_text }}</span></a></td>
                         </tr>
                         <tr>
                             <th>Reset Reason CPU 0</th>
@@ -53,12 +59,15 @@ export default defineComponent({
     props: {
         hostname: String,
         sdkversion: String,
-        firmware_version: String,
+        config_version: String,
         git_hash: String,
         resetreason_0: String,
         resetreason_1: String,
         cfgsavecount: { type: Number, required: true },
         uptime: { type: Number, required: true },
+        update_text: String,
+        update_url: String,
+        update_status: String,
     },
     computed: {
         timeInHours() {

@@ -7,6 +7,7 @@ InverterAbstract::InverterAbstract(uint64_t serial)
     _serial.u64 = serial;
     _alarmLogParser.reset(new AlarmLogParser());
     _devInfoParser.reset(new DevInfoParser());
+    _powerCommandParser.reset(new PowerCommandParser());
     _statisticsParser.reset(new StatisticsParser());
     _systemConfigParaParser.reset(new SystemConfigParaParser());
 }
@@ -62,6 +63,11 @@ AlarmLogParser* InverterAbstract::EventLog()
 DevInfoParser* InverterAbstract::DevInfo()
 {
     return _devInfoParser.get();
+}
+
+PowerCommandParser* InverterAbstract::PowerCommand()
+{
+    return _powerCommandParser.get();
 }
 
 StatisticsParser* InverterAbstract::Statistics()

@@ -45,12 +45,15 @@ export default defineComponent({
                 // FirmwareInfo
                 hostname: "",
                 sdkversion: "",
-                firmware_version: "",
+                config_version: "",
                 git_hash: "",
                 resetreason_0: "",
                 resetreason_1: "",
                 cfgsavecount: 0,
                 uptime: 0,
+                update_text: "",
+                update_url: "",
+                update_status: "",
                 // MemoryInfo
                 heap_total: 0,
                 heap_used: 0,
@@ -72,8 +75,35 @@ export default defineComponent({
                 .then((data) => {
                     this.systemDataList = data;
                     this.dataLoading = false;
+                    this.getUpdateInfo();
                 })
         },
+        getUpdateInfo() {
+            const fetchUrl = "https://api.github.com/repos/tbnobody/OpenDTU/compare/"
+                + this.systemDataList.git_hash?.substring(1) + "...HEAD";
+
+            fetch(fetchUrl)
+                .then((response) => {
+                    if (response.ok) {
+                        return response.json()
+                    }
+                    throw new Error('Error fetching version information');
+                })
+                .then((data) => {
+                    if (data.total_commits > 0) {
+                        this.systemDataList.update_text = "New version available! Show changes!"
+                        this.systemDataList.update_status = "text-bg-danger";
+                        this.systemDataList.update_url = data.html_url;
+                    } else {
+                        this.systemDataList.update_text = "Up to date!"
+                        this.systemDataList.update_status = "text-bg-success";
+                    }
+                })
+                .catch((error: Error) => {
+                    this.systemDataList.update_text = error.message;
+                    this.systemDataList.update_status = "text-bg-secondary";
+                });
+        }
     },
 });
 </script>

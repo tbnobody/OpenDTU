@@ -64,6 +64,7 @@ Sends text raw data as difined in VE.Direct spec.
 * Show inverters internal event log
 * Show inverter information like firmware version, firmware build date, hardware revision and hardware version
 * Show and set the current inverter limit
+* Function to turn the inverter off an on
 * Uses ESP32 microcontroller and NRF24L01+
 * Multi-Inverter support
 * MQTT support (with TLS)
@@ -95,7 +96,7 @@ Sample Picture:
 
 Also supported: Board with Ethernet-Connector and Power-over-Ethernet [Olimex ESP32-POE](https://www.olimex.com/Products/IoT/ESP32/ESP32-POE/open-source-hardware)
 
-#### NRF24L01+ radio board
+### NRF24L01+ radio board
 The PLUS sign is IMPORTANT! There are different variants available, with antenna on the printed circuit board or external antenna.
 
 Sample picture:
@@ -113,7 +114,7 @@ A heavily incomplete list of trusted hardware shops in germany is:
 
 This list is for your convenience only, the project is not related to any of these shops.
 
-#### Power supply
+### Power supply
 Use a power suppy with 5V and 1A. The USB cable connected to your PC/Notebook may be powerful enough or may be not.
 
 

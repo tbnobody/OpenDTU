@@ -70,31 +70,6 @@ typedef struct {
     uint16_t div; // divisor / calc command
 } byteAssign_t;
 
-// prototypes
-class StatisticsParser;
-static float calcYieldTotalCh0(StatisticsParser* iv, uint8_t arg0);
-static float calcYieldDayCh0(StatisticsParser* iv, uint8_t arg0);
-static float calcUdcCh(StatisticsParser* iv, uint8_t arg0);
-static float calcPowerDcCh0(StatisticsParser* iv, uint8_t arg0);
-static float calcEffiencyCh0(StatisticsParser* iv, uint8_t arg0);
-static float calcIrradiation(StatisticsParser* iv, uint8_t arg0);
-
-using func_t = float(StatisticsParser*, uint8_t);
-
-struct calcFunc_t {
-    uint8_t funcId; // unique id
-    func_t* func; // function pointer
-};
-
-const calcFunc_t calcFunctions[] = {
-    { CALC_YT_CH0, &calcYieldTotalCh0 },
-    { CALC_YD_CH0, &calcYieldDayCh0 },
-    { CALC_UDC_CH, &calcUdcCh },
-    { CALC_PDC_CH0, &calcPowerDcCh0 },
-    { CALC_EFF_CH0, &calcEffiencyCh0 },
-    { CALC_IRR_CH, &calcIrradiation }
-};
-
 class StatisticsParser : public Parser {
 public:
     void clearBuffer();

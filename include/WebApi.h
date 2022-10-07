@@ -11,6 +11,7 @@
 #include "WebApi_mqtt.h"
 #include "WebApi_network.h"
 #include "WebApi_ntp.h"
+#include "WebApi_power.h"
 #include "WebApi_sysstatus.h"
 #include "WebApi_webapp.h"
 #include "WebApi_ws_live.h"
@@ -38,6 +39,7 @@ private:
     WebApiMqttClass _webApiMqtt;
     WebApiNetworkClass _webApiNetwork;
     WebApiNtpClass _webApiNtp;
+    WebApiPowerClass _webApiPower;
     WebApiSysstatusClass _webApiSysstatus;
     WebApiWebappClass _webApiWebapp;
     WebApiWsLiveClass _webApiWsLive;

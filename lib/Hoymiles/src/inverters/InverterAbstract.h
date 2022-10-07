@@ -3,6 +3,7 @@
 #include "../commands/ActivePowerControlCommand.h"
 #include "../parser/AlarmLogParser.h"
 #include "../parser/DevInfoParser.h"
+#include "../parser/PowerCommandParser.h"
 #include "../parser/StatisticsParser.h"
 #include "../parser/SystemConfigParaParser.h"
 #include "HoymilesRadio.h"
@@ -51,9 +52,12 @@ public:
     virtual bool sendSystemConfigParaRequest(HoymilesRadio* radio) = 0;
     virtual bool sendActivePowerControlRequest(HoymilesRadio* radio, float limit, PowerLimitControlType type) = 0;
     virtual bool resendActivePowerControlRequest(HoymilesRadio* radio) = 0;
+    virtual bool sendPowerControlRequest(HoymilesRadio* radio, bool turnOn) = 0;
+    virtual bool resendPowerControlRequest(HoymilesRadio* radio) = 0;
 
     AlarmLogParser* EventLog();
     DevInfoParser* DevInfo();
+    PowerCommandParser* PowerCommand();
     StatisticsParser* Statistics();
     SystemConfigParaParser* SystemConfigPara();
 
@@ -67,6 +71,7 @@ private:
 
     std::unique_ptr<AlarmLogParser> _alarmLogParser;
     std::unique_ptr<DevInfoParser> _devInfoParser;
+    std::unique_ptr<PowerCommandParser> _powerCommandParser;
     std::unique_ptr<StatisticsParser> _statisticsParser;
     std::unique_ptr<SystemConfigParaParser> _systemConfigParaParser;
 };

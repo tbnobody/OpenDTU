@@ -14,6 +14,7 @@
 #define TOPIC_SUB_LIMIT_PERSISTENT_ABSOLUTE "limit_persistent_absolute"
 #define TOPIC_SUB_LIMIT_NONPERSISTENT_RELATIVE "limit_nonpersistent_relative"
 #define TOPIC_SUB_LIMIT_NONPERSISTENT_ABSOLUTE "limit_nonpersistent_absolute"
+#define TOPIC_SUB_POWER "power"
 
 MqttSettingsClass::MqttSettingsClass()
 {
@@ -30,6 +31,8 @@ void MqttSettingsClass::NetworkEvent(network_event event)
         Serial.println(F("Network lost connection"));
         mqttReconnectTimer.detach(); // ensure we don't reconnect to MQTT while reconnecting to Wi-Fi
         break;
+    default:
+        break;
     }
 }
 
@@ -44,6 +47,7 @@ void MqttSettingsClass::onMqttConnect(bool sessionPresent)
     mqttClient->subscribe(String(topic + "+/cmd/" + TOPIC_SUB_LIMIT_PERSISTENT_ABSOLUTE).c_str(), 0);
     mqttClient->subscribe(String(topic + "+/cmd/" + TOPIC_SUB_LIMIT_NONPERSISTENT_RELATIVE).c_str(), 0);
     mqttClient->subscribe(String(topic + "+/cmd/" + TOPIC_SUB_LIMIT_NONPERSISTENT_ABSOLUTE).c_str(), 0);
+    mqttClient->subscribe(String(topic + "+/cmd/" + TOPIC_SUB_POWER).c_str(), 0);
 }
 
 void MqttSettingsClass::onMqttDisconnect(espMqttClientTypes::DisconnectReason reason)
@@ -118,38 +122,43 @@ void MqttSettingsClass::onMqttMessage(const espMqttClientTypes::MessagePropertie
     char* strlimit = new char[len + 1];
     memcpy(strlimit, payload, len);
     strlimit[len] = '\0';
-    uint32_t limit = strtol(strlimit, NULL, 10);
+    uint32_t payload_val = strtol(strlimit, NULL, 10);
     delete[] strlimit;
 
     if (!strcmp(setting, TOPIC_SUB_LIMIT_PERSISTENT_RELATIVE)) {
         // Set inverter limit relative persistent
-        limit = min<uint32_t>(100, limit);
-        Serial.printf("Limit Persistent: %d %%\n", limit);
-        inv->sendActivePowerControlRequest(Hoymiles.getRadio(), limit, PowerLimitControlType::RelativPersistent);
+        payload_val = min<uint32_t>(100, payload_val);
+        Serial.printf("Limit Persistent: %d %%\n", payload_val);
+        inv->sendActivePowerControlRequest(Hoymiles.getRadio(), payload_val, PowerLimitControlType::RelativPersistent);
 
     } else if (!strcmp(setting, TOPIC_SUB_LIMIT_PERSISTENT_ABSOLUTE)) {
         // Set inverter limit absolute persistent
-        Serial.printf("Limit Persistent: %d W\n", limit);
-        inv->sendActivePowerControlRequest(Hoymiles.getRadio(), limit, PowerLimitControlType::AbsolutPersistent);
+        Serial.printf("Limit Persistent: %d W\n", payload_val);
+        inv->sendActivePowerControlRequest(Hoymiles.getRadio(), payload_val, PowerLimitControlType::AbsolutPersistent);
 
     } else if (!strcmp(setting, TOPIC_SUB_LIMIT_NONPERSISTENT_RELATIVE)) {
         // Set inverter limit relative non persistent
-        limit = min<uint32_t>(100, limit);
-        Serial.printf("Limit Non-Persistent: %d %%\n", limit);
+        payload_val = min<uint32_t>(100, payload_val);
+        Serial.printf("Limit Non-Persistent: %d %%\n", payload_val);
         if (!properties.retain) {
-            inv->sendActivePowerControlRequest(Hoymiles.getRadio(), limit, PowerLimitControlType::RelativNonPersistent);
+            inv->sendActivePowerControlRequest(Hoymiles.getRadio(), payload_val, PowerLimitControlType::RelativNonPersistent);
         } else {
             Serial.println("Ignored because retained");
         }
 
     } else if (!strcmp(setting, TOPIC_SUB_LIMIT_NONPERSISTENT_ABSOLUTE)) {
         // Set inverter limit absolute non persistent
-        Serial.printf("Limit Non-Persistent: %d W\n", limit);
+        Serial.printf("Limit Non-Persistent: %d W\n", payload_val);
         if (!properties.retain) {
-            inv->sendActivePowerControlRequest(Hoymiles.getRadio(), limit, PowerLimitControlType::AbsolutNonPersistent);
+            inv->sendActivePowerControlRequest(Hoymiles.getRadio(), payload_val, PowerLimitControlType::AbsolutNonPersistent);
         } else {
             Serial.println("Ignored because retained");
         }
+
+    } else if(!strcmp(setting, TOPIC_SUB_POWER)) {
+        // Turn inverter on or off
+        Serial.printf("Set inverter power to: %d\n", payload_val);
+        inv->sendPowerControlRequest(Hoymiles.getRadio(), payload_val > 0);
     }
 }
 

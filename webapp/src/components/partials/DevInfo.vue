@@ -1,5 +1,10 @@
 <template>
-    <table class="table table-hover">
+    <BootstrapAlert :show="!devInfoList.valid_data">
+        <h4 class="alert-heading">
+            <BIconInfoSquare class="fs-2" />&nbsp;No Information available
+        </h4>Did not receive any valid data from the inverter till now. Still trying...
+    </BootstrapAlert>
+    <table v-if="devInfoList.valid_data" class="table table-hover">
         <tbody>
             <tr>
                 <td>Bootloader Version</td>
@@ -27,8 +32,10 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue';
+import BootstrapAlert from '@/components/partials/BootstrapAlert.vue';
 
 declare interface DevInfoData {
+    valid_data: boolean,
     fw_bootloader_version: number,
     fw_build_version: number,
     fw_build_datetime: Date,
@@ -37,6 +44,9 @@ declare interface DevInfoData {
 }
 
 export default defineComponent({
+    components: {
+        BootstrapAlert,
+    },
     props: {
         devInfoList: { type: Object as () => DevInfoData, required: true },
     },

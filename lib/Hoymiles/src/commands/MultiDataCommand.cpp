@@ -61,7 +61,7 @@ CommandAbstract* MultiDataCommand::getRequestFrameCommand(uint8_t frame_no)
 bool MultiDataCommand::handleResponse(InverterAbstract* inverter, fragment_t fragment[], uint8_t max_fragment_id)
 {
     // All fragments are available --> Check CRC
-    uint16_t crc = 0xffff, crcRcv;
+    uint16_t crc = 0xffff, crcRcv = 0;
 
     for (uint8_t i = 0; i < max_fragment_id; i++) {
         if (i == max_fragment_id - 1) {
