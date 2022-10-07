@@ -70,31 +70,6 @@ typedef struct {
     uint16_t div; // divisor / calc command
 } byteAssign_t;
 
-// prototypes
-class StatisticsParser;
-static float calcYieldTotalCh0(StatisticsParser* iv, uint8_t arg0);
-static float calcYieldDayCh0(StatisticsParser* iv, uint8_t arg0);
-static float calcUdcCh(StatisticsParser* iv, uint8_t arg0);
-static float calcPowerDcCh0(StatisticsParser* iv, uint8_t arg0);
-static float calcEffiencyCh0(StatisticsParser* iv, uint8_t arg0);
-static float calcIrradiation(StatisticsParser* iv, uint8_t arg0);
-
-using func_t = float(StatisticsParser*, uint8_t);
-
-struct calcFunc_t {
-    uint8_t funcId; // unique id
-    func_t* func; // function pointer
-};
-
-const calcFunc_t calcFunctions[] = {
-    { CALC_YT_CH0, &calcYieldTotalCh0 },
-    { CALC_YD_CH0, &calcYieldDayCh0 },
-    { CALC_UDC_CH, &calcUdcCh },
-    { CALC_PDC_CH0, &calcPowerDcCh0 },
-    { CALC_EFF_CH0, &calcEffiencyCh0 },
-    { CALC_IRR_CH, &calcIrradiation }
-};
-
 class StatisticsParser : public Parser {
 public:
     void clearBuffer();
@@ -113,6 +88,10 @@ public:
     uint16_t getChannelMaxPower(uint8_t channel);
     void setChannelMaxPower(uint8_t channel, uint16_t power);
 
+    void resetRxFailureCount();
+    void incrementRxFailureCount();
+    uint32_t getRxFailureCount();
+
 private:
     uint8_t _payloadStatistic[STATISTIC_PACKET_SIZE] = {};
     uint8_t _statisticLength = 0;
@@ -120,4 +99,6 @@ private:
 
     const byteAssign_t* _byteAssignment;
     uint8_t _byteAssignmentCount;
+
+    uint32_t _rxFailureCount = 0;
 };

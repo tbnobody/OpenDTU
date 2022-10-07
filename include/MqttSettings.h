@@ -23,6 +23,7 @@ private:
 
     void onMqttDisconnect(espMqttClientTypes::DisconnectReason reason);
     void onMqttConnect(bool sessionPresent);
+    void onMqttMessage(const espMqttClientTypes::MessageProperties& properties, const char* topic, const uint8_t* payload, size_t len, size_t index, size_t total);
 
     void performConnect();
     void performDisconnect();

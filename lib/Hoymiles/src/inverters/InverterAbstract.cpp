@@ -7,6 +7,7 @@ InverterAbstract::InverterAbstract(uint64_t serial)
     _serial.u64 = serial;
     _alarmLogParser.reset(new AlarmLogParser());
     _devInfoParser.reset(new DevInfoParser());
+    _powerCommandParser.reset(new PowerCommandParser());
     _statisticsParser.reset(new StatisticsParser());
     _systemConfigParaParser.reset(new SystemConfigParaParser());
 }
@@ -40,6 +41,20 @@ const char* InverterAbstract::name()
     return _name;
 }
 
+bool InverterAbstract::isProducing()
+{
+    if (!Statistics()->hasChannelFieldValue(CH0, FLD_PAC)) {
+        return false;
+    }
+
+    return Statistics()->getChannelFieldValue(CH0, FLD_PAC) > 0;
+}
+
+bool InverterAbstract::isReachable()
+{
+    return Statistics()->getRxFailureCount() <= MAX_ONLINE_FAILURE_COUNT;
+}
+
 AlarmLogParser* InverterAbstract::EventLog()
 {
     return _alarmLogParser.get();
@@ -48,6 +63,11 @@ AlarmLogParser* InverterAbstract::EventLog()
 DevInfoParser* InverterAbstract::DevInfo()
 {
     return _devInfoParser.get();
+}
+
+PowerCommandParser* InverterAbstract::PowerCommand()
+{
+    return _powerCommandParser.get();
 }
 
 StatisticsParser* InverterAbstract::Statistics()
@@ -90,6 +110,7 @@ void InverterAbstract::addRxFragment(uint8_t fragment[], uint8_t len)
         // Packets with 0x81 will be seen as 1
         memcpy(_rxFragmentBuffer[(fragmentCount & 0b01111111) - 1].fragment, &fragment[10], len - 11);
         _rxFragmentBuffer[(fragmentCount & 0b01111111) - 1].len = len - 11;
+        _rxFragmentBuffer[(fragmentCount & 0b01111111) - 1].mainCmd = fragment[0];
         _rxFragmentBuffer[(fragmentCount & 0b01111111) - 1].wasReceived = true;
 
         if ((fragmentCount & 0b01111111) > _rxFragmentLastPacketId) {
@@ -109,7 +130,12 @@ uint8_t InverterAbstract::verifyAllFragments(CommandAbstract* cmd)
     // All missing
     if (_rxFragmentLastPacketId == 0) {
         Serial.println(F("All missing"));
-        return FRAGMENT_ALL_MISSING;
+        if (cmd->getSendCount() <= MAX_RESEND_COUNT) {
+            return FRAGMENT_ALL_MISSING_RESEND;
+        } else {
+            cmd->gotTimeout(this);
+            return FRAGMENT_ALL_MISSING_TIMEOUT;
+        }
     }
 
     // Last fragment is missing (thte one with 0x80)
@@ -118,6 +144,7 @@ uint8_t InverterAbstract::verifyAllFragments(CommandAbstract* cmd)
         if (_rxFragmentRetransmitCnt++ < MAX_RETRANSMIT_COUNT) {
             return _rxFragmentLastPacketId + 1;
         } else {
+            cmd->gotTimeout(this);
             return FRAGMENT_RETRANSMIT_TIMEOUT;
         }
     }
@@ -129,12 +156,14 @@ uint8_t InverterAbstract::verifyAllFragments(CommandAbstract* cmd)
             if (_rxFragmentRetransmitCnt++ < MAX_RETRANSMIT_COUNT) {
                 return i + 1;
             } else {
+                cmd->gotTimeout(this);
                 return FRAGMENT_RETRANSMIT_TIMEOUT;
             }
         }
     }
 
     if (!cmd->handleResponse(this, _rxFragmentBuffer, _rxFragmentMaxPacketId)) {
+        cmd->gotTimeout(this);
         return FRAGMENT_HANDLE_ERROR;
     }
 

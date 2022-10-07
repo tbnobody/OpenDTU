@@ -2,10 +2,11 @@
 
 * CommandAbstract
     * DevControlCommand
+        * ActivePowerControlCommand
     * MultiDataCommand
         * AlarmDataCommand
         * DevInfoAllCommand
-        * DevInfoSampleCommand
+        * DevInfoSimpleCommand
         * RealTimeRunDataCommand
         * SystemConfigParaCommand
     * ParaSetCommand

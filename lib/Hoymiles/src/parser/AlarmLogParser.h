@@ -22,9 +22,14 @@ public:
     uint8_t getEntryCount();
     void getLogEntry(uint8_t entryId, AlarmLogEntry_t* entry);
 
+    void setLastAlarmRequestSuccess(LastCommandSuccess status);
+    LastCommandSuccess getLastAlarmRequestSuccess();
+
 private:
     static int getTimezoneOffset();
 
     uint8_t _payloadAlarmLog[ALARM_LOG_PAYLOAD_SIZE];
     uint8_t _alarmLogLength;
+
+    LastCommandSuccess _lastAlarmRequestSuccess = CMD_NOK; // Set to NOK to fetch at startup
 };

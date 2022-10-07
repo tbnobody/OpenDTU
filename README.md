@@ -7,6 +7,9 @@
 This project was started from [this](https://www.mikrocontroller.net/topic/525778) discussion (Mikrocontroller.net).
 It was the goal to replace the original Hoymiles DTU (Telemetry Gateway) with their cloud access. With a lot of reverse engineering the Hoymiles protocol was decrypted and analyzed.
 
+## Screenshots
+Several screenshots of the frontend can be found here: [Screenshots](docs/screenshots)
+
 ## Currently supported Inverters
 * Hoymiles HM-300
 * Hoymiles HM-350
@@ -17,13 +20,16 @@ It was the goal to replace the original Hoymiles DTU (Telemetry Gateway) with th
 * Hoymiles HM-1000
 * Hoymiles HM-1200
 * Hoymiles HM-1500
+* TSUN TSOL-M350 (Maybe depending on firmware on the inverter)
 * TSUN TSOL-M800 (Maybe depending on firmware on the inverter)
+* TSUN TSOL-M1600 (Maybe depending on firmware on the inverter)
 
 ## Features for end users
 * Read live data from inverter
 * Show inverters internal event log
 * Show inverter information like firmware version, firmware build date, hardware revision and hardware version
-* Show current inverter limit (setting the limit is not yet implemented)
+* Show and set the current inverter limit
+* Function to turn the inverter off and on
 * Uses ESP32 microcontroller and NRF24L01+
 * Multi-Inverter support
 * MQTT support (with TLS)
@@ -54,7 +60,7 @@ Sample Picture:
 
 Also supported: Board with Ethernet-Connector and Power-over-Ethernet [Olimex ESP32-POE](https://www.olimex.com/Products/IoT/ESP32/ESP32-POE/open-source-hardware)
 
-#### NRF24L01+ radio board
+### NRF24L01+ radio board
 The PLUS sign is IMPORTANT! There are different variants available, with antenna on the printed circuit board or external antenna.
 
 Sample picture:
@@ -72,7 +78,7 @@ A heavily incomplete list of trusted hardware shops in germany is:
 
 This list is for your convenience only, the project is not related to any of these shops.
 
-#### Power supply
+### Power supply
 Use a power suppy with 5V and 1A. The USB cable connected to your PC/Notebook may be powerful enough or may be not.
 
 
@@ -147,6 +153,8 @@ You'll find the firmware file (after a successfull build process) under `.pio/bu
 
 After the successful upload, the OpenDTU immediately restarts into the new firmware.
 
+## MQTT Topic Documentation
+A documentation of all available MQTT Topics can be found here: [MQTT Documentation](docs/MQTT_Topics.md)
 
 ## Available cases
 * [https://www.thingiverse.com/thing:5435911](https://www.thingiverse.com/thing:5435911)

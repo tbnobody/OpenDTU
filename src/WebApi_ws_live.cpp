@@ -78,14 +78,15 @@ void WebApiWsLiveClass::generateJsonResponse(JsonVariant& root)
         auto inv = Hoymiles.getInverterByPos(i);
 
         char buffer[sizeof(uint64_t) * 8 + 1];
-        snprintf(buffer, sizeof(buffer), "%0lx%08lx",
+        snprintf(buffer, sizeof(buffer), "%0x%08x",
             ((uint32_t)((inv->serial() >> 32) & 0xFFFFFFFF)),
             ((uint32_t)(inv->serial() & 0xFFFFFFFF)));
 
         root[i][F("serial")] = String(buffer);
         root[i][F("name")] = inv->name();
         root[i][F("data_age")] = (millis() - inv->Statistics()->getLastUpdate()) / 1000;
-        root[i][F("age_critical")] = ((millis() - inv->Statistics()->getLastUpdate()) / 1000) > Configuration.get().Dtu_PollInterval * 5;
+        root[i][F("reachable")] = inv->isReachable();
+        root[i][F("producing")] = inv->isProducing();
 
         // Loop all channels
         for (uint8_t c = 0; c <= inv->Statistics()->getChannelCount(); c++) {

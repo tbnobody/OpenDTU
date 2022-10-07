@@ -1,6 +1,12 @@
 #pragma once
 #include <cstdint>
 
+typedef enum {
+    CMD_OK,
+    CMD_NOK,
+    CMD_PENDING
+} LastCommandSuccess;
+
 class Parser {
 public:
     uint32_t getLastUpdate();

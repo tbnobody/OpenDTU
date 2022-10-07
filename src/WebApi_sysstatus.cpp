@@ -7,6 +7,7 @@
 #include "AsyncJson.h"
 #include "Configuration.h"
 #include "NetworkSettings.h"
+#include <Hoymiles.h>
 #include <LittleFS.h>
 #include <ResetReason.h>
 
@@ -59,10 +60,12 @@ void WebApiSysstatusClass::onSystemStatus(AsyncWebServerRequest* request)
 
     char version[16];
     snprintf(version, sizeof(version), "%d.%d.%d", CONFIG_VERSION >> 24 & 0xff, CONFIG_VERSION >> 16 & 0xff, CONFIG_VERSION >> 8 & 0xff);
-    root[F("firmware_version")] = version;
+    root[F("config_version")] = version;
     root[F("git_hash")] = AUTO_GIT_HASH;
 
     root[F("uptime")] = esp_timer_get_time() / 1000000;
+
+    root[F("radio_connected")] = Hoymiles.getRadio()->isConnected();
 
     response->setLength();
     request->send(response);

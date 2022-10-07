@@ -10,6 +10,11 @@ RequestFrameCommand::RequestFrameCommand(uint64_t target_address, uint64_t route
     _payload_size = 10;
 }
 
+String RequestFrameCommand::getCommandName()
+{
+    return "RequestFrame";
+}
+
 void RequestFrameCommand::setFrameNo(uint8_t frame_no)
 {
     _payload[9] = frame_no | 0x80;

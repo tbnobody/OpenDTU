@@ -11,7 +11,7 @@ public:
     const uint8_t getAssignmentCount();
 
 private:
-    const byteAssign_t byteAssignment[19] = {
+    const byteAssign_t byteAssignment[18] = {
         { FLD_UDC, UNIT_V, CH1, 2, 2, 10 },
         { FLD_IDC, UNIT_A, CH1, 4, 2, 100 },
         { FLD_PDC, UNIT_W, CH1, 6, 2, 10 },

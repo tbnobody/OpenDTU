@@ -21,3 +21,51 @@ float SystemConfigParaParser::getLimitPercent()
 {
     return ((((uint16_t)_payload[2]) << 8) | _payload[3]) / 10;
 }
+
+void SystemConfigParaParser::setLimitPercent(float value)
+{
+    _payload[2] = ((uint16_t)(value * 10)) >> 8;
+    _payload[3] = ((uint16_t)(value * 10));
+}
+
+void SystemConfigParaParser::setLastLimitCommandSuccess(LastCommandSuccess status)
+{
+    _lastLimitCommandSuccess = status;
+}
+
+LastCommandSuccess SystemConfigParaParser::getLastLimitCommandSuccess()
+{
+    return _lastLimitCommandSuccess;
+}
+
+uint32_t SystemConfigParaParser::getLastUpdateCommand()
+{
+    return _lastUpdateCommand;
+}
+
+void SystemConfigParaParser::setLastUpdateCommand(uint32_t lastUpdate)
+{
+    _lastUpdateCommand = lastUpdate;
+    setLastUpdate(lastUpdate);
+}
+
+void SystemConfigParaParser::setLastLimitRequestSuccess(LastCommandSuccess status)
+{
+    _lastLimitRequestSuccess = status;
+}
+
+LastCommandSuccess SystemConfigParaParser::getLastLimitRequestSuccess()
+{
+    return _lastLimitRequestSuccess;
+}
+
+uint32_t SystemConfigParaParser::getLastUpdateRequest()
+{
+    return _lastUpdateRequest;
+}
+
+void SystemConfigParaParser::setLastUpdateRequest(uint32_t lastUpdate)
+{
+    _lastUpdateRequest = lastUpdate;
+    setLastUpdate(lastUpdate);
+}

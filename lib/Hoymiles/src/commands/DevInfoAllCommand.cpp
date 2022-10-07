@@ -9,6 +9,11 @@ DevInfoAllCommand::DevInfoAllCommand(uint64_t target_address, uint64_t router_ad
     setTimeout(200);
 }
 
+String DevInfoAllCommand::getCommandName()
+{
+    return "DevInfoAll";
+}
+
 bool DevInfoAllCommand::handleResponse(InverterAbstract* inverter, fragment_t fragment[], uint8_t max_fragment_id)
 {
     // Check CRC of whole payload

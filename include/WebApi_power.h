@@ -3,14 +3,14 @@
 
 #include <ESPAsyncWebServer.h>
 
-class WebApiLimitClass {
+class WebApiPowerClass {
 public:
     void init(AsyncWebServer* server);
     void loop();
 
 private:
-    void onLimitStatus(AsyncWebServerRequest* request);
-    void onLimitPost(AsyncWebServerRequest* request);
+    void onPowerStatus(AsyncWebServerRequest* request);
+    void onPowerPost(AsyncWebServerRequest* request);
 
     AsyncWebServer* _server;
 };

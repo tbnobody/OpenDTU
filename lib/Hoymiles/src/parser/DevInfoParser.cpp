@@ -1,6 +1,22 @@
 #include "DevInfoParser.h"
 #include <cstring>
 
+typedef struct {
+    uint8_t hwPart[3];
+    uint16_t maxPower;
+    const char* modelName;
+} devInfo_t;
+
+const devInfo_t devInfo[] = {
+    { { 0x10, 0x10, 0x10 }, 300, "HM-300" },
+    { { 0x10, 0x10, 0x40 }, 400, "HM-400" },
+    { { 0x10, 0x11, 0x10 }, 600, "HM-600" },
+    { { 0x10, 0x11, 0x20 }, 700, "HM-700" },
+    { { 0x10, 0x11, 0x40 }, 800, "HM-800" },
+    { { 0x10, 0x12, 0x10 }, 1200, "HM-1200" },
+    { { 0x10, 0x12, 0x30 }, 1500, "HM-1500" }
+};
+
 void DevInfoParser::clearBufferAll()
 {
     memset(_payloadDevInfoAll, 0, DEV_INFO_SIZE);
@@ -17,20 +33,20 @@ void DevInfoParser::appendFragmentAll(uint8_t offset, uint8_t* payload, uint8_t 
     _devInfoAllLength += len;
 }
 
-void DevInfoParser::clearBufferSample()
+void DevInfoParser::clearBufferSimple()
 {
-    memset(_payloadDevInfoSample, 0, DEV_INFO_SIZE);
-    _devInfoSampleLength = 0;
+    memset(_payloadDevInfoSimple, 0, DEV_INFO_SIZE);
+    _devInfoSimpleLength = 0;
 }
 
-void DevInfoParser::appendFragmentSample(uint8_t offset, uint8_t* payload, uint8_t len)
+void DevInfoParser::appendFragmentSimple(uint8_t offset, uint8_t* payload, uint8_t len)
 {
     if (offset + len > DEV_INFO_SIZE) {
-        Serial.printf("FATAL: (%s, %d) dev info Sample packet too large for buffer\n", __FILE__, __LINE__);
+        Serial.printf("FATAL: (%s, %d) dev info Simple packet too large for buffer\n", __FILE__, __LINE__);
         return;
     }
-    memcpy(&_payloadDevInfoSample[offset], payload, len);
-    _devInfoSampleLength += len;
+    memcpy(&_payloadDevInfoSimple[offset], payload, len);
+    _devInfoSimpleLength += len;
 }
 
 uint32_t DevInfoParser::getLastUpdateAll()
@@ -44,14 +60,14 @@ void DevInfoParser::setLastUpdateAll(uint32_t lastUpdate)
     setLastUpdate(lastUpdate);
 }
 
-uint32_t DevInfoParser::getLastUpdateSample()
+uint32_t DevInfoParser::getLastUpdateSimple()
 {
-    return _lastUpdateSample;
+    return _lastUpdateSimple;
 }
 
-void DevInfoParser::setLastUpdateSample(uint32_t lastUpdate)
+void DevInfoParser::setLastUpdateSimple(uint32_t lastUpdate)
 {
-    _lastUpdateSample = lastUpdate;
+    _lastUpdateSimple = lastUpdate;
     setLastUpdate(lastUpdate);
 }
 
@@ -84,15 +100,48 @@ uint32_t DevInfoParser::getHwPartNumber()
     uint16_t hwpn_h;
     uint16_t hwpn_l;
 
-    hwpn_h = (((uint16_t)_payloadDevInfoSample[2]) << 8) | _payloadDevInfoSample[3];
-    hwpn_l = (((uint16_t)_payloadDevInfoSample[4]) << 8) | _payloadDevInfoSample[5];
+    hwpn_h = (((uint16_t)_payloadDevInfoSimple[2]) << 8) | _payloadDevInfoSimple[3];
+    hwpn_l = (((uint16_t)_payloadDevInfoSimple[4]) << 8) | _payloadDevInfoSimple[5];
 
     return ((uint32_t)hwpn_h << 16) | ((uint32_t)hwpn_l);
 }
 
-uint16_t DevInfoParser::getHwVersion()
+String DevInfoParser::getHwVersion()
 {
-    return (((uint16_t)_payloadDevInfoSample[6]) << 8) | _payloadDevInfoSample[7];
+    char buf[8];
+    snprintf(buf, sizeof(buf), "%02d.%02d", _payloadDevInfoSimple[6], _payloadDevInfoSimple[7]);
+    return String(buf);
+}
+
+uint16_t DevInfoParser::getMaxPower()
+{
+    uint8_t idx = getDevIdx();
+    if (idx == 0xff) {
+        return 0;
+    }
+    return devInfo[idx].maxPower;
+}
+
+String DevInfoParser::getHwModelName()
+{
+    uint8_t idx = getDevIdx();
+    if (idx == 0xff) {
+        return "";
+    }
+    return devInfo[idx].modelName;
+}
+
+uint8_t DevInfoParser::getDevIdx()
+{
+     uint8_t pos;
+    for (pos = 0; pos < sizeof(devInfo) / sizeof(devInfo_t); pos++) {
+         if (devInfo[pos].hwPart[0] == _payloadDevInfoSimple[2]
+            && devInfo[pos].hwPart[1] == _payloadDevInfoSimple[3]
+            && devInfo[pos].hwPart[2] == _payloadDevInfoSimple[4]) {
+            return pos;
+        }
+    }
+    return 0xff;
 }
 
 /* struct tm to seconds since Unix epoch */
