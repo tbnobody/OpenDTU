@@ -111,7 +111,7 @@ String DevInfoParser::getHwVersion()
 {
     char buf[8];
     snprintf(buf, sizeof(buf), "%02d.%02d", _payloadDevInfoSimple[6], _payloadDevInfoSimple[7]);
-    return String(buf);
+    return buf;
 }
 
 uint16_t DevInfoParser::getMaxPower()
