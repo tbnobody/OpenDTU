@@ -48,6 +48,7 @@ void HoymilesRadio::loop()
                 f = _rxBuffer.getFront();
                 memset(f->fragment, 0xcc, MAX_RF_PAYLOAD_SIZE);
                 f->len = _radio->getDynamicPayloadSize();
+                f->channel = _radio->getChannel();
                 if (f->len > MAX_RF_PAYLOAD_SIZE)
                     f->len = MAX_RF_PAYLOAD_SIZE;
 
@@ -69,7 +70,9 @@ void HoymilesRadio::loop()
 
                 if (nullptr != inv) {
                     // Save packet in inverter rx buffer
-                    dumpBuf("RX ", f->fragment, f->len);
+                    char buf[30];
+                    snprintf(buf, sizeof(buf), "RX Channel: %d --> ", f->channel);
+                    dumpBuf(buf, f->fragment, f->len);
                     inv->addRxFragment(f->fragment, f->len);
                 } else {
                     Serial.println(F("Inverter Not found!"));
