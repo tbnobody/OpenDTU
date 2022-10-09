@@ -115,7 +115,11 @@ bool HM_Abstract::resendActivePowerControlRequest(HoymilesRadio* radio)
 
 bool HM_Abstract::sendPowerControlRequest(HoymilesRadio* radio, bool turnOn)
 {
-    _powerState = turnOn;
+    if (turnOn) {
+        _powerState = 1;
+    } else {
+        _powerState = 0;
+    }
 
     PowerControlCommand* cmd = radio->enqueCommand<PowerControlCommand>();
     cmd->setPowerOn(turnOn);
@@ -125,7 +129,33 @@ bool HM_Abstract::sendPowerControlRequest(HoymilesRadio* radio, bool turnOn)
     return true;
 }
 
+bool HM_Abstract::sendRestartControlRequest(HoymilesRadio* radio)
+{
+    _powerState = 2;
+
+    PowerControlCommand* cmd = radio->enqueCommand<PowerControlCommand>();
+    cmd->setRestart();
+    cmd->setTargetAddress(serial());
+    PowerCommand()->setLastPowerCommandSuccess(CMD_PENDING);
+
+    return true;
+}
+
 bool HM_Abstract::resendPowerControlRequest(HoymilesRadio* radio)
 {
-    return sendPowerControlRequest(radio, _powerState);
+    switch (_powerState) {
+    case 0:
+        return sendPowerControlRequest(radio, false);
+        break;
+    case 1:
+        return sendPowerControlRequest(radio, true);
+        break;
+    case 2:
+        return sendRestartControlRequest(radio);
+        break;
+
+    default:
+        return false;
+        break;
+    }
 }

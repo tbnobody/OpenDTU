@@ -15,6 +15,7 @@
 #define TOPIC_SUB_LIMIT_NONPERSISTENT_RELATIVE "limit_nonpersistent_relative"
 #define TOPIC_SUB_LIMIT_NONPERSISTENT_ABSOLUTE "limit_nonpersistent_absolute"
 #define TOPIC_SUB_POWER "power"
+#define TOPIC_SUB_RESTART "restart"
 
 MqttSettingsClass::MqttSettingsClass()
 {
@@ -48,6 +49,7 @@ void MqttSettingsClass::onMqttConnect(bool sessionPresent)
     mqttClient->subscribe(String(topic + "+/cmd/" + TOPIC_SUB_LIMIT_NONPERSISTENT_RELATIVE).c_str(), 0);
     mqttClient->subscribe(String(topic + "+/cmd/" + TOPIC_SUB_LIMIT_NONPERSISTENT_ABSOLUTE).c_str(), 0);
     mqttClient->subscribe(String(topic + "+/cmd/" + TOPIC_SUB_POWER).c_str(), 0);
+    mqttClient->subscribe(String(topic + "+/cmd/" + TOPIC_SUB_RESTART).c_str(), 0);
 }
 
 void MqttSettingsClass::onMqttDisconnect(espMqttClientTypes::DisconnectReason reason)
@@ -155,10 +157,19 @@ void MqttSettingsClass::onMqttMessage(const espMqttClientTypes::MessagePropertie
             Serial.println("Ignored because retained");
         }
 
-    } else if(!strcmp(setting, TOPIC_SUB_POWER)) {
+    } else if (!strcmp(setting, TOPIC_SUB_POWER)) {
         // Turn inverter on or off
         Serial.printf("Set inverter power to: %d\n", payload_val);
         inv->sendPowerControlRequest(Hoymiles.getRadio(), payload_val > 0);
+
+    } else if (!strcmp(setting, TOPIC_SUB_RESTART)) {
+        // Restart inverter
+        Serial.printf("Restart inverter\n");
+        if (!properties.retain && payload_val == 1) {
+            inv->sendRestartControlRequest(Hoymiles.getRadio());
+        } else {
+            Serial.println("Ignored because retained");
+        }
     }
 }
 
