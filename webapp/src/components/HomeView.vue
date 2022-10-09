@@ -280,6 +280,9 @@
                                 <button type="button" class="btn btn-danger" @click="onSetPowerSettings(false)">
                                     <BIconToggleOff class="fs-4" />&nbsp;Turn Off
                                 </button>
+                                <button type="button" class="btn btn-warning" @click="onSetPowerSettings(true, true)">
+                                    <BIconArrowCounterclockwise class="fs-4" />&nbsp;Restart
+                                </button>
                             </div>
                         </template>
 
@@ -568,11 +571,20 @@ export default defineComponent({
             this.showAlertPower = false;
         },
 
-        onSetPowerSettings(turnOn: boolean) {
-            const data = {
-                serial: this.powerSettingSerial,
-                power: turnOn,
-            };
+        onSetPowerSettings(turnOn: boolean, restart = false) {
+            let data = {};
+            if (restart) {
+                data = {
+                    serial: this.powerSettingSerial,
+                    restart: true,
+                };
+            } else {
+                data = {
+                    serial: this.powerSettingSerial,
+                    power: turnOn,
+                };
+            }
+
             const formData = new FormData();
             formData.append("data", JSON.stringify(data));
 
