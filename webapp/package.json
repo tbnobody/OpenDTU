@@ -21,7 +21,7 @@
     "@babel/core": "^7.19.3",
     "@babel/eslint-parser": "^7.19.1",
     "@types/bootstrap": "^5.2.5",
-    "@types/node": "^18.8.2",
+    "@types/node": "^18.8.3",
     "@types/spark-md5": "^3.0.2",
     "@typescript-eslint/parser": "^5.38.1",
     "@vue/cli-plugin-babel": "~5.0.8",
