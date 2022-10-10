@@ -46,9 +46,7 @@ public:
     void setDtuSerial(uint64_t serial);
 
     bool isIdle();
-    void sendEsbPacket(CommandAbstract* cmd);
-    void sendRetransmitPacket(uint8_t fragment_id);
-    void sendLastPacketAgain();
+    bool isConnected();
 
     template <typename T>
     T* enqueCommand()
@@ -67,6 +65,10 @@ private:
     void openWritingPipe(serial_u serial);
     bool checkFragmentCrc(fragment_t* fragment);
     void dumpBuf(const char* info, uint8_t buf[], uint8_t len);
+
+    void sendEsbPacket(CommandAbstract* cmd);
+    void sendRetransmitPacket(uint8_t fragment_id);
+    void sendLastPacketAgain();
 
     std::unique_ptr<SPIClass> _hspi;
     std::unique_ptr<RF24> _radio;

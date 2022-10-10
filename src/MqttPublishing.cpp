@@ -65,6 +65,11 @@ void MqttPublishingClass::loop()
             if (inv->SystemConfigPara()->getLastUpdate() > 0) {
                 // Limit
                 MqttSettings.publish(subtopic + "/status/limit_relative", String(inv->SystemConfigPara()->getLimitPercent()));
+
+                uint16_t maxpower = inv->DevInfo()->getMaxPower();
+                if (maxpower > 0) {
+                    MqttSettings.publish(subtopic + "/status/limit_absolute", String(inv->SystemConfigPara()->getLimitPercent() * maxpower / 100));
+                }
             }
 
             MqttSettings.publish(subtopic + "/status/reachable", String(inv->isReachable()));
