@@ -173,11 +173,20 @@
                                 <div class="row mb-3">
                                     <label for="inputCurrentLimit" class="col-sm-3 col-form-label">Current
                                         Limit:</label>
-                                    <div class="col-sm-9">
+                                    <div class="col-sm-4">
                                         <div class="input-group">
                                             <input type="number" class="form-control" id="inputCurrentLimit"
                                                 aria-describedby="currentLimitType" v-model="currentLimit" disabled />
                                             <span class="input-group-text" id="currentLimitType">%</span>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-sm-4" v-if="maxPower > 0">
+                                        <div class="input-group">
+                                            <input type="number" class="form-control" id="inputCurrentLimitAbsolute"
+                                                aria-describedby="currentLimitTypeAbsolute"
+                                                v-model="currentLimitAbsolute" disabled />
+                                            <span class="input-group-text" id="currentLimitTypeAbsolute">W</span>
                                         </div>
                                     </div>
                                 </div>
@@ -341,7 +350,9 @@ export default defineComponent({
             limitSettingLoading: true,
 
             currentLimit: 0,
+            currentLimitAbsolute: 0,
             successCommandLimit: "",
+            maxPower: 0,
             targetLimit: 0,
             targetLimitMin: 10,
             targetLimitMax: 100,
@@ -494,7 +505,11 @@ export default defineComponent({
             fetch("/api/limit/status")
                 .then((response) => response.json())
                 .then((data) => {
+                    this.maxPower = data[serial].max_power;
                     this.currentLimit = data[serial].limit_relative;
+                    if (this.maxPower > 0) {
+                        this.currentLimitAbsolute = this.currentLimit * this.maxPower / 100;
+                    }
                     this.successCommandLimit = data[serial].limit_set_status;
                     this.limitSettingSerial = serial;
                     this.limitSettingLoading = false;
