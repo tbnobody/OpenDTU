@@ -30,7 +30,7 @@
     "@vue/cli-plugin-typescript": "^5.0.8",
     "@vue/cli-service": "~5.0.8",
     "@vue/eslint-config-typescript": "^11.0.2",
-    "eslint": "^8.24.0",
+    "eslint": "^8.25.0",
     "eslint-plugin-vue": "^9.6.0",
     "typescript": "^4.8.4",
     "vue-cli-plugin-compression": "~2.0.0"
