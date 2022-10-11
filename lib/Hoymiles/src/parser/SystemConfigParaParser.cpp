@@ -19,7 +19,7 @@ void SystemConfigParaParser::appendFragment(uint8_t offset, uint8_t* payload, ui
 
 float SystemConfigParaParser::getLimitPercent()
 {
-    return ((((uint16_t)_payload[2]) << 8) | _payload[3]) / 10;
+    return ((((uint16_t)_payload[2]) << 8) | _payload[3]) / 10.0;
 }
 
 void SystemConfigParaParser::setLimitPercent(float value)
