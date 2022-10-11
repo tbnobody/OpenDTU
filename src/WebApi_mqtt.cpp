@@ -170,6 +170,13 @@ void WebApiMqttClass::onMqttAdminPost(AsyncWebServerRequest* request)
             return;
         }
 
+        if (!root[F("mqtt_topic")].as<String>().endsWith("/")) {
+            retMsg[F("message")] = F("Topic must end with slash (/)!");
+            response->setLength();
+            request->send(response);
+            return;
+        }
+
         if (root[F("mqtt_port")].as<uint>() == 0 || root[F("mqtt_port")].as<uint>() > 65535) {
             retMsg[F("message")] = F("Port must be a number between 1 and 65535!");
             response->setLength();
