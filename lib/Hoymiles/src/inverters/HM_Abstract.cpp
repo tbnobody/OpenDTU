@@ -97,6 +97,10 @@ bool HM_Abstract::sendSystemConfigParaRequest(HoymilesRadio* radio)
 
 bool HM_Abstract::sendActivePowerControlRequest(HoymilesRadio* radio, float limit, PowerLimitControlType type)
 {
+    if (type == PowerLimitControlType::RelativNonPersistent || type == PowerLimitControlType::RelativPersistent) {
+        limit = min<float>(100, limit);
+    }
+
     _activePowerControlLimit = limit;
     _activePowerControlType = type;
 

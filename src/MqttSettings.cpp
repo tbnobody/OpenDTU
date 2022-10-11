@@ -129,7 +129,6 @@ void MqttSettingsClass::onMqttMessage(const espMqttClientTypes::MessagePropertie
 
     if (!strcmp(setting, TOPIC_SUB_LIMIT_PERSISTENT_RELATIVE)) {
         // Set inverter limit relative persistent
-        payload_val = min<uint32_t>(100, payload_val);
         Serial.printf("Limit Persistent: %d %%\n", payload_val);
         inv->sendActivePowerControlRequest(Hoymiles.getRadio(), payload_val, PowerLimitControlType::RelativPersistent);
 
@@ -140,7 +139,6 @@ void MqttSettingsClass::onMqttMessage(const espMqttClientTypes::MessagePropertie
 
     } else if (!strcmp(setting, TOPIC_SUB_LIMIT_NONPERSISTENT_RELATIVE)) {
         // Set inverter limit relative non persistent
-        payload_val = min<uint32_t>(100, payload_val);
         Serial.printf("Limit Non-Persistent: %d %%\n", payload_val);
         if (!properties.retain) {
             inv->sendActivePowerControlRequest(Hoymiles.getRadio(), payload_val, PowerLimitControlType::RelativNonPersistent);
