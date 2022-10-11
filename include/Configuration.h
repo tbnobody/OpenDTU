@@ -4,6 +4,7 @@
 #include <Arduino.h>
 
 #define CONFIG_FILENAME "/config.bin"
+#define CONFIG_FILENAME_JSON "/config.json"
 #define CONFIG_VERSION 0x00011500 // 0.1.21 // make sure to clean all after change
 
 #define WIFI_MAX_SSID_STRLEN 31
@@ -25,6 +26,8 @@
 #define INV_MAX_NAME_STRLEN 31
 #define INV_MAX_COUNT 10
 #define INV_MAX_CHAN_COUNT 4
+
+#define JSON_BUFFER_SIZE 6144
 
 struct INVERTER_CONFIG_T {
     uint64_t Serial;
@@ -89,6 +92,9 @@ public:
     CONFIG_T& get();
 
     INVERTER_CONFIG_T* getFreeInverterSlot();
+
+private:
+    bool readJson();
 };
 
 extern ConfigurationClass Configuration;

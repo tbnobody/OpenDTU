@@ -55,7 +55,7 @@
 
                     <div v-else-if="!uploading">
                         <div class="form-group pt-2 mt-3">
-                            <input class="form-control" type="file" ref="file" accept=".bin" @change="uploadConfig" />
+                            <input class="form-control" type="file" ref="file" accept=".json" @change="uploadConfig" />
                         </div>
                     </div>
 
@@ -175,7 +175,7 @@ export default defineComponent({
         downloadConfig() {
             const link = document.createElement('a')
             link.href = "/api/config/get"
-            link.download = 'config.bin'
+            link.download = 'config.json'
             link.click()
         },
         uploadConfig(event: Event | null) {
