@@ -47,6 +47,7 @@ public:
 
     bool isIdle();
     bool isConnected();
+    bool isPVariant();
 
     template <typename T>
     T* enqueCommand()
