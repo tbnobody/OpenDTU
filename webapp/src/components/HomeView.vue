@@ -506,9 +506,9 @@ export default defineComponent({
                 .then((response) => response.json())
                 .then((data) => {
                     this.maxPower = data[serial].max_power;
-                    this.currentLimit = data[serial].limit_relative;
+                    this.currentLimit = Number((data[serial].limit_relative).toFixed(1));
                     if (this.maxPower > 0) {
-                        this.currentLimitAbsolute = this.currentLimit * this.maxPower / 100;
+                        this.currentLimitAbsolute = Number((this.currentLimit * this.maxPower / 100).toFixed(1));
                     }
                     this.successCommandLimit = data[serial].limit_set_status;
                     this.limitSettingSerial = serial;
