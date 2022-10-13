@@ -58,6 +58,8 @@ void ConfigurationClass::init()
     config.Mqtt_Hass_Retain = MQTT_HASS_RETAIN;
     strlcpy(config.Mqtt_Hass_Topic, MQTT_HASS_TOPIC, sizeof(config.Mqtt_Hass_Topic));
     config.Mqtt_Hass_IndividualPanels = MQTT_HASS_INDIVIDUALPANELS;
+
+    strlcpy(config.Security_Password, ACCESS_POINT_PASSWORD, sizeof(config.Security_Password));
 }
 
 bool ConfigurationClass::write()
@@ -120,6 +122,9 @@ bool ConfigurationClass::write()
     dtu["serial"] = config.Dtu_Serial;
     dtu["poll_interval"] = config.Dtu_PollInterval;
     dtu["pa_level"] = config.Dtu_PaLevel;
+
+    JsonObject security = doc.createNestedObject("security");
+    security["password"] = config.Security_Password;
 
     JsonArray inverters = doc.createNestedArray("inverters");
     for (uint8_t i = 0; i < INV_MAX_COUNT; i++) {
@@ -259,6 +264,9 @@ bool ConfigurationClass::readJson()
     config.Dtu_PollInterval = dtu["poll_interval"] | DTU_POLL_INTERVAL;
     config.Dtu_PaLevel = dtu["pa_level"] | DTU_PA_LEVEL;
 
+    JsonObject security = doc["security"];
+    strlcpy(config.Security_Password, security["password"] | ACCESS_POINT_PASSWORD, sizeof(config.Security_Password));
+
     JsonArray inverters = doc["inverters"];
     for (uint8_t i = 0; i < INV_MAX_COUNT; i++) {
         JsonObject inv = inverters[i].as<JsonObject>();
@@ -341,6 +349,10 @@ void ConfigurationClass::migrate()
 
     if (config.Cfg_Version < 0x00011500) {
         config.Mqtt_Hass_Expire = MQTT_HASS_EXPIRE;
+    }
+
+    if (config.Cfg_Version < 0x00011600) {
+        strlcpy(config.Security_Password, ACCESS_POINT_PASSWORD, sizeof(config.Security_Password));
     }
 
     config.Cfg_Version = CONFIG_VERSION;
