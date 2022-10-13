@@ -31,6 +31,10 @@
                                 </router-link>
                             </li>
                             <li>
+                                <router-link @click="onClick" class="dropdown-item" to="/settings/security">Security Settings
+                                </router-link>
+                            </li>
+                            <li>
                                 <router-link @click="onClick" class="dropdown-item" to="/settings/dtu">DTU Settings</router-link>
                             </li>
                             <li>

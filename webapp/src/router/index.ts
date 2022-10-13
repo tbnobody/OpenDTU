@@ -12,6 +12,7 @@ import InverterAdminView from '@/components/InverterAdminView.vue'
 import DtuAdminView from '@/components/DtuAdminView.vue'
 import FirmwareUpgradeView from '@/components/FirmwareUpgradeView.vue'
 import ConfigAdminView from '@/components/ConfigAdminView.vue'
+import SecurityAdminView from '@/components/SecurityAdminView.vue'
 
 const routes: Array<RouteRecordRaw> = [
     {
@@ -78,6 +79,11 @@ const routes: Array<RouteRecordRaw> = [
         path: '/settings/config',
         name: 'Config Management',
         component: ConfigAdminView
+    },
+    {
+        path: '/settings/security',
+        name: 'Security',
+        component: SecurityAdminView
     }
 ];
 
