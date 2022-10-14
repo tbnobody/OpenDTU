@@ -87,6 +87,12 @@ void WebApiWsLiveClass::generateJsonResponse(JsonVariant& root)
         root[i][F("data_age")] = (millis() - inv->Statistics()->getLastUpdate()) / 1000;
         root[i][F("reachable")] = inv->isReachable();
         root[i][F("producing")] = inv->isProducing();
+        root[i][F("limit_relative")] = inv->SystemConfigPara()->getLimitPercent();
+        if (inv->DevInfo()->getMaxPower() > 0) {
+            root[i][F("limit_absolute")] = inv->SystemConfigPara()->getLimitPercent() * inv->DevInfo()->getMaxPower() / 100.0;
+        } else {
+            root[i][F("limit_absolute")] = -1;
+        }
 
         // Loop all channels
         for (uint8_t c = 0; c <= inv->Statistics()->getChannelCount(); c++) {

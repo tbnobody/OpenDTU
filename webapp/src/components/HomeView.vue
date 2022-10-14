@@ -38,9 +38,15 @@
                                     'bg-warning': inverter.reachable && !inverter.producing,
                                     'bg-primary': inverter.reachable && inverter.producing,
                                 }">
-                                {{ inverter.name }} (Inverter Serial Number:
-                                {{ inverter.serial }}) (Data Age:
-                                {{ inverter.data_age }} seconds)
+                                <div>
+                                    {{ inverter.name }} (Inverter Serial Number:
+                                    {{ inverter.serial }}) (Data Age:
+                                    {{ inverter.data_age }} seconds)
+                                    <span>Current Limit: {{ inverter.limit_absolute.toFixed(0) }}W | {{
+                                    inverter.limit_relative.toFixed(0)
+                                    }}%</span>
+                                </div>
+
 
                                 <div class="btn-toolbar" role="toolbar">
                                     <div class="btn-group me-2" role="group">
@@ -319,6 +325,8 @@ declare interface Inverter {
     name: string,
     reachable: boolean,
     producing: boolean,
+    limit_relative: 0,
+    limit_absolute: 0,
     data_age: 0,
     events: 0
 }
