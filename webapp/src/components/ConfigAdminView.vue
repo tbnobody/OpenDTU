@@ -116,11 +116,19 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue';
+import {
+    BIconExclamationCircleFill,
+    BIconArrowLeft,
+    BIconCheckCircle
+} from 'bootstrap-icons-vue';
 import * as bootstrap from 'bootstrap';
 import BootstrapAlert from "@/components/partials/BootstrapAlert.vue";
 
 export default defineComponent({
     components: {
+        BIconExclamationCircleFill,
+        BIconArrowLeft,
+        BIconCheckCircle,
         BootstrapAlert,
     },
     data() {

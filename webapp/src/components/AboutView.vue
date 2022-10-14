@@ -99,3 +99,23 @@
     </div>
 
 </template>
+
+<script lang="ts">
+import { defineComponent } from 'vue';
+import {
+    BIconInfoCircle,
+    BIconActivity,
+    BIconBug,
+    BIconChat
+} from 'bootstrap-icons-vue';
+
+export default defineComponent({
+    components: {
+        BIconInfoCircle,
+        BIconActivity,
+        BIconBug,
+        BIconChat,
+    },
+});
+
+</script>

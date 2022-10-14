@@ -74,8 +74,20 @@
 <script lang="ts">
 import { defineComponent } from 'vue';
 import SparkMD5 from "spark-md5";
+import {
+    BIconExclamationCircleFill,
+    BIconArrowLeft,
+    BIconArrowRepeat,
+    BIconCheckCircle
+} from 'bootstrap-icons-vue';
 
 export default defineComponent({
+    components: {
+        BIconExclamationCircleFill,
+        BIconArrowLeft,
+        BIconArrowRepeat,
+        BIconCheckCircle,
+    },
     data() {
         return {
             loading: true,
@@ -122,7 +134,7 @@ export default defineComponent({
             this.uploading = true;
             const formData = new FormData();
             if (event !== null) {
-                const target= event.target as HTMLInputElement;
+                const target = event.target as HTMLInputElement;
                 if (target.files !== null) {
                     this.file = target.files[0];
                 }

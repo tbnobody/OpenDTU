@@ -96,7 +96,7 @@
 
                             <div class="mb-3" v-for="(max, index) in editInverterData.max_power" :key="`${index}`">
                                 <label :for="`inverter-max_${index}`" class="col-form-label">Max power string {{ index +
-                                        1
+                                1
                                 }}:</label>
                                 <div class="input-group">
                                     <input type="number" class="form-control" :id="`inverter-max_${index}`" min="0"
@@ -146,6 +146,10 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue';
+import {
+    BIconTrash,
+    BIconPencil
+} from 'bootstrap-icons-vue';
 import * as bootstrap from 'bootstrap';
 import BootstrapAlert from "@/components/partials/BootstrapAlert.vue";
 
@@ -160,6 +164,8 @@ declare interface Inverter {
 export default defineComponent({
     components: {
         BootstrapAlert,
+        BIconTrash,
+        BIconPencil,
     },
     data() {
         return {
@@ -184,7 +190,7 @@ export default defineComponent({
         this.getInverters();
     },
     computed: {
-        sortedInverters() {
+        sortedInverters(): Inverter[] {
             return this.inverters.slice().sort((a, b) => {
                 return a.serial - b.serial;
             });
