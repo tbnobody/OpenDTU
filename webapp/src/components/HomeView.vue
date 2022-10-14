@@ -42,11 +42,11 @@
                                     {{ inverter.name }} (Inverter Serial Number:
                                     {{ inverter.serial }}) (Data Age:
                                     {{ inverter.data_age }} seconds)
-                                    <span>Current Limit: {{ inverter.limit_absolute.toFixed(0) }}W | {{
-                                    inverter.limit_relative.toFixed(0)
-                                    }}%</span>
+                                    Current Limit: <template v-if="inverter.limit_absolute > -1"> {{
+                                    inverter.limit_absolute.toFixed(0) }}W | </template>{{
+                                        inverter.limit_relative.toFixed(0)
+                                        }}%
                                 </div>
-
 
                                 <div class="btn-toolbar" role="toolbar">
                                     <div class="btn-group me-2" role="group">
