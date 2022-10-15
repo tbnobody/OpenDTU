@@ -38,17 +38,26 @@
                                     'bg-warning': inverter.reachable && !inverter.producing,
                                     'bg-primary': inverter.reachable && inverter.producing,
                                 }">
-                                <div>
-                                    {{ inverter.name }} (Inverter Serial Number:
-                                    {{ inverter.serial }}) (Data Age:
-                                    {{ inverter.data_age }} seconds)
-                                    Current Limit: <template v-if="inverter.limit_absolute > -1"> {{
-                                    inverter.limit_absolute.toFixed(0) }}W | </template>{{
-                                        inverter.limit_relative.toFixed(0)
-                                        }}%
+                                <div class="p-2 flex-grow-1">
+                                    <div class="d-flex flex-wrap">
+                                        <div style="padding-right: 2em;">
+                                            {{ inverter.name }}
+                                        </div>
+                                        <div style="padding-right: 2em;">
+                                            Serial Number: {{ inverter.serial }}
+                                        </div>
+                                        <div style="padding-right: 2em;">
+                                            Current Limit: <template v-if="inverter.limit_absolute > -1"> {{
+                                            inverter.limit_absolute.toFixed(0) }}W | </template>{{
+                                                inverter.limit_relative.toFixed(0)
+                                                }}%
+                                        </div>
+                                        <div style="padding-right: 2em;">
+                                            Data Age: {{ inverter.data_age }} seconds
+                                        </div>
+                                    </div>
                                 </div>
-
-                                <div class="btn-toolbar" role="toolbar">
+                                <div class="btn-toolbar p-2" role="toolbar">
                                     <div class="btn-group me-2" role="group">
                                         <button type="button" class="btn btn-sm btn-danger"
                                             @click="onShowLimitSettings(inverter.serial)"
