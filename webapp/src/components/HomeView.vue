@@ -12,7 +12,7 @@
 
         <template v-else>
             <div class="row gy-3">
-                <div class="col-sm-3 col-md-2">
+                <div class="col-sm-3 col-md-2" :style="[inverterData.length == 1 ? {'display': 'none' } : {}]">
                     <div class="nav nav-pills row-cols-sm-1" id="v-pills-tab" role="tablist"
                         aria-orientation="vertical">
                         <button v-for="inverter in inverterData" :key="inverter.serial" class="nav-link"
@@ -27,7 +27,8 @@
                     </div>
                 </div>
 
-                <div class="tab-content col-sm-9 col-md-10" id="v-pills-tabContent">
+                <div class="tab-content" id="v-pills-tabContent" :class="{'col-sm-9 col-md-10': inverterData.length > 1,
+                'col-sm-12 col-md-12': inverterData.length == 1 }">
                     <div v-for="inverter in inverterData" :key="inverter.serial" class="tab-pane fade show"
                         :id="'v-pills-' + inverter.serial" role="tabpanel"
                         :aria-labelledby="'v-pills-' + inverter.serial + '-tab'" tabindex="0">
