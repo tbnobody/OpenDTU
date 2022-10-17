@@ -59,6 +59,7 @@
 <script lang="ts">
 import { defineComponent } from 'vue';
 import BootstrapAlert from "@/components/BootstrapAlert.vue";
+import type { DtuConfig } from "@/types/DtuConfig";
 
 export default defineComponent({
     components: {
@@ -67,11 +68,7 @@ export default defineComponent({
     data() {
         return {
             dataLoading: true,
-            dtuConfigList: {
-                dtu_serial: 0,
-                dtu_pollinterval: 0,
-                dtu_palevel: 0
-            },
+            dtuConfigList: {} as DtuConfig,
             palevelList: [
                 { key: 0, value: "Minimum (-18 dBm)" },
                 { key: 1, value: "Low (-12 dBm)" },
