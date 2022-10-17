@@ -77,12 +77,14 @@
     </nav>
 </template>
 
-<script>
-export default {
+<script lang="ts">
+import { defineComponent } from 'vue';
+
+export default defineComponent({
     methods: {
         onClick() {
-            this.$refs.navbarCollapse && this.$refs.navbarCollapse.classList.remove("show");
+            this.$refs.navbarCollapse && (this.$refs.navbarCollapse as HTMLElement).classList.remove("show");
         }
     },
-}
+});
 </script>
