@@ -173,9 +173,9 @@ void VeDirectFrameHandler::rxData(uint8_t inbyte)
 void VeDirectFrameHandler::frameEndEvent(bool valid) {
 	if ( valid ) {
 		veMap = _tmpMap;
-		_tmpMap.clear();
 		setLastUpdate();
 	}
+	_tmpMap.clear();
 }
 
 /*
