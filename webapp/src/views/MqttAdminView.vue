@@ -228,6 +228,7 @@
 <script lang="ts">
 import { defineComponent } from 'vue';
 import BootstrapAlert from "@/components/BootstrapAlert.vue";
+import type { MqttConfig } from "@/types/MqttConfig";
 
 export default defineComponent({
     components: {
@@ -236,26 +237,7 @@ export default defineComponent({
     data() {
         return {
             dataLoading: true,
-            mqttConfigList: {
-                mqtt_enabled: false,
-                mqtt_hostname: "",
-                mqtt_port: 0,
-                mqtt_username: "",
-                mqtt_password: "",
-                mqtt_topic: "",
-                mqtt_publish_interval: 0,
-                mqtt_retain: false,
-                mqtt_tls: false,
-                mqtt_root_ca_cert: "",
-                mqtt_lwt_topic: "",
-                mqtt_lwt_online: "",
-                mqtt_lwt_offline: "",
-                mqtt_hass_enabled: false,
-                mqtt_hass_expire: false,
-                mqtt_hass_retain: false,
-                mqtt_hass_topic: "",
-                mqtt_hass_individualpanels: false
-            },
+            mqttConfigList: {} as MqttConfig,
             alertMessage: "",
             alertType: "info",
             showAlert: false,
