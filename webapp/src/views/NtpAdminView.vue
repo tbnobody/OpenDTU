@@ -88,6 +88,7 @@
 <script lang="ts">
 import { defineComponent } from 'vue';
 import BootstrapAlert from "@/components/BootstrapAlert.vue";
+import type { NtpConfig } from "@/types/NtpConfig";
 
 export default defineComponent({
     components: {
@@ -97,11 +98,7 @@ export default defineComponent({
         return {
             dataLoading: true,
             timezoneLoading: true,
-            ntpConfigList: {
-                ntp_server: "",
-                ntp_timezone: "",
-                ntp_timezone_descr: ""
-            },
+            ntpConfigList: {} as NtpConfig,
             timezoneList: {},
             timezoneSelect: "",
             mcuTime: new Date(),
