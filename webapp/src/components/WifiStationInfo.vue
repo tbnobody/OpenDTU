@@ -10,24 +10,24 @@
                         <tr>
                             <th>Status</th>
                             <td class="badge" :class="{
-                                'bg-danger': !sta_status,
-                                'bg-success': sta_status,
+                                'bg-danger': !networkStatus.sta_status,
+                                'bg-success': networkStatus.sta_status,
                             }">
-                                <span v-if="sta_status">enabled</span>
+                                <span v-if="networkStatus.sta_status">enabled</span>
                                 <span v-else>disabled</span>
                             </td>
                         </tr>
                         <tr>
                             <th>SSID</th>
-                            <td>{{ sta_ssid }}</td>
+                            <td>{{ networkStatus.sta_ssid }}</td>
                         </tr>
                         <tr>
                             <th>Quality</th>
-                            <td>{{ getRSSIasQuality(sta_rssi) }} %</td>
+                            <td>{{ getRSSIasQuality(networkStatus.sta_rssi) }} %</td>
                         </tr>
                         <tr>
                             <th>RSSI</th>
-                            <td>{{ sta_rssi }}</td>
+                            <td>{{ networkStatus.sta_rssi }}</td>
                         </tr>
                     </tbody>
                 </table>
@@ -37,13 +37,12 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue';
+import type { NetworkStatus } from '@/types/NetworkStatus';
+import { defineComponent, type PropType } from 'vue';
 
 export default defineComponent({
     props: {
-        sta_status: { type: Boolean, required: true },
-        sta_ssid: String,
-        sta_rssi: { type: Number, required: true },
+        networkStatus: { type: Object as PropType<NetworkStatus>, required: true },
     },
     methods: {
         getRSSIasQuality(rssi: number) {

@@ -9,11 +9,11 @@
                     <tbody>
                         <tr>
                             <th>IP Address</th>
-                            <td>{{ ap_ip }}</td>
+                            <td>{{ networkStatus.ap_ip }}</td>
                         </tr>
                         <tr>
                             <th>MAC Address</th>
-                            <td>{{ ap_mac }}</td>
+                            <td>{{ networkStatus.ap_mac }}</td>
                         </tr>
                     </tbody>
                 </table>
@@ -23,12 +23,12 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue';
+import type { NetworkStatus } from '@/types/NetworkStatus';
+import { defineComponent, type PropType } from 'vue';
 
 export default defineComponent({
     props: {
-        ap_ip: String,
-        ap_mac: String,
+        networkStatus: { type: Object as PropType<NetworkStatus>, required: true },
     },
 });
 </script>

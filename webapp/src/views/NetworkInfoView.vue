@@ -10,13 +10,13 @@
         </div>
 
         <template v-if="!dataLoading">
-            <WifiStationInfo v-bind="networkDataList" />
+            <WifiStationInfo :networkStatus="networkDataList" />
             <div class="mt-5"></div>
-            <WifiApInfo v-bind="networkDataList" />
+            <WifiApInfo :networkStatus="networkDataList" />
             <div class="mt-5"></div>
-            <InterfaceNetworkInfo v-bind="networkDataList" />
+            <InterfaceNetworkInfo :networkStatus="networkDataList" />
             <div class="mt-5"></div>
-            <InterfaceApInfo v-bind="networkDataList" />
+            <InterfaceApInfo :networkStatus="networkDataList" />
             <div class="mt-5"></div>
         </template>
     </div>
@@ -28,6 +28,7 @@ import WifiStationInfo from "@/components/WifiStationInfo.vue";
 import WifiApInfo from "@/components/WifiApInfo.vue";
 import InterfaceNetworkInfo from "@/components/InterfaceNetworkInfo.vue";
 import InterfaceApInfo from "@/components/InterfaceApInfo.vue";
+import type { NetworkStatus } from '@/types/NetworkStatus';
 
 export default defineComponent({
     components: {
@@ -39,28 +40,7 @@ export default defineComponent({
     data() {
         return {
             dataLoading: true,
-            networkDataList: {
-                // WifiStationInfo
-                sta_status: false,
-                sta_ssid: "",
-                sta_rssi: 0,
-                // WifiApInfo
-                ap_status: false,
-                ap_ssid: "",
-                ap_stationnum: 0,
-                // InterfaceNetworkInfo
-                network_hostname: "",
-                network_ip: "",
-                network_netmask: "",
-                network_gateway: "",
-                network_dns1: "",
-                network_dns2: "",
-                network_mac: "",
-                network_mode: "",
-                // InterfaceApInfo
-                ap_ip: "",
-                ap_mac: "",
-            }
+            networkDataList: {} as NetworkStatus,
         }
     },
     created() {

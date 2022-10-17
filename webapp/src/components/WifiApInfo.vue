@@ -10,20 +10,20 @@
                         <tr>
                             <th>Status</th>
                             <td class="badge" :class="{
-                                'bg-danger': !ap_status,
-                                'bg-success': ap_status,
+                                'bg-danger': !networkStatus.ap_status,
+                                'bg-success': networkStatus.ap_status,
                             }">
-                                <span v-if="ap_status">enabled</span>
+                                <span v-if="networkStatus.ap_status">enabled</span>
                                 <span v-else>disabled</span>
                             </td>
                         </tr>
                         <tr>
                             <th>SSID</th>
-                            <td>{{ ap_ssid }}</td>
+                            <td>{{ networkStatus.ap_ssid }}</td>
                         </tr>
                         <tr>
                             <th># Stations</th>
-                            <td>{{ ap_stationnum }}</td>
+                            <td>{{ networkStatus.ap_stationnum }}</td>
                         </tr>
                     </tbody>
                 </table>
@@ -33,13 +33,12 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue';
+import type { NetworkStatus } from '@/types/NetworkStatus';
+import { defineComponent, type PropType } from 'vue';
 
 export default defineComponent({
     props: {
-        ap_status: { type: Boolean, required: true },
-        ap_ssid: String,
-        ap_stationnum: { type: Number, required: true },
+        networkStatus: { type: Object as PropType<NetworkStatus>, required: true },
     },
 });
 </script>
