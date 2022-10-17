@@ -14,10 +14,10 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <FsInfo name="Heap" :total="heap_total" :used="heap_used" />
-                        <FsInfo name="LittleFs" :total="littlefs_total"
-                            :used="littlefs_used" />
-                        <FsInfo name="Sketch" :total="sketch_total" :used="sketch_used" />
+                        <FsInfo name="Heap" :total="systemStatus.heap_total" :used="systemStatus.heap_used" />
+                        <FsInfo name="LittleFs" :total="systemStatus.littlefs_total"
+                            :used="systemStatus.littlefs_used" />
+                        <FsInfo name="Sketch" :total="systemStatus.sketch_total" :used="systemStatus.sketch_used" />
                     </tbody>
                 </table>
             </div>
@@ -26,7 +26,8 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue';
+import { defineComponent, type PropType } from 'vue';
+import type { SystemStatus } from '@/types/SystemStatus';
 import FsInfo from "@/components/FsInfo.vue";
 
 export default defineComponent({
@@ -34,12 +35,7 @@ export default defineComponent({
         FsInfo,
     },
     props: {
-        heap_total: { type: Number, required: true },
-        heap_used: { type: Number, required: true },
-        littlefs_total: { type: Number, required: true },
-        littlefs_used: { type: Number, required: true },
-        sketch_total: { type: Number, required: true },
-        sketch_used: { type: Number, required: true },
+        systemStatus: { type: Object as PropType<SystemStatus>, required: true },
     },
 });
 </script>

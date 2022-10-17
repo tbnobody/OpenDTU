@@ -9,41 +9,42 @@
                     <tbody>
                         <tr>
                             <th>Hostname</th>
-                            <td>{{ hostname }}</td>
+                            <td>{{ systemStatus.hostname }}</td>
                         </tr>
                         <tr>
                             <th>SDK Version</th>
-                            <td>{{ sdkversion }}</td>
+                            <td>{{ systemStatus.sdkversion }}</td>
                         </tr>
                         <tr>
                             <th>Config Version</th>
-                            <td>{{ config_version }}</td>
+                            <td>{{ systemStatus.config_version }}</td>
                         </tr>
                         <tr>
                             <th>Firmware Version / Git Hash</th>
-                            <td><a :href="'https://github.com/tbnobody/OpenDTU/commits/' + git_hash?.substring(1)"
-                                    target="_blank">{{ git_hash?.substring(1) }}</a></td>
+                            <td><a :href="'https://github.com/tbnobody/OpenDTU/commits/' + systemStatus.git_hash?.substring(1)"
+                                    target="_blank">{{ systemStatus.git_hash?.substring(1) }}</a></td>
                         </tr>
                         <tr>
                             <th>Firmware Update</th>
-                            <td><a :href="update_url" target="_blank"><span class="badge" :class="update_status">{{
-                            update_text }}</span></a></td>
+                            <td><a :href="systemStatus.update_url" target="_blank"><span class="badge"
+                                        :class="systemStatus.update_status">{{
+                                        systemStatus.update_text }}</span></a></td>
                         </tr>
                         <tr>
                             <th>Reset Reason CPU 0</th>
-                            <td>{{ resetreason_0 }}</td>
+                            <td>{{ systemStatus.resetreason_0 }}</td>
                         </tr>
                         <tr>
                             <th>Reset Reason CPU 1</th>
-                            <td>{{ resetreason_1 }}</td>
+                            <td>{{ systemStatus.resetreason_1 }}</td>
                         </tr>
                         <tr>
                             <th>Config save count</th>
-                            <td>{{ cfgsavecount }}</td>
+                            <td>{{ systemStatus.cfgsavecount }}</td>
                         </tr>
                         <tr>
                             <th>Uptime</th>
-                            <td>{{ timeInHours(uptime) }}</td>
+                            <td>{{ timeInHours(systemStatus.uptime) }}</td>
                         </tr>
                     </tbody>
                 </table>
@@ -53,21 +54,12 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue';
+import { defineComponent, type PropType } from 'vue';
+import type { SystemStatus } from '@/types/SystemStatus';
 
 export default defineComponent({
     props: {
-        hostname: String,
-        sdkversion: String,
-        config_version: String,
-        git_hash: String,
-        resetreason_0: String,
-        resetreason_1: String,
-        cfgsavecount: { type: Number, required: true },
-        uptime: { type: Number, required: true },
-        update_text: String,
-        update_url: String,
-        update_status: String,
+        systemStatus: { type: Object as PropType<SystemStatus>, required: true },
     },
     computed: {
         timeInHours() {

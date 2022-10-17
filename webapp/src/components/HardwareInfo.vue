@@ -9,19 +9,19 @@
                     <tbody>
                         <tr>
                             <th>Chip Model</th>
-                            <td>{{ chipmodel }}</td>
+                            <td>{{ systemStatus.chipmodel }}</td>
                         </tr>
                         <tr>
                             <th>Chip Revision</th>
-                            <td>{{ chiprevision }}</td>
+                            <td>{{ systemStatus.chiprevision }}</td>
                         </tr>
                         <tr>
                             <th>Chip Cores</th>
-                            <td>{{ chipcores }}</td>
+                            <td>{{ systemStatus.chipcores }}</td>
                         </tr>
                         <tr>
                             <th>CPU Frequency</th>
-                            <td>{{ cpufreq }} MHz</td>
+                            <td>{{ systemStatus.cpufreq }} MHz</td>
                         </tr>
                     </tbody>
                 </table>
@@ -31,14 +31,12 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue';
+import type { SystemStatus } from '@/types/SystemStatus';
+import { defineComponent, type PropType } from 'vue';
 
 export default defineComponent({
     props: {
-        chipmodel: String,
-        chiprevision: { type: Number, required: true },
-        chipcores: { type: Number, required: true },
-        cpufreq: { type: Number, required: true },
+        systemStatus: { type: Object as PropType<SystemStatus>, required: true },
     },
 });
 </script>

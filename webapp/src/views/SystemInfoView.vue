@@ -11,13 +11,13 @@
         </div>
 
         <template v-if="!dataLoading">
-            <FirmwareInfo v-bind="systemDataList" />
+            <FirmwareInfo :systemStatus="systemDataList" />
             <div class="mt-5"></div>
-            <HardwareInfo v-bind="systemDataList" />
+            <HardwareInfo :systemStatus="systemDataList" />
             <div class="mt-5"></div>
-            <MemoryInfo v-bind="systemDataList" />
+            <MemoryInfo :systemStatus="systemDataList" />
             <div class="mt-5"></div>
-            <RadioInfo v-bind="systemDataList" />
+            <RadioInfo :systemStatus="systemDataList" />
             <div class="mt-5"></div>
         </template>
     </div>
@@ -29,6 +29,7 @@ import HardwareInfo from "@/components/HardwareInfo.vue";
 import FirmwareInfo from "@/components/FirmwareInfo.vue";
 import MemoryInfo from "@/components/MemoryInfo.vue";
 import RadioInfo from "@/components/RadioInfo.vue";
+import type { SystemStatus } from '@/types/SystemStatus';
 
 export default defineComponent({
     components: {
@@ -40,35 +41,7 @@ export default defineComponent({
     data() {
         return {
             dataLoading: true,
-            systemDataList: {
-                // HardwareInfo
-                chipmodel: "",
-                chiprevision: 0,
-                chipcores: 0,
-                cpufreq: 0,
-                // FirmwareInfo
-                hostname: "",
-                sdkversion: "",
-                config_version: "",
-                git_hash: "",
-                resetreason_0: "",
-                resetreason_1: "",
-                cfgsavecount: 0,
-                uptime: 0,
-                update_text: "",
-                update_url: "",
-                update_status: "",
-                // MemoryInfo
-                heap_total: 0,
-                heap_used: 0,
-                littlefs_total: 0,
-                littlefs_used: 0,
-                sketch_total: 0,
-                sketch_used: 0,
-                // RadioInfo
-                radio_connected: false,
-                radio_pvariant: false,
-            }
+            systemDataList: {} as SystemStatus,
         }
     },
     created() {

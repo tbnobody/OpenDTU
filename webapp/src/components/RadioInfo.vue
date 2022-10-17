@@ -10,22 +10,24 @@
                         <tr>
                             <th>Chip Status</th>
                             <td class="badge" :class="{
-                                'bg-danger': !radio_connected,
-                                'bg-success': radio_connected,
+                                'bg-danger': !systemStatus.radio_connected,
+                                'bg-success': systemStatus.radio_connected,
                             }">
-                                <span v-if="radio_connected">connected</span>
+                                <span v-if="systemStatus.radio_connected">connected</span>
                                 <span v-else>not connected</span>
                             </td>
                         </tr>
                         <tr>
                             <th>Chip Type</th>
                             <td class="badge" :class="{
-                                'bg-danger': radio_connected && !radio_pvariant,
-                                'bg-success': radio_connected && radio_pvariant,
-                                'bg-secondary': !radio_connected,
+                                'bg-danger': systemStatus.radio_connected && !systemStatus.radio_pvariant,
+                                'bg-success': systemStatus.radio_connected && systemStatus.radio_pvariant,
+                                'bg-secondary': !systemStatus.radio_connected,
                             }">
-                                <span v-if="radio_connected && radio_pvariant">nRF24L01+</span>
-                                <span v-else-if="radio_connected && !radio_pvariant">nRF24L01</span>
+                                <span
+                                    v-if="systemStatus.radio_connected && systemStatus.radio_pvariant">nRF24L01+</span>
+                                <span
+                                    v-else-if="systemStatus.radio_connected && !systemStatus.radio_pvariant">nRF24L01</span>
                                 <span v-else>Unknown</span>
                             </td>
                         </tr>
@@ -37,12 +39,12 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue';
+import { defineComponent, type PropType } from 'vue';
+import type { SystemStatus } from '@/types/SystemStatus';
 
 export default defineComponent({
     props: {
-        radio_connected: { type: Boolean, required: true },
-        radio_pvariant: { type: Boolean, required: true },
+        systemStatus: { type: Object as PropType<SystemStatus>, required: true },
     },
 });
 </script>
