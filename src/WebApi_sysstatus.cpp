@@ -66,6 +66,7 @@ void WebApiSysstatusClass::onSystemStatus(AsyncWebServerRequest* request)
     root[F("uptime")] = esp_timer_get_time() / 1000000;
 
     root[F("radio_connected")] = Hoymiles.getRadio()->isConnected();
+    root[F("radio_pvariant")] = Hoymiles.getRadio()->isPVariant();
 
     response->setLength();
     request->send(response);

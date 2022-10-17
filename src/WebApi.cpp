@@ -28,6 +28,7 @@ void WebApiClass::init()
     _webApiNetwork.init(&_server);
     _webApiNtp.init(&_server);
     _webApiPower.init(&_server);
+    _webApiSecurity.init(&_server);
     _webApiSysstatus.init(&_server);
     _webApiWebapp.init(&_server);
     _webApiWsLive.init(&_server);
@@ -50,6 +51,7 @@ void WebApiClass::loop()
     _webApiNetwork.loop();
     _webApiNtp.loop();
     _webApiPower.loop();
+    _webApiSecurity.loop();
     _webApiSysstatus.loop();
     _webApiWebapp.loop();
     _webApiWsLive.loop();

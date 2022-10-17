@@ -55,7 +55,7 @@
 
                     <div v-else-if="!uploading">
                         <div class="form-group pt-2 mt-3">
-                            <input class="form-control" type="file" ref="file" accept=".bin" @change="uploadConfig" />
+                            <input class="form-control" type="file" ref="file" accept=".json" @change="uploadConfig" />
                         </div>
                     </div>
 
@@ -116,11 +116,19 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue';
+import {
+    BIconExclamationCircleFill,
+    BIconArrowLeft,
+    BIconCheckCircle
+} from 'bootstrap-icons-vue';
 import * as bootstrap from 'bootstrap';
 import BootstrapAlert from "@/components/partials/BootstrapAlert.vue";
 
 export default defineComponent({
     components: {
+        BIconExclamationCircleFill,
+        BIconArrowLeft,
+        BIconCheckCircle,
         BootstrapAlert,
     },
     data() {
@@ -175,7 +183,7 @@ export default defineComponent({
         downloadConfig() {
             const link = document.createElement('a')
             link.href = "/api/config/get"
-            link.download = 'config.bin'
+            link.download = 'config.json'
             link.click()
         },
         uploadConfig(event: Event | null) {

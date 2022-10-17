@@ -10,7 +10,8 @@
                 <td>Model</td>
                 <td v-if="devInfoList.hw_model_name != ''">{{ devInfoList.hw_model_name }}</td>
                 <td v-else>Unknown model! Please report the "Hardware Part Number" and model (e.g. HM-350) as an issue
-                    <a href="https://github.com/tbnobody/OpenDTU/issues" target="_blank">here</a>.</td>
+                    <a href="https://github.com/tbnobody/OpenDTU/issues" target="_blank">here</a>.
+                </td>
             </tr>
             <tr>
                 <td>Bootloader Version</td>
@@ -38,6 +39,7 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue';
+import { BIconInfoSquare } from 'bootstrap-icons-vue';
 import BootstrapAlert from '@/components/partials/BootstrapAlert.vue';
 
 declare interface DevInfoData {
@@ -52,6 +54,7 @@ declare interface DevInfoData {
 
 export default defineComponent({
     components: {
+        BIconInfoSquare,
         BootstrapAlert,
     },
     props: {

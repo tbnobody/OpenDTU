@@ -151,11 +151,13 @@ void WebApiNetworkClass::onNetworkAdminPost(AsyncWebServerRequest* request)
         request->send(response);
         return;
     }
-    if (root[F("ssid")].as<String>().length() == 0 || root[F("ssid")].as<String>().length() > WIFI_MAX_SSID_STRLEN) {
-        retMsg[F("message")] = F("SSID must between 1 and " STR(WIFI_MAX_SSID_STRLEN) " characters long!");
-        response->setLength();
-        request->send(response);
-        return;
+    if (NetworkSettings.NetworkMode() == network_mode::WiFi) {
+        if (root[F("ssid")].as<String>().length() == 0 || root[F("ssid")].as<String>().length() > WIFI_MAX_SSID_STRLEN) {
+            retMsg[F("message")] = F("SSID must between 1 and " STR(WIFI_MAX_SSID_STRLEN) " characters long!");
+            response->setLength();
+            request->send(response);
+            return;
+        }
     }
     if (root[F("password")].as<String>().length() > WIFI_MAX_PASSWORD_STRLEN - 1) {
         retMsg[F("message")] = F("Password must not be longer than " STR(WIFI_MAX_PASSWORD_STRLEN) " characters long!");

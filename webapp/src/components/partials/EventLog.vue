@@ -52,9 +52,6 @@ export default defineComponent({
                 const dMins = minutes > 9 ? minutes : "0" + minutes;
                 const dSecs = seconds > 9 ? seconds : "0" + seconds;
 
-                if (days > 0) {
-                    return days + " " + dHours + ":" + dMins + ":" + dSecs;
-                }
                 return dHours + ":" + dMins + ":" + dSecs;
             };
         },

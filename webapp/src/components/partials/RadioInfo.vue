@@ -17,6 +17,18 @@
                                 <span v-else>not connected</span>
                             </td>
                         </tr>
+                        <tr>
+                            <th>Chip Type</th>
+                            <td class="badge" :class="{
+                                'bg-danger': radio_connected && !radio_pvariant,
+                                'bg-success': radio_connected && radio_pvariant,
+                                'bg-secondary': !radio_connected,
+                            }">
+                                <span v-if="radio_connected && radio_pvariant">nRF24L01+</span>
+                                <span v-else-if="radio_connected && !radio_pvariant">nRF24L01</span>
+                                <span v-else>Unknown</span>
+                            </td>
+                        </tr>
                     </tbody>
                 </table>
             </div>
@@ -30,6 +42,7 @@ import { defineComponent } from 'vue';
 export default defineComponent({
     props: {
         radio_connected: { type: Boolean, required: true },
+        radio_pvariant: { type: Boolean, required: true },
     },
 });
 </script>

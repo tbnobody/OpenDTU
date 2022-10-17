@@ -39,11 +39,9 @@ void WebApiPowerClass::onPowerStatus(AsyncWebServerRequest* request)
         String limitStatus = "Unknown";
         if (status == LastCommandSuccess::CMD_OK) {
             limitStatus = "Ok";
-        }
-        else if (status == LastCommandSuccess::CMD_NOK) {
+        } else if (status == LastCommandSuccess::CMD_NOK) {
             limitStatus = "Failure";
-        }
-        else if (status == LastCommandSuccess::CMD_PENDING) {
+        } else if (status == LastCommandSuccess::CMD_PENDING) {
             limitStatus = "Pending";
         }
         root[buffer]["power_set_status"] = limitStatus;
@@ -86,7 +84,7 @@ void WebApiPowerClass::onPowerPost(AsyncWebServerRequest* request)
     }
 
     if (!(root.containsKey("serial")
-            && root.containsKey("power"))) {
+            && (root.containsKey("power") || root.containsKey("restart")))) {
         retMsg[F("message")] = F("Values are missing!");
         response->setLength();
         request->send(response);
@@ -101,8 +99,6 @@ void WebApiPowerClass::onPowerPost(AsyncWebServerRequest* request)
     }
 
     uint64_t serial = strtoll(root[F("serial")].as<String>().c_str(), NULL, 16);
-    uint16_t power = root[F("power")].as<bool>();
-
     auto inv = Hoymiles.getInverterBySerial(serial);
     if (inv == nullptr) {
         retMsg[F("message")] = F("Invalid inverter specified!");
@@ -111,7 +107,14 @@ void WebApiPowerClass::onPowerPost(AsyncWebServerRequest* request)
         return;
     }
 
-    inv->sendPowerControlRequest(Hoymiles.getRadio(), power);
+    if (root.containsKey("power")) {
+        uint16_t power = root[F("power")].as<bool>();
+        inv->sendPowerControlRequest(Hoymiles.getRadio(), power);
+    } else {
+        if (root[F("restart")].as<bool>()) {
+            inv->sendRestartControlRequest(Hoymiles.getRadio());
+        }
+    }
 
     retMsg[F("type")] = F("success");
     retMsg[F("message")] = F("Settings saved!");

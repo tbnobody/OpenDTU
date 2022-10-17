@@ -38,11 +38,26 @@
                                     'bg-warning': inverter.reachable && !inverter.producing,
                                     'bg-primary': inverter.reachable && inverter.producing,
                                 }">
-                                {{ inverter.name }} (Inverter Serial Number:
-                                {{ inverter.serial }}) (Data Age:
-                                {{ inverter.data_age }} seconds)
-
-                                <div class="btn-toolbar" role="toolbar">
+                                <div class="p-2 flex-grow-1">
+                                    <div class="d-flex flex-wrap">
+                                        <div style="padding-right: 2em;">
+                                            {{ inverter.name }}
+                                        </div>
+                                        <div style="padding-right: 2em;">
+                                            Serial Number: {{ inverter.serial }}
+                                        </div>
+                                        <div style="padding-right: 2em;">
+                                            Current Limit: <template v-if="inverter.limit_absolute > -1"> {{
+                                            inverter.limit_absolute.toFixed(0) }}W | </template>{{
+                                                inverter.limit_relative.toFixed(0)
+                                                }}%
+                                        </div>
+                                        <div style="padding-right: 2em;">
+                                            Data Age: {{ inverter.data_age }} seconds
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="btn-toolbar p-2" role="toolbar">
                                     <div class="btn-group me-2" role="group">
                                         <button type="button" class="btn btn-sm btn-danger"
                                             @click="onShowLimitSettings(inverter.serial)"
@@ -175,11 +190,20 @@
                                 <div class="row mb-3">
                                     <label for="inputCurrentLimit" class="col-sm-3 col-form-label">Current
                                         Limit:</label>
-                                    <div class="col-sm-9">
+                                    <div class="col-sm-4">
                                         <div class="input-group">
                                             <input type="number" class="form-control" id="inputCurrentLimit"
                                                 aria-describedby="currentLimitType" v-model="currentLimit" disabled />
                                             <span class="input-group-text" id="currentLimitType">%</span>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-sm-4" v-if="maxPower > 0">
+                                        <div class="input-group">
+                                            <input type="number" class="form-control" id="inputCurrentLimitAbsolute"
+                                                aria-describedby="currentLimitTypeAbsolute"
+                                                v-model="currentLimitAbsolute" disabled />
+                                            <span class="input-group-text" id="currentLimitTypeAbsolute">W</span>
                                         </div>
                                     </div>
                                 </div>
@@ -282,6 +306,9 @@
                                 <button type="button" class="btn btn-danger" @click="onSetPowerSettings(false)">
                                     <BIconToggleOff class="fs-4" />&nbsp;Turn Off
                                 </button>
+                                <button type="button" class="btn btn-warning" @click="onSetPowerSettings(true, true)">
+                                    <BIconArrowCounterclockwise class="fs-4" />&nbsp;Restart
+                                </button>
                             </div>
                         </template>
 
@@ -298,11 +325,23 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue';
-import InverterChannelInfo from "@/components/partials/InverterChannelInfo.vue";
 import * as bootstrap from 'bootstrap';
+import {
+    BIconXCircleFill,
+    BIconExclamationCircleFill,
+    BIconCheckCircleFill,
+    BIconSpeedometer,
+    BIconPower,
+    BIconCpu,
+    BIconJournalText,
+    BIconToggleOn,
+    BIconToggleOff,
+    BIconArrowCounterclockwise
+} from 'bootstrap-icons-vue';
 import EventLog from '@/components/partials/EventLog.vue';
 import DevInfo from '@/components/partials/DevInfo.vue';
 import BootstrapAlert from '@/components/partials/BootstrapAlert.vue';
+import InverterChannelInfo from "@/components/partials/InverterChannelInfo.vue";
 import VedirectView from '@/components/partials/VedirectView.vue';
 
 declare interface Inverter {
@@ -310,6 +349,8 @@ declare interface Inverter {
     name: string,
     reachable: boolean,
     producing: boolean,
+    limit_relative: 0,
+    limit_absolute: 0,
     data_age: 0,
     events: 0
 }
@@ -320,6 +361,16 @@ export default defineComponent({
         EventLog,
         DevInfo,
         BootstrapAlert,
+        BIconXCircleFill,
+        BIconExclamationCircleFill,
+        BIconCheckCircleFill,
+        BIconSpeedometer,
+        BIconPower,
+        BIconCpu,
+        BIconJournalText,
+        BIconToggleOn,
+        BIconToggleOff,
+        BIconArrowCounterclockwise,
         VedirectView
     },
     data() {
@@ -342,7 +393,9 @@ export default defineComponent({
             limitSettingLoading: true,
 
             currentLimit: 0,
+            currentLimitAbsolute: 0,
             successCommandLimit: "",
+            maxPower: 0,
             targetLimit: 0,
             targetLimitMin: 10,
             targetLimitMax: 100,
@@ -495,7 +548,11 @@ export default defineComponent({
             fetch("/api/limit/status")
                 .then((response) => response.json())
                 .then((data) => {
-                    this.currentLimit = data[serial].limit_relative;
+                    this.maxPower = data[serial].max_power;
+                    this.currentLimit = Number((data[serial].limit_relative).toFixed(1));
+                    if (this.maxPower > 0) {
+                        this.currentLimitAbsolute = Number((this.currentLimit * this.maxPower / 100).toFixed(1));
+                    }
                     this.successCommandLimit = data[serial].limit_set_status;
                     this.limitSettingSerial = serial;
                     this.limitSettingLoading = false;
@@ -572,11 +629,20 @@ export default defineComponent({
             this.showAlertPower = false;
         },
 
-        onSetPowerSettings(turnOn: boolean) {
-            const data = {
-                serial: this.powerSettingSerial,
-                power: turnOn,
-            };
+        onSetPowerSettings(turnOn: boolean, restart = false) {
+            let data = {};
+            if (restart) {
+                data = {
+                    serial: this.powerSettingSerial,
+                    restart: true,
+                };
+            } else {
+                data = {
+                    serial: this.powerSettingSerial,
+                    power: turnOn,
+                };
+            }
+
             const formData = new FormData();
             formData.append("data", JSON.stringify(data));
 

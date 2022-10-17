@@ -4,7 +4,8 @@
 #include <Arduino.h>
 
 #define CONFIG_FILENAME "/config.bin"
-#define CONFIG_VERSION 0x00011500 // 0.1.21 // make sure to clean all after change
+#define CONFIG_FILENAME_JSON "/config.json"
+#define CONFIG_VERSION 0x00011600 // 0.1.22 // make sure to clean all after change
 
 #define WIFI_MAX_SSID_STRLEN 31
 #define WIFI_MAX_PASSWORD_STRLEN 64
@@ -25,6 +26,8 @@
 #define INV_MAX_NAME_STRLEN 31
 #define INV_MAX_COUNT 10
 #define INV_MAX_CHAN_COUNT 4
+
+#define JSON_BUFFER_SIZE 6144
 
 struct INVERTER_CONFIG_T {
     uint64_t Serial;
@@ -82,6 +85,8 @@ struct CONFIG_T {
     char Mqtt_Hostname[MQTT_MAX_HOSTNAME_STRLEN + 1];
 
     bool Mqtt_Hass_Expire;
+
+    char Security_Password[WIFI_MAX_PASSWORD_STRLEN + 1];
 };
 
 class ConfigurationClass {
@@ -93,6 +98,9 @@ public:
     CONFIG_T& get();
 
     INVERTER_CONFIG_T* getFreeInverterSlot();
+
+private:
+    bool readJson();
 };
 
 extern ConfigurationClass Configuration;

@@ -67,6 +67,7 @@ export default defineComponent({
                 sketch_used: 0,
                 // RadioInfo
                 radio_connected: false,
+                radio_pvariant: false,
             }
         }
     },

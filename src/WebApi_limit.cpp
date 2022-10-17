@@ -36,6 +36,7 @@ void WebApiLimitClass::onLimitStatus(AsyncWebServerRequest* request)
             ((uint32_t)(inv->serial() & 0xFFFFFFFF)));
 
         root[buffer]["limit_relative"] = inv->SystemConfigPara()->getLimitPercent();
+        root[buffer]["max_power"] = inv->DevInfo()->getMaxPower();
 
         LastCommandSuccess status = inv->SystemConfigPara()->getLastLimitCommandSuccess();
         String limitStatus = "Unknown";

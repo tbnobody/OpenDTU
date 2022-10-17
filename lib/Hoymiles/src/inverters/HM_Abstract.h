@@ -12,6 +12,7 @@ public:
     bool sendActivePowerControlRequest(HoymilesRadio* radio, float limit, PowerLimitControlType type);
     bool resendActivePowerControlRequest(HoymilesRadio* radio);
     bool sendPowerControlRequest(HoymilesRadio* radio, bool turnOn);
+    bool sendRestartControlRequest(HoymilesRadio* radio);
     bool resendPowerControlRequest(HoymilesRadio* radio);
 
 private:
@@ -19,5 +20,5 @@ private:
     float _activePowerControlLimit = 0;
     PowerLimitControlType _activePowerControlType = PowerLimitControlType::AbsolutNonPersistent;
 
-    bool _powerState = true;
+    uint8_t _powerState = 1;
 };

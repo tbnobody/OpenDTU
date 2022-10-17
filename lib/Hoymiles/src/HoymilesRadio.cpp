@@ -169,6 +169,11 @@ bool HoymilesRadio::isConnected()
     return _radio->isChipConnected();
 }
 
+bool HoymilesRadio::isPVariant()
+{
+    return _radio->isPVariant();
+}
+
 void HoymilesRadio::openReadingPipe()
 {
     serial_u s;
