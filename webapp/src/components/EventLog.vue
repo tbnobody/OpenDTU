@@ -20,24 +20,13 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue';
+import { defineComponent, type PropType } from 'vue';
 import { timestampToString } from '@/utils';
-
-declare interface EventData {
-    message_id: number,
-    message: string,
-    start_time: number,
-    end_time: number
-}
-
-declare interface EventLogData {
-    count: number,
-    events: { [key: number]: EventData }
-}
+import type { EventlogItems } from '@/types/EventlogStatus';
 
 export default defineComponent({
     props: {
-        eventLogList: { type: Object as () => EventLogData, required: true },
+        eventLogList: { type: Object as PropType<EventlogItems>, required: true },
     },
     computed: {
         timeInHours() {

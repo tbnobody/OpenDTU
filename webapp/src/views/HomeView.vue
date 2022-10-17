@@ -128,7 +128,7 @@
                             </div>
                         </div>
 
-                        <EventLog v-if="!eventLogLoading" :eventLogList="(eventLogList as any)" />
+                        <EventLog v-if="!eventLogLoading" :eventLogList="eventLogList" />
                     </div>
 
                     <div class="modal-footer">
@@ -342,6 +342,7 @@ import DevInfo from '@/components/DevInfo.vue';
 import BootstrapAlert from '@/components/BootstrapAlert.vue';
 import InverterChannelInfo from "@/components/InverterChannelInfo.vue";
 import type { DevInfoStatus } from '@/types/DevInfoStatus';
+import type { EventlogItems } from '@/types/EventlogStatus';
 
 declare interface Inverter {
     serial: number,
@@ -381,7 +382,7 @@ export default defineComponent({
             inverterData: [] as Inverter[],
             isFirstFetchAfterConnect: true,
             eventLogView: {} as bootstrap.Modal,
-            eventLogList: {},
+            eventLogList: {} as EventlogItems,
             eventLogLoading: true,
             devInfoView: {} as bootstrap.Modal,
             devInfoList: {} as DevInfoStatus,
