@@ -114,6 +114,7 @@
 <script lang="ts">
 import { defineComponent } from 'vue';
 import BootstrapAlert from "@/components/BootstrapAlert.vue";
+import type { NetworkConfig } from "@/types/NetworkkConfig";
 
 export default defineComponent({
     components: {
@@ -122,17 +123,7 @@ export default defineComponent({
     data() {
         return {
             dataLoading: true,
-            networkConfigList: {
-                ssid: "",
-                password: "",
-                hostname: "",
-                dhcp: false,
-                ipaddress: "",
-                netmask: "",
-                gateway: "",
-                dns1: "",
-                dns2: ""
-            },
+            networkConfigList: {} as NetworkConfig,
             alertMessage: "",
             alertType: "info",
             showAlert: false,
