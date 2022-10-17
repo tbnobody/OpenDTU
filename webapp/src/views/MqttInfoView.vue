@@ -177,6 +177,7 @@ export default defineComponent({
                 mqtt_root_ca_cert_info: "",
                 mqtt_connected: false,
                 mqtt_hass_enabled: false,
+                mqtt_hass_expire: false,
                 mqtt_hass_retain: false,
                 mqtt_hass_topic: "",
                 mqtt_hass_individualpanels: false
