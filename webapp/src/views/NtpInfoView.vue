@@ -67,18 +67,13 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue';
+import type { NtpStatus } from "@/types/NtpStatus";
 
 export default defineComponent({
     data() {
         return {
             dataLoading: true,
-            ntpDataList: {
-                ntp_server: "",
-                ntp_timezone: "",
-                ntp_timezone_descr: "",
-                ntp_status: false,
-                ntp_localtime: ""
-            },
+            ntpDataList: {} as NtpStatus,
         };
     },
     created() {
