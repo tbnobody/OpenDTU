@@ -56,6 +56,7 @@
 <script lang="ts">
 import { defineComponent, type PropType } from 'vue';
 import type { SystemStatus } from '@/types/SystemStatus';
+import { timestampToString } from '@/utils';
 
 export default defineComponent({
     props: {
@@ -64,16 +65,7 @@ export default defineComponent({
     computed: {
         timeInHours() {
             return (value: number) => {
-                const days = Math.floor(value / 3600 / 24);
-                const hours = Math.floor((value - days * 3600 * 24) / 3600);
-                const minutes = Math.floor((value - days * 3600 * 24 - hours * 3600) / 60);
-                const seconds = (value - days * 3600 * 24 - hours * 3600 + minutes * 60) % 60;
-
-                const dHours = hours > 9 ? hours : "0" + hours;
-                const dMins = minutes > 9 ? minutes : "0" + minutes;
-                const dSecs = seconds > 9 ? seconds : "0" + seconds;
-
-                return days + " days " + dHours + ":" + dMins + ":" + dSecs;
+                return timestampToString(value, true);
             };
         },
     },
