@@ -38,19 +38,10 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue';
+import { defineComponent, type PropType } from 'vue';
 import { BIconInfoSquare } from 'bootstrap-icons-vue';
 import BootstrapAlert from '@/components/BootstrapAlert.vue';
-
-declare interface DevInfoData {
-    valid_data: boolean,
-    fw_bootloader_version: number,
-    fw_build_version: number,
-    fw_build_datetime: Date,
-    hw_part_number: number,
-    hw_version: number,
-    hw_model_name: string,
-}
+import type { DevInfoStatus } from "@/types/DevInfoStatus";
 
 export default defineComponent({
     components: {
@@ -58,7 +49,7 @@ export default defineComponent({
         BootstrapAlert,
     },
     props: {
-        devInfoList: { type: Object as () => DevInfoData, required: true },
+        devInfoList: { type: Object as PropType<DevInfoStatus>, required: true },
     },
     computed: {
         formatVersion() {

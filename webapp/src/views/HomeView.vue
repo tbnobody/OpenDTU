@@ -154,7 +154,7 @@
                             </div>
                         </div>
 
-                        <DevInfo v-if="!devInfoLoading" :devInfoList="(devInfoList as any)" />
+                        <DevInfo v-if="!devInfoLoading" :devInfoList="devInfoList" />
                     </div>
 
                     <div class="modal-footer">
@@ -341,6 +341,7 @@ import EventLog from '@/components/EventLog.vue';
 import DevInfo from '@/components/DevInfo.vue';
 import BootstrapAlert from '@/components/BootstrapAlert.vue';
 import InverterChannelInfo from "@/components/InverterChannelInfo.vue";
+import type { DevInfoStatus } from '@/types/DevInfoStatus';
 
 declare interface Inverter {
     serial: number,
@@ -383,7 +384,7 @@ export default defineComponent({
             eventLogList: {},
             eventLogLoading: true,
             devInfoView: {} as bootstrap.Modal,
-            devInfoList: {},
+            devInfoList: {} as DevInfoStatus,
             devInfoLoading: true,
 
             limitSettingView: {} as bootstrap.Modal,
