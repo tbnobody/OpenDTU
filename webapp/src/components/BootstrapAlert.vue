@@ -6,11 +6,11 @@
     </div>
 </template>
 
-<script>
+<script lang="ts">
 import { computed, defineComponent, onBeforeUnmount, ref, watch } from "vue";
 import Alert from "bootstrap/js/dist/alert";
 
-export const toInteger = (value, defaultValue = NaN) => {
+export const toInteger = (value: number, defaultValue = NaN) => {
     return Number.isInteger(value) ? value : defaultValue;
 };
 
@@ -26,8 +26,8 @@ export default defineComponent({
     },
     emits: ["dismissed", "dismiss-count-down", "update:modelValue"],
     setup(props, { emit }) {
-        const element = undefined;
-        let instance = undefined;
+        const element = ref<HTMLElement>();
+        const instance = ref<Alert>();
         const classes = computed(() => ({
             [`alert-${props.variant}`]: props.variant,
             show: props.modelValue,
@@ -35,9 +35,9 @@ export default defineComponent({
             fade: props.modelValue,
         }));
 
-        let _countDownTimeout = 0;
+        let _countDownTimeout: number | undefined = 0;
 
-        const parseCountDown = (value) => {
+        const parseCountDown = (value: boolean | number) => {
             if (typeof value === "boolean") {
                 return 0;
             }
@@ -57,8 +57,8 @@ export default defineComponent({
 
         onBeforeUnmount(() => {
             clearCountDownInterval();
-            instance?.dispose();
-            instance = undefined;
+            instance.value?.dispose();
+            instance.value = undefined;
         });
 
         const parsedModelValue = computed(() => {
@@ -76,8 +76,8 @@ export default defineComponent({
 
         const handleShowAndModelChanged = () => {
             countDown.value = parseCountDown(props.modelValue);
-            if ((parsedModelValue.value || props.show) && !instance)
-                instance = new Alert(element);
+            if ((parsedModelValue.value || props.show) && !instance.value)
+                instance.value = new Alert(element.value as HTMLElement);
         };
 
         const dismissClicked = () => {
