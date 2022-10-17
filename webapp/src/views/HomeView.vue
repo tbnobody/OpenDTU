@@ -343,18 +343,7 @@ import BootstrapAlert from '@/components/BootstrapAlert.vue';
 import InverterChannelInfo from "@/components/InverterChannelInfo.vue";
 import type { DevInfoStatus } from '@/types/DevInfoStatus';
 import type { EventlogItems } from '@/types/EventlogStatus';
-
-declare interface Inverter {
-    serial: number,
-    name: string,
-    reachable: boolean,
-    producing: boolean,
-    limit_relative: 0,
-    limit_absolute: 0,
-    data_age: 0,
-    events: 0,
-    [key: number]: any,
-}
+import type { Inverters } from '@/types/LiveDataStatus';
 
 export default defineComponent({
     components: {
@@ -379,7 +368,7 @@ export default defineComponent({
             heartInterval: 0,
             dataAgeInterval: 0,
             dataLoading: true,
-            inverterData: [] as Inverter[],
+            inverterData: [] as Inverters,
             isFirstFetchAfterConnect: true,
             eventLogView: {} as bootstrap.Modal,
             eventLogList: {} as EventlogItems,

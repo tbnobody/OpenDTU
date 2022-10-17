@@ -13,9 +13,11 @@
                 </thead>
                 <tbody>
                     <tr v-for="(property, key) in channelData" :key="`prop-${key}`">
-                        <th scope="row">{{ key }}</th>
-                        <td style="text-align: right">{{ formatNumber(property.v) }}</td>
-                        <td>{{ property.u }}</td>
+                        <template v-if="property">
+                            <th scope="row">{{ key }}</th>
+                            <td style="text-align: right">{{ formatNumber(property.v) }}</td>
+                            <td>{{ property.u }}</td>
+                        </template>
                     </tr>
                 </tbody>
             </table>
@@ -24,18 +26,19 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue';
+import { defineComponent, type PropType } from 'vue';
+import type { InverterStatistics } from '@/types/LiveDataStatus';
 
 export default defineComponent({
     props: {
-        channelData: Object,
+        channelData: { type: Object as PropType<InverterStatistics>, required: true },
         channelNumber: { type: Number, required: true },
     },
     methods: {
-        formatNumber(num: string) {
+        formatNumber(num: number) {
             return new Intl.NumberFormat(
                 undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }
-            ).format(parseFloat(num));
+            ).format(num);
         },
     },
 });
