@@ -128,7 +128,7 @@
                             </div>
                         </div>
 
-                        <EventLog v-if="!eventLogLoading" :eventLogList="eventLogList" />
+                        <EventLog v-if="!eventLogLoading" :eventLogList="(eventLogList as any)" />
                     </div>
 
                     <div class="modal-footer">
@@ -154,7 +154,7 @@
                             </div>
                         </div>
 
-                        <DevInfo v-if="!devInfoLoading" :devInfoList="devInfoList" />
+                        <DevInfo v-if="!devInfoLoading" :devInfoList="(devInfoList as any)" />
                     </div>
 
                     <div class="modal-footer">
