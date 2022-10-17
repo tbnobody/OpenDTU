@@ -1,24 +1,25 @@
 # opendtu
 
-## Project setup
-```
+## Project Setup
+
+```sh
 yarn install
 ```
 
-### Compiles and hot-reloads for development
-```
-yarn serve
+### Compile and Hot-Reload for Development
+
+```sh
+yarn dev
 ```
 
-### Compiles and minifies for production
-```
+### Type-Check, Compile and Minify for Production
+
+```sh
 yarn build
 ```
 
-### Lints and fixes files
-```
+### Lint with [ESLint](https://eslint.org/)
+
+```sh
 yarn lint
 ```
-
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).

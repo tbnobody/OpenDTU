@@ -350,7 +350,8 @@ declare interface Inverter {
     limit_relative: 0,
     limit_absolute: 0,
     data_age: 0,
-    events: 0
+    events: 0,
+    [key: number]: any,
 }
 
 export default defineComponent({

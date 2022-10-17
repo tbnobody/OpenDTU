@@ -1,4 +1,4 @@
-import { createWebHistory, createRouter, RouteRecordRaw } from 'vue-router';
+import { createRouter, createWebHistory } from 'vue-router';
 import HomeView from '@/views/HomeView.vue'
 import AboutView from '@/views/AboutView.vue'
 import NetworkInfoView from '@/views/NetworkInfoView.vue'
@@ -14,7 +14,10 @@ import FirmwareUpgradeView from '@/views/FirmwareUpgradeView.vue'
 import ConfigAdminView from '@/views/ConfigAdminView.vue'
 import SecurityAdminView from '@/views/SecurityAdminView.vue'
 
-const routes: Array<RouteRecordRaw> = [
+const router = createRouter({
+    history: createWebHistory(import.meta.env.BASE_URL),
+    linkActiveClass: "active",
+    routes: [
     {
         path: '/',
         name: 'Home',
@@ -85,12 +88,7 @@ const routes: Array<RouteRecordRaw> = [
         name: 'Security',
         component: SecurityAdminView
     }
-];
-
-const router = createRouter({
-    history: createWebHistory(),
-    routes,
-    linkActiveClass: "active",
-});
+]
+})
 
 export default router;
