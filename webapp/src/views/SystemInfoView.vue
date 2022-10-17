@@ -25,10 +25,10 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue';
-import HardwareInfo from "@/components/partials/HardwareInfo.vue";
-import FirmwareInfo from "@/components/partials/FirmwareInfo.vue";
-import MemoryInfo from "@/components/partials/MemoryInfo.vue";
-import RadioInfo from "@/components/partials/RadioInfo.vue";
+import HardwareInfo from "@/components/HardwareInfo.vue";
+import FirmwareInfo from "@/components/FirmwareInfo.vue";
+import MemoryInfo from "@/components/MemoryInfo.vue";
+import RadioInfo from "@/components/RadioInfo.vue";
 
 export default defineComponent({
     components: {

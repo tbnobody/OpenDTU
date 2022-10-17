@@ -151,7 +151,7 @@ import {
     BIconPencil
 } from 'bootstrap-icons-vue';
 import * as bootstrap from 'bootstrap';
-import BootstrapAlert from "@/components/partials/BootstrapAlert.vue";
+import BootstrapAlert from "@/components/BootstrapAlert.vue";
 
 declare interface Inverter {
     id: string,

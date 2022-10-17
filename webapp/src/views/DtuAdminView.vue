@@ -58,7 +58,7 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue';
-import BootstrapAlert from "@/components/partials/BootstrapAlert.vue";
+import BootstrapAlert from "@/components/BootstrapAlert.vue";
 
 export default defineComponent({
     components: {

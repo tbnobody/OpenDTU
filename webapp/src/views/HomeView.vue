@@ -337,10 +337,10 @@ import {
     BIconToggleOff,
     BIconArrowCounterclockwise
 } from 'bootstrap-icons-vue';
-import EventLog from '@/components/partials/EventLog.vue';
-import DevInfo from '@/components/partials/DevInfo.vue';
-import BootstrapAlert from '@/components/partials/BootstrapAlert.vue';
-import InverterChannelInfo from "@/components/partials/InverterChannelInfo.vue";
+import EventLog from '@/components/EventLog.vue';
+import DevInfo from '@/components/DevInfo.vue';
+import BootstrapAlert from '@/components/BootstrapAlert.vue';
+import InverterChannelInfo from "@/components/InverterChannelInfo.vue";
 
 declare interface Inverter {
     serial: number,

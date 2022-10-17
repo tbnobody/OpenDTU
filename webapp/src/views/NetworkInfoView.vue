@@ -24,10 +24,10 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue';
-import WifiStationInfo from "./partials/WifiStationInfo.vue";
-import WifiApInfo from "./partials/WifiApInfo.vue";
-import InterfaceNetworkInfo from "./partials/InterfaceNetworkInfo.vue";
-import InterfaceApInfo from "./partials/InterfaceApInfo.vue";
+import WifiStationInfo from "@/components/WifiStationInfo.vue";
+import WifiApInfo from "@/components/WifiApInfo.vue";
+import InterfaceNetworkInfo from "@/components/InterfaceNetworkInfo.vue";
+import InterfaceApInfo from "@/components/InterfaceApInfo.vue";
 
 export default defineComponent({
     components: {

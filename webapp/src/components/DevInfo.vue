@@ -40,7 +40,7 @@
 <script lang="ts">
 import { defineComponent } from 'vue';
 import { BIconInfoSquare } from 'bootstrap-icons-vue';
-import BootstrapAlert from '@/components/partials/BootstrapAlert.vue';
+import BootstrapAlert from '@/components/BootstrapAlert.vue';
 
 declare interface DevInfoData {
     valid_data: boolean,

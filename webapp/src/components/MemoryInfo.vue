@@ -27,7 +27,7 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue';
-import FsInfo from "@/components/partials/FsInfo.vue";
+import FsInfo from "@/components/FsInfo.vue";
 
 export default defineComponent({
     components: {
