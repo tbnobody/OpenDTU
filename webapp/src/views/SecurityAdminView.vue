@@ -22,7 +22,7 @@
                             <label for="inputPassword" class="col-sm-2 col-form-label">Password:</label>
                             <div class="col-sm-10">
                                 <input type="password" class="form-control" id="inputPassword" maxlength="64"
-                                    placeholder="Password" v-model="password" />
+                                    placeholder="Password" v-model="securityConfigList.password" />
                             </div>
                         </div>
 
@@ -51,6 +51,7 @@
 <script lang="ts">
 import { defineComponent } from 'vue';
 import BootstrapAlert from "@/components/BootstrapAlert.vue";
+import type { SecurityConfig } from '@/types/SecurityConfig';
 
 export default defineComponent({
     components: {
@@ -63,7 +64,7 @@ export default defineComponent({
             alertType: "info",
             showAlert: false,
 
-            password: "",
+            securityConfigList: {} as SecurityConfig,
             passwordRepeat: "",
         };
     },
@@ -77,8 +78,8 @@ export default defineComponent({
                 .then((response) => response.json())
                 .then(
                     (data) => {
-                        this.password = data["password"];
-                        this.passwordRepeat = this.password;
+                        this.securityConfigList = data;
+                        this.passwordRepeat = this.securityConfigList.password;
                         this.dataLoading = false;
                     }
                 );
@@ -86,7 +87,7 @@ export default defineComponent({
         savePasswordConfig(e: Event) {
             e.preventDefault();
 
-            if (this.password != this.passwordRepeat) {
+            if (this.securityConfigList.password != this.passwordRepeat) {
                 this.alertMessage = "Passwords are not equal";
                 this.alertType = "warning";
                 this.showAlert = true;
@@ -94,10 +95,7 @@ export default defineComponent({
             }
 
             const formData = new FormData();
-            const data = {
-                password: this.password
-            }
-            formData.append("data", JSON.stringify(data));
+            formData.append("data", JSON.stringify(this.securityConfigList));
 
             fetch("/api/security/password", {
                 method: "POST",
