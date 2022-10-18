@@ -1,329 +1,316 @@
 <template>
-    <div class="container-fluid" role="main">
-        <div class="page-header">
-            <h1>Live Data</h1>
-        </div>
-
-        <div class="text-center" v-if="dataLoading">
-            <div class="spinner-border" role="status">
-                <span class="visually-hidden">Loading...</span>
-            </div>
-        </div>
-
-        <template v-else>
-            <div class="row gy-3">
-                <div class="col-sm-3 col-md-2" :style="[inverterData.length == 1 ? {'display': 'none' } : {}]">
-                    <div class="nav nav-pills row-cols-sm-1" id="v-pills-tab" role="tablist"
-                        aria-orientation="vertical">
-                        <button v-for="inverter in inverterData" :key="inverter.serial" class="nav-link"
-                            :id="'v-pills-' + inverter.serial + '-tab'" data-bs-toggle="pill"
-                            :data-bs-target="'#v-pills-' + inverter.serial" type="button" role="tab"
-                            aria-controls="'v-pills-' + inverter.serial" aria-selected="true">
-                            <BIconXCircleFill class="fs-4" v-if="!inverter.reachable" />
-                            <BIconExclamationCircleFill class="fs-4" v-if="inverter.reachable && !inverter.producing" />
-                            <BIconCheckCircleFill class="fs-4" v-if="inverter.reachable && inverter.producing" />
-                            {{ inverter.name }}
-                        </button>
-                    </div>
-                </div>
-
-                <div class="tab-content" id="v-pills-tabContent" :class="{'col-sm-9 col-md-10': inverterData.length > 1,
-                'col-sm-12 col-md-12': inverterData.length == 1 }">
-                    <div v-for="inverter in inverterData" :key="inverter.serial" class="tab-pane fade show"
-                        :id="'v-pills-' + inverter.serial" role="tabpanel"
-                        :aria-labelledby="'v-pills-' + inverter.serial + '-tab'" tabindex="0">
-                        <div class="card">
-                            <div class="card-header text-white bg-primary d-flex justify-content-between align-items-center"
-                                :class="{
-                                    'bg-danger': !inverter.reachable,
-                                    'bg-warning': inverter.reachable && !inverter.producing,
-                                    'bg-primary': inverter.reachable && inverter.producing,
-                                }">
-                                <div class="p-1 flex-grow-1">
-                                    <div class="d-flex flex-wrap">
-                                        <div style="padding-right: 2em;">
-                                            {{ inverter.name }}
-                                        </div>
-                                        <div style="padding-right: 2em;">
-                                            Serial Number: {{ inverter.serial }}
-                                        </div>
-                                        <div style="padding-right: 2em;">
-                                            Current Limit: <template v-if="inverter.limit_absolute > -1"> {{
-                                            inverter.limit_absolute.toFixed(0) }}W | </template>{{
-                                                inverter.limit_relative.toFixed(0)
-                                                }}%
-                                        </div>
-                                        <div style="padding-right: 2em;">
-                                            Data Age: {{ inverter.data_age }} seconds
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="btn-toolbar p-2" role="toolbar">
-                                    <div class="btn-group me-2" role="group">
-                                        <button type="button" class="btn btn-sm btn-danger"
-                                            @click="onShowLimitSettings(inverter.serial)"
-                                            title="Show / Set Inverter Limit">
-                                            <BIconSpeedometer style="font-size:24px;" />
-
-                                        </button>
-                                    </div>
-
-                                    <div class="btn-group me-2" role="group">
-                                        <button type="button" class="btn btn-sm btn-danger"
-                                            @click="onShowPowerSettings(inverter.serial)" title="Turn Inverter on/off">
-                                            <BIconPower style="font-size:24px;" />
-
-                                        </button>
-                                    </div>
-
-                                    <div class="btn-group me-2" role="group">
-                                        <button type="button" class="btn btn-sm btn-info"
-                                            @click="onShowDevInfo(inverter.serial)" title="Show Inverter Info">
-                                            <BIconCpu style="font-size:24px;" />
-
-                                        </button>
-                                    </div>
-
-                                    <div class="btn-group" role="group">
-                                        <button v-if="inverter.events >= 0" type="button"
-                                            class="btn btn-sm btn-secondary position-relative"
-                                            @click="onShowEventlog(inverter.serial)" title="Show Eventlog">
-                                            <BIconJournalText style="font-size:24px;" />
-                                            <span
-                                                class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
-                                                {{ inverter.events }}
-                                                <span class="visually-hidden">unread messages</span>
-                                            </span>
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="card-body">
-                                <div class="row flex-row-reverse flex-wrap-reverse align-items-end g-3">
-                                    <template v-for="channel in 5" :key="channel">
-                                        <div v-if="inverter[channel - 1]" :class="`col order-${5 - channel}`">
-                                            <InverterChannelInfo :channelData="inverter[channel - 1]"
-                                                :channelNumber="channel - 1" />
-                                        </div>
-                                    </template>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+    <BasePage :title="'Live Data'" :isLoading="dataLoading" :isWideScreen="true">
+        <div class="row gy-3">
+            <div class="col-sm-3 col-md-2" :style="[inverterData.length == 1 ? {'display': 'none' } : {}]">
+                <div class="nav nav-pills row-cols-sm-1" id="v-pills-tab" role="tablist" aria-orientation="vertical">
+                    <button v-for="inverter in inverterData" :key="inverter.serial" class="nav-link"
+                        :id="'v-pills-' + inverter.serial + '-tab'" data-bs-toggle="pill"
+                        :data-bs-target="'#v-pills-' + inverter.serial" type="button" role="tab"
+                        aria-controls="'v-pills-' + inverter.serial" aria-selected="true">
+                        <BIconXCircleFill class="fs-4" v-if="!inverter.reachable" />
+                        <BIconExclamationCircleFill class="fs-4" v-if="inverter.reachable && !inverter.producing" />
+                        <BIconCheckCircleFill class="fs-4" v-if="inverter.reachable && inverter.producing" />
+                        {{ inverter.name }}
+                    </button>
                 </div>
             </div>
-        </template>
 
-        <div class="modal" id="eventView" tabindex="-1">
-            <div class="modal-dialog modal-lg">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title">Event Log</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body">
-                        <div class="text-center" v-if="eventLogLoading">
-                            <div class="spinner-border" role="status">
-                                <span class="visually-hidden">Loading...</span>
-                            </div>
-                        </div>
-
-                        <EventLog v-if="!eventLogLoading" :eventLogList="eventLogList" />
-                    </div>
-
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" @click="onHideEventlog"
-                            data-bs-dismiss="modal">Close</button>
-                    </div>
-
-                </div>
-            </div>
-        </div>
-
-        <div class="modal" id="devInfoView" tabindex="-1">
-            <div class="modal-dialog modal-lg">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title">Inverter Info</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body">
-                        <div class="text-center" v-if="devInfoLoading">
-                            <div class="spinner-border" role="status">
-                                <span class="visually-hidden">Loading...</span>
-                            </div>
-                        </div>
-
-                        <DevInfo v-if="!devInfoLoading" :devInfoList="devInfoList" />
-                    </div>
-
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" @click="onHideDevInfo"
-                            data-bs-dismiss="modal">Close</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="modal" id="limitSettingView" ref="limitSettingView" tabindex="-1">
-            <div class="modal-dialog modal-lg">
-                <div class="modal-content">
-                    <form @submit="onSubmitLimit">
-                        <div class="modal-header">
-                            <h5 class="modal-title">Limit Settings</h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                        </div>
-                        <div class="modal-body">
-
-                            <BootstrapAlert v-model="showAlertLimit" :variant="alertTypeLimit">
-                                {{ alertMessageLimit }}
-                            </BootstrapAlert>
-                            <div class="text-center" v-if="limitSettingLoading">
-                                <div class="spinner-border" role="status">
-                                    <span class="visually-hidden">Loading...</span>
-                                </div>
-                            </div>
-
-                            <template v-if="!limitSettingLoading">
-
-                                <div class="row mb-3">
-                                    <label for="inputCurrentLimit" class="col-sm-3 col-form-label">Current
-                                        Limit:</label>
-                                    <div class="col-sm-4">
-                                        <div class="input-group">
-                                            <input type="number" class="form-control" id="inputCurrentLimit"
-                                                aria-describedby="currentLimitType" v-model="currentLimit" disabled />
-                                            <span class="input-group-text" id="currentLimitType">%</span>
-                                        </div>
+            <div class="tab-content" id="v-pills-tabContent" :class="{'col-sm-9 col-md-10': inverterData.length > 1,
+            'col-sm-12 col-md-12': inverterData.length == 1 }">
+                <div v-for="inverter in inverterData" :key="inverter.serial" class="tab-pane fade show"
+                    :id="'v-pills-' + inverter.serial" role="tabpanel"
+                    :aria-labelledby="'v-pills-' + inverter.serial + '-tab'" tabindex="0">
+                    <div class="card">
+                        <div class="card-header text-white bg-primary d-flex justify-content-between align-items-center"
+                            :class="{
+                                'bg-danger': !inverter.reachable,
+                                'bg-warning': inverter.reachable && !inverter.producing,
+                                'bg-primary': inverter.reachable && inverter.producing,
+                            }">
+                            <div class="p-1 flex-grow-1">
+                                <div class="d-flex flex-wrap">
+                                    <div style="padding-right: 2em;">
+                                        {{ inverter.name }}
                                     </div>
-
-                                    <div class="col-sm-4" v-if="maxPower > 0">
-                                        <div class="input-group">
-                                            <input type="number" class="form-control" id="inputCurrentLimitAbsolute"
-                                                aria-describedby="currentLimitTypeAbsolute"
-                                                v-model="currentLimitAbsolute" disabled />
-                                            <span class="input-group-text" id="currentLimitTypeAbsolute">W</span>
-                                        </div>
+                                    <div style="padding-right: 2em;">
+                                        Serial Number: {{ inverter.serial }}
+                                    </div>
+                                    <div style="padding-right: 2em;">
+                                        Current Limit: <template v-if="inverter.limit_absolute > -1"> {{
+                                        inverter.limit_absolute.toFixed(0) }}W | </template>{{
+                                            inverter.limit_relative.toFixed(0)
+                                            }}%
+                                    </div>
+                                    <div style="padding-right: 2em;">
+                                        Data Age: {{ inverter.data_age }} seconds
                                     </div>
                                 </div>
+                            </div>
+                            <div class="btn-toolbar p-2" role="toolbar">
+                                <div class="btn-group me-2" role="group">
+                                    <button type="button" class="btn btn-sm btn-danger"
+                                        @click="onShowLimitSettings(inverter.serial)" title="Show / Set Inverter Limit">
+                                        <BIconSpeedometer style="font-size:24px;" />
 
-                                <div class="row mb-3 align-items-center">
-                                    <label for="inputLastLimitSet" class="col-sm-3 col-form-label">Last Limit Set
-                                        Status:</label>
-                                    <div class="col-sm-9">
-                                        <span class="badge" :class="{
-                                            'bg-danger': successCommandLimit == 'Failure',
-                                            'bg-warning': successCommandLimit == 'Pending',
-                                            'bg-success': successCommandLimit == 'Ok',
-                                            'bg-secondary': successCommandLimit == 'Unknown',
-                                        }">
-                                            {{ successCommandLimit }}
+                                    </button>
+                                </div>
+
+                                <div class="btn-group me-2" role="group">
+                                    <button type="button" class="btn btn-sm btn-danger"
+                                        @click="onShowPowerSettings(inverter.serial)" title="Turn Inverter on/off">
+                                        <BIconPower style="font-size:24px;" />
+
+                                    </button>
+                                </div>
+
+                                <div class="btn-group me-2" role="group">
+                                    <button type="button" class="btn btn-sm btn-info"
+                                        @click="onShowDevInfo(inverter.serial)" title="Show Inverter Info">
+                                        <BIconCpu style="font-size:24px;" />
+
+                                    </button>
+                                </div>
+
+                                <div class="btn-group" role="group">
+                                    <button v-if="inverter.events >= 0" type="button"
+                                        class="btn btn-sm btn-secondary position-relative"
+                                        @click="onShowEventlog(inverter.serial)" title="Show Eventlog">
+                                        <BIconJournalText style="font-size:24px;" />
+                                        <span
+                                            class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                                            {{ inverter.events }}
+                                            <span class="visually-hidden">unread messages</span>
                                         </span>
-                                    </div>
+                                    </button>
                                 </div>
-
-                                <div class="row mb-3">
-                                    <label for="inputTargetLimit" class="col-sm-3 col-form-label">Set Limit:</label>
-                                    <div class="col-sm-9">
-                                        <div class="input-group">
-                                            <input type="number" name="inputTargetLimit" class="form-control"
-                                                id="inputTargetLimit" :min="targetLimitMin" :max="targetLimitMax"
-                                                v-model="targetLimit">
-                                            <button class="btn btn-primary dropdown-toggle" type="button"
-                                                data-bs-toggle="dropdown" aria-expanded="false">{{ targetLimitTypeText
-                                                }}</button>
-                                            <ul class="dropdown-menu dropdown-menu-end">
-                                                <li><a class="dropdown-item" @click="onSelectType(1)" href="#">Relative
-                                                        (%)</a></li>
-                                                <li><a class="dropdown-item" @click="onSelectType(0)" href="#">Absolute
-                                                        (W)</a></li>
-                                            </ul>
-                                        </div>
-                                        <div v-if="targetLimitType == 0" class="alert alert-secondary mt-3"
-                                            role="alert">
-                                            <b>Hint:</b> If you set the limit as absolute value the display of the
-                                            current value will only be updated after ~4 minutes.
-                                        </div>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="row flex-row-reverse flex-wrap-reverse align-items-end g-3">
+                                <template v-for="channel in 5" :key="channel">
+                                    <div v-if="inverter[channel - 1]" :class="`col order-${5 - channel}`">
+                                        <InverterChannelInfo :channelData="inverter[channel - 1]"
+                                            :channelNumber="channel - 1" />
                                     </div>
-                                </div>
-                            </template>
-
+                                </template>
+                            </div>
                         </div>
-
-                        <div class="modal-footer">
-                            <button type="submit" class="btn btn-danger" @click="onSetLimitSettings(true)">Set Limit
-                                Persistent</button>
-
-                            <button type="submit" class="btn btn-danger" @click="onSetLimitSettings(false)">Set Limit
-                                Non-Persistent</button>
-
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                        </div>
-                    </form>
+                    </div>
                 </div>
             </div>
         </div>
+    </BasePage>
 
-        <div class="modal" id="powerSettingView" ref="powerSettingView" tabindex="-1">
-            <div class="modal-dialog modal-lg">
-                <div class="modal-content">
+    <div class="modal" id="eventView" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Event Log</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="text-center" v-if="eventLogLoading">
+                        <div class="spinner-border" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                    </div>
+
+                    <EventLog v-if="!eventLogLoading" :eventLogList="eventLogList" />
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" @click="onHideEventlog"
+                        data-bs-dismiss="modal">Close</button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="devInfoView" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Inverter Info</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="text-center" v-if="devInfoLoading">
+                        <div class="spinner-border" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                    </div>
+
+                    <DevInfo v-if="!devInfoLoading" :devInfoList="devInfoList" />
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" @click="onHideDevInfo"
+                        data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="limitSettingView" ref="limitSettingView" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <form @submit="onSubmitLimit">
                     <div class="modal-header">
-                        <h5 class="modal-title">Power Settings</h5>
+                        <h5 class="modal-title">Limit Settings</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
 
-                        <BootstrapAlert v-model="showAlertPower" :variant="alertTypePower">
-                            {{ alertMessagePower }}
+                        <BootstrapAlert v-model="showAlertLimit" :variant="alertTypeLimit">
+                            {{ alertMessageLimit }}
                         </BootstrapAlert>
-                        <div class="text-center" v-if="powerSettingLoading">
+                        <div class="text-center" v-if="limitSettingLoading">
                             <div class="spinner-border" role="status">
                                 <span class="visually-hidden">Loading...</span>
                             </div>
                         </div>
 
-                        <template v-if="!powerSettingLoading">
+                        <template v-if="!limitSettingLoading">
+
+                            <div class="row mb-3">
+                                <label for="inputCurrentLimit" class="col-sm-3 col-form-label">Current
+                                    Limit:</label>
+                                <div class="col-sm-4">
+                                    <div class="input-group">
+                                        <input type="number" class="form-control" id="inputCurrentLimit"
+                                            aria-describedby="currentLimitType" v-model="currentLimit" disabled />
+                                        <span class="input-group-text" id="currentLimitType">%</span>
+                                    </div>
+                                </div>
+
+                                <div class="col-sm-4" v-if="maxPower > 0">
+                                    <div class="input-group">
+                                        <input type="number" class="form-control" id="inputCurrentLimitAbsolute"
+                                            aria-describedby="currentLimitTypeAbsolute" v-model="currentLimitAbsolute"
+                                            disabled />
+                                        <span class="input-group-text" id="currentLimitTypeAbsolute">W</span>
+                                    </div>
+                                </div>
+                            </div>
+
                             <div class="row mb-3 align-items-center">
-                                <label for="inputLastPowerSet" class="col col-form-label">Last Power Set
+                                <label for="inputLastLimitSet" class="col-sm-3 col-form-label">Last Limit Set
                                     Status:</label>
-                                <div class="col">
+                                <div class="col-sm-9">
                                     <span class="badge" :class="{
-                                        'bg-danger': successCommandPower == 'Failure',
-                                        'bg-warning': successCommandPower == 'Pending',
-                                        'bg-success': successCommandPower == 'Ok',
-                                        'bg-secondary': successCommandPower == 'Unknown',
+                                        'bg-danger': successCommandLimit == 'Failure',
+                                        'bg-warning': successCommandLimit == 'Pending',
+                                        'bg-success': successCommandLimit == 'Ok',
+                                        'bg-secondary': successCommandLimit == 'Unknown',
                                     }">
-                                        {{ successCommandPower }}
+                                        {{ successCommandLimit }}
                                     </span>
                                 </div>
                             </div>
 
-                            <div class="d-grid gap-2 col-6 mx-auto">
-                                <button type="button" class="btn btn-success" @click="onSetPowerSettings(true)">
-                                    <BIconToggleOn class="fs-4" />&nbsp;Turn On
-                                </button>
-                                <button type="button" class="btn btn-danger" @click="onSetPowerSettings(false)">
-                                    <BIconToggleOff class="fs-4" />&nbsp;Turn Off
-                                </button>
-                                <button type="button" class="btn btn-warning" @click="onSetPowerSettings(true, true)">
-                                    <BIconArrowCounterclockwise class="fs-4" />&nbsp;Restart
-                                </button>
+                            <div class="row mb-3">
+                                <label for="inputTargetLimit" class="col-sm-3 col-form-label">Set Limit:</label>
+                                <div class="col-sm-9">
+                                    <div class="input-group">
+                                        <input type="number" name="inputTargetLimit" class="form-control"
+                                            id="inputTargetLimit" :min="targetLimitMin" :max="targetLimitMax"
+                                            v-model="targetLimit">
+                                        <button class="btn btn-primary dropdown-toggle" type="button"
+                                            data-bs-toggle="dropdown" aria-expanded="false">{{ targetLimitTypeText
+                                            }}</button>
+                                        <ul class="dropdown-menu dropdown-menu-end">
+                                            <li><a class="dropdown-item" @click="onSelectType(1)" href="#">Relative
+                                                    (%)</a></li>
+                                            <li><a class="dropdown-item" @click="onSelectType(0)" href="#">Absolute
+                                                    (W)</a></li>
+                                        </ul>
+                                    </div>
+                                    <div v-if="targetLimitType == 0" class="alert alert-secondary mt-3" role="alert">
+                                        <b>Hint:</b> If you set the limit as absolute value the display of the
+                                        current value will only be updated after ~4 minutes.
+                                    </div>
+                                </div>
                             </div>
                         </template>
 
                     </div>
 
                     <div class="modal-footer">
+                        <button type="submit" class="btn btn-danger" @click="onSetLimitSettings(true)">Set Limit
+                            Persistent</button>
+
+                        <button type="submit" class="btn btn-danger" @click="onSetLimitSettings(false)">Set Limit
+                            Non-Persistent</button>
+
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                     </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="powerSettingView" ref="powerSettingView" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Power Settings</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+
+                    <BootstrapAlert v-model="showAlertPower" :variant="alertTypePower">
+                        {{ alertMessagePower }}
+                    </BootstrapAlert>
+                    <div class="text-center" v-if="powerSettingLoading">
+                        <div class="spinner-border" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                    </div>
+
+                    <template v-if="!powerSettingLoading">
+                        <div class="row mb-3 align-items-center">
+                            <label for="inputLastPowerSet" class="col col-form-label">Last Power Set
+                                Status:</label>
+                            <div class="col">
+                                <span class="badge" :class="{
+                                    'bg-danger': successCommandPower == 'Failure',
+                                    'bg-warning': successCommandPower == 'Pending',
+                                    'bg-success': successCommandPower == 'Ok',
+                                    'bg-secondary': successCommandPower == 'Unknown',
+                                }">
+                                    {{ successCommandPower }}
+                                </span>
+                            </div>
+                        </div>
+
+                        <div class="d-grid gap-2 col-6 mx-auto">
+                            <button type="button" class="btn btn-success" @click="onSetPowerSettings(true)">
+                                <BIconToggleOn class="fs-4" />&nbsp;Turn On
+                            </button>
+                            <button type="button" class="btn btn-danger" @click="onSetPowerSettings(false)">
+                                <BIconToggleOff class="fs-4" />&nbsp;Turn Off
+                            </button>
+                            <button type="button" class="btn btn-warning" @click="onSetPowerSettings(true, true)">
+                                <BIconArrowCounterclockwise class="fs-4" />&nbsp;Restart
+                            </button>
+                        </div>
+                    </template>
+
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                 </div>
             </div>
         </div>
     </div>
+
 </template>
 
 <script lang="ts">
 import { defineComponent } from 'vue';
+import BasePage from '@/components/BasePage.vue';
 import * as bootstrap from 'bootstrap';
 import {
     BIconXCircleFill,
@@ -347,6 +334,7 @@ import type { Inverters } from '@/types/LiveDataStatus';
 
 export default defineComponent({
     components: {
+        BasePage,
         InverterChannelInfo,
         EventLog,
         DevInfo,
@@ -427,7 +415,7 @@ export default defineComponent({
         if (this.isFirstFetchAfterConnect) {
             this.isFirstFetchAfterConnect = false;
 
-            const firstTabEl = this.$el.querySelector(
+            const firstTabEl = document.querySelector(
                 "#v-pills-tab:first-child button"
             );
             if (firstTabEl != null) {
