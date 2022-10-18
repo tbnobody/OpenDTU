@@ -215,7 +215,7 @@
                                     <div class="input-group">
                                         <input type="number" name="inputTargetLimit" class="form-control"
                                             id="inputTargetLimit" :min="targetLimitMin" :max="targetLimitMax"
-                                            v-model="targetLimit">
+                                            v-model="targetLimitList.limit_value">
                                         <button class="btn btn-primary dropdown-toggle" type="button"
                                             data-bs-toggle="dropdown" aria-expanded="false">{{ targetLimitTypeText
                                             }}</button>
@@ -332,6 +332,7 @@ import type { DevInfoStatus } from '@/types/DevInfoStatus';
 import type { EventlogItems } from '@/types/EventlogStatus';
 import type { Inverters } from '@/types/LiveDataStatus';
 import type { LimitStatus } from '@/types/LimitStatus';
+import type { LimitConfig } from '@/types/LimitConfig';
 
 export default defineComponent({
     components: {
@@ -367,12 +368,11 @@ export default defineComponent({
             devInfoLoading: true,
 
             limitSettingView: {} as bootstrap.Modal,
-            limitSettingSerial: 0,
             limitSettingLoading: true,
 
             currentLimitList: {} as LimitStatus,
+            targetLimitList: {} as LimitConfig,
 
-            targetLimit: 0,
             targetLimitMin: 10,
             targetLimitMax: 100,
             targetLimitTypeText: "Relative (%)",
@@ -524,19 +524,20 @@ export default defineComponent({
             this.devInfoView.show();
         },
         onHideLimitSettings() {
-            this.limitSettingSerial = 0;
-            this.targetLimit = 0;
-            this.targetLimitType = 1;
-            this.targetLimitTypeText = "Relative (%)";
             this.showAlertLimit = false;
         },
         onShowLimitSettings(serial: number) {
+            this.targetLimitList.serial = 0;
+            this.targetLimitList.limit_value = 0;
+            this.targetLimitType = 1;
+            this.targetLimitTypeText = "Relative (%)";
+
             this.limitSettingLoading = true;
             fetch("/api/limit/status")
                 .then((response) => response.json())
                 .then((data) => {
                     this.currentLimitList = data[serial];
-                    this.limitSettingSerial = serial;
+                    this.targetLimitList.serial = serial;
                     this.limitSettingLoading = false;
                 });
 
@@ -545,15 +546,11 @@ export default defineComponent({
         onSubmitLimit(e: Event) {
             e.preventDefault();
 
-            const data = {
-                serial: this.limitSettingSerial,
-                limit_value: this.targetLimit,
-                limit_type: (this.targetLimitPersistent ? 256 : 0) + this.targetLimitType,
-            };
+            this.targetLimitList.limit_type = (this.targetLimitPersistent ? 256 : 0) + this.targetLimitType
             const formData = new FormData();
-            formData.append("data", JSON.stringify(data));
+            formData.append("data", JSON.stringify(this.targetLimitList));
 
-            console.log(data);
+            console.log(this.targetLimitList);
 
             fetch("/api/limit/config", {
                 method: "POST",
