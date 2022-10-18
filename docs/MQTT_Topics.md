@@ -39,7 +39,7 @@ serial will be replaced with the serial number of the inverter.
 | [serial]/0/temperature                  | R     | Temperature of inverter in degree celsius            | Degree Celsius (°C)        |
 | [serial]/0/voltage                      | R     | AC voltage in volt                                   | Volt (V)                   |
 | [serial]/0/yieldday                     | R     | Energy converted to AC per day in watt hours         | Watt hours (Wh)            |
-| [serial]/0/yieldtotal                   | R     | Energy converted to AC since reset watt hours        | Watt hours (Wh)            |
+| [serial]/0/yieldtotal                   | R     | Energy converted to AC since reset watt hours        | Watt hours (kWh)           |
 
 ### DC input channel topics
 
@@ -52,7 +52,7 @@ serial will be replaced with the serial number of the inverter.
 | [serial]/[1-4]/power                    | R     | DC power of specific input in watt                   | Watt (W)                   |
 | [serial]/[1-4]/voltage                  | R     | DC voltage of specific input in volt                 | Volt (V)                   |
 | [serial]/[1-4]/yieldday                 | R     | Energy converted to AC per day on specific input     | Watt hours (Wh)            |
-| [serial]/[1-4]/yieldtotal               | R     | Energy converted to AC since reset on specific input | Watt hours (Wh)            |
+| [serial]/[1-4]/yieldtotal               | R     | Energy converted to AC since reset on specific input | Watt hours (kWh)           |
 
 ### Inverter limit specific topics
 
