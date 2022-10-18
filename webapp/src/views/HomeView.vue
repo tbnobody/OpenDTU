@@ -586,7 +586,7 @@ export default defineComponent({
             } else {
                 this.targetLimitTypeText = "Absolute (W)";
                 this.targetLimitMin = 10;
-                this.targetLimitMax = 1500;
+                this.targetLimitMax = (this.currentLimitList.max_power > 0 ? this.currentLimitList.max_power : 1500);
             }
             this.targetLimitType = type;
         },
