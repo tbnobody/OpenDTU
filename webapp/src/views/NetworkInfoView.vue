@@ -1,29 +1,19 @@
 <template>
-    <div class="container-xxl" role="main">
-        <div class="page-header">
-            <h1>Network Info</h1>
-        </div>
-        <div class="text-center" v-if="dataLoading">
-            <div class="spinner-border" role="status">
-                <span class="visually-hidden">Loading...</span>
-            </div>
-        </div>
-
-        <template v-if="!dataLoading">
-            <WifiStationInfo :networkStatus="networkDataList" />
-            <div class="mt-5"></div>
-            <WifiApInfo :networkStatus="networkDataList" />
-            <div class="mt-5"></div>
-            <InterfaceNetworkInfo :networkStatus="networkDataList" />
-            <div class="mt-5"></div>
-            <InterfaceApInfo :networkStatus="networkDataList" />
-            <div class="mt-5"></div>
-        </template>
-    </div>
+    <BasePage :title="'Network Info'" :isLoading="dataLoading">
+        <WifiStationInfo :networkStatus="networkDataList" />
+        <div class="mt-5"></div>
+        <WifiApInfo :networkStatus="networkDataList" />
+        <div class="mt-5"></div>
+        <InterfaceNetworkInfo :networkStatus="networkDataList" />
+        <div class="mt-5"></div>
+        <InterfaceApInfo :networkStatus="networkDataList" />
+        <div class="mt-5"></div>
+    </BasePage>
 </template>
 
 <script lang="ts">
 import { defineComponent } from 'vue';
+import BasePage from '@/components/BasePage.vue';
 import WifiStationInfo from "@/components/WifiStationInfo.vue";
 import WifiApInfo from "@/components/WifiApInfo.vue";
 import InterfaceNetworkInfo from "@/components/InterfaceNetworkInfo.vue";
@@ -32,6 +22,7 @@ import type { NetworkStatus } from '@/types/NetworkStatus';
 
 export default defineComponent({
     components: {
+        BasePage,
         WifiStationInfo,
         WifiApInfo,
         InterfaceNetworkInfo,

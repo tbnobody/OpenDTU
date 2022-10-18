@@ -1,9 +1,5 @@
 <template>
-    <div class="container-xxl" role="main">
-        <div class="page-header">
-            <h1>Firmware Upgrade</h1>
-        </div>
-
+    <BasePage :title="'Firmware Upgrade'">
         <div class="position-relative" v-if="loading">
             <div class="position-absolute top-50 start-50 translate-middle">
                 <div class="spinner-border" role="status">
@@ -68,11 +64,12 @@
                 </div>
             </div>
         </div>
-    </div>
+    </BasePage>
 </template>
 
 <script lang="ts">
 import { defineComponent } from 'vue';
+import BasePage from '@/components/BasePage.vue';
 import SparkMD5 from "spark-md5";
 import {
     BIconExclamationCircleFill,
@@ -83,6 +80,7 @@ import {
 
 export default defineComponent({
     components: {
+        BasePage,
         BIconExclamationCircleFill,
         BIconArrowLeft,
         BIconArrowRepeat,

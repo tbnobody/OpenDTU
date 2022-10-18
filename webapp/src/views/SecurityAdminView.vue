@@ -1,60 +1,51 @@
 <template>
-    <div class="container-xxl" role="main">
-        <div class="page-header">
-            <h1>Security Settings</h1>
-        </div>
+    <BasePage :title="'Security Settings'" :isLoading="dataLoading">
         <BootstrapAlert v-model="showAlert" dismissible :variant="alertType">
             {{ alertMessage }}
         </BootstrapAlert>
 
-        <div class="text-center" v-if="dataLoading">
-            <div class="spinner-border" role="status">
-                <span class="visually-hidden">Loading...</span>
-            </div>
-        </div>
-
-        <template v-if="!dataLoading">
-            <form @submit="savePasswordConfig">
-                <div class="card">
-                    <div class="card-header text-white bg-primary">Admin password</div>
-                    <div class="card-body">
-                        <div class="row mb-3">
-                            <label for="inputPassword" class="col-sm-2 col-form-label">Password:</label>
-                            <div class="col-sm-10">
-                                <input type="password" class="form-control" id="inputPassword" maxlength="64"
-                                    placeholder="Password" v-model="securityConfigList.password" />
-                            </div>
+        <form @submit="savePasswordConfig">
+            <div class="card">
+                <div class="card-header text-white bg-primary">Admin password</div>
+                <div class="card-body">
+                    <div class="row mb-3">
+                        <label for="inputPassword" class="col-sm-2 col-form-label">Password:</label>
+                        <div class="col-sm-10">
+                            <input type="password" class="form-control" id="inputPassword" maxlength="64"
+                                placeholder="Password" v-model="securityConfigList.password" />
                         </div>
-
-                        <div class="row mb-3">
-                            <label for="inputPasswordRepeat" class="col-sm-2 col-form-label">Repeat Password:</label>
-                            <div class="col-sm-10">
-                                <input type="password" class="form-control" id="inputPasswordRepeat" maxlength="64"
-                                    placeholder="Password" v-model="passwordRepeat" />
-                            </div>
-                        </div>
-
-                        <div class="alert alert-secondary" role="alert">
-                            <b>Hint:</b>
-                            The administrator password is used to connect to the device when in AP mode.
-                            It must be 8..64 characters.
-                        </div>
-
                     </div>
+
+                    <div class="row mb-3">
+                        <label for="inputPasswordRepeat" class="col-sm-2 col-form-label">Repeat Password:</label>
+                        <div class="col-sm-10">
+                            <input type="password" class="form-control" id="inputPasswordRepeat" maxlength="64"
+                                placeholder="Password" v-model="passwordRepeat" />
+                        </div>
+                    </div>
+
+                    <div class="alert alert-secondary" role="alert">
+                        <b>Hint:</b>
+                        The administrator password is used to connect to the device when in AP mode.
+                        It must be 8..64 characters.
+                    </div>
+
                 </div>
-                <button type="submit" class="btn btn-primary mb-3">Save</button>
-            </form>
-        </template>
-    </div>
+            </div>
+            <button type="submit" class="btn btn-primary mb-3">Save</button>
+        </form>
+    </BasePage>
 </template>
 
 <script lang="ts">
 import { defineComponent } from 'vue';
+import BasePage from '@/components/BasePage.vue';
 import BootstrapAlert from "@/components/BootstrapAlert.vue";
 import type { SecurityConfig } from '@/types/SecurityConfig';
 
 export default defineComponent({
     components: {
+        BasePage,
         BootstrapAlert,
     },
     data() {

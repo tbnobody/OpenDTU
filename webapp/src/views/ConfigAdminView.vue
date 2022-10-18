@@ -1,121 +1,110 @@
 <template>
-    <div class="container-xxl" role="main">
-        <div class="page-header">
-            <h1>Config Management</h1>
-        </div>
+    <BasePage :title="'Config Management'" :isLoading="loading">
         <BootstrapAlert v-model="showAlert" dismissible :variant="alertType">
             {{ alertMessage }}
         </BootstrapAlert>
 
-        <div class="text-center" v-if="loading">
-            <div class="spinner-border" role="status">
-                <span class="visually-hidden">Loading...</span>
+        <div class="card">
+            <div class="card-header text-white bg-primary">Backup: Configuration File Backup</div>
+            <div class="card-body text-center">
+                Backup the configuration file
+                <button class="btn btn-primary" @click="downloadConfig">Backup
+                </button>
             </div>
         </div>
 
-        <template v-if="!loading">
-            <div class="card">
-                <div class="card-header text-white bg-primary">Backup: Configuration File Backup</div>
-                <div class="card-body text-center">
-                    Backup the configuration file
-                    <button class="btn btn-primary" @click="downloadConfig">Backup
+        <div class="card mt-5">
+            <div class="card-header text-white bg-primary">Restore: Restore the Configuration File</div>
+            <div class="card-body text-center">
+
+                <div v-if="!uploading && UploadError != ''">
+                    <p class="h1 mb-2">
+                        <BIconExclamationCircleFill />
+                    </p>
+                    <span style="vertical-align: middle" class="ml-2">
+                        {{ UploadError }}
+                    </span>
+                    <br />
+                    <br />
+                    <button class="btn btn-light" @click="clear">
+                        <BIconArrowLeft /> Back
                     </button>
                 </div>
-            </div>
 
-            <div class="card mt-5">
-                <div class="card-header text-white bg-primary">Restore: Restore the Configuration File</div>
-                <div class="card-body text-center">
-
-                    <div v-if="!uploading && UploadError != ''">
-                        <p class="h1 mb-2">
-                            <BIconExclamationCircleFill />
-                        </p>
-                        <span style="vertical-align: middle" class="ml-2">
-                            {{ UploadError }}
-                        </span>
-                        <br />
-                        <br />
-                        <button class="btn btn-light" @click="clear">
-                            <BIconArrowLeft /> Back
-                        </button>
-                    </div>
-
-                    <div v-else-if="!uploading && UploadSuccess">
-                        <span class="h1 mb-2">
-                            <BIconCheckCircle />
-                        </span>
-                        <span> Upload Success </span>
-                        <br />
-                        <br />
-                        <button class="btn btn-primary" @click="clear">
-                            <BIconArrowLeft /> Back
-                        </button>
-                    </div>
-
-                    <div v-else-if="!uploading">
-                        <div class="form-group pt-2 mt-3">
-                            <input class="form-control" type="file" ref="file" accept=".json" @change="uploadConfig" />
-                        </div>
-                    </div>
-
-                    <div v-else-if="uploading">
-                        <div class="progress">
-                            <div class="progress-bar" role="progressbar" :style="{ width: progress + '%' }"
-                                v-bind:aria-valuenow="progress" aria-valuemin="0" aria-valuemax="100">
-                                {{ progress }}%
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="alert alert-danger mt-3" role="alert">
-                        <b>Note:</b> This operation replaces the configuration file with the restored configuration and
-                        restarts OpenDTU to apply all settings.
-                    </div>
-                </div>
-            </div>
-
-            <div class="card mt-5">
-                <div class="card-header text-white bg-primary">Initialize: Perform Factory Reset</div>
-                <div class="card-body text-center">
-
-                    <button class="btn btn-danger" @click="onFactoryResetModal">Restore Factory-Default Settings
+                <div v-else-if="!uploading && UploadSuccess">
+                    <span class="h1 mb-2">
+                        <BIconCheckCircle />
+                    </span>
+                    <span> Upload Success </span>
+                    <br />
+                    <br />
+                    <button class="btn btn-primary" @click="clear">
+                        <BIconArrowLeft /> Back
                     </button>
+                </div>
 
-                    <div class="alert alert-danger mt-3" role="alert">
-                        <b>Note:</b> Click Restore Factory-Default Settings to restore and initialize the
-                        factory-default settings and reboot.
+                <div v-else-if="!uploading">
+                    <div class="form-group pt-2 mt-3">
+                        <input class="form-control" type="file" ref="file" accept=".json" @change="uploadConfig" />
                     </div>
                 </div>
-            </div>
-        </template>
 
-        <div class="modal" id="factoryReset" tabindex="-1">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title">Factory Reset</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <div v-else-if="uploading">
+                    <div class="progress">
+                        <div class="progress-bar" role="progressbar" :style="{ width: progress + '%' }"
+                            v-bind:aria-valuenow="progress" aria-valuemin="0" aria-valuemax="100">
+                            {{ progress }}%
+                        </div>
                     </div>
-                    <div class="modal-body">
-                        Are you sure you want to delete the current configuration and reset all settings to their
-                        factory defaults?
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" @click="onFactoryResetCancel"
-                            data-bs-dismiss="modal">Cancel</button>
-                        <button type="button" class="btn btn-danger" @click="onFactoryResetPerform">Factory
-                            Reset!</button>
-                    </div>
+                </div>
+
+                <div class="alert alert-danger mt-3" role="alert">
+                    <b>Note:</b> This operation replaces the configuration file with the restored configuration and
+                    restarts OpenDTU to apply all settings.
                 </div>
             </div>
         </div>
 
+        <div class="card mt-5">
+            <div class="card-header text-white bg-primary">Initialize: Perform Factory Reset</div>
+            <div class="card-body text-center">
+
+                <button class="btn btn-danger" @click="onFactoryResetModal">Restore Factory-Default Settings
+                </button>
+
+                <div class="alert alert-danger mt-3" role="alert">
+                    <b>Note:</b> Click Restore Factory-Default Settings to restore and initialize the
+                    factory-default settings and reboot.
+                </div>
+            </div>
+        </div>
+    </BasePage>
+
+    <div class="modal" id="factoryReset" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Factory Reset</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    Are you sure you want to delete the current configuration and reset all settings to their
+                    factory defaults?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" @click="onFactoryResetCancel"
+                        data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-danger" @click="onFactoryResetPerform">Factory
+                        Reset!</button>
+                </div>
+            </div>
+        </div>
     </div>
 </template>
 
 <script lang="ts">
 import { defineComponent } from 'vue';
+import BasePage from '@/components/BasePage.vue';
 import {
     BIconExclamationCircleFill,
     BIconArrowLeft,
@@ -126,6 +115,7 @@ import BootstrapAlert from "@/components/BootstrapAlert.vue";
 
 export default defineComponent({
     components: {
+        BasePage,
         BIconExclamationCircleFill,
         BIconArrowLeft,
         BIconCheckCircle,

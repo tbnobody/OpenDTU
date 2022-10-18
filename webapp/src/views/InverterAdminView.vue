@@ -1,9 +1,5 @@
 <template>
-    <div class="container-xxl" role="main">
-        <div class="page-header">
-            <h1>Inverter Settings</h1>
-        </div>
-
+    <BasePage :title="'Inverter Settings'" :isLoading="dataLoading">
         <BootstrapAlert v-model="showAlert" dismissible :variant="alertType">
             {{ alertMessage }}
         </BootstrapAlert>
@@ -72,80 +68,79 @@
                 </div>
             </div>
         </div>
+    </BasePage>
 
-        <div class="modal" id="inverterEdit" tabindex="-1">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title">Edit Inverter</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body">
+    <div class="modal" id="inverterEdit" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Edit Inverter</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
 
-                        <form>
-                            <div class="mb-3">
-                                <label for="inverter-serial" class="col-form-label">Serial:</label>
-                                <input v-model="editInverterData.serial" type="number" id="inverter-serial"
-                                    class="form-control" />
+                    <form>
+                        <div class="mb-3">
+                            <label for="inverter-serial" class="col-form-label">Serial:</label>
+                            <input v-model="editInverterData.serial" type="number" id="inverter-serial"
+                                class="form-control" />
+                        </div>
+                        <div class="mb-3">
+                            <label for="inverter-name" class="col-form-label">Name:</label>
+                            <input v-model="editInverterData.name" type="text" id="inverter-name" class="form-control"
+                                maxlength="31" />
+                        </div>
+
+                        <div class="mb-3" v-for="(max, index) in editInverterData.max_power" :key="`${index}`">
+                            <label :for="`inverter-max_${index}`" class="col-form-label">Max power string {{ index +
+                            1
+                            }}:</label>
+                            <div class="input-group">
+                                <input type="number" class="form-control" :id="`inverter-max_${index}`" min="0"
+                                    v-model="editInverterData.max_power[index]"
+                                    :aria-describedby="`inverter-maxDescription_${index} inverter-maxHelpText_${index}`" />
+                                <span class="input-group-text" :id="`inverter-maxDescription_${index}`">W</span>
                             </div>
-                            <div class="mb-3">
-                                <label for="inverter-name" class="col-form-label">Name:</label>
-                                <input v-model="editInverterData.name" type="text" id="inverter-name"
-                                    class="form-control" maxlength="31" />
-                            </div>
+                            <div :id="`inverter-maxHelpText_${index}`" class="form-text">This value is used to
+                                calculate the Irradiation.</div>
+                        </div>
+                    </form>
 
-                            <div class="mb-3" v-for="(max, index) in editInverterData.max_power" :key="`${index}`">
-                                <label :for="`inverter-max_${index}`" class="col-form-label">Max power string {{ index +
-                                1
-                                }}:</label>
-                                <div class="input-group">
-                                    <input type="number" class="form-control" :id="`inverter-max_${index}`" min="0"
-                                        v-model="editInverterData.max_power[index]"
-                                        :aria-describedby="`inverter-maxDescription_${index} inverter-maxHelpText_${index}`" />
-                                    <span class="input-group-text" :id="`inverter-maxDescription_${index}`">W</span>
-                                </div>
-                                <div :id="`inverter-maxHelpText_${index}`" class="form-text">This value is used to
-                                    calculate the Irradiation.</div>
-                            </div>
-                        </form>
-
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" @click="onCancel"
-                            data-bs-dismiss="modal">Cancel</button>
-                        <button type="button" class="btn btn-primary" @click="onEditSubmit(editId)">Save
-                            changes</button>
-                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" @click="onCancel"
+                        data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" @click="onEditSubmit(editId)">Save
+                        changes</button>
                 </div>
             </div>
         </div>
+    </div>
 
-        <div class="modal" id="inverterDelete" tabindex="-1">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title">Delete Inverter</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body">
-                        Are you sure you want to delete the inverter "{{ deleteInverterData.name }}" with serial number
-                        {{ deleteInverterData.serial }}?
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" @click="onDeleteCancel"
-                            data-bs-dismiss="modal">Cancel</button>
-                        <button type="button" class="btn btn-danger"
-                            @click="onDelete(deleteId.toString())">Delete</button>
-                    </div>
+    <div class="modal" id="inverterDelete" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Delete Inverter</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    Are you sure you want to delete the inverter "{{ deleteInverterData.name }}" with serial number
+                    {{ deleteInverterData.serial }}?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" @click="onDeleteCancel"
+                        data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-danger" @click="onDelete(deleteId.toString())">Delete</button>
                 </div>
             </div>
         </div>
-
     </div>
 </template>
 
 <script lang="ts">
 import { defineComponent } from 'vue';
+import BasePage from '@/components/BasePage.vue';
 import {
     BIconTrash,
     BIconPencil
@@ -163,6 +158,7 @@ declare interface Inverter {
 
 export default defineComponent({
     components: {
+        BasePage,
         BootstrapAlert,
         BIconTrash,
         BIconPencil,
@@ -177,6 +173,7 @@ export default defineComponent({
             editInverterData: {} as Inverter,
             deleteInverterData: {} as Inverter,
             inverters: [] as Inverter[],
+            dataLoading: true,
             alertMessage: "",
             alertType: "info",
             showAlert: false,
@@ -198,9 +195,13 @@ export default defineComponent({
     },
     methods: {
         getInverters() {
+            this.dataLoading = true;
             fetch("/api/inverter/list")
                 .then((response) => response.json())
-                .then((data) => (this.inverters = data.inverter));
+                .then((data) => {
+                    this.inverters = data.inverter;
+                    this.dataLoading = false;
+                });
         },
         onSubmit() {
             const formData = new FormData();

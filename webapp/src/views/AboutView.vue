@@ -1,10 +1,5 @@
 <template>
-    <div class="container-xxl" role="main">
-        <div class="page-header">
-            <h1>About OpenDTU</h1>
-        </div>
-
-
+    <BasePage :title="'About OpenDTU'">
         <div class="accordion" id="accordionExample">
             <div class="accordion-item">
                 <h2 class="accordion-header" id="headingOne">
@@ -96,12 +91,13 @@
 
         </div>
 
-    </div>
+    </BasePage>
 
 </template>
 
 <script lang="ts">
 import { defineComponent } from 'vue';
+import BasePage from '@/components/BasePage.vue';
 import {
     BIconInfoCircle,
     BIconActivity,
@@ -111,6 +107,7 @@ import {
 
 export default defineComponent({
     components: {
+        BasePage,
         BIconInfoCircle,
         BIconActivity,
         BIconBug,

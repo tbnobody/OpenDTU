@@ -1,30 +1,19 @@
 <template>
-    <div class="container-xxl" role="main">
-        <div class="page-header">
-            <h1>System Info</h1>
-        </div>
-
-        <div class="text-center" v-if="dataLoading">
-            <div class="spinner-border" role="status">
-                <span class="visually-hidden">Loading...</span>
-            </div>
-        </div>
-
-        <template v-if="!dataLoading">
-            <FirmwareInfo :systemStatus="systemDataList" />
-            <div class="mt-5"></div>
-            <HardwareInfo :systemStatus="systemDataList" />
-            <div class="mt-5"></div>
-            <MemoryInfo :systemStatus="systemDataList" />
-            <div class="mt-5"></div>
-            <RadioInfo :systemStatus="systemDataList" />
-            <div class="mt-5"></div>
-        </template>
-    </div>
+    <BasePage :title="'System Info'" :isLoading="dataLoading">
+        <FirmwareInfo :systemStatus="systemDataList" />
+        <div class="mt-5"></div>
+        <HardwareInfo :systemStatus="systemDataList" />
+        <div class="mt-5"></div>
+        <MemoryInfo :systemStatus="systemDataList" />
+        <div class="mt-5"></div>
+        <RadioInfo :systemStatus="systemDataList" />
+        <div class="mt-5"></div>
+    </BasePage>
 </template>
 
 <script lang="ts">
 import { defineComponent } from 'vue';
+import BasePage from '@/components/BasePage.vue';
 import HardwareInfo from "@/components/HardwareInfo.vue";
 import FirmwareInfo from "@/components/FirmwareInfo.vue";
 import MemoryInfo from "@/components/MemoryInfo.vue";
@@ -33,6 +22,7 @@ import type { SystemStatus } from '@/types/SystemStatus';
 
 export default defineComponent({
     components: {
+        BasePage,
         HardwareInfo,
         FirmwareInfo,
         MemoryInfo,
