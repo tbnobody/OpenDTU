@@ -82,7 +82,7 @@ uint16_t DevInfoParser::getFwBuildVersion()
 
 time_t DevInfoParser::getFwBuildDateTime()
 {
-    struct tm timeinfo = { 0 };
+    struct tm timeinfo = { };
     timeinfo.tm_year = ((((uint16_t)_payloadDevInfoAll[2]) << 8) | _payloadDevInfoAll[3]) - 1900;
 
     timeinfo.tm_mon = ((((uint16_t)_payloadDevInfoAll[4]) << 8) | _payloadDevInfoAll[5]) / 100 - 1;

@@ -258,7 +258,7 @@ void WebApiNtpClass::onNtpTimePost(AsyncWebServerRequest* request)
     local.tm_year = root[F("year")].as<uint>() - 1900; // years since 1900
 
     time_t t = mktime(&local);
-    struct timeval now = { .tv_sec = t };
+    struct timeval now = { .tv_sec = t, .tv_usec = 0 };
     settimeofday(&now, NULL);
 
     retMsg[F("type")] = F("success");
