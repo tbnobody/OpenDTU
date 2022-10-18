@@ -179,12 +179,12 @@
                                 <div class="col-sm-4">
                                     <div class="input-group">
                                         <input type="number" class="form-control" id="inputCurrentLimit"
-                                            aria-describedby="currentLimitType" v-model="currentLimit" disabled />
+                                            aria-describedby="currentLimitType" v-model="currentLimitRelative" disabled />
                                         <span class="input-group-text" id="currentLimitType">%</span>
                                     </div>
                                 </div>
 
-                                <div class="col-sm-4" v-if="maxPower > 0">
+                                <div class="col-sm-4" v-if="currentLimitList.max_power > 0">
                                     <div class="input-group">
                                         <input type="number" class="form-control" id="inputCurrentLimitAbsolute"
                                             aria-describedby="currentLimitTypeAbsolute" v-model="currentLimitAbsolute"
@@ -199,12 +199,12 @@
                                     Status:</label>
                                 <div class="col-sm-9">
                                     <span class="badge" :class="{
-                                        'bg-danger': successCommandLimit == 'Failure',
-                                        'bg-warning': successCommandLimit == 'Pending',
-                                        'bg-success': successCommandLimit == 'Ok',
-                                        'bg-secondary': successCommandLimit == 'Unknown',
+                                        'bg-danger': currentLimitList.limit_set_status == 'Failure',
+                                        'bg-warning': currentLimitList.limit_set_status == 'Pending',
+                                        'bg-success': currentLimitList.limit_set_status == 'Ok',
+                                        'bg-secondary': currentLimitList.limit_set_status == 'Unknown',
                                     }">
-                                        {{ successCommandLimit }}
+                                        {{ currentLimitList.limit_set_status }}
                                     </span>
                                 </div>
                             </div>
@@ -331,6 +331,7 @@ import InverterChannelInfo from "@/components/InverterChannelInfo.vue";
 import type { DevInfoStatus } from '@/types/DevInfoStatus';
 import type { EventlogItems } from '@/types/EventlogStatus';
 import type { Inverters } from '@/types/LiveDataStatus';
+import type { LimitStatus } from '@/types/LimitStatus';
 
 export default defineComponent({
     components: {
@@ -369,10 +370,8 @@ export default defineComponent({
             limitSettingSerial: 0,
             limitSettingLoading: true,
 
-            currentLimit: 0,
-            currentLimitAbsolute: 0,
-            successCommandLimit: "",
-            maxPower: 0,
+            currentLimitList: {} as LimitStatus,
+
             targetLimit: 0,
             targetLimitMin: 10,
             targetLimitMax: 100,
@@ -422,6 +421,17 @@ export default defineComponent({
                 const firstTab = new bootstrap.Tab(firstTabEl);
                 firstTab.show();
             }
+        }
+    },
+    computed: {
+        currentLimitAbsolute(): number {
+            if (this.currentLimitList.max_power > 0) {
+                return Number((this.currentLimitList.limit_relative * this.currentLimitList.max_power / 100).toFixed(1));
+            }
+            return 0;
+        },
+        currentLimitRelative(): number {
+            return Number((this.currentLimitList.limit_relative).toFixed(1));
         }
     },
     methods: {
@@ -525,12 +535,7 @@ export default defineComponent({
             fetch("/api/limit/status")
                 .then((response) => response.json())
                 .then((data) => {
-                    this.maxPower = data[serial].max_power;
-                    this.currentLimit = Number((data[serial].limit_relative).toFixed(1));
-                    if (this.maxPower > 0) {
-                        this.currentLimitAbsolute = Number((this.currentLimit * this.maxPower / 100).toFixed(1));
-                    }
-                    this.successCommandLimit = data[serial].limit_set_status;
+                    this.currentLimitList = data[serial];
                     this.limitSettingSerial = serial;
                     this.limitSettingLoading = false;
                 });
