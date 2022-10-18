@@ -39,7 +39,7 @@
                                     'bg-warning': inverter.reachable && !inverter.producing,
                                     'bg-primary': inverter.reachable && inverter.producing,
                                 }">
-                                <div class="p-2 flex-grow-1">
+                                <div class="p-1 flex-grow-1">
                                     <div class="d-flex flex-wrap">
                                         <div style="padding-right: 2em;">
                                             {{ inverter.name }}
