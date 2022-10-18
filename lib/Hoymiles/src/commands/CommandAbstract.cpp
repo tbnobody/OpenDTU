@@ -38,7 +38,7 @@ void CommandAbstract::setTargetAddress(uint64_t address)
     convertSerialToPacketId(&_payload[1], address);
     _targetAddress = address;
 }
-const uint64_t CommandAbstract::getTargetAddress()
+uint64_t CommandAbstract::getTargetAddress()
 {
     return _targetAddress;
 }
@@ -49,7 +49,7 @@ void CommandAbstract::setRouterAddress(uint64_t address)
     _routerAddress = address;
 }
 
-const uint64_t CommandAbstract::getRouterAddress()
+uint64_t CommandAbstract::getRouterAddress()
 {
     return _routerAddress;
 }

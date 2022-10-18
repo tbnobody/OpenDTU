@@ -37,7 +37,7 @@ public:
     const char* name();
     virtual String typeName() = 0;
     virtual const byteAssign_t* getByteAssignment() = 0;
-    virtual const uint8_t getAssignmentCount() = 0;
+    virtual uint8_t getAssignmentCount() = 0;
 
     bool isProducing();
     bool isReachable();
