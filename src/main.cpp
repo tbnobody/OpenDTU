@@ -7,6 +7,7 @@
 #include "MqttHassPublishing.h"
 #include "MqttPublishing.h"
 #include "MqttSettings.h"
+#include "MqttVictronPublishing.h"
 #include "NtpSettings.h"
 #include "WebApi.h"
 #include "NetworkSettings.h"
@@ -120,6 +121,8 @@ void loop()
     MqttPublishing.loop();
     yield();
     MqttHassPublishing.loop();
+    yield();
+    MqttVictronPublishing.loop();
     yield();
     WebApi.loop();
     yield();

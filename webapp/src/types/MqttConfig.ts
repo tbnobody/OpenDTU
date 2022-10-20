@@ -16,5 +16,6 @@ export interface MqttConfig {
     mqtt_hass_expire: boolean,
     mqtt_hass_retain: boolean,
     mqtt_hass_topic: string,
-    mqtt_hass_individualpanels: boolean
+    mqtt_hass_individualpanels: boolean,
+    mqtt_victron_enabled: boolean
 }

@@ -54,6 +54,8 @@ void WebApiInverterClass::onInverterList(AsyncWebServerRequest* request)
                 obj[F("type")] = inv->typeName();
             }
 
+            obj[F("phase")] = config.Inverter[i].CurrentPhase;
+
             for (uint8_t c = 0; c < INV_MAX_CHAN_COUNT; c++) {
                 obj[F("max_power")][c] = config.Inverter[i].MaxChannelPower[c];
             }
@@ -225,6 +227,8 @@ void WebApiInverterClass::onInverterEdit(AsyncWebServerRequest* request)
     // Interpret the string as a hex value and convert it to uint64_t
     inverter.Serial = new_serial;
     strncpy(inverter.Name, root[F("name")].as<String>().c_str(), INV_MAX_NAME_STRLEN);
+
+    inverter.CurrentPhase = strtoll(root[F("phase")].as<String>().c_str(), NULL, 16);
 
     uint8_t arrayCount = 0;
     for (JsonVariant maxPower : maxPowerArray) {

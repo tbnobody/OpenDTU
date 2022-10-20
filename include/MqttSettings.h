@@ -6,6 +6,7 @@
 #include <Ticker.h>
 #include <espMqttClient.h>
 #include <memory>
+#include <map>
 
 class MqttSettingsClass {
 public:
@@ -15,6 +16,14 @@ public:
     bool getConnected();
     void publish(String subtopic, String payload);
     void publishHass(String subtopic, String payload);
+
+    void publishVictron(String hoyserial, String payload);
+
+    const char* VictronPortalId;
+    std::map<String, String> VictronDeviceInstance;
+ 
+    String getVictronPortalId();
+    String getVictronDeviceInstance(String hoyserial);
 
     String getPrefix();
 
