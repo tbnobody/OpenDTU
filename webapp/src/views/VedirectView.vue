@@ -181,14 +181,7 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue';
-
-declare interface Vedirect {
-    SER: string,
-    PID: string,
-    FW: string,
-    age_critical: boolean,
-    data_age: 0,
-}
+import type { Vedirect } from '@/types/LiveDataStatus';
 
 export default defineComponent({
     components: {
@@ -270,10 +263,10 @@ export default defineComponent({
             this.heartInterval && clearTimeout(this.heartInterval);
             this.isFirstFetchAfterConnect = true;
         },
-        formatNumber(num: string) {
+        formatNumber(num: number) {
             return new Intl.NumberFormat(
                 undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }
-            ).format(parseFloat(num));
+            ).format(num);
         },
     },
 });

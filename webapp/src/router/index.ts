@@ -12,8 +12,8 @@ import InverterAdminView from '@/views/InverterAdminView.vue'
 import DtuAdminView from '@/views/DtuAdminView.vue'
 import FirmwareUpgradeView from '@/views/FirmwareUpgradeView.vue'
 import ConfigAdminView from '@/views/ConfigAdminView.vue'
-import VedirectAdminView from '@/components/VedirectAdminView.vue'
-import VedirectInfoView from '@/components/VedirectInfoView.vue'
+import VedirectAdminView from '@/views/VedirectAdminView.vue'
+import VedirectInfoView from '@/views/VedirectInfoView.vue'
 import SecurityAdminView from '@/views/SecurityAdminView.vue'
 
 const router = createRouter({

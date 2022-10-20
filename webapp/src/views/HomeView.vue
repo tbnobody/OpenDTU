@@ -101,6 +101,8 @@
         </div>
     </BasePage>
 
+    <VedirectView />
+
     <div class="modal" id="eventView" tabindex="-1">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
@@ -328,6 +330,7 @@ import EventLog from '@/components/EventLog.vue';
 import DevInfo from '@/components/DevInfo.vue';
 import BootstrapAlert from '@/components/BootstrapAlert.vue';
 import InverterChannelInfo from "@/components/InverterChannelInfo.vue";
+import VedirectView from '@/views/VedirectView.vue';
 import type { DevInfoStatus } from '@/types/DevInfoStatus';
 import type { EventlogItems } from '@/types/EventlogStatus';
 import type { Inverters } from '@/types/LiveDataStatus';
@@ -349,6 +352,7 @@ export default defineComponent({
         BIconToggleOn,
         BIconToggleOff,
         BIconArrowCounterclockwise,
+        VedirectView
     },
     data() {
         return {
