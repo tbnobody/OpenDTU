@@ -1,22 +1,25 @@
-import { createWebHistory, createRouter, RouteRecordRaw } from 'vue-router';
-import HomeView from '@/components/HomeView.vue'
-import AboutView from '@/components/AboutView.vue'
-import NetworkInfoView from '@/components/NetworkInfoView.vue'
-import SystemInfoView from '@/components/SystemInfoView.vue'
-import NtpInfoView from '@/components/NtpInfoView.vue'
-import NetworkAdminView from '@/components/NetworkAdminView.vue'
-import NtpAdminView from '@/components/NtpAdminView.vue'
-import MqttAdminView from '@/components/MqttAdminView.vue'
-import MqttInfoView from '@/components/MqttInfoView.vue'
-import InverterAdminView from '@/components/InverterAdminView.vue'
-import DtuAdminView from '@/components/DtuAdminView.vue'
-import FirmwareUpgradeView from '@/components/FirmwareUpgradeView.vue'
-import ConfigAdminView from '@/components/ConfigAdminView.vue'
+import { createRouter, createWebHistory } from 'vue-router';
+import HomeView from '@/views/HomeView.vue'
+import AboutView from '@/views/AboutView.vue'
+import NetworkInfoView from '@/views/NetworkInfoView.vue'
+import SystemInfoView from '@/views/SystemInfoView.vue'
+import NtpInfoView from '@/views/NtpInfoView.vue'
+import NetworkAdminView from '@/views/NetworkAdminView.vue'
+import NtpAdminView from '@/views/NtpAdminView.vue'
+import MqttAdminView from '@/views/MqttAdminView.vue'
+import MqttInfoView from '@/views/MqttInfoView.vue'
+import InverterAdminView from '@/views/InverterAdminView.vue'
+import DtuAdminView from '@/views/DtuAdminView.vue'
+import FirmwareUpgradeView from '@/views/FirmwareUpgradeView.vue'
+import ConfigAdminView from '@/views/ConfigAdminView.vue'
 import VedirectAdminView from '@/components/VedirectAdminView.vue'
 import VedirectInfoView from '@/components/VedirectInfoView.vue'
-import SecurityAdminView from '@/components/SecurityAdminView.vue'
+import SecurityAdminView from '@/views/SecurityAdminView.vue'
 
-const routes: Array<RouteRecordRaw> = [
+const router = createRouter({
+    history: createWebHistory(import.meta.env.BASE_URL),
+    linkActiveClass: "active",
+    routes: [
     {
         path: '/',
         name: 'Home',
@@ -97,12 +100,7 @@ const routes: Array<RouteRecordRaw> = [
         name: 'Security',
         component: SecurityAdminView
     }
-];
-
-const router = createRouter({
-    history: createWebHistory(),
-    routes,
-    linkActiveClass: "active",
-});
+]
+})
 
 export default router;

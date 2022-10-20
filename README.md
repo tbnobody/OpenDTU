@@ -163,6 +163,7 @@ This can be achieved by editing the 'platformio.ini' file and add/change one or 
   * clean the sources:  `platformio run -e generic -t clean`
   * erase flash: `platformio run -e generic -t erase`
 ### using the pre-compiled .bin files
+The pre-compiled files can be found on the [github page](https://github.com/tbnobody/OpenDTU) in the tab "Actions" and the sub menu "OpenDTU Build". Just choose the latest build from the master branch (blue font). You need to be logged in with your github account to download the files.
 Use a ESP32 flash tool of your choice and flash the .bin files to the right addresses:
 
 | Address  | File                   |
@@ -172,7 +173,8 @@ Use a ESP32 flash tool of your choice and flash the .bin files to the right addr
 | 0xe000   | boot_app0.bin          |
 | 0x10000  | opendtu-*.bin          |
 
-Make sure too uncheck the DoNotChgBin option. Otherwise you will maybe get errors like "invalid header"
+Make sure too uncheck the DoNotChgBin option. Otherwise you will maybe get errors like "invalid header".
+For further upgraded you can just use the web interface and upload the opendtu-*.bin file.
 
 ## First configuration
 * After the initial flashing of the microcontroller, an Access Point called "OpenDTU-*" is opened. The default password is "openDTU42".
