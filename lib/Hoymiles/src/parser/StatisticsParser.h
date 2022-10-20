@@ -68,6 +68,7 @@ typedef struct {
     uint8_t start; // pos of first byte in buffer
     uint8_t num; // number of bytes in buffer
     uint16_t div; // divisor / calc command
+    bool isSigned; // allow negative numbers
 } byteAssign_t;
 
 class StatisticsParser : public Parser {
