@@ -8,18 +8,6 @@
 
     <template v-else>
         <div class="row gy-3">
-            <div class="col-sm-3 col-md-2">
-                <div class="nav nav-pills row-cols-sm-1" id="v-pills-tab" role="tablist"
-                    aria-orientation="vertical">
-                    <button class="nav-link"
-                        :id="'v-pills-vedirect-tab'" data-bs-toggle="pill"
-                        :data-bs-target="'#v-pills-vedirect'" type="button" role="tab"
-                        aria-controls="'v-pills-vedirect'" aria-selected="true">
-                        Ve.Direct
-                    </button>
-                </div>
-            </div>
-
             <div class="tab-content col-sm-9 col-md-10" id="v-pills-tabContent">
                 <div class="tab-pane fade show"
                     :id="'v-pills-vedirect'" role="tabpanel"
@@ -30,11 +18,22 @@
                                 'bg-danger': vedirectData.age_critical,
                                 'bg-primary': !vedirectData.age_critical,
                             }">
-                            {{ vedirectData.PID }} (Serial Number:
-                            {{ vedirectData.SER }}, Firmware 
-                            {{ vedirectData.FW }}) (Data Age:
-                            {{ vedirectData.data_age }} seconds)
-
+                            <div class="p-1 flex-grow-1">
+                                <div class="d-flex flex-wrap">
+                                    <div style="padding-right: 2em;">
+                                        {{ vedirectData.PID }}
+                                    </div>
+                                    <div style="padding-right: 2em;">
+                                        Serial Number: {{ vedirectData.SER }}
+                                    </div>
+                                    <div style="padding-right: 2em;">
+                                        Firmware Number: {{ vedirectData.FW }}
+                                    </div>
+                                    <div style="padding-right: 2em;">
+                                        Data Age: {{ vedirectData.data_age }} seconds
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                         <div class="card-body">
                             <div class="row">
