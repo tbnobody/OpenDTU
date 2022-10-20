@@ -181,12 +181,12 @@
                                 <div class="col-sm-4">
                                     <div class="input-group">
                                         <input type="number" class="form-control" id="inputCurrentLimit"
-                                            aria-describedby="currentLimitType" v-model="currentLimit" disabled />
+                                            aria-describedby="currentLimitType" v-model="currentLimitRelative" disabled />
                                         <span class="input-group-text" id="currentLimitType">%</span>
                                     </div>
                                 </div>
 
-                                <div class="col-sm-4" v-if="maxPower > 0">
+                                <div class="col-sm-4" v-if="currentLimitList.max_power > 0">
                                     <div class="input-group">
                                         <input type="number" class="form-control" id="inputCurrentLimitAbsolute"
                                             aria-describedby="currentLimitTypeAbsolute" v-model="currentLimitAbsolute"
@@ -201,12 +201,12 @@
                                     Status:</label>
                                 <div class="col-sm-9">
                                     <span class="badge" :class="{
-                                        'bg-danger': successCommandLimit == 'Failure',
-                                        'bg-warning': successCommandLimit == 'Pending',
-                                        'bg-success': successCommandLimit == 'Ok',
-                                        'bg-secondary': successCommandLimit == 'Unknown',
+                                        'bg-danger': currentLimitList.limit_set_status == 'Failure',
+                                        'bg-warning': currentLimitList.limit_set_status == 'Pending',
+                                        'bg-success': currentLimitList.limit_set_status == 'Ok',
+                                        'bg-secondary': currentLimitList.limit_set_status == 'Unknown',
                                     }">
-                                        {{ successCommandLimit }}
+                                        {{ currentLimitList.limit_set_status }}
                                     </span>
                                 </div>
                             </div>
@@ -217,7 +217,7 @@
                                     <div class="input-group">
                                         <input type="number" name="inputTargetLimit" class="form-control"
                                             id="inputTargetLimit" :min="targetLimitMin" :max="targetLimitMax"
-                                            v-model="targetLimit">
+                                            v-model="targetLimitList.limit_value">
                                         <button class="btn btn-primary dropdown-toggle" type="button"
                                             data-bs-toggle="dropdown" aria-expanded="false">{{ targetLimitTypeText
                                             }}</button>
@@ -334,6 +334,8 @@ import VedirectView from '@/views/VedirectView.vue';
 import type { DevInfoStatus } from '@/types/DevInfoStatus';
 import type { EventlogItems } from '@/types/EventlogStatus';
 import type { Inverters } from '@/types/LiveDataStatus';
+import type { LimitStatus } from '@/types/LimitStatus';
+import type { LimitConfig } from '@/types/LimitConfig';
 
 export default defineComponent({
     components: {
@@ -370,14 +372,11 @@ export default defineComponent({
             devInfoLoading: true,
 
             limitSettingView: {} as bootstrap.Modal,
-            limitSettingSerial: 0,
             limitSettingLoading: true,
 
-            currentLimit: 0,
-            currentLimitAbsolute: 0,
-            successCommandLimit: "",
-            maxPower: 0,
-            targetLimit: 0,
+            currentLimitList: {} as LimitStatus,
+            targetLimitList: {} as LimitConfig,
+
             targetLimitMin: 10,
             targetLimitMax: 100,
             targetLimitTypeText: "Relative (%)",
@@ -426,6 +425,17 @@ export default defineComponent({
                 const firstTab = new bootstrap.Tab(firstTabEl);
                 firstTab.show();
             }
+        }
+    },
+    computed: {
+        currentLimitAbsolute(): number {
+            if (this.currentLimitList.max_power > 0) {
+                return Number((this.currentLimitList.limit_relative * this.currentLimitList.max_power / 100).toFixed(1));
+            }
+            return 0;
+        },
+        currentLimitRelative(): number {
+            return Number((this.currentLimitList.limit_relative).toFixed(1));
         }
     },
     methods: {
@@ -518,24 +528,20 @@ export default defineComponent({
             this.devInfoView.show();
         },
         onHideLimitSettings() {
-            this.limitSettingSerial = 0;
-            this.targetLimit = 0;
-            this.targetLimitType = 1;
-            this.targetLimitTypeText = "Relative (%)";
             this.showAlertLimit = false;
         },
         onShowLimitSettings(serial: number) {
+            this.targetLimitList.serial = 0;
+            this.targetLimitList.limit_value = 0;
+            this.targetLimitType = 1;
+            this.targetLimitTypeText = "Relative (%)";
+
             this.limitSettingLoading = true;
             fetch("/api/limit/status")
                 .then((response) => response.json())
                 .then((data) => {
-                    this.maxPower = data[serial].max_power;
-                    this.currentLimit = Number((data[serial].limit_relative).toFixed(1));
-                    if (this.maxPower > 0) {
-                        this.currentLimitAbsolute = Number((this.currentLimit * this.maxPower / 100).toFixed(1));
-                    }
-                    this.successCommandLimit = data[serial].limit_set_status;
-                    this.limitSettingSerial = serial;
+                    this.currentLimitList = data[serial];
+                    this.targetLimitList.serial = serial;
                     this.limitSettingLoading = false;
                 });
 
@@ -544,15 +550,11 @@ export default defineComponent({
         onSubmitLimit(e: Event) {
             e.preventDefault();
 
-            const data = {
-                serial: this.limitSettingSerial,
-                limit_value: this.targetLimit,
-                limit_type: (this.targetLimitPersistent ? 256 : 0) + this.targetLimitType,
-            };
+            this.targetLimitList.limit_type = (this.targetLimitPersistent ? 256 : 0) + this.targetLimitType
             const formData = new FormData();
-            formData.append("data", JSON.stringify(data));
+            formData.append("data", JSON.stringify(this.targetLimitList));
 
-            console.log(data);
+            console.log(this.targetLimitList);
 
             fetch("/api/limit/config", {
                 method: "POST",
@@ -588,7 +590,7 @@ export default defineComponent({
             } else {
                 this.targetLimitTypeText = "Absolute (W)";
                 this.targetLimitMin = 10;
-                this.targetLimitMax = 1500;
+                this.targetLimitMax = (this.currentLimitList.max_power > 0 ? this.currentLimitList.max_power : 1500);
             }
             this.targetLimitType = type;
         },

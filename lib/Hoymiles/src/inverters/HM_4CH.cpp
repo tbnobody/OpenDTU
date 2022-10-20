@@ -33,7 +33,7 @@ const byteAssign_t* HM_4CH::getByteAssignment()
     return byteAssignment;
 }
 
-const uint8_t HM_4CH::getAssignmentCount()
+uint8_t HM_4CH::getAssignmentCount()
 {
     return sizeof(byteAssignment) / sizeof(byteAssign_t);
 }

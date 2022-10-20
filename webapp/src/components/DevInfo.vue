@@ -14,6 +14,10 @@
                 </td>
             </tr>
             <tr>
+                <td>Detected max. Power</td>
+                <td>{{ devInfoList.max_power }} W</td>
+            </tr>
+            <tr>
                 <td>Bootloader Version</td>
                 <td>{{ formatVersion(devInfoList.fw_bootloader_version) }}</td>
             </tr>

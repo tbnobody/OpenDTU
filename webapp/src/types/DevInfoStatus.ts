@@ -5,5 +5,6 @@ export interface DevInfoStatus {
     fw_build_datetime: Date,
     hw_part_number: number,
     hw_version: number,
-    hw_model_name: string
+    hw_model_name: string,
+    max_power: number,
 }

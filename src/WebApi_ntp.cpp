@@ -228,21 +228,21 @@ void WebApiNtpClass::onNtpTimePost(AsyncWebServerRequest* request)
         return;
     }
 
-    if (root[F("hour")].as<uint>() < 0 || root[F("hour")].as<uint>() > 23) {
+    if (root[F("hour")].as<uint>() > 23) {
         retMsg[F("message")] = F("Hour must be a number between 0 and 23!");
         response->setLength();
         request->send(response);
         return;
     }
 
-    if (root[F("minute")].as<uint>() < 0 || root[F("minute")].as<uint>() > 59) {
+    if (root[F("minute")].as<uint>() > 59) {
         retMsg[F("message")] = F("Minute must be a number between 0 and 59!");
         response->setLength();
         request->send(response);
         return;
     }
 
-    if (root[F("second")].as<uint>() < 0 || root[F("second")].as<uint>() > 59) {
+    if (root[F("second")].as<uint>() > 59) {
         retMsg[F("message")] = F("Second must be a number between 0 and 59!");
         response->setLength();
         request->send(response);
@@ -258,7 +258,7 @@ void WebApiNtpClass::onNtpTimePost(AsyncWebServerRequest* request)
     local.tm_year = root[F("year")].as<uint>() - 1900; // years since 1900
 
     time_t t = mktime(&local);
-    struct timeval now = { .tv_sec = t };
+    struct timeval now = { .tv_sec = t, .tv_usec = 0 };
     settimeofday(&now, NULL);
 
     retMsg[F("type")] = F("success");

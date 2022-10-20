@@ -231,3 +231,4 @@ A documentation of all available MQTT Topics can be found here: [MQTT Documentat
 - [Ahoy](https://github.com/grindylow/ahoy)
 - [DTU Simulator](https://github.com/Ziyatoe/DTUsimMI1x00-Hoymiles)
 - [OpenDTU extended to talk to Victrons MPPT battery chargers (Ve.Direct)](https://github.com/helgeerbe/OpenDTU_VeDirect)
+- [BreakoutBoard - sample printed circuit board for OpenDTU and Ahoy](https://github.com/dokuhn/openDTU-BreakoutBoard)

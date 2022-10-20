@@ -1,21 +1,24 @@
 #include "DevInfoParser.h"
 #include <cstring>
 
+#define ALL 0xff
+
 typedef struct {
-    uint8_t hwPart[3];
+    uint8_t hwPart[4];
     uint16_t maxPower;
     const char* modelName;
 } devInfo_t;
 
 const devInfo_t devInfo[] = {
-    { { 0x10, 0x10, 0x10 }, 300, "HM-300" },
-    { { 0x10, 0x10, 0x20 }, 350, "HM-350" },
-    { { 0x10, 0x10, 0x40 }, 400, "HM-400" },
-    { { 0x10, 0x11, 0x10 }, 600, "HM-600" },
-    { { 0x10, 0x11, 0x20 }, 700, "HM-700" },
-    { { 0x10, 0x11, 0x40 }, 800, "HM-800" },
-    { { 0x10, 0x12, 0x10 }, 1200, "HM-1200" },
-    { { 0x10, 0x12, 0x30 }, 1500, "HM-1500" }
+    { { 0x10, 0x10, 0x10, ALL }, 300, "HM-300" },
+    { { 0x10, 0x10, 0x20, ALL }, 350, "HM-350" },
+    { { 0x10, 0x10, 0x40, ALL }, 400, "HM-400" },
+    { { 0x10, 0x11, 0x10, ALL }, 600, "HM-600" },
+    { { 0x10, 0x11, 0x20, ALL }, 700, "HM-700" },
+    { { 0x10, 0x11, 0x40, ALL }, 800, "HM-800" },
+    { { 0x10, 0x12, 0x10, ALL }, 1200, "HM-1200" },
+    { { 0x10, 0x12, 0x30, ALL }, 1500, "HM-1500" },
+    { { 0x10, 0x10, 0x10, 0x15 }, static_cast<uint16_t>(300 * 0.7), "HM-300" }, // HM-300 factory limitted to 70%
 };
 
 void DevInfoParser::clearBufferAll()
@@ -79,7 +82,7 @@ uint16_t DevInfoParser::getFwBuildVersion()
 
 time_t DevInfoParser::getFwBuildDateTime()
 {
-    struct tm timeinfo = { 0 };
+    struct tm timeinfo = { };
     timeinfo.tm_year = ((((uint16_t)_payloadDevInfoAll[2]) << 8) | _payloadDevInfoAll[3]) - 1900;
 
     timeinfo.tm_mon = ((((uint16_t)_payloadDevInfoAll[4]) << 8) | _payloadDevInfoAll[5]) / 100 - 1;
@@ -135,6 +138,17 @@ String DevInfoParser::getHwModelName()
 uint8_t DevInfoParser::getDevIdx()
 {
      uint8_t pos;
+     // Check for all 4 bytes first
+    for (pos = 0; pos < sizeof(devInfo) / sizeof(devInfo_t); pos++) {
+         if (devInfo[pos].hwPart[0] == _payloadDevInfoSimple[2]
+            && devInfo[pos].hwPart[1] == _payloadDevInfoSimple[3]
+            && devInfo[pos].hwPart[2] == _payloadDevInfoSimple[4]
+            && devInfo[pos].hwPart[3] == _payloadDevInfoSimple[5]) {
+            return pos;
+        }
+    }
+
+    // Then only for 3 bytes
     for (pos = 0; pos < sizeof(devInfo) / sizeof(devInfo_t); pos++) {
          if (devInfo[pos].hwPart[0] == _payloadDevInfoSimple[2]
             && devInfo[pos].hwPart[1] == _payloadDevInfoSimple[3]
