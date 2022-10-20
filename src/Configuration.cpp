@@ -142,6 +142,11 @@ bool ConfigurationClass::write()
         }
     }
 
+    JsonObject vedirect = doc.createNestedObject("vedirect");
+    vedirect["enabled"] = config.Vedirect_Enabled;
+    vedirect["updates_only"] = config.Vedirect_UpdatesOnly;
+    vedirect["poll_interval"] = config.Vedirect_PollInterval;
+
     // Serialize JSON to file
     if (serializeJson(doc, f) == 0) {
         Serial.println("Failed to write file");
@@ -282,6 +287,11 @@ bool ConfigurationClass::readJson()
             config.Inverter[i].MaxChannelPower[c] = channels[c];
         }
     }
+
+    JsonObject vedirect = doc["vedirect"];
+    config.Vedirect_Enabled = vedirect["enabled"] | VEDIRECT_ENABLED;
+    config.Vedirect_UpdatesOnly = vedirect["updates_only"] | VEDIRECT_UPDATESONLY;
+    config.Vedirect_PollInterval = vedirect["poll_interval"] | VEDIRECT_POLL_INTERVAL;
 
     f.close();
     return true;
