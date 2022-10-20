@@ -48,6 +48,7 @@ void WebApiMqttClass::onMqttStatus(AsyncWebServerRequest* request)
     root[F("mqtt_hass_retain")] = config.Mqtt_Hass_Retain;
     root[F("mqtt_hass_topic")] = config.Mqtt_Hass_Topic;
     root[F("mqtt_hass_individualpanels")] = config.Mqtt_Hass_IndividualPanels;
+    root[F("mqtt_victron_enabled")] = config.Mqtt_Victron_Enabled;
 
     response->setLength();
     request->send(response);
@@ -81,6 +82,7 @@ void WebApiMqttClass::onMqttAdminGet(AsyncWebServerRequest* request)
     root[F("mqtt_hass_retain")] = config.Mqtt_Hass_Retain;
     root[F("mqtt_hass_topic")] = config.Mqtt_Hass_Topic;
     root[F("mqtt_hass_individualpanels")] = config.Mqtt_Hass_IndividualPanels;
+    root[F("mqtt_victron_enabled")] = config.Mqtt_Victron_Enabled;
 
     response->setLength();
     request->send(response);
@@ -138,7 +140,8 @@ void WebApiMqttClass::onMqttAdminPost(AsyncWebServerRequest* request)
             && root.containsKey("mqtt_hass_expire")
             && root.containsKey("mqtt_hass_retain")
             && root.containsKey("mqtt_hass_topic")
-            && root.containsKey("mqtt_hass_individualpanels"))) {
+            && root.containsKey("mqtt_hass_individualpanels")
+            && root.containsKey("mqtt_victron_enabled"))) {
         retMsg[F("message")] = F("Values are missing!");
         response->setLength();
         request->send(response);
@@ -271,6 +274,7 @@ void WebApiMqttClass::onMqttAdminPost(AsyncWebServerRequest* request)
     config.Mqtt_Hass_Retain = root[F("mqtt_hass_retain")].as<bool>();
     config.Mqtt_Hass_IndividualPanels = root[F("mqtt_hass_individualpanels")].as<bool>();
     strlcpy(config.Mqtt_Hass_Topic, root[F("mqtt_hass_topic")].as<String>().c_str(), sizeof(config.Mqtt_Hass_Topic));
+    config.Mqtt_Victron_Enabled = root[F("mqtt_victron_enabled")].as<bool>();
     Configuration.write();
 
     retMsg[F("type")] = F("success");

@@ -39,6 +39,7 @@
                                 <th scope="col">Serial</th>
                                 <th>Name</th>
                                 <th>Type</th>
+                                <th>Phase</th>
                                 <th>Action</th>
                             </tr>
                         </thead>
@@ -47,6 +48,9 @@
                                 <td>{{ inverter.serial }}</td>
                                 <td>{{ inverter.name }}</td>
                                 <td>{{ inverter.type }}</td>
+                                <td>
+                                    L{{ inverter.phase}}
+                                </td>
                                 <td>
                                     <a href="#" class="icon text-danger" title="Delete inverter">
                                         <BIconTrash v-on:click="onOpenModal(modalDelete, inverter)" />
@@ -81,6 +85,17 @@
                                    class="form-control" maxlength="31" />
                         </div>
 
+                        <div class="row mb-3">
+                            <label for="inverter-phase" class="col-sm-2 col-form-label">Current phase:</label>
+                            <div class="col-sm-10">
+                                <select class="form-select" v-model="selectedInverterData.phase">
+                                    <option v-for="phase in phaseList" :key="phase.key" :value="phase.key">
+                                        {{ phase.value }}
+                                    </option>
+                                </select>
+                            </div>
+                        </div>                
+                        
                         <div v-for="(max, index) in selectedInverterData.channel" :key="`${index}`">
                             <div class="row g-2">
                                 <div class="col-md">
@@ -162,6 +177,7 @@ declare interface Inverter {
     serial: number;
     name: string;
     type: string;
+    phase: number;
     channel: Array<Channel>;
 }
 
@@ -186,6 +202,12 @@ export default defineComponent({
             selectedInverterData: {} as Inverter,
             inverters: [] as Inverter[],
             dataLoading: true,
+            phaseList: [
+                { key: 0, value: "None" },
+                { key: 1, value: "L1" },
+                { key: 2, value: "L2" },
+                { key: 3, value: "L3" },
+            ],
             alert: {} as AlertResponse
         };
     },

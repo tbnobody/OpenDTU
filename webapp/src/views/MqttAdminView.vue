@@ -28,6 +28,17 @@
                             </div>
                         </div>
                     </div>
+                    
+                    <div class="row mb-3" v-show="mqttConfigList.mqtt_enabled">
+                        <label class="col-sm-4 form-check-label" for="inputMqttVictron">Enable Victron Cerbo MQTT</label>
+                        <div class="col-sm-8">
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" id="inputMqttVictron"
+                                    v-model="mqttConfigList.mqtt_victron_enabled" />
+                            </div>
+                        </div>
+                    </div>
+
                 </div>
             </div>
 

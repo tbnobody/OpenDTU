@@ -37,6 +37,7 @@ struct CHANNEL_CONFIG_T {
 struct INVERTER_CONFIG_T {
     uint64_t Serial;
     char Name[INV_MAX_NAME_STRLEN + 1];
+    uint16_t CurrentPhase;    
     CHANNEL_CONFIG_T channel[INV_MAX_CHAN_COUNT];
 };
 
@@ -87,6 +88,8 @@ struct CONFIG_T {
     bool Mqtt_Hass_Expire;
 
     char Security_Password[WIFI_MAX_PASSWORD_STRLEN + 1];
+
+    bool Mqtt_Victron_Enabled;
 };
 
 class ConfigurationClass {

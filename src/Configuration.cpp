@@ -78,11 +78,15 @@ bool ConfigurationClass::write()
     JsonObject security = doc.createNestedObject("security");
     security["password"] = config.Security_Password;
 
+    JsonObject mqtt_victron = mqtt.createNestedObject("victron");
+    mqtt_victron["enabled"] = config.Mqtt_Victron_Enabled;
+
     JsonArray inverters = doc.createNestedArray("inverters");
     for (uint8_t i = 0; i < INV_MAX_COUNT; i++) {
         JsonObject inv = inverters.createNestedObject();
         inv["serial"] = config.Inverter[i].Serial;
         inv["name"] = config.Inverter[i].Name;
+        inv["phase"] = config.Inverter[i].CurrentPhase;
 
         JsonArray channel = inv.createNestedArray("channel");
         for (uint8_t c = 0; c < INV_MAX_CHAN_COUNT; c++) {
@@ -198,11 +202,15 @@ bool ConfigurationClass::read()
     JsonObject security = doc["security"];
     strlcpy(config.Security_Password, security["password"] | ACCESS_POINT_PASSWORD, sizeof(config.Security_Password));
 
+    JsonObject mqtt_victron = mqtt["victron"];
+    config.Mqtt_Victron_Enabled = mqtt_victron["enabled"] | MQTT_VICTRON_ENABLED;
+
     JsonArray inverters = doc["inverters"];
     for (uint8_t i = 0; i < INV_MAX_COUNT; i++) {
         JsonObject inv = inverters[i].as<JsonObject>();
         config.Inverter[i].Serial = inv["serial"] | 0ULL;
         strlcpy(config.Inverter[i].Name, inv["name"] | "", sizeof(config.Inverter[i].Name));
+        config.Inverter[i].CurrentPhase = inv["phase"] | 0ULL;
 
         JsonArray channel = inv["channel"];
         for (uint8_t c = 0; c < INV_MAX_CHAN_COUNT; c++) {

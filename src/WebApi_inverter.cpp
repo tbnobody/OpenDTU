@@ -8,6 +8,7 @@
 #include "Configuration.h"
 #include "Hoymiles.h"
 #include "MqttHassPublishing.h"
+#include "MqttVictronPublishing.h"
 #include "WebApi.h"
 #include "helper.h"
 
@@ -61,6 +62,8 @@ void WebApiInverterClass::onInverterList(AsyncWebServerRequest* request)
                 obj[F("type")] = inv->typeName();
                 max_channels = inv->Statistics()->getChannelCount();
             }
+
+            obj[F("phase")] = config.Inverter[i].CurrentPhase;
 
             JsonArray channel = obj.createNestedArray("channel");
             for (uint8_t c = 0; c < max_channels; c++) {
@@ -162,6 +165,7 @@ void WebApiInverterClass::onInverterAdd(AsyncWebServerRequest* request)
     }
 
     MqttHassPublishing.forceUpdate();
+    MqttVictronPublishing.forceRegister();
 }
 
 void WebApiInverterClass::onInverterEdit(AsyncWebServerRequest* request)
@@ -245,6 +249,8 @@ void WebApiInverterClass::onInverterEdit(AsyncWebServerRequest* request)
     inverter.Serial = new_serial;
     strncpy(inverter.Name, root[F("name")].as<String>().c_str(), INV_MAX_NAME_STRLEN);
 
+    inverter.CurrentPhase = strtoll(root[F("phase")].as<String>().c_str(), NULL, 16);
+
     uint8_t arrayCount = 0;
     for (JsonVariant channel : channelArray) {
         inverter.channel[arrayCount].MaxChannelPower = channel[F("max_power")].as<uint16_t>();
@@ -281,6 +287,7 @@ void WebApiInverterClass::onInverterEdit(AsyncWebServerRequest* request)
     }
 
     MqttHassPublishing.forceUpdate();
+    MqttVictronPublishing.forceRegister();
 }
 
 void WebApiInverterClass::onInverterDelete(AsyncWebServerRequest* request)
@@ -349,4 +356,5 @@ void WebApiInverterClass::onInverterDelete(AsyncWebServerRequest* request)
     request->send(response);
 
     MqttHassPublishing.forceUpdate();
+    MqttVictronPublishing.forceRegister();
 }
