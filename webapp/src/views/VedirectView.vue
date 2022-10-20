@@ -8,180 +8,164 @@
 
     <template v-else>
         <div class="row gy-3">
-            <div class="col-sm-3 col-md-2">
-                <div class="nav nav-pills row-cols-sm-1" id="v-pills-tab" role="tablist"
-                    aria-orientation="vertical">
-                    <button class="nav-link"
-                        :id="'v-pills-vedirect-tab'" data-bs-toggle="pill"
-                        :data-bs-target="'#v-pills-vedirect'" type="button" role="tab"
-                        aria-controls="'v-pills-vedirect'" aria-selected="true">
-                        Ve.Direct
-                    </button>
-                </div>
-            </div>
-            
-            <div class="tab-content col-sm-9 col-md-10" id="v-pills-tabContent">
-                <div class="tab-pane fade show"
-                    :id="'v-pills-vedirect'" role="tabpanel"
-                    :aria-labelledby="'v-pills-vedirect-tab'" tabindex="0">
-                    <div class="card">
-                        <div class="card-header text-white bg-primary d-flex justify-content-between align-items-center"
-                            :class="{
-                                'bg-danger': vedirectData.age_critical,
-                                'bg-primary': !vedirectData.age_critical,
-                            }">
-                            <div class="p-1 flex-grow-1">
-                                <div class="d-flex flex-wrap">
-                                    <div style="padding-right: 2em;">
-                                        {{ vedirectData.PID }}
-                                    </div>
-                                    <div style="padding-right: 2em;">
-                                        Serial Number: {{ vedirectData.SER }}
-                                    </div>
-                                    <div style="padding-right: 2em;">
-                                        Firmware Number: {{ vedirectData.FW }}
-                                    </div>
-                                    <div style="padding-right: 2em;">
-                                        Data Age: {{ vedirectData.data_age }} seconds
-                                    </div>
+            <div class="tab-content col-sm-12 col-md-12" id="v-pills-tabContent">
+                <div class="card">
+                    <div class="card-header text-white bg-primary d-flex justify-content-between align-items-center"
+                        :class="{
+                            'bg-danger': vedirectData.age_critical,
+                            'bg-primary': !vedirectData.age_critical,
+                        }">
+                        <div class="p-1 flex-grow-1">
+                            <div class="d-flex flex-wrap">
+                                <div style="padding-right: 2em;">
+                                    {{ vedirectData.PID }}
+                                </div>
+                                <div style="padding-right: 2em;">
+                                    Serial Number: {{ vedirectData.SER }}
+                                </div>
+                                <div style="padding-right: 2em;">
+                                    Firmware Number: {{ vedirectData.FW }}
+                                </div>
+                                <div style="padding-right: 2em;">
+                                    Data Age: {{ vedirectData.data_age }} seconds
                                 </div>
                             </div>
                         </div>
-                        <div class="card-body">
-                            <div class="row">
-                                <div class="col order-0">
-                                    <div class="card" :class="{ 'border-info': true }">
-                                        <div class="card-header bg-info">Device Info</div>
-                                        <div class="card-body">
-                                            <table class="table table-striped table-hover">
-                                                <thead>
-                                                    <tr>
-                                                        <th scope="col">Property</th>
-                                                        <th style="text-align: right" scope="col">Value</th>
-                                                        <th scope="col">Unit</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    <tr>
-                                                        <th scope="row">Load output state </th>
-                                                        <td style="text-align: right">{{vedirectData.LOAD}}</td>
-                                                        <td></td>
-                                                    </tr>
-                                                    <tr>
-                                                        <th scope="row">State of operation </th>
-                                                        <td style="text-align: right">{{vedirectData.CS}}</td>
-                                                        <td></td>
-                                                    </tr>
-                                                    <tr>
-                                                        <th scope="row">Tracker operation mode </th>
-                                                        <td style="text-align: right">{{vedirectData.MPPT}}</td>
-                                                        <td></td>
-                                                    </tr>
-                                                    <tr>
-                                                        <th scope="row">Off reason </th>
-                                                        <td style="text-align: right">{{vedirectData.OR}}</td>
-                                                        <td></td>
-                                                    </tr>
-                                                    <tr>
-                                                        <th scope="row">Error code </th>
-                                                        <td style="text-align: right">{{vedirectData.ERR}}</td>
-                                                        <td></td>
-                                                    </tr>
-                                                    <tr>
-                                                        <th scope="row">Day sequence number (0..364) </th>
-                                                        <td style="text-align: right">{{vedirectData.HSDS.v}}</td>
-                                                        <td>{{vedirectData.HSDS.u}}</td>
-                                                    </tr>
-                                                </tbody>
-                                            </table>
-                                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col order-0">
+                                <div class="card" :class="{ 'border-info': true }">
+                                    <div class="card-header bg-info">Device Info</div>
+                                    <div class="card-body">
+                                        <table class="table table-striped table-hover">
+                                            <thead>
+                                                <tr>
+                                                    <th scope="col">Property</th>
+                                                    <th style="text-align: right" scope="col">Value</th>
+                                                    <th scope="col">Unit</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr>
+                                                    <th scope="row">Load output state </th>
+                                                    <td style="text-align: right">{{vedirectData.LOAD}}</td>
+                                                    <td></td>
+                                                </tr>
+                                                <tr>
+                                                    <th scope="row">State of operation </th>
+                                                    <td style="text-align: right">{{vedirectData.CS}}</td>
+                                                    <td></td>
+                                                </tr>
+                                                <tr>
+                                                    <th scope="row">Tracker operation mode </th>
+                                                    <td style="text-align: right">{{vedirectData.MPPT}}</td>
+                                                    <td></td>
+                                                </tr>
+                                                <tr>
+                                                    <th scope="row">Off reason </th>
+                                                    <td style="text-align: right">{{vedirectData.OR}}</td>
+                                                    <td></td>
+                                                </tr>
+                                                <tr>
+                                                    <th scope="row">Error code </th>
+                                                    <td style="text-align: right">{{vedirectData.ERR}}</td>
+                                                    <td></td>
+                                                </tr>
+                                                <tr>
+                                                    <th scope="row">Day sequence number (0..364) </th>
+                                                    <td style="text-align: right">{{vedirectData.HSDS.v}}</td>
+                                                    <td>{{vedirectData.HSDS.u}}</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
                                     </div>
                                 </div>
-                                <div class="col order-1">
-                                    <div class="card" :class="{ 'border-info': false }">
-                                        <div class="card-header">Battery</div>
-                                        <div class="card-body">
-                                            <table class="table table-striped table-hover">
-                                                <thead>
-                                                    <tr>
-                                                        <th scope="col">Property</th>
-                                                        <th style="text-align: right" scope="col">Value</th>
-                                                        <th scope="col">Unit</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    <tr>
-                                                        <th scope="row">Battery voltage </th>
-                                                        <td style="text-align: right">{{formatNumber(vedirectData.V.v)}}</td>
-                                                        <td>{{vedirectData.V.u}}</td>
-                                                    </tr>
-                                                    <tr>
-                                                        <th scope="row">Battery current </th>
-                                                        <td style="text-align: right">{{formatNumber(vedirectData.I.v)}}</td>
-                                                        <td>{{vedirectData.I.u}}</td>
-                                                    </tr>
-                                                </tbody>
-                                            </table>
-                                        </div>
+                            </div>
+                            <div class="col order-1">
+                                <div class="card" :class="{ 'border-info': false }">
+                                    <div class="card-header">Battery</div>
+                                    <div class="card-body">
+                                        <table class="table table-striped table-hover">
+                                            <thead>
+                                                <tr>
+                                                    <th scope="col">Property</th>
+                                                    <th style="text-align: right" scope="col">Value</th>
+                                                    <th scope="col">Unit</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr>
+                                                    <th scope="row">Battery voltage </th>
+                                                    <td style="text-align: right">{{formatNumber(vedirectData.V.v)}}</td>
+                                                    <td>{{vedirectData.V.u}}</td>
+                                                </tr>
+                                                <tr>
+                                                    <th scope="row">Battery current </th>
+                                                    <td style="text-align: right">{{formatNumber(vedirectData.I.v)}}</td>
+                                                    <td>{{vedirectData.I.u}}</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
                                     </div>
                                 </div>
-                                <div class="col order-2">
-                                    <div class="card" :class="{ 'border-info': false }">
-                                        <div class="card-header">Panel</div>
-                                        <div class="card-body">
-                                            <table class="table table-striped table-hover">
-                                                <thead>
-                                                    <tr>
-                                                        <th scope="col">Property</th>
-                                                        <th style="text-align: right" scope="col">Value</th>
-                                                        <th scope="col">Unit</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    <tr>
-                                                        <th scope="row">Panel voltage </th>
-                                                        <td style="text-align: right">{{formatNumber(vedirectData.VPV.v)}}</td>
-                                                        <td>{{vedirectData.VPV.u}}</td>
-                                                    </tr>
-                                                    <tr>
-                                                        <th scope="row">Panel power </th>
-                                                        <td style="text-align: right">{{formatNumber(vedirectData.PPV.v)}}</td>
-                                                        <td>{{vedirectData.PPV.u}}</td>
-                                                    </tr>
-                                                    <tr>
-                                                        <th scope="row">Yield total (user resettable counter) </th>
-                                                        <td style="text-align: right">{{formatNumber(vedirectData.H19.v)}}</td>
-                                                        <td>{{vedirectData.H19.u}}</td>
-                                                    </tr>
-                                                    <tr>
-                                                        <th scope="row">Yield today </th>
-                                                        <td style="text-align: right">{{formatNumber(vedirectData.H20.v)}}</td>
-                                                        <td>{{vedirectData.H20.u}}</td>
-                                                    </tr>
-                                                    <tr>
-                                                        <th scope="row">Maximum power today </th>
-                                                        <td style="text-align: right">{{formatNumber(vedirectData.H21.v)}}</td>
-                                                        <td>{{vedirectData.H21.u}}</td>
-                                                    </tr>
-                                                    <tr>
-                                                        <th scope="row">Yield yesterday </th>
-                                                        <td style="text-align: right">{{formatNumber(vedirectData.H22.v)}}</td>
-                                                        <td>{{vedirectData.H22.u}}</td>
-                                                    </tr>
-                                                    <tr>
-                                                        <th scope="row">Maximum power yesterday </th>
-                                                        <td style="text-align: right">{{formatNumber(vedirectData.H23.v)}}</td>
-                                                        <td>{{vedirectData.H23.u}}</td>
-                                                    </tr>
-                                                </tbody>
-                                            </table>
-                                        </div>
+                            </div>
+                            <div class="col order-2">
+                                <div class="card" :class="{ 'border-info': false }">
+                                    <div class="card-header">Panel</div>
+                                    <div class="card-body">
+                                        <table class="table table-striped table-hover">
+                                            <thead>
+                                                <tr>
+                                                    <th scope="col">Property</th>
+                                                    <th style="text-align: right" scope="col">Value</th>
+                                                    <th scope="col">Unit</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr>
+                                                    <th scope="row">Panel voltage </th>
+                                                    <td style="text-align: right">{{formatNumber(vedirectData.VPV.v)}}</td>
+                                                    <td>{{vedirectData.VPV.u}}</td>
+                                                </tr>
+                                                <tr>
+                                                    <th scope="row">Panel power </th>
+                                                    <td style="text-align: right">{{formatNumber(vedirectData.PPV.v)}}</td>
+                                                    <td>{{vedirectData.PPV.u}}</td>
+                                                </tr>
+                                                <tr>
+                                                    <th scope="row">Yield total (user resettable counter) </th>
+                                                    <td style="text-align: right">{{formatNumber(vedirectData.H19.v)}}</td>
+                                                    <td>{{vedirectData.H19.u}}</td>
+                                                </tr>
+                                                <tr>
+                                                    <th scope="row">Yield today </th>
+                                                    <td style="text-align: right">{{formatNumber(vedirectData.H20.v)}}</td>
+                                                    <td>{{vedirectData.H20.u}}</td>
+                                                </tr>
+                                                <tr>
+                                                    <th scope="row">Maximum power today </th>
+                                                    <td style="text-align: right">{{formatNumber(vedirectData.H21.v)}}</td>
+                                                    <td>{{vedirectData.H21.u}}</td>
+                                                </tr>
+                                                <tr>
+                                                    <th scope="row">Yield yesterday </th>
+                                                    <td style="text-align: right">{{formatNumber(vedirectData.H22.v)}}</td>
+                                                    <td>{{vedirectData.H22.u}}</td>
+                                                </tr>
+                                                <tr>
+                                                    <th scope="row">Maximum power yesterday </th>
+                                                    <td style="text-align: right">{{formatNumber(vedirectData.H23.v)}}</td>
+                                                    <td>{{vedirectData.H23.u}}</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                </div>
+                </div>   
             </div>
         </div>
     </template>
