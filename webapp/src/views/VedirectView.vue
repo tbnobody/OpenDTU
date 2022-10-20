@@ -8,6 +8,18 @@
 
     <template v-else>
         <div class="row gy-3">
+            <div class="col-sm-3 col-md-2">
+                <div class="nav nav-pills row-cols-sm-1" id="v-pills-tab" role="tablist"
+                    aria-orientation="vertical">
+                    <button class="nav-link"
+                        :id="'v-pills-vedirect-tab'" data-bs-toggle="pill"
+                        :data-bs-target="'#v-pills-vedirect'" type="button" role="tab"
+                        aria-controls="'v-pills-vedirect'" aria-selected="true">
+                        Ve.Direct
+                    </button>
+                </div>
+            </div>
+            
             <div class="tab-content col-sm-9 col-md-10" id="v-pills-tabContent">
                 <div class="tab-pane fade show"
                     :id="'v-pills-vedirect'" role="tabpanel"
