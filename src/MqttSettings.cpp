@@ -3,6 +3,7 @@
  * Copyright (C) 2022 Thomas Basler and others
  */
 #include "MqttSettings.h"
+#include "ArduinoJson.h"
 #include "Configuration.h"
 #include "NetworkSettings.h"
 #include <Hoymiles.h>
@@ -50,6 +51,39 @@ void MqttSettingsClass::onMqttConnect(bool sessionPresent)
     mqttClient->subscribe(String(topic + "+/cmd/" + TOPIC_SUB_LIMIT_NONPERSISTENT_ABSOLUTE).c_str(), 0);
     mqttClient->subscribe(String(topic + "+/cmd/" + TOPIC_SUB_POWER).c_str(), 0);
     mqttClient->subscribe(String(topic + "+/cmd/" + TOPIC_SUB_RESTART).c_str(), 0);
+
+    // Loop all inverters and register @Victron Venus OS
+    for (uint8_t i = 0; i < Hoymiles.getNumInverters(); i++) {
+        auto inv = Hoymiles.getInverterByPos(i);
+
+        char buffer[sizeof(uint64_t) * 8 + 1];
+        snprintf(buffer, sizeof(buffer), "%0x%08x",
+            ((uint32_t)((inv->serial() >> 32) & 0xFFFFFFFF)),
+            ((uint32_t)(inv->serial() & 0xFFFFFFFF)));
+        String subtopic = String(buffer);
+
+        // Register @Victon Venus
+        String hoyserial = String(subtopic);
+        mqttClient->subscribe(String("device/HM" + hoyserial + "/DBus").c_str(),0);
+
+        DynamicJsonDocument serviceDoc(256);
+        serviceDoc[hoyserial] = F("pvinverter");
+        JsonObject serviceObj = serviceDoc.as<JsonObject>();
+
+        DynamicJsonDocument rootDoc(1024);
+        rootDoc[F("clientId")] = "HM" + hoyserial;
+        rootDoc[F("connected")] = 1;
+        rootDoc[F("version")] = "stromi-0.1";
+        rootDoc[F("services")] = serviceObj;
+        JsonObject rootObj = rootDoc.as<JsonObject>();
+
+        char data[1024];
+        serializeJson(rootObj, data);
+
+        String topic = ("device/HM" + hoyserial + "/Status");
+        mqttClient->publish(topic.c_str(), 0, 1, data);
+    }
+    
 }
 
 void MqttSettingsClass::onMqttDisconnect(espMqttClientTypes::DisconnectReason reason)
@@ -102,17 +136,63 @@ void MqttSettingsClass::onMqttMessage(const espMqttClientTypes::MessagePropertie
     subtopic = strtok_r(rest, "/", &rest);
     setting = strtok_r(rest, "/", &rest);
 
+    uint64_t serial;
+
     if (serial_str == NULL || subtopic == NULL || setting == NULL) {
+       
+        // Victron message only on startup after subscribe
+        // device/116181045449/DBus = JSON 
+        char* rest = &token_topic[strlen("device/HM")];
+        serial_str = strtok_r(rest, "/", &rest);
+
+        if (serial_str == NULL) {
+            return;
+        }
+
+        serial = strtoull(serial_str, 0, 16);
+
+        auto inv = Hoymiles.getInverterBySerial(serial);
+
+        if (inv == nullptr) {
+            Serial.print(F("Can not register inverter: "));
+            Serial.println(serial);
+            return;
+        }
+
+        char* strlimit = new char[len + 1];
+        memcpy(strlimit, payload, len);
+        strlimit[len] = '\0';
+        
+        DynamicJsonDocument docDbus(512);
+        deserializeJson(docDbus, strlimit);
+        VictronPortalId = docDbus["portalId"];
+                    
+        DynamicJsonDocument docInstance(256);
+        docInstance = docDbus["deviceInstance"];
+        String deviceInstance = docInstance[serial_str];
+    
+        String inverter = serial_str;
+        VictronDeviceInstance.insert({inverter, deviceInstance});
+
+        if (VictronDeviceInstance.find(inverter)!=VictronDeviceInstance.end()) {
+            String valfound = VictronDeviceInstance[inverter];
+            Serial.print(F("Register inverter: "));
+            Serial.print(serial_str);
+            Serial.print(F(" to Victron Venus OS with portalId: "));
+            Serial.print(VictronPortalId);
+            Serial.print(F(" and deviceInstance: "));
+            Serial.println(valfound);
+        }
         return;
     }
 
-    uint64_t serial;
     serial = strtoull(serial_str, 0, 16);
 
     auto inv = Hoymiles.getInverterBySerial(serial);
 
     if (inv == nullptr) {
-        Serial.println(F("Inverter not found"));
+        Serial.print(F("Inverter not found: "));
+        Serial.println(serial);
         return;
     }
 
@@ -211,6 +291,8 @@ void MqttSettingsClass::performDisconnect()
     const CONFIG_T& config = Configuration.get();
     publish(config.Mqtt_LwtTopic, config.Mqtt_LwtValue_Offline);
     mqttClient->disconnect();
+
+    // Reminder to logoff in Venus OS!
 }
 
 void MqttSettingsClass::performReconnect()
@@ -226,6 +308,23 @@ void MqttSettingsClass::performReconnect()
 bool MqttSettingsClass::getConnected()
 {
     return mqttClient->connected();
+}
+
+String MqttSettingsClass::getVictronPortalId()
+{
+    return VictronPortalId;
+}
+
+String MqttSettingsClass::getVictronDeviceInstance(String hoyserial)
+{
+    if (VictronDeviceInstance.find(hoyserial)!=VictronDeviceInstance.end()) {
+        return VictronDeviceInstance[hoyserial];
+    } else {
+        Serial.print(F("No Victron deviceInstance found for inverter: "));
+        Serial.println(hoyserial);
+        String ret = hoyserial + "NOdevInstance";
+        return ret;
+    }
 }
 
 String MqttSettingsClass::getPrefix()
@@ -245,6 +344,11 @@ void MqttSettingsClass::publishHass(String subtopic, String payload)
     String topic = Configuration.get().Mqtt_Hass_Topic;
     topic += subtopic;
     mqttClient->publish(topic.c_str(), 0, Configuration.get().Mqtt_Hass_Retain, payload.c_str());
+}
+
+void MqttSettingsClass::publishVictron(String topic, String payload)
+{
+    mqttClient->publish(topic.c_str(), 0, 1, payload.c_str());
 }
 
 void MqttSettingsClass::init()
