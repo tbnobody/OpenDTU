@@ -1,0 +1,33 @@
+name: ✨ Request a feature
+description: Suggest an improvement idea for OpenDTU!
+title: "[Request]"
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: >
+        **Thank you for wanting to request a feature in OpenDTU!**
+
+        Before you go ahead with your request, please first consider if it wouldn't be
+        better suited in a external home automation software like OpenHAB, ioBroker, Home Assistant etc.
+
+  - type: textarea
+    attributes:
+      label: Is your feature request related to a problem? Please describe.
+      description: A clear and concise description of what the problem is. Eg, "I'm always frustrated when [...]".
+  - type: textarea
+    attributes:
+      label: Describe the solution you'd like
+      description: A clear and concise description of what you want to happen.
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Describe alternatives you've considered
+      description: A clear and concise description of any alternative solutions or features you've considered.
+  - type: textarea
+    attributes:
+      label: Additional context
+      description: Add any other context or screenshots about the feature request here.
+
+
