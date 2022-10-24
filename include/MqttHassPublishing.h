@@ -3,6 +3,7 @@
 
 #include "Configuration.h"
 #include <Arduino.h>
+#include <ArduinoJson.h>
 #include <Hoymiles.h>
 #include <memory>
 
@@ -59,6 +60,7 @@ public:
 
 private:
     void publishField(std::shared_ptr<InverterAbstract> inv, uint8_t channel, byteAssign_fieldDeviceClass_t fieldType, bool clear = false);
+    void createDeviceInfo(JsonObject& object, std::shared_ptr<InverterAbstract> inv);
 
     bool _wasConnected = false;
     bool _updateForced = false;
