@@ -3,7 +3,6 @@
  * Copyright (C) 2022 Thomas Basler and others
  */
 #include "MqttHassPublishing.h"
-#include "ArduinoJson.h"
 #include "MqttPublishing.h"
 #include "MqttSettings.h"
 #include "NetworkSettings.h"
@@ -102,13 +101,8 @@ void MqttHassPublishingClass::publishField(std::shared_ptr<InverterAbstract> inv
         }
 
         DynamicJsonDocument deviceDoc(512);
-        deviceDoc[F("name")] = inv->name();
-        deviceDoc[F("ids")] = String(serial);
-        deviceDoc[F("cu")] = String(F("http://")) + String(WiFi.localIP().toString());
-        deviceDoc[F("mf")] = F("OpenDTU");
-        deviceDoc[F("mdl")] = inv->typeName();
-        deviceDoc[F("sw")] = AUTO_GIT_HASH;
         JsonObject deviceObj = deviceDoc.as<JsonObject>();
+        createDeviceInfo(deviceObj, inv);
 
         DynamicJsonDocument root(1024);
         root[F("name")] = name;
@@ -129,8 +123,22 @@ void MqttHassPublishingClass::publishField(std::shared_ptr<InverterAbstract> inv
         char buffer[512];
         serializeJson(root, buffer);
         MqttSettings.publishHass(configTopic, buffer);
-    }
-    else {
+    } else {
         MqttSettings.publishHass(configTopic, "");
     }
+}
+
+void MqttHassPublishingClass::createDeviceInfo(JsonObject& object, std::shared_ptr<InverterAbstract> inv)
+{
+    char serial[sizeof(uint64_t) * 8 + 1];
+    snprintf(serial, sizeof(serial), "%0x%08x",
+        ((uint32_t)((inv->serial() >> 32) & 0xFFFFFFFF)),
+        ((uint32_t)(inv->serial() & 0xFFFFFFFF)));
+
+    object[F("name")] = inv->name();
+    object[F("ids")] = String(serial);
+    object[F("cu")] = String(F("http://")) + String(WiFi.localIP().toString());
+    object[F("mf")] = F("OpenDTU");
+    object[F("mdl")] = inv->typeName();
+    object[F("sw")] = AUTO_GIT_HASH;
 }
