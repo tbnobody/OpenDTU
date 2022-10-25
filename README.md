@@ -8,7 +8,7 @@ This project was started from [this](https://www.mikrocontroller.net/topic/52577
 It was the goal to replace the original Hoymiles DTU (Telemetry Gateway) with their cloud access. With a lot of reverse engineering the Hoymiles protocol was decrypted and analyzed.
 
 ## Screenshots
-Several screenshots of the frontend can be found here: [Screenshots](docs/screenshots)
+Several screenshots of the frontend can be found here: [Screenshots](docs/screenshots/README.md)
 
 ## Currently supported Inverters
 * Hoymiles HM-300
