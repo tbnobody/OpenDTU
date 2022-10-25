@@ -100,16 +100,15 @@ void MqttHassPublishingClass::publishField(std::shared_ptr<InverterAbstract> inv
             name = String(inv->name()) + " CH" + String(channel) + " " + fieldName;
         }
 
-        DynamicJsonDocument deviceDoc(512);
-        JsonObject deviceObj = deviceDoc.as<JsonObject>();
-        createDeviceInfo(deviceObj, inv);
-
         DynamicJsonDocument root(1024);
         root[F("name")] = name;
         root[F("stat_t")] = stateTopic;
         root[F("unit_of_meas")] = inv->Statistics()->getChannelFieldUnit(channel, fieldType.fieldId);
         root[F("uniq_id")] = String(serial) + "_ch" + String(channel) + "_" + fieldName;
-        root[F("dev")] = deviceObj;
+
+        JsonObject deviceObj = root.createNestedObject("dev");
+        createDeviceInfo(deviceObj, inv);
+
         if (Configuration.get().Mqtt_Hass_Expire) {
             root[F("exp_aft")] = Hoymiles.getNumInverters() * Configuration.get().Mqtt_PublishInterval * 2;
         }
@@ -137,7 +136,7 @@ void MqttHassPublishingClass::createDeviceInfo(JsonObject& object, std::shared_p
 
     object[F("name")] = inv->name();
     object[F("ids")] = String(serial);
-    object[F("cu")] = String(F("http://")) + String(WiFi.localIP().toString());
+    object[F("cu")] = String(F("http://")) + WiFi.localIP().toString();
     object[F("mf")] = F("OpenDTU");
     object[F("mdl")] = inv->typeName();
     object[F("sw")] = AUTO_GIT_HASH;
