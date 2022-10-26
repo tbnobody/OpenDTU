@@ -61,6 +61,9 @@ void MqttHassPublishingClass::publishConfig()
         publishInverterNumber(inv, "Limit NonPersistent Absolute", "mdi:speedometer", "config", "cmd/limit_nonpersistent_absolute", "status/limit_absolute", "W", 10, 1500);
         publishInverterNumber(inv, "Limit Persistent Absolute", "mdi:speedometer", "config", "cmd/limit_persistent_absolute", "status/limit_absolute", "W", 10, 1500);
 
+        publishInverterBinarySensor(inv, "Reachable", "status/reachable", "1", "0");
+        publishInverterBinarySensor(inv, "Producing", "status/producing", "1", "0");
+
         // Loop all channels
         for (uint8_t c = 0; c <= inv->Statistics()->getChannelCount(); c++) {
             for (uint8_t f = 0; f < DEVICE_CLS_ASSIGN_LIST_LEN; f++) {
@@ -208,6 +211,38 @@ void MqttHassPublishingClass::publishInverterNumber(
     root[F("unit_of_meas")] = unitOfMeasure;
     root[F("min")] = min;
     root[F("max")] = max;
+
+    JsonObject deviceObj = root.createNestedObject("dev");
+    createDeviceInfo(deviceObj, inv);
+
+    char buffer[512];
+    serializeJson(root, buffer);
+    MqttSettings.publishHass(configTopic, buffer);
+}
+
+void MqttHassPublishingClass::publishInverterBinarySensor(std::shared_ptr<InverterAbstract> inv, const char* caption, const char* subTopic, const char* payload_on, const char* payload_off)
+{
+    char serial[sizeof(uint64_t) * 8 + 1];
+    snprintf(serial, sizeof(serial), "%0x%08x",
+        ((uint32_t)((inv->serial() >> 32) & 0xFFFFFFFF)),
+        ((uint32_t)(inv->serial() & 0xFFFFFFFF)));
+
+    String sensorId = caption;
+    sensorId.replace(" ", "_");
+    sensorId.toLowerCase();
+
+    String configTopic = "binary_sensor/dtu_" + String(serial)
+        + "/" + sensorId
+        + "/config";
+
+    String statTopic = MqttSettings.getPrefix() + String(serial) + "/" + subTopic;
+
+    DynamicJsonDocument root(1024);
+    root[F("name")] = caption;
+    root[F("uniq_id")] = String(serial) + "_" + sensorId;
+    root[F("stat_t")] = statTopic;
+    root[F("pl_on")] = payload_on;
+    root[F("pl_off")] = payload_off;
 
     JsonObject deviceObj = root.createNestedObject("dev");
     createDeviceInfo(deviceObj, inv);
