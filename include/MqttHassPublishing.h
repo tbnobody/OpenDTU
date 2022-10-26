@@ -61,6 +61,7 @@ public:
 private:
     void publishField(std::shared_ptr<InverterAbstract> inv, uint8_t channel, byteAssign_fieldDeviceClass_t fieldType, bool clear = false);
     void publishInverterButton(std::shared_ptr<InverterAbstract> inv, const char* caption, const char* icon, const char* category, const char* deviceClass, const char* subTopic, const char* payload);
+    void publishInverterNumber(std::shared_ptr<InverterAbstract> inv, const char* caption, const char* icon, const char* category, const char* commandTopic, const char* stateTopic, const char* unitOfMeasure, int16_t min = 1, int16_t max = 100);
     void createDeviceInfo(JsonObject& object, std::shared_ptr<InverterAbstract> inv);
 
     bool _wasConnected = false;
