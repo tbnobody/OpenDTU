@@ -51,6 +51,10 @@ void MqttHassPublishingClass::publishConfig()
     for (uint8_t i = 0; i < Hoymiles.getNumInverters(); i++) {
         auto inv = Hoymiles.getInverterByPos(i);
 
+        publishInverterButton(inv, "Turn Inverter Off", "mdi:power-plug-off", "config", "", "cmd/power", "0");
+        publishInverterButton(inv, "Turn Inverter On", "mdi:power-plug", "config", "", "cmd/power", "1");
+        publishInverterButton(inv, "Restart Inverter", "", "config", "restart", "cmd/restart", "1");
+
         // Loop all channels
         for (uint8_t c = 0; c <= inv->Statistics()->getChannelCount(); c++) {
             for (uint8_t f = 0; f < DEVICE_CLS_ASSIGN_LIST_LEN; f++) {
@@ -125,6 +129,44 @@ void MqttHassPublishingClass::publishField(std::shared_ptr<InverterAbstract> inv
     } else {
         MqttSettings.publishHass(configTopic, "");
     }
+}
+
+void MqttHassPublishingClass::publishInverterButton(std::shared_ptr<InverterAbstract> inv, const char* caption, const char* icon, const char* category, const char* deviceClass, const char* subTopic, const char* payload)
+{
+    char serial[sizeof(uint64_t) * 8 + 1];
+    snprintf(serial, sizeof(serial), "%0x%08x",
+        ((uint32_t)((inv->serial() >> 32) & 0xFFFFFFFF)),
+        ((uint32_t)(inv->serial() & 0xFFFFFFFF)));
+
+    String buttonId = caption;
+    buttonId.replace(" ", "_");
+    buttonId.toLowerCase();
+
+    String configTopic = "button/dtu_" + String(serial)
+        + "/" + buttonId
+        + "/config";
+
+    String cmdTopic = MqttSettings.getPrefix() + String(serial) + "/" + subTopic;
+
+    DynamicJsonDocument root(1024);
+    root[F("name")] = caption;
+    root[F("uniq_id")] = String(serial) + "_" + buttonId;
+    if(strcmp(icon, "")) {
+        root[F("ic")] = icon;
+    }
+    if(strcmp(deviceClass, "")) {
+        root[F("dev_cla")] = deviceClass;
+    }
+    root[F("ent_cat")] = category;
+    root[F("cmd_t")] = cmdTopic;
+    root[F("payload_press")] = payload;
+
+    JsonObject deviceObj = root.createNestedObject("dev");
+    createDeviceInfo(deviceObj, inv);
+
+    char buffer[512];
+    serializeJson(root, buffer);
+    MqttSettings.publishHass(configTopic, buffer);
 }
 
 void MqttHassPublishingClass::createDeviceInfo(JsonObject& object, std::shared_ptr<InverterAbstract> inv)
