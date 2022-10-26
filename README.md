@@ -8,7 +8,7 @@ This project was started from [this](https://www.mikrocontroller.net/topic/52577
 It was the goal to replace the original Hoymiles DTU (Telemetry Gateway) with their cloud access. With a lot of reverse engineering the Hoymiles protocol was decrypted and analyzed.
 
 ## Screenshots
-Several screenshots of the frontend can be found here: [Screenshots](docs/screenshots)
+Several screenshots of the frontend can be found here: [Screenshots](docs/screenshots/README.md)
 
 I extended the original OpenDTU software to support also Victron's Ve.Direct protocol on the same chip. Additional information about Ve.direct can be downloaded from https://www.victronenergy.com/support-and-downloads/technical-information.
 
@@ -162,9 +162,10 @@ This can be achieved by editing the 'platformio.ini' file and add/change one or 
 * other options:
   * clean the sources:  `platformio run -e generic -t clean`
   * erase flash: `platformio run -e generic -t erase`
+
 ### using the pre-compiled .bin files
 The pre-compiled files can be found on the [github page](https://github.com/tbnobody/OpenDTU) in the tab "Actions" and the sub menu "OpenDTU Build". Just choose the latest build from the master branch (blue font). You need to be logged in with your github account to download the files.
-Use a ESP32 flash tool of your choice and flash the .bin files to the right addresses:
+Use a ESP32 flash tool of your choice (see next chapter) and flash the `.bin` files to the right addresses:
 
 | Address  | File                   |
 | ---------| ---------------------- |
@@ -173,8 +174,31 @@ Use a ESP32 flash tool of your choice and flash the .bin files to the right addr
 | 0xe000   | boot_app0.bin          |
 | 0x10000  | opendtu-*.bin          |
 
-Make sure too uncheck the DoNotChgBin option. Otherwise you will maybe get errors like "invalid header".
-For further upgraded you can just use the web interface and upload the opendtu-*.bin file.
+For further updates you can just use the web interface and upload the `opendtu-*.bin` file.
+
+### Flash with esptool.py (Linux)
+```
+esptool.py --port /dev/ttyUSB0 --chip esp32 --before default_reset --after hard_reset \
+  write_flash --flash_mode dout --flash_freq 40m --flash_size detect \
+  0x1000 bootloader_dio_40m.bin \
+  0x8000 partitions.bin \
+  0xe000 boot_app0.bin \
+  0x10000 opendtu-generic.bin
+```
+
+### Flash with Espressif Flash Download Tool (Windows)
+
+[Download link](https://www.espressif.com/en/support/download/other-tools)
+
+- On startup, select Chip Type -> "ESP32" / WorkMode -> "Develop"
+- Prepare all settings (see picture). Make sure to uncheck the `DoNotChgBin` option. Otherwise you may get errors like "invalid header".
+- ![flash tool image](docs/esp32_flash_download_tool.png)
+- Press "Erase" button on screen. Look into the terminal window, you should see dots appear. Then press  the "Boot" button on the ESP32 board. Wait for "FINISH" to see if flashing/erasing is done.
+- To program, press "Start" on screen, then the "Boot" button.
+- When flashing is complete (FINISH appears) then press the Reset button on the ESP32 board (or powercycle ) to start the OpenDTU application.
+
+### Flash with ESP_Flasher (Windows)
+Users report that [ESP_Flasher](https://github.com/Jason2866/ESP_Flasher/releases/) is suitable for flashing OpenDTU on Windows.
 
 ## First configuration
 * After the initial flashing of the microcontroller, an Access Point called "OpenDTU-*" is opened. The default password is "openDTU42".
@@ -190,6 +214,8 @@ Once you have your OpenDTU running and connected to WLAN, you can do further upd
 Navigate to Settings --> Firmware upgrade and press the browse button. Select the firmware file from your local computer.
 
 You'll find the firmware file (after a successfull build process) under `.pio/build/generic/firmware.bin`.
+
+If you downloaded a precompiled zip archive, unpack it and choose `opendtu-generic.bin`.
 
 After the successful upload, the OpenDTU immediately restarts into the new firmware.
 
