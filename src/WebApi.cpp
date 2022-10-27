@@ -29,6 +29,7 @@ void WebApiClass::init()
     _webApiNetwork.init(&_server);
     _webApiNtp.init(&_server);
     _webApiPower.init(&_server);
+    _webApiPrometheus.init(&_server);
     _webApiSecurity.init(&_server);
     _webApiSysstatus.init(&_server);
     _webApiWebapp.init(&_server);
