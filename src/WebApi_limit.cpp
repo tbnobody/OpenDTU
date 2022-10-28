@@ -29,14 +29,10 @@ void WebApiLimitClass::onLimitStatus(AsyncWebServerRequest* request)
     for (uint8_t i = 0; i < Hoymiles.getNumInverters(); i++) {
         auto inv = Hoymiles.getInverterByPos(i);
 
-        // Inverter Serial is read as HEX
-        char buffer[sizeof(uint64_t) * 8 + 1];
-        snprintf(buffer, sizeof(buffer), "%0x%08x",
-            ((uint32_t)((inv->serial() >> 32) & 0xFFFFFFFF)),
-            ((uint32_t)(inv->serial() & 0xFFFFFFFF)));
+        String serial = inv->serialString();
 
-        root[buffer]["limit_relative"] = inv->SystemConfigPara()->getLimitPercent();
-        root[buffer]["max_power"] = inv->DevInfo()->getMaxPower();
+        root[serial]["limit_relative"] = inv->SystemConfigPara()->getLimitPercent();
+        root[serial]["max_power"] = inv->DevInfo()->getMaxPower();
 
         LastCommandSuccess status = inv->SystemConfigPara()->getLastLimitCommandSuccess();
         String limitStatus = "Unknown";
@@ -49,7 +45,7 @@ void WebApiLimitClass::onLimitStatus(AsyncWebServerRequest* request)
         else if (status == LastCommandSuccess::CMD_PENDING) {
             limitStatus = "Pending";
         }
-        root[buffer]["limit_set_status"] = limitStatus;
+        root[serial]["limit_set_status"] = limitStatus;
     }
 
     response->setLength();

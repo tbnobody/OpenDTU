@@ -85,10 +85,7 @@ void MqttHassPublishingClass::publishField(std::shared_ptr<InverterAbstract> inv
         return;
     }
 
-    char serial[sizeof(uint64_t) * 8 + 1];
-    snprintf(serial, sizeof(serial), "%0x%08x",
-        ((uint32_t)((inv->serial() >> 32) & 0xFFFFFFFF)),
-        ((uint32_t)(inv->serial() & 0xFFFFFFFF)));
+    String serial = inv->serialString();
 
     String fieldName;
     if (channel == CH0 && fieldType.fieldId == FLD_PDC) {
@@ -97,7 +94,7 @@ void MqttHassPublishingClass::publishField(std::shared_ptr<InverterAbstract> inv
         fieldName = inv->Statistics()->getChannelFieldName(channel, fieldType.fieldId);
     }
 
-    String configTopic = "sensor/dtu_" + String(serial)
+    String configTopic = "sensor/dtu_" + serial
         + "/" + "ch" + String(channel) + "_" + fieldName
         + "/config";
 
@@ -117,7 +114,7 @@ void MqttHassPublishingClass::publishField(std::shared_ptr<InverterAbstract> inv
         root[F("name")] = name;
         root[F("stat_t")] = stateTopic;
         root[F("unit_of_meas")] = inv->Statistics()->getChannelFieldUnit(channel, fieldType.fieldId);
-        root[F("uniq_id")] = String(serial) + "_ch" + String(channel) + "_" + fieldName;
+        root[F("uniq_id")] = serial + "_ch" + String(channel) + "_" + fieldName;
 
         JsonObject deviceObj = root.createNestedObject("dev");
         createDeviceInfo(deviceObj, inv);
@@ -142,24 +139,21 @@ void MqttHassPublishingClass::publishField(std::shared_ptr<InverterAbstract> inv
 
 void MqttHassPublishingClass::publishInverterButton(std::shared_ptr<InverterAbstract> inv, const char* caption, const char* icon, const char* category, const char* deviceClass, const char* subTopic, const char* payload)
 {
-    char serial[sizeof(uint64_t) * 8 + 1];
-    snprintf(serial, sizeof(serial), "%0x%08x",
-        ((uint32_t)((inv->serial() >> 32) & 0xFFFFFFFF)),
-        ((uint32_t)(inv->serial() & 0xFFFFFFFF)));
+    String serial = inv->serialString();
 
     String buttonId = caption;
     buttonId.replace(" ", "_");
     buttonId.toLowerCase();
 
-    String configTopic = "button/dtu_" + String(serial)
+    String configTopic = "button/dtu_" + serial
         + "/" + buttonId
         + "/config";
 
-    String cmdTopic = MqttSettings.getPrefix() + String(serial) + "/" + subTopic;
+    String cmdTopic = MqttSettings.getPrefix() + serial + "/" + subTopic;
 
     DynamicJsonDocument root(1024);
     root[F("name")] = caption;
-    root[F("uniq_id")] = String(serial) + "_" + buttonId;
+    root[F("uniq_id")] = serial + "_" + buttonId;
     if (strcmp(icon, "")) {
         root[F("ic")] = icon;
     }
@@ -183,25 +177,22 @@ void MqttHassPublishingClass::publishInverterNumber(
     const char* commandTopic, const char* stateTopic, const char* unitOfMeasure,
     int16_t min, int16_t max)
 {
-    char serial[sizeof(uint64_t) * 8 + 1];
-    snprintf(serial, sizeof(serial), "%0x%08x",
-        ((uint32_t)((inv->serial() >> 32) & 0xFFFFFFFF)),
-        ((uint32_t)(inv->serial() & 0xFFFFFFFF)));
+    String serial = inv->serialString();
 
     String buttonId = caption;
     buttonId.replace(" ", "_");
     buttonId.toLowerCase();
 
-    String configTopic = "number/dtu_" + String(serial)
+    String configTopic = "number/dtu_" + serial
         + "/" + buttonId
         + "/config";
 
-    String cmdTopic = MqttSettings.getPrefix() + String(serial) + "/" + commandTopic;
-    String statTopic = MqttSettings.getPrefix() + String(serial) + "/" + stateTopic;
+    String cmdTopic = MqttSettings.getPrefix() + serial + "/" + commandTopic;
+    String statTopic = MqttSettings.getPrefix() + serial + "/" + stateTopic;
 
     DynamicJsonDocument root(1024);
     root[F("name")] = caption;
-    root[F("uniq_id")] = String(serial) + "_" + buttonId;
+    root[F("uniq_id")] = serial + "_" + buttonId;
     if (strcmp(icon, "")) {
         root[F("ic")] = icon;
     }
@@ -222,24 +213,21 @@ void MqttHassPublishingClass::publishInverterNumber(
 
 void MqttHassPublishingClass::publishInverterBinarySensor(std::shared_ptr<InverterAbstract> inv, const char* caption, const char* subTopic, const char* payload_on, const char* payload_off)
 {
-    char serial[sizeof(uint64_t) * 8 + 1];
-    snprintf(serial, sizeof(serial), "%0x%08x",
-        ((uint32_t)((inv->serial() >> 32) & 0xFFFFFFFF)),
-        ((uint32_t)(inv->serial() & 0xFFFFFFFF)));
+    String serial = inv->serialString();
 
     String sensorId = caption;
     sensorId.replace(" ", "_");
     sensorId.toLowerCase();
 
-    String configTopic = "binary_sensor/dtu_" + String(serial)
+    String configTopic = "binary_sensor/dtu_" + serial
         + "/" + sensorId
         + "/config";
 
-    String statTopic = MqttSettings.getPrefix() + String(serial) + "/" + subTopic;
+    String statTopic = MqttSettings.getPrefix() + serial + "/" + subTopic;
 
     DynamicJsonDocument root(1024);
     root[F("name")] = caption;
-    root[F("uniq_id")] = String(serial) + "_" + sensorId;
+    root[F("uniq_id")] = serial + "_" + sensorId;
     root[F("stat_t")] = statTopic;
     root[F("pl_on")] = payload_on;
     root[F("pl_off")] = payload_off;
@@ -254,13 +242,8 @@ void MqttHassPublishingClass::publishInverterBinarySensor(std::shared_ptr<Invert
 
 void MqttHassPublishingClass::createDeviceInfo(JsonObject& object, std::shared_ptr<InverterAbstract> inv)
 {
-    char serial[sizeof(uint64_t) * 8 + 1];
-    snprintf(serial, sizeof(serial), "%0x%08x",
-        ((uint32_t)((inv->serial() >> 32) & 0xFFFFFFFF)),
-        ((uint32_t)(inv->serial() & 0xFFFFFFFF)));
-
     object[F("name")] = inv->name();
-    object[F("ids")] = String(serial);
+    object[F("ids")] = inv->serialString();
     object[F("cu")] = String(F("http://")) + WiFi.localIP().toString();
     object[F("mf")] = F("OpenDTU");
     object[F("mdl")] = inv->typeName();

@@ -5,6 +5,13 @@
 InverterAbstract::InverterAbstract(uint64_t serial)
 {
     _serial.u64 = serial;
+
+    char serial_buff[sizeof(uint64_t) * 8 + 1];
+    snprintf(serial_buff, sizeof(serial_buff), "%0x%08x",
+        ((uint32_t)((serial >> 32) & 0xFFFFFFFF)),
+        ((uint32_t)(serial & 0xFFFFFFFF)));
+    _serialString = serial_buff;
+
     _alarmLogParser.reset(new AlarmLogParser());
     _devInfoParser.reset(new DevInfoParser());
     _powerCommandParser.reset(new PowerCommandParser());
@@ -24,6 +31,11 @@ void InverterAbstract::init()
 uint64_t InverterAbstract::serial()
 {
     return _serial.u64;
+}
+
+const String& InverterAbstract::serialString()
+{
+    return _serialString;
 }
 
 void InverterAbstract::setName(const char* name)
