@@ -91,6 +91,17 @@
                                 maxlength="31" />
                         </div>
 
+                        <div class="row mb-3">
+                            <label for="inverter-phase" class="col-sm-2 col-form-label">Current phase:</label>
+                            <div class="col-sm-10">
+                                <select class="form-select" v-model="editInverterData.phase">
+                                    <option v-for="phase in phaseList" :key="phase.key" :value="phase.key">
+                                        {{ phase.value }}
+                                    </option>
+                                </select>
+                            </div>
+                        </div>
+
                         <div class="mb-3" v-for="(max, index) in editInverterData.max_power" :key="`${index}`">
                             <label :for="`inverter-max_${index}`" class="col-form-label">Max power string {{ index +
                             1
@@ -152,7 +163,8 @@ declare interface Inverter {
     id: string,
     serial: number,
     name: string,
-    type: string
+    type: string,
+    phase: number,
     max_power: number[]
 }
 
@@ -174,6 +186,12 @@ export default defineComponent({
             deleteInverterData: {} as Inverter,
             inverters: [] as Inverter[],
             dataLoading: true,
+            phaseList: [
+                { key: 0, value: "None" },
+                { key: 1, value: "L1" },
+                { key: 2, value: "L2" },
+                { key: 3, value: "L3" },
+            ],
             alertMessage: "",
             alertType: "info",
             showAlert: false,
@@ -241,6 +259,7 @@ export default defineComponent({
             this.deleteId = -1;
             this.deleteInverterData.serial = 0;
             this.deleteInverterData.name = "";
+            this.deleteInverterData.phase = 0;
             this.deleteInverterData.max_power = [];
             this.modalDelete.hide();
         },
@@ -270,6 +289,7 @@ export default defineComponent({
             this.deleteId = -1;
             this.deleteInverterData.serial = 0;
             this.deleteInverterData.name = "";
+            this.deleteInverterData.phase = 0;
             this.deleteInverterData.max_power = [];
             this.modalDelete.hide();
         },
@@ -279,12 +299,14 @@ export default defineComponent({
             this.editInverterData.serial = inverter.serial;
             this.editInverterData.name = inverter.name;
             this.editInverterData.type = inverter.type;
+            this.editInverterData.phase = inverter.phase;
             this.editInverterData.max_power = inverter.max_power;
         },
         onCancel() {
             this.editId = "-1";
             this.editInverterData.serial = 0;
             this.editInverterData.name = "";
+            this.editInverterData.phase = 0;
             this.editInverterData.max_power = [];
             this.modal.hide();
         },
@@ -317,6 +339,7 @@ export default defineComponent({
             this.editInverterData.serial = 0;
             this.editInverterData.name = "";
             this.editInverterData.type = "";
+            this.editInverterData.phase = 0;
             this.editInverterData.max_power = [];
             this.modal.hide();
         },
