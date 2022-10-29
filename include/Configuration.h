@@ -83,6 +83,8 @@ struct CONFIG_T {
     bool Mqtt_Hass_Expire;
 
     char Security_Password[WIFI_MAX_PASSWORD_STRLEN + 1];
+
+    bool Mqtt_Victron_Enabled;
 };
 
 class ConfigurationClass {

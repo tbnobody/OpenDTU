@@ -52,7 +52,11 @@ void MqttSettingsClass::onMqttConnect(bool sessionPresent)
     mqttClient->subscribe(String(topic + "+/cmd/" + TOPIC_SUB_POWER).c_str(), 0);
     mqttClient->subscribe(String(topic + "+/cmd/" + TOPIC_SUB_RESTART).c_str(), 0);
 
-    // Loop all inverters and register @Victron Venus OS
+    // Check for doing some Victron parts...
+    if (!Configuration.get().Mqtt_Victron_Enabled) {
+        return;
+    }
+    // Loop all inverters and subscribe each for Victron Venus messages
     for (uint8_t i = 0; i < Hoymiles.getNumInverters(); i++) {
         auto inv = Hoymiles.getInverterByPos(i);
 
@@ -60,30 +64,9 @@ void MqttSettingsClass::onMqttConnect(bool sessionPresent)
         snprintf(buffer, sizeof(buffer), "%0x%08x",
             ((uint32_t)((inv->serial() >> 32) & 0xFFFFFFFF)),
             ((uint32_t)(inv->serial() & 0xFFFFFFFF)));
-        String subtopic = String(buffer);
-
-        // Register @Victon Venus
-        String hoyserial = String(subtopic);
-        mqttClient->subscribe(String("device/HM" + hoyserial + "/DBus").c_str(),0);
-
-        DynamicJsonDocument serviceDoc(256);
-        serviceDoc[hoyserial] = F("pvinverter");
-        JsonObject serviceObj = serviceDoc.as<JsonObject>();
-
-        DynamicJsonDocument rootDoc(1024);
-        rootDoc[F("clientId")] = "HM" + hoyserial;
-        rootDoc[F("connected")] = 1;
-        rootDoc[F("version")] = "stromi-0.1";
-        rootDoc[F("services")] = serviceObj;
-        JsonObject rootObj = rootDoc.as<JsonObject>();
-
-        char data[1024];
-        serializeJson(rootObj, data);
-
-        String topic = ("device/HM" + hoyserial + "/Status");
-        mqttClient->publish(topic.c_str(), 0, 1, data);
+        String str_serial = String(buffer);
+        mqttClient->subscribe(String("device/HM" + str_serial + "/DBus").c_str(),0);
     }
-    
 }
 
 void MqttSettingsClass::onMqttDisconnect(espMqttClientTypes::DisconnectReason reason)
@@ -150,7 +133,6 @@ void MqttSettingsClass::onMqttMessage(const espMqttClientTypes::MessagePropertie
         }
 
         serial = strtoull(serial_str, 0, 16);
-
         auto inv = Hoymiles.getInverterBySerial(serial);
 
         if (inv == nullptr) {

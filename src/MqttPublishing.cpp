@@ -71,27 +71,6 @@ void MqttPublishingClass::loop()
                 uint16_t maxpower = inv->DevInfo()->getMaxPower();
                 if (maxpower > 0) {
                     MqttSettings.publish(subtopic + "/status/limit_absolute", String(inv->SystemConfigPara()->getLimitPercent() * maxpower / 100));
-
-                    // Publish maxpower and error code to Victron Venus OS
-                    String deviceInstance = MqttSettings.getVictronDeviceInstance(subtopic);
-                    String portalid = MqttSettings.getVictronPortalId();
-                    if ( portalid == NULL ) { portalid = "NOportalId"; }
-
-                    String Vtopic = "W/" + portalid + "/pvinverter/" + deviceInstance + "/ErrorCode";
-                    DynamicJsonDocument val1Doc(128);
-                    val1Doc["value"] = 0;
-                    JsonObject val1Obj = val1Doc.as<JsonObject>();
-                    String data1;
-                    serializeJson(val1Obj, data1);
-                    MqttSettings.publishVictron(Vtopic, data1);
-
-                    Vtopic = "W/" + portalid + "/pvinverter/" + deviceInstance + "/Ac/MaxPower";
-                    DynamicJsonDocument val2Doc(128);
-                    val2Doc["value"] = maxpower;
-                    JsonObject val2Obj = val2Doc.as<JsonObject>();
-                    String data2;
-                    serializeJson(val2Obj, data2);
-                    MqttSettings.publishVictron(Vtopic, data2);
                 }
             }
 
@@ -125,61 +104,6 @@ void MqttPublishingClass::publishField(std::shared_ptr<InverterAbstract> inv, ui
     }
 
     MqttSettings.publish(topic, String(inv->Statistics()->getChannelFieldValue(channel, fieldId)));
-
-    // topic = "W/{}/pvinverter/{}/{}".format(portalId, deviceId, key) # UPDATE THIS
-    // print("{} = {}".format(topic, data.get(key) ) )
-    // client.publish(topic, json.dumps({ "value": data.get(key) }) )
-    if (channel == 0) {
-
-        float fieldvalue = float(inv->Statistics()->getChannelFieldValue(channel, fieldId));
-        fieldvalue = round(fieldvalue * 100)/100;
-        String fieldname = (inv->Statistics()->getChannelFieldName(channel, fieldId));
-        String portalid = MqttSettings.getVictronPortalId();
-        if ( portalid == NULL ) { portalid = "NOportalId"; }
-        String topic = "W/" + portalid + "/pvinverter";
-        String topic_Victron_sum;
-        String topic_Victron_phase;
-    
-        char serial[sizeof(uint64_t) * 8 + 1];
-        snprintf(serial, sizeof(serial), "%0x%08x",
-        ((uint32_t)((inv->serial() >> 32) & 0xFFFFFFFF)),
-        ((uint32_t)(inv->serial() & 0xFFFFFFFF)));
-        String invSerial = String(serial);
-
-        String deviceInstance = MqttSettings.getVictronDeviceInstance(serial);
-
-        int response = false;
-        if ( fieldname == "Voltage" ) { response = true; }
-        if ( fieldname == "Power") { response = true; }
-        if ( fieldname == "Current" ) { response = true; }
-        if ( fieldname == "YieldTotal") { response = true; }
-
-        if ( response ) {   
-            // fieldname[0] = std::toupper(fieldname[0]);
-            if ( fieldname == "YieldTotal" ) { 
-                topic_Victron_sum += topic + "/" + deviceInstance + "/Ac/Energy/Forward";
-                topic_Victron_phase += topic + "/" + deviceInstance + "/Ac/L1/Energy/Forward";
-            } else {
-                topic_Victron_sum += topic + "/" + deviceInstance + "/Ac/" + fieldname;
-                topic_Victron_phase += topic + "/" + deviceInstance + "/Ac/L1/" + fieldname;
-            }    
-
-            DynamicJsonDocument valueDoc(256);
-            valueDoc["value"] = fieldvalue;
-            JsonObject valueObj = valueDoc.as<JsonObject>();
-
-            String data;
-            serializeJson(valueObj, data);
-
-            Serial.print(F("MqTT publish value: "));
-            Serial.print(data);
-            Serial.print(F(" to Venus OS with topic: "));
-            Serial.println(topic_Victron_sum);
-
-            MqttSettings.publishVictron(topic_Victron_sum, data);
-            MqttSettings.publishVictron(topic_Victron_phase, data);
-        }
-     }
 }
 
 String MqttPublishingClass::getTopic(std::shared_ptr<InverterAbstract> inv, uint8_t channel, uint8_t fieldId)
