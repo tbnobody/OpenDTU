@@ -32,6 +32,7 @@
 struct INVERTER_CONFIG_T {
     uint64_t Serial;
     char Name[INV_MAX_NAME_STRLEN + 1];
+    uint16_t CurrentPhase;
     uint16_t MaxChannelPower[INV_MAX_CHAN_COUNT];
 };
 

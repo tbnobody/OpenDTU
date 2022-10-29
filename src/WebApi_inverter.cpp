@@ -54,6 +54,8 @@ void WebApiInverterClass::onInverterList(AsyncWebServerRequest* request)
                 obj[F("type")] = inv->typeName();
             }
 
+            obj[F("phase")] = config.Inverter[i].CurrentPhase;
+
             for (uint8_t c = 0; c < INV_MAX_CHAN_COUNT; c++) {
                 obj[F("max_power")][c] = config.Inverter[i].MaxChannelPower[c];
             }

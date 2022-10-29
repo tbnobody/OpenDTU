@@ -11,10 +11,8 @@ public:
     void init();
     void loop();
 
-    static String getTopic(std::shared_ptr<InverterAbstract> inv, uint8_t channel, uint8_t fieldId);
-
 private:
-    void publishField(std::shared_ptr<InverterAbstract> inv, uint8_t channel, uint8_t fieldId);
+    void publishField(std::shared_ptr<InverterAbstract> inv, uint8_t invphase, uint8_t fieldId);
 
     uint32_t _lastPublishStats[INV_MAX_COUNT];
     uint32_t _lastPublish;
