@@ -108,11 +108,14 @@ This can be achieved by editing the 'platformio.ini' file and add/change one or 
 * Install git and enable git in vscode - [git download](https://git-scm.com/downloads/) - [Instructions](https://www.jcchouinard.com/install-git-in-vscode/)
 * Clone this repository (you really have to clone it, don't just download the ZIP file. During the build process the git hash gets embedded into the firmware. If you download the ZIP file a build error will occur): Inside vscode open the command palette by pressing `CTRL` + `SHIFT` + `P`. Enter `git clone`, add the repository-URL `https://github.com/tbnobody/OpenDTU`. Next you have to choose (or create) a target directory.
 * In vscode, choose File --> Open Folder and select the previously downloaded source code. (You have to select the folder which contains the "platformio.ini" file)
-* There is a short [Video](https://youtu.be/9cA_esv3zeA) showing these steps.
 * Adjust the COM port in the file "platformio.ini" for your USB-serial-converter. It occurs twice:
     * upload_port
     * monitor_port
 * Select the arrow button in the status bar (PlatformIO: Upload) to compile and upload the firmware. During the compilation, all required libraries are downloaded automatically.
+* There are two videos showing these steps:
+    * [Git Clone and compilation](https://youtu.be/9cA_esv3zeA)
+    * [Full installation and compilation](https://youtu.be/xs6TqHn7QWM)
+
 ### on the commandline with PlatformIO Core
 * Install [PlatformIO Core](https://platformio.org/install/cli)
 * Clone this repository (you really have to clone it, don't just download the ZIP file. During the build process the git hash gets embedded into the firmware. If you download the ZIP file a build error will occur)
