@@ -30,7 +30,7 @@ private:
         FLD_PAC,
         FLD_F,
         FLD_T,
-        FLD_PCT,
+        FLD_PF,
         FLD_EFF,
         FLD_IRR,
         FLD_PRA

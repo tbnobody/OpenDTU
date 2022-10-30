@@ -16,7 +16,7 @@ enum {
     UNIT_C,
     UNIT_PCT,
     UNIT_VA,
-    UNIT_CNT
+    UNIT_NONE
 };
 const char* const units[] = { "V", "A", "W", "Wh", "kWh", "Hz", "°C", "%", "var", "" };
 
@@ -32,7 +32,7 @@ enum {
     FLD_PAC,
     FLD_F,
     FLD_T,
-    FLD_PCT,
+    FLD_PF,
     FLD_EFF,
     FLD_IRR,
     FLD_PRA,
