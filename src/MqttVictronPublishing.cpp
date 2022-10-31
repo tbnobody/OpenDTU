@@ -176,7 +176,7 @@ void MqttVictronPublishingClass::publishField(std::shared_ptr<InverterAbstract> 
         String nondata;
         serializeJson(nonvalueObj, nondata);
 
-        String valA, valB;
+        String valA, valB, topicA, topicB;
 
         switch ( invphase ) {
             case 1:
@@ -196,15 +196,14 @@ void MqttVictronPublishingClass::publishField(std::shared_ptr<InverterAbstract> 
         }
 
         if ( fieldname == "YieldTotal" ) { 
-                topic_Victron_phase += topic + "/" + deviceInstance + "/Ac/" + valA + "/Energy/Forward";      
-                MqttSettings.publishVictron(topic_Victron_phase, nondata);
-                topic_Victron_phase += topic + "/" + deviceInstance + "/Ac/" + valB + "/Energy/Forward";      
-                MqttSettings.publishVictron(topic_Victron_phase, nondata);
+                topicA += topic + "/" + deviceInstance + "/Ac/" + valA + "/Energy/Forward";      
+                topicB += topic + "/" + deviceInstance + "/Ac/" + valB + "/Energy/Forward"; 
         } else {
-                topic_Victron_phase += topic + "/" + deviceInstance + "/Ac/" + valA + "/" + fieldname;
-                MqttSettings.publishVictron(topic_Victron_phase, nondata);
-                topic_Victron_phase += topic + "/" + deviceInstance + "/Ac/" + valB + "/" + fieldname;
-                MqttSettings.publishVictron(topic_Victron_phase, nondata);
+                topicA += topic + "/" + deviceInstance + "/Ac/" + valA + "/" + fieldname;
+                topicB += topic + "/" + deviceInstance + "/Ac/" + valB + "/" + fieldname;
         }
+        
+        MqttSettings.publishVictron(topicA, nondata);
+        MqttSettings.publishVictron(topicB, nondata);
     }
 }
