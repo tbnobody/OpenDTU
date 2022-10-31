@@ -228,6 +228,8 @@ void WebApiInverterClass::onInverterEdit(AsyncWebServerRequest* request)
     inverter.Serial = new_serial;
     strncpy(inverter.Name, root[F("name")].as<String>().c_str(), INV_MAX_NAME_STRLEN);
 
+    inverter.CurrentPhase = strtoll(root[F("phase")].as<String>().c_str(), NULL, 16);
+
     uint8_t arrayCount = 0;
     for (JsonVariant maxPower : maxPowerArray) {
         inverter.MaxChannelPower[arrayCount] = maxPower.as<uint16_t>();

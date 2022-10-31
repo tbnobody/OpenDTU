@@ -55,6 +55,9 @@
                                     {{ inverter.type }}
                                 </td>
                                 <td>
+                                    {{ inverter.phase}}
+                                </td>
+                                <td>
                                     <a href="#" class="icon text-danger" title="Delete inverter">
                                         <BIconTrash v-on:click="onDeleteModal(inverter)" />
                                     </a>&nbsp;
