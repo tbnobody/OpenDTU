@@ -83,6 +83,7 @@ public:
     bool hasChannelFieldValue(uint8_t channel, uint8_t fieldId);
     const char* getChannelFieldUnit(uint8_t channel, uint8_t fieldId);
     const char* getChannelFieldName(uint8_t channel, uint8_t fieldId);
+    uint8_t getChannelFieldDigits(uint8_t channel, uint8_t fieldId);
 
     uint8_t getChannelCount();
 
