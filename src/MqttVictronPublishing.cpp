@@ -90,14 +90,14 @@ void MqttVictronPublishingClass::loop()
         
             }
 
+            // Loop all fields in channel 0
+            for (uint8_t f = 0; f < sizeof(_publishFields); f++) {
+                publishField(inv, invphase, _publishFields[f]);
+            }
+
             uint32_t lastUpdate = inv->Statistics()->getLastUpdate();
             if (lastUpdate > 0 && lastUpdate != _lastPublishStats[i]) {
                 _lastPublishStats[i] = lastUpdate;
-                              
-                // Loop all fields in channel 0
-                for (uint8_t f = 0; f < sizeof(_publishFields); f++) {
-                    publishField(inv, invphase, _publishFields[f]);
-                }
             }
 
             yield();
