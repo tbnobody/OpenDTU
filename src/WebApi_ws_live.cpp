@@ -134,6 +134,7 @@ void WebApiWsLiveClass::addField(JsonVariant& root, uint8_t idx, std::shared_ptr
         }
         root[idx][String(channel)][chanName]["v"] = inv->Statistics()->getChannelFieldValue(channel, fieldId);
         root[idx][String(channel)][chanName]["u"] = inv->Statistics()->getChannelFieldUnit(channel, fieldId);
+        root[idx][String(channel)][chanName]["d"] = inv->Statistics()->getChannelFieldDigits(channel, fieldId);
     }
 }
 
