@@ -47,12 +47,13 @@ void MqttVictronPublishingClass::loop()
 
             // Get Current phase
             uint16_t invphase = config.Inverter[i].CurrentPhase;
+            uint64_t invname = config.Inverter[i].Serial;
 
             String Vtopic = ("device/HM" + str_serial + "/Status");
             DynamicJsonDocument rootDoc(1024);
             rootDoc[F("clientId")] = "HM" + str_serial;
             rootDoc[F("connected")] = 1;
-            rootDoc[F("version")] = "0.1-L" + String(invphase);
+            rootDoc[F("version")] = "0.1-L" + String(invphase) + "-" + String(invname);
             rootDoc[F("services")] = serviceObj;
             JsonObject rootObj = rootDoc.as<JsonObject>();
             String data;
