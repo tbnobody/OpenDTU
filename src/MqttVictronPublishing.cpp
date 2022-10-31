@@ -48,11 +48,14 @@ void MqttVictronPublishingClass::loop()
             // Get Current phase
             uint16_t invphase = config.Inverter[i+1].CurrentPhase;
             String invname = config.Inverter[i+1].Name;
+            String invconnected;
+
+            if (invphase == 0) { invconnected = "0"; } else { invconnected = "1"; }
 
             String Vtopic = ("device/HM" + str_serial + "/Status");
             DynamicJsonDocument rootDoc(1024);
             rootDoc[F("clientId")] = "HM" + str_serial;
-            rootDoc[F("connected")] = 1;
+            rootDoc[F("connected")] = invconnected;
             rootDoc[F("version")] = "0.1-L" + String(invphase) + "-" + invname;
             rootDoc[F("services")] = serviceObj;
             JsonObject rootObj = rootDoc.as<JsonObject>();
@@ -158,5 +161,57 @@ void MqttVictronPublishingClass::publishField(std::shared_ptr<InverterAbstract> 
 
         MqttSettings.publishVictron(topic_Victron_sum, data);
         MqttSettings.publishVictron(topic_Victron_phase, data);
+
+        // Send Value 0 to other current phases and energy 
+        uint8_t nonval = 0;
+        DynamicJsonDocument nonvalueDoc(64);
+        nonvalueDoc["value"] = nonval;
+        JsonObject nonvalueObj = nonvalueDoc.as<JsonObject>();
+
+        String nondata;
+        serializeJson(nonvalueObj, nondata);
+
+        if ( invphase == 1) {
+            if ( fieldname == "YieldTotal" ) { 
+                topic_Victron_phase += topic + "/" + deviceInstance + "/Ac/L2/Energy/Forward";      
+                MqttSettings.publishVictron(topic_Victron_phase, nondata);
+                topic_Victron_phase += topic + "/" + deviceInstance + "/Ac/L3/Energy/Forward";      
+                MqttSettings.publishVictron(topic_Victron_phase, nondata);
+            } else {
+                topic_Victron_phase += topic + "/" + deviceInstance + "/Ac/L2/" + fieldname;
+                MqttSettings.publishVictron(topic_Victron_phase, nondata);
+                topic_Victron_phase += topic + "/" + deviceInstance + "/Ac/L3/" + fieldname;
+                MqttSettings.publishVictron(topic_Victron_phase, nondata);
+            }
+        }
+
+        if ( invphase == 2) {
+            if ( fieldname == "YieldTotal" ) { 
+                topic_Victron_phase += topic + "/" + deviceInstance + "/Ac/L1/Energy/Forward";      
+                MqttSettings.publishVictron(topic_Victron_phase, nondata);
+                topic_Victron_phase += topic + "/" + deviceInstance + "/Ac/L3/Energy/Forward";      
+                MqttSettings.publishVictron(topic_Victron_phase, nondata);
+            } else {
+                topic_Victron_phase += topic + "/" + deviceInstance + "/Ac/L1/" + fieldname;
+                MqttSettings.publishVictron(topic_Victron_phase, nondata);
+                topic_Victron_phase += topic + "/" + deviceInstance + "/Ac/L3/" + fieldname;
+                MqttSettings.publishVictron(topic_Victron_phase, nondata);
+            }
+        }
+        
+        if ( invphase == 3) {
+            if ( fieldname == "YieldTotal" ) { 
+                topic_Victron_phase += topic + "/" + deviceInstance + "/Ac/L1/Energy/Forward";      
+                MqttSettings.publishVictron(topic_Victron_phase, nondata);
+                topic_Victron_phase += topic + "/" + deviceInstance + "/Ac/L2/Energy/Forward";      
+                MqttSettings.publishVictron(topic_Victron_phase, nondata);
+            } else {
+                topic_Victron_phase += topic + "/" + deviceInstance + "/Ac/L1/" + fieldname;
+                MqttSettings.publishVictron(topic_Victron_phase, nondata);
+                topic_Victron_phase += topic + "/" + deviceInstance + "/Ac/L2/" + fieldname;
+                MqttSettings.publishVictron(topic_Victron_phase, nondata);
+            }
+        }
+
      }
 }
