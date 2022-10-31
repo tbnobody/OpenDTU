@@ -40,7 +40,7 @@
                                     <div style="padding-right: 2em;">
                                         Current Limit: <template v-if="inverter.limit_absolute > -1"> {{
                                                 formatNumber(inverter.limit_absolute, 0)
-                                        }}W | </template>{{ formatNumber(inverter.limit_relative, 0) }}%
+                                        }} W | </template>{{ formatNumber(inverter.limit_relative, 0) }} %
                                     </div>
                                     <div style="padding-right: 2em;">
                                         Data Age: {{ inverter.data_age }} seconds
