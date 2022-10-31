@@ -39,6 +39,7 @@
                                 <th scope="col">Serial</th>
                                 <th>Name</th>
                                 <th>Type</th>
+                                <th>Phase</th>
                                 <th>Action</th>
                             </tr>
                         </thead>
@@ -55,7 +56,7 @@
                                     {{ inverter.type }}
                                 </td>
                                 <td>
-                                    {{ inverter.phase}}
+                                    L{{ inverter.phase}}
                                 </td>
                                 <td>
                                     <a href="#" class="icon text-danger" title="Delete inverter">
