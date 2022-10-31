@@ -1,7 +1,7 @@
 <template>
     <BasePage :title="'Live Data'" :isLoading="dataLoading" :isWideScreen="true">
         <div class="row gy-3">
-            <div class="col-sm-3 col-md-2" :style="[inverterData.length == 1 ? {'display': 'none' } : {}]">
+            <div class="col-sm-3 col-md-2" :style="[inverterData.length == 1 ? { 'display': 'none' } : {}]">
                 <div class="nav nav-pills row-cols-sm-1" id="v-pills-tab" role="tablist" aria-orientation="vertical">
                     <button v-for="inverter in inverterData" :key="inverter.serial" class="nav-link"
                         :id="'v-pills-' + inverter.serial + '-tab'" data-bs-toggle="pill"
@@ -15,8 +15,10 @@
                 </div>
             </div>
 
-            <div class="tab-content" id="v-pills-tabContent" :class="{'col-sm-9 col-md-10': inverterData.length > 1,
-            'col-sm-12 col-md-12': inverterData.length == 1 }">
+            <div class="tab-content" id="v-pills-tabContent" :class="{
+                'col-sm-9 col-md-10': inverterData.length > 1,
+                'col-sm-12 col-md-12': inverterData.length == 1
+            }">
                 <div v-for="inverter in inverterData" :key="inverter.serial" class="tab-pane fade show"
                     :id="'v-pills-' + inverter.serial" role="tabpanel"
                     :aria-labelledby="'v-pills-' + inverter.serial + '-tab'" tabindex="0">
@@ -37,9 +39,8 @@
                                     </div>
                                     <div style="padding-right: 2em;">
                                         Current Limit: <template v-if="inverter.limit_absolute > -1"> {{
-                                        inverter.limit_absolute.toFixed(0) }}W | </template>{{
-                                            inverter.limit_relative.toFixed(0)
-                                            }}%
+                                                formatNumber(inverter.limit_absolute, 0)
+                                        }}W | </template>{{ formatNumber(inverter.limit_relative, 0) }}%
                                     </div>
                                     <div style="padding-right: 2em;">
                                         Data Age: {{ inverter.data_age }} seconds
@@ -178,15 +179,16 @@
                                     Limit:</label>
                                 <div class="col-sm-4">
                                     <div class="input-group">
-                                        <input type="number" class="form-control" id="inputCurrentLimit"
-                                            aria-describedby="currentLimitType" v-model="currentLimitRelative" disabled />
+                                        <input type="text" class="form-control" id="inputCurrentLimit"
+                                            aria-describedby="currentLimitType" v-model="currentLimitRelative"
+                                            disabled />
                                         <span class="input-group-text" id="currentLimitType">%</span>
                                     </div>
                                 </div>
 
                                 <div class="col-sm-4" v-if="currentLimitList.max_power > 0">
                                     <div class="input-group">
-                                        <input type="number" class="form-control" id="inputCurrentLimitAbsolute"
+                                        <input type="text" class="form-control" id="inputCurrentLimitAbsolute"
                                             aria-describedby="currentLimitTypeAbsolute" v-model="currentLimitAbsolute"
                                             disabled />
                                         <span class="input-group-text" id="currentLimitTypeAbsolute">W</span>
@@ -333,6 +335,7 @@ import type { EventlogItems } from '@/types/EventlogStatus';
 import type { Inverters } from '@/types/LiveDataStatus';
 import type { LimitStatus } from '@/types/LimitStatus';
 import type { LimitConfig } from '@/types/LimitConfig';
+import { formatNumber } from '@/utils';
 
 export default defineComponent({
     components: {
@@ -424,17 +427,18 @@ export default defineComponent({
         }
     },
     computed: {
-        currentLimitAbsolute(): number {
+        currentLimitAbsolute(): string {
             if (this.currentLimitList.max_power > 0) {
-                return Number((this.currentLimitList.limit_relative * this.currentLimitList.max_power / 100).toFixed(1));
+                return formatNumber(this.currentLimitList.limit_relative * this.currentLimitList.max_power / 100, 2);
             }
-            return 0;
+            return "0";
         },
-        currentLimitRelative(): number {
-            return Number((this.currentLimitList.limit_relative).toFixed(1));
+        currentLimitRelative(): string {
+            return formatNumber(this.currentLimitList.limit_relative, 2);
         }
     },
     methods: {
+        formatNumber,
         getInitialData() {
             this.dataLoading = true;
             fetch("/api/livedata/status")
