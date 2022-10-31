@@ -375,7 +375,7 @@ String NetworkSettingsClass::macAddress()
         return WiFi.macAddress();
         break;
     default:
-        return String("");
+        return "";
     }
 }
 

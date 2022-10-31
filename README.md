@@ -115,7 +115,7 @@ A heavily incomplete list of trusted hardware shops in germany is:
 This list is for your convenience only, the project is not related to any of these shops.
 
 ### Power supply
-Use a power suppy with 5V and 1A. The USB cable connected to your PC/Notebook may be powerful enough or may be not.
+Use a power suppy with 5 V and 1 A. The USB cable connected to your PC/Notebook may be powerful enough or may be not.
 
 
 ## Wiring up
@@ -146,11 +146,14 @@ This can be achieved by editing the 'platformio.ini' file and add/change one or 
 * Install git and enable git in vscode - [git download](https://git-scm.com/downloads/) - [Instructions](https://www.jcchouinard.com/install-git-in-vscode/)
 * Clone this repository (you really have to clone it, don't just download the ZIP file. During the build process the git hash gets embedded into the firmware. If you download the ZIP file a build error will occur): Inside vscode open the command palette by pressing `CTRL` + `SHIFT` + `P`. Enter `git clone`, add the repository-URL `https://github.com/tbnobody/OpenDTU`. Next you have to choose (or create) a target directory.
 * In vscode, choose File --> Open Folder and select the previously downloaded source code. (You have to select the folder which contains the "platformio.ini" file)
-* There is a short [Video](https://youtu.be/9cA_esv3zeA) showing these steps.
 * Adjust the COM port in the file "platformio.ini" for your USB-serial-converter. It occurs twice:
     * upload_port
     * monitor_port
 * Select the arrow button in the status bar (PlatformIO: Upload) to compile and upload the firmware. During the compilation, all required libraries are downloaded automatically.
+* There are two videos showing these steps:
+    * [Git Clone and compilation](https://youtu.be/9cA_esv3zeA)
+    * [Full installation and compilation](https://youtu.be/xs6TqHn7QWM)
+
 ### on the commandline with PlatformIO Core
 * Install [PlatformIO Core](https://platformio.org/install/cli)
 * Clone this repository (you really have to clone it, don't just download the ZIP file. During the build process the git hash gets embedded into the firmware. If you download the ZIP file a build error will occur)
@@ -244,11 +247,11 @@ A documentation of all available MQTT Topics can be found here: [MQTT Documentat
 * First: When there is no light on the solar panels, the inverter completely turns off and does not answer to OpenDTU! So if you assembled your OpenDTU in the evening, wait until tomorrow.
 * When there is no data received from the inverter(s) - try to reduce the distance between the openDTU and the inverter (e.g. move it to the window towards the roof)
 * Under Settings -> DTU Settings you can increase the transmit power "PA level". Default is "minimum".
-* The NRF24L01+ needs relatively much current. With bad power supply (and especially bad cables!) a 10uF capacitor soldered directly to the NRF24L01+ board connector brings more stability (pin 1+2 are the power supply). Note the polarity of the capacitor....
-* You can try to use an USB power supply with 1A or more instead of connecting the ESP32 to the computer.
+* The NRF24L01+ needs relatively much current. With bad power supply (and especially bad cables!) a 10 µF capacitor soldered directly to the NRF24L01+ board connector brings more stability (pin 1+2 are the power supply). Note the polarity of the capacitor…
+* You can try to use an USB power supply with 1 A or more instead of connecting the ESP32 to the computer.
 * Try a different USB cable. Once again, a stable power source is important. Some USB cables are made of much plastic and very little copper inside.
-* Double-Check that you have a radio module NRF24L01+ with a plus sign at the end. NRF24L01 module without the plus are not compatible with this project.
-* There is no possibility of auto-discovering the inverters. Double-Check you have entered the serial numbers of the inverters correctly.
+* Double check that you have a radio module NRF24L01+ with a plus sign at the end. NRF24L01 module without the plus are not compatible with this project.
+* There is no possibility of auto-discovering the inverters. Double check you have entered the serial numbers of the inverters correctly.
 * OpenDTU needs access to a working NTP server to get the current date & time.
 * If your problem persists, check the  [Issues on Github](https://github.com/tbnobody/OpenDTU/issues). Please inspect not only the open issues, also the closed issues contain useful information.
 * Another source of information are the [Discussions](https://github.com/tbnobody/OpenDTU/discussions/)

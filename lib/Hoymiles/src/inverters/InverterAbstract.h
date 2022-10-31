@@ -33,6 +33,7 @@ public:
     explicit InverterAbstract(uint64_t serial);
     void init();
     uint64_t serial();
+    const String& serialString();
     void setName(const char* name);
     const char* name();
     virtual String typeName() = 0;
@@ -64,6 +65,7 @@ public:
 
 private:
     serial_u _serial;
+    String _serialString;
     char _name[MAX_NAME_LENGTH] = "";
     fragment_t _rxFragmentBuffer[MAX_RF_FRAGMENT_COUNT];
     uint8_t _rxFragmentMaxPacketId = 0;
