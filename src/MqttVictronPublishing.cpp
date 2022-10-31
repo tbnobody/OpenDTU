@@ -52,7 +52,7 @@ void MqttVictronPublishingClass::loop()
             DynamicJsonDocument rootDoc(1024);
             rootDoc[F("clientId")] = "HM" + str_serial;
             rootDoc[F("connected")] = 1;
-            rootDoc[F("version")] = "stromi-0.1-L" + invphase;
+            rootDoc[F("version")] = "0.1-L" + invphase;
             rootDoc[F("services")] = serviceObj;
             JsonObject rootObj = rootDoc.as<JsonObject>();
             String data;
