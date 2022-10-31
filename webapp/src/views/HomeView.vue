@@ -376,7 +376,7 @@ export default defineComponent({
             currentLimitList: {} as LimitStatus,
             targetLimitList: {} as LimitConfig,
 
-            targetLimitMin: 10,
+            targetLimitMin: 2,
             targetLimitMax: 100,
             targetLimitTypeText: "Relative (%)",
             targetLimitType: 1,
@@ -585,7 +585,7 @@ export default defineComponent({
         onSelectType(type: number) {
             if (type == 1) {
                 this.targetLimitTypeText = "Relative (%)";
-                this.targetLimitMin = 10;
+                this.targetLimitMin = 2;
                 this.targetLimitMax = 100;
             } else {
                 this.targetLimitTypeText = "Absolute (W)";
