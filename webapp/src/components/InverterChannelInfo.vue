@@ -28,6 +28,7 @@
 <script lang="ts">
 import { defineComponent, type PropType } from 'vue';
 import type { InverterStatistics } from '@/types/LiveDataStatus';
+import { formatNumber } from '@/utils';
 
 export default defineComponent({
     props: {
@@ -35,11 +36,7 @@ export default defineComponent({
         channelNumber: { type: Number, required: true },
     },
     methods: {
-        formatNumber(num: number, digits: number) {
-            return new Intl.NumberFormat(
-                undefined, { minimumFractionDigits: digits, maximumFractionDigits: digits }
-            ).format(num);
-        },
+        formatNumber,
     },
 });
 </script>
