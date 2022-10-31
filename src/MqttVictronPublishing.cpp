@@ -45,11 +45,14 @@ void MqttVictronPublishingClass::loop()
             serviceDoc[str_serial] = F("pvinverter");
             JsonObject serviceObj = serviceDoc.as<JsonObject>();
 
+            // Get Current phase
+            uint8_t invphase = config.Inverter[i].CurrentPhase;
+
             String Vtopic = ("device/HM" + str_serial + "/Status");
             DynamicJsonDocument rootDoc(1024);
             rootDoc[F("clientId")] = "HM" + str_serial;
             rootDoc[F("connected")] = 1;
-            rootDoc[F("version")] = "stromi-0.1";
+            rootDoc[F("version")] = "stromi-0.1-L" + invphase;
             rootDoc[F("services")] = serviceObj;
             JsonObject rootObj = rootDoc.as<JsonObject>();
             String data;
@@ -86,10 +89,7 @@ void MqttVictronPublishingClass::loop()
             uint32_t lastUpdate = inv->Statistics()->getLastUpdate();
             if (lastUpdate > 0 && lastUpdate != _lastPublishStats[i]) {
                 _lastPublishStats[i] = lastUpdate;
-
-                // Get Current phase
-                uint8_t invphase = config.Inverter[i].CurrentPhase;
-                                
+                              
                 // Loop all fields in channel 0
                 for (uint8_t f = 0; f < sizeof(_publishFields); f++) {
                     publishField(inv, invphase, _publishFields[f]);
@@ -135,7 +135,7 @@ void MqttVictronPublishingClass::publishField(std::shared_ptr<InverterAbstract> 
         // fieldname[0] = std::toupper(fieldname[0]);
         if ( fieldname == "YieldTotal" ) { 
             topic_Victron_sum += topic + "/" + deviceInstance + "/Ac/Energy/Forward";
-            topic_Victron_phase += topic + "/" + deviceInstance + "/Ac/L" + invphase + "/Energy/Forward";
+            topic_Victron_phase += topic + "/" + deviceInstance + "/Ac/" + invphase + "/Energy/Forward";
         } else {
             topic_Victron_sum += topic + "/" + deviceInstance + "/Ac/" + fieldname;
             topic_Victron_phase += topic + "/" + deviceInstance + "/Ac/L" + invphase + "/" + fieldname;
