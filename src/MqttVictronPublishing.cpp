@@ -46,7 +46,7 @@ void MqttVictronPublishingClass::loop()
             JsonObject serviceObj = serviceDoc.as<JsonObject>();
 
             // Get Current phase
-            uint8_t invphase = config.Inverter[i].CurrentPhase;
+            uint16_t invphase = config.Inverter[i].CurrentPhase;
 
             String Vtopic = ("device/HM" + str_serial + "/Status");
             DynamicJsonDocument rootDoc(1024);
@@ -103,7 +103,7 @@ void MqttVictronPublishingClass::loop()
     }
 }
 
-void MqttVictronPublishingClass::publishField(std::shared_ptr<InverterAbstract> inv, uint8_t invphase, uint8_t fieldId)
+void MqttVictronPublishingClass::publishField(std::shared_ptr<InverterAbstract> inv, uint16_t invphase, uint8_t fieldId)
 {
     // topic = "W/{}/pvinverter/{}/{}".format(portalId, deviceId, key)
     // print("{} = {}".format(topic, data.get(key) ) )
