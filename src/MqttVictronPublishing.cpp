@@ -135,10 +135,10 @@ void MqttVictronPublishingClass::publishField(std::shared_ptr<InverterAbstract> 
         // fieldname[0] = std::toupper(fieldname[0]);
         if ( fieldname == "YieldTotal" ) { 
             topic_Victron_sum += topic + "/" + deviceInstance + "/Ac/Energy/Forward";
-            topic_Victron_phase += topic + "/" + deviceInstance + "/Ac/" + invphase + "/Energy/Forward";
+            topic_Victron_phase += topic + "/" + deviceInstance + "/Ac/L" + invphase + "/Energy/Forward";
         } else {
             topic_Victron_sum += topic + "/" + deviceInstance + "/Ac/" + fieldname;
-            topic_Victron_phase += topic + "/" + deviceInstance + "/Ac/" + invphase + "/" + fieldname;
+            topic_Victron_phase += topic + "/" + deviceInstance + "/Ac/L" + invphase + "/" + fieldname;
         }    
 
         DynamicJsonDocument valueDoc(256);
