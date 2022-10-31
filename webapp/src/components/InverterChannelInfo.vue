@@ -15,7 +15,7 @@
                     <tr v-for="(property, key) in channelData" :key="`prop-${key}`">
                         <template v-if="property">
                             <th scope="row">{{ key }}</th>
-                            <td style="text-align: right">{{ formatNumber(property.v) }}</td>
+                            <td style="text-align: right">{{ formatNumber(property.v, property.d) }}</td>
                             <td>{{ property.u }}</td>
                         </template>
                     </tr>
@@ -35,9 +35,9 @@ export default defineComponent({
         channelNumber: { type: Number, required: true },
     },
     methods: {
-        formatNumber(num: number) {
+        formatNumber(num: number, digits: number) {
             return new Intl.NumberFormat(
-                undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }
+                undefined, { minimumFractionDigits: digits, maximumFractionDigits: digits }
             ).format(num);
         },
     },
