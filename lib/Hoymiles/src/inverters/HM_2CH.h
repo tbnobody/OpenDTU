@@ -31,7 +31,7 @@ private:
         { FLD_PAC, UNIT_W, CH0, 30, 2, 10, false },
         { FLD_PRA, UNIT_VA, CH0, 32, 2, 10, false },
         { FLD_F, UNIT_HZ, CH0, 28, 2, 100, false },
-        { FLD_PF, UNIT_NONE, CH0, 36, 2, 10, false },
+        { FLD_PF, UNIT_NONE, CH0, 36, 2, 1000, false },
         { FLD_T, UNIT_C, CH0, 38, 2, 10, true },
         { FLD_EVT_LOG, UNIT_NONE, CH0, 40, 2, 1, false },
         { FLD_YD, UNIT_WH, CH0, CALC_YD_CH0, 0, CMD_CALC, false },
