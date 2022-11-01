@@ -70,7 +70,12 @@ void MqttPublishingClass::loop()
 
             MqttSettings.publish(subtopic + "/status/reachable", String(inv->isReachable()));
             MqttSettings.publish(subtopic + "/status/producing", String(inv->isProducing()));
-            MqttSettings.publish(subtopic + "/status/last_update", String(std::time(0) - (millis() - inv->Statistics()->getLastUpdate()) / 1000));
+
+            if (inv->Statistics()->getLastUpdate() > 0) {
+                MqttSettings.publish(subtopic + "/status/last_update", String(std::time(0) - (millis() - inv->Statistics()->getLastUpdate()) / 1000));
+            } else {
+                MqttSettings.publish(subtopic + "/status/last_update", String(0));
+            }
 
             uint32_t lastUpdate = inv->Statistics()->getLastUpdate();
             if (lastUpdate > 0 && lastUpdate != _lastPublishStats[i]) {
