@@ -126,6 +126,7 @@ void MqttVictronPublishingClass::publishField(std::shared_ptr<InverterAbstract> 
         //fieldval = ( fieldval * 100 );
         //int fieldvalint = int( fieldval );
         float fieldvalue = roundf (float( fieldval )) / 10.0;
+        fieldvalue = roundf (fieldvalue);
 
 
         String portalid = MqttSettings.getVictronPortalId();
