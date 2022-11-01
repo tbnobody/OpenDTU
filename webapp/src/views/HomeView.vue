@@ -332,7 +332,7 @@ import BootstrapAlert from '@/components/BootstrapAlert.vue';
 import InverterChannelInfo from "@/components/InverterChannelInfo.vue";
 import type { DevInfoStatus } from '@/types/DevInfoStatus';
 import type { EventlogItems } from '@/types/EventlogStatus';
-import type { Inverters } from '@/types/LiveDataStatus';
+import type { LiveData, Inverter } from '@/types/LiveDataStatus';
 import type { LimitStatus } from '@/types/LimitStatus';
 import type { LimitConfig } from '@/types/LimitConfig';
 import { formatNumber } from '@/utils';
@@ -361,7 +361,7 @@ export default defineComponent({
             heartInterval: 0,
             dataAgeInterval: 0,
             dataLoading: true,
-            inverterData: [] as Inverters,
+            liveData: {} as LiveData,
             isFirstFetchAfterConnect: true,
             eventLogView: {} as bootstrap.Modal,
             eventLogList: {} as EventlogItems,
@@ -435,6 +435,9 @@ export default defineComponent({
         },
         currentLimitRelative(): string {
             return formatNumber(this.currentLimitList.limit_relative, 2);
+        },
+        inverterData(): Inverter[] {
+            return this.liveData.inverters;
         }
     },
     methods: {
@@ -444,7 +447,7 @@ export default defineComponent({
             fetch("/api/livedata/status")
                 .then((response) => response.json())
                 .then((data) => {
-                    this.inverterData = data;
+                    this.liveData = data;
                     this.dataLoading = false;
                 });
         },
@@ -459,7 +462,7 @@ export default defineComponent({
 
             this.socket.onmessage = (event) => {
                 console.log(event);
-                this.inverterData = JSON.parse(event.data);
+                this.liveData = JSON.parse(event.data);
                 this.dataLoading = false;
                 this.heartCheck(); // Reset heartbeat detection
             };
