@@ -118,14 +118,8 @@ void MqttVictronPublishingClass::publishField(std::shared_ptr<InverterAbstract> 
     if ( fieldname == "YieldTotal") { response = true; }
 
     if ( response ) {   
-
-        //float fieldval = float(inv->Statistics()->getChannelFieldValue(0, fieldId));
-        uint32_t fieldval = uint32_t((inv->Statistics()->getChannelFieldValue(0, fieldId)) * 10);
-
-        // fieldvalue = round(fieldvalue * 100)/100;
-        //fieldval = ( fieldval * 100 );
-        //int fieldvalint = int( fieldval );
-        float fieldvalue = roundf (float( fieldval )) / 10.0000000000000000;
+        double fieldval = double(inv->Statistics()->getChannelFieldValue(0, fieldId));
+        double fieldvalue = floor( fieldval * 100.0 + .5 ) / 100.0;
 
         String portalid = MqttSettings.getVictronPortalId();
         if ( portalid == NULL ) { portalid = "NOportalId"; }
@@ -133,13 +127,14 @@ void MqttVictronPublishingClass::publishField(std::shared_ptr<InverterAbstract> 
         String topic_Victron_sum;
         String topic_Victron_phase;
     
-        char serial[sizeof(uint64_t) * 8 + 1];
-        snprintf(serial, sizeof(serial), "%0x%08x",
-        ((uint32_t)((inv->serial() >> 32) & 0xFFFFFFFF)),
-        ((uint32_t)(inv->serial() & 0xFFFFFFFF)));
-        String invSerial = String(serial);
+        //char serial[sizeof(uint64_t) * 8 + 1];
+        //snprintf(serial, sizeof(serial), "%0x%08x",
+        //((uint32_t)((inv->serial() >> 32) & 0xFFFFFFFF)),
+        //((uint32_t)(inv->serial() & 0xFFFFFFFF)));
+        //String invSerial = String(serial);
+        String invSerial = inv->serialString();
 
-        String deviceInstance = MqttSettings.getVictronDeviceInstance(serial);
+        String deviceInstance = MqttSettings.getVictronDeviceInstance(invSerial);
 
         // fieldname[0] = std::toupper(fieldname[0]);
         if ( fieldname == "YieldTotal" ) { 
