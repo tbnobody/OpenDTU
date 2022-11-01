@@ -17,7 +17,7 @@ public:
     void publish(const String& subtopic, const String& payload);
     void publishHass(const String& subtopic, const String& payload);
 
-    void publishVictron(String hoyserial, String payload);
+    void publishVictron(const String& hoyserial, const String& payload);
 
     const char* VictronPortalId;
     std::map<String, String> VictronDeviceInstance;

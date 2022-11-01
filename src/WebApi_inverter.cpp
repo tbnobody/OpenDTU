@@ -8,6 +8,7 @@
 #include "Configuration.h"
 #include "Hoymiles.h"
 #include "MqttHassPublishing.h"
+#include "MqttVictronPublishing.h"
 #include "helper.h"
 
 void WebApiInverterClass::init(AsyncWebServer* server)
@@ -149,6 +150,7 @@ void WebApiInverterClass::onInverterAdd(AsyncWebServerRequest* request)
     }
 
     MqttHassPublishing.forceUpdate();
+    MqttVictronPublishing.forceRegister();
 }
 
 void WebApiInverterClass::onInverterEdit(AsyncWebServerRequest* request)
@@ -265,6 +267,7 @@ void WebApiInverterClass::onInverterEdit(AsyncWebServerRequest* request)
     }
 
     MqttHassPublishing.forceUpdate();
+    MqttVictronPublishing.forceRegister();
 }
 
 void WebApiInverterClass::onInverterDelete(AsyncWebServerRequest* request)
@@ -329,4 +332,5 @@ void WebApiInverterClass::onInverterDelete(AsyncWebServerRequest* request)
     request->send(response);
 
     MqttHassPublishing.forceUpdate();
+    MqttVictronPublishing.forceRegister();
 }
