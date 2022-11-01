@@ -79,7 +79,17 @@ float StatisticsParser::getChannelFieldValue(uint8_t channel, uint8_t fieldId)
             val |= _payloadStatistic[ptr];
         } while (++ptr != end);
 
-        return static_cast<float>(val) / static_cast<float>(div);
+        float result;
+        if (b[pos].isSigned && b[pos].num == 2) {
+            result = static_cast<float>(static_cast<int16_t>(val));
+        } else if (b[pos].isSigned && b[pos].num == 4) {
+            result = static_cast<float>(static_cast<int32_t>(val));
+        } else {
+            result = static_cast<float>(val);
+        }
+
+        result /= static_cast<float>(div);
+        return result;
     } else {
         // Value has to be calculated
         return calcFunctions[b[pos].start].func(this, b[pos].num);
@@ -108,6 +118,25 @@ const char* StatisticsParser::getChannelFieldName(uint8_t channel, uint8_t field
     const byteAssign_t* b = _byteAssignment;
 
     return fields[b[pos].fieldId];
+}
+
+uint8_t StatisticsParser::getChannelFieldDigits(uint8_t channel, uint8_t fieldId)
+{
+    uint8_t pos = getAssignIdxByChannelField(channel, fieldId);
+    const byteAssign_t* b = _byteAssignment;
+
+    switch (b[pos].div) {
+    case 1:
+        return 0;
+    case 10:
+        return 1;
+    case 100:
+        return 2;
+    case 1000:
+        return 3;
+    default:
+        return 2;
+    }
 }
 
 uint8_t StatisticsParser::getChannelCount()

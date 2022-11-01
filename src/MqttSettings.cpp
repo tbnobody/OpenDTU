@@ -273,8 +273,6 @@ void MqttSettingsClass::performDisconnect()
     const CONFIG_T& config = Configuration.get();
     publish(config.Mqtt_LwtTopic, config.Mqtt_LwtValue_Offline);
     mqttClient->disconnect();
-
-    // Reminder to logoff in Venus OS!
 }
 
 void MqttSettingsClass::performReconnect()
@@ -314,14 +312,14 @@ String MqttSettingsClass::getPrefix()
     return Configuration.get().Mqtt_Topic;
 }
 
-void MqttSettingsClass::publish(String subtopic, String payload)
+void MqttSettingsClass::publish(const String& subtopic, const String& payload)
 {
     String topic = getPrefix();
     topic += subtopic;
     mqttClient->publish(topic.c_str(), 0, Configuration.get().Mqtt_Retain, payload.c_str());
 }
 
-void MqttSettingsClass::publishHass(String subtopic, String payload)
+void MqttSettingsClass::publishHass(const String& subtopic, const String& payload)
 {
     String topic = Configuration.get().Mqtt_Hass_Topic;
     topic += subtopic;

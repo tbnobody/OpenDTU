@@ -4,6 +4,7 @@
  */
 #include "NetworkSettings.h"
 #include "Configuration.h"
+#include "Utils.h"
 #include "defaults.h"
 #include <WiFi.h>
 #ifdef OPENDTU_ETHERNET
@@ -142,7 +143,7 @@ void NetworkSettingsClass::enableAdminMode()
 
 String NetworkSettingsClass::getApName()
 {
-    return String(ACCESS_POINT_NAME + String(getChipId()));
+    return String(ACCESS_POINT_NAME + String(Utils::getChipId()));
 }
 
 void NetworkSettingsClass::loop()
@@ -374,7 +375,7 @@ String NetworkSettingsClass::macAddress()
         return WiFi.macAddress();
         break;
     default:
-        return String("");
+        return "";
     }
 }
 
@@ -385,7 +386,7 @@ String NetworkSettingsClass::getHostname()
     char resultHostname[WIFI_MAX_HOSTNAME_STRLEN + 1];
     uint8_t pos = 0;
 
-    uint32_t chipId = getChipId();
+    uint32_t chipId = Utils::getChipId();
     snprintf(preparedHostname, WIFI_MAX_HOSTNAME_STRLEN + 1, config.WiFi_Hostname, chipId);
 
     const char* pC = preparedHostname;
@@ -429,15 +430,6 @@ bool NetworkSettingsClass::isConnected()
 network_mode NetworkSettingsClass::NetworkMode()
 {
     return _networkMode;
-}
-
-uint32_t NetworkSettingsClass::getChipId()
-{
-    uint32_t chipId = 0;
-    for (int i = 0; i < 17; i += 8) {
-        chipId |= ((ESP.getEfuseMac() >> (40 - i)) & 0xff) << i;
-    }
-    return chipId;
 }
 
 NetworkSettingsClass NetworkSettings;

@@ -77,12 +77,7 @@ void WebApiWsLiveClass::generateJsonResponse(JsonVariant& root)
     for (uint8_t i = 0; i < Hoymiles.getNumInverters(); i++) {
         auto inv = Hoymiles.getInverterByPos(i);
 
-        char buffer[sizeof(uint64_t) * 8 + 1];
-        snprintf(buffer, sizeof(buffer), "%0x%08x",
-            ((uint32_t)((inv->serial() >> 32) & 0xFFFFFFFF)),
-            ((uint32_t)(inv->serial() & 0xFFFFFFFF)));
-
-        root[i][F("serial")] = String(buffer);
+        root[i][F("serial")] = inv->serialString();
         root[i][F("name")] = inv->name();
         root[i][F("data_age")] = (millis() - inv->Statistics()->getLastUpdate()) / 1000;
         root[i][F("reachable")] = inv->isReachable();
@@ -110,7 +105,7 @@ void WebApiWsLiveClass::generateJsonResponse(JsonVariant& root)
             addField(root, i, inv, c, FLD_YT);
             addField(root, i, inv, c, FLD_F);
             addField(root, i, inv, c, FLD_T);
-            addField(root, i, inv, c, FLD_PCT);
+            addField(root, i, inv, c, FLD_PF);
             addField(root, i, inv, c, FLD_PRA);
             addField(root, i, inv, c, FLD_EFF);
             addField(root, i, inv, c, FLD_IRR);
@@ -139,6 +134,7 @@ void WebApiWsLiveClass::addField(JsonVariant& root, uint8_t idx, std::shared_ptr
         }
         root[idx][String(channel)][chanName]["v"] = inv->Statistics()->getChannelFieldValue(channel, fieldId);
         root[idx][String(channel)][chanName]["u"] = inv->Statistics()->getChannelFieldUnit(channel, fieldId);
+        root[idx][String(channel)][chanName]["d"] = inv->Statistics()->getChannelFieldDigits(channel, fieldId);
     }
 }
 

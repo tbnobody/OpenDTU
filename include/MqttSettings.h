@@ -14,8 +14,8 @@ public:
     void init();
     void performReconnect();
     bool getConnected();
-    void publish(String subtopic, String payload);
-    void publishHass(String subtopic, String payload);
+    void publish(const String& subtopic, const String& payload);
+    void publishHass(const String& subtopic, const String& payload);
 
     void publishVictron(String hoyserial, String payload);
 

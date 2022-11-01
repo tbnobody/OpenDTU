@@ -35,7 +35,7 @@
                 <span class="h1 mb-2">
                     <BIconCheckCircle />
                 </span>
-                <span> OTA Success </span>
+                <span> OTA Success. The unit has been automatically restarted and will be available again in a few moments. </span>
                 <br />
                 <br />
                 <button class="btn btn-primary" @click="clear">
