@@ -109,38 +109,38 @@ void MqttVictronPublishingClass::loop()
 
 void MqttVictronPublishingClass::publishField(std::shared_ptr<InverterAbstract> inv, uint16_t invphase, uint8_t fieldId)
 {
-    // topic = "W/{}/pvinverter/{}/{}".format(portalId, deviceId, key)
-    // print("{} = {}".format(topic, data.get(key) ) )
-    // client.publish(topic, json.dumps({ "value": data.get(key) }) )
-    float fieldval = float(inv->Statistics()->getChannelFieldValue(0, fieldId));
-
-    // fieldvalue = round(fieldvalue * 100)/100;
-    fieldval = ( fieldval * 100 );
-    int fieldvalint = int( fieldval );
-    float fieldvalue = float( fieldvalint ) / 100.000;
-
     String fieldname = (inv->Statistics()->getChannelFieldName(0, fieldId));
-    String portalid = MqttSettings.getVictronPortalId();
-    if ( portalid == NULL ) { portalid = "NOportalId"; }
-    String topic = "W/" + portalid + "/pvinverter";
-    String topic_Victron_sum;
-    String topic_Victron_phase;
-    
-    char serial[sizeof(uint64_t) * 8 + 1];
-    snprintf(serial, sizeof(serial), "%0x%08x",
-    ((uint32_t)((inv->serial() >> 32) & 0xFFFFFFFF)),
-    ((uint32_t)(inv->serial() & 0xFFFFFFFF)));
-    String invSerial = String(serial);
 
-    String deviceInstance = MqttSettings.getVictronDeviceInstance(serial);
-
-    int response = false;
+    bool response = false;
     if ( fieldname == "Voltage" ) { response = true; }
     if ( fieldname == "Power") { response = true; }
     if ( fieldname == "Current" ) { response = true; }
     if ( fieldname == "YieldTotal") { response = true; }
 
     if ( response ) {   
+
+        //float fieldval = float(inv->Statistics()->getChannelFieldValue(0, fieldId));
+        uint32_t fieldval = uint32_t((inv->Statistics()->getChannelFieldValue(0, fieldId)) * 10);
+
+        // fieldvalue = round(fieldvalue * 100)/100;
+        //fieldval = ( fieldval * 100 );
+        //int fieldvalint = int( fieldval );
+        float fieldvalue = float( fieldval ) / 10.0;
+
+        String portalid = MqttSettings.getVictronPortalId();
+        if ( portalid == NULL ) { portalid = "NOportalId"; }
+        String topic = "W/" + portalid + "/pvinverter";
+        String topic_Victron_sum;
+        String topic_Victron_phase;
+    
+        char serial[sizeof(uint64_t) * 8 + 1];
+        snprintf(serial, sizeof(serial), "%0x%08x",
+        ((uint32_t)((inv->serial() >> 32) & 0xFFFFFFFF)),
+        ((uint32_t)(inv->serial() & 0xFFFFFFFF)));
+        String invSerial = String(serial);
+
+        String deviceInstance = MqttSettings.getVictronDeviceInstance(serial);
+
         // fieldname[0] = std::toupper(fieldname[0]);
         if ( fieldname == "YieldTotal" ) { 
             topic_Victron_sum += topic + "/" + deviceInstance + "/Ac/Energy/Forward";
