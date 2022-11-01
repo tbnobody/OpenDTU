@@ -328,7 +328,7 @@ void MqttSettingsClass::publishHass(const String& subtopic, const String& payloa
     mqttClient->publish(topic.c_str(), 0, Configuration.get().Mqtt_Hass_Retain, payload.c_str());
 }
 
-void MqttSettingsClass::publishVictron(String topic, String payload)
+void MqttSettingsClass::publishVictron(const String& topic, const String& payload)
 {
     mqttClient->publish(topic.c_str(), 0, 1, payload.c_str());
 }
