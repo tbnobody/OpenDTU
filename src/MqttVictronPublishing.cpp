@@ -34,11 +34,12 @@ void MqttVictronPublishingClass::loop()
         for (uint8_t i = 0; i < Hoymiles.getNumInverters(); i++) {
             auto inv = Hoymiles.getInverterByPos(i);
 
-            char buffer[sizeof(uint64_t) * 8 + 1];
-            snprintf(buffer, sizeof(buffer), "%0x%08x",
-                ((uint32_t)((inv->serial() >> 32) & 0xFFFFFFFF)),
-                ((uint32_t)(inv->serial() & 0xFFFFFFFF)));
-            String str_serial = String(buffer);
+            //char buffer[sizeof(uint64_t) * 8 + 1];
+            //snprintf(buffer, sizeof(buffer), "%0x%08x",
+            //    ((uint32_t)((inv->serial() >> 32) & 0xFFFFFFFF)),
+            //    ((uint32_t)(inv->serial() & 0xFFFFFFFF)));
+            //String str_serial = String(buffer);
+            String str_serial = inv->serialString();
 
             // Publish inverter as device service to Victron Venus OS with connected=1
             DynamicJsonDocument serviceDoc(256);
@@ -87,17 +88,16 @@ void MqttVictronPublishingClass::loop()
                 String data2;
                 serializeJson(val2Obj, data2);
                 MqttSettings.publishVictron(Vtopic, data2);
-        
-            }
-
-            // Loop all fields in channel 0
-            for (uint8_t f = 0; f < sizeof(_publishFields); f++) {
-                publishField(inv, invphase, _publishFields[f]);
             }
 
             uint32_t lastUpdate = inv->Statistics()->getLastUpdate();
             if (lastUpdate > 0 && lastUpdate != _lastPublishStats[i]) {
                 _lastPublishStats[i] = lastUpdate;
+
+                // Loop all fields in channel 0
+                for (uint8_t f = 0; f < sizeof(_publishFields); f++) {
+                    publishField(inv, invphase, _publishFields[f]);
+                }
             }
 
             yield();
@@ -125,7 +125,8 @@ void MqttVictronPublishingClass::publishField(std::shared_ptr<InverterAbstract> 
         // fieldvalue = round(fieldvalue * 100)/100;
         //fieldval = ( fieldval * 100 );
         //int fieldvalint = int( fieldval );
-        float fieldvalue = float( fieldval ) / 10.0;
+        float fieldvalue = roundf (float( fieldval )) / 10.0;
+
 
         String portalid = MqttSettings.getVictronPortalId();
         if ( portalid == NULL ) { portalid = "NOportalId"; }
