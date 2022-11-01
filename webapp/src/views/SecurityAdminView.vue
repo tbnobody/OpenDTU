@@ -6,7 +6,7 @@
 
         <form @submit="savePasswordConfig">
             <div class="card">
-                <div class="card-header text-white bg-primary">Admin password</div>
+                <div class="card-header text-bg-primary">Admin password</div>
                 <div class="card-body">
                     <div class="row mb-3">
                         <label for="inputPassword" class="col-sm-2 col-form-label">Password:</label>

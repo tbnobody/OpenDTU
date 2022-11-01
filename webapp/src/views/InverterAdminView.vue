@@ -5,7 +5,7 @@
         </BootstrapAlert>
 
         <div class="card">
-            <div class="card-header text-white bg-primary">Add a new Inverter</div>
+            <div class="card-header text-bg-primary">Add a new Inverter</div>
             <div class="card-body">
                 <form class="form-inline" v-on:submit.prevent="onSubmit">
                     <div class="form-group">
@@ -30,7 +30,7 @@
         </div>
 
         <div class="card mt-5">
-            <div class="card-header text-white bg-primary">Inverter List</div>
+            <div class="card-header text-bg-primary">Inverter List</div>
             <div class="card-body">
                 <div class="table-responsive">
                     <table class="table">

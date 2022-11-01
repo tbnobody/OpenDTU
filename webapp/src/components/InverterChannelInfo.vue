@@ -1,7 +1,7 @@
 <template>
     <div class="card" :class="{ 'border-info': channelNumber == 0 }">
         <div v-if="channelNumber >= 1" class="card-header">String {{ channelNumber }}</div>
-        <div v-if="channelNumber == 0" class="card-header bg-info">Phase {{ channelNumber + 1 }}</div>
+        <div v-if="channelNumber == 0" class="card-header text-bg-info">Phase {{ channelNumber + 1 }}</div>
         <div class="card-body">
             <table class="table table-striped table-hover">
                 <thead>

@@ -6,7 +6,7 @@
 
         <form @submit="saveNetworkConfig">
             <div class="card">
-                <div class="card-header text-white bg-primary">WiFi Configuration</div>
+                <div class="card-header text-bg-primary">WiFi Configuration</div>
                 <div class="card-body">
                     <div class="row mb-3">
                         <label for="inputSSID" class="col-sm-2 col-form-label">WiFi SSID:</label>
@@ -50,7 +50,7 @@
             </div>
 
             <div class="card" v-show="!networkConfigList.dhcp">
-                <div class="card-header text-white bg-primary">
+                <div class="card-header text-bg-primary">
                     Static IP Configuration
                 </div>
                 <div class="card-body">

@@ -24,11 +24,11 @@
                     :id="'v-pills-' + inverter.serial" role="tabpanel"
                     :aria-labelledby="'v-pills-' + inverter.serial + '-tab'" tabindex="0">
                     <div class="card">
-                        <div class="card-header text-white bg-primary d-flex justify-content-between align-items-center"
+                        <div class="card-header d-flex justify-content-between align-items-center"
                             :class="{
-                                'bg-danger': !inverter.reachable,
-                                'bg-warning': inverter.reachable && !inverter.producing,
-                                'bg-primary': inverter.reachable && inverter.producing,
+                                'text-bg-danger': !inverter.reachable,
+                                'text-bg-warning': inverter.reachable && !inverter.producing,
+                                'text-bg-primary': inverter.reachable && inverter.producing,
                             }">
                             <div class="p-1 flex-grow-1">
                                 <div class="d-flex flex-wrap">
@@ -79,7 +79,7 @@
                                         @click="onShowEventlog(inverter.serial)" title="Show Eventlog">
                                         <BIconJournalText style="font-size:24px;" />
                                         <span
-                                            class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                                            class="position-absolute top-0 start-100 translate-middle badge rounded-pill text-bg-danger">
                                             {{ inverter.events }}
                                             <span class="visually-hidden">unread messages</span>
                                         </span>
@@ -202,10 +202,10 @@
                                     Status:</label>
                                 <div class="col-sm-9">
                                     <span class="badge" :class="{
-                                        'bg-danger': currentLimitList.limit_set_status == 'Failure',
-                                        'bg-warning': currentLimitList.limit_set_status == 'Pending',
-                                        'bg-success': currentLimitList.limit_set_status == 'Ok',
-                                        'bg-secondary': currentLimitList.limit_set_status == 'Unknown',
+                                        'text-bg-danger': currentLimitList.limit_set_status == 'Failure',
+                                        'text-bg-warning': currentLimitList.limit_set_status == 'Pending',
+                                        'text-bg-success': currentLimitList.limit_set_status == 'Ok',
+                                        'text-bg-secondary': currentLimitList.limit_set_status == 'Unknown',
                                     }">
                                         {{ currentLimitList.limit_set_status }}
                                     </span>
@@ -277,10 +277,10 @@
                                 Status:</label>
                             <div class="col">
                                 <span class="badge" :class="{
-                                    'bg-danger': successCommandPower == 'Failure',
-                                    'bg-warning': successCommandPower == 'Pending',
-                                    'bg-success': successCommandPower == 'Ok',
-                                    'bg-secondary': successCommandPower == 'Unknown',
+                                    'text-bg-danger': successCommandPower == 'Failure',
+                                    'text-bg-warning': successCommandPower == 'Pending',
+                                    'text-bg-success': successCommandPower == 'Ok',
+                                    'text-bg-secondary': successCommandPower == 'Unknown',
                                 }">
                                     {{ successCommandPower }}
                                 </span>
