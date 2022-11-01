@@ -31,4 +31,6 @@ export interface Inverter {
     [key: number]: InverterStatistics,
 };
 
-export interface Inverters extends Array<Inverter>{};
+export interface LiveData {
+    inverters: Inverter[],
+}
