@@ -1,7 +1,7 @@
 <template>
     <BasePage :title="'NTP Info'" :isLoading="dataLoading">
         <div class="card">
-            <div class="card-header text-white bg-primary">Configuration Summary</div>
+            <div class="card-header text-bg-primary">Configuration Summary</div>
             <div class="card-body">
                 <div class="table-responsive">
                     <table class="table table-hover table-condensed">
@@ -25,7 +25,7 @@
         </div>
 
         <div class="card mt-5">
-            <div class="card-header text-white bg-primary">Current Time</div>
+            <div class="card-header text-bg-primary">Current Time</div>
             <div class="card-body">
                 <div class="table-responsive">
                     <table class="table table-hover table-condensed">
@@ -33,8 +33,8 @@
                             <tr>
                                 <th>Status</th>
                                 <td class="badge" :class="{
-                                    'bg-danger': !ntpDataList.ntp_status,
-                                    'bg-success': ntpDataList.ntp_status,
+                                    'text-bg-danger': !ntpDataList.ntp_status,
+                                    'text-bg-success': ntpDataList.ntp_status,
                                 }">
                                     <span v-if="ntpDataList.ntp_status">synced</span>
                                     <span v-else>not synced</span>

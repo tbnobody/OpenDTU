@@ -5,7 +5,7 @@
         </BootstrapAlert>
 
         <div class="card">
-            <div class="card-header text-white bg-primary">Backup: Configuration File Backup</div>
+            <div class="card-header text-bg-primary">Backup: Configuration File Backup</div>
             <div class="card-body text-center">
                 Backup the configuration file
                 <button class="btn btn-primary" @click="downloadConfig">Backup
@@ -14,7 +14,7 @@
         </div>
 
         <div class="card mt-5">
-            <div class="card-header text-white bg-primary">Restore: Restore the Configuration File</div>
+            <div class="card-header text-bg-primary">Restore: Restore the Configuration File</div>
             <div class="card-body text-center">
 
                 <div v-if="!uploading && UploadError != ''">
@@ -66,7 +66,7 @@
         </div>
 
         <div class="card mt-5">
-            <div class="card-header text-white bg-primary">Initialize: Perform Factory Reset</div>
+            <div class="card-header text-bg-primary">Initialize: Perform Factory Reset</div>
             <div class="card-body text-center">
 
                 <button class="btn btn-danger" @click="onFactoryResetModal">Restore Factory-Default Settings

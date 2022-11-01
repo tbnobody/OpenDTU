@@ -6,7 +6,7 @@
 
         <form @submit="saveMqttConfig">
             <div class="card">
-                <div class="card-header text-white bg-primary">MqTT Configuration</div>
+                <div class="card-header text-bg-primary">MqTT Configuration</div>
                 <div class="card-body">
                     <div class="row mb-3">
                         <label class="col-sm-4 form-check-label" for="inputMqtt">Enable MqTT</label>
@@ -43,7 +43,7 @@
             </div>
 
             <div class="card mt-5" v-show="mqttConfigList.mqtt_enabled">
-                <div class="card-header text-white bg-primary">
+                <div class="card-header text-bg-primary">
                     MqTT Broker Parameter
                 </div>
                 <div class="card-body">
@@ -138,7 +138,7 @@
             </div>
 
             <div class="card mt-5" v-show="mqttConfigList.mqtt_enabled">
-                <div class="card-header text-white bg-primary">LWT Parameters</div>
+                <div class="card-header text-bg-primary">LWT Parameters</div>
                 <div class="card-body">
                     <div class="row mb-3">
                         <label for="inputLwtTopic" class="col-sm-2 col-form-label">LWT Topic:</label>
@@ -175,7 +175,7 @@
             </div>
 
             <div class="card mt-5" v-show="mqttConfigList.mqtt_enabled && mqttConfigList.mqtt_hass_enabled">
-                <div class="card-header text-white bg-primary">Home Assistant MQTT Auto Discovery Parameters</div>
+                <div class="card-header text-bg-primary">Home Assistant MQTT Auto Discovery Parameters</div>
                 <div class="card-body">
                     <div class="row mb-3">
                         <label for="inputHassTopic" class="col-sm-2 col-form-label">Prefix Topic:</label>

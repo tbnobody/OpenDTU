@@ -9,7 +9,7 @@
         </div>
 
         <div v-if="!loading && !uploading && OTAError != ''" class="card">
-            <div class="card-header text-white bg-danger">OTA Error</div>
+            <div class="card-header text-bg-danger">OTA Error</div>
             <div class="card-body text-center">
                 <p class="h1 mb-2">
                     <BIconExclamationCircleFill />
@@ -30,7 +30,7 @@
         </div>
 
         <div v-else-if="!loading && !uploading && OTASuccess" class="card">
-            <div class="card-header text-white bg-success">OTA Status</div>
+            <div class="card-header text-bg-success">OTA Status</div>
             <div class="card-body text-center">
                 <span class="h1 mb-2">
                     <BIconCheckCircle />
@@ -45,7 +45,7 @@
         </div>
 
         <div v-else-if="!loading && !uploading" class="card">
-            <div class="card-header text-white bg-primary">Firmware Upload</div>
+            <div class="card-header text-bg-primary">Firmware Upload</div>
             <div class="card-body text-center">
                 <div class="form-group pt-2 mt-3">
                     <input class="form-control" type="file" ref="file" accept=".bin,.bin.gz" @change="uploadOTA" />
@@ -54,7 +54,7 @@
         </div>
 
         <div v-else-if="!loading && uploading" class="card">
-            <div class="card-header text-white bg-primary">Upload Progress</div>
+            <div class="card-header text-bg-primary">Upload Progress</div>
             <div class="card-body text-center">
                 <div class="progress">
                     <div class="progress-bar" role="progressbar" :style="{ width: progress + '%' }"

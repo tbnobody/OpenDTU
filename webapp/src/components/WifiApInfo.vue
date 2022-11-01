@@ -1,6 +1,6 @@
 <template>
     <div class="card">
-        <div class="card-header text-white bg-primary">
+        <div class="card-header text-bg-primary">
             WiFi Information (Access Point)
         </div>
         <div class="card-body">
@@ -10,8 +10,8 @@
                         <tr>
                             <th>Status</th>
                             <td class="badge" :class="{
-                                'bg-danger': !networkStatus.ap_status,
-                                'bg-success': networkStatus.ap_status,
+                                'text-bg-danger': !networkStatus.ap_status,
+                                'text-bg-success': networkStatus.ap_status,
                             }">
                                 <span v-if="networkStatus.ap_status">enabled</span>
                                 <span v-else>disabled</span>
