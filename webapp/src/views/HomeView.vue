@@ -1,5 +1,6 @@
 <template>
     <BasePage :title="'Live Data'" :isLoading="dataLoading" :isWideScreen="true">
+        <InverterTotalInfo :totalData="liveData.total" /><br />
         <div class="row gy-3">
             <div class="col-sm-3 col-md-2" :style="[inverterData.length == 1 ? { 'display': 'none' } : {}]">
                 <div class="nav nav-pills row-cols-sm-1" id="v-pills-tab" role="tablist" aria-orientation="vertical">
@@ -330,6 +331,7 @@ import EventLog from '@/components/EventLog.vue';
 import DevInfo from '@/components/DevInfo.vue';
 import BootstrapAlert from '@/components/BootstrapAlert.vue';
 import InverterChannelInfo from "@/components/InverterChannelInfo.vue";
+import InverterTotalInfo from '@/components/InverterTotalInfo.vue';
 import type { DevInfoStatus } from '@/types/DevInfoStatus';
 import type { EventlogItems } from '@/types/EventlogStatus';
 import type { LiveData, Inverter } from '@/types/LiveDataStatus';
@@ -341,6 +343,7 @@ export default defineComponent({
     components: {
         BasePage,
         InverterChannelInfo,
+        InverterTotalInfo,
         EventLog,
         DevInfo,
         BootstrapAlert,

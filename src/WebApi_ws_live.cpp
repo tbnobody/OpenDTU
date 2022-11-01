@@ -74,9 +74,17 @@ void WebApiWsLiveClass::loop()
 void WebApiWsLiveClass::generateJsonResponse(JsonVariant& root)
 {
     JsonArray invArray = root.createNestedArray("inverters");
+
+    float totalPower = 0;
+    float totalYieldDay = 0;
+    float totalYieldTotal = 0;
+
     // Loop all inverters
     for (uint8_t i = 0; i < Hoymiles.getNumInverters(); i++) {
         auto inv = Hoymiles.getInverterByPos(i);
+        if (inv == nullptr) {
+            continue;
+        }
 
         JsonObject invObject = invArray.createNestedObject();
 
@@ -123,7 +131,17 @@ void WebApiWsLiveClass::generateJsonResponse(JsonVariant& root)
         if (inv->Statistics()->getLastUpdate() > _newestInverterTimestamp) {
             _newestInverterTimestamp = inv->Statistics()->getLastUpdate();
         }
+
+        totalPower += inv->Statistics()->getChannelFieldValue(CH0, FLD_PAC);
+        totalYieldDay += inv->Statistics()->getChannelFieldValue(CH0, FLD_YD);
+        totalYieldTotal += inv->Statistics()->getChannelFieldValue(CH0, FLD_YT);
     }
+
+    JsonObject totalObj = root.createNestedObject("total");
+    // todo: Fixed hard coded name, unit and digits
+    addTotalField(totalObj, "Power", totalPower, "W", 1);
+    addTotalField(totalObj, "YieldDay", totalYieldDay, "Wh", 0);
+    addTotalField(totalObj, "YieldTotal", totalYieldTotal, "kWh", 2);
 }
 
 void WebApiWsLiveClass::addField(JsonObject& root, uint8_t idx, std::shared_ptr<InverterAbstract> inv, uint8_t channel, uint8_t fieldId, String topic)
@@ -139,6 +157,13 @@ void WebApiWsLiveClass::addField(JsonObject& root, uint8_t idx, std::shared_ptr<
         root[String(channel)][chanName]["u"] = inv->Statistics()->getChannelFieldUnit(channel, fieldId);
         root[String(channel)][chanName]["d"] = inv->Statistics()->getChannelFieldDigits(channel, fieldId);
     }
+}
+
+void WebApiWsLiveClass::addTotalField(JsonObject& root, String name, float value, String unit, uint8_t digits)
+{
+    root[name]["v"] = value;
+    root[name]["u"] = unit;
+    root[name]["d"] = digits;
 }
 
 void WebApiWsLiveClass::onWebsocketEvent(AsyncWebSocket* server, AsyncWebSocketClient* client, AwsEventType type, void* arg, uint8_t* data, size_t len)

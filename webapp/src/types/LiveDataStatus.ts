@@ -31,6 +31,13 @@ export interface Inverter {
     [key: number]: InverterStatistics,
 };
 
+export interface Total {
+    Power: ValueObject,
+    YieldDay: ValueObject,
+    YieldTotal: ValueObject,
+};
+
 export interface LiveData {
     inverters: Inverter[],
+    total: Total,
 }
