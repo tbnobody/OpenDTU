@@ -1,6 +1,7 @@
 export interface ValueObject {
     v: number, // value
     u: string, // unit
+    d: number, // digits
 };
 
 export interface InverterStatistics {

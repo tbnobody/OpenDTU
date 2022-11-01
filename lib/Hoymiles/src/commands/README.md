@@ -3,6 +3,7 @@
 * CommandAbstract
     * DevControlCommand
         * ActivePowerControlCommand
+        * PowerControlCommand
     * MultiDataCommand
         * AlarmDataCommand
         * DevInfoAllCommand
