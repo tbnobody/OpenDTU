@@ -29,12 +29,6 @@ void WebApiPowerClass::onPowerStatus(AsyncWebServerRequest* request)
     for (uint8_t i = 0; i < Hoymiles.getNumInverters(); i++) {
         auto inv = Hoymiles.getInverterByPos(i);
 
-        // Inverter Serial is read as HEX
-        char buffer[sizeof(uint64_t) * 8 + 1];
-        snprintf(buffer, sizeof(buffer), "%0x%08x",
-            ((uint32_t)((inv->serial() >> 32) & 0xFFFFFFFF)),
-            ((uint32_t)(inv->serial() & 0xFFFFFFFF)));
-
         LastCommandSuccess status = inv->PowerCommand()->getLastPowerCommandSuccess();
         String limitStatus = "Unknown";
         if (status == LastCommandSuccess::CMD_OK) {
@@ -44,7 +38,7 @@ void WebApiPowerClass::onPowerStatus(AsyncWebServerRequest* request)
         } else if (status == LastCommandSuccess::CMD_PENDING) {
             limitStatus = "Pending";
         }
-        root[buffer]["power_set_status"] = limitStatus;
+        root[inv->serialString()]["power_set_status"] = limitStatus;
     }
 
     response->setLength();

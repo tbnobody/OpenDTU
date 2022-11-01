@@ -3,6 +3,7 @@
 
 #include "Configuration.h"
 #include <Arduino.h>
+#include <ArduinoJson.h>
 #include <Hoymiles.h>
 #include <memory>
 
@@ -43,7 +44,7 @@ const byteAssign_fieldDeviceClass_t deviceFieldAssignment[] = {
     { FLD_PAC, DEVICE_CLS_PWR, STATE_CLS_MEASUREMENT },
     { FLD_F, DEVICE_CLS_FREQ, STATE_CLS_MEASUREMENT },
     { FLD_T, DEVICE_CLS_TEMP, STATE_CLS_MEASUREMENT },
-    { FLD_PCT, DEVICE_CLS_POWER_FACTOR, STATE_CLS_MEASUREMENT },
+    { FLD_PF, DEVICE_CLS_POWER_FACTOR, STATE_CLS_MEASUREMENT },
     { FLD_EFF, DEVICE_CLS_NONE, STATE_CLS_NONE },
     { FLD_IRR, DEVICE_CLS_NONE, STATE_CLS_NONE },
     { FLD_PRA, DEVICE_CLS_REACTIVE_POWER, STATE_CLS_MEASUREMENT }
@@ -59,6 +60,10 @@ public:
 
 private:
     void publishField(std::shared_ptr<InverterAbstract> inv, uint8_t channel, byteAssign_fieldDeviceClass_t fieldType, bool clear = false);
+    void publishInverterButton(std::shared_ptr<InverterAbstract> inv, const char* caption, const char* icon, const char* category, const char* deviceClass, const char* subTopic, const char* payload);
+    void publishInverterNumber(std::shared_ptr<InverterAbstract> inv, const char* caption, const char* icon, const char* category, const char* commandTopic, const char* stateTopic, const char* unitOfMeasure, int16_t min = 1, int16_t max = 100);
+    void publishInverterBinarySensor(std::shared_ptr<InverterAbstract> inv, const char* caption, const char* subTopic, const char* payload_on, const char* payload_off);
+    void createDeviceInfo(JsonObject& object, std::shared_ptr<InverterAbstract> inv);
 
     bool _wasConnected = false;
     bool _updateForced = false;

@@ -7,10 +7,16 @@
 #include "MqttHassPublishing.h"
 #include "MqttPublishing.h"
 #include "MqttSettings.h"
+<<<<<<< HEAD
 #include "MqttVictronPublishing.h"
 #include "NtpSettings.h"
 #include "WebApi.h"
+=======
+>>>>>>> 9ee75ed7ce9b5aac7cdf787ddadac248c0c49d04
 #include "NetworkSettings.h"
+#include "NtpSettings.h"
+#include "Utils.h"
+#include "WebApi.h"
 #include "defaults.h"
 #include <Arduino.h>
 #include <LittleFS.h>
@@ -77,9 +83,22 @@ void setup()
     WebApi.init();
     Serial.println(F("done"));
 
+    // Check for default DTU serial
+    Serial.print(F("Check for default DTU serial... "));
+    CONFIG_T& config = Configuration.get();
+    if (config.Dtu_Serial == DTU_SERIAL) {
+        Serial.print(F("generate serial based on ESP chip id: "));
+        uint64_t dtuId = Utils::generateDtuSerial();
+        Serial.printf("%0x%08x... ",
+            ((uint32_t)((dtuId >> 32) & 0xFFFFFFFF)),
+            ((uint32_t)(dtuId & 0xFFFFFFFF)));
+        config.Dtu_Serial = dtuId;
+        Configuration.write();
+    }
+    Serial.println(F("done"));
+
     // Initialize inverter communication
     Serial.print(F("Initialize Hoymiles interface... "));
-    const CONFIG_T& config = Configuration.get();
     Hoymiles.init();
 
     Serial.println(F("  Setting radio PA level... "));

@@ -3,7 +3,7 @@
         <tbody>
             <tr>
                 <td>Current Limit</td>
-                <td>{{ formatNumber(limitData.limit) }}%</td>
+                <td>{{ formatNumber(limitData.limit, 2) }}%</td>
             </tr>
         </tbody>
     </table>
@@ -11,6 +11,7 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue';
+import { formatNumber } from '@/utils';
 
 declare interface LimitData {
     limit: number,
@@ -20,14 +21,8 @@ export default defineComponent({
     props: {
         limitData: { type: Object as () => LimitData, required: true },
     },
-    computed: {
-        formatNumber() {
-            return (num: number) => {
-                return new Intl.NumberFormat(
-                    undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }
-                ).format(num)
-            };
-        },
-    },
+    methods: {
+        formatNumber,
+    }
 });
 </script>

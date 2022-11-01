@@ -11,7 +11,7 @@
                     <div class="row mb-3">
                         <label for="inputDtuSerial" class="col-sm-2 col-form-label">Serial:</label>
                         <div class="col-sm-10">
-                            <input type="number" class="form-control" id="inputDtuSerial" min="1" max="99999999999"
+                            <input type="number" class="form-control" id="inputDtuSerial" min="1" max="199999999999"
                                 placeholder="DTU Serial" v-model="dtuConfigList.dtu_serial" />
                         </div>
                     </div>

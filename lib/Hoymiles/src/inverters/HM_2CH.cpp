@@ -25,7 +25,7 @@ bool HM_2CH::isValidSerial(uint64_t serial)
 
 String HM_2CH::typeName()
 {
-    return String(F("HM-600, HM-700, HM-800"));
+    return F("HM-600, HM-700, HM-800");
 }
 
 const byteAssign_t* HM_2CH::getByteAssignment()
