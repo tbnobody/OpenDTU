@@ -6,13 +6,8 @@
 #include "Hoymiles.h"
 #include "MqttHassPublishing.h"
 #include "MqttPublishing.h"
-#include "MqttSettings.h"
-<<<<<<< HEAD
 #include "MqttVictronPublishing.h"
-#include "NtpSettings.h"
-#include "WebApi.h"
-=======
->>>>>>> 9ee75ed7ce9b5aac7cdf787ddadac248c0c49d04
+#include "MqttSettings.h"
 #include "NetworkSettings.h"
 #include "NtpSettings.h"
 #include "Utils.h"
