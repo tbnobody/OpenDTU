@@ -43,7 +43,7 @@ void MqttVictronPublishingClass::loop()
 
             // Get Current phase
             uint16_t invphase = config.Inverter[i+1].CurrentPhase;
-            String invname = config.Inverter[i+1].Name;
+            String invname = inv->name();
             uint8_t invconnected;
 
             if (invphase == 0) { invconnected = 0; } else { invconnected = 1; }
