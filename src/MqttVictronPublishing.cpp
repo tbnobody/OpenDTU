@@ -154,6 +154,7 @@ void MqttVictronPublishingClass::publishField(std::shared_ptr<InverterAbstract> 
 
         Serial.print(F("MqTT publish value: "));
         Serial.print(data);
+        Serial.print(fieldId);
         Serial.print(F(" to Venus OS with topic sum: "));
         Serial.print(topic_Victron_sum);
         Serial.print(F(" and topic phase: "));
