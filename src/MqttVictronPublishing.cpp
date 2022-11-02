@@ -42,7 +42,7 @@ void MqttVictronPublishingClass::loop()
             JsonObject serviceObj = serviceDoc.as<JsonObject>();
 
             // Get Current phase
-            uint16_t invphase = config.Inverter[i+1].CurrentPhase;
+            uint16_t invphase = config.Inverter[i].CurrentPhase;
             String invname = inv->name();
             uint8_t invconnected;
 
@@ -176,6 +176,7 @@ void MqttVictronPublishingClass::publishField(std::shared_ptr<InverterAbstract> 
                 valB = "L2";
                 break;
             default:
+                return;
                 break;
         }
 
