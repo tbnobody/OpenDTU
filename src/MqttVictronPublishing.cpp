@@ -111,6 +111,13 @@ void MqttVictronPublishingClass::publishField(std::shared_ptr<InverterAbstract> 
 {
     String fieldname = (inv->Statistics()->getChannelFieldName(0, fieldId));
 
+    Serial.print(F("Fieldname: "));
+    Serial.print(fieldname);
+    Serial.print(F(" - FieldID: "));
+    Serial.print(fieldId);
+    Serial.print(F(" value: "));
+    Serial.println(double(inv->Statistics()->getChannelFieldValue(0, fieldId)));
+
     bool response = false;
     if ( fieldname == "Voltage" ) { response = true; }
     if ( fieldname == "Power") { response = true; }
