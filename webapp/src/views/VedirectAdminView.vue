@@ -15,7 +15,7 @@
         <template v-if="!dataLoading">
             <form @submit="saveVedirectConfig">
                 <div class="card">
-                    <div class="card-header text-white bg-primary">Ve.direct Configuration</div>
+                    <div class="card-header bg-primary">Ve.direct Configuration</div>
                     <div class="card-body">
                         <div class="row mb-3">
                             <label class="col-sm-2 form-check-label" for="inputVedirect">Enable Ve.direct</label>

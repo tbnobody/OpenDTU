@@ -6,7 +6,7 @@
 
         <form @submit="saveNtpConfig">
             <div class="card">
-                <div class="card-header text-white bg-primary">NTP Configuration</div>
+                <div class="card-header text-bg-primary">NTP Configuration</div>
                 <div class="card-body">
                     <div class="row mb-3">
                         <label for="inputNtpServer" class="col-sm-2 col-form-label">Time Server:</label>
@@ -41,7 +41,7 @@
         </form>
 
         <div class="card">
-            <div class="card-header text-white bg-primary">Manual Time Synchronization</div>
+            <div class="card-header text-bg-primary">Manual Time Synchronization</div>
             <div class="card-body">
                 <div class="row mb-3">
                     <label for="currentMcuTime" class="col-sm-2 col-form-label">Current OpenDTU Time:</label>

@@ -1,7 +1,7 @@
 <template>
     <BasePage :title="'MqTT Info'" :isLoading="dataLoading">
         <div class="card">
-            <div class="card-header text-white bg-primary">Configuration Summary</div>
+            <div class="card-header text-bg-primary">Configuration Summary</div>
             <div class="card-body">
                 <div class="table-responsive">
                     <table class="table table-hover table-condensed">
@@ -9,8 +9,8 @@
                             <tr>
                                 <th>Status</th>
                                 <td class="badge" :class="{
-                                    'bg-danger': !mqttDataList.mqtt_enabled,
-                                    'bg-success': mqttDataList.mqtt_enabled,
+                                    'text-bg-danger': !mqttDataList.mqtt_enabled,
+                                    'text-bg-success': mqttDataList.mqtt_enabled,
                                 }">
                                     <span v-if="mqttDataList.mqtt_enabled">enabled</span>
                                     <span v-else>disabled</span>
@@ -39,8 +39,8 @@
                             <tr>
                                 <th>Retain</th>
                                 <td class="badge" :class="{
-                                    'bg-danger': !mqttDataList.mqtt_retain,
-                                    'bg-success': mqttDataList.mqtt_retain,
+                                    'text-bg-danger': !mqttDataList.mqtt_retain,
+                                    'text-bg-success': mqttDataList.mqtt_retain,
                                 }">
                                     <span v-if="mqttDataList.mqtt_retain">enabled</span>
                                     <span v-else>disabled</span>
@@ -49,8 +49,8 @@
                             <tr>
                                 <th>TLS</th>
                                 <td class="badge" :class="{
-                                    'bg-danger': !mqttDataList.mqtt_tls,
-                                    'bg-success': mqttDataList.mqtt_tls,
+                                    'text-bg-danger': !mqttDataList.mqtt_tls,
+                                    'text-bg-success': mqttDataList.mqtt_tls,
                                 }">
                                     <span v-if="mqttDataList.mqtt_tls">enabled</span>
                                     <span v-else>disabled</span>
@@ -67,7 +67,7 @@
         </div>
 
         <div class="card mt-5">
-            <div class="card-header text-white bg-primary">Home Assistant MQTT Auto Discovery Configuration Summary
+            <div class="card-header text-bg-primary">Home Assistant MQTT Auto Discovery Configuration Summary
             </div>
             <div class="card-body">
                 <div class="table-responsive">
@@ -76,8 +76,8 @@
                             <tr>
                                 <th>Status</th>
                                 <td class="badge" :class="{
-                                    'bg-danger': !mqttDataList.mqtt_hass_enabled,
-                                    'bg-success': mqttDataList.mqtt_hass_enabled,
+                                    'text-bg-danger': !mqttDataList.mqtt_hass_enabled,
+                                    'text-bg-success': mqttDataList.mqtt_hass_enabled,
                                 }">
                                     <span v-if="mqttDataList.mqtt_hass_enabled">enabled</span>
                                     <span v-else>disabled</span>
@@ -90,8 +90,8 @@
                             <tr>
                                 <th>Retain</th>
                                 <td class="badge" :class="{
-                                    'bg-danger': !mqttDataList.mqtt_hass_retain,
-                                    'bg-success': mqttDataList.mqtt_hass_retain,
+                                    'text-bg-danger': !mqttDataList.mqtt_hass_retain,
+                                    'text-bg-success': mqttDataList.mqtt_hass_retain,
                                 }">
                                     <span v-if="mqttDataList.mqtt_hass_retain">enabled</span>
                                     <span v-else>disabled</span>
@@ -100,8 +100,8 @@
                             <tr>
                                 <th>Expire</th>
                                 <td class="badge" :class="{
-                                    'bg-danger': !mqttDataList.mqtt_hass_expire,
-                                    'bg-success': mqttDataList.mqtt_hass_expire,
+                                    'text-bg-danger': !mqttDataList.mqtt_hass_expire,
+                                    'text-bg-success': mqttDataList.mqtt_hass_expire,
                                 }">
                                     <span v-if="mqttDataList.mqtt_hass_expire">enabled</span>
                                     <span v-else>disabled</span>
@@ -110,8 +110,8 @@
                             <tr>
                                 <th>Individual Panels</th>
                                 <td class="badge" :class="{
-                                    'bg-danger': !mqttDataList.mqtt_hass_individualpanels,
-                                    'bg-success': mqttDataList.mqtt_hass_individualpanels,
+                                    'text-bg-danger': !mqttDataList.mqtt_hass_individualpanels,
+                                    'text-bg-success': mqttDataList.mqtt_hass_individualpanels,
                                 }">
                                     <span v-if="mqttDataList.mqtt_hass_individualpanels">enabled</span>
                                     <span v-else>disabled</span>
@@ -124,7 +124,7 @@
         </div>
 
         <div class="card mt-5">
-            <div class="card-header text-white bg-primary">Runtime Summary</div>
+            <div class="card-header text-bg-primary">Runtime Summary</div>
             <div class="card-body">
                 <div class="table-responsive">
                     <table class="table table-hover table-condensed">
@@ -132,8 +132,8 @@
                             <tr>
                                 <th>Connection Status</th>
                                 <td class="badge" :class="{
-                                    'bg-danger': !mqttDataList.mqtt_connected,
-                                    'bg-success': mqttDataList.mqtt_connected,
+                                    'text-bg-danger': !mqttDataList.mqtt_connected,
+                                    'text-bg-success': mqttDataList.mqtt_connected,
                                 }">
                                     <span v-if="mqttDataList.mqtt_connected">connected</span>
                                     <span v-else>disconnected</span>

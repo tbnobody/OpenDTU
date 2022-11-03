@@ -12,7 +12,7 @@
 
         <template v-if="!dataLoading">
             <div class="card">
-                <div class="card-header text-white bg-primary">Configuration Summary</div>
+                <div class="card-header bg-primary">Configuration Summary</div>
                 <div class="card-body">
                     <div class="table-responsive">
                         <table class="table table-hover table-condensed">

@@ -120,6 +120,25 @@ const char* StatisticsParser::getChannelFieldName(uint8_t channel, uint8_t field
     return fields[b[pos].fieldId];
 }
 
+uint8_t StatisticsParser::getChannelFieldDigits(uint8_t channel, uint8_t fieldId)
+{
+    uint8_t pos = getAssignIdxByChannelField(channel, fieldId);
+    const byteAssign_t* b = _byteAssignment;
+
+    switch (b[pos].div) {
+    case 1:
+        return 0;
+    case 10:
+        return 1;
+    case 100:
+        return 2;
+    case 1000:
+        return 3;
+    default:
+        return 2;
+    }
+}
+
 uint8_t StatisticsParser::getChannelCount()
 {
     const byteAssign_t* b = _byteAssignment;

@@ -1,7 +1,7 @@
 <template>
     <div class="card" :class="{ 'border-info': channelNumber == 0 }">
         <div v-if="channelNumber >= 1" class="card-header">String {{ channelNumber }}</div>
-        <div v-if="channelNumber == 0" class="card-header bg-info">Phase {{ channelNumber + 1 }}</div>
+        <div v-if="channelNumber == 0" class="card-header text-bg-info">Phase {{ channelNumber + 1 }}</div>
         <div class="card-body">
             <table class="table table-striped table-hover">
                 <thead>
@@ -15,7 +15,7 @@
                     <tr v-for="(property, key) in channelData" :key="`prop-${key}`">
                         <template v-if="property">
                             <th scope="row">{{ key }}</th>
-                            <td style="text-align: right">{{ formatNumber(property.v) }}</td>
+                            <td style="text-align: right">{{ formatNumber(property.v, property.d) }}</td>
                             <td>{{ property.u }}</td>
                         </template>
                     </tr>
@@ -28,6 +28,7 @@
 <script lang="ts">
 import { defineComponent, type PropType } from 'vue';
 import type { InverterStatistics } from '@/types/LiveDataStatus';
+import { formatNumber } from '@/utils';
 
 export default defineComponent({
     props: {
@@ -35,11 +36,7 @@ export default defineComponent({
         channelNumber: { type: Number, required: true },
     },
     methods: {
-        formatNumber(num: number) {
-            return new Intl.NumberFormat(
-                undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }
-            ).format(num);
-        },
+        formatNumber,
     },
 });
 </script>

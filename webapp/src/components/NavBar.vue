@@ -1,7 +1,7 @@
 <template>
     <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
         <div class="container-fluid">
-            <a class="navbar-brand" href="#">OpenDTU</a>
+            <a class="navbar-brand" href="#"><span class="text-warning"><BIconSun width="30" height="30" class="d-inline-block align-text-top"/></span> OpenDTU</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup"
                 aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
@@ -85,8 +85,12 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue';
+import { BIconSun } from 'bootstrap-icons-vue';
 
 export default defineComponent({
+    components: {
+        BIconSun,
+    },
     methods: {
         onClick() {
             this.$refs.navbarCollapse && (this.$refs.navbarCollapse as HTMLElement).classList.remove("show");
