@@ -73,19 +73,41 @@
                     </li>
                 </ul>
             </div>
+            <form class="d-flex" role="search" v-if="isLogged">
+                <button class="btn btn-outline-danger" @click="signout">Logout</button>
+            </form>
         </div>
     </nav>
 </template>
 
 <script lang="ts">
 import { defineComponent } from 'vue';
+import { logout, isLoggedIn } from '@/utils/authentication';
 import { BIconSun } from 'bootstrap-icons-vue';
 
 export default defineComponent({
     components: {
         BIconSun,
     },
+    data() {
+        return {
+            isLogged: this.isLoggedIn(),
+        }
+    },
+    created() {
+        this.$emitter.on("logged-in", () => {
+            this.isLogged = this.isLoggedIn();
+        });
+    },
     methods: {
+        isLoggedIn,
+        logout,
+        signout(e: Event) {
+            e.preventDefault();
+            this.logout();
+            this.isLogged = this.isLoggedIn();
+            this.$router.push('/');
+        },
         onClick() {
             this.$refs.navbarCollapse && (this.$refs.navbarCollapse as HTMLElement).classList.remove("show");
         }

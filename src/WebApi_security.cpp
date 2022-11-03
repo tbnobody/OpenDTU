@@ -6,6 +6,7 @@
 #include "ArduinoJson.h"
 #include "AsyncJson.h"
 #include "Configuration.h"
+#include "WebApi.h"
 #include "helper.h"
 
 void WebApiSecurityClass::init(AsyncWebServer* server)
@@ -16,6 +17,7 @@ void WebApiSecurityClass::init(AsyncWebServer* server)
 
     _server->on("/api/security/password", HTTP_GET, std::bind(&WebApiSecurityClass::onPasswordGet, this, _1));
     _server->on("/api/security/password", HTTP_POST, std::bind(&WebApiSecurityClass::onPasswordPost, this, _1));
+    _server->on("/api/security/authenticate", HTTP_GET, std::bind(&WebApiSecurityClass::onAuthenticateGet, this, _1));
 }
 
 void WebApiSecurityClass::loop()
@@ -24,6 +26,10 @@ void WebApiSecurityClass::loop()
 
 void WebApiSecurityClass::onPasswordGet(AsyncWebServerRequest* request)
 {
+    if (!WebApi.checkCredentials(request)) {
+        return;
+    }
+
     AsyncJsonResponse* response = new AsyncJsonResponse();
     JsonObject root = response->getRoot();
     const CONFIG_T& config = Configuration.get();
@@ -36,6 +42,10 @@ void WebApiSecurityClass::onPasswordGet(AsyncWebServerRequest* request)
 
 void WebApiSecurityClass::onPasswordPost(AsyncWebServerRequest* request)
 {
+    if (!WebApi.checkCredentials(request)) {
+        return;
+    }
+
     AsyncJsonResponse* response = new AsyncJsonResponse();
     JsonObject retMsg = response->getRoot();
     retMsg[F("type")] = F("warning");
@@ -86,6 +96,21 @@ void WebApiSecurityClass::onPasswordPost(AsyncWebServerRequest* request)
 
     retMsg[F("type")] = F("success");
     retMsg[F("message")] = F("Settings saved!");
+
+    response->setLength();
+    request->send(response);
+}
+
+void WebApiSecurityClass::onAuthenticateGet(AsyncWebServerRequest* request)
+{
+    if (!WebApi.checkCredentials(request)) {
+        return;
+    }
+
+    AsyncJsonResponse* response = new AsyncJsonResponse();
+    JsonObject retMsg = response->getRoot();
+    retMsg[F("type")] = F("success");
+    retMsg[F("message")] = F("Authentication successfull!");
 
     response->setLength();
     request->send(response);

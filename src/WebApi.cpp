@@ -5,6 +5,7 @@
 #include "WebApi.h"
 #include "ArduinoJson.h"
 #include "AsyncJson.h"
+#include "Configuration.h"
 #include "defaults.h"
 
 WebApiClass::WebApiClass()
@@ -53,6 +54,24 @@ void WebApiClass::loop()
     _webApiSysstatus.loop();
     _webApiWebapp.loop();
     _webApiWsLive.loop();
+}
+
+bool WebApiClass::checkCredentials(AsyncWebServerRequest* request)
+{
+    CONFIG_T& config = Configuration.get();
+    if (request->authenticate(AUTH_USERNAME, config.Security_Password)) {
+        return true;
+    }
+
+    AsyncWebServerResponse* r = request->beginResponse(401);
+
+    // WebAPI should set the X-Requested-With to prevent browser internal auth dialogs
+    if (!request->hasHeader("X-Requested-With")) {
+        r->addHeader(F("WWW-Authenticate"), F("Basic realm=\"Login Required\""));
+    }
+    request->send(r);
+
+    return false;
 }
 
 WebApiClass WebApi;

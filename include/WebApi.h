@@ -24,6 +24,8 @@ public:
     void init();
     void loop();
 
+    static bool checkCredentials(AsyncWebServerRequest* request);
+
 private:
     AsyncWebServer _server;
     AsyncEventSource _events;
