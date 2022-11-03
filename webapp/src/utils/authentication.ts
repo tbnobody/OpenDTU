@@ -1,11 +1,11 @@
-export function authHeader(): HeadersInit {
+export function authHeader(): Headers {
     // return authorization header with basic auth credentials
     let user = JSON.parse(localStorage.getItem('user') || "");
 
     if (user && user.authdata) {
-        return { 'Authorization': 'Basic ' + user.authdata };
+        return new Headers({ 'Authorization': 'Basic ' + user.authdata })
     } else {
-        return {};
+        return new Headers();
     }
 }
 
