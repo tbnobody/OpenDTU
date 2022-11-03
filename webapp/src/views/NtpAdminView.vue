@@ -75,6 +75,7 @@
 import { defineComponent } from 'vue';
 import BasePage from '@/components/BasePage.vue';
 import BootstrapAlert from "@/components/BootstrapAlert.vue";
+import { handleResponse, authHeader } from '@/utils/authentication';
 import type { NtpConfig } from "@/types/NtpConfig";
 
 export default defineComponent({
@@ -127,8 +128,8 @@ export default defineComponent({
         },
         getNtpConfig() {
             this.dataLoading = true;
-            fetch("/api/ntp/config")
-                .then((response) => response.json())
+            fetch("/api/ntp/config", { headers: authHeader() })
+                .then(handleResponse)
                 .then(
                     (data) => {
                         this.ntpConfigList = data;
@@ -142,8 +143,8 @@ export default defineComponent({
         },
         getCurrentTime() {
             this.dataLoading = true;
-            fetch("/api/ntp/time")
-                .then((response) => response.json())
+            fetch("/api/ntp/time", { headers: authHeader() })
+                .then(handleResponse)
                 .then(
                     (data) => {
                         this.mcuTime = new Date(
@@ -168,15 +169,10 @@ export default defineComponent({
 
             fetch("/api/ntp/time", {
                 method: "POST",
+                headers: authHeader(),
                 body: formData,
             })
-                .then(function (response) {
-                    if (response.status != 200) {
-                        throw response.status;
-                    } else {
-                        return response.json();
-                    }
-                })
+                .then(handleResponse)
                 .then(
                     (response) => {
                         this.alertMessage = response.message;
@@ -196,15 +192,10 @@ export default defineComponent({
 
             fetch("/api/ntp/config", {
                 method: "POST",
+                headers: authHeader(),
                 body: formData,
             })
-                .then(function (response) {
-                    if (response.status != 200) {
-                        throw response.status;
-                    } else {
-                        return response.json();
-                    }
-                })
+                .then(handleResponse)
                 .then(
                     (response) => {
                         this.alertMessage = response.message;
