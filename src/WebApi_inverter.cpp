@@ -9,6 +9,7 @@
 #include "Hoymiles.h"
 #include "MqttHassPublishing.h"
 #include "MqttVictronPublishing.h"
+#include "WebApi.h"
 #include "helper.h"
 
 void WebApiInverterClass::init(AsyncWebServer* server)
@@ -29,6 +30,10 @@ void WebApiInverterClass::loop()
 
 void WebApiInverterClass::onInverterList(AsyncWebServerRequest* request)
 {
+    if (!WebApi.checkCredentials(request)) {
+        return;
+    }
+
     AsyncJsonResponse* response = new AsyncJsonResponse(false, 4096U);
     JsonObject root = response->getRoot();
     JsonArray data = root.createNestedArray(F("inverter"));
@@ -69,6 +74,10 @@ void WebApiInverterClass::onInverterList(AsyncWebServerRequest* request)
 
 void WebApiInverterClass::onInverterAdd(AsyncWebServerRequest* request)
 {
+    if (!WebApi.checkCredentials(request)) {
+        return;
+    }
+
     AsyncJsonResponse* response = new AsyncJsonResponse();
     JsonObject retMsg = response->getRoot();
     retMsg[F("type")] = F("warning");
@@ -155,6 +164,10 @@ void WebApiInverterClass::onInverterAdd(AsyncWebServerRequest* request)
 
 void WebApiInverterClass::onInverterEdit(AsyncWebServerRequest* request)
 {
+    if (!WebApi.checkCredentials(request)) {
+        return;
+    }
+
     AsyncJsonResponse* response = new AsyncJsonResponse();
     JsonObject retMsg = response->getRoot();
     retMsg[F("type")] = F("warning");
@@ -272,6 +285,10 @@ void WebApiInverterClass::onInverterEdit(AsyncWebServerRequest* request)
 
 void WebApiInverterClass::onInverterDelete(AsyncWebServerRequest* request)
 {
+    if (!WebApi.checkCredentials(request)) {
+        return;
+    }
+
     AsyncJsonResponse* response = new AsyncJsonResponse();
     JsonObject retMsg = response->getRoot();
     retMsg[F("type")] = F("warning");

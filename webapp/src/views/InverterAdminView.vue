@@ -162,6 +162,7 @@ import {
 } from 'bootstrap-icons-vue';
 import * as bootstrap from 'bootstrap';
 import BootstrapAlert from "@/components/BootstrapAlert.vue";
+import { handleResponse, authHeader } from '@/utils/authentication';
 
 declare interface Inverter {
     id: string,
@@ -218,8 +219,8 @@ export default defineComponent({
     methods: {
         getInverters() {
             this.dataLoading = true;
-            fetch("/api/inverter/list")
-                .then((response) => response.json())
+            fetch("/api/inverter/list", { headers: authHeader() })
+                .then(handleResponse)
                 .then((data) => {
                     this.inverters = data.inverter;
                     this.dataLoading = false;
@@ -231,15 +232,10 @@ export default defineComponent({
 
             fetch("/api/inverter/add", {
                 method: "POST",
+                headers: authHeader(),
                 body: formData,
             })
-                .then(function (response) {
-                    if (response.status != 200) {
-                        throw response.status;
-                    } else {
-                        return response.json();
-                    }
-                })
+                .then(handleResponse)
                 .then(
                     (response) => {
                         this.alertMessage = response.message;
@@ -273,15 +269,10 @@ export default defineComponent({
 
             fetch("/api/inverter/del", {
                 method: "POST",
+                headers: authHeader(),
                 body: formData,
             })
-                .then(function (response) {
-                    if (response.status != 200) {
-                        throw response.status;
-                    } else {
-                        return response.json();
-                    }
-                })
+                .then(handleResponse)
                 .then(
                     (response) => {
                         this.alertMessage = response.message;
@@ -321,15 +312,10 @@ export default defineComponent({
 
             fetch("/api/inverter/edit", {
                 method: "POST",
+                headers: authHeader(),
                 body: formData,
             })
-                .then(function (response) {
-                    if (response.status != 200) {
-                        throw response.status;
-                    } else {
-                        return response.json();
-                    }
-                })
+                .then(handleResponse)
                 .then(
                     (response) => {
                         this.alertMessage = response.message;
