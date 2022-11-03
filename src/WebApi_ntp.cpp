@@ -7,6 +7,7 @@
 #include "AsyncJson.h"
 #include "Configuration.h"
 #include "NtpSettings.h"
+#include "WebApi.h"
 #include "helper.h"
 
 void WebApiNtpClass::init(AsyncWebServer* server)
@@ -52,6 +53,10 @@ void WebApiNtpClass::onNtpStatus(AsyncWebServerRequest* request)
 
 void WebApiNtpClass::onNtpAdminGet(AsyncWebServerRequest* request)
 {
+    if (!WebApi.checkCredentials(request)) {
+        return;
+    }
+
     AsyncJsonResponse* response = new AsyncJsonResponse();
     JsonObject root = response->getRoot();
     const CONFIG_T& config = Configuration.get();
@@ -66,6 +71,10 @@ void WebApiNtpClass::onNtpAdminGet(AsyncWebServerRequest* request)
 
 void WebApiNtpClass::onNtpAdminPost(AsyncWebServerRequest* request)
 {
+    if (!WebApi.checkCredentials(request)) {
+        return;
+    }
+
     AsyncJsonResponse* response = new AsyncJsonResponse();
     JsonObject retMsg = response->getRoot();
     retMsg[F("type")] = F("warning");
@@ -142,6 +151,10 @@ void WebApiNtpClass::onNtpAdminPost(AsyncWebServerRequest* request)
 
 void WebApiNtpClass::onNtpTimeGet(AsyncWebServerRequest* request)
 {
+    if (!WebApi.checkCredentials(request)) {
+        return;
+    }
+
     AsyncJsonResponse* response = new AsyncJsonResponse();
     JsonObject root = response->getRoot();
 
@@ -165,6 +178,10 @@ void WebApiNtpClass::onNtpTimeGet(AsyncWebServerRequest* request)
 
 void WebApiNtpClass::onNtpTimePost(AsyncWebServerRequest* request)
 {
+    if (!WebApi.checkCredentials(request)) {
+        return;
+    }
+
     AsyncJsonResponse* response = new AsyncJsonResponse();
     JsonObject retMsg = response->getRoot();
     retMsg[F("type")] = F("warning");
