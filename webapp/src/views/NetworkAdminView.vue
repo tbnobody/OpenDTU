@@ -104,6 +104,7 @@
 import { defineComponent } from 'vue';
 import BasePage from '@/components/BasePage.vue';
 import BootstrapAlert from "@/components/BootstrapAlert.vue";
+import { handleResponse, authHeader } from '@/utils/authentication';
 import type { NetworkConfig } from "@/types/NetworkkConfig";
 
 export default defineComponent({
@@ -126,8 +127,8 @@ export default defineComponent({
     methods: {
         getNetworkConfig() {
             this.dataLoading = true;
-            fetch("/api/network/config")
-                .then((response) => response.json())
+            fetch("/api/network/config", { headers: authHeader() })
+                .then(handleResponse)
                 .then((data) => {
                     this.networkConfigList = data;
                     this.dataLoading = false;
@@ -141,15 +142,10 @@ export default defineComponent({
 
             fetch("/api/network/config", {
                 method: "POST",
+                headers: authHeader(),
                 body: formData,
             })
-                .then(function (response) {
-                    if (response.status != 200) {
-                        throw response.status;
-                    } else {
-                        return response.json();
-                    }
-                })
+                .then(handleResponse)
                 .then(
                     (response) => {
                         this.alertMessage = response.message;
