@@ -218,6 +218,7 @@
 import { defineComponent } from 'vue';
 import BasePage from '@/components/BasePage.vue';
 import BootstrapAlert from "@/components/BootstrapAlert.vue";
+import { handleResponse, authHeader } from '@/utils/authentication';
 import type { MqttConfig } from "@/types/MqttConfig";
 
 export default defineComponent({
@@ -240,8 +241,8 @@ export default defineComponent({
     methods: {
         getMqttConfig() {
             this.dataLoading = true;
-            fetch("/api/mqtt/config")
-                .then((response) => response.json())
+            fetch("/api/mqtt/config", { headers: authHeader() })
+                .then(handleResponse)
                 .then((data) => {
                     this.mqttConfigList = data;
                     this.dataLoading = false;
@@ -255,15 +256,10 @@ export default defineComponent({
 
             fetch("/api/mqtt/config", {
                 method: "POST",
+                headers: authHeader(),
                 body: formData,
             })
-                .then(function (response) {
-                    if (response.status != 200) {
-                        throw response.status;
-                    } else {
-                        return response.json();
-                    }
-                })
+                .then(handleResponse)
                 .then(
                     (response) => {
                         this.alertMessage = response.message;
