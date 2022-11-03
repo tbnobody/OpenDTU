@@ -49,6 +49,7 @@
 import { defineComponent } from 'vue';
 import BasePage from '@/components/BasePage.vue';
 import BootstrapAlert from "@/components/BootstrapAlert.vue";
+import { handleResponse, authHeader } from '@/utils/authentication';
 import type { DtuConfig } from "@/types/DtuConfig";
 
 export default defineComponent({
@@ -77,8 +78,8 @@ export default defineComponent({
     methods: {
         getDtuConfig() {
             this.dataLoading = true;
-            fetch("/api/dtu/config")
-                .then((response) => response.json())
+            fetch("/api/dtu/config", { headers: authHeader() })
+                .then(handleResponse)
                 .then(
                     (data) => {
                         this.dtuConfigList = data;
@@ -94,15 +95,10 @@ export default defineComponent({
 
             fetch("/api/dtu/config", {
                 method: "POST",
+                headers: authHeader(),
                 body: formData,
             })
-                .then(function (response) {
-                    if (response.status != 200) {
-                        throw response.status;
-                    } else {
-                        return response.json();
-                    }
-                })
+                .then(handleResponse)
                 .then(
                     (response) => {
                         this.alertMessage = response.message;
