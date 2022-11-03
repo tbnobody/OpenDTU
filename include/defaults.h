@@ -9,6 +9,7 @@
 
 #define ACCESS_POINT_NAME "OpenDTU-"
 #define ACCESS_POINT_PASSWORD "openDTU42"
+#define AUTH_USERNAME "admin"
 
 #define ADMIN_TIMEOUT 180
 #define WIFI_RECONNECT_TIMEOUT 15

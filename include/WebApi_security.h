@@ -12,5 +12,7 @@ private:
     void onPasswordGet(AsyncWebServerRequest* request);
     void onPasswordPost(AsyncWebServerRequest* request);
 
+    void onAuthenticateGet(AsyncWebServerRequest* request);
+
     AsyncWebServer* _server;
 };

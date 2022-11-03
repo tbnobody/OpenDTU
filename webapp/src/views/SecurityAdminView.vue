@@ -26,8 +26,8 @@
 
                     <div class="alert alert-secondary" role="alert">
                         <b>Hint:</b>
-                        The administrator password is used to connect to the device when in AP mode.
-                        It must be 8..64 characters.
+                        The administrator password is used to access this web interface (user 'admin'), but also to
+                        connect to the device when in AP mode. It must be 8..64 characters.
                     </div>
 
                 </div>
@@ -41,6 +41,7 @@
 import { defineComponent } from 'vue';
 import BasePage from '@/components/BasePage.vue';
 import BootstrapAlert from "@/components/BootstrapAlert.vue";
+import { handleResponse, authHeader } from '@/utils/authentication';
 import type { SecurityConfig } from '@/types/SecurityConfig';
 
 export default defineComponent({
@@ -65,8 +66,8 @@ export default defineComponent({
     methods: {
         getPasswordConfig() {
             this.dataLoading = true;
-            fetch("/api/security/password")
-                .then((response) => response.json())
+            fetch("/api/security/password", { headers: authHeader() })
+                .then(handleResponse)
                 .then(
                     (data) => {
                         this.securityConfigList = data;
@@ -90,15 +91,10 @@ export default defineComponent({
 
             fetch("/api/security/password", {
                 method: "POST",
+                headers: authHeader(),
                 body: formData,
             })
-                .then(function (response) {
-                    if (response.status != 200) {
-                        throw response.status;
-                    } else {
-                        return response.json();
-                    }
-                })
+                .then(handleResponse)
                 .then(
                     (response) => {
                         this.alertMessage = response.message;
