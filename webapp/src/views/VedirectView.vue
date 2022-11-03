@@ -12,8 +12,8 @@
                 <div class="card">
                     <div class="card-header d-flex justify-content-between align-items-center"
                         :class="{
-                            'bg-danger': vedirectData.age_critical,
-                            'bg-primary': !vedirectData.age_critical,
+                            'text-bg-danger': vedirectData.age_critical,
+                            'text-bg-primary': !vedirectData.age_critical,
                         }">
                         <div class="p-1 flex-grow-1">
                             <div class="d-flex flex-wrap">
@@ -33,7 +33,7 @@
                         </div>
                     </div>
                     <div class="card-body">
-                        <div class="row">
+                        <div class="row flex-row-reverse flex-wrap-reverse align-items-end g-3">
                             <div class="col order-0">
                                 <div class="card" :class="{ 'border-info': true }">
                                     <div class="card-header bg-info">Device Info</div>
@@ -176,7 +176,7 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue';
-import type { Vedirect } from '@/types/LiveDataStatus';
+import type { Vedirect } from '@/types/VedirectLiveDataStatus';
 
 export default defineComponent({
     components: {

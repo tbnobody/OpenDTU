@@ -1,62 +1,52 @@
 <template>
-    <div class="container-xxl" role="main">
-        <div class="page-header">
-            <h1>Ve.direct Info</h1>
-        </div>
-
-        <div class="text-center" v-if="dataLoading">
-            <div class="spinner-border" role="status">
-                <span class="visually-hidden">Loading...</span>
-            </div>
-        </div>
-
-        <template v-if="!dataLoading">
-            <div class="card">
-                <div class="card-header bg-primary">Configuration Summary</div>
-                <div class="card-body">
-                    <div class="table-responsive">
-                        <table class="table table-hover table-condensed">
-                            <tbody>
-                                <tr>
-                                    <th>Status</th>
-                                    <td class="badge" :class="{
-                                        'bg-danger': !vedirectDataList.vedirect_enabled,
-                                        'bg-success': vedirectDataList.vedirect_enabled,
-                                    }">
-                                        <span v-if="vedirectDataList.vedirect_enabled">enabled</span>
-                                        <span v-else>disabled</span>
-                                    </td>
-                                </tr>
-                                <tr v-show="vedirectDataList.vedirect_enabled">
+    <BasePage :title="'Ve.direct Info'" :isLoading="dataLoading">
+        <div class="card">
+            <div class="card-header text-bg-primary">Configuration Summary</div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover table-condensed">
+                        <tbody>
+                            <tr>
+                                <th>Status</th>
+                                <td class="badge" :class="{
+                                    'text-bg-danger': !vedirectDataList.vedirect_enabled,
+                                    'text-bg-success': vedirectDataList.vedirect_enabled,
+                                }">
+                                    <span v-if="vedirectDataList.vedirect_enabled">enabled</span>
+                                    <span v-else>disabled</span>
+                                </td>
+                            </tr>
+                            <tr v-show="vedirectDataList.vedirect_enabled">
                                     <th>Updates Only</th>
                                     <td class="badge" :class="{
-                                        'bg-danger': !vedirectDataList.vedirect_updatesonly,
-                                        'bg-success': vedirectDataList.vedirect_updatesonly,
+                                        'text-bg-danger': !vedirectDataList.vedirect_updatesonly,
+                                        'text-bg-success': vedirectDataList.vedirect_updatesonly,
                                     }">
                                         <span v-if="vedirectDataList.vedirect_updatesonly">enabled</span>
                                         <span v-else>disabled</span>
                                     </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
             </div>
-        </template>
-    </div>
+        </div>
+    </BasePage>
 </template>
 
 <script lang="ts">
 import { defineComponent } from 'vue';
+import BasePage from '@/components/BasePage.vue';
+import type { VedirectStatus } from "@/types/VedirectStatus";
 
 export default defineComponent({
+    components: {
+        BasePage,
+    },
     data() {
         return {
             dataLoading: true,
-            vedirectDataList: {
-                vedirect_enabled: false,
-                vedirect_updatesonly: true,
-            },
+            vedirectDataList: {} as VedirectStatus,
         };
     },
     created() {
