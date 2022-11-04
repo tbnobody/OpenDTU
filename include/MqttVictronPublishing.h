@@ -10,6 +10,8 @@ class MqttVictronPublishingClass {
 public:
     void init();
     void loop();
+    void forceRegister();
+    void registerInverter();
 
 private:
     void publishField(std::shared_ptr<InverterAbstract> inv, uint8_t invphase, uint8_t fieldId);
@@ -33,6 +35,9 @@ private:
         FLD_IRR,
         FLD_PRA
     };
+
+    bool _wasConnected = false;
+    bool _registerForced = false;
 };
 
 extern MqttVictronPublishingClass MqttVictronPublishing;
