@@ -119,7 +119,7 @@ void MqttVictronPublishingClass::registerInverter()
         String portalid = MqttSettings.getVictronPortalId();
         if ( portalid == NULL ) { portalid = "NOportalId"; }
 
-        String Vtopic = "W/" + portalid + "/pvinverter/" + deviceInstance + "/ErrorCode";
+        Vtopic = "W/" + portalid + "/pvinverter/" + deviceInstance + "/ErrorCode";
         DynamicJsonDocument val1Doc(32);
         val1Doc["value"] = 0;
         JsonObject val1Obj = val1Doc.as<JsonObject>();
