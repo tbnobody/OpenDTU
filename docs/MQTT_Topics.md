@@ -4,13 +4,15 @@ The base topic, as configured in the web GUI is prepended to all follwing topics
 
 ## General topics
 
+serial will be replaced with the serial number of the OpenDTU device.
+
 | Topic                                   | R / W | Description                                          | Value / Unit               |
 | --------------------------------------- | ----- | ---------------------------------------------------- | -------------------------- |
-| dtu/ip                                  | R     | IP address of OpenDTU                                | IP address                 |
-| dtu/hostname                            | R     | Current hostname of the dtu (as set in web GUI)      |                            |
-| dtu/rssi                                | R     | WiFi network quality                                 | db value                   |
+| dtu/[serial]/ip                         | R     | IP address of OpenDTU                                | IP address                 |
+| dtu/[serial]/hostname                   | R     | Current hostname of the dtu (as set in web GUI)      |                            |
+| dtu/[serial]/rssi                       | R     | WiFi network quality                                 | db value                   |
 | dtu/status                              | R     | Indicates whether OpenDTU network is reachable       | online /  offline          |
-| dtu/uptime                              | R     | Time in seconds since startup                        | seconds                    |
+| dtu/[serial]/uptime                     | R     | Time in seconds since startup                        | seconds                    |
 
 ## Inverter specific topics
 
