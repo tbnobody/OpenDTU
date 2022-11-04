@@ -33,29 +33,39 @@ void MqttVictronPublishingClass::loop()
             auto inv = Hoymiles.getInverterByPos(i);
 
             String str_serial = inv->serialString();
+ 
+            uint32_t lastUpdate = inv->Statistics()->getLastUpdate();
+            if (lastUpdate > 0 && lastUpdate != _lastPublishStats[i]) {
+                _lastPublishStats[i] = lastUpdate;
+ 
+                String invname = inv->name();
 
-            // Publish inverter as device service to Victron Venus OS with connected=1
-            DynamicJsonDocument serviceDoc(64);
-            serviceDoc[str_serial] = F("pvinverter");
-            JsonObject serviceObj = serviceDoc.as<JsonObject>();
+                // Get Current phase
+                uint8_t invphase = config.Inverter[i].CurrentPhase;
+                uint8_t invconnected;
+                if (invphase == 0) { invconnected = 0; } else { invconnected = 1; }
 
-            // Get Current phase
-            uint16_t invphase = config.Inverter[i].CurrentPhase;
-            String invname = inv->name();
-            uint8_t invconnected;
+                // Publish inverter as device service to Victron Venus OS with connected=1
+                DynamicJsonDocument serviceDoc(64);
+                serviceDoc[str_serial] = F("pvinverter");
+                JsonObject serviceObj = serviceDoc.as<JsonObject>();
 
-            if (invphase == 0) { invconnected = 0; } else { invconnected = 1; }
+                String Vtopic = ("device/HM" + str_serial + "/Status");
+                DynamicJsonDocument rootDoc(256);
+                rootDoc[F("clientId")] = "HM" + str_serial;
+                rootDoc[F("connected")] = invconnected;
+                rootDoc[F("version")] = "0.1-L" + String(invphase) + "-" + invname;
+                rootDoc[F("services")] = serviceObj;
+                JsonObject rootObj = rootDoc.as<JsonObject>();
+                String data;
+                serializeJson(rootObj, data);
+                MqttSettings.publishVictron(Vtopic, data);
 
-            String Vtopic = ("device/HM" + str_serial + "/Status");
-            DynamicJsonDocument rootDoc(256);
-            rootDoc[F("clientId")] = "HM" + str_serial;
-            rootDoc[F("connected")] = invconnected;
-            rootDoc[F("version")] = "0.1-L" + String(invphase) + "-" + invname;
-            rootDoc[F("services")] = serviceObj;
-            JsonObject rootObj = rootDoc.as<JsonObject>();
-            String data;
-            serializeJson(rootObj, data);
-            MqttSettings.publishVictron(Vtopic, data);
+                // Loop all fields in channel 0
+                for (uint8_t f = 0; f < sizeof(_publishFields); f++) {
+                    publishField(inv, invphase, _publishFields[f]);
+                }
+            }
 
             if (inv->SystemConfigPara()->getLastUpdate() > 0) {
                 // Get Limit
@@ -66,7 +76,7 @@ void MqttVictronPublishingClass::loop()
                 String portalid = MqttSettings.getVictronPortalId();
                 if ( portalid == NULL ) { portalid = "NOportalId"; }
 
-                Vtopic = "W/" + portalid + "/pvinverter/" + deviceInstance + "/ErrorCode";
+                String Vtopic = "W/" + portalid + "/pvinverter/" + deviceInstance + "/ErrorCode";
                 DynamicJsonDocument val1Doc(32);
                 val1Doc["value"] = 0;
                 JsonObject val1Obj = val1Doc.as<JsonObject>();
@@ -81,16 +91,6 @@ void MqttVictronPublishingClass::loop()
                 String data2;
                 serializeJson(val2Obj, data2);
                 MqttSettings.publishVictron(Vtopic, data2);
-            }
-
-            uint32_t lastUpdate = inv->Statistics()->getLastUpdate();
-            if (lastUpdate > 0 && lastUpdate != _lastPublishStats[i]) {
-                _lastPublishStats[i] = lastUpdate;
-
-                // Loop all fields in channel 0
-                for (uint8_t f = 0; f < sizeof(_publishFields); f++) {
-                    publishField(inv, invphase, _publishFields[f]);
-                }
             }
 
             yield();
