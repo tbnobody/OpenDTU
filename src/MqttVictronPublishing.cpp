@@ -7,8 +7,6 @@
 #include "MqttPublishing.h"
 #include "MqttSettings.h"
 #include "NetworkSettings.h"
-#include <ctime>
-#include <string>
 
 MqttVictronPublishingClass MqttVictronPublishing;
 
@@ -37,7 +35,7 @@ void MqttVictronPublishingClass::loop()
             String str_serial = inv->serialString();
 
             // Publish inverter as device service to Victron Venus OS with connected=1
-            DynamicJsonDocument serviceDoc(256);
+            DynamicJsonDocument serviceDoc(64);
             serviceDoc[str_serial] = F("pvinverter");
             JsonObject serviceObj = serviceDoc.as<JsonObject>();
 
@@ -49,7 +47,7 @@ void MqttVictronPublishingClass::loop()
             if (invphase == 0) { invconnected = 0; } else { invconnected = 1; }
 
             String Vtopic = ("device/HM" + str_serial + "/Status");
-            DynamicJsonDocument rootDoc(1024);
+            DynamicJsonDocument rootDoc(256);
             rootDoc[F("clientId")] = "HM" + str_serial;
             rootDoc[F("connected")] = invconnected;
             rootDoc[F("version")] = "0.1-L" + String(invphase) + "-" + invname;
@@ -69,7 +67,7 @@ void MqttVictronPublishingClass::loop()
                 if ( portalid == NULL ) { portalid = "NOportalId"; }
 
                 Vtopic = "W/" + portalid + "/pvinverter/" + deviceInstance + "/ErrorCode";
-                DynamicJsonDocument val1Doc(128);
+                DynamicJsonDocument val1Doc(32);
                 val1Doc["value"] = 0;
                 JsonObject val1Obj = val1Doc.as<JsonObject>();
                 String data1;
@@ -77,7 +75,7 @@ void MqttVictronPublishingClass::loop()
                 MqttSettings.publishVictron(Vtopic, data1);
 
                 Vtopic = "W/" + portalid + "/pvinverter/" + deviceInstance + "/Ac/MaxPower";
-                DynamicJsonDocument val2Doc(128);
+                DynamicJsonDocument val2Doc(32);
                 val2Doc["value"] = maxpower;
                 JsonObject val2Obj = val2Doc.as<JsonObject>();
                 String data2;
@@ -102,7 +100,7 @@ void MqttVictronPublishingClass::loop()
     }
 }
 
-void MqttVictronPublishingClass::publishField(std::shared_ptr<InverterAbstract> inv, uint16_t invphase, uint8_t fieldId)
+void MqttVictronPublishingClass::publishField(std::shared_ptr<InverterAbstract> inv, uint8_t invphase, uint8_t fieldId)
 {
     bool response = false;
     String fieldname;
@@ -133,7 +131,7 @@ void MqttVictronPublishingClass::publishField(std::shared_ptr<InverterAbstract> 
             topic_Victron_phase += topic + "/" + deviceInstance + "/Ac/L" + invphase + "/" + fieldname;
         }    
 
-        DynamicJsonDocument valueDoc(256);
+        DynamicJsonDocument valueDoc(32);
         valueDoc["value"] = fieldvalue;
         JsonObject valueObj = valueDoc.as<JsonObject>();
 
@@ -153,7 +151,7 @@ void MqttVictronPublishingClass::publishField(std::shared_ptr<InverterAbstract> 
 
         // Send Value 0 to other current phases and energy forward
         uint8_t nonval = 0;
-        DynamicJsonDocument nonvalueDoc(64);
+        DynamicJsonDocument nonvalueDoc(32);
         nonvalueDoc["value"] = nonval;
         JsonObject nonvalueObj = nonvalueDoc.as<JsonObject>();
 

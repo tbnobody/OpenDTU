@@ -12,7 +12,7 @@ public:
     void loop();
 
 private:
-    void publishField(std::shared_ptr<InverterAbstract> inv, uint16_t invphase, uint8_t fieldId);
+    void publishField(std::shared_ptr<InverterAbstract> inv, uint8_t invphase, uint8_t fieldId);
 
     uint32_t _lastPublishStats[INV_MAX_COUNT];
     uint32_t _lastPublish;

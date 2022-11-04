@@ -145,11 +145,11 @@ void MqttSettingsClass::onMqttMessage(const espMqttClientTypes::MessagePropertie
         memcpy(strlimit, payload, len);
         strlimit[len] = '\0';
         
-        DynamicJsonDocument docDbus(512);
+        DynamicJsonDocument docDbus(64);
         deserializeJson(docDbus, strlimit);
         VictronPortalId = docDbus["portalId"];
                     
-        DynamicJsonDocument docInstance(256);
+        DynamicJsonDocument docInstance(64);
         docInstance = docDbus["deviceInstance"];
         String deviceInstance = docInstance[serial_str];
     
