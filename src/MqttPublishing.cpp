@@ -29,6 +29,10 @@ void MqttPublishingClass::loop()
             MqttSettings.publish("dtu/rssi", String(WiFi.RSSI()));
         }
 
+        float totalPower = 0;
+        float totalYieldDay = 0;
+        float totalYieldTotal = 0;
+
         // Loop all inverters
         for (uint8_t i = 0; i < Hoymiles.getNumInverters(); i++) {
             auto inv = Hoymiles.getInverterByPos(i);
@@ -89,8 +93,18 @@ void MqttPublishingClass::loop()
                 }
             }
 
+            // add inverter totals to overall totals
+            totalPower += inv->Statistics()->getChannelFieldValue(0, FLD_PAC);
+            totalYieldDay += inv->Statistics()->getChannelFieldValue(0, FLD_YD);
+            totalYieldTotal += inv->Statistics()->getChannelFieldValue(0, FLD_YT);
+
             yield();
         }
+
+        // publish overall totals
+        MqttSettings.publish("dtu/power", String(totalPower));
+        MqttSettings.publish("dtu/yieldday", String(totalYieldDay));
+        MqttSettings.publish("dtu/yieldtotal", String(totalYieldTotal));
 
         _lastPublish = millis();
     }
