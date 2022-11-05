@@ -190,6 +190,15 @@ A documentation of all available MQTT Topics can be found here: [MQTT Documentat
 ## Available cases
 * <https://www.thingiverse.com/thing:5435911>
 * <https://www.printables.com/model/293003-sol-opendtu-esp32-nrf24l01-case>
+   *  The pin assignment for the soldering shown in the figures is
+      ```
+      -DHOYMILES_PIN_MISO=19
+      -DHOYMILES_PIN_MOSI=23
+      -DHOYMILES_PIN_SCLK=18
+      -DHOYMILES_PIN_IRQ=15
+      -DHOYMILES_PIN_CE=4
+      -DHOYMILES_PIN_CS=5
+      ```
 
 ## Building
 * Building the WebApp
