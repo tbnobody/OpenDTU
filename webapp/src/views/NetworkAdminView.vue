@@ -128,7 +128,7 @@ export default defineComponent({
         getNetworkConfig() {
             this.dataLoading = true;
             fetch("/api/network/config", { headers: authHeader() })
-                .then(handleResponse)
+                .then((response) => handleResponse(response, this.$emitter))
                 .then((data) => {
                     this.networkConfigList = data;
                     this.dataLoading = false;
@@ -145,7 +145,7 @@ export default defineComponent({
                 headers: authHeader(),
                 body: formData,
             })
-                .then(handleResponse)
+                .then((response) => handleResponse(response, this.$emitter))
                 .then(
                     (response) => {
                         this.alertMessage = response.message;

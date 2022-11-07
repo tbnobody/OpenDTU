@@ -1,3 +1,5 @@
+import type { Emitter, EventType } from "mitt";
+
 export function authHeader(): Headers {
     // return authorization header with basic auth credentials
     let user = JSON.parse(localStorage.getItem('user') || "");
@@ -45,13 +47,14 @@ export function login(username: String, password: String) {
         });
 }
 
-export function handleResponse(response: Response) {
+export function handleResponse(response: Response, emitter: Emitter<Record<EventType, unknown>>) {
     return response.text().then(text => {
         const data = text && JSON.parse(text);
         if (!response.ok) {
             if (response.status === 401) {
                 // auto logout if 401 response returned from api
                 logout();
+                emitter.emit("logged-out");
                 location.reload();
             }
 

@@ -76,6 +76,7 @@ export default defineComponent({
                         router.push(this.returnUrl);
                     },
                     error => {
+                        this.$emitter.emit("logged-out");
                         this.alertMessage = error;
                         this.alertType = 'danger';
                         this.showAlert = true;
