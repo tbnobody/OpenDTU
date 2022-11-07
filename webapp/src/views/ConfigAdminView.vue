@@ -156,7 +156,7 @@ export default defineComponent({
                 headers: authHeader(),
                 body: formData,
             })
-                .then(handleResponse)
+                .then((response) => handleResponse(response, this.$emitter))
                 .then(
                     (response) => {
                         this.alertMessage = response.message;

@@ -72,8 +72,9 @@
                         <router-link @click="onClick" class="nav-link" to="/about">About</router-link>
                     </li>
                 </ul>
-                <form class="d-flex" role="search" v-if="isLogged">
-                    <button class="btn btn-outline-danger" @click="signout">Logout</button>
+                <form class="d-flex" role="search">
+                    <button v-if="isLogged" class="btn btn-outline-danger" @click="signout">Logout</button>
+                    <button v-if="!isLogged" class="btn btn-outline-success" @click="signin">Login</button>
                 </form>
             </div>
         </div>
@@ -98,14 +99,21 @@ export default defineComponent({
         this.$emitter.on("logged-in", () => {
             this.isLogged = this.isLoggedIn();
         });
+        this.$emitter.on("logged-out", () => {
+            this.isLogged = this.isLoggedIn();
+        });
     },
     methods: {
         isLoggedIn,
         logout,
+        signin(e: Event) {
+            e.preventDefault();
+            this.$router.push('/login');
+        },
         signout(e: Event) {
             e.preventDefault();
             this.logout();
-            this.isLogged = this.isLoggedIn();
+            this.$emitter.emit("logged-out");
             this.$router.push('/');
         },
         onClick() {
