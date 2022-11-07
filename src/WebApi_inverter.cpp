@@ -54,15 +54,18 @@ void WebApiInverterClass::onInverterList(AsyncWebServerRequest* request)
             obj[F("serial")] = buffer;
 
             auto inv = Hoymiles.getInverterBySerial(config.Inverter[i].Serial);
+            uint8_t max_channels;
             if (inv == nullptr) {
                 obj[F("type")] = F("Unknown");
+                max_channels = INV_MAX_CHAN_COUNT;
             } else {
                 obj[F("type")] = inv->typeName();
+                max_channels = inv->Statistics()->getChannelCount();
             }
 
             obj[F("phase")] = config.Inverter[i].CurrentPhase;
 
-            for (uint8_t c = 0; c < INV_MAX_CHAN_COUNT; c++) {
+            for (uint8_t c = 0; c < max_channels; c++) {
                 obj[F("max_power")][c] = config.Inverter[i].MaxChannelPower[c];
             }
         }
@@ -227,7 +230,7 @@ void WebApiInverterClass::onInverterEdit(AsyncWebServerRequest* request)
     }
 
     JsonArray maxPowerArray = root[F("max_power")].as<JsonArray>();
-    if (maxPowerArray.size() != INV_MAX_CHAN_COUNT) {
+    if (maxPowerArray.size() == 0 || maxPowerArray.size() > INV_MAX_CHAN_COUNT) {
         retMsg[F("message")] = F("Invalid amount of max channel setting given!");
         response->setLength();
         request->send(response);
