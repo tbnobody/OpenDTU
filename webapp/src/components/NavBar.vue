@@ -7,7 +7,7 @@
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" ref="navbarCollapse" id="navbarNavAltMarkup">
-                <ul class="navbar-nav">
+                <ul class="navbar-nav me-auto">
                     <li class="nav-item">
                         <router-link @click="onClick" class="nav-link" to="/">Live Data</router-link>
                     </li>
@@ -72,10 +72,10 @@
                         <router-link @click="onClick" class="nav-link" to="/about">About</router-link>
                     </li>
                 </ul>
+                <form class="d-flex" role="search" v-if="isLogged">
+                    <button class="btn btn-outline-danger" @click="signout">Logout</button>
+                </form>
             </div>
-            <form class="d-flex" role="search" v-if="isLogged">
-                <button class="btn btn-outline-danger" @click="signout">Logout</button>
-            </form>
         </div>
     </nav>
 </template>
