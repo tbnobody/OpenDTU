@@ -3,7 +3,10 @@ export function authHeader(): Headers {
     let user = JSON.parse(localStorage.getItem('user') || "");
 
     if (user && user.authdata) {
-        return new Headers({ 'Authorization': 'Basic ' + user.authdata })
+        const headers = new Headers();
+        headers.append('Authorization', 'Basic ' + user.authdata);
+        headers.append('X-Requested-With', 'XMLHttpRequest')
+        return new Headers(headers);
     } else {
         return new Headers();
     }
