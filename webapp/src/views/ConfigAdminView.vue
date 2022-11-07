@@ -112,6 +112,7 @@ import {
 } from 'bootstrap-icons-vue';
 import * as bootstrap from 'bootstrap';
 import BootstrapAlert from "@/components/BootstrapAlert.vue";
+import { handleResponse, authHeader } from '@/utils/authentication';
 
 export default defineComponent({
     components: {
@@ -152,15 +153,10 @@ export default defineComponent({
 
             fetch("/api/config/delete", {
                 method: "POST",
+                headers: authHeader(),
                 body: formData,
             })
-                .then(function (response) {
-                    if (response.status != 200) {
-                        throw response.status;
-                    } else {
-                        return response.json();
-                    }
-                })
+                .then(handleResponse)
                 .then(
                     (response) => {
                         this.alertMessage = response.message;
@@ -171,10 +167,17 @@ export default defineComponent({
             this.modalFactoryReset.hide();
         },
         downloadConfig() {
-            const link = document.createElement('a')
-            link.href = "/api/config/get"
-            link.download = 'config.json'
-            link.click()
+            fetch("/api/config/get", { headers: authHeader() })
+                .then(res => res.blob())
+                .then(blob => {
+                    var file = window.URL.createObjectURL(blob);
+                    var a = document.createElement('a');
+                    a.href = file;
+                    a.download = "config.json";
+                    document.body.appendChild(a);
+                    a.click();
+                    a.remove();
+                });
         },
         uploadConfig(event: Event | null) {
             this.uploading = true;
@@ -206,6 +209,9 @@ export default defineComponent({
 
             formData.append("config", this.file, "config");
             request.open("post", "/api/config/upload");
+            authHeader().forEach((value, key) => {
+                request.setRequestHeader(key, value);
+            });
             request.send(formData);
         },
         clear() {
