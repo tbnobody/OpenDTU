@@ -110,30 +110,8 @@ void MqttVictronPublishingClass::registerInverter()
         JsonObject rootObj = rootDoc.as<JsonObject>();
         String data;
         serializeJson(rootObj, data);
+        
         MqttSettings.publishVictron(Vtopic, data);
-
-        // Publish limit and error code to Victron Venus OS
-        uint16_t maxpower = inv->DevInfo()->getMaxPower();
-
-        String deviceInstance = MqttSettings.getVictronDeviceInstance(str_serial);
-        String portalid = MqttSettings.getVictronPortalId();
-        if ( portalid == NULL ) { portalid = "NOportalId"; }
-
-        Vtopic = "W/" + portalid + "/pvinverter/" + deviceInstance + "/ErrorCode";
-        DynamicJsonDocument val1Doc(32);
-        val1Doc["value"] = 0;
-        JsonObject val1Obj = val1Doc.as<JsonObject>();
-        String data1;
-        serializeJson(val1Obj, data1);
-        MqttSettings.publishVictron(Vtopic, data1);
-
-        Vtopic = "W/" + portalid + "/pvinverter/" + deviceInstance + "/Ac/MaxPower";
-        DynamicJsonDocument val2Doc(32);
-        val2Doc["value"] = maxpower;
-        JsonObject val2Obj = val2Doc.as<JsonObject>();
-        String data2;
-        serializeJson(val2Obj, data2);
-        MqttSettings.publishVictron(Vtopic, data2);
     }
 }
 
@@ -152,26 +130,24 @@ void MqttVictronPublishingClass::publishField(std::shared_ptr<InverterAbstract> 
 
         String portalid = MqttSettings.getVictronPortalId();
         if ( portalid == NULL ) { portalid = "NOportalId"; }
-        String topic = "W/" + portalid + "/pvinverter";
-        String topic_Victron_sum;
-        String topic_Victron_phase;
+
+        String topic_sum, topic_phase, topic_err, topic_maxp;
     
         String invSerial = inv->serialString();
-
         String deviceInstance = MqttSettings.getVictronDeviceInstance(invSerial);
+        String topic = "W/" + portalid + "/pvinverter/" + deviceInstance;
 
         if ( fieldId == 4 ) { 
-            topic_Victron_sum += topic + "/" + deviceInstance + "/Ac/Energy/Forward";
-            topic_Victron_phase += topic + "/" + deviceInstance + "/Ac/L" + invphase + "/Energy/Forward";
+            topic_sum += topic + "/Ac/Energy/Forward";
+            topic_phase += topic + "/Ac/L" + invphase + "/Energy/Forward";
         } else {
-            topic_Victron_sum += topic + "/" + deviceInstance + "/Ac/" + fieldname;
-            topic_Victron_phase += topic + "/" + deviceInstance + "/Ac/L" + invphase + "/" + fieldname;
+            topic_sum += topic + "/Ac/" + fieldname;
+            topic_phase += topic + "/Ac/L" + invphase + "/" + fieldname;
         }    
 
         DynamicJsonDocument valueDoc(32);
         valueDoc["value"] = fieldvalue;
         JsonObject valueObj = valueDoc.as<JsonObject>();
-
         String data;
         serializeJson(valueObj, data);
 
@@ -179,19 +155,38 @@ void MqttVictronPublishingClass::publishField(std::shared_ptr<InverterAbstract> 
         Serial.print(fieldId);
         Serial.print(data);
         Serial.print(F(" to Venus OS with topic sum: "));
-        Serial.print(topic_Victron_sum);
+        Serial.print(topic_sum);
         Serial.print(F(" and topic phase: "));
-        Serial.println(topic_Victron_phase);
+        Serial.println(topic_phase);
 
-        MqttSettings.publishVictron(topic_Victron_sum, data);
-        MqttSettings.publishVictron(topic_Victron_phase, data);
+        MqttSettings.publishVictron(topic_sum, data);
+        MqttSettings.publishVictron(topic_phase, data);
+
+        // Publish limit and error code to Victron Venus OS
+        uint16_t maxpower = inv->DevInfo()->getMaxPower();
+        topic_err += topic + "/ErrorCode";
+
+        DynamicJsonDocument val1Doc(32);
+        val1Doc["value"] = 0;
+        JsonObject val1Obj = val1Doc.as<JsonObject>();
+        String data1;
+        serializeJson(val1Obj, data1);
+        MqttSettings.publishVictron(topic_err, data1);
+
+        topic_maxp += topic + "/Ac/MaxPower";
+        DynamicJsonDocument val2Doc(32);
+        val2Doc["value"] = maxpower;
+        JsonObject val2Obj = val2Doc.as<JsonObject>();
+        String data2;
+        serializeJson(val2Obj, data2);
+        MqttSettings.publishVictron(topic_maxp, data2);
 
         // Send Value 0 to other current phases and energy forward
         uint8_t nonval = 0;
+
         DynamicJsonDocument nonvalueDoc(32);
         nonvalueDoc["value"] = nonval;
         JsonObject nonvalueObj = nonvalueDoc.as<JsonObject>();
-
         String nondata;
         serializeJson(nonvalueObj, nondata);
 
@@ -216,11 +211,11 @@ void MqttVictronPublishingClass::publishField(std::shared_ptr<InverterAbstract> 
         }
 
         if ( fieldname == "YieldTotal" ) { 
-                topicA += topic + "/" + deviceInstance + "/Ac/" + valA + "/Energy/Forward";      
-                topicB += topic + "/" + deviceInstance + "/Ac/" + valB + "/Energy/Forward"; 
+                topicA += topic + "/Ac/" + valA + "/Energy/Forward";      
+                topicB += topic + "/Ac/" + valB + "/Energy/Forward"; 
         } else {
-                topicA += topic + "/" + deviceInstance + "/Ac/" + valA + "/" + fieldname;
-                topicB += topic + "/" + deviceInstance + "/Ac/" + valB + "/" + fieldname;
+                topicA += topic + "/Ac/" + valA + "/" + fieldname;
+                topicB += topic + "/Ac/" + valB + "/" + fieldname;
         }
         
         MqttSettings.publishVictron(topicA, nondata);
