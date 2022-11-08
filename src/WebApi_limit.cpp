@@ -6,6 +6,7 @@
 #include "ArduinoJson.h"
 #include "AsyncJson.h"
 #include "Hoymiles.h"
+#include "WebApi.h"
 
 void WebApiLimitClass::init(AsyncWebServer* server)
 {
@@ -54,6 +55,10 @@ void WebApiLimitClass::onLimitStatus(AsyncWebServerRequest* request)
 
 void WebApiLimitClass::onLimitPost(AsyncWebServerRequest* request)
 {
+    if (!WebApi.checkCredentials(request)) {
+        return;
+    }
+
     AsyncJsonResponse* response = new AsyncJsonResponse();
     JsonObject retMsg = response->getRoot();
     retMsg[F("type")] = F("warning");

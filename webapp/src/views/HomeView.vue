@@ -50,7 +50,7 @@
                             </div>
                             <div class="btn-toolbar p-2" role="toolbar">
                                 <div class="btn-group me-2" role="group">
-                                    <button type="button" class="btn btn-sm btn-danger"
+                                    <button :disabled="!isLogged" type="button" class="btn btn-sm btn-danger"
                                         @click="onShowLimitSettings(inverter.serial)" title="Show / Set Inverter Limit">
                                         <BIconSpeedometer style="font-size:24px;" />
 
@@ -58,7 +58,7 @@
                                 </div>
 
                                 <div class="btn-group me-2" role="group">
-                                    <button type="button" class="btn btn-sm btn-danger"
+                                    <button :disabled="!isLogged" type="button" class="btn btn-sm btn-danger"
                                         @click="onShowPowerSettings(inverter.serial)" title="Turn Inverter on/off">
                                         <BIconPower style="font-size:24px;" />
 
@@ -337,6 +337,7 @@ import type { EventlogItems } from '@/types/EventlogStatus';
 import type { LiveData, Inverter } from '@/types/LiveDataStatus';
 import type { LimitStatus } from '@/types/LimitStatus';
 import type { LimitConfig } from '@/types/LimitConfig';
+import { isLoggedIn, handleResponse, authHeader } from '@/utils/authentication';
 import { formatNumber } from '@/utils';
 
 export default defineComponent({
@@ -360,6 +361,8 @@ export default defineComponent({
     },
     data() {
         return {
+            isLogged: this.isLoggedIn(),
+
             socket: {} as WebSocket,
             heartInterval: 0,
             dataAgeInterval: 0,
@@ -402,6 +405,12 @@ export default defineComponent({
         this.getInitialData();
         this.initSocket();
         this.initDataAgeing();
+        this.$emitter.on("logged-in", () => {
+            this.isLogged = this.isLoggedIn();
+        });
+        this.$emitter.on("logged-out", () => {
+            this.isLogged = this.isLoggedIn();
+        });
     },
     mounted() {
         this.eventLogView = new bootstrap.Modal('#eventView');
@@ -445,6 +454,7 @@ export default defineComponent({
     },
     methods: {
         formatNumber,
+        isLoggedIn,
         getInitialData() {
             this.dataLoading = true;
             fetch("/api/livedata/status")
@@ -564,15 +574,10 @@ export default defineComponent({
 
             fetch("/api/limit/config", {
                 method: "POST",
+                headers: authHeader(),
                 body: formData,
             })
-                .then(function (response) {
-                    if (response.status != 200) {
-                        throw response.status;
-                    } else {
-                        return response.json();
-                    }
-                })
+                .then((response) => handleResponse(response, this.$emitter))
                 .then(
                     (response) => {
                         if (response.type == "success") {
@@ -639,15 +644,10 @@ export default defineComponent({
 
             fetch("/api/power/config", {
                 method: "POST",
+                headers: authHeader(),
                 body: formData,
             })
-                .then(function (response) {
-                    if (response.status != 200) {
-                        throw response.status;
-                    } else {
-                        return response.json();
-                    }
-                })
+                .then((response) => handleResponse(response, this.$emitter))
                 .then(
                     (response) => {
                         if (response.type == "success") {
