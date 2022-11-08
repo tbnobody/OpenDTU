@@ -6,6 +6,7 @@
 #include "ArduinoJson.h"
 #include "AsyncJson.h"
 #include "Hoymiles.h"
+#include "WebApi.h"
 
 void WebApiPowerClass::init(AsyncWebServer* server)
 {
@@ -47,6 +48,10 @@ void WebApiPowerClass::onPowerStatus(AsyncWebServerRequest* request)
 
 void WebApiPowerClass::onPowerPost(AsyncWebServerRequest* request)
 {
+    if (!WebApi.checkCredentials(request)) {
+        return;
+    }
+
     AsyncJsonResponse* response = new AsyncJsonResponse();
     JsonObject retMsg = response->getRoot();
     retMsg[F("type")] = F("warning");
