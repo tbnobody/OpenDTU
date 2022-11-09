@@ -28,7 +28,7 @@ export function login(username: String, password: String) {
         method: 'GET',
         headers: {
             'X-Requested-With': 'XMLHttpRequest',
-            'Authorization': 'Basic ' + window.btoa(username + ':' + password)
+            'Authorization': 'Basic ' + btoa(unescape(encodeURIComponent(username + ':' + password))),
         },
     };
 
@@ -39,7 +39,7 @@ export function login(username: String, password: String) {
             if (retVal) {
                 // store user details and basic auth credentials in local storage
                 // to keep user logged in between page refreshes
-                retVal.authdata = window.btoa(username + ':' + password);
+                retVal.authdata = btoa(unescape(encodeURIComponent(username + ':' + password)));
                 localStorage.setItem('user', JSON.stringify(retVal));
             }
 
