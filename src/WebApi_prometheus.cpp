@@ -84,7 +84,6 @@ void WebApiPrometheusClass::onPrometheusMetrics(AsyncWebServerRequest* request)
         }
     }
     stream->addHeader(F("Cache-Control"), F("no-cache"));
-    stream->addHeader(F("Cache-Control"), F("no-cache"));
     request->send(stream);
 }
 
