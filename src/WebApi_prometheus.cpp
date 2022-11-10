@@ -49,17 +49,14 @@ void WebApiPrometheusClass::onPrometheusMetrics(AsyncWebServerRequest* request)
     for (uint8_t i = 0; i < Hoymiles.getNumInverters(); i++) {
         auto inv = Hoymiles.getInverterByPos(i);
 
-        char serial[sizeof(uint64_t) * 8 + 1];
-        snprintf(serial, sizeof(serial), "%0x%08x",
-            ((uint32_t)((inv->serial() >> 32) & 0xFFFFFFFF)),
-            ((uint32_t)(inv->serial() & 0xFFFFFFFF)));
+        String serial = inv->serialString();
         const char* name = inv->name();
         if (i == 0) {
             stream->print(F("# HELP opendtu_last_update last update from inverter in s\n"));
             stream->print(F("# TYPE opendtu_last_update gauge\n"));
         }
         stream->printf("opendtu_last_update{serial=\"%s\",unit=\"%d\",name=\"%s\"} %d\n",
-            serial, i, name, inv->Statistics()->getLastUpdate() / 1000);
+            serial.c_str(), i, name, inv->Statistics()->getLastUpdate() / 1000);
 
         // Loop all channels
         for (uint8_t c = 0; c <= inv->Statistics()->getChannelCount(); c++) {
@@ -87,7 +84,7 @@ void WebApiPrometheusClass::onPrometheusMetrics(AsyncWebServerRequest* request)
     request->send(stream);
 }
 
-void WebApiPrometheusClass::addField(AsyncResponseStream* stream, const char* serial, uint8_t idx, std::shared_ptr<InverterAbstract> inv, uint8_t channel, uint8_t fieldId, const char* channelName)
+void WebApiPrometheusClass::addField(AsyncResponseStream* stream, String& serial, uint8_t idx, std::shared_ptr<InverterAbstract> inv, uint8_t channel, uint8_t fieldId, const char* channelName)
 {
     if (inv->Statistics()->hasChannelFieldValue(channel, fieldId)) {
         const char* chanName = (channelName == NULL) ? inv->Statistics()->getChannelFieldName(channel, fieldId) : channelName;
@@ -95,6 +92,6 @@ void WebApiPrometheusClass::addField(AsyncResponseStream* stream, const char* se
             stream->printf("# HELP opendtu_%s in %s\n", chanName, inv->Statistics()->getChannelFieldUnit(channel, fieldId));
             stream->printf("# TYPE opendtu_%s gauge\n", chanName);
         }
-        stream->printf("opendtu_%s{serial=\"%s\",unit=\"%d\",name=\"%s\",channel=\"%d\"} %f\n", chanName, serial, idx, inv->name(), channel, inv->Statistics()->getChannelFieldValue(channel, fieldId));
+        stream->printf("opendtu_%s{serial=\"%s\",unit=\"%d\",name=\"%s\",channel=\"%d\"} %f\n", chanName, serial.c_str(), idx, inv->name(), channel, inv->Statistics()->getChannelFieldValue(channel, fieldId));
     }
 }
