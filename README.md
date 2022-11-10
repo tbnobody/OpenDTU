@@ -39,6 +39,7 @@ Several screenshots of the frontend can be found here: [Screenshots](docs/screen
 * Default source supports up to 10 inverters
 * Time zone support
 * Ethernet support
+* Prometheus API endpoint (/api/prometheus/metrics)
 
 ## Features for developers
 * The microcontroller part
