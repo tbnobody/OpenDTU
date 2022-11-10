@@ -10,14 +10,14 @@ void WebApiPrometheusClass::init(AsyncWebServer* server)
 
     _server = server;
 
-    _server->on("/metrics", HTTP_GET, std::bind(&WebApiPrometheusClass::onPrometheusMetrics, this, _1));
+    _server->on("/api/prometheus/metrics", HTTP_GET, std::bind(&WebApiPrometheusClass::onPrometheusMetricsGet, this, _1));
 }
 
 void WebApiPrometheusClass::loop()
 {
 }
 
-void WebApiPrometheusClass::onPrometheusMetrics(AsyncWebServerRequest* request)
+void WebApiPrometheusClass::onPrometheusMetricsGet(AsyncWebServerRequest* request)
 {
     auto stream = request->beginResponseStream("text/plain; charset=utf-8", 8192);
 

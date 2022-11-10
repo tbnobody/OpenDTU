@@ -9,7 +9,7 @@ public:
     void loop();
 
 private:
-    void onPrometheusMetrics(AsyncWebServerRequest* request);
+    void onPrometheusMetricsGet(AsyncWebServerRequest* request);
 
     void addField(AsyncResponseStream* stream, String& serial, uint8_t idx, std::shared_ptr<InverterAbstract> inv, uint8_t channel, uint8_t fieldId, const char* channelName = NULL);
 
