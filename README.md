@@ -188,6 +188,9 @@ After the successful upload, the OpenDTU immediately restarts into the new firmw
 ## MQTT Topic Documentation
 A documentation of all available MQTT Topics can be found here: [MQTT Documentation](docs/MQTT_Topics.md)
 
+## Web API Documentation
+A documentation of the Web API can be found here: [Web-API Documentation](docs/Web-API.md)
+
 ## Available cases
 * <https://www.thingiverse.com/thing:5435911>
 * <https://www.printables.com/model/293003-sol-opendtu-esp32-nrf24l01-case>
