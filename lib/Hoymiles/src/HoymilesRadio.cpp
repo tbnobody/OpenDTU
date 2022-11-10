@@ -127,7 +127,7 @@ void HoymilesRadio::loop()
             }
         } else {
             // If inverter was not found, assume the command is invalid
-            Serial.println(F("Invalid inverter found"));
+            Serial.println(F("RX: Invalid inverter found"));
             _commandQueue.pop();
             _busyFlag = false;
         }
@@ -137,8 +137,13 @@ void HoymilesRadio::loop()
             CommandAbstract* cmd = _commandQueue.front().get();
 
             auto inv = Hoymiles.getInverterBySerial(cmd->getTargetAddress());
-            inv->clearRxFragmentBuffer();
-            sendEsbPacket(cmd);
+            if (nullptr != inv) {
+                inv->clearRxFragmentBuffer();
+                sendEsbPacket(cmd);
+            } else {
+                Serial.println(F("TX: Invalid inverter found"));
+                _commandQueue.pop();
+            }
         }
     }
 }
