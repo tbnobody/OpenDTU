@@ -45,6 +45,7 @@ may be incomplete
 - Some API calls have a single URL for GET and POST - e.g. `/api/ntp/config`
 - Other API calls use e.g. `/api/limit/status` to GET data and a different URL `/api/limit/config` to POST data.
 - If you want to investigate the web api communication, a good tool is [Postman](https://www.postman.com/)
+- Settings API require username and password provided with Basic Authentication credentials
 
 
 ### Get information
@@ -389,7 +390,7 @@ martin@bln9716cm ~/swbuild/OpenDTU $ curl --no-progress-meter http://192.168.10.
 
 For example, filter out the current total power:
 ```
-~$ curl --no-progress-meter http://192.168.10.10/api/livedata/status | jq '.total | .Power.v' 
+~$ curl --no-progress-meter http://192.168.10.10/api/livedata/status | jq '.total | .Power.v'
 140.7999878
 ```
 
@@ -405,33 +406,33 @@ The Web API is designed to allow the web frontend in the web browser to communic
 If you want to configure the ntp server setting, first fetch the information from the web API:
 
 ```
-~$ curl http://192.168.10.10/api/ntp/config
+~$ curl -u "admin:password" http://192.168.10.10/api/ntp/config
 {"ntp_server":"pool.ntp.org","ntp_timezone":"CET-1CEST,M3.5.0,M10.5.0/3","ntp_timezone_descr":"Europe/Berlin"}
 ```
 
 Then, second step, send your new settings. Use the text output from curl in the first step, add `data=` and enclose the whole data with single quotes.
 
 ```
-~$ curl http://192.168.10.10/api/ntp/config -d 'data={"ntp_server":"my.own.ntp.server.home","ntp_timezone":"CET-1CEST,M3.5.0,M10.5.0/3","ntp_timezone_descr":"Europe/Berlin"}'
+~$ curl -u "admin:password" http://192.168.10.10/api/ntp/config -d 'data={"ntp_server":"my.own.ntp.server.home","ntp_timezone":"CET-1CEST,M3.5.0,M10.5.0/3","ntp_timezone_descr":"Europe/Berlin"}'
 {"type":"success","message":"Settings saved!"}
 ```
 You will receive a json formatted response.
 
 #### Example 2: change power limit
 
-In the second example, I want to change the non persistent power limit of an inverter. Again, first fetch current data: 
+In the second example, I want to change the non persistent power limit of an inverter. Again, first fetch current data:
 
 ```
 ~$ curl http://192.168.10.10/api/limit/status
 {"11418186xxxx":{"limit_relative":100,"max_power":600,"limit_set_status":"Ok"},"11418180xxxx":{"limit_relative":100,"max_power":800,"limit_set_status":"Ok"}}
 ```
 
-I see data from two configured inverters. 
+I see data from two configured inverters.
 
 Now I set the relative power limit of inverter with serialnumber `11418180xxxx` to 50%.
 
 ```
-~$ curl http://192.168.10.10/api/limit/config -d 'data={"serial":"11418180xxxx", "limit_type":1, "limit_value":50}'
+~$ curl -u "admin:password" http://192.168.10.10/api/limit/config -d 'data={"serial":"11418180xxxx", "limit_type":1, "limit_value":50}'
 {"type":"success","message":"Settings saved!"}
 ```
 
