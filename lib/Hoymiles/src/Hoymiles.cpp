@@ -4,10 +4,16 @@
 #include "inverters/HM_4CH.h"
 #include <Arduino.h>
 
+#define HOY_SEMAPHORE_TAKE() xSemaphoreTake(_xSemaphore, portMAX_DELAY)
+#define HOY_SEMAPHORE_GIVE() xSemaphoreGive(_xSemaphore)
+
 HoymilesClass Hoymiles;
 
 void HoymilesClass::init()
 {
+    _xSemaphore = xSemaphoreCreateMutex();
+    HOY_SEMAPHORE_GIVE();  // release before first use
+
     _pollInterval = 0;
     _radio.reset(new HoymilesRadio());
     _radio->init();
@@ -15,6 +21,7 @@ void HoymilesClass::init()
 
 void HoymilesClass::loop()
 {
+    HOY_SEMAPHORE_TAKE();
     _radio->loop();
 
     if (getNumInverters() > 0) {
@@ -66,6 +73,8 @@ void HoymilesClass::loop()
             _lastPoll = millis();
         }
     }
+
+    HOY_SEMAPHORE_GIVE();
 }
 
 std::shared_ptr<InverterAbstract> HoymilesClass::addInverter(const char* name, uint64_t serial)
@@ -135,7 +144,9 @@ void HoymilesClass::removeInverterBySerial(uint64_t serial)
 {
     for (uint8_t i = 0; i < _inverters.size(); i++) {
         if (_inverters[i]->serial() == serial) {
+            HOY_SEMAPHORE_TAKE();
             _inverters.erase(_inverters.begin() + i);
+            HOY_SEMAPHORE_GIVE();
             return;
         }
     }
