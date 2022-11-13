@@ -13,7 +13,7 @@
 class HoymilesClass {
 public:
     void init();
-    void loop();
+    void loop(bool operate);
 
     std::shared_ptr<InverterAbstract> addInverter(const char* name, uint64_t serial);
     std::shared_ptr<InverterAbstract> getInverterByPos(uint8_t pos);

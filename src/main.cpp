@@ -9,6 +9,7 @@
 #include "MqttSettings.h"
 #include "NetworkSettings.h"
 #include "NtpSettings.h"
+#include "SunsetClass.h"
 #include "Utils.h"
 #include "WebApi.h"
 #include "defaults.h"
@@ -63,6 +64,11 @@ void setup()
     // Initialize NTP
     Serial.print(F("Initialize NTP... "));
     NtpSettings.init();
+    Serial.println(F("done"));
+
+    // Initialize Sunrise Sunset calculation
+    Serial.print(F("Initialize Sunset... "));
+    SunsetClassInst.init();
     Serial.println(F("done"));
 
     // Initialize MqTT
@@ -129,7 +135,9 @@ void loop()
 {
     NetworkSettings.loop();
     yield();
-    Hoymiles.loop();
+    Hoymiles.loop(!Configuration.get().Sunset_Enabled || SunsetClassInst.isDayTime());
+    yield();
+    SunsetClassInst.loop();
     yield();
     MqttPublishing.loop();
     yield();
