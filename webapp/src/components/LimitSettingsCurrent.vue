@@ -14,7 +14,7 @@ import { defineComponent } from 'vue';
 import { formatNumber } from '@/utils';
 
 declare interface LimitData {
-    limit: number,
+    limit: number;
 }
 
 export default defineComponent({
