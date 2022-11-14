@@ -1,3 +1,3 @@
 export interface SecurityConfig {
-    password: string
+    password: string;
 }
