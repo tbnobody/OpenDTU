@@ -38,7 +38,7 @@ void WebApiNtpClass::onNtpStatus(AsyncWebServerRequest* request)
     root[F("ntp_timezone_descr")] = config.Ntp_TimezoneDescr;
 
     struct tm timeinfo;
-    if (!getLocalTime(&timeinfo, 0)) {
+    if (!getLocalTime(&timeinfo, 5)) {
         root[F("ntp_status")] = false;
     } else {
         root[F("ntp_status")] = true;
@@ -159,7 +159,7 @@ void WebApiNtpClass::onNtpTimeGet(AsyncWebServerRequest* request)
     JsonObject root = response->getRoot();
 
     struct tm timeinfo;
-    if (!getLocalTime(&timeinfo, 0)) {
+    if (!getLocalTime(&timeinfo, 5)) {
         root[F("ntp_status")] = false;
     } else {
         root[F("ntp_status")] = true;
