@@ -119,7 +119,9 @@ void WebApiWsLiveClass::generateJsonResponse(JsonVariant& root)
             addField(invObject, i, inv, c, FLD_PF);
             addField(invObject, i, inv, c, FLD_PRA);
             addField(invObject, i, inv, c, FLD_EFF);
-            addField(invObject, i, inv, c, FLD_IRR);
+            if (c > 0 && inv->Statistics()->getChannelMaxPower(c - 1) > 0) {
+                addField(invObject, i, inv, c, FLD_IRR);
+            }
         }
 
         if (inv->Statistics()->hasChannelFieldValue(CH0, FLD_EVT_LOG)) {
