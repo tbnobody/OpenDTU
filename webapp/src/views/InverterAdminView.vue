@@ -11,12 +11,12 @@
                     <div class="form-group">
                         <label>Serial</label>
                         <input v-model="newInverterData.serial" type="number" class="form-control ml-sm-2 mr-sm-4 my-2"
-                               required />
+                            required />
                     </div>
                     <div class="form-group">
                         <label>Name</label>
                         <input v-model="newInverterData.name" type="text" class="form-control ml-sm-2 mr-sm-4 my-2"
-                               maxlength="31" required />
+                            maxlength="31" required />
                     </div>
                     <div class="ml-auto text-right">
                         <button type="submit" class="btn btn-primary my-2">Add</button>
@@ -154,11 +154,6 @@ import * as bootstrap from 'bootstrap';
 import BootstrapAlert from "@/components/BootstrapAlert.vue";
 import { handleResponse, authHeader } from '@/utils/authentication';
 
-declare interface Channel {
-    name: string
-    max_power: number
-}
-
 declare interface Inverter {
     id: string,
     serial: number,
@@ -226,8 +221,8 @@ export default defineComponent({
             const formData = new FormData();
             formData.append("data", jsonData);
 
-            fetch('/api/inverter/' + endpoint, {
-                method: 'POST',
+            fetch("/api/inverter/" + endpoint, {
+                method: "POST",
                 headers: authHeader(),
                 body: formData,
             })
