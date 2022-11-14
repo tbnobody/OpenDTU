@@ -55,7 +55,7 @@
                     <div class="row mb-3">
                         <label for="inputUsername" class="col-sm-2 col-form-label">Username:</label>
                         <div class="col-sm-10">
-                            <input type="text" class="form-control" id="inputUsername" maxlength="32"
+                            <input type="text" class="form-control" id="inputUsername" maxlength="64"
                                 placeholder="Username, leave empty for anonymous connection"
                                 v-model="mqttConfigList.mqtt_username" />
                         </div>
@@ -64,7 +64,7 @@
                     <div class="row mb-3">
                         <label for="inputPassword" class="col-sm-2 col-form-label">Password:</label>
                         <div class="col-sm-10">
-                            <input type="password" class="form-control" id="inputPassword" maxlength="32"
+                            <input type="password" class="form-control" id="inputPassword" maxlength="64"
                                 placeholder="Password, leave empty for anonymous connection"
                                 v-model="mqttConfigList.mqtt_password" />
                         </div>
