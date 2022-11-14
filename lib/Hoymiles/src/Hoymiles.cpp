@@ -64,10 +64,9 @@ void HoymilesClass::loop()
                     Serial.println(F("Request device info"));
                     iv->sendDevInfoRequest(_radio.get());
                 }
-
-                if (++inverterPos >= getNumInverters()) {
-                    inverterPos = 0;
-                }
+            }
+            if (++inverterPos >= getNumInverters()) {
+                inverterPos = 0;
             }
 
             _lastPoll = millis();
