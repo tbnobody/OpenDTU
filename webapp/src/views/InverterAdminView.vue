@@ -100,7 +100,7 @@
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" @click="onCloseModal(modal)"
                         data-bs-dismiss="modal">Cancel</button>
-                    <button type="button" class="btn btn-primary" @click="onEditSubmit()">Save
+                    <button type="button" class="btn btn-primary" @click="onEditSubmit">Save
                         changes</button>
                 </div>
             </div>
@@ -140,17 +140,17 @@ import BootstrapAlert from "@/components/BootstrapAlert.vue";
 import { handleResponse, authHeader } from '@/utils/authentication';
 
 declare interface Inverter {
-    id: string,
-    serial: number,
-    name: string,
-    type: string,
-    max_power: number[]
+    id: string;
+    serial: number;
+    name: string;
+    type: string;
+    max_power: number[];
 }
 
 declare interface AlertResponse {
-    message: string,
-    type: string,
-    show: boolean
+    message: string;
+    type: string;
+    show: boolean;
 }
 
 export default defineComponent({
@@ -195,7 +195,7 @@ export default defineComponent({
                     this.dataLoading = false;
                 });
         },
-        callInverterApiEndpoint: function (endpoint: string, jsonData: string) {
+        callInverterApiEndpoint(endpoint: string, jsonData: string) {
             const formData = new FormData();
             formData.append("data", jsonData);
 
