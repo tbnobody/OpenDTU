@@ -16,7 +16,7 @@
     "bootstrap-icons-vue": "^1.8.1",
     "mitt": "^3.0.0",
     "spark-md5": "^3.0.2",
-    "vue": "^3.2.41",
+    "vue": "^3.2.45",
     "vue-router": "^4.1.6"
   },
   "devDependencies": {
