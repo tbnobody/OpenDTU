@@ -96,12 +96,12 @@
                             </div>
                         </div>
 
-                        <div v-for="(max, index) in selectedInverterData.max_power" :key="`${index}`">
+                        <div v-for="(max, index) in selectedInverterData.channel" :key="`${index}`">
                             <label :for="`inverter-max_${index}`" class="col-form-label">Max power string {{ index +1 }}:</label>
                             <div class="d-flex mb-2">
                                 <div class="input-group">
                                     <input type="number" class="form-control" :id="`inverter-max_${index}`" min="0"
-                                           v-model="selectedInverterData.max_power[index]"
+                                           v-model="selectedInverterData.channel[index].max_power"
                                            :aria-describedby="`inverter-maxDescription_${index} inverter-customizer`" />
                                     <span class="input-group-text" :id="`inverter-maxDescription_${index}`">W<sup>*</sup></span>
                                 </div>
@@ -154,13 +154,18 @@ import * as bootstrap from 'bootstrap';
 import BootstrapAlert from "@/components/BootstrapAlert.vue";
 import { handleResponse, authHeader } from '@/utils/authentication';
 
+declare interface Channel {
+    name: string;
+    max_power: number;
+}
+
 declare interface Inverter {
     id: string;
     serial: number;
     name: string;
     type: string;
     phase: number;
-    max_power: number[];
+    channel: Array<Channel>;
 }
 
 declare interface AlertResponse {
