@@ -264,4 +264,15 @@ INVERTER_CONFIG_T* ConfigurationClass::getFreeInverterSlot()
     return NULL;
 }
 
+INVERTER_CONFIG_T* ConfigurationClass::getInverterConfig(uint64_t serial)
+{
+    for (uint8_t i = 0; i < INV_MAX_COUNT; i++) {
+        if (config.Inverter[i].Serial == serial) {
+            return &config.Inverter[i];
+        }
+    }
+
+    return NULL;
+}
+
 ConfigurationClass Configuration;
