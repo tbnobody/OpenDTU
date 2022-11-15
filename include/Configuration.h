@@ -101,6 +101,7 @@ public:
     CONFIG_T& get();
 
     INVERTER_CONFIG_T* getFreeInverterSlot();
+    INVERTER_CONFIG_T* getInverterConfig(uint64_t serial);
 };
 
 extern ConfigurationClass Configuration;
