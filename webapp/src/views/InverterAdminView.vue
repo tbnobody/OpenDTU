@@ -97,20 +97,26 @@
                         </div>
 
                         <div v-for="(max, index) in selectedInverterData.channel" :key="`${index}`">
-                            <label :for="`inverter-name_${index}`" class="col-form-label">Name string {{ index +1 }}:</label>
-                            <div class="d-flex mb-2">
-                                <div class="input-group">
-                                    <input type="text" class="form-control" :id="`inverter-name_${index}`" maxlength="31"
-                                           v-model="selectedInverterData.channel[index].name" />
+                            <div class="row g-2">
+                                <div class="col-md">
+                                    <label :for="`inverter-name_${index}`" class="col-form-label">Name string {{ index +1 }}:</label>
+                                    <div class="d-flex mb-2">
+                                        <div class="input-group">
+                                            <input type="text" class="form-control" :id="`inverter-name_${index}`" maxlength="31"
+                                                v-model="selectedInverterData.channel[index].name" />
+                                        </div>
+                                    </div>
                                 </div>
-                            </div>
-                            <label :for="`inverter-max_${index}`" class="col-form-label">Max power string {{ index +1 }}:</label>
-                            <div class="d-flex mb-2">
-                                <div class="input-group">
-                                    <input type="number" class="form-control" :id="`inverter-max_${index}`" min="0"
-                                           v-model="selectedInverterData.channel[index].max_power"
-                                           :aria-describedby="`inverter-maxDescription_${index} inverter-customizer`" />
-                                    <span class="input-group-text" :id="`inverter-maxDescription_${index}`">W<sup>*</sup></span>
+                                <div class="col-md-5">
+                                    <label :for="`inverter-max_${index}`" class="col-form-label">Max power string {{ index +1 }}:</label>
+                                    <div class="d-flex mb-2">
+                                        <div class="input-group">
+                                            <input type="number" class="form-control" :id="`inverter-max_${index}`" min="0"
+                                                v-model="selectedInverterData.channel[index].max_power"
+                                                :aria-describedby="`inverter-maxDescription_${index} inverter-customizer`" />
+                                            <span class="input-group-text" :id="`inverter-maxDescription_${index}`">W<sup>*</sup></span>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
