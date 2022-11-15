@@ -4,7 +4,7 @@
 #include <Arduino.h>
 
 #define CONFIG_FILENAME "/config.json"
-#define CONFIG_VERSION 0x00011600 // 0.1.22 // make sure to clean all after change
+#define CONFIG_VERSION 0x00011700 // 0.1.23 // make sure to clean all after change
 
 #define WIFI_MAX_SSID_STRLEN 31
 #define WIFI_MAX_PASSWORD_STRLEN 64
@@ -25,12 +25,19 @@
 #define INV_MAX_COUNT 10
 #define INV_MAX_CHAN_COUNT 4
 
+#define CHAN_MAX_NAME_STRLEN 31
+
 #define JSON_BUFFER_SIZE 6144
+
+struct CHANNEL_CONFIG_T {
+    uint16_t MaxChannelPower;
+    char Name[CHAN_MAX_NAME_STRLEN];
+};
 
 struct INVERTER_CONFIG_T {
     uint64_t Serial;
     char Name[INV_MAX_NAME_STRLEN + 1];
-    uint16_t MaxChannelPower[INV_MAX_CHAN_COUNT];
+    CHANNEL_CONFIG_T channel[INV_MAX_CHAN_COUNT];
 };
 
 struct CONFIG_T {

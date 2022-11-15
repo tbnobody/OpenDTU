@@ -84,9 +84,11 @@ bool ConfigurationClass::write()
         inv["serial"] = config.Inverter[i].Serial;
         inv["name"] = config.Inverter[i].Name;
 
-        JsonArray channels = inv.createNestedArray("channels");
+        JsonArray channel = inv.createNestedArray("channel");
         for (uint8_t c = 0; c < INV_MAX_CHAN_COUNT; c++) {
-            channels.add(config.Inverter[i].MaxChannelPower[c]);
+            JsonObject chanData = channel.createNestedObject();
+            chanData["name"] = config.Inverter[i].channel[c].Name;
+            chanData["max_power"] = config.Inverter[i].channel[c].MaxChannelPower;
         }
     }
 
@@ -202,9 +204,10 @@ bool ConfigurationClass::read()
         config.Inverter[i].Serial = inv["serial"] | 0ULL;
         strlcpy(config.Inverter[i].Name, inv["name"] | "", sizeof(config.Inverter[i].Name));
 
-        JsonArray channels = inv["channels"];
+        JsonArray channel = inv["channel"];
         for (uint8_t c = 0; c < INV_MAX_CHAN_COUNT; c++) {
-            config.Inverter[i].MaxChannelPower[c] = channels[c];
+            config.Inverter[i].channel[c].MaxChannelPower = channel[c]["max_power"] | 0;
+            strlcpy(config.Inverter[i].channel[c].Name, channel[c]["name"] | "", sizeof(config.Inverter[i].channel[c].Name));
         }
     }
 
@@ -214,8 +217,35 @@ bool ConfigurationClass::read()
 
 void ConfigurationClass::migrate()
 {
+    if (config.Cfg_Version < 0x00011700) {
+        File f = LittleFS.open(CONFIG_FILENAME, "r", false);
+        if (!f) {
+            Serial.println(F("Failed to open file, cancel migration"));
+            return;
+        }
+
+        DynamicJsonDocument doc(JSON_BUFFER_SIZE);
+        // Deserialize the JSON document
+        DeserializationError error = deserializeJson(doc, f);
+        if (error) {
+            Serial.println(F("Failed to read file, cancel migration"));
+            return;
+        }
+
+        JsonArray inverters = doc["inverters"];
+        for (uint8_t i = 0; i < INV_MAX_COUNT; i++) {
+            JsonObject inv = inverters[i].as<JsonObject>();
+            JsonArray channels = inv["channels"];
+            for (uint8_t c = 0; c < INV_MAX_CHAN_COUNT; c++) {
+                config.Inverter[i].channel[c].MaxChannelPower = channels[c];
+                strlcpy(config.Inverter[i].channel[c].Name, "", sizeof(config.Inverter[i].channel[c].Name));
+            }
+        }
+    }
+
     config.Cfg_Version = CONFIG_VERSION;
     write();
+    read();
 }
 
 CONFIG_T& ConfigurationClass::get()
