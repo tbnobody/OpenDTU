@@ -16,12 +16,12 @@
     "bootstrap-icons-vue": "^1.8.1",
     "mitt": "^3.0.0",
     "spark-md5": "^3.0.2",
-    "vue": "^3.2.41",
+    "vue": "^3.2.45",
     "vue-router": "^4.1.6"
   },
   "devDependencies": {
     "@rushstack/eslint-patch": "^1.2.0",
-    "@types/bootstrap": "^5.2.5",
+    "@types/bootstrap": "^5.2.6",
     "@types/node": "^18.11.9",
     "@types/spark-md5": "^3.0.2",
     "@vitejs/plugin-vue": "^3.2.0",
@@ -30,7 +30,7 @@
     "eslint": "^8.27.0",
     "eslint-plugin-vue": "^9.7.0",
     "npm-run-all": "^4.1.5",
-    "sass": "^1.55.0",
+    "sass": "^1.56.1",
     "typescript": "^4.8.4",
     "vite": "^3.2.3",
     "vite-plugin-compression": "^0.5.1",

@@ -1,29 +1,29 @@
 export interface SystemStatus {
     // HardwareInfo
-    chipmodel: string,
-    chiprevision: number,
-    chipcores: number,
-    cpufreq: number,
+    chipmodel: string;
+    chiprevision: number;
+    chipcores: number;
+    cpufreq: number;
     // FirmwareInfo
-    hostname: string,
-    sdkversion: string,
-    config_version: string,
-    git_hash: string,
-    resetreason_0: string,
-    resetreason_1: string,
-    cfgsavecount: number,
-    uptime: number,
-    update_text: string,
-    update_url: string,
-    update_status: string,
+    hostname: string;
+    sdkversion: string;
+    config_version: string;
+    git_hash: string;
+    resetreason_0: string;
+    resetreason_1: string;
+    cfgsavecount: number;
+    uptime: number;
+    update_text: string;
+    update_url: string;
+    update_status: string;
     // MemoryInfo
-    heap_total: number,
-    heap_used: number,
-    littlefs_total: number,
-    littlefs_used: number,
-    sketch_total: number,
-    sketch_used: number,
+    heap_total: number;
+    heap_used: number;
+    littlefs_total: number;
+    littlefs_used: number;
+    sketch_total: number;
+    sketch_used: number;
     // RadioInfo
-    radio_connected: boolean,
-    radio_pvariant: boolean,
+    radio_connected: boolean;
+    radio_pvariant: boolean;
 }
