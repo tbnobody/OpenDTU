@@ -73,15 +73,22 @@
                 <div class="modal-body">
                     <form>
                         <div class="mb-3">
-                            <label for="inverter-serial" class="col-form-label">Serial:</label>
+                            <label for="inverter-serial" class="col-form-label">Inverter Serial:</label>
                             <input v-model="selectedInverterData.serial" type="number" id="inverter-serial"
                                    class="form-control" />
-                            <label for="inverter-name" class="col-form-label">Name:</label>
+                            <label for="inverter-name" class="col-form-label">Inverter Name:</label>
                             <input v-model="selectedInverterData.name" type="text" id="inverter-name"
                                    class="form-control" maxlength="31" />
                         </div>
 
                         <div v-for="(max, index) in selectedInverterData.channel" :key="`${index}`">
+                            <label :for="`inverter-name_${index}`" class="col-form-label">Name string {{ index +1 }}:</label>
+                            <div class="d-flex mb-2">
+                                <div class="input-group">
+                                    <input type="text" class="form-control" :id="`inverter-name_${index}`" maxlength="31"
+                                           v-model="selectedInverterData.channel[index].name" />
+                                </div>
+                            </div>
                             <label :for="`inverter-max_${index}`" class="col-form-label">Max power string {{ index +1 }}:</label>
                             <div class="d-flex mb-2">
                                 <div class="input-group">
