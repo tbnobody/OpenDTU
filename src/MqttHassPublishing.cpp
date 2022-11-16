@@ -152,7 +152,7 @@ void MqttHassPublishingClass::publishInverterButton(std::shared_ptr<InverterAbst
     String cmdTopic = MqttSettings.getPrefix() + serial + "/" + subTopic;
 
     DynamicJsonDocument root(1024);
-    root[F("name")] = caption;
+    root[F("name")] = String(inv->name()) + " " + caption;
     root[F("uniq_id")] = serial + "_" + buttonId;
     if (strcmp(icon, "")) {
         root[F("ic")] = icon;
@@ -191,7 +191,7 @@ void MqttHassPublishingClass::publishInverterNumber(
     String statTopic = MqttSettings.getPrefix() + serial + "/" + stateTopic;
 
     DynamicJsonDocument root(1024);
-    root[F("name")] = caption;
+    root[F("name")] = String(inv->name()) + " " + caption;
     root[F("uniq_id")] = serial + "_" + buttonId;
     if (strcmp(icon, "")) {
         root[F("ic")] = icon;
@@ -226,7 +226,7 @@ void MqttHassPublishingClass::publishInverterBinarySensor(std::shared_ptr<Invert
     String statTopic = MqttSettings.getPrefix() + serial + "/" + subTopic;
 
     DynamicJsonDocument root(1024);
-    root[F("name")] = caption;
+    root[F("name")] = String(inv->name()) + " " + caption;
     root[F("uniq_id")] = serial + "_" + sensorId;
     root[F("stat_t")] = statTopic;
     root[F("pl_on")] = payload_on;

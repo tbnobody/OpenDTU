@@ -51,6 +51,7 @@
 import { defineComponent } from 'vue';
 import BasePage from '@/components/BasePage.vue';
 import BootstrapAlert from "@/components/BootstrapAlert.vue";
+import { handleResponse, authHeader } from '@/utils/authentication';
 import type { VedirectConfig } from "@/types/VedirectConfig";
 
 export default defineComponent({
@@ -73,8 +74,8 @@ export default defineComponent({
     methods: {
         getVedirectConfig() {
             this.dataLoading = true;
-            fetch("/api/vedirect/config")
-                .then((response) => response.json())
+            fetch("api/vedirect/config", { headers: authHeader() })
+                .then((response) => handleResponse(response, this.$emitter))
                 .then((data) => {
                     this.vedirectConfigList = data;
                     this.dataLoading = false;
@@ -88,15 +89,10 @@ export default defineComponent({
 
             fetch("/api/vedirect/config", {
                 method: "POST",
+                headers: authHeader(),
                 body: formData,
             })
-                .then(function (response) {
-                    if (response.status != 200) {
-                        throw response.status;
-                    } else {
-                        return response.json();
-                    }
-                })
+                .then((response) => handleResponse(response, this.$emitter))
                 .then(
                     (response) => {
                         this.alertMessage = response.message;

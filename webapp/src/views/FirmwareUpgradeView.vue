@@ -77,6 +77,7 @@ import {
     BIconArrowRepeat,
     BIconCheckCircle
 } from 'bootstrap-icons-vue';
+import { authHeader } from '@/utils/authentication';
 
 export default defineComponent({
     components: {
@@ -160,6 +161,9 @@ export default defineComponent({
                     formData.append("MD5", (md5 as string));
                     formData.append("firmware", this.file, "firmware");
                     request.open("post", "/api/firmware/update");
+                    authHeader().forEach((value, key) => {
+                        request.setRequestHeader(key, value);
+                    });
                     request.send(formData);
                 })
                 .catch(() => {

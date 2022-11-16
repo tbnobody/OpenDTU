@@ -8,6 +8,7 @@
 #include "Configuration.h"
 #include "MqttHassPublishing.h"
 #include "MqttSettings.h"
+#include "WebApi.h"
 #include "helper.h"
 
 void WebApiMqttClass::init(AsyncWebServer* server)
@@ -54,6 +55,10 @@ void WebApiMqttClass::onMqttStatus(AsyncWebServerRequest* request)
 
 void WebApiMqttClass::onMqttAdminGet(AsyncWebServerRequest* request)
 {
+    if (!WebApi.checkCredentials(request)) {
+        return;
+    }
+
     AsyncJsonResponse* response = new AsyncJsonResponse(false, MQTT_JSON_DOC_SIZE);
     JsonObject root = response->getRoot();
     const CONFIG_T& config = Configuration.get();
@@ -83,6 +88,10 @@ void WebApiMqttClass::onMqttAdminGet(AsyncWebServerRequest* request)
 
 void WebApiMqttClass::onMqttAdminPost(AsyncWebServerRequest* request)
 {
+    if (!WebApi.checkCredentials(request)) {
+        return;
+    }
+
     AsyncJsonResponse* response = new AsyncJsonResponse(false, MQTT_JSON_DOC_SIZE);
     JsonObject retMsg = response->getRoot();
     retMsg[F("type")] = F("warning");

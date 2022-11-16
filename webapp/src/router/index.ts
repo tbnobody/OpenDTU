@@ -15,6 +15,7 @@ import ConfigAdminView from '@/views/ConfigAdminView.vue'
 import VedirectAdminView from '@/views/VedirectAdminView.vue'
 import VedirectInfoView from '@/views/VedirectInfoView.vue'
 import SecurityAdminView from '@/views/SecurityAdminView.vue'
+import LoginView from '@/views/LoginView.vue'
 
 const router = createRouter({
     history: createWebHistory(import.meta.env.BASE_URL),
@@ -24,6 +25,11 @@ const router = createRouter({
         path: '/',
         name: 'Home',
         component: HomeView
+    },
+    {
+        path: '/login',
+        name: 'Login',
+        component: LoginView
     },
     {
         path: '/about',
@@ -101,6 +107,22 @@ const router = createRouter({
         component: SecurityAdminView
     }
 ]
-})
+});
+
+router.beforeEach((to, from, next) => {
+    // redirect to login page if not logged in and trying to access a restricted page
+    const publicPages = ['/', '/login', '/about', '/info/network', '/info/system', '/info/ntp', '/info/mqtt', ];
+    const authRequired = !publicPages.includes(to.path);
+    const loggedIn = localStorage.getItem('user');
+
+    if (authRequired && !loggedIn) {
+        return next({
+            path: '/login',
+            query: { returnUrl: to.path }
+        });
+    }
+
+    next();
+});
 
 export default router;

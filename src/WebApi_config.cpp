@@ -6,6 +6,7 @@
 #include "ArduinoJson.h"
 #include "AsyncJson.h"
 #include "Configuration.h"
+#include "WebApi.h"
 #include <LittleFS.h>
 
 void WebApiConfigClass::init(AsyncWebServer* server)
@@ -32,11 +33,19 @@ void WebApiConfigClass::loop()
 
 void WebApiConfigClass::onConfigGet(AsyncWebServerRequest* request)
 {
+    if (!WebApi.checkCredentials(request)) {
+        return;
+    }
+
     request->send(LittleFS, CONFIG_FILENAME_JSON, String(), true);
 }
 
 void WebApiConfigClass::onConfigDelete(AsyncWebServerRequest* request)
 {
+    if (!WebApi.checkCredentials(request)) {
+        return;
+    }
+
     AsyncJsonResponse* response = new AsyncJsonResponse();
     JsonObject retMsg = response->getRoot();
     retMsg[F("type")] = F("warning");
@@ -93,6 +102,10 @@ void WebApiConfigClass::onConfigDelete(AsyncWebServerRequest* request)
 
 void WebApiConfigClass::onConfigUploadFinish(AsyncWebServerRequest* request)
 {
+    if (!WebApi.checkCredentials(request)) {
+        return;
+    }
+
     // the request handler is triggered after the upload has finished...
     // create the response, add header, and send response
 
@@ -108,6 +121,10 @@ void WebApiConfigClass::onConfigUploadFinish(AsyncWebServerRequest* request)
 
 void WebApiConfigClass::onConfigUpload(AsyncWebServerRequest* request, String filename, size_t index, uint8_t* data, size_t len, bool final)
 {
+    if (!WebApi.checkCredentials(request)) {
+        return;
+    }
+
     if (!index) {
         // open the file on first call and store the file handle in the request object
         request->_tempFile = LittleFS.open(CONFIG_FILENAME_JSON, "w");

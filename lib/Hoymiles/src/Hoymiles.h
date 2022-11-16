@@ -31,6 +31,8 @@ private:
     std::vector<std::shared_ptr<InverterAbstract>> _inverters;
     std::unique_ptr<HoymilesRadio> _radio;
 
+    SemaphoreHandle_t _xSemaphore;
+
     uint32_t _pollInterval = 0;
     uint32_t _lastPoll = 0;
 };

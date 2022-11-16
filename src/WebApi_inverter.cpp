@@ -8,6 +8,7 @@
 #include "Configuration.h"
 #include "Hoymiles.h"
 #include "MqttHassPublishing.h"
+#include "WebApi.h"
 #include "helper.h"
 
 void WebApiInverterClass::init(AsyncWebServer* server)
@@ -28,6 +29,10 @@ void WebApiInverterClass::loop()
 
 void WebApiInverterClass::onInverterList(AsyncWebServerRequest* request)
 {
+    if (!WebApi.checkCredentials(request)) {
+        return;
+    }
+
     AsyncJsonResponse* response = new AsyncJsonResponse(false, 4096U);
     JsonObject root = response->getRoot();
     JsonArray data = root.createNestedArray(F("inverter"));
@@ -48,13 +53,16 @@ void WebApiInverterClass::onInverterList(AsyncWebServerRequest* request)
             obj[F("serial")] = buffer;
 
             auto inv = Hoymiles.getInverterBySerial(config.Inverter[i].Serial);
+            uint8_t max_channels;
             if (inv == nullptr) {
                 obj[F("type")] = F("Unknown");
+                max_channels = INV_MAX_CHAN_COUNT;
             } else {
                 obj[F("type")] = inv->typeName();
+                max_channels = inv->Statistics()->getChannelCount();
             }
 
-            for (uint8_t c = 0; c < INV_MAX_CHAN_COUNT; c++) {
+            for (uint8_t c = 0; c < max_channels; c++) {
                 obj[F("max_power")][c] = config.Inverter[i].MaxChannelPower[c];
             }
         }
@@ -66,6 +74,10 @@ void WebApiInverterClass::onInverterList(AsyncWebServerRequest* request)
 
 void WebApiInverterClass::onInverterAdd(AsyncWebServerRequest* request)
 {
+    if (!WebApi.checkCredentials(request)) {
+        return;
+    }
+
     AsyncJsonResponse* response = new AsyncJsonResponse();
     JsonObject retMsg = response->getRoot();
     retMsg[F("type")] = F("warning");
@@ -151,6 +163,10 @@ void WebApiInverterClass::onInverterAdd(AsyncWebServerRequest* request)
 
 void WebApiInverterClass::onInverterEdit(AsyncWebServerRequest* request)
 {
+    if (!WebApi.checkCredentials(request)) {
+        return;
+    }
+
     AsyncJsonResponse* response = new AsyncJsonResponse();
     JsonObject retMsg = response->getRoot();
     retMsg[F("type")] = F("warning");
@@ -210,7 +226,7 @@ void WebApiInverterClass::onInverterEdit(AsyncWebServerRequest* request)
     }
 
     JsonArray maxPowerArray = root[F("max_power")].as<JsonArray>();
-    if (maxPowerArray.size() != INV_MAX_CHAN_COUNT) {
+    if (maxPowerArray.size() == 0 || maxPowerArray.size() > INV_MAX_CHAN_COUNT) {
         retMsg[F("message")] = F("Invalid amount of max channel setting given!");
         response->setLength();
         request->send(response);
@@ -265,6 +281,10 @@ void WebApiInverterClass::onInverterEdit(AsyncWebServerRequest* request)
 
 void WebApiInverterClass::onInverterDelete(AsyncWebServerRequest* request)
 {
+    if (!WebApi.checkCredentials(request)) {
+        return;
+    }
+
     AsyncJsonResponse* response = new AsyncJsonResponse();
     JsonObject retMsg = response->getRoot();
     retMsg[F("type")] = F("warning");
