@@ -5,6 +5,7 @@ export interface ValueObject {
 };
 
 export interface InverterStatistics {
+    name: ValueObject,
     Power?: ValueObject;
     Voltage?: ValueObject;
     Current?: ValueObject;

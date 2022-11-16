@@ -62,8 +62,11 @@ void WebApiInverterClass::onInverterList(AsyncWebServerRequest* request)
                 max_channels = inv->Statistics()->getChannelCount();
             }
 
+            JsonArray channel = obj.createNestedArray("channel");
             for (uint8_t c = 0; c < max_channels; c++) {
-                obj[F("max_power")][c] = config.Inverter[i].MaxChannelPower[c];
+                JsonObject chanData = channel.createNestedObject();
+                chanData["name"] = config.Inverter[i].channel[c].Name;
+                chanData["max_power"] = config.Inverter[i].channel[c].MaxChannelPower;
             }
         }
     }
@@ -154,7 +157,7 @@ void WebApiInverterClass::onInverterAdd(AsyncWebServerRequest* request)
 
     if (inv != nullptr) {
         for (uint8_t c = 0; c < INV_MAX_CHAN_COUNT; c++) {
-            inv->Statistics()->setChannelMaxPower(c, inverter->MaxChannelPower[c]);
+            inv->Statistics()->setChannelMaxPower(c, inverter->channel[c].MaxChannelPower);
         }
     }
 
@@ -197,7 +200,7 @@ void WebApiInverterClass::onInverterEdit(AsyncWebServerRequest* request)
         return;
     }
 
-    if (!(root.containsKey("id") && root.containsKey("serial") && root.containsKey("name") && root.containsKey("max_power"))) {
+    if (!(root.containsKey("id") && root.containsKey("serial") && root.containsKey("name") && root.containsKey("channel"))) {
         retMsg[F("message")] = F("Values are missing!");
         response->setLength();
         request->send(response);
@@ -225,8 +228,8 @@ void WebApiInverterClass::onInverterEdit(AsyncWebServerRequest* request)
         return;
     }
 
-    JsonArray maxPowerArray = root[F("max_power")].as<JsonArray>();
-    if (maxPowerArray.size() == 0 || maxPowerArray.size() > INV_MAX_CHAN_COUNT) {
+    JsonArray channelArray = root[F("channel")].as<JsonArray>();
+    if (channelArray.size() == 0 || channelArray.size() > INV_MAX_CHAN_COUNT) {
         retMsg[F("message")] = F("Invalid amount of max channel setting given!");
         response->setLength();
         request->send(response);
@@ -243,8 +246,9 @@ void WebApiInverterClass::onInverterEdit(AsyncWebServerRequest* request)
     strncpy(inverter.Name, root[F("name")].as<String>().c_str(), INV_MAX_NAME_STRLEN);
 
     uint8_t arrayCount = 0;
-    for (JsonVariant maxPower : maxPowerArray) {
-        inverter.MaxChannelPower[arrayCount] = maxPower.as<uint16_t>();
+    for (JsonVariant channel : channelArray) {
+        inverter.channel[arrayCount].MaxChannelPower = channel[F("max_power")].as<uint16_t>();
+        strncpy(inverter.channel[arrayCount].Name, channel[F("name")] | "", sizeof(inverter.channel[arrayCount].Name));
         arrayCount++;
     }
 
@@ -272,7 +276,7 @@ void WebApiInverterClass::onInverterEdit(AsyncWebServerRequest* request)
 
     if (inv != nullptr) {
         for (uint8_t c = 0; c < INV_MAX_CHAN_COUNT; c++) {
-            inv->Statistics()->setChannelMaxPower(c, inverter.MaxChannelPower[c]);
+            inv->Statistics()->setChannelMaxPower(c, inverter.channel[c].MaxChannelPower);
         }
     }
 

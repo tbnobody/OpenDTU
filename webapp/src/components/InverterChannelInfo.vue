@@ -1,6 +1,9 @@
 <template>
     <div class="card" :class="{ 'border-info': channelNumber == 0 }">
-        <div v-if="channelNumber >= 1" class="card-header">String {{ channelNumber }}</div>
+        <div v-if="channelNumber >= 1" class="card-header">
+            <template v-if="channelData.name.u != ''">{{ channelData.name.u }}</template>
+            <template v-else>String {{ channelNumber }}</template>
+        </div>
         <div v-if="channelNumber == 0" class="card-header text-bg-info">Phase {{ channelNumber + 1 }}</div>
         <div class="card-body">
             <table class="table table-striped table-hover">
@@ -13,7 +16,7 @@
                 </thead>
                 <tbody>
                     <tr v-for="(property, key) in channelData" :key="`prop-${key}`">
-                        <template v-if="property">
+                        <template v-if="key != 'name' && property">
                             <th scope="row">{{ key }}</th>
                             <td style="text-align: right">{{ formatNumber(property.v, property.d) }}</td>
                             <td>{{ property.u }}</td>
