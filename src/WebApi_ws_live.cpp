@@ -102,6 +102,12 @@ void WebApiWsLiveClass::generateJsonResponse(JsonVariant& root)
 
         // Loop all channels
         for (uint8_t c = 0; c <= inv->Statistics()->getChannelCount(); c++) {
+            if (c > 0) {
+                INVERTER_CONFIG_T* inv_cfg = Configuration.getInverterConfig(inv->serial());
+                if (inv_cfg != nullptr) {
+                    invObject[String(c)][F("name")]["u"] = inv_cfg->channel[c - 1].Name;
+                }
+            }
             addField(invObject, i, inv, c, FLD_PAC);
             addField(invObject, i, inv, c, FLD_UAC);
             addField(invObject, i, inv, c, FLD_IAC);
@@ -119,7 +125,9 @@ void WebApiWsLiveClass::generateJsonResponse(JsonVariant& root)
             addField(invObject, i, inv, c, FLD_PF);
             addField(invObject, i, inv, c, FLD_PRA);
             addField(invObject, i, inv, c, FLD_EFF);
-            addField(invObject, i, inv, c, FLD_IRR);
+            if (c > 0 && inv->Statistics()->getChannelMaxPower(c - 1) > 0) {
+                addField(invObject, i, inv, c, FLD_IRR);
+            }
         }
 
         if (inv->Statistics()->hasChannelFieldValue(CH0, FLD_EVT_LOG)) {

@@ -5,33 +5,33 @@ Information in JSON format can be obtained through the web API
 ## List of URLs
 may be incomplete
 
-| GET/POST | URL |
-| -- | -- |
-| Get | /api/config/get |
-| Post | /api/config/delete |
-| Post | /api/config/upload |
-| Get | /api/devinfo/status |
-| Get+Post | /api/dtu/config |
-| Get | /api/eventlog/status?inv=inverter-serialnumber |
-| Post | /api/firmware/update |
-| Get | /api/inverter/list |
-| Post | /api/inverter/add |
-| Post | /api/inverter/del |
-| Post | /api/inverter/edit |
-| Post | /api/limit/config |
-| Get | /api/limit/status |
-| Get | /api/livedata/status |
-| Get+Post | /api/mqtt/config |
-| Get | /api/mqtt/status |
-| Get+Post | /api/network/config |
-| Get | /api/network/status |
-| Get+Post | /api/ntp/config |
-| Get | /api/ntp/status |
-| Get+Post | /api/ntp/time |
-| Get | /api/power/status |
-| Post | /api/power/config |
-| Get+Post | /api/security/password |
-| Get | /api/system/status |
+| GET/POST | Auth required | URL |
+| -------- | --- | -- |
+| Get      | yes | /api/config/get |
+| Post     | yes | /api/config/delete |
+| Post     | yes | /api/config/upload |
+| Get      | no  | /api/devinfo/status |
+| Get+Post | yes | /api/dtu/config |
+| Get      | no  | /api/eventlog/status?inv=inverter-serialnumber |
+| Post     | yes | /api/firmware/update |
+| Get      | yes | /api/inverter/list |
+| Post     | yes | /api/inverter/add |
+| Post     | yes | /api/inverter/del |
+| Post     | yes | /api/inverter/edit |
+| Post     | yes | /api/limit/config |
+| Get      | no  | /api/limit/status |
+| Get      | no  | /api/livedata/status |
+| Get+Post | yes | /api/mqtt/config |
+| Get      | no  | /api/mqtt/status |
+| Get+Post | yes | /api/network/config |
+| Get      | no  | /api/network/status |
+| Get+Post | yes | /api/ntp/config |
+| Get      | no  | /api/ntp/status |
+| Get+Post | yes | /api/ntp/time |
+| Get      | no  | /api/power/status |
+| Post     | yes | /api/power/config |
+| Get+Post | yes | /api/security/password |
+| Get      | no  | /api/system/status |
 
 
 ## Examples of Use
@@ -51,6 +51,8 @@ may be incomplete
 ### Get information
 
 You can "talk" to the OpenDTU with a command line tool like `curl`. The output is in plain JSON, without carriage return/linefeed and is therefore not very human readable.
+
+#### Get current livedata
 
 ```
 ~$ curl http://192.168.10.10/api/livedata/status
@@ -384,7 +386,7 @@ martin@bln9716cm ~/swbuild/OpenDTU $ curl --no-progress-meter http://192.168.10.
 }
 ```
 
-### combine curl and jq
+#### combine curl and jq
 
 `jq` can filter specific fields from json output.
 
@@ -394,6 +396,15 @@ For example, filter out the current total power:
 140.7999878
 ```
 
+#### Get information where login is required
+
+When config data is requested, username and password have to be provided to `curl`
+Username is always `admin`, the default password is `openDTU42`. The password is used for both the admin login and the Admin-mode Access Point.
+
+```
+~$ curl --u admin:openDTU42 http://192.168.10.10/api/ntp/config
+{"ntp_server":"pool.ntp.org","ntp_timezone":"CET-1CEST,M3.5.0,M10.5.0/3","ntp_timezone_descr":"Europe/Berlin"}
+```
 
 ### Post information
 

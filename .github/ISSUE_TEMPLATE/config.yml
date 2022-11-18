@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: 🤔 Have questions or need support?
+    url: https://discord.gg/WzhxEY62mB
+    about: Discuss with us on Discord
+  - name: 🤔 Have questions or need support?
+    url: https://github.com/tbnobody/OpenDTU/discussions
+    about: Use the GitHub Discussions feature
