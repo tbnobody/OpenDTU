@@ -73,57 +73,86 @@ void WebApiWsLiveClass::loop()
 
 void WebApiWsLiveClass::generateJsonResponse(JsonVariant& root)
 {
+    JsonArray invArray = root.createNestedArray("inverters");
+
+    float totalPower = 0;
+    float totalYieldDay = 0;
+    float totalYieldTotal = 0;
+
     // Loop all inverters
     for (uint8_t i = 0; i < Hoymiles.getNumInverters(); i++) {
         auto inv = Hoymiles.getInverterByPos(i);
+        if (inv == nullptr) {
+            continue;
+        }
 
-        root[i][F("serial")] = inv->serialString();
-        root[i][F("name")] = inv->name();
-        root[i][F("data_age")] = (millis() - inv->Statistics()->getLastUpdate()) / 1000;
-        root[i][F("reachable")] = inv->isReachable();
-        root[i][F("producing")] = inv->isProducing();
-        root[i][F("limit_relative")] = inv->SystemConfigPara()->getLimitPercent();
+        JsonObject invObject = invArray.createNestedObject();
+
+        invObject[F("serial")] = inv->serialString();
+        invObject[F("name")] = inv->name();
+        invObject[F("data_age")] = (millis() - inv->Statistics()->getLastUpdate()) / 1000;
+        invObject[F("reachable")] = inv->isReachable();
+        invObject[F("producing")] = inv->isProducing();
+        invObject[F("limit_relative")] = inv->SystemConfigPara()->getLimitPercent();
         if (inv->DevInfo()->getMaxPower() > 0) {
-            root[i][F("limit_absolute")] = inv->SystemConfigPara()->getLimitPercent() * inv->DevInfo()->getMaxPower() / 100.0;
+            invObject[F("limit_absolute")] = inv->SystemConfigPara()->getLimitPercent() * inv->DevInfo()->getMaxPower() / 100.0;
         } else {
-            root[i][F("limit_absolute")] = -1;
+            invObject[F("limit_absolute")] = -1;
         }
 
         // Loop all channels
         for (uint8_t c = 0; c <= inv->Statistics()->getChannelCount(); c++) {
-            addField(root, i, inv, c, FLD_PAC);
-            addField(root, i, inv, c, FLD_UAC);
-            addField(root, i, inv, c, FLD_IAC);
-            if (c == 0) {
-                addField(root, i, inv, c, FLD_PDC, F("Power DC"));
-            } else {
-                addField(root, i, inv, c, FLD_PDC);
+            if (c > 0) {
+                INVERTER_CONFIG_T* inv_cfg = Configuration.getInverterConfig(inv->serial());
+                if (inv_cfg != nullptr) {
+                    invObject[String(c)][F("name")]["u"] = inv_cfg->channel[c - 1].Name;
+                }
             }
-            addField(root, i, inv, c, FLD_UDC);
-            addField(root, i, inv, c, FLD_IDC);
-            addField(root, i, inv, c, FLD_YD);
-            addField(root, i, inv, c, FLD_YT);
-            addField(root, i, inv, c, FLD_F);
-            addField(root, i, inv, c, FLD_T);
-            addField(root, i, inv, c, FLD_PF);
-            addField(root, i, inv, c, FLD_PRA);
-            addField(root, i, inv, c, FLD_EFF);
-            addField(root, i, inv, c, FLD_IRR);
+            addField(invObject, i, inv, c, FLD_PAC);
+            addField(invObject, i, inv, c, FLD_UAC);
+            addField(invObject, i, inv, c, FLD_IAC);
+            if (c == 0) {
+                addField(invObject, i, inv, c, FLD_PDC, F("Power DC"));
+            } else {
+                addField(invObject, i, inv, c, FLD_PDC);
+            }
+            addField(invObject, i, inv, c, FLD_UDC);
+            addField(invObject, i, inv, c, FLD_IDC);
+            addField(invObject, i, inv, c, FLD_YD);
+            addField(invObject, i, inv, c, FLD_YT);
+            addField(invObject, i, inv, c, FLD_F);
+            addField(invObject, i, inv, c, FLD_T);
+            addField(invObject, i, inv, c, FLD_PF);
+            addField(invObject, i, inv, c, FLD_PRA);
+            addField(invObject, i, inv, c, FLD_EFF);
+            if (c > 0 && inv->Statistics()->getChannelMaxPower(c - 1) > 0) {
+                addField(invObject, i, inv, c, FLD_IRR);
+            }
         }
 
         if (inv->Statistics()->hasChannelFieldValue(CH0, FLD_EVT_LOG)) {
-            root[i][F("events")] = inv->EventLog()->getEntryCount();
+            invObject[F("events")] = inv->EventLog()->getEntryCount();
         } else {
-            root[i][F("events")] = -1;
+            invObject[F("events")] = -1;
         }
 
         if (inv->Statistics()->getLastUpdate() > _newestInverterTimestamp) {
             _newestInverterTimestamp = inv->Statistics()->getLastUpdate();
         }
+
+        totalPower += inv->Statistics()->getChannelFieldValue(CH0, FLD_PAC);
+        totalYieldDay += inv->Statistics()->getChannelFieldValue(CH0, FLD_YD);
+        totalYieldTotal += inv->Statistics()->getChannelFieldValue(CH0, FLD_YT);
     }
+
+    JsonObject totalObj = root.createNestedObject("total");
+    // todo: Fixed hard coded name, unit and digits
+    addTotalField(totalObj, "Power", totalPower, "W", 1);
+    addTotalField(totalObj, "YieldDay", totalYieldDay, "Wh", 0);
+    addTotalField(totalObj, "YieldTotal", totalYieldTotal, "kWh", 2);
 }
 
-void WebApiWsLiveClass::addField(JsonVariant& root, uint8_t idx, std::shared_ptr<InverterAbstract> inv, uint8_t channel, uint8_t fieldId, String topic)
+void WebApiWsLiveClass::addField(JsonObject& root, uint8_t idx, std::shared_ptr<InverterAbstract> inv, uint8_t channel, uint8_t fieldId, String topic)
 {
     if (inv->Statistics()->hasChannelFieldValue(channel, fieldId)) {
         String chanName;
@@ -132,10 +161,17 @@ void WebApiWsLiveClass::addField(JsonVariant& root, uint8_t idx, std::shared_ptr
         } else {
             chanName = topic;
         }
-        root[idx][String(channel)][chanName]["v"] = inv->Statistics()->getChannelFieldValue(channel, fieldId);
-        root[idx][String(channel)][chanName]["u"] = inv->Statistics()->getChannelFieldUnit(channel, fieldId);
-        root[idx][String(channel)][chanName]["d"] = inv->Statistics()->getChannelFieldDigits(channel, fieldId);
+        root[String(channel)][chanName]["v"] = inv->Statistics()->getChannelFieldValue(channel, fieldId);
+        root[String(channel)][chanName]["u"] = inv->Statistics()->getChannelFieldUnit(channel, fieldId);
+        root[String(channel)][chanName]["d"] = inv->Statistics()->getChannelFieldDigits(channel, fieldId);
     }
+}
+
+void WebApiWsLiveClass::addTotalField(JsonObject& root, String name, float value, String unit, uint8_t digits)
+{
+    root[name]["v"] = value;
+    root[name]["u"] = unit;
+    root[name]["d"] = digits;
 }
 
 void WebApiWsLiveClass::onWebsocketEvent(AsyncWebSocket* server, AsyncWebSocketClient* client, AwsEventType type, void* arg, uint8_t* data, size_t len)
@@ -153,8 +189,8 @@ void WebApiWsLiveClass::onWebsocketEvent(AsyncWebSocket* server, AsyncWebSocketC
 
 void WebApiWsLiveClass::onLivedataStatus(AsyncWebServerRequest* request)
 {
-    AsyncJsonResponse* response = new AsyncJsonResponse(true, 40960U);
-    JsonVariant root = response->getRoot().as<JsonVariant>();
+    AsyncJsonResponse* response = new AsyncJsonResponse(false, 40960U);
+    JsonVariant root = response->getRoot();
 
     generateJsonResponse(root);
 

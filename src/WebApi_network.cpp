@@ -7,6 +7,7 @@
 #include "AsyncJson.h"
 #include "Configuration.h"
 #include "NetworkSettings.h"
+#include "WebApi.h"
 #include "helper.h"
 
 void WebApiNetworkClass::init(AsyncWebServer* server)
@@ -52,6 +53,10 @@ void WebApiNetworkClass::onNetworkStatus(AsyncWebServerRequest* request)
 
 void WebApiNetworkClass::onNetworkAdminGet(AsyncWebServerRequest* request)
 {
+    if (!WebApi.checkCredentials(request)) {
+        return;
+    }
+
     AsyncJsonResponse* response = new AsyncJsonResponse();
     JsonObject root = response->getRoot();
     const CONFIG_T& config = Configuration.get();
@@ -72,6 +77,10 @@ void WebApiNetworkClass::onNetworkAdminGet(AsyncWebServerRequest* request)
 
 void WebApiNetworkClass::onNetworkAdminPost(AsyncWebServerRequest* request)
 {
+    if (!WebApi.checkCredentials(request)) {
+        return;
+    }
+
     AsyncJsonResponse* response = new AsyncJsonResponse();
     JsonObject retMsg = response->getRoot();
     retMsg[F("type")] = F("warning");

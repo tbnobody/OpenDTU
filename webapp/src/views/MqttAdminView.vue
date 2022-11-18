@@ -6,7 +6,7 @@
 
         <form @submit="saveMqttConfig">
             <div class="card">
-                <div class="card-header text-white bg-primary">MqTT Configuration</div>
+                <div class="card-header text-bg-primary">MqTT Configuration</div>
                 <div class="card-body">
                     <div class="row mb-3">
                         <label class="col-sm-4 form-check-label" for="inputMqtt">Enable MqTT</label>
@@ -43,7 +43,7 @@
             </div>
 
             <div class="card mt-5" v-show="mqttConfigList.mqtt_enabled">
-                <div class="card-header text-white bg-primary">
+                <div class="card-header text-bg-primary">
                     MqTT Broker Parameter
                 </div>
                 <div class="card-body">
@@ -66,7 +66,7 @@
                     <div class="row mb-3">
                         <label for="inputUsername" class="col-sm-2 col-form-label">Username:</label>
                         <div class="col-sm-10">
-                            <input type="text" class="form-control" id="inputUsername" maxlength="32"
+                            <input type="text" class="form-control" id="inputUsername" maxlength="64"
                                 placeholder="Username, leave empty for anonymous connection"
                                 v-model="mqttConfigList.mqtt_username" />
                         </div>
@@ -75,7 +75,7 @@
                     <div class="row mb-3">
                         <label for="inputPassword" class="col-sm-2 col-form-label">Password:</label>
                         <div class="col-sm-10">
-                            <input type="password" class="form-control" id="inputPassword" maxlength="32"
+                            <input type="password" class="form-control" id="inputPassword" maxlength="64"
                                 placeholder="Password, leave empty for anonymous connection"
                                 v-model="mqttConfigList.mqtt_password" />
                         </div>
@@ -138,7 +138,7 @@
             </div>
 
             <div class="card mt-5" v-show="mqttConfigList.mqtt_enabled">
-                <div class="card-header text-white bg-primary">LWT Parameters</div>
+                <div class="card-header text-bg-primary">LWT Parameters</div>
                 <div class="card-body">
                     <div class="row mb-3">
                         <label for="inputLwtTopic" class="col-sm-2 col-form-label">LWT Topic:</label>
@@ -175,7 +175,7 @@
             </div>
 
             <div class="card mt-5" v-show="mqttConfigList.mqtt_enabled && mqttConfigList.mqtt_hass_enabled">
-                <div class="card-header text-white bg-primary">Home Assistant MQTT Auto Discovery Parameters</div>
+                <div class="card-header text-bg-primary">Home Assistant MQTT Auto Discovery Parameters</div>
                 <div class="card-body">
                     <div class="row mb-3">
                         <label for="inputHassTopic" class="col-sm-2 col-form-label">Prefix Topic:</label>
@@ -229,6 +229,7 @@
 import { defineComponent } from 'vue';
 import BasePage from '@/components/BasePage.vue';
 import BootstrapAlert from "@/components/BootstrapAlert.vue";
+import { handleResponse, authHeader } from '@/utils/authentication';
 import type { MqttConfig } from "@/types/MqttConfig";
 
 export default defineComponent({
@@ -251,8 +252,8 @@ export default defineComponent({
     methods: {
         getMqttConfig() {
             this.dataLoading = true;
-            fetch("/api/mqtt/config")
-                .then((response) => response.json())
+            fetch("/api/mqtt/config", { headers: authHeader() })
+                .then((response) => handleResponse(response, this.$emitter))
                 .then((data) => {
                     this.mqttConfigList = data;
                     this.dataLoading = false;
@@ -266,15 +267,10 @@ export default defineComponent({
 
             fetch("/api/mqtt/config", {
                 method: "POST",
+                headers: authHeader(),
                 body: formData,
             })
-                .then(function (response) {
-                    if (response.status != 200) {
-                        throw response.status;
-                    } else {
-                        return response.json();
-                    }
-                })
+                .then((response) => handleResponse(response, this.$emitter))
                 .then(
                     (response) => {
                         this.alertMessage = response.message;

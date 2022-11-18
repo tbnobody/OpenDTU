@@ -1,13 +1,13 @@
 <template>
     <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
         <div class="container-fluid">
-            <a class="navbar-brand" href="#">OpenDTU</a>
+            <a class="navbar-brand" href="#"><span class="text-warning"><BIconSun width="30" height="30" class="d-inline-block align-text-top"/></span> OpenDTU</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup"
                 aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" ref="navbarCollapse" id="navbarNavAltMarkup">
-                <ul class="navbar-nav">
+                <ul class="navbar-nav me-auto">
                     <li class="nav-item">
                         <router-link @click="onClick" class="nav-link" to="/">Live Data</router-link>
                     </li>
@@ -72,6 +72,10 @@
                         <router-link @click="onClick" class="nav-link" to="/about">About</router-link>
                     </li>
                 </ul>
+                <form class="d-flex" role="search">
+                    <button v-if="isLogged" class="btn btn-outline-danger" @click="signout">Logout</button>
+                    <button v-if="!isLogged" class="btn btn-outline-success" @click="signin">Login</button>
+                </form>
             </div>
         </div>
     </nav>
@@ -79,9 +83,39 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue';
+import { logout, isLoggedIn } from '@/utils/authentication';
+import { BIconSun } from 'bootstrap-icons-vue';
 
 export default defineComponent({
+    components: {
+        BIconSun,
+    },
+    data() {
+        return {
+            isLogged: this.isLoggedIn(),
+        }
+    },
+    created() {
+        this.$emitter.on("logged-in", () => {
+            this.isLogged = this.isLoggedIn();
+        });
+        this.$emitter.on("logged-out", () => {
+            this.isLogged = this.isLoggedIn();
+        });
+    },
     methods: {
+        isLoggedIn,
+        logout,
+        signin(e: Event) {
+            e.preventDefault();
+            this.$router.push('/login');
+        },
+        signout(e: Event) {
+            e.preventDefault();
+            this.logout();
+            this.$emitter.emit("logged-out");
+            this.$router.push('/');
+        },
         onClick() {
             this.$refs.navbarCollapse && (this.$refs.navbarCollapse as HTMLElement).classList.remove("show");
         }

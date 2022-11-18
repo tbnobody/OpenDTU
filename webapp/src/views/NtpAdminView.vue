@@ -6,7 +6,7 @@
 
         <form @submit="saveNtpConfig">
             <div class="card">
-                <div class="card-header text-white bg-primary">NTP Configuration</div>
+                <div class="card-header text-bg-primary">NTP Configuration</div>
                 <div class="card-body">
                     <div class="row mb-3">
                         <label for="inputNtpServer" class="col-sm-2 col-form-label">Time Server:</label>
@@ -41,7 +41,7 @@
         </form>
 
         <div class="card">
-            <div class="card-header text-white bg-primary">Manual Time Synchronization</div>
+            <div class="card-header text-bg-primary">Manual Time Synchronization</div>
             <div class="card-body">
                 <div class="row mb-3">
                     <label for="currentMcuTime" class="col-sm-2 col-form-label">Current OpenDTU Time:</label>
@@ -75,6 +75,7 @@
 import { defineComponent } from 'vue';
 import BasePage from '@/components/BasePage.vue';
 import BootstrapAlert from "@/components/BootstrapAlert.vue";
+import { handleResponse, authHeader } from '@/utils/authentication';
 import type { NtpConfig } from "@/types/NtpConfig";
 
 export default defineComponent({
@@ -127,8 +128,8 @@ export default defineComponent({
         },
         getNtpConfig() {
             this.dataLoading = true;
-            fetch("/api/ntp/config")
-                .then((response) => response.json())
+            fetch("/api/ntp/config", { headers: authHeader() })
+                .then((response) => handleResponse(response, this.$emitter))
                 .then(
                     (data) => {
                         this.ntpConfigList = data;
@@ -142,8 +143,8 @@ export default defineComponent({
         },
         getCurrentTime() {
             this.dataLoading = true;
-            fetch("/api/ntp/time")
-                .then((response) => response.json())
+            fetch("/api/ntp/time", { headers: authHeader() })
+                .then((response) => handleResponse(response, this.$emitter))
                 .then(
                     (data) => {
                         this.mcuTime = new Date(
@@ -168,15 +169,10 @@ export default defineComponent({
 
             fetch("/api/ntp/time", {
                 method: "POST",
+                headers: authHeader(),
                 body: formData,
             })
-                .then(function (response) {
-                    if (response.status != 200) {
-                        throw response.status;
-                    } else {
-                        return response.json();
-                    }
-                })
+                .then((response) => handleResponse(response, this.$emitter))
                 .then(
                     (response) => {
                         this.alertMessage = response.message;
@@ -196,15 +192,10 @@ export default defineComponent({
 
             fetch("/api/ntp/config", {
                 method: "POST",
+                headers: authHeader(),
                 body: formData,
             })
-                .then(function (response) {
-                    if (response.status != 200) {
-                        throw response.status;
-                    } else {
-                        return response.json();
-                    }
-                })
+                .then((response) => handleResponse(response, this.$emitter))
                 .then(
                     (response) => {
                         this.alertMessage = response.message;
