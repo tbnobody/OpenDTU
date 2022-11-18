@@ -1,6 +1,6 @@
 <template>
     <div class="card">
-        <div class="card-header text-white bg-primary">
+        <div class="card-header text-bg-primary">
             Network Interface (Access Point)
         </div>
         <div class="card-body">

@@ -6,7 +6,7 @@
 
         <form @submit="saveNetworkConfig">
             <div class="card">
-                <div class="card-header text-white bg-primary">WiFi Configuration</div>
+                <div class="card-header text-bg-primary">WiFi Configuration</div>
                 <div class="card-body">
                     <div class="row mb-3">
                         <label for="inputSSID" class="col-sm-2 col-form-label">WiFi SSID:</label>
@@ -50,7 +50,7 @@
             </div>
 
             <div class="card" v-show="!networkConfigList.dhcp">
-                <div class="card-header text-white bg-primary">
+                <div class="card-header text-bg-primary">
                     Static IP Configuration
                 </div>
                 <div class="card-body">
@@ -104,6 +104,7 @@
 import { defineComponent } from 'vue';
 import BasePage from '@/components/BasePage.vue';
 import BootstrapAlert from "@/components/BootstrapAlert.vue";
+import { handleResponse, authHeader } from '@/utils/authentication';
 import type { NetworkConfig } from "@/types/NetworkkConfig";
 
 export default defineComponent({
@@ -126,8 +127,8 @@ export default defineComponent({
     methods: {
         getNetworkConfig() {
             this.dataLoading = true;
-            fetch("/api/network/config")
-                .then((response) => response.json())
+            fetch("/api/network/config", { headers: authHeader() })
+                .then((response) => handleResponse(response, this.$emitter))
                 .then((data) => {
                     this.networkConfigList = data;
                     this.dataLoading = false;
@@ -141,15 +142,10 @@ export default defineComponent({
 
             fetch("/api/network/config", {
                 method: "POST",
+                headers: authHeader(),
                 body: formData,
             })
-                .then(function (response) {
-                    if (response.status != 200) {
-                        throw response.status;
-                    } else {
-                        return response.json();
-                    }
-                })
+                .then((response) => handleResponse(response, this.$emitter))
                 .then(
                     (response) => {
                         this.alertMessage = response.message;

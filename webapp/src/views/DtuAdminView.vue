@@ -6,7 +6,7 @@
 
         <form @submit="saveDtuConfig">
             <div class="card">
-                <div class="card-header text-white bg-primary">DTU Configuration</div>
+                <div class="card-header text-bg-primary">DTU Configuration</div>
                 <div class="card-body">
                     <div class="row mb-3">
                         <label for="inputDtuSerial" class="col-sm-2 col-form-label">Serial:</label>
@@ -49,6 +49,7 @@
 import { defineComponent } from 'vue';
 import BasePage from '@/components/BasePage.vue';
 import BootstrapAlert from "@/components/BootstrapAlert.vue";
+import { handleResponse, authHeader } from '@/utils/authentication';
 import type { DtuConfig } from "@/types/DtuConfig";
 
 export default defineComponent({
@@ -77,8 +78,8 @@ export default defineComponent({
     methods: {
         getDtuConfig() {
             this.dataLoading = true;
-            fetch("/api/dtu/config")
-                .then((response) => response.json())
+            fetch("/api/dtu/config", { headers: authHeader() })
+                .then((response) => handleResponse(response, this.$emitter))
                 .then(
                     (data) => {
                         this.dtuConfigList = data;
@@ -94,15 +95,10 @@ export default defineComponent({
 
             fetch("/api/dtu/config", {
                 method: "POST",
+                headers: authHeader(),
                 body: formData,
             })
-                .then(function (response) {
-                    if (response.status != 200) {
-                        throw response.status;
-                    } else {
-                        return response.json();
-                    }
-                })
+                .then((response) => handleResponse(response, this.$emitter))
                 .then(
                     (response) => {
                         this.alertMessage = response.message;

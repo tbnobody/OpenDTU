@@ -1,6 +1,6 @@
 <template>
     <div class="card">
-        <div class="card-header text-white bg-primary">
+        <div class="card-header text-bg-primary">
             Radio Information
         </div>
         <div class="card-body">
@@ -10,8 +10,8 @@
                         <tr>
                             <th>Chip Status</th>
                             <td class="badge" :class="{
-                                'bg-danger': !systemStatus.radio_connected,
-                                'bg-success': systemStatus.radio_connected,
+                                'text-bg-danger': !systemStatus.radio_connected,
+                                'text-bg-success': systemStatus.radio_connected,
                             }">
                                 <span v-if="systemStatus.radio_connected">connected</span>
                                 <span v-else>not connected</span>
@@ -20,9 +20,9 @@
                         <tr>
                             <th>Chip Type</th>
                             <td class="badge" :class="{
-                                'bg-danger': systemStatus.radio_connected && !systemStatus.radio_pvariant,
-                                'bg-success': systemStatus.radio_connected && systemStatus.radio_pvariant,
-                                'bg-secondary': !systemStatus.radio_connected,
+                                'text-bg-danger': systemStatus.radio_connected && !systemStatus.radio_pvariant,
+                                'text-bg-success': systemStatus.radio_connected && systemStatus.radio_pvariant,
+                                'text-bg-secondary': !systemStatus.radio_connected,
                             }">
                                 <span
                                     v-if="systemStatus.radio_connected && systemStatus.radio_pvariant">nRF24L01+</span>

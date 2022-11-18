@@ -1,5 +1,6 @@
 <template>
     <BasePage :title="'Live Data'" :isLoading="dataLoading" :isWideScreen="true">
+        <InverterTotalInfo :totalData="liveData.total" /><br />
         <div class="row gy-3">
             <div class="col-sm-3 col-md-2" :style="[inverterData.length == 1 ? { 'display': 'none' } : {}]">
                 <div class="nav nav-pills row-cols-sm-1" id="v-pills-tab" role="tablist" aria-orientation="vertical">
@@ -23,11 +24,11 @@
                     :id="'v-pills-' + inverter.serial" role="tabpanel"
                     :aria-labelledby="'v-pills-' + inverter.serial + '-tab'" tabindex="0">
                     <div class="card">
-                        <div class="card-header text-white bg-primary d-flex justify-content-between align-items-center"
+                        <div class="card-header d-flex justify-content-between align-items-center"
                             :class="{
-                                'bg-danger': !inverter.reachable,
-                                'bg-warning': inverter.reachable && !inverter.producing,
-                                'bg-primary': inverter.reachable && inverter.producing,
+                                'text-bg-danger': !inverter.reachable,
+                                'text-bg-warning': inverter.reachable && !inverter.producing,
+                                'text-bg-primary': inverter.reachable && inverter.producing,
                             }">
                             <div class="p-1 flex-grow-1">
                                 <div class="d-flex flex-wrap">
@@ -49,7 +50,7 @@
                             </div>
                             <div class="btn-toolbar p-2" role="toolbar">
                                 <div class="btn-group me-2" role="group">
-                                    <button type="button" class="btn btn-sm btn-danger"
+                                    <button :disabled="!isLogged" type="button" class="btn btn-sm btn-danger"
                                         @click="onShowLimitSettings(inverter.serial)" title="Show / Set Inverter Limit">
                                         <BIconSpeedometer style="font-size:24px;" />
 
@@ -57,7 +58,7 @@
                                 </div>
 
                                 <div class="btn-group me-2" role="group">
-                                    <button type="button" class="btn btn-sm btn-danger"
+                                    <button :disabled="!isLogged" type="button" class="btn btn-sm btn-danger"
                                         @click="onShowPowerSettings(inverter.serial)" title="Turn Inverter on/off">
                                         <BIconPower style="font-size:24px;" />
 
@@ -78,7 +79,7 @@
                                         @click="onShowEventlog(inverter.serial)" title="Show Eventlog">
                                         <BIconJournalText style="font-size:24px;" />
                                         <span
-                                            class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                                            class="position-absolute top-0 start-100 translate-middle badge rounded-pill text-bg-danger">
                                             {{ inverter.events }}
                                             <span class="visually-hidden">unread messages</span>
                                         </span>
@@ -201,10 +202,10 @@
                                     Status:</label>
                                 <div class="col-sm-9">
                                     <span class="badge" :class="{
-                                        'bg-danger': currentLimitList.limit_set_status == 'Failure',
-                                        'bg-warning': currentLimitList.limit_set_status == 'Pending',
-                                        'bg-success': currentLimitList.limit_set_status == 'Ok',
-                                        'bg-secondary': currentLimitList.limit_set_status == 'Unknown',
+                                        'text-bg-danger': currentLimitList.limit_set_status == 'Failure',
+                                        'text-bg-warning': currentLimitList.limit_set_status == 'Pending',
+                                        'text-bg-success': currentLimitList.limit_set_status == 'Ok',
+                                        'text-bg-secondary': currentLimitList.limit_set_status == 'Unknown',
                                     }">
                                         {{ currentLimitList.limit_set_status }}
                                     </span>
@@ -276,10 +277,10 @@
                                 Status:</label>
                             <div class="col">
                                 <span class="badge" :class="{
-                                    'bg-danger': successCommandPower == 'Failure',
-                                    'bg-warning': successCommandPower == 'Pending',
-                                    'bg-success': successCommandPower == 'Ok',
-                                    'bg-secondary': successCommandPower == 'Unknown',
+                                    'text-bg-danger': successCommandPower == 'Failure',
+                                    'text-bg-warning': successCommandPower == 'Pending',
+                                    'text-bg-success': successCommandPower == 'Ok',
+                                    'text-bg-secondary': successCommandPower == 'Unknown',
                                 }">
                                     {{ successCommandPower }}
                                 </span>
@@ -330,17 +331,20 @@ import EventLog from '@/components/EventLog.vue';
 import DevInfo from '@/components/DevInfo.vue';
 import BootstrapAlert from '@/components/BootstrapAlert.vue';
 import InverterChannelInfo from "@/components/InverterChannelInfo.vue";
+import InverterTotalInfo from '@/components/InverterTotalInfo.vue';
 import type { DevInfoStatus } from '@/types/DevInfoStatus';
 import type { EventlogItems } from '@/types/EventlogStatus';
-import type { Inverters } from '@/types/LiveDataStatus';
+import type { LiveData, Inverter } from '@/types/LiveDataStatus';
 import type { LimitStatus } from '@/types/LimitStatus';
 import type { LimitConfig } from '@/types/LimitConfig';
+import { isLoggedIn, handleResponse, authHeader } from '@/utils/authentication';
 import { formatNumber } from '@/utils';
 
 export default defineComponent({
     components: {
         BasePage,
         InverterChannelInfo,
+        InverterTotalInfo,
         EventLog,
         DevInfo,
         BootstrapAlert,
@@ -357,11 +361,13 @@ export default defineComponent({
     },
     data() {
         return {
+            isLogged: this.isLoggedIn(),
+
             socket: {} as WebSocket,
             heartInterval: 0,
             dataAgeInterval: 0,
             dataLoading: true,
-            inverterData: [] as Inverters,
+            liveData: {} as LiveData,
             isFirstFetchAfterConnect: true,
             eventLogView: {} as bootstrap.Modal,
             eventLogList: {} as EventlogItems,
@@ -399,6 +405,12 @@ export default defineComponent({
         this.getInitialData();
         this.initSocket();
         this.initDataAgeing();
+        this.$emitter.on("logged-in", () => {
+            this.isLogged = this.isLoggedIn();
+        });
+        this.$emitter.on("logged-out", () => {
+            this.isLogged = this.isLoggedIn();
+        });
     },
     mounted() {
         this.eventLogView = new bootstrap.Modal('#eventView');
@@ -435,16 +447,20 @@ export default defineComponent({
         },
         currentLimitRelative(): string {
             return formatNumber(this.currentLimitList.limit_relative, 2);
+        },
+        inverterData(): Inverter[] {
+            return this.liveData.inverters;
         }
     },
     methods: {
         formatNumber,
+        isLoggedIn,
         getInitialData() {
             this.dataLoading = true;
             fetch("/api/livedata/status")
                 .then((response) => response.json())
                 .then((data) => {
-                    this.inverterData = data;
+                    this.liveData = data;
                     this.dataLoading = false;
                 });
         },
@@ -459,7 +475,7 @@ export default defineComponent({
 
             this.socket.onmessage = (event) => {
                 console.log(event);
-                this.inverterData = JSON.parse(event.data);
+                this.liveData = JSON.parse(event.data);
                 this.dataLoading = false;
                 this.heartCheck(); // Reset heartbeat detection
             };
@@ -558,15 +574,10 @@ export default defineComponent({
 
             fetch("/api/limit/config", {
                 method: "POST",
+                headers: authHeader(),
                 body: formData,
             })
-                .then(function (response) {
-                    if (response.status != 200) {
-                        throw response.status;
-                    } else {
-                        return response.json();
-                    }
-                })
+                .then((response) => handleResponse(response, this.$emitter))
                 .then(
                     (response) => {
                         if (response.type == "success") {
@@ -633,15 +644,10 @@ export default defineComponent({
 
             fetch("/api/power/config", {
                 method: "POST",
+                headers: authHeader(),
                 body: formData,
             })
-                .then(function (response) {
-                    if (response.status != 200) {
-                        throw response.status;
-                    } else {
-                        return response.json();
-                    }
-                })
+                .then((response) => handleResponse(response, this.$emitter))
                 .then(
                     (response) => {
                         if (response.type == "success") {

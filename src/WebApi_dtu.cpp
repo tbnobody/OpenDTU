@@ -7,6 +7,7 @@
 #include "AsyncJson.h"
 #include "Configuration.h"
 #include "Hoymiles.h"
+#include "WebApi.h"
 
 void WebApiDtuClass::init(AsyncWebServer* server)
 {
@@ -24,6 +25,10 @@ void WebApiDtuClass::loop()
 
 void WebApiDtuClass::onDtuAdminGet(AsyncWebServerRequest* request)
 {
+    if (!WebApi.checkCredentials(request)) {
+        return;
+    }
+
     AsyncJsonResponse* response = new AsyncJsonResponse();
     JsonObject root = response->getRoot();
     const CONFIG_T& config = Configuration.get();
@@ -43,6 +48,10 @@ void WebApiDtuClass::onDtuAdminGet(AsyncWebServerRequest* request)
 
 void WebApiDtuClass::onDtuAdminPost(AsyncWebServerRequest* request)
 {
+    if (!WebApi.checkCredentials(request)) {
+        return;
+    }
+
     AsyncJsonResponse* response = new AsyncJsonResponse();
     JsonObject retMsg = response->getRoot();
     retMsg[F("type")] = F("warning");
