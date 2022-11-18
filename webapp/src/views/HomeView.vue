@@ -45,6 +45,9 @@
                                     </div>
                                     <div style="padding-right: 2em;">
                                         Data Age: {{ inverter.data_age }} seconds
+                                        <template v-if="inverter.data_age > 300">
+                                            / {{ calculateAbsoluteTime(inverter.data_age) }}
+                                        </template>
                                     </div>
                                 </div>
                             </div>
@@ -660,6 +663,11 @@ export default defineComponent({
                     }
                 )
         },
+        calculateAbsoluteTime(lastTime: number): string {
+            const userLocale = globalThis.navigator.language;
+            const date = new Date(Date.now() - lastTime * 1000);
+            return date.toLocaleString(userLocale)
+        }
     },
 });
 </script>
