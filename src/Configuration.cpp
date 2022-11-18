@@ -257,14 +257,6 @@ void ConfigurationClass::migrate()
         }
     }
 
-    if (config.Cfg_Version < 0x00011800) {
-        config.Sunset_Enabled = SUNSET_ENABLED;
-        strlcpy(config.Sunset_Latitude, SUNSET_LATITUDE, sizeof(config.Sunset_Latitude));
-        strlcpy(config.Sunset_Longitude, SUNSET_LONGITUDE, sizeof(config.Sunset_Longitude));
-        config.Sunset_Sunriseoffset = SUNSET_SUNRISEOFFSET;
-        config.Sunset_Sunsetoffset = SUNSET_SUNSETOFFSET;
-    }
-
     config.Cfg_Version = CONFIG_VERSION;
     write();
     read();

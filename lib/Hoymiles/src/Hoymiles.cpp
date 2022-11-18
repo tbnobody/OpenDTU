@@ -28,9 +28,9 @@ void HoymilesClass::loop(bool bOperate)
         if (millis() - _lastPoll > (_pollInterval * 1000)) {
             static uint8_t inverterPos = 0;
 
-            if (_radio->isIdle() && bOperate) {
+            if (_radio->isIdle()) {
                 std::shared_ptr<InverterAbstract> iv = getInverterByPos(inverterPos);
-                if (iv != nullptr) {
+                if (iv != nullptr  && operate) {
                     Serial.print(F("Fetch inverter: "));
                     Serial.println(iv->serial(), HEX);
 
