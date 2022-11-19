@@ -74,7 +74,7 @@ export default defineComponent({
     methods: {
         getVedirectConfig() {
             this.dataLoading = true;
-            fetch("api/vedirect/config", { headers: authHeader() })
+            fetch("/api/vedirect/config", { headers: authHeader() })
                 .then((response) => handleResponse(response, this.$emitter))
                 .then((data) => {
                     this.vedirectConfigList = data;

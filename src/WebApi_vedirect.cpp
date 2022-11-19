@@ -7,6 +7,7 @@
 #include "ArduinoJson.h"
 #include "AsyncJson.h"
 #include "Configuration.h"
+#include "WebApi.h"
 #include "helper.h"
 
 void WebApiVedirectClass::init(AsyncWebServer* server)
@@ -28,7 +29,7 @@ void WebApiVedirectClass::onVedirectStatus(AsyncWebServerRequest* request)
 {
     AsyncJsonResponse* response = new AsyncJsonResponse();
     JsonObject root = response->getRoot();
-    CONFIG_T& config = Configuration.get();
+    const CONFIG_T& config = Configuration.get();
 
     root[F("vedirect_enabled")] = config.Vedirect_Enabled;
     root[F("vedirect_pollinterval")] = config.Vedirect_PollInterval;
@@ -40,9 +41,13 @@ void WebApiVedirectClass::onVedirectStatus(AsyncWebServerRequest* request)
 
 void WebApiVedirectClass::onVedirectAdminGet(AsyncWebServerRequest* request)
 {
+    if (!WebApi.checkCredentials(request)) {
+        return;
+    }
+
     AsyncJsonResponse* response = new AsyncJsonResponse();
     JsonObject root = response->getRoot();
-    CONFIG_T& config = Configuration.get();
+    const CONFIG_T& config = Configuration.get();
 
     root[F("vedirect_enabled")] = config.Vedirect_Enabled;
     root[F("vedirect_pollinterval")] = config.Vedirect_PollInterval;
@@ -54,6 +59,10 @@ void WebApiVedirectClass::onVedirectAdminGet(AsyncWebServerRequest* request)
 
 void WebApiVedirectClass::onVedirectAdminPost(AsyncWebServerRequest* request)
 {
+    if (!WebApi.checkCredentials(request)) {
+        return;
+    }
+
     AsyncJsonResponse* response = new AsyncJsonResponse();
     JsonObject retMsg = response->getRoot();
     retMsg[F("type")] = F("warning");
