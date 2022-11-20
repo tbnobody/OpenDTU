@@ -1,5 +1,6 @@
 <template>
     <BasePage :title="'Live Data'" :isLoading="dataLoading" :isWideScreen="true">
+        <HintView :hints="liveData.hints" />
         <InverterTotalInfo :totalData="liveData.total" /><br />
         <div class="row gy-3">
             <div class="col-sm-3 col-md-2" :style="[inverterData.length == 1 ? { 'display': 'none' } : {}]">
@@ -335,6 +336,7 @@ import DevInfo from '@/components/DevInfo.vue';
 import BootstrapAlert from '@/components/BootstrapAlert.vue';
 import InverterChannelInfo from "@/components/InverterChannelInfo.vue";
 import InverterTotalInfo from '@/components/InverterTotalInfo.vue';
+import HintView from '@/components/HintView.vue';
 import type { DevInfoStatus } from '@/types/DevInfoStatus';
 import type { EventlogItems } from '@/types/EventlogStatus';
 import type { LiveData, Inverter } from '@/types/LiveDataStatus';
@@ -348,6 +350,7 @@ export default defineComponent({
         BasePage,
         InverterChannelInfo,
         InverterTotalInfo,
+        HintView,
         EventLog,
         DevInfo,
         BootstrapAlert,
