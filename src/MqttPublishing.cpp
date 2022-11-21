@@ -70,12 +70,7 @@ void MqttPublishingClass::loop()
 
             MqttSettings.publish(subtopic + "/status/reachable", String(inv->isReachable()));
             MqttSettings.publish(subtopic + "/status/producing", String(inv->isProducing()));
-
-            if (inv->Statistics()->getLastUpdate() > 0) {
-                MqttSettings.publish(subtopic + "/status/last_update", String(std::time(0) - (millis() - inv->Statistics()->getLastUpdate()) / 1000));
-            } else {
-                MqttSettings.publish(subtopic + "/status/last_update", String(0));
-            }
+            MqttSettings.publish(subtopic + "/status/last_update", String(std::time(0) - (millis() - inv->Statistics()->getLastUpdate()) / 1000));
 
             uint32_t lastUpdate = inv->Statistics()->getLastUpdate();
             if (lastUpdate > 0 && lastUpdate != _lastPublishStats[i]) {
@@ -83,12 +78,6 @@ void MqttPublishingClass::loop()
 
                 // Loop all channels
                 for (uint8_t c = 0; c <= inv->Statistics()->getChannelCount(); c++) {
-                    if (c > 0) {
-                        INVERTER_CONFIG_T* inv_cfg = Configuration.getInverterConfig(inv->serial());
-                        if (inv_cfg != nullptr) {
-                            MqttSettings.publish(inv->serialString() + "/" + String(c) + "/name", inv_cfg->channel[c - 1].Name);
-                        }
-                    }
                     for (uint8_t f = 0; f < sizeof(_publishFields); f++) {
                         publishField(inv, c, _publishFields[f]);
                     }

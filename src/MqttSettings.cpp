@@ -350,5 +350,3 @@ void MqttSettingsClass::createMqttClientObject()
         mqttClient = static_cast<MqttClient*>(new espMqttClient);
     }
 }
-
-MqttSettingsClass MqttSettings;
