@@ -5,6 +5,7 @@
 #include "WebApi_ws_live.h"
 #include "AsyncJson.h"
 #include "Configuration.h"
+#include "defaults.h"
 
 WebApiWsLiveClass::WebApiWsLiveClass()
     : _ws("/livedata")
@@ -150,6 +151,16 @@ void WebApiWsLiveClass::generateJsonResponse(JsonVariant& root)
     addTotalField(totalObj, "Power", totalPower, "W", 1);
     addTotalField(totalObj, "YieldDay", totalYieldDay, "Wh", 0);
     addTotalField(totalObj, "YieldTotal", totalYieldTotal, "kWh", 2);
+
+    JsonObject hintObj = root.createNestedObject("hints");
+    struct tm timeinfo;
+    hintObj[F("time_sync")] = !getLocalTime(&timeinfo, 5);
+    hintObj[F("radio_problem")] = (!Hoymiles.getRadio()->isConnected() || !Hoymiles.getRadio()->isPVariant());
+    if (!strcmp(Configuration.get().Security_Password, ACCESS_POINT_PASSWORD)) {
+        hintObj[F("default_password")] = true;
+    } else {
+        hintObj[F("default_password")] = false;
+    }
 }
 
 void WebApiWsLiveClass::addField(JsonObject& root, uint8_t idx, std::shared_ptr<InverterAbstract> inv, uint8_t channel, uint8_t fieldId, String topic)

@@ -38,7 +38,14 @@ export interface Total {
     YieldTotal: ValueObject;
 };
 
+export interface Hints {
+    time_sync: boolean;
+    default_password: boolean;
+    radio_problem: boolean;
+};
+
 export interface LiveData {
     inverters: Inverter[];
     total: Total;
+    hints: Hints;
 }

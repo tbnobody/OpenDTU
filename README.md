@@ -10,6 +10,10 @@ It was the goal to replace the original Hoymiles DTU (Telemetry Gateway) with th
 ## Screenshots
 Several screenshots of the frontend can be found here: [Screenshots](docs/screenshots/README.md)
 
+## Builds
+Different builds from existing installations can be found here [Builds](docs/builds/README.md)
+Like to show your own build? Just send me a Pull Request.
+
 ## Currently supported Inverters
 * Hoymiles HM-300
 * Hoymiles HM-350
