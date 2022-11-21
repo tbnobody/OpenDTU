@@ -64,7 +64,7 @@ void WebApiInverterClass::onInverterList(AsyncWebServerRequest* request)
             }
 
             obj[F("phase")] = config.Inverter[i].CurrentPhase;
-
+            
             JsonArray channel = obj.createNestedArray("channel");
             for (uint8_t c = 0; c < max_channels; c++) {
                 JsonObject chanData = channel.createNestedObject();
