@@ -25,6 +25,7 @@ void WebApiClass::init()
     _webApiFirmware.init(&_server);
     _webApiInverter.init(&_server);
     _webApiLimit.init(&_server);
+    _webApiMaintenance.init(&_server);
     _webApiMqtt.init(&_server);
     _webApiNetwork.init(&_server);
     _webApiNtp.init(&_server);
@@ -47,6 +48,7 @@ void WebApiClass::loop()
     _webApiFirmware.loop();
     _webApiInverter.loop();
     _webApiLimit.loop();
+    _webApiMaintenance.loop();
     _webApiMqtt.loop();
     _webApiNetwork.loop();
     _webApiNtp.loop();

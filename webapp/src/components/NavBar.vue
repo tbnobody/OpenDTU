@@ -46,6 +46,9 @@
                             <li>
                                 <router-link @click="onClick" class="dropdown-item" to="/firmware/upgrade">Firmware Upgrade</router-link>
                             </li>
+                            <li>
+                                <router-link @click="onClick" class="dropdown-item" to="/maintenance/reboot">Device Reboot</router-link>
+                            </li>
                         </ul>
                     </li>
                     <li class="nav-item dropdown">

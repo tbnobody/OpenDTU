@@ -14,6 +14,7 @@ import FirmwareUpgradeView from '@/views/FirmwareUpgradeView.vue'
 import ConfigAdminView from '@/views/ConfigAdminView.vue'
 import SecurityAdminView from '@/views/SecurityAdminView.vue'
 import LoginView from '@/views/LoginView.vue'
+import MaintenanceRebootView from '@/views/MaintenanceRebootView.vue';
 
 const router = createRouter({
     history: createWebHistory(import.meta.env.BASE_URL),
@@ -93,6 +94,11 @@ const router = createRouter({
         path: '/settings/security',
         name: 'Security',
         component: SecurityAdminView
+    },
+    {
+        path: '/maintenance/reboot',
+        name: 'Device Reboot',
+        component: MaintenanceRebootView
     }
 ]
 });
