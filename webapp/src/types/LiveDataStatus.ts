@@ -5,6 +5,7 @@ export interface ValueObject {
 };
 
 export interface InverterStatistics {
+    name: ValueObject,
     Power?: ValueObject;
     Voltage?: ValueObject;
     Current?: ValueObject;
@@ -37,7 +38,14 @@ export interface Total {
     YieldTotal: ValueObject;
 };
 
+export interface Hints {
+    time_sync: boolean;
+    default_password: boolean;
+    radio_problem: boolean;
+};
+
 export interface LiveData {
     inverters: Inverter[];
     total: Total;
+    hints: Hints;
 }

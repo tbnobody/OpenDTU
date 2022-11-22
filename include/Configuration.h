@@ -3,9 +3,8 @@
 
 #include <Arduino.h>
 
-#define CONFIG_FILENAME "/config.bin"
-#define CONFIG_FILENAME_JSON "/config.json"
-#define CONFIG_VERSION 0x00011600 // 0.1.22 // make sure to clean all after change
+#define CONFIG_FILENAME "/config.json"
+#define CONFIG_VERSION 0x00011700 // 0.1.23 // make sure to clean all after change
 
 #define WIFI_MAX_SSID_STRLEN 31
 #define WIFI_MAX_PASSWORD_STRLEN 64
@@ -15,10 +14,9 @@
 #define NTP_MAX_TIMEZONE_STRLEN 50
 #define NTP_MAX_TIMEZONEDESCR_STRLEN 50
 
-#define MQTT_MAX_HOSTNAME_OLD_STRLEN 31
 #define MQTT_MAX_HOSTNAME_STRLEN 128
-#define MQTT_MAX_USERNAME_STRLEN 32
-#define MQTT_MAX_PASSWORD_STRLEN 32
+#define MQTT_MAX_USERNAME_STRLEN 64
+#define MQTT_MAX_PASSWORD_STRLEN 64
 #define MQTT_MAX_TOPIC_STRLEN 32
 #define MQTT_MAX_LWTVALUE_STRLEN 20
 #define MQTT_MAX_ROOT_CA_CERT_STRLEN 2048 
@@ -27,12 +25,19 @@
 #define INV_MAX_COUNT 10
 #define INV_MAX_CHAN_COUNT 4
 
+#define CHAN_MAX_NAME_STRLEN 31
+
 #define JSON_BUFFER_SIZE 6144
+
+struct CHANNEL_CONFIG_T {
+    uint16_t MaxChannelPower;
+    char Name[CHAN_MAX_NAME_STRLEN];
+};
 
 struct INVERTER_CONFIG_T {
     uint64_t Serial;
     char Name[INV_MAX_NAME_STRLEN + 1];
-    uint16_t MaxChannelPower[INV_MAX_CHAN_COUNT];
+    CHANNEL_CONFIG_T channel[INV_MAX_CHAN_COUNT];
 };
 
 struct CONFIG_T {
@@ -54,7 +59,6 @@ struct CONFIG_T {
     char Ntp_TimezoneDescr[NTP_MAX_TIMEZONEDESCR_STRLEN + 1];
 
     bool Mqtt_Enabled;
-    char Mqtt_Hostname_Short[MQTT_MAX_HOSTNAME_OLD_STRLEN + 1]; // Deprecated but for config compatibility
     uint Mqtt_Port;
     char Mqtt_Username[MQTT_MAX_USERNAME_STRLEN + 1];
     char Mqtt_Password[MQTT_MAX_PASSWORD_STRLEN + 1];
@@ -98,9 +102,7 @@ public:
     CONFIG_T& get();
 
     INVERTER_CONFIG_T* getFreeInverterSlot();
-
-private:
-    bool readJson();
+    INVERTER_CONFIG_T* getInverterConfig(uint64_t serial);
 };
 
 extern ConfigurationClass Configuration;

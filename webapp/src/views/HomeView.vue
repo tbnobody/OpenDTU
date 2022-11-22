@@ -1,5 +1,6 @@
 <template>
     <BasePage :title="'Live Data'" :isLoading="dataLoading" :isWideScreen="true">
+        <HintView :hints="liveData.hints" />
         <InverterTotalInfo :totalData="liveData.total" /><br />
         <div class="row gy-3">
             <div class="col-sm-3 col-md-2" :style="[inverterData.length == 1 ? { 'display': 'none' } : {}]">
@@ -45,6 +46,9 @@
                                     </div>
                                     <div style="padding-right: 2em;">
                                         Data Age: {{ inverter.data_age }} seconds
+                                        <template v-if="inverter.data_age > 300">
+                                            / {{ calculateAbsoluteTime(inverter.data_age) }}
+                                        </template>
                                     </div>
                                 </div>
                             </div>
@@ -334,6 +338,7 @@ import DevInfo from '@/components/DevInfo.vue';
 import BootstrapAlert from '@/components/BootstrapAlert.vue';
 import InverterChannelInfo from "@/components/InverterChannelInfo.vue";
 import InverterTotalInfo from '@/components/InverterTotalInfo.vue';
+import HintView from '@/components/HintView.vue';
 import VedirectView from '@/views/VedirectView.vue';
 import type { DevInfoStatus } from '@/types/DevInfoStatus';
 import type { EventlogItems } from '@/types/EventlogStatus';
@@ -348,6 +353,7 @@ export default defineComponent({
         BasePage,
         InverterChannelInfo,
         InverterTotalInfo,
+        HintView,
         EventLog,
         DevInfo,
         BootstrapAlert,
@@ -664,6 +670,11 @@ export default defineComponent({
                     }
                 )
         },
+        calculateAbsoluteTime(lastTime: number): string {
+            const userLocale = globalThis.navigator.language;
+            const date = new Date(Date.now() - lastTime * 1000);
+            return date.toLocaleString(userLocale)
+        }
     },
 });
 </script>

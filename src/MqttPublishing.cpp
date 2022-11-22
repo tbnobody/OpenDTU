@@ -83,6 +83,12 @@ void MqttPublishingClass::loop()
 
                 // Loop all channels
                 for (uint8_t c = 0; c <= inv->Statistics()->getChannelCount(); c++) {
+                    if (c > 0) {
+                        INVERTER_CONFIG_T* inv_cfg = Configuration.getInverterConfig(inv->serial());
+                        if (inv_cfg != nullptr) {
+                            MqttSettings.publish(inv->serialString() + "/" + String(c) + "/name", inv_cfg->channel[c - 1].Name);
+                        }
+                    }
                     for (uint8_t f = 0; f < sizeof(_publishFields); f++) {
                         publishField(inv, c, _publishFields[f]);
                     }

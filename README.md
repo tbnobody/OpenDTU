@@ -10,6 +10,10 @@ It was the goal to replace the original Hoymiles DTU (Telemetry Gateway) with th
 ## Screenshots
 Several screenshots of the frontend can be found here: [Screenshots](docs/screenshots/README.md)
 
+## Builds
+Different builds from existing installations can be found here [Builds](docs/builds/README.md)
+Like to show your own build? Just send me a Pull Request.
+
 I extended the original OpenDTU software to support also Victron's Ve.Direct protocol on the same chip. Additional information about Ve.direct can be downloaded from https://www.victronenergy.com/support-and-downloads/technical-information.
 
 Web-Live-Interface:
