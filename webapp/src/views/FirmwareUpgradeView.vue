@@ -77,7 +77,7 @@ import {
     BIconArrowRepeat,
     BIconCheckCircle
 } from 'bootstrap-icons-vue';
-import { authHeader } from '@/utils/authentication';
+import { authHeader, isLoggedIn } from '@/utils/authentication';
 
 export default defineComponent({
     components: {
@@ -184,6 +184,9 @@ export default defineComponent({
         },
     },
     mounted() {
+        if (!isLoggedIn()) {
+            this.$router.push({ path: "/login", query: { returnUrl: this.$router.currentRoute.value.fullPath } });
+        }
         this.loading = false;
     },
 });

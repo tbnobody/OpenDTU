@@ -47,7 +47,7 @@ import { defineComponent } from 'vue';
 import * as bootstrap from 'bootstrap';
 import BasePage from '@/components/BasePage.vue';
 import BootstrapAlert from "@/components/BootstrapAlert.vue";
-import { handleResponse, authHeader } from '@/utils/authentication';
+import { handleResponse, authHeader, isLoggedIn } from '@/utils/authentication';
 
 export default defineComponent({
     components: {
@@ -66,6 +66,10 @@ export default defineComponent({
         };
     },
     mounted() {
+        if (!isLoggedIn()) {
+            this.$router.push({ path: "/login", query: { returnUrl: this.$router.currentRoute.value.fullPath } });
+        }
+
         this.performReboot = new bootstrap.Modal('#performReboot');
     },
     methods: {
