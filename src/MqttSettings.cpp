@@ -60,11 +60,7 @@ void MqttSettingsClass::onMqttConnect(bool sessionPresent)
     for (uint8_t i = 0; i < Hoymiles.getNumInverters(); i++) {
         auto inv = Hoymiles.getInverterByPos(i);
 
-        char buffer[sizeof(uint64_t) * 8 + 1];
-        snprintf(buffer, sizeof(buffer), "%0x%08x",
-            ((uint32_t)((inv->serial() >> 32) & 0xFFFFFFFF)),
-            ((uint32_t)(inv->serial() & 0xFFFFFFFF)));
-        String str_serial = String(buffer);
+        String str_serial = inv->serialString();
         mqttClient->subscribe(String("device/HM" + str_serial + "/DBus").c_str(),0);
     }
 }
@@ -147,6 +143,9 @@ void MqttSettingsClass::onMqttMessage(const espMqttClientTypes::MessagePropertie
         
         DynamicJsonDocument docDbus(64);
         deserializeJson(docDbus, strlimit);
+        
+        delete[] strlimit;
+        
         VictronPortalId = docDbus["portalId"];
                     
         DynamicJsonDocument docInstance(64);

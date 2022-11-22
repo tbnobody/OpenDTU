@@ -2,8 +2,8 @@
 /*
  * Copyright (C) 2022 Thomas Basler and others
  */
-#include "ArduinoJson.h"
 #include "MqttVictronPublishing.h"
+#include "ArduinoJson.h"
 #include "MqttPublishing.h"
 #include "MqttSettings.h"
 #include "NetworkSettings.h"
@@ -50,11 +50,11 @@ void MqttVictronPublishingClass::loop()
             auto inv = Hoymiles.getInverterByPos(i);
 
             String str_serial = inv->serialString();
- 
+
             uint32_t lastUpdate = inv->Statistics()->getLastUpdate();
             if (lastUpdate > 0 && lastUpdate != _lastPublishStats[i]) {
                 _lastPublishStats[i] = lastUpdate;
- 
+
                 String invname = inv->name();
 
                 // Get Current phase
@@ -94,7 +94,11 @@ void MqttVictronPublishingClass::registerInverter()
         uint8_t invconnected;
 
         // Current phase = L0 --> No register to Victron Cerbo, only L1, L2, L3
-        if (invphase == 0) { invconnected = 0; } else { invconnected = 1; }
+        if (invphase == 0) {
+            invconnected = 0;
+        } else {
+            invconnected = 1;
+        }
 
         // Publish inverter as device service to Victron Venus OS with connected=1
         DynamicJsonDocument serviceDoc(64);
@@ -110,7 +114,7 @@ void MqttVictronPublishingClass::registerInverter()
         JsonObject rootObj = rootDoc.as<JsonObject>();
         String data;
         serializeJson(rootObj, data);
-        
+
         MqttSettings.publishVictron(Vtopic, data);
     }
 }
@@ -119,31 +123,45 @@ void MqttVictronPublishingClass::publishField(std::shared_ptr<InverterAbstract> 
 {
     bool response = false;
     String fieldname;
-    if ( fieldId == 4 ) { response = true; fieldname = "YieldTotal"; }
-    if ( fieldId == 5 ) { response = true; fieldname = "Voltage"; }
-    if ( fieldId == 6 ) { response = true; fieldname = "Current"; }
-    if ( fieldId == 7 ) { response = true; fieldname = "Power"; }
+    if (fieldId == 4) {
+        response = true;
+        fieldname = "YieldTotal";
+    }
+    if (fieldId == 5) {
+        response = true;
+        fieldname = "Voltage";
+    }
+    if (fieldId == 6) {
+        response = true;
+        fieldname = "Current";
+    }
+    if (fieldId == 7) {
+        response = true;
+        fieldname = "Power";
+    }
 
-    if ( response ) {   
+    if (response) {
         double fieldval = double(inv->Statistics()->getChannelFieldValue(0, fieldId));
-        double fieldvalue = floor( fieldval * 100.0 + .5 ) / 100.0;
+        double fieldvalue = floor(fieldval * 100.0 + .5) / 100.0;
 
         String portalid = MqttSettings.getVictronPortalId();
-        if ( portalid == NULL ) { portalid = "NOportalId"; }
+        if (portalid == NULL) {
+            portalid = "NOportalId";
+        }
 
         String topic_sum, topic_phase, topic_err, topic_maxp;
-    
+
         String invSerial = inv->serialString();
         String deviceInstance = MqttSettings.getVictronDeviceInstance(invSerial);
         String topic = "W/" + portalid + "/pvinverter/" + deviceInstance;
 
-        if ( fieldId == 4 ) { 
+        if (fieldId == 4) {
             topic_sum += topic + "/Ac/Energy/Forward";
             topic_phase += topic + "/Ac/L" + invphase + "/Energy/Forward";
         } else {
             topic_sum += topic + "/Ac/" + fieldname;
             topic_phase += topic + "/Ac/L" + invphase + "/" + fieldname;
-        }    
+        }
 
         DynamicJsonDocument valueDoc(32);
         valueDoc["value"] = fieldvalue;
@@ -192,32 +210,32 @@ void MqttVictronPublishingClass::publishField(std::shared_ptr<InverterAbstract> 
 
         String valA, valB, topicA, topicB;
 
-        switch ( invphase ) {
-            case 1:
-                valA = "L2";
-                valB = "L3";
-                break;
-            case 2:
-                valA = "L1";
-                valB = "L3";
-                break;
-            case 3:
-                valA = "L1";
-                valB = "L2";
-                break;
-            default:
-                return;
-                break;
+        switch (invphase) {
+        case 1:
+            valA = "L2";
+            valB = "L3";
+            break;
+        case 2:
+            valA = "L1";
+            valB = "L3";
+            break;
+        case 3:
+            valA = "L1";
+            valB = "L2";
+            break;
+        default:
+            return;
+            break;
         }
 
-        if ( fieldname == "YieldTotal" ) { 
-                topicA += topic + "/Ac/" + valA + "/Energy/Forward";      
-                topicB += topic + "/Ac/" + valB + "/Energy/Forward"; 
+        if (fieldname == "YieldTotal") {
+            topicA += topic + "/Ac/" + valA + "/Energy/Forward";
+            topicB += topic + "/Ac/" + valB + "/Energy/Forward";
         } else {
-                topicA += topic + "/Ac/" + valA + "/" + fieldname;
-                topicB += topic + "/Ac/" + valB + "/" + fieldname;
+            topicA += topic + "/Ac/" + valA + "/" + fieldname;
+            topicB += topic + "/Ac/" + valB + "/" + fieldname;
         }
-        
+
         MqttSettings.publishVictron(topicA, nondata);
         MqttSettings.publishVictron(topicB, nondata);
     }

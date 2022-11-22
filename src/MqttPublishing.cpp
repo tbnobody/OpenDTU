@@ -148,15 +148,11 @@ void MqttPublishingClass::publishField(std::shared_ptr<InverterAbstract> inv, ui
         String topic_Victron_sum;
         String topic_Victron_phase;
     
-        char serial[sizeof(uint64_t) * 8 + 1];
-        snprintf(serial, sizeof(serial), "%0x%08x",
-        ((uint32_t)((inv->serial() >> 32) & 0xFFFFFFFF)),
-        ((uint32_t)(inv->serial() & 0xFFFFFFFF)));
-        String invSerial = String(serial);
+        String invserial = inv->serialString();
 
-        String deviceInstance = MqttSettings.getVictronDeviceInstance(serial);
+        String deviceInstance = MqttSettings.getVictronDeviceInstance(invserial);
 
-        int response = false;
+        bool response = false;
         if ( fieldname == "Voltage" ) { response = true; }
         if ( fieldname == "Power") { response = true; }
         if ( fieldname == "Current" ) { response = true; }

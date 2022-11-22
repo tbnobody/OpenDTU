@@ -48,9 +48,7 @@
                                 <td>{{ inverter.serial }}</td>
                                 <td>{{ inverter.name }}</td>
                                 <td>{{ inverter.type }}</td>
-                                <td>
-                                    L{{ inverter.phase}}
-                                </td>
+                                <td>L{{ inverter.phase}}</td>
                                 <td>
                                     <a href="#" class="icon text-danger" title="Delete inverter">
                                         <BIconTrash v-on:click="onOpenModal(modalDelete, inverter)" />
