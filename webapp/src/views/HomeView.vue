@@ -498,9 +498,11 @@ export default defineComponent({
         },
         initDataAgeing() {
             this.dataAgeInterval = setInterval(() => {
-                this.inverterData.forEach(element => {
-                    element.data_age++;
-                });
+                if (this.inverterData) {
+                    this.inverterData.forEach(element => {
+                        element.data_age++;
+                    });
+                }
             }, 1000);
         },
         // Send heartbeat packets regularly * 59s Send a heartbeat
