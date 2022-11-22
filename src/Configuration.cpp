@@ -77,6 +77,7 @@ bool ConfigurationClass::write()
 
     JsonObject security = doc.createNestedObject("security");
     security["password"] = config.Security_Password;
+    security["allow_readonly"] = config.Security_AllowReadonly;
 
     JsonArray inverters = doc.createNestedArray("inverters");
     for (uint8_t i = 0; i < INV_MAX_COUNT; i++) {
@@ -197,6 +198,7 @@ bool ConfigurationClass::read()
 
     JsonObject security = doc["security"];
     strlcpy(config.Security_Password, security["password"] | ACCESS_POINT_PASSWORD, sizeof(config.Security_Password));
+    config.Security_AllowReadonly = security["allow_readonly"] | SECURITY_ALLOW_READONLY;
 
     JsonArray inverters = doc["inverters"];
     for (uint8_t i = 0; i < INV_MAX_COUNT; i++) {

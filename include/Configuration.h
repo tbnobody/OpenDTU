@@ -87,6 +87,7 @@ struct CONFIG_T {
     bool Mqtt_Hass_Expire;
 
     char Security_Password[WIFI_MAX_PASSWORD_STRLEN + 1];
+    bool Security_AllowReadonly;
 };
 
 class ConfigurationClass {

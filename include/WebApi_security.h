@@ -9,8 +9,8 @@ public:
     void loop();
 
 private:
-    void onPasswordGet(AsyncWebServerRequest* request);
-    void onPasswordPost(AsyncWebServerRequest* request);
+    void onSecurityGet(AsyncWebServerRequest* request);
+    void onSecurityPost(AsyncWebServerRequest* request);
 
     void onAuthenticateGet(AsyncWebServerRequest* request);
 
