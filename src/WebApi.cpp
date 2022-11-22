@@ -77,4 +77,14 @@ bool WebApiClass::checkCredentials(AsyncWebServerRequest* request)
     return false;
 }
 
+bool WebApiClass::checkCredentialsReadonly(AsyncWebServerRequest* request)
+{
+    CONFIG_T& config = Configuration.get();
+    if (config.Security_AllowReadonly) {
+        return true;
+    } else {
+        return checkCredentials(request);
+    }
+}
+
 WebApiClass WebApi;

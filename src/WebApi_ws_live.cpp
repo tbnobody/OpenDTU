@@ -6,6 +6,7 @@
 #include "AsyncJson.h"
 #include "Configuration.h"
 #include "defaults.h"
+#include "WebApi.h"
 
 WebApiWsLiveClass::WebApiWsLiveClass()
     : _ws("/livedata")
@@ -200,6 +201,10 @@ void WebApiWsLiveClass::onWebsocketEvent(AsyncWebSocket* server, AsyncWebSocketC
 
 void WebApiWsLiveClass::onLivedataStatus(AsyncWebServerRequest* request)
 {
+    if (!WebApi.checkCredentialsReadonly(request)) {
+        return;
+    }
+
     AsyncJsonResponse* response = new AsyncJsonResponse(false, 40960U);
     JsonVariant root = response->getRoot();
 

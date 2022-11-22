@@ -6,6 +6,7 @@
 #include "ArduinoJson.h"
 #include "AsyncJson.h"
 #include "Hoymiles.h"
+#include "WebApi.h"
 
 void WebApiEventlogClass::init(AsyncWebServer* server)
 {
@@ -22,6 +23,10 @@ void WebApiEventlogClass::loop()
 
 void WebApiEventlogClass::onEventlogStatus(AsyncWebServerRequest* request)
 {
+    if (!WebApi.checkCredentialsReadonly(request)) {
+        return;
+    }
+
     AsyncJsonResponse* response = new AsyncJsonResponse(false, 2048);
     JsonObject root = response->getRoot();
 

@@ -27,6 +27,7 @@ public:
     void loop();
 
     static bool checkCredentials(AsyncWebServerRequest* request);
+    static bool checkCredentialsReadonly(AsyncWebServerRequest* request);
 
 private:
     AsyncWebServer _server;

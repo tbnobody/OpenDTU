@@ -24,6 +24,10 @@ void WebApiLimitClass::loop()
 
 void WebApiLimitClass::onLimitStatus(AsyncWebServerRequest* request)
 {
+    if (!WebApi.checkCredentialsReadonly(request)) {
+        return;
+    }
+
     AsyncJsonResponse* response = new AsyncJsonResponse();
     JsonObject root = response->getRoot();
 
