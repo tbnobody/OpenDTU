@@ -242,7 +242,7 @@ export default defineComponent({
         getMqttConfig() {
             this.dataLoading = true;
             fetch("/api/mqtt/config", { headers: authHeader() })
-                .then((response) => handleResponse(response, this.$emitter))
+                .then((response) => handleResponse(response, this.$emitter, this.$router))
                 .then((data) => {
                     this.mqttConfigList = data;
                     this.dataLoading = false;
@@ -259,7 +259,7 @@ export default defineComponent({
                 headers: authHeader(),
                 body: formData,
             })
-                .then((response) => handleResponse(response, this.$emitter))
+                .then((response) => handleResponse(response, this.$emitter, this.$router))
                 .then(
                     (response) => {
                         this.alertMessage = response.message;

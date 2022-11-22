@@ -78,7 +78,7 @@ export default defineComponent({
                 headers: authHeader(),
                 body: formData,
             })
-                .then((response) => handleResponse(response, this.$emitter))
+                .then((response) => handleResponse(response, this.$emitter, this.$router))
                 .then((data) => {
                     this.alertMessage = data.message;
                     this.alertType = data.type;

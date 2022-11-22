@@ -149,6 +149,7 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue';
+import { handleResponse, authHeader } from '@/utils/authentication';
 import BasePage from '@/components/BasePage.vue';
 import type { MqttStatus } from '@/types/MqttStatus';
 
@@ -168,8 +169,8 @@ export default defineComponent({
     methods: {
         getMqttInfo() {
             this.dataLoading = true;
-            fetch("/api/mqtt/status")
-                .then((response) => response.json())
+            fetch("/api/mqtt/status", { headers: authHeader() })
+                .then((response) => handleResponse(response, this.$emitter, this.$router))
                 .then((data) => {
                     this.mqttDataList = data;
                     this.dataLoading = false;

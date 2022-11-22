@@ -67,7 +67,7 @@ export default defineComponent({
         getPasswordConfig() {
             this.dataLoading = true;
             fetch("/api/security/password", { headers: authHeader() })
-                .then((response) => handleResponse(response, this.$emitter))
+                .then((response) => handleResponse(response, this.$emitter, this.$router))
                 .then(
                     (data) => {
                         this.securityConfigList = data;
@@ -94,7 +94,7 @@ export default defineComponent({
                 headers: authHeader(),
                 body: formData,
             })
-                .then((response) => handleResponse(response, this.$emitter))
+                .then((response) => handleResponse(response, this.$emitter, this.$router))
                 .then(
                     (response) => {
                         this.alertMessage = response.message;
