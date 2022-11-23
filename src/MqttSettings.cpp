@@ -145,7 +145,7 @@ void MqttSettingsClass::onMqttMessage(const espMqttClientTypes::MessagePropertie
         deserializeJson(docDbus, strlimit);
         
         delete[] strlimit;
-        
+
         VictronPortalId = docDbus["portalId"];
                     
         DynamicJsonDocument docInstance(64);
@@ -294,7 +294,7 @@ String MqttSettingsClass::getVictronPortalId()
     return VictronPortalId;
 }
 
-String MqttSettingsClass::getVictronDeviceInstance(String hoyserial)
+String MqttSettingsClass::getVictronDeviceInstance(const String& hoyserial)
 {
     if (VictronDeviceInstance.find(hoyserial)!=VictronDeviceInstance.end()) {
         return VictronDeviceInstance[hoyserial];

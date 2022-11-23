@@ -210,7 +210,7 @@ bool ConfigurationClass::read()
         JsonObject inv = inverters[i].as<JsonObject>();
         config.Inverter[i].Serial = inv["serial"] | 0ULL;
         strlcpy(config.Inverter[i].Name, inv["name"] | "", sizeof(config.Inverter[i].Name));
-        config.Inverter[i].CurrentPhase = inv["phase"] | 0ULL;
+        config.Inverter[i].CurrentPhase = inv["phase"] | 0;
 
         JsonArray channel = inv["channel"];
         for (uint8_t c = 0; c < INV_MAX_CHAN_COUNT; c++) {

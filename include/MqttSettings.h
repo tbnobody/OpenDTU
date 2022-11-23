@@ -23,7 +23,7 @@ public:
     std::map<String, String> VictronDeviceInstance;
  
     String getVictronPortalId();
-    String getVictronDeviceInstance(String hoyserial);
+    String getVictronDeviceInstance(const String& hoyserial);
 
     String getPrefix();
 
