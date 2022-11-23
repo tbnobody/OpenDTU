@@ -16,6 +16,18 @@ export function authHeader(): Headers {
     return new Headers(headers);
 }
 
+export function authUrl(): string {
+    let user = null;
+    try {
+        user = JSON.parse(localStorage.getItem('user') || "");
+    } catch { }
+
+    if (user && user.authdata) {
+        return encodeURIComponent(atob(user.authdata)).replace("%3A", ":") + '@';
+    }
+    return "";
+}
+
 export function logout() {
     // remove user from local storage to log user out
     localStorage.removeItem('user');

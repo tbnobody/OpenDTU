@@ -342,7 +342,7 @@ import type { EventlogItems } from '@/types/EventlogStatus';
 import type { LiveData, Inverter } from '@/types/LiveDataStatus';
 import type { LimitStatus } from '@/types/LimitStatus';
 import type { LimitConfig } from '@/types/LimitConfig';
-import { isLoggedIn, handleResponse, authHeader } from '@/utils/authentication';
+import { isLoggedIn, handleResponse, authHeader, authUrl } from '@/utils/authentication';
 import { formatNumber } from '@/utils';
 
 export default defineComponent({
@@ -474,8 +474,9 @@ export default defineComponent({
             console.log("Starting connection to WebSocket Server");
 
             const { protocol, host } = location;
+            const authString = authUrl();
             const webSocketUrl = `${protocol === "https:" ? "wss" : "ws"
-                }://${host}/livedata`;
+                }://${authString}${host}/livedata`;
 
             this.socket = new WebSocket(webSocketUrl);
 
