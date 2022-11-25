@@ -2,12 +2,10 @@
 /*
  * Copyright (C) 2022 Thomas Basler and others
  */
-#include "ArduinoJson.h"
 #include "MqttPublishing.h"
 #include "MqttSettings.h"
 #include "NetworkSettings.h"
 #include <ctime>
-#include <string>
 
 MqttPublishingClass MqttPublishing;
 
