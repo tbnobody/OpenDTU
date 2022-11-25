@@ -116,7 +116,7 @@ This can be achieved by editing the 'platformio.ini' file and add/change one or 
 * Adjust the COM port in the file "platformio.ini" for your USB-serial-converter. It occurs twice:
     * upload_port
     * monitor_port
-* Select the arrow button in the status bar (PlatformIO: Upload) to compile and upload the firmware. During the compilation, all required libraries are downloaded automatically.
+* Select the arrow button in the blue bottom status bar (PlatformIO: Upload) to compile and upload the firmware. During the compilation, all required libraries are downloaded automatically.
 * There are two videos showing these steps:
     * [Git Clone and compilation](https://youtu.be/9cA_esv3zeA)
     * [Full installation and compilation](https://youtu.be/xs6TqHn7QWM)
@@ -225,6 +225,7 @@ A documentation of the Web API can be found here: [Web-API Documentation](docs/W
 * OpenDTU needs access to a working NTP server to get the current date & time.
 * If your problem persists, check the  [Issues on Github](https://github.com/tbnobody/OpenDTU/issues). Please inspect not only the open issues, also the closed issues contain useful information.
 * Another source of information are the [Discussions](https://github.com/tbnobody/OpenDTU/discussions/)
+* When flashing with VSCode Plattform.IO fails and also with ESPRESSIF tool a demo bin file cannot be flashed to the ESP32 with error message "A fatal error occurred: MD5 of file does not match data in flash!" than un-wire/unconnect ESP32 from the NRF24L01+ board. Try to flash again and rewire afterwards. 
 
 ## Related Projects
 - [Ahoy](https://github.com/grindylow/ahoy)
