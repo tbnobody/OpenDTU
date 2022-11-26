@@ -33,7 +33,7 @@
                         </div>
                     </div>
                     <div class="card-body">
-                        <div class="row flex-row-reverse flex-wrap-reverse align-items-end g-3">
+                        <div class="row flex-row flex-wrap align-items-start g-3">
                             <div class="col order-0">
                                 <div class="card" :class="{ 'border-info': true }">
                                     <div class="card-header bg-info">Device Info</div>
