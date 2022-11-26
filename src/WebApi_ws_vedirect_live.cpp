@@ -6,6 +6,7 @@
 #include "AsyncJson.h"
 #include "Configuration.h"
 #include "WebApi.h"
+#include "defaults.h"
 
 WebApiWsVedirectLiveClass::WebApiWsVedirectLiveClass()
     : _ws("/vedirectlivedata")
