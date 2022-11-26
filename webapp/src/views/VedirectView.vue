@@ -177,7 +177,7 @@
 <script lang="ts">
 import { defineComponent } from 'vue';
 import type { Vedirect } from '@/types/VedirectLiveDataStatus';
-import { isLoggedIn, handleResponse, authHeader, authUrl } from '@/utils/authentication';
+import { handleResponse, authHeader, authUrl } from '@/utils/authentication';
 
 
 export default defineComponent({
