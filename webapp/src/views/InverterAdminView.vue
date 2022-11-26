@@ -207,7 +207,7 @@ export default defineComponent({
         getInverters() {
             this.dataLoading = true;
             fetch("/api/inverter/list", { headers: authHeader() })
-                .then((response) => handleResponse(response, this.$emitter))
+                .then((response) => handleResponse(response, this.$emitter, this.$router))
                 .then((data) => {
                     this.inverters = data.inverter;
                     this.dataLoading = false;
@@ -222,7 +222,7 @@ export default defineComponent({
                 headers: authHeader(),
                 body: formData,
             })
-                .then((response) => handleResponse(response, this.$emitter))
+                .then((response) => handleResponse(response, this.$emitter, this.$router))
                 .then((data) => {
                     this.getInverters();
                     this.alert = data;

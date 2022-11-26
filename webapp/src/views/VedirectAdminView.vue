@@ -75,7 +75,7 @@ export default defineComponent({
         getVedirectConfig() {
             this.dataLoading = true;
             fetch("/api/vedirect/config", { headers: authHeader() })
-                .then((response) => handleResponse(response, this.$emitter))
+                .then((response) => handleResponse(response, this.$emitter, this.$router))
                 .then((data) => {
                     this.vedirectConfigList = data;
                     this.dataLoading = false;
@@ -92,7 +92,7 @@ export default defineComponent({
                 headers: authHeader(),
                 body: formData,
             })
-                .then((response) => handleResponse(response, this.$emitter))
+                .then((response) => handleResponse(response, this.$emitter, this.$router))
                 .then(
                     (response) => {
                         this.alertMessage = response.message;

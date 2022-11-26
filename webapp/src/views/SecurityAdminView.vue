@@ -32,6 +32,22 @@
 
                 </div>
             </div>
+
+            <div class="card mt-5">
+                <div class="card-header text-bg-primary">Permissions</div>
+                <div class="card-body">
+                    <div class="row mb-3">
+                        <label class="col-sm-6 form-check-label" for="inputReadonly">Allow readonly access to web interface</label>
+                        <div class="col-sm-6">
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" id="inputReadonly"
+                                    v-model="securityConfigList.allow_readonly" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <button type="submit" class="btn btn-primary mb-3">Save</button>
         </form>
     </BasePage>
@@ -66,8 +82,8 @@ export default defineComponent({
     methods: {
         getPasswordConfig() {
             this.dataLoading = true;
-            fetch("/api/security/password", { headers: authHeader() })
-                .then((response) => handleResponse(response, this.$emitter))
+            fetch("/api/security/config", { headers: authHeader() })
+                .then((response) => handleResponse(response, this.$emitter, this.$router))
                 .then(
                     (data) => {
                         this.securityConfigList = data;
@@ -89,12 +105,12 @@ export default defineComponent({
             const formData = new FormData();
             formData.append("data", JSON.stringify(this.securityConfigList));
 
-            fetch("/api/security/password", {
+            fetch("/api/security/config", {
                 method: "POST",
                 headers: authHeader(),
                 body: formData,
             })
-                .then((response) => handleResponse(response, this.$emitter))
+                .then((response) => handleResponse(response, this.$emitter, this.$router))
                 .then(
                     (response) => {
                         this.alertMessage = response.message;

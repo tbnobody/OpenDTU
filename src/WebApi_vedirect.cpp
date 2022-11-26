@@ -27,6 +27,10 @@ void WebApiVedirectClass::loop()
 
 void WebApiVedirectClass::onVedirectStatus(AsyncWebServerRequest* request)
 {
+    if (!WebApi.checkCredentialsReadonly(request)) {
+        return;
+    }
+    
     AsyncJsonResponse* response = new AsyncJsonResponse();
     JsonObject root = response->getRoot();
     const CONFIG_T& config = Configuration.get();

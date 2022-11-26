@@ -112,7 +112,7 @@ import {
 } from 'bootstrap-icons-vue';
 import * as bootstrap from 'bootstrap';
 import BootstrapAlert from "@/components/BootstrapAlert.vue";
-import { handleResponse, authHeader } from '@/utils/authentication';
+import { handleResponse, authHeader, isLoggedIn } from '@/utils/authentication';
 
 export default defineComponent({
     components: {
@@ -137,6 +137,9 @@ export default defineComponent({
         };
     },
     mounted() {
+        if (!isLoggedIn()) {
+            this.$router.push({ path: "/login", query: { returnUrl: this.$router.currentRoute.value.fullPath } });
+        }
         this.modalFactoryReset = new bootstrap.Modal('#factoryReset');
         this.loading = false;
     },
@@ -156,7 +159,7 @@ export default defineComponent({
                 headers: authHeader(),
                 body: formData,
             })
-                .then((response) => handleResponse(response, this.$emitter))
+                .then((response) => handleResponse(response, this.$emitter, this.$router))
                 .then(
                     (response) => {
                         this.alertMessage = response.message;

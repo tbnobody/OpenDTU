@@ -5,6 +5,7 @@
 #include "WebApi_ws_live.h"
 #include "AsyncJson.h"
 #include "Configuration.h"
+#include "WebApi.h"
 #include "defaults.h"
 
 WebApiWsLiveClass::WebApiWsLiveClass()
@@ -65,6 +66,13 @@ void WebApiWsLiveClass::loop()
         String buffer;
         if (buffer) {
             serializeJson(root, buffer);
+
+            if (Configuration.get().Security_AllowReadonly) {
+                _ws.setAuthentication("", "");
+            } else {
+                _ws.setAuthentication(AUTH_USERNAME, Configuration.get().Security_Password);
+            }
+
             _ws.textAll(buffer);
         }
 
@@ -200,6 +208,10 @@ void WebApiWsLiveClass::onWebsocketEvent(AsyncWebSocket* server, AsyncWebSocketC
 
 void WebApiWsLiveClass::onLivedataStatus(AsyncWebServerRequest* request)
 {
+    if (!WebApi.checkCredentialsReadonly(request)) {
+        return;
+    }
+
     AsyncJsonResponse* response = new AsyncJsonResponse(false, 40960U);
     JsonVariant root = response->getRoot();
 

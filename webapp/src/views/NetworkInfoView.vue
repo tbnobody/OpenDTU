@@ -13,6 +13,7 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue';
+import { handleResponse, authHeader } from '@/utils/authentication';
 import BasePage from '@/components/BasePage.vue';
 import WifiStationInfo from "@/components/WifiStationInfo.vue";
 import WifiApInfo from "@/components/WifiApInfo.vue";
@@ -40,8 +41,8 @@ export default defineComponent({
     methods: {
         getNetworkInfo() {
             this.dataLoading = true;
-            fetch("/api/network/status")
-                .then((response) => response.json())
+            fetch("/api/network/status", { headers: authHeader() })
+                .then((response) => handleResponse(response, this.$emitter, this.$router))
                 .then((data) => {
                     this.networkDataList = data;
                     this.dataLoading = false;

@@ -24,6 +24,10 @@ void WebApiPowerClass::loop()
 
 void WebApiPowerClass::onPowerStatus(AsyncWebServerRequest* request)
 {
+    if (!WebApi.checkCredentialsReadonly(request)) {
+        return;
+    }
+
     AsyncJsonResponse* response = new AsyncJsonResponse();
     JsonObject root = response->getRoot();
 

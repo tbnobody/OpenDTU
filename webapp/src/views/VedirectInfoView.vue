@@ -36,6 +36,7 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue';
+import { handleResponse, authHeader } from '@/utils/authentication';
 import BasePage from '@/components/BasePage.vue';
 import type { VedirectStatus } from "@/types/VedirectStatus";
 
@@ -55,8 +56,8 @@ export default defineComponent({
     methods: {
         getVedirectInfo() {
             this.dataLoading = true;
-            fetch("/api/vedirect/status")
-                .then((response) => response.json())
+            fetch("/api/vedirect/status", { headers: authHeader() })
+                .then((response) => handleResponse(response, this.$emitter, this.$router))
                 .then((data) => {
                     this.vedirectDataList = data;
                     this.dataLoading = false;

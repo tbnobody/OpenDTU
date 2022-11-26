@@ -79,7 +79,7 @@ export default defineComponent({
         getDtuConfig() {
             this.dataLoading = true;
             fetch("/api/dtu/config", { headers: authHeader() })
-                .then((response) => handleResponse(response, this.$emitter))
+                .then((response) => handleResponse(response, this.$emitter, this.$router))
                 .then(
                     (data) => {
                         this.dtuConfigList = data;
@@ -98,7 +98,7 @@ export default defineComponent({
                 headers: authHeader(),
                 body: formData,
             })
-                .then((response) => handleResponse(response, this.$emitter))
+                .then((response) => handleResponse(response, this.$emitter, this.$router))
                 .then(
                     (response) => {
                         this.alertMessage = response.message;

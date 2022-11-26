@@ -13,6 +13,7 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue';
+import { handleResponse, authHeader } from '@/utils/authentication';
 import BasePage from '@/components/BasePage.vue';
 import HardwareInfo from "@/components/HardwareInfo.vue";
 import FirmwareInfo from "@/components/FirmwareInfo.vue";
@@ -40,8 +41,8 @@ export default defineComponent({
     methods: {
         getSystemInfo() {
             this.dataLoading = true;
-            fetch("/api/system/status")
-                .then((response) => response.json())
+            fetch("/api/system/status", { headers: authHeader() })
+                .then((response) => handleResponse(response, this.$emitter, this.$router))
                 .then((data) => {
                     this.systemDataList = data;
                     this.dataLoading = false;

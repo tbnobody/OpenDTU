@@ -25,6 +25,7 @@ void WebApiClass::init()
     _webApiFirmware.init(&_server);
     _webApiInverter.init(&_server);
     _webApiLimit.init(&_server);
+    _webApiMaintenance.init(&_server);
     _webApiMqtt.init(&_server);
     _webApiNetwork.init(&_server);
     _webApiNtp.init(&_server);
@@ -49,6 +50,7 @@ void WebApiClass::loop()
     _webApiFirmware.loop();
     _webApiInverter.loop();
     _webApiLimit.loop();
+    _webApiMaintenance.loop();
     _webApiMqtt.loop();
     _webApiNetwork.loop();
     _webApiNtp.loop();
@@ -77,6 +79,16 @@ bool WebApiClass::checkCredentials(AsyncWebServerRequest* request)
     request->send(r);
 
     return false;
+}
+
+bool WebApiClass::checkCredentialsReadonly(AsyncWebServerRequest* request)
+{
+    CONFIG_T& config = Configuration.get();
+    if (config.Security_AllowReadonly) {
+        return true;
+    } else {
+        return checkCredentials(request);
+    }
 }
 
 WebApiClass WebApi;

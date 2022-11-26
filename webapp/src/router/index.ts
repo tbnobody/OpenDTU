@@ -16,6 +16,7 @@ import VedirectAdminView from '@/views/VedirectAdminView.vue'
 import VedirectInfoView from '@/views/VedirectInfoView.vue'
 import SecurityAdminView from '@/views/SecurityAdminView.vue'
 import LoginView from '@/views/LoginView.vue'
+import MaintenanceRebootView from '@/views/MaintenanceRebootView.vue';
 
 const router = createRouter({
     history: createWebHistory(import.meta.env.BASE_URL),
@@ -105,24 +106,13 @@ const router = createRouter({
         path: '/settings/security',
         name: 'Security',
         component: SecurityAdminView
+    },
+    {
+        path: '/maintenance/reboot',
+        name: 'Device Reboot',
+        component: MaintenanceRebootView
     }
 ]
-});
-
-router.beforeEach((to, from, next) => {
-    // redirect to login page if not logged in and trying to access a restricted page
-    const publicPages = ['/', '/login', '/about', '/info/network', '/info/system', '/info/ntp', '/info/mqtt', '/info/vedirect', ];
-    const authRequired = !publicPages.includes(to.path);
-    const loggedIn = localStorage.getItem('user');
-
-    if (authRequired && !loggedIn) {
-        return next({
-            path: '/login',
-            query: { returnUrl: to.path }
-        });
-    }
-
-    next();
 });
 
 export default router;

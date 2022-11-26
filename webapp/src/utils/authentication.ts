@@ -1,17 +1,31 @@
 import type { Emitter, EventType } from "mitt";
+import type { Router } from "vue-router";
 
 export function authHeader(): Headers {
     // return authorization header with basic auth credentials
-    let user = JSON.parse(localStorage.getItem('user') || "");
+    let user = null;
+    try {
+        user = JSON.parse(localStorage.getItem('user') || "");
+    } catch { }
+
+    const headers = new Headers();
+    headers.append('X-Requested-With', 'XMLHttpRequest');
+    if (user && user.authdata) {
+        headers.append('Authorization', 'Basic ' + user.authdata);
+    }
+    return new Headers(headers);
+}
+
+export function authUrl(): string {
+    let user = null;
+    try {
+        user = JSON.parse(localStorage.getItem('user') || "");
+    } catch { }
 
     if (user && user.authdata) {
-        const headers = new Headers();
-        headers.append('Authorization', 'Basic ' + user.authdata);
-        headers.append('X-Requested-With', 'XMLHttpRequest')
-        return new Headers(headers);
-    } else {
-        return new Headers();
+        return encodeURIComponent(atob(user.authdata)).replace("%3A", ":") + '@';
     }
+    return "";
 }
 
 export function logout() {
@@ -47,7 +61,7 @@ export function login(username: String, password: String) {
         });
 }
 
-export function handleResponse(response: Response, emitter: Emitter<Record<EventType, unknown>>) {
+export function handleResponse(response: Response, emitter: Emitter<Record<EventType, unknown>>, router: Router) {
     return response.text().then(text => {
         const data = text && JSON.parse(text);
         if (!response.ok) {
@@ -55,7 +69,7 @@ export function handleResponse(response: Response, emitter: Emitter<Record<Event
                 // auto logout if 401 response returned from api
                 logout();
                 emitter.emit("logged-out");
-                location.reload();
+                router.push({path: "/login", query: { returnUrl: router.currentRoute.value.fullPath }});
             }
 
             const error = (data && data.message) || response.statusText;

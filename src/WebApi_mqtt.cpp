@@ -28,6 +28,10 @@ void WebApiMqttClass::loop()
 
 void WebApiMqttClass::onMqttStatus(AsyncWebServerRequest* request)
 {
+    if (!WebApi.checkCredentialsReadonly(request)) {
+        return;
+    }
+
     AsyncJsonResponse* response = new AsyncJsonResponse(false, MQTT_JSON_DOC_SIZE);
     JsonObject root = response->getRoot();
     const CONFIG_T& config = Configuration.get();

@@ -177,6 +177,8 @@
 <script lang="ts">
 import { defineComponent } from 'vue';
 import type { Vedirect } from '@/types/VedirectLiveDataStatus';
+import { isLoggedIn, handleResponse, authHeader, authUrl } from '@/utils/authentication';
+
 
 export default defineComponent({
     components: {
@@ -202,8 +204,8 @@ export default defineComponent({
     methods: {
         getInitialData() {
             this.dataLoading = true;
-            fetch("/api/vedirectlivedata/status")
-                .then((response) => response.json())
+            fetch("/api/vedirectlivedata/status", { headers: authHeader() })
+                .then((response) => handleResponse(response, this.$emitter, this.$router))
                 .then((data) => {
                     this.vedirectData = data;
                     this.dataLoading = false;
@@ -213,8 +215,9 @@ export default defineComponent({
             console.log("Starting connection to WebSocket Server");
 
             const { protocol, host } = location;
+            const authString = authUrl();
             const webSocketUrl = `${protocol === "https:" ? "wss" : "ws"
-                }://${host}/vedirectlivedata`;
+                }://${authString}${host}/vedirectlivedata`;
 
             this.socket = new WebSocket(webSocketUrl);
 
@@ -237,7 +240,9 @@ export default defineComponent({
         },
         initDataAgeing() {
             this.dataAgeInterval = setInterval(() => {
-                this.vedirectData.data_age++;
+                if (this.vedirectData) {
+                    this.vedirectData.data_age++;
+                }
             }, 1000);
         },
         // Send heartbeat packets regularly * 59s Send a heartbeat

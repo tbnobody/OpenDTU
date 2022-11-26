@@ -5,6 +5,7 @@
 #include "WebApi_ws_vedirect_live.h"
 #include "AsyncJson.h"
 #include "Configuration.h"
+#include "WebApi.h"
 
 WebApiWsVedirectLiveClass::WebApiWsVedirectLiveClass()
     : _ws("/vedirectlivedata")
@@ -60,6 +61,13 @@ void WebApiWsVedirectLiveClass::loop()
         String buffer;
         if (buffer) {
             serializeJson(root, buffer);
+            
+            if (Configuration.get().Security_AllowReadonly) {
+                _ws.setAuthentication("", "");
+            } else {
+                _ws.setAuthentication(AUTH_USERNAME, Configuration.get().Security_Password);
+            }
+
             _ws.textAll(buffer);
         }
 
@@ -125,6 +133,9 @@ void WebApiWsVedirectLiveClass::onWebsocketEvent(AsyncWebSocket* server, AsyncWe
 
 void WebApiWsVedirectLiveClass::onLivedataStatus(AsyncWebServerRequest* request)
 {
+    if (!WebApi.checkCredentialsReadonly(request)) {
+        return;
+    }
     AsyncJsonResponse* response = new AsyncJsonResponse(false, 1024U);
     JsonVariant root = response->getRoot().as<JsonVariant>();
     generateJsonResponse(root);
