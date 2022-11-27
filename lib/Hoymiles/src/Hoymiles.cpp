@@ -9,14 +9,14 @@
 
 HoymilesClass Hoymiles;
 
-void HoymilesClass::init()
+void HoymilesClass::init(SPIClass* initialisedSpiBus, uint8_t pinCE, uint8_t pinIRQ)
 {
     _xSemaphore = xSemaphoreCreateMutex();
     HOY_SEMAPHORE_GIVE();  // release before first use
 
     _pollInterval = 0;
     _radio.reset(new HoymilesRadio());
-    _radio->init();
+    _radio->init(initialisedSpiBus, pinCE, pinIRQ);
 }
 
 void HoymilesClass::loop()

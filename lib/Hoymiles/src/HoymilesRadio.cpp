@@ -5,15 +5,14 @@
 #include <Every.h>
 #include <FunctionalInterrupt.h>
 
-void HoymilesRadio::init()
+void HoymilesRadio::init(SPIClass* initialisedSpiBus, uint8_t pinCE, uint8_t pinIRQ)
 {
     _dtuSerial.u64 = 0;
 
-    _hspi.reset(new SPIClass(HSPI));
-    _radio.reset(new RF24(HOYMILES_PIN_CE, HOYMILES_PIN_CS));
+    _spiPtr.reset(initialisedSpiBus);
+    _radio.reset(new RF24(pinCE, initialisedSpiBus->pinSS()));
 
-    _hspi->begin(HOYMILES_PIN_SCLK, HOYMILES_PIN_MISO, HOYMILES_PIN_MOSI, HOYMILES_PIN_CS);
-    _radio->begin(_hspi.get());
+    _radio->begin(_spiPtr.get());
 
     _radio->setDataRate(RF24_250KBPS);
     _radio->enableDynamicPayloads();
@@ -27,7 +26,7 @@ void HoymilesRadio::init()
         Serial.println(F("Connection error!!"));
     }
 
-    attachInterrupt(digitalPinToInterrupt(HOYMILES_PIN_IRQ), std::bind(&HoymilesRadio::handleIntr, this), FALLING);
+    attachInterrupt(digitalPinToInterrupt(pinIRQ), std::bind(&HoymilesRadio::handleIntr, this), FALLING);
 
     openReadingPipe();
     _radio->startListening();

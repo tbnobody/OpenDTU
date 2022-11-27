@@ -12,7 +12,7 @@
 
 class HoymilesClass {
 public:
-    void init();
+    void init(SPIClass* initialisedSpiBus, uint8_t pinCE, uint8_t pinIRQ);
     void loop();
 
     std::shared_ptr<InverterAbstract> addInverter(const char* name, uint64_t serial);
