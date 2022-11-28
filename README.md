@@ -198,6 +198,9 @@ A documentation of the Web API can be found here: [Web-API Documentation](docs/W
 ## Available cases
 * <https://www.thingiverse.com/thing:5435911>
 * <https://www.printables.com/model/293003-sol-opendtu-esp32-nrf24l01-case>
+* <https://www.thingiverse.com/thing:5661780>
+* <https://www.thingiverse.com/thing:5632374>
+
 
 ## Building
 * Building the WebApp
