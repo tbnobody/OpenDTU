@@ -99,13 +99,13 @@
                                             <input type="number" class="form-control" :id="`inverter-max_${index}`" min="0"
                                                 v-model="selectedInverterData.channel[index].max_power"
                                                 :aria-describedby="`inverter-maxDescription_${index} inverter-customizer`" />
-                                            <span class="input-group-text" :id="`inverter-maxDescription_${index}`">W<sup>*</sup></span>
+                                            <span class="input-group-text" :id="`inverter-maxDescription_${index}`">W<sub>p</sub><sup>*</sup></span>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                        <div :id="`inverter-customizer`" class="form-text">*) Input the kWp of the channel to
+                        <div :id="`inverter-customizer`" class="form-text">*) Input the W<sub>p</sub> of the channel to
                             calculate irradiation.</div>
                     </form>
 
