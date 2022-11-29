@@ -277,6 +277,7 @@ void WebApiNtpClass::onNtpTimePost(AsyncWebServerRequest* request)
     local.tm_mday = root[F("day")].as<uint>(); // day of the month - [ 1 to 31 ]
     local.tm_mon = root[F("month")].as<uint>() - 1; // months since January - [ 0 to 11 ]
     local.tm_year = root[F("year")].as<uint>() - 1900; // years since 1900
+    local.tm_isdst = -1;
 
     time_t t = mktime(&local);
     struct timeval now = { .tv_sec = t, .tv_usec = 0 };
