@@ -1,32 +1,32 @@
 <template>
     <div class="card">
         <div class="card-header text-bg-primary">
-            WiFi Information (Station)
+            {{ $t('wifistationinfo.WifiStationInfo') }}
         </div>
         <div class="card-body">
             <div class="table-responsive">
                 <table class="table table-hover table-condensed">
                     <tbody>
                         <tr>
-                            <th>Status</th>
+                            <th>{{ $t('wifistationinfo.Status') }}</th>
                             <td class="badge" :class="{
                                 'text-bg-danger': !networkStatus.sta_status,
                                 'text-bg-success': networkStatus.sta_status,
                             }">
-                                <span v-if="networkStatus.sta_status">enabled</span>
-                                <span v-else>disabled</span>
+                                <span v-if="networkStatus.sta_status">{{ $t('wifistationinfo.Enabled') }}</span>
+                                <span v-else>{{ $t('wifistationinfo.Disabled') }}</span>
                             </td>
                         </tr>
                         <tr>
-                            <th>SSID</th>
+                            <th>{{ $t('wifistationinfo.Ssid') }}</th>
                             <td>{{ networkStatus.sta_ssid }}</td>
                         </tr>
                         <tr>
-                            <th>Quality</th>
+                            <th>{{ $t('wifistationinfo.Quality') }}</th>
                             <td>{{ getRSSIasQuality(networkStatus.sta_rssi) }} %</td>
                         </tr>
                         <tr>
-                            <th>RSSI</th>
+                            <th>{{ $t('wifistationinfo.Rssi') }}</th>
                             <td>{{ networkStatus.sta_rssi }}</td>
                         </tr>
                     </tbody>

@@ -1,28 +1,28 @@
 <template>
     <div class="card">
         <div class="card-header text-bg-primary">
-            WiFi Information (Access Point)
+            {{ $t('wifiapinfo.WifiApInfo') }}
         </div>
         <div class="card-body">
             <div class="table-responsive">
                 <table class="table table-hover table-condensed">
                     <tbody>
                         <tr>
-                            <th>Status</th>
+                            <th>{{ $t('wifiapinfo.Status') }}</th>
                             <td class="badge" :class="{
                                 'text-bg-danger': !networkStatus.ap_status,
                                 'text-bg-success': networkStatus.ap_status,
                             }">
-                                <span v-if="networkStatus.ap_status">enabled</span>
-                                <span v-else>disabled</span>
+                                <span v-if="networkStatus.ap_status">{{ $t('wifiapinfo.Enabled') }}</span>
+                                <span v-else>{{ $t('wifiapinfo.Disabled') }}</span>
                             </td>
                         </tr>
                         <tr>
-                            <th>SSID</th>
+                            <th>{{ $t('wifiapinfo.Ssid') }}</th>
                             <td>{{ networkStatus.ap_ssid }}</td>
                         </tr>
                         <tr>
-                            <th># Stations</th>
+                            <th>{{ $t('wifiapinfo.Stations') }}</th>
                             <td>{{ networkStatus.ap_stationnum }}</td>
                         </tr>
                     </tbody>

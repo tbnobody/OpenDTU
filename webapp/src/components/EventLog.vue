@@ -1,10 +1,10 @@
 <template>
     <table class="table table-hover">
         <thead>
-            <th scope="col">Start</th>
-            <th scope="col">Stop</th>
-            <th scope="col">ID</th>
-            <th scope="col">Message</th>
+            <th scope="col">{{ $t('eventlog.Start') }}</th>
+            <th scope="col">{{ $t('eventlog.Stop') }}</th>
+            <th scope="col">{{ $t('eventlog.Id') }}</th>
+            <th scope="col">{{ $t('eventlog.Message') }}</th>
         </thead>
         <tbody>
             <template v-for="event in eventLogList.count" :key="event">

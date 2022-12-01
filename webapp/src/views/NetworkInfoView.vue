@@ -1,5 +1,5 @@
 <template>
-    <BasePage :title="'Network Info'" :isLoading="dataLoading">
+    <BasePage :title="$t('networkinfo.NetworkInformation')" :isLoading="dataLoading">
         <WifiStationInfo :networkStatus="networkDataList" />
         <div class="mt-5"></div>
         <WifiApInfo :networkStatus="networkDataList" />

@@ -1,27 +1,27 @@
 <template>
     <div class="card">
         <div class="card-header text-bg-primary">
-            Hardware Information
+            {{ $t('hardwareinfo.HardwareInformation') }}
         </div>
         <div class="card-body">
             <div class="table-responsive">
                 <table class="table table-hover table-condensed">
                     <tbody>
                         <tr>
-                            <th>Chip Model</th>
+                            <th>{{ $t('hardwareinfo.ChipModel') }}</th>
                             <td>{{ systemStatus.chipmodel }}</td>
                         </tr>
                         <tr>
-                            <th>Chip Revision</th>
+                            <th>{{ $t('hardwareinfo.ChipRevision') }}</th>
                             <td>{{ systemStatus.chiprevision }}</td>
                         </tr>
                         <tr>
-                            <th>Chip Cores</th>
+                            <th>{{ $t('hardwareinfo.ChipCores') }}</th>
                             <td>{{ systemStatus.chipcores }}</td>
                         </tr>
                         <tr>
-                            <th>CPU Frequency</th>
-                            <td>{{ systemStatus.cpufreq }} MHz</td>
+                            <th>{{ $t('hardwareinfo.CpuFrequency') }}</th>
+                            <td>{{ systemStatus.cpufreq }} {{ $t('hardwareinfo.Mhz') }}</td>
                         </tr>
                     </tbody>
                 </table>

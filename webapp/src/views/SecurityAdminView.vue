@@ -1,15 +1,17 @@
 <template>
-    <BasePage :title="'Security Settings'" :isLoading="dataLoading">
+    <BasePage :title="$t('securityadmin.SecuritySettings')" :isLoading="dataLoading">
         <BootstrapAlert v-model="showAlert" dismissible :variant="alertType">
             {{ alertMessage }}
         </BootstrapAlert>
 
         <form @submit="savePasswordConfig">
             <div class="card">
-                <div class="card-header text-bg-primary">Admin password</div>
+                <div class="card-header text-bg-primary">{{ $t('securityadmin.AdminPassword') }}</div>
                 <div class="card-body">
                     <div class="row mb-3">
-                        <label for="inputPassword" class="col-sm-2 col-form-label">Password:</label>
+                        <label for="inputPassword" class="col-sm-2 col-form-label">
+                            {{ $t('securityadmin.Password') }}
+                        </label>
                         <div class="col-sm-10">
                             <input type="password" class="form-control" id="inputPassword" maxlength="64"
                                 placeholder="Password" v-model="securityConfigList.password" />
@@ -17,27 +19,27 @@
                     </div>
 
                     <div class="row mb-3">
-                        <label for="inputPasswordRepeat" class="col-sm-2 col-form-label">Repeat Password:</label>
+                        <label for="inputPasswordRepeat" class="col-sm-2 col-form-label">
+                            {{ $t('securityadmin.RepeatPassword') }}
+                        </label>
                         <div class="col-sm-10">
                             <input type="password" class="form-control" id="inputPasswordRepeat" maxlength="64"
                                 placeholder="Password" v-model="passwordRepeat" />
                         </div>
                     </div>
 
-                    <div class="alert alert-secondary" role="alert">
-                        <b>Hint:</b>
-                        The administrator password is used to access this web interface (user 'admin'), but also to
-                        connect to the device when in AP mode. It must be 8..64 characters.
-                    </div>
+                    <div class="alert alert-secondary" role="alert" v-html="$t('securityadmin.PasswordHint')"></div>
 
                 </div>
             </div>
 
             <div class="card mt-5">
-                <div class="card-header text-bg-primary">Permissions</div>
+                <div class="card-header text-bg-primary">{{ $t('securityadmin.Permissions') }}</div>
                 <div class="card-body">
                     <div class="row mb-3">
-                        <label class="col-sm-6 form-check-label" for="inputReadonly">Allow readonly access to web interface</label>
+                        <label class="col-sm-6 form-check-label" for="inputReadonly">
+                            {{ $t('securityadmin.ReadOnly') }}
+                        </label>
                         <div class="col-sm-6">
                             <div class="form-check form-switch">
                                 <input class="form-check-input" type="checkbox" id="inputReadonly"
@@ -48,7 +50,7 @@
                 </div>
             </div>
 
-            <button type="submit" class="btn btn-primary mb-3">Save</button>
+            <button type="submit" class="btn btn-primary mb-3">{{ $t('securityadmin.Save') }}</button>
         </form>
     </BasePage>
 </template>

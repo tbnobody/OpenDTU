@@ -1,63 +1,63 @@
 <template>
-    <BasePage :title="'MqTT Info'" :isLoading="dataLoading">
+    <BasePage :title="$t('mqttinfo.MqttInformation')" :isLoading="dataLoading">
         <div class="card">
-            <div class="card-header text-bg-primary">Configuration Summary</div>
+            <div class="card-header text-bg-primary">{{ $t('mqttinfo.ConfigurationSummary') }}</div>
             <div class="card-body">
                 <div class="table-responsive">
                     <table class="table table-hover table-condensed">
                         <tbody>
                             <tr>
-                                <th>Status</th>
+                                <th>{{ $t('mqttinfo.Status') }}</th>
                                 <td class="badge" :class="{
                                     'text-bg-danger': !mqttDataList.mqtt_enabled,
                                     'text-bg-success': mqttDataList.mqtt_enabled,
                                 }">
-                                    <span v-if="mqttDataList.mqtt_enabled">enabled</span>
-                                    <span v-else>disabled</span>
+                                    <span v-if="mqttDataList.mqtt_enabled">{{ $t('mqttinfo.Enabled') }}</span>
+                                    <span v-else>{{ $t('mqttinfo.Disabled') }}</span>
                                 </td>
                             </tr>
                             <tr>
-                                <th>Server</th>
+                                <th>{{ $t('mqttinfo.Server') }}</th>
                                 <td>{{ mqttDataList.mqtt_hostname }}</td>
                             </tr>
                             <tr>
-                                <th>Port</th>
+                                <th>{{ $t('mqttinfo.Port') }}</th>
                                 <td>{{ mqttDataList.mqtt_port }}</td>
                             </tr>
                             <tr>
-                                <th>Username</th>
+                                <th>{{ $t('mqttinfo.Username') }}</th>
                                 <td>{{ mqttDataList.mqtt_username }}</td>
                             </tr>
                             <tr>
-                                <th>Base Topic</th>
+                                <th>{{ $t('mqttinfo.BaseTopic') }}</th>
                                 <td>{{ mqttDataList.mqtt_topic }}</td>
                             </tr>
                             <tr>
-                                <th>Publish Interval</th>
-                                <td>{{ mqttDataList.mqtt_publish_interval }} seconds</td>
+                                <th>{{ $t('mqttinfo.PublishInterval') }}</th>
+                                <td>{{ $t('mqttinfo.Seconds', { sec: mqttDataList.mqtt_publish_interval }) }}</td>
                             </tr>
                             <tr>
-                                <th>Retain</th>
+                                <th>{{ $t('mqttinfo.Retain') }}</th>
                                 <td class="badge" :class="{
                                     'text-bg-danger': !mqttDataList.mqtt_retain,
                                     'text-bg-success': mqttDataList.mqtt_retain,
                                 }">
-                                    <span v-if="mqttDataList.mqtt_retain">enabled</span>
-                                    <span v-else>disabled</span>
+                                    <span v-if="mqttDataList.mqtt_retain">{{ $t('mqttinfo.Enabled') }}</span>
+                                    <span v-else>{{ $t('mqttinfo.Disabled') }}</span>
                                 </td>
                             </tr>
                             <tr>
-                                <th>TLS</th>
+                                <th>{{ $t('mqttinfo.Tls') }}</th>
                                 <td class="badge" :class="{
                                     'text-bg-danger': !mqttDataList.mqtt_tls,
                                     'text-bg-success': mqttDataList.mqtt_tls,
                                 }">
-                                    <span v-if="mqttDataList.mqtt_tls">enabled</span>
-                                    <span v-else>disabled</span>
+                                    <span v-if="mqttDataList.mqtt_tls">{{ $t('mqttinfo.Enabled') }}</span>
+                                    <span v-else>{{ $t('mqttinfo.Disabled') }}</span>
                                 </td>
                             </tr>
                             <tr v-show="mqttDataList.mqtt_tls">
-                                <th>Root CA Certifcate Info</th>
+                                <th>{{ $t('mqttinfo.RootCertifcateInfo') }}</th>
                                 <td>{{ mqttDataList.mqtt_root_ca_cert_info }}</td>
                             </tr>
                         </tbody>
@@ -67,54 +67,54 @@
         </div>
 
         <div class="card mt-5">
-            <div class="card-header text-bg-primary">Home Assistant MQTT Auto Discovery Configuration Summary
-            </div>
+            <div class="card-header text-bg-primary">{{ $t('mqttinfo.HassSummary') }}</div>
             <div class="card-body">
                 <div class="table-responsive">
                     <table class="table table-hover table-condensed">
                         <tbody>
                             <tr>
-                                <th>Status</th>
+                                <th>{{ $t('mqttinfo.Status') }}</th>
                                 <td class="badge" :class="{
                                     'text-bg-danger': !mqttDataList.mqtt_hass_enabled,
                                     'text-bg-success': mqttDataList.mqtt_hass_enabled,
                                 }">
-                                    <span v-if="mqttDataList.mqtt_hass_enabled">enabled</span>
-                                    <span v-else>disabled</span>
+                                    <span v-if="mqttDataList.mqtt_hass_enabled">{{ $t('mqttinfo.Enabled') }}</span>
+                                    <span v-else>{{ $t('mqttinfo.Disabled') }}</span>
                                 </td>
                             </tr>
                             <tr>
-                                <th>Base Topic</th>
+                                <th>{{ $t('mqttinfo.BaseTopic') }}</th>
                                 <td>{{ mqttDataList.mqtt_hass_topic }}</td>
                             </tr>
                             <tr>
-                                <th>Retain</th>
+                                <th>{{ $t('mqttinfo.Retain') }}</th>
                                 <td class="badge" :class="{
                                     'text-bg-danger': !mqttDataList.mqtt_hass_retain,
                                     'text-bg-success': mqttDataList.mqtt_hass_retain,
                                 }">
-                                    <span v-if="mqttDataList.mqtt_hass_retain">enabled</span>
-                                    <span v-else>disabled</span>
+                                    <span v-if="mqttDataList.mqtt_hass_retain">{{ $t('mqttinfo.Enabled') }}</span>
+                                    <span v-else>{{ $t('mqttinfo.Disabled') }}</span>
                                 </td>
                             </tr>
                             <tr>
-                                <th>Expire</th>
+                                <th>{{ $t('mqttinfo.Expire') }}</th>
                                 <td class="badge" :class="{
                                     'text-bg-danger': !mqttDataList.mqtt_hass_expire,
                                     'text-bg-success': mqttDataList.mqtt_hass_expire,
                                 }">
-                                    <span v-if="mqttDataList.mqtt_hass_expire">enabled</span>
-                                    <span v-else>disabled</span>
+                                    <span v-if="mqttDataList.mqtt_hass_expire">{{ $t('mqttinfo.Enabled') }}</span>
+                                    <span v-else>{{ $t('mqttinfo.Disabled') }}</span>
                                 </td>
                             </tr>
                             <tr>
-                                <th>Individual Panels</th>
+                                <th>{{ $t('mqttinfo.IndividualPanels') }}</th>
                                 <td class="badge" :class="{
                                     'text-bg-danger': !mqttDataList.mqtt_hass_individualpanels,
                                     'text-bg-success': mqttDataList.mqtt_hass_individualpanels,
                                 }">
-                                    <span v-if="mqttDataList.mqtt_hass_individualpanels">enabled</span>
-                                    <span v-else>disabled</span>
+                                    <span v-if="mqttDataList.mqtt_hass_individualpanels">{{ $t('mqttinfo.Enabled')
+                                    }}</span>
+                                    <span v-else>{{ $t('mqttinfo.Disabled') }}</span>
                                 </td>
                             </tr>
                         </tbody>
@@ -124,19 +124,19 @@
         </div>
 
         <div class="card mt-5">
-            <div class="card-header text-bg-primary">Runtime Summary</div>
+            <div class="card-header text-bg-primary">{{ $t('mqttinfo.RuntimeSummary') }}</div>
             <div class="card-body">
                 <div class="table-responsive">
                     <table class="table table-hover table-condensed">
                         <tbody>
                             <tr>
-                                <th>Connection Status</th>
+                                <th>{{ $t('mqttinfo.ConnectionStatus') }}</th>
                                 <td class="badge" :class="{
                                     'text-bg-danger': !mqttDataList.mqtt_connected,
                                     'text-bg-success': mqttDataList.mqtt_connected,
                                 }">
-                                    <span v-if="mqttDataList.mqtt_connected">connected</span>
-                                    <span v-else>disconnected</span>
+                                    <span v-if="mqttDataList.mqtt_connected">{{ $t('mqttinfo.Connected') }}</span>
+                                    <span v-else>{{ $t('mqttinfo.Disconnected') }}</span>
                                 </td>
                             </tr>
                         </tbody>

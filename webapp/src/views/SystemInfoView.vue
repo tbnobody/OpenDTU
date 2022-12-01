@@ -1,5 +1,5 @@
 <template>
-    <BasePage :title="'System Info'" :isLoading="dataLoading">
+    <BasePage :title="$t('systeminfo.SystemInfo')" :isLoading="dataLoading">
         <FirmwareInfo :systemStatus="systemDataList" />
         <div class="mt-5"></div>
         <HardwareInfo :systemStatus="systemDataList" />
@@ -58,15 +58,15 @@ export default defineComponent({
                     if (response.ok) {
                         return response.json()
                     }
-                    throw new Error('Error fetching version information');
+                    throw new Error(this.$t("systeminfo.VersionError"));
                 })
                 .then((data) => {
                     if (data.total_commits > 0) {
-                        this.systemDataList.update_text = "New version available! Show changes!"
+                        this.systemDataList.update_text = this.$t("systeminfo.VersionNew");
                         this.systemDataList.update_status = "text-bg-danger";
                         this.systemDataList.update_url = data.html_url;
                     } else {
-                        this.systemDataList.update_text = "Up to date!"
+                        this.systemDataList.update_text = this.$t("systeminfo.VersionOk");
                         this.systemDataList.update_status = "text-bg-success";
                     }
                 })

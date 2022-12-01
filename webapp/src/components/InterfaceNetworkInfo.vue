@@ -1,38 +1,38 @@
 <template>
     <div class="card">
         <div class="card-header text-bg-primary">
-            Network Interface ({{ networkStatus.network_mode }})
+            {{ $t('interfacenetworkinfo.NetworkInterface', { iface: networkStatus.network_mode }) }}
         </div>
         <div class="card-body">
             <div class="table-responsive">
                 <table class="table table-hover table-condensed">
                     <tbody>
                         <tr>
-                            <th>Hostname</th>
+                            <th>{{ $t('interfacenetworkinfo.Hostname') }}</th>
                             <td>{{ networkStatus.network_hostname }}</td>
                         </tr>
                         <tr>
-                            <th>IP Address</th>
+                            <th>{{ $t('interfacenetworkinfo.IpAddress') }}</th>
                             <td>{{ networkStatus.network_ip }}</td>
                         </tr>
                         <tr>
-                            <th>Netmask</th>
+                            <th>{{ $t('interfacenetworkinfo.Netmask') }}</th>
                             <td>{{ networkStatus.network_netmask }}</td>
                         </tr>
                         <tr>
-                            <th>Default Gateway</th>
+                            <th>{{ $t('interfacenetworkinfo.DefaultGateway') }}</th>
                             <td>{{ networkStatus.network_gateway }}</td>
                         </tr>
                         <tr>
-                            <th>DNS 1</th>
+                            <th>{{ $t('interfacenetworkinfo.Dns', { num: 1 }) }}</th>
                             <td>{{ networkStatus.network_dns1 }}</td>
                         </tr>
                         <tr>
-                            <th>DNS 2</th>
+                            <th>{{ $t('interfacenetworkinfo.Dns', { num: 2 }) }}</th>
                             <td>{{ networkStatus.network_dns2 }}</td>
                         </tr>
                         <tr>
-                            <th>MAC Address</th>
+                            <th>{{ $t('interfacenetworkinfo.MacAddress') }}</th>
                             <td>{{ networkStatus.network_mac }}</td>
                         </tr>
                     </tbody>

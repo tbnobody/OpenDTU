@@ -1,17 +1,17 @@
 <template>
-    <BasePage :title="'NTP Settings'" :isLoading="dataLoading || timezoneLoading">
+    <BasePage :title="$t('ntpadmin.NtpSettings')" :isLoading="dataLoading || timezoneLoading">
         <BootstrapAlert v-model="showAlert" dismissible :variant="alertType">
             {{ alertMessage }}
         </BootstrapAlert>
 
         <form @submit="saveNtpConfig">
             <div class="card">
-                <div class="card-header text-bg-primary">NTP Configuration</div>
+                <div class="card-header text-bg-primary">{{ $t('ntpadmin.NtpConfiguration') }}</div>
                 <div class="card-body">
                     <div class="row mb-3">
-                        <label for="inputNtpServer" class="col-sm-2 col-form-label">Time Server:
-                            <BIconInfoCircle v-tooltip
-                                title="The default value is fine as long as OpenDTU has direct access to the internet." />
+                        <label for="inputNtpServer" class="col-sm-2 col-form-label">
+                            {{ $t('ntpadmin.TimeServer') }}
+                            <BIconInfoCircle v-tooltip :title="$t('ntpadmin.TimeServerHint')" />
                         </label>
                         <div class="col-sm-10">
                             <input type="text" class="form-control" id="inputNtpServer" maxlength="32"
@@ -20,7 +20,7 @@
                     </div>
 
                     <div class="row mb-3">
-                        <label for="inputTimezone" class="col-sm-2 col-form-label">Timezone:</label>
+                        <label for="inputTimezone" class="col-sm-2 col-form-label">{{ $t('ntpadmin.Timezone') }}</label>
                         <div class="col-sm-10">
                             <select class="form-select" v-model="timezoneSelect">
                                 <option v-for="(config, name) in timezoneList" :key="name + '---' + config"
@@ -32,7 +32,9 @@
                     </div>
 
                     <div class="row mb-3">
-                        <label for="inputTimezoneConfig" class="col-sm-2 col-form-label">Timezone Config:</label>
+                        <label for="inputTimezoneConfig" class="col-sm-2 col-form-label">
+                            {{ $t('ntpadmin.TimezoneConfig') }}
+                        </label>
                         <div class="col-sm-10">
                             <input type="text" class="form-control" id="inputTimezoneConfig" maxlength="32"
                                 placeholder="Timezone" v-model="ntpConfigList.ntp_timezone" disabled />
@@ -40,35 +42,34 @@
                     </div>
                 </div>
             </div>
-            <button type="submit" class="btn btn-primary mb-3">Save</button>
+            <button type="submit" class="btn btn-primary mb-3">{{ $t('ntpadmin.Save') }}</button>
         </form>
 
         <div class="card">
-            <div class="card-header text-bg-primary">Manual Time Synchronization</div>
+            <div class="card-header text-bg-primary">{{ $t('ntpadmin.ManualTimeSynchronization') }}</div>
             <div class="card-body">
                 <div class="row mb-3">
-                    <label for="currentMcuTime" class="col-sm-2 col-form-label">Current OpenDTU Time:</label>
+                    <label for="currentMcuTime" class="col-sm-2 col-form-label">
+                        {{ $t('ntpadmin.CurrentOpenDtuTime') }}
+                    </label>
                     <div class="col-sm-10">
                         <input type="text" class="form-control" id="currentMcuTime" v-model="mcuTime" disabled />
                     </div>
                 </div>
                 <div class="row mb-3">
-                    <label for="currentLocalTime" class="col-sm-2 col-form-label">Current Local Time:</label>
+                    <label for="currentLocalTime" class="col-sm-2 col-form-label">
+                        {{ $t('ntpadmin.CurrentLocalTime') }}
+                    </label>
                     <div class="col-sm-10">
                         <input type="text" class="form-control" id="currentLocalTime" v-model="localTime" disabled />
                     </div>
                 </div>
                 <div class="text-center mb-3">
-                    <button type="button" class="btn btn-danger" @click="setCurrentTime()"
-                        title="Synchronize Time">Synchronize Time
+                    <button type="button" class="btn btn-danger" @click="setCurrentTime()">
+                        {{ $t('ntpadmin.SynchronizeTime') }}
                     </button>
                 </div>
-                <div class="alert alert-secondary" role="alert">
-                    <b>Hint:</b> You can use the manual time synchronization to set the current time of OpenDTU if
-                    no NTP server is available. But be aware, that in case of power cycle the time gets lost. Also
-                    note that time accuracy will be skewed badly, as it can not be resynchronised regularly and the
-                    ESP32 microcontroller does not have a real time clock.
-                </div>
+                <div class="alert alert-secondary" role="alert" v-html="$t('ntpadmin.SynchronizeTimeHint')"></div>
 
             </div>
         </div>

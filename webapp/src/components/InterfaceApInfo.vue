@@ -1,18 +1,18 @@
 <template>
     <div class="card">
         <div class="card-header text-bg-primary">
-            Network Interface (Access Point)
+            {{ $t('interfaceapinfo.NetworkInterface') }}
         </div>
         <div class="card-body">
             <div class="table-responsive">
                 <table class="table table-hover table-condensed">
                     <tbody>
                         <tr>
-                            <th>IP Address</th>
+                            <th>{{ $t('interfaceapinfo.IpAddress') }}</th>
                             <td>{{ networkStatus.ap_ip }}</td>
                         </tr>
                         <tr>
-                            <th>MAC Address</th>
+                            <th>{{ $t('interfaceapinfo.MacAddress') }}</th>
                             <td>{{ networkStatus.ap_mac }}</td>
                         </tr>
                     </tbody>

@@ -1,40 +1,38 @@
 <template>
     <BootstrapAlert :show="!devInfoList.valid_data">
         <h4 class="alert-heading">
-            <BIconInfoSquare class="fs-2" />&nbsp;No Information available
-        </h4>Did not receive any valid data from the inverter till now. Still trying...
+            <BIconInfoSquare class="fs-2" />&nbsp;{{ $t('devinfo.NoInfo') }}
+        </h4>{{ $t('devinfo.NoInfoLong') }}
     </BootstrapAlert>
     <table v-if="devInfoList.valid_data" class="table table-hover">
         <tbody>
             <tr>
-                <td>Model</td>
+                <td>{{ $t('devinfo.Model') }}</td>
                 <td v-if="devInfoList.hw_model_name != ''">{{ devInfoList.hw_model_name }}</td>
-                <td v-else>Unknown model! Please report the "Hardware Part Number" and model (e.g. HM-350) as an issue
-                    <a href="https://github.com/tbnobody/OpenDTU/issues" target="_blank">here</a>.
-                </td>
+                <td v-else v-html="$t('devinfo.UnknownModel')"></td>
             </tr>
             <tr>
-                <td>Detected max. Power</td>
+                <td>{{ $t('devinfo.DetectedMaxPower') }}</td>
                 <td>{{ devInfoList.max_power }} W</td>
             </tr>
             <tr>
-                <td>Bootloader Version</td>
+                <td>{{ $t('devinfo.BootloaderVersion') }}</td>
                 <td>{{ formatVersion(devInfoList.fw_bootloader_version) }}</td>
             </tr>
             <tr>
-                <td>Firmware Version</td>
+                <td>{{ $t('devinfo.FirmwareVersion') }}</td>
                 <td>{{ formatVersion(devInfoList.fw_build_version) }}</td>
             </tr>
             <tr>
-                <td>Firmware Build Date</td>
+                <td>{{ $t('devinfo.FirmwareBuildDate') }}</td>
                 <td>{{ devInfoList.fw_build_datetime }}</td>
             </tr>
             <tr>
-                <td>Hardware Part Number</td>
+                <td>{{ $t('devinfo.HardwarePartNumber') }}</td>
                 <td>{{ devInfoList.hw_part_number }}</td>
             </tr>
             <tr>
-                <td>Hardware Version</td>
+                <td>{{ $t('devinfo.HardwareVersion') }}</td>
                 <td>{{ devInfoList.hw_version }}</td>
             </tr>
         </tbody>

@@ -1,15 +1,15 @@
 <template>
-    <BasePage :title="'Firmware Upgrade'">
+    <BasePage :title="$t('firmwareupgrade.FirmwareUpgrade')">
         <div class="position-relative" v-if="loading">
             <div class="position-absolute top-50 start-50 translate-middle">
                 <div class="spinner-border" role="status">
-                    <span class="visually-hidden">Loading...</span>
+                    <span class="visually-hidden">{{ $t('firmwareupgrade.Loading') }}</span>
                 </div>
             </div>
         </div>
 
         <div v-if="!loading && !uploading && OTAError != ''" class="card">
-            <div class="card-header text-bg-danger">OTA Error</div>
+            <div class="card-header text-bg-danger">{{ $t('firmwareupgrade.OtaError') }}</div>
             <div class="card-body text-center">
                 <p class="h1 mb-2">
                     <BIconExclamationCircleFill />
@@ -21,31 +21,31 @@
                 <br />
                 <br />
                 <button class="btn btn-light" @click="clear">
-                    <BIconArrowLeft /> Back
+                    <BIconArrowLeft /> {{ $t('firmwareupgrade.Back') }}
                 </button>
                 <button class="btn btn-primary" @click="retryOTA">
-                    <BIconArrowRepeat /> Retry
+                    <BIconArrowRepeat /> {{ $t('firmwareupgrade.Retry') }}
                 </button>
             </div>
         </div>
 
         <div v-else-if="!loading && !uploading && OTASuccess" class="card">
-            <div class="card-header text-bg-success">OTA Status</div>
+            <div class="card-header text-bg-success">{{ $t('firmwareupgrade.OtaStatus') }}</div>
             <div class="card-body text-center">
                 <span class="h1 mb-2">
                     <BIconCheckCircle />
                 </span>
-                <span> OTA Success. The unit has been automatically restarted and will be available again in a few moments. </span>
+                <span> {{ $t('firmwareupgrade.OtaSuccess') }} </span>
                 <br />
                 <br />
                 <button class="btn btn-primary" @click="clear">
-                    <BIconArrowLeft /> Back
+                    <BIconArrowLeft /> {{ $t('firmwareupgrade.Back') }}
                 </button>
             </div>
         </div>
 
         <div v-else-if="!loading && !uploading" class="card">
-            <div class="card-header text-bg-primary">Firmware Upload</div>
+            <div class="card-header text-bg-primary">{{ $t('firmwareupgrade.FirmwareUpload') }}</div>
             <div class="card-body text-center">
                 <div class="form-group pt-2 mt-3">
                     <input class="form-control" type="file" ref="file" accept=".bin,.bin.gz" @change="uploadOTA" />
@@ -54,7 +54,7 @@
         </div>
 
         <div v-else-if="!loading && uploading" class="card">
-            <div class="card-header text-bg-primary">Upload Progress</div>
+            <div class="card-header text-bg-primary">{{ $t('firmwareupgrade.UploadProgress') }}</div>
             <div class="card-body text-center">
                 <div class="progress">
                     <div class="progress-bar" role="progressbar" :style="{ width: progress + '%' }"

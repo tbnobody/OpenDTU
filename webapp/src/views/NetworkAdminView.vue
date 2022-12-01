@@ -1,44 +1,50 @@
 <template>
-    <BasePage :title="'Network Settings'" :isLoading="dataLoading">
+    <BasePage :title="$t('networkadmin.NetworkSettings')" :isLoading="dataLoading">
         <BootstrapAlert v-model="showAlert" dismissible :variant="alertType">
             {{ alertMessage }}
         </BootstrapAlert>
 
         <form @submit="saveNetworkConfig">
             <div class="card">
-                <div class="card-header text-bg-primary">WiFi Configuration</div>
+                <div class="card-header text-bg-primary">{{ $t('networkadmin.WifiConfiguration') }}</div>
                 <div class="card-body">
                     <div class="row mb-3">
-                        <label for="inputSSID" class="col-sm-2 col-form-label">WiFi SSID:</label>
+                        <label for="inputSSID" class="col-sm-2 col-form-label">
+                            {{ $t('networkadmin.WifiSsid') }}
+                        </label>
                         <div class="col-sm-10">
-                            <input type="text" class="form-control" id="inputSSID" maxlength="32" placeholder="SSID"
+                            <input type="text" class="form-control" id="inputSSID" maxlength="32"
                                 v-model="networkConfigList.ssid" />
                         </div>
                     </div>
 
                     <div class="row mb-3">
-                        <label for="inputPassword" class="col-sm-2 col-form-label">WiFi Password:</label>
+                        <label for="inputPassword" class="col-sm-2 col-form-label">
+                            {{ $t('networkadmin.WifiPassword') }}
+                        </label>
                         <div class="col-sm-10">
                             <input type="password" class="form-control" id="inputPassword" maxlength="64"
-                                placeholder="PSK" v-model="networkConfigList.password" />
+                                v-model="networkConfigList.password" />
                         </div>
                     </div>
 
                     <div class="row mb-3">
-                        <label for="inputHostname" class="col-sm-2 col-form-label">Hostname:</label>
+                        <label for="inputHostname" class="col-sm-2 col-form-label">
+                            {{ $t('networkadmin.Hostname') }}
+                        </label>
                         <div class="col-sm-10">
                             <input type="text" class="form-control" id="inputHostname" maxlength="32"
-                                placeholder="Hostname" v-model="networkConfigList.hostname" />
+                                v-model="networkConfigList.hostname" />
 
-                            <div class="alert alert-secondary" role="alert">
-                                <b>Hint:</b> The text <span class="font-monospace">%06X</span> will be replaced
-                                with the last 6 digits of the ESP ChipID in hex format.
+                            <div class="alert alert-secondary" role="alert" v-html="$t('networkadmin.HostnameHint')">
                             </div>
                         </div>
                     </div>
 
                     <div class="row mb-3">
-                        <label class="col-sm-2 form-check-label" for="inputDHCP">Enable DHCP</label>
+                        <label class="col-sm-2 form-check-label" for="inputDHCP">
+                            {{ $t('networkadmin.EnableDhcp') }}
+                        </label>
                         <div class="col-sm-10">
                             <div class="form-check form-switch">
                                 <input class="form-check-input" type="checkbox" id="inputDHCP"
@@ -51,51 +57,59 @@
 
             <div class="card" v-show="!networkConfigList.dhcp">
                 <div class="card-header text-bg-primary">
-                    Static IP Configuration
+                    {{ $t('networkadmin.StaticIpConfiguration') }}
                 </div>
                 <div class="card-body">
                     <div class="row mb-3">
-                        <label for="inputIP" class="col-sm-2 col-form-label">IP Address:</label>
+                        <label for="inputIP" class="col-sm-2 col-form-label">{{ $t('networkadmin.IpAddress') }}</label>
                         <div class="col-sm-10">
-                            <input type="text" class="form-control" id="inputIP" maxlength="32" placeholder="IP address"
+                            <input type="text" class="form-control" id="inputIP" maxlength="32"
                                 v-model="networkConfigList.ipaddress" />
                         </div>
                     </div>
 
                     <div class="row mb-3">
-                        <label for="inputNetmask" class="col-sm-2 col-form-label">Netmask:</label>
+                        <label for="inputNetmask" class="col-sm-2 col-form-label">
+                            {{ $t('networkadmin.Netmask') }}
+                        </label>
                         <div class="col-sm-10">
                             <input type="text" class="form-control" id="inputNetmask" maxlength="32"
-                                placeholder="Netmask" v-model="networkConfigList.netmask" />
+                                v-model="networkConfigList.netmask" />
                         </div>
                     </div>
 
                     <div class="row mb-3">
-                        <label for="inputGateway" class="col-sm-2 col-form-label">Default Gateway:</label>
+                        <label for="inputGateway" class="col-sm-2 col-form-label">
+                            {{ $t('networkadmin.DefaultGateway') }}
+                        </label>
                         <div class="col-sm-10">
                             <input type="text" class="form-control" id="inputGateway" maxlength="32"
-                                placeholder="Default Gateway" v-model="networkConfigList.gateway" />
+                                v-model="networkConfigList.gateway" />
                         </div>
                     </div>
 
                     <div class="row mb-3">
-                        <label for="inputDNS1" class="col-sm-2 col-form-label">DNS Server 1:</label>
+                        <label for="inputDNS1" class="col-sm-2 col-form-label">
+                            {{ $t('networkadmin.Dns', { num: 1 }) }}
+                        </label>
                         <div class="col-sm-10">
                             <input type="text" class="form-control" id="inputDNS1" maxlength="32"
-                                placeholder="DNS Server 1" v-model="networkConfigList.dns1" />
+                                v-model="networkConfigList.dns1" />
                         </div>
                     </div>
 
                     <div class="row mb-3">
-                        <label for="inputDNS2" class="col-sm-2 col-form-label">DNS Server 2:</label>
+                        <label for="inputDNS2" class="col-sm-2 col-form-label">
+                            {{ $t('networkadmin.Dns', { num: 2 }) }}
+                        </label>
                         <div class="col-sm-10">
                             <input type="text" class="form-control" id="inputDNS2" maxlength="32"
-                                placeholder="DNS Server 2" v-model="networkConfigList.dns2" />
+                                v-model="networkConfigList.dns2" />
                         </div>
                     </div>
                 </div>
             </div>
-            <button type="submit" class="btn btn-primary mb-3">Save</button>
+            <button type="submit" class="btn btn-primary mb-3">{{ $t('networkadmin.Save') }}</button>
         </form>
     </BasePage>
 </template>

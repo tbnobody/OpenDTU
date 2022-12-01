@@ -1,20 +1,24 @@
 <template>
-    <BasePage :title="'Console'" :isLoading="dataLoading">
+    <BasePage :title="$t('console.Console')" :isLoading="dataLoading">
         <div class="card">
-            <div class="card-header text-bg-primary">Virtual debug console</div>
+            <div class="card-header text-bg-primary">{{ $t('console.VirtualDebugConsole') }}</div>
             <div class="card-body">
                 <div class="row g-3 align-items-center">
                     <div class="col">
                         <div class="form-check form-switch">
                             <input class="form-check-input" type="checkbox" role="switch" id="autoScroll"
                                 v-model="isAutoScroll">
-                            <label class="form-check-label" for="autoScroll">Enable Auto Scroll</label>
+                            <label class="form-check-label" for="autoScroll">
+                                {{ $t('console.EnableAutoScroll') }}
+                            </label>
                         </div>
                     </div>
                     <div class="col text-end">
                         <div class="btn-group" role="group">
-                            <button type="button" class="btn btn-primary" :onClick="clearConsole">Clear Console</button>
-                            <button type="button" class="btn btn-secondary" :onClick="copyConsole">Copy to clipboard</button>
+                            <button type="button" class="btn btn-primary" :onClick="clearConsole">
+                                {{ $t('console.ClearConsole') }}</button>
+                            <button type="button" class="btn btn-secondary" :onClick="copyConsole">
+                                {{ $t('console.CopyToClipboard') }}</button>
                         </div>
                     </div>
                 </div>

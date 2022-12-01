@@ -1,20 +1,16 @@
 <template>
     <BootstrapAlert :show="hints.radio_problem" variant="danger">
-        <BIconBroadcast class="fs-4" /> Could not connect to a correct NRF24L01+ radio module. Please check the wiring.
+        <BIconBroadcast class="fs-4" /> {{ $t('hints.RadioProblem') }}
     </BootstrapAlert>
 
     <BootstrapAlert :show="hints.time_sync" variant="danger">
-        <BIconClock class="fs-4" /> The clock has not yet been synchronised. Without a
-        correctly set clock, no requests are made to the inverter. This is normal shortly after the start. However,
-        after a longer runtime (>1 minute), it indicates that the NTP server is not accessible. <a
-            @click="gotoTimeSettings" href="#" class="alert-link">Please check your time
-            settings.</a>
+        <BIconClock class="fs-4" /> {{ $t('hints.TimeSync') }}
+        <a @click="gotoTimeSettings" href="#" class="alert-link">{{ $t('hints.TimeSyncLink') }}</a>
     </BootstrapAlert>
 
     <BootstrapAlert :show="hints.default_password" variant="danger">
-        <BIconExclamationCircle class="fs-4" /> You are using the default password for the web interface and the
-        emergency access point. This is potentially insecure. <a @click="gotoPasswordSettings" href="#"
-            class="alert-link">Please change the password.</a>
+        <BIconExclamationCircle class="fs-4" /> {{ $t('hints.DefaultPassword') }}
+        <a @click="gotoPasswordSettings" href="#" class="alert-link">{{ $t('hints.DefaultPasswordLink') }}</a>
     </BootstrapAlert>
 </template>
 

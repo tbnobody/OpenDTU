@@ -1,15 +1,17 @@
 <template>
-    <BasePage :title="'MqTT Settings'" :isLoading="dataLoading">
+    <BasePage :title="$t('mqttadmin.MqttSettings')" :isLoading="dataLoading">
         <BootstrapAlert v-model="showAlert" dismissible :variant="alertType">
             {{ alertMessage }}
         </BootstrapAlert>
 
         <form @submit="saveMqttConfig">
             <div class="card">
-                <div class="card-header text-bg-primary">MqTT Configuration</div>
+                <div class="card-header text-bg-primary">{{ $t('mqttadmin.MqttConfiguration') }}</div>
                 <div class="card-body">
                     <div class="row mb-3">
-                        <label class="col-sm-4 form-check-label" for="inputMqtt">Enable MqTT</label>
+                        <label class="col-sm-4 form-check-label" for="inputMqtt">
+                            {{ $t('mqttadmin.EnableMqtt') }}
+                        </label>
                         <div class="col-sm-8">
                             <div class="form-check form-switch">
                                 <input class="form-check-input" type="checkbox" id="inputMqtt"
@@ -19,8 +21,9 @@
                     </div>
 
                     <div class="row mb-3" v-show="mqttConfigList.mqtt_enabled">
-                        <label class="col-sm-4 form-check-label" for="inputMqttHass">Enable Home Assistant MQTT Auto
-                            Discovery</label>
+                        <label class="col-sm-4 form-check-label" for="inputMqttHass">
+                            {{ $t('mqttadmin.EnableHass') }}
+                        </label>
                         <div class="col-sm-8">
                             <div class="form-check form-switch">
                                 <input class="form-check-input" type="checkbox" id="inputMqttHass"
@@ -33,67 +36,78 @@
 
             <div class="card mt-5" v-show="mqttConfigList.mqtt_enabled">
                 <div class="card-header text-bg-primary">
-                    MqTT Broker Parameter
+                    {{ $t('mqttadmin.MqttBrokerParameter') }}
                 </div>
                 <div class="card-body">
                     <div class="row mb-3">
-                        <label for="inputHostname" class="col-sm-2 col-form-label">Hostname:</label>
+                        <label for="inputHostname" class="col-sm-2 col-form-label">
+                            {{ $t('mqttadmin.Hostname') }}
+                        </label>
                         <div class="col-sm-10">
                             <input type="text" class="form-control" id="inputHostname" maxlength="128"
-                                placeholder="Hostname or IP address" v-model="mqttConfigList.mqtt_hostname" />
+                                :placeholder="$t('mqttadmin.HostnameHint')" v-model="mqttConfigList.mqtt_hostname" />
                         </div>
                     </div>
 
                     <div class="row mb-3">
-                        <label for="inputPort" class="col-sm-2 col-form-label">Port:</label>
+                        <label for="inputPort" class="col-sm-2 col-form-label">
+                            {{ $t('mqttadmin.Port') }}
+                        </label>
                         <div class="col-sm-10">
                             <input type="number" class="form-control" id="inputPort" min="1" max="65535"
-                                placeholder="Port number" v-model="mqttConfigList.mqtt_port" />
+                                v-model="mqttConfigList.mqtt_port" />
                         </div>
                     </div>
 
                     <div class="row mb-3">
-                        <label for="inputUsername" class="col-sm-2 col-form-label">Username:</label>
+                        <label for="inputUsername" class="col-sm-2 col-form-label">
+                            {{ $t('mqttadmin.Username') }}
+                        </label>
                         <div class="col-sm-10">
                             <input type="text" class="form-control" id="inputUsername" maxlength="64"
-                                placeholder="Username, leave empty for anonymous connection"
-                                v-model="mqttConfigList.mqtt_username" />
+                                :placeholder="$t('mqttadmin.UsernameHint')" v-model="mqttConfigList.mqtt_username" />
                         </div>
                     </div>
 
                     <div class="row mb-3">
-                        <label for="inputPassword" class="col-sm-2 col-form-label">Password:</label>
+                        <label for="inputPassword" class="col-sm-2 col-form-label">
+                            {{ $t('mqttadmin.Password') }}
+                        </label>
                         <div class="col-sm-10">
                             <input type="password" class="form-control" id="inputPassword" maxlength="64"
-                                placeholder="Password, leave empty for anonymous connection"
-                                v-model="mqttConfigList.mqtt_password" />
+                                :placeholder="$t('mqttadmin.PasswordHint')" v-model="mqttConfigList.mqtt_password" />
                         </div>
                     </div>
 
                     <div class="row mb-3">
-                        <label for="inputTopic" class="col-sm-2 col-form-label">Base Topic:</label>
+                        <label for="inputTopic" class="col-sm-2 col-form-label">
+                            {{ $t('mqttadmin.BaseTopic') }}</label>
                         <div class="col-sm-10">
                             <input type="text" class="form-control" id="inputTopic" maxlength="32"
-                                placeholder="Base topic, will be prepend to all published topics (e.g. inverter/)"
-                                v-model="mqttConfigList.mqtt_topic" />
+                                :placeholder="$t('mqttadmin.BaseTopicHint')" v-model="mqttConfigList.mqtt_topic" />
                         </div>
                     </div>
 
                     <div class="row mb-3">
-                        <label for="inputPublishInterval" class="col-sm-2 col-form-label">Publish Interval:</label>
+                        <label for="inputPublishInterval" class="col-sm-2 col-form-label">
+                            {{ $t('mqttadmin.PublishInterval') }}
+                        </label>
                         <div class="col-sm-10">
                             <div class="input-group">
                                 <input type="number" class="form-control" id="inputPublishInterval" min="5" max="86400"
                                     placeholder="Publish Interval in Seconds"
                                     v-model="mqttConfigList.mqtt_publish_interval"
                                     aria-describedby="publishIntervalDescription" />
-                                <span class="input-group-text" id="publishIntervalDescription">seconds</span>
+                                <span class="input-group-text" id="publishIntervalDescription">
+                                    {{ $t('mqttadmin.Seconds') }}</span>
                             </div>
                         </div>
                     </div>
 
                     <div class="row mb-3">
-                        <label class="col-sm-2 form-check-label" for="inputRetain">Enable Retain Flag</label>
+                        <label class="col-sm-2 form-check-label" for="inputRetain">
+                            {{ $t('mqttadmin.EnableRetain') }}
+                        </label>
                         <div class="col-sm-10">
                             <div class="form-check form-switch">
                                 <input class="form-check-input" type="checkbox" id="inputRetain"
@@ -103,7 +117,9 @@
                     </div>
 
                     <div class="row mb-3">
-                        <label class="col-sm-2 form-check-label" for="inputTls">Enable TLS</label>
+                        <label class="col-sm-2 form-check-label" for="inputTls">
+                            {{ $t('mqttadmin.EnableTls') }}
+                        </label>
                         <div class="col-sm-10">
                             <div class="form-check form-switch">
                                 <input class="form-check-input" type="checkbox" id="inputTls"
@@ -113,13 +129,13 @@
                     </div>
 
                     <div class="row mb-3" v-show="mqttConfigList.mqtt_tls">
-                        <label for="inputCert" class="col-sm-2 col-form-label">CA-Root-Certificate (default
-                            Letsencrypt):</label>
+                        <label for="inputCert" class="col-sm-2 col-form-label">
+                            {{ $t('mqttadmin.RootCa') }}
+                        </label>
                         <div class="col-sm-10">
                             <textarea class="form-control" id="inputCert" maxlength="2048" rows="10"
-                                placeholder="Root CA Certificate from Letsencrypt"
                                 v-model="mqttConfigList.mqtt_root_ca_cert">
-                                </textarea>
+                            </textarea>
                         </div>
                     </div>
 
@@ -127,36 +143,41 @@
             </div>
 
             <div class="card mt-5" v-show="mqttConfigList.mqtt_enabled">
-                <div class="card-header text-bg-primary">LWT Parameters</div>
+                <div class="card-header text-bg-primary">{{ $t('mqttadmin.LwtParameters') }}</div>
                 <div class="card-body">
                     <div class="row mb-3">
-                        <label for="inputLwtTopic" class="col-sm-2 col-form-label">LWT Topic:</label>
+                        <label for="inputLwtTopic" class="col-sm-2 col-form-label">
+                            {{ $t('mqttadmin.LwtTopic') }}
+                        </label>
                         <div class="col-sm-10">
                             <div class="input-group">
-                                <span class="input-group-text" id="basic-addon3">{{
-                                mqttConfigList.mqtt_topic
-                                }}</span>
+                                <span class="input-group-text" id="basic-addon3">
+                                    {{ mqttConfigList.mqtt_topic }}
+                                </span>
                                 <input type="text" class="form-control" id="inputLwtTopic" maxlength="32"
-                                    placeholder="LWT topic, will be append base topic"
-                                    v-model="mqttConfigList.mqtt_lwt_topic" aria-describedby="basic-addon3" />
+                                    :placeholder="$t('mqttadmin.LwtTopicHint')" aria-describedby="basic-addon3"
+                                    v-model="mqttConfigList.mqtt_lwt_topic" />
                             </div>
                         </div>
                     </div>
 
                     <div class="row mb-3">
-                        <label for="inputLwtOnline" class="col-sm-2 col-form-label">LWT Online message:</label>
+                        <label for="inputLwtOnline" class="col-sm-2 col-form-label">
+                            {{ $t('mqttadmin.LwtOnline') }}
+                        </label>
                         <div class="col-sm-10">
                             <input type="text" class="form-control" id="inputLwtOnline" maxlength="20"
-                                placeholder="Message that will be published to LWT topic when online"
-                                v-model="mqttConfigList.mqtt_lwt_online" />
+                                :placeholder="$t('mqttadmin.LwtOnlineHint')" v-model="mqttConfigList.mqtt_lwt_online" />
                         </div>
                     </div>
 
                     <div class="row mb-3">
-                        <label for="inputLwtOffline" class="col-sm-2 col-form-label">LWT Offline message:</label>
+                        <label for="inputLwtOffline" class="col-sm-2 col-form-label">
+                            {{ $t('mqttadmin.LwtOffline') }}
+                        </label>
                         <div class="col-sm-10">
                             <input type="text" class="form-control" id="inputLwtOffline" maxlength="20"
-                                placeholder="Message that will be published to LWT topic when offline"
+                                :placeholder="$t('mqttadmin.LwtOfflineHint')"
                                 v-model="mqttConfigList.mqtt_lwt_offline" />
                         </div>
                     </div>
@@ -164,19 +185,23 @@
             </div>
 
             <div class="card mt-5" v-show="mqttConfigList.mqtt_enabled && mqttConfigList.mqtt_hass_enabled">
-                <div class="card-header text-bg-primary">Home Assistant MQTT Auto Discovery Parameters</div>
+                <div class="card-header text-bg-primary">{{ $t('mqttadmin.HassParameters') }}</div>
                 <div class="card-body">
                     <div class="row mb-3">
-                        <label for="inputHassTopic" class="col-sm-2 col-form-label">Prefix Topic:</label>
+                        <label for="inputHassTopic" class="col-sm-2 col-form-label">
+                            {{ $t('mqttadmin.HassPrefixTopic') }}
+                        </label>
                         <div class="col-sm-10">
                             <input type="text" class="form-control" id="inputHassTopic" maxlength="32"
-                                placeholder="The prefix for the discovery topic"
+                                :placeholder="$t('mqttadmin.HassPrefixTopicHint')"
                                 v-model="mqttConfigList.mqtt_hass_topic" />
                         </div>
                     </div>
 
                     <div class="row mb-3">
-                        <label class="col-sm-2 form-check-label" for="inputHassRetain">Enable Retain Flag</label>
+                        <label class="col-sm-2 form-check-label" for="inputHassRetain">
+                            {{ $t('mqttadmin.HassRetain') }}
+                        </label>
                         <div class="col-sm-10">
                             <div class="form-check form-switch">
                                 <input class="form-check-input" type="checkbox" id="inputHassRetain"
@@ -186,7 +211,9 @@
                     </div>
 
                     <div class="row mb-3">
-                        <label class="col-sm-2 form-check-label" for="inputHassExpire">Enable Expiration</label>
+                        <label class="col-sm-2 form-check-label" for="inputHassExpire">
+                            {{ $t('mqttadmin.HassExpire') }}
+                        </label>
                         <div class="col-sm-10">
                             <div class="form-check form-switch">
                                 <input class="form-check-input" type="checkbox" id="inputHassExpire"
@@ -196,8 +223,9 @@
                     </div>
 
                     <div class="row mb-3">
-                        <label class="col-sm-2 form-check-label" for="inputIndividualPanels">Individual
-                            Panels:</label>
+                        <label class="col-sm-2 form-check-label" for="inputIndividualPanels">
+                            {{ $t('mqttadmin.HassIndividual') }}
+                        </label>
                         <div class="col-sm-10">
                             <div class="form-check form-switch">
                                 <input class="form-check-input" type="checkbox" id="inputIndividualPanels"
@@ -209,7 +237,7 @@
                 </div>
             </div>
 
-            <button type="submit" class="btn btn-primary mb-3">Save</button>
+            <button type="submit" class="btn btn-primary mb-3">{{ $t('mqttadmin.Save') }}</button>
         </form>
     </BasePage>
 </template>

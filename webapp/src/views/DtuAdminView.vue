@@ -1,42 +1,43 @@
 <template>
-    <BasePage :title="'DTU Settings'" :isLoading="dataLoading">
+    <BasePage :title="$t('dtuadmin.DtuSettings')" :isLoading="dataLoading">
         <BootstrapAlert v-model="showAlert" dismissible :variant="alertType">
             {{ alertMessage }}
         </BootstrapAlert>
 
         <form @submit="saveDtuConfig">
             <div class="card">
-                <div class="card-header text-bg-primary">DTU Configuration</div>
+                <div class="card-header text-bg-primary">{{ $t('dtuadmin.DtuConfiguration') }}</div>
                 <div class="card-body">
                     <div class="row mb-3">
-                        <label for="inputDtuSerial" class="col-sm-2 col-form-label">Serial:
-                            <BIconInfoCircle v-tooltip title="Both the inverter and the DTU have a serial number. 
-                                The DTU serial number is randomly generated at the first start and does not 
-                                normally need to be changed." />
-
+                        <label for="inputDtuSerial" class="col-sm-2 col-form-label">{{ $t('dtuadmin.Serial') }}
+                            <BIconInfoCircle v-tooltip :title="$t('dtuadmin.SerialHint')" />
                         </label>
                         <div class="col-sm-10">
                             <input type="number" class="form-control" id="inputDtuSerial" min="1" max="199999999999"
-                                placeholder="DTU Serial" v-model="dtuConfigList.dtu_serial" />
+                                v-model="dtuConfigList.dtu_serial" />
                         </div>
                     </div>
 
                     <div class="row mb-3">
-                        <label for="inputPollInterval" class="col-sm-2 col-form-label">Poll Interval:</label>
+                        <label for="inputPollInterval" class="col-sm-2 col-form-label">
+                            {{ $t('dtuadmin.PollInterval') }}
+                        </label>
                         <div class="col-sm-10">
                             <div class="input-group">
                                 <input type="number" class="form-control" id="inputPollInterval" min="1" max="86400"
-                                    placeholder="Poll Interval in Seconds" v-model="dtuConfigList.dtu_pollinterval"
+                                    v-model="dtuConfigList.dtu_pollinterval"
                                     aria-describedby="pollIntervalDescription" />
-                                <span class="input-group-text" id="pollIntervalDescription">seconds</span>
+                                <span class="input-group-text" id="pollIntervalDescription">
+                                    {{ $t('dtuadmin.Seconds') }}
+                                </span>
                             </div>
                         </div>
                     </div>
 
                     <div class="row mb-3">
-                        <label for="inputTimezone" class="col-sm-2 col-form-label">PA Level:
-                            <BIconInfoCircle v-tooltip
-                                title="Make sure your power supply is stable enough before increasing the transmit power." />
+                        <label for="inputTimezone" class="col-sm-2 col-form-label">
+                            {{ $t('dtuadmin.PaLevel') }}
+                            <BIconInfoCircle v-tooltip :title="$t('dtuadmin.PaLevelHint')" />
                         </label>
                         <div class="col-sm-10">
                             <select class="form-select" v-model="dtuConfigList.dtu_palevel">
@@ -48,7 +49,7 @@
                     </div>
                 </div>
             </div>
-            <button type="submit" class="btn btn-primary mb-3">Save</button>
+            <button type="submit" class="btn btn-primary mb-3">{{ $t('dtuadmin.Save') }}</button>
         </form>
     </BasePage>
 </template>
@@ -74,10 +75,10 @@ export default defineComponent({
             dataLoading: true,
             dtuConfigList: {} as DtuConfig,
             palevelList: [
-                { key: 0, value: "Minimum (-18 dBm)" },
-                { key: 1, value: "Low (-12 dBm)" },
-                { key: 2, value: "High (-6 dBm)" },
-                { key: 3, value: "Maximum (0 dBm)" },
+                { key: 0, value: this.$t('dtuadmin.Min') },
+                { key: 1, value: this.$t('dtuadmin.Low') },
+                { key: 2, value: this.$t('dtuadmin.High') },
+                { key: 3, value: this.$t('dtuadmin.Max') },
             ],
             alertMessage: "",
             alertType: "info",

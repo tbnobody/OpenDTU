@@ -1,21 +1,21 @@
 <template>
-    <BasePage :title="'NTP Info'" :isLoading="dataLoading">
+    <BasePage :title="$t('ntpinfo.NtpInformation')" :isLoading="dataLoading">
         <div class="card">
-            <div class="card-header text-bg-primary">Configuration Summary</div>
+            <div class="card-header text-bg-primary">{{ $t('ntpinfo.ConfigurationSummary') }}</div>
             <div class="card-body">
                 <div class="table-responsive">
                     <table class="table table-hover table-condensed">
                         <tbody>
                             <tr>
-                                <th>Server</th>
+                                <th>{{ $t('ntpinfo.Server') }}</th>
                                 <td>{{ ntpDataList.ntp_server }}</td>
                             </tr>
                             <tr>
-                                <th>Timezone</th>
+                                <th>{{ $t('ntpinfo.Timezone') }}</th>
                                 <td>{{ ntpDataList.ntp_timezone }}</td>
                             </tr>
                             <tr>
-                                <th>Timezone Description</th>
+                                <th>{{ $t('ntpinfo.TimezoneDescription') }}</th>
                                 <td>{{ ntpDataList.ntp_timezone_descr }}</td>
                             </tr>
                         </tbody>
@@ -25,23 +25,23 @@
         </div>
 
         <div class="card mt-5">
-            <div class="card-header text-bg-primary">Current Time</div>
+            <div class="card-header text-bg-primary">{{ $t('ntpinfo.CurrentTime') }}</div>
             <div class="card-body">
                 <div class="table-responsive">
                     <table class="table table-hover table-condensed">
                         <tbody>
                             <tr>
-                                <th>Status</th>
+                                <th>{{ $t('ntpinfo.Status') }}</th>
                                 <td class="badge" :class="{
                                     'text-bg-danger': !ntpDataList.ntp_status,
                                     'text-bg-success': ntpDataList.ntp_status,
                                 }">
-                                    <span v-if="ntpDataList.ntp_status">synced</span>
-                                    <span v-else>not synced</span>
+                                    <span v-if="ntpDataList.ntp_status">{{ $t('ntpinfo.Synced') }}</span>
+                                    <span v-else>{{ $t('ntpinfo.NotSynced') }}</span>
                                 </td>
                             </tr>
                             <tr>
-                                <th>Local Time</th>
+                                <th>{{ $t('ntpinfo.LocalTime') }}</th>
                                 <td>{{ ntpDataList.ntp_localtime }}</td>
                             </tr>
                         </tbody>

@@ -1,20 +1,20 @@
 <template>
-    <BasePage :title="'Config Management'" :isLoading="loading">
+    <BasePage :title="$t('configadmin.ConfigManagement')" :isLoading="loading">
         <BootstrapAlert v-model="showAlert" dismissible :variant="alertType">
             {{ alertMessage }}
         </BootstrapAlert>
 
         <div class="card">
-            <div class="card-header text-bg-primary">Backup: Configuration File Backup</div>
+            <div class="card-header text-bg-primary">{{ $t('configadmin.BackupHeader') }}</div>
             <div class="card-body text-center">
-                Backup the configuration file
-                <button class="btn btn-primary" @click="downloadConfig">Backup
+                {{ $t('configadmin.BackupConfig') }}
+                <button class="btn btn-primary" @click="downloadConfig">{{ $t('configadmin.Backup') }}
                 </button>
             </div>
         </div>
 
         <div class="card mt-5">
-            <div class="card-header text-bg-primary">Restore: Restore the Configuration File</div>
+            <div class="card-header text-bg-primary">{{ $t('configadmin.RestoreHeader') }}</div>
             <div class="card-body text-center">
 
                 <div v-if="!uploading && UploadError != ''">
@@ -27,7 +27,7 @@
                     <br />
                     <br />
                     <button class="btn btn-light" @click="clear">
-                        <BIconArrowLeft /> Back
+                        <BIconArrowLeft /> {{ $t('configadmin.Back') }}
                     </button>
                 </div>
 
@@ -35,11 +35,11 @@
                     <span class="h1 mb-2">
                         <BIconCheckCircle />
                     </span>
-                    <span> Upload Success </span>
+                    <span> {{ $t('configadmin.UploadSuccess') }} </span>
                     <br />
                     <br />
                     <button class="btn btn-primary" @click="clear">
-                        <BIconArrowLeft /> Back
+                        <BIconArrowLeft /> {{ $t('configadmin.Back') }}
                     </button>
                 </div>
 
@@ -58,24 +58,18 @@
                     </div>
                 </div>
 
-                <div class="alert alert-danger mt-3" role="alert">
-                    <b>Note:</b> This operation replaces the configuration file with the restored configuration and
-                    restarts OpenDTU to apply all settings.
-                </div>
+                <div class="alert alert-danger mt-3" role="alert" v-html="$t('configadmin.RestoreHint')"></div>
             </div>
         </div>
 
         <div class="card mt-5">
-            <div class="card-header text-bg-primary">Initialize: Perform Factory Reset</div>
+            <div class="card-header text-bg-primary">{{ $t('configadmin.ResetHeader') }}</div>
             <div class="card-body text-center">
 
-                <button class="btn btn-danger" @click="onFactoryResetModal">Restore Factory-Default Settings
+                <button class="btn btn-danger" @click="onFactoryResetModal">{{ $t('configadmin.FactoryResetButton') }}
                 </button>
 
-                <div class="alert alert-danger mt-3" role="alert">
-                    <b>Note:</b> Click Restore Factory-Default Settings to restore and initialize the
-                    factory-default settings and reboot.
-                </div>
+                <div class="alert alert-danger mt-3" role="alert" v-html="$t('configadmin.ResetHint')"></div>
             </div>
         </div>
     </BasePage>
@@ -84,18 +78,18 @@
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title">Factory Reset</h5>
+                    <h5 class="modal-title">{{ $t('configadmin.FactoryReset') }}</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    Are you sure you want to delete the current configuration and reset all settings to their
-                    factory defaults?
+                    {{ $t('configadmin.ResetMsg') }}
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" @click="onFactoryResetCancel"
-                        data-bs-dismiss="modal">Cancel</button>
-                    <button type="button" class="btn btn-danger" @click="onFactoryResetPerform">Factory
-                        Reset!</button>
+                        data-bs-dismiss="modal">{{ $t('configadmin.Cancel') }}</button>
+                    <button type="button" class="btn btn-danger" @click="onFactoryResetPerform">
+                        {{ $t('configadmin.ResetConfirm') }}
+                    </button>
                 </div>
             </div>
         </div>
