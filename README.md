@@ -172,7 +172,7 @@ This can be achieved by editing the 'platformio.ini' file and add/change one or 
   * erase flash: `platformio run -e generic -t erase`
 
 ### using the pre-compiled .bin files
-The pre-compiled files can be found on the [github page](https://github.com/tbnobody/OpenDTU) in the tab "Actions" and the sub menu "OpenDTU Build". Just choose the latest build from the master branch (blue font). You need to be logged in with your github account to download the files.
+The pre-compiled files can be found on the [github page](https://github.com/tbnobody/OpenDTU) in the tab "Actions" and the sub menu "OpenDTU Build". Just choose the latest build from the master branch (search for "master" in the blue font text but click on the white header text!). You need to be logged in with your github account to download the files.
 Use a ESP32 flash tool of your choice (see next chapter) and flash the `.bin` files to the right addresses:
 
 | Address  | File                   |
@@ -184,7 +184,7 @@ Use a ESP32 flash tool of your choice (see next chapter) and flash the `.bin` fi
 
 For further updates you can just use the web interface and upload the `opendtu-*.bin` file.
 
-### Flash with esptool.py (Linux)
+#### Flash with esptool.py (Linux)
 ```
 esptool.py --port /dev/ttyUSB0 --chip esp32 --before default_reset --after hard_reset \
   write_flash --flash_mode dout --flash_freq 40m --flash_size detect \
@@ -194,7 +194,7 @@ esptool.py --port /dev/ttyUSB0 --chip esp32 --before default_reset --after hard_
   0x10000 opendtu-generic.bin
 ```
 
-### Flash with Espressif Flash Download Tool (Windows)
+#### Flash with Espressif Flash Download Tool (Windows)
 
 [Download link](https://www.espressif.com/en/support/download/other-tools)
 
@@ -205,7 +205,7 @@ esptool.py --port /dev/ttyUSB0 --chip esp32 --before default_reset --after hard_
 - To program, press "Start" on screen, then the "Boot" button.
 - When flashing is complete (FINISH appears) then press the Reset button on the ESP32 board (or powercycle ) to start the OpenDTU application.
 
-### Flash with ESP_Flasher (Windows)
+#### Flash with ESP_Flasher (Windows)
 Users report that [ESP_Flasher](https://github.com/Jason2866/ESP_Flasher/releases/) is suitable for flashing OpenDTU on Windows.
 
 ## First configuration
@@ -236,6 +236,9 @@ A documentation of the Web API can be found here: [Web-API Documentation](docs/W
 ## Available cases
 * <https://www.thingiverse.com/thing:5435911>
 * <https://www.printables.com/model/293003-sol-opendtu-esp32-nrf24l01-case>
+* <https://www.thingiverse.com/thing:5661780>
+* <https://www.thingiverse.com/thing:5632374>
+
 
 ## Building
 * Building the WebApp

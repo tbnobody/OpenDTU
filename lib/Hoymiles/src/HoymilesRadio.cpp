@@ -5,15 +5,14 @@
 #include <Every.h>
 #include <FunctionalInterrupt.h>
 
-void HoymilesRadio::init()
+void HoymilesRadio::init(SPIClass* initialisedSpiBus, uint8_t pinCE, uint8_t pinIRQ)
 {
     _dtuSerial.u64 = 0;
 
-    _hspi.reset(new SPIClass(HSPI));
-    _radio.reset(new RF24(HOYMILES_PIN_CE, HOYMILES_PIN_CS));
+    _spiPtr.reset(initialisedSpiBus);
+    _radio.reset(new RF24(pinCE, initialisedSpiBus->pinSS()));
 
-    _hspi->begin(HOYMILES_PIN_SCLK, HOYMILES_PIN_MISO, HOYMILES_PIN_MOSI, HOYMILES_PIN_CS);
-    _radio->begin(_hspi.get());
+    _radio->begin(_spiPtr.get());
 
     _radio->setDataRate(RF24_250KBPS);
     _radio->enableDynamicPayloads();
@@ -27,7 +26,7 @@ void HoymilesRadio::init()
         Serial.println(F("Connection error!!"));
     }
 
-    attachInterrupt(digitalPinToInterrupt(HOYMILES_PIN_IRQ), std::bind(&HoymilesRadio::handleIntr, this), FALLING);
+    attachInterrupt(digitalPinToInterrupt(pinIRQ), std::bind(&HoymilesRadio::handleIntr, this), FALLING);
 
     openReadingPipe();
     _radio->startListening();
@@ -43,17 +42,15 @@ void HoymilesRadio::loop()
     if (_packetReceived) {
         Serial.println(F("Interrupt received"));
         while (_radio->available()) {
-            if (!_rxBuffer.full()) {
-                fragment_t* f;
-                f = _rxBuffer.getFront();
-                memset(f->fragment, 0xcc, MAX_RF_PAYLOAD_SIZE);
-                f->len = _radio->getDynamicPayloadSize();
-                f->channel = _radio->getChannel();
-                if (f->len > MAX_RF_PAYLOAD_SIZE)
-                    f->len = MAX_RF_PAYLOAD_SIZE;
-
-                _radio->read(f->fragment, f->len);
-                _rxBuffer.pushFront(f);
+            if (!(_rxBuffer.size() > FRAGMENT_BUFFER_SIZE)) {
+                fragment_t f;
+                memset(f.fragment, 0xcc, MAX_RF_PAYLOAD_SIZE);
+                f.len = _radio->getDynamicPayloadSize();
+                f.channel = _radio->getChannel();
+                if (f.len > MAX_RF_PAYLOAD_SIZE)
+                    f.len = MAX_RF_PAYLOAD_SIZE;
+                _radio->read(f.fragment, f.len);
+                _rxBuffer.push(f);
             } else {
                 Serial.println(F("Buffer full"));
                 _radio->flush_rx();
@@ -64,16 +61,16 @@ void HoymilesRadio::loop()
     } else {
         // Perform package parsing only if no packages are received
         if (!_rxBuffer.empty()) {
-            fragment_t* f = _rxBuffer.getBack();
-            if (checkFragmentCrc(f)) {
-                std::shared_ptr<InverterAbstract> inv = Hoymiles.getInverterByFragment(f);
+            fragment_t f = _rxBuffer.back();
+            if (checkFragmentCrc(&f)) {
+                std::shared_ptr<InverterAbstract> inv = Hoymiles.getInverterByFragment(&f);
 
                 if (nullptr != inv) {
                     // Save packet in inverter rx buffer
                     char buf[30];
-                    snprintf(buf, sizeof(buf), "RX Channel: %d --> ", f->channel);
-                    dumpBuf(buf, f->fragment, f->len);
-                    inv->addRxFragment(f->fragment, f->len);
+                    snprintf(buf, sizeof(buf), "RX Channel: %d --> ", f.channel);
+                    dumpBuf(buf, f.fragment, f.len);
+                    inv->addRxFragment(f.fragment, f.len);
                 } else {
                     Serial.println(F("Inverter Not found!"));
                 }
@@ -83,7 +80,7 @@ void HoymilesRadio::loop()
             }
 
             // Remove paket from buffer even it was corrupted
-            _rxBuffer.popBack();
+            _rxBuffer.pop();
         }
     }
 

@@ -1,6 +1,5 @@
 #pragma once
 
-#include "CircularBuffer.h"
 #include "TimeoutHelper.h"
 #include "commands/CommandAbstract.h"
 #include "types.h"
@@ -12,33 +11,9 @@
 // number of fragments hold in buffer
 #define FRAGMENT_BUFFER_SIZE 30
 
-#ifndef HOYMILES_PIN_MISO
-#define HOYMILES_PIN_MISO 19
-#endif
-
-#ifndef HOYMILES_PIN_MOSI
-#define HOYMILES_PIN_MOSI 23
-#endif
-
-#ifndef HOYMILES_PIN_SCLK
-#define HOYMILES_PIN_SCLK 18
-#endif
-
-#ifndef HOYMILES_PIN_IRQ
-#define HOYMILES_PIN_IRQ 16
-#endif
-
-#ifndef HOYMILES_PIN_CE
-#define HOYMILES_PIN_CE 4
-#endif
-
-#ifndef HOYMILES_PIN_CS
-#define HOYMILES_PIN_CS 5
-#endif
-
 class HoymilesRadio {
 public:
-    void init();
+    void init(SPIClass* initialisedSpiBus, uint8_t pinCE, uint8_t pinIRQ);
     void loop();
     void setPALevel(rf24_pa_dbm_e paLevel);
 
@@ -71,7 +46,7 @@ private:
     void sendRetransmitPacket(uint8_t fragment_id);
     void sendLastPacketAgain();
 
-    std::unique_ptr<SPIClass> _hspi;
+    std::unique_ptr<SPIClass> _spiPtr;
     std::unique_ptr<RF24> _radio;
     uint8_t _rxChLst[5] = { 3, 23, 40, 61, 75 };
     uint8_t _rxChIdx = 0;
@@ -81,7 +56,7 @@ private:
 
     volatile bool _packetReceived = false;
 
-    CircularBuffer<fragment_t, FRAGMENT_BUFFER_SIZE> _rxBuffer;
+    std::queue<fragment_t> _rxBuffer;
     TimeoutHelper _rxTimeout;
 
     serial_u _dtuSerial;
