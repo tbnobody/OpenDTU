@@ -59,7 +59,7 @@ export default defineComponent({
         this.returnUrl = this.$route.query.returnUrl?.toString() || '/';
     },
     methods: {
-        handleSubmit(e: Event) {
+        handleSubmit() {
             this.submitted = true;
             const { username, password } = this;
 

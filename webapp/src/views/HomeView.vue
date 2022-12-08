@@ -670,7 +670,7 @@ export default defineComponent({
                 )
         },
         calculateAbsoluteTime(lastTime: number): string {
-            const userLocale = globalThis.navigator.language;
+            const userLocale = navigator.language;
             const date = new Date(Date.now() - lastTime * 1000);
             return date.toLocaleString(userLocale)
         }
