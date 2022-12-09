@@ -101,17 +101,18 @@ jobs:
       - name: Copy bootloader_dio_40m.bin
         run: cp ~/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32/bin/bootloader_dio_40m.bin .pio/build/${{ matrix.environment }}/bootloader_dio_40m.bin
 
-      - uses: actions/upload-artifact@v3
-        with:
-          name: opendtu-${{ matrix.environment }}
-          path: |
-            .pio/build/${{ matrix.environment }}/opendtu-${{ matrix.environment }}.bin
-            .pio/build/${{ matrix.environment }}/partitions.bin
-            .pio/build/${{ matrix.environment }}/bootloader_dio_40m.bin
-            .pio/build/${{ matrix.environment }}/boot_app0.bin
+      - name: Generate Tag name for release
+        run: |
+          echo "tag=build-$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
+        id: release_tag
 
-      - uses: actions/upload-artifact@v3
-        if: startsWith(github.ref, 'refs/tags/')
+      - name: Add Tag to Commit
+        run: |
+          git tag ${{ steps.release_tag.outputs.tag }}
+          git push origin ${{ steps.release_tag.outputs.tag }}
+
+      - name: Upload Artifacts (.bin files)
+        uses: actions/upload-artifact@v3
         with:
           name: opendtu-release
           path: |
@@ -119,22 +120,25 @@ jobs:
             .pio/build/${{ matrix.environment }}/partitions.bin
             .pio/build/${{ matrix.environment }}/bootloader_dio_40m.bin
             .pio/build/${{ matrix.environment }}/boot_app0.bin
+
+    outputs:
+      release_tag: ${{ steps.release_tag.outputs.tag }}
 
   release:
     name: Create Release
     runs-on: ubuntu-latest
     needs: [get_default_envs, build]
-    if: startsWith(github.ref, 'refs/tags/')
     steps:
       - uses: actions/download-artifact@v3
         with:
           name: opendtu-release
 
-      - name: Create draft release
+      - name: Create tagged release
         uses: softprops/action-gh-release@v1
         with:
-          draft: True
+          draft: false
           files: |
             *.bin
+          tag_name: ${{ needs.build.outputs.release_tag }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
