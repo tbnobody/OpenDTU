@@ -2,18 +2,18 @@
 /*
  * Copyright (C) 2022 Thomas Basler and others
  */
-#include "MqttHassPublishing.h"
+#include "MqttHandleHass.h"
 #include "MqttPublishing.h"
 #include "MqttSettings.h"
 #include "NetworkSettings.h"
 
-MqttHassPublishingClass MqttHassPublishing;
+MqttHandleHassClass MqttHandleHass;
 
-void MqttHassPublishingClass::init()
+void MqttHandleHassClass::init()
 {
 }
 
-void MqttHassPublishingClass::loop()
+void MqttHandleHassClass::loop()
 {
     if (_updateForced) {
         publishConfig();
@@ -30,12 +30,12 @@ void MqttHassPublishingClass::loop()
     }
 }
 
-void MqttHassPublishingClass::forceUpdate()
+void MqttHandleHassClass::forceUpdate()
 {
     _updateForced = true;
 }
 
-void MqttHassPublishingClass::publishConfig()
+void MqttHandleHassClass::publishConfig()
 {
     if (!Configuration.get().Mqtt_Hass_Enabled) {
         return;
@@ -79,7 +79,7 @@ void MqttHassPublishingClass::publishConfig()
     }
 }
 
-void MqttHassPublishingClass::publishField(std::shared_ptr<InverterAbstract> inv, uint8_t channel, byteAssign_fieldDeviceClass_t fieldType, bool clear)
+void MqttHandleHassClass::publishField(std::shared_ptr<InverterAbstract> inv, uint8_t channel, byteAssign_fieldDeviceClass_t fieldType, bool clear)
 {
     if (!inv->Statistics()->hasChannelFieldValue(channel, fieldType.fieldId)) {
         return;
@@ -137,7 +137,7 @@ void MqttHassPublishingClass::publishField(std::shared_ptr<InverterAbstract> inv
     }
 }
 
-void MqttHassPublishingClass::publishInverterButton(std::shared_ptr<InverterAbstract> inv, const char* caption, const char* icon, const char* category, const char* deviceClass, const char* subTopic, const char* payload)
+void MqttHandleHassClass::publishInverterButton(std::shared_ptr<InverterAbstract> inv, const char* caption, const char* icon, const char* category, const char* deviceClass, const char* subTopic, const char* payload)
 {
     String serial = inv->serialString();
 
@@ -172,7 +172,7 @@ void MqttHassPublishingClass::publishInverterButton(std::shared_ptr<InverterAbst
     MqttSettings.publishHass(configTopic, buffer);
 }
 
-void MqttHassPublishingClass::publishInverterNumber(
+void MqttHandleHassClass::publishInverterNumber(
     std::shared_ptr<InverterAbstract> inv, const char* caption, const char* icon, const char* category,
     const char* commandTopic, const char* stateTopic, const char* unitOfMeasure,
     int16_t min, int16_t max)
@@ -211,7 +211,7 @@ void MqttHassPublishingClass::publishInverterNumber(
     MqttSettings.publishHass(configTopic, buffer);
 }
 
-void MqttHassPublishingClass::publishInverterBinarySensor(std::shared_ptr<InverterAbstract> inv, const char* caption, const char* subTopic, const char* payload_on, const char* payload_off)
+void MqttHandleHassClass::publishInverterBinarySensor(std::shared_ptr<InverterAbstract> inv, const char* caption, const char* subTopic, const char* payload_on, const char* payload_off)
 {
     String serial = inv->serialString();
 
@@ -240,7 +240,7 @@ void MqttHassPublishingClass::publishInverterBinarySensor(std::shared_ptr<Invert
     MqttSettings.publishHass(configTopic, buffer);
 }
 
-void MqttHassPublishingClass::createDeviceInfo(JsonObject& object, std::shared_ptr<InverterAbstract> inv)
+void MqttHandleHassClass::createDeviceInfo(JsonObject& object, std::shared_ptr<InverterAbstract> inv)
 {
     object[F("name")] = inv->name();
     object[F("ids")] = inv->serialString();

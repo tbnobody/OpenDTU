@@ -7,7 +7,7 @@
 #include "AsyncJson.h"
 #include "Configuration.h"
 #include "Hoymiles.h"
-#include "MqttHassPublishing.h"
+#include "MqttHandleHass.h"
 #include "WebApi.h"
 #include "helper.h"
 
@@ -161,7 +161,7 @@ void WebApiInverterClass::onInverterAdd(AsyncWebServerRequest* request)
         }
     }
 
-    MqttHassPublishing.forceUpdate();
+    MqttHandleHass.forceUpdate();
 }
 
 void WebApiInverterClass::onInverterEdit(AsyncWebServerRequest* request)
@@ -280,7 +280,7 @@ void WebApiInverterClass::onInverterEdit(AsyncWebServerRequest* request)
         }
     }
 
-    MqttHassPublishing.forceUpdate();
+    MqttHandleHass.forceUpdate();
 }
 
 void WebApiInverterClass::onInverterDelete(AsyncWebServerRequest* request)
@@ -348,5 +348,5 @@ void WebApiInverterClass::onInverterDelete(AsyncWebServerRequest* request)
     response->setLength();
     request->send(response);
 
-    MqttHassPublishing.forceUpdate();
+    MqttHandleHass.forceUpdate();
 }

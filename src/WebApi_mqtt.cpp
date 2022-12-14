@@ -6,7 +6,7 @@
 #include "ArduinoJson.h"
 #include "AsyncJson.h"
 #include "Configuration.h"
-#include "MqttHassPublishing.h"
+#include "MqttHandleHass.h"
 #include "MqttSettings.h"
 #include "WebApi.h"
 #include "helper.h"
@@ -284,7 +284,7 @@ void WebApiMqttClass::onMqttAdminPost(AsyncWebServerRequest* request)
     request->send(response);
 
     MqttSettings.performReconnect();
-    MqttHassPublishing.forceUpdate();
+    MqttHandleHass.forceUpdate();
 }
 
 String WebApiMqttClass::getRootCaCertInfo(const char* cert)

@@ -51,7 +51,7 @@ const byteAssign_fieldDeviceClass_t deviceFieldAssignment[] = {
 };
 #define DEVICE_CLS_ASSIGN_LIST_LEN (sizeof(deviceFieldAssignment) / sizeof(byteAssign_fieldDeviceClass_t))
 
-class MqttHassPublishingClass {
+class MqttHandleHassClass {
 public:
     void init();
     void loop();
@@ -69,4 +69,4 @@ private:
     bool _updateForced = false;
 };
 
-extern MqttHassPublishingClass MqttHassPublishing;
+extern MqttHandleHassClass MqttHandleHass;

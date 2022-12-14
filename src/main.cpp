@@ -4,7 +4,7 @@
  */
 #include "Configuration.h"
 #include "Hoymiles.h"
-#include "MqttHassPublishing.h"
+#include "MqttHandleHass.h"
 #include "MqttPublishing.h"
 #include "MqttSettings.h"
 #include "NetworkSettings.h"
@@ -69,7 +69,7 @@ void setup()
     Serial.print(F("Initialize MqTT... "));
     MqttSettings.init();
     MqttPublishing.init();
-    MqttHassPublishing.init();
+    MqttHandleHass.init();
     Serial.println(F("done"));
 
     // Initialize WebApi
@@ -135,7 +135,7 @@ void loop()
     yield();
     MqttPublishing.loop();
     yield();
-    MqttHassPublishing.loop();
+    MqttHandleHass.loop();
     yield();
     WebApi.loop();
     yield();
