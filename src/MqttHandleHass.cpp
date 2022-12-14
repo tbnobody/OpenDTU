@@ -131,9 +131,9 @@ void MqttHandleHassClass::publishField(std::shared_ptr<InverterAbstract> inv, ui
 
         char buffer[512];
         serializeJson(root, buffer);
-        MqttSettings.publishHass(configTopic, buffer);
+        publish(configTopic, buffer);
     } else {
-        MqttSettings.publishHass(configTopic, "");
+        publish(configTopic, "");
     }
 }
 
@@ -169,7 +169,7 @@ void MqttHandleHassClass::publishInverterButton(std::shared_ptr<InverterAbstract
 
     char buffer[512];
     serializeJson(root, buffer);
-    MqttSettings.publishHass(configTopic, buffer);
+    publish(configTopic, buffer);
 }
 
 void MqttHandleHassClass::publishInverterNumber(
@@ -208,7 +208,7 @@ void MqttHandleHassClass::publishInverterNumber(
 
     char buffer[512];
     serializeJson(root, buffer);
-    MqttSettings.publishHass(configTopic, buffer);
+    publish(configTopic, buffer);
 }
 
 void MqttHandleHassClass::publishInverterBinarySensor(std::shared_ptr<InverterAbstract> inv, const char* caption, const char* subTopic, const char* payload_on, const char* payload_off)
@@ -237,7 +237,7 @@ void MqttHandleHassClass::publishInverterBinarySensor(std::shared_ptr<InverterAb
 
     char buffer[512];
     serializeJson(root, buffer);
-    MqttSettings.publishHass(configTopic, buffer);
+    publish(configTopic, buffer);
 }
 
 void MqttHandleHassClass::createDeviceInfo(JsonObject& object, std::shared_ptr<InverterAbstract> inv)
@@ -248,4 +248,11 @@ void MqttHandleHassClass::createDeviceInfo(JsonObject& object, std::shared_ptr<I
     object[F("mf")] = F("OpenDTU");
     object[F("mdl")] = inv->typeName();
     object[F("sw")] = AUTO_GIT_HASH;
+}
+
+void MqttHandleHassClass::publish(const String& subtopic, const String& payload)
+{
+    String topic = Configuration.get().Mqtt_Hass_Topic;
+    topic += subtopic;
+    MqttSettings.publishGeneric(topic.c_str(), payload.c_str(), Configuration.get().Mqtt_Hass_Retain);
 }

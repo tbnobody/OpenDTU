@@ -165,13 +165,6 @@ void MqttSettingsClass::publishGeneric(const String& topic, const String& payloa
     mqttClient->publish(topic.c_str(), qos, retain, payload.c_str());
 }
 
-void MqttSettingsClass::publishHass(const String& subtopic, const String& payload)
-{
-    String topic = Configuration.get().Mqtt_Hass_Topic;
-    topic += subtopic;
-    mqttClient->publish(topic.c_str(), 0, Configuration.get().Mqtt_Hass_Retain, payload.c_str());
-}
-
 void MqttSettingsClass::init()
 {
     using std::placeholders::_1;

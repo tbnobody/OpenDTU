@@ -16,7 +16,6 @@ public:
     bool getConnected();
     void publish(const String& subtopic, const String& payload);
     void publishGeneric(const String& topic, const String& payload, bool retain, uint8_t qos = 0);
-    void publishHass(const String& subtopic, const String& payload);
 
     void subscribe(const String& topic, uint8_t qos, const espMqttClientTypes::OnMessageCallback& cb);
     void unsubscribe(const String& topic);
