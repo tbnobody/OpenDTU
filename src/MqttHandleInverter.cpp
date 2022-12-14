@@ -2,18 +2,18 @@
 /*
  * Copyright (C) 2022 Thomas Basler and others
  */
-#include "MqttPublishing.h"
+#include "MqttHandleInverter.h"
 #include "MqttSettings.h"
 #include "NetworkSettings.h"
 #include <ctime>
 
-MqttPublishingClass MqttPublishing;
+MqttHandleInverterClass MqttHandleInverter;
 
-void MqttPublishingClass::init()
+void MqttHandleInverterClass::init()
 {
 }
 
-void MqttPublishingClass::loop()
+void MqttHandleInverterClass::loop()
 {
     if (!MqttSettings.getConnected() || !Hoymiles.getRadio()->isIdle()) {
         return;
@@ -102,7 +102,7 @@ void MqttPublishingClass::loop()
     }
 }
 
-void MqttPublishingClass::publishField(std::shared_ptr<InverterAbstract> inv, uint8_t channel, uint8_t fieldId)
+void MqttHandleInverterClass::publishField(std::shared_ptr<InverterAbstract> inv, uint8_t channel, uint8_t fieldId)
 {
     String topic = getTopic(inv, channel, fieldId);
     if (topic == "") {
@@ -112,7 +112,7 @@ void MqttPublishingClass::publishField(std::shared_ptr<InverterAbstract> inv, ui
     MqttSettings.publish(topic, String(inv->Statistics()->getChannelFieldValue(channel, fieldId)));
 }
 
-String MqttPublishingClass::getTopic(std::shared_ptr<InverterAbstract> inv, uint8_t channel, uint8_t fieldId)
+String MqttHandleInverterClass::getTopic(std::shared_ptr<InverterAbstract> inv, uint8_t channel, uint8_t fieldId)
 {
     if (!inv->Statistics()->hasChannelFieldValue(channel, fieldId)) {
         return String("");

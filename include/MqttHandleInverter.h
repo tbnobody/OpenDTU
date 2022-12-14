@@ -6,7 +6,7 @@
 #include <Hoymiles.h>
 #include <memory>
 
-class MqttPublishingClass {
+class MqttHandleInverterClass {
 public:
     void init();
     void loop();
@@ -37,4 +37,4 @@ private:
     };
 };
 
-extern MqttPublishingClass MqttPublishing;
+extern MqttHandleInverterClass MqttHandleInverter;

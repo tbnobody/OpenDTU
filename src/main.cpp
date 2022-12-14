@@ -5,7 +5,7 @@
 #include "Configuration.h"
 #include "Hoymiles.h"
 #include "MqttHandleHass.h"
-#include "MqttPublishing.h"
+#include "MqttHandleInverter.h"
 #include "MqttSettings.h"
 #include "NetworkSettings.h"
 #include "NtpSettings.h"
@@ -68,7 +68,7 @@ void setup()
     // Initialize MqTT
     Serial.print(F("Initialize MqTT... "));
     MqttSettings.init();
-    MqttPublishing.init();
+    MqttHandleInverter.init();
     MqttHandleHass.init();
     Serial.println(F("done"));
 
@@ -133,7 +133,7 @@ void loop()
     yield();
     Hoymiles.loop();
     yield();
-    MqttPublishing.loop();
+    MqttHandleInverter.loop();
     yield();
     MqttHandleHass.loop();
     yield();

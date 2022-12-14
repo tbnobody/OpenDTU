@@ -3,7 +3,7 @@
  * Copyright (C) 2022 Thomas Basler and others
  */
 #include "MqttHandleHass.h"
-#include "MqttPublishing.h"
+#include "MqttHandleInverter.h"
 #include "MqttSettings.h"
 #include "NetworkSettings.h"
 
@@ -99,7 +99,7 @@ void MqttHandleHassClass::publishField(std::shared_ptr<InverterAbstract> inv, ui
         + "/config";
 
     if (!clear) {
-        String stateTopic = MqttSettings.getPrefix() + MqttPublishing.getTopic(inv, channel, fieldType.fieldId);
+        String stateTopic = MqttSettings.getPrefix() + MqttHandleInverter.getTopic(inv, channel, fieldType.fieldId);
         const char* devCls = deviceClasses[fieldType.deviceClsId];
         const char* stateCls = stateClasses[fieldType.stateClsId];
 
