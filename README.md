@@ -24,9 +24,15 @@ Like to show your own build? Just send me a Pull Request.
 * Hoymiles HM-1000
 * Hoymiles HM-1200
 * Hoymiles HM-1500
-* TSUN TSOL-M350 (Maybe depending on firmware on the inverter)
-* TSUN TSOL-M800 (Maybe depending on firmware on the inverter)
-* TSUN TSOL-M1600 (Maybe depending on firmware on the inverter)
+* TSUN TSOL-M350 (Maybe depending on firmware or serial number on the inverter)
+* TSUN TSOL-M800 (Maybe depending on firmware or serial number on the inverter)
+* TSUN TSOL-M1600 (Maybe depending on firmware or serial number on the inverter)
+
+TSUN compatibility remark:
+Compatibility with openDTU seems to be related to serial numbers. Current findings indicate that TSUN converters with a serial number starting with "11" are supported, whereby converters with a serial number starting with "10" are not.
+Firmware version seems to play not a significant role and cannot be read from the stickers. For completeness, the following firmware version have been reported to work with openDUT:
+* v1.0.10 TSOL-M800 (DE)
+* v1.0.12 TSOL-M1600
 
 ## Features for end users
 * Read live data from inverter
