@@ -244,7 +244,7 @@ void MqttHandleHassClass::createDeviceInfo(JsonObject& object, std::shared_ptr<I
 {
     object[F("name")] = inv->name();
     object[F("ids")] = inv->serialString();
-    object[F("cu")] = String(F("http://")) + WiFi.localIP().toString();
+    object[F("cu")] = String(F("http://")) + NetworkSettings.localIP().toString();
     object[F("mf")] = F("OpenDTU");
     object[F("mdl")] = inv->typeName();
     object[F("sw")] = AUTO_GIT_HASH;
