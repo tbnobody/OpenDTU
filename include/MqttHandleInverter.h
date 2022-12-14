@@ -4,6 +4,7 @@
 #include "Configuration.h"
 #include <Arduino.h>
 #include <Hoymiles.h>
+#include <espMqttClient.h>
 #include <memory>
 
 class MqttHandleInverterClass {
@@ -15,6 +16,7 @@ public:
 
 private:
     void publishField(std::shared_ptr<InverterAbstract> inv, uint8_t channel, uint8_t fieldId);
+    void onMqttMessage(const espMqttClientTypes::MessageProperties& properties, const char* topic, const uint8_t* payload, size_t len, size_t index, size_t total);
 
     uint32_t _lastPublishStats[INV_MAX_COUNT];
     uint32_t _lastPublish;

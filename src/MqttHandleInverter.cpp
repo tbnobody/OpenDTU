@@ -6,10 +6,31 @@
 #include "MqttSettings.h"
 #include <ctime>
 
+#define TOPIC_SUB_LIMIT_PERSISTENT_RELATIVE "limit_persistent_relative"
+#define TOPIC_SUB_LIMIT_PERSISTENT_ABSOLUTE "limit_persistent_absolute"
+#define TOPIC_SUB_LIMIT_NONPERSISTENT_RELATIVE "limit_nonpersistent_relative"
+#define TOPIC_SUB_LIMIT_NONPERSISTENT_ABSOLUTE "limit_nonpersistent_absolute"
+#define TOPIC_SUB_POWER "power"
+#define TOPIC_SUB_RESTART "restart"
+
 MqttHandleInverterClass MqttHandleInverter;
 
 void MqttHandleInverterClass::init()
 {
+    using std::placeholders::_1;
+    using std::placeholders::_2;
+    using std::placeholders::_3;
+    using std::placeholders::_4;
+    using std::placeholders::_5;
+    using std::placeholders::_6;
+
+    String topic = MqttSettings.getPrefix();
+    MqttSettings.subscribe(String(topic + "+/cmd/" + TOPIC_SUB_LIMIT_PERSISTENT_RELATIVE).c_str(), 0, std::bind(&MqttHandleInverterClass::onMqttMessage, this, _1, _2, _3, _4, _5, _6));
+    MqttSettings.subscribe(String(topic + "+/cmd/" + TOPIC_SUB_LIMIT_PERSISTENT_ABSOLUTE).c_str(), 0, std::bind(&MqttHandleInverterClass::onMqttMessage, this, _1, _2, _3, _4, _5, _6));
+    MqttSettings.subscribe(String(topic + "+/cmd/" + TOPIC_SUB_LIMIT_NONPERSISTENT_RELATIVE).c_str(), 0, std::bind(&MqttHandleInverterClass::onMqttMessage, this, _1, _2, _3, _4, _5, _6));
+    MqttSettings.subscribe(String(topic + "+/cmd/" + TOPIC_SUB_LIMIT_NONPERSISTENT_ABSOLUTE).c_str(), 0, std::bind(&MqttHandleInverterClass::onMqttMessage, this, _1, _2, _3, _4, _5, _6));
+    MqttSettings.subscribe(String(topic + "+/cmd/" + TOPIC_SUB_POWER).c_str(), 0, std::bind(&MqttHandleInverterClass::onMqttMessage, this, _1, _2, _3, _4, _5, _6));
+    MqttSettings.subscribe(String(topic + "+/cmd/" + TOPIC_SUB_RESTART).c_str(), 0, std::bind(&MqttHandleInverterClass::onMqttMessage, this, _1, _2, _3, _4, _5, _6));
 }
 
 void MqttHandleInverterClass::loop()
@@ -119,4 +140,89 @@ String MqttHandleInverterClass::getTopic(std::shared_ptr<InverterAbstract> inv, 
     }
 
     return inv->serialString() + "/" + String(channel) + "/" + chanName;
+}
+
+void MqttHandleInverterClass::onMqttMessage(const espMqttClientTypes::MessageProperties& properties, const char* topic, const uint8_t* payload, size_t len, size_t index, size_t total)
+{
+    const CONFIG_T& config = Configuration.get();
+
+    char token_topic[MQTT_MAX_TOPIC_STRLEN + 40]; // respect all subtopics
+    strncpy(token_topic, topic, MQTT_MAX_TOPIC_STRLEN + 40); // convert const char* to char*
+
+    char* serial_str;
+    char* subtopic;
+    char* setting;
+    char* rest = &token_topic[strlen(config.Mqtt_Topic)];
+
+    serial_str = strtok_r(rest, "/", &rest);
+    subtopic = strtok_r(rest, "/", &rest);
+    setting = strtok_r(rest, "/", &rest);
+
+    if (serial_str == NULL || subtopic == NULL || setting == NULL) {
+        return;
+    }
+
+    uint64_t serial;
+    serial = strtoull(serial_str, 0, 16);
+
+    auto inv = Hoymiles.getInverterBySerial(serial);
+
+    if (inv == nullptr) {
+        Serial.println(F("Inverter not found"));
+        return;
+    }
+
+    // check if subtopic is unequal cmd
+    if (strcmp(subtopic, "cmd")) {
+        return;
+    }
+
+    char* strlimit = new char[len + 1];
+    memcpy(strlimit, payload, len);
+    strlimit[len] = '\0';
+    uint32_t payload_val = strtol(strlimit, NULL, 10);
+    delete[] strlimit;
+
+    if (!strcmp(setting, TOPIC_SUB_LIMIT_PERSISTENT_RELATIVE)) {
+        // Set inverter limit relative persistent
+        Serial.printf("Limit Persistent: %d %%\n", payload_val);
+        inv->sendActivePowerControlRequest(Hoymiles.getRadio(), payload_val, PowerLimitControlType::RelativPersistent);
+
+    } else if (!strcmp(setting, TOPIC_SUB_LIMIT_PERSISTENT_ABSOLUTE)) {
+        // Set inverter limit absolute persistent
+        Serial.printf("Limit Persistent: %d W\n", payload_val);
+        inv->sendActivePowerControlRequest(Hoymiles.getRadio(), payload_val, PowerLimitControlType::AbsolutPersistent);
+
+    } else if (!strcmp(setting, TOPIC_SUB_LIMIT_NONPERSISTENT_RELATIVE)) {
+        // Set inverter limit relative non persistent
+        Serial.printf("Limit Non-Persistent: %d %%\n", payload_val);
+        if (!properties.retain) {
+            inv->sendActivePowerControlRequest(Hoymiles.getRadio(), payload_val, PowerLimitControlType::RelativNonPersistent);
+        } else {
+            Serial.println("Ignored because retained");
+        }
+
+    } else if (!strcmp(setting, TOPIC_SUB_LIMIT_NONPERSISTENT_ABSOLUTE)) {
+        // Set inverter limit absolute non persistent
+        Serial.printf("Limit Non-Persistent: %d W\n", payload_val);
+        if (!properties.retain) {
+            inv->sendActivePowerControlRequest(Hoymiles.getRadio(), payload_val, PowerLimitControlType::AbsolutNonPersistent);
+        } else {
+            Serial.println("Ignored because retained");
+        }
+
+    } else if (!strcmp(setting, TOPIC_SUB_POWER)) {
+        // Turn inverter on or off
+        Serial.printf("Set inverter power to: %d\n", payload_val);
+        inv->sendPowerControlRequest(Hoymiles.getRadio(), payload_val > 0);
+
+    } else if (!strcmp(setting, TOPIC_SUB_RESTART)) {
+        // Restart inverter
+        Serial.printf("Restart inverter\n");
+        if (!properties.retain && payload_val == 1) {
+            inv->sendRestartControlRequest(Hoymiles.getRadio());
+        } else {
+            Serial.println("Ignored because retained");
+        }
+    }
 }
