@@ -22,11 +22,18 @@ void MqttPublishingClass::loop()
     const CONFIG_T& config = Configuration.get();
 
     if (millis() - _lastPublish > (config.Mqtt_PublishInterval * 1000)) {
-        MqttSettings.publish("dtu/uptime", String(millis() / 1000));
-        MqttSettings.publish("dtu/ip", NetworkSettings.localIP().toString());
-        MqttSettings.publish("dtu/hostname", NetworkSettings.getHostname());
+
+        // compose subtopic "dtu/<serialnumber>" with config.DtuSerial as hex
+        char dtu_subtopic[sizeof(uint64_t) * 8 + 5];
+        snprintf(dtu_subtopic, sizeof(dtu_subtopic), "dtu/%0x%08x",
+        ((uint32_t)((config.Dtu_Serial >> 32) & 0xFFFFFFFF)),
+        ((uint32_t)(config.Dtu_Serial & 0xFFFFFFFF)));
+
+        MqttSettings.publish(String(dtu_subtopic) + "/uptime", String(millis() / 1000));
+        MqttSettings.publish(String(dtu_subtopic) + "/ip", NetworkSettings.localIP().toString());
+        MqttSettings.publish(String(dtu_subtopic) + "/hostname", NetworkSettings.getHostname());
         if (NetworkSettings.NetworkMode() == network_mode::WiFi) {
-            MqttSettings.publish("dtu/rssi", String(WiFi.RSSI()));
+            MqttSettings.publish(String(dtu_subtopic) + "/rssi", String(WiFi.RSSI()));
         }
 
         // Loop all inverters
