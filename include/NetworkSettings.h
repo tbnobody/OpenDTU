@@ -3,7 +3,6 @@
 
 #include <DNSServer.h>
 #include <WiFi.h>
-#include <memory>
 #include <vector>
 
 enum class network_mode {

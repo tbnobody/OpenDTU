@@ -3,12 +3,11 @@
  * Copyright (C) 2022 Thomas Basler and others
  */
 #include "WebApi_ntp.h"
-#include "ArduinoJson.h"
-#include "AsyncJson.h"
 #include "Configuration.h"
 #include "NtpSettings.h"
 #include "WebApi.h"
 #include "helper.h"
+#include <AsyncJson.h>
 
 void WebApiNtpClass::init(AsyncWebServer* server)
 {

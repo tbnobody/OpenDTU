@@ -2,11 +2,9 @@
 #pragma once
 
 #include "NetworkSettings.h"
-#include <Arduino.h>
 #include <MqttSubscribeParser.h>
 #include <Ticker.h>
 #include <espMqttClient.h>
-#include <memory>
 
 class MqttSettingsClass {
 public:

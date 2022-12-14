@@ -3,11 +3,10 @@
  * Copyright (C) 2022 Thomas Basler and others
  */
 #include "WebApi_dtu.h"
-#include "ArduinoJson.h"
-#include "AsyncJson.h"
 #include "Configuration.h"
-#include "Hoymiles.h"
 #include "WebApi.h"
+#include <AsyncJson.h>
+#include <Hoymiles.h>
 
 void WebApiDtuClass::init(AsyncWebServer* server)
 {

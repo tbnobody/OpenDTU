@@ -4,10 +4,6 @@
  */
 #include "MqttSettings.h"
 #include "Configuration.h"
-#include "NetworkSettings.h"
-#include <MqttClientSetup.h>
-#include <Ticker.h>
-#include <espMqttClient.h>
 
 MqttSettingsClass::MqttSettingsClass()
 {

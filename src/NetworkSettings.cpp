@@ -6,7 +6,6 @@
 #include "Configuration.h"
 #include "Utils.h"
 #include "defaults.h"
-#include <WiFi.h>
 #ifdef OPENDTU_ETHERNET
 #include <ETH.h>
 #endif

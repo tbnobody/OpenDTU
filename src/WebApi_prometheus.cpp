@@ -1,8 +1,7 @@
 #include "WebApi_prometheus.h"
-
 #include "Configuration.h"
-#include "Hoymiles.h"
 #include "NetworkSettings.h"
+#include <Hoymiles.h>
 
 void WebApiPrometheusClass::init(AsyncWebServer* server)
 {

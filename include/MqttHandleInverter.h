@@ -2,10 +2,8 @@
 #pragma once
 
 #include "Configuration.h"
-#include <Arduino.h>
 #include <Hoymiles.h>
 #include <espMqttClient.h>
-#include <memory>
 
 class MqttHandleInverterClass {
 public:

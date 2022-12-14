@@ -3,11 +3,10 @@
  * Copyright (C) 2022 Thomas Basler and others
  */
 #include "WebApi_security.h"
-#include "ArduinoJson.h"
-#include "AsyncJson.h"
 #include "Configuration.h"
 #include "WebApi.h"
 #include "helper.h"
+#include <AsyncJson.h>
 
 void WebApiSecurityClass::init(AsyncWebServer* server)
 {

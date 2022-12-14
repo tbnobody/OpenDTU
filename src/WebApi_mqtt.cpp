@@ -3,13 +3,12 @@
  * Copyright (C) 2022 Thomas Basler and others
  */
 #include "WebApi_mqtt.h"
-#include "ArduinoJson.h"
-#include "AsyncJson.h"
 #include "Configuration.h"
 #include "MqttHandleHass.h"
 #include "MqttSettings.h"
 #include "WebApi.h"
 #include "helper.h"
+#include <AsyncJson.h>
 
 void WebApiMqttClass::init(AsyncWebServer* server)
 {

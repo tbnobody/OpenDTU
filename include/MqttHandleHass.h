@@ -1,11 +1,8 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 #pragma once
 
-#include "Configuration.h"
-#include <Arduino.h>
 #include <ArduinoJson.h>
 #include <Hoymiles.h>
-#include <memory>
 
 // mqtt discovery device classes
 enum {

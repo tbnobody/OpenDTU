@@ -3,10 +3,9 @@
  * Copyright (C) 2022 Thomas Basler and others
  */
 #include "WebApi_limit.h"
-#include "ArduinoJson.h"
-#include "AsyncJson.h"
-#include "Hoymiles.h"
 #include "WebApi.h"
+#include <AsyncJson.h>
+#include <Hoymiles.h>
 
 void WebApiLimitClass::init(AsyncWebServer* server)
 {
@@ -43,11 +42,9 @@ void WebApiLimitClass::onLimitStatus(AsyncWebServerRequest* request)
         String limitStatus = "Unknown";
         if (status == LastCommandSuccess::CMD_OK) {
             limitStatus = "Ok";
-        }
-        else if (status == LastCommandSuccess::CMD_NOK) {
+        } else if (status == LastCommandSuccess::CMD_NOK) {
             limitStatus = "Failure";
-        }
-        else if (status == LastCommandSuccess::CMD_PENDING) {
+        } else if (status == LastCommandSuccess::CMD_PENDING) {
             limitStatus = "Pending";
         }
         root[serial]["limit_set_status"] = limitStatus;

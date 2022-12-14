@@ -3,10 +3,9 @@
  * Copyright (C) 2022 Thomas Basler and others
  */
 #include "WebApi_devinfo.h"
-#include "ArduinoJson.h"
-#include "AsyncJson.h"
-#include "Hoymiles.h"
 #include "WebApi.h"
+#include <AsyncJson.h>
+#include <Hoymiles.h>
 #include <ctime>
 
 void WebApiDevInfoClass::init(AsyncWebServer* server)

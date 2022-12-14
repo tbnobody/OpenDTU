@@ -3,7 +3,6 @@
  * Copyright (C) 2022 Thomas Basler and others
  */
 #include "Configuration.h"
-#include "Hoymiles.h"
 #include "MqttHandleDtu.h"
 #include "MqttHandleHass.h"
 #include "MqttHandleInverter.h"
@@ -14,6 +13,7 @@
 #include "WebApi.h"
 #include "defaults.h"
 #include <Arduino.h>
+#include <Hoymiles.h>
 #include <LittleFS.h>
 
 void setup()

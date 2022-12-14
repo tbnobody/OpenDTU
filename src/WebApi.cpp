@@ -3,10 +3,9 @@
  * Copyright (C) 2022 Thomas Basler and others
  */
 #include "WebApi.h"
-#include "ArduinoJson.h"
-#include "AsyncJson.h"
 #include "Configuration.h"
 #include "defaults.h"
+#include <AsyncJson.h>
 
 WebApiClass::WebApiClass()
     : _server(HTTP_PORT)

@@ -3,10 +3,9 @@
  * Copyright (C) 2022 Thomas Basler and others
  */
 #include "WebApi_config.h"
-#include "ArduinoJson.h"
-#include "AsyncJson.h"
 #include "Configuration.h"
 #include "WebApi.h"
+#include <AsyncJson.h>
 #include <LittleFS.h>
 
 void WebApiConfigClass::init(AsyncWebServer* server)
