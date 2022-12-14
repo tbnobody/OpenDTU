@@ -4,7 +4,6 @@
  */
 #include "MqttHandleInverter.h"
 #include "MqttSettings.h"
-#include "NetworkSettings.h"
 #include <ctime>
 
 MqttHandleInverterClass MqttHandleInverter;
@@ -22,13 +21,6 @@ void MqttHandleInverterClass::loop()
     const CONFIG_T& config = Configuration.get();
 
     if (millis() - _lastPublish > (config.Mqtt_PublishInterval * 1000)) {
-        MqttSettings.publish("dtu/uptime", String(millis() / 1000));
-        MqttSettings.publish("dtu/ip", NetworkSettings.localIP().toString());
-        MqttSettings.publish("dtu/hostname", NetworkSettings.getHostname());
-        if (NetworkSettings.NetworkMode() == network_mode::WiFi) {
-            MqttSettings.publish("dtu/rssi", String(WiFi.RSSI()));
-        }
-
         // Loop all inverters
         for (uint8_t i = 0; i < Hoymiles.getNumInverters(); i++) {
             auto inv = Hoymiles.getInverterByPos(i);
