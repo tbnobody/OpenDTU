@@ -28,7 +28,7 @@ void WebApiPrometheusClass::onPrometheusMetricsGet(AsyncWebServerRequest* reques
 
     stream->print(F("# HELP opendtu_platform Platform info\n"));
     stream->print(F("# TYPE opendtu_platform gauge\n"));
-    stream->printf("opendtu_platform{arch=\"%s\",mac=\"%s\"} 1\n", ESP.getChipModel(), WiFi.macAddress().c_str());
+    stream->printf("opendtu_platform{arch=\"%s\",mac=\"%s\"} 1\n", ESP.getChipModel(), NetworkSettings.macAddress().c_str());
 
     stream->print(F("# HELP opendtu_uptime Uptime in seconds\n"));
     stream->print(F("# TYPE opendtu_uptime counter\n"));
