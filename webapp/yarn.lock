@@ -2044,10 +2044,10 @@ vite-plugin-compression@^0.5.1:
     debug "^4.3.3"
     fs-extra "^10.0.0"
 
-vite-plugin-css-injected-by-js@^2.1.1:
-  version "2.1.1"
-  resolved "https://registry.yarnpkg.com/vite-plugin-css-injected-by-js/-/vite-plugin-css-injected-by-js-2.1.1.tgz#a79275241c61f1c8d55d228f5b2dded450a580e4"
-  integrity sha512-gjIG6iFWde32oRr/bK9CsfN+jdbura2y4GlDzeOiEm6py38ud8dXzFl9zwmHjOjZdr8XEgQ9TovzVGNzp47esw==
+vite-plugin-css-injected-by-js@^2.2.0:
+  version "2.2.0"
+  resolved "https://registry.yarnpkg.com/vite-plugin-css-injected-by-js/-/vite-plugin-css-injected-by-js-2.2.0.tgz#5ff95fbee027698e399a30437335214dc09bb989"
+  integrity sha512-SRGuyY1WUHj7cPzv7AIE0bG5Cb+vioxuq3CkFc1j0b8z5Cy3rXLG8SwxjriylFcZAY7tH2jU4i1bsCJRE/ou6g==
 
 vite@^4.0.1:
   version "4.0.1"
