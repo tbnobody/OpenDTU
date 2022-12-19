@@ -48,6 +48,11 @@ export default defineConfig({
         target: 'ws://192.168.20.110/',
         ws: true,
         changeOrigin: true
+      },
+      '^/console': {
+        target: 'ws://192.168.20.110/',
+        ws: true,
+        changeOrigin: true
       }
     }
   }
