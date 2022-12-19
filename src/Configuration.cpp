@@ -3,6 +3,7 @@
  * Copyright (C) 2022 Thomas Basler and others
  */
 #include "Configuration.h"
+#include "MessageOutput.h"
 #include "defaults.h"
 #include <ArduinoJson.h>
 #include <LittleFS.h>
@@ -95,7 +96,7 @@ bool ConfigurationClass::write()
 
     // Serialize JSON to file
     if (serializeJson(doc, f) == 0) {
-        Serial.println("Failed to write file");
+        MessageOutput.println("Failed to write file");
         return false;
     }
 
@@ -111,7 +112,7 @@ bool ConfigurationClass::read()
     // Deserialize the JSON document
     DeserializationError error = deserializeJson(doc, f);
     if (error) {
-        Serial.println(F("Failed to read file, using default configuration"));
+        MessageOutput.println(F("Failed to read file, using default configuration"));
     }
 
     JsonObject cfg = doc["cfg"];
@@ -222,7 +223,7 @@ void ConfigurationClass::migrate()
     if (config.Cfg_Version < 0x00011700) {
         File f = LittleFS.open(CONFIG_FILENAME, "r", false);
         if (!f) {
-            Serial.println(F("Failed to open file, cancel migration"));
+            MessageOutput.println(F("Failed to open file, cancel migration"));
             return;
         }
 
@@ -230,7 +231,7 @@ void ConfigurationClass::migrate()
         // Deserialize the JSON document
         DeserializationError error = deserializeJson(doc, f);
         if (error) {
-            Serial.println(F("Failed to read file, cancel migration"));
+            MessageOutput.println(F("Failed to read file, cancel migration"));
             return;
         }
 

@@ -4,6 +4,7 @@
  */
 #include "WebApi_ws_live.h"
 #include "Configuration.h"
+#include "MessageOutput.h"
 #include "WebApi.h"
 #include "defaults.h"
 #include <AsyncJson.h>
@@ -198,11 +199,11 @@ void WebApiWsLiveClass::onWebsocketEvent(AsyncWebSocket* server, AsyncWebSocketC
     if (type == WS_EVT_CONNECT) {
         char str[64];
         snprintf(str, sizeof(str), "Websocket: [%s][%u] connect", server->url(), client->id());
-        Serial.println(str);
+        MessageOutput.println(str);
     } else if (type == WS_EVT_DISCONNECT) {
         char str[64];
         snprintf(str, sizeof(str), "Websocket: [%s][%u] disconnect", server->url(), client->id());
-        Serial.println(str);
+        MessageOutput.println(str);
     }
 }
 

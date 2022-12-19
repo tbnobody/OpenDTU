@@ -4,6 +4,7 @@
  */
 #include "NetworkSettings.h"
 #include "Configuration.h"
+#include "MessageOutput.h"
 #include "Utils.h"
 #include "defaults.h"
 #ifdef OPENDTU_ETHERNET
@@ -30,30 +31,30 @@ void NetworkSettingsClass::NetworkEvent(WiFiEvent_t event)
     switch (event) {
 #ifdef OPENDTU_ETHERNET
     case ARDUINO_EVENT_ETH_START:
-        Serial.println(F("ETH start"));
+        MessageOutput.println(F("ETH start"));
         if (_networkMode == network_mode::Ethernet) {
             raiseEvent(network_event::NETWORK_START);
         }
         break;
     case ARDUINO_EVENT_ETH_STOP:
-        Serial.println(F("ETH stop"));
+        MessageOutput.println(F("ETH stop"));
         if (_networkMode == network_mode::Ethernet) {
             raiseEvent(network_event::NETWORK_STOP);
         }
         break;
     case ARDUINO_EVENT_ETH_CONNECTED:
-        Serial.println(F("ETH connected"));
+        MessageOutput.println(F("ETH connected"));
         _ethConnected = true;
         raiseEvent(network_event::NETWORK_CONNECTED);
         break;
     case ARDUINO_EVENT_ETH_GOT_IP:
-        Serial.printf("ETH got IP: %s\n", ETH.localIP().toString().c_str());
+        MessageOutput.printf("ETH got IP: %s\n", ETH.localIP().toString().c_str());
         if (_networkMode == network_mode::Ethernet) {
             raiseEvent(network_event::NETWORK_GOT_IP);
         }
         break;
     case ARDUINO_EVENT_ETH_DISCONNECTED:
-        Serial.println(F("ETH disconnected"));
+        MessageOutput.println(F("ETH disconnected"));
         _ethConnected = false;
         if (_networkMode == network_mode::Ethernet) {
             raiseEvent(network_event::NETWORK_DISCONNECTED);
@@ -61,21 +62,21 @@ void NetworkSettingsClass::NetworkEvent(WiFiEvent_t event)
         break;
 #endif
     case ARDUINO_EVENT_WIFI_STA_CONNECTED:
-        Serial.println(F("WiFi connected"));
+        MessageOutput.println(F("WiFi connected"));
         if (_networkMode == network_mode::WiFi) {
             raiseEvent(network_event::NETWORK_CONNECTED);
         }
         break;
     case ARDUINO_EVENT_WIFI_STA_DISCONNECTED:
-        Serial.println(F("WiFi disconnected"));
+        MessageOutput.println(F("WiFi disconnected"));
         if (_networkMode == network_mode::WiFi) {
-            Serial.println(F("Try reconnecting"));
+            MessageOutput.println(F("Try reconnecting"));
             WiFi.reconnect();
             raiseEvent(network_event::NETWORK_DISCONNECTED);
         }
         break;
     case ARDUINO_EVENT_WIFI_STA_GOT_IP:
-        Serial.printf("WiFi got ip: %s\n", WiFi.localIP().toString().c_str());
+        MessageOutput.printf("WiFi got ip: %s\n", WiFi.localIP().toString().c_str());
         if (_networkMode == network_mode::WiFi) {
             raiseEvent(network_event::NETWORK_GOT_IP);
         }
@@ -151,7 +152,7 @@ void NetworkSettingsClass::loop()
     if (_ethConnected) {
         if (_networkMode != network_mode::Ethernet) {
             // Do stuff when switching to Ethernet mode
-            Serial.println(F("Switch to Ethernet mode"));
+            MessageOutput.println(F("Switch to Ethernet mode"));
             _networkMode = network_mode::Ethernet;
             WiFi.mode(WIFI_MODE_NULL);
             setStaticIp();
@@ -161,7 +162,7 @@ void NetworkSettingsClass::loop()
 #endif
         if (_networkMode != network_mode::WiFi) {
         // Do stuff when switching to Ethernet mode
-        Serial.println(F("Switch to WiFi mode"));
+        MessageOutput.println(F("Switch to WiFi mode"));
         _networkMode = network_mode::WiFi;
         enableAdminMode();
         applyConfig();
@@ -182,7 +183,7 @@ void NetworkSettingsClass::loop()
         // seconds, disable the internal Access Point
         if (adminTimeoutCounter > ADMIN_TIMEOUT) {
             adminEnabled = false;
-            Serial.println(F("Admin mode disabled"));
+            MessageOutput.println(F("Admin mode disabled"));
             setupMode();
         }
         // It's nearly not possible to use the internal AP if the
@@ -193,16 +194,16 @@ void NetworkSettingsClass::loop()
             connectRedoTimer = 0;
         } else {
             if (connectTimeoutTimer > WIFI_RECONNECT_TIMEOUT && !forceDisconnection) {
-                Serial.print(F("Disable search for AP... "));
+                MessageOutput.print(F("Disable search for AP... "));
                 WiFi.mode(WIFI_AP);
-                Serial.println(F("done"));
+                MessageOutput.println(F("done"));
                 connectRedoTimer = 0;
                 forceDisconnection = true;
             }
             if (connectRedoTimer > WIFI_RECONNECT_REDO_TIMEOUT && forceDisconnection) {
-                Serial.print(F("Enable search for AP... "));
+                MessageOutput.print(F("Enable search for AP... "));
                 WiFi.mode(WIFI_AP_STA);
-                Serial.println(F("done"));
+                MessageOutput.println(F("done"));
                 applyConfig();
                 connectTimeoutTimer = 0;
                 forceDisconnection = false;
@@ -220,28 +221,28 @@ void NetworkSettingsClass::applyConfig()
     if (!strcmp(Configuration.get().WiFi_Ssid, "")) {
         return;
     }
-    Serial.print(F("Configuring WiFi STA using "));
+    MessageOutput.print(F("Configuring WiFi STA using "));
     if (strcmp(WiFi.SSID().c_str(), Configuration.get().WiFi_Ssid) || strcmp(WiFi.psk().c_str(), Configuration.get().WiFi_Password)) {
-        Serial.print(F("new credentials... "));
+        MessageOutput.print(F("new credentials... "));
         WiFi.begin(
             Configuration.get().WiFi_Ssid,
             Configuration.get().WiFi_Password);
     } else {
-        Serial.print(F("existing credentials... "));
+        MessageOutput.print(F("existing credentials... "));
         WiFi.begin();
     }
-    Serial.println(F("done"));
+    MessageOutput.println(F("done"));
     setStaticIp();
 }
 
 void NetworkSettingsClass::setHostname()
 {
-    Serial.print(F("Setting Hostname... "));
+    MessageOutput.print(F("Setting Hostname... "));
     if (_networkMode == network_mode::WiFi) {
         if (WiFi.hostname(getHostname())) {
-            Serial.println(F("done"));
+            MessageOutput.println(F("done"));
         } else {
-            Serial.println(F("failed"));
+            MessageOutput.println(F("failed"));
         }
 
         // Evil bad hack to get the hostname set up correctly
@@ -252,9 +253,9 @@ void NetworkSettingsClass::setHostname()
 #ifdef OPENDTU_ETHERNET
     else if (_networkMode == network_mode::Ethernet) {
         if (ETH.setHostname(getHostname().c_str())) {
-            Serial.println(F("done"));
+            MessageOutput.println(F("done"));
         } else {
-            Serial.println(F("failed"));
+            MessageOutput.println(F("failed"));
         }
     }
 #endif
@@ -264,35 +265,35 @@ void NetworkSettingsClass::setStaticIp()
 {
     if (_networkMode == network_mode::WiFi) {
         if (Configuration.get().WiFi_Dhcp) {
-            Serial.print(F("Configuring WiFi STA DHCP IP... "));
+            MessageOutput.print(F("Configuring WiFi STA DHCP IP... "));
             WiFi.config(INADDR_NONE, INADDR_NONE, INADDR_NONE);
-            Serial.println(F("done"));
+            MessageOutput.println(F("done"));
         } else {
-            Serial.print(F("Configuring WiFi STA static IP... "));
+            MessageOutput.print(F("Configuring WiFi STA static IP... "));
             WiFi.config(
                 IPAddress(Configuration.get().WiFi_Ip),
                 IPAddress(Configuration.get().WiFi_Gateway),
                 IPAddress(Configuration.get().WiFi_Netmask),
                 IPAddress(Configuration.get().WiFi_Dns1),
                 IPAddress(Configuration.get().WiFi_Dns2));
-            Serial.println(F("done"));
+            MessageOutput.println(F("done"));
         }
     }
 #ifdef OPENDTU_ETHERNET
     else if (_networkMode == network_mode::Ethernet) {
         if (Configuration.get().WiFi_Dhcp) {
-            Serial.print(F("Configuring Ethernet DHCP IP... "));
+            MessageOutput.print(F("Configuring Ethernet DHCP IP... "));
             ETH.config(INADDR_NONE, INADDR_NONE, INADDR_NONE, INADDR_NONE);
-            Serial.println(F("done"));
+            MessageOutput.println(F("done"));
         } else {
-            Serial.print(F("Configuring Ethernet static IP... "));
+            MessageOutput.print(F("Configuring Ethernet static IP... "));
             ETH.config(
                 IPAddress(Configuration.get().WiFi_Ip),
                 IPAddress(Configuration.get().WiFi_Gateway),
                 IPAddress(Configuration.get().WiFi_Netmask),
                 IPAddress(Configuration.get().WiFi_Dns1),
                 IPAddress(Configuration.get().WiFi_Dns2));
-            Serial.println(F("done"));
+            MessageOutput.println(F("done"));
         }
     }
 #endif

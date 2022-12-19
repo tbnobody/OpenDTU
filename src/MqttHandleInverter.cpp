@@ -3,6 +3,7 @@
  * Copyright (C) 2022 Thomas Basler and others
  */
 #include "MqttHandleInverter.h"
+#include "MessageOutput.h"
 #include "MqttSettings.h"
 #include <ctime>
 
@@ -168,7 +169,7 @@ void MqttHandleInverterClass::onMqttMessage(const espMqttClientTypes::MessagePro
     auto inv = Hoymiles.getInverterBySerial(serial);
 
     if (inv == nullptr) {
-        Serial.println(F("Inverter not found"));
+        MessageOutput.println(F("Inverter not found"));
         return;
     }
 
@@ -185,44 +186,44 @@ void MqttHandleInverterClass::onMqttMessage(const espMqttClientTypes::MessagePro
 
     if (!strcmp(setting, TOPIC_SUB_LIMIT_PERSISTENT_RELATIVE)) {
         // Set inverter limit relative persistent
-        Serial.printf("Limit Persistent: %d %%\n", payload_val);
+        MessageOutput.printf("Limit Persistent: %d %%\n", payload_val);
         inv->sendActivePowerControlRequest(Hoymiles.getRadio(), payload_val, PowerLimitControlType::RelativPersistent);
 
     } else if (!strcmp(setting, TOPIC_SUB_LIMIT_PERSISTENT_ABSOLUTE)) {
         // Set inverter limit absolute persistent
-        Serial.printf("Limit Persistent: %d W\n", payload_val);
+        MessageOutput.printf("Limit Persistent: %d W\n", payload_val);
         inv->sendActivePowerControlRequest(Hoymiles.getRadio(), payload_val, PowerLimitControlType::AbsolutPersistent);
 
     } else if (!strcmp(setting, TOPIC_SUB_LIMIT_NONPERSISTENT_RELATIVE)) {
         // Set inverter limit relative non persistent
-        Serial.printf("Limit Non-Persistent: %d %%\n", payload_val);
+        MessageOutput.printf("Limit Non-Persistent: %d %%\n", payload_val);
         if (!properties.retain) {
             inv->sendActivePowerControlRequest(Hoymiles.getRadio(), payload_val, PowerLimitControlType::RelativNonPersistent);
         } else {
-            Serial.println("Ignored because retained");
+            MessageOutput.println("Ignored because retained");
         }
 
     } else if (!strcmp(setting, TOPIC_SUB_LIMIT_NONPERSISTENT_ABSOLUTE)) {
         // Set inverter limit absolute non persistent
-        Serial.printf("Limit Non-Persistent: %d W\n", payload_val);
+        MessageOutput.printf("Limit Non-Persistent: %d W\n", payload_val);
         if (!properties.retain) {
             inv->sendActivePowerControlRequest(Hoymiles.getRadio(), payload_val, PowerLimitControlType::AbsolutNonPersistent);
         } else {
-            Serial.println("Ignored because retained");
+            MessageOutput.println("Ignored because retained");
         }
 
     } else if (!strcmp(setting, TOPIC_SUB_POWER)) {
         // Turn inverter on or off
-        Serial.printf("Set inverter power to: %d\n", payload_val);
+        MessageOutput.printf("Set inverter power to: %d\n", payload_val);
         inv->sendPowerControlRequest(Hoymiles.getRadio(), payload_val > 0);
 
     } else if (!strcmp(setting, TOPIC_SUB_RESTART)) {
         // Restart inverter
-        Serial.printf("Restart inverter\n");
+        MessageOutput.printf("Restart inverter\n");
         if (!properties.retain && payload_val == 1) {
             inv->sendRestartControlRequest(Hoymiles.getRadio());
         } else {
-            Serial.println("Ignored because retained");
+            MessageOutput.println("Ignored because retained");
         }
     }
 }
