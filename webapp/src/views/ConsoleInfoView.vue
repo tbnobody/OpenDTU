@@ -1,0 +1,119 @@
+<template>
+    <BasePage :title="'Console'" :isLoading="dataLoading">
+        <div class="card">
+            <div class="card-header text-bg-primary">Virtual debug console</div>
+            <div class="card-body">
+                <div class="row g-3 align-items-center">
+                    <div class="col">
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" role="switch" id="autoScroll"
+                                v-model="isAutoScroll">
+                            <label class="form-check-label" for="autoScroll">Enable Auto Scroll</label>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <button type="button" class="btn btn-primary" :onClick="clearConsole">Clear Console</button>
+                    </div>
+                </div>
+                <textarea id="console" class="form-control" rows="12" v-model="consoleBuffer" readonly></textarea>
+            </div>
+        </div>
+    </BasePage>
+</template>
+
+<script lang="ts">
+import { defineComponent } from 'vue';
+import BasePage from '@/components/BasePage.vue';
+import { authUrl } from '@/utils/authentication';
+
+export default defineComponent({
+    components: {
+        BasePage,
+    },
+    data() {
+        return {
+            socket: {} as WebSocket,
+            heartInterval: 0,
+            dataLoading: true,
+            consoleBuffer: "",
+            isAutoScroll: true,
+        };
+    },
+    created() {
+        this.initSocket();
+        this.dataLoading = false;
+    },
+    unmounted() {
+        this.closeSocket();
+    },
+    methods: {
+        initSocket() {
+            console.log("Starting connection to WebSocket Server");
+
+            const { protocol, host } = location;
+            const authString = authUrl();
+            const webSocketUrl = `${protocol === "https:" ? "wss" : "ws"
+                }://${authString}${host}/console`;
+
+            this.closeSocket();
+            this.socket = new WebSocket(webSocketUrl);
+
+            this.socket.onmessage = (event) => {
+                console.log(event);
+                this.consoleBuffer += event.data;
+
+                if (this.isAutoScroll) {
+                    let textarea = this.$el.querySelector("#console");
+                    textarea.scrollTop = textarea.scrollHeight;
+                }
+                this.heartCheck(); // Reset heartbeat detection
+            };
+
+            this.socket.onopen = function (event) {
+                console.log(event);
+                console.log("Successfully connected to the echo websocket server...");
+            };
+
+            // Listen to window events , When the window closes , Take the initiative to disconnect websocket Connect
+            window.onbeforeunload = () => {
+                this.closeSocket();
+            };
+        },
+        // Send heartbeat packets regularly * 59s Send a heartbeat
+        heartCheck() {
+            this.heartInterval && clearTimeout(this.heartInterval);
+            this.heartInterval = setInterval(() => {
+                if (this.socket.readyState === 1) {
+                    // Connection status
+                    this.socket.send("ping");
+                } else {
+                    this.initSocket(); // Breakpoint reconnection 5 Time
+                }
+            }, 5 * 1000);
+        },
+        /** To break off websocket Connect */
+        closeSocket() {
+            try {
+                this.socket.close();
+            } catch {
+                // continue regardless of error
+            }
+
+            this.heartInterval && clearTimeout(this.heartInterval);
+        },
+        clearConsole() {
+            this.consoleBuffer = "";
+        }
+    }
+});
+</script>
+
+<style>
+textarea:focus.form-control,
+textarea.form-control {
+    background-color: #0C0C0C;
+    color: #CCCCCC;
+    padding: 8px;
+    font-family: courier new;
+}
+</style>

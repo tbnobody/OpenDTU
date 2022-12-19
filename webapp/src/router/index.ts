@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router';
 import HomeView from '@/views/HomeView.vue'
 import AboutView from '@/views/AboutView.vue'
+import ConsoleInfoView from '@/views/ConsoleInfoView.vue'
 import NetworkInfoView from '@/views/NetworkInfoView.vue'
 import SystemInfoView from '@/views/SystemInfoView.vue'
 import NtpInfoView from '@/views/NtpInfoView.vue'
@@ -54,6 +55,11 @@ const router = createRouter({
         path: '/info/mqtt',
         name: 'MqTT',
         component: MqttInfoView
+    },
+    {
+        path: '/info/console',
+        name: 'Web Console',
+        component: ConsoleInfoView
     },
     {
         path: '/settings/network',
