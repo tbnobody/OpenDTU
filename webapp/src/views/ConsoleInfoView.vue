@@ -11,8 +11,11 @@
                             <label class="form-check-label" for="autoScroll">Enable Auto Scroll</label>
                         </div>
                     </div>
-                    <div class="col">
-                        <button type="button" class="btn btn-primary" :onClick="clearConsole">Clear Console</button>
+                    <div class="col text-end">
+                        <div class="btn-group" role="group">
+                            <button type="button" class="btn btn-primary" :onClick="clearConsole">Clear Console</button>
+                            <button type="button" class="btn btn-secondary" :onClick="copyConsole">Copy to clipboard</button>
+                        </div>
                     </div>
                 </div>
                 <textarea id="console" class="form-control" rows="12" v-model="consoleBuffer" readonly></textarea>
@@ -108,6 +111,16 @@ export default defineComponent({
         },
         clearConsole() {
             this.consoleBuffer = "";
+        },
+        copyConsole() {
+            navigator.clipboard.writeText(this.consoleBuffer).then(
+                () => {
+                    console.log('clipboard successfully set');
+                },
+                () => {
+                    console.error('clipboard write failed');
+                }
+            );
         }
     }
 });
