@@ -15,7 +15,7 @@ public:
     virtual ~CommandAbstract() {};
 
     const uint8_t* getDataPayload();
-    void dumpDataPayload(Stream& stream);
+    void dumpDataPayload(Print* stream);
 
     uint8_t getDataSize();
 

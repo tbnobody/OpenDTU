@@ -3,6 +3,7 @@
  * Copyright (C) 2022 Thomas Basler and others
  */
 #include "StatisticsParser.h"
+#include "../Hoymiles.h"
 
 static float calcYieldTotalCh0(StatisticsParser* iv, uint8_t arg0);
 static float calcYieldDayCh0(StatisticsParser* iv, uint8_t arg0);
@@ -42,7 +43,7 @@ void StatisticsParser::clearBuffer()
 void StatisticsParser::appendFragment(uint8_t offset, uint8_t* payload, uint8_t len)
 {
     if (offset + len > STATISTIC_PACKET_SIZE) {
-        Serial.printf("FATAL: (%s, %d) stats packet too large for buffer\n", __FILE__, __LINE__);
+        Hoymiles.getMessageOutput()->printf("FATAL: (%s, %d) stats packet too large for buffer\n", __FILE__, __LINE__);
         return;
     }
     memcpy(&_payloadStatistic[offset], payload, len);

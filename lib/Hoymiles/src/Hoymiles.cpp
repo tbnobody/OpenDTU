@@ -35,8 +35,8 @@ void HoymilesClass::loop()
             if (_radio->isIdle()) {
                 std::shared_ptr<InverterAbstract> iv = getInverterByPos(inverterPos);
                 if (iv != nullptr) {
-                    Serial.print(F("Fetch inverter: "));
-                    Serial.println(iv->serial(), HEX);
+                    _messageOutput->print(F("Fetch inverter: "));
+                    _messageOutput->println(iv->serial(), HEX);
 
                     iv->sendStatsRequest(_radio.get());
 
@@ -48,25 +48,25 @@ void HoymilesClass::loop()
                     if ((iv->SystemConfigPara()->getLastLimitRequestSuccess() == CMD_NOK)
                         || ((millis() - iv->SystemConfigPara()->getLastUpdateRequest() > HOY_SYSTEM_CONFIG_PARA_POLL_INTERVAL)
                             && (millis() - iv->SystemConfigPara()->getLastUpdateCommand() > HOY_SYSTEM_CONFIG_PARA_POLL_MIN_DURATION))) {
-                        Serial.println("Request SystemConfigPara");
+                        _messageOutput->println("Request SystemConfigPara");
                         iv->sendSystemConfigParaRequest(_radio.get());
                     }
 
                     // Set limit if required
                     if (iv->SystemConfigPara()->getLastLimitCommandSuccess() == CMD_NOK) {
-                        Serial.println(F("Resend ActivePowerControl"));
+                        _messageOutput->println(F("Resend ActivePowerControl"));
                         iv->resendActivePowerControlRequest(_radio.get());
                     }
 
                     // Set power status if required
                     if (iv->PowerCommand()->getLastPowerCommandSuccess() == CMD_NOK) {
-                        Serial.println(F("Resend PowerCommand"));
+                        _messageOutput->println(F("Resend PowerCommand"));
                         iv->resendPowerControlRequest(_radio.get());
                     }
 
                     // Fetch dev info (but first fetch stats)
                     if (iv->Statistics()->getLastUpdate() > 0 && (iv->DevInfo()->getLastUpdateAll() == 0 || iv->DevInfo()->getLastUpdateSimple() == 0)) {
-                        Serial.println(F("Request device info"));
+                        _messageOutput->println(F("Request device info"));
                         iv->sendDevInfoRequest(_radio.get());
                     }
                 }
@@ -175,4 +175,14 @@ uint32_t HoymilesClass::PollInterval()
 void HoymilesClass::setPollInterval(uint32_t interval)
 {
     _pollInterval = interval;
+}
+
+void HoymilesClass::setMessageOutput(Print* output)
+{
+    _messageOutput = output;
+}
+
+Print* HoymilesClass::getMessageOutput()
+{
+    return _messageOutput;
 }

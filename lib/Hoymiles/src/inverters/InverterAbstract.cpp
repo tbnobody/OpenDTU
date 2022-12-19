@@ -3,6 +3,7 @@
  * Copyright (C) 2022 Thomas Basler and others
  */
 #include "InverterAbstract.h"
+#include "../Hoymiles.h"
 #include "crc.h"
 #include <cstring>
 
@@ -107,18 +108,18 @@ void InverterAbstract::clearRxFragmentBuffer()
 void InverterAbstract::addRxFragment(uint8_t fragment[], uint8_t len)
 {
     if (len < 11) {
-        Serial.printf("FATAL: (%s, %d) fragment too short\n", __FILE__, __LINE__);
+        Hoymiles.getMessageOutput()->printf("FATAL: (%s, %d) fragment too short\n", __FILE__, __LINE__);
         return;
     }
 
     if (len - 11 > MAX_RF_PAYLOAD_SIZE) {
-        Serial.printf("FATAL: (%s, %d) fragment too large\n", __FILE__, __LINE__);
+        Hoymiles.getMessageOutput()->printf("FATAL: (%s, %d) fragment too large\n", __FILE__, __LINE__);
         return;
     }
 
     uint8_t fragmentCount = fragment[9];
     if (fragmentCount == 0) {
-        Serial.println("ERROR: fragment number zero received and ignored");
+        Hoymiles.getMessageOutput()->println("ERROR: fragment number zero received and ignored");
         return;
     }
 
@@ -145,7 +146,7 @@ uint8_t InverterAbstract::verifyAllFragments(CommandAbstract* cmd)
 {
     // All missing
     if (_rxFragmentLastPacketId == 0) {
-        Serial.println(F("All missing"));
+        Hoymiles.getMessageOutput()->println(F("All missing"));
         if (cmd->getSendCount() <= MAX_RESEND_COUNT) {
             return FRAGMENT_ALL_MISSING_RESEND;
         } else {
@@ -156,7 +157,7 @@ uint8_t InverterAbstract::verifyAllFragments(CommandAbstract* cmd)
 
     // Last fragment is missing (thte one with 0x80)
     if (_rxFragmentMaxPacketId == 0) {
-        Serial.println(F("Last missing"));
+        Hoymiles.getMessageOutput()->println(F("Last missing"));
         if (_rxFragmentRetransmitCnt++ < MAX_RETRANSMIT_COUNT) {
             return _rxFragmentLastPacketId + 1;
         } else {
@@ -168,7 +169,7 @@ uint8_t InverterAbstract::verifyAllFragments(CommandAbstract* cmd)
     // Middle fragment is missing
     for (uint8_t i = 0; i < _rxFragmentMaxPacketId - 1; i++) {
         if (!_rxFragmentBuffer[i].wasReceived) {
-            Serial.println(F("Middle missing"));
+            Hoymiles.getMessageOutput()->println(F("Middle missing"));
             if (_rxFragmentRetransmitCnt++ < MAX_RETRANSMIT_COUNT) {
                 return i + 1;
             } else {

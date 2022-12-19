@@ -4,6 +4,7 @@
 #include "HoymilesRadio.h"
 #include "inverters/InverterAbstract.h"
 #include "types.h"
+#include <Print.h>
 #include <SPI.h>
 #include <memory>
 #include <vector>
@@ -15,6 +16,9 @@ class HoymilesClass {
 public:
     void init(SPIClass* initialisedSpiBus, uint8_t pinCE, uint8_t pinIRQ);
     void loop();
+
+    void setMessageOutput(Print* output);
+    Print* getMessageOutput();
 
     std::shared_ptr<InverterAbstract> addInverter(const char* name, uint64_t serial);
     std::shared_ptr<InverterAbstract> getInverterByPos(uint8_t pos);
@@ -36,6 +40,8 @@ private:
 
     uint32_t _pollInterval = 0;
     uint32_t _lastPoll = 0;
+
+    Print* _messageOutput = &Serial;
 };
 
 extern HoymilesClass Hoymiles;

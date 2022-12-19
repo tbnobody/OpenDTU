@@ -3,6 +3,7 @@
  * Copyright (C) 2022 Thomas Basler and others
  */
 #include "DevInfoParser.h"
+#include "../Hoymiles.h"
 #include <cstring>
 
 #define ALL 0xff
@@ -36,7 +37,7 @@ void DevInfoParser::clearBufferAll()
 void DevInfoParser::appendFragmentAll(uint8_t offset, uint8_t* payload, uint8_t len)
 {
     if (offset + len > DEV_INFO_SIZE) {
-        Serial.printf("FATAL: (%s, %d) dev info all packet too large for buffer\n", __FILE__, __LINE__);
+        Hoymiles.getMessageOutput()->printf("FATAL: (%s, %d) dev info all packet too large for buffer\n", __FILE__, __LINE__);
         return;
     }
     memcpy(&_payloadDevInfoAll[offset], payload, len);
@@ -52,7 +53,7 @@ void DevInfoParser::clearBufferSimple()
 void DevInfoParser::appendFragmentSimple(uint8_t offset, uint8_t* payload, uint8_t len)
 {
     if (offset + len > DEV_INFO_SIZE) {
-        Serial.printf("FATAL: (%s, %d) dev info Simple packet too large for buffer\n", __FILE__, __LINE__);
+        Hoymiles.getMessageOutput()->printf("FATAL: (%s, %d) dev info Simple packet too large for buffer\n", __FILE__, __LINE__);
         return;
     }
     memcpy(&_payloadDevInfoSimple[offset], payload, len);
@@ -88,7 +89,7 @@ uint16_t DevInfoParser::getFwBuildVersion()
 
 time_t DevInfoParser::getFwBuildDateTime()
 {
-    struct tm timeinfo = { };
+    struct tm timeinfo = {};
     timeinfo.tm_year = ((((uint16_t)_payloadDevInfoAll[2]) << 8) | _payloadDevInfoAll[3]) - 1900;
 
     timeinfo.tm_mon = ((((uint16_t)_payloadDevInfoAll[4]) << 8) | _payloadDevInfoAll[5]) / 100 - 1;
@@ -143,10 +144,10 @@ String DevInfoParser::getHwModelName()
 
 uint8_t DevInfoParser::getDevIdx()
 {
-     uint8_t pos;
-     // Check for all 4 bytes first
+    uint8_t pos;
+    // Check for all 4 bytes first
     for (pos = 0; pos < sizeof(devInfo) / sizeof(devInfo_t); pos++) {
-         if (devInfo[pos].hwPart[0] == _payloadDevInfoSimple[2]
+        if (devInfo[pos].hwPart[0] == _payloadDevInfoSimple[2]
             && devInfo[pos].hwPart[1] == _payloadDevInfoSimple[3]
             && devInfo[pos].hwPart[2] == _payloadDevInfoSimple[4]
             && devInfo[pos].hwPart[3] == _payloadDevInfoSimple[5]) {
@@ -156,7 +157,7 @@ uint8_t DevInfoParser::getDevIdx()
 
     // Then only for 3 bytes
     for (pos = 0; pos < sizeof(devInfo) / sizeof(devInfo_t); pos++) {
-         if (devInfo[pos].hwPart[0] == _payloadDevInfoSimple[2]
+        if (devInfo[pos].hwPart[0] == _payloadDevInfoSimple[2]
             && devInfo[pos].hwPart[1] == _payloadDevInfoSimple[3]
             && devInfo[pos].hwPart[2] == _payloadDevInfoSimple[4]) {
             return pos;
