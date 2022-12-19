@@ -46,6 +46,16 @@ export default defineComponent({
     unmounted() {
         this.closeSocket();
     },
+    watch: {
+        consoleBuffer() {
+            if (this.isAutoScroll) {
+                let textarea = this.$el.querySelector("#console");
+                setTimeout(() => {
+                    textarea.scrollTop = textarea.scrollHeight;
+                }, 0);
+            }
+        }
+    },
     methods: {
         initSocket() {
             console.log("Starting connection to WebSocket Server");
@@ -61,11 +71,6 @@ export default defineComponent({
             this.socket.onmessage = (event) => {
                 console.log(event);
                 this.consoleBuffer += event.data;
-
-                if (this.isAutoScroll) {
-                    let textarea = this.$el.querySelector("#console");
-                    textarea.scrollTop = textarea.scrollHeight;
-                }
                 this.heartCheck(); // Reset heartbeat detection
             };
 
