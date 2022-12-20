@@ -18,7 +18,7 @@
                         </div>
                     </div>
                 </div>
-                <textarea id="console" class="form-control" rows="12" v-model="consoleBuffer" readonly></textarea>
+                <textarea id="console" class="form-control" rows="24" v-model="consoleBuffer" readonly></textarea>
             </div>
         </div>
     </BasePage>
