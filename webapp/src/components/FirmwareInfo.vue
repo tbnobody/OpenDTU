@@ -22,13 +22,16 @@
                         <tr>
                             <th>Firmware Version / Git Hash</th>
                             <td><a :href="'https://github.com/tbnobody/OpenDTU/commits/' + systemStatus.git_hash?.substring(1)"
-                                    target="_blank">{{ systemStatus.git_hash?.substring(1) }}</a></td>
+                                    target="_blank" v-tooltip title="Click here to show information about your current version">{{
+                                            systemStatus.git_hash?.substring(1)
+                                    }}</a></td>
                         </tr>
                         <tr>
                             <th>Firmware Update</th>
-                            <td><a :href="systemStatus.update_url" target="_blank"><span class="badge"
-                                        :class="systemStatus.update_status">{{
-                                        systemStatus.update_text }}</span></a></td>
+                            <td><a :href="systemStatus.update_url" target="_blank" v-tooltip title="Click here to view the changes between your version 
+                                    and the latest version"><span class="badge" :class="systemStatus.update_status">{{
+                                            systemStatus.update_text
+                                    }}</span></a></td>
                         </tr>
                         <tr>
                             <th>Reset Reason CPU 0</th>

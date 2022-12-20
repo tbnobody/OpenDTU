@@ -55,7 +55,7 @@
                             <div class="btn-toolbar p-2" role="toolbar">
                                 <div class="btn-group me-2" role="group">
                                     <button :disabled="!isLogged" type="button" class="btn btn-sm btn-danger"
-                                        @click="onShowLimitSettings(inverter.serial)" title="Show / Set Inverter Limit">
+                                        @click="onShowLimitSettings(inverter.serial)" v-tooltip title="Show / Set Inverter Limit">
                                         <BIconSpeedometer style="font-size:24px;" />
 
                                     </button>
@@ -63,7 +63,7 @@
 
                                 <div class="btn-group me-2" role="group">
                                     <button :disabled="!isLogged" type="button" class="btn btn-sm btn-danger"
-                                        @click="onShowPowerSettings(inverter.serial)" title="Turn Inverter on/off">
+                                        @click="onShowPowerSettings(inverter.serial)" v-tooltip title="Turn Inverter on/off">
                                         <BIconPower style="font-size:24px;" />
 
                                     </button>
@@ -71,7 +71,7 @@
 
                                 <div class="btn-group me-2" role="group">
                                     <button type="button" class="btn btn-sm btn-info"
-                                        @click="onShowDevInfo(inverter.serial)" title="Show Inverter Info">
+                                        @click="onShowDevInfo(inverter.serial)" v-tooltip title="Show Inverter Info">
                                         <BIconCpu style="font-size:24px;" />
 
                                     </button>
@@ -80,7 +80,7 @@
                                 <div class="btn-group" role="group">
                                     <button v-if="inverter.events >= 0" type="button"
                                         class="btn btn-sm btn-secondary position-relative"
-                                        @click="onShowEventlog(inverter.serial)" title="Show Eventlog">
+                                        @click="onShowEventlog(inverter.serial)" v-tooltip title="Show Eventlog">
                                         <BIconJournalText style="font-size:24px;" />
                                         <span
                                             class="position-absolute top-0 start-100 translate-middle badge rounded-pill text-bg-danger">

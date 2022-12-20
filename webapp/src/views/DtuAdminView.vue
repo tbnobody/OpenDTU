@@ -9,7 +9,12 @@
                 <div class="card-header text-bg-primary">DTU Configuration</div>
                 <div class="card-body">
                     <div class="row mb-3">
-                        <label for="inputDtuSerial" class="col-sm-2 col-form-label">Serial:</label>
+                        <label for="inputDtuSerial" class="col-sm-2 col-form-label">Serial:
+                            <BIconInfoCircle v-tooltip title="Both the inverter and the DTU have a serial number. 
+                                The DTU serial number is randomly generated at the first start and does not 
+                                normally need to be changed." />
+
+                        </label>
                         <div class="col-sm-10">
                             <input type="number" class="form-control" id="inputDtuSerial" min="1" max="199999999999"
                                 placeholder="DTU Serial" v-model="dtuConfigList.dtu_serial" />
@@ -29,7 +34,10 @@
                     </div>
 
                     <div class="row mb-3">
-                        <label for="inputTimezone" class="col-sm-2 col-form-label">PA Level:</label>
+                        <label for="inputTimezone" class="col-sm-2 col-form-label">PA Level:
+                            <BIconInfoCircle v-tooltip
+                                title="Make sure your power supply is stable enough before increasing the transmit power." />
+                        </label>
                         <div class="col-sm-10">
                             <select class="form-select" v-model="dtuConfigList.dtu_palevel">
                                 <option v-for="palevel in palevelList" :key="palevel.key" :value="palevel.key">
@@ -51,11 +59,15 @@ import BasePage from '@/components/BasePage.vue';
 import BootstrapAlert from "@/components/BootstrapAlert.vue";
 import { handleResponse, authHeader } from '@/utils/authentication';
 import type { DtuConfig } from "@/types/DtuConfig";
+import {
+    BIconInfoCircle,
+} from 'bootstrap-icons-vue';
 
 export default defineComponent({
     components: {
         BasePage,
         BootstrapAlert,
+        BIconInfoCircle,
     },
     data() {
         return {

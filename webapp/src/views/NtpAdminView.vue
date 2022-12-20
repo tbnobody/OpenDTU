@@ -9,7 +9,10 @@
                 <div class="card-header text-bg-primary">NTP Configuration</div>
                 <div class="card-body">
                     <div class="row mb-3">
-                        <label for="inputNtpServer" class="col-sm-2 col-form-label">Time Server:</label>
+                        <label for="inputNtpServer" class="col-sm-2 col-form-label">Time Server:
+                            <BIconInfoCircle v-tooltip
+                                title="The default value is fine as long as OpenDTU has direct access to the internet." />
+                        </label>
                         <div class="col-sm-10">
                             <input type="text" class="form-control" id="inputNtpServer" maxlength="32"
                                 placeholder="Time Server" v-model="ntpConfigList.ntp_server" />
@@ -78,11 +81,15 @@ import BasePage from '@/components/BasePage.vue';
 import BootstrapAlert from "@/components/BootstrapAlert.vue";
 import { handleResponse, authHeader } from '@/utils/authentication';
 import type { NtpConfig } from "@/types/NtpConfig";
+import {
+    BIconInfoCircle,
+} from 'bootstrap-icons-vue';
 
 export default defineComponent({
     components: {
         BasePage,
         BootstrapAlert,
+        BIconInfoCircle,
     },
     data() {
         return {

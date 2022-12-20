@@ -75,37 +75,49 @@
                         <div class="mb-3">
                             <label for="inverter-serial" class="col-form-label">Inverter Serial:</label>
                             <input v-model="selectedInverterData.serial" type="number" id="inverter-serial"
-                                   class="form-control" />
-                            <label for="inverter-name" class="col-form-label">Inverter Name:</label>
+                                class="form-control" />
+                            <label for="inverter-name" class="col-form-label">Inverter Name:
+                                <BIconInfoCircle v-tooltip
+                                    title="Here you can specify a custom name for your inverter." />
+                            </label>
                             <input v-model="selectedInverterData.name" type="text" id="inverter-name"
-                                   class="form-control" maxlength="31" />
+                                class="form-control" maxlength="31" />
                         </div>
 
                         <div v-for="(max, index) in selectedInverterData.channel" :key="`${index}`">
                             <div class="row g-2">
                                 <div class="col-md">
-                                    <label :for="`inverter-name_${index}`" class="col-form-label">Name string {{ index +1 }}:</label>
+                                    <label :for="`inverter-name_${index}`" class="col-form-label">Name string {{ index
+                                            + 1
+                                    }}:
+                                        <BIconInfoCircle v-tooltip
+                                            title="Here you can specify a custom name for the respective port of your inverter." />
+                                    </label>
                                     <div class="d-flex mb-2">
                                         <div class="input-group">
-                                            <input type="text" class="form-control" :id="`inverter-name_${index}`" maxlength="31"
-                                                v-model="selectedInverterData.channel[index].name" />
+                                            <input type="text" class="form-control" :id="`inverter-name_${index}`"
+                                                maxlength="31" v-model="selectedInverterData.channel[index].name" />
                                         </div>
                                     </div>
                                 </div>
                                 <div class="col-md-5">
-                                    <label :for="`inverter-max_${index}`" class="col-form-label">Max power string {{ index +1 }}:</label>
+                                    <label :for="`inverter-max_${index}`" class="col-form-label">Max power string {{
+                                            index + 1
+                                    }}: <BIconInfoCircle v-tooltip
+                                            title="Enter the max power of the connected solar panels." /></label>
                                     <div class="d-flex mb-2">
                                         <div class="input-group">
-                                            <input type="number" class="form-control" :id="`inverter-max_${index}`" min="0"
-                                                v-model="selectedInverterData.channel[index].max_power"
+                                            <input type="number" class="form-control" :id="`inverter-max_${index}`"
+                                                min="0" v-model="selectedInverterData.channel[index].max_power"
                                                 :aria-describedby="`inverter-maxDescription_${index} inverter-customizer`" />
-                                            <span class="input-group-text" :id="`inverter-maxDescription_${index}`">W<sub>p</sub><sup>*</sup></span>
+                                            <span class="input-group-text"
+                                                :id="`inverter-maxDescription_${index}`">W<sub>p</sub><sup>*</sup></span>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                        <div :id="`inverter-customizer`" class="form-text">*) Input the W<sub>p</sub> of the channel to
+                        <div :id="`inverter-customizer`" class="form-text">*) Enter the W<sub>p</sub> of the channel to
                             calculate irradiation.</div>
                     </form>
 
@@ -146,7 +158,8 @@ import { defineComponent } from 'vue';
 import BasePage from '@/components/BasePage.vue';
 import {
     BIconTrash,
-    BIconPencil
+    BIconPencil,
+    BIconInfoCircle,
 } from 'bootstrap-icons-vue';
 import * as bootstrap from 'bootstrap';
 import BootstrapAlert from "@/components/BootstrapAlert.vue";
@@ -177,6 +190,7 @@ export default defineComponent({
         BootstrapAlert,
         BIconTrash,
         BIconPencil,
+        BIconInfoCircle,
     },
     data() {
         return {
