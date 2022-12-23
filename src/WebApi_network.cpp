@@ -6,6 +6,7 @@
 #include "Configuration.h"
 #include "NetworkSettings.h"
 #include "WebApi.h"
+#include "WebApi_errors.h"
 #include "helper.h"
 #include <AsyncJson.h>
 
@@ -90,6 +91,7 @@ void WebApiNetworkClass::onNetworkAdminPost(AsyncWebServerRequest* request)
 
     if (!request->hasParam("data", true)) {
         retMsg[F("message")] = F("No values found!");
+        retMsg[F("code")] = WebApiError::GenericNoValueFound;
         response->setLength();
         request->send(response);
         return;
@@ -99,6 +101,7 @@ void WebApiNetworkClass::onNetworkAdminPost(AsyncWebServerRequest* request)
 
     if (json.length() > 1024) {
         retMsg[F("message")] = F("Data too large!");
+        retMsg[F("code")] = WebApiError::GenericDataTooLarge;
         response->setLength();
         request->send(response);
         return;
@@ -109,6 +112,7 @@ void WebApiNetworkClass::onNetworkAdminPost(AsyncWebServerRequest* request)
 
     if (error) {
         retMsg[F("message")] = F("Failed to parse data!");
+        retMsg[F("code")] = WebApiError::GenericParseError;
         response->setLength();
         request->send(response);
         return;
@@ -116,6 +120,7 @@ void WebApiNetworkClass::onNetworkAdminPost(AsyncWebServerRequest* request)
 
     if (!(root.containsKey("ssid") && root.containsKey("password") && root.containsKey("hostname") && root.containsKey("dhcp") && root.containsKey("ipaddress") && root.containsKey("netmask") && root.containsKey("gateway") && root.containsKey("dns1") && root.containsKey("dns2"))) {
         retMsg[F("message")] = F("Values are missing!");
+        retMsg[F("code")] = WebApiError::GenericValueMissing;
         response->setLength();
         request->send(response);
         return;
@@ -124,6 +129,7 @@ void WebApiNetworkClass::onNetworkAdminPost(AsyncWebServerRequest* request)
     IPAddress ipaddress;
     if (!ipaddress.fromString(root[F("ipaddress")].as<String>())) {
         retMsg[F("message")] = F("IP address is invalid!");
+        retMsg[F("code")] = WebApiError::NetworkIpInvalid;
         response->setLength();
         request->send(response);
         return;
@@ -131,6 +137,7 @@ void WebApiNetworkClass::onNetworkAdminPost(AsyncWebServerRequest* request)
     IPAddress netmask;
     if (!netmask.fromString(root[F("netmask")].as<String>())) {
         retMsg[F("message")] = F("Netmask is invalid!");
+        retMsg[F("code")] = WebApiError::NetworkNetmaskInvalid;
         response->setLength();
         request->send(response);
         return;
@@ -138,6 +145,7 @@ void WebApiNetworkClass::onNetworkAdminPost(AsyncWebServerRequest* request)
     IPAddress gateway;
     if (!gateway.fromString(root[F("gateway")].as<String>())) {
         retMsg[F("message")] = F("Gateway is invalid!");
+        retMsg[F("code")] = WebApiError::NetworkGatewayInvalid;
         response->setLength();
         request->send(response);
         return;
@@ -145,6 +153,7 @@ void WebApiNetworkClass::onNetworkAdminPost(AsyncWebServerRequest* request)
     IPAddress dns1;
     if (!dns1.fromString(root[F("dns1")].as<String>())) {
         retMsg[F("message")] = F("DNS Server IP 1 is invalid!");
+        retMsg[F("code")] = WebApiError::NetworkDns1Invalid;
         response->setLength();
         request->send(response);
         return;
@@ -152,6 +161,7 @@ void WebApiNetworkClass::onNetworkAdminPost(AsyncWebServerRequest* request)
     IPAddress dns2;
     if (!dns2.fromString(root[F("dns2")].as<String>())) {
         retMsg[F("message")] = F("DNS Server IP 2 is invalid!");
+        retMsg[F("code")] = WebApiError::NetworkDns2Invalid;
         response->setLength();
         request->send(response);
         return;
@@ -211,6 +221,7 @@ void WebApiNetworkClass::onNetworkAdminPost(AsyncWebServerRequest* request)
 
     retMsg[F("type")] = F("success");
     retMsg[F("message")] = F("Settings saved!");
+    retMsg[F("code")] = WebApiError::GenericSuccess;
 
     response->setLength();
     request->send(response);
