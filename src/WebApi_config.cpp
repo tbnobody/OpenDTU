@@ -5,6 +5,7 @@
 #include "WebApi_config.h"
 #include "Configuration.h"
 #include "WebApi.h"
+#include "WebApi_errors.h"
 #include <AsyncJson.h>
 #include <LittleFS.h>
 
@@ -51,6 +52,7 @@ void WebApiConfigClass::onConfigDelete(AsyncWebServerRequest* request)
 
     if (!request->hasParam("data", true)) {
         retMsg[F("message")] = F("No values found!");
+        retMsg[F("code")] = WebApiError::GenericNoValueFound;
         response->setLength();
         request->send(response);
         return;
@@ -60,6 +62,7 @@ void WebApiConfigClass::onConfigDelete(AsyncWebServerRequest* request)
 
     if (json.length() > 1024) {
         retMsg[F("message")] = F("Data too large!");
+        retMsg[F("code")] = WebApiError::GenericDataTooLarge;
         response->setLength();
         request->send(response);
         return;
@@ -70,6 +73,7 @@ void WebApiConfigClass::onConfigDelete(AsyncWebServerRequest* request)
 
     if (error) {
         retMsg[F("message")] = F("Failed to parse data!");
+        retMsg[F("code")] = WebApiError::GenericDataTooLarge;
         response->setLength();
         request->send(response);
         return;
@@ -77,6 +81,7 @@ void WebApiConfigClass::onConfigDelete(AsyncWebServerRequest* request)
 
     if (!(root.containsKey("delete"))) {
         retMsg[F("message")] = F("Values are missing!");
+        retMsg[F("code")] = WebApiError::GenericValueMissing;
         response->setLength();
         request->send(response);
         return;
@@ -84,6 +89,7 @@ void WebApiConfigClass::onConfigDelete(AsyncWebServerRequest* request)
 
     if (root[F("delete")].as<bool>() == false) {
         retMsg[F("message")] = F("Not deleted anything!");
+        retMsg[F("code")] = WebApiError::ConfigNotDeleted;
         response->setLength();
         request->send(response);
         return;
@@ -91,6 +97,7 @@ void WebApiConfigClass::onConfigDelete(AsyncWebServerRequest* request)
 
     retMsg[F("type")] = F("success");
     retMsg[F("message")] = F("Configuration resettet. Rebooting now...");
+    retMsg[F("code")] = WebApiError::ConfigSuccess;
 
     response->setLength();
     request->send(response);
