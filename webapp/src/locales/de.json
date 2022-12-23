@@ -46,7 +46,9 @@
         "5001": "@:apiresponse.2001",
         "5002": "Das Limit muss zwischen 1 und {max} sein!",
         "5003": "Ungültiten Typ angegeben!",
-        "5004": "Ungültigen Inverter angegeben!"
+        "5004": "Ungültigen Inverter angegeben!",
+        "6001": "Neustart durchgeführt!",
+        "6002": "Neustart abgebrochen!"
     },
     "home": {
         "LiveData": "Live Daten",

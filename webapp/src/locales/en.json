@@ -46,7 +46,9 @@
         "5001": "@:apiresponse.2001",
         "5002": "Limit must between 1 and {max}!",
         "5003": "Invalid type specified!",
-        "5004": "Invalid inverter specified!"
+        "5004": "Invalid inverter specified!",
+        "6001": "Reboot triggered!",
+        "6002": "Reboot cancled!"
     },
     "home": {
         "LiveData": "Live Data",
