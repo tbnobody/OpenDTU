@@ -16,5 +16,15 @@ enum WebApiError {
 
     ConfigBase = 3000,
     ConfigNotDeleted,
-    ConfigSuccess
+    ConfigSuccess,
+
+    InverterBase = 4000,
+    InverterSerialZero,
+    InverterNameLength,
+    InverterCount,
+    InverterAdded,
+    InverterInvalidId,
+    InverterInvalidMaxChannel,
+    InverterChanged,
+    InverterDeleted,
 };

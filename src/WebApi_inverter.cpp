@@ -6,6 +6,7 @@
 #include "Configuration.h"
 #include "MqttHandleHass.h"
 #include "WebApi.h"
+#include "WebApi_errors.h"
 #include "helper.h"
 #include <AsyncJson.h>
 #include <Hoymiles.h>
@@ -86,6 +87,7 @@ void WebApiInverterClass::onInverterAdd(AsyncWebServerRequest* request)
 
     if (!request->hasParam("data", true)) {
         retMsg[F("message")] = F("No values found!");
+        retMsg[F("code")] = WebApiError::GenericNoValueFound;
         response->setLength();
         request->send(response);
         return;
@@ -95,6 +97,7 @@ void WebApiInverterClass::onInverterAdd(AsyncWebServerRequest* request)
 
     if (json.length() > 1024) {
         retMsg[F("message")] = F("Data too large!");
+        retMsg[F("code")] = WebApiError::GenericDataTooLarge;
         response->setLength();
         request->send(response);
         return;
@@ -105,6 +108,7 @@ void WebApiInverterClass::onInverterAdd(AsyncWebServerRequest* request)
 
     if (error) {
         retMsg[F("message")] = F("Failed to parse data!");
+        retMsg[F("code")] = WebApiError::GenericParseError;
         response->setLength();
         request->send(response);
         return;
@@ -112,6 +116,7 @@ void WebApiInverterClass::onInverterAdd(AsyncWebServerRequest* request)
 
     if (!(root.containsKey("serial") && root.containsKey("name"))) {
         retMsg[F("message")] = F("Values are missing!");
+        retMsg[F("code")] = WebApiError::GenericValueMissing;
         response->setLength();
         request->send(response);
         return;
@@ -119,6 +124,7 @@ void WebApiInverterClass::onInverterAdd(AsyncWebServerRequest* request)
 
     if (root[F("serial")].as<uint64_t>() == 0) {
         retMsg[F("message")] = F("Serial must be a number > 0!");
+        retMsg[F("code")] = WebApiError::InverterSerialZero;
         response->setLength();
         request->send(response);
         return;
@@ -126,6 +132,8 @@ void WebApiInverterClass::onInverterAdd(AsyncWebServerRequest* request)
 
     if (root[F("name")].as<String>().length() == 0 || root[F("name")].as<String>().length() > INV_MAX_NAME_STRLEN) {
         retMsg[F("message")] = F("Name must between 1 and " STR(INV_MAX_NAME_STRLEN) " characters long!");
+        retMsg[F("code")] = WebApiError::InverterNameLength;
+        retMsg[F("param")][F("max")] = INV_MAX_NAME_STRLEN;
         response->setLength();
         request->send(response);
         return;
@@ -135,6 +143,8 @@ void WebApiInverterClass::onInverterAdd(AsyncWebServerRequest* request)
 
     if (!inverter) {
         retMsg[F("message")] = F("Only " STR(INV_MAX_COUNT) " inverters are supported!");
+        retMsg[F("code")] = WebApiError::InverterCount;
+        retMsg[F("param")][F("max")] = INV_MAX_COUNT;
         response->setLength();
         request->send(response);
         return;
@@ -148,6 +158,7 @@ void WebApiInverterClass::onInverterAdd(AsyncWebServerRequest* request)
 
     retMsg[F("type")] = F("success");
     retMsg[F("message")] = F("Inverter created!");
+    retMsg[F("code")] = WebApiError::InverterAdded;
 
     response->setLength();
     request->send(response);
@@ -175,6 +186,7 @@ void WebApiInverterClass::onInverterEdit(AsyncWebServerRequest* request)
 
     if (!request->hasParam("data", true)) {
         retMsg[F("message")] = F("No values found!");
+        retMsg[F("code")] = WebApiError::GenericNoValueFound;
         response->setLength();
         request->send(response);
         return;
@@ -184,6 +196,7 @@ void WebApiInverterClass::onInverterEdit(AsyncWebServerRequest* request)
 
     if (json.length() > 1024) {
         retMsg[F("message")] = F("Data too large!");
+        retMsg[F("code")] = WebApiError::GenericDataTooLarge;
         response->setLength();
         request->send(response);
         return;
@@ -194,6 +207,7 @@ void WebApiInverterClass::onInverterEdit(AsyncWebServerRequest* request)
 
     if (error) {
         retMsg[F("message")] = F("Failed to parse data!");
+        retMsg[F("code")] = WebApiError::GenericParseError;
         response->setLength();
         request->send(response);
         return;
@@ -201,6 +215,7 @@ void WebApiInverterClass::onInverterEdit(AsyncWebServerRequest* request)
 
     if (!(root.containsKey("id") && root.containsKey("serial") && root.containsKey("name") && root.containsKey("channel"))) {
         retMsg[F("message")] = F("Values are missing!");
+        retMsg[F("code")] = WebApiError::GenericValueMissing;
         response->setLength();
         request->send(response);
         return;
@@ -208,6 +223,7 @@ void WebApiInverterClass::onInverterEdit(AsyncWebServerRequest* request)
 
     if (root[F("id")].as<uint8_t>() > INV_MAX_COUNT - 1) {
         retMsg[F("message")] = F("Invalid ID specified!");
+        retMsg[F("code")] = WebApiError::InverterInvalidId;
         response->setLength();
         request->send(response);
         return;
@@ -215,6 +231,7 @@ void WebApiInverterClass::onInverterEdit(AsyncWebServerRequest* request)
 
     if (root[F("serial")].as<uint64_t>() == 0) {
         retMsg[F("message")] = F("Serial must be a number > 0!");
+        retMsg[F("code")] = WebApiError::InverterSerialZero;
         response->setLength();
         request->send(response);
         return;
@@ -222,6 +239,8 @@ void WebApiInverterClass::onInverterEdit(AsyncWebServerRequest* request)
 
     if (root[F("name")].as<String>().length() == 0 || root[F("name")].as<String>().length() > INV_MAX_NAME_STRLEN) {
         retMsg[F("message")] = F("Name must between 1 and " STR(INV_MAX_NAME_STRLEN) " characters long!");
+        retMsg[F("code")] = WebApiError::InverterNameLength;
+        retMsg[F("param")][F("max")] = INV_MAX_NAME_STRLEN;
         response->setLength();
         request->send(response);
         return;
@@ -230,6 +249,7 @@ void WebApiInverterClass::onInverterEdit(AsyncWebServerRequest* request)
     JsonArray channelArray = root[F("channel")].as<JsonArray>();
     if (channelArray.size() == 0 || channelArray.size() > INV_MAX_CHAN_COUNT) {
         retMsg[F("message")] = F("Invalid amount of max channel setting given!");
+        retMsg[F("code")] = WebApiError::InverterInvalidMaxChannel;
         response->setLength();
         request->send(response);
         return;
@@ -254,6 +274,7 @@ void WebApiInverterClass::onInverterEdit(AsyncWebServerRequest* request)
     Configuration.write();
 
     retMsg[F("type")] = F("success");
+    retMsg[F("code")] = WebApiError::InverterChanged;
     retMsg[F("message")] = F("Inverter changed!");
 
     response->setLength();
@@ -294,6 +315,7 @@ void WebApiInverterClass::onInverterDelete(AsyncWebServerRequest* request)
 
     if (!request->hasParam("data", true)) {
         retMsg[F("message")] = F("No values found!");
+        retMsg[F("code")] = WebApiError::GenericNoValueFound;
         response->setLength();
         request->send(response);
         return;
@@ -303,6 +325,7 @@ void WebApiInverterClass::onInverterDelete(AsyncWebServerRequest* request)
 
     if (json.length() > 1024) {
         retMsg[F("message")] = F("Data too large!");
+        retMsg[F("code")] = WebApiError::GenericDataTooLarge;
         response->setLength();
         request->send(response);
         return;
@@ -313,6 +336,7 @@ void WebApiInverterClass::onInverterDelete(AsyncWebServerRequest* request)
 
     if (error) {
         retMsg[F("message")] = F("Failed to parse data!");
+        retMsg[F("code")] = WebApiError::GenericParseError;
         response->setLength();
         request->send(response);
         return;
@@ -320,6 +344,7 @@ void WebApiInverterClass::onInverterDelete(AsyncWebServerRequest* request)
 
     if (!(root.containsKey("id"))) {
         retMsg[F("message")] = F("Values are missing!");
+        retMsg[F("code")] = WebApiError::GenericValueMissing;
         response->setLength();
         request->send(response);
         return;
@@ -327,6 +352,7 @@ void WebApiInverterClass::onInverterDelete(AsyncWebServerRequest* request)
 
     if (root[F("id")].as<uint8_t>() > INV_MAX_COUNT - 1) {
         retMsg[F("message")] = F("Invalid ID specified!");
+        retMsg[F("code")] = WebApiError::InverterInvalidId;
         response->setLength();
         request->send(response);
         return;
@@ -343,6 +369,7 @@ void WebApiInverterClass::onInverterDelete(AsyncWebServerRequest* request)
 
     retMsg[F("type")] = F("success");
     retMsg[F("message")] = F("Inverter deleted!");
+    retMsg[F("code")] = WebApiError::InverterDeleted;
 
     response->setLength();
     request->send(response);
