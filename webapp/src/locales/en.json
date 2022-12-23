@@ -48,7 +48,22 @@
         "5003": "Invalid type specified!",
         "5004": "Invalid inverter specified!",
         "6001": "Reboot triggered!",
-        "6002": "Reboot cancled!"
+        "6002": "Reboot cancled!",
+        "7001": "MQTT Server must between 1 and {max} characters long!",
+        "7002": "Username must not longer then {max} characters!",
+        "7003": "Password must not longer then {max} characters!",
+        "7004": "Topic must not longer then {max} characters!",
+        "7005": "Topic must not contain space characters!",
+        "7006": "Topic must end with slash (/)!",
+        "7007": "Port must be a number between 1 and 65535!",
+        "7008": "Certificate must not longer then {max} characters!",
+        "7009": "LWT topic must not longer then {max} characters!",
+        "7010": "LWT topic must not contain space characters!",
+        "7011": "LWT online value must not longer then {max} characters!",
+        "7012": "LWT offline value must not longer then {max} characters!",
+        "7013": "Publish interval must be a number between {min} and {max}!",
+        "7014": "Hass topic must not longer then {max} characters!",
+        "7015": "Hass topic must not contain space characters!"
     },
     "home": {
         "LiveData": "Live Data",

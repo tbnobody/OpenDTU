@@ -48,7 +48,22 @@
         "5003": "Ungültiten Typ angegeben!",
         "5004": "Ungültigen Inverter angegeben!",
         "6001": "Neustart durchgeführt!",
-        "6002": "Neustart abgebrochen!"
+        "6002": "Neustart abgebrochen!",
+        "7001": "MQTT Server muss zwischen 1 und {max} Zeichen lng sein!",
+        "7002": "Benutzername darf nicht länger als {max} Zeichen sein!",
+        "7003": "Passwort darf nicht länger als {max} Zeichen sein!",
+        "7004": "Topic darf nicht länger als {max} Zeichen sein!",
+        "7005": "Topic darf keine Leerzeichen enthalten!",
+        "7006": "Topic muss mit einem Slash (/) enden!",
+        "7007": "Port muss eine Zahl zwischen 1 und 65535 sein!",
+        "7008": "Das Zertifikat darf nicht länger als {max} Zeichen sein!",
+        "7009": "LWT Topic darf nicht länger als {max} Zeichen sein!",
+        "7010": "LWT Topic darf keine Leerzeichen enthalten!",
+        "7011": "LWT Online Nachricht darf nicht länger als {max} Zeichen sein!",
+        "7012": "LWT Offline Nachricht darf nicht länger als {max} Zeichen sein!",
+        "7013": "Veröffentlichungsintervall muss zwischen {min} und {max} sein!",
+        "7014": "Hass Topic darf nicht länger als {max} Zeichen sein!",
+        "7015": "Hass Topic darf keine Leerzeichen enthalten!"
     },
     "home": {
         "LiveData": "Live Daten",
