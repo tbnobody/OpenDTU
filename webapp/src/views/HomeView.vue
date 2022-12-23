@@ -654,7 +654,7 @@ export default defineComponent({
                         if (response.type == "success") {
                             this.powerSettingView.hide();
                         } else {
-                            this.alertMessagePower = response.message;
+                            this.alertMessagePower = this.$t('apiresponse.' + response.code, response.param);
                             this.alertTypePower = response.type;
                             this.showAlertPower = true;
                         }
