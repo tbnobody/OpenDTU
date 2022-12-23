@@ -4,6 +4,7 @@
  */
 #include "WebApi_limit.h"
 #include "WebApi.h"
+#include "WebApi_errors.h"
 #include <AsyncJson.h>
 #include <Hoymiles.h>
 
@@ -66,6 +67,7 @@ void WebApiLimitClass::onLimitPost(AsyncWebServerRequest* request)
 
     if (!request->hasParam("data", true)) {
         retMsg[F("message")] = F("No values found!");
+        retMsg[F("code")] = WebApiError::GenericNoValueFound;
         response->setLength();
         request->send(response);
         return;
@@ -75,6 +77,7 @@ void WebApiLimitClass::onLimitPost(AsyncWebServerRequest* request)
 
     if (json.length() > 1024) {
         retMsg[F("message")] = F("Data too large!");
+        retMsg[F("code")] = WebApiError::GenericDataTooLarge;
         response->setLength();
         request->send(response);
         return;
@@ -85,6 +88,7 @@ void WebApiLimitClass::onLimitPost(AsyncWebServerRequest* request)
 
     if (error) {
         retMsg[F("message")] = F("Failed to parse data!");
+        retMsg[F("code")] = WebApiError::GenericParseError;
         response->setLength();
         request->send(response);
         return;
@@ -94,6 +98,7 @@ void WebApiLimitClass::onLimitPost(AsyncWebServerRequest* request)
             && root.containsKey("limit_value")
             && root.containsKey("limit_type"))) {
         retMsg[F("message")] = F("Values are missing!");
+        retMsg[F("code")] = WebApiError::GenericValueMissing;
         response->setLength();
         request->send(response);
         return;
@@ -101,6 +106,7 @@ void WebApiLimitClass::onLimitPost(AsyncWebServerRequest* request)
 
     if (root[F("serial")].as<uint64_t>() == 0) {
         retMsg[F("message")] = F("Serial must be a number > 0!");
+        retMsg[F("code")] = WebApiError::LimitSerialZero;
         response->setLength();
         request->send(response);
         return;
@@ -108,6 +114,8 @@ void WebApiLimitClass::onLimitPost(AsyncWebServerRequest* request)
 
     if (root[F("limit_value")].as<uint16_t>() == 0 || root[F("limit_value")].as<uint16_t>() > 1500) {
         retMsg[F("message")] = F("Limit must between 1 and 1500!");
+        retMsg[F("code")] = WebApiError::LimitInvalidLimit;
+        retMsg[F("param")][F("max")] = 1500;
         response->setLength();
         request->send(response);
         return;
@@ -119,6 +127,7 @@ void WebApiLimitClass::onLimitPost(AsyncWebServerRequest* request)
             || (root[F("limit_type")].as<uint16_t>() == PowerLimitControlType::RelativPersistent))) {
 
         retMsg[F("message")] = F("Invalid type specified!");
+        retMsg[F("code")] = WebApiError::LimitInvalidType;
         response->setLength();
         request->send(response);
         return;
@@ -131,6 +140,7 @@ void WebApiLimitClass::onLimitPost(AsyncWebServerRequest* request)
     auto inv = Hoymiles.getInverterBySerial(serial);
     if (inv == nullptr) {
         retMsg[F("message")] = F("Invalid inverter specified!");
+        retMsg[F("code")] = WebApiError::LimitInvalidInverter;
         response->setLength();
         request->send(response);
         return;
@@ -140,6 +150,7 @@ void WebApiLimitClass::onLimitPost(AsyncWebServerRequest* request)
 
     retMsg[F("type")] = F("success");
     retMsg[F("message")] = F("Settings saved!");
+    retMsg[F("code")] = WebApiError::GenericSuccess;
 
     response->setLength();
     request->send(response);
