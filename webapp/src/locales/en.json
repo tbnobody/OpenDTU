@@ -24,6 +24,16 @@
     "base": {
         "Loading": "Loading..."
     },
+    "apiresponse": {
+        "1001": "Settings saved!",
+        "1002": "No values found!",
+        "1003": "Data too large!",
+        "1004": "Failed to parse data!",
+        "1005": "Values are missing!",
+        "2001": "Serial cannot be zero!",
+        "2002": "Poll interval must be greater zero!",
+        "2003": "Invalid power level setting!"
+    },
     "home": {
         "LiveData": "Live Data",
         "SerialNumber": "Serial Number: ",
