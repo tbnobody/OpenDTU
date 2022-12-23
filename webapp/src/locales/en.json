@@ -63,7 +63,12 @@
         "7012": "LWT offline value must not longer then {max} characters!",
         "7013": "Publish interval must be a number between {min} and {max}!",
         "7014": "Hass topic must not longer then {max} characters!",
-        "7015": "Hass topic must not contain space characters!"
+        "7015": "Hass topic must not contain space characters!",
+        "8001": "IP address is invalid!",
+        "8002": "Netmask is invalid!",
+        "8003": "Gateway is invalid!",
+        "8004": "DNS Server IP 1 is invalid!",
+        "8005": "DNS Server IP 2 is invalid!"
     },
     "home": {
         "LiveData": "Live Data",

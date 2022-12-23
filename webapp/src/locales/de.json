@@ -63,7 +63,12 @@
         "7012": "LWT Offline Nachricht darf nicht länger als {max} Zeichen sein!",
         "7013": "Veröffentlichungsintervall muss zwischen {min} und {max} sein!",
         "7014": "Hass Topic darf nicht länger als {max} Zeichen sein!",
-        "7015": "Hass Topic darf keine Leerzeichen enthalten!"
+        "7015": "Hass Topic darf keine Leerzeichen enthalten!",
+        "8001": "IP Adresse ist ungültig!",
+        "8002": "Netzmaske ist ungültig!",
+        "8003": "Standardgateway ist ungültig!",
+        "8004": "DNS Server IP 1 ist ungültig!",
+        "8005": "DNS Server IP 2 ist ungültig!"
     },
     "home": {
         "LiveData": "Live Daten",
