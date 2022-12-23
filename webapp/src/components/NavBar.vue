@@ -1,7 +1,18 @@
 <template>
     <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
         <div class="container-fluid">
-            <router-link @click="onClick" class="navbar-brand" to="/"><span class="text-warning"><BIconSun width="30" height="30" class="d-inline-block align-text-top"/></span> OpenDTU</router-link>
+            <router-link @click="onClick" class="navbar-brand" to="/">
+                <span v-if="isXmas" class="text-success">
+                    <BIconTree width="30" height="30" class="d-inline-block align-text-top" />
+                </span>
+                <span v-else-if="isEaster" class="text-info">
+                    <BIconEgg width="30" height="30" class="d-inline-block align-text-top" />
+                </span>
+                <span v-else class="text-warning">
+                    <BIconSun width="30" height="30" class="d-inline-block align-text-top" />
+                </span>
+                 OpenDTU
+            </router-link>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup"
                 aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
@@ -93,15 +104,18 @@
 <script lang="ts">
 import { defineComponent } from 'vue';
 import { logout, isLoggedIn } from '@/utils/authentication';
-import { BIconSun } from 'bootstrap-icons-vue';
+import { BIconSun, BIconTree, BIconEgg } from 'bootstrap-icons-vue';
 
 export default defineComponent({
     components: {
         BIconSun,
+        BIconTree,
+        BIconEgg,
     },
     data() {
         return {
             isLogged: this.isLoggedIn(),
+            now: {} as Date,
         }
     },
     created() {
@@ -111,6 +125,24 @@ export default defineComponent({
         this.$emitter.on("logged-out", () => {
             this.isLogged = this.isLoggedIn();
         });
+
+        this.now = new Date();
+        setInterval(() => {
+            this.now = new Date();
+        }, 10000)
+    },
+    computed: {
+        isXmas() {
+            return (this.now.getMonth() + 1 == 12 && (this.now.getDate() >= 24 && this.now.getDate() <= 26));
+        },
+        isEaster() {
+            const easter = this.getEasterSunday(this.now.getFullYear());
+            var easterStart = new Date(easter);
+            var easterEnd = new Date(easter);
+            easterStart.setDate(easterStart.getDate() - 2);
+            easterEnd.setDate(easterEnd.getDate() + 1);
+            return this.now >= easterStart && this.now < easterEnd;
+        },
     },
     methods: {
         isLoggedIn,
@@ -127,6 +159,19 @@ export default defineComponent({
         },
         onClick() {
             this.$refs.navbarCollapse && (this.$refs.navbarCollapse as HTMLElement).classList.remove("show");
+        },
+        getEasterSunday(year: number): Date {
+            var f = Math.floor;
+            var G = year % 19;
+            var C = f(year / 100);
+            var H = (C - f(C / 4) - f((8 * C + 13) / 25) + 19 * G + 15) % 30;
+            var I = H - f(H / 28) * (1 - f(29 / (H + 1)) * f((21 - G) / 11));
+            var J = (year + f(year / 4) + I + 2 - C + f(C / 4)) % 7;
+            var L = I - J;
+            var month = 3 + f((L + 40) / 44);
+            var day = L + 28 - 31 * f(month / 4);
+
+            return new Date(year, month - 1, day);
         }
     },
 });
