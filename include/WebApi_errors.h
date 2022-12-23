@@ -77,4 +77,8 @@ enum WebApiError {
     SecurityBase = 10000,
     SecurityPasswordLength,
     SecurityAuthSuccess,
+
+    PowerBase = 11000,
+    PowerSerialZero,
+    PowerInvalidInverter,
 };
