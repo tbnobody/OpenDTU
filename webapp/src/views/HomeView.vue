@@ -584,7 +584,7 @@ export default defineComponent({
                         if (response.type == "success") {
                             this.limitSettingView.hide();
                         } else {
-                            this.alertMessageLimit = response.message;
+                            this.alertMessageLimit = this.$t('apiresponse.' + response.code, response.param);
                             this.alertTypeLimit = response.type;
                             this.showAlertLimit = true;
                         }

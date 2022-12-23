@@ -42,7 +42,11 @@
         "4005": "Invalid ID specified!",
         "4006": "Invalid amount of max channel setting given!",
         "4007": "Inverter changed!",
-        "4008": "Inverter deleted!"
+        "4008": "Inverter deleted!",
+        "5001": "@:apiresponse.2001",
+        "5002": "Limit must between 1 and {max}!",
+        "5003": "Invalid type specified!",
+        "5004": "Invalid inverter specified!"
     },
     "home": {
         "LiveData": "Live Data",

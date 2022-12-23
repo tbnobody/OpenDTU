@@ -42,7 +42,11 @@
         "4005": "Ungültige ID angegeben!",
         "4006": "Ungültige Anzahl an Kanalwerten übergeben!",
         "4007": "Wechselrichter geändert!",
-        "4008": "Wechselrichter gelöscht!"
+        "4008": "Wechselrichter gelöscht!",
+        "5001": "@:apiresponse.2001",
+        "5002": "Das Limit muss zwischen 1 und {max} sein!",
+        "5003": "Ungültiten Typ angegeben!",
+        "5004": "Ungültigen Inverter angegeben!"
     },
     "home": {
         "LiveData": "Live Daten",
