@@ -181,6 +181,7 @@ declare interface Inverter {
 declare interface AlertResponse {
     message: string;
     type: string;
+    code: number;
     show: boolean;
 }
 
@@ -240,6 +241,7 @@ export default defineComponent({
                 .then((data) => {
                     this.getInverters();
                     this.alert = data;
+                    this.alert.message = this.$t('apiresponse.' + data.code, data.param);
                     this.alert.show = true;
                 });
         },
