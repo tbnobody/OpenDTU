@@ -111,7 +111,11 @@
         "LastPowerSetStatus": "Letzer Übertragungsstatus:",
         "TurnOn": "Einschalten",
         "TurnOff": "Ausschalten",
-        "Restart": "Neustarten"
+        "Restart": "Neustarten",
+        "Failure": "Fehlgeschlagen",
+        "Pending": "Ausstehend",
+        "Ok": "Ok",
+        "Unknown": "Unbekannt"
     },
     "eventlog": {
         "Start": "Begin",

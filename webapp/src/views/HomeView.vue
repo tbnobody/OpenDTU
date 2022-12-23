@@ -211,7 +211,7 @@
                                         'text-bg-success': currentLimitList.limit_set_status == 'Ok',
                                         'text-bg-secondary': currentLimitList.limit_set_status == 'Unknown',
                                     }">
-                                        {{ currentLimitList.limit_set_status }}
+                                        {{ $t('home.' + currentLimitList.limit_set_status) }}
                                     </span>
                                 </div>
                             </div>
@@ -278,7 +278,7 @@
                                     'text-bg-success': successCommandPower == 'Ok',
                                     'text-bg-secondary': successCommandPower == 'Unknown',
                                 }">
-                                    {{ successCommandPower }}
+                                    {{ $t('home.' + successCommandPower) }}
                                 </span>
                             </div>
                         </div>

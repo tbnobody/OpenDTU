@@ -111,7 +111,11 @@
         "LastPowerSetStatus": "Last Power Set Status:",
         "TurnOn": "Turn On",
         "TurnOff": "Turn Off",
-        "Restart": "Restart"
+        "Restart": "Restart",
+        "Failure": "Failure",
+        "Pending": "Pending",
+        "Ok": "Ok",
+        "Unknown": "Unknown"
     },
     "eventlog": {
         "Start": "Start",
