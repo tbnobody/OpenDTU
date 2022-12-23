@@ -78,7 +78,9 @@
         "9007": "Hour must be a number between {min} and {max}!",
         "9008": "Minute must be a number between {min} and {max}!",
         "9009": "Second must be a number between {min} and {max}!",
-        "9010": "Time updated!"
+        "9010": "Time updated!",
+        "10001": "Password must between 8 and {max} characters long!",
+        "10002": "Authentication successfull!"
     },
     "home": {
         "LiveData": "Live Data",
