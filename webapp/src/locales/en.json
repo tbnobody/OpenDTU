@@ -68,7 +68,17 @@
         "8002": "Netmask is invalid!",
         "8003": "Gateway is invalid!",
         "8004": "DNS Server IP 1 is invalid!",
-        "8005": "DNS Server IP 2 is invalid!"
+        "8005": "DNS Server IP 2 is invalid!",
+        "9001": "NTP Server must between 1 and {max} characters long!",
+        "9002": "Timezone must between 1 and {max} characters long!",
+        "9003": "Timezone description must between 1 and {max} characters long!",
+        "9004": "Year must be a number between {min} and {max}!",
+        "9005": "Month must be a number between {min} and {max}!",
+        "9006": "Day must be a number between {min} and {max}!",
+        "9007": "Hour must be a number between {min} and {max}!",
+        "9008": "Minute must be a number between {min} and {max}!",
+        "9009": "Second must be a number between {min} and {max}!",
+        "9010": "Time updated!"
     },
     "home": {
         "LiveData": "Live Data",
