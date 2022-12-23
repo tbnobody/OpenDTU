@@ -156,7 +156,7 @@ export default defineComponent({
                 .then((response) => handleResponse(response, this.$emitter, this.$router))
                 .then(
                     (response) => {
-                        this.alertMessage = response.message;
+                        this.alertMessage = this.$t('apiresponse.' + response.code, response.param);
                         this.alertType = response.type;
                         this.showAlert = true;
                     }

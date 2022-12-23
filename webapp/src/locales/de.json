@@ -32,7 +32,9 @@
         "1005": "Benötigte Werte fehlen!",
         "2001": "Die Seriennummer darf nicht 0 sein!",
         "2002": "Das Abfrage Interval muss größer als 0 sein!",
-        "2003": "Ungültige Sendeleistung angegeben!"
+        "2003": "Ungültige Sendeleistung angegeben!",
+        "3001": "Nichts gelöscht!",
+        "3002": "Konfiguration zurückgesetzt. Starte jetzt neu..."
     },
     "home": {
         "LiveData": "Live Daten",

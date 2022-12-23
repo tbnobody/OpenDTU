@@ -32,7 +32,9 @@
         "1005": "Values are missing!",
         "2001": "Serial cannot be zero!",
         "2002": "Poll interval must be greater zero!",
-        "2003": "Invalid power level setting!"
+        "2003": "Invalid power level setting!",
+        "3001": "Not deleted anything!",
+        "3002": "Configuration resettet. Rebooting now..."
     },
     "home": {
         "LiveData": "Live Data",
