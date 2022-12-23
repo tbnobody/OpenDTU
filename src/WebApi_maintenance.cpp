@@ -5,6 +5,7 @@
 
 #include "WebApi_maintenance.h"
 #include "WebApi.h"
+#include "WebApi_errors.h"
 #include <AsyncJson.h>
 
 void WebApiMaintenanceClass::init(AsyncWebServer* server)
@@ -32,6 +33,7 @@ void WebApiMaintenanceClass::onRebootPost(AsyncWebServerRequest* request)
 
     if (!request->hasParam("data", true)) {
         retMsg[F("message")] = F("No values found!");
+        retMsg[F("code")] = WebApiError::GenericNoValueFound;
         response->setLength();
         request->send(response);
         return;
@@ -41,6 +43,7 @@ void WebApiMaintenanceClass::onRebootPost(AsyncWebServerRequest* request)
 
     if (json.length() > MQTT_JSON_DOC_SIZE) {
         retMsg[F("message")] = F("Data too large!");
+        retMsg[F("code")] = WebApiError::GenericDataTooLarge;
         response->setLength();
         request->send(response);
         return;
@@ -51,6 +54,7 @@ void WebApiMaintenanceClass::onRebootPost(AsyncWebServerRequest* request)
 
     if (error) {
         retMsg[F("message")] = F("Failed to parse data!");
+        retMsg[F("code")] = WebApiError::GenericParseError;
         response->setLength();
         request->send(response);
         return;
@@ -58,6 +62,7 @@ void WebApiMaintenanceClass::onRebootPost(AsyncWebServerRequest* request)
 
     if (!(root.containsKey("reboot"))) {
         retMsg[F("message")] = F("Values are missing!");
+        retMsg[F("code")] = WebApiError::GenericValueMissing;
         response->setLength();
         request->send(response);
         return;
@@ -66,6 +71,7 @@ void WebApiMaintenanceClass::onRebootPost(AsyncWebServerRequest* request)
     if (root[F("reboot")].as<bool>()) {
         retMsg[F("type")] = F("success");
         retMsg[F("message")] = F("Reboot triggered!");
+        retMsg[F("code")] = WebApiError::MaintenanceRebootTriggered;
 
         response->setLength();
         request->send(response);
@@ -75,6 +81,7 @@ void WebApiMaintenanceClass::onRebootPost(AsyncWebServerRequest* request)
         ESP.restart();
     } else {
         retMsg[F("message")] = F("Reboot cancled!");
+        retMsg[F("code")] = WebApiError::MaintenanceRebootCancled;
 
         response->setLength();
         request->send(response);

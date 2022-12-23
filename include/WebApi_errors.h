@@ -33,4 +33,8 @@ enum WebApiError {
     LimitInvalidLimit,
     LimitInvalidType,
     LimitInvalidInverter,
+
+    MaintenanceBase = 6000,
+    MaintenanceRebootTriggered,
+    MaintenanceRebootCancled,
 };
