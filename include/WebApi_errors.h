@@ -73,4 +73,8 @@ enum WebApiError {
     NtpMinuteInvalid,
     NtpSecondInvalid,
     NtpTimeUpdated,
+
+    SecurityBase = 10000,
+    SecurityPasswordLength,
+    SecurityAuthSuccess,
 };
