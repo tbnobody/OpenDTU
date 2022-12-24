@@ -63,9 +63,9 @@ enum {
 };
 
 typedef struct {
+    uint8_t ch; // channel 0 - 4
     uint8_t fieldId; // field id
     uint8_t unitId; // uint id
-    uint8_t ch; // channel 0 - 4
     uint8_t start; // pos of first byte in buffer
     uint8_t num; // number of bytes in buffer
     uint16_t div; // divisor / calc command
