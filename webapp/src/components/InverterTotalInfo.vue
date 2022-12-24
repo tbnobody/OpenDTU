@@ -34,9 +34,9 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, type PropType } from 'vue';
 import type { Total } from '@/types/LiveDataStatus';
 import { formatNumber } from '@/utils';
+import { defineComponent, type PropType } from 'vue';
 
 export default defineComponent({
     props: {

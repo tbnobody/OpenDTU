@@ -15,14 +15,14 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, type PropType } from 'vue';
-import type { Hints } from '@/types/LiveDataStatus';
 import BootstrapAlert from '@/components/BootstrapAlert.vue';
+import type { Hints } from '@/types/LiveDataStatus';
 import {
-    BIconClock,
-    BIconExclamationCircle,
     BIconBroadcast,
+    BIconClock,
+    BIconExclamationCircle
 } from 'bootstrap-icons-vue';
+import { defineComponent, type PropType } from 'vue';
 
 export default defineComponent({
     components: {

@@ -34,9 +34,9 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, type PropType } from 'vue';
-import type { SystemStatus } from '@/types/SystemStatus';
 import CardElement from '@/components/CardElement.vue';
+import type { SystemStatus } from '@/types/SystemStatus';
+import { defineComponent, type PropType } from 'vue';
 
 export default defineComponent({
     components: {

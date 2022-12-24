@@ -139,11 +139,11 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue';
-import { handleResponse, authHeader } from '@/utils/authentication';
 import BasePage from '@/components/BasePage.vue';
 import CardElement from '@/components/CardElement.vue';
 import type { MqttStatus } from '@/types/MqttStatus';
+import { authHeader, handleResponse } from '@/utils/authentication';
+import { defineComponent } from 'vue';
 
 export default defineComponent({
     components: {

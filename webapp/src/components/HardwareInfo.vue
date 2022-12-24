@@ -26,9 +26,9 @@
 </template>
 
 <script lang="ts">
+import CardElement from '@/components/CardElement.vue';
 import type { SystemStatus } from '@/types/SystemStatus';
 import { defineComponent, type PropType } from 'vue';
-import CardElement from '@/components/CardElement.vue';
 
 export default defineComponent({
     components: {

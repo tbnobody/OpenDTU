@@ -308,34 +308,34 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue';
 import BasePage from '@/components/BasePage.vue';
-import * as bootstrap from 'bootstrap';
-import {
-    BIconXCircleFill,
-    BIconExclamationCircleFill,
-    BIconCheckCircleFill,
-    BIconSpeedometer,
-    BIconPower,
-    BIconCpu,
-    BIconJournalText,
-    BIconToggleOn,
-    BIconToggleOff,
-    BIconArrowCounterclockwise
-} from 'bootstrap-icons-vue';
-import EventLog from '@/components/EventLog.vue';
-import DevInfo from '@/components/DevInfo.vue';
 import BootstrapAlert from '@/components/BootstrapAlert.vue';
+import DevInfo from '@/components/DevInfo.vue';
+import EventLog from '@/components/EventLog.vue';
+import HintView from '@/components/HintView.vue';
 import InverterChannelInfo from "@/components/InverterChannelInfo.vue";
 import InverterTotalInfo from '@/components/InverterTotalInfo.vue';
-import HintView from '@/components/HintView.vue';
 import type { DevInfoStatus } from '@/types/DevInfoStatus';
 import type { EventlogItems } from '@/types/EventlogStatus';
-import type { LiveData, Inverter } from '@/types/LiveDataStatus';
-import type { LimitStatus } from '@/types/LimitStatus';
 import type { LimitConfig } from '@/types/LimitConfig';
-import { isLoggedIn, handleResponse, authHeader, authUrl } from '@/utils/authentication';
+import type { LimitStatus } from '@/types/LimitStatus';
+import type { Inverter, LiveData } from '@/types/LiveDataStatus';
 import { formatNumber } from '@/utils';
+import { authHeader, authUrl, handleResponse, isLoggedIn } from '@/utils/authentication';
+import * as bootstrap from 'bootstrap';
+import {
+    BIconArrowCounterclockwise,
+    BIconCheckCircleFill,
+    BIconCpu,
+    BIconExclamationCircleFill,
+    BIconJournalText,
+    BIconPower,
+    BIconSpeedometer,
+    BIconToggleOff,
+    BIconToggleOn,
+    BIconXCircleFill
+} from 'bootstrap-icons-vue';
+import { defineComponent } from 'vue';
 
 export default defineComponent({
     components: {

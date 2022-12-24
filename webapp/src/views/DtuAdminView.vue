@@ -36,16 +36,14 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue';
 import BasePage from '@/components/BasePage.vue';
 import BootstrapAlert from "@/components/BootstrapAlert.vue";
-import InputElement from '@/components/InputElement.vue';
 import CardElement from '@/components/CardElement.vue';
-import { handleResponse, authHeader } from '@/utils/authentication';
+import InputElement from '@/components/InputElement.vue';
 import type { DtuConfig } from "@/types/DtuConfig";
-import {
-    BIconInfoCircle,
-} from 'bootstrap-icons-vue';
+import { authHeader, handleResponse } from '@/utils/authentication';
+import { BIconInfoCircle } from 'bootstrap-icons-vue';
+import { defineComponent } from 'vue';
 
 export default defineComponent({
     components: {

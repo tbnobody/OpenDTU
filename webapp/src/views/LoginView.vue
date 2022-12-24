@@ -29,12 +29,12 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue';
+import BasePage from '@/components/BasePage.vue';
+import BootstrapAlert from "@/components/BootstrapAlert.vue";
+import CardElement from '@/components/CardElement.vue';
 import router from '@/router';
 import { login } from '@/utils';
-import BasePage from '@/components/BasePage.vue';
-import CardElement from '@/components/CardElement.vue';
-import BootstrapAlert from "@/components/BootstrapAlert.vue";
+import { defineComponent } from 'vue';
 
 export default defineComponent({
     components: {

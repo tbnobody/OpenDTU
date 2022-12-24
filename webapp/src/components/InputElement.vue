@@ -54,8 +54,9 @@
 </template>
 
 <script lang="ts">
-import {defineComponent} from 'vue';
-import {BIconInfoCircle} from 'bootstrap-icons-vue';
+import { BIconInfoCircle } from 'bootstrap-icons-vue';
+import { defineComponent } from 'vue';
+
 export default defineComponent({
     components: {
         BIconInfoCircle,

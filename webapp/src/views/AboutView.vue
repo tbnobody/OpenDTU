@@ -70,14 +70,14 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue';
 import BasePage from '@/components/BasePage.vue';
 import {
-    BIconInfoCircle,
     BIconActivity,
     BIconBug,
-    BIconChat
+    BIconChat,
+    BIconInfoCircle
 } from 'bootstrap-icons-vue';
+import { defineComponent } from 'vue';
 
 export default defineComponent({
     components: {

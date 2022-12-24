@@ -40,10 +40,10 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, type PropType } from 'vue';
-import { BIconInfoSquare } from 'bootstrap-icons-vue';
 import BootstrapAlert from '@/components/BootstrapAlert.vue';
 import type { DevInfoStatus } from "@/types/DevInfoStatus";
+import { BIconInfoSquare } from 'bootstrap-icons-vue';
+import { defineComponent, type PropType } from 'vue';
 
 export default defineComponent({
     components: {

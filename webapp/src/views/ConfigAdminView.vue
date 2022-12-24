@@ -86,17 +86,17 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue';
 import BasePage from '@/components/BasePage.vue';
-import {
-    BIconExclamationCircleFill,
-    BIconArrowLeft,
-    BIconCheckCircle
-} from 'bootstrap-icons-vue';
-import * as bootstrap from 'bootstrap';
 import BootstrapAlert from "@/components/BootstrapAlert.vue";
 import CardElement from '@/components/CardElement.vue';
-import { handleResponse, authHeader, isLoggedIn } from '@/utils/authentication';
+import { authHeader, handleResponse, isLoggedIn } from '@/utils/authentication';
+import * as bootstrap from 'bootstrap';
+import {
+    BIconArrowLeft,
+    BIconCheckCircle,
+    BIconExclamationCircleFill
+} from 'bootstrap-icons-vue';
+import { defineComponent } from 'vue';
 
 export default defineComponent({
     components: {

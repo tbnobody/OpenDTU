@@ -40,9 +40,9 @@
 </template>
 
 <script lang="ts">
+import CardElement from '@/components/CardElement.vue';
 import type { NetworkStatus } from '@/types/NetworkStatus';
 import { defineComponent, type PropType } from 'vue';
-import CardElement from '@/components/CardElement.vue';
 
 export default defineComponent({
     components: {

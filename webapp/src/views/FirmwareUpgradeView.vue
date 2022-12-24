@@ -65,17 +65,17 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue';
 import BasePage from '@/components/BasePage.vue';
 import CardElement from '@/components/CardElement.vue';
-import SparkMD5 from "spark-md5";
+import { authHeader, isLoggedIn } from '@/utils/authentication';
 import {
-    BIconExclamationCircleFill,
     BIconArrowLeft,
     BIconArrowRepeat,
-    BIconCheckCircle
+    BIconCheckCircle,
+    BIconExclamationCircleFill
 } from 'bootstrap-icons-vue';
-import { authHeader, isLoggedIn } from '@/utils/authentication';
+import SparkMD5 from "spark-md5";
+import { defineComponent } from 'vue';
 
 export default defineComponent({
     components: {

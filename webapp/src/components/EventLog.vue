@@ -20,9 +20,9 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, type PropType } from 'vue';
-import { timestampToString } from '@/utils';
 import type { EventlogItems } from '@/types/EventlogStatus';
+import { timestampToString } from '@/utils';
+import { defineComponent, type PropType } from 'vue';
 
 export default defineComponent({
     props: {

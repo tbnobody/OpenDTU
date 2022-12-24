@@ -148,17 +148,17 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue';
 import BasePage from '@/components/BasePage.vue';
-import {
-    BIconTrash,
-    BIconPencil,
-    BIconInfoCircle,
-} from 'bootstrap-icons-vue';
-import * as bootstrap from 'bootstrap';
 import BootstrapAlert from "@/components/BootstrapAlert.vue";
 import CardElement from '@/components/CardElement.vue';
-import { handleResponse, authHeader } from '@/utils/authentication';
+import { authHeader, handleResponse } from '@/utils/authentication';
+import * as bootstrap from 'bootstrap';
+import {
+    BIconInfoCircle,
+    BIconPencil,
+    BIconTrash
+} from 'bootstrap-icons-vue';
+import { defineComponent } from 'vue';
 
 declare interface Channel {
     name: string;

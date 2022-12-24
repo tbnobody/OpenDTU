@@ -34,12 +34,12 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue';
-import * as bootstrap from 'bootstrap';
 import BasePage from '@/components/BasePage.vue';
 import BootstrapAlert from "@/components/BootstrapAlert.vue";
 import CardElement from '@/components/CardElement.vue';
-import { handleResponse, authHeader, isLoggedIn } from '@/utils/authentication';
+import { authHeader, handleResponse, isLoggedIn } from '@/utils/authentication';
+import * as bootstrap from 'bootstrap';
+import { defineComponent } from 'vue';
 
 export default defineComponent({
     components: {
