@@ -4,60 +4,54 @@
             {{ alert.message }}
         </BootstrapAlert>
 
-        <div class="card">
-            <div class="card-header text-bg-primary">{{ $t('inverteradmin.AddInverter') }}</div>
-            <div class="card-body">
-                <form class="form-inline" v-on:submit.prevent="onSubmit">
-                    <div class="form-group">
-                        <label>{{ $t('inverteradmin.Serial') }}</label>
-                        <input v-model="newInverterData.serial" type="number" class="form-control ml-sm-2 mr-sm-4 my-2"
-                            required />
-                    </div>
-                    <div class="form-group">
-                        <label>{{ $t('inverteradmin.Name') }}</label>
-                        <input v-model="newInverterData.name" type="text" class="form-control ml-sm-2 mr-sm-4 my-2"
-                            maxlength="31" required />
-                    </div>
-                    <div class="ml-auto text-right">
-                        <button type="submit" class="btn btn-primary my-2">{{ $t('inverteradmin.Add') }}</button>
-                    </div>
-                    <div class="alert alert-secondary" role="alert" v-html="$t('inverteradmin.AddHint')"></div>
-                </form>
-            </div>
-        </div>
-
-        <div class="card mt-5">
-            <div class="card-header text-bg-primary">{{ $t('inverteradmin.InverterList') }}</div>
-            <div class="card-body">
-                <div class="table-responsive">
-                    <table class="table">
-                        <thead>
-                            <tr>
-                                <th scope="col">{{ $t('inverteradmin.Serial') }}</th>
-                                <th>{{ $t('inverteradmin.Name') }}</th>
-                                <th>{{ $t('inverteradmin.Type') }}</th>
-                                <th>{{ $t('inverteradmin.Action') }}</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr v-for="inverter in sortedInverters" v-bind:key="inverter.id">
-                                <td>{{ inverter.serial }}</td>
-                                <td>{{ inverter.name }}</td>
-                                <td>{{ inverter.type }}</td>
-                                <td>
-                                    <a href="#" class="icon text-danger" :title="$t('inverteradmin.DeleteInverter')">
-                                        <BIconTrash v-on:click="onOpenModal(modalDelete, inverter)" />
-                                    </a>&nbsp;
-                                    <a href="#" class="icon" :title="$t('inverteradmin.EditInverter')">
-                                        <BIconPencil v-on:click="onOpenModal(modal, inverter)" />
-                                    </a>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
+        <CardElement :text="$t('inverteradmin.AddInverter')" textVariant="text-bg-primary">
+            <form class="form-inline" v-on:submit.prevent="onSubmit">
+                <div class="form-group">
+                    <label>{{ $t('inverteradmin.Serial') }}</label>
+                    <input v-model="newInverterData.serial" type="number" class="form-control ml-sm-2 mr-sm-4 my-2"
+                        required />
                 </div>
+                <div class="form-group">
+                    <label>{{ $t('inverteradmin.Name') }}</label>
+                    <input v-model="newInverterData.name" type="text" class="form-control ml-sm-2 mr-sm-4 my-2"
+                        maxlength="31" required />
+                </div>
+                <div class="ml-auto text-right">
+                    <button type="submit" class="btn btn-primary my-2">{{ $t('inverteradmin.Add') }}</button>
+                </div>
+                <div class="alert alert-secondary" role="alert" v-html="$t('inverteradmin.AddHint')"></div>
+            </form>
+        </CardElement>
+
+        <CardElement :text="$t('inverteradmin.InverterList')" textVariant="text-bg-primary" add-space>
+            <div class="table-responsive">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th scope="col">{{ $t('inverteradmin.Serial') }}</th>
+                            <th>{{ $t('inverteradmin.Name') }}</th>
+                            <th>{{ $t('inverteradmin.Type') }}</th>
+                            <th>{{ $t('inverteradmin.Action') }}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr v-for="inverter in sortedInverters" v-bind:key="inverter.id">
+                            <td>{{ inverter.serial }}</td>
+                            <td>{{ inverter.name }}</td>
+                            <td>{{ inverter.type }}</td>
+                            <td>
+                                <a href="#" class="icon text-danger" :title="$t('inverteradmin.DeleteInverter')">
+                                    <BIconTrash v-on:click="onOpenModal(modalDelete, inverter)" />
+                                </a>&nbsp;
+                                <a href="#" class="icon" :title="$t('inverteradmin.EditInverter')">
+                                    <BIconPencil v-on:click="onOpenModal(modal, inverter)" />
+                                </a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
-        </div>
+        </CardElement>
     </BasePage>
 
     <div class="modal" id="inverterEdit" tabindex="-1">
@@ -163,6 +157,7 @@ import {
 } from 'bootstrap-icons-vue';
 import * as bootstrap from 'bootstrap';
 import BootstrapAlert from "@/components/BootstrapAlert.vue";
+import CardElement from '@/components/CardElement.vue';
 import { handleResponse, authHeader } from '@/utils/authentication';
 
 declare interface Channel {
@@ -189,6 +184,7 @@ export default defineComponent({
     components: {
         BasePage,
         BootstrapAlert,
+        CardElement,
         BIconTrash,
         BIconPencil,
         BIconInfoCircle,

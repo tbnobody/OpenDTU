@@ -5,58 +5,51 @@
         </BootstrapAlert>
 
         <form @submit="saveNetworkConfig">
-            <div class="card">
-                <div class="card-header text-bg-primary">{{ $t('networkadmin.WifiConfiguration') }}</div>
-                <div class="card-body">
+            <CardElement :text="$t('networkadmin.WifiConfiguration')" textVariant="text-bg-primary">
+                <InputElement :label="$t('networkadmin.WifiSsid')"
+                              v-model="networkConfigList.ssid"
+                              type="text" maxlength="32"/>
 
-                    <InputElement :label="$t('networkadmin.WifiSsid')"
-                                  v-model="networkConfigList.ssid"
-                                  type="text" maxlength="32"/>
+                <InputElement :label="$t('networkadmin.WifiPassword')"
+                              v-model="networkConfigList.password"
+                              type="password" maxlength="64"/>
 
-                    <InputElement :label="$t('networkadmin.WifiPassword')"
-                                  v-model="networkConfigList.password"
-                                  type="password" maxlength="64"/>
+                <InputElement :label="$t('networkadmin.Hostname')"
+                              v-model="networkConfigList.hostname"
+                              type="text" maxlength="32"
+                >
+                    <div class="alert alert-secondary" role="alert" v-html="$t('networkadmin.HostnameHint')"></div>
+                </InputElement>
 
-                    <InputElement :label="$t('networkadmin.Hostname')"
-                                  v-model="networkConfigList.hostname"
-                                  type="text" maxlength="32"
-                    >
-                        <div class="alert alert-secondary" role="alert" v-html="$t('networkadmin.HostnameHint')"></div>
-                    </InputElement>
+                <InputElement :label="$t('networkadmin.EnableDhcp')"
+                              v-model="networkConfigList.dhcp"
+                              type="checkbox"/>
+            </CardElement>
 
-                    <InputElement :label="$t('networkadmin.EnableDhcp')"
-                                  v-model="networkConfigList.dhcp"
-                                  type="checkbox"/>
-                </div>
-            </div>
+            <CardElement :text="$t('networkadmin.StaticIpConfiguration')" textVariant="text-bg-primary" add-space
+                         v-show="!networkConfigList.dhcp"
+            >
+                <InputElement :label="$t('networkadmin.IpAddress')"
+                              v-model="networkConfigList.ipaddress"
+                              type="text" maxlength="32"/>
 
-            <div class="card" v-show="!networkConfigList.dhcp">
-                <div class="card-header text-bg-primary">
-                    {{ $t('networkadmin.StaticIpConfiguration') }}
-                </div>
-                <div class="card-body">
+                <InputElement :label="$t('networkadmin.Netmask')"
+                              v-model="networkConfigList.netmask"
+                              type="text" maxlength="32"/>
 
-                    <InputElement :label="$t('networkadmin.IpAddress')"
-                                  v-model="networkConfigList.ipaddress"
-                                  type="text" maxlength="32"/>
+                <InputElement :label="$t('networkadmin.DefaultGateway')"
+                              v-model="networkConfigList.gateway"
+                              type="text" maxlength="32"/>
 
-                    <InputElement :label="$t('networkadmin.Netmask')"
-                                  v-model="networkConfigList.netmask"
-                                  type="text" maxlength="32"/>
+                <InputElement :label="$t('networkadmin.Dns', { num: 1 })"
+                              v-model="networkConfigList.dns1"
+                              type="text" maxlength="32"/>
 
-                    <InputElement :label="$t('networkadmin.DefaultGateway')"
-                                  v-model="networkConfigList.gateway"
-                                  type="text" maxlength="32"/>
+                <InputElement :label="$t('networkadmin.Dns', { num: 2 })"
+                              v-model="networkConfigList.dns2"
+                              type="text" maxlength="32"/>
+            </CardElement>
 
-                    <InputElement :label="$t('networkadmin.Dns', { num: 1 })"
-                                  v-model="networkConfigList.dns1"
-                                  type="text" maxlength="32"/>
-
-                    <InputElement :label="$t('networkadmin.Dns', { num: 2 })"
-                                  v-model="networkConfigList.dns2"
-                                  type="text" maxlength="32"/>
-                </div>
-            </div>
             <button type="submit" class="btn btn-primary mb-3">{{ $t('networkadmin.Save') }}</button>
         </form>
     </BasePage>
@@ -67,6 +60,7 @@ import { defineComponent } from 'vue';
 import BasePage from '@/components/BasePage.vue';
 import BootstrapAlert from "@/components/BootstrapAlert.vue";
 import InputElement from '@/components/InputElement.vue';
+import CardElement from '@/components/CardElement.vue';
 import { handleResponse, authHeader } from '@/utils/authentication';
 import type { NetworkConfig } from "@/types/NetworkkConfig";
 
@@ -75,6 +69,7 @@ export default defineComponent({
         BasePage,
         BootstrapAlert,
         InputElement,
+        CardElement,
     },
     data() {
         return {

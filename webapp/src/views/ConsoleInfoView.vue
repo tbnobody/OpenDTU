@@ -1,41 +1,40 @@
 <template>
     <BasePage :title="$t('console.Console')" :isLoading="dataLoading">
-        <div class="card">
-            <div class="card-header text-bg-primary">{{ $t('console.VirtualDebugConsole') }}</div>
-            <div class="card-body">
-                <div class="row g-3 align-items-center">
-                    <div class="col">
-                        <div class="form-check form-switch">
-                            <input class="form-check-input" type="checkbox" role="switch" id="autoScroll"
-                                v-model="isAutoScroll">
-                            <label class="form-check-label" for="autoScroll">
-                                {{ $t('console.EnableAutoScroll') }}
-                            </label>
-                        </div>
-                    </div>
-                    <div class="col text-end">
-                        <div class="btn-group" role="group">
-                            <button type="button" class="btn btn-primary" :onClick="clearConsole">
-                                {{ $t('console.ClearConsole') }}</button>
-                            <button type="button" class="btn btn-secondary" :onClick="copyConsole">
-                                {{ $t('console.CopyToClipboard') }}</button>
-                        </div>
+        <CardElement :text="$t('console.VirtualDebugConsole')" textVariant="text-bg-primary">
+            <div class="row g-3 align-items-center">
+                <div class="col">
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" role="switch" id="autoScroll"
+                            v-model="isAutoScroll">
+                        <label class="form-check-label" for="autoScroll">
+                            {{ $t('console.EnableAutoScroll') }}
+                        </label>
                     </div>
                 </div>
-                <textarea id="console" class="form-control" rows="24" v-model="consoleBuffer" readonly></textarea>
+                <div class="col text-end">
+                    <div class="btn-group" role="group">
+                        <button type="button" class="btn btn-primary" :onClick="clearConsole">
+                            {{ $t('console.ClearConsole') }}</button>
+                        <button type="button" class="btn btn-secondary" :onClick="copyConsole">
+                            {{ $t('console.CopyToClipboard') }}</button>
+                    </div>
+                </div>
             </div>
-        </div>
+            <textarea id="console" class="form-control" rows="24" v-model="consoleBuffer" readonly></textarea>
+        </CardElement>
     </BasePage>
 </template>
 
 <script lang="ts">
 import { defineComponent } from 'vue';
 import BasePage from '@/components/BasePage.vue';
+import CardElement from '@/components/CardElement.vue';
 import { authUrl } from '@/utils/authentication';
 
 export default defineComponent({
     components: {
         BasePage,
+        CardElement,
     },
     data() {
         return {

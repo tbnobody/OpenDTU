@@ -5,31 +5,23 @@
         </BootstrapAlert>
 
         <form @submit="savePasswordConfig">
-            <div class="card">
-                <div class="card-header text-bg-primary">{{ $t('securityadmin.AdminPassword') }}</div>
-                <div class="card-body">
+            <CardElement :text="$t('securityadmin.AdminPassword')" textVariant="text-bg-primary">
+                <InputElement :label="$t('securityadmin.Password')"
+                              v-model="securityConfigList.password"
+                              type="password" maxlength="64"/>
 
-                    <InputElement :label="$t('securityadmin.Password')"
-                                  v-model="securityConfigList.password"
-                                  type="password" maxlength="64"/>
+                <InputElement :label="$t('securityadmin.RepeatPassword')"
+                              v-model="passwordRepeat"
+                              type="password" maxlength="64"/>
 
-                    <InputElement :label="$t('securityadmin.RepeatPassword')"
-                                  v-model="passwordRepeat"
-                                  type="password" maxlength="64"/>
+                <div class="alert alert-secondary" role="alert" v-html="$t('securityadmin.PasswordHint')"></div>
+            </CardElement>
 
-                    <div class="alert alert-secondary" role="alert" v-html="$t('securityadmin.PasswordHint')"></div>
-                </div>
-            </div>
-
-            <div class="card mt-5">
-                <div class="card-header text-bg-primary">{{ $t('securityadmin.Permissions') }}</div>
-                <div class="card-body">
-
-                    <InputElement :label="$t('securityadmin.ReadOnly')"
-                                  v-model="securityConfigList.allow_readonly"
-                                  type="checkbox" wide/>
-                </div>
-            </div>
+            <CardElement :text="$t('securityadmin.Permissions')" textVariant="text-bg-primary" add-space>
+                <InputElement :label="$t('securityadmin.ReadOnly')"
+                              v-model="securityConfigList.allow_readonly"
+                              type="checkbox" wide/>
+            </CardElement>
 
             <button type="submit" class="btn btn-primary mb-3">{{ $t('securityadmin.Save') }}</button>
         </form>
@@ -41,6 +33,7 @@ import { defineComponent } from 'vue';
 import BasePage from '@/components/BasePage.vue';
 import BootstrapAlert from "@/components/BootstrapAlert.vue";
 import InputElement from '@/components/InputElement.vue';
+import CardElement from '@/components/CardElement.vue';
 import { handleResponse, authHeader } from '@/utils/authentication';
 import type { SecurityConfig } from '@/types/SecurityConfig';
 
@@ -49,6 +42,7 @@ export default defineComponent({
         BasePage,
         BootstrapAlert,
         InputElement,
+        CardElement,
     },
     data() {
         return {

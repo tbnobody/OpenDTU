@@ -8,68 +8,66 @@
             </div>
         </div>
 
-        <div v-if="!loading && !uploading && OTAError != ''" class="card">
-            <div class="card-header text-bg-danger">{{ $t('firmwareupgrade.OtaError') }}</div>
-            <div class="card-body text-center">
-                <p class="h1 mb-2">
-                    <BIconExclamationCircleFill />
-                </p>
+        <CardElement :text="$t('firmwareupgrade.OtaError')" textVariant="text-bg-danger" center-content
+                     v-if="!loading && !uploading && OTAError != ''"
+        >
+            <p class="h1 mb-2">
+                <BIconExclamationCircleFill />
+            </p>
 
-                <span style="vertical-align: middle" class="ml-2">
-                    {{ OTAError }}
-                </span>
-                <br />
-                <br />
-                <button class="btn btn-light" @click="clear">
-                    <BIconArrowLeft /> {{ $t('firmwareupgrade.Back') }}
-                </button>
-                <button class="btn btn-primary" @click="retryOTA">
-                    <BIconArrowRepeat /> {{ $t('firmwareupgrade.Retry') }}
-                </button>
+            <span style="vertical-align: middle" class="ml-2">
+                {{ OTAError }}
+            </span>
+            <br />
+            <br />
+            <button class="btn btn-light" @click="clear">
+                <BIconArrowLeft /> {{ $t('firmwareupgrade.Back') }}
+            </button>
+            <button class="btn btn-primary" @click="retryOTA">
+                <BIconArrowRepeat /> {{ $t('firmwareupgrade.Retry') }}
+            </button>
+        </CardElement>
+
+        <CardElement :text="$t('firmwareupgrade.OtaStatus')" textVariant="text-bg-success" center-content
+                     v-else-if="!loading && !uploading && OTASuccess"
+        >
+            <span class="h1 mb-2">
+                <BIconCheckCircle />
+            </span>
+            <span> {{ $t('firmwareupgrade.OtaSuccess') }} </span>
+            <br />
+            <br />
+            <button class="btn btn-primary" @click="clear">
+                <BIconArrowLeft /> {{ $t('firmwareupgrade.Back') }}
+            </button>
+        </CardElement>
+
+        <CardElement :text="$t('firmwareupgrade.FirmwareUpload')" textVariant="text-bg-primary" center-content
+                     v-else-if="!loading && !uploading"
+        >
+            <div class="form-group pt-2 mt-3">
+                <input class="form-control" type="file" ref="file" accept=".bin,.bin.gz" @change="uploadOTA" />
             </div>
-        </div>
+        </CardElement>
 
-        <div v-else-if="!loading && !uploading && OTASuccess" class="card">
-            <div class="card-header text-bg-success">{{ $t('firmwareupgrade.OtaStatus') }}</div>
-            <div class="card-body text-center">
-                <span class="h1 mb-2">
-                    <BIconCheckCircle />
-                </span>
-                <span> {{ $t('firmwareupgrade.OtaSuccess') }} </span>
-                <br />
-                <br />
-                <button class="btn btn-primary" @click="clear">
-                    <BIconArrowLeft /> {{ $t('firmwareupgrade.Back') }}
-                </button>
-            </div>
-        </div>
-
-        <div v-else-if="!loading && !uploading" class="card">
-            <div class="card-header text-bg-primary">{{ $t('firmwareupgrade.FirmwareUpload') }}</div>
-            <div class="card-body text-center">
-                <div class="form-group pt-2 mt-3">
-                    <input class="form-control" type="file" ref="file" accept=".bin,.bin.gz" @change="uploadOTA" />
+        <CardElement :text="$t('firmwareupgrade.UploadProgress')" textVariant="text-bg-primary" center-content
+                     v-else-if="!loading && uploading"
+        >
+            <div class="progress">
+                <div class="progress-bar" role="progressbar" :style="{ width: progress + '%' }"
+                    v-bind:aria-valuenow="progress" aria-valuemin="0" aria-valuemax="100">
+                    {{ progress }}%
                 </div>
             </div>
-        </div>
+        </CardElement>
 
-        <div v-else-if="!loading && uploading" class="card">
-            <div class="card-header text-bg-primary">{{ $t('firmwareupgrade.UploadProgress') }}</div>
-            <div class="card-body text-center">
-                <div class="progress">
-                    <div class="progress-bar" role="progressbar" :style="{ width: progress + '%' }"
-                        v-bind:aria-valuenow="progress" aria-valuemin="0" aria-valuemax="100">
-                        {{ progress }}%
-                    </div>
-                </div>
-            </div>
-        </div>
     </BasePage>
 </template>
 
 <script lang="ts">
 import { defineComponent } from 'vue';
 import BasePage from '@/components/BasePage.vue';
+import CardElement from '@/components/CardElement.vue';
 import SparkMD5 from "spark-md5";
 import {
     BIconExclamationCircleFill,
@@ -82,6 +80,7 @@ import { authHeader, isLoggedIn } from '@/utils/authentication';
 export default defineComponent({
     components: {
         BasePage,
+        CardElement,
         BIconExclamationCircleFill,
         BIconArrowLeft,
         BIconArrowRepeat,

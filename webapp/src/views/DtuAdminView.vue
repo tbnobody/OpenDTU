@@ -5,35 +5,31 @@
         </BootstrapAlert>
 
         <form @submit="saveDtuConfig">
-            <div class="card">
-                <div class="card-header text-bg-primary">{{ $t('dtuadmin.DtuConfiguration') }}</div>
-                <div class="card-body">
+            <CardElement :text="$t('dtuadmin.DtuConfiguration')" textVariant="text-bg-primary">
+                <InputElement :label="$t('dtuadmin.Serial')"
+                                v-model="dtuConfigList.dtu_serial"
+                                type="number" min="1" max="199999999999"
+                                :tooltip="$t('dtuadmin.SerialHint')"/>
 
-                    <InputElement :label="$t('dtuadmin.Serial')"
-                                  v-model="dtuConfigList.dtu_serial"
-                                  type="number" min="1" max="199999999999"
-                                  :tooltip="$t('dtuadmin.SerialHint')"/>
+                <InputElement :label="$t('dtuadmin.PollInterval')"
+                                v-model="dtuConfigList.dtu_pollinterval"
+                                type="number" min="1" max="86400"
+                                :postfix="$t('dtuadmin.Seconds')"/>
 
-                    <InputElement :label="$t('dtuadmin.PollInterval')"
-                                  v-model="dtuConfigList.dtu_pollinterval"
-                                  type="number" min="1" max="86400"
-                                  :postfix="$t('dtuadmin.Seconds')"/>
-
-                    <div class="row mb-3">
-                        <label for="inputTimezone" class="col-sm-2 col-form-label">
-                            {{ $t('dtuadmin.PaLevel') }}
-                            <BIconInfoCircle v-tooltip :title="$t('dtuadmin.PaLevelHint')" />
-                        </label>
-                        <div class="col-sm-10">
-                            <select class="form-select" v-model="dtuConfigList.dtu_palevel">
-                                <option v-for="palevel in palevelList" :key="palevel.key" :value="palevel.key">
-                                    {{ palevel.value }}
-                                </option>
-                            </select>
-                        </div>
+                <div class="row mb-3">
+                    <label for="inputTimezone" class="col-sm-2 col-form-label">
+                        {{ $t('dtuadmin.PaLevel') }}
+                        <BIconInfoCircle v-tooltip :title="$t('dtuadmin.PaLevelHint')" />
+                    </label>
+                    <div class="col-sm-10">
+                        <select class="form-select" v-model="dtuConfigList.dtu_palevel">
+                            <option v-for="palevel in palevelList" :key="palevel.key" :value="palevel.key">
+                                {{ palevel.value }}
+                            </option>
+                        </select>
                     </div>
                 </div>
-            </div>
+            </CardElement>
             <button type="submit" class="btn btn-primary mb-3">{{ $t('dtuadmin.Save') }}</button>
         </form>
     </BasePage>
@@ -44,6 +40,7 @@ import { defineComponent } from 'vue';
 import BasePage from '@/components/BasePage.vue';
 import BootstrapAlert from "@/components/BootstrapAlert.vue";
 import InputElement from '@/components/InputElement.vue';
+import CardElement from '@/components/CardElement.vue';
 import { handleResponse, authHeader } from '@/utils/authentication';
 import type { DtuConfig } from "@/types/DtuConfig";
 import {
@@ -56,6 +53,7 @@ export default defineComponent({
         BootstrapAlert,
         BIconInfoCircle,
         InputElement,
+        CardElement,
     },
     data() {
         return {

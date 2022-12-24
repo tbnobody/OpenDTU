@@ -5,55 +5,47 @@
         </BootstrapAlert>
 
         <form @submit="saveNtpConfig">
-            <div class="card">
-                <div class="card-header text-bg-primary">{{ $t('ntpadmin.NtpConfiguration') }}</div>
-                <div class="card-body">
+            <CardElement :text="$t('ntpadmin.NtpConfiguration')" textVariant="text-bg-primary">
+                <InputElement :label="$t('ntpadmin.TimeServer')"
+                              v-model="ntpConfigList.ntp_server"
+                              type="text" maxlength="32"
+                              :tooltip="$t('ntpadmin.TimeServerHint')"/>
 
-                    <InputElement :label="$t('ntpadmin.TimeServer')"
-                                  v-model="ntpConfigList.ntp_server"
-                                  type="text" maxlength="32"
-                                  :tooltip="$t('ntpadmin.TimeServerHint')"/>
-
-                    <div class="row mb-3">
-                        <label for="inputTimezone" class="col-sm-2 col-form-label">{{ $t('ntpadmin.Timezone') }}</label>
-                        <div class="col-sm-10">
-                            <select class="form-select" v-model="timezoneSelect">
-                                <option v-for="(config, name) in timezoneList" :key="name + '---' + config"
-                                    :value="name + '---' + config">
-                                    {{ name }}
-                                </option>
-                            </select>
-                        </div>
+                <div class="row mb-3">
+                    <label for="inputTimezone" class="col-sm-2 col-form-label">{{ $t('ntpadmin.Timezone') }}</label>
+                    <div class="col-sm-10">
+                        <select class="form-select" v-model="timezoneSelect">
+                            <option v-for="(config, name) in timezoneList" :key="name + '---' + config"
+                                :value="name + '---' + config">
+                                {{ name }}
+                            </option>
+                        </select>
                     </div>
-
-                    <InputElement :label="$t('ntpadmin.TimezoneConfig')"
-                                  v-model="ntpConfigList.ntp_timezone"
-                                  type="text" maxlength="32" disabled/>
                 </div>
-            </div>
+
+                <InputElement :label="$t('ntpadmin.TimezoneConfig')"
+                              v-model="ntpConfigList.ntp_timezone"
+                              type="text" maxlength="32" disabled/>
+            </CardElement>
             <button type="submit" class="btn btn-primary mb-3">{{ $t('ntpadmin.Save') }}</button>
         </form>
 
-        <div class="card">
-            <div class="card-header text-bg-primary">{{ $t('ntpadmin.ManualTimeSynchronization') }}</div>
-            <div class="card-body">
+        <CardElement :text="$t('ntpadmin.ManualTimeSynchronization')" textVariant="text-bg-primary" add-space>
+            <InputElement :label="$t('ntpadmin.CurrentOpenDtuTime')"
+                           v-model="mcuTime"
+                           type="text" disabled/>
 
-                <InputElement :label="$t('ntpadmin.CurrentOpenDtuTime')"
-                              v-model="mcuTime"
-                              type="text" disabled/>
+            <InputElement :label="$t('ntpadmin.CurrentLocalTime')"
+                          v-model="localTime"
+                          type="text" disabled/>
 
-                <InputElement :label="$t('ntpadmin.CurrentLocalTime')"
-                              v-model="localTime"
-                              type="text" disabled/>
-
-                <div class="text-center mb-3">
-                    <button type="button" class="btn btn-danger" @click="setCurrentTime()">
-                        {{ $t('ntpadmin.SynchronizeTime') }}
-                    </button>
-                </div>
-                <div class="alert alert-secondary" role="alert" v-html="$t('ntpadmin.SynchronizeTimeHint')"></div>
+            <div class="text-center mb-3">
+                <button type="button" class="btn btn-danger" @click="setCurrentTime()">
+                    {{ $t('ntpadmin.SynchronizeTime') }}
+                </button>
             </div>
-        </div>
+            <div class="alert alert-secondary" role="alert" v-html="$t('ntpadmin.SynchronizeTimeHint')"></div>
+        </CardElement>
     </BasePage>
 </template>
 
@@ -62,6 +54,7 @@ import { defineComponent } from 'vue';
 import BasePage from '@/components/BasePage.vue';
 import BootstrapAlert from "@/components/BootstrapAlert.vue";
 import InputElement from '@/components/InputElement.vue';
+import CardElement from '@/components/CardElement.vue';
 import { handleResponse, authHeader } from '@/utils/authentication';
 import type { NtpConfig } from "@/types/NtpConfig";
 import {
@@ -74,6 +67,7 @@ export default defineComponent({
         BootstrapAlert,
         BIconInfoCircle,
         InputElement,
+        CardElement,
     },
     data() {
         return {

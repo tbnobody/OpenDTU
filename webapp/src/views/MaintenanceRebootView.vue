@@ -4,16 +4,12 @@
             {{ alertMessage }}
         </BootstrapAlert>
 
-        <div class="card mt-5">
-            <div class="card-header text-bg-primary">{{ $t('maintenancereboot.PerformReboot') }}</div>
-            <div class="card-body text-center">
+        <CardElement :text="$t('maintenancereboot.PerformReboot')" textVariant="text-bg-primary" center-content>
+            <button class="btn btn-danger" @click="onOpenModal(performReboot)">{{ $t('maintenancereboot.Reboot') }}
+            </button>
 
-                <button class="btn btn-danger" @click="onOpenModal(performReboot)">{{ $t('maintenancereboot.Reboot') }}
-                </button>
-
-                <div class="alert alert-danger mt-3" role="alert" v-html="$t('maintenancereboot.RebootHint')"></div>
-            </div>
-        </div>
+            <div class="alert alert-danger mt-3" role="alert" v-html="$t('maintenancereboot.RebootHint')"></div>
+        </CardElement>
     </BasePage>
 
     <div class="modal" id="performReboot" tabindex="-1">
@@ -42,12 +38,14 @@ import { defineComponent } from 'vue';
 import * as bootstrap from 'bootstrap';
 import BasePage from '@/components/BasePage.vue';
 import BootstrapAlert from "@/components/BootstrapAlert.vue";
+import CardElement from '@/components/CardElement.vue';
 import { handleResponse, authHeader, isLoggedIn } from '@/utils/authentication';
 
 export default defineComponent({
     components: {
         BasePage,
         BootstrapAlert,
+        CardElement,
     },
     data() {
         return {
