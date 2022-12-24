@@ -1,13 +1,13 @@
+import mitt from 'mitt'
 import { createApp } from 'vue'
 import { createI18n } from 'vue-i18n'
-import { messages, defaultLocale } from './locales'
 import App from './App.vue'
-import router from './router'
-import mitt from 'mitt';
+import { defaultLocale, messages } from './locales'
 import { tooltip } from './plugins/bootstrap'
+import router from './router'
 
-import './scss/styles.scss'
 import "bootstrap"
+import './scss/styles.scss'
 
 const app = createApp(App)
 

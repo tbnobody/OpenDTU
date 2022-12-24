@@ -1,21 +1,21 @@
-import { createRouter, createWebHistory } from 'vue-router';
-import HomeView from '@/views/HomeView.vue'
-import AboutView from '@/views/AboutView.vue'
-import ConsoleInfoView from '@/views/ConsoleInfoView.vue'
-import NetworkInfoView from '@/views/NetworkInfoView.vue'
-import SystemInfoView from '@/views/SystemInfoView.vue'
-import NtpInfoView from '@/views/NtpInfoView.vue'
-import NetworkAdminView from '@/views/NetworkAdminView.vue'
-import NtpAdminView from '@/views/NtpAdminView.vue'
-import MqttAdminView from '@/views/MqttAdminView.vue'
-import MqttInfoView from '@/views/MqttInfoView.vue'
-import InverterAdminView from '@/views/InverterAdminView.vue'
-import DtuAdminView from '@/views/DtuAdminView.vue'
-import FirmwareUpgradeView from '@/views/FirmwareUpgradeView.vue'
-import ConfigAdminView from '@/views/ConfigAdminView.vue'
-import SecurityAdminView from '@/views/SecurityAdminView.vue'
-import LoginView from '@/views/LoginView.vue'
+import AboutView from '@/views/AboutView.vue';
+import ConfigAdminView from '@/views/ConfigAdminView.vue';
+import ConsoleInfoView from '@/views/ConsoleInfoView.vue';
+import DtuAdminView from '@/views/DtuAdminView.vue';
+import FirmwareUpgradeView from '@/views/FirmwareUpgradeView.vue';
+import HomeView from '@/views/HomeView.vue';
+import InverterAdminView from '@/views/InverterAdminView.vue';
+import LoginView from '@/views/LoginView.vue';
 import MaintenanceRebootView from '@/views/MaintenanceRebootView.vue';
+import MqttAdminView from '@/views/MqttAdminView.vue';
+import MqttInfoView from '@/views/MqttInfoView.vue';
+import NetworkAdminView from '@/views/NetworkAdminView.vue';
+import NetworkInfoView from '@/views/NetworkInfoView.vue';
+import NtpAdminView from '@/views/NtpAdminView.vue';
+import NtpInfoView from '@/views/NtpInfoView.vue';
+import SecurityAdminView from '@/views/SecurityAdminView.vue';
+import SystemInfoView from '@/views/SystemInfoView.vue';
+import { createRouter, createWebHistory } from 'vue-router';
 
 const router = createRouter({
     history: createWebHistory(import.meta.env.BASE_URL),

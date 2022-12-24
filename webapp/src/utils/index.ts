@@ -1,6 +1,6 @@
-import { timestampToString } from './time';
+import { isLoggedIn, login, logout } from './authentication';
 import { formatNumber } from './number';
-import { login, logout, isLoggedIn } from './authentication';
+import { timestampToString } from './time';
 
 export {
     timestampToString,
