@@ -24,8 +24,8 @@ import { defineComponent } from 'vue';
 export default defineComponent({
     components: {
         BasePage,
-        HardwareInfo,
         FirmwareInfo,
+        HardwareInfo,
         MemoryInfo,
         RadioInfo,
     },

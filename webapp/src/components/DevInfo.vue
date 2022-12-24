@@ -47,8 +47,8 @@ import { defineComponent, type PropType } from 'vue';
 
 export default defineComponent({
     components: {
-        BIconInfoSquare,
         BootstrapAlert,
+        BIconInfoSquare,
     },
     props: {
         devInfoList: { type: Object as PropType<DevInfoStatus>, required: true },

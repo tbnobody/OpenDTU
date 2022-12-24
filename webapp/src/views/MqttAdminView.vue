@@ -120,8 +120,8 @@ export default defineComponent({
     components: {
         BasePage,
         BootstrapAlert,
-        InputElement,
         CardElement,
+        InputElement,
     },
     data() {
         return {

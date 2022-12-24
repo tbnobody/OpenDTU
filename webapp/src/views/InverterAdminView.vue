@@ -185,9 +185,9 @@ export default defineComponent({
         BasePage,
         BootstrapAlert,
         CardElement,
-        BIconTrash,
-        BIconPencil,
         BIconInfoCircle,
+        BIconPencil,
+        BIconTrash,
     },
     data() {
         return {

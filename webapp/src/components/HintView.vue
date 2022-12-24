@@ -27,9 +27,9 @@ import { defineComponent, type PropType } from 'vue';
 export default defineComponent({
     components: {
         BootstrapAlert,
+        BIconBroadcast,
         BIconClock,
         BIconExclamationCircle,
-        BIconBroadcast,
     },
     props: {
         hints: { type: Object as PropType<Hints>, required: true },

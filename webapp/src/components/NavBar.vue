@@ -108,9 +108,9 @@ import { defineComponent } from 'vue';
 
 export default defineComponent({
     components: {
+        BIconEgg,
         BIconSun,
         BIconTree,
-        BIconEgg,
     },
     data() {
         return {

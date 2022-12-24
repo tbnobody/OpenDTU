@@ -82,10 +82,10 @@ import { defineComponent } from 'vue';
 export default defineComponent({
     components: {
         BasePage,
-        BIconInfoCircle,
         BIconActivity,
         BIconBug,
         BIconChat,
+        BIconInfoCircle,
     },
 });
 

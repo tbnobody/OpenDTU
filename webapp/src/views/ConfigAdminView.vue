@@ -101,11 +101,11 @@ import { defineComponent } from 'vue';
 export default defineComponent({
     components: {
         BasePage,
-        BIconExclamationCircleFill,
-        BIconArrowLeft,
-        BIconCheckCircle,
         BootstrapAlert,
         CardElement,
+        BIconArrowLeft,
+        BIconCheckCircle,
+        BIconExclamationCircleFill,
     },
     data() {
         return {

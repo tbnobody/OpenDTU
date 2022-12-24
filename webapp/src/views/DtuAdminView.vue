@@ -49,9 +49,9 @@ export default defineComponent({
     components: {
         BasePage,
         BootstrapAlert,
-        BIconInfoCircle,
-        InputElement,
         CardElement,
+        InputElement,
+        BIconInfoCircle,
     },
     data() {
         return {

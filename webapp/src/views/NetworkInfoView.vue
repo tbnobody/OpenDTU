@@ -24,10 +24,10 @@ import { defineComponent } from 'vue';
 export default defineComponent({
     components: {
         BasePage,
-        WifiStationInfo,
-        WifiApInfo,
-        InterfaceNetworkInfo,
         InterfaceApInfo,
+        InterfaceNetworkInfo,
+        WifiApInfo,
+        WifiStationInfo,
     },
     data() {
         return {

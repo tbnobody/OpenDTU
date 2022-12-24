@@ -81,10 +81,10 @@ export default defineComponent({
     components: {
         BasePage,
         CardElement,
-        BIconExclamationCircleFill,
         BIconArrowLeft,
         BIconArrowRepeat,
         BIconCheckCircle,
+        BIconExclamationCircleFill,
     },
     data() {
         return {
