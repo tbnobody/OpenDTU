@@ -57,15 +57,11 @@ import InputElement from '@/components/InputElement.vue';
 import CardElement from '@/components/CardElement.vue';
 import { handleResponse, authHeader } from '@/utils/authentication';
 import type { NtpConfig } from "@/types/NtpConfig";
-import {
-    BIconInfoCircle,
-} from 'bootstrap-icons-vue';
 
 export default defineComponent({
     components: {
         BasePage,
         BootstrapAlert,
-        BIconInfoCircle,
         InputElement,
         CardElement,
     },
