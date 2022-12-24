@@ -8,31 +8,16 @@
             <div class="card">
                 <div class="card-header text-bg-primary">{{ $t('dtuadmin.DtuConfiguration') }}</div>
                 <div class="card-body">
-                    <div class="row mb-3">
-                        <label for="inputDtuSerial" class="col-sm-2 col-form-label">{{ $t('dtuadmin.Serial') }}
-                            <BIconInfoCircle v-tooltip :title="$t('dtuadmin.SerialHint')" />
-                        </label>
-                        <div class="col-sm-10">
-                            <input type="number" class="form-control" id="inputDtuSerial" min="1" max="199999999999"
-                                v-model="dtuConfigList.dtu_serial" />
-                        </div>
-                    </div>
 
-                    <div class="row mb-3">
-                        <label for="inputPollInterval" class="col-sm-2 col-form-label">
-                            {{ $t('dtuadmin.PollInterval') }}
-                        </label>
-                        <div class="col-sm-10">
-                            <div class="input-group">
-                                <input type="number" class="form-control" id="inputPollInterval" min="1" max="86400"
-                                    v-model="dtuConfigList.dtu_pollinterval"
-                                    aria-describedby="pollIntervalDescription" />
-                                <span class="input-group-text" id="pollIntervalDescription">
-                                    {{ $t('dtuadmin.Seconds') }}
-                                </span>
-                            </div>
-                        </div>
-                    </div>
+                    <InputElement :label="$t('dtuadmin.Serial')"
+                                  v-model="dtuConfigList.dtu_serial"
+                                  type="number" min="1" max="199999999999"
+                                  :tooltip="$t('dtuadmin.SerialHint')"/>
+
+                    <InputElement :label="$t('dtuadmin.PollInterval')"
+                                  v-model="dtuConfigList.dtu_pollinterval"
+                                  type="number" min="1" max="86400"
+                                  :postfix="$t('dtuadmin.Seconds')"/>
 
                     <div class="row mb-3">
                         <label for="inputTimezone" class="col-sm-2 col-form-label">
@@ -58,6 +43,7 @@
 import { defineComponent } from 'vue';
 import BasePage from '@/components/BasePage.vue';
 import BootstrapAlert from "@/components/BootstrapAlert.vue";
+import InputElement from '@/components/InputElement.vue';
 import { handleResponse, authHeader } from '@/utils/authentication';
 import type { DtuConfig } from "@/types/DtuConfig";
 import {
@@ -69,6 +55,7 @@ export default defineComponent({
         BasePage,
         BootstrapAlert,
         BIconInfoCircle,
+        InputElement,
     },
     data() {
         return {

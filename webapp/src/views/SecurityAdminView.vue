@@ -8,45 +8,26 @@
             <div class="card">
                 <div class="card-header text-bg-primary">{{ $t('securityadmin.AdminPassword') }}</div>
                 <div class="card-body">
-                    <div class="row mb-3">
-                        <label for="inputPassword" class="col-sm-2 col-form-label">
-                            {{ $t('securityadmin.Password') }}
-                        </label>
-                        <div class="col-sm-10">
-                            <input type="password" class="form-control" id="inputPassword" maxlength="64"
-                                placeholder="Password" v-model="securityConfigList.password" />
-                        </div>
-                    </div>
 
-                    <div class="row mb-3">
-                        <label for="inputPasswordRepeat" class="col-sm-2 col-form-label">
-                            {{ $t('securityadmin.RepeatPassword') }}
-                        </label>
-                        <div class="col-sm-10">
-                            <input type="password" class="form-control" id="inputPasswordRepeat" maxlength="64"
-                                placeholder="Password" v-model="passwordRepeat" />
-                        </div>
-                    </div>
+                    <InputElement :label="$t('securityadmin.Password')"
+                                  v-model="securityConfigList.password"
+                                  type="password" maxlength="64"/>
+
+                    <InputElement :label="$t('securityadmin.RepeatPassword')"
+                                  v-model="passwordRepeat"
+                                  type="password" maxlength="64"/>
 
                     <div class="alert alert-secondary" role="alert" v-html="$t('securityadmin.PasswordHint')"></div>
-
                 </div>
             </div>
 
             <div class="card mt-5">
                 <div class="card-header text-bg-primary">{{ $t('securityadmin.Permissions') }}</div>
                 <div class="card-body">
-                    <div class="row mb-3">
-                        <label class="col-sm-6 form-check-label" for="inputReadonly">
-                            {{ $t('securityadmin.ReadOnly') }}
-                        </label>
-                        <div class="col-sm-6">
-                            <div class="form-check form-switch">
-                                <input class="form-check-input" type="checkbox" id="inputReadonly"
-                                    v-model="securityConfigList.allow_readonly" />
-                            </div>
-                        </div>
-                    </div>
+
+                    <InputElement :label="$t('securityadmin.ReadOnly')"
+                                  v-model="securityConfigList.allow_readonly"
+                                  type="checkbox" wide/>
                 </div>
             </div>
 
@@ -59,6 +40,7 @@
 import { defineComponent } from 'vue';
 import BasePage from '@/components/BasePage.vue';
 import BootstrapAlert from "@/components/BootstrapAlert.vue";
+import InputElement from '@/components/InputElement.vue';
 import { handleResponse, authHeader } from '@/utils/authentication';
 import type { SecurityConfig } from '@/types/SecurityConfig';
 
@@ -66,6 +48,7 @@ export default defineComponent({
     components: {
         BasePage,
         BootstrapAlert,
+        InputElement,
     },
     data() {
         return {

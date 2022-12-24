@@ -8,16 +8,11 @@
             <div class="card">
                 <div class="card-header text-bg-primary">{{ $t('ntpadmin.NtpConfiguration') }}</div>
                 <div class="card-body">
-                    <div class="row mb-3">
-                        <label for="inputNtpServer" class="col-sm-2 col-form-label">
-                            {{ $t('ntpadmin.TimeServer') }}
-                            <BIconInfoCircle v-tooltip :title="$t('ntpadmin.TimeServerHint')" />
-                        </label>
-                        <div class="col-sm-10">
-                            <input type="text" class="form-control" id="inputNtpServer" maxlength="32"
-                                placeholder="Time Server" v-model="ntpConfigList.ntp_server" />
-                        </div>
-                    </div>
+
+                    <InputElement :label="$t('ntpadmin.TimeServer')"
+                                  v-model="ntpConfigList.ntp_server"
+                                  type="text" maxlength="32"
+                                  :tooltip="$t('ntpadmin.TimeServerHint')"/>
 
                     <div class="row mb-3">
                         <label for="inputTimezone" class="col-sm-2 col-form-label">{{ $t('ntpadmin.Timezone') }}</label>
@@ -31,15 +26,9 @@
                         </div>
                     </div>
 
-                    <div class="row mb-3">
-                        <label for="inputTimezoneConfig" class="col-sm-2 col-form-label">
-                            {{ $t('ntpadmin.TimezoneConfig') }}
-                        </label>
-                        <div class="col-sm-10">
-                            <input type="text" class="form-control" id="inputTimezoneConfig" maxlength="32"
-                                placeholder="Timezone" v-model="ntpConfigList.ntp_timezone" disabled />
-                        </div>
-                    </div>
+                    <InputElement :label="$t('ntpadmin.TimezoneConfig')"
+                                  v-model="ntpConfigList.ntp_timezone"
+                                  type="text" maxlength="32" disabled/>
                 </div>
             </div>
             <button type="submit" class="btn btn-primary mb-3">{{ $t('ntpadmin.Save') }}</button>
@@ -48,29 +37,21 @@
         <div class="card">
             <div class="card-header text-bg-primary">{{ $t('ntpadmin.ManualTimeSynchronization') }}</div>
             <div class="card-body">
-                <div class="row mb-3">
-                    <label for="currentMcuTime" class="col-sm-2 col-form-label">
-                        {{ $t('ntpadmin.CurrentOpenDtuTime') }}
-                    </label>
-                    <div class="col-sm-10">
-                        <input type="text" class="form-control" id="currentMcuTime" v-model="mcuTime" disabled />
-                    </div>
-                </div>
-                <div class="row mb-3">
-                    <label for="currentLocalTime" class="col-sm-2 col-form-label">
-                        {{ $t('ntpadmin.CurrentLocalTime') }}
-                    </label>
-                    <div class="col-sm-10">
-                        <input type="text" class="form-control" id="currentLocalTime" v-model="localTime" disabled />
-                    </div>
-                </div>
+
+                <InputElement :label="$t('ntpadmin.CurrentOpenDtuTime')"
+                              v-model="mcuTime"
+                              type="text" disabled/>
+
+                <InputElement :label="$t('ntpadmin.CurrentLocalTime')"
+                              v-model="localTime"
+                              type="text" disabled/>
+
                 <div class="text-center mb-3">
                     <button type="button" class="btn btn-danger" @click="setCurrentTime()">
                         {{ $t('ntpadmin.SynchronizeTime') }}
                     </button>
                 </div>
                 <div class="alert alert-secondary" role="alert" v-html="$t('ntpadmin.SynchronizeTimeHint')"></div>
-
             </div>
         </div>
     </BasePage>
@@ -80,6 +61,7 @@
 import { defineComponent } from 'vue';
 import BasePage from '@/components/BasePage.vue';
 import BootstrapAlert from "@/components/BootstrapAlert.vue";
+import InputElement from '@/components/InputElement.vue';
 import { handleResponse, authHeader } from '@/utils/authentication';
 import type { NtpConfig } from "@/types/NtpConfig";
 import {
@@ -91,6 +73,7 @@ export default defineComponent({
         BasePage,
         BootstrapAlert,
         BIconInfoCircle,
+        InputElement,
     },
     data() {
         return {
