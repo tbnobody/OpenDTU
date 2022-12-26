@@ -89,7 +89,7 @@
         "SerialNumber": "Serial Number: ",
         "CurrentLimit": "Current Limit: ",
         "DataAge": "Data Age: ",
-        "Seconds": "seconds",
+        "Seconds": "{val} seconds",
         "ShowSetInverterLimit": "Show / Set Inverter Limit",
         "TurnOnOff": "Turn Inverter on/off",
         "ShowInverterInfo": "Show Inverter Info",
