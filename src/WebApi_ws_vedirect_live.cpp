@@ -5,6 +5,7 @@
 #include "WebApi_ws_vedirect_live.h"
 #include "AsyncJson.h"
 #include "Configuration.h"
+#include "MessageOutput.h"
 #include "WebApi.h"
 #include "defaults.h"
 
@@ -125,10 +126,12 @@ void WebApiWsVedirectLiveClass::onWebsocketEvent(AsyncWebSocket* server, AsyncWe
         char str[64];
         snprintf(str, sizeof(str), "Websocket: [%s][%u] connect", server->url(), client->id());
         Serial.println(str);
+        MessageOutput.println(str);
     } else if (type == WS_EVT_DISCONNECT) {
         char str[64];
         snprintf(str, sizeof(str), "Websocket: [%s][%u] disconnect", server->url(), client->id());
         Serial.println(str);
+        MessageOutput.println(str);
     }
 }
 

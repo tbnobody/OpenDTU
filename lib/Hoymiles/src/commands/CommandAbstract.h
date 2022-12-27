@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-2.0-or-later
 #pragma once
 
 #include "types.h"
@@ -14,7 +15,7 @@ public:
     virtual ~CommandAbstract() {};
 
     const uint8_t* getDataPayload();
-    void dumpDataPayload(Stream& stream);
+    void dumpDataPayload(Print* stream);
 
     uint8_t getDataSize();
 

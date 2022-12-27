@@ -1,7 +1,8 @@
+// SPDX-License-Identifier: GPL-2.0-or-later
 #pragma once
 
-#include "Hoymiles.h"
 #include <ESPAsyncWebServer.h>
+#include <Hoymiles.h>
 
 class WebApiPrometheusClass {
 public:

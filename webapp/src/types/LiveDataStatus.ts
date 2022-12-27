@@ -2,7 +2,7 @@ export interface ValueObject {
     v: number; // value
     u: string; // unit
     d: number; // digits
-};
+}
 
 export interface InverterStatistics {
     name: ValueObject,
@@ -30,19 +30,19 @@ export interface Inverter {
     limit_absolute: number;
     events: number;
     [key: number]: InverterStatistics;
-};
+}
 
 export interface Total {
     Power: ValueObject;
     YieldDay: ValueObject;
     YieldTotal: ValueObject;
-};
+}
 
 export interface Hints {
     time_sync: boolean;
     default_password: boolean;
     radio_problem: boolean;
-};
+}
 
 export interface LiveData {
     inverters: Inverter[];

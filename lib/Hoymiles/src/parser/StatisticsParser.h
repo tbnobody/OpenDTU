@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-2.0-or-later
 #pragma once
 #include "Parser.h"
 #include <Arduino.h>
@@ -62,13 +63,14 @@ enum {
 };
 
 typedef struct {
+    uint8_t ch; // channel 0 - 4
     uint8_t fieldId; // field id
     uint8_t unitId; // uint id
-    uint8_t ch; // channel 0 - 4
     uint8_t start; // pos of first byte in buffer
     uint8_t num; // number of bytes in buffer
     uint16_t div; // divisor / calc command
     bool isSigned; // allow negative numbers
+    uint8_t digits; // number of valid digits after the decimal point
 } byteAssign_t;
 
 class StatisticsParser : public Parser {

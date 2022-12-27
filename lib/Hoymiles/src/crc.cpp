@@ -1,3 +1,7 @@
+// SPDX-License-Identifier: GPL-2.0-or-later
+/*
+ * Copyright (C) 2022 Thomas Basler and others
+ */
 #include "crc.h"
 
 uint8_t crc8(const uint8_t buf[], uint8_t len)

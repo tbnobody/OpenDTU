@@ -1,88 +1,69 @@
 <template>
-    <BasePage :title="'NTP Settings'" :isLoading="dataLoading || timezoneLoading">
+    <BasePage :title="$t('ntpadmin.NtpSettings')" :isLoading="dataLoading || timezoneLoading">
         <BootstrapAlert v-model="showAlert" dismissible :variant="alertType">
             {{ alertMessage }}
         </BootstrapAlert>
 
         <form @submit="saveNtpConfig">
-            <div class="card">
-                <div class="card-header text-bg-primary">NTP Configuration</div>
-                <div class="card-body">
-                    <div class="row mb-3">
-                        <label for="inputNtpServer" class="col-sm-2 col-form-label">Time Server:</label>
-                        <div class="col-sm-10">
-                            <input type="text" class="form-control" id="inputNtpServer" maxlength="32"
-                                placeholder="Time Server" v-model="ntpConfigList.ntp_server" />
-                        </div>
-                    </div>
+            <CardElement :text="$t('ntpadmin.NtpConfiguration')" textVariant="text-bg-primary">
+                <InputElement :label="$t('ntpadmin.TimeServer')"
+                              v-model="ntpConfigList.ntp_server"
+                              type="text" maxlength="32"
+                              :tooltip="$t('ntpadmin.TimeServerHint')"/>
 
-                    <div class="row mb-3">
-                        <label for="inputTimezone" class="col-sm-2 col-form-label">Timezone:</label>
-                        <div class="col-sm-10">
-                            <select class="form-select" v-model="timezoneSelect">
-                                <option v-for="(config, name) in timezoneList" :key="name + '---' + config"
-                                    :value="name + '---' + config">
-                                    {{ name }}
-                                </option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <div class="row mb-3">
-                        <label for="inputTimezoneConfig" class="col-sm-2 col-form-label">Timezone Config:</label>
-                        <div class="col-sm-10">
-                            <input type="text" class="form-control" id="inputTimezoneConfig" maxlength="32"
-                                placeholder="Timezone" v-model="ntpConfigList.ntp_timezone" disabled />
-                        </div>
+                <div class="row mb-3">
+                    <label for="inputTimezone" class="col-sm-2 col-form-label">{{ $t('ntpadmin.Timezone') }}</label>
+                    <div class="col-sm-10">
+                        <select class="form-select" v-model="timezoneSelect">
+                            <option v-for="(config, name) in timezoneList" :key="name + '---' + config"
+                                :value="name + '---' + config">
+                                {{ name }}
+                            </option>
+                        </select>
                     </div>
                 </div>
-            </div>
-            <button type="submit" class="btn btn-primary mb-3">Save</button>
+
+                <InputElement :label="$t('ntpadmin.TimezoneConfig')"
+                              v-model="ntpConfigList.ntp_timezone"
+                              type="text" maxlength="32" disabled/>
+            </CardElement>
+            <button type="submit" class="btn btn-primary mb-3">{{ $t('ntpadmin.Save') }}</button>
         </form>
 
-        <div class="card">
-            <div class="card-header text-bg-primary">Manual Time Synchronization</div>
-            <div class="card-body">
-                <div class="row mb-3">
-                    <label for="currentMcuTime" class="col-sm-2 col-form-label">Current OpenDTU Time:</label>
-                    <div class="col-sm-10">
-                        <input type="text" class="form-control" id="currentMcuTime" v-model="mcuTime" disabled />
-                    </div>
-                </div>
-                <div class="row mb-3">
-                    <label for="currentLocalTime" class="col-sm-2 col-form-label">Current Local Time:</label>
-                    <div class="col-sm-10">
-                        <input type="text" class="form-control" id="currentLocalTime" v-model="localTime" disabled />
-                    </div>
-                </div>
-                <div class="text-center mb-3">
-                    <button type="button" class="btn btn-danger" @click="setCurrentTime()"
-                        title="Synchronize Time">Synchronize Time
-                    </button>
-                </div>
-                <div class="alert alert-secondary" role="alert">
-                    <b>Hint:</b> You can use the manual time synchronization to set the current time of OpenDTU if
-                    no NTP server is available. But be aware, that in case of power cycle the time gets lost. Also
-                    note that time accuracy will be skewed badly, as it can not be resynchronised regularly and the
-                    ESP32 microcontroller does not have a real time clock.
-                </div>
+        <CardElement :text="$t('ntpadmin.ManualTimeSynchronization')" textVariant="text-bg-primary" add-space>
+            <InputElement :label="$t('ntpadmin.CurrentOpenDtuTime')"
+                           v-model="mcuTime"
+                           type="text" disabled/>
 
+            <InputElement :label="$t('ntpadmin.CurrentLocalTime')"
+                          v-model="localTime"
+                          type="text" disabled/>
+
+            <div class="text-center mb-3">
+                <button type="button" class="btn btn-danger" @click="setCurrentTime()">
+                    {{ $t('ntpadmin.SynchronizeTime') }}
+                </button>
             </div>
-        </div>
+            <div class="alert alert-secondary" role="alert" v-html="$t('ntpadmin.SynchronizeTimeHint')"></div>
+        </CardElement>
     </BasePage>
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue';
 import BasePage from '@/components/BasePage.vue';
 import BootstrapAlert from "@/components/BootstrapAlert.vue";
-import { handleResponse, authHeader } from '@/utils/authentication';
+import CardElement from '@/components/CardElement.vue';
+import InputElement from '@/components/InputElement.vue';
 import type { NtpConfig } from "@/types/NtpConfig";
+import { authHeader, handleResponse } from '@/utils/authentication';
+import { defineComponent } from 'vue';
 
 export default defineComponent({
     components: {
         BasePage,
         BootstrapAlert,
+        CardElement,
+        InputElement,
     },
     data() {
         return {
@@ -176,7 +157,7 @@ export default defineComponent({
                 .then((response) => handleResponse(response, this.$emitter, this.$router))
                 .then(
                     (response) => {
-                        this.alertMessage = response.message;
+                        this.alertMessage = this.$t('apiresponse.' + response.code, response.param);
                         this.alertType = response.type;
                         this.showAlert = true;
                     }
@@ -199,7 +180,7 @@ export default defineComponent({
                 .then((response) => handleResponse(response, this.$emitter, this.$router))
                 .then(
                     (response) => {
-                        this.alertMessage = response.message;
+                        this.alertMessage = this.$t('apiresponse.' + response.code, response.param);
                         this.alertType = response.type;
                         this.showAlert = true;
                     }

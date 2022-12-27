@@ -1,3 +1,7 @@
+// SPDX-License-Identifier: GPL-2.0-or-later
+/*
+ * Copyright (C) 2022 Thomas Basler and others
+ */
 #include "ResetReason.h"
 
 #if ESP_IDF_VERSION_MAJOR > 3 // IDF 4+

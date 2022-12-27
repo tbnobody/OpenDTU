@@ -3,12 +3,11 @@
  * Copyright (C) 2022 Thomas Basler and others
  */
 #include "WebApi_firmware.h"
-#include "ArduinoJson.h"
-#include "AsyncJson.h"
 #include "Configuration.h"
 #include "Update.h"
 #include "WebApi.h"
 #include "helper.h"
+#include <AsyncJson.h>
 
 void WebApiFirmwareClass::init(AsyncWebServer* server)
 {

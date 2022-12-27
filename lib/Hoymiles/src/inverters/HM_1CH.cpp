@@ -1,3 +1,7 @@
+// SPDX-License-Identifier: GPL-2.0-or-later
+/*
+ * Copyright (C) 2022 Thomas Basler and others
+ */
 #include "HM_1CH.h"
 
 HM_1CH::HM_1CH(uint64_t serial)

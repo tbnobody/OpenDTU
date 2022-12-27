@@ -1,69 +1,48 @@
 <template>
-    <BasePage :title="'Security Settings'" :isLoading="dataLoading">
+    <BasePage :title="$t('securityadmin.SecuritySettings')" :isLoading="dataLoading">
         <BootstrapAlert v-model="showAlert" dismissible :variant="alertType">
             {{ alertMessage }}
         </BootstrapAlert>
 
         <form @submit="savePasswordConfig">
-            <div class="card">
-                <div class="card-header text-bg-primary">Admin password</div>
-                <div class="card-body">
-                    <div class="row mb-3">
-                        <label for="inputPassword" class="col-sm-2 col-form-label">Password:</label>
-                        <div class="col-sm-10">
-                            <input type="password" class="form-control" id="inputPassword" maxlength="64"
-                                placeholder="Password" v-model="securityConfigList.password" />
-                        </div>
-                    </div>
+            <CardElement :text="$t('securityadmin.AdminPassword')" textVariant="text-bg-primary">
+                <InputElement :label="$t('securityadmin.Password')"
+                              v-model="securityConfigList.password"
+                              type="password" maxlength="64"/>
 
-                    <div class="row mb-3">
-                        <label for="inputPasswordRepeat" class="col-sm-2 col-form-label">Repeat Password:</label>
-                        <div class="col-sm-10">
-                            <input type="password" class="form-control" id="inputPasswordRepeat" maxlength="64"
-                                placeholder="Password" v-model="passwordRepeat" />
-                        </div>
-                    </div>
+                <InputElement :label="$t('securityadmin.RepeatPassword')"
+                              v-model="passwordRepeat"
+                              type="password" maxlength="64"/>
 
-                    <div class="alert alert-secondary" role="alert">
-                        <b>Hint:</b>
-                        The administrator password is used to access this web interface (user 'admin'), but also to
-                        connect to the device when in AP mode. It must be 8..64 characters.
-                    </div>
+                <div class="alert alert-secondary" role="alert" v-html="$t('securityadmin.PasswordHint')"></div>
+            </CardElement>
 
-                </div>
-            </div>
+            <CardElement :text="$t('securityadmin.Permissions')" textVariant="text-bg-primary" add-space>
+                <InputElement :label="$t('securityadmin.ReadOnly')"
+                              v-model="securityConfigList.allow_readonly"
+                              type="checkbox" wide/>
+            </CardElement>
 
-            <div class="card mt-5">
-                <div class="card-header text-bg-primary">Permissions</div>
-                <div class="card-body">
-                    <div class="row mb-3">
-                        <label class="col-sm-6 form-check-label" for="inputReadonly">Allow readonly access to web interface</label>
-                        <div class="col-sm-6">
-                            <div class="form-check form-switch">
-                                <input class="form-check-input" type="checkbox" id="inputReadonly"
-                                    v-model="securityConfigList.allow_readonly" />
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <button type="submit" class="btn btn-primary mb-3">Save</button>
+            <button type="submit" class="btn btn-primary mb-3">{{ $t('securityadmin.Save') }}</button>
         </form>
     </BasePage>
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue';
 import BasePage from '@/components/BasePage.vue';
 import BootstrapAlert from "@/components/BootstrapAlert.vue";
-import { handleResponse, authHeader } from '@/utils/authentication';
+import CardElement from '@/components/CardElement.vue';
+import InputElement from '@/components/InputElement.vue';
 import type { SecurityConfig } from '@/types/SecurityConfig';
+import { authHeader, handleResponse } from '@/utils/authentication';
+import { defineComponent } from 'vue';
 
 export default defineComponent({
     components: {
         BasePage,
         BootstrapAlert,
+        CardElement,
+        InputElement,
     },
     data() {
         return {
@@ -113,7 +92,7 @@ export default defineComponent({
                 .then((response) => handleResponse(response, this.$emitter, this.$router))
                 .then(
                     (response) => {
-                        this.alertMessage = response.message;
+                        this.alertMessage = this.$t('apiresponse.' + response.code, response.param);
                         this.alertType = response.type;
                         this.showAlert = true;
                     }

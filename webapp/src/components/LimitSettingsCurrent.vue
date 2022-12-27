@@ -10,8 +10,8 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue';
 import { formatNumber } from '@/utils';
+import { defineComponent } from 'vue';
 
 declare interface LimitData {
     limit: number;

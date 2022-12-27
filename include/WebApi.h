@@ -17,6 +17,7 @@
 #include "WebApi_security.h"
 #include "WebApi_sysstatus.h"
 #include "WebApi_webapp.h"
+#include "WebApi_ws_console.h"
 #include "WebApi_ws_live.h"
 #include "WebApi_ws_vedirect_live.h"
 #include "WebApi_vedirect.h"
@@ -51,6 +52,7 @@ private:
     WebApiSecurityClass _webApiSecurity;
     WebApiSysstatusClass _webApiSysstatus;
     WebApiWebappClass _webApiWebapp;
+    WebApiWsConsoleClass _webApiWsConsole;
     WebApiWsLiveClass _webApiWsLive;
     WebApiWsVedirectLiveClass _webApiWsVedirectLive;
     WebApiVedirectClass _webApiVedirect;

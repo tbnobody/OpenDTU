@@ -1,48 +1,47 @@
 <template>
-    <BasePage :title="'Ve.direct Info'" :isLoading="dataLoading">
-        <div class="card">
-            <div class="card-header text-bg-primary">Configuration Summary</div>
-            <div class="card-body">
-                <div class="table-responsive">
-                    <table class="table table-hover table-condensed">
-                        <tbody>
-                            <tr>
-                                <th>Status</th>
+    <BasePage :title="$t('vedirectinfo.VedirectInformation')" :isLoading="dataLoading">
+        <CardElement :text="$t('vedirectinfo.ConfigurationSummary')" textVariant="text-bg-primary">
+            <div class="table-responsive">
+                <table class="table table-hover table-condensed">
+                    <tbody>
+                        <tr>
+                            <th>{{ $t('vedirectinfo.Status') }}</th>
+                            <td class="badge" :class="{
+                                'text-bg-danger': !vedirectDataList.vedirect_enabled,
+                                'text-bg-success': vedirectDataList.vedirect_enabled,
+                            }">
+                                <span v-if="vedirectDataList.vedirect_enabled">{{ $t('vedirectinfo.Enabled') }}</span>
+                                <span v-else>{{ $t('vedirectinfo.Disabled') }}</span>
+                            </td>
+                        </tr>
+                        <tr v-show="vedirectDataList.vedirect_enabled">
+                                <th>{{ $t('vedirectinfo.UpdatesOnly') }}</th>
                                 <td class="badge" :class="{
-                                    'text-bg-danger': !vedirectDataList.vedirect_enabled,
-                                    'text-bg-success': vedirectDataList.vedirect_enabled,
+                                    'text-bg-danger': !vedirectDataList.vedirect_updatesonly,
+                                    'text-bg-success': vedirectDataList.vedirect_updatesonly,
                                 }">
-                                    <span v-if="vedirectDataList.vedirect_enabled">enabled</span>
-                                    <span v-else>disabled</span>
+                                    <span v-if="vedirectDataList.vedirect_updatesonly">{{ $t('vedirectinfo.UpdatesEnabled') }}</span>
+                                    <span v-else>{{ $t('vedirectinfo.UpdatesDisabled') }}</span>
                                 </td>
-                            </tr>
-                            <tr v-show="vedirectDataList.vedirect_enabled">
-                                    <th>Updates Only</th>
-                                    <td class="badge" :class="{
-                                        'text-bg-danger': !vedirectDataList.vedirect_updatesonly,
-                                        'text-bg-success': vedirectDataList.vedirect_updatesonly,
-                                    }">
-                                        <span v-if="vedirectDataList.vedirect_updatesonly">enabled</span>
-                                        <span v-else>disabled</span>
-                                    </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
-        </div>
+        </CardElement>
     </BasePage>
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue';
-import { handleResponse, authHeader } from '@/utils/authentication';
 import BasePage from '@/components/BasePage.vue';
+import CardElement from '@/components/CardElement.vue';
 import type { VedirectStatus } from "@/types/VedirectStatus";
+import { authHeader, handleResponse } from '@/utils/authentication';
+import { defineComponent } from 'vue';
 
 export default defineComponent({
     components: {
         BasePage,
+        CardElement,
     },
     data() {
         return {

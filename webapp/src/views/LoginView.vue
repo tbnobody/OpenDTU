@@ -1,46 +1,46 @@
 <template>
-    <BasePage :title="'Login'" :isLoading="dataLoading">
+    <BasePage :title="$t('login.Login')" :isLoading="dataLoading">
         <BootstrapAlert v-model="showAlert" dismissible :variant="alertType">
             {{ alertMessage }}
         </BootstrapAlert>
 
-        <div class="card">
-            <div class="card-header text-bg-danger">System Login</div>
-            <div class="card-body">
-
-                <form @submit.prevent="handleSubmit">
-                    <div class="form-group">
-                        <label for="username">Username</label>
-                        <input type="text" v-model="username" name="username" class="form-control"
-                            :class="{ 'is-invalid': submitted && !username }" />
-                        <div v-show="submitted && !username" class="invalid-feedback">Username is required</div>
+        <CardElement :text="$t('login.SystemLogin')" textVariant="text-bg-danger">
+            <form @submit.prevent="handleSubmit">
+                <div class="form-group">
+                    <label for="username">{{ $t('login.Username') }}</label>
+                    <input type="text" v-model="username" name="username" class="form-control"
+                        :class="{ 'is-invalid': submitted && !username }" />
+                    <div v-show="submitted && !username" class="invalid-feedback">{{ $t('login.UsernameRequired') }}
                     </div>
-                    <div class="form-group">
-                        <label htmlFor="password">Password</label>
-                        <input type="password" v-model="password" name="password" class="form-control"
-                            :class="{ 'is-invalid': submitted && !password }" />
-                        <div v-show="submitted && !password" class="invalid-feedback">Password is required</div>
-                    </div>
-                    <div class="form-group">
-                        <button class="btn btn-primary" :disabled="dataLoading">Login</button>
-                    </div>
-                </form>
-            </div>
-        </div>
+                </div>
+                <div class="form-group">
+                    <label htmlFor="password">{{ $t('login.Password') }}</label>
+                    <input type="password" v-model="password" name="password" class="form-control"
+                        :class="{ 'is-invalid': submitted && !password }" />
+                    <div v-show="submitted && !password" class="invalid-feedback">
+                        {{ $t('login.PasswordRequired') }}</div>
+                </div>
+                <div class="form-group">
+                    <button class="btn btn-primary" :disabled="dataLoading">{{ $t('login.LoginButton') }}</button>
+                </div>
+            </form>
+        </CardElement>
     </BasePage>
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue';
-import router from '@/router';
-import { login } from '@/utils';
 import BasePage from '@/components/BasePage.vue';
 import BootstrapAlert from "@/components/BootstrapAlert.vue";
+import CardElement from '@/components/CardElement.vue';
+import router from '@/router';
+import { login } from '@/utils';
+import { defineComponent } from 'vue';
 
 export default defineComponent({
     components: {
         BasePage,
         BootstrapAlert,
+        CardElement,
     },
     data() {
         return {
@@ -59,7 +59,7 @@ export default defineComponent({
         this.returnUrl = this.$route.query.returnUrl?.toString() || '/';
     },
     methods: {
-        handleSubmit(e: Event) {
+        handleSubmit() {
             this.submitted = true;
             const { username, password } = this;
 

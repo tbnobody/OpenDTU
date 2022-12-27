@@ -1,4 +1,9 @@
+// SPDX-License-Identifier: GPL-2.0-or-later
+/*
+ * Copyright (C) 2022 Thomas Basler and others
+ */
 #include "StatisticsParser.h"
+#include "../Hoymiles.h"
 
 static float calcYieldTotalCh0(StatisticsParser* iv, uint8_t arg0);
 static float calcYieldDayCh0(StatisticsParser* iv, uint8_t arg0);
@@ -38,7 +43,7 @@ void StatisticsParser::clearBuffer()
 void StatisticsParser::appendFragment(uint8_t offset, uint8_t* payload, uint8_t len)
 {
     if (offset + len > STATISTIC_PACKET_SIZE) {
-        Serial.printf("FATAL: (%s, %d) stats packet too large for buffer\n", __FILE__, __LINE__);
+        Hoymiles.getMessageOutput()->printf("FATAL: (%s, %d) stats packet too large for buffer\n", __FILE__, __LINE__);
         return;
     }
     memcpy(&_payloadStatistic[offset], payload, len);
@@ -123,20 +128,7 @@ const char* StatisticsParser::getChannelFieldName(uint8_t channel, uint8_t field
 uint8_t StatisticsParser::getChannelFieldDigits(uint8_t channel, uint8_t fieldId)
 {
     uint8_t pos = getAssignIdxByChannelField(channel, fieldId);
-    const byteAssign_t* b = _byteAssignment;
-
-    switch (b[pos].div) {
-    case 1:
-        return 0;
-    case 10:
-        return 1;
-    case 100:
-        return 2;
-    case 1000:
-        return 3;
-    default:
-        return 2;
-    }
+    return _byteAssignment[pos].digits;
 }
 
 uint8_t StatisticsParser::getChannelCount()

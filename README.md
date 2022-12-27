@@ -59,9 +59,15 @@ Sends text raw data as difined in VE.Direct spec.
 * Hoymiles HM-1000
 * Hoymiles HM-1200
 * Hoymiles HM-1500
-* TSUN TSOL-M350 (Maybe depending on firmware on the inverter)
-* TSUN TSOL-M800 (Maybe depending on firmware on the inverter)
-* TSUN TSOL-M1600 (Maybe depending on firmware on the inverter)
+* TSUN TSOL-M350 (Maybe depending on firmware/serial number on the inverter)
+* TSUN TSOL-M800 (Maybe depending on firmware/serial number on the inverter)
+* TSUN TSOL-M1600 (Maybe depending on firmware/serial number on the inverter)
+
+**TSUN compatibility remark:**
+Compatibility with OpenDTU seems to be related to serial numbers. Current findings indicate that TSUN inverters with a serial number starting with "11" are supported, whereby inverters with a serial number starting with "10" are not.
+Firmware version seems to play not a significant role and cannot be read from the stickers. For completeness, the following firmware version have been reported to work with OpenDTU:
+* v1.0.10 TSOL-M800 (DE)
+* v1.0.12 TSOL-M1600
 
 ## Features for end users
 * Read live data from inverter
@@ -80,6 +86,7 @@ Sends text raw data as difined in VE.Direct spec.
 * Ve.Direct interface (via web-interface, REST-api, or MQTT)
 * Ethernet support
 * Prometheus API endpoint (/api/prometheus/metrics)
+* English and german web interface
 
 ## Features for developers
 * The microcontroller part
@@ -132,7 +139,7 @@ Use a power suppy with 5 V and 1 A. The USB cable connected to your PC/Notebook 
 
 ### Change pin assignment
 Its possible to change all the pins of the NRF24L01+ module.
-This can be achieved by editing the 'platformio.ini' file and add/change one or more of the following lines to the 'build_flags' parameter:
+This can be achieved by copying one of the [env:....] sections from 'platformio.ini' to 'platformio_override.ini' and editing the 'platformio_override.ini' file and add/change one or more of the following lines to the 'build_flags' parameter:
 ```
 -DHOYMILES_PIN_MISO=19
 -DHOYMILES_PIN_MOSI=23
@@ -143,6 +150,7 @@ This can be achieved by editing the 'platformio.ini' file and add/change one or 
 -DVICTRON_PIN_TX=21
 -DVICTRON_PIN_RX=22 
 ```
+It is recommended to make all changes only in the  'platformio_override.ini', this is your personal copy.
 
 ## Flashing and starting up
 ### with Visual Studio Code
@@ -150,8 +158,8 @@ This can be achieved by editing the 'platformio.ini' file and add/change one or 
 * In Visual Studio Code, install the [PlatformIO Extension](https://marketplace.visualstudio.com/items?itemName=platformio.platformio-ide)
 * Install git and enable git in vscode - [git download](https://git-scm.com/downloads/) - [Instructions](https://www.jcchouinard.com/install-git-in-vscode/)
 * Clone this repository (you really have to clone it, don't just download the ZIP file. During the build process the git hash gets embedded into the firmware. If you download the ZIP file a build error will occur): Inside vscode open the command palette by pressing `CTRL` + `SHIFT` + `P`. Enter `git clone`, add the repository-URL `https://github.com/tbnobody/OpenDTU`. Next you have to choose (or create) a target directory.
-* In vscode, choose File --> Open Folder and select the previously downloaded source code. (You have to select the folder which contains the "platformio.ini" file)
-* Adjust the COM port in the file "platformio.ini" for your USB-serial-converter. It occurs twice:
+* In vscode, choose File --> Open Folder and select the previously downloaded source code. (You have to select the folder which contains the "platformio.ini" and "platformio_override.ini" file)
+* Adjust the COM port in the file "platformio_override.ini" for your USB-to-serial-converter. It occurs twice:
     * upload_port
     * monitor_port
 * Select the arrow button in the blue bottom status bar (PlatformIO: Upload) to compile and upload the firmware. During the compilation, all required libraries are downloaded automatically.
@@ -162,7 +170,7 @@ This can be achieved by editing the 'platformio.ini' file and add/change one or 
 ### on the commandline with PlatformIO Core
 * Install [PlatformIO Core](https://platformio.org/install/cli)
 * Clone this repository (you really have to clone it, don't just download the ZIP file. During the build process the git hash gets embedded into the firmware. If you download the ZIP file a build error will occur)
-* Adjust the COM port in the file "platformio.ini". It occurs twice:
+* Adjust the COM port in the file "platformio_override.ini". It occurs twice:
     * upload_port
     * monitor_port
 * build: `platformio run -e generic`

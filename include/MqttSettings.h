@@ -2,10 +2,9 @@
 #pragma once
 
 #include "NetworkSettings.h"
-#include <Arduino.h>
+#include <MqttSubscribeParser.h>
 #include <Ticker.h>
 #include <espMqttClient.h>
-#include <memory>
 
 class MqttSettingsClass {
 public:
@@ -14,7 +13,10 @@ public:
     void performReconnect();
     bool getConnected();
     void publish(const String& subtopic, const String& payload);
-    void publishHass(const String& subtopic, const String& payload);
+    void publishGeneric(const String& topic, const String& payload, bool retain, uint8_t qos = 0);
+
+    void subscribe(const String& topic, uint8_t qos, const espMqttClientTypes::OnMessageCallback& cb);
+    void unsubscribe(const String& topic);
 
     String getPrefix();
 
@@ -34,6 +36,7 @@ private:
     String clientId;
     String willTopic;
     Ticker mqttReconnectTimer;
+    MqttSubscribeParser _mqttSubscribeParser;
 };
 
 extern MqttSettingsClass MqttSettings;

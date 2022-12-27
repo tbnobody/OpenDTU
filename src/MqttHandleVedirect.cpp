@@ -3,19 +3,19 @@
  * Copyright (C) 2022 Helge Erbe and others
  */
 #include "VeDirectFrameHandler.h"
-#include "MqttVedirectPublishing.h"
+#include "MqttHandleVedirect.h"
 #include "MqttSettings.h"
 
 
 
 
-MqttVedirectPublishingClass MqttVedirectPublishing;
+MqttHandleVedirectClass MqttHandleVedirect;
 
-void MqttVedirectPublishingClass::init()
+void MqttHandleVedirectClass::init()
 {
 }
 
-void MqttVedirectPublishingClass::loop()
+void MqttHandleVedirectClass::loop()
 {
     CONFIG_T& config = Configuration.get();
 

@@ -8,6 +8,7 @@
 #include "AsyncJson.h"
 #include "Configuration.h"
 #include "WebApi.h"
+#include "WebApi_errors.h"
 #include "helper.h"
 
 void WebApiVedirectClass::init(AsyncWebServer* server)
@@ -73,6 +74,7 @@ void WebApiVedirectClass::onVedirectAdminPost(AsyncWebServerRequest* request)
 
     if (!request->hasParam("data", true)) {
         retMsg[F("message")] = F("No values found!");
+        retMsg[F("code")] = WebApiError::GenericNoValueFound;
         response->setLength();
         request->send(response);
         return;
@@ -82,6 +84,7 @@ void WebApiVedirectClass::onVedirectAdminPost(AsyncWebServerRequest* request)
 
     if (json.length() > 1024) {
         retMsg[F("message")] = F("Data too large!");
+        retMsg[F("code")] = WebApiError::GenericDataTooLarge;
         response->setLength();
         request->send(response);
         return;
@@ -92,6 +95,7 @@ void WebApiVedirectClass::onVedirectAdminPost(AsyncWebServerRequest* request)
 
     if (error) {
         retMsg[F("message")] = F("Failed to parse data!");
+        retMsg[F("code")] = WebApiError::GenericParseError;
         response->setLength();
         request->send(response);
         return;
@@ -99,13 +103,18 @@ void WebApiVedirectClass::onVedirectAdminPost(AsyncWebServerRequest* request)
 
     if (!(root.containsKey("vedirect_enabled") && root.containsKey("vedirect_pollinterval") && root.containsKey("vedirect_updatesonly")) ) {
         retMsg[F("message")] = F("Values are missing!");
+        retMsg[F("code")] = WebApiError::GenericValueMissing;
         response->setLength();
         request->send(response);
         return;
     }
 
      if (root[F("vedirect_pollinterval")].as<uint32_t>() == 0) {
-        retMsg[F("message")] = F("Poll interval must be greater zero!");
+        retMsg[F("message")] = F("Poll interval must be a number between 5 and 65535!");
+        retMsg[F("code")] = WebApiError::MqttPublishInterval;
+        retMsg[F("param")][F("min")] = 5;
+        retMsg[F("param")][F("max")] = 65535;
+         
         response->setLength();
         request->send(response);
         return;
@@ -119,6 +128,7 @@ void WebApiVedirectClass::onVedirectAdminPost(AsyncWebServerRequest* request)
 
     retMsg[F("type")] = F("success");
     retMsg[F("message")] = F("Settings saved!");
+    retMsg[F("code")] = WebApiError::GenericSuccess;
 
     response->setLength();
     request->send(response);

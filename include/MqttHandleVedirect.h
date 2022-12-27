@@ -14,7 +14,7 @@
 #define VICTRON_PIN_TX 21
 #endif
 
-class MqttVedirectPublishingClass {
+class MqttHandleVedirectClass {
 public:
     void init();
     void loop();
@@ -23,4 +23,4 @@ private:
     uint32_t _lastPublish;
 };
 
-extern MqttVedirectPublishingClass MqttVedirectPublishing;
+extern MqttHandleVedirectClass MqttHandleVedirect;

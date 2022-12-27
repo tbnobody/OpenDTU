@@ -1,11 +1,8 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 #pragma once
 
-#include "Configuration.h"
-#include <Arduino.h>
 #include <ArduinoJson.h>
 #include <Hoymiles.h>
-#include <memory>
 
 // mqtt discovery device classes
 enum {
@@ -51,7 +48,7 @@ const byteAssign_fieldDeviceClass_t deviceFieldAssignment[] = {
 };
 #define DEVICE_CLS_ASSIGN_LIST_LEN (sizeof(deviceFieldAssignment) / sizeof(byteAssign_fieldDeviceClass_t))
 
-class MqttHassPublishingClass {
+class MqttHandleHassClass {
 public:
     void init();
     void loop();
@@ -59,6 +56,7 @@ public:
     void forceUpdate();
 
 private:
+    void publish(const String& subtopic, const String& payload);
     void publishField(std::shared_ptr<InverterAbstract> inv, uint8_t channel, byteAssign_fieldDeviceClass_t fieldType, bool clear = false);
     void publishInverterButton(std::shared_ptr<InverterAbstract> inv, const char* caption, const char* icon, const char* category, const char* deviceClass, const char* subTopic, const char* payload);
     void publishInverterNumber(std::shared_ptr<InverterAbstract> inv, const char* caption, const char* icon, const char* category, const char* commandTopic, const char* stateTopic, const char* unitOfMeasure, int16_t min = 1, int16_t max = 100);
@@ -69,4 +67,4 @@ private:
     bool _updateForced = false;
 };
 
-extern MqttHassPublishingClass MqttHassPublishing;
+extern MqttHandleHassClass MqttHandleHass;

@@ -21,13 +21,13 @@
                                     {{ vedirectData.PID }}
                                 </div>
                                 <div style="padding-right: 2em;">
-                                    Serial Number: {{ vedirectData.SER }}
+                                    {{ $t('vedirecthome.SerialNumber') }} {{ vedirectData.SER }}
                                 </div>
                                 <div style="padding-right: 2em;">
-                                    Firmware Number: {{ vedirectData.FW }}
+                                    {{ $t('vedirecthome.FirmwareNumber') }}  {{ vedirectData.FW }}
                                 </div>
                                 <div style="padding-right: 2em;">
-                                    Data Age: {{ vedirectData.data_age }} seconds
+                                    {{ $t('vedirecthome.DataAge') }} {{ $t('vedirecthome.Seconds', {'val': vedirectData.data_age }) }}
                                 </div>
                             </div>
                         </div>
@@ -36,44 +36,44 @@
                         <div class="row flex-row flex-wrap align-items-start g-3">
                             <div class="col order-0">
                                 <div class="card" :class="{ 'border-info': true }">
-                                    <div class="card-header bg-info">Device Info</div>
+                                    <div class="card-header bg-info">{{ $t('vedirecthome.DeviceInfo') }}</div>
                                     <div class="card-body">
                                         <table class="table table-striped table-hover">
                                             <thead>
                                                 <tr>
-                                                    <th scope="col">Property</th>
-                                                    <th style="text-align: right" scope="col">Value</th>
-                                                    <th scope="col">Unit</th>
+                                                    <th scope="col">{{ $t('vedirecthome.Property') }}</th>
+                                                    <th style="text-align: right" scope="col">{{ $t('vedirecthome.Value') }}</th>
+                                                    <th scope="col">{{ $t('vedirecthome.Unit') }}</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
                                                 <tr>
-                                                    <th scope="row">Load output state </th>
+                                                    <th scope="row">{{ $t('vedirecthome.LoadOutputState') }}</th>
                                                     <td style="text-align: right">{{vedirectData.LOAD}}</td>
                                                     <td></td>
                                                 </tr>
                                                 <tr>
-                                                    <th scope="row">State of operation </th>
+                                                    <th scope="row">{{ $t('vedirecthome.StateOfOperation') }}</th>
                                                     <td style="text-align: right">{{vedirectData.CS}}</td>
                                                     <td></td>
                                                 </tr>
                                                 <tr>
-                                                    <th scope="row">Tracker operation mode </th>
+                                                    <th scope="row">{{ $t('vedirecthome.TrackerOperationMode') }}</th>
                                                     <td style="text-align: right">{{vedirectData.MPPT}}</td>
                                                     <td></td>
                                                 </tr>
                                                 <tr>
-                                                    <th scope="row">Off reason </th>
+                                                    <th scope="row">{{ $t('vedirecthome.OffReason') }}</th>
                                                     <td style="text-align: right">{{vedirectData.OR}}</td>
                                                     <td></td>
                                                 </tr>
                                                 <tr>
-                                                    <th scope="row">Error code </th>
+                                                    <th scope="row">{{ $t('vedirecthome.ErrorCode') }}</th>
                                                     <td style="text-align: right">{{vedirectData.ERR}}</td>
                                                     <td></td>
                                                 </tr>
                                                 <tr>
-                                                    <th scope="row">Day sequence number (0..364) </th>
+                                                    <th scope="row">{{ $t('vedirecthome.DaySequenceNumber') }}</th>
                                                     <td style="text-align: right">{{vedirectData.HSDS.v}}</td>
                                                     <td>{{vedirectData.HSDS.u}}</td>
                                                 </tr>
@@ -84,24 +84,24 @@
                             </div>
                             <div class="col order-1">
                                 <div class="card" :class="{ 'border-info': false }">
-                                    <div class="card-header">Battery</div>
+                                    <div class="card-header">{{ $t('vedirecthome.Battery') }}</div>
                                     <div class="card-body">
                                         <table class="table table-striped table-hover">
                                             <thead>
                                                 <tr>
-                                                    <th scope="col">Property</th>
-                                                    <th style="text-align: right" scope="col">Value</th>
-                                                    <th scope="col">Unit</th>
+                                                    <th scope="col">{{ $t('vedirecthome.Property') }}</th>
+                                                    <th style="text-align: right" scope="col">{{ $t('vedirecthome.Value') }}</th>
+                                                    <th scope="col">{{ $t('vedirecthome.Unit') }}</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
                                                 <tr>
-                                                    <th scope="row">Battery voltage </th>
+                                                    <th scope="row">{{ $t('vedirecthome.BatteryVoltage') }}</th>
                                                     <td style="text-align: right">{{formatNumber(vedirectData.V.v)}}</td>
                                                     <td>{{vedirectData.V.u}}</td>
                                                 </tr>
                                                 <tr>
-                                                    <th scope="row">Battery current </th>
+                                                    <th scope="row">{{ $t('vedirecthome.BatteryCurrent') }}</th>
                                                     <td style="text-align: right">{{formatNumber(vedirectData.I.v)}}</td>
                                                     <td>{{vedirectData.I.u}}</td>
                                                 </tr>
@@ -112,49 +112,49 @@
                             </div>
                             <div class="col order-2">
                                 <div class="card" :class="{ 'border-info': false }">
-                                    <div class="card-header">Panel</div>
+                                    <div class="card-header">{{ $t('vedirecthome.Panel') }}</div>
                                     <div class="card-body">
                                         <table class="table table-striped table-hover">
                                             <thead>
                                                 <tr>
-                                                    <th scope="col">Property</th>
-                                                    <th style="text-align: right" scope="col">Value</th>
-                                                    <th scope="col">Unit</th>
+                                                    <th scope="col">{{ $t('vedirecthome.Property') }}</th>
+                                                    <th style="text-align: right" scope="col">{{ $t('vedirecthome.Value') }}</th>
+                                                    <th scope="col">{{ $t('vedirecthome.Unit') }}</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
                                                 <tr>
-                                                    <th scope="row">Panel voltage </th>
+                                                    <th scope="row">{{ $t('vedirecthome.PanelVoltage') }}</th>
                                                     <td style="text-align: right">{{formatNumber(vedirectData.VPV.v)}}</td>
                                                     <td>{{vedirectData.VPV.u}}</td>
                                                 </tr>
                                                 <tr>
-                                                    <th scope="row">Panel power </th>
+                                                    <th scope="row">{{ $t('vedirecthome.PanelPower') }}</th>
                                                     <td style="text-align: right">{{formatNumber(vedirectData.PPV.v)}}</td>
                                                     <td>{{vedirectData.PPV.u}}</td>
                                                 </tr>
                                                 <tr>
-                                                    <th scope="row">Yield total (user resettable counter) </th>
+                                                    <th scope="row">{{ $t('vedirecthome.YieldTotal') }}</th>
                                                     <td style="text-align: right">{{formatNumber(vedirectData.H19.v)}}</td>
                                                     <td>{{vedirectData.H19.u}}</td>
                                                 </tr>
                                                 <tr>
-                                                    <th scope="row">Yield today </th>
+                                                    <th scope="row">{{ $t('vedirecthome.YieldToday') }}</th>
                                                     <td style="text-align: right">{{formatNumber(vedirectData.H20.v)}}</td>
                                                     <td>{{vedirectData.H20.u}}</td>
                                                 </tr>
                                                 <tr>
-                                                    <th scope="row">Maximum power today </th>
+                                                    <th scope="row">{{ $t('vedirecthome.MaximumPowerToday') }}</th>
                                                     <td style="text-align: right">{{formatNumber(vedirectData.H21.v)}}</td>
                                                     <td>{{vedirectData.H21.u}}</td>
                                                 </tr>
                                                 <tr>
-                                                    <th scope="row">Yield yesterday </th>
+                                                    <th scope="row">{{ $t('vedirecthome.YieldYesterday') }}</th>
                                                     <td style="text-align: right">{{formatNumber(vedirectData.H22.v)}}</td>
                                                     <td>{{vedirectData.H22.u}}</td>
                                                 </tr>
                                                 <tr>
-                                                    <th scope="row">Maximum power yesterday </th>
+                                                    <th scope="row">{{ $t('vedirecthome.MaximumPowerYesterday') }}</th>
                                                     <td style="text-align: right">{{formatNumber(vedirectData.H23.v)}}</td>
                                                     <td>{{vedirectData.H23.u}}</td>
                                                 </tr>

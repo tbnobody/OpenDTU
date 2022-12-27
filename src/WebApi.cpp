@@ -3,10 +3,9 @@
  * Copyright (C) 2022 Thomas Basler and others
  */
 #include "WebApi.h"
-#include "ArduinoJson.h"
-#include "AsyncJson.h"
 #include "Configuration.h"
 #include "defaults.h"
+#include <AsyncJson.h>
 
 WebApiClass::WebApiClass()
     : _server(HTTP_PORT)
@@ -34,6 +33,7 @@ void WebApiClass::init()
     _webApiSecurity.init(&_server);
     _webApiSysstatus.init(&_server);
     _webApiWebapp.init(&_server);
+    _webApiWsConsole.init(&_server);
     _webApiWsLive.init(&_server);
     _webApiWsVedirectLive.init(&_server);
     _webApiVedirect.init(&_server);
@@ -58,6 +58,7 @@ void WebApiClass::loop()
     _webApiSecurity.loop();
     _webApiSysstatus.loop();
     _webApiWebapp.loop();
+    _webApiWsConsole.loop();
     _webApiWsLive.loop();
     _webApiWsVedirectLive.loop();
     _webApiVedirect.loop();

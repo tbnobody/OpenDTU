@@ -1,8 +1,12 @@
-#include "WebApi_prometheus.h"
 
+// SPDX-License-Identifier: GPL-2.0-or-later
+/*
+ * Copyright (C) 2022 Thomas Basler and others
+ */
+#include "WebApi_prometheus.h"
 #include "Configuration.h"
-#include "Hoymiles.h"
 #include "NetworkSettings.h"
+#include <Hoymiles.h>
 
 void WebApiPrometheusClass::init(AsyncWebServer* server)
 {
@@ -28,7 +32,7 @@ void WebApiPrometheusClass::onPrometheusMetricsGet(AsyncWebServerRequest* reques
 
     stream->print(F("# HELP opendtu_platform Platform info\n"));
     stream->print(F("# TYPE opendtu_platform gauge\n"));
-    stream->printf("opendtu_platform{arch=\"%s\",mac=\"%s\"} 1\n", ESP.getChipModel(), WiFi.macAddress().c_str());
+    stream->printf("opendtu_platform{arch=\"%s\",mac=\"%s\"} 1\n", ESP.getChipModel(), NetworkSettings.macAddress().c_str());
 
     stream->print(F("# HELP opendtu_uptime Uptime in seconds\n"));
     stream->print(F("# TYPE opendtu_uptime counter\n"));
