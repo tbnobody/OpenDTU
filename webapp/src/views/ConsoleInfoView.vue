@@ -116,14 +116,12 @@ export default defineComponent({
             this.consoleBuffer = "";
         },
         copyConsole() {
-            navigator.clipboard.writeText(this.consoleBuffer).then(
-                () => {
-                    console.log('clipboard successfully set');
-                },
-                () => {
-                    console.error('clipboard write failed');
-                }
-            );
+            var input = document.createElement('textarea');
+            input.innerHTML = this.consoleBuffer;
+            document.body.appendChild(input);
+            input.select();
+            document.execCommand('copy');
+            document.body.removeChild(input);
         }
     }
 });
