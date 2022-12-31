@@ -145,5 +145,6 @@ export default defineComponent({
     color: #CCCCCC;
     padding: 8px;
     font-family: courier new;
+    font-size: .875em;
 }
 </style>
