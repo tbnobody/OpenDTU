@@ -76,7 +76,12 @@ export default defineComponent({
 
             this.socket.onmessage = (event) => {
                 console.log(event);
-                this.consoleBuffer += event.data;
+
+                let outstr = new String(event.data);
+                if (outstr.endsWith('\n')) {
+                    outstr = outstr.substring(0, outstr.length - 1);
+                }
+                this.consoleBuffer += this.getOutDate() + outstr.replaceAll("\n", "\n" + this.getOutDate());
                 this.heartCheck(); // Reset heartbeat detection
             };
 
@@ -112,6 +117,13 @@ export default defineComponent({
 
             this.heartInterval && clearTimeout(this.heartInterval);
         },
+        getOutDate(): String {
+            const u = new Date();
+            return ('0' + u.getHours()).slice(-2) + ':' +
+                ('0' + u.getMinutes()).slice(-2) + ':' +
+                ('0' + u.getSeconds()).slice(-2) + '.' +
+                (u.getMilliseconds() / 1000).toFixed(3).slice(2, 5) + ' > ';
+        },
         clearConsole() {
             this.consoleBuffer = "";
         },
@@ -128,8 +140,7 @@ export default defineComponent({
 </script>
 
 <style>
-textarea:focus.form-control,
-textarea.form-control {
+#console {
     background-color: #0C0C0C;
     color: #CCCCCC;
     padding: 8px;
