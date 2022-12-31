@@ -2,7 +2,7 @@ import mitt from 'mitt'
 import { createApp } from 'vue'
 import { createI18n } from 'vue-i18n'
 import App from './App.vue'
-import { defaultLocale, messages } from './locales'
+import { defaultLocale, messages, dateTimeFormats } from './locales'
 import { tooltip } from './plugins/bootstrap'
 import router from './router'
 
@@ -21,7 +21,8 @@ const i18n = createI18n({
     globalInjection: true,
     locale: navigator.language.split('-')[0],
     fallbackLocale: defaultLocale,
-    messages
+    messages,
+    datetimeFormats: dateTimeFormats,
 })
 
 app.use(router)

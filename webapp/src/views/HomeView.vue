@@ -662,9 +662,8 @@ export default defineComponent({
                 )
         },
         calculateAbsoluteTime(lastTime: number): string {
-            const userLocale = navigator.language;
             const date = new Date(Date.now() - lastTime * 1000);
-            return date.toLocaleString(userLocale)
+            return this.$d(date, 'datetime');
         }
     },
 });
