@@ -315,7 +315,7 @@
         "RepeatPassword": "Passwort wiederholen:",
         "PasswordHint": "<b>Hinweis:</b> Das Administrator-Passwort wird für den Zugriff auf die Webschnittstelle (Benutzer 'admin'), aber auch für die Verbindung mit dem Gerät im AP-Modus verwendet. Es muss 8..64 Zeichen lang sein.",
         "Permissions": "Berechtigungen",
-        "ReadOnly": "Nur-Lese-Zugriff auf die Weboberfläche zulassen",
+        "ReadOnly": "Nur-Lese-Zugriff auf die Weboberfläche ohne Passwort zulassen",
         "Save": "@:dtuadmin.Save"
     },
     "ntpadmin": {
