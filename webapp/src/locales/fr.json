@@ -317,7 +317,7 @@
         "RepeatPassword": "Répéter le mot de passe",
         "PasswordHint": "<b>Astuce :</b> Le mot de passe administrateur est utilisé pour accéder à cette interface web (utilisateur 'admin'), mais aussi pour se connecter à l'appareil en mode AP. Il doit comporter de 8 à 64 caractères.",
         "Permissions": "Autorisations",
-        "ReadOnly": "Autoriser l'accès en lecture seule à l'interface web",
+        "ReadOnly": "Autoriser l'accès en lecture seule à l'interface web sans mot de passe",
         "Save": "@:dtuadmin.Save"
     },
     "ntpadmin": {
