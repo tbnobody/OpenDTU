@@ -315,7 +315,7 @@
         "RepeatPassword": "Repeat Password:",
         "PasswordHint": "<b>Hint:</b> The administrator password is used to access this web interface (user 'admin'), but also to connect to the device when in AP mode. It must be 8..64 characters.",
         "Permissions": "Permissions",
-        "ReadOnly": "Allow readonly access to web interface",
+        "ReadOnly": "Allow readonly access to web interface without password",
         "Save": "@:dtuadmin.Save"
     },
     "ntpadmin": {
