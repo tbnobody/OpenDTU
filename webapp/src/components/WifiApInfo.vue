@@ -19,7 +19,7 @@
                     </tr>
                     <tr>
                         <th>{{ $t('wifiapinfo.Stations') }}</th>
-                        <td>{{ networkStatus.ap_stationnum }}</td>
+                        <td>{{ $n(networkStatus.ap_stationnum, 'decimal') }}</td>
                     </tr>
                 </tbody>
             </table>

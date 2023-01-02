@@ -41,7 +41,7 @@
                     </tr>
                     <tr>
                         <th>{{ $t('firmwareinfo.ConfigSaveCount') }}</th>
-                        <td>{{ systemStatus.cfgsavecount }}</td>
+                        <td>{{ $n(systemStatus.cfgsavecount, 'decimal') }}</td>
                     </tr>
                     <tr>
                         <th>{{ $t('firmwareinfo.Uptime') }}</th>

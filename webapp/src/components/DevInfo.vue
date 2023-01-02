@@ -13,7 +13,7 @@
             </tr>
             <tr>
                 <td>{{ $t('devinfo.DetectedMaxPower') }}</td>
-                <td>{{ devInfoList.max_power }} W</td>
+                <td>{{ $n(devInfoList.max_power, 'decimal') }} W</td>
             </tr>
             <tr>
                 <td>{{ $t('devinfo.BootloaderVersion') }}</td>

@@ -71,6 +71,9 @@ export const numberFormats: I18nOptions["numberFormats"] = {
         percent: {
             style: 'percent',
         },
+        kilobyte: {
+            style: 'unit', unit: 'kilobyte',
+        },
     },
     [Locales.DE]: {
         decimal: {
@@ -85,6 +88,9 @@ export const numberFormats: I18nOptions["numberFormats"] = {
         percent: {
             style: 'percent',
         },
+        kilobyte: {
+            style: 'unit', unit: 'kilobyte',
+        },
     },
     [Locales.FR]: {
         decimal: {
@@ -98,6 +104,9 @@ export const numberFormats: I18nOptions["numberFormats"] = {
         },
         percent: {
           style: 'percent',
+        },
+        kilobyte: {
+            style: 'unit', unit: 'kilobyte',
         },
     },
 };

@@ -5,16 +5,15 @@
             <div class="progress">
                 <div class="progress-bar" role="progressbar" :style="{ width: getPercent() + '%' }"
                     v-bind:aria-valuenow="getPercent()" aria-valuemin="0" aria-valuemax="100">
-                    {{ getPercent() }}%
+                    {{ $n(getPercent() / 100, 'percent') }}
                 </div>
             </div>
         </td>
         <td class="rightCell">
-            {{ Math.round((total - used) / 1024) }}
-            KByte
+            {{ $n(Math.round((total - used) / 1024), 'kilobyte') }}
         </td>
-        <td class="rightCell">{{ Math.round(used / 1024) }} KByte</td>
-        <td class="rightCell">{{ Math.round(total / 1024) }} KByte</td>
+        <td class="rightCell">{{ $n(Math.round(used / 1024), 'kilobyte') }}</td>
+        <td class="rightCell">{{ $n(Math.round(total / 1024), 'kilobyte') }}</td>
     </tr>
 </template>
 
