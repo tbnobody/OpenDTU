@@ -57,4 +57,49 @@ export const dateTimeFormats: I18nOptions["datetimeFormats"] = {
     }
 };
 
+export const numberFormats: I18nOptions["numberFormats"] = {
+    [Locales.EN]: {
+        decimal: {
+            style: 'decimal',
+        },
+        decimalNoDigits: {
+            style: 'decimal', minimumFractionDigits: 0, maximumFractionDigits: 0
+        },
+        decimalTwoDigits: {
+            style: 'decimal', minimumFractionDigits: 2, maximumFractionDigits: 2
+        },
+        percent: {
+            style: 'percent',
+        },
+    },
+    [Locales.DE]: {
+        decimal: {
+            style: 'decimal',
+        },
+        decimalNoDigits: {
+            style: 'decimal', minimumFractionDigits: 0, maximumFractionDigits: 0
+        },
+        decimalTwoDigits: {
+            style: 'decimal', minimumFractionDigits: 2, maximumFractionDigits: 2
+        },
+        percent: {
+            style: 'percent',
+        },
+    },
+    [Locales.FR]: {
+        decimal: {
+            style: 'decimal',
+        },
+        decimalNoDigits: {
+            style: 'decimal', minimumFractionDigits: 0, maximumFractionDigits: 0
+        },
+        decimalTwoDigits: {
+            style: 'decimal', minimumFractionDigits: 2, maximumFractionDigits: 2
+        },
+        percent: {
+          style: 'percent',
+        },
+    },
+};
+
 export const defaultLocale = Locales.EN;
