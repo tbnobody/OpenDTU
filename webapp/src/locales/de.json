@@ -354,7 +354,7 @@
         "RepeatPassword": "Passwort wiederholen:",
         "PasswordHint": "<b>Hinweis:</b> Das Administrator-Passwort wird für den Zugriff auf die Webschnittstelle (Benutzer 'admin'), aber auch für die Verbindung mit dem Gerät im AP-Modus verwendet. Es muss 8..64 Zeichen lang sein.",
         "Permissions": "Berechtigungen",
-        "ReadOnly": "Nur-Lese-Zugriff auf die Weboberfläche zulassen",
+        "ReadOnly": "Nur-Lese-Zugriff auf die Weboberfläche ohne Passwort zulassen",
         "Save": "@:dtuadmin.Save"
     },
     "ntpadmin": {
@@ -512,6 +512,6 @@
         "TimeSync": "Die Uhr wurde noch nicht synchronisiert. Ohne eine korrekt eingestellte Uhr werden keine Anfragen an den Wechselrichter gesendet. Dies ist kurz nach dem Start normal. Nach einer längeren Laufzeit (>1 Minute) bedeutet es jedoch, dass der NTP-Server nicht erreichbar ist.",
         "TimeSyncLink": "Bitte überprüfen Sie Ihre Zeiteinstellungen.",
         "DefaultPassword": "Sie verwenden das Standardpasswort für die Weboberfläche und den Notfall Access Point. Dies ist potenziell unsicher.",
-        "DefaultPasswortLink": "Bitte ändern Sie das Passwort."
+        "DefaultPasswordLink": "Bitte ändern Sie das Passwort."
     }
 }

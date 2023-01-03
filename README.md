@@ -185,7 +185,7 @@ Use a ESP32 flash tool of your choice (see next chapter) and flash the `.bin` fi
 
 | Address  | File                   |
 | ---------| ---------------------- |
-| 0x1000   | bootloader_dio_40m.bin |
+| 0x1000   | bootloader.bin         |
 | 0x8000   | partitions.bin         |
 | 0xe000   | boot_app0.bin          |
 | 0x10000  | opendtu-*.bin          |
@@ -196,7 +196,7 @@ For further updates you can just use the web interface and upload the `opendtu-*
 ```
 esptool.py --port /dev/ttyUSB0 --chip esp32 --before default_reset --after hard_reset \
   write_flash --flash_mode dout --flash_freq 40m --flash_size detect \
-  0x1000 bootloader_dio_40m.bin \
+  0x1000 bootloader.bin \
   0x8000 partitions.bin \
   0xe000 boot_app0.bin \
   0x10000 opendtu-generic.bin
@@ -220,7 +220,8 @@ Users report that [ESP_Flasher](https://github.com/Jason2866/ESP_Flasher/release
 * After the initial flashing of the microcontroller, an Access Point called "OpenDTU-*" is opened. The default password is "openDTU42".
 * Use a web browser to open the address [http://192.168.4.1](http://192.168.4.1)
 * Navigate to Settings --> Network Settings and enter your WiFi credentials. The username to access the config menu is "admin" and the password the same as for accessing the Access Point (default: "openDTU42").
-* OpenDTU then simultaneously connects to your WiFi AP with this credentials. Navigate to Info --> Network and look into section "Network Interface (Station)" for the IP address received via DHCP.
+* OpenDTU then simultaneously connects to your WiFi AP with these credentials. Navigate to Info --> Network and look into section "Network Interface (Station)" for the IP address received via DHCP.
+* If your WiFi AP uses an allow-list for MAC-addresses, please be aware that the ESP32 has two different MAC addresses for its AP and client modes, they are also listed at Info --> Network.
 * When OpenDTU is connected to a configured WiFI AP, the "OpenDTU-*" Access Point is closed after 3 minutes.
 * OpenDTU needs access to a working NTP server to get the current date & time. Both are sent to the inverter with each request. Default NTP server is pool.ntp.org. If your network has different requirements please change accordingly (Settings --> NTP Settings).
 * Add your inverter in the inverter settings (Settings --> Inverter Settings)
