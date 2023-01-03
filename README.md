@@ -50,7 +50,7 @@ Firmware version seems to play not a significant role and cannot be read from th
 * Time zone support
 * Ethernet support
 * Prometheus API endpoint (/api/prometheus/metrics)
-* English and german web interface
+* English, german and french web interface
 
 ## Features for developers
 * The microcontroller part
