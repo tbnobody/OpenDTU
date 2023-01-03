@@ -268,9 +268,7 @@
     "invertertotalinfo": {
         "TotalYieldTotal": "Rendement total",
         "TotalYieldDay": "Rendement du jour",
-        "TotalPower": "Puissance de l'installation",
-        "TotalVoltage": "Tension moyenne",
-        "TotalCurrent": "Courant"
+        "TotalPower": "Puissance de l'installation"
     },
     "inverterchannelproperty": {
         "Power": "Puissance",
