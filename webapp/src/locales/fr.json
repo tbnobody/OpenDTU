@@ -398,6 +398,7 @@
         "InverterName": "Nom de l'onduleur :",
         "InverterNameHint": "Ici, vous pouvez spécifier un nom personnalisé pour votre onduleur.",
         "StringName": "Nom de la ligne {num}:",
+        "StringNameHint": "Ici, vous pouvez spécifier un nom personnalisé pour le port respectif de votre onduleur.",
         "StringMaxPower": "Puissance maximale de la ligne {num}:",
         "StringMaxPowerHint": "Entrez la puissance maximale des panneaux solaires connectés.",
         "InverterHint": "*) Entrez le W<sub>p</sub> du canal pour calculer l'irradiation.",
