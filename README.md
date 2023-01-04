@@ -31,7 +31,7 @@ Like to show your own build? Just send me a Pull Request.
 **TSUN compatibility remark:**
 Compatibility with OpenDTU seems to be related to serial numbers. Current findings indicate that TSUN inverters with a serial number starting with "11" are supported, whereby inverters with a serial number starting with "10" are not.
 Firmware version seems to play not a significant role and cannot be read from the stickers. For completeness, the following firmware version have been reported to work with OpenDTU:
-* v1.0.10 TSOL-M800 (DE)
+* v1.0.8, v1.0.10 TSOL-M800 (DE)
 * v1.0.12 TSOL-M1600
 
 ## Features for end users
