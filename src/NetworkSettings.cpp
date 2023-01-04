@@ -48,7 +48,7 @@ void NetworkSettingsClass::NetworkEvent(WiFiEvent_t event)
         raiseEvent(network_event::NETWORK_CONNECTED);
         break;
     case ARDUINO_EVENT_ETH_GOT_IP:
-        MessageOutput.printf("ETH got IP: %s\n", ETH.localIP().toString().c_str());
+        MessageOutput.printf("ETH got IP: %s\r\n", ETH.localIP().toString().c_str());
         if (_networkMode == network_mode::Ethernet) {
             raiseEvent(network_event::NETWORK_GOT_IP);
         }
@@ -76,7 +76,7 @@ void NetworkSettingsClass::NetworkEvent(WiFiEvent_t event)
         }
         break;
     case ARDUINO_EVENT_WIFI_STA_GOT_IP:
-        MessageOutput.printf("WiFi got ip: %s\n", WiFi.localIP().toString().c_str());
+        MessageOutput.printf("WiFi got ip: %s\r\n", WiFi.localIP().toString().c_str());
         if (_networkMode == network_mode::WiFi) {
             raiseEvent(network_event::NETWORK_GOT_IP);
         }

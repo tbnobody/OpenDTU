@@ -108,12 +108,12 @@ void InverterAbstract::clearRxFragmentBuffer()
 void InverterAbstract::addRxFragment(uint8_t fragment[], uint8_t len)
 {
     if (len < 11) {
-        Hoymiles.getMessageOutput()->printf("FATAL: (%s, %d) fragment too short\n", __FILE__, __LINE__);
+        Hoymiles.getMessageOutput()->printf("FATAL: (%s, %d) fragment too short\r\n", __FILE__, __LINE__);
         return;
     }
 
     if (len - 11 > MAX_RF_PAYLOAD_SIZE) {
-        Hoymiles.getMessageOutput()->printf("FATAL: (%s, %d) fragment too large\n", __FILE__, __LINE__);
+        Hoymiles.getMessageOutput()->printf("FATAL: (%s, %d) fragment too large\r\n", __FILE__, __LINE__);
         return;
     }
 

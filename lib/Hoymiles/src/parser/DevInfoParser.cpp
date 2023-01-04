@@ -37,7 +37,7 @@ void DevInfoParser::clearBufferAll()
 void DevInfoParser::appendFragmentAll(uint8_t offset, uint8_t* payload, uint8_t len)
 {
     if (offset + len > DEV_INFO_SIZE) {
-        Hoymiles.getMessageOutput()->printf("FATAL: (%s, %d) dev info all packet too large for buffer\n", __FILE__, __LINE__);
+        Hoymiles.getMessageOutput()->printf("FATAL: (%s, %d) dev info all packet too large for buffer\r\n", __FILE__, __LINE__);
         return;
     }
     memcpy(&_payloadDevInfoAll[offset], payload, len);
@@ -53,7 +53,7 @@ void DevInfoParser::clearBufferSimple()
 void DevInfoParser::appendFragmentSimple(uint8_t offset, uint8_t* payload, uint8_t len)
 {
     if (offset + len > DEV_INFO_SIZE) {
-        Hoymiles.getMessageOutput()->printf("FATAL: (%s, %d) dev info Simple packet too large for buffer\n", __FILE__, __LINE__);
+        Hoymiles.getMessageOutput()->printf("FATAL: (%s, %d) dev info Simple packet too large for buffer\r\n", __FILE__, __LINE__);
         return;
     }
     memcpy(&_payloadDevInfoSimple[offset], payload, len);
