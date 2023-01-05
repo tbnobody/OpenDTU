@@ -412,6 +412,8 @@
         "BackupHeader": "Sauvegarder le fichier de configuration",
         "BackupConfig": "Fichier de configuration",
         "Backup": "Sauvegarder",
+        "Restore": "Restore",
+        "NoFileSelected": "No file selected",
         "RestoreHeader": "Restaurer le fichier de configuration",
         "Back": "Retour",
         "UploadSuccess": "Succès du téléversement",

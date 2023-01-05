@@ -51,8 +51,19 @@
             </div>
 
             <div v-else-if="!uploading">
-                <div class="form-group pt-2 mt-3">
-                    <input class="form-control" type="file" ref="file" accept=".json" @change="uploadConfig" />
+                <div class="row g-3 align-items-center form-group pt-2">
+                    <div class="col-sm">
+                        <select class="form-select" v-model="restoreFileSelect">
+                            <option selected value="config.json">Main Config (config.json)</option>
+                        </select>
+                    </div>
+                    <div class="col-sm">
+                        <input class="form-control" type="file" ref="file" accept=".json" />
+                    </div>
+                    <div class="col-sm">
+                        <button class="btn btn-primary" @click="uploadConfig">{{ $t('configadmin.Restore') }}
+                        </button>
+                    </div>
                 </div>
             </div>
 
@@ -135,6 +146,7 @@ export default defineComponent({
             file: {} as Blob,
             fileList: {} as ConfigFileList,
             backupFileSelect: "",
+            restoreFileSelect: "config.json",
         };
     },
     mounted() {
@@ -197,11 +209,14 @@ export default defineComponent({
         uploadConfig(event: Event | null) {
             this.uploading = true;
             const formData = new FormData();
-            if (event !== null) {
-                const target = event.target as HTMLInputElement;
-                if (target.files !== null) {
-                    this.file = target.files[0];
-                }
+            const target = this.$refs.file as HTMLInputElement; //  event.target as HTMLInputElement;
+            if (target.files !== null && target.files?.length > 0) {
+                this.file = target.files[0];
+            } else {
+                this.UploadError = this.$t("configadmin.NoFileSelected");
+                this.uploading = false;
+                this.progress = 0;
+                return;
             }
             const request = new XMLHttpRequest();
             request.addEventListener("load", () => {
@@ -223,7 +238,7 @@ export default defineComponent({
             request.withCredentials = true;
 
             formData.append("config", this.file, "config");
-            request.open("post", "/api/config/upload");
+            request.open("post", "/api/config/upload?file=" + this.restoreFileSelect);
             authHeader().forEach((value, key) => {
                 request.setRequestHeader(key, value);
             });
@@ -232,6 +247,7 @@ export default defineComponent({
         clear() {
             this.UploadError = "";
             this.UploadSuccess = false;
+            this.getFileList();
         },
     },
 });

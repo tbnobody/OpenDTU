@@ -412,6 +412,8 @@
         "BackupHeader": "Sicherung: Sicherung der Konfigurationsdatei",
         "BackupConfig": "Sicherung der Konfigurationsdatei",
         "Backup": "Sichern",
+        "Restore": "Wiederherstellen",
+        "NoFileSelected": "Keine Datei Ausgewählt",
         "RestoreHeader": "Wiederherstellen: Wiederherstellen der Konfigurationsdatei",
         "Back": "Zurück",
         "UploadSuccess": "Erfolgreich hochgeladen",

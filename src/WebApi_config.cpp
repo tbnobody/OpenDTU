@@ -171,7 +171,12 @@ void WebApiConfigClass::onConfigUpload(AsyncWebServerRequest* request, String fi
 
     if (!index) {
         // open the file on first call and store the file handle in the request object
-        request->_tempFile = LittleFS.open(CONFIG_FILENAME, "w");
+        if (!request->hasParam("file")) {
+            request->send(500);
+            return;
+        }
+        String name = "/" + request->getParam("file")->value();
+        request->_tempFile = LittleFS.open(name, "w");
     }
 
     if (len) {

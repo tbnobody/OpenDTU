@@ -412,6 +412,8 @@
         "BackupHeader": "Backup: Configuration File Backup",
         "BackupConfig": "Backup the configuration file",
         "Backup": "Backup",
+        "Restore": "Restore",
+        "NoFileSelected": "No file selected",
         "RestoreHeader": "Restore: Restore the Configuration File",
         "Back": "Back",
         "UploadSuccess": "Upload Success",
