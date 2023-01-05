@@ -5,9 +5,22 @@
         </BootstrapAlert>
 
         <CardElement :text="$t('configadmin.BackupHeader')" textVariant="text-bg-primary" center-content>
-            {{ $t('configadmin.BackupConfig') }}
-            <button class="btn btn-primary" @click="downloadConfig">{{ $t('configadmin.Backup') }}
-            </button>
+            <div class="row g-3 align-items-center">
+                <div class="col-sm">
+                    {{ $t('configadmin.BackupConfig') }}
+                </div>
+                <div class="col-sm">
+                    <select class="form-select" v-model="backupFileSelect">
+                        <option v-for="(file) in fileList.configs" :key="file.name" :value="file.name">
+                            {{ file.name }}
+                        </option>
+                    </select>
+                </div>
+                <div class="col-sm">
+                    <button class="btn btn-primary" @click="downloadConfig">{{ $t('configadmin.Backup') }}
+                    </button>
+                </div>
+            </div>
         </CardElement>
 
         <CardElement :text="$t('configadmin.RestoreHeader')" textVariant="text-bg-primary" center-content add-space>
@@ -89,6 +102,7 @@
 import BasePage from '@/components/BasePage.vue';
 import BootstrapAlert from "@/components/BootstrapAlert.vue";
 import CardElement from '@/components/CardElement.vue';
+import type { ConfigFileList } from '@/types/Config';
 import { authHeader, handleResponse, isLoggedIn } from '@/utils/authentication';
 import * as bootstrap from 'bootstrap';
 import {
@@ -119,14 +133,15 @@ export default defineComponent({
             UploadError: "",
             UploadSuccess: false,
             file: {} as Blob,
+            fileList: {} as ConfigFileList,
+            backupFileSelect: "",
         };
     },
     mounted() {
-        if (!isLoggedIn()) {
-            this.$router.push({ path: "/login", query: { returnUrl: this.$router.currentRoute.value.fullPath } });
-        }
         this.modalFactoryReset = new bootstrap.Modal('#factoryReset');
-        this.loading = false;
+    },
+    created() {
+        this.getFileList();
     },
     methods: {
         onFactoryResetModal() {
@@ -154,8 +169,20 @@ export default defineComponent({
                 )
             this.modalFactoryReset.hide();
         },
+        getFileList() {
+            this.loading = true;
+            fetch("/api/config/list", { headers: authHeader() })
+                .then((response) => handleResponse(response, this.$emitter, this.$router))
+                .then((data) => {
+                    this.fileList = data;
+                    if (this.fileList.configs) {
+                        this.backupFileSelect = this.fileList.configs[0].name;
+                    }
+                    this.loading = false;
+                });
+        },
         downloadConfig() {
-            fetch("/api/config/get", { headers: authHeader() })
+            fetch("/api/config/get?file=" + this.backupFileSelect, { headers: authHeader() })
                 .then(res => res.blob())
                 .then(blob => {
                     var file = window.URL.createObjectURL(blob);

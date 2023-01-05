@@ -22,6 +22,7 @@ void WebApiConfigClass::init(AsyncWebServer* server)
 
     _server->on("/api/config/get", HTTP_GET, std::bind(&WebApiConfigClass::onConfigGet, this, _1));
     _server->on("/api/config/delete", HTTP_POST, std::bind(&WebApiConfigClass::onConfigDelete, this, _1));
+    _server->on("/api/config/list", HTTP_GET, std::bind(&WebApiConfigClass::onConfigListGet, this, _1));
     _server->on("/api/config/upload", HTTP_POST,
         std::bind(&WebApiConfigClass::onConfigUploadFinish, this, _1),
         std::bind(&WebApiConfigClass::onConfigUpload, this, _1, _2, _3, _4, _5, _6));
@@ -37,7 +38,17 @@ void WebApiConfigClass::onConfigGet(AsyncWebServerRequest* request)
         return;
     }
 
-    request->send(LittleFS, CONFIG_FILENAME, String(), true);
+    String requestFile = CONFIG_FILENAME;
+    if (request->hasParam("file")) {
+        String name = "/" + request->getParam("file")->value();
+        if (LittleFS.exists(name)) {
+            requestFile = name;
+        } else {
+            request->send(404);
+        }
+    }
+
+    request->send(LittleFS, requestFile, String(), true);
 }
 
 void WebApiConfigClass::onConfigDelete(AsyncWebServerRequest* request)
@@ -104,6 +115,33 @@ void WebApiConfigClass::onConfigDelete(AsyncWebServerRequest* request)
 
     LittleFS.remove(CONFIG_FILENAME);
     ESP.restart();
+}
+
+void WebApiConfigClass::onConfigListGet(AsyncWebServerRequest* request)
+{
+    if (!WebApi.checkCredentials(request)) {
+        return;
+    }
+
+    AsyncJsonResponse* response = new AsyncJsonResponse();
+    JsonObject root = response->getRoot();
+    JsonArray data = root.createNestedArray(F("configs"));
+
+    File rootfs = LittleFS.open("/");
+    File file = rootfs.openNextFile();
+    while (file) {
+        if (file.isDirectory()) {
+            continue;
+        }
+        JsonObject obj = data.createNestedObject();
+        obj["name"] = String(file.name());
+
+        file = rootfs.openNextFile();
+    }
+    file.close();
+
+    response->setLength();
+    request->send(response);
 }
 
 void WebApiConfigClass::onConfigUploadFinish(AsyncWebServerRequest* request)
