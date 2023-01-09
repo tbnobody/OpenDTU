@@ -36,6 +36,6 @@
     "vite": "^4.0.4",
     "vite-plugin-compression": "^0.5.1",
     "vite-plugin-css-injected-by-js": "^2.2.0",
-    "vue-tsc": "^1.0.19"
+    "vue-tsc": "^1.0.24"
   }
 }
