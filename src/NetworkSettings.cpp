@@ -215,6 +215,25 @@ void NetworkSettingsClass::loop()
     }
 }
 
+void NetworkSettingsClass::beginWireGuard(){
+    // WireGuard configuration --- UPDATE this configuration from JSON
+    char public_key[] = "";
+    char private_key[] = "";
+    IPAddress local_ip(10,0,0,6);
+    char public_key_endpoint[] = "";
+    char endpoint_address[] = ""; // IP of Wireguard endpoint to connect to.
+    int endpoint_port = 51820;
+      
+    // Must set the correct time
+    configTime(9 * 60 * 60, 0, "ntp.jst.mfeed.ad.jp", "ntp.nict.jp", "time.google.com");
+    wg.begin(
+        local_ip,           // IP address of the local interface
+        private_key,        // Private key of the local interface
+        endpoint_address,   // Address of the endpoint peer.
+        public_key_endpoint,         // Public key of the endpoint peer.
+        endpoint_port);     // Port pf the endpoint peer.
+}
+
 void NetworkSettingsClass::applyConfig()
 {
     setHostname();
@@ -233,6 +252,14 @@ void NetworkSettingsClass::applyConfig()
     }
     MessageOutput.println(F("done"));
     setStaticIp();
+
+    // Configure & Start Wireguard Client
+    bool wireguardEnabled = true;
+    if (!wg.is_initialized() && wireguardEnabled){
+        MessageOutput.print(F("Initilize Wireguard... "));
+        beginWireGuard();
+        MessageOutput.print(F("Initilize Wireguard... Done"));
+    }
 }
 
 void NetworkSettingsClass::setHostname()
