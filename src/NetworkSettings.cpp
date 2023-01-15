@@ -217,20 +217,20 @@ void NetworkSettingsClass::loop()
 
 void NetworkSettingsClass::beginWireGuard(){
     // WireGuard configuration --- UPDATE this configuration from JSON
-    char public_key[] = "";
     char private_key[] = "";
-    IPAddress local_ip(10,0,0,6);
+    IPAddress local_ip(0,0,0,0);
     char public_key_endpoint[] = "";
-    char endpoint_address[] = ""; // IP of Wireguard endpoint to connect to.
-    int endpoint_port = 51820;
+    char endpoint_address[] = "";
+    int endpoint_port = 12345;
       
     // Must set the correct time
-    configTime(9 * 60 * 60, 0, "ntp.jst.mfeed.ad.jp", "ntp.nict.jp", "time.google.com");
+    configTime(0, 0, "pool.ntp.org", "time.nist.gov");
+    setenv("TZ", "CET-1CEST,M3.5.0,M10.5.0/3", 0);
     wg.begin(
         local_ip,           // IP address of the local interface
         private_key,        // Private key of the local interface
         endpoint_address,   // Address of the endpoint peer.
-        public_key_endpoint,         // Public key of the endpoint peer.
+        public_key_endpoint,// Public key of the endpoint peer.
         endpoint_port);     // Port pf the endpoint peer.
 }
 
