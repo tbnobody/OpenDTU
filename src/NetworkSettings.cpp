@@ -212,20 +212,6 @@ void NetworkSettingsClass::loop()
     }
 }
 
-void NetworkSettingsClass::beginWireGuard(){
-    // Initialize NTP
-    MessageOutput.print(F("Initialize NTP... "));
-    NtpSettings.init();
-    MessageOutput.println(F("...done. Beginn initialize Wireguard..."));
-    wg.begin(
-        Configuration.get().Wg_Local_Ip,           // IP address of the local interface
-        Configuration.get().Wg_Opendtu_Private_Key,// Private key of the local interface
-        Configuration.get().Wg_Endpoint_Address,   // Address of the endpoint peer.
-        Configuration.get().Wg_Endpoint_Public_Key,// Public key of the endpoint peer.
-        Configuration.get().Wg_Endpoint_Port);     // Port pf the endpoint peer.
-    MessageOutput.println(F("...done."));
-}
-
 void NetworkSettingsClass::applyConfig()
 {
     setHostname();
@@ -244,13 +230,6 @@ void NetworkSettingsClass::applyConfig()
     }
     MessageOutput.println(F("done"));
     setStaticIp();
-
-    // Configure & Start Wireguard Client
-    if (!wg.is_initialized() && Configuration.get().Wg_Enabled){
-        MessageOutput.print(F("Initilize Wireguard... "));
-        beginWireGuard();
-        MessageOutput.print(F("Initilize Wireguard... Done"));
-    }
 }
 
 void NetworkSettingsClass::setHostname()

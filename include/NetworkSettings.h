@@ -5,7 +5,6 @@
 #include <WiFi.h>
 #include <vector>
 #include <NtpSettings.h>
-#include <WireGuard-ESP32.h>
 
 enum class network_mode {
     WiFi,
@@ -77,9 +76,6 @@ private:
     network_mode _networkMode = network_mode::Undefined;
     bool _ethConnected = false;
     std::vector<NetworkEventCbList_t> _cbEventList;
-
-    WireGuard wg;
-    void beginWireGuard();
 };
 
 extern NetworkSettingsClass NetworkSettings;
