@@ -27,6 +27,8 @@
 
 #define CHAN_MAX_NAME_STRLEN 31
 
+#define DEV_MAX_MAPPING_NAME_STRLEN 31
+
 #define JSON_BUFFER_SIZE 6144
 
 struct CHANNEL_CONFIG_T {
@@ -88,6 +90,8 @@ struct CONFIG_T {
 
     char Security_Password[WIFI_MAX_PASSWORD_STRLEN + 1];
     bool Security_AllowReadonly;
+
+    char Dev_PinMapping[DEV_MAX_MAPPING_NAME_STRLEN + 1];
 };
 
 class ConfigurationClass {

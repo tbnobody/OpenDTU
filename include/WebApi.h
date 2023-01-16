@@ -6,6 +6,7 @@
 #include "WebApi_dtu.h"
 #include "WebApi_eventlog.h"
 #include "WebApi_firmware.h"
+#include "WebApi_device.h"
 #include "WebApi_inverter.h"
 #include "WebApi_limit.h"
 #include "WebApi_maintenance.h"
@@ -35,6 +36,7 @@ private:
     AsyncEventSource _events;
 
     WebApiConfigClass _webApiConfig;
+    WebApiDeviceClass _webApiDevice;
     WebApiDevInfoClass _webApiDevInfo;
     WebApiDtuClass _webApiDtu;
     WebApiEventlogClass _webApiEventlog;

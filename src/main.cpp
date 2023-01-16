@@ -10,6 +10,7 @@
 #include "MqttSettings.h"
 #include "NetworkSettings.h"
 #include "NtpSettings.h"
+#include "PinMapping.h"
 #include "Utils.h"
 #include "WebApi.h"
 #include "defaults.h"
@@ -56,6 +57,15 @@ void setup()
     }
     MessageOutput.println(F("done"));
 
+    // Load PinMapping
+    MessageOutput.print(F("Reading PinMapping... "));
+    if (PinMapping.init(String(Configuration.get().Dev_PinMapping))) {
+        MessageOutput.print(F("found valid mapping "));
+    } else {
+        MessageOutput.print(F("using default config "));
+    }
+    MessageOutput.println(F("done"));
+
     // Initialize WiFi
     MessageOutput.print(F("Initialize Network... "));
     NetworkSettings.init();
@@ -96,39 +106,44 @@ void setup()
 
     // Initialize inverter communication
     MessageOutput.print(F("Initialize Hoymiles interface... "));
-    SPIClass* spiClass = new SPIClass(HSPI);
-    spiClass->begin(HOYMILES_PIN_SCLK, HOYMILES_PIN_MISO, HOYMILES_PIN_MOSI, HOYMILES_PIN_CS);
-    Hoymiles.setMessageOutput(&MessageOutput);
-    Hoymiles.init(spiClass, HOYMILES_PIN_CE, HOYMILES_PIN_IRQ);
+    if (PinMapping.isValidNrf24Config()) {
+        SPIClass* spiClass = new SPIClass(HSPI);
+        PinMapping_t& pin = PinMapping.get();
+        spiClass->begin(pin.nrf24_clk, pin.nrf24_miso, pin.nrf24_mosi, pin.nrf24_cs);
+        Hoymiles.setMessageOutput(&MessageOutput);
+        Hoymiles.init(spiClass, pin.nrf24_en, pin.nrf24_irq);
 
-    MessageOutput.println(F("  Setting radio PA level... "));
-    Hoymiles.getRadio()->setPALevel((rf24_pa_dbm_e)config.Dtu_PaLevel);
+        MessageOutput.println(F("  Setting radio PA level... "));
+        Hoymiles.getRadio()->setPALevel((rf24_pa_dbm_e)config.Dtu_PaLevel);
 
-    MessageOutput.println(F("  Setting DTU serial... "));
-    Hoymiles.getRadio()->setDtuSerial(config.Dtu_Serial);
+        MessageOutput.println(F("  Setting DTU serial... "));
+        Hoymiles.getRadio()->setDtuSerial(config.Dtu_Serial);
 
-    MessageOutput.println(F("  Setting poll interval... "));
-    Hoymiles.setPollInterval(config.Dtu_PollInterval);
+        MessageOutput.println(F("  Setting poll interval... "));
+        Hoymiles.setPollInterval(config.Dtu_PollInterval);
 
-    for (uint8_t i = 0; i < INV_MAX_COUNT; i++) {
-        if (config.Inverter[i].Serial > 0) {
-            MessageOutput.print(F("  Adding inverter: "));
-            MessageOutput.print(config.Inverter[i].Serial, HEX);
-            MessageOutput.print(F(" - "));
-            MessageOutput.print(config.Inverter[i].Name);
-            auto inv = Hoymiles.addInverter(
-                config.Inverter[i].Name,
-                config.Inverter[i].Serial);
+        for (uint8_t i = 0; i < INV_MAX_COUNT; i++) {
+            if (config.Inverter[i].Serial > 0) {
+                MessageOutput.print(F("  Adding inverter: "));
+                MessageOutput.print(config.Inverter[i].Serial, HEX);
+                MessageOutput.print(F(" - "));
+                MessageOutput.print(config.Inverter[i].Name);
+                auto inv = Hoymiles.addInverter(
+                    config.Inverter[i].Name,
+                    config.Inverter[i].Serial);
 
-            if (inv != nullptr) {
-                for (uint8_t c = 0; c < INV_MAX_CHAN_COUNT; c++) {
-                    inv->Statistics()->setChannelMaxPower(c, config.Inverter[i].channel[c].MaxChannelPower);
+                if (inv != nullptr) {
+                    for (uint8_t c = 0; c < INV_MAX_CHAN_COUNT; c++) {
+                        inv->Statistics()->setChannelMaxPower(c, config.Inverter[i].channel[c].MaxChannelPower);
+                    }
                 }
+                MessageOutput.println(F(" done"));
             }
-            MessageOutput.println(F(" done"));
         }
+        MessageOutput.println(F("done"));
+    } else {
+        MessageOutput.println(F("Invalid pin config"));
     }
-    MessageOutput.println(F("done"));
 }
 
 void loop()

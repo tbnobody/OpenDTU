@@ -78,3 +78,5 @@
 #define MQTT_HASS_RETAIN true
 #define MQTT_HASS_TOPIC "homeassistant/"
 #define MQTT_HASS_INDIVIDUALPANELS false
+
+#define DEV_PINMAPPING ""
