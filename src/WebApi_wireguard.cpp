@@ -7,7 +7,6 @@
 #include "NetworkSettings.h"
 #include "WebApi.h"
 #include "WebApi_errors.h"
-#include "helper.h"
 #include <AsyncJson.h>
 
 void WebApiWireguardClass::init(AsyncWebServer* server)
@@ -116,7 +115,6 @@ void WebApiWireguardClass::onWireguardAdminPost(AsyncWebServerRequest* request)
         return;
     }
 
-    // Wireguard
     if (!(root.containsKey("wg_enabled") && root.containsKey("wg_opendtu_public_key") && root.containsKey("wg_opendtu_private_key") && root.containsKey("wg_endpoint_public_key") && root.containsKey("wg_endpoint_address") && root.containsKey("wg_endpoint_port") && root.containsKey("wg_local_ip"))) {
         retMsg[F("message")] = F("Values are missing!");
         retMsg[F("code")] = WebApiError::GenericValueMissing;
@@ -146,7 +144,4 @@ void WebApiWireguardClass::onWireguardAdminPost(AsyncWebServerRequest* request)
 
     response->setLength();
     request->send(response);
-
-    NetworkSettings.enableAdminMode();
-    NetworkSettings.applyConfig();
 }

@@ -6,3 +6,4 @@
 .vscode/settings.json
 platformio-device-monitor*.log
 platformio_override.ini
+include/defaults_secret.h
