@@ -4,6 +4,7 @@
 #include <DNSServer.h>
 #include <WiFi.h>
 #include <vector>
+#include <NtpSettings.h>
 #include <WireGuard-ESP32.h>
 
 enum class network_mode {
