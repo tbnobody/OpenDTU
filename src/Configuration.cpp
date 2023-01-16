@@ -40,6 +40,15 @@ bool ConfigurationClass::write()
     wifi["dhcp"] = config.WiFi_Dhcp;
     wifi["hostname"] = config.WiFi_Hostname;
 
+    JsonObject wg = doc.createNestedObject("wg");
+    wg["enabled"] = config.Wg_Enabled;
+    wg["local_ip"] = IPAddress(config.Wg_Local_Ip).toString();
+    wg["opendtu_private_key"] = config.Wg_Opendtu_Private_Key;
+    wg["opendtu_public_key"] = config.Wg_Opendtu_Public_Key;
+    wg["endpoint_address"] = config.Wg_Endpoint_Address;
+    wg["endpoint_public_key"] = config.Wg_Endpoint_Public_Key;
+    wg["endpoint_port"] = config.Wg_Endpoint_Port;
+
     JsonObject ntp = doc.createNestedObject("ntp");
     ntp["server"] = config.Ntp_Server;
     ntp["timezone"] = config.Ntp_Timezone;
@@ -169,6 +178,20 @@ bool ConfigurationClass::read()
     config.WiFi_Dns2[3] = wifi_dns2[3];
 
     config.WiFi_Dhcp = wifi["dhcp"] | WIFI_DHCP;
+
+    JsonObject wg = doc["wg"];
+    config.Wg_Enabled = wg["enabled"] | WG_ENABLED;
+    strlcpy(config.Wg_Opendtu_Public_Key, wg["opendtu_public_key"] | WG_OPENDTU_PUBLIC_KEY, sizeof(config.Wg_Opendtu_Public_Key));
+    strlcpy(config.Wg_Opendtu_Private_Key, wg["opendtu_private_key"] | WG_OPENDTU_PRIVATE_KEY, sizeof(config.Wg_Opendtu_Private_Key));
+    strlcpy(config.Wg_Endpoint_Address, wg["endpoint_address"] | WG_ENDPOINT_ADDRESS, sizeof(config.Wg_Endpoint_Address));
+    strlcpy(config.Wg_Endpoint_Public_Key, wg["endpoint_public_key"] | WG_ENDPOINT_PUBLIC_KEY, sizeof(config.Wg_Endpoint_Public_Key));
+    config.Wg_Endpoint_Port = wg["endpoint_port"] | WG_ENDPOINT_PORT;
+    IPAddress Wg_Local_Ip;
+    Wg_Local_Ip.fromString(wg["local_ip"] | WG_LOCAL_IP);
+    config.Wg_Local_Ip[0] = Wg_Local_Ip[0];
+    config.Wg_Local_Ip[1] = Wg_Local_Ip[1];
+    config.Wg_Local_Ip[2] = Wg_Local_Ip[2];
+    config.Wg_Local_Ip[3] = Wg_Local_Ip[3];
 
     JsonObject ntp = doc["ntp"];
     strlcpy(config.Ntp_Server, ntp["server"] | NTP_SERVER, sizeof(config.Ntp_Server));
