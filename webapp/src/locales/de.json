@@ -481,6 +481,7 @@
         "PinOverview": "Anschlussübersicht",
         "Category": "Kategorie",
         "Name": "Name",
-        "Number": "Nummer"
+        "ValueSelected": "Ausgewählt",
+        "ValueActive": "Aktiv"
     }
 }

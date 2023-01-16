@@ -1,3 +1,5 @@
+import type { Device } from "./PinMapping";
+
 export interface DeviceConfig {
-    dev_pinmapping: string;
+    curPin: Device;
 }

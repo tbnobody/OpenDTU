@@ -4,28 +4,28 @@
             {{ alertMessage }}
         </BootstrapAlert>
 
-        <form @submit="saveDtuConfig">
+        <nav>
+            <div class="nav nav-tabs" id="nav-tab" role="tablist">
+                <button class="nav-link active" id="nav-pin-tab" data-bs-toggle="tab" data-bs-target="#nav-pin"
+                    type="button" role="tab" aria-controls="nav-pin" aria-selected="true">{{
+                        $t('deviceadmin.PinAssignment')
+                    }}</button>
+            </div>
+        </nav>
+        <div class="tab-content" id="nav-tabContent">
+            <div class="tab-pane fade show active" id="nav-pin" role="tabpanel" aria-labelledby="nav-pin-tab"
+                tabindex="0">
+                <div class="card">
+                    <div class="card-body">
 
-            <nav>
-                <div class="nav nav-tabs" id="nav-tab" role="tablist">
-                    <button class="nav-link active" id="nav-pin-tab" data-bs-toggle="tab" data-bs-target="#nav-pin"
-                        type="button" role="tab" aria-controls="nav-pin" aria-selected="true">{{
-                            $t('deviceadmin.PinAssignment')
-                        }}</button>
-                </div>
-            </nav>
-            <div class="tab-content" id="nav-tabContent">
-                <div class="tab-pane fade show active" id="nav-pin" role="tabpanel" aria-labelledby="nav-pin-tab"
-                    tabindex="0">
-                    <div class="card">
-                        <div class="card-body">
-
+                        <form @submit="savePinConfig">
                             <div class="row mb-3">
                                 <label for="inputPinProfile" class="col-sm-2 col-form-label">{{
                                     $t('deviceadmin.SelectedProfile')
                                 }}</label>
                                 <div class="col-sm-10">
-                                    <select class="form-select" id="inputPinProfile" v-model="deviceConfigList.dev_pinmapping">
+                                    <select class="form-select" id="inputPinProfile"
+                                        v-model="deviceConfigList.curPin.name">
                                         <option v-for="device in pinMappingList" :value="device.name">
                                             {{ device.name }}
                                         </option>
@@ -33,17 +33,21 @@
                                 </div>
                             </div>
 
-                            <div class="alert alert-danger mt-3" role="alert" v-html="$t('deviceadmin.ProfileHint')"></div>
+                            <div class="alert alert-danger mt-3" role="alert" v-html="$t('deviceadmin.ProfileHint')">
+                            </div>
 
-                            <PinInfo :pinAssignment="pinMappingList.find(i => i.name === deviceConfigList.dev_pinmapping)" />
+                            <PinInfo
+                                :selectedPinAssignment="pinMappingList.find(i => i.name === deviceConfigList.curPin.name)"
+                                :currentPinAssignment="deviceConfigList.curPin" />
 
-                        </div>
+                            <button type="submit" class="btn btn-primary mb-3">{{ $t('deviceadmin.Save') }}</button>
+                        </form>
                     </div>
                 </div>
             </div>
+        </div>
 
-            <button type="submit" class="btn btn-primary mb-3">{{ $t('deviceadmin.Save') }}</button>
-        </form>
+
     </BasePage>
 </template>
 
@@ -109,7 +113,7 @@ export default defineComponent({
                     }
                 );
         },
-        saveDtuConfig(e: Event) {
+        savePinConfig(e: Event) {
             e.preventDefault();
 
             const formData = new FormData();

@@ -4,6 +4,7 @@
  */
 #include "WebApi_device.h"
 #include "Configuration.h"
+#include "PinMapping.h"
 #include "WebApi.h"
 #include "WebApi_errors.h"
 #include "helper.h"
@@ -32,8 +33,27 @@ void WebApiDeviceClass::onDeviceAdminGet(AsyncWebServerRequest* request)
     AsyncJsonResponse* response = new AsyncJsonResponse(false, MQTT_JSON_DOC_SIZE);
     JsonObject root = response->getRoot();
     const CONFIG_T& config = Configuration.get();
+    const PinMapping_t& pin = PinMapping.get();
 
-    root[F("dev_pinmapping")] = config.Dev_PinMapping;
+    JsonObject curPin = root.createNestedObject("curPin");
+    curPin[F("name")] = config.Dev_PinMapping;
+
+    JsonObject nrfObj = curPin.createNestedObject("nrf24");
+    nrfObj[F("clk")] = pin.nrf24_clk;
+    nrfObj[F("cs")] = pin.nrf24_cs;
+    nrfObj[F("en")] = pin.nrf24_en;
+    nrfObj[F("irq")] = pin.nrf24_irq;
+    nrfObj[F("miso")] = pin.nrf24_miso;
+    nrfObj[F("mosi")] = pin.nrf24_mosi;
+
+    JsonObject ethObj = curPin.createNestedObject("eth");
+    ethObj[F("enabled")] = pin.eth_enabled;
+    ethObj[F("phy_addr")] = pin.eth_phy_addr;
+    ethObj[F("power")] = pin.eth_power;
+    ethObj[F("mdc")] = pin.eth_mdc;
+    ethObj[F("mdio")] = pin.eth_mdio;
+    ethObj[F("type")] = pin.eth_type;
+    ethObj[F("clk_mode")] = pin.eth_clk_mode;
 
     response->setLength();
     request->send(response);
