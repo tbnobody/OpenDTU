@@ -1,7 +1,6 @@
 #include <WireguardSettings.h>
 #include "Configuration.h"
 #include "MessageOutput.h"
-#include "defaults.h"
 
 WireguardSettingsClass::WireguardSettingsClass()
 {

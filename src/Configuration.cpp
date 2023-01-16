@@ -5,6 +5,7 @@
 #include "Configuration.h"
 #include "MessageOutput.h"
 #include "defaults.h"
+#include "defaults_wireguard.h"
 #include <ArduinoJson.h>
 #include <LittleFS.h>
 
