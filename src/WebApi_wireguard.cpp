@@ -10,22 +10,22 @@
 #include "helper.h"
 #include <AsyncJson.h>
 
-void WebApiNetworkClass::init(AsyncWebServer* server)
+void WebApiWireguardClass::init(AsyncWebServer* server)
 {
     using std::placeholders::_1;
 
     _server = server;
 
-    _server->on("/api/wireguard/status", HTTP_GET, std::bind(&WebApiNetworkClass::onNetworkStatus, this, _1));
-    _server->on("/api/wireguard/config", HTTP_GET, std::bind(&WebApiNetworkClass::onNetworkAdminGet, this, _1));
-    _server->on("/api/wireguard/config", HTTP_POST, std::bind(&WebApiNetworkClass::onNetworkAdminPost, this, _1));
+    _server->on("/api/wireguard/status", HTTP_GET, std::bind(&WebApiWireguardClass::onWireguardStatus, this, _1));
+    _server->on("/api/wireguard/config", HTTP_GET, std::bind(&WebApiWireguardClass::onWireguardAdminGet, this, _1));
+    _server->on("/api/wireguard/config", HTTP_POST, std::bind(&WebApiWireguardClass::onWireguardAdminPost, this, _1));
 }
 
-void WebApiNetworkClass::loop()
+void WebApiWireguardClass::loop()
 {
 }
 
-void WebApiNetworkClass::onNetworkStatus(AsyncWebServerRequest* request)
+void WebApiWireguardClass::onWireguardStatus(AsyncWebServerRequest* request)
 {
     if (!WebApi.checkCredentialsReadonly(request)) {
         return;
@@ -55,7 +55,7 @@ void WebApiNetworkClass::onNetworkStatus(AsyncWebServerRequest* request)
     request->send(response);
 }
 
-void WebApiNetworkClass::onNetworkAdminGet(AsyncWebServerRequest* request)
+void WebApiWireguardClass::onWireguardAdminGet(AsyncWebServerRequest* request)
 {
     if (!WebApi.checkCredentials(request)) {
         return;
@@ -77,7 +77,7 @@ void WebApiNetworkClass::onNetworkAdminGet(AsyncWebServerRequest* request)
     request->send(response);
 }
 
-void WebApiNetworkClass::onNetworkAdminPost(AsyncWebServerRequest* request)
+void WebApiWireguardClass::onWireguardAdminPost(AsyncWebServerRequest* request)
 {
     if (!WebApi.checkCredentials(request)) {
         return;
@@ -116,23 +116,28 @@ void WebApiNetworkClass::onNetworkAdminPost(AsyncWebServerRequest* request)
         return;
     }
 
-    CONFIG_T& config = Configuration.get();
     // Wireguard
-    if ( ( root.containsKey("wg_endabled") && root.containsKey("wg_opendtu_public_key") && root.containsKey("wg_opendtu_private_key") && root.containsKey("wg_endpoint_public_key") && root.containsKey("wg_endpoint_address") && root.containsKey("wg_endpoint_port") && root.containsKey("wg_local_ip") ) ){
-        IPAddress Wg_Local_Ip;
-        if (Wg_Local_Ip.fromString(root[F("wg_local_ip")].as<String>())) {
-            config.Wg_Local_Ip[0] = Wg_Local_Ip[0];
-            config.Wg_Local_Ip[1] = Wg_Local_Ip[1];
-            config.Wg_Local_Ip[2] = Wg_Local_Ip[2];
-            config.Wg_Local_Ip[3] = Wg_Local_Ip[3];
-        }
-        config.Wg_Enabled = root[F("wg_endabled")].as<bool>();
-        strlcpy(config.Wg_Opendtu_Public_Key, root[F("wg_opendtu_public_key")].as<String>().c_str(), sizeof(config.Wg_Opendtu_Public_Key));
-        strlcpy(config.Wg_Opendtu_Private_Key, root[F("wg_opendtu_private_key")].as<String>().c_str(), sizeof(config.Wg_Opendtu_Private_Key));
-        strlcpy(config.Wg_Endpoint_Public_Key, root[F("wg_endpoint_public_key")].as<String>().c_str(), sizeof(config.Wg_Endpoint_Public_Key));
-        strlcpy(config.Wg_Endpoint_Address, root[F("wg_endpoint_address")].as<String>().c_str(), sizeof(config.Wg_Endpoint_Address));
-        config.Wg_Endpoint_Port = root[F("wg_endpoint_port")].as<uint>();    
+    if (!(root.containsKey("wg_endabled") && root.containsKey("wg_opendtu_public_key") && root.containsKey("wg_opendtu_private_key") && root.containsKey("wg_endpoint_public_key") && root.containsKey("wg_endpoint_address") && root.containsKey("wg_endpoint_port") && root.containsKey("wg_local_ip"))) {
+        retMsg[F("message")] = F("Values are missing!");
+        retMsg[F("code")] = WebApiError::GenericValueMissing;
+        response->setLength();
+        request->send(response);
+        return;
     }
+    CONFIG_T& config = Configuration.get();
+    IPAddress Wg_Local_Ip;
+    if (Wg_Local_Ip.fromString(root[F("wg_local_ip")].as<String>())) {
+        config.Wg_Local_Ip[0] = Wg_Local_Ip[0];
+        config.Wg_Local_Ip[1] = Wg_Local_Ip[1];
+        config.Wg_Local_Ip[2] = Wg_Local_Ip[2];
+        config.Wg_Local_Ip[3] = Wg_Local_Ip[3];
+    }
+    config.Wg_Enabled = root[F("wg_endabled")].as<bool>();
+    strlcpy(config.Wg_Opendtu_Public_Key, root[F("wg_opendtu_public_key")].as<String>().c_str(), sizeof(config.Wg_Opendtu_Public_Key));
+    strlcpy(config.Wg_Opendtu_Private_Key, root[F("wg_opendtu_private_key")].as<String>().c_str(), sizeof(config.Wg_Opendtu_Private_Key));
+    strlcpy(config.Wg_Endpoint_Public_Key, root[F("wg_endpoint_public_key")].as<String>().c_str(), sizeof(config.Wg_Endpoint_Public_Key));
+    strlcpy(config.Wg_Endpoint_Address, root[F("wg_endpoint_address")].as<String>().c_str(), sizeof(config.Wg_Endpoint_Address));
+    config.Wg_Endpoint_Port = root[F("wg_endpoint_port")].as<uint>();
     Configuration.write();
 
     retMsg[F("type")] = F("success");
