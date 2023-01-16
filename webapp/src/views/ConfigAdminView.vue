@@ -55,6 +55,7 @@
                     <div class="col-sm">
                         <select class="form-select" v-model="restoreFileSelect">
                             <option selected value="config.json">Main Config (config.json)</option>
+                            <option selected value="pin_mapping.json">Pin Mapping (pin_mapping.json)</option>
                         </select>
                     </div>
                     <div class="col-sm">
