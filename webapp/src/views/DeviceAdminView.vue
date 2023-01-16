@@ -91,14 +91,16 @@ export default defineComponent({
                 .then(
                     (data) => {
                         this.pinMappingList = data;
-                        this.pinMappingList.push({
-                            "name": this.$t('deviceadmin.DefaultProfile')
-                        } as Device);
-                        this.pinMappingList.sort((a, b) => (a.name < b.name) ? -1 : 1);
-                        this.pinMappingLoading = false;
                     }
                 )
                 .catch(() => {
+                    this.pinMappingList = Array<Device>();
+                })
+                .finally(() => {
+                    this.pinMappingList.push({
+                        "name": this.$t('deviceadmin.DefaultProfile')
+                    } as Device);
+                    this.pinMappingList.sort((a, b) => (a.name < b.name) ? -1 : 1);
                     this.pinMappingLoading = false;
                 });
         },
