@@ -33,6 +33,7 @@ void WebApiClass::init()
     _webApiSecurity.init(&_server);
     _webApiSysstatus.init(&_server);
     _webApiWebapp.init(&_server);
+    _webApiWireguard.init(&_server);
     _webApiWsConsole.init(&_server);
     _webApiWsLive.init(&_server);
 
@@ -56,6 +57,7 @@ void WebApiClass::loop()
     _webApiSecurity.loop();
     _webApiSysstatus.loop();
     _webApiWebapp.loop();
+    _webApiWireguard.loop();
     _webApiWsConsole.loop();
     _webApiWsLive.loop();
 }

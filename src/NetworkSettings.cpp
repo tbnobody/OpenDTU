@@ -215,16 +215,18 @@ void NetworkSettingsClass::loop()
     }
 }
 
-void NetworkSettingsClass::beginWireGuard(){      
-    // Must set the correct time
-    configTime(0, 0, NTP_SERVER, "time.nist.gov");
-    setenv("TZ", NTP_TIMEZONE, 0);
+void NetworkSettingsClass::beginWireGuard(){
+    // Initialize NTP
+    MessageOutput.print(F("Initialize NTP... "));
+    NtpSettings.init();
+    MessageOutput.println(F("...done. Beginn initialize Wireguard..."));
     wg.begin(
         Configuration.get().Wg_Local_Ip,           // IP address of the local interface
         Configuration.get().Wg_Opendtu_Private_Key,// Private key of the local interface
         Configuration.get().Wg_Endpoint_Address,   // Address of the endpoint peer.
         Configuration.get().Wg_Endpoint_Public_Key,// Public key of the endpoint peer.
         Configuration.get().Wg_Endpoint_Port);     // Port pf the endpoint peer.
+    MessageOutput.println(F("...done."));
 }
 
 void NetworkSettingsClass::applyConfig()
