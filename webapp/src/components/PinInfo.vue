@@ -36,6 +36,36 @@
                         <td>{{ pinAssignment?.nrf24?.cs }}</td>
                     </tr>
 
+                    <tr>
+                        <td rowspan="7">Ethernet</td>
+                        <td>enabled</td>
+                        <td>{{ pinAssignment?.eth?.enabled }}</td>
+                    </tr>
+                    <tr>
+                        <td>phy_addr</td>
+                        <td>{{ pinAssignment?.eth?.phy_addr }}</td>
+                    </tr>
+                    <tr>
+                        <td>power</td>
+                        <td>{{ pinAssignment?.eth?.power }}</td>
+                    </tr>
+                    <tr>
+                        <td>mdc</td>
+                        <td>{{ pinAssignment?.eth?.mdc }}</td>
+                    </tr>
+                    <tr>
+                        <td>mdio</td>
+                        <td>{{ pinAssignment?.eth?.mdio }}</td>
+                    </tr>
+                    <tr>
+                        <td>type</td>
+                        <td>{{ pinAssignment?.eth?.type }}</td>
+                    </tr>
+                    <tr>
+                        <td>clk_mode</td>
+                        <td>{{ pinAssignment?.eth?.clk_mode }}</td>
+                    </tr>
+
                 </tbody>
             </table>
         </div>

@@ -21,13 +21,25 @@ PinMappingClass::PinMappingClass()
     _pinMapping.nrf24_irq = HOYMILES_PIN_IRQ;
     _pinMapping.nrf24_miso = HOYMILES_PIN_MISO;
     _pinMapping.nrf24_mosi = HOYMILES_PIN_MOSI;
+
+#ifdef OPENDTU_ETHERNET
+    _pinMapping.eth_enabled = true;
+#else
+    _pinMapping.eth_enabled = false;
+#endif
+
+    _pinMapping.eth_phy_addr = ETH_PHY_ADDR;
+    _pinMapping.eth_power = ETH_PHY_POWER;
+    _pinMapping.eth_mdc = ETH_PHY_MDC;
+    _pinMapping.eth_mdio = ETH_PHY_MDIO;
+    _pinMapping.eth_type = ETH_PHY_TYPE;
+    _pinMapping.eth_clk_mode = ETH_CLK_MODE;
 }
 
 PinMapping_t& PinMappingClass::get()
 {
     return _pinMapping;
 }
-
 
 bool PinMappingClass::init(const String& deviceMapping)
 {
@@ -54,6 +66,20 @@ bool PinMappingClass::init(const String& deviceMapping)
             _pinMapping.nrf24_irq = doc[i]["nrf24"]["irq"] | HOYMILES_PIN_IRQ;
             _pinMapping.nrf24_miso = doc[i]["nrf24"]["miso"] | HOYMILES_PIN_MISO;
             _pinMapping.nrf24_mosi = doc[i]["nrf24"]["mosi"] | HOYMILES_PIN_MOSI;
+
+#ifdef OPENDTU_ETHERNET
+            _pinMapping.eth_enabled = doc[i]["eth"]["enabled"] | true;
+#else
+            _pinMapping.eth_enabled = doc[i]["eth"]["enabled"] | false;
+#endif
+
+            _pinMapping.eth_phy_addr = doc[i]["eth"]["phy_addr"] | ETH_PHY_ADDR;
+            _pinMapping.eth_power = doc[i]["eth"]["power"] | ETH_PHY_POWER;
+            _pinMapping.eth_mdc = doc[i]["eth"]["mdc"] | ETH_PHY_MDC;
+            _pinMapping.eth_mdio = doc[i]["eth"]["mdio"] | ETH_PHY_MDIO;
+            _pinMapping.eth_type = doc[i]["eth"]["type"] | ETH_PHY_TYPE;
+            _pinMapping.eth_clk_mode = doc[i]["eth"]["clk_mode"] | ETH_CLK_MODE;
+
             return true;
         }
     }
@@ -69,4 +95,9 @@ bool PinMappingClass::isValidNrf24Config()
         && _pinMapping.nrf24_irq > 0
         && _pinMapping.nrf24_miso > 0
         && _pinMapping.nrf24_mosi > 0;
+}
+
+bool PinMappingClass::isValidEthConfig()
+{
+    return _pinMapping.eth_enabled;
 }

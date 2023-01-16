@@ -5,6 +5,7 @@
 #include "NetworkSettings.h"
 #include "Configuration.h"
 #include "MessageOutput.h"
+#include "PinMapping.h"
 #include "Utils.h"
 #include "defaults.h"
 #ifdef OPENDTU_ETHERNET
@@ -130,7 +131,10 @@ void NetworkSettingsClass::setupMode()
         }
     }
 #ifdef OPENDTU_ETHERNET
-    ETH.begin();
+    if (PinMapping.isValidEthConfig()) {
+        PinMapping_t& pin = PinMapping.get();
+        ETH.begin(pin.eth_phy_addr, pin.eth_power, pin.eth_mdc, pin.eth_mdio, pin.eth_type, pin.eth_clk_mode);
+    }
 #endif
 }
 
