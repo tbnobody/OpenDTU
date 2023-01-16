@@ -65,7 +65,7 @@ void WebApiWireguardClass::onWireguardAdminGet(AsyncWebServerRequest* request)
     JsonObject root = response->getRoot();
     const CONFIG_T& config = Configuration.get();
 
-    root[F("wg_endabled")] = config.Wg_Enabled;
+    root[F("wg_enabled")] = config.Wg_Enabled;
     root[F("wg_opendtu_public_key")] = config.Wg_Opendtu_Public_Key;
     root[F("wg_opendtu_private_key")] = config.Wg_Opendtu_Private_Key;
     root[F("wg_endpoint_public_key")] = config.Wg_Endpoint_Public_Key;
@@ -117,7 +117,7 @@ void WebApiWireguardClass::onWireguardAdminPost(AsyncWebServerRequest* request)
     }
 
     // Wireguard
-    if (!(root.containsKey("wg_endabled") && root.containsKey("wg_opendtu_public_key") && root.containsKey("wg_opendtu_private_key") && root.containsKey("wg_endpoint_public_key") && root.containsKey("wg_endpoint_address") && root.containsKey("wg_endpoint_port") && root.containsKey("wg_local_ip"))) {
+    if (!(root.containsKey("wg_enabled") && root.containsKey("wg_opendtu_public_key") && root.containsKey("wg_opendtu_private_key") && root.containsKey("wg_endpoint_public_key") && root.containsKey("wg_endpoint_address") && root.containsKey("wg_endpoint_port") && root.containsKey("wg_local_ip"))) {
         retMsg[F("message")] = F("Values are missing!");
         retMsg[F("code")] = WebApiError::GenericValueMissing;
         response->setLength();
@@ -132,7 +132,7 @@ void WebApiWireguardClass::onWireguardAdminPost(AsyncWebServerRequest* request)
         config.Wg_Local_Ip[2] = Wg_Local_Ip[2];
         config.Wg_Local_Ip[3] = Wg_Local_Ip[3];
     }
-    config.Wg_Enabled = root[F("wg_endabled")].as<bool>();
+    config.Wg_Enabled = root[F("wg_enabled")].as<bool>();
     strlcpy(config.Wg_Opendtu_Public_Key, root[F("wg_opendtu_public_key")].as<String>().c_str(), sizeof(config.Wg_Opendtu_Public_Key));
     strlcpy(config.Wg_Opendtu_Private_Key, root[F("wg_opendtu_private_key")].as<String>().c_str(), sizeof(config.Wg_Opendtu_Private_Key));
     strlcpy(config.Wg_Endpoint_Public_Key, root[F("wg_endpoint_public_key")].as<String>().c_str(), sizeof(config.Wg_Endpoint_Public_Key));
