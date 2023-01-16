@@ -9,6 +9,7 @@
 #include "MqttHandleInverter.h"
 #include "MqttSettings.h"
 #include "NetworkSettings.h"
+#include "WireguardSettings.h"
 #include "NtpSettings.h"
 #include "Utils.h"
 #include "WebApi.h"
@@ -74,6 +75,11 @@ void setup()
     MqttHandleInverter.init();
     MqttHandleHass.init();
     MessageOutput.println(F("done"));
+    
+    // Initialize Wireguard
+    MessageOutput.print(F("Initialize Wireguard... "));
+    WireguardSettings.init();
+    MessageOutput.println(F("done"));
 
     // Initialize WebApi
     MessageOutput.print(F("Initialize WebApi... "));
@@ -134,6 +140,8 @@ void setup()
 void loop()
 {
     NetworkSettings.loop();
+    yield();
+    WireguardSettings.loop();
     yield();
     Hoymiles.loop();
     yield();
