@@ -58,9 +58,9 @@ struct CONFIG_T {
 
     bool Wg_Enabled;
     byte Wg_Local_Ip[4];
-    char Wg_Opendtu_Private_Key[44];
-    char Wg_Opendtu_Public_Key[44];
-    char Wg_Endpoint_Public_Key[44];
+    char Wg_Opendtu_Private_Key[45];
+    char Wg_Opendtu_Public_Key[45];
+    char Wg_Endpoint_Public_Key[45];
     char Wg_Endpoint_Address[15];
     uint Wg_Endpoint_Port;
 
