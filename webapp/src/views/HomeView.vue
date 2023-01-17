@@ -45,7 +45,7 @@
                                         }} W | </template>{{ $n(inverter.limit_relative / 100, 'percent') }}
                                     </div>
                                     <div style="padding-right: 2em;">
-                                        {{ $t('home.DataAge') }} {{ $t('home.Seconds', {'val': inverter.data_age }) }}
+                                        {{ $t('home.DataAge') }} {{ $t('home.Seconds', {'val': $n(inverter.data_age) }) }}
                                         <template v-if="inverter.data_age > 300">
                                             / {{ calculateAbsoluteTime(inverter.data_age) }}
                                         </template>
