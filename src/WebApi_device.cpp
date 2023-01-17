@@ -98,7 +98,7 @@ void WebApiDeviceClass::onDeviceAdminPost(AsyncWebServerRequest* request)
         return;
     }
 
-    if (!(root.containsKey("dev_pinmapping"))) {
+    if (!(root.containsKey("curPin"))) {
         retMsg[F("message")] = F("Values are missing!");
         retMsg[F("code")] = WebApiError::GenericValueMissing;
         response->setLength();
@@ -106,7 +106,7 @@ void WebApiDeviceClass::onDeviceAdminPost(AsyncWebServerRequest* request)
         return;
     }
 
-    if (root[F("dev_pinmapping")].as<String>().length() == 0 || root[F("dev_pinmapping")].as<String>().length() > DEV_MAX_MAPPING_NAME_STRLEN) {
+    if (root[F("curPin")][F("name")].as<String>().length() == 0 || root[F("curPin")][F("name")].as<String>().length() > DEV_MAX_MAPPING_NAME_STRLEN) {
         retMsg[F("message")] = F("Pin mapping must between 1 and " STR(DEV_MAX_MAPPING_NAME_STRLEN) " characters long!");
         retMsg[F("code")] = WebApiError::HardwarePinMappingLength;
         retMsg[F("param")][F("max")] = DEV_MAX_MAPPING_NAME_STRLEN;
@@ -116,7 +116,7 @@ void WebApiDeviceClass::onDeviceAdminPost(AsyncWebServerRequest* request)
     }
 
     CONFIG_T& config = Configuration.get();
-    strlcpy(config.Dev_PinMapping, root[F("dev_pinmapping")].as<String>().c_str(), sizeof(config.Dev_PinMapping));
+    strlcpy(config.Dev_PinMapping, root[F("curPin")][F("name")].as<String>().c_str(), sizeof(config.Dev_PinMapping));
     Configuration.write();
 
     retMsg[F("type")] = F("success");
