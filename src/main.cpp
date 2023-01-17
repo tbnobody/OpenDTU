@@ -3,6 +3,7 @@
  * Copyright (C) 2022 Thomas Basler and others
  */
 #include "Configuration.h"
+#include "Display_Graphic.h"
 #include "MessageOutput.h"
 #include "MqttHandleDtu.h"
 #include "MqttHandleHass.h"
@@ -90,6 +91,11 @@ void setup()
     WebApi.init();
     MessageOutput.println(F("done"));
 
+    // Initialize Display
+    MessageOutput.print(F("Initialize Display... "));
+    Display.init(3); // 1 Nokia 5110, 2 for SSD1306, 3 for for SH1106 ...
+    MessageOutput.println(F("done"));
+
     // Check for default DTU serial
     MessageOutput.print(F("Check for default DTU serial... "));
     CONFIG_T& config = Configuration.get();
@@ -159,6 +165,8 @@ void loop()
     MqttHandleHass.loop();
     yield();
     WebApi.loop();
+    yield();
+    Display.loop();
     yield();
     MessageOutput.loop();
     yield();
