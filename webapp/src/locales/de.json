@@ -8,6 +8,7 @@
         "InverterSettings": "Wechselrichter Einstellungen",
         "SecuritySettings": "Sicherheitseinstellungen",
         "DTUSettings": "DTU Einstellungen",
+        "DeviceManager": "Geräte-Manager",
         "ConfigManagement": "Konfigurationsverwaltung",
         "FirmwareUpgrade": "Firmware Aktualisierung",
         "DeviceReboot": "Geräteneustart",
@@ -82,7 +83,8 @@
         "10001": "Das Passwort muss zwischen 8 und {max} Zeichen lang sein!",
         "10002": "Authentifizierung erfolgreich!",
         "11001": "@:apiresponse.2001",
-        "11002": "@:apiresponse:5004"
+        "11002": "@:apiresponse:5004",
+        "12001": "Profil muss zwischen 1 und {max} Zeichen lang sein!"
     },
     "home": {
         "LiveData": "Live Daten",
@@ -412,6 +414,8 @@
         "BackupHeader": "Sicherung: Sicherung der Konfigurationsdatei",
         "BackupConfig": "Sicherung der Konfigurationsdatei",
         "Backup": "Sichern",
+        "Restore": "Wiederherstellen",
+        "NoFileSelected": "Keine Datei Ausgewählt",
         "RestoreHeader": "Wiederherstellen: Wiederherstellen der Konfigurationsdatei",
         "Back": "Zurück",
         "UploadSuccess": "Erfolgreich hochgeladen",
@@ -464,5 +468,20 @@
         "TimeSyncLink": "Bitte überprüfen Sie Ihre Zeiteinstellungen.",
         "DefaultPassword": "Sie verwenden das Standardpasswort für die Weboberfläche und den Notfall Access Point. Dies ist potenziell unsicher.",
         "DefaultPasswordLink": "Bitte ändern Sie das Passwort."
+    },
+    "deviceadmin": {
+        "DeviceManager": "Geräte-Manager",
+        "PinAssignment": "Anschlusseinstellungen",
+        "SelectedProfile": "Ausgewähltes Profil:",
+        "DefaultProfile": "(Standard Einstellungen)",
+        "ProfileHint": "Ihr Gerät reagiert möglicherweise nicht mehr, wenn Sie ein inkompatibles Profil wählen. In diesem Fall müssen Sie eine Löschung über das serielle Interface durchführen.",
+        "Save": "@:dtuadmin.Save"
+    },
+    "pininfo": {
+        "PinOverview": "Anschlussübersicht",
+        "Category": "Kategorie",
+        "Name": "Name",
+        "ValueSelected": "Ausgewählt",
+        "ValueActive": "Aktiv"
     }
 }

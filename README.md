@@ -31,7 +31,7 @@ Like to show your own build? Just send me a Pull Request.
 **TSUN compatibility remark:**
 Compatibility with OpenDTU seems to be related to serial numbers. Current findings indicate that TSUN inverters with a serial number starting with "11" are supported, whereby inverters with a serial number starting with "10" are not.
 Firmware version seems to play not a significant role and cannot be read from the stickers. For completeness, the following firmware version have been reported to work with OpenDTU:
-* v1.0.10 TSOL-M800 (DE)
+* v1.0.8, v1.0.10 TSOL-M800 (DE)
 * v1.0.12 TSOL-M1600
 
 ## Features for end users
@@ -50,7 +50,7 @@ Firmware version seems to play not a significant role and cannot be read from th
 * Time zone support
 * Ethernet support
 * Prometheus API endpoint (/api/prometheus/metrics)
-* English and german web interface
+* English, german and french web interface
 
 ## Features for developers
 * The microcontroller part
@@ -113,6 +113,7 @@ This can be achieved by copying one of the [env:....] sections from 'platformio.
 -DHOYMILES_PIN_CS=5
 ```
 It is recommended to make all changes only in the  'platformio_override.ini', this is your personal copy.
+You can also change  the pins by creating a custom [device profile](docs/DeviceProfiles.md).
 
 ## Flashing and starting up
 ### with Visual Studio Code
@@ -177,6 +178,9 @@ esptool.py --port /dev/ttyUSB0 --chip esp32 --before default_reset --after hard_
 
 #### Flash with ESP_Flasher (Windows)
 Users report that [ESP_Flasher](https://github.com/Jason2866/ESP_Flasher/releases/) is suitable for flashing OpenDTU on Windows.
+
+#### Flash with [ESP_Flasher](https://espressif.github.io/esptool-js/) - web version
+It is also possible to flash it via the web tools which might be more convenient and is platformindependent.
 
 ## First configuration
 * After the initial flashing of the microcontroller, an Access Point called "OpenDTU-*" is opened. The default password is "openDTU42".

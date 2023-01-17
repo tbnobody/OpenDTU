@@ -59,7 +59,7 @@
                 <InputElement v-show="mqttConfigList.mqtt_tls"
                               :label="$t('mqttadmin.RootCa')"
                               v-model="mqttConfigList.mqtt_root_ca_cert"
-                              type="textarea" maxlength="2048" rows="10"/>
+                              type="textarea" maxlength="2560" rows="10"/>
             </CardElement>
 
             <CardElement :text="$t('mqttadmin.LwtParameters')" textVariant="text-bg-primary" add-space

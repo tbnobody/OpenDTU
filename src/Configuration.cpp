@@ -90,6 +90,9 @@ bool ConfigurationClass::write()
     security["password"] = config.Security_Password;
     security["allow_readonly"] = config.Security_AllowReadonly;
 
+    JsonObject device = doc.createNestedObject("device");
+    device["pinmapping"] = config.Dev_PinMapping;
+
     JsonArray inverters = doc.createNestedArray("inverters");
     for (uint8_t i = 0; i < INV_MAX_COUNT; i++) {
         JsonObject inv = inverters.createNestedObject();
@@ -224,6 +227,9 @@ bool ConfigurationClass::read()
     JsonObject security = doc["security"];
     strlcpy(config.Security_Password, security["password"] | ACCESS_POINT_PASSWORD, sizeof(config.Security_Password));
     config.Security_AllowReadonly = security["allow_readonly"] | SECURITY_ALLOW_READONLY;
+
+    JsonObject device = doc["device"];
+    strlcpy(config.Dev_PinMapping, device["pinmapping"] | DEV_PINMAPPING, sizeof(config.Dev_PinMapping));
 
     JsonArray inverters = doc["inverters"];
     for (uint8_t i = 0; i < INV_MAX_COUNT; i++) {

@@ -15,7 +15,7 @@ void AlarmLogParser::clearBuffer()
 void AlarmLogParser::appendFragment(uint8_t offset, uint8_t* payload, uint8_t len)
 {
     if (offset + len > ALARM_LOG_PAYLOAD_SIZE) {
-        Hoymiles.getMessageOutput()->printf("FATAL: (%s, %d) stats packet too large for buffer (%d > %d)\n", __FILE__, __LINE__, offset + len, ALARM_LOG_PAYLOAD_SIZE);
+        Hoymiles.getMessageOutput()->printf("FATAL: (%s, %d) stats packet too large for buffer (%d > %d)\r\n", __FILE__, __LINE__, offset + len, ALARM_LOG_PAYLOAD_SIZE);
         return;
     }
     memcpy(&_payloadAlarmLog[offset], payload, len);

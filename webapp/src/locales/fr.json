@@ -8,6 +8,7 @@
         "InverterSettings": "Paramètres des onduleurs",
         "SecuritySettings": "Paramètres de sécurité",
         "DTUSettings": "Paramètres DTU",
+        "DeviceManager": "Device-Manager",
         "ConfigManagement": "Gestion de la configuration",
         "FirmwareUpgrade": "Mise à jour du firmware",
         "DeviceReboot": "Redémarrage de l'appareil",
@@ -82,7 +83,8 @@
         "10001": "Le mot de passe doit comporter entre 8 et {max} caractères !",
         "10002": "Authentification réussie !",
         "11001": "@:apiresponse.2001",
-        "11002": "@:apiresponse:5004"
+        "11002": "@:apiresponse:5004",
+        "12001": "Profil must between 1 and {max} characters long!"
     },
     "home": {
         "LiveData": "Données en direct",
@@ -412,6 +414,8 @@
         "BackupHeader": "Sauvegarder le fichier de configuration",
         "BackupConfig": "Fichier de configuration",
         "Backup": "Sauvegarder",
+        "Restore": "Restore",
+        "NoFileSelected": "No file selected",
         "RestoreHeader": "Restaurer le fichier de configuration",
         "Back": "Retour",
         "UploadSuccess": "Succès du téléversement",
@@ -464,5 +468,20 @@
         "TimeSyncLink": "Veuillez vérifier vos paramètres horaires.",
         "DefaultPassword": "Vous utilisez le mot de passe par défaut pour l'interface Web et le point d'accès d'urgence. Ceci est potentiellement non sécurisé.",
         "DefaultPasswordLink": "Merci de changer le mot de passe."
+    },
+    "deviceadmin": {
+        "DeviceManager": "Device-Manager",
+        "PinAssignment": "Connection settings",
+        "SelectedProfile": "Selected profile:",
+        "DefaultProfile": "(Default settings)",
+        "ProfileHint": "Your device may stop responding if you select an incompatible profile. In this case, you must perform a deletion via the serial interface.",
+        "Save": "@:dtuadmin.Save"
+    },
+    "pininfo": {
+        "PinOverview": "Connection overview",
+        "Category": "Category",
+        "Name": "Name",
+        "ValueSelected": "Selected",
+        "ValueActive": "Active"
     }
 }

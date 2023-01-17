@@ -1,6 +1,7 @@
 import AboutView from '@/views/AboutView.vue';
 import ConfigAdminView from '@/views/ConfigAdminView.vue';
 import ConsoleInfoView from '@/views/ConsoleInfoView.vue';
+import DeviceAdminView from '@/views/DeviceAdminView.vue'
 import DtuAdminView from '@/views/DtuAdminView.vue';
 import FirmwareUpgradeView from '@/views/FirmwareUpgradeView.vue';
 import HomeView from '@/views/HomeView.vue';
@@ -85,6 +86,11 @@ const router = createRouter({
         path: '/settings/dtu',
         name: 'DTU Settings',
         component: DtuAdminView
+    },
+    {
+        path: '/settings/device',
+        name: 'Device Manager',
+        component: DeviceAdminView
     },
     {
         path: '/firmware/upgrade',

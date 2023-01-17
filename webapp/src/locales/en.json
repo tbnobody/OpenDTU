@@ -8,6 +8,7 @@
         "InverterSettings": "Inverter Settings",
         "SecuritySettings": "Security Settings",
         "DTUSettings": "DTU Settings",
+        "DeviceManager": "Device-Manager",
         "ConfigManagement": "Config Management",
         "FirmwareUpgrade": "Firmware Upgrade",
         "DeviceReboot": "Device Reboot",
@@ -82,7 +83,8 @@
         "10001": "Password must between 8 and {max} characters long!",
         "10002": "Authentication successfull!",
         "11001": "@:apiresponse.2001",
-        "11002": "@:apiresponse:5004"
+        "11002": "@:apiresponse:5004",
+        "12001": "Profil must between 1 and {max} characters long!"
     },
     "home": {
         "LiveData": "Live Data",
@@ -412,6 +414,8 @@
         "BackupHeader": "Backup: Configuration File Backup",
         "BackupConfig": "Backup the configuration file",
         "Backup": "Backup",
+        "Restore": "Restore",
+        "NoFileSelected": "No file selected",
         "RestoreHeader": "Restore: Restore the Configuration File",
         "Back": "Back",
         "UploadSuccess": "Upload Success",
@@ -464,5 +468,21 @@
         "TimeSyncLink": "Please check your time settings.",
         "DefaultPassword": "You are using the default password for the web interface and the emergency access point. This is potentially insecure.",
         "DefaultPasswordLink": "Please change the password."
+    },
+    "deviceadmin": {
+        "DeviceManager": "Device-Manager",
+        "PinAssignment": "Connection settings",
+        "SelectedProfile": "Selected profile:",
+        "DefaultProfile": "(Default settings)",
+        "ProfileHint": "Your device may stop responding if you select an incompatible profile. In this case, you must perform a deletion via the serial interface.",
+        "Save": "@:dtuadmin.Save"
+    },
+    "pininfo": {
+        "PinOverview": "Connection overview",
+        "Category": "Category",
+        "Name": "Name",
+        "Number": "Number",
+        "ValueSelected": "Selected",
+        "ValueActive": "Active"
     }
 }
