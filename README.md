@@ -113,6 +113,7 @@ This can be achieved by copying one of the [env:....] sections from 'platformio.
 -DHOYMILES_PIN_CS=5
 ```
 It is recommended to make all changes only in the  'platformio_override.ini', this is your personal copy.
+You can also change  the pins by creating a custom [device profile](docs/DeviceProfiles.md).
 
 ## Flashing and starting up
 ### with Visual Studio Code
