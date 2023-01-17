@@ -115,7 +115,7 @@ import BasePage from '@/components/BasePage.vue';
 import BootstrapAlert from "@/components/BootstrapAlert.vue";
 import CardElement from '@/components/CardElement.vue';
 import type { ConfigFileList } from '@/types/Config';
-import { authHeader, handleResponse, isLoggedIn } from '@/utils/authentication';
+import { authHeader, handleResponse } from '@/utils/authentication';
 import * as bootstrap from 'bootstrap';
 import {
     BIconArrowLeft,
@@ -207,7 +207,7 @@ export default defineComponent({
                     a.remove();
                 });
         },
-        uploadConfig(event: Event | null) {
+        uploadConfig() {
             this.uploading = true;
             const formData = new FormData();
             const target = this.$refs.file as HTMLInputElement; //  event.target as HTMLInputElement;

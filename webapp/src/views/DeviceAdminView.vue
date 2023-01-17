@@ -26,7 +26,7 @@
                                 <div class="col-sm-10">
                                     <select class="form-select" id="inputPinProfile"
                                         v-model="deviceConfigList.curPin.name">
-                                        <option v-for="device in pinMappingList" :value="device.name">
+                                        <option v-for="device in pinMappingList" :value="device.name" :key="device.name">
                                             {{ device.name }}
                                         </option>
                                     </select>
@@ -54,7 +54,6 @@
 <script lang="ts">
 import BasePage from '@/components/BasePage.vue';
 import BootstrapAlert from "@/components/BootstrapAlert.vue";
-import InputElement from '@/components/InputElement.vue';
 import PinInfo from '@/components/PinInfo.vue';
 import type { DeviceConfig } from "@/types/DeviceConfig";
 import type { PinMapping, Device } from "@/types/PinMapping";
@@ -65,7 +64,6 @@ export default defineComponent({
     components: {
         BasePage,
         BootstrapAlert,
-        InputElement,
         PinInfo,
     },
     data() {
