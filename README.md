@@ -178,6 +178,9 @@ esptool.py --port /dev/ttyUSB0 --chip esp32 --before default_reset --after hard_
 #### Flash with ESP_Flasher (Windows)
 Users report that [ESP_Flasher](https://github.com/Jason2866/ESP_Flasher/releases/) is suitable for flashing OpenDTU on Windows.
 
+#### Flash with [ESP_Flasher](https://espressif.github.io/esptool-js/) - web version
+It is also possible to flash it via the web tools which might be more convenient and is platformindependent.
+
 ## First configuration
 * After the initial flashing of the microcontroller, an Access Point called "OpenDTU-*" is opened. The default password is "openDTU42".
 * Use a web browser to open the address [http://192.168.4.1](http://192.168.4.1)
