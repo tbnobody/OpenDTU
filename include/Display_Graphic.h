@@ -22,7 +22,6 @@ private:
 
     uint8_t _mExtra;
     uint8_t _display_type = 0;
-    uint16_t _dispX = 0;
     uint16_t _dispY = 0;
     uint16_t _period = 1000;
     uint16_t _interval = 60000; // interval at which to power save (milliseconds)

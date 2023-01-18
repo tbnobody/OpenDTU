@@ -91,18 +91,19 @@ void DisplayGraphicClass::printText(const char* text, uint8_t line)
         break;
     }
 
-    // get the font height, to calculate the textheight
+   // get the font height, to calculate the textheight
     _dispY += (_display->getMaxCharHeight()) + 1;
 
     // calculate the starting position of the text
+    uint16_t dispX;
     if (line == 1) {
-        _dispX = 20 + ex;
+        dispX = 20 + ex;
     } else {
-        _dispX = 5 + ex;
+        dispX = 5 + ex;
     }
 
     // draw the Text, on the calculated pos
-    _display->drawStr(_dispX, _dispY, text);
+    _display->drawStr(dispX, _dispY, text);
 }
 
 void DisplayGraphicClass::loop()
@@ -191,7 +192,6 @@ void DisplayGraphicClass::loop()
         }
         _display->sendBuffer();
 
-        _dispX = 0;
         _dispY = 0;
         _mExtra++;
         _lastDisplayUpdate = millis();
