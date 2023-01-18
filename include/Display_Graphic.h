@@ -13,7 +13,7 @@ public:
     DisplayGraphicClass();
     ~DisplayGraphicClass();
 
-    void init(uint8_t type);
+    void init(uint8_t type, uint8_t disp_SCL, uint8_t disp_SDA, uint8_t disp_reset);
     void loop();
 
     bool dispPowerSafe = true;
@@ -27,6 +27,9 @@ private:
 
     uint8_t _mExtra;
     uint8_t _display_type = 0;
+    uint8_t _display_SCL = SCL;
+    uint8_t _display_SDA = SDA;
+    uint8_t _display_reset = U8X8_PIN_NONE;
     uint16_t _dispX = 0;
     uint16_t _dispY = 0;
     uint16_t _period = 1000;

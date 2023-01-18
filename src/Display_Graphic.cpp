@@ -25,15 +25,15 @@ static uint8_t bmp_arrow[] PROGMEM = {
     B00011110, B00001110, B00000110, B00000000, B00000000, B00000000, B00000000
 };
 
-std::map<int, std::function<U8G2*()>> display_types = {
-    { 0, []() { return new U8G2_PCD8544_84X48_F_4W_HW_SPI(U8G2_R0, /*cs*/ 5, /*dc*/ 4, /*reset*/ 16); } },
-    { 1, []() { return new U8G2_SSD1306_128X64_NONAME_F_HW_I2C(U8G2_R0, /*reset*/ U8X8_PIN_NONE, /*clock*/ SCL, /*data*/ SDA); } },
-    { 2, []() { return new U8G2_SH1106_128X64_NONAME_F_HW_I2C(U8G2_R0, /*reset*/ U8X8_PIN_NONE, /*clock*/ SCL, /*data*/ SDA); } },
+std::map<uint8_t, std::function<U8G2*(uint8_t, uint8_t, uint8_t)>> display_types = {
+    { 0, [](uint8_t disp_SCL, uint8_t disp_SDA, uint8_t disp_reset) { return new U8G2_PCD8544_84X48_F_4W_HW_SPI(U8G2_R0, disp_SCL, disp_SDA, disp_reset); } },
+    { 1, [](uint8_t disp_SCL, uint8_t disp_SDA, uint8_t disp_reset) { return new U8G2_SSD1306_128X64_NONAME_F_HW_I2C(U8G2_R0, disp_reset, disp_SCL, disp_SDA); } },
+    { 2, [](uint8_t disp_SCL, uint8_t disp_SDA, uint8_t disp_reset) { return new U8G2_SH1106_128X64_NONAME_F_HW_I2C(U8G2_R0, disp_reset, disp_SCL, disp_SDA); } },
 };
 
 DisplayGraphicClass::DisplayGraphicClass()
 {
-    init(_display_type);
+    init(_display_type, _display_SCL, _display_SDA, _display_reset);
 }
 
 DisplayGraphicClass::~DisplayGraphicClass()
@@ -41,13 +41,16 @@ DisplayGraphicClass::~DisplayGraphicClass()
     delete _display;
 }
 
-void DisplayGraphicClass::init(uint8_t type)
+void DisplayGraphicClass::init(uint8_t type, uint8_t disp_SCL, uint8_t disp_SDA, uint8_t disp_reset)
 {
     _display_type = type;
+    _display_SCL = disp_SCL;
+    _display_SDA = disp_SDA;
+    _display_reset = disp_reset;
     int const_type = type - 1;
     if (const_type >= 0) {
         auto constructor = display_types[const_type];
-        _display = constructor();
+        _display = constructor(disp_SCL, disp_SDA, disp_reset);
         _display->begin();
     }
 }
