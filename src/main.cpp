@@ -81,17 +81,17 @@ void setup()
     NtpSettings.init();
     MessageOutput.println(F("done"));
 
+    // Initialize Wireguard
+    MessageOutput.print(F("Initialize Wireguard... "));
+    WireguardSettings.init();
+    MessageOutput.println(F("done"));
+
     // Initialize MqTT
     MessageOutput.print(F("Initialize MqTT... "));
     MqttSettings.init();
     MqttHandleDtu.init();
     MqttHandleInverter.init();
     MqttHandleHass.init();
-    MessageOutput.println(F("done"));
-    
-    // Initialize Wireguard
-    MessageOutput.print(F("Initialize Wireguard... "));
-    WireguardSettings.init();
     MessageOutput.println(F("done"));
 
     // Initialize WebApi

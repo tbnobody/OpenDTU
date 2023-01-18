@@ -57,12 +57,13 @@ struct CONFIG_T {
     char WiFi_Hostname[WIFI_MAX_HOSTNAME_STRLEN + 1];
 
     bool Wg_Enabled;
-    byte Wg_Local_Ip[4];
-    char Wg_Opendtu_Private_Key[45];
-    char Wg_Opendtu_Public_Key[45];
-    char Wg_Endpoint_Public_Key[45];
     char Wg_Endpoint_Address[15];
+    byte Wg_Endpoint_Local_Ip[4];
     uint Wg_Endpoint_Port;
+    char Wg_Endpoint_Public_Key[45];
+    char Wg_Opendtu_Public_Key[45];
+    byte Wg_Opendtu_Local_Ip[4];
+    char Wg_Opendtu_Private_Key[45];
 
     char Ntp_Server[NTP_MAX_SERVER_STRLEN + 1];
     char Ntp_Timezone[NTP_MAX_TIMEZONE_STRLEN + 1];
