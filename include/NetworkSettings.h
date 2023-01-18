@@ -4,7 +4,6 @@
 #include <DNSServer.h>
 #include <WiFi.h>
 #include <vector>
-#include <NtpSettings.h>
 
 enum class network_mode {
     WiFi,
