@@ -111,7 +111,7 @@ void DisplayGraphicClass::loop()
         return;
     }
 
-    if ((millis() - _lastPublish) > _period) {
+    if ((millis() - _lastDisplayUpdate) > _period) {
         float totalPower = 0;
         float totalYieldDay = 0;
         float totalYieldTotal = 0;
@@ -194,7 +194,7 @@ void DisplayGraphicClass::loop()
         _dispX = 0;
         _dispY = 0;
         _mExtra++;
-        _lastPublish = millis();
+        _lastDisplayUpdate = millis();
     }
 }
 
