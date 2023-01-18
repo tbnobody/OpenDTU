@@ -1,4 +1,9 @@
+// SPDX-License-Identifier: GPL-2.0-or-later
 #include "Display_Graphic.h"
+#include <Hoymiles.h>
+#include <NetworkSettings.h>
+#include <map>
+#include <time.h>
 
 static uint8_t bmp_logo[] PROGMEM = {
     B00000000, B00000000, // ................
@@ -138,8 +143,9 @@ void DisplayGraphicClass::loop()
         uint8_t ex = (_mExtra % 7);
         if (isprod > 0) {
             _display->drawXBMP(5 + ex, 1, 8, 17, bmp_arrow);
-            if (dispLogo)
+            if (dispLogo) {
                 _display->drawXBMP(_display->getWidth() - 24 + ex, 2, 16, 16, bmp_logo);
+            }
         }
         //<=======================
 

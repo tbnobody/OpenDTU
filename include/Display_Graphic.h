@@ -1,12 +1,7 @@
-#ifndef Display_Graphic_H
-#define Display_Graphic_H
+// SPDX-License-Identifier: GPL-2.0-or-later
+#pragma once
 
-#include <Arduino.h>
-#include <Hoymiles.h>
-#include <NetworkSettings.h>
 #include <U8g2lib.h>
-#include <map>
-#include <time.h>
 
 class DisplayGraphicClass {
 public:
@@ -37,5 +32,3 @@ private:
 };
 
 extern DisplayGraphicClass Display;
-
-#endif
