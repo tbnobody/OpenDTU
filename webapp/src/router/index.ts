@@ -13,6 +13,8 @@ import MqttInfoView from '@/views/MqttInfoView.vue';
 import NetworkAdminView from '@/views/NetworkAdminView.vue';
 import NetworkInfoView from '@/views/NetworkInfoView.vue';
 import NtpAdminView from '@/views/NtpAdminView.vue';
+import WireguardInfoView from '@/views/WireguardInfoView.vue';
+import WireguardAdminView from '@/views/WireguardAdminView.vue';
 import NtpInfoView from '@/views/NtpInfoView.vue';
 import SecurityAdminView from '@/views/SecurityAdminView.vue';
 import SystemInfoView from '@/views/SystemInfoView.vue';
@@ -53,6 +55,11 @@ const router = createRouter({
         component: NtpInfoView
     },
     {
+        path: '/info/wireguard',
+        name: 'Wireguard',
+        component: WireguardInfoView
+    },
+    {
         path: '/info/mqtt',
         name: 'MqTT',
         component: MqttInfoView
@@ -71,6 +78,11 @@ const router = createRouter({
         path: '/settings/ntp',
         name: 'NTP Settings',
         component: NtpAdminView
+    },
+    {
+        path: '/settings/wireguard',
+        name: 'Wireguard Settings',
+        component: WireguardAdminView
     },
     {
         path: '/settings/mqtt',

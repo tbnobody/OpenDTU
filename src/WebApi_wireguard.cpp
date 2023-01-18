@@ -33,22 +33,16 @@ void WebApiWireguardClass::onWireguardStatus(AsyncWebServerRequest* request)
     AsyncJsonResponse* response = new AsyncJsonResponse();
     JsonObject root = response->getRoot();
 
-    root[F("sta_status")] = ((WiFi.getMode() & WIFI_STA) != 0);
-    root[F("sta_ssid")] = WiFi.SSID();
-    root[F("sta_rssi")] = WiFi.RSSI();
-    root[F("network_hostname")] = NetworkSettings.getHostname();
-    root[F("network_ip")] = NetworkSettings.localIP().toString();
-    root[F("network_netmask")] = NetworkSettings.subnetMask().toString();
-    root[F("network_gateway")] = NetworkSettings.gatewayIP().toString();
-    root[F("network_dns1")] = NetworkSettings.dnsIP(0).toString();
-    root[F("network_dns2")] = NetworkSettings.dnsIP(1).toString();
-    root[F("network_mac")] = NetworkSettings.macAddress();
-    root[F("network_mode")] = NetworkSettings.NetworkMode() == network_mode::WiFi ? F("Station") : F("Ethernet");
-    root[F("ap_status")] = ((WiFi.getMode() & WIFI_AP) != 0);
-    root[F("ap_ssid")] = NetworkSettings.getApName();
-    root[F("ap_ip")] = WiFi.softAPIP().toString();
-    root[F("ap_mac")] = WiFi.softAPmacAddress();
-    root[F("ap_stationnum")] = WiFi.softAPgetStationNum();
+    const CONFIG_T& config = Configuration.get();
+    root[F("wg_enabled")] = config.Wg_Enabled;
+
+    root[F("wg_endpoint_address")] = config.Wg_Endpoint_Address;
+    root[F("wg_endpoint_local_ip")] = IPAddress(config.Wg_Endpoint_Local_Ip).toString();
+    root[F("wg_endpoint_port")] = config.Wg_Endpoint_Port;
+    root[F("wg_endpoint_public_key")] = config.Wg_Endpoint_Public_Key;
+
+    root[F("wg_opendtu_local_ip")] = IPAddress(config.Wg_Opendtu_Local_Ip).toString();
+    root[F("wg_opendtu_public_key")] = config.Wg_Opendtu_Public_Key;
 
     response->setLength();
     request->send(response);
@@ -65,12 +59,15 @@ void WebApiWireguardClass::onWireguardAdminGet(AsyncWebServerRequest* request)
     const CONFIG_T& config = Configuration.get();
 
     root[F("wg_enabled")] = config.Wg_Enabled;
+
+    root[F("wg_endpoint_address")] = config.Wg_Endpoint_Address;
+    root[F("wg_endpoint_local_ip")] = IPAddress(config.Wg_Endpoint_Local_Ip).toString();
+    root[F("wg_endpoint_port")] = config.Wg_Endpoint_Port;
+    root[F("wg_endpoint_public_key")] = config.Wg_Endpoint_Public_Key;
+
+    root[F("wg_opendtu_local_ip")] = IPAddress(config.Wg_Opendtu_Local_Ip).toString();
     root[F("wg_opendtu_public_key")] = config.Wg_Opendtu_Public_Key;
     root[F("wg_opendtu_private_key")] = config.Wg_Opendtu_Private_Key;
-    root[F("wg_endpoint_public_key")] = config.Wg_Endpoint_Public_Key;
-    root[F("wg_endpoint_address")] = config.Wg_Endpoint_Address;
-    root[F("wg_endpoint_port")] = config.Wg_Endpoint_Port;
-    root[F("wg_local_ip")] = IPAddress(config.Wg_Local_Ip).toString();
 
     response->setLength();
     request->send(response);
@@ -115,7 +112,11 @@ void WebApiWireguardClass::onWireguardAdminPost(AsyncWebServerRequest* request)
         return;
     }
 
-    if (!(root.containsKey("wg_enabled") && root.containsKey("wg_opendtu_public_key") && root.containsKey("wg_opendtu_private_key") && root.containsKey("wg_endpoint_public_key") && root.containsKey("wg_endpoint_address") && root.containsKey("wg_endpoint_port") && root.containsKey("wg_local_ip"))) {
+    if (!(root.containsKey("wg_enabled") && root.containsKey("wg_endpoint_address") 
+        && root.containsKey("wg_endpoint_local_ip") && root.containsKey("wg_endpoint_port") 
+        && root.containsKey("wg_endpoint_public_key") && root.containsKey("wg_opendtu_local_ip") 
+        && root.containsKey("wg_opendtu_public_key") && root.containsKey("wg_opendtu_private_key"))) {
+
         retMsg[F("message")] = F("Values are missing!");
         retMsg[F("code")] = WebApiError::GenericValueMissing;
         response->setLength();
@@ -123,12 +124,19 @@ void WebApiWireguardClass::onWireguardAdminPost(AsyncWebServerRequest* request)
         return;
     }
     CONFIG_T& config = Configuration.get();
-    IPAddress Wg_Local_Ip;
-    if (Wg_Local_Ip.fromString(root[F("wg_local_ip")].as<String>())) {
-        config.Wg_Local_Ip[0] = Wg_Local_Ip[0];
-        config.Wg_Local_Ip[1] = Wg_Local_Ip[1];
-        config.Wg_Local_Ip[2] = Wg_Local_Ip[2];
-        config.Wg_Local_Ip[3] = Wg_Local_Ip[3];
+    IPAddress Wg_Endpoint_Local_Ip;
+    if (Wg_Endpoint_Local_Ip.fromString(root[F("wg_endpoint_local_ip")].as<String>())) {
+        config.Wg_Endpoint_Local_Ip[0] = Wg_Endpoint_Local_Ip[0];
+        config.Wg_Endpoint_Local_Ip[1] = Wg_Endpoint_Local_Ip[1];
+        config.Wg_Endpoint_Local_Ip[2] = Wg_Endpoint_Local_Ip[2];
+        config.Wg_Endpoint_Local_Ip[3] = Wg_Endpoint_Local_Ip[3];
+    }
+    IPAddress Wg_Opendtu_Local_Ip;
+    if (Wg_Opendtu_Local_Ip.fromString(root[F("wg_opendtu_local_ip")].as<String>())) {
+        config.Wg_Opendtu_Local_Ip[0] = Wg_Opendtu_Local_Ip[0];
+        config.Wg_Opendtu_Local_Ip[1] = Wg_Opendtu_Local_Ip[1];
+        config.Wg_Opendtu_Local_Ip[2] = Wg_Opendtu_Local_Ip[2];
+        config.Wg_Opendtu_Local_Ip[3] = Wg_Opendtu_Local_Ip[3];
     }
     config.Wg_Enabled = root[F("wg_enabled")].as<bool>();
     strlcpy(config.Wg_Opendtu_Public_Key, root[F("wg_opendtu_public_key")].as<String>().c_str(), sizeof(config.Wg_Opendtu_Public_Key));

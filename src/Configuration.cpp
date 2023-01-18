@@ -5,7 +5,6 @@
 #include "Configuration.h"
 #include "MessageOutput.h"
 #include "defaults.h"
-#include "defaults_wireguard.h"
 #include <ArduinoJson.h>
 #include <LittleFS.h>
 
@@ -43,12 +42,13 @@ bool ConfigurationClass::write()
 
     JsonObject wg = doc.createNestedObject("wg");
     wg["enabled"] = config.Wg_Enabled;
-    wg["local_ip"] = IPAddress(config.Wg_Local_Ip).toString();
-    wg["opendtu_private_key"] = config.Wg_Opendtu_Private_Key;
-    wg["opendtu_public_key"] = config.Wg_Opendtu_Public_Key;
     wg["endpoint_address"] = config.Wg_Endpoint_Address;
-    wg["endpoint_public_key"] = config.Wg_Endpoint_Public_Key;
+    wg["endpoint_local_ip"] = IPAddress(config.Wg_Endpoint_Local_Ip).toString();
     wg["endpoint_port"] = config.Wg_Endpoint_Port;
+    wg["endpoint_public_key"] = config.Wg_Endpoint_Public_Key;
+    wg["opendtu_local_ip"] = IPAddress(config.Wg_Opendtu_Local_Ip).toString();
+    wg["opendtu_public_key"] = config.Wg_Opendtu_Public_Key;
+    wg["opendtu_private_key"] = config.Wg_Opendtu_Private_Key;
 
     JsonObject ntp = doc.createNestedObject("ntp");
     ntp["server"] = config.Ntp_Server;
@@ -181,12 +181,18 @@ bool ConfigurationClass::read()
     strlcpy(config.Wg_Endpoint_Address, wg["endpoint_address"] | WG_ENDPOINT_ADDRESS, sizeof(config.Wg_Endpoint_Address));
     strlcpy(config.Wg_Endpoint_Public_Key, wg["endpoint_public_key"] | WG_ENDPOINT_PUBLIC_KEY, sizeof(config.Wg_Endpoint_Public_Key));
     config.Wg_Endpoint_Port = wg["endpoint_port"] | WG_ENDPOINT_PORT;
-    IPAddress Wg_Local_Ip;
-    Wg_Local_Ip.fromString(wg["local_ip"] | WG_LOCAL_IP);
-    config.Wg_Local_Ip[0] = Wg_Local_Ip[0];
-    config.Wg_Local_Ip[1] = Wg_Local_Ip[1];
-    config.Wg_Local_Ip[2] = Wg_Local_Ip[2];
-    config.Wg_Local_Ip[3] = Wg_Local_Ip[3];
+    IPAddress Wg_Opendtu_Local_Ip;
+    Wg_Opendtu_Local_Ip.fromString(wg["opendtu_local_ip"] | WG_OPENDTU_LOCAL_IP);
+    config.Wg_Opendtu_Local_Ip[0] = Wg_Opendtu_Local_Ip[0];
+    config.Wg_Opendtu_Local_Ip[1] = Wg_Opendtu_Local_Ip[1];
+    config.Wg_Opendtu_Local_Ip[2] = Wg_Opendtu_Local_Ip[2];
+    config.Wg_Opendtu_Local_Ip[3] = Wg_Opendtu_Local_Ip[3];
+    IPAddress Wg_Endpoint_Local_Ip;
+    Wg_Endpoint_Local_Ip.fromString(wg["endpoint_local_ip"] | WG_ENDPOINT_LOCAL_IP);
+    config.Wg_Endpoint_Local_Ip[0] = Wg_Endpoint_Local_Ip[0];
+    config.Wg_Endpoint_Local_Ip[1] = Wg_Endpoint_Local_Ip[1];
+    config.Wg_Endpoint_Local_Ip[2] = Wg_Endpoint_Local_Ip[2];
+    config.Wg_Endpoint_Local_Ip[3] = Wg_Endpoint_Local_Ip[3];
 
     JsonObject ntp = doc["ntp"];
     strlcpy(config.Ntp_Server, ntp["server"] | NTP_SERVER, sizeof(config.Ntp_Server));

@@ -20,13 +20,14 @@
 #define WIFI_PASSWORD ""
 #define WIFI_DHCP true
 
-/*#define WG_ENABLED false
-#define WG_LOCAL_IP ""
+#define WG_ENABLED false
+#define WG_ENDPOINT_ADDRESS ""
+#define WG_ENDPOINT_PORT 51820
+#define WG_ENDPOINT_LOCAL_IP ""
+#define WG_ENDPOINT_PUBLIC_KEY ""
+#define WG_OPENDTU_LOCAL_IP ""
 #define WG_OPENDTU_PUBLIC_KEY ""
 #define WG_OPENDTU_PRIVATE_KEY ""
-#define WG_ENDPOINT_PUBLIC_KEY ""
-#define WG_ENDPOINT_ADDRESS ""
-#define WG_ENDPOINT_PORT 51820*/
 
 #define NTP_SERVER "pool.ntp.org"
 #define NTP_TIMEZONE "CET-1CEST,M3.5.0,M10.5.0/3"
