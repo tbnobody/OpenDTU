@@ -30,29 +30,26 @@ static uint8_t bmp_arrow[] PROGMEM = {
     B00011110, B00001110, B00000110, B00000000, B00000000, B00000000, B00000000
 };
 
-std::map<int, std::function<U8G2*()>> display_types = {
-    { 0, []() { return new U8G2_PCD8544_84X48_F_4W_HW_SPI(U8G2_R0, /*cs*/ 5, /*dc*/ 4, /*reset*/ 16); } },
-    { 1, []() { return new U8G2_SSD1306_128X64_NONAME_F_HW_I2C(U8G2_R0, /*reset*/ U8X8_PIN_NONE, /*clock*/ SCL, /*data*/ SDA); } },
-    { 2, []() { return new U8G2_SH1106_128X64_NONAME_F_HW_I2C(U8G2_R0, /*reset*/ U8X8_PIN_NONE, /*clock*/ SCL, /*data*/ SDA); } },
+std::map<DisplayType_t, std::function<U8G2*(uint8_t, uint8_t, uint8_t, uint8_t)>> display_types = {
+    { DisplayType_t::PCD8544, [](uint8_t reset, uint8_t clock, uint8_t data, uint8_t cs) { return new U8G2_PCD8544_84X48_F_4W_HW_SPI(U8G2_R0, cs, data, reset); } },
+    { DisplayType_t::SSD1306, [](uint8_t reset, uint8_t clock, uint8_t data, uint8_t cs) { return new U8G2_SSD1306_128X64_NONAME_F_HW_I2C(U8G2_R0, reset, clock, data); } },
+    { DisplayType_t::SH1106, [](uint8_t reset, uint8_t clock, uint8_t data, uint8_t cs) { return new U8G2_SH1106_128X64_NONAME_F_HW_I2C(U8G2_R0, reset, clock, data); } },
 };
 
 DisplayGraphicClass::DisplayGraphicClass()
-{
-    init(_display_type);
-}
+{}
 
 DisplayGraphicClass::~DisplayGraphicClass()
 {
     delete _display;
 }
 
-void DisplayGraphicClass::init(uint8_t type)
+void DisplayGraphicClass::init(DisplayType_t type, uint8_t data, uint8_t clk, uint8_t cs, uint8_t reset)
 {
     _display_type = type;
-    int const_type = type - 1;
-    if (const_type >= 0) {
-        auto constructor = display_types[const_type];
-        _display = constructor();
+    if (_display_type > DisplayType_t::None) {
+        auto constructor = display_types[_display_type];
+        _display = constructor(reset, clk, data, cs);
         _display->begin();
     }
 }
@@ -108,7 +105,7 @@ void DisplayGraphicClass::printText(const char* text, uint8_t line)
 
 void DisplayGraphicClass::loop()
 {
-    if (_display_type == 0) {
+    if (_display_type == DisplayType_t::None) {
         return;
     }
 

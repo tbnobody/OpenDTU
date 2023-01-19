@@ -3,12 +3,19 @@
 
 #include <U8g2lib.h>
 
+enum DisplayType_t {
+    None,
+    PCD8544,
+    SSD1306,
+    SH1106,
+};
+
 class DisplayGraphicClass {
 public:
     DisplayGraphicClass();
     ~DisplayGraphicClass();
 
-    void init(uint8_t type);
+    void init(DisplayType_t type, uint8_t data, uint8_t clk, uint8_t cs, uint8_t reset);
     void loop();
 
     bool dispPowerSafe = true;
@@ -20,8 +27,8 @@ private:
 
     U8G2* _display;
 
+    DisplayType_t _display_type = DisplayType_t::None;
     uint8_t _mExtra;
-    uint8_t _display_type = 0;
     uint16_t _dispY = 0;
     uint16_t _period = 1000;
     uint16_t _interval = 60000; // interval at which to power save (milliseconds)

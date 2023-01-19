@@ -93,7 +93,7 @@ void setup()
 
     // Initialize Display
     MessageOutput.print(F("Initialize Display... "));
-    Display.init(3); // 1 Nokia 5110, 2 for SSD1306, 3 for for SH1106 ...
+    Display.init(DisplayType_t::SSD1306, SDA, SCL, 255, 255);
     MessageOutput.println(F("done"));
 
     // Check for default DTU serial
