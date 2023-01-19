@@ -124,6 +124,7 @@ void WebApiWireguardClass::onWireguardAdminPost(AsyncWebServerRequest* request)
         return;
     }
     CONFIG_T& config = Configuration.get();
+    config.Wg_Refresh = true;
     IPAddress Wg_Endpoint_Local_Ip;
     if (Wg_Endpoint_Local_Ip.fromString(root[F("wg_endpoint_local_ip")].as<String>())) {
         config.Wg_Endpoint_Local_Ip[0] = Wg_Endpoint_Local_Ip[0];

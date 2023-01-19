@@ -4,27 +4,27 @@
             <div class="table-responsive">
                 <table class="table table-hover table-condensed">
                     <tbody>
-                        <tr>
+                        <tr v-if="wireguardDataList.wg_enabled">
                             <th>{{ $t('wireguardinfo.EndpointAddress') }}</th>
                             <td>{{ wireguardDataList.wg_endpoint_address }}</td>
                         </tr>
-                        <tr>
+                        <tr v-if="wireguardDataList.wg_enabled">
                             <th>{{ $t('wireguardinfo.EndpointPort') }}</th>
                             <td>{{ wireguardDataList.wg_endpoint_port }}</td>
                         </tr>
-                        <tr>
+                        <tr v-if="wireguardDataList.wg_enabled">
                             <th>{{ $t('wireguardinfo.EndpointLocalIP') }}</th>
                             <td>{{ wireguardDataList.wg_endpoint_local_ip }}</td>
                         </tr>
-                        <tr>
+                        <tr v-if="wireguardDataList.wg_enabled">
                             <th>{{ $t('wireguardinfo.EndpointPublicKey') }}</th>
                             <td>{{ wireguardDataList.wg_endpoint_public_key }}</td>
                         </tr>
-                        <tr>
+                        <tr v-if="wireguardDataList.wg_enabled">
                             <th>{{ $t('wireguardinfo.OpenDTULocalIP') }}</th>
                             <td>{{ wireguardDataList.wg_opendtu_local_ip }}</td>
                         </tr>
-                        <tr>
+                        <tr v-if="wireguardDataList.wg_enabled">
                             <th>{{ $t('wireguardinfo.OpenDTUPublicKey') }}</th>
                             <td>{{ wireguardDataList.wg_opendtu_public_key }}</td>
                         </tr>

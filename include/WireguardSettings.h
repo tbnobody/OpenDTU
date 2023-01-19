@@ -11,6 +11,7 @@ public:
 
 private:
     WireGuard wg;
+    void endWireGuard();
     void beginWireGuard();
 };
 

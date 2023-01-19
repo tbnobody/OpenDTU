@@ -81,11 +81,6 @@ void setup()
     NtpSettings.init();
     MessageOutput.println(F("done"));
 
-    // Initialize Wireguard
-    MessageOutput.print(F("Initialize Wireguard... "));
-    WireguardSettings.init();
-    MessageOutput.println(F("done"));
-
     // Initialize MqTT
     MessageOutput.print(F("Initialize MqTT... "));
     MqttSettings.init();
@@ -165,6 +160,11 @@ void setup()
     } else {
         MessageOutput.println(F("Invalid pin config"));
     }
+    
+    // Initialize Wireguard
+    MessageOutput.print(F("Initialize Wireguard... "));
+    WireguardSettings.init();
+    MessageOutput.println(F("done"));
 }
 
 void loop()

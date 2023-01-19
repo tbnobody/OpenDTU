@@ -3,12 +3,15 @@
         <BootstrapAlert v-model="showAlert" dismissible :variant="alertType">
             {{ alertMessage }}
         </BootstrapAlert>
-
         <form @submit="saveWireguardConfig">
             <CardElement :text="$t('wireguardadmin.WireguardConfiguration')" textVariant="text-bg-primary">
                 <InputElement :label="$t('wireguardadmin.EnableWireguard')"
                               v-model="wireguardConfigList.wg_enabled"
                               type="checkbox" wide/>
+            </CardElement>
+            <CardElement :text="$t('wireguardadmin.WireguardParameters')" textVariant="text-bg-primary"
+                        v-show="wireguardConfigList.wg_enabled"
+            >
                 <InputElement :label="$t('wireguardadmin.EndpointAddress')"
                               v-model="wireguardConfigList.wg_endpoint_address"
                               type="text" maxlength="128"
@@ -38,8 +41,7 @@
                               type="text" maxlength="128"
                               :placeholder="$t('wireguardadmin.OpenDTUPrivateKeyHint')"/>
             </CardElement>
-
-            <button type="submit" class="btn btn-primary mb-3">{{ $t('wireguardadmin.Save') }}</button>
+            <button type="submit" class="btn btn-danger">{{ $t('wireguardadmin.SaveReboot') }}</button>
         </form>
     </BasePage>
 </template>
