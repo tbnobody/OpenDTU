@@ -83,6 +83,12 @@ bool ConfigurationClass::write()
     JsonObject device = doc.createNestedObject("device");
     device["pinmapping"] = config.Dev_PinMapping;
 
+    JsonObject display = device.createNestedObject("display");
+    display["powersafe"] = config.Display_PowerSafe;
+    display["screensaver"] = config.Display_ScreenSaver;
+    display["showlogo"] = config.Display_ShowLogo;
+    display["contrast"] = config.Display_Contrast;
+
     JsonArray inverters = doc.createNestedArray("inverters");
     for (uint8_t i = 0; i < INV_MAX_COUNT; i++) {
         JsonObject inv = inverters.createNestedObject();
@@ -206,6 +212,12 @@ bool ConfigurationClass::read()
 
     JsonObject device = doc["device"];
     strlcpy(config.Dev_PinMapping, device["pinmapping"] | DEV_PINMAPPING, sizeof(config.Dev_PinMapping));
+
+    JsonObject display = device["display"];
+    config.Display_PowerSafe = display["powersafe"] | DISPLAY_POWERSAFE;
+    config.Display_ScreenSaver = display["screensaver"] | DISPLAY_SCREENSAVER;
+    config.Display_ShowLogo = display["showlogo"] | DISPLAY_SHOWLOGO;
+    config.Display_Contrast = display["contrast"] | DISPLAY_CONTRAST;
 
     JsonArray inverters = doc["inverters"];
     for (uint8_t i = 0; i < INV_MAX_COUNT; i++) {

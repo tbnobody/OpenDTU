@@ -56,6 +56,7 @@ void setup()
         MessageOutput.print(F("migrated... "));
         Configuration.migrate();
     }
+    CONFIG_T& config = Configuration.get();
     MessageOutput.println(F("done"));
 
     // Load PinMapping
@@ -100,11 +101,14 @@ void setup()
         pin.display_clk,
         pin.display_cs,
         pin.display_reset);
+    Display.showLogo = config.Display_ShowLogo;
+    Display.enablePowerSafe = config.Display_PowerSafe;
+    Display.enableScreensaver = config.Display_ScreenSaver;
+    Display.contrast = config.Display_Contrast;
     MessageOutput.println(F("done"));
 
     // Check for default DTU serial
     MessageOutput.print(F("Check for default DTU serial... "));
-    CONFIG_T& config = Configuration.get();
     if (config.Dtu_Serial == DTU_SERIAL) {
         MessageOutput.print(F("generate serial based on ESP chip id: "));
         uint64_t dtuId = Utils::generateDtuSerial();
