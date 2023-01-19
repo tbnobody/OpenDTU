@@ -201,7 +201,7 @@ export default defineComponent({
                     var file = window.URL.createObjectURL(blob);
                     var a = document.createElement('a');
                     a.href = file;
-                    a.download = "config.json";
+                    a.download = this.backupFileSelect;
                     document.body.appendChild(a);
                     a.click();
                     a.remove();
