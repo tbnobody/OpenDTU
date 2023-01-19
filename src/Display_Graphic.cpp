@@ -61,7 +61,7 @@ void DisplayGraphicClass::printText(const char* text, uint8_t line)
     uint16_t maxHeight = _display->getHeight();
 
     // pxMovement +x (0 - 6 px)
-    uint8_t ex = (_mExtra % 7);
+    uint8_t ex = enableScreensaver ? (_mExtra % 7) : 0;
 
     // set the font size based on the display size
     switch (line) {
@@ -138,7 +138,7 @@ void DisplayGraphicClass::loop()
 
         //=====> Logo and Lighting ==========
         //   pxMovement +x (0 - 6 px)
-        uint8_t ex = (_mExtra % 7);
+        uint8_t ex = enableScreensaver ? (_mExtra % 7) : 0;
         if (isprod > 0) {
             _display->drawXBMP(5 + ex, 1, 8, 17, bmp_arrow);
             if (showLogo) {

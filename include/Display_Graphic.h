@@ -19,6 +19,7 @@ public:
     void loop();
 
     bool enablePowerSafe = true;
+    bool enableScreensaver = true;
     bool showLogo = true;
     uint8_t contrast = 60;
 
