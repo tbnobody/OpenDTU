@@ -55,6 +55,13 @@ void WebApiDeviceClass::onDeviceAdminGet(AsyncWebServerRequest* request)
     ethObj[F("type")] = pin.eth_type;
     ethObj[F("clk_mode")] = pin.eth_clk_mode;
 
+    JsonObject displayObj = curPin.createNestedObject("display");
+    displayObj[F("type")] = pin.display_type;
+    displayObj[F("data")] = pin.display_data;
+    displayObj[F("clk")] = pin.display_clk;
+    displayObj[F("cs")] = pin.display_cs;
+    displayObj[F("reset")] = pin.display_reset;
+
     response->setLength();
     request->send(response);
 }
