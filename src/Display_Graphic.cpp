@@ -134,14 +134,14 @@ void DisplayGraphicClass::loop()
         _display->clearBuffer();
 
         // set Contrast of the Display to raise the lifetime
-        _display->setContrast(dispContrast);
+        _display->setContrast(contrast);
 
         //=====> Logo and Lighting ==========
         //   pxMovement +x (0 - 6 px)
         uint8_t ex = (_mExtra % 7);
         if (isprod > 0) {
             _display->drawXBMP(5 + ex, 1, 8, 17, bmp_arrow);
-            if (dispLogo) {
+            if (showLogo) {
                 _display->drawXBMP(_display->getWidth() - 24 + ex, 2, 16, 16, bmp_logo);
             }
         }
@@ -164,8 +164,8 @@ void DisplayGraphicClass::loop()
         else {
             printText("offline", 1);
             // check if it's time to enter power saving mode
-            if (millis() - _previousMillis >= (_interval * 2) && (dispPowerSafe)) {
-                _display->setPowerSave(true);
+            if (millis() - _previousMillis >= (_interval * 2)) {
+                _display->setPowerSave(enablePowerSafe);
             }
         }
         //<=======================

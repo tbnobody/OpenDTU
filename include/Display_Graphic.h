@@ -18,9 +18,9 @@ public:
     void init(DisplayType_t type, uint8_t data, uint8_t clk, uint8_t cs, uint8_t reset);
     void loop();
 
-    bool dispPowerSafe = true;
-    bool dispLogo = true;
-    uint8_t dispContrast = 60;
+    bool enablePowerSafe = true;
+    bool showLogo = true;
+    uint8_t contrast = 60;
 
 private:
     void printText(const char* text, uint8_t line);
