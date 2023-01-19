@@ -57,6 +57,7 @@ struct CONFIG_T {
     char WiFi_Hostname[WIFI_MAX_HOSTNAME_STRLEN + 1];
 
     bool Wg_Enabled;
+    bool Wg_Refresh;
     char Wg_Endpoint_Address[15];
     byte Wg_Endpoint_Local_Ip[4];
     uint Wg_Endpoint_Port;

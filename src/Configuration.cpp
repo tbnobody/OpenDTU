@@ -176,6 +176,7 @@ bool ConfigurationClass::read()
 
     JsonObject wg = doc["wg"];
     config.Wg_Enabled = wg["enabled"] | WG_ENABLED;
+    config.Wg_Refresh = false;
     strlcpy(config.Wg_Opendtu_Public_Key, wg["opendtu_public_key"] | WG_OPENDTU_PUBLIC_KEY, sizeof(config.Wg_Opendtu_Public_Key));
     strlcpy(config.Wg_Opendtu_Private_Key, wg["opendtu_private_key"] | WG_OPENDTU_PRIVATE_KEY, sizeof(config.Wg_Opendtu_Private_Key));
     strlcpy(config.Wg_Endpoint_Address, wg["endpoint_address"] | WG_ENDPOINT_ADDRESS, sizeof(config.Wg_Endpoint_Address));

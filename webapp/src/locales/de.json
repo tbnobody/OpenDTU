@@ -355,6 +355,7 @@
     "wireguardadmin": {
         "WireguardSettings": "Wireguard Einstellungen",
         "WireguardConfiguration": "Wireguard Konfiguration",
+        "WireguardParameters" : "Wireguard Parameter",
         "Server": "Server",
         "EnableWireguard" : "Wireguard aktivieren",
         "EndpointAddress" : "Endpoint Adresse",
@@ -376,6 +377,7 @@
         "Disabled": "nicht aktiv",
         "Connected" : "verbunden",
         "Disconnected" : "getrennt",
+        "SaveReboot" : "Speichern & Neustart",
         "Save": "@:dtuadmin.Save"
     },
     "networkadmin": {
