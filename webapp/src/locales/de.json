@@ -475,6 +475,11 @@
         "SelectedProfile": "Ausgewähltes Profil:",
         "DefaultProfile": "(Standard Einstellungen)",
         "ProfileHint": "Ihr Gerät reagiert möglicherweise nicht mehr, wenn Sie ein inkompatibles Profil wählen. In diesem Fall müssen Sie eine Löschung über das serielle Interface durchführen.",
+        "Display": "Display",
+        "PowerSafe": "Power Safe aktivieren:",
+        "Screensaver": "Screensaver aktivieren:",
+        "ShowLogo": "Logo Anzeigen:",
+        "Contrast": "Kontrast ({contrast}):",
         "Save": "@:dtuadmin.Save"
     },
     "pininfo": {
