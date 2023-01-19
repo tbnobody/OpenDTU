@@ -65,6 +65,7 @@ void setup()
     } else {
         MessageOutput.print(F("using default config "));
     }
+    const PinMapping_t& pin = PinMapping.get();
     MessageOutput.println(F("done"));
 
     // Initialize WiFi
@@ -93,7 +94,12 @@ void setup()
 
     // Initialize Display
     MessageOutput.print(F("Initialize Display... "));
-    Display.init(DisplayType_t::SSD1306, SDA, SCL, 255, 255);
+    Display.init(
+        static_cast<DisplayType_t>(pin.display_type),
+        pin.display_data,
+        pin.display_clk,
+        pin.display_cs,
+        pin.display_reset);
     MessageOutput.println(F("done"));
 
     // Check for default DTU serial
@@ -114,7 +120,6 @@ void setup()
     MessageOutput.print(F("Initialize Hoymiles interface... "));
     if (PinMapping.isValidNrf24Config()) {
         SPIClass* spiClass = new SPIClass(HSPI);
-        PinMapping_t& pin = PinMapping.get();
         spiClass->begin(pin.nrf24_clk, pin.nrf24_miso, pin.nrf24_mosi, pin.nrf24_cs);
         Hoymiles.setMessageOutput(&MessageOutput);
         Hoymiles.init(spiClass, pin.nrf24_en, pin.nrf24_irq);
