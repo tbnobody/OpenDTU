@@ -15,8 +15,8 @@
             "power": -1,
             "mdc": -1,
             "mdio": -1,
-            "type": -1,
-            "clk_mode": -1
+            "type": 0,
+            "clk_mode": 0
         }
     },
     {
@@ -35,8 +35,8 @@
             "power": -1,
             "mdc": -1,
             "mdio": -1,
-            "type": -1,
-            "clk_mode": -1
+            "type": 0,
+            "clk_mode": 0
         },
         "display": {
             "type": 2,
@@ -125,8 +125,8 @@
             "power": -1,
             "mdc": -1,
             "mdio": -1,
-            "type": -1,
-            "clk_mode": -1
+            "type": 0,
+            "clk_mode": 0
         }
     },
     {
