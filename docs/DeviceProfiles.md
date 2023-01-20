@@ -31,6 +31,31 @@ To change the device profile, navigate to the "Device Manager" and selected the 
         }
     },
     {
+        "name": "Generic NodeMCU 38 pin with SSD1306",
+        "nrf24": {
+            "miso": 19,
+            "mosi": 23,
+            "clk": 18,
+            "irq": 16,
+            "en": 4,
+            "cs": 5
+        },
+        "eth": {
+            "enabled": false,
+            "phy_addr": -1,
+            "power": -1,
+            "mdc": -1,
+            "mdio": -1,
+            "type": -1,
+            "clk_mode": -1
+        },
+        "display": {
+            "type": 2,
+            "data": 21,
+            "clk": 22
+        }
+    },
+    {
         "name": "Olimex ESP32-POE",
         "nrf24": {
             "miso": 15,
@@ -54,3 +79,27 @@ To change the device profile, navigate to the "Device Manager" and selected the 
 ```
 
 The json file can contain multiple profiles. Each profile requires a name and different parameters. If one parameter is not set, the default value, as compiled into the firmware is used. The example above shows all the currently supported values. Others may follow. A sample file with a lot of boards can be found [here](pin_mapping.json). This means you can just flash the generic bin file and upload the pin_mapping.json file. Then you select your board and everything works hopyfully as expected.
+
+## Implemented configuration values
+
+| Parameter     | Data Type | Description |
+| ------------- | --------- | ----------- |
+| name          | string    | Unique name of the profile (max 63 characters) |
+| nrf24.miso    | number    | MISO Pin |
+| nrf24.mosi    | number    | MOSI Pin |
+| nrf24.clk     | number    | Clock Pin |
+| nrf24.irq     | number    | Interrupt Pin |
+| nrf24.en      | number    | Enable Pin |
+| nrf24.cs      | number    | Chip Select Pin |
+| eth.enabled   | boolean   | Enable/Disable the ethernet stack |
+| eth.phy_addr  | number    | Unique PHY addr |
+| eth.power     | number    | Power Pin (if available) |
+| eth.mdc       | number    | Serial Management Interface MDC Pin |
+| eth.mdio      | number    | Serial Management Interface MDIO Pin |
+| eth.type      | number    | Possible values:<br>* 0 = ETH_PHY_LAN8720<br>* 1 = ETH_PHY_TLK110<br>* 2 = ETH_PHY_RTL8201<br>* 3 = ETH_PHY_DP83848<br>* 4 = ETH_PHY_DM9051<br>* 5 = ETH_PHY_KSZ8041<br>* 6 = ETH_PHY_KSZ8081 |
+| eth.clk_mode  | number    | Possible values:<br>* 0 = ETH_CLOCK_GPIO0_IN<br>* 1 = ETH_CLOCK_GPIO0_OUT<br>* 2 = ETH_CLOCK_GPIO16_OUT<br>* 3 = ETH_CLOCK_GPIO17_OUT |
+| display.type  | number    | Specify type of display. Possible values:<br>* 0 = None (default)<br>* 1 = PCD8544 <br>* 2 = SSD1306 <br>* 3 = SH1106 |
+| display.data  | number    | Data Pin (e.g. SDA for i2c displays) required for all displays |
+| display.clk   | number    | Clock Pin (e.g. SCL for i2c displays) required for SSD1306 and SH1106 |
+| display.cs    | number    | Chip Select Pin required for PCD8544 |
+| display.reset | number    | Reset Pin required for PCD8544, optional for all other displays |
