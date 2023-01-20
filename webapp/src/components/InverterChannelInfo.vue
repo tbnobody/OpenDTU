@@ -19,7 +19,12 @@
                     <tr v-for="(property, key) in channelData" :key="`prop-${key}`">
                         <template v-if="key != 'name' && property">
                             <th scope="row">{{ $t('inverterchannelproperty.' + key) }}</th>
-                            <td style="text-align: right">{{ formatNumber(property.v, property.d) }}</td>
+                            <td style="text-align: right">
+                                {{ $n(property.v, 'decimal', {
+                                    minimumFractionDigits: property.d,
+                                    maximumFractionDigits: property.d})
+                                }}
+                             </td>
                             <td>{{ property.u }}</td>
                         </template>
                     </tr>
@@ -31,16 +36,12 @@
 
 <script lang="ts">
 import type { InverterStatistics } from '@/types/LiveDataStatus';
-import { formatNumber } from '@/utils';
 import { defineComponent, type PropType } from 'vue';
 
 export default defineComponent({
     props: {
         channelData: { type: Object as PropType<InverterStatistics>, required: true },
         channelNumber: { type: Number, required: true },
-    },
-    methods: {
-        formatNumber,
     },
 });
 </script>

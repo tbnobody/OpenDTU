@@ -19,11 +19,11 @@
                     </tr>
                     <tr>
                         <th>{{ $t('wifistationinfo.Quality') }}</th>
-                        <td>{{ getRSSIasQuality(networkStatus.sta_rssi) }} %</td>
+                        <td>{{ $n(getRSSIasQuality(networkStatus.sta_rssi), 'percent') }}</td>
                     </tr>
                     <tr>
                         <th>{{ $t('wifistationinfo.Rssi') }}</th>
-                        <td>{{ networkStatus.sta_rssi }}</td>
+                        <td>{{ $n(networkStatus.sta_rssi, 'decimal') }}</td>
                     </tr>
                 </tbody>
             </table>
@@ -55,7 +55,7 @@ export default defineComponent({
                 quality = 2 * (rssi + 100);
             }
 
-            return quality;
+            return quality / 100;
         },
     },
 });

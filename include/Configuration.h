@@ -19,13 +19,15 @@
 #define MQTT_MAX_PASSWORD_STRLEN 64
 #define MQTT_MAX_TOPIC_STRLEN 32
 #define MQTT_MAX_LWTVALUE_STRLEN 20
-#define MQTT_MAX_ROOT_CA_CERT_STRLEN 2048 
+#define MQTT_MAX_ROOT_CA_CERT_STRLEN 2560
 
 #define INV_MAX_NAME_STRLEN 31
 #define INV_MAX_COUNT 10
 #define INV_MAX_CHAN_COUNT 4
 
 #define CHAN_MAX_NAME_STRLEN 31
+
+#define DEV_MAX_MAPPING_NAME_STRLEN 31
 
 #define JSON_BUFFER_SIZE 6144
 
@@ -92,6 +94,8 @@ struct CONFIG_T {
 
     char Security_Password[WIFI_MAX_PASSWORD_STRLEN + 1];
     bool Security_AllowReadonly;
+
+    char Dev_PinMapping[DEV_MAX_MAPPING_NAME_STRLEN + 1];
 };
 
 class ConfigurationClass {

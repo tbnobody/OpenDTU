@@ -81,4 +81,7 @@ enum WebApiError {
     PowerBase = 11000,
     PowerSerialZero,
     PowerInvalidInverter,
+
+    HardwareBase = 12000,
+    HardwarePinMappingLength,
 };

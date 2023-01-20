@@ -8,6 +8,7 @@
         "InverterSettings": "Paramètres des onduleurs",
         "SecuritySettings": "Paramètres de sécurité",
         "DTUSettings": "Paramètres DTU",
+        "DeviceManager": "Device-Manager",
         "VedirectSettings": "Paramètres Ve.direct",
         "ConfigManagement": "Gestion de la configuration",
         "FirmwareUpgrade": "Mise à jour du firmware",
@@ -84,7 +85,8 @@
         "10001": "Le mot de passe doit comporter entre 8 et {max} caractères !",
         "10002": "Authentification réussie !",
         "11001": "@:apiresponse.2001",
-        "11002": "@:apiresponse:5004"
+        "11002": "@:apiresponse:5004",
+        "12001": "Profil must between 1 and {max} characters long!"
     },
     "home": {
         "LiveData": "Données en direct",
@@ -307,9 +309,7 @@
     "invertertotalinfo": {
         "TotalYieldTotal": "Rendement total",
         "TotalYieldDay": "Rendement du jour",
-        "TotalPower": "Puissance de l'installation",
-        "TotalVoltage": "Tension moyenne",
-        "TotalCurrent": "Courant"
+        "TotalPower": "Puissance de l'installation"
     },
     "inverterchannelproperty": {
         "Power": "Puissance",
@@ -449,6 +449,7 @@
         "InverterName": "Nom de l'onduleur :",
         "InverterNameHint": "Ici, vous pouvez spécifier un nom personnalisé pour votre onduleur.",
         "StringName": "Nom de la ligne {num}:",
+        "StringNameHint": "Ici, vous pouvez spécifier un nom personnalisé pour le port respectif de votre onduleur.",
         "StringMaxPower": "Puissance maximale de la ligne {num}:",
         "StringMaxPowerHint": "Entrez la puissance maximale des panneaux solaires connectés.",
         "InverterHint": "*) Entrez le W<sub>p</sub> du canal pour calculer l'irradiation.",
@@ -462,6 +463,8 @@
         "BackupHeader": "Sauvegarder le fichier de configuration",
         "BackupConfig": "Fichier de configuration",
         "Backup": "Sauvegarder",
+        "Restore": "Restore",
+        "NoFileSelected": "No file selected",
         "RestoreHeader": "Restaurer le fichier de configuration",
         "Back": "Retour",
         "UploadSuccess": "Succès du téléversement",
@@ -514,5 +517,20 @@
         "TimeSyncLink": "Veuillez vérifier vos paramètres horaires.",
         "DefaultPassword": "Vous utilisez le mot de passe par défaut pour l'interface Web et le point d'accès d'urgence. Ceci est potentiellement non sécurisé.",
         "DefaultPasswordLink": "Merci de changer le mot de passe."
+    },
+    "deviceadmin": {
+        "DeviceManager": "Device-Manager",
+        "PinAssignment": "Connection settings",
+        "SelectedProfile": "Selected profile:",
+        "DefaultProfile": "(Default settings)",
+        "ProfileHint": "Your device may stop responding if you select an incompatible profile. In this case, you must perform a deletion via the serial interface.",
+        "Save": "@:dtuadmin.Save"
+    },
+    "pininfo": {
+        "PinOverview": "Connection overview",
+        "Category": "Category",
+        "Name": "Name",
+        "ValueSelected": "Selected",
+        "ValueActive": "Active"
     }
 }

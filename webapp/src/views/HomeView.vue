@@ -41,11 +41,11 @@
                                     </div>
                                     <div style="padding-right: 2em;">
                                         {{ $t('home.CurrentLimit') }}<template v-if="inverter.limit_absolute > -1"> {{
-                                                formatNumber(inverter.limit_absolute, 0)
-                                        }} W | </template>{{ formatNumber(inverter.limit_relative, 0) }} %
+                                                $n(inverter.limit_absolute, 'decimalNoDigits')
+                                        }} W | </template>{{ $n(inverter.limit_relative / 100, 'percent') }}
                                     </div>
                                     <div style="padding-right: 2em;">
-                                        {{ $t('home.DataAge') }} {{ $t('home.Seconds', {'val': inverter.data_age }) }}
+                                        {{ $t('home.DataAge') }} {{ $t('home.Seconds', {'val': $n(inverter.data_age) }) }}
                                         <template v-if="inverter.data_age > 300">
                                             / {{ calculateAbsoluteTime(inverter.data_age) }}
                                         </template>
@@ -323,7 +323,6 @@ import type { EventlogItems } from '@/types/EventlogStatus';
 import type { LimitConfig } from '@/types/LimitConfig';
 import type { LimitStatus } from '@/types/LimitStatus';
 import type { Inverter, LiveData } from '@/types/LiveDataStatus';
-import { formatNumber } from '@/utils';
 import { authHeader, authUrl, handleResponse, isLoggedIn } from '@/utils/authentication';
 import * as bootstrap from 'bootstrap';
 import {
@@ -443,19 +442,20 @@ export default defineComponent({
     computed: {
         currentLimitAbsolute(): string {
             if (this.currentLimitList.max_power > 0) {
-                return formatNumber(this.currentLimitList.limit_relative * this.currentLimitList.max_power / 100, 2);
+                return this.$n(this.currentLimitList.limit_relative * this.currentLimitList.max_power / 100,
+                    'decimalTwoDigits');
             }
             return "0";
         },
         currentLimitRelative(): string {
-            return formatNumber(this.currentLimitList.limit_relative, 2);
+            return this.$n(this.currentLimitList.limit_relative,
+                'decimalTwoDigits');
         },
         inverterData(): Inverter[] {
             return this.liveData.inverters;
         }
     },
     methods: {
-        formatNumber,
         isLoggedIn,
         getInitialData() {
             this.dataLoading = true;

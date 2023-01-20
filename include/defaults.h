@@ -79,6 +79,8 @@
 #define MQTT_HASS_TOPIC "homeassistant/"
 #define MQTT_HASS_INDIVIDUALPANELS false
 
+#define DEV_PINMAPPING ""
+
 #define VEDIRECT_ENABLED false
 #define VEDIRECT_UPDATESONLY true
 #define VEDIRECT_POLL_INTERVAL 5
