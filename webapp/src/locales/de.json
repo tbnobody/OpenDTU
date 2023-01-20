@@ -480,7 +480,7 @@
         "PowerSafeHint": "Schaltet das Display aus wenn kein Wechselrichter produziert",
         "Screensaver": "Screensaver aktivieren:",
         "ScreensaverHint": "Bewegt die Ausgabe bei jeder Aktualisierung um ein Einbrennen zu verhindern. (Nützlich v.a. für OLED Displays)",
-        "ShowLogo": "Logo Anzeigen:",
+        "ShowLogo": "Logo anzeigen:",
         "Contrast": "Kontrast ({contrast}):",
         "Save": "@:dtuadmin.Save"
     },
