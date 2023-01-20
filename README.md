@@ -64,7 +64,8 @@ Firmware version seems to play not a significant role and cannot be read from th
 ## Hardware you need
 
 ### ESP32 board
-For ease of use, buy a "ESP32 DEVKIT DOIT" or "ESP32 NodeMCU Development Board" with an ESP32-S3 or ESP-WROOM-32 chipset on it.
+For ease of use, buy a "ESP32 DEVKIT DOIT" or "ESP32 NodeMCU Development Board" with an ESP32-S3 or ESP-WROOM-32 chipset on it. 
+There are different models on the market with different PIN layouts. Please be careful before connecting them to the NRF24L01+ module and check the labeling pins on the ESP32 Developer Board.
 
 Sample Picture:
 
@@ -93,13 +94,29 @@ This list is for your convenience only, the project is not related to any of the
 ### Power supply
 Use a power suppy with 5 V and 1 A. The USB cable connected to your PC/Notebook may be powerful enough or may be not.
 
-
 ## Wiring up
 ### Schematic
 ![Schematic](docs/Wiring_ESP32_Schematic.png)
 
 ### Symbolic view
 ![Symbolic](docs/Wiring_ESP32_Symbol.png)
+
+### alternative PIN-Layout
+![Schematic](docs/nodemcu-esp32_devkitv1.png)
+
+
+### Wiring schema
+
+| ESP32 Board | nRF24L01+ Board |
+|-------------|-----------|
+| 3,3V        | VCC  |
+| GPIO23      | MOSI  |
+| GPIO19      | MISO  |
+| GPIO18      | SCK  |
+| GPIO5       | CS  |
+| GPIO16      | IRQ  |
+| GPIO4       | CE  |
+| GND         | GND  |
 
 ### Change pin assignment
 Its possible to change all the pins of the NRF24L01+ module.
@@ -115,7 +132,13 @@ This can be achieved by copying one of the [env:....] sections from 'platformio.
 It is recommended to make all changes only in the  'platformio_override.ini', this is your personal copy.
 You can also change  the pins by creating a custom [device profile](docs/DeviceProfiles.md).
 
+
+
 ## Flashing and starting up
+### prerequisites
+* Install CP210x USB to UART Bridge VCP device drivers (Windows / Mac OSX) from [Silicon Labs Software Download Page](https://www.silabs.com/developers/usb-to-uart-bridge-vcp-drivers?tab=downloads) 
+* connect developer board's micro-usb port to computer
+
 ### with Visual Studio Code
 * Install [Visual Studio Code](https://code.visualstudio.com/download) (from now named "vscode")
 * In Visual Studio Code, install the [PlatformIO Extension](https://marketplace.visualstudio.com/items?itemName=platformio.platformio-ide)
