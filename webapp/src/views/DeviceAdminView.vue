@@ -50,10 +50,12 @@
                     <div class="card">
                         <div class="card-body">
                             <InputElement :label="$t('deviceadmin.PowerSafe')"
-                                v-model="deviceConfigList.display.power_safe" type="checkbox" />
+                                v-model="deviceConfigList.display.power_safe" type="checkbox"
+                                :tooltip="$t('deviceadmin.PowerSafeHint')" />
 
                             <InputElement :label="$t('deviceadmin.Screensaver')"
-                                v-model="deviceConfigList.display.screensaver" type="checkbox" />
+                                v-model="deviceConfigList.display.screensaver" type="checkbox"
+                                :tooltip="$t('deviceadmin.ScreensaverHint')" />
 
                             <InputElement :label="$t('deviceadmin.ShowLogo')"
                                 v-model="deviceConfigList.display.show_logo" type="checkbox" />
@@ -96,7 +98,7 @@ export default defineComponent({
         BootstrapAlert,
         InputElement,
         PinInfo,
-    },
+        },
     data() {
         return {
             dataLoading: true,
