@@ -51,6 +51,7 @@ Firmware version seems to play not a significant role and cannot be read from th
 * Ethernet support
 * Prometheus API endpoint (/api/prometheus/metrics)
 * English, german and french web interface
+* Displays (SSD1306, SH1106, PCD8544)
 
 ## Features for developers
 * The microcontroller part
