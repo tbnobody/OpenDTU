@@ -444,7 +444,7 @@
         "Back": "Zurück",
         "Retry": "Wiederholen",
         "OtaStatus": "OTA Status",
-        "OtaSuccess": "OTA Erfolgreich. Das Gerät wurde automatisch neu gestartet und wird in wenigen Augenblicken wieder zur Verfügung stehen.",
+        "OtaSuccess": "OTA Erfolgreich. Das Gerät wurde automatisch neu gestartet und wird in wenigen Augenblicken wieder zur Verfügung stehen. Bitte nicht vergessen die Weboberfläche neu zu laden!",
         "FirmwareUpload": "Firmware hochladen",
         "UploadProgress": "Hochlade Fortschritt"
     },

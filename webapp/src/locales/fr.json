@@ -444,7 +444,7 @@
         "Back": "Retour",
         "Retry": "Réessayer",
         "OtaStatus": "Statut OTA",
-        "OtaSuccess": "Succès de l'OTA. L'unité a été automatiquement redémarrée et sera à nouveau disponible dans quelques instants.",
+        "OtaSuccess": "Succès de l'OTA. L'unité a été automatiquement redémarrée et sera à nouveau disponible dans quelques instants. N'oubliez pas de recharger l'interface web !",
         "FirmwareUpload": "Téléversement du firmware",
         "UploadProgress": "Progression du téléversement"
     },

@@ -444,7 +444,7 @@
         "Back": "Back",
         "Retry": "Retry",
         "OtaStatus": "OTA Status",
-        "OtaSuccess": "OTA Success. The unit has been automatically restarted and will be available again in a few moments.",
+        "OtaSuccess": "OTA Success. The unit has been automatically restarted and will be available again in a few moments. Please do not forget to reload the web interface!",
         "FirmwareUpload": "Firmware Upload",
         "UploadProgress": "Upload Progress"
     },
