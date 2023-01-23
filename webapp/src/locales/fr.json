@@ -9,7 +9,7 @@
         "InverterSettings": "Paramètres des onduleurs",
         "SecuritySettings": "Paramètres de sécurité",
         "DTUSettings": "Paramètres DTU",
-        "DeviceManager": "Device-Manager",
+        "DeviceManager": "Gestionnaire de périphériques",
         "ConfigManagement": "Gestion de la configuration",
         "FirmwareUpgrade": "Mise à jour du firmware",
         "DeviceReboot": "Redémarrage de l'appareil",
@@ -86,7 +86,7 @@
         "10002": "Authentification réussie !",
         "11001": "@:apiresponse.2001",
         "11002": "@:apiresponse:5004",
-        "12001": "Profil must between 1 and {max} characters long!"
+        "12001": "Le profil doit comporter entre 1 et {max} caractères !"
     },
     "home": {
         "LiveData": "Données en direct",
@@ -490,7 +490,7 @@
         "Back": "Retour",
         "Retry": "Réessayer",
         "OtaStatus": "Statut OTA",
-        "OtaSuccess": "Succès de l'OTA. L'unité a été automatiquement redémarrée et sera à nouveau disponible dans quelques instants.",
+        "OtaSuccess": "Succès de l'OTA. L'unité a été automatiquement redémarrée et sera à nouveau disponible dans quelques instants. N'oubliez pas de recharger l'interface web !",
         "FirmwareUpload": "Téléversement du firmware",
         "UploadProgress": "Progression du téléversement"
     },
@@ -516,25 +516,25 @@
         "DefaultPasswordLink": "Merci de changer le mot de passe."
     },
     "deviceadmin": {
-        "DeviceManager": "Device-Manager",
-        "PinAssignment": "Connection settings",
-        "SelectedProfile": "Selected profile:",
-        "DefaultProfile": "(Default settings)",
-        "ProfileHint": "Your device may stop responding if you select an incompatible profile. In this case, you must perform a deletion via the serial interface.",
-        "Display": "Display",
-        "PowerSafe": "Enable Power Safe:",
-        "PowerSafeHint": "Turn off the display if no inverter is producing.",
-        "Screensaver": "Enable Screensaver:",
-        "ScreensaverHint": "Move the display a little bit on each update to prevent burn-in. (Useful especially for OLED displays)",
-        "ShowLogo": "Show Logo:",
-        "Contrast": "Contrast ({contrast}):",
+        "DeviceManager": "Gestionnaire de périphériques",
+        "PinAssignment": "Paramètres de connexion",
+        "SelectedProfile": "Profil sélectionné",
+        "DefaultProfile": "(Réglages par défaut)",
+        "ProfileHint": "Votre appareil peut cesser de répondre si vous sélectionnez un profil incompatible. Dans ce cas, vous devez effectuer une suppression via l'interface série.",
+        "Display": "Affichage",
+        "PowerSafe": "Activer l'économiseur d'énergie",
+        "PowerSafeHint": "Eteindre l'écran si aucun onduleur n'est en production.",
+        "Screensaver": "Activer l'écran de veille",
+        "ScreensaverHint": "Déplacez un peu l'écran à chaque mise à jour pour éviter le phénomène de brûlure. (Utile surtout pour les écrans OLED)",
+        "ShowLogo": "Afficher le logo",
+        "Contrast": "Contraste ({contrast}):",
         "Save": "@:dtuadmin.Save"
     },
     "pininfo": {
-        "PinOverview": "Connection overview",
-        "Category": "Category",
-        "Name": "Name",
-        "ValueSelected": "Selected",
-        "ValueActive": "Active"
+        "PinOverview": "Vue d'ensemble des connexions",
+        "Category": "Catégorie",
+        "Name": "Nom",
+        "ValueSelected": "Sélectionné",
+        "ValueActive": "Activé"
     }
 }
