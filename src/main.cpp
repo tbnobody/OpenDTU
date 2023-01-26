@@ -3,6 +3,7 @@
  * Copyright (C) 2022 Thomas Basler and others
  */
 #include "Configuration.h"
+#include "Display_Graphic.h"
 #include "MessageOutput.h"
 #include "VeDirectFrameHandler.h"
 #include "MqttHandleDtu.h"
@@ -57,6 +58,7 @@ void setup()
         MessageOutput.print(F("migrated... "));
         Configuration.migrate();
     }
+    CONFIG_T& config = Configuration.get();
     MessageOutput.println(F("done"));
 
     // Load PinMapping
@@ -66,6 +68,7 @@ void setup()
     } else {
         MessageOutput.print(F("using default config "));
     }
+    const PinMapping_t& pin = PinMapping.get();
     MessageOutput.println(F("done"));
 
     // Initialize WiFi
@@ -93,9 +96,22 @@ void setup()
     WebApi.init();
     MessageOutput.println(F("done"));
 
+    // Initialize Display
+    MessageOutput.print(F("Initialize Display... "));
+    Display.init(
+        static_cast<DisplayType_t>(pin.display_type),
+        pin.display_data,
+        pin.display_clk,
+        pin.display_cs,
+        pin.display_reset);
+    Display.showLogo = config.Display_ShowLogo;
+    Display.enablePowerSafe = config.Display_PowerSafe;
+    Display.enableScreensaver = config.Display_ScreenSaver;
+    Display.contrast = config.Display_Contrast;
+    MessageOutput.println(F("done"));
+
     // Check for default DTU serial
     MessageOutput.print(F("Check for default DTU serial... "));
-    CONFIG_T& config = Configuration.get();
     if (config.Dtu_Serial == DTU_SERIAL) {
         MessageOutput.print(F("generate serial based on ESP chip id: "));
         uint64_t dtuId = Utils::generateDtuSerial();
@@ -111,7 +127,6 @@ void setup()
     MessageOutput.print(F("Initialize Hoymiles interface... "));
     if (PinMapping.isValidNrf24Config()) {
         SPIClass* spiClass = new SPIClass(HSPI);
-        PinMapping_t& pin = PinMapping.get();
         spiClass->begin(pin.nrf24_clk, pin.nrf24_miso, pin.nrf24_mosi, pin.nrf24_cs);
         Hoymiles.setMessageOutput(&MessageOutput);
         Hoymiles.init(spiClass, pin.nrf24_en, pin.nrf24_irq);
@@ -176,6 +191,8 @@ void loop()
     MqttHandleHass.loop();
     yield();
     WebApi.loop();
+    yield();
+    Display.loop();
     yield();
     MessageOutput.loop();
     yield();

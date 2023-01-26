@@ -10,6 +10,26 @@
 
 #define JSON_BUFFER_SIZE 6144
 
+#ifndef DISPLAY_TYPE
+#define DISPLAY_TYPE 0
+#endif
+
+#ifndef DISPLAY_DATA
+#define DISPLAY_DATA 255
+#endif
+
+#ifndef DISPLAY_CLK
+#define DISPLAY_CLK 255
+#endif
+
+#ifndef DISPLAY_CS
+#define DISPLAY_CS 255
+#endif
+
+#ifndef DISPLAY_RESET
+#define DISPLAY_RESET 255
+#endif
+
 PinMappingClass PinMapping;
 
 PinMappingClass::PinMappingClass()
@@ -34,6 +54,13 @@ PinMappingClass::PinMappingClass()
     _pinMapping.eth_mdio = ETH_PHY_MDIO;
     _pinMapping.eth_type = ETH_PHY_TYPE;
     _pinMapping.eth_clk_mode = ETH_CLK_MODE;
+
+    _pinMapping.display_type = DISPLAY_TYPE;
+    _pinMapping.display_data = DISPLAY_DATA;
+    _pinMapping.display_clk = DISPLAY_CLK;
+    _pinMapping.display_cs = DISPLAY_CS;
+    _pinMapping.display_reset = DISPLAY_RESET;
+
 }
 
 PinMapping_t& PinMappingClass::get()
@@ -79,6 +106,12 @@ bool PinMappingClass::init(const String& deviceMapping)
             _pinMapping.eth_mdio = doc[i]["eth"]["mdio"] | ETH_PHY_MDIO;
             _pinMapping.eth_type = doc[i]["eth"]["type"] | ETH_PHY_TYPE;
             _pinMapping.eth_clk_mode = doc[i]["eth"]["clk_mode"] | ETH_CLK_MODE;
+
+            _pinMapping.display_type = doc[i]["display"]["type"] | DISPLAY_TYPE;
+            _pinMapping.display_data = doc[i]["display"]["data"] | DISPLAY_DATA;
+            _pinMapping.display_clk = doc[i]["display"]["clk"] | DISPLAY_CLK;
+            _pinMapping.display_cs = doc[i]["display"]["cs"] | DISPLAY_CS;
+            _pinMapping.display_reset = doc[i]["display"]["reset"] | DISPLAY_RESET;
 
             return true;
         }

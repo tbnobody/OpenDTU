@@ -24,6 +24,11 @@ struct PinMapping_t {
     int eth_mdio;
     eth_phy_type_t eth_type;
     eth_clock_mode_t eth_clk_mode;
+    uint8_t display_type;
+    uint8_t display_data;
+    uint8_t display_clk;
+    uint8_t display_cs;
+    uint8_t display_reset;
 };
 
 class PinMappingClass {

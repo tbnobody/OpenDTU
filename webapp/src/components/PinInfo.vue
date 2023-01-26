@@ -80,6 +80,33 @@
                         <td>{{ currentPinAssignment?.eth?.clk_mode }}</td>
                     </tr>
 
+                    <tr>
+                        <td rowspan="6">Display</td>
+                        <td>type</td>
+                        <td>{{ selectedPinAssignment?.display?.type }}</td>
+                        <td>{{ currentPinAssignment?.display?.type }}</td>
+                    </tr>
+                    <tr>
+                        <td>data</td>
+                        <td>{{ selectedPinAssignment?.display?.data }}</td>
+                        <td>{{ currentPinAssignment?.display?.data }}</td>
+                    </tr>
+                    <tr>
+                        <td>clk</td>
+                        <td>{{ selectedPinAssignment?.display?.clk }}</td>
+                        <td>{{ currentPinAssignment?.display?.clk }}</td>
+                    </tr>
+                    <tr>
+                        <td>cs</td>
+                        <td>{{ selectedPinAssignment?.display?.cs }}</td>
+                        <td>{{ currentPinAssignment?.display?.cs }}</td>
+                    </tr>
+                    <tr>
+                        <td>reset</td>
+                        <td>{{ selectedPinAssignment?.display?.reset }}</td>
+                        <td>{{ currentPinAssignment?.display?.reset }}</td>
+                    </tr>
+
                 </tbody>
             </table>
         </div>

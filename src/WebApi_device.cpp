@@ -4,6 +4,7 @@
  */
 #include "WebApi_device.h"
 #include "Configuration.h"
+#include "Display_Graphic.h"
 #include "PinMapping.h"
 #include "WebApi.h"
 #include "WebApi_errors.h"
@@ -38,22 +39,35 @@ void WebApiDeviceClass::onDeviceAdminGet(AsyncWebServerRequest* request)
     JsonObject curPin = root.createNestedObject("curPin");
     curPin[F("name")] = config.Dev_PinMapping;
 
-    JsonObject nrfObj = curPin.createNestedObject("nrf24");
-    nrfObj[F("clk")] = pin.nrf24_clk;
-    nrfObj[F("cs")] = pin.nrf24_cs;
-    nrfObj[F("en")] = pin.nrf24_en;
-    nrfObj[F("irq")] = pin.nrf24_irq;
-    nrfObj[F("miso")] = pin.nrf24_miso;
-    nrfObj[F("mosi")] = pin.nrf24_mosi;
+    JsonObject nrfPinObj = curPin.createNestedObject("nrf24");
+    nrfPinObj[F("clk")] = pin.nrf24_clk;
+    nrfPinObj[F("cs")] = pin.nrf24_cs;
+    nrfPinObj[F("en")] = pin.nrf24_en;
+    nrfPinObj[F("irq")] = pin.nrf24_irq;
+    nrfPinObj[F("miso")] = pin.nrf24_miso;
+    nrfPinObj[F("mosi")] = pin.nrf24_mosi;
 
-    JsonObject ethObj = curPin.createNestedObject("eth");
-    ethObj[F("enabled")] = pin.eth_enabled;
-    ethObj[F("phy_addr")] = pin.eth_phy_addr;
-    ethObj[F("power")] = pin.eth_power;
-    ethObj[F("mdc")] = pin.eth_mdc;
-    ethObj[F("mdio")] = pin.eth_mdio;
-    ethObj[F("type")] = pin.eth_type;
-    ethObj[F("clk_mode")] = pin.eth_clk_mode;
+    JsonObject ethPinObj = curPin.createNestedObject("eth");
+    ethPinObj[F("enabled")] = pin.eth_enabled;
+    ethPinObj[F("phy_addr")] = pin.eth_phy_addr;
+    ethPinObj[F("power")] = pin.eth_power;
+    ethPinObj[F("mdc")] = pin.eth_mdc;
+    ethPinObj[F("mdio")] = pin.eth_mdio;
+    ethPinObj[F("type")] = pin.eth_type;
+    ethPinObj[F("clk_mode")] = pin.eth_clk_mode;
+
+    JsonObject displayPinObj = curPin.createNestedObject("display");
+    displayPinObj[F("type")] = pin.display_type;
+    displayPinObj[F("data")] = pin.display_data;
+    displayPinObj[F("clk")] = pin.display_clk;
+    displayPinObj[F("cs")] = pin.display_cs;
+    displayPinObj[F("reset")] = pin.display_reset;
+
+    JsonObject display = root.createNestedObject("display");
+    display[F("show_logo")] = config.Display_ShowLogo;
+    display[F("power_safe")] = config.Display_PowerSafe;
+    display[F("screensaver")] = config.Display_ScreenSaver;
+    display[F("contrast")] = config.Display_Contrast;
 
     response->setLength();
     request->send(response);
@@ -98,7 +112,7 @@ void WebApiDeviceClass::onDeviceAdminPost(AsyncWebServerRequest* request)
         return;
     }
 
-    if (!(root.containsKey("curPin"))) {
+    if (!(root.containsKey("curPin") || root.containsKey("display"))) {
         retMsg[F("message")] = F("Values are missing!");
         retMsg[F("code")] = WebApiError::GenericValueMissing;
         response->setLength();
@@ -116,7 +130,19 @@ void WebApiDeviceClass::onDeviceAdminPost(AsyncWebServerRequest* request)
     }
 
     CONFIG_T& config = Configuration.get();
+    bool performRestart = root[F("curPin")][F("name")].as<String>() != config.Dev_PinMapping;
+
     strlcpy(config.Dev_PinMapping, root[F("curPin")][F("name")].as<String>().c_str(), sizeof(config.Dev_PinMapping));
+    config.Display_ShowLogo = root[F("display")][F("show_logo")].as<bool>();
+    config.Display_PowerSafe = root[F("display")][F("power_safe")].as<bool>();
+    config.Display_ScreenSaver = root[F("display")][F("screensaver")].as<bool>();
+    config.Display_Contrast = root[F("display")][F("contrast")].as<uint8_t>();
+
+    Display.showLogo = config.Display_ShowLogo;
+    Display.enablePowerSafe = config.Display_PowerSafe;
+    Display.enableScreensaver = config.Display_ScreenSaver;
+    Display.contrast = config.Display_Contrast;
+
     Configuration.write();
 
     retMsg[F("type")] = F("success");
@@ -126,8 +152,10 @@ void WebApiDeviceClass::onDeviceAdminPost(AsyncWebServerRequest* request)
     response->setLength();
     request->send(response);
 
-    yield();
-    delay(1000);
-    yield();
-    ESP.restart();
+    if (performRestart) {
+        yield();
+        delay(1000);
+        yield();
+        ESP.restart();
+    }
 }

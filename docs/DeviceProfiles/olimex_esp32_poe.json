@@ -1,0 +1,72 @@
+[
+    {
+        "name": "Olimex ESP32-POE",
+        "nrf24": {
+            "miso": 15,
+            "mosi": 2,
+            "clk": 14,
+            "irq": 13,
+            "en": 16,
+            "cs": 5
+        },
+        "eth": {
+            "enabled": true,
+            "phy_addr": 0,
+            "power": 12,
+            "mdc": 23,
+            "mdio": 18,
+            "type": 0,
+            "clk_mode": 3
+        }
+    },
+    {
+        "name": "Olimex ESP32-POE with SSD1306",
+        "nrf24": {
+            "miso": 15,
+            "mosi": 2,
+            "clk": 14,
+            "irq": 13,
+            "en": 16,
+            "cs": 5
+        },
+        "eth": {
+            "enabled": true,
+            "phy_addr": 0,
+            "power": 12,
+            "mdc": 23,
+            "mdio": 18,
+            "type": 0,
+            "clk_mode": 3
+        },
+        "display": {
+            "type": 2,
+            "data": 33,
+            "clk": 32
+        }
+    },
+    {
+        "name": "Olimex ESP32-POE with SH1106",
+        "nrf24": {
+            "miso": 15,
+            "mosi": 2,
+            "clk": 14,
+            "irq": 13,
+            "en": 16,
+            "cs": 5
+        },
+        "eth": {
+            "enabled": true,
+            "phy_addr": 0,
+            "power": 12,
+            "mdc": 23,
+            "mdio": 18,
+            "type": 0,
+            "clk_mode": 3
+        },
+        "display": {
+            "type": 2,
+            "data": 33,
+            "clk": 32
+        }
+    }
+]

@@ -27,7 +27,7 @@
 
 #define CHAN_MAX_NAME_STRLEN 31
 
-#define DEV_MAX_MAPPING_NAME_STRLEN 31
+#define DEV_MAX_MAPPING_NAME_STRLEN 63
 
 #define JSON_BUFFER_SIZE 6144
 
@@ -96,6 +96,11 @@ struct CONFIG_T {
     bool Security_AllowReadonly;
 
     char Dev_PinMapping[DEV_MAX_MAPPING_NAME_STRLEN + 1];
+
+    bool Display_PowerSafe;
+    bool Display_ScreenSaver;
+    bool Display_ShowLogo;
+    uint8_t Display_Contrast;
 };
 
 class ConfigurationClass {

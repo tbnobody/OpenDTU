@@ -17,10 +17,19 @@ export interface Ethernet {
     clk_mode: number;
 }
 
+export interface Display {
+    type: number;
+    data: number;
+    clk: number;
+    cs: number;
+    reset: number;
+}
+
 export interface Device  {
     name: string;
     nrf24: Nrf24;
     eth: Ethernet;
+    display: Display;
 }
 
 export interface PinMapping extends Array<Device>{}
