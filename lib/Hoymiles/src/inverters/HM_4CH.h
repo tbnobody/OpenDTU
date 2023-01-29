@@ -8,11 +8,10 @@ public:
     explicit HM_4CH(uint64_t serial);
     static bool isValidSerial(uint64_t serial);
     String typeName();
-    const byteAssign_t* getByteAssignment();
-    uint8_t getAssignmentCount();
+    const std::list<byteAssign_t>* getByteAssignment();
 
 private:
-    const byteAssign_t byteAssignment[36] = {
+    const std::list<byteAssign_t> byteAssignment = {
         { CH1, FLD_UDC, UNIT_V, 2, 2, 10, false, 1 },
         { CH1, FLD_IDC, UNIT_A, 4, 2, 100, false, 2 },
         { CH1, FLD_PDC, UNIT_W, 8, 2, 10, false, 1 },

@@ -28,10 +28,9 @@ const calcFunc_t calcFunctions[] = {
     { CALC_IRR_CH, &calcIrradiation }
 };
 
-void StatisticsParser::setByteAssignment(const byteAssign_t* byteAssignment, const uint8_t count)
+void StatisticsParser::setByteAssignment(const std::list<byteAssign_t>* byteAssignment)
 {
     _byteAssignment = byteAssignment;
-    _byteAssignmentCount = count;
 }
 
 void StatisticsParser::clearBuffer()
@@ -50,31 +49,26 @@ void StatisticsParser::appendFragment(uint8_t offset, uint8_t* payload, uint8_t 
     _statisticLength += len;
 }
 
-uint8_t StatisticsParser::getAssignIdxByChannelField(uint8_t channel, uint8_t fieldId)
+const byteAssign_t* StatisticsParser::getAssignmentByChannelField(uint8_t channel, uint8_t fieldId)
 {
-    const byteAssign_t* b = _byteAssignment;
-
-    uint8_t pos;
-    for (pos = 0; pos < _byteAssignmentCount; pos++) {
-        if (b[pos].ch == channel && b[pos].fieldId == fieldId) {
-            return pos;
+    for (auto const& i : *_byteAssignment) {
+        if (i.ch == channel && i.fieldId == fieldId) {
+            return &i;
         }
     }
-    return 0xff;
+    return NULL;
 }
 
 float StatisticsParser::getChannelFieldValue(uint8_t channel, uint8_t fieldId)
 {
-    uint8_t pos = getAssignIdxByChannelField(channel, fieldId);
-    if (pos == 0xff) {
+    const byteAssign_t* pos = getAssignmentByChannelField(channel, fieldId);
+    if (pos == NULL) {
         return 0;
     }
 
-    const byteAssign_t* b = _byteAssignment;
-
-    uint8_t ptr = b[pos].start;
-    uint8_t end = ptr + b[pos].num;
-    uint16_t div = b[pos].div;
+    uint8_t ptr = pos->start;
+    uint8_t end = ptr + pos->num;
+    uint16_t div = pos->div;
 
     if (CMD_CALC != div) {
         // Value is a static value
@@ -85,9 +79,9 @@ float StatisticsParser::getChannelFieldValue(uint8_t channel, uint8_t fieldId)
         } while (++ptr != end);
 
         float result;
-        if (b[pos].isSigned && b[pos].num == 2) {
+        if (pos->isSigned && pos->num == 2) {
             result = static_cast<float>(static_cast<int16_t>(val));
-        } else if (b[pos].isSigned && b[pos].num == 4) {
+        } else if (pos->isSigned && pos->num == 4) {
             result = static_cast<float>(static_cast<int32_t>(val));
         } else {
             result = static_cast<float>(val);
@@ -97,7 +91,7 @@ float StatisticsParser::getChannelFieldValue(uint8_t channel, uint8_t fieldId)
         return result;
     } else {
         // Value has to be calculated
-        return calcFunctions[b[pos].start].func(this, b[pos].num);
+        return calcFunctions[pos->start].func(this, pos->num);
     }
 
     return 0;
@@ -105,39 +99,34 @@ float StatisticsParser::getChannelFieldValue(uint8_t channel, uint8_t fieldId)
 
 bool StatisticsParser::hasChannelFieldValue(uint8_t channel, uint8_t fieldId)
 {
-    uint8_t pos = getAssignIdxByChannelField(channel, fieldId);
-    return pos != 0xff;
+    const byteAssign_t* pos = getAssignmentByChannelField(channel, fieldId);
+    return pos != NULL;
 }
 
 const char* StatisticsParser::getChannelFieldUnit(uint8_t channel, uint8_t fieldId)
 {
-    uint8_t pos = getAssignIdxByChannelField(channel, fieldId);
-    const byteAssign_t* b = _byteAssignment;
-
-    return units[b[pos].unitId];
+    const byteAssign_t* pos = getAssignmentByChannelField(channel, fieldId);
+    return units[pos->unitId];
 }
 
 const char* StatisticsParser::getChannelFieldName(uint8_t channel, uint8_t fieldId)
 {
-    uint8_t pos = getAssignIdxByChannelField(channel, fieldId);
-    const byteAssign_t* b = _byteAssignment;
-
-    return fields[b[pos].fieldId];
+    const byteAssign_t* pos = getAssignmentByChannelField(channel, fieldId);
+    return fields[pos->fieldId];
 }
 
 uint8_t StatisticsParser::getChannelFieldDigits(uint8_t channel, uint8_t fieldId)
 {
-    uint8_t pos = getAssignIdxByChannelField(channel, fieldId);
-    return _byteAssignment[pos].digits;
+    const byteAssign_t* pos = getAssignmentByChannelField(channel, fieldId);
+    return pos->digits;
 }
 
 uint8_t StatisticsParser::getChannelCount()
 {
-    const byteAssign_t* b = _byteAssignment;
     uint8_t cnt = 0;
-    for (uint8_t pos = 0; pos < _byteAssignmentCount; pos++) {
-        if (b[pos].ch > cnt) {
-            cnt = b[pos].ch;
+    for (auto const &b: *_byteAssignment) {
+        if (b.ch > cnt) {
+            cnt = b.ch;
         }
     }
 

@@ -3,6 +3,7 @@
 #include "Parser.h"
 #include <Arduino.h>
 #include <cstdint>
+#include <list>
 
 #define STATISTIC_PACKET_SIZE (4 * 16)
 
@@ -78,9 +79,9 @@ public:
     void clearBuffer();
     void appendFragment(uint8_t offset, uint8_t* payload, uint8_t len);
 
-    void setByteAssignment(const byteAssign_t* byteAssignment, const uint8_t count);
+    void setByteAssignment(const std::list<byteAssign_t>* byteAssignment);
 
-    uint8_t getAssignIdxByChannelField(uint8_t channel, uint8_t fieldId);
+    const byteAssign_t* getAssignmentByChannelField(uint8_t channel, uint8_t fieldId);
     float getChannelFieldValue(uint8_t channel, uint8_t fieldId);
     bool hasChannelFieldValue(uint8_t channel, uint8_t fieldId);
     const char* getChannelFieldUnit(uint8_t channel, uint8_t fieldId);
@@ -101,8 +102,7 @@ private:
     uint8_t _statisticLength = 0;
     uint16_t _chanMaxPower[CH4];
 
-    const byteAssign_t* _byteAssignment;
-    uint8_t _byteAssignmentCount;
+    const std::list<byteAssign_t>* _byteAssignment;
 
     uint32_t _rxFailureCount = 0;
 };
