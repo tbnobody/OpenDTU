@@ -115,9 +115,9 @@ void MqttHandleHassClass::publishField(std::shared_ptr<InverterAbstract> inv, ui
         root[F("stat_t")] = stateTopic;
         root[F("uniq_id")] = serial + "_ch" + String(channel) + "_" + fieldName;
 
-        String unit_of_meausure = inv->Statistics()->getChannelFieldUnit(channel, fieldType.fieldId);
-        if (unit_of_meausure != "") {
-            root[F("unit_of_meas")] = unit_of_meausure;
+        String unit_of_measure = inv->Statistics()->getChannelFieldUnit(channel, fieldType.fieldId);
+        if (unit_of_measure != "") {
+            root[F("unit_of_meas")] = unit_of_measure;
         }
 
         JsonObject deviceObj = root.createNestedObject("dev");
