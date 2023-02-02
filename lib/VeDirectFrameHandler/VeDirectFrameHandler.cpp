@@ -56,9 +56,9 @@ VeDirectFrameHandler::VeDirectFrameHandler() :
 {
 }
 
-void VeDirectFrameHandler::init()
+void VeDirectFrameHandler::init(int8_t rx, int8_t tx)
 {
-    VedirectSerial.begin(19200, SERIAL_8N1, VICTRON_PIN_RX, VICTRON_PIN_TX);
+    VedirectSerial.begin(19200, SERIAL_8N1, rx, tx);
     VedirectSerial.flush();
 }
 

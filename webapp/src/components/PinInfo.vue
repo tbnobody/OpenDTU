@@ -81,7 +81,7 @@
                     </tr>
 
                     <tr>
-                        <td rowspan="6">Display</td>
+                        <td rowspan="5">Display</td>
                         <td>type</td>
                         <td>{{ selectedPinAssignment?.display?.type }}</td>
                         <td>{{ currentPinAssignment?.display?.type }}</td>
@@ -105,6 +105,18 @@
                         <td>reset</td>
                         <td>{{ selectedPinAssignment?.display?.reset }}</td>
                         <td>{{ currentPinAssignment?.display?.reset }}</td>
+                    </tr>
+
+                    <tr>
+                        <td rowspan="2">Victron</td>
+                        <td>RX</td>
+                        <td>{{ selectedPinAssignment?.victron?.rx }}</td>
+                        <td>{{ currentPinAssignment?.victron?.rx }}</td>
+                    </tr>
+                    <tr>
+                        <td>TX</td>
+                        <td>{{ selectedPinAssignment?.victron?.tx }}</td>
+                        <td>{{ currentPinAssignment?.victron?.tx }}</td>
                     </tr>
 
                 </tbody>

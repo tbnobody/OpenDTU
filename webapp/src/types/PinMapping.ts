@@ -25,11 +25,17 @@ export interface Display {
     reset: number;
 }
 
+export interface Victron {
+    rx: number;
+    tx: number;
+}
+
 export interface Device  {
     name: string;
     nrf24: Nrf24;
     eth: Ethernet;
     display: Display;
+    victron: Victron;
 }
 
 export interface PinMapping extends Array<Device>{}

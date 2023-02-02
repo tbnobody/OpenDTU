@@ -60,6 +60,9 @@ PinMappingClass::PinMappingClass()
     _pinMapping.display_clk = DISPLAY_CLK;
     _pinMapping.display_cs = DISPLAY_CS;
     _pinMapping.display_reset = DISPLAY_RESET;
+   
+    _pinMapping.victron_tx = VICTRON_PIN_TX;
+    _pinMapping.victron_rx = VICTRON_PIN_RX;
 
 }
 
@@ -113,6 +116,9 @@ bool PinMappingClass::init(const String& deviceMapping)
             _pinMapping.display_cs = doc[i]["display"]["cs"] | DISPLAY_CS;
             _pinMapping.display_reset = doc[i]["display"]["reset"] | DISPLAY_RESET;
 
+            _pinMapping.victron_rx = doc[i]["victron"]["rx"] | VICTRON_PIN_RX;
+            _pinMapping.victron_tx = doc[i]["victron"]["tx"] | VICTRON_PIN_TX;
+
             return true;
         }
     }
@@ -133,4 +139,10 @@ bool PinMappingClass::isValidNrf24Config()
 bool PinMappingClass::isValidEthConfig()
 {
     return _pinMapping.eth_enabled;
+}
+
+bool PinMappingClass::isValidVictronConfig()
+{
+    return _pinMapping.victron_rx > 0
+        && _pinMapping.victron_tx > 0;
 }

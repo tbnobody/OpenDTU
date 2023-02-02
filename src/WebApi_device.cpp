@@ -69,6 +69,10 @@ void WebApiDeviceClass::onDeviceAdminGet(AsyncWebServerRequest* request)
     display[F("screensaver")] = config.Display_ScreenSaver;
     display[F("contrast")] = config.Display_Contrast;
 
+    JsonObject victronPinObj = curPin.createNestedObject("victron");
+    victronPinObj[F("rx")] = pin.victron_rx;
+    victronPinObj[F("tx")] = pin.victron_tx;
+
     response->setLength();
     request->send(response);
 }

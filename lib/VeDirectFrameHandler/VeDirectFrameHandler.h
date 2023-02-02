@@ -29,7 +29,7 @@ class VeDirectFrameHandler {
 public:
 
     VeDirectFrameHandler();
-    void init();                                  // initialize HardewareSerial
+    void init(int8_t rx, int8_t tx);             // initialize HardewareSerial
     void setPollInterval(unsigned long interval); // set poll intervall in seconds
     void loop();                                 // main loop to read ve.direct data
     unsigned long getLastUpdate();               // timestamp of last successful frame read
