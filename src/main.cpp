@@ -3,7 +3,8 @@
  * Copyright (C) 2022 Thomas Basler and others
  */
 #include "Configuration.h"
-#include "Display_Graphic.h"
+#include "Display.h"
+#include "Display_helper.h"
 #include "MessageOutput.h"
 #include "MqttHandleDtu.h"
 #include "MqttHandleHass.h"
@@ -95,13 +96,7 @@ void setup()
 
     // Initialize Display
     MessageOutput.print(F("Initialize Display... "));
-    Display.init(
-        static_cast<DisplayType_t>(pin.display_type),
-        pin.display_data,
-        pin.display_clk,
-        pin.display_cs,
-        pin.display_reset);
-    Display.showLogo = config.Display_ShowLogo;
+    Display.init(static_cast<DisplayType_t>(pin.display_type));
     Display.enablePowerSafe = config.Display_PowerSafe;
     Display.enableScreensaver = config.Display_ScreenSaver;
     Display.contrast = config.Display_Contrast;
@@ -123,7 +118,7 @@ void setup()
     // Initialize inverter communication
     MessageOutput.print(F("Initialize Hoymiles interface... "));
     if (PinMapping.isValidNrf24Config()) {
-        SPIClass* spiClass = new SPIClass(HSPI);
+        SPIClass* spiClass = new SPIClass(VSPI);
         spiClass->begin(pin.nrf24_clk, pin.nrf24_miso, pin.nrf24_mosi, pin.nrf24_cs);
         Hoymiles.setMessageOutput(&MessageOutput);
         Hoymiles.init(spiClass, pin.nrf24_en, pin.nrf24_irq);

@@ -4,7 +4,7 @@
  */
 #include "WebApi_device.h"
 #include "Configuration.h"
-#include "Display_Graphic.h"
+#include "Display.h"
 #include "PinMapping.h"
 #include "WebApi.h"
 #include "WebApi_errors.h"
@@ -138,7 +138,6 @@ void WebApiDeviceClass::onDeviceAdminPost(AsyncWebServerRequest* request)
     config.Display_ScreenSaver = root[F("display")][F("screensaver")].as<bool>();
     config.Display_Contrast = root[F("display")][F("contrast")].as<uint8_t>();
 
-    Display.showLogo = config.Display_ShowLogo;
     Display.enablePowerSafe = config.Display_PowerSafe;
     Display.enableScreensaver = config.Display_ScreenSaver;
     Display.contrast = config.Display_Contrast;
