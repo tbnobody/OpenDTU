@@ -83,7 +83,7 @@ bool PinMappingClass::init(const String& deviceMapping)
         MessageOutput.println(F("Failed to read file, using default configuration"));
     }
 
-    for (uint8_t i = 1; i <= doc.size(); i++) {
+    for (uint8_t i = 0; i < doc.size(); i++) {
         String devName = doc[i]["name"] | "";
         if (devName == deviceMapping) {
             strlcpy(_pinMapping.name, devName.c_str(), sizeof(_pinMapping.name));

@@ -20,6 +20,10 @@ here are some screenshots of OpenDTU's web interface.
 
 ***
 
+![](12_Eventlog.png)
+
+***
+
 ![](02_NetworkAdmin.png)
 
 ***
@@ -85,7 +89,3 @@ here are some screenshots of OpenDTU's web interface.
 ***
 
 ![](18_Console.png)
-
-***
-
-![](12_Eventlog.png)

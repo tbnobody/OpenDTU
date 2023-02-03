@@ -113,8 +113,12 @@ void MqttHandleHassClass::publishField(std::shared_ptr<InverterAbstract> inv, ui
         DynamicJsonDocument root(1024);
         root[F("name")] = name;
         root[F("stat_t")] = stateTopic;
-        root[F("unit_of_meas")] = inv->Statistics()->getChannelFieldUnit(channel, fieldType.fieldId);
         root[F("uniq_id")] = serial + "_ch" + String(channel) + "_" + fieldName;
+
+        String unit_of_meausure = inv->Statistics()->getChannelFieldUnit(channel, fieldType.fieldId);
+        if (unit_of_meausure != "") {
+            root[F("unit_of_meas")] = unit_of_meausure;
+        }
 
         JsonObject deviceObj = root.createNestedObject("dev");
         createDeviceInfo(deviceObj, inv);
