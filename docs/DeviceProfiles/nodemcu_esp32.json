@@ -1,6 +1,6 @@
 [
     {
-        "name": "Generic NodeMCU 38 pin",
+        "name": "Generic NodeMCU 32",
         "nrf24": {
             "miso": 19,
             "mosi": 23,
