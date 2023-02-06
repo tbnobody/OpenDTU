@@ -147,15 +147,15 @@ std::list<ChannelNum_t> StatisticsParser::getChannelsByType(ChannelType_t type)
     return l;
 }
 
-uint16_t StatisticsParser::getChannelMaxPower(uint8_t channel)
+uint16_t StatisticsParser::getStringMaxPower(uint8_t channel)
 {
-    return _chanMaxPower[channel];
+    return _stringMaxPower[channel];
 }
 
-void StatisticsParser::setChannelMaxPower(uint8_t channel, uint16_t power)
+void StatisticsParser::setStringMaxPower(uint8_t channel, uint16_t power)
 {
-    if (channel < sizeof(_chanMaxPower) / sizeof(_chanMaxPower[0])) {
-        _chanMaxPower[channel] = power;
+    if (channel < sizeof(_stringMaxPower) / sizeof(_stringMaxPower[0])) {
+        _stringMaxPower[channel] = power;
     }
 }
 
@@ -230,8 +230,8 @@ static float calcEffiencyCh0(StatisticsParser* iv, uint8_t arg0)
 static float calcIrradiation(StatisticsParser* iv, uint8_t arg0)
 {
     if (NULL != iv) {
-        if (iv->getChannelMaxPower(arg0) > 0)
-            return iv->getChannelFieldValue(TYPE_DC, static_cast<ChannelNum_t>(arg0), FLD_PDC) / iv->getChannelMaxPower(arg0) * 100.0f;
+        if (iv->getStringMaxPower(arg0) > 0)
+            return iv->getChannelFieldValue(TYPE_DC, static_cast<ChannelNum_t>(arg0), FLD_PDC) / iv->getStringMaxPower(arg0) * 100.0f;
     }
     return 0.0;
 }

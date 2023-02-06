@@ -137,7 +137,7 @@ void WebApiWsLiveClass::generateJsonResponse(JsonVariant& root)
                 addField(invObject, i, inv, t, c, FLD_PF);
                 addField(invObject, i, inv, t, c, FLD_PRA);
                 addField(invObject, i, inv, t, c, FLD_EFF);
-                if (t == TYPE_DC && inv->Statistics()->getChannelMaxPower(c) > 0) {
+                if (t == TYPE_DC && inv->Statistics()->getStringMaxPower(c) > 0) {
                     addField(invObject, i, inv, t, c, FLD_IRR);
                 }
             }

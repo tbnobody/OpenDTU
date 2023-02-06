@@ -149,7 +149,7 @@ void setup()
 
                 if (inv != nullptr) {
                     for (uint8_t c = 0; c < INV_MAX_CHAN_COUNT; c++) {
-                        inv->Statistics()->setChannelMaxPower(c, config.Inverter[i].channel[c].MaxChannelPower);
+                        inv->Statistics()->setStringMaxPower(c, config.Inverter[i].channel[c].MaxChannelPower);
                     }
                 }
                 MessageOutput.println(F(" done"));

@@ -100,8 +100,8 @@ public:
     const char* getChannelTypeName(ChannelType_t type);
     std::list<ChannelNum_t> getChannelsByType(ChannelType_t type);
 
-    uint16_t getChannelMaxPower(uint8_t channel);
-    void setChannelMaxPower(uint8_t channel, uint16_t power);
+    uint16_t getStringMaxPower(uint8_t channel);
+    void setStringMaxPower(uint8_t channel, uint16_t power);
 
     void resetRxFailureCount();
     void incrementRxFailureCount();
@@ -110,7 +110,7 @@ public:
 private:
     uint8_t _payloadStatistic[STATISTIC_PACKET_SIZE] = {};
     uint8_t _statisticLength = 0;
-    uint16_t _chanMaxPower[CH4];
+    uint16_t _stringMaxPower[CH4];
 
     const std::list<byteAssign_t>* _byteAssignment;
 
