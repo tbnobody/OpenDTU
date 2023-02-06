@@ -8,6 +8,7 @@
 #include "VeDirectFrameHandler.h"
 #include "MqttHandleDtu.h"
 #include "MqttHandleHass.h"
+#include "MqttHandleVedirectHass.h"
 #include "MqttHandleInverter.h"
 #include "MqttHandleVedirect.h"
 #include "MqttSettings.h"
@@ -89,6 +90,7 @@ void setup()
     MqttHandleInverter.init();
     MqttHandleVedirect.init();
     MqttHandleHass.init();
+    MqttHandleVedirectHass.init();
     MessageOutput.println(F("done"));
 
     // Initialize WebApi
@@ -194,6 +196,10 @@ void loop()
     }
     MqttHandleHass.loop();
     yield();
+    if (Configuration.get().Vedirect_Enabled) {
+        MqttHandleVedirectHass.loop();
+        yield();
+    }
     WebApi.loop();
     yield();
     Display.loop();
