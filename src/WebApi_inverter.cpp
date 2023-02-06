@@ -59,7 +59,7 @@ void WebApiInverterClass::onInverterList(AsyncWebServerRequest* request)
                 max_channels = INV_MAX_CHAN_COUNT;
             } else {
                 obj[F("type")] = inv->typeName();
-                max_channels = inv->Statistics()->getChannelCount();
+                max_channels = inv->Statistics()->getChannelsByType(TYPE_DC).size();
             }
 
             JsonArray channel = obj.createNestedArray("channel");

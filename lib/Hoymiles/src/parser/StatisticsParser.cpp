@@ -49,19 +49,19 @@ void StatisticsParser::appendFragment(uint8_t offset, uint8_t* payload, uint8_t 
     _statisticLength += len;
 }
 
-const byteAssign_t* StatisticsParser::getAssignmentByChannelField(uint8_t channel, uint8_t fieldId)
+const byteAssign_t* StatisticsParser::getAssignmentByChannelField(ChannelType_t type, ChannelNum_t channel, FieldId_t fieldId)
 {
     for (auto const& i : *_byteAssignment) {
-        if (i.ch == channel && i.fieldId == fieldId) {
+        if (i.type == type && i.ch == channel && i.fieldId == fieldId) {
             return &i;
         }
     }
     return NULL;
 }
 
-float StatisticsParser::getChannelFieldValue(uint8_t channel, uint8_t fieldId)
+float StatisticsParser::getChannelFieldValue(ChannelType_t type, ChannelNum_t channel, FieldId_t fieldId)
 {
-    const byteAssign_t* pos = getAssignmentByChannelField(channel, fieldId);
+    const byteAssign_t* pos = getAssignmentByChannelField(type, channel, fieldId);
     if (pos == NULL) {
         return 0;
     }
@@ -97,40 +97,54 @@ float StatisticsParser::getChannelFieldValue(uint8_t channel, uint8_t fieldId)
     return 0;
 }
 
-bool StatisticsParser::hasChannelFieldValue(uint8_t channel, uint8_t fieldId)
+bool StatisticsParser::hasChannelFieldValue(ChannelType_t type, ChannelNum_t channel, FieldId_t fieldId)
 {
-    const byteAssign_t* pos = getAssignmentByChannelField(channel, fieldId);
+    const byteAssign_t* pos = getAssignmentByChannelField(type, channel, fieldId);
     return pos != NULL;
 }
 
-const char* StatisticsParser::getChannelFieldUnit(uint8_t channel, uint8_t fieldId)
+const char* StatisticsParser::getChannelFieldUnit(ChannelType_t type, ChannelNum_t channel, FieldId_t fieldId)
 {
-    const byteAssign_t* pos = getAssignmentByChannelField(channel, fieldId);
+    const byteAssign_t* pos = getAssignmentByChannelField(type, channel, fieldId);
     return units[pos->unitId];
 }
 
-const char* StatisticsParser::getChannelFieldName(uint8_t channel, uint8_t fieldId)
+const char* StatisticsParser::getChannelFieldName(ChannelType_t type, ChannelNum_t channel, FieldId_t fieldId)
 {
-    const byteAssign_t* pos = getAssignmentByChannelField(channel, fieldId);
+    const byteAssign_t* pos = getAssignmentByChannelField(type, channel, fieldId);
     return fields[pos->fieldId];
 }
 
-uint8_t StatisticsParser::getChannelFieldDigits(uint8_t channel, uint8_t fieldId)
+uint8_t StatisticsParser::getChannelFieldDigits(ChannelType_t type, ChannelNum_t channel, FieldId_t fieldId)
 {
-    const byteAssign_t* pos = getAssignmentByChannelField(channel, fieldId);
+    const byteAssign_t* pos = getAssignmentByChannelField(type, channel, fieldId);
     return pos->digits;
 }
 
-uint8_t StatisticsParser::getChannelCount()
+std::list<ChannelType_t> StatisticsParser::getChannelTypes()
 {
-    uint8_t cnt = 0;
-    for (auto const &b: *_byteAssignment) {
-        if (b.ch > cnt) {
-            cnt = b.ch;
+    return {
+        TYPE_AC,
+        TYPE_DC,
+        TYPE_INV
+    };
+}
+
+const char* StatisticsParser::getChannelTypeName(ChannelType_t type)
+{
+    return channelsTypes[type];
+}
+
+std::list<ChannelNum_t> StatisticsParser::getChannelsByType(ChannelType_t type)
+{
+    std::list<ChannelNum_t> l;
+    for (auto const& b : *_byteAssignment) {
+        if (b.type == type) {
+            l.push_back(b.ch);
         }
     }
-
-    return cnt;
+    l.unique();
+    return l;
 }
 
 uint16_t StatisticsParser::getChannelMaxPower(uint8_t channel)
@@ -140,7 +154,7 @@ uint16_t StatisticsParser::getChannelMaxPower(uint8_t channel)
 
 void StatisticsParser::setChannelMaxPower(uint8_t channel, uint16_t power)
 {
-    if (channel < CH4) {
+    if (channel < sizeof(_chanMaxPower) / sizeof(_chanMaxPower[0])) {
         _chanMaxPower[channel] = power;
     }
 }
@@ -163,8 +177,8 @@ uint32_t StatisticsParser::getRxFailureCount()
 static float calcYieldTotalCh0(StatisticsParser* iv, uint8_t arg0)
 {
     float yield = 0;
-    for (uint8_t i = 1; i <= iv->getChannelCount(); i++) {
-        yield += iv->getChannelFieldValue(i, FLD_YT);
+    for (auto& channel : iv->getChannelsByType(TYPE_DC)) {
+        yield += iv->getChannelFieldValue(TYPE_DC, channel, FLD_YT);
     }
     return yield;
 }
@@ -172,8 +186,8 @@ static float calcYieldTotalCh0(StatisticsParser* iv, uint8_t arg0)
 static float calcYieldDayCh0(StatisticsParser* iv, uint8_t arg0)
 {
     float yield = 0;
-    for (uint8_t i = 1; i <= iv->getChannelCount(); i++) {
-        yield += iv->getChannelFieldValue(i, FLD_YD);
+    for (auto& channel : iv->getChannelsByType(TYPE_DC)) {
+        yield += iv->getChannelFieldValue(TYPE_DC, channel, FLD_YD);
     }
     return yield;
 }
@@ -181,14 +195,14 @@ static float calcYieldDayCh0(StatisticsParser* iv, uint8_t arg0)
 // arg0 = channel of source
 static float calcUdcCh(StatisticsParser* iv, uint8_t arg0)
 {
-    return iv->getChannelFieldValue(arg0, FLD_UDC);
+    return iv->getChannelFieldValue(TYPE_DC, static_cast<ChannelNum_t>(arg0), FLD_UDC);
 }
 
 static float calcPowerDcCh0(StatisticsParser* iv, uint8_t arg0)
 {
     float dcPower = 0;
-    for (uint8_t i = 1; i <= iv->getChannelCount(); i++) {
-        dcPower += iv->getChannelFieldValue(i, FLD_PDC);
+    for (auto& channel : iv->getChannelsByType(TYPE_DC)) {
+        dcPower += iv->getChannelFieldValue(TYPE_DC, channel, FLD_PDC);
     }
     return dcPower;
 }
@@ -196,15 +210,19 @@ static float calcPowerDcCh0(StatisticsParser* iv, uint8_t arg0)
 // arg0 = channel
 static float calcEffiencyCh0(StatisticsParser* iv, uint8_t arg0)
 {
-    float acPower = iv->getChannelFieldValue(CH0, FLD_PAC);
-    float dcPower = 0;
-    for (uint8_t i = 1; i <= iv->getChannelCount(); i++) {
-        dcPower += iv->getChannelFieldValue(i, FLD_PDC);
+    float acPower = 0;
+    for (auto& channel : iv->getChannelsByType(TYPE_AC)) {
+        acPower += iv->getChannelFieldValue(TYPE_AC, channel, FLD_PAC);
     }
+
+    float dcPower = 0;
+    for (auto& channel : iv->getChannelsByType(TYPE_DC)) {
+        dcPower += iv->getChannelFieldValue(TYPE_DC, channel, FLD_PDC);
+    }
+
     if (dcPower > 0) {
         return acPower / dcPower * 100.0f;
     }
-
     return 0.0;
 }
 
@@ -212,8 +230,8 @@ static float calcEffiencyCh0(StatisticsParser* iv, uint8_t arg0)
 static float calcIrradiation(StatisticsParser* iv, uint8_t arg0)
 {
     if (NULL != iv) {
-        if (iv->getChannelMaxPower(arg0 - 1) > 0)
-            return iv->getChannelFieldValue(arg0, FLD_PDC) / iv->getChannelMaxPower(arg0 - 1) * 100.0f;
+        if (iv->getChannelMaxPower(arg0) > 0)
+            return iv->getChannelFieldValue(TYPE_DC, static_cast<ChannelNum_t>(arg0), FLD_PDC) / iv->getChannelMaxPower(arg0) * 100.0f;
     }
     return 0.0;
 }
