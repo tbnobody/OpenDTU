@@ -89,7 +89,7 @@ void MqttHandleVedirectHassClass::publishBinarySensor(const char* caption, const
 
 void MqttHandleVedirectHassClass::createDeviceInfo(JsonObject& object)
 {
-    object[F("name")] = "Victron";
+    object[F("name")] = "Victron(" + VeDirect.veMap["SER"] + ")";
     object[F("ids")] = VeDirect.veMap["SER"];
     object[F("cu")] = String(F("http://")) + NetworkSettings.localIP().toString();
     object[F("mf")] = F("OpenDTU");
