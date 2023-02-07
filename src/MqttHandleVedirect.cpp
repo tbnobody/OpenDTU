@@ -21,7 +21,16 @@ void MqttHandleVedirectClass::loop()
 
     if (!MqttSettings.getConnected() || !config.Vedirect_Enabled) {
         return;
-    }    
+    }   
+
+    String serial;
+    auto pos = VeDirect.veMap.find("SER");
+    if (pos == VeDirect.veMap.end()) {
+        return;
+    } 
+    else {
+        serial = pos->second;
+    }
 
     if (millis() - _lastPublish > (config.Mqtt_PublishInterval * 1000)) {
         String key;
@@ -44,7 +53,7 @@ void MqttHandleVedirectClass::loop()
         
             // publish only changed key, values pairs
             if (!config.Vedirect_UpdatesOnly || (bChanged && config.Vedirect_UpdatesOnly)) {
-                topic = "victron/";
+                topic = "victron/" + serial + "/";
                 topic.concat(key);  
                 MqttSettings.publish(topic.c_str(), value.c_str()); 
             }

@@ -46,7 +46,8 @@ void MqttHandleVedirectHassClass::publishConfig()
     if (!MqttSettings.getConnected()) {
         return;
     }
-    if (VeDirect.veMap.find("SER") == VeDirect.veMap.end()) {
+    // ensure data is revieved from victron
+    if (VeDirect.veMap.find("SER") == VeDirect.veMap.end()) { 
         return;
     }
 
