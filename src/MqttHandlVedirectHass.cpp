@@ -51,12 +51,56 @@ void MqttHandleVedirectHassClass::publishConfig()
         return;
     }
 
-    publishBinarySensor("Load output state", "victron/LOAD", "ON", "OFF");
+    publishBinarySensor("Load output state", "LOAD", "ON", "OFF");
+
+    // battery info
+    publishSensor("Battery voltage", "V", "voltage", "measurement", "mV");
+    publishSensor("Battery current", "I", "current", "measurement", "mA");
 
     yield();
 }
 
+void MqttHandleVedirectHassClass::publishSensor(const char* caption, const char* subTopic, const char* deviceClass, const char* stateClass, const char* unitOfMeasurement )
+{
+    String serial = VeDirect.veMap["SER"];
 
+    String sensorId = caption;
+    sensorId.replace(" ", "_");
+    sensorId.toLowerCase();
+
+    String configTopic = "sensor/dtu_victron_" + serial
+        + "/" + sensorId
+        + "/config";
+    
+    String statTopic = MqttSettings.getPrefix() + "victron/" + VeDirect.veMap["SER"] + "/" + subTopic;
+
+    DynamicJsonDocument root(1024);
+    root[F("name")] = caption;
+    root[F("stat_t")] = statTopic;
+    root[F("uniq_id")] = serial + "_" + sensorId;
+
+    if (unitOfMeasurement != NULL) {
+        root[F("unit_of_meas")] = unitOfMeasurement;
+    }
+
+    JsonObject deviceObj = root.createNestedObject("dev");
+    createDeviceInfo(deviceObj);
+
+    if (Configuration.get().Mqtt_Hass_Expire) {
+        root[F("exp_aft")] = Configuration.get().Mqtt_PublishInterval * 3;
+    }
+    if (deviceClass != NULL) {
+        root[F("dev_cla")] = deviceClass;
+    }
+    if (stateClass != NULL) {
+        root[F("stat_cla")] = stateClass;
+    }
+
+    char buffer[512];
+    serializeJson(root, buffer);
+    publish(configTopic, buffer);
+
+}
 void MqttHandleVedirectHassClass::publishBinarySensor(const char* caption, const char* subTopic, const char* payload_on, const char* payload_off)
 {
     String serial = VeDirect.veMap["SER"];
@@ -69,11 +113,10 @@ void MqttHandleVedirectHassClass::publishBinarySensor(const char* caption, const
         + "/" + sensorId
         + "/config";
 
-    // String statTopic = MqttSettings.getPrefix() + serial + "/" + subTopic; // TODO extend with serial
-    String statTopic = MqttSettings.getPrefix() + subTopic;
+    String statTopic = MqttSettings.getPrefix() + "victron/" + VeDirect.veMap["SER"] + "/" + subTopic;
 
     DynamicJsonDocument root(1024);
-    root[F("name")] = String("Victron ") + caption;
+    root[F("name")] = caption;
     root[F("uniq_id")] = serial + "_" + sensorId;
     root[F("stat_t")] = statTopic;
     root[F("pl_on")] = payload_on;
