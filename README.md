@@ -75,11 +75,11 @@ Serial will be replaced with the serial number of the MPPT device.
 
 | Topic                                   | R / W | Description                                          | Value / Unit               |
 | --------------------------------------- | ----- | ---------------------------------------------------- | -------------------------- |
-| victron/[serial]/PID                    | R     | Product description.                                 | text                       |
-| victron/[serial]/SER                    | R     | Serial Number.                                       | text                       |
-| victron/[serial]/FW                     | R     | Firmware Number.                                     | int                       |
+| victron/[serial]/PID                    | R     | Product description                                  | text                       |
+| victron/[serial]/SER                    | R     | Serial number                                        | text                       |
+| victron/[serial]/FW                     | R     | Firmware number                                      | int                        |
 | victron/[serial]/LOAD                   | R     | Load output state                                    | ON /  OFF                  |
-| victron/[serial]/CS                     | R     | State of operation.                                  | text e. g. "Bulk"          |
+| victron/[serial]/CS                     | R     | State of operation                                   | text e. g. "Bulk"          |
 | victron/[serial]/ERR                    | R     | Error code                                           | text e. g. "No error"      |
 | victron/[serial]/OR                     | R     | Off reasen                                           | text e. g. "Not off"       |
 | victron/[serial]/MPPT                   | R     | Tracker operation mode                               | text e. g. "MPP Tracker active" |
