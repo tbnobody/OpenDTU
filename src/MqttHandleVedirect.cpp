@@ -54,7 +54,32 @@ void MqttHandleVedirectClass::loop()
             // publish only changed key, values pairs
             if (!config.Vedirect_UpdatesOnly || (bChanged && config.Vedirect_UpdatesOnly)) {
                 topic = "victron/" + serial + "/";
-                topic.concat(key);  
+                topic.concat(key);
+                if (key.equals("PID")) {
+                    value = VeDirect.getPidAsString(value.c_str());
+                } 
+                else if (key.equals("CS")) {
+                    value = VeDirect.getCsAsString(value.c_str());
+                } 
+                else if (key.equals("ERR")) {
+                    value = VeDirect.getErrAsString(value.c_str());
+                } 
+                else if (key.equals("OR")) {
+                    value = VeDirect.getOrAsString(value.c_str());
+                } 
+                else if (key.equals("MPPT")) {
+                    value = VeDirect.getMpptAsString(value.c_str());
+                } 
+                else if (key.equals("V") ||
+                         key.equals("I") ||
+                         key.equals("VPV")) {
+                    value = round(value.toDouble() / 10.0) / 100.0;
+                } 
+                else if (key.equals("H19") ||
+                         key.equals("H20") ||
+                         key.equals("H22")) {
+                    value = value.toDouble() / 100.0;
+                } 
                 MqttSettings.publish(topic.c_str(), value.c_str()); 
             }
         }

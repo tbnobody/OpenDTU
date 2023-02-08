@@ -51,11 +51,29 @@ void MqttHandleVedirectHassClass::publishConfig()
         return;
     }
 
-    publishBinarySensor("Load output state", "LOAD", "ON", "OFF");
+    // device info
+    publishBinarySensor("MPPT load output state", "LOAD", "ON", "OFF");
+    publishSensor("MPPT serial number", "SER");
+    publishSensor("MPPT firmware number", "FW");
+    publishSensor("MPPT state of operation", "CS");
+    publishSensor("MPPT error code", "ERR");
+    publishSensor("MPPT off reason", "OR");
+    publishSensor("MPPT tracker operation mode", "MPPT");
+    publishSensor("MPPT Day sequence number (0...364)", "HSDS", "duration", "total_increasing", "d");
 
     // battery info
-    publishSensor("Battery voltage", "V", "voltage", "measurement", "mV");
-    publishSensor("Battery current", "I", "current", "measurement", "mA");
+    publishSensor("Battery voltage", "V", "voltage", "measurement", "V");
+    publishSensor("Battery current", "I", "current", "measurement", "A");
+
+    // panel info
+    publishSensor("Panel voltage", "VPV", "voltage", "measurement", "V");
+    publishSensor("Panel power", "PPV", "power", "measurement", "W");
+    publishSensor("Panel power", "PPV", "power", "measurement", "W");
+    publishSensor("Panel yield total", "H19", "energy", "total_increasing", "kWh");
+    publishSensor("Panel yield today", "H20", "energy", "total_increasing", "kWh");
+    publishSensor("Panel maximum power today", "H21", "power", "measurement", "W");
+    publishSensor("Panel yield yesterday", "H22", "energy", "measurement", "kWh");
+    publishSensor("Panel maximum power yesterday", "H23", "power", "measurement", "W");
 
     yield();
 }
