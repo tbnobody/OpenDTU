@@ -14,12 +14,13 @@ Several screenshots of the frontend can be found here: [Screenshots](docs/screen
 Different builds from existing installations can be found here [Builds](docs/builds/README.md)
 Like to show your own build? Just send me a Pull Request.
 
+## Extensions to the original OpenDTU
 I extended the original OpenDTU software to support also Victron's Ve.Direct protocol on the same chip. Additional information about Ve.direct can be downloaded from https://www.victronenergy.com/support-and-downloads/technical-information.
 
-Web-Live-Interface:
+### Web-Live-Interface:
 ![image](https://user-images.githubusercontent.com/59169507/187224107-4e0d0cab-2e1b-4e47-9410-a49f80aa6789.png)
 
-REST-API (/api/verdirectlivedata/status):
+### REST-API (/api/verdirectlivedata/status):
 ````JSON
 {
 "data_age":0,
@@ -45,9 +46,64 @@ REST-API (/api/verdirectlivedata/status):
 }
 ````
 
-MQTT:
+### Home Assistant auto discovery
 
-Sends text raw data as difined in VE.Direct spec.
+![image](https://user-images.githubusercontent.com/59169507/217558862-a83846c5-6070-43cd-9a0b-90a8b2e2e8c6.png)
+
+### Device Manager
+
+Add Victron TX / RX PINs to the device manager
+
+````json
+[
+    {
+        "name": "My very special esp32 test board",
+        "victron": {
+            "rx": 22,
+            "tx": 21
+        }
+    }
+]
+````
+
+### MQTT Topics
+
+The base topic, as configured in the web GUI is prepended to all follwing topics.
+Serial will be replaced with the serial number of the MPPT device.
+
+## MPPT topics
+
+| Topic                                   | R / W | Description                                          | Value / Unit               |
+| --------------------------------------- | ----- | ---------------------------------------------------- | -------------------------- |
+| victron/[serial]/PID                    | R     | Product description.                                 | text                       |
+| victron/[serial]/SER                    | R     | Serial Number.                                       | text                       |
+| victron/[serial]/FW                     | R     | Firmware Number.                                     | int                       |
+| victron/[serial]/LOAD                   | R     | Load output state                                    | ON /  OFF                  |
+| victron/[serial]/CS                     | R     | State of operation.                                  | text e. g. "Bulk"          |
+| victron/[serial]/ERR                    | R     | Error code                                           | text e. g. "No error"      |
+| victron/[serial]/OR                     | R     | Off reasen                                           | text e. g. "Not off"       |
+| victron/[serial]/MPPT                   | R     | Tracker operation mode                               | text e. g. "MPP Tracker active" |
+| victron/[serial]/HSDS                   | R     | Day sequence number (0...364)                        | int in days                |
+
+## Battery specific topics
+
+| Topic                                   | R / W | Description                                          | Value / Unit               |
+| --------------------------------------- | ----- | ---------------------------------------------------- | -------------------------- |
+| victron/[serial]/V                      | R     | Voltage                                              | Volt (V)                   |
+| victron/[serial]/I                      | R     | Current                                              | Ampere (A)                 |
+
+## Panel specific topics
+
+| Topic                                   | R / W | Description                                          | Value / Unit               |
+| --------------------------------------- | ----- | ---------------------------------------------------- | -------------------------- |
+| victron/[serial]/VPV                    | R     | Voltage                                              | Volt (V)                   |
+| victron/[serial]/PPV                    | R     | Power                                                | Watt (W)                   |
+| victron/[serial]/H19                    | R     | Yield total (user resettable counter)                | Kilo watt hours (kWh)      |
+| victron/[serial]/H20                    | R     | Yield today                                          | Kilo watt hours (kWh)      |
+| victron/[serial]/H21                    | R     | Maximum power today                                  | Watt (W)                   |
+| victron/[serial]/H22                    | R     | Yield yesterday                                      | Kilo watt hours (kWh)      |
+| victron/[serial]/H23                    | R     | Maximum power yesterday                              | Watt (W)                   |
+
 
 ## Currently supported Inverters
 * Hoymiles HM-300
