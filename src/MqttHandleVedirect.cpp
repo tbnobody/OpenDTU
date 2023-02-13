@@ -5,6 +5,7 @@
 #include "VeDirectFrameHandler.h"
 #include "MqttHandleVedirect.h"
 #include "MqttSettings.h"
+#include "MessageOutput.h"
 
 
 
@@ -33,6 +34,11 @@ void MqttHandleVedirectClass::loop()
     }
 
     if (millis() - _lastPublish > (config.Mqtt_PublishInterval * 1000)) {
+        if (millis() - VeDirect.getLastUpdate() > (config.Vedirect_PollInterval * 3 * 1000)) {
+            MessageOutput.printf("VeDirect Data too old: Stopping publishing. Last read before %f seconds\r\n", (millis() - VeDirect.getLastUpdate()) / 1000.0);
+            return;
+        }
+
         String key;
         String value;
         bool bChanged;
