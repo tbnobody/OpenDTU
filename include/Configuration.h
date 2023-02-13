@@ -34,6 +34,7 @@
 struct CHANNEL_CONFIG_T {
     uint16_t MaxChannelPower;
     char Name[CHAN_MAX_NAME_STRLEN];
+    float YieldTotalOffset;
 };
 
 struct INVERTER_CONFIG_T {

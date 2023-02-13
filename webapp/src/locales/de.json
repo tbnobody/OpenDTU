@@ -404,6 +404,8 @@
         "StringNameHint": "Hier kann ein eigener Name für den entsprechenden Port des Wechselrichters angegeben werden.",
         "StringMaxPower": "Max. Leistung String {num}:",
         "StringMaxPowerHint": "Eingabe der maximalen Leistung der angeschlossenen Solarmodule.",
+        "StringYtOffset": "Ertragsversatz String {num}:",
+        "StringYtOffsetHint": "Dieser Offset wird beim Auslesen des Gesamtertragswertes des Wechselrichters angewendet. Damit kann der Gesamtertrag des Wechselrichters auf Null gesetzt werden, wenn ein gebrauchter Wechselrichter verwendet wird.",
         "InverterHint": "*) Geben Sie die W<sub>p</sub> des Ports ein, um die Einstrahlung zu errechnen.",
         "Cancel": "@:maintenancereboot.Cancel",
         "Save": "@:dtuadmin.Save",

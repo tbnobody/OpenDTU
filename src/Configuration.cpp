@@ -100,6 +100,7 @@ bool ConfigurationClass::write()
             JsonObject chanData = channel.createNestedObject();
             chanData["name"] = config.Inverter[i].channel[c].Name;
             chanData["max_power"] = config.Inverter[i].channel[c].MaxChannelPower;
+            chanData["yield_total_offset"] = config.Inverter[i].channel[c].YieldTotalOffset;
         }
     }
 
@@ -228,6 +229,7 @@ bool ConfigurationClass::read()
         JsonArray channel = inv["channel"];
         for (uint8_t c = 0; c < INV_MAX_CHAN_COUNT; c++) {
             config.Inverter[i].channel[c].MaxChannelPower = channel[c]["max_power"] | 0;
+            config.Inverter[i].channel[c].YieldTotalOffset = channel[c]["yield_total_offset"] | 0.0f;
             strlcpy(config.Inverter[i].channel[c].Name, channel[c]["name"] | "", sizeof(config.Inverter[i].channel[c].Name));
         }
     }

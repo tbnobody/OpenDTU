@@ -59,9 +59,21 @@ const byteAssign_t* StatisticsParser::getAssignmentByChannelField(ChannelType_t 
     return NULL;
 }
 
+fieldSettings_t* StatisticsParser::getSettingByChannelField(ChannelType_t type, ChannelNum_t channel, FieldId_t fieldId)
+{
+    for (auto& i : _fieldSettings) {
+        if (i.type == type && i.ch == channel && i.fieldId == fieldId) {
+            return &i;
+        }
+    }
+    return NULL;
+}
+
 float StatisticsParser::getChannelFieldValue(ChannelType_t type, ChannelNum_t channel, FieldId_t fieldId)
 {
     const byteAssign_t* pos = getAssignmentByChannelField(type, channel, fieldId);
+    fieldSettings_t* setting = getSettingByChannelField(type, channel, fieldId);
+
     if (pos == NULL) {
         return 0;
     }
@@ -88,6 +100,9 @@ float StatisticsParser::getChannelFieldValue(ChannelType_t type, ChannelNum_t ch
         }
 
         result /= static_cast<float>(div);
+        if (setting != NULL) {
+            result += setting->offset;
+        }
         return result;
     } else {
         // Value has to be calculated
@@ -119,6 +134,25 @@ uint8_t StatisticsParser::getChannelFieldDigits(ChannelType_t type, ChannelNum_t
 {
     const byteAssign_t* pos = getAssignmentByChannelField(type, channel, fieldId);
     return pos->digits;
+}
+
+float StatisticsParser::getChannelFieldOffset(ChannelType_t type, ChannelNum_t channel, FieldId_t fieldId)
+{
+    fieldSettings_t* setting = getSettingByChannelField(type, channel, fieldId);
+    if (setting != NULL) {
+        return setting->offset;
+    }
+    return 0;
+}
+
+void StatisticsParser::setChannelFieldOffset(ChannelType_t type, ChannelNum_t channel, FieldId_t fieldId, float offset)
+{
+    fieldSettings_t* setting = getSettingByChannelField(type, channel, fieldId);
+    if (setting != NULL) {
+        setting->offset = offset;
+    } else {
+        _fieldSettings.push_back({ type, channel, fieldId, offset });
+    }
 }
 
 std::list<ChannelType_t> StatisticsParser::getChannelTypes()

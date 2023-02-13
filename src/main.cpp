@@ -150,6 +150,7 @@ void setup()
                 if (inv != nullptr) {
                     for (uint8_t c = 0; c < INV_MAX_CHAN_COUNT; c++) {
                         inv->Statistics()->setStringMaxPower(c, config.Inverter[i].channel[c].MaxChannelPower);
+                        inv->Statistics()->setChannelFieldOffset(TYPE_DC, static_cast<ChannelNum_t>(c), FLD_YT, config.Inverter[i].channel[c].YieldTotalOffset);
                     }
                 }
                 MessageOutput.println(F(" done"));

@@ -404,6 +404,8 @@
         "StringNameHint": "Here you can specify a custom name for the respective port of your inverter.",
         "StringMaxPower": "Max power string {num}:",
         "StringMaxPowerHint": "Enter the max power of the connected solar panels.",
+        "StringYtOffset": "Yield total offset string {num}:",
+        "StringYtOffsetHint": "This offset is applied the read yield total value from the inverter. This can be used to set the yield total of the inverter to zero if a used inverter is used.",
         "InverterHint": "*) Enter the W<sub>p</sub> of the channel to calculate irradiation.",
         "Cancel": "@:maintenancereboot.Cancel",
         "Save": "@:dtuadmin.Save",

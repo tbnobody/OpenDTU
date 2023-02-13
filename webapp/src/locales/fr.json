@@ -404,6 +404,8 @@
         "StringNameHint": "Ici, vous pouvez spécifier un nom personnalisé pour le port respectif de votre onduleur.",
         "StringMaxPower": "Puissance maximale de la ligne {num}:",
         "StringMaxPowerHint": "Entrez la puissance maximale des panneaux solaires connectés.",
+        "StringYtOffset": "Yield total offset string {num}:",
+        "StringYtOffsetHint": "This offset is applied the read yield total value from the inverter. This can be used to set the yield total of the inverter to zero if a used inverter is used.",
         "InverterHint": "*) Entrez le W<sub>p</sub> du canal pour calculer l'irradiation.",
         "Cancel": "@:maintenancereboot.Cancel",
         "Save": "@:dtuadmin.Save",
