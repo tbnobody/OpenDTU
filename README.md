@@ -216,6 +216,7 @@ A documentation of the Web API can be found here: [Web-API Documentation](docs/W
 * <https://www.printables.com/model/293003-sol-opendtu-esp32-nrf24l01-case>
 * <https://www.thingiverse.com/thing:5661780>
 * <https://www.thingiverse.com/thing:5632374>
+* <https://www.thingiverse.com/thing:5852233>
 
 
 ## Building
