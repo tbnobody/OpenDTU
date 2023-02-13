@@ -92,11 +92,12 @@
                             </div>
                         </div>
                         <div class="card-body">
-                            <div class="row flex-row-reverse flex-wrap-reverse align-items-end g-3">
-                                <template v-for="channel in 5" :key="channel">
-                                    <div v-if="inverter[channel - 1]" :class="`col order-${5 - channel}`">
-                                        <InverterChannelInfo :channelData="inverter[channel - 1]"
-                                            :channelNumber="channel - 1" />
+                            <div class="row flex-row-reverse flex-wrap-reverse g-3">
+                                <template v-for="chanType in [{obj: inverter.INV, name: 'INV'}, {obj: inverter.AC, name: 'AC'}, {obj: inverter.DC, name: 'DC'}].reverse()">
+                                    <div v-for="channel in Object.keys(chanType.obj).sort().reverse().map(x=>+x)" :key="channel" class="col">
+                                        <InverterChannelInfo :channelData="chanType.obj[channel]"
+                                            :channelType="chanType.name"
+                                            :channelNumber="channel" />
                                     </div>
                                 </template>
                             </div>

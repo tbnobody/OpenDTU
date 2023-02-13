@@ -11,6 +11,7 @@
 #include "types.h"
 #include <Arduino.h>
 #include <cstdint>
+#include <list>
 
 #define MAX_NAME_LENGTH 32
 
@@ -38,8 +39,7 @@ public:
     void setName(const char* name);
     const char* name();
     virtual String typeName() = 0;
-    virtual const byteAssign_t* getByteAssignment() = 0;
-    virtual uint8_t getAssignmentCount() = 0;
+    virtual const std::list<byteAssign_t>* getByteAssignment() = 0;
 
     bool isProducing();
     bool isReachable();

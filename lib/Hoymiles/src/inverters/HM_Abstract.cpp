@@ -40,14 +40,14 @@ bool HM_Abstract::sendAlarmLogRequest(HoymilesRadio* radio, bool force)
     }
 
     if (!force) {
-        if (Statistics()->hasChannelFieldValue(CH0, FLD_EVT_LOG)) {
-            if ((uint8_t)Statistics()->getChannelFieldValue(CH0, FLD_EVT_LOG) == _lastAlarmLogCnt) {
+        if (Statistics()->hasChannelFieldValue(TYPE_INV, CH0, FLD_EVT_LOG)) {
+            if ((uint8_t)Statistics()->getChannelFieldValue(TYPE_INV, CH0, FLD_EVT_LOG) == _lastAlarmLogCnt) {
                 return false;
             }
         }
     }
 
-    _lastAlarmLogCnt = (uint8_t)Statistics()->getChannelFieldValue(CH0, FLD_EVT_LOG);
+    _lastAlarmLogCnt = (uint8_t)Statistics()->getChannelFieldValue(TYPE_INV, CH0, FLD_EVT_LOG);
 
     time_t now;
     time(&now);
