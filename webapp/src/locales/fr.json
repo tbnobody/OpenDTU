@@ -263,6 +263,7 @@
     "inverterchannelinfo": {
         "String": "Ligne {num}",
         "Phase": "Phase {num}",
+        "General": "General",
         "Property": "Propriété",
         "Value": "Valeur",
         "Unit": "Unité"

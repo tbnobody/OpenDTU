@@ -112,33 +112,33 @@ void WebApiWsLiveClass::generateJsonResponse(JsonVariant& root)
 
         // Loop all channels
         for (auto& t : inv->Statistics()->getChannelTypes()) {
+            JsonObject chanTypeObj = invObject.createNestedObject(inv->Statistics()->getChannelTypeName(t));
             for (auto& c : inv->Statistics()->getChannelsByType(t)) {
                 if (t == TYPE_DC) {
                     INVERTER_CONFIG_T* inv_cfg = Configuration.getInverterConfig(inv->serial());
                     if (inv_cfg != nullptr) {
-                        // TODO(tbnobody)
-                        invObject[String(static_cast<uint8_t>(c) + 1)][F("name")]["u"] = inv_cfg->channel[c].Name;
+                        chanTypeObj[String(static_cast<uint8_t>(c))][F("name")]["u"] = inv_cfg->channel[c].Name;
                     }
                 }
-                addField(invObject, i, inv, t, c, FLD_PAC);
-                addField(invObject, i, inv, t, c, FLD_UAC);
-                addField(invObject, i, inv, t, c, FLD_IAC);
+                addField(chanTypeObj, i, inv, t, c, FLD_PAC);
+                addField(chanTypeObj, i, inv, t, c, FLD_UAC);
+                addField(chanTypeObj, i, inv, t, c, FLD_IAC);
                 if (t == TYPE_AC) {
-                    addField(invObject, i, inv, t, c, FLD_PDC, F("Power DC"));
+                    addField(chanTypeObj, i, inv, t, c, FLD_PDC, F("Power DC"));
                 } else {
-                    addField(invObject, i, inv, t, c, FLD_PDC);
+                    addField(chanTypeObj, i, inv, t, c, FLD_PDC);
                 }
-                addField(invObject, i, inv, t, c, FLD_UDC);
-                addField(invObject, i, inv, t, c, FLD_IDC);
-                addField(invObject, i, inv, t, c, FLD_YD);
-                addField(invObject, i, inv, t, c, FLD_YT);
-                addField(invObject, i, inv, t, c, FLD_F);
-                addField(invObject, i, inv, t, c, FLD_T);
-                addField(invObject, i, inv, t, c, FLD_PF);
-                addField(invObject, i, inv, t, c, FLD_PRA);
-                addField(invObject, i, inv, t, c, FLD_EFF);
+                addField(chanTypeObj, i, inv, t, c, FLD_UDC);
+                addField(chanTypeObj, i, inv, t, c, FLD_IDC);
+                addField(chanTypeObj, i, inv, t, c, FLD_YD);
+                addField(chanTypeObj, i, inv, t, c, FLD_YT);
+                addField(chanTypeObj, i, inv, t, c, FLD_F);
+                addField(chanTypeObj, i, inv, t, c, FLD_T);
+                addField(chanTypeObj, i, inv, t, c, FLD_PF);
+                addField(chanTypeObj, i, inv, t, c, FLD_PRA);
+                addField(chanTypeObj, i, inv, t, c, FLD_EFF);
                 if (t == TYPE_DC && inv->Statistics()->getStringMaxPower(c) > 0) {
-                    addField(invObject, i, inv, t, c, FLD_IRR);
+                    addField(chanTypeObj, i, inv, t, c, FLD_IRR);
                 }
             }
         }
@@ -187,12 +187,7 @@ void WebApiWsLiveClass::addField(JsonObject& root, uint8_t idx, std::shared_ptr<
             chanName = topic;
         }
         String chanNum;
-        if (type == TYPE_DC) {
-            // TODO(tbnobody)
-            chanNum = static_cast<uint8_t>(channel) + 1;
-        } else {
-            chanNum = channel;
-        }
+        chanNum = channel;
         root[chanNum][chanName]["v"] = inv->Statistics()->getChannelFieldValue(type, channel, fieldId);
         root[chanNum][chanName]["u"] = inv->Statistics()->getChannelFieldUnit(type, channel, fieldId);
         root[chanNum][chanName]["d"] = inv->Statistics()->getChannelFieldDigits(type, channel, fieldId);
