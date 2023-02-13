@@ -5,6 +5,7 @@
 #include "WebApi_mqtt.h"
 #include "Configuration.h"
 #include "MqttHandleHass.h"
+#include "MqttHandleVedirectHass.h"
 #include "MqttSettings.h"
 #include "WebApi.h"
 #include "WebApi_errors.h"
@@ -316,6 +317,7 @@ void WebApiMqttClass::onMqttAdminPost(AsyncWebServerRequest* request)
 
     MqttSettings.performReconnect();
     MqttHandleHass.forceUpdate();
+    MqttHandleVedirectHass.forceUpdate();
 }
 
 String WebApiMqttClass::getRootCaCertInfo(const char* cert)
