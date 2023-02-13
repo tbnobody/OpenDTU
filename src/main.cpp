@@ -182,24 +182,21 @@ void loop()
     yield();
     Hoymiles.loop();
     yield();
+    // Vedirect_Enabled is unknown to lib. Therefor check has to be done here
     if (Configuration.get().Vedirect_Enabled) {
-        VeDirect.loop();
+		VeDirect.loop();
         yield();
-    }
+	}
     MqttHandleDtu.loop();
     yield();
     MqttHandleInverter.loop();
     yield();
-    if (Configuration.get().Vedirect_Enabled) {
-        MqttHandleVedirect.loop();
-        yield();
-    }
+    MqttHandleVedirect.loop();
+    yield();
     MqttHandleHass.loop();
     yield();
-    if (Configuration.get().Vedirect_Enabled) {
-        MqttHandleVedirectHass.loop();
-        yield();
-    }
+    MqttHandleVedirectHass.loop();
+    yield();
     WebApi.loop();
     yield();
     Display.loop();

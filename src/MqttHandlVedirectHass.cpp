@@ -16,6 +16,9 @@ void MqttHandleVedirectHassClass::init()
 
 void MqttHandleVedirectHassClass::loop()
 {
+    if (!Configuration.get().Vedirect_Enabled) {
+        return;
+    }
     if (_updateForced) {
         publishConfig();
         _updateForced = false;
