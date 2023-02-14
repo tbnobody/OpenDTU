@@ -32,12 +32,7 @@ String HM_1CH::typeName()
     return F("HM-300, HM-350, HM-400");
 }
 
-const byteAssign_t* HM_1CH::getByteAssignment()
+const std::list<byteAssign_t>* HM_1CH::getByteAssignment()
 {
-    return byteAssignment;
-}
-
-uint8_t HM_1CH::getAssignmentCount()
-{
-    return sizeof(byteAssignment) / sizeof(byteAssign_t);
+    return &byteAssignment;
 }

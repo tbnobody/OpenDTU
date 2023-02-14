@@ -63,39 +63,48 @@ void WebApiPrometheusClass::onPrometheusMetricsGet(AsyncWebServerRequest* reques
             serial.c_str(), i, name, inv->Statistics()->getLastUpdate() / 1000);
 
         // Loop all channels
-        for (uint8_t c = 0; c <= inv->Statistics()->getChannelCount(); c++) {
-            addField(stream, serial, i, inv, c, FLD_PAC);
-            addField(stream, serial, i, inv, c, FLD_UAC);
-            addField(stream, serial, i, inv, c, FLD_IAC);
-            if (c == 0) {
-                addField(stream, serial, i, inv, c, FLD_PDC, "PowerDC");
-            } else {
-                addField(stream, serial, i, inv, c, FLD_PDC);
+        for (auto& t : inv->Statistics()->getChannelTypes()) {
+            for (auto& c : inv->Statistics()->getChannelsByType(t)) {
+                addField(stream, serial, i, inv, t, c, FLD_PAC);
+                addField(stream, serial, i, inv, t, c, FLD_UAC);
+                addField(stream, serial, i, inv, t, c, FLD_IAC);
+                if (t == TYPE_AC) {
+                    addField(stream, serial, i, inv, t, c, FLD_PDC, "PowerDC");
+                } else {
+                    addField(stream, serial, i, inv, t, c, FLD_PDC);
+                }
+                addField(stream, serial, i, inv, t, c, FLD_UDC);
+                addField(stream, serial, i, inv, t, c, FLD_IDC);
+                addField(stream, serial, i, inv, t, c, FLD_YD);
+                addField(stream, serial, i, inv, t, c, FLD_YT);
+                addField(stream, serial, i, inv, t, c, FLD_F);
+                addField(stream, serial, i, inv, t, c, FLD_T);
+                addField(stream, serial, i, inv, t, c, FLD_PF);
+                addField(stream, serial, i, inv, t, c, FLD_PRA);
+                addField(stream, serial, i, inv, t, c, FLD_EFF);
+                addField(stream, serial, i, inv, t, c, FLD_IRR);
             }
-            addField(stream, serial, i, inv, c, FLD_UDC);
-            addField(stream, serial, i, inv, c, FLD_IDC);
-            addField(stream, serial, i, inv, c, FLD_YD);
-            addField(stream, serial, i, inv, c, FLD_YT);
-            addField(stream, serial, i, inv, c, FLD_F);
-            addField(stream, serial, i, inv, c, FLD_T);
-            addField(stream, serial, i, inv, c, FLD_PF);
-            addField(stream, serial, i, inv, c, FLD_PRA);
-            addField(stream, serial, i, inv, c, FLD_EFF);
-            addField(stream, serial, i, inv, c, FLD_IRR);
         }
     }
     stream->addHeader(F("Cache-Control"), F("no-cache"));
     request->send(stream);
 }
 
-void WebApiPrometheusClass::addField(AsyncResponseStream* stream, String& serial, uint8_t idx, std::shared_ptr<InverterAbstract> inv, uint8_t channel, uint8_t fieldId, const char* channelName)
+void WebApiPrometheusClass::addField(AsyncResponseStream* stream, String& serial, uint8_t idx, std::shared_ptr<InverterAbstract> inv, ChannelType_t type, ChannelNum_t channel, FieldId_t fieldId, const char* channelName)
 {
-    if (inv->Statistics()->hasChannelFieldValue(channel, fieldId)) {
-        const char* chanName = (channelName == NULL) ? inv->Statistics()->getChannelFieldName(channel, fieldId) : channelName;
-        if (idx == 0 && channel == 0) {
-            stream->printf("# HELP opendtu_%s in %s\n", chanName, inv->Statistics()->getChannelFieldUnit(channel, fieldId));
+    if (inv->Statistics()->hasChannelFieldValue(type, channel, fieldId)) {
+        const char* chanName = (channelName == NULL) ? inv->Statistics()->getChannelFieldName(type, channel, fieldId) : channelName;
+        if (idx == 0 && type == TYPE_AC && channel == 0) {
+            stream->printf("# HELP opendtu_%s in %s\n", chanName, inv->Statistics()->getChannelFieldUnit(type, channel, fieldId));
             stream->printf("# TYPE opendtu_%s gauge\n", chanName);
         }
-        stream->printf("opendtu_%s{serial=\"%s\",unit=\"%d\",name=\"%s\",channel=\"%d\"} %f\n", chanName, serial.c_str(), idx, inv->name(), channel, inv->Statistics()->getChannelFieldValue(channel, fieldId));
+        stream->printf("opendtu_%s{serial=\"%s\",unit=\"%d\",name=\"%s\",type=\"%s\",channel=\"%d\"} %f\n",
+            chanName,
+            serial.c_str(),
+            idx,
+            inv->name(),
+            inv->Statistics()->getChannelTypeName(type),
+            channel,
+            inv->Statistics()->getChannelFieldValue(type, channel, fieldId));
     }
 }

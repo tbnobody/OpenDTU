@@ -1,3 +1,7 @@
+// SPDX-License-Identifier: GPL-2.0-or-later
+/*
+ * Copyright (C) 2022 - 2023 Thomas Basler and others
+ */
 #include "Utils.h"
 #include <Esp.h>
 

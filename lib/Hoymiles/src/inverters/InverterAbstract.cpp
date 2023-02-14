@@ -30,7 +30,7 @@ void InverterAbstract::init()
     // Not possible in constructor --> virtual function
     // Not possible in verifyAllFragments --> Because no data if nothing is ever received
     // It has to be executed because otherwise the getChannelCount method in stats always returns 0
-    _statisticsParser.get()->setByteAssignment(getByteAssignment(), getAssignmentCount());
+    _statisticsParser.get()->setByteAssignment(getByteAssignment());
 }
 
 uint64_t InverterAbstract::serial()
@@ -60,11 +60,14 @@ const char* InverterAbstract::name()
 
 bool InverterAbstract::isProducing()
 {
-    if (!Statistics()->hasChannelFieldValue(CH0, FLD_PAC)) {
-        return false;
+    float totalAc = 0;
+    for (auto& c : Statistics()->getChannelsByType(TYPE_AC)) {
+        if (Statistics()->hasChannelFieldValue(TYPE_AC, c, FLD_PAC)) {
+            totalAc += Statistics()->getChannelFieldValue(TYPE_AC, c, FLD_PAC);
+        }
     }
 
-    return Statistics()->getChannelFieldValue(CH0, FLD_PAC) > 0;
+    return totalAc > 0;
 }
 
 bool InverterAbstract::isReachable()

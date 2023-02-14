@@ -65,13 +65,15 @@ void MqttHandleHassClass::publishConfig()
         publishInverterBinarySensor(inv, "Producing", "status/producing", "1", "0");
 
         // Loop all channels
-        for (uint8_t c = 0; c <= inv->Statistics()->getChannelCount(); c++) {
-            for (uint8_t f = 0; f < DEVICE_CLS_ASSIGN_LIST_LEN; f++) {
-                bool clear = false;
-                if (c > 0 && !config.Mqtt_Hass_IndividualPanels) {
-                    clear = true;
+        for (auto& t : inv->Statistics()->getChannelTypes()) {
+            for (auto& c : inv->Statistics()->getChannelsByType(t)) {
+                for (uint8_t f = 0; f < DEVICE_CLS_ASSIGN_LIST_LEN; f++) {
+                    bool clear = false;
+                    if (t == TYPE_DC && !config.Mqtt_Hass_IndividualPanels) {
+                        clear = true;
+                    }
+                    publishField(inv, t, c, deviceFieldAssignment[f], clear);
                 }
-                publishField(inv, c, deviceFieldAssignment[f], clear);
             }
         }
 
@@ -79,32 +81,40 @@ void MqttHandleHassClass::publishConfig()
     }
 }
 
-void MqttHandleHassClass::publishField(std::shared_ptr<InverterAbstract> inv, uint8_t channel, byteAssign_fieldDeviceClass_t fieldType, bool clear)
+void MqttHandleHassClass::publishField(std::shared_ptr<InverterAbstract> inv, ChannelType_t type, ChannelNum_t channel, byteAssign_fieldDeviceClass_t fieldType, bool clear)
 {
-    if (!inv->Statistics()->hasChannelFieldValue(channel, fieldType.fieldId)) {
+    if (!inv->Statistics()->hasChannelFieldValue(type, channel, fieldType.fieldId)) {
         return;
     }
 
     String serial = inv->serialString();
 
     String fieldName;
-    if (channel == CH0 && fieldType.fieldId == FLD_PDC) {
+    if (type == TYPE_AC && fieldType.fieldId == FLD_PDC) {
         fieldName = "PowerDC";
     } else {
-        fieldName = inv->Statistics()->getChannelFieldName(channel, fieldType.fieldId);
+        fieldName = inv->Statistics()->getChannelFieldName(type, channel, fieldType.fieldId);
+    }
+
+    String chanNum;
+    if (type == TYPE_DC) {
+        // TODO(tbnobody)
+        chanNum = static_cast<uint8_t>(channel) + 1;
+    } else {
+        chanNum = channel;
     }
 
     String configTopic = "sensor/dtu_" + serial
-        + "/" + "ch" + String(channel) + "_" + fieldName
+        + "/" + "ch" + chanNum + "_" + fieldName
         + "/config";
 
     if (!clear) {
-        String stateTopic = MqttSettings.getPrefix() + MqttHandleInverter.getTopic(inv, channel, fieldType.fieldId);
+        String stateTopic = MqttSettings.getPrefix() + MqttHandleInverter.getTopic(inv, type, channel, fieldType.fieldId);
         const char* devCls = deviceClasses[fieldType.deviceClsId];
         const char* stateCls = stateClasses[fieldType.stateClsId];
 
         String name;
-        if (channel == CH0) {
+        if (type != TYPE_DC) {
             name = String(inv->name()) + " " + fieldName;
         } else {
             name = String(inv->name()) + " CH" + String(channel) + " " + fieldName;
@@ -115,9 +125,9 @@ void MqttHandleHassClass::publishField(std::shared_ptr<InverterAbstract> inv, ui
         root[F("stat_t")] = stateTopic;
         root[F("uniq_id")] = serial + "_ch" + String(channel) + "_" + fieldName;
 
-        String unit_of_meausure = inv->Statistics()->getChannelFieldUnit(channel, fieldType.fieldId);
-        if (unit_of_meausure != "") {
-            root[F("unit_of_meas")] = unit_of_meausure;
+        String unit_of_measure = inv->Statistics()->getChannelFieldUnit(type, channel, fieldType.fieldId);
+        if (unit_of_measure != "") {
+            root[F("unit_of_meas")] = unit_of_measure;
         }
 
         JsonObject deviceObj = root.createNestedObject("dev");

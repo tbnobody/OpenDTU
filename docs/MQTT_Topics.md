@@ -51,6 +51,7 @@ serial will be replaced with the serial number of the inverter.
 | Topic                                   | R / W | Description                                          | Value / Unit               |
 | --------------------------------------- | ----- | ---------------------------------------------------- | -------------------------- |
 | [serial]/[1-4]/current                  | R     | DC current of specific input in ampere               | Ampere (A)                 |
+| [serial]/[1-4]/name                     | R     | Name of the DC input channel as configured in web GUI|                            |
 | [serial]/[1-4]/irradiation              | R     | Ratio DC Power over set maximum power (in web GUI)   | %                          |
 | [serial]/[1-4]/power                    | R     | DC power of specific input in watt                   | Watt (W)                   |
 | [serial]/[1-4]/voltage                  | R     | DC voltage of specific input in volt                 | Volt (V)                   |

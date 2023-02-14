@@ -302,6 +302,7 @@
     "inverterchannelinfo": {
         "String": "String {num}",
         "Phase": "Phase {num}",
+        "General": "General",
         "Property": "Property",
         "Value": "Value",
         "Unit": "Unit"
