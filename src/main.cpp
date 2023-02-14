@@ -3,7 +3,8 @@
  * Copyright (C) 2022 Thomas Basler and others
  */
 #include "Configuration.h"
-#include "Display_Graphic.h"
+#include "Display.h"
+#include "Display_helper.h"
 #include "MessageOutput.h"
 #include "MqttHandleDtu.h"
 #include "MqttHandleHass.h"
@@ -100,8 +101,11 @@ void setup()
         pin.display_data,
         pin.display_clk,
         pin.display_cs,
-        pin.display_reset);
-    Display.showLogo = config.Display_ShowLogo;
+        pin.display_reset,
+        pin.display_busy,
+        pin.display_dc);
+
+    // Display.showLogo = config.Display_ShowLogo;
     Display.enablePowerSafe = config.Display_PowerSafe;
     Display.enableScreensaver = config.Display_ScreenSaver;
     Display.contrast = config.Display_Contrast;

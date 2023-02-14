@@ -4,7 +4,7 @@
  */
 #include "WebApi_device.h"
 #include "Configuration.h"
-#include "Display_Graphic.h"
+#include "Display.h"
 #include "PinMapping.h"
 #include "WebApi.h"
 #include "WebApi_errors.h"
@@ -62,6 +62,8 @@ void WebApiDeviceClass::onDeviceAdminGet(AsyncWebServerRequest* request)
     displayPinObj[F("clk")] = pin.display_clk;
     displayPinObj[F("cs")] = pin.display_cs;
     displayPinObj[F("reset")] = pin.display_reset;
+    displayPinObj[F("busy")] = pin.display_busy;
+    displayPinObj[F("dc")] = pin.display_dc;
 
     JsonObject display = root.createNestedObject("display");
     display[F("show_logo")] = config.Display_ShowLogo;
@@ -133,12 +135,12 @@ void WebApiDeviceClass::onDeviceAdminPost(AsyncWebServerRequest* request)
     bool performRestart = root[F("curPin")][F("name")].as<String>() != config.Dev_PinMapping;
 
     strlcpy(config.Dev_PinMapping, root[F("curPin")][F("name")].as<String>().c_str(), sizeof(config.Dev_PinMapping));
-    config.Display_ShowLogo = root[F("display")][F("show_logo")].as<bool>();
+    // config.Display_ShowLogo = root[F("display")][F("show_logo")].as<bool>();
     config.Display_PowerSafe = root[F("display")][F("power_safe")].as<bool>();
     config.Display_ScreenSaver = root[F("display")][F("screensaver")].as<bool>();
     config.Display_Contrast = root[F("display")][F("contrast")].as<uint8_t>();
 
-    Display.showLogo = config.Display_ShowLogo;
+    // Display.showLogo = config.Display_ShowLogo;
     Display.enablePowerSafe = config.Display_PowerSafe;
     Display.enableScreensaver = config.Display_ScreenSaver;
     Display.contrast = config.Display_Contrast;

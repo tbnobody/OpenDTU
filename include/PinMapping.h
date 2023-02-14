@@ -2,8 +2,8 @@
 #pragma once
 
 #include <Arduino.h>
-#include <stdint.h>
 #include <ETH.h>
+#include <stdint.h>
 
 #define PINMAPPING_FILENAME "/pin_mapping.json"
 
@@ -29,6 +29,8 @@ struct PinMapping_t {
     uint8_t display_clk;
     uint8_t display_cs;
     uint8_t display_reset;
+    uint8_t display_busy;
+    uint8_t display_dc;
 };
 
 class PinMappingClass {
