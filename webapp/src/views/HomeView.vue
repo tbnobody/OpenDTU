@@ -106,10 +106,9 @@
                 </div>
             </div>
         </div>
+        <VedirectView />
     </BasePage>
-
-    <VedirectView />
-
+   
     <div class="modal" id="eventView" tabindex="-1">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
@@ -318,7 +317,7 @@ import EventLog from '@/components/EventLog.vue';
 import HintView from '@/components/HintView.vue';
 import InverterChannelInfo from "@/components/InverterChannelInfo.vue";
 import InverterTotalInfo from '@/components/InverterTotalInfo.vue';
-import VedirectView from '@/views/VedirectView.vue';
+import VedirectView from '@/components/VedirectView.vue';
 import type { DevInfoStatus } from '@/types/DevInfoStatus';
 import type { EventlogItems } from '@/types/EventlogStatus';
 import type { LimitConfig } from '@/types/LimitConfig';

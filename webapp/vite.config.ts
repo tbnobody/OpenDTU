@@ -49,6 +49,11 @@ export default defineConfig({
         ws: true,
         changeOrigin: true
       },
+      '^/vedirectlivedata': {
+        target: 'ws://192.168.178.78/',
+        ws: true,
+        changeOrigin: true
+      },
       '^/console': {
         target: 'ws://192.168.20.110/',
         ws: true,
