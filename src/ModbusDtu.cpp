@@ -53,11 +53,13 @@ void ModbusDtuClass::loop()
                     mb.Hreg(chan* 20 + 0x1001, (serialInv >> 24) & 0xFFFF);
                     mb.Hreg(chan* 20 + 0x1002, (serialInv >> 8) & 0xFFFF);
                     mb.Hreg(chan* 20 + 0x1003, (serialInv << 8) + c);
-                    mb.Hreg(chan* 20 + 0x1004, (uint16_t)(inv->Statistics()->getChannelFieldValue(c, FLD_UDC)*10));
-                    mb.Hreg(chan* 20 + 0x1005, (uint16_t)(inv->Statistics()->getChannelFieldValue(c, FLD_IDC)*100));
+                    if(inv->Statistics()->getChannelMaxPower(c)>0 && inv->Statistics()->getChannelFieldValue(c, FLD_IRR) < 120){
+                        mb.Hreg(chan* 20 + 0x1004, (uint16_t)(inv->Statistics()->getChannelFieldValue(c, FLD_UDC)*10));
+                        mb.Hreg(chan* 20 + 0x1005, (uint16_t)(inv->Statistics()->getChannelFieldValue(c, FLD_IDC)*100));
+                        mb.Hreg(chan* 20 + 0x1008, (uint16_t)(inv->Statistics()->getChannelFieldValue(c, FLD_PDC)*10));
+                    }
                     mb.Hreg(chan* 20 + 0x1006, (uint16_t)(inv->Statistics()->getChannelFieldValue(0, FLD_UAC)*10));
                     mb.Hreg(chan* 20 + 0x1007, (uint16_t)(inv->Statistics()->getChannelFieldValue(0, FLD_F)*100));
-                    mb.Hreg(chan* 20 + 0x1008, (uint16_t)(inv->Statistics()->getChannelFieldValue(c, FLD_PDC)*10));
                     mb.Hreg(chan* 20 + 0x1009, (uint16_t)(inv->Statistics()->getChannelFieldValue(c, FLD_YD)));
                     mb.Hreg(chan* 20 + 0x100A, ((uint16_t)(((uint32_t)(inv->Statistics()->getChannelFieldValue(c, FLD_YT)*1000)) >> 16)) & 0xFFFF);
                     mb.Hreg(chan* 20 + 0x100B, (((uint16_t)(inv->Statistics()->getChannelFieldValue(c, FLD_YT)*1000))) & 0xFFFF);
