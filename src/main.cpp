@@ -3,6 +3,7 @@
  * Copyright (C) 2022 Thomas Basler and others
  */
 #include "Configuration.h"
+#include "ModbusDtu.h"
 #include "Display_Graphic.h"
 #include "MessageOutput.h"
 #include "MqttHandleDtu.h"
@@ -159,6 +160,10 @@ void setup()
     } else {
         MessageOutput.println(F("Invalid pin config"));
     }
+    // Initialize Modbus
+    MessageOutput.print(F("Initialize Modbus... "));
+    ModbusDtu.init();
+    MessageOutput.println(F("done"));
 }
 
 void loop()
@@ -166,6 +171,8 @@ void loop()
     NetworkSettings.loop();
     yield();
     Hoymiles.loop();
+    yield();
+    ModbusDtu.loop();
     yield();
     MqttHandleDtu.loop();
     yield();
