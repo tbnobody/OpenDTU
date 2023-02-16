@@ -81,7 +81,7 @@ void WebApiWsVedirectLiveClass::generateJsonResponse(JsonVariant& root)
 {
     // device info
     root["data_age"] = (millis() - VeDirect.getLastUpdate() ) / 1000;
-    root["age_critical"] = VeDirect.isDataValid();
+    root["age_critical"] = !VeDirect.isDataValid();
     root["PID"] = VeDirect.getPidAsString(VeDirect.veMap["PID"].c_str());
     root["SER"] = VeDirect.veMap["SER"];
     root["FW"] = VeDirect.veMap["FW"];
