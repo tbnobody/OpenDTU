@@ -198,6 +198,19 @@ bool VeDirectFrameHandler::hexRxEvent(uint8_t inbyte) {
 	return true;		// stubbed out for future
 }
 
+bool VeDirectFrameHandler::isDataValid() {
+	if (veMap.empty()) {
+		return false;
+	}
+ 	if ((millis() - getLastUpdate()) / 1000 > _pollInterval * 5) { 
+        return false;
+	}
+    if (veMap.find("SER") == veMap.end()) {
+        return false;
+    } 
+	return true;
+}
+
 unsigned long VeDirectFrameHandler::getLastUpdate()
 {
     return _lastPoll;

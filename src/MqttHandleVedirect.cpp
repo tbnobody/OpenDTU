@@ -24,26 +24,17 @@ void MqttHandleVedirectClass::loop()
         return;
     }   
 
-    String serial;
-    auto pos = VeDirect.veMap.find("SER");
-    if (pos == VeDirect.veMap.end()) {
-        MessageOutput.printf("No VeDirect Data\r\n");
+    if (!VeDirect.isDataValid()) { 
+        MessageOutput.printf("VeDirect Data not valid: Stopping publishing. Last read before %lu seconds\r\n", (millis() - VeDirect.getLastUpdate()) / 1000);
         return;
-    } 
-    else {
-        serial = pos->second;
     }
 
     if (millis() - _lastPublish > (config.Mqtt_PublishInterval * 1000)) {
-        if ((millis() - VeDirect.getLastUpdate()) / 1000 > config.Vedirect_PollInterval * 5) { // same as age critical in live view
-            MessageOutput.printf("VeDirect Data too old: Stopping publishing. Last read before %lu seconds\r\n", (millis() - VeDirect.getLastUpdate()) / 1000);
-            return;
-        }
-
         String key;
         String value;
         String mapedValue;
         bool bChanged = false;
+        String serial = VeDirect.veMap["SER"];
 
         String topic = "";
         for (auto it = VeDirect.veMap.begin(); it != VeDirect.veMap.end(); ++it) {
@@ -61,7 +52,6 @@ void MqttHandleVedirectClass::loop()
                 }
             }
 
-        
             // publish only changed key, values pairs
             if (!config.Vedirect_UpdatesOnly || (bChanged && config.Vedirect_UpdatesOnly)) {
                 topic = "victron/" + serial + "/";

@@ -80,40 +80,40 @@ void WebApiWsVedirectLiveClass::loop()
 void WebApiWsVedirectLiveClass::generateJsonResponse(JsonVariant& root)
 {
     // device info
-    root[F("data_age")] = (millis() - VeDirect.getLastUpdate() ) / 1000;
-    root[F("age_critical")] = ((millis() - VeDirect.getLastUpdate()) / 1000) > Configuration.get().Vedirect_PollInterval * 5;
-    root[F("PID")] = VeDirect.getPidAsString(VeDirect.veMap["PID"].c_str());
-    root[F("SER")] = VeDirect.veMap["SER"];
-    root[F("FW")] = VeDirect.veMap["FW"];
-    root[F("LOAD")] = VeDirect.veMap["LOAD"];
-    root[F("CS")] = VeDirect.getCsAsString(VeDirect.veMap["CS"].c_str());
-    root[F("ERR")] = VeDirect.getErrAsString(VeDirect.veMap["ERR"].c_str());
-    root[F("OR")] = VeDirect.getOrAsString(VeDirect.veMap["OR"].c_str());
-    root[F("MPPT")] = VeDirect.getMpptAsString(VeDirect.veMap["MPPT"].c_str());
-    root[F("HSDS")]["v"] = VeDirect.veMap["HSDS"].toInt();
-    root[F("HSDS")]["u"] = "Days";
+    root["data_age"] = (millis() - VeDirect.getLastUpdate() ) / 1000;
+    root["age_critical"] = VeDirect.isDataValid();
+    root["PID"] = VeDirect.getPidAsString(VeDirect.veMap["PID"].c_str());
+    root["SER"] = VeDirect.veMap["SER"];
+    root["FW"] = VeDirect.veMap["FW"];
+    root["LOAD"] = VeDirect.veMap["LOAD"];
+    root["CS"] = VeDirect.getCsAsString(VeDirect.veMap["CS"].c_str());
+    root["ERR"] = VeDirect.getErrAsString(VeDirect.veMap["ERR"].c_str());
+    root["OR"] = VeDirect.getOrAsString(VeDirect.veMap["OR"].c_str());
+    root["MPPT"] = VeDirect.getMpptAsString(VeDirect.veMap["MPPT"].c_str());
+    root["HSDS"]["v"] = VeDirect.veMap["HSDS"].toInt();
+    root["HSDS"]["u"] = "Days";
 
     // battery info    
-    root[F("V")]["v"] = round(VeDirect.veMap["V"].toDouble() / 10.0) / 100.0;
-    root[F("V")]["u"] = "V";
-    root[F("I")]["v"] = round(VeDirect.veMap["I"].toDouble() / 10.0) / 100.0;
-    root[F("I")]["u"] = "A";
+    root["V"]["v"] = round(VeDirect.veMap["V"].toDouble() / 10.0) / 100.0;
+    root["V"]["u"] = "V";
+    root["I"]["v"] = round(VeDirect.veMap["I"].toDouble() / 10.0) / 100.0;
+    root["I"]["u"] = "A";
 
     // panel info
-    root[F("VPV")]["v"] = round(VeDirect.veMap["VPV"].toDouble() / 10.0) / 100.0;
-    root[F("VPV")]["u"] = "V";
-    root[F("PPV")]["v"] = VeDirect.veMap["PPV"].toInt();
-    root[F("PPV")]["u"] = "W";
-    root[F("H19")]["v"] = VeDirect.veMap["H19"].toDouble() / 100.0;
-    root[F("H19")]["u"] = "kWh";
-    root[F("H20")]["v"] = VeDirect.veMap["H20"].toDouble() / 100.0;
-    root[F("H20")]["u"] = "kWh";
-    root[F("H21")]["v"] = VeDirect.veMap["H21"].toInt();
-    root[F("H21")]["u"] = "W";
-    root[F("H22")]["v"] = VeDirect.veMap["H22"].toDouble() / 100.0;
-    root[F("H22")]["u"] = "kWh";
-    root[F("H23")]["v"] = VeDirect.veMap["H23"].toInt();
-    root[F("H23")]["u"] = "W";
+    root["VPV"]["v"] = round(VeDirect.veMap["VPV"].toDouble() / 10.0) / 100.0;
+    root["VPV"]["u"] = "V";
+    root["PPV"]["v"] = VeDirect.veMap["PPV"].toInt();
+    root["PPV"]["u"] = "W";
+    root["H19"]["v"] = VeDirect.veMap["H19"].toDouble() / 100.0;
+    root["H19"]["u"] = "kWh";
+    root["H20"]["v"] = VeDirect.veMap["H20"].toDouble() / 100.0;
+    root["H20"]["u"] = "kWh";
+    root["H21"]["v"] = VeDirect.veMap["H21"].toInt();
+    root["H21"]["u"] = "W";
+    root["H22"]["v"] = VeDirect.veMap["H22"].toDouble() / 100.0;
+    root["H22"]["u"] = "kWh";
+    root["H23"]["v"] = VeDirect.veMap["H23"].toInt();
+    root["H23"]["u"] = "W";
 
     if (VeDirect.getLastUpdate() > _newestVedirectTimestamp) {
         _newestVedirectTimestamp = VeDirect.getLastUpdate();

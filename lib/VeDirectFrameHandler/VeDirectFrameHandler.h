@@ -33,6 +33,7 @@ public:
     void setPollInterval(unsigned long interval); // set poll intervall in seconds
     void loop();                                 // main loop to read ve.direct data
     unsigned long getLastUpdate();               // timestamp of last successful frame read
+    bool isDataValid();                          // return true if data valid and not outdated
     String getPidAsString(const char* pid);      // product id as string  
     String getCsAsString(const char* cs);        // current state as string
     String getErrAsString(const char* err);      // errer state as string

@@ -50,7 +50,7 @@ void MqttHandleVedirectHassClass::publishConfig()
         return;
     }
     // ensure data is revieved from victron
-    if (VeDirect.veMap.find("SER") == VeDirect.veMap.end()) { 
+    if (!VeDirect.isDataValid()) { 
         return;
     }
 
