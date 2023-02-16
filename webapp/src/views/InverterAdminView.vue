@@ -55,7 +55,7 @@
     </BasePage>
 
     <div class="modal" id="inverterEdit" tabindex="-1">
-        <div class="modal-dialog">
+        <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title">{{ $t('inverteradmin.EditInverter') }}</h5>
@@ -90,7 +90,9 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="col-md-5">
+                            </div>
+                            <div class="row g-2">
+                                <div class="col">
                                     <label :for="`inverter-max_${index}`" class="col-form-label">
                                         {{ $t('inverteradmin.StringMaxPower', { num: index + 1 }) }}
                                         <BIconInfoCircle v-tooltip :title="$t('inverteradmin.StringMaxPowerHint')" />
@@ -102,6 +104,21 @@
                                                 :aria-describedby="`inverter-maxDescription_${index} inverter-customizer`" />
                                             <span class="input-group-text"
                                                 :id="`inverter-maxDescription_${index}`">W<sub>p</sub><sup>*</sup></span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col">
+                                    <label :for="`inverter-ytoffset_${index}`" class="col-form-label">
+                                        {{ $t('inverteradmin.StringYtOffset', { num: index + 1 }) }}
+                                        <BIconInfoCircle v-tooltip :title="$t('inverteradmin.StringYtOffsetHint')" />
+                                    </label>
+                                    <div class="d-flex mb-2">
+                                        <div class="input-group">
+                                            <input type="number" class="form-control" :id="`inverter-ytoffset_${index}`"
+                                                min="0" v-model="selectedInverterData.channel[index].yield_total_offset"
+                                                :aria-describedby="`inverter-ytoffsetDescription_${index} inverter-customizer`" />
+                                            <span class="input-group-text"
+                                                :id="`inverter-ytoffsetDescription_${index}`">kWh</span>
                                         </div>
                                     </div>
                                 </div>
@@ -163,6 +180,7 @@ import { defineComponent } from 'vue';
 declare interface Channel {
     name: string;
     max_power: number;
+    yield_total_offset: number;
 }
 
 declare interface Inverter {

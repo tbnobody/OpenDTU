@@ -117,13 +117,13 @@ void MqttHandleHassClass::publishField(std::shared_ptr<InverterAbstract> inv, Ch
         if (type != TYPE_DC) {
             name = String(inv->name()) + " " + fieldName;
         } else {
-            name = String(inv->name()) + " CH" + String(channel) + " " + fieldName;
+            name = String(inv->name()) + " CH" + chanNum + " " + fieldName;
         }
 
         DynamicJsonDocument root(1024);
         root[F("name")] = name;
         root[F("stat_t")] = stateTopic;
-        root[F("uniq_id")] = serial + "_ch" + String(channel) + "_" + fieldName;
+        root[F("uniq_id")] = serial + "_ch" + chanNum + "_" + fieldName;
 
         String unit_of_measure = inv->Statistics()->getChannelFieldUnit(type, channel, fieldType.fieldId);
         if (unit_of_measure != "") {

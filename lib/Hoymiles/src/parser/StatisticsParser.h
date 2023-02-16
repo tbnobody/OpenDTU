@@ -82,6 +82,13 @@ typedef struct {
     uint8_t digits; // number of valid digits after the decimal point
 } byteAssign_t;
 
+typedef struct {
+    ChannelType_t type;
+    ChannelNum_t ch; // channel 0 - 4
+    FieldId_t fieldId; // field id
+    float offset; // offset (positive/negative) to be applied on the fetched value
+} fieldSettings_t;
+
 class StatisticsParser : public Parser {
 public:
     void clearBuffer();
@@ -90,11 +97,16 @@ public:
     void setByteAssignment(const std::list<byteAssign_t>* byteAssignment);
 
     const byteAssign_t* getAssignmentByChannelField(ChannelType_t type, ChannelNum_t channel, FieldId_t fieldId);
+    fieldSettings_t* getSettingByChannelField(ChannelType_t type, ChannelNum_t channel, FieldId_t fieldId);
+
     float getChannelFieldValue(ChannelType_t type, ChannelNum_t channel, FieldId_t fieldId);
     bool hasChannelFieldValue(ChannelType_t type, ChannelNum_t channel, FieldId_t fieldId);
     const char* getChannelFieldUnit(ChannelType_t type, ChannelNum_t channel, FieldId_t fieldId);
     const char* getChannelFieldName(ChannelType_t type, ChannelNum_t channel, FieldId_t fieldId);
     uint8_t getChannelFieldDigits(ChannelType_t type, ChannelNum_t channel, FieldId_t fieldId);
+
+    float getChannelFieldOffset(ChannelType_t type, ChannelNum_t channel, FieldId_t fieldId);
+    void setChannelFieldOffset(ChannelType_t type, ChannelNum_t channel, FieldId_t fieldId, float offset);
 
     std::list<ChannelType_t> getChannelTypes();
     const char* getChannelTypeName(ChannelType_t type);
@@ -113,6 +125,7 @@ private:
     uint16_t _stringMaxPower[CH4];
 
     const std::list<byteAssign_t>* _byteAssignment;
+    std::list<fieldSettings_t> _fieldSettings;
 
     uint32_t _rxFailureCount = 0;
 };
