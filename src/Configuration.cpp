@@ -127,7 +127,7 @@ bool ConfigurationClass::read()
     // Deserialize the JSON document
     DeserializationError error = deserializeJson(doc, f);
     if (error) {
-        MessageOutput.println(F("Failed to read file, using default configuration"));
+        MessageOutput.printf("Failed to read file, using default configuration. Error: %s (capacity: %d)\r\n", error.c_str(), doc.capacity());
     }
 
     JsonObject cfg = doc["cfg"];
