@@ -25,7 +25,6 @@ void MqttHandleVedirectClass::loop()
     }   
 
     if (!VeDirect.isDataValid()) { 
-        MessageOutput.printf("VeDirect Data not valid: Stopping publishing. Last read before %lu seconds\r\n", (millis() - VeDirect.getLastUpdate()) / 1000);
         return;
     }
 
