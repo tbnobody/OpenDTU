@@ -60,6 +60,8 @@ struct CONFIG_T {
     char Ntp_Server[NTP_MAX_SERVER_STRLEN + 1];
     char Ntp_Timezone[NTP_MAX_TIMEZONE_STRLEN + 1];
     char Ntp_TimezoneDescr[NTP_MAX_TIMEZONEDESCR_STRLEN + 1];
+    double Ntp_Longitude;
+    double Ntp_Latitude;
 
     bool Mqtt_Enabled;
     uint Mqtt_Port;
