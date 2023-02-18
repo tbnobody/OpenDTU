@@ -38,12 +38,12 @@
                     <tbody>
                         <tr v-for="inverter in sortedInverters" v-bind:key="inverter.id">
                             <td>
-                                <span class="badge" :class="{
+                                <span class="badge" :title="$t('inverteradmin.Receive')" :class="{
                                     'text-bg-warning': !inverter.poll_enable_night,
                                     'text-bg-dark': inverter.poll_enable_night,}"
                                     ><BIconArrowDown v-if="inverter.poll_enable"  /></span>
 
-                                <span class="badge" title="Send" :class="{
+                                <span class="badge" :title="$t('inverteradmin.Send')" :class="{
                                     'text-bg-warning': !inverter.command_enable_night,
                                     'text-bg-dark': inverter.command_enable_night,}"
                                     ><BIconArrowUp v-if="inverter.command_enable" /></span>

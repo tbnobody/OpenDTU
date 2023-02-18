@@ -402,6 +402,8 @@
         "AddHint": " <b>Astuce :</b> Vous pouvez définir des paramètres supplémentaires après avoir créé l'onduleur. Utilisez l'icône du stylo dans la liste des onduleurs.",
         "InverterList": "Liste des onduleurs",
         "Status": "Status",
+        "Send": "Send",
+        "Receive": "Receive",
         "StatusHint": "<b>Astuce :</b> The inverter is power by it's DC input. If there is no sun, the inverter is off. Requests can still be sent.",
         "Type": "Type",
         "Action": "Action",

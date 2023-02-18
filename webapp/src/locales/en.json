@@ -402,6 +402,8 @@
         "AddHint": "<b>Hint:</b> You can set additional parameters after you have created the inverter. Use the pen icon in the inverter list.",
         "InverterList": "Inverter List",
         "Status": "Status",
+        "Send": "Send",
+        "Receive": "Receive",
         "StatusHint": "<b>Hint:</b> The inverter is power by it's DC input. If there is no sun, the inverter is off. Requests can still be sent.",
         "Type": "Type",
         "Action": "Action",

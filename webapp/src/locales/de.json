@@ -402,6 +402,8 @@
         "AddHint": "<b>Hinweis:</b> Sie können zusätzliche Parameter einstellen, nachdem Sie den Wechselrichter erstellt haben. Verwenden Sie dazu das Stiftsymbol in der Wechselrichterliste.",
         "InverterList": "Wechselrichterliste",
         "Status": "Status",
+        "Send": "Senden",
+        "Receive": "Empfangen",
         "StatusHint": "<b>Hinweis:</b> Der Wechselrichter wird über seinen DC-Eingang mit Strom versorgt. Wenn keine Sonne scheint, ist der Wechselrichter aus. Es können trotzdem Anfragen gesendet werden.",
         "Type": "Typ",
         "Action": "Aktion",
