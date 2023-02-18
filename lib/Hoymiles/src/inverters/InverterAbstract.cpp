@@ -75,6 +75,26 @@ bool InverterAbstract::isReachable()
     return Statistics()->getRxFailureCount() <= MAX_ONLINE_FAILURE_COUNT;
 }
 
+void InverterAbstract::setEnablePolling(bool enabled)
+{
+    _enablePolling = enabled;
+}
+
+bool InverterAbstract::getEnablePolling()
+{
+    return _enablePolling;
+}
+
+void InverterAbstract::setEnableCommands(bool enabled)
+{
+    _enableCommands = enabled;
+}
+
+bool InverterAbstract::getEnableCommands()
+{
+    return _enableCommands;
+}
+
 AlarmLogParser* InverterAbstract::EventLog()
 {
     return _alarmLogParser.get();
