@@ -100,6 +100,7 @@
                                 <InputElement :label="$t('inverteradmin.CommandEnableNight')"
                                     v-model="selectedInverterData.command_enable_night"
                                     type="checkbox" wide/>
+                                <div class="alert alert-secondary mt-3" role="alert" v-html="$t('inverteradmin.StatusHint')"></div>
                             </CardElement>
                         </div>
 
