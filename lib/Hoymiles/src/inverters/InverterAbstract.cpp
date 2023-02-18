@@ -67,12 +67,12 @@ bool InverterAbstract::isProducing()
         }
     }
 
-    return totalAc > 0;
+    return _enablePolling && totalAc > 0;
 }
 
 bool InverterAbstract::isReachable()
 {
-    return Statistics()->getRxFailureCount() <= MAX_ONLINE_FAILURE_COUNT;
+    return _enablePolling && Statistics()->getRxFailureCount() <= MAX_ONLINE_FAILURE_COUNT;
 }
 
 void InverterAbstract::setEnablePolling(bool enabled)
