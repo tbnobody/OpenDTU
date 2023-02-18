@@ -74,6 +74,21 @@
                             </label>
                             <input v-model="selectedInverterData.name" type="text" id="inverter-name"
                                 class="form-control" maxlength="31" />
+
+                            <CardElement :text="$t('inverteradmin.InverterStatus')" addSpace>
+                                <InputElement :label="$t('inverteradmin.PollEnable')"
+                                    v-model="selectedInverterData.poll_enable"
+                                    type="checkbox" wide />
+                                <InputElement :label="$t('inverteradmin.PollEnableNight')"
+                                    v-model="selectedInverterData.poll_enable_night"
+                                    type="checkbox" wide/>
+                                <InputElement :label="$t('inverteradmin.CommandEnable')"
+                                    v-model="selectedInverterData.command_enable"
+                                    type="checkbox" wide/>
+                                <InputElement :label="$t('inverteradmin.CommandEnableNight')"
+                                    v-model="selectedInverterData.command_enable_night"
+                                    type="checkbox" wide/>
+                            </CardElement>
                         </div>
 
                         <div v-for="(max, index) in selectedInverterData.channel" :key="`${index}`">
@@ -168,6 +183,7 @@
 import BasePage from '@/components/BasePage.vue';
 import BootstrapAlert from "@/components/BootstrapAlert.vue";
 import CardElement from '@/components/CardElement.vue';
+import InputElement from '@/components/InputElement.vue';
 import { authHeader, handleResponse } from '@/utils/authentication';
 import * as bootstrap from 'bootstrap';
 import {
@@ -188,6 +204,10 @@ declare interface Inverter {
     serial: number;
     name: string;
     type: string;
+    poll_enable: boolean;
+    poll_enable_night: boolean;
+    command_enable: boolean;
+    command_enable_night: boolean;
     channel: Array<Channel>;
 }
 
@@ -206,6 +226,7 @@ export default defineComponent({
         BIconInfoCircle,
         BIconPencil,
         BIconTrash,
+        InputElement,
     },
     data() {
         return {

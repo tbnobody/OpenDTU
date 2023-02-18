@@ -96,6 +96,10 @@ bool ConfigurationClass::write()
         JsonObject inv = inverters.createNestedObject();
         inv["serial"] = config.Inverter[i].Serial;
         inv["name"] = config.Inverter[i].Name;
+        inv["poll_enable"] = config.Inverter[i].Poll_Enable;
+        inv["poll_enable_night"] = config.Inverter[i].Poll_Enable_Night;
+        inv["command_enable"] = config.Inverter[i].Command_Enable;
+        inv["command_enable_night"] = config.Inverter[i].Command_Enable_Night;
 
         JsonArray channel = inv.createNestedArray("channel");
         for (uint8_t c = 0; c < INV_MAX_CHAN_COUNT; c++) {
@@ -229,6 +233,11 @@ bool ConfigurationClass::read()
         JsonObject inv = inverters[i].as<JsonObject>();
         config.Inverter[i].Serial = inv["serial"] | 0ULL;
         strlcpy(config.Inverter[i].Name, inv["name"] | "", sizeof(config.Inverter[i].Name));
+
+        config.Inverter[i].Poll_Enable = inv["poll_enable"] | true;
+        config.Inverter[i].Poll_Enable_Night = inv["poll_enable_night"] | true;
+        config.Inverter[i].Command_Enable = inv["command_enable"] | true;
+        config.Inverter[i].Command_Enable_Night = inv["command_enable_night"] | true;
 
         JsonArray channel = inv["channel"];
         for (uint8_t c = 0; c < INV_MAX_CHAN_COUNT; c++) {
