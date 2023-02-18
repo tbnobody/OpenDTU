@@ -401,6 +401,7 @@
         "Add": "Hinzufügen",
         "AddHint": "<b>Hinweis:</b> Sie können zusätzliche Parameter einstellen, nachdem Sie den Wechselrichter erstellt haben. Verwenden Sie dazu das Stiftsymbol in der Wechselrichterliste.",
         "InverterList": "Wechselrichterliste",
+        "Status": "Status",
         "Type": "Typ",
         "Action": "Aktion",
         "DeleteInverter": "Wechselrichter löschen",

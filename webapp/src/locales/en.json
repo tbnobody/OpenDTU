@@ -401,6 +401,7 @@
         "Add": "Add",
         "AddHint": "<b>Hint:</b> You can set additional parameters after you have created the inverter. Use the pen icon in the inverter list.",
         "InverterList": "Inverter List",
+        "Status": "Status",
         "Type": "Type",
         "Action": "Action",
         "DeleteInverter": "Delete inverter",

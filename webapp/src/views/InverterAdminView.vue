@@ -28,7 +28,8 @@
                 <table class="table">
                     <thead>
                         <tr>
-                            <th scope="col">{{ $t('inverteradmin.Serial') }}</th>
+                            <th scope="col">{{ $t('inverteradmin.Status') }}</th>
+                            <th>{{ $t('inverteradmin.Serial') }}</th>
                             <th>{{ $t('inverteradmin.Name') }}</th>
                             <th>{{ $t('inverteradmin.Type') }}</th>
                             <th>{{ $t('inverteradmin.Action') }}</th>
@@ -36,6 +37,17 @@
                     </thead>
                     <tbody>
                         <tr v-for="inverter in sortedInverters" v-bind:key="inverter.id">
+                            <td>
+                                <span class="badge" :class="{
+                                    'text-bg-warning': !inverter.poll_enable_night,
+                                    'text-bg-dark': inverter.poll_enable_night,}"
+                                    ><BIconArrowDown v-if="inverter.poll_enable"  /></span>
+
+                                <span class="badge" title="Send" :class="{
+                                    'text-bg-warning': !inverter.command_enable_night,
+                                    'text-bg-dark': inverter.command_enable_night,}"
+                                    ><BIconArrowUp v-if="inverter.command_enable" /></span>
+                            </td>
                             <td>{{ inverter.serial }}</td>
                             <td>{{ inverter.name }}</td>
                             <td>{{ inverter.type }}</td>
@@ -189,7 +201,9 @@ import * as bootstrap from 'bootstrap';
 import {
     BIconInfoCircle,
     BIconPencil,
-    BIconTrash
+    BIconTrash,
+    BIconArrowDown,
+    BIconArrowUp,
 } from 'bootstrap-icons-vue';
 import { defineComponent } from 'vue';
 
@@ -223,10 +237,12 @@ export default defineComponent({
         BasePage,
         BootstrapAlert,
         CardElement,
+        InputElement,
         BIconInfoCircle,
         BIconPencil,
         BIconTrash,
-        InputElement,
+        BIconArrowDown,
+        BIconArrowUp,
     },
     data() {
         return {

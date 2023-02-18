@@ -401,6 +401,7 @@
         "Add": "Ajouter",
         "AddHint": " <b>Astuce :</b> Vous pouvez définir des paramètres supplémentaires après avoir créé l'onduleur. Utilisez l'icône du stylo dans la liste des onduleurs.",
         "InverterList": "Liste des onduleurs",
+        "Status": "Status",
         "Type": "Type",
         "Action": "Action",
         "DeleteInverter": "Supprimer l'onduleur",
