@@ -228,7 +228,12 @@
         "Status": "Status",
         "Synced": "synced",
         "NotSynced": "not synced",
-        "LocalTime": "Local Time"
+        "LocalTime": "Local Time",
+        "Sunrise": "Nautical Sunrise",
+        "Sunset": "Nautical Sunset",
+        "Mode": "Mode",
+        "Day": "Day",
+        "Night": "Night"
     },
     "mqttinfo": {
         "MqttInformation": "MQTT Information",

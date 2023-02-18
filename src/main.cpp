@@ -12,6 +12,7 @@
 #include "NetworkSettings.h"
 #include "NtpSettings.h"
 #include "PinMapping.h"
+#include "SunPosition.h"
 #include "Utils.h"
 #include "WebApi.h"
 #include "defaults.h"
@@ -78,6 +79,11 @@ void setup()
     // Initialize NTP
     MessageOutput.print(F("Initialize NTP... "));
     NtpSettings.init();
+    MessageOutput.println(F("done"));
+
+    // Initialize SunPosition
+    MessageOutput.print(F("Initialize SunPosition... "));
+    SunPosition.init();
     MessageOutput.println(F("done"));
 
     // Initialize MqTT
@@ -177,6 +183,8 @@ void loop()
     WebApi.loop();
     yield();
     Display.loop();
+    yield();
+    SunPosition.loop();
     yield();
     MessageOutput.loop();
     yield();

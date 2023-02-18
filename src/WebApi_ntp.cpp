@@ -5,6 +5,7 @@
 #include "WebApi_ntp.h"
 #include "Configuration.h"
 #include "NtpSettings.h"
+#include "SunPosition.h"
 #include "WebApi.h"
 #include "WebApi_errors.h"
 #include "helper.h"
@@ -50,6 +51,16 @@ void WebApiNtpClass::onNtpStatus(AsyncWebServerRequest* request)
     char timeStringBuff[50];
     strftime(timeStringBuff, sizeof(timeStringBuff), "%A, %B %d %Y %H:%M:%S", &timeinfo);
     root[F("ntp_localtime")] = timeStringBuff;
+
+    SunPosition.sunriseTime(&timeinfo);
+    strftime(timeStringBuff, sizeof(timeStringBuff), "%A, %B %d %Y %H:%M:%S", &timeinfo);
+    root[F("sun_risetime")] = timeStringBuff;
+
+    SunPosition.sunsetTime(&timeinfo);
+    strftime(timeStringBuff, sizeof(timeStringBuff), "%A, %B %d %Y %H:%M:%S", &timeinfo);
+    root[F("sun_settime")] = timeStringBuff;
+
+    root[F("sun_isDayPeriod")] = SunPosition.isDayPeriod();
 
     response->setLength();
     request->send(response);
