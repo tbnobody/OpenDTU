@@ -3,10 +3,10 @@
  * Copyright (C) 2022 Thomas Basler and others
  */
 #include "WebApi_power.h"
-#include "ArduinoJson.h"
-#include "AsyncJson.h"
-#include "Hoymiles.h"
 #include "WebApi.h"
+#include "WebApi_errors.h"
+#include <AsyncJson.h>
+#include <Hoymiles.h>
 
 void WebApiPowerClass::init(AsyncWebServer* server)
 {
@@ -62,6 +62,7 @@ void WebApiPowerClass::onPowerPost(AsyncWebServerRequest* request)
 
     if (!request->hasParam("data", true)) {
         retMsg[F("message")] = F("No values found!");
+        retMsg[F("code")] = WebApiError::GenericNoValueFound;
         response->setLength();
         request->send(response);
         return;
@@ -71,6 +72,7 @@ void WebApiPowerClass::onPowerPost(AsyncWebServerRequest* request)
 
     if (json.length() > 1024) {
         retMsg[F("message")] = F("Data too large!");
+        retMsg[F("code")] = WebApiError::GenericDataTooLarge;
         response->setLength();
         request->send(response);
         return;
@@ -81,6 +83,7 @@ void WebApiPowerClass::onPowerPost(AsyncWebServerRequest* request)
 
     if (error) {
         retMsg[F("message")] = F("Failed to parse data!");
+        retMsg[F("code")] = WebApiError::GenericParseError;
         response->setLength();
         request->send(response);
         return;
@@ -89,6 +92,7 @@ void WebApiPowerClass::onPowerPost(AsyncWebServerRequest* request)
     if (!(root.containsKey("serial")
             && (root.containsKey("power") || root.containsKey("restart")))) {
         retMsg[F("message")] = F("Values are missing!");
+        retMsg[F("code")] = WebApiError::GenericValueMissing;
         response->setLength();
         request->send(response);
         return;
@@ -96,6 +100,7 @@ void WebApiPowerClass::onPowerPost(AsyncWebServerRequest* request)
 
     if (root[F("serial")].as<uint64_t>() == 0) {
         retMsg[F("message")] = F("Serial must be a number > 0!");
+        retMsg[F("code")] = WebApiError::PowerSerialZero;
         response->setLength();
         request->send(response);
         return;
@@ -105,6 +110,7 @@ void WebApiPowerClass::onPowerPost(AsyncWebServerRequest* request)
     auto inv = Hoymiles.getInverterBySerial(serial);
     if (inv == nullptr) {
         retMsg[F("message")] = F("Invalid inverter specified!");
+        retMsg[F("code")] = WebApiError::PowerInvalidInverter;
         response->setLength();
         request->send(response);
         return;
@@ -121,6 +127,7 @@ void WebApiPowerClass::onPowerPost(AsyncWebServerRequest* request)
 
     retMsg[F("type")] = F("success");
     retMsg[F("message")] = F("Settings saved!");
+    retMsg[F("code")] = WebApiError::GenericSuccess;
 
     response->setLength();
     request->send(response);

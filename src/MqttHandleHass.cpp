@@ -2,18 +2,18 @@
 /*
  * Copyright (C) 2022 Thomas Basler and others
  */
-#include "MqttHassPublishing.h"
-#include "MqttPublishing.h"
+#include "MqttHandleHass.h"
+#include "MqttHandleInverter.h"
 #include "MqttSettings.h"
 #include "NetworkSettings.h"
 
-MqttHassPublishingClass MqttHassPublishing;
+MqttHandleHassClass MqttHandleHass;
 
-void MqttHassPublishingClass::init()
+void MqttHandleHassClass::init()
 {
 }
 
-void MqttHassPublishingClass::loop()
+void MqttHandleHassClass::loop()
 {
     if (_updateForced) {
         publishConfig();
@@ -30,12 +30,12 @@ void MqttHassPublishingClass::loop()
     }
 }
 
-void MqttHassPublishingClass::forceUpdate()
+void MqttHandleHassClass::forceUpdate()
 {
     _updateForced = true;
 }
 
-void MqttHassPublishingClass::publishConfig()
+void MqttHandleHassClass::publishConfig()
 {
     if (!Configuration.get().Mqtt_Hass_Enabled) {
         return;
@@ -65,13 +65,15 @@ void MqttHassPublishingClass::publishConfig()
         publishInverterBinarySensor(inv, "Producing", "status/producing", "1", "0");
 
         // Loop all channels
-        for (uint8_t c = 0; c <= inv->Statistics()->getChannelCount(); c++) {
-            for (uint8_t f = 0; f < DEVICE_CLS_ASSIGN_LIST_LEN; f++) {
-                bool clear = false;
-                if (c > 0 && !config.Mqtt_Hass_IndividualPanels) {
-                    clear = true;
+        for (auto& t : inv->Statistics()->getChannelTypes()) {
+            for (auto& c : inv->Statistics()->getChannelsByType(t)) {
+                for (uint8_t f = 0; f < DEVICE_CLS_ASSIGN_LIST_LEN; f++) {
+                    bool clear = false;
+                    if (t == TYPE_DC && !config.Mqtt_Hass_IndividualPanels) {
+                        clear = true;
+                    }
+                    publishField(inv, t, c, deviceFieldAssignment[f], clear);
                 }
-                publishField(inv, c, deviceFieldAssignment[f], clear);
             }
         }
 
@@ -79,42 +81,54 @@ void MqttHassPublishingClass::publishConfig()
     }
 }
 
-void MqttHassPublishingClass::publishField(std::shared_ptr<InverterAbstract> inv, uint8_t channel, byteAssign_fieldDeviceClass_t fieldType, bool clear)
+void MqttHandleHassClass::publishField(std::shared_ptr<InverterAbstract> inv, ChannelType_t type, ChannelNum_t channel, byteAssign_fieldDeviceClass_t fieldType, bool clear)
 {
-    if (!inv->Statistics()->hasChannelFieldValue(channel, fieldType.fieldId)) {
+    if (!inv->Statistics()->hasChannelFieldValue(type, channel, fieldType.fieldId)) {
         return;
     }
 
     String serial = inv->serialString();
 
     String fieldName;
-    if (channel == CH0 && fieldType.fieldId == FLD_PDC) {
+    if (type == TYPE_AC && fieldType.fieldId == FLD_PDC) {
         fieldName = "PowerDC";
     } else {
-        fieldName = inv->Statistics()->getChannelFieldName(channel, fieldType.fieldId);
+        fieldName = inv->Statistics()->getChannelFieldName(type, channel, fieldType.fieldId);
+    }
+
+    String chanNum;
+    if (type == TYPE_DC) {
+        // TODO(tbnobody)
+        chanNum = static_cast<uint8_t>(channel) + 1;
+    } else {
+        chanNum = channel;
     }
 
     String configTopic = "sensor/dtu_" + serial
-        + "/" + "ch" + String(channel) + "_" + fieldName
+        + "/" + "ch" + chanNum + "_" + fieldName
         + "/config";
 
     if (!clear) {
-        String stateTopic = MqttSettings.getPrefix() + MqttPublishing.getTopic(inv, channel, fieldType.fieldId);
+        String stateTopic = MqttSettings.getPrefix() + MqttHandleInverter.getTopic(inv, type, channel, fieldType.fieldId);
         const char* devCls = deviceClasses[fieldType.deviceClsId];
         const char* stateCls = stateClasses[fieldType.stateClsId];
 
         String name;
-        if (channel == CH0) {
+        if (type != TYPE_DC) {
             name = String(inv->name()) + " " + fieldName;
         } else {
-            name = String(inv->name()) + " CH" + String(channel) + " " + fieldName;
+            name = String(inv->name()) + " CH" + chanNum + " " + fieldName;
         }
 
         DynamicJsonDocument root(1024);
         root[F("name")] = name;
         root[F("stat_t")] = stateTopic;
-        root[F("unit_of_meas")] = inv->Statistics()->getChannelFieldUnit(channel, fieldType.fieldId);
-        root[F("uniq_id")] = serial + "_ch" + String(channel) + "_" + fieldName;
+        root[F("uniq_id")] = serial + "_ch" + chanNum + "_" + fieldName;
+
+        String unit_of_measure = inv->Statistics()->getChannelFieldUnit(type, channel, fieldType.fieldId);
+        if (unit_of_measure != "") {
+            root[F("unit_of_meas")] = unit_of_measure;
+        }
 
         JsonObject deviceObj = root.createNestedObject("dev");
         createDeviceInfo(deviceObj, inv);
@@ -131,13 +145,13 @@ void MqttHassPublishingClass::publishField(std::shared_ptr<InverterAbstract> inv
 
         char buffer[512];
         serializeJson(root, buffer);
-        MqttSettings.publishHass(configTopic, buffer);
+        publish(configTopic, buffer);
     } else {
-        MqttSettings.publishHass(configTopic, "");
+        publish(configTopic, "");
     }
 }
 
-void MqttHassPublishingClass::publishInverterButton(std::shared_ptr<InverterAbstract> inv, const char* caption, const char* icon, const char* category, const char* deviceClass, const char* subTopic, const char* payload)
+void MqttHandleHassClass::publishInverterButton(std::shared_ptr<InverterAbstract> inv, const char* caption, const char* icon, const char* category, const char* deviceClass, const char* subTopic, const char* payload)
 {
     String serial = inv->serialString();
 
@@ -169,10 +183,10 @@ void MqttHassPublishingClass::publishInverterButton(std::shared_ptr<InverterAbst
 
     char buffer[512];
     serializeJson(root, buffer);
-    MqttSettings.publishHass(configTopic, buffer);
+    publish(configTopic, buffer);
 }
 
-void MqttHassPublishingClass::publishInverterNumber(
+void MqttHandleHassClass::publishInverterNumber(
     std::shared_ptr<InverterAbstract> inv, const char* caption, const char* icon, const char* category,
     const char* commandTopic, const char* stateTopic, const char* unitOfMeasure,
     int16_t min, int16_t max)
@@ -208,10 +222,10 @@ void MqttHassPublishingClass::publishInverterNumber(
 
     char buffer[512];
     serializeJson(root, buffer);
-    MqttSettings.publishHass(configTopic, buffer);
+    publish(configTopic, buffer);
 }
 
-void MqttHassPublishingClass::publishInverterBinarySensor(std::shared_ptr<InverterAbstract> inv, const char* caption, const char* subTopic, const char* payload_on, const char* payload_off)
+void MqttHandleHassClass::publishInverterBinarySensor(std::shared_ptr<InverterAbstract> inv, const char* caption, const char* subTopic, const char* payload_on, const char* payload_off)
 {
     String serial = inv->serialString();
 
@@ -237,15 +251,22 @@ void MqttHassPublishingClass::publishInverterBinarySensor(std::shared_ptr<Invert
 
     char buffer[512];
     serializeJson(root, buffer);
-    MqttSettings.publishHass(configTopic, buffer);
+    publish(configTopic, buffer);
 }
 
-void MqttHassPublishingClass::createDeviceInfo(JsonObject& object, std::shared_ptr<InverterAbstract> inv)
+void MqttHandleHassClass::createDeviceInfo(JsonObject& object, std::shared_ptr<InverterAbstract> inv)
 {
     object[F("name")] = inv->name();
     object[F("ids")] = inv->serialString();
-    object[F("cu")] = String(F("http://")) + WiFi.localIP().toString();
+    object[F("cu")] = String(F("http://")) + NetworkSettings.localIP().toString();
     object[F("mf")] = F("OpenDTU");
     object[F("mdl")] = inv->typeName();
     object[F("sw")] = AUTO_GIT_HASH;
+}
+
+void MqttHandleHassClass::publish(const String& subtopic, const String& payload)
+{
+    String topic = Configuration.get().Mqtt_Hass_Topic;
+    topic += subtopic;
+    MqttSettings.publishGeneric(topic.c_str(), payload.c_str(), Configuration.get().Mqtt_Hass_Retain);
 }

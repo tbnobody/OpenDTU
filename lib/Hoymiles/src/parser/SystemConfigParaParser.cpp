@@ -1,4 +1,9 @@
+// SPDX-License-Identifier: GPL-2.0-or-later
+/*
+ * Copyright (C) 2022 Thomas Basler and others
+ */
 #include "SystemConfigParaParser.h"
+#include "../Hoymiles.h"
 #include <cstring>
 
 void SystemConfigParaParser::clearBuffer()
@@ -10,7 +15,7 @@ void SystemConfigParaParser::clearBuffer()
 void SystemConfigParaParser::appendFragment(uint8_t offset, uint8_t* payload, uint8_t len)
 {
     if (offset + len > (SYSTEM_CONFIG_PARA_SIZE)) {
-        Serial.printf("FATAL: (%s, %d) stats packet too large for buffer\n", __FILE__, __LINE__);
+        Hoymiles.getMessageOutput()->printf("FATAL: (%s, %d) stats packet too large for buffer\r\n", __FILE__, __LINE__);
         return;
     }
     memcpy(&_payload[offset], payload, len);

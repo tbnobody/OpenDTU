@@ -1,40 +1,39 @@
 <template>
-    <div class="card">
-        <div class="card-header text-bg-primary">
-            Hardware Information
+    <CardElement :text="$t('hardwareinfo.HardwareInformation')" textVariant="text-bg-primary">
+        <div class="table-responsive">
+            <table class="table table-hover table-condensed">
+                <tbody>
+                    <tr>
+                        <th>{{ $t('hardwareinfo.ChipModel') }}</th>
+                        <td>{{ systemStatus.chipmodel }}</td>
+                    </tr>
+                    <tr>
+                        <th>{{ $t('hardwareinfo.ChipRevision') }}</th>
+                        <td>{{ systemStatus.chiprevision }}</td>
+                    </tr>
+                    <tr>
+                        <th>{{ $t('hardwareinfo.ChipCores') }}</th>
+                        <td>{{ systemStatus.chipcores }}</td>
+                    </tr>
+                    <tr>
+                        <th>{{ $t('hardwareinfo.CpuFrequency') }}</th>
+                        <td>{{ systemStatus.cpufreq }} {{ $t('hardwareinfo.Mhz') }}</td>
+                    </tr>
+                </tbody>
+            </table>
         </div>
-        <div class="card-body">
-            <div class="table-responsive">
-                <table class="table table-hover table-condensed">
-                    <tbody>
-                        <tr>
-                            <th>Chip Model</th>
-                            <td>{{ systemStatus.chipmodel }}</td>
-                        </tr>
-                        <tr>
-                            <th>Chip Revision</th>
-                            <td>{{ systemStatus.chiprevision }}</td>
-                        </tr>
-                        <tr>
-                            <th>Chip Cores</th>
-                            <td>{{ systemStatus.chipcores }}</td>
-                        </tr>
-                        <tr>
-                            <th>CPU Frequency</th>
-                            <td>{{ systemStatus.cpufreq }} MHz</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </div>
+    </CardElement>
 </template>
 
 <script lang="ts">
+import CardElement from '@/components/CardElement.vue';
 import type { SystemStatus } from '@/types/SystemStatus';
 import { defineComponent, type PropType } from 'vue';
 
 export default defineComponent({
+    components: {
+        CardElement,
+    },
     props: {
         systemStatus: { type: Object as PropType<SystemStatus>, required: true },
     },

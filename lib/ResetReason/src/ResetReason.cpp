@@ -1,3 +1,7 @@
+// SPDX-License-Identifier: GPL-2.0-or-later
+/*
+ * Copyright (C) 2022 Thomas Basler and others
+ */
 #include "ResetReason.h"
 
 #if ESP_IDF_VERSION_MAJOR > 3 // IDF 4+
@@ -30,15 +34,19 @@ String ResetReasonClass::get_reset_reason_verbose(uint8_t cpu_id)
     case 3:
         reason_str = F("Software reset digital core");
         break;
+#ifndef CONFIG_IDF_TARGET_ESP32C3
     case 4:
         reason_str = F("Legacy watch dog reset digital core");
         break;
+#endif
     case 5:
         reason_str = F("Deep Sleep reset digital core");
         break;
+#ifndef CONFIG_IDF_TARGET_ESP32C3
     case 6:
         reason_str = F("Reset by SLC module, reset digital core");
         break;
+#endif
     case 7:
         reason_str = F("Timer Group0 Watch dog reset digital core");
         break;
@@ -60,9 +68,11 @@ String ResetReasonClass::get_reset_reason_verbose(uint8_t cpu_id)
     case 13:
         reason_str = F("RTC Watch dog Reset CPU");
         break;
+#ifndef CONFIG_IDF_TARGET_ESP32C3
     case 14:
         reason_str = F("for APP CPU, reseted by PRO CPU");
         break;
+#endif
     case 15:
         reason_str = F("Reset when the vdd voltage is not stable");
         break;
@@ -90,15 +100,19 @@ String ResetReasonClass::get_reset_reason_short(uint8_t cpu_id)
     case 3:
         reason_str = F("SW_RESET");
         break;
+#ifndef CONFIG_IDF_TARGET_ESP32C3
     case 4:
         reason_str = F("OWDT_RESET");
         break;
+#endif
     case 5:
         reason_str = F("DEEPSLEEP_RESET");
         break;
+#ifndef CONFIG_IDF_TARGET_ESP32C3
     case 6:
         reason_str = F("SDIO_RESET");
         break;
+#endif
     case 7:
         reason_str = F("TG0WDT_SYS_RESET");
         break;
@@ -120,9 +134,11 @@ String ResetReasonClass::get_reset_reason_short(uint8_t cpu_id)
     case 13:
         reason_str = F("RTCWDT_CPU_RESET");
         break;
+#ifndef CONFIG_IDF_TARGET_ESP32C3
     case 14:
         reason_str = F("EXT_CPU_RESET");
         break;
+#endif
     case 15:
         reason_str = F("RTCWDT_BROWN_OUT_RESET");
         break;

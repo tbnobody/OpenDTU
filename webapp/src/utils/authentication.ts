@@ -6,7 +6,9 @@ export function authHeader(): Headers {
     let user = null;
     try {
         user = JSON.parse(localStorage.getItem('user') || "");
-    } catch { }
+    } catch {
+        // continue regardless of error
+    }
 
     const headers = new Headers();
     headers.append('X-Requested-With', 'XMLHttpRequest');
@@ -20,7 +22,9 @@ export function authUrl(): string {
     let user = null;
     try {
         user = JSON.parse(localStorage.getItem('user') || "");
-    } catch { }
+    } catch {
+        // continue regardless of error
+    }
 
     if (user && user.authdata) {
         return encodeURIComponent(atob(user.authdata)).replace("%3A", ":") + '@';

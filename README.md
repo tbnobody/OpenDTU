@@ -24,9 +24,16 @@ Like to show your own build? Just send me a Pull Request.
 * Hoymiles HM-1000
 * Hoymiles HM-1200
 * Hoymiles HM-1500
-* TSUN TSOL-M350 (Maybe depending on firmware on the inverter)
-* TSUN TSOL-M800 (Maybe depending on firmware on the inverter)
-* TSUN TSOL-M1600 (Maybe depending on firmware on the inverter)
+* Solenso SOL-H400
+* TSUN TSOL-M350 (Maybe depending on firmware/serial number on the inverter)
+* TSUN TSOL-M800 (Maybe depending on firmware/serial number on the inverter)
+* TSUN TSOL-M1600 (Maybe depending on firmware/serial number on the inverter)
+
+**TSUN compatibility remark:**
+Compatibility with OpenDTU seems to be related to serial numbers. Current findings indicate that TSUN inverters with a serial number starting with "11" are supported, whereby inverters with a serial number starting with "10" are not.
+Firmware version seems to play not a significant role and cannot be read from the stickers. For completeness, the following firmware version have been reported to work with OpenDTU:
+* v1.0.8, v1.0.10 TSOL-M800 (DE)
+* v1.0.12 TSOL-M1600
 
 ## Features for end users
 * Read live data from inverter
@@ -44,6 +51,8 @@ Like to show your own build? Just send me a Pull Request.
 * Time zone support
 * Ethernet support
 * Prometheus API endpoint (/api/prometheus/metrics)
+* English, german and french web interface
+* Displays (SSD1306, SH1106, PCD8544)
 
 ## Features for developers
 * The microcontroller part
@@ -53,6 +62,16 @@ Like to show your own build? Just send me a Pull Request.
 * The WebApp part
     * Build with [Vue.js](https://vuejs.org)
     * Source is written in TypeScript
+
+## Breaking changes
+Generated using: `git log --date=short --pretty=format:"* %h%x09%ad%x09%s" | grep BREAKING`
+```
+* 3b7aef6       2023-02-13      BREAKING CHANGE: Web API!
+* d4c838a       2023-02-06      BREAKING CHANGE: Prometheus API!
+* daf847e       2022-11-14      BREAKING CHANGE: Removed deprecated config parsing method
+* 69b675b       2022-11-01      BREAKING CHANGE: Structure WebAPI /api/livedata/status changed
+* 27ed4e3       2022-10-31      BREAKING: Change power factor from percent value to value between 0 and 1
+```
 
 ## Hardware you need
 
@@ -106,6 +125,7 @@ This can be achieved by copying one of the [env:....] sections from 'platformio.
 -DHOYMILES_PIN_CS=5
 ```
 It is recommended to make all changes only in the  'platformio_override.ini', this is your personal copy.
+You can also change  the pins by creating a custom [device profile](docs/DeviceProfiles.md).
 
 ## Flashing and starting up
 ### with Visual Studio Code
@@ -118,6 +138,7 @@ It is recommended to make all changes only in the  'platformio_override.ini', th
     * upload_port
     * monitor_port
 * Select the arrow button in the blue bottom status bar (PlatformIO: Upload) to compile and upload the firmware. During the compilation, all required libraries are downloaded automatically.
+* Under Linux, if the upload fails with error messages "Could not open /dev/ttyUSB0, the port doesn't exist", you can check via ```ls -la /dev/tty*``` to which group your port belongs to, and then add your user this group via ```sudo adduser <yourusername> dialout```
 * There are two videos showing these steps:
     * [Git Clone and compilation](https://youtu.be/9cA_esv3zeA)
     * [Full installation and compilation](https://youtu.be/xs6TqHn7QWM)
@@ -140,7 +161,7 @@ Use a ESP32 flash tool of your choice (see next chapter) and flash the `.bin` fi
 
 | Address  | File                   |
 | ---------| ---------------------- |
-| 0x1000   | bootloader_dio_40m.bin |
+| 0x1000   | bootloader.bin         |
 | 0x8000   | partitions.bin         |
 | 0xe000   | boot_app0.bin          |
 | 0x10000  | opendtu-*.bin          |
@@ -151,7 +172,7 @@ For further updates you can just use the web interface and upload the `opendtu-*
 ```
 esptool.py --port /dev/ttyUSB0 --chip esp32 --before default_reset --after hard_reset \
   write_flash --flash_mode dout --flash_freq 40m --flash_size detect \
-  0x1000 bootloader_dio_40m.bin \
+  0x1000 bootloader.bin \
   0x8000 partitions.bin \
   0xe000 boot_app0.bin \
   0x10000 opendtu-generic.bin
@@ -171,11 +192,15 @@ esptool.py --port /dev/ttyUSB0 --chip esp32 --before default_reset --after hard_
 #### Flash with ESP_Flasher (Windows)
 Users report that [ESP_Flasher](https://github.com/Jason2866/ESP_Flasher/releases/) is suitable for flashing OpenDTU on Windows.
 
+#### Flash with [ESP_Flasher](https://espressif.github.io/esptool-js/) - web version
+It is also possible to flash it via the web tools which might be more convenient and is platformindependent.
+
 ## First configuration
 * After the initial flashing of the microcontroller, an Access Point called "OpenDTU-*" is opened. The default password is "openDTU42".
 * Use a web browser to open the address [http://192.168.4.1](http://192.168.4.1)
 * Navigate to Settings --> Network Settings and enter your WiFi credentials. The username to access the config menu is "admin" and the password the same as for accessing the Access Point (default: "openDTU42").
-* OpenDTU then simultaneously connects to your WiFi AP with this credentials. Navigate to Info --> Network and look into section "Network Interface (Station)" for the IP address received via DHCP.
+* OpenDTU then simultaneously connects to your WiFi AP with these credentials. Navigate to Info --> Network and look into section "Network Interface (Station)" for the IP address received via DHCP.
+* If your WiFi AP uses an allow-list for MAC-addresses, please be aware that the ESP32 has two different MAC addresses for its AP and client modes, they are also listed at Info --> Network.
 * When OpenDTU is connected to a configured WiFI AP, the "OpenDTU-*" Access Point is closed after 3 minutes.
 * OpenDTU needs access to a working NTP server to get the current date & time. Both are sent to the inverter with each request. Default NTP server is pool.ntp.org. If your network has different requirements please change accordingly (Settings --> NTP Settings).
 * Add your inverter in the inverter settings (Settings --> Inverter Settings)
@@ -201,6 +226,7 @@ A documentation of the Web API can be found here: [Web-API Documentation](docs/W
 * <https://www.printables.com/model/293003-sol-opendtu-esp32-nrf24l01-case>
 * <https://www.thingiverse.com/thing:5661780>
 * <https://www.thingiverse.com/thing:5632374>
+* <https://www.thingiverse.com/thing:5852233>
 
 
 ## Building

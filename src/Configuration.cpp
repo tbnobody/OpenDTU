@@ -3,6 +3,7 @@
  * Copyright (C) 2022 Thomas Basler and others
  */
 #include "Configuration.h"
+#include "MessageOutput.h"
 #include "defaults.h"
 #include <ArduinoJson.h>
 #include <LittleFS.h>
@@ -79,6 +80,15 @@ bool ConfigurationClass::write()
     security["password"] = config.Security_Password;
     security["allow_readonly"] = config.Security_AllowReadonly;
 
+    JsonObject device = doc.createNestedObject("device");
+    device["pinmapping"] = config.Dev_PinMapping;
+
+    JsonObject display = device.createNestedObject("display");
+    display["powersafe"] = config.Display_PowerSafe;
+    display["screensaver"] = config.Display_ScreenSaver;
+    display["showlogo"] = config.Display_ShowLogo;
+    display["contrast"] = config.Display_Contrast;
+
     JsonArray inverters = doc.createNestedArray("inverters");
     for (uint8_t i = 0; i < INV_MAX_COUNT; i++) {
         JsonObject inv = inverters.createNestedObject();
@@ -90,12 +100,13 @@ bool ConfigurationClass::write()
             JsonObject chanData = channel.createNestedObject();
             chanData["name"] = config.Inverter[i].channel[c].Name;
             chanData["max_power"] = config.Inverter[i].channel[c].MaxChannelPower;
+            chanData["yield_total_offset"] = config.Inverter[i].channel[c].YieldTotalOffset;
         }
     }
 
     // Serialize JSON to file
     if (serializeJson(doc, f) == 0) {
-        Serial.println("Failed to write file");
+        MessageOutput.println("Failed to write file");
         return false;
     }
 
@@ -111,7 +122,7 @@ bool ConfigurationClass::read()
     // Deserialize the JSON document
     DeserializationError error = deserializeJson(doc, f);
     if (error) {
-        Serial.println(F("Failed to read file, using default configuration"));
+        MessageOutput.println(F("Failed to read file, using default configuration"));
     }
 
     JsonObject cfg = doc["cfg"];
@@ -200,6 +211,15 @@ bool ConfigurationClass::read()
     strlcpy(config.Security_Password, security["password"] | ACCESS_POINT_PASSWORD, sizeof(config.Security_Password));
     config.Security_AllowReadonly = security["allow_readonly"] | SECURITY_ALLOW_READONLY;
 
+    JsonObject device = doc["device"];
+    strlcpy(config.Dev_PinMapping, device["pinmapping"] | DEV_PINMAPPING, sizeof(config.Dev_PinMapping));
+
+    JsonObject display = device["display"];
+    config.Display_PowerSafe = display["powersafe"] | DISPLAY_POWERSAFE;
+    config.Display_ScreenSaver = display["screensaver"] | DISPLAY_SCREENSAVER;
+    config.Display_ShowLogo = display["showlogo"] | DISPLAY_SHOWLOGO;
+    config.Display_Contrast = display["contrast"] | DISPLAY_CONTRAST;
+
     JsonArray inverters = doc["inverters"];
     for (uint8_t i = 0; i < INV_MAX_COUNT; i++) {
         JsonObject inv = inverters[i].as<JsonObject>();
@@ -209,6 +229,7 @@ bool ConfigurationClass::read()
         JsonArray channel = inv["channel"];
         for (uint8_t c = 0; c < INV_MAX_CHAN_COUNT; c++) {
             config.Inverter[i].channel[c].MaxChannelPower = channel[c]["max_power"] | 0;
+            config.Inverter[i].channel[c].YieldTotalOffset = channel[c]["yield_total_offset"] | 0.0f;
             strlcpy(config.Inverter[i].channel[c].Name, channel[c]["name"] | "", sizeof(config.Inverter[i].channel[c].Name));
         }
     }
@@ -222,7 +243,7 @@ void ConfigurationClass::migrate()
     if (config.Cfg_Version < 0x00011700) {
         File f = LittleFS.open(CONFIG_FILENAME, "r", false);
         if (!f) {
-            Serial.println(F("Failed to open file, cancel migration"));
+            MessageOutput.println(F("Failed to open file, cancel migration"));
             return;
         }
 
@@ -230,7 +251,7 @@ void ConfigurationClass::migrate()
         // Deserialize the JSON document
         DeserializationError error = deserializeJson(doc, f);
         if (error) {
-            Serial.println(F("Failed to read file, cancel migration"));
+            MessageOutput.println(F("Failed to read file, cancel migration"));
             return;
         }
 

@@ -1,230 +1,127 @@
 <template>
-    <BasePage :title="'MqTT Settings'" :isLoading="dataLoading">
+    <BasePage :title="$t('mqttadmin.MqttSettings')" :isLoading="dataLoading">
         <BootstrapAlert v-model="showAlert" dismissible :variant="alertType">
             {{ alertMessage }}
         </BootstrapAlert>
 
         <form @submit="saveMqttConfig">
-            <div class="card">
-                <div class="card-header text-bg-primary">MqTT Configuration</div>
-                <div class="card-body">
-                    <div class="row mb-3">
-                        <label class="col-sm-4 form-check-label" for="inputMqtt">Enable MqTT</label>
-                        <div class="col-sm-8">
-                            <div class="form-check form-switch">
-                                <input class="form-check-input" type="checkbox" id="inputMqtt"
-                                    v-model="mqttConfigList.mqtt_enabled" />
-                            </div>
-                        </div>
-                    </div>
+            <CardElement :text="$t('mqttadmin.MqttConfiguration')" textVariant="text-bg-primary">
+                <InputElement :label="$t('mqttadmin.EnableMqtt')"
+                              v-model="mqttConfigList.mqtt_enabled"
+                              type="checkbox" wide/>
 
-                    <div class="row mb-3" v-show="mqttConfigList.mqtt_enabled">
-                        <label class="col-sm-4 form-check-label" for="inputMqttHass">Enable Home Assistant MQTT Auto
-                            Discovery</label>
-                        <div class="col-sm-8">
-                            <div class="form-check form-switch">
-                                <input class="form-check-input" type="checkbox" id="inputMqttHass"
-                                    v-model="mqttConfigList.mqtt_hass_enabled" />
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+                <InputElement v-show="mqttConfigList.mqtt_enabled"
+                              :label="$t('mqttadmin.EnableHass')"
+                              v-model="mqttConfigList.mqtt_hass_enabled"
+                              type="checkbox" wide/>
+            </CardElement>
 
-            <div class="card mt-5" v-show="mqttConfigList.mqtt_enabled">
-                <div class="card-header text-bg-primary">
-                    MqTT Broker Parameter
-                </div>
-                <div class="card-body">
-                    <div class="row mb-3">
-                        <label for="inputHostname" class="col-sm-2 col-form-label">Hostname:</label>
-                        <div class="col-sm-10">
-                            <input type="text" class="form-control" id="inputHostname" maxlength="128"
-                                placeholder="Hostname or IP address" v-model="mqttConfigList.mqtt_hostname" />
-                        </div>
-                    </div>
+            <CardElement :text="$t('mqttadmin.MqttBrokerParameter')" textVariant="text-bg-primary" add-space
+                         v-show="mqttConfigList.mqtt_enabled"
+            >
+                <InputElement :label="$t('mqttadmin.Hostname')"
+                              v-model="mqttConfigList.mqtt_hostname"
+                              type="text" maxlength="128"
+                              :placeholder="$t('mqttadmin.HostnameHint')"/>
 
-                    <div class="row mb-3">
-                        <label for="inputPort" class="col-sm-2 col-form-label">Port:</label>
-                        <div class="col-sm-10">
-                            <input type="number" class="form-control" id="inputPort" min="1" max="65535"
-                                placeholder="Port number" v-model="mqttConfigList.mqtt_port" />
-                        </div>
-                    </div>
+                <InputElement :label="$t('mqttadmin.Port')"
+                              v-model="mqttConfigList.mqtt_port"
+                              type="number" min="1" max="65535"/>
 
-                    <div class="row mb-3">
-                        <label for="inputUsername" class="col-sm-2 col-form-label">Username:</label>
-                        <div class="col-sm-10">
-                            <input type="text" class="form-control" id="inputUsername" maxlength="64"
-                                placeholder="Username, leave empty for anonymous connection"
-                                v-model="mqttConfigList.mqtt_username" />
-                        </div>
-                    </div>
+                <InputElement :label="$t('mqttadmin.Username')"
+                              v-model="mqttConfigList.mqtt_username"
+                              type="text" maxlength="64"
+                              :placeholder="$t('mqttadmin.UsernameHint')"/>
 
-                    <div class="row mb-3">
-                        <label for="inputPassword" class="col-sm-2 col-form-label">Password:</label>
-                        <div class="col-sm-10">
-                            <input type="password" class="form-control" id="inputPassword" maxlength="64"
-                                placeholder="Password, leave empty for anonymous connection"
-                                v-model="mqttConfigList.mqtt_password" />
-                        </div>
-                    </div>
+                <InputElement :label="$t('mqttadmin.Password')"
+                              v-model="mqttConfigList.mqtt_password"
+                              type="password" maxlength="64"
+                              :placeholder="$t('mqttadmin.PasswordHint')"/>
 
-                    <div class="row mb-3">
-                        <label for="inputTopic" class="col-sm-2 col-form-label">Base Topic:</label>
-                        <div class="col-sm-10">
-                            <input type="text" class="form-control" id="inputTopic" maxlength="32"
-                                placeholder="Base topic, will be prepend to all published topics (e.g. inverter/)"
-                                v-model="mqttConfigList.mqtt_topic" />
-                        </div>
-                    </div>
+                <InputElement :label="$t('mqttadmin.BaseTopic')"
+                              v-model="mqttConfigList.mqtt_topic"
+                              type="text" maxlength="32"
+                              :placeholder="$t('mqttadmin.BaseTopicHint')"/>
 
-                    <div class="row mb-3">
-                        <label for="inputPublishInterval" class="col-sm-2 col-form-label">Publish Interval:</label>
-                        <div class="col-sm-10">
-                            <div class="input-group">
-                                <input type="number" class="form-control" id="inputPublishInterval" min="5" max="86400"
-                                    placeholder="Publish Interval in Seconds"
-                                    v-model="mqttConfigList.mqtt_publish_interval"
-                                    aria-describedby="publishIntervalDescription" />
-                                <span class="input-group-text" id="publishIntervalDescription">seconds</span>
-                            </div>
-                        </div>
-                    </div>
+                <InputElement :label="$t('mqttadmin.PublishInterval')"
+                              v-model="mqttConfigList.mqtt_publish_interval"
+                              type="number" min="5" max="86400"
+                              :postfix="$t('mqttadmin.Seconds')"/>
 
-                    <div class="row mb-3">
-                        <label class="col-sm-2 form-check-label" for="inputRetain">Enable Retain Flag</label>
-                        <div class="col-sm-10">
-                            <div class="form-check form-switch">
-                                <input class="form-check-input" type="checkbox" id="inputRetain"
-                                    v-model="mqttConfigList.mqtt_retain" />
-                            </div>
-                        </div>
-                    </div>
+                <InputElement :label="$t('mqttadmin.EnableRetain')"
+                              v-model="mqttConfigList.mqtt_retain"
+                              type="checkbox"/>
 
-                    <div class="row mb-3">
-                        <label class="col-sm-2 form-check-label" for="inputTls">Enable TLS</label>
-                        <div class="col-sm-10">
-                            <div class="form-check form-switch">
-                                <input class="form-check-input" type="checkbox" id="inputTls"
-                                    v-model="mqttConfigList.mqtt_tls" />
-                            </div>
-                        </div>
-                    </div>
+                <InputElement :label="$t('mqttadmin.EnableTls')"
+                              v-model="mqttConfigList.mqtt_tls"
+                              type="checkbox"/>
 
-                    <div class="row mb-3" v-show="mqttConfigList.mqtt_tls">
-                        <label for="inputCert" class="col-sm-2 col-form-label">CA-Root-Certificate (default
-                            Letsencrypt):</label>
-                        <div class="col-sm-10">
-                            <textarea class="form-control" id="inputCert" maxlength="2048" rows="10"
-                                placeholder="Root CA Certificate from Letsencrypt"
-                                v-model="mqttConfigList.mqtt_root_ca_cert">
-                                </textarea>
-                        </div>
-                    </div>
+                <InputElement v-show="mqttConfigList.mqtt_tls"
+                              :label="$t('mqttadmin.RootCa')"
+                              v-model="mqttConfigList.mqtt_root_ca_cert"
+                              type="textarea" maxlength="2560" rows="10"/>
+            </CardElement>
 
-                </div>
-            </div>
+            <CardElement :text="$t('mqttadmin.LwtParameters')" textVariant="text-bg-primary" add-space
+                         v-show="mqttConfigList.mqtt_enabled"
+            >
+                <InputElement :label="$t('mqttadmin.LwtTopic')"
+                              v-model="mqttConfigList.mqtt_lwt_topic"
+                              type="text" maxlength="32" :prefix="mqttConfigList.mqtt_topic"
+                              :placeholder="$t('mqttadmin.LwtTopicHint')"/>
 
-            <div class="card mt-5" v-show="mqttConfigList.mqtt_enabled">
-                <div class="card-header text-bg-primary">LWT Parameters</div>
-                <div class="card-body">
-                    <div class="row mb-3">
-                        <label for="inputLwtTopic" class="col-sm-2 col-form-label">LWT Topic:</label>
-                        <div class="col-sm-10">
-                            <div class="input-group">
-                                <span class="input-group-text" id="basic-addon3">{{
-                                mqttConfigList.mqtt_topic
-                                }}</span>
-                                <input type="text" class="form-control" id="inputLwtTopic" maxlength="32"
-                                    placeholder="LWT topic, will be append base topic"
-                                    v-model="mqttConfigList.mqtt_lwt_topic" aria-describedby="basic-addon3" />
-                            </div>
-                        </div>
-                    </div>
+                <InputElement :label="$t('mqttadmin.LwtOnline')"
+                              v-model="mqttConfigList.mqtt_lwt_online"
+                              type="text" maxlength="20"
+                              :placeholder="$t('mqttadmin.LwtOnlineHint')"/>
 
-                    <div class="row mb-3">
-                        <label for="inputLwtOnline" class="col-sm-2 col-form-label">LWT Online message:</label>
-                        <div class="col-sm-10">
-                            <input type="text" class="form-control" id="inputLwtOnline" maxlength="20"
-                                placeholder="Message that will be published to LWT topic when online"
-                                v-model="mqttConfigList.mqtt_lwt_online" />
-                        </div>
-                    </div>
+                <InputElement :label="$t('mqttadmin.LwtOffline')"
+                              v-model="mqttConfigList.mqtt_lwt_offline"
+                              type="text" maxlength="20"
+                              :placeholder="$t('mqttadmin.LwtOfflineHint')"/>
+            </CardElement>
 
-                    <div class="row mb-3">
-                        <label for="inputLwtOffline" class="col-sm-2 col-form-label">LWT Offline message:</label>
-                        <div class="col-sm-10">
-                            <input type="text" class="form-control" id="inputLwtOffline" maxlength="20"
-                                placeholder="Message that will be published to LWT topic when offline"
-                                v-model="mqttConfigList.mqtt_lwt_offline" />
-                        </div>
-                    </div>
-                </div>
-            </div>
+            <CardElement :text="$t('mqttadmin.HassParameters')" textVariant="text-bg-primary" add-space
+                         v-show="mqttConfigList.mqtt_enabled && mqttConfigList.mqtt_hass_enabled"
+            >
+                <InputElement :label="$t('mqttadmin.HassPrefixTopic')"
+                              v-model="mqttConfigList.mqtt_hass_topic"
+                              type="text" maxlength="32"
+                              :placeholder="$t('mqttadmin.HassPrefixTopicHint')"/>
 
-            <div class="card mt-5" v-show="mqttConfigList.mqtt_enabled && mqttConfigList.mqtt_hass_enabled">
-                <div class="card-header text-bg-primary">Home Assistant MQTT Auto Discovery Parameters</div>
-                <div class="card-body">
-                    <div class="row mb-3">
-                        <label for="inputHassTopic" class="col-sm-2 col-form-label">Prefix Topic:</label>
-                        <div class="col-sm-10">
-                            <input type="text" class="form-control" id="inputHassTopic" maxlength="32"
-                                placeholder="The prefix for the discovery topic"
-                                v-model="mqttConfigList.mqtt_hass_topic" />
-                        </div>
-                    </div>
+                <InputElement :label="$t('mqttadmin.HassRetain')"
+                              v-model="mqttConfigList.mqtt_hass_retain"
+                              type="checkbox"/>
 
-                    <div class="row mb-3">
-                        <label class="col-sm-2 form-check-label" for="inputHassRetain">Enable Retain Flag</label>
-                        <div class="col-sm-10">
-                            <div class="form-check form-switch">
-                                <input class="form-check-input" type="checkbox" id="inputHassRetain"
-                                    v-model="mqttConfigList.mqtt_hass_retain" />
-                            </div>
-                        </div>
-                    </div>
+                <InputElement :label="$t('mqttadmin.HassExpire')"
+                              v-model="mqttConfigList.mqtt_hass_expire"
+                              type="checkbox"/>
 
-                    <div class="row mb-3">
-                        <label class="col-sm-2 form-check-label" for="inputHassExpire">Enable Expiration</label>
-                        <div class="col-sm-10">
-                            <div class="form-check form-switch">
-                                <input class="form-check-input" type="checkbox" id="inputHassExpire"
-                                    v-model="mqttConfigList.mqtt_hass_expire" />
-                            </div>
-                        </div>
-                    </div>
+                <InputElement :label="$t('mqttadmin.HassIndividual')"
+                              v-model="mqttConfigList.mqtt_hass_individualpanels"
+                              type="checkbox"/>
+            </CardElement>
 
-                    <div class="row mb-3">
-                        <label class="col-sm-2 form-check-label" for="inputIndividualPanels">Individual
-                            Panels:</label>
-                        <div class="col-sm-10">
-                            <div class="form-check form-switch">
-                                <input class="form-check-input" type="checkbox" id="inputIndividualPanels"
-                                    v-model="mqttConfigList.mqtt_hass_individualpanels" />
-                            </div>
-                        </div>
-                    </div>
-
-                </div>
-            </div>
-
-            <button type="submit" class="btn btn-primary mb-3">Save</button>
+            <button type="submit" class="btn btn-primary mb-3">{{ $t('mqttadmin.Save') }}</button>
         </form>
     </BasePage>
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue';
 import BasePage from '@/components/BasePage.vue';
 import BootstrapAlert from "@/components/BootstrapAlert.vue";
-import { handleResponse, authHeader } from '@/utils/authentication';
+import CardElement from '@/components/CardElement.vue';
+import InputElement from '@/components/InputElement.vue';
 import type { MqttConfig } from "@/types/MqttConfig";
+import { authHeader, handleResponse } from '@/utils/authentication';
+import { defineComponent } from 'vue';
 
 export default defineComponent({
     components: {
         BasePage,
         BootstrapAlert,
+        CardElement,
+        InputElement,
     },
     data() {
         return {
@@ -262,7 +159,7 @@ export default defineComponent({
                 .then((response) => handleResponse(response, this.$emitter, this.$router))
                 .then(
                     (response) => {
-                        this.alertMessage = response.message;
+                        this.alertMessage = this.$t('apiresponse.' + response.code, response.param);
                         this.alertType = response.type;
                         this.showAlert = true;
                     }

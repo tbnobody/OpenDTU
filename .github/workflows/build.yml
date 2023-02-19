@@ -98,18 +98,10 @@ jobs:
       - name: Copy boot_app0.bin
         run: cp ~/.platformio/packages/framework-arduinoespressif32/tools/partitions/boot_app0.bin .pio/build/${{ matrix.environment }}/boot_app0.bin
 
-      - name: Copy bootloader_dio_40m.bin
-        run: cp ~/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32/bin/bootloader_dio_40m.bin .pio/build/${{ matrix.environment }}/bootloader_dio_40m.bin
-
       - name: Generate Tag name for release
         run: |
-          echo "tag=build-$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
+          echo "tag=build-$(date -I)-$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
         id: release_tag
-
-      - name: Add Tag to Commit
-        run: |
-          git tag ${{ steps.release_tag.outputs.tag }}
-          git push origin ${{ steps.release_tag.outputs.tag }}
 
       - name: Upload Artifacts (.bin files)
         uses: actions/upload-artifact@v3
@@ -118,7 +110,7 @@ jobs:
           path: |
             .pio/build/${{ matrix.environment }}/opendtu-${{ matrix.environment }}.bin
             .pio/build/${{ matrix.environment }}/partitions.bin
-            .pio/build/${{ matrix.environment }}/bootloader_dio_40m.bin
+            .pio/build/${{ matrix.environment }}/bootloader.bin
             .pio/build/${{ matrix.environment }}/boot_app0.bin
 
     outputs:

@@ -7,7 +7,7 @@
 
         <div class="text-center" v-if="isLoading">
             <div class="spinner-border" role="status">
-                <span class="visually-hidden">Loading...</span>
+                <span class="visually-hidden">{{ $t('base.Loading') }}</span>
             </div>
         </div>
 

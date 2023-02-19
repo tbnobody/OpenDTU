@@ -1,3 +1,7 @@
+// SPDX-License-Identifier: GPL-2.0-or-later
+/*
+ * Copyright (C) 2022 Thomas Basler and others
+ */
 #include "CommandAbstract.h"
 #include "crc.h"
 #include <string.h>
@@ -19,13 +23,13 @@ const uint8_t* CommandAbstract::getDataPayload()
     return _payload;
 }
 
-void CommandAbstract::dumpDataPayload(Stream& stream)
+void CommandAbstract::dumpDataPayload(Print* stream)
 {
     const uint8_t* payload = getDataPayload();
     for (uint8_t i = 0; i < getDataSize(); i++) {
-        stream.printf("%02X ", payload[i]);
+        stream->printf("%02X ", payload[i]);
     }
-    stream.println("");
+    stream->println("");
 }
 
 uint8_t CommandAbstract::getDataSize()

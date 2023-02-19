@@ -78,3 +78,10 @@
 #define MQTT_HASS_RETAIN true
 #define MQTT_HASS_TOPIC "homeassistant/"
 #define MQTT_HASS_INDIVIDUALPANELS false
+
+#define DEV_PINMAPPING ""
+
+#define DISPLAY_POWERSAFE true
+#define DISPLAY_SCREENSAVER true
+#define DISPLAY_SHOWLOGO true
+#define DISPLAY_CONTRAST 60

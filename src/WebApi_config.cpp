@@ -3,10 +3,10 @@
  * Copyright (C) 2022 Thomas Basler and others
  */
 #include "WebApi_config.h"
-#include "ArduinoJson.h"
-#include "AsyncJson.h"
 #include "Configuration.h"
 #include "WebApi.h"
+#include "WebApi_errors.h"
+#include <AsyncJson.h>
 #include <LittleFS.h>
 
 void WebApiConfigClass::init(AsyncWebServer* server)
@@ -22,6 +22,7 @@ void WebApiConfigClass::init(AsyncWebServer* server)
 
     _server->on("/api/config/get", HTTP_GET, std::bind(&WebApiConfigClass::onConfigGet, this, _1));
     _server->on("/api/config/delete", HTTP_POST, std::bind(&WebApiConfigClass::onConfigDelete, this, _1));
+    _server->on("/api/config/list", HTTP_GET, std::bind(&WebApiConfigClass::onConfigListGet, this, _1));
     _server->on("/api/config/upload", HTTP_POST,
         std::bind(&WebApiConfigClass::onConfigUploadFinish, this, _1),
         std::bind(&WebApiConfigClass::onConfigUpload, this, _1, _2, _3, _4, _5, _6));
@@ -37,7 +38,17 @@ void WebApiConfigClass::onConfigGet(AsyncWebServerRequest* request)
         return;
     }
 
-    request->send(LittleFS, CONFIG_FILENAME, String(), true);
+    String requestFile = CONFIG_FILENAME;
+    if (request->hasParam("file")) {
+        String name = "/" + request->getParam("file")->value();
+        if (LittleFS.exists(name)) {
+            requestFile = name;
+        } else {
+            request->send(404);
+        }
+    }
+
+    request->send(LittleFS, requestFile, String(), true);
 }
 
 void WebApiConfigClass::onConfigDelete(AsyncWebServerRequest* request)
@@ -52,6 +63,7 @@ void WebApiConfigClass::onConfigDelete(AsyncWebServerRequest* request)
 
     if (!request->hasParam("data", true)) {
         retMsg[F("message")] = F("No values found!");
+        retMsg[F("code")] = WebApiError::GenericNoValueFound;
         response->setLength();
         request->send(response);
         return;
@@ -61,6 +73,7 @@ void WebApiConfigClass::onConfigDelete(AsyncWebServerRequest* request)
 
     if (json.length() > 1024) {
         retMsg[F("message")] = F("Data too large!");
+        retMsg[F("code")] = WebApiError::GenericDataTooLarge;
         response->setLength();
         request->send(response);
         return;
@@ -71,6 +84,7 @@ void WebApiConfigClass::onConfigDelete(AsyncWebServerRequest* request)
 
     if (error) {
         retMsg[F("message")] = F("Failed to parse data!");
+        retMsg[F("code")] = WebApiError::GenericDataTooLarge;
         response->setLength();
         request->send(response);
         return;
@@ -78,6 +92,7 @@ void WebApiConfigClass::onConfigDelete(AsyncWebServerRequest* request)
 
     if (!(root.containsKey("delete"))) {
         retMsg[F("message")] = F("Values are missing!");
+        retMsg[F("code")] = WebApiError::GenericValueMissing;
         response->setLength();
         request->send(response);
         return;
@@ -85,6 +100,7 @@ void WebApiConfigClass::onConfigDelete(AsyncWebServerRequest* request)
 
     if (root[F("delete")].as<bool>() == false) {
         retMsg[F("message")] = F("Not deleted anything!");
+        retMsg[F("code")] = WebApiError::ConfigNotDeleted;
         response->setLength();
         request->send(response);
         return;
@@ -92,12 +108,40 @@ void WebApiConfigClass::onConfigDelete(AsyncWebServerRequest* request)
 
     retMsg[F("type")] = F("success");
     retMsg[F("message")] = F("Configuration resettet. Rebooting now...");
+    retMsg[F("code")] = WebApiError::ConfigSuccess;
 
     response->setLength();
     request->send(response);
 
     LittleFS.remove(CONFIG_FILENAME);
     ESP.restart();
+}
+
+void WebApiConfigClass::onConfigListGet(AsyncWebServerRequest* request)
+{
+    if (!WebApi.checkCredentials(request)) {
+        return;
+    }
+
+    AsyncJsonResponse* response = new AsyncJsonResponse();
+    JsonObject root = response->getRoot();
+    JsonArray data = root.createNestedArray(F("configs"));
+
+    File rootfs = LittleFS.open("/");
+    File file = rootfs.openNextFile();
+    while (file) {
+        if (file.isDirectory()) {
+            continue;
+        }
+        JsonObject obj = data.createNestedObject();
+        obj["name"] = String(file.name());
+
+        file = rootfs.openNextFile();
+    }
+    file.close();
+
+    response->setLength();
+    request->send(response);
 }
 
 void WebApiConfigClass::onConfigUploadFinish(AsyncWebServerRequest* request)
@@ -127,7 +171,12 @@ void WebApiConfigClass::onConfigUpload(AsyncWebServerRequest* request, String fi
 
     if (!index) {
         // open the file on first call and store the file handle in the request object
-        request->_tempFile = LittleFS.open(CONFIG_FILENAME, "w");
+        if (!request->hasParam("file")) {
+            request->send(500);
+            return;
+        }
+        String name = "/" + request->getParam("file")->value();
+        request->_tempFile = LittleFS.open(name, "w");
     }
 
     if (len) {

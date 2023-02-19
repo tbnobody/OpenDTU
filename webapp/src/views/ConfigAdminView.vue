@@ -1,101 +1,109 @@
 <template>
-    <BasePage :title="'Config Management'" :isLoading="loading">
+    <BasePage :title="$t('configadmin.ConfigManagement')" :isLoading="loading">
         <BootstrapAlert v-model="showAlert" dismissible :variant="alertType">
             {{ alertMessage }}
         </BootstrapAlert>
 
-        <div class="card">
-            <div class="card-header text-bg-primary">Backup: Configuration File Backup</div>
-            <div class="card-body text-center">
-                Backup the configuration file
-                <button class="btn btn-primary" @click="downloadConfig">Backup
-                </button>
-            </div>
-        </div>
-
-        <div class="card mt-5">
-            <div class="card-header text-bg-primary">Restore: Restore the Configuration File</div>
-            <div class="card-body text-center">
-
-                <div v-if="!uploading && UploadError != ''">
-                    <p class="h1 mb-2">
-                        <BIconExclamationCircleFill />
-                    </p>
-                    <span style="vertical-align: middle" class="ml-2">
-                        {{ UploadError }}
-                    </span>
-                    <br />
-                    <br />
-                    <button class="btn btn-light" @click="clear">
-                        <BIconArrowLeft /> Back
+        <CardElement :text="$t('configadmin.BackupHeader')" textVariant="text-bg-primary" center-content>
+            <div class="row g-3 align-items-center">
+                <div class="col-sm">
+                    {{ $t('configadmin.BackupConfig') }}
+                </div>
+                <div class="col-sm">
+                    <select class="form-select" v-model="backupFileSelect">
+                        <option v-for="(file) in fileList.configs" :key="file.name" :value="file.name">
+                            {{ file.name }}
+                        </option>
+                    </select>
+                </div>
+                <div class="col-sm">
+                    <button class="btn btn-primary" @click="downloadConfig">{{ $t('configadmin.Backup') }}
                     </button>
                 </div>
-
-                <div v-else-if="!uploading && UploadSuccess">
-                    <span class="h1 mb-2">
-                        <BIconCheckCircle />
-                    </span>
-                    <span> Upload Success </span>
-                    <br />
-                    <br />
-                    <button class="btn btn-primary" @click="clear">
-                        <BIconArrowLeft /> Back
-                    </button>
-                </div>
-
-                <div v-else-if="!uploading">
-                    <div class="form-group pt-2 mt-3">
-                        <input class="form-control" type="file" ref="file" accept=".json" @change="uploadConfig" />
-                    </div>
-                </div>
-
-                <div v-else-if="uploading">
-                    <div class="progress">
-                        <div class="progress-bar" role="progressbar" :style="{ width: progress + '%' }"
-                            v-bind:aria-valuenow="progress" aria-valuemin="0" aria-valuemax="100">
-                            {{ progress }}%
-                        </div>
-                    </div>
-                </div>
-
-                <div class="alert alert-danger mt-3" role="alert">
-                    <b>Note:</b> This operation replaces the configuration file with the restored configuration and
-                    restarts OpenDTU to apply all settings.
-                </div>
             </div>
-        </div>
+        </CardElement>
 
-        <div class="card mt-5">
-            <div class="card-header text-bg-primary">Initialize: Perform Factory Reset</div>
-            <div class="card-body text-center">
-
-                <button class="btn btn-danger" @click="onFactoryResetModal">Restore Factory-Default Settings
+        <CardElement :text="$t('configadmin.RestoreHeader')" textVariant="text-bg-primary" center-content add-space>
+            <div v-if="!uploading && UploadError != ''">
+                <p class="h1 mb-2">
+                    <BIconExclamationCircleFill />
+                </p>
+                <span style="vertical-align: middle" class="ml-2">
+                    {{ UploadError }}
+                </span>
+                <br />
+                <br />
+                <button class="btn btn-light" @click="clear">
+                    <BIconArrowLeft /> {{ $t('configadmin.Back') }}
                 </button>
+            </div>
 
-                <div class="alert alert-danger mt-3" role="alert">
-                    <b>Note:</b> Click Restore Factory-Default Settings to restore and initialize the
-                    factory-default settings and reboot.
+            <div v-else-if="!uploading && UploadSuccess">
+                <span class="h1 mb-2">
+                    <BIconCheckCircle />
+                </span>
+                <span> {{ $t('configadmin.UploadSuccess') }} </span>
+                <br />
+                <br />
+                <button class="btn btn-primary" @click="clear">
+                    <BIconArrowLeft /> {{ $t('configadmin.Back') }}
+                </button>
+            </div>
+
+            <div v-else-if="!uploading">
+                <div class="row g-3 align-items-center form-group pt-2">
+                    <div class="col-sm">
+                        <select class="form-select" v-model="restoreFileSelect">
+                            <option selected value="config.json">Main Config (config.json)</option>
+                            <option selected value="pin_mapping.json">Pin Mapping (pin_mapping.json)</option>
+                        </select>
+                    </div>
+                    <div class="col-sm">
+                        <input class="form-control" type="file" ref="file" accept=".json" />
+                    </div>
+                    <div class="col-sm">
+                        <button class="btn btn-primary" @click="uploadConfig">{{ $t('configadmin.Restore') }}
+                        </button>
+                    </div>
                 </div>
             </div>
-        </div>
+
+            <div v-else-if="uploading">
+                <div class="progress">
+                    <div class="progress-bar" role="progressbar" :style="{ width: progress + '%' }"
+                        v-bind:aria-valuenow="progress" aria-valuemin="0" aria-valuemax="100">
+                        {{ progress }}%
+                    </div>
+                </div>
+            </div>
+
+            <div class="alert alert-danger mt-3" role="alert" v-html="$t('configadmin.RestoreHint')"></div>
+        </CardElement>
+
+        <CardElement :text="$t('configadmin.ResetHeader')" textVariant="text-bg-primary" center-content add-space>
+            <button class="btn btn-danger" @click="onFactoryResetModal">{{ $t('configadmin.FactoryResetButton') }}
+            </button>
+
+            <div class="alert alert-danger mt-3" role="alert" v-html="$t('configadmin.ResetHint')"></div>
+        </CardElement>
     </BasePage>
 
     <div class="modal" id="factoryReset" tabindex="-1">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title">Factory Reset</h5>
+                    <h5 class="modal-title">{{ $t('configadmin.FactoryReset') }}</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    Are you sure you want to delete the current configuration and reset all settings to their
-                    factory defaults?
+                    {{ $t('configadmin.ResetMsg') }}
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" @click="onFactoryResetCancel"
-                        data-bs-dismiss="modal">Cancel</button>
-                    <button type="button" class="btn btn-danger" @click="onFactoryResetPerform">Factory
-                        Reset!</button>
+                        data-bs-dismiss="modal">{{ $t('configadmin.Cancel') }}</button>
+                    <button type="button" class="btn btn-danger" @click="onFactoryResetPerform">
+                        {{ $t('configadmin.ResetConfirm') }}
+                    </button>
                 </div>
             </div>
         </div>
@@ -103,24 +111,27 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue';
 import BasePage from '@/components/BasePage.vue';
-import {
-    BIconExclamationCircleFill,
-    BIconArrowLeft,
-    BIconCheckCircle
-} from 'bootstrap-icons-vue';
-import * as bootstrap from 'bootstrap';
 import BootstrapAlert from "@/components/BootstrapAlert.vue";
-import { handleResponse, authHeader, isLoggedIn } from '@/utils/authentication';
+import CardElement from '@/components/CardElement.vue';
+import type { ConfigFileList } from '@/types/Config';
+import { authHeader, handleResponse } from '@/utils/authentication';
+import * as bootstrap from 'bootstrap';
+import {
+    BIconArrowLeft,
+    BIconCheckCircle,
+    BIconExclamationCircleFill
+} from 'bootstrap-icons-vue';
+import { defineComponent } from 'vue';
 
 export default defineComponent({
     components: {
         BasePage,
-        BIconExclamationCircleFill,
+        BootstrapAlert,
+        CardElement,
         BIconArrowLeft,
         BIconCheckCircle,
-        BootstrapAlert,
+        BIconExclamationCircleFill,
     },
     data() {
         return {
@@ -134,14 +145,16 @@ export default defineComponent({
             UploadError: "",
             UploadSuccess: false,
             file: {} as Blob,
+            fileList: {} as ConfigFileList,
+            backupFileSelect: "",
+            restoreFileSelect: "config.json",
         };
     },
     mounted() {
-        if (!isLoggedIn()) {
-            this.$router.push({ path: "/login", query: { returnUrl: this.$router.currentRoute.value.fullPath } });
-        }
         this.modalFactoryReset = new bootstrap.Modal('#factoryReset');
-        this.loading = false;
+    },
+    created() {
+        this.getFileList();
     },
     methods: {
         onFactoryResetModal() {
@@ -162,34 +175,49 @@ export default defineComponent({
                 .then((response) => handleResponse(response, this.$emitter, this.$router))
                 .then(
                     (response) => {
-                        this.alertMessage = response.message;
+                        this.alertMessage = this.$t('apiresponse.' + response.code, response.param);
                         this.alertType = response.type;
                         this.showAlert = true;
                     }
                 )
             this.modalFactoryReset.hide();
         },
+        getFileList() {
+            this.loading = true;
+            fetch("/api/config/list", { headers: authHeader() })
+                .then((response) => handleResponse(response, this.$emitter, this.$router))
+                .then((data) => {
+                    this.fileList = data;
+                    if (this.fileList.configs) {
+                        this.backupFileSelect = this.fileList.configs[0].name;
+                    }
+                    this.loading = false;
+                });
+        },
         downloadConfig() {
-            fetch("/api/config/get", { headers: authHeader() })
+            fetch("/api/config/get?file=" + this.backupFileSelect, { headers: authHeader() })
                 .then(res => res.blob())
                 .then(blob => {
                     var file = window.URL.createObjectURL(blob);
                     var a = document.createElement('a');
                     a.href = file;
-                    a.download = "config.json";
+                    a.download = this.backupFileSelect;
                     document.body.appendChild(a);
                     a.click();
                     a.remove();
                 });
         },
-        uploadConfig(event: Event | null) {
+        uploadConfig() {
             this.uploading = true;
             const formData = new FormData();
-            if (event !== null) {
-                const target = event.target as HTMLInputElement;
-                if (target.files !== null) {
-                    this.file = target.files[0];
-                }
+            const target = this.$refs.file as HTMLInputElement; //  event.target as HTMLInputElement;
+            if (target.files !== null && target.files?.length > 0) {
+                this.file = target.files[0];
+            } else {
+                this.UploadError = this.$t("configadmin.NoFileSelected");
+                this.uploading = false;
+                this.progress = 0;
+                return;
             }
             const request = new XMLHttpRequest();
             request.addEventListener("load", () => {
@@ -211,7 +239,7 @@ export default defineComponent({
             request.withCredentials = true;
 
             formData.append("config", this.file, "config");
-            request.open("post", "/api/config/upload");
+            request.open("post", "/api/config/upload?file=" + this.restoreFileSelect);
             authHeader().forEach((value, key) => {
                 request.setRequestHeader(key, value);
             });
@@ -220,6 +248,7 @@ export default defineComponent({
         clear() {
             this.UploadError = "";
             this.UploadSuccess = false;
+            this.getFileList();
         },
     },
 });

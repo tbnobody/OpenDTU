@@ -11,6 +11,7 @@ public:
 private:
     void onConfigGet(AsyncWebServerRequest* request);
     void onConfigDelete(AsyncWebServerRequest* request);
+    void onConfigListGet(AsyncWebServerRequest* request);
     void onConfigUploadFinish(AsyncWebServerRequest* request);
     void onConfigUpload(AsyncWebServerRequest* request, String filename, size_t index, uint8_t* data, size_t len, bool final);
 

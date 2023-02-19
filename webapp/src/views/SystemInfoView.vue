@@ -1,5 +1,5 @@
 <template>
-    <BasePage :title="'System Info'" :isLoading="dataLoading">
+    <BasePage :title="$t('systeminfo.SystemInfo')" :isLoading="dataLoading">
         <FirmwareInfo :systemStatus="systemDataList" />
         <div class="mt-5"></div>
         <HardwareInfo :systemStatus="systemDataList" />
@@ -12,20 +12,20 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue';
-import { handleResponse, authHeader } from '@/utils/authentication';
 import BasePage from '@/components/BasePage.vue';
-import HardwareInfo from "@/components/HardwareInfo.vue";
 import FirmwareInfo from "@/components/FirmwareInfo.vue";
+import HardwareInfo from "@/components/HardwareInfo.vue";
 import MemoryInfo from "@/components/MemoryInfo.vue";
 import RadioInfo from "@/components/RadioInfo.vue";
 import type { SystemStatus } from '@/types/SystemStatus';
+import { authHeader, handleResponse } from '@/utils/authentication';
+import { defineComponent } from 'vue';
 
 export default defineComponent({
     components: {
         BasePage,
-        HardwareInfo,
         FirmwareInfo,
+        HardwareInfo,
         MemoryInfo,
         RadioInfo,
     },
@@ -58,15 +58,15 @@ export default defineComponent({
                     if (response.ok) {
                         return response.json()
                     }
-                    throw new Error('Error fetching version information');
+                    throw new Error(this.$t("systeminfo.VersionError"));
                 })
                 .then((data) => {
                     if (data.total_commits > 0) {
-                        this.systemDataList.update_text = "New version available! Show changes!"
+                        this.systemDataList.update_text = this.$t("systeminfo.VersionNew");
                         this.systemDataList.update_status = "text-bg-danger";
                         this.systemDataList.update_url = data.html_url;
                     } else {
-                        this.systemDataList.update_text = "Up to date!"
+                        this.systemDataList.update_text = this.$t("systeminfo.VersionOk");
                         this.systemDataList.update_status = "text-bg-success";
                     }
                 })

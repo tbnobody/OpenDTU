@@ -36,12 +36,20 @@ export default defineConfig({
       },
     },
   },
+  esbuild: {
+    drop: ['console', 'debugger'],
+  },
   server: {
     proxy: {
       '^/api': {
         target: 'http://192.168.20.110/'
       },
       '^/livedata': {
+        target: 'ws://192.168.20.110/',
+        ws: true,
+        changeOrigin: true
+      },
+      '^/console': {
         target: 'ws://192.168.20.110/',
         ws: true,
         changeOrigin: true

@@ -1,3 +1,7 @@
+// SPDX-License-Identifier: GPL-2.0-or-later
+/*
+ * Copyright (C) 2022 Thomas Basler and others
+ */
 #include "HM_1CH.h"
 
 HM_1CH::HM_1CH(uint64_t serial)
@@ -28,12 +32,7 @@ String HM_1CH::typeName()
     return F("HM-300, HM-350, HM-400");
 }
 
-const byteAssign_t* HM_1CH::getByteAssignment()
+const std::list<byteAssign_t>* HM_1CH::getByteAssignment()
 {
-    return byteAssignment;
-}
-
-uint8_t HM_1CH::getAssignmentCount()
-{
-    return sizeof(byteAssignment) / sizeof(byteAssign_t);
+    return &byteAssignment;
 }

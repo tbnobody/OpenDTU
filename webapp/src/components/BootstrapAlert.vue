@@ -7,8 +7,8 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, onBeforeUnmount, ref, watch } from "vue";
 import Alert from "bootstrap/js/dist/alert";
+import { computed, defineComponent, onBeforeUnmount, ref, watch } from "vue";
 
 export const toInteger = (value: number, defaultValue = NaN) => {
     return Number.isInteger(value) ? value : defaultValue;
