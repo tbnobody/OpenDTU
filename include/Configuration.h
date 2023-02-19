@@ -4,7 +4,7 @@
 #include <Arduino.h>
 
 #define CONFIG_FILENAME "/config.json"
-#define CONFIG_VERSION 0x00011700 // 0.1.23 // make sure to clean all after change
+#define CONFIG_VERSION 0x00011800 // 0.1.24 // make sure to clean all after change
 
 #define WIFI_MAX_SSID_STRLEN 31
 #define WIFI_MAX_PASSWORD_STRLEN 64
@@ -29,7 +29,7 @@
 
 #define DEV_MAX_MAPPING_NAME_STRLEN 63
 
-#define JSON_BUFFER_SIZE 6144
+#define JSON_BUFFER_SIZE 12288
 
 struct CHANNEL_CONFIG_T {
     uint16_t MaxChannelPower;

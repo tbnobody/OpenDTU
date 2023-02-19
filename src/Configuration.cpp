@@ -55,7 +55,7 @@ bool ConfigurationClass::write()
     mqtt["password"] = config.Mqtt_Password;
     mqtt["topic"] = config.Mqtt_Topic;
     mqtt["retain"] = config.Mqtt_Retain;
-    mqtt["publish_invterval"] = config.Mqtt_PublishInterval;
+    mqtt["publish_interval"] = config.Mqtt_PublishInterval;
 
     JsonObject mqtt_lwt = mqtt.createNestedObject("lwt");
     mqtt_lwt["topic"] = config.Mqtt_LwtTopic;
@@ -192,7 +192,7 @@ bool ConfigurationClass::read()
     strlcpy(config.Mqtt_Password, mqtt["password"] | MQTT_PASSWORD, sizeof(config.Mqtt_Password));
     strlcpy(config.Mqtt_Topic, mqtt["topic"] | MQTT_TOPIC, sizeof(config.Mqtt_Topic));
     config.Mqtt_Retain = mqtt["retain"] | MQTT_RETAIN;
-    config.Mqtt_PublishInterval = mqtt["publish_invterval"] | MQTT_PUBLISH_INTERVAL;
+    config.Mqtt_PublishInterval = mqtt["publish_interval"] | MQTT_PUBLISH_INTERVAL;
 
     JsonObject mqtt_lwt = mqtt["lwt"];
     strlcpy(config.Mqtt_LwtTopic, mqtt_lwt["topic"] | MQTT_LWT_TOPIC, sizeof(config.Mqtt_LwtTopic));
@@ -253,21 +253,21 @@ bool ConfigurationClass::read()
 
 void ConfigurationClass::migrate()
 {
+    File f = LittleFS.open(CONFIG_FILENAME, "r", false);
+    if (!f) {
+        MessageOutput.println(F("Failed to open file, cancel migration"));
+        return;
+    }
+
+    DynamicJsonDocument doc(JSON_BUFFER_SIZE);
+    // Deserialize the JSON document
+    DeserializationError error = deserializeJson(doc, f);
+    if (error) {
+        MessageOutput.printf("Failed to read file, cancel migration: %s\r\n", error.c_str());
+        return;
+    }
+
     if (config.Cfg_Version < 0x00011700) {
-        File f = LittleFS.open(CONFIG_FILENAME, "r", false);
-        if (!f) {
-            MessageOutput.println(F("Failed to open file, cancel migration"));
-            return;
-        }
-
-        DynamicJsonDocument doc(JSON_BUFFER_SIZE);
-        // Deserialize the JSON document
-        DeserializationError error = deserializeJson(doc, f);
-        if (error) {
-            MessageOutput.println(F("Failed to read file, cancel migration"));
-            return;
-        }
-
         JsonArray inverters = doc["inverters"];
         for (uint8_t i = 0; i < INV_MAX_COUNT; i++) {
             JsonObject inv = inverters[i].as<JsonObject>();
@@ -278,6 +278,13 @@ void ConfigurationClass::migrate()
             }
         }
     }
+
+    if (config.Cfg_Version < 0x00011800) {
+        JsonObject mqtt = doc["mqtt"];
+        config.Mqtt_PublishInterval = mqtt["publish_invterval"];
+    }
+
+    f.close();
 
     config.Cfg_Version = CONFIG_VERSION;
     write();
