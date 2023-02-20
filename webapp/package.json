@@ -21,6 +21,7 @@
     "vue-router": "^4.1.6"
   },
   "devDependencies": {
+    "@intlify/unplugin-vue-i18n": "^0.8.2",
     "@rushstack/eslint-patch": "^1.2.0",
     "@types/bootstrap": "^5.2.6",
     "@types/node": "^18.14.0",

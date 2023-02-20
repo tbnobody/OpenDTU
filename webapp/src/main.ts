@@ -1,8 +1,9 @@
+import messages from '@intlify/unplugin-vue-i18n/messages'
 import mitt from 'mitt'
 import { createApp } from 'vue'
 import { createI18n } from 'vue-i18n'
 import App from './App.vue'
-import { defaultLocale, messages, dateTimeFormats, numberFormats } from './locales'
+import { dateTimeFormats, defaultLocale, numberFormats } from './locales'
 import { tooltip } from './plugins/bootstrap'
 import router from './router'
 
