@@ -33,6 +33,7 @@ export default defineConfig({
     cssCodeSplit: false,
     outDir: '../webapp_dist',
     emptyOutDir: true,
+    minify: 'terser',
     rollupOptions: {
       output: {
         // Only create one js file
