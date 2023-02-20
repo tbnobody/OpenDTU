@@ -78,13 +78,13 @@ void PowerLimiterClass::loop()
 
     _lastLoop = millis();
 
-    std::shared_ptr<InverterAbstract> inverter = Hoymiles.getInverterByPos(1); // TODO make Inverter selectable
+    std::shared_ptr<InverterAbstract> inverter = Hoymiles.getInverterByPos(1); // TODO(helgeerbe) make Inverter selectable
 
     if (inverter == nullptr || !inverter->isReachable()) {
         return;
     }
 
-    float dcVoltage = inverter->Statistics()->getChannelFieldValue(TYPE_DC, CH0, FLD_UDC); // TODO make channel selectable
+    float dcVoltage = inverter->Statistics()->getChannelFieldValue(TYPE_DC, CH0, FLD_UDC); // TODO(helgeerbe) make channel selectable
 
     if ((millis() - inverter->Statistics()->getLastUpdate()) > 10000) {
         return;
@@ -101,7 +101,7 @@ void PowerLimiterClass::loop()
     }
 
     if (inverter->isProducing()) {
-        float acPower = inverter->Statistics()->getChannelFieldValue(TYPE_AC, CH0, FLD_PAC); // TODO check settings
+        float acPower = inverter->Statistics()->getChannelFieldValue(TYPE_AC, CH0, FLD_PAC); // TODO(helgeerbe) check settings
         float correctedDcVoltage = dcVoltage + (acPower * config.PowerLimiter_VoltageLoadCorrectionFactor);
 
         if ((_consumeSolarPowerOnly && isStartThresholdReached(inverter))
@@ -216,8 +216,8 @@ float PowerLimiterClass::getLoadCorrectedVoltage(std::shared_ptr<InverterAbstrac
 {
     CONFIG_T& config = Configuration.get();
 
-    float acPower = inverter->Statistics()->getChannelFieldValue(TYPE_AC, CH0, FLD_PAC); // TODO check settings
-    float dcVoltage = inverter->Statistics()->getChannelFieldValue(TYPE_DC, CH0, FLD_UDC); // TODO check settings
+    float acPower = inverter->Statistics()->getChannelFieldValue(TYPE_AC, CH0, FLD_PAC); // TODO(helgeerbe) check settings
+    float dcVoltage = inverter->Statistics()->getChannelFieldValue(TYPE_DC, CH0, FLD_UDC); // TODO(helgeerbe) check settings
 
     if (dcVoltage <= 0.0) {
         return 0.0;
