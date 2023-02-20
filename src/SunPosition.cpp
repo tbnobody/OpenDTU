@@ -45,8 +45,8 @@ void SunPositionClass::updateSunData()
     }
 
     _sun.setCurrentDate(1900 + timeinfo.tm_year, timeinfo.tm_mon + 1, timeinfo.tm_mday);
-    _sunriseMinutes = (int)_sun.calcCustomSunrise(SunSet::SUNSET_NAUTICAL);
-    _sunsetMinutes = (int)_sun.calcCustomSunset(SunSet::SUNSET_NAUTICAL);
+    _sunriseMinutes = static_cast<int>(_sun.calcCustomSunrise(SunSet::SUNSET_NAUTICAL));
+    _sunsetMinutes = static_cast<int>(_sun.calcCustomSunset(SunSet::SUNSET_NAUTICAL));
     uint minutesPastMidnight = timeinfo.tm_hour * 60 + timeinfo.tm_min;
 
     _isDayPeriod = (minutesPastMidnight >= _sunriseMinutes) && (minutesPastMidnight < _sunsetMinutes);
@@ -59,12 +59,13 @@ bool SunPositionClass::sunsetTime(struct tm* info)
     time_t aTime = time(NULL);
 
     // Set the time to midnight
-    struct tm* tm = localtime(&aTime);
-    tm->tm_sec = 0;
-    tm->tm_min = _sunsetMinutes;
-    tm->tm_hour = 0;
-    tm->tm_isdst = -1;
-    time_t midnight = mktime(tm);
+    struct tm tm;
+    localtime_r(&aTime, &tm);
+    tm.tm_sec = 0;
+    tm.tm_min = _sunsetMinutes;
+    tm.tm_hour = 0;
+    tm.tm_isdst = -1;
+    time_t midnight = mktime(&tm);
 
     localtime_r(&midnight, info);
     return _isValidInfo;
@@ -76,12 +77,13 @@ bool SunPositionClass::sunriseTime(struct tm* info)
     time_t aTime = time(NULL);
 
     // Set the time to midnight
-    struct tm* tm = localtime(&aTime);
-    tm->tm_sec = 0;
-    tm->tm_min = _sunriseMinutes;
-    tm->tm_hour = 0;
-    tm->tm_isdst = -1;
-    time_t midnight = mktime(tm);
+    struct tm tm;
+    localtime_r(&aTime, &tm);
+    tm.tm_sec = 0;
+    tm.tm_min = _sunriseMinutes;
+    tm.tm_hour = 0;
+    tm.tm_isdst = -1;
+    time_t midnight = mktime(&tm);
 
     localtime_r(&midnight, info);
     return _isValidInfo;
