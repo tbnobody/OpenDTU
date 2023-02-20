@@ -10,6 +10,7 @@
         "DTUSettings": "DTU Einstellungen",
         "DeviceManager": "Geräte-Manager",
         "VedirectSettings": "Ve.direct Settings",
+        "BatterySettings": "Battery Settings",
         "ConfigManagement": "Konfigurationsverwaltung",
         "FirmwareUpgrade": "Firmware Aktualisierung",
         "DeviceReboot": "Geräteneustart",
@@ -432,6 +433,13 @@
         "PublishInterval": "Veröffentlichungsintervall:",
         "Seconds": "Sekunden",
         "UpdatesOnly": "Nur Änderungen senden:",
+        "Save": "@:dtuadmin.Save"
+    },
+    "batteryadmin": {
+        "BatterySettings": "Batterie Einstellungen",
+        "BatteryConfiguration": "Batterie Konfiguration",
+        "EnableBatteryCanBus": "Aktiviere Batterie CAN Bus Schnittstelle",
+        "Seconds": "@:dtuadmin.Seconds",
         "Save": "@:dtuadmin.Save"
     },
     "inverteradmin": {

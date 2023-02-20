@@ -17,6 +17,8 @@
 #include "PinMapping.h"
 #include "Utils.h"
 #include "WebApi.h"
+#include "PowerLimiter.h"
+#include "PylontechCanReceiver.h"
 #include "defaults.h"
 #include <Arduino.h>
 #include <Hoymiles.h>
@@ -175,11 +177,19 @@ void setup()
     } else {
         MessageOutput.println(F("Invalid pin config"));
     }
+
+    // Dynamic power limiter
+    PowerLimiter.init();
+
+    // Pylontech / CAN bus
+    PylontechCanReceiver.init();
 }
 
 void loop()
 {
     NetworkSettings.loop();
+    yield();
+    PowerLimiter.loop();
     yield();
     Hoymiles.loop();
     yield();
@@ -203,5 +213,7 @@ void loop()
     Display.loop();
     yield();
     MessageOutput.loop();
+    yield();
+    PylontechCanReceiver.loop();
     yield();
 }

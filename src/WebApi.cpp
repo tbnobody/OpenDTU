@@ -17,6 +17,7 @@ void WebApiClass::init()
 {
     _server.addHandler(&_events);
 
+    _webApiBattery.init(&_server);
     _webApiConfig.init(&_server);
     _webApiDevice.init(&_server);
     _webApiDevInfo.init(&_server);
@@ -30,7 +31,8 @@ void WebApiClass::init()
     _webApiNetwork.init(&_server);
     _webApiNtp.init(&_server);
     _webApiPower.init(&_server);
-    _webApiPrometheus.init(&_server);
+    _webApiPowerLimiter.init(&_server);
+    // _webApiPrometheus.init(&_server); // TODO remove
     _webApiSecurity.init(&_server);
     _webApiSysstatus.init(&_server);
     _webApiWebapp.init(&_server);
@@ -44,6 +46,7 @@ void WebApiClass::init()
 
 void WebApiClass::loop()
 {
+    _webApiBattery.loop();
     _webApiConfig.loop();
     _webApiDevice.loop();
     _webApiDevInfo.loop();
@@ -57,6 +60,7 @@ void WebApiClass::loop()
     _webApiNetwork.loop();
     _webApiNtp.loop();
     _webApiPower.loop();
+    _webApiPowerLimiter.loop();
     _webApiSecurity.loop();
     _webApiSysstatus.loop();
     _webApiWebapp.loop();

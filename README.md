@@ -1,4 +1,18 @@
-# OpenDTU_VeDirect
+# OpenDTU-OnBattery
+
+This is a fork from the Hoymiles project OpenDTU.
+
+## Extensions to the original OpenDTU
+
+This project is still under development and adds following features:
+
+* Support Victron's Ve.Direct protocol on the same chip. Additional information about Ve.direct can be downloaded from https://www.victronenergy.com/support-and-downloads/technical-information.
+* Dynamically sets the Hoymiles power limited according to the currently used energy in the household (needs an MQTT based power meter like Shelly 3EM)
+* Battery support: Read the voltage from Victron MPPT charge controller or from the Hoymiles DC inputs and starts/stops the power producing based on configurable voltage thresholds
+* Voltage correction that takes the voltage drop because of the current output load into account (not 100% reliable calculation)
+* Can read the current solar panel power from the Victron MPPT and adjust the limiter accordingly to not save energy in the battery (for increased system efficiency). Increases the battery lifespan and reduces energy loses.
+* Settings can be configured in the UI
+* Pylontech Battery support (via CAN bus interface). Use the SOC for starting/stopping the power output and provide the battery data via MQTT
 
 [![OpenDTU Build](https://github.com/tbnobody/OpenDTU/actions/workflows/build.yml/badge.svg)](https://github.com/tbnobody/OpenDTU/actions/workflows/build.yml)
 [![cpplint](https://github.com/tbnobody/OpenDTU/actions/workflows/cpplint.yml/badge.svg)](https://github.com/tbnobody/OpenDTU/actions/workflows/cpplint.yml)
@@ -13,9 +27,6 @@ Several screenshots of the frontend can be found here: [Screenshots](docs/screen
 ## Builds
 Different builds from existing installations can be found here [Builds](docs/builds/README.md)
 Like to show your own build? Just send me a Pull Request.
-
-## Extensions to the original OpenDTU
-I extended the original OpenDTU software to support also Victron's Ve.Direct protocol on the same chip. Additional information about Ve.direct can be downloaded from https://www.victronenergy.com/support-and-downloads/technical-information.
 
 ### Web-Live-Interface:
 ![image](https://user-images.githubusercontent.com/59169507/187224107-4e0d0cab-2e1b-4e47-9410-a49f80aa6789.png)

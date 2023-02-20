@@ -17,7 +17,7 @@
 #define MQTT_MAX_HOSTNAME_STRLEN 128
 #define MQTT_MAX_USERNAME_STRLEN 64
 #define MQTT_MAX_PASSWORD_STRLEN 64
-#define MQTT_MAX_TOPIC_STRLEN 32
+#define MQTT_MAX_TOPIC_STRLEN 256
 #define MQTT_MAX_LWTVALUE_STRLEN 20
 #define MQTT_MAX_ROOT_CA_CERT_STRLEN 2560
 
@@ -29,7 +29,7 @@
 
 #define DEV_MAX_MAPPING_NAME_STRLEN 63
 
-#define JSON_BUFFER_SIZE 7000
+#define JSON_BUFFER_SIZE 8192
 
 struct CHANNEL_CONFIG_T {
     uint16_t MaxChannelPower;
@@ -92,6 +92,23 @@ struct CONFIG_T {
     char Mqtt_Hostname[MQTT_MAX_HOSTNAME_STRLEN + 1];
 
     bool Mqtt_Hass_Expire;
+
+    bool PowerLimiter_Enabled;
+    bool PowerLimiter_SolarPassTroughEnabled;
+    uint32_t PowerLimiter_Interval;
+    char PowerLimiter_MqttTopicPowerMeter1[MQTT_MAX_TOPIC_STRLEN + 1];
+    char PowerLimiter_MqttTopicPowerMeter2[MQTT_MAX_TOPIC_STRLEN + 1];
+    char PowerLimiter_MqttTopicPowerMeter3[MQTT_MAX_TOPIC_STRLEN + 1];
+    bool PowerLimiter_IsInverterBehindPowerMeter;
+    uint32_t PowerLimiter_LowerPowerLimit;
+    uint32_t PowerLimiter_UpperPowerLimit;
+    uint32_t PowerLimiter_BatterySocStartThreshold;
+    uint32_t PowerLimiter_BatterySocStopThreshold;
+    float PowerLimiter_VoltageStartThreshold;
+    float PowerLimiter_VoltageStopThreshold;
+    float PowerLimiter_VoltageLoadCorrectionFactor;
+
+    bool Battery_Enabled;
 
     char Security_Password[WIFI_MAX_PASSWORD_STRLEN + 1];
     bool Security_AllowReadonly;

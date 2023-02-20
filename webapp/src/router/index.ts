@@ -1,4 +1,5 @@
 import AboutView from '@/views/AboutView.vue';
+import BatteryAdminView from '@/views/BatteryAdminView.vue';
 import ConfigAdminView from '@/views/ConfigAdminView.vue';
 import ConsoleInfoView from '@/views/ConsoleInfoView.vue';
 import DeviceAdminView from '@/views/DeviceAdminView.vue'
@@ -6,6 +7,7 @@ import DtuAdminView from '@/views/DtuAdminView.vue';
 import FirmwareUpgradeView from '@/views/FirmwareUpgradeView.vue';
 import HomeView from '@/views/HomeView.vue';
 import VedirectAdminView from '@/views/VedirectAdminView.vue'
+import PowerLimiterAdminView from '@/views/PowerLimiterAdminView.vue'
 import VedirectInfoView from '@/views/VedirectInfoView.vue'
 import InverterAdminView from '@/views/InverterAdminView.vue';
 import LoginView from '@/views/LoginView.vue';
@@ -83,6 +85,16 @@ const router = createRouter({
         path: '/settings/vedirect',
         name: 'Ve.direct Settings',
         component: VedirectAdminView
+    },
+    {
+        path: '/settings/powerlimiter',
+        name: 'Power limiter Settings',
+        component: PowerLimiterAdminView
+    },
+    {
+        path: '/settings/battery',
+        name: 'Battery Settings',
+        component: BatteryAdminView
     },
     {
         path: '/settings/mqtt',
