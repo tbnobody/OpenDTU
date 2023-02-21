@@ -4,7 +4,6 @@
 #include "VeDirectFrameHandler.h"
 #include "Configuration.h"
 #include <Arduino.h>
-#include <map>
 
 #ifndef VICTRON_PIN_RX
 #define VICTRON_PIN_RX 22

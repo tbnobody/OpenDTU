@@ -12,7 +12,6 @@
 #pragma once
 
 #include <Arduino.h>
-#include <map>
 
 #ifndef VICTRON_PIN_TX
 #define VICTRON_PIN_TX 21      // HardwareSerial TX Pin
