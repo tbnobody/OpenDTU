@@ -19,7 +19,7 @@ public:
     void init();
     void loop();
 private:
-    std::map<String, String> _kv_map;
+    veStruct _kvFrame;
     uint32_t _lastPublish;
 };
 

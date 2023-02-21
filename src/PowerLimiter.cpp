@@ -190,12 +190,11 @@ bool PowerLimiterClass::canUseDirectSolarPower()
     CONFIG_T& config = Configuration.get();
 
     if (!config.PowerLimiter_SolarPassTroughEnabled
-            || !config.Vedirect_Enabled
-            || !VeDirect.veMap.count("PPV")) {
+            || !config.Vedirect_Enabled) {
         return false;
     }
 
-    if (VeDirect.veMap["PPV"].toInt() < 10) {
+    if (VeDirect.veFrame.PPV < 10.0) {
         // Not enough power
         return false;
     }
@@ -209,7 +208,7 @@ uint32_t PowerLimiterClass::getDirectSolarPower()
         return 0;
     }
 
-    return VeDirect.veMap["PPV"].toInt();
+    return (uint32_t) round(VeDirect.veFrame.PPV);
 }
 
 float PowerLimiterClass::getLoadCorrectedVoltage(std::shared_ptr<InverterAbstract> inverter)

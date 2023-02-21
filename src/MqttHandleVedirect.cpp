@@ -29,65 +29,69 @@ void MqttHandleVedirectClass::loop()
     }
 
     if (millis() - _lastPublish > (config.Mqtt_PublishInterval * 1000)) {
-        String key;
         String value;
-        String mapedValue;
-        bool bChanged = false;
-        String serial = VeDirect.veMap["SER"];
+        String topic = "victron/";
+        topic.concat(VeDirect.veFrame.SER);
+        topic.concat("/");
 
-        String topic = "";
-        for (auto it = VeDirect.veMap.begin(); it != VeDirect.veMap.end(); ++it) {
-            key = it->first;
-            value = it->second;
-            
-            if (config.Vedirect_UpdatesOnly){
-                // Mark changed values
-                auto a = _kv_map.find(key);
-                bChanged = true;
-                if (a !=  _kv_map.end()) {
-                    if (a->first.equals(value)) {
-                        bChanged = false;
-                    }   
-                }
-            }
-
-            // publish only changed key, values pairs
-            if (!config.Vedirect_UpdatesOnly || (bChanged && config.Vedirect_UpdatesOnly)) {
-                topic = "victron/" + serial + "/";
-                topic.concat(key);
-                if (key.equals("PID")) {
-                    mapedValue = VeDirect.getPidAsString(value.c_str());
-                } 
-                else if (key.equals("CS")) {
-                    mapedValue = VeDirect.getCsAsString(value.c_str());
-                } 
-                else if (key.equals("ERR")) {
-                    mapedValue = VeDirect.getErrAsString(value.c_str());
-                } 
-                else if (key.equals("OR")) {
-                    mapedValue = VeDirect.getOrAsString(value.c_str());
-                } 
-                else if (key.equals("MPPT")) {
-                    mapedValue = VeDirect.getMpptAsString(value.c_str());
-                } 
-                else if (key.equals("V") ||
-                         key.equals("I") ||
-                         key.equals("VPV")) {
-                    mapedValue = round(value.toDouble() / 10.0) / 100.0;
-                } 
-                else if (key.equals("H19") ||
-                         key.equals("H20") ||
-                         key.equals("H22")) {
-                    mapedValue = value.toDouble() / 100.0;
-                } 
-                else {
-                    mapedValue = value;
-                }
-                MqttSettings.publish(topic.c_str(), mapedValue.c_str()); 
-            }
+        if (!config.Vedirect_UpdatesOnly || VeDirect.veFrame.PID != _kvFrame.PID)
+            MqttSettings.publish(topic + "PID", VeDirect.getPidAsString(VeDirect.veFrame.PID)); 
+        if (!config.Vedirect_UpdatesOnly || strcmp(VeDirect.veFrame.SER, _kvFrame.SER) != 0)
+            MqttSettings.publish(topic + "SER", VeDirect.veFrame.SER ); 
+        if (!config.Vedirect_UpdatesOnly || strcmp(VeDirect.veFrame.FW, _kvFrame.FW) != 0)
+            MqttSettings.publish(topic + "FW", VeDirect.veFrame.FW); 
+        if (!config.Vedirect_UpdatesOnly || VeDirect.veFrame.LOAD != _kvFrame.LOAD)
+            MqttSettings.publish(topic + "LOAD", VeDirect.veFrame.LOAD == true ? "ON": "OFF"); 
+        if (!config.Vedirect_UpdatesOnly || VeDirect.veFrame.CS != _kvFrame.CS)
+            MqttSettings.publish(topic + "CS", VeDirect.getCsAsString(VeDirect.veFrame.CS)); 
+        if (!config.Vedirect_UpdatesOnly || VeDirect.veFrame.ERR != _kvFrame.ERR)
+            MqttSettings.publish(topic + "ERR", VeDirect.getErrAsString(VeDirect.veFrame.ERR)); 
+        if (!config.Vedirect_UpdatesOnly || VeDirect.veFrame.OR != _kvFrame.OR)
+            MqttSettings.publish(topic + "OR", VeDirect.getOrAsString(VeDirect.veFrame.OR)); 
+        if (!config.Vedirect_UpdatesOnly || VeDirect.veFrame.MPPT != _kvFrame.MPPT)
+            MqttSettings.publish(topic + "MPPT", VeDirect.getMpptAsString(VeDirect.veFrame.MPPT)); 
+        if (!config.Vedirect_UpdatesOnly || VeDirect.veFrame.HSDS != _kvFrame.HSDS) {
+            value = VeDirect.veFrame.HSDS;
+            MqttSettings.publish(topic + "HSDS", value); 
+        }
+        if (!config.Vedirect_UpdatesOnly || VeDirect.veFrame.V != _kvFrame.V) {
+            value = VeDirect.veFrame.V;
+            MqttSettings.publish(topic + "V", value); 
+        }
+        if (!config.Vedirect_UpdatesOnly || VeDirect.veFrame.I != _kvFrame.I) {
+            value = VeDirect.veFrame.I;
+            MqttSettings.publish(topic + "I", value); 
+        }
+        if (!config.Vedirect_UpdatesOnly || VeDirect.veFrame.VPV != _kvFrame.VPV) {
+            value = VeDirect.veFrame.VPV;
+            MqttSettings.publish(topic + "VPV", value); 
+        }
+        if (!config.Vedirect_UpdatesOnly || VeDirect.veFrame.PPV != _kvFrame.PPV) {
+            value = VeDirect.veFrame.PPV;
+            MqttSettings.publish(topic + "PPV", value); 
+        }
+        if (!config.Vedirect_UpdatesOnly || VeDirect.veFrame.H19 != _kvFrame.H19) {
+            value = VeDirect.veFrame.H19;
+            MqttSettings.publish(topic + "H19", value); 
+        }
+        if (!config.Vedirect_UpdatesOnly || VeDirect.veFrame.H20 != _kvFrame.H20) {
+            value = VeDirect.veFrame.H20;
+            MqttSettings.publish(topic + "H20", value); 
+        }
+        if (!config.Vedirect_UpdatesOnly || VeDirect.veFrame.H21 != _kvFrame.H21) {
+            value = VeDirect.veFrame.H21;
+            MqttSettings.publish(topic + "H21", value); 
+        }
+        if (!config.Vedirect_UpdatesOnly || VeDirect.veFrame.H22 != _kvFrame.H22) {
+            value = VeDirect.veFrame.H22;
+            MqttSettings.publish(topic + "H22", value); 
+        }
+        if (!config.Vedirect_UpdatesOnly || VeDirect.veFrame.H23 != _kvFrame.H23) {
+            value = VeDirect.veFrame.H23;
+            MqttSettings.publish(topic + "H23", value); 
         }
         if (config.Vedirect_UpdatesOnly){
-            _kv_map = VeDirect.veMap;
+            _kvFrame= VeDirect.veFrame;
         }
         _lastPublish = millis();
     }

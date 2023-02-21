@@ -41,6 +41,16 @@ char MODULE[] = "VE.Frame";	// Victron seems to use this to find out where loggi
 // The name of the record that contains the checksum.
 static constexpr char checksumTagName[] = "CHECKSUM";
 
+// state machine
+enum States {                               
+	IDLE,
+	RECORD_BEGIN,
+	RECORD_NAME,
+	RECORD_VALUE,
+	CHECKSUM,
+	RECORD_HEX
+};
+
 HardwareSerial VedirectSerial(1);
 
 VeDirectFrameHandler VeDirect;
@@ -49,8 +59,10 @@ VeDirectFrameHandler::VeDirectFrameHandler() :
 	//mStop(false),	// don't know what Victron uses this for, not using
 	_state(IDLE),
 	_checksum(0),
+	_textPointer(0),
 	_name(""),
 	_value(""),
+	_tmpFrame(),
 	_pollInterval(5),
 	_lastPoll(0)
 {
@@ -107,7 +119,8 @@ void VeDirectFrameHandler::rxData(uint8_t inbyte)
 		}
 		break;
 	case RECORD_BEGIN:
-		_name = (char) inbyte;
+		_textPointer = _name;
+		*_textPointer++ = inbyte;
 		_state = RECORD_NAME;
 		break;
 	case RECORD_NAME:
@@ -115,18 +128,22 @@ void VeDirectFrameHandler::rxData(uint8_t inbyte)
 		switch(inbyte) {
 		case '\t':
 			// the Checksum record indicates a EOR
-			if (_name.equals(checksumTagName)) {
-				_state = CHECKSUM;
-				break;
+			if ( _textPointer < (_name + sizeof(_name)) ) {
+				*_textPointer = 0; /* Zero terminate */
+				if (strcmp(_name, checksumTagName) == 0) {
+					_state = CHECKSUM;
+					break;
+				}
 			}
+			_textPointer = _value; /* Reset value pointer */
 			_state = RECORD_VALUE;
-			_value = "";
 			break;
 		case '#': /* Ignore # from serial number*/
 			break;
 		default:
 			// add byte to name, but do no overflow
-			_name += (char) inbyte;
+			if ( _textPointer < (_name + sizeof(_name)) )
+				*_textPointer++ = inbyte;
 			break;
 		}
 		break;
@@ -134,14 +151,18 @@ void VeDirectFrameHandler::rxData(uint8_t inbyte)
 		// The record value is being received.  The \r indicates a new record.
 		switch(inbyte) {
 		case '\n':
-			_tmpMap[_name] = _value;
+			if ( _textPointer < (_value + sizeof(_value)) ) {
+				*_textPointer = 0; // make zero ended
+				textRxEvent(_name, _value);
+			}
 			_state = RECORD_BEGIN;
 			break;
 		case '\r': /* Skip */
 			break;
 		default:
 			// add byte to value, but do no overflow
-			_value += (char) inbyte;
+			if ( _textPointer < (_value + sizeof(_value)) )
+				*_textPointer++ = inbyte;
 			break;
 		}
 		break;
@@ -165,6 +186,72 @@ void VeDirectFrameHandler::rxData(uint8_t inbyte)
 }
 
 /*
+ * textRxEvent
+ * This function is called every time a new name/value is successfully parsed.  It writes the values to the temporary buffer.
+ */
+void VeDirectFrameHandler::textRxEvent(char * name, char * value) {
+	if (strcmp(name, "PID") == 0) {
+		_tmpFrame.PID = strtol(value, nullptr, 0);
+	}
+	else if (strcmp(name, "SER") == 0) {
+		strcpy(_tmpFrame.SER, value);
+	}
+	else if (strcmp(name, "FW") == 0) {
+		strcpy(_tmpFrame.FW, value);
+	}
+	else if (strcmp(name, "LOAD") == 0) {
+		if (strcmp(value, "ON") == 0)
+			_tmpFrame.LOAD = true;
+		else	
+			_tmpFrame.LOAD = false;
+	}
+	else if (strcmp(name, "CS") == 0) {
+		_tmpFrame.CS = atoi(value);
+	}
+	else if (strcmp(name, "ERR") == 0) {
+		_tmpFrame.ERR = atoi(value);
+	}
+	else if (strcmp(name, "OR") == 0) {
+		_tmpFrame.OR = strtol(value, nullptr, 0);
+	}
+	else if (strcmp(name, "MPPT") == 0) {
+		_tmpFrame.MPPT = atoi(value);
+	}
+	else if (strcmp(name, "HSDS") == 0) {
+		_tmpFrame.HSDS = atoi(value);
+	}
+	else if (strcmp(name, "V") == 0) {
+		_tmpFrame.V = round(atof(value) / 10.0) / 100.0;
+	}
+	else if (strcmp(name, "I") == 0) {
+		_tmpFrame.I = round(atof(value) / 10.0) / 100.0;
+	}
+	else if (strcmp(name, "VPV") == 0) {
+		_tmpFrame.VPV = round(atof(value) / 10.0) / 100.0;
+	}
+	else if (strcmp(name, "PPV") == 0) {
+		_tmpFrame.PPV = atoi(value);
+	}
+	else if (strcmp(name, "H19") == 0) {
+		_tmpFrame.H19 = atof(value) / 100.0;
+	}
+	else if (strcmp(name, "H20") == 0) {
+		_tmpFrame.H20 = atof(value) / 100.0;
+	}
+	else if (strcmp(name, "H21") == 0) {
+		_tmpFrame.H21 = atoi(value);
+	}
+	else if (strcmp(name, "H22") == 0) {
+		_tmpFrame.H22 = atof(value) / 100.0;
+	}
+	else if (strcmp(name, "H23") == 0) {
+		_tmpFrame.H23 = atoi(value);
+	}
+	
+}
+
+
+/*
  *	frameEndEvent
  *  This function is called at the end of the received frame.  If the checksum is valid, the temp buffer is read line by line.
  *  If the name exists in the public buffer, the new value is copied to the public buffer.	If not, a new name/value entry
@@ -172,10 +259,10 @@ void VeDirectFrameHandler::rxData(uint8_t inbyte)
  */
 void VeDirectFrameHandler::frameEndEvent(bool valid) {
 	if ( valid ) {
-		veMap = _tmpMap;
+		veFrame = _tmpFrame;
 		setLastUpdate();
 	}
-	_tmpMap.clear();
+	_tmpFrame = {};
 }
 
 /*
@@ -199,15 +286,12 @@ bool VeDirectFrameHandler::hexRxEvent(uint8_t inbyte) {
 }
 
 bool VeDirectFrameHandler::isDataValid() {
-	if (veMap.empty()) {
-		return false;
-	}
  	if ((millis() - getLastUpdate()) / 1000 > _pollInterval * 5) { 
         return false;
 	}
-    if (veMap.find("SER") == veMap.end()) {
-        return false;
-    } 
+	if (strlen(veFrame.SER) == 0) {
+		return false;
+	}
 	return true;
 }
 
@@ -229,12 +313,11 @@ void VeDirectFrameHandler::setLastUpdate()
  * getPidAsString
  * This function returns the product id (PID) as readable text.
  */
-String VeDirectFrameHandler::getPidAsString(const char* pid)
+String VeDirectFrameHandler::getPidAsString(uint16_t pid)
 {
 	String strPID ="";
 
-	long lPID = strtol(pid, nullptr, 0);
-	switch(lPID) {
+	switch(pid) {
 		case 0x0300:
 			strPID =  "BlueSolar MPPT 70|15";
 			break;
@@ -452,12 +535,11 @@ String VeDirectFrameHandler::getPidAsString(const char* pid)
  * getCsAsString
  * This function returns the state of operations (CS) as readable text.
  */
-String VeDirectFrameHandler::getCsAsString(const char* cs)
+String VeDirectFrameHandler::getCsAsString(uint8_t cs)
 {
 	String strCS ="";
 
-	int iCS = atoi(cs);
-	switch(iCS) {
+	switch(cs) {
 		case 0:
 			strCS =  "OFF";
 			break;
@@ -495,12 +577,11 @@ String VeDirectFrameHandler::getCsAsString(const char* cs)
  * getErrAsString
  * This function returns error state (ERR) as readable text.
  */
-String VeDirectFrameHandler::getErrAsString(const char* err)
+String VeDirectFrameHandler::getErrAsString(uint8_t err)
 {
 	String strERR ="";
 
-	int iERR = atoi(err);
-	switch(iERR) {
+	switch(err) {
 		case 0:
 			strERR =  "No error";
 			break;
@@ -571,12 +652,11 @@ String VeDirectFrameHandler::getErrAsString(const char* err)
  * getOrAsString
  * This function returns the off reason (OR) as readable text.
  */
-String VeDirectFrameHandler::getOrAsString(const char* offReason)
+String VeDirectFrameHandler::getOrAsString(uint32_t offReason)
 {
 	String strOR ="";
 
-	long lOR = strtol(offReason, nullptr, 0);
-	switch(lOR) {
+	switch(offReason) {
 		case 0x00000000:
 			strOR =  "Not off";
 			break;
@@ -617,14 +697,13 @@ String VeDirectFrameHandler::getOrAsString(const char* offReason)
  * getMpptAsString
  * This function returns the state of MPPT (MPPT) as readable text.
  */
-String VeDirectFrameHandler::getMpptAsString(const char* mppt)
+String VeDirectFrameHandler::getMpptAsString(uint8_t mppt)
 {
 	String strMPPT ="";
 
-	int iMPPT = atoi(mppt);
-	switch(iMPPT) {
+	switch(mppt) {
 		case 0:
-			strMPPT =  "Off";
+			strMPPT =  "OFF";
 			break;
 		case 1:
 			strMPPT =  "Voltage or current limited";

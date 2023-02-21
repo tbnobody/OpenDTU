@@ -83,7 +83,7 @@ void MqttHandleVedirectHassClass::publishConfig()
 
 void MqttHandleVedirectHassClass::publishSensor(const char* caption, const char* subTopic, const char* deviceClass, const char* stateClass, const char* unitOfMeasurement )
 {
-    String serial = VeDirect.veMap["SER"];
+    String serial = VeDirect.veFrame.SER;
 
     String sensorId = caption;
     sensorId.replace(" ", "_");
@@ -93,7 +93,10 @@ void MqttHandleVedirectHassClass::publishSensor(const char* caption, const char*
         + "/" + sensorId
         + "/config";
     
-    String statTopic = MqttSettings.getPrefix() + "victron/" + VeDirect.veMap["SER"] + "/" + subTopic;
+    String statTopic = MqttSettings.getPrefix() + "victron/";
+    statTopic.concat(VeDirect.veFrame.SER);
+    statTopic.concat("/");
+    statTopic.concat(subTopic);
 
     DynamicJsonDocument root(1024);
     root[F("name")] = caption;
@@ -124,7 +127,7 @@ void MqttHandleVedirectHassClass::publishSensor(const char* caption, const char*
 }
 void MqttHandleVedirectHassClass::publishBinarySensor(const char* caption, const char* subTopic, const char* payload_on, const char* payload_off)
 {
-    String serial = VeDirect.veMap["SER"];
+    String serial = VeDirect.veFrame.SER;
 
     String sensorId = caption;
     sensorId.replace(" ", "_");
@@ -134,7 +137,10 @@ void MqttHandleVedirectHassClass::publishBinarySensor(const char* caption, const
         + "/" + sensorId
         + "/config";
 
-    String statTopic = MqttSettings.getPrefix() + "victron/" + VeDirect.veMap["SER"] + "/" + subTopic;
+    String statTopic = MqttSettings.getPrefix() + "victron/";
+    statTopic.concat(VeDirect.veFrame.SER);
+    statTopic.concat("/");
+    statTopic.concat(subTopic);
 
     DynamicJsonDocument root(1024);
     root[F("name")] = caption;
@@ -153,11 +159,12 @@ void MqttHandleVedirectHassClass::publishBinarySensor(const char* caption, const
 
 void MqttHandleVedirectHassClass::createDeviceInfo(JsonObject& object)
 {
-    object[F("name")] = "Victron(" + VeDirect.veMap["SER"] + ")";
-    object[F("ids")] = VeDirect.veMap["SER"];
+    String serial = VeDirect.veFrame.SER;
+    object[F("name")] = "Victron(" + serial + ")";
+    object[F("ids")] = serial;
     object[F("cu")] = String(F("http://")) + NetworkSettings.localIP().toString();
     object[F("mf")] = F("OpenDTU");
-    object[F("mdl")] = VeDirect.getPidAsString(VeDirect.veMap["PID"].c_str());
+    object[F("mdl")] = VeDirect.getPidAsString(VeDirect.veFrame.PID);
     object[F("sw")] = AUTO_GIT_HASH;
 }
 
