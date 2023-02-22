@@ -24,6 +24,7 @@ public:
     std::shared_ptr<InverterAbstract> getInverterByPos(uint8_t pos);
     std::shared_ptr<InverterAbstract> getInverterBySerial(uint64_t serial);
     std::shared_ptr<InverterAbstract> getInverterByFragment(fragment_t* fragment);
+    int8_t getInverterPosBySerial(uint64_t serial);
     void removeInverterBySerial(uint64_t serial);
     size_t getNumInverters();
 

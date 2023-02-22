@@ -102,6 +102,23 @@
                                     type="checkbox" wide/>
                                 <div class="alert alert-secondary mt-3" role="alert" v-html="$t('inverteradmin.StatusHint')"></div>
                             </CardElement>
+
+                            <CardElement :text="$t('inverteradmin.Failsafe')" addSpace>
+                                <label for="inverter-limit-failsafe" class="col-form-label">
+                                    {{ $t('inverteradmin.FailsafeLimitTimeout') }}
+                                    <BIconInfoCircle v-tooltip :title="$t('inverteradmin.FailsafeLimitTimeoutHint')" />
+                                </label>
+                                <input v-model="selectedInverterData.limit_failsafe_time_interval" type="number" id="inverter-failsafe-time"
+                                class="form-control" />
+
+                                <label for="inverter-max-current" class="col-form-label">
+                                    {{ $t('inverteradmin.FailsafeMaxCurrentPerChannel') }}
+                                    <BIconInfoCircle v-tooltip :title="$t('inverteradmin.FailsafeMaxCurrentPerChannelHint')" />
+                                </label>
+                                <input v-model="selectedInverterData.max_channel_current" type="number" id="inverter-max-channel-current"
+                                class="form-control" />
+                                <div class="alert alert-secondary mt-3" role="alert" v-html="$t('inverteradmin.FailsafeHint')"></div>
+                            </CardElement>
                         </div>
 
                         <div v-for="(max, index) in selectedInverterData.channel" :key="`${index}`">
@@ -224,6 +241,8 @@ declare interface Inverter {
     command_enable: boolean;
     command_enable_night: boolean;
     channel: Array<Channel>;
+    limit_failsafe_time_interval: number;
+    max_channel_current: number;
 }
 
 declare interface AlertResponse {

@@ -27,6 +27,8 @@ enum WebApiError {
     InverterInvalidMaxChannel,
     InverterChanged,
     InverterDeleted,
+    InverterInvalidFailsafeTime,
+    InverterInvalidMaxChannelCurrent,
 
     LimitBase = 5000,
     LimitSerialZero,

@@ -73,6 +73,10 @@ void WebApiInverterClass::onInverterList(AsyncWebServerRequest* request)
                 chanData["max_power"] = config.Inverter[i].channel[c].MaxChannelPower;
                 chanData["yield_total_offset"] = config.Inverter[i].channel[c].YieldTotalOffset;
             }
+
+            obj[F("limit_failsafe_time_interval")] = (float)config.Inverter[i].LimitFailsafeTimeInterval / 1000;
+            obj[F("max_channel_current")] = (float)config.Inverter[i].MaxChannelCurrent / 1000;
+            
         }
     }
 
@@ -159,6 +163,8 @@ void WebApiInverterClass::onInverterAdd(AsyncWebServerRequest* request)
     inverter->Serial = strtoll(root[F("serial")].as<String>().c_str(), NULL, 16);
 
     strncpy(inverter->Name, root[F("name")].as<String>().c_str(), INV_MAX_NAME_STRLEN);
+    inverter->LimitFailsafeTimeInterval = 0;
+    inverter->MaxChannelCurrent = 0;
     Configuration.write();
 
     retMsg[F("type")] = F("success");
@@ -260,6 +266,23 @@ void WebApiInverterClass::onInverterEdit(AsyncWebServerRequest* request)
         return;
     }
 
+    if (root[F("limit_failsafe_time_interval")].as<float>() < 0) {
+        retMsg[F("message")] = F("Invalid failsafe time specified!");
+        retMsg[F("code")] = WebApiError::InverterInvalidFailsafeTime;
+        response->setLength();
+        request->send(response);
+        return;
+    }
+
+    if (root[F("max_channel_current")].as<float>() < 0) {
+        retMsg[F("message")] = F("Invalid max channel current specified!");
+        retMsg[F("code")] = WebApiError::InverterInvalidMaxChannelCurrent;
+        response->setLength();
+        request->send(response);
+        return;
+    }
+    //"failsave_time":12.5,"max_channel_current":21.5}
+
     INVERTER_CONFIG_T& inverter = Configuration.get().Inverter[root[F("id")].as<uint8_t>()];
 
     uint64_t new_serial = strtoll(root[F("serial")].as<String>().c_str(), NULL, 16);
@@ -268,6 +291,9 @@ void WebApiInverterClass::onInverterEdit(AsyncWebServerRequest* request)
     // Interpret the string as a hex value and convert it to uint64_t
     inverter.Serial = new_serial;
     strncpy(inverter.Name, root[F("name")].as<String>().c_str(), INV_MAX_NAME_STRLEN);
+
+    inverter.LimitFailsafeTimeInterval = root[F("limit_failsafe_time_interval")].as<float>() * 1000;
+    inverter.MaxChannelCurrent = root[F("max_channel_current")].as<float>() * 1000;
 
     uint8_t arrayCount = 0;
     for (JsonVariant channel : channelArray) {

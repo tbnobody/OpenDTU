@@ -427,7 +427,13 @@
         "Cancel": "@:maintenancereboot.Cancel",
         "Save": "@:dtuadmin.Save",
         "DeleteMsg": "Are you sure you want to delete the inverter \"{name}\" with serial number {serial}?",
-        "Delete": "Delete"
+        "Delete": "Delete",
+        "Failsafe": "Failsafe Settings",
+        "FailsafeHint": "<b>Hint:</b> Settings in this section are primarily meant for using a battery safely. Use value: 0 to deactivate these checks.",
+        "FailsafeLimitTimeout": "Maximum interval between limit requests (seconds):",
+        "FailsafeLimitTimeoutHint": "Maximum time interval between consecutive calls to set the non-persistent limits. The inverter is disabled if no new value is received after this time.",
+        "FailsafeMaxCurrentPerChannel": "Maximum channel current (Ampere):",
+        "FailsafeMaxCurrentPerChannelHint": "The inverter is disabled if a channel current exceeds this value."
     },
     "configadmin": {
         "ConfigManagement": "Config Management",

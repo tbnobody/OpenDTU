@@ -5,6 +5,7 @@
 #include "MqttHandleInverter.h"
 #include "MessageOutput.h"
 #include "MqttSettings.h"
+#include "Failsafe.h"
 #include <ctime>
 
 #define TOPIC_SUB_LIMIT_PERSISTENT_RELATIVE "limit_persistent_relative"
@@ -195,6 +196,8 @@ void MqttHandleInverterClass::onMqttMessage(const espMqttClientTypes::MessagePro
     uint32_t payload_val = strtol(strlimit, NULL, 10);
     delete[] strlimit;
 
+    FailsafeCheck.RequestReceived(Hoymiles.getInverterPosBySerial(serial));
+
     if (!strcmp(setting, TOPIC_SUB_LIMIT_PERSISTENT_RELATIVE)) {
         // Set inverter limit relative persistent
         MessageOutput.printf("Limit Persistent: %d %%\r\n", payload_val);
@@ -213,10 +216,9 @@ void MqttHandleInverterClass::onMqttMessage(const espMqttClientTypes::MessagePro
         } else {
             MessageOutput.println("Ignored because retained");
         }
-
+        
     } else if (!strcmp(setting, TOPIC_SUB_LIMIT_NONPERSISTENT_ABSOLUTE)) {
         // Set inverter limit absolute non persistent
-        MessageOutput.printf("Limit Non-Persistent: %d W\r\n", payload_val);
         if (!properties.retain) {
             inv->sendActivePowerControlRequest(Hoymiles.getRadio(), payload_val, PowerLimitControlType::AbsolutNonPersistent);
         } else {
