@@ -427,7 +427,13 @@
         "Cancel": "@:maintenancereboot.Cancel",
         "Save": "@:dtuadmin.Save",
         "DeleteMsg": "Soll der Wechselrichter \"{name}\" mit der Seriennummer {serial} wirklich gelöscht werden?",
-        "Delete": "Löschen"
+        "Delete": "Löschen",
+        "Failsafe": "Failsafe Einstellungen",
+        "FailsafeHint": "<b>Hinweis:</b> Die Einstellungen in dieser Sektion sind vor allem für den gesteuerten sicheren Betrieb an einer Batterie gedacht. Verwenden sie den Wert 0 um die Überwachung zu deaktivieren.",
+        "FailsafeLimitTimeout": "Maximales Interval zwischen Limits (Sekunden):",
+        "FailsafeLimitTimeoutHint": "Maximalzeit zwischen zwei aufeinanderfolgenden temporäen Limits. Wenn nach dieser Zeit kein neuer Wert empfangen wurde wird der Wechselrichter abgeschaltet.",
+        "FailsafeMaxCurrentPerChannel": "Maximaler Strom in einem Eingangskanal (Ampere):",
+        "FailsafeMaxCurrentPerChannelHint": "Wird dieser Strom überschritten wird der Wechselrichter abgeschaltet."
     },
     "configadmin": {
         "ConfigManagement": "Konfigurationsverwaltung",
