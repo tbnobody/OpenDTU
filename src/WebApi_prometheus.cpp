@@ -7,6 +7,7 @@
 #include "Configuration.h"
 #include "NetworkSettings.h"
 #include <Hoymiles.h>
+#include "MessageOutput.h"
 
 void WebApiPrometheusClass::init(AsyncWebServer* server)
 {
@@ -22,72 +23,81 @@ void WebApiPrometheusClass::loop()
 }
 
 void WebApiPrometheusClass::onPrometheusMetricsGet(AsyncWebServerRequest* request)
-{
-    auto stream = request->beginResponseStream("text/plain; charset=utf-8", 40960);
+{   
+    try {
+        auto stream = request->beginResponseStream("text/plain; charset=utf-8", 40960);
+  
+        stream->print(F("# HELP opendtu_build Build info\n"));
+        stream->print(F("# TYPE opendtu_build gauge\n"));
+        stream->printf("opendtu_build{name=\"%s\",id=\"%s\",version=\"%d.%d.%d\"} 1\n",
+            NetworkSettings.getHostname().c_str(), AUTO_GIT_HASH, CONFIG_VERSION >> 24 & 0xff, CONFIG_VERSION >> 16 & 0xff, CONFIG_VERSION >> 8 & 0xff);
 
-    stream->print(F("# HELP opendtu_build Build info\n"));
-    stream->print(F("# TYPE opendtu_build gauge\n"));
-    stream->printf("opendtu_build{name=\"%s\",id=\"%s\",version=\"%d.%d.%d\"} 1\n",
-        NetworkSettings.getHostname().c_str(), AUTO_GIT_HASH, CONFIG_VERSION >> 24 & 0xff, CONFIG_VERSION >> 16 & 0xff, CONFIG_VERSION >> 8 & 0xff);
+        stream->print(F("# HELP opendtu_platform Platform info\n"));
+        stream->print(F("# TYPE opendtu_platform gauge\n"));
+        stream->printf("opendtu_platform{arch=\"%s\",mac=\"%s\"} 1\n", ESP.getChipModel(), NetworkSettings.macAddress().c_str());
 
-    stream->print(F("# HELP opendtu_platform Platform info\n"));
-    stream->print(F("# TYPE opendtu_platform gauge\n"));
-    stream->printf("opendtu_platform{arch=\"%s\",mac=\"%s\"} 1\n", ESP.getChipModel(), NetworkSettings.macAddress().c_str());
+        stream->print(F("# HELP opendtu_uptime Uptime in seconds\n"));
+        stream->print(F("# TYPE opendtu_uptime counter\n"));
+        stream->printf("opendtu_uptime %lld\n", esp_timer_get_time() / 1000000);
 
-    stream->print(F("# HELP opendtu_uptime Uptime in seconds\n"));
-    stream->print(F("# TYPE opendtu_uptime counter\n"));
-    stream->printf("opendtu_uptime %lld\n", esp_timer_get_time() / 1000000);
+        stream->print(F("# HELP opendtu_heap_size System memory size\n"));
+        stream->print(F("# TYPE opendtu_heap_size gauge\n"));
+        stream->printf("opendtu_heap_size %zu\n", ESP.getHeapSize());
 
-    stream->print(F("# HELP opendtu_heap_size System memory size\n"));
-    stream->print(F("# TYPE opendtu_heap_size gauge\n"));
-    stream->printf("opendtu_heap_size %zu\n", ESP.getHeapSize());
+        stream->print(F("# HELP opendtu_free_heap_size System free memory\n"));
+        stream->print(F("# TYPE opendtu_free_heap_size gauge\n"));
+        stream->printf("opendtu_free_heap_size %zu\n", ESP.getFreeHeap());
 
-    stream->print(F("# HELP opendtu_free_heap_size System free memory\n"));
-    stream->print(F("# TYPE opendtu_free_heap_size gauge\n"));
-    stream->printf("opendtu_free_heap_size %zu\n", ESP.getFreeHeap());
+        stream->print(F("# HELP wifi_rssi WiFi RSSI\n"));
+        stream->print(F("# TYPE wifi_rssi gauge\n"));
+        stream->printf("wifi_rssi %d\n", WiFi.RSSI());
 
-    stream->print(F("# HELP wifi_rssi WiFi RSSI\n"));
-    stream->print(F("# TYPE wifi_rssi gauge\n"));
-    stream->printf("wifi_rssi %d\n", WiFi.RSSI());
+        for (uint8_t i = 0; i < Hoymiles.getNumInverters(); i++) {
+            auto inv = Hoymiles.getInverterByPos(i);
 
-    for (uint8_t i = 0; i < Hoymiles.getNumInverters(); i++) {
-        auto inv = Hoymiles.getInverterByPos(i);
+            String serial = inv->serialString();
+            const char* name = inv->name();
+            if (i == 0) {
+                stream->print(F("# HELP opendtu_last_update last update from inverter in s\n"));
+                stream->print(F("# TYPE opendtu_last_update gauge\n"));
+            }
+            stream->printf("opendtu_last_update{serial=\"%s\",unit=\"%d\",name=\"%s\"} %d\n",
+                serial.c_str(), i, name, inv->Statistics()->getLastUpdate() / 1000);
 
-        String serial = inv->serialString();
-        const char* name = inv->name();
-        if (i == 0) {
-            stream->print(F("# HELP opendtu_last_update last update from inverter in s\n"));
-            stream->print(F("# TYPE opendtu_last_update gauge\n"));
-        }
-        stream->printf("opendtu_last_update{serial=\"%s\",unit=\"%d\",name=\"%s\"} %d\n",
-            serial.c_str(), i, name, inv->Statistics()->getLastUpdate() / 1000);
-
-        // Loop all channels
-        for (auto& t : inv->Statistics()->getChannelTypes()) {
-            for (auto& c : inv->Statistics()->getChannelsByType(t)) {
-                addField(stream, serial, i, inv, t, c, FLD_PAC);
-                addField(stream, serial, i, inv, t, c, FLD_UAC);
-                addField(stream, serial, i, inv, t, c, FLD_IAC);
-                if (t == TYPE_AC) {
-                    addField(stream, serial, i, inv, t, c, FLD_PDC, "PowerDC");
-                } else {
-                    addField(stream, serial, i, inv, t, c, FLD_PDC);
+            // Loop all channels
+            for (auto& t : inv->Statistics()->getChannelTypes()) {
+                for (auto& c : inv->Statistics()->getChannelsByType(t)) {
+                    addField(stream, serial, i, inv, t, c, FLD_PAC);
+                    addField(stream, serial, i, inv, t, c, FLD_UAC);
+                    addField(stream, serial, i, inv, t, c, FLD_IAC);
+                    if (t == TYPE_AC) {
+                        addField(stream, serial, i, inv, t, c, FLD_PDC, "PowerDC");
+                    } else {
+                        addField(stream, serial, i, inv, t, c, FLD_PDC);
+                    }
+                    addField(stream, serial, i, inv, t, c, FLD_UDC);
+                    addField(stream, serial, i, inv, t, c, FLD_IDC);
+                    addField(stream, serial, i, inv, t, c, FLD_YD);
+                    addField(stream, serial, i, inv, t, c, FLD_YT);
+                    addField(stream, serial, i, inv, t, c, FLD_F);
+                    addField(stream, serial, i, inv, t, c, FLD_T);
+                    addField(stream, serial, i, inv, t, c, FLD_PF);
+                    addField(stream, serial, i, inv, t, c, FLD_PRA);
+                    addField(stream, serial, i, inv, t, c, FLD_EFF);
+                    addField(stream, serial, i, inv, t, c, FLD_IRR);
                 }
-                addField(stream, serial, i, inv, t, c, FLD_UDC);
-                addField(stream, serial, i, inv, t, c, FLD_IDC);
-                addField(stream, serial, i, inv, t, c, FLD_YD);
-                addField(stream, serial, i, inv, t, c, FLD_YT);
-                addField(stream, serial, i, inv, t, c, FLD_F);
-                addField(stream, serial, i, inv, t, c, FLD_T);
-                addField(stream, serial, i, inv, t, c, FLD_PF);
-                addField(stream, serial, i, inv, t, c, FLD_PRA);
-                addField(stream, serial, i, inv, t, c, FLD_EFF);
-                addField(stream, serial, i, inv, t, c, FLD_IRR);
             }
         }
+        stream->addHeader(F("Cache-Control"), F("no-cache"));
+        request->send(stream);
     }
-    stream->addHeader(F("Cache-Control"), F("no-cache"));
-    request->send(stream);
+    catch (std::bad_alloc& bad_alloc) {
+        MessageOutput.printf("Call to /api/prometheus/metrics temporarely out of resources. Reason: \"%s\".", bad_alloc.what());
+        
+        auto response = request->beginResponse(429, "text/plain", "Too Many Requests");
+        response->addHeader("Retry-After", "60");
+        request->send(response);
+    }
 }
 
 void WebApiPrometheusClass::addField(AsyncResponseStream* stream, String& serial, uint8_t idx, std::shared_ptr<InverterAbstract> inv, ChannelType_t type, ChannelNum_t channel, FieldId_t fieldId, const char* channelName)
