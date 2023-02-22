@@ -55,25 +55,29 @@ void WebApiWsVedirectLiveClass::loop()
 
     // Update on ve.direct change or at least after 10 seconds
     if (millis() - _lastWsPublish > (10 * 1000) || (maxTimeStamp != _newestVedirectTimestamp)) {
+        try {
+                DynamicJsonDocument root(1024);
+                JsonVariant var = root;
+                generateJsonResponse(var);
 
-        DynamicJsonDocument root(1024);
-        JsonVariant var = root;
-        generateJsonResponse(var);
+                String buffer;
+                if (buffer) {
+                    serializeJson(root, buffer);
+                    
+                    if (Configuration.get().Security_AllowReadonly) {
+                        _ws.setAuthentication("", "");
+                    } else {
+                        _ws.setAuthentication(AUTH_USERNAME, Configuration.get().Security_Password);
+                    }
 
-        String buffer;
-        if (buffer) {
-            serializeJson(root, buffer);
-            
-            if (Configuration.get().Security_AllowReadonly) {
-                _ws.setAuthentication("", "");
-            } else {
-                _ws.setAuthentication(AUTH_USERNAME, Configuration.get().Security_Password);
-            }
+                    _ws.textAll(buffer);
+                }
 
-            _ws.textAll(buffer);
+                _lastWsPublish = millis();
         }
-
-        _lastWsPublish = millis();
+        catch (std::bad_alloc& bad_alloc) {
+            MessageOutput.printf("Call to /api/vedirectlivedata/status temporarely out of resources. Reason: \"%s\".", bad_alloc.what());
+        }
     }
 }
 
