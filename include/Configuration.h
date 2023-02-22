@@ -44,8 +44,8 @@ struct INVERTER_CONFIG_T {
     bool Poll_Enable_Night;
     bool Command_Enable;
     bool Command_Enable_Night;
-    uint32_t MaxChannelCurrent;
     uint32_t LimitFailsafeTimeInterval;
+    uint32_t MaxChannelCurrent;
     CHANNEL_CONFIG_T channel[INV_MAX_CHAN_COUNT];
 };
 
