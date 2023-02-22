@@ -5,6 +5,7 @@
 #include "WebApi_limit.h"
 #include "WebApi.h"
 #include "WebApi_errors.h"
+#include "Failsafe.h"
 #include <AsyncJson.h>
 #include <Hoymiles.h>
 
@@ -146,6 +147,7 @@ void WebApiLimitClass::onLimitPost(AsyncWebServerRequest* request)
         return;
     }
 
+    FailsafeCheck.RequestReceived(Hoymiles.getInverterPosBySerial(serial));
     inv->sendActivePowerControlRequest(Hoymiles.getRadio(), limit, type);
 
     retMsg[F("type")] = F("success");

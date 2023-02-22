@@ -5,6 +5,7 @@
 #include "WebApi_power.h"
 #include "WebApi.h"
 #include "WebApi_errors.h"
+#include "Failsafe.h"
 #include <AsyncJson.h>
 #include <Hoymiles.h>
 
@@ -118,9 +119,11 @@ void WebApiPowerClass::onPowerPost(AsyncWebServerRequest* request)
 
     if (root.containsKey("power")) {
         uint16_t power = root[F("power")].as<bool>();
+        FailsafeCheck.RequestReceived(Hoymiles.getInverterPosBySerial(serial));
         inv->sendPowerControlRequest(Hoymiles.getRadio(), power);
     } else {
         if (root[F("restart")].as<bool>()) {
+            FailsafeCheck.RequestReceived(Hoymiles.getInverterPosBySerial(serial));
             inv->sendRestartControlRequest(Hoymiles.getRadio());
         }
     }

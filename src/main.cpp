@@ -14,6 +14,7 @@
 #include "NtpSettings.h"
 #include "PinMapping.h"
 #include "SunPosition.h"
+#include "Failsafe.h"
 #include "Utils.h"
 #include "WebApi.h"
 #include "defaults.h"
@@ -127,6 +128,7 @@ void setup()
     MessageOutput.println(F("done"));
 
     InverterSettings.init();
+    FailsafeCheck.init();
 }
 
 void loop()
@@ -148,5 +150,7 @@ void loop()
     SunPosition.loop();
     yield();
     MessageOutput.loop();
+    yield();
+    FailsafeCheck.loop();
     yield();
 }
