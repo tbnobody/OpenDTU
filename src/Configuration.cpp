@@ -100,6 +100,8 @@ bool ConfigurationClass::write()
         inv["poll_enable_night"] = config.Inverter[i].Poll_Enable_Night;
         inv["command_enable"] = config.Inverter[i].Command_Enable;
         inv["command_enable_night"] = config.Inverter[i].Command_Enable_Night;
+        inv["limit_failsafe_time_interval"] = config.Inverter[i].LimitFailsafeTimeInterval;
+        inv["max_channel_current"] = config.Inverter[i].MaxChannelCurrent;
 
         JsonArray channel = inv.createNestedArray("channel");
         for (uint8_t c = 0; c < INV_MAX_CHAN_COUNT; c++) {
@@ -238,6 +240,8 @@ bool ConfigurationClass::read()
         config.Inverter[i].Poll_Enable_Night = inv["poll_enable_night"] | true;
         config.Inverter[i].Command_Enable = inv["command_enable"] | true;
         config.Inverter[i].Command_Enable_Night = inv["command_enable_night"] | true;
+        config.Inverter[i].LimitFailsafeTimeInterval = inv["limit_failsafe_time_interval"] | 0;
+        config.Inverter[i].MaxChannelCurrent = inv["max_channel_current"] | 0;
 
         JsonArray channel = inv["channel"];
         for (uint8_t c = 0; c < INV_MAX_CHAN_COUNT; c++) {
