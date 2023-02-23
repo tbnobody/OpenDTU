@@ -540,6 +540,7 @@ export default defineComponent({
                 .then((response) => handleResponse(response, this.$emitter, this.$router))
                 .then((data) => {
                     this.devInfoList = data[serial][0];
+                    this.devInfoList.serial = serial;
                     this.devInfoLoading = false;
                 });
 
