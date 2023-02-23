@@ -17,9 +17,11 @@ void WireguardSettingsClass::loop(){
 }
 
 void WireguardSettingsClass::init(){
+    MessageOutput.print(F("Initialize Wireguard... "));
     if (Configuration.get().Wg_Enabled) {
         beginWireGuard();
     }
+    MessageOutput.println(F("done"));
 }
 
 void WireguardSettingsClass::beginWireGuard(){

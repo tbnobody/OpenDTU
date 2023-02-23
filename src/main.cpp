@@ -128,18 +128,13 @@ void setup()
     MessageOutput.println(F("done"));
 
     InverterSettings.init();
-    
-    // Initialize Wireguard
-    MessageOutput.print(F("Initialize Wireguard... "));
+
     WireguardSettings.init();
-    MessageOutput.println(F("done"));
 }
 
 void loop()
 {
     NetworkSettings.loop();
-    yield();
-    WireguardSettings.loop();
     yield();
     WireguardSettings.loop();
     yield();
