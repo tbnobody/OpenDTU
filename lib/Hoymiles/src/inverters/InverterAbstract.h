@@ -11,6 +11,7 @@
 #include "types.h"
 #include <Arduino.h>
 #include <cstdint>
+#include <list>
 
 #define MAX_NAME_LENGTH 32
 
@@ -38,11 +39,16 @@ public:
     void setName(const char* name);
     const char* name();
     virtual String typeName() = 0;
-    virtual const byteAssign_t* getByteAssignment() = 0;
-    virtual uint8_t getAssignmentCount() = 0;
+    virtual const std::list<byteAssign_t>* getByteAssignment() = 0;
 
     bool isProducing();
     bool isReachable();
+
+    void setEnablePolling(bool enabled);
+    bool getEnablePolling();
+
+    void setEnableCommands(bool enabled);
+    bool getEnableCommands();
 
     void clearRxFragmentBuffer();
     void addRxFragment(uint8_t fragment[], uint8_t len);
@@ -72,6 +78,9 @@ private:
     uint8_t _rxFragmentMaxPacketId = 0;
     uint8_t _rxFragmentLastPacketId = 0;
     uint8_t _rxFragmentRetransmitCnt = 0;
+
+    bool _enablePolling = true;
+    bool _enableCommands = true;
 
     std::unique_ptr<AlarmLogParser> _alarmLogParser;
     std::unique_ptr<DevInfoParser> _devInfoParser;

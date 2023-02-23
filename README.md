@@ -63,6 +63,16 @@ Firmware version seems to play not a significant role and cannot be read from th
     * Build with [Vue.js](https://vuejs.org)
     * Source is written in TypeScript
 
+## Breaking changes
+Generated using: `git log --date=short --pretty=format:"* %h%x09%ad%x09%s" | grep BREAKING`
+```
+* 3b7aef6       2023-02-13      BREAKING CHANGE: Web API!
+* d4c838a       2023-02-06      BREAKING CHANGE: Prometheus API!
+* daf847e       2022-11-14      BREAKING CHANGE: Removed deprecated config parsing method
+* 69b675b       2022-11-01      BREAKING CHANGE: Structure WebAPI /api/livedata/status changed
+* 27ed4e3       2022-10-31      BREAKING: Change power factor from percent value to value between 0 and 1
+```
+
 ## Hardware you need
 
 ### ESP32 board
@@ -216,6 +226,7 @@ A documentation of the Web API can be found here: [Web-API Documentation](docs/W
 * <https://www.printables.com/model/293003-sol-opendtu-esp32-nrf24l01-case>
 * <https://www.thingiverse.com/thing:5661780>
 * <https://www.thingiverse.com/thing:5632374>
+* <https://www.thingiverse.com/thing:5852233>
 
 
 ## Building
