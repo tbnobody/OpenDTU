@@ -96,7 +96,7 @@ void WebApiPrometheusClass::addField(AsyncResponseStream* stream, String& serial
         const char* chanName = (channelName == NULL) ? inv->Statistics()->getChannelFieldName(type, channel, fieldId) : channelName;
         if (idx == 0 && type == TYPE_AC && channel == 0) {
             stream->printf("# HELP opendtu_%s in %s\n", chanName, inv->Statistics()->getChannelFieldUnit(type, channel, fieldId));
-            stream->printf("# TYPE opendtu_%s gauge\n", chanName);
+            stream->printf("# TYPE opendtu_%s %s\n", chanName, inv->Statistics()->getChannelFieldMetricType(type, channel, fieldId));
         }
         stream->printf("opendtu_%s{serial=\"%s\",unit=\"%d\",name=\"%s\",type=\"%s\",channel=\"%d\"} %f\n",
             chanName,

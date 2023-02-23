@@ -43,6 +43,9 @@ enum FieldId_t {
 const char* const fields[] = { "Voltage", "Current", "Power", "YieldDay", "YieldTotal",
     "Voltage", "Current", "Power", "Frequency", "Temperature", "PowerFactor", "Efficiency", "Irradiation", "ReactivePower", "EventLogCount" };
 
+const char* const field_metric_types[] = { "gauge", "gauge", "gauge", "counter", "counter",
+    "gauge", "gauge", "gauge", "gauge", "gauge", "gauge", "gauge", "gauge", "gauge", "counter" };
+
 // indices to calculation functions, defined in hmInverter.h
 enum {
     CALC_YT_CH0 = 0,
@@ -103,6 +106,7 @@ public:
     bool hasChannelFieldValue(ChannelType_t type, ChannelNum_t channel, FieldId_t fieldId);
     const char* getChannelFieldUnit(ChannelType_t type, ChannelNum_t channel, FieldId_t fieldId);
     const char* getChannelFieldName(ChannelType_t type, ChannelNum_t channel, FieldId_t fieldId);
+    const char* getChannelFieldMetricType(ChannelType_t type, ChannelNum_t channel, FieldId_t fieldId);
     uint8_t getChannelFieldDigits(ChannelType_t type, ChannelNum_t channel, FieldId_t fieldId);
 
     float getChannelFieldOffset(ChannelType_t type, ChannelNum_t channel, FieldId_t fieldId);

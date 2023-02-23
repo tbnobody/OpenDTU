@@ -130,6 +130,12 @@ const char* StatisticsParser::getChannelFieldName(ChannelType_t type, ChannelNum
     return fields[pos->fieldId];
 }
 
+const char* StatisticsParser::getChannelFieldMetricType(ChannelType_t type, ChannelNum_t channel, FieldId_t fieldId)
+{
+    const byteAssign_t* pos = getAssignmentByChannelField(type, channel, fieldId);
+    return field_metric_types[pos->fieldId];
+}
+
 uint8_t StatisticsParser::getChannelFieldDigits(ChannelType_t type, ChannelNum_t channel, FieldId_t fieldId)
 {
     const byteAssign_t* pos = getAssignmentByChannelField(type, channel, fieldId);
