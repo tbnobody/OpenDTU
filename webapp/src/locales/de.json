@@ -443,6 +443,12 @@
         "UpdatesOnly": "Nur Änderungen senden:",
         "Save": "@:dtuadmin.Save"
     },
+    "powerlimiteradmin": {
+        "InverterId": "Wechselrichter ID",
+        "InverterIdHint": "Wähle den Wechselrichter an dem die Batterie hängt.",
+        "InverterChannelId": "Kanal ID",
+        "InverterChannelIdHint": "Wähle den Kanal an dem die Batterie hängt."
+    },
     "batteryadmin": {
         "BatterySettings": "Batterie Einstellungen",
         "BatteryConfiguration": "Batterie Konfiguration",

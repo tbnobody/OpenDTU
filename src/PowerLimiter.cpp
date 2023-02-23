@@ -78,13 +78,13 @@ void PowerLimiterClass::loop()
 
     _lastLoop = millis();
 
-    std::shared_ptr<InverterAbstract> inverter = Hoymiles.getInverterByPos(1); // TODO(helgeerbe) make Inverter selectable
+    std::shared_ptr<InverterAbstract> inverter = Hoymiles.getInverterByPos(config.PowerLimiter_InverterId);
 
     if (inverter == nullptr || !inverter->isReachable()) {
         return;
     }
 
-    float dcVoltage = inverter->Statistics()->getChannelFieldValue(TYPE_DC, CH0, FLD_UDC); // TODO(helgeerbe) make channel selectable
+    float dcVoltage = inverter->Statistics()->getChannelFieldValue(TYPE_DC, (ChannelNum_t) config.PowerLimiter_InverterChannelId, FLD_UDC);
 
     if ((millis() - inverter->Statistics()->getLastUpdate()) > 10000) {
         return;

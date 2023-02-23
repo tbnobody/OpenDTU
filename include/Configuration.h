@@ -106,6 +106,8 @@ struct CONFIG_T {
     char PowerLimiter_MqttTopicPowerMeter2[MQTT_MAX_TOPIC_STRLEN + 1];
     char PowerLimiter_MqttTopicPowerMeter3[MQTT_MAX_TOPIC_STRLEN + 1];
     bool PowerLimiter_IsInverterBehindPowerMeter;
+    uint8_t PowerLimiter_InverterId;
+    uint8_t PowerLimiter_InverterChannelId;
     uint32_t PowerLimiter_LowerPowerLimit;
     uint32_t PowerLimiter_UpperPowerLimit;
     uint32_t PowerLimiter_BatterySocStartThreshold;

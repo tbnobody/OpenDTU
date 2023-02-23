@@ -5,6 +5,8 @@ export interface PowerLimiterConfig {
     mqtt_topic_powermeter_2: string;
     mqtt_topic_powermeter_3: string;
     is_inverter_behind_powermeter: boolean;
+    inverterId: number;
+    inverterChannelId: number;
     lower_power_limit: number;
     upper_power_limit: number;
     battery_soc_start_threshold: number;
