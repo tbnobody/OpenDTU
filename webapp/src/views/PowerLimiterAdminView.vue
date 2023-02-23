@@ -17,13 +17,13 @@
 
                 <div class="alert alert-secondary" v-show="powerLimiterConfigList.enabled" role="alert" v-html="$t('powerlimiteradmin.SolarpasstroughInfo')"></div>
 
-                <div class="row mb-3">
+                <div class="row mb-3" v-show="powerLimiterConfigList.enabled">
                     <label for="inputTimezone" class="col-sm-2 col-form-label">
                         {{ $t('powerlimiteradmin.InverterId') }}
                         <BIconInfoCircle v-tooltip :title="$t('powerlimiteradmin.InverterIdHint')" />
                     </label>
                     <div class="col-sm-10">
-                        <select class="form-select" v-model="powerLimiterConfigList.inverterId">
+                        <select class="form-select" v-model="powerLimiterConfigList.inverter_id">
                             <option v-for="inverter in inverterList" :key="inverter.key" :value="inverter.key">
                                 {{ inverter.value }}
                             </option>
@@ -31,13 +31,13 @@
                     </div>
                 </div>
 
-                <div class="row mb-3">
+                <div class="row mb-3" v-show="powerLimiterConfigList.enabled">
                     <label for="inputTimezone" class="col-sm-2 col-form-label">
                         {{ $t('powerlimiteradmin.InverterChannelId') }}
                         <BIconInfoCircle v-tooltip :title="$t('powerlimiteradmin.InverterChannelIdHint')" />
                     </label>
                     <div class="col-sm-10">
-                        <select class="form-select" v-model="powerLimiterConfigList.inverterChannelId">
+                        <select class="form-select" v-model="powerLimiterConfigList.inverter_channel_id">
                             <option v-for="inverterChannel in inverterChannelList" :key="inverterChannel.key" :value="inverterChannel.key">
                                 {{ inverterChannel.value }}
                             </option>

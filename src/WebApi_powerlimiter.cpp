@@ -109,6 +109,7 @@ void WebApiPowerLimiterClass::onAdminPost(AsyncWebServerRequest* request)
         return;
     }
 
+
     CONFIG_T& config = Configuration.get();
     config.PowerLimiter_Enabled = root[F("enabled")].as<bool>();
     config.PowerLimiter_SolarPassTroughEnabled = root[F("solar_passtrough_enabled")].as<bool>();
@@ -133,7 +134,7 @@ void WebApiPowerLimiterClass::onAdminPost(AsyncWebServerRequest* request)
     response->setLength();
     request->send(response);
 
-    MqttSettings.performReconnect();
-    MqttHandleHass.forceUpdate();
+    MqttSettings.performReconnect();  // TODO(helge) is this really needed
+    MqttHandleHass.forceUpdate();   // TODO(helge) is this really needed
     PowerLimiter.init();
 }
