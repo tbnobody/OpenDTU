@@ -92,7 +92,7 @@ void WebApiPrometheusClass::onPrometheusMetricsGet(AsyncWebServerRequest* reques
         request->send(stream);
     }
     catch (std::bad_alloc& bad_alloc) {
-        MessageOutput.printf("Call to /api/prometheus/metrics temporarely out of resources. Reason: \"%s\".", bad_alloc.what());
+        MessageOutput.printf("Call to /api/prometheus/metrics temporarely out of resources. Reason: \"%s\".\r\n", bad_alloc.what());
         
         auto response = request->beginResponse(429, "text/plain", "Too Many Requests");
         response->addHeader("Retry-After", "60");

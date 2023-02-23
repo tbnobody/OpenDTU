@@ -80,7 +80,7 @@ void WebApiWsLiveClass::loop()
             _lastWsPublish = millis();
         }
         catch (std::bad_alloc& bad_alloc) {
-            MessageOutput.printf("Call to /api/livedata/status temporarely out of resources. Reason: \"%s\".", bad_alloc.what());
+            MessageOutput.printf("Call to /api/livedata/status temporarely out of resources. Reason: \"%s\".\r\n", bad_alloc.what());
         }
     }
 }
