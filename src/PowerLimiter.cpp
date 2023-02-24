@@ -101,7 +101,7 @@ void PowerLimiterClass::loop()
     }
 
     if (inverter->isProducing()) {
-        float acPower = inverter->Statistics()->getChannelFieldValue(TYPE_AC, CH0, FLD_PAC); // TODO(helgeerbe) check settings
+        float acPower = inverter->Statistics()->getChannelFieldValue(TYPE_AC, (ChannelNum_t) config.PowerLimiter_InverterChannelId, FLD_PAC); 
         float correctedDcVoltage = dcVoltage + (acPower * config.PowerLimiter_VoltageLoadCorrectionFactor);
 
         if ((_consumeSolarPowerOnly && isStartThresholdReached(inverter))
@@ -215,8 +215,8 @@ float PowerLimiterClass::getLoadCorrectedVoltage(std::shared_ptr<InverterAbstrac
 {
     CONFIG_T& config = Configuration.get();
 
-    float acPower = inverter->Statistics()->getChannelFieldValue(TYPE_AC, CH0, FLD_PAC); // TODO(helgeerbe) check settings
-    float dcVoltage = inverter->Statistics()->getChannelFieldValue(TYPE_DC, CH0, FLD_UDC); // TODO(helgeerbe) check settings
+    float acPower = inverter->Statistics()->getChannelFieldValue(TYPE_AC, (ChannelNum_t) config.PowerLimiter_InverterChannelId, FLD_PAC); 
+    float dcVoltage = inverter->Statistics()->getChannelFieldValue(TYPE_DC, (ChannelNum_t) config.PowerLimiter_InverterChannelId, FLD_UDC); 
 
     if (dcVoltage <= 0.0) {
         return 0.0;
