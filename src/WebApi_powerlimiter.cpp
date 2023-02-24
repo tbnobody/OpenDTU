@@ -42,6 +42,8 @@ void WebApiPowerLimiterClass::onStatus(AsyncWebServerRequest* request)
     root[F("is_inverter_behind_powermeter")] = config.PowerLimiter_IsInverterBehindPowerMeter;
     root[F("inverter_id")] = config.PowerLimiter_InverterId;
     root[F("inverter_channel_id")] = config.PowerLimiter_InverterChannelId;
+    root[F("target_power_consumption")] = config.PowerLimiter_TargetPowerConsumption;
+    root[F("target_power_consumption_hysteresis")] = config.PowerLimiter_TargetPowerConsumptionHysteresis;
     root[F("lower_power_limit")] = config.PowerLimiter_LowerPowerLimit;
     root[F("upper_power_limit")] = config.PowerLimiter_UpperPowerLimit;
     root[F("battery_soc_start_threshold")] = config.PowerLimiter_BatterySocStartThreshold;
@@ -102,7 +104,10 @@ void WebApiPowerLimiterClass::onAdminPost(AsyncWebServerRequest* request)
     if (!(root.containsKey("enabled") 
         	&& root.containsKey("lower_power_limit")
             && root.containsKey("inverter_id")
-            && root.containsKey("inverter_channel_id"))) {
+            && root.containsKey("inverter_channel_id")
+            && root.containsKey("target_power_consumption")
+            && root.containsKey("target_power_consumption_hysteresis")
+        )) {
         retMsg[F("message")] = F("Values are missing!");
         response->setLength();
         request->send(response);
@@ -119,6 +124,8 @@ void WebApiPowerLimiterClass::onAdminPost(AsyncWebServerRequest* request)
     config.PowerLimiter_IsInverterBehindPowerMeter = root[F("is_inverter_behind_powermeter")].as<bool>();
     config.PowerLimiter_InverterId = root[F("inverter_id")].as<uint8_t>();
     config.PowerLimiter_InverterChannelId = root[F("inverter_channel_id")].as<uint8_t>();
+    config.PowerLimiter_TargetPowerConsumption = root[F("target_power_consumption")].as<uint32_t>();
+    config.PowerLimiter_TargetPowerConsumptionHysteresis = root[F("target_power_consumption_hysteresis")].as<uint32_t>();
     config.PowerLimiter_LowerPowerLimit = root[F("lower_power_limit")].as<uint32_t>();
     config.PowerLimiter_UpperPowerLimit = root[F("upper_power_limit")].as<uint32_t>();
     config.PowerLimiter_BatterySocStartThreshold = root[F("battery_soc_start_threshold")].as<float>();
@@ -135,6 +142,5 @@ void WebApiPowerLimiterClass::onAdminPost(AsyncWebServerRequest* request)
     request->send(response);
 
     MqttSettings.performReconnect();  // TODO(helge) is this really needed
-    MqttHandleHass.forceUpdate();   // TODO(helge) is this really needed
     PowerLimiter.init();
 }

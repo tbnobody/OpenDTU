@@ -7,6 +7,8 @@ export interface PowerLimiterConfig {
     is_inverter_behind_powermeter: boolean;
     inverter_id: number;
     inverter_channel_id: number;
+    target_power_consumption: number;
+    target_power_consumption_hysteresis: number;
     lower_power_limit: number;
     upper_power_limit: number;
     battery_soc_start_threshold: number;

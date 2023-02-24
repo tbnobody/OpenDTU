@@ -447,7 +447,12 @@
         "InverterId": "Wechselrichter ID",
         "InverterIdHint": "Wähle den Wechselrichter an dem die Batterie hängt.",
         "InverterChannelId": "Kanal ID",
-        "InverterChannelIdHint": "Wähle den Kanal an dem die Batterie hängt."
+        "InverterChannelIdHint": "Wähle den Kanal an dem die Batterie hängt.",
+        "TargetPowerConsumption": "Erlaubter Stromverbrauch",
+        "TargetPowerConsumptionHint": "Angestrebter erlaubter Stromverbrauch.",
+        "TargetPowerConsumptionHysteresis": "Hysterese für den Zielstromverbrauch",
+        "TargetPowerConsumptionHysteresisHint": "Wert um den der Zielstromverbrauch schwanken darf, ohne dass nachgeregelt wird."
+        
     },
     "batteryadmin": {
         "BatterySettings": "Batterie Einstellungen",

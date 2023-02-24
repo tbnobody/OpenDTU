@@ -125,6 +125,8 @@ bool ConfigurationClass::write()
     powerlimiter["is_inverter_behind_powermeter"] = config.PowerLimiter_IsInverterBehindPowerMeter;
     powerlimiter["inverter_id"] = config.PowerLimiter_InverterId;
     powerlimiter["inverter_channel_id"] = config.PowerLimiter_InverterChannelId;
+    powerlimiter["target_power_consumption"] = config.PowerLimiter_TargetPowerConsumption;
+    powerlimiter["target_power_consumption_hysteresis"] = config.PowerLimiter_TargetPowerConsumptionHysteresis;
     powerlimiter["lower_power_limit"] = config.PowerLimiter_LowerPowerLimit;
     powerlimiter["upper_power_limit"] = config.PowerLimiter_UpperPowerLimit;
     powerlimiter["battery_soc_start_threshold"] = config.PowerLimiter_BatterySocStartThreshold;
@@ -288,6 +290,8 @@ bool ConfigurationClass::read()
     config.PowerLimiter_IsInverterBehindPowerMeter = powerlimiter["is_inverter_behind_powermeter"] | POWERLIMITER_IS_INVERTER_BEHIND_POWER_METER;
     config.PowerLimiter_InverterId = powerlimiter["inverter_id"] | POWERLIMITER_INVERTER_ID;
     config.PowerLimiter_InverterChannelId = powerlimiter["inverter_channel_id"] | POWERLIMITER_INVERTER_CHANNEL_ID;
+    config.PowerLimiter_InverterChannelId = powerlimiter["target_power_consumption"] | POWERLIMITER_TARGET_POWER_CONSUMPTION;
+    config.PowerLimiter_InverterChannelId = powerlimiter["target_power_consumption_hysteresis"] | POWERLIMITER_TARGET_POWER_CONSUMPTION_HYSTERESIS;
     config.PowerLimiter_LowerPowerLimit = powerlimiter["lower_power_limit"] | POWERLIMITER_LOWER_POWER_LIMIT;
     config.PowerLimiter_UpperPowerLimit = powerlimiter["upper_power_limit"] | POWERLIMITER_UPPER_POWER_LIMIT;
     config.PowerLimiter_BatterySocStartThreshold = powerlimiter["battery_soc_start_threshold"] | POWERLIMITER_BATTERY_SOC_START_THRESHOLD;

@@ -19,7 +19,7 @@
 
                 <div class="row mb-3" v-show="powerLimiterConfigList.enabled">
                     <label for="inputTimezone" class="col-sm-2 col-form-label">
-                        {{ $t('powerlimiteradmin.InverterId') }}
+                        {{ $t('powerlimiteradmin.InverterId') }}:
                         <BIconInfoCircle v-tooltip :title="$t('powerlimiteradmin.InverterIdHint')" />
                     </label>
                     <div class="col-sm-10">
@@ -33,7 +33,7 @@
 
                 <div class="row mb-3" v-show="powerLimiterConfigList.enabled">
                     <label for="inputTimezone" class="col-sm-2 col-form-label">
-                        {{ $t('powerlimiteradmin.InverterChannelId') }}
+                        {{ $t('powerlimiteradmin.InverterChannelId') }}:
                         <BIconInfoCircle v-tooltip :title="$t('powerlimiteradmin.InverterChannelIdHint')" />
                     </label>
                     <div class="col-sm-10">
@@ -42,6 +42,34 @@
                                 {{ inverterChannel.value }}
                             </option>
                         </select>
+                    </div>
+                </div>
+
+                <div class="row mb-3" v-show="powerLimiterConfigList.enabled">
+                    <label for="targetPowerConsumption" class="col-sm-2 col-form-label">{{ $t('powerlimiteradmin.TargetPowerConsumption') }}:
+                        <BIconInfoCircle v-tooltip :title="$t('powerlimiteradmin.TargetPowerConsumptionHint')" />
+                    </label>
+                    <div class="col-sm-10">
+                        <div class="input-group">
+                            <input type="number" class="form-control" id="targetPowerConsumption"
+                                placeholder="70" min="10" v-model="powerLimiterConfigList.target_power_consumption"
+                                aria-describedby="targetPowerConsumptionDescription" />
+                                <span class="input-group-text" id="targetPowerConsumptionDescription">W</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row mb-3" v-show="powerLimiterConfigList.enabled">
+                    <label for="targetPowerConsumptionHyteresis" class="col-sm-2 col-form-label">{{ $t('powerlimiteradmin.TargetPowerConsumptionHysteresis') }}:
+                        <BIconInfoCircle v-tooltip :title="$t('powerlimiteradmin.TargetPowerConsumptionHysteresisHint')" />
+                    </label>
+                    <div class="col-sm-10">
+                        <div class="input-group">
+                            <input type="number" class="form-control" id="targetPowerConsumptionHysteresis"
+                                placeholder="25" min="10" v-model="powerLimiterConfigList.target_power_consumption_hysteresis"
+                                aria-describedby="targetPowerConsumptionHysteresisDescription" />
+                                <span class="input-group-text" id="targetPowerConsumptionHysteresisDescription">W</span>
+                        </div>
                     </div>
                 </div>
                 
