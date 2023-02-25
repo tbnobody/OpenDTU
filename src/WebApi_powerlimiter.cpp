@@ -12,6 +12,7 @@
 #include "PowerLimiter.h"
 #include "WebApi.h"
 #include "helper.h"
+#include "WebApi_errors.h"
 
 void WebApiPowerLimiterClass::init(AsyncWebServer* server)
 {
@@ -109,6 +110,7 @@ void WebApiPowerLimiterClass::onAdminPost(AsyncWebServerRequest* request)
             && root.containsKey("target_power_consumption_hysteresis")
         )) {
         retMsg[F("message")] = F("Values are missing!");
+        retMsg[F("code")] = WebApiError::GenericValueMissing;
         response->setLength();
         request->send(response);
         return;

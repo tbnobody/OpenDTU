@@ -52,7 +52,7 @@
                     <div class="col-sm-10">
                         <div class="input-group">
                             <input type="number" class="form-control" id="targetPowerConsumption"
-                                placeholder="70" min="10" v-model="powerLimiterConfigList.target_power_consumption"
+                                placeholder="75" min="0" v-model="powerLimiterConfigList.target_power_consumption"
                                 aria-describedby="targetPowerConsumptionDescription" required/>
                                 <span class="input-group-text" id="targetPowerConsumptionDescription">W</span>
                         </div>
@@ -66,7 +66,7 @@
                     <div class="col-sm-10">
                         <div class="input-group">
                             <input type="number" class="form-control" id="targetPowerConsumptionHysteresis"
-                                placeholder="25" min="10" v-model="powerLimiterConfigList.target_power_consumption_hysteresis"
+                                placeholder="30" min="0" v-model="powerLimiterConfigList.target_power_consumption_hysteresis"
                                 aria-describedby="targetPowerConsumptionHysteresisDescription" />
                                 <span class="input-group-text" id="targetPowerConsumptionHysteresisDescription">W</span>
                         </div>
