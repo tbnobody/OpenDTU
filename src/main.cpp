@@ -138,6 +138,7 @@ void setup()
     // Initialize ve.direct communication
     MessageOutput.println(F("Initialize ve.direct interface... "));
     if (PinMapping.isValidVictronConfig()) {
+        MessageOutput.printf("ve.direct rx = %d, tx = %d\r\n", pin.victron_rx, pin.victron_tx);
         VeDirect.init(pin.victron_rx, pin.victron_tx);
         VeDirect.setPollInterval(config.Vedirect_PollInterval);
         MessageOutput.println(F("done"));
