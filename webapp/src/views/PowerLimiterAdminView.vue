@@ -53,7 +53,7 @@
                         <div class="input-group">
                             <input type="number" class="form-control" id="targetPowerConsumption"
                                 placeholder="70" min="10" v-model="powerLimiterConfigList.target_power_consumption"
-                                aria-describedby="targetPowerConsumptionDescription" />
+                                aria-describedby="targetPowerConsumptionDescription" required/>
                                 <span class="input-group-text" id="targetPowerConsumptionDescription">W</span>
                         </div>
                     </div>
@@ -61,7 +61,7 @@
 
                 <div class="row mb-3" v-show="powerLimiterConfigList.enabled">
                     <label for="targetPowerConsumptionHyteresis" class="col-sm-2 col-form-label">{{ $t('powerlimiteradmin.TargetPowerConsumptionHysteresis') }}:
-                        <BIconInfoCircle v-tooltip :title="$t('powerlimiteradmin.TargetPowerConsumptionHysteresisHint')" />
+                        <BIconInfoCircle v-tooltip :title="$t('powerlimiteradmin.TargetPowerConsumptionHysteresisHint')" required/>
                     </label>
                     <div class="col-sm-10">
                         <div class="input-group">
@@ -79,7 +79,7 @@
                         <div class="input-group">
                             <input type="number" class="form-control" id="inputLowerPowerLimit"
                                 placeholder="50" min="10" v-model="powerLimiterConfigList.lower_power_limit"
-                                aria-describedby="lowerPowerLimitDescription" />
+                                aria-describedby="lowerPowerLimitDescription" required/>
                                 <span class="input-group-text" id="lowerPowerLimitDescription">W</span>
                         </div>
                     </div>
@@ -91,7 +91,7 @@
                         <div class="input-group">
                             <input type="number" class="form-control" id="inputUpperPowerLimit"
                                 placeholder="800" v-model="powerLimiterConfigList.upper_power_limit"
-                                aria-describedby="upperPowerLimitDescription" />
+                                aria-describedby="upperPowerLimitDescription" required/>
                             <span class="input-group-text" id="upperPowerLimitDescription">W</span>
                         </div>
                     </div>
@@ -116,7 +116,7 @@
                     <div class="col-sm-10">
                         <div class="input-group">
                             <input type="text" class="form-control" id="inputMqttTopicPowerMeter2"
-                                placeholder="shellies/shellyem3/emeter/1/power" v-model="powerLimiterConfigList.mqtt_topic_powermeter_2" />
+                                placeholder="shellies/shellyem3/emeter/1/power" v-model="powerLimiterConfigList.mqtt_topic_powermeter_2" required/>
                         </div>
                     </div>
                 </div>
@@ -126,7 +126,7 @@
                     <div class="col-sm-10">
                         <div class="input-group">
                             <input type="text" class="form-control" id="inputMqttTopicPowerMeter3"
-                                placeholder="shellies/shellyem3/emeter/2/power" v-model="powerLimiterConfigList.mqtt_topic_powermeter_3" />
+                                placeholder="shellies/shellyem3/emeter/2/power" v-model="powerLimiterConfigList.mqtt_topic_powermeter_3" required/>
                         </div>
                     </div>
                 </div>
@@ -136,7 +136,7 @@
                     <div class="col-sm-10">
                         <div class="form-check form-switch">
                             <input class="form-check-input" type="checkbox" id="inputIsInverterBehindPowerMeter"
-                                v-model="powerLimiterConfigList.is_inverter_behind_powermeter" />
+                                v-model="powerLimiterConfigList.is_inverter_behind_powermeter" required/>
                         </div>
                     </div>
                 </div>
@@ -151,7 +151,7 @@
                         <div class="input-group">
                             <input type="number" class="form-control" id="batterySocStartThreshold"
                                 placeholder="80" v-model="powerLimiterConfigList.battery_soc_start_threshold"
-                                aria-describedby="batterySocStartThresholdDescription" min="0" max="100" />
+                                aria-describedby="batterySocStartThresholdDescription" min="0" max="100" required/>
                                 <span class="input-group-text" id="batterySocStartThresholdDescription">%</span>
                         </div>
                     </div>
@@ -163,7 +163,7 @@
                         <div class="input-group">
                             <input type="number" class="form-control" id="batterySocStopThreshold"
                                 placeholder="20" v-model="powerLimiterConfigList.battery_soc_stop_threshold"
-                                aria-describedby="batterySocStopThresholdDescription" min="0" max="100" />
+                                aria-describedby="batterySocStopThresholdDescription" min="0" max="100" required/>
                                 <span class="input-group-text" id="batterySocStopThresholdDescription">%</span>
                         </div>
                     </div>
@@ -177,7 +177,7 @@
                         <div class="input-group">
                             <input type="number" step="0.01" class="form-control" id="inputVoltageStartThreshold"
                                 placeholder="50" v-model="powerLimiterConfigList.voltage_start_threshold"
-                                aria-describedby="voltageStartThresholdDescription" />
+                                aria-describedby="voltageStartThresholdDescription" required/>
                                 <span class="input-group-text" id="voltageStartThresholdDescription">V</span>
                         </div>
                     </div>
@@ -189,7 +189,7 @@
                         <div class="input-group">
                             <input type="number" step="0.01" class="form-control" id="inputVoltageStopThreshold"
                                 placeholder="49" v-model="powerLimiterConfigList.voltage_stop_threshold"
-                                aria-describedby="voltageStopThresholdDescription" />
+                                aria-describedby="voltageStopThresholdDescription" required/>
                             <span class="input-group-text" id="voltageStopThresholdDescription">V</span>
                         </div>
                     </div>
@@ -201,7 +201,7 @@
                         <div class="input-group">
                             <input type="number" step="0.0001" class="form-control" id="inputVoltageLoadCorrectionFactor"
                                 placeholder="49" v-model="powerLimiterConfigList.voltage_load_correction_factor"
-                                aria-describedby="voltageLoadCorrectionFactorDescription" />
+                                aria-describedby="voltageLoadCorrectionFactorDescription" required/>
                             <span class="input-group-text" id="voltageLoadCorrectionFactorDescription">V</span>
                         </div>
                     </div>
