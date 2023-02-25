@@ -13,16 +13,20 @@
                             <td>{{ wireguardDataList.wg_endpoint_port }}</td>
                         </tr>
                         <tr v-if="wireguardDataList.wg_enabled">
-                            <th>{{ $t('wireguardinfo.EndpointLocalIP') }}</th>
-                            <td>{{ wireguardDataList.wg_endpoint_local_ip }}</td>
-                        </tr>
-                        <tr v-if="wireguardDataList.wg_enabled">
                             <th>{{ $t('wireguardinfo.EndpointPublicKey') }}</th>
                             <td>{{ wireguardDataList.wg_endpoint_public_key }}</td>
                         </tr>
                         <tr v-if="wireguardDataList.wg_enabled">
                             <th>{{ $t('wireguardinfo.OpenDTULocalIP') }}</th>
                             <td>{{ wireguardDataList.wg_opendtu_local_ip }}</td>
+                        </tr>
+                        <tr v-if="wireguardDataList.wg_enabled">
+                            <th>{{ $t('wireguardinfo.OpenDTUAllowedIP') }}</th>
+                            <td>{{ wireguardDataList.wg_opendtu_allowed_ip }}</td>
+                        </tr>
+                        <tr v-if="wireguardDataList.wg_enabled">
+                            <th>{{ $t('wireguardinfo.OpenDTUAllowedMask') }}</th>
+                            <td>{{ wireguardDataList.wg_opendtu_allowed_mask }}</td>
                         </tr>
                         <tr v-if="wireguardDataList.wg_enabled">
                             <th>{{ $t('wireguardinfo.OpenDTUPublicKey') }}</th>

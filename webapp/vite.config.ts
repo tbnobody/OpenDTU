@@ -51,15 +51,15 @@ export default defineConfig({
   server: {
     proxy: {
       '^/api': {
-        target: 'http://192.168.178.64/'
+        target: 'http://192.168.1.102/'
       },
       '^/livedata': {
-        target: 'ws://192.168.178.64/',
+        target: 'ws://192.168.1.102/',
         ws: true,
         changeOrigin: true
       },
       '^/console': {
-        target: 'ws://192.168.178.64/',
+        target: 'ws://192.168.1.102/',
         ws: true,
         changeOrigin: true
       }

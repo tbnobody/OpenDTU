@@ -37,11 +37,12 @@ void WebApiWireguardClass::onWireguardStatus(AsyncWebServerRequest* request)
     root[F("wg_enabled")] = config.Wg_Enabled;
 
     root[F("wg_endpoint_address")] = config.Wg_Endpoint_Address;
-    root[F("wg_endpoint_local_ip")] = IPAddress(config.Wg_Endpoint_Local_Ip).toString();
     root[F("wg_endpoint_port")] = config.Wg_Endpoint_Port;
     root[F("wg_endpoint_public_key")] = config.Wg_Endpoint_Public_Key;
 
     root[F("wg_opendtu_local_ip")] = IPAddress(config.Wg_Opendtu_Local_Ip).toString();
+    root[F("wg_opendtu_allowed_ip")] = IPAddress(config.Wg_Opendtu_Allowed_Ip).toString();
+    root[F("wg_opendtu_allowed_mask")] = IPAddress(config.Wg_Opendtu_Allowed_Mask).toString();
     root[F("wg_opendtu_public_key")] = config.Wg_Opendtu_Public_Key;
 
     response->setLength();
@@ -61,13 +62,14 @@ void WebApiWireguardClass::onWireguardAdminGet(AsyncWebServerRequest* request)
     root[F("wg_enabled")] = config.Wg_Enabled;
 
     root[F("wg_endpoint_address")] = config.Wg_Endpoint_Address;
-    root[F("wg_endpoint_local_ip")] = IPAddress(config.Wg_Endpoint_Local_Ip).toString();
     root[F("wg_endpoint_port")] = config.Wg_Endpoint_Port;
     root[F("wg_endpoint_public_key")] = config.Wg_Endpoint_Public_Key;
 
     root[F("wg_opendtu_local_ip")] = IPAddress(config.Wg_Opendtu_Local_Ip).toString();
     root[F("wg_opendtu_public_key")] = config.Wg_Opendtu_Public_Key;
     root[F("wg_opendtu_private_key")] = config.Wg_Opendtu_Private_Key;
+    root[F("wg_opendtu_allowed_ip")] = IPAddress(config.Wg_Opendtu_Allowed_Ip).toString();
+    root[F("wg_opendtu_allowed_mask")] = IPAddress(config.Wg_Opendtu_Allowed_Mask).toString();
 
     response->setLength();
     request->send(response);
@@ -113,9 +115,10 @@ void WebApiWireguardClass::onWireguardAdminPost(AsyncWebServerRequest* request)
     }
 
     if (!(root.containsKey("wg_enabled") && root.containsKey("wg_endpoint_address") 
-        && root.containsKey("wg_endpoint_local_ip") && root.containsKey("wg_endpoint_port") 
-        && root.containsKey("wg_endpoint_public_key") && root.containsKey("wg_opendtu_local_ip") 
-        && root.containsKey("wg_opendtu_public_key") && root.containsKey("wg_opendtu_private_key"))) {
+        && root.containsKey("wg_endpoint_port") && root.containsKey("wg_endpoint_public_key") 
+        && root.containsKey("wg_opendtu_local_ip") && root.containsKey("wg_opendtu_allowed_ip") 
+        && root.containsKey("wg_opendtu_allowed_mask") && root.containsKey("wg_opendtu_public_key") 
+        && root.containsKey("wg_opendtu_private_key"))) {
 
         retMsg[F("message")] = F("Values are missing!");
         retMsg[F("code")] = WebApiError::GenericValueMissing;
@@ -125,12 +128,19 @@ void WebApiWireguardClass::onWireguardAdminPost(AsyncWebServerRequest* request)
     }
     CONFIG_T& config = Configuration.get();
     config.Wg_Refresh = true;
-    IPAddress Wg_Endpoint_Local_Ip;
-    if (Wg_Endpoint_Local_Ip.fromString(root[F("wg_endpoint_local_ip")].as<String>())) {
-        config.Wg_Endpoint_Local_Ip[0] = Wg_Endpoint_Local_Ip[0];
-        config.Wg_Endpoint_Local_Ip[1] = Wg_Endpoint_Local_Ip[1];
-        config.Wg_Endpoint_Local_Ip[2] = Wg_Endpoint_Local_Ip[2];
-        config.Wg_Endpoint_Local_Ip[3] = Wg_Endpoint_Local_Ip[3];
+    IPAddress Wg_Opendtu_Allowed_Ip;
+    if (Wg_Opendtu_Allowed_Ip.fromString(root[F("wg_opendtu_allowed_ip")].as<String>())) {
+        config.Wg_Opendtu_Allowed_Ip[0] = Wg_Opendtu_Allowed_Ip[0];
+        config.Wg_Opendtu_Allowed_Ip[1] = Wg_Opendtu_Allowed_Ip[1];
+        config.Wg_Opendtu_Allowed_Ip[2] = Wg_Opendtu_Allowed_Ip[2];
+        config.Wg_Opendtu_Allowed_Ip[3] = Wg_Opendtu_Allowed_Ip[3];
+    }
+    IPAddress Wg_Opendtu_Allowed_Mask;
+    if (Wg_Opendtu_Allowed_Mask.fromString(root[F("wg_opendtu_allowed_mask")].as<String>())) {
+        config.Wg_Opendtu_Allowed_Mask[0] = Wg_Opendtu_Allowed_Mask[0];
+        config.Wg_Opendtu_Allowed_Mask[1] = Wg_Opendtu_Allowed_Mask[1];
+        config.Wg_Opendtu_Allowed_Mask[2] = Wg_Opendtu_Allowed_Mask[2];
+        config.Wg_Opendtu_Allowed_Mask[3] = Wg_Opendtu_Allowed_Mask[3];
     }
     IPAddress Wg_Opendtu_Local_Ip;
     if (Wg_Opendtu_Local_Ip.fromString(root[F("wg_opendtu_local_ip")].as<String>())) {

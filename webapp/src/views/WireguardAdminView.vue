@@ -16,10 +16,6 @@
                               v-model="wireguardConfigList.wg_endpoint_address"
                               type="text" maxlength="128"
                               :placeholder="$t('wireguardadmin.EndpointAddressHint')"/>
-                <InputElement :label="$t('wireguardadmin.EndpointLocalIP')"
-                              v-model="wireguardConfigList.wg_endpoint_local_ip"
-                              type="text" maxlength="128"
-                              :placeholder="$t('wireguardadmin.EndpointLocalIPHint')"/>
                 <InputElement :label="$t('wireguardadmin.EndpointPort')"
                               v-model="wireguardConfigList.wg_endpoint_port"
                               type="text" maxlength="128"
@@ -32,6 +28,14 @@
                               v-model="wireguardConfigList.wg_opendtu_local_ip"
                               type="text" maxlength="128"
                               :placeholder="$t('wireguardadmin.OpenDTULocalIPHint')"/>
+                <InputElement :label="$t('wireguardadmin.OpenDTUAllowedIP')"
+                              v-model="wireguardConfigList.wg_opendtu_allowed_ip"
+                              type="text" maxlength="128"
+                              :placeholder="$t('wireguardadmin.OpenDTUAllowedIPHint')"/>
+                <InputElement :label="$t('wireguardadmin.OpenDTUAllowedMask')"
+                              v-model="wireguardConfigList.wg_opendtu_allowed_mask"
+                              type="text" maxlength="128"
+                              :placeholder="$t('wireguardadmin.OpenDTUAllowedMaskHint')"/>
                 <InputElement :label="$t('wireguardadmin.OpenDTUPublicKey')"
                               v-model="wireguardConfigList.wg_opendtu_public_key"
                               type="text" maxlength="128"

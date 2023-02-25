@@ -43,10 +43,11 @@ bool ConfigurationClass::write()
     JsonObject wg = doc.createNestedObject("wg");
     wg["enabled"] = config.Wg_Enabled;
     wg["endpoint_address"] = config.Wg_Endpoint_Address;
-    wg["endpoint_local_ip"] = IPAddress(config.Wg_Endpoint_Local_Ip).toString();
     wg["endpoint_port"] = config.Wg_Endpoint_Port;
     wg["endpoint_public_key"] = config.Wg_Endpoint_Public_Key;
     wg["opendtu_local_ip"] = IPAddress(config.Wg_Opendtu_Local_Ip).toString();
+    wg["opendtu_allowed_ip"] = IPAddress(config.Wg_Opendtu_Allowed_Ip).toString();
+    wg["opendtu_allowed_mask"] = IPAddress(config.Wg_Opendtu_Allowed_Mask).toString();
     wg["opendtu_public_key"] = config.Wg_Opendtu_Public_Key;
     wg["opendtu_private_key"] = config.Wg_Opendtu_Private_Key;
 
@@ -201,12 +202,18 @@ bool ConfigurationClass::read()
     config.Wg_Opendtu_Local_Ip[1] = Wg_Opendtu_Local_Ip[1];
     config.Wg_Opendtu_Local_Ip[2] = Wg_Opendtu_Local_Ip[2];
     config.Wg_Opendtu_Local_Ip[3] = Wg_Opendtu_Local_Ip[3];
-    IPAddress Wg_Endpoint_Local_Ip;
-    Wg_Endpoint_Local_Ip.fromString(wg["endpoint_local_ip"] | WG_ENDPOINT_LOCAL_IP);
-    config.Wg_Endpoint_Local_Ip[0] = Wg_Endpoint_Local_Ip[0];
-    config.Wg_Endpoint_Local_Ip[1] = Wg_Endpoint_Local_Ip[1];
-    config.Wg_Endpoint_Local_Ip[2] = Wg_Endpoint_Local_Ip[2];
-    config.Wg_Endpoint_Local_Ip[3] = Wg_Endpoint_Local_Ip[3];
+    IPAddress Wg_Opendtu_Allowed_Ip;
+    Wg_Opendtu_Allowed_Ip.fromString(wg["opendtu_allowed_ip"] | WG_OPENDTU_ALLOWED_IP);
+    config.Wg_Opendtu_Allowed_Ip[0] = Wg_Opendtu_Allowed_Ip[0];
+    config.Wg_Opendtu_Allowed_Ip[1] = Wg_Opendtu_Allowed_Ip[1];
+    config.Wg_Opendtu_Allowed_Ip[2] = Wg_Opendtu_Allowed_Ip[2];
+    config.Wg_Opendtu_Allowed_Ip[3] = Wg_Opendtu_Allowed_Ip[3];
+    IPAddress Wg_Opendtu_Allowed_Mask;
+    Wg_Opendtu_Allowed_Mask.fromString(wg["opendtu_allowed_mask"] | WG_OPENDTU_ALLOWED_MASK);
+    config.Wg_Opendtu_Allowed_Mask[0] = Wg_Opendtu_Allowed_Mask[0];
+    config.Wg_Opendtu_Allowed_Mask[1] = Wg_Opendtu_Allowed_Mask[1];
+    config.Wg_Opendtu_Allowed_Mask[2] = Wg_Opendtu_Allowed_Mask[2];
+    config.Wg_Opendtu_Allowed_Mask[3] = Wg_Opendtu_Allowed_Mask[3];
 
     JsonObject ntp = doc["ntp"];
     strlcpy(config.Ntp_Server, ntp["server"] | NTP_SERVER, sizeof(config.Ntp_Server));

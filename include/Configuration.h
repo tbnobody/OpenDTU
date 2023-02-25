@@ -64,10 +64,11 @@ struct CONFIG_T {
     bool Wg_Enabled;
     bool Wg_Refresh;
     char Wg_Endpoint_Address[15];
-    byte Wg_Endpoint_Local_Ip[4];
     uint Wg_Endpoint_Port;
     char Wg_Endpoint_Public_Key[45];
     char Wg_Opendtu_Public_Key[45];
+    byte Wg_Opendtu_Allowed_Ip[4];
+    byte Wg_Opendtu_Allowed_Mask[4];
     byte Wg_Opendtu_Local_Ip[4];
     char Wg_Opendtu_Private_Key[45];
 

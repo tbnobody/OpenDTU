@@ -7,6 +7,7 @@
 #include "InverterSettings.h"
 #include "MessageOutput.h"
 #include "MqttHandleDtu.h"
+#include "MqttHandleShelly3EM.h"
 #include "MqttHandleHass.h"
 #include "MqttHandleInverter.h"
 #include "MqttSettings.h"
@@ -129,6 +130,7 @@ void setup()
 
     InverterSettings.init();
 
+    MqttHandleShelly3EM.init();
     WireguardSettings.init();
 }
 
@@ -145,6 +147,8 @@ void loop()
     MqttHandleInverter.loop();
     yield();
     MqttHandleHass.loop();
+    yield();
+    MqttHandleShelly3EM.loop();
     yield();
     WebApi.loop();
     yield();
