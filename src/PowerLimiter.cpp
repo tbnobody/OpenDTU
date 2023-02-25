@@ -148,41 +148,50 @@ void PowerLimiterClass::loop()
     }
 
     int32_t newPowerLimit = 0;
+    bool withinTargetRange = false;
 
     if (millis() - _lastPowerMeterUpdate < (30 * 1000)) {
         newPowerLimit = static_cast<int>(_powerMeter1Power + _powerMeter2Power + _powerMeter3Power);
+        // check if grid power consumption is within the upper an lower threshold of the target consumption
+        if (!_consumeSolarPowerOnly &&
+            newPowerLimit > (config.PowerLimiter_TargetPowerConsumption - config.PowerLimiter_TargetPowerConsumptionHysteresis) &&
+            newPowerLimit < (config.PowerLimiter_TargetPowerConsumption + config.PowerLimiter_TargetPowerConsumptionHysteresis))
+            withinTargetRange = true;
+        else {
+            if (config.PowerLimiter_IsInverterBehindPowerMeter) {
+                // If the inverter the behind the power meter (part of measurement),
+                // the produced power of this inverter has also to be taken into account.
+                // We don't use FLD_PAC from the statistics, because that
+                // data might be too old and unrelieable.
+                newPowerLimit += _lastRequestedPowerLimit;
+            }
 
-        if (config.PowerLimiter_IsInverterBehindPowerMeter) {
-            // If the inverter the behind the power meter (part of measurement),
-            // the produced power of this inverter has also to be taken into account.
-            // We don't use FLD_PAC from the statistics, because that
-            // data might be too old and unrelieable.
-            newPowerLimit += _lastRequestedPowerLimit;
+            newPowerLimit -= config.PowerLimiter_TargetPowerConsumption;
+
+            uint16_t upperPowerLimit = config.PowerLimiter_UpperPowerLimit;
+            if (_consumeSolarPowerOnly && upperPowerLimit > victronChargePower) {
+                // Battery voltage too low, use Victron solar power only
+                upperPowerLimit = victronChargePower;
+            }
+
+            newPowerLimit = constrain(newPowerLimit, (uint16_t)config.PowerLimiter_LowerPowerLimit, upperPowerLimit);
+
+            MessageOutput.printf("[PowerLimiterClass::loop] powerMeter: %d W lastRequestedPowerLimit: %d\r\n",
+                static_cast<int>(_powerMeter1Power + _powerMeter2Power + _powerMeter3Power), _lastRequestedPowerLimit);
         }
-
-        newPowerLimit -= 10;
-
-        uint16_t upperPowerLimit = config.PowerLimiter_UpperPowerLimit;
-        if (_consumeSolarPowerOnly && upperPowerLimit > victronChargePower) {
-            // Battery voltage too low, use Victron solar power only
-            upperPowerLimit = victronChargePower;
-        }
-
-        newPowerLimit = constrain(newPowerLimit, (uint16_t)config.PowerLimiter_LowerPowerLimit, upperPowerLimit);
-
-        MessageOutput.printf("[PowerLimiterClass::loop] powerMeter: %d W lastRequestedPowerLimit: %d\r\n",
-            static_cast<int>(_powerMeter1Power + _powerMeter2Power + _powerMeter3Power), _lastRequestedPowerLimit);
     } else {
         // If the power meter values are older than 30 seconds,
         // set the limit to config.PowerLimiter_LowerPowerLimit for safety reasons.
         newPowerLimit = config.PowerLimiter_LowerPowerLimit;
     }
 
-    MessageOutput.printf("[PowerLimiterClass::loop] Limit Non-Persistent: %d W\r\n", newPowerLimit);
-    inverter->sendActivePowerControlRequest(Hoymiles.getRadio(), newPowerLimit, PowerLimitControlType::AbsolutNonPersistent);
-    _lastRequestedPowerLimit = newPowerLimit;
+    if(!withinTargetRange) {
+        MessageOutput.printf("[PowerLimiterClass::loop] Limit Non-Persistent: %d W\r\n", newPowerLimit);
+        inverter->sendActivePowerControlRequest(Hoymiles.getRadio(), newPowerLimit, PowerLimitControlType::AbsolutNonPersistent);
+        _lastRequestedPowerLimit = newPowerLimit;
 
-    _lastCommandSent = millis();
+        _lastCommandSent = millis();
+    }
 }
 
 bool PowerLimiterClass::canUseDirectSolarPower()
