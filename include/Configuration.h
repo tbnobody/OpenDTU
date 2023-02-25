@@ -61,6 +61,17 @@ struct CONFIG_T {
     bool WiFi_Dhcp;
     char WiFi_Hostname[WIFI_MAX_HOSTNAME_STRLEN + 1];
 
+    bool Wg_Enabled;
+    bool Wg_Refresh;
+    char Wg_Endpoint_Address[15];
+    uint Wg_Endpoint_Port;
+    char Wg_Endpoint_Public_Key[45];
+    char Wg_Opendtu_Public_Key[45];
+    byte Wg_Opendtu_Allowed_Ip[4];
+    byte Wg_Opendtu_Allowed_Mask[4];
+    byte Wg_Opendtu_Local_Ip[4];
+    char Wg_Opendtu_Private_Key[45];
+
     char Ntp_Server[NTP_MAX_SERVER_STRLEN + 1];
     char Ntp_Timezone[NTP_MAX_TIMEZONE_STRLEN + 1];
     char Ntp_TimezoneDescr[NTP_MAX_TIMEZONEDESCR_STRLEN + 1];

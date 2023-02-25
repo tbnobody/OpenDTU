@@ -18,6 +18,7 @@
 #include "WebApi_security.h"
 #include "WebApi_sysstatus.h"
 #include "WebApi_webapp.h"
+#include "WebApi_wireguard.h"
 #include "WebApi_ws_console.h"
 #include "WebApi_ws_live.h"
 #include <ESPAsyncWebServer.h>
@@ -52,6 +53,7 @@ private:
     WebApiSecurityClass _webApiSecurity;
     WebApiSysstatusClass _webApiSysstatus;
     WebApiWebappClass _webApiWebapp;
+    WebApiWireguardClass _webApiWireguard;
     WebApiWsConsoleClass _webApiWsConsole;
     WebApiWsLiveClass _webApiWsLive;
 };

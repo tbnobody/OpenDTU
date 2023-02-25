@@ -7,10 +7,12 @@
 #include "InverterSettings.h"
 #include "MessageOutput.h"
 #include "MqttHandleDtu.h"
+#include "MqttHandleShelly3EM.h"
 #include "MqttHandleHass.h"
 #include "MqttHandleInverter.h"
 #include "MqttSettings.h"
 #include "NetworkSettings.h"
+#include "WireguardSettings.h"
 #include "NtpSettings.h"
 #include "PinMapping.h"
 #include "SunPosition.h"
@@ -127,11 +129,16 @@ void setup()
     MessageOutput.println(F("done"));
 
     InverterSettings.init();
+
+    MqttHandleShelly3EM.init();
+    WireguardSettings.init();
 }
 
 void loop()
 {
     NetworkSettings.loop();
+    yield();
+    WireguardSettings.loop();
     yield();
     InverterSettings.loop();
     yield();
@@ -140,6 +147,8 @@ void loop()
     MqttHandleInverter.loop();
     yield();
     MqttHandleHass.loop();
+    yield();
+    MqttHandleShelly3EM.loop();
     yield();
     WebApi.loop();
     yield();
