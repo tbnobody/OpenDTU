@@ -49,8 +49,8 @@ void WebApiPowerLimiterClass::onStatus(AsyncWebServerRequest* request)
     root[F("upper_power_limit")] = config.PowerLimiter_UpperPowerLimit;
     root[F("battery_soc_start_threshold")] = config.PowerLimiter_BatterySocStartThreshold;
     root[F("battery_soc_stop_threshold")] = config.PowerLimiter_BatterySocStopThreshold;
-    root[F("voltage_start_threshold")] = (int) (config.PowerLimiter_VoltageStartThreshold * 100 +0.5) / 100.0;
-    root[F("voltage_stop_threshold")] = (int) (config.PowerLimiter_VoltageStopThreshold * 100 +0.5) / 100.0;;
+    root[F("voltage_start_threshold")] = static_cast<int>(config.PowerLimiter_VoltageStartThreshold * 100 +0.5) / 100.0;
+    root[F("voltage_stop_threshold")] = static_cast<int>(config.PowerLimiter_VoltageStopThreshold * 100 +0.5) / 100.0;;
     root[F("voltage_load_correction_factor")] = config.PowerLimiter_VoltageLoadCorrectionFactor;
 
     response->setLength();
@@ -133,9 +133,9 @@ void WebApiPowerLimiterClass::onAdminPost(AsyncWebServerRequest* request)
     config.PowerLimiter_BatterySocStartThreshold = root[F("battery_soc_start_threshold")].as<float>();
     config.PowerLimiter_BatterySocStopThreshold = root[F("battery_soc_stop_threshold")].as<float>();
     config.PowerLimiter_VoltageStartThreshold = root[F("voltage_start_threshold")].as<float>();
-    config.PowerLimiter_VoltageStartThreshold = (int) (config.PowerLimiter_VoltageStartThreshold * 100) / 100.0;
+    config.PowerLimiter_VoltageStartThreshold = static_cast<int>(config.PowerLimiter_VoltageStartThreshold * 100) / 100.0;
     config.PowerLimiter_VoltageStopThreshold = root[F("voltage_stop_threshold")].as<float>();
-    config.PowerLimiter_VoltageStopThreshold = (int)(config.PowerLimiter_VoltageStopThreshold * 100) / 100.0;
+    config.PowerLimiter_VoltageStopThreshold = static_cast<int>(config.PowerLimiter_VoltageStopThreshold * 100) / 100.0;
     config.PowerLimiter_VoltageLoadCorrectionFactor = root[F("voltage_load_correction_factor")].as<float>();
     Configuration.write();
 
