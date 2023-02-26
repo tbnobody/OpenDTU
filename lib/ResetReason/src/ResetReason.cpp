@@ -70,7 +70,7 @@ String ResetReasonClass::get_reset_reason_verbose(uint8_t cpu_id)
         break;
 #ifndef CONFIG_IDF_TARGET_ESP32C3
     case 14:
-        reason_str = F("for APP CPU, reseted by PRO CPU");
+        reason_str = F("for APP CPU, reset by PRO CPU");
         break;
 #endif
     case 15:
