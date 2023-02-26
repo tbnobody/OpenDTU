@@ -65,27 +65,29 @@ void WebApiPrometheusClass::onPrometheusMetricsGet(AsyncWebServerRequest* reques
             stream->printf("opendtu_last_update{serial=\"%s\",unit=\"%d\",name=\"%s\"} %d\n",
                 serial.c_str(), i, name, inv->Statistics()->getLastUpdate() / 1000);
 
-            // Loop all channels
-            for (auto& t : inv->Statistics()->getChannelTypes()) {
-                for (auto& c : inv->Statistics()->getChannelsByType(t)) {
-                    addField(stream, serial, i, inv, t, c, FLD_PAC);
-                    addField(stream, serial, i, inv, t, c, FLD_UAC);
-                    addField(stream, serial, i, inv, t, c, FLD_IAC);
-                    if (t == TYPE_AC) {
-                        addField(stream, serial, i, inv, t, c, FLD_PDC, "PowerDC");
-                    } else {
-                        addField(stream, serial, i, inv, t, c, FLD_PDC);
+            // Loop all channels if Statistics have been updated at least once since DTU boot
+            if (inv->Statistics()->getLastUpdate() > 0) {
+                for (auto& t : inv->Statistics()->getChannelTypes()) {
+                    for (auto& c : inv->Statistics()->getChannelsByType(t)) {
+                        addField(stream, serial, i, inv, t, c, FLD_PAC);
+                        addField(stream, serial, i, inv, t, c, FLD_UAC);
+                        addField(stream, serial, i, inv, t, c, FLD_IAC);
+                        if (t == TYPE_AC) {
+                            addField(stream, serial, i, inv, t, c, FLD_PDC, "PowerDC");
+                        } else {
+                            addField(stream, serial, i, inv, t, c, FLD_PDC);
+                        }
+                        addField(stream, serial, i, inv, t, c, FLD_UDC);
+                        addField(stream, serial, i, inv, t, c, FLD_IDC);
+                        addField(stream, serial, i, inv, t, c, FLD_YD);
+                        addField(stream, serial, i, inv, t, c, FLD_YT);
+                        addField(stream, serial, i, inv, t, c, FLD_F);
+                        addField(stream, serial, i, inv, t, c, FLD_T);
+                        addField(stream, serial, i, inv, t, c, FLD_PF);
+                        addField(stream, serial, i, inv, t, c, FLD_PRA);
+                        addField(stream, serial, i, inv, t, c, FLD_EFF);
+                        addField(stream, serial, i, inv, t, c, FLD_IRR);
                     }
-                    addField(stream, serial, i, inv, t, c, FLD_UDC);
-                    addField(stream, serial, i, inv, t, c, FLD_IDC);
-                    addField(stream, serial, i, inv, t, c, FLD_YD);
-                    addField(stream, serial, i, inv, t, c, FLD_YT);
-                    addField(stream, serial, i, inv, t, c, FLD_F);
-                    addField(stream, serial, i, inv, t, c, FLD_T);
-                    addField(stream, serial, i, inv, t, c, FLD_PF);
-                    addField(stream, serial, i, inv, t, c, FLD_PRA);
-                    addField(stream, serial, i, inv, t, c, FLD_EFF);
-                    addField(stream, serial, i, inv, t, c, FLD_IRR);
                 }
             }
         }
