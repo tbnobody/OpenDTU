@@ -59,6 +59,7 @@ void WebApiWsLiveClass::loop()
 
     // Update on every inverter change or at least after 10 seconds
     if (millis() - _lastWsPublish > (10 * 1000) || (maxTimeStamp != _newestInverterTimestamp)) {
+
         try {
             DynamicJsonDocument root(40960);
             JsonVariant var = root;
@@ -77,11 +78,11 @@ void WebApiWsLiveClass::loop()
                 _ws.textAll(buffer);
             }
 
-            _lastWsPublish = millis();
-        }
-        catch (std::bad_alloc& bad_alloc) {
+        } catch (std::bad_alloc& bad_alloc) {
             MessageOutput.printf("Call to /api/livedata/status temporarely out of resources. Reason: \"%s\".\r\n", bad_alloc.what());
         }
+
+        _lastWsPublish = millis();
     }
 }
 
@@ -224,11 +225,18 @@ void WebApiWsLiveClass::onLivedataStatus(AsyncWebServerRequest* request)
         return;
     }
 
-    AsyncJsonResponse* response = new AsyncJsonResponse(false, 40960U);
-    JsonVariant root = response->getRoot();
+    try {
+        AsyncJsonResponse* response = new AsyncJsonResponse(false, 40960U);
+        JsonVariant root = response->getRoot();
 
-    generateJsonResponse(root);
+        generateJsonResponse(root);
 
-    response->setLength();
-    request->send(response);
+        response->setLength();
+        request->send(response);
+
+    } catch (std::bad_alloc& bad_alloc) {
+        MessageOutput.printf("Call to /api/livedata/status temporarely out of resources. Reason: \"%s\".\r\n", bad_alloc.what());
+
+        WebApi.sendTooManyRequests(request);
+    }
 }

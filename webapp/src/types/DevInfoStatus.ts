@@ -1,4 +1,5 @@
 export interface DevInfoStatus {
+    serial: number;
     valid_data: boolean;
     fw_bootloader_version: number;
     fw_build_version: number;

@@ -5,7 +5,9 @@
  */
 #include "WebApi_prometheus.h"
 #include "Configuration.h"
+#include "MessageOutput.h"
 #include "NetworkSettings.h"
+#include "WebApi.h"
 #include <Hoymiles.h>
 #include "MessageOutput.h"
 
@@ -23,10 +25,10 @@ void WebApiPrometheusClass::loop()
 }
 
 void WebApiPrometheusClass::onPrometheusMetricsGet(AsyncWebServerRequest* request)
-{   
+{
     try {
         auto stream = request->beginResponseStream("text/plain; charset=utf-8", 40960);
-  
+
         stream->print(F("# HELP opendtu_build Build info\n"));
         stream->print(F("# TYPE opendtu_build gauge\n"));
         stream->printf("opendtu_build{name=\"%s\",id=\"%s\",version=\"%d.%d.%d\"} 1\n",
@@ -64,39 +66,39 @@ void WebApiPrometheusClass::onPrometheusMetricsGet(AsyncWebServerRequest* reques
             stream->printf("opendtu_last_update{serial=\"%s\",unit=\"%d\",name=\"%s\"} %d\n",
                 serial.c_str(), i, name, inv->Statistics()->getLastUpdate() / 1000);
 
-            // Loop all channels
-            for (auto& t : inv->Statistics()->getChannelTypes()) {
-                for (auto& c : inv->Statistics()->getChannelsByType(t)) {
-                    addField(stream, serial, i, inv, t, c, FLD_PAC);
-                    addField(stream, serial, i, inv, t, c, FLD_UAC);
-                    addField(stream, serial, i, inv, t, c, FLD_IAC);
-                    if (t == TYPE_AC) {
-                        addField(stream, serial, i, inv, t, c, FLD_PDC, "PowerDC");
-                    } else {
-                        addField(stream, serial, i, inv, t, c, FLD_PDC);
+            // Loop all channels if Statistics have been updated at least once since DTU boot
+            if (inv->Statistics()->getLastUpdate() > 0) {
+                for (auto& t : inv->Statistics()->getChannelTypes()) {
+                    for (auto& c : inv->Statistics()->getChannelsByType(t)) {
+                        addField(stream, serial, i, inv, t, c, FLD_PAC);
+                        addField(stream, serial, i, inv, t, c, FLD_UAC);
+                        addField(stream, serial, i, inv, t, c, FLD_IAC);
+                        if (t == TYPE_AC) {
+                            addField(stream, serial, i, inv, t, c, FLD_PDC, "PowerDC");
+                        } else {
+                            addField(stream, serial, i, inv, t, c, FLD_PDC);
+                        }
+                        addField(stream, serial, i, inv, t, c, FLD_UDC);
+                        addField(stream, serial, i, inv, t, c, FLD_IDC);
+                        addField(stream, serial, i, inv, t, c, FLD_YD);
+                        addField(stream, serial, i, inv, t, c, FLD_YT);
+                        addField(stream, serial, i, inv, t, c, FLD_F);
+                        addField(stream, serial, i, inv, t, c, FLD_T);
+                        addField(stream, serial, i, inv, t, c, FLD_PF);
+                        addField(stream, serial, i, inv, t, c, FLD_PRA);
+                        addField(stream, serial, i, inv, t, c, FLD_EFF);
+                        addField(stream, serial, i, inv, t, c, FLD_IRR);
                     }
-                    addField(stream, serial, i, inv, t, c, FLD_UDC);
-                    addField(stream, serial, i, inv, t, c, FLD_IDC);
-                    addField(stream, serial, i, inv, t, c, FLD_YD);
-                    addField(stream, serial, i, inv, t, c, FLD_YT);
-                    addField(stream, serial, i, inv, t, c, FLD_F);
-                    addField(stream, serial, i, inv, t, c, FLD_T);
-                    addField(stream, serial, i, inv, t, c, FLD_PF);
-                    addField(stream, serial, i, inv, t, c, FLD_PRA);
-                    addField(stream, serial, i, inv, t, c, FLD_EFF);
-                    addField(stream, serial, i, inv, t, c, FLD_IRR);
                 }
             }
         }
         stream->addHeader(F("Cache-Control"), F("no-cache"));
         request->send(stream);
-    }
-    catch (std::bad_alloc& bad_alloc) {
+
+    } catch (std::bad_alloc& bad_alloc) {
         MessageOutput.printf("Call to /api/prometheus/metrics temporarely out of resources. Reason: \"%s\".\r\n", bad_alloc.what());
-        
-        auto response = request->beginResponse(429, "text/plain", "Too Many Requests");
-        response->addHeader("Retry-After", "60");
-        request->send(response);
+
+        WebApi.sendTooManyRequests(request);
     }
 }
 
@@ -106,7 +108,7 @@ void WebApiPrometheusClass::addField(AsyncResponseStream* stream, String& serial
         const char* chanName = (channelName == NULL) ? inv->Statistics()->getChannelFieldName(type, channel, fieldId) : channelName;
         if (idx == 0 && type == TYPE_AC && channel == 0) {
             stream->printf("# HELP opendtu_%s in %s\n", chanName, inv->Statistics()->getChannelFieldUnit(type, channel, fieldId));
-            stream->printf("# TYPE opendtu_%s gauge\n", chanName);
+            stream->printf("# TYPE opendtu_%s %s\n", chanName, _metricTypes[_fieldMetricAssignment[fieldId]]);
         }
         stream->printf("opendtu_%s{serial=\"%s\",unit=\"%d\",name=\"%s\",type=\"%s\",channel=\"%d\"} %f\n",
             chanName,

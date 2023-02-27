@@ -55,6 +55,7 @@ void WebApiWsVedirectLiveClass::loop()
 
     // Update on ve.direct change or at least after 10 seconds
     if (millis() - _lastWsPublish > (10 * 1000) || (maxTimeStamp != _newestVedirectTimestamp)) {
+        
         try {
                 DynamicJsonDocument root(1024);
                 JsonVariant var = root;
@@ -73,11 +74,11 @@ void WebApiWsVedirectLiveClass::loop()
                     _ws.textAll(buffer);
                 }
 
-                _lastWsPublish = millis();
-        }
-        catch (std::bad_alloc& bad_alloc) {
+        } catch (std::bad_alloc& bad_alloc) {
             MessageOutput.printf("Call to /api/vedirectlivedata/status temporarely out of resources. Reason: \"%s\".\r\n", bad_alloc.what());
         }
+
+        _lastWsPublish = millis();
     }
 }
 
