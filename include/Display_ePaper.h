@@ -13,28 +13,29 @@
 #include <SPI.h>
 #include <map>
 
-#include <GxEPD2_BW.h>
 #include <GxEPD2_3C.h>
+#include <GxEPD2_BW.h>
 // FreeFonts from Adafruit_GFX
-#include <Fonts/FreeSans9pt7b.h>
 #include <Fonts/FreeSans12pt7b.h>
 #include <Fonts/FreeSans18pt7b.h>
 #include <Fonts/FreeSans24pt7b.h>
+#include <Fonts/FreeSans9pt7b.h>
 
-#include "imagedata.h"
 #include "Display_helper.h"
+#include "imagedata.h"
 
 // GDEW027C44   2.7 " b/w/r 176x264, IL91874
 // GDEH0154D67  1.54" b/w   200x200
 
-class DisplayEPaperClass
-{
+class DisplayEPaperClass {
 public:
     DisplayEPaperClass();
     ~DisplayEPaperClass();
     void fullRefresh();
     void init(DisplayType_t type, uint8_t _CS, uint8_t _DC, uint8_t _RST, uint8_t _BUSY, uint8_t _SCK, uint8_t _MOSI);
     void loop(float totalPower, float totalYieldDay, float totalYieldTotal, uint8_t isprod);
+
+    uint8_t displayRotation = 2;
 
 private:
     void headlineIP();
@@ -43,10 +44,9 @@ private:
 
     bool _changed = false;
     char _fmtText[35];
-    const char *_settedIP;
+    const char* _settedIP;
     uint8_t headfootline = 16;
-
-    GxEPD2_GFX *_display;
+    GxEPD2_GFX* _display;
 };
 
 extern DisplayEPaperClass DisplayEPaper;

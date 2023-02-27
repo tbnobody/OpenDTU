@@ -4,6 +4,7 @@
 enum DisplayType_t
 {
     None,
+    PCD8544,
     SSD1306,
     SH1106,
     ePaper154

@@ -37,7 +37,7 @@ void DisplayEPaperClass::init(DisplayType_t type, uint8_t _CS, uint8_t _DC, uint
         _display->epd2.selectSPI(hspi, SPISettings(spiClk, MSBFIRST, SPI_MODE0));
 #endif
         _display->init(115200, true, 2, false);
-        _display->setRotation(2);
+        _display->setRotation(displayRotation);
         _display->setFullWindow();
 
         // Logo

@@ -96,8 +96,9 @@ struct CONFIG_T {
 
     bool Display_PowerSafe;
     bool Display_ScreenSaver;
-    bool Display_ShowLogo;
+    uint8_t Display_Rotation;
     uint8_t Display_Contrast;
+    uint16_t Display_RefreshTime; // Achtung, max 65535
 };
 
 class ConfigurationClass {

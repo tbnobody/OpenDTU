@@ -66,10 +66,11 @@ void WebApiDeviceClass::onDeviceAdminGet(AsyncWebServerRequest* request)
     displayPinObj[F("dc")] = pin.display_dc;
 
     JsonObject display = root.createNestedObject("display");
-    display[F("show_logo")] = config.Display_ShowLogo;
     display[F("power_safe")] = config.Display_PowerSafe;
     display[F("screensaver")] = config.Display_ScreenSaver;
     display[F("contrast")] = config.Display_Contrast;
+    display["rotation"] = config.Display_Rotation;
+    display["refreshtime"] = config.Display_RefreshTime;
 
     response->setLength();
     request->send(response);
@@ -140,10 +141,11 @@ void WebApiDeviceClass::onDeviceAdminPost(AsyncWebServerRequest* request)
     config.Display_ScreenSaver = root[F("display")][F("screensaver")].as<bool>();
     config.Display_Contrast = root[F("display")][F("contrast")].as<uint8_t>();
 
-    // Display.showLogo = config.Display_ShowLogo;
     Display.enablePowerSafe = config.Display_PowerSafe;
     Display.enableScreensaver = config.Display_ScreenSaver;
     Display.contrast = config.Display_Contrast;
+    Display.period = config.Display_RefreshTime;
+    Display.rotation = config.Display_Rotation;
 
     Configuration.write();
 

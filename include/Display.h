@@ -12,13 +12,14 @@ public:
     bool enablePowerSafe;
     bool enableScreensaver;
     uint8_t contrast;
-    uint16_t counterEPaper;
-    uint16_t _period = 10000;
-    uint32_t _lastDisplayUpdate = 0;
-    time_t now = time(nullptr);
+    uint8_t rotation;
+    uint16_t period = 10000; // Achtung, max 65535
 
 private:
     DisplayType_t _display_type = DisplayType_t::None;
+    uint32_t _lastDisplayUpdate = 0;
+    time_t now = time(nullptr);
+    uint16_t counterEPaper;
 };
 
 extern DisplayClass Display;

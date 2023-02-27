@@ -96,6 +96,13 @@ void setup()
 
     // Initialize Display
     MessageOutput.print(F("Initialize Display... "));
+    /*
+    Display.enablePowerSafe = config.Display_PowerSafe;
+    Display.enableScreensaver = config.Display_ScreenSaver;
+    Display.contrast = config.Display_Contrast;
+    Display.rotation = config.Display_Rotation;
+    Display.period = config.Display_RefreshTime;
+
     Display.init(
         static_cast<DisplayType_t>(pin.display_type),
         pin.display_data,
@@ -104,11 +111,16 @@ void setup()
         pin.display_reset,
         pin.display_busy,
         pin.display_dc);
+*/
+    /************ Test Definition start ***********/
+    Display.enablePowerSafe = false;
+    Display.enableScreensaver = false;
+    Display.contrast = 255;
+    Display.rotation = 2;
+    Display.period = 1000;
+    Display.init(DisplayType_t::PCD8544, 13, 14, 15, 26, 255, 27);
+    /************ Test Definition ende ***********/
 
-    // Display.showLogo = config.Display_ShowLogo;
-    Display.enablePowerSafe = config.Display_PowerSafe;
-    Display.enableScreensaver = config.Display_ScreenSaver;
-    Display.contrast = config.Display_Contrast;
     MessageOutput.println(F("done"));
 
     // Check for default DTU serial
