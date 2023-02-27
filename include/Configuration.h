@@ -6,7 +6,7 @@
 #define CONFIG_FILENAME "/config.json"
 #define CONFIG_VERSION 0x00011800 // 0.1.24 // make sure to clean all after change
 
-#define WIFI_MAX_SSID_STRLEN 31
+#define WIFI_MAX_SSID_STRLEN 32
 #define WIFI_MAX_PASSWORD_STRLEN 64
 #define WIFI_MAX_HOSTNAME_STRLEN 31
 
