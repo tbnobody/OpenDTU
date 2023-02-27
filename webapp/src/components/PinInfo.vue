@@ -23,7 +23,7 @@
                         <td>{{ currentPinAssignment?.nrf24?.mosi }}</td>
                     </tr>
                     <tr>
-                        <td>CLK</td>
+                        <td>CLK {{ $t('pininfo.or') }} SCK</td>
                         <td>{{ selectedPinAssignment?.nrf24?.clk }}</td>
                         <td>{{ currentPinAssignment?.nrf24?.clk }}</td>
                     </tr>
@@ -33,12 +33,12 @@
                         <td>{{ currentPinAssignment?.nrf24?.irq }}</td>
                     </tr>
                     <tr>
-                        <td>EN</td>
+                        <td>EN {{ $t('pininfo.or') }} CE</td>
                         <td>{{ selectedPinAssignment?.nrf24?.en }}</td>
                         <td>{{ currentPinAssignment?.nrf24?.en }}</td>
                     </tr>
                     <tr>
-                        <td>CS</td>
+                        <td>CS  {{ $t('pininfo.or') }} CSN</td>
                         <td>{{ selectedPinAssignment?.nrf24?.cs }}</td>
                         <td>{{ currentPinAssignment?.nrf24?.cs }}</td>
                     </tr>

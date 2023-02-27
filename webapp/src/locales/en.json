@@ -513,6 +513,7 @@
         "Name": "Name",
         "Number": "Number",
         "ValueSelected": "Selected",
-        "ValueActive": "Active"
+        "ValueActive": "Active",
+        "or": "or"
     }
 }

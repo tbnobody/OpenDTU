@@ -512,6 +512,7 @@
         "Category": "Kategorie",
         "Name": "Name",
         "ValueSelected": "Ausgewählt",
-        "ValueActive": "Aktiv"
+        "ValueActive": "Aktiv",
+        "or": "oder"
     }
 }
