@@ -90,13 +90,12 @@ void PowerLimiterClass::loop()
         return;
     }
 
-    uint32_t victronChargePower = this->getDirectSolarPower();
+    float victronChargePower = this->getDirectSolarPower();
 
-    MessageOutput.printf("[PowerLimiterClass::loop] victronChargePower: %d\r\n",
-        static_cast<int>(victronChargePower));
+    MessageOutput.printf("[PowerLimiterClass::loop] victronChargePower: %.2f\r\n", victronChargePower);
 
     if (millis() - _lastPowerMeterUpdate < (30 * 1000)) {
-        MessageOutput.printf("[PowerLimiterClass::loop] dcVoltage: %f config.PowerLimiter_VoltageStartThreshold: %f config.PowerLimiter_VoltageStopThreshold: %f inverter->isProducing(): %d\r\n",
+        MessageOutput.printf("[PowerLimiterClass::loop] dcVoltage: %.2f config.PowerLimiter_VoltageStartThreshold: %.2f config.PowerLimiter_VoltageStopThreshold: %.2f inverter->isProducing(): %d\r\n",
             dcVoltage, config.PowerLimiter_VoltageStartThreshold, config.PowerLimiter_VoltageStopThreshold, inverter->isProducing());
     }
 
@@ -116,7 +115,7 @@ void PowerLimiterClass::loop()
         if ((!_consumeSolarPowerOnly && isStopThresholdReached(inverter))
                 || (_consumeSolarPowerOnly && victronChargePower < 10)) {
             // DC voltage too low, stop the inverter
-            MessageOutput.printf("[PowerLimiterClass::loop] DC voltage: %f Corrected DC voltage: %f...\r\n",
+            MessageOutput.printf("[PowerLimiterClass::loop] DC voltage: %.2f Corrected DC voltage: %.2f...\r\n",
                 dcVoltage, correctedDcVoltage);
             MessageOutput.println("[PowerLimiterClass::loop] Stopping inverter...");
             inverter->sendPowerControlRequest(Hoymiles.getRadio(), false);
@@ -174,7 +173,15 @@ void PowerLimiterClass::loop()
                 upperPowerLimit = victronChargePower;
             }
 
-            newPowerLimit = constrain(newPowerLimit, (uint16_t)config.PowerLimiter_LowerPowerLimit, upperPowerLimit);
+            if (newPowerLimit > upperPowerLimit) 
+                newPowerLimit = upperPowerLimit;
+            else if (newPowerLimit < (uint16_t)config.PowerLimiter_LowerPowerLimit) {
+                newPowerLimit = (uint16_t)config.PowerLimiter_LowerPowerLimit;
+                // stop the inverter
+                MessageOutput.println("[PowerLimiterClass::loop] Power limit too low. Stopping inverter...");
+                inverter->sendPowerControlRequest(Hoymiles.getRadio(), false);
+
+            }
 
             MessageOutput.printf("[PowerLimiterClass::loop] powerMeter: %d W lastRequestedPowerLimit: %d\r\n",
                 static_cast<int>(_powerMeter1Power + _powerMeter2Power + _powerMeter3Power), _lastRequestedPowerLimit);
@@ -211,13 +218,13 @@ bool PowerLimiterClass::canUseDirectSolarPower()
     return true;
 }
 
-uint32_t PowerLimiterClass::getDirectSolarPower()
+float PowerLimiterClass::getDirectSolarPower()
 {
     if (!this->canUseDirectSolarPower()) {
         return 0;
     }
 
-    return (uint32_t) round(VeDirect.veFrame.PPV);
+    return VeDirect.veFrame.PPV;
 }
 
 float PowerLimiterClass::getLoadCorrectedVoltage(std::shared_ptr<InverterAbstract> inverter)
