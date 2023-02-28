@@ -8,13 +8,13 @@
 #include "NetworkSettings.h"
 #include <Hoymiles.h>
 #include "MessageOutput.h"
-#include <HTTPClient.h>
 #include <ArduinoJson.h>
 
 MqttHandleShelly3EMClass MqttHandleShelly3EM;
 
 void MqttHandleShelly3EMClass::init()
 {
+    http.setReuse(true);
 }
 
 void MqttHandleShelly3EMClass::loop()
@@ -23,15 +23,12 @@ void MqttHandleShelly3EMClass::loop()
         return;
     }
 
-    const CONFIG_T& config = Configuration.get();
-
-    if (millis() - _lastPublish > (config.Mqtt_PublishInterval * 1000)) {
-        WiFiClient client;  // or WiFiClientSecure for HTTPS
-        HTTPClient http;
-
+    //const CONFIG_T& config = Configuration.get();
+    //if (millis() - _lastPublish > (config.Mqtt_PublishInterval * 1000)) {
+    if (millis() - _lastPublish > (3 * 999)) {
         // Send request
-        http.useHTTP10(true);
-        http.begin(client, "http://192.168.1.103/status");
+        MessageOutput.println(F("Polling SHEM-3... "));
+        http.begin("http://192.168.1.103/status");
         int httpCode = http.GET();
 
         if (httpCode == 200) {
