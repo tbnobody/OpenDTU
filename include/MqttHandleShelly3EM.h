@@ -2,6 +2,7 @@
 #pragma once
 
 #include <cstdint>
+#include <HTTPClient.h>
 
 class MqttHandleShelly3EMClass {
 public:
@@ -10,6 +11,7 @@ public:
 
 private:
     uint32_t _lastPublish;
+    HTTPClient http;
 };
 
 extern MqttHandleShelly3EMClass MqttHandleShelly3EM;
