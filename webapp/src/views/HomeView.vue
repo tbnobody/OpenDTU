@@ -95,9 +95,14 @@
                             <div class="row flex-row-reverse flex-wrap-reverse g-3">
                                 <template v-for="chanType in [{obj: inverter.INV, name: 'INV'}, {obj: inverter.AC, name: 'AC'}, {obj: inverter.DC, name: 'DC'}].reverse()">
                                     <div v-for="channel in Object.keys(chanType.obj).sort().reverse().map(x=>+x)" :key="channel" class="col">
-                                        <InverterChannelInfo :channelData="chanType.obj[channel]"
-                                            :channelType="chanType.name"
-                                            :channelNumber="channel" />
+                                        <template v-if="(chanType.name != 'DC') ||
+                                            (chanType.name == 'DC' && getSumIrridiation(inverter) == 0) ||
+                                            (chanType.name == 'DC' && getSumIrridiation(inverter) > 0 && chanType.obj[channel].Irradiation?.v || 0 > 0)
+                                            ">
+                                            <InverterChannelInfo :channelData="chanType.obj[channel]"
+                                                :channelType="chanType.name"
+                                                :channelNumber="channel" />
+                                        </template>
                                     </div>
                                 </template>
                             </div>
@@ -666,6 +671,13 @@ export default defineComponent({
         calculateAbsoluteTime(lastTime: number): string {
             const date = new Date(Date.now() - lastTime * 1000);
             return this.$d(date, 'datetime');
+        },
+        getSumIrridiation(inv: Inverter): number {
+            let total = 0;
+            Object.keys(inv.DC).forEach((key) => {
+                total += inv.DC[key as unknown as number].Irradiation?.v || 0;
+            });
+            return total;
         }
     },
 });
