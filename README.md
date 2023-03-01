@@ -28,6 +28,9 @@ Several screenshots of the frontend can be found here: [Screenshots](docs/screen
 Different builds from existing installations can be found here [Builds](docs/builds/README.md)
 Like to show your own build? Just send me a Pull Request.
 
+### Dynamic Power Limiter Interface
+![image](https://user-images.githubusercontent.com/59169507/222155765-9fff47a4-8ffa-42cf-8671-6359288e0cab.png)
+
 ### Web-Live-Interface:
 ![image](https://user-images.githubusercontent.com/59169507/187224107-4e0d0cab-2e1b-4e47-9410-a49f80aa6789.png)
 
