@@ -90,9 +90,9 @@ void PowerLimiterClass::loop()
         return;
     }
 
-    float victronChargePower = this->getDirectSolarPower();
+    uint16_t victronChargePower = this->getDirectSolarPower();
 
-    MessageOutput.printf("[PowerLimiterClass::loop] victronChargePower: %.2f\r\n", victronChargePower);
+    MessageOutput.printf("[PowerLimiterClass::loop] victronChargePower: %d\r\n", victronChargePower);
 
     if (millis() - _lastPowerMeterUpdate < (30 * 1000)) {
         MessageOutput.printf("[PowerLimiterClass::loop] dcVoltage: %.2f config.PowerLimiter_VoltageStartThreshold: %.2f config.PowerLimiter_VoltageStopThreshold: %.2f inverter->isProducing(): %d\r\n",
@@ -218,13 +218,13 @@ bool PowerLimiterClass::canUseDirectSolarPower()
     return true;
 }
 
-float PowerLimiterClass::getDirectSolarPower()
+uint16_t PowerLimiterClass::getDirectSolarPower()
 {
     if (!this->canUseDirectSolarPower()) {
         return 0;
     }
 
-    return VeDirect.veFrame.PPV;
+    return round(VeDirect.veFrame.PPV);
 }
 
 float PowerLimiterClass::getLoadCorrectedVoltage(std::shared_ptr<InverterAbstract> inverter)

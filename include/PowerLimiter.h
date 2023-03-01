@@ -25,7 +25,7 @@ private:
     float _powerMeter3Power;
 
     bool canUseDirectSolarPower();
-    float getDirectSolarPower();
+    uint16_t getDirectSolarPower();
     float getLoadCorrectedVoltage(std::shared_ptr<InverterAbstract> inverter);
     bool isStartThresholdReached(std::shared_ptr<InverterAbstract> inverter);
     bool isStopThresholdReached(std::shared_ptr<InverterAbstract> inverter);
