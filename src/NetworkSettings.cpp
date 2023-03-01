@@ -121,9 +121,11 @@ void NetworkSettingsClass::setupMode()
         dnsServer->stop();
         dnsServerStatus = false;
         if (_networkMode == network_mode::WiFi) {
+            /* // TODO (helge) check if this makes problems to connect to the ap
             WiFi.setScanMethod(WIFI_ALL_CHANNEL_SCAN);
             WiFi.setSortMethod(WIFI_CONNECT_AP_BY_SIGNAL);
-            WiFi.mode(WIFI_STA);
+            */
+           WiFi.mode(WIFI_STA); 
         } else {
             WiFi.mode(WIFI_MODE_NULL);
         }
