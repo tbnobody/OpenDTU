@@ -6,13 +6,13 @@ This is a fork from the Hoymiles project OpenDTU.
 
 This project is still under development and adds following features:
 
-* Support Victron's Ve.Direct protocol on the same chip. Additional information about Ve.direct can be downloaded from https://www.victronenergy.com/support-and-downloads/technical-information.
+* Support Victron's Ve.Direct protocol on the same chip (cable based serial interface!). Additional information about Ve.direct can be downloaded from https://www.victronenergy.com/support-and-downloads/technical-information.
 * Dynamically sets the Hoymiles power limited according to the currently used energy in the household (needs an MQTT based power meter like Shelly 3EM)
 * Battery support: Read the voltage from Victron MPPT charge controller or from the Hoymiles DC inputs and starts/stops the power producing based on configurable voltage thresholds
 * Voltage correction that takes the voltage drop because of the current output load into account (not 100% reliable calculation)
 * Can read the current solar panel power from the Victron MPPT and adjust the limiter accordingly to not save energy in the battery (for increased system efficiency). Increases the battery lifespan and reduces energy loses.
 * Settings can be configured in the UI
-* Pylontech Battery support (via CAN bus interface). Use the SOC for starting/stopping the power output and provide the battery data via MQTT
+* Pylontech Battery support (via CAN bus interface). Use the SOC for starting/stopping the power output and provide the battery data via MQTT (autodiscovery for home assistant is currently not supported). Serial inteface pins are actual hard coded (RX PIN 27, TX PIN 26)
 
 [![OpenDTU Build](https://github.com/tbnobody/OpenDTU/actions/workflows/build.yml/badge.svg)](https://github.com/tbnobody/OpenDTU/actions/workflows/build.yml)
 [![cpplint](https://github.com/tbnobody/OpenDTU/actions/workflows/cpplint.yml/badge.svg)](https://github.com/tbnobody/OpenDTU/actions/workflows/cpplint.yml)
@@ -117,6 +117,36 @@ Serial will be replaced with the serial number of the MPPT device.
 | victron/[serial]/H21                    | R     | Maximum power today                                  | Watt (W)                   |
 | victron/[serial]/H22                    | R     | Yield yesterday                                      | Kilo watt hours (kWh)      |
 | victron/[serial]/H23                    | R     | Maximum power yesterday                              | Watt (W)                   |
+
+## Pylontech Battery topics
+
+| Topic                                   | R / W | Description                                          | Value / Unit               |
+| --------------------------------------- | ----- | ---------------------------------------------------- | -------------------------- |
+| battery/settings/chargeVoltage         | R     | Voltage                                              | Volt (V)                   |
+| battery/settings/chargeCurrentLimitation | R     |                                               |                    |
+| battery/settings/dischargeCurrentLimitation | R     |                                               |                |
+| battery/stateOfCharge         | R     |                                               |                   |
+| battery/stateOfHealth        | R     |                                               |                   |
+| battery/voltage         | R     |                                               |                   |
+| battery/current         | R     |                                               |                   |
+| battery/temperature"         | R     |                                               |                   |
+| battery/alarm/overCurrentDischarge        | R     |                                               |                   |
+| battery/alarm/underTemperature        | R     |                                               |                    |
+| battery/alarm/overTemperature         | R     |                                               |                  |
+| battery/alarm/underVoltage         | R     |                                               |                   |
+| battery/alarm/overVoltage         | R     |                                               |                  |
+| battery/alarm/bmsInternal         | R     |                                               |                   |
+| battery/alarm/overCurrentCharge        | R     |                                               |                   |
+| battery/warning/highCurrentDischarge     | R     |                                               |                   |
+| battery/warning/lowTemperature        | R     |                                               |                    |
+| battery/warning/highTemperature        | R     |                                               |                    |
+| battery/warning/lowVoltage         | R     |                                               |                  |
+| battery/warning/highVoltage         | R     |                                               |                    |
+| battery/warning/bmsInternal        | R     |                                               |                   |
+| battery/manufacturer   | R     |                                               |                    |
+| battery/charging/chargeEnabled        | R     |                                               |                    |
+| battery/charging/dischargeEnabled        | R     |                                               |                    |
+| battery/charging/chargeImmediately       | R     |                                               |                    |
 
 
 ## Currently supported Inverters
