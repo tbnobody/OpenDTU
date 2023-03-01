@@ -118,6 +118,16 @@ Serial will be replaced with the serial number of the MPPT device.
 | victron/[serial]/H22                    | R     | Yield yesterday                                      | Kilo watt hours (kWh)      |
 | victron/[serial]/H23                    | R     | Maximum power yesterday                              | Watt (W)                   |
 
+## Power Meter (Shelly 3EM) topics
+
+Topics for 3 phases of a power meter is configurable. Given is an example for the Shelly 3EM. Positive values mean power import, negative values mean power export to the grid.
+
+| Topic                                   | R / W | Description                                          | Value / Unit               |
+| --------------------------------------- | ----- | ---------------------------------------------------- | -------------------------- |
+| shellies/[Shelly Name]/emeter/0/power   | w     | Power Phase 0                                         | Watt (W)                    |
+| shellies/[Shelly Name]/emeter/1/power   | w     | Power Phase 1                                         | Watt (W)                    |
+| shellies/[Shelly Name]/emeter/2/power   | w     | Power Phase 2                                         | Watt (W)                   |
+
 ## Pylontech Battery topics
 
 | Topic                                   | R / W | Description                                          | Value / Unit               |
