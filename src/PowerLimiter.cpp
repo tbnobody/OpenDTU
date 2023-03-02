@@ -40,7 +40,7 @@ void PowerLimiterClass::init()
         MqttSettings.subscribe(config.PowerLimiter_MqttTopicPowerMeter3, 0, std::bind(&PowerLimiterClass::onMqttMessage, this, _1, _2, _3, _4, _5, _6));
     }
 
-    _consumeSolarPowerOnly = false;
+    _consumeSolarPowerOnly = true;
 }
 
 void PowerLimiterClass::onMqttMessage(const espMqttClientTypes::MessageProperties& properties, const char* topic, const uint8_t* payload, size_t len, size_t index, size_t total)
@@ -92,10 +92,10 @@ void PowerLimiterClass::loop()
 
     uint16_t victronChargePower = this->getDirectSolarPower();
 
-    MessageOutput.printf("[PowerLimiterClass::loop] victronChargePower: %d\r\n", victronChargePower);
-
+    MessageOutput.printf("[PowerLimiterClass::loop] victronChargePower: %d, consumeSolarPowerOnly: %s \r\n", victronChargePower, _consumeSolarPowerOnly ? "true" : "false");
+   
     if (millis() - _lastPowerMeterUpdate < (30 * 1000)) {
-        MessageOutput.printf("[PowerLimiterClass::loop] dcVoltage: %.2f config.PowerLimiter_VoltageStartThreshold: %.2f config.PowerLimiter_VoltageStopThreshold: %.2f inverter->isProducing(): %d\r\n",
+        MessageOutput.printf("[PowerLimiterClass::loop] dcVoltage: %.2f Voltage Start Threshold: %.2f Voltage Stop Threshold: %.2f inverter->isProducing(): %d\r\n",
             dcVoltage, config.PowerLimiter_VoltageStartThreshold, config.PowerLimiter_VoltageStopThreshold, inverter->isProducing());
     }
 
@@ -109,7 +109,7 @@ void PowerLimiterClass::loop()
                 || !canUseDirectSolarPower()) {
             // The battery is full enough again, use the full battery power from now on.
             _consumeSolarPowerOnly = false;
-        } else if (!_consumeSolarPowerOnly && isStopThresholdReached(inverter) && canUseDirectSolarPower()) {
+        } else if (!_consumeSolarPowerOnly && !isStopThresholdReached(inverter) && canUseDirectSolarPower()) {
             // The battery voltage dropped too low
             _consumeSolarPowerOnly = true;
         }
