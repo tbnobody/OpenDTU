@@ -132,7 +132,7 @@ void PowerLimiterClass::loop()
             return;
         }
     } else {
-        if ((isStartThresholdReached(inverter) || canUseDirectSolarPower()) && powerMeter > 0) {
+        if ((isStartThresholdReached(inverter) || canUseDirectSolarPower()) && powerMeter >= config.PowerLimiter_LowerPowerLimit) {
             // DC voltage high enough, start the inverter
             MessageOutput.println("[PowerLimiterClass::loop] Starting up inverter...");
             _lastCommandSent = millis();
