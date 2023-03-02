@@ -112,11 +112,11 @@ void setup()
         pin.display_dc);
 
     /************ Test Definition start ***********/
-    // Display.enablePowerSafe = false;
-    // Display.enableScreensaver = false;
-    // Display.contrast = 255;
-    // Display.rotation = 2;
-    // Display.period = 1000;
+     //Display.enablePowerSafe = false;
+     //Display.enableScreensaver = false;
+     //Display.contrast = 255;
+     //Display.rotation = 2;
+     //Display.period = 1000;
     // Display.init(DisplayType_t::PCD8544, 13, 14, 15, 26, 255, 27);
     /************ Test Definition ende ***********/
 
