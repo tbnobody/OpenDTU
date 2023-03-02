@@ -44,6 +44,8 @@ bool ConfigurationClass::write()
     ntp["server"] = config.Ntp_Server;
     ntp["timezone"] = config.Ntp_Timezone;
     ntp["timezone_descr"] = config.Ntp_TimezoneDescr;
+    ntp["latitude"] = config.Ntp_Latitude;
+    ntp["longitude"] = config.Ntp_Longitude;
 
     JsonObject mqtt = doc.createNestedObject("mqtt");
     mqtt["enabled"] = config.Mqtt_Enabled;
@@ -53,7 +55,7 @@ bool ConfigurationClass::write()
     mqtt["password"] = config.Mqtt_Password;
     mqtt["topic"] = config.Mqtt_Topic;
     mqtt["retain"] = config.Mqtt_Retain;
-    mqtt["publish_invterval"] = config.Mqtt_PublishInterval;
+    mqtt["publish_interval"] = config.Mqtt_PublishInterval;
 
     JsonObject mqtt_lwt = mqtt.createNestedObject("lwt");
     mqtt_lwt["topic"] = config.Mqtt_LwtTopic;
@@ -95,6 +97,10 @@ bool ConfigurationClass::write()
         JsonObject inv = inverters.createNestedObject();
         inv["serial"] = config.Inverter[i].Serial;
         inv["name"] = config.Inverter[i].Name;
+        inv["poll_enable"] = config.Inverter[i].Poll_Enable;
+        inv["poll_enable_night"] = config.Inverter[i].Poll_Enable_Night;
+        inv["command_enable"] = config.Inverter[i].Command_Enable;
+        inv["command_enable_night"] = config.Inverter[i].Command_Enable_Night;
 
         JsonArray channel = inv.createNestedArray("channel");
         for (uint8_t c = 0; c < INV_MAX_CHAN_COUNT; c++) {
@@ -176,6 +182,8 @@ bool ConfigurationClass::read()
     strlcpy(config.Ntp_Server, ntp["server"] | NTP_SERVER, sizeof(config.Ntp_Server));
     strlcpy(config.Ntp_Timezone, ntp["timezone"] | NTP_TIMEZONE, sizeof(config.Ntp_Timezone));
     strlcpy(config.Ntp_TimezoneDescr, ntp["timezone_descr"] | NTP_TIMEZONEDESCR, sizeof(config.Ntp_TimezoneDescr));
+    config.Ntp_Latitude = ntp["latitude"] | NTP_LATITUDE;
+    config.Ntp_Longitude = ntp["longitude"] | NTP_LONGITUDE;
 
     JsonObject mqtt = doc["mqtt"];
     config.Mqtt_Enabled = mqtt["enabled"] | MQTT_ENABLED;
@@ -185,7 +193,7 @@ bool ConfigurationClass::read()
     strlcpy(config.Mqtt_Password, mqtt["password"] | MQTT_PASSWORD, sizeof(config.Mqtt_Password));
     strlcpy(config.Mqtt_Topic, mqtt["topic"] | MQTT_TOPIC, sizeof(config.Mqtt_Topic));
     config.Mqtt_Retain = mqtt["retain"] | MQTT_RETAIN;
-    config.Mqtt_PublishInterval = mqtt["publish_invterval"] | MQTT_PUBLISH_INTERVAL;
+    config.Mqtt_PublishInterval = mqtt["publish_interval"] | MQTT_PUBLISH_INTERVAL;
 
     JsonObject mqtt_lwt = mqtt["lwt"];
     strlcpy(config.Mqtt_LwtTopic, mqtt_lwt["topic"] | MQTT_LWT_TOPIC, sizeof(config.Mqtt_LwtTopic));
@@ -228,6 +236,11 @@ bool ConfigurationClass::read()
         config.Inverter[i].Serial = inv["serial"] | 0ULL;
         strlcpy(config.Inverter[i].Name, inv["name"] | "", sizeof(config.Inverter[i].Name));
 
+        config.Inverter[i].Poll_Enable = inv["poll_enable"] | true;
+        config.Inverter[i].Poll_Enable_Night = inv["poll_enable_night"] | true;
+        config.Inverter[i].Command_Enable = inv["command_enable"] | true;
+        config.Inverter[i].Command_Enable_Night = inv["command_enable_night"] | true;
+
         JsonArray channel = inv["channel"];
         for (uint8_t c = 0; c < INV_MAX_CHAN_COUNT; c++) {
             config.Inverter[i].channel[c].MaxChannelPower = channel[c]["max_power"] | 0;
@@ -242,21 +255,21 @@ bool ConfigurationClass::read()
 
 void ConfigurationClass::migrate()
 {
+    File f = LittleFS.open(CONFIG_FILENAME, "r", false);
+    if (!f) {
+        MessageOutput.println(F("Failed to open file, cancel migration"));
+        return;
+    }
+
+    DynamicJsonDocument doc(JSON_BUFFER_SIZE);
+    // Deserialize the JSON document
+    DeserializationError error = deserializeJson(doc, f);
+    if (error) {
+        MessageOutput.printf("Failed to read file, cancel migration: %s\r\n", error.c_str());
+        return;
+    }
+
     if (config.Cfg_Version < 0x00011700) {
-        File f = LittleFS.open(CONFIG_FILENAME, "r", false);
-        if (!f) {
-            MessageOutput.println(F("Failed to open file, cancel migration"));
-            return;
-        }
-
-        DynamicJsonDocument doc(JSON_BUFFER_SIZE);
-        // Deserialize the JSON document
-        DeserializationError error = deserializeJson(doc, f);
-        if (error) {
-            MessageOutput.println(F("Failed to read file, cancel migration"));
-            return;
-        }
-
         JsonArray inverters = doc["inverters"];
         for (uint8_t i = 0; i < INV_MAX_COUNT; i++) {
             JsonObject inv = inverters[i].as<JsonObject>();
@@ -267,6 +280,13 @@ void ConfigurationClass::migrate()
             }
         }
     }
+
+    if (config.Cfg_Version < 0x00011800) {
+        JsonObject mqtt = doc["mqtt"];
+        config.Mqtt_PublishInterval = mqtt["publish_invterval"];
+    }
+
+    f.close();
 
     config.Cfg_Version = CONFIG_VERSION;
     write();

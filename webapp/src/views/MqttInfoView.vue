@@ -6,12 +6,8 @@
                     <tbody>
                         <tr>
                             <th>{{ $t('mqttinfo.Status') }}</th>
-                            <td class="badge" :class="{
-                                'text-bg-danger': !mqttDataList.mqtt_enabled,
-                                'text-bg-success': mqttDataList.mqtt_enabled,
-                            }">
-                                <span v-if="mqttDataList.mqtt_enabled">{{ $t('mqttinfo.Enabled') }}</span>
-                                <span v-else>{{ $t('mqttinfo.Disabled') }}</span>
+                            <td>
+                                <StatusBadge :status="mqttDataList.mqtt_enabled" true_text="mqttinfo.Enabled" false_text="mqttinfo.Disabled" />
                             </td>
                         </tr>
                         <tr>
@@ -36,22 +32,14 @@
                         </tr>
                         <tr>
                             <th>{{ $t('mqttinfo.Retain') }}</th>
-                            <td class="badge" :class="{
-                                'text-bg-danger': !mqttDataList.mqtt_retain,
-                                'text-bg-success': mqttDataList.mqtt_retain,
-                            }">
-                                <span v-if="mqttDataList.mqtt_retain">{{ $t('mqttinfo.Enabled') }}</span>
-                                <span v-else>{{ $t('mqttinfo.Disabled') }}</span>
+                            <td>
+                                <StatusBadge :status="mqttDataList.mqtt_retain" true_text="mqttinfo.Enabled" false_text="mqttinfo.Disabled" />
                             </td>
                         </tr>
                         <tr>
                             <th>{{ $t('mqttinfo.Tls') }}</th>
-                            <td class="badge" :class="{
-                                'text-bg-danger': !mqttDataList.mqtt_tls,
-                                'text-bg-success': mqttDataList.mqtt_tls,
-                            }">
-                                <span v-if="mqttDataList.mqtt_tls">{{ $t('mqttinfo.Enabled') }}</span>
-                                <span v-else>{{ $t('mqttinfo.Disabled') }}</span>
+                            <td>
+                                <StatusBadge :status="mqttDataList.mqtt_tls" true_text="mqttinfo.Enabled" false_text="mqttinfo.Disabled" />
                             </td>
                         </tr>
                         <tr v-show="mqttDataList.mqtt_tls">
@@ -69,12 +57,8 @@
                     <tbody>
                         <tr>
                             <th>{{ $t('mqttinfo.Status') }}</th>
-                            <td class="badge" :class="{
-                                'text-bg-danger': !mqttDataList.mqtt_hass_enabled,
-                                'text-bg-success': mqttDataList.mqtt_hass_enabled,
-                            }">
-                                <span v-if="mqttDataList.mqtt_hass_enabled">{{ $t('mqttinfo.Enabled') }}</span>
-                                <span v-else>{{ $t('mqttinfo.Disabled') }}</span>
+                            <td>
+                                <StatusBadge :status="mqttDataList.mqtt_hass_enabled" true_text="mqttinfo.Enabled" false_text="mqttinfo.Disabled" />
                             </td>
                         </tr>
                         <tr>
@@ -83,33 +67,20 @@
                         </tr>
                         <tr>
                             <th>{{ $t('mqttinfo.Retain') }}</th>
-                            <td class="badge" :class="{
-                                'text-bg-danger': !mqttDataList.mqtt_hass_retain,
-                                'text-bg-success': mqttDataList.mqtt_hass_retain,
-                            }">
-                                <span v-if="mqttDataList.mqtt_hass_retain">{{ $t('mqttinfo.Enabled') }}</span>
-                                <span v-else>{{ $t('mqttinfo.Disabled') }}</span>
+                            <td>
+                                <StatusBadge :status="mqttDataList.mqtt_hass_retain" true_text="mqttinfo.Enabled" false_text="mqttinfo.Disabled" />
                             </td>
                         </tr>
                         <tr>
                             <th>{{ $t('mqttinfo.Expire') }}</th>
-                            <td class="badge" :class="{
-                                'text-bg-danger': !mqttDataList.mqtt_hass_expire,
-                                'text-bg-success': mqttDataList.mqtt_hass_expire,
-                            }">
-                                <span v-if="mqttDataList.mqtt_hass_expire">{{ $t('mqttinfo.Enabled') }}</span>
-                                <span v-else>{{ $t('mqttinfo.Disabled') }}</span>
+                            <td>
+                                <StatusBadge :status="mqttDataList.mqtt_hass_expire" true_text="mqttinfo.Enabled" false_text="mqttinfo.Disabled" />
                             </td>
                         </tr>
                         <tr>
                             <th>{{ $t('mqttinfo.IndividualPanels') }}</th>
-                            <td class="badge" :class="{
-                                'text-bg-danger': !mqttDataList.mqtt_hass_individualpanels,
-                                'text-bg-success': mqttDataList.mqtt_hass_individualpanels,
-                            }">
-                                <span v-if="mqttDataList.mqtt_hass_individualpanels">{{ $t('mqttinfo.Enabled')
-                                }}</span>
-                                <span v-else>{{ $t('mqttinfo.Disabled') }}</span>
+                            <td>
+                                <StatusBadge :status="mqttDataList.mqtt_hass_individualpanels" true_text="mqttinfo.Enabled" false_text="mqttinfo.Disabled" />
                             </td>
                         </tr>
                     </tbody>
@@ -123,12 +94,8 @@
                     <tbody>
                         <tr>
                             <th>{{ $t('mqttinfo.ConnectionStatus') }}</th>
-                            <td class="badge" :class="{
-                                'text-bg-danger': !mqttDataList.mqtt_connected,
-                                'text-bg-success': mqttDataList.mqtt_connected,
-                            }">
-                                <span v-if="mqttDataList.mqtt_connected">{{ $t('mqttinfo.Connected') }}</span>
-                                <span v-else>{{ $t('mqttinfo.Disconnected') }}</span>
+                            <td>
+                                <StatusBadge :status="mqttDataList.mqtt_connected" true_text="mqttinfo.Connected" false_text="mqttinfo.Disconnected" />
                             </td>
                         </tr>
                     </tbody>
@@ -141,6 +108,7 @@
 <script lang="ts">
 import BasePage from '@/components/BasePage.vue';
 import CardElement from '@/components/CardElement.vue';
+import StatusBadge from '@/components/StatusBadge.vue';
 import type { MqttStatus } from '@/types/MqttStatus';
 import { authHeader, handleResponse } from '@/utils/authentication';
 import { defineComponent } from 'vue';
@@ -149,6 +117,7 @@ export default defineComponent({
     components: {
         BasePage,
         CardElement,
+        StatusBadge
     },
     data() {
         return {

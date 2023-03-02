@@ -23,6 +23,8 @@
 #define NTP_SERVER "pool.ntp.org"
 #define NTP_TIMEZONE "CET-1CEST,M3.5.0,M10.5.0/3"
 #define NTP_TIMEZONEDESCR "Europe/Berlin"
+#define NTP_LONGITUDE 10.4515f
+#define NTP_LATITUDE 51.1657f
 
 #define MQTT_ENABLED false
 #define MQTT_HOST ""

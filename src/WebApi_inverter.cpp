@@ -51,6 +51,10 @@ void WebApiInverterClass::onInverterList(AsyncWebServerRequest* request)
                 ((uint32_t)((config.Inverter[i].Serial >> 32) & 0xFFFFFFFF)),
                 ((uint32_t)(config.Inverter[i].Serial & 0xFFFFFFFF)));
             obj[F("serial")] = buffer;
+            obj[F("poll_enable")] = config.Inverter[i].Poll_Enable;
+            obj[F("poll_enable_night")] = config.Inverter[i].Poll_Enable_Night;
+            obj[F("command_enable")] = config.Inverter[i].Command_Enable;
+            obj[F("command_enable_night")] = config.Inverter[i].Command_Enable_Night;
 
             auto inv = Hoymiles.getInverterBySerial(config.Inverter[i].Serial);
             uint8_t max_channels;
@@ -270,6 +274,11 @@ void WebApiInverterClass::onInverterEdit(AsyncWebServerRequest* request)
         inverter.channel[arrayCount].MaxChannelPower = channel[F("max_power")].as<uint16_t>();
         inverter.channel[arrayCount].YieldTotalOffset = channel[F("yield_total_offset")].as<float>();
         strncpy(inverter.channel[arrayCount].Name, channel[F("name")] | "", sizeof(inverter.channel[arrayCount].Name));
+        inverter.Poll_Enable = root[F("poll_enable")] | true;
+        inverter.Poll_Enable_Night = root[F("poll_enable_night")] | true;
+        inverter.Command_Enable = root[F("command_enable")] | true;
+        inverter.Command_Enable_Night = root[F("command_enable_night")] | true;
+
         arrayCount++;
     }
 
@@ -297,6 +306,8 @@ void WebApiInverterClass::onInverterEdit(AsyncWebServerRequest* request)
     }
 
     if (inv != nullptr) {
+        inv->setEnablePolling(inverter.Poll_Enable);
+        inv->setEnableCommands(inverter.Command_Enable);
         for (uint8_t c = 0; c < INV_MAX_CHAN_COUNT; c++) {
             inv->Statistics()->setStringMaxPower(c, inverter.channel[c].MaxChannelPower);
             inv->Statistics()->setChannelFieldOffset(TYPE_DC, static_cast<ChannelNum_t>(c), FLD_YT, inverter.channel[c].YieldTotalOffset);

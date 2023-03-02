@@ -7,6 +7,18 @@
     <table v-if="devInfoList.valid_data" class="table table-hover">
         <tbody>
             <tr>
+                <td>{{ $t('devinfo.Serial') }}</td>
+                <td>{{ devInfoList.serial }}</td>
+            </tr>
+            <tr>
+                <td>{{ $t('devinfo.ProdYear') }}</td>
+                <td>{{ productionYear() }}</td>
+            </tr>
+            <tr>
+                <td>{{ $t('devinfo.ProdWeek') }}</td>
+                <td>{{ productionWeek() }}</td>
+            </tr>
+            <tr>
                 <td>{{ $t('devinfo.Model') }}</td>
                 <td v-if="devInfoList.hw_model_name != ''">{{ devInfoList.hw_model_name }}</td>
                 <td v-else v-html="$t('devinfo.UnknownModel')"></td>
@@ -61,6 +73,16 @@ export default defineComponent({
                 const version_patch = Math.floor((value - version_major * 10000 - version_minor * 100));
                 return version_major + "." + version_minor + "." + version_patch;
             };
+        },
+        productionYear() {
+            return() => {
+                return ((parseInt(this.devInfoList.serial.toString(), 16) >> (7 * 4)) & 0xF) + 2014;
+            }
+        },
+        productionWeek() {
+            return() => {
+                return ((parseInt(this.devInfoList.serial.toString(), 16) >> (5 * 4)) & 0xFF).toString(16);
+            }
         }
     }
 });
