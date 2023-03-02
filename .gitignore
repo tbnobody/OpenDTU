@@ -4,5 +4,6 @@
 .vscode/launch.json
 .vscode/ipch
 .vscode/settings.json
+.vscode/extensions.json
 platformio-device-monitor*.log
 platformio_override.ini
