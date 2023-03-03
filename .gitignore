@@ -5,6 +5,5 @@
 .vscode/ipch
 .vscode/settings.json
 .vscode/extensions.json
-.gitignore
 platformio-device-monitor*.log
 platformio_override.ini
