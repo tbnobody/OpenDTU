@@ -114,7 +114,7 @@ void PowerLimiterClass::loop()
             _consumeSolarPowerOnly = true;
         }
 
-        if ((!_consumeSolarPowerOnly && isStopThresholdReached(inverter))
+        if (isStopThresholdReached(inverter)
                 || (_consumeSolarPowerOnly && !canUseDirectSolarPower())) {
             // DC voltage too low, stop the inverter
             MessageOutput.printf("[PowerLimiterClass::loop] DC voltage: %.2f Corrected DC voltage: %.2f...\r\n",
@@ -132,7 +132,7 @@ void PowerLimiterClass::loop()
             return;
         }
     } else {
-        if ((isStartThresholdReached(inverter) || canUseDirectSolarPower()) && powerMeter >= config.PowerLimiter_LowerPowerLimit) {
+        if ((isStartThresholdReached(inverter) || (_consumeSolarPowerOnly && canUseDirectSolarPower() && (!isStopThresholdReached(inverter)))) && powerMeter >= config.PowerLimiter_LowerPowerLimit) {
             // DC voltage high enough, start the inverter
             MessageOutput.println("[PowerLimiterClass::loop] Starting up inverter...");
             _lastCommandSent = millis();
