@@ -23,7 +23,6 @@ void PowerLimiterClass::init()
     using std::placeholders::_5;
     using std::placeholders::_6;
 
-    _lastRequestedPowerLimit = 0;
 
     CONFIG_T& config = Configuration.get();
 
@@ -41,6 +40,10 @@ void PowerLimiterClass::init()
     }
 
     _consumeSolarPowerOnly = true;
+     _lastCommandSent = 0;
+    _lastLoop = 0;
+    _lastPowerMeterUpdate = 0;
+    _lastRequestedPowerLimit = 0;
 }
 
 void PowerLimiterClass::onMqttMessage(const espMqttClientTypes::MessageProperties& properties, const char* topic, const uint8_t* payload, size_t len, size_t index, size_t total)
@@ -91,7 +94,7 @@ void PowerLimiterClass::loop()
     }
 
     float efficency = inverter->Statistics()->getChannelFieldValue(TYPE_AC, (ChannelNum_t) config.PowerLimiter_InverterChannelId, FLD_EFF);
-    uint16_t victronChargePower = this->getDirectSolarPower();
+    uint32_t victronChargePower = this->getDirectSolarPower();
 
     MessageOutput.printf("[PowerLimiterClass::loop] victronChargePower: %d, efficiency: %.2f, consumeSolarPowerOnly: %s \r\n", victronChargePower, efficency, _consumeSolarPowerOnly ? "true" : "false");
    
@@ -133,7 +136,8 @@ void PowerLimiterClass::loop()
             return;
         }
     } else {
-        if ((isStartThresholdReached(inverter) || (canUseDirectSolarPower() && (!isStopThresholdReached(inverter)))) && powerMeter >= config.PowerLimiter_LowerPowerLimit) {
+        if ((isStartThresholdReached(inverter) || (canUseDirectSolarPower() && (!isStopThresholdReached(inverter)))) 
+                && powerMeter >= config.PowerLimiter_LowerPowerLimit) {
             // DC voltage high enough, start the inverter
             MessageOutput.println("[PowerLimiterClass::loop] Starting up inverter...");
             _lastCommandSent = millis();
