@@ -90,9 +90,10 @@ void PowerLimiterClass::loop()
         return;
     }
 
+    float efficency = inverter->Statistics()->getChannelFieldValue(TYPE_AC, (ChannelNum_t) config.PowerLimiter_InverterChannelId, FLD_EFF);
     uint16_t victronChargePower = this->getDirectSolarPower();
 
-    MessageOutput.printf("[PowerLimiterClass::loop] victronChargePower: %d, consumeSolarPowerOnly: %s \r\n", victronChargePower, _consumeSolarPowerOnly ? "true" : "false");
+    MessageOutput.printf("[PowerLimiterClass::loop] victronChargePower: %d, efficiency: %.2f, consumeSolarPowerOnly: %s \r\n", victronChargePower, efficency, _consumeSolarPowerOnly ? "true" : "false");
    
     if (millis() - _lastPowerMeterUpdate < (30 * 1000)) {
         MessageOutput.printf("[PowerLimiterClass::loop] dcVoltage: %.2f Voltage Start Threshold: %.2f Voltage Stop Threshold: %.2f inverter->isProducing(): %d\r\n",
@@ -114,7 +115,7 @@ void PowerLimiterClass::loop()
             _consumeSolarPowerOnly = true;
         }
 
-        if ((!_consumeSolarPowerOnly && isStopThresholdReached(inverter))
+        if (isStopThresholdReached(inverter)
                 || (_consumeSolarPowerOnly && !canUseDirectSolarPower())) {
             // DC voltage too low, stop the inverter
             MessageOutput.printf("[PowerLimiterClass::loop] DC voltage: %.2f Corrected DC voltage: %.2f...\r\n",
@@ -132,7 +133,7 @@ void PowerLimiterClass::loop()
             return;
         }
     } else {
-        if ((isStartThresholdReached(inverter) || canUseDirectSolarPower()) && powerMeter >= config.PowerLimiter_LowerPowerLimit) {
+        if ((isStartThresholdReached(inverter) || (canUseDirectSolarPower() && (!isStopThresholdReached(inverter)))) && powerMeter >= config.PowerLimiter_LowerPowerLimit) {
             // DC voltage high enough, start the inverter
             MessageOutput.println("[PowerLimiterClass::loop] Starting up inverter...");
             _lastCommandSent = millis();
@@ -170,8 +171,8 @@ void PowerLimiterClass::loop()
 
             uint16_t upperPowerLimit = config.PowerLimiter_UpperPowerLimit;
             if (_consumeSolarPowerOnly && (upperPowerLimit > victronChargePower)) {
-                // Battery voltage too low, use Victron solar power only
-                upperPowerLimit = victronChargePower;
+                // Battery voltage too low, use Victron solar power (corrected by efficency factor) only
+                upperPowerLimit = victronChargePower * (efficency / 100.0);
             }
 
             if (newPowerLimit > upperPowerLimit) 
