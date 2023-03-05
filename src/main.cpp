@@ -7,6 +7,7 @@
 #include "InverterSettings.h"
 #include "MessageOutput.h"
 #include "VeDirectFrameHandler.h"
+#include "PylontechCanReceiver.h"
 #include "MqttHandleDtu.h"
 #include "MqttHandleHass.h"
 #include "MqttHandleVedirectHass.h"
@@ -20,7 +21,6 @@
 #include "Utils.h"
 #include "WebApi.h"
 #include "PowerLimiter.h"
-#include "PylontechCanReceiver.h"
 #include "defaults.h"
 #include <Arduino.h>
 #include <LittleFS.h>
