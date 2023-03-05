@@ -227,6 +227,8 @@ A documentation of the Web API can be found here: [Web-API Documentation](docs/W
 * <https://www.thingiverse.com/thing:5661780>
 * <https://www.thingiverse.com/thing:5632374>
 * <https://www.thingiverse.com/thing:5852233>
+* <https://www.printables.com/model/377994-opendtu-pcb-box-for-the-wider-board>
+* <https://www.printables.com/model/376840-esp32-ahoy-opendtu-pcb-housing>
 
 ## Available layouts for printed circuit boards
 * [BreakoutBoard - sample printed circuit board for OpenDTU and Ahoy](https://github.com/dokuhn/openDTU-BreakoutBoard)
