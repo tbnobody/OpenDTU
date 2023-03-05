@@ -110,7 +110,7 @@ void PowerLimiterClass::loop()
         if ((_consumeSolarPowerOnly && isStartThresholdReached(inverter))) {
             // The battery is full enough again, use the full battery power from now on.
             _consumeSolarPowerOnly = false;
-        } else if (!_consumeSolarPowerOnly && !isStopThresholdReached(inverter) && canUseDirectSolarPower()) {
+        } else if (!_consumeSolarPowerOnly && isStopThresholdReached(inverter) && canUseDirectSolarPower()) {
             // The battery voltage dropped too low
             _consumeSolarPowerOnly = true;
         }
