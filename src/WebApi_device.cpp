@@ -73,6 +73,10 @@ void WebApiDeviceClass::onDeviceAdminGet(AsyncWebServerRequest* request)
     victronPinObj[F("rx")] = pin.victron_rx;
     victronPinObj[F("tx")] = pin.victron_tx;
 
+    JsonObject batteryPinObj = curPin.createNestedObject("battery");
+    batteryPinObj[F("rx")] = pin.battery_rx;
+    batteryPinObj[F("tx")] = pin.battery_tx;
+
     response->setLength();
     request->send(response);
 }

@@ -17,7 +17,8 @@
 
 class PylontechCanReceiverClass {
 public:
-    void init();
+    void init(int8_t rx, int8_t tx);
+    void enable();
     void loop();
     void parseCanPackets();
     void mqtt();
