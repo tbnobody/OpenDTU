@@ -22,20 +22,20 @@ void HoymilesClass::init(SPIClass* initialisedSpiBus, uint8_t pinCE, uint8_t pin
     HOY_SEMAPHORE_GIVE();  // release before first use
 
     _pollInterval = 0;
-    _radio.reset(new HoymilesRadio());
-    _radio->init(initialisedSpiBus, pinCE, pinIRQ);
+    _radioNrf.reset(new HoymilesRadio_NRF());
+    _radioNrf->init(initialisedSpiBus, pinCE, pinIRQ);
 }
 
 void HoymilesClass::loop()
 {
     HOY_SEMAPHORE_TAKE();
-    _radio->loop();
+    _radioNrf->loop();
 
     if (getNumInverters() > 0) {
         if (millis() - _lastPoll > (_pollInterval * 1000)) {
             static uint8_t inverterPos = 0;
 
-            if (_radio->isIdle()) {
+            if (_radioNrf->isIdle()) {
                 std::shared_ptr<InverterAbstract> iv = getInverterByPos(inverterPos);
                 if (iv != nullptr) {
                     _messageOutput->print("Fetch inverter: ");
@@ -89,17 +89,17 @@ std::shared_ptr<InverterAbstract> HoymilesClass::addInverter(const char* name, u
 {
     std::shared_ptr<InverterAbstract> i = nullptr;
     if (HMS_4CH::isValidSerial(serial)) {
-        i = std::make_shared<HMS_4CH>(_radio.get(), serial);
+        i = std::make_shared<HMS_4CH>(_radioNrf.get(), serial);
     } else if (HMS_2CH::isValidSerial(serial)) {
-        i = std::make_shared<HMS_2CH>(_radio.get(), serial);
+        i = std::make_shared<HMS_2CH>(_radioNrf.get(), serial);
     } else if (HMS_1CH::isValidSerial(serial)) {
-        i = std::make_shared<HMS_1CH>(_radio.get(), serial);
+        i = std::make_shared<HMS_1CH>(_radioNrf.get(), serial);
     } else if (HM_4CH::isValidSerial(serial)) {
-        i = std::make_shared<HM_4CH>(_radio.get(), serial);
+        i = std::make_shared<HM_4CH>(_radioNrf.get(), serial);
     } else if (HM_2CH::isValidSerial(serial)) {
-        i = std::make_shared<HM_2CH>(_radio.get(), serial);
+        i = std::make_shared<HM_2CH>(_radioNrf.get(), serial);
     } else if (HM_1CH::isValidSerial(serial)) {
-        i = std::make_shared<HM_1CH>(_radio.get(), serial);
+        i = std::make_shared<HM_1CH>(_radioNrf.get(), serial);
     }
 
     if (i) {
@@ -171,9 +171,9 @@ size_t HoymilesClass::getNumInverters()
     return _inverters.size();
 }
 
-HoymilesRadio* HoymilesClass::getRadio()
+HoymilesRadio_NRF* HoymilesClass::getRadioNrf()
 {
-    return _radio.get();
+    return _radioNrf.get();
 }
 
 uint32_t HoymilesClass::PollInterval()

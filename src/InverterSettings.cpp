@@ -29,10 +29,10 @@ void InverterSettingsClass::init()
         Hoymiles.init(spiClass, pin.nrf24_en, pin.nrf24_irq);
 
         MessageOutput.println("  Setting radio PA level... ");
-        Hoymiles.getRadio()->setPALevel((rf24_pa_dbm_e)config.Dtu_PaLevel);
+        Hoymiles.getRadioNrf()->setPALevel((rf24_pa_dbm_e)config.Dtu_PaLevel);
 
         MessageOutput.println("  Setting DTU serial... ");
-        Hoymiles.getRadio()->setDtuSerial(config.Dtu_Serial);
+        Hoymiles.getRadioNrf()->setDtuSerial(config.Dtu_Serial);
 
         MessageOutput.println("  Setting poll interval... ");
         Hoymiles.setPollInterval(config.Dtu_PollInterval);

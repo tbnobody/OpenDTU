@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 #pragma once
 
-#include "HoymilesRadio.h"
+#include "HoymilesRadio_NRF.h"
 #include "inverters/InverterAbstract.h"
 #include "types.h"
 #include <Print.h>
@@ -27,14 +27,14 @@ public:
     void removeInverterBySerial(uint64_t serial);
     size_t getNumInverters();
 
-    HoymilesRadio* getRadio();
+    HoymilesRadio_NRF* getRadioNrf();
 
     uint32_t PollInterval();
     void setPollInterval(uint32_t interval);
 
 private:
     std::vector<std::shared_ptr<InverterAbstract>> _inverters;
-    std::unique_ptr<HoymilesRadio> _radio;
+    std::unique_ptr<HoymilesRadio_NRF> _radioNrf;
 
     SemaphoreHandle_t _xSemaphore;
 

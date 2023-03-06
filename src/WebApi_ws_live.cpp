@@ -175,7 +175,7 @@ void WebApiWsLiveClass::generateJsonResponse(JsonVariant& root)
     JsonObject hintObj = root.createNestedObject("hints");
     struct tm timeinfo;
     hintObj["time_sync"] = !getLocalTime(&timeinfo, 5);
-    hintObj["radio_problem"] = (!Hoymiles.getRadio()->isConnected() || !Hoymiles.getRadio()->isPVariant());
+    hintObj["radio_problem"] = (!Hoymiles.getRadioNrf()->isConnected() || !Hoymiles.getRadioNrf()->isPVariant());
     if (!strcmp(Configuration.get().Security_Password, ACCESS_POINT_PASSWORD)) {
         hintObj["default_password"] = true;
     } else {
