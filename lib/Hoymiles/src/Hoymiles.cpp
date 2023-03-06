@@ -6,6 +6,9 @@
 #include "inverters/HM_1CH.h"
 #include "inverters/HM_2CH.h"
 #include "inverters/HM_4CH.h"
+#include "inverters/HMS_1CH.h"
+#include "inverters/HMS_2CH.h"
+#include "inverters/HMS_4CH.h"
 #include <Arduino.h>
 
 #define HOY_SEMAPHORE_TAKE() xSemaphoreTake(_xSemaphore, portMAX_DELAY)
@@ -85,7 +88,13 @@ void HoymilesClass::loop()
 std::shared_ptr<InverterAbstract> HoymilesClass::addInverter(const char* name, uint64_t serial)
 {
     std::shared_ptr<InverterAbstract> i = nullptr;
-    if (HM_4CH::isValidSerial(serial)) {
+    if (HMS_4CH::isValidSerial(serial)) {
+        i = std::make_shared<HMS_4CH>(serial);
+    } else if (HMS_2CH::isValidSerial(serial)) {
+        i = std::make_shared<HMS_2CH>(serial);
+    } else if (HMS_1CH::isValidSerial(serial)) {
+        i = std::make_shared<HMS_1CH>(serial);
+    } else if (HM_4CH::isValidSerial(serial)) {
         i = std::make_shared<HM_4CH>(serial);
     } else if (HM_2CH::isValidSerial(serial)) {
         i = std::make_shared<HM_2CH>(serial);

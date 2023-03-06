@@ -8,6 +8,7 @@
 #include <memory>
 #include <nRF24L01.h>
 #include <queue>
+#include <cmt2300a.h>
 
 // number of fragments hold in buffer
 #define FRAGMENT_BUFFER_SIZE 30
