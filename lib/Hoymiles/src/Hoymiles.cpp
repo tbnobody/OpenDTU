@@ -41,36 +41,36 @@ void HoymilesClass::loop()
                     _messageOutput->print("Fetch inverter: ");
                     _messageOutput->println(iv->serial(), HEX);
 
-                    iv->sendStatsRequest(_radio.get());
+                    iv->sendStatsRequest();
 
                     // Fetch event log
                     bool force = iv->EventLog()->getLastAlarmRequestSuccess() == CMD_NOK;
-                    iv->sendAlarmLogRequest(_radio.get(), force);
+                    iv->sendAlarmLogRequest(force);
 
                     // Fetch limit
                     if ((iv->SystemConfigPara()->getLastLimitRequestSuccess() == CMD_NOK)
                         || ((millis() - iv->SystemConfigPara()->getLastUpdateRequest() > HOY_SYSTEM_CONFIG_PARA_POLL_INTERVAL)
                             && (millis() - iv->SystemConfigPara()->getLastUpdateCommand() > HOY_SYSTEM_CONFIG_PARA_POLL_MIN_DURATION))) {
                         _messageOutput->println("Request SystemConfigPara");
-                        iv->sendSystemConfigParaRequest(_radio.get());
+                        iv->sendSystemConfigParaRequest();
                     }
 
                     // Set limit if required
                     if (iv->SystemConfigPara()->getLastLimitCommandSuccess() == CMD_NOK) {
                         _messageOutput->println("Resend ActivePowerControl");
-                        iv->resendActivePowerControlRequest(_radio.get());
+                        iv->resendActivePowerControlRequest();
                     }
 
                     // Set power status if required
                     if (iv->PowerCommand()->getLastPowerCommandSuccess() == CMD_NOK) {
                         _messageOutput->println("Resend PowerCommand");
-                        iv->resendPowerControlRequest(_radio.get());
+                        iv->resendPowerControlRequest();
                     }
 
                     // Fetch dev info (but first fetch stats)
                     if (iv->Statistics()->getLastUpdate() > 0 && (iv->DevInfo()->getLastUpdateAll() == 0 || iv->DevInfo()->getLastUpdateSimple() == 0)) {
                         _messageOutput->println("Request device info");
-                        iv->sendDevInfoRequest(_radio.get());
+                        iv->sendDevInfoRequest();
                     }
                 }
                 if (++inverterPos >= getNumInverters()) {
@@ -89,17 +89,17 @@ std::shared_ptr<InverterAbstract> HoymilesClass::addInverter(const char* name, u
 {
     std::shared_ptr<InverterAbstract> i = nullptr;
     if (HMS_4CH::isValidSerial(serial)) {
-        i = std::make_shared<HMS_4CH>(serial);
+        i = std::make_shared<HMS_4CH>(_radio.get(), serial);
     } else if (HMS_2CH::isValidSerial(serial)) {
-        i = std::make_shared<HMS_2CH>(serial);
+        i = std::make_shared<HMS_2CH>(_radio.get(), serial);
     } else if (HMS_1CH::isValidSerial(serial)) {
-        i = std::make_shared<HMS_1CH>(serial);
+        i = std::make_shared<HMS_1CH>(_radio.get(), serial);
     } else if (HM_4CH::isValidSerial(serial)) {
-        i = std::make_shared<HM_4CH>(serial);
+        i = std::make_shared<HM_4CH>(_radio.get(), serial);
     } else if (HM_2CH::isValidSerial(serial)) {
-        i = std::make_shared<HM_2CH>(serial);
+        i = std::make_shared<HM_2CH>(_radio.get(), serial);
     } else if (HM_1CH::isValidSerial(serial)) {
-        i = std::make_shared<HM_1CH>(serial);
+        i = std::make_shared<HM_1CH>(_radio.get(), serial);
     }
 
     if (i) {

@@ -4,5 +4,5 @@
  */
 #include "HMS_Abstract.h"
 
-HMS_Abstract::HMS_Abstract(uint64_t serial)
-    : HM_Abstract(serial) {};
+HMS_Abstract::HMS_Abstract(HoymilesRadio* radio, uint64_t serial)
+    : HM_Abstract(radio, serial) {};

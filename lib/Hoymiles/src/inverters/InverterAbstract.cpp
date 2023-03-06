@@ -7,9 +7,10 @@
 #include "crc.h"
 #include <cstring>
 
-InverterAbstract::InverterAbstract(uint64_t serial)
+InverterAbstract::InverterAbstract(HoymilesRadio *radio, uint64_t serial)
 {
     _serial.u64 = serial;
+    _radio = radio;
 
     char serial_buff[sizeof(uint64_t) * 8 + 1];
     snprintf(serial_buff, sizeof(serial_buff), "%0x%08x",

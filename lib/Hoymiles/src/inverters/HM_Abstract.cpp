@@ -12,10 +12,10 @@
 #include "commands/RealTimeRunDataCommand.h"
 #include "commands/SystemConfigParaCommand.h"
 
-HM_Abstract::HM_Abstract(uint64_t serial)
-    : InverterAbstract(serial) {};
+HM_Abstract::HM_Abstract(HoymilesRadio* radio, uint64_t serial)
+    : InverterAbstract(radio, serial) {};
 
-bool HM_Abstract::sendStatsRequest(HoymilesRadio* radio)
+bool HM_Abstract::sendStatsRequest()
 {
     if (!getEnablePolling()) {
         return false;
@@ -29,14 +29,14 @@ bool HM_Abstract::sendStatsRequest(HoymilesRadio* radio)
     time_t now;
     time(&now);
 
-    RealTimeRunDataCommand* cmd = radio->enqueCommand<RealTimeRunDataCommand>();
+    RealTimeRunDataCommand* cmd = _radio->enqueCommand<RealTimeRunDataCommand>();
     cmd->setTime(now);
     cmd->setTargetAddress(serial());
 
     return true;
 }
 
-bool HM_Abstract::sendAlarmLogRequest(HoymilesRadio* radio, bool force)
+bool HM_Abstract::sendAlarmLogRequest(bool force)
 {
     if (!getEnablePolling()) {
         return false;
@@ -60,7 +60,7 @@ bool HM_Abstract::sendAlarmLogRequest(HoymilesRadio* radio, bool force)
     time_t now;
     time(&now);
 
-    AlarmDataCommand* cmd = radio->enqueCommand<AlarmDataCommand>();
+    AlarmDataCommand* cmd = _radio->enqueCommand<AlarmDataCommand>();
     cmd->setTime(now);
     cmd->setTargetAddress(serial());
     EventLog()->setLastAlarmRequestSuccess(CMD_PENDING);
@@ -68,7 +68,7 @@ bool HM_Abstract::sendAlarmLogRequest(HoymilesRadio* radio, bool force)
     return true;
 }
 
-bool HM_Abstract::sendDevInfoRequest(HoymilesRadio* radio)
+bool HM_Abstract::sendDevInfoRequest()
 {
     if (!getEnablePolling()) {
         return false;
@@ -82,18 +82,18 @@ bool HM_Abstract::sendDevInfoRequest(HoymilesRadio* radio)
     time_t now;
     time(&now);
 
-    DevInfoAllCommand* cmdAll = radio->enqueCommand<DevInfoAllCommand>();
+    DevInfoAllCommand* cmdAll = _radio->enqueCommand<DevInfoAllCommand>();
     cmdAll->setTime(now);
     cmdAll->setTargetAddress(serial());
 
-    DevInfoSimpleCommand* cmdSimple = radio->enqueCommand<DevInfoSimpleCommand>();
+    DevInfoSimpleCommand* cmdSimple = _radio->enqueCommand<DevInfoSimpleCommand>();
     cmdSimple->setTime(now);
     cmdSimple->setTargetAddress(serial());
 
     return true;
 }
 
-bool HM_Abstract::sendSystemConfigParaRequest(HoymilesRadio* radio)
+bool HM_Abstract::sendSystemConfigParaRequest()
 {
     if (!getEnablePolling()) {
         return false;
@@ -107,7 +107,7 @@ bool HM_Abstract::sendSystemConfigParaRequest(HoymilesRadio* radio)
     time_t now;
     time(&now);
 
-    SystemConfigParaCommand* cmd = radio->enqueCommand<SystemConfigParaCommand>();
+    SystemConfigParaCommand* cmd = _radio->enqueCommand<SystemConfigParaCommand>();
     cmd->setTime(now);
     cmd->setTargetAddress(serial());
     SystemConfigPara()->setLastLimitRequestSuccess(CMD_PENDING);
@@ -115,7 +115,7 @@ bool HM_Abstract::sendSystemConfigParaRequest(HoymilesRadio* radio)
     return true;
 }
 
-bool HM_Abstract::sendActivePowerControlRequest(HoymilesRadio* radio, float limit, PowerLimitControlType type)
+bool HM_Abstract::sendActivePowerControlRequest(float limit, PowerLimitControlType type)
 {
     if (!getEnableCommands()) {
         return false;
@@ -128,7 +128,7 @@ bool HM_Abstract::sendActivePowerControlRequest(HoymilesRadio* radio, float limi
     _activePowerControlLimit = limit;
     _activePowerControlType = type;
 
-    ActivePowerControlCommand* cmd = radio->enqueCommand<ActivePowerControlCommand>();
+    ActivePowerControlCommand* cmd = _radio->enqueCommand<ActivePowerControlCommand>();
     cmd->setActivePowerLimit(limit, type);
     cmd->setTargetAddress(serial());
     SystemConfigPara()->setLastLimitCommandSuccess(CMD_PENDING);
@@ -136,12 +136,12 @@ bool HM_Abstract::sendActivePowerControlRequest(HoymilesRadio* radio, float limi
     return true;
 }
 
-bool HM_Abstract::resendActivePowerControlRequest(HoymilesRadio* radio)
+bool HM_Abstract::resendActivePowerControlRequest()
 {
-    return sendActivePowerControlRequest(radio, _activePowerControlLimit, _activePowerControlType);
+    return sendActivePowerControlRequest(_activePowerControlLimit, _activePowerControlType);
 }
 
-bool HM_Abstract::sendPowerControlRequest(HoymilesRadio* radio, bool turnOn)
+bool HM_Abstract::sendPowerControlRequest(bool turnOn)
 {
     if (!getEnableCommands()) {
         return false;
@@ -153,7 +153,7 @@ bool HM_Abstract::sendPowerControlRequest(HoymilesRadio* radio, bool turnOn)
         _powerState = 0;
     }
 
-    PowerControlCommand* cmd = radio->enqueCommand<PowerControlCommand>();
+    PowerControlCommand* cmd = _radio->enqueCommand<PowerControlCommand>();
     cmd->setPowerOn(turnOn);
     cmd->setTargetAddress(serial());
     PowerCommand()->setLastPowerCommandSuccess(CMD_PENDING);
@@ -161,7 +161,7 @@ bool HM_Abstract::sendPowerControlRequest(HoymilesRadio* radio, bool turnOn)
     return true;
 }
 
-bool HM_Abstract::sendRestartControlRequest(HoymilesRadio* radio)
+bool HM_Abstract::sendRestartControlRequest()
 {
     if (!getEnableCommands()) {
         return false;
@@ -169,7 +169,7 @@ bool HM_Abstract::sendRestartControlRequest(HoymilesRadio* radio)
 
     _powerState = 2;
 
-    PowerControlCommand* cmd = radio->enqueCommand<PowerControlCommand>();
+    PowerControlCommand* cmd = _radio->enqueCommand<PowerControlCommand>();
     cmd->setRestart();
     cmd->setTargetAddress(serial());
     PowerCommand()->setLastPowerCommandSuccess(CMD_PENDING);
@@ -177,17 +177,17 @@ bool HM_Abstract::sendRestartControlRequest(HoymilesRadio* radio)
     return true;
 }
 
-bool HM_Abstract::resendPowerControlRequest(HoymilesRadio* radio)
+bool HM_Abstract::resendPowerControlRequest()
 {
     switch (_powerState) {
     case 0:
-        return sendPowerControlRequest(radio, false);
+        return sendPowerControlRequest(false);
         break;
     case 1:
-        return sendPowerControlRequest(radio, true);
+        return sendPowerControlRequest(true);
         break;
     case 2:
-        return sendRestartControlRequest(radio);
+        return sendRestartControlRequest();
         break;
 
     default:

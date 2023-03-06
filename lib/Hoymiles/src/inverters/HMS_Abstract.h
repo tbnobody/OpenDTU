@@ -5,5 +5,5 @@
 
 class HMS_Abstract : public HM_Abstract {
 public:
-    explicit HMS_Abstract(uint64_t serial);
+    explicit HMS_Abstract(HoymilesRadio* radio, uint64_t serial);
 };

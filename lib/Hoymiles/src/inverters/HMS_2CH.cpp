@@ -4,8 +4,8 @@
  */
 #include "HMS_2CH.h"
 
-HMS_2CH::HMS_2CH(uint64_t serial)
-    : HMS_Abstract(serial) {};
+HMS_2CH::HMS_2CH(HoymilesRadio* radio, uint64_t serial)
+    : HMS_Abstract(radio, serial) {};
 
 bool HMS_2CH::isValidSerial(uint64_t serial)
 {

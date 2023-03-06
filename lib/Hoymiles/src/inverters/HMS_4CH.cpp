@@ -4,8 +4,8 @@
  */
 #include "HMS_4CH.h"
 
-HMS_4CH::HMS_4CH(uint64_t serial)
-    : HMS_Abstract(serial) {};
+HMS_4CH::HMS_4CH(HoymilesRadio* radio, uint64_t serial)
+    : HMS_Abstract(radio, serial) {};
 
 bool HMS_4CH::isValidSerial(uint64_t serial)
 {

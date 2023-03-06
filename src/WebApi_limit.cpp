@@ -146,7 +146,7 @@ void WebApiLimitClass::onLimitPost(AsyncWebServerRequest* request)
         return;
     }
 
-    inv->sendActivePowerControlRequest(Hoymiles.getRadio(), limit, type);
+    inv->sendActivePowerControlRequest(limit, type);
 
     retMsg["type"] = "success";
     retMsg["message"] = "Settings saved!";
