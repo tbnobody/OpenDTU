@@ -27,6 +27,7 @@ void setup()
     Serial.begin(SERIAL_BAUDRATE);
     while (!Serial)
         yield();
+    sleep(1); // waiting for vs code terminal to be re-connected
     MessageOutput.println();
     MessageOutput.println("Starting OpenDTU");
 
