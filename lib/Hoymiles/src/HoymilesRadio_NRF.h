@@ -31,11 +31,8 @@ private:
     void switchRxCh();
     void openReadingPipe();
     void openWritingPipe(serial_u serial);
-    bool checkFragmentCrc(fragment_t* fragment);
 
     void sendEsbPacket(CommandAbstract* cmd);
-    void sendRetransmitPacket(uint8_t fragment_id);
-    void sendLastPacketAgain();
 
     std::unique_ptr<SPIClass> _spiPtr;
     std::unique_ptr<RF24> _radio;

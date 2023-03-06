@@ -5,7 +5,6 @@
 #include "HoymilesRadio_NRF.h"
 #include "Hoymiles.h"
 #include "commands/RequestFrameCommand.h"
-#include "crc.h"
 #include <Every.h>
 #include <FunctionalInterrupt.h>
 
@@ -215,11 +214,7 @@ void HoymilesRadio_NRF::switchRxCh()
     _radio->startListening();
 }
 
-bool HoymilesRadio_NRF::checkFragmentCrc(fragment_t* fragment)
-{
-    uint8_t crc = crc8(fragment->fragment, fragment->len - 1);
-    return (crc == fragment->fragment[fragment->len - 1]);
-}
+
 
 void HoymilesRadio_NRF::sendEsbPacket(CommandAbstract* cmd)
 {
@@ -250,21 +245,3 @@ void HoymilesRadio_NRF::sendEsbPacket(CommandAbstract* cmd)
     _busyFlag = true;
     _rxTimeout.set(cmd->getTimeout());
 }
-
-void HoymilesRadio_NRF::sendRetransmitPacket(uint8_t fragment_id)
-{
-    CommandAbstract* cmd = _commandQueue.front().get();
-
-    CommandAbstract* requestCmd = cmd->getRequestFrameCommand(fragment_id);
-
-    if (requestCmd != nullptr) {
-        sendEsbPacket(requestCmd);
-    }
-}
-
-void HoymilesRadio_NRF::sendLastPacketAgain()
-{
-    CommandAbstract* cmd = _commandQueue.front().get();
-    sendEsbPacket(cmd);
-}
-

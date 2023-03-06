@@ -4,6 +4,7 @@
  */
 #include "HoymilesRadio.h"
 #include "Hoymiles.h"
+#include "crc.h"
 
 serial_u HoymilesRadio::DtuSerial()
 {
@@ -25,6 +26,29 @@ serial_u HoymilesRadio::convertSerialToRadioId(serial_u serial)
     radioId.b[1] = serial.b[3];
     radioId.b[0] = 0x01;
     return radioId;
+}
+
+bool HoymilesRadio::checkFragmentCrc(fragment_t* fragment)
+{
+    uint8_t crc = crc8(fragment->fragment, fragment->len - 1);
+    return (crc == fragment->fragment[fragment->len - 1]);
+}
+
+void HoymilesRadio::sendRetransmitPacket(uint8_t fragment_id)
+{
+    CommandAbstract* cmd = _commandQueue.front().get();
+
+    CommandAbstract* requestCmd = cmd->getRequestFrameCommand(fragment_id);
+
+    if (requestCmd != nullptr) {
+        sendEsbPacket(requestCmd);
+    }
+}
+
+void HoymilesRadio::sendLastPacketAgain()
+{
+    CommandAbstract* cmd = _commandQueue.front().get();
+    sendEsbPacket(cmd);
 }
 
 void HoymilesRadio::dumpBuf(const char* info, uint8_t buf[], uint8_t len)
