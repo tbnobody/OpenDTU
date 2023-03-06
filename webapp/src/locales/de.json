@@ -25,6 +25,11 @@
     "base": {
         "Loading": "Lade..."
     },
+    "localeswitcher": {
+        "Dark": "Dunkel",
+        "Light": "Hell",
+        "Auto": "Automatisch"
+    },
     "apiresponse": {
         "1001": "Einstellungen gespeichert!",
         "1002": "Keine Werte gefunden!",
