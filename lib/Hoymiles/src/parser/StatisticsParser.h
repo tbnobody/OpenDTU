@@ -60,7 +60,7 @@ enum ChannelNum_t {
     CH1,
     CH2,
     CH3,
-    CH4
+    CH_CNT
 };
 
 enum ChannelType_t {
@@ -122,7 +122,7 @@ public:
 private:
     uint8_t _payloadStatistic[STATISTIC_PACKET_SIZE] = {};
     uint8_t _statisticLength = 0;
-    uint16_t _stringMaxPower[CH4];
+    uint16_t _stringMaxPower[CH_CNT];
 
     const std::list<byteAssign_t>* _byteAssignment;
     std::list<fieldSettings_t> _fieldSettings;
