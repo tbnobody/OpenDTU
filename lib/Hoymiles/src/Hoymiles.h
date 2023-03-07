@@ -2,6 +2,7 @@
 #pragma once
 
 #include "HoymilesRadio_NRF.h"
+#include "HoymilesRadio_CMT.h"
 #include "inverters/InverterAbstract.h"
 #include "types.h"
 #include <Print.h>
@@ -35,6 +36,7 @@ public:
 private:
     std::vector<std::shared_ptr<InverterAbstract>> _inverters;
     std::unique_ptr<HoymilesRadio_NRF> _radioNrf;
+    std::unique_ptr<HoymilesRadio_CMT> _radioCmt;
 
     SemaphoreHandle_t _xSemaphore;
 
