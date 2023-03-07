@@ -9,16 +9,21 @@
 
 PylontechCanReceiverClass PylontechCanReceiver;
 
-void PylontechCanReceiverClass::init()
+void PylontechCanReceiverClass::init(int8_t rx, int8_t tx)
 {
+    CAN.setPins(rx, tx);
+
     CONFIG_T& config = Configuration.get();
 
     if (!config.Battery_Enabled) {
         return;
     }
-  
-    CAN.setPins(PYLONTECH_PIN_RX, PYLONTECH_PIN_TX);
 
+    enable();
+}
+
+void PylontechCanReceiverClass::enable()
+{
     if (!CAN.begin(500E3)) {
         Hoymiles.getMessageOutput()->println("Starting CAN failed!");
     }

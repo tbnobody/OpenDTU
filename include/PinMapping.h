@@ -31,6 +31,8 @@ struct PinMapping_t {
     uint8_t display_reset;
     uint8_t victron_tx;
     uint8_t victron_rx;
+    uint8_t battery_rx;
+    uint8_t battery_tx;
 };
 
 class PinMappingClass {
@@ -42,6 +44,7 @@ public:
     bool isValidNrf24Config();
     bool isValidEthConfig();
     bool isValidVictronConfig();
+    bool isValidBatteryConfig();
 
 private:
     PinMapping_t _pinMapping;

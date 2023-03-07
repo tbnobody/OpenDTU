@@ -270,7 +270,9 @@ This can be achieved by copying one of the [env:....] sections from 'platformio.
 -DHOYMILES_PIN_CE=4
 -DHOYMILES_PIN_CS=5
 -DVICTRON_PIN_TX=21
--DVICTRON_PIN_RX=22 
+-DVICTRON_PIN_RX=22
+-DPYLONTECH_PIN_RX=27
+-DPYLONTECH_PIN_TX=14
 ```
 It is recommended to make all changes only in the  'platformio_override.ini', this is your personal copy.
 You can also change  the pins by creating a custom [device profile](docs/DeviceProfiles.md).

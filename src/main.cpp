@@ -7,6 +7,7 @@
 #include "InverterSettings.h"
 #include "MessageOutput.h"
 #include "VeDirectFrameHandler.h"
+#include "PylontechCanReceiver.h"
 #include "MqttHandleDtu.h"
 #include "MqttHandleHass.h"
 #include "MqttHandleVedirectHass.h"
@@ -20,7 +21,6 @@
 #include "Utils.h"
 #include "WebApi.h"
 #include "PowerLimiter.h"
-#include "PylontechCanReceiver.h"
 #include "defaults.h"
 #include <Arduino.h>
 #include <LittleFS.h>
@@ -149,8 +149,15 @@ void setup()
     // Dynamic power limiter
     PowerLimiter.init();
 
-    // Pylontech / CAN bus
-    PylontechCanReceiver.init();
+    // Initialize Pylontech Battery / CAN bus
+    MessageOutput.println(F("Initialize Pylontech battery interface... "));
+    if (PinMapping.isValidBatteryConfig()) {
+        MessageOutput.printf("Pylontech Battery rx = %d, tx = %d\r\n", pin.battery_rx, pin.battery_tx);
+        PylontechCanReceiver.init(pin.battery_rx, pin.battery_tx);
+        MessageOutput.println(F("done"));
+    } else {
+        MessageOutput.println(F("Invalid pin config"));
+    }
 }
 
 void loop()

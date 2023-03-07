@@ -40,7 +40,7 @@ void PowerLimiterClass::init()
     }
 
     _consumeSolarPowerOnly = true;
-     _lastCommandSent = 0;
+    _lastCommandSent = 0;
     _lastLoop = 0;
     _lastPowerMeterUpdate = 0;
     _lastRequestedPowerLimit = 0;
@@ -48,8 +48,6 @@ void PowerLimiterClass::init()
 
 void PowerLimiterClass::onMqttMessage(const espMqttClientTypes::MessageProperties& properties, const char* topic, const uint8_t* payload, size_t len, size_t index, size_t total)
 {
-    MessageOutput.printf("PowerLimiterClass: Received MQTT message on topic: %s\r\n", topic);
-
     CONFIG_T& config = Configuration.get();
 
     if (strcmp(topic, config.PowerLimiter_MqttTopicPowerMeter1) == 0) {
@@ -109,11 +107,10 @@ void PowerLimiterClass::loop()
         float acPower = inverter->Statistics()->getChannelFieldValue(TYPE_AC, (ChannelNum_t) config.PowerLimiter_InverterChannelId, FLD_PAC); 
         float correctedDcVoltage = dcVoltage + (acPower * config.PowerLimiter_VoltageLoadCorrectionFactor);
 
-        if ((_consumeSolarPowerOnly && isStartThresholdReached(inverter))
-                || !canUseDirectSolarPower()) {
+        if ((_consumeSolarPowerOnly && isStartThresholdReached(inverter))) {
             // The battery is full enough again, use the full battery power from now on.
             _consumeSolarPowerOnly = false;
-        } else if (!_consumeSolarPowerOnly && !isStopThresholdReached(inverter) && canUseDirectSolarPower()) {
+        } else if (!_consumeSolarPowerOnly && isStopThresholdReached(inverter) && canUseDirectSolarPower()) {
             // The battery voltage dropped too low
             _consumeSolarPowerOnly = true;
         }
@@ -224,7 +221,7 @@ bool PowerLimiterClass::canUseDirectSolarPower()
 
 uint16_t PowerLimiterClass::getDirectSolarPower()
 {
-    if (!this->canUseDirectSolarPower()) {
+    if (!canUseDirectSolarPower()) {
         return 0;
     }
 
@@ -249,7 +246,7 @@ bool PowerLimiterClass::isStartThresholdReached(std::shared_ptr<InverterAbstract
 {
     CONFIG_T& config = Configuration.get();
 
-    // If the Battery interface is enabled, use the SOC value
+    // Check if the Battery interface is enabled and the SOC start threshold is reached
     if (config.Battery_Enabled
             && config.PowerLimiter_BatterySocStartThreshold > 0.0
             && (millis() - Battery.stateOfChargeLastUpdate) < 60000
@@ -270,7 +267,7 @@ bool PowerLimiterClass::isStopThresholdReached(std::shared_ptr<InverterAbstract>
 {
     CONFIG_T& config = Configuration.get();
 
-    // If the Battery interface is enabled, use the SOC value
+    // Check if the Battery interface is enabled and the SOC stop threshold is reached
     if (config.Battery_Enabled
             && config.PowerLimiter_BatterySocStopThreshold > 0.0
             && (millis() - Battery.stateOfChargeLastUpdate) < 60000
