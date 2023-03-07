@@ -61,7 +61,7 @@ private:
 
     String cmtChToFreq(const uint8_t channel);
     void cmtSwitchChannel(const uint8_t channel);
-    uint8_t cmtFreqToChan(const String func_name, const String var_name, const uint32_t freq_kHz);
+    uint8_t cmtFreqToChan(const String& func_name, const String& var_name, const uint32_t freq_kHz);
     bool cmtSwitchDtuFreq(const uint32_t to_freq_kHz);
     bool cmtConfig(void);
     bool cmtSwitchInvAndDtuFreq(const uint64_t inv_serial, const uint32_t from_freq_kHz, const uint32_t to_freq_kHz);
@@ -77,7 +77,7 @@ private:
     uint32_t cmtTxTimeCount = 0;
 
     uint8_t cmtBaseChOff860; // offset from initalized CMT base frequency to Hoy base frequency in channels
-    uint8_t cmtActualCh; // actual used channel, should be stored per inverter und set before next Tx, if hopping is used
+    uint8_t cmtCurrentCh; // current used channel, should be stored per inverter und set before next Tx, if hopping is used
 
     uint8_t cmtTx56toCh = 0xFF; // send CMD56 active to Channel xx, inactive = 0xFF
 

@@ -24,32 +24,36 @@ void HoymilesRadio_CMT::cmtSwitchChannel(const uint8_t channel)
     yield();
     CMT2300A_SetFrequencyChannel(channel);
     yield();
-    cmtActualCh = channel;
-    // Hoymiles.getMessageOutput()->println("[cmtSwitchChannel] switched channel to " + cmtGetActFreq());
+    cmtCurrentCh = channel;
 }
 
-uint8_t HoymilesRadio_CMT::cmtFreqToChan(const String func_name, const String var_name, const uint32_t freq_kHz)
+uint8_t HoymilesRadio_CMT::cmtFreqToChan(const String& func_name, const String& var_name, const uint32_t freq_kHz)
 {
     if ((freq_kHz % 250) != 0) {
-        Hoymiles.getMessageOutput()->println(func_name + " " + var_name + " " + String(freq_kHz / 1000.0, 3) + " MHz is not divisible by 250 kHz!");
+        Hoymiles.getMessageOutput()->printf("%s %s %.3f MHz is not divisible by 250 kHz!\r\n",
+            func_name.c_str(), var_name.c_str(), freq_kHz / 1000.0);
         return 0xFF; // ERROR
     }
     const uint32_t min_Freq_kHz = (HOY_BASE_FREQ + (cmtBaseChOff860 >= 1 ? cmtBaseChOff860 : 1) * CMT2300A_ONE_STEP_SIZE * FH_OFFSET) / 1000; // frequency can not be lower than actual initailized base freq
     const uint32_t max_Freq_kHz = (HOY_BASE_FREQ + 0xFE * CMT2300A_ONE_STEP_SIZE * FH_OFFSET) / 1000; // =923500, 0xFF does not work
     if (freq_kHz < min_Freq_kHz || freq_kHz > max_Freq_kHz) {
-        Hoymiles.getMessageOutput()->println(func_name + " " + var_name + " " + String(freq_kHz / 1000.0, 2) + " MHz is out of Hoymiles/CMT range! (" + String(min_Freq_kHz / 1000.0, 2) + " MHz - " + String(max_Freq_kHz / 1000.0, 2) + " MHz)");
+        Hoymiles.getMessageOutput()->printf("%s %s %.2f MHz is out of Hoymiles/CMT range! (%.2f MHz - %.2f MHz)\r\n",
+            func_name.c_str(), var_name.c_str(), freq_kHz / 1000.0, min_Freq_kHz / 1000.0, max_Freq_kHz / 1000.0);
         return 0xFF; // ERROR
     }
-    if (freq_kHz < 863000 || freq_kHz > 870000)
-        Hoymiles.getMessageOutput()->println(func_name + " !!! caution: " + var_name + " " + String(freq_kHz / 1000.0, 2) + " MHz is out of EU legal range! (863 - 870 MHz)");
+    if (freq_kHz < 863000 || freq_kHz > 870000) {
+        Hoymiles.getMessageOutput()->printf("%s !!! caution: %s %.2f MHz is out of EU legal range! (863 - 870 MHz)\r\n",
+            func_name.c_str(), var_name.c_str(), freq_kHz / 1000.0);
+    }
     return (freq_kHz * 1000 - HOY_BASE_FREQ) / CMT2300A_ONE_STEP_SIZE / FH_OFFSET - cmtBaseChOff860; // frequency to channel
 }
 
 bool HoymilesRadio_CMT::cmtSwitchDtuFreq(const uint32_t to_freq_kHz)
 {
     const uint8_t toChannel = cmtFreqToChan("[cmtSwitchDtuFreq]", "to_freq_kHz", to_freq_kHz);
-    if (toChannel == 0xFF)
+    if (toChannel == 0xFF) {
         return false;
+    }
 
     cmtSwitchChannel(toChannel);
 
@@ -58,12 +62,6 @@ bool HoymilesRadio_CMT::cmtSwitchDtuFreq(const uint32_t to_freq_kHz)
 
 bool HoymilesRadio_CMT::cmtConfig(void)
 {
-#ifdef ENABLE_ANTENNA_SWITCH
-    /* If you enable antenna switch, GPIO1/GPIO2 will output RX_ACTIVE/TX_ACTIVE,
-       and it can't output INT1/INT2 via GPIO1/GPIO2 */
-    CMT2300A_EnableAntennaSwitch(0);
-
-#else
     /* Config GPIOs */
     CMT2300A_ConfigGpio(
         CMT2300A_GPIO3_SEL_INT2);
@@ -73,14 +71,10 @@ bool HoymilesRadio_CMT::cmtConfig(void)
         CMT2300A_INT_SEL_TX_DONE, /* Config INT1 */
         CMT2300A_INT_SEL_PKT_OK /* Config INT2 */
     );
-#endif
 
     /* Enable interrupt */
     CMT2300A_EnableInterrupt(
         CMT2300A_MASK_TX_DONE_EN | CMT2300A_MASK_PREAM_OK_EN | CMT2300A_MASK_SYNC_OK_EN | CMT2300A_MASK_CRC_OK_EN | CMT2300A_MASK_PKT_DONE_EN);
-
-    /* Disable low frequency OSC calibration */
-    // CMT2300A_EnableLfosc(FALSE);
 
     CMT2300A_SetFrequencyStep(100); // set FH_OFFSET to 100 (frequency = base freq + 2.5kHz*FH_OFFSET*FH_CHANNEL)
 
@@ -88,8 +82,9 @@ bool HoymilesRadio_CMT::cmtConfig(void)
     CMT2300A_EnableFifoMerge(true);
 
     /* Go to sleep for configuration to take effect */
-    if (!CMT2300A_GoSleep())
+    if (!CMT2300A_GoSleep()) {
         return false; // CMT2300A not switched to sleep mode!
+    }
 
     return true;
 }
@@ -98,8 +93,9 @@ bool HoymilesRadio_CMT::cmtSwitchInvAndDtuFreq(const uint64_t inv_serial, const 
 {
     const uint8_t fromChannel = cmtFreqToChan("[cmtSwitchInvAndDtuFreq]", "from_freq_kHz", from_freq_kHz);
     const uint8_t toChannel = cmtFreqToChan("[cmtSwitchInvAndDtuFreq]", "to_freq_kHz", to_freq_kHz);
-    if (fromChannel == 0xFF || toChannel == 0xFF)
+    if (fromChannel == 0xFF || toChannel == 0xFF) {
         return false;
+    }
 
     cmtSwitchChannel(fromChannel);
     cmtTx56toCh = toChannel;
@@ -115,17 +111,13 @@ bool HoymilesRadio_CMT::cmtSwitchInvAndDtuFreq(const uint64_t inv_serial, const 
     cmtTxBuffer[13] = 0x14;
     cmtTxBuffer[14] = crc8(cmtTxBuffer, 14);
 
-    Hoymiles.getMessageOutput()->print("TX CMD56 ");
-    Hoymiles.getMessageOutput()->print(cmtChToFreq(cmtActualCh));
-    Hoymiles.getMessageOutput()->print(" --> ");
+    Hoymiles.getMessageOutput()->printf("TX CMD56 %s --> ", cmtChToFreq(cmtCurrentCh).c_str());
     dumpBuf("", cmtTxBuffer, 15);
 
     cmtTxLength = 15;
     cmtTxTimeout = 100;
 
     cmtNextState = CMT_STATE_TX_START;
-
-    //_busyFlag = true;
 
     return true;
 }
@@ -135,11 +127,11 @@ enumCMTresult HoymilesRadio_CMT::cmtProcess(void)
     enumCMTresult nRes = CMT_BUSY;
 
     switch (cmtNextState) {
-    case CMT_STATE_IDLE: {
+    case CMT_STATE_IDLE:
         nRes = CMT_IDLE;
         break;
-    }
-    case CMT_STATE_RX_START: {
+
+    case CMT_STATE_RX_START:
         CMT2300A_GoStby();
         CMT2300A_ClearInterruptFlags();
 
@@ -147,33 +139,31 @@ enumCMTresult HoymilesRadio_CMT::cmtProcess(void)
         CMT2300A_EnableReadFifo();
         CMT2300A_ClearRxFifo();
 
-        if (!CMT2300A_GoRx())
+        if (!CMT2300A_GoRx()) {
             cmtNextState = CMT_STATE_ERROR;
-        else
+        } else {
             cmtNextState = CMT_STATE_RX_WAIT;
+        }
 
         cmtRxTimeCount = CMT2300A_GetTickCount();
         cmtRxTimeout = 200;
 
         break;
-    }
-    case CMT_STATE_RX_WAIT: {
-#ifdef ENABLE_ANTENNA_SWITCH
-        if (CMT2300A_MASK_PKT_OK_FLG & CMT2300A_ReadReg(CMT2300A_CUS_INT_FLAG)) /* Read PKT_OK flag */
-#else
+
+    case CMT_STATE_RX_WAIT:
         if (_packetReceived) /* Read INT2, PKT_OK */
-#endif
         {
             Hoymiles.getMessageOutput()->println("Interrupt received");
             _packetReceived = false; // reset interrupt
             cmtNextState = CMT_STATE_RX_DONE;
         }
 
-        if ((CMT2300A_GetTickCount() - cmtRxTimeCount) > cmtRxTimeout)
+        if ((CMT2300A_GetTickCount() - cmtRxTimeCount) > cmtRxTimeout) {
             cmtNextState = CMT_STATE_RX_TIMEOUT;
+        }
 
         break;
-    }
+
     case CMT_STATE_RX_DONE: {
         CMT2300A_GoStby();
 
@@ -187,35 +177,40 @@ enumCMTresult HoymilesRadio_CMT::cmtProcess(void)
                 fragment_t f;
                 memset(f.fragment, 0xcc, MAX_RF_PAYLOAD_SIZE);
                 CMT2300A_ReadFifo(&f.len, 1); // first byte in FiFo is length
-                f.channel = cmtActualCh;
+                f.channel = cmtCurrentCh;
                 f.rssi = CMT2300A_GetRssiDBm();
-                if (f.len > MAX_RF_PAYLOAD_SIZE)
+                if (f.len > MAX_RF_PAYLOAD_SIZE) {
                     f.len = MAX_RF_PAYLOAD_SIZE;
+                }
                 CMT2300A_ReadFifo(f.fragment, f.len);
-                if (f.fragment[9] & 0x80) // last frame detection for end Rx
+                if (f.fragment[9] & 0x80) { // last frame detection for end Rx
                     isLastFrame = true;
+                }
                 _rxBuffer.push(f);
             } else {
                 Hoymiles.getMessageOutput()->println("Buffer full");
             }
-        } else if ((state & 0x19) == 0x19)
-            Hoymiles.getMessageOutput()->println("[CMT_STATE_RX_DONE] state: " + String(state, HEX) + " (CRC_ERROR)");
-        else
-            Hoymiles.getMessageOutput()->println("[CMT_STATE_RX_DONE] wrong state: " + String(state, HEX));
+        } else if ((state & 0x19) == 0x19) {
+            Hoymiles.getMessageOutput()->printf("[CMT_STATE_RX_DONE] state: %x (CRC_ERROR)\r\n", state);
+        } else {
+            Hoymiles.getMessageOutput()->printf("[CMT_STATE_RX_DONE] wrong state: %x\r\n", state);
+        }
 
         CMT2300A_ClearInterruptFlags();
 
         CMT2300A_GoSleep();
 
-        if (isLastFrame) // last frame received
+        if (isLastFrame) { // last frame received
             cmtNextState = CMT_STATE_IDLE;
-        else
+        } else {
             cmtNextState = CMT_STATE_RX_START; // receive next frame(s)
+        }
 
         nRes = CMT_RX_DONE;
         break;
     }
-    case CMT_STATE_RX_TIMEOUT: {
+
+    case CMT_STATE_RX_TIMEOUT:
         CMT2300A_GoSleep();
 
         Hoymiles.getMessageOutput()->println("RX timeout!");
@@ -223,17 +218,17 @@ enumCMTresult HoymilesRadio_CMT::cmtProcess(void)
         cmtNextState = CMT_STATE_IDLE;
 
         // send CMD56 after 3 Rx timeouts
-        if (cmtRxTimeoutCnt < 2)
+        if (cmtRxTimeoutCnt < 2) {
             cmtRxTimeoutCnt++;
-        else {
+        } else {
             uint32_t invSerial = cmtTxBuffer[1] << 24 | cmtTxBuffer[2] << 16 | cmtTxBuffer[3] << 8 | cmtTxBuffer[4]; // read inverter serial from last Tx buffer
             cmtSwitchInvAndDtuFreq(invSerial, HOY_BOOT_FREQ / 1000, CMT_WORK_FREQ);
         }
 
         nRes = CMT_RX_TIMEOUT;
         break;
-    }
-    case CMT_STATE_TX_START: {
+
+    case CMT_STATE_TX_START:
         CMT2300A_GoStby();
         CMT2300A_ClearInterruptFlags();
 
@@ -245,34 +240,33 @@ enumCMTresult HoymilesRadio_CMT::cmtProcess(void)
         /* The length need be smaller than 32 */
         CMT2300A_WriteFifo(cmtTxBuffer, cmtTxLength);
 
-        if (!(CMT2300A_ReadReg(CMT2300A_CUS_FIFO_FLAG) & CMT2300A_MASK_TX_FIFO_NMTY_FLG))
+        if (!(CMT2300A_ReadReg(CMT2300A_CUS_FIFO_FLAG) & CMT2300A_MASK_TX_FIFO_NMTY_FLG)) {
             cmtNextState = CMT_STATE_ERROR;
+        }
 
-        if (!CMT2300A_GoTx())
+        if (!CMT2300A_GoTx()) {
             cmtNextState = CMT_STATE_ERROR;
-        else
+        } else {
             cmtNextState = CMT_STATE_TX_WAIT;
+        }
 
         cmtTxTimeCount = CMT2300A_GetTickCount();
 
         break;
-    }
-    case CMT_STATE_TX_WAIT: {
-        // #ifdef ENABLE_ANTENNA_SWITCH
+
+    case CMT_STATE_TX_WAIT:
         if (CMT2300A_MASK_TX_DONE_FLG & CMT2300A_ReadReg(CMT2300A_CUS_INT_CLR1)) /* Read TX_DONE flag */
-        // #else
-        //             if(CMT2300A_ReadGpio1())  /* Read INT1, TX_DONE */
-        // #endif
         {
             cmtNextState = CMT_STATE_TX_DONE;
         }
 
-        if ((CMT2300A_GetTickCount() - cmtTxTimeCount) > cmtTxTimeout)
+        if ((CMT2300A_GetTickCount() - cmtTxTimeCount) > cmtTxTimeout) {
             cmtNextState = CMT_STATE_TX_TIMEOUT;
+        }
 
         break;
-    }
-    case CMT_STATE_TX_DONE: {
+
+    case CMT_STATE_TX_DONE:
         CMT2300A_ClearInterruptFlags();
         CMT2300A_GoSleep();
 
@@ -280,16 +274,17 @@ enumCMTresult HoymilesRadio_CMT::cmtProcess(void)
             cmtSwitchChannel(cmtTx56toCh);
             cmtTx56toCh = 0xFF;
             cmtNextState = CMT_STATE_IDLE;
-        } else
+        } else {
             cmtNextState = CMT_STATE_RX_START; // receive answer
+        }
 
         nRes = CMT_TX_DONE;
         break;
-    }
-    case CMT_STATE_TX_TIMEOUT: {
+
+    case CMT_STATE_TX_TIMEOUT:
         CMT2300A_GoSleep();
 
-        Hoymiles.getMessageOutput()->println("TC timeout!");
+        Hoymiles.getMessageOutput()->println("TX timeout!");
 
         if (cmtTx56toCh != 0xFF) {
             cmtTx56toCh = 0xFF;
@@ -300,8 +295,8 @@ enumCMTresult HoymilesRadio_CMT::cmtProcess(void)
 
         nRes = CMT_TX_TIMEOUT;
         break;
-    }
-    case CMT_STATE_ERROR: {
+
+    case CMT_STATE_ERROR:
         CMT2300A_SoftReset();
         CMT2300A_DelayMs(20);
 
@@ -312,7 +307,7 @@ enumCMTresult HoymilesRadio_CMT::cmtProcess(void)
 
         nRes = CMT_ERROR;
         break;
-    }
+
     default:
         break;
     }
@@ -371,13 +366,9 @@ void HoymilesRadio_CMT::loop()
 
                 if (nullptr != inv) {
                     // Save packet in inverter rx buffer
-                    Hoymiles.getMessageOutput()->print("RX ");
-                    Hoymiles.getMessageOutput()->print(cmtChToFreq(f.channel));
-                    Hoymiles.getMessageOutput()->print(" --> ");
+                    Hoymiles.getMessageOutput()->printf("RX %s --> ", cmtChToFreq(f.channel).c_str());
                     dumpBuf("", f.fragment, f.len);
-                    Hoymiles.getMessageOutput()->print("| ");
-                    Hoymiles.getMessageOutput()->print(f.rssi);
-                    Hoymiles.getMessageOutput()->println(" dBm");
+                    Hoymiles.getMessageOutput()->printf("| %d dBm", f.rssi);
 
                     inv->addRxFragment(f.fragment, f.len);
                 } else {
@@ -477,11 +468,8 @@ void HoymilesRadio_CMT::sendEsbPacket(CommandAbstract* cmd)
 
     cmd->setRouterAddress(DtuSerial().u64);
 
-    Hoymiles.getMessageOutput()->print("TX ");
-    Hoymiles.getMessageOutput()->print(cmd->getCommandName());
-    Hoymiles.getMessageOutput()->print(" ");
-    Hoymiles.getMessageOutput()->print(cmtChToFreq(cmtActualCh));
-    Hoymiles.getMessageOutput()->print(" --> ");
+    Hoymiles.getMessageOutput()->printf("TX %s %s --> ",
+        cmd->getCommandName().c_str(), cmtChToFreq(cmtCurrentCh).c_str());
     cmd->dumpDataPayload(Hoymiles.getMessageOutput());
 
     memcpy(cmtTxBuffer, cmd->getDataPayload(), cmd->getDataSize());
