@@ -227,7 +227,14 @@ A documentation of the Web API can be found here: [Web-API Documentation](docs/W
 * <https://www.thingiverse.com/thing:5661780>
 * <https://www.thingiverse.com/thing:5632374>
 * <https://www.thingiverse.com/thing:5852233>
+* <https://www.printables.com/model/377994-opendtu-pcb-box-for-the-wider-board>
+* <https://www.printables.com/model/376840-esp32-ahoy-opendtu-pcb-housing>
 
+## Available layouts for printed circuit boards
+* [BreakoutBoard - sample printed circuit board for OpenDTU and Ahoy](https://github.com/dokuhn/openDTU-BreakoutBoard)
+* [Board for OpenDTU with Display](https://github.com/SteffMUC/openDTU_wDisplay2)
+* [OpenDTU PCB mit Display](https://github.com/turrican944/OpenDTU-PCB)
+* [PCB for OpenDTU in Cable Branchbox](https://github.com/plewka/ESP-Solar_OpenDTU)
 
 ## Building
 * Building the WebApp
@@ -261,4 +268,3 @@ A documentation of the Web API can be found here: [Web-API Documentation](docs/W
 - [Ahoy](https://github.com/grindylow/ahoy)
 - [DTU Simulator](https://github.com/Ziyatoe/DTUsimMI1x00-Hoymiles)
 - [OpenDTU extended to talk to Victrons MPPT battery chargers (Ve.Direct)](https://github.com/helgeerbe/OpenDTU_VeDirect)
-- [BreakoutBoard - sample printed circuit board for OpenDTU and Ahoy](https://github.com/dokuhn/openDTU-BreakoutBoard)
