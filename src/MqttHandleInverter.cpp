@@ -36,7 +36,7 @@ void MqttHandleInverterClass::init()
 
 void MqttHandleInverterClass::loop()
 {
-    if (!MqttSettings.getConnected() || !Hoymiles.getRadioNrf()->isIdle()) {
+    if (!MqttSettings.getConnected() || !Hoymiles.isAllRadioIdle()) {
         return;
     }
 

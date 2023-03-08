@@ -36,6 +36,8 @@ public:
     uint32_t PollInterval();
     void setPollInterval(uint32_t interval);
 
+    bool isAllRadioIdle();
+
 private:
     std::vector<std::shared_ptr<InverterAbstract>> _inverters;
     std::unique_ptr<HoymilesRadio_NRF> _radioNrf;

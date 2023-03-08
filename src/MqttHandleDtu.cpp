@@ -16,7 +16,7 @@ void MqttHandleDtuClass::init()
 
 void MqttHandleDtuClass::loop()
 {
-    if (!MqttSettings.getConnected() || !Hoymiles.getRadioNrf()->isIdle()) {
+    if (!MqttSettings.getConnected() || !Hoymiles.isAllRadioIdle()) {
         return;
     }
 
