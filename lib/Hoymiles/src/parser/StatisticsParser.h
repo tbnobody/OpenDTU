@@ -60,6 +60,8 @@ enum ChannelNum_t {
     CH1,
     CH2,
     CH3,
+    CH4,
+    CH5,
     CH_CNT
 };
 
@@ -72,7 +74,7 @@ const char* const channelsTypes[] = { "AC", "DC", "INV" };
 
 typedef struct {
     ChannelType_t type;
-    ChannelNum_t ch; // channel 0 - 4
+    ChannelNum_t ch; // channel 0 - 5
     FieldId_t fieldId; // field id
     UnitId_t unitId; // uint id
     uint8_t start; // pos of first byte in buffer
@@ -84,7 +86,7 @@ typedef struct {
 
 typedef struct {
     ChannelType_t type;
-    ChannelNum_t ch; // channel 0 - 4
+    ChannelNum_t ch; // channel 0 - 5
     FieldId_t fieldId; // field id
     float offset; // offset (positive/negative) to be applied on the fetched value
 } fieldSettings_t;
