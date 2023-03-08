@@ -119,6 +119,18 @@
                         <td>{{ currentPinAssignment?.victron?.tx }}</td>
                     </tr>
 
+                    <tr>
+                        <td rowspan="2">Battery</td>
+                        <td>RX</td>
+                        <td>{{ selectedPinAssignment?.battery?.rx }}</td>
+                        <td>{{ currentPinAssignment?.battery?.rx }}</td>
+                    </tr>
+                    <tr>
+                        <td>TX</td>
+                        <td>{{ selectedPinAssignment?.battery?.tx }}</td>
+                        <td>{{ currentPinAssignment?.battery?.tx }}</td>
+                    </tr>
+
                 </tbody>
             </table>
         </div>
