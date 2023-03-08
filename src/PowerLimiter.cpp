@@ -125,6 +125,7 @@ void PowerLimiterClass::loop()
                     inverter->sendActivePowerControlRequest(Hoymiles.getRadio(), newPowerLimit, PowerLimitControlType::AbsolutNonPersistent);
                     _lastRequestedPowerLimit = newPowerLimit;
                     _lastCommandSent = millis();
+                    return;
                 }
 
                 // do nothing if battery is empty
@@ -144,6 +145,7 @@ void PowerLimiterClass::loop()
                     MessageOutput.println("[PowerLimiterClass::loop] Starting up inverter...");
                     inverter->sendPowerControlRequest(Hoymiles.getRadio(), true);
                     _lastCommandSent = millis();
+                    return;
                 }
                 else
                     return;
