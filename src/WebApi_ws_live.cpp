@@ -180,6 +180,9 @@ void WebApiWsLiveClass::generateJsonResponse(JsonVariant& root)
     } else {
         hintObj[F("default_password")] = false;
     }
+
+    JsonObject vedirectObj = root.createNestedObject("vedirect");
+    vedirectObj[F("enabled")] = Configuration.get().Vedirect_Enabled;
 }
 
 void WebApiWsLiveClass::addField(JsonObject& root, uint8_t idx, std::shared_ptr<InverterAbstract> inv, ChannelType_t type, ChannelNum_t channel, FieldId_t fieldId, String topic)
