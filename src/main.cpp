@@ -174,6 +174,7 @@ void setup()
     MessageOutput.print(F("Initialize WatchDog... "));
     WatchDogDtu.init();
     MessageOutput.println(F("done"));
+
     InverterSettings.init();
 }
 
