@@ -200,6 +200,11 @@ HoymilesRadio_NRF* HoymilesClass::getRadioNrf()
     return _radioNrf.get();
 }
 
+HoymilesRadio_CMT* HoymilesClass::getRadioCmt()
+{
+    return _radioCmt.get();
+}
+
 uint32_t HoymilesClass::PollInterval()
 {
     return _pollInterval;

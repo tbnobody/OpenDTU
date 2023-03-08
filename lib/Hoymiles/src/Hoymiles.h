@@ -31,6 +31,7 @@ public:
     size_t getNumInverters();
 
     HoymilesRadio_NRF* getRadioNrf();
+    HoymilesRadio_CMT* getRadioCmt();
 
     uint32_t PollInterval();
     void setPollInterval(uint32_t interval);

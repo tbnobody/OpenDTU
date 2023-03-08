@@ -134,5 +134,6 @@ void WebApiDtuClass::onDtuAdminPost(AsyncWebServerRequest* request)
 
     Hoymiles.getRadioNrf()->setPALevel((rf24_pa_dbm_e)config.Dtu_PaLevel);
     Hoymiles.getRadioNrf()->setDtuSerial(config.Dtu_Serial);
+    Hoymiles.getRadioCmt()->setDtuSerial(config.Dtu_Serial);
     Hoymiles.setPollInterval(config.Dtu_PollInterval);
 }
