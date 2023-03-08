@@ -64,6 +64,8 @@ public:
     virtual bool sendRestartControlRequest() = 0;
     virtual bool resendPowerControlRequest() = 0;
 
+    HoymilesRadio* getRadio();
+
     AlarmLogParser* EventLog();
     DevInfoParser* DevInfo();
     PowerCommandParser* PowerCommand();

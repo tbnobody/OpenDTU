@@ -96,6 +96,11 @@ bool InverterAbstract::getEnableCommands()
     return _enableCommands;
 }
 
+HoymilesRadio* InverterAbstract::getRadio()
+{
+    return _radio;
+}
+
 AlarmLogParser* InverterAbstract::EventLog()
 {
     return _alarmLogParser.get();

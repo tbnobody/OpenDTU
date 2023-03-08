@@ -33,6 +33,7 @@ void HoymilesRadio_NRF::init(SPIClass* initialisedSpiBus, uint8_t pinCE, uint8_t
 
     openReadingPipe();
     _radio->startListening();
+    _isInitialized = true;
 }
 
 void HoymilesRadio_NRF::loop()
@@ -157,11 +158,6 @@ void HoymilesRadio_NRF::setDtuSerial(uint64_t serial)
 {
     HoymilesRadio::setDtuSerial(serial);
     openReadingPipe();
-}
-
-bool HoymilesRadio_NRF::isIdle()
-{
-    return !_busyFlag;
 }
 
 bool HoymilesRadio_NRF::isConnected()

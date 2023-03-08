@@ -3,7 +3,7 @@
 
 #include <stdint.h>
 
-void cmt_spi3_init(void);
+void cmt_spi3_init(int8_t pin_sdio, int8_t pin_clk, int8_t pin_cs, int8_t pin_fcs);
 
 void cmt_spi3_write(uint8_t addr, uint8_t dat);
 uint8_t cmt_spi3_read(uint8_t addr);

@@ -222,7 +222,7 @@ enumCMTresult HoymilesRadio_CMT::cmtProcess(void)
             cmtRxTimeoutCnt++;
         } else {
             uint32_t invSerial = cmtTxBuffer[1] << 24 | cmtTxBuffer[2] << 16 | cmtTxBuffer[3] << 8 | cmtTxBuffer[4]; // read inverter serial from last Tx buffer
-            cmtSwitchInvAndDtuFreq(invSerial, HOY_BOOT_FREQ / 1000, CMT_WORK_FREQ);
+            cmtSwitchInvAndDtuFreq(invSerial, HOY_BOOT_FREQ / 1000, HOYMILES_CMT_WORK_FREQ);
         }
 
         nRes = CMT_RX_TIMEOUT;
@@ -315,12 +315,12 @@ enumCMTresult HoymilesRadio_CMT::cmtProcess(void)
     return nRes;
 }
 
-void HoymilesRadio_CMT::init()
+void HoymilesRadio_CMT::init(int8_t pin_sdio, int8_t pin_clk, int8_t pin_cs, int8_t pin_fcs, int8_t pin_gpio3)
 {
     _dtuSerial.u64 = 0;
     uint8_t tmp;
 
-    CMT2300A_InitSpi();
+    CMT2300A_InitSpi(pin_sdio, pin_clk, pin_cs, pin_fcs);
     if (!CMT2300A_Init()) {
         Hoymiles.getMessageOutput()->println("CMT2300A_Init() failed!");
         return;
@@ -345,11 +345,12 @@ void HoymilesRadio_CMT::init()
         return;
     }
 
-    attachInterrupt(digitalPinToInterrupt(CMT_PIN_GPIO3), std::bind(&HoymilesRadio_CMT::handleIntr, this), RISING);
+    attachInterrupt(digitalPinToInterrupt(pin_gpio3), std::bind(&HoymilesRadio_CMT::handleIntr, this), RISING);
 
-    cmtSwitchDtuFreq(CMT_WORK_FREQ); // start dtu at work freqency, for fast Rx if inverter is already on and frequency switched
+    cmtSwitchDtuFreq(HOYMILES_CMT_WORK_FREQ); // start dtu at work freqency, for fast Rx if inverter is already on and frequency switched
 
     _ChipConnected = true;
+    _isInitialized = true;
 
     Hoymiles.getMessageOutput()->println("CMT init successful");
 }
@@ -445,11 +446,6 @@ void HoymilesRadio_CMT::loop()
             }
         }
     }
-}
-
-bool HoymilesRadio_CMT::isIdle()
-{
-    return !_busyFlag;
 }
 
 bool HoymilesRadio_CMT::isConnected()

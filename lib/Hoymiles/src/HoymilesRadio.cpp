@@ -62,3 +62,13 @@ void HoymilesRadio::dumpBuf(const char* info, uint8_t buf[], uint8_t len)
     }
     Hoymiles.getMessageOutput()->println("");
 }
+
+bool HoymilesRadio::isInitialized()
+{
+    return _isInitialized;
+}
+
+bool HoymilesRadio::isIdle()
+{
+    return !_busyFlag;
+}

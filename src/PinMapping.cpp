@@ -38,6 +38,26 @@
 #define LED1 -1
 #endif
 
+#ifndef CMT_CLK
+#define CMT_CLK -1
+#endif
+
+#ifndef CMT_CS
+#define CMT_CS -1
+#endif
+
+#ifndef CMT_FCS
+#define CMT_FCS -1
+#endif
+
+#ifndef CMT_GPIO3
+#define CMT_GPIO3 -1
+#endif
+
+#ifndef CMT_SDIO
+#define CMT_SDIO -1
+#endif
+
 PinMappingClass PinMapping;
 
 PinMappingClass::PinMappingClass()
@@ -49,6 +69,12 @@ PinMappingClass::PinMappingClass()
     _pinMapping.nrf24_irq = HOYMILES_PIN_IRQ;
     _pinMapping.nrf24_miso = HOYMILES_PIN_MISO;
     _pinMapping.nrf24_mosi = HOYMILES_PIN_MOSI;
+
+    _pinMapping.cmt_clk = CMT_CLK;
+    _pinMapping.cmt_cs = CMT_CS;
+    _pinMapping.cmt_fcs = CMT_FCS;
+    _pinMapping.cmt_gpio3 = CMT_GPIO3;
+    _pinMapping.cmt_sdio = CMT_SDIO;
 
 #ifdef OPENDTU_ETHERNET
     _pinMapping.eth_enabled = true;
@@ -104,6 +130,12 @@ bool PinMappingClass::init(const String& deviceMapping)
             _pinMapping.nrf24_miso = doc[i]["nrf24"]["miso"] | HOYMILES_PIN_MISO;
             _pinMapping.nrf24_mosi = doc[i]["nrf24"]["mosi"] | HOYMILES_PIN_MOSI;
 
+            _pinMapping.cmt_clk = doc[i]["cmt"]["clk"] | CMT_CLK;
+            _pinMapping.cmt_cs = doc[i]["cmt"]["cs"] | CMT_CS;
+            _pinMapping.cmt_fcs = doc[i]["cmt"]["fcs"] | CMT_FCS;
+            _pinMapping.cmt_gpio3 = doc[i]["cmt"]["gpio3"] | CMT_GPIO3;
+            _pinMapping.cmt_sdio = doc[i]["cmt"]["sdio"] | CMT_SDIO;
+
 #ifdef OPENDTU_ETHERNET
             _pinMapping.eth_enabled = doc[i]["eth"]["enabled"] | true;
 #else
@@ -141,6 +173,15 @@ bool PinMappingClass::isValidNrf24Config()
         && _pinMapping.nrf24_irq >= 0
         && _pinMapping.nrf24_miso >= 0
         && _pinMapping.nrf24_mosi >= 0;
+}
+
+bool PinMappingClass::isValidCmt2300Config()
+{
+    return _pinMapping.cmt_clk >= 0
+        && _pinMapping.cmt_cs >= 0
+        && _pinMapping.cmt_fcs >= 0
+        && _pinMapping.cmt_gpio3 >= 0
+        && _pinMapping.cmt_sdio >= 0;
 }
 
 bool PinMappingClass::isValidEthConfig()

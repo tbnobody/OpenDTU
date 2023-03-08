@@ -22,11 +22,19 @@ void InverterSettingsClass::init()
 
     // Initialize inverter communication
     MessageOutput.print("Initialize Hoymiles interface... ");
-    if (PinMapping.isValidNrf24Config()) {
+    if (PinMapping.isValidNrf24Config() || PinMapping.isValidCmt2300Config()) {
         SPIClass* spiClass = new SPIClass(VSPI);
         spiClass->begin(pin.nrf24_clk, pin.nrf24_miso, pin.nrf24_mosi, pin.nrf24_cs);
         Hoymiles.setMessageOutput(&MessageOutput);
-        Hoymiles.init(spiClass, pin.nrf24_en, pin.nrf24_irq);
+        Hoymiles.init();
+
+        if (PinMapping.isValidNrf24Config()) {
+            Hoymiles.initNRF(spiClass, pin.nrf24_en, pin.nrf24_irq);
+        }
+
+        if (PinMapping.isValidCmt2300Config()) {
+            Hoymiles.initCMT(pin.cmt_sdio, pin.cmt_clk, pin.cmt_cs, pin.cmt_fcs, pin.cmt_gpio3);
+        }
 
         MessageOutput.println("  Setting radio PA level... ");
         Hoymiles.getRadioNrf()->setPALevel((rf24_pa_dbm_e)config.Dtu_PaLevel);

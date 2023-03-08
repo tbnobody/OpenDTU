@@ -20,7 +20,6 @@ public:
 
     virtual void setDtuSerial(uint64_t serial);
 
-    bool isIdle();
     bool isConnected();
     bool isPVariant();
 
@@ -46,6 +45,4 @@ private:
 
     std::queue<fragment_t> _rxBuffer;
     TimeoutHelper _rxTimeout;
-
-    bool _busyFlag = false;
 };

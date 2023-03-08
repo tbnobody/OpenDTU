@@ -18,6 +18,13 @@ struct PinMapping_t {
     int8_t nrf24_irq;
     int8_t nrf24_en;
     int8_t nrf24_cs;
+
+    int8_t cmt_clk;
+    int8_t cmt_cs;
+    int8_t cmt_fcs;
+    int8_t cmt_gpio3;
+    int8_t cmt_sdio;
+
     int8_t eth_phy_addr;
     bool eth_enabled;
     int eth_power;
@@ -40,6 +47,7 @@ public:
     PinMapping_t& get();
 
     bool isValidNrf24Config();
+    bool isValidCmt2300Config();
     bool isValidEthConfig();
 
 private:

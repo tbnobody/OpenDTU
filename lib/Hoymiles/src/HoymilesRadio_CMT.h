@@ -39,10 +39,9 @@ typedef enum {
 
 class HoymilesRadio_CMT : public HoymilesRadio {
 public:
-    void init();
+    void init(int8_t pin_sdio, int8_t pin_clk, int8_t pin_cs, int8_t pin_fcs, int8_t pin_gpio3);
     void loop();
 
-    bool isIdle();
     bool isConnected();
 
 private:
@@ -54,8 +53,6 @@ private:
 
     std::queue<fragment_t> _rxBuffer;
     TimeoutHelper _rxTimeout;
-
-    bool _busyFlag = false;
 
     bool _ChipConnected = false;
 

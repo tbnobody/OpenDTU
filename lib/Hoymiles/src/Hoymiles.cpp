@@ -3,12 +3,12 @@
  * Copyright (C) 2022 Thomas Basler and others
  */
 #include "Hoymiles.h"
-#include "inverters/HM_1CH.h"
-#include "inverters/HM_2CH.h"
-#include "inverters/HM_4CH.h"
 #include "inverters/HMS_1CH.h"
 #include "inverters/HMS_2CH.h"
 #include "inverters/HMS_4CH.h"
+#include "inverters/HM_1CH.h"
+#include "inverters/HM_2CH.h"
+#include "inverters/HM_4CH.h"
 #include <Arduino.h>
 
 #define HOY_SEMAPHORE_TAKE() xSemaphoreTake(_xSemaphore, portMAX_DELAY)
@@ -16,73 +16,90 @@
 
 HoymilesClass Hoymiles;
 
-void HoymilesClass::init(SPIClass* initialisedSpiBus, uint8_t pinCE, uint8_t pinIRQ)
+void HoymilesClass::init()
 {
     _xSemaphore = xSemaphoreCreateMutex();
-    HOY_SEMAPHORE_GIVE();  // release before first use
+    HOY_SEMAPHORE_GIVE(); // release before first use
 
     _pollInterval = 0;
     _radioNrf.reset(new HoymilesRadio_NRF());
-    _radioNrf->init(initialisedSpiBus, pinCE, pinIRQ);
-
     _radioCmt.reset(new HoymilesRadio_CMT());
-    _radioCmt->init();
+}
+
+void HoymilesClass::initNRF(SPIClass* initialisedSpiBus, uint8_t pinCE, uint8_t pinIRQ)
+{
+    _radioNrf->init(initialisedSpiBus, pinCE, pinIRQ);
+}
+
+void HoymilesClass::initCMT(int8_t pin_sdio, int8_t pin_clk, int8_t pin_cs, int8_t pin_fcs, int8_t pin_gpio3)
+{
+    _radioCmt->init(pin_sdio, pin_clk, pin_cs, pin_fcs, pin_gpio3);
 }
 
 void HoymilesClass::loop()
 {
     HOY_SEMAPHORE_TAKE();
-    _radioNrf->loop();
-    _radioCmt->loop();
+    if (_radioNrf->isInitialized()) {
+        _radioNrf->loop();
+    }
+
+    if (_radioCmt->isInitialized()) {
+        _radioCmt->loop();
+    }
 
     if (getNumInverters() > 0) {
         if (millis() - _lastPoll > (_pollInterval * 1000)) {
             static uint8_t inverterPos = 0;
 
-            if (_radioNrf->isIdle() && _radioCmt->isIdle()) {
-                std::shared_ptr<InverterAbstract> iv = getInverterByPos(inverterPos);
-                if (iv != nullptr) {
-                    _messageOutput->print("Fetch inverter: ");
-                    _messageOutput->println(iv->serial(), HEX);
-
-                    iv->sendStatsRequest();
-
-                    // Fetch event log
-                    bool force = iv->EventLog()->getLastAlarmRequestSuccess() == CMD_NOK;
-                    iv->sendAlarmLogRequest(force);
-
-                    // Fetch limit
-                    if ((iv->SystemConfigPara()->getLastLimitRequestSuccess() == CMD_NOK)
-                        || ((millis() - iv->SystemConfigPara()->getLastUpdateRequest() > HOY_SYSTEM_CONFIG_PARA_POLL_INTERVAL)
-                            && (millis() - iv->SystemConfigPara()->getLastUpdateCommand() > HOY_SYSTEM_CONFIG_PARA_POLL_MIN_DURATION))) {
-                        _messageOutput->println("Request SystemConfigPara");
-                        iv->sendSystemConfigParaRequest();
-                    }
-
-                    // Set limit if required
-                    if (iv->SystemConfigPara()->getLastLimitCommandSuccess() == CMD_NOK) {
-                        _messageOutput->println("Resend ActivePowerControl");
-                        iv->resendActivePowerControlRequest();
-                    }
-
-                    // Set power status if required
-                    if (iv->PowerCommand()->getLastPowerCommandSuccess() == CMD_NOK) {
-                        _messageOutput->println("Resend PowerCommand");
-                        iv->resendPowerControlRequest();
-                    }
-
-                    // Fetch dev info (but first fetch stats)
-                    if (iv->Statistics()->getLastUpdate() > 0 && (iv->DevInfo()->getLastUpdateAll() == 0 || iv->DevInfo()->getLastUpdateSimple() == 0)) {
-                        _messageOutput->println("Request device info");
-                        iv->sendDevInfoRequest();
-                    }
-                }
+            std::shared_ptr<InverterAbstract> iv = getInverterByPos(inverterPos);
+            if ((iv == nullptr) || ((iv != nullptr) && (!iv->getRadio()->isInitialized()))) {
                 if (++inverterPos >= getNumInverters()) {
                     inverterPos = 0;
                 }
             }
 
-            _lastPoll = millis();
+            if (iv != nullptr && iv->getRadio()->isInitialized() && iv->getRadio()->isIdle()) {
+                _messageOutput->print("Fetch inverter: ");
+                _messageOutput->println(iv->serial(), HEX);
+
+                iv->sendStatsRequest();
+
+                // Fetch event log
+                bool force = iv->EventLog()->getLastAlarmRequestSuccess() == CMD_NOK;
+                iv->sendAlarmLogRequest(force);
+
+                // Fetch limit
+                if ((iv->SystemConfigPara()->getLastLimitRequestSuccess() == CMD_NOK)
+                    || ((millis() - iv->SystemConfigPara()->getLastUpdateRequest() > HOY_SYSTEM_CONFIG_PARA_POLL_INTERVAL)
+                        && (millis() - iv->SystemConfigPara()->getLastUpdateCommand() > HOY_SYSTEM_CONFIG_PARA_POLL_MIN_DURATION))) {
+                    _messageOutput->println("Request SystemConfigPara");
+                    iv->sendSystemConfigParaRequest();
+                }
+
+                // Set limit if required
+                if (iv->SystemConfigPara()->getLastLimitCommandSuccess() == CMD_NOK) {
+                    _messageOutput->println("Resend ActivePowerControl");
+                    iv->resendActivePowerControlRequest();
+                }
+
+                // Set power status if required
+                if (iv->PowerCommand()->getLastPowerCommandSuccess() == CMD_NOK) {
+                    _messageOutput->println("Resend PowerCommand");
+                    iv->resendPowerControlRequest();
+                }
+
+                // Fetch dev info (but first fetch stats)
+                if (iv->Statistics()->getLastUpdate() > 0 && (iv->DevInfo()->getLastUpdateAll() == 0 || iv->DevInfo()->getLastUpdateSimple() == 0)) {
+                    _messageOutput->println("Request device info");
+                    iv->sendDevInfoRequest();
+                }
+
+                if (++inverterPos >= getNumInverters()) {
+                    inverterPos = 0;
+                }
+
+                _lastPoll = millis();
+            }
         }
     }
 
