@@ -25,6 +25,11 @@
     "base": {
         "Loading": "Loading..."
     },
+    "localeswitcher": {
+        "Dark": "Dark",
+        "Light": "Light",
+        "Auto": "Auto"
+    },
     "apiresponse": {
         "1001": "Settings saved!",
         "1002": "No values found!",
@@ -129,6 +134,9 @@
         "NoInfo": "No Information available",
         "NoInfoLong": "Did not receive any valid data from the inverter till now. Still trying...",
         "UnknownModel": "Unknown model! Please report the \"Hardware Part Number\" and model (e.g. HM-350) as an issue <a href=\"https://github.com/tbnobody/OpenDTU/issues\" target=\"_blank\">here</a>.",
+        "Serial": "Serial",
+        "ProdYear": "Production Year",
+        "ProdWeek": "Production Week",
         "Model": "Model",
         "DetectedMaxPower": "Detected max. Power",
         "BootloaderVersion": "Bootloader Version",
@@ -228,7 +236,12 @@
         "Status": "Status",
         "Synced": "synced",
         "NotSynced": "not synced",
-        "LocalTime": "Local Time"
+        "LocalTime": "Local Time",
+        "Sunrise": "Nautical Sunrise",
+        "Sunset": "Nautical Sunset",
+        "Mode": "Mode",
+        "Day": "Day",
+        "Night": "Night"
     },
     "mqttinfo": {
         "MqttInformation": "MQTT Information",
@@ -263,6 +276,7 @@
     "inverterchannelinfo": {
         "String": "String {num}",
         "Phase": "Phase {num}",
+        "General": "General",
         "Property": "Property",
         "Value": "Value",
         "Unit": "Unit"
@@ -327,6 +341,9 @@
         "TimeServerHint": "The default value is fine as long as OpenDTU has direct access to the internet.",
         "Timezone": "Timezone:",
         "TimezoneConfig": "Timezone Config:",
+        "LocationConfiguration": "Location Configuration",
+        "Longitude": "Longitude",
+        "Latitude": "Latitude",
         "Save": "@:dtuadmin.Save",
         "ManualTimeSynchronization": "Manual Time Synchronization",
         "CurrentOpenDtuTime": "Current OpenDTU Time:",
@@ -392,6 +409,10 @@
         "Add": "Add",
         "AddHint": "<b>Hint:</b> You can set additional parameters after you have created the inverter. Use the pen icon in the inverter list.",
         "InverterList": "Inverter List",
+        "Status": "Status",
+        "Send": "Send",
+        "Receive": "Receive",
+        "StatusHint": "<b>Hint:</b> The inverter is power by it's DC input. If there is no sun, the inverter is off. Requests can still be sent.",
         "Type": "Type",
         "Action": "Action",
         "DeleteInverter": "Delete inverter",
@@ -399,10 +420,17 @@
         "InverterSerial": "Inverter Serial:",
         "InverterName": "Inverter Name:",
         "InverterNameHint": "Here you can specify a custom name for your inverter.",
+        "InverterStatus": "Receive / Send",
+        "PollEnable": "Poll inverter data",
+        "PollEnableNight": "Poll inverter data at night",
+        "CommandEnable": "Send commands",
+        "CommandEnableNight": "Send commands at night",
         "StringName": "Name string {num}:",
         "StringNameHint": "Here you can specify a custom name for the respective port of your inverter.",
         "StringMaxPower": "Max power string {num}:",
         "StringMaxPowerHint": "Enter the max power of the connected solar panels.",
+        "StringYtOffset": "Yield total offset string {num}:",
+        "StringYtOffsetHint": "This offset is applied the read yield total value from the inverter. This can be used to set the yield total of the inverter to zero if a used inverter is used. But you can still try polling data.",
         "InverterHint": "*) Enter the W<sub>p</sub> of the channel to calculate irradiation.",
         "Cancel": "@:maintenancereboot.Cancel",
         "Save": "@:dtuadmin.Save",

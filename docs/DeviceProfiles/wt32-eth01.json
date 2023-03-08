@@ -16,7 +16,7 @@
             "mdc": 23,
             "mdio": 18,
             "type": 0,
-            "clk_mode": 3
+            "clk_mode": 0
         }
     }
 ]

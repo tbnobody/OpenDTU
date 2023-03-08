@@ -5,6 +5,7 @@ import vue from '@vitejs/plugin-vue'
 
 import viteCompression from 'vite-plugin-compression';
 import cssInjectedByJsPlugin from 'vite-plugin-css-injected-by-js'
+import VueI18nPlugin from '@intlify/unplugin-vue-i18n/vite'
 
 const path = require('path')
 
@@ -13,7 +14,14 @@ export default defineConfig({
   plugins: [
     vue(),
     viteCompression({ deleteOriginFile: true, threshold: 0 }),
-    cssInjectedByJsPlugin()],
+    cssInjectedByJsPlugin(),
+    VueI18nPlugin({
+        /* options */
+        include: path.resolve(path.dirname(fileURLToPath(import.meta.url)), './src/locales/**'),
+        fullInstall: false,
+        forceStringify: true,
+    }),
+  ],
   resolve: {
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url)),
@@ -25,6 +33,7 @@ export default defineConfig({
     cssCodeSplit: false,
     outDir: '../webapp_dist',
     emptyOutDir: true,
+    minify: 'terser',
     rollupOptions: {
       output: {
         // Only create one js file
