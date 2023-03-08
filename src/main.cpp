@@ -4,6 +4,7 @@
  */
 #include "Configuration.h"
 #include "ModbusDtu.h"
+#include "WatchDogDtu.h"
 #include "Display_Graphic.h"
 #include "MessageOutput.h"
 #include "MqttHandleDtu.h"
@@ -163,6 +164,8 @@ void setup()
     // Initialize Modbus
     MessageOutput.print(F("Initialize Modbus... "));
     ModbusDtu.init();
+    MessageOutput.print(F("Initialize WatchDog... "));
+    WatchDogDtu.init();
     MessageOutput.println(F("done"));
 }
 
@@ -185,5 +188,7 @@ void loop()
     Display.loop();
     yield();
     MessageOutput.loop();
+    yield();
+    WatchDogDtu.loop();
     yield();
 }
