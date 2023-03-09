@@ -38,6 +38,10 @@ void HoymilesRadio_NRF::init(SPIClass* initialisedSpiBus, uint8_t pinCE, uint8_t
 
 void HoymilesRadio_NRF::loop()
 {
+    if (!_isInitialized) {
+        return;
+    }
+
     EVERY_N_MILLIS(4)
     {
         switchRxCh();
@@ -151,22 +155,35 @@ void HoymilesRadio_NRF::loop()
 
 void HoymilesRadio_NRF::setPALevel(rf24_pa_dbm_e paLevel)
 {
+    if (!_isInitialized) {
+        return;
+    }
     _radio->setPALevel(paLevel);
 }
 
 void HoymilesRadio_NRF::setDtuSerial(uint64_t serial)
 {
     HoymilesRadio::setDtuSerial(serial);
+
+    if (!_isInitialized) {
+        return;
+    }
     openReadingPipe();
 }
 
 bool HoymilesRadio_NRF::isConnected()
 {
+    if (!_isInitialized) {
+        return false;
+    }
     return _radio->isChipConnected();
 }
 
 bool HoymilesRadio_NRF::isPVariant()
 {
+    if (!_isInitialized) {
+        return false;
+    }
     return _radio->isPVariant();
 }
 
@@ -209,8 +226,6 @@ void HoymilesRadio_NRF::switchRxCh()
     _radio->setChannel(getRxNxtChannel());
     _radio->startListening();
 }
-
-
 
 void HoymilesRadio_NRF::sendEsbPacket(CommandAbstract* cmd)
 {

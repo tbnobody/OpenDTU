@@ -357,6 +357,9 @@ void HoymilesRadio_CMT::init(int8_t pin_sdio, int8_t pin_clk, int8_t pin_cs, int
 
 void HoymilesRadio_CMT::loop()
 {
+    if (!_isInitialized) {
+        return;
+    }
     enumCMTresult mCMTstate = cmtProcess();
 
     if (mCMTstate != CMT_RX_DONE) { // Perform package parsing only if no packages are received
@@ -450,6 +453,9 @@ void HoymilesRadio_CMT::loop()
 
 bool HoymilesRadio_CMT::isConnected()
 {
+    if (!_isInitialized) {
+        return false;
+    }
     return _ChipConnected;
 }
 

@@ -40,13 +40,8 @@ void HoymilesClass::initCMT(int8_t pin_sdio, int8_t pin_clk, int8_t pin_cs, int8
 void HoymilesClass::loop()
 {
     HOY_SEMAPHORE_TAKE();
-    if (_radioNrf->isInitialized()) {
-        _radioNrf->loop();
-    }
-
-    if (_radioCmt->isInitialized()) {
-        _radioCmt->loop();
-    }
+    _radioNrf->loop();
+    _radioCmt->loop();
 
     if (getNumInverters() > 0) {
         if (millis() - _lastPoll > (_pollInterval * 1000)) {
