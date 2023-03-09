@@ -500,7 +500,7 @@
         "DiscussionBody": "Discuss with us on <a href=\"https://discord.gg/WzhxEY62mB\" target=\"_blank\">Discord</a> or <a href=\"https://github.com/tbnobody/OpenDTU/discussions\" target=\"_blank\">Github</a>"
     },
     "hints": {
-        "RadioProblem": "Could not connect to a correct NRF24L01+ radio module. Please check the wiring.",
+        "RadioProblem": "Could not connect to a configured radio module. Please check the wiring.",
         "TimeSync": "The clock has not yet been synchronised. Without a correctly set clock, no requests are made to the inverter. This is normal shortly after the start. However, after a longer runtime (>1 minute), it indicates that the NTP server is not accessible.",
         "TimeSyncLink": "Please check your time settings.",
         "DefaultPassword": "You are using the default password for the web interface and the emergency access point. This is potentially insecure.",

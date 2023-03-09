@@ -500,7 +500,7 @@
         "DiscussionBody": "Diskutieren Sie mit uns auf <a href=\"https://discord.gg/WzhxEY62mB\" target=\"_blank\">Discord</a> oder <a href=\"https://github.com/tbnobody/OpenDTU/discussions\" target=\"_blank\">Github</a>"
     },
     "hints": {
-        "RadioProblem": "Es konnte keine Verbindung zu einem NRF24L01+ Funkmodul hergestellt werden. Bitte überprüfen Sie die Verdrahtung.",
+        "RadioProblem": "Es konnte keine Verbindung zu einem der konfigurierten Funkmodule hergestellt werden. Bitte überprüfen Sie die Verdrahtung.",
         "TimeSync": "Die Uhr wurde noch nicht synchronisiert. Ohne eine korrekt eingestellte Uhr werden keine Anfragen an den Wechselrichter gesendet. Dies ist kurz nach dem Start normal. Nach einer längeren Laufzeit (>1 Minute) bedeutet es jedoch, dass der NTP-Server nicht erreichbar ist.",
         "TimeSyncLink": "Bitte überprüfen Sie Ihre Zeiteinstellungen.",
         "DefaultPassword": "Sie verwenden das Standardpasswort für die Weboberfläche und den Notfall Access Point. Dies ist potenziell unsicher.",

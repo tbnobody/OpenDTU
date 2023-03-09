@@ -500,7 +500,7 @@
         "DiscussionBody": "Discutez avec nous sur <a href=\"https://discord.gg/WzhxEY62mB\" target=\"_blank\">Discord</a> ou sur <a href=\"https://github.com/tbnobody/OpenDTU/discussions\" target=\"_blank\">Github</a>"
     },
     "hints": {
-        "RadioProblem": "Impossible de se connecter à un module radio NRF24L01+ correct. Veuillez vérifier le câblage.",
+        "RadioProblem": "Impossible de se connecter à un module radio configuré.. Veuillez vérifier le câblage.",
         "TimeSync": "L'horloge n'a pas encore été synchronisée. Sans une horloge correctement réglée, aucune demande n'est adressée à l'onduleur. Ceci est normal peu de temps après le démarrage. Cependant, après un temps de fonctionnement plus long (>1 minute), cela indique que le serveur NTP n'est pas accessible.",
         "TimeSyncLink": "Veuillez vérifier vos paramètres horaires.",
         "DefaultPassword": "Vous utilisez le mot de passe par défaut pour l'interface Web et le point d'accès d'urgence. Ceci est potentiellement non sécurisé.",
