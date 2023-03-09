@@ -75,9 +75,8 @@ void HoymilesRadio_NRF::loop()
 
                 if (nullptr != inv) {
                     // Save packet in inverter rx buffer
-                    char buf[30];
-                    snprintf(buf, sizeof(buf), "RX Channel: %d --> ", f.channel);
-                    dumpBuf(buf, f.fragment, f.len);
+                    Hoymiles.getMessageOutput()->printf("RX Channel: %d --> ", f.channel);
+                    dumpBuf(f.fragment, f.len);
                     inv->addRxFragment(f.fragment, f.len);
                 } else {
                     Hoymiles.getMessageOutput()->println("Inverter Not found!");

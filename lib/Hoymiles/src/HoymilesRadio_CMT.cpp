@@ -112,7 +112,7 @@ bool HoymilesRadio_CMT::cmtSwitchInvAndDtuFreq(const uint64_t inv_serial, const 
     cmtTxBuffer[14] = crc8(cmtTxBuffer, 14);
 
     Hoymiles.getMessageOutput()->printf("TX CMD56 %s --> ", cmtChToFreq(cmtCurrentCh).c_str());
-    dumpBuf("", cmtTxBuffer, 15);
+    dumpBuf(cmtTxBuffer, 15);
 
     cmtTxLength = 15;
     cmtTxTimeout = 100;
@@ -371,7 +371,7 @@ void HoymilesRadio_CMT::loop()
                 if (nullptr != inv) {
                     // Save packet in inverter rx buffer
                     Hoymiles.getMessageOutput()->printf("RX %s --> ", cmtChToFreq(f.channel).c_str());
-                    dumpBuf("", f.fragment, f.len);
+                    dumpBuf(f.fragment, f.len, false);
                     Hoymiles.getMessageOutput()->printf("| %d dBm", f.rssi);
 
                     inv->addRxFragment(f.fragment, f.len);

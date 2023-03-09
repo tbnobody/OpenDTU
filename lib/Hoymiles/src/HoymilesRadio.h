@@ -23,7 +23,7 @@ public:
 
 protected:
     static serial_u convertSerialToRadioId(serial_u serial);
-    void dumpBuf(const char* info, uint8_t buf[], uint8_t len);
+    void dumpBuf(const uint8_t buf[], uint8_t len, bool appendNewline = true);
 
     bool checkFragmentCrc(fragment_t* fragment);
     virtual void sendEsbPacket(CommandAbstract* cmd) = 0;

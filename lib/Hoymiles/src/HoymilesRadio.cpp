@@ -51,16 +51,14 @@ void HoymilesRadio::sendLastPacketAgain()
     sendEsbPacket(cmd);
 }
 
-void HoymilesRadio::dumpBuf(const char* info, uint8_t buf[], uint8_t len)
+void HoymilesRadio::dumpBuf(const uint8_t buf[], uint8_t len, bool appendNewline)
 {
-
-    if (NULL != info)
-        Hoymiles.getMessageOutput()->print(String(info));
-
     for (uint8_t i = 0; i < len; i++) {
         Hoymiles.getMessageOutput()->printf("%02X ", buf[i]);
     }
-    Hoymiles.getMessageOutput()->println("");
+    if (appendNewline) {
+        Hoymiles.getMessageOutput()->println("");
+    }
 }
 
 bool HoymilesRadio::isInitialized()
