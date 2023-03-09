@@ -30,12 +30,18 @@ export interface Victron {
     tx: number;
 }
 
+export interface Battery {
+    rx: number;
+    tx: number;
+}
+
 export interface Device  {
     name: string;
     nrf24: Nrf24;
     eth: Ethernet;
     display: Display;
     victron: Victron;
+    battery: Battery;
 }
 
 export interface PinMapping extends Array<Device>{}
