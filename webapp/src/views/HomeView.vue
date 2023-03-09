@@ -111,7 +111,7 @@
                 </div>
             </div>
         </div>
-        <VedirectView />
+        <VedirectView v-show="liveData.vedirect.enabled" />
     </BasePage>
    
     <div class="modal" id="eventView" tabindex="-1">

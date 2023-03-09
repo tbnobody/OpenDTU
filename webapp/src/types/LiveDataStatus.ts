@@ -46,8 +46,13 @@ export interface Hints {
     radio_problem: boolean;
 }
 
+export interface Vedirect {
+    enabled: boolean;
+}
+
 export interface LiveData {
     inverters: Inverter[];
     total: Total;
     hints: Hints;
+    vedirect: Vedirect;
 }
