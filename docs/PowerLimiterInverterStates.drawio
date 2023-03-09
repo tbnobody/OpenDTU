@@ -13,7 +13,7 @@
                 <mxCell id="sqCMRMHiXPc9LqBIY9SA-1" value="" style="ellipse;html=1;shape=startState;fillColor=#000000;strokeColor=#ff0000;" parent="1" vertex="1">
                     <mxGeometry x="475" y="50" width="30" height="30" as="geometry"/>
                 </mxCell>
-                <mxCell id="sqCMRMHiXPc9LqBIY9SA-2" value="discover state on initial cal or after enabling powerLimiterl" style="html=1;verticalAlign=bottom;endArrow=open;endSize=8;strokeColor=#ff0000;rounded=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;entryPerimeter=0;" parent="1" source="sqCMRMHiXPc9LqBIY9SA-1" target="2" edge="1">
+                <mxCell id="sqCMRMHiXPc9LqBIY9SA-2" value="discover state on initial call or after enabling powerLimiter" style="html=1;verticalAlign=bottom;endArrow=open;endSize=8;strokeColor=#ff0000;rounded=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;entryPerimeter=0;" parent="1" source="sqCMRMHiXPc9LqBIY9SA-1" target="2" edge="1">
                     <mxGeometry relative="1" as="geometry">
                         <mxPoint x="205" y="370" as="targetPoint"/>
                     </mxGeometry>
