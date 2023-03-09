@@ -257,7 +257,7 @@ uint16_t PowerLimiterClass::getDirectSolarPower()
         return 0;
     }
 
-    return round(VeDirect.veFrame.PPV);
+    return VeDirect.veFrame.PPV;
 }
 
 float PowerLimiterClass::getLoadCorrectedVoltage(std::shared_ptr<InverterAbstract> inverter)
