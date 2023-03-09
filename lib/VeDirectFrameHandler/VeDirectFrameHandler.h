@@ -37,7 +37,7 @@ typedef struct {
     double V;                       // battery voltage in V
     double I;                       // battery current in A
     double VPV;                     // panel voltage in V
-    double PPV;                     // panel power in W
+    uint16_t PPV;                     // panel power in W
     double H19;                     // yield total kWh
     double H20;                     // yield today kWh
     uint16_t H21;                   // maximum power today W
@@ -61,13 +61,13 @@ public:
     String getOrAsString(uint32_t offReason); // off reason as string
     String getMpptAsString(uint8_t mppt);    // state of mppt as string
 
-    veStruct veFrame;                             // public map for received name and value pairs
+    veStruct veFrame{};                      // public struct for received name and value pairs
 
 private:
     void setLastUpdate();                     // set timestampt after successful frame read
     void rxData(uint8_t inbyte);              // byte of serial data
     void textRxEvent(char *, char *);
-    void frameEndEvent(bool);                 // copy temp map to public map
+    void frameEndEvent(bool);                 // copy temp struct to public struct
     void logE(const char *, const char *);    
     bool hexRxEvent(uint8_t);
 
@@ -77,7 +77,7 @@ private:
     char * _textPointer;                       // pointer to the private buffer we're writing to, name or value
     char _name[VE_MAX_VALUE_LEN];              // buffer for the field name
     char _value[VE_MAX_VALUE_LEN];             // buffer for the field value
-    veStruct _tmpFrame;                        // private struct for received name and value pairs
+    veStruct _tmpFrame{};                        // private struct for received name and value pairs
     unsigned long _pollInterval;
     unsigned long _lastPoll;
 };

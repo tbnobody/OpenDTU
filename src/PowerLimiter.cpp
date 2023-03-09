@@ -75,13 +75,14 @@ void PowerLimiterClass::loop()
             || !Hoymiles.getRadio()->isIdle()
             || (millis() - _lastCommandSent) < (config.PowerLimiter_Interval * 1000)
             || (millis() - _lastLoop) < (config.PowerLimiter_Interval * 1000)) {
+        if (!config.PowerLimiter_Enabled)
+            _plState = STATE_DISCOVER; // ensure STATE_DISCOVER is set, if PowerLimiter will be enabled.
         return;
     }
 
     _lastLoop = millis();
 
     std::shared_ptr<InverterAbstract> inverter = Hoymiles.getInverterByPos(config.PowerLimiter_InverterId);
-
     if (inverter == nullptr || !inverter->isReachable()) {
         return;
     }
