@@ -187,10 +187,13 @@
     },
     "radioinfo": {
         "RadioInformation": "Radio Information",
-        "ChipStatus": "Chip Status",
-        "ChipType": "Chip Type",
+        "Status": "{module} Status",
+        "ChipStatus": "{module} Chip Status",
+        "ChipType": "{module} Chip Type",
         "Connected": "connected",
         "NotConnected": "not connected",
+        "Configured": "configured",
+        "NotConfigured": "not configured",
         "Unknown": "Unknown"
     },
     "networkinfo": {

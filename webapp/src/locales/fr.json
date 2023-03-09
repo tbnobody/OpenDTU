@@ -187,10 +187,13 @@
     },
     "radioinfo": {
         "RadioInformation": "Informations sur la radio",
-        "ChipStatus": "État de la puce",
-        "ChipType": "Type de puce",
+        "Status": "{module} Status",
+        "ChipStatus": "{module} sÉtat de la puce",
+        "ChipType": "{module} Type de puce",
         "Connected": "connectée",
         "NotConnected": "non connectée",
+        "Configured": "configured",
+        "NotConfigured": "not configured",
         "Unknown": "Inconnue"
     },
     "networkinfo": {
