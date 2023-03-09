@@ -18,7 +18,7 @@ public:
     void init();
     void loop();
 private:
-    veStruct _kvFrame;
+    veStruct _kvFrame{};
     uint32_t _lastPublish;
 };
 

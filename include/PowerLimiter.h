@@ -7,6 +7,14 @@
 #include <Hoymiles.h>
 #include <memory>
 
+enum PowerLimiterStates {
+    STATE_DISCOVER = 0, 
+    STATE_OFF, 
+    STATE_CONSUME_SOLAR_POWER_ONLY, 
+    STATE_NORMAL_OPERATION
+};
+   
+
 class PowerLimiterClass {
 public:
     void init();
@@ -18,13 +26,15 @@ private:
     uint32_t _lastLoop;
     uint32_t _lastPowerMeterUpdate;
     uint16_t _lastRequestedPowerLimit;
-    bool _consumeSolarPowerOnly;
+    u_int8_t _plState = STATE_DISCOVER; 
 
     float _powerMeter1Power;
     float _powerMeter2Power;
     float _powerMeter3Power;
 
     bool canUseDirectSolarPower();
+    int32_t calcPowerLimit(std::shared_ptr<InverterAbstract> inverter, bool consumeSolarPowerOnly);
+    void setNewPowerLimit(std::shared_ptr<InverterAbstract> inverter, uint32_t newPowerLimit);
     uint16_t getDirectSolarPower();
     float getLoadCorrectedVoltage(std::shared_ptr<InverterAbstract> inverter);
     bool isStartThresholdReached(std::shared_ptr<InverterAbstract> inverter);
