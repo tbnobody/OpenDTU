@@ -36,7 +36,7 @@
                         <div class="row flex-row flex-wrap align-items-start g-3">
                             <div class="col order-0">
                                 <div class="card" :class="{ 'border-info': true }">
-                                    <div class="card-header bg-info">{{ $t('vedirecthome.DeviceInfo') }}</div>
+                                    <div class="card-header text-bg-info">{{ $t('vedirecthome.DeviceInfo') }}</div>
                                     <div class="card-body">
                                         <table class="table table-striped table-hover">
                                             <thead>
