@@ -9,7 +9,9 @@ may be incomplete
 | -------- | --- | -- |
 | Get      | yes | /api/config/get |
 | Post     | yes | /api/config/delete |
+| Get      | yes | /api/config/list |
 | Post     | yes | /api/config/upload |
+| Get+Post | yes | /api/device/config |
 | Get      | no  | /api/devinfo/status |
 | Get+Post | yes | /api/dtu/config |
 | Get      | no  | /api/eventlog/status?inv=inverter-serialnumber |
@@ -21,6 +23,7 @@ may be incomplete
 | Post     | yes | /api/limit/config |
 | Get      | no  | /api/limit/status |
 | Get      | no  | /api/livedata/status |
+| Post     | yes | /api/maintenance/reboot |
 | Get+Post | yes | /api/mqtt/config |
 | Get      | no  | /api/mqtt/status |
 | Get+Post | yes | /api/network/config |
@@ -30,7 +33,9 @@ may be incomplete
 | Get+Post | yes | /api/ntp/time |
 | Get      | no  | /api/power/status |
 | Post     | yes | /api/power/config |
-| Get+Post | yes | /api/security/password |
+| Get      | no  | /api/prometheus/metrics |
+| Get+Post | yes | /api/security/config |
+| Get      | yes | /api/security/authenticate |
 | Get      | no  | /api/system/status |
 
 
@@ -46,6 +51,7 @@ may be incomplete
 - Other API calls use e.g. `/api/limit/status` to GET data and a different URL `/api/limit/config` to POST data.
 - If you want to investigate the web api communication, a good tool is [Postman](https://www.postman.com/)
 - Settings API require username and password provided with Basic Authentication credentials
+- If you disable the readonly access to the web API, every endpoint requires authentication
 
 
 ### Get information
