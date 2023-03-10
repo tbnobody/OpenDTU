@@ -7,18 +7,20 @@
 #include <Hoymiles.h>
 #include <memory>
 
-enum PowerLimiterStates {
+typedef enum {
     STATE_DISCOVER = 0, 
     STATE_OFF, 
     STATE_CONSUME_SOLAR_POWER_ONLY, 
     STATE_NORMAL_OPERATION
-};
+} plStates;
    
 
 class PowerLimiterClass {
 public:
     void init();
     void loop();
+    plStates getPowerLimiterState();
+    uint16_t getLastRequestedPowewrLimit();
     void onMqttMessage(const espMqttClientTypes::MessageProperties& properties, const char* topic, const uint8_t* payload, size_t len, size_t index, size_t total);
 
 private:
@@ -26,7 +28,7 @@ private:
     uint32_t _lastLoop;
     uint32_t _lastPowerMeterUpdate;
     uint16_t _lastRequestedPowerLimit;
-    u_int8_t _plState = STATE_DISCOVER; 
+    plStates _plState = STATE_DISCOVER; 
 
     float _powerMeter1Power;
     float _powerMeter2Power;

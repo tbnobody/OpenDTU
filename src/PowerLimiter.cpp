@@ -186,6 +186,14 @@ void PowerLimiterClass::loop()
     }
 }
 
+plStates PowerLimiterClass::getPowerLimiterState() {
+    return _plState;
+}
+
+uint16_t PowerLimiterClass::getLastRequestedPowewrLimit() {
+    return _lastRequestedPowerLimit;
+}
+
 bool PowerLimiterClass::canUseDirectSolarPower()
 {
     CONFIG_T& config = Configuration.get();

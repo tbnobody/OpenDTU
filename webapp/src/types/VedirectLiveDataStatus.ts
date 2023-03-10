@@ -22,4 +22,6 @@ export interface Vedirect {
     H21: ValueObject;
     H22: ValueObject;
     H23: ValueObject;
+    PLSTATE: number;
+    PLLIMIT: number;
 }

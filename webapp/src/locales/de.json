@@ -152,7 +152,8 @@
         "YieldToday": "Ertrag heute",
         "MaximumPowerToday": "Maximale Leistung heute",
         "YieldYesterday": "Ertrag gestern",
-        "MaximumPowerYesterday": "Maximale Leistung gestern"
+        "MaximumPowerYesterday": "Maximale Leistung gestern",
+        "PowerLimiterState": "Power limiter Status [aus (laden), nur die Sonne nutzen, Nutzung der Batterie]"
     },
     "eventlog": {
         "Start": "Begin",

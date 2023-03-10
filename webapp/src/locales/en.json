@@ -152,7 +152,8 @@
         "YieldToday": "Yield today",
         "MaximumPowerToday": "Maximum power today",
         "YieldYesterday": "Yield yesterday",
-        "MaximumPowerYesterday": "Maximum power yesterday"
+        "MaximumPowerYesterday": "Maximum power yesterday",
+        "PowerLimiterState": "Power limiter state [off (charging), solar passthrough, on battery]"
     },
     "eventlog": {
         "Start": "Start",

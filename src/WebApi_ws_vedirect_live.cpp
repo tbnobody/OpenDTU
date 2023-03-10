@@ -8,6 +8,7 @@
 #include "MessageOutput.h"
 #include "WebApi.h"
 #include "defaults.h"
+#include "PowerLimiter.h"
 
 WebApiWsVedirectLiveClass::WebApiWsVedirectLiveClass()
     : _ws("/vedirectlivedata")
@@ -119,6 +120,13 @@ void WebApiWsVedirectLiveClass::generateJsonResponse(JsonVariant& root)
     root["H22"]["u"] = "kWh";
     root["H23"]["v"] = VeDirect.veFrame.H23;
     root["H23"]["u"] = "W";
+
+    // power limiter state
+    if (Configuration.get().PowerLimiter_Enabled)
+        root["PLSTATE"] = PowerLimiter.getPowerLimiterState();
+    else
+        root["PLSTATE"] = -1;
+    root["PLLIMIT"] = PowerLimiter.getLastRequestedPowewrLimit();
 
     if (VeDirect.getLastUpdate() > _newestVedirectTimestamp) {
         _newestVedirectTimestamp = VeDirect.getLastUpdate();

@@ -31,6 +31,27 @@
                                 </div>
                             </div>
                         </div>
+                        <div class="btn-group me-2" role="group">
+                            <button type="button"
+                                class="btn btn-sm" v-tooltip :title="$t('vedirecthome.PowerLimiterState')">
+                                <div v-if="vedirectData.PLSTATE == 0">
+                                    <BIconXCircleFill style="font-size:24px;" />
+                                </div>
+                                <div v-else-if="vedirectData.PLSTATE == 1">
+                                    <BIconBatteryCharging style="font-size:24px;" />
+                                </div>
+                                <div v-else-if="vedirectData.PLSTATE == 2">
+                                    <BIconSun style="font-size:24px;" />
+                                </div>
+                                <div v-else-if="vedirectData.PLSTATE == 3">
+                                    <BIconBatteryHalf style="font-size:24px;" />
+                                </div>
+                                <span v-if="vedirectData.PLSTATE != -1"
+                                    class="position-absolute top-0 start-100 translate-middle badge rounded-pill text-bg-info">
+                                    {{ vedirectData.PLLIMIT }} W
+                                </span>
+                            </button>
+                        </div>
                     </div>
                     <div class="card-body">
                         <div class="row flex-row flex-wrap align-items-start g-3">
@@ -178,10 +199,20 @@
 import { defineComponent } from 'vue';
 import type { Vedirect } from '@/types/VedirectLiveDataStatus';
 import { handleResponse, authHeader, authUrl } from '@/utils/authentication';
+import {
+    BIconSun,
+    BIconBatteryCharging,
+    BIconBatteryHalf,
+    BIconXCircleFill
+} from 'bootstrap-icons-vue';
 
 
 export default defineComponent({
     components: {
+        BIconSun,
+        BIconBatteryCharging,
+        BIconBatteryHalf,
+        BIconXCircleFill
     },
     data() {
         return {
