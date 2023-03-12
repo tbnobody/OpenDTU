@@ -1,8 +1,9 @@
 #include "PylontechCanReceiver.h"
 #include "Battery.h"
 #include "Configuration.h"
+#include "MessageOutput.h"
 #include "MqttSettings.h"
-#include <CAN.h>
+#include <driver/twai.h>
 #include <ctime>
 
 //#define PYLONTECH_DEBUG_ENABLED
@@ -11,21 +12,35 @@ PylontechCanReceiverClass PylontechCanReceiver;
 
 void PylontechCanReceiverClass::init(int8_t rx, int8_t tx)
 {
-    CAN.setPins(rx, tx);
-
     CONFIG_T& config = Configuration.get();
-
     if (!config.Battery_Enabled) {
         return;
     }
 
-    enable();
+  g_config = TWAI_GENERAL_CONFIG_DEFAULT((gpio_num_t)tx, (gpio_num_t)rx, TWAI_MODE_NORMAL);
+  enable();
+
 }
 
 void PylontechCanReceiverClass::enable()
 {
-    if (!CAN.begin(500E3)) {
-        Hoymiles.getMessageOutput()->println("Starting CAN failed!");
+
+    // Initialize configuration structures using macro initializers
+    twai_timing_config_t t_config = TWAI_TIMING_CONFIG_500KBITS();
+    twai_filter_config_t f_config = TWAI_FILTER_CONFIG_ACCEPT_ALL();
+
+    // Install TWAI driver
+    if (twai_driver_install(&g_config, &t_config, &f_config) == ESP_OK) {
+        MessageOutput.printf("Driver installed\n");
+    } else {
+        MessageOutput.printf("Failed to install driver\n");
+    }
+
+    // Start TWAI driver
+    if (twai_start() == ESP_OK) {
+        MessageOutput.printf("Driver started\n");
+    } else {
+        MessageOutput.printf("Failed to start driver\n");
     }
 }
 
@@ -83,65 +98,75 @@ void PylontechCanReceiverClass::mqtt()
 
 void PylontechCanReceiverClass::parseCanPackets()
 {
-    // try to parse packet
-    int packetSize = CAN.parsePacket();
 
-    if ((packetSize <= 0 && CAN.packetId() == -1)
-            || CAN.packetRtr()) {
+    // Check for messages. twai_recive is blocking when there is no data so we return if there are no frames in the buffer
+    twai_status_info_t status_info;
+    if (twai_get_status_info(&status_info) != ESP_OK) {
+        MessageOutput .printf("Failed to get status info\n");
+        return;
+    }
+    if (status_info.msgs_to_rx == 0) {
         return;
     }
 
-    switch (CAN.packetId()) {
+    // Wait for message to be received, function is blocking
+    twai_message_t rx_message;
+    if (twai_receive(&rx_message, pdMS_TO_TICKS(100)) != ESP_OK) {
+        MessageOutput.printf("Failed to receive message\n");
+        return;
+    }
+
+    switch (rx_message.identifier) {
         case 0x351: {
-            Battery.chargeVoltage = this->scaleValue(this->readUnsignedInt16(), 0.1);
-            Battery.chargeCurrentLimitation = this->scaleValue(this->readSignedInt16(), 0.1);
-            Battery.dischargeCurrentLimitation = this->scaleValue(this->readSignedInt16(), 0.1);
+            Battery.chargeVoltage = this->scaleValue(this->readUnsignedInt16(rx_message.data), 0.1);
+            Battery.chargeCurrentLimitation = this->scaleValue(this->readSignedInt16(rx_message.data + 2), 0.1);
+            Battery.dischargeCurrentLimitation = this->scaleValue(this->readSignedInt16(rx_message.data + 4), 0.1);
 
 #ifdef PYLONTECH_DEBUG_ENABLED
-            Hoymiles.getMessageOutput()->printf("[Pylontech] chargeVoltage: %f chargeCurrentLimitation: %f dischargeCurrentLimitation: %f\n",
+           MessageOutput.printf("[Pylontech] chargeVoltage: %f chargeCurrentLimitation: %f dischargeCurrentLimitation: %f\n",
                 Battery.chargeVoltage, Battery.chargeCurrentLimitation, Battery.dischargeCurrentLimitation);
 #endif
             break;
         }
 
         case 0x355: {
-            Battery.stateOfCharge = this->readUnsignedInt16();
+            Battery.stateOfCharge = this->readUnsignedInt16(rx_message.data);
             Battery.stateOfChargeLastUpdate = millis();
-            Battery.stateOfHealth = this->readUnsignedInt16();
+            Battery.stateOfHealth = this->readUnsignedInt16(rx_message.data + 2);
 
 #ifdef PYLONTECH_DEBUG_ENABLED
-            Hoymiles.getMessageOutput()->printf("[Pylontech] soc: %d soh: %d\n",
+            MessageOutput.printf("[Pylontech] soc: %d soh: %d\n",
                 Battery.stateOfCharge, Battery.stateOfHealth);
 #endif
             break;
         }
 
         case 0x356: {
-            Battery.voltage = this->scaleValue(this->readSignedInt16(), 0.01);
-            Battery.current = this->scaleValue(this->readSignedInt16(), 0.1);
-            Battery.temperature = this->scaleValue(this->readSignedInt16(), 0.1);
+            Battery.voltage = this->scaleValue(this->readSignedInt16(rx_message.data), 0.01);
+            Battery.current = this->scaleValue(this->readSignedInt16(rx_message.data + 2), 0.1);
+            Battery.temperature = this->scaleValue(this->readSignedInt16(rx_message.data + 4), 0.1);
 
 #ifdef PYLONTECH_DEBUG_ENABLED
-            Hoymiles.getMessageOutput()->printf("[Pylontech] voltage: %f current: %f temperature: %f\n",
+            MessageOutput.printf("[Pylontech] voltage: %f current: %f temperature: %f\n",
                 Battery.voltage, Battery.current, Battery.temperature);
 #endif
             break;
         }
 
         case 0x359: {
-            uint16_t alarmBits = this->readUnsignedInt8();
+            uint16_t alarmBits = rx_message.data[0];
             Battery.alarmOverCurrentDischarge = this->getBit(alarmBits, 7);
             Battery.alarmUnderTemperature = this->getBit(alarmBits, 4);
             Battery.alarmOverTemperature = this->getBit(alarmBits, 3);
             Battery.alarmUnderVoltage = this->getBit(alarmBits, 2);
             Battery.alarmOverVoltage= this->getBit(alarmBits, 1);
 
-            alarmBits = this->readUnsignedInt8();
+            alarmBits = rx_message.data[1];
             Battery.alarmBmsInternal= this->getBit(alarmBits, 3);
             Battery.alarmOverCurrentCharge = this->getBit(alarmBits, 0);
 
 #ifdef PYLONTECH_DEBUG_ENABLED
-            Hoymiles.getMessageOutput()->printf("[Pylontech] Alarms: %d %d %d %d %d %d %d\n",
+            MessageOutput.printf("[Pylontech] Alarms: %d %d %d %d %d %d %d\n",
                 Battery.alarmOverCurrentDischarge,
                 Battery.alarmUnderTemperature,
                 Battery.alarmOverTemperature,
@@ -151,19 +176,19 @@ void PylontechCanReceiverClass::parseCanPackets()
                 Battery.alarmOverCurrentCharge);
 #endif
 
-            uint16_t warningBits = this->readUnsignedInt8();
+            uint16_t warningBits = rx_message.data[2];
             Battery.warningHighCurrentDischarge = this->getBit(warningBits, 7);
             Battery.warningLowTemperature = this->getBit(warningBits, 4);
             Battery.warningHighTemperature = this->getBit(warningBits, 3);
             Battery.warningLowVoltage = this->getBit(warningBits, 2);
             Battery.warningHighVoltage = this->getBit(warningBits, 1);
 
-            warningBits = this->readUnsignedInt8();
+            warningBits = rx_message.data[3];
             Battery.warningBmsInternal= this->getBit(warningBits, 3);
             Battery.warningHighCurrentCharge = this->getBit(warningBits, 0);
 
 #ifdef PYLONTECH_DEBUG_ENABLED
-            Hoymiles.getMessageOutput()->printf("[Pylontech] Warnings: %d %d %d %d %d %d %d\n",
+            MessageOutput.printf("[Pylontech] Warnings: %d %d %d %d %d %d %d\n",
                 Battery.warningHighCurrentDischarge,
                 Battery.warningLowTemperature,
                 Battery.warningHighTemperature,
@@ -177,7 +202,8 @@ void PylontechCanReceiverClass::parseCanPackets()
 
         case 0x35E: {
 
-            String manufacturer = CAN.readString();
+            String manufacturer = String(rx_message.data, rx_message.data_length_code);
+            //CAN.readString();
 
             if (manufacturer == "") {
                 break;
@@ -186,47 +212,43 @@ void PylontechCanReceiverClass::parseCanPackets()
             strlcpy(Battery.manufacturer, manufacturer.c_str(), sizeof(Battery.manufacturer));
 
 #ifdef PYLONTECH_DEBUG_ENABLED
-            Hoymiles.getMessageOutput()->printf("[Pylontech] Manufacturer: %s\n", manufacturer.c_str());
+            MessageOutput.printf("[Pylontech] Manufacturer: %s\n", manufacturer.c_str());
 #endif   
             break;
         }
 
         case 0x35C: {
-            uint16_t chargeStatusBits = this->readUnsignedInt8();
+            uint16_t chargeStatusBits = rx_message.data[0];
             Battery.chargeEnabled = this->getBit(chargeStatusBits, 7);
             Battery.dischargeEnabled = this->getBit(chargeStatusBits, 6);
             Battery.chargeImmediately = this->getBit(chargeStatusBits, 5);
 
 #ifdef PYLONTECH_DEBUG_ENABLED
-            Hoymiles.getMessageOutput()->printf("[Pylontech] chargeStatusBits: %d %d %d\n",
+            MessageOutput.printf("[Pylontech] chargeStatusBits: %d %d %d\n",
                 Battery.chargeEnabled,
                 Battery.dischargeEnabled,
                 Battery.chargeImmediately);
 #endif
 
-            this->readUnsignedInt8();
+            // this->readUnsignedInt8();
             break;
         }
     }
 }
 
-uint8_t PylontechCanReceiverClass::readUnsignedInt8()
-{
-    return CAN.read();
-}
 
-uint16_t PylontechCanReceiverClass::readUnsignedInt16()
+uint16_t PylontechCanReceiverClass::readUnsignedInt16(uint8_t *data)
 {
     uint8_t bytes[2];
-    bytes[0] = (uint8_t)CAN.read();
-    bytes[1] = (uint8_t)CAN.read();
-
+    bytes[0] = *data;
+    bytes[1] = *(data + 1);
     return (bytes[1] << 8) + bytes[0];
+
 }
 
-int16_t PylontechCanReceiverClass::readSignedInt16()
+int16_t PylontechCanReceiverClass::readSignedInt16(uint8_t *data)
 {
-    return this->readUnsignedInt16();
+    return this->readUnsignedInt16(data);
 }
 
 float PylontechCanReceiverClass::scaleValue(int16_t value, float factor)
