@@ -31,16 +31,16 @@ void PylontechCanReceiverClass::enable()
 
     // Install TWAI driver
     if (twai_driver_install(&g_config, &t_config, &f_config) == ESP_OK) {
-        MessageOutput.printf("Driver installed\n");
+        MessageOutput.printf("[Pylontech] Twai driver installed\n");
     } else {
-        MessageOutput.printf("Failed to install driver\n");
+        MessageOutput.printf("[Pylontech] Failed to install Twai driver\n");
     }
 
     // Start TWAI driver
     if (twai_start() == ESP_OK) {
-        MessageOutput.printf("Driver started\n");
+        MessageOutput.printf("[Pylontech] Twai driver started\n");
     } else {
-        MessageOutput.printf("Failed to start driver\n");
+        MessageOutput.printf("[Pylontech] Failed to start Twai driver\n");
     }
 }
 
@@ -102,7 +102,7 @@ void PylontechCanReceiverClass::parseCanPackets()
     // Check for messages. twai_recive is blocking when there is no data so we return if there are no frames in the buffer
     twai_status_info_t status_info;
     if (twai_get_status_info(&status_info) != ESP_OK) {
-        MessageOutput .printf("Failed to get status info\n");
+        MessageOutput.printf("[Pylontech]Failed to get Twai status info\n");
         return;
     }
     if (status_info.msgs_to_rx == 0) {
@@ -112,7 +112,7 @@ void PylontechCanReceiverClass::parseCanPackets()
     // Wait for message to be received, function is blocking
     twai_message_t rx_message;
     if (twai_receive(&rx_message, pdMS_TO_TICKS(100)) != ESP_OK) {
-        MessageOutput.printf("Failed to receive message\n");
+        MessageOutput.printf("[Pylontech] Failed to receive message\n");
         return;
     }
 
@@ -201,7 +201,6 @@ void PylontechCanReceiverClass::parseCanPackets()
         }
 
         case 0x35E: {
-
             String manufacturer = String(rx_message.data, rx_message.data_length_code);
             //CAN.readString();
 
@@ -230,7 +229,6 @@ void PylontechCanReceiverClass::parseCanPackets()
                 Battery.chargeImmediately);
 #endif
 
-            // this->readUnsignedInt8();
             break;
         }
     }
