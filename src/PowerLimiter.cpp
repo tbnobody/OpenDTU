@@ -119,11 +119,7 @@ void PowerLimiterClass::loop()
                         dcVoltage, correctedDcVoltage);
                     MessageOutput.println("[PowerLimiterClass::loop] Stopping inverter...");
                     inverter->sendPowerControlRequest(Hoymiles.getRadio(), false);
-
-                    uint16_t newPowerLimit = (uint16_t)config.PowerLimiter_LowerPowerLimit;
-                    inverter->sendActivePowerControlRequest(Hoymiles.getRadio(), newPowerLimit, PowerLimitControlType::AbsolutNonPersistent);
-                    _lastRequestedPowerLimit = newPowerLimit;
-                    _lastCommandSent = millis();
+                    setNewPowerLimit(inverter, config.PowerLimiter_LowerPowerLimit);
                     return;
                 }
 
@@ -190,7 +186,7 @@ plStates PowerLimiterClass::getPowerLimiterState() {
     return _plState;
 }
 
-uint16_t PowerLimiterClass::getLastRequestedPowewrLimit() {
+uint32_t PowerLimiterClass::getLastRequestedPowewrLimit() {
     return _lastRequestedPowerLimit;
 }
 
@@ -215,7 +211,7 @@ int32_t PowerLimiterClass::calcPowerLimit(std::shared_ptr<InverterAbstract> inve
 {
     CONFIG_T& config = Configuration.get();
     
-    int32_t newPowerLimit = _powerMeter1Power + _powerMeter2Power + _powerMeter3Power;
+    int32_t newPowerLimit = round(_powerMeter1Power + _powerMeter2Power + _powerMeter3Power);
 
     float efficency = inverter->Statistics()->getChannelFieldValue(TYPE_AC, (ChannelNum_t) config.PowerLimiter_InverterChannelId, FLD_EFF);
     uint32_t victronChargePower = this->getDirectSolarPower();
@@ -234,7 +230,7 @@ int32_t PowerLimiterClass::calcPowerLimit(std::shared_ptr<InverterAbstract> inve
 
         newPowerLimit -= config.PowerLimiter_TargetPowerConsumption;
 
-        uint16_t upperPowerLimit = config.PowerLimiter_UpperPowerLimit;
+        uint32_t upperPowerLimit = config.PowerLimiter_UpperPowerLimit;
         if (consumeSolarPowerOnly && (upperPowerLimit > adjustedVictronChargePower)) {
             // Battery voltage too low, use Victron solar power (corrected by efficency factor) only
             upperPowerLimit = adjustedVictronChargePower;
@@ -258,7 +254,7 @@ void PowerLimiterClass::setNewPowerLimit(std::shared_ptr<InverterAbstract> inver
     _lastCommandSent = millis();
 }
 
-uint16_t PowerLimiterClass::getDirectSolarPower()
+uint32_t PowerLimiterClass::getDirectSolarPower()
 {
     if (!canUseDirectSolarPower()) {
         return 0;
