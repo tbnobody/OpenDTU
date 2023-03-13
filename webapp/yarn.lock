@@ -696,10 +696,10 @@ boolbase@^1.0.0:
   resolved "https://registry.yarnpkg.com/boolbase/-/boolbase-1.0.0.tgz#68dff5fbe60c51eb37725ea9e3ed310dcc1e776e"
   integrity sha512-JZOSA7Mo9sNGB8+UjSgzdLtokWAky1zbztM3WRLCbZ70/3cTANmQmOdR7y2g+J0e2WXywy1yS468tY+IruqEww==
 
-bootstrap-icons-vue@^1.8.1:
-  version "1.8.1"
-  resolved "https://registry.yarnpkg.com/bootstrap-icons-vue/-/bootstrap-icons-vue-1.8.1.tgz#ce4a0c1f6efe41dabcc1341f2cb191d307fbaf50"
-  integrity sha512-uItRULwQz0epETi9x/RBEqfjHmTAmkIIczpH1R6L9T6yyaaijk0826PzTWnWNm15tw66JT/8GNuXjB0HI5PHLw==
+bootstrap-icons-vue@^1.10.3:
+  version "1.10.3"
+  resolved "https://registry.yarnpkg.com/bootstrap-icons-vue/-/bootstrap-icons-vue-1.10.3.tgz#ae725513c9655ce86effa2a0b09e9e65b02c8f1a"
+  integrity sha512-BzqmLufgHjFvSReJ1GQqNkl780UFK0rWT4Y1IQC7lZClXyOSsM5Ipw04BnuVmmrqgtSxzak83jcBwLJgCK3scg==
 
 bootstrap@^5.3.0-alpha1:
   version "5.3.0-alpha1"

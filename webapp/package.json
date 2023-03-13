@@ -13,7 +13,7 @@
   "dependencies": {
     "@popperjs/core": "^2.11.6",
     "bootstrap": "^5.3.0-alpha1",
-    "bootstrap-icons-vue": "^1.8.1",
+    "bootstrap-icons-vue": "^1.10.3",
     "mitt": "^3.0.0",
     "spark-md5": "^3.0.2",
     "vue": "^3.2.47",
