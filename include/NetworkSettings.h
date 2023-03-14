@@ -59,6 +59,7 @@ public:
 private:
     void setHostname();
     void setStaticIp();
+    void setupMDNS();
     void setupMode();
     void NetworkEvent(WiFiEvent_t event);
     bool adminEnabled = true;

@@ -9,6 +9,7 @@
 #include "Utils.h"
 #include "defaults.h"
 #include <ETH.h>
+#include <ESPmDNS.h>
 
 NetworkSettingsClass::NetworkSettingsClass()
     : apIp(192, 168, 4, 1)
@@ -232,6 +233,7 @@ void NetworkSettingsClass::applyConfig()
     }
     MessageOutput.println(F("done"));
     setStaticIp();
+    setupMDNS();
 }
 
 void NetworkSettingsClass::setHostname()
@@ -292,6 +294,17 @@ void NetworkSettingsClass::setStaticIp()
             MessageOutput.println(F("done"));
         }
     }
+}
+
+void NetworkSettingsClass::setupMDNS()
+{
+    MessageOutput.print(F("Setting up mDNS responder... "));
+    if (!MDNS.begin(getHostname().c_str())) {
+        MessageOutput.print(F("failed"));
+        return;
+    }
+    
+    MessageOutput.println(F("successful"));
 }
 
 IPAddress NetworkSettingsClass::localIP()

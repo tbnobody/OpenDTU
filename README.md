@@ -210,7 +210,7 @@ It is also possible to flash it via the web tools which might be more convenient
 Once you have your OpenDTU running and connected to WLAN, you can do further updates through the web interface.
 Navigate to Settings --> Firmware upgrade and press the browse button. Select the firmware file from your local computer.
 
-You'll find the firmware file (after a successfull build process) under `.pio/build/generic/firmware.bin`.
+You'll find the firmware file (after a successful build process) under `.pio/build/generic/firmware.bin`.
 
 If you downloaded a precompiled zip archive, unpack it and choose `opendtu-generic.bin`.
 

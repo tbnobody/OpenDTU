@@ -86,8 +86,8 @@ void setup()
     SunPosition.init();
     MessageOutput.println(F("done"));
 
-    // Initialize MqTT
-    MessageOutput.print(F("Initialize MqTT... "));
+    // Initialize MQTT
+    MessageOutput.print(F("Initialize MQTT... "));
     MqttSettings.init();
     MqttHandleDtu.init();
     MqttHandleInverter.init();
