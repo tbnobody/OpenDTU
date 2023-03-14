@@ -94,16 +94,18 @@
                         <div class="card-body">
                             <div class="row flex-row-reverse flex-wrap-reverse g-3">
                                 <template v-for="chanType in [{obj: inverter.INV, name: 'INV'}, {obj: inverter.AC, name: 'AC'}, {obj: inverter.DC, name: 'DC'}].reverse()">
-                                    <div v-for="channel in Object.keys(chanType.obj).sort().reverse().map(x=>+x)" :key="channel" class="col">
+                                    <template v-for="channel in Object.keys(chanType.obj).sort().reverse().map(x=>+x)" :key="channel">
                                         <template v-if="(chanType.name != 'DC') ||
                                             (chanType.name == 'DC' && getSumIrridiation(inverter) == 0) ||
                                             (chanType.name == 'DC' && getSumIrridiation(inverter) > 0 && chanType.obj[channel].Irradiation?.v || 0 > 0)
                                             ">
-                                            <InverterChannelInfo :channelData="chanType.obj[channel]"
-                                                :channelType="chanType.name"
-                                                :channelNumber="channel" />
+                                            <div class="col">
+                                                <InverterChannelInfo :channelData="chanType.obj[channel]"
+                                                    :channelType="chanType.name"
+                                                    :channelNumber="channel" />
+                                            </div>
                                         </template>
-                                    </div>
+                                    </template>
                                 </template>
                             </div>
                         </div>

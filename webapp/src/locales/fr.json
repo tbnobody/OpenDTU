@@ -25,6 +25,11 @@
     "base": {
         "Loading": "Chargement..."
     },
+    "localeswitcher": {
+        "Dark": "Dark",
+        "Light": "Light",
+        "Auto": "Auto"
+    },
     "apiresponse": {
         "1001": "Paramètres enregistrés !",
         "1002": "Aucune valeur trouvée !",
