@@ -71,6 +71,7 @@ Firmware version seems to play not a significant role and cannot be read from th
 ## Breaking changes
 Generated using: `git log --date=short --pretty=format:"* %h%x09%ad%x09%s" | grep BREAKING`
 ```
+* 318136d       2023-03-15      BREAKING CHANGE: Updated partition table: Make sure you have a configuration backup and completly reflash the device!
 * 3b7aef6       2023-02-13      BREAKING CHANGE: Web API!
 * d4c838a       2023-02-06      BREAKING CHANGE: Prometheus API!
 * daf847e       2022-11-14      BREAKING CHANGE: Removed deprecated config parsing method
