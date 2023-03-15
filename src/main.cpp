@@ -107,10 +107,11 @@ void setup()
         pin.display_clk,
         pin.display_cs,
         pin.display_reset);
-    Display.showLogo = config.Display_ShowLogo;
+    Display.setOrientation(config.Display_Rotation);
     Display.enablePowerSafe = config.Display_PowerSafe;
     Display.enableScreensaver = config.Display_ScreenSaver;
-    Display.contrast = config.Display_Contrast;
+    Display.setContrast(config.Display_Contrast);
+    Display.setStartupDisplay();
     MessageOutput.println(F("done"));
 
     // Check for default DTU serial

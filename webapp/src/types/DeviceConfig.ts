@@ -1,7 +1,7 @@
 import type { Device } from "./PinMapping";
 
 export interface Display {
-    show_logo: boolean;
+    rotation: number;
     power_safe: boolean;
     screensaver: boolean;
     contrast: number;
