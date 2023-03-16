@@ -8,6 +8,7 @@ public:
     TimeoutHelper();
     void set(uint32_t ms);
     void extend(uint32_t ms);
+    void reset();
     bool occured();
 
 private:
