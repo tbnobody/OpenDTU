@@ -217,7 +217,8 @@ int32_t PowerLimiterClass::calcPowerLimit(std::shared_ptr<InverterAbstract> inve
     uint32_t victronChargePower = this->getDirectSolarPower();
     uint32_t adjustedVictronChargePower = victronChargePower * (efficency > 0.0 ? (efficency / 100.0) : 1.0); // if inverter is off, use 1.0
 
-    MessageOutput.printf("[PowerLimiterClass::loop] victronChargePower: %d, efficiency: %.2f, consumeSolarPowerOnly: %s \r\n", victronChargePower, efficency, consumeSolarPowerOnly ? "true" : "false");
+    MessageOutput.printf("[PowerLimiterClass::loop] victronChargePower: %d, efficiency: %.2f, consumeSolarPowerOnly: %s, powerConsumption: %d \r\n", 
+        victronChargePower, efficency, consumeSolarPowerOnly ? "true" : "false", newPowerLimit);
    
     if (millis() - _lastPowerMeterUpdate < (30 * 1000)) {
         if (config.PowerLimiter_IsInverterBehindPowerMeter) {
@@ -230,7 +231,7 @@ int32_t PowerLimiterClass::calcPowerLimit(std::shared_ptr<InverterAbstract> inve
 
         newPowerLimit -= config.PowerLimiter_TargetPowerConsumption;
 
-        uint32_t upperPowerLimit = config.PowerLimiter_UpperPowerLimit;
+        int32_t upperPowerLimit = config.PowerLimiter_UpperPowerLimit;
         if (consumeSolarPowerOnly && (upperPowerLimit > adjustedVictronChargePower)) {
             // Battery voltage too low, use Victron solar power (corrected by efficency factor) only
             upperPowerLimit = adjustedVictronChargePower;
