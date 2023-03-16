@@ -612,7 +612,7 @@ export default defineComponent({
             } else {
                 this.targetLimitTypeText = this.$t('home.Absolute');
                 this.targetLimitMin = 10;
-                this.targetLimitMax = (this.currentLimitList.max_power > 0 ? this.currentLimitList.max_power : 1500);
+                this.targetLimitMax = (this.currentLimitList.max_power > 0 ? this.currentLimitList.max_power : 2250);
             }
             this.targetLimitType = type;
         },
