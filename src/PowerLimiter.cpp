@@ -186,7 +186,7 @@ plStates PowerLimiterClass::getPowerLimiterState() {
     return _plState;
 }
 
-uint32_t PowerLimiterClass::getLastRequestedPowewrLimit() {
+int32_t PowerLimiterClass::getLastRequestedPowewrLimit() {
     return _lastRequestedPowerLimit;
 }
 
@@ -214,8 +214,8 @@ int32_t PowerLimiterClass::calcPowerLimit(std::shared_ptr<InverterAbstract> inve
     int32_t newPowerLimit = round(_powerMeter1Power + _powerMeter2Power + _powerMeter3Power);
 
     float efficency = inverter->Statistics()->getChannelFieldValue(TYPE_AC, (ChannelNum_t) config.PowerLimiter_InverterChannelId, FLD_EFF);
-    uint32_t victronChargePower = this->getDirectSolarPower();
-    uint32_t adjustedVictronChargePower = victronChargePower * (efficency > 0.0 ? (efficency / 100.0) : 1.0); // if inverter is off, use 1.0
+    int32_t victronChargePower = this->getDirectSolarPower();
+    int32_t adjustedVictronChargePower = victronChargePower * (efficency > 0.0 ? (efficency / 100.0) : 1.0); // if inverter is off, use 1.0
 
     MessageOutput.printf("[PowerLimiterClass::loop] victronChargePower: %d, efficiency: %.2f, consumeSolarPowerOnly: %s, powerConsumption: %d \r\n", 
         victronChargePower, efficency, consumeSolarPowerOnly ? "true" : "false", newPowerLimit);
@@ -247,7 +247,7 @@ int32_t PowerLimiterClass::calcPowerLimit(std::shared_ptr<InverterAbstract> inve
     return newPowerLimit;
 }
 
-void PowerLimiterClass::setNewPowerLimit(std::shared_ptr<InverterAbstract> inverter, uint32_t newPowerLimit)
+void PowerLimiterClass::setNewPowerLimit(std::shared_ptr<InverterAbstract> inverter, int32_t newPowerLimit)
 {
     MessageOutput.printf("[PowerLimiterClass::loop] Limit Non-Persistent: %d W\r\n", newPowerLimit);
     inverter->sendActivePowerControlRequest(Hoymiles.getRadio(), newPowerLimit, PowerLimitControlType::AbsolutNonPersistent);
@@ -255,7 +255,7 @@ void PowerLimiterClass::setNewPowerLimit(std::shared_ptr<InverterAbstract> inver
     _lastCommandSent = millis();
 }
 
-uint32_t PowerLimiterClass::getDirectSolarPower()
+int32_t PowerLimiterClass::getDirectSolarPower()
 {
     if (!canUseDirectSolarPower()) {
         return 0;
