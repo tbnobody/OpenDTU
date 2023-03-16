@@ -101,6 +101,7 @@ struct CONFIG_T {
 
     bool PowerLimiter_Enabled;
     bool PowerLimiter_SolarPassTroughEnabled;
+    uint8_t PowerLimiter_BatteryDrainStategy;
     uint32_t PowerLimiter_Interval;
     char PowerLimiter_MqttTopicPowerMeter1[MQTT_MAX_TOPIC_STRLEN + 1];
     char PowerLimiter_MqttTopicPowerMeter2[MQTT_MAX_TOPIC_STRLEN + 1];

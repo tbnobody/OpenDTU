@@ -14,6 +14,19 @@
                                 :label="$t('powerlimiteradmin.EnableSolarPasstrough')"
                                 v-model="powerLimiterConfigList.solar_passtrough_enabled"
                                 type="checkbox" wide/>
+                
+                <div class="row mb-3" v-show="powerLimiterConfigList.enabled && powerLimiterConfigList.solar_passtrough_enabled">
+                    <label for="inputTimezone" class="col-sm-2 col-form-label">
+                        {{ $t('powerlimiteradmin.BatteryDrainStrategy') }}:
+                    </label>
+                    <div class="col-sm-10">
+                        <select class="form-select" v-model="powerLimiterConfigList.battery_drain_strategy">
+                            <option v-for="batteryDrainStrategy in batteryDrainStrategyList" :key="batteryDrainStrategy.key" :value="batteryDrainStrategy.key">
+                                {{ $t(batteryDrainStrategy.value) }}
+                            </option>
+                        </select>
+                    </div>
+                </div>
 
                 <div class="alert alert-secondary" v-show="powerLimiterConfigList.enabled" role="alert" v-html="$t('powerlimiteradmin.SolarpasstroughInfo')"></div>
 
@@ -255,6 +268,10 @@ export default defineComponent({
                 { key: 1, value: "CH 1" },
                 { key: 2, value: "CH 2" },
                 { key: 3, value: "CH 3" },
+            ],
+            batteryDrainStrategyList: [
+                { key: 0, value: "powerlimiteradmin.BatteryDrainWhenFull"},
+                { key: 1, value: "powerlimiteradmin.BatteryDrainAtNight" },
             ],
             alertMessage: "",
             alertType: "info",

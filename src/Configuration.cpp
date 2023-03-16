@@ -118,6 +118,7 @@ bool ConfigurationClass::write()
     JsonObject powerlimiter = doc.createNestedObject("powerlimiter");
     powerlimiter["enabled"] = config.PowerLimiter_Enabled;
     powerlimiter["solar_passtrough_enabled"] = config.PowerLimiter_SolarPassTroughEnabled;
+    powerlimiter["battery_drain_strategy"] = config.PowerLimiter_BatteryDrainStategy;
     powerlimiter["interval"] = config.PowerLimiter_Interval;
     powerlimiter["mqtt_topic_powermeter_1"] = config.PowerLimiter_MqttTopicPowerMeter1;
     powerlimiter["mqtt_topic_powermeter_2"] = config.PowerLimiter_MqttTopicPowerMeter2;
@@ -283,6 +284,7 @@ bool ConfigurationClass::read()
     JsonObject powerlimiter = doc["powerlimiter"];
     config.PowerLimiter_Enabled = powerlimiter["enabled"] | POWERLIMITER_ENABLED;
     config.PowerLimiter_SolarPassTroughEnabled = powerlimiter["solar_passtrough_enabled"] | POWERLIMITER_SOLAR_PASSTROUGH_ENABLED;
+    config.PowerLimiter_BatteryDrainStategy = powerlimiter["battery_drain_strategy"] | POWERLIMITER_BATTERY_DRAIN_STRATEGY;
     config.PowerLimiter_Interval =  POWERLIMITER_INTERVAL;
     strlcpy(config.PowerLimiter_MqttTopicPowerMeter1, powerlimiter["mqtt_topic_powermeter_1"] | "", sizeof(config.PowerLimiter_MqttTopicPowerMeter1));
     strlcpy(config.PowerLimiter_MqttTopicPowerMeter2, powerlimiter["mqtt_topic_powermeter_2"] | "", sizeof(config.PowerLimiter_MqttTopicPowerMeter2));

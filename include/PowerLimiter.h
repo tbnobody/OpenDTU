@@ -13,6 +13,11 @@ typedef enum {
     STATE_CONSUME_SOLAR_POWER_ONLY, 
     STATE_NORMAL_OPERATION
 } plStates;
+
+typedef enum {
+    EMPTY_WHEN_FULL= 0, 
+    EMPTY_AT_NIGTH
+} batDrainStrategy;
    
 
 class PowerLimiterClass {

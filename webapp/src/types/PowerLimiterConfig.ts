@@ -1,6 +1,7 @@
 export interface PowerLimiterConfig {
     enabled: boolean;
     solar_passtrough_enabled: boolean;
+    battery_drain_strategy: number;
     mqtt_topic_powermeter_1: string;
     mqtt_topic_powermeter_2: string;
     mqtt_topic_powermeter_3: string;

@@ -149,7 +149,7 @@ void PowerLimiterClass::loop()
                 int32_t newPowerLimit = calcPowerLimit(inverter, true);
                 if (!inverter->isProducing() 
                         || isStopThresholdReached(inverter)
-                        || newPowerLimit < config.PowerLimiter_LowerPowerLimit) {
+                        || (newPowerLimit < config.PowerLimiter_LowerPowerLimit && config.PowerLimiter_BatteryDrainStategy == EMPTY_WHEN_FULL)) {
                     _plState = STATE_OFF;
                     break;
                 }
