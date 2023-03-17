@@ -11,8 +11,8 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <template v-for="(category) in categories">
-                        <tr v-for="(prop, prop_idx) in properties(category)">
+                    <template v-for="(category) in categories" :key="category">
+                        <tr v-for="(prop, prop_idx) in properties(category)" :key="prop">
                             <td v-if="prop_idx == 0" :rowspan="properties(category).length">
                                 {{ capitalizeFirstLetter(category) }}</td>
                             <td :class="{ 'table-danger': !isEqual(category, prop) }">{{ prop }}</td>
