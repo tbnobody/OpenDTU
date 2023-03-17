@@ -53,6 +53,7 @@ private:
 
     std::queue<fragment_t> _rxBuffer;
     TimeoutHelper _rxTimeout;
+    TimeoutHelper _txTimeout;
 
     bool _ChipConnected = false;
 
@@ -69,9 +70,7 @@ private:
     uint8_t cmtTxLength = 0;
 
     uint32_t cmtRxTimeout = 200;
-    uint32_t cmtTxTimeout = 200;
     uint32_t cmtRxTimeCount = 0;
-    uint32_t cmtTxTimeCount = 0;
 
     uint8_t cmtBaseChOff860; // offset from initalized CMT base frequency to Hoy base frequency in channels
     uint8_t cmtCurrentCh; // current used channel, should be stored per inverter und set before next Tx, if hopping is used

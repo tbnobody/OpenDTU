@@ -115,7 +115,7 @@ bool HoymilesRadio_CMT::cmtSwitchInvAndDtuFreq(const uint64_t inv_serial, const 
     dumpBuf(cmtTxBuffer, 15);
 
     cmtTxLength = 15;
-    cmtTxTimeout = 100;
+    _txTimeout.set(100);
 
     cmtNextState = CMT_STATE_TX_START;
 
@@ -250,7 +250,7 @@ enumCMTresult HoymilesRadio_CMT::cmtProcess(void)
             cmtNextState = CMT_STATE_TX_WAIT;
         }
 
-        cmtTxTimeCount = CMT2300A_GetTickCount();
+        _txTimeout.reset();
 
         break;
 
@@ -260,7 +260,7 @@ enumCMTresult HoymilesRadio_CMT::cmtProcess(void)
             cmtNextState = CMT_STATE_TX_DONE;
         }
 
-        if ((CMT2300A_GetTickCount() - cmtTxTimeCount) > cmtTxTimeout) {
+        if (_txTimeout.occured()) {
             cmtNextState = CMT_STATE_TX_TIMEOUT;
         }
 
@@ -476,7 +476,7 @@ void HoymilesRadio_CMT::sendEsbPacket(CommandAbstract* cmd)
 
     memcpy(cmtTxBuffer, cmd->getDataPayload(), cmd->getDataSize());
     cmtTxLength = cmd->getDataSize();
-    cmtTxTimeout = 100;
+    _txTimeout.set(100);
 
     cmtNextState = CMT_STATE_TX_START;
 
