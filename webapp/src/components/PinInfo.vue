@@ -80,14 +80,25 @@ export default defineComponent({
             return Array.from(new Set(total)).sort();
         },
         isEqual(category: string, prop: string): boolean {
-            if (!((this.selectedPinAssignment as Device)[category as keyof Device])) {
-                return false;
+            let comSel = 999999;
+            let comCur = 999999;
+
+            if ((this.selectedPinAssignment as Device)[category as keyof Device]) {
+                comSel = (this.selectedPinAssignment as any)[category][prop];
             }
-            if (!((this.currentPinAssignment as Device)[category as keyof Device])) {
-                return false;
+            if ((this.currentPinAssignment as Device)[category as keyof Device]) {
+                comCur = (this.currentPinAssignment as any)[category][prop];
             }
 
-            return (this.selectedPinAssignment as any)[category][prop] == (this.currentPinAssignment as any)[category][prop];
+            if (comSel == -1 || comSel == 255 || comSel == undefined) {
+                comSel = 999999;
+            }
+
+            if (comCur == -1 || comCur == 255 || comSel == undefined) {
+                comCur = 999999;
+            }
+
+            return comSel == comCur;
         },
         capitalizeFirstLetter(value: string): string {
             return value.charAt(0).toUpperCase() + value.slice(1);
