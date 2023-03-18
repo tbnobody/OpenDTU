@@ -126,7 +126,9 @@ void MqttHandleInverterClass::publishField(std::shared_ptr<InverterAbstract> inv
         return;
     }
 
-    MqttSettings.publish(topic, String(inv->Statistics()->getChannelFieldValue(type, channel, fieldId)));
+    MqttSettings.publish(topic, String(
+        inv->Statistics()->getChannelFieldValue(type, channel, fieldId),
+        static_cast<unsigned int>(inv->Statistics()->getChannelFieldDigits(type, channel, fieldId))));
 }
 
 String MqttHandleInverterClass::getTopic(std::shared_ptr<InverterAbstract> inv, ChannelType_t type, ChannelNum_t channel, FieldId_t fieldId)

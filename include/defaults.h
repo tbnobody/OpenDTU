@@ -85,7 +85,7 @@
 
 #define DISPLAY_POWERSAFE true
 #define DISPLAY_SCREENSAVER true
-#define DISPLAY_SHOWLOGO true
+#define DISPLAY_ROTATION 2
 #define DISPLAY_CONTRAST 60
 
 #define VEDIRECT_ENABLED false

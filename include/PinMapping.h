@@ -2,8 +2,8 @@
 #pragma once
 
 #include <Arduino.h>
-#include <stdint.h>
 #include <ETH.h>
+#include <stdint.h>
 
 #define PINMAPPING_FILENAME "/pin_mapping.json"
 

@@ -17,7 +17,7 @@ export default defineConfig({
     cssInjectedByJsPlugin(),
     VueI18nPlugin({
         /* options */
-        include: path.resolve(path.dirname(fileURLToPath(import.meta.url)), './src/locales/**'),
+        include: path.resolve(path.dirname(fileURLToPath(import.meta.url)), './src/locales/**.json'),
         fullInstall: false,
         forceStringify: true,
     }),
