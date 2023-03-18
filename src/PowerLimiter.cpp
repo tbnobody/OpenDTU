@@ -149,12 +149,15 @@ void PowerLimiterClass::loop()
                 int32_t newPowerLimit = calcPowerLimit(inverter, true);
                 if (!inverter->isProducing() 
                         || isStopThresholdReached(inverter)
-                        || (newPowerLimit < config.PowerLimiter_LowerPowerLimit && config.PowerLimiter_BatteryDrainStategy == EMPTY_WHEN_FULL)) {
+                        || newPowerLimit < config.PowerLimiter_LowerPowerLimit) {
                     _plState = STATE_OFF;
                     break;
-                }
-                else if (!canUseDirectSolarPower() || isStartThresholdReached(inverter)) {
+                } else if ((!canUseDirectSolarPower() && config.PowerLimiter_BatteryDrainStategy == EMPTY_AT_NIGTH) || isStartThresholdReached(inverter)) {
                     _plState = STATE_NORMAL_OPERATION;
+                    break;
+                }
+                else if (!canUseDirectSolarPower()) {
+                    _plState = STATE_OFF;
                     break;
                 }
                 setNewPowerLimit(inverter, newPowerLimit);
