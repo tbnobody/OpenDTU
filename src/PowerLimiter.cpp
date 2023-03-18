@@ -199,7 +199,7 @@ bool PowerLimiterClass::canUseDirectSolarPower()
         return false;
     }
 
-    if (VeDirect.veFrame.PPV < 10.0) {
+    if (VeDirect.veFrame.PPV < 10) {
         // Not enough power
         return false;
     }
