@@ -5,7 +5,7 @@
 #include "HMT_6CH.h"
 
 HMT_6CH::HMT_6CH(HoymilesRadio* radio, uint64_t serial)
-    : HMS_Abstract(radio, serial) {};
+    : HMT_Abstract(radio, serial) {};
 
 bool HMT_6CH::isValidSerial(uint64_t serial)
 {
