@@ -127,12 +127,15 @@ void PowerLimiterClass::loop()
                 if (isStopThresholdReached(inverter)) 
                     return;
                 // check for possible state changes
-                if (isStartThresholdReached(inverter) && calcPowerLimit(inverter, false) >= config.PowerLimiter_LowerPowerLimit) {
-                    _plState = STATE_NORMAL_OPERATION;
-                }
-                else if (canUseDirectSolarPower() && calcPowerLimit(inverter, true) >= config.PowerLimiter_LowerPowerLimit) {
+               if (canUseDirectSolarPower() && calcPowerLimit(inverter, true) >= config.PowerLimiter_LowerPowerLimit) {
                     _plState = STATE_CONSUME_SOLAR_POWER_ONLY;
                 }
+                else if ((isStartThresholdReached(inverter) ||
+                 (config.PowerLimiter_Enabled && config.PowerLimiter_BatteryDrainStategy == EMPTY_AT_NIGTH))
+                 && calcPowerLimit(inverter, false) >= config.PowerLimiter_LowerPowerLimit) {
+                    _plState = STATE_NORMAL_OPERATION;
+                }
+                
 
                 // inverter on on state change
                 if (_plState != STATE_OFF) {
@@ -148,15 +151,16 @@ void PowerLimiterClass::loop()
             case STATE_CONSUME_SOLAR_POWER_ONLY: {
                 int32_t newPowerLimit = calcPowerLimit(inverter, true);
                 if (!inverter->isProducing() 
-                        || isStopThresholdReached(inverter)
-                        || newPowerLimit < config.PowerLimiter_LowerPowerLimit) {
+                        || isStopThresholdReached(inverter)) {
                     _plState = STATE_OFF;
                     break;
-                } else if ((!canUseDirectSolarPower() && config.PowerLimiter_BatteryDrainStategy == EMPTY_AT_NIGTH) || isStartThresholdReached(inverter)) {
+                } else if ((!canUseDirectSolarPower() && config.PowerLimiter_BatteryDrainStategy == EMPTY_AT_NIGTH) 
+                    || isStartThresholdReached(inverter)) {
                     _plState = STATE_NORMAL_OPERATION;
                     break;
                 }
-                else if (!canUseDirectSolarPower()) {
+                else if (!canUseDirectSolarPower() || 
+                    newPowerLimit < config.PowerLimiter_LowerPowerLimit) {
                     _plState = STATE_OFF;
                     break;
                 }
