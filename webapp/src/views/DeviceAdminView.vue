@@ -57,8 +57,18 @@
                                 v-model="deviceConfigList.display.screensaver" type="checkbox"
                                 :tooltip="$t('deviceadmin.ScreensaverHint')" />
 
-                            <InputElement :label="$t('deviceadmin.ShowLogo')"
-                                v-model="deviceConfigList.display.show_logo" type="checkbox" />
+                            <div class="row mb-3">
+                                <label class="col-sm-2 col-form-label">
+                                    {{ $t('deviceadmin.Rotation') }}
+                                </label>
+                                <div class="col-sm-10">
+                                    <select class="form-select" v-model="deviceConfigList.display.rotation">
+                                        <option v-for="rotation in displayRotationList" :key="rotation.key" :value="rotation.key">
+                                            {{ rotation.value }}
+                                        </option>
+                                    </select>
+                                </div>
+                            </div>
 
                             <div class="row mb-3">
                                 <label for="inputDisplayContrast" class="col-sm-2 col-form-label">{{
@@ -108,6 +118,12 @@ export default defineComponent({
             alertMessage: "",
             alertType: "info",
             showAlert: false,
+            displayRotationList: [
+                { key: 0, value: this.$t('deviceadmin.rot0') },
+                { key: 1, value: this.$t('deviceadmin.rot90') },
+                { key: 2, value: this.$t('deviceadmin.rot180') },
+                { key: 3, value: this.$t('deviceadmin.rot270') },
+            ],
         }
     },
     created() {

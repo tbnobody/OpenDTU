@@ -3,6 +3,10 @@
 [![OpenDTU Build](https://github.com/tbnobody/OpenDTU/actions/workflows/build.yml/badge.svg)](https://github.com/tbnobody/OpenDTU/actions/workflows/build.yml)
 [![cpplint](https://github.com/tbnobody/OpenDTU/actions/workflows/cpplint.yml/badge.svg)](https://github.com/tbnobody/OpenDTU/actions/workflows/cpplint.yml)
 
+## !! IMPORTANT UPGRADE NOTES !!
+
+If you are upgrading from a version before 15.03.2023 you have to upgrade the partition table of the ESP32. Please follow the [this](docs/UpgradePartition.md) documentation!
+
 ## Background
 This project was started from [this](https://www.mikrocontroller.net/topic/525778) discussion (Mikrocontroller.net).
 It was the goal to replace the original Hoymiles DTU (Telemetry Gateway) with their cloud access. With a lot of reverse engineering the Hoymiles protocol was decrypted and analyzed.
@@ -67,6 +71,7 @@ Firmware version seems to play not a significant role and cannot be read from th
 ## Breaking changes
 Generated using: `git log --date=short --pretty=format:"* %h%x09%ad%x09%s" | grep BREAKING`
 ```
+* 318136d       2023-03-15      BREAKING CHANGE: Updated partition table: Make sure you have a configuration backup and completly reflash the device!
 * 3b7aef6       2023-02-13      BREAKING CHANGE: Web API!
 * d4c838a       2023-02-06      BREAKING CHANGE: Prometheus API!
 * daf847e       2022-11-14      BREAKING CHANGE: Removed deprecated config parsing method

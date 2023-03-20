@@ -64,7 +64,7 @@ void WebApiDeviceClass::onDeviceAdminGet(AsyncWebServerRequest* request)
     displayPinObj[F("reset")] = pin.display_reset;
 
     JsonObject display = root.createNestedObject("display");
-    display[F("show_logo")] = config.Display_ShowLogo;
+    display[F("rotation")] = config.Display_Rotation;
     display[F("power_safe")] = config.Display_PowerSafe;
     display[F("screensaver")] = config.Display_ScreenSaver;
     display[F("contrast")] = config.Display_Contrast;
@@ -133,15 +133,15 @@ void WebApiDeviceClass::onDeviceAdminPost(AsyncWebServerRequest* request)
     bool performRestart = root[F("curPin")][F("name")].as<String>() != config.Dev_PinMapping;
 
     strlcpy(config.Dev_PinMapping, root[F("curPin")][F("name")].as<String>().c_str(), sizeof(config.Dev_PinMapping));
-    config.Display_ShowLogo = root[F("display")][F("show_logo")].as<bool>();
+    config.Display_Rotation = root[F("display")][F("rotation")].as<uint8_t>();
     config.Display_PowerSafe = root[F("display")][F("power_safe")].as<bool>();
     config.Display_ScreenSaver = root[F("display")][F("screensaver")].as<bool>();
     config.Display_Contrast = root[F("display")][F("contrast")].as<uint8_t>();
 
-    Display.showLogo = config.Display_ShowLogo;
+    Display.setOrientation(config.Display_Rotation);
     Display.enablePowerSafe = config.Display_PowerSafe;
     Display.enableScreensaver = config.Display_ScreenSaver;
-    Display.contrast = config.Display_Contrast;
+    Display.setContrast(config.Display_Contrast);
 
     Configuration.write();
 

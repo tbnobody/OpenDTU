@@ -88,7 +88,7 @@ bool ConfigurationClass::write()
     JsonObject display = device.createNestedObject("display");
     display["powersafe"] = config.Display_PowerSafe;
     display["screensaver"] = config.Display_ScreenSaver;
-    display["showlogo"] = config.Display_ShowLogo;
+    display["rotation"] = config.Display_Rotation;
     display["contrast"] = config.Display_Contrast;
 
     JsonArray inverters = doc.createNestedArray("inverters");
@@ -225,7 +225,7 @@ bool ConfigurationClass::read()
     JsonObject display = device["display"];
     config.Display_PowerSafe = display["powersafe"] | DISPLAY_POWERSAFE;
     config.Display_ScreenSaver = display["screensaver"] | DISPLAY_SCREENSAVER;
-    config.Display_ShowLogo = display["showlogo"] | DISPLAY_SHOWLOGO;
+    config.Display_Rotation = display["rotation"] | DISPLAY_ROTATION;
     config.Display_Contrast = display["contrast"] | DISPLAY_CONTRAST;
 
     JsonArray inverters = doc["inverters"];
