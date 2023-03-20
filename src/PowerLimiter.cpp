@@ -197,7 +197,7 @@ bool PowerLimiterClass::canUseDirectSolarPower()
         return false;
     }
 
-    if (VeDirect.veFrame.PPV < 10) {
+    if (VeDirect.veFrame.PPV < 20) {
         // Not enough power
         return false;
     }
@@ -242,6 +242,7 @@ int32_t PowerLimiterClass::calcPowerLimit(std::shared_ptr<InverterAbstract> inve
         // set the limit to config.PowerLimiter_LowerPowerLimit for safety reasons.
         newPowerLimit = config.PowerLimiter_LowerPowerLimit;
     }
+    MessageOutput.printf("[PowerLimiterClass::loop] newPowerLimit: %d\r\n", newPowerLimit);
     return newPowerLimit;
 }
 
