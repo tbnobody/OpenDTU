@@ -3,7 +3,7 @@
 #include <driver/spi_master.h>
 #include <esp_rom_gpio.h> // for esp_rom_gpio_connect_out_signal
 
-#define CMT_SPI_CLK 1000000 // 1 MHz
+#define CMT_SPI_CLK 4000000 // 4 MHz
 
 spi_device_handle_t spi_reg, spi_fifo;
 
