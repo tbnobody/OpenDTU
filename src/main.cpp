@@ -20,6 +20,7 @@
 #include "SunPosition.h"
 #include "Utils.h"
 #include "WebApi.h"
+#include "PowerMeter.h"
 #include "PowerLimiter.h"
 #include "defaults.h"
 #include <Arduino.h>
@@ -146,6 +147,8 @@ void setup()
     } else {
         MessageOutput.println(F("Invalid pin config"));
     }
+    // Power meter
+    PowerMeter.init();
 
     // Dynamic power limiter
     PowerLimiter.init();
@@ -164,6 +167,8 @@ void setup()
 void loop()
 {
     NetworkSettings.loop();
+    yield();
+    PowerMeter.loop();
     yield();
     PowerLimiter.loop();
     yield();
