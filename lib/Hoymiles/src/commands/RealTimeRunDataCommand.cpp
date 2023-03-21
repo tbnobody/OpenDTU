@@ -27,13 +27,19 @@ bool RealTimeRunDataCommand::handleResponse(InverterAbstract* inverter, fragment
 
     // Move all fragments into target buffer
     uint8_t offs = 0;
+
+    // Clear the backbuffer
     inverter->Statistics()->clearBuffer();
     for (uint8_t i = 0; i < max_fragment_id; i++) {
         inverter->Statistics()->appendFragment(offs, fragment[i].fragment, fragment[i].len);
         offs += (fragment[i].len);
     }
-    inverter->Statistics()->resetRxFailureCount();
-    inverter->Statistics()->setLastUpdate(millis());
+
+    // Swaps the backbuffer, if the received statistics fragments match up to the full data size.
+    if (inverter->Statistics()->swap()) {
+        inverter->Statistics()->resetRxFailureCount();
+        inverter->Statistics()->setLastUpdate(millis());
+    }
     return true;
 }
 

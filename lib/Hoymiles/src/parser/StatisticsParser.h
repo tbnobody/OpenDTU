@@ -93,6 +93,7 @@ class StatisticsParser : public Parser {
 public:
     void clearBuffer();
     void appendFragment(uint8_t offset, uint8_t* payload, uint8_t len);
+    bool swap();
 
     void setByteAssignment(const std::list<byteAssign_t>* byteAssignment);
 
@@ -121,6 +122,7 @@ public:
 
 private:
     uint8_t _payloadStatistic[STATISTIC_PACKET_SIZE] = {};
+    uint8_t _payloadStatistic_off[STATISTIC_PACKET_SIZE] = {};
     uint8_t _statisticLength = 0;
     uint16_t _stringMaxPower[CH4];
 

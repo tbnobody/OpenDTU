@@ -35,8 +35,19 @@ void StatisticsParser::setByteAssignment(const std::list<byteAssign_t>* byteAssi
 
 void StatisticsParser::clearBuffer()
 {
-    memset(_payloadStatistic, 0, STATISTIC_PACKET_SIZE);
+    memset(_payloadStatistic_off, 0, STATISTIC_PACKET_SIZE);
     _statisticLength = 0;
+}
+
+// If the statistics packet has the full size, we swap and confirm that the data is good (return true)
+bool StatisticsParser::swap()
+{
+    if (_statisticLength == STATISTIC_PACKET_SIZE) {
+        memcpy(_payloadStatistic, _payloadStatistic_off, STATISTIC_PACKET_SIZE);
+        return true;
+    }
+
+    return false;
 }
 
 void StatisticsParser::appendFragment(uint8_t offset, uint8_t* payload, uint8_t len)
@@ -45,7 +56,7 @@ void StatisticsParser::appendFragment(uint8_t offset, uint8_t* payload, uint8_t 
         Hoymiles.getMessageOutput()->printf("FATAL: (%s, %d) stats packet too large for buffer\r\n", __FILE__, __LINE__);
         return;
     }
-    memcpy(&_payloadStatistic[offset], payload, len);
+    memcpy(&_payloadStatistic_off[offset], payload, len);
     _statisticLength += len;
 }
 
