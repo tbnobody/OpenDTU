@@ -5,23 +5,23 @@ You can run the webapp locally with `yarn dev`. If you enter the IP of your ESP 
 ## Project Setup
 
 ```sh
-yarn install
+$ yarn install
 ```
 
 ### Compile and Hot-Reload for Development
 
 ```sh
-yarn dev
+$ yarn dev
 ```
 
 ### Type-Check, Compile and Minify for Production
 
 ```sh
-yarn build
+$ yarn build
 ```
 
 ### Lint with [ESLint](https://eslint.org/)
 
 ```sh
-yarn lint
+$ yarn lint
 ```

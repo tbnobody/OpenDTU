@@ -8,17 +8,21 @@
 If you are upgrading from a version before 15.03.2023 you have to upgrade the partition table of the ESP32. Please follow the [this](docs/UpgradePartition.md) documentation!
 
 ## Background
+
 This project was started from [this](https://www.mikrocontroller.net/topic/525778) discussion (Mikrocontroller.net).
 It was the goal to replace the original Hoymiles DTU (Telemetry Gateway) with their cloud access. With a lot of reverse engineering the Hoymiles protocol was decrypted and analyzed.
 
 ## Screenshots
+
 Several screenshots of the frontend can be found here: [Screenshots](docs/screenshots/README.md)
 
 ## Builds
+
 Different builds from existing installations can be found here [Builds](docs/builds/README.md)
 Like to show your own build? Just send me a Pull Request.
 
 ## Currently supported Inverters
+
 * Hoymiles HM-300
 * Hoymiles HM-350
 * Hoymiles HM-400
@@ -36,10 +40,12 @@ Like to show your own build? Just send me a Pull Request.
 **TSUN compatibility remark:**
 Compatibility with OpenDTU seems to be related to serial numbers. Current findings indicate that TSUN inverters with a serial number starting with "11" are supported, whereby inverters with a serial number starting with "10" are not.
 Firmware version seems to play not a significant role and cannot be read from the stickers. For completeness, the following firmware version have been reported to work with OpenDTU:
+
 * v1.0.8, v1.0.10 TSOL-M800 (DE)
 * v1.0.12 TSOL-M1600
 
 ## Features for end users
+
 * Read live data from inverter
 * Show inverters internal event log
 * Show inverter information like firmware version, firmware build date, hardware revision and hardware version
@@ -60,17 +66,20 @@ Firmware version seems to play not a significant role and cannot be read from th
 * Dark Theme
 
 ## Features for developers
+
 * The microcontroller part
-    * Build with Arduino PlatformIO Framework for the ESP32
-    * Uses a fork of [ESPAsyncWebserver](https://github.com/yubox-node-org/ESPAsyncWebServer) and [espMqttClient](https://github.com/bertmelis/espMqttClient)
+  * Build with Arduino PlatformIO Framework for the ESP32
+  * Uses a fork of [ESPAsyncWebserver](https://github.com/yubox-node-org/ESPAsyncWebServer) and [espMqttClient](https://github.com/bertmelis/espMqttClient)
 
 * The WebApp part
-    * Build with [Vue.js](https://vuejs.org)
-    * Source is written in TypeScript
+  * Build with [Vue.js](https://vuejs.org)
+  * Source is written in TypeScript
 
 ## Breaking changes
+
 Generated using: `git log --date=short --pretty=format:"* %h%x09%ad%x09%s" | grep BREAKING`
-```
+
+```code
 * 318136d       2023-03-15      BREAKING CHANGE: Updated partition table: Make sure you have a configuration backup and completly reflash the device!
 * 3b7aef6       2023-02-13      BREAKING CHANGE: Web API!
 * d4c838a       2023-02-06      BREAKING CHANGE: Prometheus API!
@@ -82,6 +91,7 @@ Generated using: `git log --date=short --pretty=format:"* %h%x09%ad%x09%s" | gre
 ## Hardware you need
 
 ### ESP32 board
+
 For ease of use, buy a "ESP32 DEVKIT DOIT" or "ESP32 NodeMCU Development Board" with an ESP32-S3 or ESP-WROOM-32 chipset on it.
 
 Sample Picture:
@@ -91,6 +101,7 @@ Sample Picture:
 Also supported: Board with Ethernet-Connector and Power-over-Ethernet [Olimex ESP32-POE](https://www.olimex.com/Products/IoT/ESP32/ESP32-POE/open-source-hardware)
 
 ### NRF24L01+ radio board
+
 The PLUS sign is IMPORTANT! There are different variants available, with antenna on the printed circuit board or external antenna.
 
 Sample picture:
@@ -109,20 +120,25 @@ A heavily incomplete list of trusted hardware shops in germany is:
 This list is for your convenience only, the project is not related to any of these shops.
 
 ### Power supply
+
 Use a power suppy with 5 V and 1 A. The USB cable connected to your PC/Notebook may be powerful enough or may be not.
 
-
 ## Wiring up
+
 ### Schematic
+
 ![Schematic](docs/Wiring_ESP32_Schematic.png)
 
 ### Symbolic view
+
 ![Symbolic](docs/Wiring_ESP32_Symbol.png)
 
 ### Change pin assignment
+
 Its possible to change all the pins of the NRF24L01+ module.
 This can be achieved by copying one of the [env:....] sections from 'platformio.ini' to 'platformio_override.ini' and editing the 'platformio_override.ini' file and add/change one or more of the following lines to the 'build_flags' parameter:
-```
+
+```code
 -DHOYMILES_PIN_MISO=19
 -DHOYMILES_PIN_MOSI=23
 -DHOYMILES_PIN_SCLK=18
@@ -130,31 +146,35 @@ This can be achieved by copying one of the [env:....] sections from 'platformio.
 -DHOYMILES_PIN_CE=4
 -DHOYMILES_PIN_CS=5
 ```
+
 It is recommended to make all changes only in the  'platformio_override.ini', this is your personal copy.
 You can also change  the pins by creating a custom [device profile](docs/DeviceProfiles.md).
 
 ## Flashing and starting up
+
 ### with Visual Studio Code
+
 * Install [Visual Studio Code](https://code.visualstudio.com/download) (from now named "vscode")
 * In Visual Studio Code, install the [PlatformIO Extension](https://marketplace.visualstudio.com/items?itemName=platformio.platformio-ide)
 * Install git and enable git in vscode - [git download](https://git-scm.com/downloads/) - [Instructions](https://www.jcchouinard.com/install-git-in-vscode/)
 * Clone this repository (you really have to clone it, don't just download the ZIP file. During the build process the git hash gets embedded into the firmware. If you download the ZIP file a build error will occur): Inside vscode open the command palette by pressing `CTRL` + `SHIFT` + `P`. Enter `git clone`, add the repository-URL `https://github.com/tbnobody/OpenDTU`. Next you have to choose (or create) a target directory.
 * In vscode, choose File --> Open Folder and select the previously downloaded source code. (You have to select the folder which contains the "platformio.ini" and "platformio_override.ini" file)
 * Adjust the COM port in the file "platformio_override.ini" for your USB-to-serial-converter. It occurs twice:
-    * upload_port
-    * monitor_port
+  * upload_port
+  * monitor_port
 * Select the arrow button in the blue bottom status bar (PlatformIO: Upload) to compile and upload the firmware. During the compilation, all required libraries are downloaded automatically.
 * Under Linux, if the upload fails with error messages "Could not open /dev/ttyUSB0, the port doesn't exist", you can check via ```ls -la /dev/tty*``` to which group your port belongs to, and then add your user this group via ```sudo adduser <yourusername> dialout```
 * There are two videos showing these steps:
-    * [Git Clone and compilation](https://youtu.be/9cA_esv3zeA)
-    * [Full installation and compilation](https://youtu.be/xs6TqHn7QWM)
+  * [Git Clone and compilation](https://youtu.be/9cA_esv3zeA)
+  * [Full installation and compilation](https://youtu.be/xs6TqHn7QWM)
 
 ### on the commandline with PlatformIO Core
+
 * Install [PlatformIO Core](https://platformio.org/install/cli)
 * Clone this repository (you really have to clone it, don't just download the ZIP file. During the build process the git hash gets embedded into the firmware. If you download the ZIP file a build error will occur)
 * Adjust the COM port in the file "platformio_override.ini". It occurs twice:
-    * upload_port
-    * monitor_port
+  * upload_port
+  * monitor_port
 * build: `platformio run -e generic`
 * upload to esp module: `platformio run -e generic -t upload`
 * other options:
@@ -162,6 +182,7 @@ You can also change  the pins by creating a custom [device profile](docs/DeviceP
   * erase flash: `platformio run -e generic -t erase`
 
 ### using the pre-compiled .bin files
+
 The pre-compiled files can be found on the [github page](https://github.com/tbnobody/OpenDTU) in the tab "Actions" and the sub menu "OpenDTU Build". Just choose the latest build from the master branch (search for "master" in the blue font text but click on the white header text!). You need to be logged in with your github account to download the files.
 Use a ESP32 flash tool of your choice (see next chapter) and flash the `.bin` files to the right addresses:
 
@@ -175,8 +196,9 @@ Use a ESP32 flash tool of your choice (see next chapter) and flash the `.bin` fi
 For further updates you can just use the web interface and upload the `opendtu-*.bin` file.
 
 #### Flash with esptool.py (Linux)
-```
-esptool.py --port /dev/ttyUSB0 --chip esp32 --before default_reset --after hard_reset \
+
+```sh
+$ esptool.py --port /dev/ttyUSB0 --chip esp32 --before default_reset --after hard_reset \
   write_flash --flash_mode dout --flash_freq 40m --flash_size detect \
   0x1000 bootloader.bin \
   0x8000 partitions.bin \
@@ -188,20 +210,23 @@ esptool.py --port /dev/ttyUSB0 --chip esp32 --before default_reset --after hard_
 
 [Download link](https://www.espressif.com/en/support/download/other-tools)
 
-- On startup, select Chip Type -> "ESP32" / WorkMode -> "Develop"
-- Prepare all settings (see picture). Make sure to uncheck the `DoNotChgBin` option. Otherwise you may get errors like "invalid header".
-- ![flash tool image](docs/esp32_flash_download_tool.png)
-- Press "Erase" button on screen. Look into the terminal window, you should see dots appear. Then press  the "Boot" button on the ESP32 board. Wait for "FINISH" to see if flashing/erasing is done.
-- To program, press "Start" on screen, then the "Boot" button.
-- When flashing is complete (FINISH appears) then press the Reset button on the ESP32 board (or powercycle ) to start the OpenDTU application.
+* On startup, select Chip Type -> "ESP32" / WorkMode -> "Develop"
+* Prepare all settings (see picture). Make sure to uncheck the `DoNotChgBin` option. Otherwise you may get errors like "invalid header".
+* ![flash tool image](docs/esp32_flash_download_tool.png)
+* Press "Erase" button on screen. Look into the terminal window, you should see dots appear. Then press  the "Boot" button on the ESP32 board. Wait for "FINISH" to see if flashing/erasing is done.
+* To program, press "Start" on screen, then the "Boot" button.
+* When flashing is complete (FINISH appears) then press the Reset button on the ESP32 board (or powercycle ) to start the OpenDTU application.
 
 #### Flash with ESP_Flasher (Windows)
+
 Users report that [ESP_Flasher](https://github.com/Jason2866/ESP_Flasher/releases/) is suitable for flashing OpenDTU on Windows.
 
 #### Flash with [ESP_Flasher](https://espressif.github.io/esptool-js/) - web version
+
 It is also possible to flash it via the web tools which might be more convenient and is platformindependent.
 
 ## First configuration
+
 * After the initial flashing of the microcontroller, an Access Point called "OpenDTU-*" is opened. The default password is "openDTU42".
 * Use a web browser to open the address [http://192.168.4.1](http://192.168.4.1)
 * Navigate to Settings --> Network Settings and enter your WiFi credentials. The username to access the config menu is "admin" and the password the same as for accessing the Access Point (default: "openDTU42").
@@ -212,6 +237,7 @@ It is also possible to flash it via the web tools which might be more convenient
 * Add your inverter in the inverter settings (Settings --> Inverter Settings)
 
 ## Flashing an Update using "Over The Air" OTA Update
+
 Once you have your OpenDTU running and connected to WLAN, you can do further updates through the web interface.
 Navigate to Settings --> Firmware upgrade and press the browse button. Select the firmware file from your local computer.
 
@@ -222,12 +248,15 @@ If you downloaded a precompiled zip archive, unpack it and choose `opendtu-gener
 After the successful upload, the OpenDTU immediately restarts into the new firmware.
 
 ## MQTT Topic Documentation
+
 A documentation of all available MQTT Topics can be found here: [MQTT Documentation](docs/MQTT_Topics.md)
 
 ## Web API Documentation
+
 A documentation of the Web API can be found here: [Web-API Documentation](docs/Web-API.md)
 
 ## Available cases
+
 * <https://www.thingiverse.com/thing:5435911>
 * <https://www.printables.com/model/293003-sol-opendtu-esp32-nrf24l01-case>
 * <https://www.thingiverse.com/thing:5661780>
@@ -237,26 +266,31 @@ A documentation of the Web API can be found here: [Web-API Documentation](docs/W
 * <https://www.printables.com/model/376840-esp32-ahoy-opendtu-pcb-housing>
 
 ## Available layouts for printed circuit boards
+
 * [BreakoutBoard - sample printed circuit board for OpenDTU and Ahoy](https://github.com/dokuhn/openDTU-BreakoutBoard)
 * [Board for OpenDTU with Display](https://github.com/SteffMUC/openDTU_wDisplay2)
 * [OpenDTU PCB mit Display](https://github.com/turrican944/OpenDTU-PCB)
 * [PCB for OpenDTU in Cable Branchbox](https://github.com/plewka/ESP-Solar_OpenDTU)
 
 ## Building
+
 * Building the WebApp
-    * The WebApp can be build using yarn
-    ```
+  * The WebApp can be build using yarn
+
+    ```sh
     $ cd webapp
     $ yarn install
     $ yarn build
     ```
-    * The updated output is placed in the 'webapp_dist' directory
-    * It is only necessary to build the webapp when you made changes to it
+
+  * The updated output is placed in the 'webapp_dist' directory
+  * It is only necessary to build the webapp when you made changes to it
 
 * Building the microcontroller firmware
-    * Visual Studio Code with the PlatformIO Extension is required for building
+  * Visual Studio Code with the PlatformIO Extension is required for building
 
 ## Troubleshooting
+
 * First: When there is no light on the solar panels, the inverter completely turns off and does not answer to OpenDTU! So if you assembled your OpenDTU in the evening, wait until tomorrow.
 * When there is no data received from the inverter(s) - try to reduce the distance between the openDTU and the inverter (e.g. move it to the window towards the roof)
 * Under Settings -> DTU Settings you can increase the transmit power "PA level". Default is "minimum".
@@ -268,9 +302,10 @@ A documentation of the Web API can be found here: [Web-API Documentation](docs/W
 * OpenDTU needs access to a working NTP server to get the current date & time.
 * If your problem persists, check the  [Issues on Github](https://github.com/tbnobody/OpenDTU/issues). Please inspect not only the open issues, also the closed issues contain useful information.
 * Another source of information are the [Discussions](https://github.com/tbnobody/OpenDTU/discussions/)
-* When flashing with VSCode Plattform.IO fails and also with ESPRESSIF tool a demo bin file cannot be flashed to the ESP32 with error message "A fatal error occurred: MD5 of file does not match data in flash!" than un-wire/unconnect ESP32 from the NRF24L01+ board. Try to flash again and rewire afterwards. 
+* When flashing with VSCode Plattform.IO fails and also with ESPRESSIF tool a demo bin file cannot be flashed to the ESP32 with error message "A fatal error occurred: MD5 of file does not match data in flash!" than un-wire/unconnect ESP32 from the NRF24L01+ board. Try to flash again and rewire afterwards.
 
 ## Related Projects
-- [Ahoy](https://github.com/grindylow/ahoy)
-- [DTU Simulator](https://github.com/Ziyatoe/DTUsimMI1x00-Hoymiles)
-- [OpenDTU extended to talk to Victrons MPPT battery chargers (Ve.Direct)](https://github.com/helgeerbe/OpenDTU_VeDirect)
+
+* [Ahoy](https://github.com/grindylow/ahoy)
+* [DTU Simulator](https://github.com/Ziyatoe/DTUsimMI1x00-Hoymiles)
+* [OpenDTU extended to talk to Victrons MPPT battery chargers (Ve.Direct)](https://github.com/helgeerbe/OpenDTU_VeDirect)

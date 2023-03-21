@@ -4,88 +4,88 @@ here are some screenshots of OpenDTU's web interface.
 
 ***
 
-![](01_LiveView.png)
+![Live Data Screenshot](01_LiveView.png)
 
 ***
 
-![](15_LimitSettings.png)
+![Limit Settings Dialog Screenshot](15_LimitSettings.png)
 
 ***
 
-![](16_PowerSettings.png)
+![Power Settings Dialog Screenshot](16_PowerSettings.png)
 
 ***
 
-![](17_InverterInfo.png)
+![Inverter Info Dialog Screenshot](17_InverterInfo.png)
 
 ***
 
-![](12_Eventlog.png)
+![Event Log Dialog Screenshot](12_Eventlog.png)
 
 ***
 
-![](02_NetworkAdmin.png)
+![Network Settings Screenshot](02_NetworkAdmin.png)
 
 ***
 
-![](03_NtpAdmin.png)
+![NTP Settings Screenshot](03_NtpAdmin.png)
 
 ***
 
-![](04_MqttAdmin.png)
+![MQTT Settings Screenshot](04_MqttAdmin.png)
 
 ***
 
-![](05_InverterAdmin.png)
+![Inverter Settings Screenshot](05_InverterAdmin.png)
 
 ***
 
-![](13_InverterSettings.png)
+![Edit Inverter Dialog Screenshot](13_InverterSettings.png)
 
 ***
 
-![](22_Security.png)
+![Security Settings Screenshot](22_Security.png)
 
 ***
 
-![](06_DtuAdmin.png)
+![DTU Settings Screenshot](06_DtuAdmin.png)
 
 ***
 
-![](20_DeviceManager_Pin.png)
+![Device-Manager Connection Settings Screenshot](20_DeviceManager_Pin.png)
 
 ***
 
-![](21_DeviceManager_Display.png)
+![Device-Manager Display Settings Screenshot](21_DeviceManager_Display.png)
 
 ***
 
-![](14_ConfigManagement.png)
+![Config Management Screenshot](14_ConfigManagement.png)
 
 ***
 
-![](07_FirmwareUpgrade.png)
+![Firmware Upgrade Screenshot](07_FirmwareUpgrade.png)
 
 ***
 
-![](19_Reboot.png)
+![Device Reboot Screenshot](19_Reboot.png)
 
 ***
 
-![](11_SystemInfo.png)
+![System Info Screenshot](11_SystemInfo.png)
 
 ***
 
-![](08_NetworkInfo.png)
+![Network Information Screenshot](08_NetworkInfo.png)
 
 ***
 
-![](09_NtpInfo.png)
+![NTP Information Screenshot](09_NtpInfo.png)
 
 ***
 
-![](10_MqttInfo.png)
+![MQTT Information Screenshot](10_MqttInfo.png)
 
 ***
 
-![](18_Console.png)
+![Console Screenshot](18_Console.png)
