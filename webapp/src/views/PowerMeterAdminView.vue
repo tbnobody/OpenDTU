@@ -18,7 +18,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="row mb-3">
+                    <div class="row mb-3" v-show="powerMeterConfigList.enabled">
                     <label for="inputTimezone" class="col-sm-2 col-form-label">{{ $t('powermeteradmin.PowerMeterSource') }}</label>
                     <div class="col-sm-10">
                         <select class="form-select" v-model="powerMeterConfigList.source">
@@ -31,7 +31,7 @@
                 </div>
             </div>
 
-            <div class="card" v-if="powerMeterConfigList.source === 0" >
+            <div class="card" v-if="powerMeterConfigList.source === 0 && powerMeterConfigList.enabled" >
                 <div class="card-header text-bg-primary">{{ $t('powermeteradmin.MQTT') }}</div>
                 <div class="card-body">
                     <div class="row mb-3">
@@ -67,7 +67,7 @@
             </div>
 
             
-            <div class="card" v-if="powerMeterConfigList.source === 1 || powerMeterConfigList.source === 2" >
+            <div class="card" v-if="(powerMeterConfigList.source === 1 || powerMeterConfigList.source === 2)  && powerMeterConfigList.enabled" >
                 <div class="card-header text-bg-primary">{{ $t('powermeteradmin.SDM') }}</div>
                 <div class="card-body">
                     <div class="row mb-3">
