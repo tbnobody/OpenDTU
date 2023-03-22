@@ -168,7 +168,7 @@ int32_t PowerLimiterClass::calcPowerLimit(std::shared_ptr<InverterAbstract> inve
 {
     CONFIG_T& config = Configuration.get();
     
-    int32_t newPowerLimit = round(_powerMeter1Power + _powerMeter2Power + _powerMeter3Power);
+    int32_t newPowerLimit = round(PowerMeter.getPowerTotal());
 
     float efficency = inverter->Statistics()->getChannelFieldValue(TYPE_AC, (ChannelNum_t) config.PowerLimiter_InverterChannelId, FLD_EFF);
     int32_t victronChargePower = this->getDirectSolarPower();
