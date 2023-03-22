@@ -491,7 +491,7 @@
         "TargetPowerConsumptionHysteresisHint": "Value around which the target power consumption fluctuates without readjustment.",
         "LowerPowerLimit": "Lower power limit",
         "UpperPowerLimit": "Upper power limit",
-        "PowerMeters": "Power meters - MQTT",
+        "PowerMeters": "Power meter",
         "MqttTopicPowerMeter1": "MQTT topic - Power meter #1",
         "MqttTopicPowerMeter2": "MQTT topic - Power meter #2 (optional)",
         "MqttTopicPowerMeter3": "MQTT topic - Power meter #3 (optional)",

@@ -490,7 +490,7 @@
         "TargetPowerConsumptionHysteresisHint": "Wert um den der Zielstromverbrauch schwanken darf, ohne dass nachgeregelt wird.",
         "LowerPowerLimit": "Unteres Leistungslimit",
         "UpperPowerLimit": "Oberes Leistungslimit",
-        "PowerMeters": "Leistungsmesser - MQTT",
+        "PowerMeters": "Leistungsmesser",
         "BatterySocStartThreshold": "Akku SOC - Start",
         "BatterySocStopThreshold": "Akku SOC - Stop",
         "VoltageStartThreshold": "DC Spannung - Start",
