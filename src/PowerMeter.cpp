@@ -7,6 +7,7 @@
 #include "MqttSettings.h"
 #include "NetworkSettings.h"
 #include "SDM.h"
+#include "MessageOutput.h"
 #include <ctime>
 
 PowerMeterClass PowerMeter;
@@ -26,17 +27,17 @@ void PowerMeterClass::init()
 
     CONFIG_T& config = Configuration.get();
 //if(!mqttInitDone){
-    if (strlen(config.PowerMeter_MqttTopicPowerMeter1) != 0 && !strcmp(PowerMeter_MqttTopicPowerMeter1old, config.PowerMeter_MqttTopicPowerMeter1)) {
+    if (strlen(config.PowerMeter_MqttTopicPowerMeter1) != 0 && strcmp(PowerMeter_MqttTopicPowerMeter1old, config.PowerMeter_MqttTopicPowerMeter1)) {
         MqttSettings.subscribe(config.PowerMeter_MqttTopicPowerMeter1, 0, std::bind(&PowerMeterClass::onMqttMessage, this, _1, _2, _3, _4, _5, _6));
         strlcpy(PowerMeter_MqttTopicPowerMeter1old, config.PowerMeter_MqttTopicPowerMeter1, sizeof(config.PowerMeter_MqttTopicPowerMeter3));
     }
 
-    if (strlen(config.PowerMeter_MqttTopicPowerMeter2) != 0 && !strcmp(PowerMeter_MqttTopicPowerMeter2old, config.PowerMeter_MqttTopicPowerMeter2)) {
+    if (strlen(config.PowerMeter_MqttTopicPowerMeter2) != 0 && strcmp(PowerMeter_MqttTopicPowerMeter2old, config.PowerMeter_MqttTopicPowerMeter2)) {
         MqttSettings.subscribe(config.PowerMeter_MqttTopicPowerMeter2, 0, std::bind(&PowerMeterClass::onMqttMessage, this, _1, _2, _3, _4, _5, _6));
         strlcpy(PowerMeter_MqttTopicPowerMeter2old, config.PowerMeter_MqttTopicPowerMeter2, sizeof(config.PowerMeter_MqttTopicPowerMeter3));
     }
 
-    if (strlen(config.PowerMeter_MqttTopicPowerMeter3) != 0 && !strcmp(PowerMeter_MqttTopicPowerMeter3old, config.PowerMeter_MqttTopicPowerMeter3)) {
+    if (strlen(config.PowerMeter_MqttTopicPowerMeter3) != 0 && strcmp(PowerMeter_MqttTopicPowerMeter3old, config.PowerMeter_MqttTopicPowerMeter3)) {
         MqttSettings.subscribe(config.PowerMeter_MqttTopicPowerMeter3, 0, std::bind(&PowerMeterClass::onMqttMessage, this, _1, _2, _3, _4, _5, _6));
         strlcpy(PowerMeter_MqttTopicPowerMeter3old, config.PowerMeter_MqttTopicPowerMeter3, sizeof(config.PowerMeter_MqttTopicPowerMeter3));
     }
@@ -64,7 +65,6 @@ void PowerMeterClass::onMqttMessage(const espMqttClientTypes::MessageProperties&
 {
     CONFIG_T& config = Configuration.get();
     if(config.PowerMeter_Enabled && config.PowerMeter_Source == 0){
-        Hoymiles.getMessageOutput()->printf("PowerMeterClass: Received MQTT message on topic: %s\n", topic);
 
         if (strcmp(topic, config.PowerMeter_MqttTopicPowerMeter1) == 0) {
             _powerMeter1Power = std::stof(std::string(reinterpret_cast<const char*>(payload), (unsigned int)len));
@@ -78,7 +78,7 @@ void PowerMeterClass::onMqttMessage(const espMqttClientTypes::MessageProperties&
             _powerMeter3Power = std::stof(std::string(reinterpret_cast<const char*>(payload), (unsigned int)len));
         }
         
-        Hoymiles.getMessageOutput()->printf("PowerMeterClass: TotalPower: %5.2f\n", getPowerTotal());
+        MessageOutput.printf("PowerMeterClass: TotalPower: %5.2f\n", getPowerTotal());
     }
 
     _lastPowerMeterUpdate = millis();
@@ -132,7 +132,7 @@ void PowerMeterClass::loop()
             _PowerMeterExport = static_cast<float>(sdm.readVal(SDM_EXPORT_ACTIVE_ENERGY, _address));
         }
         
-        Hoymiles.getMessageOutput()->printf("PowerMeterClass: TotalPower: %5.2f\n", getPowerTotal());
+        MessageOutput.printf("PowerMeterClass: TotalPower: %5.2f\n", getPowerTotal());
         
         mqtt();
 
