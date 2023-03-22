@@ -8,7 +8,9 @@
 #include "AsyncJson.h"
 #include "Configuration.h"
 #include "MqttHandleHass.h"
+#include "MqttHandleVedirectHass.h"
 #include "MqttSettings.h"
+#include "PowerMeter.h"
 #include "PowerLimiter.h"
 #include "WebApi.h"
 #include "helper.h"
@@ -141,6 +143,9 @@ void WebApiPowerLimiterClass::onAdminPost(AsyncWebServerRequest* request)
     response->setLength();
     request->send(response);
 
-    MqttSettings.performReconnect();  // TODO(helge) is this really needed
+    MqttSettings.performReconnect();  
     PowerLimiter.init();
+    PowerMeter.init();
+    MqttHandleHass.forceUpdate();
+    MqttHandleVedirectHass.forceUpdate();
 }

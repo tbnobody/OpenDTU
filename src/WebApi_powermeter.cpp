@@ -7,8 +7,10 @@
 #include "ArduinoJson.h"
 #include "AsyncJson.h"
 #include "Configuration.h"
+#include "MqttHandleVedirectHass.h"
 #include "MqttHandleHass.h"
 #include "MqttSettings.h"
+#include "PowerLimiter.h"
 #include "PowerMeter.h"
 #include "WebApi.h"
 #include "helper.h"
@@ -115,9 +117,11 @@ void WebApiPowerMeterClass::onAdminPost(AsyncWebServerRequest* request)
 
     response->setLength();
     request->send(response);
-    
+
+
+    MqttSettings.performReconnect();  
     PowerMeter.init();
-    MqttSettings.performReconnect();
+    PowerLimiter.init();
     MqttHandleHass.forceUpdate();
-    
+    MqttHandleVedirectHass.forceUpdate();
 }
