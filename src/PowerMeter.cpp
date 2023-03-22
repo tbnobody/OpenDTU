@@ -88,6 +88,10 @@ float PowerMeterClass::getPowerTotal(){
     return _powerMeter1Power + _powerMeter2Power + _powerMeter3Power;
 }
 
+uint32_t PowerMeterClass::getLastPowerMeterUpdate(){
+    return _lastPowerMeterUpdate;
+}
+
 void PowerMeterClass::mqtt(){
     if (!MqttSettings.getConnected()){
         return;

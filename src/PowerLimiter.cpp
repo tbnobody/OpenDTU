@@ -19,7 +19,6 @@ void PowerLimiterClass::init()
 {
     _lastCommandSent = 0;
     _lastLoop = 0;
-    _lastPowerMeterUpdate = 0;
     _lastRequestedPowerLimit = 0;
 }
 
@@ -52,7 +51,7 @@ void PowerLimiterClass::loop()
         return;
     }
 
-    if (millis() - _lastPowerMeterUpdate < (30 * 1000)) {
+    if (millis() - PowerMeter.getLastPowerMeterUpdate() < (30 * 1000)) {
         MessageOutput.printf("[PowerLimiterClass::loop] dcVoltage: %.2f Voltage Start Threshold: %.2f Voltage Stop Threshold: %.2f inverter->isProducing(): %d\r\n",
             dcVoltage, config.PowerLimiter_VoltageStartThreshold, config.PowerLimiter_VoltageStopThreshold, inverter->isProducing());
     }
@@ -177,7 +176,7 @@ int32_t PowerLimiterClass::calcPowerLimit(std::shared_ptr<InverterAbstract> inve
     MessageOutput.printf("[PowerLimiterClass::loop] victronChargePower: %d, efficiency: %.2f, consumeSolarPowerOnly: %s, powerConsumption: %d \r\n", 
         victronChargePower, efficency, consumeSolarPowerOnly ? "true" : "false", newPowerLimit);
    
-    if (millis() - _lastPowerMeterUpdate < (30 * 1000)) {
+    if (millis() - PowerMeter.getLastPowerMeterUpdate() < (30 * 1000)) {
         if (config.PowerLimiter_IsInverterBehindPowerMeter) {
             // If the inverter the behind the power meter (part of measurement),
             // the produced power of this inverter has also to be taken into account.

@@ -30,7 +30,6 @@ public:
 private:
     uint32_t _lastCommandSent;
     uint32_t _lastLoop;
-    uint32_t _lastPowerMeterUpdate;
     int32_t _lastRequestedPowerLimit;
     plStates _plState = STATE_DISCOVER; 
 
