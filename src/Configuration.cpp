@@ -290,13 +290,13 @@ bool ConfigurationClass::read()
 
     JsonObject powermeter = doc["powermeter"];
     config.PowerMeter_Enabled = powermeter["enabled"] | POWERMETER_ENABLED;
-    config.PowerMeter_Interval =  POWERMETER_INTERVAL;
-    config.PowerMeter_Source =  POWERMETER_SOURCE;
+    config.PowerMeter_Interval =  powermeter["interval"] | POWERMETER_INTERVAL;
+    config.PowerMeter_Source =  powermeter["source"] | POWERMETER_SOURCE;
     strlcpy(config.PowerMeter_MqttTopicPowerMeter1, powermeter["mqtt_topic_powermeter_1"] | "", sizeof(config.PowerMeter_MqttTopicPowerMeter1));
     strlcpy(config.PowerMeter_MqttTopicPowerMeter2, powermeter["mqtt_topic_powermeter_2"] | "", sizeof(config.PowerMeter_MqttTopicPowerMeter2));
     strlcpy(config.PowerMeter_MqttTopicPowerMeter3, powermeter["mqtt_topic_powermeter_3"] | "", sizeof(config.PowerMeter_MqttTopicPowerMeter3));
-    config.PowerMeter_SdmBaudrate =  POWERMETER_SDMBAUDRATE;
-    config.PowerMeter_SdmAddress =  POWERMETER_SDMADDRESS;
+    config.PowerMeter_SdmBaudrate =  powermeter["sdmbaudrate"] | POWERMETER_SDMBAUDRATE;
+    config.PowerMeter_SdmAddress =  powermeter["sdmaddress"] | POWERMETER_SDMADDRESS;
 
 
     JsonObject powerlimiter = doc["powerlimiter"];
