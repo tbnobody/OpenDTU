@@ -36,7 +36,7 @@ extern "C" {
 #define CMT2300A_GetTickCount() millis()
 /* ************************************************************************ */
 
-void CMT2300A_InitSpi(int8_t pin_sdio, int8_t pin_clk, int8_t pin_cs, int8_t pin_fcs);
+void CMT2300A_InitSpi(int8_t pin_sdio, int8_t pin_clk, int8_t pin_cs, int8_t pin_fcs, uint32_t spi_speed);
 
 uint8_t CMT2300A_ReadReg(uint8_t addr);
 void CMT2300A_WriteReg(uint8_t addr, uint8_t dat);

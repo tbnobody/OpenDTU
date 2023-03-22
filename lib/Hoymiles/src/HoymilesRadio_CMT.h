@@ -8,6 +8,7 @@
 #include <Arduino.h>
 #include <memory>
 #include <queue>
+#include <cmt2300wrapper.h>
 
 // number of fragments hold in buffer
 #define FRAGMENT_BUFFER_SIZE 30
@@ -41,6 +42,7 @@ class HoymilesRadio_CMT : public HoymilesRadio {
 public:
     void init(int8_t pin_sdio, int8_t pin_clk, int8_t pin_cs, int8_t pin_fcs, int8_t pin_gpio3);
     void loop();
+    void setPALevel(int8_t paLevel);
 
     bool isConnected();
 
@@ -49,19 +51,18 @@ private:
 
     void sendEsbPacket(CommandAbstract* cmd);
 
+    std::unique_ptr<CMT2300a> _radio;
+
     volatile bool _packetReceived = false;
 
     std::queue<fragment_t> _rxBuffer;
     TimeoutHelper _rxTimeout;
     TimeoutHelper _txTimeout;
 
-    bool _ChipConnected = false;
-
     String cmtChToFreq(const uint8_t channel);
     void cmtSwitchChannel(const uint8_t channel);
     uint8_t cmtFreqToChan(const String& func_name, const String& var_name, const uint32_t freq_kHz);
     bool cmtSwitchDtuFreq(const uint32_t to_freq_kHz);
-    bool cmtConfig(void);
     bool cmtSwitchInvAndDtuFreq(const uint64_t inv_serial, const uint32_t from_freq_kHz, const uint32_t to_freq_kHz);
     enumCMTresult cmtProcess(void);
 

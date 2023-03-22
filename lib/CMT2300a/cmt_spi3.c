@@ -3,11 +3,9 @@
 #include <driver/spi_master.h>
 #include <esp_rom_gpio.h> // for esp_rom_gpio_connect_out_signal
 
-#define CMT_SPI_CLK 4000000 // 4 MHz
-
 spi_device_handle_t spi_reg, spi_fifo;
 
-void cmt_spi3_init(int8_t pin_sdio, int8_t pin_clk, int8_t pin_cs, int8_t pin_fcs)
+void cmt_spi3_init(int8_t pin_sdio, int8_t pin_clk, int8_t pin_cs, int8_t pin_fcs, uint32_t spi_speed)
 {
     spi_bus_config_t buscfg = {
         .mosi_io_num = pin_sdio,
@@ -22,7 +20,7 @@ void cmt_spi3_init(int8_t pin_sdio, int8_t pin_clk, int8_t pin_cs, int8_t pin_fc
         .address_bits = 0,
         .dummy_bits = 0,
         .mode = 0, // SPI mode 0
-        .clock_speed_hz = CMT_SPI_CLK,
+        .clock_speed_hz = spi_speed,
         .spics_io_num = pin_cs,
         .flags = SPI_DEVICE_HALFDUPLEX | SPI_DEVICE_3WIRE,
         .queue_size = 1,
@@ -40,8 +38,8 @@ void cmt_spi3_init(int8_t pin_sdio, int8_t pin_clk, int8_t pin_cs, int8_t pin_fc
         .dummy_bits = 0,
         .mode = 0, // SPI mode 0
         .cs_ena_pretrans = 2,
-        .cs_ena_posttrans = (uint8_t)(1 / (CMT_SPI_CLK * 10e6 * 2) + 2), // >2 us
-        .clock_speed_hz = CMT_SPI_CLK,
+        .cs_ena_posttrans = (uint8_t)(1 / (spi_speed * 10e6 * 2) + 2), // >2 us
+        .clock_speed_hz = spi_speed,
         .spics_io_num = pin_fcs,
         .flags = SPI_DEVICE_HALFDUPLEX | SPI_DEVICE_3WIRE,
         .queue_size = 1,

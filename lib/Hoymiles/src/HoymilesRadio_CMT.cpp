@@ -7,10 +7,7 @@
 #include "crc.h"
 #include <FunctionalInterrupt.h>
 #include <cmt2300a.h>
-#include <cmt2300a_params.h>
 
-#define CMT2300A_ONE_STEP_SIZE 2500 // frequency channel step size for fast frequency hopping operation: One step size is 2.5 kHz.
-#define FH_OFFSET 100 // value * CMT2300A_ONE_STEP_SIZE = channel frequency offset
 #define HOY_BASE_FREQ 860000000 // Hoymiles base frequency for CMD56 channels is 860.00 MHz
 #define HOY_BOOT_FREQ 868000000 // Hoymiles boot/init frequency after power up inverter
 
@@ -56,35 +53,6 @@ bool HoymilesRadio_CMT::cmtSwitchDtuFreq(const uint32_t to_freq_kHz)
     }
 
     cmtSwitchChannel(toChannel);
-
-    return true;
-}
-
-bool HoymilesRadio_CMT::cmtConfig(void)
-{
-    /* Config GPIOs */
-    CMT2300A_ConfigGpio(
-        CMT2300A_GPIO3_SEL_INT2);
-
-    /* Config interrupt */
-    CMT2300A_ConfigInterrupt(
-        CMT2300A_INT_SEL_TX_DONE, /* Config INT1 */
-        CMT2300A_INT_SEL_PKT_OK /* Config INT2 */
-    );
-
-    /* Enable interrupt */
-    CMT2300A_EnableInterrupt(
-        CMT2300A_MASK_TX_DONE_EN | CMT2300A_MASK_PREAM_OK_EN | CMT2300A_MASK_SYNC_OK_EN | CMT2300A_MASK_CRC_OK_EN | CMT2300A_MASK_PKT_DONE_EN);
-
-    CMT2300A_SetFrequencyStep(100); // set FH_OFFSET to 100 (frequency = base freq + 2.5kHz*FH_OFFSET*FH_CHANNEL)
-
-    /* Use a single 64-byte FIFO for either Tx or Rx */
-    CMT2300A_EnableFifoMerge(true);
-
-    /* Go to sleep for configuration to take effect */
-    if (!CMT2300A_GoSleep()) {
-        return false; // CMT2300A not switched to sleep mode!
-    }
 
     return true;
 }
@@ -301,7 +269,7 @@ enumCMTresult HoymilesRadio_CMT::cmtProcess(void)
         CMT2300A_DelayMs(20);
 
         CMT2300A_GoStby();
-        cmtConfig();
+        _radio->begin();
 
         cmtNextState = CMT_STATE_IDLE;
 
@@ -318,41 +286,24 @@ enumCMTresult HoymilesRadio_CMT::cmtProcess(void)
 void HoymilesRadio_CMT::init(int8_t pin_sdio, int8_t pin_clk, int8_t pin_cs, int8_t pin_fcs, int8_t pin_gpio3)
 {
     _dtuSerial.u64 = 0;
-    uint8_t tmp;
 
-    CMT2300A_InitSpi(pin_sdio, pin_clk, pin_cs, pin_fcs);
-    if (!CMT2300A_Init()) {
-        Hoymiles.getMessageOutput()->println("CMT2300A_Init() failed!");
-        return;
-    }
+    _radio.reset(new CMT2300a(pin_sdio, pin_clk, pin_cs, pin_fcs));
 
-    /* config registers */
-    CMT2300A_ConfigRegBank(CMT2300A_CMT_BANK_ADDR, g_cmt2300aCmtBank, CMT2300A_CMT_BANK_SIZE);
-    CMT2300A_ConfigRegBank(CMT2300A_SYSTEM_BANK_ADDR, g_cmt2300aSystemBank, CMT2300A_SYSTEM_BANK_SIZE);
-    CMT2300A_ConfigRegBank(CMT2300A_FREQUENCY_BANK_ADDR, g_cmt2300aFrequencyBank, CMT2300A_FREQUENCY_BANK_SIZE); // cmtBaseChOff860 need to be changed to the same frequency for channel calculation
-    CMT2300A_ConfigRegBank(CMT2300A_DATA_RATE_BANK_ADDR, g_cmt2300aDataRateBank, CMT2300A_DATA_RATE_BANK_SIZE);
-    CMT2300A_ConfigRegBank(CMT2300A_BASEBAND_BANK_ADDR, g_cmt2300aBasebandBank, CMT2300A_BASEBAND_BANK_SIZE);
-    CMT2300A_ConfigRegBank(CMT2300A_TX_BANK_ADDR, g_cmt2300aTxBank, CMT2300A_TX_BANK_SIZE);
+    _radio->begin();
 
     cmtBaseChOff860 = (860000000 - HOY_BASE_FREQ) / CMT2300A_ONE_STEP_SIZE / FH_OFFSET;
 
-    // xosc_aac_code[2:0] = 2
-    tmp = (~0x07) & CMT2300A_ReadReg(CMT2300A_CUS_CMT10);
-    CMT2300A_WriteReg(CMT2300A_CUS_CMT10, tmp | 0x02);
+    cmtSwitchDtuFreq(HOYMILES_CMT_WORK_FREQ); // start dtu at work freqency, for fast Rx if inverter is already on and frequency switched
 
-    if (!cmtConfig()) {
-        Hoymiles.getMessageOutput()->println("cmtConfig() failed!");
-        return;
+    if (_radio->isChipConnected()) {
+        Hoymiles.getMessageOutput()->println("Connection successful");
+    } else {
+        Hoymiles.getMessageOutput()->println("Connection error!!");
     }
 
     attachInterrupt(digitalPinToInterrupt(pin_gpio3), std::bind(&HoymilesRadio_CMT::handleIntr, this), RISING);
 
-    cmtSwitchDtuFreq(HOYMILES_CMT_WORK_FREQ); // start dtu at work freqency, for fast Rx if inverter is already on and frequency switched
-
-    _ChipConnected = true;
     _isInitialized = true;
-
-    Hoymiles.getMessageOutput()->println("CMT init successful");
 }
 
 void HoymilesRadio_CMT::loop()
@@ -451,12 +402,25 @@ void HoymilesRadio_CMT::loop()
     }
 }
 
+void HoymilesRadio_CMT::setPALevel(int8_t paLevel)
+{
+    if (!_isInitialized) {
+        return;
+    }
+
+    if (_radio->setPALevel(paLevel)) {
+        Hoymiles.getMessageOutput()->printf("CMT TX power set to %d dBm\r\n", paLevel);
+    } else {
+        Hoymiles.getMessageOutput()->printf("CMT TX power %d dBm is not defined! (min: -10 dBm, max: 20 dBm)\r\n", paLevel);
+    }
+}
+
 bool HoymilesRadio_CMT::isConnected()
 {
     if (!_isInitialized) {
         return false;
     }
-    return _ChipConnected;
+    return _radio->isChipConnected();
 }
 
 void ARDUINO_ISR_ATTR HoymilesRadio_CMT::handleIntr()
