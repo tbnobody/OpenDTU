@@ -31,6 +31,7 @@ void WebApiClass::init()
     _webApiNetwork.init(&_server);
     _webApiNtp.init(&_server);
     _webApiPower.init(&_server);
+    _webApiPowerMeter.init(&_server);
     _webApiPowerLimiter.init(&_server);
     _webApiPrometheus.init(&_server);
     _webApiSecurity.init(&_server);
@@ -60,6 +61,7 @@ void WebApiClass::loop()
     _webApiNetwork.loop();
     _webApiNtp.loop();
     _webApiPower.loop();
+    _webApiPowerMeter.loop();
     _webApiPowerLimiter.loop();
     _webApiSecurity.loop();
     _webApiSysstatus.loop();
