@@ -99,13 +99,20 @@ struct CONFIG_T {
 
     bool Mqtt_Hass_Expire;
 
+    bool PowerMeter_Enabled;
+    uint32_t PowerMeter_Interval;
+    uint32_t PowerMeter_Source;
+    char PowerMeter_MqttTopicPowerMeter1[MQTT_MAX_TOPIC_STRLEN + 1];
+    char PowerMeter_MqttTopicPowerMeter2[MQTT_MAX_TOPIC_STRLEN + 1];
+    char PowerMeter_MqttTopicPowerMeter3[MQTT_MAX_TOPIC_STRLEN + 1];
+    uint32_t PowerMeter_SdmBaudrate;
+    uint32_t PowerMeter_SdmAddress;
+
+
     bool PowerLimiter_Enabled;
     bool PowerLimiter_SolarPassTroughEnabled;
     uint8_t PowerLimiter_BatteryDrainStategy;
     uint32_t PowerLimiter_Interval;
-    char PowerLimiter_MqttTopicPowerMeter1[MQTT_MAX_TOPIC_STRLEN + 1];
-    char PowerLimiter_MqttTopicPowerMeter2[MQTT_MAX_TOPIC_STRLEN + 1];
-    char PowerLimiter_MqttTopicPowerMeter3[MQTT_MAX_TOPIC_STRLEN + 1];
     bool PowerLimiter_IsInverterBehindPowerMeter;
     uint8_t PowerLimiter_InverterId;
     uint8_t PowerLimiter_InverterChannelId;

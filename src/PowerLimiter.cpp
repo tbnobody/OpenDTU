@@ -4,6 +4,7 @@
  */
 
 #include "Battery.h"
+#include "PowerMeter.h"
 #include "PowerLimiter.h"
 #include "Configuration.h"
 #include "MqttSettings.h"
@@ -16,52 +17,10 @@ PowerLimiterClass PowerLimiter;
 
 void PowerLimiterClass::init()
 {
-    using std::placeholders::_1;
-    using std::placeholders::_2;
-    using std::placeholders::_3;
-    using std::placeholders::_4;
-    using std::placeholders::_5;
-    using std::placeholders::_6;
-
-
-    CONFIG_T& config = Configuration.get();
-
-    // Zero export power limiter
-    if (strlen(config.PowerLimiter_MqttTopicPowerMeter1) != 0) {
-        MqttSettings.subscribe(config.PowerLimiter_MqttTopicPowerMeter1, 0, std::bind(&PowerLimiterClass::onMqttMessage, this, _1, _2, _3, _4, _5, _6));
-    }
-
-    if (strlen(config.PowerLimiter_MqttTopicPowerMeter2) != 0) {
-        MqttSettings.subscribe(config.PowerLimiter_MqttTopicPowerMeter2, 0, std::bind(&PowerLimiterClass::onMqttMessage, this, _1, _2, _3, _4, _5, _6));
-    }
-
-    if (strlen(config.PowerLimiter_MqttTopicPowerMeter3) != 0) {
-        MqttSettings.subscribe(config.PowerLimiter_MqttTopicPowerMeter3, 0, std::bind(&PowerLimiterClass::onMqttMessage, this, _1, _2, _3, _4, _5, _6));
-    }
-
-     _lastCommandSent = 0;
+    _lastCommandSent = 0;
     _lastLoop = 0;
     _lastPowerMeterUpdate = 0;
     _lastRequestedPowerLimit = 0;
-}
-
-void PowerLimiterClass::onMqttMessage(const espMqttClientTypes::MessageProperties& properties, const char* topic, const uint8_t* payload, size_t len, size_t index, size_t total)
-{
-    CONFIG_T& config = Configuration.get();
-
-    if (strcmp(topic, config.PowerLimiter_MqttTopicPowerMeter1) == 0) {
-        _powerMeter1Power = std::stof(std::string(reinterpret_cast<const char*>(payload), (unsigned int)len));
-    }
-
-    if (strcmp(topic, config.PowerLimiter_MqttTopicPowerMeter2) == 0) {
-        _powerMeter2Power = std::stof(std::string(reinterpret_cast<const char*>(payload), (unsigned int)len));
-    }
-
-    if (strcmp(topic, config.PowerLimiter_MqttTopicPowerMeter3) == 0) {
-        _powerMeter3Power = std::stof(std::string(reinterpret_cast<const char*>(payload), (unsigned int)len));
-    }
-
-    _lastPowerMeterUpdate = millis();
 }
 
 void PowerLimiterClass::loop()
@@ -69,7 +28,7 @@ void PowerLimiterClass::loop()
     CONFIG_T& config = Configuration.get();
 
     if (!config.PowerLimiter_Enabled
-            || !MqttSettings.getConnected()
+            || !config.PowerMeter_Enabled
             || !Hoymiles.getRadio()->isIdle()
             || (millis() - _lastCommandSent) < (config.PowerLimiter_Interval * 1000)
             || (millis() - _lastLoop) < (config.PowerLimiter_Interval * 1000)) {
@@ -209,7 +168,7 @@ int32_t PowerLimiterClass::calcPowerLimit(std::shared_ptr<InverterAbstract> inve
 {
     CONFIG_T& config = Configuration.get();
     
-    int32_t newPowerLimit = round(_powerMeter1Power + _powerMeter2Power + _powerMeter3Power);
+    int32_t newPowerLimit = round(PowerMeter.getPowerTotal());
 
     float efficency = inverter->Statistics()->getChannelFieldValue(TYPE_AC, (ChannelNum_t) config.PowerLimiter_InverterChannelId, FLD_EFF);
     int32_t victronChargePower = this->getDirectSolarPower();
