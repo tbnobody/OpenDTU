@@ -20,6 +20,7 @@ export default defineConfig({
         include: path.resolve(path.dirname(fileURLToPath(import.meta.url)), './src/locales/**.json'),
         fullInstall: false,
         forceStringify: true,
+        strictMessage: false,
     }),
   ],
   resolve: {
