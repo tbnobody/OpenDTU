@@ -29,6 +29,7 @@ Like to show your own build? Just send me a Pull Request.
 * Hoymiles HM-1200
 * Hoymiles HM-1500
 * Solenso SOL-H400
+* Solenso SOL-H800
 * TSUN TSOL-M350 (Maybe depending on firmware/serial number on the inverter)
 * TSUN TSOL-M800 (Maybe depending on firmware/serial number on the inverter)
 * TSUN TSOL-M1600 (Maybe depending on firmware/serial number on the inverter)
