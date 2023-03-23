@@ -197,8 +197,13 @@ void MqttHandleInverterClass::onMqttMessage(const espMqttClientTypes::MessagePro
     char* strlimit = new char[len + 1];
     memcpy(strlimit, payload, len);
     strlimit[len] = '\0';
-    uint32_t payload_val = strtol(strlimit, NULL, 10);
+    int32_t payload_val = strtol(strlimit, NULL, 10);
     delete[] strlimit;
+
+    if (payload_val < 0) {
+        MessageOutput.printf("MQTT payload < 0 received --> ignoring\r\n");
+        return;
+    }
 
     if (!strcmp(setting, TOPIC_SUB_LIMIT_PERSISTENT_RELATIVE)) {
         // Set inverter limit relative persistent
