@@ -26,39 +26,14 @@ void PowerMeterClass::init()
     _lastPowerMeterUpdate = 0;
 
     CONFIG_T& config = Configuration.get();
-//if(!mqttInitDone){
-    if (strlen(config.PowerMeter_MqttTopicPowerMeter1) != 0 && strcmp(PowerMeter_MqttTopicPowerMeter1old, config.PowerMeter_MqttTopicPowerMeter1)) {
-        MqttSettings.subscribe(config.PowerMeter_MqttTopicPowerMeter1, 0, std::bind(&PowerMeterClass::onMqttMessage, this, _1, _2, _3, _4, _5, _6));
-        strlcpy(PowerMeter_MqttTopicPowerMeter1old, config.PowerMeter_MqttTopicPowerMeter1, sizeof(config.PowerMeter_MqttTopicPowerMeter3));
-    }
 
-    if (strlen(config.PowerMeter_MqttTopicPowerMeter2) != 0 && strcmp(PowerMeter_MqttTopicPowerMeter2old, config.PowerMeter_MqttTopicPowerMeter2)) {
-        MqttSettings.subscribe(config.PowerMeter_MqttTopicPowerMeter2, 0, std::bind(&PowerMeterClass::onMqttMessage, this, _1, _2, _3, _4, _5, _6));
-        strlcpy(PowerMeter_MqttTopicPowerMeter2old, config.PowerMeter_MqttTopicPowerMeter2, sizeof(config.PowerMeter_MqttTopicPowerMeter3));
-    }
-
-    if (strlen(config.PowerMeter_MqttTopicPowerMeter3) != 0 && strcmp(PowerMeter_MqttTopicPowerMeter3old, config.PowerMeter_MqttTopicPowerMeter3)) {
-        MqttSettings.subscribe(config.PowerMeter_MqttTopicPowerMeter3, 0, std::bind(&PowerMeterClass::onMqttMessage, this, _1, _2, _3, _4, _5, _6));
-        strlcpy(PowerMeter_MqttTopicPowerMeter3old, config.PowerMeter_MqttTopicPowerMeter3, sizeof(config.PowerMeter_MqttTopicPowerMeter3));
-    }
+    MqttSettings.subscribe(config.PowerMeter_MqttTopicPowerMeter1, 0, std::bind(&PowerMeterClass::onMqttMessage, this, _1, _2, _3, _4, _5, _6));
+    MqttSettings.subscribe(config.PowerMeter_MqttTopicPowerMeter2, 0, std::bind(&PowerMeterClass::onMqttMessage, this, _1, _2, _3, _4, _5, _6));
+    MqttSettings.subscribe(config.PowerMeter_MqttTopicPowerMeter3, 0, std::bind(&PowerMeterClass::onMqttMessage, this, _1, _2, _3, _4, _5, _6));
+       
     mqttInitDone = true;
-//}
+
     sdm.begin();
-    /*if(config.PowerMeter_Source != 0){
-        if (strlen(config.PowerMeter_MqttTopicPowerMeter1) != 0) {
-            MqttSettings.unsubscribe(config.PowerMeter_MqttTopicPowerMeter1);
-        }
-
-        if (strlen(config.PowerMeter_MqttTopicPowerMeter2) != 0) {
-            MqttSettings.unsubscribe(config.PowerMeter_MqttTopicPowerMeter2);
-        }
-
-        if (strlen(config.PowerMeter_MqttTopicPowerMeter3) != 0) {
-            MqttSettings.unsubscribe(config.PowerMeter_MqttTopicPowerMeter3);
-        }
-        Hoymiles.getMessageOutput()->printf("PowerMeterClass: MQTT unsubscribed\n");
-    }*/
-
 }
 
 void PowerMeterClass::onMqttMessage(const espMqttClientTypes::MessageProperties& properties, const char* topic, const uint8_t* payload, size_t len, size_t index, size_t total)
@@ -141,6 +116,5 @@ void PowerMeterClass::loop()
         mqtt();
 
         _lastPowerMeterUpdate = millis();
-        
     }
 }

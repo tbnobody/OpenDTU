@@ -142,10 +142,4 @@ void WebApiPowerLimiterClass::onAdminPost(AsyncWebServerRequest* request)
 
     response->setLength();
     request->send(response);
-
-    MqttSettings.performReconnect();  
-    PowerLimiter.init();
-    PowerMeter.init();
-    MqttHandleHass.forceUpdate();
-    MqttHandleVedirectHass.forceUpdate();
 }

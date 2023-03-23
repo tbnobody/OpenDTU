@@ -40,10 +40,6 @@ private:
     float _PowerMeterExport = 0.0;
 
     bool mqttInitDone = false;
-    char PowerMeter_MqttTopicPowerMeter1old[MQTT_MAX_TOPIC_STRLEN + 1];
-    char PowerMeter_MqttTopicPowerMeter2old[MQTT_MAX_TOPIC_STRLEN + 1];
-    char PowerMeter_MqttTopicPowerMeter3old[MQTT_MAX_TOPIC_STRLEN + 1];
-
 };
 
 extern PowerMeterClass PowerMeter;

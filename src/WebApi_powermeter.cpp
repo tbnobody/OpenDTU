@@ -118,10 +118,8 @@ void WebApiPowerMeterClass::onAdminPost(AsyncWebServerRequest* request)
     response->setLength();
     request->send(response);
 
-
-    MqttSettings.performReconnect();  
-    PowerMeter.init();
-    PowerLimiter.init();
-    MqttHandleHass.forceUpdate();
-    MqttHandleVedirectHass.forceUpdate();
+    yield();
+    delay(1000);
+    yield();
+    ESP.restart();
 }
