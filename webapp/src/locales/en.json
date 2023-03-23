@@ -86,7 +86,7 @@
         "9009": "Second must be a number between {min} and {max}!",
         "9010": "Time updated!",
         "10001": "Password must between 8 and {max} characters long!",
-        "10002": "Authentication successfull!",
+        "10002": "Authentication successful!",
         "11001": "@:apiresponse.2001",
         "11002": "@:apiresponse:5004",
         "12001": "Profil must between 1 and {max} characters long!"
