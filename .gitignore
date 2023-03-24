@@ -7,4 +7,3 @@
 platformio-device-monitor*.log
 platformio_override.ini
 .DS_Store
-webapp_dist

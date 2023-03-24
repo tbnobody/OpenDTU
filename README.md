@@ -144,7 +144,7 @@ You can also change  the pins by creating a custom [device profile](docs/DeviceP
     * upload_port
     * monitor_port
 * Select the arrow button in the blue bottom status bar (PlatformIO: Upload) to compile and upload the firmware. During the compilation, all required libraries are downloaded automatically.
-* Under Linux, if the upload fails with error messages "Could not open /dev/ttyUSB0, the port doesn't exist", you can check via ```ls -la /dev/tty*``` to which group your port belongs to, and then add your user this group via ```sudo adduser <yourusername> dialout``` (if you are using ```arch-linux``` use: ```sudo gpasswd -a <yourusername> uucp```, this method also requires a reboot).
+* Under Linux, if the upload fails with error messages "Could not open /dev/ttyUSB0, the port doesn't exist", you can check via ```ls -la /dev/tty*``` to which group your port belongs to, and then add your user this group via ```sudo adduser <yourusername> dialout``` (if you are using ```arch-linux``` use: ```sudo gpasswd -a <yourusername> uucp```, this method requires a logout/login of the affected user).
 * There are two videos showing these steps:
     * [Git Clone and compilation](https://youtu.be/9cA_esv3zeA)
     * [Full installation and compilation](https://youtu.be/xs6TqHn7QWM)
@@ -199,7 +199,7 @@ esptool.py --port /dev/ttyUSB0 --chip esp32 --before default_reset --after hard_
 Users report that [ESP_Flasher](https://github.com/Jason2866/ESP_Flasher/releases/) is suitable for flashing OpenDTU on Windows.
 
 #### Flash with [ESP_Flasher](https://espressif.github.io/esptool-js/) - web version
-It is also possible to flash it via the web tools which might be more convenient and is platform agnostic.
+It is also possible to flash it via the web tools which might be more convenient and is platform independent.
 
 ## First configuration
 * After the initial flashing of the microcontroller, an Access Point called "OpenDTU-*" is opened. The default password is "openDTU42".
