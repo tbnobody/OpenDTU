@@ -61,14 +61,16 @@ void WebApiWsLiveClass::loop()
     if (millis() - _lastWsPublish > (10 * 1000) || (maxTimeStamp != _newestInverterTimestamp)) {
 
         try {
-            DynamicJsonDocument root(40960);
-            JsonVariant var = root;
-            generateJsonResponse(var);
-
             String buffer;
-            if (buffer) {
+            // free JsonDocument as soon as possible
+            {
+                DynamicJsonDocument root(40960);
+                JsonVariant var = root;
+                generateJsonResponse(var);
                 serializeJson(root, buffer);
+            }
 
+            if (buffer) {
                 if (Configuration.get().Security_AllowReadonly) {
                     _ws.setAuthentication("", "");
                 } else {
