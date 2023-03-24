@@ -13,6 +13,7 @@ This project is still under development and adds following features:
 * Can read the current solar panel power from the Victron MPPT and adjust the limiter accordingly to not save energy in the battery (for increased system efficiency). Increases the battery lifespan and reduces energy loses.
 * Settings can be configured in the UI
 * Pylontech Battery support (via CAN bus interface). Use the SOC for starting/stopping the power output and provide the battery data via MQTT (autodiscovery for home assistant is currently not supported). Pin Mapping is supported (default RX PIN 27, TX PIN 26). Actual no live view support for Pylontech Battery.
+* Huawei R4850G2 power supply unit that can act as AC charger. Supports status shown on the web interface and options to set voltage and current limits on the web interface and via MQTT. Connection is done using CAN bus (needs to be separate from Pylontech CAN bus) via SN65HVD230 interface.
 
 [![OpenDTU Build](https://github.com/tbnobody/OpenDTU/actions/workflows/build.yml/badge.svg)](https://github.com/tbnobody/OpenDTU/actions/workflows/build.yml)
 [![cpplint](https://github.com/tbnobody/OpenDTU/actions/workflows/cpplint.yml/badge.svg)](https://github.com/tbnobody/OpenDTU/actions/workflows/cpplint.yml)
@@ -162,6 +163,23 @@ Topics for 3 phases of a power meter is configurable. Given is an example for th
 | battery/charging/dischargeEnabled        | R     |                                               |                    |
 | battery/charging/chargeImmediately       | R     |                                               |                    |
 
+## Huawei AC charger topics
+| Topic                                   | R / W | Description                                          | Value / Unit               |
+| --------------------------------------- | ----- | ---------------------------------------------------- | -------------------------- |
+| huawei/cmd/limit_online_voltage         | W     | Online voltage (i.e. CAN bus connected)              | Volt (V)                   |
+| huawei/cmd/limit_online_current         | W     | Online current (i.e. CAN bus connected)              | Ampere (A)                 |
+| huawei/cmd/power                        | W     | Controls output pin GPIO to drive solid state relais | 0 / 1                      |
+| huawei/data_age                         | R     | How old the data is                                  | Seconds                    |
+| huawei/input_voltage                    | R     | Input voltage                                        | Volt (V)                   |
+| huawei/input_current                    | R     | Input current                                        | Ampere (A)                 |
+| huawei/input_power                      | R     | Input power                                          | Watt (W)                   |
+| huawei/output_voltage                   | R     | Output voltage                                       | Volt (V)                   |
+| huawei/output_current                   | R     | Output current                                       | Ampere (A)                 |
+| huawei/max_output_current               | R     | Maximum output current (set using the online limit)  | Ampere (A)                 |
+| huawei/output_power                     | R     | Output power                                         | Watt (W)                   |
+| huawei/input_temp                       | R     | Input air temperature                                | °C                         |
+| huawei/output_temp                      | R     | Output air temperature                               | °C                         |
+| huawei/efficiency                       | R     | Efficiency                                           | Percentage                 |
 
 ## Currently supported Inverters
 * Hoymiles HM-300
