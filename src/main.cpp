@@ -8,6 +8,7 @@
 #include "MessageOutput.h"
 #include "VeDirectFrameHandler.h"
 #include "PylontechCanReceiver.h"
+#include "Huawei_can.h"
 #include "MqttHandleDtu.h"
 #include "MqttHandleHass.h"
 #include "MqttHandleVedirectHass.h"
@@ -158,6 +159,17 @@ void setup()
     } else {
         MessageOutput.println(F("Invalid pin config"));
     }
+
+    // Initialize Huawei AC-charger PSU / CAN bus
+    MessageOutput.println(F("Initialize Huawei AC charger interface... "));
+    if (PinMapping.isValidHuaweiConfig()) {
+        MessageOutput.printf("Huawei AC-charger miso = %d, mosi = %d, clk = %d, irq = %d, cs = %d\r\n", pin.huawei_miso, pin.huawei_mosi, pin.huawei_clk, pin.huawei_irq, pin.huawei_cs);
+        HuaweiCan.init(pin.huawei_miso, pin.huawei_mosi, pin.huawei_clk, pin.huawei_irq, pin.huawei_cs);
+        MessageOutput.println(F("done"));
+    } else {
+        MessageOutput.println(F("Invalid pin config"));
+    }
+
 }
 
 void loop()
@@ -192,5 +204,7 @@ void loop()
     MessageOutput.loop();
     yield();
     PylontechCanReceiver.loop();
+    yield();
+    HuaweiCan.loop();
     yield();
 }

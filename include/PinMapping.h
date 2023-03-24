@@ -33,6 +33,11 @@ struct PinMapping_t {
     uint8_t victron_rx;
     uint8_t battery_rx;
     uint8_t battery_tx;
+    uint8_t huawei_miso;
+    uint8_t huawei_mosi;
+    uint8_t huawei_clk;
+    uint8_t huawei_irq;
+    uint8_t huawei_cs;
 };
 
 class PinMappingClass {
@@ -45,7 +50,8 @@ public:
     bool isValidEthConfig();
     bool isValidVictronConfig();
     bool isValidBatteryConfig();
-
+    bool isValidHuaweiConfig();
+    
 private:
     PinMapping_t _pinMapping;
 };

@@ -40,6 +40,8 @@ void WebApiClass::init()
     _webApiWsLive.init(&_server);
     _webApiWsVedirectLive.init(&_server);
     _webApiVedirect.init(&_server);
+    _webApiWsHuaweiLive.init(&_server);
+    _webApiHuaweiClass.init(&_server);
 
     _server.begin();
 }
@@ -68,6 +70,8 @@ void WebApiClass::loop()
     _webApiWsLive.loop();
     _webApiWsVedirectLive.loop();
     _webApiVedirect.loop();
+    _webApiWsHuaweiLive.loop();
+    _webApiHuaweiClass.loop();
 }
 
 bool WebApiClass::checkCredentials(AsyncWebServerRequest* request)
