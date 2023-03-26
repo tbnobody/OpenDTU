@@ -119,6 +119,7 @@ struct CONFIG_T {
     float PowerLimiter_VoltageLoadCorrectionFactor;
 
     bool Battery_Enabled;
+    bool Huawei_Enabled;
 
     char Security_Password[WIFI_MAX_PASSWORD_STRLEN + 1];
     bool Security_AllowReadonly;

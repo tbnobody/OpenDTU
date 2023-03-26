@@ -38,6 +38,7 @@ struct PinMapping_t {
     uint8_t huawei_clk;
     uint8_t huawei_irq;
     uint8_t huawei_cs;
+    uint8_t huawei_power;
 };
 
 class PinMappingClass {

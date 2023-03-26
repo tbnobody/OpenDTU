@@ -11,7 +11,7 @@
 
 HuaweiCanClass HuaweiCan;
 
-void HuaweiCanClass::init(uint8_t huawei_miso, uint8_t huawei_mosi, uint8_t huawei_clk, uint8_t huawei_irq, uint8_t huawei_cs)
+void HuaweiCanClass::init(uint8_t huawei_miso, uint8_t huawei_mosi, uint8_t huawei_clk, uint8_t huawei_irq, uint8_t huawei_cs, uint8_t huawei_power)
 {
 
   hspi = new SPIClass(VSPI);
@@ -32,11 +32,15 @@ void HuaweiCanClass::init(uint8_t huawei_miso, uint8_t huawei_mosi, uint8_t huaw
 
   CAN->setMode(MCP_NORMAL);   // Change to normal mode to allow messages to be transmitted
 
+  pinMode(huawei_power, OUTPUT);
+  digitalWrite(huawei_power,HIGH);
+  _huawei_power = huawei_power;
+
 }
 
-RectifierParameters_t& HuaweiCanClass::get()
+RectifierParameters_t * HuaweiCanClass::get()
 {
-    return _rp;
+    return &_rp;
 }
 
 unsigned long HuaweiCanClass::getLastUpdate()
@@ -179,3 +183,9 @@ void HuaweiCanClass::setValue(float in, uint8_t parameterType)
       MessageOutput.println("Error Sending Message...");
     }
 }
+
+void HuaweiCanClass::setPower(bool power) {
+  digitalWrite(_huawei_power, power);
+}
+
+

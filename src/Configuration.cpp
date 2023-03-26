@@ -138,6 +138,9 @@ bool ConfigurationClass::write()
     JsonObject battery = doc.createNestedObject("battery");
     battery["enabled"] = config.Battery_Enabled;
 
+    JsonObject huawei = doc.createNestedObject("huawei");
+    huawei["enabled"] = config.Huawei_Enabled;
+
     // Serialize JSON to file
     if (serializeJson(doc, f) == 0) {
         MessageOutput.println("Failed to write file");
@@ -302,6 +305,9 @@ bool ConfigurationClass::read()
 
     JsonObject battery = doc["battery"];
     config.Battery_Enabled = battery["enabled"] | BATTERY_ENABLED;
+
+    JsonObject huawei = doc["huawei"];
+    config.Huawei_Enabled = huawei["enabled"] | HUAWEI_ENABLED;
 
     f.close();
     return true;

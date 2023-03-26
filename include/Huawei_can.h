@@ -45,10 +45,12 @@ struct RectifierParameters_t {
 
 class HuaweiCanClass {
 public:
-    void init(uint8_t huawei_miso, uint8_t huawei_mosi, uint8_t huawei_clk, uint8_t huawei_irq, uint8_t huawei_cs);
+    void init(uint8_t huawei_miso, uint8_t huawei_mosi, uint8_t huawei_clk, uint8_t huawei_irq, uint8_t huawei_cs, uint8_t huawei_power);
     void loop();
     void setValue(float in, uint8_t parameterType);
-    RectifierParameters_t& get();
+    void setPower(bool power);
+
+    RectifierParameters_t * get();
     unsigned long getLastUpdate();
 
 private:
@@ -62,6 +64,7 @@ private:
     SPIClass *hspi;
     MCP_CAN *CAN;
     uint8_t _huawei_irq;
+    uint8_t _huawei_power;
 
 };
 
