@@ -41,8 +41,12 @@ void MqttHandleHuaweiClass::loop()
         return;
     }
 
-
     const CONFIG_T& config = Configuration.get();
+
+    if (!config.Huawei_Enabled) {
+        return;
+    }
+
     const RectifierParameters_t *rp = HuaweiCan.get();
 
     if ((millis() - _lastPublish) > (config.Mqtt_PublishInterval * 1000) ) {
