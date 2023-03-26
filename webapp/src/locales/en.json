@@ -11,6 +11,7 @@
         "DeviceManager": "Device-Manager",
         "VedirectSettings": "Ve.direct Settings",
         "BatterySettings": "@:batteryadmin.BatterySettings",
+        "AcChargerSettings": "AC Charger",
         "ConfigManagement": "Config Management",
         "FirmwareUpgrade": "Firmware Upgrade",
         "DeviceReboot": "Device Reboot",
@@ -609,5 +610,40 @@
         "Number": "Number",
         "ValueSelected": "Selected",
         "ValueActive": "Active"
-    }
+      },
+      "huawei": {
+        "DataAge": "Data Age: ",
+        "Seconds": " {val} seconds",
+        "Input": "Input",
+        "Output": "Output",
+        "Property": "Property",
+        "Value": "Value",
+        "Unit": "Unit",
+        "input_voltage": "Input voltage",
+        "input_current": "Input current",
+        "input_power": "Input power",
+        "input_temp": "Input temperature",
+        "efficiency": "Efficiency",
+        "output_voltage": "Output voltage",
+        "output_current": "Output current",
+        "max_output_current": "Maximum output current",
+        "output_power": "Output power",
+        "output_temp": "Output temperature",
+        "ShowSetLimit": "Show / Set Huawei Limit",
+        "LimitSettings": "Limit Settings",
+        "SetOffline": "Set limit, CAN bus not connected",
+        "SetOnline": "Set limit, CAN bus connected",
+        "LimitHint": "<b>Hint:</b> CAN bus not connected voltage limit is 48V-58.5V.",
+        "Close": "close",
+        "SetVoltageLimit": "Voltage limit:",
+        "SetCurrentLimit": "Current limit:",
+        "CurrentLimit": "Current limit:"  
+      },
+      "acchargeradmin": {
+        "ChargerSettings": "AC Charger Settings",
+        "Configuration": "AC Charger Configuration",
+        "EnableHuawei": "Enable Huawei R4850G2 on CAN Bus Interface",
+        "Seconds": "@:dtuadmin.Seconds",
+        "Save": "@:dtuadmin.Save"
+      }
 }
