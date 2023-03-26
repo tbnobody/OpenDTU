@@ -101,6 +101,7 @@ struct CONFIG_T {
 
     bool PowerLimiter_Enabled;
     bool PowerLimiter_SolarPassTroughEnabled;
+    uint8_t PowerLimiter_BatteryDrainStategy;
     uint32_t PowerLimiter_Interval;
     char PowerLimiter_MqttTopicPowerMeter1[MQTT_MAX_TOPIC_STRLEN + 1];
     char PowerLimiter_MqttTopicPowerMeter2[MQTT_MAX_TOPIC_STRLEN + 1];
@@ -108,10 +109,10 @@ struct CONFIG_T {
     bool PowerLimiter_IsInverterBehindPowerMeter;
     uint8_t PowerLimiter_InverterId;
     uint8_t PowerLimiter_InverterChannelId;
-    uint32_t PowerLimiter_TargetPowerConsumption;
-    uint32_t PowerLimiter_TargetPowerConsumptionHysteresis;
-    uint32_t PowerLimiter_LowerPowerLimit;
-    uint32_t PowerLimiter_UpperPowerLimit;
+    int32_t PowerLimiter_TargetPowerConsumption;
+    int32_t PowerLimiter_TargetPowerConsumptionHysteresis;
+    int32_t PowerLimiter_LowerPowerLimit;
+    int32_t PowerLimiter_UpperPowerLimit;
     uint32_t PowerLimiter_BatterySocStartThreshold;
     uint32_t PowerLimiter_BatterySocStopThreshold;
     float PowerLimiter_VoltageStartThreshold;
@@ -128,7 +129,7 @@ struct CONFIG_T {
 
     bool Display_PowerSafe;
     bool Display_ScreenSaver;
-    bool Display_ShowLogo;
+    uint8_t Display_Rotation;
     uint8_t Display_Contrast;
 };
 

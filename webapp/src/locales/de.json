@@ -459,6 +459,9 @@
         "General": "Allgemein",
         "Enable": "Aktiviert",
         "EnableSolarPasstrough": "Aktiviere Solar Pass-trough",
+        "BatteryDrainStrategy": "Strategie zur Batterieentleerung",
+        "BatteryDrainWhenFull": "Leeren, wenn voll",
+        "BatteryDrainAtNight": "Leeren zur Nacht",
         "SolarpasstroughInfo": "Diese Einstellung aktiviert die direkte Weitergabe der aktuell vom Laderegler gemeldeten Solarleistung an den Wechselrichter um eine unnötige Speicherung zu vermeiden und die Energieverluste zu minimieren.",
         "InverterId": "Wechselrichter ID",
         "InverterIdHint": "Wähle den Wechselrichter an dem die Batterie hängt.",
@@ -599,8 +602,12 @@
         "PowerSafeHint": "Schaltet das Display aus, wenn kein Wechselrichter Strom erzeugt",
         "Screensaver": "Screensaver aktivieren:",
         "ScreensaverHint": "Bewegt die Ausgabe bei jeder Aktualisierung um ein Einbrennen zu verhindern (v. a. für OLED-Displays nützlich)",
-        "ShowLogo": "Logo anzeigen:",
         "Contrast": "Kontrast ({contrast}):",
+        "Rotation": "Rotation:",
+        "rot0": "Keine Rotation",
+        "rot90": "90 Grad Drehung",
+        "rot180": "180 Grad Drehung",
+        "rot270": "270 Grad Drehung",
         "Save": "@:dtuadmin.Save"
     },
     "pininfo": {

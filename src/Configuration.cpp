@@ -88,7 +88,7 @@ bool ConfigurationClass::write()
     JsonObject display = device.createNestedObject("display");
     display["powersafe"] = config.Display_PowerSafe;
     display["screensaver"] = config.Display_ScreenSaver;
-    display["showlogo"] = config.Display_ShowLogo;
+    display["rotation"] = config.Display_Rotation;
     display["contrast"] = config.Display_Contrast;
 
     JsonArray inverters = doc.createNestedArray("inverters");
@@ -118,6 +118,7 @@ bool ConfigurationClass::write()
     JsonObject powerlimiter = doc.createNestedObject("powerlimiter");
     powerlimiter["enabled"] = config.PowerLimiter_Enabled;
     powerlimiter["solar_passtrough_enabled"] = config.PowerLimiter_SolarPassTroughEnabled;
+    powerlimiter["battery_drain_strategy"] = config.PowerLimiter_BatteryDrainStategy;
     powerlimiter["interval"] = config.PowerLimiter_Interval;
     powerlimiter["mqtt_topic_powermeter_1"] = config.PowerLimiter_MqttTopicPowerMeter1;
     powerlimiter["mqtt_topic_powermeter_2"] = config.PowerLimiter_MqttTopicPowerMeter2;
@@ -256,7 +257,7 @@ bool ConfigurationClass::read()
     JsonObject display = device["display"];
     config.Display_PowerSafe = display["powersafe"] | DISPLAY_POWERSAFE;
     config.Display_ScreenSaver = display["screensaver"] | DISPLAY_SCREENSAVER;
-    config.Display_ShowLogo = display["showlogo"] | DISPLAY_SHOWLOGO;
+    config.Display_Rotation = display["rotation"] | DISPLAY_ROTATION;
     config.Display_Contrast = display["contrast"] | DISPLAY_CONTRAST;
 
     JsonArray inverters = doc["inverters"];
@@ -286,6 +287,7 @@ bool ConfigurationClass::read()
     JsonObject powerlimiter = doc["powerlimiter"];
     config.PowerLimiter_Enabled = powerlimiter["enabled"] | POWERLIMITER_ENABLED;
     config.PowerLimiter_SolarPassTroughEnabled = powerlimiter["solar_passtrough_enabled"] | POWERLIMITER_SOLAR_PASSTROUGH_ENABLED;
+    config.PowerLimiter_BatteryDrainStategy = powerlimiter["battery_drain_strategy"] | POWERLIMITER_BATTERY_DRAIN_STRATEGY;
     config.PowerLimiter_Interval =  POWERLIMITER_INTERVAL;
     strlcpy(config.PowerLimiter_MqttTopicPowerMeter1, powerlimiter["mqtt_topic_powermeter_1"] | "", sizeof(config.PowerLimiter_MqttTopicPowerMeter1));
     strlcpy(config.PowerLimiter_MqttTopicPowerMeter2, powerlimiter["mqtt_topic_powermeter_2"] | "", sizeof(config.PowerLimiter_MqttTopicPowerMeter2));

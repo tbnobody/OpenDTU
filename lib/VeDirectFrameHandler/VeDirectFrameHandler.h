@@ -33,16 +33,16 @@ typedef struct {
     uint8_t ERR;                    // error code
     uint32_t OR;                    // off reason
     uint8_t  MPPT;                  // state of MPP tracker
-    uint16_t HSDS;                  // day sequence number 1...365
+    uint32_t HSDS;                  // day sequence number 1...365
     double V;                       // battery voltage in V
     double I;                       // battery current in A
     double VPV;                     // panel voltage in V
-    uint16_t PPV;                     // panel power in W
+    int32_t PPV;                    // panel power in W
     double H19;                     // yield total kWh
     double H20;                     // yield today kWh
-    uint16_t H21;                   // maximum power today W
+    int32_t H21;                   // maximum power today W
     double H22;                     // yield yesterday kWh
-    uint16_t H23;                   // maximum power yesterday W
+    int32_t H23;                   // maximum power yesterday W
 } veStruct;
 
 class VeDirectFrameHandler {
