@@ -185,7 +185,7 @@ void HuaweiCanClass::setValue(float in, uint8_t parameterType)
 }
 
 void HuaweiCanClass::setPower(bool power) {
-  digitalWrite(_huawei_power, power);
+  digitalWrite(_huawei_power, !power);
 }
 
 
