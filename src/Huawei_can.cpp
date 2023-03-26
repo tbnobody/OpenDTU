@@ -72,7 +72,7 @@ void HuaweiCanClass::onReceive(uint8_t* frame, uint8_t len)
       return;
     }
 
-    uint32_t value = __bswap32(*(uint32_t*)&frame[4]);
+    uint32_t value = __bswap32(* reinterpret_cast<uint32_t*> (frame + 4));
 
     switch (frame[1]) {
     case R48xx_DATA_INPUT_POWER:
