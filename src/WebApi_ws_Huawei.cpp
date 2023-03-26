@@ -73,28 +73,28 @@ void WebApiWsHuaweiLiveClass::loop()
 
 void WebApiWsHuaweiLiveClass::generateJsonResponse(JsonVariant& root)
 {
-    const RectifierParameters_t& rp = HuaweiCan.get();
+    const RectifierParameters_t * rp = HuaweiCan.get();
 
     root["data_age"] = (millis() - HuaweiCan.getLastUpdate()) / 1000;
-    root[F("input_voltage")]["v"] = rp.input_voltage;
+    root[F("input_voltage")]["v"] = rp->input_voltage;
     root[F("input_voltage")]["u"] = "V";
-    root[F("input_current")]["v"] = rp.input_current;
+    root[F("input_current")]["v"] = rp->input_current;
     root[F("input_current")]["u"] = "A";
-    root[F("input_power")]["v"] = rp.input_power;
+    root[F("input_power")]["v"] = rp->input_power;
     root[F("input_power")]["u"] = "W";
-    root[F("output_voltage")]["v"] = rp.output_voltage;
+    root[F("output_voltage")]["v"] = rp->output_voltage;
     root[F("output_voltage")]["u"] = "V";
-    root[F("output_current")]["v"] = rp.output_current;
+    root[F("output_current")]["v"] = rp->output_current;
     root[F("output_current")]["u"] = "A";
-    root[F("max_output_current")]["v"] = rp.max_output_current;
+    root[F("max_output_current")]["v"] = rp->max_output_current;
     root[F("max_output_current")]["u"] = "A";
-    root[F("output_power")]["v"] = rp.output_power;
+    root[F("output_power")]["v"] = rp->output_power;
     root[F("output_power")]["u"] = "W";
-    root[F("input_temp")]["v"] = rp.input_temp;
+    root[F("input_temp")]["v"] = rp->input_temp;
     root[F("input_temp")]["u"] = "°C";
-    root[F("output_temp")]["v"] = rp.output_temp;
+    root[F("output_temp")]["v"] = rp->output_temp;
     root[F("output_temp")]["u"] = "°C";
-    root[F("efficiency")]["v"] = rp.efficiency;
+    root[F("efficiency")]["v"] = rp->efficiency;
     root[F("efficiency")]["u"] = "%";
 
 }
