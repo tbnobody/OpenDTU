@@ -41,28 +41,23 @@ void MqttHandleHuaweiClass::loop()
         return;
     }
 
-    // FIXME - Some memory issue when this is enabled
-    return;
 
-    String json_string;
     const CONFIG_T& config = Configuration.get();
     const RectifierParameters_t *rp = HuaweiCan.get();
 
     if ((millis() - _lastPublish) > (config.Mqtt_PublishInterval * 1000) ) {
-      DynamicJsonDocument doc(256);
-      doc["data_age"] = (millis() - HuaweiCan.getLastUpdate()) / 1000;
-      doc[F("input_voltage")] = rp->input_voltage;
-      doc[F("input_current")] = rp->input_current;
-      doc[F("input_power")] = rp->input_power;
-      doc[F("output_voltage")] = rp->output_voltage;
-      doc[F("output_current")] = rp->output_current;
-      doc[F("max_output_current")] = rp->max_output_current;
-      doc[F("output_power")] = rp->output_power;
-      doc[F("input_temp")] = rp->input_temp;
-      doc[F("output_temp")] = rp->output_temp;
-      doc[F("efficiency")] = rp->efficiency;
-      serializeJson(doc, json_string);
-      MqttSettings.publish("huawei", json_string);
+      MqttSettings.publish("huawei/data_age", String((millis() - HuaweiCan.getLastUpdate()) / 1000));
+      MqttSettings.publish("huawei/input_voltage", String(rp->input_voltage));
+      MqttSettings.publish("huawei/input_current", String(rp->input_current));
+      MqttSettings.publish("huawei/input_power", String(rp->input_power));
+      MqttSettings.publish("huawei/output_voltage", String(rp->output_voltage));
+      MqttSettings.publish("huawei/output_current", String(rp->output_current));
+      MqttSettings.publish("huawei/max_output_current", String(rp->max_output_current));
+      MqttSettings.publish("huawei/output_power", String(rp->output_power));
+      MqttSettings.publish("huawei/input_temp", String(rp->input_temp));
+      MqttSettings.publish("huawei/output_temp", String(rp->output_temp));
+      MqttSettings.publish("huawei/efficiency", String(rp->efficiency));
+
 
       yield();
       _lastPublish = millis();
