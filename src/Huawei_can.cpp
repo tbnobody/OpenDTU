@@ -14,7 +14,7 @@ HuaweiCanClass HuaweiCan;
 void HuaweiCanClass::init(uint8_t huawei_miso, uint8_t huawei_mosi, uint8_t huawei_clk, uint8_t huawei_irq, uint8_t huawei_cs, uint8_t huawei_power)
 {
 
-  hspi = new SPIClass(VSPI);
+  hspi = new SPIClass(HSPI);
   hspi->begin(huawei_clk, huawei_miso, huawei_mosi, huawei_cs);
   pinMode(huawei_cs, OUTPUT);
   digitalWrite(huawei_cs, HIGH);
@@ -89,6 +89,7 @@ void HuaweiCanClass::onReceive(uint8_t* frame, uint8_t len)
 
     case R48xx_DATA_OUTPUT_POWER:
         _rp.output_power = value / 1024.0;
+        lastUpdate = millis();  // We'll only update last update on the important params
         break;
 
     case R48xx_DATA_EFFICIENCY:
@@ -124,7 +125,7 @@ void HuaweiCanClass::onReceive(uint8_t* frame, uint8_t len)
         _rp.output_current = value / 1024.0;
 
         /* This is normally the last parameter received. Print */
-        lastUpdate = millis();
+        lastUpdate = millis();  // We'll only update last update on the important params
 
         MessageOutput.printf("In:  %.02fV, %.02fA, %.02fW\n", _rp.input_voltage, _rp.input_current, _rp.input_power);
         MessageOutput.printf("Out: %.02fV, %.02fA of %.02fA, %.02fW\n", _rp.output_voltage, _rp.output_current, _rp.max_output_current, _rp.output_power);
