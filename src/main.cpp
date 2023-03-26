@@ -14,6 +14,7 @@
 #include "MqttHandleVedirectHass.h"
 #include "MqttHandleInverter.h"
 #include "MqttHandleVedirect.h"
+#include "MqttHandleHuawei.h"
 #include "MqttSettings.h"
 #include "NetworkSettings.h"
 #include "NtpSettings.h"
@@ -100,6 +101,7 @@ void setup()
     MqttHandleVedirect.init();
     MqttHandleHass.init();
     MqttHandleVedirectHass.init();
+    MqttHandleHuawei.init();
     MessageOutput.println(F("done"));
 
     // Initialize WebApi
@@ -163,8 +165,8 @@ void setup()
     // Initialize Huawei AC-charger PSU / CAN bus
     MessageOutput.println(F("Initialize Huawei AC charger interface... "));
     if (PinMapping.isValidHuaweiConfig()) {
-        MessageOutput.printf("Huawei AC-charger miso = %d, mosi = %d, clk = %d, irq = %d, cs = %d\r\n", pin.huawei_miso, pin.huawei_mosi, pin.huawei_clk, pin.huawei_irq, pin.huawei_cs);
-        HuaweiCan.init(pin.huawei_miso, pin.huawei_mosi, pin.huawei_clk, pin.huawei_irq, pin.huawei_cs);
+        MessageOutput.printf("Huawei AC-charger miso = %d, mosi = %d, clk = %d, irq = %d, cs = %d, power_pin = %d\r\n", pin.huawei_miso, pin.huawei_mosi, pin.huawei_clk, pin.huawei_irq, pin.huawei_cs, pin.huawei_power);
+        HuaweiCan.init(pin.huawei_miso, pin.huawei_mosi, pin.huawei_clk, pin.huawei_irq, pin.huawei_cs, pin.huawei_power);
         MessageOutput.println(F("done"));
     } else {
         MessageOutput.println(F("Invalid pin config"));
@@ -194,6 +196,8 @@ void loop()
     MqttHandleHass.loop();
     yield();
     MqttHandleVedirectHass.loop();
+    yield();
+    MqttHandleHuawei.loop();
     yield();
     WebApi.loop();
     yield();
