@@ -61,7 +61,7 @@ private:
     unsigned long lastUpdate;
     RectifierParameters_t _rp;
 
-    SPIClass *hspi;
+    SPIClass *spi;
     MCP_CAN *CAN;
     uint8_t _huawei_irq;
     uint8_t _huawei_power;

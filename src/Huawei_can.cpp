@@ -14,15 +14,15 @@ HuaweiCanClass HuaweiCan;
 void HuaweiCanClass::init(uint8_t huawei_miso, uint8_t huawei_mosi, uint8_t huawei_clk, uint8_t huawei_irq, uint8_t huawei_cs, uint8_t huawei_power)
 {
 
-  hspi = new SPIClass(HSPI);
-  hspi->begin(huawei_clk, huawei_miso, huawei_mosi, huawei_cs);
+  spi = new SPIClass(VSPI);
+  spi->begin(huawei_clk, huawei_miso, huawei_mosi, huawei_cs);
   pinMode(huawei_cs, OUTPUT);
   digitalWrite(huawei_cs, HIGH);
 
   pinMode(huawei_irq, INPUT_PULLUP);
   _huawei_irq = huawei_irq;
 
-  CAN = new MCP_CAN(hspi, huawei_cs);
+  CAN = new MCP_CAN(spi, huawei_cs);
   if(CAN->begin(MCP_ANY, CAN_125KBPS, MCP_8MHZ) == CAN_OK) {
     MessageOutput.println("MCP2515 Initialized Successfully!");
   }
