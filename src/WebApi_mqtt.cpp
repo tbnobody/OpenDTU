@@ -256,10 +256,10 @@ void WebApiMqttClass::onMqttAdminPost(AsyncWebServerRequest* request)
             return;
         }
 
-        if (root[F("mqtt_publish_interval")].as<uint32_t>() < 5 || root[F("mqtt_publish_interval")].as<uint32_t>() > 65535) {
-            retMsg[F("message")] = F("Publish interval must be a number between 5 and 65535!");
+        if (root[F("mqtt_publish_interval")].as<uint32_t>() < 1 || root[F("mqtt_publish_interval")].as<uint32_t>() > 65535) {
+            retMsg[F("message")] = F("Publish interval must be a number between 1 and 65535!");
             retMsg[F("code")] = WebApiError::MqttPublishInterval;
-            retMsg[F("param")][F("min")] = 5;
+            retMsg[F("param")][F("min")] = 1;
             retMsg[F("param")][F("max")] = 65535;
             response->setLength();
             request->send(response);
