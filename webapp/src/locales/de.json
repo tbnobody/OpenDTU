@@ -10,7 +10,8 @@
         "DTUSettings": "DTU",
         "DeviceManager": "Hardware",
         "VedirectSettings": "Ve.direct",
-        "BatterySettings": "Battery",
+        "BatterySettings": "Batterie",
+        "AcChargerSettings": "AC Ladegerät",
         "ConfigManagement": "Konfigurationsverwaltung",
         "FirmwareUpgrade": "Firmware-Aktualisierung",
         "DeviceReboot": "Neustart",
@@ -630,5 +631,40 @@
         "Name": "Name",
         "ValueSelected": "Ausgewählt",
         "ValueActive": "Aktiv"
-    }
+      },
+      "huawei": {
+        "DataAge": "letzte Aktualisierung: ",
+        "Seconds": "vor {val} Sekunden",
+        "Input": "Eingang",
+        "Output": "Ausgang",
+        "Property": "Eigenschaft",
+        "Value": "Wert",
+        "Unit": "Einheit",
+        "input_voltage": "Eingangsspannung",
+        "input_current": "Eingangsstrom",
+        "input_power": "Eingangsleistung",
+        "input_temp": "Eingangstemperatur",
+        "efficiency": "Wirkungsgrad",
+        "output_voltage": "Ausgangsspannung",
+        "output_current": "Ausgangsstrom",
+        "max_output_current": "Maximaler Ausgangsstrom",
+        "output_power": "Ausgangsleistung",
+        "output_temp": "Ausgangstemperatur",
+        "ShowSetLimit": "Zeige / Setze Limit",
+        "LimitSettings": "Limit-Einstellungen",
+        "SetOffline": "Limit setzen, CAN Bus nicht verbunden",
+        "SetOnline": "Limit setzen, CAN Bus verbunden",
+        "LimitHint": "<b>Hinweis:</b> Spannungsbereich wenn CAN Bus nicht verbunden ist 48V-58.5V ",
+        "Close": "Schließen",
+        "SetVoltageLimit": "Spannungslimit:",
+        "SetCurrentLimit": "Stromlimit:",
+        "CurrentLimit": "Aktuelles Limit: "  
+      },
+      "acchargeradmin": {
+        "ChargerSettings": "AC Ladegerät Einstellungen",
+        "Configuration": "AC Ladegerät Konfiguration",
+        "EnableHuawei": "Huawei R4850G2 an CAN Bus Interface aktiv",
+        "Seconds": "@:dtuadmin.Seconds",
+        "Save": "@:dtuadmin.Save"
+      }
 }

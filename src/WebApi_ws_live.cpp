@@ -185,6 +185,10 @@ void WebApiWsLiveClass::generateJsonResponse(JsonVariant& root)
 
     JsonObject vedirectObj = root.createNestedObject("vedirect");
     vedirectObj[F("enabled")] = Configuration.get().Vedirect_Enabled;
+
+    JsonObject huaweiObj = root.createNestedObject("huawei");
+    huaweiObj[F("enabled")] = Configuration.get().Huawei_Enabled;
+
 }
 
 void WebApiWsLiveClass::addField(JsonObject& root, uint8_t idx, std::shared_ptr<InverterAbstract> inv, ChannelType_t type, ChannelNum_t channel, FieldId_t fieldId, String topic)

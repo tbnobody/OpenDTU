@@ -66,6 +66,13 @@ PinMappingClass::PinMappingClass()
 
     _pinMapping.battery_rx = PYLONTECH_PIN_RX;
     _pinMapping.battery_tx = PYLONTECH_PIN_TX;
+
+    _pinMapping.huawei_miso = HUAWEI_PIN_MISO;
+    _pinMapping.huawei_mosi = HUAWEI_PIN_MOSI;
+    _pinMapping.huawei_clk = HUAWEI_PIN_SCLK;
+    _pinMapping.huawei_cs = HUAWEI_PIN_CS;
+    _pinMapping.huawei_irq = HUAWEI_PIN_IRQ;
+    _pinMapping.huawei_power = HUAWEI_PIN_POWER;
 }
 
 PinMapping_t& PinMappingClass::get()
@@ -124,6 +131,13 @@ bool PinMappingClass::init(const String& deviceMapping)
             _pinMapping.battery_rx = doc[i]["battery"]["rx"] | PYLONTECH_PIN_RX;
             _pinMapping.battery_tx = doc[i]["battery"]["tx"] | PYLONTECH_PIN_TX;
 
+            _pinMapping.huawei_miso = doc[i]["huawei"]["miso"] | HUAWEI_PIN_MISO;
+            _pinMapping.huawei_mosi = doc[i]["huawei"]["mosi"] | HUAWEI_PIN_MOSI;
+            _pinMapping.huawei_clk = doc[i]["huawei"]["clk"] | HUAWEI_PIN_SCLK;
+            _pinMapping.huawei_irq = doc[i]["huawei"]["irq"] | HUAWEI_PIN_IRQ;
+            _pinMapping.huawei_cs = doc[i]["huawei"]["cs"] | HUAWEI_PIN_CS;
+            _pinMapping.huawei_power = doc[i]["huawei"]["power"] | HUAWEI_PIN_POWER;
+
             return true;
         }
     }
@@ -156,4 +170,14 @@ bool PinMappingClass::isValidBatteryConfig()
 {
     return _pinMapping.battery_rx > 0
         && _pinMapping.battery_tx > 0;
+}
+
+bool PinMappingClass::isValidHuaweiConfig()
+{
+    return _pinMapping.huawei_miso > 0
+        && _pinMapping.huawei_mosi > 0
+        && _pinMapping.huawei_clk > 0
+        && _pinMapping.huawei_irq > 0
+        && _pinMapping.huawei_cs > 0
+        && _pinMapping.huawei_power > 0;
 }

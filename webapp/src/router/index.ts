@@ -1,5 +1,6 @@
 import AboutView from '@/views/AboutView.vue';
 import BatteryAdminView from '@/views/BatteryAdminView.vue';
+import AcChargerAdminView from '@/views/AcChargerAdminView.vue';
 import ConfigAdminView from '@/views/ConfigAdminView.vue';
 import ConsoleInfoView from '@/views/ConsoleInfoView.vue';
 import DeviceAdminView from '@/views/DeviceAdminView.vue'
@@ -101,6 +102,11 @@ const router = createRouter({
         path: '/settings/battery',
         name: 'Battery Settings',
         component: BatteryAdminView
+    },
+    {
+      path: '/settings/chargerac',
+      name: 'Charger Settings',
+      component: AcChargerAdminView
     },
     {
         path: '/settings/mqtt',

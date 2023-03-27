@@ -114,6 +114,9 @@
             </div>
         </div>
         <VedirectView v-show="liveData.vedirect.enabled" />
+        <div v-show="liveData.huawei.enabled" >
+          <HuaweiView/>
+        </div>
     </BasePage>
    
     <div class="modal" id="eventView" tabindex="-1">
@@ -325,6 +328,7 @@ import HintView from '@/components/HintView.vue';
 import InverterChannelInfo from "@/components/InverterChannelInfo.vue";
 import InverterTotalInfo from '@/components/InverterTotalInfo.vue';
 import VedirectView from '@/components/VedirectView.vue';
+import HuaweiView from '@/components/HuaweiView.vue'
 import type { DevInfoStatus } from '@/types/DevInfoStatus';
 import type { EventlogItems } from '@/types/EventlogStatus';
 import type { LimitConfig } from '@/types/LimitConfig';
@@ -365,7 +369,8 @@ export default defineComponent({
         BIconToggleOff,
         BIconToggleOn,
         BIconXCircleFill,
-        VedirectView
+        VedirectView,
+        HuaweiView
     },
     data() {
         return {
