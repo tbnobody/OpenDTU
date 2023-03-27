@@ -489,7 +489,7 @@ export default defineComponent({
 
             this.socket.onopen = function (event) {
                 console.log(event);
-                console.log("Successfuly connected to the echo websocket server...");
+                console.log("Successfully connected to the echo websocket server...");
             };
 
             // Listen to window events , When the window closes , Take the initiative to disconnect websocket Connect
