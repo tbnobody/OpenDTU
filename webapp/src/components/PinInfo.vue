@@ -11,102 +11,21 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr>
-                        <td rowspan="6">NRF24</td>
-                        <td>MISO</td>
-                        <td>{{ selectedPinAssignment?.nrf24?.miso }}</td>
-                        <td>{{ currentPinAssignment?.nrf24?.miso }}</td>
-                    </tr>
-                    <tr>
-                        <td>MOSI</td>
-                        <td>{{ selectedPinAssignment?.nrf24?.mosi }}</td>
-                        <td>{{ currentPinAssignment?.nrf24?.mosi }}</td>
-                    </tr>
-                    <tr>
-                        <td>CLK</td>
-                        <td>{{ selectedPinAssignment?.nrf24?.clk }}</td>
-                        <td>{{ currentPinAssignment?.nrf24?.clk }}</td>
-                    </tr>
-                    <tr>
-                        <td>IRQ</td>
-                        <td>{{ selectedPinAssignment?.nrf24?.irq }}</td>
-                        <td>{{ currentPinAssignment?.nrf24?.irq }}</td>
-                    </tr>
-                    <tr>
-                        <td>EN</td>
-                        <td>{{ selectedPinAssignment?.nrf24?.en }}</td>
-                        <td>{{ currentPinAssignment?.nrf24?.en }}</td>
-                    </tr>
-                    <tr>
-                        <td>CS</td>
-                        <td>{{ selectedPinAssignment?.nrf24?.cs }}</td>
-                        <td>{{ currentPinAssignment?.nrf24?.cs }}</td>
-                    </tr>
-
-                    <tr>
-                        <td rowspan="7">Ethernet</td>
-                        <td>enabled</td>
-                        <td>{{ selectedPinAssignment?.eth?.enabled }}</td>
-                        <td>{{ currentPinAssignment?.eth?.enabled }}</td>
-                    </tr>
-                    <tr>
-                        <td>phy_addr</td>
-                        <td>{{ selectedPinAssignment?.eth?.phy_addr }}</td>
-                        <td>{{ currentPinAssignment?.eth?.phy_addr }}</td>
-                    </tr>
-                    <tr>
-                        <td>power</td>
-                        <td>{{ selectedPinAssignment?.eth?.power }}</td>
-                        <td>{{ currentPinAssignment?.eth?.power }}</td>
-                    </tr>
-                    <tr>
-                        <td>mdc</td>
-                        <td>{{ selectedPinAssignment?.eth?.mdc }}</td>
-                        <td>{{ currentPinAssignment?.eth?.mdc }}</td>
-                    </tr>
-                    <tr>
-                        <td>mdio</td>
-                        <td>{{ selectedPinAssignment?.eth?.mdio }}</td>
-                        <td>{{ currentPinAssignment?.eth?.mdio }}</td>
-                    </tr>
-                    <tr>
-                        <td>type</td>
-                        <td>{{ selectedPinAssignment?.eth?.type }}</td>
-                        <td>{{ currentPinAssignment?.eth?.type }}</td>
-                    </tr>
-                    <tr>
-                        <td>clk_mode</td>
-                        <td>{{ selectedPinAssignment?.eth?.clk_mode }}</td>
-                        <td>{{ currentPinAssignment?.eth?.clk_mode }}</td>
-                    </tr>
-
-                    <tr>
-                        <td rowspan="6">Display</td>
-                        <td>type</td>
-                        <td>{{ selectedPinAssignment?.display?.type }}</td>
-                        <td>{{ currentPinAssignment?.display?.type }}</td>
-                    </tr>
-                    <tr>
-                        <td>data</td>
-                        <td>{{ selectedPinAssignment?.display?.data }}</td>
-                        <td>{{ currentPinAssignment?.display?.data }}</td>
-                    </tr>
-                    <tr>
-                        <td>clk</td>
-                        <td>{{ selectedPinAssignment?.display?.clk }}</td>
-                        <td>{{ currentPinAssignment?.display?.clk }}</td>
-                    </tr>
-                    <tr>
-                        <td>cs</td>
-                        <td>{{ selectedPinAssignment?.display?.cs }}</td>
-                        <td>{{ currentPinAssignment?.display?.cs }}</td>
-                    </tr>
-                    <tr>
-                        <td>reset</td>
-                        <td>{{ selectedPinAssignment?.display?.reset }}</td>
-                        <td>{{ currentPinAssignment?.display?.reset }}</td>
-                    </tr>
-
+                    <template v-for="(category) in categories" :key="category">
+                        <tr v-for="(prop, prop_idx) in properties(category)" :key="prop">
+                            <td v-if="prop_idx == 0" :rowspan="properties(category).length">
+                                {{ capitalizeFirstLetter(category) }}</td>
+                            <td :class="{ 'table-danger': !isEqual(category, prop) }">{{ prop }}</td>
+                            <td>
+                                <template v-if="((selectedPinAssignment as Device)[category as keyof Device])">
+                                    {{ (selectedPinAssignment as any)[category][prop] }}</template>
+                            </td>
+                            <td>
+                                <template v-if="((currentPinAssignment as Device)[category as keyof Device])">
+                                    {{ (currentPinAssignment as any)[category][prop] }}</template>
+                            </td>
+                        </tr>
+                    </template>
                 </tbody>
             </table>
         </div>
@@ -126,5 +45,64 @@ export default defineComponent({
         selectedPinAssignment: { type: Object as PropType<Device | undefined>, required: true },
         currentPinAssignment: { type: Object as PropType<Device | undefined>, required: true },
     },
+    computed: {
+        categories(): string[] {
+            let curArray: Array<string> = [];
+            if (this.currentPinAssignment) {
+                curArray = Object.keys(this.currentPinAssignment as Device);
+            }
+
+            let selArray: Array<string> = [];
+            if (this.selectedPinAssignment) {
+                selArray = Object.keys(this.selectedPinAssignment as Device);
+            }
+
+            let total: Array<string> = [];
+            total = total.concat(curArray, selArray);
+            return Array.from(new Set(total)).filter(cat => cat != 'name').sort();
+        },
+    },
+    methods: {
+        properties(category: string): string[] {
+            let curArray: Array<string> = [];
+            if ((this.currentPinAssignment as Device)[category as keyof Device]) {
+                curArray = Object.keys((this.currentPinAssignment as Device)[category as keyof Device]);
+            }
+
+            let selArray: Array<string> = [];
+            if ((this.selectedPinAssignment as Device)[category as keyof Device]) {
+                selArray = Object.keys((this.selectedPinAssignment as Device)[category as keyof Device]);
+            }
+
+            let total: Array<string> = [];
+            total = total.concat(curArray, selArray);
+
+            return Array.from(new Set(total)).sort();
+        },
+        isEqual(category: string, prop: string): boolean {
+            let comSel = 999999;
+            let comCur = 999999;
+
+            if ((this.selectedPinAssignment as Device)[category as keyof Device]) {
+                comSel = (this.selectedPinAssignment as any)[category][prop];
+            }
+            if ((this.currentPinAssignment as Device)[category as keyof Device]) {
+                comCur = (this.currentPinAssignment as any)[category][prop];
+            }
+
+            if (comSel == -1 || comSel == 255 || comSel == undefined) {
+                comSel = 999999;
+            }
+
+            if (comCur == -1 || comCur == 255 || comCur == undefined) {
+                comCur = 999999;
+            }
+
+            return comSel == comCur;
+        },
+        capitalizeFirstLetter(value: string): string {
+            return value.charAt(0).toUpperCase() + value.slice(1);
+        },
+    }
 });
 </script>

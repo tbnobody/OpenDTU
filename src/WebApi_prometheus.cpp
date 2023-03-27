@@ -69,6 +69,7 @@ void WebApiPrometheusClass::onPrometheusMetricsGet(AsyncWebServerRequest* reques
             if (inv->Statistics()->getLastUpdate() > 0) {
                 for (auto& t : inv->Statistics()->getChannelTypes()) {
                     for (auto& c : inv->Statistics()->getChannelsByType(t)) {
+                        addPanelInfo(stream, serial, i, inv, t, c);
                         addField(stream, serial, i, inv, t, c, FLD_PAC);
                         addField(stream, serial, i, inv, t, c, FLD_UAC);
                         addField(stream, serial, i, inv, t, c, FLD_IAC);
@@ -118,4 +119,50 @@ void WebApiPrometheusClass::addField(AsyncResponseStream* stream, String& serial
             channel,
             inv->Statistics()->getChannelFieldValue(type, channel, fieldId));
     }
+}
+
+void WebApiPrometheusClass::addPanelInfo(AsyncResponseStream* stream, String& serial, uint8_t idx, std::shared_ptr<InverterAbstract> inv, ChannelType_t type, ChannelNum_t channel)
+{
+    if (type != TYPE_DC) {
+        return;
+    }
+
+    const CONFIG_T& config = Configuration.get();
+
+    const bool printHelp = (idx == 0 && channel == 0);
+    if (printHelp) {
+        stream->print(F("# HELP opendtu_PanelInfo panel information\n"));
+        stream->print(F("# TYPE opendtu_PanelInfo gauge\n"));
+    }
+    stream->printf("opendtu_PanelInfo{serial=\"%s\",unit=\"%d\",name=\"%s\",channel=\"%d\",panelname=\"%s\"} 1\n",
+        serial.c_str(),
+        idx,
+        inv->name(),
+        channel,
+        config.Inverter[idx].channel[channel].Name
+    );
+
+    if (printHelp) {
+        stream->print(F("# HELP opendtu_MaxPower panel maximum output power\n"));
+        stream->print(F("# TYPE opendtu_MaxPower gauge\n"));
+    }
+    stream->printf("opendtu_MaxPower{serial=\"%s\",unit=\"%d\",name=\"%s\",channel=\"%d\"} %d\n",
+        serial.c_str(),
+        idx,
+        inv->name(),
+        channel,
+        config.Inverter[idx].channel[channel].MaxChannelPower
+    );
+
+    if (printHelp) {
+        stream->print(F("# HELP opendtu_YieldTotalOffset panel yield offset (for used inverters)\n"));
+        stream->print(F("# TYPE opendtu_YieldTotalOffset gauge\n"));
+    }
+    stream->printf("opendtu_YieldTotalOffset{serial=\"%s\",unit=\"%d\",name=\"%s\",channel=\"%d\"} %f\n",
+        serial.c_str(),
+        idx,
+        inv->name(),
+        channel,
+        config.Inverter[idx].channel[channel].YieldTotalOffset
+    );
 }

@@ -86,7 +86,7 @@
         "9009": "Second must be a number between {min} and {max}!",
         "9010": "Time updated!",
         "10001": "Password must between 8 and {max} characters long!",
-        "10002": "Authentication successfull!",
+        "10002": "Authentication successful!",
         "11001": "@:apiresponse.2001",
         "11002": "@:apiresponse:5004",
         "12001": "Profil must between 1 and {max} characters long!"
@@ -508,8 +508,12 @@
         "PowerSafeHint": "Turn off the display if no inverter is producing.",
         "Screensaver": "Enable Screensaver:",
         "ScreensaverHint": "Move the display a little bit on each update to prevent burn-in. (Useful especially for OLED displays)",
-        "ShowLogo": "Show Logo:",
         "Contrast": "Contrast ({contrast}):",
+        "Rotation": "Rotation:",
+        "rot0": "No rotation",
+        "rot90": "90 degree rotation",
+        "rot180": "180 degree rotation",
+        "rot270": "270 degree rotation",
         "Save": "@:dtuadmin.Save"
     },
     "pininfo": {

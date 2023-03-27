@@ -3,6 +3,10 @@
 [![OpenDTU Build](https://github.com/tbnobody/OpenDTU/actions/workflows/build.yml/badge.svg)](https://github.com/tbnobody/OpenDTU/actions/workflows/build.yml)
 [![cpplint](https://github.com/tbnobody/OpenDTU/actions/workflows/cpplint.yml/badge.svg)](https://github.com/tbnobody/OpenDTU/actions/workflows/cpplint.yml)
 
+## !! IMPORTANT UPGRADE NOTES !!
+
+If you are upgrading from a version before 15.03.2023 you have to upgrade the partition table of the ESP32. Please follow the [this](docs/UpgradePartition.md) documentation!
+
 ## Background
 This project was started from [this](https://www.mikrocontroller.net/topic/525778) discussion (Mikrocontroller.net).
 It was the goal to replace the original Hoymiles DTU (Telemetry Gateway) with their cloud access. With a lot of reverse engineering the Hoymiles protocol was decrypted and analyzed.
@@ -25,6 +29,7 @@ Like to show your own build? Just send me a Pull Request.
 * Hoymiles HM-1200
 * Hoymiles HM-1500
 * Solenso SOL-H400
+* Solenso SOL-H800
 * TSUN TSOL-M350 (Maybe depending on firmware/serial number on the inverter)
 * TSUN TSOL-M800 (Maybe depending on firmware/serial number on the inverter)
 * TSUN TSOL-M1600 (Maybe depending on firmware/serial number on the inverter)
@@ -67,6 +72,7 @@ Firmware version seems to play not a significant role and cannot be read from th
 ## Breaking changes
 Generated using: `git log --date=short --pretty=format:"* %h%x09%ad%x09%s" | grep BREAKING`
 ```
+* 318136d       2023-03-15      BREAKING CHANGE: Updated partition table: Make sure you have a configuration backup and completly reflash the device!
 * 3b7aef6       2023-02-13      BREAKING CHANGE: Web API!
 * d4c838a       2023-02-06      BREAKING CHANGE: Prometheus API!
 * daf847e       2022-11-14      BREAKING CHANGE: Removed deprecated config parsing method
@@ -139,7 +145,7 @@ You can also change  the pins by creating a custom [device profile](docs/DeviceP
     * upload_port
     * monitor_port
 * Select the arrow button in the blue bottom status bar (PlatformIO: Upload) to compile and upload the firmware. During the compilation, all required libraries are downloaded automatically.
-* Under Linux, if the upload fails with error messages "Could not open /dev/ttyUSB0, the port doesn't exist", you can check via ```ls -la /dev/tty*``` to which group your port belongs to, and then add your user this group via ```sudo adduser <yourusername> dialout```
+* Under Linux, if the upload fails with error messages "Could not open /dev/ttyUSB0, the port doesn't exist", you can check via ```ls -la /dev/tty*``` to which group your port belongs to, and then add your user this group via ```sudo adduser <yourusername> dialout``` (if you are using ```arch-linux``` use: ```sudo gpasswd -a <yourusername> uucp```, this method requires a logout/login of the affected user).
 * There are two videos showing these steps:
     * [Git Clone and compilation](https://youtu.be/9cA_esv3zeA)
     * [Full installation and compilation](https://youtu.be/xs6TqHn7QWM)
@@ -194,7 +200,7 @@ esptool.py --port /dev/ttyUSB0 --chip esp32 --before default_reset --after hard_
 Users report that [ESP_Flasher](https://github.com/Jason2866/ESP_Flasher/releases/) is suitable for flashing OpenDTU on Windows.
 
 #### Flash with [ESP_Flasher](https://espressif.github.io/esptool-js/) - web version
-It is also possible to flash it via the web tools which might be more convenient and is platformindependent.
+It is also possible to flash it via the web tools which might be more convenient and is platform independent.
 
 ## First configuration
 * After the initial flashing of the microcontroller, an Access Point called "OpenDTU-*" is opened. The default password is "openDTU42".

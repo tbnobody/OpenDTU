@@ -508,8 +508,12 @@
         "PowerSafeHint": "Eteindre l'écran si aucun onduleur n'est en production.",
         "Screensaver": "Activer l'écran de veille",
         "ScreensaverHint": "Déplacez un peu l'écran à chaque mise à jour pour éviter le phénomène de brûlure. (Utile surtout pour les écrans OLED)",
-        "ShowLogo": "Afficher le logo",
         "Contrast": "Contraste ({contrast}):",
+        "Rotation": "Rotation:",
+        "rot0": "No rotation",
+        "rot90": "90 degree rotation",
+        "rot180": "180 degree rotation",
+        "rot270": "270 degree rotation",
         "Save": "@:dtuadmin.Save"
     },
     "pininfo": {
