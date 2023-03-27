@@ -18,7 +18,8 @@
     "spark-md5": "^3.0.2",
     "vue": "^3.2.47",
     "vue-i18n": "^9.2.2",
-    "vue-router": "^4.1.6"
+    "vue-router": "^4.1.6",
+    "yarn": "^1.22.19"
   },
   "devDependencies": {
     "@intlify/unplugin-vue-i18n": "^0.10.0",
