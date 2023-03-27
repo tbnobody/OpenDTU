@@ -25,7 +25,7 @@ void HoymilesRadio::init(SPIClass* initialisedSpiBus, uint8_t pinCE, uint8_t pin
     _radio->setRetries(0, 0);
     _radio->maskIRQ(true, true, false); // enable only receiving interrupts
     if (_radio->isChipConnected()) {
-        Hoymiles.getMessageOutput()->println(F("Connection successfull"));
+        Hoymiles.getMessageOutput()->println(F("Connection successful"));
     } else {
         Hoymiles.getMessageOutput()->println(F("Connection error!!"));
     }
@@ -121,7 +121,7 @@ void HoymilesRadio::loop()
                 sendRetransmitPacket(verifyResult);
 
             } else {
-                // Successfull received all packages
+                // Successful received all packages
                 Hoymiles.getMessageOutput()->println(F("Success"));
                 _commandQueue.pop();
                 _busyFlag = false;
