@@ -120,7 +120,7 @@ void WebApiSecurityClass::onAuthenticateGet(AsyncWebServerRequest* request)
     AsyncJsonResponse* response = new AsyncJsonResponse();
     JsonObject retMsg = response->getRoot();
     retMsg[F("type")] = F("success");
-    retMsg[F("message")] = F("Authentication successfull!");
+    retMsg[F("message")] = F("Authentication successful!");
     retMsg[F("code")] = WebApiError::SecurityAuthSuccess;
 
     response->setLength();
