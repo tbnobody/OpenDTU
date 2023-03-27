@@ -287,7 +287,7 @@ void HoymilesRadio_CMT::init(int8_t pin_sdio, int8_t pin_clk, int8_t pin_cs, int
 {
     _dtuSerial.u64 = 0;
 
-    _radio.reset(new CMT2300a(pin_sdio, pin_clk, pin_cs, pin_fcs));
+    _radio.reset(new CMT2300A(pin_sdio, pin_clk, pin_cs, pin_fcs));
 
     _radio->begin();
 

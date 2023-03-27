@@ -8,9 +8,9 @@
 #define FH_OFFSET 100 // value * CMT2300A_ONE_STEP_SIZE = channel frequency offset
 #define CMT_SPI_SPEED 4000000 // 4 MHz
 
-class CMT2300a {
+class CMT2300A {
 public:
-    CMT2300a(uint8_t pin_sdio, uint8_t pin_clk, uint8_t pin_cs, uint8_t pin_fcs, uint32_t _spi_speed = CMT_SPI_SPEED);
+    CMT2300A(uint8_t pin_sdio, uint8_t pin_clk, uint8_t pin_cs, uint8_t pin_fcs, uint32_t _spi_speed = CMT_SPI_SPEED);
 
     bool begin(void);
 

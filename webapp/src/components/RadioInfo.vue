@@ -40,13 +40,13 @@
                         </td>
                     </tr>
                     <tr>
-                        <th>{{ $t('radioinfo.Status', { module: "CMT2300a" }) }}</th>
+                        <th>{{ $t('radioinfo.Status', { module: "CMT2300A" }) }}</th>
                         <td>
                             <StatusBadge :status="systemStatus.cmt_configured" true_text="radioinfo.Configured" false_text="radioinfo.NotConfigured" false_class="text-bg-secondary" />
                         </td>
                     </tr>
                     <tr>
-                        <th>{{ $t('radioinfo.ChipStatus', { module: "CMT2300a" }) }}</th>
+                        <th>{{ $t('radioinfo.ChipStatus', { module: "CMT2300A" }) }}</th>
                         <td>
                             <span class="badge" :class="{
                                 'text-bg-danger': systemStatus.cmt_configured && !systemStatus.cmt_connected,

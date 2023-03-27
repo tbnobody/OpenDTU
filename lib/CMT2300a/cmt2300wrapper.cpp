@@ -6,7 +6,7 @@
 #include "cmt2300a.h"
 #include "cmt2300a_params.h"
 
-CMT2300a::CMT2300a(uint8_t pin_sdio, uint8_t pin_clk, uint8_t pin_cs, uint8_t pin_fcs, uint32_t spi_speed)
+CMT2300A::CMT2300A(uint8_t pin_sdio, uint8_t pin_clk, uint8_t pin_cs, uint8_t pin_fcs, uint32_t spi_speed)
 {
     _pin_sdio = pin_sdio;
     _pin_clk = pin_clk;
@@ -15,17 +15,17 @@ CMT2300a::CMT2300a(uint8_t pin_sdio, uint8_t pin_clk, uint8_t pin_cs, uint8_t pi
     _spi_speed = spi_speed;
 }
 
-bool CMT2300a::begin(void)
+bool CMT2300A::begin(void)
 {
     return _init_pins() && _init_radio();
 }
 
-bool CMT2300a::isChipConnected()
+bool CMT2300A::isChipConnected()
 {
     return CMT2300A_IsExist();
 }
 
-bool CMT2300a::setPALevel(int8_t level)
+bool CMT2300A::setPALevel(int8_t level)
 {
     uint16_t Tx_dBm_word;
     switch (level) {
@@ -138,14 +138,14 @@ bool CMT2300a::setPALevel(int8_t level)
     return true;
 }
 
-bool CMT2300a::_init_pins()
+bool CMT2300A::_init_pins()
 {
     CMT2300A_InitSpi(_pin_sdio, _pin_clk, _pin_cs, _pin_fcs, _spi_speed);
 
     return true; // assuming pins are connected properly
 }
 
-bool CMT2300a::_init_radio()
+bool CMT2300A::_init_radio()
 {
     if (!CMT2300A_Init()) {
         return false;

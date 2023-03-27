@@ -51,7 +51,7 @@ private:
 
     void sendEsbPacket(CommandAbstract* cmd);
 
-    std::unique_ptr<CMT2300a> _radio;
+    std::unique_ptr<CMT2300A> _radio;
 
     volatile bool _packetReceived = false;
 
