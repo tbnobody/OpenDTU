@@ -115,14 +115,21 @@ bool ConfigurationClass::write()
     vedirect["updates_only"] = config.Vedirect_UpdatesOnly;
     vedirect["poll_interval"] = config.Vedirect_PollInterval;
 
+    JsonObject powermeter = doc.createNestedObject("powermeter");
+    powermeter["enabled"] = config.PowerMeter_Enabled;
+    powermeter["interval"] = config.PowerMeter_Interval;
+    powermeter["source"] = config.PowerMeter_Source;
+    powermeter["mqtt_topic_powermeter_1"] = config.PowerMeter_MqttTopicPowerMeter1;
+    powermeter["mqtt_topic_powermeter_2"] = config.PowerMeter_MqttTopicPowerMeter2;
+    powermeter["mqtt_topic_powermeter_3"] = config.PowerMeter_MqttTopicPowerMeter3;
+    powermeter["sdmbaudrate"] = config.PowerMeter_SdmBaudrate;
+    powermeter["sdmaddress"] = config.PowerMeter_SdmAddress;
+
     JsonObject powerlimiter = doc.createNestedObject("powerlimiter");
     powerlimiter["enabled"] = config.PowerLimiter_Enabled;
     powerlimiter["solar_passtrough_enabled"] = config.PowerLimiter_SolarPassTroughEnabled;
     powerlimiter["battery_drain_strategy"] = config.PowerLimiter_BatteryDrainStategy;
     powerlimiter["interval"] = config.PowerLimiter_Interval;
-    powerlimiter["mqtt_topic_powermeter_1"] = config.PowerLimiter_MqttTopicPowerMeter1;
-    powerlimiter["mqtt_topic_powermeter_2"] = config.PowerLimiter_MqttTopicPowerMeter2;
-    powerlimiter["mqtt_topic_powermeter_3"] = config.PowerLimiter_MqttTopicPowerMeter3;
     powerlimiter["is_inverter_behind_powermeter"] = config.PowerLimiter_IsInverterBehindPowerMeter;
     powerlimiter["inverter_id"] = config.PowerLimiter_InverterId;
     powerlimiter["inverter_channel_id"] = config.PowerLimiter_InverterChannelId;
@@ -281,14 +288,22 @@ bool ConfigurationClass::read()
     config.Vedirect_UpdatesOnly = vedirect["updates_only"] | VEDIRECT_UPDATESONLY;
     config.Vedirect_PollInterval = vedirect["poll_interval"] | VEDIRECT_POLL_INTERVAL;
 
+    JsonObject powermeter = doc["powermeter"];
+    config.PowerMeter_Enabled = powermeter["enabled"] | POWERMETER_ENABLED;
+    config.PowerMeter_Interval =  powermeter["interval"] | POWERMETER_INTERVAL;
+    config.PowerMeter_Source =  powermeter["source"] | POWERMETER_SOURCE;
+    strlcpy(config.PowerMeter_MqttTopicPowerMeter1, powermeter["mqtt_topic_powermeter_1"] | "", sizeof(config.PowerMeter_MqttTopicPowerMeter1));
+    strlcpy(config.PowerMeter_MqttTopicPowerMeter2, powermeter["mqtt_topic_powermeter_2"] | "", sizeof(config.PowerMeter_MqttTopicPowerMeter2));
+    strlcpy(config.PowerMeter_MqttTopicPowerMeter3, powermeter["mqtt_topic_powermeter_3"] | "", sizeof(config.PowerMeter_MqttTopicPowerMeter3));
+    config.PowerMeter_SdmBaudrate =  powermeter["sdmbaudrate"] | POWERMETER_SDMBAUDRATE;
+    config.PowerMeter_SdmAddress =  powermeter["sdmaddress"] | POWERMETER_SDMADDRESS;
+
+
     JsonObject powerlimiter = doc["powerlimiter"];
     config.PowerLimiter_Enabled = powerlimiter["enabled"] | POWERLIMITER_ENABLED;
     config.PowerLimiter_SolarPassTroughEnabled = powerlimiter["solar_passtrough_enabled"] | POWERLIMITER_SOLAR_PASSTROUGH_ENABLED;
     config.PowerLimiter_BatteryDrainStategy = powerlimiter["battery_drain_strategy"] | POWERLIMITER_BATTERY_DRAIN_STRATEGY;
     config.PowerLimiter_Interval =  POWERLIMITER_INTERVAL;
-    strlcpy(config.PowerLimiter_MqttTopicPowerMeter1, powerlimiter["mqtt_topic_powermeter_1"] | "", sizeof(config.PowerLimiter_MqttTopicPowerMeter1));
-    strlcpy(config.PowerLimiter_MqttTopicPowerMeter2, powerlimiter["mqtt_topic_powermeter_2"] | "", sizeof(config.PowerLimiter_MqttTopicPowerMeter2));
-    strlcpy(config.PowerLimiter_MqttTopicPowerMeter3, powerlimiter["mqtt_topic_powermeter_3"] | "", sizeof(config.PowerLimiter_MqttTopicPowerMeter3));
     config.PowerLimiter_IsInverterBehindPowerMeter = powerlimiter["is_inverter_behind_powermeter"] | POWERLIMITER_IS_INVERTER_BEHIND_POWER_METER;
     config.PowerLimiter_InverterId = powerlimiter["inverter_id"] | POWERLIMITER_INVERTER_ID;
     config.PowerLimiter_InverterChannelId = powerlimiter["inverter_channel_id"] | POWERLIMITER_INVERTER_CHANNEL_ID;

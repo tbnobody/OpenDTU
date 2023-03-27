@@ -10,6 +10,8 @@
 #include "WebApi.h"
 #include "WebApi_errors.h"
 #include "helper.h"
+#include "PowerLimiter.h"
+#include "PowerMeter.h"
 #include <AsyncJson.h>
 
 void WebApiMqttClass::init(AsyncWebServer* server)
@@ -318,6 +320,8 @@ void WebApiMqttClass::onMqttAdminPost(AsyncWebServerRequest* request)
     MqttSettings.performReconnect();
     MqttHandleHass.forceUpdate();
     MqttHandleVedirectHass.forceUpdate();
+    PowerMeter.init();
+    PowerLimiter.init();
 }
 
 String WebApiMqttClass::getRootCaCertInfo(const char* cert)

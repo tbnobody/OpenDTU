@@ -26,12 +26,10 @@ public:
     void loop();
     plStates getPowerLimiterState();
     int32_t getLastRequestedPowewrLimit();
-    void onMqttMessage(const espMqttClientTypes::MessageProperties& properties, const char* topic, const uint8_t* payload, size_t len, size_t index, size_t total);
 
 private:
     uint32_t _lastCommandSent;
     uint32_t _lastLoop;
-    uint32_t _lastPowerMeterUpdate;
     int32_t _lastRequestedPowerLimit;
     plStates _plState = STATE_DISCOVER; 
 

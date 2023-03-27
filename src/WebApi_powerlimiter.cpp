@@ -8,7 +8,9 @@
 #include "AsyncJson.h"
 #include "Configuration.h"
 #include "MqttHandleHass.h"
+#include "MqttHandleVedirectHass.h"
 #include "MqttSettings.h"
+#include "PowerMeter.h"
 #include "PowerLimiter.h"
 #include "WebApi.h"
 #include "helper.h"
@@ -38,9 +40,6 @@ void WebApiPowerLimiterClass::onStatus(AsyncWebServerRequest* request)
     root[F("enabled")] = config.PowerLimiter_Enabled;
     root[F("solar_passtrough_enabled")] = config.PowerLimiter_SolarPassTroughEnabled;
     root[F("battery_drain_strategy")] = config.PowerLimiter_BatteryDrainStategy;
-    root[F("mqtt_topic_powermeter_1")] = config.PowerLimiter_MqttTopicPowerMeter1;
-    root[F("mqtt_topic_powermeter_2")] = config.PowerLimiter_MqttTopicPowerMeter2;
-    root[F("mqtt_topic_powermeter_3")] = config.PowerLimiter_MqttTopicPowerMeter3;
     root[F("is_inverter_behind_powermeter")] = config.PowerLimiter_IsInverterBehindPowerMeter;
     root[F("inverter_id")] = config.PowerLimiter_InverterId;
     root[F("inverter_channel_id")] = config.PowerLimiter_InverterChannelId;
@@ -122,9 +121,6 @@ void WebApiPowerLimiterClass::onAdminPost(AsyncWebServerRequest* request)
     config.PowerLimiter_Enabled = root[F("enabled")].as<bool>();
     config.PowerLimiter_SolarPassTroughEnabled = root[F("solar_passtrough_enabled")].as<bool>();
     config.PowerLimiter_BatteryDrainStategy= root[F("battery_drain_strategy")].as<uint8_t>();
-    strlcpy(config.PowerLimiter_MqttTopicPowerMeter1, root[F("mqtt_topic_powermeter_1")].as<String>().c_str(), sizeof(config.PowerLimiter_MqttTopicPowerMeter1));
-    strlcpy(config.PowerLimiter_MqttTopicPowerMeter2, root[F("mqtt_topic_powermeter_2")].as<String>().c_str(), sizeof(config.PowerLimiter_MqttTopicPowerMeter2));
-    strlcpy(config.PowerLimiter_MqttTopicPowerMeter3, root[F("mqtt_topic_powermeter_3")].as<String>().c_str(), sizeof(config.PowerLimiter_MqttTopicPowerMeter3));
     config.PowerLimiter_IsInverterBehindPowerMeter = root[F("is_inverter_behind_powermeter")].as<bool>();
     config.PowerLimiter_InverterId = root[F("inverter_id")].as<uint8_t>();
     config.PowerLimiter_InverterChannelId = root[F("inverter_channel_id")].as<uint8_t>();
@@ -146,7 +142,4 @@ void WebApiPowerLimiterClass::onAdminPost(AsyncWebServerRequest* request)
 
     response->setLength();
     request->send(response);
-
-    MqttSettings.performReconnect();  // TODO(helge) is this really needed
-    PowerLimiter.init();
 }
