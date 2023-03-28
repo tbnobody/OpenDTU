@@ -3,7 +3,7 @@
 #include "Parser.h"
 #include <Arduino.h>
 #include <cstdint>
-#include <list>
+#include <array>
 
 #define ALARM_LOG_ENTRY_COUNT 15
 #define ALARM_LOG_ENTRY_SIZE 12
@@ -50,5 +50,5 @@ private:
 
     AlarmMessageType_t _messageType = AlarmMessageType_t::ALL;
 
-    static const std::list<AlarmMessage_t> _alarmMessages;
+    static const std::array<const AlarmMessage_t, 76> _alarmMessages;
 };

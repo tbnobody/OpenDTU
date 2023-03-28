@@ -6,7 +6,7 @@
 #include "../Hoymiles.h"
 #include <cstring>
 
-const std::list<AlarmMessage_t> AlarmLogParser::_alarmMessages = {
+const std::array<const AlarmMessage_t, 76> AlarmLogParser::_alarmMessages = {{
     { AlarmMessageType_t::ALL, 1, "Inverter start" },
     { AlarmMessageType_t::ALL, 2, "DTU command failed" },
     { AlarmMessageType_t::ALL, 121, "Over temperature protection" },
@@ -83,7 +83,7 @@ const std::list<AlarmMessage_t> AlarmLogParser::_alarmMessages = {
     { AlarmMessageType_t::ALL, 5200, "Firmware error" },
     { AlarmMessageType_t::ALL, 8310, "Shut down" },
     { AlarmMessageType_t::ALL, 9000, "Microinverter is suspected of being stolen" },
-};
+}};
 
 void AlarmLogParser::clearBuffer()
 {
