@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * Copyright (C) 2022 Thomas Basler and others
+ * Copyright (C) 2023 Thomas Basler and others
  */
 #include "HoymilesRadio_CMT.h"
 #include "Hoymiles.h"
@@ -9,7 +9,7 @@
 #include <cmt2300a.h>
 
 #define HOY_BASE_FREQ 860000000 // Hoymiles base frequency for CMD56 channels is 860.00 MHz
-#define HOY_BOOT_FREQ 868000000 // Hoymiles boot/init frequency after power up inverter
+#define HOY_BOOT_FREQ 868000000 // Hoymiles boot/init frequency after power up inverter or connection lost for 15 min
 
 String HoymilesRadio_CMT::cmtChToFreq(const uint8_t channel)
 {
