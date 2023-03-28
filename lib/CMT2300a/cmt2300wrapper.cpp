@@ -166,7 +166,7 @@ bool CMT2300A::_init_radio()
 
     /* Config GPIOs */
     CMT2300A_ConfigGpio(
-        CMT2300A_GPIO3_SEL_INT2);
+        CMT2300A_GPIO2_SEL_INT1 | CMT2300A_GPIO3_SEL_INT2);
 
     /* Config interrupt */
     CMT2300A_ConfigInterrupt(

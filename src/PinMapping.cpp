@@ -50,6 +50,10 @@
 #define CMT_FCS -1
 #endif
 
+#ifndef CMT_GPIO2
+#define CMT_GPIO2 -1
+#endif
+
 #ifndef CMT_GPIO3
 #define CMT_GPIO3 -1
 #endif
@@ -73,6 +77,7 @@ PinMappingClass::PinMappingClass()
     _pinMapping.cmt_clk = CMT_CLK;
     _pinMapping.cmt_cs = CMT_CS;
     _pinMapping.cmt_fcs = CMT_FCS;
+    _pinMapping.cmt_gpio2 = CMT_GPIO2;
     _pinMapping.cmt_gpio3 = CMT_GPIO3;
     _pinMapping.cmt_sdio = CMT_SDIO;
 
@@ -133,6 +138,7 @@ bool PinMappingClass::init(const String& deviceMapping)
             _pinMapping.cmt_clk = doc[i]["cmt"]["clk"] | CMT_CLK;
             _pinMapping.cmt_cs = doc[i]["cmt"]["cs"] | CMT_CS;
             _pinMapping.cmt_fcs = doc[i]["cmt"]["fcs"] | CMT_FCS;
+            _pinMapping.cmt_gpio2 = doc[i]["cmt"]["gpio2"] | CMT_GPIO2;
             _pinMapping.cmt_gpio3 = doc[i]["cmt"]["gpio3"] | CMT_GPIO3;
             _pinMapping.cmt_sdio = doc[i]["cmt"]["sdio"] | CMT_SDIO;
 
@@ -180,7 +186,6 @@ bool PinMappingClass::isValidCmt2300Config()
     return _pinMapping.cmt_clk >= 0
         && _pinMapping.cmt_cs >= 0
         && _pinMapping.cmt_fcs >= 0
-        && _pinMapping.cmt_gpio3 >= 0
         && _pinMapping.cmt_sdio >= 0;
 }
 

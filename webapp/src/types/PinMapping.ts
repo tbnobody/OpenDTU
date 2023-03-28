@@ -12,6 +12,7 @@ export interface Cmt2300 {
     cs: number;
     fcs: number;
     sdio: number;
+    gpio2: number;
     gpio3: number;
  }
 

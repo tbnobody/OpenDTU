@@ -22,6 +22,7 @@ struct PinMapping_t {
     int8_t cmt_clk;
     int8_t cmt_cs;
     int8_t cmt_fcs;
+    int8_t cmt_gpio2;
     int8_t cmt_gpio3;
     int8_t cmt_sdio;
 

@@ -32,9 +32,9 @@ void HoymilesClass::initNRF(SPIClass* initialisedSpiBus, uint8_t pinCE, uint8_t 
     _radioNrf->init(initialisedSpiBus, pinCE, pinIRQ);
 }
 
-void HoymilesClass::initCMT(int8_t pin_sdio, int8_t pin_clk, int8_t pin_cs, int8_t pin_fcs, int8_t pin_gpio3)
+void HoymilesClass::initCMT(int8_t pin_sdio, int8_t pin_clk, int8_t pin_cs, int8_t pin_fcs, int8_t pin_gpio2, int8_t pin_gpio3)
 {
-    _radioCmt->init(pin_sdio, pin_clk, pin_cs, pin_fcs, pin_gpio3);
+    _radioCmt->init(pin_sdio, pin_clk, pin_cs, pin_fcs, pin_gpio2, pin_gpio3);
 }
 
 void HoymilesClass::loop()

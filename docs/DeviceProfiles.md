@@ -95,7 +95,8 @@ The json file can contain multiple profiles. Each profile requires a name and di
 | cmt.clk       | number    | CLK Pin |
 | cmt.cs        | number    | CS Pin |
 | cmt.fcs       | number    | FCS Pin |
-| cmt.gpio3     | number    | GPIO3 Pin |
+| cmt.gpio2     | number    | GPIO2 Pin (optional) |
+| cmt.gpio3     | number    | GPIO3 Pin (optional) |
 | eth.enabled   | boolean   | Enable/Disable the ethernet stack |
 | eth.phy_addr  | number    | Unique PHY addr |
 | eth.power     | number    | Power Pin (if available). Use -1 for not assigned pins. |

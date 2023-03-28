@@ -119,10 +119,16 @@ enumCMTresult HoymilesRadio_CMT::cmtProcess(void)
         break;
 
     case CMT_STATE_RX_WAIT:
-        if (_packetReceived) /* Read INT2, PKT_OK */
+        if (!_gpio3_configured) {
+            if (CMT2300A_MASK_PKT_OK_FLG & CMT2300A_ReadReg(CMT2300A_CUS_INT_FLAG)) { // read INT2, PKT_OK flag
+                _packetReceived = true;
+            }
+        }
+
+        if (_packetReceived)
         {
-            Hoymiles.getMessageOutput()->println("Interrupt received");
-            _packetReceived = false; // reset interrupt
+            Hoymiles.getMessageOutput()->println("Interrupt 2 received");
+            _packetReceived = false; // reset interrupt 2
             cmtNextState = CMT_STATE_RX_DONE;
         }
 
@@ -223,8 +229,14 @@ enumCMTresult HoymilesRadio_CMT::cmtProcess(void)
         break;
 
     case CMT_STATE_TX_WAIT:
-        if (CMT2300A_MASK_TX_DONE_FLG & CMT2300A_ReadReg(CMT2300A_CUS_INT_CLR1)) /* Read TX_DONE flag */
-        {
+        if (!_gpio2_configured) {
+            if (CMT2300A_MASK_TX_DONE_FLG & CMT2300A_ReadReg(CMT2300A_CUS_INT_CLR1)) { // read INT1, TX_DONE flag
+                _packetSent = true;
+            }
+        }
+        if (_packetSent) {
+            Hoymiles.getMessageOutput()->println(F("Interrupt 1 received"));
+            _packetSent = false; // reset interrupt 1
             cmtNextState = CMT_STATE_TX_DONE;
         }
 
@@ -283,7 +295,7 @@ enumCMTresult HoymilesRadio_CMT::cmtProcess(void)
     return nRes;
 }
 
-void HoymilesRadio_CMT::init(int8_t pin_sdio, int8_t pin_clk, int8_t pin_cs, int8_t pin_fcs, int8_t pin_gpio3)
+void HoymilesRadio_CMT::init(int8_t pin_sdio, int8_t pin_clk, int8_t pin_cs, int8_t pin_fcs, int8_t pin_gpio2, int8_t pin_gpio3)
 {
     _dtuSerial.u64 = 0;
 
@@ -301,7 +313,15 @@ void HoymilesRadio_CMT::init(int8_t pin_sdio, int8_t pin_clk, int8_t pin_cs, int
         Hoymiles.getMessageOutput()->println("Connection error!!");
     }
 
-    attachInterrupt(digitalPinToInterrupt(pin_gpio3), std::bind(&HoymilesRadio_CMT::handleIntr, this), RISING);
+    if (pin_gpio2 >= 0) {
+        attachInterrupt(digitalPinToInterrupt(pin_gpio2), std::bind(&HoymilesRadio_CMT::handleInt1, this), RISING);
+        _gpio2_configured = true;
+    }
+
+    if (pin_gpio3 >= 0) {
+        attachInterrupt(digitalPinToInterrupt(pin_gpio3), std::bind(&HoymilesRadio_CMT::handleInt2, this), RISING);
+        _gpio3_configured = true;
+    }
 
     _isInitialized = true;
 }
@@ -423,7 +443,12 @@ bool HoymilesRadio_CMT::isConnected()
     return _radio->isChipConnected();
 }
 
-void ARDUINO_ISR_ATTR HoymilesRadio_CMT::handleIntr()
+void ARDUINO_ISR_ATTR HoymilesRadio_CMT::handleInt1()
+{
+    _packetSent = true;
+}
+
+void ARDUINO_ISR_ATTR HoymilesRadio_CMT::handleInt2()
 {
     _packetReceived = true;
 }

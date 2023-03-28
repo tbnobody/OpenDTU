@@ -33,7 +33,7 @@ void InverterSettingsClass::init()
         }
 
         if (PinMapping.isValidCmt2300Config()) {
-            Hoymiles.initCMT(pin.cmt_sdio, pin.cmt_clk, pin.cmt_cs, pin.cmt_fcs, pin.cmt_gpio3);
+            Hoymiles.initCMT(pin.cmt_sdio, pin.cmt_clk, pin.cmt_cs, pin.cmt_fcs, pin.cmt_gpio2, pin.cmt_gpio3);
         }
 
         MessageOutput.println("  Setting radio PA level... ");

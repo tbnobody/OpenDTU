@@ -52,6 +52,7 @@ void WebApiDeviceClass::onDeviceAdminGet(AsyncWebServerRequest* request)
     cmtPinObj["cs"] = pin.cmt_cs;
     cmtPinObj["fcs"] = pin.cmt_fcs;
     cmtPinObj["sdio"] = pin.cmt_sdio;
+    cmtPinObj["gpio2"] = pin.cmt_gpio2;
     cmtPinObj["gpio3"] = pin.cmt_gpio3;
 
     JsonObject ethPinObj = curPin.createNestedObject("eth");

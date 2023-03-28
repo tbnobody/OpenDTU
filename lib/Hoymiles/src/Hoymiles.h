@@ -17,7 +17,7 @@ class HoymilesClass {
 public:
     void init();
     void initNRF(SPIClass* initialisedSpiBus, uint8_t pinCE, uint8_t pinIRQ);
-    void initCMT(int8_t pin_sdio, int8_t pin_clk, int8_t pin_cs, int8_t pin_fcs, int8_t pin_gpio3);
+    void initCMT(int8_t pin_sdio, int8_t pin_clk, int8_t pin_cs, int8_t pin_fcs, int8_t pin_gpio2, int8_t pin_gpio3);
     void loop();
 
     void setMessageOutput(Print* output);
