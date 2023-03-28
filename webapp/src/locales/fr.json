@@ -322,13 +322,15 @@
         "SerialHint": "L'onduleur et le DTU ont tous deux un numéro de série. Le numéro de série du DTU est généré de manière aléatoire lors du premier démarrage et ne doit normalement pas être modifié.",
         "PollInterval": "Intervalle de sondage",
         "Seconds": "Secondes",
-        "PaLevel": "Niveau de puissance d'émission",
-        "PaLevelHint": "Assurez-vous que votre alimentation est suffisamment stable avant d'augmenter la puissance d'émission.",
+        "NrfPaLevel": "NRF24 Niveau de puissance d'émission",
+        "CmtPaLevel": "CMT2300A Niveau de puissance d'émission",
+        "NrfPaLevelHint": "Used for HM-Inverters. Assurez-vous que votre alimentation est suffisamment stable avant d'augmenter la puissance d'émission.",
+        "CmtPaLevelHint": "Used for HMS/HMT-Inverters. Assurez-vous que votre alimentation est suffisamment stable avant d'augmenter la puissance d'émission.",
         "Save": "Sauvegarder",
-        "Min": "Minimum (-18 dBm)",
-        "Low": "Bas (-12 dBm)",
-        "High": "Haut (-6 dBm)",
-        "Max": "Maximum (0 dBm)"
+        "Min": "Minimum ({db} dBm)",
+        "Low": "Bas ({db} dBm)",
+        "High": "Haut ({db} dBm)",
+        "Max": "Maximum ({db} dBm)"
     },
     "securityadmin": {
         "SecuritySettings": "Paramètres de sécurité",

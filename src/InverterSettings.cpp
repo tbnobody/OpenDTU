@@ -37,7 +37,8 @@ void InverterSettingsClass::init()
         }
 
         MessageOutput.println("  Setting radio PA level... ");
-        Hoymiles.getRadioNrf()->setPALevel((rf24_pa_dbm_e)config.Dtu_PaLevel);
+        Hoymiles.getRadioNrf()->setPALevel((rf24_pa_dbm_e)config.Dtu_NrfPaLevel);
+        Hoymiles.getRadioCmt()->setPALevel(config.Dtu_CmtPaLevel);
 
         MessageOutput.println("  Setting DTU serial... ");
         Hoymiles.getRadioNrf()->setDtuSerial(config.Dtu_Serial);
