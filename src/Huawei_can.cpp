@@ -43,7 +43,7 @@ RectifierParameters_t * HuaweiCanClass::get()
     return &_rp;
 }
 
-unsigned long HuaweiCanClass::getLastUpdate()
+uint32_t HuaweiCanClass::getLastUpdate()
 {
     return lastUpdate;
 }
@@ -142,7 +142,7 @@ void HuaweiCanClass::onReceive(uint8_t* frame, uint8_t len)
 void HuaweiCanClass::loop()
 {
 
-  long unsigned int rxId;
+  INT32U rxId;
   unsigned char len = 0;
   unsigned char rxBuf[8];
    
