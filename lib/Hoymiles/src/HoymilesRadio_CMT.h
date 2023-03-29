@@ -78,7 +78,6 @@ private:
     uint32_t cmtRxTimeout = 200;
     uint32_t cmtRxTimeCount = 0;
 
-    uint8_t cmtBaseChOff860; // offset from initalized CMT base frequency to Hoy base frequency in channels
     uint8_t cmtCurrentCh; // current used channel, should be stored per inverter und set before next Tx, if hopping is used
 
     uint8_t cmtTx56toCh = 0xFF; // send CMD56 active to Channel xx, inactive = 0xFF

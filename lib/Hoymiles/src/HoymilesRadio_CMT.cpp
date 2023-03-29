@@ -11,9 +11,12 @@
 #define HOY_BASE_FREQ 860000000 // Hoymiles base frequency for CMD56 channels is 860.00 MHz
 #define HOY_BOOT_FREQ 868000000 // Hoymiles boot/init frequency after power up inverter or connection lost for 15 min
 
+// offset from initalized CMT base frequency to Hoy base frequency in channels
+#define CMT_BASE_CH_OFFSET860 ((860000000 - HOY_BASE_FREQ) / CMT2300A_ONE_STEP_SIZE / FH_OFFSET)
+
 String HoymilesRadio_CMT::cmtChToFreq(const uint8_t channel)
 {
-    return String((HOY_BASE_FREQ + (cmtBaseChOff860 + channel) * FH_OFFSET * CMT2300A_ONE_STEP_SIZE) / 1000000.0, 2) + " MHz";
+    return String((HOY_BASE_FREQ + (CMT_BASE_CH_OFFSET860 + channel) * FH_OFFSET * CMT2300A_ONE_STEP_SIZE) / 1000000.0, 2) + " MHz";
 }
 
 void HoymilesRadio_CMT::cmtSwitchChannel(const uint8_t channel)
@@ -31,7 +34,7 @@ uint8_t HoymilesRadio_CMT::cmtFreqToChan(const String& func_name, const String& 
             func_name.c_str(), var_name.c_str(), freq_kHz / 1000.0);
         return 0xFF; // ERROR
     }
-    const uint32_t min_Freq_kHz = (HOY_BASE_FREQ + (cmtBaseChOff860 >= 1 ? cmtBaseChOff860 : 1) * CMT2300A_ONE_STEP_SIZE * FH_OFFSET) / 1000; // frequency can not be lower than actual initailized base freq
+    const uint32_t min_Freq_kHz = (HOY_BASE_FREQ + (CMT_BASE_CH_OFFSET860 >= 1 ? CMT_BASE_CH_OFFSET860 : 1) * CMT2300A_ONE_STEP_SIZE * FH_OFFSET) / 1000; // frequency can not be lower than actual initailized base freq
     const uint32_t max_Freq_kHz = (HOY_BASE_FREQ + 0xFE * CMT2300A_ONE_STEP_SIZE * FH_OFFSET) / 1000; // =923500, 0xFF does not work
     if (freq_kHz < min_Freq_kHz || freq_kHz > max_Freq_kHz) {
         Hoymiles.getMessageOutput()->printf("%s %s %.2f MHz is out of Hoymiles/CMT range! (%.2f MHz - %.2f MHz)\r\n",
@@ -42,7 +45,7 @@ uint8_t HoymilesRadio_CMT::cmtFreqToChan(const String& func_name, const String& 
         Hoymiles.getMessageOutput()->printf("%s !!! caution: %s %.2f MHz is out of EU legal range! (863 - 870 MHz)\r\n",
             func_name.c_str(), var_name.c_str(), freq_kHz / 1000.0);
     }
-    return (freq_kHz * 1000 - HOY_BASE_FREQ) / CMT2300A_ONE_STEP_SIZE / FH_OFFSET - cmtBaseChOff860; // frequency to channel
+    return (freq_kHz * 1000 - HOY_BASE_FREQ) / CMT2300A_ONE_STEP_SIZE / FH_OFFSET - CMT_BASE_CH_OFFSET860; // frequency to channel
 }
 
 bool HoymilesRadio_CMT::cmtSwitchDtuFreq(const uint32_t to_freq_kHz)
@@ -75,7 +78,7 @@ bool HoymilesRadio_CMT::cmtSwitchInvAndDtuFreq(const uint64_t inv_serial, const 
     cmtTxBuffer[9] = 0x02;
     cmtTxBuffer[10] = 0x15;
     cmtTxBuffer[11] = 0x21;
-    cmtTxBuffer[12] = (uint8_t)(cmtBaseChOff860 + toChannel);
+    cmtTxBuffer[12] = (uint8_t)(CMT_BASE_CH_OFFSET860 + toChannel);
     cmtTxBuffer[13] = 0x14;
     cmtTxBuffer[14] = crc8(cmtTxBuffer, 14);
 
@@ -302,8 +305,6 @@ void HoymilesRadio_CMT::init(int8_t pin_sdio, int8_t pin_clk, int8_t pin_cs, int
     _radio.reset(new CMT2300A(pin_sdio, pin_clk, pin_cs, pin_fcs));
 
     _radio->begin();
-
-    cmtBaseChOff860 = (860000000 - HOY_BASE_FREQ) / CMT2300A_ONE_STEP_SIZE / FH_OFFSET;
 
     cmtSwitchDtuFreq(HOYMILES_CMT_WORK_FREQ); // start dtu at work freqency, for fast Rx if inverter is already on and frequency switched
 
