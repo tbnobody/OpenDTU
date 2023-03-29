@@ -68,5 +68,24 @@
             "data": 21,
             "clk": 22
         }
+    },
+    {
+        "name": "Generic NodeMCU 32 with NRF + CMT Module",
+        "nrf24": {
+            "miso": 19,
+            "mosi": 23,
+            "clk": 18,
+            "irq": 16,
+            "en": 4,
+            "cs": 5
+        },
+        "cmt": {
+            "clk": 12,
+            "sdio": 14,
+            "cs": 27,
+            "fcs": 26,
+            "gpio2": -1,
+            "gpio3": -1
+        }
     }
 ]
