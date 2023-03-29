@@ -27,9 +27,14 @@ void PowerMeterClass::init()
 
     CONFIG_T& config = Configuration.get();
 
-    MqttSettings.subscribe(config.PowerMeter_MqttTopicPowerMeter1, 0, std::bind(&PowerMeterClass::onMqttMessage, this, _1, _2, _3, _4, _5, _6));
-    MqttSettings.subscribe(config.PowerMeter_MqttTopicPowerMeter2, 0, std::bind(&PowerMeterClass::onMqttMessage, this, _1, _2, _3, _4, _5, _6));
-    MqttSettings.subscribe(config.PowerMeter_MqttTopicPowerMeter3, 0, std::bind(&PowerMeterClass::onMqttMessage, this, _1, _2, _3, _4, _5, _6));
+    if (config.PowerMeter_Enabled && 
+        (strlen(config.PowerMeter_MqttTopicPowerMeter1) > 0) &&
+        (strlen(config.PowerMeter_MqttTopicPowerMeter2) > 0) &&
+        (strlen(config.PowerMeter_MqttTopicPowerMeter3) > 0) ) {
+      MqttSettings.subscribe(config.PowerMeter_MqttTopicPowerMeter1, 0, std::bind(&PowerMeterClass::onMqttMessage, this, _1, _2, _3, _4, _5, _6));
+      MqttSettings.subscribe(config.PowerMeter_MqttTopicPowerMeter2, 0, std::bind(&PowerMeterClass::onMqttMessage, this, _1, _2, _3, _4, _5, _6));
+      MqttSettings.subscribe(config.PowerMeter_MqttTopicPowerMeter3, 0, std::bind(&PowerMeterClass::onMqttMessage, this, _1, _2, _3, _4, _5, _6));
+    }
        
     mqttInitDone = true;
 
