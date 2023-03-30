@@ -195,6 +195,7 @@ Topics for 3 phases of a power meter is configurable. Given is an example for th
 * Hoymiles HM-1000
 * Hoymiles HM-1200
 * Hoymiles HM-1500
+* Solenso SOL-H350
 * Solenso SOL-H400
 * Solenso SOL-H800
 * TSUN TSOL-M350 (Maybe depending on firmware/serial number on the inverter)
