@@ -122,12 +122,12 @@ bool PinMappingClass::init(const String& deviceMapping)
 
 bool PinMappingClass::isValidNrf24Config()
 {
-    return _pinMapping.nrf24_clk > 0
-        && _pinMapping.nrf24_cs > 0
-        && _pinMapping.nrf24_en > 0
-        && _pinMapping.nrf24_irq > 0
-        && _pinMapping.nrf24_miso > 0
-        && _pinMapping.nrf24_mosi > 0;
+    return _pinMapping.nrf24_clk >= 0
+        && _pinMapping.nrf24_cs >= 0
+        && _pinMapping.nrf24_en >= 0
+        && _pinMapping.nrf24_irq >= 0
+        && _pinMapping.nrf24_miso >= 0
+        && _pinMapping.nrf24_mosi >= 0;
 }
 
 bool PinMappingClass::isValidEthConfig()
