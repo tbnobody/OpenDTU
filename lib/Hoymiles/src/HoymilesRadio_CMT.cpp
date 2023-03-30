@@ -344,7 +344,7 @@ void HoymilesRadio_CMT::loop()
                     // Save packet in inverter rx buffer
                     Hoymiles.getMessageOutput()->printf("RX %s --> ", cmtChToFreq(f.channel).c_str());
                     dumpBuf(f.fragment, f.len, false);
-                    Hoymiles.getMessageOutput()->printf("| %d dBm", f.rssi);
+                    Hoymiles.getMessageOutput()->printf("| %d dBm\r\n", f.rssi);
 
                     inv->addRxFragment(f.fragment, f.len);
                 } else {
