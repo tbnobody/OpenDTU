@@ -84,6 +84,7 @@ struct CONFIG_T {
     uint32_t Dtu_PollInterval;
     uint8_t Dtu_NrfPaLevel;
     int8_t Dtu_CmtPaLevel;
+    uint32_t Dtu_CmtFrequency;
 
     bool Mqtt_Hass_Enabled;
     bool Mqtt_Hass_Retain;

@@ -81,6 +81,7 @@ bool ConfigurationClass::write()
     dtu["poll_interval"] = config.Dtu_PollInterval;
     dtu["nrf_pa_level"] = config.Dtu_NrfPaLevel;
     dtu["cmt_pa_level"] = config.Dtu_CmtPaLevel;
+    dtu["cmt_frequency"] = config.Dtu_CmtFrequency;
 
     JsonObject security = doc.createNestedObject("security");
     security["password"] = config.Security_Password;
@@ -222,6 +223,7 @@ bool ConfigurationClass::read()
     config.Dtu_PollInterval = dtu["poll_interval"] | DTU_POLL_INTERVAL;
     config.Dtu_NrfPaLevel = dtu["nrf_pa_level"] | DTU_NRF_PA_LEVEL;
     config.Dtu_CmtPaLevel = dtu["cmt_pa_level"] | DTU_CMT_PA_LEVEL;
+    config.Dtu_CmtFrequency = dtu["cmt_frequency"] | DTU_CMT_FREQUENCY;
 
     JsonObject security = doc["security"];
     strlcpy(config.Security_Password, security["password"] | ACCESS_POINT_PASSWORD, sizeof(config.Security_Password));

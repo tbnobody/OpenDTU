@@ -44,6 +44,9 @@ void InverterSettingsClass::init()
         Hoymiles.getRadioNrf()->setDtuSerial(config.Dtu_Serial);
         Hoymiles.getRadioCmt()->setDtuSerial(config.Dtu_Serial);
 
+        MessageOutput.println("  Setting CMT target frequency... ");
+        Hoymiles.getRadioCmt()->setInverterTargetFrequency(config.Dtu_CmtFrequency);
+
         MessageOutput.println("  Setting poll interval... ");
         Hoymiles.setPollInterval(config.Dtu_PollInterval);
 

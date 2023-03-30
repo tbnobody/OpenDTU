@@ -78,6 +78,7 @@
 #define DTU_POLL_INTERVAL 5
 #define DTU_NRF_PA_LEVEL 0
 #define DTU_CMT_PA_LEVEL 0
+#define DTU_CMT_FREQUENCY 865000
 
 #define MQTT_HASS_ENABLED false
 #define MQTT_HASS_EXPIRE true

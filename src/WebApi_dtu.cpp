@@ -44,6 +44,7 @@ void WebApiDtuClass::onDtuAdminGet(AsyncWebServerRequest* request)
     root["nrf_palevel"] = config.Dtu_NrfPaLevel;
     root["cmt_enabled"] = Hoymiles.getRadioCmt()->isInitialized();
     root["cmt_palevel"] = config.Dtu_CmtPaLevel;
+    root["cmt_frequency"] = config.Dtu_CmtFrequency;
 
     response->setLength();
     request->send(response);
@@ -88,7 +89,7 @@ void WebApiDtuClass::onDtuAdminPost(AsyncWebServerRequest* request)
         return;
     }
 
-    if (!(root.containsKey("serial") && root.containsKey("pollinterval") && root.containsKey("nrf_palevel") && root.containsKey("cmt_palevel"))) {
+    if (!(root.containsKey("serial") && root.containsKey("pollinterval") && root.containsKey("nrf_palevel") && root.containsKey("cmt_palevel") && root.containsKey("cmt_frequency"))) {
         retMsg["message"] = "Values are missing!";
         retMsg["code"] = WebApiError::GenericValueMissing;
         response->setLength();
@@ -121,8 +122,18 @@ void WebApiDtuClass::onDtuAdminPost(AsyncWebServerRequest* request)
     }
 
     if (root["cmt_palevel"].as<int8_t>() < -10 || root["cmt_palevel"].as<int8_t>() > 20) {
-        retMsg["message"] = F("Invalid power level setting!");
+        retMsg["message"] = "Invalid power level setting!";
         retMsg["code"] = WebApiError::DtuInvalidPowerLevel;
+        response->setLength();
+        request->send(response);
+        return;
+    }
+
+    if (root["cmt_frequency"].as<uint32_t>() < 860000 || root["cmt_frequency"].as<uint32_t>() > 923000 || root["cmt_frequency"].as<uint32_t>() % 250 > 0) {
+        retMsg["message"] = "Invalid CMT frequency setting!";
+        retMsg["code"] = WebApiError::DtuInvalidCmtFrequency;
+        retMsg["param"]["min"] = 860000;
+        retMsg["param"]["max"] = 923000;
         response->setLength();
         request->send(response);
         return;
@@ -135,6 +146,7 @@ void WebApiDtuClass::onDtuAdminPost(AsyncWebServerRequest* request)
     config.Dtu_PollInterval = root["pollinterval"].as<uint32_t>();
     config.Dtu_NrfPaLevel = root["nrf_palevel"].as<uint8_t>();
     config.Dtu_CmtPaLevel = root["cmt_palevel"].as<int8_t>();
+    config.Dtu_CmtFrequency = root["cmt_frequency"].as<uint32_t>();
     Configuration.write();
 
     retMsg["type"] = "success";
@@ -148,5 +160,6 @@ void WebApiDtuClass::onDtuAdminPost(AsyncWebServerRequest* request)
     Hoymiles.getRadioCmt()->setPALevel(config.Dtu_CmtPaLevel);
     Hoymiles.getRadioNrf()->setDtuSerial(config.Dtu_Serial);
     Hoymiles.getRadioCmt()->setDtuSerial(config.Dtu_Serial);
+    Hoymiles.getRadioCmt()->setInverterTargetFrequency(config.Dtu_CmtFrequency);
     Hoymiles.setPollInterval(config.Dtu_PollInterval);
 }

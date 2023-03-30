@@ -5,4 +5,5 @@ export interface DtuConfig {
     nrf_palevel: number;
     cmt_enabled: boolean;
     cmt_palevel: number;
+    cmt_frequency: number;
 }

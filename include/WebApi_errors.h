@@ -13,6 +13,7 @@ enum WebApiError {
     DtuSerialZero,
     DtuPollZero,
     DtuInvalidPowerLevel,
+    DtuInvalidCmtFrequency,
 
     ConfigBase = 3000,
     ConfigNotDeleted,

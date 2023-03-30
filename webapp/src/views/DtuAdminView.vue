@@ -43,6 +43,13 @@
                         </select>
                     </div>
                 </div>
+
+                <InputElement :label="$t('dtuadmin.CmtFrequency')"
+                                v-model="dtuConfigList.cmt_frequency"
+                                type="number" min="860250" max="923500"
+                                :postfix="$t('dtuadmin.khz')"
+                                :tooltip="$t('dtuadmin.CmtFrequencyHint')"
+                                v-if="dtuConfigList.cmt_enabled"/>
             </CardElement>
             <button type="submit" class="btn btn-primary mb-3">{{ $t('dtuadmin.Save') }}</button>
         </form>
