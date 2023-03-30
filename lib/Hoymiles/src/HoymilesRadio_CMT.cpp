@@ -199,7 +199,7 @@ enumCMTresult HoymilesRadio_CMT::cmtProcess(void)
             cmtRxTimeoutCnt++;
         } else {
             uint32_t invSerial = cmtTxBuffer[1] << 24 | cmtTxBuffer[2] << 16 | cmtTxBuffer[3] << 8 | cmtTxBuffer[4]; // read inverter serial from last Tx buffer
-            cmtSwitchInvAndDtuFreq(invSerial, HOY_BOOT_FREQ / 1000, HOYMILES_CMT_WORK_FREQ);
+            cmtSwitchInvAndDtuFreq(invSerial, HOY_BOOT_FREQ / 1000, _inverterTargetFrequency);
         }
 
         nRes = CMT_RX_TIMEOUT;
@@ -306,7 +306,7 @@ void HoymilesRadio_CMT::init(int8_t pin_sdio, int8_t pin_clk, int8_t pin_cs, int
 
     _radio->begin();
 
-    cmtSwitchDtuFreq(HOYMILES_CMT_WORK_FREQ); // start dtu at work freqency, for fast Rx if inverter is already on and frequency switched
+    cmtSwitchDtuFreq(_inverterTargetFrequency); // start dtu at work freqency, for fast Rx if inverter is already on and frequency switched
 
     if (_radio->isChipConnected()) {
         Hoymiles.getMessageOutput()->println("Connection successful");
@@ -434,6 +434,15 @@ void HoymilesRadio_CMT::setPALevel(int8_t paLevel)
     } else {
         Hoymiles.getMessageOutput()->printf("CMT TX power %d dBm is not defined! (min: -10 dBm, max: 20 dBm)\r\n", paLevel);
     }
+}
+
+void HoymilesRadio_CMT::setInverterTargetFrequency(uint32_t frequency)
+{
+    _inverterTargetFrequency = frequency;
+    if (!_isInitialized) {
+        return;
+    }
+    cmtSwitchDtuFreq(_inverterTargetFrequency);
 }
 
 bool HoymilesRadio_CMT::isConnected()

@@ -13,6 +13,10 @@
 // number of fragments hold in buffer
 #define FRAGMENT_BUFFER_SIZE 30
 
+#ifndef HOYMILES_CMT_WORK_FREQ
+#define HOYMILES_CMT_WORK_FREQ 865000
+#endif
+
 /* CMT states */
 typedef enum {
     CMT_STATE_IDLE = 0,
@@ -43,6 +47,7 @@ public:
     void init(int8_t pin_sdio, int8_t pin_clk, int8_t pin_cs, int8_t pin_fcs, int8_t pin_gpio2, int8_t pin_gpio3);
     void loop();
     void setPALevel(int8_t paLevel);
+    void setInverterTargetFrequency(uint32_t frequency);
 
     bool isConnected();
 
@@ -63,6 +68,8 @@ private:
     std::queue<fragment_t> _rxBuffer;
     TimeoutHelper _rxTimeout;
     TimeoutHelper _txTimeout;
+
+    uint32_t _inverterTargetFrequency = HOYMILES_CMT_WORK_FREQ;
 
     String cmtChToFreq(const uint8_t channel);
     void cmtSwitchChannel(const uint8_t channel);
