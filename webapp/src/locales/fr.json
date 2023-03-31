@@ -329,6 +329,7 @@
         "CmtPaLevelHint": "Used for HMS/HMT-Inverters. Assurez-vous que votre alimentation est suffisamment stable avant d'augmenter la puissance d'émission.",
         "CmtFrequency": "CMT2300A Frequency:",
         "CmtFrequencyHint": "Stelle sicher, dass du nur Frequenzen verwendet werden welche im entsprechenden Land erlaubt sind!",
+        "CmtFrequencyWarning": "The selected frequency is outside the range allowed in the EU. Make sure that this selection does not violate any local regulations.",
         "khz": "kHz",
         "Save": "Sauvegarder",
         "Min": "Minimum ({db} dBm)",

@@ -44,12 +44,24 @@
                     </div>
                 </div>
 
-                <InputElement :label="$t('dtuadmin.CmtFrequency')"
+                <div class="row mb-3" v-if="dtuConfigList.cmt_enabled">
+                    <label for="cmtFrequency" class="col-sm-2 col-form-label">
+                        {{ $t('dtuadmin.CmtFrequency') }}
+                        <BIconInfoCircle v-tooltip :title="$t('dtuadmin.CmtFrequencyHint')" />
+                    </label>
+                    <div class="col-sm-10">
+                        <div class="input-group mb-3">
+                            <input type="range" class="form-control form-range"
                                 v-model="dtuConfigList.cmt_frequency"
-                                type="number" min="860250" max="923500"
-                                :postfix="$t('dtuadmin.khz')"
-                                :tooltip="$t('dtuadmin.CmtFrequencyHint')"
-                                v-if="dtuConfigList.cmt_enabled"/>
+                                min="860250" max="923500" step="250"
+                                id="cmtFrequency" aria-describedby="basic-addon2"
+                                style="height: unset;" />
+                            <span class="input-group-text" id="basic-addon2">{{ cmtFrequencyText }}</span>
+                        </div>
+                        <div class="alert alert-danger" role="alert" v-html="$t('dtuadmin.CmtFrequencyWarning')" v-if="cmtIsOutOfEu"></div>
+                    </div>
+                </div>
+
             </CardElement>
             <button type="submit" class="btn btn-primary mb-3">{{ $t('dtuadmin.Save') }}</button>
         </form>
@@ -97,6 +109,14 @@ export default defineComponent({
     },
     created() {
         this.getDtuConfig();
+    },
+    computed: {
+        cmtFrequencyText() {
+            return this.$n(this.dtuConfigList.cmt_frequency / 1000, "decimalTwoDigits") + " MHz";
+        },
+        cmtIsOutOfEu() {
+            return this.dtuConfigList.cmt_frequency < 863000 || this.dtuConfigList.cmt_frequency > 870000;
+        }
     },
     methods: {
         getDtuConfig() {

@@ -329,6 +329,7 @@
         "CmtPaLevelHint": "Verwendet für HMS/HMT-Wechselrichter. Stellen Sie sicher, dass Ihre Stromversorgung stabil genug ist, bevor Sie die Sendeleistung erhöhen.",
         "CmtFrequency": "CMT2300A Frequenz:",
         "CmtFrequencyHint": "Stelle sicher, dass du nur Frequenzen verwendet werden welche im entsprechenden Land erlaubt sind!",
+        "CmtFrequencyWarning": "Die ausgewählte Frequenz befindet außerhalb des in der EU zugelassenen Bereiches. Vergewissere dich, dass mit dieser Auswahl keine lokalen Regularien verletzt werden.",
         "khz": "kHz",
         "Save": "Speichern",
         "Min": "Minimum ({db} dBm)",
