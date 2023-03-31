@@ -34,6 +34,8 @@ void InverterSettingsClass::init()
 
         if (PinMapping.isValidCmt2300Config()) {
             Hoymiles.initCMT(pin.cmt_sdio, pin.cmt_clk, pin.cmt_cs, pin.cmt_fcs, pin.cmt_gpio2, pin.cmt_gpio3);
+            MessageOutput.println(F("  Setting CMT target frequency... "));
+            Hoymiles.getRadioCmt()->setInverterTargetFrequency(config.Dtu_CmtFrequency);
         }
 
         MessageOutput.println("  Setting radio PA level... ");
@@ -43,9 +45,6 @@ void InverterSettingsClass::init()
         MessageOutput.println("  Setting DTU serial... ");
         Hoymiles.getRadioNrf()->setDtuSerial(config.Dtu_Serial);
         Hoymiles.getRadioCmt()->setDtuSerial(config.Dtu_Serial);
-
-        MessageOutput.println("  Setting CMT target frequency... ");
-        Hoymiles.getRadioCmt()->setInverterTargetFrequency(config.Dtu_CmtFrequency);
 
         MessageOutput.println("  Setting poll interval... ");
         Hoymiles.setPollInterval(config.Dtu_PollInterval);
