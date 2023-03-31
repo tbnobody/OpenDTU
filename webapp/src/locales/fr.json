@@ -23,7 +23,8 @@
         "Login": "Connexion"
     },
     "base": {
-        "Loading": "Chargement..."
+        "Loading": "Chargement...",
+        "Reload": "Reload"
     },
     "localeswitcher": {
         "Dark": "Dark",

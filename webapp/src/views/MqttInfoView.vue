@@ -1,5 +1,5 @@
 <template>
-    <BasePage :title="$t('mqttinfo.MqttInformation')" :isLoading="dataLoading">
+    <BasePage :title="$t('mqttinfo.MqttInformation')" :isLoading="dataLoading" :show-reload="true" @reload="getMqttInfo">
         <CardElement :text="$t('mqttinfo.ConfigurationSummary')" textVariant="text-bg-primary">
             <div class="table-responsive">
                 <table class="table table-hover table-condensed">

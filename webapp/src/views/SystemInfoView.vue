@@ -1,5 +1,5 @@
 <template>
-    <BasePage :title="$t('systeminfo.SystemInfo')" :isLoading="dataLoading">
+    <BasePage :title="$t('systeminfo.SystemInfo')" :isLoading="dataLoading" :show-reload="true" @reload="getSystemInfo">
         <FirmwareInfo :systemStatus="systemDataList" />
         <div class="mt-5"></div>
         <HardwareInfo :systemStatus="systemDataList" />
