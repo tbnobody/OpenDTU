@@ -109,10 +109,10 @@ export default defineComponent({
     },
     computed: {
         cmtFrequencyText() {
-            return this.$n(this.dtuConfigList.cmt_frequency / 1000, "decimalTwoDigits") + " MHz";
+            return this.$t("dtuadmin.MHz", { mhz: this.$n(this.dtuConfigList.cmt_frequency / 1000, "decimalTwoDigits") });
         },
         cmtPaLevelText() {
-            return this.$n(this.dtuConfigList.cmt_palevel * 1) + " dBm";
+            return this.$t("dtuadmin.dBm", { dbm: this.$n(this.dtuConfigList.cmt_palevel * 1) });
         },
         cmtIsOutOfEu() {
             return this.dtuConfigList.cmt_frequency < 863000 || this.dtuConfigList.cmt_frequency > 870000;
