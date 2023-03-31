@@ -36,11 +36,14 @@
                         <BIconInfoCircle v-tooltip :title="$t('dtuadmin.CmtPaLevelHint')" />
                     </label>
                     <div class="col-sm-10">
-                        <select id="inputCmtPaLevel" class="form-select" v-model="dtuConfigList.cmt_palevel">
-                            <option v-for="palevel in cmtpalevelList" :key="palevel.key" :value="palevel.key">
-                                {{ $t(`dtuadmin.` + palevel.value, { db: palevel.db }) }}
-                            </option>
-                        </select>
+                        <div class="input-group mb-3">
+                            <input type="range" class="form-control form-range"
+                                v-model="dtuConfigList.cmt_palevel"
+                                min="-10" max="20"
+                                id="inputCmtPaLevel" aria-describedby="basic-addon1"
+                                style="height: unset;" />
+                            <span class="input-group-text" id="basic-addon1">{{ cmtPaLevelText }}</span>
+                        </div>
                     </div>
                 </div>
 
@@ -96,12 +99,6 @@ export default defineComponent({
                 { key: 2, value: 'High', db: "-6" },
                 { key: 3, value: 'Max', db: "0" },
             ],
-            cmtpalevelList: [
-                { key: 0, value: 'Min', db: "0" },
-                { key: 13, value: 'Low', db: "13" },
-                { key: 17, value: 'High', db: "17" },
-                { key: 20, value: 'Max', db: "20" },
-            ],
             alertMessage: "",
             alertType: "info",
             showAlert: false,
@@ -113,6 +110,9 @@ export default defineComponent({
     computed: {
         cmtFrequencyText() {
             return this.$n(this.dtuConfigList.cmt_frequency / 1000, "decimalTwoDigits") + " MHz";
+        },
+        cmtPaLevelText() {
+            return this.$n(this.dtuConfigList.cmt_palevel * 1) + " dBm";
         },
         cmtIsOutOfEu() {
             return this.dtuConfigList.cmt_frequency < 863000 || this.dtuConfigList.cmt_frequency > 870000;
