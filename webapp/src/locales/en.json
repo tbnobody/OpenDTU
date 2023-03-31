@@ -328,7 +328,7 @@
         "NrfPaLevelHint": "Used for HM-Inverters. Make sure your power supply is stable enough before increasing the transmit power.",
         "CmtPaLevelHint": "Used for HMS/HMT-Inverters. Make sure your power supply is stable enough before increasing the transmit power.",
         "CmtFrequency": "CMT2300A Frequency:",
-        "CmtFrequencyHint": "Make sure to only use frequencies that are allowed in the respective country!",
+        "CmtFrequencyHint": "Make sure to only use frequencies that are allowed in the respective country! After a frequency change, it can take up to 15min until a connection is established.",
         "CmtFrequencyWarning": "The selected frequency is outside the range allowed in the EU. Make sure that this selection does not violate any local regulations.",
         "MHz": "{mhz} MHz",
         "dBm": "{dbm} dBm",

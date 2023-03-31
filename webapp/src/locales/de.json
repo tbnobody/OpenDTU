@@ -328,7 +328,7 @@
         "NrfPaLevelHint": "Verwendet für HM-Wechselrichter. Stellen Sie sicher, dass Ihre Stromversorgung stabil genug ist, bevor Sie die Sendeleistung erhöhen.",
         "CmtPaLevelHint": "Verwendet für HMS/HMT-Wechselrichter. Stellen Sie sicher, dass Ihre Stromversorgung stabil genug ist, bevor Sie die Sendeleistung erhöhen.",
         "CmtFrequency": "CMT2300A Frequenz:",
-        "CmtFrequencyHint": "Stelle sicher, dass du nur Frequenzen verwendet werden welche im entsprechenden Land erlaubt sind!",
+        "CmtFrequencyHint": "Stelle sicher, dass du nur Frequenzen verwendet werden welche im entsprechenden Land erlaubt sind! Nach einer Frequenzänderung kann es bis zu 15min dauern bis eine Verbindung hergestellt wird.",
         "CmtFrequencyWarning": "Die ausgewählte Frequenz befindet außerhalb des in der EU zugelassenen Bereiches. Vergewissere dich, dass mit dieser Auswahl keine lokalen Regularien verletzt werden.",
         "MHz": "{mhz} MHz",
         "dBm": "{dbm} dBm",
