@@ -28,7 +28,8 @@
         "Login": "Anmelden"
     },
     "base": {
-        "Loading": "Lade..."
+        "Loading": "Lade...",
+        "Reload": "Aktualisieren"
     },
     "localeswitcher": {
         "Dark": "Dunkel",
