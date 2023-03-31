@@ -23,12 +23,12 @@ void InverterSettingsClass::init()
     // Initialize inverter communication
     MessageOutput.print("Initialize Hoymiles interface... ");
     if (PinMapping.isValidNrf24Config() || PinMapping.isValidCmt2300Config()) {
-        SPIClass* spiClass = new SPIClass(VSPI);
-        spiClass->begin(pin.nrf24_clk, pin.nrf24_miso, pin.nrf24_mosi, pin.nrf24_cs);
         Hoymiles.setMessageOutput(&MessageOutput);
         Hoymiles.init();
 
         if (PinMapping.isValidNrf24Config()) {
+            SPIClass* spiClass = new SPIClass(VSPI);
+            spiClass->begin(pin.nrf24_clk, pin.nrf24_miso, pin.nrf24_mosi, pin.nrf24_cs);
             Hoymiles.initNRF(spiClass, pin.nrf24_en, pin.nrf24_irq);
         }
 
