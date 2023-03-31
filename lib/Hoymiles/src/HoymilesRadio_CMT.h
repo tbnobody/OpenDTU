@@ -51,6 +51,9 @@ public:
 
     bool isConnected();
 
+    static uint32_t getMinFrequency();
+    static uint32_t getMaxFrequency();
+
 private:
     void ARDUINO_ISR_ATTR handleInt1();
     void ARDUINO_ISR_ATTR handleInt2();

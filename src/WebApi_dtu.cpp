@@ -129,11 +129,14 @@ void WebApiDtuClass::onDtuAdminPost(AsyncWebServerRequest* request)
         return;
     }
 
-    if (root["cmt_frequency"].as<uint32_t>() < 860000 || root["cmt_frequency"].as<uint32_t>() > 923000 || root["cmt_frequency"].as<uint32_t>() % 250 > 0) {
+    if (root["cmt_frequency"].as<uint32_t>() < Hoymiles.getRadioCmt()->getMinFrequency()
+        || root["cmt_frequency"].as<uint32_t>() > Hoymiles.getRadioCmt()->getMaxFrequency()
+        || root["cmt_frequency"].as<uint32_t>() % 250 > 0) {
+
         retMsg["message"] = "Invalid CMT frequency setting!";
         retMsg["code"] = WebApiError::DtuInvalidCmtFrequency;
-        retMsg["param"]["min"] = 860000;
-        retMsg["param"]["max"] = 923000;
+        retMsg["param"]["min"] = Hoymiles.getRadioCmt()->getMinFrequency();
+        retMsg["param"]["max"] = Hoymiles.getRadioCmt()->getMaxFrequency();
         response->setLength();
         request->send(response);
         return;
