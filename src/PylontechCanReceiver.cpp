@@ -133,6 +133,7 @@ void PylontechCanReceiverClass::parseCanPackets()
             Battery.stateOfCharge = this->readUnsignedInt16(rx_message.data);
             Battery.stateOfChargeLastUpdate = millis();
             Battery.stateOfHealth = this->readUnsignedInt16(rx_message.data + 2);
+            Battery.lastUpdate = millis();
 
 #ifdef PYLONTECH_DEBUG_ENABLED
             MessageOutput.printf("[Pylontech] soc: %d soh: %d\n",
