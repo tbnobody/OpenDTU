@@ -4,6 +4,7 @@
  */
 #include "Huawei_can.h"
 #include "MessageOutput.h"
+#include "Configuration.h"
 #include <SPI.h>
 #include <mcp_can.h>
 
@@ -14,6 +15,12 @@ HuaweiCanClass HuaweiCan;
 void HuaweiCanClass::init(uint8_t huawei_miso, uint8_t huawei_mosi, uint8_t huawei_clk, uint8_t huawei_irq, uint8_t huawei_cs, uint8_t huawei_power)
 {
 
+  const CONFIG_T& config = Configuration.get();
+
+  if (!config.Huawei_Enabled) {
+      return;
+  }
+  
   spi = new SPIClass(VSPI);
   spi->begin(huawei_clk, huawei_miso, huawei_mosi, huawei_cs);
   pinMode(huawei_cs, OUTPUT);
@@ -145,7 +152,13 @@ void HuaweiCanClass::loop()
   INT32U rxId;
   unsigned char len = 0;
   unsigned char rxBuf[8];
-   
+
+  const CONFIG_T& config = Configuration.get();
+
+  if (!config.Huawei_Enabled) {
+      return;
+  }
+
   if(!digitalRead(_huawei_irq))                         // If CAN_INT pin is low, read receive buffer
   {
     CAN->readMsgBuf(&rxId, &len, rxBuf);      // Read data: len = data length, buf = data byte(s)
