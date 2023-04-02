@@ -5,6 +5,8 @@
 #include "WebApi_Huawei.h"
 #include "Huawei_can.h"
 #include "Configuration.h"
+#include "MessageOutput.h"
+#include "PinMapping.h"
 #include "WebApi.h"
 #include "WebApi_errors.h"
 #include <AsyncJson.h>
@@ -198,7 +200,7 @@ void WebApiHuaweiClass::onAdminPost(AsyncWebServerRequest* request)
     if (!WebApi.checkCredentials(request)) {
         return;
     }
-
+    
     AsyncJsonResponse* response = new AsyncJsonResponse();
     JsonObject retMsg = response->getRoot();
     retMsg[F("type")] = F("warning");
@@ -250,6 +252,18 @@ void WebApiHuaweiClass::onAdminPost(AsyncWebServerRequest* request)
 
     response->setLength();
     request->send(response);
+
+    const PinMapping_t& pin = PinMapping.get();
+    if (config.Huawei_Enabled) {
+      MessageOutput.println(F("Initialize Huawei AC charger interface... "));
+      if (PinMapping.isValidHuaweiConfig()) {
+          MessageOutput.printf("Huawei AC-charger miso = %d, mosi = %d, clk = %d, irq = %d, cs = %d, power_pin = %d\r\n", pin.huawei_miso, pin.huawei_mosi, pin.huawei_clk, pin.huawei_irq, pin.huawei_cs, pin.huawei_power);
+          HuaweiCan.init(pin.huawei_miso, pin.huawei_mosi, pin.huawei_clk, pin.huawei_irq, pin.huawei_cs, pin.huawei_power);
+          MessageOutput.println(F("done"));
+      } else {
+          MessageOutput.println(F("Invalid pin config"));
+      }
+    }
 
     HuaweiCan.setPower(config.Huawei_Enabled);
 }

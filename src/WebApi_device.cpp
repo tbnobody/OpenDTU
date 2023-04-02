@@ -77,6 +77,14 @@ void WebApiDeviceClass::onDeviceAdminGet(AsyncWebServerRequest* request)
     batteryPinObj[F("rx")] = pin.battery_rx;
     batteryPinObj[F("tx")] = pin.battery_tx;
 
+    JsonObject huaweiPinObj = curPin.createNestedObject("huawei");
+    huaweiPinObj[F("miso")] = pin.huawei_miso;
+    huaweiPinObj[F("mosi")] = pin.huawei_mosi;
+    huaweiPinObj[F("clk")] = pin.huawei_clk;
+    huaweiPinObj[F("irq")] = pin.huawei_irq;
+    huaweiPinObj[F("cs")] = pin.huawei_cs;
+    huaweiPinObj[F("power")] = pin.huawei_power;
+
     response->setLength();
     request->send(response);
 }
