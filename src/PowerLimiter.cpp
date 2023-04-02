@@ -223,7 +223,18 @@ void PowerLimiterClass::setNewPowerLimit(std::shared_ptr<InverterAbstract> inver
             _lastCommandSent = millis();
         } 
         MessageOutput.printf("[PowerLimiterClass::loop] Limit Non-Persistent: %d W\r\n", newPowerLimit);
-        inverter->sendActivePowerControlRequest(Hoymiles.getRadio(), newPowerLimit, PowerLimitControlType::AbsolutNonPersistent);
+
+        std::list<ChannelNum_t> dcChnls = inverter->Statistics()->getChannelsByType(TYPE_DC);
+        int dcProdChnls = 0, dcTotalChnls = dcChnls.size();
+        for (auto& c : dcChnls){
+            if (inverter->Statistics()->getChannelFieldValue(TYPE_DC, c, FLD_PDC) > 0)
+                dcProdChnls++;
+        }
+        int32_t effPowerLimit = round(newPowerLimit * (float)dcTotalChnls / dcProdChnls);
+        if (effPowerLimit > config.PowerLimiter_UpperPowerLimit)
+            effPowerLimit = config.PowerLimiter_UpperPowerLimit;
+
+        inverter->sendActivePowerControlRequest(Hoymiles.getRadio(), effPowerLimit, PowerLimitControlType::AbsolutNonPersistent);
         _lastRequestedPowerLimit = newPowerLimit;
     }
 }
