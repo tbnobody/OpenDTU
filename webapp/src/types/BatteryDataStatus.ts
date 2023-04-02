@@ -1,6 +1,6 @@
 import type { ValueObject } from '@/types/LiveDataStatus';
 
-interface flags {
+interface BatteryFlags {
     dischargeCurrent: boolean;
     chargeCurrent: boolean;
     lowTemperature: boolean;
@@ -23,8 +23,8 @@ export interface Battery {
     voltage: ValueObject;
     current: ValueObject;
     temperature: ValueObject;
-    warnings: flags;
-    alarms: flags;
+    warnings: BatteryFlags;
+    alarms: BatteryFlags;
     manufacturer: string;
     chargeEnabled: boolean;
     dischargeEnabled: boolean;
