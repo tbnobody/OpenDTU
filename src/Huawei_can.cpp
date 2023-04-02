@@ -14,35 +14,34 @@ HuaweiCanClass HuaweiCan;
 
 void HuaweiCanClass::init(uint8_t huawei_miso, uint8_t huawei_mosi, uint8_t huawei_clk, uint8_t huawei_irq, uint8_t huawei_cs, uint8_t huawei_power)
 {
+    const CONFIG_T& config = Configuration.get();
 
-  const CONFIG_T& config = Configuration.get();
+    if (!config.Huawei_Enabled) {
+        return;
+    }
 
-  if (!config.Huawei_Enabled) {
-      return;
-  }
-  
-  spi = new SPIClass(VSPI);
-  spi->begin(huawei_clk, huawei_miso, huawei_mosi, huawei_cs);
-  pinMode(huawei_cs, OUTPUT);
-  digitalWrite(huawei_cs, HIGH);
+    spi = new SPIClass(VSPI);
+    spi->begin(huawei_clk, huawei_miso, huawei_mosi, huawei_cs);
+    pinMode(huawei_cs, OUTPUT);
+    digitalWrite(huawei_cs, HIGH);
 
-  pinMode(huawei_irq, INPUT_PULLUP);
-  _huawei_irq = huawei_irq;
+    pinMode(huawei_irq, INPUT_PULLUP);
+    _huawei_irq = huawei_irq;
 
-  CAN = new MCP_CAN(spi, huawei_cs);
-  if(CAN->begin(MCP_ANY, CAN_125KBPS, MCP_8MHZ) == CAN_OK) {
-    MessageOutput.println("MCP2515 Initialized Successfully!");
-  }
-  else {
-    MessageOutput.println("Error Initializing MCP2515...");
-  }
+    CAN = new MCP_CAN(spi, huawei_cs);
+    if(CAN->begin(MCP_ANY, CAN_125KBPS, MCP_8MHZ) == CAN_OK) {
+        MessageOutput.println("MCP2515 Initialized Successfully!");
+    }
+    else {
+        MessageOutput.println("Error Initializing MCP2515...");
+    }
 
-  CAN->setMode(MCP_NORMAL);   // Change to normal mode to allow messages to be transmitted
+    // Change to normal mode to allow messages to be transmitted
+    CAN->setMode(MCP_NORMAL);
 
-  pinMode(huawei_power, OUTPUT);
-  digitalWrite(huawei_power,HIGH);
-  _huawei_power = huawei_power;
-
+    pinMode(huawei_power, OUTPUT);
+    digitalWrite(huawei_power, HIGH);
+    _huawei_power = huawei_power;
 }
 
 RectifierParameters_t * HuaweiCanClass::get()
@@ -60,13 +59,12 @@ uint8_t data[8] = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
 void HuaweiCanClass::sendRequest()
 {
     if (previousMillis < millis()) {
-
         // Send extended message 
         byte sndStat = CAN->sendMsgBuf(0x108040FE, 1, 8, data);
-        if(sndStat == CAN_OK){
-          MessageOutput.println("Message Sent Successfully!");
+        if(sndStat == CAN_OK) {
+            MessageOutput.println("Message Sent Successfully!");
         } else {
-          MessageOutput.println("Error Sending Message...");
+            MessageOutput.println("Error Sending Message...");
         }
 
         previousMillis += 5000;
@@ -96,7 +94,8 @@ void HuaweiCanClass::onReceive(uint8_t* frame, uint8_t len)
 
     case R48xx_DATA_OUTPUT_POWER:
         _rp.output_power = value / 1024.0;
-        lastUpdate = millis();  // We'll only update last update on the important params
+        // We'll only update last update on the important params
+        lastUpdate = millis();
         break;
 
     case R48xx_DATA_EFFICIENCY:
@@ -159,8 +158,8 @@ void HuaweiCanClass::loop()
       return;
   }
 
-  if(!digitalRead(_huawei_irq))                         // If CAN_INT pin is low, read receive buffer
-  {
+  if (!digitalRead(_huawei_irq)) {
+    // If CAN_INT pin is low, read receive buffer
     CAN->readMsgBuf(&rxId, &len, rxBuf);      // Read data: len = data length, buf = data byte(s)
     
     if((rxId & 0x80000000) == 0x80000000) {  // Determine if ID is standard (11 bits) or extended (29 bits)
@@ -191,15 +190,13 @@ void HuaweiCanClass::setValue(float in, uint8_t parameterType)
 
     // Send extended message 
     byte sndStat = CAN->sendMsgBuf(0x108180FE, 1, 8, data);
-    if(sndStat == CAN_OK){
-      MessageOutput.println("Message Sent Successfully!");
+    if (sndStat == CAN_OK) {
+        MessageOutput.println("Message Sent Successfully!");
     } else {
-      MessageOutput.println("Error Sending Message...");
+        MessageOutput.println("Error Sending Message...");
     }
 }
 
 void HuaweiCanClass::setPower(bool power) {
-  digitalWrite(_huawei_power, !power);
+    digitalWrite(_huawei_power, !power);
 }
-
-
