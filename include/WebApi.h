@@ -27,6 +27,8 @@
 #include "WebApi_vedirect.h"
 #include "WebApi_ws_Huawei.h"
 #include "WebApi_Huawei.h"
+#include "WebApi_ws_Pylontech.h"
+#include "WebApi_Pylontech.h"
 #include <ESPAsyncWebServer.h>
 
 class WebApiClass {
@@ -70,6 +72,8 @@ private:
     WebApiVedirectClass _webApiVedirect;
     WebApiHuaweiClass _webApiHuaweiClass;
     WebApiWsHuaweiLiveClass _webApiWsHuaweiLive;
+    WebApiPylontechClass _webApiPylontechClass;
+    WebApiWsPylontechLiveClass _webApiWsPylontechLive;
     
 };
 
