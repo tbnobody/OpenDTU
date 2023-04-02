@@ -230,7 +230,7 @@ void PowerLimiterClass::setNewPowerLimit(std::shared_ptr<InverterAbstract> inver
             if (inverter->Statistics()->getChannelFieldValue(TYPE_DC, c, FLD_PDC) > 0)
                 dcProdChnls++;
         }
-        int32_t effPowerLimit = round(newPowerLimit * (float)dcTotalChnls / dcProdChnls);
+        int32_t effPowerLimit = round(newPowerLimit * static_cast<float>(dcTotalChnls) / dcProdChnls);
         if (effPowerLimit > config.PowerLimiter_UpperPowerLimit)
             effPowerLimit = config.PowerLimiter_UpperPowerLimit;
 
