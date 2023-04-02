@@ -11,7 +11,7 @@
 #include "defaults.h"
 
 WebApiWsPylontechLiveClass::WebApiWsPylontechLiveClass()
-    : _ws("/Pylontechlivedata")
+    : _ws("/batterylivedata")
 {
 }
 
