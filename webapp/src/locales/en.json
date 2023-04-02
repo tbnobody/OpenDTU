@@ -671,5 +671,33 @@
         "EnableHuawei": "Enable Huawei R4850G2 on CAN Bus Interface",
         "Seconds": "@:dtuadmin.Seconds",
         "Save": "@:dtuadmin.Save"
+      },
+      "battery": {
+        "battery": "battery",
+        "DataAge": "Data Age: ",
+        "Seconds": " {val} seconds",
+        "Status": "Status",
+        "Property": "Property",
+        "Value": "Value",
+        "Unit": "Unit",
+        "stateOfCharge": "State of charge",
+        "stateOfHealth": "State of health",
+        "voltage": "Voltage",
+        "current": "Current",
+        "temperature": "Temperature",
+        "chargeVoltage": "Requested charge voltage",
+        "chargeCurrentLimitation": "Charge current limit",
+        "dischargeCurrentLimitation": "Discharge current limit",
+        "warn_alarm": "Alarms and warnings",
+        "ok": "OK",
+        "alarm": "Alarm",
+        "warning": "Warning",
+        "dischargeCurrent": "Discharge current",
+        "chargeCurrent": "Charge current",
+        "lowTemperature": "Low temperature",
+        "highTemperature": "High temperature",
+        "lowVoltage": "Low voltage",
+        "highVoltage": "High voltage",
+        "bmsInternal": "BMS internal"
       }
 }

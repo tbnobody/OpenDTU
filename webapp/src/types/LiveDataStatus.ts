@@ -54,10 +54,15 @@ export interface Huawei {
   enabled: boolean;
 }
 
+export interface Battery {
+  enabled: boolean;
+}
+
 export interface LiveData {
     inverters: Inverter[];
     total: Total;
     hints: Hints;
     vedirect: Vedirect;
     huawei: Huawei;
+    battery: Battery;
 }
