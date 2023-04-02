@@ -14,6 +14,8 @@ HuaweiCanClass HuaweiCan;
 
 void HuaweiCanClass::init(uint8_t huawei_miso, uint8_t huawei_mosi, uint8_t huawei_clk, uint8_t huawei_irq, uint8_t huawei_cs, uint8_t huawei_power)
 {
+    initialized = false;
+
     const CONFIG_T& config = Configuration.get();
 
     if (!config.Huawei_Enabled) {
@@ -29,12 +31,13 @@ void HuaweiCanClass::init(uint8_t huawei_miso, uint8_t huawei_mosi, uint8_t huaw
     _huawei_irq = huawei_irq;
 
     CAN = new MCP_CAN(spi, huawei_cs);
-    if(CAN->begin(MCP_ANY, CAN_125KBPS, MCP_8MHZ) == CAN_OK) {
-        MessageOutput.println("MCP2515 Initialized Successfully!");
-    }
-    else {
+    if (!CAN->begin(MCP_ANY, CAN_125KBPS, MCP_8MHZ) == CAN_OK) {
         MessageOutput.println("Error Initializing MCP2515...");
+        return;
     }
+
+    MessageOutput.println("MCP2515 Initialized Successfully!");
+    initialized = true;
 
     // Change to normal mode to allow messages to be transmitted
     CAN->setMode(MCP_NORMAL);
@@ -154,7 +157,7 @@ void HuaweiCanClass::loop()
 
   const CONFIG_T& config = Configuration.get();
 
-  if (!config.Huawei_Enabled) {
+  if (!config.Huawei_Enabled || !initialized) {
       return;
   }
 

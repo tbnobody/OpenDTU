@@ -89,6 +89,7 @@ private:
     MCP_CAN *CAN;
     uint8_t _huawei_irq;
     uint8_t _huawei_power;
+    bool initialized = false;
 };
 
 extern HuaweiCanClass HuaweiCan;
