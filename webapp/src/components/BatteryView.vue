@@ -42,32 +42,32 @@
                       <tbody>
                         <tr>
                           <th scope="row">{{ $t('battery.stateOfCharge') }}</th>
-                          <td style="text-align: right">{{ formatNumber(batteryData.stateOfCharge.v) }}</td>
+                          <td style="text-align: right">{{ batteryData.stateOfCharge.v.toFixed(1) }}</td>
                           <td>{{ batteryData.stateOfCharge.u }}</td>
                         </tr>
                         <tr>
                           <th scope="row">{{ $t('battery.stateOfHealth') }}</th>
-                          <td style="text-align: right">{{ formatNumber(batteryData.stateOfHealth.v) }}</td>
+                          <td style="text-align: right">{{ batteryData.stateOfHealth.v.toFixed(1) }}</td>
                           <td>{{ batteryData.stateOfHealth.u }}</td>
                         </tr>
                         <tr>
                           <th scope="row">{{ $t('battery.voltage') }}</th>
-                          <td style="text-align: right">{{ formatNumber(batteryData.voltage.v) }}</td>
+                          <td style="text-align: right">{{ batteryData.voltage.v.toFixed(1) }}</td>
                           <td>{{ batteryData.voltage.u }}</td>
                         </tr>
                         <tr>
                           <th scope="row">{{ $t('battery.current') }}</th>
-                          <td style="text-align: right">{{ Math.round(batteryData.current.v) }}</td>
+                          <td style="text-align: right">{{ batteryData.current.v.toFixed(1) }}</td>
                           <td>{{ batteryData.current.u }}</td>
                         </tr>
                         <tr>
                           <th scope="row">{{ $t('battery.temperature') }}</th>
-                          <td style="text-align: right">{{ batteryData.temperature.v }}</td>
+                          <td style="text-align: right">{{ batteryData.temperature.v.toFixed(1) }}</td>
                           <td>{{ batteryData.temperature.u }}</td>
                         </tr>
                         <tr>
                           <th scope="row">{{ $t('battery.chargeVoltage') }}</th>
-                          <td style="text-align: right">{{ batteryData.chargeVoltage.v }}</td>
+                          <td style="text-align: right">{{ batteryData.chargeVoltage.v.toFixed(1) }}</td>
                           <td>{{ batteryData.chargeVoltage.u }}</td>
                         </tr>
                         <tr>
@@ -330,7 +330,7 @@ export default defineComponent({
       };
     },
     initDataAgeing() {
-      this.dataAgeInterval = setInterval(() => {
+      this.dataAgeInterval = setInterval(()  => {
         if (this.batteryData) {
           this.batteryData.data_age++;
         }
@@ -353,12 +353,7 @@ export default defineComponent({
       this.socket.close();
       this.heartInterval && clearTimeout(this.heartInterval);
       this.isFirstFetchAfterConnect = true;
-    },
-    formatNumber(num: number) {
-      return new Intl.NumberFormat(
-        undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }
-      ).format(num);
-    },
+    }
   },
 });
 </script>
