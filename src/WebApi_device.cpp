@@ -63,6 +63,10 @@ void WebApiDeviceClass::onDeviceAdminGet(AsyncWebServerRequest* request)
     displayPinObj["cs"] = pin.display_cs;
     displayPinObj["reset"] = pin.display_reset;
 
+    JsonObject ledPinObj = curPin.createNestedObject("led");
+    ledPinObj["led0"] = pin.led[0];
+    ledPinObj["led1"] = pin.led[1];
+
     JsonObject display = root.createNestedObject("display");
     display["rotation"] = config.Display_Rotation;
     display["power_safe"] = config.Display_PowerSafe;
