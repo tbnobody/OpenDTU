@@ -730,10 +730,10 @@ bootstrap-icons-vue@^1.10.3:
   resolved "https://registry.yarnpkg.com/bootstrap-icons-vue/-/bootstrap-icons-vue-1.10.3.tgz#ae725513c9655ce86effa2a0b09e9e65b02c8f1a"
   integrity sha512-BzqmLufgHjFvSReJ1GQqNkl780UFK0rWT4Y1IQC7lZClXyOSsM5Ipw04BnuVmmrqgtSxzak83jcBwLJgCK3scg==
 
-bootstrap@^5.3.0-alpha2:
-  version "5.3.0-alpha2"
-  resolved "https://registry.yarnpkg.com/bootstrap/-/bootstrap-5.3.0-alpha2.tgz#81ac5909258dc3abb3cc08348853d121ecac619d"
-  integrity sha512-r1ayh5d56rhwrezVjhM8bt8tiUcdQ8J9JeCwCTAeKSpOrCWH5V5S6XiJ26DqbX7o5QSH5HIKm7W88CKxVjhCVQ==
+bootstrap@^5.3.0-alpha3:
+  version "5.3.0-alpha3"
+  resolved "https://registry.yarnpkg.com/bootstrap/-/bootstrap-5.3.0-alpha3.tgz#ad64d9a663c53ab7aca99c560e0bd16b5e023441"
+  integrity sha512-FBhOWMxkCFr74hesJdchLXhqagPTXS+kRNU3gE0FR5Ki/AdPSz32Ik96Z28+yBluCnE/pc9st7l1yPwKgbtfSA==
 
 brace-expansion@^1.1.7:
   version "1.1.11"
