@@ -24,6 +24,7 @@ export interface Inverter {
     serial: number;
     name: string;
     data_age: number;
+    poll_enabled: boolean;
     reachable: boolean;
     producing: boolean;
     limit_relative: number;

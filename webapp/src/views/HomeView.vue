@@ -27,9 +27,10 @@
                     <div class="card">
                         <div class="card-header d-flex justify-content-between align-items-center"
                             :class="{
-                                'text-bg-danger': !inverter.reachable,
-                                'text-bg-warning': inverter.reachable && !inverter.producing,
-                                'text-bg-primary': inverter.reachable && inverter.producing,
+                                'text-bg-tertiary': !inverter.poll_enabled,
+                                'text-bg-danger': inverter.poll_enabled && !inverter.reachable,
+                                'text-bg-warning': inverter.poll_enabled && inverter.reachable && !inverter.producing,
+                                'text-bg-primary': inverter.poll_enabled && inverter.reachable && inverter.producing,
                             }">
                             <div class="p-1 flex-grow-1">
                                 <div class="d-flex flex-wrap">

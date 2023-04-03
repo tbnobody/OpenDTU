@@ -108,6 +108,7 @@ void WebApiWsLiveClass::generateJsonResponse(JsonVariant& root)
         invObject[F("serial")] = inv->serialString();
         invObject[F("name")] = inv->name();
         invObject[F("data_age")] = (millis() - inv->Statistics()->getLastUpdate()) / 1000;
+        invObject[F("poll_enabled")] = inv->getEnablePolling();
         invObject[F("reachable")] = inv->isReachable();
         invObject[F("producing")] = inv->isProducing();
         invObject[F("limit_relative")] = inv->SystemConfigPara()->getLimitPercent();
