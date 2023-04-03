@@ -7,7 +7,7 @@ This is a fork from the Hoymiles project OpenDTU.
 This project is still under development and adds following features:
 
 * Support Victron's Ve.Direct protocol on the same chip (cable based serial interface!). Additional information about Ve.direct can be downloaded from https://www.victronenergy.com/support-and-downloads/technical-information.
-* Dynamically sets the Hoymiles power limited according to the currently used energy in the household (needs an MQTT based power meter like Shelly 3EM)
+* Dynamically sets the Hoymiles power limited according to the currently used energy in the household. Needs an HTTP JSON based power meter (e.g. Tasmota), an MQTT based power meter like Shelly 3EM or an SDM power meter.
 * Battery support: Read the voltage from Victron MPPT charge controller or from the Hoymiles DC inputs and starts/stops the power producing based on configurable voltage thresholds
 * Voltage correction that takes the voltage drop because of the current output load into account (not 100% reliable calculation)
 * Can read the current solar panel power from the Victron MPPT and adjust the limiter accordingly to not save energy in the battery (for increased system efficiency). Increases the battery lifespan and reduces energy loses.

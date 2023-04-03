@@ -175,7 +175,8 @@ int32_t PowerLimiterClass::calcPowerLimit(std::shared_ptr<InverterAbstract> inve
 
     MessageOutput.printf("[PowerLimiterClass::loop] victronChargePower: %d, efficiency: %.2f, consumeSolarPowerOnly: %s, powerConsumption: %d \r\n", 
         victronChargePower, efficency, consumeSolarPowerOnly ? "true" : "false", newPowerLimit);
-   
+
+    // Safety check: Are the power meter values not too old?
     if (millis() - PowerMeter.getLastPowerMeterUpdate() < (30 * 1000)) {
         if (config.PowerLimiter_IsInverterBehindPowerMeter) {
             // If the inverter the behind the power meter (part of measurement),
