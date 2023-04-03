@@ -1,0 +1,64 @@
+[
+    {
+        "name": "LEDs, Display",
+        "nrf24": {
+            "miso": 19,
+            "mosi": 23,
+            "clk": 18,
+            "irq": 16,
+            "en": 4,
+            "cs": 5
+        },
+        "display": {
+            "type": 3,
+            "data": 21,
+            "clk": 22
+        },
+        "led": {
+            "led0": 25,
+            "led1": 26
+        }
+    },
+    {
+        "name": "Only Display",
+        "nrf24": {
+            "miso": 19,
+            "mosi": 23,
+            "clk": 18,
+            "irq": 16,
+            "en": 4,
+            "cs": 5
+        },
+        "display": {
+            "type": 3,
+            "data": 21,
+            "clk": 22
+        }
+    },
+    {
+        "name": "Only LEDs",
+        "nrf24": {
+            "miso": 19,
+            "mosi": 23,
+            "clk": 18,
+            "irq": 16,
+            "en": 4,
+            "cs": 5
+        },
+        "led": {
+            "led0": 25,
+            "led1": 26
+        }
+    },
+    {
+        "name": "No Output",
+        "nrf24": {
+            "miso": 19,
+            "mosi": 23,
+            "clk": 18,
+            "irq": 16,
+            "en": 4,
+            "cs": 5
+        }
+    }
+]
