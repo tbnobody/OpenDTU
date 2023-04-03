@@ -5,6 +5,7 @@
 #include "Configuration.h"
 #include "Display_Graphic.h"
 #include "InverterSettings.h"
+#include "Led_Single.h"
 #include "MessageOutput.h"
 #include "MqttHandleDtu.h"
 #include "MqttHandleHass.h"
@@ -114,6 +115,11 @@ void setup()
     Display.setStartupDisplay();
     MessageOutput.println("done");
 
+    // Initialize Single LEDs
+    MessageOutput.print("Initialize LEDs... ");
+    LedSingle.init();
+    MessageOutput.println("done");
+
     // Check for default DTU serial
     MessageOutput.print("Check for default DTU serial... ");
     if (config.Dtu_Serial == DTU_SERIAL) {
@@ -149,5 +155,7 @@ void loop()
     SunPosition.loop();
     yield();
     MessageOutput.loop();
+    yield();
+    LedSingle.loop();
     yield();
 }

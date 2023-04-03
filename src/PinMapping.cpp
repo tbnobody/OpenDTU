@@ -30,6 +30,14 @@
 #define DISPLAY_RESET 255
 #endif
 
+#ifndef LED0
+#define LED0 -1
+#endif
+
+#ifndef LED1
+#define LED1 -1
+#endif
+
 PinMappingClass PinMapping;
 
 PinMappingClass::PinMappingClass()
@@ -61,6 +69,8 @@ PinMappingClass::PinMappingClass()
     _pinMapping.display_cs = DISPLAY_CS;
     _pinMapping.display_reset = DISPLAY_RESET;
 
+    _pinMapping.led[0] = LED0;
+    _pinMapping.led[1] = LED1;
 }
 
 PinMapping_t& PinMappingClass::get()
@@ -112,6 +122,9 @@ bool PinMappingClass::init(const String& deviceMapping)
             _pinMapping.display_clk = doc[i]["display"]["clk"] | DISPLAY_CLK;
             _pinMapping.display_cs = doc[i]["display"]["cs"] | DISPLAY_CS;
             _pinMapping.display_reset = doc[i]["display"]["reset"] | DISPLAY_RESET;
+
+            _pinMapping.led[0] = doc[i]["led"]["led0"] | LED0;
+            _pinMapping.led[1] = doc[i]["led"]["led1"] | LED1;
 
             return true;
         }
