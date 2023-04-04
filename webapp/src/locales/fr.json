@@ -324,9 +324,13 @@
         "Unit": "Unité"
     },
     "invertertotalinfo": {
-        "TotalYieldTotal": "Rendement total",
-        "TotalYieldDay": "Rendement du jour",
-        "TotalPower": "Puissance de l'installation"
+        "InverterTotalYieldTotal": "Onduleurs rendement total",
+        "InverterTotalYieldDay": "Onduleurs rendement du jour",
+        "InverterTotalPower": "Onduleurs puissance de l'installation",
+        "MpptTotalYieldTotal": "MPPT rendement total",
+        "MpptTotalYieldDay": "MPPT rendement du jour",
+        "MpptTotalPower": "MPPT puissance de l'installation",
+        "BatterySoc": "State of charge"
     },
     "inverterchannelproperty": {
         "Power": "Puissance",

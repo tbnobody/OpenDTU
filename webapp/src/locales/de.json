@@ -325,9 +325,13 @@
         "Unit": "Einheit"
     },
     "invertertotalinfo": {
-        "TotalYieldTotal": "Gesamtertrag Insgesamt",
-        "TotalYieldDay": "Gesamtertrag Heute",
-        "TotalPower": "Gesamtleistung"
+        "InverterTotalYieldTotal": "Inverter Gesamtertrag Insgesamt",
+        "InverterTotalYieldDay": "Inverter Gesamtertrag Heute",
+        "InverterTotalPower": "Inverter Gesamtleistung",
+        "MpptTotalYieldTotal": "MPPT Gesamtertrag Insgesamt",
+        "MpptTotalYieldDay": "MPPT Gesamtertrag Heute",
+        "MpptTotalPower": "MPPT Gesamtleistung",
+        "BatterySoc": "Ladezustand"
     },
     "inverterchannelproperty": {
         "Power": "Leistung",

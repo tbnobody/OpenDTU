@@ -48,6 +48,7 @@ export interface Hints {
 
 export interface Vedirect {
     enabled: boolean;
+    total: Total;
 }
 
 export interface Huawei {
@@ -56,6 +57,7 @@ export interface Huawei {
 
 export interface Battery {
   enabled: boolean;
+  soc: ValueObject;
 }
 
 export interface LiveData {
