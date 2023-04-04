@@ -6,6 +6,8 @@
 #include "Configuration.h"
 #include "MessageOutput.h"
 #include "WebApi.h"
+#include "Battery.h"
+#include "VeDirectFrameHandler.h"
 #include "defaults.h"
 #include <AsyncJson.h>
 
@@ -185,13 +187,17 @@ void WebApiWsLiveClass::generateJsonResponse(JsonVariant& root)
 
     JsonObject vedirectObj = root.createNestedObject("vedirect");
     vedirectObj[F("enabled")] = Configuration.get().Vedirect_Enabled;
-
+    JsonObject totalVeObj = vedirectObj.createNestedObject("total");
+    addTotalField(totalVeObj, "Power", VeDirect.veFrame.PPV, "W", 1);
+    addTotalField(totalVeObj, "YieldDay", VeDirect.veFrame.H20, "Wh", 0);
+    addTotalField(totalVeObj, "YieldTotal", VeDirect.veFrame.H19, "kWh", 2);
+    
     JsonObject huaweiObj = root.createNestedObject("huawei");
     huaweiObj[F("enabled")] = Configuration.get().Huawei_Enabled;
 
     JsonObject batteryObj = root.createNestedObject("battery");
     batteryObj[F("enabled")] = Configuration.get().Battery_Enabled;
-
+    addTotalField(batteryObj, "soc", Battery.stateOfCharge, "%", 0);
 }
 
 void WebApiWsLiveClass::addField(JsonObject& root, uint8_t idx, std::shared_ptr<InverterAbstract> inv, ChannelType_t type, ChannelNum_t channel, FieldId_t fieldId, String topic)
