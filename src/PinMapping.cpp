@@ -92,7 +92,7 @@ bool PinMappingClass::init(const String& deviceMapping)
     // Deserialize the JSON document
     DeserializationError error = deserializeJson(doc, f);
     if (error) {
-        MessageOutput.println(F("Failed to read file, using default configuration"));
+        MessageOutput.println("Failed to read file, using default configuration");
     }
 
     for (uint8_t i = 0; i < doc.size(); i++) {

@@ -34,8 +34,8 @@ void WebApiSecurityClass::onSecurityGet(AsyncWebServerRequest* request)
     JsonObject root = response->getRoot();
     const CONFIG_T& config = Configuration.get();
 
-    root[F("password")] = config.Security_Password;
-    root[F("allow_readonly")] = config.Security_AllowReadonly;
+    root["password"] = config.Security_Password;
+    root["allow_readonly"] = config.Security_AllowReadonly;
 
     response->setLength();
     request->send(response);
@@ -49,11 +49,11 @@ void WebApiSecurityClass::onSecurityPost(AsyncWebServerRequest* request)
 
     AsyncJsonResponse* response = new AsyncJsonResponse();
     JsonObject retMsg = response->getRoot();
-    retMsg[F("type")] = F("warning");
+    retMsg["type"] = "warning";
 
     if (!request->hasParam("data", true)) {
-        retMsg[F("message")] = F("No values found!");
-        retMsg[F("code")] = WebApiError::GenericNoValueFound;
+        retMsg["message"] = "No values found!";
+        retMsg["code"] = WebApiError::GenericNoValueFound;
         response->setLength();
         request->send(response);
         return;
@@ -62,8 +62,8 @@ void WebApiSecurityClass::onSecurityPost(AsyncWebServerRequest* request)
     String json = request->getParam("data", true)->value();
 
     if (json.length() > 1024) {
-        retMsg[F("message")] = F("Data too large!");
-        retMsg[F("code")] = WebApiError::GenericDataTooLarge;
+        retMsg["message"] = "Data too large!";
+        retMsg["code"] = WebApiError::GenericDataTooLarge;
         response->setLength();
         request->send(response);
         return;
@@ -73,8 +73,8 @@ void WebApiSecurityClass::onSecurityPost(AsyncWebServerRequest* request)
     DeserializationError error = deserializeJson(root, json);
 
     if (error) {
-        retMsg[F("message")] = F("Failed to parse data!");
-        retMsg[F("code")] = WebApiError::GenericParseError;
+        retMsg["message"] = "Failed to parse data!";
+        retMsg["code"] = WebApiError::GenericParseError;
         response->setLength();
         request->send(response);
         return;
@@ -82,30 +82,30 @@ void WebApiSecurityClass::onSecurityPost(AsyncWebServerRequest* request)
 
     if (!root.containsKey("password")
         && root.containsKey("allow_readonly")) {
-        retMsg[F("message")] = F("Values are missing!");
-        retMsg[F("code")] = WebApiError::GenericValueMissing;
+        retMsg["message"] = "Values are missing!";
+        retMsg["code"] = WebApiError::GenericValueMissing;
         response->setLength();
         request->send(response);
         return;
     }
 
-    if (root[F("password")].as<String>().length() < 8 || root[F("password")].as<String>().length() > WIFI_MAX_PASSWORD_STRLEN) {
-        retMsg[F("message")] = F("Password must between 8 and " STR(WIFI_MAX_PASSWORD_STRLEN) " characters long!");
-        retMsg[F("code")] = WebApiError::SecurityPasswordLength;
-        retMsg[F("param")][F("max")] = WIFI_MAX_PASSWORD_STRLEN;
+    if (root["password"].as<String>().length() < 8 || root["password"].as<String>().length() > WIFI_MAX_PASSWORD_STRLEN) {
+        retMsg["message"] = "Password must between 8 and " STR(WIFI_MAX_PASSWORD_STRLEN) " characters long!";
+        retMsg["code"] = WebApiError::SecurityPasswordLength;
+        retMsg["param"]["max"] = WIFI_MAX_PASSWORD_STRLEN;
         response->setLength();
         request->send(response);
         return;
     }
 
     CONFIG_T& config = Configuration.get();
-    strlcpy(config.Security_Password, root[F("password")].as<String>().c_str(), sizeof(config.Security_Password));
-    config.Security_AllowReadonly = root[F("allow_readonly")].as<bool>();
+    strlcpy(config.Security_Password, root["password"].as<String>().c_str(), sizeof(config.Security_Password));
+    config.Security_AllowReadonly = root["allow_readonly"].as<bool>();
     Configuration.write();
 
-    retMsg[F("type")] = F("success");
-    retMsg[F("message")] = F("Settings saved!");
-    retMsg[F("code")] = WebApiError::GenericSuccess;
+    retMsg["type"] = "success";
+    retMsg["message"] = "Settings saved!";
+    retMsg["code"] = WebApiError::GenericSuccess;
 
     response->setLength();
     request->send(response);
@@ -119,9 +119,9 @@ void WebApiSecurityClass::onAuthenticateGet(AsyncWebServerRequest* request)
 
     AsyncJsonResponse* response = new AsyncJsonResponse();
     JsonObject retMsg = response->getRoot();
-    retMsg[F("type")] = F("success");
-    retMsg[F("message")] = F("Authentication successful!");
-    retMsg[F("code")] = WebApiError::SecurityAuthSuccess;
+    retMsg["type"] = "success";
+    retMsg["message"] = "Authentication successful!";
+    retMsg["code"] = WebApiError::SecurityAuthSuccess;
 
     response->setLength();
     request->send(response);

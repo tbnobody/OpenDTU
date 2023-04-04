@@ -29,11 +29,11 @@ void WebApiMaintenanceClass::onRebootPost(AsyncWebServerRequest* request)
 
     AsyncJsonResponse* response = new AsyncJsonResponse(false, MQTT_JSON_DOC_SIZE);
     JsonObject retMsg = response->getRoot();
-    retMsg[F("type")] = F("warning");
+    retMsg["type"] = "warning";
 
     if (!request->hasParam("data", true)) {
-        retMsg[F("message")] = F("No values found!");
-        retMsg[F("code")] = WebApiError::GenericNoValueFound;
+        retMsg["message"] = "No values found!";
+        retMsg["code"] = WebApiError::GenericNoValueFound;
         response->setLength();
         request->send(response);
         return;
@@ -42,8 +42,8 @@ void WebApiMaintenanceClass::onRebootPost(AsyncWebServerRequest* request)
     String json = request->getParam("data", true)->value();
 
     if (json.length() > MQTT_JSON_DOC_SIZE) {
-        retMsg[F("message")] = F("Data too large!");
-        retMsg[F("code")] = WebApiError::GenericDataTooLarge;
+        retMsg["message"] = "Data too large!";
+        retMsg["code"] = WebApiError::GenericDataTooLarge;
         response->setLength();
         request->send(response);
         return;
@@ -53,25 +53,25 @@ void WebApiMaintenanceClass::onRebootPost(AsyncWebServerRequest* request)
     DeserializationError error = deserializeJson(root, json);
 
     if (error) {
-        retMsg[F("message")] = F("Failed to parse data!");
-        retMsg[F("code")] = WebApiError::GenericParseError;
+        retMsg["message"] = "Failed to parse data!";
+        retMsg["code"] = WebApiError::GenericParseError;
         response->setLength();
         request->send(response);
         return;
     }
 
     if (!(root.containsKey("reboot"))) {
-        retMsg[F("message")] = F("Values are missing!");
-        retMsg[F("code")] = WebApiError::GenericValueMissing;
+        retMsg["message"] = "Values are missing!";
+        retMsg["code"] = WebApiError::GenericValueMissing;
         response->setLength();
         request->send(response);
         return;
     }
 
-    if (root[F("reboot")].as<bool>()) {
-        retMsg[F("type")] = F("success");
-        retMsg[F("message")] = F("Reboot triggered!");
-        retMsg[F("code")] = WebApiError::MaintenanceRebootTriggered;
+    if (root["reboot"].as<bool>()) {
+        retMsg["type"] = "success";
+        retMsg["message"] = "Reboot triggered!";
+        retMsg["code"] = WebApiError::MaintenanceRebootTriggered;
 
         response->setLength();
         request->send(response);
@@ -80,8 +80,8 @@ void WebApiMaintenanceClass::onRebootPost(AsyncWebServerRequest* request)
         yield();
         ESP.restart();
     } else {
-        retMsg[F("message")] = F("Reboot cancled!");
-        retMsg[F("code")] = WebApiError::MaintenanceRebootCancled;
+        retMsg["message"] = "Reboot cancled!";
+        retMsg["code"] = WebApiError::MaintenanceRebootCancled;
 
         response->setLength();
         request->send(response);

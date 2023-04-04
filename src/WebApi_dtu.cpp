@@ -38,9 +38,9 @@ void WebApiDtuClass::onDtuAdminGet(AsyncWebServerRequest* request)
     snprintf(buffer, sizeof(buffer), "%0x%08x",
         ((uint32_t)((config.Dtu_Serial >> 32) & 0xFFFFFFFF)),
         ((uint32_t)(config.Dtu_Serial & 0xFFFFFFFF)));
-    root[F("dtu_serial")] = buffer;
-    root[F("dtu_pollinterval")] = config.Dtu_PollInterval;
-    root[F("dtu_palevel")] = config.Dtu_PaLevel;
+    root["dtu_serial"] = buffer;
+    root["dtu_pollinterval"] = config.Dtu_PollInterval;
+    root["dtu_palevel"] = config.Dtu_PaLevel;
 
     response->setLength();
     request->send(response);
@@ -54,11 +54,11 @@ void WebApiDtuClass::onDtuAdminPost(AsyncWebServerRequest* request)
 
     AsyncJsonResponse* response = new AsyncJsonResponse();
     JsonObject retMsg = response->getRoot();
-    retMsg[F("type")] = F("warning");
+    retMsg["type"] = "warning";
 
     if (!request->hasParam("data", true)) {
-        retMsg[F("message")] = F("No values found!");
-        retMsg[F("code")] = WebApiError::GenericNoValueFound;
+        retMsg["message"] = "No values found!";
+        retMsg["code"] = WebApiError::GenericNoValueFound;
         response->setLength();
         request->send(response);
         return;
@@ -67,8 +67,8 @@ void WebApiDtuClass::onDtuAdminPost(AsyncWebServerRequest* request)
     String json = request->getParam("data", true)->value();
 
     if (json.length() > 1024) {
-        retMsg[F("message")] = F("Data too large!");
-        retMsg[F("code")] = WebApiError::GenericDataTooLarge;
+        retMsg["message"] = "Data too large!";
+        retMsg["code"] = WebApiError::GenericDataTooLarge;
         response->setLength();
         request->send(response);
         return;
@@ -78,40 +78,40 @@ void WebApiDtuClass::onDtuAdminPost(AsyncWebServerRequest* request)
     DeserializationError error = deserializeJson(root, json);
 
     if (error) {
-        retMsg[F("message")] = F("Failed to parse data!");
-        retMsg[F("code")] = WebApiError::GenericParseError;
+        retMsg["message"] = "Failed to parse data!";
+        retMsg["code"] = WebApiError::GenericParseError;
         response->setLength();
         request->send(response);
         return;
     }
 
     if (!(root.containsKey("dtu_serial") && root.containsKey("dtu_pollinterval") && root.containsKey("dtu_palevel"))) {
-        retMsg[F("message")] = F("Values are missing!");
-        retMsg[F("code")] = WebApiError::GenericValueMissing;
+        retMsg["message"] = "Values are missing!";
+        retMsg["code"] = WebApiError::GenericValueMissing;
         response->setLength();
         request->send(response);
         return;
     }
 
-    if (root[F("dtu_serial")].as<uint64_t>() == 0) {
-        retMsg[F("message")] = F("Serial cannot be zero!");
-        retMsg[F("code")] = WebApiError::DtuSerialZero;
+    if (root["dtu_serial"].as<uint64_t>() == 0) {
+        retMsg["message"] = "Serial cannot be zero!";
+        retMsg["code"] = WebApiError::DtuSerialZero;
         response->setLength();
         request->send(response);
         return;
     }
 
-    if (root[F("dtu_pollinterval")].as<uint32_t>() == 0) {
-        retMsg[F("message")] = F("Poll interval must be greater zero!");
-        retMsg[F("code")] = WebApiError::DtuPollZero;
+    if (root["dtu_pollinterval"].as<uint32_t>() == 0) {
+        retMsg["message"] = "Poll interval must be greater zero!";
+        retMsg["code"] = WebApiError::DtuPollZero;
         response->setLength();
         request->send(response);
         return;
     }
 
-    if (root[F("dtu_palevel")].as<uint8_t>() > 3) {
-        retMsg[F("message")] = F("Invalid power level setting!");
-        retMsg[F("code")] = WebApiError::DtuInvalidPowerLevel;
+    if (root["dtu_palevel"].as<uint8_t>() > 3) {
+        retMsg["message"] = "Invalid power level setting!";
+        retMsg["code"] = WebApiError::DtuInvalidPowerLevel;
         response->setLength();
         request->send(response);
         return;
@@ -120,14 +120,14 @@ void WebApiDtuClass::onDtuAdminPost(AsyncWebServerRequest* request)
     CONFIG_T& config = Configuration.get();
 
     // Interpret the string as a hex value and convert it to uint64_t
-    config.Dtu_Serial = strtoll(root[F("dtu_serial")].as<String>().c_str(), NULL, 16);
-    config.Dtu_PollInterval = root[F("dtu_pollinterval")].as<uint32_t>();
-    config.Dtu_PaLevel = root[F("dtu_palevel")].as<uint8_t>();
+    config.Dtu_Serial = strtoll(root["dtu_serial"].as<String>().c_str(), NULL, 16);
+    config.Dtu_PollInterval = root["dtu_pollinterval"].as<uint32_t>();
+    config.Dtu_PaLevel = root["dtu_palevel"].as<uint8_t>();
     Configuration.write();
 
-    retMsg[F("type")] = F("success");
-    retMsg[F("message")] = F("Settings saved!");
-    retMsg[F("code")] = WebApiError::GenericSuccess;
+    retMsg["type"] = "success";
+    retMsg["message"] = "Settings saved!";
+    retMsg["code"] = WebApiError::GenericSuccess;
 
     response->setLength();
     request->send(response);
