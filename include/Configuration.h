@@ -29,6 +29,13 @@
 
 #define DEV_MAX_MAPPING_NAME_STRLEN 63
 
+#define POWERMETER_MAX_PHASES 3
+#define POWERMETER_MAX_HTTP_URL_STRLEN 1024
+#define POWERMETER_MAX_HTTP_HEADER_KEY_STRLEN 64
+#define POWERMETER_MAX_HTTP_HEADER_VALUE_STRLEN 256
+#define POWERMETER_MAX_HTTP_JSON_PATH_STRLEN 256
+#define POWERMETER_HTTP_TIMEOUT 1000
+
 #define JSON_BUFFER_SIZE 12288
 
 struct CHANNEL_CONFIG_T {
@@ -45,6 +52,15 @@ struct INVERTER_CONFIG_T {
     bool Command_Enable;
     bool Command_Enable_Night;
     CHANNEL_CONFIG_T channel[INV_MAX_CHAN_COUNT];
+};
+
+struct POWERMETER_HTTP_PHASE_CONFIG_T {
+    bool Enabled;
+    char Url[POWERMETER_MAX_HTTP_URL_STRLEN + 1];
+    char HeaderKey[POWERMETER_MAX_HTTP_HEADER_KEY_STRLEN + 1];
+    char HeaderValue[POWERMETER_MAX_HTTP_HEADER_VALUE_STRLEN + 1];
+    uint16_t Timeout;
+    char JsonPath[POWERMETER_MAX_HTTP_JSON_PATH_STRLEN + 1];
 };
 
 struct CONFIG_T {
@@ -107,7 +123,9 @@ struct CONFIG_T {
     char PowerMeter_MqttTopicPowerMeter3[MQTT_MAX_TOPIC_STRLEN + 1];
     uint32_t PowerMeter_SdmBaudrate;
     uint32_t PowerMeter_SdmAddress;
-
+    uint32_t PowerMeter_HttpInterval;
+    bool PowerMeter_HttpIndividualRequests;
+    POWERMETER_HTTP_PHASE_CONFIG_T Powermeter_Http_Phase[POWERMETER_MAX_PHASES];
 
     bool PowerLimiter_Enabled;
     bool PowerLimiter_SolarPassTroughEnabled;

@@ -1,3 +1,13 @@
+export interface PowerMeterHttpPhaseConfig {
+    index: number;
+    enabled: boolean;
+    url: string;
+    header_key: string;
+    header_value: string;
+    json_path: string;
+    timeout: number;
+};
+
 export interface PowerMeterConfig {
     enabled: boolean;
     source: number;
@@ -7,4 +17,6 @@ export interface PowerMeterConfig {
     mqtt_topic_powermeter_3: string;
     sdmbaudrate: number;
     sdmaddress: number;
+    http_individual_requests: boolean;
+    http_phases: Array<PowerMeterHttpPhaseConfig>;
 }
