@@ -16,7 +16,7 @@ typedef enum {
 
 typedef enum {
     EMPTY_WHEN_FULL= 0, 
-    EMPTY_AT_NIGTH
+    EMPTY_AT_NIGHT
 } batDrainStrategy;
    
 
