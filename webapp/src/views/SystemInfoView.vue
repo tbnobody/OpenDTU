@@ -50,8 +50,9 @@ export default defineComponent({
                 })
         },
         getUpdateInfo() {
+            this.systemDataList.git_hash = this.systemDataList.git_hash?.substring(0, 1) == 'g' ? this.systemDataList.git_hash?.substring(1) : this.systemDataList.git_hash;
             const fetchUrl = "https://api.github.com/repos/tbnobody/OpenDTU/compare/"
-                + this.systemDataList.git_hash?.substring(1) + "...HEAD";
+                + this.systemDataList.git_hash + "...HEAD";
 
             fetch(fetchUrl)
                 .then((response) => {
