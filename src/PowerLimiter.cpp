@@ -226,13 +226,16 @@ void PowerLimiterClass::setNewPowerLimit(std::shared_ptr<InverterAbstract> inver
 
         std::list<ChannelNum_t> dcChnls = inverter->Statistics()->getChannelsByType(TYPE_DC);
         int dcProdChnls = 0, dcTotalChnls = dcChnls.size();
-        for (auto& c : dcChnls){
-            if (inverter->Statistics()->getChannelFieldValue(TYPE_DC, c, FLD_PDC) > 0)
+        for (auto& c : dcChnls) {
+            if (inverter->Statistics()->getChannelFieldValue(TYPE_DC, c, FLD_PDC) > 0) {
                 dcProdChnls++;
+            }
         }
         int32_t effPowerLimit = round(newPowerLimit * static_cast<float>(dcTotalChnls) / dcProdChnls);
-        if (effPowerLimit > config.PowerLimiter_UpperPowerLimit)
-            effPowerLimit = config.PowerLimiter_UpperPowerLimit;
+        uint16_t inverterMaxPower = inverter->DevInfo()->getMaxPower();
+        if (effPowerLimit > inverterMaxPower) {
+            effPowerLimit = inverterMaxPower;
+        }
 
         inverter->sendActivePowerControlRequest(Hoymiles.getRadio(), effPowerLimit, PowerLimitControlType::AbsolutNonPersistent);
         _lastRequestedPowerLimit = newPowerLimit;
