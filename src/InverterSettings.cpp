@@ -21,27 +21,27 @@ void InverterSettingsClass::init()
     const PinMapping_t& pin = PinMapping.get();
 
     // Initialize inverter communication
-    MessageOutput.print(F("Initialize Hoymiles interface... "));
+    MessageOutput.print("Initialize Hoymiles interface... ");
     if (PinMapping.isValidNrf24Config()) {
         SPIClass* spiClass = new SPIClass(VSPI);
         spiClass->begin(pin.nrf24_clk, pin.nrf24_miso, pin.nrf24_mosi, pin.nrf24_cs);
         Hoymiles.setMessageOutput(&MessageOutput);
         Hoymiles.init(spiClass, pin.nrf24_en, pin.nrf24_irq);
 
-        MessageOutput.println(F("  Setting radio PA level... "));
+        MessageOutput.println("  Setting radio PA level... ");
         Hoymiles.getRadio()->setPALevel((rf24_pa_dbm_e)config.Dtu_PaLevel);
 
-        MessageOutput.println(F("  Setting DTU serial... "));
+        MessageOutput.println("  Setting DTU serial... ");
         Hoymiles.getRadio()->setDtuSerial(config.Dtu_Serial);
 
-        MessageOutput.println(F("  Setting poll interval... "));
+        MessageOutput.println("  Setting poll interval... ");
         Hoymiles.setPollInterval(config.Dtu_PollInterval);
 
         for (uint8_t i = 0; i < INV_MAX_COUNT; i++) {
             if (config.Inverter[i].Serial > 0) {
-                MessageOutput.print(F("  Adding inverter: "));
+                MessageOutput.print("  Adding inverter: ");
                 MessageOutput.print(config.Inverter[i].Serial, HEX);
-                MessageOutput.print(F(" - "));
+                MessageOutput.print(" - ");
                 MessageOutput.print(config.Inverter[i].Name);
                 auto inv = Hoymiles.addInverter(
                     config.Inverter[i].Name,
@@ -53,12 +53,12 @@ void InverterSettingsClass::init()
                         inv->Statistics()->setChannelFieldOffset(TYPE_DC, static_cast<ChannelNum_t>(c), FLD_YT, config.Inverter[i].channel[c].YieldTotalOffset);
                     }
                 }
-                MessageOutput.println(F(" done"));
+                MessageOutput.println(" done");
             }
         }
-        MessageOutput.println(F("done"));
+        MessageOutput.println("done");
     } else {
-        MessageOutput.println(F("Invalid pin config"));
+        MessageOutput.println("Invalid pin config");
     }
 }
 

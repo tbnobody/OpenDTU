@@ -14,11 +14,11 @@ void MqttSettingsClass::NetworkEvent(network_event event)
 {
     switch (event) {
     case network_event::NETWORK_GOT_IP:
-        MessageOutput.println(F("Network connected"));
+        MessageOutput.println("Network connected");
         performConnect();
         break;
     case network_event::NETWORK_DISCONNECTED:
-        MessageOutput.println(F("Network lost connection"));
+        MessageOutput.println("Network lost connection");
         mqttReconnectTimer.detach(); // ensure we don't reconnect to MQTT while reconnecting to Wi-Fi
         break;
     default:
@@ -28,7 +28,7 @@ void MqttSettingsClass::NetworkEvent(network_event event)
 
 void MqttSettingsClass::onMqttConnect(bool sessionPresent)
 {
-    MessageOutput.println(F("Connected to MQTT."));
+    MessageOutput.println("Connected to MQTT.");
     const CONFIG_T& config = Configuration.get();
     publish(config.Mqtt_LwtTopic, config.Mqtt_LwtValue_Online);
 
@@ -51,30 +51,30 @@ void MqttSettingsClass::unsubscribe(const String& topic)
 
 void MqttSettingsClass::onMqttDisconnect(espMqttClientTypes::DisconnectReason reason)
 {
-    MessageOutput.println(F("Disconnected from MQTT."));
+    MessageOutput.println("Disconnected from MQTT.");
 
-    MessageOutput.print(F("Disconnect reason:"));
+    MessageOutput.print("Disconnect reason:");
     switch (reason) {
     case espMqttClientTypes::DisconnectReason::TCP_DISCONNECTED:
-        MessageOutput.println(F("TCP_DISCONNECTED"));
+        MessageOutput.println("TCP_DISCONNECTED");
         break;
     case espMqttClientTypes::DisconnectReason::MQTT_UNACCEPTABLE_PROTOCOL_VERSION:
-        MessageOutput.println(F("MQTT_UNACCEPTABLE_PROTOCOL_VERSION"));
+        MessageOutput.println("MQTT_UNACCEPTABLE_PROTOCOL_VERSION");
         break;
     case espMqttClientTypes::DisconnectReason::MQTT_IDENTIFIER_REJECTED:
-        MessageOutput.println(F("MQTT_IDENTIFIER_REJECTED"));
+        MessageOutput.println("MQTT_IDENTIFIER_REJECTED");
         break;
     case espMqttClientTypes::DisconnectReason::MQTT_SERVER_UNAVAILABLE:
-        MessageOutput.println(F("MQTT_SERVER_UNAVAILABLE"));
+        MessageOutput.println("MQTT_SERVER_UNAVAILABLE");
         break;
     case espMqttClientTypes::DisconnectReason::MQTT_MALFORMED_CREDENTIALS:
-        MessageOutput.println(F("MQTT_MALFORMED_CREDENTIALS"));
+        MessageOutput.println("MQTT_MALFORMED_CREDENTIALS");
         break;
     case espMqttClientTypes::DisconnectReason::MQTT_NOT_AUTHORIZED:
-        MessageOutput.println(F("MQTT_NOT_AUTHORIZED"));
+        MessageOutput.println("MQTT_NOT_AUTHORIZED");
         break;
     default:
-        MessageOutput.println(F("Unknown"));
+        MessageOutput.println("Unknown");
     }
     mqttReconnectTimer.once(
         2, +[](MqttSettingsClass* instance) { instance->performConnect(); }, this);
@@ -82,7 +82,7 @@ void MqttSettingsClass::onMqttDisconnect(espMqttClientTypes::DisconnectReason re
 
 void MqttSettingsClass::onMqttMessage(const espMqttClientTypes::MessageProperties& properties, const char* topic, const uint8_t* payload, size_t len, size_t index, size_t total)
 {
-    MessageOutput.print(F("Received MQTT message on topic: "));
+    MessageOutput.print("Received MQTT message on topic: ");
     MessageOutput.println(topic);
 
     _mqttSubscribeParser.handle_message(properties, topic, payload, len, index, total);
@@ -97,7 +97,7 @@ void MqttSettingsClass::performConnect()
         using std::placeholders::_4;
         using std::placeholders::_5;
         using std::placeholders::_6;
-        MessageOutput.println(F("Connecting to MQTT..."));
+        MessageOutput.println("Connecting to MQTT...");
         const CONFIG_T& config = Configuration.get();
         willTopic = getPrefix() + config.Mqtt_LwtTopic;
         clientId = NetworkSettings.getApName();

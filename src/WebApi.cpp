@@ -73,7 +73,7 @@ bool WebApiClass::checkCredentials(AsyncWebServerRequest* request)
 
     // WebAPI should set the X-Requested-With to prevent browser internal auth dialogs
     if (!request->hasHeader("X-Requested-With")) {
-        r->addHeader(F("WWW-Authenticate"), F("Basic realm=\"Login Required\""));
+        r->addHeader("WWW-Authenticate", "Basic realm=\"Login Required\"");
     }
     request->send(r);
 

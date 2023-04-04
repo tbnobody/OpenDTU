@@ -25,9 +25,9 @@ void HoymilesRadio::init(SPIClass* initialisedSpiBus, uint8_t pinCE, uint8_t pin
     _radio->setRetries(0, 0);
     _radio->maskIRQ(true, true, false); // enable only receiving interrupts
     if (_radio->isChipConnected()) {
-        Hoymiles.getMessageOutput()->println(F("Connection successful"));
+        Hoymiles.getMessageOutput()->println("Connection successful");
     } else {
-        Hoymiles.getMessageOutput()->println(F("Connection error!!"));
+        Hoymiles.getMessageOutput()->println("Connection error!!");
     }
 
     attachInterrupt(digitalPinToInterrupt(pinIRQ), std::bind(&HoymilesRadio::handleIntr, this), FALLING);
@@ -44,7 +44,7 @@ void HoymilesRadio::loop()
     }
 
     if (_packetReceived) {
-        Hoymiles.getMessageOutput()->println(F("Interrupt received"));
+        Hoymiles.getMessageOutput()->println("Interrupt received");
         while (_radio->available()) {
             if (!(_rxBuffer.size() > FRAGMENT_BUFFER_SIZE)) {
                 fragment_t f;
@@ -56,7 +56,7 @@ void HoymilesRadio::loop()
                 _radio->read(f.fragment, f.len);
                 _rxBuffer.push(f);
             } else {
-                Hoymiles.getMessageOutput()->println(F("Buffer full"));
+                Hoymiles.getMessageOutput()->println("Buffer full");
                 _radio->flush_rx();
             }
         }
@@ -76,11 +76,11 @@ void HoymilesRadio::loop()
                     dumpBuf(buf, f.fragment, f.len);
                     inv->addRxFragment(f.fragment, f.len);
                 } else {
-                    Hoymiles.getMessageOutput()->println(F("Inverter Not found!"));
+                    Hoymiles.getMessageOutput()->println("Inverter Not found!");
                 }
 
             } else {
-                Hoymiles.getMessageOutput()->println(F("Frame kaputt"));
+                Hoymiles.getMessageOutput()->println("Frame kaputt");
             }
 
             // Remove paket from buffer even it was corrupted
@@ -89,46 +89,46 @@ void HoymilesRadio::loop()
     }
 
     if (_busyFlag && _rxTimeout.occured()) {
-        Hoymiles.getMessageOutput()->println(F("RX Period End"));
+        Hoymiles.getMessageOutput()->println("RX Period End");
         std::shared_ptr<InverterAbstract> inv = Hoymiles.getInverterBySerial(_commandQueue.front().get()->getTargetAddress());
 
         if (nullptr != inv) {
             CommandAbstract* cmd = _commandQueue.front().get();
             uint8_t verifyResult = inv->verifyAllFragments(cmd);
             if (verifyResult == FRAGMENT_ALL_MISSING_RESEND) {
-                Hoymiles.getMessageOutput()->println(F("Nothing received, resend whole request"));
+                Hoymiles.getMessageOutput()->println("Nothing received, resend whole request");
                 sendLastPacketAgain();
 
             } else if (verifyResult == FRAGMENT_ALL_MISSING_TIMEOUT) {
-                Hoymiles.getMessageOutput()->println(F("Nothing received, resend count exeeded"));
+                Hoymiles.getMessageOutput()->println("Nothing received, resend count exeeded");
                 _commandQueue.pop();
                 _busyFlag = false;
 
             } else if (verifyResult == FRAGMENT_RETRANSMIT_TIMEOUT) {
-                Hoymiles.getMessageOutput()->println(F("Retransmit timeout"));
+                Hoymiles.getMessageOutput()->println("Retransmit timeout");
                 _commandQueue.pop();
                 _busyFlag = false;
 
             } else if (verifyResult == FRAGMENT_HANDLE_ERROR) {
-                Hoymiles.getMessageOutput()->println(F("Packet handling error"));
+                Hoymiles.getMessageOutput()->println("Packet handling error");
                 _commandQueue.pop();
                 _busyFlag = false;
 
             } else if (verifyResult > 0) {
                 // Perform Retransmit
-                Hoymiles.getMessageOutput()->print(F("Request retransmit: "));
+                Hoymiles.getMessageOutput()->print("Request retransmit: ");
                 Hoymiles.getMessageOutput()->println(verifyResult);
                 sendRetransmitPacket(verifyResult);
 
             } else {
                 // Successful received all packages
-                Hoymiles.getMessageOutput()->println(F("Success"));
+                Hoymiles.getMessageOutput()->println("Success");
                 _commandQueue.pop();
                 _busyFlag = false;
             }
         } else {
             // If inverter was not found, assume the command is invalid
-            Hoymiles.getMessageOutput()->println(F("RX: Invalid inverter found"));
+            Hoymiles.getMessageOutput()->println("RX: Invalid inverter found");
             _commandQueue.pop();
             _busyFlag = false;
         }
@@ -142,7 +142,7 @@ void HoymilesRadio::loop()
                 inv->clearRxFragmentBuffer();
                 sendEsbPacket(cmd);
             } else {
-                Hoymiles.getMessageOutput()->println(F("TX: Invalid inverter found"));
+                Hoymiles.getMessageOutput()->println("TX: Invalid inverter found");
                 _commandQueue.pop();
             }
         }
@@ -252,11 +252,11 @@ void HoymilesRadio::sendEsbPacket(CommandAbstract* cmd)
     openWritingPipe(s);
     _radio->setRetries(3, 15);
 
-    Hoymiles.getMessageOutput()->print(F("TX "));
+    Hoymiles.getMessageOutput()->print("TX ");
     Hoymiles.getMessageOutput()->print(cmd->getCommandName());
-    Hoymiles.getMessageOutput()->print(F(" Channel: "));
+    Hoymiles.getMessageOutput()->print(" Channel: ");
     Hoymiles.getMessageOutput()->print(_radio->getChannel());
-    Hoymiles.getMessageOutput()->print(F(" --> "));
+    Hoymiles.getMessageOutput()->print(" --> ");
     cmd->dumpDataPayload(Hoymiles.getMessageOutput());
     _radio->write(cmd->getDataPayload(), cmd->getDataSize());
 
@@ -294,5 +294,5 @@ void HoymilesRadio::dumpBuf(const char* info, uint8_t buf[], uint8_t len)
     for (uint8_t i = 0; i < len; i++) {
         Hoymiles.getMessageOutput()->printf("%02X ", buf[i]);
     }
-    Hoymiles.getMessageOutput()->println(F(""));
+    Hoymiles.getMessageOutput()->println("");
 }

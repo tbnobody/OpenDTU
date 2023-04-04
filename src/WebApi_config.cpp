@@ -59,11 +59,11 @@ void WebApiConfigClass::onConfigDelete(AsyncWebServerRequest* request)
 
     AsyncJsonResponse* response = new AsyncJsonResponse();
     JsonObject retMsg = response->getRoot();
-    retMsg[F("type")] = F("warning");
+    retMsg["type"] = "warning";
 
     if (!request->hasParam("data", true)) {
-        retMsg[F("message")] = F("No values found!");
-        retMsg[F("code")] = WebApiError::GenericNoValueFound;
+        retMsg["message"] = "No values found!";
+        retMsg["code"] = WebApiError::GenericNoValueFound;
         response->setLength();
         request->send(response);
         return;
@@ -72,8 +72,8 @@ void WebApiConfigClass::onConfigDelete(AsyncWebServerRequest* request)
     String json = request->getParam("data", true)->value();
 
     if (json.length() > 1024) {
-        retMsg[F("message")] = F("Data too large!");
-        retMsg[F("code")] = WebApiError::GenericDataTooLarge;
+        retMsg["message"] = "Data too large!";
+        retMsg["code"] = WebApiError::GenericDataTooLarge;
         response->setLength();
         request->send(response);
         return;
@@ -83,32 +83,32 @@ void WebApiConfigClass::onConfigDelete(AsyncWebServerRequest* request)
     DeserializationError error = deserializeJson(root, json);
 
     if (error) {
-        retMsg[F("message")] = F("Failed to parse data!");
-        retMsg[F("code")] = WebApiError::GenericDataTooLarge;
+        retMsg["message"] = "Failed to parse data!";
+        retMsg["code"] = WebApiError::GenericDataTooLarge;
         response->setLength();
         request->send(response);
         return;
     }
 
     if (!(root.containsKey("delete"))) {
-        retMsg[F("message")] = F("Values are missing!");
-        retMsg[F("code")] = WebApiError::GenericValueMissing;
+        retMsg["message"] = "Values are missing!";
+        retMsg["code"] = WebApiError::GenericValueMissing;
         response->setLength();
         request->send(response);
         return;
     }
 
-    if (root[F("delete")].as<bool>() == false) {
-        retMsg[F("message")] = F("Not deleted anything!");
-        retMsg[F("code")] = WebApiError::ConfigNotDeleted;
+    if (root["delete"].as<bool>() == false) {
+        retMsg["message"] = "Not deleted anything!";
+        retMsg["code"] = WebApiError::ConfigNotDeleted;
         response->setLength();
         request->send(response);
         return;
     }
 
-    retMsg[F("type")] = F("success");
-    retMsg[F("message")] = F("Configuration resettet. Rebooting now...");
-    retMsg[F("code")] = WebApiError::ConfigSuccess;
+    retMsg["type"] = "success";
+    retMsg["message"] = "Configuration resettet. Rebooting now...";
+    retMsg["code"] = WebApiError::ConfigSuccess;
 
     response->setLength();
     request->send(response);
@@ -125,7 +125,7 @@ void WebApiConfigClass::onConfigListGet(AsyncWebServerRequest* request)
 
     AsyncJsonResponse* response = new AsyncJsonResponse();
     JsonObject root = response->getRoot();
-    JsonArray data = root.createNestedArray(F("configs"));
+    JsonArray data = root.createNestedArray("configs");
 
     File rootfs = LittleFS.open("/");
     File file = rootfs.openNextFile();

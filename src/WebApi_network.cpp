@@ -34,22 +34,22 @@ void WebApiNetworkClass::onNetworkStatus(AsyncWebServerRequest* request)
     AsyncJsonResponse* response = new AsyncJsonResponse();
     JsonObject root = response->getRoot();
 
-    root[F("sta_status")] = ((WiFi.getMode() & WIFI_STA) != 0);
-    root[F("sta_ssid")] = WiFi.SSID();
-    root[F("sta_rssi")] = WiFi.RSSI();
-    root[F("network_hostname")] = NetworkSettings.getHostname();
-    root[F("network_ip")] = NetworkSettings.localIP().toString();
-    root[F("network_netmask")] = NetworkSettings.subnetMask().toString();
-    root[F("network_gateway")] = NetworkSettings.gatewayIP().toString();
-    root[F("network_dns1")] = NetworkSettings.dnsIP(0).toString();
-    root[F("network_dns2")] = NetworkSettings.dnsIP(1).toString();
-    root[F("network_mac")] = NetworkSettings.macAddress();
-    root[F("network_mode")] = NetworkSettings.NetworkMode() == network_mode::WiFi ? F("Station") : F("Ethernet");
-    root[F("ap_status")] = ((WiFi.getMode() & WIFI_AP) != 0);
-    root[F("ap_ssid")] = NetworkSettings.getApName();
-    root[F("ap_ip")] = WiFi.softAPIP().toString();
-    root[F("ap_mac")] = WiFi.softAPmacAddress();
-    root[F("ap_stationnum")] = WiFi.softAPgetStationNum();
+    root["sta_status"] = ((WiFi.getMode() & WIFI_STA) != 0);
+    root["sta_ssid"] = WiFi.SSID();
+    root["sta_rssi"] = WiFi.RSSI();
+    root["network_hostname"] = NetworkSettings.getHostname();
+    root["network_ip"] = NetworkSettings.localIP().toString();
+    root["network_netmask"] = NetworkSettings.subnetMask().toString();
+    root["network_gateway"] = NetworkSettings.gatewayIP().toString();
+    root["network_dns1"] = NetworkSettings.dnsIP(0).toString();
+    root["network_dns2"] = NetworkSettings.dnsIP(1).toString();
+    root["network_mac"] = NetworkSettings.macAddress();
+    root["network_mode"] = NetworkSettings.NetworkMode() == network_mode::WiFi ? "Station" : "Ethernet";
+    root["ap_status"] = ((WiFi.getMode() & WIFI_AP) != 0);
+    root["ap_ssid"] = NetworkSettings.getApName();
+    root["ap_ip"] = WiFi.softAPIP().toString();
+    root["ap_mac"] = WiFi.softAPmacAddress();
+    root["ap_stationnum"] = WiFi.softAPgetStationNum();
 
     response->setLength();
     request->send(response);
@@ -65,15 +65,15 @@ void WebApiNetworkClass::onNetworkAdminGet(AsyncWebServerRequest* request)
     JsonObject root = response->getRoot();
     const CONFIG_T& config = Configuration.get();
 
-    root[F("hostname")] = config.WiFi_Hostname;
-    root[F("dhcp")] = config.WiFi_Dhcp;
-    root[F("ipaddress")] = IPAddress(config.WiFi_Ip).toString();
-    root[F("netmask")] = IPAddress(config.WiFi_Netmask).toString();
-    root[F("gateway")] = IPAddress(config.WiFi_Gateway).toString();
-    root[F("dns1")] = IPAddress(config.WiFi_Dns1).toString();
-    root[F("dns2")] = IPAddress(config.WiFi_Dns2).toString();
-    root[F("ssid")] = config.WiFi_Ssid;
-    root[F("password")] = config.WiFi_Password;
+    root["hostname"] = config.WiFi_Hostname;
+    root["dhcp"] = config.WiFi_Dhcp;
+    root["ipaddress"] = IPAddress(config.WiFi_Ip).toString();
+    root["netmask"] = IPAddress(config.WiFi_Netmask).toString();
+    root["gateway"] = IPAddress(config.WiFi_Gateway).toString();
+    root["dns1"] = IPAddress(config.WiFi_Dns1).toString();
+    root["dns2"] = IPAddress(config.WiFi_Dns2).toString();
+    root["ssid"] = config.WiFi_Ssid;
+    root["password"] = config.WiFi_Password;
 
     response->setLength();
     request->send(response);
@@ -87,11 +87,11 @@ void WebApiNetworkClass::onNetworkAdminPost(AsyncWebServerRequest* request)
 
     AsyncJsonResponse* response = new AsyncJsonResponse();
     JsonObject retMsg = response->getRoot();
-    retMsg[F("type")] = F("warning");
+    retMsg["type"] = "warning";
 
     if (!request->hasParam("data", true)) {
-        retMsg[F("message")] = F("No values found!");
-        retMsg[F("code")] = WebApiError::GenericNoValueFound;
+        retMsg["message"] = "No values found!";
+        retMsg["code"] = WebApiError::GenericNoValueFound;
         response->setLength();
         request->send(response);
         return;
@@ -100,8 +100,8 @@ void WebApiNetworkClass::onNetworkAdminPost(AsyncWebServerRequest* request)
     String json = request->getParam("data", true)->value();
 
     if (json.length() > 1024) {
-        retMsg[F("message")] = F("Data too large!");
-        retMsg[F("code")] = WebApiError::GenericDataTooLarge;
+        retMsg["message"] = "Data too large!";
+        retMsg["code"] = WebApiError::GenericDataTooLarge;
         response->setLength();
         request->send(response);
         return;
@@ -111,78 +111,78 @@ void WebApiNetworkClass::onNetworkAdminPost(AsyncWebServerRequest* request)
     DeserializationError error = deserializeJson(root, json);
 
     if (error) {
-        retMsg[F("message")] = F("Failed to parse data!");
-        retMsg[F("code")] = WebApiError::GenericParseError;
+        retMsg["message"] = "Failed to parse data!";
+        retMsg["code"] = WebApiError::GenericParseError;
         response->setLength();
         request->send(response);
         return;
     }
 
     if (!(root.containsKey("ssid") && root.containsKey("password") && root.containsKey("hostname") && root.containsKey("dhcp") && root.containsKey("ipaddress") && root.containsKey("netmask") && root.containsKey("gateway") && root.containsKey("dns1") && root.containsKey("dns2"))) {
-        retMsg[F("message")] = F("Values are missing!");
-        retMsg[F("code")] = WebApiError::GenericValueMissing;
+        retMsg["message"] = "Values are missing!";
+        retMsg["code"] = WebApiError::GenericValueMissing;
         response->setLength();
         request->send(response);
         return;
     }
 
     IPAddress ipaddress;
-    if (!ipaddress.fromString(root[F("ipaddress")].as<String>())) {
-        retMsg[F("message")] = F("IP address is invalid!");
-        retMsg[F("code")] = WebApiError::NetworkIpInvalid;
+    if (!ipaddress.fromString(root["ipaddress"].as<String>())) {
+        retMsg["message"] = "IP address is invalid!";
+        retMsg["code"] = WebApiError::NetworkIpInvalid;
         response->setLength();
         request->send(response);
         return;
     }
     IPAddress netmask;
-    if (!netmask.fromString(root[F("netmask")].as<String>())) {
-        retMsg[F("message")] = F("Netmask is invalid!");
-        retMsg[F("code")] = WebApiError::NetworkNetmaskInvalid;
+    if (!netmask.fromString(root["netmask"].as<String>())) {
+        retMsg["message"] = "Netmask is invalid!";
+        retMsg["code"] = WebApiError::NetworkNetmaskInvalid;
         response->setLength();
         request->send(response);
         return;
     }
     IPAddress gateway;
-    if (!gateway.fromString(root[F("gateway")].as<String>())) {
-        retMsg[F("message")] = F("Gateway is invalid!");
-        retMsg[F("code")] = WebApiError::NetworkGatewayInvalid;
+    if (!gateway.fromString(root["gateway"].as<String>())) {
+        retMsg["message"] = "Gateway is invalid!";
+        retMsg["code"] = WebApiError::NetworkGatewayInvalid;
         response->setLength();
         request->send(response);
         return;
     }
     IPAddress dns1;
-    if (!dns1.fromString(root[F("dns1")].as<String>())) {
-        retMsg[F("message")] = F("DNS Server IP 1 is invalid!");
-        retMsg[F("code")] = WebApiError::NetworkDns1Invalid;
+    if (!dns1.fromString(root["dns1"].as<String>())) {
+        retMsg["message"] = "DNS Server IP 1 is invalid!";
+        retMsg["code"] = WebApiError::NetworkDns1Invalid;
         response->setLength();
         request->send(response);
         return;
     }
     IPAddress dns2;
-    if (!dns2.fromString(root[F("dns2")].as<String>())) {
-        retMsg[F("message")] = F("DNS Server IP 2 is invalid!");
-        retMsg[F("code")] = WebApiError::NetworkDns2Invalid;
+    if (!dns2.fromString(root["dns2"].as<String>())) {
+        retMsg["message"] = "DNS Server IP 2 is invalid!";
+        retMsg["code"] = WebApiError::NetworkDns2Invalid;
         response->setLength();
         request->send(response);
         return;
     }
 
-    if (root[F("hostname")].as<String>().length() == 0 || root[F("hostname")].as<String>().length() > WIFI_MAX_HOSTNAME_STRLEN) {
-        retMsg[F("message")] = F("Hostname must between 1 and " STR(WIFI_MAX_HOSTNAME_STRLEN) " characters long!");
+    if (root["hostname"].as<String>().length() == 0 || root["hostname"].as<String>().length() > WIFI_MAX_HOSTNAME_STRLEN) {
+        retMsg["message"] = "Hostname must between 1 and " STR(WIFI_MAX_HOSTNAME_STRLEN) " characters long!";
         response->setLength();
         request->send(response);
         return;
     }
     if (NetworkSettings.NetworkMode() == network_mode::WiFi) {
-        if (root[F("ssid")].as<String>().length() == 0 || root[F("ssid")].as<String>().length() > WIFI_MAX_SSID_STRLEN) {
-            retMsg[F("message")] = F("SSID must between 1 and " STR(WIFI_MAX_SSID_STRLEN) " characters long!");
+        if (root["ssid"].as<String>().length() == 0 || root["ssid"].as<String>().length() > WIFI_MAX_SSID_STRLEN) {
+            retMsg["message"] = "SSID must between 1 and " STR(WIFI_MAX_SSID_STRLEN) " characters long!";
             response->setLength();
             request->send(response);
             return;
         }
     }
-    if (root[F("password")].as<String>().length() > WIFI_MAX_PASSWORD_STRLEN - 1) {
-        retMsg[F("message")] = F("Password must not be longer than " STR(WIFI_MAX_PASSWORD_STRLEN) " characters long!");
+    if (root["password"].as<String>().length() > WIFI_MAX_PASSWORD_STRLEN - 1) {
+        retMsg["message"] = "Password must not be longer than " STR(WIFI_MAX_PASSWORD_STRLEN) " characters long!";
         response->setLength();
         request->send(response);
         return;
@@ -209,19 +209,19 @@ void WebApiNetworkClass::onNetworkAdminPost(AsyncWebServerRequest* request)
     config.WiFi_Dns2[1] = dns2[1];
     config.WiFi_Dns2[2] = dns2[2];
     config.WiFi_Dns2[3] = dns2[3];
-    strlcpy(config.WiFi_Ssid, root[F("ssid")].as<String>().c_str(), sizeof(config.WiFi_Ssid));
-    strlcpy(config.WiFi_Password, root[F("password")].as<String>().c_str(), sizeof(config.WiFi_Password));
-    strlcpy(config.WiFi_Hostname, root[F("hostname")].as<String>().c_str(), sizeof(config.WiFi_Hostname));
-    if (root[F("dhcp")].as<bool>()) {
+    strlcpy(config.WiFi_Ssid, root["ssid"].as<String>().c_str(), sizeof(config.WiFi_Ssid));
+    strlcpy(config.WiFi_Password, root["password"].as<String>().c_str(), sizeof(config.WiFi_Password));
+    strlcpy(config.WiFi_Hostname, root["hostname"].as<String>().c_str(), sizeof(config.WiFi_Hostname));
+    if (root["dhcp"].as<bool>()) {
         config.WiFi_Dhcp = true;
     } else {
         config.WiFi_Dhcp = false;
     }
     Configuration.write();
 
-    retMsg[F("type")] = F("success");
-    retMsg[F("message")] = F("Settings saved!");
-    retMsg[F("code")] = WebApiError::GenericSuccess;
+    retMsg["type"] = "success";
+    retMsg["message"] = "Settings saved!";
+    retMsg["code"] = WebApiError::GenericSuccess;
 
     response->setLength();
     request->send(response);
