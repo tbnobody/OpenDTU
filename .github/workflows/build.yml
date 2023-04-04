@@ -114,7 +114,7 @@ jobs:
           path: |
             .pio/build/${{ matrix.environment }}/opendtu-${{ matrix.environment }}.bin
             .pio/build/${{ matrix.environment }}/partitions.bin
-            .pio/build/${{ matrix.environment }}/bootloader_dio_40m.bin
+            .pio/build/${{ matrix.environment }}/bootloader.bin
             .pio/build/${{ matrix.environment }}/boot_app0.bin
 
   release:
@@ -127,10 +127,10 @@ jobs:
         with:
           name: opendtu-release
 
-      - name: Create draft release
+      - name: Create release
         uses: softprops/action-gh-release@v1
         with:
-          draft: True
+          draft: False
           files: |
             *.bin
         env:
