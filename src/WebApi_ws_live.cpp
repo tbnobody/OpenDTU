@@ -189,7 +189,7 @@ void WebApiWsLiveClass::generateJsonResponse(JsonVariant& root)
     vedirectObj[F("enabled")] = Configuration.get().Vedirect_Enabled;
     JsonObject totalVeObj = vedirectObj.createNestedObject("total");
     addTotalField(totalVeObj, "Power", VeDirect.veFrame.PPV, "W", 1);
-    addTotalField(totalVeObj, "YieldDay", VeDirect.veFrame.H20, "Wh", 0);
+    addTotalField(totalVeObj, "YieldDay", VeDirect.veFrame.H20 * 1000, "Wh", 0);
     addTotalField(totalVeObj, "YieldTotal", VeDirect.veFrame.H19, "kWh", 2);
     
     JsonObject huaweiObj = root.createNestedObject("huawei");
