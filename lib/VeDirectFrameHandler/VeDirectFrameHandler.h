@@ -25,7 +25,7 @@
 #define VE_MAX_VALUE_LEN 33 // VE.Direct Protocol: max value size is 33 including /0
 
 typedef struct {
-    uint16_t PID;                   // pruduct id
+    uint16_t PID;                   // product id
     char SER[VE_MAX_VALUE_LEN];     // serial number
     char FW[VE_MAX_VALUE_LEN];      // firmware release number
     bool LOAD;                      // virtual load output state (on if battery voltage reaches upper limit, off if battery reaches lower limit)

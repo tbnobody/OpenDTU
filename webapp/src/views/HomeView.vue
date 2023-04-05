@@ -1,7 +1,7 @@
 <template>
     <BasePage :title="$t('home.LiveData')" :isLoading="dataLoading" :isWideScreen="true">
         <HintView :hints="liveData.hints" />
-        <InverterTotalInfo :totalData="liveData.total" /><br />
+        <InverterTotalInfo :totalData="liveData.total" :totalVeData="liveData.vedirect" :totalBattData="liveData.battery"/><br />
         <div class="row gy-3">
             <div class="col-sm-3 col-md-2" :style="[inverterData.length == 1 ? { 'display': 'none' } : {}]">
                 <div class="nav nav-pills row-cols-sm-1" id="v-pills-tab" role="tablist" aria-orientation="vertical">
