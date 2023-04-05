@@ -17,9 +17,6 @@ PowerLimiterClass PowerLimiter;
 
 void PowerLimiterClass::init()
 {
-    _lastCommandSent = 0;
-    _lastLoop = 0;
-    _lastRequestedPowerLimit = 0;
 }
 
 void PowerLimiterClass::loop()
@@ -44,10 +41,16 @@ void PowerLimiterClass::loop()
     }
 
     float dcVoltage = inverter->Statistics()->getChannelFieldValue(TYPE_DC, (ChannelNum_t) config.PowerLimiter_InverterChannelId, FLD_UDC);
-    float acPower = inverter->Statistics()->getChannelFieldValue(TYPE_AC, (ChannelNum_t) config.PowerLimiter_InverterChannelId, FLD_PAC); 
+    float acPower = inverter->Statistics()->getChannelFieldValue(TYPE_AC, (ChannelNum_t) config.PowerLimiter_InverterChannelId, FLD_PAC);
     float correctedDcVoltage = dcVoltage + (acPower * config.PowerLimiter_VoltageLoadCorrectionFactor);
 
-    if ((millis() - inverter->Statistics()->getLastUpdate()) > 10000) {
+    // If the last inverter update is too old, don't do anything.
+    // If the last inverter update was before the last limit updated, don't do anything.
+    // Also give the Power meter 3 seconds time to recognize power changes because of the last set limit
+    // and also because the Hoymiles MPPT might not react immediately.
+    if ((millis() - inverter->Statistics()->getLastUpdate()) > 10000
+            || inverter->Statistics()->getLastUpdate() <= _lastLimitSetTime
+            || PowerMeter.getLastPowerMeterUpdate() <= (_lastLimitSetTime + 3000)) {
         return;
     }
 
@@ -55,7 +58,6 @@ void PowerLimiterClass::loop()
         MessageOutput.printf("[PowerLimiterClass::loop] dcVoltage: %.2f Voltage Start Threshold: %.2f Voltage Stop Threshold: %.2f inverter->isProducing(): %d\r\n",
             dcVoltage, config.PowerLimiter_VoltageStartThreshold, config.PowerLimiter_VoltageStopThreshold, inverter->isProducing());
     }
-
 
     while(true) {
         switch(_plState) {
@@ -179,13 +181,14 @@ int32_t PowerLimiterClass::calcPowerLimit(std::shared_ptr<InverterAbstract> inve
         victronChargePower, efficency, consumeSolarPowerOnly ? "true" : "false", newPowerLimit);
 
     // Safety check: Are the power meter values not too old?
-    if (millis() - PowerMeter.getLastPowerMeterUpdate() < (30 * 1000)) {
+    // Are the reported inverter data not too old?
+    if (millis() - PowerMeter.getLastPowerMeterUpdate() < (30 * 1000)
+            && millis() - inverter->Statistics()->getLastUpdate() < (15 * 1000)) {
         if (config.PowerLimiter_IsInverterBehindPowerMeter) {
             // If the inverter the behind the power meter (part of measurement),
             // the produced power of this inverter has also to be taken into account.
-            // We don't use FLD_PAC from the statistics, because that
-            // data might be too old and unrelieable.
-            newPowerLimit += _lastRequestedPowerLimit;
+            float acPower = inverter->Statistics()->getChannelFieldValue(TYPE_AC, (ChannelNum_t) config.PowerLimiter_InverterChannelId, FLD_PAC); 
+            newPowerLimit += static_cast<int>(acPower);
         }
 
         newPowerLimit -= config.PowerLimiter_TargetPowerConsumption;
@@ -228,6 +231,8 @@ void PowerLimiterClass::setNewPowerLimit(std::shared_ptr<InverterAbstract> inver
         MessageOutput.printf("[PowerLimiterClass::loop] Limit Non-Persistent: %d W\r\n", newPowerLimit);
         inverter->sendActivePowerControlRequest(Hoymiles.getRadio(), newPowerLimit, PowerLimitControlType::AbsolutNonPersistent);
         _lastRequestedPowerLimit = newPowerLimit;
+        // wait for the next inverter update (+ 3 seconds to make sure the limit got applied)
+        _lastLimitSetTime = millis();
     }
 }
 
@@ -244,7 +249,7 @@ float PowerLimiterClass::getLoadCorrectedVoltage(std::shared_ptr<InverterAbstrac
 {
     CONFIG_T& config = Configuration.get();
 
-    float acPower = inverter->Statistics()->getChannelFieldValue(TYPE_AC, (ChannelNum_t) config.PowerLimiter_InverterChannelId, FLD_PAC); 
+    float acPower = inverter->Statistics()->getChannelFieldValue(TYPE_AC, (ChannelNum_t) config.PowerLimiter_InverterChannelId, FLD_PAC);
     float dcVoltage = inverter->Statistics()->getChannelFieldValue(TYPE_DC, (ChannelNum_t) config.PowerLimiter_InverterChannelId, FLD_UDC); 
 
     if (dcVoltage <= 0.0) {

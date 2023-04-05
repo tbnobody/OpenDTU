@@ -28,9 +28,10 @@ public:
     int32_t getLastRequestedPowewrLimit();
 
 private:
-    uint32_t _lastCommandSent;
-    uint32_t _lastLoop;
-    int32_t _lastRequestedPowerLimit;
+    uint32_t _lastCommandSent = 0;
+    uint32_t _lastLoop = 0;
+    int32_t _lastRequestedPowerLimit = 0;
+    uint32_t _lastLimitSetTime = 0;
     plStates _plState = STATE_DISCOVER; 
 
     float _powerMeter1Power;
