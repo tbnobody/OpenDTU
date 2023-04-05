@@ -23,21 +23,43 @@ void PowerLimiterClass::loop()
 {
     CONFIG_T& config = Configuration.get();
 
-    if (!config.PowerLimiter_Enabled
-            || !config.PowerMeter_Enabled
+    // Run inital checks to make sure we have met the basic conditions
+    if ( !config.PowerMeter_Enabled
             || !Hoymiles.getRadio()->isIdle()
             || (millis() - _lastCommandSent) < (config.PowerLimiter_Interval * 1000)
             || (millis() - _lastLoop) < (config.PowerLimiter_Interval * 1000)) {
-        if (!config.PowerLimiter_Enabled)
-            _plState = STATE_DISCOVER; // ensure STATE_DISCOVER is set, if PowerLimiter will be enabled.
         return;
     }
 
     _lastLoop = millis();
 
+      // Debug state transistions
+    
+
+    MessageOutput.printf("****************** PL STATE: %i\r\n", _plState);
+
     std::shared_ptr<InverterAbstract> inverter = Hoymiles.getInverterByPos(config.PowerLimiter_InverterId);
     if (inverter == nullptr || !inverter->isReachable()) {
         return;
+    }
+
+    // Make sure inverter is turned off if PL is disabled by user
+    // Make sure inverter is turned off when lower battery threshold is reached
+    // In this case we willbe in some state and want to reach STATE_PL_SHUTDOWN
+    if ((!config.PowerLimiter_Enabled && _plState != STATE_PL_SHUTDOWN)
+           || isStopThresholdReached(inverter)) {
+        if (inverter->isProducing()) {
+            MessageOutput.printf("PL initiated inverter shutdown.\r\n");
+            inverter->sendPowerControlRequest(Hoymiles.getRadio(), false);
+        } else {
+            _plState = STATE_PL_SHUTDOWN;
+        }
+        return;
+    }
+
+    // PL is disabled
+    if (!config.PowerLimiter_Enabled) {
+      return;
     }
 
     float dcVoltage = inverter->Statistics()->getChannelFieldValue(TYPE_DC, (ChannelNum_t) config.PowerLimiter_InverterChannelId, FLD_UDC);
@@ -59,87 +81,26 @@ void PowerLimiterClass::loop()
             dcVoltage, config.PowerLimiter_VoltageStartThreshold, config.PowerLimiter_VoltageStopThreshold, inverter->isProducing());
     }
 
-    while(true) {
-        switch(_plState) {
-            case STATE_DISCOVER:
-                if (!inverter->isProducing() || isStopThresholdReached(inverter)) {
-                    _plState = STATE_OFF;
-                }
-                else if (canUseDirectSolarPower()) {
-                    _plState = STATE_CONSUME_SOLAR_POWER_ONLY;
-                }
-                else {
-                    _plState = STATE_NORMAL_OPERATION;
-                }
-                break;
-            case STATE_OFF:
-                // if on turn off
-                if (inverter->isProducing()) {
-                    MessageOutput.printf("[PowerLimiterClass::loop] DC voltage: %.2f Corrected DC voltage: %.2f...\r\n",
-                        dcVoltage, correctedDcVoltage);
-                    setNewPowerLimit(inverter, -1);
-                    return;
-                }
+  	// Check if we need to move state away from STATE_PL_SHUTDOWN
+    if (_plState == STATE_PL_SHUTDOWN) {
 
-                // do nothing if battery is empty
-                if (isStopThresholdReached(inverter)) 
-                    return;
-                // check for possible state changes
-                if (canUseDirectSolarPower()) {
-                    _plState = STATE_CONSUME_SOLAR_POWER_ONLY;
-                }
-                if (isStartThresholdReached(inverter)) {
-                    _plState = STATE_NORMAL_OPERATION;
-                }
-                return;
-                break;
-            case STATE_CONSUME_SOLAR_POWER_ONLY: {
-                int32_t newPowerLimit = calcPowerLimit(inverter, true);
-                if (isStopThresholdReached(inverter)) {
-                    _plState = STATE_OFF;
-                    break;
-                }
-                if (isStartThresholdReached(inverter)) {
-                    _plState = STATE_NORMAL_OPERATION;
-                    break;
-                }
+      // Allow discharge when start threshold reached
+      // This is also the trigger for drain strategy: EMPTY_WHEN_FULL
+      if (isStartThresholdReached(inverter)) {
+        _plState = STATE_ACTIVE;
+      }
 
-                if (!canUseDirectSolarPower()) {
-                    if (config.PowerLimiter_BatteryDrainStategy == EMPTY_AT_NIGHT)
-                        _plState = STATE_NORMAL_OPERATION;
-                    else
-                        _plState = STATE_OFF;
-                    break;
-                }
+      // Allow discharge when drain strategy is EMPTY_AT_NIGHT
+      if (config.PowerLimiter_BatteryDrainStategy == EMPTY_AT_NIGHT) {
+        _plState = STATE_ACTIVE;
+      }
 
-                setNewPowerLimit(inverter, newPowerLimit);
-                return;
-                break;
-            }
-            case STATE_NORMAL_OPERATION: {
-                int32_t newPowerLimit = calcPowerLimit(inverter, false);
-                if (isStopThresholdReached(inverter)) {
-                    _plState = STATE_OFF;
-                    break;
-                }
-                if (!isStartThresholdReached(inverter) && canUseDirectSolarPower() && (config.PowerLimiter_BatteryDrainStategy == EMPTY_AT_NIGHT)) {
-                    _plState = STATE_CONSUME_SOLAR_POWER_ONLY;
-                    break;
-                }
-
-                // check if grid power consumption is not within the upper and lower threshold of the target consumption
-                if (newPowerLimit >= (config.PowerLimiter_TargetPowerConsumption - config.PowerLimiter_TargetPowerConsumptionHysteresis) &&
-                    newPowerLimit <= (config.PowerLimiter_TargetPowerConsumption + config.PowerLimiter_TargetPowerConsumptionHysteresis) &&
-                    _lastRequestedPowerLimit >= (config.PowerLimiter_TargetPowerConsumption - config.PowerLimiter_TargetPowerConsumptionHysteresis) &&
-                    _lastRequestedPowerLimit <= (config.PowerLimiter_TargetPowerConsumption + config.PowerLimiter_TargetPowerConsumptionHysteresis) ) {
-                    return;    
-                }
-                setNewPowerLimit(inverter, newPowerLimit);;
-                return;
-                break;
-            } 
-        }
+      return;
     }
+
+    int32_t newPowerLimit = calcPowerLimit(inverter, canUseDirectSolarPower());
+    MessageOutput.printf("****************************** Powerlimit: %i\r\n", newPowerLimit);
+    setNewPowerLimit(inverter, newPowerLimit);
 }
 
 plStates PowerLimiterClass::getPowerLimiterState() {
@@ -154,7 +115,7 @@ bool PowerLimiterClass::canUseDirectSolarPower()
 {
     CONFIG_T& config = Configuration.get();
 
-    if (!config.PowerLimiter_SolarPassTroughEnabled
+    if (!config.PowerLimiter_SolarPassThroughEnabled
             || !config.Vedirect_Enabled) {
         return false;
     }
@@ -166,6 +127,9 @@ bool PowerLimiterClass::canUseDirectSolarPower()
 
     return true;
 }
+
+
+
 
 int32_t PowerLimiterClass::calcPowerLimit(std::shared_ptr<InverterAbstract> inverter, bool consumeSolarPowerOnly)
 {
