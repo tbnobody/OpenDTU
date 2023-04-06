@@ -143,6 +143,7 @@ void setup()
         Configuration.write();
     }
     MessageOutput.println("done");
+    MessageOutput.println("done");
 
     InverterSettings.init();
 
