@@ -4,88 +4,88 @@ here are some screenshots of OpenDTU's web interface.
 
 ***
 
-![](01_LiveView.png)
+![Live View](01_LiveView.png)
 
 ***
 
-![](15_LimitSettings.png)
+![Limit Settings](15_LimitSettings.png)
 
 ***
 
-![](16_PowerSettings.png)
+![Power Settings](16_PowerSettings.png)
 
 ***
 
-![](17_InverterInfo.png)
+![Inverter Info](17_InverterInfo.png)
 
 ***
 
-![](12_Eventlog.png)
+![Eventlog](12_Eventlog.png)
 
 ***
 
-![](02_NetworkAdmin.png)
+![Network Admin](02_NetworkAdmin.png)
 
 ***
 
-![](03_NtpAdmin.png)
+![NTP Admin](03_NtpAdmin.png)
 
 ***
 
-![](04_MqttAdmin.png)
+![MQTT Admin](04_MqttAdmin.png)
 
 ***
 
-![](05_InverterAdmin.png)
+![Inverter Admin](05_InverterAdmin.png)
 
 ***
 
-![](13_InverterSettings.png)
+![Inverter Settings](13_InverterSettings.png)
 
 ***
 
-![](22_Security.png)
+![Security](22_Security.png)
 
 ***
 
-![](06_DtuAdmin.png)
+![DTU Admin](06_DtuAdmin.png)
 
 ***
 
-![](20_DeviceManager_Pin.png)
+![Device Manager Pin](20_DeviceManager_Pin.png)
 
 ***
 
-![](21_DeviceManager_Display.png)
+![Device Manager Display](21_DeviceManager_Display.png)
 
 ***
 
-![](14_ConfigManagement.png)
+![Config Management](14_ConfigManagement.png)
 
 ***
 
-![](07_FirmwareUpgrade.png)
+![Firmware Upgrade](07_FirmwareUpgrade.png)
 
 ***
 
-![](19_Reboot.png)
+![Reboot](19_Reboot.png)
 
 ***
 
-![](11_SystemInfo.png)
+![System Info](11_SystemInfo.png)
 
 ***
 
-![](08_NetworkInfo.png)
+![Network Info](08_NetworkInfo.png)
 
 ***
 
-![](09_NtpInfo.png)
+![NTP Info](09_NtpInfo.png)
 
 ***
 
-![](10_MqttInfo.png)
+![MQTT Info](10_MqttInfo.png)
 
 ***
 
-![](18_Console.png)
+![Console](18_Console.png)
