@@ -122,7 +122,7 @@ void PowerLimiterClass::loop()
                     _plState = STATE_OFF;
                     break;
                 }
-                if (canUseDirectSolarPower() && (config.PowerLimiter_BatteryDrainStategy == EMPTY_AT_NIGHT)) {
+                if (!isStartThresholdReached(inverter) && canUseDirectSolarPower() && (config.PowerLimiter_BatteryDrainStategy == EMPTY_AT_NIGHT)) {
                     _plState = STATE_CONSUME_SOLAR_POWER_ONLY;
                     break;
                 }
