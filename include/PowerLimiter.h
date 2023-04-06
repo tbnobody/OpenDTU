@@ -8,8 +8,8 @@
 #include <memory>
 
 typedef enum {
-    STATE_PL_SHUTDOWN = 0, 
-    STATE_ACTIVE
+    SHUTDOWN = 0, 
+    ACTIVE
 } plStates;
 
 typedef enum {
@@ -32,8 +32,9 @@ private:
     uint32_t _lastLoop = 0;
     int32_t _lastRequestedPowerLimit = 0;
     uint32_t _lastLimitSetTime = 0;
-    plStates _plState = STATE_ACTIVE; 
+    plStates _plState = ACTIVE; 
     bool _disabled = false;
+    bool _batteryDischargeEnabled = false;
 
     float _powerMeter1Power;
     float _powerMeter2Power;
