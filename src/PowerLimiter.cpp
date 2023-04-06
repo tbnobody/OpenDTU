@@ -22,7 +22,7 @@ void PowerLimiterClass::init()
 void PowerLimiterClass::loop()
 {
     CONFIG_T& config = Configuration.get();
-
+ 
     // Run inital checks to make sure we have met the basic conditions
     if ( !config.PowerMeter_Enabled
             || !Hoymiles.getRadio()->isIdle()
