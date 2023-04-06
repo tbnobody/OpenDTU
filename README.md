@@ -7,15 +7,17 @@ This is a fork from the Hoymiles project OpenDTU.
 This project is still under development and adds following features:
 
 * Support Victron's Ve.Direct protocol on the same chip (cable based serial interface!). Additional information about Ve.direct can be downloaded from https://www.victronenergy.com/support-and-downloads/technical-information.
-* Dynamically sets the Hoymiles power limited according to the currently used energy in the household (needs an MQTT based power meter like Shelly 3EM)
+* Dynamically sets the Hoymiles power limited according to the currently used energy in the household. Needs an HTTP JSON based power meter (e.g. Tasmota), an MQTT based power meter like Shelly 3EM or an SDM power meter.
 * Battery support: Read the voltage from Victron MPPT charge controller or from the Hoymiles DC inputs and starts/stops the power producing based on configurable voltage thresholds
 * Voltage correction that takes the voltage drop because of the current output load into account (not 100% reliable calculation)
 * Can read the current solar panel power from the Victron MPPT and adjust the limiter accordingly to not save energy in the battery (for increased system efficiency). Increases the battery lifespan and reduces energy loses.
 * Settings can be configured in the UI
 * Pylontech Battery support (via CAN bus interface). Use the SOC for starting/stopping the power output and provide the battery data via MQTT (autodiscovery for home assistant is currently not supported). Pin Mapping is supported (default RX PIN 27, TX PIN 26). Actual no live view support for Pylontech Battery.
+* Huawei R4850G2 power supply unit that can act as AC charger. Supports status shown on the web interface and options to set voltage and current limits on the web interface and via MQTT. Connection is done using CAN bus (needs to be separate from Pylontech CAN bus) via SN65HVD230 interface.
 
 [![OpenDTU Build](https://github.com/tbnobody/OpenDTU/actions/workflows/build.yml/badge.svg)](https://github.com/tbnobody/OpenDTU/actions/workflows/build.yml)
 [![cpplint](https://github.com/tbnobody/OpenDTU/actions/workflows/cpplint.yml/badge.svg)](https://github.com/tbnobody/OpenDTU/actions/workflows/cpplint.yml)
+[![Yarn Linting](https://github.com/tbnobody/OpenDTU/actions/workflows/yarnlint.yml/badge.svg)](https://github.com/tbnobody/OpenDTU/actions/workflows/yarnlint.yml)
 
 ## !! IMPORTANT UPGRADE NOTES !!
 
@@ -166,6 +168,23 @@ Topics for 3 phases of a power meter is configurable. Given is an example for th
 | battery/charging/dischargeEnabled        | R     |                                               |                    |
 | battery/charging/chargeImmediately       | R     |                                               |                    |
 
+## Huawei AC charger topics
+| Topic                                   | R / W | Description                                          | Value / Unit               |
+| --------------------------------------- | ----- | ---------------------------------------------------- | -------------------------- |
+| huawei/cmd/limit_online_voltage         | W     | Online voltage (i.e. CAN bus connected)              | Volt (V)                   |
+| huawei/cmd/limit_online_current         | W     | Online current (i.e. CAN bus connected)              | Ampere (A)                 |
+| huawei/cmd/power                        | W     | Controls output pin GPIO to drive solid state relais | 0 / 1                      |
+| huawei/data_age                         | R     | How old the data is                                  | Seconds                    |
+| huawei/input_voltage                    | R     | Input voltage                                        | Volt (V)                   |
+| huawei/input_current                    | R     | Input current                                        | Ampere (A)                 |
+| huawei/input_power                      | R     | Input power                                          | Watt (W)                   |
+| huawei/output_voltage                   | R     | Output voltage                                       | Volt (V)                   |
+| huawei/output_current                   | R     | Output current                                       | Ampere (A)                 |
+| huawei/max_output_current               | R     | Maximum output current (set using the online limit)  | Ampere (A)                 |
+| huawei/output_power                     | R     | Output power                                         | Watt (W)                   |
+| huawei/input_temp                       | R     | Input air temperature                                | °C                         |
+| huawei/output_temp                      | R     | Output air temperature                               | °C                         |
+| huawei/efficiency                       | R     | Efficiency                                           | Percentage                 |
 
 ## Currently supported Inverters
 * Hoymiles HM-300
@@ -177,6 +196,7 @@ Topics for 3 phases of a power meter is configurable. Given is an example for th
 * Hoymiles HM-1000
 * Hoymiles HM-1200
 * Hoymiles HM-1500
+* Solenso SOL-H350
 * Solenso SOL-H400
 * Solenso SOL-H800
 * TSUN TSOL-M350 (Maybe depending on firmware/serial number on the inverter)

@@ -1,7 +1,7 @@
 <template>
     <BasePage :title="$t('home.LiveData')" :isLoading="dataLoading" :isWideScreen="true">
         <HintView :hints="liveData.hints" />
-        <InverterTotalInfo :totalData="liveData.total" /><br />
+        <InverterTotalInfo :totalData="liveData.total" :totalVeData="liveData.vedirect" :totalBattData="liveData.battery"/><br />
         <div class="row gy-3">
             <div class="col-sm-3 col-md-2" :style="[inverterData.length == 1 ? { 'display': 'none' } : {}]">
                 <div class="nav nav-pills row-cols-sm-1" id="v-pills-tab" role="tablist" aria-orientation="vertical">
@@ -27,9 +27,10 @@
                     <div class="card">
                         <div class="card-header d-flex justify-content-between align-items-center"
                             :class="{
-                                'text-bg-danger': !inverter.reachable,
-                                'text-bg-warning': inverter.reachable && !inverter.producing,
-                                'text-bg-primary': inverter.reachable && inverter.producing,
+                                'text-bg-tertiary': !inverter.poll_enabled,
+                                'text-bg-danger': inverter.poll_enabled && !inverter.reachable,
+                                'text-bg-warning': inverter.poll_enabled && inverter.reachable && !inverter.producing,
+                                'text-bg-primary': inverter.poll_enabled && inverter.reachable && inverter.producing,
                             }">
                             <div class="p-1 flex-grow-1">
                                 <div class="d-flex flex-wrap">
@@ -114,6 +115,12 @@
             </div>
         </div>
         <VedirectView v-show="liveData.vedirect.enabled" />
+        <div v-show="liveData.battery.enabled" >
+          <BatteryView/>
+        </div>
+        <div v-show="liveData.huawei.enabled" >
+          <HuaweiView/>
+        </div>
     </BasePage>
    
     <div class="modal" id="eventView" tabindex="-1">
@@ -325,6 +332,8 @@ import HintView from '@/components/HintView.vue';
 import InverterChannelInfo from "@/components/InverterChannelInfo.vue";
 import InverterTotalInfo from '@/components/InverterTotalInfo.vue';
 import VedirectView from '@/components/VedirectView.vue';
+import HuaweiView from '@/components/HuaweiView.vue'
+import BatteryView from '@/components/BatteryView.vue'
 import type { DevInfoStatus } from '@/types/DevInfoStatus';
 import type { EventlogItems } from '@/types/EventlogStatus';
 import type { LimitConfig } from '@/types/LimitConfig';
@@ -365,7 +374,9 @@ export default defineComponent({
         BIconToggleOff,
         BIconToggleOn,
         BIconXCircleFill,
-        VedirectView
+        VedirectView,
+        HuaweiView,
+        BatteryView
     },
     data() {
         return {
@@ -492,7 +503,7 @@ export default defineComponent({
 
             this.socket.onopen = function (event) {
                 console.log(event);
-                console.log("Successfuly connected to the echo websocket server...");
+                console.log("Successfully connected to the echo websocket server...");
             };
 
             // Listen to window events , When the window closes , Take the initiative to disconnect websocket Connect

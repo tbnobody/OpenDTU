@@ -41,6 +41,10 @@ void WebApiClass::init()
     _webApiWsLive.init(&_server);
     _webApiWsVedirectLive.init(&_server);
     _webApiVedirect.init(&_server);
+    _webApiWsHuaweiLive.init(&_server);
+    _webApiHuaweiClass.init(&_server);
+    _webApiWsPylontechLive.init(&_server);
+    _webApiPylontechClass.init(&_server);
 
     _server.begin();
 }
@@ -70,6 +74,10 @@ void WebApiClass::loop()
     _webApiWsLive.loop();
     _webApiWsVedirectLive.loop();
     _webApiVedirect.loop();
+    _webApiWsHuaweiLive.loop();
+    _webApiHuaweiClass.loop();
+    _webApiWsPylontechLive.loop();
+    _webApiPylontechClass.loop();
 }
 
 bool WebApiClass::checkCredentials(AsyncWebServerRequest* request)
@@ -83,7 +91,7 @@ bool WebApiClass::checkCredentials(AsyncWebServerRequest* request)
 
     // WebAPI should set the X-Requested-With to prevent browser internal auth dialogs
     if (!request->hasHeader("X-Requested-With")) {
-        r->addHeader(F("WWW-Authenticate"), F("Basic realm=\"Login Required\""));
+        r->addHeader("WWW-Authenticate", "Basic realm=\"Login Required\"");
     }
     request->send(r);
 

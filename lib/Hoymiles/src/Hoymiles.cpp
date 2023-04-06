@@ -35,7 +35,7 @@ void HoymilesClass::loop()
             if (_radio->isIdle()) {
                 std::shared_ptr<InverterAbstract> iv = getInverterByPos(inverterPos);
                 if (iv != nullptr) {
-                    _messageOutput->print(F("Fetch inverter: "));
+                    _messageOutput->print("Fetch inverter: ");
                     _messageOutput->println(iv->serial(), HEX);
 
                     iv->sendStatsRequest(_radio.get());
@@ -54,19 +54,19 @@ void HoymilesClass::loop()
 
                     // Set limit if required
                     if (iv->SystemConfigPara()->getLastLimitCommandSuccess() == CMD_NOK) {
-                        _messageOutput->println(F("Resend ActivePowerControl"));
+                        _messageOutput->println("Resend ActivePowerControl");
                         iv->resendActivePowerControlRequest(_radio.get());
                     }
 
                     // Set power status if required
                     if (iv->PowerCommand()->getLastPowerCommandSuccess() == CMD_NOK) {
-                        _messageOutput->println(F("Resend PowerCommand"));
+                        _messageOutput->println("Resend PowerCommand");
                         iv->resendPowerControlRequest(_radio.get());
                     }
 
                     // Fetch dev info (but first fetch stats)
                     if (iv->Statistics()->getLastUpdate() > 0 && (iv->DevInfo()->getLastUpdateAll() == 0 || iv->DevInfo()->getLastUpdateSimple() == 0)) {
-                        _messageOutput->println(F("Request device info"));
+                        _messageOutput->println("Request device info");
                         iv->sendDevInfoRequest(_radio.get());
                     }
                 }

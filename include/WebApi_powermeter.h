@@ -13,6 +13,7 @@ private:
     void onStatus(AsyncWebServerRequest* request);
     void onAdminGet(AsyncWebServerRequest* request);
     void onAdminPost(AsyncWebServerRequest* request);
+    void onTestHttpRequest(AsyncWebServerRequest* request);
 
     AsyncWebServer* _server;
 };

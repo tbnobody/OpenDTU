@@ -58,22 +58,24 @@ void WebApiWsVedirectLiveClass::loop()
     if (millis() - _lastWsPublish > (10 * 1000) || (maxTimeStamp != _newestVedirectTimestamp)) {
         
         try {
+            String buffer;
+            // free JsonDocument as soon as possible
+            {
                 DynamicJsonDocument root(1024);
                 JsonVariant var = root;
                 generateJsonResponse(var);
-
-                String buffer;
-                if (buffer) {
-                    serializeJson(root, buffer);
-                    
-                    if (Configuration.get().Security_AllowReadonly) {
-                        _ws.setAuthentication("", "");
-                    } else {
-                        _ws.setAuthentication(AUTH_USERNAME, Configuration.get().Security_Password);
-                    }
-
-                    _ws.textAll(buffer);
+                serializeJson(root, buffer);
+            }
+            
+            if (buffer) {        
+                if (Configuration.get().Security_AllowReadonly) {
+                    _ws.setAuthentication("", "");
+                } else {
+                    _ws.setAuthentication(AUTH_USERNAME, Configuration.get().Security_Password);
                 }
+
+                _ws.textAll(buffer);
+            }
 
         } catch (std::bad_alloc& bad_alloc) {
             MessageOutput.printf("Call to /api/vedirectlivedata/status temporarely out of resources. Reason: \"%s\".\r\n", bad_alloc.what());
@@ -153,10 +155,18 @@ void WebApiWsVedirectLiveClass::onLivedataStatus(AsyncWebServerRequest* request)
     if (!WebApi.checkCredentialsReadonly(request)) {
         return;
     }
-    AsyncJsonResponse* response = new AsyncJsonResponse(false, 1024U);
-    JsonVariant root = response->getRoot().as<JsonVariant>();
-    generateJsonResponse(root);
+    try {
+        AsyncJsonResponse* response = new AsyncJsonResponse(false, 1024U);
+        JsonVariant root = response->getRoot();
 
-    response->setLength();
-    request->send(response);
+        generateJsonResponse(root);
+
+        response->setLength();
+        request->send(response);
+
+    } catch (std::bad_alloc& bad_alloc) {
+        MessageOutput.printf("Call to /api/livedata/status temporarely out of resources. Reason: \"%s\".\r\n", bad_alloc.what());
+
+        WebApi.sendTooManyRequests(request);
+    }
 }

@@ -100,7 +100,7 @@ float StatisticsParser::getChannelFieldValue(ChannelType_t type, ChannelNum_t ch
         }
 
         result /= static_cast<float>(div);
-        if (setting != NULL) {
+        if (setting != NULL && _statisticLength > 0) {
             result += setting->offset;
         }
         return result;

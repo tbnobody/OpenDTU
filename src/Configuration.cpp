@@ -124,6 +124,19 @@ bool ConfigurationClass::write()
     powermeter["mqtt_topic_powermeter_3"] = config.PowerMeter_MqttTopicPowerMeter3;
     powermeter["sdmbaudrate"] = config.PowerMeter_SdmBaudrate;
     powermeter["sdmaddress"] = config.PowerMeter_SdmAddress;
+    powermeter["http_individual_requests"] = config.PowerMeter_HttpIndividualRequests;
+
+    JsonArray powermeter_http_phases = powermeter.createNestedArray("http_phases");
+    for (uint8_t i = 0; i < POWERMETER_MAX_PHASES; i++) {
+        JsonObject powermeter_phase = powermeter_http_phases.createNestedObject();
+
+        powermeter_phase["enabled"] = config.Powermeter_Http_Phase[i].Enabled;
+        powermeter_phase["url"] = config.Powermeter_Http_Phase[i].Url;
+        powermeter_phase["header_key"] = config.Powermeter_Http_Phase[i].HeaderKey;
+        powermeter_phase["header_value"] = config.Powermeter_Http_Phase[i].HeaderValue;
+        powermeter_phase["timeout"] = config.Powermeter_Http_Phase[i].Timeout;
+        powermeter_phase["json_path"] = config.Powermeter_Http_Phase[i].JsonPath;
+    }
 
     JsonObject powerlimiter = doc.createNestedObject("powerlimiter");
     powerlimiter["enabled"] = config.PowerLimiter_Enabled;
@@ -146,6 +159,9 @@ bool ConfigurationClass::write()
     JsonObject battery = doc.createNestedObject("battery");
     battery["enabled"] = config.Battery_Enabled;
 
+    JsonObject huawei = doc.createNestedObject("huawei");
+    huawei["enabled"] = config.Huawei_Enabled;
+
     // Serialize JSON to file
     if (serializeJson(doc, f) == 0) {
         MessageOutput.println("Failed to write file");
@@ -164,7 +180,7 @@ bool ConfigurationClass::read()
     // Deserialize the JSON document
     DeserializationError error = deserializeJson(doc, f);
     if (error) {
-        MessageOutput.printf("Failed to read file, using default configuration. Error: %s (capacity: %d)\r\n", error.c_str(), doc.capacity());
+        MessageOutput.println("Failed to read file, using default configuration");
     }
 
     JsonObject cfg = doc["cfg"];
@@ -297,7 +313,19 @@ bool ConfigurationClass::read()
     strlcpy(config.PowerMeter_MqttTopicPowerMeter3, powermeter["mqtt_topic_powermeter_3"] | "", sizeof(config.PowerMeter_MqttTopicPowerMeter3));
     config.PowerMeter_SdmBaudrate =  powermeter["sdmbaudrate"] | POWERMETER_SDMBAUDRATE;
     config.PowerMeter_SdmAddress =  powermeter["sdmaddress"] | POWERMETER_SDMADDRESS;
+    config.PowerMeter_HttpIndividualRequests = powermeter["http_individual_requests"] | false;
 
+    JsonArray powermeter_http_phases = powermeter["http_phases"];
+    for (uint8_t i = 0; i < POWERMETER_MAX_PHASES; i++) {
+        JsonObject powermeter_phase = powermeter_http_phases[i].as<JsonObject>();
+
+        config.Powermeter_Http_Phase[i].Enabled = powermeter_phase["enabled"] | (i == 0);
+        strlcpy(config.Powermeter_Http_Phase[i].Url, powermeter_phase["url"] | "", sizeof(config.Powermeter_Http_Phase[i].Url));
+        strlcpy(config.Powermeter_Http_Phase[i].HeaderKey, powermeter_phase["header_key"] | "", sizeof(config.Powermeter_Http_Phase[i].HeaderKey));
+        strlcpy(config.Powermeter_Http_Phase[i].HeaderValue, powermeter_phase["header_value"] | "", sizeof(config.Powermeter_Http_Phase[i].HeaderValue));
+        config.Powermeter_Http_Phase[i].Timeout = powermeter_phase["timeout"] | POWERMETER_HTTP_TIMEOUT;
+        strlcpy(config.Powermeter_Http_Phase[i].JsonPath, powermeter_phase["json_path"] | "", sizeof(config.Powermeter_Http_Phase[i].JsonPath));
+    }
 
     JsonObject powerlimiter = doc["powerlimiter"];
     config.PowerLimiter_Enabled = powerlimiter["enabled"] | POWERLIMITER_ENABLED;
@@ -320,6 +348,9 @@ bool ConfigurationClass::read()
     JsonObject battery = doc["battery"];
     config.Battery_Enabled = battery["enabled"] | BATTERY_ENABLED;
 
+    JsonObject huawei = doc["huawei"];
+    config.Huawei_Enabled = huawei["enabled"] | HUAWEI_ENABLED;
+
     f.close();
     return true;
 }
@@ -328,7 +359,7 @@ void ConfigurationClass::migrate()
 {
     File f = LittleFS.open(CONFIG_FILENAME, "r", false);
     if (!f) {
-        MessageOutput.println(F("Failed to open file, cancel migration"));
+        MessageOutput.println("Failed to open file, cancel migration");
         return;
     }
 

@@ -185,7 +185,7 @@ void MqttHandleInverterClass::onMqttMessage(const espMqttClientTypes::MessagePro
     auto inv = Hoymiles.getInverterBySerial(serial);
 
     if (inv == nullptr) {
-        MessageOutput.println(F("Inverter not found"));
+        MessageOutput.println("Inverter not found");
         return;
     }
 

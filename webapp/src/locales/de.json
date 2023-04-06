@@ -10,7 +10,9 @@
         "DTUSettings": "DTU",
         "DeviceManager": "Hardware",
         "VedirectSettings": "Ve.direct",
-        "BatterySettings": "Battery",
+        "PowerMeterSettings": "Power Meter",
+        "BatterySettings": "Batterie",
+        "AcChargerSettings": "AC Ladegerät",
         "ConfigManagement": "Konfigurationsverwaltung",
         "FirmwareUpgrade": "Firmware-Aktualisierung",
         "DeviceReboot": "Neustart",
@@ -26,7 +28,8 @@
         "Login": "Anmelden"
     },
     "base": {
-        "Loading": "Lade..."
+        "Loading": "Lade...",
+        "Reload": "Aktualisieren"
     },
     "localeswitcher": {
         "Dark": "Dunkel",
@@ -323,9 +326,13 @@
         "Unit": "Einheit"
     },
     "invertertotalinfo": {
-        "TotalYieldTotal": "Gesamtertrag Insgesamt",
-        "TotalYieldDay": "Gesamtertrag Heute",
-        "TotalPower": "Gesamtleistung"
+        "InverterTotalYieldTotal": "Inverter Gesamtertrag Insgesamt",
+        "InverterTotalYieldDay": "Inverter Gesamtertrag Heute",
+        "InverterTotalPower": "Inverter Gesamtleistung",
+        "MpptTotalYieldTotal": "MPPT Gesamtertrag Insgesamt",
+        "MpptTotalYieldDay": "MPPT Gesamtertrag Heute",
+        "MpptTotalPower": "MPPT Gesamtleistung",
+        "BatterySoc": "Ladezustand"
     },
     "inverterchannelproperty": {
         "Power": "Leistung",
@@ -462,13 +469,27 @@
         "typeMQTT": "MQTT",
         "typeSDM1ph": "SDM 1 phase (SDM120/220/230)",
         "typeSDM3ph": "SDM 3 phase (SDM72/630)",
+        "typeHTTP": "HTTP(S) + JSON",
         "MqttTopicPowerMeter1": "MQTT topic - Stromzähler #1",
         "MqttTopicPowerMeter2": "MQTT topic - Stromzähler #2 (Optional)",
         "MqttTopicPowerMeter3": "MQTT topic - Stromzähler #3 (Optional)",
         "SDM": "SDM-Stromzähler Konfiguration",
         "sdmbaudrate": "Baudrate",
         "sdmaddress": "Modbus Adresse",
-        "Save": "@:dtuadmin.Save"
+        "Save": "@:dtuadmin.Save",
+        "HTTP": "HTTP(S) + JSON - Allgemeine Konfiguration",
+        "httpIndividualRequests": "Individuelle HTTP requests pro Phase",
+        "httpUrlDescription": "Die URL muss mit http:// oder https:// beginnen. Manche Zeichen wie Leerzeichen und = müssen mit URL-Kodierung kodiert werden (%xx). Achtung: Ein Überprüfung von SSL Server Zertifikaten ist nicht implementiert (MITM-Attacken sind möglich)! Beispiele gibt es unten.",
+        "httpPhase": "HTTP(S) + JSON Konfiguration - Phase {phaseNumber}",
+        "httpEnabled": "Phase aktiviert",
+        "httpUrl": "URL",
+        "httpHeaderKey": "Optional: HTTP request header - Key",
+        "httpHeaderKeyDescription": "Ein individueller HTTP request header kann hier definiert werden. Das kann z.B. verwendet werden um einen eigenen Authorization header mitzugeben.",
+        "httpHeaderValue": "Optional: HTTP request header - Wert",
+        "httpJsonPath": "JSON Pfad",
+        "httpJsonPathDescription": "JSON Pfad um den Leistungswert zu finden. Es verwendet die Selektions-Syntax von mobizt/FirebaseJson. Beispiele gibt es unten.",
+        "httpTimeout": "Timeout",
+        "testHttpRequest": "Testen"
     },
     "powerlimiteradmin": {
         "PowerLimiterSettings": "Power Limiter Einstellungen",
@@ -630,5 +651,68 @@
         "Name": "Name",
         "ValueSelected": "Ausgewählt",
         "ValueActive": "Aktiv"
-    }
+      },
+      "huawei": {
+        "DataAge": "letzte Aktualisierung: ",
+        "Seconds": "vor {val} Sekunden",
+        "Input": "Eingang",
+        "Output": "Ausgang",
+        "Property": "Eigenschaft",
+        "Value": "Wert",
+        "Unit": "Einheit",
+        "input_voltage": "Eingangsspannung",
+        "input_current": "Eingangsstrom",
+        "input_power": "Eingangsleistung",
+        "input_temp": "Eingangstemperatur",
+        "efficiency": "Wirkungsgrad",
+        "output_voltage": "Ausgangsspannung",
+        "output_current": "Ausgangsstrom",
+        "max_output_current": "Maximaler Ausgangsstrom",
+        "output_power": "Ausgangsleistung",
+        "output_temp": "Ausgangstemperatur",
+        "ShowSetLimit": "Zeige / Setze Limit",
+        "LimitSettings": "Limit-Einstellungen",
+        "SetOffline": "Limit setzen, CAN Bus nicht verbunden",
+        "SetOnline": "Limit setzen, CAN Bus verbunden",
+        "LimitHint": "<b>Hinweis:</b> Spannungsbereich wenn CAN Bus nicht verbunden ist 48V-58.5V ",
+        "Close": "Schließen",
+        "SetVoltageLimit": "Spannungslimit:",
+        "SetCurrentLimit": "Stromlimit:",
+        "CurrentLimit": "Aktuelles Limit: "  
+      },
+      "acchargeradmin": {
+        "ChargerSettings": "AC Ladegerät Einstellungen",
+        "Configuration": "AC Ladegerät Konfiguration",
+        "EnableHuawei": "Huawei R4850G2 an CAN Bus Interface aktiv",
+        "Seconds": "@:dtuadmin.Seconds",
+        "Save": "@:dtuadmin.Save"
+      },
+      "battery": {
+        "battery": "Batterie",
+        "DataAge": "letzte Aktualisierung: ",
+        "Seconds": "vor {val} Sekunden",
+        "Status": "Status",
+        "Property": "Eigenschaft",
+        "Value": "Wert",
+        "Unit": "Einheit",
+        "stateOfCharge": "Ladezustand (SOC)",
+        "stateOfHealth": "Batteriezustand (SOH)",
+        "voltage": "Spannung",
+        "current": "Strom",
+        "temperature": "Temperatur",
+        "chargeVoltage": "Gewünschte Ladespannung (BMS)",
+        "chargeCurrentLimitation": "Ladestromlimit",
+        "dischargeCurrentLimitation": "Entladestromlimit",
+        "warn_alarm": "Warnungen und Alarme",
+        "ok": "OK",
+        "alarm": "Alarm",
+        "warning": "Warnung",
+        "dischargeCurrent": "Entladestrom",
+        "chargeCurrent": "Ladestrom",
+        "lowTemperature": "Temperatur niedrig",
+        "highTemperature": "Temperatur hoch",
+        "lowVoltage": "Spannung niedrig",
+        "highVoltage": "Spannung hoch",
+        "bmsInternal": "BMS intern"
+      }
 }

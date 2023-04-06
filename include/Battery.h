@@ -5,6 +5,8 @@
 
 class BatteryClass {
 public:
+    uint32_t lastUpdate;
+
     float chargeVoltage;
     float chargeCurrentLimitation;
     float dischargeCurrentLimitation;

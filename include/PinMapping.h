@@ -6,6 +6,7 @@
 #include <stdint.h>
 
 #define PINMAPPING_FILENAME "/pin_mapping.json"
+#define PINMAPPING_LED_COUNT 2
 
 #define MAPPING_NAME_STRLEN 31
 
@@ -33,6 +34,13 @@ struct PinMapping_t {
     uint8_t victron_rx;
     uint8_t battery_rx;
     uint8_t battery_tx;
+    uint8_t huawei_miso;
+    uint8_t huawei_mosi;
+    uint8_t huawei_clk;
+    uint8_t huawei_irq;
+    uint8_t huawei_cs;
+    uint8_t huawei_power;
+    int8_t led[PINMAPPING_LED_COUNT];
 };
 
 class PinMappingClass {
@@ -45,7 +53,8 @@ public:
     bool isValidEthConfig();
     bool isValidVictronConfig();
     bool isValidBatteryConfig();
-
+    bool isValidHuaweiConfig();
+    
 private:
     PinMapping_t _pinMapping;
 };

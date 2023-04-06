@@ -103,3 +103,5 @@ The json file can contain multiple profiles. Each profile requires a name and di
 | display.clk   | number    | Clock Pin (e.g. SCL for i2c displays) required for SSD1306 and SH1106. Use 255 for not assigned pins. |
 | display.cs    | number    | Chip Select Pin required for PCD8544. Use 255 for not assigned pins. |
 | display.reset | number    | Reset Pin required for PCD8544, optional for all other displays. Use 255 for not assigned pins. |
+| led.led0      | number    | LED pin for network indication. Blinking = WLAN connected but NTP & MQTT (if enabled) disconnected. On = WLAN, NTP, MQTT connected. Off = Network not connected |
+| led.led1      | number    | LED pin for inverter indication. On = All inverters reachable & producing. Blinking = All inverters reachable but not producing. Off = At least one inverter is not reachable. Only inverters with polling enabled are considered. |

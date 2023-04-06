@@ -10,6 +10,9 @@
         "DTUSettings": "DTU",
         "DeviceManager": "Périphériques",
         "VedirectSettings": "Ve.direct",
+        "PowerMeterSettings": "Power Meter",
+        "BatterySettings": "Battery",
+        "AcChargerSettings": "AC Charger",
         "ConfigManagement": "Gestion de la configuration",
         "FirmwareUpgrade": "Mise à jour du firmware",
         "DeviceReboot": "Redémarrage de l'appareil",
@@ -25,7 +28,8 @@
         "Login": "Connexion"
     },
     "base": {
-        "Loading": "Chargement..."
+        "Loading": "Chargement...",
+        "Reload": "Reload"
     },
     "localeswitcher": {
         "Dark": "Dark",
@@ -321,9 +325,13 @@
         "Unit": "Unité"
     },
     "invertertotalinfo": {
-        "TotalYieldTotal": "Rendement total",
-        "TotalYieldDay": "Rendement du jour",
-        "TotalPower": "Puissance de l'installation"
+        "InverterTotalYieldTotal": "Onduleurs rendement total",
+        "InverterTotalYieldDay": "Onduleurs rendement du jour",
+        "InverterTotalPower": "Onduleurs puissance de l'installation",
+        "MpptTotalYieldTotal": "MPPT rendement total",
+        "MpptTotalYieldDay": "MPPT rendement du jour",
+        "MpptTotalPower": "MPPT puissance de l'installation",
+        "BatterySoc": "State of charge"
     },
     "inverterchannelproperty": {
         "Power": "Puissance",
@@ -571,5 +579,68 @@
         "Name": "Nom",
         "ValueSelected": "Sélectionné",
         "ValueActive": "Activé"
-    }
+      },
+      "huawei": {
+        "DataAge": "Data Age: ",
+        "Seconds": " {val} seconds",
+        "Input": "Input",
+        "Output": "Output",
+        "Property": "Property",
+        "Value": "Value",
+        "Unit": "Unit",
+        "input_voltage": "Input voltage",
+        "input_current": "Input current",
+        "input_power": "Input power",
+        "input_temp": "Input temperature",
+        "efficiency": "Efficiency",
+        "output_voltage": "Output voltage",
+        "output_current": "Output current",
+        "max_output_current": "Maximum output current",
+        "output_power": "Output power",
+        "output_temp": "Output temperature",
+        "ShowSetLimit": "Show / Set Huawei Limit",
+        "LimitSettings": "Limit Settings",
+        "SetOffline": "Set limit, CAN bus not connected",
+        "SetOnline": "Set limit, CAN bus connected",
+        "LimitHint": "<b>Hint:</b> CAN bus not connected voltage limit is 48V-58.5V.",
+        "Close": "close",
+        "SetVoltageLimit": "Voltage limit:",
+        "SetCurrentLimit": "Current limit:",
+        "CurrentLimit": "Current limit:"  
+      },
+      "acchargeradmin": {
+        "ChargerSettings": "AC Charger Settings",
+        "Configuration": "AC Charger Configuration",
+        "EnableHuawei": "Enable Huawei R4850G2 on CAN Bus Interface",
+        "Seconds": "@:dtuadmin.Seconds",
+        "Save": "@:dtuadmin.Save"
+      },
+      "battery": {
+        "battery": "battery",
+        "DataAge": "Data Age: ",
+        "Seconds": " {val} seconds",
+        "Status": "Status",
+        "Property": "Property",
+        "Value": "Value",
+        "Unit": "Unit",
+        "stateOfCharge": "State of charge",
+        "stateOfHealth": "State of health",
+        "voltage": "Voltage",
+        "current": "Current",
+        "temperature": "Temperature",
+        "chargeVoltage": "Requested charge voltage",
+        "chargeCurrentLimitation": "Charge current limit",
+        "dischargeCurrentLimitation": "Discharge current limit",
+        "warn_alarm": "Alarms and warnings",
+        "ok": "OK",
+        "alarm": "Alarm",
+        "warning": "Warning",
+        "dischargeCurrent": "Discharge current",
+        "chargeCurrent": "Charge current",
+        "lowTemperature": "Low temperature",
+        "highTemperature": "High temperature",
+        "lowVoltage": "Low voltage",
+        "highVoltage": "High voltage",
+        "bmsInternal": "BMS internal"
+      }
 }
