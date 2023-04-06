@@ -96,6 +96,11 @@ bool InverterAbstract::getEnableCommands()
     return _enableCommands;
 }
 
+bool InverterAbstract::sendChangeChannelRequest()
+{
+    return false;
+}
+
 HoymilesRadio* InverterAbstract::getRadio()
 {
     return _radio;

@@ -63,6 +63,7 @@ public:
     virtual bool sendPowerControlRequest(bool turnOn) = 0;
     virtual bool sendRestartControlRequest() = 0;
     virtual bool resendPowerControlRequest() = 0;
+    virtual bool sendChangeChannelRequest();
 
     HoymilesRadio* getRadio();
 

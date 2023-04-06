@@ -54,39 +54,6 @@ bool HoymilesRadio_CMT::cmtSwitchDtuFreq(const uint32_t to_freq_kHz)
     return true;
 }
 
-bool HoymilesRadio_CMT::cmtSwitchInvAndDtuFreq(const uint64_t inv_serial, const uint32_t from_freq_kHz, const uint32_t to_freq_kHz)
-{
-    const uint8_t fromChannel = getChannelFromFrequency(from_freq_kHz);
-    const uint8_t toChannel = getChannelFromFrequency(to_freq_kHz);
-    if (fromChannel == 0xFF || toChannel == 0xFF) {
-        return false;
-    }
-
-    _radio->setChannel(fromChannel);
-    cmtTx56toCh = toChannel;
-
-    // CMD56 for inverter frequency/channel switch
-    cmtTxBuffer[0] = 0x56;
-    // cmtTxBuffer[1-4] = last inverter serial
-    // cmtTxBuffer[5-8] = dtu serial
-    cmtTxBuffer[9] = 0x02;
-    cmtTxBuffer[10] = 0x15;
-    cmtTxBuffer[11] = 0x21;
-    cmtTxBuffer[12] = (uint8_t)(CMT_BASE_CH_OFFSET860 + toChannel);
-    cmtTxBuffer[13] = 0x14;
-    cmtTxBuffer[14] = crc8(cmtTxBuffer, 14);
-
-    Hoymiles.getMessageOutput()->printf("TX CMD56 %.2f MHz --> ", getFrequencyFromChannel(_radio->getChannel()));
-    dumpBuf(cmtTxBuffer, 15);
-
-    cmtTxLength = 15;
-    _txTimeout.set(100);
-
-    cmtNextState = CMT_STATE_TX_START;
-
-    return true;
-}
-
 enumCMTresult HoymilesRadio_CMT::cmtProcess(void)
 {
     enumCMTresult nRes = CMT_BUSY;
@@ -142,7 +109,6 @@ enumCMTresult HoymilesRadio_CMT::cmtProcess(void)
 
         uint8_t state = CMT2300A_ReadReg(CMT2300A_CUS_INT_FLAG);
         if ((state & 0x1b) == 0x1b) {
-            cmtRxTimeoutCnt = 0;
 
             if (!(_rxBuffer.size() > FRAGMENT_BUFFER_SIZE)) {
                 fragment_t f;
@@ -188,89 +154,7 @@ enumCMTresult HoymilesRadio_CMT::cmtProcess(void)
 
         cmtNextState = CMT_STATE_IDLE;
 
-        // send CMD56 after 3 Rx timeouts
-        if (cmtRxTimeoutCnt < 2) {
-            cmtRxTimeoutCnt++;
-        } else {
-            uint32_t invSerial = cmtTxBuffer[1] << 24 | cmtTxBuffer[2] << 16 | cmtTxBuffer[3] << 8 | cmtTxBuffer[4]; // read inverter serial from last Tx buffer
-            cmtSwitchInvAndDtuFreq(invSerial, HOY_BOOT_FREQ / 1000, _inverterTargetFrequency);
-        }
-
         nRes = CMT_RX_TIMEOUT;
-        break;
-
-    case CMT_STATE_TX_START:
-        CMT2300A_GoStby();
-        CMT2300A_ClearInterruptFlags();
-
-        /* Must clear FIFO after enable SPI to read or write the FIFO */
-        CMT2300A_EnableWriteFifo();
-        CMT2300A_ClearTxFifo();
-
-        CMT2300A_WriteReg(CMT2300A_CUS_PKT15, cmtTxLength); // set Tx length
-        /* The length need be smaller than 32 */
-        CMT2300A_WriteFifo(cmtTxBuffer, cmtTxLength);
-
-        if (!(CMT2300A_ReadReg(CMT2300A_CUS_FIFO_FLAG) & CMT2300A_MASK_TX_FIFO_NMTY_FLG)) {
-            cmtNextState = CMT_STATE_ERROR;
-        }
-
-        if (!CMT2300A_GoTx()) {
-            cmtNextState = CMT_STATE_ERROR;
-        } else {
-            cmtNextState = CMT_STATE_TX_WAIT;
-        }
-
-        _txTimeout.reset();
-
-        break;
-
-    case CMT_STATE_TX_WAIT:
-        if (!_gpio2_configured) {
-            if (CMT2300A_MASK_TX_DONE_FLG & CMT2300A_ReadReg(CMT2300A_CUS_INT_CLR1)) { // read INT1, TX_DONE flag
-                _packetSent = true;
-            }
-        }
-        if (_packetSent) {
-            Hoymiles.getMessageOutput()->println(F("Interrupt 1 received"));
-            _packetSent = false; // reset interrupt 1
-            cmtNextState = CMT_STATE_TX_DONE;
-        }
-
-        if (_txTimeout.occured()) {
-            cmtNextState = CMT_STATE_TX_TIMEOUT;
-        }
-
-        break;
-
-    case CMT_STATE_TX_DONE:
-        CMT2300A_ClearInterruptFlags();
-        CMT2300A_GoSleep();
-
-        if (cmtTx56toCh != 0xFF) {
-            _radio->setChannel(cmtTx56toCh);
-            cmtTx56toCh = 0xFF;
-            cmtNextState = CMT_STATE_IDLE;
-        } else {
-            cmtNextState = CMT_STATE_RX_START; // receive answer
-        }
-
-        nRes = CMT_TX_DONE;
-        break;
-
-    case CMT_STATE_TX_TIMEOUT:
-        CMT2300A_GoSleep();
-
-        Hoymiles.getMessageOutput()->println("TX timeout!");
-
-        if (cmtTx56toCh != 0xFF) {
-            cmtTx56toCh = 0xFF;
-            cmtNextState = CMT_STATE_IDLE;
-        }
-
-        cmtNextState = CMT_STATE_IDLE;
-
-        nRes = CMT_TX_TIMEOUT;
         break;
 
     case CMT_STATE_ERROR:
@@ -437,6 +321,11 @@ void HoymilesRadio_CMT::setInverterTargetFrequency(uint32_t frequency)
     cmtSwitchDtuFreq(_inverterTargetFrequency);
 }
 
+uint32_t HoymilesRadio_CMT::getInverterTargetFrequency()
+{
+    return _inverterTargetFrequency;
+}
+
 bool HoymilesRadio_CMT::isConnected()
 {
     if (!_isInitialized) {
@@ -471,19 +360,22 @@ void HoymilesRadio_CMT::sendEsbPacket(CommandAbstract* cmd)
 
     cmd->setRouterAddress(DtuSerial().u64);
 
+    uint8_t oldChannel;
+    oldChannel = _radio->getChannel();
+    if (cmd->getDataPayload()[0] == 0x56) { // @todo(tbnobody) Bad hack to identify ChannelChange Command
+        cmtSwitchDtuFreq(HOY_BOOT_FREQ / 1000);
+    }
+
     Hoymiles.getMessageOutput()->printf("TX %s %.2f MHz --> ",
         cmd->getCommandName().c_str(), getFrequencyFromChannel(_radio->getChannel()));
     cmd->dumpDataPayload(Hoymiles.getMessageOutput());
 
-    // Still here for to handle CMD56 correctly (inverter serial etc.)
-    memcpy(cmtTxBuffer, cmd->getDataPayload(), cmd->getDataSize());
-
     if (_radio->write(cmd->getDataPayload(), cmd->getDataSize())) {
-        _packetSent = false; // still bad hack, to be removed
         cmtNextState = CMT_STATE_RX_START;
     } else {
         Hoymiles.getMessageOutput()->println("TX SPI Timeout");
     }
+    _radio->setChannel(oldChannel);
 
     _busyFlag = true;
     _rxTimeout.set(cmd->getTimeout());

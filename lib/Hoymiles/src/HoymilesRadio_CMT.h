@@ -24,10 +24,6 @@ typedef enum {
     CMT_STATE_RX_WAIT,
     CMT_STATE_RX_DONE,
     CMT_STATE_RX_TIMEOUT,
-    CMT_STATE_TX_START,
-    CMT_STATE_TX_WAIT,
-    CMT_STATE_TX_DONE,
-    CMT_STATE_TX_TIMEOUT,
     CMT_STATE_ERROR,
 } enumCMTstate;
 
@@ -37,8 +33,6 @@ typedef enum {
     CMT_BUSY,
     CMT_RX_DONE,
     CMT_RX_TIMEOUT,
-    CMT_TX_DONE,
-    CMT_TX_TIMEOUT,
     CMT_ERROR,
 } enumCMTresult;
 
@@ -48,11 +42,15 @@ public:
     void loop();
     void setPALevel(int8_t paLevel);
     void setInverterTargetFrequency(uint32_t frequency);
+    uint32_t getInverterTargetFrequency();
 
     bool isConnected();
 
     static uint32_t getMinFrequency();
     static uint32_t getMaxFrequency();
+
+    static float getFrequencyFromChannel(const uint8_t channel);
+    static uint8_t getChannelFromFrequency(const uint32_t freq_kHz);
 
 private:
     void ARDUINO_ISR_ATTR handleInt1();
@@ -74,21 +72,11 @@ private:
 
     uint32_t _inverterTargetFrequency = HOYMILES_CMT_WORK_FREQ;
 
-    static float getFrequencyFromChannel(const uint8_t channel);
-    static uint8_t getChannelFromFrequency(const uint32_t freq_kHz);
-
     bool cmtSwitchDtuFreq(const uint32_t to_freq_kHz);
-    bool cmtSwitchInvAndDtuFreq(const uint64_t inv_serial, const uint32_t from_freq_kHz, const uint32_t to_freq_kHz);
     enumCMTresult cmtProcess(void);
 
     enumCMTstate cmtNextState = CMT_STATE_IDLE;
-    uint8_t cmtTxBuffer[32];
-    uint8_t cmtTxLength = 0;
 
     uint32_t cmtRxTimeout = 200;
     uint32_t cmtRxTimeCount = 0;
-
-    uint8_t cmtTx56toCh = 0xFF; // send CMD56 active to Channel xx, inactive = 0xFF
-
-    uint8_t cmtRxTimeoutCnt = 0; // Rx timeout counter !!! should be stored per inverter !!!
 };

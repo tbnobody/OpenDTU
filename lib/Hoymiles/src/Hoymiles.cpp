@@ -58,6 +58,10 @@ void HoymilesClass::loop()
                 _messageOutput->print("Fetch inverter: ");
                 _messageOutput->println(iv->serial(), HEX);
 
+                if (!iv->isReachable()) {
+                    iv->sendChangeChannelRequest();
+                }
+
                 iv->sendStatsRequest();
 
                 // Fetch event log
