@@ -35,7 +35,13 @@
     "label_extractor": [
         {
             "pattern": "(.): (.+)",
-            "target": "$1"
+            "target": "$1",
+            "on_property": "title"
+        },
+        {
+            "pattern": "(.) (.+)",
+            "target": "$1",
+            "on_property": "title"
         }
     ],
     "tag_resolver": {
