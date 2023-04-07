@@ -174,7 +174,8 @@ int32_t PowerLimiterClass::calcPowerLimit(std::shared_ptr<InverterAbstract> inve
     int32_t newPowerLimit = round(PowerMeter.getPowerTotal());
 
     // Safety check, return on too old power meter values
-    if ((millis() - PowerMeter.getLastPowerMeterUpdate()) > (30 * 1000)) {
+    if (millis() - PowerMeter.getLastPowerMeterUpdate() < (30 * 1000)
+            && millis() - inverter->Statistics()->getLastUpdate() < (15 * 1000)) {
         // If the power meter values are older than 30 seconds,
         // set the limit to config.PowerLimiter_LowerPowerLimit for safety reasons.
         MessageOutput.println("[PowerLimiterClass::loop] Power Meter values too old. Using lower limit");
@@ -193,7 +194,7 @@ int32_t PowerLimiterClass::calcPowerLimit(std::shared_ptr<InverterAbstract> inve
         // If the inverter the behind the power meter (part of measurement),
         // the produced power of this inverter has also to be taken into account.
         // We don't use FLD_PAC from the statistics, because that
-        // data might be too old and unrelieable.
+        // data might be too old and unreliable.
         float acPower = inverter->Statistics()->getChannelFieldValue(TYPE_AC, (ChannelNum_t) config.PowerLimiter_InverterChannelId, FLD_PAC); 
         newPowerLimit += static_cast<int>(acPower);
     }
@@ -211,7 +212,7 @@ int32_t PowerLimiterClass::calcPowerLimit(std::shared_ptr<InverterAbstract> inve
 
     int32_t upperPowerLimit = config.PowerLimiter_UpperPowerLimit;
     if (consumeSolarPowerOnly && (upperPowerLimit > adjustedVictronChargePower)) {
-        // Battery voltage too low, use Victron solar power (corrected by efficency factor) only
+        // Battery voltage too low, use Victron solar power (corrected by efficiency factor) only
         upperPowerLimit = adjustedVictronChargePower;
     }
 
