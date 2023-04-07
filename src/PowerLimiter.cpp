@@ -174,8 +174,8 @@ int32_t PowerLimiterClass::calcPowerLimit(std::shared_ptr<InverterAbstract> inve
     int32_t newPowerLimit = round(PowerMeter.getPowerTotal());
 
     // Safety check, return on too old power meter values
-    if (millis() - PowerMeter.getLastPowerMeterUpdate() < (30 * 1000)
-            && millis() - inverter->Statistics()->getLastUpdate() < (config.Dtu_PollInterval * 3 * 1000)) {
+    if (millis() - PowerMeter.getLastPowerMeterUpdate() > (30 * 1000)
+            && (millis() - inverter->Statistics()->getLastUpdate()) > (config.Dtu_PollInterval * 3 * 1000)) {
         // If the power meter values are older than 30 seconds, 
         // and the Inverter Stats are older then 3x the poll interval
         // set the limit to config.PowerLimiter_LowerPowerLimit for safety reasons.
