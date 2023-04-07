@@ -138,8 +138,9 @@ Use a power suppy with 5 V and 1 A. The USB cable connected to your PC/Notebook 
 
 ### Change pin assignment
 
-Its possible to change all the pins of the NRF24L01+ module.
-This can be achieved by copying one of the [env:....] sections from 'platformio.ini' to 'platformio_override.ini' and editing the 'platformio_override.ini' file and add/change one or more of the following lines to the 'build_flags' parameter:
+Its possible to change all the pins of the NRF24L01+ module, the Display, the LED etc.
+The recommend way to change the pin assignment is by creating a custom [device profile](docs/DeviceProfiles.md).
+It is also possible to create a custom environment and compile the source yourself. This can be achieved by copying one of the [env:....] sections from 'platformio.ini' to 'platformio_override.ini' and editing the 'platformio_override.ini' file and add/change one or more of the following lines to the 'build_flags' parameter:
 
 ```makefile
 -DHOYMILES_PIN_MISO=19
@@ -151,7 +152,6 @@ This can be achieved by copying one of the [env:....] sections from 'platformio.
 ```
 
 It is recommended to make all changes only in the  'platformio_override.ini', this is your personal copy.
-You can also change  the pins by creating a custom [device profile](docs/DeviceProfiles.md).
 
 ## Flashing and starting up
 
