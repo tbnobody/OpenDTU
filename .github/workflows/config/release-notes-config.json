@@ -1,0 +1,44 @@
+{
+    "categories": [
+        {
+            "title": "## ⚡ Breaking Changes",
+            "labels": [
+                "breaking change"
+            ]
+        },
+        {
+            "title": "## 🚀 Features",
+            "labels": [
+                "feature"
+            ]
+        },
+        {
+            "title": "## 🐛 Fixes",
+            "labels": [
+                "fix"
+            ]
+        },
+        {
+            "title": "## 📚 Documentation",
+            "labels": [
+                "doc"
+            ]
+        },
+        {
+            "title": "## 🛠 Under the hood",
+            "labels": []
+        }
+    ],
+    "template": "${{CHANGELOG}}",
+    "pr_template": "- [${{TITLE}}](https://github.com/tbnobody/OpenDTU/commit/${{MERGE_SHA}})",
+    "empty_template": "- no changes",
+    "label_extractor": [
+        {
+            "pattern": "(.): (.+)",
+            "target": "$1"
+        }
+    ],
+    "tag_resolver": {
+        "method": "sort"
+    }
+}

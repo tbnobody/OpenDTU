@@ -30,6 +30,14 @@
 #define DISPLAY_RESET 255
 #endif
 
+#ifndef LED0
+#define LED0 -1
+#endif
+
+#ifndef LED1
+#define LED1 -1
+#endif
+
 PinMappingClass PinMapping;
 
 PinMappingClass::PinMappingClass()
@@ -73,6 +81,8 @@ PinMappingClass::PinMappingClass()
     _pinMapping.huawei_cs = HUAWEI_PIN_CS;
     _pinMapping.huawei_irq = HUAWEI_PIN_IRQ;
     _pinMapping.huawei_power = HUAWEI_PIN_POWER;
+    _pinMapping.led[0] = LED0;
+    _pinMapping.led[1] = LED1;
 }
 
 PinMapping_t& PinMappingClass::get()
@@ -92,7 +102,7 @@ bool PinMappingClass::init(const String& deviceMapping)
     // Deserialize the JSON document
     DeserializationError error = deserializeJson(doc, f);
     if (error) {
-        MessageOutput.println(F("Failed to read file, using default configuration"));
+        MessageOutput.println("Failed to read file, using default configuration");
     }
 
     for (uint8_t i = 0; i < doc.size(); i++) {
@@ -138,6 +148,9 @@ bool PinMappingClass::init(const String& deviceMapping)
             _pinMapping.huawei_cs = doc[i]["huawei"]["cs"] | HUAWEI_PIN_CS;
             _pinMapping.huawei_power = doc[i]["huawei"]["power"] | HUAWEI_PIN_POWER;
 
+            _pinMapping.led[0] = doc[i]["led"]["led0"] | LED0;
+            _pinMapping.led[1] = doc[i]["led"]["led1"] | LED1;
+
             return true;
         }
     }
@@ -147,12 +160,12 @@ bool PinMappingClass::init(const String& deviceMapping)
 
 bool PinMappingClass::isValidNrf24Config()
 {
-    return _pinMapping.nrf24_clk > 0
-        && _pinMapping.nrf24_cs > 0
-        && _pinMapping.nrf24_en > 0
-        && _pinMapping.nrf24_irq > 0
-        && _pinMapping.nrf24_miso > 0
-        && _pinMapping.nrf24_mosi > 0;
+    return _pinMapping.nrf24_clk >= 0
+        && _pinMapping.nrf24_cs >= 0
+        && _pinMapping.nrf24_en >= 0
+        && _pinMapping.nrf24_irq >= 0
+        && _pinMapping.nrf24_miso >= 0
+        && _pinMapping.nrf24_mosi >= 0;
 }
 
 bool PinMappingClass::isValidEthConfig()

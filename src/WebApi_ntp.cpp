@@ -38,29 +38,29 @@ void WebApiNtpClass::onNtpStatus(AsyncWebServerRequest* request)
     JsonObject root = response->getRoot();
     const CONFIG_T& config = Configuration.get();
 
-    root[F("ntp_server")] = config.Ntp_Server;
-    root[F("ntp_timezone")] = config.Ntp_Timezone;
-    root[F("ntp_timezone_descr")] = config.Ntp_TimezoneDescr;
+    root["ntp_server"] = config.Ntp_Server;
+    root["ntp_timezone"] = config.Ntp_Timezone;
+    root["ntp_timezone_descr"] = config.Ntp_TimezoneDescr;
 
     struct tm timeinfo;
     if (!getLocalTime(&timeinfo, 5)) {
-        root[F("ntp_status")] = false;
+        root["ntp_status"] = false;
     } else {
-        root[F("ntp_status")] = true;
+        root["ntp_status"] = true;
     }
     char timeStringBuff[50];
     strftime(timeStringBuff, sizeof(timeStringBuff), "%A, %B %d %Y %H:%M:%S", &timeinfo);
-    root[F("ntp_localtime")] = timeStringBuff;
+    root["ntp_localtime"] = timeStringBuff;
 
     SunPosition.sunriseTime(&timeinfo);
     strftime(timeStringBuff, sizeof(timeStringBuff), "%A, %B %d %Y %H:%M:%S", &timeinfo);
-    root[F("sun_risetime")] = timeStringBuff;
+    root["sun_risetime"] = timeStringBuff;
 
     SunPosition.sunsetTime(&timeinfo);
     strftime(timeStringBuff, sizeof(timeStringBuff), "%A, %B %d %Y %H:%M:%S", &timeinfo);
-    root[F("sun_settime")] = timeStringBuff;
+    root["sun_settime"] = timeStringBuff;
 
-    root[F("sun_isDayPeriod")] = SunPosition.isDayPeriod();
+    root["sun_isDayPeriod"] = SunPosition.isDayPeriod();
 
     response->setLength();
     request->send(response);
@@ -76,11 +76,11 @@ void WebApiNtpClass::onNtpAdminGet(AsyncWebServerRequest* request)
     JsonObject root = response->getRoot();
     const CONFIG_T& config = Configuration.get();
 
-    root[F("ntp_server")] = config.Ntp_Server;
-    root[F("ntp_timezone")] = config.Ntp_Timezone;
-    root[F("ntp_timezone_descr")] = config.Ntp_TimezoneDescr;
-    root[F("longitude")] = config.Ntp_Longitude;
-    root[F("latitude")] = config.Ntp_Latitude;
+    root["ntp_server"] = config.Ntp_Server;
+    root["ntp_timezone"] = config.Ntp_Timezone;
+    root["ntp_timezone_descr"] = config.Ntp_TimezoneDescr;
+    root["longitude"] = config.Ntp_Longitude;
+    root["latitude"] = config.Ntp_Latitude;
 
     response->setLength();
     request->send(response);
@@ -94,11 +94,11 @@ void WebApiNtpClass::onNtpAdminPost(AsyncWebServerRequest* request)
 
     AsyncJsonResponse* response = new AsyncJsonResponse();
     JsonObject retMsg = response->getRoot();
-    retMsg[F("type")] = F("warning");
+    retMsg["type"] = "warning";
 
     if (!request->hasParam("data", true)) {
-        retMsg[F("message")] = F("No values found!");
-        retMsg[F("code")] = WebApiError::GenericNoValueFound;
+        retMsg["message"] = "No values found!";
+        retMsg["code"] = WebApiError::GenericNoValueFound;
         response->setLength();
         request->send(response);
         return;
@@ -107,8 +107,8 @@ void WebApiNtpClass::onNtpAdminPost(AsyncWebServerRequest* request)
     String json = request->getParam("data", true)->value();
 
     if (json.length() > 1024) {
-        retMsg[F("message")] = F("Data too large!");
-        retMsg[F("code")] = WebApiError::GenericDataTooLarge;
+        retMsg["message"] = "Data too large!";
+        retMsg["code"] = WebApiError::GenericDataTooLarge;
         response->setLength();
         request->send(response);
         return;
@@ -118,59 +118,59 @@ void WebApiNtpClass::onNtpAdminPost(AsyncWebServerRequest* request)
     DeserializationError error = deserializeJson(root, json);
 
     if (error) {
-        retMsg[F("message")] = F("Failed to parse data!");
-        retMsg[F("code")] = WebApiError::GenericParseError;
+        retMsg["message"] = "Failed to parse data!";
+        retMsg["code"] = WebApiError::GenericParseError;
         response->setLength();
         request->send(response);
         return;
     }
 
     if (!(root.containsKey("ntp_server") && root.containsKey("ntp_timezone") && root.containsKey("longitude") && root.containsKey("latitude"))) {
-        retMsg[F("message")] = F("Values are missing!");
-        retMsg[F("code")] = WebApiError::GenericValueMissing;
+        retMsg["message"] = "Values are missing!";
+        retMsg["code"] = WebApiError::GenericValueMissing;
         response->setLength();
         request->send(response);
         return;
     }
 
-    if (root[F("ntp_server")].as<String>().length() == 0 || root[F("ntp_server")].as<String>().length() > NTP_MAX_SERVER_STRLEN) {
-        retMsg[F("message")] = F("NTP Server must between 1 and " STR(NTP_MAX_SERVER_STRLEN) " characters long!");
-        retMsg[F("code")] = WebApiError::NtpServerLength;
-        retMsg[F("param")][F("max")] = NTP_MAX_SERVER_STRLEN;
+    if (root["ntp_server"].as<String>().length() == 0 || root["ntp_server"].as<String>().length() > NTP_MAX_SERVER_STRLEN) {
+        retMsg["message"] = "NTP Server must between 1 and " STR(NTP_MAX_SERVER_STRLEN) " characters long!";
+        retMsg["code"] = WebApiError::NtpServerLength;
+        retMsg["param"]["max"] = NTP_MAX_SERVER_STRLEN;
         response->setLength();
         request->send(response);
         return;
     }
 
-    if (root[F("ntp_timezone")].as<String>().length() == 0 || root[F("ntp_timezone")].as<String>().length() > NTP_MAX_TIMEZONE_STRLEN) {
-        retMsg[F("message")] = F("Timezone must between 1 and " STR(NTP_MAX_TIMEZONE_STRLEN) " characters long!");
-        retMsg[F("code")] = WebApiError::NtpTimezoneLength;
-        retMsg[F("param")][F("max")] = NTP_MAX_TIMEZONE_STRLEN;
+    if (root["ntp_timezone"].as<String>().length() == 0 || root["ntp_timezone"].as<String>().length() > NTP_MAX_TIMEZONE_STRLEN) {
+        retMsg["message"] = "Timezone must between 1 and " STR(NTP_MAX_TIMEZONE_STRLEN) " characters long!";
+        retMsg["code"] = WebApiError::NtpTimezoneLength;
+        retMsg["param"]["max"] = NTP_MAX_TIMEZONE_STRLEN;
         response->setLength();
         request->send(response);
         return;
     }
 
-    if (root[F("ntp_timezone_descr")].as<String>().length() == 0 || root[F("ntp_timezone_descr")].as<String>().length() > NTP_MAX_TIMEZONEDESCR_STRLEN) {
-        retMsg[F("message")] = F("Timezone description must between 1 and " STR(NTP_MAX_TIMEZONEDESCR_STRLEN) " characters long!");
-        retMsg[F("code")] = WebApiError::NtpTimezoneDescriptionLength;
-        retMsg[F("param")][F("max")] = NTP_MAX_TIMEZONEDESCR_STRLEN;
+    if (root["ntp_timezone_descr"].as<String>().length() == 0 || root["ntp_timezone_descr"].as<String>().length() > NTP_MAX_TIMEZONEDESCR_STRLEN) {
+        retMsg["message"] = "Timezone description must between 1 and " STR(NTP_MAX_TIMEZONEDESCR_STRLEN) " characters long!";
+        retMsg["code"] = WebApiError::NtpTimezoneDescriptionLength;
+        retMsg["param"]["max"] = NTP_MAX_TIMEZONEDESCR_STRLEN;
         response->setLength();
         request->send(response);
         return;
     }
 
     CONFIG_T& config = Configuration.get();
-    strlcpy(config.Ntp_Server, root[F("ntp_server")].as<String>().c_str(), sizeof(config.Ntp_Server));
-    strlcpy(config.Ntp_Timezone, root[F("ntp_timezone")].as<String>().c_str(), sizeof(config.Ntp_Timezone));
-    strlcpy(config.Ntp_TimezoneDescr, root[F("ntp_timezone_descr")].as<String>().c_str(), sizeof(config.Ntp_TimezoneDescr));
-    config.Ntp_Latitude = root[F("latitude")].as<double>();
-    config.Ntp_Longitude = root[F("longitude")].as<double>();
+    strlcpy(config.Ntp_Server, root["ntp_server"].as<String>().c_str(), sizeof(config.Ntp_Server));
+    strlcpy(config.Ntp_Timezone, root["ntp_timezone"].as<String>().c_str(), sizeof(config.Ntp_Timezone));
+    strlcpy(config.Ntp_TimezoneDescr, root["ntp_timezone_descr"].as<String>().c_str(), sizeof(config.Ntp_TimezoneDescr));
+    config.Ntp_Latitude = root["latitude"].as<double>();
+    config.Ntp_Longitude = root["longitude"].as<double>();
     Configuration.write();
 
-    retMsg[F("type")] = F("success");
-    retMsg[F("message")] = F("Settings saved!");
-    retMsg[F("code")] = WebApiError::GenericSuccess;
+    retMsg["type"] = "success";
+    retMsg["message"] = "Settings saved!";
+    retMsg["code"] = WebApiError::GenericSuccess;
 
     response->setLength();
     request->send(response);
@@ -190,17 +190,17 @@ void WebApiNtpClass::onNtpTimeGet(AsyncWebServerRequest* request)
 
     struct tm timeinfo;
     if (!getLocalTime(&timeinfo, 5)) {
-        root[F("ntp_status")] = false;
+        root["ntp_status"] = false;
     } else {
-        root[F("ntp_status")] = true;
+        root["ntp_status"] = true;
     }
 
-    root[F("year")] = timeinfo.tm_year + 1900;
-    root[F("month")] = timeinfo.tm_mon + 1;
-    root[F("day")] = timeinfo.tm_mday;
-    root[F("hour")] = timeinfo.tm_hour;
-    root[F("minute")] = timeinfo.tm_min;
-    root[F("second")] = timeinfo.tm_sec;
+    root["year"] = timeinfo.tm_year + 1900;
+    root["month"] = timeinfo.tm_mon + 1;
+    root["day"] = timeinfo.tm_mday;
+    root["hour"] = timeinfo.tm_hour;
+    root["minute"] = timeinfo.tm_min;
+    root["second"] = timeinfo.tm_sec;
 
     response->setLength();
     request->send(response);
@@ -214,11 +214,11 @@ void WebApiNtpClass::onNtpTimePost(AsyncWebServerRequest* request)
 
     AsyncJsonResponse* response = new AsyncJsonResponse();
     JsonObject retMsg = response->getRoot();
-    retMsg[F("type")] = F("warning");
+    retMsg["type"] = "warning";
 
     if (!request->hasParam("data", true)) {
-        retMsg[F("message")] = F("No values found!");
-        retMsg[F("code")] = WebApiError::GenericNoValueFound;
+        retMsg["message"] = "No values found!";
+        retMsg["code"] = WebApiError::GenericNoValueFound;
         response->setLength();
         request->send(response);
         return;
@@ -227,8 +227,8 @@ void WebApiNtpClass::onNtpTimePost(AsyncWebServerRequest* request)
     String json = request->getParam("data", true)->value();
 
     if (json.length() > 1024) {
-        retMsg[F("message")] = F("Data too large!");
-        retMsg[F("code")] = WebApiError::GenericDataTooLarge;
+        retMsg["message"] = "Data too large!";
+        retMsg["code"] = WebApiError::GenericDataTooLarge;
         response->setLength();
         request->send(response);
         return;
@@ -238,8 +238,8 @@ void WebApiNtpClass::onNtpTimePost(AsyncWebServerRequest* request)
     DeserializationError error = deserializeJson(root, json);
 
     if (error) {
-        retMsg[F("message")] = F("Failed to parse data!");
-        retMsg[F("code")] = WebApiError::GenericParseError;
+        retMsg["message"] = "Failed to parse data!";
+        retMsg["code"] = WebApiError::GenericParseError;
         response->setLength();
         request->send(response);
         return;
@@ -251,89 +251,89 @@ void WebApiNtpClass::onNtpTimePost(AsyncWebServerRequest* request)
             && root.containsKey("hour")
             && root.containsKey("minute")
             && root.containsKey("second"))) {
-        retMsg[F("message")] = F("Values are missing!");
-        retMsg[F("code")] = WebApiError::GenericValueMissing;
+        retMsg["message"] = "Values are missing!";
+        retMsg["code"] = WebApiError::GenericValueMissing;
         response->setLength();
         request->send(response);
         return;
     }
 
-    if (root[F("year")].as<uint>() < 2022 || root[F("year")].as<uint>() > 2100) {
-        retMsg[F("message")] = F("Year must be a number between 2022 and 2100!");
-        retMsg[F("code")] = WebApiError::NtpYearInvalid;
-        retMsg[F("param")][F("min")] = 2022;
-        retMsg[F("param")][F("max")] = 2100;
+    if (root["year"].as<uint>() < 2022 || root["year"].as<uint>() > 2100) {
+        retMsg["message"] = "Year must be a number between 2022 and 2100!";
+        retMsg["code"] = WebApiError::NtpYearInvalid;
+        retMsg["param"]["min"] = 2022;
+        retMsg["param"]["max"] = 2100;
         response->setLength();
         request->send(response);
         return;
     }
 
-    if (root[F("month")].as<uint>() < 1 || root[F("month")].as<uint>() > 12) {
-        retMsg[F("message")] = F("Month must be a number between 1 and 12!");
-        retMsg[F("code")] = WebApiError::NtpMonthInvalid;
-        retMsg[F("param")][F("min")] = 1;
-        retMsg[F("param")][F("max")] = 12;
+    if (root["month"].as<uint>() < 1 || root["month"].as<uint>() > 12) {
+        retMsg["message"] = "Month must be a number between 1 and 12!";
+        retMsg["code"] = WebApiError::NtpMonthInvalid;
+        retMsg["param"]["min"] = 1;
+        retMsg["param"]["max"] = 12;
         response->setLength();
         request->send(response);
         return;
     }
 
-    if (root[F("day")].as<uint>() < 1 || root[F("day")].as<uint>() > 31) {
-        retMsg[F("message")] = F("Day must be a number between 1 and 31!");
-        retMsg[F("code")] = WebApiError::NtpDayInvalid;
-        retMsg[F("param")][F("min")] = 1;
-        retMsg[F("param")][F("max")] = 31;
+    if (root["day"].as<uint>() < 1 || root["day"].as<uint>() > 31) {
+        retMsg["message"] = "Day must be a number between 1 and 31!";
+        retMsg["code"] = WebApiError::NtpDayInvalid;
+        retMsg["param"]["min"] = 1;
+        retMsg["param"]["max"] = 31;
         response->setLength();
         request->send(response);
         return;
     }
 
-    if (root[F("hour")].as<uint>() > 23) {
-        retMsg[F("message")] = F("Hour must be a number between 0 and 23!");
-        retMsg[F("code")] = WebApiError::NtpHourInvalid;
-        retMsg[F("param")][F("min")] = 0;
-        retMsg[F("param")][F("max")] = 23;
+    if (root["hour"].as<uint>() > 23) {
+        retMsg["message"] = "Hour must be a number between 0 and 23!";
+        retMsg["code"] = WebApiError::NtpHourInvalid;
+        retMsg["param"]["min"] = 0;
+        retMsg["param"]["max"] = 23;
         response->setLength();
         request->send(response);
         return;
     }
 
-    if (root[F("minute")].as<uint>() > 59) {
-        retMsg[F("message")] = F("Minute must be a number between 0 and 59!");
-        retMsg[F("code")] = WebApiError::NtpMinuteInvalid;
-        retMsg[F("param")][F("min")] = 0;
-        retMsg[F("param")][F("max")] = 59;
+    if (root["minute"].as<uint>() > 59) {
+        retMsg["message"] = "Minute must be a number between 0 and 59!";
+        retMsg["code"] = WebApiError::NtpMinuteInvalid;
+        retMsg["param"]["min"] = 0;
+        retMsg["param"]["max"] = 59;
         response->setLength();
         request->send(response);
         return;
     }
 
-    if (root[F("second")].as<uint>() > 59) {
-        retMsg[F("message")] = F("Second must be a number between 0 and 59!");
-        retMsg[F("code")] = WebApiError::NtpSecondInvalid;
-        retMsg[F("param")][F("min")] = 0;
-        retMsg[F("param")][F("max")] = 59;
+    if (root["second"].as<uint>() > 59) {
+        retMsg["message"] = "Second must be a number between 0 and 59!";
+        retMsg["code"] = WebApiError::NtpSecondInvalid;
+        retMsg["param"]["min"] = 0;
+        retMsg["param"]["max"] = 59;
         response->setLength();
         request->send(response);
         return;
     }
 
     tm local;
-    local.tm_sec = root[F("second")].as<uint>(); // seconds after the minute - [ 0 to 59 ]
-    local.tm_min = root[F("minute")].as<uint>(); // minutes after the hour - [ 0 to 59 ]
-    local.tm_hour = root[F("hour")].as<uint>(); // hours since midnight - [ 0 to 23 ]
-    local.tm_mday = root[F("day")].as<uint>(); // day of the month - [ 1 to 31 ]
-    local.tm_mon = root[F("month")].as<uint>() - 1; // months since January - [ 0 to 11 ]
-    local.tm_year = root[F("year")].as<uint>() - 1900; // years since 1900
+    local.tm_sec = root["second"].as<uint>(); // seconds after the minute - [ 0 to 59 ]
+    local.tm_min = root["minute"].as<uint>(); // minutes after the hour - [ 0 to 59 ]
+    local.tm_hour = root["hour"].as<uint>(); // hours since midnight - [ 0 to 23 ]
+    local.tm_mday = root["day"].as<uint>(); // day of the month - [ 1 to 31 ]
+    local.tm_mon = root["month"].as<uint>() - 1; // months since January - [ 0 to 11 ]
+    local.tm_year = root["year"].as<uint>() - 1900; // years since 1900
     local.tm_isdst = -1;
 
     time_t t = mktime(&local);
     struct timeval now = { .tv_sec = t, .tv_usec = 0 };
     settimeofday(&now, NULL);
 
-    retMsg[F("type")] = F("success");
-    retMsg[F("message")] = F("Time updated!");
-    retMsg[F("code")] = WebApiError::NtpTimeUpdated;
+    retMsg["type"] = "success";
+    retMsg["message"] = "Time updated!";
+    retMsg["code"] = WebApiError::NtpTimeUpdated;
 
     response->setLength();
     request->send(response);

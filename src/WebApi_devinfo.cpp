@@ -34,18 +34,18 @@ void WebApiDevInfoClass::onDevInfoStatus(AsyncWebServerRequest* request)
         auto inv = Hoymiles.getInverterByPos(i);
 
         JsonObject devInfoObj = root[inv->serialString()].createNestedObject();
-        devInfoObj[F("valid_data")] = inv->DevInfo()->getLastUpdate() > 0;
-        devInfoObj[F("fw_bootloader_version")] = inv->DevInfo()->getFwBootloaderVersion();
-        devInfoObj[F("fw_build_version")] = inv->DevInfo()->getFwBuildVersion();
-        devInfoObj[F("hw_part_number")] = inv->DevInfo()->getHwPartNumber();
-        devInfoObj[F("hw_version")] = inv->DevInfo()->getHwVersion();
-        devInfoObj[F("hw_model_name")] = inv->DevInfo()->getHwModelName();
-        devInfoObj[F("max_power")] = inv->DevInfo()->getMaxPower();
+        devInfoObj["valid_data"] = inv->DevInfo()->getLastUpdate() > 0;
+        devInfoObj["fw_bootloader_version"] = inv->DevInfo()->getFwBootloaderVersion();
+        devInfoObj["fw_build_version"] = inv->DevInfo()->getFwBuildVersion();
+        devInfoObj["hw_part_number"] = inv->DevInfo()->getHwPartNumber();
+        devInfoObj["hw_version"] = inv->DevInfo()->getHwVersion();
+        devInfoObj["hw_model_name"] = inv->DevInfo()->getHwModelName();
+        devInfoObj["max_power"] = inv->DevInfo()->getMaxPower();
 
         char timebuffer[32];
         const time_t t = inv->DevInfo()->getFwBuildDateTime();
         std::strftime(timebuffer, sizeof(timebuffer), "%Y-%m-%d %H:%M:%S", gmtime(&t));
-        devInfoObj[F("fw_build_datetime")] = String(timebuffer);
+        devInfoObj["fw_build_datetime"] = String(timebuffer);
     }
 
     response->setLength();

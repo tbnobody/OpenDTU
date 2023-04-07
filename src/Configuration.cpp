@@ -180,7 +180,7 @@ bool ConfigurationClass::read()
     // Deserialize the JSON document
     DeserializationError error = deserializeJson(doc, f);
     if (error) {
-        MessageOutput.printf("Failed to read file, using default configuration. Error: %s (capacity: %d)\r\n", error.c_str(), doc.capacity());
+        MessageOutput.println("Failed to read file, using default configuration");
     }
 
     JsonObject cfg = doc["cfg"];
@@ -359,7 +359,7 @@ void ConfigurationClass::migrate()
 {
     File f = LittleFS.open(CONFIG_FILENAME, "r", false);
     if (!f) {
-        MessageOutput.println(F("Failed to open file, cancel migration"));
+        MessageOutput.println("Failed to open file, cancel migration");
         return;
     }
 

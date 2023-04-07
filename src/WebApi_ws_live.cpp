@@ -6,6 +6,8 @@
 #include "Configuration.h"
 #include "MessageOutput.h"
 #include "WebApi.h"
+#include "Battery.h"
+#include "VeDirectFrameHandler.h"
 #include "defaults.h"
 #include <AsyncJson.h>
 
@@ -105,16 +107,17 @@ void WebApiWsLiveClass::generateJsonResponse(JsonVariant& root)
 
         JsonObject invObject = invArray.createNestedObject();
 
-        invObject[F("serial")] = inv->serialString();
-        invObject[F("name")] = inv->name();
-        invObject[F("data_age")] = (millis() - inv->Statistics()->getLastUpdate()) / 1000;
-        invObject[F("reachable")] = inv->isReachable();
-        invObject[F("producing")] = inv->isProducing();
-        invObject[F("limit_relative")] = inv->SystemConfigPara()->getLimitPercent();
+        invObject["serial"] = inv->serialString();
+        invObject["name"] = inv->name();
+        invObject["data_age"] = (millis() - inv->Statistics()->getLastUpdate()) / 1000;
+        invObject["poll_enabled"] = inv->getEnablePolling();
+        invObject["reachable"] = inv->isReachable();
+        invObject["producing"] = inv->isProducing();
+        invObject["limit_relative"] = inv->SystemConfigPara()->getLimitPercent();
         if (inv->DevInfo()->getMaxPower() > 0) {
-            invObject[F("limit_absolute")] = inv->SystemConfigPara()->getLimitPercent() * inv->DevInfo()->getMaxPower() / 100.0;
+            invObject["limit_absolute"] = inv->SystemConfigPara()->getLimitPercent() * inv->DevInfo()->getMaxPower() / 100.0;
         } else {
-            invObject[F("limit_absolute")] = -1;
+            invObject["limit_absolute"] = -1;
         }
 
         // Loop all channels
@@ -124,14 +127,14 @@ void WebApiWsLiveClass::generateJsonResponse(JsonVariant& root)
                 if (t == TYPE_DC) {
                     INVERTER_CONFIG_T* inv_cfg = Configuration.getInverterConfig(inv->serial());
                     if (inv_cfg != nullptr) {
-                        chanTypeObj[String(static_cast<uint8_t>(c))][F("name")]["u"] = inv_cfg->channel[c].Name;
+                        chanTypeObj[String(static_cast<uint8_t>(c))]["name"]["u"] = inv_cfg->channel[c].Name;
                     }
                 }
                 addField(chanTypeObj, i, inv, t, c, FLD_PAC);
                 addField(chanTypeObj, i, inv, t, c, FLD_UAC);
                 addField(chanTypeObj, i, inv, t, c, FLD_IAC);
                 if (t == TYPE_AC) {
-                    addField(chanTypeObj, i, inv, t, c, FLD_PDC, F("Power DC"));
+                    addField(chanTypeObj, i, inv, t, c, FLD_PDC, "Power DC");
                 } else {
                     addField(chanTypeObj, i, inv, t, c, FLD_PDC);
                 }
@@ -151,9 +154,9 @@ void WebApiWsLiveClass::generateJsonResponse(JsonVariant& root)
         }
 
         if (inv->Statistics()->hasChannelFieldValue(TYPE_INV, CH0, FLD_EVT_LOG)) {
-            invObject[F("events")] = inv->EventLog()->getEntryCount();
+            invObject["events"] = inv->EventLog()->getEntryCount();
         } else {
-            invObject[F("events")] = -1;
+            invObject["events"] = -1;
         }
 
         if (inv->Statistics()->getLastUpdate() > _newestInverterTimestamp) {
@@ -175,23 +178,27 @@ void WebApiWsLiveClass::generateJsonResponse(JsonVariant& root)
 
     JsonObject hintObj = root.createNestedObject("hints");
     struct tm timeinfo;
-    hintObj[F("time_sync")] = !getLocalTime(&timeinfo, 5);
-    hintObj[F("radio_problem")] = (!Hoymiles.getRadio()->isConnected() || !Hoymiles.getRadio()->isPVariant());
+    hintObj["time_sync"] = !getLocalTime(&timeinfo, 5);
+    hintObj["radio_problem"] = (!Hoymiles.getRadio()->isConnected() || !Hoymiles.getRadio()->isPVariant());
     if (!strcmp(Configuration.get().Security_Password, ACCESS_POINT_PASSWORD)) {
-        hintObj[F("default_password")] = true;
+        hintObj["default_password"] = true;
     } else {
-        hintObj[F("default_password")] = false;
+        hintObj["default_password"] = false;
     }
 
     JsonObject vedirectObj = root.createNestedObject("vedirect");
     vedirectObj[F("enabled")] = Configuration.get().Vedirect_Enabled;
-
+    JsonObject totalVeObj = vedirectObj.createNestedObject("total");
+    addTotalField(totalVeObj, "Power", VeDirect.veFrame.PPV, "W", 1);
+    addTotalField(totalVeObj, "YieldDay", VeDirect.veFrame.H20 * 1000, "Wh", 0);
+    addTotalField(totalVeObj, "YieldTotal", VeDirect.veFrame.H19, "kWh", 2);
+    
     JsonObject huaweiObj = root.createNestedObject("huawei");
     huaweiObj[F("enabled")] = Configuration.get().Huawei_Enabled;
 
     JsonObject batteryObj = root.createNestedObject("battery");
     batteryObj[F("enabled")] = Configuration.get().Battery_Enabled;
-
+    addTotalField(batteryObj, "soc", Battery.stateOfCharge, "%", 0);
 }
 
 void WebApiWsLiveClass::addField(JsonObject& root, uint8_t idx, std::shared_ptr<InverterAbstract> inv, ChannelType_t type, ChannelNum_t channel, FieldId_t fieldId, String topic)

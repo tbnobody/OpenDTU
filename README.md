@@ -2,6 +2,8 @@
 
 This is a fork from the Hoymiles project OpenDTU.
 
+![GitHub tag (latest SemVer)](https://img.shields.io/github/v/tag/helgeerbe/OpenDTU?label=based%20on%20original%20OpenDTU)
+
 ## Extensions to the original OpenDTU
 
 This project is still under development and adds following features:
@@ -17,6 +19,7 @@ This project is still under development and adds following features:
 
 [![OpenDTU Build](https://github.com/tbnobody/OpenDTU/actions/workflows/build.yml/badge.svg)](https://github.com/tbnobody/OpenDTU/actions/workflows/build.yml)
 [![cpplint](https://github.com/tbnobody/OpenDTU/actions/workflows/cpplint.yml/badge.svg)](https://github.com/tbnobody/OpenDTU/actions/workflows/cpplint.yml)
+[![Yarn Linting](https://github.com/tbnobody/OpenDTU/actions/workflows/yarnlint.yml/badge.svg)](https://github.com/tbnobody/OpenDTU/actions/workflows/yarnlint.yml)
 
 ## !! IMPORTANT UPGRADE NOTES !!
 
@@ -195,6 +198,7 @@ Topics for 3 phases of a power meter is configurable. Given is an example for th
 * Hoymiles HM-1000
 * Hoymiles HM-1200
 * Hoymiles HM-1500
+* Solenso SOL-H350
 * Solenso SOL-H400
 * Solenso SOL-H800
 * TSUN TSOL-M350 (Maybe depending on firmware/serial number on the inverter)

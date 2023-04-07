@@ -106,7 +106,7 @@
                                 'text-bg-success': !batteryData.alarms.dischargeCurrent
                             }">
                                 <template v-if="!batteryData.alarms.dischargeCurrent">{{ $t('battery.ok') }}</template>
-                                <template v-else="batteryData.alarms.dischargeCurrent">{{ $t('battery.alarm') }}</template>
+                                <template v-else>{{ $t('battery.alarm') }}</template>
                             </span>
                           </td>
                           <td>
@@ -115,7 +115,7 @@
                                   'text-bg-success': !batteryData.warnings.dischargeCurrent
                               }">
                                   <template v-if="!batteryData.warnings.dischargeCurrent">{{ $t('battery.ok') }}</template>
-                                  <template v-else="batteryData.warnings.dischargeCurrent">{{ $t('battery.warning') }}</template>
+                                  <template v-else>{{ $t('battery.warning') }}</template>
                               </span>
                           </td>
                         </tr>
@@ -127,7 +127,7 @@
                                 'text-bg-success': !batteryData.alarms.chargeCurrent
                             }">
                                 <template v-if="!batteryData.alarms.chargeCurrent">{{ $t('battery.ok') }}</template>
-                                <template v-else="batteryData.alarms.chargeCurrent">{{ $t('battery.alarm') }}</template>
+                                <template v-else>{{ $t('battery.alarm') }}</template>
                             </span>
                           </td>
                           <td>
@@ -136,7 +136,7 @@
                                   'text-bg-success': !batteryData.warnings.chargeCurrent
                               }">
                                   <template v-if="!batteryData.warnings.chargeCurrent">{{ $t('battery.ok') }}</template>
-                                  <template v-else="batteryData.warnings.chargeCurrent">{{ $t('battery.warning') }}</template>
+                                  <template v-else>{{ $t('battery.warning') }}</template>
                               </span>
                           </td>
                         </tr>
@@ -148,7 +148,7 @@
                                 'text-bg-success': !batteryData.alarms.lowTemperature
                             }">
                                 <template v-if="!batteryData.alarms.lowTemperature">{{ $t('battery.ok') }}</template>
-                                <template v-else="batteryData.alarms.lowTemperature">{{ $t('battery.alarm') }}</template>
+                                <template v-else>{{ $t('battery.alarm') }}</template>
                             </span>
                           </td>
                           <td>
@@ -157,7 +157,7 @@
                                   'text-bg-success': !batteryData.warnings.lowTemperature
                               }">
                                   <template v-if="!batteryData.warnings.lowTemperature">{{ $t('battery.ok') }}</template>
-                                  <template v-else="batteryData.warnings.lowTemperature">{{ $t('battery.warning') }}</template>
+                                  <template v-else>{{ $t('battery.warning') }}</template>
                               </span>
                           </td>
                         </tr>
@@ -169,7 +169,7 @@
                                 'text-bg-success': !batteryData.alarms.highTemperature
                             }">
                                 <template v-if="!batteryData.alarms.highTemperature">{{ $t('battery.ok') }}</template>
-                                <template v-else="batteryData.alarms.highTemperature">{{ $t('battery.alarm') }}</template>
+                                <template v-else>{{ $t('battery.alarm') }}</template>
                             </span>
                           </td>
                           <td>
@@ -178,7 +178,7 @@
                                   'text-bg-success': !batteryData.warnings.highTemperature
                               }">
                                   <template v-if="!batteryData.warnings.highTemperature">{{ $t('battery.ok') }}</template>
-                                  <template v-else="batteryData.warnings.highTemperature">{{ $t('battery.warning') }}</template>
+                                  <template v-else>{{ $t('battery.warning') }}</template>
                               </span>
                           </td>
                         </tr>
@@ -190,7 +190,7 @@
                                 'text-bg-success': !batteryData.alarms.lowVoltage
                             }">
                                 <template v-if="!batteryData.alarms.lowVoltage">{{ $t('battery.ok') }}</template>
-                                <template v-else="batteryData.alarms.lowVoltage">{{ $t('battery.alarm') }}</template>
+                                <template v-else>{{ $t('battery.alarm') }}</template>
                             </span>
                           </td>
                           <td>
@@ -199,7 +199,7 @@
                                   'text-bg-success': !batteryData.warnings.lowVoltage
                               }">
                                   <template v-if="!batteryData.warnings.lowVoltage">{{ $t('battery.ok') }}</template>
-                                  <template v-else="batteryData.warnings.lowVoltage">{{ $t('battery.warning') }}</template>
+                                  <template v-else>{{ $t('battery.warning') }}</template>
                               </span>
                           </td>
                         </tr>
@@ -211,7 +211,7 @@
                                 'text-bg-success': !batteryData.alarms.highVoltage
                             }">
                                 <template v-if="!batteryData.alarms.highVoltage">{{ $t('battery.ok') }}</template>
-                                <template v-else="batteryData.alarms.highVoltage">{{ $t('battery.alarm') }}</template>
+                                <template v-else>{{ $t('battery.alarm') }}</template>
                             </span>
                           </td>
                           <td>
@@ -220,7 +220,7 @@
                                   'text-bg-success': !batteryData.warnings.highVoltage
                               }">
                                   <template v-if="!batteryData.warnings.highVoltage">{{ $t('battery.ok') }}</template>
-                                  <template v-else="batteryData.warnings.highVoltage">{{ $t('battery.warning') }}</template>
+                                  <template v-else>{{ $t('battery.warning') }}</template>
                               </span>
                           </td>
                         </tr>
@@ -232,7 +232,7 @@
                                 'text-bg-success': !batteryData.alarms.bmsInternal
                             }">
                                 <template v-if="!batteryData.alarms.bmsInternal">{{ $t('battery.ok') }}</template>
-                                <template v-else="batteryData.alarms.bmsInternal">{{ $t('battery.alarm') }}</template>
+                                <template v-else>{{ $t('battery.alarm') }}</template>
                             </span>
                           </td>
                           <td>
@@ -241,7 +241,7 @@
                                   'text-bg-success': !batteryData.warnings.bmsInternal
                               }">
                                   <template v-if="!batteryData.warnings.bmsInternal">{{ $t('battery.ok') }}</template>
-                                  <template v-else="batteryData.warnings.bmsInternal">{{ $t('battery.warning') }}</template>
+                                  <template v-else>{{ $t('battery.warning') }}</template>
                               </span>
                           </td>
                         </tr>

@@ -17,9 +17,6 @@ PowerLimiterClass PowerLimiter;
 
 void PowerLimiterClass::init()
 {
-    _lastCommandSent = 0;
-    _lastLoop = 0;
-    _lastRequestedPowerLimit = 0;
 }
 
 void PowerLimiterClass::loop()
@@ -44,10 +41,16 @@ void PowerLimiterClass::loop()
     }
 
     float dcVoltage = inverter->Statistics()->getChannelFieldValue(TYPE_DC, (ChannelNum_t) config.PowerLimiter_InverterChannelId, FLD_UDC);
-    float acPower = inverter->Statistics()->getChannelFieldValue(TYPE_AC, (ChannelNum_t) config.PowerLimiter_InverterChannelId, FLD_PAC); 
+    float acPower = inverter->Statistics()->getChannelFieldValue(TYPE_AC, (ChannelNum_t) config.PowerLimiter_InverterChannelId, FLD_PAC);
     float correctedDcVoltage = dcVoltage + (acPower * config.PowerLimiter_VoltageLoadCorrectionFactor);
 
-    if ((millis() - inverter->Statistics()->getLastUpdate()) > 10000) {
+    // If the last inverter update is too old, don't do anything.
+    // If the last inverter update was before the last limit updated, don't do anything.
+    // Also give the Power meter 3 seconds time to recognize power changes because of the last set limit
+    // and also because the Hoymiles MPPT might not react immediately.
+    if ((millis() - inverter->Statistics()->getLastUpdate()) > 10000
+            || inverter->Statistics()->getLastUpdate() <= _lastLimitSetTime
+            || PowerMeter.getLastPowerMeterUpdate() <= (_lastLimitSetTime + 3000)) {
         return;
     }
 
@@ -55,7 +58,6 @@ void PowerLimiterClass::loop()
         MessageOutput.printf("[PowerLimiterClass::loop] dcVoltage: %.2f Voltage Start Threshold: %.2f Voltage Stop Threshold: %.2f inverter->isProducing(): %d\r\n",
             dcVoltage, config.PowerLimiter_VoltageStartThreshold, config.PowerLimiter_VoltageStopThreshold, inverter->isProducing());
     }
-
 
     while(true) {
         switch(_plState) {
@@ -103,7 +105,7 @@ void PowerLimiterClass::loop()
                 }
 
                 if (!canUseDirectSolarPower()) {
-                    if (config.PowerLimiter_BatteryDrainStategy == EMPTY_AT_NIGTH)
+                    if (config.PowerLimiter_BatteryDrainStategy == EMPTY_AT_NIGHT)
                         _plState = STATE_NORMAL_OPERATION;
                     else
                         _plState = STATE_OFF;
@@ -120,14 +122,16 @@ void PowerLimiterClass::loop()
                     _plState = STATE_OFF;
                     break;
                 }
-                if (canUseDirectSolarPower() && (config.PowerLimiter_BatteryDrainStategy == EMPTY_AT_NIGTH)) {
+                if (!isStartThresholdReached(inverter) && canUseDirectSolarPower() && (config.PowerLimiter_BatteryDrainStategy == EMPTY_AT_NIGHT)) {
                     _plState = STATE_CONSUME_SOLAR_POWER_ONLY;
                     break;
                 }
 
                 // check if grid power consumption is not within the upper and lower threshold of the target consumption
                 if (newPowerLimit >= (config.PowerLimiter_TargetPowerConsumption - config.PowerLimiter_TargetPowerConsumptionHysteresis) &&
-                    newPowerLimit <= (config.PowerLimiter_TargetPowerConsumption + config.PowerLimiter_TargetPowerConsumptionHysteresis)) {
+                    newPowerLimit <= (config.PowerLimiter_TargetPowerConsumption + config.PowerLimiter_TargetPowerConsumptionHysteresis) &&
+                    _lastRequestedPowerLimit >= (config.PowerLimiter_TargetPowerConsumption - config.PowerLimiter_TargetPowerConsumptionHysteresis) &&
+                    _lastRequestedPowerLimit <= (config.PowerLimiter_TargetPowerConsumption + config.PowerLimiter_TargetPowerConsumptionHysteresis) ) {
                     return;    
                 }
                 setNewPowerLimit(inverter, newPowerLimit);;
@@ -190,7 +194,8 @@ int32_t PowerLimiterClass::calcPowerLimit(std::shared_ptr<InverterAbstract> inve
         // the produced power of this inverter has also to be taken into account.
         // We don't use FLD_PAC from the statistics, because that
         // data might be too old and unrelieable.
-        newPowerLimit += _lastRequestedPowerLimit;
+        float acPower = inverter->Statistics()->getChannelFieldValue(TYPE_AC, (ChannelNum_t) config.PowerLimiter_InverterChannelId, FLD_PAC); 
+        newPowerLimit += static_cast<int>(acPower);
     }
 
     float efficency = inverter->Statistics()->getChannelFieldValue(TYPE_AC, (ChannelNum_t) config.PowerLimiter_InverterChannelId, FLD_EFF);
@@ -247,6 +252,8 @@ void PowerLimiterClass::setNewPowerLimit(std::shared_ptr<InverterAbstract> inver
         MessageOutput.printf("[PowerLimiterClass::loop] Limit Non-Persistent: %d W\r\n", newPowerLimit);
         inverter->sendActivePowerControlRequest(Hoymiles.getRadio(), newPowerLimit, PowerLimitControlType::AbsolutNonPersistent);
         _lastRequestedPowerLimit = newPowerLimit;
+        // wait for the next inverter update (+ 3 seconds to make sure the limit got applied)
+        _lastLimitSetTime = millis();
     }
 }
 
@@ -263,7 +270,7 @@ float PowerLimiterClass::getLoadCorrectedVoltage(std::shared_ptr<InverterAbstrac
 {
     CONFIG_T& config = Configuration.get();
 
-    float acPower = inverter->Statistics()->getChannelFieldValue(TYPE_AC, (ChannelNum_t) config.PowerLimiter_InverterChannelId, FLD_PAC); 
+    float acPower = inverter->Statistics()->getChannelFieldValue(TYPE_AC, (ChannelNum_t) config.PowerLimiter_InverterChannelId, FLD_PAC);
     float dcVoltage = inverter->Statistics()->getChannelFieldValue(TYPE_DC, (ChannelNum_t) config.PowerLimiter_InverterChannelId, FLD_UDC); 
 
     if (dcVoltage <= 0.0) {
