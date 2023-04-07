@@ -11,6 +11,7 @@
 #include "MqttHandleHass.h"
 #include "MqttHandleInverter.h"
 #include "MqttSettings.h"
+#include "MqttHandleTotal.h"  // #350 Publish Inverter Total Data via MQTT
 #include "NetworkSettings.h"
 #include "NtpSettings.h"
 #include "PinMapping.h"
@@ -93,6 +94,7 @@ void setup()
     MqttHandleDtu.init();
     MqttHandleInverter.init();
     MqttHandleHass.init();
+    MqttHandleTotal.init();  // #350 Publish Inverter Total Data via MQTT
     MessageOutput.println("done");
 
     // Initialize WebApi
@@ -147,6 +149,8 @@ void loop()
     MqttHandleInverter.loop();
     yield();
     MqttHandleHass.loop();
+    yield();
+    MqttHandleTotal.loop(); // #350 Publish Inverter Total Data via MQTT
     yield();
     WebApi.loop();
     yield();
