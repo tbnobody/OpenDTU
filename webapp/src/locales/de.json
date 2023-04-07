@@ -470,6 +470,7 @@
         "typeSDM1ph": "SDM 1 phase (SDM120/220/230)",
         "typeSDM3ph": "SDM 3 phase (SDM72/630)",
         "typeHTTP": "HTTP(S) + JSON",
+        "typeSML": "SML (OBIS 16.7.0)",
         "MqttTopicPowerMeter1": "MQTT topic - Stromzähler #1",
         "MqttTopicPowerMeter2": "MQTT topic - Stromzähler #2 (Optional)",
         "MqttTopicPowerMeter3": "MQTT topic - Stromzähler #3 (Optional)",

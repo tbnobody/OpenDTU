@@ -10,10 +10,13 @@
 #include "SDM.h"
 #include "MessageOutput.h"
 #include <ctime>
+#include <SoftwareSerial.h>
 
 PowerMeterClass PowerMeter;
 
 SDM sdm(Serial2, 9600, NOT_A_PIN, SERIAL_8N1, SDM_RX_PIN, SDM_TX_PIN);
+
+SoftwareSerial inputSerial;
 
 void PowerMeterClass::init()
 {
@@ -28,8 +31,12 @@ void PowerMeterClass::init()
     _lastPowerMeterUpdate = 0;
 
     CONFIG_T& config = Configuration.get();
+    
+    if (!config.PowerMeter_Enabled) {
+        return;
+    }
 
-    if (config.PowerMeter_Enabled && config.PowerMeter_Source == 0) {
+    if (config.PowerMeter_Source == SOURCE_MQTT) {
         if (strlen(config.PowerMeter_MqttTopicPowerMeter1) > 0) {
             MqttSettings.subscribe(config.PowerMeter_MqttTopicPowerMeter1, 0, std::bind(&PowerMeterClass::onMqttMessage, this, _1, _2, _3, _4, _5, _6));
         }
@@ -43,16 +50,30 @@ void PowerMeterClass::init()
         }
     }
 
-    mqttInitDone = true;
+    if(config.PowerMeter_Source == SOURCE_SDM1PH || config.PowerMeter_Source == SOURCE_SDM3PH) {
+        sdm.begin();
+    }
+    
+    if (config.PowerMeter_Source == SOURCE_HTTP) {
+        HttpPowerMeter.init();
+    }
 
-    sdm.begin();
-    HttpPowerMeter.init();
+    if(config.PowerMeter_Source == SOURCE_SML) {
+        pinMode(SML_RX_PIN, INPUT);
+        inputSerial.begin(9600, SWSERIAL_8N1, SML_RX_PIN, -1, false, 128, 95);
+        inputSerial.enableRx(true);
+        inputSerial.enableTx(false);
+        inputSerial.flush();
+    }
+    
+    mqttInitDone = true;
 }
 
 void PowerMeterClass::onMqttMessage(const espMqttClientTypes::MessageProperties& properties, const char* topic, const uint8_t* payload, size_t len, size_t index, size_t total)
 {
     CONFIG_T& config = Configuration.get();
-    if (config.PowerMeter_Enabled && config.PowerMeter_Source != SOURCE_MQTT) {
+
+    if (!config.PowerMeter_Enabled || config.PowerMeter_Source != SOURCE_MQTT) {
         return;
     }
 
@@ -96,14 +117,20 @@ void PowerMeterClass::mqtt()
         MqttSettings.publish(topic + "/voltage1", String(_powerMeter1Voltage));
         MqttSettings.publish(topic + "/voltage2", String(_powerMeter2Voltage));
         MqttSettings.publish(topic + "/voltage3", String(_powerMeter3Voltage));
-        MqttSettings.publish(topic + "/import", String(_PowerMeterImport));
-        MqttSettings.publish(topic + "/export", String(_PowerMeterExport));
+        MqttSettings.publish(topic + "/import", String(_powerMeterImport));
+        MqttSettings.publish(topic + "/export", String(_powerMeterExport));
     }
 }
 
 void PowerMeterClass::loop()
 {
     CONFIG_T& config = Configuration.get();
+
+    if (config.PowerMeter_Enabled && config.PowerMeter_Source == SOURCE_SML) {
+        if (!smlReadLoop()) {
+            return;
+        }
+    }
 
     if (!config.PowerMeter_Enabled
             || (millis() - _lastPowerMeterCheck) < (config.PowerMeter_Interval * 1000)) {
@@ -112,15 +139,15 @@ void PowerMeterClass::loop()
 
     uint8_t _address = config.PowerMeter_SdmAddress;
 
-    if (config.PowerMeter_Source== SOURCE_SDM1PH) {
+    if (config.PowerMeter_Source == SOURCE_SDM1PH) {
         _powerMeter1Power = static_cast<float>(sdm.readVal(SDM_PHASE_1_POWER, _address));
         _powerMeter2Power = 0.0;
         _powerMeter3Power = 0.0;
         _powerMeter1Voltage = static_cast<float>(sdm.readVal(SDM_PHASE_1_VOLTAGE, _address));
         _powerMeter2Voltage = 0.0;
         _powerMeter3Voltage = 0.0;
-        _PowerMeterImport = static_cast<float>(sdm.readVal(SDM_IMPORT_ACTIVE_ENERGY, _address));
-        _PowerMeterExport = static_cast<float>(sdm.readVal(SDM_EXPORT_ACTIVE_ENERGY, _address));
+        _powerMeterImport = static_cast<float>(sdm.readVal(SDM_IMPORT_ACTIVE_ENERGY, _address));
+        _powerMeterExport = static_cast<float>(sdm.readVal(SDM_EXPORT_ACTIVE_ENERGY, _address));
         _lastPowerMeterUpdate = millis();
     }
     else if (config.PowerMeter_Source == SOURCE_SDM3PH) {
@@ -130,8 +157,8 @@ void PowerMeterClass::loop()
         _powerMeter1Voltage = static_cast<float>(sdm.readVal(SDM_PHASE_1_VOLTAGE, _address));
         _powerMeter2Voltage = static_cast<float>(sdm.readVal(SDM_PHASE_2_VOLTAGE, _address));
         _powerMeter3Voltage = static_cast<float>(sdm.readVal(SDM_PHASE_3_VOLTAGE, _address));
-        _PowerMeterImport = static_cast<float>(sdm.readVal(SDM_IMPORT_ACTIVE_ENERGY, _address));
-        _PowerMeterExport = static_cast<float>(sdm.readVal(SDM_EXPORT_ACTIVE_ENERGY, _address));
+        _powerMeterImport = static_cast<float>(sdm.readVal(SDM_IMPORT_ACTIVE_ENERGY, _address));
+        _powerMeterExport = static_cast<float>(sdm.readVal(SDM_EXPORT_ACTIVE_ENERGY, _address));
         _lastPowerMeterUpdate = millis();
     }
     else if (config.PowerMeter_Source == SOURCE_HTTP) {
@@ -148,4 +175,23 @@ void PowerMeterClass::loop()
     mqtt();
 
     _lastPowerMeterCheck = millis();
+}
+
+bool PowerMeterClass::smlReadLoop()
+{
+    while (inputSerial.available()) {
+        double readVal = 0;
+        unsigned char smlCurrentChar = inputSerial.read();
+        sml_states_t smlCurrentState = smlState(smlCurrentChar);
+        if (smlCurrentState == SML_LISTEND) {
+            for(auto& handler: smlHandlerList) {
+                if (smlOBISCheck(handler.OBIS)) {
+                    handler.Fn(readVal);
+                    *handler.Arg = readVal;
+                }
+            }
+        } else if (smlCurrentState == SML_FINAL)
+            return true;
+    }
+    return false;
 }
