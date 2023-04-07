@@ -17,9 +17,9 @@
                     </tr>
                     <tr>
                         <th>{{ $t('firmwareinfo.FirmwareVersion') }}</th>
-                        <td><a :href="'https://github.com/tbnobody/OpenDTU/commits/' + systemStatus.git_hash?.substring(1)"
+                        <td><a :href="versionInfoUrl"
                                 target="_blank" v-tooltip :title="$t('firmwareinfo.FirmwareVersionHint')">
-                                {{ systemStatus.git_hash?.substring(1) }}
+                                {{ systemStatus.git_hash }}
                             </a></td>
                     </tr>
                     <tr>
@@ -72,6 +72,12 @@ export default defineComponent({
                 return timestampToString(value, true);
             };
         },
+        versionInfoUrl(): string {
+            if (this.systemStatus.git_is_hash) {
+                return 'https://github.com/tbnobody/OpenDTU/commits/' + this.systemStatus.git_hash;
+            }
+            return 'https://github.com/tbnobody/OpenDTU/releases/tag/' + this.systemStatus.git_hash;
+        }
     },
 });
 </script>

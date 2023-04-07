@@ -27,9 +27,10 @@
                     <div class="card">
                         <div class="card-header d-flex justify-content-between align-items-center"
                             :class="{
-                                'text-bg-danger': !inverter.reachable,
-                                'text-bg-warning': inverter.reachable && !inverter.producing,
-                                'text-bg-primary': inverter.reachable && inverter.producing,
+                                'text-bg-tertiary': !inverter.poll_enabled,
+                                'text-bg-danger': inverter.poll_enabled && !inverter.reachable,
+                                'text-bg-warning': inverter.poll_enabled && inverter.reachable && !inverter.producing,
+                                'text-bg-primary': inverter.poll_enabled && inverter.reachable && inverter.producing,
                             }">
                             <div class="p-1 flex-grow-1">
                                 <div class="d-flex flex-wrap">
@@ -489,7 +490,7 @@ export default defineComponent({
 
             this.socket.onopen = function (event) {
                 console.log(event);
-                console.log("Successfuly connected to the echo websocket server...");
+                console.log("Successfully connected to the echo websocket server...");
             };
 
             // Listen to window events , When the window closes , Take the initiative to disconnect websocket Connect

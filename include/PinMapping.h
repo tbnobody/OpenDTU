@@ -6,6 +6,7 @@
 #include <stdint.h>
 
 #define PINMAPPING_FILENAME "/pin_mapping.json"
+#define PINMAPPING_LED_COUNT 2
 
 #define MAPPING_NAME_STRLEN 31
 
@@ -29,6 +30,7 @@ struct PinMapping_t {
     uint8_t display_clk;
     uint8_t display_cs;
     uint8_t display_reset;
+    int8_t led[PINMAPPING_LED_COUNT];
 };
 
 class PinMappingClass {

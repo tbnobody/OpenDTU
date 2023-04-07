@@ -23,7 +23,8 @@
         "Login": "Login"
     },
     "base": {
-        "Loading": "Loading..."
+        "Loading": "Loading...",
+        "Reload": "Reload"
     },
     "localeswitcher": {
         "Dark": "Dark",

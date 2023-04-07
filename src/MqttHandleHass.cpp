@@ -121,26 +121,26 @@ void MqttHandleHassClass::publishField(std::shared_ptr<InverterAbstract> inv, Ch
         }
 
         DynamicJsonDocument root(1024);
-        root[F("name")] = name;
-        root[F("stat_t")] = stateTopic;
-        root[F("uniq_id")] = serial + "_ch" + chanNum + "_" + fieldName;
+        root["name"] = name;
+        root["stat_t"] = stateTopic;
+        root["uniq_id"] = serial + "_ch" + chanNum + "_" + fieldName;
 
         String unit_of_measure = inv->Statistics()->getChannelFieldUnit(type, channel, fieldType.fieldId);
         if (unit_of_measure != "") {
-            root[F("unit_of_meas")] = unit_of_measure;
+            root["unit_of_meas"] = unit_of_measure;
         }
 
         JsonObject deviceObj = root.createNestedObject("dev");
         createDeviceInfo(deviceObj, inv);
 
         if (Configuration.get().Mqtt_Hass_Expire) {
-            root[F("exp_aft")] = Hoymiles.getNumInverters() * Configuration.get().Mqtt_PublishInterval * 3;
+            root["exp_aft"] = Hoymiles.getNumInverters() * Configuration.get().Mqtt_PublishInterval * 3;
         }
         if (devCls != 0) {
-            root[F("dev_cla")] = devCls;
+            root["dev_cla"] = devCls;
         }
         if (stateCls != 0) {
-            root[F("stat_cla")] = stateCls;
+            root["stat_cla"] = stateCls;
         }
 
         char buffer[512];
@@ -166,17 +166,17 @@ void MqttHandleHassClass::publishInverterButton(std::shared_ptr<InverterAbstract
     String cmdTopic = MqttSettings.getPrefix() + serial + "/" + subTopic;
 
     DynamicJsonDocument root(1024);
-    root[F("name")] = String(inv->name()) + " " + caption;
-    root[F("uniq_id")] = serial + "_" + buttonId;
+    root["name"] = String(inv->name()) + " " + caption;
+    root["uniq_id"] = serial + "_" + buttonId;
     if (strcmp(icon, "")) {
-        root[F("ic")] = icon;
+        root["ic"] = icon;
     }
     if (strcmp(deviceClass, "")) {
-        root[F("dev_cla")] = deviceClass;
+        root["dev_cla"] = deviceClass;
     }
-    root[F("ent_cat")] = category;
-    root[F("cmd_t")] = cmdTopic;
-    root[F("payload_press")] = payload;
+    root["ent_cat"] = category;
+    root["cmd_t"] = cmdTopic;
+    root["payload_press"] = payload;
 
     JsonObject deviceObj = root.createNestedObject("dev");
     createDeviceInfo(deviceObj, inv);
@@ -205,17 +205,17 @@ void MqttHandleHassClass::publishInverterNumber(
     String statTopic = MqttSettings.getPrefix() + serial + "/" + stateTopic;
 
     DynamicJsonDocument root(1024);
-    root[F("name")] = String(inv->name()) + " " + caption;
-    root[F("uniq_id")] = serial + "_" + buttonId;
+    root["name"] = String(inv->name()) + " " + caption;
+    root["uniq_id"] = serial + "_" + buttonId;
     if (strcmp(icon, "")) {
-        root[F("ic")] = icon;
+        root["ic"] = icon;
     }
-    root[F("ent_cat")] = category;
-    root[F("cmd_t")] = cmdTopic;
-    root[F("stat_t")] = statTopic;
-    root[F("unit_of_meas")] = unitOfMeasure;
-    root[F("min")] = min;
-    root[F("max")] = max;
+    root["ent_cat"] = category;
+    root["cmd_t"] = cmdTopic;
+    root["stat_t"] = statTopic;
+    root["unit_of_meas"] = unitOfMeasure;
+    root["min"] = min;
+    root["max"] = max;
 
     JsonObject deviceObj = root.createNestedObject("dev");
     createDeviceInfo(deviceObj, inv);
@@ -240,11 +240,11 @@ void MqttHandleHassClass::publishInverterBinarySensor(std::shared_ptr<InverterAb
     String statTopic = MqttSettings.getPrefix() + serial + "/" + subTopic;
 
     DynamicJsonDocument root(1024);
-    root[F("name")] = String(inv->name()) + " " + caption;
-    root[F("uniq_id")] = serial + "_" + sensorId;
-    root[F("stat_t")] = statTopic;
-    root[F("pl_on")] = payload_on;
-    root[F("pl_off")] = payload_off;
+    root["name"] = String(inv->name()) + " " + caption;
+    root["uniq_id"] = serial + "_" + sensorId;
+    root["stat_t"] = statTopic;
+    root["pl_on"] = payload_on;
+    root["pl_off"] = payload_off;
 
     JsonObject deviceObj = root.createNestedObject("dev");
     createDeviceInfo(deviceObj, inv);
@@ -256,12 +256,12 @@ void MqttHandleHassClass::publishInverterBinarySensor(std::shared_ptr<InverterAb
 
 void MqttHandleHassClass::createDeviceInfo(JsonObject& object, std::shared_ptr<InverterAbstract> inv)
 {
-    object[F("name")] = inv->name();
-    object[F("ids")] = inv->serialString();
-    object[F("cu")] = String(F("http://")) + NetworkSettings.localIP().toString();
-    object[F("mf")] = F("OpenDTU");
-    object[F("mdl")] = inv->typeName();
-    object[F("sw")] = AUTO_GIT_HASH;
+    object["name"] = inv->name();
+    object["ids"] = inv->serialString();
+    object["cu"] = String("http://") + NetworkSettings.localIP().toString();
+    object["mf"] = "OpenDTU";
+    object["mdl"] = inv->typeName();
+    object["sw"] = AUTO_GIT_HASH;
 }
 
 void MqttHandleHassClass::publish(const String& subtopic, const String& payload)

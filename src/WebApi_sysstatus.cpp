@@ -37,40 +37,40 @@ void WebApiSysstatusClass::onSystemStatus(AsyncWebServerRequest* request)
     AsyncJsonResponse* response = new AsyncJsonResponse();
     JsonObject root = response->getRoot();
 
-    root[F("hostname")] = NetworkSettings.getHostname();
+    root["hostname"] = NetworkSettings.getHostname();
 
-    root[F("sdkversion")] = ESP.getSdkVersion();
-    root[F("cpufreq")] = ESP.getCpuFreqMHz();
+    root["sdkversion"] = ESP.getSdkVersion();
+    root["cpufreq"] = ESP.getCpuFreqMHz();
 
-    root[F("heap_total")] = ESP.getHeapSize();
-    root[F("heap_used")] = ESP.getHeapSize() - ESP.getFreeHeap();
-    root[F("sketch_total")] = ESP.getFreeSketchSpace();
-    root[F("sketch_used")] = ESP.getSketchSize();
-    root[F("littlefs_total")] = LittleFS.totalBytes();
-    root[F("littlefs_used")] = LittleFS.usedBytes();
+    root["heap_total"] = ESP.getHeapSize();
+    root["heap_used"] = ESP.getHeapSize() - ESP.getFreeHeap();
+    root["sketch_total"] = ESP.getFreeSketchSpace();
+    root["sketch_used"] = ESP.getSketchSize();
+    root["littlefs_total"] = LittleFS.totalBytes();
+    root["littlefs_used"] = LittleFS.usedBytes();
 
-    root[F("chiprevision")] = ESP.getChipRevision();
-    root[F("chipmodel")] = ESP.getChipModel();
-    root[F("chipcores")] = ESP.getChipCores();
+    root["chiprevision"] = ESP.getChipRevision();
+    root["chipmodel"] = ESP.getChipModel();
+    root["chipcores"] = ESP.getChipCores();
 
     String reason;
     reason = ResetReason.get_reset_reason_verbose(0);
-    root[F("resetreason_0")] = reason;
+    root["resetreason_0"] = reason;
 
     reason = ResetReason.get_reset_reason_verbose(1);
-    root[F("resetreason_1")] = reason;
+    root["resetreason_1"] = reason;
 
-    root[F("cfgsavecount")] = Configuration.get().Cfg_SaveCount;
+    root["cfgsavecount"] = Configuration.get().Cfg_SaveCount;
 
     char version[16];
     snprintf(version, sizeof(version), "%d.%d.%d", CONFIG_VERSION >> 24 & 0xff, CONFIG_VERSION >> 16 & 0xff, CONFIG_VERSION >> 8 & 0xff);
-    root[F("config_version")] = version;
-    root[F("git_hash")] = AUTO_GIT_HASH;
+    root["config_version"] = version;
+    root["git_hash"] = AUTO_GIT_HASH;
 
-    root[F("uptime")] = esp_timer_get_time() / 1000000;
+    root["uptime"] = esp_timer_get_time() / 1000000;
 
-    root[F("radio_connected")] = Hoymiles.getRadio()->isConnected();
-    root[F("radio_pvariant")] = Hoymiles.getRadio()->isPVariant();
+    root["radio_connected"] = Hoymiles.getRadio()->isConnected();
+    root["radio_pvariant"] = Hoymiles.getRadio()->isPVariant();
 
     response->setLength();
     request->send(response);

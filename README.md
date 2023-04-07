@@ -2,6 +2,7 @@
 
 [![OpenDTU Build](https://github.com/tbnobody/OpenDTU/actions/workflows/build.yml/badge.svg)](https://github.com/tbnobody/OpenDTU/actions/workflows/build.yml)
 [![cpplint](https://github.com/tbnobody/OpenDTU/actions/workflows/cpplint.yml/badge.svg)](https://github.com/tbnobody/OpenDTU/actions/workflows/cpplint.yml)
+[![Yarn Linting](https://github.com/tbnobody/OpenDTU/actions/workflows/yarnlint.yml/badge.svg)](https://github.com/tbnobody/OpenDTU/actions/workflows/yarnlint.yml)
 
 ## !! IMPORTANT UPGRADE NOTES !!
 
@@ -28,6 +29,7 @@ Like to show your own build? Just send me a Pull Request.
 * Hoymiles HM-1000
 * Hoymiles HM-1200
 * Hoymiles HM-1500
+* Solenso SOL-H350
 * Solenso SOL-H400
 * Solenso SOL-H800
 * TSUN TSOL-M350 (Maybe depending on firmware/serial number on the inverter)

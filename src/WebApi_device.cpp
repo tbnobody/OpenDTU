@@ -37,37 +37,41 @@ void WebApiDeviceClass::onDeviceAdminGet(AsyncWebServerRequest* request)
     const PinMapping_t& pin = PinMapping.get();
 
     JsonObject curPin = root.createNestedObject("curPin");
-    curPin[F("name")] = config.Dev_PinMapping;
+    curPin["name"] = config.Dev_PinMapping;
 
     JsonObject nrfPinObj = curPin.createNestedObject("nrf24");
-    nrfPinObj[F("clk")] = pin.nrf24_clk;
-    nrfPinObj[F("cs")] = pin.nrf24_cs;
-    nrfPinObj[F("en")] = pin.nrf24_en;
-    nrfPinObj[F("irq")] = pin.nrf24_irq;
-    nrfPinObj[F("miso")] = pin.nrf24_miso;
-    nrfPinObj[F("mosi")] = pin.nrf24_mosi;
+    nrfPinObj["clk"] = pin.nrf24_clk;
+    nrfPinObj["cs"] = pin.nrf24_cs;
+    nrfPinObj["en"] = pin.nrf24_en;
+    nrfPinObj["irq"] = pin.nrf24_irq;
+    nrfPinObj["miso"] = pin.nrf24_miso;
+    nrfPinObj["mosi"] = pin.nrf24_mosi;
 
     JsonObject ethPinObj = curPin.createNestedObject("eth");
-    ethPinObj[F("enabled")] = pin.eth_enabled;
-    ethPinObj[F("phy_addr")] = pin.eth_phy_addr;
-    ethPinObj[F("power")] = pin.eth_power;
-    ethPinObj[F("mdc")] = pin.eth_mdc;
-    ethPinObj[F("mdio")] = pin.eth_mdio;
-    ethPinObj[F("type")] = pin.eth_type;
-    ethPinObj[F("clk_mode")] = pin.eth_clk_mode;
+    ethPinObj["enabled"] = pin.eth_enabled;
+    ethPinObj["phy_addr"] = pin.eth_phy_addr;
+    ethPinObj["power"] = pin.eth_power;
+    ethPinObj["mdc"] = pin.eth_mdc;
+    ethPinObj["mdio"] = pin.eth_mdio;
+    ethPinObj["type"] = pin.eth_type;
+    ethPinObj["clk_mode"] = pin.eth_clk_mode;
 
     JsonObject displayPinObj = curPin.createNestedObject("display");
-    displayPinObj[F("type")] = pin.display_type;
-    displayPinObj[F("data")] = pin.display_data;
-    displayPinObj[F("clk")] = pin.display_clk;
-    displayPinObj[F("cs")] = pin.display_cs;
-    displayPinObj[F("reset")] = pin.display_reset;
+    displayPinObj["type"] = pin.display_type;
+    displayPinObj["data"] = pin.display_data;
+    displayPinObj["clk"] = pin.display_clk;
+    displayPinObj["cs"] = pin.display_cs;
+    displayPinObj["reset"] = pin.display_reset;
+
+    JsonObject ledPinObj = curPin.createNestedObject("led");
+    ledPinObj["led0"] = pin.led[0];
+    ledPinObj["led1"] = pin.led[1];
 
     JsonObject display = root.createNestedObject("display");
-    display[F("rotation")] = config.Display_Rotation;
-    display[F("power_safe")] = config.Display_PowerSafe;
-    display[F("screensaver")] = config.Display_ScreenSaver;
-    display[F("contrast")] = config.Display_Contrast;
+    display["rotation"] = config.Display_Rotation;
+    display["power_safe"] = config.Display_PowerSafe;
+    display["screensaver"] = config.Display_ScreenSaver;
+    display["contrast"] = config.Display_Contrast;
 
     response->setLength();
     request->send(response);
@@ -81,11 +85,11 @@ void WebApiDeviceClass::onDeviceAdminPost(AsyncWebServerRequest* request)
 
     AsyncJsonResponse* response = new AsyncJsonResponse(false, MQTT_JSON_DOC_SIZE);
     JsonObject retMsg = response->getRoot();
-    retMsg[F("type")] = F("warning");
+    retMsg["type"] = "warning";
 
     if (!request->hasParam("data", true)) {
-        retMsg[F("message")] = F("No values found!");
-        retMsg[F("code")] = WebApiError::GenericNoValueFound;
+        retMsg["message"] = "No values found!";
+        retMsg["code"] = WebApiError::GenericNoValueFound;
         response->setLength();
         request->send(response);
         return;
@@ -94,8 +98,8 @@ void WebApiDeviceClass::onDeviceAdminPost(AsyncWebServerRequest* request)
     String json = request->getParam("data", true)->value();
 
     if (json.length() > MQTT_JSON_DOC_SIZE) {
-        retMsg[F("message")] = F("Data too large!");
-        retMsg[F("code")] = WebApiError::GenericDataTooLarge;
+        retMsg["message"] = "Data too large!";
+        retMsg["code"] = WebApiError::GenericDataTooLarge;
         response->setLength();
         request->send(response);
         return;
@@ -105,38 +109,38 @@ void WebApiDeviceClass::onDeviceAdminPost(AsyncWebServerRequest* request)
     DeserializationError error = deserializeJson(root, json);
 
     if (error) {
-        retMsg[F("message")] = F("Failed to parse data!");
-        retMsg[F("code")] = WebApiError::GenericParseError;
+        retMsg["message"] = "Failed to parse data!";
+        retMsg["code"] = WebApiError::GenericParseError;
         response->setLength();
         request->send(response);
         return;
     }
 
     if (!(root.containsKey("curPin") || root.containsKey("display"))) {
-        retMsg[F("message")] = F("Values are missing!");
-        retMsg[F("code")] = WebApiError::GenericValueMissing;
+        retMsg["message"] = "Values are missing!";
+        retMsg["code"] = WebApiError::GenericValueMissing;
         response->setLength();
         request->send(response);
         return;
     }
 
-    if (root[F("curPin")][F("name")].as<String>().length() == 0 || root[F("curPin")][F("name")].as<String>().length() > DEV_MAX_MAPPING_NAME_STRLEN) {
-        retMsg[F("message")] = F("Pin mapping must between 1 and " STR(DEV_MAX_MAPPING_NAME_STRLEN) " characters long!");
-        retMsg[F("code")] = WebApiError::HardwarePinMappingLength;
-        retMsg[F("param")][F("max")] = DEV_MAX_MAPPING_NAME_STRLEN;
+    if (root["curPin"]["name"].as<String>().length() == 0 || root["curPin"]["name"].as<String>().length() > DEV_MAX_MAPPING_NAME_STRLEN) {
+        retMsg["message"] = "Pin mapping must between 1 and " STR(DEV_MAX_MAPPING_NAME_STRLEN) " characters long!";
+        retMsg["code"] = WebApiError::HardwarePinMappingLength;
+        retMsg["param"]["max"] = DEV_MAX_MAPPING_NAME_STRLEN;
         response->setLength();
         request->send(response);
         return;
     }
 
     CONFIG_T& config = Configuration.get();
-    bool performRestart = root[F("curPin")][F("name")].as<String>() != config.Dev_PinMapping;
+    bool performRestart = root["curPin"]["name"].as<String>() != config.Dev_PinMapping;
 
-    strlcpy(config.Dev_PinMapping, root[F("curPin")][F("name")].as<String>().c_str(), sizeof(config.Dev_PinMapping));
-    config.Display_Rotation = root[F("display")][F("rotation")].as<uint8_t>();
-    config.Display_PowerSafe = root[F("display")][F("power_safe")].as<bool>();
-    config.Display_ScreenSaver = root[F("display")][F("screensaver")].as<bool>();
-    config.Display_Contrast = root[F("display")][F("contrast")].as<uint8_t>();
+    strlcpy(config.Dev_PinMapping, root["curPin"]["name"].as<String>().c_str(), sizeof(config.Dev_PinMapping));
+    config.Display_Rotation = root["display"]["rotation"].as<uint8_t>();
+    config.Display_PowerSafe = root["display"]["power_safe"].as<bool>();
+    config.Display_ScreenSaver = root["display"]["screensaver"].as<bool>();
+    config.Display_Contrast = root["display"]["contrast"].as<uint8_t>();
 
     Display.setOrientation(config.Display_Rotation);
     Display.enablePowerSafe = config.Display_PowerSafe;
@@ -145,9 +149,9 @@ void WebApiDeviceClass::onDeviceAdminPost(AsyncWebServerRequest* request)
 
     Configuration.write();
 
-    retMsg[F("type")] = F("success");
-    retMsg[F("message")] = F("Settings saved!");
-    retMsg[F("code")] = WebApiError::GenericSuccess;
+    retMsg["type"] = "success";
+    retMsg["message"] = "Settings saved!";
+    retMsg["code"] = WebApiError::GenericSuccess;
 
     response->setLength();
     request->send(response);
