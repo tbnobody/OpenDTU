@@ -53,19 +53,19 @@ void PowerMeterClass::init()
     if(config.PowerMeter_Source == SOURCE_SDM1PH || config.PowerMeter_Source == SOURCE_SDM3PH) {
         sdm.begin();
     }
-    
+
     if (config.PowerMeter_Source == SOURCE_HTTP) {
         HttpPowerMeter.init();
     }
 
-    if(config.PowerMeter_Source == SOURCE_SML) {
+    if (config.PowerMeter_Source == SOURCE_SML) {
         pinMode(SML_RX_PIN, INPUT);
         inputSerial.begin(9600, SWSERIAL_8N1, SML_RX_PIN, -1, false, 128, 95);
         inputSerial.enableRx(true);
         inputSerial.enableTx(false);
         inputSerial.flush();
     }
-    
+
     mqttInitDone = true;
 }
 
@@ -184,14 +184,16 @@ bool PowerMeterClass::smlReadLoop()
         unsigned char smlCurrentChar = inputSerial.read();
         sml_states_t smlCurrentState = smlState(smlCurrentChar);
         if (smlCurrentState == SML_LISTEND) {
-            for(auto& handler: smlHandlerList) {
+            for (auto& handler: smlHandlerList) {
                 if (smlOBISCheck(handler.OBIS)) {
                     handler.Fn(readVal);
                     *handler.Arg = readVal;
                 }
             }
-        } else if (smlCurrentState == SML_FINAL)
+        } else if (smlCurrentState == SML_FINAL) {
             return true;
+        }
     }
+
     return false;
 }
