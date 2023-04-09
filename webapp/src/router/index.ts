@@ -17,6 +17,7 @@ import NtpInfoView from '@/views/NtpInfoView.vue';
 import SecurityAdminView from '@/views/SecurityAdminView.vue';
 import SystemInfoView from '@/views/SystemInfoView.vue';
 import { createRouter, createWebHistory } from 'vue-router';
+import { isLoggedIn } from '@/utils/authentication';
 
 const router = createRouter({
     history: createWebHistory(import.meta.env.BASE_URL),
@@ -114,5 +115,16 @@ const router = createRouter({
     }
 ]
 });
+
+router.beforeEach((to, from, next) => {
+    if (to.fullPath === '/' || to.fullPath === '/login') {
+        next();
+    } else {
+        if (!isLoggedIn()) {
+            next('/login');
+        }
+    }
+    next();
+})
 
 export default router;
