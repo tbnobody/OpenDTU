@@ -5,7 +5,7 @@
 #include <cstdint>
 #include <list>
 
-#define STATISTIC_PACKET_SIZE (4 * 16)
+#define STATISTIC_PACKET_SIZE (7 * 16)
 
 // units
 enum UnitId_t {
