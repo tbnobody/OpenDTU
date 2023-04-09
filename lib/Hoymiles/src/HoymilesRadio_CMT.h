@@ -75,8 +75,8 @@ private:
     uint32_t _inverterTargetFrequency = HOYMILES_CMT_WORK_FREQ;
 
     static float getFrequencyFromChannel(const uint8_t channel);
-    void cmtSwitchChannel(const uint8_t channel);
-    uint8_t cmtFreqToChan(const String& func_name, const String& var_name, const uint32_t freq_kHz);
+    static uint8_t getChannelFromFrequency(const uint32_t freq_kHz);
+
     bool cmtSwitchDtuFreq(const uint32_t to_freq_kHz);
     bool cmtSwitchInvAndDtuFreq(const uint64_t inv_serial, const uint32_t from_freq_kHz, const uint32_t to_freq_kHz);
     enumCMTresult cmtProcess(void);
@@ -87,8 +87,6 @@ private:
 
     uint32_t cmtRxTimeout = 200;
     uint32_t cmtRxTimeCount = 0;
-
-    uint8_t cmtCurrentCh; // current used channel, should be stored per inverter und set before next Tx, if hopping is used
 
     uint8_t cmtTx56toCh = 0xFF; // send CMD56 active to Channel xx, inactive = 0xFF
 
