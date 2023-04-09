@@ -240,11 +240,8 @@ void HoymilesRadio_NRF::sendEsbPacket(CommandAbstract* cmd)
     openWritingPipe(s);
     _radio->setRetries(3, 15);
 
-    Hoymiles.getMessageOutput()->print("TX ");
-    Hoymiles.getMessageOutput()->print(cmd->getCommandName());
-    Hoymiles.getMessageOutput()->print(" Channel: ");
-    Hoymiles.getMessageOutput()->print(_radio->getChannel());
-    Hoymiles.getMessageOutput()->print(" --> ");
+    Hoymiles.getMessageOutput()->printf("TX %s Channel: %d --> ",
+        cmd->getCommandName().c_str(), _radio->getChannel());
     cmd->dumpDataPayload(Hoymiles.getMessageOutput());
     _radio->write(cmd->getDataPayload(), cmd->getDataSize());
 
