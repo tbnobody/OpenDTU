@@ -372,10 +372,8 @@ void HoymilesRadio_CMT::loop()
             CommandAbstract* cmd = _commandQueue.front().get();
             uint8_t verifyResult = inv->verifyAllFragments(cmd);
             if (verifyResult == FRAGMENT_ALL_MISSING_RESEND) {
-                Hoymiles.getMessageOutput()->println("Nothing received");
-                // sendLastPacketAgain();
-                _commandQueue.pop();
-                _busyFlag = false;
+                Hoymiles.getMessageOutput()->println("Nothing received, resend whole request");
+                sendLastPacketAgain();
 
             } else if (verifyResult == FRAGMENT_ALL_MISSING_TIMEOUT) {
                 Hoymiles.getMessageOutput()->println("Nothing received, resend count exeeded");
