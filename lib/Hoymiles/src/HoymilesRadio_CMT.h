@@ -74,7 +74,7 @@ private:
 
     uint32_t _inverterTargetFrequency = HOYMILES_CMT_WORK_FREQ;
 
-    String cmtChToFreq(const uint8_t channel);
+    static float getFrequencyFromChannel(const uint8_t channel);
     void cmtSwitchChannel(const uint8_t channel);
     uint8_t cmtFreqToChan(const String& func_name, const String& var_name, const uint32_t freq_kHz);
     bool cmtSwitchDtuFreq(const uint32_t to_freq_kHz);

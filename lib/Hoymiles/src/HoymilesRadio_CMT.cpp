@@ -9,9 +9,9 @@
 #include <cmt2300a.h>
 
 #define HOY_BOOT_FREQ 868000000 // Hoymiles boot/init frequency after power up inverter or connection lost for 15 min
-
+#define HOY_BASE_FREQ 860000000
 // offset from initalized CMT base frequency to Hoy base frequency in channels
-#define CMT_BASE_CH_OFFSET860 ((860000000 - CMT_BASE_FREQ) / CMT2300A_ONE_STEP_SIZE / FH_OFFSET)
+#define CMT_BASE_CH_OFFSET860 ((HOY_BASE_FREQ - CMT_BASE_FREQ) / CMT2300A_ONE_STEP_SIZE / FH_OFFSET)
 
 // frequency can not be lower than actual initailized base freq
 #define CMT_MIN_FREQ_KHZ ((CMT_BASE_FREQ + (CMT_BASE_CH_OFFSET860 >= 1 ? CMT_BASE_CH_OFFSET860 : 1) * CMT2300A_ONE_STEP_SIZE * FH_OFFSET) / 1000)
@@ -19,9 +19,9 @@
 // =923500, 0xFF does not work
 #define CMT_MAX_FREQ_KHZ ((CMT_BASE_FREQ + 0xFE * CMT2300A_ONE_STEP_SIZE * FH_OFFSET) / 1000)
 
-String HoymilesRadio_CMT::cmtChToFreq(const uint8_t channel)
+float HoymilesRadio_CMT::getFrequencyFromChannel(const uint8_t channel)
 {
-    return String((CMT_BASE_FREQ + (CMT_BASE_CH_OFFSET860 + channel) * FH_OFFSET * CMT2300A_ONE_STEP_SIZE) / 1000000.0, 2) + " MHz";
+    return (CMT_BASE_FREQ + (CMT_BASE_CH_OFFSET860 + channel) * FH_OFFSET * CMT2300A_ONE_STEP_SIZE) / 1000000.0;
 }
 
 void HoymilesRadio_CMT::cmtSwitchChannel(const uint8_t channel)
@@ -83,7 +83,7 @@ bool HoymilesRadio_CMT::cmtSwitchInvAndDtuFreq(const uint64_t inv_serial, const 
     cmtTxBuffer[13] = 0x14;
     cmtTxBuffer[14] = crc8(cmtTxBuffer, 14);
 
-    Hoymiles.getMessageOutput()->printf("TX CMD56 %s --> ", cmtChToFreq(cmtCurrentCh).c_str());
+    Hoymiles.getMessageOutput()->printf("TX CMD56 %.2f MHz --> ", getFrequencyFromChannel(cmtCurrentCh));
     dumpBuf(cmtTxBuffer, 15);
 
     cmtTxLength = 15;
@@ -343,7 +343,7 @@ void HoymilesRadio_CMT::loop()
 
                 if (nullptr != inv) {
                     // Save packet in inverter rx buffer
-                    Hoymiles.getMessageOutput()->printf("RX %s --> ", cmtChToFreq(f.channel).c_str());
+                    Hoymiles.getMessageOutput()->printf("RX %.2f MHz --> ", getFrequencyFromChannel(f.channel));
                     dumpBuf(f.fragment, f.len, false);
                     Hoymiles.getMessageOutput()->printf("| %d dBm\r\n", f.rssi);
 
@@ -478,8 +478,8 @@ void HoymilesRadio_CMT::sendEsbPacket(CommandAbstract* cmd)
 
     cmd->setRouterAddress(DtuSerial().u64);
 
-    Hoymiles.getMessageOutput()->printf("TX %s %s --> ",
-        cmd->getCommandName().c_str(), cmtChToFreq(cmtCurrentCh).c_str());
+    Hoymiles.getMessageOutput()->printf("TX %s %.2f MHz --> ",
+        cmd->getCommandName().c_str(), getFrequencyFromChannel(cmtCurrentCh));
     cmd->dumpDataPayload(Hoymiles.getMessageOutput());
 
     // Still here for to handle CMD56 correctly (inverter serial etc.)
