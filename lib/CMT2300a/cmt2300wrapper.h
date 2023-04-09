@@ -21,6 +21,18 @@ public:
 
     bool write(const uint8_t* buf, uint8_t len);
 
+    /**
+     * Set RF communication channel. The frequency used by a channel is
+     * @param channel Which RF channel to communicate on, 0-254
+     */
+    void setChannel(uint8_t channel);
+
+    /**
+     * Get RF communication channel
+     * @return The currently configured RF Channel
+     */
+    uint8_t getChannel(void);
+
     bool setPALevel(int8_t level);
 
 private:

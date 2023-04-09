@@ -60,6 +60,16 @@ bool CMT2300A::write(const uint8_t* buf, uint8_t len)
     return true;
 }
 
+void CMT2300A::setChannel(uint8_t channel)
+{
+    CMT2300A_SetFrequencyChannel(channel);
+}
+
+uint8_t CMT2300A::getChannel(void)
+{
+    return CMT2300A_ReadReg(CMT2300A_CUS_FREQ_CHNL);
+}
+
 bool CMT2300A::setPALevel(int8_t level)
 {
     uint16_t Tx_dBm_word;

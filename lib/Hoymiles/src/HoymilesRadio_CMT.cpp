@@ -26,9 +26,7 @@ String HoymilesRadio_CMT::cmtChToFreq(const uint8_t channel)
 
 void HoymilesRadio_CMT::cmtSwitchChannel(const uint8_t channel)
 {
-    yield();
-    CMT2300A_SetFrequencyChannel(channel);
-    yield();
+    _radio->setChannel(channel);
     cmtCurrentCh = channel;
 }
 
