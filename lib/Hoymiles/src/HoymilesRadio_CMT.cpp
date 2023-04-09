@@ -485,11 +485,15 @@ void HoymilesRadio_CMT::sendEsbPacket(CommandAbstract* cmd)
         cmd->getCommandName().c_str(), cmtChToFreq(cmtCurrentCh).c_str());
     cmd->dumpDataPayload(Hoymiles.getMessageOutput());
 
+    // Still here for to handle CMD56 correctly (inverter serial etc.)
     memcpy(cmtTxBuffer, cmd->getDataPayload(), cmd->getDataSize());
-    cmtTxLength = cmd->getDataSize();
-    _txTimeout.set(100);
 
-    cmtNextState = CMT_STATE_TX_START;
+    if (_radio->write(cmd->getDataPayload(), cmd->getDataSize())) {
+        _packetSent = false; // still bad hack, to be removed
+        cmtNextState = CMT_STATE_RX_START;
+    } else {
+        Hoymiles.getMessageOutput()->println("TX SPI Timeout");
+    }
 
     _busyFlag = true;
     _rxTimeout.set(cmd->getTimeout());

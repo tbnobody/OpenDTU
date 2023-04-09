@@ -25,6 +25,41 @@ bool CMT2300A::isChipConnected()
     return CMT2300A_IsExist();
 }
 
+bool CMT2300A::write(const uint8_t* buf, uint8_t len)
+{
+    CMT2300A_GoStby();
+    CMT2300A_ClearInterruptFlags();
+
+    /* Must clear FIFO after enable SPI to read or write the FIFO */
+    CMT2300A_EnableWriteFifo();
+    CMT2300A_ClearTxFifo();
+
+    CMT2300A_WriteReg(CMT2300A_CUS_PKT15, len); // set Tx length
+    /* The length need be smaller than 32 */
+    CMT2300A_WriteFifo(buf, len);
+
+    if (!(CMT2300A_ReadReg(CMT2300A_CUS_FIFO_FLAG) & CMT2300A_MASK_TX_FIFO_NMTY_FLG)) {
+        return false;
+    }
+
+    if (!CMT2300A_GoTx()) {
+        return false;
+    }
+
+    uint32_t timer = millis();
+
+    while (!(CMT2300A_MASK_TX_DONE_FLG & CMT2300A_ReadReg(CMT2300A_CUS_INT_CLR1))) {
+        if (millis() - timer > 95) {
+            return false;
+        }
+    }
+
+    CMT2300A_ClearInterruptFlags();
+    CMT2300A_GoSleep();
+
+    return true;
+}
+
 bool CMT2300A::setPALevel(int8_t level)
 {
     uint16_t Tx_dBm_word;

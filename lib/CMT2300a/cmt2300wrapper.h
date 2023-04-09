@@ -19,6 +19,8 @@ public:
      */
     bool isChipConnected();
 
+    bool write(const uint8_t* buf, uint8_t len);
+
     bool setPALevel(int8_t level);
 
 private:
