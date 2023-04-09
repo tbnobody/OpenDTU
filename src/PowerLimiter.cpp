@@ -154,7 +154,7 @@ bool PowerLimiterClass::canUseDirectSolarPower()
 {
     CONFIG_T& config = Configuration.get();
 
-    if (!config.PowerLimiter_SolarPassTroughEnabled
+    if (!config.PowerLimiter_SolarPassThroughEnabled
             || !config.Vedirect_Enabled) {
         return false;
     }
