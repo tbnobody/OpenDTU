@@ -6,9 +6,9 @@
 #include "commands/CommandAbstract.h"
 #include "types.h"
 #include <Arduino.h>
+#include <cmt2300wrapper.h>
 #include <memory>
 #include <queue>
-#include <cmt2300wrapper.h>
 
 // number of fragments hold in buffer
 #define FRAGMENT_BUFFER_SIZE 30
@@ -16,25 +16,6 @@
 #ifndef HOYMILES_CMT_WORK_FREQ
 #define HOYMILES_CMT_WORK_FREQ 865000
 #endif
-
-/* CMT states */
-typedef enum {
-    CMT_STATE_IDLE = 0,
-    CMT_STATE_RX_START,
-    CMT_STATE_RX_WAIT,
-    CMT_STATE_RX_DONE,
-    CMT_STATE_RX_TIMEOUT,
-    CMT_STATE_ERROR,
-} enumCMTstate;
-
-/* CMT process function results */
-typedef enum {
-    CMT_IDLE = 0,
-    CMT_BUSY,
-    CMT_RX_DONE,
-    CMT_RX_TIMEOUT,
-    CMT_ERROR,
-} enumCMTresult;
 
 class HoymilesRadio_CMT : public HoymilesRadio {
 public:
@@ -73,10 +54,4 @@ private:
     uint32_t _inverterTargetFrequency = HOYMILES_CMT_WORK_FREQ;
 
     bool cmtSwitchDtuFreq(const uint32_t to_freq_kHz);
-    enumCMTresult cmtProcess(void);
-
-    enumCMTstate cmtNextState = CMT_STATE_IDLE;
-
-    uint32_t cmtRxTimeout = 200;
-    uint32_t cmtRxTimeCount = 0;
 };

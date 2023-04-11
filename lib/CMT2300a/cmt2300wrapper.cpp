@@ -25,6 +25,46 @@ bool CMT2300A::isChipConnected()
     return CMT2300A_IsExist();
 }
 
+bool CMT2300A::startListening(void)
+{
+    CMT2300A_GoStby();
+    CMT2300A_ClearInterruptFlags();
+
+    /* Must clear FIFO after enable SPI to read or write the FIFO */
+    CMT2300A_EnableReadFifo();
+    CMT2300A_ClearRxFifo();
+
+    if (!CMT2300A_GoRx()) {
+        return false;
+    } else {
+        return true;
+    }
+}
+
+bool CMT2300A::stopListening(void)
+{
+    CMT2300A_ClearInterruptFlags();
+    return CMT2300A_GoSleep();
+}
+
+bool CMT2300A::available(void)
+{
+    return (
+        CMT2300A_MASK_PREAM_OK_FLG |
+        CMT2300A_MASK_SYNC_OK_FLG |
+        CMT2300A_MASK_CRC_OK_FLG |
+        CMT2300A_MASK_PKT_OK_FLG
+        ) & CMT2300A_ReadReg(CMT2300A_CUS_INT_FLAG);
+}
+
+void CMT2300A::read(void* buf, uint8_t len)
+{
+    // Fetch the payload
+    CMT2300A_ReadFifo(static_cast<uint8_t*>(buf), len);
+
+    CMT2300A_ClearInterruptFlags();
+}
+
 bool CMT2300A::write(const uint8_t* buf, uint8_t len)
 {
     CMT2300A_GoStby();
@@ -68,6 +108,18 @@ void CMT2300A::setChannel(uint8_t channel)
 uint8_t CMT2300A::getChannel(void)
 {
     return CMT2300A_ReadReg(CMT2300A_CUS_FREQ_CHNL);
+}
+
+uint8_t CMT2300A::getDynamicPayloadSize(void)
+{
+    uint8_t result;
+    CMT2300A_ReadFifo(&result, 1); // first byte in FiFo is length
+    return result;
+}
+
+int CMT2300A::getRssiDBm()
+{
+    return CMT2300A_GetRssiDBm();
 }
 
 bool CMT2300A::setPALevel(int8_t level)
@@ -181,6 +233,18 @@ bool CMT2300A::setPALevel(int8_t level)
     CMT2300A_WriteReg(CMT2300A_CUS_TX9, Tx_dBm_word & 0xFF);
 
     return true;
+}
+
+bool CMT2300A::rxFifoAvailable()
+{
+    return (
+        CMT2300A_MASK_PKT_OK_FLG
+        ) & CMT2300A_ReadReg(CMT2300A_CUS_INT_FLAG);
+}
+
+void CMT2300A::flush_rx(void)
+{
+    CMT2300A_ClearRxFifo();
 }
 
 bool CMT2300A::_init_pins()
