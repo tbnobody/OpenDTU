@@ -27,9 +27,8 @@
                                 <div class="col-sm-10">
                                     <select class="form-select" id="inputPinProfile"
                                         v-model="deviceConfigList.curPin.name">
-                                        <option v-for="device in pinMappingList" :value="device.name"
-                                            :key="device.name">
-                                            {{ device.name }}
+                                        <option v-for="device in pinMappingList" :value="device.name" :key="device.name">
+                                            {{ device.name === "Default" ? $t('deviceadmin.DefaultProfile') : device.name }}
                                         </option>
                                     </select>
                                 </div>
@@ -144,10 +143,8 @@ export default defineComponent({
                     this.pinMappingList = Array<Device>();
                 })
                 .finally(() => {
-                    this.pinMappingList.push({
-                        "name": this.$t('deviceadmin.DefaultProfile')
-                    } as Device);
                     this.pinMappingList.sort((a, b) => (a.name < b.name) ? -1 : 1);
+                    this.pinMappingList.splice(0, 0, { "name": "Default" } as Device);
                     this.pinMappingLoading = false;
                 });
         },
