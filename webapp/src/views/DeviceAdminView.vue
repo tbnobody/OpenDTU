@@ -63,8 +63,8 @@
                                 </label>
                                 <div class="col-sm-10">
                                     <select class="form-select" v-model="deviceConfigList.display.rotation">
-                                        <option v-for="rotation in displayRotationList" :key="rotation.key" :value="rotation.key">
-                                            {{ rotation.value }}
+                                        <option v-for="(rotation, index) in displayRotationList" :key="index" :value="index">
+                                            {{ $t(`deviceadmin.` + rotation) }}
                                         </option>
                                     </select>
                                 </div>
@@ -119,10 +119,10 @@ export default defineComponent({
             alertType: "info",
             showAlert: false,
             displayRotationList: [
-                { key: 0, value: this.$t('deviceadmin.rot0') },
-                { key: 1, value: this.$t('deviceadmin.rot90') },
-                { key: 2, value: this.$t('deviceadmin.rot180') },
-                { key: 3, value: this.$t('deviceadmin.rot270') },
+                'rot0',
+                'rot90',
+                'rot180',
+                'rot270',
             ],
         }
     },
