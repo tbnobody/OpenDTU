@@ -23,8 +23,8 @@
                     </label>
                     <div class="col-sm-10">
                         <select class="form-select" v-model="dtuConfigList.dtu_palevel">
-                            <option v-for="palevel in palevelList" :key="palevel.key" :value="palevel.key">
-                                {{ palevel.value }}
+                            <option v-for="(palevel, index) in palevelList" :key="index" :value="index">
+                                {{ $t(`dtuadmin.` + palevel) }}
                             </option>
                         </select>
                     </div>
@@ -58,10 +58,10 @@ export default defineComponent({
             dataLoading: true,
             dtuConfigList: {} as DtuConfig,
             palevelList: [
-                { key: 0, value: this.$t('dtuadmin.Min') },
-                { key: 1, value: this.$t('dtuadmin.Low') },
-                { key: 2, value: this.$t('dtuadmin.High') },
-                { key: 3, value: this.$t('dtuadmin.Max') },
+                'Min', 
+                'Low', 
+                'High', 
+                'Max',
             ],
             alertMessage: "",
             alertType: "info",
