@@ -118,7 +118,7 @@ Sample Picture:
 
 Also supported: Board with Ethernet-Connector and Power-over-Ethernet [Olimex ESP32-POE](https://www.olimex.com/Products/IoT/ESP32/ESP32-POE/open-source-hardware)
 
-### NRF24L01+ radio board
+### NRF24L01+ radio board (See inverter table above for supported inverters)
 
 The PLUS sign is IMPORTANT! There are different variants available, with antenna on the printed circuit board or external antenna.
 
@@ -137,11 +137,19 @@ A heavily incomplete list of trusted hardware shops in germany is:
 
 This list is for your convenience only, the project is not related to any of these shops.
 
+### CMT2300A radio board  (See inverter table above for supported inverters)
+
+It is important to get a module which supports SPI communicatiton. The following modules are currently supported:
+
+* EBYTE E49-900M20S
+
+The CMT2300A uses 3-Wire half duplex SPI communication. Due to this fact it currently requires a separate SPI bus. If you want to run the CMT2300A module on the same ESP32 as a NRF24L01+ module or a PCD8544 display make sure you get a ESP which supports 2 SPI busses.
+
 ### Power supply
 
 Use a power suppy with 5 V and 1 A. The USB cable connected to your PC/Notebook may be powerful enough or may be not.
 
-## Wiring up
+## Wiring up the NRF24L01+ module
 
 ### Schematic
 
