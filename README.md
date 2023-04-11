@@ -24,28 +24,41 @@ Like to show your own build? Just send me a Pull Request.
 
 ## Currently supported Inverters
 
-* Hoymiles HM-300
-* Hoymiles HM-350
-* Hoymiles HM-400
-* Hoymiles HM-600
-* Hoymiles HM-700
-* Hoymiles HM-800
-* Hoymiles HM-1000
-* Hoymiles HM-1200
-* Hoymiles HM-1500
-* Solenso SOL-H350
-* Solenso SOL-H400
-* Solenso SOL-H800
-* TSUN TSOL-M350 (Maybe depending on firmware/serial number on the inverter)
-* TSUN TSOL-M800 (Maybe depending on firmware/serial number on the inverter)
-* TSUN TSOL-M1600 (Maybe depending on firmware/serial number on the inverter)
+| Model               | Required RF Module | DC Inputs | AC Phases |
+| --------------------| ------------------ | --------- | --------- |
+| Hoymiles HM-300     | NRF24L01+          | 1         | 1         |
+| Hoymiles HM-350     | NRF24L01+          | 1         | 1         |
+| Hoymiles HM-400     | NRF24L01+          | 1         | 1         |
+| Hoymiles HM-600     | NRF24L01+          | 2         | 1         |
+| Hoymiles HM-700     | NRF24L01+          | 2         | 1         |
+| Hoymiles HM-800     | NRF24L01+          | 2         | 1         |
+| Hoymiles HM-1000    | NRF24L01+          | 4         | 1         |
+| Hoymiles HM-1200    | NRF24L01+          | 4         | 1         |
+| Hoymiles HM-1500    | NRF24L01+          | 4         | 1         |
+| Hoymiles HMS-300    | CMT2300A           | 1         | 1         |
+| Hoymiles HMS-350    | CMT2300A           | 1         | 1         |
+| Hoymiles HMS-400    | CMT2300A           | 1         | 1         |
+| Hoymiles HMS-450    | CMT2300A           | 1         | 1         |
+| Hoymiles HMS-500    | CMT2300A           | 1         | 1         |
+| Hoymiles HMS-600    | CMT2300A           | 2         | 1         |
+| Hoymiles HMS-700    | CMT2300A           | 2         | 1         |
+| Hoymiles HMS-800    | CMT2300A           | 2         | 1         |
+| Hoymiles HMS-900    | CMT2300A           | 2         | 1         |
+| Hoymiles HMS-1000   | CMT2300A           | 2         | 1         |
+| Hoymiles HMS-1600   | CMT2300A           | 4         | 1         |
+| Hoymiles HMS-1800   | CMT2300A           | 4         | 1         |
+| Hoymiles HMS-2000   | CMT2300A           | 4         | 1         |
+| Hoymiles HMT-1800   | CMT2300A           | 6         | 3         |
+| Hoymiles HMT-2250   | CMT2300A           | 6         | 3         |
+| Solenso SOL-H350    | NRF24L01+          | 1         | 1         |
+| Solenso SOL-H400    | NRF24L01+          | 1         | 1         |
+| Solenso SOL-H800    | NRF24L01+          | 2         | 1         |
+| TSUN TSOL-M350      | NRF24L01+          | 1         | 1         |
+| TSUN TSOL-M800      | NRF24L01+          | 2         | 1         |
+| TSUN TSOL-M1600     | NRF24L01+          | 4         | 1         |
 
 **TSUN compatibility remark:**
-Compatibility with OpenDTU seems to be related to serial numbers. Current findings indicate that TSUN inverters with a serial number starting with "11" are supported, whereby inverters with a serial number starting with "10" are not.
-Firmware version seems to play not a significant role and cannot be read from the stickers. For completeness, the following firmware version have been reported to work with OpenDTU:
-
-* v1.0.8, v1.0.10 TSOL-M800 (DE)
-* v1.0.12 TSOL-M1600
+Compatibility with OpenDTU is most likly related to the serial number of the inverter. Current findings indicate that TSUN inverters with a serial number starting with "11" are supported, whereby inverters with a serial number starting with "10" are not.
 
 ## Features for end users
 
@@ -66,6 +79,8 @@ Firmware version seems to play not a significant role and cannot be read from th
 * Prometheus API endpoint (/api/prometheus/metrics)
 * English, german and french web interface
 * Displays (SSD1306, SH1106, PCD8544)
+* Status LEDs
+* Konfiguration management (export / import configurations)
 * Dark Theme
 
 ## Features for developers
@@ -304,7 +319,7 @@ A documentation of the Web API can be found here: [Web-API Documentation](docs/W
 * OpenDTU needs access to a working NTP server to get the current date & time.
 * If your problem persists, check the  [Issues on Github](https://github.com/tbnobody/OpenDTU/issues). Please inspect not only the open issues, also the closed issues contain useful information.
 * Another source of information are the [Discussions](https://github.com/tbnobody/OpenDTU/discussions/)
-* When flashing with VSCode Plattform.IO fails and also with ESPRESSIF tool a demo bin file cannot be flashed to the ESP32 with error message "A fatal error occurred: MD5 of file does not match data in flash!" than un-wire/unconnect ESP32 from the NRF24L01+ board. Try to flash again and rewire afterwards. 
+* When flashing with VSCode Plattform.IO fails and also with ESPRESSIF tool a demo bin file cannot be flashed to the ESP32 with error message "A fatal error occurred: MD5 of file does not match data in flash!" than un-wire/unconnect ESP32 from the NRF24L01+ board. Try to flash again and rewire afterwards.
 
 ## Related Projects
 
