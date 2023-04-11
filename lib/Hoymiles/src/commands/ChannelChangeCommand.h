@@ -13,4 +13,6 @@ public:
     uint8_t getChannel();
 
     virtual bool handleResponse(InverterAbstract* inverter, fragment_t fragment[], uint8_t max_fragment_id);
+
+    virtual uint8_t getMaxResendCount();
 };

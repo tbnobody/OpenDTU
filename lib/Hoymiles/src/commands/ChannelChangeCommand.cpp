@@ -37,3 +37,9 @@ bool ChannelChangeCommand::handleResponse(InverterAbstract* inverter, fragment_t
 {
     return true;
 }
+
+uint8_t ChannelChangeCommand::getMaxResendCount()
+{
+    // This command will never retrieve an answer. Therefor it's not required to repeat it
+    return 0;
+}
