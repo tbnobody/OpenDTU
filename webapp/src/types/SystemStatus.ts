@@ -9,6 +9,7 @@ export interface SystemStatus {
     sdkversion: string;
     config_version: string;
     git_hash: string;
+    git_is_hash: boolean;
     resetreason_0: string;
     resetreason_1: string;
     cfgsavecount: number;

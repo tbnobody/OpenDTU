@@ -2,6 +2,8 @@
 
 This is a fork from the Hoymiles project OpenDTU.
 
+![GitHub tag (latest SemVer)](https://img.shields.io/github/v/tag/helgeerbe/OpenDTU?label=based%20on%20original%20OpenDTU)
+
 ## Extensions to the original OpenDTU
 
 This project is still under development and adds following features:

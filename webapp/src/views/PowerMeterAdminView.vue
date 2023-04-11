@@ -215,10 +215,11 @@ export default defineComponent({
             dataLoading: true,
             powerMeterConfigList: {} as PowerMeterConfig,
             powerMeterSourceList: [
-            { key: 3, value: this.$t('powermeteradmin.typeHTTP') },
                 { key: 0, value: this.$t('powermeteradmin.typeMQTT') },
                 { key: 1, value: this.$t('powermeteradmin.typeSDM1ph') },
                 { key: 2, value: this.$t('powermeteradmin.typeSDM3ph') },
+                { key: 3, value: this.$t('powermeteradmin.typeHTTP') },
+                { key: 4, value: this.$t('powermeteradmin.typeSML') },
             ],
             alertMessage: "",
             alertType: "info",
