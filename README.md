@@ -188,6 +188,12 @@ Topics for 3 phases of a power meter is configurable. Given is an example for th
 | huawei/output_temp                      | R     | Output air temperature                               | °C                         |
 | huawei/efficiency                       | R     | Efficiency                                           | Percentage                 |
 
+## Power Limiter topics
+| Topic                                   | R / W | Description                                          | Value / Unit               |
+| --------------------------------------- | ----- | ---------------------------------------------------- | -------------------------- |
+| powerlimiter/cmd/disable                | W     | Power Limiter disable override for external PL control | 0 / 1                    |
+| powerlimiter/status/disabled            | R     | Power Limiter disable override status                | 0 / 1                    |
+
 ## Currently supported Inverters
 * Hoymiles HM-300
 * Hoymiles HM-350

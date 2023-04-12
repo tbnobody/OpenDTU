@@ -24,11 +24,13 @@ void PowerLimiterClass::loop()
     CONFIG_T& config = Configuration.get();
 
     if (!config.PowerLimiter_Enabled
+            || _disabled
             || !config.PowerMeter_Enabled
             || !Hoymiles.getRadio()->isIdle()
             || (millis() - _lastCommandSent) < (config.PowerLimiter_Interval * 1000)
             || (millis() - _lastLoop) < (config.PowerLimiter_Interval * 1000)) {
-        if (!config.PowerLimiter_Enabled)
+        if (!config.PowerLimiter_Enabled
+            || _disabled)
             _plState = STATE_DISCOVER; // ensure STATE_DISCOVER is set, if PowerLimiter will be enabled.
         return;
     }
@@ -148,6 +150,14 @@ plStates PowerLimiterClass::getPowerLimiterState() {
 
 int32_t PowerLimiterClass::getLastRequestedPowewrLimit() {
     return _lastRequestedPowerLimit;
+}
+
+bool PowerLimiterClass::getDisable() {
+    return _disabled;
+}
+
+void PowerLimiterClass::setDisable(bool disable) {
+    _disabled = disable;
 }
 
 bool PowerLimiterClass::canUseDirectSolarPower()
