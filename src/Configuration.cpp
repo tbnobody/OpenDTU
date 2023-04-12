@@ -65,6 +65,9 @@ bool ConfigurationClass::write()
     JsonObject mqtt_tls = mqtt.createNestedObject("tls");
     mqtt_tls["enabled"] = config.Mqtt_Tls;
     mqtt_tls["root_ca_cert"] = config.Mqtt_RootCaCert;
+    mqtt_tls["certlogin"] = config.Mqtt_TlsCertLogin;
+    mqtt_tls["client_cert"] = config.Mqtt_ClientCert;
+    mqtt_tls["client_key"] = config.Mqtt_ClientKey;
 
     JsonObject mqtt_hass = mqtt.createNestedObject("hass");
     mqtt_hass["enabled"] = config.Mqtt_Hass_Enabled;
@@ -202,6 +205,9 @@ bool ConfigurationClass::read()
     JsonObject mqtt_tls = mqtt["tls"];
     config.Mqtt_Tls = mqtt_tls["enabled"] | MQTT_TLS;
     strlcpy(config.Mqtt_RootCaCert, mqtt_tls["root_ca_cert"] | MQTT_ROOT_CA_CERT, sizeof(config.Mqtt_RootCaCert));
+    config.Mqtt_TlsCertLogin = mqtt_tls["certlogin"] | MQTT_TLSCERTLOGIN;
+    strlcpy(config.Mqtt_ClientCert, mqtt_tls["client_cert"] | MQTT_TLSCLIENTCERT, sizeof(config.Mqtt_ClientCert));
+    strlcpy(config.Mqtt_ClientKey, mqtt_tls["client_key"] | MQTT_TLSCLIENTKEY, sizeof(config.Mqtt_ClientKey));
 
     JsonObject mqtt_hass = mqtt["hass"];
     config.Mqtt_Hass_Enabled = mqtt_hass["enabled"] | MQTT_HASS_ENABLED;

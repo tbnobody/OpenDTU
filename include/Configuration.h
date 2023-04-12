@@ -19,7 +19,7 @@
 #define MQTT_MAX_PASSWORD_STRLEN 64
 #define MQTT_MAX_TOPIC_STRLEN 32
 #define MQTT_MAX_LWTVALUE_STRLEN 20
-#define MQTT_MAX_ROOT_CA_CERT_STRLEN 2560
+#define MQTT_MAX_CERT_STRLEN 2560
 
 #define INV_MAX_NAME_STRLEN 31
 #define INV_MAX_COUNT 10
@@ -89,7 +89,10 @@ struct CONFIG_T {
     char Mqtt_Hass_Topic[MQTT_MAX_TOPIC_STRLEN + 1];
     bool Mqtt_Hass_IndividualPanels;
     bool Mqtt_Tls;
-    char Mqtt_RootCaCert[MQTT_MAX_ROOT_CA_CERT_STRLEN + 1];
+    char Mqtt_RootCaCert[MQTT_MAX_CERT_STRLEN + 1];
+    bool Mqtt_TlsCertLogin;
+    char Mqtt_ClientCert[MQTT_MAX_CERT_STRLEN + 1];
+    char Mqtt_ClientKey[MQTT_MAX_CERT_STRLEN + 1];
 
     char Mqtt_Hostname[MQTT_MAX_HOSTNAME_STRLEN + 1];
 

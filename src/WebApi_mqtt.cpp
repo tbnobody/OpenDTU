@@ -44,7 +44,9 @@ void WebApiMqttClass::onMqttStatus(AsyncWebServerRequest* request)
     root["mqtt_connected"] = MqttSettings.getConnected();
     root["mqtt_retain"] = config.Mqtt_Retain;
     root["mqtt_tls"] = config.Mqtt_Tls;
-    root["mqtt_root_ca_cert_info"] = getRootCaCertInfo(config.Mqtt_RootCaCert);
+    root["mqtt_root_ca_cert_info"] = getTlsCertInfo(config.Mqtt_RootCaCert);
+    root["mqtt_tls_cert_login"] = config.Mqtt_TlsCertLogin;
+    root["mqtt_client_cert_info"] = getTlsCertInfo(config.Mqtt_ClientCert);
     root["mqtt_lwt_topic"] = String(config.Mqtt_Topic) + config.Mqtt_LwtTopic;
     root["mqtt_publish_interval"] = config.Mqtt_PublishInterval;
     root["mqtt_hass_enabled"] = config.Mqtt_Hass_Enabled;
@@ -76,6 +78,9 @@ void WebApiMqttClass::onMqttAdminGet(AsyncWebServerRequest* request)
     root["mqtt_retain"] = config.Mqtt_Retain;
     root["mqtt_tls"] = config.Mqtt_Tls;
     root["mqtt_root_ca_cert"] = config.Mqtt_RootCaCert;
+    root["mqtt_tls_cert_login"] = config.Mqtt_TlsCertLogin;
+    root["mqtt_client_cert"] = config.Mqtt_ClientCert;
+    root["mqtt_client_key"] = config.Mqtt_ClientKey;
     root["mqtt_lwt_topic"] = config.Mqtt_LwtTopic;
     root["mqtt_lwt_online"] = config.Mqtt_LwtValue_Online;
     root["mqtt_lwt_offline"] = config.Mqtt_LwtValue_Offline;
@@ -137,6 +142,9 @@ void WebApiMqttClass::onMqttAdminPost(AsyncWebServerRequest* request)
             && root.containsKey("mqtt_topic")
             && root.containsKey("mqtt_retain")
             && root.containsKey("mqtt_tls")
+            && root.containsKey("mqtt_tls_cert_login")
+            && root.containsKey("mqtt_client_cert")
+            && root.containsKey("mqtt_client_key")
             && root.containsKey("mqtt_lwt_topic")
             && root.containsKey("mqtt_lwt_online")
             && root.containsKey("mqtt_lwt_offline")
@@ -164,7 +172,7 @@ void WebApiMqttClass::onMqttAdminPost(AsyncWebServerRequest* request)
         }
 
         if (root["mqtt_username"].as<String>().length() > MQTT_MAX_USERNAME_STRLEN) {
-            retMsg["message"] = "Username must not longer then " STR(MQTT_MAX_USERNAME_STRLEN) " characters!";
+            retMsg["message"] = "Username must not be longer than " STR(MQTT_MAX_USERNAME_STRLEN) " characters!";
             retMsg["code"] = WebApiError::MqttUsernameLength;
             retMsg["param"]["max"] = MQTT_MAX_USERNAME_STRLEN;
             response->setLength();
@@ -172,7 +180,7 @@ void WebApiMqttClass::onMqttAdminPost(AsyncWebServerRequest* request)
             return;
         }
         if (root["mqtt_password"].as<String>().length() > MQTT_MAX_PASSWORD_STRLEN) {
-            retMsg["message"] = "Password must not longer then " STR(MQTT_MAX_PASSWORD_STRLEN) " characters!";
+            retMsg["message"] = "Password must not be longer than " STR(MQTT_MAX_PASSWORD_STRLEN) " characters!";
             retMsg["code"] = WebApiError::MqttPasswordLength;
             retMsg["param"]["max"] = MQTT_MAX_PASSWORD_STRLEN;
             response->setLength();
@@ -180,7 +188,7 @@ void WebApiMqttClass::onMqttAdminPost(AsyncWebServerRequest* request)
             return;
         }
         if (root["mqtt_topic"].as<String>().length() > MQTT_MAX_TOPIC_STRLEN) {
-            retMsg["message"] = "Topic must not longer then " STR(MQTT_MAX_TOPIC_STRLEN) " characters!";
+            retMsg["message"] = "Topic must not be longer than " STR(MQTT_MAX_TOPIC_STRLEN) " characters!";
             retMsg["code"] = WebApiError::MqttTopicLength;
             retMsg["param"]["max"] = MQTT_MAX_TOPIC_STRLEN;
             response->setLength();
@@ -197,7 +205,7 @@ void WebApiMqttClass::onMqttAdminPost(AsyncWebServerRequest* request)
         }
 
         if (!root["mqtt_topic"].as<String>().endsWith("/")) {
-            retMsg["message"] = "Topic must end with slash (/)!";
+            retMsg["message"] = "Topic must end with a slash (/)!";
             retMsg["code"] = WebApiError::MqttTopicTrailingSlash;
             response->setLength();
             request->send(response);
@@ -212,17 +220,19 @@ void WebApiMqttClass::onMqttAdminPost(AsyncWebServerRequest* request)
             return;
         }
 
-        if (root["mqtt_root_ca_cert"].as<String>().length() > MQTT_MAX_ROOT_CA_CERT_STRLEN) {
-            retMsg["message"] = "Certificate must not longer then " STR(MQTT_MAX_ROOT_CA_CERT_STRLEN) " characters!";
+        if (root["mqtt_root_ca_cert"].as<String>().length() > MQTT_MAX_CERT_STRLEN
+                || root["mqtt_client_cert"].as<String>().length() > MQTT_MAX_CERT_STRLEN
+                || root["mqtt_client_key"].as<String>().length() > MQTT_MAX_CERT_STRLEN) {
+            retMsg["message"] = "Certificates must not be longer than " STR(MQTT_MAX_CERT_STRLEN) " characters!";
             retMsg["code"] = WebApiError::MqttCertificateLength;
-            retMsg["param"]["max"] = MQTT_MAX_ROOT_CA_CERT_STRLEN;
+            retMsg["param"]["max"] = MQTT_MAX_CERT_STRLEN;
             response->setLength();
             request->send(response);
             return;
         }
 
         if (root["mqtt_lwt_topic"].as<String>().length() > MQTT_MAX_TOPIC_STRLEN) {
-            retMsg["message"] = "LWT topic must not longer then " STR(MQTT_MAX_TOPIC_STRLEN) " characters!";
+            retMsg["message"] = "LWT topic must not be longer than " STR(MQTT_MAX_TOPIC_STRLEN) " characters!";
             retMsg["code"] = WebApiError::MqttLwtTopicLength;
             retMsg["param"]["max"] = MQTT_MAX_TOPIC_STRLEN;
             response->setLength();
@@ -239,7 +249,7 @@ void WebApiMqttClass::onMqttAdminPost(AsyncWebServerRequest* request)
         }
 
         if (root["mqtt_lwt_online"].as<String>().length() > MQTT_MAX_LWTVALUE_STRLEN) {
-            retMsg["message"] = "LWT online value must not longer then " STR(MQTT_MAX_LWTVALUE_STRLEN) " characters!";
+            retMsg["message"] = "LWT online value must not be longer than " STR(MQTT_MAX_LWTVALUE_STRLEN) " characters!";
             retMsg["code"] = WebApiError::MqttLwtOnlineLength;
             retMsg["param"]["max"] = MQTT_MAX_LWTVALUE_STRLEN;
             response->setLength();
@@ -248,7 +258,7 @@ void WebApiMqttClass::onMqttAdminPost(AsyncWebServerRequest* request)
         }
 
         if (root["mqtt_lwt_offline"].as<String>().length() > MQTT_MAX_LWTVALUE_STRLEN) {
-            retMsg["message"] = "LWT offline value must not longer then " STR(MQTT_MAX_LWTVALUE_STRLEN) " characters!";
+            retMsg["message"] = "LWT offline value must not be longer than " STR(MQTT_MAX_LWTVALUE_STRLEN) " characters!";
             retMsg["code"] = WebApiError::MqttLwtOfflineLength;
             retMsg["param"]["max"] = MQTT_MAX_LWTVALUE_STRLEN;
             response->setLength();
@@ -268,7 +278,7 @@ void WebApiMqttClass::onMqttAdminPost(AsyncWebServerRequest* request)
 
         if (root["mqtt_hass_enabled"].as<bool>()) {
             if (root["mqtt_hass_topic"].as<String>().length() > MQTT_MAX_TOPIC_STRLEN) {
-                retMsg["message"] = "Hass topic must not longer then " STR(MQTT_MAX_TOPIC_STRLEN) " characters!";
+                retMsg["message"] = "Hass topic must not be longer than " STR(MQTT_MAX_TOPIC_STRLEN) " characters!";
                 retMsg["code"] = WebApiError::MqttHassTopicLength;
                 retMsg["param"]["max"] = MQTT_MAX_TOPIC_STRLEN;
                 response->setLength();
@@ -291,6 +301,9 @@ void WebApiMqttClass::onMqttAdminPost(AsyncWebServerRequest* request)
     config.Mqtt_Retain = root["mqtt_retain"].as<bool>();
     config.Mqtt_Tls = root["mqtt_tls"].as<bool>();
     strlcpy(config.Mqtt_RootCaCert, root["mqtt_root_ca_cert"].as<String>().c_str(), sizeof(config.Mqtt_RootCaCert));
+    config.Mqtt_TlsCertLogin = root["mqtt_tls_cert_login"].as<bool>();
+    strlcpy(config.Mqtt_ClientCert, root["mqtt_client_cert"].as<String>().c_str(), sizeof(config.Mqtt_ClientCert));
+    strlcpy(config.Mqtt_ClientKey, root["mqtt_client_key"].as<String>().c_str(), sizeof(config.Mqtt_ClientKey));
     config.Mqtt_Port = root["mqtt_port"].as<uint>();
     strlcpy(config.Mqtt_Hostname, root["mqtt_hostname"].as<String>().c_str(), sizeof(config.Mqtt_Hostname));
     strlcpy(config.Mqtt_Username, root["mqtt_username"].as<String>().c_str(), sizeof(config.Mqtt_Username));
@@ -318,23 +331,23 @@ void WebApiMqttClass::onMqttAdminPost(AsyncWebServerRequest* request)
     MqttHandleHass.forceUpdate();
 }
 
-String WebApiMqttClass::getRootCaCertInfo(const char* cert)
+String WebApiMqttClass::getTlsCertInfo(const char* cert)
 {
-    char rootCaCertInfo[1024] = "";
+    char tlsCertInfo[1024] = "";
 
-    mbedtls_x509_crt global_cacert;
+    mbedtls_x509_crt tlsCert;
 
-    strlcpy(rootCaCertInfo, "Can't parse root ca", sizeof(rootCaCertInfo));
+    strlcpy(tlsCertInfo, "Can't parse TLS certificate", sizeof(tlsCertInfo));
 
-    mbedtls_x509_crt_init(&global_cacert);
-    int ret = mbedtls_x509_crt_parse(&global_cacert, const_cast<unsigned char*>((unsigned char*)cert), 1 + strlen(cert));
+    mbedtls_x509_crt_init(&tlsCert);
+    int ret = mbedtls_x509_crt_parse(&tlsCert, const_cast<unsigned char*>((unsigned char*)cert), 1 + strlen(cert));
     if (ret < 0) {
-        snprintf(rootCaCertInfo, sizeof(rootCaCertInfo), "Can't parse root ca: mbedtls_x509_crt_parse returned -0x%x\n\n", -ret);
-        mbedtls_x509_crt_free(&global_cacert);
+        snprintf(tlsCertInfo, sizeof(tlsCertInfo), "Can't parse TLS certificate: mbedtls_x509_crt_parse returned -0x%x\n\n", -ret);
+        mbedtls_x509_crt_free(&tlsCert);
         return "";
     }
-    mbedtls_x509_crt_info(rootCaCertInfo, sizeof(rootCaCertInfo) - 1, "", &global_cacert);
-    mbedtls_x509_crt_free(&global_cacert);
+    mbedtls_x509_crt_info(tlsCertInfo, sizeof(tlsCertInfo) - 1, "", &tlsCert);
+    mbedtls_x509_crt_free(&tlsCert);
 
-    return rootCaCertInfo;
+    return tlsCertInfo;
 }
