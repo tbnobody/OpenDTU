@@ -189,7 +189,6 @@ import BootstrapAlert from "@/components/BootstrapAlert.vue";
 import CardElement from '@/components/CardElement.vue';
 import InputElement from '@/components/InputElement.vue';
 import { handleResponse, authHeader } from '@/utils/authentication';
-// import { BIconInfoCircle } from 'bootstrap-icons-vue';
 import type { PowerMeterHttpPhaseConfig, PowerMeterConfig } from "@/types/PowerMeterConfig";
 
 export default defineComponent({
@@ -197,8 +196,7 @@ export default defineComponent({
         BasePage,
         BootstrapAlert,
         CardElement,
-        InputElement,
-        // BIconInfoCircle,
+        InputElement
     },
     data() {
         return {
@@ -228,15 +226,6 @@ export default defineComponent({
                 .then((data) => {
                     this.powerMeterConfigList = data;
                     this.dataLoading = false;
-
-                    // type MyType = {
-                    //     id: number;
-                    //     name: string;
-                    // }
-
-                    // type MyGroupType = {
-                    //     [key:string]: MyType;
-                    // }
 
                     for (var i = 0; i < this.powerMeterConfigList.http_phases.length; i++) {
                         this.testHttpRequestAlert.push({
