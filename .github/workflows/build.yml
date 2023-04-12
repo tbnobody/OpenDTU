@@ -52,6 +52,9 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
+      - name: Get tags
+        run: git fetch --force --tags origin
+
       - name: Cache pip
         uses: actions/cache@v3
         with:
