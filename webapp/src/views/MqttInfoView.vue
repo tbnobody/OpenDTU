@@ -46,6 +46,16 @@
                             <th>{{ $t('mqttinfo.RootCertifcateInfo') }}</th>
                             <td>{{ mqttDataList.mqtt_root_ca_cert_info }}</td>
                         </tr>
+                        <tr>
+                            <th>{{ $t('mqttinfo.TlsCertLogin') }}</th>
+                            <td>
+                                <StatusBadge :status="mqttDataList.mqtt_tls_cert_login" true_text="mqttinfo.Enabled" false_text="mqttinfo.Disabled" />
+                            </td>
+                        </tr>
+                        <tr v-show="mqttDataList.mqtt_tls_cert_login">
+                            <th>{{ $t('mqttinfo.ClientCertifcateInfo') }}</th>
+                            <td>{{ mqttDataList.mqtt_client_cert_info }}</td>
+                        </tr>
                     </tbody>
                 </table>
             </div>

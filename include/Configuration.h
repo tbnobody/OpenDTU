@@ -90,6 +90,9 @@ struct CONFIG_T {
     bool Mqtt_Hass_IndividualPanels;
     bool Mqtt_Tls;
     char Mqtt_RootCaCert[MQTT_MAX_ROOT_CA_CERT_STRLEN + 1];
+    bool Mqtt_TlsCertLogin;
+    char Mqtt_ClientCert[MQTT_MAX_ROOT_CA_CERT_STRLEN + 1];
+    char Mqtt_ClientKey[MQTT_MAX_ROOT_CA_CERT_STRLEN + 1];
 
     char Mqtt_Hostname[MQTT_MAX_HOSTNAME_STRLEN + 1];
 
