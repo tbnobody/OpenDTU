@@ -44,9 +44,9 @@ void WebApiMqttClass::onMqttStatus(AsyncWebServerRequest* request)
     root["mqtt_connected"] = MqttSettings.getConnected();
     root["mqtt_retain"] = config.Mqtt_Retain;
     root["mqtt_tls"] = config.Mqtt_Tls;
-    root["mqtt_root_ca_cert_info"] = getRootCaCertInfo(config.Mqtt_RootCaCert);
+    root["mqtt_root_ca_cert_info"] = getTlsCertInfo(config.Mqtt_RootCaCert);
     root["mqtt_tls_cert_login"] = config.Mqtt_TlsCertLogin;
-    root["mqtt_client_cert_info"] = getRootCaCertInfo(config.Mqtt_ClientCert);
+    root["mqtt_client_cert_info"] = getTlsCertInfo(config.Mqtt_ClientCert);
     root["mqtt_lwt_topic"] = String(config.Mqtt_Topic) + config.Mqtt_LwtTopic;
     root["mqtt_publish_interval"] = config.Mqtt_PublishInterval;
     root["mqtt_hass_enabled"] = config.Mqtt_Hass_Enabled;
@@ -331,23 +331,23 @@ void WebApiMqttClass::onMqttAdminPost(AsyncWebServerRequest* request)
     MqttHandleHass.forceUpdate();
 }
 
-String WebApiMqttClass::getRootCaCertInfo(const char* cert)
+String WebApiMqttClass::getTlsCertInfo(const char* cert)
 {
-    char rootCaCertInfo[1024] = "";
+    char tlsCertInfo[1024] = "";
 
-    mbedtls_x509_crt global_cacert;
+    mbedtls_x509_crt tlsCert;
 
-    strlcpy(rootCaCertInfo, "Can't parse root ca", sizeof(rootCaCertInfo));
+    strlcpy(tlsCertInfo, "Can't parse TLS certificate", sizeof(tlsCertInfo));
 
-    mbedtls_x509_crt_init(&global_cacert);
-    int ret = mbedtls_x509_crt_parse(&global_cacert, const_cast<unsigned char*>((unsigned char*)cert), 1 + strlen(cert));
+    mbedtls_x509_crt_init(&tlsCert);
+    int ret = mbedtls_x509_crt_parse(&tlsCert, const_cast<unsigned char*>((unsigned char*)cert), 1 + strlen(cert));
     if (ret < 0) {
-        snprintf(rootCaCertInfo, sizeof(rootCaCertInfo), "Can't parse root ca: mbedtls_x509_crt_parse returned -0x%x\n\n", -ret);
-        mbedtls_x509_crt_free(&global_cacert);
+        snprintf(tlsCertInfo, sizeof(tlsCertInfo), "Can't parse TLS certificate: mbedtls_x509_crt_parse returned -0x%x\n\n", -ret);
+        mbedtls_x509_crt_free(&tlsCert);
         return "";
     }
-    mbedtls_x509_crt_info(rootCaCertInfo, sizeof(rootCaCertInfo) - 1, "", &global_cacert);
-    mbedtls_x509_crt_free(&global_cacert);
+    mbedtls_x509_crt_info(tlsCertInfo, sizeof(tlsCertInfo) - 1, "", &tlsCert);
+    mbedtls_x509_crt_free(&tlsCert);
 
-    return rootCaCertInfo;
+    return tlsCertInfo;
 }
