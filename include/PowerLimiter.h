@@ -26,6 +26,8 @@ public:
     void loop();
     plStates getPowerLimiterState();
     int32_t getLastRequestedPowewrLimit();
+    void setDisable(bool disable);
+    bool getDisable();
 
 private:
     uint32_t _lastCommandSent = 0;
@@ -33,6 +35,7 @@ private:
     int32_t _lastRequestedPowerLimit = 0;
     uint32_t _lastLimitSetTime = 0;
     plStates _plState = STATE_DISCOVER; 
+    bool _disabled = false;
 
     float _powerMeter1Power;
     float _powerMeter2Power;
