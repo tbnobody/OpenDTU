@@ -172,7 +172,7 @@ void WebApiMqttClass::onMqttAdminPost(AsyncWebServerRequest* request)
         }
 
         if (root["mqtt_username"].as<String>().length() > MQTT_MAX_USERNAME_STRLEN) {
-            retMsg["message"] = "Username must not longer then " STR(MQTT_MAX_USERNAME_STRLEN) " characters!";
+            retMsg["message"] = "Username must not be longer than " STR(MQTT_MAX_USERNAME_STRLEN) " characters!";
             retMsg["code"] = WebApiError::MqttUsernameLength;
             retMsg["param"]["max"] = MQTT_MAX_USERNAME_STRLEN;
             response->setLength();
@@ -180,7 +180,7 @@ void WebApiMqttClass::onMqttAdminPost(AsyncWebServerRequest* request)
             return;
         }
         if (root["mqtt_password"].as<String>().length() > MQTT_MAX_PASSWORD_STRLEN) {
-            retMsg["message"] = "Password must not longer then " STR(MQTT_MAX_PASSWORD_STRLEN) " characters!";
+            retMsg["message"] = "Password must not be longer than " STR(MQTT_MAX_PASSWORD_STRLEN) " characters!";
             retMsg["code"] = WebApiError::MqttPasswordLength;
             retMsg["param"]["max"] = MQTT_MAX_PASSWORD_STRLEN;
             response->setLength();
@@ -188,7 +188,7 @@ void WebApiMqttClass::onMqttAdminPost(AsyncWebServerRequest* request)
             return;
         }
         if (root["mqtt_topic"].as<String>().length() > MQTT_MAX_TOPIC_STRLEN) {
-            retMsg["message"] = "Topic must not longer then " STR(MQTT_MAX_TOPIC_STRLEN) " characters!";
+            retMsg["message"] = "Topic must not be longer than " STR(MQTT_MAX_TOPIC_STRLEN) " characters!";
             retMsg["code"] = WebApiError::MqttTopicLength;
             retMsg["param"]["max"] = MQTT_MAX_TOPIC_STRLEN;
             response->setLength();
@@ -205,7 +205,7 @@ void WebApiMqttClass::onMqttAdminPost(AsyncWebServerRequest* request)
         }
 
         if (!root["mqtt_topic"].as<String>().endsWith("/")) {
-            retMsg["message"] = "Topic must end with slash (/)!";
+            retMsg["message"] = "Topic must end with a slash (/)!";
             retMsg["code"] = WebApiError::MqttTopicTrailingSlash;
             response->setLength();
             request->send(response);
@@ -232,7 +232,7 @@ void WebApiMqttClass::onMqttAdminPost(AsyncWebServerRequest* request)
         }
 
         if (root["mqtt_lwt_topic"].as<String>().length() > MQTT_MAX_TOPIC_STRLEN) {
-            retMsg["message"] = "LWT topic must not longer then " STR(MQTT_MAX_TOPIC_STRLEN) " characters!";
+            retMsg["message"] = "LWT topic must not be longer than " STR(MQTT_MAX_TOPIC_STRLEN) " characters!";
             retMsg["code"] = WebApiError::MqttLwtTopicLength;
             retMsg["param"]["max"] = MQTT_MAX_TOPIC_STRLEN;
             response->setLength();
@@ -249,7 +249,7 @@ void WebApiMqttClass::onMqttAdminPost(AsyncWebServerRequest* request)
         }
 
         if (root["mqtt_lwt_online"].as<String>().length() > MQTT_MAX_LWTVALUE_STRLEN) {
-            retMsg["message"] = "LWT online value must not longer then " STR(MQTT_MAX_LWTVALUE_STRLEN) " characters!";
+            retMsg["message"] = "LWT online value must not be longer than " STR(MQTT_MAX_LWTVALUE_STRLEN) " characters!";
             retMsg["code"] = WebApiError::MqttLwtOnlineLength;
             retMsg["param"]["max"] = MQTT_MAX_LWTVALUE_STRLEN;
             response->setLength();
@@ -258,7 +258,7 @@ void WebApiMqttClass::onMqttAdminPost(AsyncWebServerRequest* request)
         }
 
         if (root["mqtt_lwt_offline"].as<String>().length() > MQTT_MAX_LWTVALUE_STRLEN) {
-            retMsg["message"] = "LWT offline value must not longer then " STR(MQTT_MAX_LWTVALUE_STRLEN) " characters!";
+            retMsg["message"] = "LWT offline value must not be longer than " STR(MQTT_MAX_LWTVALUE_STRLEN) " characters!";
             retMsg["code"] = WebApiError::MqttLwtOfflineLength;
             retMsg["param"]["max"] = MQTT_MAX_LWTVALUE_STRLEN;
             response->setLength();
@@ -278,7 +278,7 @@ void WebApiMqttClass::onMqttAdminPost(AsyncWebServerRequest* request)
 
         if (root["mqtt_hass_enabled"].as<bool>()) {
             if (root["mqtt_hass_topic"].as<String>().length() > MQTT_MAX_TOPIC_STRLEN) {
-                retMsg["message"] = "Hass topic must not longer then " STR(MQTT_MAX_TOPIC_STRLEN) " characters!";
+                retMsg["message"] = "Hass topic must not be longer than " STR(MQTT_MAX_TOPIC_STRLEN) " characters!";
                 retMsg["code"] = WebApiError::MqttHassTopicLength;
                 retMsg["param"]["max"] = MQTT_MAX_TOPIC_STRLEN;
                 response->setLength();
