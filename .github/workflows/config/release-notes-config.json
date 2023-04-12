@@ -45,6 +45,6 @@
         }
     ],
     "tag_resolver": {
-        "method": "sort"
+        "method": "semver"
     }
 }
