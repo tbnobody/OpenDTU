@@ -16,6 +16,7 @@
 #include "MqttHandleInverter.h"
 #include "MqttHandleVedirect.h"
 #include "MqttHandleHuawei.h"
+#include "MqttHandlePowerLimiter.h"
 #include "MqttSettings.h"
 #include "NetworkSettings.h"
 #include "NtpSettings.h"
@@ -104,6 +105,7 @@ void setup()
     MqttHandleHass.init();
     MqttHandleVedirectHass.init();
     MqttHandleHuawei.init();
+    MqttHandlePowerLimiter.init();
     MessageOutput.println("done");
 
     // Initialize WebApi
@@ -211,6 +213,8 @@ void loop()
     MqttHandleVedirectHass.loop();
     yield();
     MqttHandleHuawei.loop();
+    yield();
+    MqttHandlePowerLimiter.loop();
     yield();
     WebApi.loop();
     yield();
