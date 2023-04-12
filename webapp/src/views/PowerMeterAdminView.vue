@@ -101,6 +101,7 @@
 
                     <CardElement
                             v-for="(http_phase, index) in powerMeterConfigList.http_phases"
+                            :key="http_phase.index"
                             :text="$t('powermeteradmin.httpPhase', { phaseNumber: http_phase.index })"
                             textVariant="text-bg-primary"
                             add-space>
@@ -188,7 +189,6 @@ import BootstrapAlert from "@/components/BootstrapAlert.vue";
 import CardElement from '@/components/CardElement.vue';
 import InputElement from '@/components/InputElement.vue';
 import { handleResponse, authHeader } from '@/utils/authentication';
-import { BIconInfoCircle } from 'bootstrap-icons-vue';
 import type { PowerMeterHttpPhaseConfig, PowerMeterConfig } from "@/types/PowerMeterConfig";
 
 export default defineComponent({
@@ -196,21 +196,9 @@ export default defineComponent({
         BasePage,
         BootstrapAlert,
         CardElement,
-        InputElement,
-        BIconInfoCircle,
+        InputElement
     },
     data() {
-        const people: { name: string; age: number; }[] = [
-    {
-        age: 27,
-        name: 'Tim'
-    },
-    {
-        age: 28,
-        name: 'Bob'
-    }
-];
-
         return {
             dataLoading: true,
             powerMeterConfigList: {} as PowerMeterConfig,
@@ -224,7 +212,7 @@ export default defineComponent({
             alertMessage: "",
             alertType: "info",
             showAlert: false,
-            testHttpRequestAlert: <{ message: string; type: string; show: boolean; }[]> [ ],
+            testHttpRequestAlert:  [{message: "", type: "", show: false}] as { message: string; type: string; show: boolean; }[]
         };
     },
     created() {
@@ -238,15 +226,6 @@ export default defineComponent({
                 .then((data) => {
                     this.powerMeterConfigList = data;
                     this.dataLoading = false;
-
-                    type MyType = {
-                        id: number;
-                        name: string;
-                    }
-
-                    type MyGroupType = {
-                        [key:string]: MyType;
-                    }
 
                     for (var i = 0; i < this.powerMeterConfigList.http_phases.length; i++) {
                         this.testHttpRequestAlert.push({
