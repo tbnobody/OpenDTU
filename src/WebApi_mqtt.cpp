@@ -220,12 +220,12 @@ void WebApiMqttClass::onMqttAdminPost(AsyncWebServerRequest* request)
             return;
         }
 
-        if (root["mqtt_root_ca_cert"].as<String>().length() > MQTT_MAX_ROOT_CA_CERT_STRLEN
-                || root["mqtt_client_cert"].as<String>().length() > MQTT_MAX_ROOT_CA_CERT_STRLEN
-                || root["mqtt_client_key"].as<String>().length() > MQTT_MAX_ROOT_CA_CERT_STRLEN) {
-            retMsg["message"] = "Certificates must not be longer than " STR(MQTT_MAX_ROOT_CA_CERT_STRLEN) " characters!";
+        if (root["mqtt_root_ca_cert"].as<String>().length() > MQTT_MAX_CERT_STRLEN
+                || root["mqtt_client_cert"].as<String>().length() > MQTT_MAX_CERT_STRLEN
+                || root["mqtt_client_key"].as<String>().length() > MQTT_MAX_CERT_STRLEN) {
+            retMsg["message"] = "Certificates must not be longer than " STR(MQTT_MAX_CERT_STRLEN) " characters!";
             retMsg["code"] = WebApiError::MqttCertificateLength;
-            retMsg["param"]["max"] = MQTT_MAX_ROOT_CA_CERT_STRLEN;
+            retMsg["param"]["max"] = MQTT_MAX_CERT_STRLEN;
             response->setLength();
             request->send(response);
             return;
