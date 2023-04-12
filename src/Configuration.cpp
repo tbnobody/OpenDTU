@@ -259,8 +259,8 @@ bool ConfigurationClass::read()
 
         config.Inverter[i].Poll_Enable = inv["poll_enable"] | true;
         config.Inverter[i].Poll_Enable_Night = inv["poll_enable_night"] | true;
-        config.Inverter[i].Command_Enable = inv["command_enable"] | true;
-        config.Inverter[i].Command_Enable_Night = inv["command_enable_night"] | true;
+        config.Inverter[i].Command_Enable = inv["command_enable"] | false;
+        config.Inverter[i].Command_Enable_Night = inv["command_enable_night"] | false;
         config.Inverter[i].ReachableThreshold = inv["reachable_threshold"] | REACHABLE_THRESHOLD;
         config.Inverter[i].ZeroRuntimeDataIfUnrechable = inv["zero_runtime"] | false;
         config.Inverter[i].ZeroYieldDayOnMidnight = inv["zero_day"] | false;
