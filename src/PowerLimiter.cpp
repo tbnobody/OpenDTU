@@ -26,24 +26,19 @@ void PowerLimiterClass::loop()
     // Run inital checks to make sure we have met the basic conditions
     if ( !config.PowerMeter_Enabled
             || !Hoymiles.getRadio()->isIdle()
-            || (millis() - _lastCommandSent) < (config.PowerLimiter_Interval * 1000)
             || (millis() - _lastLoop) < (config.PowerLimiter_Interval * 1000)) {
         return;
     }
 
     _lastLoop = millis();
 
-    // Debug state transistions, TODO: Remove
-    MessageOutput.printf("****************** PL STATE: %i\r\n", _plState);
-
     std::shared_ptr<InverterAbstract> inverter = Hoymiles.getInverterByPos(config.PowerLimiter_InverterId);
     if (inverter == nullptr || !inverter->isReachable()) {
         return;
     }
 
-    // Make sure inverter is turned off if PL is disabled by user
-    // Make sure inverter is turned off when lower battery threshold is reached
-    // In this case we are in some state and want to reach STATE_PL_SHUTDOWN
+    // Make sure inverter is turned off if PL is disabled by user/MQTT
+    // Make sure inverter is turned off when low battery threshold is reached
     if (((!config.PowerLimiter_Enabled || _disabled) && _plState != SHUTDOWN)
            || isStopThresholdReached(inverter)) {
         if (inverter->isProducing()) {
@@ -55,35 +50,34 @@ void PowerLimiterClass::loop()
         return;
     }
 
-    // If power limiter is disabled
-    if (!config.PowerLimiter_Enabled) {
+    // Return if power limiter is disabled
+    if (!config.PowerLimiter_Enabled || _disabled) {
       return;
     }
-
-    float dcVoltage = inverter->Statistics()->getChannelFieldValue(TYPE_DC, (ChannelNum_t) config.PowerLimiter_InverterChannelId, FLD_UDC);
-    //float acPower = inverter->Statistics()->getChannelFieldValue(TYPE_AC, (ChannelNum_t) config.PowerLimiter_InverterChannelId, FLD_PAC); 
-    //float correctedDcVoltage = dcVoltage + (acPower * config.PowerLimiter_VoltageLoadCorrectionFactor);
+  	// At this point the PL is enabled but we could still be in the shutdown state 
+    _plState = ACTIVE;
 
     // If the last inverter update is too old, don't do anything.
     // If the last inverter update was before the last limit updated, don't do anything.
-    // Also give the Power meter 3 seconds time to recognize power changes because of the last set limit
-    // and also because the Hoymiles MPPT might not react immediately.
+    // Also give the Power meter 3 seconds time to recognize power changes after the last set limit
+    // as the Hoymiles MPPT might not react immediately.
     if ((millis() - inverter->Statistics()->getLastUpdate()) > 10000
             || inverter->Statistics()->getLastUpdate() <= _lastLimitSetTime
             || PowerMeter.getLastPowerMeterUpdate() <= (_lastLimitSetTime + 3000)) {
         return;
     }
 
+    // Printout some stats
     if (millis() - PowerMeter.getLastPowerMeterUpdate() < (30 * 1000)) {
+        float dcVoltage = inverter->Statistics()->getChannelFieldValue(TYPE_DC, (ChannelNum_t) config.PowerLimiter_InverterChannelId, FLD_UDC);
         MessageOutput.printf("[PowerLimiterClass::loop] dcVoltage: %.2f Voltage Start Threshold: %.2f Voltage Stop Threshold: %.2f inverter->isProducing(): %d\r\n",
             dcVoltage, config.PowerLimiter_VoltageStartThreshold, config.PowerLimiter_VoltageStopThreshold, inverter->isProducing());
     }
 
-  	// If we're in shutdown move to active operation
-    if (_plState == SHUTDOWN) {
-      _plState = ACTIVE;
-    }
 
+    // Battery charging cycle conditions
+    // The battery can only be discharged after a full charge in the
+    // EMPTY_WHEN_FULL case 
     if (isStopThresholdReached(inverter)) {
       // Disable battery discharge when empty
       _batteryDischargeEnabled = false;
@@ -98,10 +92,11 @@ void PowerLimiterClass::loop()
       _batteryDischargeEnabled = true;
     }
 
+    // Calculate and set Power Limit
     int32_t newPowerLimit = calcPowerLimit(inverter, !_batteryDischargeEnabled);
+    setNewPowerLimit(inverter, newPowerLimit);
     // Debug, TODO: Remove
     MessageOutput.printf("****************************** Powerlimit: %i\r\n", newPowerLimit);
-    setNewPowerLimit(inverter, newPowerLimit);
 }
 
 plStates PowerLimiterClass::getPowerLimiterState() {
@@ -212,7 +207,6 @@ void PowerLimiterClass::setNewPowerLimit(std::shared_ptr<InverterAbstract> inver
     if (!inverter->isProducing() && newPowerLimit > config.PowerLimiter_LowerPowerLimit) {
         MessageOutput.println("[PowerLimiterClass::loop] Starting up inverter...");
         inverter->sendPowerControlRequest(Hoymiles.getRadio(), true);
-        _lastCommandSent = millis();
     }
 
     // Stop the inverter if limit is below threshold.
@@ -221,7 +215,6 @@ void PowerLimiterClass::setNewPowerLimit(std::shared_ptr<InverterAbstract> inver
         if (inverter->isProducing()) {
             MessageOutput.println("[PowerLimiterClass::loop] Stopping inverter...");
             inverter->sendPowerControlRequest(Hoymiles.getRadio(), false);
-            _lastCommandSent = millis();
         }
         newPowerLimit = config.PowerLimiter_LowerPowerLimit;
     }
@@ -230,7 +223,7 @@ void PowerLimiterClass::setNewPowerLimit(std::shared_ptr<InverterAbstract> inver
     // and differs from the last requested value
     if( _lastRequestedPowerLimit != newPowerLimit &&
           /* newPowerLimit > config.PowerLimiter_LowerPowerLimit &&  -->  This will always be true given the check above, kept for code readability */
-          newPowerLimit < config.PowerLimiter_UpperPowerLimit ) {
+          newPowerLimit <= config.PowerLimiter_UpperPowerLimit ) {
         MessageOutput.printf("[PowerLimiterClass::loop] Limit Non-Persistent: %d W\r\n", newPowerLimit);
         inverter->sendActivePowerControlRequest(Hoymiles.getRadio(), newPowerLimit, PowerLimitControlType::AbsolutNonPersistent);
         _lastRequestedPowerLimit = newPowerLimit;

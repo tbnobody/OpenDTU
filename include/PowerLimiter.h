@@ -28,7 +28,6 @@ public:
     bool getDisable();
 
 private:
-    uint32_t _lastCommandSent = 0;
     uint32_t _lastLoop = 0;
     int32_t _lastRequestedPowerLimit = 0;
     uint32_t _lastLimitSetTime = 0;
