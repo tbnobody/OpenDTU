@@ -10,13 +10,13 @@
 #define HOY_BOOT_FREQ 868000000 // Hoymiles boot/init frequency after power up inverter or connection lost for 15 min
 #define HOY_BASE_FREQ 860000000
 // offset from initalized CMT base frequency to Hoy base frequency in channels
-#define CMT_BASE_CH_OFFSET860 ((HOY_BASE_FREQ - CMT_BASE_FREQ) / CMT2300A_ONE_STEP_SIZE / FH_OFFSET)
+#define CMT_BASE_CH_OFFSET860 ((CMT_BASE_FREQ - HOY_BASE_FREQ) / CMT2300A_ONE_STEP_SIZE / FH_OFFSET)
 
 // frequency can not be lower than actual initailized base freq
-#define CMT_MIN_FREQ_KHZ ((CMT_BASE_FREQ + (CMT_BASE_CH_OFFSET860 >= 1 ? CMT_BASE_CH_OFFSET860 : 1) * CMT2300A_ONE_STEP_SIZE * FH_OFFSET) / 1000)
+#define MIN_FREQ_KHZ ((HOY_BASE_FREQ + (CMT_BASE_CH_OFFSET860 >= 1 ? CMT_BASE_CH_OFFSET860 : 1) * CMT2300A_ONE_STEP_SIZE * FH_OFFSET) / 1000)
 
 // =923500, 0xFF does not work
-#define CMT_MAX_FREQ_KHZ ((CMT_BASE_FREQ + 0xFE * CMT2300A_ONE_STEP_SIZE * FH_OFFSET) / 1000)
+#define MAX_FREQ_KHZ ((HOY_BASE_FREQ + 0xFE * CMT2300A_ONE_STEP_SIZE * FH_OFFSET) / 1000)
 
 float HoymilesRadio_CMT::getFrequencyFromChannel(const uint8_t channel)
 {
@@ -29,9 +29,9 @@ uint8_t HoymilesRadio_CMT::getChannelFromFrequency(const uint32_t freq_kHz)
         Hoymiles.getMessageOutput()->printf("%.3f MHz is not divisible by 250 kHz!\r\n", freq_kHz / 1000.0);
         return 0xFF; // ERROR
     }
-    if (freq_kHz < CMT_MIN_FREQ_KHZ || freq_kHz > CMT_MAX_FREQ_KHZ) {
+    if (freq_kHz < MIN_FREQ_KHZ || freq_kHz > MAX_FREQ_KHZ) {
         Hoymiles.getMessageOutput()->printf("%.2f MHz is out of Hoymiles/CMT range! (%.2f MHz - %.2f MHz)\r\n",
-            freq_kHz / 1000.0, CMT_MIN_FREQ_KHZ / 1000.0, CMT_MAX_FREQ_KHZ / 1000.0);
+            freq_kHz / 1000.0, MIN_FREQ_KHZ / 1000.0, MAX_FREQ_KHZ / 1000.0);
         return 0xFF; // ERROR
     }
     if (freq_kHz < 863000 || freq_kHz > 870000) {
@@ -241,12 +241,12 @@ bool HoymilesRadio_CMT::isConnected()
 
 uint32_t HoymilesRadio_CMT::getMinFrequency()
 {
-    return CMT_MIN_FREQ_KHZ;
+    return MIN_FREQ_KHZ;
 }
 
 uint32_t HoymilesRadio_CMT::getMaxFrequency()
 {
-    return CMT_MAX_FREQ_KHZ;
+    return MAX_FREQ_KHZ;
 }
 
 void ARDUINO_ISR_ATTR HoymilesRadio_CMT::handleInt1()
