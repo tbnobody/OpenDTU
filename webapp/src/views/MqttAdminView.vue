@@ -60,6 +60,21 @@
                               :label="$t('mqttadmin.RootCa')"
                               v-model="mqttConfigList.mqtt_root_ca_cert"
                               type="textarea" maxlength="2560" rows="10"/>
+
+                <InputElement v-show="mqttConfigList.mqtt_tls"
+                              :label="$t('mqttadmin.TlsCertLoginEnable')"
+                              v-model="mqttConfigList.mqtt_tls_cert_login"
+                              type="checkbox"/>
+
+                <InputElement v-show="mqttConfigList.mqtt_tls_cert_login"
+                              :label="$t('mqttadmin.ClientCert')"
+                              v-model="mqttConfigList.mqtt_client_cert"
+                              type="textarea" maxlength="2560" rows="10"/>
+
+                <InputElement v-show="mqttConfigList.mqtt_tls_cert_login"
+                              :label="$t('mqttadmin.ClientKey')"
+                              v-model="mqttConfigList.mqtt_client_key"
+                              type="textarea" maxlength="2560" rows="10"/>
             </CardElement>
 
             <CardElement :text="$t('mqttadmin.LwtParameters')" textVariant="text-bg-primary" add-space

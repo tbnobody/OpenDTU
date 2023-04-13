@@ -7,14 +7,14 @@ You can either create your own device profile as described [here](DeviceProfiles
 ## Uploading Device Profiles
 
 Use the "Config Management" site to upload (Restore) the json file. Make sure to choose "Pin Mapping (pin_mapping.json)" in the combo box. After you click on restore the ESP will restart. At this point, the profile is not yet active. Please read the next chapter.
-![](screenshots/14_ConfigManagement.png)
+![Config Management](screenshots/14_ConfigManagement.png)
 
 ## Selecting a Device Profile
 
 After you uploaded the device profile you can select the profile in the "Device Manager" view. After a click on "Save" the ESP will be restarted and the pin assignment is active. At this point the display should already show something. Please see the next chapter for display settings.
-![](screenshots/20_DeviceManager_Pin.png)
+![Device Manager](screenshots/20_DeviceManager_Pin.png)
 
 ## Display Settings
 
 Display settings can also be found in the "Device Manager".
-![](screenshots/21_DeviceManager_Display.png)
+![Device Manager Display](screenshots/21_DeviceManager_Display.png)

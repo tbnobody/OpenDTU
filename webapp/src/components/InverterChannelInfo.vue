@@ -17,29 +17,31 @@
         </div>
 
         <div class="card-body">
-            <table class="table table-striped table-hover">
-                <thead>
-                    <tr>
-                        <th scope="col">{{ $t('inverterchannelinfo.Property') }}</th>
-                        <th style="text-align: right" scope="col">{{ $t('inverterchannelinfo.Value') }}</th>
-                        <th scope="col">{{ $t('inverterchannelinfo.Unit') }}</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr v-for="(property, key) in channelData" :key="`prop-${key}`">
-                        <template v-if="key != 'name' && property">
-                            <th scope="row">{{ $t('inverterchannelproperty.' + key) }}</th>
-                            <td style="text-align: right">
-                                {{ $n(property.v, 'decimal', {
-                                      minimumFractionDigits: property.d,
-                                      maximumFractionDigits: property.d})
-                                }}
-                            </td>
-                            <td>{{ property.u }}</td>
-                        </template>
-                    </tr>
-                </tbody>
-            </table>
+            <div class="table-responsive">
+                <table class="table table-striped table-hover">
+                    <thead>
+                        <tr>
+                            <th scope="col">{{ $t('inverterchannelinfo.Property') }}</th>
+                            <th style="text-align: right" scope="col">{{ $t('inverterchannelinfo.Value') }}</th>
+                            <th scope="col">{{ $t('inverterchannelinfo.Unit') }}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr v-for="(property, key) in channelData" :key="`prop-${key}`">
+                            <template v-if="key != 'name' && property">
+                                <th scope="row">{{ $t('inverterchannelproperty.' + key) }}</th>
+                                <td style="text-align: right">
+                                    {{ $n(property.v, 'decimal', {
+                                        minimumFractionDigits: property.d,
+                                        maximumFractionDigits: property.d})
+                                    }}
+                                </td>
+                                <td>{{ property.u }}</td>
+                            </template>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 </template>

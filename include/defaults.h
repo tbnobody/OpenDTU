@@ -66,6 +66,9 @@
                           "mRGunUHBcnWEvgJBQl9nJEiU0Zsnvgc/ubhPgXRR4Xq37Z0j4r7g1SgEEzwxA57d\n" \
                           "emyPxgcYxn/eR44/KJ4EBs+lVDR3veyJm+kXQ99b21/+jh5Xos1AnX5iItreGCc=\n" \
                           "-----END CERTIFICATE-----\n"
+#define MQTT_TLSCERTLOGIN false
+#define MQTT_TLSCLIENTCERT ""
+#define MQTT_TLSCLIENTKEY ""
 #define MQTT_LWT_TOPIC "dtu/status"
 #define MQTT_LWT_ONLINE "online"
 #define MQTT_LWT_OFFLINE "offline"

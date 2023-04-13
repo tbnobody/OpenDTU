@@ -3,6 +3,7 @@
 Information in JSON format can be obtained through the web API
 
 ## List of URLs
+
 may be incomplete
 
 | GET/POST | Auth required | URL |
@@ -38,10 +39,9 @@ may be incomplete
 | Get      | yes | /api/security/authenticate |
 | Get      | no  | /api/system/status |
 
-
 ## Examples of Use
 
-### Important notes:
+### Important notes
 
 - IP addresses and serial numbers in this examples are anonymized. Adjust to your own needs.
 - The output from curl is without a linefeed at the end, so please be careful when copying the output - do not accidentally add the shell prompt directly after it.
@@ -53,23 +53,21 @@ may be incomplete
 - Settings API require username and password provided with Basic Authentication credentials
 - If you disable the readonly access to the web API, every endpoint requires authentication
 
-
 ### Get information
 
 You can "talk" to the OpenDTU with a command line tool like `curl`. The output is in plain JSON, without carriage return/linefeed and is therefore not very human readable.
 
 #### Get current livedata
 
-```
-~$ curl http://192.168.10.10/api/livedata/status
+```bash
+$ curl http://192.168.10.10/api/livedata/status
 {"inverters":[{"serial":"11617160xxxx","name":"Meine Solaranlage","data_age":6983,"reachable":false,"producing":false,"limit_relative":0,"limit_absolute":-1,"AC":{"0":{"Power":{"v":0,"u":"W","d":1},"Voltage":{"v":0,"u":"V","d":1},"Current":{"v":0,"u":"A","d":2},"Power DC":{"v":0,"u":"W","d":1},"YieldDay":{"v":0,"u":"Wh","d":0},"YieldTotal":{"v":0,"u":"kWh","d":3},"Frequency":{"v":0,"u":"Hz","d":2},"PowerFactor":{"v":0,"u":"","d":3},"ReactivePower":{"v":0,"u":"var","d":1},"Efficiency":{"v":0,"u":"%","d":3}}},"DC":{"0":{"name":{"u":""},"Power":{"v":0,"u":"W","d":1},"Voltage":{"v":0,"u":"V","d":1},"Current":{"v":0,"u":"A","d":2},"YieldDay":{"v":0,"u":"Wh","d":0},"YieldTotal":{"v":0,"u":"kWh","d":3},"Irradiation":{"v":0,"u":"%","d":3}},"1":{"name":{"u":""},"Power":{"v":0,"u":"W","d":1},"Voltage":{"v":0,"u":"V","d":1},"Current":{"v":0,"u":"A","d":2},"YieldDay":{"v":0,"u":"Wh","d":0},"YieldTotal":{"v":0,"u":"kWh","d":3},"Irradiation":{"v":0,"u":"%","d":3}},"2":{"name":{"u":""},"Power":{"v":0,"u":"W","d":1},"Voltage":{"v":0,"u":"V","d":1},"Current":{"v":0,"u":"A","d":2},"YieldDay":{"v":0,"u":"Wh","d":0},"YieldTotal":{"v":0,"u":"kWh","d":3},"Irradiation":{"v":0,"u":"%","d":3}},"3":{"name":{"u":""},"Power":{"v":0,"u":"W","d":1},"Voltage":{"v":0,"u":"V","d":1},"Current":{"v":0,"u":"A","d":2},"YieldDay":{"v":0,"u":"Wh","d":0},"YieldTotal":{"v":0,"u":"kWh","d":3}}},"INV":{"0":{"Temperature":{"v":0,"u":"°C","d":1}}},"events":0},{"serial":"11417160xxxx","name":"test","data_age":6983,"reachable":false,"producing":false,"limit_relative":0,"limit_absolute":-1,"AC":{"0":{"Power":{"v":0,"u":"W","d":1},"Voltage":{"v":0,"u":"V","d":1},"Current":{"v":0,"u":"A","d":2},"Power DC":{"v":0,"u":"W","d":1},"YieldDay":{"v":0,"u":"Wh","d":0},"YieldTotal":{"v":0,"u":"kWh","d":3},"Frequency":{"v":0,"u":"Hz","d":2},"PowerFactor":{"v":0,"u":"","d":3},"ReactivePower":{"v":0,"u":"var","d":1},"Efficiency":{"v":0,"u":"%","d":3}}},"DC":{"0":{"name":{"u":"test 1"},"Power":{"v":0,"u":"W","d":1},"Voltage":{"v":0,"u":"V","d":1},"Current":{"v":0,"u":"A","d":2},"YieldDay":{"v":0,"u":"Wh","d":0},"YieldTotal":{"v":0,"u":"kWh","d":3},"Irradiation":{"v":0,"u":"%","d":3}},"1":{"name":{"u":"test 2"},"Power":{"v":0,"u":"W","d":1},"Voltage":{"v":0,"u":"V","d":1},"Current":{"v":0,"u":"A","d":2},"YieldDay":{"v":0,"u":"Wh","d":0},"YieldTotal":{"v":0,"u":"kWh","d":3},"Irradiation":{"v":0,"u":"%","d":3}}},"INV":{"0":{"Temperature":{"v":0,"u":"°C","d":1}}},"events":0}],"total":{"Power":{"v":0,"u":"W","d":1},"YieldDay":{"v":0,"u":"Wh","d":0},"YieldTotal":{"v":0,"u":"kWh","d":2}},"hints":{"time_sync":false,"radio_problem":false,"default_password":false}}
 ```
 
-
 To enhance readability (and filter information) use the JSON command line processor `jq`.
 
-```
-~$ curl --no-progress-meter http://192.168.10.10/api/livedata/status | jq
+```bash
+$ curl --no-progress-meter http://192.168.10.10/api/livedata/status | jq
 {
   "inverters": [
     {
@@ -455,8 +453,8 @@ To enhance readability (and filter information) use the JSON command line proces
 
 The eventlog can be fetched with the inverter serial number as parameter:
 
-```
-martin@bln9716cm ~/swbuild/OpenDTU $ curl --no-progress-meter http://192.168.10.10/api/eventlog/status?inv=11418186xxxx | jq
+```bash
+$ curl --no-progress-meter http://192.168.10.10/api/eventlog/status?inv=11418186xxxx | jq
 {
   "11418186xxxx": {
     "count": 4,
@@ -495,8 +493,9 @@ martin@bln9716cm ~/swbuild/OpenDTU $ curl --no-progress-meter http://192.168.10.
 `jq` can filter specific fields from json output.
 
 For example, filter out the current total power:
-```
-~$ curl --no-progress-meter http://192.168.10.10/api/livedata/status | jq '.total | .Power.v'
+
+```bash
+$ curl --no-progress-meter http://192.168.10.10/api/livedata/status | jq '.total | .Power.v'
 140.7999878
 ```
 
@@ -505,8 +504,8 @@ For example, filter out the current total power:
 When config data is requested, username and password have to be provided to `curl`
 Username is always `admin`, the default password is `openDTU42`. The password is used for both the admin login and the Admin-mode Access Point.
 
-```
-~$ curl --u admin:openDTU42 http://192.168.10.10/api/ntp/config
+```bash
+$ curl --u admin:openDTU42 http://192.168.10.10/api/ntp/config
 {"ntp_server":"pool.ntp.org","ntp_timezone":"CET-1CEST,M3.5.0,M10.5.0/3","ntp_timezone_descr":"Europe/Berlin"}
 ```
 
@@ -520,25 +519,26 @@ The Web API is designed to allow the web frontend in the web browser to communic
 
 If you want to configure the ntp server setting, first fetch the information from the web API:
 
-```
-~$ curl -u "admin:password" http://192.168.10.10/api/ntp/config
+```bash
+$ curl -u "admin:password" http://192.168.10.10/api/ntp/config
 {"ntp_server":"pool.ntp.org","ntp_timezone":"CET-1CEST,M3.5.0,M10.5.0/3","ntp_timezone_descr":"Europe/Berlin"}
 ```
 
 Then, second step, send your new settings. Use the text output from curl in the first step, add `data=` and enclose the whole data with single quotes.
 
-```
-~$ curl -u "admin:password" http://192.168.10.10/api/ntp/config -d 'data={"ntp_server":"my.own.ntp.server.home","ntp_timezone":"CET-1CEST,M3.5.0,M10.5.0/3","ntp_timezone_descr":"Europe/Berlin"}'
+```bash
+$ curl -u "admin:password" http://192.168.10.10/api/ntp/config -d 'data={"ntp_server":"my.own.ntp.server.home","ntp_timezone":"CET-1CEST,M3.5.0,M10.5.0/3","ntp_timezone_descr":"Europe/Berlin"}'
 {"type":"success","message":"Settings saved!"}
 ```
+
 You will receive a json formatted response.
 
 #### Example 2: change power limit
 
 In the second example, I want to change the non persistent power limit of an inverter. Again, first fetch current data:
 
-```
-~$ curl http://192.168.10.10/api/limit/status
+```bash
+$ curl http://192.168.10.10/api/limit/status
 {"11418186xxxx":{"limit_relative":100,"max_power":600,"limit_set_status":"Ok"},"11418180xxxx":{"limit_relative":100,"max_power":800,"limit_set_status":"Ok"}}
 ```
 
@@ -546,19 +546,19 @@ I see data from two configured inverters.
 
 Now I set the relative power limit of inverter with serialnumber `11418180xxxx` to 50%.
 
-```
-~$ curl -u "admin:password" http://192.168.10.10/api/limit/config -d 'data={"serial":"11418180xxxx", "limit_type":1, "limit_value":50}'
+```bash
+$ curl -u "admin:password" http://192.168.10.10/api/limit/config -d 'data={"serial":"11418180xxxx", "limit_type":1, "limit_value":50}'
 {"type":"success","message":"Settings saved!"}
 ```
 
 Then I read again the limit status. In the first answer the status is `pending`, some seconds later it changed to `OK`.
 
-```
-~$ curl http://192.168.10.10/api/limit/status
+```bash
+$ curl http://192.168.10.10/api/limit/status
 {"11418186xxxx":{"limit_relative":100,"max_power":600,"limit_set_status":"Ok"},"11418180xxxx":{"limit_relative":100,"max_power":800,"limit_set_status":"Pending"}}
 
 ...
 
-~$ curl http://192.168.10.10/api/limit/status
+$ curl http://192.168.10.10/api/limit/status
 {"11418186xxxx":{"limit_relative":100,"max_power":600,"limit_set_status":"Ok"},"11418180xxxx":{"limit_relative":50,"max_power":800,"limit_set_status":"Ok"}}
 ```
