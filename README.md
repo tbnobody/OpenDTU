@@ -24,38 +24,38 @@ Like to show your own build? Just send me a Pull Request.
 
 ## Currently supported Inverters
 
-| Model               | Required RF Module | DC Inputs | AC Phases |
-| --------------------| ------------------ | --------- | --------- |
-| Hoymiles HM-300     | NRF24L01+          | 1         | 1         |
-| Hoymiles HM-350     | NRF24L01+          | 1         | 1         |
-| Hoymiles HM-400     | NRF24L01+          | 1         | 1         |
-| Hoymiles HM-600     | NRF24L01+          | 2         | 1         |
-| Hoymiles HM-700     | NRF24L01+          | 2         | 1         |
-| Hoymiles HM-800     | NRF24L01+          | 2         | 1         |
-| Hoymiles HM-1000    | NRF24L01+          | 4         | 1         |
-| Hoymiles HM-1200    | NRF24L01+          | 4         | 1         |
-| Hoymiles HM-1500    | NRF24L01+          | 4         | 1         |
-| Hoymiles HMS-300    | CMT2300A           | 1         | 1         |
-| Hoymiles HMS-350    | CMT2300A           | 1         | 1         |
-| Hoymiles HMS-400    | CMT2300A           | 1         | 1         |
-| Hoymiles HMS-450    | CMT2300A           | 1         | 1         |
-| Hoymiles HMS-500    | CMT2300A           | 1         | 1         |
-| Hoymiles HMS-600    | CMT2300A           | 2         | 1         |
-| Hoymiles HMS-700    | CMT2300A           | 2         | 1         |
-| Hoymiles HMS-800    | CMT2300A           | 2         | 1         |
-| Hoymiles HMS-900    | CMT2300A           | 2         | 1         |
-| Hoymiles HMS-1000   | CMT2300A           | 2         | 1         |
-| Hoymiles HMS-1600   | CMT2300A           | 4         | 1         |
-| Hoymiles HMS-1800   | CMT2300A           | 4         | 1         |
-| Hoymiles HMS-2000   | CMT2300A           | 4         | 1         |
-| Hoymiles HMT-1800   | CMT2300A           | 6         | 3         |
-| Hoymiles HMT-2250   | CMT2300A           | 6         | 3         |
-| Solenso SOL-H350    | NRF24L01+          | 1         | 1         |
-| Solenso SOL-H400    | NRF24L01+          | 1         | 1         |
-| Solenso SOL-H800    | NRF24L01+          | 2         | 1         |
-| TSUN TSOL-M350      | NRF24L01+          | 1         | 1         |
-| TSUN TSOL-M800      | NRF24L01+          | 2         | 1         |
-| TSUN TSOL-M1600     | NRF24L01+          | 4         | 1         |
+| Model               | Required RF Module | DC Inputs | MPP-Tracker | AC Phases |
+| --------------------| ------------------ | --------- | ----------- | --------- |
+| Hoymiles HM-300     | NRF24L01+          | 1         | 1           | 1         |
+| Hoymiles HM-350     | NRF24L01+          | 1         | 1           | 1         |
+| Hoymiles HM-400     | NRF24L01+          | 1         | 1           | 1         |
+| Hoymiles HM-600     | NRF24L01+          | 2         | 2           | 1         |
+| Hoymiles HM-700     | NRF24L01+          | 2         | 2           | 1         |
+| Hoymiles HM-800     | NRF24L01+          | 2         | 2           | 1         |
+| Hoymiles HM-1000    | NRF24L01+          | 4         | 2           | 1         |
+| Hoymiles HM-1200    | NRF24L01+          | 4         | 2           | 1         |
+| Hoymiles HM-1500    | NRF24L01+          | 4         | 2           | 1         |
+| Hoymiles HMS-300    | CMT2300A           | 1         | 1           | 1         |
+| Hoymiles HMS-350    | CMT2300A           | 1         | 1           | 1         |
+| Hoymiles HMS-400    | CMT2300A           | 1         | 1           | 1         |
+| Hoymiles HMS-450    | CMT2300A           | 1         | 1           | 1         |
+| Hoymiles HMS-500    | CMT2300A           | 1         | 1           | 1         |
+| Hoymiles HMS-600    | CMT2300A           | 2         | 2           | 1         |
+| Hoymiles HMS-700    | CMT2300A           | 2         | 2           | 1         |
+| Hoymiles HMS-800    | CMT2300A           | 2         | 2           | 1         |
+| Hoymiles HMS-900    | CMT2300A           | 2         | 2           | 1         |
+| Hoymiles HMS-1000   | CMT2300A           | 2         | 2           | 1         |
+| Hoymiles HMS-1600   | CMT2300A           | 4         | 4           | 1         |
+| Hoymiles HMS-1800   | CMT2300A           | 4         | 4           | 1         |
+| Hoymiles HMS-2000   | CMT2300A           | 4         | 4           | 1         |
+| Hoymiles HMT-1800   | CMT2300A           | 6         | 3           | 3         |
+| Hoymiles HMT-2250   | CMT2300A           | 6         | 3           | 3         |
+| Solenso SOL-H350    | NRF24L01+          | 1         | 1           | 1         |
+| Solenso SOL-H400    | NRF24L01+          | 1         | 1           | 1         |
+| Solenso SOL-H800    | NRF24L01+          | 2         | 2           | 1         |
+| TSUN TSOL-M350      | NRF24L01+          | 1         | 1           | 1         |
+| TSUN TSOL-M800      | NRF24L01+          | 2         | 2           | 1         |
+| TSUN TSOL-M1600     | NRF24L01+          | 4         | 2           | 1         |
 
 **TSUN compatibility remark:**
 Compatibility with OpenDTU is most likly related to the serial number of the inverter. Current findings indicate that TSUN inverters with a serial number starting with "11" are supported, whereby inverters with a serial number starting with "10" are not.
@@ -143,7 +143,7 @@ It is important to get a module which supports SPI communicatiton. The following
 
 * EBYTE E49-900M20S
 
-The CMT2300A uses 3-Wire half duplex SPI communication. Due to this fact it currently requires a separate SPI bus. If you want to run the CMT2300A module on the same ESP32 as a NRF24L01+ module or a PCD8544 display make sure you get a ESP which supports 2 SPI busses.
+The CMT2300A uses 3-Wire half duplex SPI communication. Due to this fact it currently requires a separate SPI bus. If you want to run the CMT2300A module on the same ESP32 as a NRF24L01+ module or a PCD8544 display make sure you get a ESP which supports 2 SPI busses. Currently the SPI bus host is hardcoded to number 2. This may change in future.
 
 ### Power supply
 
