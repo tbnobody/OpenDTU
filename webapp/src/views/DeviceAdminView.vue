@@ -27,9 +27,8 @@
                                 <div class="col-sm-10">
                                     <select class="form-select" id="inputPinProfile"
                                         v-model="deviceConfigList.curPin.name">
-                                        <option v-for="device in pinMappingList" :value="device.name"
-                                            :key="device.name">
-                                            {{ device.name }}
+                                        <option v-for="device in pinMappingList" :value="device.name" :key="device.name">
+                                            {{ device.name === "Default" ? $t('deviceadmin.DefaultProfile') : device.name }}
                                         </option>
                                     </select>
                                 </div>
@@ -64,7 +63,7 @@
                                 <div class="col-sm-10">
                                     <select class="form-select" v-model="deviceConfigList.display.rotation">
                                         <option v-for="rotation in displayRotationList" :key="rotation.key" :value="rotation.key">
-                                            {{ rotation.value }}
+                                            {{ $t(`deviceadmin.` + rotation.value) }}
                                         </option>
                                     </select>
                                 </div>
@@ -119,10 +118,10 @@ export default defineComponent({
             alertType: "info",
             showAlert: false,
             displayRotationList: [
-                { key: 0, value: this.$t('deviceadmin.rot0') },
-                { key: 1, value: this.$t('deviceadmin.rot90') },
-                { key: 2, value: this.$t('deviceadmin.rot180') },
-                { key: 3, value: this.$t('deviceadmin.rot270') },
+                { key: 0, value: 'rot0' },
+                { key: 1, value: 'rot90' },
+                { key: 2, value: 'rot180' },
+                { key: 3, value: 'rot270' },
             ],
         }
     },
@@ -144,10 +143,8 @@ export default defineComponent({
                     this.pinMappingList = Array<Device>();
                 })
                 .finally(() => {
-                    this.pinMappingList.push({
-                        "name": this.$t('deviceadmin.DefaultProfile')
-                    } as Device);
                     this.pinMappingList.sort((a, b) => (a.name < b.name) ? -1 : 1);
+                    this.pinMappingList.splice(0, 0, { "name": "Default" } as Device);
                     this.pinMappingLoading = false;
                 });
         },

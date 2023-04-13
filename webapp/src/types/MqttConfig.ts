@@ -9,6 +9,9 @@ export interface MqttConfig {
     mqtt_retain: boolean;
     mqtt_tls: boolean;
     mqtt_root_ca_cert: string;
+    mqtt_tls_cert_login: boolean;
+    mqtt_client_cert: string;
+    mqtt_client_key: string;
     mqtt_lwt_topic: string;
     mqtt_lwt_online: string;
     mqtt_lwt_offline: string;
