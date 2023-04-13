@@ -418,7 +418,7 @@
         "Status": "Status",
         "Send": "Send",
         "Receive": "Receive",
-        "StatusHint": "<b>Hint:</b> The inverter is power by it's DC input. If there is no sun, the inverter is off. Requests can still be sent.",
+        "StatusHint": "<b>Hint:</b> The inverter is powered by it's DC input. If there is no sun, the inverter is off. Requests can still be sent.",
         "Type": "Type",
         "Action": "Action",
         "DeleteInverter": "Delete inverter",
