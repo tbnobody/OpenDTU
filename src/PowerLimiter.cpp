@@ -22,9 +22,9 @@ void PowerLimiterClass::init()
 void PowerLimiterClass::loop()
 {
     CONFIG_T& config = Configuration.get();
- 
+
     // Run inital checks to make sure we have met the basic conditions
-    if ( !config.PowerMeter_Enabled
+    if (!config.PowerMeter_Enabled
             || !Hoymiles.getRadio()->isIdle()
             || (millis() - _lastLoop) < (config.PowerLimiter_Interval * 1000)) {
         return;
@@ -95,8 +95,6 @@ void PowerLimiterClass::loop()
     // Calculate and set Power Limit
     int32_t newPowerLimit = calcPowerLimit(inverter, !_batteryDischargeEnabled);
     setNewPowerLimit(inverter, newPowerLimit);
-    // Debug, TODO: Remove
-    MessageOutput.printf("****************************** Powerlimit: %i\r\n", newPowerLimit);
 }
 
 plStates PowerLimiterClass::getPowerLimiterState() {
@@ -175,16 +173,9 @@ int32_t PowerLimiterClass::calcPowerLimit(std::shared_ptr<InverterAbstract> inve
     MessageOutput.printf("[PowerLimiterClass::loop] victronChargePower: %d, efficiency: %.2f, consumeSolarPowerOnly: %s, powerConsumption: %d \r\n", 
         victronChargePower, efficency, consumeSolarPowerOnly ? "true" : "false", newPowerLimit);
 
-    // Safety check: Are the power meter values not too old?
-    // Are the reported inverter data not too old?
-    if (millis() - PowerMeter.getLastPowerMeterUpdate() < (30 * 1000)
-            && millis() - inverter->Statistics()->getLastUpdate() < (15 * 1000)) {
-        if (config.PowerLimiter_IsInverterBehindPowerMeter) {
-            // If the inverter the behind the power meter (part of measurement),
-            // the produced power of this inverter has also to be taken into account.
-            float acPower = inverter->Statistics()->getChannelFieldValue(TYPE_AC, (ChannelNum_t) config.PowerLimiter_InverterChannelId, FLD_PAC); 
-            newPowerLimit += static_cast<int>(acPower);
-        }
+    // We're not trying to hit 0 exactly but take an offset into account
+    // This means we never fully compensate the used power with the inverter 
+    newPowerLimit -= config.PowerLimiter_TargetPowerConsumption;
 
     int32_t upperPowerLimit = config.PowerLimiter_UpperPowerLimit;
     if (consumeSolarPowerOnly && (upperPowerLimit > adjustedVictronChargePower)) {
