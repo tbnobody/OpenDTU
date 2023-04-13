@@ -267,8 +267,6 @@ void HoymilesRadio_CMT::sendEsbPacket(CommandAbstract* cmd)
 
     _radio->stopListening();
 
-    uint8_t oldChannel;
-    oldChannel = _radio->getChannel();
     if (cmd->getDataPayload()[0] == 0x56) { // @todo(tbnobody) Bad hack to identify ChannelChange Command
         cmtSwitchDtuFreq(HOY_BOOT_FREQ / 1000);
     }
@@ -280,7 +278,7 @@ void HoymilesRadio_CMT::sendEsbPacket(CommandAbstract* cmd)
     if (!_radio->write(cmd->getDataPayload(), cmd->getDataSize())) {
         Hoymiles.getMessageOutput()->println("TX SPI Timeout");
     }
-    _radio->setChannel(oldChannel);
+    cmtSwitchDtuFreq(_inverterTargetFrequency);
     _radio->startListening();
     _busyFlag = true;
     _rxTimeout.set(cmd->getTimeout());
