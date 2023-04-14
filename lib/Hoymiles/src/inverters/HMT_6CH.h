@@ -54,20 +54,20 @@ private:
         { TYPE_DC, CH5, FLD_YD, UNIT_WH, 66, 2, 1, false, 0 },
         { TYPE_DC, CH5, FLD_IRR, UNIT_PCT, CALC_IRR_CH, CH5, CMD_CALC, false, 3 },
 
-        { TYPE_AC, CH0, FLD_UAC, UNIT_V, 68, 2, 10, false, 1 }, // dummy
-        //{ TYPE_AC, CH0, FLD_UAC_1N, UNIT_V, 68, 2, 10, false, 1 },
-        //{ TYPE_AC, CH0, FLD_UAC_2N, UNIT_V, 70, 2, 10, false, 1 },
-        //{ TYPE_AC, CH0, FLD_UAC_3N, UNIT_V, 72, 2, 10, false, 1 },
-        //{ TYPE_AC, CH0, FLD_UAC_12, UNIT_V, 74, 2, 10, false, 1 },
-        //{ TYPE_AC, CH0, FLD_UAC_23, UNIT_V, 76, 2, 10, false, 1 },
-        //{ TYPE_AC, CH0, FLD_UAC_31, UNIT_V, 78, 2, 10, false, 1 },
+        { TYPE_AC, CH0, FLD_UAC, UNIT_V, 74, 2, 10, false, 1 }, // dummy
+        { TYPE_AC, CH0, FLD_UAC_1N, UNIT_V, 68, 2, 10, false, 1 },
+        { TYPE_AC, CH0, FLD_UAC_2N, UNIT_V, 70, 2, 10, false, 1 },
+        { TYPE_AC, CH0, FLD_UAC_3N, UNIT_V, 72, 2, 10, false, 1 },
+        { TYPE_AC, CH0, FLD_UAC_12, UNIT_V, 74, 2, 10, false, 1 },
+        { TYPE_AC, CH0, FLD_UAC_23, UNIT_V, 76, 2, 10, false, 1 },
+        { TYPE_AC, CH0, FLD_UAC_31, UNIT_V, 78, 2, 10, false, 1 },
         { TYPE_AC, CH0, FLD_F, UNIT_HZ, 80, 2, 100, false, 2 },
         { TYPE_AC, CH0, FLD_PAC, UNIT_W, 82, 2, 10, false, 1 },
         { TYPE_AC, CH0, FLD_PRA, UNIT_VA, 84, 2, 10, true, 1 },
         { TYPE_AC, CH0, FLD_IAC, UNIT_A, 86, 2, 100, false, 2 }, // dummy
-        //{ TYPE_AC, CH0, FLD_IAC_1, UNIT_A, 86, 2, 100, false, 2 },
-        //{ TYPE_AC, CH0, FLD_IAC_2, UNIT_A, 88, 2, 100, false, 2 },
-        //{ TYPE_AC, CH0, FLD_IAC_3, UNIT_A, 90, 2, 100, false, 2 },
+        { TYPE_AC, CH0, FLD_IAC_1, UNIT_A, 86, 2, 100, false, 2 },
+        { TYPE_AC, CH0, FLD_IAC_2, UNIT_A, 88, 2, 100, false, 2 },
+        { TYPE_AC, CH0, FLD_IAC_3, UNIT_A, 90, 2, 100, false, 2 },
         { TYPE_AC, CH0, FLD_PF, UNIT_NONE, 92, 2, 1000, false, 3 },
 
         { TYPE_INV, CH0, FLD_T, UNIT_C, 94, 2, 10, true, 1 },

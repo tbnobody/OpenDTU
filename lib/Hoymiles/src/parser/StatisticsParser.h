@@ -38,10 +38,21 @@ enum FieldId_t {
     FLD_EFF,
     FLD_IRR,
     FLD_PRA,
-    FLD_EVT_LOG
+    FLD_EVT_LOG,
+    // HMT only
+    FLD_UAC_1N,
+    FLD_UAC_2N,
+    FLD_UAC_3N,
+    FLD_UAC_12,
+    FLD_UAC_23,
+    FLD_UAC_31,
+    FLD_IAC_1,
+    FLD_IAC_2,
+    FLD_IAC_3
 };
 const char* const fields[] = { "Voltage", "Current", "Power", "YieldDay", "YieldTotal",
-    "Voltage", "Current", "Power", "Frequency", "Temperature", "PowerFactor", "Efficiency", "Irradiation", "ReactivePower", "EventLogCount" };
+    "Voltage", "Current", "Power", "Frequency", "Temperature", "PowerFactor", "Efficiency", "Irradiation", "ReactivePower", "EventLogCount",
+    "Voltage Ph1-N", "Voltage Ph2-N", "Voltage Ph3-N", "Voltage Ph1-Ph2", "Voltage Ph2-Ph3", "Voltage Ph3-Ph1", "Current Ph1", "Current Ph2", "Current Ph3" };
 
 // indices to calculation functions, defined in hmInverter.h
 enum {
