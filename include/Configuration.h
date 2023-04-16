@@ -61,6 +61,7 @@ struct CONFIG_T {
     byte WiFi_Dns2[4];
     bool WiFi_Dhcp;
     char WiFi_Hostname[WIFI_MAX_HOSTNAME_STRLEN + 1];
+    uint WiFi_ApTimeout;
 
     char Ntp_Server[NTP_MAX_SERVER_STRLEN + 1];
     char Ntp_Timezone[NTP_MAX_TIMEZONE_STRLEN + 1];

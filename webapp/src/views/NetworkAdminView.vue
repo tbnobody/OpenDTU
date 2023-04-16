@@ -50,6 +50,12 @@
                               type="text" maxlength="32"/>
             </CardElement>
 
+            <CardElement :text="$t('networkadmin.AdminAp')" textVariant="text-bg-primary" add-space>
+                <InputElement :label="$t('networkadmin.ApTimeout')"
+                              v-model="networkConfigList.aptimeout"
+                              type="number" min="0" max="99999"
+                              :tooltip="$t('networkadmin.ApTimeoutHint')"/>
+            </CardElement>
             <button type="submit" class="btn btn-primary mb-3">{{ $t('networkadmin.Save') }}</button>
         </form>
     </BasePage>
