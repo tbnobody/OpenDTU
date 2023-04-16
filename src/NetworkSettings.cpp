@@ -139,6 +139,7 @@ void NetworkSettingsClass::enableAdminMode()
 {
     adminEnabled = true;
     adminTimeoutCounter = 0;
+    adminTimeoutCounterMax = Configuration.get().WiFi_ApTimeout * 60;
     setupMode();
 }
 
@@ -168,7 +169,12 @@ void NetworkSettingsClass::loop()
     }
 
     if (millis() - lastTimerCall > 1000) {
-        adminTimeoutCounter++;
+        if (adminEnabled && adminTimeoutCounterMax > 0) {
+            adminTimeoutCounter++;
+            if (adminTimeoutCounter % 10 == 0) {
+                MessageOutput.printf("Admin AP remaining seconds: %d / %d\r\n", adminTimeoutCounter, adminTimeoutCounterMax);
+            }
+        }
         connectTimeoutTimer++;
         connectRedoTimer++;
         lastTimerCall = millis();
@@ -178,9 +184,9 @@ void NetworkSettingsClass::loop()
         if (!isConnected()) {
             adminTimeoutCounter = 0;
         }
-        // If WiFi is connected to AP for more than ADMIN_TIMEOUT
+        // If WiFi is connected to AP for more than adminTimeoutCounterMax
         // seconds, disable the internal Access Point
-        if (adminTimeoutCounter > ADMIN_TIMEOUT) {
+        if (adminTimeoutCounter > adminTimeoutCounterMax) {
             adminEnabled = false;
             MessageOutput.println("Admin mode disabled");
             setupMode();

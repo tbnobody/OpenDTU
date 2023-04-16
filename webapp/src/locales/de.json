@@ -76,6 +76,7 @@
         "8003": "Standardgateway ist ungültig!",
         "8004": "DNS-Server-IP 1 ist ungültig!",
         "8005": "DNS-Server-IP 2 ist ungültig!",
+        "8006": "Administrative AccessPoint Timeout-Wert ist ungültig!",
         "9001": "Zeitserver muss zwischen 1 und {max} Zeichen lang sein!",
         "9002": "Zeitzone muss zwischen 1 und {max} Zeichen lang sein!",
         "9003": "Zeitzonenbeschreibung muss zwischen 1 und {max} Zeichen lang sein!",
@@ -367,6 +368,9 @@
         "Netmask": "Netzmaske:",
         "DefaultGateway": "Standardgateway:",
         "Dns": "DNS-Server {num}:",
+        "AdminAp": "WLAN-Konfiguration (Admin AccessPoint)",
+        "ApTimeout": "AccessPoint Zeitlimit (Minuten)",
+        "ApTimeoutHint": "Wie viele Minuten der AccessPoint offen gehalten wird. Ein Wert von 0 bedeutet unendlich.",
         "Save": "@:dtuadmin.Save"
     },
     "mqttadmin": {

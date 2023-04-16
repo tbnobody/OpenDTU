@@ -74,6 +74,7 @@ void WebApiNetworkClass::onNetworkAdminGet(AsyncWebServerRequest* request)
     root["dns2"] = IPAddress(config.WiFi_Dns2).toString();
     root["ssid"] = config.WiFi_Ssid;
     root["password"] = config.WiFi_Password;
+    root["aptimeout"] = config.WiFi_ApTimeout;
 
     response->setLength();
     request->send(response);
@@ -118,7 +119,7 @@ void WebApiNetworkClass::onNetworkAdminPost(AsyncWebServerRequest* request)
         return;
     }
 
-    if (!(root.containsKey("ssid") && root.containsKey("password") && root.containsKey("hostname") && root.containsKey("dhcp") && root.containsKey("ipaddress") && root.containsKey("netmask") && root.containsKey("gateway") && root.containsKey("dns1") && root.containsKey("dns2"))) {
+    if (!(root.containsKey("ssid") && root.containsKey("password") && root.containsKey("hostname") && root.containsKey("dhcp") && root.containsKey("ipaddress") && root.containsKey("netmask") && root.containsKey("gateway") && root.containsKey("dns1") && root.containsKey("dns2") && root.containsKey("aptimeout"))) {
         retMsg["message"] = "Values are missing!";
         retMsg["code"] = WebApiError::GenericValueMissing;
         response->setLength();
@@ -187,6 +188,13 @@ void WebApiNetworkClass::onNetworkAdminPost(AsyncWebServerRequest* request)
         request->send(response);
         return;
     }
+    if (root["aptimeout"].as<uint>() > 99999) {
+        retMsg["message"] = "ApTimeout must be a number between 0 and 99999!";
+        retMsg["code"] = WebApiError::NetworkApTimeoutInvalid;
+        response->setLength();
+        request->send(response);
+        return;
+    }
 
     CONFIG_T& config = Configuration.get();
     config.WiFi_Ip[0] = ipaddress[0];
@@ -217,6 +225,7 @@ void WebApiNetworkClass::onNetworkAdminPost(AsyncWebServerRequest* request)
     } else {
         config.WiFi_Dhcp = false;
     }
+    config.WiFi_ApTimeout = root["aptimeout"].as<uint>();
     Configuration.write();
 
     retMsg["type"] = "success";
