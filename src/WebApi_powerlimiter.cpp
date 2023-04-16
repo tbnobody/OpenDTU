@@ -119,6 +119,7 @@ void WebApiPowerLimiterClass::onAdminPost(AsyncWebServerRequest* request)
 
     CONFIG_T& config = Configuration.get();
     config.PowerLimiter_Enabled = root[F("enabled")].as<bool>();
+    PowerLimiter.setDisable(false);  // User input clears the PL internal disable flag
     config.PowerLimiter_SolarPassThroughEnabled = root[F("solar_passtrough_enabled")].as<bool>();
     config.PowerLimiter_BatteryDrainStategy= root[F("battery_drain_strategy")].as<uint8_t>();
     config.PowerLimiter_IsInverterBehindPowerMeter = root[F("is_inverter_behind_powermeter")].as<bool>();
