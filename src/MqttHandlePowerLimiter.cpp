@@ -65,19 +65,23 @@ void MqttHandlePowerLimiterClass::onMqttMessage(const espMqttClientTypes::Messag
         return;
     }
 
-    char* strlimit = new char[len + 1];
-    memcpy(strlimit, payload, len);
-    strlimit[len] = '\0';
-    float payload_val = strtof(strlimit, NULL);
-    delete[] strlimit;
+    char* str = new char[len + 1];
+    memcpy(str, payload, len);
+    str[len] = '\0';
+    uint8_t payload_val = atoi(str);
+    delete[] str;
 
     if (!strcmp(setting, TOPIC_SUB_POWER_LIMITER)) {
-        MessageOutput.printf("Disable power limter: %f A\r\n", payload_val);
         if(payload_val == 1) {
+          MessageOutput.println("Power limiter disabled");
           PowerLimiter.setDisable(true);
-        } 
+          return;
+        }
         if(payload_val == 0) {
+          MessageOutput.println("Power limiter enabled");
           PowerLimiter.setDisable(false);
+          return;
         } 
+        MessageOutput.println("Power limiter enable / disable - unknown command received. Please use 0 or 1");
     } 
 }
