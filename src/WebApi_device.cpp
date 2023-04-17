@@ -47,6 +47,14 @@ void WebApiDeviceClass::onDeviceAdminGet(AsyncWebServerRequest* request)
     nrfPinObj["miso"] = pin.nrf24_miso;
     nrfPinObj["mosi"] = pin.nrf24_mosi;
 
+    JsonObject cmtPinObj = curPin.createNestedObject("cmt");
+    cmtPinObj["clk"] = pin.cmt_clk;
+    cmtPinObj["cs"] = pin.cmt_cs;
+    cmtPinObj["fcs"] = pin.cmt_fcs;
+    cmtPinObj["sdio"] = pin.cmt_sdio;
+    cmtPinObj["gpio2"] = pin.cmt_gpio2;
+    cmtPinObj["gpio3"] = pin.cmt_gpio3;
+
     JsonObject ethPinObj = curPin.createNestedObject("eth");
     ethPinObj["enabled"] = pin.eth_enabled;
     ethPinObj["phy_addr"] = pin.eth_phy_addr;

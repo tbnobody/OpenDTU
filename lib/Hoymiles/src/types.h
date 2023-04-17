@@ -16,5 +16,6 @@ typedef struct {
     uint8_t fragment[MAX_RF_PAYLOAD_SIZE];
     uint8_t len;
     uint8_t channel;
+    int8_t rssi;
     bool wasReceived;
 } fragment_t;

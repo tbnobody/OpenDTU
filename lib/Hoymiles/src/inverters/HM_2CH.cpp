@@ -5,8 +5,8 @@
  */
 #include "HM_2CH.h"
 
-HM_2CH::HM_2CH(uint64_t serial)
-    : HM_Abstract(serial) {};
+HM_2CH::HM_2CH(HoymilesRadio* radio, uint64_t serial)
+    : HM_Abstract(radio, serial) {};
 
 bool HM_2CH::isValidSerial(uint64_t serial)
 {

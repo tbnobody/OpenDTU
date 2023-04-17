@@ -1,5 +1,9 @@
 export interface DtuConfig {
-    dtu_serial: number;
-    dtu_pollinterval: number;
-    dtu_palevel: number;
+    serial: number;
+    pollinterval: number;
+    nrf_enabled: boolean;
+    nrf_palevel: number;
+    cmt_enabled: boolean;
+    cmt_palevel: number;
+    cmt_frequency: number;
 }

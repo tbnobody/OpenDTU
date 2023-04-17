@@ -13,3 +13,4 @@
   * ParaSetCommand
   * SingleDataCommand
     * RequestFrameCommand
+  * ChannelChangeCommand

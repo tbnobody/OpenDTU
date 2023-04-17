@@ -1,10 +1,89 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * Copyright (C) 2022 Thomas Basler and others
+ * Copyright (C) 2022-2023 Thomas Basler and others
  */
 #include "AlarmLogParser.h"
 #include "../Hoymiles.h"
 #include <cstring>
+
+const std::array<const AlarmMessage_t, 76> AlarmLogParser::_alarmMessages = {{
+    { AlarmMessageType_t::ALL, 1, "Inverter start" },
+    { AlarmMessageType_t::ALL, 2, "DTU command failed" },
+    { AlarmMessageType_t::ALL, 121, "Over temperature protection" },
+    { AlarmMessageType_t::ALL, 124, "Shut down by remote control" },
+    { AlarmMessageType_t::ALL, 125, "Grid configuration parameter error" },
+    { AlarmMessageType_t::ALL, 126, "Software error code 126" },
+    { AlarmMessageType_t::ALL, 127, "Firmware error" },
+    { AlarmMessageType_t::ALL, 128, "Software error code 128" },
+    { AlarmMessageType_t::ALL, 129, "Abnormal bias" },
+    { AlarmMessageType_t::ALL, 130, "Offline" },
+    { AlarmMessageType_t::ALL, 141, "Grid: Grid overvoltage" },
+    { AlarmMessageType_t::ALL, 142, "Grid: 10 min value grid overvoltage" },
+    { AlarmMessageType_t::ALL, 143, "Grid: Grid undervoltage" },
+    { AlarmMessageType_t::ALL, 144, "Grid: Grid overfrequency" },
+    { AlarmMessageType_t::ALL, 145, "Grid: Grid underfrequency" },
+    { AlarmMessageType_t::ALL, 146, "Grid: Rapid grid frequency change rate" },
+    { AlarmMessageType_t::ALL, 147, "Grid: Power grid outage" },
+    { AlarmMessageType_t::ALL, 148, "Grid: Grid disconnection" },
+    { AlarmMessageType_t::ALL, 149, "Grid: Island detected" },
+    { AlarmMessageType_t::HMT, 171, "Grid: Abnormal phase difference between phase to phase" },
+    { AlarmMessageType_t::ALL, 205, "MPPT-A: Input overvoltage" },
+    { AlarmMessageType_t::ALL, 206, "MPPT-B: Input overvoltage" },
+    { AlarmMessageType_t::ALL, 207, "MPPT-A: Input undervoltage" },
+    { AlarmMessageType_t::ALL, 208, "MPPT-B: Input undervoltage" },
+    { AlarmMessageType_t::ALL, 209, "PV-1: No input" },
+    { AlarmMessageType_t::ALL, 210, "PV-2: No input" },
+    { AlarmMessageType_t::ALL, 211, "PV-3: No input" },
+    { AlarmMessageType_t::ALL, 212, "PV-4: No input" },
+    { AlarmMessageType_t::ALL, 213, "MPPT-A: PV-1 & PV-2 abnormal wiring" },
+    { AlarmMessageType_t::ALL, 214, "MPPT-B: PV-3 & PV-4 abnormal wiring" },
+    { AlarmMessageType_t::ALL, 215, "PV-1: Input overvoltage" },
+    { AlarmMessageType_t::HMT, 215, "MPPT-C: Input overvoltage" },
+    { AlarmMessageType_t::ALL, 216, "PV-1: Input undervoltage" },
+    { AlarmMessageType_t::HMT, 216, "MPPT-C: Input undervoltage" },
+    { AlarmMessageType_t::ALL, 217, "PV-2: Input overvoltage" },
+    { AlarmMessageType_t::HMT, 217, "PV-5: No input" },
+    { AlarmMessageType_t::ALL, 218, "PV-2: Input undervoltage" },
+    { AlarmMessageType_t::HMT, 218, "PV-6: No input" },
+    { AlarmMessageType_t::ALL, 219, "PV-3: Input overvoltage" },
+    { AlarmMessageType_t::HMT, 219, "MPPT-C: PV-5 & PV-6 abnormal wiring" },
+    { AlarmMessageType_t::ALL, 220, "PV-3: Input undervoltage" },
+    { AlarmMessageType_t::ALL, 221, "PV-4: Input overvoltage" },
+    { AlarmMessageType_t::HMT, 221, "Abnormal wiring of grid neutral line" },
+    { AlarmMessageType_t::ALL, 222, "PV-4: Input undervoltage" },
+    { AlarmMessageType_t::ALL, 301, "Hardware error code 301" },
+    { AlarmMessageType_t::ALL, 302, "Hardware error code 302" },
+    { AlarmMessageType_t::ALL, 303, "Hardware error code 303" },
+    { AlarmMessageType_t::ALL, 304, "Hardware error code 304" },
+    { AlarmMessageType_t::ALL, 305, "Hardware error code 305" },
+    { AlarmMessageType_t::ALL, 306, "Hardware error code 306" },
+    { AlarmMessageType_t::ALL, 307, "Hardware error code 307" },
+    { AlarmMessageType_t::ALL, 308, "Hardware error code 308" },
+    { AlarmMessageType_t::ALL, 309, "Hardware error code 309" },
+    { AlarmMessageType_t::ALL, 310, "Hardware error code 310" },
+    { AlarmMessageType_t::ALL, 311, "Hardware error code 311" },
+    { AlarmMessageType_t::ALL, 312, "Hardware error code 312" },
+    { AlarmMessageType_t::ALL, 313, "Hardware error code 313" },
+    { AlarmMessageType_t::ALL, 314, "Hardware error code 314" },
+    { AlarmMessageType_t::ALL, 5041, "Error code-04 Port 1" },
+    { AlarmMessageType_t::ALL, 5042, "Error code-04 Port 2" },
+    { AlarmMessageType_t::ALL, 5043, "Error code-04 Port 3" },
+    { AlarmMessageType_t::ALL, 5044, "Error code-04 Port 4" },
+    { AlarmMessageType_t::ALL, 5051, "PV Input 1 Overvoltage/Undervoltage" },
+    { AlarmMessageType_t::ALL, 5052, "PV Input 2 Overvoltage/Undervoltage" },
+    { AlarmMessageType_t::ALL, 5053, "PV Input 3 Overvoltage/Undervoltage" },
+    { AlarmMessageType_t::ALL, 5054, "PV Input 4 Overvoltage/Undervoltage" },
+    { AlarmMessageType_t::ALL, 5060, "Abnormal bias" },
+    { AlarmMessageType_t::ALL, 5070, "Over temperature protection" },
+    { AlarmMessageType_t::ALL, 5080, "Grid Overvoltage/Undervoltage" },
+    { AlarmMessageType_t::ALL, 5090, "Grid Overfrequency/Underfrequency" },
+    { AlarmMessageType_t::ALL, 5100, "Island detected" },
+    { AlarmMessageType_t::ALL, 5120, "EEPROM reading and writing error" },
+    { AlarmMessageType_t::ALL, 5150, "10 min value grid overvoltage" },
+    { AlarmMessageType_t::ALL, 5200, "Firmware error" },
+    { AlarmMessageType_t::ALL, 8310, "Shut down" },
+    { AlarmMessageType_t::ALL, 9000, "Microinverter is suspected of being stolen" },
+}};
 
 void AlarmLogParser::clearBuffer()
 {
@@ -37,6 +116,11 @@ LastCommandSuccess AlarmLogParser::getLastAlarmRequestSuccess()
     return _lastAlarmRequestSuccess;
 }
 
+void AlarmLogParser::setMessageType(AlarmMessageType_t type)
+{
+    _messageType = type;
+}
+
 void AlarmLogParser::getLogEntry(uint8_t entryId, AlarmLogEntry_t* entry)
 {
     uint8_t entryStartOffset = 2 + entryId * ALARM_LOG_ENTRY_SIZE;
@@ -62,217 +146,16 @@ void AlarmLogParser::getLogEntry(uint8_t entryId, AlarmLogEntry_t* entry)
         entry->EndTime += (endTimeOffset + timezoneOffset);
     }
 
-    switch (entry->MessageId) {
-    case 1:
-        entry->Message = "Inverter start";
-        break;
-    case 2:
-        entry->Message = "DTU command failed";
-        break;
-    case 121:
-        entry->Message = "Over temperature protection";
-        break;
-    case 124:
-        entry->Message = "Shut down by remote control";
-        break;
-    case 125:
-        entry->Message = "Grid configuration parameter error";
-        break;
-    case 126:
-        entry->Message = "Software error code 126";
-        break;
-    case 127:
-        entry->Message = "Firmware error";
-        break;
-    case 128:
-        entry->Message = "Software error code 128";
-        break;
-    case 129:
-        entry->Message = "Abnormal bias";
-        break;
-    case 130:
-        entry->Message = "Offline";
-        break;
-    case 141:
-        entry->Message = "Grid: Grid overvoltage";
-        break;
-    case 142:
-        entry->Message = "Grid: 10 min value grid overvoltage";
-        break;
-    case 143:
-        entry->Message = "Grid: Grid undervoltage";
-        break;
-    case 144:
-        entry->Message = "Grid: Grid overfrequency";
-        break;
-    case 145:
-        entry->Message = "Grid: Grid underfrequency";
-        break;
-    case 146:
-        entry->Message = "Grid: Rapid grid frequency change rate";
-        break;
-    case 147:
-        entry->Message = "Grid: Power grid outage";
-        break;
-    case 148:
-        entry->Message = "Grid: Grid disconnection";
-        break;
-    case 149:
-        entry->Message = "Grid: Island detected";
-        break;
-    case 205:
-        entry->Message = "MPPT-A: Input overvoltage";
-        break;
-    case 206:
-        entry->Message = "MPPT-B: Input overvoltage";
-        break;
-    case 207:
-        entry->Message = "MPPT-A: Input undervoltage";
-        break;
-    case 208:
-        entry->Message = "MPPT-B: Input undervoltage";
-        break;
-    case 209:
-        entry->Message = "PV-1: No input";
-        break;
-    case 210:
-        entry->Message = "PV-2: No input";
-        break;
-    case 211:
-        entry->Message = "PV-3: No input";
-        break;
-    case 212:
-        entry->Message = "PV-4: No input";
-        break;
-    case 213:
-        entry->Message = "MPPT-A: PV-1 & PV-2 abnormal wiring";
-        break;
-    case 214:
-        entry->Message = "MPPT-B: PV-3 & PV-4 abnormal wiring";
-        break;
-    case 215:
-        entry->Message = "PV-1: Input overvoltage";
-        break;
-    case 216:
-        entry->Message = "PV-1: Input undervoltage";
-        break;
-    case 217:
-        entry->Message = "PV-2: Input overvoltage";
-        break;
-    case 218:
-        entry->Message = "PV-2: Input undervoltage";
-        break;
-    case 219:
-        entry->Message = "PV-3: Input overvoltage";
-        break;
-    case 220:
-        entry->Message = "PV-3: Input undervoltage";
-        break;
-    case 221:
-        entry->Message = "PV-4: Input overvoltage";
-        break;
-    case 222:
-        entry->Message = "PV-4: Input undervoltage";
-        break;
-    case 301:
-        entry->Message = "Hardware error code 301";
-        break;
-    case 302:
-        entry->Message = "Hardware error code 302";
-        break;
-    case 303:
-        entry->Message = "Hardware error code 303";
-        break;
-    case 304:
-        entry->Message = "Hardware error code 304";
-        break;
-    case 305:
-        entry->Message = "Hardware error code 305";
-        break;
-    case 306:
-        entry->Message = "Hardware error code 306";
-        break;
-    case 307:
-        entry->Message = "Hardware error code 307";
-        break;
-    case 308:
-        entry->Message = "Hardware error code 308";
-        break;
-    case 309:
-        entry->Message = "Hardware error code 309";
-        break;
-    case 310:
-        entry->Message = "Hardware error code 310";
-        break;
-    case 311:
-        entry->Message = "Hardware error code 311";
-        break;
-    case 312:
-        entry->Message = "Hardware error code 312";
-        break;
-    case 313:
-        entry->Message = "Hardware error code 313";
-        break;
-    case 314:
-        entry->Message = "Hardware error code 314";
-        break;
-    case 5041:
-        entry->Message = "Error code-04 Port 1";
-        break;
-    case 5042:
-        entry->Message = "Error code-04 Port 2";
-        break;
-    case 5043:
-        entry->Message = "Error code-04 Port 3";
-        break;
-    case 5044:
-        entry->Message = "Error code-04 Port 4";
-        break;
-    case 5051:
-        entry->Message = "PV Input 1 Overvoltage/Undervoltage";
-        break;
-    case 5052:
-        entry->Message = "PV Input 2 Overvoltage/Undervoltage";
-        break;
-    case 5053:
-        entry->Message = "PV Input 3 Overvoltage/Undervoltage";
-        break;
-    case 5054:
-        entry->Message = "PV Input 4 Overvoltage/Undervoltage";
-        break;
-    case 5060:
-        entry->Message = "Abnormal bias";
-        break;
-    case 5070:
-        entry->Message = "Over temperature protection";
-        break;
-    case 5080:
-        entry->Message = "Grid Overvoltage/Undervoltage";
-        break;
-    case 5090:
-        entry->Message = "Grid Overfrequency/Underfrequency";
-        break;
-    case 5100:
-        entry->Message = "Island detected";
-        break;
-    case 5120:
-        entry->Message = "EEPROM reading and writing error";
-        break;
-    case 5150:
-        entry->Message = "10 min value grid overvoltage";
-        break;
-    case 5200:
-        entry->Message = "Firmware error";
-        break;
-    case 8310:
-        entry->Message = "Shut down";
-        break;
-    case 9000:
-        entry->Message = "Microinverter is suspected of being stolen";
-        break;
-    default:
-        entry->Message = "Unknown";
-        break;
+    entry->Message = "Unknown";
+    for (auto& msg : _alarmMessages) {
+        if (msg.MessageId == entry->MessageId) {
+            if (msg.InverterType == _messageType) {
+                entry->Message = msg.Message;
+                break;
+            } else if (msg.InverterType == AlarmMessageType_t::ALL) {
+                entry->Message = msg.Message;
+            }
+        }
     }
 }
 

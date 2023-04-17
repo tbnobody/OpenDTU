@@ -118,10 +118,10 @@ void WebApiPowerClass::onPowerPost(AsyncWebServerRequest* request)
 
     if (root.containsKey("power")) {
         uint16_t power = root["power"].as<bool>();
-        inv->sendPowerControlRequest(Hoymiles.getRadio(), power);
+        inv->sendPowerControlRequest(power);
     } else {
         if (root["restart"].as<bool>()) {
-            inv->sendRestartControlRequest(Hoymiles.getRadio());
+            inv->sendRestartControlRequest();
         }
     }
 

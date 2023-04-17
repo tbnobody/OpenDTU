@@ -45,6 +45,7 @@
         "2001": "Die Seriennummer darf nicht 0 sein!",
         "2002": "Das Abfraginterval muss größer als 0 sein!",
         "2003": "Ungültige Sendeleistung angegeben!",
+        "2004": "Die Frequenz muss zwischen {min} und {max} kHz liegen und ein vielfaches von 250kHz betragen!",
         "3001": "Nichts gelöscht!",
         "3002": "Konfiguration zurückgesetzt. Starte jetzt neu...",
         "4001": "@:apiresponse.2001",
@@ -220,10 +221,13 @@
     },
     "radioinfo": {
         "RadioInformation": "Funkmodulinformationen",
-        "ChipStatus": "Chip-Status",
-        "ChipType": "Chip-Typ",
+        "Status": "{module} Status",
+        "ChipStatus": "{module} Chip-Status",
+        "ChipType": "{module} Chip-Type",
         "Connected": "verbunden",
         "NotConnected": "nicht verbunden",
+        "Configured": "konfiguriert",
+        "NotConfigured": "nicht konfiguriert",
         "Unknown": "unbekannt"
     },
     "networkinfo": {
@@ -366,13 +370,20 @@
         "SerialHint": "Sowohl der Wechselrichter als auch die DTU haben eine Seriennummer. Die DTU-Seriennummer wird beim ersten Start zufällig generiert und muss normalerweise nicht geändert werden.",
         "PollInterval": "Abfrageintervall:",
         "Seconds": "Sekunden",
-        "PaLevel": "Sendeleistung:",
-        "PaLevelHint": "Stellen Sie sicher, dass Ihre Stromversorgung stabil genug ist, bevor Sie die Sendeleistung erhöhen.",
+        "NrfPaLevel": "NRF24 Sendeleistung:",
+        "CmtPaLevel": "CMT2300A Sendeleistung:",
+        "NrfPaLevelHint": "Verwendet für HM-Wechselrichter. Stellen Sie sicher, dass Ihre Stromversorgung stabil genug ist, bevor Sie die Sendeleistung erhöhen.",
+        "CmtPaLevelHint": "Verwendet für HMS/HMT-Wechselrichter. Stellen Sie sicher, dass Ihre Stromversorgung stabil genug ist, bevor Sie die Sendeleistung erhöhen.",
+        "CmtFrequency": "CMT2300A Frequenz:",
+        "CmtFrequencyHint": "Stelle sicher, dass du nur Frequenzen verwendet werden welche im entsprechenden Land erlaubt sind! Nach einer Frequenzänderung kann es bis zu 15min dauern bis eine Verbindung hergestellt wird.",
+        "CmtFrequencyWarning": "Die ausgewählte Frequenz befindet außerhalb des in der EU zugelassenen Bereiches. Vergewissere dich, dass mit dieser Auswahl keine lokalen Regularien verletzt werden.",
+        "MHz": "{mhz} MHz",
+        "dBm": "{dbm} dBm",
         "Save": "Speichern",
-        "Min": "Minimum (-18 dBm)",
-        "Low": "Niedrig (-12 dBm)",
-        "High": "Hoch (-6 dBm)",
-        "Max": "Maximum (0 dBm)"
+        "Min": "Minimum ({db} dBm)",
+        "Low": "Niedrig ({db} dBm)",
+        "High": "Hoch ({db} dBm)",
+        "Max": "Maximum ({db} dBm)"
     },
     "securityadmin": {
         "SecuritySettings": "Sicherheitseinstellungen",
@@ -626,7 +637,7 @@
         "DiscussionBody": "Diskutieren Sie mit uns auf <a href=\"https://discord.gg/WzhxEY62mB\" target=\"_blank\">Discord</a> oder <a href=\"https://github.com/tbnobody/OpenDTU/discussions\" target=\"_blank\">Github</a>"
     },
     "hints": {
-        "RadioProblem": "Es konnte keine Verbindung zu einem NRF24L01+ Funkmodul hergestellt werden. Bitte überprüfen Sie die Verdrahtung.",
+        "RadioProblem": "Es konnte keine Verbindung zu einem der konfigurierten Funkmodule hergestellt werden. Bitte überprüfen Sie die Verdrahtung.",
         "TimeSync": "Die Uhr wurde noch nicht synchronisiert. Ohne eine korrekt eingestellte Uhr werden keine Anfragen an den Wechselrichter gesendet. Dies ist kurz nach dem Start normal. Nach einer längeren Laufzeit (>1 Minute) bedeutet es jedoch, dass der NTP-Server nicht erreichbar ist.",
         "TimeSyncLink": "Bitte überprüfen Sie Ihre Zeiteinstellungen.",
         "DefaultPassword": "Sie verwenden das Standardpasswort für die Weboberfläche und den Notfall Access Point. Dies ist potenziell unsicher.",

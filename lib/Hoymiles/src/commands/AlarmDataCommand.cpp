@@ -10,7 +10,7 @@ AlarmDataCommand::AlarmDataCommand(uint64_t target_address, uint64_t router_addr
 {
     setTime(time);
     setDataType(0x11);
-    setTimeout(600);
+    setTimeout(750);
 }
 
 String AlarmDataCommand::getCommandName()

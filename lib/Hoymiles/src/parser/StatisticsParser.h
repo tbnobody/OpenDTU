@@ -5,7 +5,7 @@
 #include <cstdint>
 #include <list>
 
-#define STATISTIC_PACKET_SIZE (4 * 16)
+#define STATISTIC_PACKET_SIZE (7 * 16)
 
 // units
 enum UnitId_t {
@@ -38,10 +38,21 @@ enum FieldId_t {
     FLD_EFF,
     FLD_IRR,
     FLD_PRA,
-    FLD_EVT_LOG
+    FLD_EVT_LOG,
+    // HMT only
+    FLD_UAC_1N,
+    FLD_UAC_2N,
+    FLD_UAC_3N,
+    FLD_UAC_12,
+    FLD_UAC_23,
+    FLD_UAC_31,
+    FLD_IAC_1,
+    FLD_IAC_2,
+    FLD_IAC_3
 };
 const char* const fields[] = { "Voltage", "Current", "Power", "YieldDay", "YieldTotal",
-    "Voltage", "Current", "Power", "Frequency", "Temperature", "PowerFactor", "Efficiency", "Irradiation", "ReactivePower", "EventLogCount" };
+    "Voltage", "Current", "Power", "Frequency", "Temperature", "PowerFactor", "Efficiency", "Irradiation", "ReactivePower", "EventLogCount",
+    "Voltage Ph1-N", "Voltage Ph2-N", "Voltage Ph3-N", "Voltage Ph1-Ph2", "Voltage Ph2-Ph3", "Voltage Ph3-Ph1", "Current Ph1", "Current Ph2", "Current Ph3" };
 
 // indices to calculation functions, defined in hmInverter.h
 enum {
@@ -60,7 +71,9 @@ enum ChannelNum_t {
     CH1,
     CH2,
     CH3,
-    CH4
+    CH4,
+    CH5,
+    CH_CNT
 };
 
 enum ChannelType_t {
@@ -72,7 +85,7 @@ const char* const channelsTypes[] = { "AC", "DC", "INV" };
 
 typedef struct {
     ChannelType_t type;
-    ChannelNum_t ch; // channel 0 - 4
+    ChannelNum_t ch; // channel 0 - 5
     FieldId_t fieldId; // field id
     UnitId_t unitId; // uint id
     uint8_t start; // pos of first byte in buffer
@@ -84,7 +97,7 @@ typedef struct {
 
 typedef struct {
     ChannelType_t type;
-    ChannelNum_t ch; // channel 0 - 4
+    ChannelNum_t ch; // channel 0 - 5
     FieldId_t fieldId; // field id
     float offset; // offset (positive/negative) to be applied on the fetched value
 } fieldSettings_t;
@@ -122,7 +135,7 @@ public:
 private:
     uint8_t _payloadStatistic[STATISTIC_PACKET_SIZE] = {};
     uint8_t _statisticLength = 0;
-    uint16_t _stringMaxPower[CH4];
+    uint16_t _stringMaxPower[CH_CNT];
 
     const std::list<byteAssign_t>* _byteAssignment;
     std::list<fieldSettings_t> _fieldSettings;

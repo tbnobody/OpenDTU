@@ -6,6 +6,8 @@
 #include <cstdint>
 
 #define RF_LEN 32
+#define MAX_RESEND_COUNT 4 // Used if all packages are missing
+#define MAX_RETRANSMIT_COUNT 5 // Used to send the retransmit package
 
 class InverterAbstract;
 
@@ -38,6 +40,12 @@ public:
 
     virtual bool handleResponse(InverterAbstract* inverter, fragment_t fragment[], uint8_t max_fragment_id) = 0;
     virtual void gotTimeout(InverterAbstract* inverter);
+
+    // Sets the amount how often the specific command is resent if all fragments where missing
+    virtual uint8_t getMaxResendCount();
+
+    // Sets the amount how often a missing fragment is re-requested if it was not available
+    virtual uint8_t getMaxRetransmitCount();
 
 protected:
     uint8_t _payload[RF_LEN];
