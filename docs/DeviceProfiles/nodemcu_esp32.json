@@ -20,6 +20,34 @@
         }
     },
     {
+        "name": "Generic NodeMCU 32 with CMT2300A",
+        "nrf24": {
+            "miso": -1,
+            "mosi": -1,
+            "clk": -1,
+            "irq": -1,
+            "en": -1,
+            "cs": -1
+        },
+        "cmt": {
+            "clk": 18,
+            "cs": 4,
+            "fcs": 5,
+            "sdio": 23,
+            "gpio2": 19,
+            "gpio3": 16
+        },
+        "eth": {
+            "enabled": false,
+            "phy_addr": -1,
+            "power": -1,
+            "mdc": -1,
+            "mdio": -1,
+            "type": 0,
+            "clk_mode": 0
+        }
+    },
+    {
         "name": "Generic NodeMCU 32 with SSD1306",
         "nrf24": {
             "miso": 19,
@@ -67,6 +95,25 @@
             "type": 3,
             "data": 21,
             "clk": 22
+        }
+    },
+    {
+        "name": "Generic NodeMCU 32 with NRF + CMT Module",
+        "nrf24": {
+            "miso": 19,
+            "mosi": 23,
+            "clk": 18,
+            "irq": 16,
+            "en": 4,
+            "cs": 5
+        },
+        "cmt": {
+            "clk": 12,
+            "sdio": 14,
+            "cs": 27,
+            "fcs": 26,
+            "gpio2": -1,
+            "gpio3": -1
         }
     }
 ]

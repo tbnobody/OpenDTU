@@ -7,6 +7,15 @@ export interface Nrf24 {
     cs: number;
 }
 
+export interface Cmt2300 {
+    clk: number;
+    cs: number;
+    fcs: number;
+    sdio: number;
+    gpio2: number;
+    gpio3: number;
+ }
+
 export interface Ethernet {
     enabled: boolean;
     phy_addr: number;
@@ -38,6 +47,7 @@ export interface Battery {
 export interface Device  {
     name: string;
     nrf24: Nrf24;
+    cmt: Cmt2300;
     eth: Ethernet;
     display: Display;
     victron: Victron;

@@ -5,7 +5,7 @@
 
 class HM_2CH : public HM_Abstract {
 public:
-    explicit HM_2CH(uint64_t serial);
+    explicit HM_2CH(HoymilesRadio* radio, uint64_t serial);
     static bool isValidSerial(uint64_t serial);
     String typeName();
     const std::list<byteAssign_t>* getByteAssignment();

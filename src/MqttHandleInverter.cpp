@@ -36,7 +36,7 @@ void MqttHandleInverterClass::init()
 
 void MqttHandleInverterClass::loop()
 {
-    if (!MqttSettings.getConnected() || !Hoymiles.getRadio()->isIdle()) {
+    if (!MqttSettings.getConnected() || !Hoymiles.isAllRadioIdle()) {
         return;
     }
 
@@ -208,18 +208,18 @@ void MqttHandleInverterClass::onMqttMessage(const espMqttClientTypes::MessagePro
     if (!strcmp(setting, TOPIC_SUB_LIMIT_PERSISTENT_RELATIVE)) {
         // Set inverter limit relative persistent
         MessageOutput.printf("Limit Persistent: %d %%\r\n", payload_val);
-        inv->sendActivePowerControlRequest(Hoymiles.getRadio(), payload_val, PowerLimitControlType::RelativPersistent);
+        inv->sendActivePowerControlRequest(payload_val, PowerLimitControlType::RelativPersistent);
 
     } else if (!strcmp(setting, TOPIC_SUB_LIMIT_PERSISTENT_ABSOLUTE)) {
         // Set inverter limit absolute persistent
         MessageOutput.printf("Limit Persistent: %d W\r\n", payload_val);
-        inv->sendActivePowerControlRequest(Hoymiles.getRadio(), payload_val, PowerLimitControlType::AbsolutPersistent);
+        inv->sendActivePowerControlRequest(payload_val, PowerLimitControlType::AbsolutPersistent);
 
     } else if (!strcmp(setting, TOPIC_SUB_LIMIT_NONPERSISTENT_RELATIVE)) {
         // Set inverter limit relative non persistent
         MessageOutput.printf("Limit Non-Persistent: %d %%\r\n", payload_val);
         if (!properties.retain) {
-            inv->sendActivePowerControlRequest(Hoymiles.getRadio(), payload_val, PowerLimitControlType::RelativNonPersistent);
+            inv->sendActivePowerControlRequest(payload_val, PowerLimitControlType::RelativNonPersistent);
         } else {
             MessageOutput.println("Ignored because retained");
         }
@@ -228,7 +228,7 @@ void MqttHandleInverterClass::onMqttMessage(const espMqttClientTypes::MessagePro
         // Set inverter limit absolute non persistent
         MessageOutput.printf("Limit Non-Persistent: %d W\r\n", payload_val);
         if (!properties.retain) {
-            inv->sendActivePowerControlRequest(Hoymiles.getRadio(), payload_val, PowerLimitControlType::AbsolutNonPersistent);
+            inv->sendActivePowerControlRequest(payload_val, PowerLimitControlType::AbsolutNonPersistent);
         } else {
             MessageOutput.println("Ignored because retained");
         }
@@ -236,13 +236,13 @@ void MqttHandleInverterClass::onMqttMessage(const espMqttClientTypes::MessagePro
     } else if (!strcmp(setting, TOPIC_SUB_POWER)) {
         // Turn inverter on or off
         MessageOutput.printf("Set inverter power to: %d\r\n", payload_val);
-        inv->sendPowerControlRequest(Hoymiles.getRadio(), payload_val > 0);
+        inv->sendPowerControlRequest(payload_val > 0);
 
     } else if (!strcmp(setting, TOPIC_SUB_RESTART)) {
         // Restart inverter
         MessageOutput.printf("Restart inverter\r\n");
         if (!properties.retain && payload_val == 1) {
-            inv->sendRestartControlRequest(Hoymiles.getRadio());
+            inv->sendRestartControlRequest();
         } else {
             MessageOutput.println("Ignored because retained");
         }

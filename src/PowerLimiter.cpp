@@ -25,7 +25,7 @@ void PowerLimiterClass::loop()
 
     if (!config.PowerLimiter_Enabled
             || !config.PowerMeter_Enabled
-            || !Hoymiles.getRadio()->isIdle()
+            || !Hoymiles.isAllRadioIdle()
             || (millis() - _lastCommandSent) < (config.PowerLimiter_Interval * 1000)
             || (millis() - _lastLoop) < (config.PowerLimiter_Interval * 1000)) {
         if (!config.PowerLimiter_Enabled)
@@ -219,17 +219,17 @@ void PowerLimiterClass::setNewPowerLimit(std::shared_ptr<InverterAbstract> inver
         if (newPowerLimit < config.PowerLimiter_LowerPowerLimit) {
             if (inverter->isProducing()) {
                 MessageOutput.println("[PowerLimiterClass::loop] Stopping inverter...");
-                inverter->sendPowerControlRequest(Hoymiles.getRadio(), false);
+                inverter->sendPowerControlRequest(false);
                 _lastCommandSent = millis();
             }
             newPowerLimit = config.PowerLimiter_LowerPowerLimit;
         } else if (!inverter->isProducing()) {
             MessageOutput.println("[PowerLimiterClass::loop] Starting up inverter...");
-            inverter->sendPowerControlRequest(Hoymiles.getRadio(), true);
+            inverter->sendPowerControlRequest(true);
             _lastCommandSent = millis();
         } 
         MessageOutput.printf("[PowerLimiterClass::loop] Limit Non-Persistent: %d W\r\n", newPowerLimit);
-        inverter->sendActivePowerControlRequest(Hoymiles.getRadio(), newPowerLimit, PowerLimitControlType::AbsolutNonPersistent);
+        inverter->sendActivePowerControlRequest(newPowerLimit, PowerLimitControlType::AbsolutNonPersistent);
         _lastRequestedPowerLimit = newPowerLimit;
         // wait for the next inverter update (+ 3 seconds to make sure the limit got applied)
         _lastLimitSetTime = millis();

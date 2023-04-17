@@ -112,10 +112,10 @@ void WebApiLimitClass::onLimitPost(AsyncWebServerRequest* request)
         return;
     }
 
-    if (root["limit_value"].as<uint16_t>() == 0 || root["limit_value"].as<uint16_t>() > 1500) {
-        retMsg["message"] = "Limit must between 1 and 1500!";
+    if (root["limit_value"].as<uint16_t>() == 0 || root["limit_value"].as<uint16_t>() > 2250) {
+        retMsg["message"] = "Limit must between 1 and 2250!";
         retMsg["code"] = WebApiError::LimitInvalidLimit;
-        retMsg["param"]["max"] = 1500;
+        retMsg["param"]["max"] = 2250;
         response->setLength();
         request->send(response);
         return;
@@ -146,7 +146,7 @@ void WebApiLimitClass::onLimitPost(AsyncWebServerRequest* request)
         return;
     }
 
-    inv->sendActivePowerControlRequest(Hoymiles.getRadio(), limit, type);
+    inv->sendActivePowerControlRequest(limit, type);
 
     retMsg["type"] = "success";
     retMsg["message"] = "Settings saved!";

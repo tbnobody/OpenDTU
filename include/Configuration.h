@@ -4,7 +4,7 @@
 #include <Arduino.h>
 
 #define CONFIG_FILENAME "/config.json"
-#define CONFIG_VERSION 0x00011800 // 0.1.24 // make sure to clean all after change
+#define CONFIG_VERSION 0x00011900 // 0.1.24 // make sure to clean all after change
 
 #define WIFI_MAX_SSID_STRLEN 32
 #define WIFI_MAX_PASSWORD_STRLEN 64
@@ -23,7 +23,7 @@
 
 #define INV_MAX_NAME_STRLEN 31
 #define INV_MAX_COUNT 10
-#define INV_MAX_CHAN_COUNT 4
+#define INV_MAX_CHAN_COUNT 6
 
 #define CHAN_MAX_NAME_STRLEN 31
 
@@ -98,7 +98,9 @@ struct CONFIG_T {
 
     uint64_t Dtu_Serial;
     uint32_t Dtu_PollInterval;
-    uint8_t Dtu_PaLevel;
+    uint8_t Dtu_NrfPaLevel;
+    int8_t Dtu_CmtPaLevel;
+    uint32_t Dtu_CmtFrequency;
 
     bool Mqtt_Hass_Enabled;
     bool Mqtt_Hass_Retain;
