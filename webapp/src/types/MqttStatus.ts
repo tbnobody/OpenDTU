@@ -8,6 +8,8 @@ export interface MqttStatus {
     mqtt_retain: boolean;
     mqtt_tls: boolean;
     mqtt_root_ca_cert_info: string;
+    mqtt_tls_cert_login: boolean;
+    mqtt_client_cert_info: string;
     mqtt_connected: boolean;
     mqtt_hass_enabled: boolean;
     mqtt_hass_expire: boolean;

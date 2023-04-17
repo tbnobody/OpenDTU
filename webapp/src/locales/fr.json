@@ -23,7 +23,8 @@
         "Login": "Connexion"
     },
     "base": {
-        "Loading": "Chargement..."
+        "Loading": "Chargement...",
+        "Reload": "Reload"
     },
     "localeswitcher": {
         "Dark": "Dark",
@@ -39,6 +40,7 @@
         "2001": "Le numéro de série ne peut pas être nul !",
         "2002": "L'intervalle de sondage doit être supérieur à zéro !",
         "2003": "Réglage du niveau de puissance invalide !",
+        "2004": "The frequency must be set between {min} and {max} kHz and must be a multiple of 250kHz!",
         "3001": "Rien n'a été supprimé !",
         "3002": "Configuration réinitialisée. Redémarrage maintenant...",
         "4001": "@:apiresponse.2001",
@@ -186,10 +188,13 @@
     },
     "radioinfo": {
         "RadioInformation": "Informations sur la radio",
-        "ChipStatus": "État de la puce",
-        "ChipType": "Type de puce",
+        "Status": "{module} Status",
+        "ChipStatus": "{module} sÉtat de la puce",
+        "ChipType": "{module} Type de puce",
         "Connected": "connectée",
         "NotConnected": "non connectée",
+        "Configured": "configured",
+        "NotConfigured": "not configured",
         "Unknown": "Inconnue"
     },
     "networkinfo": {
@@ -258,6 +263,8 @@
         "Retain": "Conserver",
         "Tls": "TLS",
         "RootCertifcateInfo": "Informations sur le certificat de l'autorité de certification racine",
+        "TlsCertLogin": "Connexion avec un certificat TLS",
+        "ClientCertifcateInfo": "Informations sur le certificat du client",
         "HassSummary": "Résumé de la configuration de la découverte automatique du MQTT de Home Assistant",
         "Expire": "Expiration",
         "IndividualPanels": "Panneaux individuels",
@@ -316,13 +323,20 @@
         "SerialHint": "L'onduleur et le DTU ont tous deux un numéro de série. Le numéro de série du DTU est généré de manière aléatoire lors du premier démarrage et ne doit normalement pas être modifié.",
         "PollInterval": "Intervalle de sondage",
         "Seconds": "Secondes",
-        "PaLevel": "Niveau de puissance d'émission",
-        "PaLevelHint": "Assurez-vous que votre alimentation est suffisamment stable avant d'augmenter la puissance d'émission.",
+        "NrfPaLevel": "NRF24 Niveau de puissance d'émission",
+        "CmtPaLevel": "CMT2300A Niveau de puissance d'émission",
+        "NrfPaLevelHint": "Used for HM-Inverters. Assurez-vous que votre alimentation est suffisamment stable avant d'augmenter la puissance d'émission.",
+        "CmtPaLevelHint": "Used for HMS/HMT-Inverters. Assurez-vous que votre alimentation est suffisamment stable avant d'augmenter la puissance d'émission.",
+        "CmtFrequency": "CMT2300A Frequency:",
+        "CmtFrequencyHint": "Make sure to only use frequencies that are allowed in the respective country! After a frequency change, it can take up to 15min until a connection is established.",
+        "CmtFrequencyWarning": "The selected frequency is outside the range allowed in the EU. Make sure that this selection does not violate any local regulations.",
+        "MHz": "{mhz} MHz",
+        "dBm": "{dbm} dBm",
         "Save": "Sauvegarder",
-        "Min": "Minimum (-18 dBm)",
-        "Low": "Bas (-12 dBm)",
-        "High": "Haut (-6 dBm)",
-        "Max": "Maximum (0 dBm)"
+        "Min": "Minimum ({db} dBm)",
+        "Low": "Bas ({db} dBm)",
+        "High": "Haut ({db} dBm)",
+        "Max": "Maximum ({db} dBm)"
     },
     "securityadmin": {
         "SecuritySettings": "Paramètres de sécurité",
@@ -386,6 +400,9 @@
         "EnableRetain": "Activation du maintien",
         "EnableTls": "Activer le TLS",
         "RootCa": "Certificat CA-Root (par défaut Letsencrypt)",
+        "TlsCertLoginEnable": "Activer la connexion par certificat TLS",
+        "ClientCert": "Certificat client TLS:",
+        "ClientKey": "Clé client TLS:",
         "LwtParameters": "Paramètres LWT",
         "LwtTopic": "Sujet LWT",
         "LwtTopicHint": "Sujet LWT, sera ajouté comme sujet de base",
@@ -491,7 +508,7 @@
         "DiscussionBody": "Discutez avec nous sur <a href=\"https://discord.gg/WzhxEY62mB\" target=\"_blank\">Discord</a> ou sur <a href=\"https://github.com/tbnobody/OpenDTU/discussions\" target=\"_blank\">Github</a>"
     },
     "hints": {
-        "RadioProblem": "Impossible de se connecter à un module radio NRF24L01+ correct. Veuillez vérifier le câblage.",
+        "RadioProblem": "Impossible de se connecter à un module radio configuré.. Veuillez vérifier le câblage.",
         "TimeSync": "L'horloge n'a pas encore été synchronisée. Sans une horloge correctement réglée, aucune demande n'est adressée à l'onduleur. Ceci est normal peu de temps après le démarrage. Cependant, après un temps de fonctionnement plus long (>1 minute), cela indique que le serveur NTP n'est pas accessible.",
         "TimeSyncLink": "Veuillez vérifier vos paramètres horaires.",
         "DefaultPassword": "Vous utilisez le mot de passe par défaut pour l'interface Web et le point d'accès d'urgence. Ceci est potentiellement non sécurisé.",

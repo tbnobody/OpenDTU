@@ -4,8 +4,8 @@
  */
 #include "HM_1CH.h"
 
-HM_1CH::HM_1CH(uint64_t serial)
-    : HM_Abstract(serial) {};
+HM_1CH::HM_1CH(HoymilesRadio* radio, uint64_t serial)
+    : HM_Abstract(radio, serial) {};
 
 bool HM_1CH::isValidSerial(uint64_t serial)
 {
@@ -29,7 +29,7 @@ bool HM_1CH::isValidSerial(uint64_t serial)
 
 String HM_1CH::typeName()
 {
-    return F("HM-300, HM-350, HM-400");
+    return "HM-300, HM-350, HM-400";
 }
 
 const std::list<byteAssign_t>* HM_1CH::getByteAssignment()

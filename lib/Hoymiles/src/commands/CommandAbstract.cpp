@@ -101,3 +101,13 @@ void CommandAbstract::convertSerialToPacketId(uint8_t buffer[], uint64_t serial)
 void CommandAbstract::gotTimeout(InverterAbstract* inverter)
 {
 }
+
+uint8_t CommandAbstract::getMaxResendCount()
+{
+    return MAX_RESEND_COUNT;
+}
+
+uint8_t CommandAbstract::getMaxRetransmitCount()
+{
+    return MAX_RETRANSMIT_COUNT;
+}

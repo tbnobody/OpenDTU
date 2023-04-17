@@ -94,7 +94,7 @@ export default defineComponent({
                 comSel = 999999;
             }
 
-            if (comCur == -1 || comCur == 255 || comSel == undefined) {
+            if (comCur == -1 || comCur == 255 || comCur == undefined) {
                 comCur = 999999;
             }
 

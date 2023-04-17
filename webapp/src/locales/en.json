@@ -23,7 +23,8 @@
         "Login": "Login"
     },
     "base": {
-        "Loading": "Loading..."
+        "Loading": "Loading...",
+        "Reload": "Reload"
     },
     "localeswitcher": {
         "Dark": "Dark",
@@ -39,6 +40,7 @@
         "2001": "Serial cannot be zero!",
         "2002": "Poll interval must be greater zero!",
         "2003": "Invalid power level setting!",
+        "2004": "The frequency must be set between {min} and {max} kHz and must be a multiple of 250kHz!",
         "3001": "Not deleted anything!",
         "3002": "Configuration resettet. Rebooting now...",
         "4001": "@:apiresponse.2001",
@@ -86,7 +88,7 @@
         "9009": "Second must be a number between {min} and {max}!",
         "9010": "Time updated!",
         "10001": "Password must between 8 and {max} characters long!",
-        "10002": "Authentication successfull!",
+        "10002": "Authentication successful!",
         "11001": "@:apiresponse.2001",
         "11002": "@:apiresponse:5004",
         "12001": "Profil must between 1 and {max} characters long!"
@@ -186,10 +188,13 @@
     },
     "radioinfo": {
         "RadioInformation": "Radio Information",
-        "ChipStatus": "Chip Status",
-        "ChipType": "Chip Type",
+        "Status": "{module} Status",
+        "ChipStatus": "{module} Chip Status",
+        "ChipType": "{module} Chip Type",
         "Connected": "connected",
         "NotConnected": "not connected",
+        "Configured": "configured",
+        "NotConfigured": "not configured",
         "Unknown": "Unknown"
     },
     "networkinfo": {
@@ -258,6 +263,8 @@
         "Retain": "Retain",
         "Tls": "TLS",
         "RootCertifcateInfo": "Root CA Certifcate Info",
+        "TlsCertLogin": "Login with TLS Certificate",
+        "ClientCertifcateInfo": "Client Certifcate Info",
         "HassSummary": "Home Assistant MQTT Auto Discovery Configuration Summary",
         "Expire": "Expire",
         "IndividualPanels": "Individual Panels",
@@ -316,13 +323,20 @@
         "SerialHint": "Both the inverter and the DTU have a serial number. The DTU serial number is randomly generated at the first start and does not normally need to be changed.",
         "PollInterval": "Poll Interval:",
         "Seconds": "Seconds",
-        "PaLevel": "PA Level:",
-        "PaLevelHint": "Make sure your power supply is stable enough before increasing the transmit power.",
+        "NrfPaLevel": "NRF24 Transmitting power:",
+        "CmtPaLevel": "CMT2300A Transmitting power:",
+        "NrfPaLevelHint": "Used for HM-Inverters. Make sure your power supply is stable enough before increasing the transmit power.",
+        "CmtPaLevelHint": "Used for HMS/HMT-Inverters. Make sure your power supply is stable enough before increasing the transmit power.",
+        "CmtFrequency": "CMT2300A Frequency:",
+        "CmtFrequencyHint": "Make sure to only use frequencies that are allowed in the respective country! After a frequency change, it can take up to 15min until a connection is established.",
+        "CmtFrequencyWarning": "The selected frequency is outside the range allowed in the EU. Make sure that this selection does not violate any local regulations.",
+        "MHz": "{mhz} MHz",
+        "dBm": "{dbm} dBm",
         "Save": "Save",
-        "Min": "Minimum (-18 dBm)",
-        "Low": "Low (-12 dBm)",
-        "High": "High (-6 dBm)",
-        "Max": "Maximum (0 dBm)"
+        "Min": "Minimum ({db} dBm)",
+        "Low": "Low ({db} dBm)",
+        "High": "High ({db} dBm)",
+        "Max": "Maximum ({db} dBm)"
     },
     "securityadmin": {
         "SecuritySettings": "Security Settings",
@@ -386,6 +400,9 @@
         "EnableRetain": "Enable Retain Flag",
         "EnableTls": "Enable TLS",
         "RootCa": "CA-Root-Certificate (default Letsencrypt):",
+        "TlsCertLoginEnable": "Enable TLS Certificate Login",
+        "ClientCert": "TLS Client-Certificate:",
+        "ClientKey": "TLS Client-Key:",
         "LwtParameters": "LWT Parameters",
         "LwtTopic": "LWT Topic:",
         "LwtTopicHint": "LWT topic, will be append base topic",
@@ -412,7 +429,7 @@
         "Status": "Status",
         "Send": "Send",
         "Receive": "Receive",
-        "StatusHint": "<b>Hint:</b> The inverter is power by it's DC input. If there is no sun, the inverter is off. Requests can still be sent.",
+        "StatusHint": "<b>Hint:</b> The inverter is powered by its DC input. If there is no sun, the inverter is off. Requests can still be sent.",
         "Type": "Type",
         "Action": "Action",
         "DeleteInverter": "Delete inverter",
@@ -491,7 +508,7 @@
         "DiscussionBody": "Discuss with us on <a href=\"https://discord.gg/WzhxEY62mB\" target=\"_blank\">Discord</a> or <a href=\"https://github.com/tbnobody/OpenDTU/discussions\" target=\"_blank\">Github</a>"
     },
     "hints": {
-        "RadioProblem": "Could not connect to a correct NRF24L01+ radio module. Please check the wiring.",
+        "RadioProblem": "Could not connect to a configured radio module. Please check the wiring.",
         "TimeSync": "The clock has not yet been synchronised. Without a correctly set clock, no requests are made to the inverter. This is normal shortly after the start. However, after a longer runtime (>1 minute), it indicates that the NTP server is not accessible.",
         "TimeSyncLink": "Please check your time settings.",
         "DefaultPassword": "You are using the default password for the web interface and the emergency access point. This is potentially insecure.",

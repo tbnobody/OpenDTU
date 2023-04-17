@@ -5,7 +5,7 @@
 
 class HM_4CH : public HM_Abstract {
 public:
-    explicit HM_4CH(uint64_t serial);
+    explicit HM_4CH(HoymilesRadio* radio, uint64_t serial);
     static bool isValidSerial(uint64_t serial);
     String typeName();
     const std::list<byteAssign_t>* getByteAssignment();

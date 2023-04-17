@@ -91,6 +91,12 @@ The json file can contain multiple profiles. Each profile requires a name and di
 | nrf24.irq     | number    | Interrupt Pin |
 | nrf24.en      | number    | Enable Pin |
 | nrf24.cs      | number    | Chip Select Pin |
+| cmt.sdio      | number    | SDIO Pin |
+| cmt.clk       | number    | CLK Pin |
+| cmt.cs        | number    | CS Pin |
+| cmt.fcs       | number    | FCS Pin |
+| cmt.gpio2     | number    | GPIO2 Pin (optional) |
+| cmt.gpio3     | number    | GPIO3 Pin (optional) |
 | eth.enabled   | boolean   | Enable/Disable the ethernet stack |
 | eth.phy_addr  | number    | Unique PHY addr |
 | eth.power     | number    | Power Pin (if available). Use -1 for not assigned pins. |
@@ -103,3 +109,5 @@ The json file can contain multiple profiles. Each profile requires a name and di
 | display.clk   | number    | Clock Pin (e.g. SCL for i2c displays) required for SSD1306 and SH1106. Use 255 for not assigned pins. |
 | display.cs    | number    | Chip Select Pin required for PCD8544. Use 255 for not assigned pins. |
 | display.reset | number    | Reset Pin required for PCD8544, optional for all other displays. Use 255 for not assigned pins. |
+| led.led0      | number    | LED pin for network indication. Blinking = WLAN connected but NTP & MQTT (if enabled) disconnected. On = WLAN, NTP, MQTT connected. Off = Network not connected |
+| led.led1      | number    | LED pin for inverter indication. On = All inverters reachable & producing. Blinking = All inverters reachable but not producing. Off = At least one inverter is not reachable. Only inverters with polling enabled are considered. |

@@ -1,5 +1,5 @@
 <template>
-    <BasePage :title="$t('ntpinfo.NtpInformation')" :isLoading="dataLoading">
+    <BasePage :title="$t('ntpinfo.NtpInformation')" :isLoading="dataLoading" :show-reload="true" @reload="getNtpInfo">
         <CardElement :text="$t('ntpinfo.ConfigurationSummary')" textVariant="text-bg-primary">
             <div class="table-responsive">
                 <table class="table table-hover table-condensed">

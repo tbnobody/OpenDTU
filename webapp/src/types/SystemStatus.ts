@@ -9,6 +9,7 @@ export interface SystemStatus {
     sdkversion: string;
     config_version: string;
     git_hash: string;
+    git_is_hash: boolean;
     resetreason_0: string;
     resetreason_1: string;
     cfgsavecount: number;
@@ -24,6 +25,9 @@ export interface SystemStatus {
     sketch_total: number;
     sketch_used: number;
     // RadioInfo
-    radio_connected: boolean;
-    radio_pvariant: boolean;
+    nrf_configured: boolean;
+    nrf_connected: boolean;
+    nrf_pvariant: boolean;
+    cmt_configured: boolean;
+    cmt_connected: boolean;
 }

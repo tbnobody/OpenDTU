@@ -65,6 +65,9 @@ bool ConfigurationClass::write()
     JsonObject mqtt_tls = mqtt.createNestedObject("tls");
     mqtt_tls["enabled"] = config.Mqtt_Tls;
     mqtt_tls["root_ca_cert"] = config.Mqtt_RootCaCert;
+    mqtt_tls["certlogin"] = config.Mqtt_TlsCertLogin;
+    mqtt_tls["client_cert"] = config.Mqtt_ClientCert;
+    mqtt_tls["client_key"] = config.Mqtt_ClientKey;
 
     JsonObject mqtt_hass = mqtt.createNestedObject("hass");
     mqtt_hass["enabled"] = config.Mqtt_Hass_Enabled;
@@ -76,7 +79,9 @@ bool ConfigurationClass::write()
     JsonObject dtu = doc.createNestedObject("dtu");
     dtu["serial"] = config.Dtu_Serial;
     dtu["poll_interval"] = config.Dtu_PollInterval;
-    dtu["pa_level"] = config.Dtu_PaLevel;
+    dtu["nrf_pa_level"] = config.Dtu_NrfPaLevel;
+    dtu["cmt_pa_level"] = config.Dtu_CmtPaLevel;
+    dtu["cmt_frequency"] = config.Dtu_CmtFrequency;
 
     JsonObject security = doc.createNestedObject("security");
     security["password"] = config.Security_Password;
@@ -128,7 +133,7 @@ bool ConfigurationClass::read()
     // Deserialize the JSON document
     DeserializationError error = deserializeJson(doc, f);
     if (error) {
-        MessageOutput.println(F("Failed to read file, using default configuration"));
+        MessageOutput.println("Failed to read file, using default configuration");
     }
 
     JsonObject cfg = doc["cfg"];
@@ -202,6 +207,9 @@ bool ConfigurationClass::read()
     JsonObject mqtt_tls = mqtt["tls"];
     config.Mqtt_Tls = mqtt_tls["enabled"] | MQTT_TLS;
     strlcpy(config.Mqtt_RootCaCert, mqtt_tls["root_ca_cert"] | MQTT_ROOT_CA_CERT, sizeof(config.Mqtt_RootCaCert));
+    config.Mqtt_TlsCertLogin = mqtt_tls["certlogin"] | MQTT_TLSCERTLOGIN;
+    strlcpy(config.Mqtt_ClientCert, mqtt_tls["client_cert"] | MQTT_TLSCLIENTCERT, sizeof(config.Mqtt_ClientCert));
+    strlcpy(config.Mqtt_ClientKey, mqtt_tls["client_key"] | MQTT_TLSCLIENTKEY, sizeof(config.Mqtt_ClientKey));
 
     JsonObject mqtt_hass = mqtt["hass"];
     config.Mqtt_Hass_Enabled = mqtt_hass["enabled"] | MQTT_HASS_ENABLED;
@@ -213,7 +221,9 @@ bool ConfigurationClass::read()
     JsonObject dtu = doc["dtu"];
     config.Dtu_Serial = dtu["serial"] | DTU_SERIAL;
     config.Dtu_PollInterval = dtu["poll_interval"] | DTU_POLL_INTERVAL;
-    config.Dtu_PaLevel = dtu["pa_level"] | DTU_PA_LEVEL;
+    config.Dtu_NrfPaLevel = dtu["nrf_pa_level"] | DTU_NRF_PA_LEVEL;
+    config.Dtu_CmtPaLevel = dtu["cmt_pa_level"] | DTU_CMT_PA_LEVEL;
+    config.Dtu_CmtFrequency = dtu["cmt_frequency"] | DTU_CMT_FREQUENCY;
 
     JsonObject security = doc["security"];
     strlcpy(config.Security_Password, security["password"] | ACCESS_POINT_PASSWORD, sizeof(config.Security_Password));
@@ -255,7 +265,7 @@ void ConfigurationClass::migrate()
 {
     File f = LittleFS.open(CONFIG_FILENAME, "r", false);
     if (!f) {
-        MessageOutput.println(F("Failed to open file, cancel migration"));
+        MessageOutput.println("Failed to open file, cancel migration");
         return;
     }
 
@@ -282,6 +292,11 @@ void ConfigurationClass::migrate()
     if (config.Cfg_Version < 0x00011800) {
         JsonObject mqtt = doc["mqtt"];
         config.Mqtt_PublishInterval = mqtt["publish_invterval"];
+    }
+
+    if  (config.Cfg_Version < 0x00011900) {
+        JsonObject dtu = doc["dtu"];
+        config.Dtu_NrfPaLevel = dtu["pa_level"];
     }
 
     f.close();

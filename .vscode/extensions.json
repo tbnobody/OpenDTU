@@ -2,7 +2,10 @@
     // See http://go.microsoft.com/fwlink/?LinkId=827846
     // for the documentation about the extensions.json format
     "recommendations": [
-        "platformio.platformio-ide"
+        "platformio.platformio-ide",
+        "DavidAnson.vscode-markdownlint",
+        "Vue.volar",
+        "Vue.vscode-typescript-vue-plugin"
     ],
     "unwantedRecommendations": [
         "ms-vscode.cpptools-extension-pack"

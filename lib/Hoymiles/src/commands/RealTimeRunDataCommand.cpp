@@ -10,7 +10,7 @@ RealTimeRunDataCommand::RealTimeRunDataCommand(uint64_t target_address, uint64_t
 {
     setTime(time);
     setDataType(0x0b);
-    setTimeout(200);
+    setTimeout(500);
 }
 
 String RealTimeRunDataCommand::getCommandName()
