@@ -527,6 +527,9 @@ String VeDirectFrameHandler::getPidAsString(uint16_t pid)
 		case 0XA10F:
 			strPID =  "BlueSolar MPPT VE.Can 150|100";
 			break;
+		case 0XA110:
+			strPID =  "SmartSolar MPPT RS 450|100";
+			break; 
 		case 0XA112:
 			strPID =  "BlueSolar MPPT VE.Can 250|70";
 			break;
