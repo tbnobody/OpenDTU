@@ -23,11 +23,12 @@ void HoymilesRadio_NRF::init(SPIClass* initialisedSpiBus, uint8_t pinCE, uint8_t
     _radio->setAddressWidth(5);
     _radio->setRetries(0, 0);
     _radio->maskIRQ(true, true, false); // enable only receiving interrupts
-    if (_radio->isChipConnected()) {
-        Hoymiles.getMessageOutput()->println("Connection successful");
-    } else {
-        Hoymiles.getMessageOutput()->println("Connection error!!");
+    _isConfigured = true;
+    if (!_radio->isChipConnected()) {
+        Hoymiles.getMessageOutput()->println("NRF: Connection error!!");
+        return;
     }
+    Hoymiles.getMessageOutput()->println("NRF: Connection successful");
 
     attachInterrupt(digitalPinToInterrupt(pinIRQ), std::bind(&HoymilesRadio_NRF::handleIntr, this), FALLING);
 
@@ -60,7 +61,7 @@ void HoymilesRadio_NRF::loop()
                 _radio->read(f.fragment, f.len);
                 _rxBuffer.push(f);
             } else {
-                Hoymiles.getMessageOutput()->println("Buffer full");
+                Hoymiles.getMessageOutput()->println("NRF: Buffer full");
                 _radio->flush_rx();
             }
         }
