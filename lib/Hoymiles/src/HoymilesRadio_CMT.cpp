@@ -63,11 +63,12 @@ void HoymilesRadio_CMT::init(int8_t pin_sdio, int8_t pin_clk, int8_t pin_cs, int
 
     cmtSwitchDtuFreq(_inverterTargetFrequency); // start dtu at work freqency, for fast Rx if inverter is already on and frequency switched
 
-    if (_radio->isChipConnected()) {
-        Hoymiles.getMessageOutput()->println("Connection successful");
-    } else {
-        Hoymiles.getMessageOutput()->println("Connection error!!");
+    _isConfigured = true;
+    if (!_radio->isChipConnected()) {
+        Hoymiles.getMessageOutput()->println("CMT: Connection error!!");
+        return;
     }
+    Hoymiles.getMessageOutput()->println("CMT: Connection successful");
 
     if (pin_gpio2 >= 0) {
         attachInterrupt(digitalPinToInterrupt(pin_gpio2), std::bind(&HoymilesRadio_CMT::handleInt1, this), RISING);
@@ -109,7 +110,7 @@ void HoymilesRadio_CMT::loop()
                 _radio->read(f.fragment, f.len);
                 _rxBuffer.push(f);
             } else {
-                Hoymiles.getMessageOutput()->println("Buffer full");
+                Hoymiles.getMessageOutput()->println("CMT: Buffer full");
                 _radio->flush_rx();
             }
         }

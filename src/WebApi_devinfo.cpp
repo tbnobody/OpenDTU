@@ -30,22 +30,27 @@ void WebApiDevInfoClass::onDevInfoStatus(AsyncWebServerRequest* request)
     AsyncJsonResponse* response = new AsyncJsonResponse();
     JsonObject root = response->getRoot();
 
-    for (uint8_t i = 0; i < Hoymiles.getNumInverters(); i++) {
-        auto inv = Hoymiles.getInverterByPos(i);
+    uint64_t serial = 0;
+    if (request->hasParam("inv")) {
+        String s = request->getParam("inv")->value();
+        serial = strtoll(s.c_str(), NULL, 16);
+    }
 
-        JsonObject devInfoObj = root[inv->serialString()].createNestedObject();
-        devInfoObj["valid_data"] = inv->DevInfo()->getLastUpdate() > 0;
-        devInfoObj["fw_bootloader_version"] = inv->DevInfo()->getFwBootloaderVersion();
-        devInfoObj["fw_build_version"] = inv->DevInfo()->getFwBuildVersion();
-        devInfoObj["hw_part_number"] = inv->DevInfo()->getHwPartNumber();
-        devInfoObj["hw_version"] = inv->DevInfo()->getHwVersion();
-        devInfoObj["hw_model_name"] = inv->DevInfo()->getHwModelName();
-        devInfoObj["max_power"] = inv->DevInfo()->getMaxPower();
+    auto inv = Hoymiles.getInverterBySerial(serial);
+
+    if (inv != nullptr) {
+        root["valid_data"] = inv->DevInfo()->getLastUpdate() > 0;
+        root["fw_bootloader_version"] = inv->DevInfo()->getFwBootloaderVersion();
+        root["fw_build_version"] = inv->DevInfo()->getFwBuildVersion();
+        root["hw_part_number"] = inv->DevInfo()->getHwPartNumber();
+        root["hw_version"] = inv->DevInfo()->getHwVersion();
+        root["hw_model_name"] = inv->DevInfo()->getHwModelName();
+        root["max_power"] = inv->DevInfo()->getMaxPower();
 
         char timebuffer[32];
         const time_t t = inv->DevInfo()->getFwBuildDateTime();
         std::strftime(timebuffer, sizeof(timebuffer), "%Y-%m-%d %H:%M:%S", gmtime(&t));
-        devInfoObj["fw_build_datetime"] = String(timebuffer);
+        root["fw_build_datetime"] = String(timebuffer);
     }
 
     response->setLength();
