@@ -60,6 +60,7 @@ VeDirectFrameHandler::VeDirectFrameHandler() :
 	_state(IDLE),
 	_checksum(0),
 	_textPointer(0),
+	_hexSize(0),
 	_name(""),
 	_value(""),
 	_tmpFrame(),
@@ -99,7 +100,9 @@ void VeDirectFrameHandler::rxData(uint8_t inbyte)
 {
 	//if (mStop) return;
 	if ( (inbyte == ':') && (_state != CHECKSUM) ) {
-		_state = RECORD_HEX;
+		_prevState = _state; //hex frame can interrupt TEXT
+		_state = RECORD_HEX; 
+		_hexSize = 0;
 	}
 	if (_state != RECORD_HEX) {
 		_checksum += inbyte;
@@ -177,10 +180,7 @@ void VeDirectFrameHandler::rxData(uint8_t inbyte)
 		break;
 	}
 	case RECORD_HEX:
-		if (hexRxEvent(inbyte)) {
-			_checksum = 0;
-			_state = IDLE;
-		}
+		_state = hexRxEvent(inbyte);
 		break;
 	}
 }
@@ -279,10 +279,27 @@ void VeDirectFrameHandler::logE(const char * module, const char * error) {
 
 /*
  *	hexRxEvent
- *  This function included for continuity and possible future use.	
+ *  This function records hex answers or async messages	
  */
-bool VeDirectFrameHandler::hexRxEvent(uint8_t inbyte) {
-	return true;		// stubbed out for future
+int VeDirectFrameHandler::hexRxEvent(uint8_t inbyte) {
+	int ret=RECORD_HEX; // default - continue recording until end of frame
+
+	switch (inbyte) {
+	case '\n':
+		// restore previous state
+		ret=_prevState;
+		break;
+		
+	default:
+		_hexSize++;
+		if (_hexSize>=VE_MAX_HEX_LEN) { // oops -buffer overflow - something went wrong, we abort
+			logE(MODULE,"hexRx buffer overflow - aborting read");
+			_hexSize=0;
+			ret=IDLE;
+		}
+	}
+	
+	return ret;
 }
 
 bool VeDirectFrameHandler::isDataValid() {
@@ -510,6 +527,9 @@ String VeDirectFrameHandler::getPidAsString(uint16_t pid)
 		case 0XA10F:
 			strPID =  "BlueSolar MPPT VE.Can 150|100";
 			break;
+		case 0XA110:
+			strPID =  "SmartSolar MPPT RS 450|100";
+			break; 
 		case 0XA112:
 			strPID =  "BlueSolar MPPT VE.Can 250|70";
 			break;

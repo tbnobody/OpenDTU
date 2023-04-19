@@ -65,7 +65,7 @@
                     <div class="col-sm-10">
                         <div class="input-group">
                             <input type="number" class="form-control" id="targetPowerConsumption"
-                                placeholder="75" min="0" v-model="powerLimiterConfigList.target_power_consumption"
+                                placeholder="75" v-model="powerLimiterConfigList.target_power_consumption"
                                 aria-describedby="targetPowerConsumptionDescription" required/>
                                 <span class="input-group-text" id="targetPowerConsumptionDescription">W</span>
                         </div>

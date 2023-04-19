@@ -23,6 +23,8 @@
 
 #define VE_MAX_NAME_LEN 9   // VE.Direct Protocol: max name size is 9 including /0
 #define VE_MAX_VALUE_LEN 33 // VE.Direct Protocol: max value size is 33 including /0
+#define VE_MAX_HEX_LEN 100 // Maximum size of hex frame - max payload 34 byte (=68 char) + safe buffer
+
 
 typedef struct {
     uint16_t PID;                   // product id
@@ -69,12 +71,14 @@ private:
     void textRxEvent(char *, char *);
     void frameEndEvent(bool);                 // copy temp struct to public struct
     void logE(const char *, const char *);    
-    bool hexRxEvent(uint8_t);
+    int hexRxEvent(uint8_t);
 
     //bool mStop;                               // not sure what Victron uses this for, not using
     int _state;                                // current state
+    int _prevState;                            // previous state
     uint8_t	_checksum;                         // checksum value
     char * _textPointer;                       // pointer to the private buffer we're writing to, name or value
+    int _hexSize;                               // length of hex buffer
     char _name[VE_MAX_VALUE_LEN];              // buffer for the field name
     char _value[VE_MAX_VALUE_LEN];             // buffer for the field value
     veStruct _tmpFrame{};                        // private struct for received name and value pairs
