@@ -533,7 +533,7 @@ export default defineComponent({
             fetch("/api/eventlog/status?inv=" + serial, { headers: authHeader() })
                 .then((response) => handleResponse(response, this.$emitter, this.$router))
                 .then((data) => {
-                    this.eventLogList = data[serial];
+                    this.eventLogList = data;
                     this.eventLogLoading = false;
                 });
 
