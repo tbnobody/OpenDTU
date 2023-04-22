@@ -1,6 +1,7 @@
 # MQTT Topics
 
-The base topic, as configured in the web GUI is prepended to all follwing topics.
+The base topic, as configured in the web GUI is prepended to all following topics.
+Serial will be replaced with the serial number of the respective device.
 
 ## General topics
 
@@ -72,3 +73,85 @@ cmd topics are used to set values. Status topics are updated from values set in 
 | [serial]/cmd/limit_nonpersistent_absolute | W     | Set the inverter limit as a absolute value. The  value will reset to the last persistent value at night without power. The updated value will set immediatly within the inverter but show up in the web GUI and limit_relative topic after around 4 minutes. If you are using a already known inverter (known Hardware ID), the updated value will show up within a few seconds. The value must be published non-retained, otherwise it will be ignored! | Watt (W)                   |
 | [serial]/cmd/power                        | W      | Turn the inverter on (1) or off (0)                 | 0 or 1                     |
 | [serial]/cmd/restart                      | W      | Restarts the inverters (also resets YieldDay)       | 1                          |
+
+### Victron MPPT topics
+
+#### General
+
+| Topic                                   | R / W | Description                                          | Value / Unit               |
+| --------------------------------------- | ----- | ---------------------------------------------------- | -------------------------- |
+| victron/[serial]/PID                    | R     | Product description                                  | text                       |
+| victron/[serial]/SER                    | R     | Serial number                                        | text                       |
+| victron/[serial]/FW                     | R     | Firmware number                                      | int                        |
+| victron/[serial]/LOAD                   | R     | Load output state                                    | ON /  OFF                  |
+| victron/[serial]/CS                     | R     | State of operation                                   | text e. g. "Bulk"          |
+| victron/[serial]/ERR                    | R     | Error code                                           | text e. g. "No error"      |
+| victron/[serial]/OR                     | R     | Off reasen                                           | text e. g. "Not off"       |
+| victron/[serial]/MPPT                   | R     | Tracker operation mode                               | text e. g. "MPP Tracker active" |
+| victron/[serial]/HSDS                   | R     | Day sequence number (0...364)                        | int in days                |
+
+#### Battery output
+
+| Topic                                   | R / W | Description                                          | Value / Unit               |
+| --------------------------------------- | ----- | ---------------------------------------------------- | -------------------------- |
+| victron/[serial]/V                      | R     | Voltage                                              | Volt (V)                   |
+| victron/[serial]/I                      | R     | Current                                              | Ampere (A)                 |
+
+#### Solar input
+
+| Topic                                   | R / W | Description                                          | Value / Unit               |
+| --------------------------------------- | ----- | ---------------------------------------------------- | -------------------------- |
+| victron/[serial]/VPV                    | R     | Voltage                                              | Volt (V)                   |
+| victron/[serial]/PPV                    | R     | Power                                                | Watt (W)                   |
+| victron/[serial]/H19                    | R     | Yield total (user resettable counter)                | Kilo watt hours (kWh)      |
+| victron/[serial]/H20                    | R     | Yield today                                          | Kilo watt hours (kWh)      |
+| victron/[serial]/H21                    | R     | Maximum power today                                  | Watt (W)                   |
+| victron/[serial]/H22                    | R     | Yield yesterday                                      | Kilo watt hours (kWh)      |
+| victron/[serial]/H23                    | R     | Maximum power yesterday                              | Watt (W)                   |
+
+### Pylontech battery topics
+
+| Topic                                   | R / W | Description                                          | Value / Unit               |
+| --------------------------------------- | ----- | ---------------------------------------------------- | -------------------------- |
+| battery/settings/chargeVoltage          | R     | Voltage                                              | Volt (V)                   |
+| battery/settings/chargeCurrentLimitation | R    | BMS requested max. charge current                    | Ampere (A)                 |
+| battery/settings/dischargeCurrentLimitation | R | BMS requested max. discharge current                 | Ampere (A)                 |
+| battery/stateOfCharge                   | R     | State of Health                                      | %                          |
+| battery/stateOfHealth                   | R     | State of Charge                                      | %                          |
+| battery/voltage                         | R     | Actual voltage                                       | Volt (V)                   |
+| battery/current                         | R     | Actual current                                       | Ampere (A)                 |
+| battery/temperature"                    | R     | Actual temperature                                   | °C                         |
+| battery/alarm/overCurrentDischarge      | R     | Alarm: High discharge current                        | 0 / 1                      |
+| battery/alarm/underTemperature          | R     | Alarm: Low temperature                               | 0 / 1                      |
+| battery/alarm/overTemperature           | R     | Alarm: High temperature                              | 0 / 1                      |
+| battery/alarm/underVoltage              | R     | Alarm: Low voltage                                   | 0 / 1                      |
+| battery/alarm/overVoltage               | R     | Alarm: High voltage                                  | 0 / 1                      |
+| battery/alarm/bmsInternal               | R     | Alarm: BMS internal                                  | 0 / 1                      |
+| battery/warning/highCurrentDischarge    | R     | Warning: High discharge current                      | 0 / 1                      |
+| battery/warning/lowTemperature          | R     | Warning: Low temperature                             | 0 / 1                      |
+| battery/warning/highTemperature         | R     | Warning: High temperature                            | 0 / 1                      |
+| battery/warning/lowVoltage              | R     | Warning: Low voltage                                 | 0 / 1                      |
+| battery/warning/highVoltage             | R     | Warning: High voltage                                | 0 / 1                      |
+| battery/warning/bmsInternal             | R     | Warning: BMS internal                                | 0 / 1                      |
+| battery/manufacturer                    | R     | Manufacturer                                         | String                     |
+| battery/charging/chargeEnabled          | R     | Charge enabled flag                                  | 0 / 1                      |
+| battery/charging/dischargeEnabled       | R     | Discharge enabled flag                               | 0 / 1                      |
+| battery/charging/chargeImmediately      | R     | Charge immediately flag                              | 0 / 1                      |
+
+### Huawei AC charger topics
+| Topic                                   | R / W | Description                                          | Value / Unit               |
+| --------------------------------------- | ----- | ---------------------------------------------------- | -------------------------- |
+| huawei/cmd/limit_online_voltage         | W     | Online voltage (i.e. CAN bus connected)              | Volt (V)                   |
+| huawei/cmd/limit_online_current         | W     | Online current (i.e. CAN bus connected)              | Ampere (A)                 |
+| huawei/cmd/power                        | W     | Controls output pin GPIO to drive solid state relais | 0 / 1                      |
+| huawei/data_age                         | R     | How old the data is                                  | Seconds                    |
+| huawei/input_voltage                    | R     | Input voltage                                        | Volt (V)                   |
+| huawei/input_current                    | R     | Input current                                        | Ampere (A)                 |
+| huawei/input_power                      | R     | Input power                                          | Watt (W)                   |
+| huawei/output_voltage                   | R     | Output voltage                                       | Volt (V)                   |
+| huawei/output_current                   | R     | Output current                                       | Ampere (A)                 |
+| huawei/max_output_current               | R     | Maximum output current (set using the online limit)  | Ampere (A)                 |
+| huawei/output_power                     | R     | Output power                                         | Watt (W)                   |
+| huawei/input_temp                       | R     | Input air temperature                                | °C                         |
+| huawei/output_temp                      | R     | Output air temperature                               | °C                         |
+| huawei/efficiency                       | R     | Efficiency                                           | Percentage                 |
