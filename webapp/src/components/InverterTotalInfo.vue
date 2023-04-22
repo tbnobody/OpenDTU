@@ -89,9 +89,9 @@
       </div>
     </div>
   </div>
-  <div v-show="totalBattData.enabled">
+  <div v-show="totalBattData.enabled || powerMeterData.enabled || huaweiData.enabled">
     <div class="row row-cols-1 row-cols-md-3 g-3">
-      <div class="col">
+      <div class="col" v-show="totalBattData.enabled">
         <div class="card">
           <div class="card-header text-bg-success">{{ $t('invertertotalinfo.BatterySoc') }}</div>
           <div class="card-body card-text text-center">
@@ -105,12 +105,40 @@
           </div>
         </div>
       </div>
+      <div class="col" v-show="powerMeterData.enabled">
+        <div class="card">
+          <div class="card-header text-bg-success">{{ $t('invertertotalinfo.HomePower') }}</div>
+          <div class="card-body card-text text-center">
+            <h2>
+              {{ $n(powerMeterData.Power.v, 'decimal', {
+                minimumFractionDigits: powerMeterData.Power.d,
+                maximumFractionDigits: powerMeterData.Power.d
+              }) }}
+              <small class="text-muted">{{ powerMeterData.Power.u }}</small>
+            </h2>
+          </div>
+        </div>
+      </div>
+      <div class="col" v-show="huaweiData.enabled">
+        <div class="card">
+          <div class="card-header text-bg-success">{{ $t('invertertotalinfo.HuaweiPower') }}</div>
+          <div class="card-body card-text text-center">
+            <h2>
+              {{ $n(huaweiData.Power.v, 'decimal', {
+                minimumFractionDigits: huaweiData.Power.d,
+                maximumFractionDigits: huaweiData.Power.d
+              }) }}
+              <small class="text-muted">{{ huaweiData.Power.u }}</small>
+            </h2>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </template>
 
 <script lang="ts">
-import type { Battery, Total, Vedirect } from '@/types/LiveDataStatus';
+import type { Battery, Total, Vedirect, Huawei, PowerMeter } from '@/types/LiveDataStatus';
 import { defineComponent, type PropType } from 'vue';
 
 export default defineComponent({
@@ -118,6 +146,8 @@ export default defineComponent({
     totalData: { type: Object as PropType<Total>, required: true },
     totalVeData: { type: Object as PropType<Vedirect>, required: true },
     totalBattData: { type: Object as PropType<Battery>, required: true },
+    powerMeterData: { type: Object as PropType<Huawei>, required: true },
+    huaweiData: { type: Object as PropType<PowerMeter>, required: true },
   },
 });
 </script>

@@ -54,11 +54,17 @@ export interface Vedirect {
 
 export interface Huawei {
   enabled: boolean;
+  Power: ValueObject;
 }
 
 export interface Battery {
   enabled: boolean;
   soc: ValueObject;
+}
+
+export interface PowerMeter {
+  enabled: boolean;
+  Power: ValueObject;
 }
 
 export interface LiveData {
@@ -68,4 +74,5 @@ export interface LiveData {
     vedirect: Vedirect;
     huawei: Huawei;
     battery: Battery;
+    power_meter: PowerMeter;
 }
