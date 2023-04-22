@@ -1,36 +1,202 @@
 # OpenDTU-OnBattery
 
-This is a fork from the Hoymiles project [OpenDTU](https://github.com/tbnobody/OpenDTU). This project is still under development but is being used on a day to day basis as well.
+This is a fork from the Hoymiles project OpenDTU.
 
 ![GitHub tag (latest SemVer)](https://img.shields.io/github/v/tag/helgeerbe/OpenDTU?label=based%20on%20original%20OpenDTU)
 
-## Features
+<mark>This README is kept similar to the openDTU project for process reasons.</mark>
 
-* Hoymiles inverter support for live data and display of various inverter internal information. (Partial) support for multiple inverters.
-* MQTT support (with TLS) with partial Home Assistant MQTT Auto Discovery
-* Automatic inverter power control of a selected Hoymiles inverter to compensate the currently used energy in the household. 
-* Energy meter support with interface options to HTTP JSON based power meters (e.g. Tasmota), MQTT based power meters (e.g. Shelly 3EM) or SDM power meters.
-* Support for Victron MPPT charge controller using Ve.Direct. cf. Ve.direct: https://www.victronenergy.com/support-and-downloads/technical-information.
-* Generic voltage based battery support using Victron MPPT charge controller or Hoymiles inverter voltage values to start / stop inverter power output. (with load compensation)
-* Pylontech battery support via CAN bus interface. State of Charge reported by BMS is used to start / stop inverter power output. Battery data is exported via MQTT (no support for home assistant auto discovery). 
-* Support for Huawei R4850G2 power supply unit that can act as AC charging source. [Overview](https://www.beyondlogic.org/review-huawei-r4850g2-power-supply-53-5vdc-3kw/)
-* Other features from [OpenDTU](https://github.com/tbnobody/OpenDTU) maintained
+<mark>Please refer to the [openDTU-onBattery readme ](README_onBattery.md) for project documentation.</mark>
 
-## Hardware
 
-To get started with this project you will need to assemble a few hardware components that allow interfacing with the desired devices. What is needed depends on the use-case but may consist of:
+## Extensions to the original OpenDTU
 
-* ESP32 board that contains the CPU and WIFI connectivity
-* NRF24L01+ or CMT2300A radio board to interface with the inverter. Please check the list of the supported inverters below for the board needed.
-* 3.3V / 5V logic level shifter to interface with the Victron MPPT charge controller
-* SN65HVD230 CAN bus transceiver to interface with a Pylontech battery
-* MCP2515 SPI / CAN bus transceiver to interface with the Huawei AC PSU
-* Relais board + 3.3V / 5 V logic level shifter to switch the slot detect on the Huawei AC PSU
-* Display [Display](docs/Display.md)
+This project is still under development and adds following features:
 
-More detailed information on the hardware can be found in the [Hardware and flashing](docs/hardware_flash.md) document.
+* Support Victron's Ve.Direct protocol on the same chip (cable based serial interface!). Additional information about Ve.direct can be downloaded from https://www.victronenergy.com/support-and-downloads/technical-information.
+* Dynamically sets the Hoymiles power limited according to the currently used energy in the household. Needs an HTTP JSON based power meter (e.g. Tasmota), an MQTT based power meter like Shelly 3EM or an SDM power meter.
+* Battery support: Read the voltage from Victron MPPT charge controller or from the Hoymiles DC inputs and starts/stops the power producing based on configurable voltage thresholds
+* Voltage correction that takes the voltage drop because of the current output load into account (not 100% reliable calculation)
+* Can read the current solar panel power from the Victron MPPT and adjust the limiter accordingly to not save energy in the battery (for increased system efficiency). Increases the battery lifespan and reduces energy loses.
+* Settings can be configured in the UI
+* Pylontech Battery support (via CAN bus interface). Use the SOC for starting/stopping the power output and provide the battery data via MQTT (autodiscovery for home assistant is currently not supported). Pin Mapping is supported (default RX PIN 27, TX PIN 26). Actual no live view support for Pylontech Battery.
+* Huawei R4850G2 power supply unit that can act as AC charger. Supports status shown on the web interface and options to set voltage and current limits on the web interface and via MQTT. Connection is done using CAN bus (needs to be separate from Pylontech CAN bus) via SN65HVD230 interface.
 
-### Currently supported Inverters
+[![OpenDTU Build](https://github.com/tbnobody/OpenDTU/actions/workflows/build.yml/badge.svg)](https://github.com/tbnobody/OpenDTU/actions/workflows/build.yml)
+[![cpplint](https://github.com/tbnobody/OpenDTU/actions/workflows/cpplint.yml/badge.svg)](https://github.com/tbnobody/OpenDTU/actions/workflows/cpplint.yml)
+[![Yarn Linting](https://github.com/tbnobody/OpenDTU/actions/workflows/yarnlint.yml/badge.svg)](https://github.com/tbnobody/OpenDTU/actions/workflows/yarnlint.yml)
+
+## !! IMPORTANT UPGRADE NOTES !!
+
+If you are upgrading from a version before 15.03.2023 you have to upgrade the partition table of the ESP32. Please follow the [this](docs/UpgradePartition.md) documentation!
+
+## Background
+
+This project was started from [this](https://www.mikrocontroller.net/topic/525778) discussion (Mikrocontroller.net).
+It was the goal to replace the original Hoymiles DTU (Telemetry Gateway) with their cloud access. With a lot of reverse engineering the Hoymiles protocol was decrypted and analyzed.
+
+## Screenshots
+
+Several screenshots of the frontend can be found here: [Screenshots](docs/screenshots/README.md)
+
+## Builds
+
+Different builds from existing installations can be found here [Builds](docs/builds/README.md)
+Like to show your own build? Just send me a Pull Request.
+
+### Dynamic Power Limiter Interface
+![image](https://user-images.githubusercontent.com/59169507/222155765-9fff47a4-8ffa-42cf-8671-6359288e0cab.png)
+
+####
+Power Limiter States
+![PowerLimiterInverterStates](https://github.com/helgeerbe/OpenDTU-OnBattery/blob/development/docs/PowerLimiterInverterStates.png)
+
+### Web-Live-Interface:
+![image](https://user-images.githubusercontent.com/59169507/187224107-4e0d0cab-2e1b-4e47-9410-a49f80aa6789.png)
+
+### REST-API (/api/verdirectlivedata/status):
+````JSON
+{
+"data_age":0,
+"age_critical":false,
+"PID":"SmartSolar MPPT 100|30",
+"SER":"XXX",
+"FW":"159",
+"LOAD":"ON",
+"CS":"Bulk",
+"ERR":"No error",
+"OR":"Not off",
+"MPPT":"MPP Tracker active",
+"HSDS":{"v":46,"u":"Days"},
+"V":{"v":26.36,"u":"V"},
+"I":{"v":3.4,"u":"A"},
+"VPV":{"v":37.13,"u":"V"},
+"PPV":{"v":93,"u":"W"},
+"H19":{"v":83.16,"u":"kWh"},
+"H20":{"v":1.39,"u":"kWh"},
+"H21":{"v":719,"u":"W"},
+"H22":{"v":1.43,"u":"kWh"},
+"H23":{"v":737,"u":"W"}
+}
+````
+
+### Home Assistant auto discovery
+
+![image](https://user-images.githubusercontent.com/59169507/217558862-a83846c5-6070-43cd-9a0b-90a8b2e2e8c6.png)
+
+### Device Manager
+
+Add Victron TX / RX PINs to the device manager
+
+````json
+[
+    {
+        "name": "My very special esp32 test board",
+        "victron": {
+            "rx": 22,
+            "tx": 21
+        }
+    }
+]
+````
+
+### MQTT Topics
+
+The base topic, as configured in the web GUI is prepended to all follwing topics.
+Serial will be replaced with the serial number of the MPPT device.
+
+## MPPT topics
+
+| Topic                                   | R / W | Description                                          | Value / Unit               |
+| --------------------------------------- | ----- | ---------------------------------------------------- | -------------------------- |
+| victron/[serial]/PID                    | R     | Product description                                  | text                       |
+| victron/[serial]/SER                    | R     | Serial number                                        | text                       |
+| victron/[serial]/FW                     | R     | Firmware number                                      | int                        |
+| victron/[serial]/LOAD                   | R     | Load output state                                    | ON /  OFF                  |
+| victron/[serial]/CS                     | R     | State of operation                                   | text e. g. "Bulk"          |
+| victron/[serial]/ERR                    | R     | Error code                                           | text e. g. "No error"      |
+| victron/[serial]/OR                     | R     | Off reasen                                           | text e. g. "Not off"       |
+| victron/[serial]/MPPT                   | R     | Tracker operation mode                               | text e. g. "MPP Tracker active" |
+| victron/[serial]/HSDS                   | R     | Day sequence number (0...364)                        | int in days                |
+
+## Battery specific topics
+
+| Topic                                   | R / W | Description                                          | Value / Unit               |
+| --------------------------------------- | ----- | ---------------------------------------------------- | -------------------------- |
+| victron/[serial]/V                      | R     | Voltage                                              | Volt (V)                   |
+| victron/[serial]/I                      | R     | Current                                              | Ampere (A)                 |
+
+## Panel specific topics
+
+| Topic                                   | R / W | Description                                          | Value / Unit               |
+| --------------------------------------- | ----- | ---------------------------------------------------- | -------------------------- |
+| victron/[serial]/VPV                    | R     | Voltage                                              | Volt (V)                   |
+| victron/[serial]/PPV                    | R     | Power                                                | Watt (W)                   |
+| victron/[serial]/H19                    | R     | Yield total (user resettable counter)                | Kilo watt hours (kWh)      |
+| victron/[serial]/H20                    | R     | Yield today                                          | Kilo watt hours (kWh)      |
+| victron/[serial]/H21                    | R     | Maximum power today                                  | Watt (W)                   |
+| victron/[serial]/H22                    | R     | Yield yesterday                                      | Kilo watt hours (kWh)      |
+| victron/[serial]/H23                    | R     | Maximum power yesterday                              | Watt (W)                   |
+
+## Power Meter (Shelly 3EM) topics
+
+Topics for 3 phases of a power meter is configurable. Given is an example for the Shelly 3EM. Positive values mean power import, negative values mean power export to the grid.
+
+| Topic                                   | R / W | Description                                          | Value / Unit               |
+| --------------------------------------- | ----- | ---------------------------------------------------- | -------------------------- |
+| shellies/[Shelly Name]/emeter/0/power   | w     | Power Phase 0                                         | Watt (W)                    |
+| shellies/[Shelly Name]/emeter/1/power   | w     | Power Phase 1                                         | Watt (W)                    |
+| shellies/[Shelly Name]/emeter/2/power   | w     | Power Phase 2                                         | Watt (W)                   |
+
+## Pylontech Battery topics
+
+| Topic                                   | R / W | Description                                          | Value / Unit               |
+| --------------------------------------- | ----- | ---------------------------------------------------- | -------------------------- |
+| battery/settings/chargeVoltage         | R     | Voltage                                              | Volt (V)                   |
+| battery/settings/chargeCurrentLimitation | R     |                                               |                    |
+| battery/settings/dischargeCurrentLimitation | R     |                                               |                |
+| battery/stateOfCharge         | R     |                                               |                   |
+| battery/stateOfHealth        | R     |                                               |                   |
+| battery/voltage         | R     |                                               |                   |
+| battery/current         | R     |                                               |                   |
+| battery/temperature"         | R     |                                               |                   |
+| battery/alarm/overCurrentDischarge        | R     |                                               |                   |
+| battery/alarm/underTemperature        | R     |                                               |                    |
+| battery/alarm/overTemperature         | R     |                                               |                  |
+| battery/alarm/underVoltage         | R     |                                               |                   |
+| battery/alarm/overVoltage         | R     |                                               |                  |
+| battery/alarm/bmsInternal         | R     |                                               |                   |
+| battery/alarm/overCurrentCharge        | R     |                                               |                   |
+| battery/warning/highCurrentDischarge     | R     |                                               |                   |
+| battery/warning/lowTemperature        | R     |                                               |                    |
+| battery/warning/highTemperature        | R     |                                               |                    |
+| battery/warning/lowVoltage         | R     |                                               |                  |
+| battery/warning/highVoltage         | R     |                                               |                    |
+| battery/warning/bmsInternal        | R     |                                               |                   |
+| battery/manufacturer   | R     |                                               |                    |
+| battery/charging/chargeEnabled        | R     |                                               |                    |
+| battery/charging/dischargeEnabled        | R     |                                               |                    |
+| battery/charging/chargeImmediately       | R     |                                               |                    |
+
+## Huawei AC charger topics
+| Topic                                   | R / W | Description                                          | Value / Unit               |
+| --------------------------------------- | ----- | ---------------------------------------------------- | -------------------------- |
+| huawei/cmd/limit_online_voltage         | W     | Online voltage (i.e. CAN bus connected)              | Volt (V)                   |
+| huawei/cmd/limit_online_current         | W     | Online current (i.e. CAN bus connected)              | Ampere (A)                 |
+| huawei/cmd/power                        | W     | Controls output pin GPIO to drive solid state relais | 0 / 1                      |
+| huawei/data_age                         | R     | How old the data is                                  | Seconds                    |
+| huawei/input_voltage                    | R     | Input voltage                                        | Volt (V)                   |
+| huawei/input_current                    | R     | Input current                                        | Ampere (A)                 |
+| huawei/input_power                      | R     | Input power                                          | Watt (W)                   |
+| huawei/output_voltage                   | R     | Output voltage                                       | Volt (V)                   |
+| huawei/output_current                   | R     | Output current                                       | Ampere (A)                 |
+| huawei/max_output_current               | R     | Maximum output current (set using the online limit)  | Ampere (A)                 |
+| huawei/output_power                     | R     | Output power                                         | Watt (W)                   |
+| huawei/input_temp                       | R     | Input air temperature                                | °C                         |
+| huawei/output_temp                      | R     | Output air temperature                               | °C                         |
+| huawei/efficiency                       | R     | Efficiency                                           | Percentage                 |
+
+## Currently supported Inverters
 
 | Model               | Required RF Module | DC Inputs | MPP-Tracker | AC Phases |
 | --------------------| ------------------ | --------- | ----------- | --------- |
@@ -66,38 +232,267 @@ More detailed information on the hardware can be found in the [Hardware and flas
 | TSUN TSOL-M1600     | NRF24L01+          | 4         | 2           | 1         |
 
 **TSUN compatibility remark:**
-Compatibility with OpenDTU is most likely related to the serial number of the inverter. Current findings indicate that TSUN inverters with a serial number starting with "11" are supported, whereby inverters with a serial number starting with "10" are not.
+Compatibility with OpenDTU is most likly related to the serial number of the inverter. Current findings indicate that TSUN inverters with a serial number starting with "11" are supported, whereby inverters with a serial number starting with "10" are not.
 
+## Features for end users
 
-## Screenshots
+* Read live data from inverter
+* Show inverters internal event log
+* Show inverter information like firmware version, firmware build date, hardware revision and hardware version
+* Show and set the current inverter limit
+* Function to turn the inverter off and on
+* Uses ESP32 microcontroller and NRF24L01+
+* Multi-Inverter support
+* MQTT support (with TLS)
+* Home Assistant MQTT Auto Discovery support
+* Nice and fancy WebApp with visualization of current data
+* Firmware upgrade using the web UI
+* Default source supports up to 10 inverters
+* Time zone support
+* Ve.Direct interface (via web-interface, REST-api, or MQTT)
+* Ethernet support
+* Prometheus API endpoint (/api/prometheus/metrics)
+* English, german and french web interface
+* Displays (SSD1306, SH1106, PCD8544)
+* Status LEDs
+* Konfiguration management (export / import configurations)
+* Dark Theme
 
-Several screenshots of the frontend can be found here: [Screenshots](docs/screenshots/README.md)
+## Features for developers
 
-## Configuration and usage
+* The microcontroller part
+  * Build with Arduino PlatformIO Framework for the ESP32
+  * Uses a fork of [ESPAsyncWebserver](https://github.com/yubox-node-org/ESPAsyncWebServer) and [espMqttClient](https://github.com/bertmelis/espMqttClient)
 
-### First configuration
+* The WebApp part
+  * Build with [Vue.js](https://vuejs.org)
+  * Source is written in TypeScript
 
-* After the [initial flashing](docs/hardware_flash.md#flashing-and-starting-up) of the microcontroller, an Access Point called "OpenDTU-*" is opened. The default password is "openDTU42".
+## Breaking changes
+
+Generated using: `git log --date=short --pretty=format:"* %h%x09%ad%x09%s" | grep BREAKING`
+
+```code
+* 59f43a8       2023-04-17      BREAKING CHANGE: Web API Endpoint /api/devinfo/status requires GET parameter inv=
+* 318136d       2023-03-15      BREAKING CHANGE: Updated partition table: Make sure you have a configuration backup and completly reflash the device!
+* 3b7aef6       2023-02-13      BREAKING CHANGE: Web API!
+* d4c838a       2023-02-06      BREAKING CHANGE: Prometheus API!
+* daf847e       2022-11-14      BREAKING CHANGE: Removed deprecated config parsing method
+* 69b675b       2022-11-01      BREAKING CHANGE: Structure WebAPI /api/livedata/status changed
+* 27ed4e3       2022-10-31      BREAKING: Change power factor from percent value to value between 0 and 1
+```
+
+## Hardware you need
+
+### ESP32 board
+
+For ease of use, buy a "ESP32 DEVKIT DOIT" or "ESP32 NodeMCU Development Board" with an ESP32-S3 or ESP-WROOM-32 chipset on it.
+
+Sample Picture:
+
+![NodeMCU-ESP32](docs/nodemcu-esp32.png)
+
+Also supported: Board with Ethernet-Connector and Power-over-Ethernet [Olimex ESP32-POE](https://www.olimex.com/Products/IoT/ESP32/ESP32-POE/open-source-hardware)
+
+### NRF24L01+ radio board (See inverter table above for supported inverters)
+
+The PLUS sign is IMPORTANT! There are different variants available, with antenna on the printed circuit board or external antenna.
+
+Sample picture:
+
+![nrf24l01plus](docs/nrf24l01plus.png)
+
+Buy your hardware from a trusted source, at best from a dealer/online shop in your country where you have support and the right to return non-functional hardware.
+When you want to buy from Amazon, AliExpress, eBay etc., take note that there is a lot of low-quality or fake hardware offered. Read customer comments and ratings carefully!
+
+A heavily incomplete list of trusted hardware shops in germany is:
+
+* [AZ-Delivery](https://www.az-delivery.de/)
+* [Makershop](https://www.makershop.de/)
+* [Berrybase](https://www.berrybase.de/)
+
+This list is for your convenience only, the project is not related to any of these shops.
+
+### CMT2300A radio board  (See inverter table above for supported inverters)
+
+It is important to get a module which supports SPI communicatiton. The following modules are currently supported:
+
+* EBYTE E49-900M20S
+
+The CMT2300A uses 3-Wire half duplex SPI communication. Due to this fact it currently requires a separate SPI bus. If you want to run the CMT2300A module on the same ESP32 as a NRF24L01+ module or a PCD8544 display make sure you get a ESP which supports 2 SPI busses. Currently the SPI bus host is hardcoded to number 2. This may change in future.
+
+### Power supply
+
+Use a power suppy with 5 V and 1 A. The USB cable connected to your PC/Notebook may be powerful enough or may be not.
+
+## Wiring up the NRF24L01+ module
+
+### Schematic
+
+![Schematic](docs/Wiring_ESP32_Schematic.png)
+
+### Symbolic view
+
+![Symbolic](docs/Wiring_ESP32_Symbol.png)
+
+### Change pin assignment
+
+Its possible to change all the pins of the NRF24L01+ module, the Display, the LED etc.
+The recommend way to change the pin assignment is by creating a custom [device profile](docs/DeviceProfiles.md).
+It is also possible to create a custom environment and compile the source yourself. This can be achieved by copying one of the [env:....] sections from 'platformio.ini' to 'platformio_override.ini' and editing the 'platformio_override.ini' file and add/change one or more of the following lines to the 'build_flags' parameter:
+
+```makefile
+-DHOYMILES_PIN_MISO=19
+-DHOYMILES_PIN_MOSI=23
+-DHOYMILES_PIN_SCLK=18
+-DHOYMILES_PIN_IRQ=16
+-DHOYMILES_PIN_CE=4
+-DHOYMILES_PIN_CS=5
+-DVICTRON_PIN_TX=21
+-DVICTRON_PIN_RX=22
+-DPYLONTECH_PIN_RX=27
+-DPYLONTECH_PIN_TX=14
+```
+
+It is recommended to make all changes only in the  'platformio_override.ini', this is your personal copy.
+
+## Flashing and starting up
+
+### with Visual Studio Code
+
+* Install [Visual Studio Code](https://code.visualstudio.com/download) (from now named "vscode")
+* In Visual Studio Code, install the [PlatformIO Extension](https://marketplace.visualstudio.com/items?itemName=platformio.platformio-ide)
+* Install git and enable git in vscode - [git download](https://git-scm.com/downloads/) - [Instructions](https://www.jcchouinard.com/install-git-in-vscode/)
+* Clone this repository (you really have to clone it, don't just download the ZIP file. During the build process the git hash gets embedded into the firmware. If you download the ZIP file a build error will occur): Inside vscode open the command palette by pressing `CTRL` + `SHIFT` + `P`. Enter `git clone`, add the repository-URL `https://github.com/tbnobody/OpenDTU`. Next you have to choose (or create) a target directory.
+* In vscode, choose File --> Open Folder and select the previously downloaded source code. (You have to select the folder which contains the "platformio.ini" and "platformio_override.ini" file)
+* Adjust the COM port in the file "platformio_override.ini" for your USB-to-serial-converter. It occurs twice:
+  * upload_port
+  * monitor_port
+* Select the arrow button in the blue bottom status bar (PlatformIO: Upload) to compile and upload the firmware. During the compilation, all required libraries are downloaded automatically.
+* Under Linux, if the upload fails with error messages "Could not open /dev/ttyUSB0, the port doesn't exist", you can check via ```ls -la /dev/tty*``` to which group your port belongs to, and then add your user this group via ```sudo adduser <yourusername> dialout``` (if you are using ```arch-linux``` use: ```sudo gpasswd -a <yourusername> uucp```, this method requires a logout/login of the affected user).
+* There are two videos showing these steps:
+  * [Git Clone and compilation](https://youtu.be/9cA_esv3zeA)
+  * [Full installation and compilation](https://youtu.be/xs6TqHn7QWM)
+
+### on the commandline with PlatformIO Core
+
+* Install [PlatformIO Core](https://platformio.org/install/cli)
+* Clone this repository (you really have to clone it, don't just download the ZIP file. During the build process the git hash gets embedded into the firmware. If you download the ZIP file a build error will occur)
+* Adjust the COM port in the file "platformio_override.ini". It occurs twice:
+  * upload_port
+  * monitor_port
+* build: `platformio run -e generic`
+* upload to esp module: `platformio run -e generic -t upload`
+* other options:
+  * clean the sources:  `platformio run -e generic -t clean`
+  * erase flash: `platformio run -e generic -t erase`
+
+### using the pre-compiled .bin files
+
+The pre-compiled files can be found on the [github page](https://github.com/tbnobody/OpenDTU) in the tab "Actions" and the sub menu "OpenDTU Build". Just choose the latest build from the master branch (search for "master" in the blue font text but click on the white header text!). You need to be logged in with your github account to download the files.
+Use a ESP32 flash tool of your choice (see next chapter) and flash the `.bin` files to the right addresses:
+
+| Address  | File                   |
+| ---------| ---------------------- |
+| 0x1000   | bootloader.bin         |
+| 0x8000   | partitions.bin         |
+| 0xe000   | boot_app0.bin          |
+| 0x10000  | opendtu-*.bin          |
+
+For further updates you can just use the web interface and upload the `opendtu-*.bin` file.
+
+#### Flash with esptool.py (Linux)
+
+```bash
+esptool.py --port /dev/ttyUSB0 --chip esp32 --before default_reset --after hard_reset \
+  write_flash --flash_mode dout --flash_freq 40m --flash_size detect \
+  0x1000 bootloader.bin \
+  0x8000 partitions.bin \
+  0xe000 boot_app0.bin \
+  0x10000 opendtu-generic.bin
+```
+
+#### Flash with Espressif Flash Download Tool (Windows)
+
+[Download link](https://www.espressif.com/en/support/download/other-tools)
+
+* On startup, select Chip Type -> "ESP32" / WorkMode -> "Develop"
+* Prepare all settings (see picture). Make sure to uncheck the `DoNotChgBin` option. Otherwise you may get errors like "invalid header".
+* ![flash tool image](docs/esp32_flash_download_tool.png)
+* Press "Erase" button on screen. Look into the terminal window, you should see dots appear. Then press  the "Boot" button on the ESP32 board. Wait for "FINISH" to see if flashing/erasing is done.
+* To program, press "Start" on screen, then the "Boot" button.
+* When flashing is complete (FINISH appears) then press the Reset button on the ESP32 board (or powercycle ) to start the OpenDTU application.
+
+#### Flash with ESP_Flasher (Windows)
+
+Users report that [ESP_Flasher](https://github.com/Jason2866/ESP_Flasher/releases/) is suitable for flashing OpenDTU on Windows.
+
+#### Flash with [ESP_Flasher](https://espressif.github.io/esptool-js/) - web version
+
+It is also possible to flash it via the web tools which might be more convenient and is platform independent.
+
+## First configuration
+
+* After the initial flashing of the microcontroller, an Access Point called "OpenDTU-*" is opened. The default password is "openDTU42".
 * Use a web browser to open the address [http://192.168.4.1](http://192.168.4.1)
 * Navigate to Settings --> Network Settings and enter your WiFi credentials. The username to access the config menu is "admin" and the password the same as for accessing the Access Point (default: "openDTU42").
 * OpenDTU then simultaneously connects to your WiFi AP with these credentials. Navigate to Info --> Network and look into section "Network Interface (Station)" for the IP address received via DHCP.
 * If your WiFi AP uses an allow-list for MAC-addresses, please be aware that the ESP32 has two different MAC addresses for its AP and client modes, they are also listed at Info --> Network.
 * When OpenDTU is connected to a configured WiFI AP, the "OpenDTU-*" Access Point is closed after 3 minutes.
 * OpenDTU needs access to a working NTP server to get the current date & time. Both are sent to the inverter with each request. Default NTP server is pool.ntp.org. If your network has different requirements please change accordingly (Settings --> NTP Settings).
-* Activate Ve.direct, Battery and the AC Charger according to the available hardware 
-* Configure a Power Meter to provide a data source for the current consumption
-* Configure the Dynamic Power Limiter according to the used battery. Documentation about the power limiter interface and states can be found below.
-* If desired connect to a home automation system using MQTT or the Webapi. 
-  * A documentation of all available MQTT Topics can be found here: [MQTT Documentation](docs/MQTT_Topics.md)
-  * A documentation of the Web API can be found here: [Web-API Documentation](docs/Web-API.md)
-  * Home Assistant auto discovery is supported. [Example image](https://user-images.githubusercontent.com/59169507/217558862-a83846c5-6070-43cd-9a0b-90a8b2e2e8c6.png)
+* Add your inverter in the inverter settings (Settings --> Inverter Settings)
 
-### Dynamic Power Limiter Interface
-![image](https://user-images.githubusercontent.com/59169507/222155765-9fff47a4-8ffa-42cf-8671-6359288e0cab.png)
+## Flashing an Update using "Over The Air" OTA Update
 
-#### Power Limiter States
-![PowerLimiterInverterStates](https://github.com/helgeerbe/OpenDTU-OnBattery/blob/development/docs/PowerLimiterInverterStates.png)
+Once you have your OpenDTU running and connected to WLAN, you can do further updates through the web interface.
+Navigate to Settings --> Firmware upgrade and press the browse button. Select the firmware file from your local computer.
 
+You'll find the firmware file (after a successful build process) under `.pio/build/generic/firmware.bin`.
+
+If you downloaded a precompiled zip archive, unpack it and choose `opendtu-generic.bin`.
+
+After the successful upload, the OpenDTU immediately restarts into the new firmware.
+
+## MQTT Topic Documentation
+
+A documentation of all available MQTT Topics can be found here: [MQTT Documentation](docs/MQTT_Topics.md)
+
+## Web API Documentation
+
+A documentation of the Web API can be found here: [Web-API Documentation](docs/Web-API.md)
+
+## Available cases
+
+* <https://www.thingiverse.com/thing:5435911>
+* <https://www.printables.com/model/293003-sol-opendtu-esp32-nrf24l01-case>
+* <https://www.thingiverse.com/thing:5661780>
+* <https://www.thingiverse.com/thing:5632374>
+* <https://www.thingiverse.com/thing:5852233>
+* <https://www.printables.com/model/377994-opendtu-pcb-box-for-the-wider-board>
+* <https://www.printables.com/model/376840-esp32-ahoy-opendtu-pcb-housing>
+
+## Available layouts for printed circuit boards
+
+* [BreakoutBoard - sample printed circuit board for OpenDTU and Ahoy](https://github.com/dokuhn/openDTU-BreakoutBoard)
+* [Board for OpenDTU with Display](https://github.com/SteffMUC/openDTU_wDisplay2)
+* [OpenDTU PCB mit Display](https://github.com/turrican944/OpenDTU-PCB)
+* [PCB for OpenDTU in Cable Branchbox](https://github.com/plewka/ESP-Solar_OpenDTU)
+
+## Building
+
+* Building the WebApp
+  * The WebApp can be build using yarn
+
+    ```bash
+    cd webapp
+    yarn install
+    yarn build
+    ```
+
+  * The updated output is placed in the 'webapp_dist' directory
+  * It is only necessary to build the webapp when you made changes to it
+* Building the microcontroller firmware
+  * Visual Studio Code with the PlatformIO Extension is required for building
 
 ## Troubleshooting
 
@@ -113,59 +508,6 @@ Several screenshots of the frontend can be found here: [Screenshots](docs/screen
 * If your problem persists, check the  [Issues on Github](https://github.com/tbnobody/OpenDTU/issues). Please inspect not only the open issues, also the closed issues contain useful information.
 * Another source of information are the [Discussions](https://github.com/tbnobody/OpenDTU/discussions/)
 * When flashing with VSCode Plattform.IO fails and also with ESPRESSIF tool a demo bin file cannot be flashed to the ESP32 with error message "A fatal error occurred: MD5 of file does not match data in flash!" than un-wire/unconnect ESP32 from the NRF24L01+ board. Try to flash again and rewire afterwards.
-
-## Background
-
-This project was started from [this](https://www.mikrocontroller.net/topic/525778) discussion (Mikrocontroller.net).
-It was the goal to replace the original Hoymiles DTU (Telemetry Gateway) with their cloud access. With a lot of reverse engineering the Hoymiles protocol was decrypted and analyzed.
-
-## Features for developers
-
-### Status
-
-[![OpenDTU Build](https://github.com/tbnobody/OpenDTU/actions/workflows/build.yml/badge.svg)](https://github.com/tbnobody/OpenDTU/actions/workflows/build.yml)
-[![cpplint](https://github.com/tbnobody/OpenDTU/actions/workflows/cpplint.yml/badge.svg)](https://github.com/tbnobody/OpenDTU/actions/workflows/cpplint.yml)
-[![Yarn Linting](https://github.com/tbnobody/OpenDTU/actions/workflows/yarnlint.yml/badge.svg)](https://github.com/tbnobody/OpenDTU/actions/workflows/yarnlint.yml)
-
-### Core technologies used
-
-* The microcontroller part
-  * Build with Arduino PlatformIO Framework for the ESP32
-  * Uses a fork of [ESPAsyncWebserver](https://github.com/yubox-node-org/ESPAsyncWebServer) and [espMqttClient](https://github.com/bertmelis/espMqttClient)
-
-* The WebApp part
-  * Build with [Vue.js](https://vuejs.org)
-  * Source is written in TypeScript
-
-### Breaking changes
-
-Generated using: `git log --date=short --pretty=format:"* %h%x09%ad%x09%s" | grep BREAKING`
-
-```code
-* 59f43a8       2023-04-17      BREAKING CHANGE: Web API Endpoint /api/devinfo/status requires GET parameter inv=
-* 318136d       2023-03-15      BREAKING CHANGE: Updated partition table: Make sure you have a configuration backup and completly reflash the device!
-* 3b7aef6       2023-02-13      BREAKING CHANGE: Web API!
-* d4c838a       2023-02-06      BREAKING CHANGE: Prometheus API!
-* daf847e       2022-11-14      BREAKING CHANGE: Removed deprecated config parsing method
-* 69b675b       2022-11-01      BREAKING CHANGE: Structure WebAPI /api/livedata/status changed
-* 27ed4e3       2022-10-31      BREAKING: Change power factor from percent value to value between 0 and 1
-```
-
-### Building
-
-* Building the WebApp
-  * The WebApp can be build using yarn
-
-    ```bash
-    cd webapp
-    yarn install
-    yarn build
-    ```
-
-  * The updated output is placed in the 'webapp_dist' directory
-  * It is only necessary to build the webapp when you made changes to it
-* Building the microcontroller firmware
-  * Visual Studio Code with the PlatformIO Extension is required for building
 
 ## Related Projects
 
