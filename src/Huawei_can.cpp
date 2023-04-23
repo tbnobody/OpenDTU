@@ -22,7 +22,7 @@ void HuaweiCanClass::init(uint8_t huawei_miso, uint8_t huawei_mosi, uint8_t huaw
         return;
     }
 
-    spi = new SPIClass(VSPI);
+    spi = new SPIClass(HSPI);
     spi->begin(huawei_clk, huawei_miso, huawei_mosi, huawei_cs);
     pinMode(huawei_cs, OUTPUT);
     digitalWrite(huawei_cs, HIGH);
