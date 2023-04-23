@@ -149,14 +149,6 @@ int32_t PowerLimiterClass::calcPowerLimit(std::shared_ptr<InverterAbstract> inve
         return config.PowerLimiter_LowerPowerLimit;
     }
 
-    // check if grid power consumption is within the limits of the target consumption + hysteresis
-    if (newPowerLimit >= (config.PowerLimiter_TargetPowerConsumption - config.PowerLimiter_TargetPowerConsumptionHysteresis) &&
-        newPowerLimit <= (config.PowerLimiter_TargetPowerConsumption + config.PowerLimiter_TargetPowerConsumptionHysteresis)) {
-          // The values have not changed much. We just use the old setting
-          MessageOutput.println("[PowerLimiterClass::loop] reusing old limit");
-          return _lastRequestedPowerLimit;
-    }
-
     if (config.PowerLimiter_IsInverterBehindPowerMeter) {
         // If the inverter the behind the power meter (part of measurement),
         // the produced power of this inverter has also to be taken into account.
@@ -165,6 +157,16 @@ int32_t PowerLimiterClass::calcPowerLimit(std::shared_ptr<InverterAbstract> inve
         float acPower = inverter->Statistics()->getChannelFieldValue(TYPE_AC, (ChannelNum_t) config.PowerLimiter_InverterChannelId, FLD_PAC); 
         newPowerLimit += static_cast<int>(acPower);
     }
+    
+    // check if grid power consumption is within the limits of the target consumption + hysteresis
+    if (newPowerLimit >= (config.PowerLimiter_TargetPowerConsumption - config.PowerLimiter_TargetPowerConsumptionHysteresis) &&
+        newPowerLimit <= (config.PowerLimiter_TargetPowerConsumption + config.PowerLimiter_TargetPowerConsumptionHysteresis)) {
+          // The values have not changed much. We just use the old setting
+          MessageOutput.println("[PowerLimiterClass::loop] reusing old limit");
+          return _lastRequestedPowerLimit;
+    }
+
+
 
     float efficency = inverter->Statistics()->getChannelFieldValue(TYPE_AC, (ChannelNum_t) config.PowerLimiter_InverterChannelId, FLD_EFF);
     int32_t victronChargePower = this->getDirectSolarPower();
