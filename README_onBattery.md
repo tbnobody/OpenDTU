@@ -113,7 +113,8 @@ Other settings are:
 * Target power consumption and hysteresis set the power range that can be consumed from the grid.
 * Power limits control the min / max limits of the inverter
 * Inverter is behind power meter. Select this if your inverter power is measured by the power meter. This is typically the case.
-* Battery start and stop threshold can be configured using voltage and / or state of charge values. Stage of charge values require a Pylontech battery at this point.
+* Battery start and stop threshold can be configured using voltage and / or state of charge values. Stage of charge values requires a Pylontech battery at this point.
+* A Battery full solar passthrough threshold can be configured using voltage or state of charge value. Stage of charge values requires a Pylontech battery at this point. The option can be used if the battery is full and will steer the inverter according to solar power reported by the Victron MPPT Solar Charger. 
 
 ![image](https://user-images.githubusercontent.com/59169507/222155765-9fff47a4-8ffa-42cf-8671-6359288e0cab.png)
 

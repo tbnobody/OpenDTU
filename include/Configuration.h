@@ -151,6 +151,9 @@ struct CONFIG_T {
     float PowerLimiter_VoltageStopThreshold;
     float PowerLimiter_VoltageLoadCorrectionFactor;
     int8_t PowerLimiter_RestartHour;
+    uint32_t PowerLimiter_FullSolarPassThroughSoc;
+    float PowerLimiter_FullSolarPassThroughStartVoltage;
+    float PowerLimiter_FullSolarPassThroughStopVoltage;
 
     bool Battery_Enabled;
     bool Huawei_Enabled;

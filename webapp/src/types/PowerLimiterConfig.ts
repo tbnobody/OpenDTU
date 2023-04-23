@@ -15,4 +15,7 @@ export interface PowerLimiterConfig {
     voltage_stop_threshold: number;
     voltage_load_correction_factor: number;
     inverter_restart_hour: number;
+    full_solar_passthrough_soc: number;
+    full_solar_passthrough_start_voltage: number;
+    full_solar_passthrough_stop_voltage: number;
 }

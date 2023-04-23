@@ -53,6 +53,9 @@ void WebApiPowerLimiterClass::onStatus(AsyncWebServerRequest* request)
     root[F("voltage_stop_threshold")] = static_cast<int>(config.PowerLimiter_VoltageStopThreshold * 100 +0.5) / 100.0;;
     root[F("voltage_load_correction_factor")] = config.PowerLimiter_VoltageLoadCorrectionFactor;
     root[F("inverter_restart_hour")] = config.PowerLimiter_RestartHour;
+    root[F("full_solar_passthrough_soc")] = config.PowerLimiter_FullSolarPassThroughSoc;
+    root[F("full_solar_passthrough_start_voltage")] = static_cast<int>(config.PowerLimiter_FullSolarPassThroughStartVoltage * 100 + 0.5) / 100.0;
+    root[F("full_solar_passthrough_stop_voltage")] = static_cast<int>(config.PowerLimiter_FullSolarPassThroughStopVoltage * 100 + 0.5) / 100.0;
 
     response->setLength();
     request->send(response);
@@ -120,7 +123,7 @@ void WebApiPowerLimiterClass::onAdminPost(AsyncWebServerRequest* request)
 
     CONFIG_T& config = Configuration.get();
     config.PowerLimiter_Enabled = root[F("enabled")].as<bool>();
-    PowerLimiter.setDisable(false);  // User input clears the PL internal disable flag
+    PowerLimiter.setMode(PL_MODE_ENABLE_NORMAL_OP);  // User input sets PL to normal operation
     config.PowerLimiter_SolarPassThroughEnabled = root[F("solar_passtrough_enabled")].as<bool>();
     config.PowerLimiter_BatteryDrainStategy= root[F("battery_drain_strategy")].as<uint8_t>();
     config.PowerLimiter_IsInverterBehindPowerMeter = root[F("is_inverter_behind_powermeter")].as<bool>();
@@ -138,6 +141,12 @@ void WebApiPowerLimiterClass::onAdminPost(AsyncWebServerRequest* request)
     config.PowerLimiter_VoltageStopThreshold = static_cast<int>(config.PowerLimiter_VoltageStopThreshold * 100) / 100.0;
     config.PowerLimiter_VoltageLoadCorrectionFactor = root[F("voltage_load_correction_factor")].as<float>();
     config.PowerLimiter_RestartHour = root[F("inverter_restart_hour")].as<int8_t>();
+    config.PowerLimiter_FullSolarPassThroughSoc = root[F("full_solar_passthrough_soc")].as<uint32_t>();
+    config.PowerLimiter_FullSolarPassThroughStartVoltage = static_cast<int>(root[F("full_solar_passthrough_start_voltage")].as<float>() * 100) / 100.0;
+    config.PowerLimiter_FullSolarPassThroughStopVoltage = static_cast<int>(root[F("full_solar_passthrough_stop_voltage")].as<float>() * 100) / 100.0;
+
+
+
     Configuration.write();
 
     PowerLimiter.calcNextInverterRestart();

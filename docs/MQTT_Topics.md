@@ -153,6 +153,7 @@ cmd topics are used to set values. Status topics are updated from values set in 
 | battery/charging/chargeImmediately      | R     | Charge immediately flag                              | 0 / 1                      |
 
 ### Huawei AC charger topics
+
 | Topic                                   | R / W | Description                                          | Value / Unit               |
 | --------------------------------------- | ----- | ---------------------------------------------------- | -------------------------- |
 | huawei/cmd/limit_online_voltage         | W     | Online voltage (i.e. CAN bus connected)              | Volt (V)                   |
@@ -169,3 +170,10 @@ cmd topics are used to set values. Status topics are updated from values set in 
 | huawei/input_temp                       | R     | Input air temperature                                | °C                         |
 | huawei/output_temp                      | R     | Output air temperature                               | °C                         |
 | huawei/efficiency                       | R     | Efficiency                                           | Percentage                 |
+
+### Power Limiter topics
+
+| Topic                                   | R / W | Description                                          | Value / Unit               |
+| --------------------------------------- | ----- | ---------------------------------------------------- | -------------------------- |
+| powerlimiter/cmd/mode                   | W     | Power Limiter operation mode                         | 0 - Normal operation, 1 - Fully disable, 2 - Solar Passthrough only |
+| powerlimiter/status/mode                | R     | Get Power Limiter operation mode                     | see above                  |

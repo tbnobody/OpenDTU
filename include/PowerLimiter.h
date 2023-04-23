@@ -12,6 +12,11 @@
 #define PL_UI_STATE_USE_SOLAR_ONLY 2
 #define PL_UI_STATE_USE_SOLAR_AND_BATTERY 3
 
+#define PL_MODE_ENABLE_NORMAL_OP 0
+#define PL_MODE_FULL_DISABLE 1
+#define PL_MODE_SOLAR_PT_ONLY 2
+
+
 typedef enum {
     SHUTDOWN = 0, 
     ACTIVE
@@ -29,8 +34,8 @@ public:
     void loop();
     uint8_t getPowerLimiterState();
     int32_t getLastRequestedPowewrLimit();
-    void setDisable(bool disable);
-    bool getDisable();
+    void setMode(uint8_t mode);
+    bool getMode();
     void calcNextInverterRestart();
 
 private:
@@ -38,10 +43,11 @@ private:
     int32_t _lastRequestedPowerLimit = 0;
     uint32_t _lastLimitSetTime = 0;
     plStates _plState; 
-    bool _disabled = false;
+    uint8_t _mode = PL_MODE_ENABLE_NORMAL_OP;
     bool _batteryDischargeEnabled = false;
     uint32_t _nextInverterRestart = 0; // Values: 0->not calculated / 1->no restart configured / >1->time of next inverter restart in millis()
     uint32_t _nextCalculateCheck = 5000; // time in millis for next NTP check to calulate restart
+    bool _fullSolarPassThroughEnabled = false;
 
     float _powerMeter1Power;
     float _powerMeter2Power;
@@ -54,6 +60,7 @@ private:
     float getLoadCorrectedVoltage(std::shared_ptr<InverterAbstract> inverter);
     bool isStartThresholdReached(std::shared_ptr<InverterAbstract> inverter);
     bool isStopThresholdReached(std::shared_ptr<InverterAbstract> inverter);
+    bool useFullSolarPassthrough(std::shared_ptr<InverterAbstract> inverter);
 };
 
 extern PowerLimiterClass PowerLimiter;

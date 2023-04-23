@@ -152,6 +152,20 @@
                     </div>
                 </div>
 
+                <div class="row mb-3" v-show="powerLimiterConfigList.solar_passtrough_enabled">
+                    <label for="batterySocSolarPassthroughStartThreshold" class="col-sm-2 col-form-label">{{ $t('powerlimiteradmin.BatterySocSolarPassthroughStartThreshold') }}
+                      <BIconInfoCircle v-tooltip :title="$t('powerlimiteradmin.BatterySocSolarPassthroughStartThresholdHint')" />
+                    </label>
+                    <div class="col-sm-10">
+                        <div class="input-group">
+                            <input type="number" class="form-control" id="batterySocSolarPassthroughStartThreshold"
+                                placeholder="20" v-model="powerLimiterConfigList.full_solar_passthrough_soc"
+                                aria-describedby="batterySocSolarPassthroughStartThresholdDescription" min="0" max="100" required/>
+                                <span class="input-group-text" id="batterySocSolarPassthroughStartThresholdDescription">%</span>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="alert alert-secondary" role="alert" v-html="$t('powerlimiteradmin.BatterySocInfo')"></div>
 
                 <div class="row mb-3">
@@ -174,6 +188,32 @@
                                 placeholder="49" v-model="powerLimiterConfigList.voltage_stop_threshold"
                                 aria-describedby="voltageStopThresholdDescription" required/>
                             <span class="input-group-text" id="voltageStopThresholdDescription">V</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row mb-3" v-show="powerLimiterConfigList.solar_passtrough_enabled">
+                    <label for="inputVoltageSolarPassthroughStartThreshold" class="col-sm-2 col-form-label">{{ $t('powerlimiteradmin.VoltageSolarPassthroughStartThreshold') }}:
+                      <BIconInfoCircle v-tooltip :title="$t('powerlimiteradmin.VoltageSolarPassthroughStartThresholdHint')" />
+                    </label>
+                    <div class="col-sm-10">
+                        <div class="input-group">
+                            <input type="number" step="0.01" class="form-control" id="inputVoltageSolarPassthroughStartThreshold"
+                                placeholder="49" v-model="powerLimiterConfigList.full_solar_passthrough_start_voltage"
+                                aria-describedby="voltageSolarPassthroughStartThresholdDescription" required/>
+                            <span class="input-group-text" id="voltageSolarPassthroughStartThresholdDescription">V</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row mb-3"  v-show="powerLimiterConfigList.solar_passtrough_enabled">
+                    <label for="inputVoltageSolarPassthroughStopThreshold" class="col-sm-2 col-form-label">{{ $t('powerlimiteradmin.VoltageSolarPassthroughStopThreshold') }}:</label>
+                    <div class="col-sm-10">
+                        <div class="input-group">
+                            <input type="number" step="0.01" class="form-control" id="inputVoltageSolarPassthroughStopThreshold"
+                                placeholder="49" v-model="powerLimiterConfigList.full_solar_passthrough_stop_voltage"
+                                aria-describedby="voltageSolarPassthroughStopThresholdDescription" required/>
+                            <span class="input-group-text" id="voltageSolarPassthroughStopThresholdDescription">V</span>
                         </div>
                     </div>
                 </div>

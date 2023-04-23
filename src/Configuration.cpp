@@ -164,6 +164,9 @@ bool ConfigurationClass::write()
     powerlimiter["voltage_stop_threshold"] = config.PowerLimiter_VoltageStopThreshold;
     powerlimiter["voltage_load_correction_factor"] = config.PowerLimiter_VoltageLoadCorrectionFactor;
     powerlimiter["inverter_restart_hour"] = config.PowerLimiter_RestartHour;
+    powerlimiter["full_solar_passthrough_soc"] = config.PowerLimiter_FullSolarPassThroughSoc;
+    powerlimiter["full_solar_passthrough_start_voltage"] = config.PowerLimiter_FullSolarPassThroughStartVoltage;
+    powerlimiter["full_solar_passthrough_stop_voltage"] = config.PowerLimiter_FullSolarPassThroughStopVoltage;
 
     JsonObject battery = doc.createNestedObject("battery");
     battery["enabled"] = config.Battery_Enabled;
@@ -362,6 +365,9 @@ bool ConfigurationClass::read()
     config.PowerLimiter_VoltageStopThreshold = powerlimiter["voltage_stop_threshold"] | POWERLIMITER_VOLTAGE_STOP_THRESHOLD;
     config.PowerLimiter_VoltageLoadCorrectionFactor = powerlimiter["voltage_load_correction_factor"] | POWERLIMITER_VOLTAGE_LOAD_CORRECTION_FACTOR;
     config.PowerLimiter_RestartHour = powerlimiter["inverter_restart_hour"] | POWERLIMITER_RESTART_HOUR;
+    config.PowerLimiter_FullSolarPassThroughSoc = powerlimiter["full_solar_passthrough_soc"] | POWERLIMITER_FULL_SOLAR_PASSTHROUGH_SOC;
+    config.PowerLimiter_FullSolarPassThroughStartVoltage = powerlimiter["full_solar_passthrough_start_voltage"] | POWERLIMITER_FULL_SOLAR_PASSTHROUGH_START_VOLTAGE;
+    config.PowerLimiter_FullSolarPassThroughStopVoltage = powerlimiter["full_solar_passthrough_stop_voltage"] | POWERLIMITER_FULL_SOLAR_PASSTHROUGH_STOP_VOLTAGE;
 
     JsonObject battery = doc["battery"];
     config.Battery_Enabled = battery["enabled"] | BATTERY_ENABLED;

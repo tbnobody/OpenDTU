@@ -8,7 +8,7 @@
 #include "PowerLimiter.h"
 #include <ctime>
 
-#define TOPIC_SUB_POWER_LIMITER "disable"
+#define TOPIC_SUB_POWER_LIMITER "mode"
 
 MqttHandlePowerLimiterClass MqttHandlePowerLimiter;
 
@@ -38,7 +38,7 @@ void MqttHandlePowerLimiterClass::loop()
     const CONFIG_T& config = Configuration.get();
 
     if ((millis() - _lastPublish) > (config.Mqtt_PublishInterval * 1000) ) {
-      MqttSettings.publish("powerlimiter/status/disabled", String(PowerLimiter.getDisable()));
+      MqttSettings.publish("powerlimiter/status/mode", String(PowerLimiter.getMode()));
 
       yield();
       _lastPublish = millis();
@@ -77,14 +77,19 @@ void MqttHandlePowerLimiterClass::onMqttMessage(const espMqttClientTypes::Messag
     delete[] str;
 
     if (!strcmp(setting, TOPIC_SUB_POWER_LIMITER)) {
+        if(payload_val == 2) {
+          MessageOutput.println("Power limiter full solar PT");
+          PowerLimiter.setMode(PL_MODE_SOLAR_PT_ONLY);
+          return;
+        }
         if(payload_val == 1) {
           MessageOutput.println("Power limiter disabled");
-          PowerLimiter.setDisable(true);
+          PowerLimiter.setMode(PL_MODE_FULL_DISABLE);
           return;
         }
         if(payload_val == 0) {
           MessageOutput.println("Power limiter enabled");
-          PowerLimiter.setDisable(false);
+          PowerLimiter.setMode(PL_MODE_ENABLE_NORMAL_OP);
           return;
         } 
         MessageOutput.println("Power limiter enable / disable - unknown command received. Please use 0 or 1");

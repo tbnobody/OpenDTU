@@ -15,7 +15,7 @@
 
 PowerLimiterClass PowerLimiter;
 
-// #define POWER_LIMITER_DEBUG
+#define POWER_LIMITER_DEBUG
 
 void PowerLimiterClass::init()
 {
@@ -75,7 +75,7 @@ void PowerLimiterClass::loop()
     }
 
     // Make sure inverter is turned off if PL is disabled by user/MQTT
-    if (((!config.PowerLimiter_Enabled || _disabled) && _plState != SHUTDOWN)) {
+    if (((!config.PowerLimiter_Enabled || _mode == PL_MODE_FULL_DISABLE) && _plState != SHUTDOWN)) {
         if (inverter->isProducing()) {
             MessageOutput.printf("PL initiated inverter shutdown.\r\n");
             inverter->sendActivePowerControlRequest(static_cast<float>(config.PowerLimiter_LowerPowerLimit), PowerLimitControlType::AbsolutNonPersistent);
@@ -91,7 +91,7 @@ void PowerLimiterClass::loop()
     }
 
     // Return if power limiter is disabled
-    if (!config.PowerLimiter_Enabled || _disabled) {
+    if (!config.PowerLimiter_Enabled || _mode == PL_MODE_FULL_DISABLE) {
 #ifdef POWER_LIMITER_DEBUG
   MessageOutput.printf("[PowerLimiterClass::loop] ******************* PL disabled\r\n");
 #endif        
@@ -206,12 +206,12 @@ int32_t PowerLimiterClass::getLastRequestedPowewrLimit() {
     return _lastRequestedPowerLimit;
 }
 
-bool PowerLimiterClass::getDisable() {
-    return _disabled;
+bool PowerLimiterClass::getMode() {
+    return _mode;
 }
 
-void PowerLimiterClass::setDisable(bool disable) {
-    _disabled = disable;
+void PowerLimiterClass::setMode(uint8_t mode) {
+    _mode = mode;
 }
 
 bool PowerLimiterClass::canUseDirectSolarPower()
@@ -232,7 +232,13 @@ bool PowerLimiterClass::canUseDirectSolarPower()
 }
 
 
-
+// Logic table
+// | Case # | batteryDischargeEnabled | solarPowerEnabled | useFullSolarPassthrough | Result                                                      |
+// | 1      | false                   | false             | doesn't matter          | PL = 0                                                      |
+// | 2      | false                   | true              | doesn't matter          | PL = Victron Power                                          |
+// | 3      | true                    | doesn't matter    | false                   | PL = PowerMeter value (Battery can supply unlimited energy) |
+// | 4      | true                    | false             | true                    | PL = PowerMeter value                                       |
+// | 5      | true                    | true              | true                    | PL = max(PowerMeter value, Victron Power)                   |
 
 int32_t PowerLimiterClass::calcPowerLimit(std::shared_ptr<InverterAbstract> inverter, bool solarPowerEnabled, bool batteryDischargeEnabled)
 {
@@ -241,7 +247,7 @@ int32_t PowerLimiterClass::calcPowerLimit(std::shared_ptr<InverterAbstract> inve
     int32_t newPowerLimit = round(PowerMeter.getPowerTotal());
 
     if (!solarPowerEnabled && !batteryDischargeEnabled) {
-      // No energy sources available
+      // Case 1 - No energy sources available
       return 0;
     }
 
@@ -256,6 +262,7 @@ int32_t PowerLimiterClass::calcPowerLimit(std::shared_ptr<InverterAbstract> inve
 
     // We're not trying to hit 0 exactly but take an offset into account
     // This means we never fully compensate the used power with the inverter 
+    // Case 3
     newPowerLimit -= config.PowerLimiter_TargetPowerConsumption;
 
     // Check if the new value is within the limits of the hysteresis and
@@ -268,17 +275,27 @@ int32_t PowerLimiterClass::calcPowerLimit(std::shared_ptr<InverterAbstract> inve
             return _lastRequestedPowerLimit;
     }
 
-    // We should use Victron solar power only (corrected by efficiency factor)
-    if (solarPowerEnabled && !batteryDischargeEnabled) {
-        float efficiency = inverter->Statistics()->getChannelFieldValue(TYPE_AC, (ChannelNum_t) config.PowerLimiter_InverterChannelId, FLD_EFF);
-        int32_t victronChargePower = this->getDirectSolarPower();
-        int32_t adjustedVictronChargePower = victronChargePower * (efficiency > 0.0 ? (efficiency / 100.0) : 1.0); // if inverter is off, use 1.0
+    // At this point we've calculated the required energy to compensate for household consumption. 
+    // If the battery is enabled this can always be supplied since we assume that the battery can supply unlimited power
+    // The next step is to determine if the Solar power as provided by the Victron charger
+    // actually constrains or dictates another inverter power value
+    float efficiency = inverter->Statistics()->getChannelFieldValue(TYPE_AC, (ChannelNum_t) config.PowerLimiter_InverterChannelId, FLD_EFF) * 0.95 /*Victron efficiency*/;
+    int32_t victronChargePower = this->getDirectSolarPower();
+    int32_t adjustedVictronChargePower = victronChargePower * (efficiency > 0.0 ? (efficiency / 100.0) : 1.0); // if inverter is off, use 1.0
 
+    // Battery can be discharged and we should output max (Victron solar power || power meter value)
+    if(batteryDischargeEnabled && useFullSolarPassthrough(inverter)) {
+      // Case 5
+      newPowerLimit = newPowerLimit > adjustedVictronChargePower ? newPowerLimit : adjustedVictronChargePower;
+    } 
+
+    // We should use Victron solar power only (corrected by efficiency factor)
+    if ((solarPowerEnabled && !batteryDischargeEnabled) || (_mode == PL_MODE_SOLAR_PT_ONLY)) {
+        // Case 2 - Limit power to solar power only
         MessageOutput.printf("[PowerLimiterClass::loop] Consuming Solar Power Only -> victronChargePower: %d, efficiency: %.2f, powerConsumption: %d \r\n", 
             victronChargePower, efficiency, newPowerLimit);
 
-        // Limit power to solar power only
-        if (adjustedVictronChargePower < newPowerLimit)
+        if ((adjustedVictronChargePower < newPowerLimit) || (_mode == PL_MODE_SOLAR_PT_ONLY)) 
           newPowerLimit = adjustedVictronChargePower;
     }
 
@@ -445,4 +462,48 @@ void PowerLimiterClass::calcNextInverterRestart()
         _nextInverterRestart = 0;
     }
     MessageOutput.printf("[PowerLimiterClass::calcNextInverterRestart] _nextInverterRestart @ %d millis\r\n", _nextInverterRestart);
+}
+
+bool PowerLimiterClass::useFullSolarPassthrough(std::shared_ptr<InverterAbstract> inverter)
+{
+    CONFIG_T& config = Configuration.get();
+
+    // We only do full solar PT if general solar PT is enabled
+    if(!config.PowerLimiter_SolarPassThroughEnabled) {
+      return false;
+    }
+
+    // Check if the Battery interface is enabled and the SOC stop threshold is reached
+    if (config.Battery_Enabled
+            && config.PowerLimiter_FullSolarPassThroughSoc > 0.0
+            && (millis() - Battery.stateOfChargeLastUpdate) < 60000
+            && Battery.stateOfCharge >= config.PowerLimiter_FullSolarPassThroughSoc) {
+        return true;
+    }
+    
+    // Otherwise we use the voltage threshold
+    if (config.PowerLimiter_FullSolarPassThroughStartVoltage <= 0.0 || config.PowerLimiter_FullSolarPassThroughStopVoltage <= 0.0) {
+        return false;
+    }
+
+    float dcVoltage = inverter->Statistics()->getChannelFieldValue(TYPE_DC, (ChannelNum_t) config.PowerLimiter_InverterChannelId, FLD_UDC);
+
+#ifdef POWER_LIMITER_DEBUG
+    MessageOutput.printf("[PowerLimiterClass::loop] useFullSolarPassthrough: FullSolarPT Start %f, FullSolarPT Stop: %f, dcVoltage: %f\r\n",
+        config.PowerLimiter_FullSolarPassThroughStartVoltage, config.PowerLimiter_FullSolarPassThroughStopVoltage, dcVoltage);
+#endif 
+
+    if (dcVoltage <= 0.0) {
+        return false;
+    }
+    
+    if (dcVoltage >= config.PowerLimiter_FullSolarPassThroughStartVoltage) {
+      _fullSolarPassThroughEnabled = true;
+    }
+
+    if (dcVoltage <= config.PowerLimiter_FullSolarPassThroughStopVoltage) {
+      _fullSolarPassThroughEnabled = false;
+    }
+
+    return _fullSolarPassThroughEnabled;
 }
