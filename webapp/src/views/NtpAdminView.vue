@@ -36,6 +36,21 @@
                 <InputElement :label="$t('ntpadmin.Longitude')"
                               v-model="ntpConfigList.longitude"
                               type="number" min="-180" max="180" step="any"/>
+
+
+                <div class="row mb-3">
+                    <label class="col-sm-2 col-form-label">
+                        {{ $t('ntpadmin.SunSetType') }}
+                        <BIconInfoCircle v-tooltip :title="$t('ntpadmin.SunSetTypeHint')" />
+                    </label>
+                    <div class="col-sm-10">
+                        <select class="form-select" v-model="ntpConfigList.sunsettype">
+                            <option v-for="sunsettype in sunsetTypeList" :key="sunsettype.key" :value="sunsettype.key">
+                                {{ $t(`ntpadmin.` + sunsettype.value) }}
+                            </option>
+                        </select>
+                    </div>
+                </div>
             </CardElement>
             <button type="submit" class="btn btn-primary mb-3">{{ $t('ntpadmin.Save') }}</button>
         </form>
@@ -67,6 +82,7 @@ import InputElement from '@/components/InputElement.vue';
 import type { NtpConfig } from "@/types/NtpConfig";
 import { authHeader, handleResponse } from '@/utils/authentication';
 import { defineComponent } from 'vue';
+import { BIconInfoCircle } from 'bootstrap-icons-vue';
 
 export default defineComponent({
     components: {
@@ -74,6 +90,7 @@ export default defineComponent({
         BootstrapAlert,
         CardElement,
         InputElement,
+        BIconInfoCircle,
     },
     data() {
         return {
@@ -88,6 +105,12 @@ export default defineComponent({
             alertMessage: "",
             alertType: "info",
             showAlert: false,
+            sunsetTypeList: [
+                { key: 0, value: 'OFFICIAL' },
+                { key: 1, value: 'NAUTICAL' },
+                { key: 2, value: 'CIVIL' },
+                { key: 3, value: 'ASTONOMICAL' },
+            ],
         };
     },
     watch: {

@@ -59,10 +59,10 @@ void LedSingleClass::loop()
         _ledState[1] = LedState_t::Off;
         if (Hoymiles.getNumInverters()) {
             // set LED status
-            if (Datastore.isAllEnabledReachable && Datastore.isAllEnabledProducing) {
+            if (Datastore.getIsAllEnabledReachable() && Datastore.getIsAllEnabledProducing()) {
                 _ledState[1] = LedState_t::On;
             }
-            if (Datastore.isAllEnabledReachable && !Datastore.isAllEnabledProducing) {
+            if (Datastore.getIsAllEnabledReachable() && !Datastore.getIsAllEnabledProducing()) {
                 _ledState[1] = LedState_t::Blink;
             }
         }

@@ -6,9 +6,10 @@
 #include "../Hoymiles.h"
 #include <cstring>
 
-const std::array<const AlarmMessage_t, 76> AlarmLogParser::_alarmMessages = {{
+const std::array<const AlarmMessage_t, ALARM_MSG_COUNT> AlarmLogParser::_alarmMessages = {{
     { AlarmMessageType_t::ALL, 1, "Inverter start" },
     { AlarmMessageType_t::ALL, 2, "DTU command failed" },
+    { AlarmMessageType_t::ALL, 73, "Temperature >80°C" }, // https://github.com/tbnobody/OpenDTU/discussions/590#discussioncomment-6049750
     { AlarmMessageType_t::ALL, 121, "Over temperature protection" },
     { AlarmMessageType_t::ALL, 124, "Shut down by remote control" },
     { AlarmMessageType_t::ALL, 125, "Grid configuration parameter error" },

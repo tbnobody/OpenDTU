@@ -6,10 +6,17 @@
 #include "Configuration.h"
 #include <Hoymiles.h>
 
+#define DAT_SEMAPHORE_TAKE() \
+    do {                     \
+    } while (xSemaphoreTake(_xSemaphore, portMAX_DELAY) != pdPASS)
+#define DAT_SEMAPHORE_GIVE() xSemaphoreGive(_xSemaphore)
+
 DatastoreClass Datastore;
 
 DatastoreClass::DatastoreClass()
 {
+    _xSemaphore = xSemaphoreCreateMutex();
+    DAT_SEMAPHORE_GIVE(); // release before first use
 }
 
 void DatastoreClass::init()
@@ -24,23 +31,25 @@ void DatastoreClass::loop()
         uint8_t isProducing = 0;
         uint8_t isReachable = 0;
 
-        totalAcYieldTotalEnabled = 0;
-        totalAcYieldTotalDigits = 0;
+        DAT_SEMAPHORE_TAKE();
 
-        totalAcYieldDayEnabled = 0;
-        totalAcYieldDayDigits = 0;
+        _totalAcYieldTotalEnabled = 0;
+        _totalAcYieldTotalDigits = 0;
 
-        totalAcPowerEnabled = 0;
-        totalAcPowerDigits = 0;
+        _totalAcYieldDayEnabled = 0;
+        _totalAcYieldDayDigits = 0;
 
-        totalDcPowerEnabled = 0;
-        totalDcPowerDigits = 0;
+        _totalAcPowerEnabled = 0;
+        _totalAcPowerDigits = 0;
 
-        totalDcPowerIrradiation = 0;
-        totalDcIrradiationInstalled = 0;
+        _totalDcPowerEnabled = 0;
+        _totalDcPowerDigits = 0;
 
-        isAllEnabledProducing = true;
-        isAllEnabledReachable = true;
+        _totalDcPowerIrradiation = 0;
+        _totalDcIrradiationInstalled = 0;
+
+        _isAllEnabledProducing = true;
+        _isAllEnabledReachable = true;
 
         for (uint8_t i = 0; i < Hoymiles.getNumInverters(); i++) {
             auto inv = Hoymiles.getInverterByPos(i);
@@ -57,7 +66,7 @@ void DatastoreClass::loop()
                 isProducing++;
             } else {
                 if (inv->getEnablePolling()) {
-                    isAllEnabledProducing = false;
+                    _isAllEnabledProducing = false;
                 }
             }
 
@@ -65,42 +74,164 @@ void DatastoreClass::loop()
                 isReachable++;
             } else {
                 if (inv->getEnablePolling()) {
-                    isAllEnabledReachable = false;
+                    _isAllEnabledReachable = false;
                 }
             }
 
             for (auto& c : inv->Statistics()->getChannelsByType(TYPE_AC)) {
                 if (cfg->Poll_Enable) {
-                    totalAcYieldTotalEnabled += inv->Statistics()->getChannelFieldValue(TYPE_AC, c, FLD_YT);
-                    totalAcYieldDayEnabled += inv->Statistics()->getChannelFieldValue(TYPE_AC, c, FLD_YD);
+                    _totalAcYieldTotalEnabled += inv->Statistics()->getChannelFieldValue(TYPE_AC, c, FLD_YT);
+                    _totalAcYieldDayEnabled += inv->Statistics()->getChannelFieldValue(TYPE_AC, c, FLD_YD);
 
-                    totalAcYieldTotalDigits = max<unsigned int>(totalAcYieldTotalDigits, inv->Statistics()->getChannelFieldDigits(TYPE_AC, c, FLD_YT));
-                    totalAcYieldDayDigits = max<unsigned int>(totalAcYieldDayDigits, inv->Statistics()->getChannelFieldDigits(TYPE_AC, c, FLD_YD));
+                    _totalAcYieldTotalDigits = max<unsigned int>(_totalAcYieldTotalDigits, inv->Statistics()->getChannelFieldDigits(TYPE_AC, c, FLD_YT));
+                    _totalAcYieldDayDigits = max<unsigned int>(_totalAcYieldDayDigits, inv->Statistics()->getChannelFieldDigits(TYPE_AC, c, FLD_YD));
                 }
                 if (inv->getEnablePolling()) {
-                    totalAcPowerEnabled += inv->Statistics()->getChannelFieldValue(TYPE_AC, c, FLD_PAC);
-                    totalAcPowerDigits = max<unsigned int>(totalAcPowerDigits, inv->Statistics()->getChannelFieldDigits(TYPE_AC, c, FLD_PAC));
+                    _totalAcPowerEnabled += inv->Statistics()->getChannelFieldValue(TYPE_AC, c, FLD_PAC);
+                    _totalAcPowerDigits = max<unsigned int>(_totalAcPowerDigits, inv->Statistics()->getChannelFieldDigits(TYPE_AC, c, FLD_PAC));
                 }
             }
 
             for (auto& c : inv->Statistics()->getChannelsByType(TYPE_DC)) {
                 if (inv->getEnablePolling()) {
-                    totalDcPowerEnabled += inv->Statistics()->getChannelFieldValue(TYPE_DC, c, FLD_PDC);
-                    totalDcPowerDigits = max<unsigned int>(totalDcPowerDigits, inv->Statistics()->getChannelFieldDigits(TYPE_DC, c, FLD_PDC));
+                    _totalDcPowerEnabled += inv->Statistics()->getChannelFieldValue(TYPE_DC, c, FLD_PDC);
+                    _totalDcPowerDigits = max<unsigned int>(_totalDcPowerDigits, inv->Statistics()->getChannelFieldDigits(TYPE_DC, c, FLD_PDC));
 
                     if (inv->Statistics()->getStringMaxPower(c) > 0) {
-                        totalDcPowerIrradiation += inv->Statistics()->getChannelFieldValue(TYPE_DC, c, FLD_PDC);
-                        totalDcIrradiationInstalled += inv->Statistics()->getStringMaxPower(c);
+                        _totalDcPowerIrradiation += inv->Statistics()->getChannelFieldValue(TYPE_DC, c, FLD_PDC);
+                        _totalDcIrradiationInstalled += inv->Statistics()->getStringMaxPower(c);
                     }
                 }
             }
         }
 
-        isAtLeastOneProducing = isProducing > 0;
-        isAtLeastOneReachable = isReachable > 0;
+        _isAtLeastOneProducing = isProducing > 0;
+        _isAtLeastOneReachable = isReachable > 0;
 
-        totalDcIrradiation = totalDcIrradiationInstalled > 0 ? totalDcPowerIrradiation / totalDcIrradiationInstalled * 100.0f : 0;
+        _totalDcIrradiation = _totalDcIrradiationInstalled > 0 ? _totalDcPowerIrradiation / _totalDcIrradiationInstalled * 100.0f : 0;
+
+        DAT_SEMAPHORE_GIVE();
 
         _updateTimeout.reset();
     }
+}
+
+float DatastoreClass::getTotalAcYieldTotalEnabled()
+{
+    DAT_SEMAPHORE_TAKE();
+    float retval = _totalAcYieldTotalEnabled;
+    DAT_SEMAPHORE_GIVE();
+    return retval;
+}
+
+float DatastoreClass::getTotalAcYieldDayEnabled()
+{
+    DAT_SEMAPHORE_TAKE();
+    float retval = _totalAcYieldDayEnabled;
+    DAT_SEMAPHORE_GIVE();
+    return retval;
+}
+
+float DatastoreClass::getTotalAcPowerEnabled()
+{
+    DAT_SEMAPHORE_TAKE();
+    float retval = _totalAcPowerEnabled;
+    DAT_SEMAPHORE_GIVE();
+    return retval;
+}
+
+float DatastoreClass::getTotalDcPowerEnabled()
+{
+    DAT_SEMAPHORE_TAKE();
+    float retval = _totalDcPowerEnabled;
+    DAT_SEMAPHORE_GIVE();
+    return retval;
+}
+
+float DatastoreClass::getTotalDcPowerIrradiation()
+{
+    DAT_SEMAPHORE_TAKE();
+    float retval = _totalDcPowerIrradiation;
+    DAT_SEMAPHORE_GIVE();
+    return retval;
+}
+
+float DatastoreClass::getTotalDcIrradiationInstalled()
+{
+    DAT_SEMAPHORE_TAKE();
+    float retval = _totalDcIrradiationInstalled;
+    DAT_SEMAPHORE_GIVE();
+    return retval;
+}
+
+float DatastoreClass::getTotalDcIrradiation()
+{
+    DAT_SEMAPHORE_TAKE();
+    float retval = _totalDcIrradiation;
+    DAT_SEMAPHORE_GIVE();
+    return retval;
+}
+
+unsigned int DatastoreClass::getTotalAcYieldTotalDigits()
+{
+    DAT_SEMAPHORE_TAKE();
+    unsigned int retval = _totalAcYieldTotalDigits;
+    DAT_SEMAPHORE_GIVE();
+    return retval;
+}
+
+unsigned int DatastoreClass::getTotalAcYieldDayDigits()
+{
+    DAT_SEMAPHORE_TAKE();
+    unsigned int retval = _totalAcYieldDayDigits;
+    DAT_SEMAPHORE_GIVE();
+    return retval;
+}
+
+unsigned int DatastoreClass::getTotalAcPowerDigits()
+{
+    DAT_SEMAPHORE_TAKE();
+    unsigned int retval = _totalAcPowerDigits;
+    DAT_SEMAPHORE_GIVE();
+    return retval;
+}
+
+unsigned int DatastoreClass::getTotalDcPowerDigits()
+{
+    DAT_SEMAPHORE_TAKE();
+    unsigned int retval = _totalDcPowerDigits;
+    DAT_SEMAPHORE_GIVE();
+    return retval;
+}
+
+bool DatastoreClass::getIsAtLeastOneReachable()
+{
+    DAT_SEMAPHORE_TAKE();
+    bool retval = _isAtLeastOneReachable;
+    DAT_SEMAPHORE_GIVE();
+    return retval;
+}
+
+bool DatastoreClass::getIsAtLeastOneProducing()
+{
+    DAT_SEMAPHORE_TAKE();
+    bool retval = _isAtLeastOneProducing;
+    DAT_SEMAPHORE_GIVE();
+    return retval;
+}
+
+bool DatastoreClass::getIsAllEnabledProducing()
+{
+    DAT_SEMAPHORE_TAKE();
+    bool retval = _isAllEnabledProducing;
+    DAT_SEMAPHORE_GIVE();
+    return retval;
+}
+
+bool DatastoreClass::getIsAllEnabledReachable()
+{
+    DAT_SEMAPHORE_TAKE();
+    bool retval = _isAllEnabledReachable;
+    DAT_SEMAPHORE_GIVE();
+    return retval;
 }

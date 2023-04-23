@@ -68,6 +68,11 @@ bool MultiDataCommand::handleResponse(InverterAbstract* inverter, fragment_t fra
     uint16_t crc = 0xffff, crcRcv = 0;
 
     for (uint8_t i = 0; i < max_fragment_id; i++) {
+        // Doublecheck if correct answer package
+        if (fragment[i].mainCmd != (_payload[0] | 0x80)) {
+            return false;
+        }
+
         if (i == max_fragment_id - 1) {
             // Last packet
             crc = crc16(fragment[i].fragment, fragment[i].len - 2, crc);

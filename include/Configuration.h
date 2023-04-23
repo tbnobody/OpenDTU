@@ -47,6 +47,7 @@ struct CHANNEL_CONFIG_T {
 struct INVERTER_CONFIG_T {
     uint64_t Serial;
     char Name[INV_MAX_NAME_STRLEN + 1];
+    uint8_t Order;
     bool Poll_Enable;
     bool Poll_Enable_Night;
     bool Command_Enable;
@@ -82,6 +83,7 @@ struct CONFIG_T {
     char Ntp_TimezoneDescr[NTP_MAX_TIMEZONEDESCR_STRLEN + 1];
     double Ntp_Longitude;
     double Ntp_Latitude;
+    uint8_t Ntp_SunsetType;
 
     bool Mqtt_Enabled;
     uint Mqtt_Port;

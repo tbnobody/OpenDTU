@@ -105,9 +105,14 @@ void WebApiWsLiveClass::generateJsonResponse(JsonVariant& root)
         }
 
         JsonObject invObject = invArray.createNestedObject();
+        INVERTER_CONFIG_T* inv_cfg = Configuration.getInverterConfig(inv->serial());
+        if (inv_cfg == nullptr) {
+            continue;
+        }
 
         invObject["serial"] = inv->serialString();
         invObject["name"] = inv->name();
+        invObject["order"] = inv_cfg->Order;
         invObject["data_age"] = (millis() - inv->Statistics()->getLastUpdate()) / 1000;
         invObject["poll_enabled"] = inv->getEnablePolling();
         invObject["reachable"] = inv->isReachable();
@@ -124,10 +129,7 @@ void WebApiWsLiveClass::generateJsonResponse(JsonVariant& root)
             JsonObject chanTypeObj = invObject.createNestedObject(inv->Statistics()->getChannelTypeName(t));
             for (auto& c : inv->Statistics()->getChannelsByType(t)) {
                 if (t == TYPE_DC) {
-                    INVERTER_CONFIG_T* inv_cfg = Configuration.getInverterConfig(inv->serial());
-                    if (inv_cfg != nullptr) {
-                        chanTypeObj[String(static_cast<uint8_t>(c))]["name"]["u"] = inv_cfg->channel[c].Name;
-                    }
+                    chanTypeObj[String(static_cast<uint8_t>(c))]["name"]["u"] = inv_cfg->channel[c].Name;
                 }
                 addField(chanTypeObj, i, inv, t, c, FLD_PAC);
                 addField(chanTypeObj, i, inv, t, c, FLD_UAC);
@@ -164,9 +166,9 @@ void WebApiWsLiveClass::generateJsonResponse(JsonVariant& root)
     }
 
     JsonObject totalObj = root.createNestedObject("total");
-    addTotalField(totalObj, "Power", Datastore.totalAcPowerEnabled, "W", Datastore.totalAcPowerDigits);
-    addTotalField(totalObj, "YieldDay", Datastore.totalAcYieldDayEnabled, "Wh", Datastore.totalAcYieldDayDigits);
-    addTotalField(totalObj, "YieldTotal", Datastore.totalAcYieldTotalEnabled, "kWh", Datastore.totalAcYieldTotalDigits);
+    addTotalField(totalObj, "Power", Datastore.getTotalAcPowerEnabled(), "W", Datastore.getTotalAcPowerDigits());
+    addTotalField(totalObj, "YieldDay", Datastore.getTotalAcYieldDayEnabled(), "Wh", Datastore.getTotalAcYieldDayDigits());
+    addTotalField(totalObj, "YieldTotal", Datastore.getTotalAcYieldTotalEnabled(), "kWh", Datastore.getTotalAcYieldTotalDigits());
 
     JsonObject hintObj = root.createNestedObject("hints");
     struct tm timeinfo;
