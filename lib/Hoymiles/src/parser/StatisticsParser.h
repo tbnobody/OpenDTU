@@ -37,7 +37,7 @@ enum FieldId_t {
     FLD_PF,
     FLD_EFF,
     FLD_IRR,
-    FLD_PRA,
+    FLD_Q,
     FLD_EVT_LOG,
     // HMT only
     FLD_UAC_1N,

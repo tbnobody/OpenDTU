@@ -40,6 +40,6 @@ private:
         { FLD_PF, METRIC_TYPE_GAUGE },
         { FLD_EFF, METRIC_TYPE_GAUGE },
         { FLD_IRR, METRIC_TYPE_GAUGE },
-        { FLD_PRA, METRIC_TYPE_GAUGE }
+        { FLD_Q, METRIC_TYPE_GAUGE }
     };
 };
