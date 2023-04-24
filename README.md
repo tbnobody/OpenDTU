@@ -80,7 +80,7 @@ Compatibility with OpenDTU is most likly related to the serial number of the inv
 * English, german and french web interface
 * Displays (SSD1306, SH1106, PCD8544)
 * Status LEDs
-* Konfiguration management (export / import configurations)
+* Configuration management (export / import configurations)
 * Dark Theme
 
 ## Features for developers
