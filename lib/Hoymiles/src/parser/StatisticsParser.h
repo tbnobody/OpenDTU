@@ -17,7 +17,7 @@ enum UnitId_t {
     UNIT_HZ,
     UNIT_C,
     UNIT_PCT,
-    UNIT_VA,
+    UNIT_VAR,
     UNIT_NONE
 };
 const char* const units[] = { "V", "A", "W", "Wh", "kWh", "Hz", "°C", "%", "var", "" };
