@@ -8,6 +8,12 @@
     },
     "lib": ["ES2021", "DOM"],
     "moduleResolution": "Node",
+
+    /* Linting */
+    "strict": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noFallthroughCasesInSwitch": true
   },
 
   "references": [
