@@ -54,7 +54,7 @@ void HoymilesClass::loop()
                 }
             }
 
-            if (iv != nullptr && iv->getRadio()->isInitialized() && iv->getRadio()->isIdle()) {
+            if (iv != nullptr && iv->getRadio()->isInitialized() && iv->getRadio()->isQueueEmpty()) {
                 _messageOutput->print("Fetch inverter: ");
                 _messageOutput->println(iv->serial(), HEX);
 
