@@ -229,7 +229,24 @@ void PowerLimiterClass::setNewPowerLimit(std::shared_ptr<InverterAbstract> inver
             _lastCommandSent = millis();
         } 
         MessageOutput.printf("[PowerLimiterClass::loop] Limit Non-Persistent: %d W\r\n", newPowerLimit);
-        inverter->sendActivePowerControlRequest(newPowerLimit, PowerLimitControlType::AbsolutNonPersistent);
+
+        int32_t effPowerLimit = newPowerLimit;
+        std::list<ChannelNum_t> dcChnls = inverter->Statistics()->getChannelsByType(TYPE_DC);
+        int dcProdChnls = 0, dcTotalChnls = dcChnls.size();
+        for (auto& c : dcChnls) {
+            if (inverter->Statistics()->getChannelFieldValue(TYPE_DC, c, FLD_PDC) > 1.0) {
+                dcProdChnls++;
+            }
+        }
+        if (dcProdChnls > 0) {
+            effPowerLimit = round(newPowerLimit * static_cast<float>(dcTotalChnls) / dcProdChnls);
+            uint16_t inverterMaxPower = inverter->DevInfo()->getMaxPower();
+            if (effPowerLimit > inverterMaxPower) {
+                effPowerLimit = inverterMaxPower;
+            }
+        }
+
+        inverter->sendActivePowerControlRequest(effPowerLimit, PowerLimitControlType::AbsolutNonPersistent);
         _lastRequestedPowerLimit = newPowerLimit;
         // wait for the next inverter update (+ 3 seconds to make sure the limit got applied)
         _lastLimitSetTime = millis();
