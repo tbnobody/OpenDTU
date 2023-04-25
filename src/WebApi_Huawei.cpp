@@ -190,6 +190,11 @@ void WebApiHuaweiClass::onAdminGet(AsyncWebServerRequest* request)
     const CONFIG_T& config = Configuration.get();
 
     root[F("enabled")] = config.Huawei_Enabled;
+    root[F("auto_power_enabled")] = config.Huawei_Auto_Power_Enabled;
+    root[F("voltage_limit")] = static_cast<int>(config.Huawei_Auto_Power_Voltage_Limit * 100) / 100.0;
+    root[F("enable_voltage_limit")] = static_cast<int>(config.Huawei_Auto_Power_Enable_Voltage_Limit * 100) / 100.0;
+    root[F("lower_power_limit")] = config.Huawei_Auto_Power_Lower_Power_Limit;
+    root[F("upper_power_limit")] = config.Huawei_Auto_Power_Upper_Power_Limit;   
 
     response->setLength();
     request->send(response);
@@ -234,7 +239,11 @@ void WebApiHuaweiClass::onAdminPost(AsyncWebServerRequest* request)
         return;
     }
 
-    if (!(root.containsKey("enabled"))) {
+    if (!(root.containsKey("enabled")) ||
+        !(root.containsKey("auto_power_enabled")) ||
+        !(root.containsKey("voltage_limit")) ||
+        !(root.containsKey("lower_power_limit")) ||
+        !(root.containsKey("upper_power_limit"))) {
         retMsg[F("message")] = F("Values are missing!");
         retMsg[F("code")] = WebApiError::GenericValueMissing;
         response->setLength();
@@ -244,6 +253,11 @@ void WebApiHuaweiClass::onAdminPost(AsyncWebServerRequest* request)
 
     CONFIG_T& config = Configuration.get();
     config.Huawei_Enabled = root[F("enabled")].as<bool>();
+    config.Huawei_Auto_Power_Enabled = root[F("auto_power_enabled")].as<bool>();
+    config.Huawei_Auto_Power_Voltage_Limit = root[F("voltage_limit")].as<float>();
+    config.Huawei_Auto_Power_Enable_Voltage_Limit = root[F("enable_voltage_limit")].as<float>();
+    config.Huawei_Auto_Power_Lower_Power_Limit = root[F("lower_power_limit")].as<float>();
+    config.Huawei_Auto_Power_Upper_Power_Limit = root[F("upper_power_limit")].as<float>();    
     Configuration.write();
 
     retMsg[F("type")] = F("success");
@@ -254,6 +268,7 @@ void WebApiHuaweiClass::onAdminPost(AsyncWebServerRequest* request)
     request->send(response);
 
     const PinMapping_t& pin = PinMapping.get();
+    // Properly turn this on
     if (config.Huawei_Enabled) {
         MessageOutput.println(F("Initialize Huawei AC charger interface... "));
         if (PinMapping.isValidHuaweiConfig()) {
@@ -265,5 +280,18 @@ void WebApiHuaweiClass::onAdminPost(AsyncWebServerRequest* request)
         }
     }
 
-    HuaweiCan.setPower(config.Huawei_Enabled);
+    // Properly turn this off
+    if (!config.Huawei_Enabled) {
+      HuaweiCan.setValue(0, HUAWEI_ONLINE_CURRENT);
+      delay(500);
+      HuaweiCan.setMode(HUAWEI_MODE_OFF);
+      return;
+    }
+
+    if (config.Huawei_Auto_Power_Enabled) {
+      HuaweiCan.setMode(HUAWEI_MODE_AUTO_INT);
+      return;
+    }
+
+    HuaweiCan.setMode(HUAWEI_MODE_AUTO_EXT);
 }

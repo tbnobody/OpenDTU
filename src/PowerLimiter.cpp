@@ -9,6 +9,7 @@
 #include "Configuration.h"
 #include "MqttSettings.h"
 #include "NetworkSettings.h"
+#include "Huawei_can.h"
 #include <VeDirectFrameHandler.h>
 #include "MessageOutput.h"
 #include <ctime>
@@ -199,8 +200,8 @@ uint8_t PowerLimiterClass::getPowerLimiterState() {
     return PL_UI_STATE_INACTIVE;
 }
 
-int32_t PowerLimiterClass::getLastRequestedPowewrLimit() {
-    return _lastRequestedPowerLimit;
+int32_t PowerLimiterClass::getLastRequestedPowerLimit() {
+	    return _lastRequestedPowerLimit;
 }
 
 bool PowerLimiterClass::getMode() {
@@ -279,7 +280,15 @@ int32_t PowerLimiterClass::calcPowerLimit(std::shared_ptr<InverterAbstract> inve
     if(batteryDischargeEnabled && useFullSolarPassthrough(inverter)) {
       // Case 5
       newPowerLimit = newPowerLimit > adjustedVictronChargePower ? newPowerLimit : adjustedVictronChargePower;
-    } 
+    } else {
+      // We check if the PSU is on and disable the Power Limiter in this case. 
+      // The PSU should reduce power or shut down first before the Power Limiter kicks in
+      // The only case where this is not desired is if the battery is over the Full Solar Passthrough Threshold
+      // In this case the Power Limiter should start. The PSU will shutdown when the Power Limiter is active
+      if (HuaweiCan.getAutoPowerStatus()) {
+        return 0;
+      }
+    }
 
     // We should use Victron solar power only (corrected by efficiency factor)
     if ((solarPowerEnabled && !batteryDischargeEnabled) || (_mode == PL_MODE_SOLAR_PT_ONLY)) {

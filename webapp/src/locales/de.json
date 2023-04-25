@@ -733,6 +733,13 @@
         "ChargerSettings": "AC Ladegerät Einstellungen",
         "Configuration": "AC Ladegerät Konfiguration",
         "EnableHuawei": "Huawei R4850G2 an CAN Bus Interface aktiv",
+        "EnableAutoPower": "Automatische Leistungssteuerung",
+        "Limits": "Limits",
+        "VoltageLimit": "Ladespannungslimit",
+        "enableVoltageLimit": "Start Spannungslimit",
+        "enableVoltageLimitHint": "Die automatische Leistungssteuerung wird deaktiviert wenn die Ausgangsspannung über diesem Wert liegt und wenn gleichzeitig die Ausgangsleistung unter die minimale Leistung fällt.\nDie automatische Leistungssteuerung wird re-aktiveiert wenn die Batteriespannung unter diesen Wert fällt.",
+        "lowerPowerLimit": "Minimale Leistung",
+        "upperPowerLimit": "Maximale Leistung",
         "Seconds": "@:dtuadmin.Seconds",
         "Save": "@:dtuadmin.Save"
       },

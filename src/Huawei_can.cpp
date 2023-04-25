@@ -4,6 +4,8 @@
  */
 #include "Huawei_can.h"
 #include "MessageOutput.h"
+#include "PowerMeter.h"
+#include "PowerLimiter.h"
 #include "Configuration.h"
 #include <SPI.h>
 #include <mcp_can.h>
@@ -14,7 +16,9 @@ HuaweiCanClass HuaweiCan;
 
 void HuaweiCanClass::init(uint8_t huawei_miso, uint8_t huawei_mosi, uint8_t huawei_clk, uint8_t huawei_irq, uint8_t huawei_cs, uint8_t huawei_power)
 {
-    initialized = false;
+    if (_initialized) {
+      return;
+    }
 
     const CONFIG_T& config = Configuration.get();
 
@@ -32,12 +36,12 @@ void HuaweiCanClass::init(uint8_t huawei_miso, uint8_t huawei_mosi, uint8_t huaw
 
     CAN = new MCP_CAN(spi, huawei_cs);
     if (!CAN->begin(MCP_ANY, CAN_125KBPS, MCP_8MHZ) == CAN_OK) {
-        MessageOutput.println("Error Initializing MCP2515...");
+        MessageOutput.println("[HuaweiCanClass::init] Error Initializing MCP2515...");
         return;
     }
 
-    MessageOutput.println("MCP2515 Initialized Successfully!");
-    initialized = true;
+    MessageOutput.println("[HuaweiCanClass::init] MCP2515 Initialized Successfully!");
+    _initialized = true;
 
     // Change to normal mode to allow messages to be transmitted
     CAN->setMode(MCP_NORMAL);
@@ -45,6 +49,10 @@ void HuaweiCanClass::init(uint8_t huawei_miso, uint8_t huawei_mosi, uint8_t huaw
     pinMode(huawei_power, OUTPUT);
     digitalWrite(huawei_power, HIGH);
     _huawei_power = huawei_power;
+
+    if (config.Huawei_Auto_Power_Enabled) {
+      _mode = HUAWEI_MODE_AUTO_INT;
+    }
 }
 
 RectifierParameters_t * HuaweiCanClass::get()
@@ -54,23 +62,18 @@ RectifierParameters_t * HuaweiCanClass::get()
 
 uint32_t HuaweiCanClass::getLastUpdate()
 {
-    return lastUpdate;
+    return _lastUpdateReceivedMillis;
 }
+
 uint8_t data[8] = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
 
 // Requests current values from Huawei unit. Response is handled in onReceive
 void HuaweiCanClass::sendRequest()
 {
-    if (previousMillis < millis()) {
-        // Send extended message 
-        byte sndStat = CAN->sendMsgBuf(0x108040FE, 1, 8, data);
-        if(sndStat == CAN_OK) {
-            MessageOutput.println("Message Sent Successfully!");
-        } else {
-            MessageOutput.println("Error Sending Message...");
-        }
-
-        previousMillis += 5000;
+    // Send extended message 
+    byte sndStat = CAN->sendMsgBuf(0x108040FE, 1, 8, data);
+    if(sndStat != CAN_OK) {
+        MessageOutput.println("[HuaweiCanClass::sendRequest] Error Sending Message...");
     }
 }
 
@@ -97,8 +100,9 @@ void HuaweiCanClass::onReceive(uint8_t* frame, uint8_t len)
 
     case R48xx_DATA_OUTPUT_POWER:
         _rp.output_power = value / 1024.0;
+        _newOutputPowerReceived = true;
         // We'll only update last update on the important params
-        lastUpdate = millis();
+        _lastUpdateReceivedMillis = millis();
         break;
 
     case R48xx_DATA_EFFICIENCY:
@@ -110,7 +114,7 @@ void HuaweiCanClass::onReceive(uint8_t* frame, uint8_t len)
         break;
 
     case R48xx_DATA_OUTPUT_CURRENT_MAX:
-        _rp.max_output_current = value / MAX_CURRENT_MULTIPLIER;
+        _rp.max_output_current = static_cast<float>(value) / MAX_CURRENT_MULTIPLIER;
         break;
 
     case R48xx_DATA_INPUT_VOLTAGE:
@@ -133,12 +137,16 @@ void HuaweiCanClass::onReceive(uint8_t* frame, uint8_t len)
     case R48xx_DATA_OUTPUT_CURRENT:
         _rp.output_current = value / 1024.0;
 
-        /* This is normally the last parameter received. Print */
-        lastUpdate = millis();  // We'll only update last update on the important params
+        if (_rp.output_current > HUAWEI_AUTO_MODE_SHUTDOWN_CURRENT) {
+          _outputCurrentOnSinceMillis = millis();
+        }
 
-        MessageOutput.printf("In:  %.02fV, %.02fA, %.02fW\n", _rp.input_voltage, _rp.input_current, _rp.input_power);
-        MessageOutput.printf("Out: %.02fV, %.02fA of %.02fA, %.02fW\n", _rp.output_voltage, _rp.output_current, _rp.max_output_current, _rp.output_power);
-        MessageOutput.printf("Eff: %.01f%%, Temp in: %.01fC, Temp out: %.01fC\n", _rp.efficiency * 100, _rp.input_temp, _rp.output_temp);
+        /* This is normally the last parameter received. Print */
+        _lastUpdateReceivedMillis = millis();  // We'll only update last update on the important params
+
+        MessageOutput.printf("[HuaweiCanClass::onReceive] In:  %.02fV, %.02fA, %.02fW\n", _rp.input_voltage, _rp.input_current, _rp.input_power);
+        MessageOutput.printf("[HuaweiCanClass::onReceive] Out: %.02fV, %.02fA of %.02fA, %.02fW\n", _rp.output_voltage, _rp.output_current, _rp.max_output_current, _rp.output_power);
+        MessageOutput.printf("[HuaweiCanClass::onReceive] Eff: %.01f%%, Temp in: %.01fC, Temp out: %.01fC\n", _rp.efficiency * 100, _rp.input_temp, _rp.output_temp);
 
         break;
 
@@ -157,7 +165,7 @@ void HuaweiCanClass::loop()
 
   const CONFIG_T& config = Configuration.get();
 
-  if (!config.Huawei_Enabled || !initialized) {
+  if (!config.Huawei_Enabled || !_initialized) {
       return;
   }
 
@@ -175,12 +183,110 @@ void HuaweiCanClass::loop()
       // https://www.beyondlogic.org/review-huawei-r4850g2-power-supply-53-5vdc-3kw/
     }    
   }
-    sendRequest();
+
+  // Request updated values in regular intervals
+  if (_nextRequestMillis < millis()) {
+     MessageOutput.println("[HUAWEI********************* Sending request"); 
+      sendRequest();
+      _nextRequestMillis = millis() + 5000;
+  }
+
+  // If the output current is low for a long time, shutdown PSU
+  if (_outputCurrentOnSinceMillis + HUAWEI_AUTO_MODE_SHUTDOWN_DELAY < millis() && 
+      (_mode == HUAWEI_MODE_AUTO_EXT || _mode == HUAWEI_MODE_AUTO_INT)) {
+    digitalWrite(_huawei_power, 1);
+  }
+
+  // ***********************
+  // Automatic power control
+  // ***********************
+
+  if (_mode == HUAWEI_MODE_AUTO_INT ) {
+
+    // Set voltage limit in periodic intervals
+    if ( _nextAutoModePeriodicIntMillis < millis()) {
+      MessageOutput.printf("[HuaweiCanClass::loop] Periodically setting voltage limit: %f \r\n", config.Huawei_Auto_Power_Voltage_Limit);
+      setValue(config.Huawei_Auto_Power_Voltage_Limit, HUAWEI_ONLINE_VOLTAGE);
+      _nextAutoModePeriodicIntMillis = millis() + 60000;
+    }
+
+    // Re-enable automatic power control if the output voltage has dropped below threshold
+    if(_rp.output_voltage < config.Huawei_Auto_Power_Enable_Voltage_Limit ) {
+      _autoPowerEnabled = 10;
+    }
+
+    if ((PowerLimiter.getPowerLimiterState() == PL_UI_STATE_INACTIVE ||
+        PowerLimiter.getPowerLimiterState() == PL_UI_STATE_CHARGING) && 
+        PowerMeter.getLastPowerMeterUpdate() > _lastPowerMeterUpdateReceivedMillis &&
+        _newOutputPowerReceived && 
+        _autoPowerEnabled > 0) {
+        // Power Limiter is inactive and we have received both: 
+        // a new PowerMeter and a new output power value. Also we're _autoPowerEnabled
+        // So we're good to calculate a new limit
+
+      _newOutputPowerReceived = false;
+      _lastPowerMeterUpdateReceivedMillis = PowerMeter.getLastPowerMeterUpdate();
+
+      // Calculate new power limit
+      float newPowerLimit = -1 * round(PowerMeter.getPowerTotal());
+      newPowerLimit += _rp.output_power;
+      MessageOutput.printf("[HuaweiCanClass::loop] PL: %f, OP: %f \r\n", newPowerLimit, _rp.output_power);
+
+      if (newPowerLimit > config.Huawei_Auto_Power_Lower_Power_Limit) {
+
+        // Check if the output power has dropped below the lower limit (i.e. the battery is full)
+        // and if the PSU should be turned off. Also we use a simple counter mechanism here to be able
+        // to ramp up from zero output power when starting up
+        if (_rp.output_power < config.Huawei_Auto_Power_Lower_Power_Limit) {
+          MessageOutput.printf("[HuaweiCanClass::loop] Power and voltage limit reached. Disabling automatic power control .... \r\n");
+          _autoPowerEnabled--;
+          if (_autoPowerEnabled == 0) {
+            _autoPowerActive = false;
+            setValue(0, HUAWEI_ONLINE_CURRENT);
+            return;
+          }
+        } else {
+          _autoPowerEnabled = 10;
+        }
+
+        // Limit power to maximum
+        if (newPowerLimit > config.Huawei_Auto_Power_Upper_Power_Limit) {
+          newPowerLimit = config.Huawei_Auto_Power_Upper_Power_Limit;
+        }
+
+        // Set the actual output limit
+        float efficiency =  (_rp.efficiency > 0.5 ? _rp.efficiency : 1.0); 
+        float outputCurrent = efficiency * (newPowerLimit / _rp.output_voltage);
+        MessageOutput.printf("[HuaweiCanClass::loop] Output current %f \r\n", outputCurrent);
+        _autoPowerActive = true;
+        setValue(outputCurrent, HUAWEI_ONLINE_CURRENT);
+
+        // Issue next request for updated output values in 2s to allow for output stabilization
+        _nextRequestMillis = millis() + 2000;
+      } else {
+        // requested PL is below minium. Set current to 0
+        _autoPowerActive = false;
+        setValue(0.0, HUAWEI_ONLINE_CURRENT);
+      }
+    }
+  } 
 }
 
 void HuaweiCanClass::setValue(float in, uint8_t parameterType)
 {
     uint16_t value;
+
+    if (in < 0) {
+      MessageOutput.printf("[HuaweiCanClass::setValue]  Error: Tried to set voltage/current to negative value %f \r\n", in);
+    }
+
+    // Start PSU if needed
+    if (in > HUAWEI_AUTO_MODE_SHUTDOWN_CURRENT && parameterType == HUAWEI_ONLINE_CURRENT && 
+        (_mode == HUAWEI_MODE_AUTO_EXT || _mode == HUAWEI_MODE_AUTO_INT)) {
+      digitalWrite(_huawei_power, 0);
+      _outputCurrentOnSinceMillis = millis();
+    }
+
     if (parameterType == HUAWEI_OFFLINE_VOLTAGE || parameterType == HUAWEI_ONLINE_VOLTAGE) {
         value = in * 1024;
     } else if (parameterType == HUAWEI_OFFLINE_CURRENT || parameterType == HUAWEI_ONLINE_CURRENT) {
@@ -193,13 +299,39 @@ void HuaweiCanClass::setValue(float in, uint8_t parameterType)
 
     // Send extended message 
     byte sndStat = CAN->sendMsgBuf(0x108180FE, 1, 8, data);
-    if (sndStat == CAN_OK) {
-        MessageOutput.println("Message Sent Successfully!");
-    } else {
-        MessageOutput.println("Error Sending Message...");
+    if (sndStat != CAN_OK) {
+        MessageOutput.println("[HuaweiCanClass::setValue] Error Sending Message...");
     }
 }
 
-void HuaweiCanClass::setPower(bool power) {
-    digitalWrite(_huawei_power, !power);
+void HuaweiCanClass::setMode(uint8_t mode) {
+  const CONFIG_T& config = Configuration.get();
+
+  if(mode == HUAWEI_MODE_OFF) {
+    digitalWrite(_huawei_power, 1);
+    _mode = HUAWEI_MODE_OFF;
+  }
+  if(mode == HUAWEI_MODE_ON) {
+    digitalWrite(_huawei_power, 0);
+    _mode = HUAWEI_MODE_ON;
+  }
+
+  if (mode == HUAWEI_MODE_AUTO_INT && !config.Huawei_Auto_Power_Enabled ) {
+    MessageOutput.println("[HuaweiCanClass::setMode] WARNING: Trying to setmode to internal automatic power control without being enabled in the UI. Ignoring command");
+    return;
+  }
+
+  if (_mode == HUAWEI_MODE_AUTO_INT && mode != HUAWEI_MODE_AUTO_INT) {
+    _autoPowerActive = false;
+    setValue(0, HUAWEI_ONLINE_CURRENT);
+  }
+
+  if(mode == HUAWEI_MODE_AUTO_EXT || mode == HUAWEI_MODE_AUTO_INT) {
+    _mode = mode;
+  }
 }
+
+bool HuaweiCanClass::getAutoPowerStatus() {
+  return _autoPowerActive;
+}
+

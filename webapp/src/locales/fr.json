@@ -693,6 +693,13 @@
         "ChargerSettings": "AC Charger Settings",
         "Configuration": "AC Charger Configuration",
         "EnableHuawei": "Enable Huawei R4850G2 on CAN Bus Interface",
+        "EnableAutoPower": "Automatic power control",
+        "Limits": "Limits",
+        "VoltageLimit": "Charge Voltage limit",
+        "enableVoltageLimit": "Re-enable voltage limit",
+        "enableVoltageLimitHint": "Automatic power control is disabled if the output voltage is higher then this value and if the output power drops below the minimum output power limit (set below).\nAutomatic power control is re-enabled if the battery voltage drops below the value set in this field.",
+        "lowerPowerLimit": "Minimum output power",
+        "upperPowerLimit": "Maximum output power",
         "Seconds": "@:dtuadmin.Seconds",
         "Save": "@:dtuadmin.Save"
       },
