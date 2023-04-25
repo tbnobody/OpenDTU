@@ -104,7 +104,7 @@
                             </CardElement>
                         </div>
 
-                        <div v-for="(max, index) in selectedInverterData.channel" :key="`${index}`">
+                        <div v-for="(ch, index) in selectedInverterData.channel" :key="`${index}`">
                             <div class="row g-2">
                                 <div class="col-md">
                                     <label :for="`inverter-name_${index}`" class="col-form-label">
@@ -114,7 +114,7 @@
                                     <div class="d-flex mb-2">
                                         <div class="input-group">
                                             <input type="text" class="form-control" :id="`inverter-name_${index}`"
-                                                maxlength="31" v-model="selectedInverterData.channel[index].name" />
+                                                maxlength="31" v-model="ch.name" />
                                         </div>
                                     </div>
                                 </div>
@@ -128,7 +128,7 @@
                                     <div class="d-flex mb-2">
                                         <div class="input-group">
                                             <input type="number" class="form-control" :id="`inverter-max_${index}`"
-                                                min="0" v-model="selectedInverterData.channel[index].max_power"
+                                                min="0" v-model="ch.max_power"
                                                 :aria-describedby="`inverter-maxDescription_${index} inverter-customizer`" />
                                             <span class="input-group-text"
                                                 :id="`inverter-maxDescription_${index}`">W<sub>p</sub><sup>*</sup></span>
@@ -143,7 +143,7 @@
                                     <div class="d-flex mb-2">
                                         <div class="input-group">
                                             <input type="number" class="form-control" :id="`inverter-ytoffset_${index}`"
-                                                min="0" v-model="selectedInverterData.channel[index].yield_total_offset"
+                                                min="0" v-model="ch.yield_total_offset"
                                                 :aria-describedby="`inverter-ytoffsetDescription_${index} inverter-customizer`" />
                                             <span class="input-group-text"
                                                 :id="`inverter-ytoffsetDescription_${index}`">kWh</span>

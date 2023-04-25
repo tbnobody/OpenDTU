@@ -13,7 +13,6 @@ public:
 
     bool isIdle();
     bool isInitialized();
-    bool isConfigured();
 
     template <typename T>
     T* enqueCommand()
@@ -34,6 +33,5 @@ protected:
     serial_u _dtuSerial;
     std::queue<std::shared_ptr<CommandAbstract>> _commandQueue;
     bool _isInitialized = false;
-    bool _isConfigured = false;
     bool _busyFlag = false;
 };

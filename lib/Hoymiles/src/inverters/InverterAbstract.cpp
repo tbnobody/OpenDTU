@@ -31,7 +31,7 @@ void InverterAbstract::init()
     // Not possible in constructor --> virtual function
     // Not possible in verifyAllFragments --> Because no data if nothing is ever received
     // It has to be executed because otherwise the getChannelCount method in stats always returns 0
-    _statisticsParser.get()->setByteAssignment(getByteAssignment());
+    _statisticsParser.get()->setByteAssignment(getByteAssignment(), getByteAssignmentSize());
 }
 
 uint64_t InverterAbstract::serial()

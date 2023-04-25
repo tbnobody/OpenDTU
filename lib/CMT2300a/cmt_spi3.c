@@ -3,10 +3,16 @@
 #include <driver/spi_master.h>
 #include <esp_rom_gpio.h> // for esp_rom_gpio_connect_out_signal
 
+SemaphoreHandle_t paramLock=NULL;
+#define SPI_PARAM_LOCK()    do {} while (xSemaphoreTake(paramLock, portMAX_DELAY) != pdPASS)
+#define SPI_PARAM_UNLOCK()  xSemaphoreGive(paramLock)
+
 spi_device_handle_t spi_reg, spi_fifo;
 
 void cmt_spi3_init(int8_t pin_sdio, int8_t pin_clk, int8_t pin_cs, int8_t pin_fcs, uint32_t spi_speed)
 {
+    paramLock = xSemaphoreCreateMutex();
+
     spi_bus_config_t buscfg = {
         .mosi_io_num = pin_sdio,
         .miso_io_num = -1, // single wire MOSI/MISO
@@ -62,7 +68,9 @@ void cmt_spi3_write(uint8_t addr, uint8_t dat)
         .tx_buffer = &tx_data,
         .rx_buffer = NULL
     };
+    SPI_PARAM_LOCK();
     ESP_ERROR_CHECK(spi_device_polling_transmit(spi_reg, &t));
+    SPI_PARAM_UNLOCK();
     delayMicroseconds(100);
 }
 
@@ -76,7 +84,9 @@ uint8_t cmt_spi3_read(uint8_t addr)
         .tx_buffer = &tx_data,
         .rx_buffer = &rx_data
     };
+    SPI_PARAM_LOCK();
     ESP_ERROR_CHECK(spi_device_polling_transmit(spi_reg, &t));
+    SPI_PARAM_UNLOCK();
     delayMicroseconds(100);
     return rx_data;
 }
@@ -92,11 +102,13 @@ void cmt_spi3_write_fifo(const uint8_t* buf, uint16_t len)
         .rx_buffer = NULL
     };
 
+    SPI_PARAM_LOCK();
     for (uint8_t i = 0; i < len; i++) {
         tx_data = ~buf[i]; // negate buffer contents
         ESP_ERROR_CHECK(spi_device_polling_transmit(spi_fifo, &t));
         delayMicroseconds(4); // > 4 us
     }
+    SPI_PARAM_UNLOCK();
 }
 
 void cmt_spi3_read_fifo(uint8_t* buf, uint16_t len)
@@ -110,9 +122,11 @@ void cmt_spi3_read_fifo(uint8_t* buf, uint16_t len)
         .rx_buffer = &rx_data
     };
 
+    SPI_PARAM_LOCK();
     for (uint8_t i = 0; i < len; i++) {
         ESP_ERROR_CHECK(spi_device_polling_transmit(spi_fifo, &t));
         delayMicroseconds(4); // > 4 us
         buf[i] = rx_data;
     }
+    SPI_PARAM_UNLOCK();
 }

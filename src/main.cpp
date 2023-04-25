@@ -14,6 +14,7 @@
 #include "MqttHandleHass.h"
 #include "MqttHandleVedirectHass.h"
 #include "MqttHandleInverter.h"
+#include "MqttHandleInverterTotal.h"
 #include "MqttHandleVedirect.h"
 #include "MqttHandleHuawei.h"
 #include "MqttSettings.h"
@@ -100,6 +101,7 @@ void setup()
     MqttSettings.init();
     MqttHandleDtu.init();
     MqttHandleInverter.init();
+    MqttHandleInverterTotal.init();
     MqttHandleVedirect.init();
     MqttHandleHass.init();
     MqttHandleVedirectHass.init();
@@ -203,6 +205,8 @@ void loop()
     MqttHandleDtu.loop();
     yield();
     MqttHandleInverter.loop();
+    yield();
+    MqttHandleInverterTotal.loop();
     yield();
     MqttHandleVedirect.loop();
     yield();

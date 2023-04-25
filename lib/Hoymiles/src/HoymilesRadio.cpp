@@ -66,11 +66,6 @@ bool HoymilesRadio::isInitialized()
     return _isInitialized;
 }
 
-bool HoymilesRadio::isConfigured()
-{
-    return _isConfigured;
-}
-
 bool HoymilesRadio::isIdle()
 {
     return !_busyFlag;

@@ -107,7 +107,7 @@ public:
     void clearBuffer();
     void appendFragment(uint8_t offset, uint8_t* payload, uint8_t len);
 
-    void setByteAssignment(const std::list<byteAssign_t>* byteAssignment);
+    void setByteAssignment(const byteAssign_t* byteAssignment, uint8_t size);
 
     const byteAssign_t* getAssignmentByChannelField(ChannelType_t type, ChannelNum_t channel, FieldId_t fieldId);
     fieldSettings_t* getSettingByChannelField(ChannelType_t type, ChannelNum_t channel, FieldId_t fieldId);
@@ -137,7 +137,8 @@ private:
     uint8_t _statisticLength = 0;
     uint16_t _stringMaxPower[CH_CNT];
 
-    const std::list<byteAssign_t>* _byteAssignment;
+    const byteAssign_t* _byteAssignment;
+    uint8_t _byteAssignmentSize;
     std::list<fieldSettings_t> _fieldSettings;
 
     uint32_t _rxFailureCount = 0;

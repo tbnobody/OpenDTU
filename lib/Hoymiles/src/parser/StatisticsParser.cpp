@@ -28,9 +28,10 @@ const calcFunc_t calcFunctions[] = {
     { CALC_IRR_CH, &calcIrradiation }
 };
 
-void StatisticsParser::setByteAssignment(const std::list<byteAssign_t>* byteAssignment)
+void StatisticsParser::setByteAssignment(const byteAssign_t* byteAssignment, uint8_t size)
 {
     _byteAssignment = byteAssignment;
+    _byteAssignmentSize = size;
 }
 
 void StatisticsParser::clearBuffer()
@@ -51,9 +52,9 @@ void StatisticsParser::appendFragment(uint8_t offset, uint8_t* payload, uint8_t 
 
 const byteAssign_t* StatisticsParser::getAssignmentByChannelField(ChannelType_t type, ChannelNum_t channel, FieldId_t fieldId)
 {
-    for (auto const& i : *_byteAssignment) {
-        if (i.type == type && i.ch == channel && i.fieldId == fieldId) {
-            return &i;
+    for (uint8_t i = 0; i < _byteAssignmentSize; i++) {
+        if (_byteAssignment[i].type == type && _byteAssignment[i].ch == channel && _byteAssignment[i].fieldId == fieldId) {
+            return &_byteAssignment[i];
         }
     }
     return NULL;
@@ -172,9 +173,9 @@ const char* StatisticsParser::getChannelTypeName(ChannelType_t type)
 std::list<ChannelNum_t> StatisticsParser::getChannelsByType(ChannelType_t type)
 {
     std::list<ChannelNum_t> l;
-    for (auto const& b : *_byteAssignment) {
-        if (b.type == type) {
-            l.push_back(b.ch);
+    for (uint8_t i = 0; i < _byteAssignmentSize; i++) {
+        if (_byteAssignment[i].type == type) {
+            l.push_back(_byteAssignment[i].ch);
         }
     }
     l.unique();
