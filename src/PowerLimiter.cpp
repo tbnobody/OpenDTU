@@ -172,21 +172,21 @@ int32_t PowerLimiterClass::calcPowerLimit(std::shared_ptr<InverterAbstract> inve
             return _lastRequestedPowerLimit;
     }
 
-    float efficency = inverter->Statistics()->getChannelFieldValue(TYPE_AC, (ChannelNum_t) config.PowerLimiter_InverterChannelId, FLD_EFF);
-    int32_t victronChargePower = this->getDirectSolarPower();
-    int32_t adjustedVictronChargePower = victronChargePower * (efficency > 0.0 ? (efficency / 100.0) : 1.0); // if inverter is off, use 1.0
+    // We should use Victron solar power only (corrected by efficiency factor)
+    if (consumeSolarPowerOnly) {
+        float efficiency = inverter->Statistics()->getChannelFieldValue(TYPE_AC, (ChannelNum_t) config.PowerLimiter_InverterChannelId, FLD_EFF);
+        int32_t victronChargePower = this->getDirectSolarPower();
+        int32_t adjustedVictronChargePower = victronChargePower * (efficiency > 0.0 ? (efficiency / 100.0) : 1.0); // if inverter is off, use 1.0
 
-    MessageOutput.printf("[PowerLimiterClass::loop] victronChargePower: %d, efficiency: %.2f, consumeSolarPowerOnly: %s, powerConsumption: %d \r\n", 
-        victronChargePower, efficency, consumeSolarPowerOnly ? "true" : "false", newPowerLimit);
+        MessageOutput.printf("[PowerLimiterClass::loop] Consuming Solar Power Only -> victronChargePower: %d, efficiency: %.2f, powerConsumption: %d \r\n", 
+            victronChargePower, efficiency, newPowerLimit);
 
-    int32_t upperPowerLimit = config.PowerLimiter_UpperPowerLimit;
-    if (consumeSolarPowerOnly && (upperPowerLimit > adjustedVictronChargePower)) {
-        // Battery voltage too low, use Victron solar power (corrected by efficiency factor) only
-        upperPowerLimit = adjustedVictronChargePower;
+        newPowerLimit = adjustedVictronChargePower;
     }
 
-    if (newPowerLimit > upperPowerLimit) 
-        newPowerLimit = upperPowerLimit;
+    // Respect power limit
+    if (newPowerLimit > config.PowerLimiter_UpperPowerLimit) 
+        newPowerLimit = config.PowerLimiter_UpperPowerLimit;
 
     MessageOutput.printf("[PowerLimiterClass::loop] newPowerLimit: %d\r\n", newPowerLimit);
     return newPowerLimit;
