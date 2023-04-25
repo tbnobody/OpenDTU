@@ -141,12 +141,12 @@ int32_t PowerLimiterClass::calcPowerLimit(std::shared_ptr<InverterAbstract> inve
 
     // Safety check, return on too old power meter values
     if (millis() - PowerMeter.getLastPowerMeterUpdate() > (30 * 1000)
-            && (millis() - inverter->Statistics()->getLastUpdate()) > (config.Dtu_PollInterval * 3 * 1000)) {
+            && (millis() - inverter->Statistics()->getLastUpdate()) > (config.Dtu_PollInterval * 10 * 1000)) {
         // If the power meter values are older than 30 seconds, 
-        // and the Inverter Stats are older then 3x the poll interval
-        // set the limit to config.PowerLimiter_LowerPowerLimit for safety reasons.
-        MessageOutput.println("[PowerLimiterClass::loop] Power Meter values too old. Using lower limit");
-        return config.PowerLimiter_LowerPowerLimit;
+        // and the Inverter Stats are older then 10x the poll interval
+        // set the limit to 0W for safety reasons.
+        MessageOutput.println("[PowerLimiterClass::loop] Power Meter/Inverter values too old. Using 0W (i.e. disable inverter)");
+        return 0;
     }
 
     if (config.PowerLimiter_IsInverterBehindPowerMeter) {
@@ -157,16 +157,20 @@ int32_t PowerLimiterClass::calcPowerLimit(std::shared_ptr<InverterAbstract> inve
         float acPower = inverter->Statistics()->getChannelFieldValue(TYPE_AC, (ChannelNum_t) config.PowerLimiter_InverterChannelId, FLD_PAC); 
         newPowerLimit += static_cast<int>(acPower);
     }
-    
-    // check if grid power consumption is within the limits of the target consumption + hysteresis
-    if (newPowerLimit >= (config.PowerLimiter_TargetPowerConsumption - config.PowerLimiter_TargetPowerConsumptionHysteresis) &&
-        newPowerLimit <= (config.PowerLimiter_TargetPowerConsumption + config.PowerLimiter_TargetPowerConsumptionHysteresis)) {
-          // The values have not changed much. We just use the old setting
-          MessageOutput.println("[PowerLimiterClass::loop] reusing old limit");
-          return _lastRequestedPowerLimit;
+
+    // We're not trying to hit 0 exactly but take an offset into account
+    // This means we never fully compensate the used power with the inverter 
+    newPowerLimit -= config.PowerLimiter_TargetPowerConsumption;
+
+    // Check if the new value is within the limits of the hysteresis and
+    // if we're not limited to Solar Power only (i.e. we can discharge the battery)
+    // If things did not change much we just use the old setting
+    if (newPowerLimit >= (-config.PowerLimiter_TargetPowerConsumptionHysteresis) &&
+        newPowerLimit <= (+config.PowerLimiter_TargetPowerConsumptionHysteresis) &&
+        !consumeSolarPowerOnly ) {
+            MessageOutput.println("[PowerLimiterClass::loop] reusing old limit");
+            return _lastRequestedPowerLimit;
     }
-
-
 
     float efficency = inverter->Statistics()->getChannelFieldValue(TYPE_AC, (ChannelNum_t) config.PowerLimiter_InverterChannelId, FLD_EFF);
     int32_t victronChargePower = this->getDirectSolarPower();
@@ -174,10 +178,6 @@ int32_t PowerLimiterClass::calcPowerLimit(std::shared_ptr<InverterAbstract> inve
 
     MessageOutput.printf("[PowerLimiterClass::loop] victronChargePower: %d, efficiency: %.2f, consumeSolarPowerOnly: %s, powerConsumption: %d \r\n", 
         victronChargePower, efficency, consumeSolarPowerOnly ? "true" : "false", newPowerLimit);
-
-    // We're not trying to hit 0 exactly but take an offset into account
-    // This means we never fully compensate the used power with the inverter 
-    newPowerLimit -= config.PowerLimiter_TargetPowerConsumption;
 
     int32_t upperPowerLimit = config.PowerLimiter_UpperPowerLimit;
     if (consumeSolarPowerOnly && (upperPowerLimit > adjustedVictronChargePower)) {
