@@ -337,7 +337,9 @@
         "MpptTotalYieldTotal": "MPPT rendement total",
         "MpptTotalYieldDay": "MPPT rendement du jour",
         "MpptTotalPower": "MPPT puissance de l'installation",
-        "BatterySoc": "State of charge"
+        "BatterySoc": "State of charge",
+        "HomePower": "Grid Power",
+        "HuaweiPower": "Huawei AC Power"
     },
     "inverterchannelproperty": {
         "Power": "Puissance",

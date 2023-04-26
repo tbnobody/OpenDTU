@@ -4,6 +4,11 @@ This is a fork from the Hoymiles project OpenDTU.
 
 ![GitHub tag (latest SemVer)](https://img.shields.io/github/v/tag/helgeerbe/OpenDTU?label=based%20on%20original%20OpenDTU)
 
+<mark>This README is kept similar to the openDTU project for process reasons.</mark>
+
+<mark>Please refer to the [openDTU-onBattery readme ](README_onBattery.md) for project documentation.</mark>
+
+
 ## Extensions to the original OpenDTU
 
 This project is still under development and adds following features:
@@ -190,6 +195,12 @@ Topics for 3 phases of a power meter is configurable. Given is an example for th
 | huawei/input_temp                       | R     | Input air temperature                                | °C                         |
 | huawei/output_temp                      | R     | Output air temperature                               | °C                         |
 | huawei/efficiency                       | R     | Efficiency                                           | Percentage                 |
+
+## Power Limiter topics
+| Topic                                   | R / W | Description                                          | Value / Unit               |
+| --------------------------------------- | ----- | ---------------------------------------------------- | -------------------------- |
+| powerlimiter/cmd/disable                | W     | Power Limiter disable override for external PL control | 0 / 1                    |
+| powerlimiter/status/disabled            | R     | Power Limiter disable override status                | 0 / 1                    |
 
 ## Currently supported Inverters
 
@@ -503,6 +514,7 @@ A documentation of the Web API can be found here: [Web-API Documentation](docs/W
 * If your problem persists, check the  [Issues on Github](https://github.com/tbnobody/OpenDTU/issues). Please inspect not only the open issues, also the closed issues contain useful information.
 * Another source of information are the [Discussions](https://github.com/tbnobody/OpenDTU/discussions/)
 * When flashing with VSCode Plattform.IO fails and also with ESPRESSIF tool a demo bin file cannot be flashed to the ESP32 with error message "A fatal error occurred: MD5 of file does not match data in flash!" than un-wire/unconnect ESP32 from the NRF24L01+ board. Try to flash again and rewire afterwards.
+* Make sure to connect one inverter only to one DTU (Original, Ahoy, OpenDTU doesn't make a difference). If you query a inverter by multiple DTUs you will get strange peaks in your values.
 
 ## Related Projects
 

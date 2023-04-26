@@ -64,7 +64,7 @@
             "clk_mode": 3
         },
         "display": {
-            "type": 2,
+            "type": 3,
             "data": 33,
             "clk": 32
         }

@@ -12,6 +12,9 @@
                     <BIconSun width="30" height="30" class="d-inline-block align-text-top" />
                 </span>
                  OpenDTU
+                 <span class="text-info">
+                    <BIconBatteryCharging width="20" height="20" class="d-inline-block align-text-top" />
+                </span>
             </router-link>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup"
                 aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
@@ -128,7 +131,7 @@
 
 <script lang="ts">
 import { isLoggedIn, logout } from '@/utils/authentication';
-import { BIconEgg, BIconSun, BIconTree } from 'bootstrap-icons-vue';
+import { BIconEgg, BIconSun, BIconTree, BIconBatteryCharging } from 'bootstrap-icons-vue';
 import { defineComponent } from 'vue';
 import LocaleSwitcher from './LocaleSwitcher.vue';
 import ThemeSwitcher from './ThemeSwitcher.vue';
@@ -138,6 +141,7 @@ export default defineComponent({
         BIconEgg,
         BIconSun,
         BIconTree,
+        BIconBatteryCharging,
         LocaleSwitcher,
         ThemeSwitcher,
     },

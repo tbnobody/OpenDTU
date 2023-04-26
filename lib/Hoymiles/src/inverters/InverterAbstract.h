@@ -37,7 +37,8 @@ public:
     void setName(const char* name);
     const char* name();
     virtual String typeName() = 0;
-    virtual const std::list<byteAssign_t>* getByteAssignment() = 0;
+    virtual const byteAssign_t* getByteAssignment() = 0;
+    virtual uint8_t getByteAssignmentSize() = 0;
 
     bool isProducing();
     bool isReachable();

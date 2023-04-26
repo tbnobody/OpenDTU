@@ -7,6 +7,8 @@
 #include "MessageOutput.h"
 #include "WebApi.h"
 #include "Battery.h"
+#include "Huawei_can.h"
+#include "PowerMeter.h"
 #include "VeDirectFrameHandler.h"
 #include "defaults.h"
 #include <AsyncJson.h>
@@ -145,7 +147,7 @@ void WebApiWsLiveClass::generateJsonResponse(JsonVariant& root)
                 addField(chanTypeObj, i, inv, t, c, FLD_F);
                 addField(chanTypeObj, i, inv, t, c, FLD_T);
                 addField(chanTypeObj, i, inv, t, c, FLD_PF);
-                addField(chanTypeObj, i, inv, t, c, FLD_PRA);
+                addField(chanTypeObj, i, inv, t, c, FLD_Q);
                 addField(chanTypeObj, i, inv, t, c, FLD_EFF);
                 if (t == TYPE_DC && inv->Statistics()->getStringMaxPower(c) > 0) {
                     addField(chanTypeObj, i, inv, t, c, FLD_IRR);
@@ -197,10 +199,17 @@ void WebApiWsLiveClass::generateJsonResponse(JsonVariant& root)
     
     JsonObject huaweiObj = root.createNestedObject("huawei");
     huaweiObj[F("enabled")] = Configuration.get().Huawei_Enabled;
-
+    const RectifierParameters_t * rp = HuaweiCan.get();
+    addTotalField(huaweiObj, "Power", rp->output_power, "W", 2);
+    
     JsonObject batteryObj = root.createNestedObject("battery");
     batteryObj[F("enabled")] = Configuration.get().Battery_Enabled;
     addTotalField(batteryObj, "soc", Battery.stateOfCharge, "%", 0);
+
+    JsonObject powerMeterObj = root.createNestedObject("power_meter");
+    powerMeterObj[F("enabled")] = Configuration.get().PowerMeter_Enabled;
+    addTotalField(powerMeterObj, "Power", PowerMeter.getPowerTotal(), "W", 1);
+
 }
 
 void WebApiWsLiveClass::addField(JsonObject& root, uint8_t idx, std::shared_ptr<InverterAbstract> inv, ChannelType_t type, ChannelNum_t channel, FieldId_t fieldId, String topic)

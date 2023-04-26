@@ -63,7 +63,6 @@ void HoymilesRadio_CMT::init(int8_t pin_sdio, int8_t pin_clk, int8_t pin_cs, int
 
     cmtSwitchDtuFreq(_inverterTargetFrequency); // start dtu at work freqency, for fast Rx if inverter is already on and frequency switched
 
-    _isConfigured = true;
     if (!_radio->isChipConnected()) {
         Hoymiles.getMessageOutput()->println("CMT: Connection error!!");
         return;

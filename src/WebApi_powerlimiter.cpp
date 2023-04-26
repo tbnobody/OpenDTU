@@ -119,17 +119,18 @@ void WebApiPowerLimiterClass::onAdminPost(AsyncWebServerRequest* request)
 
     CONFIG_T& config = Configuration.get();
     config.PowerLimiter_Enabled = root[F("enabled")].as<bool>();
+    PowerLimiter.setDisable(false);  // User input clears the PL internal disable flag
     config.PowerLimiter_SolarPassThroughEnabled = root[F("solar_passtrough_enabled")].as<bool>();
     config.PowerLimiter_BatteryDrainStategy= root[F("battery_drain_strategy")].as<uint8_t>();
     config.PowerLimiter_IsInverterBehindPowerMeter = root[F("is_inverter_behind_powermeter")].as<bool>();
     config.PowerLimiter_InverterId = root[F("inverter_id")].as<uint8_t>();
     config.PowerLimiter_InverterChannelId = root[F("inverter_channel_id")].as<uint8_t>();
-    config.PowerLimiter_TargetPowerConsumption = root[F("target_power_consumption")].as<uint32_t>();
-    config.PowerLimiter_TargetPowerConsumptionHysteresis = root[F("target_power_consumption_hysteresis")].as<uint32_t>();
-    config.PowerLimiter_LowerPowerLimit = root[F("lower_power_limit")].as<uint32_t>();
-    config.PowerLimiter_UpperPowerLimit = root[F("upper_power_limit")].as<uint32_t>();
-    config.PowerLimiter_BatterySocStartThreshold = root[F("battery_soc_start_threshold")].as<float>();
-    config.PowerLimiter_BatterySocStopThreshold = root[F("battery_soc_stop_threshold")].as<float>();
+    config.PowerLimiter_TargetPowerConsumption = root[F("target_power_consumption")].as<int32_t>();
+    config.PowerLimiter_TargetPowerConsumptionHysteresis = root[F("target_power_consumption_hysteresis")].as<int32_t>();
+    config.PowerLimiter_LowerPowerLimit = root[F("lower_power_limit")].as<int32_t>();
+    config.PowerLimiter_UpperPowerLimit = root[F("upper_power_limit")].as<int32_t>();
+    config.PowerLimiter_BatterySocStartThreshold = root[F("battery_soc_start_threshold")].as<uint32_t>();
+    config.PowerLimiter_BatterySocStopThreshold = root[F("battery_soc_stop_threshold")].as<uint32_t>();
     config.PowerLimiter_VoltageStartThreshold = root[F("voltage_start_threshold")].as<float>();
     config.PowerLimiter_VoltageStartThreshold = static_cast<int>(config.PowerLimiter_VoltageStartThreshold * 100) / 100.0;
     config.PowerLimiter_VoltageStopThreshold = root[F("voltage_stop_threshold")].as<float>();

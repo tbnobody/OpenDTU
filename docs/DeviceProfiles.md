@@ -20,6 +20,22 @@ To change the device profile, navigate to the "Device Manager" and selected the 
             "en": 4,
             "cs": 5
         },
+        "victron": {
+            "rx": 22,
+            "tx": 21
+        },
+        "battery": {
+            "rx": 27,
+            "tx": 14
+        },
+        "huawei": {
+            "miso": 12,
+            "mosi": 13,
+            "clk": 26,
+            "irq": 25,
+            "power": 33,
+            "cs": 15
+        },
         "eth": {
             "enabled": false,
             "phy_addr": -1,
@@ -109,5 +125,15 @@ The json file can contain multiple profiles. Each profile requires a name and di
 | display.clk   | number    | Clock Pin (e.g. SCL for i2c displays) required for SSD1306 and SH1106. Use 255 for not assigned pins. |
 | display.cs    | number    | Chip Select Pin required for PCD8544. Use 255 for not assigned pins. |
 | display.reset | number    | Reset Pin required for PCD8544, optional for all other displays. Use 255 for not assigned pins. |
+| victron.rx    | number    | Victron Ve.direct Rx pin |
+| victron.tx    | number    | Victron Ve.direct Tx pin |
+| battery.rx    | number    | Pylontech CAN bus battery Rx pin |
+| battery.tx    | number    | Pylontech CAN bus battery Tx pin |
+| huawei.miso   | number    | MISO Pin for Huawei CAN bus interface |
+| huawei.mosi   | number    | MOSI Pin for Huawei CAN bus interface |
+| huawei.clk    | number    | CLK Pin for Huawei CAN bus interface |
+| huawei.cs     | number    | CS Pin for Huawei CAN bus interface |
+| huawei.irq    | number    | IRQ Pin for Huawei CAN bus interface |
+| huawei.power  | number    | Power Pin for Huawei power control (e.g. using slot detect) |
 | led.led0      | number    | LED pin for network indication. Blinking = WLAN connected but NTP & MQTT (if enabled) disconnected. On = WLAN, NTP, MQTT connected. Off = Network not connected |
 | led.led1      | number    | LED pin for inverter indication. On = All inverters reachable & producing. Blinking = All inverters reachable but not producing. Off = At least one inverter is not reachable. Only inverters with polling enabled are considered. |

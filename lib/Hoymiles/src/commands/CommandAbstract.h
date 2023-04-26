@@ -57,5 +57,5 @@ protected:
     uint64_t _routerAddress;
 
 private:
-    void convertSerialToPacketId(uint8_t buffer[], uint64_t serial);
+    static void convertSerialToPacketId(uint8_t buffer[], uint64_t serial);
 };

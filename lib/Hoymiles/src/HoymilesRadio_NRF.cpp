@@ -23,7 +23,6 @@ void HoymilesRadio_NRF::init(SPIClass* initialisedSpiBus, uint8_t pinCE, uint8_t
     _radio->setAddressWidth(5);
     _radio->setRetries(0, 0);
     _radio->maskIRQ(true, true, false); // enable only receiving interrupts
-    _isConfigured = true;
     if (!_radio->isChipConnected()) {
         Hoymiles.getMessageOutput()->println("NRF: Connection error!!");
         return;
