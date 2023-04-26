@@ -1,4 +1,4 @@
-name: OpenDTU Build
+name: OpenDTU-onBattery Build
 
 on:
   push:
