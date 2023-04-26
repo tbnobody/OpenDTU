@@ -38,12 +38,10 @@ void WebApiEventlogClass::onEventlogStatus(AsyncWebServerRequest* request)
     auto inv = Hoymiles.getInverterBySerial(serial);
 
     if (inv != nullptr) {
-        String serial = inv->serialString();
-
         uint8_t logEntryCount = inv->EventLog()->getEntryCount();
 
-        root[serial]["count"] = logEntryCount;
-        JsonArray eventsArray = root[serial].createNestedArray("events");
+        root["count"] = logEntryCount;
+        JsonArray eventsArray = root.createNestedArray("events");
 
         for (uint8_t logEntry = 0; logEntry < logEntryCount; logEntry++) {
             JsonObject eventsObject = eventsArray.createNestedObject();

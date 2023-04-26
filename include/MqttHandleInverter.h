@@ -33,7 +33,7 @@ private:
         FLD_PF,
         FLD_EFF,
         FLD_IRR,
-        FLD_PRA
+        FLD_Q
     };
 };
 

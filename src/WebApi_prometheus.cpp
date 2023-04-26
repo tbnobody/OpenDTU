@@ -85,7 +85,7 @@ void WebApiPrometheusClass::onPrometheusMetricsGet(AsyncWebServerRequest* reques
                         addField(stream, serial, i, inv, t, c, FLD_F);
                         addField(stream, serial, i, inv, t, c, FLD_T);
                         addField(stream, serial, i, inv, t, c, FLD_PF);
-                        addField(stream, serial, i, inv, t, c, FLD_PRA);
+                        addField(stream, serial, i, inv, t, c, FLD_Q);
                         addField(stream, serial, i, inv, t, c, FLD_EFF);
                         addField(stream, serial, i, inv, t, c, FLD_IRR);
                     }

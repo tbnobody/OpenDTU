@@ -12,6 +12,20 @@ The base topic, as configured in the web GUI is prepended to all follwing topics
 | dtu/status                              | R     | Indicates whether OpenDTU network is reachable       | online /  offline          |
 | dtu/uptime                              | R     | Time in seconds since startup                        | seconds                    |
 
+## Inverter total topicss
+
+Enabled inverter means, that only inverters with "Poll inverter data" enabled are considered.
+
+| Topic                                   | R / W | Description                                          | Value / Unit               |
+| --------------------------------------- | ----- | ---------------------------------------------------- | -------------------------- |
+| ac/power                                | R     | Sum of AC active power of all enabled inverters      | W                          |
+| ac/yieldtotal                           | R     | Sum of energy converted to AC since reset watt hours of all enabled inverters | Kilo watt hours (kWh) |
+| ac/yieldday                             | R     | Sum of energy converted to AC per day in watt hours of all enabled inverters | Watt hours (Wh)
+| ac/is_valid                             | R     | Indicator whether all enabled inverters where reachable | 0 or 1                  |
+| dc/power                                | R     | Sum of DC power of all enabled inverters             | Watt (W)                   |
+| dc/irradiation                          | R     | Produced power of all enabled inverter stripes with defined irradiation settings divided by sum of all enabled inverters irradiation | % |
+| dc/is_valid                             | R     | Indicator whether all enabled inverters where reachable | 0 or 1                  |
+
 ## Inverter specific topics
 
 serial will be replaced with the serial number of the inverter.

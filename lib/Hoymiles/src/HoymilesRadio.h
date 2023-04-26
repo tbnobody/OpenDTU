@@ -12,6 +12,7 @@ public:
     virtual void setDtuSerial(uint64_t serial);
 
     bool isIdle();
+    bool isQueueEmpty();
     bool isInitialized();
 
     template <typename T>

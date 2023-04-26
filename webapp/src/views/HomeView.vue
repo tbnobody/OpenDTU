@@ -533,7 +533,7 @@ export default defineComponent({
             fetch("/api/eventlog/status?inv=" + serial, { headers: authHeader() })
                 .then((response) => handleResponse(response, this.$emitter, this.$router))
                 .then((data) => {
-                    this.eventLogList = data[serial];
+                    this.eventLogList = data;
                     this.eventLogLoading = false;
                 });
 
@@ -544,10 +544,10 @@ export default defineComponent({
         },
         onShowDevInfo(serial: number) {
             this.devInfoLoading = true;
-            fetch("/api/devinfo/status", { headers: authHeader() })
+            fetch("/api/devinfo/status?inv=" + serial, { headers: authHeader() })
                 .then((response) => handleResponse(response, this.$emitter, this.$router))
                 .then((data) => {
-                    this.devInfoList = data[serial][0];
+                    this.devInfoList = data;
                     this.devInfoList.serial = serial;
                     this.devInfoLoading = false;
                 });

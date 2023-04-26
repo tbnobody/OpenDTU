@@ -10,6 +10,7 @@
 #include "MqttHandleDtu.h"
 #include "MqttHandleHass.h"
 #include "MqttHandleInverter.h"
+#include "MqttHandleInverterTotal.h"
 #include "MqttSettings.h"
 #include "NetworkSettings.h"
 #include "NtpSettings.h"
@@ -92,6 +93,7 @@ void setup()
     MqttSettings.init();
     MqttHandleDtu.init();
     MqttHandleInverter.init();
+    MqttHandleInverterTotal.init();
     MqttHandleHass.init();
     MessageOutput.println("done");
 
@@ -146,6 +148,7 @@ void loop()
     yield();
     MqttHandleInverter.loop();
     yield();
+    MqttHandleInverterTotal.loop();
     MqttHandleHass.loop();
     yield();
     WebApi.loop();
