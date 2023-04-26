@@ -23,13 +23,10 @@ void PowerLimiterClass::loop()
 {
     CONFIG_T& config = Configuration.get();
 
-    if (!config.PowerLimiter_Enabled
-            || !config.PowerMeter_Enabled
+    // Run inital checks to make sure we have met the basic conditions
+    if (!config.PowerMeter_Enabled
             || !Hoymiles.isAllRadioIdle()
-            || (millis() - _lastCommandSent) < (config.PowerLimiter_Interval * 1000)
             || (millis() - _lastLoop) < (config.PowerLimiter_Interval * 1000)) {
-        if (!config.PowerLimiter_Enabled)
-            _plState = STATE_DISCOVER; // ensure STATE_DISCOVER is set, if PowerLimiter will be enabled.
         return;
     }
 
@@ -40,106 +37,64 @@ void PowerLimiterClass::loop()
         return;
     }
 
-    float dcVoltage = inverter->Statistics()->getChannelFieldValue(TYPE_DC, (ChannelNum_t) config.PowerLimiter_InverterChannelId, FLD_UDC);
-    float acPower = inverter->Statistics()->getChannelFieldValue(TYPE_AC, (ChannelNum_t) config.PowerLimiter_InverterChannelId, FLD_PAC);
-    float correctedDcVoltage = dcVoltage + (acPower * config.PowerLimiter_VoltageLoadCorrectionFactor);
+    // Make sure inverter is turned off if PL is disabled by user/MQTT
+    // Make sure inverter is turned off when low battery threshold is reached
+    if (((!config.PowerLimiter_Enabled || _disabled) && _plState != SHUTDOWN)
+           || isStopThresholdReached(inverter)) {
+        if (inverter->isProducing()) {
+            MessageOutput.printf("PL initiated inverter shutdown.\r\n");
+            inverter->sendPowerControlRequest(false);
+        } else {
+            _plState = SHUTDOWN;
+        }
+        return;
+    }
+
+    // Return if power limiter is disabled
+    if (!config.PowerLimiter_Enabled || _disabled) {
+      return;
+    }
+  	// At this point the PL is enabled but we could still be in the shutdown state 
+    _plState = ACTIVE;
 
     // If the last inverter update is too old, don't do anything.
     // If the last inverter update was before the last limit updated, don't do anything.
-    // Also give the Power meter 3 seconds time to recognize power changes because of the last set limit
-    // and also because the Hoymiles MPPT might not react immediately.
+    // Also give the Power meter 3 seconds time to recognize power changes after the last set limit
+    // as the Hoymiles MPPT might not react immediately.
     if ((millis() - inverter->Statistics()->getLastUpdate()) > 10000
             || inverter->Statistics()->getLastUpdate() <= _lastLimitSetTime
             || PowerMeter.getLastPowerMeterUpdate() <= (_lastLimitSetTime + 3000)) {
         return;
     }
 
+    // Printout some stats
     if (millis() - PowerMeter.getLastPowerMeterUpdate() < (30 * 1000)) {
+        float dcVoltage = inverter->Statistics()->getChannelFieldValue(TYPE_DC, (ChannelNum_t) config.PowerLimiter_InverterChannelId, FLD_UDC);
         MessageOutput.printf("[PowerLimiterClass::loop] dcVoltage: %.2f Voltage Start Threshold: %.2f Voltage Stop Threshold: %.2f inverter->isProducing(): %d\r\n",
             dcVoltage, config.PowerLimiter_VoltageStartThreshold, config.PowerLimiter_VoltageStopThreshold, inverter->isProducing());
     }
 
-    while(true) {
-        switch(_plState) {
-            case STATE_DISCOVER:
-                if (!inverter->isProducing() || isStopThresholdReached(inverter)) {
-                    _plState = STATE_OFF;
-                }
-                else if (canUseDirectSolarPower()) {
-                    _plState = STATE_CONSUME_SOLAR_POWER_ONLY;
-                }
-                else {
-                    _plState = STATE_NORMAL_OPERATION;
-                }
-                break;
-            case STATE_OFF:
-                // if on turn off
-                if (inverter->isProducing()) {
-                    MessageOutput.printf("[PowerLimiterClass::loop] DC voltage: %.2f Corrected DC voltage: %.2f...\r\n",
-                        dcVoltage, correctedDcVoltage);
-                    setNewPowerLimit(inverter, -1);
-                    return;
-                }
 
-                // do nothing if battery is empty
-                if (isStopThresholdReached(inverter)) 
-                    return;
-                // check for possible state changes
-                if (canUseDirectSolarPower()) {
-                    _plState = STATE_CONSUME_SOLAR_POWER_ONLY;
-                }
-                if (isStartThresholdReached(inverter)) {
-                    _plState = STATE_NORMAL_OPERATION;
-                }
-                return;
-                break;
-            case STATE_CONSUME_SOLAR_POWER_ONLY: {
-                int32_t newPowerLimit = calcPowerLimit(inverter, true);
-                if (isStopThresholdReached(inverter)) {
-                    _plState = STATE_OFF;
-                    break;
-                }
-                if (isStartThresholdReached(inverter)) {
-                    _plState = STATE_NORMAL_OPERATION;
-                    break;
-                }
-
-                if (!canUseDirectSolarPower()) {
-                    if (config.PowerLimiter_BatteryDrainStategy == EMPTY_AT_NIGHT)
-                        _plState = STATE_NORMAL_OPERATION;
-                    else
-                        _plState = STATE_OFF;
-                    break;
-                }
-
-                setNewPowerLimit(inverter, newPowerLimit);
-                return;
-                break;
-            }
-            case STATE_NORMAL_OPERATION: {
-                int32_t newPowerLimit = calcPowerLimit(inverter, false);
-                if (isStopThresholdReached(inverter)) {
-                    _plState = STATE_OFF;
-                    break;
-                }
-                if (!isStartThresholdReached(inverter) && canUseDirectSolarPower() && (config.PowerLimiter_BatteryDrainStategy == EMPTY_AT_NIGHT)) {
-                    _plState = STATE_CONSUME_SOLAR_POWER_ONLY;
-                    break;
-                }
-
-                // check if grid power consumption is not within the upper and lower threshold of the target consumption
-                if (newPowerLimit >= (config.PowerLimiter_TargetPowerConsumption - config.PowerLimiter_TargetPowerConsumptionHysteresis) &&
-                    newPowerLimit <= (config.PowerLimiter_TargetPowerConsumption + config.PowerLimiter_TargetPowerConsumptionHysteresis) &&
-                    _lastRequestedPowerLimit >= (config.PowerLimiter_TargetPowerConsumption - config.PowerLimiter_TargetPowerConsumptionHysteresis) &&
-                    _lastRequestedPowerLimit <= (config.PowerLimiter_TargetPowerConsumption + config.PowerLimiter_TargetPowerConsumptionHysteresis) ) {
-                    return;    
-                }
-                setNewPowerLimit(inverter, newPowerLimit);;
-                return;
-                break;
-            } 
-        }
+    // Battery charging cycle conditions
+    // The battery can only be discharged after a full charge in the
+    // EMPTY_WHEN_FULL case 
+    if (isStopThresholdReached(inverter)) {
+      // Disable battery discharge when empty
+      _batteryDischargeEnabled = false;
+    } else if (!canUseDirectSolarPower() || 
+                config.PowerLimiter_BatteryDrainStategy == EMPTY_AT_NIGHT) {
+      // Enable battery discharge
+      _batteryDischargeEnabled = true;
     }
+
+    // This checks if the battery discharge start conditions are met for the EMPTY_WHEN_FULL case
+    if (isStartThresholdReached(inverter) && config.PowerLimiter_BatteryDrainStategy == EMPTY_WHEN_FULL) {
+      _batteryDischargeEnabled = true;
+    }
+
+    // Calculate and set Power Limit
+    int32_t newPowerLimit = calcPowerLimit(inverter, !_batteryDischargeEnabled);
+    setNewPowerLimit(inverter, newPowerLimit);
 }
 
 plStates PowerLimiterClass::getPowerLimiterState() {
@@ -148,6 +103,14 @@ plStates PowerLimiterClass::getPowerLimiterState() {
 
 int32_t PowerLimiterClass::getLastRequestedPowewrLimit() {
     return _lastRequestedPowerLimit;
+}
+
+bool PowerLimiterClass::getDisable() {
+    return _disabled;
+}
+
+void PowerLimiterClass::setDisable(bool disable) {
+    _disabled = disable;
 }
 
 bool PowerLimiterClass::canUseDirectSolarPower()
@@ -167,67 +130,95 @@ bool PowerLimiterClass::canUseDirectSolarPower()
     return true;
 }
 
+
+
+
 int32_t PowerLimiterClass::calcPowerLimit(std::shared_ptr<InverterAbstract> inverter, bool consumeSolarPowerOnly)
 {
     CONFIG_T& config = Configuration.get();
     
     int32_t newPowerLimit = round(PowerMeter.getPowerTotal());
 
-    float efficency = inverter->Statistics()->getChannelFieldValue(TYPE_AC, (ChannelNum_t) config.PowerLimiter_InverterChannelId, FLD_EFF);
-    int32_t victronChargePower = this->getDirectSolarPower();
-    int32_t adjustedVictronChargePower = victronChargePower * (efficency > 0.0 ? (efficency / 100.0) : 1.0); // if inverter is off, use 1.0
-
-    MessageOutput.printf("[PowerLimiterClass::loop] victronChargePower: %d, efficiency: %.2f, consumeSolarPowerOnly: %s, powerConsumption: %d \r\n", 
-        victronChargePower, efficency, consumeSolarPowerOnly ? "true" : "false", newPowerLimit);
-
-    // Safety check: Are the power meter values not too old?
-    // Are the reported inverter data not too old?
-    if (millis() - PowerMeter.getLastPowerMeterUpdate() < (30 * 1000)
-            && millis() - inverter->Statistics()->getLastUpdate() < (15 * 1000)) {
-        if (config.PowerLimiter_IsInverterBehindPowerMeter) {
-            // If the inverter the behind the power meter (part of measurement),
-            // the produced power of this inverter has also to be taken into account.
-            float acPower = inverter->Statistics()->getChannelFieldValue(TYPE_AC, (ChannelNum_t) config.PowerLimiter_InverterChannelId, FLD_PAC); 
-            newPowerLimit += static_cast<int>(acPower);
-        }
-
-        newPowerLimit -= config.PowerLimiter_TargetPowerConsumption;
-
-        int32_t upperPowerLimit = config.PowerLimiter_UpperPowerLimit;
-        if (consumeSolarPowerOnly && (upperPowerLimit > adjustedVictronChargePower)) {
-            // Battery voltage too low, use Victron solar power (corrected by efficency factor) only
-            upperPowerLimit = adjustedVictronChargePower;
-        }
-
-        if (newPowerLimit > upperPowerLimit) 
-            newPowerLimit = upperPowerLimit;
-    } else {
-        // If the power meter values are older than 30 seconds,
-        // set the limit to config.PowerLimiter_LowerPowerLimit for safety reasons.
-        newPowerLimit = config.PowerLimiter_LowerPowerLimit;
+    // Safety check, return on too old power meter values
+    if (millis() - PowerMeter.getLastPowerMeterUpdate() > (30 * 1000)
+            && (millis() - inverter->Statistics()->getLastUpdate()) > (config.Dtu_PollInterval * 10 * 1000)) {
+        // If the power meter values are older than 30 seconds, 
+        // and the Inverter Stats are older then 10x the poll interval
+        // set the limit to 0W for safety reasons.
+        MessageOutput.println("[PowerLimiterClass::loop] Power Meter/Inverter values too old. Using 0W (i.e. disable inverter)");
+        return 0;
     }
+
+    if (config.PowerLimiter_IsInverterBehindPowerMeter) {
+        // If the inverter the behind the power meter (part of measurement),
+        // the produced power of this inverter has also to be taken into account.
+        // We don't use FLD_PAC from the statistics, because that
+        // data might be too old and unreliable.
+        float acPower = inverter->Statistics()->getChannelFieldValue(TYPE_AC, (ChannelNum_t) config.PowerLimiter_InverterChannelId, FLD_PAC); 
+        newPowerLimit += static_cast<int>(acPower);
+    }
+
+    // We're not trying to hit 0 exactly but take an offset into account
+    // This means we never fully compensate the used power with the inverter 
+    newPowerLimit -= config.PowerLimiter_TargetPowerConsumption;
+
+    // Check if the new value is within the limits of the hysteresis and
+    // if we're not limited to Solar Power only (i.e. we can discharge the battery)
+    // If things did not change much we just use the old setting
+    if (newPowerLimit >= (-config.PowerLimiter_TargetPowerConsumptionHysteresis) &&
+        newPowerLimit <= (+config.PowerLimiter_TargetPowerConsumptionHysteresis) &&
+        !consumeSolarPowerOnly ) {
+            MessageOutput.println("[PowerLimiterClass::loop] reusing old limit");
+            return _lastRequestedPowerLimit;
+    }
+
+    // We should use Victron solar power only (corrected by efficiency factor)
+    if (consumeSolarPowerOnly) {
+        float efficiency = inverter->Statistics()->getChannelFieldValue(TYPE_AC, (ChannelNum_t) config.PowerLimiter_InverterChannelId, FLD_EFF);
+        int32_t victronChargePower = this->getDirectSolarPower();
+        int32_t adjustedVictronChargePower = victronChargePower * (efficiency > 0.0 ? (efficiency / 100.0) : 1.0); // if inverter is off, use 1.0
+
+        MessageOutput.printf("[PowerLimiterClass::loop] Consuming Solar Power Only -> victronChargePower: %d, efficiency: %.2f, powerConsumption: %d \r\n", 
+            victronChargePower, efficiency, newPowerLimit);
+
+        // Limit power to solar power only
+        if (adjustedVictronChargePower < newPowerLimit)
+          newPowerLimit = adjustedVictronChargePower;
+    }
+
+    // Respect power limit
+    if (newPowerLimit > config.PowerLimiter_UpperPowerLimit) 
+        newPowerLimit = config.PowerLimiter_UpperPowerLimit;
+
     MessageOutput.printf("[PowerLimiterClass::loop] newPowerLimit: %d\r\n", newPowerLimit);
     return newPowerLimit;
 }
 
 void PowerLimiterClass::setNewPowerLimit(std::shared_ptr<InverterAbstract> inverter, int32_t newPowerLimit)
 {
-    if(_lastRequestedPowerLimit != newPowerLimit) {
-        CONFIG_T& config = Configuration.get();
+    CONFIG_T& config = Configuration.get();
 
-        // if limit too low turn inverter offf
-        if (newPowerLimit < config.PowerLimiter_LowerPowerLimit) {
-            if (inverter->isProducing()) {
-                MessageOutput.println("[PowerLimiterClass::loop] Stopping inverter...");
-                inverter->sendPowerControlRequest(false);
-                _lastCommandSent = millis();
-            }
-            newPowerLimit = config.PowerLimiter_LowerPowerLimit;
-        } else if (!inverter->isProducing()) {
-            MessageOutput.println("[PowerLimiterClass::loop] Starting up inverter...");
-            inverter->sendPowerControlRequest(true);
-            _lastCommandSent = millis();
-        } 
+    // Start the inverter in case it's inactive and if the requested power is high enough
+    if (!inverter->isProducing() && newPowerLimit > config.PowerLimiter_LowerPowerLimit) {
+        MessageOutput.println("[PowerLimiterClass::loop] Starting up inverter...");
+        inverter->sendPowerControlRequest(true);
+    }
+
+    // Stop the inverter if limit is below threshold.
+    // We'll also set the power limit to the lower value in this case
+    if (newPowerLimit < config.PowerLimiter_LowerPowerLimit) {
+        if (inverter->isProducing()) {
+            MessageOutput.println("[PowerLimiterClass::loop] Stopping inverter...");
+            inverter->sendPowerControlRequest(false);
+        }
+        newPowerLimit = config.PowerLimiter_LowerPowerLimit;
+    }
+
+    // Set the actual limit. We'll only do this is if the limit is in the right range
+    // and differs from the last requested value
+    if( _lastRequestedPowerLimit != newPowerLimit &&
+          /* newPowerLimit > config.PowerLimiter_LowerPowerLimit &&  -->  This will always be true given the check above, kept for code readability */
+          newPowerLimit <= config.PowerLimiter_UpperPowerLimit ) {
         MessageOutput.printf("[PowerLimiterClass::loop] Limit Non-Persistent: %d W\r\n", newPowerLimit);
 
         int32_t effPowerLimit = newPowerLimit;
