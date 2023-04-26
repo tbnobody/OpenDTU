@@ -65,8 +65,8 @@ void MqttHandleInverterTotalClass::loop()
         }
 
         MqttSettings.publish("ac/power", String(totalAcPower, static_cast<unsigned int>(totalAcPowerDigits)));
-        MqttSettings.publish("ac/yieldtotal", String(totalAcYieldDay, static_cast<unsigned int>(totalAcYieldDayDigits)));
-        MqttSettings.publish("ac/yieldday", String(totalAcYieldTotal, static_cast<unsigned int>(totalAcYieldTotalDigits)));
+        MqttSettings.publish("ac/yieldtotal", String(totalAcYieldTotal, static_cast<unsigned int>(totalAcYieldTotalDigits)));
+        MqttSettings.publish("ac/yieldday", String(totalAcYieldDay, static_cast<unsigned int>(totalAcYieldDayDigits)));
         MqttSettings.publish("ac/is_valid", String(totalReachable));
         MqttSettings.publish("dc/power", String(totalDcPower, static_cast<unsigned int>(totalAcPowerDigits)));
         MqttSettings.publish("dc/irradiation", String(totalDcPowerIrrInst > 0 ? totalDcPowerIrr / totalDcPowerIrrInst * 100.0f : 0, 3));

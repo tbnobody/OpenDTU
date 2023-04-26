@@ -17,7 +17,7 @@ enum UnitId_t {
     UNIT_HZ,
     UNIT_C,
     UNIT_PCT,
-    UNIT_VA,
+    UNIT_VAR,
     UNIT_NONE
 };
 const char* const units[] = { "V", "A", "W", "Wh", "kWh", "Hz", "°C", "%", "var", "" };
@@ -37,7 +37,7 @@ enum FieldId_t {
     FLD_PF,
     FLD_EFF,
     FLD_IRR,
-    FLD_PRA,
+    FLD_Q,
     FLD_EVT_LOG,
     // HMT only
     FLD_UAC_1N,

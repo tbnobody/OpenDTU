@@ -44,7 +44,7 @@ const byteAssign_fieldDeviceClass_t deviceFieldAssignment[] = {
     { FLD_PF, DEVICE_CLS_POWER_FACTOR, STATE_CLS_MEASUREMENT },
     { FLD_EFF, DEVICE_CLS_NONE, STATE_CLS_NONE },
     { FLD_IRR, DEVICE_CLS_NONE, STATE_CLS_NONE },
-    { FLD_PRA, DEVICE_CLS_REACTIVE_POWER, STATE_CLS_MEASUREMENT }
+    { FLD_Q, DEVICE_CLS_REACTIVE_POWER, STATE_CLS_MEASUREMENT }
 };
 #define DEVICE_CLS_ASSIGN_LIST_LEN (sizeof(deviceFieldAssignment) / sizeof(byteAssign_fieldDeviceClass_t))
 
