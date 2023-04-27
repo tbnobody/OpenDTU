@@ -110,7 +110,6 @@ void cmt_spi3_write_fifo(const uint8_t* buf, uint16_t len)
     uint8_t tx_data;
 
     spi_transaction_t t = {
-        .flags = SPI_TRANS_MODE_OCT,
         .length = 8,
         .tx_buffer = &tx_data, // reference to write data
         .rx_buffer = NULL
