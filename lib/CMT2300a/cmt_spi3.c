@@ -32,10 +32,12 @@ void cmt_spi3_init(int8_t pin_sdio, int8_t pin_clk, int8_t pin_cs, int8_t pin_fc
         .max_transfer_sz = 32,
     };
     spi_device_interface_config_t devcfg = {
-        .command_bits = 0,
-        .address_bits = 0,
+        .command_bits = 1,
+        .address_bits = 7,
         .dummy_bits = 0,
         .mode = 0, // SPI mode 0
+        .cs_ena_pretrans = 1,
+        .cs_ena_posttrans = 1,
         .clock_speed_hz = spi_speed,
         .spics_io_num = pin_cs,
         .flags = SPI_DEVICE_HALFDUPLEX | SPI_DEVICE_3WIRE,
@@ -70,11 +72,12 @@ void cmt_spi3_init(int8_t pin_sdio, int8_t pin_clk, int8_t pin_cs, int8_t pin_fc
 
 void cmt_spi3_write(uint8_t addr, uint8_t dat)
 {
-    uint8_t tx_data[2];
-    tx_data[0] = ~addr;
-    tx_data[1] = ~dat;
+    uint8_t tx_data;
+    tx_data = ~dat;
     spi_transaction_t t = {
-        .length = 2 * 8,
+        .cmd = 1,
+        .addr = ~addr,
+        .length = 8,
         .tx_buffer = &tx_data,
         .rx_buffer = NULL
     };
@@ -86,12 +89,13 @@ void cmt_spi3_write(uint8_t addr, uint8_t dat)
 
 uint8_t cmt_spi3_read(uint8_t addr)
 {
-    uint8_t tx_data, rx_data;
-    tx_data = ~(addr | 0x80); // negation and MSB high (read command)
+    uint8_t rx_data;
     spi_transaction_t t = {
+        .cmd = 0,
+        .addr = ~addr,
         .length = 8,
         .rxlength = 8,
-        .tx_buffer = &tx_data,
+        .tx_buffer = NULL,
         .rx_buffer = &rx_data
     };
     SPI_PARAM_LOCK();
