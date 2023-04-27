@@ -9,8 +9,14 @@
 #include "SunPosition.h"
 #include <Hoymiles.h>
 
+// the NRF shall use the second externally usable HW SPI controller
+// for ESP32 that is the so-called VSPI, for ESP32-S2/S3/C3 it is now called implicitly
+// HSPI, as it has shifted places for these chip generations
+// for all generations, this is equivalent to SPI3_HOST in the lower level driver
 #if CONFIG_IDF_TARGET_ESP32C3 || CONFIG_IDF_TARGET_ESP32S2 || CONFIG_IDF_TARGET_ESP32S3
-#define VSPI FSPI
+#define SPI_NRF HSPI
+#else
+#define SPI_NRF VSPI
 #endif
 
 InverterSettingsClass InverterSettings;
@@ -27,7 +33,7 @@ void InverterSettingsClass::init()
         Hoymiles.init();
 
         if (PinMapping.isValidNrf24Config()) {
-            SPIClass* spiClass = new SPIClass(VSPI);
+            SPIClass* spiClass = new SPIClass(SPI_NRF);
             spiClass->begin(pin.nrf24_clk, pin.nrf24_miso, pin.nrf24_mosi, pin.nrf24_cs);
             Hoymiles.initNRF(spiClass, pin.nrf24_en, pin.nrf24_irq);
         }

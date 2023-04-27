@@ -9,13 +9,10 @@ SemaphoreHandle_t paramLock = NULL;
     } while (xSemaphoreTake(paramLock, portMAX_DELAY) != pdPASS)
 #define SPI_PARAM_UNLOCK() xSemaphoreGive(paramLock)
 
-// as Espressif confused the hell out of everyone we need to swap the selected SPI PHY here
-// as for newer generations NRF24 is exactly on the other SPI Interface and we get a collision
-#if CONFIG_IDF_TARGET_ESP32C3 || CONFIG_IDF_TARGET_ESP32S2 || CONFIG_IDF_TARGET_ESP32S3
-#define SPI_CMT SPI3_HOST
-#else
+// for ESP32 this is the so-called HSPI
+// for ESP32-S2/S3/C3 this nomenclature does not really exist anymore,
+// it is simply the first externally usable hardware SPI master controller
 #define SPI_CMT SPI2_HOST
-#endif
 
 spi_device_handle_t spi_reg, spi_fifo;
 
