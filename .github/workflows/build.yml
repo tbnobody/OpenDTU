@@ -96,16 +96,16 @@ jobs:
         run: pio run -e ${{ matrix.environment }}
 
       - name: Rename Firmware
-        run: mv .pio/build/${{ matrix.environment }}/firmware.bin .pio/build/${{ matrix.environment }}/opendtu-${{ matrix.environment }}.bin
+        run: mv .pio/build/${{ matrix.environment }}/firmware.bin .pio/build/${{ matrix.environment }}/opendtu-onbattery-${{ matrix.environment }}.bin
 
       - name: Copy boot_app0.bin
         run: cp ~/.platformio/packages/framework-arduinoespressif32/tools/partitions/boot_app0.bin .pio/build/${{ matrix.environment }}/boot_app0.bin
 
       - uses: actions/upload-artifact@v3
         with:
-          name: opendtu-${{ matrix.environment }}
+          name: opendtu-onbattery-${{ matrix.environment }}
           path: |
-            .pio/build/${{ matrix.environment }}/opendtu-${{ matrix.environment }}.bin
+            .pio/build/${{ matrix.environment }}/opendtu-onbattery-${{ matrix.environment }}.bin
             .pio/build/${{ matrix.environment }}/partitions.bin
             .pio/build/${{ matrix.environment }}/bootloader.bin
             .pio/build/${{ matrix.environment }}/boot_app0.bin
@@ -139,7 +139,7 @@ jobs:
           sudo apt install zip
           cd artifacts
           for i in */; do zip -r "${i%/}.zip" "$i"; done
-          for i in */; do cp ${i}opendtu-*.bin ./; done
+          for i in */; do cp ${i}opendtu-onbattery-*.bin ./; done
 
       - name: Create release
         uses: softprops/action-gh-release@v1
