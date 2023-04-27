@@ -40,7 +40,7 @@ private:
     float _powerMeter3Power;
 
     bool canUseDirectSolarPower();
-    int32_t calcPowerLimit(std::shared_ptr<InverterAbstract> inverter, bool consumeSolarPowerOnly);
+    int32_t calcPowerLimit(std::shared_ptr<InverterAbstract> inverter, bool solarPowerEnabled, bool batteryDischargeEnabled);
     void setNewPowerLimit(std::shared_ptr<InverterAbstract> inverter, int32_t newPowerLimit);
     int32_t getDirectSolarPower();
     float getLoadCorrectedVoltage(std::shared_ptr<InverterAbstract> inverter);

@@ -81,10 +81,9 @@ void PowerLimiterClass::loop()
     if (isStopThresholdReached(inverter)) {
       // Disable battery discharge when empty
       _batteryDischargeEnabled = false;
-    } else if (!canUseDirectSolarPower() || 
-                config.PowerLimiter_BatteryDrainStategy == EMPTY_AT_NIGHT) {
-      // Enable battery discharge
-      _batteryDischargeEnabled = true;
+    } else if (config.PowerLimiter_BatteryDrainStategy == EMPTY_AT_NIGHT) {
+      // Enable battery discharge when there is no sunshine
+      _batteryDischargeEnabled = !canUseDirectSolarPower();
     }
 
     // This checks if the battery discharge start conditions are met for the EMPTY_WHEN_FULL case
@@ -93,7 +92,7 @@ void PowerLimiterClass::loop()
     }
 
     // Calculate and set Power Limit
-    int32_t newPowerLimit = calcPowerLimit(inverter, !_batteryDischargeEnabled);
+    int32_t newPowerLimit = calcPowerLimit(inverter, canUseDirectSolarPower(), _batteryDischargeEnabled);
     setNewPowerLimit(inverter, newPowerLimit);
 }
 
@@ -133,11 +132,16 @@ bool PowerLimiterClass::canUseDirectSolarPower()
 
 
 
-int32_t PowerLimiterClass::calcPowerLimit(std::shared_ptr<InverterAbstract> inverter, bool consumeSolarPowerOnly)
+int32_t PowerLimiterClass::calcPowerLimit(std::shared_ptr<InverterAbstract> inverter, bool solarPowerEnabled, bool batteryDischargeEnabled)
 {
     CONFIG_T& config = Configuration.get();
     
     int32_t newPowerLimit = round(PowerMeter.getPowerTotal());
+
+    if (!solarPowerEnabled && !batteryDischargeEnabled) {
+      // No energy sources available
+      return 0;
+    }
 
     // Safety check, return on too old power meter values
     if (millis() - PowerMeter.getLastPowerMeterUpdate() > (30 * 1000)
@@ -163,17 +167,17 @@ int32_t PowerLimiterClass::calcPowerLimit(std::shared_ptr<InverterAbstract> inve
     newPowerLimit -= config.PowerLimiter_TargetPowerConsumption;
 
     // Check if the new value is within the limits of the hysteresis and
-    // if we're not limited to Solar Power only (i.e. we can discharge the battery)
+    // if we can discharge the battery
     // If things did not change much we just use the old setting
     if (newPowerLimit >= (-config.PowerLimiter_TargetPowerConsumptionHysteresis) &&
         newPowerLimit <= (+config.PowerLimiter_TargetPowerConsumptionHysteresis) &&
-        !consumeSolarPowerOnly ) {
+        batteryDischargeEnabled ) {
             MessageOutput.println("[PowerLimiterClass::loop] reusing old limit");
             return _lastRequestedPowerLimit;
     }
 
     // We should use Victron solar power only (corrected by efficiency factor)
-    if (consumeSolarPowerOnly) {
+    if (solarPowerEnabled && !batteryDischargeEnabled) {
         float efficiency = inverter->Statistics()->getChannelFieldValue(TYPE_AC, (ChannelNum_t) config.PowerLimiter_InverterChannelId, FLD_EFF);
         int32_t victronChargePower = this->getDirectSolarPower();
         int32_t adjustedVictronChargePower = victronChargePower * (efficiency > 0.0 ? (efficiency / 100.0) : 1.0); // if inverter is off, use 1.0
