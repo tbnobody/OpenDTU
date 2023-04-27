@@ -3,9 +3,19 @@
 #include <driver/spi_master.h>
 #include <esp_rom_gpio.h> // for esp_rom_gpio_connect_out_signal
 
-SemaphoreHandle_t paramLock=NULL;
-#define SPI_PARAM_LOCK()    do {} while (xSemaphoreTake(paramLock, portMAX_DELAY) != pdPASS)
-#define SPI_PARAM_UNLOCK()  xSemaphoreGive(paramLock)
+SemaphoreHandle_t paramLock = NULL;
+#define SPI_PARAM_LOCK() \
+    do {                 \
+    } while (xSemaphoreTake(paramLock, portMAX_DELAY) != pdPASS)
+#define SPI_PARAM_UNLOCK() xSemaphoreGive(paramLock)
+
+// as Espressif confused the hell out of everyone we need to swap the selected SPI PHY here
+// as for newer generations NRF24 is exactly on the other SPI Interface and we get a collision
+#if CONFIG_IDF_TARGET_ESP32C3 || CONFIG_IDF_TARGET_ESP32S2 || CONFIG_IDF_TARGET_ESP32S3
+#define SPI_CMT SPI3_HOST
+#else
+#define SPI_CMT SPI2_HOST
+#endif
 
 spi_device_handle_t spi_reg, spi_fifo;
 
@@ -34,8 +44,8 @@ void cmt_spi3_init(int8_t pin_sdio, int8_t pin_clk, int8_t pin_cs, int8_t pin_fc
         .post_cb = NULL,
     };
 
-    ESP_ERROR_CHECK(spi_bus_initialize(SPI2_HOST, &buscfg, 0));
-    ESP_ERROR_CHECK(spi_bus_add_device(SPI2_HOST, &devcfg, &spi_reg));
+    ESP_ERROR_CHECK(spi_bus_initialize(SPI_CMT, &buscfg, SPI_DMA_DISABLED));
+    ESP_ERROR_CHECK(spi_bus_add_device(SPI_CMT, &devcfg, &spi_reg));
 
     // FiFo
     spi_device_interface_config_t devcfg2 = {
@@ -52,9 +62,9 @@ void cmt_spi3_init(int8_t pin_sdio, int8_t pin_clk, int8_t pin_cs, int8_t pin_fc
         .pre_cb = NULL,
         .post_cb = NULL,
     };
-    ESP_ERROR_CHECK(spi_bus_add_device(SPI2_HOST, &devcfg2, &spi_fifo));
+    ESP_ERROR_CHECK(spi_bus_add_device(SPI_CMT, &devcfg2, &spi_fifo));
 
-    esp_rom_gpio_connect_out_signal(pin_sdio, spi_periph_signal[SPI2_HOST].spid_out, true, false);
+    esp_rom_gpio_connect_out_signal(pin_sdio, spi_periph_signal[SPI_CMT].spid_out, true, false);
     delay(100);
 }
 
