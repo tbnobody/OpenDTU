@@ -7,6 +7,11 @@
 #include <Hoymiles.h>
 #include <memory>
 
+#define PL_UI_STATE_INACTIVE 0
+#define PL_UI_STATE_CHARGING 1
+#define PL_UI_STATE_USE_SOLAR_ONLY 2
+#define PL_UI_STATE_USE_SOLAR_AND_BATTERY 3
+
 typedef enum {
     SHUTDOWN = 0, 
     ACTIVE
@@ -22,7 +27,7 @@ class PowerLimiterClass {
 public:
     void init();
     void loop();
-    plStates getPowerLimiterState();
+    uint8_t getPowerLimiterState();
     int32_t getLastRequestedPowewrLimit();
     void setDisable(bool disable);
     bool getDisable();
