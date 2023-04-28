@@ -73,6 +73,11 @@ void MqttHandleHuaweiClass::onMqttMessage(const espMqttClientTypes::MessagePrope
 {
     const CONFIG_T& config = Configuration.get();
 
+    // ignore messages if Huawei is disabled
+    if (!config.Huawei_Enabled) {
+        return;
+    }
+
     char token_topic[MQTT_MAX_TOPIC_STRLEN + 40]; // respect all subtopics
     strncpy(token_topic, topic, MQTT_MAX_TOPIC_STRLEN + 40); // convert const char* to char*
 
