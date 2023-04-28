@@ -13,7 +13,7 @@ Serial will be replaced with the serial number of the respective device.
 | dtu/status                              | R     | Indicates whether OpenDTU network is reachable       | online /  offline          |
 | dtu/uptime                              | R     | Time in seconds since startup                        | seconds                    |
 
-## Inverter total topicss
+## Inverter total topics
 
 Enabled inverter means, that only inverters with "Poll inverter data" enabled are considered.
 

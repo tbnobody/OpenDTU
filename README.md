@@ -261,7 +261,7 @@ Compatibility with OpenDTU is most likly related to the serial number of the inv
 * English, german and french web interface
 * Displays (SSD1306, SH1106, PCD8544)
 * Status LEDs
-* Konfiguration management (export / import configurations)
+* Configuration management (export / import configurations)
 * Dark Theme
 
 ## Features for developers
@@ -466,6 +466,13 @@ A documentation of all available MQTT Topics can be found here: [MQTT Documentat
 ## Web API Documentation
 
 A documentation of the Web API can be found here: [Web-API Documentation](docs/Web-API.md)
+
+## OpenDTU Breakoutboard
+We sat down together and designed a PCB. This is 100% compatible with openDTU and has space for all extensions such as display and LEDs. You can find the PCB design here: https://github.com/marove2000/openDTU_BreakoutBoard
+
+A ready to solder kit can be found here: https://shop.blinkyparts.com/en/OpenDTU-Your-evaluation-for-your-balcony-solar-system/blink237542
+
+<img src="docs/builds/opendtu_breakoutboard.jpg" alt='OpenDTU Breakout Board with Case' height='300px'><img src="docs/builds/thumbnail.jpg" alt='OpenDTU Breakout Board with Case' height='300px'>
 
 ## Available cases
 
