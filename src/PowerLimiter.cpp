@@ -43,6 +43,7 @@ void PowerLimiterClass::loop()
            || isStopThresholdReached(inverter)) {
         if (inverter->isProducing()) {
             MessageOutput.printf("PL initiated inverter shutdown.\r\n");
+            inverter->sendActivePowerControlRequest(config.PowerLimiter_LowerPowerLimit, PowerLimitControlType::AbsolutNonPersistent);
             inverter->sendPowerControlRequest(false);
         } else {
             _plState = SHUTDOWN;
@@ -54,16 +55,27 @@ void PowerLimiterClass::loop()
     if (!config.PowerLimiter_Enabled || _disabled) {
       return;
     }
+
+    // Safety check, return on too old power meter values
+    if (millis() - PowerMeter.getLastPowerMeterUpdate() > (30 * 1000)
+            || (millis() - inverter->Statistics()->getLastUpdate()) > (config.Dtu_PollInterval * 10 * 1000)) {
+        // If the power meter values are older than 30 seconds, 
+        // or the Inverter Stats are older then 10x the poll interval
+        // set the limit to lower power limit for safety reasons.
+        MessageOutput.println("[PowerLimiterClass::loop] Power Meter/Inverter values too old. Using 0W (i.e. disable inverter)");
+        inverter->sendActivePowerControlRequest(config.PowerLimiter_LowerPowerLimit, PowerLimitControlType::AbsolutNonPersistent);
+        inverter->sendPowerControlRequest(false);
+        return;
+    }
+
   	// At this point the PL is enabled but we could still be in the shutdown state 
     _plState = ACTIVE;
 
-    // If the last inverter update is too old, don't do anything.
     // If the last inverter update was before the last limit updated, don't do anything.
     // Also give the Power meter 3 seconds time to recognize power changes after the last set limit
     // as the Hoymiles MPPT might not react immediately.
-    if ((millis() - inverter->Statistics()->getLastUpdate()) > 10000
-            || inverter->Statistics()->getLastUpdate() <= _lastLimitSetTime
-            || PowerMeter.getLastPowerMeterUpdate() <= (_lastLimitSetTime + 3000)) {
+    if (inverter->Statistics()->getLastUpdate() <= _lastLimitSetTime
+        || PowerMeter.getLastPowerMeterUpdate() <= (_lastLimitSetTime + 3000)) {
         return;
     }
 
@@ -74,23 +86,37 @@ void PowerLimiterClass::loop()
             dcVoltage, config.PowerLimiter_VoltageStartThreshold, config.PowerLimiter_VoltageStopThreshold, inverter->isProducing());
     }
 
-
     // Battery charging cycle conditions
-    // The battery can only be discharged after a full charge in the
-    // EMPTY_WHEN_FULL case 
+    // First we always disable discharge if the battery is empty
     if (isStopThresholdReached(inverter)) {
       // Disable battery discharge when empty
       _batteryDischargeEnabled = false;
-    } else if (config.PowerLimiter_BatteryDrainStategy == EMPTY_AT_NIGHT) {
-      // Enable battery discharge when there is no sunshine
-      _batteryDischargeEnabled = !canUseDirectSolarPower();
-    }
+    } else {
+      // UI: Solar Passthrough Enabled -> false
+      // Battery discharge can be enabled when start threshold is reached
+      if (!config.PowerLimiter_SolarPassThroughEnabled && isStartThresholdReached(inverter)) {
+        _batteryDischargeEnabled = true;
+      }
 
-    // This checks if the battery discharge start conditions are met for the EMPTY_WHEN_FULL case
-    if (isStartThresholdReached(inverter) && config.PowerLimiter_BatteryDrainStategy == EMPTY_WHEN_FULL) {
-      _batteryDischargeEnabled = true;
-    }
+      // UI: Solar Passthrough Enabled -> true && EMPTY_AT_NIGHT
+      if (config.PowerLimiter_SolarPassThroughEnabled && config.PowerLimiter_BatteryDrainStategy == EMPTY_AT_NIGHT) {
+        if(isStartThresholdReached(inverter)) {
+            // In this case we should only discharge the battery as long it is above startThreshold
+            _batteryDischargeEnabled = true;
+        }
+        else {
+            // In this case we should only discharge the battery when there is no sunshine
+            _batteryDischargeEnabled = !canUseDirectSolarPower();
+        }
+      }
 
+      // UI: Solar Passthrough Enabled -> true && EMPTY_WHEN_FULL
+      // Battery discharge can be enabled when start threshold is reached
+      if (config.PowerLimiter_SolarPassThroughEnabled && isStartThresholdReached(inverter) && config.PowerLimiter_BatteryDrainStategy == EMPTY_WHEN_FULL) {
+        _batteryDischargeEnabled = true;
+      }
+    }
+    
     // Calculate and set Power Limit
     int32_t newPowerLimit = calcPowerLimit(inverter, canUseDirectSolarPower(), _batteryDischargeEnabled);
     setNewPowerLimit(inverter, newPowerLimit);
@@ -112,8 +138,8 @@ uint8_t PowerLimiterClass::getPowerLimiterState() {
       return PL_UI_STATE_USE_SOLAR_ONLY;
     }
 
-    if(VeDirect.veFrame.PPV > 0) {
-      return PL_UI_STATE_CHARGING;
+    if(!inverter->isProducing()) {
+       return PL_UI_STATE_CHARGING;
     }
 
     return PL_UI_STATE_INACTIVE;
@@ -160,16 +186,6 @@ int32_t PowerLimiterClass::calcPowerLimit(std::shared_ptr<InverterAbstract> inve
     if (!solarPowerEnabled && !batteryDischargeEnabled) {
       // No energy sources available
       return 0;
-    }
-
-    // Safety check, return on too old power meter values
-    if (millis() - PowerMeter.getLastPowerMeterUpdate() > (30 * 1000)
-            && (millis() - inverter->Statistics()->getLastUpdate()) > (config.Dtu_PollInterval * 10 * 1000)) {
-        // If the power meter values are older than 30 seconds, 
-        // and the Inverter Stats are older then 10x the poll interval
-        // set the limit to 0W for safety reasons.
-        MessageOutput.println("[PowerLimiterClass::loop] Power Meter/Inverter values too old. Using 0W (i.e. disable inverter)");
-        return 0;
     }
 
     if (config.PowerLimiter_IsInverterBehindPowerMeter) {
@@ -232,6 +248,7 @@ void PowerLimiterClass::setNewPowerLimit(std::shared_ptr<InverterAbstract> inver
     if (newPowerLimit < config.PowerLimiter_LowerPowerLimit) {
         if (inverter->isProducing()) {
             MessageOutput.println("[PowerLimiterClass::loop] Stopping inverter...");
+            inverter->sendActivePowerControlRequest(config.PowerLimiter_LowerPowerLimit, PowerLimitControlType::AbsolutNonPersistent);
             inverter->sendPowerControlRequest(false);
         }
         newPowerLimit = config.PowerLimiter_LowerPowerLimit;
