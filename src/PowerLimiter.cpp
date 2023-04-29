@@ -15,7 +15,7 @@
 
 PowerLimiterClass PowerLimiter;
 
-#define POWER_LIMITER_DEBUG
+// #define POWER_LIMITER_DEBUG
 
 void PowerLimiterClass::init()
 {
