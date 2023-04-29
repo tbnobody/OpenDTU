@@ -143,6 +143,11 @@ This list is for your convenience only, the project is not related to any of the
 It is important to get a module which supports SPI communicatiton. The following modules are currently supported:
 
 * [EBYTE E49-900M20S](https://ebyteiot.com/products/ebyte-e49-900m20s-cmt2300a-868-915mhz-smd-wireless-module-spi-hardware-module-long-range-3km-ipex-stamp-hole-antenna-wireless-module)
+* [Antenna](https://www.amazon.de/s?k=B0978Q7N7C)
+
+This list is for your convenience only, the project is not related to any of these shops.
+
+[Datasheet](https://www.ebyte.com/en/downpdf.aspx?id=1513)
 
 The CMT2300A uses 3-Wire half duplex SPI communication. Due to this fact it currently requires a separate SPI bus. If you want to run the CMT2300A module on the same ESP32 as a NRF24L01+ module or a PCD8544 display make sure you get a ESP which supports 2 SPI busses. Currently the SPI bus host is hardcoded to number 2. This may change in future.
 
