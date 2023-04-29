@@ -15,6 +15,8 @@
 
 PowerLimiterClass PowerLimiter;
 
+#define POWER_LIMITER_DEBUG
+
 void PowerLimiterClass::init()
 {
 }
@@ -30,17 +32,23 @@ void PowerLimiterClass::loop()
         return;
     }
 
+#ifdef POWER_LIMITER_DEBUG
+  MessageOutput.println("[PowerLimiterClass::loop] ******************* ENTER **********************");
+#endif
+
     _lastLoop = millis();
 
     std::shared_ptr<InverterAbstract> inverter = Hoymiles.getInverterByPos(config.PowerLimiter_InverterId);
     if (inverter == nullptr || !inverter->isReachable()) {
+#ifdef POWER_LIMITER_DEBUG
+  MessageOutput.println("[PowerLimiterClass::loop] ******************* No inverter found");
+#endif
         return;
     }
 
     // Make sure inverter is turned off if PL is disabled by user/MQTT
     // Make sure inverter is turned off when low battery threshold is reached
-    if (((!config.PowerLimiter_Enabled || _disabled) && _plState != SHUTDOWN)
-           || isStopThresholdReached(inverter)) {
+    if (((!config.PowerLimiter_Enabled || _disabled) && _plState != SHUTDOWN)) {
         if (inverter->isProducing()) {
             MessageOutput.printf("PL initiated inverter shutdown.\r\n");
             inverter->sendActivePowerControlRequest(config.PowerLimiter_LowerPowerLimit, PowerLimitControlType::AbsolutNonPersistent);
@@ -48,11 +56,17 @@ void PowerLimiterClass::loop()
         } else {
             _plState = SHUTDOWN;
         }
+#ifdef POWER_LIMITER_DEBUG
+  MessageOutput.printf("[PowerLimiterClass::loop] ******************* PL put into shutdown, _plState = %i\r\n", _plState);
+#endif        
         return;
     }
 
     // Return if power limiter is disabled
     if (!config.PowerLimiter_Enabled || _disabled) {
+#ifdef POWER_LIMITER_DEBUG
+  MessageOutput.printf("[PowerLimiterClass::loop] ******************* PL disabled\r\n");
+#endif        
       return;
     }
 
@@ -65,6 +79,9 @@ void PowerLimiterClass::loop()
         MessageOutput.println("[PowerLimiterClass::loop] Power Meter/Inverter values too old. Using 0W (i.e. disable inverter)");
         inverter->sendActivePowerControlRequest(config.PowerLimiter_LowerPowerLimit, PowerLimitControlType::AbsolutNonPersistent);
         inverter->sendPowerControlRequest(false);
+#ifdef POWER_LIMITER_DEBUG
+  MessageOutput.printf("[PowerLimiterClass::loop] ******************* PL safety shutdown, update times exceeded PM: %li, Inverter: %li \r\n", millis() - PowerMeter.getLastPowerMeterUpdate(), millis() - inverter->Statistics()->getLastUpdate());
+#endif        
         return;
     }
 
@@ -76,6 +93,9 @@ void PowerLimiterClass::loop()
     // as the Hoymiles MPPT might not react immediately.
     if (inverter->Statistics()->getLastUpdate() <= _lastLimitSetTime
         || PowerMeter.getLastPowerMeterUpdate() <= (_lastLimitSetTime + 3000)) {
+#ifdef POWER_LIMITER_DEBUG
+  MessageOutput.printf("[PowerLimiterClass::loop] ******************* PL inverter updates PM: %i, Inverter: %i \r\n", PowerMeter.getLastPowerMeterUpdate() - (_lastLimitSetTime + 3000), inverter->Statistics()->getLastUpdate() - _lastLimitSetTime);
+#endif                  
         return;
     }
 
@@ -116,10 +136,18 @@ void PowerLimiterClass::loop()
         _batteryDischargeEnabled = true;
       }
     }
-    
     // Calculate and set Power Limit
     int32_t newPowerLimit = calcPowerLimit(inverter, canUseDirectSolarPower(), _batteryDischargeEnabled);
     setNewPowerLimit(inverter, newPowerLimit);
+#ifdef POWER_LIMITER_DEBUG
+    MessageOutput.printf("[PowerLimiterClass::loop] Status: SolarPT enabled %i, Drain Strategy: %i, canUseDirectSolarPower: %i, Batt discharge: %i\r\n",
+        config.PowerLimiter_SolarPassThroughEnabled, config.PowerLimiter_BatteryDrainStategy, canUseDirectSolarPower(), _batteryDischargeEnabled);
+    MessageOutput.printf("[PowerLimiterClass::loop] Status: StartTH %i, StopTH: %i, loadCorrectedV %f\r\n",
+        isStartThresholdReached(inverter), isStopThresholdReached(inverter), getLoadCorrectedVoltage(inverter));
+    MessageOutput.printf("[PowerLimiterClass::loop] Status Batt: Ena: %i, SOC: %i, StartTH: %i, StopTH: %i, LastUpdate: %li\r\n",
+        config.Battery_Enabled, Battery.stateOfCharge, config.PowerLimiter_BatterySocStartThreshold, config.PowerLimiter_BatterySocStopThreshold, millis() - Battery.stateOfChargeLastUpdate);
+    MessageOutput.printf("[PowerLimiterClass::loop] ******************* Leaving PL, PL set to: %i, SP: %i, Batt: %i, PM: %f\r\n", newPowerLimit, canUseDirectSolarPower(), _batteryDischargeEnabled, round(PowerMeter.getPowerTotal()));
+#endif 
 }
 
 uint8_t PowerLimiterClass::getPowerLimiterState() {
