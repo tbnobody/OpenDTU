@@ -47,7 +47,6 @@ void PowerLimiterClass::loop()
     }
 
     // Make sure inverter is turned off if PL is disabled by user/MQTT
-    // Make sure inverter is turned off when low battery threshold is reached
     if (((!config.PowerLimiter_Enabled || _disabled) && _plState != SHUTDOWN)) {
         if (inverter->isProducing()) {
             MessageOutput.printf("PL initiated inverter shutdown.\r\n");
