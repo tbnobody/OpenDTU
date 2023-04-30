@@ -92,7 +92,25 @@ Several screenshots of the frontend can be found here: [Screenshots](docs/screen
   * A documentation of the Web API can be found here: [Web-API Documentation](docs/Web-API.md)
   * Home Assistant auto discovery is supported. [Example image](https://user-images.githubusercontent.com/59169507/217558862-a83846c5-6070-43cd-9a0b-90a8b2e2e8c6.png)
 
-### Dynamic Power Limiter Interface
+### Dynamic Power Limiter
+
+The dynamic power limiter is responsible for automatic inverter power adjustment. It will take the Power Meter (i.e. currently consumed power), the solar power and the battery charge state into account. The dynamic power limiter supports a few different strategies that can be configured from the user interface:
+
+* Solar Passthrough is off
+  * When using this strategy the inverter is steered such that the currently consumed power (as provided by the power meter) is compensated for. This is done as long as the battery charge state is above the limit set by the stop threshold. The inverter is turned off if the battery reaches the limit and is only re-enabled if the battery charge state reaches the limit set by start threshold.  
+* Solar Passthrough is on and the battery drain strategy is empty when full
+  * This case applies the same strategy as the strategy above. In addition Solar Power will be used to compensate for the currently used energy in cases where the battery discharge is disabled. In this case the inverter power limit is constrained to the input solar power and the power meter value so that battery discharge is avoided.
+* Solar Passthrough is on and the battery drain strategy is empty at night
+  * When using this strategy the inverter is steered such that the currently consumed power (as provided by the power meter) is compensated for. During daytime energy is taken from solar and from the battery, if the battery level is above the start threshold. At night battery power is used until the battery level reaches the stop threshold. When operating on solar power only (i.e. without using the battery) the inverter power limit is constrained to the input solar power and the power meter value so that battery discharge is avoided. The daytime / nighttime switch is based on the Victron MPPT Solar Charger power and 20W input are required in this case. 
+
+Other settings are:
+* The inverter ID configures the inverter that is controlled by the power limiter. The power limiter can only control a single inverter at this point in time.
+* Channel ID is the inverter input channel ID that is used for battery voltage readings.
+* Target power consumption and hysteresis set the power range that can be consumed from the grid.
+* Power limits control the min / max limits of the inverter
+* Inverter is behind power meter. Select this if your inverter power is measured by the power meter. This is typically the case.
+* Battery start and stop threshold can be configured using voltage and / or state of charge values. Stage of charge values require a Pylontech battery at this point.
+
 ![image](https://user-images.githubusercontent.com/59169507/222155765-9fff47a4-8ffa-42cf-8671-6359288e0cab.png)
 
 #### Power Limiter States
