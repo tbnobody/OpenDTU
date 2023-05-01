@@ -50,7 +50,8 @@ void PowerLimiterClass::loop()
     if (((!config.PowerLimiter_Enabled || _disabled) && _plState != SHUTDOWN)) {
         if (inverter->isProducing()) {
             MessageOutput.printf("PL initiated inverter shutdown.\r\n");
-            inverter->sendActivePowerControlRequest(config.PowerLimiter_LowerPowerLimit, PowerLimitControlType::AbsolutNonPersistent);
+            inverter->sendActivePowerControlRequest(static_cast<float>(config.PowerLimiter_LowerPowerLimit), PowerLimitControlType::AbsolutNonPersistent);
+            _lastRequestedPowerLimit = config.PowerLimiter_LowerPowerLimit;
             inverter->sendPowerControlRequest(false);
         } else {
             _plState = SHUTDOWN;
@@ -76,7 +77,8 @@ void PowerLimiterClass::loop()
         // or the Inverter Stats are older then 10x the poll interval
         // set the limit to lower power limit for safety reasons.
         MessageOutput.println("[PowerLimiterClass::loop] Power Meter/Inverter values too old. Using 0W (i.e. disable inverter)");
-        inverter->sendActivePowerControlRequest(config.PowerLimiter_LowerPowerLimit, PowerLimitControlType::AbsolutNonPersistent);
+        inverter->sendActivePowerControlRequest(static_cast<float>(config.PowerLimiter_LowerPowerLimit), PowerLimitControlType::AbsolutNonPersistent);
+        _lastRequestedPowerLimit = config.PowerLimiter_LowerPowerLimit;
         inverter->sendPowerControlRequest(false);
 #ifdef POWER_LIMITER_DEBUG
   MessageOutput.printf("[PowerLimiterClass::loop] ******************* PL safety shutdown, update times exceeded PM: %li, Inverter: %li \r\n", millis() - PowerMeter.getLastPowerMeterUpdate(), millis() - inverter->Statistics()->getLastUpdate());
@@ -275,7 +277,8 @@ void PowerLimiterClass::setNewPowerLimit(std::shared_ptr<InverterAbstract> inver
     if (newPowerLimit < config.PowerLimiter_LowerPowerLimit) {
         if (inverter->isProducing()) {
             MessageOutput.println("[PowerLimiterClass::loop] Stopping inverter...");
-            inverter->sendActivePowerControlRequest(config.PowerLimiter_LowerPowerLimit, PowerLimitControlType::AbsolutNonPersistent);
+            inverter->sendActivePowerControlRequest(static_cast<float>(config.PowerLimiter_LowerPowerLimit), PowerLimitControlType::AbsolutNonPersistent);
+            _lastRequestedPowerLimit = config.PowerLimiter_LowerPowerLimit;
             inverter->sendPowerControlRequest(false);
         }
         newPowerLimit = config.PowerLimiter_LowerPowerLimit;
@@ -304,8 +307,8 @@ void PowerLimiterClass::setNewPowerLimit(std::shared_ptr<InverterAbstract> inver
             }
         }
 
-        inverter->sendActivePowerControlRequest(effPowerLimit, PowerLimitControlType::AbsolutNonPersistent);
-        _lastRequestedPowerLimit = newPowerLimit;
+        inverter->sendActivePowerControlRequest(static_cast<float>(effPowerLimit), PowerLimitControlType::AbsolutNonPersistent);
+        _lastRequestedPowerLimit = effPowerLimit;
         // wait for the next inverter update (+ 3 seconds to make sure the limit got applied)
         _lastLimitSetTime = millis();
     }
