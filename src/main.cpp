@@ -26,8 +26,13 @@ void setup()
 {
     // Initialize serial output
     Serial.begin(SERIAL_BAUDRATE);
+#if ARDUINO_USB_CDC_ON_BOOT
+    Serial.setTxTimeoutMs(0);
+    delay(100);
+#else
     while (!Serial)
         yield();
+#endif
     MessageOutput.println();
     MessageOutput.println("Starting OpenDTU");
 
