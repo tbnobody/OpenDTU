@@ -12,7 +12,9 @@
 #include "inverters/HM_4CH.h"
 #include <Arduino.h>
 
-#define HOY_SEMAPHORE_TAKE() xSemaphoreTake(_xSemaphore, portMAX_DELAY)
+#define HOY_SEMAPHORE_TAKE() \
+    do {                     \
+    } while (xSemaphoreTake(_xSemaphore, portMAX_DELAY) != pdPASS)
 #define HOY_SEMAPHORE_GIVE() xSemaphoreGive(_xSemaphore)
 
 HoymilesClass Hoymiles;

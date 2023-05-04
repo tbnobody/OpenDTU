@@ -80,7 +80,7 @@ Compatibility with OpenDTU is most likly related to the serial number of the inv
 * English, german and french web interface
 * Displays (SSD1306, SH1106, PCD8544)
 * Status LEDs
-* Konfiguration management (export / import configurations)
+* Configuration management (export / import configurations)
 * Dark Theme
 
 ## Features for developers
@@ -210,8 +210,7 @@ It is recommended to make all changes only in the  'platformio_override.ini', th
 
 ### using the pre-compiled .bin files
 
-The pre-compiled files can be found on the [github page](https://github.com/tbnobody/OpenDTU) in the tab "Actions" and the sub menu "OpenDTU Build". Just choose the latest build from the master branch (search for "master" in the blue font text but click on the white header text!). You need to be logged in with your github account to download the files.
-Use a ESP32 flash tool of your choice (see next chapter) and flash the `.bin` files to the right addresses:
+The pre-compiled binary files can be found here on the [github page behind "Releases"](https://github.com/tbnobody/OpenDTU/releases) (look at the right column). For a first installation on an ESP32, download `opendtu-generic.zip`, unpack and use a ESP32 flash tool of your choice (see next chapter) to flash the `.bin` files to the right addresses:
 
 | Address  | File                   |
 | ---------| ---------------------- |
@@ -220,7 +219,7 @@ Use a ESP32 flash tool of your choice (see next chapter) and flash the `.bin` fi
 | 0xe000   | boot_app0.bin          |
 | 0x10000  | opendtu-*.bin          |
 
-For further updates you can just use the web interface and upload the `opendtu-*.bin` file.
+For further updates download `opendtu-generic.bin` and use the over-the-air firmware update in OpenDTU's web interface.
 
 #### Flash with esptool.py (Linux)
 
@@ -281,6 +280,13 @@ A documentation of all available MQTT Topics can be found here: [MQTT Documentat
 ## Web API Documentation
 
 A documentation of the Web API can be found here: [Web-API Documentation](docs/Web-API.md)
+
+## OpenDTU Breakoutboard
+We sat down together and designed a PCB. This is 100% compatible with openDTU and has space for all extensions such as display and LEDs. You can find the PCB design here: https://github.com/marove2000/openDTU_BreakoutBoard
+
+A ready to solder kit can be found here: https://shop.blinkyparts.com/en/OpenDTU-Your-evaluation-for-your-balcony-solar-system/blink237542
+
+<img src="docs/builds/opendtu_breakoutboard.jpg" alt='OpenDTU Breakout Board with Case' height='300px'><img src="docs/builds/thumbnail.jpg" alt='OpenDTU Breakout Board with Case' height='300px'>
 
 ## Available cases
 

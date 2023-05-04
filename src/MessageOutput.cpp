@@ -8,7 +8,9 @@
 
 MessageOutputClass MessageOutput;
 
-#define MSG_LOCK() xSemaphoreTake(_lock, portMAX_DELAY)
+#define MSG_LOCK() \
+    do {           \
+    } while (xSemaphoreTake(_lock, portMAX_DELAY) != pdPASS)
 #define MSG_UNLOCK() xSemaphoreGive(_lock)
 
 MessageOutputClass::MessageOutputClass()
@@ -45,7 +47,7 @@ void MessageOutputClass::loop()
             _ws->textAll(_buffer, _buff_pos);
             _buff_pos = 0;
         }
-        if(_forceSend) {
+        if (_forceSend) {
             _buff_pos = 0;
         }
         MSG_UNLOCK();
