@@ -46,6 +46,11 @@
             "type": 0,
             "clk_mode": 0
         }
+        "display": {
+            "type": 2,
+            "data": 21,
+            "clk": 22
+        }
     },
     {
         "name": "Generic NodeMCU 32 with SSD1306",
