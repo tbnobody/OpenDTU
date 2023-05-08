@@ -36,7 +36,7 @@ private:
     uint32_t _lastLoop = 0;
     int32_t _lastRequestedPowerLimit = 0;
     uint32_t _lastLimitSetTime = 0;
-    plStates _plState = ACTIVE; 
+    plStates _plState; 
     bool _disabled = false;
     bool _batteryDischargeEnabled = false;
 

@@ -19,6 +19,13 @@ PowerLimiterClass PowerLimiter;
 
 void PowerLimiterClass::init()
 {
+  CONFIG_T& config = Configuration.get();
+  if (config.PowerLimiter_Enabled) {
+    // We'll start in active state
+    _plState = ACTIVE;
+  } else {
+    _plState = SHUTDOWN;
+  }
 }
 
 void PowerLimiterClass::loop()
