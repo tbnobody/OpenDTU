@@ -2,7 +2,7 @@
 
 This is a fork from the Hoymiles project [OpenDTU](https://github.com/tbnobody/OpenDTU). This project is still under development but is being used on a day to day basis as well.
 
-![GitHub tag (latest SemVer)](https://img.shields.io/github/v/tag/helgeerbe/OpenDTU?label=based%20on%20original%20OpenDTU)
+![GitHub tag (latest SemVer)](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/helgeerbe/68b47cc8c8994d04ab3a4fa9d8aee5e6/raw/openDTUcoreRelease.json)
 
 ## Features
 
