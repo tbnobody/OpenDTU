@@ -6,8 +6,10 @@
 #include "Configuration.h"
 #include "MqttSettings.h"
 #include <Hoymiles.h>
+#include "WebApi_database.h"
 
 MqttHandleInverterTotalClass MqttHandleInverterTotal;
+WebApiDatabaseClass database;
 
 void MqttHandleInverterTotalClass::init()
 {
@@ -73,5 +75,7 @@ void MqttHandleInverterTotalClass::loop()
         MqttSettings.publish("dc/is_valid", String(totalReachable));
 
         _lastPublish.set(Configuration.get().Mqtt_PublishInterval * 1000);
+
+        database.write(totalAcYieldTotal);      // write value to database
     }
 }
