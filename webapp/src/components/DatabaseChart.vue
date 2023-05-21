@@ -24,13 +24,6 @@ export default defineComponent({
             fetch("/api/database", { headers: authHeader() })
                 .then((response) => handleResponse(response, this.$emitter, this.$router))
                 .then((energy) => {
-                    var end = new Date()
-                    var start = new Date()
-                    var interval = 1
-                    start.setDate(end.getDate() - interval)
-                    start.setHours(start.getHours() - 1)
-                    google.charts.setOnLoadCallback(drawBasic());
-
                     function drawBasic() {
                         var data = new google.visualization.DataTable();
                         data.addColumn('datetime', 'Time');
@@ -67,6 +60,13 @@ export default defineComponent({
                         var chart = new google.visualization.ColumnChart(document.getElementById('chart_div'));
                         chart.draw(data, options);
                     }
+
+                    var end = new Date()
+                    var start = new Date()
+                    var interval = 1    // number of days to show in the chart
+                    start.setDate(end.getDate() - interval)
+                    start.setHours(start.getHours() - 1)
+                    google.charts.setOnLoadCallback(drawBasic());
                 });
         }
     }
