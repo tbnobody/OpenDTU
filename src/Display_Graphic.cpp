@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 #include "Display_Graphic.h"
-#include <Hoymiles.h>
+#include "Datastore.h"
 #include <NetworkSettings.h>
 #include <map>
 #include <time.h>
@@ -113,38 +113,16 @@ void DisplayGraphicClass::loop()
     }
 
     if ((millis() - _lastDisplayUpdate) > _period) {
-        float totalPower = 0;
-        float totalYieldDay = 0;
-        float totalYieldTotal = 0;
-
-        uint8_t isprod = 0;
-
-        for (uint8_t i = 0; i < Hoymiles.getNumInverters(); i++) {
-            auto inv = Hoymiles.getInverterByPos(i);
-            if (inv == nullptr) {
-                continue;
-            }
-
-            if (inv->isProducing()) {
-                isprod++;
-            }
-
-            for (auto& c : inv->Statistics()->getChannelsByType(TYPE_AC)) {
-                totalPower += inv->Statistics()->getChannelFieldValue(TYPE_AC, c, FLD_PAC);
-                totalYieldDay += inv->Statistics()->getChannelFieldValue(TYPE_AC, c, FLD_YD);
-                totalYieldTotal += inv->Statistics()->getChannelFieldValue(TYPE_AC, c, FLD_YT);
-            }
-        }
 
         _display->clearBuffer();
 
         //=====> Actual Production ==========
-        if ((totalPower > 0) && (isprod > 0)) {
+        if (Datastore.isAtLeastOneReachable) {
             _display->setPowerSave(false);
-            if (totalPower > 999) {
-                snprintf(_fmtText, sizeof(_fmtText), "%2.1f kW", (totalPower / 1000));
+            if (Datastore.totalAcPowerEnabled > 999) {
+                snprintf(_fmtText, sizeof(_fmtText), "%2.1f kW", (Datastore.totalAcPowerEnabled / 1000));
             } else {
-                snprintf(_fmtText, sizeof(_fmtText), "%3.0f W", totalPower);
+                snprintf(_fmtText, sizeof(_fmtText), "%3.0f W", Datastore.totalAcPowerEnabled);
             }
             printText(_fmtText, 0);
             _previousMillis = millis();
@@ -162,10 +140,10 @@ void DisplayGraphicClass::loop()
         //<=======================
 
         //=====> Today & Total Production =======
-        snprintf(_fmtText, sizeof(_fmtText), "today: %4.0f Wh", totalYieldDay);
+        snprintf(_fmtText, sizeof(_fmtText), "today: %4.0f Wh", Datastore.totalAcYieldDayEnabled);
         printText(_fmtText, 1);
 
-        snprintf(_fmtText, sizeof(_fmtText), "total: %.1f kWh", totalYieldTotal);
+        snprintf(_fmtText, sizeof(_fmtText), "total: %.1f kWh", Datastore.totalAcYieldTotalEnabled);
         printText(_fmtText, 2);
         //<=======================
 
