@@ -109,6 +109,7 @@
                                     </template>
                                 </template>
                             </div>
+                            <DatabaseChart/>
                         </div>
                     </div>
                 </div>
@@ -323,6 +324,7 @@ import DevInfo from '@/components/DevInfo.vue';
 import EventLog from '@/components/EventLog.vue';
 import HintView from '@/components/HintView.vue';
 import InverterChannelInfo from "@/components/InverterChannelInfo.vue";
+import DatabaseChart from "@/components/DatabaseChart.vue";
 import InverterTotalInfo from '@/components/InverterTotalInfo.vue';
 import type { DevInfoStatus } from '@/types/DevInfoStatus';
 import type { EventlogItems } from '@/types/EventlogStatus';
@@ -353,6 +355,7 @@ export default defineComponent({
         EventLog,
         HintView,
         InverterChannelInfo,
+        DatabaseChart,
         InverterTotalInfo,
         BIconArrowCounterclockwise,
         BIconCheckCircleFill,
