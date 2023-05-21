@@ -63,6 +63,7 @@ export default defineComponent({
 
                 var options = {
                     height: 600,
+                    chartArea:{ top:25, width:'85%', height:'80%' },
                     legend: {
                         position: 'none'
                     },
