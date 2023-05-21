@@ -4,6 +4,7 @@
  */
 #include "WebApi_ws_live.h"
 #include "Configuration.h"
+#include "Datastore.h"
 #include "MessageOutput.h"
 #include "WebApi.h"
 #include "defaults.h"
@@ -90,10 +91,6 @@ void WebApiWsLiveClass::generateJsonResponse(JsonVariant& root)
 {
     JsonArray invArray = root.createNestedArray("inverters");
 
-    float totalPower = 0;
-    float totalYieldDay = 0;
-    float totalYieldTotal = 0;
-
     // Loop all inverters
     for (uint8_t i = 0; i < Hoymiles.getNumInverters(); i++) {
         auto inv = Hoymiles.getInverterByPos(i);
@@ -158,19 +155,12 @@ void WebApiWsLiveClass::generateJsonResponse(JsonVariant& root)
         if (inv->Statistics()->getLastUpdate() > _newestInverterTimestamp) {
             _newestInverterTimestamp = inv->Statistics()->getLastUpdate();
         }
-
-        for (auto& c : inv->Statistics()->getChannelsByType(TYPE_AC)) {
-            totalPower += inv->Statistics()->getChannelFieldValue(TYPE_AC, c, FLD_PAC);
-            totalYieldDay += inv->Statistics()->getChannelFieldValue(TYPE_AC, c, FLD_YD);
-            totalYieldTotal += inv->Statistics()->getChannelFieldValue(TYPE_AC, c, FLD_YT);
-        }
     }
 
     JsonObject totalObj = root.createNestedObject("total");
-    // todo: Fixed hard coded name, unit and digits
-    addTotalField(totalObj, "Power", totalPower, "W", 1);
-    addTotalField(totalObj, "YieldDay", totalYieldDay, "Wh", 0);
-    addTotalField(totalObj, "YieldTotal", totalYieldTotal, "kWh", 2);
+    addTotalField(totalObj, "Power", Datastore.totalAcPowerEnabled, "W", Datastore.totalAcPowerDigits);
+    addTotalField(totalObj, "YieldDay", Datastore.totalAcYieldDayEnabled, "Wh", Datastore.totalAcYieldDayDigits);
+    addTotalField(totalObj, "YieldTotal", Datastore.totalAcYieldTotalEnabled, "kWh", Datastore.totalAcYieldTotalDigits);
 
     JsonObject hintObj = root.createNestedObject("hints");
     struct tm timeinfo;

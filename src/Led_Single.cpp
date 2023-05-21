@@ -4,6 +4,7 @@
  */
 #include "Led_Single.h"
 #include "Configuration.h"
+#include "Datastore.h"
 #include "MqttSettings.h"
 #include "NetworkSettings.h"
 #include "PinMapping.h"
@@ -57,27 +58,11 @@ void LedSingleClass::loop()
         // Update inverter status
         _ledState[1] = LedState_t::Off;
         if (Hoymiles.getNumInverters()) {
-            bool allReachable = true;
-            bool allProducing = true;
-            for (uint8_t i = 0; i < Hoymiles.getNumInverters(); i++) {
-                auto inv = Hoymiles.getInverterByPos(i);
-                if (inv == nullptr) {
-                    continue;
-                }
-                if (inv->getEnablePolling()) {
-                    if (!inv->isReachable()) {
-                        allReachable = false;
-                    }
-                    if (!inv->isProducing()) {
-                        allProducing = false;
-                    }
-                }
-            }
             // set LED status
-            if (allReachable && allProducing) {
+            if (Datastore.isAllEnabledReachable && Datastore.isAllEnabledProducing) {
                 _ledState[1] = LedState_t::On;
             }
-            if (allReachable && !allProducing) {
+            if (Datastore.isAllEnabledReachable && !Datastore.isAllEnabledProducing) {
                 _ledState[1] = LedState_t::Blink;
             }
         }

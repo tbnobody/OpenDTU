@@ -3,6 +3,7 @@
  * Copyright (C) 2022 Thomas Basler and others
  */
 #include "Configuration.h"
+#include "Datastore.h"
 #include "Display_Graphic.h"
 #include "InverterSettings.h"
 #include "Led_Single.h"
@@ -141,6 +142,8 @@ void setup()
     MessageOutput.println("done");
 
     InverterSettings.init();
+
+    Datastore.init();
 }
 
 void loop()
@@ -149,11 +152,14 @@ void loop()
     yield();
     InverterSettings.loop();
     yield();
+    Datastore.loop();
+    yield();
     MqttHandleDtu.loop();
     yield();
     MqttHandleInverter.loop();
     yield();
     MqttHandleInverterTotal.loop();
+    yield();
     MqttHandleHass.loop();
     yield();
     WebApi.loop();
