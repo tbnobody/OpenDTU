@@ -111,7 +111,9 @@
                                         </template>
                                     </template>
                                 </template>
-                                <DatabaseChart />
+                                <div>
+                                    <DatabaseChart />
+                                </div>
                             </div>
                         </div>
                     </div>
