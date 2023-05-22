@@ -65,7 +65,7 @@ export default defineComponent({
                     var start = new Date()
                     var interval = 1    // number of days to show in the chart
                     start.setDate(end.getDate() - interval)
-                    start.setHours(start.getHours() - 1)
+                    start.setHours(start.getHours() - 2)
                     google.charts.setOnLoadCallback(drawBasic());
                 });
         }
