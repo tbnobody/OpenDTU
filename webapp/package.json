@@ -23,7 +23,7 @@
   "devDependencies": {
     "@intlify/unplugin-vue-i18n": "^0.10.0",
     "@rushstack/eslint-patch": "^1.2.0",
-    "@tsconfig/node18": "^2.0.0",
+    "@tsconfig/node18": "^2.0.1",
     "@types/bootstrap": "^5.2.6",
     "@types/node": "^18.16.6",
     "@types/spark-md5": "^3.0.2",
