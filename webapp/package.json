@@ -36,7 +36,7 @@
     "sass": "^1.62.1",
     "terser": "^5.17.3",
     "typescript": "^5.0.4",
-    "vite": "^4.3.5",
+    "vite": "^4.3.8",
     "vite-plugin-compression": "^0.5.1",
     "vite-plugin-css-injected-by-js": "^3.1.1",
     "vue-tsc": "^1.6.4"
