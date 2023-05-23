@@ -69,7 +69,7 @@ void WebApiWsLiveClass::loop()
             String buffer;
             // free JsonDocument as soon as possible
             {
-                DynamicJsonDocument root(40960);
+                DynamicJsonDocument root(4096 * INV_MAX_COUNT); // TODO helge: check if this calculation is correct
                 JsonVariant var = root;
                 generateJsonResponse(var);
                 serializeJson(root, buffer);

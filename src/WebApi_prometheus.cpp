@@ -27,7 +27,7 @@ void WebApiPrometheusClass::loop()
 void WebApiPrometheusClass::onPrometheusMetricsGet(AsyncWebServerRequest* request)
 {
     try {
-        auto stream = request->beginResponseStream("text/plain; charset=utf-8", 40960);
+        auto stream = request->beginResponseStream("text/plain; charset=utf-8", 4096 * INV_MAX_COUNT); // TODO helge: check if this calculation is correct
 
         stream->print("# HELP opendtu_build Build info\n");
         stream->print("# TYPE opendtu_build gauge\n");
