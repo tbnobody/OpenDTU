@@ -4,6 +4,10 @@ This is a fork from the Hoymiles project [OpenDTU](https://github.com/tbnobody/O
 
 ![GitHub tag (latest SemVer)](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/helgeerbe/68b47cc8c8994d04ab3a4fa9d8aee5e6/raw/openDTUcoreRelease.json)
 
+> **Warning**
+> 
+> In contrast to the original openDTU, with release 2023.05.23.post1 openDTU-onBattery supports only 5 inverters. Otherwise, there is not enough memory for the liveData view.
+
 ## Features
 
 * Hoymiles inverter support for live data and display of various inverter internal information. (Partial) support for multiple inverters.
