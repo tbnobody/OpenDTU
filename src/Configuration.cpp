@@ -95,6 +95,7 @@ bool ConfigurationClass::write()
     display["screensaver"] = config.Display_ScreenSaver;
     display["rotation"] = config.Display_Rotation;
     display["contrast"] = config.Display_Contrast;
+    display["language"] = config.Display_Language;
 
     JsonArray inverters = doc.createNestedArray("inverters");
     for (uint8_t i = 0; i < INV_MAX_COUNT; i++) {
@@ -237,6 +238,7 @@ bool ConfigurationClass::read()
     config.Display_ScreenSaver = display["screensaver"] | DISPLAY_SCREENSAVER;
     config.Display_Rotation = display["rotation"] | DISPLAY_ROTATION;
     config.Display_Contrast = display["contrast"] | DISPLAY_CONTRAST;
+    config.Display_Language = display["language"] | DISPLAY_LANGUAGE;
 
     JsonArray inverters = doc["inverters"];
     for (uint8_t i = 0; i < INV_MAX_COUNT; i++) {

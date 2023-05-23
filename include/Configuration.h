@@ -109,6 +109,7 @@ struct CONFIG_T {
     bool Display_ScreenSaver;
     uint8_t Display_Rotation;
     uint8_t Display_Contrast;
+    uint8_t Display_Language;
 };
 
 class ConfigurationClass {

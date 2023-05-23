@@ -530,6 +530,10 @@
         "Rotation": "Rotation:",
         "rot0": "Keine Rotation",
         "rot90": "90 Grad Drehung",
+        "DisplayLanguage": "Displaysprache:",
+        "en": "Englisch",
+        "de": "Deutsch",
+        "fr": "Französisch",
         "rot180": "180 Grad Drehung",
         "rot270": "270 Grad Drehung",
         "Save": "@:dtuadmin.Save"

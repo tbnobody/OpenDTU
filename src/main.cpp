@@ -120,6 +120,7 @@ void setup()
     Display.enablePowerSafe = config.Display_PowerSafe;
     Display.enableScreensaver = config.Display_ScreenSaver;
     Display.setContrast(config.Display_Contrast);
+    Display.setLanguage(config.Display_Language);
     Display.setStartupDisplay();
     MessageOutput.println("done");
 
