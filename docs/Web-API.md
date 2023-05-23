@@ -38,10 +38,12 @@ This list may be incomplete
 | Get+Post | yes | /api/security/config |
 | Get      | yes | /api/security/authenticate |
 | Get      | no  | /api/system/status |
-| Get      | no  | /api/verdirectlivedata/status |
+| Get      | no  | /api/vedirectlivedata/status |
+| Get      | no  | /api/vedirect/status |
 | Get      | no  | /api/huawei/status |
 | Get      | no  | /api/huawei/config |
 | Get      | no  | /api/huawei/limit/config |
+| Get      | no  | /api/batterylivedata/status |
 | Get      | no  | /api/battery/status |
 | Get      | no  | /api/powerlimiter/status |
 
@@ -494,7 +496,7 @@ $ curl --no-progress-meter http://192.168.10.10/api/eventlog/status?inv=11418186
 }
 ```
 
-### Victron REST-API (/api/verdirectlivedata/status):
+### Victron REST-API (/api/vedirectlivedata/status):
 ````JSON
 {
 "data_age":0,

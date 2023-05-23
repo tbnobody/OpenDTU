@@ -54,7 +54,7 @@ Power Limiter States
 ### Web-Live-Interface:
 ![image](https://user-images.githubusercontent.com/59169507/187224107-4e0d0cab-2e1b-4e47-9410-a49f80aa6789.png)
 
-### REST-API (/api/verdirectlivedata/status):
+### REST-API (/api/vedirectlivedata/status):
 ````JSON
 {
 "data_age":0,
