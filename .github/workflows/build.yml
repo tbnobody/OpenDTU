@@ -124,7 +124,7 @@ jobs:
 
       - name: Get openDTU core release
         run: |
-          echo "OPEN_DTU_CORE_RELEASE=$(git show-ref | grep 'refs/tags/v' | tail -1 | sed 's#.*/##')" >> $GITHUB_ENV
+          echo "OPEN_DTU_CORE_RELEASE=$(git for-each-ref --sort=creatordate --format '%(refname) %(creatordate)' refs/tags | grep 'refs/tags/v' | tail -1 | sed 's#.*/##' | sed 's/ .*//')" >> $GITHUB_ENV
       
       - name: Create openDTU-core-release-Badge
         uses: schneegans/dynamic-badges-action@v1.6.0
