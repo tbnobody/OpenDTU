@@ -3,6 +3,7 @@
  * Copyright (C) 2022 Thomas Basler and others
  */
 #include "Configuration.h"
+#include "Datastore.h"
 #include "Display_Graphic.h"
 #include "InverterSettings.h"
 #include "Led_Single.h"
@@ -156,6 +157,8 @@ void setup()
 
     InverterSettings.init();
 
+    Datastore.init();
+
     // Initialize ve.direct communication
     MessageOutput.println(F("Initialize ve.direct interface... "));
     if (PinMapping.isValidVictronConfig()) {
@@ -203,6 +206,8 @@ void loop()
     PowerLimiter.loop();
     yield();
     InverterSettings.loop();
+    yield();
+    Datastore.loop();
     yield();
     // Vedirect_Enabled is unknown to lib. Therefor check has to be done here
     if (Configuration.get().Vedirect_Enabled) {
