@@ -16,6 +16,7 @@
                     </button>
                 </div>
             </div>
+            <DatabaseChart />
 
             <div class="tab-content" id="v-pills-tabContent" :class="{
                     'col-sm-9 col-md-10': inverterData.length > 1,
@@ -111,9 +112,6 @@
                                         </template>
                                     </template>
                                 </template>
-                                <div>
-                                    <DatabaseChart />
-                                </div>
                             </div>
                         </div>
                     </div>
