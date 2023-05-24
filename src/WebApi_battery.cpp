@@ -109,5 +109,7 @@ void WebApiBatteryClass::onAdminPost(AsyncWebServerRequest* request)
 
     if (config.Battery_Enabled) {
         PylontechCanReceiver.enable();
+    } else {
+        PylontechCanReceiver.disable();
     }
 }

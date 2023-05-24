@@ -19,6 +19,7 @@ class PylontechCanReceiverClass {
 public:
     void init(int8_t rx, int8_t tx);
     void enable();
+    void disable();
     void loop();
     void parseCanPackets();
     void mqtt();
@@ -31,9 +32,10 @@ private:
     float scaleValue(int16_t value, float factor);
     bool getBit(uint8_t value, uint8_t bit);
 
+    bool _isEnabled = false;
     uint32_t _lastPublish;
     twai_general_config_t g_config;
-
+    esp_err_t twaiLastResult;
 };
 
 extern PylontechCanReceiverClass PylontechCanReceiver;
