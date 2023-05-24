@@ -80,6 +80,7 @@ void WebApiDeviceClass::onDeviceAdminGet(AsyncWebServerRequest* request)
     display["power_safe"] = config.Display_PowerSafe;
     display["screensaver"] = config.Display_ScreenSaver;
     display["contrast"] = config.Display_Contrast;
+    display["language"] = config.Display_Language;
 
     JsonObject victronPinObj = curPin.createNestedObject("victron");
     victronPinObj[F("rx")] = pin.victron_rx;
@@ -165,11 +166,13 @@ void WebApiDeviceClass::onDeviceAdminPost(AsyncWebServerRequest* request)
     config.Display_PowerSafe = root["display"]["power_safe"].as<bool>();
     config.Display_ScreenSaver = root["display"]["screensaver"].as<bool>();
     config.Display_Contrast = root["display"]["contrast"].as<uint8_t>();
+    config.Display_Language = root["display"]["language"].as<uint8_t>();
 
     Display.setOrientation(config.Display_Rotation);
     Display.enablePowerSafe = config.Display_PowerSafe;
     Display.enableScreensaver = config.Display_ScreenSaver;
     Display.setContrast(config.Display_Contrast);
+    Display.setLanguage(config.Display_Language);
 
     Configuration.write();
 
