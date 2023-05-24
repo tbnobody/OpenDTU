@@ -46,6 +46,7 @@ bool ConfigurationClass::write()
     ntp["timezone_descr"] = config.Ntp_TimezoneDescr;
     ntp["latitude"] = config.Ntp_Latitude;
     ntp["longitude"] = config.Ntp_Longitude;
+    ntp["sunsettype"] = config.Ntp_SunsetType;
 
     JsonObject mqtt = doc.createNestedObject("mqtt");
     mqtt["enabled"] = config.Mqtt_Enabled;
@@ -189,6 +190,7 @@ bool ConfigurationClass::read()
     strlcpy(config.Ntp_TimezoneDescr, ntp["timezone_descr"] | NTP_TIMEZONEDESCR, sizeof(config.Ntp_TimezoneDescr));
     config.Ntp_Latitude = ntp["latitude"] | NTP_LATITUDE;
     config.Ntp_Longitude = ntp["longitude"] | NTP_LONGITUDE;
+    config.Ntp_SunsetType = ntp["sunsettype"] | NTP_SUNSETTYPE;
 
     JsonObject mqtt = doc["mqtt"];
     config.Mqtt_Enabled = mqtt["enabled"] | MQTT_ENABLED;

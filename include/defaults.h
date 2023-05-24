@@ -25,6 +25,7 @@
 #define NTP_TIMEZONEDESCR "Europe/Berlin"
 #define NTP_LONGITUDE 10.4515f
 #define NTP_LATITUDE 51.1657f
+#define NTP_SUNSETTYPE 1
 
 #define MQTT_ENABLED false
 #define MQTT_HOST ""
