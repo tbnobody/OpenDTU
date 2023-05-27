@@ -541,6 +541,9 @@
         "InverterIsBehindPowerMeter": "Welchselrichter ist hinter Leistungsmesser",
         "Battery": "DC / Akku",
         "VoltageLoadCorrectionInfo": "<b>Hinweis:</b> Wenn Leistung von der Batterie abgegeben wird, bricht normalerweise die Spannung etwas ein. Damit nicht vorzeitig der Wechelrichter ausgeschaltet wird sobald der \"Stop\"-Schwellenwert erreicht wird, wird der hier angegebene Korrekturfaktor mit einberechnet. Korrigierte Spannung = DC Spannung + (Aktuelle Leistung (W) + Korrekturfaktor).",
+        "InverterRestart": "Wechselrichter Neustart",
+        "InverterRestartHour": "Stunde für Neustart",
+        "InverterRestartHint": "Neustart des Wechselrichter einmal täglich um die \"Tagesertrag\" Werte wieder auf Null zu setzen.",
         "Save": "@:dtuadmin.Save"
     },
     "batteryadmin": {

@@ -31,6 +31,7 @@ public:
     int32_t getLastRequestedPowewrLimit();
     void setDisable(bool disable);
     bool getDisable();
+    void calcNextInverterRestart();
 
 private:
     uint32_t _lastLoop = 0;
@@ -39,6 +40,8 @@ private:
     plStates _plState; 
     bool _disabled = false;
     bool _batteryDischargeEnabled = false;
+    uint32_t _nextInverterRestart = 0; // Values: 0->not calculated / 1->no restart configured / >1->time of next inverter restart in millis()
+    uint32_t _nextCalculateCheck = 5000; // time in millis for next NTP check to calulate restart
 
     float _powerMeter1Power;
     float _powerMeter2Power;

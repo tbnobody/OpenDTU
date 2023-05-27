@@ -545,6 +545,9 @@
         "InverterIsBehindPowerMeter": "Inverter is behind Power meter",
         "Battery": "DC / Battery",
         "VoltageLoadCorrectionInfo": "<b>Hint:</b> When the power output is higher, the voltage is usually decreasing. In order to not stop the inverter too early (Stop treshold), a power factor can be specified here to correct this. Corrected voltage = DC Voltage + (Current power * correction factor).",
+        "InverterRestart": "Inverter Restart",
+        "InverterRestartHour": "Restart Hour",
+        "InverterRestartHint": "Restart the Inverter once a day to reset the \"YieldDay\" values.",
         "Save": "@:dtuadmin.Save"
     },
     "batteryadmin": {

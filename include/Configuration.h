@@ -148,6 +148,7 @@ struct CONFIG_T {
     float PowerLimiter_VoltageStartThreshold;
     float PowerLimiter_VoltageStopThreshold;
     float PowerLimiter_VoltageLoadCorrectionFactor;
+    int8_t PowerLimiter_RestartHour;
 
     bool Battery_Enabled;
     bool Huawei_Enabled;

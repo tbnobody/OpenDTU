@@ -193,6 +193,24 @@
                 <div class="alert alert-secondary" role="alert" v-html="$t('powerlimiteradmin.VoltageLoadCorrectionInfo')"></div>
             </CardElement>
 
+            <CardElement :text="$t('powerlimiteradmin.InverterRestart')" textVariant="text-bg-primary" add-space
+                         v-show="powerLimiterConfigList.enabled"
+            >
+                <div class="row mb-3" v-show="powerLimiterConfigList.enabled">
+                    <label for="inputTimezone" class="col-sm-2 col-form-label">
+                        {{ $t('powerlimiteradmin.InverterRestartHour') }}:
+                        <BIconInfoCircle v-tooltip :title="$t('powerlimiteradmin.InverterRestartHint')" />
+                    </label>
+                    <div class="col-sm-10">
+                        <select class="form-select" v-model="powerLimiterConfigList.inverter_restart_hour">
+                            <option v-for="hour in restartHourList" :key="hour.key" :value="hour.key">
+                                {{ hour.value }}
+                            </option>
+                        </select>
+                    </div>
+                </div>
+            </CardElement>
+
             <button type="submit" class="btn btn-primary mb-3">{{ $t('powerlimiteradmin.Save') }}</button>
         </form>
     </BasePage>
@@ -242,6 +260,33 @@ export default defineComponent({
             batteryDrainStrategyList: [
                 { key: 0, value: "powerlimiteradmin.BatteryDrainWhenFull"},
                 { key: 1, value: "powerlimiteradmin.BatteryDrainAtNight" },
+            ],
+            restartHourList: [
+                { key: -1, value: "- - - -" },
+                { key: 0, value: "0:00" },
+                { key: 1, value: "1:00" },
+                { key: 2, value: "2:00" },
+                { key: 3, value: "3:00" },
+                { key: 4, value: "4:00" },
+                { key: 5, value: "5:00" },
+                { key: 6, value: "6:00" },
+                { key: 7, value: "7:00" },
+                { key: 8, value: "8:00" },
+                { key: 9, value: "9:00" },
+                { key: 10, value: "10:00" },
+                { key: 11, value: "11:00" },
+                { key: 12, value: "12:00" },
+                { key: 13, value: "13:00" },
+                { key: 14, value: "14:00" },
+                { key: 15, value: "15:00" },
+                { key: 16, value: "16:00" },
+                { key: 17, value: "17:00" },
+                { key: 18, value: "18:00" },
+                { key: 19, value: "19:00" },
+                { key: 20, value: "20:00" },
+                { key: 21, value: "21:00" },
+                { key: 22, value: "22:00" },
+                { key: 23, value: "23:00" },
             ],
             alertMessage: "",
             alertType: "info",

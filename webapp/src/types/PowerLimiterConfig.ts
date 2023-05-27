@@ -14,4 +14,5 @@ export interface PowerLimiterConfig {
     voltage_start_threshold: number;
     voltage_stop_threshold: number;
     voltage_load_correction_factor: number;
+    inverter_restart_hour: number;
 }
