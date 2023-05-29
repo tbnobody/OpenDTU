@@ -103,6 +103,7 @@ bool ConfigurationClass::write()
         JsonObject inv = inverters.createNestedObject();
         inv["serial"] = config.Inverter[i].Serial;
         inv["name"] = config.Inverter[i].Name;
+        inv["order"] = config.Inverter[i].Order;
         inv["poll_enable"] = config.Inverter[i].Poll_Enable;
         inv["poll_enable_night"] = config.Inverter[i].Poll_Enable_Night;
         inv["command_enable"] = config.Inverter[i].Command_Enable;
@@ -247,6 +248,7 @@ bool ConfigurationClass::read()
         JsonObject inv = inverters[i].as<JsonObject>();
         config.Inverter[i].Serial = inv["serial"] | 0ULL;
         strlcpy(config.Inverter[i].Name, inv["name"] | "", sizeof(config.Inverter[i].Name));
+        config.Inverter[i].Order = inv["order"] | 0;
 
         config.Inverter[i].Poll_Enable = inv["poll_enable"] | true;
         config.Inverter[i].Poll_Enable_Night = inv["poll_enable_night"] | true;

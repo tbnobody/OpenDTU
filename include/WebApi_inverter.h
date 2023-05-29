@@ -13,6 +13,7 @@ private:
     void onInverterAdd(AsyncWebServerRequest* request);
     void onInverterEdit(AsyncWebServerRequest* request);
     void onInverterDelete(AsyncWebServerRequest* request);
+    void onInverterOrder(AsyncWebServerRequest* request);
 
     AsyncWebServer* _server;
 };

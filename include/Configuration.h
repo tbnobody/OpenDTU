@@ -40,6 +40,7 @@ struct CHANNEL_CONFIG_T {
 struct INVERTER_CONFIG_T {
     uint64_t Serial;
     char Name[INV_MAX_NAME_STRLEN + 1];
+    uint8_t Order;
     bool Poll_Enable;
     bool Poll_Enable_Night;
     bool Command_Enable;
