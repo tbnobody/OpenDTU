@@ -29,9 +29,7 @@ export interface Inverter {
     limit_relative: number;
     limit_absolute: number;
     events: number;
-    AC: InverterStatistics[];
-    DC: InverterStatistics[];
-    INV: InverterStatistics[];
+    [key: number]: InverterStatistics;
 }
 
 export interface Total {

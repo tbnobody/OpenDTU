@@ -37,8 +37,7 @@ std::map<DisplayType_t, std::function<U8G2*(uint8_t, uint8_t, uint8_t, uint8_t)>
 };
 
 DisplayGraphicClass::DisplayGraphicClass()
-{
-}
+{}
 
 DisplayGraphicClass::~DisplayGraphicClass()
 {
@@ -89,7 +88,7 @@ void DisplayGraphicClass::printText(const char* text, uint8_t line)
         break;
     }
 
-    // get the font height, to calculate the textheight
+   // get the font height, to calculate the textheight
     _dispY += (_display->getMaxCharHeight()) + 1;
 
     // calculate the starting position of the text
@@ -127,11 +126,9 @@ void DisplayGraphicClass::loop()
                 isprod++;
             }
 
-            for (auto& c : inv->Statistics()->getChannelsByType(TYPE_AC)) {
-                totalPower += inv->Statistics()->getChannelFieldValue(TYPE_AC, c, FLD_PAC);
-                totalYieldDay += inv->Statistics()->getChannelFieldValue(TYPE_AC, c, FLD_YD);
-                totalYieldTotal += inv->Statistics()->getChannelFieldValue(TYPE_AC, c, FLD_YT);
-            }
+            totalPower += inv->Statistics()->getChannelFieldValue(CH0, FLD_PAC);
+            totalYieldDay += inv->Statistics()->getChannelFieldValue(CH0, FLD_YD);
+            totalYieldTotal += inv->Statistics()->getChannelFieldValue(CH0, FLD_YT);
         }
 
         _display->clearBuffer();
