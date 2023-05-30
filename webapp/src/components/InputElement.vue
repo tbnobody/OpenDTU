@@ -27,7 +27,6 @@
                     :maxlength="maxlength"
                     :min="min"
                     :max="max"
-                    :step="step"
                     :disabled="disabled"
                     :aria-describedby="descriptionId"
                 />
@@ -70,7 +69,6 @@ export default defineComponent({
         'maxlength': String,
         'min': String,
         'max': String,
-        'step': String,
         'rows': String,
         'disabled': Boolean,
         'postfix': String,

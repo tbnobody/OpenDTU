@@ -31,8 +31,6 @@ public:
     static bool checkCredentials(AsyncWebServerRequest* request);
     static bool checkCredentialsReadonly(AsyncWebServerRequest* request);
 
-    static void sendTooManyRequests(AsyncWebServerRequest* request);
-
 private:
     AsyncWebServer _server;
     AsyncEventSource _events;

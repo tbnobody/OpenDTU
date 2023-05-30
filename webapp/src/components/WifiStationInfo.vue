@@ -5,8 +5,12 @@
                 <tbody>
                     <tr>
                         <th>{{ $t('wifistationinfo.Status') }}</th>
-                        <td>
-                            <StatusBadge :status="networkStatus.sta_status" true_text="wifistationinfo.Enabled" false_text="wifistationinfo.Disabled" />
+                        <td class="badge" :class="{
+                            'text-bg-danger': !networkStatus.sta_status,
+                            'text-bg-success': networkStatus.sta_status,
+                        }">
+                            <span v-if="networkStatus.sta_status">{{ $t('wifistationinfo.Enabled') }}</span>
+                            <span v-else>{{ $t('wifistationinfo.Disabled') }}</span>
                         </td>
                     </tr>
                     <tr>
@@ -29,14 +33,12 @@
 
 <script lang="ts">
 import CardElement from '@/components/CardElement.vue';
-import StatusBadge from './StatusBadge.vue';
 import type { NetworkStatus } from '@/types/NetworkStatus';
 import { defineComponent, type PropType } from 'vue';
 
 export default defineComponent({
     components: {
         CardElement,
-        StatusBadge
     },
     props: {
         networkStatus: { type: Object as PropType<NetworkStatus>, required: true },
