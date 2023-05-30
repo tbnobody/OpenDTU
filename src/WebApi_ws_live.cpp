@@ -160,9 +160,9 @@ void WebApiWsLiveClass::generateJsonResponse(JsonVariant& root)
     }
 
     JsonObject totalObj = root.createNestedObject("total");
-    addTotalField(totalObj, "Power", Datastore.totalAcPowerEnabled, "W", Datastore.totalAcPowerDigits);
-    addTotalField(totalObj, "YieldDay", Datastore.totalAcYieldDayEnabled, "Wh", Datastore.totalAcYieldDayDigits);
-    addTotalField(totalObj, "YieldTotal", Datastore.totalAcYieldTotalEnabled, "kWh", Datastore.totalAcYieldTotalDigits);
+    addTotalField(totalObj, "Power", Datastore.getTotalAcPowerEnabled(), "W", Datastore.getTotalAcPowerDigits());
+    addTotalField(totalObj, "YieldDay", Datastore.getTotalAcYieldDayEnabled(), "Wh", Datastore.getTotalAcYieldDayDigits());
+    addTotalField(totalObj, "YieldTotal", Datastore.getTotalAcYieldTotalEnabled(), "kWh", Datastore.getTotalAcYieldTotalDigits());
 
     JsonObject hintObj = root.createNestedObject("hints");
     struct tm timeinfo;

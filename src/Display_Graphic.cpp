@@ -141,12 +141,12 @@ void DisplayGraphicClass::loop()
         _display->clearBuffer();
 
         //=====> Actual Production ==========
-        if (Datastore.isAtLeastOneReachable) {
+        if (Datastore.getIsAtLeastOneReachable()) {
             _display->setPowerSave(false);
-            if (Datastore.totalAcPowerEnabled > 999) {
-                snprintf(_fmtText, sizeof(_fmtText), i18n_current_power_kw[_display_language], (Datastore.totalAcPowerEnabled / 1000));
+            if (Datastore.getTotalAcPowerEnabled() > 999) {
+                snprintf(_fmtText, sizeof(_fmtText), i18n_current_power_kw[_display_language], (Datastore.getTotalAcPowerEnabled() / 1000));
             } else {
-                snprintf(_fmtText, sizeof(_fmtText), i18n_current_power_w[_display_language], Datastore.totalAcPowerEnabled);
+                snprintf(_fmtText, sizeof(_fmtText), i18n_current_power_w[_display_language], Datastore.getTotalAcPowerEnabled());
             }
             printText(_fmtText, 0);
             _previousMillis = millis();
@@ -164,10 +164,10 @@ void DisplayGraphicClass::loop()
         //<=======================
 
         //=====> Today & Total Production =======
-        snprintf(_fmtText, sizeof(_fmtText), i18n_yield_today_wh[_display_language], Datastore.totalAcYieldDayEnabled);
+        snprintf(_fmtText, sizeof(_fmtText), i18n_yield_today_wh[_display_language], Datastore.getTotalAcYieldDayEnabled());
         printText(_fmtText, 1);
 
-        snprintf(_fmtText, sizeof(_fmtText), i18n_yield_total_kwh[_display_language], Datastore.totalAcYieldTotalEnabled);
+        snprintf(_fmtText, sizeof(_fmtText), i18n_yield_total_kwh[_display_language], Datastore.getTotalAcYieldTotalEnabled());
         printText(_fmtText, 2);
         //<=======================
 
