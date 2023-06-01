@@ -3,6 +3,7 @@
  * Copyright (C) 2022 Thomas Basler and others
  */
 #include "Configuration.h"
+#include "Datastore.h"
 #include "Display_Graphic.h"
 #include "InverterSettings.h"
 #include "Led_Single.h"
@@ -119,6 +120,7 @@ void setup()
     Display.enablePowerSafe = config.Display_PowerSafe;
     Display.enableScreensaver = config.Display_ScreenSaver;
     Display.setContrast(config.Display_Contrast);
+    Display.setLanguage(config.Display_Language);
     Display.setStartupDisplay();
     MessageOutput.println("done");
 
@@ -141,6 +143,8 @@ void setup()
     MessageOutput.println("done");
 
     InverterSettings.init();
+
+    Datastore.init();
 }
 
 void loop()
@@ -149,11 +153,14 @@ void loop()
     yield();
     InverterSettings.loop();
     yield();
+    Datastore.loop();
+    yield();
     MqttHandleDtu.loop();
     yield();
     MqttHandleInverter.loop();
     yield();
     MqttHandleInverterTotal.loop();
+    yield();
     MqttHandleHass.loop();
     yield();
     WebApi.loop();

@@ -28,6 +28,7 @@
                 <table class="table">
                     <thead>
                         <tr>
+                            <th>#</th>
                             <th scope="col">{{ $t('inverteradmin.Status') }}</th>
                             <th>{{ $t('inverteradmin.Serial') }}</th>
                             <th>{{ $t('inverteradmin.Name') }}</th>
@@ -35,8 +36,9 @@
                             <th>{{ $t('inverteradmin.Action') }}</th>
                         </tr>
                     </thead>
-                    <tbody>
-                        <tr v-for="inverter in sortedInverters" v-bind:key="inverter.id">
+                    <tbody ref="invList">
+                        <tr v-for="inverter in inverters" v-bind:key="inverter.id" :data-id="inverter.id">
+                            <td><BIconGripHorizontal class="drag-handle" /></td>
                             <td>
                                 <span class="badge" :title="$t('inverteradmin.Receive')" :class="{
                                     'text-bg-warning': !inverter.poll_enable_night,
@@ -62,6 +64,9 @@
                         </tr>
                     </tbody>
                 </table>
+            </div>
+            <div class="ml-auto text-right">
+                <button class="btn btn-primary my-2" @click="onSaveOrder()">{{ $t('inverteradmin.SaveOrder') }}</button>
             </div>
         </CardElement>
     </BasePage>
@@ -197,6 +202,7 @@ import BasePage from '@/components/BasePage.vue';
 import BootstrapAlert from "@/components/BootstrapAlert.vue";
 import CardElement from '@/components/CardElement.vue';
 import InputElement from '@/components/InputElement.vue';
+import Sortable from 'sortablejs';
 import { authHeader, handleResponse } from '@/utils/authentication';
 import * as bootstrap from 'bootstrap';
 import {
@@ -205,6 +211,7 @@ import {
     BIconTrash,
     BIconArrowDown,
     BIconArrowUp,
+    BIconGripHorizontal,
 } from 'bootstrap-icons-vue';
 import { defineComponent } from 'vue';
 
@@ -219,6 +226,7 @@ declare interface Inverter {
     serial: number;
     name: string;
     type: string;
+    order: number;
     poll_enable: boolean;
     poll_enable_night: boolean;
     command_enable: boolean;
@@ -244,6 +252,7 @@ export default defineComponent({
         BIconTrash,
         BIconArrowDown,
         BIconArrowUp,
+        BIconGripHorizontal,
     },
     data() {
         return {
@@ -253,7 +262,8 @@ export default defineComponent({
             selectedInverterData: {} as Inverter,
             inverters: [] as Inverter[],
             dataLoading: true,
-            alert: {} as AlertResponse
+            alert: {} as AlertResponse,
+            sortable: {} as Sortable,
         };
     },
     mounted() {
@@ -263,21 +273,27 @@ export default defineComponent({
     created() {
         this.getInverters();
     },
-    computed: {
-        sortedInverters(): Inverter[] {
-            return this.inverters.slice().sort((a, b) => {
-                return a.serial - b.serial;
-            });
-        },
-    },
     methods: {
         getInverters() {
             this.dataLoading = true;
             fetch("/api/inverter/list", { headers: authHeader() })
                 .then((response) => handleResponse(response, this.$emitter, this.$router))
                 .then((data) => {
-                    this.inverters = data.inverter;
+                    this.inverters = data.inverter.slice().sort((a : Inverter, b: Inverter) => {
+                        return a.order - b.order;
+                    });
                     this.dataLoading = false;
+
+                    this.$nextTick(() => {
+                        const table = this.$refs.invList as HTMLElement;
+
+                        this.sortable = Sortable.create(table, {
+                            sort: true,
+                            handle: '.drag-handle',
+                            animation: 150,
+                            draggable: 'tr',
+                        });
+                    });
                 });
         },
         callInverterApiEndpoint(endpoint: string, jsonData: string) {
@@ -316,7 +332,16 @@ export default defineComponent({
         },
         onCloseModal(modal: bootstrap.Modal) {
             modal.hide();
-        }
+        },
+        onSaveOrder() {
+            this.callInverterApiEndpoint("order", JSON.stringify({ order: this.sortable.toArray() }));
+        },
     },
 });
 </script>
+
+<style>
+.drag-handle {
+    cursor: grab;
+}
+</style>

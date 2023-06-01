@@ -23,6 +23,10 @@
                             </a></td>
                     </tr>
                     <tr>
+                        <th>{{ $t('firmwareinfo.PioEnv') }}</th>
+                        <td>{{ systemStatus.pioenv }}</td>
+                    </tr>
+                    <tr>
                         <th>{{ $t('firmwareinfo.FirmwareUpdate') }}</th>
                         <td><a :href="systemStatus.update_url" target="_blank" v-tooltip
                                 :title="$t('firmwareinfo.FirmwareUpdateHint')">

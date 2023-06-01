@@ -7,7 +7,7 @@
 #include "crc.h"
 #include <cstring>
 
-InverterAbstract::InverterAbstract(HoymilesRadio *radio, uint64_t serial)
+InverterAbstract::InverterAbstract(HoymilesRadio* radio, uint64_t serial)
 {
     _serial.u64 = serial;
     _radio = radio;
@@ -152,26 +152,32 @@ void InverterAbstract::addRxFragment(uint8_t fragment[], uint8_t len)
     }
 
     uint8_t fragmentCount = fragment[9];
-    if (fragmentCount == 0) {
-        Hoymiles.getMessageOutput()->println("ERROR: fragment number zero received and ignored");
+
+    // Packets with 0x81 will be seen as 1
+    uint8_t fragmentId = fragmentCount & 0b01111111; // fragmentId is 1 based
+
+    if (fragmentId == 0) {
+        Hoymiles.getMessageOutput()->println("ERROR: fragment id zero received and ignored");
         return;
     }
 
-    if ((fragmentCount & 0b01111111) < MAX_RF_FRAGMENT_COUNT) {
-        // Packets with 0x81 will be seen as 1
-        memcpy(_rxFragmentBuffer[(fragmentCount & 0b01111111) - 1].fragment, &fragment[10], len - 11);
-        _rxFragmentBuffer[(fragmentCount & 0b01111111) - 1].len = len - 11;
-        _rxFragmentBuffer[(fragmentCount & 0b01111111) - 1].mainCmd = fragment[0];
-        _rxFragmentBuffer[(fragmentCount & 0b01111111) - 1].wasReceived = true;
+    if (fragmentId >= MAX_RF_FRAGMENT_COUNT) {
+        Hoymiles.getMessageOutput()->printf("ERROR: fragment id %d is too large for buffer and ignored\r\n", fragmentId);
+        return;
+    }
 
-        if ((fragmentCount & 0b01111111) > _rxFragmentLastPacketId) {
-            _rxFragmentLastPacketId = fragmentCount & 0b01111111;
-        }
+    memcpy(_rxFragmentBuffer[fragmentId - 1].fragment, &fragment[10], len - 11);
+    _rxFragmentBuffer[fragmentId - 1].len = len - 11;
+    _rxFragmentBuffer[fragmentId - 1].mainCmd = fragment[0];
+    _rxFragmentBuffer[fragmentId - 1].wasReceived = true;
+
+    if (fragmentId > _rxFragmentLastPacketId) {
+        _rxFragmentLastPacketId = fragmentId;
     }
 
     // 0b10000000 == 0x80
     if ((fragmentCount & 0b10000000) == 0b10000000) {
-        _rxFragmentMaxPacketId = fragmentCount & 0b01111111;
+        _rxFragmentMaxPacketId = fragmentId;
     }
 }
 

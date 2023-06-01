@@ -46,6 +46,7 @@ bool ConfigurationClass::write()
     ntp["timezone_descr"] = config.Ntp_TimezoneDescr;
     ntp["latitude"] = config.Ntp_Latitude;
     ntp["longitude"] = config.Ntp_Longitude;
+    ntp["sunsettype"] = config.Ntp_SunsetType;
 
     JsonObject mqtt = doc.createNestedObject("mqtt");
     mqtt["enabled"] = config.Mqtt_Enabled;
@@ -95,12 +96,14 @@ bool ConfigurationClass::write()
     display["screensaver"] = config.Display_ScreenSaver;
     display["rotation"] = config.Display_Rotation;
     display["contrast"] = config.Display_Contrast;
+    display["language"] = config.Display_Language;
 
     JsonArray inverters = doc.createNestedArray("inverters");
     for (uint8_t i = 0; i < INV_MAX_COUNT; i++) {
         JsonObject inv = inverters.createNestedObject();
         inv["serial"] = config.Inverter[i].Serial;
         inv["name"] = config.Inverter[i].Name;
+        inv["order"] = config.Inverter[i].Order;
         inv["poll_enable"] = config.Inverter[i].Poll_Enable;
         inv["poll_enable_night"] = config.Inverter[i].Poll_Enable_Night;
         inv["command_enable"] = config.Inverter[i].Command_Enable;
@@ -188,6 +191,7 @@ bool ConfigurationClass::read()
     strlcpy(config.Ntp_TimezoneDescr, ntp["timezone_descr"] | NTP_TIMEZONEDESCR, sizeof(config.Ntp_TimezoneDescr));
     config.Ntp_Latitude = ntp["latitude"] | NTP_LATITUDE;
     config.Ntp_Longitude = ntp["longitude"] | NTP_LONGITUDE;
+    config.Ntp_SunsetType = ntp["sunsettype"] | NTP_SUNSETTYPE;
 
     JsonObject mqtt = doc["mqtt"];
     config.Mqtt_Enabled = mqtt["enabled"] | MQTT_ENABLED;
@@ -237,12 +241,14 @@ bool ConfigurationClass::read()
     config.Display_ScreenSaver = display["screensaver"] | DISPLAY_SCREENSAVER;
     config.Display_Rotation = display["rotation"] | DISPLAY_ROTATION;
     config.Display_Contrast = display["contrast"] | DISPLAY_CONTRAST;
+    config.Display_Language = display["language"] | DISPLAY_LANGUAGE;
 
     JsonArray inverters = doc["inverters"];
     for (uint8_t i = 0; i < INV_MAX_COUNT; i++) {
         JsonObject inv = inverters[i].as<JsonObject>();
         config.Inverter[i].Serial = inv["serial"] | 0ULL;
         strlcpy(config.Inverter[i].Name, inv["name"] | "", sizeof(config.Inverter[i].Name));
+        config.Inverter[i].Order = inv["order"] | 0;
 
         config.Inverter[i].Poll_Enable = inv["poll_enable"] | true;
         config.Inverter[i].Poll_Enable_Night = inv["poll_enable_night"] | true;

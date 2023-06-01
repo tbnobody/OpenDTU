@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 #include "Display_Graphic.h"
-#include <Hoymiles.h>
+#include "Datastore.h"
 #include <NetworkSettings.h>
 #include <map>
 #include <time.h>
@@ -10,6 +10,25 @@ std::map<DisplayType_t, std::function<U8G2*(uint8_t, uint8_t, uint8_t, uint8_t)>
     { DisplayType_t::SSD1306, [](uint8_t reset, uint8_t clock, uint8_t data, uint8_t cs) { return new U8G2_SSD1306_128X64_NONAME_F_HW_I2C(U8G2_R0, reset, clock, data); } },
     { DisplayType_t::SH1106, [](uint8_t reset, uint8_t clock, uint8_t data, uint8_t cs) { return new U8G2_SH1106_128X64_NONAME_F_HW_I2C(U8G2_R0, reset, clock, data); } },
 };
+
+// Language defintion, respect order in languages[] and translation lists
+#define I18N_LOCALE_EN 0
+#define I18N_LOCALE_DE 1
+#define I18N_LOCALE_FR 2
+
+// Languages supported. Note: the order is important and must match locale_translations.h
+const uint8_t languages[] = {
+    I18N_LOCALE_EN,
+    I18N_LOCALE_DE,
+    I18N_LOCALE_FR
+};
+
+static const char* const i18n_offline[] = { "Offline", "Offline", "Offline" };
+static const char* const i18n_current_power_w[] = { "%3.0f W", "%3.0f W", "%3.0f W" };
+static const char* const i18n_current_power_kw[] = { "%2.1f kW", "%2.1f kW", "%2.1f kW" };
+static const char* const i18n_yield_today_wh[] = { "today: %4.0f Wh", "Heute: %4.0f Wh", "auj.: %4.0f Wh" };
+static const char* const i18n_yield_total_kwh[] = { "total: %.1f kWh", "Ges.: %.1f kWh", "total: %.1f kWh" };
+static const char* const i18n_date_format[] = { "%m/%d/%Y %H:%M", "%d.%m.%Y %H:%M", "%d/%m/%Y %H:%M" };
 
 DisplayGraphicClass::DisplayGraphicClass()
 {
@@ -95,6 +114,11 @@ void DisplayGraphicClass::setOrientation(uint8_t rotation)
     calcLineHeights();
 }
 
+void DisplayGraphicClass::setLanguage(uint8_t language)
+{
+    _display_language = language < sizeof(languages) / sizeof(languages[0]) ? language : DISPLAY_LANGUAGE;
+}
+
 void DisplayGraphicClass::setStartupDisplay()
 {
     if (_display_type == DisplayType_t::None) {
@@ -113,38 +137,16 @@ void DisplayGraphicClass::loop()
     }
 
     if ((millis() - _lastDisplayUpdate) > _period) {
-        float totalPower = 0;
-        float totalYieldDay = 0;
-        float totalYieldTotal = 0;
-
-        uint8_t isprod = 0;
-
-        for (uint8_t i = 0; i < Hoymiles.getNumInverters(); i++) {
-            auto inv = Hoymiles.getInverterByPos(i);
-            if (inv == nullptr) {
-                continue;
-            }
-
-            if (inv->isProducing()) {
-                isprod++;
-            }
-
-            for (auto& c : inv->Statistics()->getChannelsByType(TYPE_AC)) {
-                totalPower += inv->Statistics()->getChannelFieldValue(TYPE_AC, c, FLD_PAC);
-                totalYieldDay += inv->Statistics()->getChannelFieldValue(TYPE_AC, c, FLD_YD);
-                totalYieldTotal += inv->Statistics()->getChannelFieldValue(TYPE_AC, c, FLD_YT);
-            }
-        }
 
         _display->clearBuffer();
 
         //=====> Actual Production ==========
-        if ((totalPower > 0) && (isprod > 0)) {
+        if (Datastore.getIsAtLeastOneReachable()) {
             _display->setPowerSave(false);
-            if (totalPower > 999) {
-                snprintf(_fmtText, sizeof(_fmtText), "%2.1f kW", (totalPower / 1000));
+            if (Datastore.getTotalAcPowerEnabled() > 999) {
+                snprintf(_fmtText, sizeof(_fmtText), i18n_current_power_kw[_display_language], (Datastore.getTotalAcPowerEnabled() / 1000));
             } else {
-                snprintf(_fmtText, sizeof(_fmtText), "%3.0f W", totalPower);
+                snprintf(_fmtText, sizeof(_fmtText), i18n_current_power_w[_display_language], Datastore.getTotalAcPowerEnabled());
             }
             printText(_fmtText, 0);
             _previousMillis = millis();
@@ -153,7 +155,7 @@ void DisplayGraphicClass::loop()
 
         //=====> Offline ===========
         else {
-            printText("offline", 0);
+            printText(i18n_offline[_display_language], 0);
             // check if it's time to enter power saving mode
             if (millis() - _previousMillis >= (_interval * 2)) {
                 _display->setPowerSave(enablePowerSafe);
@@ -162,10 +164,10 @@ void DisplayGraphicClass::loop()
         //<=======================
 
         //=====> Today & Total Production =======
-        snprintf(_fmtText, sizeof(_fmtText), "today: %4.0f Wh", totalYieldDay);
+        snprintf(_fmtText, sizeof(_fmtText), i18n_yield_today_wh[_display_language], Datastore.getTotalAcYieldDayEnabled());
         printText(_fmtText, 1);
 
-        snprintf(_fmtText, sizeof(_fmtText), "total: %.1f kWh", totalYieldTotal);
+        snprintf(_fmtText, sizeof(_fmtText), i18n_yield_total_kwh[_display_language], Datastore.getTotalAcYieldTotalEnabled());
         printText(_fmtText, 2);
         //<=======================
 
@@ -175,7 +177,7 @@ void DisplayGraphicClass::loop()
         } else {
             // Get current time
             time_t now = time(nullptr);
-            strftime(_fmtText, sizeof(_fmtText), "%a %d.%m.%Y %H:%M", localtime(&now));
+            strftime(_fmtText, sizeof(_fmtText), i18n_date_format[_display_language], localtime(&now));
             printText(_fmtText, 3);
         }
         _display->sendBuffer();
