@@ -289,7 +289,7 @@
         "Value": "Value",
         "Unit": "Unit"
     },
-    "databasechart": {
+    "chart": {
         "LastDay": "last 25 hours",
     },
     "invertertotalinfo": {

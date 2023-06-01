@@ -1,7 +1,7 @@
 <template>
     <div class="card" :class="{}">
         <div class="card-header">
-            {{ $t('databasechart.LastDay') }}
+            {{ $t('chart.LastDay') }}
         </div>
         <GoogleChart />
     </div>
@@ -13,7 +13,7 @@ import { defineComponent, h } from 'vue';
 import { GChart } from 'vue-google-charts';
 //import { DatetimeFormat } from 'vue-i18n';
 
-var data: any = [['Time', 'Energy']];
+var data: any;
 export const type = 'ColumnChart';
 export const options = {
     height: 600,
@@ -56,6 +56,7 @@ export default defineComponent({
                     start.setHours(start.getHours() - 2)
 
                     var old_energy = energy[0][4]
+                    data = [['Time', 'Energy']];
                     energy.forEach((x: any[]) => {
                         var d = new Date(x[0] + 2000, x[1] - 1, x[2], x[3])
                         if ((d >= start) && (d <= end)) {
