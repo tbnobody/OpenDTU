@@ -34,6 +34,6 @@ void MqttHandleInverterTotalClass::loop()
 
         _lastPublish.set(Configuration.get().Mqtt_PublishInterval * 1000);
 
-        database.write(totalAcYieldTotal);      // write value to database
+        database.write(Datastore.getTotalAcYieldTotalEnabled());      // write value to database
     }
 }
