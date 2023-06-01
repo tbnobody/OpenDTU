@@ -52,14 +52,21 @@ void WebApiNtpClass::onNtpStatus(AsyncWebServerRequest* request)
     strftime(timeStringBuff, sizeof(timeStringBuff), "%A, %B %d %Y %H:%M:%S", &timeinfo);
     root["ntp_localtime"] = timeStringBuff;
 
-    SunPosition.sunriseTime(&timeinfo);
-    strftime(timeStringBuff, sizeof(timeStringBuff), "%A, %B %d %Y %H:%M:%S", &timeinfo);
+    if (SunPosition.sunriseTime(&timeinfo)) {
+        strftime(timeStringBuff, sizeof(timeStringBuff), "%A, %B %d %Y %H:%M:%S", &timeinfo);
+    } else {
+        strcpy(timeStringBuff, "--");
+    }
     root["sun_risetime"] = timeStringBuff;
 
-    SunPosition.sunsetTime(&timeinfo);
-    strftime(timeStringBuff, sizeof(timeStringBuff), "%A, %B %d %Y %H:%M:%S", &timeinfo);
+    if (SunPosition.sunsetTime(&timeinfo)) {
+        strftime(timeStringBuff, sizeof(timeStringBuff), "%A, %B %d %Y %H:%M:%S", &timeinfo);
+    } else {
+        strcpy(timeStringBuff, "--");
+    }
     root["sun_settime"] = timeStringBuff;
 
+    root["sun_isSunsetAvailable"] = SunPosition.isSunsetAvailable();
     root["sun_isDayPeriod"] = SunPosition.isDayPeriod();
 
     response->setLength();

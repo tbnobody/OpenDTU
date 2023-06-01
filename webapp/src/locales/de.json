@@ -246,6 +246,7 @@
         "LocalTime": "Lokale Uhrzeit",
         "Sunrise": "Morgendämmerung",
         "Sunset": "Abenddämmerung",
+        "NotAvailable": "Nicht verfügbar",
         "Mode": "Modus",
         "Day": "Tag",
         "Night": "Nacht"
