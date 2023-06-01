@@ -16,7 +16,8 @@
                     </button>
                 </div>
             </div>
-            <DatabaseChart />
+            <BarChart />
+            <CalendarChart />
 
             <div class="tab-content" id="v-pills-tabContent" :class="{
                     'col-sm-9 col-md-10': inverterData.length > 1,
@@ -334,7 +335,8 @@ import DevInfo from '@/components/DevInfo.vue';
 import EventLog from '@/components/EventLog.vue';
 import HintView from '@/components/HintView.vue';
 import InverterChannelInfo from "@/components/InverterChannelInfo.vue";
-import DatabaseChart from "@/components/DatabaseChart.vue";
+import BarChart from "@/components/BarChart.vue";
+import CalendarChart from "@/components/CalendarChart.vue";
 import InverterTotalInfo from '@/components/InverterTotalInfo.vue';
 import type { DevInfoStatus } from '@/types/DevInfoStatus';
 import type { EventlogItems } from '@/types/EventlogStatus';
@@ -365,7 +367,8 @@ export default defineComponent({
         EventLog,
         HintView,
         InverterChannelInfo,
-        DatabaseChart,
+        BarChart,
+        CalendarChart,
         InverterTotalInfo,
         BIconArrowCounterclockwise,
         BIconCheckCircleFill,
