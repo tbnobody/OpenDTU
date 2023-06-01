@@ -9,6 +9,8 @@
 #define ALARM_LOG_ENTRY_SIZE 12
 #define ALARM_LOG_PAYLOAD_SIZE (ALARM_LOG_ENTRY_COUNT * ALARM_LOG_ENTRY_SIZE + 4)
 
+#define ALARM_MSG_COUNT 77
+
 struct AlarmLogEntry_t {
     uint16_t MessageId;
     String Message;
@@ -50,5 +52,5 @@ private:
 
     AlarmMessageType_t _messageType = AlarmMessageType_t::ALL;
 
-    static const std::array<const AlarmMessage_t, 76> _alarmMessages;
+    static const std::array<const AlarmMessage_t, ALARM_MSG_COUNT> _alarmMessages;
 };

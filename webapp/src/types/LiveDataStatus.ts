@@ -23,6 +23,7 @@ export interface InverterStatistics {
 export interface Inverter {
     serial: number;
     name: string;
+    order: number;
     data_age: number;
     poll_enabled: boolean;
     reachable: boolean;
