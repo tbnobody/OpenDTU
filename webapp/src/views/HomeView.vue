@@ -457,7 +457,9 @@ export default defineComponent({
                 'decimalTwoDigits');
         },
         inverterData(): Inverter[] {
-            return this.liveData.inverters;
+            return this.liveData.inverters.slice().sort((a : Inverter, b: Inverter) => {
+                return a.order - b.order;
+            });
         }
     },
     methods: {

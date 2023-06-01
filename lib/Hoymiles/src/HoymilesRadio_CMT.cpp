@@ -121,17 +121,25 @@ void HoymilesRadio_CMT::loop()
         if (!_rxBuffer.empty()) {
             fragment_t f = _rxBuffer.back();
             if (checkFragmentCrc(&f)) {
-                std::shared_ptr<InverterAbstract> inv = Hoymiles.getInverterByFragment(&f);
 
-                if (nullptr != inv) {
-                    // Save packet in inverter rx buffer
-                    Hoymiles.getMessageOutput()->printf("RX %.2f MHz --> ", getFrequencyFromChannel(f.channel));
-                    dumpBuf(f.fragment, f.len, false);
-                    Hoymiles.getMessageOutput()->printf("| %d dBm\r\n", f.rssi);
+                serial_u dtuId = convertSerialToRadioId(_dtuSerial);
 
-                    inv->addRxFragment(f.fragment, f.len);
-                } else {
-                    Hoymiles.getMessageOutput()->println("Inverter Not found!");
+                // The CMT RF module does not filter foreign packages by itself.
+                // Has to be done manually here.
+                if (memcmp(&f.fragment[5], &dtuId.b[1], 4) == 0) {
+
+                    std::shared_ptr<InverterAbstract> inv = Hoymiles.getInverterByFragment(&f);
+
+                    if (nullptr != inv) {
+                        // Save packet in inverter rx buffer
+                        Hoymiles.getMessageOutput()->printf("RX %.2f MHz --> ", getFrequencyFromChannel(f.channel));
+                        dumpBuf(f.fragment, f.len, false);
+                        Hoymiles.getMessageOutput()->printf("| %d dBm\r\n", f.rssi);
+
+                        inv->addRxFragment(f.fragment, f.len);
+                    } else {
+                        Hoymiles.getMessageOutput()->println("Inverter Not found!");
+                    }
                 }
 
             } else {

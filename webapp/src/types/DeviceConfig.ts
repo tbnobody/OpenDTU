@@ -5,6 +5,7 @@ export interface Display {
     power_safe: boolean;
     screensaver: boolean;
     contrast: number;
+    language: number;
 }
 
 export interface DeviceConfig {

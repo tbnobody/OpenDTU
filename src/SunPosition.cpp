@@ -45,8 +45,25 @@ void SunPositionClass::updateSunData()
     }
 
     _sun.setCurrentDate(1900 + timeinfo.tm_year, timeinfo.tm_mon + 1, timeinfo.tm_mday);
-    _sunriseMinutes = static_cast<int>(_sun.calcCustomSunrise(SunSet::SUNSET_NAUTICAL));
-    _sunsetMinutes = static_cast<int>(_sun.calcCustomSunset(SunSet::SUNSET_NAUTICAL));
+
+    double sunset_type;
+    switch (config.Ntp_SunsetType) {
+    case 0:
+        sunset_type = SunSet::SUNSET_OFFICIAL;
+        break;
+    case 2:
+        sunset_type = SunSet::SUNSET_CIVIL;
+        break;
+    case 3:
+        sunset_type = SunSet::SUNSET_ASTONOMICAL;
+        break;
+    default:
+        sunset_type = SunSet::SUNSET_NAUTICAL;
+        break;
+    }
+
+    _sunriseMinutes = static_cast<int>(_sun.calcCustomSunrise(sunset_type));
+    _sunsetMinutes = static_cast<int>(_sun.calcCustomSunset(sunset_type));
     uint minutesPastMidnight = timeinfo.tm_hour * 60 + timeinfo.tm_min;
 
     _isDayPeriod = (minutesPastMidnight >= _sunriseMinutes) && (minutesPastMidnight < _sunsetMinutes);

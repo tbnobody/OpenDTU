@@ -20,6 +20,7 @@ public:
     void loop();
     void setContrast(uint8_t contrast);
     void setOrientation(uint8_t rotation = DISPLAY_ROTATION);
+    void setLanguage(uint8_t language);
     void setStartupDisplay();
 
     bool enablePowerSafe = true;
@@ -33,6 +34,7 @@ private:
     U8G2* _display;
 
     DisplayType_t _display_type = DisplayType_t::None;
+    uint8_t _display_language = DISPLAY_LANGUAGE;
     uint8_t _mExtra;
     uint16_t _period = 1000;
     uint16_t _interval = 60000; // interval at which to power save (milliseconds)

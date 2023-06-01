@@ -21,6 +21,7 @@ void WebApiInverterClass::init(AsyncWebServer* server)
     _server->on("/api/inverter/add", HTTP_POST, std::bind(&WebApiInverterClass::onInverterAdd, this, _1));
     _server->on("/api/inverter/edit", HTTP_POST, std::bind(&WebApiInverterClass::onInverterEdit, this, _1));
     _server->on("/api/inverter/del", HTTP_POST, std::bind(&WebApiInverterClass::onInverterDelete, this, _1));
+    _server->on("/api/inverter/order", HTTP_POST, std::bind(&WebApiInverterClass::onInverterOrder, this, _1));
 }
 
 void WebApiInverterClass::loop()
@@ -44,6 +45,7 @@ void WebApiInverterClass::onInverterList(AsyncWebServerRequest* request)
             JsonObject obj = data.createNestedObject();
             obj["id"] = i;
             obj["name"] = String(config.Inverter[i].Name);
+            obj["order"] = config.Inverter[i].Order;
 
             // Inverter Serial is read as HEX
             char buffer[sizeof(uint64_t) * 8 + 1];
@@ -389,4 +391,73 @@ void WebApiInverterClass::onInverterDelete(AsyncWebServerRequest* request)
     request->send(response);
 
     MqttHandleHass.forceUpdate();
+}
+
+void WebApiInverterClass::onInverterOrder(AsyncWebServerRequest* request)
+{
+    if (!WebApi.checkCredentials(request)) {
+        return;
+    }
+
+    AsyncJsonResponse* response = new AsyncJsonResponse();
+    JsonObject retMsg = response->getRoot();
+    retMsg["type"] = "warning";
+
+    if (!request->hasParam("data", true)) {
+        retMsg["message"] = "No values found!";
+        retMsg["code"] = WebApiError::GenericNoValueFound;
+        response->setLength();
+        request->send(response);
+        return;
+    }
+
+    String json = request->getParam("data", true)->value();
+
+    if (json.length() > 1024) {
+        retMsg["message"] = "Data too large!";
+        retMsg["code"] = WebApiError::GenericDataTooLarge;
+        response->setLength();
+        request->send(response);
+        return;
+    }
+
+    DynamicJsonDocument root(1024);
+    DeserializationError error = deserializeJson(root, json);
+
+    if (error) {
+        retMsg["message"] = "Failed to parse data!";
+        retMsg["code"] = WebApiError::GenericParseError;
+        response->setLength();
+        request->send(response);
+        return;
+    }
+
+    if (!(root.containsKey("order"))) {
+        retMsg["message"] = "Values are missing!";
+        retMsg["code"] = WebApiError::GenericValueMissing;
+        response->setLength();
+        request->send(response);
+        return;
+    }
+
+    // The order array contains list or id in the right order
+    JsonArray orderArray = root["order"].as<JsonArray>();
+    uint8_t order = 0;
+    for(JsonVariant id : orderArray) {
+        uint8_t inverter_id = id.as<uint8_t>();
+        if (inverter_id < INV_MAX_COUNT) {
+            INVERTER_CONFIG_T& inverter = Configuration.get().Inverter[inverter_id];
+            inverter.Order = order;
+        }
+        order++;
+    }
+
+    Configuration.write();
+
+    retMsg["type"] = "success";
+    retMsg["message"] = "Inverter order saved!";
+    retMsg["code"] = WebApiError::InverterOrdered;
+
+    response->setLength();
+    request->send(response);
 }
