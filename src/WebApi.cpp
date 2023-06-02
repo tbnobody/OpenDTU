@@ -90,4 +90,11 @@ bool WebApiClass::checkCredentialsReadonly(AsyncWebServerRequest* request)
     }
 }
 
+void WebApiClass::sendTooManyRequests(AsyncWebServerRequest* request)
+{
+    auto response = request->beginResponse(429, "text/plain", "Too Many Requests");
+    response->addHeader("Retry-After", "60");
+    request->send(response);
+}
+
 WebApiClass WebApi;

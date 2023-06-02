@@ -6,6 +6,7 @@
 #include "ModbusDtu.h"
 #include "WatchDogDtu.h"
 #include "Display_Graphic.h"
+#include "InverterSettings.h"
 #include "MessageOutput.h"
 #include "MqttHandleDtu.h"
 #include "MqttHandleHass.h"
@@ -14,11 +15,11 @@
 #include "NetworkSettings.h"
 #include "NtpSettings.h"
 #include "PinMapping.h"
+#include "SunPosition.h"
 #include "Utils.h"
 #include "WebApi.h"
 #include "defaults.h"
 #include <Arduino.h>
-#include <Hoymiles.h>
 #include <LittleFS.h>
 
 void setup()
@@ -82,6 +83,11 @@ void setup()
     NtpSettings.init();
     MessageOutput.println(F("done"));
 
+    // Initialize SunPosition
+    MessageOutput.print(F("Initialize SunPosition... "));
+    SunPosition.init();
+    MessageOutput.println(F("done"));
+
     // Initialize MqTT
     MessageOutput.print(F("Initialize MqTT... "));
     MqttSettings.init();
@@ -137,7 +143,7 @@ void loop()
 {
     NetworkSettings.loop();
     yield();
-    Hoymiles.loop();
+    InverterSettings.loop();
     yield();
     ModbusDtu.loop();
     yield();
@@ -150,6 +156,8 @@ void loop()
     WebApi.loop();
     yield();
     Display.loop();
+    yield();
+    SunPosition.loop();
     yield();
     MessageOutput.loop();
     yield();

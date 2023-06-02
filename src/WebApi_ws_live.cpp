@@ -60,21 +60,26 @@ void WebApiWsLiveClass::loop()
     // Update on every inverter change or at least after 10 seconds
     if (millis() - _lastWsPublish > (10 * 1000) || (maxTimeStamp != _newestInverterTimestamp)) {
 
-        DynamicJsonDocument root(40960);
-        JsonVariant var = root;
-        generateJsonResponse(var);
+        try {
+            DynamicJsonDocument root(40960);
+            JsonVariant var = root;
+            generateJsonResponse(var);
 
-        String buffer;
-        if (buffer) {
-            serializeJson(root, buffer);
+            String buffer;
+            if (buffer) {
+                serializeJson(root, buffer);
 
-            if (Configuration.get().Security_AllowReadonly) {
-                _ws.setAuthentication("", "");
-            } else {
-                _ws.setAuthentication(AUTH_USERNAME, Configuration.get().Security_Password);
+                if (Configuration.get().Security_AllowReadonly) {
+                    _ws.setAuthentication("", "");
+                } else {
+                    _ws.setAuthentication(AUTH_USERNAME, Configuration.get().Security_Password);
+                }
+
+                _ws.textAll(buffer);
             }
 
-            _ws.textAll(buffer);
+        } catch (std::bad_alloc& bad_alloc) {
+            MessageOutput.printf("Call to /api/livedata/status temporarely out of resources. Reason: \"%s\".\r\n", bad_alloc.what());
         }
 
         _lastWsPublish = millis();
@@ -111,36 +116,39 @@ void WebApiWsLiveClass::generateJsonResponse(JsonVariant& root)
         }
 
         // Loop all channels
-        for (uint8_t c = 0; c <= inv->Statistics()->getChannelCount(); c++) {
-            if (c > 0) {
-                INVERTER_CONFIG_T* inv_cfg = Configuration.getInverterConfig(inv->serial());
-                if (inv_cfg != nullptr) {
-                    invObject[String(c)][F("name")]["u"] = inv_cfg->channel[c - 1].Name;
+        for (auto& t : inv->Statistics()->getChannelTypes()) {
+            JsonObject chanTypeObj = invObject.createNestedObject(inv->Statistics()->getChannelTypeName(t));
+            for (auto& c : inv->Statistics()->getChannelsByType(t)) {
+                if (t == TYPE_DC) {
+                    INVERTER_CONFIG_T* inv_cfg = Configuration.getInverterConfig(inv->serial());
+                    if (inv_cfg != nullptr) {
+                        chanTypeObj[String(static_cast<uint8_t>(c))][F("name")]["u"] = inv_cfg->channel[c].Name;
+                    }
                 }
-            }
-            addField(invObject, i, inv, c, FLD_PAC);
-            addField(invObject, i, inv, c, FLD_UAC);
-            addField(invObject, i, inv, c, FLD_IAC);
-            if (c == 0) {
-                addField(invObject, i, inv, c, FLD_PDC, F("Power DC"));
-            } else {
-                addField(invObject, i, inv, c, FLD_PDC);
-            }
-            addField(invObject, i, inv, c, FLD_UDC);
-            addField(invObject, i, inv, c, FLD_IDC);
-            addField(invObject, i, inv, c, FLD_YD);
-            addField(invObject, i, inv, c, FLD_YT);
-            addField(invObject, i, inv, c, FLD_F);
-            addField(invObject, i, inv, c, FLD_T);
-            addField(invObject, i, inv, c, FLD_PF);
-            addField(invObject, i, inv, c, FLD_PRA);
-            addField(invObject, i, inv, c, FLD_EFF);
-            if (c > 0 && inv->Statistics()->getChannelMaxPower(c - 1) > 0) {
-                addField(invObject, i, inv, c, FLD_IRR);
+                addField(chanTypeObj, i, inv, t, c, FLD_PAC);
+                addField(chanTypeObj, i, inv, t, c, FLD_UAC);
+                addField(chanTypeObj, i, inv, t, c, FLD_IAC);
+                if (t == TYPE_AC) {
+                    addField(chanTypeObj, i, inv, t, c, FLD_PDC, F("Power DC"));
+                } else {
+                    addField(chanTypeObj, i, inv, t, c, FLD_PDC);
+                }
+                addField(chanTypeObj, i, inv, t, c, FLD_UDC);
+                addField(chanTypeObj, i, inv, t, c, FLD_IDC);
+                addField(chanTypeObj, i, inv, t, c, FLD_YD);
+                addField(chanTypeObj, i, inv, t, c, FLD_YT);
+                addField(chanTypeObj, i, inv, t, c, FLD_F);
+                addField(chanTypeObj, i, inv, t, c, FLD_T);
+                addField(chanTypeObj, i, inv, t, c, FLD_PF);
+                addField(chanTypeObj, i, inv, t, c, FLD_PRA);
+                addField(chanTypeObj, i, inv, t, c, FLD_EFF);
+                if (t == TYPE_DC && inv->Statistics()->getStringMaxPower(c) > 0) {
+                    addField(chanTypeObj, i, inv, t, c, FLD_IRR);
+                }
             }
         }
 
-        if (inv->Statistics()->hasChannelFieldValue(CH0, FLD_EVT_LOG)) {
+        if (inv->Statistics()->hasChannelFieldValue(TYPE_INV, CH0, FLD_EVT_LOG)) {
             invObject[F("events")] = inv->EventLog()->getEntryCount();
         } else {
             invObject[F("events")] = -1;
@@ -150,9 +158,11 @@ void WebApiWsLiveClass::generateJsonResponse(JsonVariant& root)
             _newestInverterTimestamp = inv->Statistics()->getLastUpdate();
         }
 
-        totalPower += inv->Statistics()->getChannelFieldValue(CH0, FLD_PAC);
-        totalYieldDay += inv->Statistics()->getChannelFieldValue(CH0, FLD_YD);
-        totalYieldTotal += inv->Statistics()->getChannelFieldValue(CH0, FLD_YT);
+        for (auto& c : inv->Statistics()->getChannelsByType(TYPE_AC)) {
+            totalPower += inv->Statistics()->getChannelFieldValue(TYPE_AC, c, FLD_PAC);
+            totalYieldDay += inv->Statistics()->getChannelFieldValue(TYPE_AC, c, FLD_YD);
+            totalYieldTotal += inv->Statistics()->getChannelFieldValue(TYPE_AC, c, FLD_YT);
+        }
     }
 
     JsonObject totalObj = root.createNestedObject("total");
@@ -172,18 +182,20 @@ void WebApiWsLiveClass::generateJsonResponse(JsonVariant& root)
     }
 }
 
-void WebApiWsLiveClass::addField(JsonObject& root, uint8_t idx, std::shared_ptr<InverterAbstract> inv, uint8_t channel, uint8_t fieldId, String topic)
+void WebApiWsLiveClass::addField(JsonObject& root, uint8_t idx, std::shared_ptr<InverterAbstract> inv, ChannelType_t type, ChannelNum_t channel, FieldId_t fieldId, String topic)
 {
-    if (inv->Statistics()->hasChannelFieldValue(channel, fieldId)) {
+    if (inv->Statistics()->hasChannelFieldValue(type, channel, fieldId)) {
         String chanName;
         if (topic == "") {
-            chanName = inv->Statistics()->getChannelFieldName(channel, fieldId);
+            chanName = inv->Statistics()->getChannelFieldName(type, channel, fieldId);
         } else {
             chanName = topic;
         }
-        root[String(channel)][chanName]["v"] = inv->Statistics()->getChannelFieldValue(channel, fieldId);
-        root[String(channel)][chanName]["u"] = inv->Statistics()->getChannelFieldUnit(channel, fieldId);
-        root[String(channel)][chanName]["d"] = inv->Statistics()->getChannelFieldDigits(channel, fieldId);
+        String chanNum;
+        chanNum = channel;
+        root[chanNum][chanName]["v"] = inv->Statistics()->getChannelFieldValue(type, channel, fieldId);
+        root[chanNum][chanName]["u"] = inv->Statistics()->getChannelFieldUnit(type, channel, fieldId);
+        root[chanNum][chanName]["d"] = inv->Statistics()->getChannelFieldDigits(type, channel, fieldId);
     }
 }
 
@@ -213,11 +225,18 @@ void WebApiWsLiveClass::onLivedataStatus(AsyncWebServerRequest* request)
         return;
     }
 
-    AsyncJsonResponse* response = new AsyncJsonResponse(false, 40960U);
-    JsonVariant root = response->getRoot();
+    try {
+        AsyncJsonResponse* response = new AsyncJsonResponse(false, 40960U);
+        JsonVariant root = response->getRoot();
 
-    generateJsonResponse(root);
+        generateJsonResponse(root);
 
-    response->setLength();
-    request->send(response);
+        response->setLength();
+        request->send(response);
+
+    } catch (std::bad_alloc& bad_alloc) {
+        MessageOutput.printf("Call to /api/livedata/status temporarely out of resources. Reason: \"%s\".\r\n", bad_alloc.what());
+
+        WebApi.sendTooManyRequests(request);
+    }
 }

@@ -5,6 +5,7 @@
 #include "WebApi_ntp.h"
 #include "Configuration.h"
 #include "NtpSettings.h"
+#include "SunPosition.h"
 #include "WebApi.h"
 #include "WebApi_errors.h"
 #include "helper.h"
@@ -51,6 +52,16 @@ void WebApiNtpClass::onNtpStatus(AsyncWebServerRequest* request)
     strftime(timeStringBuff, sizeof(timeStringBuff), "%A, %B %d %Y %H:%M:%S", &timeinfo);
     root[F("ntp_localtime")] = timeStringBuff;
 
+    SunPosition.sunriseTime(&timeinfo);
+    strftime(timeStringBuff, sizeof(timeStringBuff), "%A, %B %d %Y %H:%M:%S", &timeinfo);
+    root[F("sun_risetime")] = timeStringBuff;
+
+    SunPosition.sunsetTime(&timeinfo);
+    strftime(timeStringBuff, sizeof(timeStringBuff), "%A, %B %d %Y %H:%M:%S", &timeinfo);
+    root[F("sun_settime")] = timeStringBuff;
+
+    root[F("sun_isDayPeriod")] = SunPosition.isDayPeriod();
+
     response->setLength();
     request->send(response);
 }
@@ -68,6 +79,8 @@ void WebApiNtpClass::onNtpAdminGet(AsyncWebServerRequest* request)
     root[F("ntp_server")] = config.Ntp_Server;
     root[F("ntp_timezone")] = config.Ntp_Timezone;
     root[F("ntp_timezone_descr")] = config.Ntp_TimezoneDescr;
+    root[F("longitude")] = config.Ntp_Longitude;
+    root[F("latitude")] = config.Ntp_Latitude;
 
     response->setLength();
     request->send(response);
@@ -112,7 +125,7 @@ void WebApiNtpClass::onNtpAdminPost(AsyncWebServerRequest* request)
         return;
     }
 
-    if (!(root.containsKey("ntp_server") && root.containsKey("ntp_timezone"))) {
+    if (!(root.containsKey("ntp_server") && root.containsKey("ntp_timezone") && root.containsKey("longitude") && root.containsKey("latitude"))) {
         retMsg[F("message")] = F("Values are missing!");
         retMsg[F("code")] = WebApiError::GenericValueMissing;
         response->setLength();
@@ -151,6 +164,8 @@ void WebApiNtpClass::onNtpAdminPost(AsyncWebServerRequest* request)
     strlcpy(config.Ntp_Server, root[F("ntp_server")].as<String>().c_str(), sizeof(config.Ntp_Server));
     strlcpy(config.Ntp_Timezone, root[F("ntp_timezone")].as<String>().c_str(), sizeof(config.Ntp_Timezone));
     strlcpy(config.Ntp_TimezoneDescr, root[F("ntp_timezone_descr")].as<String>().c_str(), sizeof(config.Ntp_TimezoneDescr));
+    config.Ntp_Latitude = root[F("latitude")].as<double>();
+    config.Ntp_Longitude = root[F("longitude")].as<double>();
     Configuration.write();
 
     retMsg[F("type")] = F("success");

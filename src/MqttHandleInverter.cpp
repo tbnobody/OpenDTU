@@ -96,15 +96,18 @@ void MqttHandleInverterClass::loop()
                 _lastPublishStats[i] = lastUpdate;
 
                 // Loop all channels
-                for (uint8_t c = 0; c <= inv->Statistics()->getChannelCount(); c++) {
-                    if (c > 0) {
-                        INVERTER_CONFIG_T* inv_cfg = Configuration.getInverterConfig(inv->serial());
-                        if (inv_cfg != nullptr) {
-                            MqttSettings.publish(inv->serialString() + "/" + String(c) + "/name", inv_cfg->channel[c - 1].Name);
+                for (auto& t : inv->Statistics()->getChannelTypes()) {
+                    for (auto& c : inv->Statistics()->getChannelsByType(t)) {
+                        if (t == TYPE_DC) {
+                            INVERTER_CONFIG_T* inv_cfg = Configuration.getInverterConfig(inv->serial());
+                            if (inv_cfg != nullptr) {
+                                // TODO(tbnobody)
+                                MqttSettings.publish(inv->serialString() + "/" + String(static_cast<uint8_t>(c) + 1) + "/name", inv_cfg->channel[c].Name);
+                            }
                         }
-                    }
-                    for (uint8_t f = 0; f < sizeof(_publishFields); f++) {
-                        publishField(inv, c, _publishFields[f]);
+                        for (uint8_t f = 0; f < sizeof(_publishFields) / sizeof(FieldId_t); f++) {
+                            publishField(inv, t, c, _publishFields[f]);
+                        }
                     }
                 }
             }
@@ -116,31 +119,39 @@ void MqttHandleInverterClass::loop()
     }
 }
 
-void MqttHandleInverterClass::publishField(std::shared_ptr<InverterAbstract> inv, uint8_t channel, uint8_t fieldId)
+void MqttHandleInverterClass::publishField(std::shared_ptr<InverterAbstract> inv, ChannelType_t type, ChannelNum_t channel, FieldId_t fieldId)
 {
-    String topic = getTopic(inv, channel, fieldId);
+    String topic = getTopic(inv, type, channel, fieldId);
     if (topic == "") {
         return;
     }
 
-    MqttSettings.publish(topic, String(inv->Statistics()->getChannelFieldValue(channel, fieldId)));
+    MqttSettings.publish(topic, String(inv->Statistics()->getChannelFieldValue(type, channel, fieldId)));
 }
 
-String MqttHandleInverterClass::getTopic(std::shared_ptr<InverterAbstract> inv, uint8_t channel, uint8_t fieldId)
+String MqttHandleInverterClass::getTopic(std::shared_ptr<InverterAbstract> inv, ChannelType_t type, ChannelNum_t channel, FieldId_t fieldId)
 {
-    if (!inv->Statistics()->hasChannelFieldValue(channel, fieldId)) {
+    if (!inv->Statistics()->hasChannelFieldValue(type, channel, fieldId)) {
         return String("");
     }
 
     String chanName;
-    if (channel == 0 && fieldId == FLD_PDC) {
+    if (type == TYPE_AC && fieldId == FLD_PDC) {
         chanName = "powerdc";
     } else {
-        chanName = inv->Statistics()->getChannelFieldName(channel, fieldId);
+        chanName = inv->Statistics()->getChannelFieldName(type, channel, fieldId);
         chanName.toLowerCase();
     }
 
-    return inv->serialString() + "/" + String(channel) + "/" + chanName;
+    String chanNum;
+    if (type == TYPE_DC) {
+        // TODO(tbnobody)
+        chanNum = static_cast<uint8_t>(channel) + 1;
+    } else {
+        chanNum = channel;
+    }
+
+    return inv->serialString() + "/" + chanNum + "/" + chanName;
 }
 
 void MqttHandleInverterClass::onMqttMessage(const espMqttClientTypes::MessageProperties& properties, const char* topic, const uint8_t* payload, size_t len, size_t index, size_t total)
