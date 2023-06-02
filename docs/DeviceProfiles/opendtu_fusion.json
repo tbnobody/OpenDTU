@@ -1,0 +1,190 @@
+[
+    {
+        "name": "OpenDTU Fusion v1",
+        "nrf24": {
+            "miso": 48,
+            "mosi": 35,
+            "clk": 36,
+            "irq": 47,
+            "en": 38,
+            "cs": 37
+        },
+        "eth": {
+            "enabled": false,
+            "phy_addr": -1,
+            "power": -1,
+            "mdc": -1,
+            "mdio": -1,
+            "type": 0,
+            "clk_mode": 0
+        },
+        "led": {
+            "led0": 17,
+            "led1": 18
+        }
+    },
+    {
+        "name": "OpenDTU Fusion v1 with SSD1306 Display",
+        "nrf24": {
+            "miso": 48,
+            "mosi": 35,
+            "clk": 36,
+            "irq": 47,
+            "en": 38,
+            "cs": 37
+        },
+        "eth": {
+            "enabled": false,
+            "phy_addr": -1,
+            "power": -1,
+            "mdc": -1,
+            "mdio": -1,
+            "type": 0,
+            "clk_mode": 0
+        },
+        "led": {
+            "led0": 17,
+            "led1": 18
+        },
+        "display": {
+            "type": 2,
+            "data": 2,
+            "clk": 1
+        }
+    },
+    {
+        "name": "OpenDTU Fusion v1 with SH1106 Display",
+        "nrf24": {
+            "miso": 48,
+            "mosi": 35,
+            "clk": 36,
+            "irq": 47,
+            "en": 38,
+            "cs": 37
+        },
+        "eth": {
+            "enabled": false,
+            "phy_addr": -1,
+            "power": -1,
+            "mdc": -1,
+            "mdio": -1,
+            "type": 0,
+            "clk_mode": 0
+        },
+        "led": {
+            "led0": 17,
+            "led1": 18
+        },
+        "display": {
+            "type": 3,
+            "data": 2,
+            "clk": 1
+        }
+    },
+    {
+        "name": "OpenDTU Fusion v2 with CMT2300A and NRF24",
+        "nrf24": {
+            "miso": 48,
+            "mosi": 35,
+            "clk": 36,
+            "irq": 47,
+            "en": 38,
+            "cs": 37
+        },
+        "cmt": {
+            "clk": 6,
+            "cs": 4,
+            "fcs": 21,
+            "sdio": 5,
+            "gpio2": 3,
+            "gpio3": 8
+        },
+        "eth": {
+            "enabled": false,
+            "phy_addr": -1,
+            "power": -1,
+            "mdc": -1,
+            "mdio": -1,
+            "type": 0,
+            "clk_mode": 0
+        },
+        "led": {
+            "led0": 17,
+            "led1": 18
+        }
+    },
+    {
+        "name": "OpenDTU Fusion v2 with CMT2300A, NRF24 and SH1106 Display",
+        "nrf24": {
+            "miso": 48,
+            "mosi": 35,
+            "clk": 36,
+            "irq": 47,
+            "en": 38,
+            "cs": 37
+        },
+        "cmt": {
+            "clk": 6,
+            "cs": 4,
+            "fcs": 21,
+            "sdio": 5,
+            "gpio2": 3,
+            "gpio3": 8
+        },
+        "eth": {
+            "enabled": false,
+            "phy_addr": -1,
+            "power": -1,
+            "mdc": -1,
+            "mdio": -1,
+            "type": 0,
+            "clk_mode": 0
+        },
+        "led": {
+            "led0": 17,
+            "led1": 18
+        },
+        "display": {
+            "type": 3,
+            "data": 2,
+            "clk": 1
+        }
+    },
+    {
+        "name": "OpenDTU Fusion v2 with CMT2300A, NRF24 and SSD1306 Display",
+        "nrf24": {
+            "miso": 48,
+            "mosi": 35,
+            "clk": 36,
+            "irq": 47,
+            "en": 38,
+            "cs": 37
+        },
+        "cmt": {
+            "clk": 6,
+            "cs": 4,
+            "fcs": 21,
+            "sdio": 5,
+            "gpio2": 3,
+            "gpio3": 8
+        },
+        "eth": {
+            "enabled": false,
+            "phy_addr": -1,
+            "power": -1,
+            "mdc": -1,
+            "mdio": -1,
+            "type": 0,
+            "clk_mode": 0
+        },
+        "led": {
+            "led0": 17,
+            "led1": 18
+        },
+        "display": {
+            "type": 2,
+            "data": 2,
+            "clk": 1
+        }
+    }
+]

@@ -1,0 +1,22 @@
+name: Yarn Linting
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+      - name: Setup Node.js and yarn
+        uses: actions/setup-node@v3
+        with:
+          node-version: "18"
+          cache: "yarn"
+          cache-dependency-path: "webapp/yarn.lock"
+
+      - name: Install WebApp dependencies
+        run: yarn --cwd webapp install --frozen-lockfile
+
+      - name: Linting
+        run: yarn --cwd webapp lint

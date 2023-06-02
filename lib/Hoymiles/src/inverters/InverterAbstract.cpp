@@ -30,7 +30,7 @@ void InverterAbstract::init()
     // Not possible in constructor --> virtual function
     // Not possible in verifyAllFragments --> Because no data if nothing is ever received
     // It has to be executed because otherwise the getChannelCount method in stats always returns 0
-    _statisticsParser.get()->setByteAssignment(getByteAssignment());
+    _statisticsParser.get()->setByteAssignment(getByteAssignment(), getAssignmentCount());
 }
 
 uint64_t InverterAbstract::serial()
@@ -60,39 +60,16 @@ const char* InverterAbstract::name()
 
 bool InverterAbstract::isProducing()
 {
-    float totalAc = 0;
-    for (auto& c : Statistics()->getChannelsByType(TYPE_AC)) {
-        if (Statistics()->hasChannelFieldValue(TYPE_AC, c, FLD_PAC)) {
-            totalAc += Statistics()->getChannelFieldValue(TYPE_AC, c, FLD_PAC);
-        }
+    if (!Statistics()->hasChannelFieldValue(CH0, FLD_PAC)) {
+        return false;
     }
 
-    return _enablePolling && totalAc > 0;
+    return Statistics()->getChannelFieldValue(CH0, FLD_PAC) > 0;
 }
 
 bool InverterAbstract::isReachable()
 {
-    return _enablePolling && Statistics()->getRxFailureCount() <= MAX_ONLINE_FAILURE_COUNT;
-}
-
-void InverterAbstract::setEnablePolling(bool enabled)
-{
-    _enablePolling = enabled;
-}
-
-bool InverterAbstract::getEnablePolling()
-{
-    return _enablePolling;
-}
-
-void InverterAbstract::setEnableCommands(bool enabled)
-{
-    _enableCommands = enabled;
-}
-
-bool InverterAbstract::getEnableCommands()
-{
-    return _enableCommands;
+    return Statistics()->getRxFailureCount() <= MAX_ONLINE_FAILURE_COUNT;
 }
 
 AlarmLogParser* InverterAbstract::EventLog()
