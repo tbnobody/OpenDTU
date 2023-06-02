@@ -27,9 +27,10 @@
                     <div class="card">
                         <div class="card-header d-flex justify-content-between align-items-center"
                             :class="{
-                                'text-bg-danger': !inverter.reachable,
-                                'text-bg-warning': inverter.reachable && !inverter.producing,
-                                'text-bg-primary': inverter.reachable && inverter.producing,
+                                'text-bg-tertiary': !inverter.poll_enabled,
+                                'text-bg-danger': inverter.poll_enabled && !inverter.reachable,
+                                'text-bg-warning': inverter.poll_enabled && inverter.reachable && !inverter.producing,
+                                'text-bg-primary': inverter.poll_enabled && inverter.reachable && inverter.producing,
                             }">
                             <div class="p-1 flex-grow-1">
                                 <div class="d-flex flex-wrap">
@@ -92,12 +93,20 @@
                             </div>
                         </div>
                         <div class="card-body">
-                            <div class="row flex-row-reverse flex-wrap-reverse align-items-end g-3">
-                                <template v-for="channel in 5" :key="channel">
-                                    <div v-if="inverter[channel - 1]" :class="`col order-${5 - channel}`">
-                                        <InverterChannelInfo :channelData="inverter[channel - 1]"
-                                            :channelNumber="channel - 1" />
-                                    </div>
+                            <div class="row flex-row-reverse flex-wrap-reverse g-3">
+                                <template v-for="chanType in [{obj: inverter.INV, name: 'INV'}, {obj: inverter.AC, name: 'AC'}, {obj: inverter.DC, name: 'DC'}].reverse()">
+                                    <template v-for="channel in Object.keys(chanType.obj).sort().reverse().map(x=>+x)" :key="channel">
+                                        <template v-if="(chanType.name != 'DC') ||
+                                            (chanType.name == 'DC' && getSumIrridiation(inverter) == 0) ||
+                                            (chanType.name == 'DC' && getSumIrridiation(inverter) > 0 && chanType.obj[channel].Irradiation?.v || 0 > 0)
+                                            ">
+                                            <div class="col">
+                                                <InverterChannelInfo :channelData="chanType.obj[channel]"
+                                                    :channelType="chanType.name"
+                                                    :channelNumber="channel" />
+                                            </div>
+                                        </template>
+                                    </template>
                                 </template>
                             </div>
                         </div>
@@ -448,7 +457,9 @@ export default defineComponent({
                 'decimalTwoDigits');
         },
         inverterData(): Inverter[] {
-            return this.liveData.inverters;
+            return this.liveData.inverters.slice().sort((a : Inverter, b: Inverter) => {
+                return a.order - b.order;
+            });
         }
     },
     methods: {
@@ -524,7 +535,7 @@ export default defineComponent({
             fetch("/api/eventlog/status?inv=" + serial, { headers: authHeader() })
                 .then((response) => handleResponse(response, this.$emitter, this.$router))
                 .then((data) => {
-                    this.eventLogList = data[serial];
+                    this.eventLogList = data;
                     this.eventLogLoading = false;
                 });
 
@@ -535,10 +546,11 @@ export default defineComponent({
         },
         onShowDevInfo(serial: number) {
             this.devInfoLoading = true;
-            fetch("/api/devinfo/status", { headers: authHeader() })
+            fetch("/api/devinfo/status?inv=" + serial, { headers: authHeader() })
                 .then((response) => handleResponse(response, this.$emitter, this.$router))
                 .then((data) => {
-                    this.devInfoList = data[serial][0];
+                    this.devInfoList = data;
+                    this.devInfoList.serial = serial;
                     this.devInfoLoading = false;
                 });
 
@@ -602,7 +614,7 @@ export default defineComponent({
             } else {
                 this.targetLimitTypeText = this.$t('home.Absolute');
                 this.targetLimitMin = 10;
-                this.targetLimitMax = (this.currentLimitList.max_power > 0 ? this.currentLimitList.max_power : 1500);
+                this.targetLimitMax = (this.currentLimitList.max_power > 0 ? this.currentLimitList.max_power : 2250);
             }
             this.targetLimitType = type;
         },

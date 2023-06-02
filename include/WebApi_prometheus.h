@@ -15,6 +15,8 @@ private:
 
     void addField(AsyncResponseStream* stream, String& serial, uint8_t idx, std::shared_ptr<InverterAbstract> inv, ChannelType_t type, ChannelNum_t channel, FieldId_t fieldId, const char* channelName = NULL);
 
+    void addPanelInfo(AsyncResponseStream* stream, String& serial, uint8_t idx, std::shared_ptr<InverterAbstract> inv, ChannelType_t type, ChannelNum_t channel);
+
     AsyncWebServer* _server;
 
     enum {
@@ -38,6 +40,6 @@ private:
         { FLD_PF, METRIC_TYPE_GAUGE },
         { FLD_EFF, METRIC_TYPE_GAUGE },
         { FLD_IRR, METRIC_TYPE_GAUGE },
-        { FLD_PRA, METRIC_TYPE_GAUGE }
+        { FLD_Q, METRIC_TYPE_GAUGE }
     };
 };

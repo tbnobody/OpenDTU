@@ -43,6 +43,7 @@ export default defineComponent({
             dataLoading: true,
             consoleBuffer: "",
             isAutoScroll: true,
+            endWithNewline: false,
         };
     },
     created() {
@@ -78,10 +79,13 @@ export default defineComponent({
                 console.log(event);
 
                 let outstr = new String(event.data);
+                let removedNewline = false;
                 if (outstr.endsWith('\n')) {
                     outstr = outstr.substring(0, outstr.length - 1);
+                    removedNewline = true;
                 }
-                this.consoleBuffer += this.getOutDate() + outstr.replaceAll("\n", "\n" + this.getOutDate());
+                this.consoleBuffer += (this.endWithNewline ? this.getOutDate() : '') + outstr.replaceAll("\n", "\n" + this.getOutDate());
+                this.endWithNewline = removedNewline;
                 this.heartCheck(); // Reset heartbeat detection
             };
 

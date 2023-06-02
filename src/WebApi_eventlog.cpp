@@ -38,12 +38,10 @@ void WebApiEventlogClass::onEventlogStatus(AsyncWebServerRequest* request)
     auto inv = Hoymiles.getInverterBySerial(serial);
 
     if (inv != nullptr) {
-        String serial = inv->serialString();
-
         uint8_t logEntryCount = inv->EventLog()->getEntryCount();
 
-        root[serial]["count"] = logEntryCount;
-        JsonArray eventsArray = root[serial].createNestedArray(F("events"));
+        root["count"] = logEntryCount;
+        JsonArray eventsArray = root.createNestedArray("events");
 
         for (uint8_t logEntry = 0; logEntry < logEntryCount; logEntry++) {
             JsonObject eventsObject = eventsArray.createNestedObject();
@@ -51,10 +49,10 @@ void WebApiEventlogClass::onEventlogStatus(AsyncWebServerRequest* request)
             AlarmLogEntry_t entry;
             inv->EventLog()->getLogEntry(logEntry, &entry);
 
-            eventsObject[F("message_id")] = entry.MessageId;
-            eventsObject[F("message")] = entry.Message;
-            eventsObject[F("start_time")] = entry.StartTime;
-            eventsObject[F("end_time")] = entry.EndTime;
+            eventsObject["message_id"] = entry.MessageId;
+            eventsObject["message"] = entry.Message;
+            eventsObject["start_time"] = entry.StartTime;
+            eventsObject["end_time"] = entry.EndTime;
         }
     }
 

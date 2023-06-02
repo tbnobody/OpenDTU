@@ -2,6 +2,8 @@
 #pragma once
 
 #include <TimeoutHelper.h>
+#include <freertos/FreeRTOS.h>
+#include <freertos/semphr.h>
 
 class DatastoreClass {
 public:
@@ -10,52 +12,69 @@ public:
     void loop();
 
     // Sum of yield total of all enabled inverters, a inverter which is just disabled at night is also included
-    float totalAcYieldTotalEnabled = 0;
+    float getTotalAcYieldTotalEnabled();
 
     // Sum of yield day of all enabled inverters, a inverter which is just disabled at night is also included
-    float totalAcYieldDayEnabled = 0;
+    float getTotalAcYieldDayEnabled();
 
     // Sum of total AC power of all enabled inverters
-    float totalAcPowerEnabled = 0;
+    float getTotalAcPowerEnabled();
 
     // Sum of total DC power of all enabled inverters
-    float totalDcPowerEnabled = 0;
+    float getTotalDcPowerEnabled();
 
     // Sum of total DC power of all enabled inverters with maxStringPower set
-    float totalDcPowerIrradiation = 0;
+    float getTotalDcPowerIrradiation();
 
     // Sum of total installed irradiation of all enabled inverters
-    float totalDcIrradiationInstalled = 0;
+    float getTotalDcIrradiationInstalled();
 
     // Percentage (1-100) of total irradiation
-    float totalDcIrradiation = 0;
+    float getTotalDcIrradiation();
 
     // Amount of relevant digits for yield total
-    unsigned int totalAcYieldTotalDigits = 0;
+    unsigned int getTotalAcYieldTotalDigits();
 
     // Amount of relevant digits for yield total
-    unsigned int totalAcYieldDayDigits = 0;
+    unsigned int getTotalAcYieldDayDigits();
 
     // Amount of relevant digits for AC power
-    unsigned int totalAcPowerDigits = 0;
+    unsigned int getTotalAcPowerDigits();
 
     // Amount of relevant digits for DC power
-    unsigned int totalDcPowerDigits = 0;
+    unsigned int getTotalDcPowerDigits();
 
     // True, if at least one inverter is reachable
-    bool isAtLeastOneReachable = false;
+    bool getIsAtLeastOneReachable();
 
     // True if at least one inverter is producing
-    bool isAtLeastOneProducing = false;
+    bool getIsAtLeastOneProducing();
 
     // True if all enabled inverters are producing
-    bool isAllEnabledProducing = false;
+    bool getIsAllEnabledProducing();
 
     // True if all enabled inverters are reachable
-    bool isAllEnabledReachable = false;
+    bool getIsAllEnabledReachable();
 
 private:
     TimeoutHelper _updateTimeout;
+    SemaphoreHandle_t _xSemaphore;
+
+    float _totalAcYieldTotalEnabled = 0;
+    float _totalAcYieldDayEnabled = 0;
+    float _totalAcPowerEnabled = 0;
+    float _totalDcPowerEnabled = 0;
+    float _totalDcPowerIrradiation = 0;
+    float _totalDcIrradiationInstalled = 0;
+    float _totalDcIrradiation = 0;
+    unsigned int _totalAcYieldTotalDigits = 0;
+    unsigned int _totalAcYieldDayDigits = 0;
+    unsigned int _totalAcPowerDigits = 0;
+    unsigned int _totalDcPowerDigits = 0;
+    bool _isAtLeastOneReachable = false;
+    bool _isAtLeastOneProducing = false;
+    bool _isAllEnabledProducing = false;
+    bool _isAllEnabledReachable = false;
 };
 
 extern DatastoreClass Datastore;

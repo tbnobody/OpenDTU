@@ -22,6 +22,11 @@ void TimeoutHelper::extend(uint32_t ms)
     timeout += ms;
 }
 
+void TimeoutHelper::reset()
+{
+    startMillis = millis();
+}
+
 bool TimeoutHelper::occured()
 {
     return millis() > (startMillis + timeout);

@@ -22,13 +22,13 @@ void MqttHandleInverterTotalClass::loop()
     }
 
     if (_lastPublish.occured()) {
-        MqttSettings.publish("ac/power", String(Datastore.totalAcPowerEnabled, Datastore.totalAcPowerDigits));
-        MqttSettings.publish("ac/yieldtotal", String(Datastore.totalAcYieldTotalEnabled, Datastore.totalAcYieldTotalDigits));
-        MqttSettings.publish("ac/yieldday", String(Datastore.totalAcYieldDayEnabled, Datastore.totalAcYieldDayDigits));
-        MqttSettings.publish("ac/is_valid", String(Datastore.isAllEnabledReachable));
-        MqttSettings.publish("dc/power", String(Datastore.totalDcPowerEnabled, Datastore.totalDcPowerDigits));
-        MqttSettings.publish("dc/irradiation", String(Datastore.totalDcIrradiation, 3));
-        MqttSettings.publish("dc/is_valid", String(Datastore.isAllEnabledReachable));
+        MqttSettings.publish("ac/power", String(Datastore.getTotalAcPowerEnabled(), Datastore.getTotalAcPowerDigits()));
+        MqttSettings.publish("ac/yieldtotal", String(Datastore.getTotalAcYieldTotalEnabled(), Datastore.getTotalAcYieldTotalDigits()));
+        MqttSettings.publish("ac/yieldday", String(Datastore.getTotalAcYieldDayEnabled(), Datastore.getTotalAcYieldDayDigits()));
+        MqttSettings.publish("ac/is_valid", String(Datastore.getIsAllEnabledReachable()));
+        MqttSettings.publish("dc/power", String(Datastore.getTotalDcPowerEnabled(), Datastore.getTotalDcPowerDigits()));
+        MqttSettings.publish("dc/irradiation", String(Datastore.getTotalDcIrradiation(), 3));
+        MqttSettings.publish("dc/is_valid", String(Datastore.getIsAllEnabledReachable()));
 
         _lastPublish.set(Configuration.get().Mqtt_PublishInterval * 1000);
     }

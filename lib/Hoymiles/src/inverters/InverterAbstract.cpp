@@ -7,9 +7,10 @@
 #include "crc.h"
 #include <cstring>
 
-InverterAbstract::InverterAbstract(uint64_t serial)
+InverterAbstract::InverterAbstract(HoymilesRadio* radio, uint64_t serial)
 {
     _serial.u64 = serial;
+    _radio = radio;
 
     char serial_buff[sizeof(uint64_t) * 8 + 1];
     snprintf(serial_buff, sizeof(serial_buff), "%0x%08x",
@@ -30,7 +31,7 @@ void InverterAbstract::init()
     // Not possible in constructor --> virtual function
     // Not possible in verifyAllFragments --> Because no data if nothing is ever received
     // It has to be executed because otherwise the getChannelCount method in stats always returns 0
-    _statisticsParser.get()->setByteAssignment(getByteAssignment(), getAssignmentCount());
+    _statisticsParser.get()->setByteAssignment(getByteAssignment(), getByteAssignmentSize());
 }
 
 uint64_t InverterAbstract::serial()
@@ -70,6 +71,36 @@ bool InverterAbstract::isProducing()
 bool InverterAbstract::isReachable()
 {
     return Statistics()->getRxFailureCount() <= MAX_ONLINE_FAILURE_COUNT;
+}
+
+void InverterAbstract::setEnablePolling(bool enabled)
+{
+    _enablePolling = enabled;
+}
+
+bool InverterAbstract::getEnablePolling()
+{
+    return _enablePolling;
+}
+
+void InverterAbstract::setEnableCommands(bool enabled)
+{
+    _enableCommands = enabled;
+}
+
+bool InverterAbstract::getEnableCommands()
+{
+    return _enableCommands;
+}
+
+bool InverterAbstract::sendChangeChannelRequest()
+{
+    return false;
+}
+
+HoymilesRadio* InverterAbstract::getRadio()
+{
+    return _radio;
 }
 
 AlarmLogParser* InverterAbstract::EventLog()
@@ -118,26 +149,32 @@ void InverterAbstract::addRxFragment(uint8_t fragment[], uint8_t len)
     }
 
     uint8_t fragmentCount = fragment[9];
-    if (fragmentCount == 0) {
-        Hoymiles.getMessageOutput()->println("ERROR: fragment number zero received and ignored");
+
+    // Packets with 0x81 will be seen as 1
+    uint8_t fragmentId = fragmentCount & 0b01111111; // fragmentId is 1 based
+
+    if (fragmentId == 0) {
+        Hoymiles.getMessageOutput()->println("ERROR: fragment id zero received and ignored");
         return;
     }
 
-    if ((fragmentCount & 0b01111111) < MAX_RF_FRAGMENT_COUNT) {
-        // Packets with 0x81 will be seen as 1
-        memcpy(_rxFragmentBuffer[(fragmentCount & 0b01111111) - 1].fragment, &fragment[10], len - 11);
-        _rxFragmentBuffer[(fragmentCount & 0b01111111) - 1].len = len - 11;
-        _rxFragmentBuffer[(fragmentCount & 0b01111111) - 1].mainCmd = fragment[0];
-        _rxFragmentBuffer[(fragmentCount & 0b01111111) - 1].wasReceived = true;
+    if (fragmentId >= MAX_RF_FRAGMENT_COUNT) {
+        Hoymiles.getMessageOutput()->printf("ERROR: fragment id %d is too large for buffer and ignored\r\n", fragmentId);
+        return;
+    }
 
-        if ((fragmentCount & 0b01111111) > _rxFragmentLastPacketId) {
-            _rxFragmentLastPacketId = fragmentCount & 0b01111111;
-        }
+    memcpy(_rxFragmentBuffer[fragmentId - 1].fragment, &fragment[10], len - 11);
+    _rxFragmentBuffer[fragmentId - 1].len = len - 11;
+    _rxFragmentBuffer[fragmentId - 1].mainCmd = fragment[0];
+    _rxFragmentBuffer[fragmentId - 1].wasReceived = true;
+
+    if (fragmentId > _rxFragmentLastPacketId) {
+        _rxFragmentLastPacketId = fragmentId;
     }
 
     // 0b10000000 == 0x80
     if ((fragmentCount & 0b10000000) == 0b10000000) {
-        _rxFragmentMaxPacketId = fragmentCount & 0b01111111;
+        _rxFragmentMaxPacketId = fragmentId;
     }
 }
 
@@ -146,8 +183,8 @@ uint8_t InverterAbstract::verifyAllFragments(CommandAbstract* cmd)
 {
     // All missing
     if (_rxFragmentLastPacketId == 0) {
-        Hoymiles.getMessageOutput()->println(F("All missing"));
-        if (cmd->getSendCount() <= MAX_RESEND_COUNT) {
+        Hoymiles.getMessageOutput()->println("All missing");
+        if (cmd->getSendCount() <= cmd->getMaxResendCount()) {
             return FRAGMENT_ALL_MISSING_RESEND;
         } else {
             cmd->gotTimeout(this);
@@ -155,10 +192,10 @@ uint8_t InverterAbstract::verifyAllFragments(CommandAbstract* cmd)
         }
     }
 
-    // Last fragment is missing (thte one with 0x80)
+    // Last fragment is missing (the one with 0x80)
     if (_rxFragmentMaxPacketId == 0) {
-        Hoymiles.getMessageOutput()->println(F("Last missing"));
-        if (_rxFragmentRetransmitCnt++ < MAX_RETRANSMIT_COUNT) {
+        Hoymiles.getMessageOutput()->println("Last missing");
+        if (_rxFragmentRetransmitCnt++ < cmd->getMaxRetransmitCount()) {
             return _rxFragmentLastPacketId + 1;
         } else {
             cmd->gotTimeout(this);
@@ -169,8 +206,8 @@ uint8_t InverterAbstract::verifyAllFragments(CommandAbstract* cmd)
     // Middle fragment is missing
     for (uint8_t i = 0; i < _rxFragmentMaxPacketId - 1; i++) {
         if (!_rxFragmentBuffer[i].wasReceived) {
-            Hoymiles.getMessageOutput()->println(F("Middle missing"));
-            if (_rxFragmentRetransmitCnt++ < MAX_RETRANSMIT_COUNT) {
+            Hoymiles.getMessageOutput()->println("Middle missing");
+            if (_rxFragmentRetransmitCnt++ < cmd->getMaxRetransmitCount()) {
                 return i + 1;
             } else {
                 cmd->gotTimeout(this);

@@ -9,6 +9,16 @@
 #include "SunPosition.h"
 #include <Hoymiles.h>
 
+// the NRF shall use the second externally usable HW SPI controller
+// for ESP32 that is the so-called VSPI, for ESP32-S2/S3/C3 it is now called implicitly
+// HSPI, as it has shifted places for these chip generations
+// for all generations, this is equivalent to SPI3_HOST in the lower level driver
+#if CONFIG_IDF_TARGET_ESP32C3 || CONFIG_IDF_TARGET_ESP32S2 || CONFIG_IDF_TARGET_ESP32S3
+#define SPI_NRF HSPI
+#else
+#define SPI_NRF VSPI
+#endif
+
 InverterSettingsClass InverterSettings;
 
 void InverterSettingsClass::init()
@@ -17,27 +27,39 @@ void InverterSettingsClass::init()
     const PinMapping_t& pin = PinMapping.get();
 
     // Initialize inverter communication
-    MessageOutput.print(F("Initialize Hoymiles interface... "));
-    if (PinMapping.isValidNrf24Config()) {
-        SPIClass* spiClass = new SPIClass(HSPI);
-        spiClass->begin(pin.nrf24_clk, pin.nrf24_miso, pin.nrf24_mosi, pin.nrf24_cs);
+    MessageOutput.print("Initialize Hoymiles interface... ");
+    if (PinMapping.isValidNrf24Config() || PinMapping.isValidCmt2300Config()) {
         Hoymiles.setMessageOutput(&MessageOutput);
-        Hoymiles.init(spiClass, pin.nrf24_en, pin.nrf24_irq);
+        Hoymiles.init();
 
-        MessageOutput.println(F("  Setting radio PA level... "));
-        Hoymiles.getRadio()->setPALevel((rf24_pa_dbm_e)config.Dtu_PaLevel);
+        if (PinMapping.isValidNrf24Config()) {
+            SPIClass* spiClass = new SPIClass(SPI_NRF);
+            spiClass->begin(pin.nrf24_clk, pin.nrf24_miso, pin.nrf24_mosi, pin.nrf24_cs);
+            Hoymiles.initNRF(spiClass, pin.nrf24_en, pin.nrf24_irq);
+        }
 
-        MessageOutput.println(F("  Setting DTU serial... "));
-        Hoymiles.getRadio()->setDtuSerial(config.Dtu_Serial);
+        if (PinMapping.isValidCmt2300Config()) {
+            Hoymiles.initCMT(pin.cmt_sdio, pin.cmt_clk, pin.cmt_cs, pin.cmt_fcs, pin.cmt_gpio2, pin.cmt_gpio3);
+            MessageOutput.println(F("  Setting CMT target frequency... "));
+            Hoymiles.getRadioCmt()->setInverterTargetFrequency(config.Dtu_CmtFrequency);
+        }
 
-        MessageOutput.println(F("  Setting poll interval... "));
+        MessageOutput.println("  Setting radio PA level... ");
+        Hoymiles.getRadioNrf()->setPALevel((rf24_pa_dbm_e)config.Dtu_NrfPaLevel);
+        Hoymiles.getRadioCmt()->setPALevel(config.Dtu_CmtPaLevel);
+
+        MessageOutput.println("  Setting DTU serial... ");
+        Hoymiles.getRadioNrf()->setDtuSerial(config.Dtu_Serial);
+        Hoymiles.getRadioCmt()->setDtuSerial(config.Dtu_Serial);
+
+        MessageOutput.println("  Setting poll interval... ");
         Hoymiles.setPollInterval(config.Dtu_PollInterval);
 
         for (uint8_t i = 0; i < INV_MAX_COUNT; i++) {
             if (config.Inverter[i].Serial > 0) {
-                MessageOutput.print(F("  Adding inverter: "));
+                MessageOutput.print("  Adding inverter: ");
                 MessageOutput.print(config.Inverter[i].Serial, HEX);
-                MessageOutput.print(F(" - "));
+                MessageOutput.print(" - ");
                 MessageOutput.print(config.Inverter[i].Name);
                 auto inv = Hoymiles.addInverter(
                     config.Inverter[i].Name,
@@ -49,12 +71,12 @@ void InverterSettingsClass::init()
                         inv->Statistics()->setChannelFieldOffset(TYPE_DC, static_cast<ChannelNum_t>(c), FLD_YT, config.Inverter[i].channel[c].YieldTotalOffset);
                     }
                 }
-                MessageOutput.println(F(" done"));
+                MessageOutput.println(" done");
             }
         }
-        MessageOutput.println(F("done"));
+        MessageOutput.println("done");
     } else {
-        MessageOutput.println(F("Invalid pin config"));
+        MessageOutput.println("Invalid pin config");
     }
 }
 

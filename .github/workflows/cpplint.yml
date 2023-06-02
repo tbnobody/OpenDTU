@@ -18,4 +18,4 @@ jobs:
           pip install cpplint
       - name: Linting
         run: |
-          cpplint --repository=. --recursive --filter=-runtime/references,-readability/braces,-whitespace,-legal,-build/include ./src ./include ./lib/Hoymiles
+          cpplint --repository=. --recursive --filter=-runtime/references,-readability/braces,-whitespace,-legal,-build/include ./src ./include ./lib/Hoymiles ./lib/MqttSubscribeParser ./lib/TimeoutHelper ./lib/ResetReason

@@ -13,7 +13,15 @@ export default defineConfig({
   plugins: [
     vue(),
     viteCompression({ deleteOriginFile: true, threshold: 0 }),
-    cssInjectedByJsPlugin()],
+    cssInjectedByJsPlugin(),
+    VueI18nPlugin({
+        /* options */
+        include: path.resolve(path.dirname(fileURLToPath(import.meta.url)), './src/locales/**.json'),
+        fullInstall: false,
+        forceStringify: true,
+        strictMessage: false,
+    }),
+  ],
   resolve: {
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url)),

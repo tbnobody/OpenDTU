@@ -1,6 +1,15 @@
 # Builds using different boards
 
 ## ESP32 Dev Board
+
+### Build by @tbnobody, jan and @marove2000
+* Used build environment: generic
+* Case: https://www.printables.com/de/model/441037-opendtu-breakoutboard-case
+* Soldering Kit: https://shop.blinkyparts.com/en/OpenDTU-Breakoutboard-Your-evaluation-for-your-balcony-solar-system/blink237542
+* Breakout board: https://github.com/marove2000/openDTU_BreakoutBoard
+![](opendtu_breakoutboard.jpg)
+![](thumbnail.jpg)
+
 ### Build by @Marc--
 * Used build environment: generic
 * Case: https://www.thingiverse.com/thing:5435911

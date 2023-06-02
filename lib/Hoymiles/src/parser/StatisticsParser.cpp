@@ -28,10 +28,10 @@ const calcFunc_t calcFunctions[] = {
     { CALC_IRR_CH, &calcIrradiation }
 };
 
-void StatisticsParser::setByteAssignment(const byteAssign_t* byteAssignment, const uint8_t count)
+void StatisticsParser::setByteAssignment(const byteAssign_t* byteAssignment, uint8_t size)
 {
     _byteAssignment = byteAssignment;
-    _byteAssignmentCount = count;
+    _byteAssignmentSize = size;
 }
 
 void StatisticsParser::clearBuffer()
@@ -52,7 +52,13 @@ void StatisticsParser::appendFragment(uint8_t offset, uint8_t* payload, uint8_t 
 
 uint8_t StatisticsParser::getAssignIdxByChannelField(uint8_t channel, uint8_t fieldId)
 {
-    const byteAssign_t* b = _byteAssignment;
+    for (uint8_t i = 0; i < _byteAssignmentSize; i++) {
+        if (_byteAssignment[i].type == type && _byteAssignment[i].ch == channel && _byteAssignment[i].fieldId == fieldId) {
+            return &_byteAssignment[i];
+        }
+    }
+    return NULL;
+}
 
     uint8_t pos;
     for (pos = 0; pos < _byteAssignmentCount; pos++) {
@@ -94,6 +100,9 @@ float StatisticsParser::getChannelFieldValue(uint8_t channel, uint8_t fieldId)
         }
 
         result /= static_cast<float>(div);
+        if (setting != NULL && _statisticLength > 0) {
+            result += setting->offset;
+        }
         return result;
     } else {
         // Value has to be calculated
@@ -133,11 +142,24 @@ uint8_t StatisticsParser::getChannelFieldDigits(uint8_t channel, uint8_t fieldId
 
 uint8_t StatisticsParser::getChannelCount()
 {
-    const byteAssign_t* b = _byteAssignment;
-    uint8_t cnt = 0;
-    for (uint8_t pos = 0; pos < _byteAssignmentCount; pos++) {
-        if (b[pos].ch > cnt) {
-            cnt = b[pos].ch;
+    return {
+        TYPE_AC,
+        TYPE_DC,
+        TYPE_INV
+    };
+}
+
+const char* StatisticsParser::getChannelTypeName(ChannelType_t type)
+{
+    return channelsTypes[type];
+}
+
+std::list<ChannelNum_t> StatisticsParser::getChannelsByType(ChannelType_t type)
+{
+    std::list<ChannelNum_t> l;
+    for (uint8_t i = 0; i < _byteAssignmentSize; i++) {
+        if (_byteAssignment[i].type == type) {
+            l.push_back(_byteAssignment[i].ch);
         }
     }
 

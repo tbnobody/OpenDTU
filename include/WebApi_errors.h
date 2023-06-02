@@ -13,6 +13,7 @@ enum WebApiError {
     DtuSerialZero,
     DtuPollZero,
     DtuInvalidPowerLevel,
+    DtuInvalidCmtFrequency,
 
     ConfigBase = 3000,
     ConfigNotDeleted,
@@ -27,6 +28,7 @@ enum WebApiError {
     InverterInvalidMaxChannel,
     InverterChanged,
     InverterDeleted,
+    InverterOrdered,
 
     LimitBase = 5000,
     LimitSerialZero,

@@ -4,7 +4,7 @@
 #include <Arduino.h>
 
 #define CONFIG_FILENAME "/config.json"
-#define CONFIG_VERSION 0x00011800 // 0.1.24 // make sure to clean all after change
+#define CONFIG_VERSION 0x00011900 // 0.1.24 // make sure to clean all after change
 
 #define WIFI_MAX_SSID_STRLEN 32
 #define WIFI_MAX_PASSWORD_STRLEN 64
@@ -19,11 +19,11 @@
 #define MQTT_MAX_PASSWORD_STRLEN 64
 #define MQTT_MAX_TOPIC_STRLEN 32
 #define MQTT_MAX_LWTVALUE_STRLEN 20
-#define MQTT_MAX_ROOT_CA_CERT_STRLEN 2560
+#define MQTT_MAX_CERT_STRLEN 2560
 
 #define INV_MAX_NAME_STRLEN 31
 #define INV_MAX_COUNT 10
-#define INV_MAX_CHAN_COUNT 4
+#define INV_MAX_CHAN_COUNT 6
 
 #define CHAN_MAX_NAME_STRLEN 31
 
@@ -40,6 +40,7 @@ struct CHANNEL_CONFIG_T {
 struct INVERTER_CONFIG_T {
     uint64_t Serial;
     char Name[INV_MAX_NAME_STRLEN + 1];
+    uint8_t Order;
     bool Poll_Enable;
     bool Poll_Enable_Night;
     bool Command_Enable;
@@ -66,6 +67,7 @@ struct CONFIG_T {
     char Ntp_TimezoneDescr[NTP_MAX_TIMEZONEDESCR_STRLEN + 1];
     double Ntp_Longitude;
     double Ntp_Latitude;
+    uint8_t Ntp_SunsetType;
 
     bool Mqtt_Enabled;
     uint Mqtt_Port;
@@ -82,14 +84,19 @@ struct CONFIG_T {
 
     uint64_t Dtu_Serial;
     uint32_t Dtu_PollInterval;
-    uint8_t Dtu_PaLevel;
+    uint8_t Dtu_NrfPaLevel;
+    int8_t Dtu_CmtPaLevel;
+    uint32_t Dtu_CmtFrequency;
 
     bool Mqtt_Hass_Enabled;
     bool Mqtt_Hass_Retain;
     char Mqtt_Hass_Topic[MQTT_MAX_TOPIC_STRLEN + 1];
     bool Mqtt_Hass_IndividualPanels;
     bool Mqtt_Tls;
-    char Mqtt_RootCaCert[MQTT_MAX_ROOT_CA_CERT_STRLEN + 1];
+    char Mqtt_RootCaCert[MQTT_MAX_CERT_STRLEN + 1];
+    bool Mqtt_TlsCertLogin;
+    char Mqtt_ClientCert[MQTT_MAX_CERT_STRLEN + 1];
+    char Mqtt_ClientKey[MQTT_MAX_CERT_STRLEN + 1];
 
     char Mqtt_Hostname[MQTT_MAX_HOSTNAME_STRLEN + 1];
 
@@ -102,8 +109,9 @@ struct CONFIG_T {
 
     bool Display_PowerSafe;
     bool Display_ScreenSaver;
-    bool Display_ShowLogo;
+    uint8_t Display_Rotation;
     uint8_t Display_Contrast;
+    uint8_t Display_Language;
 };
 
 class ConfigurationClass {

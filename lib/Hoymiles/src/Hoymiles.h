@@ -1,7 +1,8 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 #pragma once
 
-#include "HoymilesRadio.h"
+#include "HoymilesRadio_NRF.h"
+#include "HoymilesRadio_CMT.h"
 #include "inverters/InverterAbstract.h"
 #include "types.h"
 #include <Print.h>
@@ -14,7 +15,9 @@
 
 class HoymilesClass {
 public:
-    void init(SPIClass* initialisedSpiBus, uint8_t pinCE, uint8_t pinIRQ);
+    void init();
+    void initNRF(SPIClass* initialisedSpiBus, uint8_t pinCE, uint8_t pinIRQ);
+    void initCMT(int8_t pin_sdio, int8_t pin_clk, int8_t pin_cs, int8_t pin_fcs, int8_t pin_gpio2, int8_t pin_gpio3);
     void loop();
 
     void setMessageOutput(Print* output);
@@ -27,14 +30,18 @@ public:
     void removeInverterBySerial(uint64_t serial);
     size_t getNumInverters();
 
-    HoymilesRadio* getRadio();
+    HoymilesRadio_NRF* getRadioNrf();
+    HoymilesRadio_CMT* getRadioCmt();
 
     uint32_t PollInterval();
     void setPollInterval(uint32_t interval);
 
+    bool isAllRadioIdle();
+
 private:
     std::vector<std::shared_ptr<InverterAbstract>> _inverters;
-    std::unique_ptr<HoymilesRadio> _radio;
+    std::unique_ptr<HoymilesRadio_NRF> _radioNrf;
+    std::unique_ptr<HoymilesRadio_CMT> _radioCmt;
 
     SemaphoreHandle_t _xSemaphore;
 

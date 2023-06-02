@@ -2,10 +2,11 @@
 #pragma once
 
 #include <Arduino.h>
-#include <stdint.h>
 #include <ETH.h>
+#include <stdint.h>
 
 #define PINMAPPING_FILENAME "/pin_mapping.json"
+#define PINMAPPING_LED_COUNT 2
 
 #define MAPPING_NAME_STRLEN 31
 
@@ -17,6 +18,14 @@ struct PinMapping_t {
     int8_t nrf24_irq;
     int8_t nrf24_en;
     int8_t nrf24_cs;
+
+    int8_t cmt_clk;
+    int8_t cmt_cs;
+    int8_t cmt_fcs;
+    int8_t cmt_gpio2;
+    int8_t cmt_gpio3;
+    int8_t cmt_sdio;
+
     int8_t eth_phy_addr;
     bool eth_enabled;
     int eth_power;
@@ -29,6 +38,7 @@ struct PinMapping_t {
     uint8_t display_clk;
     uint8_t display_cs;
     uint8_t display_reset;
+    int8_t led[PINMAPPING_LED_COUNT];
 };
 
 class PinMappingClass {
@@ -38,6 +48,7 @@ public:
     PinMapping_t& get();
 
     bool isValidNrf24Config();
+    bool isValidCmt2300Config();
     bool isValidEthConfig();
 
 private:
