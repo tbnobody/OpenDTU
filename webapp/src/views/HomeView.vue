@@ -16,8 +16,8 @@
                     </button>
                 </div>
             </div>
-            <BarChart />
-            <CalendarChart />
+            <BarChart v-bind:dataBase="dataBase" dataLoading="dataLoading" />
+            <CalendarChart v-bind:dataBase="dataBase" />
 
             <div class="tab-content" id="v-pills-tabContent" :class="{
                     'col-sm-9 col-md-10': inverterData.length > 1,
@@ -338,6 +338,7 @@ import InverterChannelInfo from "@/components/InverterChannelInfo.vue";
 import BarChart from "@/components/BarChart.vue";
 import CalendarChart from "@/components/CalendarChart.vue";
 import InverterTotalInfo from '@/components/InverterTotalInfo.vue';
+import type { DatabaseStatus } from '@/types/DatabaseStatus';
 import type { DevInfoStatus } from '@/types/DevInfoStatus';
 import type { EventlogItems } from '@/types/EventlogStatus';
 import type { LimitConfig } from '@/types/LimitConfig';
@@ -396,6 +397,7 @@ export default defineComponent({
             eventLogLoading: true,
             devInfoView: {} as bootstrap.Modal,
             devInfoList: {} as DevInfoStatus,
+            dataBase: {} as DatabaseStatus,
             devInfoLoading: true,
 
             limitSettingView: {} as bootstrap.Modal,
@@ -486,7 +488,13 @@ export default defineComponent({
                 .then((response) => handleResponse(response, this.$emitter, this.$router))
                 .then((data) => {
                     this.liveData = data;
-                    this.dataLoading = false;
+                    fetch("/api/database", { headers: authHeader() })
+                        .then((response) => handleResponse(response, this.$emitter, this.$router))
+                        .then((data) => {
+                            this.dataBase.values = data;
+                            this.dataBase.valid_data = true;
+                            this.dataLoading = false;
+                        });
                 });
         },
         initSocket() {
