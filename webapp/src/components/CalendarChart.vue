@@ -22,7 +22,6 @@ export const options = {
         },
     calendar: {
         cellSize: 20,
-        daysOfWeek: 'MTWTFSS',
     },
 };
 export default defineComponent({
