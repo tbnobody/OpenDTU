@@ -49,7 +49,7 @@ bool WebApiDatabaseClass::write(float energy)
     d.tm_mday = timeinfo.tm_mday;
     d.energy = old_energy = energy;
 
-    File f = LittleFS.open(DATABASE_FILENAME, "a");
+    File f = LittleFS.open(DATABASE_FILENAME, "a", true);
     if (!f) {
         return (false);
     }
