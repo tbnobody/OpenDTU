@@ -55,6 +55,7 @@ void HoymilesRadio_NRF::loop()
                 memset(f.fragment, 0xcc, MAX_RF_PAYLOAD_SIZE);
                 f.len = _radio->getDynamicPayloadSize();
                 f.channel = _radio->getChannel();
+                f.rssi = _radio->testRPD() ? -30 : -80;
                 if (f.len > MAX_RF_PAYLOAD_SIZE)
                     f.len = MAX_RF_PAYLOAD_SIZE;
                 _radio->read(f.fragment, f.len);
@@ -76,7 +77,9 @@ void HoymilesRadio_NRF::loop()
                 if (nullptr != inv) {
                     // Save packet in inverter rx buffer
                     Hoymiles.getMessageOutput()->printf("RX Channel: %d --> ", f.channel);
-                    dumpBuf(f.fragment, f.len);
+                    dumpBuf(f.fragment, f.len, false);
+                    Hoymiles.getMessageOutput()->printf("| %d dBm\r\n", f.rssi);
+
                     inv->addRxFragment(f.fragment, f.len);
                 } else {
                     Hoymiles.getMessageOutput()->println("Inverter Not found!");
