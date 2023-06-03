@@ -51,19 +51,18 @@ export default defineComponent({
     },
     methods: {
         drawChart() {
-            var end = new Date()
-            var start = new Date()
+            var end = new Date();
+            var start = new Date();
             var interval = 1    // number of days to show in the chart
-            start.setDate(end.getDate() - interval)
-            start.setHours(start.getHours() - 2)
-            const energy = this.dataBase.values
-            var old_energy = energy[0][4]
+            const energy = this.dataBase.values;
+            var old_energy = 0.0;
+            start.setDate(end.getDate() - interval);
+            start.setHours(start.getHours() - 2);
             data = [['Time', 'Energy']];
             energy.forEach((x: any[]) => {
-                var d = new Date(x[0] + 2000, x[1] - 1, x[2], x[3])
+                var d = new Date(x[0] + 2000, x[1] - 1, x[2], x[3]);
                 if ((d >= start) && (d <= end)) {
-                    var a = [d, (x[4] - old_energy) * 1000]
-                    data.push(a)
+                    data.push([d, (x[4] - old_energy) * 1000])
                 }
                 old_energy = x[4]
             })

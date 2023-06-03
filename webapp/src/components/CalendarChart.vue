@@ -59,17 +59,22 @@ export default defineComponent({
                 type: 'number',
                 id: 'Energy'
             }]]
-            var d: Date
-            var a: any
-            const energy = this.dataBase.values
-            var old_energy = energy[0][4]
-            var old_day = energy[0][2]
-            var last_energy: number
+            var d: Date;
+            var a: any;
+            const energy = this.dataBase.values;
+            var old_energy = 0.0;
+            var last_energy = 0.0;
+            var old_day = -1;
             energy.forEach((x: any[]) => {
-                if (x[2] != old_day) {
-                    data.push(a)
-                    old_day = x[2]
-                    old_energy = last_energy
+                if (old_day < 0) {
+                    old_day = x[2];
+                    old_energy = x[4];
+                } else {
+                    if (x[2] != old_day) {
+                        data.push(a)
+                        old_day = x[2]
+                        old_energy = last_energy
+                    }
                 }
                 last_energy = x[4]
                 d = new Date(x[0] + 2000, x[1] - 1, x[2], x[3])
