@@ -16,8 +16,9 @@ import { GChart } from 'vue-google-charts';
 var data: any;
 export const type = 'Calendar';
 export const options = {
+    height: 250,
     calendar: {
-        cellSize: 22,
+        cellSize: 20,
         daysOfWeek: 'MTWTFSS',
     },
 };
