@@ -12,21 +12,14 @@
 import { defineComponent, type PropType, h } from 'vue';
 import type { DatabaseStatus } from "@/types/DatabaseStatus";
 import { GChart } from 'vue-google-charts';
-//import { DatetimeFormat } from 'vue-i18n';
 
 var data: any;
 export const type = 'Calendar';
 export const options = {
-    legend: {
-        position: 'none'
+    calendar: {
+        cellSize: 22,
+        daysOfWeek: 'MTWTFSS',
     },
-    hAxis: {
-        format: 'dd.MM.YY HH:mm',
-        slantedText: true
-    },
-    vAxis: {
-        format: '# Wh'
-    }
 };
 export default defineComponent({
     components: {
@@ -42,7 +35,7 @@ export default defineComponent({
                 options,
                 type,
                 settings: {
-                    packages: ['calendar']
+                    packages: ['calendar'],
                 }
             });
     },
@@ -78,14 +71,9 @@ export default defineComponent({
                 }
                 last_energy = x[4]
                 d = new Date(x[0] + 2000, x[1] - 1, x[2], x[3])
-                a = [d, ((last_energy - old_energy) * 1000).toFixed(0)]
+                a = [d, Math.round((last_energy - old_energy) * 1000)]
             })
             data.push(a)
-
-            // var date_formatter = new google.visualization.DateFormat({
-            //     pattern: "dd.MM.YY HH:mm"
-            // });
-            // date_formatter.format(data, 0);
         }
     }
 });
