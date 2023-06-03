@@ -17,6 +17,9 @@ var data: any;
 export const type = 'Calendar';
 export const options = {
     height: 250,
+    colorAxis: {
+            colors: ['#FFFFFF', '#0000FF']
+        },
     calendar: {
         cellSize: 20,
         daysOfWeek: 'MTWTFSS',

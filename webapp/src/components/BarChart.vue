@@ -18,14 +18,13 @@ import { GChart } from 'vue-google-charts';
 var data: any;
 export const type = 'ColumnChart';
 export const options = {
-    height: 600,
+    height: 300,
     chartArea: { top: 25, width: '85%', height: '80%' },
     legend: {
         position: 'none'
     },
     hAxis: {
-        format: 'dd.MM.YY HH:mm',
-        slantedText: true
+        format: 'HH',
     },
     vAxis: {
         format: '# Wh'
