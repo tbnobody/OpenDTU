@@ -49,8 +49,18 @@ bool WebApiDatabaseClass::write(float energy)
     d.tm_mday = timeinfo.tm_mday;
     d.energy = old_energy = energy;
 
+    // create database file if it does not exist
+    if (!LittleFS.exists(DATABASE_FILENAME)) {
+        MessageOutput.println("Database file does not exist.");
+        File f = LittleFS.open(DATABASE_FILENAME, "w", true);
+        f.flush();
+        f.close();
+        MessageOutput.println("New database file created.");
+    }
+
     File f = LittleFS.open(DATABASE_FILENAME, "a", true);
     if (!f) {
+        MessageOutput.println("Failed to append to database.");
         return (false);
     }
     f.write((const uint8_t*)&d, sizeof(Data));
@@ -67,6 +77,8 @@ void WebApiDatabaseClass::onDatabase(AsyncWebServerRequest* request)
     try {
         File f = LittleFS.open(DATABASE_FILENAME, "r", false);
         if (!f) {
+            MessageOutput.println("Failed to read database.");
+            request->send(400, "text/plain", "Failed to read database.");
             return;
         }
 
@@ -91,8 +103,6 @@ void WebApiDatabaseClass::onDatabase(AsyncWebServerRequest* request)
         WebApi.sendTooManyRequests(request);
     }
 }
-
-
 
 /*  JS
 const energy = JSON.parse('[[23,5,19,6,175.4089966],[23,5,19,10,175.7649994],[23,5,19,10,175.8939972],[23,5,19,10,175.904007],[23,5,19,10,175.9149933],[23,5,19,11,175.9669952],[23,5,19,11,175.973999],[23,5,19,12,176.1159973],[23,5,19,13,176.2900085],[23,5,19,14,176.4179993],[23,5,19,15,176.5429993],[23,5,19,16,176.6100006],[23,5,19,17,176.7269897],[23,5,19,18,176.8370056],[23,5,19,19,176.9060059],[23,5,19,20,176.9360046],[23,5,19,21,176.9459991],[23,5,20,5,176.9459991],[23,5,20,6,176.9470062],[23,5,20,7,176.9629974],[23,5,20,8,177.0270081],[23,5,20,9,177.0899963],[23,5,20,10,177.2389984],[23,5,20,11,177.4759979],[23,5,20,12,177.7310028],[23,5,20,13,178.0749817],[23,5,20,14,178.3970032],[23,5,20,15,178.7460022],[23,5,20,16,179.0829926],[23,5,20,17,179.3110046],[23,5,20,18,179.4849854],[23,5,20,19,179.5549927],[23,5,20,20,179.5899963]]')
