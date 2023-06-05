@@ -1,11 +1,21 @@
 <template>
-    <div class="card" :class="{ 'border-info': channelNumber == 0 }">
-        <div v-if="channelNumber >= 1" class="card-header">
-            <template v-if="channelData.name.u != ''">{{ channelData.name.u }}</template>
-            <template v-else>{{ $t('inverterchannelinfo.String', { num: channelNumber }) }}</template>
+    <div class="card" :class="{
+        'border-info': channelType == 'AC',
+        'border-secondary': channelType == 'INV'
+    }">
+        <div v-if="channelType == 'INV'" class="card-header text-bg-secondary">
+            {{ $t('inverterchannelinfo.General') }}
         </div>
-        <div v-if="channelNumber == 0" class="card-header text-bg-info">
-            {{ $t('inverterchannelinfo.Phase', { num: channelNumber + 1 }) }}</div>
+
+        <div v-if="channelType == 'DC'" class="card-header">
+            <template v-if="channelData.name.u != ''">{{ channelData.name.u }}</template>
+            <template v-else>{{ $t('inverterchannelinfo.String', { num: channelNumber + 1 }) }}</template>
+        </div>
+
+        <div v-if="channelType == 'AC'" class="card-header text-bg-info">
+            {{ $t('inverterchannelinfo.Phase', { num: channelNumber + 1 }) }}
+        </div>
+
         <div class="card-body">
             <div class="table-responsive">
                 <table class="table table-striped table-hover">
@@ -43,6 +53,7 @@ import { defineComponent, type PropType } from 'vue';
 export default defineComponent({
     props: {
         channelData: { type: Object as PropType<InverterStatistics>, required: true },
+        channelType: { type: String, required: true },
         channelNumber: { type: Number, required: true },
     },
 });

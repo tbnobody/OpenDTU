@@ -34,7 +34,7 @@ String ResetReasonClass::get_reset_reason_verbose(uint8_t cpu_id)
     case 3:
         reason_str = "Software reset digital core";
         break;
-#ifndef CONFIG_IDF_TARGET_ESP32C3
+#if !defined(CONFIG_IDF_TARGET_ESP32C3) && !defined(CONFIG_IDF_TARGET_ESP32S3) && !defined(CONFIG_IDF_TARGET_ESP32S2)
     case 4:
         reason_str = "Legacy watch dog reset digital core";
         break;
@@ -42,7 +42,7 @@ String ResetReasonClass::get_reset_reason_verbose(uint8_t cpu_id)
     case 5:
         reason_str = "Deep Sleep reset digital core";
         break;
-#ifndef CONFIG_IDF_TARGET_ESP32C3
+#if !defined(CONFIG_IDF_TARGET_ESP32C3) && !defined(CONFIG_IDF_TARGET_ESP32S3) && !defined(CONFIG_IDF_TARGET_ESP32S2)
     case 6:
         reason_str = "Reset by SLC module, reset digital core";
         break;
@@ -68,7 +68,7 @@ String ResetReasonClass::get_reset_reason_verbose(uint8_t cpu_id)
     case 13:
         reason_str = "RTC Watch dog Reset CPU";
         break;
-#ifndef CONFIG_IDF_TARGET_ESP32C3
+#if !defined(CONFIG_IDF_TARGET_ESP32C3) && !defined(CONFIG_IDF_TARGET_ESP32S3) && !defined(CONFIG_IDF_TARGET_ESP32S2)
     case 14:
         reason_str = "for APP CPU, reset by PRO CPU";
         break;
@@ -100,7 +100,7 @@ String ResetReasonClass::get_reset_reason_short(uint8_t cpu_id)
     case 3:
         reason_str = "SW_RESET";
         break;
-#ifndef CONFIG_IDF_TARGET_ESP32C3
+#if !defined(CONFIG_IDF_TARGET_ESP32C3) && !defined(CONFIG_IDF_TARGET_ESP32S3) && !defined(CONFIG_IDF_TARGET_ESP32S2)
     case 4:
         reason_str = "OWDT_RESET";
         break;
@@ -108,7 +108,7 @@ String ResetReasonClass::get_reset_reason_short(uint8_t cpu_id)
     case 5:
         reason_str = "DEEPSLEEP_RESET";
         break;
-#ifndef CONFIG_IDF_TARGET_ESP32C3
+#if !defined(CONFIG_IDF_TARGET_ESP32C3) && !defined(CONFIG_IDF_TARGET_ESP32S3) && !defined(CONFIG_IDF_TARGET_ESP32S2)
     case 6:
         reason_str = "SDIO_RESET";
         break;
@@ -134,7 +134,7 @@ String ResetReasonClass::get_reset_reason_short(uint8_t cpu_id)
     case 13:
         reason_str = "RTCWDT_CPU_RESET";
         break;
-#ifndef CONFIG_IDF_TARGET_ESP32C3
+#if !defined(CONFIG_IDF_TARGET_ESP32C3) && !defined(CONFIG_IDF_TARGET_ESP32S3) && !defined(CONFIG_IDF_TARGET_ESP32S2)
     case 14:
         reason_str = "EXT_CPU_RESET";
         break;

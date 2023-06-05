@@ -17,6 +17,10 @@ HM_Abstract::HM_Abstract(HoymilesRadio* radio, uint64_t serial)
 
 bool HM_Abstract::sendStatsRequest()
 {
+    if (!getEnablePolling()) {
+        return false;
+    }
+
     struct tm timeinfo;
     if (!getLocalTime(&timeinfo, 5)) {
         return false;
@@ -34,20 +38,24 @@ bool HM_Abstract::sendStatsRequest()
 
 bool HM_Abstract::sendAlarmLogRequest(bool force)
 {
+    if (!getEnablePolling()) {
+        return false;
+    }
+
     struct tm timeinfo;
     if (!getLocalTime(&timeinfo, 5)) {
         return false;
     }
 
     if (!force) {
-        if (Statistics()->hasChannelFieldValue(CH0, FLD_EVT_LOG)) {
-            if ((uint8_t)Statistics()->getChannelFieldValue(CH0, FLD_EVT_LOG) == _lastAlarmLogCnt) {
+        if (Statistics()->hasChannelFieldValue(TYPE_INV, CH0, FLD_EVT_LOG)) {
+            if ((uint8_t)Statistics()->getChannelFieldValue(TYPE_INV, CH0, FLD_EVT_LOG) == _lastAlarmLogCnt) {
                 return false;
             }
         }
     }
 
-    _lastAlarmLogCnt = (uint8_t)Statistics()->getChannelFieldValue(CH0, FLD_EVT_LOG);
+    _lastAlarmLogCnt = (uint8_t)Statistics()->getChannelFieldValue(TYPE_INV, CH0, FLD_EVT_LOG);
 
     time_t now;
     time(&now);
@@ -62,6 +70,10 @@ bool HM_Abstract::sendAlarmLogRequest(bool force)
 
 bool HM_Abstract::sendDevInfoRequest()
 {
+    if (!getEnablePolling()) {
+        return false;
+    }
+
     struct tm timeinfo;
     if (!getLocalTime(&timeinfo, 5)) {
         return false;
@@ -83,6 +95,10 @@ bool HM_Abstract::sendDevInfoRequest()
 
 bool HM_Abstract::sendSystemConfigParaRequest()
 {
+    if (!getEnablePolling()) {
+        return false;
+    }
+
     struct tm timeinfo;
     if (!getLocalTime(&timeinfo, 5)) {
         return false;
@@ -101,6 +117,10 @@ bool HM_Abstract::sendSystemConfigParaRequest()
 
 bool HM_Abstract::sendActivePowerControlRequest(float limit, PowerLimitControlType type)
 {
+    if (!getEnableCommands()) {
+        return false;
+    }
+
     if (type == PowerLimitControlType::RelativNonPersistent || type == PowerLimitControlType::RelativPersistent) {
         limit = min<float>(100, limit);
     }
@@ -123,6 +143,10 @@ bool HM_Abstract::resendActivePowerControlRequest()
 
 bool HM_Abstract::sendPowerControlRequest(bool turnOn)
 {
+    if (!getEnableCommands()) {
+        return false;
+    }
+
     if (turnOn) {
         _powerState = 1;
     } else {
@@ -139,6 +163,10 @@ bool HM_Abstract::sendPowerControlRequest(bool turnOn)
 
 bool HM_Abstract::sendRestartControlRequest()
 {
+    if (!getEnableCommands()) {
+        return false;
+    }
+
     _powerState = 2;
 
     PowerControlCommand* cmd = _radio->enqueCommand<PowerControlCommand>();

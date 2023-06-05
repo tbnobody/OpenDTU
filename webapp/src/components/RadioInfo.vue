@@ -67,12 +67,14 @@
 
 <script lang="ts">
 import CardElement from '@/components/CardElement.vue';
+import StatusBadge from './StatusBadge.vue';
 import type { SystemStatus } from '@/types/SystemStatus';
 import { defineComponent, type PropType } from 'vue';
 
 export default defineComponent({
     components: {
         CardElement,
+        StatusBadge,
     },
     props: {
         systemStatus: { type: Object as PropType<SystemStatus>, required: true },

@@ -47,7 +47,7 @@ void ModbusDtuClass::loop()
     
     uint8_t chan = 0;
     uint8_t invNumb = 0;
-    if (millis() - _lastPublish > 2000 && Hoymiles.getRadio()->isIdle()) {
+    if (millis() - _lastPublish > 2000 && Hoymiles.isAllRadioIdle()) {
         for (uint8_t i = 0; i < Hoymiles.getNumInverters(); i++) {
             auto inv = Hoymiles.getInverterByPos(i);
             if (inv == nullptr) {

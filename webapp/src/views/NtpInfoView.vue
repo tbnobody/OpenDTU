@@ -27,12 +27,8 @@
                     <tbody>
                         <tr>
                             <th>{{ $t('ntpinfo.Status') }}</th>
-                            <td class="badge" :class="{
-                                'text-bg-danger': !ntpDataList.ntp_status,
-                                'text-bg-success': ntpDataList.ntp_status,
-                            }">
-                                <span v-if="ntpDataList.ntp_status">{{ $t('ntpinfo.Synced') }}</span>
-                                <span v-else>{{ $t('ntpinfo.NotSynced') }}</span>
+                            <td>
+                                <StatusBadge :status="ntpDataList.ntp_status" true_text="ntpinfo.Synced" false_text="ntpinfo.NotSynced" />
                             </td>
                         </tr>
                         <tr>
@@ -68,6 +64,7 @@
 <script lang="ts">
 import BasePage from '@/components/BasePage.vue';
 import CardElement from '@/components/CardElement.vue';
+import StatusBadge from '@/components/StatusBadge.vue';
 import type { NtpStatus } from "@/types/NtpStatus";
 import { authHeader, handleResponse } from '@/utils/authentication';
 import { defineComponent } from 'vue';
@@ -76,6 +73,7 @@ export default defineComponent({
     components: {
         BasePage,
         CardElement,
+        StatusBadge,
     },
     data() {
         return {

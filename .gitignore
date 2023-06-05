@@ -7,3 +7,4 @@
 platformio-device-monitor*.log
 logs/device-monitor*.log
 platformio_override.ini
+.DS_Store

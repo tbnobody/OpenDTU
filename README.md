@@ -294,6 +294,9 @@ A ready to solder kit can be found here: https://shop.blinkyparts.com/en/OpenDTU
 * <https://www.printables.com/model/293003-sol-opendtu-esp32-nrf24l01-case>
 * <https://www.thingiverse.com/thing:5661780>
 * <https://www.thingiverse.com/thing:5632374>
+* <https://www.thingiverse.com/thing:5852233>
+* <https://www.printables.com/model/377994-opendtu-pcb-box-for-the-wider-board>
+* <https://www.printables.com/model/376840-esp32-ahoy-opendtu-pcb-housing>
 
 ## Available layouts for printed circuit boards
 

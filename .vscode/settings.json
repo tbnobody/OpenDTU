@@ -1,7 +1,3 @@
 {
-    "C_Cpp.clang_format_style": "WebKit",
-    "files.associations": {
-        "random": "cpp",
-        "*.tcc": "cpp"
-    }
+    "C_Cpp.clang_format_style": "WebKit"
 }

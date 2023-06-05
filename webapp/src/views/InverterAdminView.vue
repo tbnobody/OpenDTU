@@ -72,7 +72,7 @@
     </BasePage>
 
     <div class="modal" id="inverterEdit" tabindex="-1">
-        <div class="modal-dialog">
+        <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title">{{ $t('inverteradmin.EditInverter') }}</h5>
@@ -91,6 +91,22 @@
                             </label>
                             <input v-model="selectedInverterData.name" type="text" id="inverter-name"
                                 class="form-control" maxlength="31" />
+
+                            <CardElement :text="$t('inverteradmin.InverterStatus')" addSpace>
+                                <InputElement :label="$t('inverteradmin.PollEnable')"
+                                    v-model="selectedInverterData.poll_enable"
+                                    type="checkbox" wide />
+                                <InputElement :label="$t('inverteradmin.PollEnableNight')"
+                                    v-model="selectedInverterData.poll_enable_night"
+                                    type="checkbox" wide/>
+                                <InputElement :label="$t('inverteradmin.CommandEnable')"
+                                    v-model="selectedInverterData.command_enable"
+                                    type="checkbox" wide/>
+                                <InputElement :label="$t('inverteradmin.CommandEnableNight')"
+                                    v-model="selectedInverterData.command_enable_night"
+                                    type="checkbox" wide/>
+                                <div class="alert alert-secondary mt-3" role="alert" v-html="$t('inverteradmin.StatusHint')"></div>
+                            </CardElement>
                         </div>
 
                         <div v-for="(ch, index) in selectedInverterData.channel" :key="`${index}`">
@@ -107,7 +123,9 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="col-md-5">
+                            </div>
+                            <div class="row g-2">
+                                <div class="col">
                                     <label :for="`inverter-max_${index}`" class="col-form-label">
                                         {{ $t('inverteradmin.StringMaxPower', { num: index + 1 }) }}
                                         <BIconInfoCircle v-tooltip :title="$t('inverteradmin.StringMaxPowerHint')" />
@@ -200,6 +218,7 @@ import { defineComponent } from 'vue';
 declare interface Channel {
     name: string;
     max_power: number;
+    yield_total_offset: number;
 }
 
 declare interface Inverter {
@@ -227,6 +246,7 @@ export default defineComponent({
         BasePage,
         BootstrapAlert,
         CardElement,
+        InputElement,
         BIconInfoCircle,
         BIconPencil,
         BIconTrash,

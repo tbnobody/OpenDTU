@@ -4,8 +4,6 @@
  */
 #include "Configuration.h"
 #include "Datastore.h"
-#include "ModbusDtu.h"
-#include "WatchDogDtu.h"
 #include "Display_Graphic.h"
 #include "InverterSettings.h"
 #include "Led_Single.h"
@@ -142,9 +140,11 @@ void setup()
         config.Dtu_Serial = dtuId;
         Configuration.write();
     }
-    MessageOutput.println(F("done"));
+    MessageOutput.println("done");
 
     InverterSettings.init();
+
+    Datastore.init();
 }
 
 void loop()
@@ -152,6 +152,8 @@ void loop()
     NetworkSettings.loop();
     yield();
     InverterSettings.loop();
+    yield();
+    Datastore.loop();
     yield();
     MqttHandleDtu.loop();
     yield();
@@ -168,5 +170,7 @@ void loop()
     SunPosition.loop();
     yield();
     MessageOutput.loop();
+    yield();
+    LedSingle.loop();
     yield();
 }

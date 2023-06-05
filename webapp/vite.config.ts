@@ -5,6 +5,7 @@ import vue from '@vitejs/plugin-vue'
 
 import viteCompression from 'vite-plugin-compression';
 import cssInjectedByJsPlugin from 'vite-plugin-css-injected-by-js'
+import VueI18nPlugin from '@intlify/unplugin-vue-i18n/vite'
 
 const path = require('path')
 
@@ -33,6 +34,7 @@ export default defineConfig({
     cssCodeSplit: false,
     outDir: '../webapp_dist',
     emptyOutDir: true,
+    minify: 'terser',
     rollupOptions: {
       output: {
         // Only create one js file

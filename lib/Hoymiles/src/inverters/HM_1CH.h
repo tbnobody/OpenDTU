@@ -2,6 +2,7 @@
 #pragma once
 
 #include "HM_Abstract.h"
+#include <list>
 
 class HM_1CH : public HM_Abstract {
 public:

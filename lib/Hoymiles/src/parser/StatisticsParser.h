@@ -3,11 +3,12 @@
 #include "Parser.h"
 #include <Arduino.h>
 #include <cstdint>
+#include <list>
 
 #define STATISTIC_PACKET_SIZE (7 * 16)
 
 // units
-enum {
+enum UnitId_t {
     UNIT_V = 0,
     UNIT_A,
     UNIT_W,
@@ -22,7 +23,7 @@ enum {
 const char* const units[] = { "V", "A", "W", "Wh", "kWh", "Hz", "°C", "%", "var", "" };
 
 // field types
-enum {
+enum FieldId_t {
     FLD_UDC = 0,
     FLD_IDC,
     FLD_PDC,
@@ -65,7 +66,7 @@ enum {
 enum { CMD_CALC = 0xffff };
 
 // CH0 is default channel (freq, ac, temp)
-enum {
+enum ChannelNum_t {
     CH0 = 0,
     CH1,
     CH2,
@@ -74,6 +75,13 @@ enum {
     CH5,
     CH_CNT
 };
+
+enum ChannelType_t {
+    TYPE_AC = 0,
+    TYPE_DC,
+    TYPE_INV
+};
+const char* const channelsTypes[] = { "AC", "DC", "INV" };
 
 typedef struct {
     ChannelType_t type;
@@ -101,17 +109,24 @@ public:
 
     void setByteAssignment(const byteAssign_t* byteAssignment, uint8_t size);
 
-    uint8_t getAssignIdxByChannelField(uint8_t channel, uint8_t fieldId);
-    float getChannelFieldValue(uint8_t channel, uint8_t fieldId);
-    bool hasChannelFieldValue(uint8_t channel, uint8_t fieldId);
-    const char* getChannelFieldUnit(uint8_t channel, uint8_t fieldId);
-    const char* getChannelFieldName(uint8_t channel, uint8_t fieldId);
-    uint8_t getChannelFieldDigits(uint8_t channel, uint8_t fieldId);
+    const byteAssign_t* getAssignmentByChannelField(ChannelType_t type, ChannelNum_t channel, FieldId_t fieldId);
+    fieldSettings_t* getSettingByChannelField(ChannelType_t type, ChannelNum_t channel, FieldId_t fieldId);
 
-    uint8_t getChannelCount();
+    float getChannelFieldValue(ChannelType_t type, ChannelNum_t channel, FieldId_t fieldId);
+    bool hasChannelFieldValue(ChannelType_t type, ChannelNum_t channel, FieldId_t fieldId);
+    const char* getChannelFieldUnit(ChannelType_t type, ChannelNum_t channel, FieldId_t fieldId);
+    const char* getChannelFieldName(ChannelType_t type, ChannelNum_t channel, FieldId_t fieldId);
+    uint8_t getChannelFieldDigits(ChannelType_t type, ChannelNum_t channel, FieldId_t fieldId);
 
-    uint16_t getChannelMaxPower(uint8_t channel);
-    void setChannelMaxPower(uint8_t channel, uint16_t power);
+    float getChannelFieldOffset(ChannelType_t type, ChannelNum_t channel, FieldId_t fieldId);
+    void setChannelFieldOffset(ChannelType_t type, ChannelNum_t channel, FieldId_t fieldId, float offset);
+
+    std::list<ChannelType_t> getChannelTypes();
+    const char* getChannelTypeName(ChannelType_t type);
+    std::list<ChannelNum_t> getChannelsByType(ChannelType_t type);
+
+    uint16_t getStringMaxPower(uint8_t channel);
+    void setStringMaxPower(uint8_t channel, uint16_t power);
 
     void resetRxFailureCount();
     void incrementRxFailureCount();

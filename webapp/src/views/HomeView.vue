@@ -676,6 +676,13 @@ export default defineComponent({
         calculateAbsoluteTime(lastTime: number): string {
             const date = new Date(Date.now() - lastTime * 1000);
             return this.$d(date, 'datetime');
+        },
+        getSumIrridiation(inv: Inverter): number {
+            let total = 0;
+            Object.keys(inv.DC).forEach((key) => {
+                total += inv.DC[key as unknown as number].Irradiation?.v || 0;
+            });
+            return total;
         }
     },
 });
