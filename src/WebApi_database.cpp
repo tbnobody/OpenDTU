@@ -29,17 +29,23 @@ bool WebApiDatabaseClass::write(float energy)
 
     // LittleFS.remove(DATABASE_FILENAME);
 
+    time_t now;
     struct tm timeinfo;
-    if (!getLocalTime(&timeinfo, 5)) // get cuurent time
-        return (false);
+    time(&now); // get current time
+    localtime_r(&now, &timeinfo);
+
+    MessageOutput.println(energy);
+
     if (timeinfo.tm_hour == old_hour) // must be new hour
         return (false);
     if (old_hour == 255) { // don't write to database after reboot
         old_hour = timeinfo.tm_hour;
         return (false);
     }
+    MessageOutput.println("Next hour.");
     if (energy <= old_energy) // enery must have increased
         return (false);
+    MessageOutput.println("Energy difference > 0");
 
     struct Data d;
     d.tm_hour = old_hour;
@@ -65,6 +71,7 @@ bool WebApiDatabaseClass::write(float energy)
     }
     f.write((const uint8_t*)&d, sizeof(Data));
     f.close();
+    MessageOutput.println("Write data point.");
     return (true);
 }
 
