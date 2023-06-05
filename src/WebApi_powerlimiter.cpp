@@ -52,6 +52,7 @@ void WebApiPowerLimiterClass::onStatus(AsyncWebServerRequest* request)
     root[F("voltage_start_threshold")] = static_cast<int>(config.PowerLimiter_VoltageStartThreshold * 100 +0.5) / 100.0;
     root[F("voltage_stop_threshold")] = static_cast<int>(config.PowerLimiter_VoltageStopThreshold * 100 +0.5) / 100.0;;
     root[F("voltage_load_correction_factor")] = config.PowerLimiter_VoltageLoadCorrectionFactor;
+    root[F("inverter_restart_hour")] = config.PowerLimiter_RestartHour;
 
     response->setLength();
     request->send(response);
@@ -136,7 +137,10 @@ void WebApiPowerLimiterClass::onAdminPost(AsyncWebServerRequest* request)
     config.PowerLimiter_VoltageStopThreshold = root[F("voltage_stop_threshold")].as<float>();
     config.PowerLimiter_VoltageStopThreshold = static_cast<int>(config.PowerLimiter_VoltageStopThreshold * 100) / 100.0;
     config.PowerLimiter_VoltageLoadCorrectionFactor = root[F("voltage_load_correction_factor")].as<float>();
+    config.PowerLimiter_RestartHour = root[F("inverter_restart_hour")].as<int8_t>();
     Configuration.write();
+
+    PowerLimiter.calcNextInverterRestart();
 
     retMsg[F("type")] = F("success");
     retMsg[F("message")] = F("Settings saved!");

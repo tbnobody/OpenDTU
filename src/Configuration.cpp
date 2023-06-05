@@ -163,6 +163,7 @@ bool ConfigurationClass::write()
     powerlimiter["voltage_start_threshold"] = config.PowerLimiter_VoltageStartThreshold;
     powerlimiter["voltage_stop_threshold"] = config.PowerLimiter_VoltageStopThreshold;
     powerlimiter["voltage_load_correction_factor"] = config.PowerLimiter_VoltageLoadCorrectionFactor;
+    powerlimiter["inverter_restart_hour"] = config.PowerLimiter_RestartHour;
 
     JsonObject battery = doc.createNestedObject("battery");
     battery["enabled"] = config.Battery_Enabled;
@@ -360,6 +361,7 @@ bool ConfigurationClass::read()
     config.PowerLimiter_VoltageStartThreshold = powerlimiter["voltage_start_threshold"] | POWERLIMITER_VOLTAGE_START_THRESHOLD;
     config.PowerLimiter_VoltageStopThreshold = powerlimiter["voltage_stop_threshold"] | POWERLIMITER_VOLTAGE_STOP_THRESHOLD;
     config.PowerLimiter_VoltageLoadCorrectionFactor = powerlimiter["voltage_load_correction_factor"] | POWERLIMITER_VOLTAGE_LOAD_CORRECTION_FACTOR;
+    config.PowerLimiter_RestartHour = powerlimiter["inverter_restart_hour"] | POWERLIMITER_RESTART_HOUR;
 
     JsonObject battery = doc["battery"];
     config.Battery_Enabled = battery["enabled"] | BATTERY_ENABLED;

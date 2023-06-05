@@ -53,6 +53,27 @@ void PowerLimiterClass::loop()
         return;
     }
 
+    // Check if next inverter restart time is reached
+    if ((_nextInverterRestart > 1) && (_nextInverterRestart <= millis())) {
+        MessageOutput.println("[PowerLimiterClass::loop] send inverter restart");
+        inverter->sendRestartControlRequest();
+        calcNextInverterRestart();
+    }
+
+    // Check if NTP time is set and next inverter restart not calculated yet
+    if ((config.PowerLimiter_RestartHour >= 0)  && (_nextInverterRestart == 0) ) {
+        // check every 5 seconds
+        if (_nextCalculateCheck < millis()) {
+            struct tm timeinfo;
+            if (getLocalTime(&timeinfo, 5)) {
+                calcNextInverterRestart();
+            } else {
+                MessageOutput.println("[PowerLimiterClass::loop] inverter restart calculation: NTP not ready");
+                _nextCalculateCheck += 5000;
+            }
+        }
+    }
+
     // Make sure inverter is turned off if PL is disabled by user/MQTT
     if (((!config.PowerLimiter_Enabled || _disabled) && _plState != SHUTDOWN)) {
         if (inverter->isProducing()) {
@@ -155,7 +176,7 @@ void PowerLimiterClass::loop()
     MessageOutput.printf("[PowerLimiterClass::loop] Status Batt: Ena: %i, SOC: %i, StartTH: %i, StopTH: %i, LastUpdate: %li\r\n",
         config.Battery_Enabled, Battery.stateOfCharge, config.PowerLimiter_BatterySocStartThreshold, config.PowerLimiter_BatterySocStopThreshold, millis() - Battery.stateOfChargeLastUpdate);
     MessageOutput.printf("[PowerLimiterClass::loop] ******************* Leaving PL, PL set to: %i, SP: %i, Batt: %i, PM: %f\r\n", newPowerLimit, canUseDirectSolarPower(), _batteryDischargeEnabled, round(PowerMeter.getPowerTotal()));
-#endif 
+#endif
 }
 
 uint8_t PowerLimiterClass::getPowerLimiterState() {
@@ -384,4 +405,44 @@ bool PowerLimiterClass::isStopThresholdReached(std::shared_ptr<InverterAbstract>
 
     float correctedDcVoltage = getLoadCorrectedVoltage(inverter);
     return correctedDcVoltage <= config.PowerLimiter_VoltageStopThreshold;
+}
+
+/// @brief calculate next inverter restart in millis
+void PowerLimiterClass::calcNextInverterRestart()
+{
+    CONFIG_T& config = Configuration.get();
+
+    // first check if restart is configured at all
+    if (config.PowerLimiter_RestartHour < 0) {
+        _nextInverterRestart = 1;
+        MessageOutput.println("[PowerLimiterClass::calcNextInverterRestart] _nextInverterRestart disabled");
+        return;
+    }
+
+    // read time from timeserver, if time is not synced then return
+    struct tm timeinfo;
+    if (getLocalTime(&timeinfo, 5)) {
+        // calculation first step is offset to next restart in minutes
+        uint16_t dayMinutes = timeinfo.tm_hour * 60 + timeinfo.tm_min;
+        uint16_t targetMinutes = config.PowerLimiter_RestartHour * 60;
+        if (config.PowerLimiter_RestartHour > timeinfo.tm_hour) {
+            // next restart is on the same day
+            _nextInverterRestart = targetMinutes - dayMinutes;
+        } else {
+            // next restart is on next day
+            _nextInverterRestart = 1440 - dayMinutes + targetMinutes;
+        }
+        #ifdef POWER_LIMITER_DEBUG
+        MessageOutput.printf("[PowerLimiterClass::calcNextInverterRestart] Localtime read %d %d / configured RestartHour %d\r\n", timeinfo.tm_hour, timeinfo.tm_min, config.PowerLimiter_RestartHour);
+        MessageOutput.printf("[PowerLimiterClass::calcNextInverterRestart] dayMinutes %d / targetMinutes %d\r\n", dayMinutes, targetMinutes);
+        MessageOutput.printf("[PowerLimiterClass::calcNextInverterRestart] next inverter restart in %d minutes\r\n", _nextInverterRestart);
+        #endif
+        // then convert unit for next restart to milliseconds and add current uptime millis()
+        _nextInverterRestart *= 60000;
+        _nextInverterRestart += millis();
+    } else {
+        MessageOutput.println("[PowerLimiterClass::calcNextInverterRestart] getLocalTime not successful, no calculation");
+        _nextInverterRestart = 0;
+    }
+    MessageOutput.printf("[PowerLimiterClass::calcNextInverterRestart] _nextInverterRestart @ %d millis\r\n", _nextInverterRestart);
 }
