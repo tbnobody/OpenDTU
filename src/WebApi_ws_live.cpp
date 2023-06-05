@@ -10,6 +10,8 @@
 #include "defaults.h"
 #include <AsyncJson.h>
 
+WebApiDatabaseClass database;
+
 WebApiWsLiveClass::WebApiWsLiveClass()
     : _ws("/livedata")
 {
@@ -163,6 +165,8 @@ void WebApiWsLiveClass::generateJsonResponse(JsonVariant& root)
     addTotalField(totalObj, "Power", Datastore.getTotalAcPowerEnabled(), "W", Datastore.getTotalAcPowerDigits());
     addTotalField(totalObj, "YieldDay", Datastore.getTotalAcYieldDayEnabled(), "Wh", Datastore.getTotalAcYieldDayDigits());
     addTotalField(totalObj, "YieldTotal", Datastore.getTotalAcYieldTotalEnabled(), "kWh", Datastore.getTotalAcYieldTotalDigits());
+
+    database.write(Datastore.getTotalAcYieldTotalEnabled());      // write value to database
 
     JsonObject hintObj = root.createNestedObject("hints");
     struct tm timeinfo;

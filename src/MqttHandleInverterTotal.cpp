@@ -10,7 +10,6 @@
 #include "WebApi_database.h"
 
 MqttHandleInverterTotalClass MqttHandleInverterTotal;
-WebApiDatabaseClass database;
 
 void MqttHandleInverterTotalClass::init()
 {
@@ -34,6 +33,5 @@ void MqttHandleInverterTotalClass::loop()
 
         _lastPublish.set(Configuration.get().Mqtt_PublishInterval * 1000);
 
-        database.write(Datastore.getTotalAcYieldTotalEnabled());      // write value to database
     }
 }
