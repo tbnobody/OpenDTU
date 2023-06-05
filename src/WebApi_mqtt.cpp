@@ -41,6 +41,7 @@ void WebApiMqttClass::onMqttStatus(AsyncWebServerRequest* request)
     root["mqtt_port"] = config.Mqtt_Port;
     root["mqtt_username"] = config.Mqtt_Username;
     root["mqtt_topic"] = config.Mqtt_Topic;
+    root["mqtt_subtopic_inverter_enabled"] = config.Mqtt_SubTopic_Inverter_Enabled;
     root["mqtt_connected"] = MqttSettings.getConnected();
     root["mqtt_retain"] = config.Mqtt_Retain;
     root["mqtt_tls"] = config.Mqtt_Tls;
@@ -75,6 +76,7 @@ void WebApiMqttClass::onMqttAdminGet(AsyncWebServerRequest* request)
     root["mqtt_username"] = config.Mqtt_Username;
     root["mqtt_password"] = config.Mqtt_Password;
     root["mqtt_topic"] = config.Mqtt_Topic;
+    root["mqtt_subtopic_inverter_enabled"] = config.Mqtt_SubTopic_Inverter_Enabled;
     root["mqtt_retain"] = config.Mqtt_Retain;
     root["mqtt_tls"] = config.Mqtt_Tls;
     root["mqtt_root_ca_cert"] = config.Mqtt_RootCaCert;
@@ -140,6 +142,7 @@ void WebApiMqttClass::onMqttAdminPost(AsyncWebServerRequest* request)
             && root.containsKey("mqtt_username")
             && root.containsKey("mqtt_password")
             && root.containsKey("mqtt_topic")
+            && root.containsKey("mqtt_subtopic_inverter_enabled")
             && root.containsKey("mqtt_retain")
             && root.containsKey("mqtt_tls")
             && root.containsKey("mqtt_tls_cert_login")
@@ -309,6 +312,7 @@ void WebApiMqttClass::onMqttAdminPost(AsyncWebServerRequest* request)
     strlcpy(config.Mqtt_Username, root["mqtt_username"].as<String>().c_str(), sizeof(config.Mqtt_Username));
     strlcpy(config.Mqtt_Password, root["mqtt_password"].as<String>().c_str(), sizeof(config.Mqtt_Password));
     strlcpy(config.Mqtt_Topic, root["mqtt_topic"].as<String>().c_str(), sizeof(config.Mqtt_Topic));
+    config.Mqtt_SubTopic_Inverter_Enabled = root["mqtt_subtopic_inverter_enabled"];
     strlcpy(config.Mqtt_LwtTopic, root["mqtt_lwt_topic"].as<String>().c_str(), sizeof(config.Mqtt_LwtTopic));
     strlcpy(config.Mqtt_LwtValue_Online, root["mqtt_lwt_online"].as<String>().c_str(), sizeof(config.Mqtt_LwtValue_Online));
     strlcpy(config.Mqtt_LwtValue_Offline, root["mqtt_lwt_offline"].as<String>().c_str(), sizeof(config.Mqtt_LwtValue_Offline));

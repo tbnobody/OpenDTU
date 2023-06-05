@@ -47,7 +47,12 @@ void MqttHandleInverterClass::loop()
         for (uint8_t i = 0; i < Hoymiles.getNumInverters(); i++) {
             auto inv = Hoymiles.getInverterByPos(i);
 
-            String subtopic = inv->serialString();
+            String subtopic;
+            if (MqttSettings.getSubTopicInverter()) {
+                subtopic = inv->name();
+            } else {
+                subtopic = inv->serialString();
+            }
 
             // Name
             MqttSettings.publish(subtopic + "/name", inv->name());

@@ -5,6 +5,7 @@ export interface MqttConfig {
     mqtt_username: string;
     mqtt_password: string;
     mqtt_topic: string;
+    mqtt_subtopic_inverter_enabled: boolean;
     mqtt_publish_interval: number;
     mqtt_retain: boolean;
     mqtt_tls: boolean;

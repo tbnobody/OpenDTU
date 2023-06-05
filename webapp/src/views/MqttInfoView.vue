@@ -27,6 +27,12 @@
                             <td>{{ mqttDataList.mqtt_topic }}</td>
                         </tr>
                         <tr>
+                            <th>{{ $t('mqttinfo.SubTopicInverter_enabled') }}</th>
+                            <td>
+                                <StatusBadge :status="mqttDataList.mqtt_subtopic_inverter_enabled" true_text="mqttinfo.Enabled" false_text="mqttinfo.Disabled" />
+                            </td>
+                        </tr>
+                        <tr>
                             <th>{{ $t('mqttinfo.PublishInterval') }}</th>
                             <td>{{ $t('mqttinfo.Seconds', { sec: mqttDataList.mqtt_publish_interval }) }}</td>
                         </tr>

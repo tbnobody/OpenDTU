@@ -43,6 +43,10 @@
                               type="text" maxlength="32"
                               :placeholder="$t('mqttadmin.BaseTopicHint')"/>
 
+                <InputElement :label="$t('mqttadmin.SubTopicInverter_enabled')"
+                              v-model="mqttConfigList.mqtt_subtopic_inverter_enabled"
+                              type="checkbox"/>
+
                 <InputElement :label="$t('mqttadmin.PublishInterval')"
                               v-model="mqttConfigList.mqtt_publish_interval"
                               type="number" min="5" max="86400"

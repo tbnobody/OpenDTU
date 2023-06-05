@@ -76,6 +76,7 @@ struct CONFIG_T {
     char Mqtt_Username[MQTT_MAX_USERNAME_STRLEN + 1];
     char Mqtt_Password[MQTT_MAX_PASSWORD_STRLEN + 1];
     char Mqtt_Topic[MQTT_MAX_TOPIC_STRLEN + 1];
+    bool Mqtt_SubTopic_Inverter_Enabled;
     bool Mqtt_Retain;
     char Mqtt_LwtTopic[MQTT_MAX_TOPIC_STRLEN + 1];
     char Mqtt_LwtValue_Online[MQTT_MAX_LWTVALUE_STRLEN + 1];

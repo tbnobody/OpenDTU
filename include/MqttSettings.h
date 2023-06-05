@@ -19,6 +19,7 @@ public:
     void unsubscribe(const String& topic);
 
     String getPrefix();
+    bool getSubTopicInverter() const;
 
 private:
     void NetworkEvent(network_event event);

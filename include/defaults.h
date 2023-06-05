@@ -33,6 +33,7 @@
 #define MQTT_USER ""
 #define MQTT_PASSWORD ""
 #define MQTT_TOPIC "solar/"
+#define MQTT_SUBTOPIC_INVERTER_ENABLED false
 #define MQTT_RETAIN true
 #define MQTT_TLS false
 // ISRG_Root_X1.crt -- Root CA for Letsencrypt

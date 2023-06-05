@@ -56,6 +56,7 @@ bool ConfigurationClass::write()
     mqtt["username"] = config.Mqtt_Username;
     mqtt["password"] = config.Mqtt_Password;
     mqtt["topic"] = config.Mqtt_Topic;
+    mqtt["subtopic_inverter_enabled"] = config.Mqtt_SubTopic_Inverter_Enabled;
     mqtt["retain"] = config.Mqtt_Retain;
     mqtt["publish_interval"] = config.Mqtt_PublishInterval;
 
@@ -202,6 +203,7 @@ bool ConfigurationClass::read()
     strlcpy(config.Mqtt_Username, mqtt["username"] | MQTT_USER, sizeof(config.Mqtt_Username));
     strlcpy(config.Mqtt_Password, mqtt["password"] | MQTT_PASSWORD, sizeof(config.Mqtt_Password));
     strlcpy(config.Mqtt_Topic, mqtt["topic"] | MQTT_TOPIC, sizeof(config.Mqtt_Topic));
+    config.Mqtt_SubTopic_Inverter_Enabled = mqtt["subtopic_inverter_enabled"] | MQTT_SUBTOPIC_INVERTER_ENABLED;
     config.Mqtt_Retain = mqtt["retain"] | MQTT_RETAIN;
     config.Mqtt_PublishInterval = mqtt["publish_interval"] | MQTT_PUBLISH_INTERVAL;
 
