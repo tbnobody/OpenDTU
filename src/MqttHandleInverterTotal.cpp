@@ -7,7 +7,6 @@
 #include "Datastore.h"
 #include "MqttSettings.h"
 #include <Hoymiles.h>
-#include "WebApi_database.h"
 
 MqttHandleInverterTotalClass MqttHandleInverterTotal;
 
@@ -32,6 +31,5 @@ void MqttHandleInverterTotalClass::loop()
         MqttSettings.publish("dc/is_valid", String(Datastore.getIsAllEnabledReachable()));
 
         _lastPublish.set(Configuration.get().Mqtt_PublishInterval * 1000);
-
     }
 }

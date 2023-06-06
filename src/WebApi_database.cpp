@@ -4,6 +4,7 @@
  */
 
 #include "WebApi_database.h"
+#include "Datastore.h"
 #include "MessageOutput.h"
 #include "WebApi.h"
 #include "defaults.h"
@@ -20,6 +21,10 @@ void WebApiDatabaseClass::init(AsyncWebServer* server)
 
 void WebApiDatabaseClass::loop()
 {
+    if (!Hoymiles.isAllRadioIdle()) {
+        return;
+    }
+    write(Datastore.getTotalAcYieldTotalEnabled()); // write value to database
 }
 
 bool WebApiDatabaseClass::write(float energy)
@@ -42,10 +47,10 @@ bool WebApiDatabaseClass::write(float energy)
         old_hour = timeinfo.tm_hour;
         return (false);
     }
-    MessageOutput.println("Next hour.");
+    // MessageOutput.println("Next hour.");
     if (energy <= old_energy) // enery must have increased
         return (false);
-    MessageOutput.println("Energy difference > 0");
+    // MessageOutput.println("Energy difference > 0");
 
     struct Data d;
     d.tm_hour = old_hour;
@@ -56,13 +61,13 @@ bool WebApiDatabaseClass::write(float energy)
     d.energy = old_energy = energy;
 
     // create database file if it does not exist
-    if (!LittleFS.exists(DATABASE_FILENAME)) {
-        MessageOutput.println("Database file does not exist.");
-        File f = LittleFS.open(DATABASE_FILENAME, "w", true);
-        f.flush();
-        f.close();
-        MessageOutput.println("New database file created.");
-    }
+    // if (!LittleFS.exists(DATABASE_FILENAME)) {
+    //    MessageOutput.println("Database file does not exist.");
+    //    File f = LittleFS.open(DATABASE_FILENAME, "w", true);
+    //    f.flush();
+    //    f.close();
+    //    MessageOutput.println("New database file created.");
+    //}
 
     File f = LittleFS.open(DATABASE_FILENAME, "a", true);
     if (!f) {
