@@ -1,7 +1,4 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
-/*
- * Copyright (C) 2023 Ralf Bauer and others
- */
 
 #include "WebApi_database.h"
 #include "Datastore.h"
@@ -34,13 +31,12 @@ bool WebApiDatabaseClass::write(float energy)
 
     // LittleFS.remove(DATABASE_FILENAME);
 
-    time_t now;
+    //MessageOutput.println(energy, 6);
+
     struct tm timeinfo;
-    time(&now); // get current time
-    localtime_r(&now, &timeinfo);
-
-    MessageOutput.println(energy);
-
+    if (!getLocalTime(&timeinfo, 5)) {
+        return false;
+    }
     if (timeinfo.tm_hour == old_hour) // must be new hour
         return (false);
     if (old_hour == 255) { // don't write to database after reboot
@@ -76,7 +72,7 @@ bool WebApiDatabaseClass::write(float energy)
     }
     f.write((const uint8_t*)&d, sizeof(Data));
     f.close();
-    MessageOutput.println("Write data point.");
+    //MessageOutput.println("Write data point.");
     return (true);
 }
 
