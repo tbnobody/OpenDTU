@@ -60,7 +60,7 @@ export default defineComponent({
             data = [['Time', 'Energy']];
             energy.forEach((x: any[]) => {
                 var d = new Date(x[0] + 2000, x[1] - 1, x[2], x[3]);
-                if ((d >= start) && (d <= end)) {
+                if ((d >= start) && (d <= end) && (old_energy > 0.0)) {
                     data.push([d, Math.round((x[4] - old_energy) * 1000)])
                 }
                 old_energy = x[4]
