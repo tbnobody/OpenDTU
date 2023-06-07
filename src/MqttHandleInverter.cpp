@@ -47,15 +47,16 @@ void MqttHandleInverterClass::loop()
         for (uint8_t i = 0; i < Hoymiles.getNumInverters(); i++) {
             auto inv = Hoymiles.getInverterByPos(i);
 
-            String subtopic;
-            if (MqttSettings.getSubTopicInverter()) {
-                subtopic = inv->name();
-            } else {
-                subtopic = inv->serialString();
-            }
+            const String subtopic = getSubTopic(inv);
 
-            // Name
-            MqttSettings.publish(subtopic + "/name", inv->name());
+            // add identification
+            if (MqttSettings.getSubTopicInverter()) {
+                // Serial
+                MqttSettings.publish(subtopic + "/serial", inv->serialString());
+            } else {
+                // Name
+                MqttSettings.publish(subtopic + "/name", inv->name());
+            }
 
             if (inv->DevInfo()->getLastUpdate() > 0) {
                 // Bootloader Version
@@ -107,7 +108,7 @@ void MqttHandleInverterClass::loop()
                             INVERTER_CONFIG_T* inv_cfg = Configuration.getInverterConfig(inv->serial());
                             if (inv_cfg != nullptr) {
                                 // TODO(tbnobody)
-                                MqttSettings.publish(inv->serialString() + "/" + String(static_cast<uint8_t>(c) + 1) + "/name", inv_cfg->channel[c].Name);
+                                MqttSettings.publish(getSubTopic(inv) + "/" + String(static_cast<uint8_t>(c) + 1) + "/name", inv_cfg->channel[c].Name);
                             }
                         }
                         for (uint8_t f = 0; f < sizeof(_publishFields) / sizeof(FieldId_t); f++) {
@@ -160,7 +161,7 @@ String MqttHandleInverterClass::getTopic(std::shared_ptr<InverterAbstract> inv, 
         chanNum = channel;
     }
 
-    return inv->serialString() + "/" + chanNum + "/" + chanName;
+    return getSubTopic(inv) + "/" + chanNum + "/" + chanName;
 }
 
 void MqttHandleInverterClass::onMqttMessage(const espMqttClientTypes::MessageProperties& properties, const char* topic, const uint8_t* payload, size_t len, size_t index, size_t total)
@@ -251,4 +252,17 @@ void MqttHandleInverterClass::onMqttMessage(const espMqttClientTypes::MessagePro
             MessageOutput.println("Ignored because retained");
         }
     }
+}
+
+String MqttHandleInverterClass::getSubTopic(std::shared_ptr<InverterAbstract> inv)
+{
+    String subtopic;
+
+    if (MqttSettings.getSubTopicInverter()) {
+        subtopic = inv->name();
+    } else {
+        subtopic = inv->serialString();
+    }
+
+    return subtopic;
 }

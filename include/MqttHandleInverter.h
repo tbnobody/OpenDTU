@@ -11,6 +11,7 @@ public:
     void loop();
 
     static String getTopic(std::shared_ptr<InverterAbstract> inv, ChannelType_t type, ChannelNum_t channel, FieldId_t fieldId);
+    static String getSubTopic(std::shared_ptr<InverterAbstract> inv);
 
 private:
     void publishField(std::shared_ptr<InverterAbstract> inv, ChannelType_t type, ChannelNum_t channel, FieldId_t fieldId);
