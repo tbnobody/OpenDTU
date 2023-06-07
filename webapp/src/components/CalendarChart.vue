@@ -45,6 +45,9 @@ export default defineComponent({
     beforeMount() {
         this.drawChart()
     },
+    mount() {
+        this.drawChart()
+    },
     methods: {
         drawChart() {
             data = [[{

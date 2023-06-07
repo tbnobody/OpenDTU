@@ -48,6 +48,9 @@ export default defineComponent({
     beforeMount() {
         this.drawChart()
     },
+    mounted() {
+        this.drawChart()
+    },
     methods: {
         drawChart() {
             var end = new Date();
