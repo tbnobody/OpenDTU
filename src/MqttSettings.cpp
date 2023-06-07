@@ -160,6 +160,19 @@ bool MqttSettingsClass::getSubTopicInverter() const
     return Configuration.get().Mqtt_SubTopic_Inverter_Enabled;
 }
 
+String MqttSettingsClass::escapeTopic(const String& topic)
+{
+    String topic_esc = topic;
+
+    topic_esc.replace('+', '_');
+    topic_esc.replace('#', '_');
+    topic_esc.replace('*', '_');
+    topic_esc.replace('$', '_');
+    topic_esc.replace('/', '_');
+
+    return topic_esc;
+}
+
 void MqttSettingsClass::publish(const String& subtopic, const String& payload)
 {
     String topic = getPrefix();

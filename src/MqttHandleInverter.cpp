@@ -259,7 +259,7 @@ String MqttHandleInverterClass::getSubTopic(std::shared_ptr<InverterAbstract> in
     String subtopic;
 
     if (MqttSettings.getSubTopicInverter()) {
-        subtopic = inv->name();
+        subtopic = MqttSettingsClass::escapeTopic(inv->name());
     } else {
         subtopic = inv->serialString();
     }

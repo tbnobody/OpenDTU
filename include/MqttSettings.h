@@ -21,6 +21,8 @@ public:
     String getPrefix();
     bool getSubTopicInverter() const;
 
+    static String escapeTopic(const String& topic);
+
 private:
     void NetworkEvent(network_event event);
 
