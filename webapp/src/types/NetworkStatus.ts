@@ -2,6 +2,7 @@ export interface NetworkStatus {
     // WifiStationInfo
     sta_status: boolean;
     sta_ssid: string;
+    sta_bssid: string;
     sta_rssi: number;
     // WifiApInfo
     ap_status: boolean;
