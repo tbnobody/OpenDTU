@@ -51,6 +51,69 @@ void HoymilesRadio::sendLastPacketAgain()
     sendEsbPacket(cmd);
 }
 
+void HoymilesRadio::handleReceivedPackage()
+{
+    if (_busyFlag && _rxTimeout.occured()) {
+        Hoymiles.getMessageOutput()->println("RX Period End");
+        std::shared_ptr<InverterAbstract> inv = Hoymiles.getInverterBySerial(_commandQueue.front().get()->getTargetAddress());
+
+        if (nullptr != inv) {
+            CommandAbstract* cmd = _commandQueue.front().get();
+            uint8_t verifyResult = inv->verifyAllFragments(cmd);
+            if (verifyResult == FRAGMENT_ALL_MISSING_RESEND) {
+                Hoymiles.getMessageOutput()->println("Nothing received, resend whole request");
+                sendLastPacketAgain();
+
+            } else if (verifyResult == FRAGMENT_ALL_MISSING_TIMEOUT) {
+                Hoymiles.getMessageOutput()->println("Nothing received, resend count exeeded");
+                _commandQueue.pop();
+                _busyFlag = false;
+
+            } else if (verifyResult == FRAGMENT_RETRANSMIT_TIMEOUT) {
+                Hoymiles.getMessageOutput()->println("Retransmit timeout");
+                _commandQueue.pop();
+                _busyFlag = false;
+
+            } else if (verifyResult == FRAGMENT_HANDLE_ERROR) {
+                Hoymiles.getMessageOutput()->println("Packet handling error");
+                _commandQueue.pop();
+                _busyFlag = false;
+
+            } else if (verifyResult > 0) {
+                // Perform Retransmit
+                Hoymiles.getMessageOutput()->print("Request retransmit: ");
+                Hoymiles.getMessageOutput()->println(verifyResult);
+                sendRetransmitPacket(verifyResult);
+
+            } else {
+                // Successful received all packages
+                Hoymiles.getMessageOutput()->println("Success");
+                _commandQueue.pop();
+                _busyFlag = false;
+            }
+        } else {
+            // If inverter was not found, assume the command is invalid
+            Hoymiles.getMessageOutput()->println("RX: Invalid inverter found");
+            _commandQueue.pop();
+            _busyFlag = false;
+        }
+    } else if (!_busyFlag) {
+        // Currently in idle mode --> send packet if one is in the queue
+        if (!_commandQueue.empty()) {
+            CommandAbstract* cmd = _commandQueue.front().get();
+
+            auto inv = Hoymiles.getInverterBySerial(cmd->getTargetAddress());
+            if (nullptr != inv) {
+                inv->clearRxFragmentBuffer();
+                sendEsbPacket(cmd);
+            } else {
+                Hoymiles.getMessageOutput()->println("TX: Invalid inverter found");
+                _commandQueue.pop();
+            }
+        }
+    }
+}
+
 void HoymilesRadio::dumpBuf(const uint8_t buf[], uint8_t len, bool appendNewline)
 {
     for (uint8_t i = 0; i < len; i++) {

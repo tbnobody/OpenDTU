@@ -210,14 +210,7 @@ It is recommended to make all changes only in the  'platformio_override.ini', th
 
 ### using the pre-compiled .bin files
 
-The pre-compiled binary files can be found here on the [github page behind "Releases"](https://github.com/tbnobody/OpenDTU/releases) (look at the right column). For a first installation on an ESP32, download `opendtu-generic.zip`, unpack and use a ESP32 flash tool of your choice (see next chapter) to flash the `.bin` files to the right addresses:
-
-| Address  | File                   |
-| ---------| ---------------------- |
-| 0x1000   | bootloader.bin         |
-| 0x8000   | partitions.bin         |
-| 0xe000   | boot_app0.bin          |
-| 0x10000  | opendtu-*.bin          |
+The pre-compiled binary files can be found here on the [github page behind "Releases"](https://github.com/tbnobody/OpenDTU/releases) (look at the right column). For a first installation on an ESP32, download `opendtu-generic.factory.bin` and use a ESP32 flash tool of your choice to flash the `.bin` file to the address `0x0`. (The previous method with different .bin files is no more necessary.)
 
 For further updates download `opendtu-generic.bin` and use the over-the-air firmware update in OpenDTU's web interface.
 
@@ -226,10 +219,7 @@ For further updates download `opendtu-generic.bin` and use the over-the-air firm
 ```bash
 esptool.py --port /dev/ttyUSB0 --chip esp32 --before default_reset --after hard_reset \
   write_flash --flash_mode dout --flash_freq 40m --flash_size detect \
-  0x1000 bootloader.bin \
-  0x8000 partitions.bin \
-  0xe000 boot_app0.bin \
-  0x10000 opendtu-generic.bin
+  0x0 opendtu-generic.factory.bin
 ```
 
 #### Flash with Espressif Flash Download Tool (Windows)

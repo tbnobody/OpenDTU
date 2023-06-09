@@ -55,14 +55,14 @@ void WebApiNtpClass::onNtpStatus(AsyncWebServerRequest* request)
     if (SunPosition.sunriseTime(&timeinfo)) {
         strftime(timeStringBuff, sizeof(timeStringBuff), "%A, %B %d %Y %H:%M:%S", &timeinfo);
     } else {
-        strcpy(timeStringBuff, "--");
+        snprintf(timeStringBuff, sizeof(timeStringBuff), "--");
     }
     root["sun_risetime"] = timeStringBuff;
 
     if (SunPosition.sunsetTime(&timeinfo)) {
         strftime(timeStringBuff, sizeof(timeStringBuff), "%A, %B %d %Y %H:%M:%S", &timeinfo);
     } else {
-        strcpy(timeStringBuff, "--");
+        snprintf(timeStringBuff, sizeof(timeStringBuff), "--");
     }
     root["sun_settime"] = timeStringBuff;
 
