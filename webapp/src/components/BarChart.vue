@@ -15,18 +15,29 @@ import type { DatabaseStatus } from "@/types/DatabaseStatus";
 import { GChart } from 'vue-google-charts';
 //import { DatetimeFormat } from 'vue-i18n';
 
-var data: any;
-export const type = 'ColumnChart';
-export const options = {
+var data_col: any;
+export const type_col = 'ColumnChart';
+export const options_col = {
     height: 300,
-    chartArea: { top: 25, width: '85%', height: '80%' },
+    chartArea: {
+        top: 25, 
+        width: '85%', 
+        height: '80%' 
+    },
+    bar: {
+        groupWidth: '100%'
+    },
     legend: {
         position: 'none'
     },
     hAxis: {
         format: 'HH',
+        minorGridlines: {
+            count: 0
+        }
     },
     vAxis: {
+        minValue: 0,
         format: '# Wh'
     }
 };
@@ -40,9 +51,9 @@ export default defineComponent({
     setup() {
         return () =>
             h(GChart, {
-                data,
-                options,
-                type
+                data: data_col,
+                options: options_col,
+                type: type_col
             });
     },
     beforeMount() {
@@ -60,11 +71,18 @@ export default defineComponent({
             var old_energy = 0.0;
             start.setDate(end.getDate() - interval);
             start.setHours(start.getHours() - 2);
-            data = [['Time', 'Energy']];
+            data_col = [[{
+                type: 'date',
+                id: 'Time'
+            },
+            {
+                type: 'number',
+                id: 'Energy'
+            }]]
             energy.forEach((x: any[]) => {
                 var d = new Date(x[0] + 2000, x[1] - 1, x[2], x[3]);
                 if ((d >= start) && (d <= end) && (old_energy > 0.0)) {
-                    data.push([d, Math.round((x[4] - old_energy) * 1000)])
+                    data_col.push([d, Math.round((x[4] - old_energy) * 1000)])
                 }
                 old_energy = x[4]
             })

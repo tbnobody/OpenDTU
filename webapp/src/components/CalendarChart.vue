@@ -3,7 +3,9 @@
         <div v-if="dataBase.valid_data">
             <div class="card-header">
             </div>
-            <GoogleChart />
+            <div>
+                <GoogleChart />
+            </div>
         </div>
     </div>
 </template>
@@ -13,15 +15,16 @@ import { defineComponent, type PropType, h } from 'vue';
 import type { DatabaseStatus } from "@/types/DatabaseStatus";
 import { GChart } from 'vue-google-charts';
 
-var data: any;
-export const type = 'Calendar';
-export const options = {
-    height: 250,
+var data_cal: any;
+export const type_cal = 'Calendar';
+export const options_cal = {
+    height: 270,
     colorAxis: {
-            colors: ['#FFFFFF', '#0000FF']
-        },
+        minValue: 0,
+        colors: ['#FFFFFF', '#0000FF']
+    },
     calendar: {
-        cellSize: 20,
+        cellSize: 24,
     },
 };
 export default defineComponent({
@@ -34,9 +37,9 @@ export default defineComponent({
     setup() {
         return () =>
             h(GChart, {
-                data,
-                options,
-                type,
+                data: data_cal,
+                options: options_cal,
+                type: type_cal,
                 settings: {
                     packages: ['calendar'],
                 }
@@ -50,7 +53,7 @@ export default defineComponent({
     },
     methods: {
         drawChart() {
-            data = [[{
+            data_cal = [[{
                 type: 'date',
                 id: 'Date'
             },
@@ -70,7 +73,7 @@ export default defineComponent({
                     old_energy = x[4];
                 } else {
                     if (x[2] != old_day) {
-                        data.push(a)
+                        data_cal.push(a)
                         old_day = x[2]
                         old_energy = last_energy
                     }
@@ -79,7 +82,7 @@ export default defineComponent({
                 d = new Date(x[0] + 2000, x[1] - 1, x[2], x[3])
                 a = [d, Math.round((last_energy - old_energy) * 1000)]
             })
-            data.push(a)
+            data_cal.push(a)
         }
     }
 });
