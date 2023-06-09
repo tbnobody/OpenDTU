@@ -2,7 +2,6 @@
 #pragma once
 
 #include "HoymilesRadio.h"
-#include "TimeoutHelper.h"
 #include "commands/CommandAbstract.h"
 #include "types.h"
 #include <Arduino.h>
@@ -48,7 +47,6 @@ private:
     bool _gpio3_configured = false;
 
     std::queue<fragment_t> _rxBuffer;
-    TimeoutHelper _rxTimeout;
     TimeoutHelper _txTimeout;
 
     uint32_t _inverterTargetFrequency = HOYMILES_CMT_WORK_FREQ;

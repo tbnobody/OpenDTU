@@ -36,6 +36,7 @@ void WebApiNetworkClass::onNetworkStatus(AsyncWebServerRequest* request)
 
     root["sta_status"] = ((WiFi.getMode() & WIFI_STA) != 0);
     root["sta_ssid"] = WiFi.SSID();
+    root["sta_bssid"] = WiFi.BSSIDstr();
     root["sta_rssi"] = WiFi.RSSI();
     root["network_hostname"] = NetworkSettings.getHostname();
     root["network_ip"] = NetworkSettings.localIP().toString();

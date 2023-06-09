@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 #pragma once
 
+#include "TimeoutHelper.h"
 #include "commands/CommandAbstract.h"
 #include "types.h"
 #include <memory>
@@ -30,9 +31,12 @@ protected:
     virtual void sendEsbPacket(CommandAbstract* cmd) = 0;
     void sendRetransmitPacket(uint8_t fragment_id);
     void sendLastPacketAgain();
+    void handleReceivedPackage();
 
     serial_u _dtuSerial;
     std::queue<std::shared_ptr<CommandAbstract>> _commandQueue;
     bool _isInitialized = false;
     bool _busyFlag = false;
+
+    TimeoutHelper _rxTimeout;
 };

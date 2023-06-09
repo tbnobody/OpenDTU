@@ -159,7 +159,11 @@ void MqttSettingsClass::publish(const String& subtopic, const String& payload)
 {
     String topic = getPrefix();
     topic += subtopic;
-    mqttClient->publish(topic.c_str(), 0, Configuration.get().Mqtt_Retain, payload.c_str());
+
+    String value = payload;
+    value.trim();
+
+    mqttClient->publish(topic.c_str(), 0, Configuration.get().Mqtt_Retain, value.c_str());
 }
 
 void MqttSettingsClass::publishGeneric(const String& topic, const String& payload, bool retain, uint8_t qos)
