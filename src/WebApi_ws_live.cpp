@@ -79,8 +79,10 @@ void WebApiWsLiveClass::loop()
                 _ws.textAll(buffer);
             }
 
-        } catch (std::bad_alloc& bad_alloc) {
+        } catch (const std::bad_alloc& bad_alloc) {
             MessageOutput.printf("Call to /api/livedata/status temporarely out of resources. Reason: \"%s\".\r\n", bad_alloc.what());
+        } catch (const std::exception& exc) {
+            MessageOutput.printf("Unknown exception in /api/livedata/status. Reason: \"%s\".\r\n", exc.what());
         }
 
         _lastWsPublish = millis();
@@ -229,9 +231,11 @@ void WebApiWsLiveClass::onLivedataStatus(AsyncWebServerRequest* request)
         response->setLength();
         request->send(response);
 
-    } catch (std::bad_alloc& bad_alloc) {
+    } catch (const std::bad_alloc& bad_alloc) {
         MessageOutput.printf("Call to /api/livedata/status temporarely out of resources. Reason: \"%s\".\r\n", bad_alloc.what());
-
+        WebApi.sendTooManyRequests(request);
+    } catch (const std::exception& exc) {
+        MessageOutput.printf("Unknown exception in /api/livedata/status. Reason: \"%s\".\r\n", exc.what());
         WebApi.sendTooManyRequests(request);
     }
 }

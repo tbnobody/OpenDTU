@@ -14,6 +14,10 @@
                         <td>{{ networkStatus.sta_ssid }}</td>
                     </tr>
                     <tr>
+                        <th>{{ $t('wifistationinfo.Bssid') }}</th>
+                        <td>{{ networkStatus.sta_bssid }}</td>
+                    </tr>
+                    <tr>
                         <th>{{ $t('wifistationinfo.Quality') }}</th>
                         <td>{{ $n(getRSSIasQuality(networkStatus.sta_rssi), 'percent') }}</td>
                     </tr>

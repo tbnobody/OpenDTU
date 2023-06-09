@@ -37,7 +37,7 @@ jobs:
       - name: Get default environments
         id: envs
         run: |
-          echo "environments=$(pio project config --json-output | jq -cr '.[0][1][0][1]')" >> $GITHUB_OUTPUT
+          echo "environments=$(pio project config --json-output | jq -cr '.[1][1][0][1]|split(",")')" >> $GITHUB_OUTPUT
 
     outputs:
       environments: ${{ steps.envs.outputs.environments }}
@@ -98,17 +98,15 @@ jobs:
       - name: Rename Firmware
         run: mv .pio/build/${{ matrix.environment }}/firmware.bin .pio/build/${{ matrix.environment }}/opendtu-${{ matrix.environment }}.bin
 
-      - name: Copy boot_app0.bin
-        run: cp ~/.platformio/packages/framework-arduinoespressif32/tools/partitions/boot_app0.bin .pio/build/${{ matrix.environment }}/boot_app0.bin
+      - name: Rename Factory Firmware
+        run: mv .pio/build/${{ matrix.environment }}/firmware.factory.bin .pio/build/${{ matrix.environment }}/opendtu-${{ matrix.environment }}.factory.bin
 
       - uses: actions/upload-artifact@v3
         with:
           name: opendtu-${{ matrix.environment }}
           path: |
             .pio/build/${{ matrix.environment }}/opendtu-${{ matrix.environment }}.bin
-            .pio/build/${{ matrix.environment }}/partitions.bin
-            .pio/build/${{ matrix.environment }}/bootloader.bin
-            .pio/build/${{ matrix.environment }}/boot_app0.bin
+            .pio/build/${{ matrix.environment }}/opendtu-${{ matrix.environment }}.factory.bin
 
   release:
     name: Create Release
@@ -121,7 +119,7 @@ jobs:
 
       - name: Build Changelog
         id: github_release
-        uses: mikepenz/release-changelog-builder-action@v3.7.0
+        uses: mikepenz/release-changelog-builder-action@v3
         with:
           failOnError: true
           commitMode: true
@@ -133,12 +131,10 @@ jobs:
         with:
           path: artifacts/
 
-      - name: Create ZIPs
+      - name: Move all files to the same location
         run: |
           ls -R
-          sudo apt install zip
           cd artifacts
-          for i in */; do zip -r "${i%/}.zip" "$i"; done
           for i in */; do cp ${i}opendtu-*.bin ./; done
 
       - name: Create release

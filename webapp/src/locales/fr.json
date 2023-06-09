@@ -208,6 +208,7 @@
         "Enabled": "activé",
         "Disabled": "désactivé",
         "Ssid": "SSID",
+        "Bssid": "BSSID",
         "Quality": "Qualité",
         "Rssi": "RSSI"
     },
