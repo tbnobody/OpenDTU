@@ -101,14 +101,14 @@ jobs:
         run: mv .pio/build/${{ matrix.environment }}/firmware.bin .pio/build/${{ matrix.environment }}/opendtu-onbattery-${{ matrix.environment }}.bin
 
       - name: Rename Factory Firmware
-        run: mv .pio/build/${{ matrix.environment }}/firmware.factory.bin .pio/build/${{ matrix.environment }}/opendtu-${{ matrix.environment }}.factory.bin
+        run: mv .pio/build/${{ matrix.environment }}/firmware.factory.bin .pio/build/${{ matrix.environment }}/opendtu-onbattery-${{ matrix.environment }}.factory.bin
 
       - uses: actions/upload-artifact@v3
         with:
           name: opendtu-onbattery-${{ matrix.environment }}
           path: |
             .pio/build/${{ matrix.environment }}/opendtu-onbattery-${{ matrix.environment }}.bin
-            .pio/build/${{ matrix.environment }}/opendtu-${{ matrix.environment }}.factory.bin
+            .pio/build/${{ matrix.environment }}/opendtu-onbattery-${{ matrix.environment }}.factory.bin
 
   release:
     name: Create Release
