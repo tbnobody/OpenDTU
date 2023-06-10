@@ -5,7 +5,6 @@
 #include <cstdint>
 #include <queue>
 #include <Every.h>
-#include "MqttHandleInverter.h"
 
 #define THIRDPARTY_MSG_BUFFERSIZE 1024
 

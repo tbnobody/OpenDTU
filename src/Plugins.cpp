@@ -3,6 +3,7 @@
 #include "MessageOutput.h"
 #include "MqttSettings.h"
 #include "string.h"
+#include <Hoymiles.h>
 
 #include "InverterPlugin.h"
 #include "MeterPlugin.h"
@@ -83,6 +84,7 @@ void PluginsClass::loopInverters()
 {
     for (uint8_t i = 0; i < Hoymiles.getNumInverters(); i++) {
         auto inv = Hoymiles.getInverterByPos(i);
+        MessageOutput.printf("PluginsClass::loopInverters inv[%d] lastupdate=%d\n", i,inv->Statistics()->getLastUpdate());
         if (inv->Statistics()->getLastUpdate() > 0) {
             for (auto& t : inv->Statistics()->getChannelTypes()) {
                 for (auto& c : inv->Statistics()->getChannelsByType(t)) {
@@ -140,10 +142,6 @@ void PluginsClass::subscribeMqtt(Plugin* plugin, char* topic, bool append)
     });
 }
 
-void PluginsClass::ctrlRequest(Plugin* plugin, JsonObject request)
-{
-    MessageOutput.printf("PluginsClass::ctrlRequest sender=%d\n", plugin->getId());
-}
 bool PluginsClass::enqueueMessage(Plugin* sender, char* topic, char* data, bool append)
 {
     // MessageOutput.printf("PluginsClass::enqueueMessage sender=%d\n", sender->getId());
