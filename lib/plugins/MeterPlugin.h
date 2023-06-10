@@ -14,13 +14,25 @@ typedef struct {
     bool update = false;
 } meterstruct;
 
+template <std::size_t N>
+class meterarray : public structarray<meterstruct, N> {
+    public:
+    meterarray() : structarray<meterstruct, N>() {}
+    meterstruct* getMeterBySerial(String& serial) {
+        return structarray<meterstruct, N>::getByKey([&serial](meterstruct& m){return serial.equals(m.serial);});
+    }
+    meterstruct* getEmptyIndex() {
+        return structarray<meterstruct, N>::getByKey([](meterstruct& s){return s.serial.isEmpty();});
+    }
+};
+
 class MeterPlugin : public Plugin {
     enum pluginIds { METER_SERIAL,
         METER_POWER };
 
 public:
     MeterPlugin()
-        : Plugin(2, "meter") , meters([](meterstruct& ms){ return ms.serial.isEmpty();})
+        : Plugin(2, "meter")
     {
 
     }
@@ -28,7 +40,7 @@ public:
     void setup() { }
     void loop()
     {
-        for (int i = 0; i < MAX_NUM_METER; i++) {
+        for (int i = 0; i < meters.size(); i++) {
             if (meters[i].update) {
                 meters[i].update = false;
                 publishAC(meters[i]);
@@ -37,7 +49,7 @@ public:
     }
     meterstruct* getIndex(String& serial)
     {
-        meterstruct* ms = meters.getByKey([&serial](meterstruct& m){return serial.equals(m.serial);});
+        meterstruct* ms = meters.getMeterBySerial(serial);
         if(ms==nullptr) {
             ms = meters.getEmptyIndex();
             if(ms!=nullptr) {
@@ -153,7 +165,7 @@ public:
         MessageOutput.printf("meterplugin: internalDataCallback from %d \n", message->getSenderId());
     }
 private:
-    structarray<meterstruct, MAX_NUM_METER> meters;
+    meterarray<MAX_NUM_METER> meters;
     std::map<String, String> topicMap;
     String meter_mqtt_topics;
     String meter_mqtt_json_topics;

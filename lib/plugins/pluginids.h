@@ -5,7 +5,6 @@
 enum PluginIds {
     PluginDemo = 999,
     PluginInverter = 1,
-    PluginPowercontrol2 = 33,
     PluginDemo2 = 99,
     PluginMeter = 2,
     PluginPowercontrol = 3,
@@ -19,11 +18,6 @@ enum PluginInverterIds {
     ACPOWER_INVERTERSTRING,
     ACPOWER_PRODUCTION,
     ACPOWER_PRODUCTION_TOTAL,
-};
-enum PluginPowercontrol2Ids {
-    INVERTER_,
-    INVERTERSTRING_,
-    POWERLIMIT_,
 };
 enum PluginDemo2Ids {
     SOMEOTHERPLUGINOUTPUT,
@@ -45,10 +39,6 @@ const char PluginInverterACPOWER_INVERTERIdString[] = "ACPOWER_INVERTER";
 const char PluginInverterACPOWER_INVERTERSTRINGIdString[] = "ACPOWER_INVERTERSTRING";
 const char PluginInverterACPOWER_PRODUCTIONIdString[] = "ACPOWER_PRODUCTION";
 const char PluginInverterACPOWER_PRODUCTION_TOTALIdString[] = "ACPOWER_PRODUCTION_TOTAL";
-const char PluginPowercontrol2IdString[] = "Powercontrol2";
-const char PluginPowercontrol2INVERTER_IdString[] = "INVERTER_";
-const char PluginPowercontrol2INVERTERSTRING_IdString[] = "INVERTERSTRING_";
-const char PluginPowercontrol2POWERLIMIT_IdString[] = "POWERLIMIT_";
 const char PluginDemo2IdString[] = "Demo2";
 const char PluginDemo2SOMEOTHERPLUGINOUTPUTIdString[] = "SOMEOTHERPLUGINOUTPUT";
 const char PluginMeterIdString[] = "Meter";
@@ -84,7 +74,6 @@ static const char* getPluginNameDebug(int pid) {
 	switch(pid){
 		case 999: return PluginDemoIdString;
 		case 1: return PluginInverterIdString;
-		case 33: return PluginPowercontrol2IdString;
 		case 99: return PluginDemo2IdString;
 		case 2: return PluginMeterIdString;
 		case 3: return PluginPowercontrolIdString;
@@ -103,12 +92,6 @@ static const char* getPluginValueNameDebug(int pid, int vid) {
 				case 1: return PluginInverterACPOWER_INVERTERSTRINGIdString;
 				case 2: return PluginInverterACPOWER_PRODUCTIONIdString;
 				case 3: return PluginInverterACPOWER_PRODUCTION_TOTALIdString;
-				default: return PluginUnknown;
-}
-		case 33: switch(vid){			
-				case 0: return PluginPowercontrol2INVERTER_IdString;
-				case 1: return PluginPowercontrol2INVERTERSTRING_IdString;
-				case 2: return PluginPowercontrol2POWERLIMIT_IdString;
 				default: return PluginUnknown;
 }
 		case 99: switch(vid){			

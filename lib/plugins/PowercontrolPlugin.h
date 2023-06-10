@@ -14,6 +14,54 @@ typedef struct {
     bool update = false;
 } powercontrolstruct;
 
+
+template <std::size_t N>
+class powercontrollerarray : public structarray<powercontrolstruct, N> {
+    public:
+    powercontrollerarray() : structarray<powercontrolstruct, N>() {}
+    powercontrolstruct* getInverterByStringSerial(String& serial) {
+        return structarray<powercontrolstruct, N>::getByKey([&serial](powercontrolstruct& pc){return serial.equals(pc.inverterSerialString);});
+    }
+    powercontrolstruct* getInverterByLongSerial(uint64_t serial) {
+        return structarray<powercontrolstruct, N>::getByKey([&serial](powercontrolstruct& pc){return (serial==pc.inverterSerial);});
+    }
+    powercontrolstruct* getMeterByStringSerial(String& serial) {
+        return structarray<powercontrolstruct, N>::getByKey([&serial](powercontrolstruct& pc){return serial.equals(pc.meterSerial);});
+    }
+    powercontrolstruct* getEmptyIndex() {
+        return structarray<powercontrolstruct, N>::getByKey([](powercontrolstruct& s){return s.inverterSerialString.isEmpty();});
+    }
+};
+
+class PowercontrolAlgo {
+public:
+    PowercontrolAlgo(){}
+    virtual bool calcLimit(powercontrolstruct& powercontrol) { return false; };
+};
+
+class DefaultPowercontrolAlgo : public PowercontrolAlgo {
+public:
+    DefaultPowercontrolAlgo() : PowercontrolAlgo() { }
+    bool calcLimit(powercontrolstruct& powercontrol)
+    {
+        MessageOutput.printf("powercontrol PowercontrolAlgo: consumption=%f production=%f limit=%f\n", powercontrol.consumption, powercontrol.production, powercontrol.limit);
+        // TODO: do some magic calculation here
+        // :/
+        // float newlimit = magicFunction(powercontrol.production,powercontrol.consumption);
+
+        float newLimit = powercontrol.consumption;
+        float threshold = std::abs(powercontrol.limit - newLimit);
+        if (threshold <= powercontrol.threshold) {
+            MessageOutput.printf("powercontrol PowercontrolAlgo: newlimit(%f) within threshold(%f) -> no limit change\n", newLimit, threshold);
+        } else {
+            MessageOutput.printf("powercontrol PowercontrolAlgo: setting limit to %f\n", newLimit);
+            powercontrol.limit = newLimit;
+            return true;
+        }
+        return false;
+    }
+};
+
 class PowercontrolPlugin : public Plugin {
     enum pluginIds { INVERTER,
         INVERTERSTRING,
@@ -22,8 +70,6 @@ class PowercontrolPlugin : public Plugin {
 public:
     PowercontrolPlugin()
         : Plugin(3, "powercontrol")
-        , powercontrollers([](powercontrolstruct& pc) { return pc.inverterSerialString.isEmpty(); })
-
     {
     }
 
@@ -34,27 +80,18 @@ public:
             if (powercontrollers[i].update) {
                 enqueueMessage((char*)"updateLimit", (char*)"true", true);
                 powercontrollers[i].update = false;
-                calcLimit(powercontrollers[i]);
+                if (calcLimit(powercontrollers[i])) {
+                    publishLimit(powercontrollers[i]);
+                }
             }
         }
     }
-    void calcLimit(powercontrolstruct& powercontrol)
-    {
-        MessageOutput.printf("powercontrol calcLimit: consumption=%f production=%f limit=%f\n", powercontrol.consumption, powercontrol.production, powercontrol.limit);
-        // TODO: do some magic calculation here
-        // :/
-        // float newlimit = magicFunction(powercontrol.production,powercontrol.consumption);
 
-        float newLimit = powercontrol.consumption;
-        float threshold = std::abs(powercontrol.limit - newLimit);
-        if (threshold <= powercontrol.threshold) {
-            MessageOutput.printf("powercontrol newlimit(%f) within threshold(%f) -> no limit change\n", newLimit, threshold);
-        } else {
-            MessageOutput.printf("powercontrol setting limit to %f\n", newLimit);
-            powercontrol.limit = newLimit;
-            publishLimit(powercontrol);
-        }
+    bool calcLimit(powercontrolstruct& powercontrol)
+    {
+        return algo->calcLimit(powercontrol); 
     }
+
     void publishLimit(powercontrolstruct& pc)
     {
         PluginMessage m(*this);
@@ -73,7 +110,7 @@ public:
         // DBGPRINTMESSAGELN(DBG_INFO,"powercontroller",message);
         if (message->has(PluginIds::PluginMeter, PluginMeterIds::METER_POWER)) {
             String meterserial = message->getDataAs<StringValue>(PluginMeterIds::METER_SERIAL).value;
-            powercontrolstruct* powercontrol = powercontrollers.getByKey([&meterserial](powercontrolstruct& pc) { return pc.meterSerial.equals(meterserial); });
+            powercontrolstruct* powercontrol = powercontrollers.getMeterByStringSerial(meterserial);
             if (powercontrol) {
                 powercontrol->consumption = message->getDataAs<FloatValue>(PluginMeterIds::METER_POWER).value;
                 powercontrol->update = true;
@@ -83,7 +120,7 @@ public:
             }
         } else if (message->has(PluginIds::PluginInverter, PluginInverterIds::ACPOWER_PRODUCTION)) {
             String inverterSerial = message->getDataAs<StringValue>(PluginInverterIds::ACPOWER_INVERTERSTRING).value;
-            powercontrolstruct* powercontrol = powercontrollers.getByKey([&inverterSerial](powercontrolstruct& pc) { return inverterSerial.equals(pc.inverterSerialString); });
+            powercontrolstruct* powercontrol = powercontrollers.getInverterByStringSerial(inverterSerial);
             if (powercontrol) {
                 powercontrol->production = message->getDataAs<FloatValue>(PluginInverterIds::ACPOWER_PRODUCTION).value;
                 powercontrol->update = true;
@@ -131,7 +168,9 @@ private:
     String meter_serial;
     uint32_t threshold;
     // powercontrolstruct powercontrol;
-    structarray<powercontrolstruct, MAX_NUM_INVERTERS> powercontrollers;
+    powercontrollerarray<MAX_NUM_INVERTERS> powercontrollers;
+    DefaultPowercontrolAlgo defaultAlgo = DefaultPowercontrolAlgo();
+    PowercontrolAlgo* algo = &defaultAlgo;
 };
 
 #endif /*__POWERCONTROLPLUGIN_H__*/

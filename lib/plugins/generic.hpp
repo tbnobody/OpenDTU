@@ -1,54 +1,78 @@
 #ifndef __GENERIC_HPP__
 #define __GENERIC_HPP__
 
-#include <stdio.h>
+#include <functional>
 #include <iostream>
-#include <vector>
 #include <memory>
+#include <stdio.h>
 #include <string>
 #include <unordered_map>
-#include <functional>
+#include <vector>
 
-template<typename T>
+template <typename T>
 struct EntityIds;
 
-class Entity
-{
+class Entity {
 public:
-    Entity(int tpid)  : type_id(tpid), _id(-1) {}
-    Entity(int tpid, int id) : type_id(tpid), _id(id) {}
-    virtual ~Entity() {}
+    Entity(int tpid)
+        : type_id(tpid)
+        , _id(-1)
+    {
+    }
+    Entity(int tpid, int id)
+        : type_id(tpid)
+        , _id(id)
+    {
+    }
+    virtual ~Entity() { }
     virtual int getId() { return _id; }
     int type_id;
     int _id;
 };
 
 template <typename T, unsigned int tpid>
-class Data : public Entity
-{
+class Data : public Entity {
 public:
-    Data(T &v) : Entity(tpid) , value(v) {}
-    Data(T &&v) : Entity(tpid) , value(std::move(v)) {}
-    Data(int id, T &v) : Entity(tpid,id) , value(v) {}
-    Data(int id, T &&v) : Entity(tpid,id) , value(std::move(v)) {}
-    Data(const int id, const T &v) : Entity(tpid,id) , value(v) {}
+    Data(T& v)
+        : Entity(tpid)
+        , value(v)
+    {
+    }
+    Data(T&& v)
+        : Entity(tpid)
+        , value(std::move(v))
+    {
+    }
+    Data(int id, T& v)
+        : Entity(tpid, id)
+        , value(v)
+    {
+    }
+    Data(int id, T&& v)
+        : Entity(tpid, id)
+        , value(std::move(v))
+    {
+    }
+    Data(const int id, const T& v)
+        : Entity(tpid, id)
+        , value(v)
+    {
+    }
     T value;
 };
 
 template <typename BASE>
-class ContainerVector 
-{
+class ContainerVector {
 
 public:
- 
     template <class U>
-    void add(U &&v)
+    void add(U&& v)
     {
         entities.push_back(std::make_shared<U>((v)));
     }
 
     template <typename T>
-    void add(T &v)
+    void add(T& v)
     {
         entities.push_back(std::make_shared<T>((v)));
     }
@@ -71,41 +95,40 @@ public:
         return (EntityIds<U>::type_id == entities[index].get()->type_id);
     }
 
-    BASE &get(int index)
+    BASE& get(int index)
     {
         auto v = (entities[index]);
         return *v.get();
     }
 
     template <typename U>
-    U &getAs(int index)
+    U& getAs(int index)
     {
         auto v = std::static_pointer_cast<U>(entities[index]);
         return *v.get();
     }
 
-    size_t getEntryCount() {
+    size_t getEntryCount()
+    {
         return entities.size();
     }
-    
+
     std::vector<std::shared_ptr<BASE>> entities;
 };
 
 template <typename KEY, typename BASE>
-class ContainerMap 
-{
+class ContainerMap {
 public:
- 
     template <class U>
-    void add(KEY &&key, U &&v)
+    void add(KEY&& key, U&& v)
     {
-        map.insert({key,std::make_shared<U>((v))});
+        map.insert({ key, std::make_shared<U>((v)) });
     }
 
     template <typename T>
-    void add(KEY &key, T &v)
+    void add(KEY& key, T& v)
     {
-        map.insert({key,std::make_shared<T>((v))});
+        map.insert({ key, std::make_shared<T>((v)) });
     }
 
     template <typename T>
@@ -120,13 +143,14 @@ public:
     }
 
     template <typename U>
-    U &getValueAs(KEY key)
+    U& getValueAs(KEY key)
     {
         auto v = std::static_pointer_cast<U>(map[key]);
         return *v.get();
     }
 
-    std::vector<KEY> getKeys() {
+    std::vector<KEY> getKeys()
+    {
         std::vector<KEY> keys;
         for (auto it = map.begin(); it != map.end(); it++) {
             keys.push_back(it->first);
@@ -135,8 +159,8 @@ public:
     }
 
     size_t getSize() { return map.size(); }
-    
-    std::unordered_map<KEY,std::shared_ptr<BASE>> map;
+
+    std::unordered_map<KEY, std::shared_ptr<BASE>> map;
 };
 
 template <typename T, std::size_t S>
@@ -144,11 +168,10 @@ class structarray {
     typedef std::function<bool(T&)> keyfunction;
 
 public:
-    structarray(structarray::keyfunction const& emptyFunc)
+    structarray()
     {
         T def;
         content.fill(def);
-        emptyIndexFunction = emptyFunc;
     }
     T* getByIndex(uint8_t index)
     {
@@ -156,17 +179,6 @@ public:
             return &content[index];
         else
             return nullptr;
-    }
-
-    T* getEmptyIndex()
-    {
-        if (emptyIndexFunction == nullptr)
-            return nullptr;
-        for (int i = 0; i < content.size(); i++) {
-            if (emptyIndexFunction(content[i]))
-                return &content[i];
-        }
-        return nullptr;
     }
 
     T* getByKey(keyfunction kf)
@@ -188,9 +200,7 @@ public:
     }
 
 private:
-    keyfunction emptyIndexFunction = nullptr;
     std::array<T, S> content;
 };
-
 
 #endif // __GENERIC_HPP_

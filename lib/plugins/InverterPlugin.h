@@ -17,6 +17,21 @@ typedef struct {
     bool updateLimit = false;
 } inverterstruct;
 
+template <std::size_t N>
+class inverterarray : public structarray<inverterstruct, N> {
+    public:
+    inverterarray() : structarray<inverterstruct, N>() {}
+    inverterstruct* getInverterByStringSerial(String& serial) {
+        return structarray<inverterstruct, N>::getByKey([&serial](inverterstruct& m){return serial.equals(m.serialString);});
+    }
+    inverterstruct* getInverterByLongSerial(uint64_t serial) {
+        return structarray<inverterstruct, N>::getByKey([&serial](inverterstruct& m){return (serial==m.serial);});
+    }
+    inverterstruct* getEmptyIndex() {
+        return structarray<inverterstruct, N>::getByKey([](inverterstruct& s){return s.serialString.isEmpty();});
+    }
+};
+
 class InverterPlugin : public Plugin {
     enum pluginIds { ACPOWER_INVERTER,
         ACPOWER_INVERTERSTRING,
@@ -27,14 +42,12 @@ public:
     InverterPlugin()
         : Plugin(1, "inverter")
     {
-        inverterstruct def;
-        inverters.fill(def);
     }
 
     void setup() { }
     void loop()
     {
-        for (int i = 0; i < MAX_NUM_INVERTERS; i++) {
+        for (int i = 0; i < inverters.size(); i++) {
             if (inverters[i].updateInverter) {
                 inverters[i].updateInverter = false;
                 publishAC(inverters[i]);
@@ -46,54 +59,34 @@ public:
         }
     }
 
-    uint8_t getIndexBySerial(uint64_t serial)
+    inverterstruct* addInverter(uint64_t serial, const String& serialString)
     {
-        for (int i = 0; i < MAX_NUM_INVERTERS; i++) {
-            if (inverters[i].serial == serial) {
-                return i;
-            }
+        inverterstruct* inverter = inverters.getEmptyIndex();
+        if (inverter != nullptr) {
+            inverter->serial = serial;
+            inverter->serialString = serialString;
         }
-        return MAX_NUM_INVERTERS;
-    }
-
-    uint8_t getIndexBySerialString(String& serial)
-    {
-        for (int i = 0; i < MAX_NUM_INVERTERS; i++) {
-            if (serial.equals(inverters[i].serialString)) {
-                return i;
-            }
-        }
-        return MAX_NUM_INVERTERS;
-    }
-
-    uint8_t addInverter(uint64_t serial, const String& serialString)
-    {
-        for (int i = 0; i < MAX_NUM_INVERTERS; i++) {
-            if (inverters[i].serial == 0) {
-                inverters[i].serial = serial;
-                inverters[i].serialString = serialString;
-                return i;
-            }
-        }
-        return MAX_NUM_INVERTERS;
+        return inverter;
     }
 
     void onTickerSetup()
     {
     }
-    void setInverterLimit(uint8_t idx, float limit) {
-        if(limit==-1) {
-            MessageOutput.printf("inverterplugin: inverter[%d] limit -1 ignored\n",idx);
+    void setInverterLimit(inverterstruct* inverter, float limit)
+    {
+        if (limit == -1) {
+            MessageOutput.printf("inverterplugin: inverter[%s] limit -1 ignored\n", inverter->serialString.c_str());
             return;
         }
-        inverters[idx].newlimit = limit;
-        inverters[idx].updateLimit = true;
+        inverter->newlimit = limit;
+        inverter->updateLimit = true;
     }
-    void setInverterPower(uint8_t idx, float power) {
-        inverters[idx].actpower = power;
-        inverters[idx].updateInverter = true;
+    void setInverterPower(inverterstruct* inverter, float power)
+    {
+        inverter->actpower = power;
+        inverter->updateInverter = true;
     }
-    void setLimit(inverterstruct inverter)
+    void setLimit(inverterstruct& inverter)
     {
         auto inv = Hoymiles.getInverterBySerial(inverter.serial);
         if (inv != nullptr) {
@@ -105,13 +98,13 @@ public:
         }
     }
 
-    void calcLimit(inverterstruct inverter)
+    void calcLimit(inverterstruct& inverter)
     {
         MessageOutput.printf("inverterplugin: calcLimit[%s]\n", inverter.serialString.c_str());
         setLimit(inverter);
     }
 
-    void publishAC(inverterstruct inverter)
+    void publishAC(inverterstruct& inverter)
     {
         MessageOutput.printf("inverterplugin: publishAC[%s]: %f\n", inverter.serialString.c_str(), inverter.actpower);
         PluginMessage m(*this);
@@ -124,16 +117,16 @@ public:
     {
         if (message->fieldId == FieldId_t::FLD_PAC && message->channelNumber == ChannelNum_t::CH0) {
             MessageOutput.printf("inverterplugin: new ac power: %f\n", message->value);
-            uint8_t index = getIndexBySerial(message->inverterSerial);
-            if (index == MAX_NUM_INVERTERS) {
+            inverterstruct* index = inverters.getInverterByLongSerial(message->inverterSerial);
+            if (index == nullptr) {
                 index = addInverter(message->inverterSerial, message->inverterStringSerial);
             }
-            if (index == MAX_NUM_INVERTERS) {
+            if (index == nullptr) {
                 MessageOutput.printf("InverterPlugin: warning! no inverter with serial %s found\n", message->inverterStringSerial.c_str());
                 return;
             }
             MessageOutput.printf("inverterplugin: update inverter.acpower[%s]: %f\n", message->inverterStringSerial.c_str(), message->value);
-            setInverterPower(index,message->value);
+            setInverterPower(index, message->value);
         }
     }
     void internalDataCallback(PluginMessage* message)
@@ -144,17 +137,17 @@ public:
                 limit = message->getDataAs<FloatValue>(PluginPowercontrolIds::POWERLIMIT).value;
             if (message->hasDataId(PluginPowercontrolIds::INVERTERSTRING)) {
                 String sserial = message->getDataAs<StringValue>(PluginPowercontrolIds::INVERTERSTRING).value;
-                uint8_t idx = getIndexBySerialString(sserial);
-                if (idx != MAX_NUM_INVERTERS) {
+                inverterstruct*  inverter = inverters.getInverterByStringSerial(sserial);
+                if (inverter != nullptr) {
                     MessageOutput.printf("InverterPlugin: PluginPowercontrol: found inverter with serialString %s\n", sserial.c_str());
-                    setInverterLimit(idx,limit);
+                    setInverterLimit(inverter, limit);
                 }
             } else if (message->hasDataId(PluginPowercontrolIds::INVERTER)) {
                 uint64_t serial = message->getDataAs<LongValue>(PluginPowercontrolIds::INVERTER).value;
-                uint8_t idx = getIndexBySerial(serial);
-                if (idx != MAX_NUM_INVERTERS) {
+                inverterstruct*  inverter = inverters.getInverterByLongSerial(serial);
+                if (inverter != nullptr) {
                     MessageOutput.printf("InverterPlugin: PluginPowercontrol: found inverter with serial %llu\n", serial);
-                    setInverterLimit(idx,limit);
+                    setInverterLimit(inverter, limit);
                 }
             } else {
                 MessageOutput.println("InverterPlugin: PluginPowercontrol: no inverter info found in message");
@@ -163,7 +156,7 @@ public:
     }
 
 private:
-    std::array<inverterstruct, MAX_NUM_INVERTERS> inverters;
+    inverterarray<MAX_NUM_INVERTERS> inverters;
 };
 
 #endif /*__INVERTERPLUGIN_H__*/

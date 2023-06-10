@@ -121,7 +121,6 @@ class System
 {
 public:
     virtual void subscribeMqtt(Plugin *plugin, char *topic, bool append) = 0;
-    virtual void ctrlRequest(Plugin *plugin,JsonObject request) = 0;
     virtual bool enqueueMessage(Plugin *sender, char *topic, char *data, bool append) = 0;
     virtual void publishMessage(Plugin *sender, PluginMessage& message) = 0;
     virtual void addTimerCb(Plugin *plugin, const char* timername, PLUGIN_TIMER_INTVAL intval, uint32_t interval, std::function<void(void)> timerCb) = 0;
@@ -250,18 +249,6 @@ public:
         if (system)
         {
             system->subscribeMqtt(this, topic, append);
-        }
-    }
-    /**
-     * @brief send control request 
-     * 
-     * @param request - json request see RestApi.h setCtrl() for content details
-     */
-    void sendCtrlRequest(JsonObject request)
-    {
-        if (system)
-        {
-            system->ctrlRequest(this, request);
         }
     }
     /**
