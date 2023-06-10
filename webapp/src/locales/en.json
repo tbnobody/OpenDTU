@@ -5,6 +5,7 @@
         "NetworkSettings": "Network Settings",
         "NTPSettings": "NTP Settings",
         "MQTTSettings": "MQTT Settings",
+        "PluginSettings": "Plugins",
         "InverterSettings": "Inverter Settings",
         "SecuritySettings": "Security Settings",
         "DTUSettings": "DTU Settings",
@@ -388,6 +389,17 @@
         "DefaultGateway": "Default Gateway:",
         "Dns": "DNS Server {num}:",
         "Save": "@:dtuadmin.Save"
+    },    
+    "pluginadmin": {
+        "Plugin": "Plugin",
+        "PluginList": "Available Plugins",
+        "PluginSettings": "Plugin-Settings",
+        "Status": "Active",
+        "Action": "Action",
+        "EditPlugin": "Edit",
+        "Name": "Plugin",
+        "Save": "@:dtuadmin.Save",
+        "Cancel": "@:maintenancereboot.Cancel"
     },
     "mqttadmin": {
         "MqttSettings": "MQTT Settings",

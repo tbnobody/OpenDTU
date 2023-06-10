@@ -48,6 +48,8 @@ public:
 
     void setEnableCommands(bool enabled);
     bool getEnableCommands();
+    bool isDebugEnabled() { return _debug;}
+    void setDebugEnabled(bool d) { _debug = d;}
 
     void clearRxFragmentBuffer();
     void addRxFragment(uint8_t fragment[], uint8_t len);
@@ -86,6 +88,7 @@ private:
 
     bool _enablePolling = true;
     bool _enableCommands = true;
+    bool _debug = false;
 
     std::unique_ptr<AlarmLogParser> _alarmLogParser;
     std::unique_ptr<DevInfoParser> _devInfoParser;

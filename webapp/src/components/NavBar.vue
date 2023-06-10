@@ -52,6 +52,9 @@
                                 <router-link @click="onClick" class="dropdown-item" to="/settings/device">{{ $t('menu.DeviceManager') }}</router-link>
                             </li>
                             <li>
+                                <router-link @click="onClick" class="dropdown-item" to="/settings/plugin">{{ $t('menu.PluginSettings') }}</router-link>
+                            </li>
+                            <li>
                                 <hr class="dropdown-divider" />
                             </li>
                             <li>

@@ -33,6 +33,7 @@ void WebApiClass::init()
     _webApiPrometheus.init(&_server);
     _webApiSecurity.init(&_server);
     _webApiSysstatus.init(&_server);
+    _webApiPlugins.init(&_server);
     _webApiWebapp.init(&_server);
     _webApiWsConsole.init(&_server);
     _webApiWsLive.init(&_server);
@@ -57,6 +58,7 @@ void WebApiClass::loop()
     _webApiPower.loop();
     _webApiSecurity.loop();
     _webApiSysstatus.loop();
+    _webApiPlugins.loop();
     _webApiWebapp.loop();
     _webApiWsConsole.loop();
     _webApiWsLive.loop();

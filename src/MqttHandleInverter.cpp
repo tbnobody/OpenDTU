@@ -6,6 +6,7 @@
 #include "MessageOutput.h"
 #include "MqttSettings.h"
 #include <ctime>
+#include "Plugins.h"
 
 #define TOPIC_SUB_LIMIT_PERSISTENT_RELATIVE "limit_persistent_relative"
 #define TOPIC_SUB_LIMIT_PERSISTENT_ABSOLUTE "limit_persistent_absolute"
@@ -121,6 +122,7 @@ void MqttHandleInverterClass::loop()
 
 void MqttHandleInverterClass::publishField(std::shared_ptr<InverterAbstract> inv, ChannelType_t type, ChannelNum_t channel, FieldId_t fieldId)
 {
+
     String topic = getTopic(inv, type, channel, fieldId);
     if (topic == "") {
         return;
@@ -132,6 +134,7 @@ void MqttHandleInverterClass::publishField(std::shared_ptr<InverterAbstract> inv
     value.trim();
 
     MqttSettings.publish(topic, value);
+
 }
 
 String MqttHandleInverterClass::getTopic(std::shared_ptr<InverterAbstract> inv, ChannelType_t type, ChannelNum_t channel, FieldId_t fieldId)

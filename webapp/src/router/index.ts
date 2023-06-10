@@ -16,6 +16,7 @@ import NtpAdminView from '@/views/NtpAdminView.vue';
 import NtpInfoView from '@/views/NtpInfoView.vue';
 import SecurityAdminView from '@/views/SecurityAdminView.vue';
 import SystemInfoView from '@/views/SystemInfoView.vue';
+import PluginAdminView from '@/views/PluginAdminView.vue';
 import { createRouter, createWebHistory } from 'vue-router';
 
 const router = createRouter({
@@ -111,7 +112,12 @@ const router = createRouter({
         path: '/maintenance/reboot',
         name: 'Device Reboot',
         component: MaintenanceRebootView
-    }
+    },
+    {
+        path: '/settings/plugin',
+        name: 'Plugin',
+        component: PluginAdminView
+    },
 ]
 });
 

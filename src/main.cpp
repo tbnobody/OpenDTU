@@ -17,6 +17,7 @@
 #include "NtpSettings.h"
 #include "PinMapping.h"
 #include "SunPosition.h"
+#include "Plugins.h"
 #include "Utils.h"
 #include "WebApi.h"
 #include "defaults.h"
@@ -145,6 +146,8 @@ void setup()
     InverterSettings.init();
 
     Datastore.init();
+
+    Plugins.init();
 }
 
 void loop()
@@ -168,6 +171,8 @@ void loop()
     Display.loop();
     yield();
     SunPosition.loop();
+    yield();
+    Plugins.loop();
     yield();
     MessageOutput.loop();
     yield();

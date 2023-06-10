@@ -186,6 +186,7 @@ uint8_t InverterAbstract::verifyAllFragments(CommandAbstract* cmd)
 {
     // All missing
     if (_rxFragmentLastPacketId == 0) {
+        if(_debug)
         Hoymiles.getMessageOutput()->println("All missing");
         if (cmd->getSendCount() <= cmd->getMaxResendCount()) {
             return FRAGMENT_ALL_MISSING_RESEND;
@@ -197,6 +198,7 @@ uint8_t InverterAbstract::verifyAllFragments(CommandAbstract* cmd)
 
     // Last fragment is missing (the one with 0x80)
     if (_rxFragmentMaxPacketId == 0) {
+        if(_debug)
         Hoymiles.getMessageOutput()->println("Last missing");
         if (_rxFragmentRetransmitCnt++ < cmd->getMaxRetransmitCount()) {
             return _rxFragmentLastPacketId + 1;
@@ -209,6 +211,7 @@ uint8_t InverterAbstract::verifyAllFragments(CommandAbstract* cmd)
     // Middle fragment is missing
     for (uint8_t i = 0; i < _rxFragmentMaxPacketId - 1; i++) {
         if (!_rxFragmentBuffer[i].wasReceived) {
+            if(_debug)
             Hoymiles.getMessageOutput()->println("Middle missing");
             if (_rxFragmentRetransmitCnt++ < cmd->getMaxRetransmitCount()) {
                 return i + 1;

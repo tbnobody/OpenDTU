@@ -20,6 +20,7 @@
 #include "WebApi_webapp.h"
 #include "WebApi_ws_console.h"
 #include "WebApi_ws_live.h"
+#include "WebApi_plugins.h"
 #include <ESPAsyncWebServer.h>
 
 class WebApiClass {
@@ -53,6 +54,7 @@ private:
     WebApiPrometheusClass _webApiPrometheus;
     WebApiSecurityClass _webApiSecurity;
     WebApiSysstatusClass _webApiSysstatus;
+    WebApiPluginsClass _webApiPlugins;
     WebApiWebappClass _webApiWebapp;
     WebApiWsConsoleClass _webApiWsConsole;
     WebApiWsLiveClass _webApiWsLive;

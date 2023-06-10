@@ -19,6 +19,8 @@
 #define SPI_NRF VSPI
 #endif
 
+#define DEBUG 0
+
 InverterSettingsClass InverterSettings;
 
 void InverterSettingsClass::init()
