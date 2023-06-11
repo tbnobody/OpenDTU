@@ -74,6 +74,9 @@ public:
 
     void loopInverters()
     {
+        // copied from WebApi_prometheus.cpp
+        // TODO: polling is bad. 
+        // notify on update would be fine!
         for (uint8_t i = 0; i < Hoymiles.getNumInverters(); i++) {
             auto inv = Hoymiles.getInverterByPos(i);
             MessageOutput.printf("inverterplugin: loopInverters inv[%d] lastupdate=%d\n", i, inv->Statistics()->getLastUpdate());
@@ -102,6 +105,10 @@ public:
 
     void publishField(std::shared_ptr<InverterAbstract> inv, ChannelType_t& type, ChannelNum_t& channel, FieldId_t fieldId)
     {
+        // hack !!!!!
+        if(fieldId != FieldId_t::FLD_PAC) {
+            return;
+        }
         if (inv->Statistics()->hasChannelFieldValue(type, channel, fieldId)) {
             String value = String(
                 inv->Statistics()->getChannelFieldValue(type, channel, fieldId),
