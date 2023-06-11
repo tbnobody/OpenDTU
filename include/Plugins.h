@@ -23,8 +23,6 @@ public:
     int getPluginCount();
 
 private:
-    void loopInverters();
-    void publishField(std::shared_ptr<InverterAbstract> inv, ChannelType_t& type, ChannelNum_t& channel, FieldId_t fieldId);
     void addPlugin(Plugin* p);
     void publishToReceiver(PluginMessage* mes);
     void publishToAll(PluginMessage* message);

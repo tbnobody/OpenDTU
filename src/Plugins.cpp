@@ -3,7 +3,6 @@
 #include "MessageOutput.h"
 #include "MqttSettings.h"
 #include "string.h"
-#include <Hoymiles.h>
 
 #include "InverterPlugin.h"
 #include "MeterPlugin.h"
@@ -67,10 +66,6 @@ void PluginsClass::loop()
             }
         }
     }
-    EVERY_N_SECONDS(5)
-    {
-        loopInverters();
-    }
     publishInternal();
     for (unsigned int i = 0; i < plugins.size(); i++) {
         if (plugins[i]->isEnabled()) {
@@ -78,55 +73,6 @@ void PluginsClass::loop()
         }
     }
     publish();
-}
-
-void PluginsClass::loopInverters()
-{
-    for (uint8_t i = 0; i < Hoymiles.getNumInverters(); i++) {
-        auto inv = Hoymiles.getInverterByPos(i);
-        MessageOutput.printf("PluginsClass::loopInverters inv[%d] lastupdate=%d\n", i,inv->Statistics()->getLastUpdate());
-        if (inv->Statistics()->getLastUpdate() > 0) {
-            for (auto& t : inv->Statistics()->getChannelTypes()) {
-                for (auto& c : inv->Statistics()->getChannelsByType(t)) {
-                    publishField(inv, t, c, FLD_PAC);
-                    publishField(inv, t, c, FLD_UAC);
-                    publishField(inv, t, c, FLD_IAC);
-                    publishField(inv, t, c, FLD_PDC);
-                    publishField(inv, t, c, FLD_UDC);
-                    publishField(inv, t, c, FLD_IDC);
-                    publishField(inv, t, c, FLD_YD);
-                    publishField(inv, t, c, FLD_YT);
-                    publishField(inv, t, c, FLD_F);
-                    publishField(inv, t, c, FLD_T);
-                    publishField(inv, t, c, FLD_PF);
-                    publishField(inv, t, c, FLD_Q);
-                    publishField(inv, t, c, FLD_EFF);
-                    publishField(inv, t, c, FLD_IRR);
-                }
-            }
-        }
-    }
-}
-
-void PluginsClass::publishField(std::shared_ptr<InverterAbstract> inv, ChannelType_t& type, ChannelNum_t& channel, FieldId_t fieldId)
-{
-    if (inv->Statistics()->hasChannelFieldValue(type, channel, fieldId)) {
-        String value = String(
-            inv->Statistics()->getChannelFieldValue(type, channel, fieldId),
-            static_cast<unsigned int>(inv->Statistics()->getChannelFieldDigits(type, channel, fieldId)));
-        value.trim();
-        InverterMessage message;
-        message.inverterSerial = inv.get()->serial();
-        message.inverterStringSerial = inv.get()->serialString();
-        message.fieldId = fieldId;
-        message.channelType = type;
-        message.channelNumber = channel;
-        message.value = value.toFloat();
-        for (unsigned int i = 0; i < plugins.size(); i++) {
-            if (plugins[i]->isEnabled())
-                plugins[i]->inverterCallback(&message);
-        }
-    }
 }
 
 void PluginsClass::subscribeMqtt(Plugin* plugin, char* topic, bool append)
