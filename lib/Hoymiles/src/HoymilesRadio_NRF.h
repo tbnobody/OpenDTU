@@ -2,7 +2,6 @@
 #pragma once
 
 #include "HoymilesRadio.h"
-#include "TimeoutHelper.h"
 #include "commands/CommandAbstract.h"
 #include <RF24.h>
 #include <memory>
@@ -44,5 +43,4 @@ private:
     volatile bool _packetReceived = false;
 
     std::queue<fragment_t> _rxBuffer;
-    TimeoutHelper _rxTimeout;
 };
