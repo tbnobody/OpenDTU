@@ -14,34 +14,43 @@ typedef struct {
     bool update = false;
 } powercontrolstruct;
 
-
 template <std::size_t N>
 class powercontrollerarray : public structarray<powercontrolstruct, N> {
-    public:
-    powercontrollerarray() : structarray<powercontrolstruct, N>() {}
-    powercontrolstruct* getInverterByStringSerial(String& serial) {
-        return structarray<powercontrolstruct, N>::getByKey([&serial](powercontrolstruct& pc){return serial.equals(pc.inverterSerialString);});
+public:
+    powercontrollerarray()
+        : structarray<powercontrolstruct, N>()
+    {
     }
-    powercontrolstruct* getInverterByLongSerial(uint64_t serial) {
-        return structarray<powercontrolstruct, N>::getByKey([&serial](powercontrolstruct& pc){return (serial==pc.inverterSerial);});
+    powercontrolstruct* getInverterByStringSerial(String& serial)
+    {
+        return structarray<powercontrolstruct, N>::getByKey([&serial](powercontrolstruct& pc) { return serial.equals(pc.inverterSerialString); });
     }
-    powercontrolstruct* getMeterByStringSerial(String& serial) {
-        return structarray<powercontrolstruct, N>::getByKey([&serial](powercontrolstruct& pc){return serial.equals(pc.meterSerial);});
+    powercontrolstruct* getInverterByLongSerial(uint64_t serial)
+    {
+        return structarray<powercontrolstruct, N>::getByKey([&serial](powercontrolstruct& pc) { return (serial == pc.inverterSerial); });
     }
-    powercontrolstruct* getEmptyIndex() {
-        return structarray<powercontrolstruct, N>::getByKey([](powercontrolstruct& s){return s.inverterSerialString.isEmpty();});
+    powercontrolstruct* getMeterByStringSerial(String& serial)
+    {
+        return structarray<powercontrolstruct, N>::getByKey([&serial](powercontrolstruct& pc) { return serial.equals(pc.meterSerial); });
+    }
+    powercontrolstruct* getEmptyIndex()
+    {
+        return structarray<powercontrolstruct, N>::getByKey([](powercontrolstruct& s) { return s.inverterSerialString.isEmpty(); });
     }
 };
 
 class PowercontrolAlgo {
 public:
-    PowercontrolAlgo(){}
+    PowercontrolAlgo() { }
     virtual bool calcLimit(powercontrolstruct& powercontrol) { return false; };
 };
 
 class DefaultPowercontrolAlgo : public PowercontrolAlgo {
 public:
-    DefaultPowercontrolAlgo() : PowercontrolAlgo() { }
+    DefaultPowercontrolAlgo()
+        : PowercontrolAlgo()
+    {
+    }
     bool calcLimit(powercontrolstruct& powercontrol)
     {
         MessageOutput.printf("powercontrol PowercontrolAlgo: consumption=%f production=%f limit=%f\n", powercontrol.consumption, powercontrol.production, powercontrol.limit);
@@ -78,7 +87,6 @@ public:
     {
         for (int i = 0; i < powercontrollers.size(); i++) {
             if (powercontrollers[i].update) {
-                enqueueMessage((char*)"updateLimit", (char*)"true", true);
                 powercontrollers[i].update = false;
                 if (calcLimit(powercontrollers[i])) {
                     publishLimit(powercontrollers[i]);
@@ -89,7 +97,7 @@ public:
 
     bool calcLimit(powercontrolstruct& powercontrol)
     {
-        return algo->calcLimit(powercontrol); 
+        return algo->calcLimit(powercontrol);
     }
 
     void publishLimit(powercontrolstruct& pc)
@@ -98,6 +106,11 @@ public:
         m.add(StringValue(INVERTERSTRING, pc.inverterSerialString));
         m.add(FloatValue(POWERLIMIT, pc.limit));
         publishMessage(m);
+        char topic[pc.inverterSerialString.length() + 7];
+        char payload[32];
+        snprintf(payload, sizeof(payload), "%f", pc.limit);
+        snprintf(topic, sizeof(payload), "%s/updateLimit", pc.inverterSerialString.c_str());
+        enqueueMessage(topic, payload, true);
     }
 
     void internalCallback(std::shared_ptr<PluginMessage> message)
