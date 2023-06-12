@@ -244,6 +244,7 @@ int32_t PowerLimiterClass::calcPowerLimit(std::shared_ptr<InverterAbstract> inve
 {
     CONFIG_T& config = Configuration.get();
     
+    int32_t acPower = 0;
     int32_t newPowerLimit = round(PowerMeter.getPowerTotal());
 
     if (!solarPowerEnabled && !batteryDischargeEnabled) {
@@ -256,8 +257,8 @@ int32_t PowerLimiterClass::calcPowerLimit(std::shared_ptr<InverterAbstract> inve
         // the produced power of this inverter has also to be taken into account.
         // We don't use FLD_PAC from the statistics, because that
         // data might be too old and unreliable.
-        float acPower = inverter->Statistics()->getChannelFieldValue(TYPE_AC, (ChannelNum_t) config.PowerLimiter_InverterChannelId, FLD_PAC); 
-        newPowerLimit += static_cast<int>(acPower);
+        acPower = static_cast<int>(inverter->Statistics()->getChannelFieldValue(TYPE_AC, (ChannelNum_t) config.PowerLimiter_InverterChannelId, FLD_PAC)); 
+        newPowerLimit += acPower;
     }
 
     // We're not trying to hit 0 exactly but take an offset into account
@@ -268,8 +269,8 @@ int32_t PowerLimiterClass::calcPowerLimit(std::shared_ptr<InverterAbstract> inve
     // Check if the new value is within the limits of the hysteresis and
     // if we can discharge the battery
     // If things did not change much we just use the old setting
-    if (newPowerLimit >= (-config.PowerLimiter_TargetPowerConsumptionHysteresis) &&
-        newPowerLimit <= (+config.PowerLimiter_TargetPowerConsumptionHysteresis) &&
+    if ((newPowerLimit - acPower) >= (-config.PowerLimiter_TargetPowerConsumptionHysteresis) &&
+        (newPowerLimit - acPower) <= (+config.PowerLimiter_TargetPowerConsumptionHysteresis) &&
         batteryDischargeEnabled ) {
             MessageOutput.println("[PowerLimiterClass::loop] reusing old limit");
             return _lastRequestedPowerLimit;
