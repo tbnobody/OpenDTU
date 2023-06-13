@@ -31,7 +31,7 @@ bool WebApiDatabaseClass::write(float energy)
 
     // LittleFS.remove(DATABASE_FILENAME);
 
-    //MessageOutput.println(energy, 6);
+    // MessageOutput.println(energy, 6);
 
     struct tm timeinfo;
     if (!getLocalTime(&timeinfo, 5)) {
@@ -72,7 +72,7 @@ bool WebApiDatabaseClass::write(float energy)
     }
     f.write((const uint8_t*)&d, sizeof(Data));
     f.close();
-    //MessageOutput.println("Write data point.");
+    // MessageOutput.println("Write data point.");
     return (true);
 }
 
@@ -82,34 +82,52 @@ void WebApiDatabaseClass::onDatabase(AsyncWebServerRequest* request)
         return;
     }
 
-    try {
-        File f = LittleFS.open(DATABASE_FILENAME, "r", false);
-        if (!f) {
-            MessageOutput.println("Failed to read database.");
-            request->send(400, "text/plain", "Failed to read database.");
-            return;
-        }
+    AsyncWebServerResponse* response = request->beginChunkedResponse("application/json",
+        [](uint8_t* buffer, size_t maxLen, size_t index) -> size_t {
+            static bool first = true;
+            static bool last = false;
+            static File f;
+            uint8_t* pr = buffer;
+            uint8_t* pre = pr + maxLen - 30;
+            size_t r;
+            struct Data d;
 
-        struct Data d;
+            if (first) {
+                f = LittleFS.open(DATABASE_FILENAME, "r", false);
+                if (!f) {
+                    return (0);
+                }
+                *pr++ = '[';
+            }
+            while(true) {
+                r = f.read((uint8_t*)&d, sizeof(Data)); // read from database
+                if (r <= 0) {
+                    if (last) {
+                        f.close();
+                        first = true;
+                        last = false;
+                        return (0); // end transmission
+                    }
+                    last = true;
+                    *pr++ = ']';
+                    return (pr - buffer); // last chunk
+                }
+                if (first) {
+                    first = false;
+                } else {
+                    *pr++ = ',';
+                }
+                int len = sprintf((char*)pr, "[%d,%d,%d,%d,%f]",
+                    d.tm_year, d.tm_mon, d.tm_mday, d.tm_hour, d.energy);
+                if (len >= 0) {
+                    pr += len;
+                }
+                if (pr >= pre)
+                    return (pr - buffer); // buffer full, return number of chars
+            }
+        });
 
-        AsyncJsonResponse* response = new AsyncJsonResponse(true, 40000U);
-        JsonArray root = response->getRoot();
-
-        while (f.read((uint8_t*)&d, sizeof(Data))) { // read from database
-            JsonArray nested = root.createNestedArray(); // create new nested array and copy data to array
-            nested.add(d.tm_year);
-            nested.add(d.tm_mon);
-            nested.add(d.tm_mday);
-            nested.add(d.tm_hour);
-            nested.add(d.energy);
-        }
-        f.close();
-        response->setLength();
-        request->send(response);
-    } catch (std::bad_alloc& bad_alloc) {
-        MessageOutput.printf("Call to /api/database temporarely out of resources. Reason: \"%s\".\r\n", bad_alloc.what());
-        WebApi.sendTooManyRequests(request);
-    }
+    request->send(response);
 }
 
 /*  JS
