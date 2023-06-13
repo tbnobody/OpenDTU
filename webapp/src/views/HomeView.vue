@@ -16,7 +16,7 @@
                     </button>
                 </div>
             </div>
-            <BarChart v-bind:dataBase="dataBase" dataLoading="dataLoading" />
+            <BarChart v-bind:dataBase="dataBase" />
             <CalendarChart v-bind:dataBase="dataBase" />
 
             <div class="tab-content" id="v-pills-tabContent" :class="{

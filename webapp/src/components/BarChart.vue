@@ -1,11 +1,9 @@
 <template>
     <div class="card" :class="{}">
-        <div v-if="dataBase.valid_data">
-            <div class="card-header">
-                {{ $t('chart.LastDay') }}
-            </div>
-            <GoogleChart />
+        <div class="card-header">
+            {{ $t('chart.LastDay') }}
         </div>
+        <GoogleChart />
     </div>
 </template>
 
@@ -20,9 +18,9 @@ export const type_col = 'ColumnChart';
 export const options_col = {
     height: 300,
     chartArea: {
-        top: 25, 
-        width: '85%', 
-        height: '80%' 
+        top: 25,
+        width: '85%',
+        height: '80%'
     },
     bar: {
         groupWidth: '100%'

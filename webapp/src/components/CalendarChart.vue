@@ -1,12 +1,8 @@
 <template>
     <div class="card" :class="{}">
-        <div v-if="dataBase.valid_data">
-            <div class="card-header">
-            </div>
-            <div>
-                <GoogleChart />
-            </div>
+        <div class="card-header">
         </div>
+        <GoogleChart />
     </div>
 </template>
 

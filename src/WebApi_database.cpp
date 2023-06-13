@@ -48,7 +48,7 @@ bool WebApiDatabaseClass::write(float energy)
         return (false);
     // MessageOutput.println("Energy difference > 0");
 
-    struct Data d;
+    struct pvData d;
     d.tm_hour = old_hour;
     old_hour = timeinfo.tm_hour;
     d.tm_year = timeinfo.tm_year - 100; // year counting from 2000
@@ -70,10 +70,65 @@ bool WebApiDatabaseClass::write(float energy)
         MessageOutput.println("Failed to append to database.");
         return (false);
     }
-    f.write((const uint8_t*)&d, sizeof(Data));
+    f.write((const uint8_t*)&d, sizeof(pvData));
     f.close();
     // MessageOutput.println("Write data point.");
     return (true);
+}
+
+// read chunk from database
+size_t WebApiDatabaseClass::readchunk(uint8_t* buffer, size_t maxLen, size_t index)
+{
+    static bool first = true;
+    static bool last = false;
+    static File f;
+    uint8_t* pr = buffer;
+    uint8_t* pre = pr + maxLen - 50;
+    size_t r;
+    struct pvData d;
+
+    if (first) {
+        f = LittleFS.open(DATABASE_FILENAME, "r", false);
+        if (!f) {
+            return (0);
+        }
+        *pr++ = '[';
+    }
+    while (true) {
+        r = f.read((uint8_t*)&d, sizeof(pvData)); // read from database
+        if (r <= 0) {
+            if (last) {
+                f.close();
+                first = true;
+                last = false;
+                return (0); // end transmission
+            }
+            last = true;
+            *pr++ = ']';
+            return (pr - buffer); // last chunk
+        }
+        if (first) {
+            first = false;
+        } else {
+            *pr++ = ',';
+        }
+        int len = sprintf((char*)pr, "[%d,%d,%d,%d,%f]",
+            d.tm_year, d.tm_mon, d.tm_mday, d.tm_hour, d.energy);
+        if (len >= 0) {
+            pr += len;
+        }
+        if (pr >= pre)
+            return (pr - buffer); // buffer full, return number of chars
+    }
+}
+
+size_t WebApiDatabaseClass::readchunk1(uint8_t* buffer, size_t maxLen, size_t index)
+{
+    size_t x = readchunk(buffer, maxLen, index);
+    MessageOutput.println("----------");
+    MessageOutput.println(maxLen);
+    MessageOutput.println(x);
+    return(x);
 }
 
 void WebApiDatabaseClass::onDatabase(AsyncWebServerRequest* request)
@@ -81,52 +136,7 @@ void WebApiDatabaseClass::onDatabase(AsyncWebServerRequest* request)
     if (!WebApi.checkCredentialsReadonly(request)) {
         return;
     }
-
-    AsyncWebServerResponse* response = request->beginChunkedResponse("application/json",
-        [](uint8_t* buffer, size_t maxLen, size_t index) -> size_t {
-            static bool first = true;
-            static bool last = false;
-            static File f;
-            uint8_t* pr = buffer;
-            uint8_t* pre = pr + maxLen - 30;
-            size_t r;
-            struct Data d;
-
-            if (first) {
-                f = LittleFS.open(DATABASE_FILENAME, "r", false);
-                if (!f) {
-                    return (0);
-                }
-                *pr++ = '[';
-            }
-            while(true) {
-                r = f.read((uint8_t*)&d, sizeof(Data)); // read from database
-                if (r <= 0) {
-                    if (last) {
-                        f.close();
-                        first = true;
-                        last = false;
-                        return (0); // end transmission
-                    }
-                    last = true;
-                    *pr++ = ']';
-                    return (pr - buffer); // last chunk
-                }
-                if (first) {
-                    first = false;
-                } else {
-                    *pr++ = ',';
-                }
-                int len = sprintf((char*)pr, "[%d,%d,%d,%d,%f]",
-                    d.tm_year, d.tm_mon, d.tm_mday, d.tm_hour, d.energy);
-                if (len >= 0) {
-                    pr += len;
-                }
-                if (pr >= pre)
-                    return (pr - buffer); // buffer full, return number of chars
-            }
-        });
-
+    AsyncWebServerResponse* response = request->beginChunkedResponse("application/json", readchunk);
     request->send(response);
 }
 
