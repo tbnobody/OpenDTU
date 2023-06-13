@@ -488,12 +488,12 @@ export default defineComponent({
                 .then((response) => handleResponse(response, this.$emitter, this.$router))
                 .then((data) => {
                     this.liveData = data;
+                    this.dataLoading = false;
                     fetch("/api/database", { headers: authHeader() })
                         .then((response) => handleResponse(response, this.$emitter, this.$router))
                         .then((data) => {
                             this.dataBase.values = data;
                             this.dataBase.valid_data = true;
-                            this.dataLoading = false;
                         });
                 });
         },
