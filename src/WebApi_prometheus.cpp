@@ -54,7 +54,7 @@ void WebApiPrometheusClass::onPrometheusMetricsGet(AsyncWebServerRequest* reques
         stream->printf("wifi_rssi %d\n", WiFi.RSSI());
 
         stream->print("# HELP wifi_station WiFi Station info\n");
-        stream->print("# TYPE wifi_station label\n");
+        stream->print("# TYPE wifi_station gauge\n");
         stream->printf("wifi_station{bssid=\"%s\"} 1\n", WiFi.BSSIDstr().c_str());
 
         for (uint8_t i = 0; i < Hoymiles.getNumInverters(); i++) {
