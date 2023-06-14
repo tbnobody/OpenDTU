@@ -96,6 +96,11 @@ void PowerMeterClass::onMqttMessage(const espMqttClientTypes::MessageProperties&
 
 float PowerMeterClass::getPowerTotal()
 {
+    CONFIG_T& config = Configuration.get();
+    if (!config.PowerMeter_Enabled
+            || (millis() - _lastPowerMeterUpdate) < (1000)) {
+        readPowerMeter();
+    }
     return _powerMeter1Power + _powerMeter2Power + _powerMeter3Power;
 }
 
@@ -137,6 +142,19 @@ void PowerMeterClass::loop()
         return;
     }
 
+    readPowerMeter();
+
+    MessageOutput.printf("PowerMeterClass: TotalPower: %5.2f\r\n", getPowerTotal());
+
+    mqtt();
+
+    _lastPowerMeterCheck = millis();
+}
+
+void PowerMeterClass::readPowerMeter()
+{
+    CONFIG_T& config = Configuration.get();
+    
     uint8_t _address = config.PowerMeter_SdmAddress;
 
     if (config.PowerMeter_Source == SOURCE_SDM1PH) {
@@ -169,12 +187,6 @@ void PowerMeterClass::loop()
             _lastPowerMeterUpdate = millis();
         }
     }
-
-    MessageOutput.printf("PowerMeterClass: TotalPower: %5.2f\r\n", getPowerTotal());
-
-    mqtt();
-
-    _lastPowerMeterCheck = millis();
 }
 
 bool PowerMeterClass::smlReadLoop()

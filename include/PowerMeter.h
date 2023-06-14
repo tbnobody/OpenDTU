@@ -60,6 +60,8 @@ private:
 
     bool mqttInitDone = false;
 
+    void readPowerMeter();
+
     bool smlReadLoop();
     const std::list<OBISHandler> smlHandlerList{
         {{0x01, 0x00, 0x10, 0x07, 0x00, 0xff}, &smlOBISW, &_powerMeter1Power},
