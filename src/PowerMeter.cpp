@@ -94,12 +94,14 @@ void PowerMeterClass::onMqttMessage(const espMqttClientTypes::MessageProperties&
     _lastPowerMeterUpdate = millis();
 }
 
-float PowerMeterClass::getPowerTotal()
+float PowerMeterClass::getPowerTotal(bool forceUpdate)
 {
-    CONFIG_T& config = Configuration.get();
-    if (config.PowerMeter_Enabled
-            && (millis() - _lastPowerMeterUpdate) < (1000)) {
-        readPowerMeter();
+    if (forceUpdate) {
+        CONFIG_T& config = Configuration.get();
+        if (config.PowerMeter_Enabled
+                && (millis() - _lastPowerMeterUpdate) > (1000)) {
+            readPowerMeter();
+        }
     }
     return _powerMeter1Power + _powerMeter2Power + _powerMeter3Power;
 }

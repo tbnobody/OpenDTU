@@ -202,7 +202,7 @@ void WebApiWsLiveClass::generateJsonResponse(JsonVariant& root)
 
     JsonObject powerMeterObj = root.createNestedObject("power_meter");
     powerMeterObj[F("enabled")] = Configuration.get().PowerMeter_Enabled;
-    addTotalField(powerMeterObj, "Power", PowerMeter.getPowerTotal(), "W", 1);
+    addTotalField(powerMeterObj, "Power", PowerMeter.getPowerTotal(false), "W", 1);
 
 }
 

@@ -40,7 +40,7 @@ public:
     void mqtt();
     void loop();
     void onMqttMessage(const espMqttClientTypes::MessageProperties& properties, const char* topic, const uint8_t* payload, size_t len, size_t index, size_t total);
-    float getPowerTotal();
+    float getPowerTotal(bool forceUpdate = true);
     uint32_t getLastPowerMeterUpdate();
 
 private:
