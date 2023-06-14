@@ -351,7 +351,7 @@ bool ConfigurationClass::read()
     config.PowerLimiter_Enabled = powerlimiter["enabled"] | POWERLIMITER_ENABLED;
     config.PowerLimiter_SolarPassThroughEnabled = powerlimiter["solar_passtrough_enabled"] | POWERLIMITER_SOLAR_PASSTROUGH_ENABLED;
     config.PowerLimiter_BatteryDrainStategy = powerlimiter["battery_drain_strategy"] | POWERLIMITER_BATTERY_DRAIN_STRATEGY;
-    config.PowerLimiter_Interval =  POWERLIMITER_INTERVAL;
+    config.PowerLimiter_Interval =  powerlimiter["interval"] | POWERLIMITER_INTERVAL;
     config.PowerLimiter_IsInverterBehindPowerMeter = powerlimiter["is_inverter_behind_powermeter"] | POWERLIMITER_IS_INVERTER_BEHIND_POWER_METER;
     config.PowerLimiter_InverterId = powerlimiter["inverter_id"] | POWERLIMITER_INVERTER_ID;
     config.PowerLimiter_InverterChannelId = powerlimiter["inverter_channel_id"] | POWERLIMITER_INVERTER_CHANNEL_ID;
