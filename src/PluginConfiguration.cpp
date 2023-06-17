@@ -41,8 +41,8 @@ void PluginConfigurationClass::debug() {
 }
 
 void PluginConfigurationClass::reset(Plugin* p) {
-    char path[strlen(p->name)+1];
-    sprintf(path,"/%s",p->name);
+    char path[32];
+    snprintf(path,sizeof(path),"/%s",p->name);
     LittleFS.remove(path);
 }
 bool PluginConfigurationClass::writeTo(JsonObject o, Plugin* p)
@@ -57,8 +57,8 @@ bool PluginConfigurationClass::write(Plugin* p)
     DynamicJsonDocument doc(PLUGIN_JSON_BUFFER_SIZE);
     JsonObject root = doc.createNestedObject(p->name);
     writeTo(root,p);
-    char path[strlen(p->name)+1];
-    sprintf(path,"/%s",p->name);
+    char path[32];
+    snprintf(path,sizeof(path),"/%s",p->name);
     File f = LittleFS.open(path, "w", true);
     if (!f) {
         return false;
@@ -82,8 +82,8 @@ bool PluginConfigurationClass::readFrom(JsonObject o, Plugin* p) {
 
 bool PluginConfigurationClass::read(Plugin* p)
 {
-    char path[strlen(p->name)+1];
-    sprintf(path,"/%s",p->name);
+    char path[32];
+    snprintf(path,sizeof(path),"/%s",p->name);
     File f = LittleFS.open(path, "r", false);
     DynamicJsonDocument doc(PLUGIN_JSON_BUFFER_SIZE);
     // Deserialize the JSON document
