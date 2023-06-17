@@ -179,7 +179,7 @@ public:
 private:
     String inverter_serial;
     String meter_serial;
-    uint32_t threshold;
+    uint32_t threshold = 20;
     // powercontrolstruct powercontrol;
     powercontrollerarray<MAX_NUM_INVERTERS> powercontrollers;
     DefaultPowercontrolAlgo defaultAlgo = DefaultPowercontrolAlgo();
