@@ -45,7 +45,7 @@
                             <label for="plugin-id" class="col-form-label">
                                 {{ $t('pluginadmin.Plugin') }}
                             </label>
-                            <p v-for="(value, propertyName)  in selectedPluginData">
+                            <p v-for="(value, propertyName) in selectedPluginData" :key="propertyName">
                             <!-- {{ propertyName }}:{{ value }}:{{ idx }} -->
                             <label class="col-sm-2 col-form-label">{{ propertyName }}: </label>
                             <span v-if="typeof(value)==='number'" >
@@ -79,26 +79,14 @@
 import BasePage from '@/components/BasePage.vue';
 import BootstrapAlert from "@/components/BootstrapAlert.vue";
 import CardElement from '@/components/CardElement.vue';
-import InputElement from '@/components/InputElement.vue';
 import Sortable from 'sortablejs';
 import { authHeader, handleResponse } from '@/utils/authentication';
 import * as bootstrap from 'bootstrap';
 
 import {
-    BIconInfoCircle,
-    BIconPencil,
-    BIconTrash,
-    BIconArrowDown,
-    BIconArrowUp,
-    BIconGripHorizontal,
+    BIconPencil
 } from 'bootstrap-icons-vue';
 import { defineComponent } from 'vue';
-
-declare interface OpenDTUPlugin {
-    name: string;
-    id: number;
-    enabled: boolean;
-}
 
 declare interface AlertResponse {
     message: string;
@@ -112,13 +100,7 @@ export default defineComponent({
         BasePage,
         BootstrapAlert,
         CardElement,
-        InputElement,
-        BIconInfoCircle,
         BIconPencil,
-        BIconTrash,
-        BIconArrowDown,
-        BIconArrowUp,
-        BIconGripHorizontal,
     },
     data() {
         return {
@@ -181,7 +163,7 @@ export default defineComponent({
         },
         onOpenModal(modal: bootstrap.Modal, pplugin: {}) {
             // deep copy object for editing/deleting
-            this.selectedPluginData = JSON.parse(JSON.stringify(pplugin));;
+            this.selectedPluginData = JSON.parse(JSON.stringify(pplugin));
             modal.show();
         },
         onCloseModal(modal: bootstrap.Modal) {
