@@ -59,6 +59,7 @@ public:
         if(debugPluginMessages) {
             DBGPRINTMESSAGELN(DBG_INFO,"demoplugin",message);
             DBGPRINTMESSAGETAGSLN(DBG_INFO,message);
+            DBGPRINTMESSAGERUNTIMELN(DBG_INFO,message);
         }
     }
 
