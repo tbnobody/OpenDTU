@@ -3,26 +3,53 @@
 
 #include "plugin.h"
 #include <map>
+#include <vector>
 
 #ifndef MAX_NUM_METER
 #define MAX_NUM_METER 5
 #endif
 
 typedef struct {
+    String& getSerial() {
+        return serial;
+    }
+    virtual void setSerial(String& _serial) {
+        serial = _serial;
+    }
+    virtual bool hasSerial(String& s) {
+        return serial.equals(s);
+    }
+    bool noSerial() {
+        return serial.isEmpty();
+    }
+    virtual float getPower() {
+        return power;
+    }
+    void setPower(float p) {
+        power = p;
+        update = true;
+    }
+    virtual bool isUpdated() {
+        return update;
+    }
+    void clearUpdated() {
+        update = false;
+    }
+    private:
     String serial;
     float power = 0;
     bool update = false;
-} meterstruct;
+} Meter;
 
 template <std::size_t N>
-class meterarray : public structarray<meterstruct, N> {
+class meterarray : public structarray<Meter, N> {
     public:
-    meterarray() : structarray<meterstruct, N>() {}
-    meterstruct* getMeterBySerial(String& serial) {
-        return structarray<meterstruct, N>::getByKey([&serial](meterstruct& m){return serial.equals(m.serial);});
+    meterarray() : structarray<Meter, N>() {}
+    Meter* getMeterBySerial(String& serial) {
+        return structarray<Meter, N>::getByKey([&serial](Meter& m){return m.hasSerial(serial);});
     }
-    meterstruct* getEmptyIndex() {
-        return structarray<meterstruct, N>::getByKey([](meterstruct& s){return s.serial.isEmpty();});
+    Meter* getEmptyIndex() {
+        return structarray<Meter, N>::getByKey([](Meter& s){return s.noSerial();});
     }
 };
 
@@ -41,19 +68,19 @@ public:
     void loop()
     {
         for (int i = 0; i < meters.size(); i++) {
-            if (meters[i].update) {
-                meters[i].update = false;
+            if (meters[i].isUpdated()) {
+                meters[i].clearUpdated();
                 publishAC(meters[i]);
             }
         }
     }
-    meterstruct* getIndex(String& serial)
+    Meter* getIndex(String& serial)
     {
-        meterstruct* ms = meters.getMeterBySerial(serial);
+        Meter* ms = meters.getMeterBySerial(serial);
         if(ms==nullptr) {
             ms = meters.getEmptyIndex();
             if(ms!=nullptr) {
-                ms->serial = serial;
+                ms->setSerial(serial);
             }
         }
         return ms;
@@ -61,13 +88,12 @@ public:
     void setMeterConsumption(String& serial, float consumption)
     {
         MessageOutput.printf("meterplugin: setMeterConsumption(%s,%f)\n", serial.c_str(),consumption);
-        meterstruct* ms = getIndex(serial);
+        Meter* ms = getIndex(serial);
         if (ms==nullptr) {
             MessageOutput.printf("meterplugin: meter[%s] not found!", serial.c_str());
             return;
         }
-        ms->power = consumption;
-        ms->update = true;
+        ms->setPower(consumption);
     }
     void mqttCallback(const MqttMessage* message)
     {
@@ -106,12 +132,12 @@ public:
         }
     }
 
-    void publishAC(meterstruct& meter)
+    void publishAC(Meter& meter)
     {
-        MessageOutput.printf("meterplugin: publishPower[%s]: %f W \n", meter.serial.c_str(), meter.power);
+        MessageOutput.printf("meterplugin: publishPower[%s]: %f W \n", meter.getSerial().c_str(), meter.getPower());
         PluginMessage m(*this);
-        m.add(FloatValue(METER_POWER, meter.power));
-        m.add(StringValue(METER_SERIAL, meter.serial));
+        m.add(FloatValue(METER_POWER, meter.getPower()));
+        m.add(StringValue(METER_SERIAL, meter.getSerial()));
         publishMessage(m);
     }
     void saveSettings(JsonObject settings)
