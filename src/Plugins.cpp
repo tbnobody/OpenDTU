@@ -28,11 +28,7 @@ void PluginsClass::init()
         if (strlen(plugins[i]->name) > maxnamelen) {
             maxnamelen = strlen(plugins[i]->name);
         }
-        if (plugins[i]->isEnabled()) {
-            plugins[i]->setup();
-            plugins[i]->onTickerSetup();
-            plugins[i]->onMqttSubscribe();
-        }
+        start(plugins[i]);
     }
     MessageOutput.println("PluginsClass::init");
 }
@@ -73,6 +69,14 @@ void PluginsClass::loop()
         }
     }
     publish();
+}
+
+void PluginsClass::start(Plugin* p) {
+    if (p->isEnabled()) {
+        p->setup();
+        p->onTickerSetup();
+        p->onMqttSubscribe();
+    }
 }
 
 void PluginsClass::subscribeMqtt(Plugin* plugin, char* topic, bool append)

@@ -21,7 +21,8 @@ public:
     Plugin* getPluginById(int pluginid);
     Plugin* getPluginByName(const char* pluginname);
     int getPluginCount();
-
+    void start(Plugin* p);
+    
 private:
     void addPlugin(Plugin* p);
     void publishToReceiver(PluginMessage* mes);
