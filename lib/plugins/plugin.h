@@ -55,7 +55,7 @@ struct EntityIds<PluginMessage>
 };
 
 //class Message;
-enum class METADATA_TAGS { EMPTY_TAG, SENDERID, RECEIVERID, TESTTAG};
+enum class METADATA_TAGS { EMPTY_TAG, SENDERID, RECEIVERID, MSGTS, TESTTAG};
 class MetaData : public ContainerMap<METADATA_TAGS,Entity> {
 
     public:
@@ -317,6 +317,7 @@ class PluginMessage :  public ContainerVector<Entity>, public Entity {
     PluginMessage(int senderid, int receiverid) : Entity(TYPEIDS::PLUGINMESSAGE_TYPE) {
         headers.setSenderId(senderid);
         headers.setReceiverId(receiverid);
+        headers.add(METADATA_TAGS::MSGTS,LongValue(0,millis()));
     }
     PluginMessage(const PluginMessage &v) = default;
     //PluginMessage(int senderid) : PluginMessage(senderid,0) { }
