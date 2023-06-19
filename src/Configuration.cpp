@@ -96,6 +96,7 @@ bool ConfigurationClass::write()
     display["screensaver"] = config.Display_ScreenSaver;
     display["rotation"] = config.Display_Rotation;
     display["contrast"] = config.Display_Contrast;
+    display["update"] = config.Display_UpdatePeriod;
     display["language"] = config.Display_Language;
 
     JsonArray inverters = doc.createNestedArray("inverters");
@@ -241,6 +242,7 @@ bool ConfigurationClass::read()
     config.Display_ScreenSaver = display["screensaver"] | DISPLAY_SCREENSAVER;
     config.Display_Rotation = display["rotation"] | DISPLAY_ROTATION;
     config.Display_Contrast = display["contrast"] | DISPLAY_CONTRAST;
+    config.Display_UpdatePeriod = display["update"] | DISPLAY_UPDATE;
     config.Display_Language = display["language"] | DISPLAY_LANGUAGE;
 
     JsonArray inverters = doc["inverters"];
@@ -300,7 +302,7 @@ void ConfigurationClass::migrate()
         config.Mqtt_PublishInterval = mqtt["publish_invterval"];
     }
 
-    if  (config.Cfg_Version < 0x00011900) {
+    if (config.Cfg_Version < 0x00011900) {
         JsonObject dtu = doc["dtu"];
         config.Dtu_NrfPaLevel = dtu["pa_level"];
     }

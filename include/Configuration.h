@@ -112,6 +112,7 @@ struct CONFIG_T {
     uint8_t Display_Rotation;
     uint8_t Display_Contrast;
     uint8_t Display_Language;
+    uint16_t Display_UpdatePeriod;
 };
 
 class ConfigurationClass {

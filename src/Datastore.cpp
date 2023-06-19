@@ -28,10 +28,11 @@ void DatastoreClass::loop()
 {
     if (Hoymiles.isAllRadioIdle() && _updateTimeout.occured()) {
 
-        uint8_t isProducing = 0;
         uint8_t isReachable = 0;
 
         DAT_SEMAPHORE_TAKE();
+
+        _isProducing = 0;
 
         _totalAcYieldTotalEnabled = 0;
         _totalAcYieldTotalDigits = 0;
@@ -63,7 +64,7 @@ void DatastoreClass::loop()
             }
 
             if (inv->isProducing()) {
-                isProducing++;
+                _isProducing++;
             } else {
                 if (inv->getEnablePolling()) {
                     _isAllEnabledProducing = false;
@@ -105,7 +106,7 @@ void DatastoreClass::loop()
             }
         }
 
-        _isAtLeastOneProducing = isProducing > 0;
+        _isAtLeastOneProducing = _isProducing > 0;
         _isAtLeastOneReachable = isReachable > 0;
 
         _totalDcIrradiation = _totalDcIrradiationInstalled > 0 ? _totalDcPowerIrradiation / _totalDcIrradiationInstalled * 100.0f : 0;
@@ -232,6 +233,14 @@ bool DatastoreClass::getIsAllEnabledReachable()
 {
     DAT_SEMAPHORE_TAKE();
     bool retval = _isAllEnabledReachable;
+    DAT_SEMAPHORE_GIVE();
+    return retval;
+}
+
+uint8_t DatastoreClass::getTotalProducing()
+{
+    DAT_SEMAPHORE_TAKE();
+    bool retval = _isProducing;
     DAT_SEMAPHORE_GIVE();
     return retval;
 }

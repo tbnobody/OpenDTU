@@ -4,7 +4,7 @@
  */
 #include "Configuration.h"
 #include "Datastore.h"
-#include "Display_Graphic.h"
+#include "Display.h"
 #include "InverterSettings.h"
 #include "Led_Single.h"
 #include "MessageOutput.h"
@@ -115,13 +115,26 @@ void setup()
         pin.display_data,
         pin.display_clk,
         pin.display_cs,
-        pin.display_reset);
+        pin.display_reset,
+        pin.display_busy,
+        pin.display_dc);
     Display.setOrientation(config.Display_Rotation);
     Display.enablePowerSafe = config.Display_PowerSafe;
     Display.enableScreensaver = config.Display_ScreenSaver;
     Display.setContrast(config.Display_Contrast);
     Display.setLanguage(config.Display_Language);
-    Display.setStartupDisplay();
+    Display.setUpdatePeriod(config.Display_UpdatePeriod);
+
+    /************ Test Definition start ***********/
+    /*
+    Display.enablePowerSafe = false;
+    Display.enableScreensaver = false;
+    Display.setContrast = 255;
+    Display.setOrientation = 2;
+    Display.setUpdatePeriod = 1000;
+    Display.init(DisplayType_t::ePaper154, 9, 10, 11, 13, 14, 12);
+    */
+    /************ Test Definition ende ***********/
     MessageOutput.println("done");
 
     // Initialize Single LEDs
