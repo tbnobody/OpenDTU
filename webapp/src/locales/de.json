@@ -208,6 +208,7 @@
         "Enabled": "aktiv",
         "Disabled": "nicht aktiv",
         "Ssid": "SSID",
+        "Bssid": "BSSID",
         "Quality": "Qualität",
         "Rssi": "RSSI"
     },
@@ -246,6 +247,7 @@
         "LocalTime": "Lokale Uhrzeit",
         "Sunrise": "Morgendämmerung",
         "Sunset": "Abenddämmerung",
+        "NotAvailable": "Nicht verfügbar",
         "Mode": "Modus",
         "Day": "Tag",
         "Night": "Nacht"

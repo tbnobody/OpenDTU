@@ -12,13 +12,10 @@ There are several possibilities to update the partition table:
 
 - Any kind of flash interface
 
-   If you like to use any kind of flash interface like `esptool.py`, Espressif Flash Download Tool, ESP_Flasher or esptool-js you have to make sure to upload **ALL** provided .bin files. It is important to enter the correct target addresses.
+   If you like to use any kind of flash interface like `esptool.py`, Espressif Flash Download Tool, ESP_Flasher or esptool-js you have to make sure to upload the provided .factory.bin file. It is important to enter the correct target address.
 
    | Address  | File                   |
    | ---------| ---------------------- |
-   | 0x1000   | bootloader.bin         |
-   | 0x8000   | partitions.bin         |
-   | 0xe000   | boot_app0.bin          |
-   | 0x10000  | opendtu-*.bin          |
+   | 0x0      | opendtu-*.factory.bin  |
 
 After upgrading the ESP32 will open the intergrated access point (AP) again. Just connect to it using the default password ("openDTU42"). If you are connected, just visit <http://192.168.4.1> and enter the "Configuration Management". Recover the previously backuped config files.
