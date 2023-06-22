@@ -147,17 +147,24 @@
         "OffReason": "Grund für das Ausschalten",
         "ErrorCode": "Fehlerbeschreibung",
         "DaySequenceNumber": "Anzahl der Tage (0..364)",
-        "Battery": "Batterie",
-        "BatteryVoltage": "Spannung",
-        "BatteryCurrent": "Strom",
-        "Panel": "Panel",
-        "PanelVoltage": "Spannung",
-        "PanelPower": "Leistung",
-        "YieldTotal": "Gesamtertrag (durch Benutzer zurücksetzbar)",
-        "YieldToday": "Ertrag heute",
-        "MaximumPowerToday": "Maximale Leistung heute",
-        "YieldYesterday": "Ertrag gestern",
-        "MaximumPowerYesterday": "Maximale Leistung gestern",
+        "Battery": "Ausgang (Batterie)",
+        "output": {
+            "P": "Leistung (berechnet)",
+            "V": "Spannung",
+            "I": "Strom",
+            "E": "Effizienz (berechnet)"
+        },
+        "Panel": "Eingang (Solarpanele)",
+        "input": {
+            "PPV": "Leistung",
+            "VPV": "Spannung",
+            "IPV": "Strom (berechnet)",
+            "YieldToday": "Ertrag heute",
+            "YieldYesterday": "Ertrag gestern",
+            "YieldTotal": "Gesamtertrag (durch Benutzer zurücksetzbar)",
+            "MaximumPowerToday": "Maximale Leistung heute",
+            "MaximumPowerYesterday": "Maximale Leistung gestern"
+        },
         "PowerLimiterState": "Power limiter Status [aus (laden), nur die Sonne nutzen, Nutzung der Batterie]"
     },
     "eventlog": {

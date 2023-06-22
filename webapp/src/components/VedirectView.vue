@@ -34,21 +34,21 @@
                         <div class="btn-group me-2" role="group">
                             <button type="button"
                                 class="btn btn-sm" v-tooltip :title="$t('vedirecthome.PowerLimiterState')">
-                                <div v-if="vedirectData.PLSTATE == 0">
+                                <div v-if="dplData.PLSTATE == 0">
                                     <BIconXCircleFill style="font-size:24px;" />
                                 </div>
-                                <div v-else-if="vedirectData.PLSTATE == 1">
+                                <div v-else-if="dplData.PLSTATE == 1">
                                     <BIconBatteryCharging style="font-size:24px;" />
                                 </div>
-                                <div v-else-if="vedirectData.PLSTATE == 2">
+                                <div v-else-if="dplData.PLSTATE == 2">
                                     <BIconSun style="font-size:24px;" />
                                 </div>
-                                <div v-else-if="vedirectData.PLSTATE == 3">
+                                <div v-else-if="dplData.PLSTATE == 3">
                                     <BIconBatteryHalf style="font-size:24px;" />
                                 </div>
-                                <span v-if="vedirectData.PLSTATE != -1"
+                                <span v-if="dplData.PLSTATE != -1"
                                     class="position-absolute top-0 start-100 translate-middle badge rounded-pill text-bg-info">
-                                    {{ vedirectData.PLLIMIT }} W
+                                    {{ dplData.PLLIMIT }} W
                                 </span>
                             </button>
                         </div>
@@ -119,15 +119,15 @@
                                                     </tr>
                                                 </thead>
                                                 <tbody>
-                                                    <tr>
-                                                        <th scope="row">{{ $t('vedirecthome.BatteryVoltage') }}</th>
-                                                        <td style="text-align: right">{{formatNumber(vedirectData.V.v)}}</td>
-                                                        <td>{{vedirectData.V.u}}</td>
-                                                    </tr>
-                                                    <tr>
-                                                        <th scope="row">{{ $t('vedirecthome.BatteryCurrent') }}</th>
-                                                        <td style="text-align: right">{{formatNumber(vedirectData.I.v)}}</td>
-                                                        <td>{{vedirectData.I.u}}</td>
+                                                    <tr v-for="(prop, key) in vedirectOutput">
+                                                        <th scope="row">{{ $t('vedirecthome.output.' + key) }}</th>
+                                                        <td style="text-align: right">
+                                                            {{ $n(prop.v, 'decimal', {
+                                                                minimumFractionDigits: prop.d,
+                                                                maximumFractionDigits: prop.d})
+                                                            }}
+                                                        </td>
+                                                        <td>{{prop.u}}</td>
                                                     </tr>
                                                 </tbody>
                                             </table>
@@ -149,40 +149,15 @@
                                                     </tr>
                                                 </thead>
                                                 <tbody>
-                                                    <tr>
-                                                        <th scope="row">{{ $t('vedirecthome.PanelVoltage') }}</th>
-                                                        <td style="text-align: right">{{formatNumber(vedirectData.VPV.v)}}</td>
-                                                        <td>{{vedirectData.VPV.u}}</td>
-                                                    </tr>
-                                                    <tr>
-                                                        <th scope="row">{{ $t('vedirecthome.PanelPower') }}</th>
-                                                        <td style="text-align: right">{{formatNumber(vedirectData.PPV.v)}}</td>
-                                                        <td>{{vedirectData.PPV.u}}</td>
-                                                    </tr>
-                                                    <tr>
-                                                        <th scope="row">{{ $t('vedirecthome.YieldTotal') }}</th>
-                                                        <td style="text-align: right">{{formatNumber(vedirectData.H19.v)}}</td>
-                                                        <td>{{vedirectData.H19.u}}</td>
-                                                    </tr>
-                                                    <tr>
-                                                        <th scope="row">{{ $t('vedirecthome.YieldToday') }}</th>
-                                                        <td style="text-align: right">{{formatNumber(vedirectData.H20.v)}}</td>
-                                                        <td>{{vedirectData.H20.u}}</td>
-                                                    </tr>
-                                                    <tr>
-                                                        <th scope="row">{{ $t('vedirecthome.MaximumPowerToday') }}</th>
-                                                        <td style="text-align: right">{{formatNumber(vedirectData.H21.v)}}</td>
-                                                        <td>{{vedirectData.H21.u}}</td>
-                                                    </tr>
-                                                    <tr>
-                                                        <th scope="row">{{ $t('vedirecthome.YieldYesterday') }}</th>
-                                                        <td style="text-align: right">{{formatNumber(vedirectData.H22.v)}}</td>
-                                                        <td>{{vedirectData.H22.u}}</td>
-                                                    </tr>
-                                                    <tr>
-                                                        <th scope="row">{{ $t('vedirecthome.MaximumPowerYesterday') }}</th>
-                                                        <td style="text-align: right">{{formatNumber(vedirectData.H23.v)}}</td>
-                                                        <td>{{vedirectData.H23.u}}</td>
+                                                    <tr v-for="(prop, key) in vedirectInput">
+                                                        <th scope="row">{{ $t('vedirecthome.input.' + key) }}</th>
+                                                        <td style="text-align: right">
+                                                            {{ $n(prop.v, 'decimal', {
+                                                                minimumFractionDigits: prop.d,
+                                                                maximumFractionDigits: prop.d})
+                                                            }}
+                                                        </td>
+                                                        <td>{{prop.u}}</td>
                                                     </tr>
                                                 </tbody>
                                             </table>
@@ -203,7 +178,7 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue';
-import type { Vedirect } from '@/types/VedirectLiveDataStatus';
+import type { DynamicPowerLimiter, VedirectDevice, VedirectOutput, VedirectInput } from '@/types/VedirectLiveDataStatus';
 import { handleResponse, authHeader, authUrl } from '@/utils/authentication';
 import {
     BIconSun,
@@ -226,7 +201,10 @@ export default defineComponent({
             heartInterval: 0,
             dataAgeInterval: 0,
             dataLoading: true,
-            vedirectData: {} as Vedirect,
+            dplData: {} as DynamicPowerLimiter,
+            vedirectData: {} as VedirectDevice,
+            vedirectOutput: {} as VedirectOutput,
+            vedirectInput: {} as VedirectInput,
             isFirstFetchAfterConnect: true,
         };
     },
@@ -244,8 +222,11 @@ export default defineComponent({
             this.dataLoading = true;
             fetch("/api/vedirectlivedata/status", { headers: authHeader() })
                 .then((response) => handleResponse(response, this.$emitter, this.$router))
-                .then((data) => {
-                    this.vedirectData = data;
+                .then((root) => {
+                    this.dplData = root["dpl"];
+                    this.vedirectData = root["device"];
+                    this.vedirectOutput = root["output"];
+                    this.vedirectInput = root["input"];
                     this.dataLoading = false;
                 });
         },
@@ -261,7 +242,11 @@ export default defineComponent({
 
             this.socket.onmessage = (event) => {
                 console.log(event);
-                this.vedirectData = JSON.parse(event.data);
+                var root = JSON.parse(event.data);
+                this.dplData = root["dpl"];
+                this.vedirectData = root["device"];
+                this.vedirectOutput = root["output"];
+                this.vedirectInput = root["input"];
                 this.dataLoading = false;
                 this.heartCheck(); // Reset heartbeat detection
             };

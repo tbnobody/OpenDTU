@@ -61,7 +61,7 @@ void WebApiWsVedirectLiveClass::loop()
             String buffer;
             // free JsonDocument as soon as possible
             {
-                DynamicJsonDocument root(1024);
+                DynamicJsonDocument root(2048);
                 JsonVariant var = root;
                 generateJsonResponse(var);
                 serializeJson(root, buffer);
@@ -88,47 +88,64 @@ void WebApiWsVedirectLiveClass::loop()
 void WebApiWsVedirectLiveClass::generateJsonResponse(JsonVariant& root)
 {
     // device info
-    root["data_age"] = (millis() - VeDirect.getLastUpdate() ) / 1000;
-    root["age_critical"] = !VeDirect.isDataValid();
-    root["PID"] = VeDirect.getPidAsString(VeDirect.veFrame.PID);
-    root["SER"] = VeDirect.veFrame.SER;
-    root["FW"] = VeDirect.veFrame.FW;
-    root["LOAD"] = VeDirect.veFrame.LOAD == true ? "ON" : "OFF";
-    root["CS"] = VeDirect.getCsAsString(VeDirect.veFrame.CS);
-    root["ERR"] = VeDirect.getErrAsString(VeDirect.veFrame.ERR);
-    root["OR"] = VeDirect.getOrAsString(VeDirect.veFrame.OR);
-    root["MPPT"] = VeDirect.getMpptAsString(VeDirect.veFrame.MPPT);
-    root["HSDS"]["v"] = VeDirect.veFrame.HSDS;
-    root["HSDS"]["u"] = "Days";
+    root["device"]["data_age"] = (millis() - VeDirect.getLastUpdate() ) / 1000;
+    root["device"]["age_critical"] = !VeDirect.isDataValid();
+    root["device"]["PID"] = VeDirect.getPidAsString(VeDirect.veFrame.PID);
+    root["device"]["SER"] = VeDirect.veFrame.SER;
+    root["device"]["FW"] = VeDirect.veFrame.FW;
+    root["device"]["LOAD"] = VeDirect.veFrame.LOAD == true ? "ON" : "OFF";
+    root["device"]["CS"] = VeDirect.getCsAsString(VeDirect.veFrame.CS);
+    root["device"]["ERR"] = VeDirect.getErrAsString(VeDirect.veFrame.ERR);
+    root["device"]["OR"] = VeDirect.getOrAsString(VeDirect.veFrame.OR);
+    root["device"]["MPPT"] = VeDirect.getMpptAsString(VeDirect.veFrame.MPPT);
+    root["device"]["HSDS"]["v"] = VeDirect.veFrame.HSDS;
+    root["device"]["HSDS"]["u"] = "d";
 
     // battery info    
-    root["V"]["v"] = VeDirect.veFrame.V;
-    root["V"]["u"] = "V";
-    root["I"]["v"] = VeDirect.veFrame.I;
-    root["I"]["u"] = "A";
+    root["output"]["P"]["v"] = VeDirect.veFrame.P;
+    root["output"]["P"]["u"] = "W";
+    root["output"]["P"]["d"] = 0;
+    root["output"]["V"]["v"] = VeDirect.veFrame.V;
+    root["output"]["V"]["u"] = "V";
+    root["output"]["V"]["d"] = 2;
+    root["output"]["I"]["v"] = VeDirect.veFrame.I;
+    root["output"]["I"]["u"] = "A";
+    root["output"]["I"]["d"] = 2;
+    root["output"]["E"]["v"] = VeDirect.veFrame.E;
+    root["output"]["E"]["u"] = "%";
+    root["output"]["E"]["d"] = 1;
 
     // panel info
-    root["VPV"]["v"] = VeDirect.veFrame.VPV;
-    root["VPV"]["u"] = "V";
-    root["PPV"]["v"] = VeDirect.veFrame.PPV;
-    root["PPV"]["u"] = "W";
-    root["H19"]["v"] = VeDirect.veFrame.H19;
-    root["H19"]["u"] = "kWh";
-    root["H20"]["v"] = VeDirect.veFrame.H20;
-    root["H20"]["u"] = "kWh";
-    root["H21"]["v"] = VeDirect.veFrame.H21;
-    root["H21"]["u"] = "W";
-    root["H22"]["v"] = VeDirect.veFrame.H22;
-    root["H22"]["u"] = "kWh";
-    root["H23"]["v"] = VeDirect.veFrame.H23;
-    root["H23"]["u"] = "W";
+    root["input"]["PPV"]["v"] = VeDirect.veFrame.PPV;
+    root["input"]["PPV"]["u"] = "W";
+    root["input"]["PPV"]["d"] = 0;
+    root["input"]["VPV"]["v"] = VeDirect.veFrame.VPV;
+    root["input"]["VPV"]["u"] = "V";
+    root["input"]["VPV"]["d"] = 2;
+    root["input"]["IPV"]["v"] = VeDirect.veFrame.IPV;
+    root["input"]["IPV"]["u"] = "A";
+    root["input"]["IPV"]["d"] = 2;
+    root["input"]["YieldToday"]["v"] = VeDirect.veFrame.H20;
+    root["input"]["YieldToday"]["u"] = "kWh";
+    root["input"]["YieldToday"]["d"] = 3;
+    root["input"]["YieldYesterday"]["v"] = VeDirect.veFrame.H22;
+    root["input"]["YieldYesterday"]["u"] = "kWh";
+    root["input"]["YieldYesterday"]["d"] = 3;
+    root["input"]["YieldTotal"]["v"] = VeDirect.veFrame.H19;
+    root["input"]["YieldTotal"]["u"] = "kWh";
+    root["input"]["YieldTotal"]["d"] = 3;
+    root["input"]["MaximumPowerToday"]["v"] = VeDirect.veFrame.H21;
+    root["input"]["MaximumPowerToday"]["u"] = "W";
+    root["input"]["MaximumPowerToday"]["d"] = 0;
+    root["input"]["MaximumPowerYesterday"]["v"] = VeDirect.veFrame.H23;
+    root["input"]["MaximumPowerYesterday"]["u"] = "W";
+    root["input"]["MaximumPowerYesterday"]["d"] = 0;
 
     // power limiter state
+    root["dpl"]["PLSTATE"] = -1;
     if (Configuration.get().PowerLimiter_Enabled)
-        root["PLSTATE"] = PowerLimiter.getPowerLimiterState();
-    else
-        root["PLSTATE"] = -1;
-    root["PLLIMIT"] = PowerLimiter.getLastRequestedPowewrLimit();
+        root["dpl"]["PLSTATE"] = PowerLimiter.getPowerLimiterState();
+    root["dpl"]["PLLIMIT"] = PowerLimiter.getLastRequestedPowewrLimit();
 
     if (VeDirect.getLastUpdate() > _newestVedirectTimestamp) {
         _newestVedirectTimestamp = VeDirect.getLastUpdate();

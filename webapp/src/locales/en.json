@@ -147,17 +147,24 @@
         "OffReason": "Off reason",
         "ErrorCode": "Error code",
         "DaySequenceNumber": "Day sequence number (0..364)",
-        "Battery": "Battery",
-        "BatteryVoltage": "Voltage",
-        "BatteryCurrent": "Current",
-        "Panel": "Panel",
-        "PanelVoltage": "Voltage",
-        "PanelPower": "Power",
-        "YieldTotal": "Yield total (user resettable counter)",
-        "YieldToday": "Yield today",
-        "MaximumPowerToday": "Maximum power today",
-        "YieldYesterday": "Yield yesterday",
-        "MaximumPowerYesterday": "Maximum power yesterday",
+        "Battery": "Output (Battery)",
+        "output": {
+            "P": "Power (calculated)",
+            "V": "Voltage",
+            "I": "Current",
+            "E": "Efficiency (calculated)"
+        },
+        "Panel": "Input (Solar Panels)",
+        "input": {
+            "PPV": "Power",
+            "VPV": "Voltage",
+            "IPV": "Current (calculated)",
+            "YieldToday": "Yield today",
+            "YieldYesterday": "Yield yesterday",
+            "YieldTotal": "Yield total (user resettable counter)",
+            "MaximumPowerToday": "Maximum power today",
+            "MaximumPowerYesterday": "Maximum power yesterday"
+        },
         "PowerLimiterState": "Power limiter state [off (charging), solar passthrough, on battery]"
     },
     "eventlog": {
