@@ -119,7 +119,7 @@
                                                     </tr>
                                                 </thead>
                                                 <tbody>
-                                                    <tr v-for="(prop, key) in vedirectOutput">
+                                                    <tr v-for="(prop, key) in vedirectOutput" v-bind:key="key">
                                                         <th scope="row">{{ $t('vedirecthome.output.' + key) }}</th>
                                                         <td style="text-align: right">
                                                             {{ $n(prop.v, 'decimal', {
@@ -149,7 +149,7 @@
                                                     </tr>
                                                 </thead>
                                                 <tbody>
-                                                    <tr v-for="(prop, key) in vedirectInput">
+                                                    <tr v-for="(prop, key) in vedirectInput" v-bind:key="key">
                                                         <th scope="row">{{ $t('vedirecthome.input.' + key) }}</th>
                                                         <td style="text-align: right">
                                                             {{ $n(prop.v, 'decimal', {
