@@ -27,8 +27,8 @@
         "Reload": "Reload"
     },
     "localeswitcher": {
-        "Dark": "Dark",
-        "Light": "Light",
+        "Dark": "Sombre",
+        "Light": "Clair",
         "Auto": "Auto"
     },
     "apiresponse": {
@@ -190,13 +190,13 @@
     },
     "radioinfo": {
         "RadioInformation": "Informations sur la radio",
-        "Status": "{module} Status",
-        "ChipStatus": "{module} sÉtat de la puce",
+        "Status": "{module} Statut",
+        "ChipStatus": "{module} État de la puce",
         "ChipType": "{module} Type de puce",
         "Connected": "connectée",
         "NotConnected": "non connectée",
-        "Configured": "configured",
-        "NotConfigured": "not configured",
+        "Configured": "configurée",
+        "NotConfigured": "non configurée",
         "Unknown": "Inconnue"
     },
     "networkinfo": {
@@ -245,12 +245,12 @@
         "Synced": "synchronisée",
         "NotSynced": "pas synchronisée",
         "LocalTime": "Heure locale",
-        "Sunrise": "Sunrise",
-        "Sunset": "Sunset",
+        "Sunrise": "Lever du soleil",
+        "Sunset": "Coucher du soleil",
         "NotAvailable": "Not Available",
         "Mode": "Mode",
-        "Day": "Day",
-        "Night": "Night"
+        "Day": "Jour",
+        "Night": "Nuit"
     },
     "mqttinfo": {
         "MqttInformation": "MQTT Information",
@@ -448,7 +448,7 @@
         "InverterSerial": "Numéro de série de l'onduleur",
         "InverterName": "Nom de l'onduleur :",
         "InverterNameHint": "Ici, vous pouvez spécifier un nom personnalisé pour votre onduleur.",
-        "InverterStatus": "Receive / Send",
+        "InverterStatus": "Recevoir / Envoyer",
         "PollEnable": "Interroger les données de l'onduleur",
         "PollEnableNight": "Interroger les données de l'onduleur la nuit",
         "CommandEnable": "Envoyer des commandes",
@@ -538,10 +538,10 @@
         "ScreensaverHint": "Déplacez un peu l'écran à chaque mise à jour pour éviter le phénomène de brûlure. (Utile surtout pour les écrans OLED)",
         "Contrast": "Contraste ({contrast}):",
         "Rotation": "Rotation:",
-        "rot0": "No rotation",
-        "rot90": "90 degree rotation",
-        "rot180": "180 degree rotation",
-        "rot270": "270 degree rotation",
+        "rot0": "Pas de rotation",
+        "rot90": "Rotation de 90 degrés",
+        "rot180": "Rotation de 180 degrés",
+        "rot270": "Rotation de 270 degrés",
         "DisplayLanguage": "Langue d'affichage",
         "en": "Anglais",
         "de": "Allemand",
