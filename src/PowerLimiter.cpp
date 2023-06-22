@@ -280,9 +280,13 @@ int32_t PowerLimiterClass::calcPowerLimit(std::shared_ptr<InverterAbstract> inve
     // If the battery is enabled this can always be supplied since we assume that the battery can supply unlimited power
     // The next step is to determine if the Solar power as provided by the Victron charger
     // actually constrains or dictates another inverter power value
-    float efficiency = inverter->Statistics()->getChannelFieldValue(TYPE_AC, (ChannelNum_t) config.PowerLimiter_InverterChannelId, FLD_EFF) * 0.95 /*Victron efficiency*/;
-    int32_t victronChargePower = this->getDirectSolarPower();
-    int32_t adjustedVictronChargePower = victronChargePower * (efficiency > 0.0 ? (efficiency / 100.0) : 1.0); // if inverter is off, use 1.0
+    float inverterEfficiencyPercent = inverter->Statistics()->getChannelFieldValue(
+        TYPE_AC, static_cast<ChannelNum_t>(config.PowerLimiter_InverterChannelId), FLD_EFF);
+    // fall back to hoymiles peak efficiency as per datasheet if inverter
+    // is currently not producing (efficiency is zero in that case)
+    float inverterEfficiencyFactor = (inverterEfficiencyPercent > 0) ? inverterEfficiencyPercent/100 : 0.967;
+    int32_t victronChargePower = getSolarChargePower();
+    int32_t adjustedVictronChargePower = victronChargePower * inverterEfficiencyFactor;
 
     // Battery can be discharged and we should output max (Victron solar power || power meter value)
     if(batteryDischargeEnabled && useFullSolarPassthrough(inverter)) {
@@ -293,8 +297,8 @@ int32_t PowerLimiterClass::calcPowerLimit(std::shared_ptr<InverterAbstract> inve
     // We should use Victron solar power only (corrected by efficiency factor)
     if ((solarPowerEnabled && !batteryDischargeEnabled) || (_mode == PL_MODE_SOLAR_PT_ONLY)) {
         // Case 2 - Limit power to solar power only
-        MessageOutput.printf("[PowerLimiterClass::loop] Consuming Solar Power Only -> victronChargePower: %d, efficiency: %.2f, powerConsumption: %d \r\n", 
-            victronChargePower, efficiency, newPowerLimit);
+        MessageOutput.printf("[PowerLimiterClass::loop] Consuming Solar Power Only -> victronChargePower: %d, inverter efficiency: %.2f, powerConsumption: %d \r\n",
+            victronChargePower, inverterEfficiencyFactor, newPowerLimit);
 
         if ((adjustedVictronChargePower < newPowerLimit) || (_mode == PL_MODE_SOLAR_PT_ONLY)) 
           newPowerLimit = adjustedVictronChargePower;
@@ -360,13 +364,13 @@ void PowerLimiterClass::setNewPowerLimit(std::shared_ptr<InverterAbstract> inver
     }
 }
 
-int32_t PowerLimiterClass::getDirectSolarPower()
+int32_t PowerLimiterClass::getSolarChargePower()
 {
     if (!canUseDirectSolarPower()) {
         return 0;
     }
 
-    return VeDirect.veFrame.PPV;
+    return VeDirect.veFrame.V * VeDirect.veFrame.I;
 }
 
 float PowerLimiterClass::getLoadCorrectedVoltage(std::shared_ptr<InverterAbstract> inverter)

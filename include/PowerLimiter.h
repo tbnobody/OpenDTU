@@ -56,7 +56,7 @@ private:
     bool canUseDirectSolarPower();
     int32_t calcPowerLimit(std::shared_ptr<InverterAbstract> inverter, bool solarPowerEnabled, bool batteryDischargeEnabled);
     void setNewPowerLimit(std::shared_ptr<InverterAbstract> inverter, int32_t newPowerLimit);
-    int32_t getDirectSolarPower();
+    int32_t getSolarChargePower();
     float getLoadCorrectedVoltage(std::shared_ptr<InverterAbstract> inverter);
     bool isStartThresholdReached(std::shared_ptr<InverterAbstract> inverter);
     bool isStopThresholdReached(std::shared_ptr<InverterAbstract> inverter);
