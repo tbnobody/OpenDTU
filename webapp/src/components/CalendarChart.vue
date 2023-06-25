@@ -1,18 +1,15 @@
 <template>
-    <div class="card" :class="{}">
-        <div class="card-header">
-        </div>
-        <GoogleChart />
+    <div class="card" v-if="dataLoaded">
+        <GChart type="Calendar" :data="chartData" :options="chartOptions" :settings="{ packages: ['calendar'] }" />
     </div>
 </template>
 
 <script lang="ts">
-import { defineComponent, type PropType, h } from 'vue';
-import type { DatabaseStatus } from "@/types/DatabaseStatus";
+import { defineComponent } from 'vue';
 import { GChart } from 'vue-google-charts';
-
+import { authHeader, handleResponse } from '@/utils/authentication';
 var data_cal: any;
-export const type_cal = 'Calendar';
+
 export const options_cal = {
     height: 270,
     colorAxis: {
@@ -27,58 +24,34 @@ export default defineComponent({
     components: {
         GChart,
     },
-    props: {
-        dataBase: { type: Object as PropType<DatabaseStatus>, required: true },
+    data() {
+        return {
+            chartData: data_cal,
+            chartOptions: options_cal,
+            dataLoaded: false,
+        }
     },
-    setup() {
-        return () =>
-            h(GChart, {
-                data: data_cal,
-                options: options_cal,
-                type: type_cal,
-                settings: {
-                    packages: ['calendar'],
-                }
-            });
-    },
-    beforeMount() {
-        this.drawChart()
-    },
-    mount() {
-        this.drawChart()
+    created() {
+        this.getInitialData();
     },
     methods: {
-        drawChart() {
-            data_cal = [[{
-                type: 'date',
-                id: 'Date'
-            },
-            {
-                type: 'number',
-                id: 'Energy'
-            }]]
-            var d: Date;
-            var a: any;
-            const energy = this.dataBase.values;
-            var old_energy = 0.0;
-            var last_energy = 0.0;
-            var old_day = -1;
-            energy.forEach((x: any[]) => {
-                if (old_day < 0) {
-                    old_day = x[2];
-                    old_energy = x[4];
-                } else {
-                    if (x[2] != old_day) {
-                        data_cal.push(a)
-                        old_day = x[2]
-                        old_energy = last_energy
+        getInitialData() {
+            this.dataLoaded = false;
+            fetch("/api/databaseDay", { headers: authHeader() })
+                .then((response) => handleResponse(response, this.$emitter, this.$router))
+                .then((energy) => {
+                    if (energy) {
+                        this.chartData = [[{ type: 'date', id: 'Date' }, { type: 'number', id: 'Energy' }]];
+                        var d: Date;
+                        var a: any;
+                        energy.forEach((x: any[]) => {
+                            d = new Date(x[0] + 2000, x[1] - 1, x[2], x[3])
+                            a = [d, Math.round(x[4])]
+                            this.chartData.push(a)
+                        })
+                        this.dataLoaded = true;
                     }
-                }
-                last_energy = x[4]
-                d = new Date(x[0] + 2000, x[1] - 1, x[2], x[3])
-                a = [d, Math.round((last_energy - old_energy) * 1000)]
-            })
-            data_cal.push(a)
+                })
         }
     }
 });

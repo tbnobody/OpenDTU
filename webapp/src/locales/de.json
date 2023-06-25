@@ -292,9 +292,6 @@
         "Value": "Wert",
         "Unit": "Einheit"
     },
-    "chart": {
-        "LastDay": "Letzte 25 Stunden",
-    },
     "invertertotalinfo": {
         "TotalYieldTotal": "Gesamtertrag Insgesamt",
         "TotalYieldDay": "Gesamtertrag Heute",

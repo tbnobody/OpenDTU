@@ -14,6 +14,8 @@ void WebApiDatabaseClass::init(AsyncWebServer* server)
 
     _server = server;
     _server->on("/api/database", HTTP_GET, std::bind(&WebApiDatabaseClass::onDatabase, this, _1));
+    _server->on("/api/databaseHour", HTTP_GET, std::bind(&WebApiDatabaseClass::onDatabaseHour, this, _1));
+    _server->on("/api/databaseDay", HTTP_GET, std::bind(&WebApiDatabaseClass::onDatabaseDay, this, _1));
 }
 
 void WebApiDatabaseClass::loop()
@@ -113,7 +115,7 @@ size_t WebApiDatabaseClass::readchunk(uint8_t* buffer, size_t maxLen, size_t ind
             *pr++ = ',';
         }
         int len = sprintf((char*)pr, "[%d,%d,%d,%d,%f]",
-            d.tm_year, d.tm_mon, d.tm_mday, d.tm_hour, d.energy);
+            d.tm_year, d.tm_mon, d.tm_mday, d.tm_hour, d.energy * 1e3);
         if (len >= 0) {
             pr += len;
         }
@@ -122,13 +124,146 @@ size_t WebApiDatabaseClass::readchunk(uint8_t* buffer, size_t maxLen, size_t ind
     }
 }
 
-size_t WebApiDatabaseClass::readchunk1(uint8_t* buffer, size_t maxLen, size_t index)
+size_t WebApiDatabaseClass::readchunk_log(uint8_t* buffer, size_t maxLen, size_t index)
 {
     size_t x = readchunk(buffer, maxLen, index);
     MessageOutput.println("----------");
     MessageOutput.println(maxLen);
     MessageOutput.println(x);
-    return(x);
+    return (x);
+}
+
+// read chunk from database for the last 25 hours
+size_t WebApiDatabaseClass::readchunkHour(uint8_t* buffer, size_t maxLen, size_t index)
+{
+    time_t now;
+    time(&now);
+    time_t sd = now - (60 * 60 * 25); // subtract 25h
+    struct tm startday;
+    localtime_r(&sd, &startday);
+    if (startday.tm_year <= (2016 - 1900)) {
+        return (false); // time not set
+    }
+
+    static bool first = true;
+    static bool last = false;
+    static bool valid = false;
+    static float oldenergy = 0.0;
+    static File f;
+    uint8_t* pr = buffer;
+    uint8_t* pre = pr + maxLen - 50;
+    size_t r;
+    struct pvData d;
+
+    if (first) {
+        f = LittleFS.open(DATABASE_FILENAME, "r", false);
+        if (!f) {
+            return (0);
+        }
+        *pr++ = '[';
+    }
+    while (true) {
+        r = f.read((uint8_t*)&d, sizeof(pvData)); // read from database
+        if (r <= 0) {
+            if (last) {
+                f.close();
+                first = true;
+                last = false;
+                valid = false;
+                return (0); // end transmission
+            }
+            last = true;
+            *pr++ = ']';
+            return (pr - buffer); // last chunk
+        }
+        if (valid) {
+            if (first) {
+                first = false;
+                oldenergy = d.energy;
+            } else {
+                *pr++ = ',';
+            }
+            int len = sprintf((char*)pr, "[%d,%d,%d,%d,%f]",
+                d.tm_year, d.tm_mon, d.tm_mday, d.tm_hour, 
+                (d.energy - oldenergy) * 1e3);
+            oldenergy = d.energy;
+            if (len >= 0) {
+                pr += len;
+            }
+            if (pr >= pre)
+                return (pr - buffer); // buffer full, return number of chars
+        } else {
+            if ((d.tm_year >= startday.tm_year - 100)
+                && (d.tm_mon >= startday.tm_mon + 1)
+                && (d.tm_mday >= startday.tm_mday)
+                && (d.tm_hour >= startday.tm_hour)
+            )
+                valid = true;
+        }
+    }
+}
+
+// read chunk from database for calendar view
+size_t WebApiDatabaseClass::readchunkDay(uint8_t* buffer, size_t maxLen, size_t index)
+{
+    static bool first = true;
+    static bool last = false;
+    static float startenergy = 0.0;
+    static struct pvData endofday = { 0, 0, 0, 0, 0.0 };
+    static File f;
+    uint8_t* pr = buffer;
+    uint8_t* pre = pr + maxLen - 50;
+    size_t r;
+    struct pvData d;
+
+    if (first) {
+        f = LittleFS.open(DATABASE_FILENAME, "r", false);
+        if (!f) {
+            return (0);
+        }
+        *pr++ = '[';
+    }
+    while (true) {
+        r = f.read((uint8_t*)&d, sizeof(pvData)); // read from database
+        if (r <= 0) {
+            if (last) {
+                f.close();
+                first = true;
+                last = false;
+                endofday = { 0, 0, 0, 0, 0.0 };
+                startenergy = 0.0;
+                return (0); // end transmission
+            }
+            last = true;
+            if (!first)
+                *pr++ = ',';
+            int len = sprintf((char*)pr, "[%d,%d,%d,%d,%f]",
+                endofday.tm_year, endofday.tm_mon, endofday.tm_mday, endofday.tm_hour, 
+                (endofday.energy - startenergy) * 1e3);
+            pr += len;
+            *pr++ = ']';
+            return (pr - buffer); // last chunk
+        }
+        if (endofday.tm_year == 0) {
+            startenergy = d.energy;
+        } else {
+            if (endofday.tm_mday != d.tm_mday) { // next day
+                if (first) {
+                    first = false;
+                } else
+                    *pr++ = ',';
+                int len = sprintf((char*)pr, "[%d,%d,%d,%d,%f]",
+                    endofday.tm_year, endofday.tm_mon, endofday.tm_mday, endofday.tm_hour, 
+                    (endofday.energy - startenergy) * 1e3);
+                startenergy = endofday.energy;
+                if (len >= 0)
+                    pr += len;
+                if (pr >= pre)
+                    return (pr - buffer); // buffer full, return number of chars
+            }
+        }
+        endofday = d;
+    }
 }
 
 void WebApiDatabaseClass::onDatabase(AsyncWebServerRequest* request)
@@ -137,6 +272,24 @@ void WebApiDatabaseClass::onDatabase(AsyncWebServerRequest* request)
         return;
     }
     AsyncWebServerResponse* response = request->beginChunkedResponse("application/json", readchunk);
+    request->send(response);
+}
+
+void WebApiDatabaseClass::onDatabaseHour(AsyncWebServerRequest* request)
+{
+    if (!WebApi.checkCredentialsReadonly(request)) {
+        return;
+    }
+    AsyncWebServerResponse* response = request->beginChunkedResponse("application/json", readchunkHour);
+    request->send(response);
+}
+
+void WebApiDatabaseClass::onDatabaseDay(AsyncWebServerRequest* request)
+{
+    if (!WebApi.checkCredentialsReadonly(request)) {
+        return;
+    }
+    AsyncWebServerResponse* response = request->beginChunkedResponse("application/json", readchunkDay);
     request->send(response);
 }
 

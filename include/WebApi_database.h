@@ -22,8 +22,12 @@ public:
 
 private:
     void onDatabase(AsyncWebServerRequest* request);
+    void onDatabaseHour(AsyncWebServerRequest* request);
+    void onDatabaseDay(AsyncWebServerRequest* request);
     static size_t readchunk(uint8_t* buffer, size_t maxLen, size_t index);
-    static size_t readchunk1(uint8_t* buffer, size_t maxLen, size_t index);
+    static size_t readchunk_log(uint8_t* buffer, size_t maxLen, size_t index);
+    static size_t readchunkHour(uint8_t* buffer, size_t maxLen, size_t index);
+    static size_t readchunkDay(uint8_t* buffer, size_t maxLen, size_t index);
     
     AsyncWebServer* _server;
 };

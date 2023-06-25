@@ -1,21 +1,17 @@
 <template>
-    <div class="card" :class="{}">
-        <div class="card-header">
-            {{ $t('chart.LastDay') }}
-        </div>
-        <GoogleChart />
+    <div class="card" v-if="dataLoaded">
+        <GChart type="ColumnChart" :data="chartData" :options="chartOptions" />
     </div>
 </template>
 
 <script lang="ts">
-import { defineComponent, type PropType, h } from 'vue';
-import type { DatabaseStatus } from "@/types/DatabaseStatus";
+import { defineComponent } from 'vue';
 import { GChart } from 'vue-google-charts';
+import { authHeader, handleResponse } from '@/utils/authentication';
 //import { DatetimeFormat } from 'vue-i18n';
-
 var data_col: any;
-export const type_col = 'ColumnChart';
-export const options_col = {
+
+const options_col = {
     height: 300,
     chartArea: {
         top: 25,
@@ -43,47 +39,31 @@ export default defineComponent({
     components: {
         GChart,
     },
-    props: {
-        dataBase: { type: Object as PropType<DatabaseStatus>, required: true },
+    data() {
+        return {
+            chartData: data_col,
+            chartOptions: options_col,
+            dataLoaded: false,
+        }
     },
-    setup() {
-        return () =>
-            h(GChart, {
-                data: data_col,
-                options: options_col,
-                type: type_col
-            });
-    },
-    beforeMount() {
-        this.drawChart()
-    },
-    mounted() {
-        this.drawChart()
+    created() {
+        this.getInitialData();
     },
     methods: {
-        drawChart() {
-            var end = new Date();
-            var start = new Date();
-            var interval = 1    // number of days to show in the chart
-            const energy = this.dataBase.values;
-            var old_energy = 0.0;
-            start.setDate(end.getDate() - interval);
-            start.setHours(start.getHours() - 2);
-            data_col = [[{
-                type: 'date',
-                id: 'Time'
-            },
-            {
-                type: 'number',
-                id: 'Energy'
-            }]]
-            energy.forEach((x: any[]) => {
-                var d = new Date(x[0] + 2000, x[1] - 1, x[2], x[3]);
-                if ((d >= start) && (d <= end) && (old_energy > 0.0)) {
-                    data_col.push([d, Math.round((x[4] - old_energy) * 1000)])
-                }
-                old_energy = x[4]
-            })
+        getInitialData() {
+            this.dataLoaded = false;
+            fetch("/api/databaseHour", { headers: authHeader() })
+                .then((response) => handleResponse(response, this.$emitter, this.$router))
+                .then((energy) => {
+                    if (energy) {
+                        this.chartData = [[{ type: 'date', id: 'Time' }, { type: 'number', id: 'Energy' }]];
+                        energy.forEach((x: any[]) => {
+                            var d = new Date(x[0] + 2000, x[1] - 1, x[2], x[3]);
+                            this.chartData.push([d, Math.round(x[4])])
+                        });
+                        this.dataLoaded = true;
+                    }
+                });
 
             // var date_formatter = new google.visualization.DateFormat({
             //     pattern: "dd.MM.YY HH:mm"

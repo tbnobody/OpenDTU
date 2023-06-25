@@ -16,23 +16,23 @@
                     </button>
                 </div>
             </div>
-            <BarChart v-bind:dataBase="dataBase" />
-            <CalendarChart v-bind:dataBase="dataBase" />
+            <BarChart />
+            <CalendarChart />
 
             <div class="tab-content" id="v-pills-tabContent" :class="{
-                    'col-sm-9 col-md-10': inverterData.length > 1,
-                    'col-sm-12 col-md-12': inverterData.length == 1
-                }">
+                'col-sm-9 col-md-10': inverterData.length > 1,
+                'col-sm-12 col-md-12': inverterData.length == 1
+            }">
                 <div v-for="inverter in inverterData" :key="inverter.serial" class="tab-pane fade show"
                     :id="'v-pills-' + inverter.serial" role="tabpanel"
                     :aria-labelledby="'v-pills-' + inverter.serial + '-tab'" tabindex="0">
                     <div class="card">
                         <div class="card-header d-flex justify-content-between align-items-center" :class="{
-                                'text-bg-tertiary': !inverter.poll_enabled,
-                                'text-bg-danger': inverter.poll_enabled && !inverter.reachable,
-                                'text-bg-warning': inverter.poll_enabled && inverter.reachable && !inverter.producing,
-                                'text-bg-primary': inverter.poll_enabled && inverter.reachable && inverter.producing,
-                            }">
+                            'text-bg-tertiary': !inverter.poll_enabled,
+                            'text-bg-danger': inverter.poll_enabled && !inverter.reachable,
+                            'text-bg-warning': inverter.poll_enabled && inverter.reachable && !inverter.producing,
+                            'text-bg-primary': inverter.poll_enabled && inverter.reachable && inverter.producing,
+                        }">
                             <div class="p-1 flex-grow-1">
                                 <div class="d-flex flex-wrap">
                                     <div style="padding-right: 2em;">
@@ -338,7 +338,6 @@ import InverterChannelInfo from "@/components/InverterChannelInfo.vue";
 import BarChart from "@/components/BarChart.vue";
 import CalendarChart from "@/components/CalendarChart.vue";
 import InverterTotalInfo from '@/components/InverterTotalInfo.vue';
-import type { DatabaseStatus } from '@/types/DatabaseStatus';
 import type { DevInfoStatus } from '@/types/DevInfoStatus';
 import type { EventlogItems } from '@/types/EventlogStatus';
 import type { LimitConfig } from '@/types/LimitConfig';
@@ -397,7 +396,6 @@ export default defineComponent({
             eventLogLoading: true,
             devInfoView: {} as bootstrap.Modal,
             devInfoList: {} as DevInfoStatus,
-            dataBase: {} as DatabaseStatus,
             devInfoLoading: true,
 
             limitSettingView: {} as bootstrap.Modal,
@@ -475,7 +473,7 @@ export default defineComponent({
                 'decimalTwoDigits');
         },
         inverterData(): Inverter[] {
-            return this.liveData.inverters.slice().sort((a : Inverter, b: Inverter) => {
+            return this.liveData.inverters.slice().sort((a: Inverter, b: Inverter) => {
                 return a.order - b.order;
             });
         }
@@ -488,13 +486,7 @@ export default defineComponent({
                 .then((response) => handleResponse(response, this.$emitter, this.$router))
                 .then((data) => {
                     this.liveData = data;
-                    fetch("/api/database", { headers: authHeader() })
-                        .then((response) => handleResponse(response, this.$emitter, this.$router))
-                        .then((data) => {
-                            this.dataBase.values = data;
-                            this.dataBase.valid_data = true;
-                            this.dataLoading = false;
-                        });
+                    this.dataLoading = false;
                 });
         },
         initSocket() {

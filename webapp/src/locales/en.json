@@ -292,9 +292,6 @@
         "Value": "Value",
         "Unit": "Unit"
     },
-    "chart": {
-        "LastDay": "last 25 hours",
-    },
     "invertertotalinfo": {
         "TotalYieldTotal": "Total Yield Total",
         "TotalYieldDay": "Total Yield Day",
