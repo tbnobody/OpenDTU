@@ -5,6 +5,7 @@
 #include "MessageOutput.h"
 #include "WebApi.h"
 #include "defaults.h"
+#include <Arduino.h>
 #include <AsyncJson.h>
 #include <LittleFS.h>
 
@@ -51,7 +52,7 @@ bool WebApiDatabaseClass::write(float energy)
     // MessageOutput.println("Energy difference > 0");
 
     struct pvData d;
-    d.tm_hour = old_hour;
+    d.tm_hour = timeinfo.tm_hour - 1;
     old_hour = timeinfo.tm_hour;
     d.tm_year = timeinfo.tm_year - 100; // year counting from 2000
     d.tm_mon = timeinfo.tm_mon + 1;
@@ -136,37 +137,47 @@ size_t WebApiDatabaseClass::readchunk_log(uint8_t* buffer, size_t maxLen, size_t
 // read chunk from database for the last 25 hours
 size_t WebApiDatabaseClass::readchunkHour(uint8_t* buffer, size_t maxLen, size_t index)
 {
-    time_t now;
-    time(&now);
-    time_t sd = now - (60 * 60 * 25); // subtract 25h
-    struct tm startday;
-    localtime_r(&sd, &startday);
-    if (startday.tm_year <= (2016 - 1900)) {
-        return (false); // time not set
-    }
+    // MessageOutput.println("====================");
+    // MessageOutput.println(startday.tm_year - 100);
+    // MessageOutput.println(startday.tm_mon + 1);
+    // MessageOutput.println(startday.tm_mday);
+    // MessageOutput.println(startday.tm_hour);
+    // MessageOutput.println("====================");
 
     static bool first = true;
     static bool last = false;
     static bool valid = false;
     static float oldenergy = 0.0;
+    static struct tm startday;
     static File f;
+    static bool fileopen = false;
     uint8_t* pr = buffer;
     uint8_t* pre = pr + maxLen - 50;
     size_t r;
     struct pvData d;
 
-    if (first) {
+    if (!fileopen) {
+        time_t now;
+        time(&now);
+        time_t sd = now - (60 * 60 * 25); // subtract 25h
+        localtime_r(&sd, &startday);
+        if (startday.tm_year <= (2016 - 1900)) {
+            return (false); // time not set
+        }
         f = LittleFS.open(DATABASE_FILENAME, "r", false);
         if (!f) {
             return (0);
         }
+        fileopen = true;
         *pr++ = '[';
     }
     while (true) {
         r = f.read((uint8_t*)&d, sizeof(pvData)); // read from database
         if (r <= 0) {
             if (last) {
+                // MessageOutput.println("Close file");
                 f.close();
+                fileopen = false;
                 first = true;
                 last = false;
                 valid = false;
@@ -176,29 +187,35 @@ size_t WebApiDatabaseClass::readchunkHour(uint8_t* buffer, size_t maxLen, size_t
             *pr++ = ']';
             return (pr - buffer); // last chunk
         }
+        if (!valid) {
+            if ((d.tm_year >= startday.tm_year - 100)
+                && (d.tm_mon >= startday.tm_mon + 1)
+                && (d.tm_mday >= startday.tm_mday)
+                && (d.tm_hour >= startday.tm_hour)) {
+                valid = true;
+                MessageOutput.println(d.tm_year);
+                MessageOutput.println(d.tm_mon);
+                MessageOutput.println(d.tm_mday);
+                MessageOutput.println(d.tm_hour);
+            } else
+                oldenergy = d.energy;
+        }
         if (valid) {
             if (first) {
                 first = false;
-                oldenergy = d.energy;
-            } else {
+            } else
                 *pr++ = ',';
-            }
             int len = sprintf((char*)pr, "[%d,%d,%d,%d,%f]",
-                d.tm_year, d.tm_mon, d.tm_mday, d.tm_hour, 
+                d.tm_year, d.tm_mon, d.tm_mday, d.tm_hour,
                 (d.energy - oldenergy) * 1e3);
             oldenergy = d.energy;
             if (len >= 0) {
                 pr += len;
             }
-            if (pr >= pre)
+            if (pr >= pre) {
+                // MessageOutput.println("send buffer");
                 return (pr - buffer); // buffer full, return number of chars
-        } else {
-            if ((d.tm_year >= startday.tm_year - 100)
-                && (d.tm_mon >= startday.tm_mon + 1)
-                && (d.tm_mday >= startday.tm_mday)
-                && (d.tm_hour >= startday.tm_hour)
-            )
-                valid = true;
+            }
         }
     }
 }
@@ -238,7 +255,7 @@ size_t WebApiDatabaseClass::readchunkDay(uint8_t* buffer, size_t maxLen, size_t 
             if (!first)
                 *pr++ = ',';
             int len = sprintf((char*)pr, "[%d,%d,%d,%d,%f]",
-                endofday.tm_year, endofday.tm_mon, endofday.tm_mday, endofday.tm_hour, 
+                endofday.tm_year, endofday.tm_mon, endofday.tm_mday, endofday.tm_hour,
                 (endofday.energy - startenergy) * 1e3);
             pr += len;
             *pr++ = ']';
@@ -253,7 +270,7 @@ size_t WebApiDatabaseClass::readchunkDay(uint8_t* buffer, size_t maxLen, size_t 
                 } else
                     *pr++ = ',';
                 int len = sprintf((char*)pr, "[%d,%d,%d,%d,%f]",
-                    endofday.tm_year, endofday.tm_mon, endofday.tm_mday, endofday.tm_hour, 
+                    endofday.tm_year, endofday.tm_mon, endofday.tm_mday, endofday.tm_hour,
                     (endofday.energy - startenergy) * 1e3);
                 startenergy = endofday.energy;
                 if (len >= 0)
