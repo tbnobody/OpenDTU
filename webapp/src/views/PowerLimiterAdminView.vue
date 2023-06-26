@@ -114,15 +114,10 @@
             <CardElement :text="$t('powerlimiteradmin.PowerMeters')" textVariant="text-bg-primary" add-space
                          v-show="powerLimiterConfigList.enabled"
             >
-                <div class="row mb-3">
-                    <label class="col-sm-2 form-check-label" for="inputRetain">{{ $t('powerlimiteradmin.InverterIsBehindPowerMeter') }}</label>
-                    <div class="col-sm-10">
-                        <div class="form-check form-switch">
-                            <input class="form-check-input" type="checkbox" id="inputIsInverterBehindPowerMeter"
-                                v-model="powerLimiterConfigList.is_inverter_behind_powermeter" required/>
-                        </div>
-                    </div>
-                </div>
+                <InputElement 
+                    :label="$t('powerlimiteradmin.InverterIsBehindPowerMeter')"
+                    v-model="powerLimiterConfigList.is_inverter_behind_powermeter"
+                    type="checkbox" wide/>
             </CardElement>
 
             <CardElement :text="$t('powerlimiteradmin.Battery')" textVariant="text-bg-primary" add-space
