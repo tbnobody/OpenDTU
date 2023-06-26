@@ -48,6 +48,7 @@ export default defineComponent({
     },
     created() {
         this.getInitialData();
+        this.startautorefresh();
     },
     methods: {
         getInitialData() {
@@ -69,7 +70,23 @@ export default defineComponent({
             //     pattern: "dd.MM.YY HH:mm"
             // });
             // date_formatter.format(data, 0);
-        }
+        },
+        callEveryHour() {
+            this.getInitialData();
+            setInterval(this.getInitialData, 1000 * 60 * 60);   // refresh every hour
+        },
+        startautorefresh() {
+            var nextDate = new Date();
+            if (nextDate.getMinutes() === 0) {
+                this.callEveryHour()
+            } else {
+                nextDate.setHours(nextDate.getHours() + 1);
+                nextDate.setMinutes(0);
+                nextDate.setSeconds(10);
+                var difference:number = nextDate.valueOf() - Date.now();
+                setTimeout(this.callEveryHour, difference);
+            }
+        },
     }
 });
 </script>
