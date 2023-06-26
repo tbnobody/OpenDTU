@@ -175,59 +175,76 @@ Use a power suppy with 5 V and 1 A. The USB cable connected to your PC/Notebook 
 
 ### Change pin assignment
 
-Its possible to change all the pins of the NRF24L01+ module, the Display, the LED etc.
+It is possible to change all the pins of the NRF24L01+ module, the Display, the LED etc.
 The recommend way to change the pin assignment is by creating a custom [device profile](docs/DeviceProfiles.md).
-It is also possible to create a custom environment and compile the source yourself. This can be achieved by copying one of the [env:....] sections from 'platformio.ini' to 'platformio_override.ini' and editing the 'platformio_override.ini' file and add/change one or more of the following lines to the 'build_flags' parameter:
+It is also possible to create a custom environment and compile the source yourself. This can be achieved by copying one of the `[env:...]` sections from `platformio.ini` to your local `platformio_override.ini` (see "Using `platformio_override.ini`" below). Add the following lines to your respective `[env:...]` section and adjust the values to reflect your actual wiring:
 
 ```makefile
--DHOYMILES_PIN_MISO=19
--DHOYMILES_PIN_MOSI=23
--DHOYMILES_PIN_SCLK=18
--DHOYMILES_PIN_IRQ=16
--DHOYMILES_PIN_CE=4
--DHOYMILES_PIN_CS=5
+build_flags =
+    -DHOYMILES_PIN_MISO=19
+    -DHOYMILES_PIN_MOSI=23
+    -DHOYMILES_PIN_SCLK=18
+    -DHOYMILES_PIN_IRQ=16
+    -DHOYMILES_PIN_CE=4
+    -DHOYMILES_PIN_CS=5
 ```
 
-It is recommended to make all changes only in the  'platformio_override.ini', this is your personal copy.
+## Building OpenDTU
 
-## Flashing and starting up
+### Building the WebApp
 
-### with Visual Studio Code
+The WebApp can be built using yarn
+
+```bash
+cd webapp
+yarn install
+yarn build
+```
+
+The updated output is placed in the `webapp_dist` directory. It is only necessary to build the WebApp when you made changes to it.
+
+### Building the firmware binary
+
+#### Using `platformio_override.ini`
+
+When building your own firmware, you may want to adjust the PlatformIO environment. Copy `platformio_override_sample.ini` and name the copy `platformio_override.ini`. Changes to the PlatformIO environment should only be made in `platformio_override.ini`. Changes to that file are ignored by GIT.
+
+Adjust the COM port for your USB-to-serial-converter. It occurs twice:
+* `upload_port`
+* `monitor_port`
+
+#### Building with Visual Studio Code
 
 * Install [Visual Studio Code](https://code.visualstudio.com/download) (from now named "vscode")
 * In Visual Studio Code, install the [PlatformIO Extension](https://marketplace.visualstudio.com/items?itemName=platformio.platformio-ide)
 * Install git and enable git in vscode - [git download](https://git-scm.com/downloads/) - [Instructions](https://www.jcchouinard.com/install-git-in-vscode/)
 * Clone this repository (you really have to clone it, don't just download the ZIP file. During the build process the git hash gets embedded into the firmware. If you download the ZIP file a build error will occur): Inside vscode open the command palette by pressing `CTRL` + `SHIFT` + `P`. Enter `git clone`, add the repository-URL `https://github.com/tbnobody/OpenDTU`. Next you have to choose (or create) a target directory.
-* In vscode, choose File --> Open Folder and select the previously downloaded source code. (You have to select the folder which contains the "platformio.ini" and "platformio_override.ini" file)
-* Adjust the COM port in the file "platformio_override.ini" for your USB-to-serial-converter. It occurs twice:
-  * upload_port
-  * monitor_port
+* In vscode, choose File --> Open Folder and select the previously downloaded source code (select the folder which contains the `platformio.ini` file).
 * Select the arrow button in the blue bottom status bar (PlatformIO: Upload) to compile and upload the firmware. During the compilation, all required libraries are downloaded automatically.
 * Under Linux, if the upload fails with error messages "Could not open /dev/ttyUSB0, the port doesn't exist", you can check via ```ls -la /dev/tty*``` to which group your port belongs to, and then add your user this group via ```sudo adduser <yourusername> dialout``` (if you are using ```arch-linux``` use: ```sudo gpasswd -a <yourusername> uucp```, this method requires a logout/login of the affected user).
 * There are two videos showing these steps:
   * [Git Clone and compilation](https://youtu.be/9cA_esv3zeA)
   * [Full installation and compilation](https://youtu.be/xs6TqHn7QWM)
 
-### on the commandline with PlatformIO Core
+#### Building on the commandline with PlatformIO Core
 
 * Install [PlatformIO Core](https://platformio.org/install/cli)
 * Clone this repository (you really have to clone it, don't just download the ZIP file. During the build process the git hash gets embedded into the firmware. If you download the ZIP file a build error will occur)
-* Adjust the COM port in the file "platformio_override.ini". It occurs twice:
-  * upload_port
-  * monitor_port
 * build: `platformio run -e generic`
 * upload to esp module: `platformio run -e generic -t upload`
 * other options:
   * clean the sources:  `platformio run -e generic -t clean`
   * erase flash: `platformio run -e generic -t erase`
 
-### using the pre-compiled .bin files
+## Flashing the firmware binary
+
+### Pre-compiled `.bin` files
 
 The pre-compiled binary files can be found here on the [github page behind "Releases"](https://github.com/tbnobody/OpenDTU/releases) (look at the right column). For a first installation on an ESP32, download `opendtu-generic.factory.bin` and use a ESP32 flash tool of your choice to flash the `.bin` file to the address `0x0`. (The previous method with different .bin files is no more necessary.)
 
 For further updates download `opendtu-generic.bin` and use the over-the-air firmware update in OpenDTU's web interface.
 
-#### Flash with esptool.py (Linux)
+### Flash with esptool.py (Linux)
 
 ```bash
 esptool.py --port /dev/ttyUSB0 --chip esp32 --before default_reset --after hard_reset \
@@ -235,7 +252,7 @@ esptool.py --port /dev/ttyUSB0 --chip esp32 --before default_reset --after hard_
   0x0 opendtu-generic.factory.bin
 ```
 
-#### Flash with Espressif Flash Download Tool (Windows)
+### Flash with Espressif Flash Download Tool (Windows)
 
 [Download link](https://www.espressif.com/en/support/download/other-tools)
 
@@ -246,11 +263,11 @@ esptool.py --port /dev/ttyUSB0 --chip esp32 --before default_reset --after hard_
 * To program, press "Start" on screen, then the "Boot" button.
 * When flashing is complete (FINISH appears) then press the Reset button on the ESP32 board (or powercycle ) to start the OpenDTU application.
 
-#### Flash with ESP_Flasher (Windows)
+### Flash with ESP_Flasher (Windows)
 
 Users report that [ESP_Flasher](https://github.com/Jason2866/ESP_Flasher/releases/) is suitable for flashing OpenDTU on Windows.
 
-#### Flash with [ESP_Flasher](https://espressif.github.io/esptool-js/) - web version
+### Flash with [ESP_Flasher](https://espressif.github.io/esptool-js/) - web version
 
 It is also possible to flash it via the web tools which might be more convenient and is platform independent.
 
@@ -308,22 +325,6 @@ A ready to solder kit can be found here: <https://shop.blinkyparts.com/en/OpenDT
 * [Board for OpenDTU with Display](https://github.com/SteffMUC/openDTU_wDisplay2)
 * [OpenDTU PCB mit Display](https://github.com/turrican944/OpenDTU-PCB)
 * [PCB for OpenDTU in Cable Branchbox](https://github.com/plewka/ESP-Solar_OpenDTU)
-
-## Building
-
-* Building the WebApp
-  * The WebApp can be build using yarn
-
-    ```bash
-    cd webapp
-    yarn install
-    yarn build
-    ```
-
-  * The updated output is placed in the 'webapp_dist' directory
-  * It is only necessary to build the webapp when you made changes to it
-* Building the microcontroller firmware
-  * Visual Studio Code with the PlatformIO Extension is required for building
 
 ## Troubleshooting
 
