@@ -74,13 +74,6 @@ public:
     void Sleep(void);
 
 private:
-    uint8_t reset_pin;
-    uint8_t dc_pin;
-    uint8_t cs_pin;
-    uint8_t busy_pin;
-    uint8_t sck_pin;
-    uint8_t mosi_pin;
-
     void Lut(unsigned char* lut);
     void SetLut(unsigned char* lut);
     void SetMemoryArea(int x_start, int y_start, int x_end, int y_end);

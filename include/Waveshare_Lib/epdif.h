@@ -56,9 +56,6 @@ public:
     uint8_t EPD_RST_PIN;
     uint8_t EPD_DC_PIN;
     uint8_t EPD_BUSY_PIN;
-
-    uint8_t GPIO_PIN_SET = 1;
-    uint8_t GPIO_PIN_RESET = 0;
 };
 
 #endif

@@ -1,32 +1,3 @@
-/*****************************************************************************
-* | File      	:   epd1in54_V2.cpp
-* | Author      :   Waveshare team
-* | Function    :   1.54inch e-paper V2
-* | Info        :
-*----------------
-* |	This version:   V1.0
-* | Date        :   2019-06-24
-* | Info        :
-#
-# Permission is hereby granted, free of charge, to any person obtaining a copy
-# of this software and associated documnetation files (the "Software"), to deal
-# in the Software without restriction, including without limitation the rights
-# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-# copies of the Software, and to permit persons to  whom the Software is
-# furished to do so, subject to the following conditions:
-#
-# The above copyright notice and this permission notice shall be included in
-# all copies or substantial portions of the Software.
-#
-# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-# FITNESS OR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-# LIABILITY WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-# THE SOFTWARE.
-#
-******************************************************************************/
 #include <stdlib.h>
 #include "Waveshare_Lib/epd1in54_V2.h"
 
@@ -102,7 +73,9 @@ Epd::Epd(uint8_t _CS, uint8_t _DC, uint8_t _RST, uint8_t _BUSY, uint8_t _SCK, ui
 void Epd::SendCommand(unsigned char command)
 {
 	DigitalWrite(EPD_DC_PIN, LOW);
+	DigitalWrite(EPD_CS_PIN, LOW);
 	SpiTransfer(command);
+	DigitalWrite(EPD_CS_PIN, HIGH);
 }
 
 /**
@@ -111,7 +84,9 @@ void Epd::SendCommand(unsigned char command)
 void Epd::SendData(unsigned char data)
 {
 	DigitalWrite(EPD_DC_PIN, HIGH);
+	DigitalWrite(EPD_CS_PIN, LOW);
 	SpiTransfer(data);
+	DigitalWrite(EPD_CS_PIN, HIGH);
 }
 
 /**
@@ -229,15 +204,15 @@ int Epd::LDirInit(void)
 	SendCommand(0x11); //data entry mode
 	SendData(0x03);
 
-  SendCommand(0x44);
-  /* x point must be the multiple of 8 or the last 3 bits will be ignored */
-  SendData((0 >> 3) & 0xFF);
-  SendData((199 >> 3) & 0xFF);
-  SendCommand(0x45);
-  SendData(0 & 0xFF);
-  SendData((0 >> 8) & 0xFF);
-  SendData(199 & 0xFF);
-  SendData((199 >> 8) & 0xFF);
+	SendCommand(0x44);
+	/* x point must be the multiple of 8 or the last 3 bits will be ignored */
+	SendData((0 >> 3) & 0xFF);
+	SendData((199 >> 3) & 0xFF);
+	SendCommand(0x45);
+	SendData(0 & 0xFF);
+	SendData((0 >> 8) & 0xFF);
+	SendData(199 & 0xFF);
+	SendData((199 >> 8) & 0xFF);
 
 	SendCommand(0x3C); //BorderWavefrom
 	SendData(0x01);

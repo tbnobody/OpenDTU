@@ -22,7 +22,7 @@ void DisplayEPaperClass::init(DisplayType_t type, uint8_t _CS, uint8_t _DC, uint
     epd->LDirInit(); // initialize epaper
     epd->Clear(); // clear old text/imagery
     epd->DisplayPartBaseWhiteImage(); // lay a base white layer down first
-    paint->SetRotate(0);
+    paint->SetRotate(2);
 }
 
 //***************************************************************************
@@ -136,6 +136,9 @@ void DisplayEPaperClass::loop(float totalPower, float totalYieldDay, float total
     actualPowerPaged(totalPower, totalYieldDay, totalYieldTotal, isprod);
 
     epd->DisplayPartFrame(); // display new text
+    // epd->HDirInit();
+    // epd->Clear();
+    epd->Sleep();
 }
 
 DisplayEPaperClass DisplayEPaper;
