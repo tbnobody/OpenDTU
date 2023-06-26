@@ -77,15 +77,11 @@ export default defineComponent({
         },
         startautorefresh() {
             var nextDate = new Date();
-            if (nextDate.getMinutes() === 0) {
-                this.callEveryHour()
-            } else {
-                nextDate.setHours(nextDate.getHours() + 1);
-                nextDate.setMinutes(0);
-                nextDate.setSeconds(10);
-                var difference:number = nextDate.valueOf() - Date.now();
-                setTimeout(this.callEveryHour, difference);
-            }
+            nextDate.setHours(nextDate.getHours() + 1);
+            nextDate.setMinutes(0);
+            nextDate.setSeconds(5);
+            var difference: number = nextDate.valueOf() - Date.now();
+            setTimeout(this.callEveryHour, difference);
         },
     }
 });
