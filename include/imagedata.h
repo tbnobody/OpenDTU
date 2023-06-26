@@ -8,3 +8,5 @@ extern const unsigned char mySigma[];
 extern const unsigned char mySun[];
 extern const unsigned char myToday[];
 extern const unsigned char myWR[];
+
+extern const unsigned char gImage_1in54[];

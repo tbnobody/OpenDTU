@@ -83,7 +83,7 @@ void DisplayClass::setOrientation(uint8_t rotation)
         DisplayMono.setOrientation(rotation);
     } else if (_display_type == ePaper154) {
 
-        DisplayEPaper.setOrientation(rotation);
+        // DisplayEPaper.setOrientation(rotation);
     }
 }
 
@@ -106,7 +106,7 @@ void DisplayClass::loop()
     }
 
     if (counterEPaper > 480) {
-        DisplayEPaper.fullRefresh();
+        // DisplayEPaper.fullRefresh();
         counterEPaper = 0;
     }
 }

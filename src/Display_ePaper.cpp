@@ -1,16 +1,6 @@
+
 #include "Display_ePaper.h"
-#include "imagedata.h"
-#include <NetworkSettings.h>
-
-static const uint32_t spiClk = 4000000; // 4 MHz
-
-std::map<DisplayType_t, std::function<GxEPD2_GFX*(uint8_t, uint8_t, uint8_t, uint8_t)>> _ePaperTypes = {
-    // DEPG0150BN 200x200, SSD1681, TTGO T5 V2.4.1
-    { DisplayType_t::ePaper154, [](uint8_t _CS, uint8_t _DC, uint8_t _RST, uint8_t _BUSY) { return new GxEPD2_BW<GxEPD2_150_BN, GxEPD2_150_BN::HEIGHT>(GxEPD2_150_BN(_CS, _DC, _RST, _BUSY)); } },
-    // GDEW027C44   2.7 " b/w/r 176x264, IL91874
-    //{DisplayType_t::ePaper270, [](uint8_t _CS, uint8_t _DC, uint8_t _RST, uint8_t _BUSY)
-    // F { return new GxEPD2_3C<GxEPD2_270c, GxEPD2_270c::HEIGHT>(GxEPD2_270c(_CS, _DC, _RST, _BUSY)); }},
-};
+/* Entry point ----------------------------------------------------------------*/
 
 DisplayEPaperClass::DisplayEPaperClass()
 {
@@ -18,221 +8,134 @@ DisplayEPaperClass::DisplayEPaperClass()
 
 DisplayEPaperClass::~DisplayEPaperClass()
 {
-    delete _display;
+    delete epd;
+    delete paint;
 }
-//***************************************************************************
+
 void DisplayEPaperClass::init(DisplayType_t type, uint8_t _CS, uint8_t _DC, uint8_t _RST, uint8_t _BUSY, uint8_t _SCK, uint8_t _MOSI)
 {
-    if (type > DisplayType_t::None) {
-        Serial.begin(115200);
-        auto constructor = _ePaperTypes[type];
-        _display = constructor(_CS, _DC, _RST, _BUSY);
+    // Serial.begin(9600); // start serial handling for text input
 
-        _display->epd2.init(_SCK, _MOSI, 115200, true, 20, false);
-        _display->init(115200, true, 20, false);
-        _display->setRotation(_displayRotation);
-        _display->setFullWindow();
+    epd = new Epd(_CS, _DC, _RST, _BUSY, _SCK, _MOSI);
+    paint = new Paint(image, 200, 200);
 
-        // Logo
-        _display->fillScreen(GxEPD_BLACK);
-        //_display->drawBitmap(0, 0, AhoyLogo, 200, 200, GxEPD_WHITE);
-        _display->drawBitmap(0, 0, OpenDTULogo, 200, 200, GxEPD_WHITE);
-        while (_display->nextPage())
-            ;
-
-        // clean the screen
-        delay(2000);
-        _display->fillScreen(GxEPD_WHITE);
-        while (_display->nextPage())
-            ;
-
-        headlineIP();
-
-        // call the PowerPage to change the PV Power Values
-        actualPowerPaged(0, 0, 0, 0);
-    }
+    epd->LDirInit(); // initialize epaper
+    epd->Clear(); // clear old text/imagery
+    epd->DisplayPartBaseWhiteImage(); // lay a base white layer down first
+    paint->SetRotate(0);
 }
-//***************************************************************************
-void DisplayEPaperClass::fullRefresh()
-{
-    // screen complete black
-    _display->fillScreen(GxEPD_BLACK);
-    while (_display->nextPage())
-        ;
-    delay(2000);
-    // screen complete white
-    _display->fillScreen(GxEPD_WHITE);
-    while (_display->nextPage())
-        ;
-}
+
 //***************************************************************************
 void DisplayEPaperClass::headlineIP()
 {
-    int16_t tbx, tby;
-    uint16_t tbw, tbh;
+    paint->SetWidth(200); // set display width
+    paint->SetHeight(headfootline); // set initial vertical space
 
-    _display->setFont(&FreeSans9pt7b);
-    _display->setTextColor(GxEPD_WHITE);
+    if ((NetworkSettings.isConnected() == true) && (NetworkSettings.localIP() > 0)) {
+        snprintf(_fmtText, sizeof(_fmtText), "%s", NetworkSettings.localIP().toString().c_str());
+    } else {
+        snprintf(_fmtText, sizeof(_fmtText), "no WiFi!!!");
+    }
 
-    _display->setPartialWindow(0, 0, _display->width(), headfootline);
-    _display->fillScreen(GxEPD_BLACK);
-    do {
-        if ((NetworkSettings.isConnected() == true) && (NetworkSettings.localIP() > 0)) {
-            snprintf(_fmtText, sizeof(_fmtText), "%s", NetworkSettings.localIP().toString().c_str());
-        } else {
-            snprintf(_fmtText, sizeof(_fmtText), "WiFi not connected");
-        }
-        _display->getTextBounds(_fmtText, 0, 0, &tbx, &tby, &tbw, &tbh);
-        uint16_t x = ((_display->width() - tbw) / 2) - tbx;
-
-        _display->setCursor(x, (headfootline - 2));
-        _display->println(_fmtText);
-    } while (_display->nextPage());
-}
-//***************************************************************************
-void DisplayEPaperClass::setOrientation(uint8_t rotation)
-{
-    _display->setRotation(rotation);
-    _display->setFullWindow();
-
-    _displayRotation = rotation;
+    paint->Clear(COLORED); // darkr background
+    x = ((paint->GetWidth() - paint->getStringWidth(_fmtText, Font16.Width)) / 2);
+    paint->DrawStringAt(x, 2, _fmtText, &Font16, UNCOLORED); // light texts
+    epd->SetFrameMemoryPartial(paint->GetImage(), 0, initial_space + (0 * row_height), paint->GetWidth(), paint->GetHeight());
 }
 //***************************************************************************
 void DisplayEPaperClass::lastUpdatePaged()
 {
-    int16_t tbx, tby;
-    uint16_t tbw, tbh;
+    paint->SetWidth(200); // set display width
+    paint->SetHeight(headfootline); // set initial vertical space
 
-    _display->setFont(&FreeSans9pt7b);
-    _display->setTextColor(GxEPD_WHITE);
+    time_t now = time(nullptr);
+    strftime(_fmtText, sizeof(_fmtText), "%d.%m.%Y %H:%M", localtime(&now));
 
-    _display->setPartialWindow(0, _display->height() - headfootline, _display->width(), headfootline);
-    _display->fillScreen(GxEPD_BLACK);
-    do {
-        time_t now = time(nullptr);
-        strftime(_fmtText, sizeof(_fmtText), "%d.%m.%Y %H:%M", localtime(&now));
-
-        _display->getTextBounds(_fmtText, 0, 0, &tbx, &tby, &tbw, &tbh);
-        uint16_t x = ((_display->width() - tbw) / 2) - tbx;
-
-        _display->setCursor(x, (_display->height() - 3));
-        _display->println(_fmtText);
-    } while (_display->nextPage());
+    paint->Clear(COLORED); // darkr background
+    x = ((paint->GetWidth() - paint->getStringWidth(_fmtText, Font16.Width)) / 2);
+    paint->DrawStringAt(x, 2, _fmtText, &Font16, UNCOLORED); // light text
+    epd->SetFrameMemoryPartial(paint->GetImage(), 0, 200 - initial_space - headfootline, paint->GetWidth(), paint->GetHeight());
 }
 //***************************************************************************
 void DisplayEPaperClass::actualPowerPaged(float _totalPower, float _totalYieldDay, float _totalYieldTotal, uint8_t _isprod)
 {
-    int16_t tbx, tby;
-    uint16_t tbw, tbh, x, y = 0;
+    paint->SetWidth(200); // set display width
+    paint->SetHeight(actualPower_height); // set initial vertical space
 
-    _display->setFont(&FreeSans24pt7b);
-    _display->setTextColor(GxEPD_BLACK);
+    // actual Production
+    if (_totalPower > 9999) {
+        snprintf(_fmtText, sizeof(_fmtText), "%.1f kW", (_totalPower / 1000));
+    } else if ((_totalPower > 0) && (_totalPower <= 9999)) {
+        snprintf(_fmtText, sizeof(_fmtText), "%.0f W", _totalPower);
+    } else {
+        snprintf(_fmtText, sizeof(_fmtText), "offline");
+    }
+    paint->Clear(UNCOLORED); // darkr background
+    x = ((paint->GetWidth() - paint->getStringWidth(_fmtText, Font24.Width)) / 2);
+    paint->DrawStringAt(x, 2, _fmtText, &Font24, COLORED); // light texts
+    epd->SetFrameMemoryPartial(paint->GetImage(), 0, initial_space + (1 * row_height), paint->GetWidth(), paint->GetHeight());
 
-    _display->setPartialWindow(0, headfootline, _display->width(), _display->height() - (headfootline * 2));
-    _display->fillScreen(GxEPD_WHITE);
-    do {
-        // actual Production
-        if (_totalPower > 9999) {
-            snprintf(_fmtText, sizeof(_fmtText), "%.1f kW", (_totalPower / 1000));
-            _changed = true;
-        } else if ((_totalPower > 0) && (_totalPower <= 9999)) {
-            snprintf(_fmtText, sizeof(_fmtText), "%.0f W", _totalPower);
-            _changed = true;
-        } else {
-            snprintf(_fmtText, sizeof(_fmtText), "offline");
+    if ((_totalYieldDay > 0) && (_totalYieldTotal > 0)) {
+        // Today Production
+        if (_totalYieldDay > 9999) {
+            snprintf(_fmtText, paint->GetWidth(), "%.1f", (_totalYieldDay / 1000));
+            x = ((paint->GetWidth() - paint->getStringWidth(_fmtText, Font24.Width)) / 2);
+            paint->DrawStringAt(x, 2, _fmtText, &Font24, COLORED); // light texts
+
+            x = (paint->GetWidth() - 50);
+            paint->DrawStringAt(x, 2, "kWh", &Font24, COLORED); // light texts
+        } else if (_totalYieldDay <= 9999) {
+            snprintf(_fmtText, paint->GetWidth(), "%.1f", (_totalYieldDay));
+            x = ((paint->GetWidth() - paint->getStringWidth(_fmtText, Font24.Width)) / 2);
+            paint->DrawStringAt(x, 2, _fmtText, &Font24, COLORED); // light texts
+
+            x = (paint->GetWidth() - 38);
+            paint->DrawStringAt(x, 2, "Wh", &Font24, COLORED); // light texts
         }
-        _display->getTextBounds(_fmtText, 0, 0, &tbx, &tby, &tbw, &tbh);
-        x = ((_display->width() - tbw) / 2) - tbx;
-        _display->setCursor(x, headfootline + tbh + 10);
-        _display->print(_fmtText);
+        paint->drawInvertedBitmap(5, 0, myToday, 30, 30, COLORED);
+        epd->SetFrameMemoryPartial(paint->GetImage(), 0, initial_space + (2 * row_height), paint->GetWidth(), paint->GetHeight());
 
-        if ((_totalYieldDay > 0) && (_totalYieldTotal > 0)) {
-            // Today Production
-            _display->setFont(&FreeSans18pt7b);
-            y = _display->height() / 2;
-            _display->setCursor(5, y);
+        // Total Production
+        if (_totalYieldTotal > 9999) {
+            snprintf(_fmtText, paint->GetWidth(), "%.1f", (_totalYieldTotal / 1000));
+            x = ((paint->GetWidth() - paint->getStringWidth(_fmtText, Font24.Width)) / 2);
+            paint->DrawStringAt(x, 2, _fmtText, &Font24, COLORED); // light texts
 
-            if (_totalYieldDay > 9999) {
-                snprintf(_fmtText, _display->width(), "%.1f", (_totalYieldDay / 1000));
-                _display->getTextBounds(_fmtText, 0, 0, &tbx, &tby, &tbw, &tbh);
-                _display->drawInvertedBitmap(5, y - ((tbh + 30) / 2), myToday, 30, 30, GxEPD_BLACK);
-                x = ((_display->width() - tbw - 20) / 2) - tbx;
-                _display->setCursor(x, y);
-                _display->print(_fmtText);
-                _display->setCursor(_display->width() - 50, y);
-                _display->setFont(&FreeSans12pt7b);
-                _display->println("kWh");
-            } else if (_totalYieldDay <= 9999) {
-                snprintf(_fmtText, _display->width(), "%.1f", (_totalYieldDay));
-                _display->getTextBounds(_fmtText, 0, 0, &tbx, &tby, &tbw, &tbh);
-                _display->drawInvertedBitmap(5, y - tbh, myToday, 30, 30, GxEPD_BLACK);
-                x = ((_display->width() - tbw - 20) / 2) - tbx;
-                _display->setCursor(x, y);
-                _display->print(_fmtText);
-                _display->setCursor(_display->width() - 38, y);
-                _display->setFont(&FreeSans12pt7b);
-                _display->println("Wh");
-            }
-            y = y + tbh + 15;
+            x = (paint->GetWidth() - 59);
+            paint->DrawStringAt(x, 2, "MWh", &Font24, COLORED); // light texts
+        } else if (_totalYieldTotal <= 9999) {
+            snprintf(_fmtText, paint->GetWidth(), "%.1f", (_totalYieldTotal));
+            x = ((paint->GetWidth() - paint->getStringWidth(_fmtText, Font24.Width)) / 2);
+            paint->DrawStringAt(x, 2, _fmtText, &Font24, COLORED); // light texts
 
-            // Total Production
-            _display->setFont(&FreeSans18pt7b);
-            _display->setCursor(5, y);
-            if (_totalYieldTotal > 9999) {
-                snprintf(_fmtText, _display->width(), "%.1f", (_totalYieldTotal / 1000));
-                _display->getTextBounds(_fmtText, 0, 0, &tbx, &tby, &tbw, &tbh);
-                _display->drawInvertedBitmap(5, y - tbh, mySigma, 30, 30, GxEPD_BLACK);
-                x = ((_display->width() - tbw - 20) / 2) - tbx;
-                _display->setCursor(x, y);
-                _display->print(_fmtText);
-                _display->setCursor(_display->width() - 59, y);
-                _display->setFont(&FreeSans12pt7b);
-                _display->println("MWh");
-            } else if (_totalYieldTotal <= 9999) {
-                snprintf(_fmtText, _display->width(), "%.1f", (_totalYieldTotal));
-                _display->getTextBounds(_fmtText, 0, 0, &tbx, &tby, &tbw, &tbh);
-                _display->drawInvertedBitmap(5, y - tbh, mySigma, 30, 30, GxEPD_BLACK);
-                x = ((_display->width() - tbw - 20) / 2) - tbx;
-                _display->setCursor(x, y);
-                _display->print(_fmtText);
-                _display->setCursor(_display->width() - 50, y);
-                _display->setFont(&FreeSans12pt7b);
-                _display->println("kWh");
-            }
+            x = (paint->GetWidth() - 50);
+            paint->DrawStringAt(x, 2, "kWh", &Font24, COLORED); // light texts
         }
+        paint->drawInvertedBitmap(5, 0, mySigma, 30, 30, COLORED);
+        epd->SetFrameMemoryPartial(paint->GetImage(), 0, initial_space + (3 * row_height), paint->GetWidth(), paint->GetHeight());
 
         // Inverter online
-        _display->setFont(&FreeSans12pt7b);
-        y = _display->height() - (headfootline + 10);
+        paint->SetWidth(200); // set display width
+        paint->SetHeight(20); // set initial vertical space
+
         snprintf(_fmtText, sizeof(_fmtText), " %d online", _isprod);
-        _display->getTextBounds(_fmtText, 0, 0, &tbx, &tby, &tbw, &tbh);
-        _display->drawInvertedBitmap(10, y - tbh, myWR, 20, 20, GxEPD_BLACK);
-        x = ((_display->width() - tbw - 20) / 2) - tbx;
-        _display->setCursor(x, y);
-        _display->println(_fmtText);
-    } while (_display->nextPage());
+        paint->drawInvertedBitmap(5, 0, myWR, 20, 20, COLORED);
+
+        paint->Clear(COLORED); // darkr background
+        x = ((paint->GetWidth() - paint->getStringWidth(_fmtText, Font16.Width)) / 2);
+        paint->DrawStringAt(x, 2, _fmtText, &Font16, UNCOLORED); // light text
+        epd->SetFrameMemoryPartial(paint->GetImage(), 0, initial_space + (4 * row_height), paint->GetWidth(), paint->GetHeight());
+    }
 }
 
-//***************************************************************************
+/* The main loop -------------------------------------------------------------*/
 void DisplayEPaperClass::loop(float totalPower, float totalYieldDay, float totalYieldTotal, uint8_t isprod)
 {
-    // check if the IP has changed
-    if (_settedIP != NetworkSettings.localIP().toString().c_str()) {
-        // save the new IP and call the Headline Funktion to adapt the Headline
-        _settedIP = NetworkSettings.localIP().toString().c_str();
-        headlineIP();
-    }
-
-    // call the PowerPage to change the PV Power Values
+    headlineIP(); // print header text
+    lastUpdatePaged();
     actualPowerPaged(totalPower, totalYieldDay, totalYieldTotal, isprod);
 
-    // if there was an change and the Inverter is producing set a new Timestam in the footline
-    if ((isprod > 0) && (_changed)) {
-        _changed = false;
-        lastUpdatePaged();
-    }
-
-    _display->powerOff();
+    epd->DisplayPartFrame(); // display new text
 }
-//***************************************************************************
+
 DisplayEPaperClass DisplayEPaper;
