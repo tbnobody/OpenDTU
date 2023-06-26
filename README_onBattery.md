@@ -110,7 +110,8 @@ The dynamic power limiter is responsible for automatic inverter power adjustment
 Other settings are:
 * The inverter ID configures the inverter that is controlled by the power limiter. The power limiter can only control a single inverter at this point in time.
 * Channel ID is the inverter input channel ID that is used for battery voltage readings.
-* Target power consumption and hysteresis set the power range that can be consumed from the grid.
+* Target power consumption specifies the power to be either consumed from the grid (when set to a positive value) or fed back into the grid (when set to a negative value).
+* The hysteresis value helps optimize communication with the inverter by skipping unnecessary power limit updates. An update is only sent if the absolute difference between the newly computed power limit and the previously set limit matches or exceeds the hysteresis value. This approach can conserve both airtime and CPU resources.
 * Power limits control the min / max limits of the inverter
 * Inverter is behind power meter. Select this if your inverter power is measured by the power meter. This is typically the case.
 * Battery start and stop threshold can be configured using voltage and / or state of charge values. Stage of charge values requires a Pylontech battery at this point.
