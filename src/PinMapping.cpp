@@ -86,6 +86,46 @@
 #define CMT_SDIO -1
 #endif
 
+#ifndef VICTRON_PIN_TX
+#define VICTRON_PIN_TX -1
+#endif
+
+#ifndef VICTRON_PIN_RX
+#define VICTRON_PIN_RX -1
+#endif
+
+#ifndef PYLONTECH_PIN_RX
+#define PYLONTECH_PIN_RX -1
+#endif
+
+#ifndef PYLONTECH_PIN_TX
+#define PYLONTECH_PIN_TX -1
+#endif
+
+#ifndef HUAWEI_PIN_MISO
+#define HUAWEI_PIN_MISO -1
+#endif
+
+#ifndef HUAWEI_PIN_MOSI
+#define HUAWEI_PIN_MOSI -1
+#endif
+
+#ifndef HUAWEI_PIN_SCLK
+#define HUAWEI_PIN_SCLK -1
+#endif
+
+#ifndef HUAWEI_PIN_CS
+#define HUAWEI_PIN_CS -1
+#endif
+
+#ifndef HUAWEI_PIN_IRQ
+#define HUAWEI_PIN_IRQ -1
+#endif
+
+#ifndef HUAWEI_PIN_POWER
+#define HUAWEI_PIN_POWER -1
+#endif
+
 PinMappingClass PinMapping;
 
 PinMappingClass::PinMappingClass()
