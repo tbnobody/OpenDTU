@@ -13,46 +13,151 @@
 #include "MessageOutput.h"
 #include <ctime>
 #include <cmath>
+#include <map>
 
 PowerLimiterClass PowerLimiter;
 
 #define POWER_LIMITER_DEBUG
 
-void PowerLimiterClass::init()
+void PowerLimiterClass::init() { }
+
+std::string const& PowerLimiterClass::getStatusText(PowerLimiterClass::Status status)
 {
-  CONFIG_T& config = Configuration.get();
-  if (config.PowerLimiter_Enabled) {
-    // We'll start in active state
-    _plState = ACTIVE;
-  } else {
-    _plState = SHUTDOWN;
-  }
+    static const std::string missing =  "programmer error: missing status text";
+
+    static const std::map<Status, const std::string> texts = {
+        { Status::Initializing, "initializing (should not see me)" },
+        { Status::DisabledByConfig, "disabled by configuration" },
+        { Status::DisabledByMqtt, "disabled by MQTT" },
+        { Status::PowerMeterDisabled, "no power meter is configured/enabled" },
+        { Status::PowerMeterTimeout, "power meter readings are outdated" },
+        { Status::PowerMeterPending, "waiting for sufficiently recent power meter reading" },
+        { Status::InverterInvalid, "invalid inverter selection/configuration" },
+        { Status::InverterOffline, "inverter is offline (polling enabled? radio okay?)" },
+        { Status::InverterLimitPending, "waiting for a power limit command to complete" },
+        { Status::InverterPowerCmdPending, "waiting for a start/stop/restart command to complete" },
+        { Status::InverterStatsPending, "waiting for sufficiently recent inverter data" },
+        { Status::Settling, "waiting for the system to settle" },
+        { Status::LowerLimitUndercut, "calculated power limit undercuts configured lower limit" }
+    };
+
+    auto iter = texts.find(status);
+    if (iter == texts.end()) { return missing; }
+
+    return iter->second;
+}
+
+void PowerLimiterClass::announceStatus(PowerLimiterClass::Status status)
+{
+    // this method is called with high frequency. print the status text if
+    // the status changed since we last printed the text of another one.
+    // otherwise repeat the info with a fixed interval.
+    if (_lastStatus == status && millis() < _lastStatusPrinted + 10 * 1000) { return; }
+
+    MessageOutput.printf("[%11.3f] DPL: %s\r\n",
+        static_cast<double>(millis())/1000, getStatusText(status).c_str());
+
+    _lastStatus = status;
+    _lastStatusPrinted = millis();
+}
+
+void PowerLimiterClass::shutdown(PowerLimiterClass::Status status)
+{
+    announceStatus(status);
+
+    if (_plState == plStates::OFF) { return; }
+
+    _plState = plStates::SHUTDOWN;
+
+    CONFIG_T& config = Configuration.get();
+    std::shared_ptr<InverterAbstract> inverter = Hoymiles.getInverterByPos(config.PowerLimiter_InverterId);
+    if (inverter == nullptr || !inverter->isProducing() || !inverter->isReachable()) {
+        _inverter = nullptr;
+        _plState = plStates::OFF;
+        return;
+    }
+
+    auto lastLimitCommandState = inverter->SystemConfigPara()->getLastLimitCommandSuccess();
+    if (CMD_PENDING == lastLimitCommandState) { return; }
+
+    auto lastPowerCommandState = inverter->PowerCommand()->getLastPowerCommandSuccess();
+    if (CMD_PENDING == lastPowerCommandState) { return; }
+
+    commitPowerLimit(inverter, config.PowerLimiter_LowerPowerLimit, false);
 }
 
 void PowerLimiterClass::loop()
 {
     CONFIG_T& config = Configuration.get();
 
-    // Run inital checks to make sure we have met the basic conditions
-    if (!config.PowerMeter_Enabled
-            || !Hoymiles.isAllRadioIdle()
-            || (millis() - _lastLoop) < (config.PowerLimiter_Interval * 1000)) {
-        return;
+    if (plStates::SHUTDOWN == _plState) {
+        // we transition from SHUTDOWN to OFF when we know the inverter was
+        // shut down. until then, we retry shutting it down. in this case we
+        // preserve the original status that lead to the decision to shut down.
+        return shutdown(_lastStatus);
+    }
+
+    if (!config.PowerLimiter_Enabled) {
+        return shutdown(Status::DisabledByConfig);
+    }
+
+    if (PL_MODE_FULL_DISABLE == _mode) {
+        return shutdown(Status::DisabledByMqtt);
+    }
+
+    // refuse to do anything without a power meter
+    if (!config.PowerMeter_Enabled) {
+        return shutdown(Status::PowerMeterDisabled);
+    }
+
+    if (millis() - PowerMeter.getLastPowerMeterUpdate() > (30 * 1000)) {
+        return shutdown(Status::PowerMeterTimeout);
+    }
+
+    std::shared_ptr<InverterAbstract> inverter =
+        Hoymiles.getInverterByPos(config.PowerLimiter_InverterId);
+
+    if (inverter == nullptr) { return announceStatus(Status::InverterInvalid); }
+
+    // data polling is disabled or the inverter is deemed offline
+    if (!inverter->isReachable()) {
+        return announceStatus(Status::InverterOffline);
+    }
+
+    // concerns active power commands (power limits) only (also from web app or MQTT)
+    auto lastLimitCommandState = inverter->SystemConfigPara()->getLastLimitCommandSuccess();
+    if (CMD_PENDING == lastLimitCommandState) {
+        return announceStatus(Status::InverterLimitPending);
+    }
+
+    // concerns power commands (start, stop, restart) only (also from web app or MQTT)
+    auto lastPowerCommandState = inverter->PowerCommand()->getLastPowerCommandSuccess();
+    if (CMD_PENDING == lastPowerCommandState) {
+        return announceStatus(Status::InverterPowerCmdPending);
+    }
+
+    // concerns both power limits and start/stop/restart commands and is
+    // only updated if a respective response was received from the inverter
+    auto lastUpdateCmd = std::max(
+            inverter->SystemConfigPara()->getLastUpdateCommand(),
+            inverter->PowerCommand()->getLastUpdateCommand());
+
+    // wait for power meter and inverter stat updates after a settling phase
+    auto settlingEnd = lastUpdateCmd + 3 * 1000;
+
+    if (millis() < settlingEnd) { return announceStatus(Status::Settling); }
+
+    if (inverter->Statistics()->getLastUpdate() <= settlingEnd) {
+        return announceStatus(Status::InverterStatsPending);
+    }
+
+    if (PowerMeter.getLastPowerMeterUpdate() <= settlingEnd) {
+        return announceStatus(Status::PowerMeterPending);
     }
 
 #ifdef POWER_LIMITER_DEBUG
   MessageOutput.println("[PowerLimiterClass::loop] ******************* ENTER **********************");
 #endif
-
-    _lastLoop = millis();
-
-    std::shared_ptr<InverterAbstract> inverter = Hoymiles.getInverterByPos(config.PowerLimiter_InverterId);
-    if (inverter == nullptr || !inverter->isReachable()) {
-#ifdef POWER_LIMITER_DEBUG
-  MessageOutput.println("[PowerLimiterClass::loop] ******************* No inverter found");
-#endif
-        return;
-    }
 
     // Check if next inverter restart time is reached
     if ((_nextInverterRestart > 1) && (_nextInverterRestart <= millis())) {
@@ -73,56 +178,6 @@ void PowerLimiterClass::loop()
                 _nextCalculateCheck += 5000;
             }
         }
-    }
-
-    // Make sure inverter is turned off if PL is disabled by user/MQTT
-    if (((!config.PowerLimiter_Enabled || _mode == PL_MODE_FULL_DISABLE) && _plState != SHUTDOWN)) {
-        if (inverter->isProducing()) {
-            MessageOutput.printf("PL initiated inverter shutdown.\r\n");
-            commitPowerLimit(inverter, config.PowerLimiter_LowerPowerLimit, false);
-        } else {
-            _plState = SHUTDOWN;
-        }
-#ifdef POWER_LIMITER_DEBUG
-  MessageOutput.printf("[PowerLimiterClass::loop] ******************* PL put into shutdown, _plState = %i\r\n", _plState);
-#endif        
-        return;
-    }
-
-    // Return if power limiter is disabled
-    if (!config.PowerLimiter_Enabled || _mode == PL_MODE_FULL_DISABLE) {
-#ifdef POWER_LIMITER_DEBUG
-  MessageOutput.printf("[PowerLimiterClass::loop] ******************* PL disabled\r\n");
-#endif        
-      return;
-    }
-
-    // Safety check, return on too old power meter values
-    if (millis() - PowerMeter.getLastPowerMeterUpdate() > (30 * 1000)
-            || (millis() - inverter->Statistics()->getLastUpdate()) > (config.Dtu_PollInterval * 10 * 1000)) {
-        // If the power meter values are older than 30 seconds, 
-        // or the Inverter Stats are older then 10x the poll interval
-        // set the limit to lower power limit for safety reasons.
-        MessageOutput.println("[PowerLimiterClass::loop] Power Meter/Inverter values too old, shutting down inverter");
-        commitPowerLimit(inverter, config.PowerLimiter_LowerPowerLimit, false);
-#ifdef POWER_LIMITER_DEBUG
-  MessageOutput.printf("[PowerLimiterClass::loop] ******************* PL safety shutdown, update times exceeded PM: %li, Inverter: %li \r\n", millis() - PowerMeter.getLastPowerMeterUpdate(), millis() - inverter->Statistics()->getLastUpdate());
-#endif        
-        return;
-    }
-
-  	// At this point the PL is enabled but we could still be in the shutdown state 
-    _plState = ACTIVE;
-
-    // If the last inverter update was before the last limit updated, don't do anything.
-    // Also give the Power meter 3 seconds time to recognize power changes after the last set limit
-    // as the Hoymiles MPPT might not react immediately.
-    if (inverter->Statistics()->getLastUpdate() <= _lastLimitSetTime
-        || PowerMeter.getLastPowerMeterUpdate() <= (_lastLimitSetTime + 3000)) {
-#ifdef POWER_LIMITER_DEBUG
-  MessageOutput.printf("[PowerLimiterClass::loop] ******************* PL inverter updates PM: %i, Inverter: %i \r\n", PowerMeter.getLastPowerMeterUpdate() - (_lastLimitSetTime + 3000), inverter->Statistics()->getLastUpdate() - _lastLimitSetTime);
-#endif                  
-        return;
     }
 
     // Printout some stats
@@ -308,7 +363,6 @@ void PowerLimiterClass::commitPowerLimit(std::shared_ptr<InverterAbstract> inver
             PowerLimitControlType::AbsolutNonPersistent);
 
     _lastRequestedPowerLimit = limit;
-    _lastLimitSetTime = millis();
 
     // enable power production only after setting the desired limit,
     // such that an older, greater limit will not cause power spikes.
@@ -328,13 +382,8 @@ void PowerLimiterClass::setNewPowerLimit(std::shared_ptr<InverterAbstract> inver
     CONFIG_T& config = Configuration.get();
 
     // Stop the inverter if limit is below threshold.
-    // We'll also set the power limit to the lower value in this case
     if (newPowerLimit < config.PowerLimiter_LowerPowerLimit) {
-        if (!inverter->isProducing()) { return; }
-
-        MessageOutput.printf("[PowerLimiterClass::setNewPowerLimit] requested power limit %d is smaller than lower power limit %d\r\n",
-                newPowerLimit, config.PowerLimiter_LowerPowerLimit);
-        return commitPowerLimit(inverter, config.PowerLimiter_LowerPowerLimit, false);
+        return shutdown(Status::LowerLimitUndercut);
     }
 
     // enforce configured upper power limit
@@ -372,6 +421,7 @@ void PowerLimiterClass::setNewPowerLimit(std::shared_ptr<InverterAbstract> inver
     MessageOutput.printf("[PowerLimiterClass::setNewPowerLimit] using new limit: %d W, requested power limit: %d\r\n",
             effPowerLimit, newPowerLimit);
 
+    _plState = plStates::ACTIVE;
     commitPowerLimit(inverter, effPowerLimit, true);
 }
 
