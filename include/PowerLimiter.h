@@ -33,6 +33,7 @@ public:
         PowerMeterPending,
         InverterInvalid,
         InverterOffline,
+        InverterCommandsDisabled,
         InverterLimitPending,
         InverterPowerCmdPending,
         InverterStatsPending,

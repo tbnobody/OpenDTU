@@ -34,6 +34,7 @@ std::string const& PowerLimiterClass::getStatusText(PowerLimiterClass::Status st
         { Status::PowerMeterPending, "waiting for sufficiently recent power meter reading" },
         { Status::InverterInvalid, "invalid inverter selection/configuration" },
         { Status::InverterOffline, "inverter is offline (polling enabled? radio okay?)" },
+        { Status::InverterCommandsDisabled, "inverter configuration prohibits sending commands" },
         { Status::InverterLimitPending, "waiting for a power limit command to complete" },
         { Status::InverterPowerCmdPending, "waiting for a start/stop/restart command to complete" },
         { Status::InverterStatsPending, "waiting for sufficiently recent inverter data" },
@@ -122,6 +123,11 @@ void PowerLimiterClass::loop()
     // data polling is disabled or the inverter is deemed offline
     if (!inverter->isReachable()) {
         return announceStatus(Status::InverterOffline);
+    }
+
+    // sending commands to the inverter is disabled
+    if (!_inverter->getEnableCommands()) {
+        return announceStatus(Status::InverterCommandsDisabled);
     }
 
     // concerns active power commands (power limits) only (also from web app or MQTT)
