@@ -29,11 +29,11 @@ bool RealTimeRunDataCommand::handleResponse(InverterAbstract* inverter, fragment
     // Check if at least all required bytes are received
     // In case of low power in the inverter it occours that some incomplete fragments
     // with a valid CRC are received.
-    if (getTotalFragmentSize(fragment, max_fragment_id) < inverter->Statistics()->getMaxByteCount()) {
+    if (getTotalFragmentSize(fragment, max_fragment_id) < inverter->Statistics()->getExpectedByteCount()) {
         Hoymiles.getMessageOutput()->printf("ERROR in %s: Received fragment size: %d min. expected size: %d\r\n",
             getCommandName().c_str(),
             getTotalFragmentSize(fragment, max_fragment_id),
-            inverter->Statistics()->getMaxByteCount());
+            inverter->Statistics()->getExpectedByteCount());
 
         return false;
     }
