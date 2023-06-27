@@ -49,10 +49,6 @@ private:
     uint32_t _nextCalculateCheck = 5000; // time in millis for next NTP check to calulate restart
     bool _fullSolarPassThroughEnabled = false;
 
-    float _powerMeter1Power;
-    float _powerMeter2Power;
-    float _powerMeter3Power;
-
     bool canUseDirectSolarPower();
     int32_t calcPowerLimit(std::shared_ptr<InverterAbstract> inverter, bool solarPowerEnabled, bool batteryDischargeEnabled);
     void commitPowerLimit(std::shared_ptr<InverterAbstract> inverter, int32_t limit, bool enablePowerProduction);
