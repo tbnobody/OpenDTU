@@ -22,7 +22,7 @@ private:
     uint32_t _lastDisplayUpdate = 0;
     time_t now = time(nullptr);
     uint16_t counterEPaper;
-    uint16_t _setUpdatePeriod; // Achtung, max 65535
+    uint16_t _setUpdatePeriod = 10000; // Achtung, max 65535
 };
 
 extern DisplayClass Display;

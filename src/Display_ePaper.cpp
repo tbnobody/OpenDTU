@@ -131,13 +131,15 @@ void DisplayEPaperClass::actualPowerPaged(float _totalPower, float _totalYieldDa
 /* The main loop -------------------------------------------------------------*/
 void DisplayEPaperClass::loop(float totalPower, float totalYieldDay, float totalYieldTotal, uint8_t isprod)
 {
+    epd->Reset();
+
     headlineIP(); // print header text
     lastUpdatePaged();
     actualPowerPaged(totalPower, totalYieldDay, totalYieldTotal, isprod);
 
     epd->DisplayPartFrame(); // display new text
-    // epd->HDirInit();
-    // epd->Clear();
+
+    //epd->LDirInit();
     epd->Sleep();
 }
 

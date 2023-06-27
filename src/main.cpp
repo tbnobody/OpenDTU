@@ -110,7 +110,7 @@ void setup()
 
     // Initialize Display
     MessageOutput.print("Initialize Display... ");
-    /*
+
     Display.init(
         static_cast<DisplayType_t>(pin.display_type),
         pin.display_data,
@@ -125,18 +125,16 @@ void setup()
     Display.setContrast(config.Display_Contrast);
     Display.setLanguage(config.Display_Language);
     Display.setUpdatePeriod(config.Display_UpdatePeriod);
-    */
 
     /************ Test Definition start ***********/
     /*
-    Display.enablePowerSafe = false;
-    Display.enableScreensaver = false;
-    Display.setContrast = 255;
-    Display.setOrientation = 2;
-    Display.setUpdatePeriod = 1000;
+        Display.init(DisplayType_t::ePaper154, 9, 10, 11, 13, 14, 12);
+        Display.enablePowerSafe = false;
+        Display.enableScreensaver = false;
+        Display.setContrast(255);
+        Display.setOrientation(2);
+        Display.setUpdatePeriod(10000);
     */
-    Display.init(DisplayType_t::ePaper154, 9, 10, 11, 13, 14, 12);
-    
     /************ Test Definition ende ***********/
     MessageOutput.println("done");
 

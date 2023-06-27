@@ -95,9 +95,8 @@ void Epd::SendData(unsigned char data)
 void Epd::WaitUntilIdle(void)
 {
 	while(DigitalRead(EPD_BUSY_PIN) == 1) {      //LOW: idle, HIGH: busy
-		DelayMs(100);
+		DelayMs(1);
 	}
-	DelayMs(200);
 }
 
 void Epd::Lut(unsigned char* lut)

@@ -50,5 +50,8 @@ uint8_t EpdIf::IfInit()
     digitalWrite(EPD_CS_PIN, HIGH);
     digitalWrite(EPD_SCK_PIN, LOW);
 
+    // serial printf
+    Serial.begin(115200);
+
     return 0;
 }
