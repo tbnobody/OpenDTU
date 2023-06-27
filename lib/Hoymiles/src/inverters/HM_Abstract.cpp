@@ -121,6 +121,10 @@ bool HM_Abstract::sendActivePowerControlRequest(float limit, PowerLimitControlTy
         return false;
     }
 
+    if (CMD_PENDING == SystemConfigPara()->getLastLimitCommandSuccess()) {
+        return false;
+    }
+
     if (type == PowerLimitControlType::RelativNonPersistent || type == PowerLimitControlType::RelativPersistent) {
         limit = min<float>(100, limit);
     }
@@ -144,6 +148,10 @@ bool HM_Abstract::resendActivePowerControlRequest()
 bool HM_Abstract::sendPowerControlRequest(bool turnOn)
 {
     if (!getEnableCommands()) {
+        return false;
+    }
+
+    if (CMD_PENDING == PowerCommand()->getLastPowerCommandSuccess()) {
         return false;
     }
 
