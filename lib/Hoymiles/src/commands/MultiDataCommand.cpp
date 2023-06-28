@@ -92,3 +92,12 @@ void MultiDataCommand::udpateCRC()
     _payload[24] = (uint8_t)(crc >> 8);
     _payload[25] = (uint8_t)(crc);
 }
+
+uint8_t MultiDataCommand::getTotalFragmentSize(fragment_t fragment[], uint8_t max_fragment_id)
+{
+    uint8_t fragmentSize = 0;
+    for (uint8_t i = 0; i < max_fragment_id; i++) {
+        fragmentSize += fragment[i].len;
+    }
+    return fragmentSize;
+}

@@ -1,0 +1,21 @@
+[
+  {
+    "name": "Wemos Lolin32 OLED",
+    "nrf24": {
+      "miso": 2,
+      "mosi": 14,
+      "clk": 12,
+      "irq": 0,
+      "en": 15,
+      "cs": 13
+    },
+    "eth": {
+      "enabled": false
+    },
+    "display": {
+      "type": 2,
+      "data": 5,
+      "clk": 4
+    }
+  }
+]
