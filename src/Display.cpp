@@ -70,7 +70,11 @@ void DisplayClass::setUpdatePeriod(uint16_t updatePeriod)
         return;
     }
 
-    _settedUpdatePeriod = updatePeriod;
+    if (updatePeriod > 999) {
+        _settedUpdatePeriod = updatePeriod;
+    } else {
+        _settedUpdatePeriod = 10000;
+    }
 }
 
 void DisplayClass::setOrientation(uint8_t rotation)
