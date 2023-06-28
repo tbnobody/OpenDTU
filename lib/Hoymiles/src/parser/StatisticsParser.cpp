@@ -34,6 +34,25 @@ void StatisticsParser::setByteAssignment(const byteAssign_t* byteAssignment, uin
     _byteAssignmentSize = size;
 }
 
+uint8_t StatisticsParser::getMaxByteCount()
+{
+    static uint8_t maxByteCount = 0;
+
+    // Use already calculated value
+    if (maxByteCount > 0) {
+        return maxByteCount;
+    }
+
+    for (uint8_t i = 0; i < _byteAssignmentSize; i++) {
+        if (_byteAssignment[i].div == CMD_CALC) {
+            continue;
+        }
+        maxByteCount = max<uint8_t>(maxByteCount, _byteAssignment[i].start + _byteAssignment[i].num);
+    }
+
+    return maxByteCount;
+}
+
 void StatisticsParser::clearBuffer()
 {
     memset(_payloadStatistic, 0, STATISTIC_PACKET_SIZE);
