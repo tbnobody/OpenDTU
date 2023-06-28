@@ -23,6 +23,9 @@
 #include <Arduino.h>
 #include <LittleFS.h>
 
+void displayTask(void*);
+TaskHandle_t displayTaskHandle;
+
 void setup()
 {
     // Initialize serial output
@@ -75,7 +78,6 @@ void setup()
     } else {
         MessageOutput.print("using default config ");
     }
-    const PinMapping_t& pin = PinMapping.get();
     MessageOutput.println("done");
 
     // Initialize WiFi
@@ -108,36 +110,6 @@ void setup()
     WebApi.init();
     MessageOutput.println("done");
 
-    // Initialize Display
-    MessageOutput.print("Initialize Display... ");
-
-    Display.init(
-        static_cast<DisplayType_t>(pin.display_type),
-        pin.display_data,
-        pin.display_clk,
-        pin.display_cs,
-        pin.display_reset,
-        pin.display_busy,
-        pin.display_dc);
-    Display.setOrientation(config.Display_Rotation);
-    Display.enablePowerSafe = config.Display_PowerSafe;
-    Display.enableScreensaver = config.Display_ScreenSaver;
-    Display.setContrast(config.Display_Contrast);
-    Display.setLanguage(config.Display_Language);
-    Display.setUpdatePeriod(config.Display_UpdatePeriod);
-
-    /************ Test Definition start ***********/
-    /*
-        Display.init(DisplayType_t::ePaper154, 9, 10, 11, 13, 14, 12);
-        Display.enablePowerSafe = false;
-        Display.enableScreensaver = false;
-        Display.setContrast(255);
-        Display.setOrientation(2);
-        Display.setUpdatePeriod(10000);
-    */
-    /************ Test Definition ende ***********/
-    MessageOutput.println("done");
-
     // Initialize Single LEDs
     MessageOutput.print("Initialize LEDs... ");
     LedSingle.init();
@@ -159,6 +131,8 @@ void setup()
     InverterSettings.init();
 
     Datastore.init();
+
+    xTaskCreateUniversal(displayTask, "displayTask", 8192, NULL, 1, &displayTaskHandle, ARDUINO_RUNNING_CORE);
 }
 
 void loop()
@@ -179,12 +153,39 @@ void loop()
     yield();
     WebApi.loop();
     yield();
-    Display.loop();
-    yield();
     SunPosition.loop();
     yield();
     MessageOutput.loop();
     yield();
     LedSingle.loop();
     yield();
+}
+
+void displayTask(void* pvParameters)
+{
+    CONFIG_T& config = Configuration.get();
+    const PinMapping_t& pin = PinMapping.get();
+
+    // Initialize Display
+    MessageOutput.print("Initialize Display... ");
+    Display.init(
+        static_cast<DisplayType_t>(pin.display_type),
+        pin.display_data,
+        pin.display_clk,
+        pin.display_cs,
+        pin.display_reset,
+        pin.display_busy,
+        pin.display_dc);
+    Display.setOrientation(config.Display_Rotation);
+    Display.enablePowerSafe = config.Display_PowerSafe;
+    Display.enableScreensaver = config.Display_ScreenSaver;
+    Display.setContrast(config.Display_Contrast);
+    Display.setLanguage(config.Display_Language);
+    Display.setUpdatePeriod(config.Display_UpdatePeriod);
+    MessageOutput.println("done");
+
+    while (true) {
+        Display.loop();
+        yield();
+    }
 }

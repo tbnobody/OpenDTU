@@ -93,7 +93,7 @@ void DisplayClass::loop()
         return;
     }
 
-    if ((millis() - _lastDisplayUpdate) > _setUpdatePeriod) {
+    if ((millis() - _lastDisplayUpdate) > 10000) {
 
         if ((_display_type == PCD8544) || (_display_type == SSD1306) || (_display_type == SH1106)) {
             DisplayMono.loop(Datastore.getTotalAcPowerEnabled(), Datastore.getTotalAcYieldDayEnabled(), Datastore.getTotalAcYieldTotalEnabled(), Datastore.getTotalProducing());
