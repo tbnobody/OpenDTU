@@ -38,6 +38,8 @@ public:
         InverterLimitPending,
         InverterPowerCmdPending,
         InverterStatsPending,
+        UnconditionalSolarPassthrough,
+        NoVeDirect,
         Settling,
         LowerLimitUndercut
     };
@@ -72,6 +74,8 @@ private:
     std::string const& getStatusText(Status status);
     void announceStatus(Status status);
     void shutdown(Status status);
+    int32_t inverterPowerDcToAc(std::shared_ptr<InverterAbstract> inverter, int32_t dcPower);
+    void unconditionalSolarPassthrough(std::shared_ptr<InverterAbstract> inverter);
     bool canUseDirectSolarPower();
     int32_t calcPowerLimit(std::shared_ptr<InverterAbstract> inverter, bool solarPowerEnabled, bool batteryDischargeEnabled);
     void commitPowerLimit(std::shared_ptr<InverterAbstract> inverter, int32_t limit, bool enablePowerProduction);

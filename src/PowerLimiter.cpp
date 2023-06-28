@@ -39,6 +39,8 @@ std::string const& PowerLimiterClass::getStatusText(PowerLimiterClass::Status st
         { Status::InverterLimitPending, "waiting for a power limit command to complete" },
         { Status::InverterPowerCmdPending, "waiting for a start/stop/restart command to complete" },
         { Status::InverterStatsPending, "waiting for sufficiently recent inverter data" },
+        { Status::UnconditionalSolarPassthrough, "unconditionally passing through all solar power (MQTT override)" },
+        { Status::NoVeDirect, "VE.Direct disabled, connection broken, or data outdated" },
         { Status::Settling, "waiting for the system to settle" },
         { Status::LowerLimitUndercut, "calculated power limit undercuts configured lower limit" }
     };
@@ -106,15 +108,6 @@ void PowerLimiterClass::loop()
         return shutdown(Status::DisabledByMqtt);
     }
 
-    // refuse to do anything without a power meter
-    if (!config.PowerMeter_Enabled) {
-        return shutdown(Status::PowerMeterDisabled);
-    }
-
-    if (millis() - PowerMeter.getLastPowerMeterUpdate() > (30 * 1000)) {
-        return shutdown(Status::PowerMeterTimeout);
-    }
-
     std::shared_ptr<InverterAbstract> currentInverter =
         Hoymiles.getInverterByPos(config.PowerLimiter_InverterId);
 
@@ -156,6 +149,21 @@ void PowerLimiterClass::loop()
     auto lastPowerCommandState = _inverter->PowerCommand()->getLastPowerCommandSuccess();
     if (CMD_PENDING == lastPowerCommandState) {
         return announceStatus(Status::InverterPowerCmdPending);
+    }
+
+    if (PL_MODE_SOLAR_PT_ONLY == _mode) {
+        // handle this mode of operation separately
+        return unconditionalSolarPassthrough(_inverter);
+    }
+
+    // the normal mode of operation requires a valid
+    // power meter reading to calculate a power limit
+    if (!config.PowerMeter_Enabled) {
+        return shutdown(Status::PowerMeterDisabled);
+    }
+
+    if (millis() - PowerMeter.getLastPowerMeterUpdate() > (30 * 1000)) {
+        return shutdown(Status::PowerMeterTimeout);
     }
 
     // concerns both power limits and start/stop/restart commands and is
@@ -253,6 +261,45 @@ void PowerLimiterClass::loop()
 #endif
 }
 
+/**
+ * calculate the AC output power (limit) to set, such that the inverter uses
+ * the given power on its DC side, i.e., adjust the power for the inverter's
+ * efficiency.
+ */
+int32_t PowerLimiterClass::inverterPowerDcToAc(std::shared_ptr<InverterAbstract> inverter, int32_t dcPower)
+{
+    CONFIG_T& config = Configuration.get();
+
+    float inverterEfficiencyPercent = inverter->Statistics()->getChannelFieldValue(
+        TYPE_AC, static_cast<ChannelNum_t>(config.PowerLimiter_InverterChannelId), FLD_EFF);
+
+    // fall back to hoymiles peak efficiency as per datasheet if inverter
+    // is currently not producing (efficiency is zero in that case)
+    float inverterEfficiencyFactor = (inverterEfficiencyPercent > 0) ? inverterEfficiencyPercent/100 : 0.967;
+
+    return dcPower * inverterEfficiencyFactor;
+}
+
+/**
+ * implements the "unconditional solar passthrough" mode of operation, which
+ * can currently only be set using MQTT. in this mode of operation, the
+ * inverter shall behave as if it was connected to the solar panels directly,
+ * i.e., all solar power (and only solar power) is fed to the AC side,
+ * independent from the power meter reading.
+ */
+void PowerLimiterClass::unconditionalSolarPassthrough(std::shared_ptr<InverterAbstract> inverter)
+{
+    CONFIG_T& config = Configuration.get();
+
+    if (!config.Vedirect_Enabled || !VeDirect.isDataValid()) {
+        return shutdown(Status::NoVeDirect);
+    }
+
+    int32_t solarPower = VeDirect.veFrame.V * VeDirect.veFrame.I;
+    setNewPowerLimit(inverter, inverterPowerDcToAc(inverter, solarPower));
+    announceStatus(Status::UnconditionalSolarPassthrough);
+}
+
 uint8_t PowerLimiterClass::getPowerLimiterState() {
     if (_inverter == nullptr || !_inverter->isReachable()) {
         return PL_UI_STATE_INACTIVE;
@@ -341,13 +388,7 @@ int32_t PowerLimiterClass::calcPowerLimit(std::shared_ptr<InverterAbstract> inve
     // If the battery is enabled this can always be supplied since we assume that the battery can supply unlimited power
     // The next step is to determine if the Solar power as provided by the Victron charger
     // actually constrains or dictates another inverter power value
-    float inverterEfficiencyPercent = inverter->Statistics()->getChannelFieldValue(
-        TYPE_AC, static_cast<ChannelNum_t>(config.PowerLimiter_InverterChannelId), FLD_EFF);
-    // fall back to hoymiles peak efficiency as per datasheet if inverter
-    // is currently not producing (efficiency is zero in that case)
-    float inverterEfficiencyFactor = (inverterEfficiencyPercent > 0) ? inverterEfficiencyPercent/100 : 0.967;
-    int32_t victronChargePower = getSolarChargePower();
-    int32_t adjustedVictronChargePower = victronChargePower * inverterEfficiencyFactor;
+    int32_t adjustedVictronChargePower = inverterPowerDcToAc(inverter, getSolarChargePower());
 
     // Battery can be discharged and we should output max (Victron solar power || power meter value)
     if(batteryDischargeEnabled && useFullSolarPassthrough(inverter)) {
@@ -356,13 +397,12 @@ int32_t PowerLimiterClass::calcPowerLimit(std::shared_ptr<InverterAbstract> inve
     } 
 
     // We should use Victron solar power only (corrected by efficiency factor)
-    if ((solarPowerEnabled && !batteryDischargeEnabled) || (_mode == PL_MODE_SOLAR_PT_ONLY)) {
+    if (solarPowerEnabled && !batteryDischargeEnabled) {
         // Case 2 - Limit power to solar power only
-        MessageOutput.printf("[PowerLimiterClass::loop] Consuming Solar Power Only -> victronChargePower: %d, inverter efficiency: %.2f, powerConsumption: %d \r\n",
-            victronChargePower, inverterEfficiencyFactor, newPowerLimit);
+        MessageOutput.printf("[PowerLimiterClass::loop] Consuming Solar Power Only -> adjustedVictronChargePower: %d, powerConsumption: %d \r\n",
+            adjustedVictronChargePower, newPowerLimit);
 
-        if ((adjustedVictronChargePower < newPowerLimit) || (_mode == PL_MODE_SOLAR_PT_ONLY)) 
-          newPowerLimit = adjustedVictronChargePower;
+        newPowerLimit = std::min(newPowerLimit, adjustedVictronChargePower);
     }
 
     MessageOutput.printf("[PowerLimiterClass::loop] newPowerLimit: %d\r\n", newPowerLimit);
