@@ -1,5 +1,5 @@
 <template>
-    <div class="card" v-if="dataLoaded">
+    <div class="card row" v-if="dataLoaded">
         <GChart type="ColumnChart" :data="chartData" :options="chartOptions" />
     </div>
 </template>
@@ -19,7 +19,7 @@ const options_col = {
         height: '80%'
     },
     bar: {
-        groupWidth: '100%'
+        groupWidth: '90%'
     },
     legend: {
         position: 'none'
