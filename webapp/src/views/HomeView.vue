@@ -16,8 +16,14 @@
                     </button>
                 </div>
             </div>
-            <BarChart />
-            <CalendarChart />
+            <div class="card">
+                <div class="card-body">
+                    <div class="row">
+                        <BarChart />
+                        <CalendarChart />
+                    </div>
+                </div>
+            </div>
 
             <div class="tab-content" id="v-pills-tabContent" :class="{
                 'col-sm-9 col-md-10': inverterData.length > 1,
