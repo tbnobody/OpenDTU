@@ -33,6 +33,7 @@ std::string const& PowerLimiterClass::getStatusText(PowerLimiterClass::Status st
         { Status::PowerMeterTimeout, "power meter readings are outdated" },
         { Status::PowerMeterPending, "waiting for sufficiently recent power meter reading" },
         { Status::InverterInvalid, "invalid inverter selection/configuration" },
+        { Status::InverterChanged, "target inverter changed" },
         { Status::InverterOffline, "inverter is offline (polling enabled? radio okay?)" },
         { Status::InverterCommandsDisabled, "inverter configuration prohibits sending commands" },
         { Status::InverterLimitPending, "waiting for a power limit command to complete" },
@@ -70,21 +71,20 @@ void PowerLimiterClass::shutdown(PowerLimiterClass::Status status)
 
     _plState = plStates::SHUTDOWN;
 
-    CONFIG_T& config = Configuration.get();
-    std::shared_ptr<InverterAbstract> inverter = Hoymiles.getInverterByPos(config.PowerLimiter_InverterId);
-    if (inverter == nullptr || !inverter->isProducing() || !inverter->isReachable()) {
+    if (_inverter == nullptr || !_inverter->isProducing() || !_inverter->isReachable()) {
         _inverter = nullptr;
         _plState = plStates::OFF;
         return;
     }
 
-    auto lastLimitCommandState = inverter->SystemConfigPara()->getLastLimitCommandSuccess();
+    auto lastLimitCommandState = _inverter->SystemConfigPara()->getLastLimitCommandSuccess();
     if (CMD_PENDING == lastLimitCommandState) { return; }
 
-    auto lastPowerCommandState = inverter->PowerCommand()->getLastPowerCommandSuccess();
+    auto lastPowerCommandState = _inverter->PowerCommand()->getLastPowerCommandSuccess();
     if (CMD_PENDING == lastPowerCommandState) { return; }
 
-    commitPowerLimit(inverter, config.PowerLimiter_LowerPowerLimit, false);
+    CONFIG_T& config = Configuration.get();
+    commitPowerLimit(_inverter, config.PowerLimiter_LowerPowerLimit, false);
 }
 
 void PowerLimiterClass::loop()
@@ -115,13 +115,29 @@ void PowerLimiterClass::loop()
         return shutdown(Status::PowerMeterTimeout);
     }
 
-    std::shared_ptr<InverterAbstract> inverter =
+    std::shared_ptr<InverterAbstract> currentInverter =
         Hoymiles.getInverterByPos(config.PowerLimiter_InverterId);
 
-    if (inverter == nullptr) { return announceStatus(Status::InverterInvalid); }
+    // in case of (newly) broken configuration, shut down
+    // the last inverter we worked with (if any)
+    if (currentInverter == nullptr) {
+        return shutdown(Status::InverterInvalid);
+    }
+
+    // if the DPL is supposed to manage another inverter now, we first
+    // shut down the previous one, if any. then we pick up the new one.
+    if (_inverter != nullptr && _inverter->serial() != currentInverter->serial()) {
+        return shutdown(Status::InverterChanged);
+    }
+
+    // update our pointer as the configuration might have changed
+    _inverter = currentInverter;
+
+    // controlling an inverter means the DPL will shut it down eventually
+    _plState = plStates::ACTIVE;
 
     // data polling is disabled or the inverter is deemed offline
-    if (!inverter->isReachable()) {
+    if (!_inverter->isReachable()) {
         return announceStatus(Status::InverterOffline);
     }
 
@@ -131,13 +147,13 @@ void PowerLimiterClass::loop()
     }
 
     // concerns active power commands (power limits) only (also from web app or MQTT)
-    auto lastLimitCommandState = inverter->SystemConfigPara()->getLastLimitCommandSuccess();
+    auto lastLimitCommandState = _inverter->SystemConfigPara()->getLastLimitCommandSuccess();
     if (CMD_PENDING == lastLimitCommandState) {
         return announceStatus(Status::InverterLimitPending);
     }
 
     // concerns power commands (start, stop, restart) only (also from web app or MQTT)
-    auto lastPowerCommandState = inverter->PowerCommand()->getLastPowerCommandSuccess();
+    auto lastPowerCommandState = _inverter->PowerCommand()->getLastPowerCommandSuccess();
     if (CMD_PENDING == lastPowerCommandState) {
         return announceStatus(Status::InverterPowerCmdPending);
     }
@@ -145,15 +161,15 @@ void PowerLimiterClass::loop()
     // concerns both power limits and start/stop/restart commands and is
     // only updated if a respective response was received from the inverter
     auto lastUpdateCmd = std::max(
-            inverter->SystemConfigPara()->getLastUpdateCommand(),
-            inverter->PowerCommand()->getLastUpdateCommand());
+            _inverter->SystemConfigPara()->getLastUpdateCommand(),
+            _inverter->PowerCommand()->getLastUpdateCommand());
 
     // wait for power meter and inverter stat updates after a settling phase
     auto settlingEnd = lastUpdateCmd + 3 * 1000;
 
     if (millis() < settlingEnd) { return announceStatus(Status::Settling); }
 
-    if (inverter->Statistics()->getLastUpdate() <= settlingEnd) {
+    if (_inverter->Statistics()->getLastUpdate() <= settlingEnd) {
         return announceStatus(Status::InverterStatsPending);
     }
 
@@ -168,7 +184,7 @@ void PowerLimiterClass::loop()
     // Check if next inverter restart time is reached
     if ((_nextInverterRestart > 1) && (_nextInverterRestart <= millis())) {
         MessageOutput.println("[PowerLimiterClass::loop] send inverter restart");
-        inverter->sendRestartControlRequest();
+        _inverter->sendRestartControlRequest();
         calcNextInverterRestart();
     }
 
@@ -188,26 +204,26 @@ void PowerLimiterClass::loop()
 
     // Printout some stats
     if (millis() - PowerMeter.getLastPowerMeterUpdate() < (30 * 1000)) {
-        float dcVoltage = inverter->Statistics()->getChannelFieldValue(TYPE_DC, (ChannelNum_t) config.PowerLimiter_InverterChannelId, FLD_UDC);
+        float dcVoltage = _inverter->Statistics()->getChannelFieldValue(TYPE_DC, (ChannelNum_t) config.PowerLimiter_InverterChannelId, FLD_UDC);
         MessageOutput.printf("[PowerLimiterClass::loop] dcVoltage: %.2f Voltage Start Threshold: %.2f Voltage Stop Threshold: %.2f inverter->isProducing(): %d\r\n",
-            dcVoltage, config.PowerLimiter_VoltageStartThreshold, config.PowerLimiter_VoltageStopThreshold, inverter->isProducing());
+            dcVoltage, config.PowerLimiter_VoltageStartThreshold, config.PowerLimiter_VoltageStopThreshold, _inverter->isProducing());
     }
 
     // Battery charging cycle conditions
     // First we always disable discharge if the battery is empty
-    if (isStopThresholdReached(inverter)) {
+    if (isStopThresholdReached(_inverter)) {
       // Disable battery discharge when empty
       _batteryDischargeEnabled = false;
     } else {
       // UI: Solar Passthrough Enabled -> false
       // Battery discharge can be enabled when start threshold is reached
-      if (!config.PowerLimiter_SolarPassThroughEnabled && isStartThresholdReached(inverter)) {
+      if (!config.PowerLimiter_SolarPassThroughEnabled && isStartThresholdReached(_inverter)) {
         _batteryDischargeEnabled = true;
       }
 
       // UI: Solar Passthrough Enabled -> true && EMPTY_AT_NIGHT
       if (config.PowerLimiter_SolarPassThroughEnabled && config.PowerLimiter_BatteryDrainStategy == EMPTY_AT_NIGHT) {
-        if(isStartThresholdReached(inverter)) {
+        if(isStartThresholdReached(_inverter)) {
             // In this case we should only discharge the battery as long it is above startThreshold
             _batteryDischargeEnabled = true;
         }
@@ -219,18 +235,18 @@ void PowerLimiterClass::loop()
 
       // UI: Solar Passthrough Enabled -> true && EMPTY_WHEN_FULL
       // Battery discharge can be enabled when start threshold is reached
-      if (config.PowerLimiter_SolarPassThroughEnabled && isStartThresholdReached(inverter) && config.PowerLimiter_BatteryDrainStategy == EMPTY_WHEN_FULL) {
+      if (config.PowerLimiter_SolarPassThroughEnabled && isStartThresholdReached(_inverter) && config.PowerLimiter_BatteryDrainStategy == EMPTY_WHEN_FULL) {
         _batteryDischargeEnabled = true;
       }
     }
     // Calculate and set Power Limit
-    int32_t newPowerLimit = calcPowerLimit(inverter, canUseDirectSolarPower(), _batteryDischargeEnabled);
-    setNewPowerLimit(inverter, newPowerLimit);
+    int32_t newPowerLimit = calcPowerLimit(_inverter, canUseDirectSolarPower(), _batteryDischargeEnabled);
+    setNewPowerLimit(_inverter, newPowerLimit);
 #ifdef POWER_LIMITER_DEBUG
     MessageOutput.printf("[PowerLimiterClass::loop] Status: SolarPT enabled %i, Drain Strategy: %i, canUseDirectSolarPower: %i, Batt discharge: %i\r\n",
         config.PowerLimiter_SolarPassThroughEnabled, config.PowerLimiter_BatteryDrainStategy, canUseDirectSolarPower(), _batteryDischargeEnabled);
     MessageOutput.printf("[PowerLimiterClass::loop] Status: StartTH %i, StopTH: %i, loadCorrectedV %f\r\n",
-        isStartThresholdReached(inverter), isStopThresholdReached(inverter), getLoadCorrectedVoltage(inverter));
+        isStartThresholdReached(_inverter), isStopThresholdReached(_inverter), getLoadCorrectedVoltage(_inverter));
     MessageOutput.printf("[PowerLimiterClass::loop] Status Batt: Ena: %i, SOC: %i, StartTH: %i, StopTH: %i, LastUpdate: %li\r\n",
         config.Battery_Enabled, Battery.stateOfCharge, config.PowerLimiter_BatterySocStartThreshold, config.PowerLimiter_BatterySocStopThreshold, millis() - Battery.stateOfChargeLastUpdate);
     MessageOutput.printf("[PowerLimiterClass::loop] ******************* Leaving PL, PL set to: %i, SP: %i, Batt: %i, PM: %f\r\n", newPowerLimit, canUseDirectSolarPower(), _batteryDischargeEnabled, round(PowerMeter.getPowerTotal()));
@@ -238,22 +254,19 @@ void PowerLimiterClass::loop()
 }
 
 uint8_t PowerLimiterClass::getPowerLimiterState() {
-    CONFIG_T& config = Configuration.get();
-
-    std::shared_ptr<InverterAbstract> inverter = Hoymiles.getInverterByPos(config.PowerLimiter_InverterId);
-    if (inverter == nullptr || !inverter->isReachable()) {
+    if (_inverter == nullptr || !_inverter->isReachable()) {
         return PL_UI_STATE_INACTIVE;
     }
 
-    if (inverter->isProducing() && _batteryDischargeEnabled) {
+    if (_inverter->isProducing() && _batteryDischargeEnabled) {
       return PL_UI_STATE_USE_SOLAR_AND_BATTERY;
     }
 
-    if (inverter->isProducing() && !_batteryDischargeEnabled) {
+    if (_inverter->isProducing() && !_batteryDischargeEnabled) {
       return PL_UI_STATE_USE_SOLAR_ONLY;
     }
 
-    if(!inverter->isProducing()) {
+    if(!_inverter->isProducing()) {
        return PL_UI_STATE_CHARGING;
     }
 
@@ -427,7 +440,6 @@ void PowerLimiterClass::setNewPowerLimit(std::shared_ptr<InverterAbstract> inver
     MessageOutput.printf("[PowerLimiterClass::setNewPowerLimit] using new limit: %d W, requested power limit: %d\r\n",
             effPowerLimit, newPowerLimit);
 
-    _plState = plStates::ACTIVE;
     commitPowerLimit(inverter, effPowerLimit, true);
 }
 

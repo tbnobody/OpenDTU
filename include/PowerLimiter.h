@@ -32,6 +32,7 @@ public:
         PowerMeterTimeout,
         PowerMeterPending,
         InverterInvalid,
+        InverterChanged,
         InverterOffline,
         InverterCommandsDisabled,
         InverterLimitPending,
@@ -62,6 +63,7 @@ private:
     Status _lastStatus = Status::Initializing;
     uint32_t _lastStatusPrinted = 0;
     uint8_t _mode = PL_MODE_ENABLE_NORMAL_OP;
+    std::shared_ptr<InverterAbstract> _inverter = nullptr;
     bool _batteryDischargeEnabled = false;
     uint32_t _nextInverterRestart = 0; // Values: 0->not calculated / 1->no restart configured / >1->time of next inverter restart in millis()
     uint32_t _nextCalculateCheck = 5000; // time in millis for next NTP check to calulate restart
