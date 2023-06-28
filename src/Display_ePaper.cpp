@@ -30,7 +30,7 @@ void DisplayEPaperClass::init(DisplayType_t type, uint8_t _CS, uint8_t _DC, uint
 
         _display->epd2.init(_SCK, _MOSI, 115200, true, 20, false);
         _display->init(115200, true, 20, false);
-        _display->setRotation(displayRotation);
+        _display->setRotation(_displayRotation);
         _display->setFullWindow();
 
         // Logo
@@ -74,7 +74,7 @@ void DisplayEPaperClass::headlineIP()
     _display->setFont(&FreeSans9pt7b);
     _display->setTextColor(GxEPD_WHITE);
 
-    _display->setPartialWindow(0, 0, _display->width(), headfootline);
+    _display->setPartialWindow(0, 0, _display->width(), _headfootline);
     _display->fillScreen(GxEPD_BLACK);
     do {
         if ((NetworkSettings.isConnected() == true) && (NetworkSettings.localIP() > 0)) {
@@ -85,9 +85,17 @@ void DisplayEPaperClass::headlineIP()
         _display->getTextBounds(_fmtText, 0, 0, &tbx, &tby, &tbw, &tbh);
         uint16_t x = ((_display->width() - tbw) / 2) - tbx;
 
-        _display->setCursor(x, (headfootline - 2));
+        _display->setCursor(x, (_headfootline - 2));
         _display->println(_fmtText);
     } while (_display->nextPage());
+}
+//***************************************************************************
+void DisplayEPaperClass::setOrientation(uint8_t rotation)
+{
+    _display->setRotation(rotation);
+    _display->setFullWindow();
+
+    _displayRotation = rotation;
 }
 //***************************************************************************
 void DisplayEPaperClass::lastUpdatePaged()
@@ -98,7 +106,7 @@ void DisplayEPaperClass::lastUpdatePaged()
     _display->setFont(&FreeSans9pt7b);
     _display->setTextColor(GxEPD_WHITE);
 
-    _display->setPartialWindow(0, _display->height() - headfootline, _display->width(), headfootline);
+    _display->setPartialWindow(0, _display->height() - _headfootline, _display->width(), _headfootline);
     _display->fillScreen(GxEPD_BLACK);
     do {
         time_t now = time(nullptr);
@@ -120,7 +128,7 @@ void DisplayEPaperClass::actualPowerPaged(float _totalPower, float _totalYieldDa
     _display->setFont(&FreeSans24pt7b);
     _display->setTextColor(GxEPD_BLACK);
 
-    _display->setPartialWindow(0, headfootline, _display->width(), _display->height() - (headfootline * 2));
+    _display->setPartialWindow(0, _headfootline, _display->width(), _display->height() - (_headfootline * 2));
     _display->fillScreen(GxEPD_WHITE);
     do {
         // actual Production
@@ -135,7 +143,7 @@ void DisplayEPaperClass::actualPowerPaged(float _totalPower, float _totalYieldDa
         }
         _display->getTextBounds(_fmtText, 0, 0, &tbx, &tby, &tbw, &tbh);
         x = ((_display->width() - tbw) / 2) - tbx;
-        _display->setCursor(x, headfootline + tbh + 10);
+        _display->setCursor(x, _headfootline + tbh + 10);
         _display->print(_fmtText);
 
         if ((_totalYieldDay > 0) && (_totalYieldTotal > 0)) {
@@ -195,7 +203,7 @@ void DisplayEPaperClass::actualPowerPaged(float _totalPower, float _totalYieldDa
 
         // Inverter online
         _display->setFont(&FreeSans12pt7b);
-        y = _display->height() - (headfootline + 10);
+        y = _display->height() - (_headfootline + 10);
         snprintf(_fmtText, sizeof(_fmtText), " %d online", _isprod);
         _display->getTextBounds(_fmtText, 0, 0, &tbx, &tby, &tbw, &tbh);
         _display->drawInvertedBitmap(10, y - tbh, myWR, 20, 20, GxEPD_BLACK);

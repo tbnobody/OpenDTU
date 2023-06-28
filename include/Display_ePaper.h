@@ -26,11 +26,11 @@ class DisplayEPaperClass {
 public:
     DisplayEPaperClass();
     ~DisplayEPaperClass();
-    void fullRefresh();
+
     void init(DisplayType_t type, uint8_t _CS, uint8_t _DC, uint8_t _RST, uint8_t _BUSY, uint8_t _SCK, uint8_t _MOSI);
     void loop(float totalPower, float totalYieldDay, float totalYieldTotal, uint8_t isprod);
-
-    uint8_t displayRotation = 2;
+    void fullRefresh();
+    void setOrientation(uint8_t rotation);
 
 private:
     void headlineIP();
@@ -40,7 +40,8 @@ private:
     bool _changed = false;
     char _fmtText[35];
     const char* _settedIP;
-    uint8_t headfootline = 16;
+    uint8_t _headfootline = 16;
+    uint8_t _displayRotation = 2;
     GxEPD2_GFX* _display;
 };
 

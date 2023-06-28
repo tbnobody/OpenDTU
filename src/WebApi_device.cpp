@@ -156,8 +156,8 @@ void WebApiDeviceClass::onDeviceAdminPost(AsyncWebServerRequest* request)
     config.Display_UpdatePeriod = root["display"]["update"].as<uint16_t>();
 
     Display.setOrientation(config.Display_Rotation);
-    Display.enablePowerSafe = config.Display_PowerSafe;
-    Display.enableScreensaver = config.Display_ScreenSaver;
+    Display.setEnablePowerSafe(config.Display_PowerSafe);
+    Display.setEnableScreensaver(config.Display_ScreenSaver);
     Display.setContrast(config.Display_Contrast);
     Display.setLanguage(config.Display_Language);
     Display.setUpdatePeriod(config.Display_UpdatePeriod);

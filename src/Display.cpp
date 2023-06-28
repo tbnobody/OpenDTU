@@ -33,12 +33,10 @@ void DisplayClass::init(DisplayType_t _type, uint8_t _data, uint8_t _clk, uint8_
     if (_type == DisplayType_t::None) {
         return;
     } else if ((_type == PCD8544) || (_type == SSD1306) || (_type == SH1106) || (_type == SSD1309)) {
-        DisplayMono.enablePowerSafe = enablePowerSafe;
-        DisplayMono.enableScreensaver = enableScreensaver;
-
         DisplayMono.init(_type, _cs, _dc, _reset, _busy, _clk, _data);
+
     } else if (_type == ePaper154) {
-        counterEPaper = 0;
+        _counterEPaper = 0;
 
         DisplayEPaper.init(_type, _cs, _dc, _reset, _busy, _clk, _data);
     }
@@ -72,7 +70,7 @@ void DisplayClass::setUpdatePeriod(uint16_t updatePeriod)
         return;
     }
 
-    _setUpdatePeriod = updatePeriod;
+    _settedUpdatePeriod = updatePeriod;
 }
 
 void DisplayClass::setOrientation(uint8_t rotation)
@@ -82,8 +80,24 @@ void DisplayClass::setOrientation(uint8_t rotation)
     } else if ((_display_type == PCD8544) || (_display_type == SSD1306) || (_display_type == SH1106) || (_display_type == SSD1309)) {
         DisplayMono.setOrientation(rotation);
     } else if (_display_type == ePaper154) {
+        DisplayEPaper.setOrientation(rotation);
+    }
+}
 
-        // DisplayEPaper.setOrientation(rotation);
+void DisplayClass::setEnablePowerSafe(bool display_PowerSafe)
+{
+    if (_display_type == DisplayType_t::None) {
+        return;
+    } else if ((_display_type == PCD8544) || (_display_type == SSD1306) || (_display_type == SH1106) || (_display_type == SSD1309)) {
+        DisplayMono.enablePowerSafe = display_PowerSafe;
+    }
+}
+void DisplayClass::setEnableScreensaver(bool display_ScreenSaver)
+{
+    if (_display_type == DisplayType_t::None) {
+        return;
+    } else if ((_display_type == PCD8544) || (_display_type == SSD1306) || (_display_type == SH1106) || (_display_type == SSD1309)) {
+        DisplayMono.enableScreensaver = display_ScreenSaver;
     }
 }
 
@@ -93,21 +107,21 @@ void DisplayClass::loop()
         return;
     }
 
-    if ((millis() - _lastDisplayUpdate) > 10000) {
+    if ((millis() - _lastDisplayUpdate) > _settedUpdatePeriod) {
 
         if ((_display_type == PCD8544) || (_display_type == SSD1306) || (_display_type == SH1106)) {
             DisplayMono.loop(Datastore.getTotalAcPowerEnabled(), Datastore.getTotalAcYieldDayEnabled(), Datastore.getTotalAcYieldTotalEnabled(), Datastore.getTotalProducing());
         } else if (_display_type == ePaper154) {
 
             DisplayEPaper.loop(Datastore.getTotalAcPowerEnabled(), Datastore.getTotalAcYieldDayEnabled(), Datastore.getTotalAcYieldTotalEnabled(), Datastore.getTotalProducing());
-            counterEPaper++;
+            _counterEPaper++;
         }
         _lastDisplayUpdate = millis();
     }
 
-    if (counterEPaper > 480) {
-        // DisplayEPaper.fullRefresh();
-        counterEPaper = 0;
+    if (_counterEPaper > 480) {
+        DisplayEPaper.fullRefresh();
+        _counterEPaper = 0;
     }
 }
 
