@@ -240,7 +240,7 @@ bool DatastoreClass::getIsAllEnabledReachable()
 uint8_t DatastoreClass::getTotalProducing()
 {
     DAT_SEMAPHORE_TAKE();
-    bool retval = _isProducing;
+    uint8_t retval = _isProducing;
     DAT_SEMAPHORE_GIVE();
     return retval;
 }
