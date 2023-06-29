@@ -285,22 +285,22 @@ bool PinMappingClass::isValidEthConfig()
 
 bool PinMappingClass::isValidVictronConfig()
 {
-    return _pinMapping.victron_rx > 0
-        && _pinMapping.victron_tx > 0;
+    return _pinMapping.victron_rx >= 0
+        && _pinMapping.victron_tx >= 0;
 }
 
 bool PinMappingClass::isValidBatteryConfig()
 {
-    return _pinMapping.battery_rx > 0
-        && _pinMapping.battery_tx > 0;
+    return _pinMapping.battery_rx >= 0
+        && _pinMapping.battery_tx >= 0;
 }
 
 bool PinMappingClass::isValidHuaweiConfig()
 {
-    return _pinMapping.huawei_miso > 0
-        && _pinMapping.huawei_mosi > 0
-        && _pinMapping.huawei_clk > 0
-        && _pinMapping.huawei_irq > 0
-        && _pinMapping.huawei_cs > 0
-        && _pinMapping.huawei_power > 0;
+    return _pinMapping.huawei_miso >= 0
+        && _pinMapping.huawei_mosi >= 0
+        && _pinMapping.huawei_clk >= 0
+        && _pinMapping.huawei_irq >= 0
+        && _pinMapping.huawei_cs >= 0
+        && _pinMapping.huawei_power >= 0;
 }
