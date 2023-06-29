@@ -199,7 +199,7 @@ uint8_t PowerLimiterClass::getPowerLimiterState() {
     return PL_UI_STATE_INACTIVE;
 }
 
-int32_t PowerLimiterClass::getLastRequestedPowewrLimit() {
+int32_t PowerLimiterClass::getLastRequestedPowerLimit() {
     return _lastRequestedPowerLimit;
 }
 

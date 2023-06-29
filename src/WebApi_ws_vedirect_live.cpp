@@ -145,7 +145,7 @@ void WebApiWsVedirectLiveClass::generateJsonResponse(JsonVariant& root)
     root["dpl"]["PLSTATE"] = -1;
     if (Configuration.get().PowerLimiter_Enabled)
         root["dpl"]["PLSTATE"] = PowerLimiter.getPowerLimiterState();
-    root["dpl"]["PLLIMIT"] = PowerLimiter.getLastRequestedPowewrLimit();
+    root["dpl"]["PLLIMIT"] = PowerLimiter.getLastRequestedPowerLimit();
 
     if (VeDirect.getLastUpdate() > _newestVedirectTimestamp) {
         _newestVedirectTimestamp = VeDirect.getLastUpdate();

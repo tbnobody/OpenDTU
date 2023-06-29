@@ -33,7 +33,7 @@ public:
     void init();
     void loop();
     uint8_t getPowerLimiterState();
-    int32_t getLastRequestedPowewrLimit();
+    int32_t getLastRequestedPowerLimit();
     void setMode(uint8_t mode);
     bool getMode();
     void calcNextInverterRestart();
