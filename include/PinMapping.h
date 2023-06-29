@@ -38,16 +38,16 @@ struct PinMapping_t {
     uint8_t display_clk;
     uint8_t display_cs;
     uint8_t display_reset;
-    uint8_t victron_tx;
-    uint8_t victron_rx;
-    uint8_t battery_rx;
-    uint8_t battery_tx;
-    uint8_t huawei_miso;
-    uint8_t huawei_mosi;
-    uint8_t huawei_clk;
-    uint8_t huawei_irq;
-    uint8_t huawei_cs;
-    uint8_t huawei_power;
+    int8_t victron_tx;
+    int8_t victron_rx;
+    int8_t battery_rx;
+    int8_t battery_tx;
+    int8_t huawei_miso;
+    int8_t huawei_mosi;
+    int8_t huawei_clk;
+    int8_t huawei_irq;
+    int8_t huawei_cs;
+    int8_t huawei_power;
     int8_t led[PINMAPPING_LED_COUNT];
 };
 
