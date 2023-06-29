@@ -58,6 +58,10 @@ void PowerLimiterClass::announceStatus(PowerLimiterClass::Status status)
     // otherwise repeat the info with a fixed interval.
     if (_lastStatus == status && millis() < _lastStatusPrinted + 10 * 1000) { return; }
 
+    // after announcing once that the DPL is disabled by configuration, it
+    // should just be silent while it is disabled.
+    if (status == Status::DisabledByConfig && _lastStatus == status) { return; }
+
     MessageOutput.printf("[%11.3f] DPL: %s\r\n",
         static_cast<double>(millis())/1000, getStatusText(status).c_str());
 
