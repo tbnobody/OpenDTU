@@ -69,7 +69,7 @@ void WebApiWsHuaweiLiveClass::loop()
             _ws.textAll(buffer);
         }
     } catch (std::bad_alloc& bad_alloc) {
-        MessageOutput.printf("Call to /api/livedata/status temporarely out of resources. Reason: \"%s\".\r\n", bad_alloc.what());
+        MessageOutput.printf("Calling /api/livedata/status has temporarily run out of resources. Reason: \"%s\".\r\n", bad_alloc.what());
     }
 }
 
@@ -129,7 +129,7 @@ void WebApiWsHuaweiLiveClass::onLivedataStatus(AsyncWebServerRequest* request)
         response->setLength();
         request->send(response);
     } catch (std::bad_alloc& bad_alloc) {
-        MessageOutput.printf("Call to /api/livedata/status temporarely out of resources. Reason: \"%s\".\r\n", bad_alloc.what());
+        MessageOutput.printf("Calling /api/livedata/status has temporarily run out of resources. Reason: \"%s\".\r\n", bad_alloc.what());
 
         WebApi.sendTooManyRequests(request);
     }
