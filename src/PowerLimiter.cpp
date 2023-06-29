@@ -69,15 +69,13 @@ void PowerLimiterClass::shutdown(PowerLimiterClass::Status status)
 {
     announceStatus(status);
 
-    if (_plState == plStates::OFF) { return; }
-
-    _plState = plStates::SHUTDOWN;
-
     if (_inverter == nullptr || !_inverter->isProducing() || !_inverter->isReachable()) {
         _inverter = nullptr;
-        _plState = plStates::OFF;
+        _shutdownInProgress = false;
         return;
     }
+
+    _shutdownInProgress = true;
 
     auto lastLimitCommandState = _inverter->SystemConfigPara()->getLastLimitCommandSuccess();
     if (CMD_PENDING == lastLimitCommandState) { return; }
@@ -93,7 +91,7 @@ void PowerLimiterClass::loop()
 {
     CONFIG_T& config = Configuration.get();
 
-    if (plStates::SHUTDOWN == _plState) {
+    if (_shutdownInProgress) {
         // we transition from SHUTDOWN to OFF when we know the inverter was
         // shut down. until then, we retry shutting it down. in this case we
         // preserve the original status that lead to the decision to shut down.
@@ -125,9 +123,6 @@ void PowerLimiterClass::loop()
 
     // update our pointer as the configuration might have changed
     _inverter = currentInverter;
-
-    // controlling an inverter means the DPL will shut it down eventually
-    _plState = plStates::ACTIVE;
 
     // data polling is disabled or the inverter is deemed offline
     if (!_inverter->isReachable()) {

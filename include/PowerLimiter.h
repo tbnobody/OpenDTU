@@ -53,15 +53,8 @@ public:
     void calcNextInverterRestart();
 
 private:
-    enum class plStates : unsigned {
-        INIT, // looping for the first time after system startup
-        ACTIVE, // normal operation, sending power limit updates to inverter
-        SHUTDOWN, // power limiter shuts down inverter
-        OFF // inverter was shut down, power limiter is NOT active
-    };
-
     int32_t _lastRequestedPowerLimit = 0;
-    plStates _plState = plStates::INIT;
+    bool _shutdownInProgress;
     Status _lastStatus = Status::Initializing;
     uint32_t _lastStatusPrinted = 0;
     uint8_t _mode = PL_MODE_ENABLE_NORMAL_OP;
