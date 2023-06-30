@@ -23,10 +23,6 @@ The 192KB LittleFS in OpenDTU can store around 6 years of data, because each dat
 
 ![Screenshot](docs/screenshots/23_Database.png)
 
-## !! IMPORTANT UPGRADE NOTES !!
-
-If you are upgrading from a version before 15.03.2023 you have to upgrade the partition table of the ESP32. Please follow the [this](docs/UpgradePartition.md) documentation!
-
 ## Background
 
 This project was started from [this](https://www.mikrocontroller.net/topic/525778) discussion (Mikrocontroller.net).
