@@ -19,7 +19,9 @@ Each data point has the following format:
 
 Example: [23,6,30,15,132.995605]
 
-![Screenshot](https://github.com/RaBa64/OpenDTU/blob/Database/docs/screenshots/23_Database.png)
+The 192KB LittleFS in OpenDTU can store around 6 years of data, because each data point needs only 8 bytes of memory.
+
+![Screenshot](docs/screenshots/23_Database.png)
 
 ## !! IMPORTANT UPGRADE NOTES !!
 
