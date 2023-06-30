@@ -1,8 +1,12 @@
-# OpenDTU
+# OpenDTU-Database
 
 [![OpenDTU Build](https://github.com/tbnobody/OpenDTU/actions/workflows/build.yml/badge.svg)](https://github.com/tbnobody/OpenDTU/actions/workflows/build.yml)
 [![cpplint](https://github.com/tbnobody/OpenDTU/actions/workflows/cpplint.yml/badge.svg)](https://github.com/tbnobody/OpenDTU/actions/workflows/cpplint.yml)
 [![Yarn Linting](https://github.com/tbnobody/OpenDTU/actions/workflows/yarnlint.yml/badge.svg)](https://github.com/tbnobody/OpenDTU/actions/workflows/yarnlint.yml)
+
+OpenDTU-Database adds an ESP32 LittleFS Database and two energy charts, a column chart of the last 25 hours and a full calendar chart.
+
+![Screenshot](https://github.com/RaBa64/OpenDTU/blob/Database/docs/screenshots/23_Database.png)
 
 ## !! IMPORTANT UPGRADE NOTES !!
 
