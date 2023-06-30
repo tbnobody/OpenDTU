@@ -43,7 +43,7 @@ private:
     char _fmtText[35];
     const char* _settedIP;
     uint8_t _headfootline = 16;
-    uint8_t _displayRotation = 2;
+    uint8_t _displayRotation = DISPLAY_ROTATION;
     uint8_t _display_language = DISPLAY_LANGUAGE;
     GxEPD2_GFX* _display;
 };

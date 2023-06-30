@@ -2,8 +2,6 @@
 #include "imagedata.h"
 #include <NetworkSettings.h>
 
-static const uint32_t spiClk = 4000000; // 4 MHz
-
 std::map<DisplayType_t, std::function<GxEPD2_GFX*(uint8_t, uint8_t, uint8_t, uint8_t)>> _ePaperTypes = {
     // DEPG0150BN 200x200, SSD1681, TTGO T5 V2.4.1
     { DisplayType_t::ePaper154, [](uint8_t _CS, uint8_t _DC, uint8_t _RST, uint8_t _BUSY) { return new GxEPD2_BW<GxEPD2_150_BN, GxEPD2_150_BN::HEIGHT>(GxEPD2_150_BN(_CS, _DC, _RST, _BUSY)); } },
@@ -117,6 +115,10 @@ void DisplayEPaperClass::setOrientation(uint8_t rotation)
 void DisplayEPaperClass::setLanguage(uint8_t language)
 {
     _display_language = language < sizeof(languages) / sizeof(languages[0]) ? language : DISPLAY_LANGUAGE;
+    _display->setFullWindow();
+
+    headlineIP();
+    lastUpdatePaged();
 }
 //***************************************************************************
 void DisplayEPaperClass::lastUpdatePaged()

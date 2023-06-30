@@ -49,7 +49,7 @@ void DisplayClass::setLanguage(uint8_t language)
     } else if ((_display_type == PCD8544) || (_display_type == SSD1306) || (_display_type == SH1106) || (_display_type == SSD1309)) {
         DisplayMono.setLanguage(language);
     } else if (_display_type == ePaper154) {
-        return;
+        DisplayEPaper.setLanguage(language);
     }
 }
 
@@ -94,6 +94,8 @@ void DisplayClass::setEnablePowerSafe(bool display_PowerSafe)
         return;
     } else if ((_display_type == PCD8544) || (_display_type == SSD1306) || (_display_type == SH1106) || (_display_type == SSD1309)) {
         DisplayMono.enablePowerSafe = display_PowerSafe;
+    } else if (_display_type == ePaper154) {
+        return;
     }
 }
 void DisplayClass::setEnableScreensaver(bool display_ScreenSaver)
@@ -102,6 +104,8 @@ void DisplayClass::setEnableScreensaver(bool display_ScreenSaver)
         return;
     } else if ((_display_type == PCD8544) || (_display_type == SSD1306) || (_display_type == SH1106) || (_display_type == SSD1309)) {
         DisplayMono.enableScreensaver = display_ScreenSaver;
+    } else if (_display_type == ePaper154) {
+        return;
     }
 }
 
@@ -113,10 +117,9 @@ void DisplayClass::loop()
 
     if ((millis() - _lastDisplayUpdate) > _settedUpdatePeriod) {
 
-        if ((_display_type == PCD8544) || (_display_type == SSD1306) || (_display_type == SH1106)) {
+        if ((_display_type == PCD8544) || (_display_type == SSD1306) || (_display_type == SH1106) || (_display_type == SSD1309)) {
             DisplayMono.loop(Datastore.getTotalAcPowerEnabled(), Datastore.getTotalAcYieldDayEnabled(), Datastore.getTotalAcYieldTotalEnabled(), Datastore.getTotalProducing());
         } else if (_display_type == ePaper154) {
-
             DisplayEPaper.loop(Datastore.getTotalAcPowerEnabled(), Datastore.getTotalAcYieldDayEnabled(), Datastore.getTotalAcYieldTotalEnabled(), Datastore.getTotalProducing());
             _counterEPaper++;
         }
