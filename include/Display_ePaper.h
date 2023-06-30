@@ -17,6 +17,7 @@
 #include <Fonts/FreeSans9pt7b.h>
 
 #include "Display_helper.h"
+#include "defaults.h"
 #include "imagedata.h"
 
 // GDEW027C44   2.7 " b/w/r 176x264, IL91874
@@ -31,6 +32,7 @@ public:
     void loop(float totalPower, float totalYieldDay, float totalYieldTotal, uint8_t isprod);
     void fullRefresh();
     void setOrientation(uint8_t rotation);
+    void setLanguage(uint8_t language);
 
 private:
     void headlineIP();
@@ -42,6 +44,7 @@ private:
     const char* _settedIP;
     uint8_t _headfootline = 16;
     uint8_t _displayRotation = 2;
+    uint8_t _display_language = DISPLAY_LANGUAGE;
     GxEPD2_GFX* _display;
 };
 

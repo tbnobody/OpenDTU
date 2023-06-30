@@ -31,7 +31,8 @@ const uint8_t languages[] = {
     I18N_LOCALE_FR
 };
 
-static const char* const i18n_offline[] = { "Offline", "Offline", "Offline" };
+static const char* const i18n_offline[] = { "offline", "Offline", "hors ligne" };
+static const char* const i18n_online[] = { "#%d Inverter online", "#%d Wechselrichter online", "#%d Onduleur en ligne" };
 static const char* const i18n_current_power_w[] = { "%3.0f W", "%3.0f W", "%3.0f W" };
 static const char* const i18n_current_power_kw[] = { "%2.1f kW", "%2.1f kW", "%2.1f kW" };
 static const char* const i18n_yield_today_wh[] = { "today: %4.0f Wh", "Heute: %4.0f Wh", "auj.: %4.0f Wh" };
@@ -175,7 +176,7 @@ void DisplayMonoClass::loop(float totalPower, float totalYieldDay, float totalYi
     if (!(_mExtra % 10) && NetworkSettings.localIP()) {
         printText(NetworkSettings.localIP().toString().c_str(), 3);
     } else if (!(_mExtra % 5)) {
-        snprintf(_fmtText, sizeof(_fmtText), "#%d Inverter online", isprod);
+        snprintf(_fmtText, sizeof(_fmtText), i18n_online[_display_language], isprod);
         printText(_fmtText, 3);
     } else {
         time_t now = time(nullptr);

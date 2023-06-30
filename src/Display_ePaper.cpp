@@ -8,9 +8,25 @@ std::map<DisplayType_t, std::function<GxEPD2_GFX*(uint8_t, uint8_t, uint8_t, uin
     // DEPG0150BN 200x200, SSD1681, TTGO T5 V2.4.1
     { DisplayType_t::ePaper154, [](uint8_t _CS, uint8_t _DC, uint8_t _RST, uint8_t _BUSY) { return new GxEPD2_BW<GxEPD2_150_BN, GxEPD2_150_BN::HEIGHT>(GxEPD2_150_BN(_CS, _DC, _RST, _BUSY)); } },
     // GDEW027C44   2.7 " b/w/r 176x264, IL91874
-    //{DisplayType_t::ePaper270, [](uint8_t _CS, uint8_t _DC, uint8_t _RST, uint8_t _BUSY)
-    // F { return new GxEPD2_3C<GxEPD2_270c, GxEPD2_270c::HEIGHT>(GxEPD2_270c(_CS, _DC, _RST, _BUSY)); }},
+    //{ DisplayType_t::ePaper270, [](uint8_t _CS, uint8_t _DC, uint8_t _RST, uint8_t _BUSY) { return new GxEPD2_3C<GxEPD2_270c, GxEPD2_270c::HEIGHT>(GxEPD2_270c(_CS, _DC, _RST, _BUSY)); } },
 };
+
+// Language defintion, respect order in languages[] and translation lists
+#define I18N_LOCALE_EN 0
+#define I18N_LOCALE_DE 1
+#define I18N_LOCALE_FR 2
+
+// Languages supported. Note: the order is important and must match locale_translations.h
+const uint8_t languages[] = {
+    I18N_LOCALE_EN,
+    I18N_LOCALE_DE,
+    I18N_LOCALE_FR
+};
+
+static const char* const i18n_offline[] = { "offline", "Offline", "hors ligne" };
+static const char* const i18n_online[] = { " %d online", " %d Online", " %d en ligne" };
+static const char* const i18n_wifi[] = { "WiFi not connected", "WiFi nicht verbunden", "WiFi non connecté" };
+static const char* const i18n_date_format[] = { "%m/%d/%Y %H:%M", "%d.%m.%Y %H:%M", "%d/%m/%Y %H:%M" };
 
 DisplayEPaperClass::DisplayEPaperClass()
 {
@@ -80,7 +96,7 @@ void DisplayEPaperClass::headlineIP()
         if ((NetworkSettings.isConnected() == true) && (NetworkSettings.localIP() > 0)) {
             snprintf(_fmtText, sizeof(_fmtText), "%s", NetworkSettings.localIP().toString().c_str());
         } else {
-            snprintf(_fmtText, sizeof(_fmtText), "WiFi not connected");
+            snprintf(_fmtText, sizeof(_fmtText), i18n_wifi[_display_language]);
         }
         _display->getTextBounds(_fmtText, 0, 0, &tbx, &tby, &tbw, &tbh);
         uint16_t x = ((_display->width() - tbw) / 2) - tbx;
@@ -98,6 +114,11 @@ void DisplayEPaperClass::setOrientation(uint8_t rotation)
     _displayRotation = rotation;
 }
 //***************************************************************************
+void DisplayEPaperClass::setLanguage(uint8_t language)
+{
+    _display_language = language < sizeof(languages) / sizeof(languages[0]) ? language : DISPLAY_LANGUAGE;
+}
+//***************************************************************************
 void DisplayEPaperClass::lastUpdatePaged()
 {
     int16_t tbx, tby;
@@ -110,7 +131,7 @@ void DisplayEPaperClass::lastUpdatePaged()
     _display->fillScreen(GxEPD_BLACK);
     do {
         time_t now = time(nullptr);
-        strftime(_fmtText, sizeof(_fmtText), "%d.%m.%Y %H:%M", localtime(&now));
+        strftime(_fmtText, sizeof(_fmtText), i18n_date_format[_display_language], localtime(&now));
 
         _display->getTextBounds(_fmtText, 0, 0, &tbx, &tby, &tbw, &tbh);
         uint16_t x = ((_display->width() - tbw) / 2) - tbx;
@@ -139,7 +160,7 @@ void DisplayEPaperClass::actualPowerPaged(float _totalPower, float _totalYieldDa
             snprintf(_fmtText, sizeof(_fmtText), "%.0f W", _totalPower);
             _changed = true;
         } else {
-            snprintf(_fmtText, sizeof(_fmtText), "offline");
+            snprintf(_fmtText, sizeof(_fmtText), i18n_offline[_display_language]);
         }
         _display->getTextBounds(_fmtText, 0, 0, &tbx, &tby, &tbw, &tbh);
         x = ((_display->width() - tbw) / 2) - tbx;
@@ -204,7 +225,7 @@ void DisplayEPaperClass::actualPowerPaged(float _totalPower, float _totalYieldDa
         // Inverter online
         _display->setFont(&FreeSans12pt7b);
         y = _display->height() - (_headfootline + 10);
-        snprintf(_fmtText, sizeof(_fmtText), " %d online", _isprod);
+        snprintf(_fmtText, sizeof(_fmtText), i18n_online[_display_language], _isprod);
         _display->getTextBounds(_fmtText, 0, 0, &tbx, &tby, &tbw, &tbh);
         _display->drawInvertedBitmap(10, y - tbh, myWR, 20, 20, GxEPD_BLACK);
         x = ((_display->width() - tbw - 20) / 2) - tbx;
