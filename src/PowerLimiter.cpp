@@ -42,6 +42,7 @@ std::string const& PowerLimiterClass::getStatusText(PowerLimiterClass::Status st
         { Status::UnconditionalSolarPassthrough, "unconditionally passing through all solar power (MQTT override)" },
         { Status::NoVeDirect, "VE.Direct disabled, connection broken, or data outdated" },
         { Status::Settling, "waiting for the system to settle" },
+        { Status::Stable, "the system is stable, the last power limit is still valid" },
         { Status::LowerLimitUndercut, "calculated power limit undercuts configured lower limit" }
     };
 
@@ -184,6 +185,12 @@ void PowerLimiterClass::loop()
         return announceStatus(Status::PowerMeterPending);
     }
 
+    // since _lastCalculation and _calculationBackoffMs are initialized to
+    // zero, this test is passed the first time the condition is checked.
+    if (millis() < (_lastCalculation + _calculationBackoffMs)) {
+        return announceStatus(Status::Stable);
+    }
+
 #ifdef POWER_LIMITER_DEBUG
   MessageOutput.println("[PowerLimiterClass::loop] ******************* ENTER **********************");
 #endif
@@ -248,7 +255,7 @@ void PowerLimiterClass::loop()
     }
     // Calculate and set Power Limit
     int32_t newPowerLimit = calcPowerLimit(_inverter, canUseDirectSolarPower(), _batteryDischargeEnabled);
-    setNewPowerLimit(_inverter, newPowerLimit);
+    bool limitUpdated = setNewPowerLimit(_inverter, newPowerLimit);
 #ifdef POWER_LIMITER_DEBUG
     MessageOutput.printf("[PowerLimiterClass::loop] Status: SolarPT enabled %i, Drain Strategy: %i, canUseDirectSolarPower: %i, Batt discharge: %i\r\n",
         config.PowerLimiter_SolarPassThroughEnabled, config.PowerLimiter_BatteryDrainStategy, canUseDirectSolarPower(), _batteryDischargeEnabled);
@@ -258,6 +265,16 @@ void PowerLimiterClass::loop()
         config.Battery_Enabled, Battery.stateOfCharge, config.PowerLimiter_BatterySocStartThreshold, config.PowerLimiter_BatterySocStopThreshold, millis() - Battery.stateOfChargeLastUpdate);
     MessageOutput.printf("[PowerLimiterClass::loop] ******************* Leaving PL, PL set to: %i, SP: %i, Batt: %i, PM: %f\r\n", newPowerLimit, canUseDirectSolarPower(), _batteryDischargeEnabled, round(PowerMeter.getPowerTotal()));
 #endif
+
+    _lastCalculation = millis();
+
+    if (!limitUpdated) {
+        // increase polling backoff if system seems to be stable
+        _calculationBackoffMs = std::min<uint32_t>(1024, _calculationBackoffMs * 2);
+        return announceStatus(Status::Stable);
+    }
+
+    _calculationBackoffMs = 128;
 }
 
 /**
@@ -433,15 +450,17 @@ void PowerLimiterClass::commitPowerLimit(std::shared_ptr<InverterAbstract> inver
 /**
  * enforces limits and a hystersis on the requested power limit, after scaling
  * the power limit to the ratio of total and producing inverter channels.
- * commits the sanitized power limit.
+ * commits the sanitized power limit. returns true if a limit update was
+ * committed, false otherwise.
  */
-void PowerLimiterClass::setNewPowerLimit(std::shared_ptr<InverterAbstract> inverter, int32_t newPowerLimit)
+bool PowerLimiterClass::setNewPowerLimit(std::shared_ptr<InverterAbstract> inverter, int32_t newPowerLimit)
 {
     CONFIG_T& config = Configuration.get();
 
     // Stop the inverter if limit is below threshold.
     if (newPowerLimit < config.PowerLimiter_LowerPowerLimit) {
-        return shutdown(Status::LowerLimitUndercut);
+        shutdown(Status::LowerLimitUndercut);
+        return true;
     }
 
     // enforce configured upper power limit
@@ -473,13 +492,14 @@ void PowerLimiterClass::setNewPowerLimit(std::shared_ptr<InverterAbstract> inver
     if ( diff < config.PowerLimiter_TargetPowerConsumptionHysteresis) {
         MessageOutput.printf("[PowerLimiterClass::setNewPowerLimit] reusing old limit: %d W, diff: %d, hysteresis: %d\r\n",
                 _lastRequestedPowerLimit, diff, config.PowerLimiter_TargetPowerConsumptionHysteresis);
-        return;
+        return false;
     }
 
     MessageOutput.printf("[PowerLimiterClass::setNewPowerLimit] using new limit: %d W, requested power limit: %d\r\n",
             effPowerLimit, newPowerLimit);
 
     commitPowerLimit(inverter, effPowerLimit, true);
+    return true;
 }
 
 int32_t PowerLimiterClass::getSolarChargePower()

@@ -41,6 +41,7 @@ public:
         UnconditionalSolarPassthrough,
         NoVeDirect,
         Settling,
+        Stable,
         LowerLimitUndercut
     };
 
@@ -57,6 +58,8 @@ private:
     bool _shutdownInProgress;
     Status _lastStatus = Status::Initializing;
     uint32_t _lastStatusPrinted = 0;
+    uint32_t _lastCalculation = 0;
+    uint32_t _calculationBackoffMs = 0;
     uint8_t _mode = PL_MODE_ENABLE_NORMAL_OP;
     std::shared_ptr<InverterAbstract> _inverter = nullptr;
     bool _batteryDischargeEnabled = false;
@@ -72,7 +75,7 @@ private:
     bool canUseDirectSolarPower();
     int32_t calcPowerLimit(std::shared_ptr<InverterAbstract> inverter, bool solarPowerEnabled, bool batteryDischargeEnabled);
     void commitPowerLimit(std::shared_ptr<InverterAbstract> inverter, int32_t limit, bool enablePowerProduction);
-    void setNewPowerLimit(std::shared_ptr<InverterAbstract> inverter, int32_t newPowerLimit);
+    bool setNewPowerLimit(std::shared_ptr<InverterAbstract> inverter, int32_t newPowerLimit);
     int32_t getSolarChargePower();
     float getLoadCorrectedVoltage(std::shared_ptr<InverterAbstract> inverter);
     bool isStartThresholdReached(std::shared_ptr<InverterAbstract> inverter);
