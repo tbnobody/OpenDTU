@@ -16,6 +16,14 @@
                     </button>
                 </div>
             </div>
+            <div class="card">
+                <div class="card-body">
+                    <div class="row">
+                        <BarChart />
+                        <CalendarChart />
+                    </div>
+                </div>
+            </div>
 
             <div class="tab-content" id="v-pills-tabContent" :class="{
                 'col-sm-9 col-md-10': inverterData.length > 1,
@@ -25,13 +33,12 @@
                     :id="'v-pills-' + inverter.serial" role="tabpanel"
                     :aria-labelledby="'v-pills-' + inverter.serial + '-tab'" tabindex="0">
                     <div class="card">
-                        <div class="card-header d-flex justify-content-between align-items-center"
-                            :class="{
-                                'text-bg-tertiary': !inverter.poll_enabled,
-                                'text-bg-danger': inverter.poll_enabled && !inverter.reachable,
-                                'text-bg-warning': inverter.poll_enabled && inverter.reachable && !inverter.producing,
-                                'text-bg-primary': inverter.poll_enabled && inverter.reachable && inverter.producing,
-                            }">
+                        <div class="card-header d-flex justify-content-between align-items-center" :class="{
+                            'text-bg-tertiary': !inverter.poll_enabled,
+                            'text-bg-danger': inverter.poll_enabled && !inverter.reachable,
+                            'text-bg-warning': inverter.poll_enabled && inverter.reachable && !inverter.producing,
+                            'text-bg-primary': inverter.poll_enabled && inverter.reachable && inverter.producing,
+                        }">
                             <div class="p-1 flex-grow-1">
                                 <div class="d-flex flex-wrap">
                                     <div style="padding-right: 2em;">
@@ -42,11 +49,11 @@
                                     </div>
                                     <div style="padding-right: 2em;">
                                         {{ $t('home.CurrentLimit') }}<template v-if="inverter.limit_absolute > -1"> {{
-                                                $n(inverter.limit_absolute, 'decimalNoDigits')
+                                            $n(inverter.limit_absolute, 'decimalNoDigits')
                                         }} W | </template>{{ $n(inverter.limit_relative / 100, 'percent') }}
                                     </div>
                                     <div style="padding-right: 2em;">
-                                        {{ $t('home.DataAge') }} {{ $t('home.Seconds', {'val': $n(inverter.data_age) }) }}
+                                        {{ $t('home.DataAge') }} {{ $t('home.Seconds', { 'val': $n(inverter.data_age) }) }}
                                         <template v-if="inverter.data_age > 300">
                                             / {{ calculateAbsoluteTime(inverter.data_age) }}
                                         </template>
@@ -56,7 +63,8 @@
                             <div class="btn-toolbar p-2" role="toolbar">
                                 <div class="btn-group me-2" role="group">
                                     <button :disabled="!isLogged" type="button" class="btn btn-sm btn-danger"
-                                        @click="onShowLimitSettings(inverter.serial)" v-tooltip :title="$t('home.ShowSetInverterLimit')">
+                                        @click="onShowLimitSettings(inverter.serial)" v-tooltip
+                                        :title="$t('home.ShowSetInverterLimit')">
                                         <BIconSpeedometer style="font-size:24px;" />
 
                                     </button>
@@ -64,7 +72,8 @@
 
                                 <div class="btn-group me-2" role="group">
                                     <button :disabled="!isLogged" type="button" class="btn btn-sm btn-danger"
-                                        @click="onShowPowerSettings(inverter.serial)" v-tooltip :title="$t('home.TurnOnOff')">
+                                        @click="onShowPowerSettings(inverter.serial)" v-tooltip
+                                        :title="$t('home.TurnOnOff')">
                                         <BIconPower style="font-size:24px;" />
 
                                     </button>
@@ -72,7 +81,8 @@
 
                                 <div class="btn-group me-2" role="group">
                                     <button type="button" class="btn btn-sm btn-info"
-                                        @click="onShowDevInfo(inverter.serial)" v-tooltip :title="$t('home.ShowInverterInfo')">
+                                        @click="onShowDevInfo(inverter.serial)" v-tooltip
+                                        :title="$t('home.ShowInverterInfo')">
                                         <BIconCpu style="font-size:24px;" />
 
                                     </button>
@@ -94,16 +104,17 @@
                         </div>
                         <div class="card-body">
                             <div class="row flex-row-reverse flex-wrap-reverse g-3">
-                                <template v-for="chanType in [{obj: inverter.INV, name: 'INV'}, {obj: inverter.AC, name: 'AC'}, {obj: inverter.DC, name: 'DC'}].reverse()">
-                                    <template v-for="channel in Object.keys(chanType.obj).sort().reverse().map(x=>+x)" :key="channel">
+                                <template
+                                    v-for="chanType in [{ obj: inverter.INV, name: 'INV' }, { obj: inverter.AC, name: 'AC' }, { obj: inverter.DC, name: 'DC' }].reverse()">
+                                    <template v-for="channel in Object.keys(chanType.obj).sort().reverse().map(x => +x)"
+                                        :key="channel">
                                         <template v-if="(chanType.name != 'DC') ||
                                             (chanType.name == 'DC' && getSumIrridiation(inverter) == 0) ||
                                             (chanType.name == 'DC' && getSumIrridiation(inverter) > 0 && chanType.obj[channel].Irradiation?.v || 0 > 0)
                                             ">
                                             <div class="col">
                                                 <InverterChannelInfo :channelData="chanType.obj[channel]"
-                                                    :channelType="chanType.name"
-                                                    :channelNumber="channel" />
+                                                    :channelType="chanType.name" :channelNumber="channel" />
                                             </div>
                                         </template>
                                     </template>
@@ -134,8 +145,8 @@
                 </div>
 
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" @click="onHideEventlog"
-                        data-bs-dismiss="modal">{{ $t('home.Close') }}</button>
+                    <button type="button" class="btn btn-secondary" @click="onHideEventlog" data-bs-dismiss="modal">{{
+                        $t('home.Close') }}</button>
                 </div>
 
             </div>
@@ -160,8 +171,8 @@
                 </div>
 
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" @click="onHideDevInfo"
-                        data-bs-dismiss="modal">{{ $t('home.Close') }}</button>
+                    <button type="button" class="btn btn-secondary" @click="onHideDevInfo" data-bs-dismiss="modal">{{
+                        $t('home.Close') }}</button>
                 </div>
             </div>
         </div>
@@ -189,12 +200,12 @@
                         <template v-if="!limitSettingLoading">
 
                             <div class="row mb-3">
-                                <label for="inputCurrentLimit" class="col-sm-3 col-form-label">{{ $t('home.CurrentLimit') }} </label>
+                                <label for="inputCurrentLimit" class="col-sm-3 col-form-label">{{ $t('home.CurrentLimit') }}
+                                </label>
                                 <div class="col-sm-4">
                                     <div class="input-group">
                                         <input type="text" class="form-control" id="inputCurrentLimit"
-                                            aria-describedby="currentLimitType" v-model="currentLimitRelative"
-                                            disabled />
+                                            aria-describedby="currentLimitType" v-model="currentLimitRelative" disabled />
                                         <span class="input-group-text" id="currentLimitType">%</span>
                                     </div>
                                 </div>
@@ -226,7 +237,8 @@
                             </div>
 
                             <div class="row mb-3">
-                                <label for="inputTargetLimit" class="col-sm-3 col-form-label">{{ $t('home.SetLimit') }}</label>
+                                <label for="inputTargetLimit" class="col-sm-3 col-form-label">{{ $t('home.SetLimit')
+                                }}</label>
                                 <div class="col-sm-9">
                                     <div class="input-group">
                                         <input type="number" name="inputTargetLimit" class="form-control"
@@ -236,11 +248,14 @@
                                             data-bs-toggle="dropdown" aria-expanded="false">{{ targetLimitTypeText
                                             }}</button>
                                         <ul class="dropdown-menu dropdown-menu-end">
-                                            <li><a class="dropdown-item" @click="onSelectType(1)" href="#">{{ $t('home.Relative') }}</a></li>
-                                            <li><a class="dropdown-item" @click="onSelectType(0)" href="#">{{ $t('home.Absolute') }}</a></li>
+                                            <li><a class="dropdown-item" @click="onSelectType(1)" href="#">{{
+                                                $t('home.Relative') }}</a></li>
+                                            <li><a class="dropdown-item" @click="onSelectType(0)" href="#">{{
+                                                $t('home.Absolute') }}</a></li>
                                         </ul>
                                     </div>
-                                    <div v-if="targetLimitType == 0" class="alert alert-secondary mt-3" role="alert" v-html="$t('home.LimitHint')"></div>
+                                    <div v-if="targetLimitType == 0" class="alert alert-secondary mt-3" role="alert"
+                                        v-html="$t('home.LimitHint')"></div>
                                 </div>
                             </div>
                         </template>
@@ -248,11 +263,14 @@
                     </div>
 
                     <div class="modal-footer">
-                        <button type="submit" class="btn btn-danger" @click="onSetLimitSettings(true)">{{ $t('home.SetPersistent') }}</button>
+                        <button type="submit" class="btn btn-danger" @click="onSetLimitSettings(true)">{{
+                            $t('home.SetPersistent') }}</button>
 
-                        <button type="submit" class="btn btn-danger" @click="onSetLimitSettings(false)">{{ $t('home.SetNonPersistent') }}</button>
+                        <button type="submit" class="btn btn-danger" @click="onSetLimitSettings(false)">{{
+                            $t('home.SetNonPersistent') }}</button>
 
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ $t('home.Close') }}</button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ $t('home.Close')
+                        }}</button>
                     </div>
                 </form>
             </div>
@@ -279,14 +297,15 @@
 
                     <template v-if="!powerSettingLoading">
                         <div class="row mb-3 align-items-center">
-                            <label for="inputLastPowerSet" class="col col-form-label">{{ $t('home.LastPowerSetStatus') }}</label>
+                            <label for="inputLastPowerSet" class="col col-form-label">{{ $t('home.LastPowerSetStatus')
+                            }}</label>
                             <div class="col">
                                 <span class="badge" :class="{
-                                    'text-bg-danger': successCommandPower == 'Failure',
-                                    'text-bg-warning': successCommandPower == 'Pending',
-                                    'text-bg-success': successCommandPower == 'Ok',
-                                    'text-bg-secondary': successCommandPower == 'Unknown',
-                                }">
+                                        'text-bg-danger': successCommandPower == 'Failure',
+                                        'text-bg-warning': successCommandPower == 'Pending',
+                                        'text-bg-success': successCommandPower == 'Ok',
+                                        'text-bg-secondary': successCommandPower == 'Unknown',
+                                    }">
                                     {{ $t('home.' + successCommandPower) }}
                                 </span>
                             </div>
@@ -313,7 +332,6 @@
             </div>
         </div>
     </div>
-
 </template>
 
 <script lang="ts">
@@ -323,6 +341,8 @@ import DevInfo from '@/components/DevInfo.vue';
 import EventLog from '@/components/EventLog.vue';
 import HintView from '@/components/HintView.vue';
 import InverterChannelInfo from "@/components/InverterChannelInfo.vue";
+import BarChart from "@/components/BarChart.vue";
+import CalendarChart from "@/components/CalendarChart.vue";
 import InverterTotalInfo from '@/components/InverterTotalInfo.vue';
 import type { DevInfoStatus } from '@/types/DevInfoStatus';
 import type { EventlogItems } from '@/types/EventlogStatus';
@@ -353,6 +373,8 @@ export default defineComponent({
         EventLog,
         HintView,
         InverterChannelInfo,
+        BarChart,
+        CalendarChart,
         InverterTotalInfo,
         BIconArrowCounterclockwise,
         BIconCheckCircleFill,
@@ -457,7 +479,7 @@ export default defineComponent({
                 'decimalTwoDigits');
         },
         inverterData(): Inverter[] {
-            return this.liveData.inverters.slice().sort((a : Inverter, b: Inverter) => {
+            return this.liveData.inverters.slice().sort((a: Inverter, b: Inverter) => {
                 return a.order - b.order;
             });
         }
