@@ -32,6 +32,18 @@ void StatisticsParser::setByteAssignment(const byteAssign_t* byteAssignment, uin
 {
     _byteAssignment = byteAssignment;
     _byteAssignmentSize = size;
+
+    for (uint8_t i = 0; i < _byteAssignmentSize; i++) {
+        if (_byteAssignment[i].div == CMD_CALC) {
+            continue;
+        }
+        _expectedByteCount = max<uint8_t>(_expectedByteCount, _byteAssignment[i].start + _byteAssignment[i].num);
+    }
+}
+
+uint8_t StatisticsParser::getExpectedByteCount()
+{
+    return _expectedByteCount;
 }
 
 void StatisticsParser::clearBuffer()

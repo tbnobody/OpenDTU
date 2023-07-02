@@ -20,6 +20,7 @@ protected:
     void setDataType(uint8_t data_type);
     uint8_t getDataType();
     void udpateCRC();
+    static uint8_t getTotalFragmentSize(fragment_t fragment[], uint8_t max_fragment_id);
 
     RequestFrameCommand _cmdRequestFrame;
 };
