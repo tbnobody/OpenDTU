@@ -173,7 +173,24 @@ cmd topics are used to set values. Status topics are updated from values set in 
 
 ### Power Limiter topics
 
-| Topic                                   | R / W | Description                                          | Value / Unit               |
+| Topic                                   | R / W | Description                                          | Value                      |
 | --------------------------------------- | ----- | ---------------------------------------------------- | -------------------------- |
-| powerlimiter/cmd/mode                   | W     | Power Limiter operation mode                         | 0 - Normal operation, 1 - Fully disable, 2 - Solar Passthrough only |
-| powerlimiter/status/mode                | R     | Get Power Limiter operation mode                     | see above                  |
+| powerlimiter/cmd/mode                   | W     | Power Limiter operation mode                         | see below                  |
+| powerlimiter/status/mode                | R     | Get Power Limiter operation mode                     | see below                  |
+
+Setting any of these modes through MQTT has *no* effect if the Power Limiter is
+disabled by configuration in the web application. The Power Limiter will stay
+off in that case.
+
+Three modes are implemented:
+* **0** - Normal operation: The Power Limiter works as configured through the
+  web application.
+* **1** - Fully disable: The inverter is shut down and the Power Limiter stops
+  operating, as if it was disabled in the web application.
+* **2** - Unconditional Solar Passthrough: The power limit is set such that all
+  solar power (adjusted for efficiency) is fed into the home. This is done
+  irrespective of grid consumption and without consuming energy from the
+  battery, which is the key difference to the regular Power Limiter Solar
+  Passthrouh feature. Essentially, the inverter mimics the behavior of a
+  traditional, non-smart inverter. This can be particularly useful in scenarios
+  where solar power is better stored elsewhere, such as in an electric car.
