@@ -216,16 +216,12 @@ bool PowerLimiterClass::canUseDirectSolarPower()
     CONFIG_T& config = Configuration.get();
 
     if (!config.PowerLimiter_SolarPassThroughEnabled
-            || !config.Vedirect_Enabled) {
+            || !config.Vedirect_Enabled
+            || !VeDirect.isDataValid()) {
         return false;
     }
 
-    if (VeDirect.veFrame.PPV < 20) {
-        // Not enough power
-        return false;
-    }
-
-    return true;
+    return VeDirect.veFrame.PPV >= 20; // enough power?
 }
 
 
