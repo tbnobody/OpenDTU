@@ -336,7 +336,6 @@ void PowerLimiterClass::setNewPowerLimit(std::shared_ptr<InverterAbstract> inver
     // enforce configured upper power limit
     int32_t effPowerLimit = std::min(newPowerLimit, config.PowerLimiter_UpperPowerLimit);
 
-
     // scale the power limit by the amount of all inverter channels devided by
     // the amount of producing inverter channels. the inverters limit each of
     // the n channels to 1/n of the total power limit. scaling the power limit
@@ -351,7 +350,7 @@ void PowerLimiterClass::setNewPowerLimit(std::shared_ptr<InverterAbstract> inver
     if (dcProdChnls > 0) {
         MessageOutput.printf("[PowerLimiterClass::setNewPowerLimit] %d channels total, %d producing channels, scaling power limit\r\n",
                 dcTotalChnls, dcProdChnls);
-        effPowerLimit = round(newPowerLimit * static_cast<float>(dcTotalChnls) / dcProdChnls);
+        effPowerLimit = round(effPowerLimit * static_cast<float>(dcTotalChnls) / dcProdChnls);
         if (effPowerLimit > inverter->DevInfo()->getMaxPower()) {
             effPowerLimit = inverter->DevInfo()->getMaxPower();
         }
@@ -360,8 +359,9 @@ void PowerLimiterClass::setNewPowerLimit(std::shared_ptr<InverterAbstract> inver
     // Check if the new value is within the limits of the hysteresis
     auto diff = std::abs(effPowerLimit - _lastRequestedPowerLimit);
     if ( diff < config.PowerLimiter_TargetPowerConsumptionHysteresis) {
-        MessageOutput.printf("[PowerLimiterClass::setNewPowerLimit] reusing old limit: %d W, diff: %d, hysteresis: %d\r\n",
-                _lastRequestedPowerLimit, diff, config.PowerLimiter_TargetPowerConsumptionHysteresis);
+        MessageOutput.printf("[PowerLimiterClass::setNewPowerLimit] reusing old limit: %d W, diff: %d, hysteresis: %d, requested power limit: %d\r\n",
+                _lastRequestedPowerLimit, diff,
+                config.PowerLimiter_TargetPowerConsumptionHysteresis, newPowerLimit);
         return;
     }
 
