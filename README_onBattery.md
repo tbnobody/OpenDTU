@@ -122,6 +122,20 @@ Other settings are:
 #### Power Limiter States
 ![PowerLimiterInverterStates](https://github.com/helgeerbe/OpenDTU-OnBattery/blob/development/docs/PowerLimiterInverterStates.png)
 
+### Huawei PSU 
+
+The Huawei PSU can be used to charge a battery. This can be be useful if an external (AC) connected solar system shall be utilized or if variable energy prices should be exploited. 
+
+Some points for consideration are: 
+* Make sure to consider the PSU voltage range when selecting the battery voltage as lower voltages <42V are not supported. 
+* The PSU runs a noisy fan and it is therefore desireable to switch it off when not being used. Some users have found that switching the slot detect pins with a relay accomplishes this. A GPIO pin is made available from the ESP to turn the PSU on/off
+
+#### Operation modes
+
+openDTU-onBattery supports three operation modes for the Huawei PSU:
+1. Fully manual - In this mode the PSU needs to be turned on/off externally using MQTT and voltage and current limits need to be provided. See [MQTT Documentation](docs/MQTT_Topics.md) for details on these commands
+2. Manual with auto power on / off - In this mode the PSU is turned on when a current limit > 1A is set. If the current limit is < 1A for some time the PSU is turned off. Current and voltage limits need to be provided externally using MQTT. See [MQTT Documentation](docs/MQTT_Topics.md) for details on these commands.
+3. Automatic - In this mode the PSU power is controlled by the Power Meter and information provided in the web-interface. If excess power is present the PSU is turned on. The voltage limit is set as per web-interface and the current limit is set so that the maximum PSU output power equals the Power Meter value. Minium and maximum PSU power levels as configured in the web-interface are respected in this process. The PSU is turned off if the output current is limited and the output power drops below the minium power level. This will disable automatic mode until the battery is discharged below the start voltage level (set in the web-interface). This mode can be enabled using the web-interface and MQTT. See [MQTT Documentation](docs/MQTT_Topics.md)
 
 ## Troubleshooting
 

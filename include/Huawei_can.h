@@ -52,6 +52,16 @@
 #define R48xx_DATA_OUTPUT_CURRENT 0x81
 #define R48xx_DATA_OUTPUT_CURRENT1 0x82
 
+#define HUAWEI_MODE_OFF 0
+#define HUAWEI_MODE_ON 1
+#define HUAWEI_MODE_AUTO_EXT 2
+#define HUAWEI_MODE_AUTO_INT 3
+
+// Wait time/current before shuting down the PSU / charger
+// This is set to allow the fan to run for some time
+#define HUAWEI_AUTO_MODE_SHUTDOWN_DELAY 60000
+#define HUAWEI_AUTO_MODE_SHUTDOWN_CURRENT 1.0
+
 struct RectifierParameters_t {
     float input_voltage;
     float input_frequency;
@@ -72,24 +82,33 @@ public:
     void init(uint8_t huawei_miso, uint8_t huawei_mosi, uint8_t huawei_clk, uint8_t huawei_irq, uint8_t huawei_cs, uint8_t huawei_power);
     void loop();
     void setValue(float in, uint8_t parameterType);
-    void setPower(bool power);
+    void setMode(uint8_t mode);
 
     RectifierParameters_t * get();
     uint32_t getLastUpdate();
+    bool getAutoPowerStatus();
 
 private:
     void sendRequest();
     void onReceive(uint8_t* frame, uint8_t len);
 
-    uint32_t previousMillis;
-    uint32_t lastUpdate;
-    RectifierParameters_t _rp;
-
     SPIClass *spi;
     MCP_CAN *CAN;
-    uint8_t _huawei_irq;
-    uint8_t _huawei_power;
-    bool initialized = false;
+    bool    _initialized = false;
+    uint8_t _huawei_irq;             // IRQ pin
+    uint8_t _huawei_power;           // Power pin
+    uint8_t _mode = HUAWEI_MODE_AUTO_EXT;
+
+    RectifierParameters_t _rp;
+
+    uint32_t _lastUpdateReceivedMillis;           // Timestamp for last data seen from the PSU
+    uint32_t _nextRequestMillis = 0;              // When to send next data request to PSU 
+    uint32_t _nextAutoModePeriodicIntMillis;      // When to send the next output volume request in Automatic mode
+    uint32_t _lastPowerMeterUpdateReceivedMillis; // Timestamp of last power meter value
+    uint32_t _outputCurrentOnSinceMillis;         // Timestamp since when the PSU was idle at zero amps
+    bool _newOutputPowerReceived = false;
+    uint8_t _autoPowerEnabled = false;
+    bool _autoPowerActive = false;
 };
 
 extern HuaweiCanClass HuaweiCan;

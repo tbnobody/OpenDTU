@@ -173,6 +173,11 @@ bool ConfigurationClass::write()
 
     JsonObject huawei = doc.createNestedObject("huawei");
     huawei["enabled"] = config.Huawei_Enabled;
+    huawei["auto_power_enabled"] = config.Huawei_Auto_Power_Enabled;
+    huawei["voltage_limit"] = config.Huawei_Auto_Power_Voltage_Limit;
+    huawei["enable_voltage_limit"] = config.Huawei_Auto_Power_Enable_Voltage_Limit;
+    huawei["lower_power_limit"] = config.Huawei_Auto_Power_Lower_Power_Limit;
+    huawei["upper_power_limit"] = config.Huawei_Auto_Power_Upper_Power_Limit;
 
     // Serialize JSON to file
     if (serializeJson(doc, f) == 0) {
@@ -374,6 +379,11 @@ bool ConfigurationClass::read()
 
     JsonObject huawei = doc["huawei"];
     config.Huawei_Enabled = huawei["enabled"] | HUAWEI_ENABLED;
+    config.Huawei_Auto_Power_Enabled = huawei["auto_power_enabled"] | false;
+    config.Huawei_Auto_Power_Voltage_Limit = huawei["voltage_limit"] | HUAWEI_AUTO_POWER_VOLTAGE_LIMIT;
+    config.Huawei_Auto_Power_Enable_Voltage_Limit =  huawei["enable_voltage_limit"] | HUAWEI_AUTO_POWER_ENABLE_VOLTAGE_LIMIT;
+    config.Huawei_Auto_Power_Lower_Power_Limit = huawei["lower_power_limit"] | HUAWEI_AUTO_POWER_LOWER_POWER_LIMIT;
+    config.Huawei_Auto_Power_Upper_Power_Limit = huawei["upper_power_limit"] | HUAWEI_AUTO_POWER_UPPER_POWER_LIMIT;
 
     f.close();
     return true;
