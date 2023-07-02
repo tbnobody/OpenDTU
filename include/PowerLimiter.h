@@ -16,12 +16,6 @@
 #define PL_MODE_FULL_DISABLE 1
 #define PL_MODE_SOLAR_PT_ONLY 2
 
-
-typedef enum {
-    SHUTDOWN = 0, 
-    ACTIVE
-} plStates;
-
 typedef enum {
     EMPTY_WHEN_FULL= 0, 
     EMPTY_AT_NIGHT
@@ -30,33 +24,58 @@ typedef enum {
 
 class PowerLimiterClass {
 public:
+    enum class Status : unsigned {
+        Initializing,
+        DisabledByConfig,
+        DisabledByMqtt,
+        PowerMeterDisabled,
+        PowerMeterTimeout,
+        PowerMeterPending,
+        InverterInvalid,
+        InverterChanged,
+        InverterOffline,
+        InverterCommandsDisabled,
+        InverterLimitPending,
+        InverterPowerCmdPending,
+        InverterStatsPending,
+        UnconditionalSolarPassthrough,
+        NoVeDirect,
+        Settling,
+        Stable,
+        LowerLimitUndercut
+    };
+
     void init();
     void loop();
     uint8_t getPowerLimiterState();
-    int32_t getLastRequestedPowewrLimit();
+    int32_t getLastRequestedPowerLimit();
     void setMode(uint8_t mode);
     bool getMode();
     void calcNextInverterRestart();
 
 private:
-    uint32_t _lastLoop = 0;
     int32_t _lastRequestedPowerLimit = 0;
-    uint32_t _lastLimitSetTime = 0;
-    plStates _plState; 
+    bool _shutdownInProgress;
+    Status _lastStatus = Status::Initializing;
+    uint32_t _lastStatusPrinted = 0;
+    uint32_t _lastCalculation = 0;
+    uint32_t _calculationBackoffMs = 0;
     uint8_t _mode = PL_MODE_ENABLE_NORMAL_OP;
+    std::shared_ptr<InverterAbstract> _inverter = nullptr;
     bool _batteryDischargeEnabled = false;
     uint32_t _nextInverterRestart = 0; // Values: 0->not calculated / 1->no restart configured / >1->time of next inverter restart in millis()
     uint32_t _nextCalculateCheck = 5000; // time in millis for next NTP check to calulate restart
     bool _fullSolarPassThroughEnabled = false;
 
-    float _powerMeter1Power;
-    float _powerMeter2Power;
-    float _powerMeter3Power;
-
+    std::string const& getStatusText(Status status);
+    void announceStatus(Status status);
+    void shutdown(Status status);
+    int32_t inverterPowerDcToAc(std::shared_ptr<InverterAbstract> inverter, int32_t dcPower);
+    void unconditionalSolarPassthrough(std::shared_ptr<InverterAbstract> inverter);
     bool canUseDirectSolarPower();
     int32_t calcPowerLimit(std::shared_ptr<InverterAbstract> inverter, bool solarPowerEnabled, bool batteryDischargeEnabled);
     void commitPowerLimit(std::shared_ptr<InverterAbstract> inverter, int32_t limit, bool enablePowerProduction);
-    void setNewPowerLimit(std::shared_ptr<InverterAbstract> inverter, int32_t newPowerLimit);
+    bool setNewPowerLimit(std::shared_ptr<InverterAbstract> inverter, int32_t newPowerLimit);
     int32_t getSolarChargePower();
     float getLoadCorrectedVoltage(std::shared_ptr<InverterAbstract> inverter);
     bool isStartThresholdReached(std::shared_ptr<InverterAbstract> inverter);
