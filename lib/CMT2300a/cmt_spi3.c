@@ -1,7 +1,6 @@
 #include "cmt_spi3.h"
 #include <Arduino.h>
 #include <driver/spi_master.h>
-#include <esp_rom_gpio.h> // for esp_rom_gpio_connect_out_signal
 
 SemaphoreHandle_t paramLock = NULL;
 #define SPI_PARAM_LOCK() \
@@ -63,19 +62,16 @@ void cmt_spi3_init(const int8_t pin_sdio, const int8_t pin_clk, const int8_t pin
     };
     ESP_ERROR_CHECK(spi_bus_add_device(SPI_CMT, &devcfg2, &spi_fifo));
 
-    esp_rom_gpio_connect_out_signal(pin_sdio, spi_periph_signal[SPI_CMT].spid_out, true, false);
     delay(100);
 }
 
-void cmt_spi3_write(const uint8_t addr, const uint8_t dat)
+void cmt_spi3_write(const uint8_t addr, const uint8_t data)
 {
-    uint8_t tx_data;
-    tx_data = ~dat;
     spi_transaction_t t = {
-        .cmd = 1,
-        .addr = ~addr,
+        .cmd = 0,
+        .addr = addr,
         .length = 8,
-        .tx_buffer = &tx_data,
+        .tx_buffer = &data,
         .rx_buffer = NULL
     };
     SPI_PARAM_LOCK();
@@ -86,35 +82,31 @@ void cmt_spi3_write(const uint8_t addr, const uint8_t dat)
 
 uint8_t cmt_spi3_read(const uint8_t addr)
 {
-    uint8_t rx_data;
+    uint8_t data;
     spi_transaction_t t = {
-        .cmd = 0,
-        .addr = ~addr,
-        .length = 8,
+        .cmd = 1,
+        .addr = addr,
         .rxlength = 8,
         .tx_buffer = NULL,
-        .rx_buffer = &rx_data
+        .rx_buffer = &data
     };
     SPI_PARAM_LOCK();
     ESP_ERROR_CHECK(spi_device_polling_transmit(spi_reg, &t));
     SPI_PARAM_UNLOCK();
     delayMicroseconds(100);
-    return rx_data;
+    return data;
 }
 
 void cmt_spi3_write_fifo(const uint8_t* buf, const uint16_t len)
 {
-    uint8_t tx_data;
-
     spi_transaction_t t = {
         .length = 8,
-        .tx_buffer = &tx_data, // reference to write data
         .rx_buffer = NULL
     };
 
     SPI_PARAM_LOCK();
     for (uint8_t i = 0; i < len; i++) {
-        tx_data = ~buf[i]; // negate buffer contents
+        t.tx_buffer = buf + i;
         ESP_ERROR_CHECK(spi_device_polling_transmit(spi_fifo, &t));
         delayMicroseconds(4); // > 4 us
     }
@@ -123,20 +115,16 @@ void cmt_spi3_write_fifo(const uint8_t* buf, const uint16_t len)
 
 void cmt_spi3_read_fifo(uint8_t* buf, const uint16_t len)
 {
-    uint8_t rx_data;
-
     spi_transaction_t t = {
-        .length = 8,
         .rxlength = 8,
-        .tx_buffer = NULL,
-        .rx_buffer = &rx_data
+        .tx_buffer = NULL
     };
 
     SPI_PARAM_LOCK();
     for (uint8_t i = 0; i < len; i++) {
+        t.rx_buffer = buf + i;
         ESP_ERROR_CHECK(spi_device_polling_transmit(spi_fifo, &t));
         delayMicroseconds(4); // > 4 us
-        buf[i] = rx_data;
     }
     SPI_PARAM_UNLOCK();
 }
