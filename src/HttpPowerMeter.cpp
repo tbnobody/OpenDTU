@@ -235,16 +235,18 @@ float HttpPowerMeterClass::getFloatValueByJsonPath(const char* jsonString, const
     }
 }
 
+#define HASH_SIZE 32
+
 String HttpPowerMeterClass::sha256(const String& data) {
   SHA256 sha256;
-  uint8_t hash[sha256.HASH_SIZE];
+  uint8_t hash[HASH_SIZE];
 
   sha256.reset();
   sha256.update(data.c_str(), data.length());
-  sha256.finalize(hash, sha256.HASH_SIZE);
+  sha256.finalize(hash, HASH_SIZE);
 
   String hashStr = "";
-  for (int i = 0; i < sha256.HASH_SIZE; i++) {
+  for (int i = 0; i < HASH_SIZE; i++) {
     String hex = String(hash[i], HEX);
     if (hex.length() == 1) {
       hashStr += "0";
