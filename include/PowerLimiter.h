@@ -28,6 +28,7 @@ public:
         Initializing,
         DisabledByConfig,
         DisabledByMqtt,
+        WaitingForValidTimestamp,
         PowerMeterDisabled,
         PowerMeterTimeout,
         PowerMeterPending,
@@ -37,6 +38,7 @@ public:
         InverterCommandsDisabled,
         InverterLimitPending,
         InverterPowerCmdPending,
+        InverterDevInfoPending,
         InverterStatsPending,
         UnconditionalSolarPassthrough,
         NoVeDirect,
@@ -59,7 +61,8 @@ private:
     Status _lastStatus = Status::Initializing;
     uint32_t _lastStatusPrinted = 0;
     uint32_t _lastCalculation = 0;
-    uint32_t _calculationBackoffMs = 0;
+    static constexpr uint32_t _calculationBackoffMsDefault = 128;
+    uint32_t _calculationBackoffMs = _calculationBackoffMsDefault;
     uint8_t _mode = PL_MODE_ENABLE_NORMAL_OP;
     std::shared_ptr<InverterAbstract> _inverter = nullptr;
     bool _batteryDischargeEnabled = false;

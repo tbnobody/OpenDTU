@@ -30,6 +30,7 @@ std::string const& PowerLimiterClass::getStatusText(PowerLimiterClass::Status st
         { Status::Initializing, "initializing (should not see me)" },
         { Status::DisabledByConfig, "disabled by configuration" },
         { Status::DisabledByMqtt, "disabled by MQTT" },
+        { Status::WaitingForValidTimestamp, "waiting for valid date and time to be available" },
         { Status::PowerMeterDisabled, "no power meter is configured/enabled" },
         { Status::PowerMeterTimeout, "power meter readings are outdated" },
         { Status::PowerMeterPending, "waiting for sufficiently recent power meter reading" },
@@ -39,6 +40,7 @@ std::string const& PowerLimiterClass::getStatusText(PowerLimiterClass::Status st
         { Status::InverterCommandsDisabled, "inverter configuration prohibits sending commands" },
         { Status::InverterLimitPending, "waiting for a power limit command to complete" },
         { Status::InverterPowerCmdPending, "waiting for a start/stop/restart command to complete" },
+        { Status::InverterDevInfoPending, "waiting for inverter device information to be available" },
         { Status::InverterStatsPending, "waiting for sufficiently recent inverter data" },
         { Status::UnconditionalSolarPassthrough, "unconditionally passing through all solar power (MQTT override)" },
         { Status::NoVeDirect, "VE.Direct disabled, connection broken, or data outdated" },
@@ -97,6 +99,14 @@ void PowerLimiterClass::loop()
 {
     CONFIG_T& config = Configuration.get();
 
+    // we know that the Hoymiles library refuses to send any message to any
+    // inverter until the system has valid time information. until then we can
+    // do nothing, not even shutdown the inverter.
+    struct tm timeinfo;
+    if (!getLocalTime(&timeinfo, 5)) {
+        return announceStatus(Status::WaitingForValidTimestamp);
+    }
+
     if (_shutdownInProgress) {
         // we transition from SHUTDOWN to OFF when we know the inverter was
         // shut down. until then, we retry shutting it down. in this case we
@@ -150,6 +160,13 @@ void PowerLimiterClass::loop()
     auto lastPowerCommandState = _inverter->PowerCommand()->getLastPowerCommandSuccess();
     if (CMD_PENDING == lastPowerCommandState) {
         return announceStatus(Status::InverterPowerCmdPending);
+    }
+
+    // a calculated power limit will always be limited to the reported
+    // device's max power. that upper limit is only known after the first
+    // DevInfoSimpleCommand succeeded.
+    if (_inverter->DevInfo()->getMaxPower() <= 0) {
+        return announceStatus(Status::InverterDevInfoPending);
     }
 
     if (PL_MODE_SOLAR_PT_ONLY == _mode) {
@@ -275,7 +292,7 @@ void PowerLimiterClass::loop()
         return announceStatus(Status::Stable);
     }
 
-    _calculationBackoffMs = 128;
+    _calculationBackoffMs = _calculationBackoffMsDefault;
 }
 
 /**
