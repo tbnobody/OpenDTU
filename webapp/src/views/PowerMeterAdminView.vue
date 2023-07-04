@@ -120,6 +120,26 @@
                                     placeholder="http://admin:supersecret@mypowermeter.home/status"
                                     prefix="GET "
                                     :tooltip="$t('powermeteradmin.httpUrlDescription')" />
+                               
+                                <div class="row mb-3">
+                                    <label for="inputTimezone" class="col-sm-2 col-form-label">{{ $t('powermeteradmin.httpAuthorization') }}</label>
+                                    <div class="col-sm-10">
+                                        <select class="form-select" v-model="http_phase.auth_type">
+                                            <option v-for="source in powerMeterAuthList" :key="source.key" :value="source.key">
+                                                {{ source.value }}
+                                            </option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div v-if="http_phase.auth_type != 0">
+                                    <InputElement :label="$t('powermeteradmin.httpUsername')"
+                                        v-model="http_phase.username"
+                                        type="text" maxlength="64"/>
+
+                                    <InputElement :label="$t('powermeteradmin.httpPassword')"
+                                        v-model="http_phase.password"
+                                        type="password" maxlength="64"/>
+                                </div>
 
                                 <InputElement :label="$t('powermeteradmin.httpHeaderKey')"
                                     v-model="http_phase.header_key"
@@ -208,6 +228,11 @@ export default defineComponent({
                 { key: 2, value: this.$t('powermeteradmin.typeSDM3ph') },
                 { key: 3, value: this.$t('powermeteradmin.typeHTTP') },
                 { key: 4, value: this.$t('powermeteradmin.typeSML') },
+            ],
+            powerMeterAuthList: [
+                { key: 0, value: "None" },
+                { key: 1, value: "Basic" },
+                { key: 2, value: "Digest" },
             ],
             alertMessage: "",
             alertType: "info",

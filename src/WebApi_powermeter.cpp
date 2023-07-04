@@ -56,6 +56,9 @@ void WebApiPowerMeterClass::onStatus(AsyncWebServerRequest* request)
         phaseObject[F("index")] = i + 1;
         phaseObject[F("enabled")] = config.Powermeter_Http_Phase[i].Enabled;
         phaseObject[F("url")] = String(config.Powermeter_Http_Phase[i].Url);
+        phaseObject[F("auth_type")]= config.Powermeter_Http_Phase[i].AuthType;
+        phaseObject[F("username")] = String(config.Powermeter_Http_Phase[i].Username);
+        phaseObject[F("password")] = String(config.Powermeter_Http_Phase[i].Password);
         phaseObject[F("header_key")] = String(config.Powermeter_Http_Phase[i].HeaderKey);
         phaseObject[F("header_value")] = String(config.Powermeter_Http_Phase[i].HeaderValue);
         phaseObject[F("json_path")] = String(config.Powermeter_Http_Phase[i].JsonPath);
@@ -137,6 +140,14 @@ void WebApiPowerMeterClass::onAdminPost(AsyncWebServerRequest* request)
                     return;
                 }
 
+                if ((phase[F("auth_type")].as<Auth>() != Auth::none)
+                    && ( phase[F("username")].as<String>().length() == 0 ||  phase[F("password")].as<String>().length() == 0)) {
+                    retMsg[F("message")] = F("Username or password must not be empty!");
+                    response->setLength();
+                    request->send(response);
+                    return;
+                }
+
                 if (!phase.containsKey("timeout")
                         || phase[F("timeout")].as<uint16_t>() <= 0) {
                     retMsg[F("message")] = F("Timeout must be greater than 0 ms!");
@@ -173,6 +184,9 @@ void WebApiPowerMeterClass::onAdminPost(AsyncWebServerRequest* request)
 
         config.Powermeter_Http_Phase[i].Enabled = (i == 0 ? true : phase[F("enabled")].as<bool>());
         strlcpy(config.Powermeter_Http_Phase[i].Url, phase[F("url")].as<String>().c_str(), sizeof(config.Powermeter_Http_Phase[i].Url));
+        config.Powermeter_Http_Phase[i].AuthType = phase[F("auth_type")].as<Auth>();
+        strlcpy(config.Powermeter_Http_Phase[i].Username, phase[F("username")].as<String>().c_str(), sizeof(config.Powermeter_Http_Phase[i].Username));
+        strlcpy(config.Powermeter_Http_Phase[i].Password, phase[F("password")].as<String>().c_str(), sizeof(config.Powermeter_Http_Phase[i].Password));
         strlcpy(config.Powermeter_Http_Phase[i].HeaderKey, phase[F("header_key")].as<String>().c_str(), sizeof(config.Powermeter_Http_Phase[i].HeaderKey));
         strlcpy(config.Powermeter_Http_Phase[i].HeaderValue, phase[F("header_value")].as<String>().c_str(), sizeof(config.Powermeter_Http_Phase[i].HeaderValue));
         config.Powermeter_Http_Phase[i].Timeout = phase[F("timeout")].as<uint16_t>();
@@ -229,7 +243,8 @@ void WebApiPowerMeterClass::onTestHttpRequest(AsyncWebServerRequest* request)
         return;
     }
 
-    if (!root.containsKey("url") || !root.containsKey("header_key") || !root.containsKey("header_value")
+    if (!root.containsKey("url") || !root.containsKey("auth_type") || !root.containsKey("username") || !root.containsKey("password") 
+            || !root.containsKey("header_key") || !root.containsKey("header_value")
             || !root.containsKey("timeout") || !root.containsKey("json_path")) {
         retMsg[F("message")] = F("Missing fields!");
         asyncJsonResponse->setLength();
@@ -241,8 +256,9 @@ void WebApiPowerMeterClass::onTestHttpRequest(AsyncWebServerRequest* request)
         errorMessage[256];
     char response[200];
 
-    if (HttpPowerMeter.httpRequest(root[F("url")].as<String>().c_str(), root[F("header_key")].as<String>().c_str(),
-            root[F("header_value")].as<String>().c_str(), root[F("timeout")].as<uint16_t>(),
+    if (HttpPowerMeter.httpRequest(root[F("url")].as<String>().c_str(), 
+            root[F("auth_type")].as<Auth>(), root[F("username")].as<String>().c_str(), root[F("password")].as<String>().c_str(),
+            root[F("header_key")].as<String>().c_str(), root[F("header_value")].as<String>().c_str(), root[F("timeout")].as<uint16_t>(),
             powerMeterResponse, sizeof(powerMeterResponse), errorMessage, sizeof(errorMessage))) {
         float power;
 

@@ -2,11 +2,14 @@ export interface PowerMeterHttpPhaseConfig {
     index: number;
     enabled: boolean;
     url: string;
+    auth_type: number;
+    username: string;
+    password: string;
     header_key: string;
     header_value: string;
     json_path: string;
     timeout: number;
-};
+}
 
 export interface PowerMeterConfig {
     enabled: boolean;

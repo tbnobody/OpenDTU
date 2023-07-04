@@ -140,6 +140,9 @@ bool ConfigurationClass::write()
 
         powermeter_phase["enabled"] = config.Powermeter_Http_Phase[i].Enabled;
         powermeter_phase["url"] = config.Powermeter_Http_Phase[i].Url;
+        powermeter_phase["auth_type"] = config.Powermeter_Http_Phase[i].AuthType;
+        powermeter_phase["username"] = config.Powermeter_Http_Phase[i].Username;
+        powermeter_phase["password"] = config.Powermeter_Http_Phase[i].Password;
         powermeter_phase["header_key"] = config.Powermeter_Http_Phase[i].HeaderKey;
         powermeter_phase["header_value"] = config.Powermeter_Http_Phase[i].HeaderValue;
         powermeter_phase["timeout"] = config.Powermeter_Http_Phase[i].Timeout;
@@ -346,6 +349,9 @@ bool ConfigurationClass::read()
 
         config.Powermeter_Http_Phase[i].Enabled = powermeter_phase["enabled"] | (i == 0);
         strlcpy(config.Powermeter_Http_Phase[i].Url, powermeter_phase["url"] | "", sizeof(config.Powermeter_Http_Phase[i].Url));
+        config.Powermeter_Http_Phase[i].AuthType = powermeter_phase["auth_type"] | Auth::none;
+        strlcpy(config.Powermeter_Http_Phase[i].Username, powermeter_phase["username"] | "", sizeof(config.Powermeter_Http_Phase[i].Username));
+        strlcpy(config.Powermeter_Http_Phase[i].Password, powermeter_phase["password"] | "", sizeof(config.Powermeter_Http_Phase[i].Password));
         strlcpy(config.Powermeter_Http_Phase[i].HeaderKey, powermeter_phase["header_key"] | "", sizeof(config.Powermeter_Http_Phase[i].HeaderKey));
         strlcpy(config.Powermeter_Http_Phase[i].HeaderValue, powermeter_phase["header_value"] | "", sizeof(config.Powermeter_Http_Phase[i].HeaderValue));
         config.Powermeter_Http_Phase[i].Timeout = powermeter_phase["timeout"] | POWERMETER_HTTP_TIMEOUT;
