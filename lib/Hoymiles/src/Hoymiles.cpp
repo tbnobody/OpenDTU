@@ -24,9 +24,9 @@ void HoymilesClass::init()
     _radioCmt.reset(new HoymilesRadio_CMT());
 }
 
-void HoymilesClass::initNRF(SPIClass* initialisedSpiBus, const uint8_t pinCE, const uint8_t pinIRQ)
+void HoymilesClass::initNRF(nrf_hal* hal, uint8_t pinIRQ)
 {
-    _radioNrf->init(initialisedSpiBus, pinCE, pinIRQ);
+    _radioNrf->init(hal, pinIRQ);
 }
 
 void HoymilesClass::initCMT(const int8_t pin_sdio, const int8_t pin_clk, const int8_t pin_cs, const int8_t pin_fcs, const int8_t pin_gpio2, const int8_t pin_gpio3)

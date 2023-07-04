@@ -8,14 +8,14 @@
 #include <Every.h>
 #include <FunctionalInterrupt.h>
 
-void HoymilesRadio_NRF::init(SPIClass* initialisedSpiBus, const uint8_t pinCE, const uint8_t pinIRQ)
+void HoymilesRadio_NRF::init(nrf_hal* hal, uint8_t pinIRQ)
 {
     _dtuSerial.u64 = 0;
 
-    _spiPtr.reset(initialisedSpiBus);
-    _radio.reset(new RF24(pinCE, initialisedSpiBus->pinSS()));
+    _hal.reset(hal);
+    _radio.reset(new RF24(hal));
 
-    _radio->begin(_spiPtr.get());
+    _radio->begin();
 
     _radio->setDataRate(RF24_250KBPS);
     _radio->enableDynamicPayloads();

@@ -7,13 +7,14 @@
 #include <memory>
 #include <nRF24L01.h>
 #include <queue>
+#include "nrf_hal.h"
 
 // number of fragments hold in buffer
 #define FRAGMENT_BUFFER_SIZE 30
 
 class HoymilesRadio_NRF : public HoymilesRadio {
 public:
-    void init(SPIClass* initialisedSpiBus, const uint8_t pinCE, const uint8_t pinIRQ);
+    void init(nrf_hal* hal, uint8_t pinIRQ);
     void loop();
     void setPALevel(const rf24_pa_dbm_e paLevel);
 
@@ -32,7 +33,7 @@ private:
 
     void sendEsbPacket(CommandAbstract& cmd);
 
-    std::unique_ptr<SPIClass> _spiPtr;
+    std::unique_ptr<nrf_hal> _hal;
     std::unique_ptr<RF24> _radio;
     uint8_t _rxChLst[5] = { 3, 23, 40, 61, 75 };
     uint8_t _rxChIdx = 0;

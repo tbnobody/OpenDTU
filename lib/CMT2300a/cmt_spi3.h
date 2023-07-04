@@ -1,7 +1,20 @@
 #ifndef __CMT_SPI3_H
 #define __CMT_SPI3_H
 
-#include <stdint.h>
+#include <driver/spi_master.h>
+
+#ifdef __cplusplus
+
+extern "C"
+{
+    void cmt_patch_spi(spi_host_device_t host_device);
+    void cmt_unpatch_spi(spi_host_device_t host_device);
+}
+
+#else
+
+void cmt_patch_spi(spi_host_device_t host_device);
+void cmt_unpatch_spi(spi_host_device_t host_device);
 
 void cmt_spi3_init(int8_t pin_sdio, int8_t pin_clk, int8_t pin_cs, int8_t pin_fcs, uint32_t spi_speed);
 
@@ -10,5 +23,8 @@ uint8_t cmt_spi3_read(uint8_t addr);
 
 void cmt_spi3_write_fifo(const uint8_t* p_buf, uint16_t len);
 void cmt_spi3_read_fifo(uint8_t* p_buf, uint16_t len);
+
+
+#endif
 
 #endif
