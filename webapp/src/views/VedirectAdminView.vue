@@ -14,14 +14,9 @@
             <CardElement :text="$t('vedirectadmin.VedirectParameter')" textVariant="text-bg-primary" add-space
                          v-show="vedirectConfigList.vedirect_enabled"
             >
-                <InputElement :label="$t('vedirectadmin.PublishInterval')"
-                              v-model="vedirectConfigList.vedirect_pollinterval"
-                              type="number" min="5" max="86400"
-                              :postfix="$t('vedirectadmin.Seconds')"/>
-
                 <InputElement :label="$t('vedirectadmin.UpdatesOnly')"
                               v-model="vedirectConfigList.vedirect_updatesonly"
-                              type="checkbox"/>
+                              type="checkbox" wide/>
             </CardElement>
 
             <button type="submit" class="btn btn-primary mb-3">{{ $t('vedirectadmin.Save') }}</button>

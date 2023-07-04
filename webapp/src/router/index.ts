@@ -70,7 +70,7 @@ const router = createRouter({
     },
     {
         path: '/info/vedirect',
-        name: 'Ve.direct',
+        name: 'VE.Direct',
         component: VedirectInfoView
     },
     {
@@ -85,7 +85,7 @@ const router = createRouter({
     },
     {
         path: '/settings/vedirect',
-        name: 'Ve.direct Settings',
+        name: 'VE.Direct Settings',
         component: VedirectAdminView
     },
     {

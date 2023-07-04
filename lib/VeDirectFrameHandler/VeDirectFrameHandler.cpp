@@ -64,8 +64,7 @@ VeDirectFrameHandler::VeDirectFrameHandler() :
 	_name(""),
 	_value(""),
 	_tmpFrame(),
-	_pollInterval(5),
-	_lastPoll(0)
+	_lastUpdate(0)
 {
 }
 
@@ -75,17 +74,8 @@ void VeDirectFrameHandler::init(int8_t rx, int8_t tx)
     VedirectSerial.flush();
 }
 
-void VeDirectFrameHandler::setPollInterval(unsigned long interval)
-{
-    _pollInterval = interval;
-}
-
 void VeDirectFrameHandler::loop()
 {
-	if ((millis() - getLastUpdate()) < _pollInterval * 1000) {
-		return;
-	}
-	
 	while ( VedirectSerial.available()) {
 		rxData(VedirectSerial.read());
 	}
@@ -273,7 +263,7 @@ void VeDirectFrameHandler::frameEndEvent(bool valid) {
 		}
 
 		veFrame = _tmpFrame;
-		setLastUpdate();
+		_lastUpdate = millis();
 	}
 	_tmpFrame = {};
 }
@@ -316,8 +306,8 @@ int VeDirectFrameHandler::hexRxEvent(uint8_t inbyte) {
 }
 
 bool VeDirectFrameHandler::isDataValid() {
- 	if ((millis() - getLastUpdate()) / 1000 > _pollInterval * 5) { 
-        return false;
+	if (_lastUpdate == 0) {
+		return false;
 	}
 	if (strlen(veFrame.SER) == 0) {
 		return false;
@@ -327,16 +317,7 @@ bool VeDirectFrameHandler::isDataValid() {
 
 unsigned long VeDirectFrameHandler::getLastUpdate()
 {
-    return _lastPoll;
-}
-
-/*
- * setLastUpdate
- * This function is called every time a new ve.direct frame was read.
- */
-void VeDirectFrameHandler::setLastUpdate()
-{
-    _lastPoll = millis();
+    return _lastUpdate;
 }
 
 /*

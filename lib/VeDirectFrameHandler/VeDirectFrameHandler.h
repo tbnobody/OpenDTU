@@ -88,7 +88,6 @@ public:
 
     VeDirectFrameHandler();
     void init(int8_t rx, int8_t tx);             // initialize HardewareSerial
-    void setPollInterval(unsigned long interval); // set poll intervall in seconds
     void loop();                                 // main loop to read ve.direct data
     unsigned long getLastUpdate();               // timestamp of last successful frame read
     bool isDataValid();                          // return true if data valid and not outdated
@@ -118,8 +117,7 @@ private:
     char _value[VE_MAX_VALUE_LEN];             // buffer for the field value
     veStruct _tmpFrame{};                        // private struct for received name and value pairs
     MovingAverage<double, 5> _efficiency;
-    unsigned long _pollInterval;
-    unsigned long _lastPoll;
+    unsigned long _lastUpdate;
 };
 
 extern VeDirectFrameHandler VeDirect;

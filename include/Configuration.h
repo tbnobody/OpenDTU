@@ -122,7 +122,6 @@ struct CONFIG_T {
 
     bool Vedirect_Enabled;
     bool Vedirect_UpdatesOnly;
-    uint32_t Vedirect_PollInterval;
 
     char Mqtt_Hostname[MQTT_MAX_HOSTNAME_STRLEN + 1];
 

@@ -121,7 +121,6 @@ bool ConfigurationClass::write()
     JsonObject vedirect = doc.createNestedObject("vedirect");
     vedirect["enabled"] = config.Vedirect_Enabled;
     vedirect["updates_only"] = config.Vedirect_UpdatesOnly;
-    vedirect["poll_interval"] = config.Vedirect_PollInterval;
 
     JsonObject powermeter = doc.createNestedObject("powermeter");
     powermeter["enabled"] = config.PowerMeter_Enabled;
@@ -330,7 +329,6 @@ bool ConfigurationClass::read()
     JsonObject vedirect = doc["vedirect"];
     config.Vedirect_Enabled = vedirect["enabled"] | VEDIRECT_ENABLED;
     config.Vedirect_UpdatesOnly = vedirect["updates_only"] | VEDIRECT_UPDATESONLY;
-    config.Vedirect_PollInterval = vedirect["poll_interval"] | VEDIRECT_POLL_INTERVAL;
 
     JsonObject powermeter = doc["powermeter"];
     config.PowerMeter_Enabled = powermeter["enabled"] | POWERMETER_ENABLED;

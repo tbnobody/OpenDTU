@@ -6,23 +6,15 @@
                     <tbody>
                         <tr>
                             <th>{{ $t('vedirectinfo.Status') }}</th>
-                            <td class="badge" :class="{
-                                'text-bg-danger': !vedirectDataList.vedirect_enabled,
-                                'text-bg-success': vedirectDataList.vedirect_enabled,
-                            }">
-                                <span v-if="vedirectDataList.vedirect_enabled">{{ $t('vedirectinfo.Enabled') }}</span>
-                                <span v-else>{{ $t('vedirectinfo.Disabled') }}</span>
+                            <td>
+                                <StatusBadge :status="vedirectDataList.vedirect_enabled" true_text="vedirectinfo.Enabled" false_text="vedirectinfo.Disabled" />
                             </td>
                         </tr>
-                        <tr v-show="vedirectDataList.vedirect_enabled">
-                                <th>{{ $t('vedirectinfo.UpdatesOnly') }}</th>
-                                <td class="badge" :class="{
-                                    'text-bg-danger': !vedirectDataList.vedirect_updatesonly,
-                                    'text-bg-success': vedirectDataList.vedirect_updatesonly,
-                                }">
-                                    <span v-if="vedirectDataList.vedirect_updatesonly">{{ $t('vedirectinfo.UpdatesEnabled') }}</span>
-                                    <span v-else>{{ $t('vedirectinfo.UpdatesDisabled') }}</span>
-                                </td>
+                        <tr>
+                            <th>{{ $t('vedirectinfo.UpdatesOnly') }}</th>
+                            <td>
+                                <StatusBadge :status="vedirectDataList.vedirect_updatesonly" true_text="vedirectinfo.UpdatesEnabled" false_text="vedirectinfo.UpdatesDisabled" />
+                            </td>
                         </tr>
                     </tbody>
                 </table>
@@ -34,6 +26,7 @@
 <script lang="ts">
 import BasePage from '@/components/BasePage.vue';
 import CardElement from '@/components/CardElement.vue';
+import StatusBadge from '@/components/StatusBadge.vue';
 import type { VedirectStatus } from "@/types/VedirectStatus";
 import { authHeader, handleResponse } from '@/utils/authentication';
 import { defineComponent } from 'vue';
@@ -42,6 +35,7 @@ export default defineComponent({
     components: {
         BasePage,
         CardElement,
+        StatusBadge
     },
     data() {
         return {

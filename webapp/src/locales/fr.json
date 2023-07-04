@@ -9,7 +9,7 @@
         "SecuritySettings": "Sécurité",
         "DTUSettings": "DTU",
         "DeviceManager": "Périphériques",
-        "VedirectSettings": "Ve.direct",
+        "VedirectSettings": "VE.Direct",
         "PowerMeterSettings": "Power Meter",
         "BatterySettings": "Battery",
         "AcChargerSettings": "AC Charger",
@@ -22,7 +22,7 @@
         "NTP": "NTP",
         "MQTT": "MQTT",
         "Console": "Console",
-        "Vedirect": "Ve.direct",
+        "Vedirect": "VE.Direct",
         "About": "A propos",
         "Logout": "Déconnexion",
         "Login": "Connexion"
@@ -318,12 +318,12 @@
         "Disconnected": "déconnecté"
     },
     "vedirectinfo": {
-        "VedirectInformation" : "Ve.direct Info",
+        "VedirectInformation" : "VE.Direct Info",
         "ConfigurationSummary": "@:ntpinfo.ConfigurationSummary",
         "Status": "@:ntpinfo.Status",
         "Enabled": "@:mqttinfo.Enabled",
         "Disabled": "@:mqttinfo.Disabled",
-        "UpdatesOnly": "Send updates only",
+        "UpdatesOnly": "@:vedirectadmin.UpdatesOnly",
         "UpdatesEnabled": "@:mqttinfo.Enabled",
         "UpdatesDisabled": "@:mqttinfo.Disabled"
     },
@@ -485,13 +485,12 @@
         "Save": "@:dtuadmin.Save"
     },
     "vedirectadmin": {
-        "VedirectSettings": "Ve.direct Settings",
-        "VedirectConfiguration": "Ve.direct Configuration",
-        "EnableVedirect": "Enable Ve.direct",
-        "VedirectParameter": "Ve.direct Parameter",
-        "PublishInterval": "Publish Interval:",
+        "VedirectSettings": "VE.Direct Settings",
+        "VedirectConfiguration": "VE.Direct Configuration",
+        "EnableVedirect": "Enable VE.Direct",
+        "VedirectParameter": "VE.Direct Parameter",
         "Seconds": "seconds",
-        "UpdatesOnly": "Send only updates:",
+        "UpdatesOnly": "Publish values to MQTT only when they change",
         "Save": "@:dtuadmin.Save"
     },
     "inverteradmin": {
