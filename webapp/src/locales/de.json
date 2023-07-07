@@ -553,7 +553,7 @@
         "BatterySocSolarPassthroughStartThresholdHint": "Wenn der Batterie SOC über diesem Limit ist wird die Inverter Leistung entsprechend der Victron MPPT Leistung gesetzt (abzüglich Effizienzkorrekturfaktor). Kann verwendet werden um überschüssige Solarleistung an das Netz zu liefern wenn die Batterie voll ist.",
         "VoltageStartThreshold": "DC Spannung - Start",
         "VoltageStopThreshold": "DC Spannung - Stop",
-        "VoltageSolarPassthroughStartThreshold": "DC Spannung - Start Solar-Üassthrough",
+        "VoltageSolarPassthroughStartThreshold": "DC Spannung - Start Solar-Passthrough",
         "VoltageSolarPassthroughStopThreshold": "DC Spannung - Stop Solar-Passthrough",
         "VoltageSolarPassthroughStartThresholdHint": "Wenn der Batteriespannung über diesem Limit ist wird die Inverter Leistung entsprechend der Victron MPPT Leistung gesetzt (abzüglich Effizienzkorrekturfaktor). Kann verwendet werden um überschüssige Solarleistung an das Netz zu liefern wenn die Batterie voll ist. Dieser Mode wird aktiv wenn das Start Spannungslimit überschritten wird und inaktiv wenn das Stop Spannungslimit unterschritten wird.",
         "VoltageLoadCorrectionFactor": "DC Spannung - Lastkorrekturfaktor",
