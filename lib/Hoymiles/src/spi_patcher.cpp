@@ -1,6 +1,8 @@
 #include "spi_patcher.h"
 
-spi_patcher spi_patcher_inst(SPI2_HOST);
+#define HOST_DEVICE SPI2_HOST
+
+spi_patcher spi_patcher_inst(HOST_DEVICE);
 
 spi_patcher::spi_patcher(spi_host_device_t host_device) :
     host_device(host_device),

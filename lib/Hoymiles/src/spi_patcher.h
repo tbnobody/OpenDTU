@@ -4,8 +4,6 @@
 
 #include <freertos/semphr.h>
 
-#include <Arduino.h>
-
 class spi_patcher
 {
 public:
