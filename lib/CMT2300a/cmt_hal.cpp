@@ -61,7 +61,7 @@ void cmt_hal::patch(spi_host_device_t host_device)
         .mode = 0, // SPI mode 0
         .duty_cycle_pos = 0,
         .cs_ena_pretrans = 2,
-        .cs_ena_posttrans = (uint8_t)(1 / (spi_speed * 10e6 * 2) + 2), // >2 us
+        .cs_ena_posttrans = static_cast<uint8_t>(2 * spi_speed / 1000000), // >2 us
         .clock_speed_hz = spi_speed,
         .input_delay_ns = 0,
         .spics_io_num = pin_fcs,
