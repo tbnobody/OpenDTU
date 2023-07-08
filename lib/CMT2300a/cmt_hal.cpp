@@ -1,7 +1,5 @@
 #include "cmt_hal.h"
 
-#include <Arduino.h>
-
 #define CMT_MAX_TRANSFER_SZ 32
 
 cmt_hal::cmt_hal() :
@@ -136,8 +134,6 @@ uint8_t cmt_hal::read_reg(uint8_t addr)
 
     release_spi();
 
-    delayMicroseconds(100);
-
     return data;
 }
 
@@ -158,8 +154,6 @@ void cmt_hal::write_reg(uint8_t addr, uint8_t data)
     ESP_ERROR_CHECK(spi_device_polling_transmit(spi_reg, &t));
 
     release_spi();
-
-    delayMicroseconds(100);
 }
 
 void cmt_hal::read_fifo(uint8_t* buf, uint16_t len)
@@ -179,7 +173,6 @@ void cmt_hal::read_fifo(uint8_t* buf, uint16_t len)
     for (uint16_t i = 0; i < len; i++) {
         t.rx_buffer = buf + i;
         ESP_ERROR_CHECK(spi_device_polling_transmit(spi_fifo, &t));
-        delayMicroseconds(4); // > 4 us
     }
 
     release_spi();
@@ -202,7 +195,6 @@ void cmt_hal::write_fifo(const uint8_t* buf, uint16_t len)
     for (uint16_t i = 0; i < len; i++) {
         t.tx_buffer = buf + i;
         ESP_ERROR_CHECK(spi_device_polling_transmit(spi_fifo, &t));
-        delayMicroseconds(4); // > 4 us
     }
 
     release_spi();
