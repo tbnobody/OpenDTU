@@ -19,7 +19,14 @@ public:
     void loop();
 private:
     veStruct _kvFrame{};
-    uint32_t _lastPublish;
+
+    // point of time in millis() when updated values will be published
+    uint32_t _nextPublishUpdatesOnly = 0;
+
+    // point of time in millis() when all values will be published
+    uint32_t _nextPublishFull = 1;
+
+    bool _PublishFull;
 };
 
 extern MqttHandleVedirectClass MqttHandleVedirect;

@@ -6,6 +6,7 @@
 #include "Configuration.h"
 #include "MqttHandleHass.h"
 #include "MqttHandleVedirectHass.h"
+#include "MqttHandleVedirect.h"
 #include "MqttSettings.h"
 #include "WebApi.h"
 #include "WebApi_errors.h"
@@ -333,6 +334,7 @@ void WebApiMqttClass::onMqttAdminPost(AsyncWebServerRequest* request)
     MqttSettings.performReconnect();
     MqttHandleHass.forceUpdate();
     MqttHandleVedirectHass.forceUpdate();
+    MqttHandleVedirect.init();
     PowerMeter.init();
     PowerLimiter.init();
 }
