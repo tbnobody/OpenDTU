@@ -153,7 +153,7 @@
                 </div>
 
                 <div class="col-sm-7">
-                  <input type="number" name="inputVoltageTargetLimit" class="form-control" id="inputVoltageTargetLimit"
+                  <input type="number" step="0.01" name="inputVoltageTargetLimit" class="form-control" id="inputVoltageTargetLimit"
                     :min="targetVoltageLimitMin" :max="targetVoltageLimitMax" v-model="targetLimitList.voltage"
                     :disabled=!targetLimitList.voltage_valid>
                 </div>
@@ -178,7 +178,7 @@
                 </div>
 
                 <div class="col-sm-7">
-                  <input type="number" name="inputCurrentTargetLimit" class="form-control" id="inputCurrentTargetLimit"
+                  <input type="number" step="0.1" name="inputCurrentTargetLimit" class="form-control" id="inputCurrentTargetLimit"
                     :min="targetCurrentLimitMin" :max="targetCurrentLimitMax" v-model="targetLimitList.current"
                     :disabled=!targetLimitList.current_valid>
                 </div>
