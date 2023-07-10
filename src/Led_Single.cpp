@@ -57,7 +57,7 @@ void LedSingleClass::loop()
 
         // Update inverter status
         _ledState[1] = LedState_t::Off;
-        if (Hoymiles.getNumInverters()) {
+        if (Hoymiles.getNumInverters() && Datastore.getIsAtLeastOnePollEnabled()) {
             // set LED status
             if (Datastore.getIsAllEnabledReachable() && Datastore.getIsAllEnabledProducing()) {
                 _ledState[1] = LedState_t::On;
