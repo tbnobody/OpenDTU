@@ -498,18 +498,17 @@ bool PowerLimiterClass::setNewPowerLimit(std::shared_ptr<InverterAbstract> inver
     std::list<ChannelNum_t> dcChnls = inverter->Statistics()->getChannelsByType(TYPE_DC);
     int dcProdChnls = 0, dcTotalChnls = dcChnls.size();
     for (auto& c : dcChnls) {
-        if (inverter->Statistics()->getChannelFieldValue(TYPE_DC, c, FLD_PDC) > 1.0) {
+        if (inverter->Statistics()->getChannelFieldValue(TYPE_DC, c, FLD_PDC) > 2.0) {
             dcProdChnls++;
         }
     }
-    if (dcProdChnls > 0) {
+    if ((dcProdChnls > 0) && (dcProdChnls != dcTotalChnls)) {
         MessageOutput.printf("[PowerLimiterClass::setNewPowerLimit] %d channels total, %d producing channels, scaling power limit\r\n",
                 dcTotalChnls, dcProdChnls);
         effPowerLimit = round(effPowerLimit * static_cast<float>(dcTotalChnls) / dcProdChnls);
-        if (effPowerLimit > inverter->DevInfo()->getMaxPower()) {
-            effPowerLimit = inverter->DevInfo()->getMaxPower();
-        }
     }
+
+    effPowerLimit = std::min<int32_t>(effPowerLimit, inverter->DevInfo()->getMaxPower());
 
     // Check if the new value is within the limits of the hysteresis
     auto diff = std::abs(effPowerLimit - _lastRequestedPowerLimit);
