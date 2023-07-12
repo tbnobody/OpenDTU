@@ -30,6 +30,20 @@
 
                 <div class="alert alert-secondary" v-show="powerLimiterConfigList.enabled" role="alert" v-html="$t('powerlimiteradmin.SolarpassthroughInfo')"></div>
 
+                <div class="row mb-3" v-show="powerLimiterConfigList.enabled && powerLimiterConfigList.solar_passthrough_enabled">
+                    <label for="solarPassthroughLosses" class="col-sm-2 col-form-label">{{ $t('powerlimiteradmin.SolarPassthroughLosses') }}</label>
+                    <div class="col-sm-10">
+                        <div class="input-group">
+                            <input type="number" class="form-control" id="solarPassthroughLosses"
+                                placeholder="3" v-model="powerLimiterConfigList.solar_passthrough_losses"
+                                aria-describedby="solarPassthroughLossesDescription" min="0" max="10" required/>
+                                <span class="input-group-text" id="solarPassthroughLossesDescription">%</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="alert alert-secondary" role="alert" v-show="powerLimiterConfigList.enabled && powerLimiterConfigList.solar_passthrough_enabled" v-html="$t('powerlimiteradmin.SolarPassthroughLossesInfo')"></div>
+
                 <div class="row mb-3" v-show="powerLimiterConfigList.enabled">
                     <label for="inputTimezone" class="col-sm-2 col-form-label">
                         {{ $t('powerlimiteradmin.InverterId') }}:

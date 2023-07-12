@@ -151,6 +151,7 @@ bool ConfigurationClass::write()
     JsonObject powerlimiter = doc.createNestedObject("powerlimiter");
     powerlimiter["enabled"] = config.PowerLimiter_Enabled;
     powerlimiter["solar_passtrough_enabled"] = config.PowerLimiter_SolarPassThroughEnabled;
+    powerlimiter["solar_passtrough_losses"] = config.PowerLimiter_SolarPassThroughLosses;
     powerlimiter["battery_drain_strategy"] = config.PowerLimiter_BatteryDrainStategy;
     powerlimiter["interval"] = config.PowerLimiter_Interval;
     powerlimiter["is_inverter_behind_powermeter"] = config.PowerLimiter_IsInverterBehindPowerMeter;
@@ -358,7 +359,8 @@ bool ConfigurationClass::read()
 
     JsonObject powerlimiter = doc["powerlimiter"];
     config.PowerLimiter_Enabled = powerlimiter["enabled"] | POWERLIMITER_ENABLED;
-    config.PowerLimiter_SolarPassThroughEnabled = powerlimiter["solar_passtrough_enabled"] | POWERLIMITER_SOLAR_PASSTROUGH_ENABLED;
+    config.PowerLimiter_SolarPassThroughEnabled = powerlimiter["solar_passtrough_enabled"] | POWERLIMITER_SOLAR_PASSTHROUGH_ENABLED;
+    config.PowerLimiter_SolarPassThroughLosses = powerlimiter["solar_passthrough_losses"] | POWERLIMITER_SOLAR_PASSTHROUGH_LOSSES;
     config.PowerLimiter_BatteryDrainStategy = powerlimiter["battery_drain_strategy"] | POWERLIMITER_BATTERY_DRAIN_STRATEGY;
     config.PowerLimiter_Interval =  powerlimiter["interval"] | POWERLIMITER_INTERVAL;
     config.PowerLimiter_IsInverterBehindPowerMeter = powerlimiter["is_inverter_behind_powermeter"] | POWERLIMITER_IS_INVERTER_BEHIND_POWER_METER;

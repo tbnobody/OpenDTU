@@ -555,6 +555,8 @@
       "General": "General",
       "Enable": "Enable",
       "EnableSolarPassthrough": "Enable Solar-Passthrough",
+      "SolarPassthroughLosses": "(Full) Solar Passthrough Losses:",
+      "SolarPassthroughLossesInfo": "<b>Hint:</b> Line losses are to be expected when transferring energy from the solar charge controller to the inverter. These losses can be taken into account to prevent the battery from gradually discharging in (full) solar passthrough mode. The power limit to be set on the inverter is additionally reduced by this factor after taking its efficiency into account.",
       "BatteryDrainStrategy": "Battery drain strategy",
       "BatteryDrainWhenFull": "Empty when full",
       "BatteryDrainAtNight": "Empty at night",

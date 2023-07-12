@@ -314,7 +314,10 @@ int32_t PowerLimiterClass::inverterPowerDcToAc(std::shared_ptr<InverterAbstract>
     // is currently not producing (efficiency is zero in that case)
     float inverterEfficiencyFactor = (inverterEfficiencyPercent > 0) ? inverterEfficiencyPercent/100 : 0.967;
 
-    return dcPower * inverterEfficiencyFactor;
+    // account for losses between solar charger and inverter (cables, junctions...)
+    float lossesFactor = 1.00 - static_cast<float>(config.PowerLimiter_SolarPassThroughLosses)/100;
+
+    return dcPower * inverterEfficiencyFactor * lossesFactor;
 }
 
 /**

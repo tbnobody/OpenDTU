@@ -141,6 +141,7 @@ struct CONFIG_T {
 
     bool PowerLimiter_Enabled;
     bool PowerLimiter_SolarPassThroughEnabled;
+    uint8_t PowerLimiter_SolarPassThroughLosses;
     uint8_t PowerLimiter_BatteryDrainStategy;
     uint32_t PowerLimiter_Interval;
     bool PowerLimiter_IsInverterBehindPowerMeter;

@@ -39,6 +39,7 @@ void WebApiPowerLimiterClass::onStatus(AsyncWebServerRequest* request)
 
     root[F("enabled")] = config.PowerLimiter_Enabled;
     root[F("solar_passthrough_enabled")] = config.PowerLimiter_SolarPassThroughEnabled;
+    root[F("solar_passthrough_losses")] = config.PowerLimiter_SolarPassThroughLosses;
     root[F("battery_drain_strategy")] = config.PowerLimiter_BatteryDrainStategy;
     root[F("is_inverter_behind_powermeter")] = config.PowerLimiter_IsInverterBehindPowerMeter;
     root[F("inverter_id")] = config.PowerLimiter_InverterId;
@@ -125,6 +126,7 @@ void WebApiPowerLimiterClass::onAdminPost(AsyncWebServerRequest* request)
     config.PowerLimiter_Enabled = root[F("enabled")].as<bool>();
     PowerLimiter.setMode(PL_MODE_ENABLE_NORMAL_OP);  // User input sets PL to normal operation
     config.PowerLimiter_SolarPassThroughEnabled = root[F("solar_passthrough_enabled")].as<bool>();
+    config.PowerLimiter_SolarPassThroughLosses = root[F("solar_passthrough_losses")].as<uint8_t>();
     config.PowerLimiter_BatteryDrainStategy= root[F("battery_drain_strategy")].as<uint8_t>();
     config.PowerLimiter_IsInverterBehindPowerMeter = root[F("is_inverter_behind_powermeter")].as<bool>();
     config.PowerLimiter_InverterId = root[F("inverter_id")].as<uint8_t>();
