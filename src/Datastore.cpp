@@ -30,6 +30,7 @@ void DatastoreClass::loop()
 
         uint8_t isProducing = 0;
         uint8_t isReachable = 0;
+        uint8_t pollEnabledCount = 0;
 
         DAT_SEMAPHORE_TAKE();
 
@@ -60,6 +61,10 @@ void DatastoreClass::loop()
             auto cfg = Configuration.getInverterConfig(inv->serial());
             if (cfg == nullptr) {
                 continue;
+            }
+
+            if (inv->getEnablePolling()) {
+                pollEnabledCount++;
             }
 
             if (inv->isProducing()) {
@@ -107,6 +112,7 @@ void DatastoreClass::loop()
 
         _isAtLeastOneProducing = isProducing > 0;
         _isAtLeastOneReachable = isReachable > 0;
+        _isAtLeastOnePollEnabled = pollEnabledCount > 0;
 
         _totalDcIrradiation = _totalDcIrradiationInstalled > 0 ? _totalDcPowerIrradiation / _totalDcIrradiationInstalled * 100.0f : 0;
 
@@ -232,6 +238,14 @@ bool DatastoreClass::getIsAllEnabledReachable()
 {
     DAT_SEMAPHORE_TAKE();
     bool retval = _isAllEnabledReachable;
+    DAT_SEMAPHORE_GIVE();
+    return retval;
+}
+
+bool DatastoreClass::getIsAtLeastOnePollEnabled()
+{
+    DAT_SEMAPHORE_TAKE();
+    bool retval = _isAtLeastOnePollEnabled;
     DAT_SEMAPHORE_GIVE();
     return retval;
 }
