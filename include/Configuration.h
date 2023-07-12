@@ -71,6 +71,7 @@ struct CONFIG_T {
     uint8_t Ntp_SunsetType;
 
     bool Mqtt_Enabled;
+    bool Mqtt_VerboseLogging;
     char Mqtt_Hostname[MQTT_MAX_HOSTNAME_STRLEN + 1];
     uint Mqtt_Port;
     char Mqtt_Username[MQTT_MAX_USERNAME_STRLEN + 1];

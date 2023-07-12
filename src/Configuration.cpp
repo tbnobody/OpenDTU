@@ -51,6 +51,7 @@ bool ConfigurationClass::write()
 
     JsonObject mqtt = doc.createNestedObject("mqtt");
     mqtt["enabled"] = config.Mqtt_Enabled;
+    mqtt["verbose_logging"] = config.Mqtt_VerboseLogging;
     mqtt["hostname"] = config.Mqtt_Hostname;
     mqtt["port"] = config.Mqtt_Port;
     mqtt["username"] = config.Mqtt_Username;
@@ -197,6 +198,7 @@ bool ConfigurationClass::read()
 
     JsonObject mqtt = doc["mqtt"];
     config.Mqtt_Enabled = mqtt["enabled"] | MQTT_ENABLED;
+    config.Mqtt_VerboseLogging = mqtt["verbose_logging"] | VERBOSE_LOGGING;
     strlcpy(config.Mqtt_Hostname, mqtt["hostname"] | MQTT_HOST, sizeof(config.Mqtt_Hostname));
     config.Mqtt_Port = mqtt["port"] | MQTT_PORT;
     strlcpy(config.Mqtt_Username, mqtt["username"] | MQTT_USER, sizeof(config.Mqtt_Username));

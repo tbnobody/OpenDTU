@@ -23,6 +23,7 @@
         "Login": "Login"
     },
     "base": {
+        "VerboseLogging": "Verbose Logging",
         "Loading": "Loading...",
         "Reload": "Reload"
     },
@@ -399,6 +400,7 @@
         "MqttSettings": "MQTT Settings",
         "MqttConfiguration": "MQTT Configuration",
         "EnableMqtt": "Enable MQTT",
+        "VerboseLogging": "@:base.VerboseLogging",
         "EnableHass": "Enable Home Assistant MQTT Auto Discovery",
         "MqttBrokerParameter": "MQTT Broker Parameter",
         "Hostname": "Hostname:",
