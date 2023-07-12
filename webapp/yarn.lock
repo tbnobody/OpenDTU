@@ -2091,7 +2091,7 @@ postcss@^8.1.10:
     picocolors "^1.0.0"
     source-map-js "^1.0.2"
 
-postcss@^8.4.24:
+postcss@^8.4.25:
   version "8.4.25"
   resolved "https://registry.yarnpkg.com/postcss/-/postcss-8.4.25.tgz#4a133f5e379eda7f61e906c3b1aaa9b81292726f"
   integrity sha512-7taJ/8t2av0Z+sQEvNzCkpDynl0tX3uJMCODi6nT3PfASC7dYCWV9aQ+uiCf+KBD4SEFcu+GvJdGdwzQ6OSjCw==
@@ -2392,10 +2392,10 @@ supports-preserve-symlinks-flag@^1.0.0:
   resolved "https://registry.yarnpkg.com/supports-preserve-symlinks-flag/-/supports-preserve-symlinks-flag-1.0.0.tgz#6eda4bd344a3c94aea376d4cc31bc77311039e09"
   integrity sha512-ot0WnXS9fgdkgIcePe6RHNk1WA8+muPa6cSjeR3V8K27q9BB1rTE3R1p7Hv0z1ZyAc8s6Vvv8DIyWf681MAt0w==
 
-terser@^5.18.2:
-  version "5.18.2"
-  resolved "https://registry.yarnpkg.com/terser/-/terser-5.18.2.tgz#ff3072a0faf21ffd38f99acc9a0ddf7b5f07b948"
-  integrity sha512-Ah19JS86ypbJzTzvUCX7KOsEIhDaRONungA4aYBjEP3JZRf4ocuDzTg4QWZnPn9DEMiMYGJPiSOy7aykoCc70w==
+terser@^5.19.0:
+  version "5.19.0"
+  resolved "https://registry.yarnpkg.com/terser/-/terser-5.19.0.tgz#7b3137b01226bdd179978207b9c8148754a6da9c"
+  integrity sha512-JpcpGOQLOXm2jsomozdMDpd5f8ZHh1rR48OFgWUH3QsyZcfPgv2qDCYbcDEAYNd4OZRj2bWYKpwdll/udZCk/Q==
   dependencies:
     "@jridgewell/source-map" "^0.3.3"
     acorn "^8.8.2"
@@ -2514,13 +2514,13 @@ vite-plugin-css-injected-by-js@^3.2.0:
   resolved "https://registry.yarnpkg.com/vite-plugin-css-injected-by-js/-/vite-plugin-css-injected-by-js-3.2.0.tgz#0e0fa1de9281a918f9945bc6401b46f7d396d7f9"
   integrity sha512-a6MtYm/qfswVCtLezzzKJWL2ZpxrXXQd6/1UHy0t/G0IILHl4GG6n4OprbcC93aXIwkeS19JNbuKWD0Xt+pZtg==
 
-vite@^4.4.2:
-  version "4.4.2"
-  resolved "https://registry.yarnpkg.com/vite/-/vite-4.4.2.tgz#acd47de771c498aec80e4900f30133d9529b278a"
-  integrity sha512-zUcsJN+UvdSyHhYa277UHhiJ3iq4hUBwHavOpsNUGsTgjBeoBlK8eDt+iT09pBq0h9/knhG/SPrZiM7cGmg7NA==
+vite@^4.4.3:
+  version "4.4.3"
+  resolved "https://registry.yarnpkg.com/vite/-/vite-4.4.3.tgz#dfaf86f4cba3058bf2724e2e2c88254fb0f21a5a"
+  integrity sha512-IMnXQXXWgLi5brBQx/4WzDxdzW0X3pjO4nqFJAuNvwKtxzAmPzFE1wszW3VDpAGQJm3RZkm/brzRdyGsnwgJIA==
   dependencies:
     esbuild "^0.18.10"
-    postcss "^8.4.24"
+    postcss "^8.4.25"
     rollup "^3.25.2"
   optionalDependencies:
     fsevents "~2.3.2"
