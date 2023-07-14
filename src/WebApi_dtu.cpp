@@ -40,6 +40,7 @@ void WebApiDtuClass::onDtuAdminGet(AsyncWebServerRequest* request)
         ((uint32_t)(config.Dtu_Serial & 0xFFFFFFFF)));
     root["serial"] = buffer;
     root["pollinterval"] = config.Dtu_PollInterval;
+    root["verbose_logging"] = config.Dtu_VerboseLogging;
     root["nrf_enabled"] = Hoymiles.getRadioNrf()->isInitialized();
     root["nrf_palevel"] = config.Dtu_NrfPaLevel;
     root["cmt_enabled"] = Hoymiles.getRadioCmt()->isInitialized();
@@ -91,6 +92,7 @@ void WebApiDtuClass::onDtuAdminPost(AsyncWebServerRequest* request)
 
     if (!(root.containsKey("serial")
             && root.containsKey("pollinterval")
+            && root.containsKey("verbose_logging")
             && root.containsKey("nrf_palevel")
             && root.containsKey("cmt_palevel")
             && root.containsKey("cmt_frequency"))) {
@@ -151,6 +153,7 @@ void WebApiDtuClass::onDtuAdminPost(AsyncWebServerRequest* request)
     // Interpret the string as a hex value and convert it to uint64_t
     config.Dtu_Serial = strtoll(root["serial"].as<String>().c_str(), NULL, 16);
     config.Dtu_PollInterval = root["pollinterval"].as<uint32_t>();
+    config.Dtu_VerboseLogging = root["verbose_logging"].as<bool>();
     config.Dtu_NrfPaLevel = root["nrf_palevel"].as<uint8_t>();
     config.Dtu_CmtPaLevel = root["cmt_palevel"].as<int8_t>();
     config.Dtu_CmtFrequency = root["cmt_frequency"].as<uint32_t>();
@@ -169,4 +172,5 @@ void WebApiDtuClass::onDtuAdminPost(AsyncWebServerRequest* request)
     Hoymiles.getRadioCmt()->setDtuSerial(config.Dtu_Serial);
     Hoymiles.getRadioCmt()->setInverterTargetFrequency(config.Dtu_CmtFrequency);
     Hoymiles.setPollInterval(config.Dtu_PollInterval);
+    Hoymiles.setVerboseLogging(config.Dtu_VerboseLogging);
 }

@@ -329,6 +329,7 @@
         "Serial": "Serial:",
         "SerialHint": "Both the inverter and the DTU have a serial number. The DTU serial number is randomly generated at the first start and does not normally need to be changed.",
         "PollInterval": "Poll Interval:",
+        "VerboseLogging": "@:base.VerboseLogging",
         "Seconds": "Seconds",
         "NrfPaLevel": "NRF24 Transmitting power:",
         "CmtPaLevel": "CMT2300A Transmitting power:",

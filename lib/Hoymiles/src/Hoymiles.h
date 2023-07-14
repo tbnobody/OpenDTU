@@ -22,6 +22,7 @@ public:
 
     void setMessageOutput(Print* output);
     Print* getMessageOutput();
+    Print* getVerboseMessageOutput();
 
     std::shared_ptr<InverterAbstract> addInverter(const char* name, uint64_t serial);
     std::shared_ptr<InverterAbstract> getInverterByPos(uint8_t pos);
@@ -35,6 +36,7 @@ public:
 
     uint32_t PollInterval();
     void setPollInterval(uint32_t interval);
+    void setVerboseLogging(bool verboseLogging);
 
     bool isAllRadioIdle();
 
@@ -46,6 +48,7 @@ private:
     SemaphoreHandle_t _xSemaphore;
 
     uint32_t _pollInterval = 0;
+    bool _verboseLogging = true;
     uint32_t _lastPoll = 0;
 
     Print* _messageOutput = &Serial;

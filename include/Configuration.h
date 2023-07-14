@@ -99,6 +99,7 @@ struct CONFIG_T {
 
     uint64_t Dtu_Serial;
     uint32_t Dtu_PollInterval;
+    bool Dtu_VerboseLogging;
     uint8_t Dtu_NrfPaLevel;
     int8_t Dtu_CmtPaLevel;
     uint32_t Dtu_CmtFrequency;

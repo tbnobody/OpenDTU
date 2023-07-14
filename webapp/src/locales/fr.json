@@ -328,6 +328,7 @@
         "Serial": "Numéro de série",
         "SerialHint": "L'onduleur et le DTU ont tous deux un numéro de série. Le numéro de série du DTU est généré de manière aléatoire lors du premier démarrage et ne doit normalement pas être modifié.",
         "PollInterval": "Intervalle de sondage",
+        "VerboseLogging": "@:base.VerboseLogging",
         "Seconds": "Secondes",
         "NrfPaLevel": "NRF24 Niveau de puissance d'émission",
         "CmtPaLevel": "CMT2300A Niveau de puissance d'émission",

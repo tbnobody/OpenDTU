@@ -82,6 +82,7 @@ bool ConfigurationClass::write()
     JsonObject dtu = doc.createNestedObject("dtu");
     dtu["serial"] = config.Dtu_Serial;
     dtu["poll_interval"] = config.Dtu_PollInterval;
+    dtu["verbose_logging"] = config.Dtu_VerboseLogging;
     dtu["nrf_pa_level"] = config.Dtu_NrfPaLevel;
     dtu["cmt_pa_level"] = config.Dtu_CmtPaLevel;
     dtu["cmt_frequency"] = config.Dtu_CmtFrequency;
@@ -229,6 +230,7 @@ bool ConfigurationClass::read()
     JsonObject dtu = doc["dtu"];
     config.Dtu_Serial = dtu["serial"] | DTU_SERIAL;
     config.Dtu_PollInterval = dtu["poll_interval"] | DTU_POLL_INTERVAL;
+    config.Dtu_VerboseLogging = dtu["verbose_logging"] | VERBOSE_LOGGING;
     config.Dtu_NrfPaLevel = dtu["nrf_pa_level"] | DTU_NRF_PA_LEVEL;
     config.Dtu_CmtPaLevel = dtu["cmt_pa_level"] | DTU_CMT_PA_LEVEL;
     config.Dtu_CmtFrequency = dtu["cmt_frequency"] | DTU_CMT_FREQUENCY;
