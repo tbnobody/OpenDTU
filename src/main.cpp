@@ -14,6 +14,7 @@
 #include "MqttHandleDtu.h"
 #include "MqttHandleHass.h"
 #include "MqttHandleVedirectHass.h"
+#include "MqttHandlePylontechHass.h"
 #include "MqttHandleInverter.h"
 #include "MqttHandleInverterTotal.h"
 #include "MqttHandleVedirect.h"
@@ -239,6 +240,8 @@ void loop()
     MessageOutput.loop();
     yield();
     PylontechCanReceiver.loop();
+    yield();
+    MqttHandlePylontechHass.loop();
     yield();
     HuaweiCan.loop();
     yield();
