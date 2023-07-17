@@ -46,7 +46,6 @@ std::string const& PowerLimiterClass::getStatusText(PowerLimiterClass::Status st
         { Status::NoVeDirect, "VE.Direct disabled, connection broken, or data outdated" },
         { Status::Settling, "waiting for the system to settle" },
         { Status::Stable, "the system is stable, the last power limit is still valid" },
-        { Status::LowerLimitUndercut, "calculated power limit undercuts configured lower limit" }
     };
 
     auto iter = texts.find(status);
@@ -73,26 +72,39 @@ void PowerLimiterClass::announceStatus(PowerLimiterClass::Status status)
     _lastStatusPrinted = millis();
 }
 
-void PowerLimiterClass::shutdown(PowerLimiterClass::Status status)
+/**
+ * returns true if the inverter state was changed or is about to change, i.e.,
+ * if it is actually in need of a shutdown. returns false otherwise, i.e., the
+ * inverter is already (assumed to be) shut down.
+ */
+bool PowerLimiterClass::shutdown(PowerLimiterClass::Status status)
 {
     announceStatus(status);
 
-    if (_inverter == nullptr || !_inverter->isProducing() || !_inverter->isReachable()) {
+    if (_inverter == nullptr || !_inverter->isProducing() ||
+            (_shutdownTimeout > 0 && _shutdownTimeout < millis()) ) {
+        // we are actually (already) done with shutting down the inverter,
+        // or a shutdown attempt was initiated but it timed out.
         _inverter = nullptr;
-        _shutdownInProgress = false;
-        return;
+        _shutdownTimeout = 0;
+        return false;
     }
 
-    _shutdownInProgress = true;
+    if (!_inverter->isReachable()) { return true; } // retry later (until timeout)
+
+    // retry shutdown for a maximum amount of time before giving up
+    if (_shutdownTimeout == 0) { _shutdownTimeout = millis() + 10 * 1000; }
 
     auto lastLimitCommandState = _inverter->SystemConfigPara()->getLastLimitCommandSuccess();
-    if (CMD_PENDING == lastLimitCommandState) { return; }
+    if (CMD_PENDING == lastLimitCommandState) { return true; }
 
     auto lastPowerCommandState = _inverter->PowerCommand()->getLastPowerCommandSuccess();
-    if (CMD_PENDING == lastPowerCommandState) { return; }
+    if (CMD_PENDING == lastPowerCommandState) { return true; }
 
     CONFIG_T& config = Configuration.get();
     commitPowerLimit(_inverter, config.PowerLimiter_LowerPowerLimit, false);
+
+    return true;
 }
 
 void PowerLimiterClass::loop()
@@ -107,19 +119,22 @@ void PowerLimiterClass::loop()
         return announceStatus(Status::WaitingForValidTimestamp);
     }
 
-    if (_shutdownInProgress) {
+    if (_shutdownTimeout > 0) {
         // we transition from SHUTDOWN to OFF when we know the inverter was
         // shut down. until then, we retry shutting it down. in this case we
         // preserve the original status that lead to the decision to shut down.
-        return shutdown(_lastStatus);
+        shutdown();
+        return;
     }
 
     if (!config.PowerLimiter_Enabled) {
-        return shutdown(Status::DisabledByConfig);
+        shutdown(Status::DisabledByConfig);
+        return;
     }
 
     if (PL_MODE_FULL_DISABLE == _mode) {
-        return shutdown(Status::DisabledByMqtt);
+        shutdown(Status::DisabledByMqtt);
+        return;
     }
 
     std::shared_ptr<InverterAbstract> currentInverter =
@@ -128,13 +143,15 @@ void PowerLimiterClass::loop()
     // in case of (newly) broken configuration, shut down
     // the last inverter we worked with (if any)
     if (currentInverter == nullptr) {
-        return shutdown(Status::InverterInvalid);
+        shutdown(Status::InverterInvalid);
+        return;
     }
 
     // if the DPL is supposed to manage another inverter now, we first
     // shut down the previous one, if any. then we pick up the new one.
     if (_inverter != nullptr && _inverter->serial() != currentInverter->serial()) {
-        return shutdown(Status::InverterChanged);
+        shutdown(Status::InverterChanged);
+        return;
     }
 
     // update our pointer as the configuration might have changed
@@ -177,11 +194,13 @@ void PowerLimiterClass::loop()
     // the normal mode of operation requires a valid
     // power meter reading to calculate a power limit
     if (!config.PowerMeter_Enabled) {
-        return shutdown(Status::PowerMeterDisabled);
+        shutdown(Status::PowerMeterDisabled);
+        return;
     }
 
     if (millis() - PowerMeter.getLastPowerMeterUpdate() > (30 * 1000)) {
-        return shutdown(Status::PowerMeterTimeout);
+        shutdown(Status::PowerMeterTimeout);
+        return;
     }
 
     // concerns both power limits and start/stop/restart commands and is
@@ -332,7 +351,8 @@ void PowerLimiterClass::unconditionalSolarPassthrough(std::shared_ptr<InverterAb
     CONFIG_T& config = Configuration.get();
 
     if (!config.Vedirect_Enabled || !VeDirect.isDataValid()) {
-        return shutdown(Status::NoVeDirect);
+        shutdown(Status::NoVeDirect);
+        return;
     }
 
     int32_t solarPower = VeDirect.veFrame.V * VeDirect.veFrame.I;
@@ -487,8 +507,9 @@ bool PowerLimiterClass::setNewPowerLimit(std::shared_ptr<InverterAbstract> inver
 
     // Stop the inverter if limit is below threshold.
     if (newPowerLimit < config.PowerLimiter_LowerPowerLimit) {
-        shutdown(Status::LowerLimitUndercut);
-        return true;
+        // the status must not change outside of loop(). this condition is
+        // communicated through log messages already.
+        return shutdown();
     }
 
     // enforce configured upper power limit
