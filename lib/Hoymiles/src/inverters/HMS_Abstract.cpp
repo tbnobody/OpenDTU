@@ -14,7 +14,7 @@ HMS_Abstract::HMS_Abstract(HoymilesRadio* radio, uint64_t serial)
 
 bool HMS_Abstract::sendChangeChannelRequest()
 {
-    if (!(getEnableCommands() && getEnablePolling())) {
+    if (!(getEnableCommands() || getEnablePolling())) {
         return false;
     }
 
