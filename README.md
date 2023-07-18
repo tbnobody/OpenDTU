@@ -187,6 +187,8 @@ Topics for 3 phases of a power meter is configurable. Given is an example for th
 | --------------------------------------- | ----- | ---------------------------------------------------- | -------------------------- |
 | huawei/cmd/limit_online_voltage         | W     | Online voltage (i.e. CAN bus connected)              | Volt (V)                   |
 | huawei/cmd/limit_online_current         | W     | Online current (i.e. CAN bus connected)              | Ampere (A)                 |
+| huawei/cmd/limit_offline_voltage        | W     | Offline voltage (i.e. CAN bus not connected)         | Volt (V)                   |
+| huawei/cmd/limit_offline_current        | W     | Offline current (i.e. CAN bus not connected)         | Ampere (A)                 |
 | huawei/cmd/power                        | W     | Controls output pin GPIO to drive solid state relais | 0 / 1                      |
 | huawei/data_age                         | R     | How old the data is                                  | Seconds                    |
 | huawei/input_voltage                    | R     | Input voltage                                        | Volt (V)                   |
