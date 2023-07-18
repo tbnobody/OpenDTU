@@ -29,6 +29,7 @@ const devInfo_t devInfo[] = {
     { { 0x10, 0x10, 0x10, 0x15 }, static_cast<uint16_t>(300 * 0.7), "HM-300" }, // HM-300 factory limitted to 70%
 
     { { 0x10, 0x20, 0x21, ALL }, 350, "HMS-350" }, // 00
+    { { 0x10, 0x20, 0x41, ALL }, 400, "HMS-400" }, // 00
     { { 0x10, 0x10, 0x51, ALL }, 450, "HMS-450" }, // 01
     { { 0x10, 0x10, 0x71, ALL }, 500, "HMS-500" }, // 02
     { { 0x10, 0x21, 0x11, ALL }, 600, "HMS-600" }, // 01

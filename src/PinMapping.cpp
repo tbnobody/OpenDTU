@@ -38,6 +38,30 @@
 #define LED1 -1
 #endif
 
+#ifndef HOYMILES_PIN_SCLK
+#define HOYMILES_PIN_SCLK -1
+#endif
+
+#ifndef HOYMILES_PIN_CS
+#define HOYMILES_PIN_CS -1
+#endif
+
+#ifndef HOYMILES_PIN_CE
+#define HOYMILES_PIN_CE -1
+#endif
+
+#ifndef HOYMILES_PIN_IRQ
+#define HOYMILES_PIN_IRQ -1
+#endif
+
+#ifndef HOYMILES_PIN_MISO
+#define HOYMILES_PIN_MISO -1
+#endif
+
+#ifndef HOYMILES_PIN_MOSI
+#define HOYMILES_PIN_MOSI -1
+#endif
+
 #ifndef CMT_CLK
 #define CMT_CLK -1
 #endif

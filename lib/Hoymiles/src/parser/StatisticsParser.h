@@ -109,6 +109,9 @@ public:
 
     void setByteAssignment(const byteAssign_t* byteAssignment, uint8_t size);
 
+    // Returns 1 based amount of expected bytes of statistic data
+    uint8_t getExpectedByteCount();
+
     const byteAssign_t* getAssignmentByChannelField(ChannelType_t type, ChannelNum_t channel, FieldId_t fieldId);
     fieldSettings_t* getSettingByChannelField(ChannelType_t type, ChannelNum_t channel, FieldId_t fieldId);
 
@@ -139,6 +142,7 @@ private:
 
     const byteAssign_t* _byteAssignment;
     uint8_t _byteAssignmentSize;
+    uint8_t _expectedByteCount;
     std::list<fieldSettings_t> _fieldSettings;
 
     uint32_t _rxFailureCount = 0;

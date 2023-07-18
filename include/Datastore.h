@@ -50,6 +50,9 @@ public:
     // True if at least one inverter is producing
     bool getIsAtLeastOneProducing();
 
+    // True if at least one inverter is enabled for polling
+    bool getIsAtLeastOnePollEnabled();
+
     // True if all enabled inverters are producing
     bool getIsAllEnabledProducing();
 
@@ -75,6 +78,7 @@ private:
     bool _isAtLeastOneProducing = false;
     bool _isAllEnabledProducing = false;
     bool _isAllEnabledReachable = false;
+    bool _isAtLeastOnePollEnabled = false;
 };
 
 extern DatastoreClass Datastore;
