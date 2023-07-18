@@ -38,6 +38,7 @@ void WebApiPowerLimiterClass::onStatus(AsyncWebServerRequest* request)
     const CONFIG_T& config = Configuration.get();
 
     root[F("enabled")] = config.PowerLimiter_Enabled;
+    root[F("verbose_logging")] = config.PowerLimiter_VerboseLogging;
     root[F("solar_passthrough_enabled")] = config.PowerLimiter_SolarPassThroughEnabled;
     root[F("solar_passthrough_losses")] = config.PowerLimiter_SolarPassThroughLosses;
     root[F("battery_drain_strategy")] = config.PowerLimiter_BatteryDrainStategy;

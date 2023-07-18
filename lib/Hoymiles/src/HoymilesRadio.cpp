@@ -54,7 +54,7 @@ void HoymilesRadio::sendLastPacketAgain()
 void HoymilesRadio::handleReceivedPackage()
 {
     if (_busyFlag && _rxTimeout.occured()) {
-        Hoymiles.getMessageOutput()->println("RX Period End");
+        Hoymiles.getVerboseMessageOutput()->println("RX Period End");
         std::shared_ptr<InverterAbstract> inv = Hoymiles.getInverterBySerial(_commandQueue.front().get()->getTargetAddress());
 
         if (nullptr != inv) {
@@ -117,10 +117,10 @@ void HoymilesRadio::handleReceivedPackage()
 void HoymilesRadio::dumpBuf(const uint8_t buf[], uint8_t len, bool appendNewline)
 {
     for (uint8_t i = 0; i < len; i++) {
-        Hoymiles.getMessageOutput()->printf("%02X ", buf[i]);
+        Hoymiles.getVerboseMessageOutput()->printf("%02X ", buf[i]);
     }
     if (appendNewline) {
-        Hoymiles.getMessageOutput()->println("");
+        Hoymiles.getVerboseMessageOutput()->println("");
     }
 }
 

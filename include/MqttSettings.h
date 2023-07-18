@@ -37,6 +37,7 @@ private:
     String willTopic;
     Ticker mqttReconnectTimer;
     MqttSubscribeParser _mqttSubscribeParser;
+    bool _verboseLogging = true;
 };
 
 extern MqttSettingsClass MqttSettings;

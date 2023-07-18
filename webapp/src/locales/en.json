@@ -28,6 +28,7 @@
         "Login": "Login"
     },
     "base": {
+        "VerboseLogging": "Verbose Logging",
         "Loading": "Loading...",
         "Reload": "Reload"
     },
@@ -382,6 +383,7 @@
         "Serial": "Serial:",
         "SerialHint": "Both the inverter and the DTU have a serial number. The DTU serial number is randomly generated at the first start and does not normally need to be changed.",
         "PollInterval": "Poll Interval:",
+        "VerboseLogging": "@:base.VerboseLogging",
         "Seconds": "Seconds",
         "NrfPaLevel": "NRF24 Transmitting power:",
         "CmtPaLevel": "CMT2300A Transmitting power:",
@@ -450,6 +452,7 @@
         "MqttSettings": "MQTT Settings",
         "MqttConfiguration": "MQTT Configuration",
         "EnableMqtt": "Enable MQTT",
+        "VerboseLogging": "@:base.VerboseLogging",
         "EnableHass": "Enable Home Assistant MQTT Auto Discovery",
         "MqttBrokerParameter": "MQTT Broker Parameter",
         "Hostname": "Hostname:",
@@ -497,6 +500,7 @@
         "PowerMeterSettings": "Power Meter Settings",
         "PowerMeterConfiguration": "Power Meter Configuration",
         "PowerMeterEnable": "Enable Power Meter",
+        "VerboseLogging": "@:base.VerboseLogging",
         "PowerMeterParameter": "Power Meter Parameter",
         "PowerMeterSource": "Power Meter type",
         "MQTT": "MQTT Parameter",
@@ -535,6 +539,7 @@
         "PowerLimiterConfiguration": "Power Limiter Configuration",
         "General": "General",
         "Enable": "Enable",
+        "VerboseLogging": "@:base.VerboseLogging",
         "EnableSolarPassthrough": "Enable Solar-Passthrough",
         "SolarPassthroughLosses": "(Full) Solar Passthrough Losses:",
         "SolarPassthroughLossesInfo": "<b>Hint:</b> Line losses are to be expected when transferring energy from the solar charge controller to the inverter. These losses can be taken into account to prevent the battery from gradually discharging in (full) solar passthrough mode. The power limit to be set on the inverter is additionally reduced by this factor after taking its efficiency into account.",

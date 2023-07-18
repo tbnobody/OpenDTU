@@ -92,6 +92,7 @@ struct CONFIG_T {
     uint8_t Ntp_SunsetType;
 
     bool Mqtt_Enabled;
+    bool Mqtt_VerboseLogging;
     uint Mqtt_Port;
     char Mqtt_Username[MQTT_MAX_USERNAME_STRLEN + 1];
     char Mqtt_Password[MQTT_MAX_PASSWORD_STRLEN + 1];
@@ -106,6 +107,7 @@ struct CONFIG_T {
 
     uint64_t Dtu_Serial;
     uint32_t Dtu_PollInterval;
+    bool Dtu_VerboseLogging;
     uint8_t Dtu_NrfPaLevel;
     int8_t Dtu_CmtPaLevel;
     uint32_t Dtu_CmtFrequency;
@@ -128,6 +130,7 @@ struct CONFIG_T {
     bool Mqtt_Hass_Expire;
 
     bool PowerMeter_Enabled;
+    bool PowerMeter_VerboseLogging;
     uint32_t PowerMeter_Interval;
     uint32_t PowerMeter_Source;
     char PowerMeter_MqttTopicPowerMeter1[MQTT_MAX_TOPIC_STRLEN + 1];
@@ -140,6 +143,7 @@ struct CONFIG_T {
     POWERMETER_HTTP_PHASE_CONFIG_T Powermeter_Http_Phase[POWERMETER_MAX_PHASES];
 
     bool PowerLimiter_Enabled;
+    bool PowerLimiter_VerboseLogging;
     bool PowerLimiter_SolarPassThroughEnabled;
     uint8_t PowerLimiter_SolarPassThroughLosses;
     uint8_t PowerLimiter_BatteryDrainStategy;

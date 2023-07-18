@@ -28,6 +28,7 @@
         "Login": "Connexion"
     },
     "base": {
+        "VerboseLogging": "Journalisation Détaillée",
         "Loading": "Chargement...",
         "Reload": "Reload"
     },
@@ -382,6 +383,7 @@
         "Serial": "Numéro de série",
         "SerialHint": "L'onduleur et le DTU ont tous deux un numéro de série. Le numéro de série du DTU est généré de manière aléatoire lors du premier démarrage et ne doit normalement pas être modifié.",
         "PollInterval": "Intervalle de sondage",
+        "VerboseLogging": "@:base.VerboseLogging",
         "Seconds": "Secondes",
         "NrfPaLevel": "NRF24 Niveau de puissance d'émission",
         "CmtPaLevel": "CMT2300A Niveau de puissance d'émission",
@@ -450,6 +452,7 @@
         "MqttSettings": "Paramètres MQTT",
         "MqttConfiguration": "Configuration du système MQTT",
         "EnableMqtt": "Activer le MQTT",
+        "VerboseLogging": "@:base.VerboseLogging",
         "EnableHass": "Activer la découverte automatique du MQTT de Home Assistant",
         "MqttBrokerParameter": "Paramètre du Broker MQTT",
         "Hostname": "Nom d'hôte",
@@ -554,6 +557,7 @@
       "PowerLimiterConfiguration": "Power Limiter Configuration",
       "General": "General",
       "Enable": "Enable",
+      "VerboseLogging": "@:base.VerboseLogging",
       "EnableSolarPassthrough": "Enable Solar-Passthrough",
       "SolarPassthroughLosses": "(Full) Solar Passthrough Losses:",
       "SolarPassthroughLossesInfo": "<b>Hint:</b> Line losses are to be expected when transferring energy from the solar charge controller to the inverter. These losses can be taken into account to prevent the battery from gradually discharging in (full) solar passthrough mode. The power limit to be set on the inverter is additionally reduced by this factor after taking its efficiency into account.",

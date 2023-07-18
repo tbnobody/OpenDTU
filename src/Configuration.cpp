@@ -50,6 +50,7 @@ bool ConfigurationClass::write()
 
     JsonObject mqtt = doc.createNestedObject("mqtt");
     mqtt["enabled"] = config.Mqtt_Enabled;
+    mqtt["verbose_logging"] = config.Mqtt_VerboseLogging;
     mqtt["hostname"] = config.Mqtt_Hostname;
     mqtt["port"] = config.Mqtt_Port;
     mqtt["username"] = config.Mqtt_Username;
@@ -80,6 +81,7 @@ bool ConfigurationClass::write()
     JsonObject dtu = doc.createNestedObject("dtu");
     dtu["serial"] = config.Dtu_Serial;
     dtu["poll_interval"] = config.Dtu_PollInterval;
+    dtu["verbose_logging"] = config.Dtu_VerboseLogging;
     dtu["nrf_pa_level"] = config.Dtu_NrfPaLevel;
     dtu["cmt_pa_level"] = config.Dtu_CmtPaLevel;
     dtu["cmt_frequency"] = config.Dtu_CmtFrequency;
@@ -124,6 +126,7 @@ bool ConfigurationClass::write()
 
     JsonObject powermeter = doc.createNestedObject("powermeter");
     powermeter["enabled"] = config.PowerMeter_Enabled;
+    powermeter["verbose_logging"] = config.PowerMeter_VerboseLogging;
     powermeter["interval"] = config.PowerMeter_Interval;
     powermeter["source"] = config.PowerMeter_Source;
     powermeter["mqtt_topic_powermeter_1"] = config.PowerMeter_MqttTopicPowerMeter1;
@@ -150,6 +153,7 @@ bool ConfigurationClass::write()
 
     JsonObject powerlimiter = doc.createNestedObject("powerlimiter");
     powerlimiter["enabled"] = config.PowerLimiter_Enabled;
+    powerlimiter["verbose_logging"] = config.PowerLimiter_VerboseLogging;
     powerlimiter["solar_passtrough_enabled"] = config.PowerLimiter_SolarPassThroughEnabled;
     powerlimiter["solar_passtrough_losses"] = config.PowerLimiter_SolarPassThroughLosses;
     powerlimiter["battery_drain_strategy"] = config.PowerLimiter_BatteryDrainStategy;
@@ -259,6 +263,7 @@ bool ConfigurationClass::read()
 
     JsonObject mqtt = doc["mqtt"];
     config.Mqtt_Enabled = mqtt["enabled"] | MQTT_ENABLED;
+    config.Mqtt_VerboseLogging = mqtt["verbose_logging"] | VERBOSE_LOGGING;
     strlcpy(config.Mqtt_Hostname, mqtt["hostname"] | MQTT_HOST, sizeof(config.Mqtt_Hostname));
     config.Mqtt_Port = mqtt["port"] | MQTT_PORT;
     strlcpy(config.Mqtt_Username, mqtt["username"] | MQTT_USER, sizeof(config.Mqtt_Username));
@@ -289,6 +294,7 @@ bool ConfigurationClass::read()
     JsonObject dtu = doc["dtu"];
     config.Dtu_Serial = dtu["serial"] | DTU_SERIAL;
     config.Dtu_PollInterval = dtu["poll_interval"] | DTU_POLL_INTERVAL;
+    config.Dtu_VerboseLogging = dtu["verbose_logging"] | VERBOSE_LOGGING;
     config.Dtu_NrfPaLevel = dtu["nrf_pa_level"] | DTU_NRF_PA_LEVEL;
     config.Dtu_CmtPaLevel = dtu["cmt_pa_level"] | DTU_CMT_PA_LEVEL;
     config.Dtu_CmtFrequency = dtu["cmt_frequency"] | DTU_CMT_FREQUENCY;
@@ -333,6 +339,7 @@ bool ConfigurationClass::read()
 
     JsonObject powermeter = doc["powermeter"];
     config.PowerMeter_Enabled = powermeter["enabled"] | POWERMETER_ENABLED;
+    config.PowerMeter_VerboseLogging = powermeter["verbose_logging"] | VERBOSE_LOGGING;
     config.PowerMeter_Interval =  powermeter["interval"] | POWERMETER_INTERVAL;
     config.PowerMeter_Source =  powermeter["source"] | POWERMETER_SOURCE;
     strlcpy(config.PowerMeter_MqttTopicPowerMeter1, powermeter["mqtt_topic_powermeter_1"] | "", sizeof(config.PowerMeter_MqttTopicPowerMeter1));
@@ -359,6 +366,7 @@ bool ConfigurationClass::read()
 
     JsonObject powerlimiter = doc["powerlimiter"];
     config.PowerLimiter_Enabled = powerlimiter["enabled"] | POWERLIMITER_ENABLED;
+    config.PowerLimiter_VerboseLogging = powerlimiter["verbose_logging"] | VERBOSE_LOGGING;
     config.PowerLimiter_SolarPassThroughEnabled = powerlimiter["solar_passtrough_enabled"] | POWERLIMITER_SOLAR_PASSTHROUGH_ENABLED;
     config.PowerLimiter_SolarPassThroughLosses = powerlimiter["solar_passthrough_losses"] | POWERLIMITER_SOLAR_PASSTHROUGH_LOSSES;
     config.PowerLimiter_BatteryDrainStategy = powerlimiter["battery_drain_strategy"] | POWERLIMITER_BATTERY_DRAIN_STRATEGY;

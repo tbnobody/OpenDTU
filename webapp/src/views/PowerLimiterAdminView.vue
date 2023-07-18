@@ -9,7 +9,12 @@
                 <InputElement :label="$t('powerlimiteradmin.Enable')"
                                 v-model="powerLimiterConfigList.enabled"
                                 type="checkbox" wide/>
-                
+
+                <InputElement v-show="powerLimiterConfigList.enabled"
+                                :label="$t('powerlimiteradmin.VerboseLogging')"
+                                v-model="powerLimiterConfigList.verbose_logging"
+                                type="checkbox" wide/>
+
                 <InputElement v-show="powerLimiterConfigList.enabled"
                                 :label="$t('powerlimiteradmin.EnableSolarPassthrough')"
                                 v-model="powerLimiterConfigList.solar_passthrough_enabled"

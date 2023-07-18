@@ -16,6 +16,12 @@
                         </div>
                     </div>
                 </div>
+
+                <InputElement v-show="powerMeterConfigList.enabled"
+                              :label="$t('powermeteradmin.VerboseLogging')"
+                              v-model="powerMeterConfigList.verbose_logging"
+                              type="checkbox"/>
+
                 <div class="row mb-3" v-show="powerMeterConfigList.enabled">
                     <label for="inputTimezone" class="col-sm-2 col-form-label">{{ $t('powermeteradmin.PowerMeterSource') }}</label>
                     <div class="col-sm-10">

@@ -60,6 +60,9 @@ void InverterSettingsClass::init()
         MessageOutput.println("  Setting poll interval... ");
         Hoymiles.setPollInterval(config.Dtu_PollInterval);
 
+        MessageOutput.println("  Setting verbosity... ");
+        Hoymiles.setVerboseLogging(config.Dtu_VerboseLogging);
+
         for (uint8_t i = 0; i < INV_MAX_COUNT; i++) {
             if (config.Inverter[i].Serial > 0) {
                 MessageOutput.print("  Adding inverter: ");

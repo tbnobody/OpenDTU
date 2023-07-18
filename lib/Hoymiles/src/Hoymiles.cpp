@@ -221,6 +221,11 @@ void HoymilesClass::setPollInterval(uint32_t interval)
     _pollInterval = interval;
 }
 
+void HoymilesClass::setVerboseLogging(bool verboseLogging)
+{
+    _verboseLogging = verboseLogging;
+}
+
 void HoymilesClass::setMessageOutput(Print* output)
 {
     _messageOutput = output;
@@ -229,4 +234,19 @@ void HoymilesClass::setMessageOutput(Print* output)
 Print* HoymilesClass::getMessageOutput()
 {
     return _messageOutput;
+}
+
+class Silent : public Print {
+    public:
+        size_t write(uint8_t c) final { return 0; }
+};
+
+Silent Dummy;
+
+Print* HoymilesClass::getVerboseMessageOutput()
+{
+    if (_verboseLogging) {
+        return _messageOutput;
+    }
+    return &Dummy;
 }

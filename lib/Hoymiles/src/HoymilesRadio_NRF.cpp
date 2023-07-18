@@ -48,7 +48,7 @@ void HoymilesRadio_NRF::loop()
     }
 
     if (_packetReceived) {
-        Hoymiles.getMessageOutput()->println("Interrupt received");
+        Hoymiles.getVerboseMessageOutput()->println("Interrupt received");
         while (_radio->available()) {
             if (!(_rxBuffer.size() > FRAGMENT_BUFFER_SIZE)) {
                 fragment_t f;
@@ -76,9 +76,9 @@ void HoymilesRadio_NRF::loop()
 
                 if (nullptr != inv) {
                     // Save packet in inverter rx buffer
-                    Hoymiles.getMessageOutput()->printf("RX Channel: %d --> ", f.channel);
+                    Hoymiles.getVerboseMessageOutput()->printf("RX Channel: %d --> ", f.channel);
                     dumpBuf(f.fragment, f.len, false);
-                    Hoymiles.getMessageOutput()->printf("| %d dBm\r\n", f.rssi);
+                    Hoymiles.getVerboseMessageOutput()->printf("| %d dBm\r\n", f.rssi);
 
                     inv->addRxFragment(f.fragment, f.len);
                 } else {
@@ -185,9 +185,9 @@ void HoymilesRadio_NRF::sendEsbPacket(CommandAbstract* cmd)
     openWritingPipe(s);
     _radio->setRetries(3, 15);
 
-    Hoymiles.getMessageOutput()->printf("TX %s Channel: %d --> ",
+    Hoymiles.getVerboseMessageOutput()->printf("TX %s Channel: %d --> ",
         cmd->getCommandName().c_str(), _radio->getChannel());
-    cmd->dumpDataPayload(Hoymiles.getMessageOutput());
+    cmd->dumpDataPayload(Hoymiles.getVerboseMessageOutput());
     _radio->write(cmd->getDataPayload(), cmd->getDataSize());
 
     _radio->setRetries(0, 0);

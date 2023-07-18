@@ -41,6 +41,7 @@ void WebApiMqttClass::onMqttStatus(AsyncWebServerRequest* request)
     const CONFIG_T& config = Configuration.get();
 
     root["mqtt_enabled"] = config.Mqtt_Enabled;
+    root["mqtt_verbose_logging"] = config.Mqtt_VerboseLogging;
     root["mqtt_hostname"] = config.Mqtt_Hostname;
     root["mqtt_port"] = config.Mqtt_Port;
     root["mqtt_username"] = config.Mqtt_Username;
@@ -74,6 +75,7 @@ void WebApiMqttClass::onMqttAdminGet(AsyncWebServerRequest* request)
     const CONFIG_T& config = Configuration.get();
 
     root["mqtt_enabled"] = config.Mqtt_Enabled;
+    root["mqtt_verbose_logging"] = config.Mqtt_VerboseLogging;
     root["mqtt_hostname"] = config.Mqtt_Hostname;
     root["mqtt_port"] = config.Mqtt_Port;
     root["mqtt_username"] = config.Mqtt_Username;
@@ -139,6 +141,7 @@ void WebApiMqttClass::onMqttAdminPost(AsyncWebServerRequest* request)
     }
 
     if (!(root.containsKey("mqtt_enabled")
+            && root.containsKey("mqtt_verbose_logging")
             && root.containsKey("mqtt_hostname")
             && root.containsKey("mqtt_port")
             && root.containsKey("mqtt_username")
@@ -302,6 +305,7 @@ void WebApiMqttClass::onMqttAdminPost(AsyncWebServerRequest* request)
 
     CONFIG_T& config = Configuration.get();
     config.Mqtt_Enabled = root["mqtt_enabled"].as<bool>();
+    config.Mqtt_VerboseLogging = root["verbose_logging"].as<bool>();
     config.Mqtt_Retain = root["mqtt_retain"].as<bool>();
     config.Mqtt_Tls = root["mqtt_tls"].as<bool>();
     strlcpy(config.Mqtt_RootCaCert, root["mqtt_root_ca_cert"].as<String>().c_str(), sizeof(config.Mqtt_RootCaCert));

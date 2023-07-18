@@ -13,6 +13,7 @@ export interface PowerMeterHttpPhaseConfig {
 
 export interface PowerMeterConfig {
     enabled: boolean;
+    verbose_logging: boolean;
     source: number;
     interval: number;
     mqtt_topic_powermeter_1: string;

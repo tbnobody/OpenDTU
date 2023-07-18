@@ -39,6 +39,7 @@ void WebApiPowerMeterClass::onStatus(AsyncWebServerRequest* request)
     const CONFIG_T& config = Configuration.get();
 
     root[F("enabled")] = config.PowerMeter_Enabled;
+    root[F("verbose_logging")] = config.PowerMeter_VerboseLogging;
     root[F("source")] = config.PowerMeter_Source;
     root[F("interval")] = config.PowerMeter_Interval;
     root[F("mqtt_topic_powermeter_1")] = config.PowerMeter_MqttTopicPowerMeter1;
@@ -169,6 +170,7 @@ void WebApiPowerMeterClass::onAdminPost(AsyncWebServerRequest* request)
 
     CONFIG_T& config = Configuration.get();
     config.PowerMeter_Enabled = root[F("enabled")].as<bool>();
+    config.PowerMeter_VerboseLogging = root[F("verbose_logging")].as<bool>();
     config.PowerMeter_Source = root[F("source")].as<uint8_t>();
     config.PowerMeter_Interval = root[F("interval")].as<uint32_t>();
     strlcpy(config.PowerMeter_MqttTopicPowerMeter1, root[F("mqtt_topic_powermeter_1")].as<String>().c_str(), sizeof(config.PowerMeter_MqttTopicPowerMeter1));
