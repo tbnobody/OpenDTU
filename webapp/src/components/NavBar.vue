@@ -11,9 +11,9 @@
                 <span v-else class="text-warning">
                     <BIconSun width="30" height="30" class="d-inline-block align-text-top" />
                 </span>
-                 OpenDTU
-                 <span class="text-info">
-                    <BIconBatteryCharging width="20" height="20" class="d-inline-block align-text-top" />
+                OpenDTU-onBattery
+                <span class="text-info">
+                    <BIconBatteryCharging width="20" height="20" class="d-inline-block align-text-center" />
                 </span>
             </router-link>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup"
