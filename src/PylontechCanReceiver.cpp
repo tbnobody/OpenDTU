@@ -118,6 +118,7 @@ void PylontechCanReceiverClass::mqtt()
     MqttSettings.publish(topic + "/settings/dischargeCurrentLimitation", String(Battery.dischargeCurrentLimitation));
     MqttSettings.publish(topic + "/stateOfCharge", String(Battery.stateOfCharge));
     MqttSettings.publish(topic + "/stateOfHealth", String(Battery.stateOfHealth));
+    MqttSettings.publish(topic + "/dataAge", String((millis() - Battery.lastUpdate) / 1000));
     MqttSettings.publish(topic + "/voltage", String(Battery.voltage));
     MqttSettings.publish(topic + "/current", String(Battery.current));
     MqttSettings.publish(topic + "/temperature", String(Battery.temperature));

@@ -156,31 +156,32 @@ Topics for 3 phases of a power meter is configurable. Given is an example for th
 
 | Topic                                   | R / W | Description                                          | Value / Unit               |
 | --------------------------------------- | ----- | ---------------------------------------------------- | -------------------------- |
-| battery/settings/chargeVoltage         | R     | Voltage                                              | Volt (V)                   |
-| battery/settings/chargeCurrentLimitation | R     |                                               |                    |
-| battery/settings/dischargeCurrentLimitation | R     |                                               |                |
-| battery/stateOfCharge         | R     |                                               |                   |
-| battery/stateOfHealth        | R     |                                               |                   |
-| battery/voltage         | R     |                                               |                   |
-| battery/current         | R     |                                               |                   |
-| battery/temperature"         | R     |                                               |                   |
-| battery/alarm/overCurrentDischarge        | R     |                                               |                   |
-| battery/alarm/underTemperature        | R     |                                               |                    |
-| battery/alarm/overTemperature         | R     |                                               |                  |
-| battery/alarm/underVoltage         | R     |                                               |                   |
-| battery/alarm/overVoltage         | R     |                                               |                  |
-| battery/alarm/bmsInternal         | R     |                                               |                   |
-| battery/alarm/overCurrentCharge        | R     |                                               |                   |
-| battery/warning/highCurrentDischarge     | R     |                                               |                   |
-| battery/warning/lowTemperature        | R     |                                               |                    |
-| battery/warning/highTemperature        | R     |                                               |                    |
-| battery/warning/lowVoltage         | R     |                                               |                  |
-| battery/warning/highVoltage         | R     |                                               |                    |
-| battery/warning/bmsInternal        | R     |                                               |                   |
-| battery/manufacturer   | R     |                                               |                    |
-| battery/charging/chargeEnabled        | R     |                                               |                    |
-| battery/charging/dischargeEnabled        | R     |                                               |                    |
-| battery/charging/chargeImmediately       | R     |                                               |                    |
+| battery/settings/chargeVoltage          | R     | Voltage                                              | Volt (V)                   |
+| battery/settings/chargeCurrentLimitation | R    | BMS requested max. charge current                    | Ampere (A)                 |
+| battery/settings/dischargeCurrentLimitation | R | BMS requested max. discharge current                 | Ampere (A)                 |
+| battery/stateOfCharge                   | R     | State of Health                                      | %                          |
+| battery/stateOfHealth                   | R     | State of Charge                                      | %                          |
+| battery/dataAge                         | R     | How old the data is                                  | Seconds                    |
+| battery/voltage                         | R     | Actual voltage                                       | Volt (V)                   |
+| battery/current                         | R     | Actual current                                       | Ampere (A)                 |
+| battery/temperature"                    | R     | Actual temperature                                   | °C                         |
+| battery/alarm/overCurrentDischarge      | R     | Alarm: High discharge current                        | 0 / 1                      |
+| battery/alarm/underTemperature          | R     | Alarm: Low temperature                               | 0 / 1                      |
+| battery/alarm/overTemperature           | R     | Alarm: High temperature                              | 0 / 1                      |
+| battery/alarm/underVoltage              | R     | Alarm: Low voltage                                   | 0 / 1                      |
+| battery/alarm/overVoltage               | R     | Alarm: High voltage                                  | 0 / 1                      |
+| battery/alarm/bmsInternal               | R     | Alarm: BMS internal                                  | 0 / 1                      |
+| battery/alarm/overCurrentCharge         | R     |                                                      |                            |
+| battery/warning/highCurrentDischarge    | R     | Warning: High discharge current                      | 0 / 1                      |
+| battery/warning/lowTemperature          | R     | Warning: Low temperature                             | 0 / 1                      |
+| battery/warning/highTemperature         | R     | Warning: High temperature                            | 0 / 1                      |
+| battery/warning/lowVoltage              | R     | Warning: Low voltage                                 | 0 / 1                      |
+| battery/warning/highVoltage             | R     | Warning: High voltage                                | 0 / 1                      |
+| battery/warning/bmsInternal             | R     | Warning: BMS internal                                | 0 / 1                      |
+| battery/manufacturer                    | R     | Manufacturer                                         | String                     |
+| battery/charging/chargeEnabled          | R     | Charge enabled flag                                  | 0 / 1                      |
+| battery/charging/dischargeEnabled       | R     | Discharge enabled flag                               | 0 / 1                      |
+| battery/charging/chargeImmediately      | R     | Charge immediately flag                              | 0 / 1                      |
 
 ## Huawei AC charger topics
 | Topic                                   | R / W | Description                                          | Value / Unit               |
