@@ -9,6 +9,7 @@
 #include "Utils.h"
 #include "defaults.h"
 #include <ESPmDNS.h>
+#include "ETHSPI.h"
 #include <ETH.h>
 
 NetworkSettingsClass::NetworkSettingsClass()
@@ -165,7 +166,14 @@ void NetworkSettingsClass::setupMode()
         }
     }
 
-    if (PinMapping.isValidEthConfig()) {
+    if (PinMapping.isValidW5500Config()) {
+        if (!_spiEth) {
+            _spiEth = true;
+
+            PinMapping_t& pin = PinMapping.get();
+            ETHSPI.begin(pin.w5500_sclk, pin.w5500_mosi, pin.w5500_miso, pin.w5500_cs, pin.w5500_int, pin.w5500_rst);
+        }
+    } else if (PinMapping.isValidEthConfig()) {
         PinMapping_t& pin = PinMapping.get();
         ETH.begin(pin.eth_phy_addr, pin.eth_power, pin.eth_mdc, pin.eth_mdio, pin.eth_type, pin.eth_clk_mode);
     }
@@ -395,6 +403,8 @@ String NetworkSettingsClass::macAddress() const
 {
     switch (_networkMode) {
     case network_mode::Ethernet:
+        if (_spiEth)
+            return ETHSPI.macAddress();
         return ETH.macAddress();
         break;
     case network_mode::WiFi:

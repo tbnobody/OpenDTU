@@ -25,6 +25,8 @@
 #include <LittleFS.h>
 #include <TaskScheduler.h>
 
+#include <driver/uart.h>
+
 void setup()
 {
     // Initialize serial output
