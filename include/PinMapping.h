@@ -26,6 +26,13 @@ struct PinMapping_t {
     int8_t cmt_gpio3;
     int8_t cmt_sdio;
 
+    int8_t w5500_mosi;
+    int8_t w5500_miso;
+    int8_t w5500_sclk;
+    int8_t w5500_cs;
+    int8_t w5500_int;
+    int8_t w5500_rst;
+
     int8_t eth_phy_addr;
     bool eth_enabled;
     int eth_power;
@@ -49,6 +56,7 @@ public:
 
     bool isValidNrf24Config() const;
     bool isValidCmt2300Config() const;
+    bool isValidW5500Config() const;
     bool isValidEthConfig() const;
 
 private:
