@@ -390,8 +390,9 @@
         "DefaultGateway": "Default Gateway:",
         "Dns": "DNS Server {num}:",
         "AdminAp": "WiFi Configuration (Admin AccessPoint)",
-        "ApTimeout": "AccessPoint Timeout (minutes)",
-        "ApTimeoutHint": "How many minutes the AccessPoint is kept open. A value of 0 means infinite.",
+        "ApTimeout": "AccessPoint Timeout:",
+        "ApTimeoutHint": "Time which the AccessPoint is kept open. A value of 0 means infinite.",
+        "Minutes": "minutes",
         "Save": "@:dtuadmin.Save"
     },
     "mqttadmin": {

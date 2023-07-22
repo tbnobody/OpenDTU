@@ -390,8 +390,9 @@
         "DefaultGateway": "Passerelle par défaut",
         "Dns": "Serveur DNS {num}",
         "AdminAp": "Configuration du réseau WiFi (Point d'accès)",
-        "ApTimeout": "Délai d'attente du point d'accès (minutes)",
-        "ApTimeoutHint": "Nombre de minutes pendant lesquelles le point d'accès reste ouvert. Une valeur de 0 signifie infini.",
+        "ApTimeout": "Délai d'attente du point d'accès",
+        "ApTimeoutHint": "Durée pendant laquelle le point d'accès reste ouvert. Une valeur de 0 signifie infini.",
+        "Minutes": "minutes",
         "Save": "@:dtuadmin.Save"
     },
     "mqttadmin": {
