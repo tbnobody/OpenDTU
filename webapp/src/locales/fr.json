@@ -527,6 +527,7 @@
     },
     "deviceadmin": {
         "DeviceManager": "Gestionnaire de périphériques",
+        "ParseError": "Erreur d'analyse dans 'pin_mapping.json': {error}",
         "PinAssignment": "Paramètres de connexion",
         "SelectedProfile": "Profil sélectionné",
         "DefaultProfile": "(Réglages par défaut)",

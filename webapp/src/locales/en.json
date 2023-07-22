@@ -527,6 +527,7 @@
     },
     "deviceadmin": {
         "DeviceManager": "Device-Manager",
+        "ParseError": "Parse error in 'pin_mapping.json': {error}",
         "PinAssignment": "Connection settings",
         "SelectedProfile": "Selected profile:",
         "DefaultProfile": "(Default settings)",

@@ -527,6 +527,7 @@
     },
     "deviceadmin": {
         "DeviceManager": "Hardware-Einstellungen",
+        "ParseError": "Syntaxfehler in 'pin_mapping.json': {error}",
         "PinAssignment": "Anschlusseinstellungen",
         "SelectedProfile": "Ausgewähltes Profil:",
         "DefaultProfile": "(Standardeinstellungen)",
