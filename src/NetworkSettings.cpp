@@ -159,8 +159,7 @@ void NetworkSettingsClass::loop()
             setStaticIp();
             setHostname();
         }
-    } else
-        if (_networkMode != network_mode::WiFi) {
+    } else if (_networkMode != network_mode::WiFi) {
         // Do stuff when switching to Ethernet mode
         MessageOutput.println("Switch to WiFi mode");
         _networkMode = network_mode::WiFi;
@@ -249,8 +248,7 @@ void NetworkSettingsClass::setHostname()
         WiFi.mode(WIFI_MODE_APSTA);
         WiFi.mode(WIFI_MODE_STA);
         setupMode();
-    }
-    else if (_networkMode == network_mode::Ethernet) {
+    } else if (_networkMode == network_mode::Ethernet) {
         if (ETH.setHostname(getHostname().c_str())) {
             MessageOutput.println("done");
         } else {
@@ -276,8 +274,7 @@ void NetworkSettingsClass::setStaticIp()
                 IPAddress(Configuration.get().WiFi_Dns2));
             MessageOutput.println("done");
         }
-    }
-    else if (_networkMode == network_mode::Ethernet) {
+    } else if (_networkMode == network_mode::Ethernet) {
         if (Configuration.get().WiFi_Dhcp) {
             MessageOutput.print("Configuring Ethernet DHCP IP... ");
             ETH.config(INADDR_NONE, INADDR_NONE, INADDR_NONE, INADDR_NONE);

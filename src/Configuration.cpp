@@ -300,7 +300,7 @@ void ConfigurationClass::migrate()
         config.Mqtt_PublishInterval = mqtt["publish_invterval"];
     }
 
-    if  (config.Cfg_Version < 0x00011900) {
+    if (config.Cfg_Version < 0x00011900) {
         JsonObject dtu = doc["dtu"];
         config.Dtu_NrfPaLevel = dtu["pa_level"];
     }
