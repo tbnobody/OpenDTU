@@ -119,7 +119,15 @@ void WebApiNetworkClass::onNetworkAdminPost(AsyncWebServerRequest* request)
         return;
     }
 
-    if (!(root.containsKey("ssid") && root.containsKey("password") && root.containsKey("hostname") && root.containsKey("dhcp") && root.containsKey("ipaddress") && root.containsKey("netmask") && root.containsKey("gateway") && root.containsKey("dns1") && root.containsKey("dns2"))) {
+    if (!(root.containsKey("ssid")
+            && root.containsKey("password")
+            && root.containsKey("hostname")
+            && root.containsKey("dhcp")
+            && root.containsKey("ipaddress")
+            && root.containsKey("netmask")
+            && root.containsKey("gateway")
+            && root.containsKey("dns1")
+            && root.containsKey("dns2"))) {
         retMsg["message"] = "Values are missing!";
         retMsg["code"] = WebApiError::GenericValueMissing;
         response->setLength();

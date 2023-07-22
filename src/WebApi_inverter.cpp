@@ -121,7 +121,8 @@ void WebApiInverterClass::onInverterAdd(AsyncWebServerRequest* request)
         return;
     }
 
-    if (!(root.containsKey("serial") && root.containsKey("name"))) {
+    if (!(root.containsKey("serial")
+            && root.containsKey("name"))) {
         retMsg["message"] = "Values are missing!";
         retMsg["code"] = WebApiError::GenericValueMissing;
         response->setLength();
