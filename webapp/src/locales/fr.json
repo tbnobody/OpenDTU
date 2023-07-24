@@ -78,6 +78,7 @@
         "8003": "La passerelle n'est pas valide !",
         "8004": "L'adresse IP du serveur DNS primaire n'est pas valide !",
         "8005": "L'adresse IP du serveur DNS secondaire n'est pas valide !",
+        "8006": "La valeur du délai d'attente du point d'accès administratif n'est pas valide !",
         "9001": "Le serveur NTP doit avoir une longueur comprise entre 1 et {max} caractères !",
         "9002": "Le fuseau horaire doit comporter entre 1 et {max} caractères !",
         "9003": "La description du fuseau horaire doit comporter entre 1 et {max} caractères !",
@@ -388,6 +389,10 @@
         "Netmask": "Masque de réseau",
         "DefaultGateway": "Passerelle par défaut",
         "Dns": "Serveur DNS {num}",
+        "AdminAp": "Configuration du réseau WiFi (Point d'accès)",
+        "ApTimeout": "Délai d'attente du point d'accès",
+        "ApTimeoutHint": "Durée pendant laquelle le point d'accès reste ouvert. Une valeur de 0 signifie infini.",
+        "Minutes": "minutes",
         "Save": "@:dtuadmin.Save"
     },
     "mqttadmin": {
@@ -527,6 +532,7 @@
     },
     "deviceadmin": {
         "DeviceManager": "Gestionnaire de périphériques",
+        "ParseError": "Erreur d'analyse dans 'pin_mapping.json': {error}",
         "PinAssignment": "Paramètres de connexion",
         "SelectedProfile": "Profil sélectionné",
         "DefaultProfile": "(Réglages par défaut)",

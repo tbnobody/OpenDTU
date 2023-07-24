@@ -6,7 +6,7 @@
 #include "../Hoymiles.h"
 #include <cstring>
 
-const std::array<const AlarmMessage_t, ALARM_MSG_COUNT> AlarmLogParser::_alarmMessages = {{
+const std::array<const AlarmMessage_t, ALARM_MSG_COUNT> AlarmLogParser::_alarmMessages = { {
     { AlarmMessageType_t::ALL, 1, "Inverter start" },
     { AlarmMessageType_t::ALL, 2, "DTU command failed" },
     { AlarmMessageType_t::ALL, 73, "Temperature >80°C" }, // https://github.com/tbnobody/OpenDTU/discussions/590#discussioncomment-6049750
@@ -84,7 +84,7 @@ const std::array<const AlarmMessage_t, ALARM_MSG_COUNT> AlarmLogParser::_alarmMe
     { AlarmMessageType_t::ALL, 5200, "Firmware error" },
     { AlarmMessageType_t::ALL, 8310, "Shut down" },
     { AlarmMessageType_t::ALL, 9000, "Microinverter is suspected of being stolen" },
-}};
+} };
 
 void AlarmLogParser::clearBuffer()
 {

@@ -133,7 +133,11 @@ void WebApiNtpClass::onNtpAdminPost(AsyncWebServerRequest* request)
         return;
     }
 
-    if (!(root.containsKey("ntp_server") && root.containsKey("ntp_timezone") && root.containsKey("longitude") && root.containsKey("latitude") && root.containsKey("sunsettype"))) {
+    if (!(root.containsKey("ntp_server")
+            && root.containsKey("ntp_timezone")
+            && root.containsKey("longitude")
+            && root.containsKey("latitude")
+            && root.containsKey("sunsettype"))) {
         retMsg["message"] = "Values are missing!";
         retMsg["code"] = WebApiError::GenericValueMissing;
         response->setLength();

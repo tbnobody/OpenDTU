@@ -35,11 +35,11 @@ void ActivePowerControlCommand::setActivePowerLimit(float limit, PowerLimitContr
 
     // limit
     _payload[12] = (l >> 8) & 0xff;
-    _payload[13] = (l) & 0xff;
+    _payload[13] = (l)&0xff;
 
     // type
     _payload[14] = (type >> 8) & 0xff;
-    _payload[15] = (type) & 0xff;
+    _payload[15] = (type)&0xff;
 
     udpateCRC(CRC_SIZE);
 }

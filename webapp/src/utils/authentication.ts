@@ -73,10 +73,10 @@ export function handleResponse(response: Response, emitter: Emitter<Record<Event
                 // auto logout if 401 response returned from api
                 logout();
                 emitter.emit("logged-out");
-                router.push({path: "/login", query: { returnUrl: router.currentRoute.value.fullPath }});
+                router.push({ path: "/login", query: { returnUrl: router.currentRoute.value.fullPath } });
             }
 
-            const error = (data && data.message) || response.statusText;
+            const error = { message: (data && data.message) || response.statusText, status: response.status || 0 };
             return Promise.reject(error);
         }
 

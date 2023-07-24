@@ -89,7 +89,11 @@ void WebApiDtuClass::onDtuAdminPost(AsyncWebServerRequest* request)
         return;
     }
 
-    if (!(root.containsKey("serial") && root.containsKey("pollinterval") && root.containsKey("nrf_palevel") && root.containsKey("cmt_palevel") && root.containsKey("cmt_frequency"))) {
+    if (!(root.containsKey("serial")
+            && root.containsKey("pollinterval")
+            && root.containsKey("nrf_palevel")
+            && root.containsKey("cmt_palevel")
+            && root.containsKey("cmt_frequency"))) {
         retMsg["message"] = "Values are missing!";
         retMsg["code"] = WebApiError::GenericValueMissing;
         response->setLength();
