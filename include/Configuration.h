@@ -129,14 +129,6 @@ struct CONFIG_T {
     bool Vedirect_Enabled;
     bool Vedirect_UpdatesOnly;
 
-    INVERTER_CONFIG_T Inverter[INV_MAX_COUNT];
-
-    uint64_t Dtu_Serial;
-    uint32_t Dtu_PollInterval;
-    uint8_t Dtu_NrfPaLevel;
-    int8_t Dtu_CmtPaLevel;
-    uint32_t Dtu_CmtFrequency;
-
     bool PowerMeter_Enabled;
     bool PowerMeter_VerboseLogging;
     uint32_t PowerMeter_Interval;
