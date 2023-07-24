@@ -39,6 +39,7 @@ bool ConfigurationClass::write()
     wifi["dns2"] = IPAddress(config.WiFi_Dns2).toString();
     wifi["dhcp"] = config.WiFi_Dhcp;
     wifi["hostname"] = config.WiFi_Hostname;
+    wifi["aptimeout"] = config.WiFi_ApTimeout;
 
     JsonObject ntp = doc.createNestedObject("ntp");
     ntp["server"] = config.Ntp_Server;
@@ -184,6 +185,7 @@ bool ConfigurationClass::read()
     config.WiFi_Dns2[3] = wifi_dns2[3];
 
     config.WiFi_Dhcp = wifi["dhcp"] | WIFI_DHCP;
+    config.WiFi_ApTimeout = wifi["aptimeout"] | ACCESS_POINT_TIMEOUT;
 
     JsonObject ntp = doc["ntp"];
     strlcpy(config.Ntp_Server, ntp["server"] | NTP_SERVER, sizeof(config.Ntp_Server));
@@ -300,7 +302,7 @@ void ConfigurationClass::migrate()
         config.Mqtt_PublishInterval = mqtt["publish_invterval"];
     }
 
-    if  (config.Cfg_Version < 0x00011900) {
+    if (config.Cfg_Version < 0x00011900) {
         JsonObject dtu = doc["dtu"];
         config.Dtu_NrfPaLevel = dtu["pa_level"];
     }

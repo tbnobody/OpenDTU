@@ -121,7 +121,8 @@ void WebApiInverterClass::onInverterAdd(AsyncWebServerRequest* request)
         return;
     }
 
-    if (!(root.containsKey("serial") && root.containsKey("name"))) {
+    if (!(root.containsKey("serial")
+            && root.containsKey("name"))) {
         retMsg["message"] = "Values are missing!";
         retMsg["code"] = WebApiError::GenericValueMissing;
         response->setLength();
@@ -443,7 +444,7 @@ void WebApiInverterClass::onInverterOrder(AsyncWebServerRequest* request)
     // The order array contains list or id in the right order
     JsonArray orderArray = root["order"].as<JsonArray>();
     uint8_t order = 0;
-    for(JsonVariant id : orderArray) {
+    for (JsonVariant id : orderArray) {
         uint8_t inverter_id = id.as<uint8_t>();
         if (inverter_id < INV_MAX_COUNT) {
             INVERTER_CONFIG_T& inverter = Configuration.get().Inverter[inverter_id];

@@ -64,6 +64,7 @@ private:
     bool adminEnabled = true;
     bool forceDisconnection = false;
     int adminTimeoutCounter = 0;
+    int adminTimeoutCounterMax = 0;
     int connectTimeoutTimer = 0;
     int connectRedoTimer = 0;
     uint32_t lastTimerCall = 0;

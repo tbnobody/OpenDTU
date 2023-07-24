@@ -11,23 +11,23 @@
 #define JSON_BUFFER_SIZE 6144
 
 #ifndef DISPLAY_TYPE
-#define DISPLAY_TYPE 0
+#define DISPLAY_TYPE 0U
 #endif
 
 #ifndef DISPLAY_DATA
-#define DISPLAY_DATA 255
+#define DISPLAY_DATA 255U
 #endif
 
 #ifndef DISPLAY_CLK
-#define DISPLAY_CLK 255
+#define DISPLAY_CLK 255U
 #endif
 
 #ifndef DISPLAY_CS
-#define DISPLAY_CS 255
+#define DISPLAY_CS 255U
 #endif
 
 #ifndef DISPLAY_RESET
-#define DISPLAY_RESET 255
+#define DISPLAY_RESET 255U
 #endif
 
 #ifndef LED0

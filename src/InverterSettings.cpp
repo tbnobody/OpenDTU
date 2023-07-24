@@ -15,7 +15,7 @@
 // for all generations, this is equivalent to SPI3_HOST in the lower level driver
 // For ESP32-C2, the only externally usable HW SPI controller is SPI2, its signal names
 // being prefixed with FSPI.
-#if  CONFIG_IDF_TARGET_ESP32S2 || CONFIG_IDF_TARGET_ESP32S3
+#if CONFIG_IDF_TARGET_ESP32S2 || CONFIG_IDF_TARGET_ESP32S3
 #define SPI_NRF HSPI
 #elif CONFIG_IDF_TARGET_ESP32C3
 #define SPI_NRF FSPI

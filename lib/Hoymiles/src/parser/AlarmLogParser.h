@@ -2,8 +2,8 @@
 #pragma once
 #include "Parser.h"
 #include <Arduino.h>
-#include <cstdint>
 #include <array>
+#include <cstdint>
 
 #define ALARM_LOG_ENTRY_COUNT 15
 #define ALARM_LOG_ENTRY_SIZE 12
