@@ -3,8 +3,8 @@
  * Copyright (C) 2022 Thomas Basler and others
  */
 #include "MqttSettings.h"
-#include "MessageOutput.h"
 #include "Configuration.h"
+#include "MessageOutput.h"
 
 MqttSettingsClass::MqttSettingsClass()
 {

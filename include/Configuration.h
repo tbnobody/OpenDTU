@@ -83,6 +83,7 @@ struct CONFIG_T {
     byte WiFi_Dns2[4];
     bool WiFi_Dhcp;
     char WiFi_Hostname[WIFI_MAX_HOSTNAME_STRLEN + 1];
+    uint WiFi_ApTimeout;
 
     char Ntp_Server[NTP_MAX_SERVER_STRLEN + 1];
     char Ntp_Timezone[NTP_MAX_TIMEZONE_STRLEN + 1];
@@ -92,6 +93,7 @@ struct CONFIG_T {
     uint8_t Ntp_SunsetType;
 
     bool Mqtt_Enabled;
+    char Mqtt_Hostname[MQTT_MAX_HOSTNAME_STRLEN + 1];
     bool Mqtt_VerboseLogging;
     uint Mqtt_Port;
     char Mqtt_Username[MQTT_MAX_USERNAME_STRLEN + 1];
@@ -116,6 +118,8 @@ struct CONFIG_T {
     bool Mqtt_Hass_Retain;
     char Mqtt_Hass_Topic[MQTT_MAX_TOPIC_STRLEN + 1];
     bool Mqtt_Hass_IndividualPanels;
+    bool Mqtt_Hass_Expire;
+
     bool Mqtt_Tls;
     char Mqtt_RootCaCert[MQTT_MAX_CERT_STRLEN + 1];
     bool Mqtt_TlsCertLogin;
@@ -125,9 +129,13 @@ struct CONFIG_T {
     bool Vedirect_Enabled;
     bool Vedirect_UpdatesOnly;
 
-    char Mqtt_Hostname[MQTT_MAX_HOSTNAME_STRLEN + 1];
+    INVERTER_CONFIG_T Inverter[INV_MAX_COUNT];
 
-    bool Mqtt_Hass_Expire;
+    uint64_t Dtu_Serial;
+    uint32_t Dtu_PollInterval;
+    uint8_t Dtu_NrfPaLevel;
+    int8_t Dtu_CmtPaLevel;
+    uint32_t Dtu_CmtFrequency;
 
     bool PowerMeter_Enabled;
     bool PowerMeter_VerboseLogging;

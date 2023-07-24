@@ -90,7 +90,8 @@ void WebApiPowerClass::onPowerPost(AsyncWebServerRequest* request)
     }
 
     if (!(root.containsKey("serial")
-            && (root.containsKey("power") || root.containsKey("restart")))) {
+            && (root.containsKey("power")
+                || root.containsKey("restart")))) {
         retMsg["message"] = "Values are missing!";
         retMsg["code"] = WebApiError::GenericValueMissing;
         response->setLength();

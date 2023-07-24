@@ -144,8 +144,7 @@ void WebApiPrometheusClass::addPanelInfo(AsyncResponseStream* stream, String& se
         idx,
         inv->name(),
         channel,
-        config.Inverter[idx].channel[channel].Name
-    );
+        config.Inverter[idx].channel[channel].Name);
 
     if (printHelp) {
         stream->print("# HELP opendtu_MaxPower panel maximum output power\n");
@@ -156,8 +155,7 @@ void WebApiPrometheusClass::addPanelInfo(AsyncResponseStream* stream, String& se
         idx,
         inv->name(),
         channel,
-        config.Inverter[idx].channel[channel].MaxChannelPower
-    );
+        config.Inverter[idx].channel[channel].MaxChannelPower);
 
     if (printHelp) {
         stream->print("# HELP opendtu_YieldTotalOffset panel yield offset (for used inverters)\n");
@@ -168,6 +166,5 @@ void WebApiPrometheusClass::addPanelInfo(AsyncResponseStream* stream, String& se
         idx,
         inv->name(),
         channel,
-        config.Inverter[idx].channel[channel].YieldTotalOffset
-    );
+        config.Inverter[idx].channel[channel].YieldTotalOffset);
 }

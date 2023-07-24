@@ -3,11 +3,11 @@
 
 #include "WebApi_battery.h"
 #include "WebApi_config.h"
+#include "WebApi_device.h"
 #include "WebApi_devinfo.h"
 #include "WebApi_dtu.h"
 #include "WebApi_eventlog.h"
 #include "WebApi_firmware.h"
-#include "WebApi_device.h"
 #include "WebApi_inverter.h"
 #include "WebApi_limit.h"
 #include "WebApi_maintenance.h"
