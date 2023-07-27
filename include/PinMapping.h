@@ -39,6 +39,7 @@ struct PinMapping_t {
     uint8_t display_cs;
     uint8_t display_reset;
     int8_t led[PINMAPPING_LED_COUNT];
+    int8_t led_rgb;
 };
 
 class PinMappingClass {
