@@ -46,6 +46,18 @@ const devInfo_t devInfo[] = {
     { { 0x10, 0x33, 0x31, ALL }, 2250, "HMT-2250" } // 01
 };
 
+#define HOY_SEMAPHORE_TAKE() \
+    do {                     \
+    } while (xSemaphoreTake(_xSemaphore, portMAX_DELAY) != pdPASS)
+#define HOY_SEMAPHORE_GIVE() xSemaphoreGive(_xSemaphore)
+
+DevInfoParser::DevInfoParser()
+    : Parser()
+{
+    _xSemaphore = xSemaphoreCreateMutex();
+    HOY_SEMAPHORE_GIVE(); // release before first use
+}
+
 void DevInfoParser::clearBufferAll()
 {
     memset(_payloadDevInfoAll, 0, DEV_INFO_SIZE);
@@ -78,6 +90,16 @@ void DevInfoParser::appendFragmentSimple(uint8_t offset, uint8_t* payload, uint8
     _devInfoSimpleLength += len;
 }
 
+void DevInfoParser::beginAppendFragment()
+{
+    HOY_SEMAPHORE_TAKE();
+}
+
+void DevInfoParser::endAppendFragment()
+{
+    HOY_SEMAPHORE_GIVE();
+}
+
 uint32_t DevInfoParser::getLastUpdateAll()
 {
     return _lastUpdateAll;
@@ -102,12 +124,16 @@ void DevInfoParser::setLastUpdateSimple(uint32_t lastUpdate)
 
 uint16_t DevInfoParser::getFwBuildVersion()
 {
-    return (((uint16_t)_payloadDevInfoAll[0]) << 8) | _payloadDevInfoAll[1];
+    HOY_SEMAPHORE_TAKE();
+    uint16_t ret = (((uint16_t)_payloadDevInfoAll[0]) << 8) | _payloadDevInfoAll[1];
+    HOY_SEMAPHORE_GIVE();
+    return ret;
 }
 
 time_t DevInfoParser::getFwBuildDateTime()
 {
     struct tm timeinfo = {};
+    HOY_SEMAPHORE_TAKE();
     timeinfo.tm_year = ((((uint16_t)_payloadDevInfoAll[2]) << 8) | _payloadDevInfoAll[3]) - 1900;
 
     timeinfo.tm_mon = ((((uint16_t)_payloadDevInfoAll[4]) << 8) | _payloadDevInfoAll[5]) / 100 - 1;
@@ -115,13 +141,17 @@ time_t DevInfoParser::getFwBuildDateTime()
 
     timeinfo.tm_hour = ((((uint16_t)_payloadDevInfoAll[6]) << 8) | _payloadDevInfoAll[7]) / 100;
     timeinfo.tm_min = ((((uint16_t)_payloadDevInfoAll[6]) << 8) | _payloadDevInfoAll[7]) % 100;
+    HOY_SEMAPHORE_GIVE();
 
     return timegm(&timeinfo);
 }
 
 uint16_t DevInfoParser::getFwBootloaderVersion()
 {
-    return (((uint16_t)_payloadDevInfoAll[8]) << 8) | _payloadDevInfoAll[9];
+    HOY_SEMAPHORE_TAKE();
+    uint16_t ret = (((uint16_t)_payloadDevInfoAll[8]) << 8) | _payloadDevInfoAll[9];
+    HOY_SEMAPHORE_GIVE();
+    return ret;
 }
 
 uint32_t DevInfoParser::getHwPartNumber()
@@ -129,8 +159,10 @@ uint32_t DevInfoParser::getHwPartNumber()
     uint16_t hwpn_h;
     uint16_t hwpn_l;
 
+    HOY_SEMAPHORE_TAKE();
     hwpn_h = (((uint16_t)_payloadDevInfoSimple[2]) << 8) | _payloadDevInfoSimple[3];
     hwpn_l = (((uint16_t)_payloadDevInfoSimple[4]) << 8) | _payloadDevInfoSimple[5];
+    HOY_SEMAPHORE_GIVE();
 
     return ((uint32_t)hwpn_h << 16) | ((uint32_t)hwpn_l);
 }
@@ -138,7 +170,9 @@ uint32_t DevInfoParser::getHwPartNumber()
 String DevInfoParser::getHwVersion()
 {
     char buf[8];
+    HOY_SEMAPHORE_TAKE();
     snprintf(buf, sizeof(buf), "%02d.%02d", _payloadDevInfoSimple[6], _payloadDevInfoSimple[7]);
+    HOY_SEMAPHORE_GIVE();
     return buf;
 }
 
@@ -162,14 +196,18 @@ String DevInfoParser::getHwModelName()
 
 uint8_t DevInfoParser::getDevIdx()
 {
+    uint8_t ret = 0xff;
     uint8_t pos;
+
+    HOY_SEMAPHORE_TAKE();
+
     // Check for all 4 bytes first
     for (pos = 0; pos < sizeof(devInfo) / sizeof(devInfo_t); pos++) {
         if (devInfo[pos].hwPart[0] == _payloadDevInfoSimple[2]
             && devInfo[pos].hwPart[1] == _payloadDevInfoSimple[3]
             && devInfo[pos].hwPart[2] == _payloadDevInfoSimple[4]
             && devInfo[pos].hwPart[3] == _payloadDevInfoSimple[5]) {
-            return pos;
+            ret = pos;
         }
     }
 
@@ -178,10 +216,13 @@ uint8_t DevInfoParser::getDevIdx()
         if (devInfo[pos].hwPart[0] == _payloadDevInfoSimple[2]
             && devInfo[pos].hwPart[1] == _payloadDevInfoSimple[3]
             && devInfo[pos].hwPart[2] == _payloadDevInfoSimple[4]) {
-            return pos;
+            ret = pos;
         }
     }
-    return 0xff;
+
+    HOY_SEMAPHORE_GIVE();
+
+    return ret;
 }
 
 /* struct tm to seconds since Unix epoch */
