@@ -179,15 +179,21 @@ void MqttSettingsClass::init()
     createMqttClientObject();
 }
 
+void MqttSettingsClass::loop()
+{
+    if (nullptr == mqttClient) { return; }
+    mqttClient->loop();
+}
+
 void MqttSettingsClass::createMqttClientObject()
 {
     if (mqttClient != nullptr)
         delete mqttClient;
     const CONFIG_T& config = Configuration.get();
     if (config.Mqtt_Tls) {
-        mqttClient = static_cast<MqttClient*>(new espMqttClientSecure);
+        mqttClient = new espMqttClientSecure(espMqttClientTypes::UseInternalTask::NO);
     } else {
-        mqttClient = static_cast<MqttClient*>(new espMqttClient);
+        mqttClient = new espMqttClient(espMqttClientTypes::UseInternalTask::NO);
     }
 }
 

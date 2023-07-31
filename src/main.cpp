@@ -155,6 +155,8 @@ void loop()
     yield();
     Datastore.loop();
     yield();
+    MqttSettings.loop();
+    yield();
     MqttHandleDtu.loop();
     yield();
     MqttHandleInverter.loop();
