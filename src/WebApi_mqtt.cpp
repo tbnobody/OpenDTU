@@ -305,7 +305,7 @@ void WebApiMqttClass::onMqttAdminPost(AsyncWebServerRequest* request)
 
     CONFIG_T& config = Configuration.get();
     config.Mqtt_Enabled = root["mqtt_enabled"].as<bool>();
-    config.Mqtt_VerboseLogging = root["verbose_logging"].as<bool>();
+    config.Mqtt_VerboseLogging = root["mqtt_verbose_logging"].as<bool>();
     config.Mqtt_Retain = root["mqtt_retain"].as<bool>();
     config.Mqtt_Tls = root["mqtt_tls"].as<bool>();
     strlcpy(config.Mqtt_RootCaCert, root["mqtt_root_ca_cert"].as<String>().c_str(), sizeof(config.Mqtt_RootCaCert));

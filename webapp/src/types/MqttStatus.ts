@@ -1,5 +1,6 @@
 export interface MqttStatus {
     mqtt_enabled: boolean;
+    mqtt_verbose_logging: boolean;
     mqtt_hostname: string;
     mqtt_port: number;
     mqtt_username: string;

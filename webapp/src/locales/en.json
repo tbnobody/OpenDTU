@@ -298,6 +298,7 @@
         "MqttInformation": "MQTT Information",
         "ConfigurationSummary": "@:ntpinfo.ConfigurationSummary",
         "Status": "@:ntpinfo.Status",
+        "VerboseLogging": "@:base.VerboseLogging",
         "Enabled": "Enabled",
         "Disabled": "Disabled",
         "Server": "@:ntpinfo.Server",
