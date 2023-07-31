@@ -31,8 +31,11 @@ typedef struct {
 
 class AlarmLogParser : public Parser {
 public:
+    AlarmLogParser();
     void clearBuffer();
     void appendFragment(uint8_t offset, uint8_t* payload, uint8_t len);
+    void beginAppendFragment();
+    void endAppendFragment();
 
     uint8_t getEntryCount();
     void getLogEntry(uint8_t entryId, AlarmLogEntry_t* entry);
@@ -46,11 +49,13 @@ private:
     static int getTimezoneOffset();
 
     uint8_t _payloadAlarmLog[ALARM_LOG_PAYLOAD_SIZE];
-    uint8_t _alarmLogLength;
+    uint8_t _alarmLogLength = 0;
 
     LastCommandSuccess _lastAlarmRequestSuccess = CMD_NOK; // Set to NOK to fetch at startup
 
     AlarmMessageType_t _messageType = AlarmMessageType_t::ALL;
 
     static const std::array<const AlarmMessage_t, ALARM_MSG_COUNT> _alarmMessages;
+
+    SemaphoreHandle_t _xSemaphore;
 };
