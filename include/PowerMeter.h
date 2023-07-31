@@ -4,8 +4,8 @@
 #include "Configuration.h"
 #include <espMqttClient.h>
 #include <Arduino.h>
-#include <Hoymiles.h>
-#include <memory>
+#include <map>
+#include <list>
 #include "SDM.h"
 #include "sml.h"
 
@@ -37,15 +37,17 @@ public:
         SOURCE_SML = 4
     };
     void init();
-    void mqtt();
     void loop();
-    void onMqttMessage(const espMqttClientTypes::MessageProperties& properties, const char* topic, const uint8_t* payload, size_t len, size_t index, size_t total);
     float getPowerTotal(bool forceUpdate = true);
     uint32_t getLastPowerMeterUpdate();
 
 private:
+    void mqtt();
+
+    void onMqttMessage(const espMqttClientTypes::MessageProperties& properties,
+        const char* topic, const uint8_t* payload, size_t len, size_t index, size_t total);
+
     bool _verboseLogging = true;
-    uint32_t _interval;
     uint32_t _lastPowerMeterCheck;
     // Used in Power limiter for safety check
     uint32_t _lastPowerMeterUpdate;
@@ -59,7 +61,7 @@ private:
     float _powerMeterImport = 0.0;
     float _powerMeterExport = 0.0;
 
-    bool mqttInitDone = false;
+    std::map<String, float*> _mqttSubscriptions;
 
     void readPowerMeter();
 

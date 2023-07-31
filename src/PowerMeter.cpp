@@ -20,80 +20,78 @@ SoftwareSerial inputSerial;
 
 void PowerMeterClass::init()
 {
-    using std::placeholders::_1;
-    using std::placeholders::_2;
-    using std::placeholders::_3;
-    using std::placeholders::_4;
-    using std::placeholders::_5;
-    using std::placeholders::_6;
-
     _lastPowerMeterCheck = 0;
     _lastPowerMeterUpdate = 0;
 
+    for (auto const& s: _mqttSubscriptions) { MqttSettings.unsubscribe(s.first); }
+    _mqttSubscriptions.clear();
+
     CONFIG_T& config = Configuration.get();
-    
+
     if (!config.PowerMeter_Enabled) {
         return;
     }
 
-    if (config.PowerMeter_Source == SOURCE_MQTT) {
-        if (strlen(config.PowerMeter_MqttTopicPowerMeter1) > 0) {
-            MqttSettings.subscribe(config.PowerMeter_MqttTopicPowerMeter1, 0, std::bind(&PowerMeterClass::onMqttMessage, this, _1, _2, _3, _4, _5, _6));
-        }
+    switch(config.PowerMeter_Source) {
+    case SOURCE_MQTT: {
+        auto subscribe = [this](char const* topic, float* target) {
+            if (strlen(topic) == 0) { return; }
+            MqttSettings.subscribe(topic, 0,
+                    std::bind(&PowerMeterClass::onMqttMessage,
+                        this, std::placeholders::_1, std::placeholders::_2,
+                        std::placeholders::_3, std::placeholders::_4,
+                        std::placeholders::_5, std::placeholders::_6)
+                    );
+            _mqttSubscriptions.try_emplace(topic, target);
+        };
 
-        if (strlen(config.PowerMeter_MqttTopicPowerMeter2) > 0) {
-            MqttSettings.subscribe(config.PowerMeter_MqttTopicPowerMeter2, 0, std::bind(&PowerMeterClass::onMqttMessage, this, _1, _2, _3, _4, _5, _6));
-        }
-
-        if (strlen(config.PowerMeter_MqttTopicPowerMeter3) > 0) {
-            MqttSettings.subscribe(config.PowerMeter_MqttTopicPowerMeter3, 0, std::bind(&PowerMeterClass::onMqttMessage, this, _1, _2, _3, _4, _5, _6));
-        }
+        subscribe(config.PowerMeter_MqttTopicPowerMeter1, &_powerMeter1Power);
+        subscribe(config.PowerMeter_MqttTopicPowerMeter2, &_powerMeter2Power);
+        subscribe(config.PowerMeter_MqttTopicPowerMeter3, &_powerMeter3Power);
+        break;
     }
 
-    if(config.PowerMeter_Source == SOURCE_SDM1PH || config.PowerMeter_Source == SOURCE_SDM3PH) {
+    case SOURCE_SDM1PH:
+    case SOURCE_SDM3PH:
         sdm.begin();
-    }
+        break;
 
-    if (config.PowerMeter_Source == SOURCE_HTTP) {
+    case SOURCE_HTTP:
         HttpPowerMeter.init();
-    }
+        break;
 
-    if (config.PowerMeter_Source == SOURCE_SML) {
+    case SOURCE_SML:
         pinMode(SML_RX_PIN, INPUT);
         inputSerial.begin(9600, SWSERIAL_8N1, SML_RX_PIN, -1, false, 128, 95);
         inputSerial.enableRx(true);
         inputSerial.enableTx(false);
         inputSerial.flush();
+        break;
     }
-
-    mqttInitDone = true;
 }
 
 void PowerMeterClass::onMqttMessage(const espMqttClientTypes::MessageProperties& properties, const char* topic, const uint8_t* payload, size_t len, size_t index, size_t total)
 {
-    CONFIG_T& config = Configuration.get();
+    for (auto const& subscription: _mqttSubscriptions) {
+        if (subscription.first != topic) { continue; }
 
-    if (!config.PowerMeter_Enabled || config.PowerMeter_Source != SOURCE_MQTT) {
-        return;
+        std::string value(reinterpret_cast<const char*>(payload), len);
+        try {
+            *subscription.second = std::stof(value);
+        }
+        catch(std::invalid_argument const& e) {
+            MessageOutput.printf("PowerMeterClass: cannot parse payload of topic '%s' as float: %s\r\n",
+                    topic, value.c_str());
+            return;
+        }
+
+        if (_verboseLogging) {
+            MessageOutput.printf("PowerMeterClass: Updated from '%s', TotalPower: %5.2f\r\n",
+                    topic, getPowerTotal());
+        }
+
+        _lastPowerMeterUpdate = millis();
     }
-
-    if (strcmp(topic, config.PowerMeter_MqttTopicPowerMeter1) == 0) {
-        _powerMeter1Power = std::stof(std::string(reinterpret_cast<const char*>(payload), (unsigned int)len));
-    }
-
-    if (strcmp(topic, config.PowerMeter_MqttTopicPowerMeter2) == 0) {
-        _powerMeter2Power = std::stof(std::string(reinterpret_cast<const char*>(payload), (unsigned int)len));
-    }
-
-    if (strcmp(topic, config.PowerMeter_MqttTopicPowerMeter3) == 0) {
-        _powerMeter3Power = std::stof(std::string(reinterpret_cast<const char*>(payload), (unsigned int)len));
-    }
-
-    if (_verboseLogging) {
-        MessageOutput.printf("PowerMeterClass: TotalPower: %5.2f\r\n", getPowerTotal());
-    }
-
-    _lastPowerMeterUpdate = millis();
 }
 
 float PowerMeterClass::getPowerTotal(bool forceUpdate)
