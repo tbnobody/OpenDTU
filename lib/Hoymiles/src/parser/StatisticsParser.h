@@ -142,7 +142,7 @@ private:
 
     const byteAssign_t* _byteAssignment;
     uint8_t _byteAssignmentSize;
-    uint8_t _expectedByteCount;
+    uint8_t _expectedByteCount = 0;
     std::list<fieldSettings_t> _fieldSettings;
 
     uint32_t _rxFailureCount = 0;
