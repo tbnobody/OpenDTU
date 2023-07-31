@@ -96,6 +96,7 @@ AlarmLogParser::AlarmLogParser()
 {
     _xSemaphore = xSemaphoreCreateMutex();
     HOY_SEMAPHORE_GIVE(); // release before first use
+    clearBuffer();
 }
 
 void AlarmLogParser::clearBuffer()

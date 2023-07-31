@@ -56,6 +56,8 @@ DevInfoParser::DevInfoParser()
 {
     _xSemaphore = xSemaphoreCreateMutex();
     HOY_SEMAPHORE_GIVE(); // release before first use
+    clearBufferSimple();
+    clearBufferAll();
 }
 
 void DevInfoParser::clearBufferAll()

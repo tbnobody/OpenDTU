@@ -38,6 +38,7 @@ StatisticsParser::StatisticsParser()
 {
     _xSemaphore = xSemaphoreCreateMutex();
     HOY_SEMAPHORE_GIVE(); // release before first use
+    clearBuffer();
 }
 
 void StatisticsParser::setByteAssignment(const byteAssign_t* byteAssignment, uint8_t size)
