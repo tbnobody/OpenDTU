@@ -571,6 +571,10 @@
         "fr": "Französisch",
         "rot180": "180 Grad Drehung",
         "rot270": "270 Grad Drehung",
+        "Leds": "LEDs",
+        "EqualBrightness": "Gleiche Helligkeit",
+        "LED0brightness": "LED0 Helligkeit ({led0bri}):",
+        "LED1brightness": "LED1 Helligkeit ({led1bri}):",
         "Save": "@:dtuadmin.Save"
     },
     "pininfo": {

@@ -13,6 +13,8 @@
                         }}</button>
                     <button class="nav-link" id="nav-display-tab" data-bs-toggle="tab" data-bs-target="#nav-display"
                         type="button" role="tab" aria-controls="nav-display">{{ $t('deviceadmin.Display') }}</button>
+                    <button class="nav-link" id="nav-leds-tab" data-bs-toggle="tab" data-bs-target="#nav-leds" type="button"
+                        role="tab" aria-controls="nav-leds">{{ $t('deviceadmin.Leds') }}</button>
                 </div>
             </nav>
             <div class="tab-content" id="nav-tabContent">
@@ -25,8 +27,7 @@
                                     $t('deviceadmin.SelectedProfile')
                                 }}</label>
                                 <div class="col-sm-10">
-                                    <select class="form-select" id="inputPinProfile"
-                                        v-model="deviceConfigList.curPin.name">
+                                    <select class="form-select" id="inputPinProfile" v-model="deviceConfigList.curPin.name">
                                         <option v-for="device in pinMappingList" :value="device.name" :key="device.name">
                                             {{ device.name === "Default" ? $t('deviceadmin.DefaultProfile') : device.name }}
                                         </option>
@@ -48,9 +49,8 @@
                     tabindex="0">
                     <div class="card">
                         <div class="card-body">
-                            <InputElement :label="$t('deviceadmin.PowerSafe')"
-                                v-model="deviceConfigList.display.power_safe" type="checkbox"
-                                :tooltip="$t('deviceadmin.PowerSafeHint')" />
+                            <InputElement :label="$t('deviceadmin.PowerSafe')" v-model="deviceConfigList.display.power_safe"
+                                type="checkbox" :tooltip="$t('deviceadmin.PowerSafeHint')" />
 
                             <InputElement :label="$t('deviceadmin.Screensaver')"
                                 v-model="deviceConfigList.display.screensaver" type="checkbox"
@@ -62,7 +62,8 @@
                                 </label>
                                 <div class="col-sm-10">
                                     <select class="form-select" v-model="deviceConfigList.display.language">
-                                        <option v-for="language in displayLanguageList" :key="language.key" :value="language.key">
+                                        <option v-for="language in displayLanguageList" :key="language.key"
+                                            :value="language.key">
                                             {{ $t(`deviceadmin.` + language.value) }}
                                         </option>
                                     </select>
@@ -75,7 +76,8 @@
                                 </label>
                                 <div class="col-sm-10">
                                     <select class="form-select" v-model="deviceConfigList.display.rotation">
-                                        <option v-for="rotation in displayRotationList" :key="rotation.key" :value="rotation.key">
+                                        <option v-for="rotation in displayRotationList" :key="rotation.key"
+                                            :value="rotation.key">
                                             {{ $t(`deviceadmin.` + rotation.value) }}
                                         </option>
                                     </select>
@@ -84,7 +86,8 @@
 
                             <div class="row mb-3">
                                 <label for="inputDisplayContrast" class="col-sm-2 col-form-label">{{
-                                    $t('deviceadmin.Contrast', { contrast: $n(deviceConfigList.display.contrast / 100,
+                                    $t('deviceadmin.Contrast', {
+                                        contrast: $n(deviceConfigList.display.contrast / 100,
                                             'percent')
                                     }) }}</label>
                                 <div class="col-sm-10">
@@ -93,6 +96,45 @@
                                 </div>
                             </div>
 
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tab-pane fade show" id="nav-leds" role="tabpanel" aria-labelledby="nav-leds-tab" tabindex="0">
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="form-check mb-3">
+                                <input class="form-check-input" type="checkbox" id="inputEqualBrightness"
+                                    v-model="equalBrightnessCheckVal" @change="setEqualBrightness()">
+                                <label class="form-check-label" for="inputEqualBrightness">
+                                    {{ $t('deviceadmin.EqualBrightness') }}</label>
+                            </div>
+
+                            <div class="row mb-3">
+                                <label for="inputLED0Brightness" class="col-sm-2 col-form-label">{{
+                                    $t('deviceadmin.LED0brightness', {
+                                        led0bri: $n(deviceConfigList.leds.led0bri / 100,
+                                            'percent')
+                                    })
+                                }}</label>
+                                <div class="col-sm-10">
+                                    <input type="range" class="form-range" min="0" max="100" id="inputLED0Brightness"
+                                        v-model="deviceConfigList.leds.led0bri" @input="syncSliders('led0bri')" />
+                                </div>
+                            </div>
+
+                            <div class="row mb-3">
+                                <label for="inputLED1Brightness" class="col-sm-2 col-form-label">{{
+                                    $t('deviceadmin.LED1brightness', {
+                                        led1bri: $n(deviceConfigList.leds.led1bri / 100,
+                                            'percent')
+                                    })
+                                }}</label>
+                                <div class="col-sm-10">
+                                    <input type="range" class="form-range" min="0" max="100" id="inputLED1Brightness"
+                                        v-model="deviceConfigList.leds.led1bri" @input="syncSliders('led1bri')" />
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -141,6 +183,7 @@ export default defineComponent({
                 { key: 1, value: "de" },
                 { key: 2, value: "fr" },
             ],
+            equalBrightnessCheckVal: false,
         }
     },
     created() {
@@ -180,7 +223,10 @@ export default defineComponent({
                         this.deviceConfigList = data;
                         this.dataLoading = false;
                     }
-                );
+                )
+                .then(() => {
+                    this.equalBrightnessCheckVal = this.isEqualBrightness();
+                });
         },
         savePinConfig(e: Event) {
             e.preventDefault();
@@ -202,6 +248,26 @@ export default defineComponent({
                     }
                 );
         },
+        isEqualBrightness(): boolean {
+            return (this.deviceConfigList.leds.led0bri === this.deviceConfigList.leds.led1bri);
+        },
+        syncSliders(updatedSlider: 'led0bri' | 'led1bri') {
+            const led0Value = this.deviceConfigList.leds.led0bri;
+            const led1Value = this.deviceConfigList.leds.led1bri;
+
+            if (this.equalBrightnessCheckVal) {
+                if (updatedSlider === 'led0bri') {
+                    this.deviceConfigList.leds.led1bri = led0Value;
+                } else if (updatedSlider === 'led1bri') {
+                    this.deviceConfigList.leds.led0bri = led1Value;
+                }
+            }
+        },
+        setEqualBrightness() {
+            if (this.equalBrightnessCheckVal) {
+                this.deviceConfigList.leds.led1bri = this.deviceConfigList.leds.led0bri;
+            }
+        }
     },
 });
 </script>

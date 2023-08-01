@@ -571,6 +571,10 @@
         "en": "Anglais",
         "de": "Allemand",
         "fr": "Français",
+        "Leds": "LEDs",
+        "EqualBrightness": "Même luminosité",
+        "LED0brightness": "LED0 luminosité ({led0bri}):",
+        "LED1brightness": "LED1 luminosité ({led1bri}):",
         "Save": "@:dtuadmin.Save"
     },
     "pininfo": {

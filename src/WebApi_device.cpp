@@ -5,6 +5,7 @@
 #include "WebApi_device.h"
 #include "Configuration.h"
 #include "Display_Graphic.h"
+#include "Led_Single.h"
 #include "PinMapping.h"
 #include "Utils.h"
 #include "WebApi.h"
@@ -83,6 +84,10 @@ void WebApiDeviceClass::onDeviceAdminGet(AsyncWebServerRequest* request)
     display["contrast"] = config.Display_Contrast;
     display["language"] = config.Display_Language;
 
+    JsonObject leds = root.createNestedObject("leds");
+    leds["led0bri"] = config.Led0_Brightness;
+    leds["led1bri"] = config.Led1_Brightness;
+
     response->setLength();
     request->send(response);
 }
@@ -153,12 +158,17 @@ void WebApiDeviceClass::onDeviceAdminPost(AsyncWebServerRequest* request)
     config.Display_ScreenSaver = root["display"]["screensaver"].as<bool>();
     config.Display_Contrast = root["display"]["contrast"].as<uint8_t>();
     config.Display_Language = root["display"]["language"].as<uint8_t>();
+    config.Led0_Brightness = root["leds"]["led0bri"].as<uint8_t>();
+    config.Led1_Brightness = root["leds"]["led1bri"].as<uint8_t>();
 
     Display.setOrientation(config.Display_Rotation);
     Display.enablePowerSafe = config.Display_PowerSafe;
     Display.enableScreensaver = config.Display_ScreenSaver;
     Display.setContrast(config.Display_Contrast);
     Display.setLanguage(config.Display_Language);
+
+    LedSingle.setBrightness(0, config.Led0_Brightness);
+    LedSingle.setBrightness(1, config.Led1_Brightness);
 
     Configuration.write();
 
