@@ -2,6 +2,7 @@
 #pragma once
 
 #include "PinMapping.h"
+#include "defaults.h"
 #include <TimeoutHelper.h>
 
 #define LEDSINGLE_UPDATE_INTERVAL 2000
@@ -18,6 +19,8 @@ public:
     LedSingleClass();
     void init();
     void loop();
+    void setBrightness(uint8_t ledIndex, uint8_t brightness);
+    uint8_t updateLED(PinMapping_t& pin, uint8_t ledIndex, uint8_t brightness);
 
     void turnAllOff();
     void turnAllOn();
@@ -34,6 +37,8 @@ private:
     TimeoutHelper _updateTimeout;
     TimeoutHelper _blinkTimeout;
     uint8_t _ledActive = 0;
+    uint8_t _ledBrightnessSetting[PINMAPPING_LED_COUNT];
+    uint8_t _ledCurrentBrightness[PINMAPPING_LED_COUNT];
 };
 
 extern LedSingleClass LedSingle;

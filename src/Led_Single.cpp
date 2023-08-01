@@ -27,7 +27,8 @@ void LedSingleClass::init()
 
         if (pin.led[i] >= 0) {
             pinMode(pin.led[i], OUTPUT);
-            digitalWrite(pin.led[i], LOW);
+            setBrightness(i, LED_BRIGHTNESS);
+            _ledCurrentBrightness[i] = 0;
             _ledActive++;
         }
 
@@ -83,14 +84,14 @@ void LedSingleClass::loop()
 
         switch (_ledState[i]) {
         case LedState_t::Off:
-            digitalWrite(pin.led[i], LOW);
+            _ledCurrentBrightness[i] = updateLED(pin, i, 0);
             break;
         case LedState_t::On:
-            digitalWrite(pin.led[i], HIGH);
+            _ledCurrentBrightness[i] = updateLED(pin, i, _ledBrightnessSetting[i]);
             break;
         case LedState_t::Blink:
             if (_blinkTimeout.occured()) {
-                digitalWrite(pin.led[i], !digitalRead(pin.led[i]));
+                _ledCurrentBrightness[i] = updateLED(pin, i, _ledBrightnessSetting[i] - _ledCurrentBrightness[i]);
                 _blinkTimeout.reset();
             }
             break;
@@ -106,4 +107,19 @@ void LedSingleClass::turnAllOff()
 void LedSingleClass::turnAllOn()
 {
     _allState = LedState_t::On;
+}
+
+void LedSingleClass::setBrightness(uint8_t ledIndex, uint8_t brightness)
+{
+    _ledBrightnessSetting[ledIndex] = brightness * 2.55f;
+}
+
+uint8_t LedSingleClass::updateLED(PinMapping_t& pin, uint8_t ledIndex, uint8_t newBrightness)
+{
+    if (newBrightness != _ledCurrentBrightness[ledIndex]) {
+        newBrightness = (newBrightness > _ledBrightnessSetting[ledIndex]) ? _ledBrightnessSetting[ledIndex] : newBrightness; // ensure new brightness isn't over the brightness setting
+        analogWrite(pin.led[ledIndex], newBrightness);
+    }
+
+    return newBrightness;
 }

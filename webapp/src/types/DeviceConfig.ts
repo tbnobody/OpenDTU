@@ -8,7 +8,13 @@ export interface Display {
     language: number;
 }
 
+export interface Leds {
+    led0bri: number;
+    led1bri: number;
+}
+
 export interface DeviceConfig {
     curPin: Device;
     display: Display;
+    leds: Leds
 }

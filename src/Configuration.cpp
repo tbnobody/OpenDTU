@@ -100,6 +100,10 @@ bool ConfigurationClass::write()
     display["contrast"] = config.Display_Contrast;
     display["language"] = config.Display_Language;
 
+    JsonObject leds = device.createNestedObject("leds");
+    leds["led0bri"] = config.Led0_Brightness;
+    leds["led1bri"] = config.Led1_Brightness;
+
     JsonArray inverters = doc.createNestedArray("inverters");
     for (uint8_t i = 0; i < INV_MAX_COUNT; i++) {
         JsonObject inv = inverters.createNestedObject();
@@ -249,6 +253,10 @@ bool ConfigurationClass::read()
     config.Display_Rotation = display["rotation"] | DISPLAY_ROTATION;
     config.Display_Contrast = display["contrast"] | DISPLAY_CONTRAST;
     config.Display_Language = display["language"] | DISPLAY_LANGUAGE;
+
+    JsonObject leds = device["leds"];
+    config.Led0_Brightness = leds["led0bri"] | LED_BRIGHTNESS;
+    config.Led1_Brightness = leds["led1bri"] | LED_BRIGHTNESS;
 
     JsonArray inverters = doc["inverters"];
     for (uint8_t i = 0; i < INV_MAX_COUNT; i++) {

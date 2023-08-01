@@ -127,6 +127,8 @@ void setup()
     // Initialize Single LEDs
     MessageOutput.print("Initialize LEDs... ");
     LedSingle.init();
+    LedSingle.setBrightness(0, config.Led0_Brightness);
+    LedSingle.setBrightness(1, config.Led1_Brightness);
     MessageOutput.println("done");
 
     // Check for default DTU serial

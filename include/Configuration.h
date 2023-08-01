@@ -116,6 +116,9 @@ struct CONFIG_T {
     uint8_t Display_Rotation;
     uint8_t Display_Contrast;
     uint8_t Display_Language;
+
+    uint8_t Led0_Brightness;
+    uint8_t Led1_Brightness;
 };
 
 class ConfigurationClass {
