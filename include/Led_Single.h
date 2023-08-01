@@ -18,6 +18,7 @@ public:
     LedSingleClass();
     void init();
     void loop();
+    void turnAllOff();
 
 private:
     enum class LedState_t {

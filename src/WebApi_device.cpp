@@ -5,6 +5,8 @@
 #include "WebApi_device.h"
 #include "Configuration.h"
 #include "Display_Graphic.h"
+#include "Led_Single.h"
+#include "MessageOutput.h"
 #include "PinMapping.h"
 #include "WebApi.h"
 #include "WebApi_errors.h"
@@ -143,6 +145,7 @@ void WebApiDeviceClass::onDeviceAdminPost(AsyncWebServerRequest* request)
         return;
     }
 
+    // A restart must be done if any pinout changed
     CONFIG_T& config = Configuration.get();
     bool performRestart = root["curPin"]["name"].as<String>() != config.Dev_PinMapping;
 
@@ -169,9 +172,12 @@ void WebApiDeviceClass::onDeviceAdminPost(AsyncWebServerRequest* request)
     request->send(response);
 
     if (performRestart) {
+        MessageOutput.println("Pin layout changed. Rebooting...");
         yield();
         delay(1000);
         yield();
+        Display.setPowerSave(true);
+        LedSingle.turnAllOff();
         ESP.restart();
     }
 }

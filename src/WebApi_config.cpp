@@ -4,6 +4,9 @@
  */
 #include "WebApi_config.h"
 #include "Configuration.h"
+#include "Display_Graphic.h"
+#include "Led_Single.h"
+#include "MessageOutput.h"
 #include "WebApi.h"
 #include "WebApi_errors.h"
 #include <AsyncJson.h>
@@ -114,6 +117,12 @@ void WebApiConfigClass::onConfigDelete(AsyncWebServerRequest* request)
     request->send(response);
 
     LittleFS.remove(CONFIG_FILENAME);
+
+    yield();
+    delay(1000);
+    yield();
+    Display.setPowerSave(true);
+    LedSingle.turnAllOff();
     ESP.restart();
 }
 
@@ -157,9 +166,12 @@ void WebApiConfigClass::onConfigUploadFinish(AsyncWebServerRequest* request)
     response->addHeader("Connection", "close");
     response->addHeader("Access-Control-Allow-Origin", "*");
     request->send(response);
+    MessageOutput.println("New config uploaded. Rebooting...");
     yield();
     delay(1000);
     yield();
+    Display.setPowerSave(true);
+    LedSingle.turnAllOff();
     ESP.restart();
 }
 

@@ -3,6 +3,8 @@
  * Copyright (C) 2022 Thomas Basler and others
  */
 
+#include "Display_Graphic.h"
+#include "Led_Single.h"
 #include "WebApi_maintenance.h"
 #include "WebApi.h"
 #include "WebApi_errors.h"
@@ -78,6 +80,8 @@ void WebApiMaintenanceClass::onRebootPost(AsyncWebServerRequest* request)
         yield();
         delay(1000);
         yield();
+        Display.setPowerSave(true);
+        LedSingle.turnAllOff();
         ESP.restart();
     } else {
         retMsg["message"] = "Reboot cancled!";

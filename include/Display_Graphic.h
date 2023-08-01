@@ -19,6 +19,7 @@ public:
     void init(DisplayType_t type, uint8_t data, uint8_t clk, uint8_t cs, uint8_t reset);
     void loop();
     void setContrast(uint8_t contrast);
+    void setPowerSave(uint8_t is_enable);
     void setOrientation(uint8_t rotation = DISPLAY_ROTATION);
     void setLanguage(uint8_t language);
     void setStartupDisplay();

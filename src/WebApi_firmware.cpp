@@ -4,6 +4,8 @@
  */
 #include "WebApi_firmware.h"
 #include "Configuration.h"
+#include "Display_Graphic.h"
+#include "Led_Single.h"
 #include "Update.h"
 #include "WebApi.h"
 #include "helper.h"
@@ -45,6 +47,8 @@ void WebApiFirmwareClass::onFirmwareUpdateFinish(AsyncWebServerRequest* request)
     yield();
     delay(1000);
     yield();
+    Display.setPowerSave(true);
+    LedSingle.turnAllOff();
     ESP.restart();
 }
 

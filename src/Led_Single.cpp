@@ -93,3 +93,20 @@ void LedSingleClass::loop()
         }
     }
 }
+
+void LedSingleClass::turnAllOff()
+{
+    auto& pin = PinMapping.get();
+
+    for (uint8_t i = 0; i < PINMAPPING_LED_COUNT; i++) {
+        if (pin.led[i] < 0) {
+            continue;
+        }
+        if (_ledState[i] == LedState_t::Off) {
+            continue;
+        }
+
+        _ledState[i] = LedState_t::Off;
+        digitalWrite(pin.led[i], LOW);
+    }
+}

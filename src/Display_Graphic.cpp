@@ -195,4 +195,12 @@ void DisplayGraphicClass::setContrast(uint8_t contrast)
     _display->setContrast(contrast * 2.55f);
 }
 
+void DisplayGraphicClass::setPowerSave(uint8_t is_enable)
+{
+    if (_display_type == DisplayType_t::None) {
+        return;
+    }
+    _display->setPowerSave(is_enable);
+}
+
 DisplayGraphicClass Display;
