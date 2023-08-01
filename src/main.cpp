@@ -215,6 +215,8 @@ void loop()
 		VeDirect.loop();
         yield();
 	}
+    MqttSettings.loop();
+    yield();
     MqttHandleDtu.loop();
     yield();
     MqttHandleInverter.loop();
