@@ -108,8 +108,8 @@ uint8_t nrf_hal::write(uint8_t cmd, const uint8_t* buf, uint8_t len)
         .flags = 0,
         .cmd = 0,
         .addr = 0,
-        .length = ((size_t)len + 1u) << 3,
-        .rxlength = ((size_t)len + 1u) << 3,
+        .length = (static_cast<size_t>(len) + 1u) << 3,
+        .rxlength = (static_cast<size_t>(len) + 1u) << 3,
         .user = NULL,
         .tx_buffer = data,
         .rx_buffer = data
@@ -138,8 +138,8 @@ uint8_t nrf_hal::write(uint8_t cmd, const uint8_t* buf, uint8_t data_len, uint8_
         .flags = 0,
         .cmd = 0,
         .addr = 0,
-        .length = ((size_t)data_len + blank_len + 1u) << 3,
-        .rxlength = ((size_t)data_len + blank_len + 1u) << 3,
+        .length = (static_cast<size_t>(data_len) + static_cast<size_t>(blank_len) + 1u) << 3,
+        .rxlength = (static_cast<size_t>(data_len) + static_cast<size_t>(blank_len) + 1u) << 3,
         .user = NULL,
         .tx_buffer = data,
         .rx_buffer = data
@@ -165,8 +165,8 @@ uint8_t nrf_hal::read(uint8_t cmd, uint8_t* buf, uint8_t len)
         .flags = 0,
         .cmd = 0,
         .addr = 0,
-        .length = ((size_t)len + 1u) << 3,
-        .rxlength = ((size_t)len + 1u) << 3,
+        .length = (static_cast<size_t>(len) + 1u) << 3,
+        .rxlength = (static_cast<size_t>(len) + 1u) << 3,
         .user = NULL,
         .tx_buffer = data,
         .rx_buffer = data
@@ -198,8 +198,8 @@ uint8_t nrf_hal::read(uint8_t cmd, uint8_t* buf, uint8_t data_len, uint8_t blank
         .flags = 0,
         .cmd = 0,
         .addr = 0,
-        .length = ((size_t)data_len + blank_len + 1u) << 3,
-        .rxlength = ((size_t)data_len + blank_len + 1u) << 3,
+        .length = (static_cast<size_t>(data_len) + static_cast<size_t>(blank_len) + 1u) << 3,
+        .rxlength = (static_cast<size_t>(data_len) + static_cast<size_t>(blank_len) + 1u) << 3,
         .user = NULL,
         .tx_buffer = data,
         .rx_buffer = data

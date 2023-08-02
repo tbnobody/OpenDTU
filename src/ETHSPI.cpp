@@ -62,7 +62,7 @@ void ETHSPIClass::begin(int8_t pin_sclk, int8_t pin_mosi, int8_t pin_miso, int8_
         .duty_cycle_pos = 0,
         .cs_ena_pretrans = 0, // only 0 supported
         .cs_ena_posttrans = 0, // only 0 supported
-        .clock_speed_hz = 20000000, // TODO: check stability
+        .clock_speed_hz = 20000000, // stable with on OpenDTU Fusion Shield
         .input_delay_ns = 0,
         .spics_io_num = pin_cs,
         .flags = 0,
@@ -119,8 +119,8 @@ String ETHSPIClass::macAddress()
 {
     uint8_t mac_addr[6] = {0, 0, 0, 0, 0, 0};
     esp_eth_ioctl(eth_handle, ETH_CMD_G_MAC_ADDR, mac_addr);
-    char mac_addr_str[18];
-    sprintf(mac_addr_str, "%02X:%02X:%02X:%02X:%02X:%02X", mac_addr[0], mac_addr[1], mac_addr[2], mac_addr[3], mac_addr[4], mac_addr[5]);
+    char mac_addr_str[24];
+    snprintf(mac_addr_str, sizeof(mac_addr_str), "%02X:%02X:%02X:%02X:%02X:%02X", mac_addr[0], mac_addr[1], mac_addr[2], mac_addr[3], mac_addr[4], mac_addr[5]);
     return String(mac_addr_str);
 }
 
