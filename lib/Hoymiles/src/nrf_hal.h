@@ -1,16 +1,18 @@
 #pragma once
 
-#include "spi_patcher.h"
+#include "SpiPatcher.h"
 
 #include <RF24_hal.h>
 
-class nrf_hal : public RF24_hal, public spi_patcher_handle
+class nrf_hal : public RF24_hal, public SpiPatcherHandle
 {
 public:
-    nrf_hal(gpio_num_t pin_mosi, gpio_num_t pin_miso, gpio_num_t pin_clk, gpio_num_t pin_cs, gpio_num_t pin_en);
+    nrf_hal();
 
     void patch() override;
     void unpatch() override;
+
+    void init(gpio_num_t pin_mosi, gpio_num_t pin_miso, gpio_num_t pin_clk, gpio_num_t pin_cs, gpio_num_t pin_en, int32_t spi_speed = 0);
 
     bool begin() override;
     void end() override;
@@ -24,19 +26,20 @@ public:
 private:
     inline void request_spi()
     {
-        spi_patcher_inst.request(this);
+        HoymilesSpiPatcher.request(this);
     }
 
     inline void release_spi()
     {
-        spi_patcher_inst.release();
+        HoymilesSpiPatcher.release();
     }
 
-    const gpio_num_t pin_mosi;
-    const gpio_num_t pin_miso;
-    const gpio_num_t pin_clk;
-    const gpio_num_t pin_cs;
-    const gpio_num_t pin_en;
+    gpio_num_t pin_mosi;
+    gpio_num_t pin_miso;
+    gpio_num_t pin_clk;
+    gpio_num_t pin_cs;
+    gpio_num_t pin_en;
+    int32_t spi_speed;
 
     spi_host_device_t host_device;
     spi_device_handle_t spi;

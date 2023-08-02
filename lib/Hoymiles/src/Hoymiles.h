@@ -16,7 +16,7 @@
 class HoymilesClass {
 public:
     void init();
-    void initNRF(nrf_hal* hal, uint8_t pinIRQ);
+    void initNRF(int8_t pin_mosi, int8_t pin_miso, int8_t pin_clk, int8_t pin_cs, int8_t pin_en, int8_t pin_irq);
     void initCMT(int8_t pin_sdio, int8_t pin_clk, int8_t pin_cs, int8_t pin_fcs, int8_t pin_gpio2, int8_t pin_gpio3);
     void loop();
 

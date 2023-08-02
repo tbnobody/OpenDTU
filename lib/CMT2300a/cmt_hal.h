@@ -1,10 +1,10 @@
 #pragma once
 
-#include "spi_patcher.h"
+#include "SpiPatcher.h"
 
 #include <driver/gpio.h>
 
-class cmt_hal : public spi_patcher_handle
+class cmt_hal : public SpiPatcherHandle
 {
 public:
     cmt_hal();
@@ -12,7 +12,7 @@ public:
     void patch() override;
     void unpatch() override;
 
-    void init(gpio_num_t pin_sdio, gpio_num_t pin_clk, gpio_num_t pin_cs, gpio_num_t pin_fcs, int32_t spi_speed);
+    void init(gpio_num_t pin_sdio, gpio_num_t pin_clk, gpio_num_t pin_cs, gpio_num_t pin_fcs, int32_t spi_speed = 0);
 
     uint8_t read_reg(uint8_t addr);
     void write_reg(uint8_t addr, uint8_t data);
@@ -22,12 +22,12 @@ public:
 private:
     inline void request_spi()
     {
-        spi_patcher_inst.request(this);
+        HoymilesSpiPatcher.request(this);
     }
 
     inline void release_spi()
     {
-        spi_patcher_inst.release();
+        HoymilesSpiPatcher.release();
     }
 
     gpio_num_t pin_sdio;

@@ -3,15 +3,17 @@
 #include <esp_rom_gpio.h>
 
 #define NRF_MAX_TRANSFER_SZ 64
+#define NRF_DEFAULT_SPI_SPEED 10000000 // 10 MHz
 
-nrf_hal::nrf_hal(gpio_num_t pin_mosi, gpio_num_t pin_miso, gpio_num_t pin_clk, gpio_num_t pin_cs, gpio_num_t pin_en) :
-    pin_mosi(pin_mosi),
-    pin_miso(pin_miso),
-    pin_clk(pin_clk),
-    pin_cs(pin_cs),
-    pin_en(pin_en)
+nrf_hal::nrf_hal() :
+    pin_mosi(GPIO_NUM_NC),
+    pin_miso(GPIO_NUM_NC),
+    pin_clk(GPIO_NUM_NC),
+    pin_cs(GPIO_NUM_NC),
+    pin_en(GPIO_NUM_NC),
+    spi_speed(NRF_DEFAULT_SPI_SPEED)
 {
-
+    
 }
 
 void nrf_hal::patch()
@@ -28,9 +30,19 @@ void nrf_hal::unpatch()
     esp_rom_gpio_connect_out_signal(pin_clk, SIG_GPIO_OUT_IDX, false, false);
 }
 
-bool nrf_hal::begin()
+void nrf_hal::init(gpio_num_t _pin_mosi, gpio_num_t _pin_miso, gpio_num_t _pin_clk, gpio_num_t _pin_cs, gpio_num_t _pin_en, int32_t _spi_speed)
 {
-    host_device = spi_patcher_inst.init();
+    pin_mosi = _pin_mosi;
+    pin_miso = _pin_miso;
+    pin_clk = _pin_clk;
+    pin_cs = _pin_cs;
+    pin_en = _pin_en;
+
+    if (_spi_speed > 0) {
+        spi_speed = _spi_speed;
+    }
+
+    host_device = HoymilesSpiPatcher.init();
 
     gpio_reset_pin(pin_mosi);
     gpio_set_direction(pin_mosi, GPIO_MODE_OUTPUT);
@@ -50,9 +62,9 @@ bool nrf_hal::begin()
         .dummy_bits = 0,
         .mode = 0,
         .duty_cycle_pos = 0,
-        .cs_ena_pretrans = 1,
-        .cs_ena_posttrans = 1,
-        .clock_speed_hz = 10000000,
+        .cs_ena_pretrans = 0,
+        .cs_ena_posttrans = 0,
+        .clock_speed_hz = spi_speed,
         .input_delay_ns = 0,
         .spics_io_num = pin_cs,
         .flags = 0,
@@ -65,7 +77,10 @@ bool nrf_hal::begin()
     gpio_reset_pin(pin_en);
     gpio_set_direction(pin_en, GPIO_MODE_OUTPUT);
     gpio_set_level(pin_en, 0);
+}
 
+bool nrf_hal::begin()
+{
     return true;
 }
 

@@ -27,14 +27,13 @@ static cmt_hal hal;
  * @name    CMT2300A_InitSpi
  * @desc    Initializes the CMT2300A SPI interface.
  * *********************************************************/
-void CMT2300A_InitSpi(int8_t pin_sdio, int8_t pin_clk, int8_t pin_cs, int8_t pin_fcs, uint32_t spi_speed)
+void CMT2300A_InitSpi(int8_t pin_sdio, int8_t pin_clk, int8_t pin_cs, int8_t pin_fcs)
 {
     hal.init(
         static_cast<gpio_num_t>(pin_sdio),
         static_cast<gpio_num_t>(pin_clk),
         static_cast<gpio_num_t>(pin_cs),
-        static_cast<gpio_num_t>(pin_fcs),
-        spi_speed
+        static_cast<gpio_num_t>(pin_fcs)
     );
 }
 

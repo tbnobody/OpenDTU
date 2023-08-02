@@ -3,13 +3,14 @@
 #include <esp_rom_gpio.h>
 
 #define CMT_MAX_TRANSFER_SZ 32
+#define CMT_DEFAULT_SPI_SPEED 4000000 // 4 MHz
 
 cmt_hal::cmt_hal() :
     pin_sdio(GPIO_NUM_NC),
     pin_clk(GPIO_NUM_NC),
     pin_cs(GPIO_NUM_NC),
     pin_fcs(GPIO_NUM_NC),
-    spi_speed(1000000)
+    spi_speed(CMT_DEFAULT_SPI_SPEED)
 {
 
 }
@@ -34,9 +35,12 @@ void cmt_hal::init(gpio_num_t _pin_sdio, gpio_num_t _pin_clk, gpio_num_t _pin_cs
     pin_clk = _pin_clk;
     pin_cs = _pin_cs;
     pin_fcs = _pin_fcs;
-    spi_speed = _spi_speed;
 
-    host_device = spi_patcher_inst.init();
+    if (_spi_speed > 0) {
+        spi_speed = _spi_speed;
+    }
+
+    host_device = HoymilesSpiPatcher.init();
 
     gpio_reset_pin(pin_sdio);
     gpio_set_direction(pin_sdio, GPIO_MODE_INPUT_OUTPUT);

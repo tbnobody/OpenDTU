@@ -8,12 +8,18 @@
 #include <Every.h>
 #include <FunctionalInterrupt.h>
 
-void HoymilesRadio_NRF::init(nrf_hal* hal, uint8_t pinIRQ)
+void HoymilesRadio_NRF::init(int8_t pin_mosi, int8_t pin_miso, int8_t pin_clk, int8_t pin_cs, int8_t pin_en, int8_t pin_irq)
 {
     _dtuSerial.u64 = 0;
 
-    _hal.reset(hal);
-    _radio.reset(new RF24(hal));
+    _hal.init(
+        static_cast<gpio_num_t>(pin_mosi),
+        static_cast<gpio_num_t>(pin_miso),
+        static_cast<gpio_num_t>(pin_clk),
+        static_cast<gpio_num_t>(pin_cs),
+        static_cast<gpio_num_t>(pin_en)
+    );
+    _radio.reset(new RF24(&_hal));
 
     _radio->begin();
 
@@ -29,7 +35,7 @@ void HoymilesRadio_NRF::init(nrf_hal* hal, uint8_t pinIRQ)
     }
     Hoymiles.getMessageOutput()->println("NRF: Connection successful");
 
-    attachInterrupt(digitalPinToInterrupt(pinIRQ), std::bind(&HoymilesRadio_NRF::handleIntr, this), FALLING);
+    attachInterrupt(digitalPinToInterrupt(pin_irq), std::bind(&HoymilesRadio_NRF::handleIntr, this), FALLING);
 
     openReadingPipe();
     _radio->startListening();

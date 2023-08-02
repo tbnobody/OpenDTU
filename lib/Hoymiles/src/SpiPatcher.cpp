@@ -1,10 +1,10 @@
-#include "spi_patcher.h"
+#include "SpiPatcher.h"
 
-#define HOST_DEVICE SPI2_HOST
+#define HOYMILES_HOST_DEVICE SPI2_HOST
 
-spi_patcher spi_patcher_inst(HOST_DEVICE);
+SpiPatcher HoymilesSpiPatcher(HOYMILES_HOST_DEVICE);
 
-spi_patcher::spi_patcher(spi_host_device_t host_device) :
+SpiPatcher::SpiPatcher(spi_host_device_t host_device) :
     host_device(host_device),
     initialized(false),
     cur_handle(nullptr)
@@ -14,12 +14,12 @@ spi_patcher::spi_patcher(spi_host_device_t host_device) :
     xSemaphoreGive(mutex);
 }
 
-spi_patcher::~spi_patcher()
+SpiPatcher::~SpiPatcher()
 {
     vSemaphoreDelete(mutex);
 }
 
-spi_host_device_t spi_patcher::init()
+spi_host_device_t SpiPatcher::init()
 {
     if (!initialized) {
         initialized = true;
