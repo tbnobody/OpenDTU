@@ -7,8 +7,11 @@
 
 class SystemConfigParaParser : public Parser {
 public:
+    SystemConfigParaParser();
     void clearBuffer();
     void appendFragment(uint8_t offset, uint8_t* payload, uint8_t len);
+    void beginAppendFragment();
+    void endAppendFragment();
 
     float getLimitPercent();
     void setLimitPercent(float value);
@@ -32,4 +35,6 @@ private:
 
     uint32_t _lastUpdateCommand = 0;
     uint32_t _lastUpdateRequest = 0;
+
+    SemaphoreHandle_t _xSemaphore;
 };
