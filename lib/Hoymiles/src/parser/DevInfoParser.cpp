@@ -210,15 +210,19 @@ uint8_t DevInfoParser::getDevIdx()
             && devInfo[pos].hwPart[2] == _payloadDevInfoSimple[4]
             && devInfo[pos].hwPart[3] == _payloadDevInfoSimple[5]) {
             ret = pos;
+            break;
         }
     }
 
-    // Then only for 3 bytes
-    for (pos = 0; pos < sizeof(devInfo) / sizeof(devInfo_t); pos++) {
-        if (devInfo[pos].hwPart[0] == _payloadDevInfoSimple[2]
-            && devInfo[pos].hwPart[1] == _payloadDevInfoSimple[3]
-            && devInfo[pos].hwPart[2] == _payloadDevInfoSimple[4]) {
-            ret = pos;
+    // Then only for 3 bytes but only if not already found
+    if (ret == 0xff) {
+        for (pos = 0; pos < sizeof(devInfo) / sizeof(devInfo_t); pos++) {
+            if (devInfo[pos].hwPart[0] == _payloadDevInfoSimple[2]
+                && devInfo[pos].hwPart[1] == _payloadDevInfoSimple[3]
+                && devInfo[pos].hwPart[2] == _payloadDevInfoSimple[4]) {
+                ret = pos;
+                break;
+            }
         }
     }
 
