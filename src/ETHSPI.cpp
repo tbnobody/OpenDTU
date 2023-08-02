@@ -8,8 +8,9 @@
 #include <Arduino.h>
 #include "MessageOutput.h"
 
-extern void tcpipInit();
-extern void add_esp_interface_netif(esp_interface_t interface, esp_netif_t* esp_netif); /* from WiFiGeneric */
+// Functions from WiFiGeneric
+void tcpipInit();
+void add_esp_interface_netif(esp_interface_t interface, esp_netif_t* esp_netif);
 
 ETHSPIClass::ETHSPIClass() :
     eth_handle(nullptr),
@@ -99,7 +100,7 @@ void ETHSPIClass::begin(int8_t pin_sclk, int8_t pin_mosi, int8_t pin_miso, int8_
 
     // Configure MAC address
     uint8_t mac_addr[6];
-    esp_base_mac_addr_get(mac_addr);
+    ESP_ERROR_CHECK(esp_efuse_mac_get_default(mac_addr));
     mac_addr[5] |= 0x03; // derive ethernet MAC address from base MAC address
     ESP_ERROR_CHECK(esp_eth_ioctl(eth_handle, ETH_CMD_S_MAC_ADDR, mac_addr));
 
