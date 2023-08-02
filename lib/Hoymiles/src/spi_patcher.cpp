@@ -6,6 +6,7 @@ spi_patcher spi_patcher_inst(HOST_DEVICE);
 
 spi_patcher::spi_patcher(spi_host_device_t host_device) :
     host_device(host_device),
+    initialized(false),
     cur_handle(nullptr)
 {
     // Use binary semaphore instead of mutex for performance reasons
@@ -16,4 +17,29 @@ spi_patcher::spi_patcher(spi_host_device_t host_device) :
 spi_patcher::~spi_patcher()
 {
     vSemaphoreDelete(mutex);
+}
+
+spi_host_device_t spi_patcher::init()
+{
+    if (!initialized) {
+        initialized = true;
+
+        spi_bus_config_t buscfg = {
+            .mosi_io_num = -1,
+            .miso_io_num = -1,
+            .sclk_io_num = -1,
+            .quadwp_io_num = -1,
+            .quadhd_io_num = -1,
+            .data4_io_num = -1,
+            .data5_io_num = -1,
+            .data6_io_num = -1,
+            .data7_io_num = -1,
+            .max_transfer_sz = SOC_SPI_MAXIMUM_BUFFER_SIZE,
+            .flags = 0,
+            .intr_flags = 0
+        };
+        ESP_ERROR_CHECK(spi_bus_initialize(host_device, &buscfg, SPI_DMA_DISABLED));
+    }
+
+    return host_device;
 }

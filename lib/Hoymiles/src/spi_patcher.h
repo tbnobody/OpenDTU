@@ -7,8 +7,10 @@
 class spi_patcher
 {
 public:
-    spi_patcher(spi_host_device_t host_device);
+    explicit spi_patcher(spi_host_device_t host_device);
     ~spi_patcher();
+
+    spi_host_device_t init();
 
     inline void request(spi_patcher_handle* handle)
     {
@@ -16,11 +18,11 @@ public:
 
         if (cur_handle != handle) {
             if (cur_handle) {
-                cur_handle->unpatch(host_device);
+                cur_handle->unpatch();
             }
             cur_handle = handle;
             if (cur_handle) {
-                cur_handle->patch(host_device);
+                cur_handle->patch();
             }
         }
     }
@@ -32,6 +34,8 @@ public:
 
 private:
     const spi_host_device_t host_device;
+    bool initialized;
+
     spi_patcher_handle* cur_handle;
 
     SemaphoreHandle_t mutex;

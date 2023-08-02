@@ -9,8 +9,8 @@ class cmt_hal : public spi_patcher_handle
 public:
     cmt_hal();
 
-    void patch(spi_host_device_t host_device) override;
-    void unpatch(spi_host_device_t host_device) override;
+    void patch() override;
+    void unpatch() override;
 
     void init(gpio_num_t pin_sdio, gpio_num_t pin_clk, gpio_num_t pin_cs, gpio_num_t pin_fcs, int32_t spi_speed);
 
@@ -36,6 +36,7 @@ private:
     gpio_num_t pin_fcs;
     int32_t spi_speed;
 
+    spi_host_device_t host_device;
     spi_device_handle_t spi_reg;
     spi_device_handle_t spi_fifo;
 };

@@ -1,5 +1,7 @@
 #include "cmt_hal.h"
 
+#include <esp_rom_gpio.h>
+
 #define CMT_MAX_TRANSFER_SZ 32
 
 cmt_hal::cmt_hal() :
@@ -12,89 +14,18 @@ cmt_hal::cmt_hal() :
 
 }
 
-void cmt_hal::patch(spi_host_device_t host_device)
+void cmt_hal::patch()
 {
-    gpio_hold_en(pin_cs);
-    gpio_hold_en(pin_fcs);
-
-    gpio_reset_pin(pin_cs);
-    gpio_reset_pin(pin_fcs);
-
-    spi_bus_config_t buscfg = {
-        .mosi_io_num = pin_sdio,
-        .miso_io_num = -1, // Single wire MOSI/MISO
-        .sclk_io_num = pin_clk,
-        .quadwp_io_num = -1,
-        .quadhd_io_num = -1,
-        .data4_io_num = -1,
-        .data5_io_num = -1,
-        .data6_io_num = -1,
-        .data7_io_num = -1,
-        .max_transfer_sz = CMT_MAX_TRANSFER_SZ,
-        .flags = 0,
-        .intr_flags = 0
-    };
-    ESP_ERROR_CHECK(spi_bus_initialize(host_device, &buscfg, SPI_DMA_DISABLED));
-
-    spi_device_interface_config_t devcfg_reg = {
-        .command_bits = 1,
-        .address_bits = 7,
-        .dummy_bits = 0,
-        .mode = 0, // SPI mode 0
-        .duty_cycle_pos = 0,
-        .cs_ena_pretrans = 1,
-        .cs_ena_posttrans = 1,
-        .clock_speed_hz = spi_speed,
-        .input_delay_ns = 0,
-        .spics_io_num = pin_cs,
-        .flags = SPI_DEVICE_HALFDUPLEX | SPI_DEVICE_3WIRE,
-        .queue_size = 1,
-        .pre_cb = NULL,
-        .post_cb = NULL
-    };
-    ESP_ERROR_CHECK(spi_bus_add_device(host_device, &devcfg_reg, &spi_reg));
-
-    spi_device_interface_config_t devcfg_fifo = {
-        .command_bits = 0,
-        .address_bits = 0,
-        .dummy_bits = 0,
-        .mode = 0, // SPI mode 0
-        .duty_cycle_pos = 0,
-        .cs_ena_pretrans = 2,
-        .cs_ena_posttrans = static_cast<uint8_t>(2 * spi_speed / 1000000), // >2 us
-        .clock_speed_hz = spi_speed,
-        .input_delay_ns = 0,
-        .spics_io_num = pin_fcs,
-        .flags = SPI_DEVICE_HALFDUPLEX | SPI_DEVICE_3WIRE,
-        .queue_size = 1,
-        .pre_cb = NULL,
-        .post_cb = NULL
-    };
-    ESP_ERROR_CHECK(spi_bus_add_device(host_device, &devcfg_fifo, &spi_fifo));
-
-    gpio_hold_dis(pin_cs);
-    gpio_hold_dis(pin_fcs);
+    esp_rom_gpio_connect_out_signal(pin_sdio, spi_periph_signal[host_device].spid_out, false, false);
+    esp_rom_gpio_connect_in_signal(pin_sdio, spi_periph_signal[host_device].spid_in, false);
+    esp_rom_gpio_connect_out_signal(pin_clk, spi_periph_signal[host_device].spiclk_out, false, false);
 }
 
-void cmt_hal::unpatch(spi_host_device_t host_device)
+void cmt_hal::unpatch()
 {
-    gpio_hold_en(pin_cs);
-    gpio_hold_en(pin_fcs);
-
-    spi_bus_remove_device(spi_reg);
-    spi_bus_remove_device(spi_fifo);
-    spi_bus_free(host_device);
-
-    gpio_reset_pin(pin_cs);
-    gpio_set_direction(pin_cs, GPIO_MODE_OUTPUT);
-    gpio_set_level(pin_cs, 1);
-
-    gpio_reset_pin(pin_fcs);
-    gpio_set_direction(pin_fcs, GPIO_MODE_OUTPUT);
-    gpio_set_level(pin_fcs, 1);
-
-    gpio_hold_dis(pin_cs);
-    gpio_hold_dis(pin_fcs);
+    esp_rom_gpio_connect_out_signal(pin_sdio, SIG_GPIO_OUT_IDX, false, false);
+    esp_rom_gpio_connect_in_signal(pin_sdio, GPIO_MATRIX_CONST_ZERO_INPUT, false);
+    esp_rom_gpio_connect_out_signal(pin_clk, SIG_GPIO_OUT_IDX, false, false);
 }
 
 void cmt_hal::init(gpio_num_t _pin_sdio, gpio_num_t _pin_clk, gpio_num_t _pin_cs, gpio_num_t _pin_fcs, int32_t _spi_speed)
@@ -105,13 +36,53 @@ void cmt_hal::init(gpio_num_t _pin_sdio, gpio_num_t _pin_clk, gpio_num_t _pin_cs
     pin_fcs = _pin_fcs;
     spi_speed = _spi_speed;
 
+    host_device = spi_patcher_inst.init();
+
+    gpio_reset_pin(pin_sdio);
+    gpio_set_direction(pin_sdio, GPIO_MODE_INPUT_OUTPUT);
+    gpio_set_level(pin_sdio, 1);
+
+    gpio_reset_pin(pin_clk);
+    gpio_set_direction(pin_clk, GPIO_MODE_OUTPUT);
+    gpio_set_level(pin_clk, 0);
+
     gpio_reset_pin(pin_cs);
-    gpio_set_direction(pin_cs, GPIO_MODE_OUTPUT);
-    gpio_set_level(pin_cs, 1);
+    spi_device_interface_config_t devcfg_reg = {
+        .command_bits = 1,
+        .address_bits = 7,
+        .dummy_bits = 0,
+        .mode = 0,
+        .duty_cycle_pos = 0,
+        .cs_ena_pretrans = 1,
+        .cs_ena_posttrans = 1,
+        .clock_speed_hz = spi_speed,
+        .input_delay_ns = 0,
+        .spics_io_num = pin_cs,
+        .flags = SPI_DEVICE_HALFDUPLEX | SPI_DEVICE_3WIRE,
+        .queue_size = 1,
+        .pre_cb = nullptr,
+        .post_cb = nullptr
+    };
+    ESP_ERROR_CHECK(spi_bus_add_device(host_device, &devcfg_reg, &spi_reg));
 
     gpio_reset_pin(pin_fcs);
-    gpio_set_direction(pin_fcs, GPIO_MODE_OUTPUT);
-    gpio_set_level(pin_fcs, 1);
+    spi_device_interface_config_t devcfg_fifo = {
+        .command_bits = 0,
+        .address_bits = 0,
+        .dummy_bits = 0,
+        .mode = 0,
+        .duty_cycle_pos = 0,
+        .cs_ena_pretrans = 2,
+        .cs_ena_posttrans = static_cast<uint8_t>(2 * spi_speed / 1000000), // >2 us
+        .clock_speed_hz = spi_speed,
+        .input_delay_ns = 0,
+        .spics_io_num = pin_fcs,
+        .flags = SPI_DEVICE_HALFDUPLEX | SPI_DEVICE_3WIRE,
+        .queue_size = 1,
+        .pre_cb = nullptr,
+        .post_cb = nullptr
+    };
+    ESP_ERROR_CHECK(spi_bus_add_device(host_device, &devcfg_fifo, &spi_fifo));
 }
 
 uint8_t cmt_hal::read_reg(uint8_t addr)

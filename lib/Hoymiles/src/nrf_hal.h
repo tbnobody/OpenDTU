@@ -9,8 +9,8 @@ class nrf_hal : public RF24_hal, public spi_patcher_handle
 public:
     nrf_hal(gpio_num_t pin_mosi, gpio_num_t pin_miso, gpio_num_t pin_clk, gpio_num_t pin_cs, gpio_num_t pin_en);
 
-    void patch(spi_host_device_t host_device) override;
-    void unpatch(spi_host_device_t host_device) override;
+    void patch() override;
+    void unpatch() override;
 
     bool begin() override;
     void end() override;
@@ -38,5 +38,6 @@ private:
     const gpio_num_t pin_cs;
     const gpio_num_t pin_en;
 
+    spi_host_device_t host_device;
     spi_device_handle_t spi;
 };
