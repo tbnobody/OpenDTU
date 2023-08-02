@@ -5,7 +5,7 @@
 #include "commands/CommandAbstract.h"
 #include "types.h"
 #include <memory>
-#include <queue>
+#include <ThreadSafeQueue.h>
 
 class HoymilesRadio {
 public:
@@ -39,7 +39,7 @@ protected:
     void handleReceivedPackage();
 
     serial_u _dtuSerial;
-    std::queue<std::shared_ptr<CommandAbstract>> _commandQueue;
+    ThreadSafeQueue<std::shared_ptr<CommandAbstract>> _commandQueue;
     bool _isInitialized = false;
     bool _busyFlag = false;
 
