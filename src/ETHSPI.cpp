@@ -1,12 +1,6 @@
 #include "ETHSPI.h"
 
-#include <esp_eth.h>
-#include <esp_system.h>
-#include <FreeRTOS.h>
-#include <driver/gpio.h>
 #include <driver/spi_master.h>
-#include <Arduino.h>
-#include "MessageOutput.h"
 
 // Functions from WiFiGeneric
 void tcpipInit();

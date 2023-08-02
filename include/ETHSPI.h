@@ -1,7 +1,7 @@
 #pragma once
 
 #include <Arduino.h>
-//#include <esp_eth.h>
+#include <esp_netif.h>
 
 class ETHSPIClass
 {
