@@ -99,7 +99,7 @@ void HoymilesRadio::handleReceivedPackage()
         }
     } else if (!_busyFlag) {
         // Currently in idle mode --> send packet if one is in the queue
-        if (!_commandQueue.empty()) {
+        if (!isQueueEmpty()) {
             CommandAbstract* cmd = _commandQueue.front().get();
 
             auto inv = Hoymiles.getInverterBySerial(cmd->getTargetAddress());

@@ -5,7 +5,7 @@
 #include "commands/CommandAbstract.h"
 #include "types.h"
 #include <memory>
-#include <queue>
+#include <ThreadSafeQueue.h>
 
 class HoymilesRadio {
 public:
@@ -17,10 +17,15 @@ public:
     bool isInitialized();
 
     template <typename T>
-    T* enqueCommand()
+    void enqueCommand(std::shared_ptr<T> cmd)
     {
-        _commandQueue.push(std::make_shared<T>());
-        return static_cast<T*>(_commandQueue.back().get());
+        _commandQueue.push(cmd);
+    }
+
+    template <typename T>
+    std::shared_ptr<T> prepareCommand()
+    {
+        return std::make_shared<T>();
     }
 
 protected:
@@ -34,7 +39,7 @@ protected:
     void handleReceivedPackage();
 
     serial_u _dtuSerial;
-    std::queue<std::shared_ptr<CommandAbstract>> _commandQueue;
+    ThreadSafeQueue<std::shared_ptr<CommandAbstract>> _commandQueue;
     bool _isInitialized = false;
     bool _busyFlag = false;
 

@@ -5,6 +5,7 @@
 #include <MqttSubscribeParser.h>
 #include <Ticker.h>
 #include <espMqttClient.h>
+#include <mutex>
 
 class MqttSettingsClass {
 public:
@@ -38,6 +39,7 @@ private:
     String willTopic;
     Ticker mqttReconnectTimer;
     MqttSubscribeParser _mqttSubscribeParser;
+    std::mutex _clientLock;
     bool _verboseLogging = true;
 };
 

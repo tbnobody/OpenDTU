@@ -18,9 +18,10 @@ bool HMS_Abstract::sendChangeChannelRequest()
         return false;
     }
 
-    ChannelChangeCommand* cmdChannel = _radio->enqueCommand<ChannelChangeCommand>();
+    auto cmdChannel = _radio->prepareCommand<ChannelChangeCommand>();
     cmdChannel->setChannel(HoymilesRadio_CMT::getChannelFromFrequency(Hoymiles.getRadioCmt()->getInverterTargetFrequency()));
     cmdChannel->setTargetAddress(serial());
+    _radio->enqueCommand(cmdChannel);
 
     return true;
 };
