@@ -6,6 +6,7 @@
 #include <Arduino.h>
 #include <Hoymiles.h>
 #include <memory>
+#include <functional>
 
 #define PL_UI_STATE_INACTIVE 0
 #define PL_UI_STATE_CHARGING 1
@@ -81,9 +82,12 @@ private:
     void commitPowerLimit(std::shared_ptr<InverterAbstract> inverter, int32_t limit, bool enablePowerProduction);
     bool setNewPowerLimit(std::shared_ptr<InverterAbstract> inverter, int32_t newPowerLimit);
     int32_t getSolarChargePower();
-    float getLoadCorrectedVoltage(std::shared_ptr<InverterAbstract> inverter);
-    bool isStartThresholdReached(std::shared_ptr<InverterAbstract> inverter);
-    bool isStopThresholdReached(std::shared_ptr<InverterAbstract> inverter);
+    float getLoadCorrectedVoltage();
+    bool testThreshold(float socThreshold, float voltThreshold,
+            std::function<bool(float, float)> compare);
+    bool isStartThresholdReached();
+    bool isStopThresholdReached();
+    bool isBelowStopThreshold();
     bool useFullSolarPassthrough(std::shared_ptr<InverterAbstract> inverter);
 };
 
