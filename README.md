@@ -287,6 +287,7 @@ A ready to solder kit can be found here: https://shop.blinkyparts.com/en/OpenDTU
 * <https://www.thingiverse.com/thing:5852233>
 * <https://www.printables.com/model/377994-opendtu-pcb-box-for-the-wider-board>
 * <https://www.printables.com/model/376840-esp32-ahoy-opendtu-pcb-housing>
+* <https://www.printables.com/model/421083-case-for-opendtu-ahoy-breakout-board-esp32-and-nrf>
 
 ## Available layouts for printed circuit boards
 
@@ -294,6 +295,7 @@ A ready to solder kit can be found here: https://shop.blinkyparts.com/en/OpenDTU
 * [Board for OpenDTU with Display](https://github.com/SteffMUC/openDTU_wDisplay2)
 * [OpenDTU PCB mit Display](https://github.com/turrican944/OpenDTU-PCB)
 * [PCB for OpenDTU in Cable Branchbox](https://github.com/plewka/ESP-Solar_OpenDTU)
+* [OpenDTU-BreakoutBoard & Case for Wallmounting](https://github.com/foorschtbar/openDTU-BreakoutBoard)
 
 ## Building
 
