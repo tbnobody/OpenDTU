@@ -87,6 +87,7 @@ struct CONFIG_T {
     char Mqtt_Hass_Topic[MQTT_MAX_TOPIC_STRLEN + 1];
     bool Mqtt_Hass_IndividualPanels;
     bool Mqtt_Hass_Expire;
+    bool Mqtt_Hass_LegacyNames;
 
     bool Mqtt_Tls;
     char Mqtt_RootCaCert[MQTT_MAX_CERT_STRLEN + 1];

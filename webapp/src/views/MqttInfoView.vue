@@ -93,6 +93,12 @@
                                 <StatusBadge :status="mqttDataList.mqtt_hass_individualpanels" true_text="mqttinfo.Enabled" false_text="mqttinfo.Disabled" />
                             </td>
                         </tr>
+                        <tr>
+                            <th>{{ $t('mqttinfo.LegacyNames') }}</th>
+                            <td>
+                                <StatusBadge :status="mqttDataList.mqtt_hass_legacy_names" true_text="mqttinfo.Enabled" false_text="mqttinfo.Disabled" />
+                            </td>
+                        </tr>
                     </tbody>
                 </table>
             </div>

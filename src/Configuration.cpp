@@ -77,6 +77,7 @@ bool ConfigurationClass::write()
     mqtt_hass["topic"] = config.Mqtt_Hass_Topic;
     mqtt_hass["individual_panels"] = config.Mqtt_Hass_IndividualPanels;
     mqtt_hass["expire"] = config.Mqtt_Hass_Expire;
+    mqtt_hass["legacy_names"] = config.Mqtt_Hass_LegacyNames;
 
     JsonObject dtu = doc.createNestedObject("dtu");
     dtu["serial"] = config.Dtu_Serial;
@@ -223,6 +224,7 @@ bool ConfigurationClass::read()
     config.Mqtt_Hass_Expire = mqtt_hass["expire"] | MQTT_HASS_EXPIRE;
     config.Mqtt_Hass_IndividualPanels = mqtt_hass["individual_panels"] | MQTT_HASS_INDIVIDUALPANELS;
     strlcpy(config.Mqtt_Hass_Topic, mqtt_hass["topic"] | MQTT_HASS_TOPIC, sizeof(config.Mqtt_Hass_Topic));
+    config.Mqtt_Hass_LegacyNames = mqtt_hass["legacy_names"] | MQTT_HASS_LEGACYNAMES;
 
     JsonObject dtu = doc["dtu"];
     config.Dtu_Serial = dtu["serial"] | DTU_SERIAL;

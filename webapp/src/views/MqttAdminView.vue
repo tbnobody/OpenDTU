@@ -113,8 +113,12 @@
                               type="checkbox"/>
 
                 <InputElement :label="$t('mqttadmin.HassIndividual')"
-                              v-model="mqttConfigList.mqtt_hass_individualpanels"
-                              type="checkbox"/>
+                            v-model="mqttConfigList.mqtt_hass_individualpanels"
+                            type="checkbox"/>
+
+                <InputElement :label="$t('mqttadmin.HassLegacyNames')"
+                            v-model="mqttConfigList.mqtt_hass_legacy_names"
+                            type="checkbox"/>
             </CardElement>
 
             <button type="submit" class="btn btn-primary mb-3">{{ $t('mqttadmin.Save') }}</button>

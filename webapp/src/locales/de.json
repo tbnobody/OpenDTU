@@ -273,6 +273,7 @@
         "HassSummary": "Home Assistant MQTT-Auto-Discovery Konfigurationszusammenfassung",
         "Expire": "Ablaufen",
         "IndividualPanels": "Einzelne Paneele",
+        "LegacyNames": "Altes Namensschema",
         "RuntimeSummary": "Laufzeitzusammenfassung",
         "ConnectionStatus": "Verbindungsstatus",
         "Connected": "verbunden",
@@ -431,6 +432,7 @@
         "HassRetain": "Retain Flag aktivieren",
         "HassExpire": "Ablauffunktion aktivieren",
         "HassIndividual": "Einzelne Paneele",
+        "HassLegacyNames": "Altes Namensschema",
         "Save": "@:dtuadmin.Save"
     },
     "inverteradmin": {

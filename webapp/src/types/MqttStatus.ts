@@ -16,4 +16,5 @@ export interface MqttStatus {
     mqtt_hass_retain: boolean;
     mqtt_hass_topic: string;
     mqtt_hass_individualpanels: boolean;
+    mqtt_hass_legacy_names: boolean;
 }

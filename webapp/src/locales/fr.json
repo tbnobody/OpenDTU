@@ -273,6 +273,7 @@
         "HassSummary": "Résumé de la configuration de la découverte automatique du MQTT de Home Assistant",
         "Expire": "Expiration",
         "IndividualPanels": "Panneaux individuels",
+        "LegacyNames": "Ancien schéma de nommage",
         "RuntimeSummary": "Résumé du temps de fonctionnement",
         "ConnectionStatus": "État de la connexion",
         "Connected": "connecté",
@@ -431,6 +432,7 @@
         "HassRetain": "Activer du maintien",
         "HassExpire": "Activer l'expiration",
         "HassIndividual": "Panneaux individuels",
+        "HassLegacyNames": "Ancien schéma de nommage",
         "Save": "@:dtuadmin.Save"
     },
     "inverteradmin": {

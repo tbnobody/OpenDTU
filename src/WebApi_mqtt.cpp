@@ -54,6 +54,7 @@ void WebApiMqttClass::onMqttStatus(AsyncWebServerRequest* request)
     root["mqtt_hass_retain"] = config.Mqtt_Hass_Retain;
     root["mqtt_hass_topic"] = config.Mqtt_Hass_Topic;
     root["mqtt_hass_individualpanels"] = config.Mqtt_Hass_IndividualPanels;
+    root["mqtt_hass_legacy_names"] = config.Mqtt_Hass_LegacyNames;
 
     response->setLength();
     request->send(response);
@@ -90,6 +91,7 @@ void WebApiMqttClass::onMqttAdminGet(AsyncWebServerRequest* request)
     root["mqtt_hass_retain"] = config.Mqtt_Hass_Retain;
     root["mqtt_hass_topic"] = config.Mqtt_Hass_Topic;
     root["mqtt_hass_individualpanels"] = config.Mqtt_Hass_IndividualPanels;
+    root["mqtt_hass_legacy_names"] = config.Mqtt_Hass_LegacyNames;
 
     response->setLength();
     request->send(response);
@@ -153,7 +155,8 @@ void WebApiMqttClass::onMqttAdminPost(AsyncWebServerRequest* request)
             && root.containsKey("mqtt_hass_expire")
             && root.containsKey("mqtt_hass_retain")
             && root.containsKey("mqtt_hass_topic")
-            && root.containsKey("mqtt_hass_individualpanels"))) {
+            && root.containsKey("mqtt_hass_individualpanels")
+            && root.containsKey("mqtt_hass_legacy_names"))) {
         retMsg["message"] = "Values are missing!";
         retMsg["code"] = WebApiError::GenericValueMissing;
         response->setLength();
@@ -318,6 +321,7 @@ void WebApiMqttClass::onMqttAdminPost(AsyncWebServerRequest* request)
     config.Mqtt_Hass_Retain = root["mqtt_hass_retain"].as<bool>();
     config.Mqtt_Hass_IndividualPanels = root["mqtt_hass_individualpanels"].as<bool>();
     strlcpy(config.Mqtt_Hass_Topic, root["mqtt_hass_topic"].as<String>().c_str(), sizeof(config.Mqtt_Hass_Topic));
+    config.Mqtt_Hass_LegacyNames = root["mqtt_hass_legacy_names"].as<bool>();
     Configuration.write();
 
     retMsg["type"] = "success";

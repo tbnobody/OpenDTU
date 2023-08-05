@@ -273,6 +273,7 @@
         "HassSummary": "Home Assistant MQTT Auto Discovery Configuration Summary",
         "Expire": "Expire",
         "IndividualPanels": "Individual Panels",
+        "LegacyNames": "Legacy Naming Scheme",
         "RuntimeSummary": "Runtime Summary",
         "ConnectionStatus": "Connection Status",
         "Connected": "connected",
@@ -431,6 +432,7 @@
         "HassRetain": "Enable Retain Flag",
         "HassExpire": "Enable Expiration",
         "HassIndividual": "Individual Panels",
+        "HassLegacyNames": "Legacy Naming Scheme",
         "Save": "@:dtuadmin.Save"
     },
     "inverteradmin": {
