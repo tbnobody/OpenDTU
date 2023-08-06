@@ -88,7 +88,7 @@ private:
     bool isStartThresholdReached();
     bool isStopThresholdReached();
     bool isBelowStopThreshold();
-    bool useFullSolarPassthrough(std::shared_ptr<InverterAbstract> inverter);
+    bool useFullSolarPassthrough();
 };
 
 extern PowerLimiterClass PowerLimiter;

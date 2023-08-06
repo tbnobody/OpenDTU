@@ -462,7 +462,7 @@ int32_t PowerLimiterClass::calcPowerLimit(std::shared_ptr<InverterAbstract> inve
     int32_t adjustedVictronChargePower = inverterPowerDcToAc(inverter, getSolarChargePower());
 
     // Battery can be discharged and we should output max (Victron solar power || power meter value)
-    if(batteryDischargeEnabled && useFullSolarPassthrough(inverter)) {
+    if(batteryDischargeEnabled && useFullSolarPassthrough()) {
       // Case 5
       newPowerLimit = newPowerLimit > adjustedVictronChargePower ? newPowerLimit : adjustedVictronChargePower;
     } else {
@@ -689,7 +689,7 @@ void PowerLimiterClass::calcNextInverterRestart()
     MessageOutput.printf("[DPL::calcNextInverterRestart] _nextInverterRestart @ %d millis\r\n", _nextInverterRestart);
 }
 
-bool PowerLimiterClass::useFullSolarPassthrough(std::shared_ptr<InverterAbstract> inverter)
+bool PowerLimiterClass::useFullSolarPassthrough()
 {
     CONFIG_T& config = Configuration.get();
 
@@ -698,35 +698,16 @@ bool PowerLimiterClass::useFullSolarPassthrough(std::shared_ptr<InverterAbstract
       return false;
     }
 
-    // Check if the Battery interface is enabled and the SOC stop threshold is reached
-    if (config.Battery_Enabled
-            && config.PowerLimiter_FullSolarPassThroughSoc > 0.0
-            && (millis() - Battery.stateOfChargeLastUpdate) < 60000) {
-              return Battery.stateOfCharge >= config.PowerLimiter_FullSolarPassThroughSoc;
-    }
-    
-    // Otherwise we use the voltage threshold
-    if (config.PowerLimiter_FullSolarPassThroughStartVoltage <= 0.0 || config.PowerLimiter_FullSolarPassThroughStopVoltage <= 0.0) {
-        return false;
+    if (testThreshold(config.PowerLimiter_FullSolarPassThroughSoc,
+                      config.PowerLimiter_FullSolarPassThroughStartVoltage,
+                      [](float a, float b) -> bool { return a >= b; })) {
+        _fullSolarPassThroughEnabled = true;
     }
 
-    float dcVoltage = inverter->Statistics()->getChannelFieldValue(TYPE_DC, (ChannelNum_t) config.PowerLimiter_InverterChannelId, FLD_UDC);
-
-    if (_verboseLogging) {
-        MessageOutput.printf("[DPL::loop] useFullSolarPassthrough: FullSolarPT Start %.2f V, FullSolarPT Stop: %.2f V, dcVoltage: %.2f V\r\n",
-            config.PowerLimiter_FullSolarPassThroughStartVoltage, config.PowerLimiter_FullSolarPassThroughStopVoltage, dcVoltage);
-    }
-
-    if (dcVoltage <= 0.0) {
-        return false;
-    }
-    
-    if (dcVoltage >= config.PowerLimiter_FullSolarPassThroughStartVoltage) {
-      _fullSolarPassThroughEnabled = true;
-    }
-
-    if (dcVoltage <= config.PowerLimiter_FullSolarPassThroughStopVoltage) {
-      _fullSolarPassThroughEnabled = false;
+    if (testThreshold(config.PowerLimiter_FullSolarPassThroughSoc,
+                      config.PowerLimiter_FullSolarPassThroughStopVoltage,
+                      [](float a, float b) -> bool { return a < b; })) {
+        _fullSolarPassThroughEnabled = false;
     }
 
     return _fullSolarPassThroughEnabled;
