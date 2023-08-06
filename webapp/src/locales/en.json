@@ -538,7 +538,7 @@
         "DefaultProfile": "(Default settings)",
         "ProfileHint": "Your device may stop responding if you select an incompatible profile. In this case, you must perform a deletion via the serial interface.",
         "Display": "Display",
-        "PowerSafe": "Enable Power Safe:",
+        "PowerSafe": "Enable Power Save:",
         "PowerSafeHint": "Turn off the display if no inverter is producing.",
         "Screensaver": "Enable Screensaver:",
         "ScreensaverHint": "Move the display a little bit on each update to prevent burn-in. (Useful especially for OLED displays)",
