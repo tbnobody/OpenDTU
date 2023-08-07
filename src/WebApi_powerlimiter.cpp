@@ -126,6 +126,7 @@ void WebApiPowerLimiterClass::onAdminPost(AsyncWebServerRequest* request)
     CONFIG_T& config = Configuration.get();
     config.PowerLimiter_Enabled = root[F("enabled")].as<bool>();
     PowerLimiter.setMode(PL_MODE_ENABLE_NORMAL_OP);  // User input sets PL to normal operation
+    config.PowerLimiter_VerboseLogging = root[F("verbose_logging")].as<bool>();
     config.PowerLimiter_SolarPassThroughEnabled = root[F("solar_passthrough_enabled")].as<bool>();
     config.PowerLimiter_SolarPassThroughLosses = root[F("solar_passthrough_losses")].as<uint8_t>();
     config.PowerLimiter_BatteryDrainStategy= root[F("battery_drain_strategy")].as<uint8_t>();
