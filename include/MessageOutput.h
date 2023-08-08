@@ -28,6 +28,8 @@ private:
     AsyncWebSocket* _ws = nullptr;
 
     std::mutex _msgLock;
+
+    void serialWrite(message_t const& m);
 };
 
 extern MessageOutputClass MessageOutput;

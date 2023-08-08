@@ -14,6 +14,15 @@ void MessageOutputClass::register_ws_output(AsyncWebSocket* output)
     _ws = output;
 }
 
+void MessageOutputClass::serialWrite(MessageOutputClass::message_t const& m)
+{
+    size_t written = 0;
+    while (written < m.size()) {
+        written += Serial.write(m.data() + written, m.size() - written);
+    }
+    Serial.flush();
+}
+
 size_t MessageOutputClass::write(uint8_t c)
 {
     std::lock_guard<std::mutex> lock(_msgLock);
@@ -25,7 +34,7 @@ size_t MessageOutputClass::write(uint8_t c)
     message.push_back(c);
 
     if (c == '\n') {
-        Serial.write(message.data(), message.size());
+        serialWrite(message);
         _lines.emplace(std::move(message));
         _task_messages.erase(iter);
     }
@@ -49,7 +58,7 @@ size_t MessageOutputClass::write(const uint8_t *buffer, size_t size)
         message.push_back(c);
 
         if (c == '\n') {
-            Serial.write(message.data(), message.size());
+            serialWrite(message);
             _lines.emplace(std::move(message));
             message.clear();
             message.reserve(size - idx - 1);
