@@ -34,7 +34,7 @@ void WebApiPowerMeterClass::loop()
 
 void WebApiPowerMeterClass::onStatus(AsyncWebServerRequest* request)
 {
-    AsyncJsonResponse* response = new AsyncJsonResponse();
+    AsyncJsonResponse* response = new AsyncJsonResponse(false, 2048);
     JsonObject root = response->getRoot();
     const CONFIG_T& config = Configuration.get();
 
