@@ -14,7 +14,7 @@ let proxy_target;
 try {
     proxy_target = require('./vite.user.ts').proxy_target;
 } catch (error) {
-    proxy_target = '192.168.178.87';
+    proxy_target = '192.168.20.110';
 }
 
 // https://vitejs.dev/config/
