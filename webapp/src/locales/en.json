@@ -186,6 +186,7 @@
         "DetectedMaxPower": "Detected max. Power",
         "BootloaderVersion": "Bootloader Version",
         "FirmwareVersion": "Firmware Version",
+        "FirmwareBranch": "Firmware Branch",
         "FirmwareBuildDate": "Firmware Build Date",
         "HardwarePartNumber": "Hardware Part Number",
         "HardwareVersion": "Hardware Version"

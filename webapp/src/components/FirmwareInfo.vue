@@ -23,6 +23,10 @@
                             </a></td>
                     </tr>
                     <tr>
+                        <th>{{ $t('firmwareinfo.FirmwareBranch') }}</th>
+                        <td>{{ systemStatus.git_branch }}</td>
+                    </tr>
+                    <tr>
                         <th>{{ $t('firmwareinfo.PioEnv') }}</th>
                         <td>{{ systemStatus.pioenv }}</td>
                     </tr>
