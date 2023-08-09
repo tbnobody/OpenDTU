@@ -186,7 +186,6 @@
         "DetectedMaxPower": "Detected max. Power",
         "BootloaderVersion": "Bootloader Version",
         "FirmwareVersion": "Firmware Version",
-        "FirmwareBranch": "Firmware Branch",
         "FirmwareBuildDate": "Firmware Build Date",
         "HardwarePartNumber": "Hardware Part Number",
         "HardwareVersion": "Hardware Version"
@@ -203,6 +202,7 @@
         "SdkVersion": "SDK Version",
         "ConfigVersion": "Config Version",
         "FirmwareVersion": "Firmware Version / Git Hash",
+        "FirmwareBranch": "Firmware Branch",
         "PioEnv": "PIO Environment",
         "FirmwareVersionHint": "Click here to show information about your current version",
         "FirmwareUpdate": "Firmware Update",
