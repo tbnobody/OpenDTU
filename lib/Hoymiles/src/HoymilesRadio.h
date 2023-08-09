@@ -16,8 +16,7 @@ public:
     bool isQueueEmpty();
     bool isInitialized();
 
-    template <typename T>
-    void enqueCommand(std::shared_ptr<T> cmd)
+    void enqueCommand(std::shared_ptr<CommandAbstract> cmd)
     {
         _commandQueue.push(cmd);
     }

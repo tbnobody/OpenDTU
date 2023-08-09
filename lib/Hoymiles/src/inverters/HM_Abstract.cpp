@@ -64,8 +64,8 @@ bool HM_Abstract::sendAlarmLogRequest(bool force)
     auto cmd = _radio->prepareCommand<AlarmDataCommand>();
     cmd->setTime(now);
     cmd->setTargetAddress(serial());
-    _radio->enqueCommand(cmd);
     EventLog()->setLastAlarmRequestSuccess(CMD_PENDING);
+    _radio->enqueCommand(cmd);
 
     return true;
 }
@@ -114,8 +114,8 @@ bool HM_Abstract::sendSystemConfigParaRequest()
     auto cmd = _radio->prepareCommand<SystemConfigParaCommand>();
     cmd->setTime(now);
     cmd->setTargetAddress(serial());
-    _radio->enqueCommand(cmd);
     SystemConfigPara()->setLastLimitRequestSuccess(CMD_PENDING);
+    _radio->enqueCommand(cmd);
 
     return true;
 }
@@ -140,8 +140,8 @@ bool HM_Abstract::sendActivePowerControlRequest(float limit, PowerLimitControlTy
     auto cmd = _radio->prepareCommand<ActivePowerControlCommand>();
     cmd->setActivePowerLimit(limit, type);
     cmd->setTargetAddress(serial());
-    _radio->enqueCommand(cmd);
     SystemConfigPara()->setLastLimitCommandSuccess(CMD_PENDING);
+    _radio->enqueCommand(cmd);
 
     return true;
 }
@@ -170,8 +170,8 @@ bool HM_Abstract::sendPowerControlRequest(bool turnOn)
     auto cmd = _radio->prepareCommand<PowerControlCommand>();
     cmd->setPowerOn(turnOn);
     cmd->setTargetAddress(serial());
-    _radio->enqueCommand(cmd);
     PowerCommand()->setLastPowerCommandSuccess(CMD_PENDING);
+    _radio->enqueCommand(cmd);
 
     return true;
 }
@@ -187,8 +187,8 @@ bool HM_Abstract::sendRestartControlRequest()
     auto cmd = _radio->prepareCommand<PowerControlCommand>();
     cmd->setRestart();
     cmd->setTargetAddress(serial());
-    _radio->enqueCommand(cmd);
     PowerCommand()->setLastPowerCommandSuccess(CMD_PENDING);
+    _radio->enqueCommand(cmd);
 
     return true;
 }
