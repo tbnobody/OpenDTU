@@ -18,10 +18,14 @@ from dulwich import porcelain
 def get_firmware_specifier_build_flag():
     try:
         build_version = porcelain.describe('.')  # '.' refers to the repository root dir
+        branch_name = porcelain.active_branch('.').decode('utf-8')
     except:
         build_version = "g0000000"
-    build_flag = "-D AUTO_GIT_HASH=\\\"" + build_version + "\\\""
+        branch_name = ""
+    build_flag = "-D AUTO_GIT_HASH=\\\"" + build_version + "\\\" "
+    build_flag += "-D AUTO_GIT_BRANCH=\\\"" + branch_name + "\\\""
     print ("Firmware Revision: " + build_version)
+    print ("Firmware build on branch: " + branch_name)
     return (build_flag)
 
 env.Append(

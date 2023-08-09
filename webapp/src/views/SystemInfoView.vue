@@ -61,7 +61,7 @@ export default defineComponent({
             }
 
             const fetchUrl = "https://api.github.com/repos/helgeerbe/OpenDTU-OnBattery/compare/"
-                + this.systemDataList.git_hash + "...HEAD";
+                + this.systemDataList.git_hash + "..." + this.systemDataList.git_branch;
 
             fetch(fetchUrl)
                 .then((response) => {
