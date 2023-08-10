@@ -25,7 +25,7 @@ def get_firmware_specifier_build_flag():
         branch_name = porcelain.active_branch('.').decode('utf-8')  # '.' refers to the repository root dir
     except Exception as err:
         print(f"Unexpected {err=}, {type(err)=}")
-        branch_name = ""
+        branch_name = "master"
     build_flag = "-D AUTO_GIT_HASH=\\\"" + build_version + "\\\" "
     build_flag += "-D AUTO_GIT_BRANCH=\\\"" + branch_name + "\\\""
     print("Firmware Revision: " + build_version)
