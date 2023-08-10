@@ -32,21 +32,30 @@ void MqttSettingsClass::onMqttConnect(bool sessionPresent)
     const CONFIG_T& config = Configuration.get();
     publish(config.Mqtt_LwtTopic, config.Mqtt_LwtValue_Online);
 
-    for (const auto& cb : _mqttSubscribeParser.get_callbacks()) {
-        mqttClient->subscribe(cb.topic.c_str(), cb.qos);
+    std::lock_guard<std::mutex> lock(_clientLock);
+    if (mqttClient != nullptr) {
+        for (const auto& cb : _mqttSubscribeParser.get_callbacks()) {
+            mqttClient->subscribe(cb.topic.c_str(), cb.qos);
+        }
     }
 }
 
 void MqttSettingsClass::subscribe(const String& topic, uint8_t qos, const espMqttClientTypes::OnMessageCallback& cb)
 {
     _mqttSubscribeParser.register_callback(topic.c_str(), qos, cb);
-    mqttClient->subscribe(topic.c_str(), qos);
+    std::lock_guard<std::mutex> lock(_clientLock);
+    if (mqttClient != nullptr) {
+        mqttClient->subscribe(topic.c_str(), qos);
+    }
 }
 
 void MqttSettingsClass::unsubscribe(const String& topic)
 {
     _mqttSubscribeParser.unregister_callback(topic.c_str());
-    mqttClient->unsubscribe(topic.c_str());
+    std::lock_guard<std::mutex> lock(_clientLock);
+    if (mqttClient != nullptr) {
+        mqttClient->unsubscribe(topic.c_str());
+    }
 }
 
 void MqttSettingsClass::onMqttDisconnect(espMqttClientTypes::DisconnectReason reason)
@@ -97,6 +106,12 @@ void MqttSettingsClass::performConnect()
         using std::placeholders::_4;
         using std::placeholders::_5;
         using std::placeholders::_6;
+
+        std::lock_guard<std::mutex> lock(_clientLock);
+        if (mqttClient == nullptr) {
+            return;
+        }
+
         MessageOutput.println("Connecting to MQTT...");
         const CONFIG_T& config = Configuration.get();
         willTopic = getPrefix() + config.Mqtt_LwtTopic;
@@ -132,6 +147,10 @@ void MqttSettingsClass::performDisconnect()
 {
     const CONFIG_T& config = Configuration.get();
     publish(config.Mqtt_LwtTopic, config.Mqtt_LwtValue_Offline);
+    std::lock_guard<std::mutex> lock(_clientLock);
+    if (mqttClient == nullptr) {
+        return;
+    }
     mqttClient->disconnect();
 }
 
@@ -147,6 +166,10 @@ void MqttSettingsClass::performReconnect()
 
 bool MqttSettingsClass::getConnected()
 {
+    std::lock_guard<std::mutex> lock(_clientLock);
+    if (mqttClient == nullptr) {
+        return false;
+    }
     return mqttClient->connected();
 }
 
@@ -157,6 +180,11 @@ String MqttSettingsClass::getPrefix()
 
 void MqttSettingsClass::publish(const String& subtopic, const String& payload)
 {
+    std::lock_guard<std::mutex> lock(_clientLock);
+    if (mqttClient == nullptr) {
+        return;
+    }
+
     String topic = getPrefix();
     topic += subtopic;
 
@@ -168,6 +196,10 @@ void MqttSettingsClass::publish(const String& subtopic, const String& payload)
 
 void MqttSettingsClass::publishGeneric(const String& topic, const String& payload, bool retain, uint8_t qos)
 {
+    std::lock_guard<std::mutex> lock(_clientLock);
+    if (mqttClient == nullptr) {
+        return;
+    }
     mqttClient->publish(topic.c_str(), qos, retain, payload.c_str());
 }
 
@@ -181,8 +213,11 @@ void MqttSettingsClass::init()
 
 void MqttSettingsClass::createMqttClientObject()
 {
-    if (mqttClient != nullptr)
+    std::lock_guard<std::mutex> lock(_clientLock);
+    if (mqttClient != nullptr) {
         delete mqttClient;
+        mqttClient = nullptr;
+    }
     const CONFIG_T& config = Configuration.get();
     if (config.Mqtt_Tls) {
         mqttClient = static_cast<MqttClient*>(new espMqttClientSecure);
