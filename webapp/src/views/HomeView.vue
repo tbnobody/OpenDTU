@@ -114,13 +114,9 @@
                 </div>
             </div>
         </div>
-        <VedirectView v-show="liveData.vedirect.enabled" />
-        <div v-show="liveData.battery.enabled" >
-          <BatteryView/>
-        </div>
-        <div v-show="liveData.huawei.enabled" >
-          <HuaweiView/>
-        </div>
+        <VedirectView v-if="liveData.vedirect.enabled" />
+        <BatteryView v-if="liveData.battery.enabled" />
+        <HuaweiView v-if="liveData.huawei.enabled" />
     </BasePage>
    
     <div class="modal" id="eventView" tabindex="-1">
