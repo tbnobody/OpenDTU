@@ -61,7 +61,7 @@ void WebApiWsVedirectLiveClass::loop()
             String buffer;
             // free JsonDocument as soon as possible
             {
-                DynamicJsonDocument root(2048);
+                DynamicJsonDocument root(_responseSize);
                 JsonVariant var = root;
                 generateJsonResponse(var);
                 serializeJson(root, buffer);
@@ -173,7 +173,7 @@ void WebApiWsVedirectLiveClass::onLivedataStatus(AsyncWebServerRequest* request)
         return;
     }
     try {
-        AsyncJsonResponse* response = new AsyncJsonResponse(false, 1024U);
+        AsyncJsonResponse* response = new AsyncJsonResponse(false, _responseSize);
         JsonVariant root = response->getRoot();
 
         generateJsonResponse(root);
