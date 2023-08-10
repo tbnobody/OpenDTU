@@ -2,12 +2,10 @@
 #pragma once
 
 #include <TimeoutHelper.h>
-#include <freertos/FreeRTOS.h>
-#include <freertos/semphr.h>
+#include <mutex>
 
 class DatastoreClass {
 public:
-    DatastoreClass();
     void init();
     void loop();
 
@@ -61,7 +59,7 @@ public:
 
 private:
     TimeoutHelper _updateTimeout;
-    SemaphoreHandle_t _xSemaphore;
+    std::mutex _mutex;
 
     float _totalAcYieldTotalEnabled = 0;
     float _totalAcYieldDayEnabled = 0;

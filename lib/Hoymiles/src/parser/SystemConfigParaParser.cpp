@@ -6,6 +6,19 @@
 #include "../Hoymiles.h"
 #include <cstring>
 
+#define HOY_SEMAPHORE_TAKE() \
+    do {                     \
+    } while (xSemaphoreTake(_xSemaphore, portMAX_DELAY) != pdPASS)
+#define HOY_SEMAPHORE_GIVE() xSemaphoreGive(_xSemaphore)
+
+SystemConfigParaParser::SystemConfigParaParser()
+    : Parser()
+{
+    _xSemaphore = xSemaphoreCreateMutex();
+    HOY_SEMAPHORE_GIVE(); // release before first use
+    clearBuffer();
+}
+
 void SystemConfigParaParser::clearBuffer()
 {
     memset(_payload, 0, SYSTEM_CONFIG_PARA_SIZE);
@@ -22,15 +35,30 @@ void SystemConfigParaParser::appendFragment(uint8_t offset, uint8_t* payload, ui
     _payloadLength += len;
 }
 
+void SystemConfigParaParser::beginAppendFragment()
+{
+    HOY_SEMAPHORE_TAKE();
+}
+
+void SystemConfigParaParser::endAppendFragment()
+{
+    HOY_SEMAPHORE_GIVE();
+}
+
 float SystemConfigParaParser::getLimitPercent()
 {
-    return ((((uint16_t)_payload[2]) << 8) | _payload[3]) / 10.0;
+    HOY_SEMAPHORE_TAKE();
+    float ret = ((((uint16_t)_payload[2]) << 8) | _payload[3]) / 10.0;
+    HOY_SEMAPHORE_GIVE();
+    return ret;
 }
 
 void SystemConfigParaParser::setLimitPercent(float value)
 {
+    HOY_SEMAPHORE_TAKE();
     _payload[2] = ((uint16_t)(value * 10)) >> 8;
     _payload[3] = ((uint16_t)(value * 10));
+    HOY_SEMAPHORE_GIVE();
 }
 
 void SystemConfigParaParser::setLastLimitCommandSuccess(LastCommandSuccess status)

@@ -86,6 +86,19 @@ const std::array<const AlarmMessage_t, ALARM_MSG_COUNT> AlarmLogParser::_alarmMe
     { AlarmMessageType_t::ALL, 9000, "Microinverter is suspected of being stolen" },
 } };
 
+#define HOY_SEMAPHORE_TAKE() \
+    do {                     \
+    } while (xSemaphoreTake(_xSemaphore, portMAX_DELAY) != pdPASS)
+#define HOY_SEMAPHORE_GIVE() xSemaphoreGive(_xSemaphore)
+
+AlarmLogParser::AlarmLogParser()
+    : Parser()
+{
+    _xSemaphore = xSemaphoreCreateMutex();
+    HOY_SEMAPHORE_GIVE(); // release before first use
+    clearBuffer();
+}
+
 void AlarmLogParser::clearBuffer()
 {
     memset(_payloadAlarmLog, 0, ALARM_LOG_PAYLOAD_SIZE);
@@ -102,8 +115,21 @@ void AlarmLogParser::appendFragment(uint8_t offset, uint8_t* payload, uint8_t le
     _alarmLogLength += len;
 }
 
+void AlarmLogParser::beginAppendFragment()
+{
+    HOY_SEMAPHORE_TAKE();
+}
+
+void AlarmLogParser::endAppendFragment()
+{
+    HOY_SEMAPHORE_GIVE();
+}
+
 uint8_t AlarmLogParser::getEntryCount()
 {
+    if (_alarmLogLength < 2) {
+        return 0;
+    }
     return (_alarmLogLength - 2) / ALARM_LOG_ENTRY_SIZE;
 }
 
@@ -128,6 +154,8 @@ void AlarmLogParser::getLogEntry(uint8_t entryId, AlarmLogEntry_t* entry)
 
     int timezoneOffset = getTimezoneOffset();
 
+    HOY_SEMAPHORE_TAKE();
+
     uint32_t wcode = (uint16_t)_payloadAlarmLog[entryStartOffset] << 8 | _payloadAlarmLog[entryStartOffset + 1];
     uint32_t startTimeOffset = 0;
     if (((wcode >> 13) & 0x01) == 1) {
@@ -142,6 +170,8 @@ void AlarmLogParser::getLogEntry(uint8_t entryId, AlarmLogEntry_t* entry)
     entry->MessageId = _payloadAlarmLog[entryStartOffset + 1];
     entry->StartTime = (((uint16_t)_payloadAlarmLog[entryStartOffset + 4] << 8) | ((uint16_t)_payloadAlarmLog[entryStartOffset + 5])) + startTimeOffset + timezoneOffset;
     entry->EndTime = ((uint16_t)_payloadAlarmLog[entryStartOffset + 6] << 8) | ((uint16_t)_payloadAlarmLog[entryStartOffset + 7]);
+
+    HOY_SEMAPHORE_GIVE();
 
     if (entry->EndTime > 0) {
         entry->EndTime += (endTimeOffset + timezoneOffset);

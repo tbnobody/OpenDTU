@@ -52,7 +52,11 @@ export default defineComponent({
             _countDownTimeout = undefined;
         };
 
-        const countDown = ref(parseCountDown(props.modelValue));
+        var countDown = ref();
+        watch(() => props.modelValue, () => {
+            countDown.value = parseCountDown(props.modelValue);
+        });
+
         const isAlertVisible = computed(() => props.modelValue || props.show);
 
         onBeforeUnmount(() => {
