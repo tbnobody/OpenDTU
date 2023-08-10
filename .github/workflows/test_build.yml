@@ -1,12 +1,6 @@
 name: OpenDTU-onBattery Test Build
 
-on:
-  push:
-    branches:
-      - 'helgeerbe/*'
-    paths-ignore:
-      - docs/**
-      - '**/*.md'
+on: push
 
 jobs:
   get_default_envs:
