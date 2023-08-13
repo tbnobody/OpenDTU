@@ -78,6 +78,7 @@
         "8003": "Gateway is invalid!",
         "8004": "DNS Server IP 1 is invalid!",
         "8005": "DNS Server IP 2 is invalid!",
+        "8006": "Administrative AccessPoint Timeout value is invalid",
         "9001": "NTP Server must between 1 and {max} characters long!",
         "9002": "Timezone must between 1 and {max} characters long!",
         "9003": "Timezone description must between 1 and {max} characters long!",
@@ -388,6 +389,10 @@
         "Netmask": "Netmask:",
         "DefaultGateway": "Default Gateway:",
         "Dns": "DNS Server {num}:",
+        "AdminAp": "WiFi Configuration (Admin AccessPoint)",
+        "ApTimeout": "AccessPoint Timeout:",
+        "ApTimeoutHint": "Time which the AccessPoint is kept open. A value of 0 means infinite.",
+        "Minutes": "minutes",
         "Save": "@:dtuadmin.Save"
     },
     "mqttadmin": {
@@ -527,6 +532,7 @@
     },
     "deviceadmin": {
         "DeviceManager": "Device-Manager",
+        "ParseError": "Parse error in 'pin_mapping.json': {error}",
         "PinAssignment": "Connection settings",
         "SelectedProfile": "Selected profile:",
         "DefaultProfile": "(Default settings)",

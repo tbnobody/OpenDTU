@@ -17,11 +17,11 @@
                                 {{ capitalizeFirstLetter(category) }}</td>
                             <td :class="{ 'table-danger': !isEqual(category, prop) }">{{ prop }}</td>
                             <td>
-                                <template v-if="((selectedPinAssignment as Device)[category as keyof Device])">
+                                <template v-if="selectedPinAssignment && category in selectedPinAssignment">
                                     {{ (selectedPinAssignment as any)[category][prop] }}</template>
                             </td>
                             <td>
-                                <template v-if="((currentPinAssignment as Device)[category as keyof Device])">
+                                <template v-if="currentPinAssignment && category in currentPinAssignment">
                                     {{ (currentPinAssignment as any)[category][prop] }}</template>
                             </td>
                         </tr>
@@ -65,12 +65,12 @@ export default defineComponent({
     methods: {
         properties(category: string): string[] {
             let curArray: Array<string> = [];
-            if ((this.currentPinAssignment as Device)[category as keyof Device]) {
+            if (this.currentPinAssignment && category in this.currentPinAssignment) {
                 curArray = Object.keys((this.currentPinAssignment as Device)[category as keyof Device]);
             }
 
             let selArray: Array<string> = [];
-            if ((this.selectedPinAssignment as Device)[category as keyof Device]) {
+            if (this.selectedPinAssignment && category in this.selectedPinAssignment) {
                 selArray = Object.keys((this.selectedPinAssignment as Device)[category as keyof Device]);
             }
 
@@ -83,10 +83,10 @@ export default defineComponent({
             let comSel = 999999;
             let comCur = 999999;
 
-            if ((this.selectedPinAssignment as Device)[category as keyof Device]) {
+            if (this.selectedPinAssignment && category in this.selectedPinAssignment) {
                 comSel = (this.selectedPinAssignment as any)[category][prop];
             }
-            if ((this.currentPinAssignment as Device)[category as keyof Device]) {
+            if (this.currentPinAssignment && category in this.currentPinAssignment) {
                 comCur = (this.currentPinAssignment as any)[category][prop];
             }
 

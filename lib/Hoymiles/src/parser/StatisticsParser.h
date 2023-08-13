@@ -104,8 +104,11 @@ typedef struct {
 
 class StatisticsParser : public Parser {
 public:
+    StatisticsParser();
     void clearBuffer();
     void appendFragment(uint8_t offset, uint8_t* payload, uint8_t len);
+    void beginAppendFragment();
+    void endAppendFragment();
 
     void setByteAssignment(const byteAssign_t* byteAssignment, uint8_t size);
 
@@ -142,8 +145,10 @@ private:
 
     const byteAssign_t* _byteAssignment;
     uint8_t _byteAssignmentSize;
-    uint8_t _expectedByteCount;
+    uint8_t _expectedByteCount = 0;
     std::list<fieldSettings_t> _fieldSettings;
 
     uint32_t _rxFailureCount = 0;
+
+    SemaphoreHandle_t _xSemaphore;
 };

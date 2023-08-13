@@ -58,7 +58,7 @@ void WebApiWebappClass::init(AsyncWebServer* server)
 #ifdef AUTO_GIT_HASH
         // check client If-None-Match header vs ETag/AUTO_GIT_HASH
         bool eTagMatch = false;
-        if(request->hasHeader("If-None-Match")){
+        if (request->hasHeader("If-None-Match")) {
             AsyncWebHeader* h = request->getHeader("If-None-Match");
             if (strncmp(AUTO_GIT_HASH, h->value().c_str(), strlen(AUTO_GIT_HASH)) == 0) {
                 eTagMatch = true;
