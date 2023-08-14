@@ -27,11 +27,13 @@ bool DevInfoAllCommand::handleResponse(InverterAbstract* inverter, fragment_t fr
 
     // Move all fragments into target buffer
     uint8_t offs = 0;
+    inverter->DevInfo()->beginAppendFragment();
     inverter->DevInfo()->clearBufferAll();
     for (uint8_t i = 0; i < max_fragment_id; i++) {
         inverter->DevInfo()->appendFragmentAll(offs, fragment[i].fragment, fragment[i].len);
         offs += (fragment[i].len);
     }
+    inverter->DevInfo()->endAppendFragment();
     inverter->DevInfo()->setLastUpdateAll(millis());
     return true;
 }

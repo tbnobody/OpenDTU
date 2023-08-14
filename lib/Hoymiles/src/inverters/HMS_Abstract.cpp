@@ -14,13 +14,14 @@ HMS_Abstract::HMS_Abstract(HoymilesRadio* radio, uint64_t serial)
 
 bool HMS_Abstract::sendChangeChannelRequest()
 {
-    if (!(getEnableCommands() && getEnablePolling())) {
+    if (!(getEnableCommands() || getEnablePolling())) {
         return false;
     }
 
-    ChannelChangeCommand* cmdChannel = _radio->enqueCommand<ChannelChangeCommand>();
+    auto cmdChannel = _radio->prepareCommand<ChannelChangeCommand>();
     cmdChannel->setChannel(HoymilesRadio_CMT::getChannelFromFrequency(Hoymiles.getRadioCmt()->getInverterTargetFrequency()));
     cmdChannel->setTargetAddress(serial());
+    _radio->enqueCommand(cmdChannel);
 
     return true;
 };

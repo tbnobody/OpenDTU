@@ -85,8 +85,8 @@
                             <div class="row mb-3">
                                 <label for="inputDisplayContrast" class="col-sm-2 col-form-label">{{
                                     $t('deviceadmin.Contrast', { contrast: $n(deviceConfigList.display.contrast / 100,
-                                        'percent')
-                                }) }}</label>
+                                            'percent')
+                                    }) }}</label>
                                 <div class="col-sm-10">
                                     <input type="range" class="form-range" min="0" max="100" id="inputDisplayContrast"
                                         v-model="deviceConfigList.display.contrast" />
@@ -120,7 +120,7 @@ export default defineComponent({
         BootstrapAlert,
         InputElement,
         PinInfo,
-        },
+    },
     data() {
         return {
             dataLoading: true,
@@ -157,7 +157,12 @@ export default defineComponent({
                         this.pinMappingList = data;
                     }
                 )
-                .catch(() => {
+                .catch((error) => {
+                    if (error.status != 404) {
+                        this.alertMessage = this.$t('deviceadmin.ParseError', { error: error.message });
+                        this.alertType = 'danger';
+                        this.showAlert = true;
+                    }
                     this.pinMappingList = Array<Device>();
                 })
                 .finally(() => {

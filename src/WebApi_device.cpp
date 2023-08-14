@@ -125,7 +125,8 @@ void WebApiDeviceClass::onDeviceAdminPost(AsyncWebServerRequest* request)
         return;
     }
 
-    if (!(root.containsKey("curPin") || root.containsKey("display"))) {
+    if (!(root.containsKey("curPin")
+            || root.containsKey("display"))) {
         retMsg["message"] = "Values are missing!";
         retMsg["code"] = WebApiError::GenericValueMissing;
         response->setLength();

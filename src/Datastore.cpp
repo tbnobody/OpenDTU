@@ -6,18 +6,7 @@
 #include "Configuration.h"
 #include <Hoymiles.h>
 
-#define DAT_SEMAPHORE_TAKE() \
-    do {                     \
-    } while (xSemaphoreTake(_xSemaphore, portMAX_DELAY) != pdPASS)
-#define DAT_SEMAPHORE_GIVE() xSemaphoreGive(_xSemaphore)
-
 DatastoreClass Datastore;
-
-DatastoreClass::DatastoreClass()
-{
-    _xSemaphore = xSemaphoreCreateMutex();
-    DAT_SEMAPHORE_GIVE(); // release before first use
-}
 
 void DatastoreClass::init()
 {
@@ -30,8 +19,9 @@ void DatastoreClass::loop()
 
         uint8_t isProducing = 0;
         uint8_t isReachable = 0;
+        uint8_t pollEnabledCount = 0;
 
-        DAT_SEMAPHORE_TAKE();
+        std::lock_guard<std::mutex> lock(_mutex);
 
         _totalAcYieldTotalEnabled = 0;
         _totalAcYieldTotalDigits = 0;
@@ -60,6 +50,10 @@ void DatastoreClass::loop()
             auto cfg = Configuration.getInverterConfig(inv->serial());
             if (cfg == nullptr) {
                 continue;
+            }
+
+            if (inv->getEnablePolling()) {
+                pollEnabledCount++;
             }
 
             if (inv->isProducing()) {
@@ -107,10 +101,9 @@ void DatastoreClass::loop()
 
         _isAtLeastOneProducing = isProducing > 0;
         _isAtLeastOneReachable = isReachable > 0;
+        _isAtLeastOnePollEnabled = pollEnabledCount > 0;
 
         _totalDcIrradiation = _totalDcIrradiationInstalled > 0 ? _totalDcPowerIrradiation / _totalDcIrradiationInstalled * 100.0f : 0;
-
-        DAT_SEMAPHORE_GIVE();
 
         _updateTimeout.reset();
     }
@@ -118,120 +111,96 @@ void DatastoreClass::loop()
 
 float DatastoreClass::getTotalAcYieldTotalEnabled()
 {
-    DAT_SEMAPHORE_TAKE();
-    float retval = _totalAcYieldTotalEnabled;
-    DAT_SEMAPHORE_GIVE();
-    return retval;
+    std::lock_guard<std::mutex> lock(_mutex);
+    return _totalAcYieldTotalEnabled;
 }
 
 float DatastoreClass::getTotalAcYieldDayEnabled()
 {
-    DAT_SEMAPHORE_TAKE();
-    float retval = _totalAcYieldDayEnabled;
-    DAT_SEMAPHORE_GIVE();
-    return retval;
+    std::lock_guard<std::mutex> lock(_mutex);
+    return _totalAcYieldDayEnabled;
 }
 
 float DatastoreClass::getTotalAcPowerEnabled()
 {
-    DAT_SEMAPHORE_TAKE();
-    float retval = _totalAcPowerEnabled;
-    DAT_SEMAPHORE_GIVE();
-    return retval;
+    std::lock_guard<std::mutex> lock(_mutex);
+    return _totalAcPowerEnabled;
 }
 
 float DatastoreClass::getTotalDcPowerEnabled()
 {
-    DAT_SEMAPHORE_TAKE();
-    float retval = _totalDcPowerEnabled;
-    DAT_SEMAPHORE_GIVE();
-    return retval;
+    std::lock_guard<std::mutex> lock(_mutex);
+    return _totalDcPowerEnabled;
 }
 
 float DatastoreClass::getTotalDcPowerIrradiation()
 {
-    DAT_SEMAPHORE_TAKE();
-    float retval = _totalDcPowerIrradiation;
-    DAT_SEMAPHORE_GIVE();
-    return retval;
+    std::lock_guard<std::mutex> lock(_mutex);
+    return _totalDcPowerIrradiation;
 }
 
 float DatastoreClass::getTotalDcIrradiationInstalled()
 {
-    DAT_SEMAPHORE_TAKE();
-    float retval = _totalDcIrradiationInstalled;
-    DAT_SEMAPHORE_GIVE();
-    return retval;
+    std::lock_guard<std::mutex> lock(_mutex);
+    return _totalDcIrradiationInstalled;
 }
 
 float DatastoreClass::getTotalDcIrradiation()
 {
-    DAT_SEMAPHORE_TAKE();
-    float retval = _totalDcIrradiation;
-    DAT_SEMAPHORE_GIVE();
-    return retval;
+    std::lock_guard<std::mutex> lock(_mutex);
+    return _totalDcIrradiation;
 }
 
 unsigned int DatastoreClass::getTotalAcYieldTotalDigits()
 {
-    DAT_SEMAPHORE_TAKE();
-    unsigned int retval = _totalAcYieldTotalDigits;
-    DAT_SEMAPHORE_GIVE();
-    return retval;
+    std::lock_guard<std::mutex> lock(_mutex);
+    return _totalAcYieldTotalDigits;
 }
 
 unsigned int DatastoreClass::getTotalAcYieldDayDigits()
 {
-    DAT_SEMAPHORE_TAKE();
-    unsigned int retval = _totalAcYieldDayDigits;
-    DAT_SEMAPHORE_GIVE();
-    return retval;
+    std::lock_guard<std::mutex> lock(_mutex);
+    return _totalAcYieldDayDigits;
 }
 
 unsigned int DatastoreClass::getTotalAcPowerDigits()
 {
-    DAT_SEMAPHORE_TAKE();
-    unsigned int retval = _totalAcPowerDigits;
-    DAT_SEMAPHORE_GIVE();
-    return retval;
+    std::lock_guard<std::mutex> lock(_mutex);
+    return _totalAcPowerDigits;
 }
 
 unsigned int DatastoreClass::getTotalDcPowerDigits()
 {
-    DAT_SEMAPHORE_TAKE();
-    unsigned int retval = _totalDcPowerDigits;
-    DAT_SEMAPHORE_GIVE();
-    return retval;
+    std::lock_guard<std::mutex> lock(_mutex);
+    return _totalDcPowerDigits;
 }
 
 bool DatastoreClass::getIsAtLeastOneReachable()
 {
-    DAT_SEMAPHORE_TAKE();
-    bool retval = _isAtLeastOneReachable;
-    DAT_SEMAPHORE_GIVE();
-    return retval;
+    std::lock_guard<std::mutex> lock(_mutex);
+    return _isAtLeastOneReachable;
 }
 
 bool DatastoreClass::getIsAtLeastOneProducing()
 {
-    DAT_SEMAPHORE_TAKE();
-    bool retval = _isAtLeastOneProducing;
-    DAT_SEMAPHORE_GIVE();
-    return retval;
+    std::lock_guard<std::mutex> lock(_mutex);
+    return _isAtLeastOneProducing;
 }
 
 bool DatastoreClass::getIsAllEnabledProducing()
 {
-    DAT_SEMAPHORE_TAKE();
-    bool retval = _isAllEnabledProducing;
-    DAT_SEMAPHORE_GIVE();
-    return retval;
+    std::lock_guard<std::mutex> lock(_mutex);
+    return _isAllEnabledProducing;
 }
 
 bool DatastoreClass::getIsAllEnabledReachable()
 {
-    DAT_SEMAPHORE_TAKE();
-    bool retval = _isAllEnabledReachable;
-    DAT_SEMAPHORE_GIVE();
-    return retval;
+    std::lock_guard<std::mutex> lock(_mutex);
+    return _isAllEnabledReachable;
+}
+
+bool DatastoreClass::getIsAtLeastOnePollEnabled()
+{
+    std::lock_guard<std::mutex> lock(_mutex);
+    return _isAtLeastOnePollEnabled;
 }

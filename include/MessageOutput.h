@@ -4,14 +4,15 @@
 #include <AsyncWebSocket.h>
 #include <HardwareSerial.h>
 #include <Stream.h>
+#include <mutex>
 
 #define BUFFER_SIZE 500
 
 class MessageOutputClass : public Print {
 public:
-    MessageOutputClass();
     void loop();
-    size_t write(uint8_t c);
+    size_t write(uint8_t c) override;
+    size_t write(const uint8_t *buffer, size_t size) override;
     void register_ws_output(AsyncWebSocket* output);
 
 private:
@@ -21,7 +22,7 @@ private:
     uint32_t _lastSend = 0;
     bool _forceSend = false;
 
-    SemaphoreHandle_t _lock;
+    std::mutex _msgLock;
 };
 
 extern MessageOutputClass MessageOutput;
