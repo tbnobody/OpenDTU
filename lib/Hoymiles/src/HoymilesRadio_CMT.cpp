@@ -138,12 +138,12 @@ void HoymilesRadio_CMT::loop()
 
                         inv->addRxFragment(f.fragment, f.len);
                     } else {
-                        Hoymiles.getMessageOutput()->println("Inverter Not found!");
+                        Hoymiles.getMessageOutput()->println("Inverter not found!");
                     }
                 }
 
             } else {
-                Hoymiles.getMessageOutput()->println("Frame kaputt"); // ;-)
+                Hoymiles.getMessageOutput()->println("Corrupted frame detected"); // ;-)
             }
 
             // Remove paket from buffer even it was corrupted

@@ -20,6 +20,7 @@
 #include "WebApi_webapp.h"
 #include "WebApi_ws_console.h"
 #include "WebApi_ws_live.h"
+#include "WebApi_fronius.h"
 #include <ESPAsyncWebServer.h>
 
 class WebApiClass {
@@ -56,6 +57,7 @@ private:
     WebApiWebappClass _webApiWebapp;
     WebApiWsConsoleClass _webApiWsConsole;
     WebApiWsLiveClass _webApiWsLive;
+    WebApiFroniusClass _webApiFronius;
 };
 
 extern WebApiClass WebApi;

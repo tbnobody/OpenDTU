@@ -17,6 +17,7 @@
 #include "NtpSettings.h"
 #include "PinMapping.h"
 #include "SunPosition.h"
+#include "SunspecApi.h"
 #include "Utils.h"
 #include "WebApi.h"
 #include "defaults.h"
@@ -145,6 +146,12 @@ void setup()
     InverterSettings.init();
 
     Datastore.init();
+
+    MessageOutput.print("Initialize SunSpec API... ");
+    SunspecApi.init();
+    MessageOutput.println("done");
+
+    MessageOutput.println("Initialization finished");
 }
 
 void loop()
@@ -172,5 +179,7 @@ void loop()
     MessageOutput.loop();
     yield();
     LedSingle.loop();
+    yield();
+    SunspecApi.loop();
     yield();
 }
