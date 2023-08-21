@@ -1,3 +1,21 @@
+# OpenDTU with SunSpec compatible Modbus TCP
+
+This project is a fork of https://github.com/tbnobody/OpenDTU which extends OpenDTU with a SunSpec compatible ModbusTCP interface.
+The goal is to integrate it into a Victron Energy ESS (based on Venus OS).
+
+Additionally, two basic JSON endpoints are implemented, which allow ``dbus-fronius`` (the driver in Venus OS) to get the necessary information to connect multiple SunSpec inverters under the same IP address. From the perspective of "dbus-fronius", this makes OpenDTU behave like a Fronius inverter system with Datamanager.
+
+Current development status:
+
+The implementation is fundamentally complete. Inverters configured in OpenDTU are automatically recognized and integrated by Venus OS.
+Limit requests are basically transmitted, but this has not been fully tested yet. My Hoymiles HMS-2000-4T seems to support only down regulation to 25%; this could be a problem.
+
+During implementation, an incompatibility between the HTTP client in dbus-Fronius with the OpenDTU internal web server was found. A patch to dbus-Fronius was necessary, without which the integration would not work cleanly. (After a first successful HTTP call the following one does not run anymore; the autodetection aborts unfinished).
+
+The patched version of ``dbus-fronius`` can be found at https://github.com/tweidelt/dbus-fronius. I will provide a binary with installation instructions.
+
+For the implementation I replaced ESPAsyncWebServer and AsyncTCP by versions provided by [Phil Bowles](https://github.com/philbowles), because they are supposed to be particularly stable. ESPAsyncWebServer had to be forked and rebuilt. I may replace ESPAsyncWebServer and AsyncTCP with the official versions again at a later time.
+
 # OpenDTU
 
 [![OpenDTU Build](https://github.com/tbnobody/OpenDTU/actions/workflows/build.yml/badge.svg)](https://github.com/tbnobody/OpenDTU/actions/workflows/build.yml)
