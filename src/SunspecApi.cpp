@@ -17,6 +17,17 @@ SunspecModel::~SunspecModel()
 {
 }
 
+float bound(float lower, float value, float upper)
+{
+    if (value < lower) {
+        return lower;
+    }
+    if (value > upper) {
+        return upper;
+    }
+    return value;
+}
+
 size_t FindUtf8CutPosition(const String& str, size_t max_size)
 {
     if (str.length() <= max_size) {
@@ -87,7 +98,9 @@ void SunspecApiClass::init()
     auto invCount = Hoymiles.getNumInverters();
     for (uint8_t i = 0; i < invCount; i++) {
         auto unitId = SunspecConstants::BASE_UNIT_ID + i;
-        mb.registerWorker(unitId, READ_HOLD_REGISTER, std::bind(&SunspecApiClass::FC03, this, std::placeholders::_1));
+        mb.registerWorker(unitId, READ_HOLD_REGISTER, std::bind(&SunspecApiClass::readHoldRegister, this, std::placeholders::_1));
+        mb.registerWorker(unitId, WRITE_HOLD_REGISTER, std::bind(&SunspecApiClass::writeHoldRegister, this, std::placeholders::_1));
+        mb.registerWorker(unitId, WRITE_MULT_REGISTERS, std::bind(&SunspecApiClass::writeMultipleRegisters, this, std::placeholders::_1));
     }
 
     mb.start(502, 10, 10000);
@@ -95,7 +108,7 @@ void SunspecApiClass::init()
 
 void SunspecApiClass::updateAllRegisters()
 {
-    MessageOutput.println("SunspecApiClass::updateRegisters for all unit IDs");
+    MessageOutput.println("Sunspec: updateRegisters for all unit IDs");
 
     auto invCount = Hoymiles.getNumInverters();
     for (uint8_t i = 0; i < invCount; i++) {
@@ -113,7 +126,7 @@ void SunspecApiClass::loop()
     }
 }
 
-ModbusMessage SunspecApiClass::FC03(ModbusMessage request)
+ModbusMessage SunspecApiClass::readHoldRegister(ModbusMessage request)
 {
     ModbusMessage response;
     uint8_t unitId = request.getServerID(); // The unit ID of the request
@@ -122,22 +135,87 @@ ModbusMessage SunspecApiClass::FC03(ModbusMessage request)
     request.get(2, addr); // read address from request
     request.get(4, words); // read # of words from request
 
-    MessageOutput.println("SunspecApiClass::FC03 request for unit " + String(unitId) + ", addr " + String(addr) + ", words " + String(words));
+    MessageOutput.println("Sunspec: readHoldRegister request for unit " + String(unitId) + ", addr " + String(addr) + ", words " + String(words));
 
     if (unitId < 1 || unitId > SunspecConstants::BASE_UNIT_ID + Hoymiles.getNumInverters() - 1) {
-        MessageOutput.println("SunspecApiClass::FC03 - invalid unit ID " + unitId);
-        response.setError(unitId, request.getFunctionCode(), ILLEGAL_DATA_ADDRESS);
-        return response;
+        return error("Sunspec: readHoldRegister - invalid unit ID " + unitId, unitId, request, ILLEGAL_DATA_ADDRESS, response);
     }
 
     // Request for FC 0x03?
     if (request.getFunctionCode() != READ_HOLD_REGISTER) {
-        MessageOutput.println("SunspecApiClass::FC03 - unsupported function code " + request.getFunctionCode());
-        response.setError(unitId, request.getFunctionCode(), ILLEGAL_FUNCTION);
-        return response;
+        return error("Sunspec: readHoldRegister - unsupported function code " + request.getFunctionCode(), unitId, request, ILLEGAL_FUNCTION, response);
     }
 
-    updateResponse(response, unitId, addr, words);
+    updateReadResponse(response, unitId, addr, words);
+    return response;
+}
+
+ModbusMessage SunspecApiClass::writeHoldRegister(ModbusMessage request)
+{
+    ModbusMessage response;
+    uint8_t unitId = request.getServerID(); // The unit ID of the request
+    uint16_t addr = 0; // Start address
+    uint16_t value = 0; // Value to write
+    request.get(2, addr); // read address from request
+    request.get(4, value); // read value from request
+
+    MessageOutput.println("Sunspec: writeHoldRegister request for unit " + String(unitId) + ", addr " + String(addr) + ", value " + String(value));
+
+    if (unitId < 1 || unitId > SunspecConstants::BASE_UNIT_ID + Hoymiles.getNumInverters() - 1) {
+        return error("Sunspec: writeHoldRegister - invalid unit ID " + unitId, unitId, request, ILLEGAL_DATA_ADDRESS, response);
+    }
+
+    // Request for FC 0x06?
+    if (request.getFunctionCode() != WRITE_HOLD_REGISTER) {
+        return error("Sunspec: writeHoldRegister - unsupported function code " + request.getFunctionCode(), unitId, request, ILLEGAL_FUNCTION, response);
+    }
+
+    writeRegister(unitId, addr, value);
+    response.setServerID(request.getServerID());
+    response.setFunctionCode(request.getFunctionCode());
+    response.add(addr);
+    response.add(value);
+    return response;
+}
+
+ModbusMessage SunspecApiClass::writeMultipleRegisters(ModbusMessage request)
+{
+    ModbusMessage response;
+    uint8_t unitId = request.getServerID(); // The unit ID of the request
+    uint16_t addr = 0; // Start address
+    uint16_t words = 0; // # of words (16 bit registers) requested
+    uint8_t byteCount = 0; // # of bytes requested
+    request.get(2, addr); // read address from request
+    request.get(4, words); // read # of words from request
+    request.get(6, byteCount); // read # of bytes from request
+
+    MessageOutput.println("Sunspec: writeMultipleRegisters request for unit " + String(unitId) + ", addr " + String(addr) + ", words " + String(words) + ", byteCount " + String(byteCount));
+
+    if (unitId < 1 || unitId > SunspecConstants::BASE_UNIT_ID + Hoymiles.getNumInverters() - 1) {
+        return error("Sunspec: writeMultipleRegisters - invalid unit ID " + unitId, unitId, request, ILLEGAL_DATA_ADDRESS, response);
+    }
+
+    if (byteCount != words * 2) {
+        return error("Sunspec: writeMultipleRegisters - byteCount doesn't match number of registers to read", unitId, request, ILLEGAL_DATA_ADDRESS, response);
+    }
+
+    // Request for FC 0x10?
+    if (request.getFunctionCode() != WRITE_MULT_REGISTERS) {
+        return error("Sunspec: writeMultipleRegisters - unsupported function code " + request.getFunctionCode(), unitId, request, ILLEGAL_FUNCTION, response);
+    }
+
+    for (uint16_t i = 0; i < words; i++) {
+        uint16_t value;
+        request.get(7 + i * 2, value); // read value from request
+
+        writeRegister(unitId, addr + i, value);
+    }
+
+    response.setServerID(request.getServerID());
+    response.setFunctionCode(request.getFunctionCode());
+    response.add(addr);
+    response.add(words);
+    response.add(byteCount);
     return response;
 }
 
@@ -199,14 +277,7 @@ float SunspecApiClass::calcDcVoltageChannelAverage(std::shared_ptr<InverterAbstr
 
 void SunspecApiClass::updateRegisters(uint8_t unitId)
 {
-    //MessageOutput.println("SunspecApiClass::updateRegisters for unit ID " + String(unitId));
-
-    // Sun Spec Scale Factors
-    const int16_t acCurrentScaleFactor = -2;
-    const int16_t acVoltageScaleFactor = -1;
-    const int16_t acPowerScaleFactor = -1;
-    const int16_t acFrequencyScaleFactor = -2;
-    const int16_t acReactivePowerScaleFactor = -1;
+    //MessageOutput.println("Sunspec: updateRegisters for unit ID " + String(unitId));
 
     auto inv = Hoymiles.getInverterByPos(unitId - SunspecConstants::BASE_UNIT_ID);
 
@@ -226,27 +297,37 @@ void SunspecApiClass::updateRegisters(uint8_t unitId)
         .add(0x8000) // Pad
         .commit();
 
-    // Sunspec Single Phase Inverter (Model 101)
     uint8_t phasesCount = determinePhasesCount(inv);
     float acCurrentTotal = inverterFieldValue(inv, TYPE_AC, CH0, FLD_IAC);
+    if (isnan(acCurrentTotal)) {
+        auto i1 = inverterFieldValue(inv, TYPE_AC, CH0, FLD_IAC_1);
+        auto i2 = inverterFieldValue(inv, TYPE_AC, CH0, FLD_IAC_2);
+        auto i3 = inverterFieldValue(inv, TYPE_AC, CH0, FLD_IAC_3);
+        acCurrentTotal = isnan(i1) ? 0 : i1 + isnan(i2) ? 0 : i2 + isnan(i3) ? 0 : i3;
+    }
     float acReactivePower = inverterFieldValue(inv, TYPE_AC, CH0, FLD_Q);
     float acCurrentPhase1 = inverterFieldValue(inv, TYPE_AC, CH0, FLD_IAC_1);
     float acCurrentPhase2 = inverterFieldValue(inv, TYPE_AC, CH0, FLD_IAC_2);
     float acCurrentPhase3 = inverterFieldValue(inv, TYPE_AC, CH0, FLD_IAC_3);
     float acVoltagePhaseToN1 = inverterFieldValue(inv, TYPE_AC, CH0, FLD_UAC_1N);
+    if (isnan(acVoltagePhaseToN1)) {
+        acVoltagePhaseToN1 = inverterFieldValue(inv, TYPE_AC, CH0, FLD_UAC);
+    }
     float acVoltagePhaseToN2 = inverterFieldValue(inv, TYPE_AC, CH0, FLD_UAC_2N);
     float acVoltagePhaseToN3 = inverterFieldValue(inv, TYPE_AC, CH0, FLD_UAC_3N);
     float acPower = inverterFieldValue(inv, TYPE_AC, CH0, FLD_PAC);
     float acFrequency = inverterFieldValue(inv, TYPE_AC, CH0, FLD_F);
-    float acPowerFactor = inverterFieldValue(inv, TYPE_AC, CH0, FLD_PF);
+    float acPowerFactor = inverterFieldValue(inv, TYPE_AC, CH0, FLD_PF) || 100;
     float acLifetimeEnergy = inverterFieldValue(inv, TYPE_AC, CH0, FLD_YT, 1000);
     float dcVoltage = calcDcVoltageChannelAverage(inv);
     float dcPower = calcDcPowerChannelSum(inv);
     float dcCurrent = dcVoltage == 0 ? 0 : (dcPower / dcVoltage);
     float temperature = inverterFieldValue(inv, TYPE_INV, CH0, FLD_T);
-    float powerLimit = inv->SystemConfigPara()->getLimitPercent();
+    float acPowerLimitPct = bound(0, inv->SystemConfigPara()->getLimitPercent(), 100) || 100; // 0 to 100
+    boolean acPowerLimitEnabled = acPowerLimitPct < 100;
 
-    newModel(unitId, 100 + phasesCount, (uint16_t)(SunspecConstants::COMMON_BASE_ADDRESS + 70))
+    // Sunspec Simple Inverter Model 10x
+    newModel(unitId, 100 + phasesCount, SunspecConstants::INVERTER_MODEL_10X_BASE_ADDRESS)
         .add((acCurrentTotal * pow(10, -acCurrentScaleFactor)))
         .add(isnan(acCurrentPhase1) ? 0x8000 : (uint16_t)acCurrentPhase1 * pow(10, -acCurrentScaleFactor))
         .add(isnan(acCurrentPhase2) ? 0x8000 : (uint16_t)acCurrentPhase2 * pow(10, -acCurrentScaleFactor))
@@ -287,20 +368,20 @@ void SunspecApiClass::updateRegisters(uint8_t unitId)
         .add(0x8000)
         .commit();
 
-    // Sunspec Single Phase Inverter (Model 111)
-    newModel(unitId, 110 + phasesCount, (uint16_t)(SunspecConstants::COMMON_BASE_ADDRESS + 110))
-        .addFloat(acCurrentTotal)
-        .addFloat(acCurrentPhase1)
-        .addFloat(acCurrentPhase2)
-        .addFloat(acCurrentPhase3)
-        .addFloat(NAN) // Phase Voltage 12
-        .addFloat(NAN) // Phase Voltage 23
-        .addFloat(NAN) // Phase Voltage 31
-        .addFloat(acVoltagePhaseToN1)
-        .addFloat(acVoltagePhaseToN2)
-        .addFloat(acVoltagePhaseToN3)
-        .addFloat(acPower)
-        .addFloat(acFrequency)
+    // SunSpec Float Inverter Model 11x
+    newModel(unitId, 110 + phasesCount, SunspecConstants::INVERTER_MODEL_11X_BASE_ADDRESS)
+        .addFloat(acCurrentTotal) // 112
+        .addFloat(acCurrentPhase1) // 114
+        .addFloat(acCurrentPhase2) // 116
+        .addFloat(acCurrentPhase3) // 118
+        .addFloat(NAN) // Phase Voltage 12 // 120
+        .addFloat(NAN) // Phase Voltage 23 // 122
+        .addFloat(NAN) // Phase Voltage 31 // 124
+        .addFloat(acVoltagePhaseToN1) // 126
+        .addFloat(acVoltagePhaseToN2) // 128
+        .addFloat(acVoltagePhaseToN3) // 130
+        .addFloat(acPower) // 132
+        .addFloat(acFrequency) // 134
         .addFloat(NAN) // VA
         .addFloat(acReactivePower)
         .addFloat(acPowerFactor)
@@ -334,27 +415,43 @@ void SunspecApiClass::updateRegisters(uint8_t unitId)
         .add(0x8000)
         .commit();
 
-    // Sunspec Immediate Controls (Model 123)
-    auto nextAddr = newModel(unitId, 123, (uint16_t)(SunspecConstants::COMMON_BASE_ADDRESS + 184))
+    // SunSpec Immediate Controls (Model 123)
+    auto nextAddr = newModel(unitId, 123, SunspecConstants::INVERTER_MODEL_IMMEDIATE_CONTROLS_BASE_ADDRESS)
+                        .add(0x8000) // Conn_WinTms
+                        .add(0x8000) // Conn_RvrtTms
+                        .add(1) // Conn: 0 or 1 (DISCONNECT/CONNECT)
+                        .add(acPowerLimitPct * pow(10, -acPowerLimitScaleFactor)) // WMaxLimPct
+                        .add(0x8000) // WMaxLimPct_WinTms
+                        .add(0x8000) // WMaxLimPct_RvrtTms
+                        .add(0x8000) // WMaxLimPct_RmpTms
+                        .add(acPowerLimitEnabled)
+                        .add(acPowerFactor * pow(10, -acPowerFactorScaleFactor))
+                        .add(0x8000) // OutPFSet_WinTms
+                        .add(0x8000) // OutPFSet_RvrtTms
+                        .add(0x8000) // OutPFSet_RmpTms
+                        .add(0) //OutPFSet_Ena (0 or 1)
+                        .add(0x8000) // VArWMaxPct
+                        .add(0x8000) // VArMaxPct
+                        .add(0x8000) // VArAvalPct
+                        .add(0x8000) // VArPct_WinTms
+                        .add(0x8000) // VArPct_RvrtTms
+                        .add(0x8000) // VArPct_RmpTms
+                        .add(0x8000) // VArPct_Mod
+                        .add(0) // VArPct_Ena (0 or 1)
+                        .add(acPowerLimitScaleFactor) // WMaxLimPct_SF
+                        .add(acPowerFactorScaleFactor) // OutPFSet_SF
                         .add(0x8000)
-                        .add(0x8000)
-                        .add(0x8000)
-                        .add(powerLimit) // 40189
-                        .add(0x8000)
-                        .add(0x8000)
-                        .add(0x8000)
-                        .add(powerLimit >= 0 && powerLimit < 100) // 40193
                         .commit();
 
     // Sunspec end marker
     newModel(unitId, 0xFFFF, nextAddr).commit();
 }
 
-void SunspecApiClass::updateResponse(ModbusMessage& response, uint8_t unitId, uint16_t addr, uint16_t words)
+void SunspecApiClass::updateReadResponse(ModbusMessage& response, uint8_t unitId, uint16_t addr, uint16_t words)
 {
     auto it = _memory.find(unitId);
     if (it == _memory.end()) {
-        MessageOutput.println("SunspecApiClass::updateResponse - invalid unit ID " + String(unitId));
+        MessageOutput.println("Sunspec: updateReadResponse - invalid unit ID " + String(unitId));
         response.setError(unitId, READ_HOLD_REGISTER, ILLEGAL_DATA_ADDRESS);
         return;
     }
@@ -364,7 +461,7 @@ void SunspecApiClass::updateResponse(ModbusMessage& response, uint8_t unitId, ui
     auto lastAddr = registers.rbegin()->first;
 
     if (addr < baseAddr || addr + words - 1 > lastAddr) {
-        MessageOutput.println("SunspecApiClass::updateResponse - address out of range [" + String(baseAddr) + ", " + String(lastAddr) + "]");
+        MessageOutput.println("Sunspec: updateReadResponse - address out of range [" + String(baseAddr) + ", " + String(lastAddr) + "]");
         response.setError(unitId, READ_HOLD_REGISTER, ILLEGAL_DATA_ADDRESS);
         return;
     }
@@ -379,4 +476,42 @@ void SunspecApiClass::updateResponse(ModbusMessage& response, uint8_t unitId, ui
             response.add(0x8000);
         }
     }
+}
+
+ModbusMessage SunspecApiClass::error(String message, uint8_t unitId, ModbusMessage request, Error errorCode, ModbusMessage response)
+{
+    MessageOutput.println(message);
+    response.setError(unitId, request.getFunctionCode(), errorCode);
+    return response;
+}
+
+void SunspecApiClass::writeRegister(uint8_t unitId, uint16_t addr, uint16_t value) {
+    MessageOutput.print("SunSpec: writing value " + String(value) + " to register " + String(addr));
+
+    auto inv = Hoymiles.getInverterByPos(unitId - SunspecConstants::BASE_UNIT_ID);
+
+    switch (addr) {
+    {
+        case SunspecConstants::INVERTER_MODEL_IMMEDIATE_CONTROLS_BASE_ADDRESS + 5: {
+            MessageOutput.print(": set power-limit");
+            float acPowerLimitPct = bound(2, value / pow(10, -acPowerLimitScaleFactor), 100); // 2 to 100 (Inverter does not support values < 2%)
+            _powerLimitPct = acPowerLimitPct;
+            if (inv->SystemConfigPara()->getLimitPercent() < 100) {
+                // If power-limit is already enabled, update the limit
+                inv->SystemConfigPara()->setLimitPercent(acPowerLimitPct);
+            }
+            break;
+        }
+
+        case SunspecConstants::INVERTER_MODEL_IMMEDIATE_CONTROLS_BASE_ADDRESS + 14: {
+            MessageOutput.print(": power-limit enable/disable");
+            inv->SystemConfigPara()->setLimitPercent(value ? _powerLimitPct : 100);
+            break;
+        }
+
+        default:
+            MessageOutput.print(": unsupported, skipped");
+        }
+    }
+    MessageOutput.println();
 }
