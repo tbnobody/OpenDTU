@@ -281,11 +281,13 @@ static bool isMidnight()
     time(&raw);
     localtime_r(&raw, &info);
 
-    if (!info.tm_hour && !reminder) {
-        // midnight detected
-        if (info.tm_min > 1)
-            reminder = true;
-        return true;
+    if (!info.tm_hour) {
+        if (!reminder) {
+            // midnight detected
+            if (info.tm_min > 1)
+                reminder = true;
+            return true;
+        }
     } else
         reminder = false;
 
