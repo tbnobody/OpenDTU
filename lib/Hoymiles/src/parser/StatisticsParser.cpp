@@ -277,13 +277,13 @@ static bool isMidnight()
     static bool reminder = false;
 
     time_t raw;
-    struct tm *info;
+    struct tm info;
     time(&raw);
-    info = localtime(&raw);
+    localtime_r(&raw, &info);
 
-    if (!info->tm_hour && !reminder) {
+    if (!info.tm_hour && !reminder) {
         // midnight detected
-        if (info->tm_min > 1)
+        if (info.tm_min > 1)
             reminder = true;
         return true;
     } else
