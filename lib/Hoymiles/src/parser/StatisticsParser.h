@@ -139,7 +139,6 @@ public:
     void incrementRxFailureCount();
     uint32_t getRxFailureCount();
 
-    float updateCurrentYieldTotal(float yield);
     float updateCurrentYieldDay(float yield);
 
 private:
@@ -154,9 +153,7 @@ private:
 
     uint32_t _rxFailureCount = 0;
 
-    float _YieldTotalCh0Offset = 0;
     float _YieldDayCh0Offset = 0;
-    float _lastYieldTotalCh0 = 0;
     float _lastYieldDayCh0 = 0;
 
     SemaphoreHandle_t _xSemaphore;
