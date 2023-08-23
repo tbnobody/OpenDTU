@@ -10,6 +10,7 @@
     } while (xSemaphoreTake(_xSemaphore, portMAX_DELAY) != pdPASS)
 #define HOY_SEMAPHORE_GIVE() xSemaphoreGive(_xSemaphore)
 
+static bool isMidnight();
 static float calcYieldTotalCh0(StatisticsParser* iv, uint8_t arg0);
 static float calcYieldDayCh0(StatisticsParser* iv, uint8_t arg0);
 static float calcUdcCh(StatisticsParser* iv, uint8_t arg0);
@@ -253,13 +254,67 @@ uint32_t StatisticsParser::getRxFailureCount()
     return _rxFailureCount;
 }
 
+float StatisticsParser::updateCurrentYieldTotal(float yield)
+{
+    if (isMidnight()) {
+        _YieldTotalCh0Offset = 0;
+        _lastYieldTotalCh0 = 0;
+    }
+
+    if (!yield) {
+        _YieldTotalCh0Offset += _lastYieldTotalCh0;
+        _lastYieldTotalCh0 = 0;
+    } else
+        _lastYieldTotalCh0 = yield;
+
+    return _YieldTotalCh0Offset + yield;
+}
+
+float StatisticsParser::updateCurrentYieldDay(float yield)
+{
+    if (isMidnight()) {
+        _YieldDayCh0Offset = 0;
+        _lastYieldDayCh0 = 0;
+    }
+
+    if (!yield) {
+        _YieldDayCh0Offset += _lastYieldDayCh0;
+        _lastYieldDayCh0 = 0;
+    } else
+        _lastYieldDayCh0 = yield;
+
+    return _YieldDayCh0Offset + yield;
+}
+
+
+// return true between 0:00 and 0:01
+static bool isMidnight()
+{
+    static bool reminder = false;
+
+    time_t raw;
+    struct tm *info;
+    time(&raw);
+    info = localtime(&raw);
+
+    if (!info->tm_hour && !reminder) {
+        // midnight detected
+        if (info->tm_min > 1)
+            reminder = true;
+        return true;
+    } else
+        reminder = false;
+
+    return false;
+}
+
 static float calcYieldTotalCh0(StatisticsParser* iv, uint8_t arg0)
 {
     float yield = 0;
     for (auto& channel : iv->getChannelsByType(TYPE_DC)) {
         yield += iv->getChannelFieldValue(TYPE_DC, channel, FLD_YT);
     }
-    return yield;
+    return iv->updateCurrentYieldTotal(yield);
 }
 
 static float calcYieldDayCh0(StatisticsParser* iv, uint8_t arg0)
@@ -268,7 +323,7 @@ static float calcYieldDayCh0(StatisticsParser* iv, uint8_t arg0)
     for (auto& channel : iv->getChannelsByType(TYPE_DC)) {
         yield += iv->getChannelFieldValue(TYPE_DC, channel, FLD_YD);
     }
-    return yield;
+    return iv->updateCurrentYieldDay(yield);
 }
 
 // arg0 = channel of source
