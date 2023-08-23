@@ -139,6 +139,9 @@ public:
     void incrementRxFailureCount();
     uint32_t getRxFailureCount();
 
+    float updateCurrentYieldTotal(float yield);
+    float updateCurrentYieldDay(float yield);
+
 private:
     uint8_t _payloadStatistic[STATISTIC_PACKET_SIZE] = {};
     uint8_t _statisticLength = 0;
@@ -150,6 +153,11 @@ private:
     std::list<fieldSettings_t> _fieldSettings;
 
     uint32_t _rxFailureCount = 0;
+
+    float _YieldTotalCh0Offset = 0;
+    float _YieldDayCh0Offset = 0;
+    float _lastYieldTotalCh0 = 0;
+    float _lastYieldDayCh0 = 0;
 
     SemaphoreHandle_t _xSemaphore;
 };
