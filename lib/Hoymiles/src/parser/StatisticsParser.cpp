@@ -10,7 +10,7 @@
     } while (xSemaphoreTake(_xSemaphore, portMAX_DELAY) != pdPASS)
 #define HOY_SEMAPHORE_GIVE() xSemaphoreGive(_xSemaphore)
 
-static bool isMidnight();
+static int getWeekDay();
 static float calcYieldTotalCh0(StatisticsParser* iv, uint8_t arg0);
 static float calcYieldDayCh0(StatisticsParser* iv, uint8_t arg0);
 static float calcUdcCh(StatisticsParser* iv, uint8_t arg0);
@@ -256,10 +256,18 @@ uint32_t StatisticsParser::getRxFailureCount()
 
 float StatisticsParser::updateCurrentYieldDay(float yield)
 {
-    if (isMidnight()) {
-        _YieldDayCh0Offset = 0;
-        _lastYieldDayCh0 = 0;
-    }
+    int wd = getWeekDay();
+
+    if (-1 == _laskWeekDay)
+        _laskWeekDay = wd;
+    else
+        if (wd != _laskWeekDay) {
+            // new day detected, reset counters
+            _YieldDayCh0Offset = 0;
+            _lastYieldDayCh0 = 0;
+
+            _laskWeekDay = wd;
+        }
 
     if (!yield) {
         _YieldDayCh0Offset += _lastYieldDayCh0;
@@ -271,27 +279,13 @@ float StatisticsParser::updateCurrentYieldDay(float yield)
 }
 
 
-// return true between 0:00 and 0:01
-static bool isMidnight()
+static int getWeekDay()
 {
-    static bool reminder = false;
-
     time_t raw;
     struct tm info;
     time(&raw);
     localtime_r(&raw, &info);
-
-    if (!info.tm_hour) {
-        if (!reminder) {
-            // midnight detected
-            if (info.tm_min > 1)
-                reminder = true;
-            return true;
-        }
-    } else
-        reminder = false;
-
-    return false;
+    return info.tm_mday; 
 }
 
 static float calcYieldTotalCh0(StatisticsParser* iv, uint8_t arg0)
