@@ -150,6 +150,13 @@ float StatisticsParser::getChannelFieldValue(ChannelType_t type, ChannelNum_t ch
     return 0;
 }
 
+String StatisticsParser::getChannelFieldValueString(ChannelType_t type, ChannelNum_t channel, FieldId_t fieldId)
+{
+    return String(
+        getChannelFieldValue(type, channel, fieldId),
+        static_cast<unsigned int>(getChannelFieldDigits(type, channel, fieldId)));
+}
+
 bool StatisticsParser::hasChannelFieldValue(ChannelType_t type, ChannelNum_t channel, FieldId_t fieldId)
 {
     const byteAssign_t* pos = getAssignmentByChannelField(type, channel, fieldId);
