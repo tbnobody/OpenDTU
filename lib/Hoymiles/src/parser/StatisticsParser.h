@@ -119,6 +119,7 @@ public:
     fieldSettings_t* getSettingByChannelField(ChannelType_t type, ChannelNum_t channel, FieldId_t fieldId);
 
     float getChannelFieldValue(ChannelType_t type, ChannelNum_t channel, FieldId_t fieldId);
+    String getChannelFieldValueString(ChannelType_t type, ChannelNum_t channel, FieldId_t fieldId);
     bool hasChannelFieldValue(ChannelType_t type, ChannelNum_t channel, FieldId_t fieldId);
     const char* getChannelFieldUnit(ChannelType_t type, ChannelNum_t channel, FieldId_t fieldId);
     const char* getChannelFieldName(ChannelType_t type, ChannelNum_t channel, FieldId_t fieldId);
