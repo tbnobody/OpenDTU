@@ -326,6 +326,8 @@ void SunspecApiClass::updateRegisters(uint8_t unitId)
     float acPowerLimitPct = bound(0, inv->SystemConfigPara()->getLimitPercent(), 100) || 100; // 0 to 100
     boolean acPowerLimitEnabled = acPowerLimitPct < 100;
 
+    float acMaxPower = inv->DevInfo()->getMaxPower();
+
     // Sunspec Simple Inverter Model 10x
     newModel(unitId, 100 + phasesCount, SunspecConstants::INVERTER_MODEL_10X_BASE_ADDRESS)
         .add((acCurrentTotal * pow(10, -acCurrentScaleFactor)))
@@ -348,11 +350,11 @@ void SunspecApiClass::updateRegisters(uint8_t unitId)
         .add(0x8000)
         .add((acReactivePower * pow(10, -acReactivePowerScaleFactor)))
         .add(acReactivePowerScaleFactor)
-        .add(0x8000)
-        .add(0x8000)
-        .add(0x8000)
-        .add(0x8000)
-        .add(0x8000)
+        .add(0x8000) //22
+        .add(0x8000) //23
+        .add((acLifetimeEnergy * pow(10, -acLifetimeEnergyScaleFactor))) //24
+        .add(0x8000) //25
+        .add(acLifetimeEnergyScaleFactor) 
         .add(0x8000)
         .add(0x8000)
         .add(0x8000)
@@ -401,47 +403,42 @@ void SunspecApiClass::updateRegisters(uint8_t unitId)
         .addUInt32(0) // 56 Vendor Event Bitfield 2
         .addUInt32(0) // 58 Vendor Event Bitfield 3
         .addUInt32(0) // 60 Vendor Event Bitfield 4
-        .add(0x8000)
-        .add(0x8000)
-        .add(0x8000)
-        .add(0x8000)
-        .add(0x8000)
-        .add(0x8000)
-        .add(0x8000)
-        .add(0x8000)
-        .add(0x8000)
-        .add(0x8000)
-        .add(0x8000)
-        .add(0x8000)
         .commit();
 
     // SunSpec Immediate Controls (Model 123)
     auto nextAddr = newModel(unitId, 123, SunspecConstants::INVERTER_MODEL_IMMEDIATE_CONTROLS_BASE_ADDRESS)
-                        .add(0x8000) // Conn_WinTms
-                        .add(0x8000) // Conn_RvrtTms
-                        .add(1) // Conn: 0 or 1 (DISCONNECT/CONNECT)
-                        .add(acPowerLimitPct * pow(10, -acPowerLimitScaleFactor)) // WMaxLimPct
-                        .add(0x8000) // WMaxLimPct_WinTms
-                        .add(0x8000) // WMaxLimPct_RvrtTms
-                        .add(0x8000) // WMaxLimPct_RmpTms
-                        .add(acPowerLimitEnabled)
-                        .add(acPowerFactor * pow(10, -acPowerFactorScaleFactor))
-                        .add(0x8000) // OutPFSet_WinTms
-                        .add(0x8000) // OutPFSet_RvrtTms
-                        .add(0x8000) // OutPFSet_RmpTms
-                        .add(0) //OutPFSet_Ena (0 or 1)
-                        .add(0x8000) // VArWMaxPct
-                        .add(0x8000) // VArMaxPct
-                        .add(0x8000) // VArAvalPct
-                        .add(0x8000) // VArPct_WinTms
-                        .add(0x8000) // VArPct_RvrtTms
-                        .add(0x8000) // VArPct_RmpTms
-                        .add(0x8000) // VArPct_Mod
-                        .add(0) // VArPct_Ena (0 or 1)
-                        .add(acPowerLimitScaleFactor) // WMaxLimPct_SF
-                        .add(acPowerFactorScaleFactor) // OutPFSet_SF
-                        .add(0x8000)
-                        .commit();
+        .add(0x8000) // Conn_WinTms
+        .add(0x8000) // Conn_RvrtTms
+        .add(1) // Conn: 0 or 1 (DISCONNECT/CONNECT)
+        .add(acPowerLimitPct * pow(10, -acPowerLimitScaleFactor)) // WMaxLimPct
+        .add(0x8000) // WMaxLimPct_WinTms
+        .add(0x8000) // WMaxLimPct_RvrtTms
+        .add(0x8000) // WMaxLimPct_RmpTms
+        .add(acPowerLimitEnabled)
+        .add(acPowerFactor * pow(10, -acPowerFactorScaleFactor))
+        .add(0x8000) // OutPFSet_WinTms
+        .add(0x8000) // OutPFSet_RvrtTms
+        .add(0x8000) // OutPFSet_RmpTms
+        .add(0) //OutPFSet_Ena (0 or 1)
+        .add(0x8000) // VArWMaxPct
+        .add(0x8000) // VArMaxPct
+        .add(0x8000) // VArAvalPct
+        .add(0x8000) // VArPct_WinTms
+        .add(0x8000) // VArPct_RvrtTms
+        .add(0x8000) // VArPct_RmpTms
+        .add(0x8000) // VArPct_Mod
+        .add(0) // VArPct_Ena (0 or 1)
+        .add(acPowerLimitScaleFactor) // WMaxLimPct_SF
+        .add(acPowerFactorScaleFactor) // OutPFSet_SF
+        .add(0x8000)
+        .commit();
+
+    // SunSpec Nameplate Model 120
+    nextAddr = newModel(unitId, 120, nextAddr)
+        .add(4) // 122 DERTyp
+        .add(acMaxPower * pow(10, -acPowerScaleFactor)) // 123 WRtg
+        .add(acPowerScaleFactor) // 124 WRtg_SF
+        .commit();
 
     // Sunspec end marker
     newModel(unitId, 0xFFFF, nextAddr).commit();

@@ -35,7 +35,7 @@ public:
 
 class SunspecApiClass {
 private:
-    const unsigned long UPDATE_INTERVAL_MILLIS = 5000L;
+    const uint32_t UPDATE_INTERVAL_MILLIS = 5000L;
 
     // SunSpec scale factors
     const int16_t acCurrentScaleFactor = -2;
@@ -43,12 +43,13 @@ private:
     const int16_t acPowerScaleFactor = -1;
     const int16_t acFrequencyScaleFactor = -2;
     const int16_t acReactivePowerScaleFactor = -1;
+    const int16_t acLifetimeEnergyScaleFactor = 2;
     const int16_t acPowerLimitScaleFactor = -2;
     const int16_t acPowerFactorScaleFactor = -2;
 
     uint16_t _powerLimitPct = 100;
-    unsigned long _lastPublish = 0;
-    unsigned long _lastLoopMillis = 0;
+    uint32_t _lastPublish = 0;
+    uint32_t _lastLoopMillis = 0;
     std::map<uint8_t, std::map<uint16_t, uint16_t>> _memory;
 
 public:
