@@ -53,3 +53,11 @@ int Utils::getTimezoneOffset()
 
     return static_cast<int>(difftime(rawtime, gmt));
 }
+
+void Utils::restartDtu()
+{
+    yield();
+    delay(1000);
+    yield();
+    ESP.restart();
+}
