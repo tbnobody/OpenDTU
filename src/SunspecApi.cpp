@@ -403,6 +403,18 @@ void SunspecApiClass::updateRegisters(uint8_t unitId)
         .addUInt32(0) // 56 Vendor Event Bitfield 2
         .addUInt32(0) // 58 Vendor Event Bitfield 3
         .addUInt32(0) // 60 Vendor Event Bitfield 4
+        .add(0x8000)
+        .add(0x8000)
+        .add(0x8000)
+        .add(0x8000)
+        .add(0x8000)
+        .add(0x8000)
+        .add(0x8000)
+        .add(0x8000)
+        .add(0x8000)
+        .add(0x8000)
+        .add(0x8000)
+        .add(0x8000)
         .commit();
 
     // SunSpec Immediate Controls (Model 123)
