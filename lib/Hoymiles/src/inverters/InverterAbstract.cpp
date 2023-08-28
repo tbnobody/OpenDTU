@@ -46,11 +46,8 @@ const String& InverterAbstract::serialString()
 
 void InverterAbstract::setName(const char* name)
 {
-    uint8_t len = strlen(name);
-    if (len + 1 > MAX_NAME_LENGTH) {
-        len = MAX_NAME_LENGTH - 1;
-    }
-    strncpy(_name, name, len);
+    strncpy(_name, name, MAX_NAME_LENGTH);
+    uint8_t len = std::min(strlen(name), (size_t) MAX_NAME_LENGTH - 1);
     _name[len] = '\0';
 }
 
