@@ -19,6 +19,9 @@ public:
     void init();
     void loop();
 
+    void turnAllOff();
+    void turnAllOn();
+
 private:
     enum class LedState_t {
         On,
@@ -27,6 +30,7 @@ private:
     };
 
     LedState_t _ledState[PINMAPPING_LED_COUNT];
+    LedState_t _allState;
     TimeoutHelper _updateTimeout;
     TimeoutHelper _blinkTimeout;
     uint8_t _ledActive = 0;

@@ -6,6 +6,7 @@
 #include "Configuration.h"
 #include "Display_Graphic.h"
 #include "PinMapping.h"
+#include "Utils.h"
 #include "WebApi.h"
 #include "WebApi_errors.h"
 #include "helper.h"
@@ -169,9 +170,6 @@ void WebApiDeviceClass::onDeviceAdminPost(AsyncWebServerRequest* request)
     request->send(response);
 
     if (performRestart) {
-        yield();
-        delay(1000);
-        yield();
-        ESP.restart();
+        Utils::restartDtu();
     }
 }
