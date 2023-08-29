@@ -67,6 +67,16 @@ export default defineConfig({
         ws: true,
         changeOrigin: true
       },
+      '^/vedirectlivedata': {
+        target: 'ws://' + proxy_target,
+        ws: true,
+        changeOrigin: true
+      },
+      '^/batterylivedata': {
+        target: 'ws://' + proxy_target,
+        ws: true,
+        changeOrigin: true
+      },
       '^/console': {
         target: 'ws://' + proxy_target,
         ws: true,
