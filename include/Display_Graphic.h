@@ -19,6 +19,7 @@ public:
     void init(DisplayType_t type, uint8_t data, uint8_t clk, uint8_t cs, uint8_t reset);
     void loop();
     void setContrast(uint8_t contrast);
+    void setStatus(bool turnOn);
     void setOrientation(uint8_t rotation = DISPLAY_ROTATION);
     void setLanguage(uint8_t language);
     void setStartupDisplay();
@@ -32,6 +33,8 @@ private:
     void setFont(uint8_t line);
 
     U8G2* _display;
+
+    bool _displayTurnedOn;
 
     DisplayType_t _display_type = DisplayType_t::None;
     uint8_t _display_language = DISPLAY_LANGUAGE;

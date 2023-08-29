@@ -91,9 +91,21 @@ void HoymilesClass::loop()
                 }
 
                 // Fetch dev info (but first fetch stats)
-                if (iv->Statistics()->getLastUpdate() > 0 && (iv->DevInfo()->getLastUpdateAll() == 0 || iv->DevInfo()->getLastUpdateSimple() == 0)) {
-                    _messageOutput->println("Request device info");
-                    iv->sendDevInfoRequest();
+                if (iv->Statistics()->getLastUpdate() > 0) {
+                    bool invalidDevInfo = !iv->DevInfo()->containsValidData()
+                        && iv->DevInfo()->getLastUpdateAll() > 0
+                        && iv->DevInfo()->getLastUpdateSimple() > 0;
+
+                    if (invalidDevInfo) {
+                        _messageOutput->println("DevInfo: No Valid Data");
+                    }
+
+                    if ((iv->DevInfo()->getLastUpdateAll() == 0)
+                        || (iv->DevInfo()->getLastUpdateSimple() == 0)
+                        || invalidDevInfo) {
+                        _messageOutput->println("Request device info");
+                        iv->sendDevInfoRequest();
+                    }
                 }
 
                 if (++inverterPos >= getNumInverters()) {

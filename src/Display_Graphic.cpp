@@ -47,6 +47,7 @@ void DisplayGraphicClass::init(DisplayType_t type, uint8_t data, uint8_t clk, ui
         _display = constructor(reset, clk, data, cs);
         _display->begin();
         setContrast(DISPLAY_CONTRAST);
+        setStatus(true);
     }
 }
 
@@ -139,10 +140,11 @@ void DisplayGraphicClass::loop()
     if ((millis() - _lastDisplayUpdate) > _period) {
 
         _display->clearBuffer();
+        bool displayPowerSave = false;
 
         //=====> Actual Production ==========
         if (Datastore.getIsAtLeastOneReachable()) {
-            _display->setPowerSave(false);
+            displayPowerSave = false;
             if (Datastore.getTotalAcPowerEnabled() > 999) {
                 snprintf(_fmtText, sizeof(_fmtText), i18n_current_power_kw[_display_language], (Datastore.getTotalAcPowerEnabled() / 1000));
             } else {
@@ -158,7 +160,7 @@ void DisplayGraphicClass::loop()
             printText(i18n_offline[_display_language], 0);
             // check if it's time to enter power saving mode
             if (millis() - _previousMillis >= (_interval * 2)) {
-                _display->setPowerSave(enablePowerSafe);
+                displayPowerSave = enablePowerSafe;
             }
         }
         //<=======================
@@ -184,6 +186,12 @@ void DisplayGraphicClass::loop()
 
         _mExtra++;
         _lastDisplayUpdate = millis();
+
+        if (!_displayTurnedOn) {
+            displayPowerSave = true;
+        }
+
+        _display->setPowerSave(displayPowerSave);
     }
 }
 
@@ -193,6 +201,11 @@ void DisplayGraphicClass::setContrast(uint8_t contrast)
         return;
     }
     _display->setContrast(contrast * 2.55f);
+}
+
+void DisplayGraphicClass::setStatus(bool turnOn)
+{
+    _displayTurnedOn = turnOn;
 }
 
 DisplayGraphicClass Display;

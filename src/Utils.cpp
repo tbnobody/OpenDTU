@@ -3,6 +3,8 @@
  * Copyright (C) 2022 - 2023 Thomas Basler and others
  */
 #include "Utils.h"
+#include "Display_Graphic.h"
+#include "Led_Single.h"
 #include <Esp.h>
 
 uint32_t Utils::getChipId()
@@ -52,4 +54,14 @@ int Utils::getTimezoneOffset()
     gmt = mktime(ptm);
 
     return static_cast<int>(difftime(rawtime, gmt));
+}
+
+void Utils::restartDtu()
+{
+    LedSingle.turnAllOff();
+    Display.setStatus(false);
+    yield();
+    delay(1000);
+    yield();
+    ESP.restart();
 }

@@ -196,6 +196,16 @@ String DevInfoParser::getHwModelName()
     return devInfo[idx].modelName;
 }
 
+bool DevInfoParser::containsValidData()
+{
+    time_t t = getFwBuildDateTime();
+
+    struct tm info;
+    localtime_r(&t, &info);
+
+    return info.tm_year > (2016 - 1900);
+}
+
 uint8_t DevInfoParser::getDevIdx()
 {
     uint8_t ret = 0xff;

@@ -5,6 +5,7 @@
 #include "WebApi_firmware.h"
 #include "Configuration.h"
 #include "Update.h"
+#include "Utils.h"
 #include "WebApi.h"
 #include "helper.h"
 #include <AsyncJson.h>
@@ -42,10 +43,7 @@ void WebApiFirmwareClass::onFirmwareUpdateFinish(AsyncWebServerRequest* request)
     response->addHeader("Connection", "close");
     response->addHeader("Access-Control-Allow-Origin", "*");
     request->send(response);
-    yield();
-    delay(1000);
-    yield();
-    ESP.restart();
+    Utils::restartDtu();
 }
 
 void WebApiFirmwareClass::onFirmwareUpdateUpload(AsyncWebServerRequest* request, String filename, size_t index, uint8_t* data, size_t len, bool final)
