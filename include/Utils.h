@@ -8,4 +8,5 @@ public:
     static uint32_t getChipId();
     static uint64_t generateDtuSerial();
     static int getTimezoneOffset();
+    static void restartDtu();
 };

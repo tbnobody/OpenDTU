@@ -131,7 +131,7 @@ void PowerLimiterClass::loop()
         return;
     }
 
-    if (PL_MODE_FULL_DISABLE == _mode) {
+    if (Mode::Disabled == _mode) {
         shutdown(Status::DisabledByMqtt);
         return;
     }
@@ -185,7 +185,7 @@ void PowerLimiterClass::loop()
         return announceStatus(Status::InverterDevInfoPending);
     }
 
-    if (PL_MODE_SOLAR_PT_ONLY == _mode) {
+    if (Mode::UnconditionalFullSolarPassthrough == _mode) {
         // handle this mode of operation separately
         return unconditionalSolarPassthrough(_inverter);
     }
@@ -396,14 +396,6 @@ uint8_t PowerLimiterClass::getPowerLimiterState() {
 
 int32_t PowerLimiterClass::getLastRequestedPowerLimit() {
 	    return _lastRequestedPowerLimit;
-}
-
-bool PowerLimiterClass::getMode() {
-    return _mode;
-}
-
-void PowerLimiterClass::setMode(uint8_t mode) {
-    _mode = mode;
 }
 
 bool PowerLimiterClass::canUseDirectSolarPower()

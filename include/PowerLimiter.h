@@ -51,8 +51,15 @@ public:
     void loop();
     uint8_t getPowerLimiterState();
     int32_t getLastRequestedPowerLimit();
-    void setMode(uint8_t mode);
-    bool getMode();
+
+    enum class Mode : unsigned {
+        Normal = 0,
+        Disabled = 1,
+        UnconditionalFullSolarPassthrough = 2
+    };
+
+    void setMode(Mode m) { _mode = m; }
+    Mode getMode() const { return _mode; }
     void calcNextInverterRestart();
 
 private:
@@ -63,7 +70,7 @@ private:
     uint32_t _lastCalculation = 0;
     static constexpr uint32_t _calculationBackoffMsDefault = 128;
     uint32_t _calculationBackoffMs = _calculationBackoffMsDefault;
-    uint8_t _mode = PL_MODE_ENABLE_NORMAL_OP;
+    Mode _mode = Mode::Normal;
     std::shared_ptr<InverterAbstract> _inverter = nullptr;
     bool _batteryDischargeEnabled = false;
     uint32_t _nextInverterRestart = 0; // Values: 0->not calculated / 1->no restart configured / >1->time of next inverter restart in millis()

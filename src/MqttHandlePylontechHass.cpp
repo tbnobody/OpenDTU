@@ -95,6 +95,7 @@ void MqttHandlePylontechHassClass::publishSensor(const char* caption, const char
 {
     String sensorId = caption;
     sensorId.replace(" ", "_");
+    sensorId.replace(".", "");
     sensorId.replace("(", "");
     sensorId.replace(")", "");
     sensorId.toLowerCase();
@@ -140,6 +141,9 @@ void MqttHandlePylontechHassClass::publishBinarySensor(const char* caption, cons
 {
     String sensorId = caption;
     sensorId.replace(" ", "_");
+    sensorId.replace(".", "");
+    sensorId.replace("(", "");
+    sensorId.replace(")", "");
     sensorId.toLowerCase();
 
     String configTopic = "binary_sensor/dtu_battery_" + serial

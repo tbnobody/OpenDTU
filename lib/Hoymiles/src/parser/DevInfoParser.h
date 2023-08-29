@@ -33,6 +33,8 @@ public:
     uint16_t getMaxPower();
     String getHwModelName();
 
+    bool containsValidData();
+
 private:
     time_t timegm(struct tm* tm);
     uint8_t getDevIdx();
