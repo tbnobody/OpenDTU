@@ -196,7 +196,7 @@ void WebApiWsLiveClass::generateJsonResponse(JsonVariant& root)
     
     JsonObject batteryObj = root.createNestedObject("battery");
     batteryObj[F("enabled")] = Configuration.get().Battery_Enabled;
-    addTotalField(batteryObj, "soc", Battery.stateOfCharge, "%", 0);
+    addTotalField(batteryObj, "soc", Battery.getStats()->getSoC(), "%", 0);
 
     JsonObject powerMeterObj = root.createNestedObject("power_meter");
     powerMeterObj[F("enabled")] = Configuration.get().PowerMeter_Enabled;

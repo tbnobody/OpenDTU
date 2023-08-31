@@ -9,7 +9,7 @@
 #include "Led_Single.h"
 #include "MessageOutput.h"
 #include "VeDirectFrameHandler.h"
-#include "PylontechCanReceiver.h"
+#include "Battery.h"
 #include "Huawei_can.h"
 #include "MqttHandleDtu.h"
 #include "MqttHandleHass.h"
@@ -176,16 +176,6 @@ void setup()
     // Dynamic power limiter
     PowerLimiter.init();
 
-    // Initialize Pylontech Battery / CAN bus
-    MessageOutput.println(F("Initialize Pylontech battery interface... "));
-    if (PinMapping.isValidBatteryConfig()) {
-        MessageOutput.printf("Pylontech Battery rx = %d, tx = %d\r\n", pin.battery_rx, pin.battery_tx);
-        PylontechCanReceiver.init(pin.battery_rx, pin.battery_tx);
-        MessageOutput.println(F("done"));
-    } else {
-        MessageOutput.println(F("Invalid pin config"));
-    }
-
     // Initialize Huawei AC-charger PSU / CAN bus
     MessageOutput.println(F("Initialize Huawei AC charger interface... "));
     if (PinMapping.isValidHuaweiConfig()) {
@@ -196,6 +186,7 @@ void setup()
         MessageOutput.println(F("Invalid pin config"));
     }
 
+    Battery.init();
 }
 
 void loop()
@@ -241,7 +232,7 @@ void loop()
     yield();
     MessageOutput.loop();
     yield();
-    PylontechCanReceiver.loop();
+    Battery.loop();
     yield();
     MqttHandlePylontechHass.loop();
     yield();

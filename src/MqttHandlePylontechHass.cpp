@@ -177,7 +177,7 @@ void MqttHandlePylontechHassClass::createDeviceInfo(JsonObject& object)
     object[F("ids")] = serial;
     object[F("cu")] = String(F("http://")) + NetworkSettings.localIP().toString();
     object[F("mf")] = F("OpenDTU");
-    object[F("mdl")] = Battery.manufacturer;
+    object[F("mdl")] = Battery.getStats()->getManufacturer();
     object[F("sw")] = AUTO_GIT_HASH;
 }
 

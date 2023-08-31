@@ -89,7 +89,9 @@ void WebApiDeviceClass::onDeviceAdminGet(AsyncWebServerRequest* request)
 
     JsonObject batteryPinObj = curPin.createNestedObject("battery");
     batteryPinObj[F("rx")] = pin.battery_rx;
+    batteryPinObj[F("rxen")] = pin.battery_rxen;
     batteryPinObj[F("tx")] = pin.battery_tx;
+    batteryPinObj[F("txen")] = pin.battery_txen;
 
     JsonObject huaweiPinObj = curPin.createNestedObject("huawei");
     huaweiPinObj[F("miso")] = pin.huawei_miso;

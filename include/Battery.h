@@ -2,44 +2,32 @@
 #pragma once
 
 #include <stdint.h>
+#include <memory>
+#include <mutex>
+
+#include "BatteryStats.h"
+
+class BatteryProvider {
+    public:
+        // returns true if the provider is ready for use, false otherwise
+        virtual bool init(bool verboseLogging) = 0;
+
+        virtual void deinit() = 0;
+        virtual void loop() = 0;
+        virtual std::shared_ptr<BatteryStats> getStats() const = 0;
+};
 
 class BatteryClass {
-public:
-    uint32_t lastUpdate;
+    public:
+        void init();
+        void loop();
 
-    float chargeVoltage;
-    float chargeCurrentLimitation;
-    float dischargeCurrentLimitation;
-    uint16_t stateOfCharge;
-    uint32_t stateOfChargeLastUpdate;
-    uint16_t stateOfHealth;
-    float voltage;
-    float current;
-    float temperature;
-    bool alarmOverCurrentDischarge;
-    bool alarmUnderTemperature;
-    bool alarmOverTemperature;
-    bool alarmUnderVoltage;
-    bool alarmOverVoltage;
+        std::shared_ptr<BatteryStats const> getStats() const;
 
-    bool alarmBmsInternal;
-    bool alarmOverCurrentCharge;
-
-
-    bool warningHighCurrentDischarge;
-    bool warningLowTemperature;
-    bool warningHighTemperature;
-    bool warningLowVoltage;
-    bool warningHighVoltage;
-
-    bool warningBmsInternal;
-    bool warningHighCurrentCharge;
-    char manufacturer[9];
-    bool chargeEnabled;
-    bool dischargeEnabled;
-    bool chargeImmediately;
-
-private:
+    private:
+        uint32_t _lastMqttPublish = 0;
+        mutable std::mutex _mutex;
+        std::unique_ptr<BatteryProvider> _upProvider = nullptr;
 };
 
 extern BatteryClass Battery;
