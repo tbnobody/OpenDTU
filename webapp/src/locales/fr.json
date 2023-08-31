@@ -450,6 +450,8 @@
         "SaveOrder": "Save order",
         "DeleteInverter": "Supprimer l'onduleur",
         "EditInverter": "Modifier l'onduleur",
+        "General": "Général",
+        "String": "Ligne",
         "InverterSerial": "Numéro de série de l'onduleur",
         "InverterName": "Nom de l'onduleur :",
         "InverterNameHint": "Ici, vous pouvez spécifier un nom personnalisé pour votre onduleur.",

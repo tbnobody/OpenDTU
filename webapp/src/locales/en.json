@@ -450,6 +450,8 @@
         "SaveOrder": "Save order",
         "DeleteInverter": "Delete inverter",
         "EditInverter": "Edit inverter",
+        "General": "General",
+        "String": "String",
         "InverterSerial": "Inverter Serial:",
         "InverterName": "Inverter Name:",
         "InverterNameHint": "Here you can specify a custom name for your inverter.",

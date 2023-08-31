@@ -450,6 +450,8 @@
         "SaveOrder": "Reihenfolge speichern",
         "DeleteInverter": "Wechselrichter löschen",
         "EditInverter": "Wechselrichter bearbeiten",
+        "General": "Allgemein",
+        "String": "String",
         "InverterSerial": "Wechselrichter Seriennummer:",
         "InverterName": "Wechselrichter Name:",
         "InverterNameHint": "Hier kann ein eigener Namen für den Wechselrichter angeben werden.",
