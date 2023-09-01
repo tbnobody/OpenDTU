@@ -88,6 +88,8 @@
                                     }}</button>
                                 <button class="nav-link" id="nav-string-tab" data-bs-toggle="tab" data-bs-target="#nav-string"
                                     type="button" role="tab" aria-controls="nav-string">{{ $t('inverteradmin.String') }}</button>
+                                <button class="nav-link" id="nav-advanced-tab" data-bs-toggle="tab" data-bs-target="#nav-advanced"
+                                    type="button" role="tab" aria-controls="nav-advanced">{{ $t('inverteradmin.Advanced') }}</button>
                             </div>
                         </nav>
                         <div class="tab-content" id="nav-tabContent">
@@ -174,6 +176,13 @@
                                 <div :id="`inverter-customizer`" class="form-text" v-html="$t('inverteradmin.InverterHint')">
                                 </div>
                             </div>
+
+                            <div class="tab-pane fade show" id="nav-advanced" role="tabpanel" aria-labelledby="nav-advanced-tab" tabindex="0">
+                                <InputElement :label="$t('inverteradmin.ReachableThreshold')"
+                                    v-model="selectedInverterData.reachable_threshold"
+                                    type="number" min="1" max="100"
+                                    :tooltip="$t('inverteradmin.ReachableThresholdHint')" wide />
+                            </div>
                         </div>
                     </form>
 
@@ -247,6 +256,7 @@ declare interface Inverter {
     poll_enable_night: boolean;
     command_enable: boolean;
     command_enable_night: boolean;
+    reachable_threshold: number;
     channel: Array<Channel>;
 }
 

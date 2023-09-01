@@ -73,7 +73,7 @@ bool InverterAbstract::isProducing()
 
 bool InverterAbstract::isReachable()
 {
-    return _enablePolling && Statistics()->getRxFailureCount() <= MAX_ONLINE_FAILURE_COUNT;
+    return _enablePolling && Statistics()->getRxFailureCount() <= _reachableThreshold;
 }
 
 void InverterAbstract::setEnablePolling(bool enabled)
@@ -94,6 +94,16 @@ void InverterAbstract::setEnableCommands(bool enabled)
 bool InverterAbstract::getEnableCommands()
 {
     return _enableCommands;
+}
+
+void InverterAbstract::setReachableThreshold(uint8_t threshold)
+{
+    _reachableThreshold = threshold;
+}
+
+uint8_t InverterAbstract::getReachableThreshold()
+{
+    return _reachableThreshold;
 }
 
 bool InverterAbstract::sendChangeChannelRequest()

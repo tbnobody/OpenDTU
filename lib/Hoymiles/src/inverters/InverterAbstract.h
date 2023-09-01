@@ -24,7 +24,6 @@ enum {
 };
 
 #define MAX_RF_FRAGMENT_COUNT 13
-#define MAX_ONLINE_FAILURE_COUNT 2
 
 class CommandAbstract;
 
@@ -48,6 +47,9 @@ public:
 
     void setEnableCommands(bool enabled);
     bool getEnableCommands();
+
+    void setReachableThreshold(uint8_t threshold);
+    uint8_t getReachableThreshold();
 
     void clearRxFragmentBuffer();
     void addRxFragment(uint8_t fragment[], uint8_t len);
@@ -86,6 +88,8 @@ private:
 
     bool _enablePolling = true;
     bool _enableCommands = true;
+
+    uint8_t _reachableThreshold = 3;
 
     std::unique_ptr<AlarmLogParser> _alarmLogParser;
     std::unique_ptr<DevInfoParser> _devInfoParser;
