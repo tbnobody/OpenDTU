@@ -81,6 +81,7 @@ struct CONFIG_T {
     char Mqtt_LwtValue_Online[MQTT_MAX_LWTVALUE_STRLEN + 1];
     char Mqtt_LwtValue_Offline[MQTT_MAX_LWTVALUE_STRLEN + 1];
     uint32_t Mqtt_PublishInterval;
+    bool Mqtt_CleanSession;
 
     bool Mqtt_Hass_Enabled;
     bool Mqtt_Hass_Retain;

@@ -48,6 +48,10 @@
                               type="number" min="5" max="86400"
                               :postfix="$t('mqttadmin.Seconds')"/>
 
+                <InputElement :label="$t('mqttadmin.CleanSession')"
+                              v-model="mqttConfigList.mqtt_clean_session"
+                              type="checkbox"/>
+
                 <InputElement :label="$t('mqttadmin.EnableRetain')"
                               v-model="mqttConfigList.mqtt_retain"
                               type="checkbox"/>

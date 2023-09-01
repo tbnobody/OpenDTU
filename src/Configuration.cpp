@@ -58,6 +58,7 @@ bool ConfigurationClass::write()
     mqtt["topic"] = config.Mqtt_Topic;
     mqtt["retain"] = config.Mqtt_Retain;
     mqtt["publish_interval"] = config.Mqtt_PublishInterval;
+    mqtt["clean_session"] = config.Mqtt_CleanSession;
 
     JsonObject mqtt_lwt = mqtt.createNestedObject("lwt");
     mqtt_lwt["topic"] = config.Mqtt_LwtTopic;
@@ -204,6 +205,7 @@ bool ConfigurationClass::read()
     strlcpy(config.Mqtt_Topic, mqtt["topic"] | MQTT_TOPIC, sizeof(config.Mqtt_Topic));
     config.Mqtt_Retain = mqtt["retain"] | MQTT_RETAIN;
     config.Mqtt_PublishInterval = mqtt["publish_interval"] | MQTT_PUBLISH_INTERVAL;
+    config.Mqtt_CleanSession = mqtt["clean_session"] | MQTT_CLEAN_SESSION;
 
     JsonObject mqtt_lwt = mqtt["lwt"];
     strlcpy(config.Mqtt_LwtTopic, mqtt_lwt["topic"] | MQTT_LWT_TOPIC, sizeof(config.Mqtt_LwtTopic));
