@@ -62,7 +62,8 @@ void WebApiWsLiveClass::loop()
     if (millis() - _lastWsPublish > (10 * 1000) || (maxTimeStamp != _newestInverterTimestamp)) {
 
         try {
-            DynamicJsonDocument root(40960);
+            std::lock_guard<std::mutex> lock(_mutex);
+            DynamicJsonDocument root(4096 * INV_MAX_COUNT);
             JsonVariant var = root;
             generateJsonResponse(var);
 
@@ -221,7 +222,8 @@ void WebApiWsLiveClass::onLivedataStatus(AsyncWebServerRequest* request)
     }
 
     try {
-        AsyncJsonResponse* response = new AsyncJsonResponse(false, 40960U);
+        std::lock_guard<std::mutex> lock(_mutex);
+        AsyncJsonResponse* response = new AsyncJsonResponse(false, 4096 * INV_MAX_COUNT);
         JsonVariant root = response->getRoot();
 
         generateJsonResponse(root);
