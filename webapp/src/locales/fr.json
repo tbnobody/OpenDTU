@@ -472,6 +472,8 @@
         "InverterHint": "*) Entrez le W<sub>p</sub> du canal pour calculer l'irradiation.",
         "ReachableThreshold": "Reachable Threshold:",
         "ReachableThresholdHint": "Defines how many requests are allowed to fail until the inverter is treated is not reachable.",
+        "ZeroRuntime": "Zero runtime data",
+        "ZeroRuntimeHint": "Zero runtime data (no yield data) if inverter becomes unreachable.",
         "Cancel": "@:maintenancereboot.Cancel",
         "Save": "@:dtuadmin.Save",
         "DeleteMsg": "Êtes-vous sûr de vouloir supprimer l'onduleur \"{name}\" avec le numéro de série \"{serial}\" ?",

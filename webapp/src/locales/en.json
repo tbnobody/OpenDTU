@@ -472,6 +472,8 @@
         "InverterHint": "*) Enter the W<sub>p</sub> of the channel to calculate irradiation.",
         "ReachableThreshold": "Reachable Threshold:",
         "ReachableThresholdHint": "Defines how many requests are allowed to fail until the inverter is treated is not reachable.",
+        "ZeroRuntime": "Zero runtime data",
+        "ZeroRuntimeHint": "Zero runtime data (no yield data) if inverter becomes unreachable.",
         "Cancel": "@:maintenancereboot.Cancel",
         "Save": "@:dtuadmin.Save",
         "DeleteMsg": "Are you sure you want to delete the inverter \"{name}\" with serial number {serial}?",

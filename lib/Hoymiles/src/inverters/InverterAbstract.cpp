@@ -106,6 +106,16 @@ uint8_t InverterAbstract::getReachableThreshold()
     return _reachableThreshold;
 }
 
+void InverterAbstract::setZeroValuesIfUnreachable(bool enabled)
+{
+    _zeroValuesIfUnreachable = enabled;
+}
+
+bool InverterAbstract::getZeroValuesIfUnreachable()
+{
+    return _zeroValuesIfUnreachable;
+}
+
 bool InverterAbstract::sendChangeChannelRequest()
 {
     return false;

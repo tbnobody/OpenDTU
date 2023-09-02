@@ -182,6 +182,11 @@
                                     v-model="selectedInverterData.reachable_threshold"
                                     type="number" min="1" max="100"
                                     :tooltip="$t('inverteradmin.ReachableThresholdHint')" wide />
+
+                                <InputElement :label="$t('inverteradmin.ZeroRuntime')"
+                                    v-model="selectedInverterData.zero_runtime"
+                                    type="checkbox"
+                                    :tooltip="$t('inverteradmin.ZeroRuntimeHint')" wide/>
                             </div>
                         </div>
                     </form>
@@ -257,6 +262,7 @@ declare interface Inverter {
     command_enable: boolean;
     command_enable_night: boolean;
     reachable_threshold: number;
+    zero_runtime: boolean;
     channel: Array<Channel>;
 }
 

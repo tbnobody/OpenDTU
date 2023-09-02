@@ -472,6 +472,8 @@
         "InverterHint": "*) Geben Sie die W<sub>p</sub> des Ports ein, um die Einstrahlung zu errechnen.",
         "ReachableThreshold": "Erreichbarkeit Schwellenwert:",
         "ReachableThresholdHint": "Legt fest, wie viele Anfragen fehlschlagen dürfen, bis der Wechselrichter als unerreichbar eingestuft wird.",
+        "ZeroRuntime": "Nulle Laufzeit Daten",
+        "ZeroRuntimeHint": "Nulle Laufzeit Daten (keine Ertragsdaten), wenn der Wechselrichter nicht erreichbar ist.",
         "Cancel": "@:maintenancereboot.Cancel",
         "Save": "@:dtuadmin.Save",
         "DeleteMsg": "Soll der Wechselrichter \"{name}\" mit der Seriennummer {serial} wirklich gelöscht werden?",

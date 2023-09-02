@@ -51,6 +51,9 @@ public:
     void setReachableThreshold(uint8_t threshold);
     uint8_t getReachableThreshold();
 
+    void setZeroValuesIfUnreachable(bool enabled);
+    bool getZeroValuesIfUnreachable();
+
     void clearRxFragmentBuffer();
     void addRxFragment(uint8_t fragment[], uint8_t len);
     uint8_t verifyAllFragments(CommandAbstract* cmd);
@@ -90,6 +93,8 @@ private:
     bool _enableCommands = true;
 
     uint8_t _reachableThreshold = 3;
+
+    bool _zeroValuesIfUnreachable = false;
 
     std::unique_ptr<AlarmLogParser> _alarmLogParser;
     std::unique_ptr<DevInfoParser> _devInfoParser;

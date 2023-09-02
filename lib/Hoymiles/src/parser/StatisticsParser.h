@@ -125,6 +125,8 @@ public:
     const char* getChannelFieldName(ChannelType_t type, ChannelNum_t channel, FieldId_t fieldId);
     uint8_t getChannelFieldDigits(ChannelType_t type, ChannelNum_t channel, FieldId_t fieldId);
 
+    bool setChannelFieldValue(ChannelType_t type, ChannelNum_t channel, FieldId_t fieldId, float value);
+
     float getChannelFieldOffset(ChannelType_t type, ChannelNum_t channel, FieldId_t fieldId);
     void setChannelFieldOffset(ChannelType_t type, ChannelNum_t channel, FieldId_t fieldId, float offset);
 
@@ -138,6 +140,8 @@ public:
     void resetRxFailureCount();
     void incrementRxFailureCount();
     uint32_t getRxFailureCount();
+
+    void zeroRuntimeData();
 
 private:
     uint8_t _payloadStatistic[STATISTIC_PACKET_SIZE] = {};
