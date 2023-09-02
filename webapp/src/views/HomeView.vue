@@ -487,9 +487,13 @@ export default defineComponent({
                 console.log(event);
                 if (event.data != "{}") {
                     this.liveData = JSON.parse(event.data);
+                    this.dataLoading = false;
+                    this.heartCheck(); // Reset heartbeat detection
+                } else {
+                    // Sometimes it does not recover automatically so have to force a reconnect
+                    this.closeSocket();
+                    this.heartCheck(10); // Reconnect faster
                 }
-                this.dataLoading = false;
-                this.heartCheck(); // Reset heartbeat detection
             };
 
             this.socket.onopen = function (event) {
@@ -512,7 +516,7 @@ export default defineComponent({
             }, 1000);
         },
         // Send heartbeat packets regularly * 59s Send a heartbeat
-        heartCheck() {
+        heartCheck(duration: number = 59) {
             this.heartInterval && clearTimeout(this.heartInterval);
             this.heartInterval = setInterval(() => {
                 if (this.socket.readyState === 1) {
@@ -521,7 +525,7 @@ export default defineComponent({
                 } else {
                     this.initSocket(); // Breakpoint reconnection 5 Time
                 }
-            }, 59 * 1000);
+            }, duration * 1000);
         },
         /** To break off websocket Connect */
         closeSocket() {
