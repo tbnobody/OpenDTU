@@ -12,18 +12,10 @@
 #include "inverters/HM_4CH.h"
 #include <Arduino.h>
 
-#define HOY_SEMAPHORE_TAKE() \
-    do {                     \
-    } while (xSemaphoreTake(_xSemaphore, portMAX_DELAY) != pdPASS)
-#define HOY_SEMAPHORE_GIVE() xSemaphoreGive(_xSemaphore)
-
 HoymilesClass Hoymiles;
 
 void HoymilesClass::init()
 {
-    _xSemaphore = xSemaphoreCreateMutex();
-    HOY_SEMAPHORE_GIVE(); // release before first use
-
     _pollInterval = 0;
     _radioNrf.reset(new HoymilesRadio_NRF());
     _radioCmt.reset(new HoymilesRadio_CMT());
@@ -41,7 +33,7 @@ void HoymilesClass::initCMT(int8_t pin_sdio, int8_t pin_clk, int8_t pin_cs, int8
 
 void HoymilesClass::loop()
 {
-    HOY_SEMAPHORE_TAKE();
+    std::lock_guard<std::mutex> lock(_mutex);
     _radioNrf->loop();
     _radioCmt->loop();
 
@@ -116,8 +108,6 @@ void HoymilesClass::loop()
             }
         }
     }
-
-    HOY_SEMAPHORE_GIVE();
 }
 
 std::shared_ptr<InverterAbstract> HoymilesClass::addInverter(const char* name, uint64_t serial)
@@ -195,9 +185,8 @@ void HoymilesClass::removeInverterBySerial(uint64_t serial)
 {
     for (uint8_t i = 0; i < _inverters.size(); i++) {
         if (_inverters[i]->serial() == serial) {
-            HOY_SEMAPHORE_TAKE();
+            std::lock_guard<std::mutex> lock(_mutex);
             _inverters.erase(_inverters.begin() + i);
-            HOY_SEMAPHORE_GIVE();
             return;
         }
     }
