@@ -116,6 +116,7 @@ void setup()
     MqttHandleVedirect.init(scheduler);
     MqttHandleHass.init(scheduler);
     MqttHandleVedirectHass.init(scheduler);
+    MqttHandlePylontechHass.init(scheduler);
     MqttHandleHuawei.init(scheduler);
     MqttHandlePowerLimiter.init(scheduler);
     MessageOutput.println("done");
