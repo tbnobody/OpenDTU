@@ -31,16 +31,16 @@ public:
     float getTotalDcIrradiation();
 
     // Amount of relevant digits for yield total
-    unsigned int getTotalAcYieldTotalDigits();
+    uint32_t getTotalAcYieldTotalDigits();
 
     // Amount of relevant digits for yield total
-    unsigned int getTotalAcYieldDayDigits();
+    uint32_t getTotalAcYieldDayDigits();
 
     // Amount of relevant digits for AC power
-    unsigned int getTotalAcPowerDigits();
+    uint32_t getTotalAcPowerDigits();
 
     // Amount of relevant digits for DC power
-    unsigned int getTotalDcPowerDigits();
+    uint32_t getTotalDcPowerDigits();
 
     // True, if at least one inverter is reachable
     bool getIsAtLeastOneReachable();
@@ -68,10 +68,10 @@ private:
     float _totalDcPowerIrradiation = 0;
     float _totalDcIrradiationInstalled = 0;
     float _totalDcIrradiation = 0;
-    unsigned int _totalAcYieldTotalDigits = 0;
-    unsigned int _totalAcYieldDayDigits = 0;
-    unsigned int _totalAcPowerDigits = 0;
-    unsigned int _totalDcPowerDigits = 0;
+    uint32_t _totalAcYieldTotalDigits = 0;
+    uint32_t _totalAcYieldDayDigits = 0;
+    uint32_t _totalAcPowerDigits = 0;
+    uint32_t _totalDcPowerDigits = 0;
     bool _isAtLeastOneReachable = false;
     bool _isAtLeastOneProducing = false;
     bool _isAllEnabledProducing = false;
