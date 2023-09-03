@@ -4,11 +4,10 @@
 #include <ArduinoJson.h>
 #include <TaskSchedulerDeclarations.h>
 
-class MqttHandlePylontechHassClass {
+class MqttHandleBatteryHassClass {
 public:
     void init(Scheduler& scheduler);
-    void publishConfig();
-    void forceUpdate();
+    void forceUpdate() { _doPublish = true; }
 
 private:
     void loop();
@@ -19,9 +18,8 @@ private:
 
     Task _loopTask;
 
-    bool _wasConnected = false;
-    bool _updateForced = false;
+    bool _doPublish = true;
     String serial = "0001"; // pseudo-serial, can be replaced in future with real serialnumber
 };
 
-extern MqttHandlePylontechHassClass MqttHandlePylontechHass;
+extern MqttHandleBatteryHassClass MqttHandleBatteryHass;

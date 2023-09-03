@@ -29,7 +29,6 @@ class BatteryClass {
 
         Task _loopTask;
 
-        uint32_t _lastMqttPublish = 0;
         mutable std::mutex _mutex;
         std::unique_ptr<BatteryProvider> _upProvider = nullptr;
 };
