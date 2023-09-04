@@ -258,22 +258,24 @@ float StatisticsParser::updateCurrentYieldDay(float yield)
 {
     int wd = getWeekDay();
 
-    if (-1 == _laskWeekDay)
-        _laskWeekDay = wd;
-    else
-        if (wd != _laskWeekDay) {
+    if (-1 == _lastWeekDay) {
+        _lastWeekDay = wd;
+    } else {
+        if (wd != _lastWeekDay) {
             // new day detected, reset counters
             _YieldDayCh0Offset = 0;
             _lastYieldDayCh0 = 0;
 
-            _laskWeekDay = wd;
+            _lastWeekDay = wd;
         }
+    }
 
     if (!yield) {
         _YieldDayCh0Offset += _lastYieldDayCh0;
         _lastYieldDayCh0 = 0;
-    } else
+    } else {
         _lastYieldDayCh0 = yield;
+    }
 
     return _YieldDayCh0Offset + yield;
 }

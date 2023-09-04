@@ -155,7 +155,7 @@ private:
 
     float _YieldDayCh0Offset = 0;
     float _lastYieldDayCh0 = 0;
-    int _laskWeekDay = -1;
+    int _lastWeekDay = -1;
 
     SemaphoreHandle_t _xSemaphore;
 };
