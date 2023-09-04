@@ -147,6 +147,7 @@ void WebApiWsLiveClass::generateJsonResponse(JsonVariant& root)
                 addField(chanTypeObj, i, inv, t, c, FLD_EFF);
                 if (t == TYPE_DC && inv->Statistics()->getStringMaxPower(c) > 0) {
                     addField(chanTypeObj, i, inv, t, c, FLD_IRR);
+                    chanTypeObj[String(c)][inv->Statistics()->getChannelFieldName(t, c, FLD_IRR)]["max"] = inv->Statistics()->getStringMaxPower(c);
                 }
             }
         }
