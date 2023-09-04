@@ -11,6 +11,12 @@
                             </td>
                         </tr>
                         <tr>
+                            <th>{{ $t('vedirectinfo.VerboseLogging') }}</th>
+                            <td>
+                                <StatusBadge :status="vedirectDataList.verbose_logging" true_text="vedirectinfo.Enabled" false_text="vedirectinfo.Disabled" />
+                            </td>
+                        </tr>
+                        <tr>
                             <th>{{ $t('vedirectinfo.UpdatesOnly') }}</th>
                             <td>
                                 <StatusBadge :status="vedirectDataList.vedirect_updatesonly" true_text="vedirectinfo.UpdatesEnabled" false_text="vedirectinfo.UpdatesDisabled" />

@@ -51,47 +51,47 @@ void MqttHandlePylontechHassClass::publishConfig()
     }
 
     // device info
-    publishSensor("Manufacturer", "manufacturer");
+    publishSensor("Manufacturer", "mdi:factory", "manufacturer");
 
     // battery info
-    publishSensor("Battery voltage", "voltage", "voltage", "measurement", "V");
-    publishSensor("Battery current", "current", "current", "measurement", "A");
-    publishSensor("Temperature", "temperature", "temperature", "measurement", "°C");
-    publishSensor("State of Charge (SOC)", "stateOfCharge", "battery", "measurement", "%");
-    publishSensor("State of Health (SOH)", "stateOfHealth", NULL, "measurement", "%");
-    publishSensor("Charge voltage (BMS)", "settings/chargeVoltage", "voltage", "measurement", "V");
-    publishSensor("Charge current limit", "settings/chargeCurrentLimitation", "current", "measurement", "A");
-    publishSensor("Discharge current limit", "settings/dischargeCurrentLimitation", "current", "measurement", "A");
+    publishSensor("Battery voltage", NULL, "voltage", "voltage", "measurement", "V");
+    publishSensor("Battery current", NULL, "current", "current", "measurement", "A");
+    publishSensor("Temperature", NULL, "temperature", "temperature", "measurement", "°C");
+    publishSensor("State of Charge (SOC)", NULL, "stateOfCharge", "battery", "measurement", "%");
+    publishSensor("State of Health (SOH)", "mdi:heart-plus", "stateOfHealth", NULL, "measurement", "%");
+    publishSensor("Charge voltage (BMS)", NULL, "settings/chargeVoltage", "voltage", "measurement", "V");
+    publishSensor("Charge current limit", NULL, "settings/chargeCurrentLimitation", "current", "measurement", "A");
+    publishSensor("Discharge current limit", NULL, "settings/dischargeCurrentLimitation", "current", "measurement", "A");
 
-    publishBinarySensor("Alarm Discharge current", "alarm/overCurrentDischarge", "1", "0");
-    publishBinarySensor("Warning Discharge current", "warning/highCurrentDischarge", "1", "0");
+    publishBinarySensor("Alarm Discharge current", "mdi:alert", "alarm/overCurrentDischarge", "1", "0");
+    publishBinarySensor("Warning Discharge current", "mdi:alert-outline", "warning/highCurrentDischarge", "1", "0");
 
-    publishBinarySensor("Alarm Temperature low", "alarm/underTemperature", "1", "0");
-    publishBinarySensor("Warning Temperature low", "warning/lowTemperature", "1", "0");
+    publishBinarySensor("Alarm Temperature low", "mdi:thermometer-low", "alarm/underTemperature", "1", "0");
+    publishBinarySensor("Warning Temperature low", "mdi:thermometer-low", "warning/lowTemperature", "1", "0");
 
-    publishBinarySensor("Alarm Temperature high", "alarm/overTemperature", "1", "0");
-    publishBinarySensor("Warning Temperature high", "warning/highTemperature", "1", "0");
+    publishBinarySensor("Alarm Temperature high", "mdi:thermometer-high", "alarm/overTemperature", "1", "0");
+    publishBinarySensor("Warning Temperature high", "mdi:thermometer-high", "warning/highTemperature", "1", "0");
 
-    publishBinarySensor("Alarm Voltage low", "alarm/underVoltage", "1", "0");
-    publishBinarySensor("Warning Voltage low", "warning/lowVoltage", "1", "0");
+    publishBinarySensor("Alarm Voltage low", "mdi:alert", "alarm/underVoltage", "1", "0");
+    publishBinarySensor("Warning Voltage low", "mdi:alert-outline", "warning/lowVoltage", "1", "0");
 
-    publishBinarySensor("Alarm Voltage high", "alarm/overVoltage", "1", "0");
-    publishBinarySensor("Warning Voltage high", "warning/highVoltage", "1", "0");
+    publishBinarySensor("Alarm Voltage high", "mdi:alert", "alarm/overVoltage", "1", "0");
+    publishBinarySensor("Warning Voltage high", "mdi:alert-outline", "warning/highVoltage", "1", "0");
 
-    publishBinarySensor("Alarm BMS internal", "alarm/bmsInternal", "1", "0");
-    publishBinarySensor("Warning BMS internal", "warning/bmsInternal", "1", "0");
+    publishBinarySensor("Alarm BMS internal", "mdi:alert", "alarm/bmsInternal", "1", "0");
+    publishBinarySensor("Warning BMS internal", "mdi:alert-outline", "warning/bmsInternal", "1", "0");
 
-    publishBinarySensor("Alarm High charge current", "alarm/overCurrentCharge", "1", "0");
-    publishBinarySensor("Warning High charge current", "warning/highCurrentCharge", "1", "0");
+    publishBinarySensor("Alarm High charge current", "mdi:alert", "alarm/overCurrentCharge", "1", "0");
+    publishBinarySensor("Warning High charge current", "mdi:alert-outline", "warning/highCurrentCharge", "1", "0");
 
-    publishBinarySensor("Charge enabled", "charging/chargeEnabled", "1", "0");
-    publishBinarySensor("Discharge enabled", "charging/dischargeEnabled", "1", "0");
-    publishBinarySensor("Charge immediately", "charging/chargeImmediately", "1", "0");
+    publishBinarySensor("Charge enabled", "mdi:battery-arrow-up", "charging/chargeEnabled", "1", "0");
+    publishBinarySensor("Discharge enabled", "mdi:battery-arrow-down", "charging/dischargeEnabled", "1", "0");
+    publishBinarySensor("Charge immediately", "mdi:alert", "charging/chargeImmediately", "1", "0");
 
     yield();
 }
 
-void MqttHandlePylontechHassClass::publishSensor(const char* caption, const char* subTopic, const char* deviceClass, const char* stateClass, const char* unitOfMeasurement )
+void MqttHandlePylontechHassClass::publishSensor(const char* caption, const char* icon, const char* subTopic, const char* deviceClass, const char* stateClass, const char* unitOfMeasurement )
 {
     String sensorId = caption;
     sensorId.replace(" ", "_");
@@ -115,6 +115,10 @@ void MqttHandlePylontechHassClass::publishSensor(const char* caption, const char
     root[F("stat_t")] = statTopic;
     root[F("uniq_id")] = serial + "_" + sensorId;
 
+    if (icon != NULL) {
+        root[F("icon")] = icon;
+    }
+
     if (unitOfMeasurement != NULL) {
         root[F("unit_of_meas")] = unitOfMeasurement;
     }
@@ -137,7 +141,8 @@ void MqttHandlePylontechHassClass::publishSensor(const char* caption, const char
     publish(configTopic, buffer);
 
 }
-void MqttHandlePylontechHassClass::publishBinarySensor(const char* caption, const char* subTopic, const char* payload_on, const char* payload_off)
+
+void MqttHandlePylontechHassClass::publishBinarySensor(const char* caption, const char* icon, const char* subTopic, const char* payload_on, const char* payload_off)
 {
     String sensorId = caption;
     sensorId.replace(" ", "_");
@@ -163,6 +168,10 @@ void MqttHandlePylontechHassClass::publishBinarySensor(const char* caption, cons
     root[F("pl_on")] = payload_on;
     root[F("pl_off")] = payload_off;
 
+    if (icon != NULL) {
+        root[F("icon")] = icon;
+    }
+
     JsonObject deviceObj = root.createNestedObject("dev");
     createDeviceInfo(deviceObj);
 
@@ -177,7 +186,7 @@ void MqttHandlePylontechHassClass::createDeviceInfo(JsonObject& object)
     object[F("ids")] = serial;
     object[F("cu")] = String(F("http://")) + NetworkSettings.localIP().toString();
     object[F("mf")] = F("OpenDTU");
-    object[F("mdl")] = Battery.manufacturer;
+    object[F("mdl")] = Battery.getStats()->getManufacturer();
     object[F("sw")] = AUTO_GIT_HASH;
 }
 

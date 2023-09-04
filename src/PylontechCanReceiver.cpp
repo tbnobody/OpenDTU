@@ -1,48 +1,53 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 #include "PylontechCanReceiver.h"
-#include "Battery.h"
 #include "Configuration.h"
 #include "MessageOutput.h"
-#include "MqttSettings.h"
+#include "PinMapping.h"
 #include <driver/twai.h>
 #include <ctime>
 
-//#define PYLONTECH_DEBUG_ENABLED
+//#define PYLONTECH_DUMMY
 
-PylontechCanReceiverClass PylontechCanReceiver;
-
-void PylontechCanReceiverClass::init(int8_t rx, int8_t tx)
+bool PylontechCanReceiver::init(bool verboseLogging)
 {
-    CONFIG_T& config = Configuration.get();
-    g_config = TWAI_GENERAL_CONFIG_DEFAULT((gpio_num_t)tx, (gpio_num_t)rx, TWAI_MODE_NORMAL);
-    if (config.Battery_Enabled) {
-        enable();
-    }
-}
+    _verboseLogging = verboseLogging;
 
-void PylontechCanReceiverClass::enable()
-{
-    if (_isEnabled) {
-        return;
+    MessageOutput.println(F("[Pylontech] Initialize interface..."));
+
+    const PinMapping_t& pin = PinMapping.get();
+    MessageOutput.printf("[Pylontech] Interface rx = %d, tx = %d\r\n",
+            pin.battery_rx, pin.battery_tx);
+
+    if (pin.battery_rx < 0 || pin.battery_tx < 0) {
+        MessageOutput.println(F("[Pylontech] Invalid pin config"));
+        return false;
     }
+
+    auto tx = static_cast<gpio_num_t>(pin.battery_tx);
+    auto rx = static_cast<gpio_num_t>(pin.battery_rx);
+    twai_general_config_t g_config = TWAI_GENERAL_CONFIG_DEFAULT(tx, rx, TWAI_MODE_NORMAL);
+
     // Initialize configuration structures using macro initializers
     twai_timing_config_t t_config = TWAI_TIMING_CONFIG_500KBITS();
     twai_filter_config_t f_config = TWAI_FILTER_CONFIG_ACCEPT_ALL();
 
     // Install TWAI driver
-    twaiLastResult = twai_driver_install(&g_config, &t_config, &f_config);
+    esp_err_t twaiLastResult = twai_driver_install(&g_config, &t_config, &f_config);
     switch (twaiLastResult) {
         case ESP_OK:
             MessageOutput.println(F("[Pylontech] Twai driver installed"));
             break;
         case ESP_ERR_INVALID_ARG:
             MessageOutput.println(F("[Pylontech] Twai driver install - invalid arg"));
+            return false;
             break;
         case ESP_ERR_NO_MEM:
             MessageOutput.println(F("[Pylontech] Twai driver install - no memory"));
+            return false;
             break;
         case ESP_ERR_INVALID_STATE:
             MessageOutput.println(F("[Pylontech] Twai driver install - invalid state"));
+            return false;
             break;
     }
 
@@ -51,22 +56,20 @@ void PylontechCanReceiverClass::enable()
     switch (twaiLastResult) {
         case ESP_OK:
             MessageOutput.println(F("[Pylontech] Twai driver started"));
-            _isEnabled = true;
             break;
         case ESP_ERR_INVALID_STATE:
             MessageOutput.println(F("[Pylontech] Twai driver start - invalid state"));
+            return false;
             break;
     }
+
+    return true;
 }
 
-void PylontechCanReceiverClass::disable()
+void PylontechCanReceiver::deinit()
 {
-    if (!_isEnabled) {
-        return;
-    }
-
     // Stop TWAI driver
-    twaiLastResult = twai_stop();
+    esp_err_t twaiLastResult = twai_stop();
     switch (twaiLastResult) {
         case ESP_OK:
             MessageOutput.println(F("[Pylontech] Twai driver stopped"));
@@ -81,7 +84,6 @@ void PylontechCanReceiverClass::disable()
     switch (twaiLastResult) {
         case ESP_OK:
             MessageOutput.println(F("[Pylontech] Twai driver uninstalled"));
-            _isEnabled = false;
             break;
         case ESP_ERR_INVALID_STATE:
             MessageOutput.println(F("[Pylontech] Twai driver uninstall - invalid state"));
@@ -89,64 +91,15 @@ void PylontechCanReceiverClass::disable()
     }
 }
 
-void PylontechCanReceiverClass::loop()
+void PylontechCanReceiver::loop()
 {
-    CONFIG_T& config = Configuration.get();
+#ifdef PYLONTECH_DUMMY
+    return dummyData();
+#endif
 
-    if (!config.Battery_Enabled) {
-        return;
-    }
-
-    parseCanPackets();
-    mqtt();
-}
-
-void PylontechCanReceiverClass::mqtt()
-{
-    CONFIG_T& config = Configuration.get();
-
-    if (!MqttSettings.getConnected()
-            || (millis() - _lastPublish) < (config.Mqtt_PublishInterval * 1000)) {
-        return;
-    }    
-
-    _lastPublish = millis();
-
-    String topic = "battery";
-    MqttSettings.publish(topic + "/settings/chargeVoltage", String(Battery.chargeVoltage));
-    MqttSettings.publish(topic + "/settings/chargeCurrentLimitation", String(Battery.chargeCurrentLimitation));
-    MqttSettings.publish(topic + "/settings/dischargeCurrentLimitation", String(Battery.dischargeCurrentLimitation));
-    MqttSettings.publish(topic + "/stateOfCharge", String(Battery.stateOfCharge));
-    MqttSettings.publish(topic + "/stateOfHealth", String(Battery.stateOfHealth));
-    MqttSettings.publish(topic + "/dataAge", String((millis() - Battery.lastUpdate) / 1000));
-    MqttSettings.publish(topic + "/voltage", String(Battery.voltage));
-    MqttSettings.publish(topic + "/current", String(Battery.current));
-    MqttSettings.publish(topic + "/temperature", String(Battery.temperature));
-    MqttSettings.publish(topic + "/alarm/overCurrentDischarge", String(Battery.alarmOverCurrentDischarge));
-    MqttSettings.publish(topic + "/alarm/underTemperature", String(Battery.alarmUnderTemperature));
-    MqttSettings.publish(topic + "/alarm/overTemperature", String(Battery.alarmOverTemperature));
-    MqttSettings.publish(topic + "/alarm/underVoltage", String(Battery.alarmUnderVoltage));
-    MqttSettings.publish(topic + "/alarm/overVoltage", String(Battery.alarmOverVoltage));
-    MqttSettings.publish(topic + "/alarm/bmsInternal", String(Battery.alarmBmsInternal));
-    MqttSettings.publish(topic + "/alarm/overCurrentCharge", String(Battery.alarmOverCurrentCharge));
-    MqttSettings.publish(topic + "/warning/highCurrentDischarge", String(Battery.warningHighCurrentDischarge));
-    MqttSettings.publish(topic + "/warning/lowTemperature", String(Battery.warningLowTemperature));
-    MqttSettings.publish(topic + "/warning/highTemperature", String(Battery.warningHighTemperature));
-    MqttSettings.publish(topic + "/warning/lowVoltage", String(Battery.warningLowVoltage));
-    MqttSettings.publish(topic + "/warning/highVoltage", String(Battery.warningHighVoltage));
-    MqttSettings.publish(topic + "/warning/bmsInternal", String(Battery.warningBmsInternal));
-    MqttSettings.publish(topic + "/warning/highCurrentCharge", String(Battery.warningHighCurrentCharge));
-    MqttSettings.publish(topic + "/manufacturer", Battery.manufacturer);
-    MqttSettings.publish(topic + "/charging/chargeEnabled", String(Battery.chargeEnabled));
-    MqttSettings.publish(topic + "/charging/dischargeEnabled", String(Battery.dischargeEnabled));
-    MqttSettings.publish(topic + "/charging/chargeImmediately", String(Battery.chargeImmediately));
-}
-
-void PylontechCanReceiverClass::parseCanPackets()
-{
     // Check for messages. twai_receive is blocking when there is no data so we return if there are no frames in the buffer
     twai_status_info_t status_info;
-    twaiLastResult = twai_get_status_info(&status_info);
+    esp_err_t twaiLastResult = twai_get_status_info(&status_info);
     if (twaiLastResult != ESP_OK) {
         switch (twaiLastResult) {
             case ESP_ERR_INVALID_ARG:
@@ -171,124 +124,126 @@ void PylontechCanReceiverClass::parseCanPackets()
 
     switch (rx_message.identifier) {
         case 0x351: {
-            Battery.chargeVoltage = this->scaleValue(this->readUnsignedInt16(rx_message.data), 0.1);
-            Battery.chargeCurrentLimitation = this->scaleValue(this->readSignedInt16(rx_message.data + 2), 0.1);
-            Battery.dischargeCurrentLimitation = this->scaleValue(this->readSignedInt16(rx_message.data + 4), 0.1);
+            _stats->_chargeVoltage = this->scaleValue(this->readUnsignedInt16(rx_message.data), 0.1);
+            _stats->_chargeCurrentLimitation = this->scaleValue(this->readSignedInt16(rx_message.data + 2), 0.1);
+            _stats->_dischargeCurrentLimitation = this->scaleValue(this->readSignedInt16(rx_message.data + 4), 0.1);
 
-#ifdef PYLONTECH_DEBUG_ENABLED
-           MessageOutput.printf("[Pylontech] chargeVoltage: %f chargeCurrentLimitation: %f dischargeCurrentLimitation: %f\n",
-                Battery.chargeVoltage, Battery.chargeCurrentLimitation, Battery.dischargeCurrentLimitation);
-#endif
+            if (_verboseLogging) {
+                MessageOutput.printf("[Pylontech] chargeVoltage: %f chargeCurrentLimitation: %f dischargeCurrentLimitation: %f\n",
+                        _stats->_chargeVoltage, _stats->_chargeCurrentLimitation, _stats->_dischargeCurrentLimitation);
+            }
             break;
         }
 
         case 0x355: {
-            Battery.stateOfCharge = this->readUnsignedInt16(rx_message.data);
-            Battery.stateOfChargeLastUpdate = millis();
-            Battery.stateOfHealth = this->readUnsignedInt16(rx_message.data + 2);
-            Battery.lastUpdate = millis();
+            _stats->setSoC(static_cast<uint8_t>(this->readUnsignedInt16(rx_message.data)));
+            _stats->_stateOfHealth = this->readUnsignedInt16(rx_message.data + 2);
 
-#ifdef PYLONTECH_DEBUG_ENABLED
-            MessageOutput.printf("[Pylontech] soc: %d soh: %d\n",
-                Battery.stateOfCharge, Battery.stateOfHealth);
-#endif
+            if (_verboseLogging) {
+                MessageOutput.printf("[Pylontech] soc: %d soh: %d\n",
+                        _stats->getSoC(), _stats->_stateOfHealth);
+            }
             break;
         }
 
         case 0x356: {
-            Battery.voltage = this->scaleValue(this->readSignedInt16(rx_message.data), 0.01);
-            Battery.current = this->scaleValue(this->readSignedInt16(rx_message.data + 2), 0.1);
-            Battery.temperature = this->scaleValue(this->readSignedInt16(rx_message.data + 4), 0.1);
+            _stats->_voltage = this->scaleValue(this->readSignedInt16(rx_message.data), 0.01);
+            _stats->_current = this->scaleValue(this->readSignedInt16(rx_message.data + 2), 0.1);
+            _stats->_temperature = this->scaleValue(this->readSignedInt16(rx_message.data + 4), 0.1);
 
-#ifdef PYLONTECH_DEBUG_ENABLED
-            MessageOutput.printf("[Pylontech] voltage: %f current: %f temperature: %f\n",
-                Battery.voltage, Battery.current, Battery.temperature);
-#endif
+            if (_verboseLogging) {
+                MessageOutput.printf("[Pylontech] voltage: %f current: %f temperature: %f\n",
+                        _stats->_voltage, _stats->_current, _stats->_temperature);
+            }
             break;
         }
 
         case 0x359: {
             uint16_t alarmBits = rx_message.data[0];
-            Battery.alarmOverCurrentDischarge = this->getBit(alarmBits, 7);
-            Battery.alarmUnderTemperature = this->getBit(alarmBits, 4);
-            Battery.alarmOverTemperature = this->getBit(alarmBits, 3);
-            Battery.alarmUnderVoltage = this->getBit(alarmBits, 2);
-            Battery.alarmOverVoltage= this->getBit(alarmBits, 1);
+            _stats->_alarmOverCurrentDischarge = this->getBit(alarmBits, 7);
+            _stats->_alarmUnderTemperature = this->getBit(alarmBits, 4);
+            _stats->_alarmOverTemperature = this->getBit(alarmBits, 3);
+            _stats->_alarmUnderVoltage = this->getBit(alarmBits, 2);
+            _stats->_alarmOverVoltage= this->getBit(alarmBits, 1);
 
             alarmBits = rx_message.data[1];
-            Battery.alarmBmsInternal= this->getBit(alarmBits, 3);
-            Battery.alarmOverCurrentCharge = this->getBit(alarmBits, 0);
+            _stats->_alarmBmsInternal= this->getBit(alarmBits, 3);
+            _stats->_alarmOverCurrentCharge = this->getBit(alarmBits, 0);
 
-#ifdef PYLONTECH_DEBUG_ENABLED
-            MessageOutput.printf("[Pylontech] Alarms: %d %d %d %d %d %d %d\n",
-                Battery.alarmOverCurrentDischarge,
-                Battery.alarmUnderTemperature,
-                Battery.alarmOverTemperature,
-                Battery.alarmUnderVoltage,
-                Battery.alarmOverVoltage,
-                Battery.alarmBmsInternal,
-                Battery.alarmOverCurrentCharge);
-#endif
+            if (_verboseLogging) {
+                MessageOutput.printf("[Pylontech] Alarms: %d %d %d %d %d %d %d\n",
+                        _stats->_alarmOverCurrentDischarge,
+                        _stats->_alarmUnderTemperature,
+                        _stats->_alarmOverTemperature,
+                        _stats->_alarmUnderVoltage,
+                        _stats->_alarmOverVoltage,
+                        _stats->_alarmBmsInternal,
+                        _stats->_alarmOverCurrentCharge);
+            }
 
             uint16_t warningBits = rx_message.data[2];
-            Battery.warningHighCurrentDischarge = this->getBit(warningBits, 7);
-            Battery.warningLowTemperature = this->getBit(warningBits, 4);
-            Battery.warningHighTemperature = this->getBit(warningBits, 3);
-            Battery.warningLowVoltage = this->getBit(warningBits, 2);
-            Battery.warningHighVoltage = this->getBit(warningBits, 1);
+            _stats->_warningHighCurrentDischarge = this->getBit(warningBits, 7);
+            _stats->_warningLowTemperature = this->getBit(warningBits, 4);
+            _stats->_warningHighTemperature = this->getBit(warningBits, 3);
+            _stats->_warningLowVoltage = this->getBit(warningBits, 2);
+            _stats->_warningHighVoltage = this->getBit(warningBits, 1);
 
             warningBits = rx_message.data[3];
-            Battery.warningBmsInternal= this->getBit(warningBits, 3);
-            Battery.warningHighCurrentCharge = this->getBit(warningBits, 0);
+            _stats->_warningBmsInternal= this->getBit(warningBits, 3);
+            _stats->_warningHighCurrentCharge = this->getBit(warningBits, 0);
 
-#ifdef PYLONTECH_DEBUG_ENABLED
-            MessageOutput.printf("[Pylontech] Warnings: %d %d %d %d %d %d %d\n",
-                Battery.warningHighCurrentDischarge,
-                Battery.warningLowTemperature,
-                Battery.warningHighTemperature,
-                Battery.warningLowVoltage,
-                Battery.warningHighVoltage,
-                Battery.warningBmsInternal,
-                Battery.warningHighCurrentCharge);
-#endif
+            if (_verboseLogging) {
+                MessageOutput.printf("[Pylontech] Warnings: %d %d %d %d %d %d %d\n",
+                        _stats->_warningHighCurrentDischarge,
+                        _stats->_warningLowTemperature,
+                        _stats->_warningHighTemperature,
+                        _stats->_warningLowVoltage,
+                        _stats->_warningHighVoltage,
+                        _stats->_warningBmsInternal,
+                        _stats->_warningHighCurrentCharge);
+            }
             break;
         }
 
         case 0x35E: {
-            String manufacturer = String(rx_message.data, rx_message.data_length_code);
-            //CAN.readString();
+            String manufacturer(reinterpret_cast<char*>(rx_message.data),
+                    rx_message.data_length_code);
 
-            if (manufacturer == "") {
-                break;
+            if (manufacturer.isEmpty()) { break; }
+
+            if (_verboseLogging) {
+                MessageOutput.printf("[Pylontech] Manufacturer: %s\n", manufacturer.c_str());
             }
 
-            strlcpy(Battery.manufacturer, manufacturer.c_str(), sizeof(Battery.manufacturer));
-
-#ifdef PYLONTECH_DEBUG_ENABLED
-            MessageOutput.printf("[Pylontech] Manufacturer: %s\n", manufacturer.c_str());
-#endif   
+            _stats->setManufacturer(std::move(manufacturer));
             break;
         }
 
         case 0x35C: {
             uint16_t chargeStatusBits = rx_message.data[0];
-            Battery.chargeEnabled = this->getBit(chargeStatusBits, 7);
-            Battery.dischargeEnabled = this->getBit(chargeStatusBits, 6);
-            Battery.chargeImmediately = this->getBit(chargeStatusBits, 5);
+            _stats->_chargeEnabled = this->getBit(chargeStatusBits, 7);
+            _stats->_dischargeEnabled = this->getBit(chargeStatusBits, 6);
+            _stats->_chargeImmediately = this->getBit(chargeStatusBits, 5);
 
-#ifdef PYLONTECH_DEBUG_ENABLED
-            MessageOutput.printf("[Pylontech] chargeStatusBits: %d %d %d\n",
-                Battery.chargeEnabled,
-                Battery.dischargeEnabled,
-                Battery.chargeImmediately);
-#endif
+            if (_verboseLogging) {
+                MessageOutput.printf("[Pylontech] chargeStatusBits: %d %d %d\n",
+                    _stats->_chargeEnabled,
+                    _stats->_dischargeEnabled,
+                    _stats->_chargeImmediately);
+            }
 
             break;
         }
+
+        default:
+            return; // do not update last update timestamp
+            break;
     }
+
+    _stats->setLastUpdate(millis());
 }
 
-uint16_t PylontechCanReceiverClass::readUnsignedInt16(uint8_t *data)
+uint16_t PylontechCanReceiver::readUnsignedInt16(uint8_t *data)
 {
     uint8_t bytes[2];
     bytes[0] = *data;
@@ -296,17 +251,94 @@ uint16_t PylontechCanReceiverClass::readUnsignedInt16(uint8_t *data)
     return (bytes[1] << 8) + bytes[0];
 }
 
-int16_t PylontechCanReceiverClass::readSignedInt16(uint8_t *data)
+int16_t PylontechCanReceiver::readSignedInt16(uint8_t *data)
 {
     return this->readUnsignedInt16(data);
 }
 
-float PylontechCanReceiverClass::scaleValue(int16_t value, float factor)
+float PylontechCanReceiver::scaleValue(int16_t value, float factor)
 {
     return value * factor;
 }
 
-bool PylontechCanReceiverClass::getBit(uint8_t value, uint8_t bit)
+bool PylontechCanReceiver::getBit(uint8_t value, uint8_t bit)
 {
     return (value & (1 << bit)) >> bit;
 }
+
+#ifdef PYLONTECH_DUMMY
+void PylontechCanReceiver::dummyData()
+{
+    static uint32_t lastUpdate = millis();
+    static uint8_t issues = 0;
+
+    if (millis() < (lastUpdate + 5 * 1000)) { return; }
+
+    lastUpdate = millis();
+    _stats->setLastUpdate(lastUpdate);
+
+    auto dummyFloat = [](int offset) -> float {
+        return offset + (static_cast<float>((lastUpdate + offset) % 10) / 10);
+    };
+
+    _stats->setManufacturer("Pylontech US3000C");
+    _stats->setSoC(42);
+    _stats->_chargeVoltage = dummyFloat(50);
+    _stats->_chargeCurrentLimitation = dummyFloat(33);
+    _stats->_dischargeCurrentLimitation = dummyFloat(12);
+    _stats->_stateOfHealth = 99;
+    _stats->_voltage = 48.67;
+    _stats->_current = dummyFloat(-1);
+    _stats->_temperature = dummyFloat(20);
+
+    _stats->_chargeEnabled = true;
+    _stats->_dischargeEnabled = true;
+    _stats->_chargeImmediately = false;
+
+    _stats->_warningHighCurrentDischarge = false;
+    _stats->_warningHighCurrentCharge = false;
+    _stats->_warningLowTemperature = false;
+    _stats->_warningHighTemperature = false;
+    _stats->_warningLowVoltage = false;
+    _stats->_warningHighVoltage = false;
+    _stats->_warningBmsInternal = false;
+
+    _stats->_alarmOverCurrentDischarge = false;
+    _stats->_alarmOverCurrentCharge = false;
+    _stats->_alarmUnderTemperature = false;
+    _stats->_alarmOverTemperature = false;
+    _stats->_alarmUnderVoltage = false;
+    _stats->_alarmOverVoltage = false;
+    _stats->_alarmBmsInternal = false;
+
+    if (issues == 1 || issues == 3) {
+        _stats->_warningHighCurrentDischarge = true;
+        _stats->_warningHighCurrentCharge = true;
+        _stats->_warningLowTemperature = true;
+        _stats->_warningHighTemperature = true;
+        _stats->_warningLowVoltage = true;
+        _stats->_warningHighVoltage = true;
+        _stats->_warningBmsInternal = true;
+    }
+
+    if (issues == 2 || issues == 3) {
+        _stats->_alarmOverCurrentDischarge = true;
+        _stats->_alarmOverCurrentCharge = true;
+        _stats->_alarmUnderTemperature = true;
+        _stats->_alarmOverTemperature = true;
+        _stats->_alarmUnderVoltage = true;
+        _stats->_alarmOverVoltage = true;
+        _stats->_alarmBmsInternal = true;
+    }
+
+    if (issues == 4) {
+        _stats->_warningHighCurrentCharge = true;
+        _stats->_warningLowTemperature = true;
+        _stats->_alarmUnderVoltage = true;
+        _stats->_dischargeEnabled = false;
+        _stats->_chargeImmediately = true;
+    }
+
+    issues = (issues + 1) % 5;
+}
+#endif

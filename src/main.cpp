@@ -9,7 +9,7 @@
 #include "Led_Single.h"
 #include "MessageOutput.h"
 #include "VeDirectFrameHandler.h"
-#include "PylontechCanReceiver.h"
+#include "Battery.h"
 #include "Huawei_can.h"
 #include "MqttHandleDtu.h"
 #include "MqttHandleHass.h"
@@ -165,7 +165,8 @@ void setup()
     MessageOutput.println(F("Initialize ve.direct interface... "));
     if (PinMapping.isValidVictronConfig()) {
         MessageOutput.printf("ve.direct rx = %d, tx = %d\r\n", pin.victron_rx, pin.victron_tx);
-        VeDirect.init(pin.victron_rx, pin.victron_tx);
+        VeDirect.init(pin.victron_rx, pin.victron_tx,
+                &MessageOutput, config.Vedirect_VerboseLogging);
         MessageOutput.println(F("done"));
     } else {
         MessageOutput.println(F("Invalid pin config"));
@@ -175,16 +176,6 @@ void setup()
 
     // Dynamic power limiter
     PowerLimiter.init();
-
-    // Initialize Pylontech Battery / CAN bus
-    MessageOutput.println(F("Initialize Pylontech battery interface... "));
-    if (PinMapping.isValidBatteryConfig()) {
-        MessageOutput.printf("Pylontech Battery rx = %d, tx = %d\r\n", pin.battery_rx, pin.battery_tx);
-        PylontechCanReceiver.init(pin.battery_rx, pin.battery_tx);
-        MessageOutput.println(F("done"));
-    } else {
-        MessageOutput.println(F("Invalid pin config"));
-    }
 
     // Initialize Huawei AC-charger PSU / CAN bus
     MessageOutput.println(F("Initialize Huawei AC charger interface... "));
@@ -196,6 +187,7 @@ void setup()
         MessageOutput.println(F("Invalid pin config"));
     }
 
+    Battery.init();
 }
 
 void loop()
@@ -212,9 +204,9 @@ void loop()
     yield();
     // Vedirect_Enabled is unknown to lib. Therefor check has to be done here
     if (Configuration.get().Vedirect_Enabled) {
-		VeDirect.loop();
+        VeDirect.loop();
         yield();
-	}
+    }
     MqttSettings.loop();
     yield();
     MqttHandleDtu.loop();
@@ -241,7 +233,7 @@ void loop()
     yield();
     MessageOutput.loop();
     yield();
-    PylontechCanReceiver.loop();
+    Battery.loop();
     yield();
     MqttHandlePylontechHass.loop();
     yield();

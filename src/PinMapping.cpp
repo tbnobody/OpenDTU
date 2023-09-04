@@ -94,12 +94,30 @@
 #define VICTRON_PIN_RX -1
 #endif
 
-#ifndef PYLONTECH_PIN_RX
-#define PYLONTECH_PIN_RX -1
+#ifndef BATTERY_PIN_RX
+#define BATTERY_PIN_RX -1
 #endif
 
-#ifndef PYLONTECH_PIN_TX
-#define PYLONTECH_PIN_TX -1
+#ifdef PYLONTECH_PIN_RX
+#undef BATTERY_PIN_RX
+#define BATTERY_PIN_RX PYLONTECH_PIN_RX
+#endif
+
+#ifndef BATTERY_PIN_RXEN
+#define BATTERY_PIN_RXEN -1
+#endif
+
+#ifndef BATTERY_PIN_TX
+#define BATTERY_PIN_TX -1
+#endif
+
+#ifdef PYLONTECH_PIN_TX
+#undef BATTERY_PIN_TX
+#define BATTERY_PIN_TX PYLONTECH_PIN_TX
+#endif
+
+#ifndef BATTERY_PIN_TXEN
+#define BATTERY_PIN_TXEN -1
 #endif
 
 #ifndef HUAWEI_PIN_MISO
@@ -167,8 +185,10 @@ PinMappingClass::PinMappingClass()
     _pinMapping.victron_tx = VICTRON_PIN_TX;
     _pinMapping.victron_rx = VICTRON_PIN_RX;
 
-    _pinMapping.battery_rx = PYLONTECH_PIN_RX;
-    _pinMapping.battery_tx = PYLONTECH_PIN_TX;
+    _pinMapping.battery_rx = BATTERY_PIN_RX;
+    _pinMapping.battery_rxen = BATTERY_PIN_RXEN;
+    _pinMapping.battery_tx = BATTERY_PIN_TX;
+    _pinMapping.battery_txen = BATTERY_PIN_TXEN;
 
     _pinMapping.huawei_miso = HUAWEI_PIN_MISO;
     _pinMapping.huawei_mosi = HUAWEI_PIN_MOSI;
@@ -240,8 +260,10 @@ bool PinMappingClass::init(const String& deviceMapping)
             _pinMapping.victron_rx = doc[i]["victron"]["rx"] | VICTRON_PIN_RX;
             _pinMapping.victron_tx = doc[i]["victron"]["tx"] | VICTRON_PIN_TX;
 
-            _pinMapping.battery_rx = doc[i]["battery"]["rx"] | PYLONTECH_PIN_RX;
-            _pinMapping.battery_tx = doc[i]["battery"]["tx"] | PYLONTECH_PIN_TX;
+            _pinMapping.battery_rx = doc[i]["battery"]["rx"] | BATTERY_PIN_RX;
+            _pinMapping.battery_rxen = doc[i]["battery"]["rxen"] | BATTERY_PIN_RXEN;
+            _pinMapping.battery_tx = doc[i]["battery"]["tx"] | BATTERY_PIN_TX;
+            _pinMapping.battery_txen = doc[i]["battery"]["txen"] | BATTERY_PIN_TXEN;
 
             _pinMapping.huawei_miso = doc[i]["huawei"]["miso"] | HUAWEI_PIN_MISO;
             _pinMapping.huawei_mosi = doc[i]["huawei"]["mosi"] | HUAWEI_PIN_MOSI;
@@ -287,12 +309,6 @@ bool PinMappingClass::isValidVictronConfig()
 {
     return _pinMapping.victron_rx >= 0
         && _pinMapping.victron_tx >= 0;
-}
-
-bool PinMappingClass::isValidBatteryConfig()
-{
-    return _pinMapping.battery_rx >= 0
-        && _pinMapping.battery_tx >= 0;
 }
 
 bool PinMappingClass::isValidHuaweiConfig()

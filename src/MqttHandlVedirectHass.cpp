@@ -55,32 +55,32 @@ void MqttHandleVedirectHassClass::publishConfig()
     }
 
     // device info
-    publishBinarySensor("MPPT load output state", "LOAD", "ON", "OFF");
-    publishSensor("MPPT serial number", "SER");
-    publishSensor("MPPT firmware number", "FW");
-    publishSensor("MPPT state of operation", "CS");
-    publishSensor("MPPT error code", "ERR");
-    publishSensor("MPPT off reason", "OR");
-    publishSensor("MPPT tracker operation mode", "MPPT");
-    publishSensor("MPPT Day sequence number (0...364)", "HSDS", NULL, "total", "d");
+    publishBinarySensor("MPPT load output state", "mdi:export", "LOAD", "ON", "OFF");
+    publishSensor("MPPT serial number", "mdi:counter", "SER");
+    publishSensor("MPPT firmware number", "mdi:counter", "FW");
+    publishSensor("MPPT state of operation", "mdi:wrench", "CS");
+    publishSensor("MPPT error code", "mdi:bell", "ERR");
+    publishSensor("MPPT off reason", "mdi:wrench", "OR");
+    publishSensor("MPPT tracker operation mode", "mdi:wrench", "MPPT");
+    publishSensor("MPPT Day sequence number (0...364)", "mdi:calendar-month-outline", "HSDS", NULL, "total", "d");
 
     // battery info
-    publishSensor("Battery voltage", "V", "voltage", "measurement", "V");
-    publishSensor("Battery current", "I", "current", "measurement", "A");
+    publishSensor("Battery voltage", NULL, "V", "voltage", "measurement", "V");
+    publishSensor("Battery current", NULL, "I", "current", "measurement", "A");
 
     // panel info
-    publishSensor("Panel voltage", "VPV", "voltage", "measurement", "V");
-    publishSensor("Panel power", "PPV", "power", "measurement", "W");
-    publishSensor("Panel yield total", "H19", "energy", "total_increasing", "kWh");
-    publishSensor("Panel yield today", "H20", "energy", "total", "kWh");
-    publishSensor("Panel maximum power today", "H21", "power", "measurement", "W");
-    publishSensor("Panel yield yesterday", "H22", "energy", "total", "kWh");
-    publishSensor("Panel maximum power yesterday", "H23", "power", "measurement", "W");
+    publishSensor("Panel voltage", NULL, "VPV", "voltage", "measurement", "V");
+    publishSensor("Panel power", NULL, "PPV", "power", "measurement", "W");
+    publishSensor("Panel yield total", NULL, "H19", "energy", "total_increasing", "kWh");
+    publishSensor("Panel yield today", NULL, "H20", "energy", "total", "kWh");
+    publishSensor("Panel maximum power today", NULL, "H21", "power", "measurement", "W");
+    publishSensor("Panel yield yesterday", NULL, "H22", "energy", "total", "kWh");
+    publishSensor("Panel maximum power yesterday", NULL, "H23", "power", "measurement", "W");
 
     yield();
 }
 
-void MqttHandleVedirectHassClass::publishSensor(const char* caption, const char* subTopic, const char* deviceClass, const char* stateClass, const char* unitOfMeasurement )
+void MqttHandleVedirectHassClass::publishSensor(const char* caption, const char* icon, const char* subTopic, const char* deviceClass, const char* stateClass, const char* unitOfMeasurement )
 {
     String serial = VeDirect.veFrame.SER;
 
@@ -105,6 +105,10 @@ void MqttHandleVedirectHassClass::publishSensor(const char* caption, const char*
     root[F("stat_t")] = statTopic;
     root[F("uniq_id")] = serial + "_" + sensorId;
 
+    if (icon != NULL) {
+        root[F("icon")] = icon;
+    }
+
     if (unitOfMeasurement != NULL) {
         root[F("unit_of_meas")] = unitOfMeasurement;
     }
@@ -127,7 +131,7 @@ void MqttHandleVedirectHassClass::publishSensor(const char* caption, const char*
     publish(configTopic, buffer);
 
 }
-void MqttHandleVedirectHassClass::publishBinarySensor(const char* caption, const char* subTopic, const char* payload_on, const char* payload_off)
+void MqttHandleVedirectHassClass::publishBinarySensor(const char* caption, const char* icon, const char* subTopic, const char* payload_on, const char* payload_off)
 {
     String serial = VeDirect.veFrame.SER;
 
@@ -153,6 +157,10 @@ void MqttHandleVedirectHassClass::publishBinarySensor(const char* caption, const
     root[F("stat_t")] = statTopic;
     root[F("pl_on")] = payload_on;
     root[F("pl_off")] = payload_off;
+
+    if (icon != NULL) {
+        root[F("icon")] = icon;
+    }
 
     JsonObject deviceObj = root.createNestedObject("dev");
     createDeviceInfo(deviceObj);

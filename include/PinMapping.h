@@ -41,7 +41,9 @@ struct PinMapping_t {
     int8_t victron_tx;
     int8_t victron_rx;
     int8_t battery_rx;
+    int8_t battery_rxen;
     int8_t battery_tx;
+    int8_t battery_txen;
     int8_t huawei_miso;
     int8_t huawei_mosi;
     int8_t huawei_clk;
@@ -61,7 +63,6 @@ public:
     bool isValidCmt2300Config();
     bool isValidEthConfig();
     bool isValidVictronConfig();
-    bool isValidBatteryConfig();
     bool isValidHuaweiConfig();
     
 private:

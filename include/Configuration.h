@@ -127,6 +127,7 @@ struct CONFIG_T {
     char Mqtt_ClientKey[MQTT_MAX_CERT_STRLEN +1];
 
     bool Vedirect_Enabled;
+    bool Vedirect_VerboseLogging;
     bool Vedirect_UpdatesOnly;
 
     bool PowerMeter_Enabled;
@@ -166,6 +167,11 @@ struct CONFIG_T {
     float PowerLimiter_FullSolarPassThroughStopVoltage;
 
     bool Battery_Enabled;
+    bool Battery_VerboseLogging;
+    uint8_t Battery_Provider;
+    uint8_t Battery_JkBmsInterface;
+    uint8_t Battery_JkBmsPollingInterval;
+
     bool Huawei_Enabled;
     bool Huawei_Auto_Power_Enabled;
     float Huawei_Auto_Power_Voltage_Limit;

@@ -4,9 +4,9 @@
 #include "ArduinoJson.h"
 #include <ESPAsyncWebServer.h>
 
-class WebApiWsPylontechLiveClass {
+class WebApiWsBatteryLiveClass {
 public:
-    WebApiWsPylontechLiveClass();
+    WebApiWsBatteryLiveClass();
     void init(AsyncWebServer* server);
     void loop();
 
@@ -20,4 +20,5 @@ private:
 
     uint32_t _lastWsCleanup = 0;
     uint32_t _lastUpdateCheck = 0;
+    static constexpr uint16_t _responseSize = 1024 + 512;
 };
