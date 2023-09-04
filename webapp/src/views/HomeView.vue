@@ -98,7 +98,7 @@
                                     <template v-for="channel in Object.keys(chanType.obj).sort().reverse().map(x=>+x)" :key="channel">
                                         <template v-if="(chanType.name != 'DC') ||
                                             (chanType.name == 'DC' && getSumIrridiation(inverter) == 0) ||
-                                            (chanType.name == 'DC' && getSumIrridiation(inverter) > 0 && chanType.obj[channel].Irradiation?.v || 0 > 0)
+                                            (chanType.name == 'DC' && getSumIrridiation(inverter) > 0 && chanType.obj[channel].Irradiation?.max || 0 > 0)
                                             ">
                                             <div class="col">
                                                 <InverterChannelInfo :channelData="chanType.obj[channel]"
@@ -686,7 +686,7 @@ export default defineComponent({
         getSumIrridiation(inv: Inverter): number {
             let total = 0;
             Object.keys(inv.DC).forEach((key) => {
-                total += inv.DC[key as unknown as number].Irradiation?.v || 0;
+                total += inv.DC[key as unknown as number].Irradiation?.max || 0;
             });
             return total;
         }
