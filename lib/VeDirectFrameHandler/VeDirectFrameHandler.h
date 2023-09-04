@@ -12,6 +12,7 @@
 #pragma once
 
 #include <Arduino.h>
+#include <array>
 
 #ifndef VICTRON_PIN_TX
 #define VICTRON_PIN_TX 21      // HardwareSerial TX Pin
@@ -87,7 +88,8 @@ class VeDirectFrameHandler {
 public:
 
     VeDirectFrameHandler();
-    void init(int8_t rx, int8_t tx);             // initialize HardewareSerial
+    void setVerboseLogging(bool verboseLogging);
+    void init(int8_t rx, int8_t tx, Print* msgOut, bool verboseLogging);
     void loop();                                 // main loop to read ve.direct data
     unsigned long getLastUpdate();               // timestamp of last successful frame read
     bool isDataValid();                          // return true if data valid and not outdated
@@ -101,13 +103,15 @@ public:
 
 private:
     void setLastUpdate();                     // set timestampt after successful frame read
+    void dumpDebugBuffer();
     void rxData(uint8_t inbyte);              // byte of serial data
     void textRxEvent(char *, char *);
     void frameEndEvent(bool);                 // copy temp struct to public struct
-    void logE(const char *, const char *);    
     int hexRxEvent(uint8_t);
 
     //bool mStop;                               // not sure what Victron uses this for, not using
+    Print* _msgOut;
+    bool _verboseLogging;
     int _state;                                // current state
     int _prevState;                            // previous state
     uint8_t	_checksum;                         // checksum value
@@ -117,7 +121,10 @@ private:
     char _value[VE_MAX_VALUE_LEN];             // buffer for the field value
     veStruct _tmpFrame{};                        // private struct for received name and value pairs
     MovingAverage<double, 5> _efficiency;
-    unsigned long _lastUpdate;
+    std::array<uint8_t, 512> _debugBuffer;
+    unsigned _debugIn;
+    uint32_t _lastByteMillis;
+    uint32_t _lastUpdate;
 };
 
 extern VeDirectFrameHandler VeDirect;

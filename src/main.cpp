@@ -165,7 +165,8 @@ void setup()
     MessageOutput.println(F("Initialize ve.direct interface... "));
     if (PinMapping.isValidVictronConfig()) {
         MessageOutput.printf("ve.direct rx = %d, tx = %d\r\n", pin.victron_rx, pin.victron_tx);
-        VeDirect.init(pin.victron_rx, pin.victron_tx);
+        VeDirect.init(pin.victron_rx, pin.victron_tx,
+                &MessageOutput, config.Vedirect_VerboseLogging);
         MessageOutput.println(F("done"));
     } else {
         MessageOutput.println(F("Invalid pin config"));
@@ -203,9 +204,9 @@ void loop()
     yield();
     // Vedirect_Enabled is unknown to lib. Therefor check has to be done here
     if (Configuration.get().Vedirect_Enabled) {
-		VeDirect.loop();
+        VeDirect.loop();
         yield();
-	}
+    }
     MqttSettings.loop();
     yield();
     MqttHandleDtu.loop();

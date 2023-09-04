@@ -12,8 +12,12 @@
             </CardElement>
 
             <CardElement :text="$t('vedirectadmin.VedirectParameter')" textVariant="text-bg-primary" add-space
-                         v-show="vedirectConfigList.vedirect_enabled"
-            >
+                         v-show="vedirectConfigList.vedirect_enabled">
+
+                <InputElement :label="$t('vedirectadmin.VerboseLogging')"
+                              v-model="vedirectConfigList.verbose_logging"
+                              type="checkbox" wide/>
+
                 <InputElement :label="$t('vedirectadmin.UpdatesOnly')"
                               v-model="vedirectConfigList.vedirect_updatesonly"
                               type="checkbox" wide/>

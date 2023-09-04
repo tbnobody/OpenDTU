@@ -327,6 +327,7 @@
         "Status": "@:ntpinfo.Status",
         "Enabled": "@:mqttinfo.Enabled",
         "Disabled": "@:mqttinfo.Disabled",
+        "VerboseLogging": "@:base.VerboseLogging",
         "UpdatesOnly": "@:vedirectadmin.UpdatesOnly",
         "UpdatesEnabled": "@:mqttinfo.Enabled",
         "UpdatesDisabled": "@:mqttinfo.Disabled"
@@ -499,7 +500,7 @@
         "VedirectConfiguration": "VE.Direct Konfiguration",
         "EnableVedirect": "Aktiviere VE.Direct",
         "VedirectParameter": "VE.Direct Parameter",
-        "Seconds": "Sekunden",
+        "VerboseLogging": "@:base.VerboseLogging",
         "UpdatesOnly": "Werte nur bei Änderung an MQTT broker senden",
         "Save": "@:dtuadmin.Save"
     },

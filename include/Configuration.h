@@ -127,6 +127,7 @@ struct CONFIG_T {
     char Mqtt_ClientKey[MQTT_MAX_CERT_STRLEN +1];
 
     bool Vedirect_Enabled;
+    bool Vedirect_VerboseLogging;
     bool Vedirect_UpdatesOnly;
 
     bool PowerMeter_Enabled;

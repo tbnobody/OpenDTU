@@ -37,6 +37,7 @@ void WebApiVedirectClass::onVedirectStatus(AsyncWebServerRequest* request)
     const CONFIG_T& config = Configuration.get();
 
     root[F("vedirect_enabled")] = config.Vedirect_Enabled;
+    root[F("verbose_logging")] = config.Vedirect_VerboseLogging;
     root[F("vedirect_updatesonly")] = config.Vedirect_UpdatesOnly;
 
     response->setLength();
@@ -54,6 +55,7 @@ void WebApiVedirectClass::onVedirectAdminGet(AsyncWebServerRequest* request)
     const CONFIG_T& config = Configuration.get();
 
     root[F("vedirect_enabled")] = config.Vedirect_Enabled;
+    root[F("verbose_logging")] = config.Vedirect_VerboseLogging;
     root[F("vedirect_updatesonly")] = config.Vedirect_UpdatesOnly;
 
     response->setLength();
@@ -99,7 +101,9 @@ void WebApiVedirectClass::onVedirectAdminPost(AsyncWebServerRequest* request)
         return;
     }
 
-    if (!(root.containsKey("vedirect_enabled") && root.containsKey("vedirect_updatesonly")) ) {
+    if (!root.containsKey("vedirect_enabled") ||
+            !root.containsKey("verbose_logging") ||
+            !root.containsKey("vedirect_updatesonly") ) {
         retMsg[F("message")] = F("Values are missing!");
         retMsg[F("code")] = WebApiError::GenericValueMissing;
         response->setLength();
@@ -109,8 +113,11 @@ void WebApiVedirectClass::onVedirectAdminPost(AsyncWebServerRequest* request)
 
     CONFIG_T& config = Configuration.get();
     config.Vedirect_Enabled = root[F("vedirect_enabled")].as<bool>();
+    config.Vedirect_VerboseLogging = root[F("verbose_logging")].as<bool>();
     config.Vedirect_UpdatesOnly = root[F("vedirect_updatesonly")].as<bool>();
     Configuration.write();
+
+    VeDirect.setVerboseLogging(config.Vedirect_VerboseLogging);
 
     retMsg[F("type")] = F("success");
     retMsg[F("message")] = F("Settings saved!");
