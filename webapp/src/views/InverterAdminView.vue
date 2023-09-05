@@ -187,6 +187,11 @@
                                     v-model="selectedInverterData.zero_runtime"
                                     type="checkbox"
                                     :tooltip="$t('inverteradmin.ZeroRuntimeHint')" wide/>
+
+                                <InputElement :label="$t('inverteradmin.ZeroDay')"
+                                    v-model="selectedInverterData.zero_day"
+                                    type="checkbox"
+                                    :tooltip="$t('inverteradmin.ZeroDayHint')" wide/>
                             </div>
                         </div>
                     </form>
@@ -263,6 +268,7 @@ declare interface Inverter {
     command_enable_night: boolean;
     reachable_threshold: number;
     zero_runtime: boolean;
+    zero_day: boolean;
     channel: Array<Channel>;
 }
 

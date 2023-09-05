@@ -112,6 +112,7 @@ bool ConfigurationClass::write()
         inv["command_enable_night"] = config.Inverter[i].Command_Enable_Night;
         inv["reachable_threshold"] = config.Inverter[i].ReachableThreshold;
         inv["zero_runtime"] = config.Inverter[i].ZeroRuntimeDataIfUnrechable;
+        inv["zero_day"] = config.Inverter[i].ZeroYieldDayOnMidnight;
 
         JsonArray channel = inv.createNestedArray("channel");
         for (uint8_t c = 0; c < INV_MAX_CHAN_COUNT; c++) {
@@ -262,6 +263,7 @@ bool ConfigurationClass::read()
         config.Inverter[i].Command_Enable_Night = inv["command_enable_night"] | true;
         config.Inverter[i].ReachableThreshold = inv["reachable_threshold"] | REACHABLE_THRESHOLD;
         config.Inverter[i].ZeroRuntimeDataIfUnrechable = inv["zero_runtime"] | false;
+        config.Inverter[i].ZeroYieldDayOnMidnight = inv["zero_day"] | false;
 
         JsonArray channel = inv["channel"];
         for (uint8_t c = 0; c < INV_MAX_CHAN_COUNT; c++) {

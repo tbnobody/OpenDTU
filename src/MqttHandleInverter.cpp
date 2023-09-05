@@ -94,7 +94,7 @@ void MqttHandleInverterClass::loop()
             }
 
             uint32_t lastUpdate = inv->Statistics()->getLastUpdate();
-            if (lastUpdate > 0 && (lastUpdate != _lastPublishStats[i] || (inv->getZeroValuesIfUnreachable() && _statsTimeout.occured()))) {
+            if (lastUpdate > 0 && (lastUpdate != _lastPublishStats[i] || ((inv->getZeroValuesIfUnreachable() || inv->getZeroYieldDayOnMidnight()) && _statsTimeout.occured()))) {
                 _lastPublishStats[i] = lastUpdate;
 
                 // At first a change of the stats have to occour. Then the stats

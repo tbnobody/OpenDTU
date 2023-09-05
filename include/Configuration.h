@@ -47,6 +47,7 @@ struct INVERTER_CONFIG_T {
     bool Command_Enable_Night;
     uint8_t ReachableThreshold;
     bool ZeroRuntimeDataIfUnrechable;
+    bool ZeroYieldDayOnMidnight;
     CHANNEL_CONFIG_T channel[INV_MAX_CHAN_COUNT];
 };
 

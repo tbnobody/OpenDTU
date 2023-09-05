@@ -3,6 +3,7 @@
  * Copyright (C) 2022 Thomas Basler and others
  */
 #include "Hoymiles.h"
+#include "Utils.h"
 #include "inverters/HMS_1CH.h"
 #include "inverters/HMS_2CH.h"
 #include "inverters/HMS_4CH.h"
@@ -105,6 +106,24 @@ void HoymilesClass::loop()
                 }
 
                 _lastPoll = millis();
+            }
+
+            // Perform housekeeping of all inverters on day change
+            int8_t currentWeekDay = Utils::getWeekDay();
+            static int8_t lastWeekDay = -1;
+            if (lastWeekDay == -1) {
+                lastWeekDay = currentWeekDay;
+            } else {
+                if (currentWeekDay != lastWeekDay) {
+
+                    for (auto& inv : _inverters) {
+                        if (inv->getZeroYieldDayOnMidnight()) {
+                            inv->Statistics()->zeroDailyData();
+                        }
+                    }
+
+                    lastWeekDay = currentWeekDay;
+                }
             }
         }
     }

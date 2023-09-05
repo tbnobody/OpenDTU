@@ -142,8 +142,11 @@ public:
     uint32_t getRxFailureCount();
 
     void zeroRuntimeData();
+    void zeroDailyData();
 
 private:
+    void zeroFields(const FieldId_t* fields);
+
     uint8_t _payloadStatistic[STATISTIC_PACKET_SIZE] = {};
     uint8_t _statisticLength = 0;
     uint16_t _stringMaxPower[CH_CNT];

@@ -54,6 +54,9 @@ public:
     void setZeroValuesIfUnreachable(bool enabled);
     bool getZeroValuesIfUnreachable();
 
+    void setZeroYieldDayOnMidnight(bool enabled);
+    bool getZeroYieldDayOnMidnight();
+
     void clearRxFragmentBuffer();
     void addRxFragment(uint8_t fragment[], uint8_t len);
     uint8_t verifyAllFragments(CommandAbstract* cmd);
@@ -95,6 +98,7 @@ private:
     uint8_t _reachableThreshold = 3;
 
     bool _zeroValuesIfUnreachable = false;
+    bool _zeroYieldDayOnMidnight = false;
 
     std::unique_ptr<AlarmLogParser> _alarmLogParser;
     std::unique_ptr<DevInfoParser> _devInfoParser;

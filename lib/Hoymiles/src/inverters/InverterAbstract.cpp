@@ -116,6 +116,16 @@ bool InverterAbstract::getZeroValuesIfUnreachable()
     return _zeroValuesIfUnreachable;
 }
 
+void InverterAbstract::setZeroYieldDayOnMidnight(bool enabled)
+{
+    _zeroYieldDayOnMidnight = enabled;
+}
+
+bool InverterAbstract::getZeroYieldDayOnMidnight()
+{
+    return _zeroYieldDayOnMidnight;
+}
+
 bool InverterAbstract::sendChangeChannelRequest()
 {
     return false;

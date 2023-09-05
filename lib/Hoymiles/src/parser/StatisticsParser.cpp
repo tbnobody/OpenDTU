@@ -55,6 +55,10 @@ const FieldId_t runtimeFields[] = {
     FLD_IAC_3,
 };
 
+const FieldId_t dailyProductionFields[] = {
+    FLD_YD,
+};
+
 StatisticsParser::StatisticsParser()
     : Parser()
 {
@@ -318,12 +322,22 @@ uint32_t StatisticsParser::getRxFailureCount()
 
 void StatisticsParser::zeroRuntimeData()
 {
+    zeroFields(runtimeFields);
+}
+
+void StatisticsParser::zeroDailyData()
+{
+    zeroFields(dailyProductionFields);
+}
+
+void StatisticsParser::zeroFields(const FieldId_t* fields)
+{
     // Loop all channels
     for (auto& t : getChannelTypes()) {
         for (auto& c : getChannelsByType(t)) {
             for (uint8_t i = 0; i < (sizeof(runtimeFields) / sizeof(runtimeFields[0])); i++) {
-                if (hasChannelFieldValue(t, c, runtimeFields[i])) {
-                    setChannelFieldValue(t, c, runtimeFields[i], 0);
+                if (hasChannelFieldValue(t, c, fields[i])) {
+                    setChannelFieldValue(t, c, fields[i], 0);
                 }
             }
         }
