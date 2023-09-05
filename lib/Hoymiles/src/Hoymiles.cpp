@@ -64,8 +64,7 @@ void HoymilesClass::loop()
                 iv->sendAlarmLogRequest(force);
 
                 // Fetch limit
-                if ((iv->SystemConfigPara()->getLastLimitRequestSuccess() == CMD_NOK)
-                    || ((millis() - iv->SystemConfigPara()->getLastUpdateRequest() > HOY_SYSTEM_CONFIG_PARA_POLL_INTERVAL)
+                if (((millis() - iv->SystemConfigPara()->getLastUpdateRequest() > HOY_SYSTEM_CONFIG_PARA_POLL_INTERVAL)
                         && (millis() - iv->SystemConfigPara()->getLastUpdateCommand() > HOY_SYSTEM_CONFIG_PARA_POLL_MIN_DURATION))) {
                     _messageOutput->println("Request SystemConfigPara");
                     iv->sendSystemConfigParaRequest();
