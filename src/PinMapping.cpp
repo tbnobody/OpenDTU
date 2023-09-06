@@ -30,6 +30,14 @@
 #define DISPLAY_RESET 255U
 #endif
 
+#ifndef DISPLAY_BUSY
+#define DISPLAY_BUSY 255
+#endif
+
+#ifndef DISPLAY_DC
+#define DISPLAY_DC 255
+#endif
+
 #ifndef LED0
 #define LED0 -1
 #endif
@@ -123,6 +131,8 @@ PinMappingClass::PinMappingClass()
     _pinMapping.display_clk = DISPLAY_CLK;
     _pinMapping.display_cs = DISPLAY_CS;
     _pinMapping.display_reset = DISPLAY_RESET;
+    _pinMapping.display_busy = DISPLAY_BUSY;
+    _pinMapping.display_dc = DISPLAY_DC;
 
     _pinMapping.led[0] = LED0;
     _pinMapping.led[1] = LED1;
@@ -184,6 +194,8 @@ bool PinMappingClass::init(const String& deviceMapping)
             _pinMapping.display_clk = doc[i]["display"]["clk"] | DISPLAY_CLK;
             _pinMapping.display_cs = doc[i]["display"]["cs"] | DISPLAY_CS;
             _pinMapping.display_reset = doc[i]["display"]["reset"] | DISPLAY_RESET;
+            _pinMapping.display_busy = doc[i]["display"]["busy"] | DISPLAY_BUSY;
+            _pinMapping.display_dc = doc[i]["display"]["dc"] | DISPLAY_DC;
 
             _pinMapping.led[0] = doc[i]["led"]["led0"] | LED0;
             _pinMapping.led[1] = doc[i]["led"]["led1"] | LED1;

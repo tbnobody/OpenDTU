@@ -4,7 +4,7 @@
  */
 #include "Configuration.h"
 #include "Datastore.h"
-#include "Display_Graphic.h"
+#include "Display.h"
 #include "InverterSettings.h"
 #include "Led_Single.h"
 #include "MessageOutput.h"
@@ -22,6 +22,9 @@
 #include "defaults.h"
 #include <Arduino.h>
 #include <LittleFS.h>
+
+void displayTask(void*);
+TaskHandle_t displayTaskHandle;
 
 void setup()
 {
@@ -108,22 +111,6 @@ void setup()
     WebApi.init();
     MessageOutput.println("done");
 
-    // Initialize Display
-    MessageOutput.print("Initialize Display... ");
-    Display.init(
-        static_cast<DisplayType_t>(pin.display_type),
-        pin.display_data,
-        pin.display_clk,
-        pin.display_cs,
-        pin.display_reset);
-    Display.setOrientation(config.Display_Rotation);
-    Display.enablePowerSafe = config.Display_PowerSafe;
-    Display.enableScreensaver = config.Display_ScreenSaver;
-    Display.setContrast(config.Display_Contrast);
-    Display.setLanguage(config.Display_Language);
-    Display.setStartupDisplay();
-    MessageOutput.println("done");
-
     // Initialize Single LEDs
     MessageOutput.print("Initialize LEDs... ");
     LedSingle.init();
@@ -145,6 +132,8 @@ void setup()
     InverterSettings.init();
 
     Datastore.init();
+
+    xTaskCreateUniversal(displayTask, "displayTask", 8192, NULL, 1, &displayTaskHandle, ARDUINO_RUNNING_CORE);
 }
 
 void loop()
@@ -165,12 +154,39 @@ void loop()
     yield();
     WebApi.loop();
     yield();
-    Display.loop();
-    yield();
     SunPosition.loop();
     yield();
     MessageOutput.loop();
     yield();
     LedSingle.loop();
     yield();
+}
+
+void displayTask(void* pvParameters)
+{
+    CONFIG_T& config = Configuration.get();
+    const PinMapping_t& pin = PinMapping.get();
+
+    // Initialize Display
+    MessageOutput.print("Initialize Display... ");
+    Display.init(
+        static_cast<DisplayType_t>(pin.display_type),
+        pin.display_data,
+        pin.display_clk,
+        pin.display_cs,
+        pin.display_reset,
+        pin.display_busy,
+        pin.display_dc);
+    Display.setOrientation(config.Display_Rotation);
+    Display.setEnablePowerSafe(config.Display_PowerSafe);
+    Display.setEnableScreensaver(config.Display_ScreenSaver);
+    Display.setContrast(config.Display_Contrast);
+    Display.setLanguage(config.Display_Language);
+    Display.setUpdatePeriod(config.Display_UpdatePeriod);
+    MessageOutput.println("done");
+
+    while (true) {
+        Display.loop();
+        yield();
+    }
 }

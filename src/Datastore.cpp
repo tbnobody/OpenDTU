@@ -204,3 +204,9 @@ bool DatastoreClass::getIsAtLeastOnePollEnabled()
     std::lock_guard<std::mutex> lock(_mutex);
     return _isAtLeastOnePollEnabled;
 }
+
+uint8_t DatastoreClass::getTotalProducing()
+{
+    std::lock_guard<std::mutex> lock(_mutex);
+    return _isProducing;
+}

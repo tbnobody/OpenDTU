@@ -57,6 +57,9 @@ public:
     // True if all enabled inverters are reachable
     bool getIsAllEnabledReachable();
 
+    // Sum of all Producing Inverters
+    uint8_t getTotalProducing();
+
 private:
     TimeoutHelper _updateTimeout;
     std::mutex _mutex;
@@ -77,6 +80,7 @@ private:
     bool _isAllEnabledProducing = false;
     bool _isAllEnabledReachable = false;
     bool _isAtLeastOnePollEnabled = false;
+    uint8_t _isProducing = 0;
 };
 
 extern DatastoreClass Datastore;

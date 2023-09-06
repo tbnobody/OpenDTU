@@ -4,7 +4,7 @@
  */
 #include "WebApi_device.h"
 #include "Configuration.h"
-#include "Display_Graphic.h"
+#include "Display.h"
 #include "PinMapping.h"
 #include "Utils.h"
 #include "WebApi.h"
@@ -71,6 +71,8 @@ void WebApiDeviceClass::onDeviceAdminGet(AsyncWebServerRequest* request)
     displayPinObj["clk"] = pin.display_clk;
     displayPinObj["cs"] = pin.display_cs;
     displayPinObj["reset"] = pin.display_reset;
+    displayPinObj["busy"] = pin.display_busy;
+    displayPinObj["dc"] = pin.display_dc;
 
     JsonObject ledPinObj = curPin.createNestedObject("led");
     ledPinObj["led0"] = pin.led[0];
@@ -82,6 +84,7 @@ void WebApiDeviceClass::onDeviceAdminGet(AsyncWebServerRequest* request)
     display["screensaver"] = config.Display_ScreenSaver;
     display["contrast"] = config.Display_Contrast;
     display["language"] = config.Display_Language;
+    display["update"] = config.Display_UpdatePeriod;
 
     response->setLength();
     request->send(response);
@@ -153,12 +156,14 @@ void WebApiDeviceClass::onDeviceAdminPost(AsyncWebServerRequest* request)
     config.Display_ScreenSaver = root["display"]["screensaver"].as<bool>();
     config.Display_Contrast = root["display"]["contrast"].as<uint8_t>();
     config.Display_Language = root["display"]["language"].as<uint8_t>();
+    config.Display_UpdatePeriod = root["display"]["update"].as<uint16_t>();
 
     Display.setOrientation(config.Display_Rotation);
-    Display.enablePowerSafe = config.Display_PowerSafe;
-    Display.enableScreensaver = config.Display_ScreenSaver;
+    Display.setEnablePowerSafe(config.Display_PowerSafe);
+    Display.setEnableScreensaver(config.Display_ScreenSaver);
     Display.setContrast(config.Display_Contrast);
     Display.setLanguage(config.Display_Language);
+    Display.setUpdatePeriod(config.Display_UpdatePeriod);
 
     Configuration.write();
 
