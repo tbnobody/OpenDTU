@@ -23,6 +23,9 @@ public:
     uint32_t getLastUpdateRequest();
     void setLastUpdateRequest(uint32_t lastUpdate);
 
+    // Returns 1 based amount of expected bytes of data
+    uint8_t getExpectedByteCount();
+
 private:
     uint8_t _payload[SYSTEM_CONFIG_PARA_SIZE];
     uint8_t _payloadLength;

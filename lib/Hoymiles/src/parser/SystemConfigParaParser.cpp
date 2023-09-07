@@ -85,3 +85,8 @@ void SystemConfigParaParser::setLastUpdateRequest(uint32_t lastUpdate)
     _lastUpdateRequest = lastUpdate;
     setLastUpdate(lastUpdate);
 }
+
+uint8_t SystemConfigParaParser::getExpectedByteCount()
+{
+    return SYSTEM_CONFIG_PARA_SIZE;
+}
