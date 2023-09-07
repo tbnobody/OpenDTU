@@ -78,6 +78,14 @@
                                     </button>
                                 </div>
 
+                                <div class="btn-group me-2" role="group">
+                                    <button type="button" class="btn btn-sm btn-info"
+                                        @click="onShowGridProfile(inverter.serial)" v-tooltip :title="$t('home.ShowGridProfile')">
+                                        <BIconOutlet style="font-size:24px;" />
+
+                                    </button>
+                                </div>
+
                                 <div class="btn-group" role="group">
                                     <button v-if="inverter.events >= 0" type="button"
                                         class="btn btn-sm btn-secondary position-relative"
@@ -161,6 +169,31 @@
 
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" @click="onHideDevInfo"
+                        data-bs-dismiss="modal">{{ $t('home.Close') }}</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="gridProfileView" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">{{ $t('home.GridProfile') }}</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="text-center" v-if="gridProfileLoading">
+                        <div class="spinner-border" role="status">
+                            <span class="visually-hidden">{{ $t('home.Loading') }}</span>
+                        </div>
+                    </div>
+
+                    <GridProfile v-if="!gridProfileLoading" :gridProfileList="gridProfileList" />
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" @click="onHideGridProfile"
                         data-bs-dismiss="modal">{{ $t('home.Close') }}</button>
                 </div>
             </div>
@@ -321,11 +354,13 @@ import BasePage from '@/components/BasePage.vue';
 import BootstrapAlert from '@/components/BootstrapAlert.vue';
 import DevInfo from '@/components/DevInfo.vue';
 import EventLog from '@/components/EventLog.vue';
+import GridProfile from '@/components/GridProfile.vue';
 import HintView from '@/components/HintView.vue';
 import InverterChannelInfo from "@/components/InverterChannelInfo.vue";
 import InverterTotalInfo from '@/components/InverterTotalInfo.vue';
 import type { DevInfoStatus } from '@/types/DevInfoStatus';
 import type { EventlogItems } from '@/types/EventlogStatus';
+import type { GridProfileStatus } from '@/types/GridProfileStatus';
 import type { LimitConfig } from '@/types/LimitConfig';
 import type { LimitStatus } from '@/types/LimitStatus';
 import type { Inverter, LiveData } from '@/types/LiveDataStatus';
@@ -337,6 +372,7 @@ import {
     BIconCpu,
     BIconExclamationCircleFill,
     BIconJournalText,
+    BIconOutlet,
     BIconPower,
     BIconSpeedometer,
     BIconToggleOff,
@@ -351,6 +387,7 @@ export default defineComponent({
         BootstrapAlert,
         DevInfo,
         EventLog,
+        GridProfile,
         HintView,
         InverterChannelInfo,
         InverterTotalInfo,
@@ -359,6 +396,7 @@ export default defineComponent({
         BIconCpu,
         BIconExclamationCircleFill,
         BIconJournalText,
+        BIconOutlet,
         BIconPower,
         BIconSpeedometer,
         BIconToggleOff,
@@ -381,6 +419,9 @@ export default defineComponent({
             devInfoView: {} as bootstrap.Modal,
             devInfoList: {} as DevInfoStatus,
             devInfoLoading: true,
+            gridProfileView: {} as bootstrap.Modal,
+            gridProfileList: {} as GridProfileStatus,
+            gridProfileLoading: true,
 
             limitSettingView: {} as bootstrap.Modal,
             limitSettingLoading: true,
@@ -421,6 +462,7 @@ export default defineComponent({
     mounted() {
         this.eventLogView = new bootstrap.Modal('#eventView');
         this.devInfoView = new bootstrap.Modal('#devInfoView');
+        this.gridProfileView = new bootstrap.Modal('#gridProfileView');
         this.limitSettingView = new bootstrap.Modal('#limitSettingView');
         this.powerSettingView = new bootstrap.Modal('#powerSettingView');
 
@@ -561,6 +603,20 @@ export default defineComponent({
                 });
 
             this.devInfoView.show();
+        },
+        onHideGridProfile() {
+            this.devInfoView.hide();
+        },
+        onShowGridProfile(serial: number) {
+            this.gridProfileLoading = true;
+            fetch("/api/gridprofile/status?inv=" + serial, { headers: authHeader() })
+                .then((response) => handleResponse(response, this.$emitter, this.$router))
+                .then((data) => {
+                    this.gridProfileList = data;
+                    this.gridProfileLoading = false;
+                });
+
+            this.gridProfileView.show();
         },
         onHideLimitSettings() {
             this.showAlertLimit = false;

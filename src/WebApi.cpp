@@ -23,6 +23,7 @@ void WebApiClass::init()
     _webApiDtu.init(&_server);
     _webApiEventlog.init(&_server);
     _webApiFirmware.init(&_server);
+    _webApiGridprofile.init(&_server);
     _webApiInverter.init(&_server);
     _webApiLimit.init(&_server);
     _webApiMaintenance.init(&_server);
@@ -48,6 +49,7 @@ void WebApiClass::loop()
     _webApiDtu.loop();
     _webApiEventlog.loop();
     _webApiFirmware.loop();
+    _webApiGridprofile.loop();
     _webApiInverter.loop();
     _webApiLimit.loop();
     _webApiMaintenance.loop();

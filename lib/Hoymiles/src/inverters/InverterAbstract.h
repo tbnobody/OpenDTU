@@ -4,6 +4,7 @@
 #include "../commands/ActivePowerControlCommand.h"
 #include "../parser/AlarmLogParser.h"
 #include "../parser/DevInfoParser.h"
+#include "../parser/GridProfileParser.h"
 #include "../parser/PowerCommandParser.h"
 #include "../parser/StatisticsParser.h"
 #include "../parser/SystemConfigParaParser.h"
@@ -71,11 +72,13 @@ public:
     virtual bool sendRestartControlRequest() = 0;
     virtual bool resendPowerControlRequest() = 0;
     virtual bool sendChangeChannelRequest();
+    virtual bool sendGridOnProFileParaRequest() = 0;
 
     HoymilesRadio* getRadio();
 
     AlarmLogParser* EventLog();
     DevInfoParser* DevInfo();
+    GridProfileParser* GridProfile();
     PowerCommandParser* PowerCommand();
     StatisticsParser* Statistics();
     SystemConfigParaParser* SystemConfigPara();
@@ -102,6 +105,7 @@ private:
 
     std::unique_ptr<AlarmLogParser> _alarmLogParser;
     std::unique_ptr<DevInfoParser> _devInfoParser;
+    std::unique_ptr<GridProfileParser> _gridProfileParser;
     std::unique_ptr<PowerCommandParser> _powerCommandParser;
     std::unique_ptr<StatisticsParser> _statisticsParser;
     std::unique_ptr<SystemConfigParaParser> _systemConfigParaParser;

@@ -126,7 +126,9 @@
         "Failure": "Fehlgeschlagen",
         "Pending": "Ausstehend",
         "Ok": "Ok",
-        "Unknown": "Unbekannt"
+        "Unknown": "Unbekannt",
+        "ShowGridProfile": "Zeige Grid Profil",
+        "GridProfile": "Grid Profil"
     },
     "eventlog": {
         "Start": "Begin",
@@ -148,6 +150,12 @@
         "FirmwareBuildDate": "Firmware-Erstellungsdatum",
         "HardwarePartNumber": "Hardware-Teilenummer",
         "HardwareVersion": "Hardware-Version"
+    },
+    "gridprofile": {
+        "NoInfo": "@:devinfo.NoInfo",
+        "NoInfoLong": "@:devinfo.NoInfoLong",
+        "GridprofileSupport": "Unterstütze die Entwicklung",
+        "GridprofileSupportLong": "Weitere Informationen sind <a href=\"https://github.com/tbnobody/OpenDTU/wiki/Grid-Profile-Parser\" target=\"_blank\">hier</a> zu finden."
     },
     "systeminfo": {
         "SystemInfo": "System Informationen",

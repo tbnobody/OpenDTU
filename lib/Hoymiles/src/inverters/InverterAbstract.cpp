@@ -20,6 +20,7 @@ InverterAbstract::InverterAbstract(HoymilesRadio* radio, uint64_t serial)
 
     _alarmLogParser.reset(new AlarmLogParser());
     _devInfoParser.reset(new DevInfoParser());
+    _gridProfileParser.reset(new GridProfileParser());
     _powerCommandParser.reset(new PowerCommandParser());
     _statisticsParser.reset(new StatisticsParser());
     _systemConfigParaParser.reset(new SystemConfigParaParser());
@@ -144,6 +145,11 @@ AlarmLogParser* InverterAbstract::EventLog()
 DevInfoParser* InverterAbstract::DevInfo()
 {
     return _devInfoParser.get();
+}
+
+GridProfileParser* InverterAbstract::GridProfile()
+{
+    return _gridProfileParser.get();
 }
 
 PowerCommandParser* InverterAbstract::PowerCommand()

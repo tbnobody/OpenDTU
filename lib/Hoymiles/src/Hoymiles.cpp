@@ -100,6 +100,11 @@ void HoymilesClass::loop()
                     }
                 }
 
+                // Fetch grid profile
+                if (iv->Statistics()->getLastUpdate() > 0 && iv->GridProfile()->getLastUpdate() == 0) {
+                    iv->sendGridOnProFileParaRequest();
+                }
+
                 if (++inverterPos >= getNumInverters()) {
                     inverterPos = 0;
                 }
