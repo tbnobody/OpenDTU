@@ -1,14 +1,9 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * Copyright (C) 2022 Thomas Basler and others
+ * Copyright (C) 2022 - 2023 Thomas Basler and others
  */
 #include "StatisticsParser.h"
 #include "../Hoymiles.h"
-
-#define HOY_SEMAPHORE_TAKE() \
-    do {                     \
-    } while (xSemaphoreTake(_xSemaphore, portMAX_DELAY) != pdPASS)
-#define HOY_SEMAPHORE_GIVE() xSemaphoreGive(_xSemaphore)
 
 static float calcYieldTotalCh0(StatisticsParser* iv, uint8_t arg0);
 static float calcYieldDayCh0(StatisticsParser* iv, uint8_t arg0);
@@ -62,8 +57,6 @@ const FieldId_t dailyProductionFields[] = {
 StatisticsParser::StatisticsParser()
     : Parser()
 {
-    _xSemaphore = xSemaphoreCreateMutex();
-    HOY_SEMAPHORE_GIVE(); // release before first use
     clearBuffer();
 }
 
@@ -99,16 +92,6 @@ void StatisticsParser::appendFragment(uint8_t offset, uint8_t* payload, uint8_t 
     }
     memcpy(&_payloadStatistic[offset], payload, len);
     _statisticLength += len;
-}
-
-void StatisticsParser::beginAppendFragment()
-{
-    HOY_SEMAPHORE_TAKE();
-}
-
-void StatisticsParser::endAppendFragment()
-{
-    HOY_SEMAPHORE_GIVE();
 }
 
 const byteAssign_t* StatisticsParser::getAssignmentByChannelField(ChannelType_t type, ChannelNum_t channel, FieldId_t fieldId)

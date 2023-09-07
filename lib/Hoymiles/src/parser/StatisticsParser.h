@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 #pragma once
 #include "Parser.h"
-#include <Arduino.h>
 #include <cstdint>
 #include <list>
 
@@ -107,8 +106,6 @@ public:
     StatisticsParser();
     void clearBuffer();
     void appendFragment(uint8_t offset, uint8_t* payload, uint8_t len);
-    void beginAppendFragment();
-    void endAppendFragment();
 
     void setByteAssignment(const byteAssign_t* byteAssignment, uint8_t size);
 
@@ -157,6 +154,4 @@ private:
     std::list<fieldSettings_t> _fieldSettings;
 
     uint32_t _rxFailureCount = 0;
-
-    SemaphoreHandle_t _xSemaphore;
 };

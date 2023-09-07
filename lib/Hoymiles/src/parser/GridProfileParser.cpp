@@ -1,21 +1,14 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * Copyright (C) 2022 Thomas Basler and others
+ * Copyright (C) 2023 Thomas Basler and others
  */
 #include "GridProfileParser.h"
 #include "../Hoymiles.h"
 #include <cstring>
 
-#define HOY_SEMAPHORE_TAKE() \
-    do {                     \
-    } while (xSemaphoreTake(_xSemaphore, portMAX_DELAY) != pdPASS)
-#define HOY_SEMAPHORE_GIVE() xSemaphoreGive(_xSemaphore)
-
 GridProfileParser::GridProfileParser()
     : Parser()
 {
-    _xSemaphore = xSemaphoreCreateMutex();
-    HOY_SEMAPHORE_GIVE(); // release before first use
     clearBuffer();
 }
 
@@ -33,16 +26,6 @@ void GridProfileParser::appendFragment(uint8_t offset, uint8_t* payload, uint8_t
     }
     memcpy(&_payloadGridProfile[offset], payload, len);
     _gridProfileLength += len;
-}
-
-void GridProfileParser::beginAppendFragment()
-{
-    HOY_SEMAPHORE_TAKE();
-}
-
-void GridProfileParser::endAppendFragment()
-{
-    HOY_SEMAPHORE_GIVE();
 }
 
 std::vector<uint8_t> GridProfileParser::getRawData()
