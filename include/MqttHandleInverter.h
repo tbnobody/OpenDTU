@@ -3,6 +3,7 @@
 
 #include "Configuration.h"
 #include <Hoymiles.h>
+#include <TimeoutHelper.h>
 #include <espMqttClient.h>
 
 class MqttHandleInverterClass {
@@ -18,6 +19,8 @@ private:
 
     uint32_t _lastPublishStats[INV_MAX_COUNT];
     uint32_t _lastPublish;
+
+    TimeoutHelper _statsTimeout;
 
     FieldId_t _publishFields[14] = {
         FLD_UDC,
