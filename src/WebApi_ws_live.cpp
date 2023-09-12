@@ -66,11 +66,6 @@ void WebApiWsLiveClass::loop()
     if (millis() - _lastWsPublish > (10 * 1000) || (maxTimeStamp != _newestInverterTimestamp)) {
 
         try {
-            std::lock_guard<std::mutex> lock(_mutex);
-            DynamicJsonDocument root(4096 * INV_MAX_COUNT);
-            JsonVariant var = root;
-            generateJsonResponse(var);
-
             String buffer;
             // free JsonDocument as soon as possible
             {
@@ -157,7 +152,6 @@ void WebApiWsLiveClass::generateJsonResponse(JsonVariant& root)
                 addField(chanTypeObj, i, inv, t, c, FLD_EFF);
                 if (t == TYPE_DC && inv->Statistics()->getStringMaxPower(c) > 0) {
                     addField(chanTypeObj, i, inv, t, c, FLD_IRR);
-                    chanTypeObj[String(c)][inv->Statistics()->getChannelFieldName(t, c, FLD_IRR)]["max"] = inv->Statistics()->getStringMaxPower(c);
                 }
             }
         }
@@ -237,9 +231,13 @@ void WebApiWsLiveClass::addTotalField(JsonObject& root, String name, float value
 void WebApiWsLiveClass::onWebsocketEvent(AsyncWebSocket* server, AsyncWebSocketClient* client, AwsEventType type, void* arg, uint8_t* data, size_t len)
 {
     if (type == WS_EVT_CONNECT) {
-        MessageOutput.printf("Websocket: [%s][%u] connect\r\n", server->url(), client->id());
+        char str[64];
+        snprintf(str, sizeof(str), "Websocket: [%s][%u] connect", server->url(), client->id());
+        MessageOutput.println(str);
     } else if (type == WS_EVT_DISCONNECT) {
-        MessageOutput.printf("Websocket: [%s][%u] disconnect\r\n", server->url(), client->id());
+        char str[64];
+        snprintf(str, sizeof(str), "Websocket: [%s][%u] disconnect", server->url(), client->id());
+        MessageOutput.println(str);
     }
 }
 
@@ -250,8 +248,7 @@ void WebApiWsLiveClass::onLivedataStatus(AsyncWebServerRequest* request)
     }
 
     try {
-        std::lock_guard<std::mutex> lock(_mutex);
-        AsyncJsonResponse* response = new AsyncJsonResponse(false, 4096 * INV_MAX_COUNT);
+        AsyncJsonResponse* response = new AsyncJsonResponse(false, 40960U);
         JsonVariant root = response->getRoot();
 
         generateJsonResponse(root);

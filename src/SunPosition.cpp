@@ -5,7 +5,6 @@
 #include "SunPosition.h"
 #include "Configuration.h"
 #include "Utils.h"
-#include <Arduino.h>
 
 SunPositionClass SunPosition;
 
@@ -84,7 +83,7 @@ void SunPositionClass::updateSunData()
 
     _sunriseMinutes = static_cast<int>(sunriseRaw);
     _sunsetMinutes = static_cast<int>(sunsetRaw);
-    uint32_t minutesPastMidnight = timeinfo.tm_hour * 60 + timeinfo.tm_min;
+    uint minutesPastMidnight = timeinfo.tm_hour * 60 + timeinfo.tm_min;
 
     _isDayPeriod = (minutesPastMidnight >= _sunriseMinutes) && (minutesPastMidnight < _sunsetMinutes);
     _isSunsetAvailable = true;

@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 #pragma once
 #include "Parser.h"
+#include <Arduino.h>
 #include <array>
 #include <cstdint>
 
@@ -33,6 +34,8 @@ public:
     AlarmLogParser();
     void clearBuffer();
     void appendFragment(uint8_t offset, uint8_t* payload, uint8_t len);
+    void beginAppendFragment();
+    void endAppendFragment();
 
     uint8_t getEntryCount();
     void getLogEntry(uint8_t entryId, AlarmLogEntry_t* entry);
@@ -53,4 +56,6 @@ private:
     AlarmMessageType_t _messageType = AlarmMessageType_t::ALL;
 
     static const std::array<const AlarmMessage_t, ALARM_MSG_COUNT> _alarmMessages;
+
+    SemaphoreHandle_t _xSemaphore;
 };

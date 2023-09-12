@@ -2,7 +2,6 @@ export interface ValueObject {
     v: number; // value
     u: string; // unit
     d: number; // digits
-    max: number;
 }
 
 export interface InverterStatistics {

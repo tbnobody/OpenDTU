@@ -8,7 +8,6 @@
 #include "WebApi_dtu.h"
 #include "WebApi_eventlog.h"
 #include "WebApi_firmware.h"
-#include "WebApi_gridprofile.h"
 #include "WebApi_inverter.h"
 #include "WebApi_limit.h"
 #include "WebApi_maintenance.h"
@@ -53,7 +52,6 @@ private:
     WebApiDtuClass _webApiDtu;
     WebApiEventlogClass _webApiEventlog;
     WebApiFirmwareClass _webApiFirmware;
-    WebApiGridProfileClass _webApiGridprofile;
     WebApiInverterClass _webApiInverter;
     WebApiLimitClass _webApiLimit;
     WebApiMaintenanceClass _webApiMaintenance;

@@ -4,7 +4,6 @@
 #include "../commands/ActivePowerControlCommand.h"
 #include "../parser/AlarmLogParser.h"
 #include "../parser/DevInfoParser.h"
-#include "../parser/GridProfileParser.h"
 #include "../parser/PowerCommandParser.h"
 #include "../parser/StatisticsParser.h"
 #include "../parser/SystemConfigParaParser.h"
@@ -25,6 +24,7 @@ enum {
 };
 
 #define MAX_RF_FRAGMENT_COUNT 13
+#define MAX_ONLINE_FAILURE_COUNT 2
 
 class CommandAbstract;
 
@@ -49,15 +49,6 @@ public:
     void setEnableCommands(bool enabled);
     bool getEnableCommands();
 
-    void setReachableThreshold(uint8_t threshold);
-    uint8_t getReachableThreshold();
-
-    void setZeroValuesIfUnreachable(bool enabled);
-    bool getZeroValuesIfUnreachable();
-
-    void setZeroYieldDayOnMidnight(bool enabled);
-    bool getZeroYieldDayOnMidnight();
-
     void clearRxFragmentBuffer();
     void addRxFragment(uint8_t fragment[], uint8_t len);
     uint8_t verifyAllFragments(CommandAbstract* cmd);
@@ -72,13 +63,11 @@ public:
     virtual bool sendRestartControlRequest() = 0;
     virtual bool resendPowerControlRequest() = 0;
     virtual bool sendChangeChannelRequest();
-    virtual bool sendGridOnProFileParaRequest() = 0;
 
     HoymilesRadio* getRadio();
 
     AlarmLogParser* EventLog();
     DevInfoParser* DevInfo();
-    GridProfileParser* GridProfile();
     PowerCommandParser* PowerCommand();
     StatisticsParser* Statistics();
     SystemConfigParaParser* SystemConfigPara();
@@ -98,14 +87,8 @@ private:
     bool _enablePolling = true;
     bool _enableCommands = true;
 
-    uint8_t _reachableThreshold = 3;
-
-    bool _zeroValuesIfUnreachable = false;
-    bool _zeroYieldDayOnMidnight = false;
-
     std::unique_ptr<AlarmLogParser> _alarmLogParser;
     std::unique_ptr<DevInfoParser> _devInfoParser;
-    std::unique_ptr<GridProfileParser> _gridProfileParser;
     std::unique_ptr<PowerCommandParser> _powerCommandParser;
     std::unique_ptr<StatisticsParser> _statisticsParser;
     std::unique_ptr<SystemConfigParaParser> _systemConfigParaParser;

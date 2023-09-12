@@ -25,6 +25,4 @@ private:
     uint32_t _lastInvUpdateCheck = 0;
     uint32_t _lastWsCleanup = 0;
     uint32_t _newestInverterTimestamp = 0;
-
-    std::mutex _mutex;
 };

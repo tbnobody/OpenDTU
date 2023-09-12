@@ -14,8 +14,6 @@
 #define TOPIC_SUB_POWER "power"
 #define TOPIC_SUB_RESTART "restart"
 
-#define PUBLISH_MAX_INTERVAL 60000
-
 MqttHandleInverterClass MqttHandleInverter;
 
 void MqttHandleInverterClass::init()
@@ -94,12 +92,8 @@ void MqttHandleInverterClass::loop()
             }
 
             uint32_t lastUpdate = inv->Statistics()->getLastUpdate();
-            if (lastUpdate > 0 && (lastUpdate != _lastPublishStats[i] || ((inv->getZeroValuesIfUnreachable() || inv->getZeroYieldDayOnMidnight()) && _statsTimeout.occured()))) {
+            if (lastUpdate > 0 && lastUpdate != _lastPublishStats[i]) {
                 _lastPublishStats[i] = lastUpdate;
-
-                // At first a change of the stats have to occour. Then the stats
-                // are published on every change or every 60 seconds
-                _statsTimeout.set(PUBLISH_MAX_INTERVAL);
 
                 // Loop all channels
                 for (auto& t : inv->Statistics()->getChannelTypes()) {
