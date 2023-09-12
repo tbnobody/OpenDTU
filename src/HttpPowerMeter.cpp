@@ -7,6 +7,7 @@
 #include <FirebaseJson.h>
 #include <Crypto.h>
 #include <SHA256.h>
+#include <memory>
 
 void HttpPowerMeterClass::init()
 {
@@ -23,39 +24,36 @@ bool HttpPowerMeterClass::updateValues()
 
     char response[2000],
         errorMessage[256];
-    bool success = true;
 
     for (uint8_t i = 0; i < POWERMETER_MAX_PHASES; i++) {
         POWERMETER_HTTP_PHASE_CONFIG_T phaseConfig = config.Powermeter_Http_Phase[i];
 
-        if (!phaseConfig.Enabled || !success) {
+        if (!phaseConfig.Enabled) {
             power[i] = 0.0;
-            continue;
-        }
+            continue;	
+        } 
 
         if (i == 0 || config.PowerMeter_HttpIndividualRequests) {
-            if (!httpRequest(phaseConfig.Url, phaseConfig.AuthType, phaseConfig.Username, phaseConfig.Password, phaseConfig.HeaderKey, phaseConfig.HeaderValue, phaseConfig.Timeout,
+            if (httpRequest(phaseConfig.Url, phaseConfig.AuthType, phaseConfig.Username, phaseConfig.Password, phaseConfig.HeaderKey, phaseConfig.HeaderValue, phaseConfig.Timeout,
                 response, sizeof(response), errorMessage, sizeof(errorMessage))) {
+                  if (!getFloatValueByJsonPath(response, phaseConfig.JsonPath, power[i])) {
+                      MessageOutput.printf("[HttpPowerMeter] Couldn't find a value with Json query \"%s\"\r\n", phaseConfig.JsonPath);
+                      return false;
+                  }
+            } else {
                 MessageOutput.printf("[HttpPowerMeter] Getting the power of phase %d failed. Error: %s\r\n",
                     i + 1, errorMessage);
-                success = false;
+                return false;
             }
-        }
-
-        if (!getFloatValueByJsonPath(response, phaseConfig.JsonPath, power[i])) {
-            MessageOutput.printf("[HttpPowerMeter] Couldn't find a value with Json query \"%s\"\r\n", phaseConfig.JsonPath);
-            success = false;
         }
     }
 
-    return success;
+    return true;
 }
 
 bool HttpPowerMeterClass::httpRequest(const char* url, Auth authType, const char* username, const char* password, const char* httpHeader, const char* httpValue, uint32_t timeout,
         char* response, size_t responseSize, char* error, size_t errorSize)
 {
-    WiFiClient* wifiClient = NULL;
-    HTTPClient httpClient;
 
     String newUrl = url;
     String urlProtocol;
@@ -77,17 +75,22 @@ bool HttpPowerMeterClass::httpRequest(const char* url, Auth authType, const char
         newUrl += urlUri;
     }
     
+    // secureWifiClient MUST be created before HTTPClient
+    // see discussion: https://github.com/helgeerbe/OpenDTU-OnBattery/issues/381
+    std::unique_ptr<WiFiClient> wifiClient;
+
     if (urlProtocol == "https") {
-        wifiClient = new WiFiClientSecure;
-        reinterpret_cast<WiFiClientSecure*>(wifiClient)->setInsecure();
+      auto secureWifiClient = std::make_unique<WiFiClientSecure>();
+      secureWifiClient->setInsecure();
+      wifiClient = std::move(secureWifiClient);
     } else {
-        wifiClient = new WiFiClient;
+      wifiClient = std::make_unique<WiFiClient>();
     }
 
+    HTTPClient httpClient;
     if (!httpClient.begin(*wifiClient, newUrl)) {
-        snprintf_P(error, errorSize, "httpClient.begin(%s) failed", newUrl.c_str());
-        delete wifiClient;
-        return false;
+      snprintf_P(error, errorSize, "httpClient.begin(%s) failed", newUrl.c_str());
+      return false;
     }
 
     httpClient.setFollowRedirects(HTTPC_STRICT_FOLLOW_REDIRECTS);
@@ -179,7 +182,6 @@ bool HttpPowerMeterClass::httpRequest(const char* url, Auth authType, const char
     }
 
     httpClient.end();
-    delete wifiClient;
 
     if (error[0] != '\0') {
         return false;
