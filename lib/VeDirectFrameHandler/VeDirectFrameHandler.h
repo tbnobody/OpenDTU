@@ -2,11 +2,11 @@
  *
  * Arduino library to read from Victron devices using VE.Direct protocol.
  * Derived from Victron framehandler reference implementation.
- * 
+ *
  * 2020.05.05 - 0.2 - initial release
  * 2021.02.23 - 0.3 - change frameLen to 22 per VE.Direct Protocol version 3.30
  * 2022.08.20 - 0.4 - changes for OpenDTU
- * 
+ *
  */
 
 #pragma once
@@ -14,18 +14,8 @@
 #include <Arduino.h>
 #include <array>
 
-#ifndef VICTRON_PIN_TX
-#define VICTRON_PIN_TX 21      // HardwareSerial TX Pin
-#endif
-
-#ifndef VICTRON_PIN_RX
-#define VICTRON_PIN_RX 22      // HardwareSerial RX Pin
-#endif
-
-#define VE_MAX_NAME_LEN 9   // VE.Direct Protocol: max name size is 9 including /0
 #define VE_MAX_VALUE_LEN 33 // VE.Direct Protocol: max value size is 33 including /0
 #define VE_MAX_HEX_LEN 100 // Maximum size of hex frame - max payload 34 byte (=68 char) + safe buffer
-
 
 typedef struct {
     uint16_t PID;                   // product id
@@ -93,7 +83,7 @@ public:
     void loop();                                 // main loop to read ve.direct data
     unsigned long getLastUpdate();               // timestamp of last successful frame read
     bool isDataValid();                          // return true if data valid and not outdated
-    String getPidAsString(uint16_t pid);      // product id as string  
+    String getPidAsString(uint16_t pid);      // product id as string
     String getCsAsString(uint8_t cs);        // current state as string
     String getErrAsString(uint8_t err);      // errer state as string
     String getOrAsString(uint32_t offReason); // off reason as string
@@ -109,12 +99,11 @@ private:
     void frameEndEvent(bool);                 // copy temp struct to public struct
     int hexRxEvent(uint8_t);
 
-    //bool mStop;                               // not sure what Victron uses this for, not using
     Print* _msgOut;
     bool _verboseLogging;
     int _state;                                // current state
     int _prevState;                            // previous state
-    uint8_t	_checksum;                         // checksum value
+    uint8_t _checksum;                         // checksum value
     char * _textPointer;                       // pointer to the private buffer we're writing to, name or value
     int _hexSize;                               // length of hex buffer
     char _name[VE_MAX_VALUE_LEN];              // buffer for the field name
