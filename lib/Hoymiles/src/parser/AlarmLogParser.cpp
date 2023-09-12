@@ -86,16 +86,9 @@ const std::array<const AlarmMessage_t, ALARM_MSG_COUNT> AlarmLogParser::_alarmMe
     { AlarmMessageType_t::ALL, 9000, "Microinverter is suspected of being stolen" },
 } };
 
-#define HOY_SEMAPHORE_TAKE() \
-    do {                     \
-    } while (xSemaphoreTake(_xSemaphore, portMAX_DELAY) != pdPASS)
-#define HOY_SEMAPHORE_GIVE() xSemaphoreGive(_xSemaphore)
-
 AlarmLogParser::AlarmLogParser()
     : Parser()
 {
-    _xSemaphore = xSemaphoreCreateMutex();
-    HOY_SEMAPHORE_GIVE(); // release before first use
     clearBuffer();
 }
 
@@ -113,16 +106,6 @@ void AlarmLogParser::appendFragment(uint8_t offset, uint8_t* payload, uint8_t le
     }
     memcpy(&_payloadAlarmLog[offset], payload, len);
     _alarmLogLength += len;
-}
-
-void AlarmLogParser::beginAppendFragment()
-{
-    HOY_SEMAPHORE_TAKE();
-}
-
-void AlarmLogParser::endAppendFragment()
-{
-    HOY_SEMAPHORE_GIVE();
 }
 
 uint8_t AlarmLogParser::getEntryCount()

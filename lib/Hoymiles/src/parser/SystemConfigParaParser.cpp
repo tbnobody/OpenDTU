@@ -1,21 +1,14 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * Copyright (C) 2022 Thomas Basler and others
+ * Copyright (C) 2022 - 2023 Thomas Basler and others
  */
 #include "SystemConfigParaParser.h"
 #include "../Hoymiles.h"
 #include <cstring>
 
-#define HOY_SEMAPHORE_TAKE() \
-    do {                     \
-    } while (xSemaphoreTake(_xSemaphore, portMAX_DELAY) != pdPASS)
-#define HOY_SEMAPHORE_GIVE() xSemaphoreGive(_xSemaphore)
-
 SystemConfigParaParser::SystemConfigParaParser()
     : Parser()
 {
-    _xSemaphore = xSemaphoreCreateMutex();
-    HOY_SEMAPHORE_GIVE(); // release before first use
     clearBuffer();
 }
 
@@ -33,16 +26,6 @@ void SystemConfigParaParser::appendFragment(uint8_t offset, uint8_t* payload, ui
     }
     memcpy(&_payload[offset], payload, len);
     _payloadLength += len;
-}
-
-void SystemConfigParaParser::beginAppendFragment()
-{
-    HOY_SEMAPHORE_TAKE();
-}
-
-void SystemConfigParaParser::endAppendFragment()
-{
-    HOY_SEMAPHORE_GIVE();
 }
 
 float SystemConfigParaParser::getLimitPercent()
@@ -101,4 +84,9 @@ void SystemConfigParaParser::setLastUpdateRequest(uint32_t lastUpdate)
 {
     _lastUpdateRequest = lastUpdate;
     setLastUpdate(lastUpdate);
+}
+
+uint8_t SystemConfigParaParser::getExpectedByteCount()
+{
+    return SYSTEM_CONFIG_PARA_SIZE;
 }

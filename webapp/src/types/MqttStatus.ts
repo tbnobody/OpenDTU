@@ -5,6 +5,7 @@ export interface MqttStatus {
     mqtt_username: string;
     mqtt_topic: string;
     mqtt_publish_interval: number;
+    mqtt_clean_session: boolean;
     mqtt_retain: boolean;
     mqtt_tls: boolean;
     mqtt_root_ca_cert_info: string;

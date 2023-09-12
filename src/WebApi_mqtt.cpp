@@ -49,6 +49,7 @@ void WebApiMqttClass::onMqttStatus(AsyncWebServerRequest* request)
     root["mqtt_client_cert_info"] = getTlsCertInfo(config.Mqtt_ClientCert);
     root["mqtt_lwt_topic"] = String(config.Mqtt_Topic) + config.Mqtt_LwtTopic;
     root["mqtt_publish_interval"] = config.Mqtt_PublishInterval;
+    root["mqtt_clean_session"] = config.Mqtt_CleanSession;
     root["mqtt_hass_enabled"] = config.Mqtt_Hass_Enabled;
     root["mqtt_hass_expire"] = config.Mqtt_Hass_Expire;
     root["mqtt_hass_retain"] = config.Mqtt_Hass_Retain;
@@ -85,6 +86,7 @@ void WebApiMqttClass::onMqttAdminGet(AsyncWebServerRequest* request)
     root["mqtt_lwt_online"] = config.Mqtt_LwtValue_Online;
     root["mqtt_lwt_offline"] = config.Mqtt_LwtValue_Offline;
     root["mqtt_publish_interval"] = config.Mqtt_PublishInterval;
+    root["mqtt_clean_session"] = config.Mqtt_CleanSession;
     root["mqtt_hass_enabled"] = config.Mqtt_Hass_Enabled;
     root["mqtt_hass_expire"] = config.Mqtt_Hass_Expire;
     root["mqtt_hass_retain"] = config.Mqtt_Hass_Retain;
@@ -149,6 +151,7 @@ void WebApiMqttClass::onMqttAdminPost(AsyncWebServerRequest* request)
             && root.containsKey("mqtt_lwt_online")
             && root.containsKey("mqtt_lwt_offline")
             && root.containsKey("mqtt_publish_interval")
+            && root.containsKey("mqtt_clean_session")
             && root.containsKey("mqtt_hass_enabled")
             && root.containsKey("mqtt_hass_expire")
             && root.containsKey("mqtt_hass_retain")
@@ -313,6 +316,7 @@ void WebApiMqttClass::onMqttAdminPost(AsyncWebServerRequest* request)
     strlcpy(config.Mqtt_LwtValue_Online, root["mqtt_lwt_online"].as<String>().c_str(), sizeof(config.Mqtt_LwtValue_Online));
     strlcpy(config.Mqtt_LwtValue_Offline, root["mqtt_lwt_offline"].as<String>().c_str(), sizeof(config.Mqtt_LwtValue_Offline));
     config.Mqtt_PublishInterval = root["mqtt_publish_interval"].as<uint32_t>();
+    config.Mqtt_CleanSession = root["mqtt_clean_session"].as<bool>();
     config.Mqtt_Hass_Enabled = root["mqtt_hass_enabled"].as<bool>();
     config.Mqtt_Hass_Expire = root["mqtt_hass_expire"].as<bool>();
     config.Mqtt_Hass_Retain = root["mqtt_hass_retain"].as<bool>();

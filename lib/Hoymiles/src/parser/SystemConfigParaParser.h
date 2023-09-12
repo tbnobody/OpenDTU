@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 #pragma once
 #include "Parser.h"
-#include <Arduino.h>
 
 #define SYSTEM_CONFIG_PARA_SIZE 16
 
@@ -10,8 +9,6 @@ public:
     SystemConfigParaParser();
     void clearBuffer();
     void appendFragment(uint8_t offset, uint8_t* payload, uint8_t len);
-    void beginAppendFragment();
-    void endAppendFragment();
 
     float getLimitPercent();
     void setLimitPercent(float value);
@@ -26,6 +23,9 @@ public:
     uint32_t getLastUpdateRequest();
     void setLastUpdateRequest(uint32_t lastUpdate);
 
+    // Returns 1 based amount of expected bytes of data
+    uint8_t getExpectedByteCount();
+
 private:
     uint8_t _payload[SYSTEM_CONFIG_PARA_SIZE];
     uint8_t _payloadLength;
@@ -35,6 +35,4 @@ private:
 
     uint32_t _lastUpdateCommand = 0;
     uint32_t _lastUpdateRequest = 0;
-
-    SemaphoreHandle_t _xSemaphore;
 };

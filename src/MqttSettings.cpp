@@ -127,6 +127,7 @@ void MqttSettingsClass::performConnect()
             }
             static_cast<espMqttClientSecure*>(mqttClient)->setWill(willTopic.c_str(), 2, config.Mqtt_Retain, config.Mqtt_LwtValue_Offline);
             static_cast<espMqttClientSecure*>(mqttClient)->setClientId(clientId.c_str());
+            static_cast<espMqttClientSecure*>(mqttClient)->setCleanSession(config.Mqtt_CleanSession);
             static_cast<espMqttClientSecure*>(mqttClient)->onConnect(std::bind(&MqttSettingsClass::onMqttConnect, this, _1));
             static_cast<espMqttClientSecure*>(mqttClient)->onDisconnect(std::bind(&MqttSettingsClass::onMqttDisconnect, this, _1));
             static_cast<espMqttClientSecure*>(mqttClient)->onMessage(std::bind(&MqttSettingsClass::onMqttMessage, this, _1, _2, _3, _4, _5, _6));
@@ -135,6 +136,7 @@ void MqttSettingsClass::performConnect()
             static_cast<espMqttClient*>(mqttClient)->setCredentials(config.Mqtt_Username, config.Mqtt_Password);
             static_cast<espMqttClient*>(mqttClient)->setWill(willTopic.c_str(), 2, config.Mqtt_Retain, config.Mqtt_LwtValue_Offline);
             static_cast<espMqttClient*>(mqttClient)->setClientId(clientId.c_str());
+            static_cast<espMqttClient*>(mqttClient)->setCleanSession(config.Mqtt_CleanSession);
             static_cast<espMqttClient*>(mqttClient)->onConnect(std::bind(&MqttSettingsClass::onMqttConnect, this, _1));
             static_cast<espMqttClient*>(mqttClient)->onDisconnect(std::bind(&MqttSettingsClass::onMqttDisconnect, this, _1));
             static_cast<espMqttClient*>(mqttClient)->onMessage(std::bind(&MqttSettingsClass::onMqttMessage, this, _1, _2, _3, _4, _5, _6));

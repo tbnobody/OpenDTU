@@ -127,7 +127,9 @@
         "Failure": "Fehlgeschlagen",
         "Pending": "Ausstehend",
         "Ok": "Ok",
-        "Unknown": "Unbekannt"
+        "Unknown": "Unbekannt",
+        "ShowGridProfile": "Zeige Grid Profil",
+        "GridProfile": "Grid Profil"
     },
     "eventlog": {
         "Start": "Begin",
@@ -149,6 +151,12 @@
         "FirmwareBuildDate": "Firmware-Erstellungsdatum",
         "HardwarePartNumber": "Hardware-Teilenummer",
         "HardwareVersion": "Hardware-Version"
+    },
+    "gridprofile": {
+        "NoInfo": "@:devinfo.NoInfo",
+        "NoInfoLong": "@:devinfo.NoInfoLong",
+        "GridprofileSupport": "Unterstütze die Entwicklung",
+        "GridprofileSupportLong": "Weitere Informationen sind <a href=\"https://github.com/tbnobody/OpenDTU/wiki/Grid-Profile-Parser\" target=\"_blank\">hier</a> zu finden."
     },
     "systeminfo": {
         "SystemInfo": "System Informationen",
@@ -266,6 +274,7 @@
         "BaseTopic": "Basis Topic",
         "PublishInterval": "Veröffentlichungsintervall",
         "Seconds": "{sec} Sekunden",
+        "CleanSession": "CleanSession Flag",
         "Retain": "Retain",
         "Tls": "TLS",
         "RootCertifcateInfo": "Root CA-Zertifikat-Informationen",
@@ -424,6 +433,7 @@
         "BaseTopicHint": "Basis-Topic, wird allen veröffentlichten Themen vorangestellt (z.B. inverter/)",
         "PublishInterval": "Veröffentlichungsintervall:",
         "Seconds": "Sekunden",
+        "CleanSession": "CleanSession Flag aktivieren",
         "EnableRetain": "Retain Flag aktivieren",
         "EnableTls": "TLS aktivieren",
         "RootCa": "CA-Root-Zertifikat (Standard Letsencrypt):",
@@ -462,6 +472,9 @@
         "SaveOrder": "Reihenfolge speichern",
         "DeleteInverter": "Wechselrichter löschen",
         "EditInverter": "Wechselrichter bearbeiten",
+        "General": "Allgemein",
+        "String": "String",
+        "Advanced": "Erweitert",
         "InverterSerial": "Wechselrichter Seriennummer:",
         "InverterName": "Wechselrichter Name:",
         "InverterNameHint": "Hier kann ein eigener Namen für den Wechselrichter angeben werden.",
@@ -477,6 +490,12 @@
         "StringYtOffset": "Ertragsversatz String {num}:",
         "StringYtOffsetHint": "Dieser Offset wird beim Auslesen des Gesamtertragswertes des Wechselrichters angewendet. Damit kann der Gesamtertrag des Wechselrichters auf Null gesetzt werden, wenn ein gebrauchter Wechselrichter verwendet wird.",
         "InverterHint": "*) Geben Sie die W<sub>p</sub> des Ports ein, um die Einstrahlung zu errechnen.",
+        "ReachableThreshold": "Erreichbarkeit Schwellenwert:",
+        "ReachableThresholdHint": "Legt fest, wie viele Anfragen fehlschlagen dürfen, bis der Wechselrichter als unerreichbar eingestuft wird.",
+        "ZeroRuntime": "Nulle Laufzeit Daten",
+        "ZeroRuntimeHint": "Nulle Laufzeit Daten (keine Ertragsdaten), wenn der Wechselrichter nicht erreichbar ist.",
+        "ZeroDay": "Nulle Tagesertrag um Mitternacht",
+        "ZeroDayHint": "Das funktioniert nur wenn der Wechselrichter nicht erreichbar ist. Wenn Daten aus dem Wechselrichter gelesen werden, werden deren Werte verwendet. (Ein Reset erfolgt nur beim Neustarten)",
         "Cancel": "@:maintenancereboot.Cancel",
         "Save": "@:dtuadmin.Save",
         "DeleteMsg": "Soll der Wechselrichter \"{name}\" mit der Seriennummer {serial} wirklich gelöscht werden?",

@@ -31,6 +31,12 @@
                             <td>{{ $t('mqttinfo.Seconds', { sec: mqttDataList.mqtt_publish_interval }) }}</td>
                         </tr>
                         <tr>
+                            <th>{{ $t('mqttinfo.CleanSession') }}</th>
+                            <td>
+                                <StatusBadge :status="mqttDataList.mqtt_clean_session" true_text="mqttinfo.Enabled" false_text="mqttinfo.Disabled" />
+                            </td>
+                        </tr>
+                        <tr>
                             <th>{{ $t('mqttinfo.Retain') }}</th>
                             <td>
                                 <StatusBadge :status="mqttDataList.mqtt_retain" true_text="mqttinfo.Enabled" false_text="mqttinfo.Disabled" />
