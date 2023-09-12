@@ -126,7 +126,9 @@
         "Failure": "Échec",
         "Pending": "En attente",
         "Ok": "OK",
-        "Unknown": "Inconnu"
+        "Unknown": "Inconnu",
+        "ShowGridProfile": "Show Grid Profile",
+        "GridProfile": "Grid Profile"
     },
     "eventlog": {
         "Start": "Départ",
@@ -148,6 +150,12 @@
         "FirmwareBuildDate": "Date de création du firmware",
         "HardwarePartNumber": "Numéro d'article matériel",
         "HardwareVersion": "Version du matériel"
+    },
+    "gridprofile": {
+        "NoInfo": "@:devinfo.NoInfo",
+        "NoInfoLong": "@:devinfo.NoInfoLong",
+        "GridprofileSupport": "Support the development",
+        "GridprofileSupportLong": "Please see <a href=\"https://github.com/tbnobody/OpenDTU/wiki/Grid-Profile-Parser\" target=\"_blank\">here</a> for further information."
     },
     "systeminfo": {
         "SystemInfo": "Informations sur le système",
@@ -265,6 +273,7 @@
         "BaseTopic": "Sujet de base",
         "PublishInterval": "Intervalle de publication",
         "Seconds": "{sec} secondes",
+        "CleanSession": "CleanSession Flag",
         "Retain": "Conserver",
         "Tls": "TLS",
         "RootCertifcateInfo": "Informations sur le certificat de l'autorité de certification racine",
@@ -412,6 +421,7 @@
         "BaseTopicHint": "Sujet de base, qui sera ajouté en préambule à tous les sujets publiés (par exemple, inverter/).",
         "PublishInterval": "Intervalle de publication",
         "Seconds": "secondes",
+        "CleanSession": "Enable CleanSession flag",
         "EnableRetain": "Activation du maintien",
         "EnableTls": "Activer le TLS",
         "RootCa": "Certificat CA-Root (par défaut Letsencrypt)",
@@ -450,6 +460,9 @@
         "SaveOrder": "Save order",
         "DeleteInverter": "Supprimer l'onduleur",
         "EditInverter": "Modifier l'onduleur",
+        "General": "Général",
+        "String": "Ligne",
+        "Advanced": "Advanced",
         "InverterSerial": "Numéro de série de l'onduleur",
         "InverterName": "Nom de l'onduleur :",
         "InverterNameHint": "Ici, vous pouvez spécifier un nom personnalisé pour votre onduleur.",
@@ -465,6 +478,12 @@
         "StringYtOffset": "Décalage du rendement total de la ligne {num} :",
         "StringYtOffsetHint": "Ce décalage est appliqué à la valeur de rendement total lue sur le variateur. Il peut être utilisé pour mettre le rendement total du variateur à zéro si un variateur usagé est utilisé.",
         "InverterHint": "*) Entrez le W<sub>p</sub> du canal pour calculer l'irradiation.",
+        "ReachableThreshold": "Reachable Threshold:",
+        "ReachableThresholdHint": "Defines how many requests are allowed to fail until the inverter is treated is not reachable.",
+        "ZeroRuntime": "Zero runtime data",
+        "ZeroRuntimeHint": "Zero runtime data (no yield data) if inverter becomes unreachable.",
+        "ZeroDay": "Zero daily yield at midnight",
+        "ZeroDayHint": "This only works if the inverter is unreachable. If data is read from the inverter, it's values will be used. (Reset only occours on power cycle)",
         "Cancel": "@:maintenancereboot.Cancel",
         "Save": "@:dtuadmin.Save",
         "DeleteMsg": "Êtes-vous sûr de vouloir supprimer l'onduleur \"{name}\" avec le numéro de série \"{serial}\" ?",

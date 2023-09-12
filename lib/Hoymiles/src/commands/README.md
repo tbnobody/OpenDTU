@@ -8,6 +8,7 @@
     * AlarmDataCommand
     * DevInfoAllCommand
     * DevInfoSimpleCommand
+    * GridOnProFilePara
     * RealTimeRunDataCommand
     * SystemConfigParaCommand
   * ParaSetCommand

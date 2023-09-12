@@ -55,4 +55,9 @@ bool RealTimeRunDataCommand::handleResponse(InverterAbstract* inverter, fragment
 void RealTimeRunDataCommand::gotTimeout(InverterAbstract* inverter)
 {
     inverter->Statistics()->incrementRxFailureCount();
+
+    if (inverter->getZeroValuesIfUnreachable() && !inverter->isReachable()) {
+        Hoymiles.getMessageOutput()->println("Set runtime data to zero");
+        inverter->Statistics()->zeroRuntimeData();
+    }
 }

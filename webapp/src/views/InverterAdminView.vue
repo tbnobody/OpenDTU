@@ -80,84 +80,119 @@
                 </div>
                 <div class="modal-body">
                     <form>
-                        <div class="mb-3">
-                            <label for="inverter-serial" class="col-form-label">
-                                {{ $t('inverteradmin.InverterSerial') }}
-                            </label>
-                            <input v-model="selectedInverterData.serial" type="number" id="inverter-serial"
-                                class="form-control" />
-                            <label for="inverter-name" class="col-form-label">{{ $t('inverteradmin.InverterName') }}
-                                <BIconInfoCircle v-tooltip :title="$t('inverteradmin.InverterNameHint')" />
-                            </label>
-                            <input v-model="selectedInverterData.name" type="text" id="inverter-name"
-                                class="form-control" maxlength="31" />
-
-                            <CardElement :text="$t('inverteradmin.InverterStatus')" addSpace>
-                                <InputElement :label="$t('inverteradmin.PollEnable')"
-                                    v-model="selectedInverterData.poll_enable"
-                                    type="checkbox" wide />
-                                <InputElement :label="$t('inverteradmin.PollEnableNight')"
-                                    v-model="selectedInverterData.poll_enable_night"
-                                    type="checkbox" wide/>
-                                <InputElement :label="$t('inverteradmin.CommandEnable')"
-                                    v-model="selectedInverterData.command_enable"
-                                    type="checkbox" wide/>
-                                <InputElement :label="$t('inverteradmin.CommandEnableNight')"
-                                    v-model="selectedInverterData.command_enable_night"
-                                    type="checkbox" wide/>
-                                <div class="alert alert-secondary mt-3" role="alert" v-html="$t('inverteradmin.StatusHint')"></div>
-                            </CardElement>
-                        </div>
-
-                        <div v-for="(ch, index) in selectedInverterData.channel" :key="`${index}`">
-                            <div class="row g-2">
-                                <div class="col-md">
-                                    <label :for="`inverter-name_${index}`" class="col-form-label">
-                                        {{ $t('inverteradmin.StringName', { num: index + 1 }) }}
-                                        <BIconInfoCircle v-tooltip :title="$t('inverteradmin.StringNameHint')" />
+                        <nav>
+                            <div class="nav nav-tabs" id="nav-tab" role="tablist">
+                                <button class="nav-link active" id="nav-general-tab" data-bs-toggle="tab" data-bs-target="#nav-general"
+                                    type="button" role="tab" aria-controls="nav-general" aria-selected="true">{{
+                                        $t('inverteradmin.General')
+                                    }}</button>
+                                <button class="nav-link" id="nav-string-tab" data-bs-toggle="tab" data-bs-target="#nav-string"
+                                    type="button" role="tab" aria-controls="nav-string">{{ $t('inverteradmin.String') }}</button>
+                                <button class="nav-link" id="nav-advanced-tab" data-bs-toggle="tab" data-bs-target="#nav-advanced"
+                                    type="button" role="tab" aria-controls="nav-advanced">{{ $t('inverteradmin.Advanced') }}</button>
+                            </div>
+                        </nav>
+                        <div class="tab-content" id="nav-tabContent">
+                            <div class="tab-pane fade show active" id="nav-general" role="tabpanel" aria-labelledby="nav-general-tab" tabindex="0">
+                                <div class="mb-3">
+                                    <label for="inverter-serial" class="col-form-label">
+                                        {{ $t('inverteradmin.InverterSerial') }}
                                     </label>
-                                    <div class="d-flex mb-2">
-                                        <div class="input-group">
-                                            <input type="text" class="form-control" :id="`inverter-name_${index}`"
-                                                maxlength="31" v-model="ch.name" />
-                                        </div>
-                                    </div>
+                                    <input v-model="selectedInverterData.serial" type="number" id="inverter-serial"
+                                        class="form-control" />
+                                    <label for="inverter-name" class="col-form-label">{{ $t('inverteradmin.InverterName') }}
+                                        <BIconInfoCircle v-tooltip :title="$t('inverteradmin.InverterNameHint')" />
+                                    </label>
+                                    <input v-model="selectedInverterData.name" type="text" id="inverter-name"
+                                        class="form-control" maxlength="31" />
+
+                                    <CardElement :text="$t('inverteradmin.InverterStatus')" addSpace>
+                                        <InputElement :label="$t('inverteradmin.PollEnable')"
+                                            v-model="selectedInverterData.poll_enable"
+                                            type="checkbox" wide />
+                                        <InputElement :label="$t('inverteradmin.PollEnableNight')"
+                                            v-model="selectedInverterData.poll_enable_night"
+                                            type="checkbox" wide/>
+                                        <InputElement :label="$t('inverteradmin.CommandEnable')"
+                                            v-model="selectedInverterData.command_enable"
+                                            type="checkbox" wide/>
+                                        <InputElement :label="$t('inverteradmin.CommandEnableNight')"
+                                            v-model="selectedInverterData.command_enable_night"
+                                            type="checkbox" wide/>
+                                        <div class="alert alert-secondary mt-3" role="alert" v-html="$t('inverteradmin.StatusHint')"></div>
+                                    </CardElement>
                                 </div>
                             </div>
-                            <div class="row g-2">
-                                <div class="col">
-                                    <label :for="`inverter-max_${index}`" class="col-form-label">
-                                        {{ $t('inverteradmin.StringMaxPower', { num: index + 1 }) }}
-                                        <BIconInfoCircle v-tooltip :title="$t('inverteradmin.StringMaxPowerHint')" />
-                                    </label>
-                                    <div class="d-flex mb-2">
-                                        <div class="input-group">
-                                            <input type="number" class="form-control" :id="`inverter-max_${index}`"
-                                                min="0" v-model="ch.max_power"
-                                                :aria-describedby="`inverter-maxDescription_${index} inverter-customizer`" />
-                                            <span class="input-group-text"
-                                                :id="`inverter-maxDescription_${index}`">W<sub>p</sub><sup>*</sup></span>
+
+                            <div class="tab-pane fade show" id="nav-string" role="tabpanel" aria-labelledby="nav-string-tab" tabindex="0">
+                                <div v-for="(ch, index) in selectedInverterData.channel" :key="`${index}`">
+                                    <div class="row g-2">
+                                        <div class="col-md">
+                                            <label :for="`inverter-name_${index}`" class="col-form-label">
+                                                {{ $t('inverteradmin.StringName', { num: index + 1 }) }}
+                                                <BIconInfoCircle v-tooltip :title="$t('inverteradmin.StringNameHint')" />
+                                            </label>
+                                            <div class="d-flex mb-2">
+                                                <div class="input-group">
+                                                    <input type="text" class="form-control" :id="`inverter-name_${index}`"
+                                                        maxlength="31" v-model="ch.name" />
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row g-2">
+                                        <div class="col">
+                                            <label :for="`inverter-max_${index}`" class="col-form-label">
+                                                {{ $t('inverteradmin.StringMaxPower', { num: index + 1 }) }}
+                                                <BIconInfoCircle v-tooltip :title="$t('inverteradmin.StringMaxPowerHint')" />
+                                            </label>
+                                            <div class="d-flex mb-2">
+                                                <div class="input-group">
+                                                    <input type="number" class="form-control" :id="`inverter-max_${index}`"
+                                                        min="0" v-model="ch.max_power"
+                                                        :aria-describedby="`inverter-maxDescription_${index} inverter-customizer`" />
+                                                    <span class="input-group-text"
+                                                        :id="`inverter-maxDescription_${index}`">W<sub>p</sub><sup>*</sup></span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col">
+                                            <label :for="`inverter-ytoffset_${index}`" class="col-form-label">
+                                                {{ $t('inverteradmin.StringYtOffset', { num: index + 1 }) }}
+                                                <BIconInfoCircle v-tooltip :title="$t('inverteradmin.StringYtOffsetHint')" />
+                                            </label>
+                                            <div class="d-flex mb-2">
+                                                <div class="input-group">
+                                                    <input type="number" class="form-control" :id="`inverter-ytoffset_${index}`"
+                                                        min="0" v-model="ch.yield_total_offset"
+                                                        :aria-describedby="`inverter-ytoffsetDescription_${index} inverter-customizer`" />
+                                                    <span class="input-group-text"
+                                                        :id="`inverter-ytoffsetDescription_${index}`">kWh</span>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
-                                <div class="col">
-                                    <label :for="`inverter-ytoffset_${index}`" class="col-form-label">
-                                        {{ $t('inverteradmin.StringYtOffset', { num: index + 1 }) }}
-                                        <BIconInfoCircle v-tooltip :title="$t('inverteradmin.StringYtOffsetHint')" />
-                                    </label>
-                                    <div class="d-flex mb-2">
-                                        <div class="input-group">
-                                            <input type="number" class="form-control" :id="`inverter-ytoffset_${index}`"
-                                                min="0" v-model="ch.yield_total_offset"
-                                                :aria-describedby="`inverter-ytoffsetDescription_${index} inverter-customizer`" />
-                                            <span class="input-group-text"
-                                                :id="`inverter-ytoffsetDescription_${index}`">kWh</span>
-                                        </div>
-                                    </div>
+                                <div :id="`inverter-customizer`" class="form-text" v-html="$t('inverteradmin.InverterHint')">
                                 </div>
                             </div>
-                        </div>
-                        <div :id="`inverter-customizer`" class="form-text" v-html="$t('inverteradmin.InverterHint')">
+
+                            <div class="tab-pane fade show" id="nav-advanced" role="tabpanel" aria-labelledby="nav-advanced-tab" tabindex="0">
+                                <InputElement :label="$t('inverteradmin.ReachableThreshold')"
+                                    v-model="selectedInverterData.reachable_threshold"
+                                    type="number" min="1" max="100"
+                                    :tooltip="$t('inverteradmin.ReachableThresholdHint')" wide />
+
+                                <InputElement :label="$t('inverteradmin.ZeroRuntime')"
+                                    v-model="selectedInverterData.zero_runtime"
+                                    type="checkbox"
+                                    :tooltip="$t('inverteradmin.ZeroRuntimeHint')" wide/>
+
+                                <InputElement :label="$t('inverteradmin.ZeroDay')"
+                                    v-model="selectedInverterData.zero_day"
+                                    type="checkbox"
+                                    :tooltip="$t('inverteradmin.ZeroDayHint')" wide/>
+                            </div>
                         </div>
                     </form>
 
@@ -231,6 +266,9 @@ declare interface Inverter {
     poll_enable_night: boolean;
     command_enable: boolean;
     command_enable_night: boolean;
+    reachable_threshold: number;
+    zero_runtime: boolean;
+    zero_day: boolean;
     channel: Array<Channel>;
 }
 

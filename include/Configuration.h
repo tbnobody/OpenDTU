@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 #pragma once
 
-#include <Arduino.h>
+#include <cstdint>
 
 #define CONFIG_FILENAME "/config.json"
 #define CONFIG_VERSION 0x00011900 // 0.1.24 // make sure to clean all after change
@@ -45,23 +45,26 @@ struct INVERTER_CONFIG_T {
     bool Poll_Enable_Night;
     bool Command_Enable;
     bool Command_Enable_Night;
+    uint8_t ReachableThreshold;
+    bool ZeroRuntimeDataIfUnrechable;
+    bool ZeroYieldDayOnMidnight;
     CHANNEL_CONFIG_T channel[INV_MAX_CHAN_COUNT];
 };
 
 struct CONFIG_T {
     uint32_t Cfg_Version;
-    uint Cfg_SaveCount;
+    uint32_t Cfg_SaveCount;
 
     char WiFi_Ssid[WIFI_MAX_SSID_STRLEN + 1];
     char WiFi_Password[WIFI_MAX_PASSWORD_STRLEN + 1];
-    byte WiFi_Ip[4];
-    byte WiFi_Netmask[4];
-    byte WiFi_Gateway[4];
-    byte WiFi_Dns1[4];
-    byte WiFi_Dns2[4];
+    uint8_t WiFi_Ip[4];
+    uint8_t WiFi_Netmask[4];
+    uint8_t WiFi_Gateway[4];
+    uint8_t WiFi_Dns1[4];
+    uint8_t WiFi_Dns2[4];
     bool WiFi_Dhcp;
     char WiFi_Hostname[WIFI_MAX_HOSTNAME_STRLEN + 1];
-    uint WiFi_ApTimeout;
+    uint32_t WiFi_ApTimeout;
 
     char Ntp_Server[NTP_MAX_SERVER_STRLEN + 1];
     char Ntp_Timezone[NTP_MAX_TIMEZONE_STRLEN + 1];
@@ -72,7 +75,7 @@ struct CONFIG_T {
 
     bool Mqtt_Enabled;
     char Mqtt_Hostname[MQTT_MAX_HOSTNAME_STRLEN + 1];
-    uint Mqtt_Port;
+    uint32_t Mqtt_Port;
     char Mqtt_Username[MQTT_MAX_USERNAME_STRLEN + 1];
     char Mqtt_Password[MQTT_MAX_PASSWORD_STRLEN + 1];
     char Mqtt_Topic[MQTT_MAX_TOPIC_STRLEN + 1];
@@ -81,6 +84,7 @@ struct CONFIG_T {
     char Mqtt_LwtValue_Online[MQTT_MAX_LWTVALUE_STRLEN + 1];
     char Mqtt_LwtValue_Offline[MQTT_MAX_LWTVALUE_STRLEN + 1];
     uint32_t Mqtt_PublishInterval;
+    bool Mqtt_CleanSession;
 
     bool Mqtt_Hass_Enabled;
     bool Mqtt_Hass_Retain;

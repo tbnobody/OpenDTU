@@ -8,6 +8,7 @@
 #include "commands/AlarmDataCommand.h"
 #include "commands/DevInfoAllCommand.h"
 #include "commands/DevInfoSimpleCommand.h"
+#include "commands/GridOnProFilePara.h"
 #include "commands/PowerControlCommand.h"
 #include "commands/RealTimeRunDataCommand.h"
 #include "commands/SystemConfigParaCommand.h"
@@ -202,4 +203,26 @@ bool HM_Abstract::resendPowerControlRequest()
         return false;
         break;
     }
+}
+
+bool HM_Abstract::sendGridOnProFileParaRequest()
+{
+    if (!getEnablePolling()) {
+        return false;
+    }
+
+    struct tm timeinfo;
+    if (!getLocalTime(&timeinfo, 5)) {
+        return false;
+    }
+
+    time_t now;
+    time(&now);
+
+    auto cmd = _radio->prepareCommand<GridOnProFilePara>();
+    cmd->setTime(now);
+    cmd->setTargetAddress(serial());
+    _radio->enqueCommand(cmd);
+
+    return true;
 }

@@ -43,7 +43,7 @@ private:
     std::unique_ptr<HoymilesRadio_NRF> _radioNrf;
     std::unique_ptr<HoymilesRadio_CMT> _radioCmt;
 
-    SemaphoreHandle_t _xSemaphore;
+    std::mutex _mutex;
 
     uint32_t _pollInterval = 0;
     uint32_t _lastPoll = 0;

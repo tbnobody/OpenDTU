@@ -15,6 +15,7 @@ public:
     bool sendPowerControlRequest(bool turnOn);
     bool sendRestartControlRequest();
     bool resendPowerControlRequest();
+    bool sendGridOnProFileParaRequest();
 
 private:
     uint8_t _lastAlarmLogCnt = 0;
