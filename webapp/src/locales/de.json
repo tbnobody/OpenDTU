@@ -133,7 +133,7 @@
     "eventlog": {
         "Start": "Begin",
         "Stop": "Ende",
-        "Id": "Fehlernummer",
+        "Id": "ID",
         "Message": "Meldung"
     },
     "devinfo": {
