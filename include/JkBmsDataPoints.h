@@ -185,6 +185,10 @@ class DataPoint {
         std::string const& getUnitText() const { return _strUnit; }
         uint32_t getTimestamp() const { return _timestamp; }
 
+        bool operator==(DataPoint const& other) const {
+            return _value == other._value;
+        }
+
     private:
         std::string _strLabel;
         std::string _strValue;
