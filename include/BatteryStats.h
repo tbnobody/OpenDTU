@@ -95,4 +95,6 @@ class JkBmsBatteryStats : public BatteryStats {
 
     private:
         JkBms::DataPointContainer _dataPoints;
+        mutable uint32_t _lastMqttPublish = 0;
+        mutable uint32_t _lastFullMqttPublish = 0;
 };

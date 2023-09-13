@@ -2,23 +2,23 @@
  *
  * Arduino library to read from Victron devices using VE.Direct protocol.
  * Derived from Victron framehandler reference implementation.
- * 
+ *
  * The MIT License
- * 
+ *
  * Copyright (c) 2019 Victron Energy BV
  * Portions Copyright (C) 2020 Chris Terwilliger
  * https://github.com/cterwilliger/VeDirectFrameHandler
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -26,13 +26,13 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
- *  
+ *
  * 2020.05.05 - 0.2 - initial release
  * 2020.06.21 - 0.2 - add MIT license, no code changes
  * 2020.08.20 - 0.3 - corrected #include reference
- * 
+ *
  */
- 
+
 #include <Arduino.h>
 #include "VeDirectFrameHandler.h"
 
@@ -54,14 +54,13 @@ HardwareSerial VedirectSerial(1);
 VeDirectFrameHandler VeDirect;
 
 class Silent : public Print {
-    public:
-        size_t write(uint8_t c) final { return 0; }
+	public:
+		size_t write(uint8_t c) final { return 0; }
 };
 
 static Silent MessageOutputDummy;
 
 VeDirectFrameHandler::VeDirectFrameHandler() :
-	//mStop(false),	// don't know what Victron uses this for, not using
 	_msgOut(&MessageOutputDummy),
 	_state(IDLE),
 	_checksum(0),
@@ -79,6 +78,7 @@ VeDirectFrameHandler::VeDirectFrameHandler() :
 void VeDirectFrameHandler::setVerboseLogging(bool verboseLogging)
 {
 	_verboseLogging = verboseLogging;
+	if (!_verboseLogging) { _debugIn = 0; }
 }
 
 void VeDirectFrameHandler::init(int8_t rx, int8_t tx, Print* msgOut, bool verboseLogging)
@@ -121,22 +121,23 @@ void VeDirectFrameHandler::loop()
 }
 
 /*
- *	rxData
+ *  rxData
  *  This function is called by loop() which passes a byte of serial data
  *  Based on Victron's example code. But using String and Map instead of pointer and arrays
  */
 void VeDirectFrameHandler::rxData(uint8_t inbyte)
 {
-	_debugBuffer[_debugIn] = inbyte;
-	_debugIn = (_debugIn + 1) % _debugBuffer.size();
-	if (0 == _debugIn) {
-		_msgOut->println("[VE.Direct] ERROR: debug buffer overrun!");
+	if (_verboseLogging) {
+		_debugBuffer[_debugIn] = inbyte;
+		_debugIn = (_debugIn + 1) % _debugBuffer.size();
+		if (0 == _debugIn) {
+			_msgOut->println("[VE.Direct] ERROR: debug buffer overrun!");
+		}
 	}
 
-	//if (mStop) return;
 	if ( (inbyte == ':') && (_state != CHECKSUM) ) {
 		_prevState = _state; //hex frame can interrupt TEXT
-		_state = RECORD_HEX; 
+		_state = RECORD_HEX;
 		_hexSize = 0;
 	}
 	if (_state != RECORD_HEX) {
@@ -239,7 +240,7 @@ void VeDirectFrameHandler::textRxEvent(char * name, char * value) {
 	else if (strcmp(name, "LOAD") == 0) {
 		if (strcmp(value, "ON") == 0)
 			_tmpFrame.LOAD = true;
-		else	
+		else
 			_tmpFrame.LOAD = false;
 	}
 	else if (strcmp(name, "CS") == 0) {
@@ -284,12 +285,11 @@ void VeDirectFrameHandler::textRxEvent(char * name, char * value) {
 	else if (strcmp(name, "H23") == 0) {
 		_tmpFrame.H23 = atoi(value);
 	}
-	
 }
 
 
 /*
- *	frameEndEvent
+ *  frameEndEvent
  *  This function is called at the end of the received frame.  If the checksum is valid, the temp buffer is read line by line.
  *  If the name exists in the public buffer, the new value is copied to the public buffer.	If not, a new name/value entry
  *  is created in the public buffer.
@@ -316,8 +316,8 @@ void VeDirectFrameHandler::frameEndEvent(bool valid) {
 }
 
 /*
- *	hexRxEvent
- *  This function records hex answers or async messages	
+ *  hexRxEvent
+ *  This function records hex answers or async messages
  */
 int VeDirectFrameHandler::hexRxEvent(uint8_t inbyte) {
 	int ret=RECORD_HEX; // default - continue recording until end of frame
@@ -327,7 +327,7 @@ int VeDirectFrameHandler::hexRxEvent(uint8_t inbyte) {
 		// restore previous state
 		ret=_prevState;
 		break;
-		
+
 	default:
 		_hexSize++;
 		if (_hexSize>=VE_MAX_HEX_LEN) { // oops -buffer overflow - something went wrong, we abort
@@ -336,7 +336,7 @@ int VeDirectFrameHandler::hexRxEvent(uint8_t inbyte) {
 			ret=IDLE;
 		}
 	}
-	
+
 	return ret;
 }
 
@@ -352,7 +352,7 @@ bool VeDirectFrameHandler::isDataValid() {
 
 unsigned long VeDirectFrameHandler::getLastUpdate()
 {
-    return _lastUpdate;
+	return _lastUpdate;
 }
 
 /*
@@ -558,7 +558,7 @@ String VeDirectFrameHandler::getPidAsString(uint16_t pid)
 			break;
 		case 0XA110:
 			strPID =  "SmartSolar MPPT RS 450|100";
-			break; 
+			break;
 		case 0XA112:
 			strPID =  "BlueSolar MPPT VE.Can 250|70";
 			break;

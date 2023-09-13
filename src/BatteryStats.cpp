@@ -1,5 +1,8 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
+#include <vector>
+#include <algorithm>
 #include "BatteryStats.h"
+#include "Configuration.h"
 #include "MqttSettings.h"
 #include "JkBmsDataPoints.h"
 
@@ -145,6 +148,34 @@ void PylontechBatteryStats::mqttPublish() const
 void JkBmsBatteryStats::mqttPublish() const
 {
     BatteryStats::mqttPublish();
+
+    using Label = JkBms::DataPointLabel;
+
+    static std::vector<Label> mqttSkip = {
+        Label::CellsMilliVolt, // complex data format
+        Label::ModificationPassword, // sensitive data
+        Label::BatterySoCPercent // already published by base class
+    };
+
+    CONFIG_T& config = Configuration.get();
+
+    // publish all topics every minute, unless the retain flag is enabled
+    bool fullPublish = _lastFullMqttPublish + 60 * 1000 < millis();
+    fullPublish &= !config.Mqtt_Retain;
+
+    for (auto iter = _dataPoints.cbegin(); iter != _dataPoints.cend(); ++iter) {
+        // skip data points that did not change since last published
+        if (!fullPublish && iter->second.getTimestamp() < _lastMqttPublish) { continue; }
+
+        auto skipMatch = std::find(mqttSkip.begin(), mqttSkip.end(), iter->first);
+        if (skipMatch != mqttSkip.end()) { continue; }
+
+        String topic((std::string("battery/") + iter->second.getLabelText()).c_str());
+        MqttSettings.publish(topic, iter->second.getValueText().c_str());
+    }
+
+    _lastMqttPublish = millis();
+    if (fullPublish) { _lastFullMqttPublish = _lastMqttPublish; }
 }
 
 void JkBmsBatteryStats::updateFrom(JkBms::DataPointContainer const& dp)

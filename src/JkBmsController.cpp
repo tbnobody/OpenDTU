@@ -312,9 +312,9 @@ void Controller::frameComplete()
             ts, _buffer.size());
         for (size_t ctr = 0; ctr < _buffer.size(); ++ctr) {
             if (ctr % 16 == 0) {
-                MessageOutput.printf("\r\n[%11.3f] JK BMS: ", ts);
+                MessageOutput.printf("\r\n[%11.3f] JK BMS:", ts);
             }
-            MessageOutput.printf("%02x ", _buffer[ctr]);
+            MessageOutput.printf(" %02x", _buffer[ctr]);
         }
         MessageOutput.println();
     }
