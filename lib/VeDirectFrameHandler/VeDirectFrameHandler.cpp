@@ -78,6 +78,7 @@ VeDirectFrameHandler::VeDirectFrameHandler() :
 void VeDirectFrameHandler::setVerboseLogging(bool verboseLogging)
 {
 	_verboseLogging = verboseLogging;
+	if (!_verboseLogging) { _debugIn = 0; }
 }
 
 void VeDirectFrameHandler::init(int8_t rx, int8_t tx, Print* msgOut, bool verboseLogging)
@@ -120,16 +121,18 @@ void VeDirectFrameHandler::loop()
 }
 
 /*
- *	rxData
+ *  rxData
  *  This function is called by loop() which passes a byte of serial data
  *  Based on Victron's example code. But using String and Map instead of pointer and arrays
  */
 void VeDirectFrameHandler::rxData(uint8_t inbyte)
 {
-	_debugBuffer[_debugIn] = inbyte;
-	_debugIn = (_debugIn + 1) % _debugBuffer.size();
-	if (0 == _debugIn) {
-		_msgOut->println("[VE.Direct] ERROR: debug buffer overrun!");
+	if (_verboseLogging) {
+		_debugBuffer[_debugIn] = inbyte;
+		_debugIn = (_debugIn + 1) % _debugBuffer.size();
+		if (0 == _debugIn) {
+			_msgOut->println("[VE.Direct] ERROR: debug buffer overrun!");
+		}
 	}
 
 	if ( (inbyte == ':') && (_state != CHECKSUM) ) {
