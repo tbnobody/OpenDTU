@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 #pragma once
 #include "Parser.h"
-#include <Arduino.h>
 #include <cstdint>
 #include <list>
 
@@ -107,8 +106,6 @@ public:
     StatisticsParser();
     void clearBuffer();
     void appendFragment(uint8_t offset, uint8_t* payload, uint8_t len);
-    void beginAppendFragment();
-    void endAppendFragment();
 
     void setByteAssignment(const byteAssign_t* byteAssignment, uint8_t size);
 
@@ -125,6 +122,8 @@ public:
     const char* getChannelFieldName(ChannelType_t type, ChannelNum_t channel, FieldId_t fieldId);
     uint8_t getChannelFieldDigits(ChannelType_t type, ChannelNum_t channel, FieldId_t fieldId);
 
+    bool setChannelFieldValue(ChannelType_t type, ChannelNum_t channel, FieldId_t fieldId, float value);
+
     float getChannelFieldOffset(ChannelType_t type, ChannelNum_t channel, FieldId_t fieldId);
     void setChannelFieldOffset(ChannelType_t type, ChannelNum_t channel, FieldId_t fieldId, float offset);
 
@@ -139,7 +138,12 @@ public:
     void incrementRxFailureCount();
     uint32_t getRxFailureCount();
 
+    void zeroRuntimeData();
+    void zeroDailyData();
+
 private:
+    void zeroFields(const FieldId_t* fields);
+
     uint8_t _payloadStatistic[STATISTIC_PACKET_SIZE] = {};
     uint8_t _statisticLength = 0;
     uint16_t _stringMaxPower[CH_CNT];
@@ -150,6 +154,4 @@ private:
     std::list<fieldSettings_t> _fieldSettings;
 
     uint32_t _rxFailureCount = 0;
-
-    SemaphoreHandle_t _xSemaphore;
 };

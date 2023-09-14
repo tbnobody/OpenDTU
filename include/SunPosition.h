@@ -22,8 +22,8 @@ private:
     SunSet _sun;
     bool _isDayPeriod = true;
     bool _isSunsetAvailable = true;
-    uint _sunriseMinutes = 0;
-    uint _sunsetMinutes = 0;
+    uint32_t _sunriseMinutes = 0;
+    uint32_t _sunsetMinutes = 0;
 
     uint32_t _lastUpdate = 0;
     bool _isValidInfo = false;

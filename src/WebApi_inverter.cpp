@@ -7,6 +7,7 @@
 #include "MqttHandleHass.h"
 #include "WebApi.h"
 #include "WebApi_errors.h"
+#include "defaults.h"
 #include "helper.h"
 #include <AsyncJson.h>
 #include <Hoymiles.h>
@@ -57,6 +58,9 @@ void WebApiInverterClass::onInverterList(AsyncWebServerRequest* request)
             obj["poll_enable_night"] = config.Inverter[i].Poll_Enable_Night;
             obj["command_enable"] = config.Inverter[i].Command_Enable;
             obj["command_enable_night"] = config.Inverter[i].Command_Enable_Night;
+            obj["reachable_threshold"] = config.Inverter[i].ReachableThreshold;
+            obj["zero_runtime"] = config.Inverter[i].ZeroRuntimeDataIfUnrechable;
+            obj["zero_day"] = config.Inverter[i].ZeroYieldDayOnMidnight;
 
             auto inv = Hoymiles.getInverterBySerial(config.Inverter[i].Serial);
             uint8_t max_channels;
@@ -281,6 +285,9 @@ void WebApiInverterClass::onInverterEdit(AsyncWebServerRequest* request)
         inverter.Poll_Enable_Night = root["poll_enable_night"] | true;
         inverter.Command_Enable = root["command_enable"] | true;
         inverter.Command_Enable_Night = root["command_enable_night"] | true;
+        inverter.ReachableThreshold = root["reachable_threshold"] | REACHABLE_THRESHOLD;
+        inverter.ZeroRuntimeDataIfUnrechable = root["zero_runtime"] | false;
+        inverter.ZeroYieldDayOnMidnight = root["zero_day"] | false;
 
         arrayCount++;
     }
@@ -311,6 +318,9 @@ void WebApiInverterClass::onInverterEdit(AsyncWebServerRequest* request)
     if (inv != nullptr) {
         inv->setEnablePolling(inverter.Poll_Enable);
         inv->setEnableCommands(inverter.Command_Enable);
+        inv->setReachableThreshold(inverter.ReachableThreshold);
+        inv->setZeroValuesIfUnreachable(inverter.ZeroRuntimeDataIfUnrechable);
+        inv->setZeroYieldDayOnMidnight(inverter.ZeroYieldDayOnMidnight);
         for (uint8_t c = 0; c < INV_MAX_CHAN_COUNT; c++) {
             inv->Statistics()->setStringMaxPower(c, inverter.channel[c].MaxChannelPower);
             inv->Statistics()->setChannelFieldOffset(TYPE_DC, static_cast<ChannelNum_t>(c), FLD_YT, inverter.channel[c].YieldTotalOffset);

@@ -151,25 +151,25 @@ float DatastoreClass::getTotalDcIrradiation()
     return _totalDcIrradiation;
 }
 
-unsigned int DatastoreClass::getTotalAcYieldTotalDigits()
+uint32_t DatastoreClass::getTotalAcYieldTotalDigits()
 {
     std::lock_guard<std::mutex> lock(_mutex);
     return _totalAcYieldTotalDigits;
 }
 
-unsigned int DatastoreClass::getTotalAcYieldDayDigits()
+uint32_t DatastoreClass::getTotalAcYieldDayDigits()
 {
     std::lock_guard<std::mutex> lock(_mutex);
     return _totalAcYieldDayDigits;
 }
 
-unsigned int DatastoreClass::getTotalAcPowerDigits()
+uint32_t DatastoreClass::getTotalAcPowerDigits()
 {
     std::lock_guard<std::mutex> lock(_mutex);
     return _totalAcPowerDigits;
 }
 
-unsigned int DatastoreClass::getTotalDcPowerDigits()
+uint32_t DatastoreClass::getTotalDcPowerDigits()
 {
     std::lock_guard<std::mutex> lock(_mutex);
     return _totalDcPowerDigits;

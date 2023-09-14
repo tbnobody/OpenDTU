@@ -48,14 +48,7 @@ std::string dataPointValueToStr(tCells const& v) {
 void DataPointContainer::updateFrom(DataPointContainer const& source)
 {
     for (auto iter = source.cbegin(); iter != source.cend(); ++iter) {
-        auto pos = _dataPoints.find(iter->first);
-
-        if (pos != _dataPoints.end()) {
-            // do not update existing data points with the same value
-            if (pos->second == iter->second) { continue; }
-
-            _dataPoints.erase(pos);
-        }
+        _dataPoints.erase(iter->first);
         _dataPoints.insert(*iter);
     }
 }
