@@ -111,6 +111,8 @@ bool HttpPowerMeterClass::httpRequest(const char* url, Auth authType, const char
 
     int httpCode = httpClient.GET();
 
+    MessageOutput.printf("[HttpPowerMeter] httpCode %d \r\n", httpCode);
+
     if (httpCode == HTTP_CODE_UNAUTHORIZED && authType == Auth::digest) {
         // Handle authentication challenge
         char realm[256];  // Buffer to store the realm received from the server
@@ -161,7 +163,9 @@ bool HttpPowerMeterClass::httpRequest(const char* url, Auth authType, const char
                 authorization += response;
                 authorization += "\", algorithm=SHA-256";
                 httpClient.addHeader("Authorization", authorization);
+                MessageOutput.printf("[HttpPowerMeter] authorization header  %s \r\n", authorization.c_str());
                 httpCode = httpClient.GET();
+                MessageOutput.printf("[HttpPowerMeter] 2nd httpCode %d \r\n", httpCode);
             }
         }        
     }
