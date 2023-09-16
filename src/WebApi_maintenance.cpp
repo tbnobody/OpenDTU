@@ -4,6 +4,7 @@
  */
 
 #include "WebApi_maintenance.h"
+#include "Utils.h"
 #include "WebApi.h"
 #include "WebApi_errors.h"
 #include <AsyncJson.h>
@@ -75,10 +76,7 @@ void WebApiMaintenanceClass::onRebootPost(AsyncWebServerRequest* request)
 
         response->setLength();
         request->send(response);
-        yield();
-        delay(1000);
-        yield();
-        ESP.restart();
+        Utils::restartDtu();
     } else {
         retMsg["message"] = "Reboot cancled!";
         retMsg["code"] = WebApiError::MaintenanceRebootCancled;

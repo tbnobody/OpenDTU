@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * Copyright (C) 2022 Thomas Basler and others
+ * Copyright (C) 2022 - 2023 Thomas Basler and others
  */
 #include "DevInfoParser.h"
 #include "../Hoymiles.h"
@@ -46,16 +46,9 @@ const devInfo_t devInfo[] = {
     { { 0x10, 0x33, 0x31, ALL }, 2250, "HMT-2250" } // 01
 };
 
-#define HOY_SEMAPHORE_TAKE() \
-    do {                     \
-    } while (xSemaphoreTake(_xSemaphore, portMAX_DELAY) != pdPASS)
-#define HOY_SEMAPHORE_GIVE() xSemaphoreGive(_xSemaphore)
-
 DevInfoParser::DevInfoParser()
     : Parser()
 {
-    _xSemaphore = xSemaphoreCreateMutex();
-    HOY_SEMAPHORE_GIVE(); // release before first use
     clearBufferSimple();
     clearBufferAll();
 }
@@ -90,16 +83,6 @@ void DevInfoParser::appendFragmentSimple(uint8_t offset, uint8_t* payload, uint8
     }
     memcpy(&_payloadDevInfoSimple[offset], payload, len);
     _devInfoSimpleLength += len;
-}
-
-void DevInfoParser::beginAppendFragment()
-{
-    HOY_SEMAPHORE_TAKE();
-}
-
-void DevInfoParser::endAppendFragment()
-{
-    HOY_SEMAPHORE_GIVE();
 }
 
 uint32_t DevInfoParser::getLastUpdateAll()
@@ -194,6 +177,16 @@ String DevInfoParser::getHwModelName()
         return "";
     }
     return devInfo[idx].modelName;
+}
+
+bool DevInfoParser::containsValidData()
+{
+    time_t t = getFwBuildDateTime();
+
+    struct tm info;
+    localtime_r(&t, &info);
+
+    return info.tm_year > (2016 - 1900);
 }
 
 uint8_t DevInfoParser::getDevIdx()

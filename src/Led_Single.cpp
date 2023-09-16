@@ -20,6 +20,7 @@ void LedSingleClass::init()
 {
     _blinkTimeout.set(500);
     _updateTimeout.set(LEDSINGLE_UPDATE_INTERVAL);
+    turnAllOn();
 
     for (uint8_t i = 0; i < PINMAPPING_LED_COUNT; i++) {
         auto& pin = PinMapping.get();
@@ -40,7 +41,7 @@ void LedSingleClass::loop()
         return;
     }
 
-    if (_updateTimeout.occured()) {
+    if (_updateTimeout.occured() && _allState == LedState_t::On) {
         const CONFIG_T& config = Configuration.get();
 
         // Update network status
@@ -68,6 +69,9 @@ void LedSingleClass::loop()
         }
 
         _updateTimeout.reset();
+    } else if (_updateTimeout.occured() && _allState == LedState_t::Off) {
+        _ledState[0] = LedState_t::Off;
+        _ledState[1] = LedState_t::Off;
     }
 
     for (uint8_t i = 0; i < PINMAPPING_LED_COUNT; i++) {
@@ -92,4 +96,14 @@ void LedSingleClass::loop()
             break;
         }
     }
+}
+
+void LedSingleClass::turnAllOff()
+{
+    _allState = LedState_t::Off;
+}
+
+void LedSingleClass::turnAllOn()
+{
+    _allState = LedState_t::On;
 }

@@ -18,5 +18,50 @@
             "type": 0,
             "clk_mode": 3
         }
+    },
+    {
+        "name": "LILYGO TTGO T-Internet-POE, nrf24 direct solder",
+        "nrf24": {
+            "miso": 12,
+            "mosi": 4,
+            "clk": 15,
+            "irq": 33,
+            "en": 14,
+            "cs": 2
+        },
+        "eth": {
+            "enabled": true,
+            "phy_addr": 0,
+            "power": -1,
+            "mdc": 23,
+            "mdio": 18,
+            "type": 0,
+            "clk_mode": 3
+        }
+    },
+    {
+        "name": "LILYGO TTGO T-Internet-POE, nrf24 direct solder, SSD1306",
+        "nrf24": {
+            "miso": 12,
+            "mosi": 4,
+            "clk": 15,
+            "irq": 33,
+            "en": 14,
+            "cs": 2
+        },
+        "eth": {
+            "enabled": true,
+            "phy_addr": 0,
+            "power": -1,
+            "mdc": 23,
+            "mdio": 18,
+            "type": 0,
+            "clk_mode": 3
+        },
+        "display": {
+            "type": 2,
+            "data": 16,
+            "clk": 32
+        }
     }
 ]

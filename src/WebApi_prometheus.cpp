@@ -74,24 +74,13 @@ void WebApiPrometheusClass::onPrometheusMetricsGet(AsyncWebServerRequest* reques
                 for (auto& t : inv->Statistics()->getChannelTypes()) {
                     for (auto& c : inv->Statistics()->getChannelsByType(t)) {
                         addPanelInfo(stream, serial, i, inv, t, c);
-                        addField(stream, serial, i, inv, t, c, FLD_PAC);
-                        addField(stream, serial, i, inv, t, c, FLD_UAC);
-                        addField(stream, serial, i, inv, t, c, FLD_IAC);
-                        if (t == TYPE_AC) {
-                            addField(stream, serial, i, inv, t, c, FLD_PDC, "PowerDC");
-                        } else {
-                            addField(stream, serial, i, inv, t, c, FLD_PDC);
+                        for (uint8_t f = 0; f < sizeof(_publishFields) / sizeof(_publishFields[0]); f++) {
+                            if (t == TYPE_AC && _publishFields[f].field == FLD_PDC) {
+                                addField(stream, serial, i, inv, t, c, _publishFields[f].field, _metricTypes[_publishFields[f].type], "PowerDC");
+                            } else {
+                                addField(stream, serial, i, inv, t, c, _publishFields[f].field, _metricTypes[_publishFields[f].type]);
+                            }
                         }
-                        addField(stream, serial, i, inv, t, c, FLD_UDC);
-                        addField(stream, serial, i, inv, t, c, FLD_IDC);
-                        addField(stream, serial, i, inv, t, c, FLD_YD);
-                        addField(stream, serial, i, inv, t, c, FLD_YT);
-                        addField(stream, serial, i, inv, t, c, FLD_F);
-                        addField(stream, serial, i, inv, t, c, FLD_T);
-                        addField(stream, serial, i, inv, t, c, FLD_PF);
-                        addField(stream, serial, i, inv, t, c, FLD_Q);
-                        addField(stream, serial, i, inv, t, c, FLD_EFF);
-                        addField(stream, serial, i, inv, t, c, FLD_IRR);
                     }
                 }
             }
@@ -106,22 +95,22 @@ void WebApiPrometheusClass::onPrometheusMetricsGet(AsyncWebServerRequest* reques
     }
 }
 
-void WebApiPrometheusClass::addField(AsyncResponseStream* stream, String& serial, uint8_t idx, std::shared_ptr<InverterAbstract> inv, ChannelType_t type, ChannelNum_t channel, FieldId_t fieldId, const char* channelName)
+void WebApiPrometheusClass::addField(AsyncResponseStream* stream, String& serial, uint8_t idx, std::shared_ptr<InverterAbstract> inv, ChannelType_t type, ChannelNum_t channel, FieldId_t fieldId, const char* metricName, const char* channelName)
 {
     if (inv->Statistics()->hasChannelFieldValue(type, channel, fieldId)) {
         const char* chanName = (channelName == NULL) ? inv->Statistics()->getChannelFieldName(type, channel, fieldId) : channelName;
         if (idx == 0 && type == TYPE_AC && channel == 0) {
             stream->printf("# HELP opendtu_%s in %s\n", chanName, inv->Statistics()->getChannelFieldUnit(type, channel, fieldId));
-            stream->printf("# TYPE opendtu_%s %s\n", chanName, _metricTypes[_fieldMetricAssignment[fieldId]]);
+            stream->printf("# TYPE opendtu_%s %s\n", chanName, metricName);
         }
-        stream->printf("opendtu_%s{serial=\"%s\",unit=\"%d\",name=\"%s\",type=\"%s\",channel=\"%d\"} %f\n",
+        stream->printf("opendtu_%s{serial=\"%s\",unit=\"%d\",name=\"%s\",type=\"%s\",channel=\"%d\"} %s\n",
             chanName,
             serial.c_str(),
             idx,
             inv->name(),
             inv->Statistics()->getChannelTypeName(type),
             channel,
-            inv->Statistics()->getChannelFieldValue(type, channel, fieldId));
+            inv->Statistics()->getChannelFieldValueString(type, channel, fieldId).c_str());
     }
 }
 

@@ -126,7 +126,9 @@
         "Failure": "Failure",
         "Pending": "Pending",
         "Ok": "Ok",
-        "Unknown": "Unknown"
+        "Unknown": "Unknown",
+        "ShowGridProfile": "Show Grid Profile",
+        "GridProfile": "Grid Profile"
     },
     "eventlog": {
         "Start": "Start",
@@ -148,6 +150,12 @@
         "FirmwareBuildDate": "Firmware Build Date",
         "HardwarePartNumber": "Hardware Part Number",
         "HardwareVersion": "Hardware Version"
+    },
+    "gridprofile": {
+        "NoInfo": "@:devinfo.NoInfo",
+        "NoInfoLong": "@:devinfo.NoInfoLong",
+        "GridprofileSupport": "Support the development",
+        "GridprofileSupportLong": "Please see <a href=\"https://github.com/tbnobody/OpenDTU/wiki/Grid-Profile-Parser\" target=\"_blank\">here</a> for further information."
     },
     "systeminfo": {
         "SystemInfo": "System Info",
@@ -265,6 +273,7 @@
         "BaseTopic": "Base Topic",
         "PublishInterval": "Publish Interval",
         "Seconds": "{sec} seconds",
+        "CleanSession": "CleanSession flag",
         "Retain": "Retain",
         "Tls": "TLS",
         "RootCertifcateInfo": "Root CA Certifcate Info",
@@ -412,6 +421,7 @@
         "BaseTopicHint": "Base topic, will be prepend to all published topics (e.g. inverter/)",
         "PublishInterval": "Publish Interval:",
         "Seconds": "seconds",
+        "CleanSession": "Enable CleanSession flag",
         "EnableRetain": "Enable Retain Flag",
         "EnableTls": "Enable TLS",
         "RootCa": "CA-Root-Certificate (default Letsencrypt):",
@@ -450,6 +460,9 @@
         "SaveOrder": "Save order",
         "DeleteInverter": "Delete inverter",
         "EditInverter": "Edit inverter",
+        "General": "General",
+        "String": "String",
+        "Advanced": "Advanced",
         "InverterSerial": "Inverter Serial:",
         "InverterName": "Inverter Name:",
         "InverterNameHint": "Here you can specify a custom name for your inverter.",
@@ -465,6 +478,12 @@
         "StringYtOffset": "Yield total offset string {num}:",
         "StringYtOffsetHint": "This offset is applied the read yield total value from the inverter. This can be used to set the yield total of the inverter to zero if a used inverter is used. But you can still try polling data.",
         "InverterHint": "*) Enter the W<sub>p</sub> of the channel to calculate irradiation.",
+        "ReachableThreshold": "Reachable Threshold:",
+        "ReachableThresholdHint": "Defines how many requests are allowed to fail until the inverter is treated is not reachable.",
+        "ZeroRuntime": "Zero runtime data",
+        "ZeroRuntimeHint": "Zero runtime data (no yield data) if inverter becomes unreachable.",
+        "ZeroDay": "Zero daily yield at midnight",
+        "ZeroDayHint": "This only works if the inverter is unreachable. If data is read from the inverter, it's values will be used. (Reset only occours on power cycle)",
         "Cancel": "@:maintenancereboot.Cancel",
         "Save": "@:dtuadmin.Save",
         "DeleteMsg": "Are you sure you want to delete the inverter \"{name}\" with serial number {serial}?",
@@ -538,7 +557,7 @@
         "DefaultProfile": "(Default settings)",
         "ProfileHint": "Your device may stop responding if you select an incompatible profile. In this case, you must perform a deletion via the serial interface.",
         "Display": "Display",
-        "PowerSafe": "Enable Power Safe:",
+        "PowerSafe": "Enable Power Save:",
         "PowerSafeHint": "Turn off the display if no inverter is producing.",
         "Screensaver": "Enable Screensaver:",
         "ScreensaverHint": "Move the display a little bit on each update to prevent burn-in. (Useful especially for OLED displays)",

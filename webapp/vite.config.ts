@@ -9,6 +9,14 @@ import VueI18nPlugin from '@intlify/unplugin-vue-i18n/vite'
 
 const path = require('path')
 
+// example 'vite.user.ts': export const proxy_target = '192.168.16.107'
+let proxy_target;
+try {
+    proxy_target = require('./vite.user.ts').proxy_target;
+} catch (error) {
+    proxy_target = '192.168.20.110';
+}
+
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [
@@ -52,15 +60,15 @@ export default defineConfig({
   server: {
     proxy: {
       '^/api': {
-        target: 'http://192.168.2.93/'
+        target: 'http://' + proxy_target
       },
       '^/livedata': {
-        target: 'ws://192.168.2.93/',
+        target: 'ws://' + proxy_target,
         ws: true,
         changeOrigin: true
       },
       '^/console': {
-        target: 'ws://192.168.2.93/',
+        target: 'ws://' + proxy_target,
         ws: true,
         changeOrigin: true
       }

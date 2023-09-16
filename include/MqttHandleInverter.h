@@ -3,6 +3,7 @@
 
 #include "Configuration.h"
 #include <Hoymiles.h>
+#include <TimeoutHelper.h>
 #include <espMqttClient.h>
 
 class MqttHandleInverterClass {
