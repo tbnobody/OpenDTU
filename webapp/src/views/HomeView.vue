@@ -2,6 +2,14 @@
     <BasePage :title="$t('home.LiveData')" :isLoading="dataLoading" :isWideScreen="true">
         <HintView :hints="liveData.hints" />
         <InverterTotalInfo :totalData="liveData.total" /><br />
+        <div class="card">
+            <div class="card-body">
+                <div class="row">
+                    <BarChart />
+                    <CalendarChart />
+                </div>
+            </div>
+        </div>
         <div class="row gy-3">
             <div class="col-sm-3 col-md-2" :style="[inverterData.length == 1 ? { 'display': 'none' } : {}]">
                 <div class="nav nav-pills row-cols-sm-1" id="v-pills-tab" role="tablist" aria-orientation="vertical">
@@ -14,14 +22,6 @@
                         <BIconCheckCircleFill class="fs-4" v-if="inverter.reachable && inverter.producing" />
                         {{ inverter.name }}
                     </button>
-                </div>
-            </div>
-            <div class="card">
-                <div class="card-body">
-                    <div class="row">
-                        <BarChart />
-                        <CalendarChart />
-                    </div>
                 </div>
             </div>
 

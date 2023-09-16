@@ -98,7 +98,7 @@ size_t WebApiDatabaseClass::readchunk(uint8_t* buffer, size_t maxLen, size_t ind
         *pr++ = '[';
     }
     while (true) {
-        r = f.read((uint8_t*)&d, sizeof(pvData)); // read from database
+        r = f.read(reinterpret_cast<uint8_t*>(&d), sizeof(pvData)); // read from database
         if (r <= 0) {
             if (last) {
                 f.close();
@@ -115,7 +115,7 @@ size_t WebApiDatabaseClass::readchunk(uint8_t* buffer, size_t maxLen, size_t ind
         } else {
             *pr++ = ',';
         }
-        int len = sprintf((char*)pr, "[%d,%d,%d,%d,%f]",
+        int len = snprintf(reinterpret_cast<char*>(pr), maxLen, "[%d,%d,%d,%d,%f]",
             d.tm_year, d.tm_mon, d.tm_mday, d.tm_hour, d.energy * 1e3);
         if (len >= 0) {
             pr += len;
@@ -175,7 +175,7 @@ size_t WebApiDatabaseClass::readchunkHour(uint8_t* buffer, size_t maxLen, size_t
         *pr++ = '[';
     }
     while (true) {
-        r = f.read((uint8_t*)&d, sizeof(pvData)); // read from database
+        r = f.read(reinterpret_cast<uint8_t*>(&d), sizeof(pvData)); // read from database
         if (r <= 0) {
             if (last) {
                 f.close();
@@ -197,7 +197,7 @@ size_t WebApiDatabaseClass::readchunkHour(uint8_t* buffer, size_t maxLen, size_t
             cd.dd[1] = d.tm_mday;
             cd.dd[0] = d.tm_hour;
             // MessageOutput.println(cd,16);
-            if (cd.dh >= startdate.dh) {
+            if ((cd.dh >= startdate.dh) && (oldenergy > 0.0)) {
                 valid = true;
             } else
                 oldenergy = d.energy;
@@ -205,9 +205,10 @@ size_t WebApiDatabaseClass::readchunkHour(uint8_t* buffer, size_t maxLen, size_t
         if (valid) {
             if (first) {
                 first = false;
-            } else
+            } else {
                 *pr++ = ',';
-            int len = sprintf((char*)pr, "[%d,%d,%d,%d,%f]",
+            }
+            int len = snprintf(reinterpret_cast<char*>(pr), maxLen, "[%d,%d,%d,%d,%f]",
                 d.tm_year, d.tm_mon, d.tm_mday, d.tm_hour,
                 (d.energy - oldenergy) * 1e3);
             oldenergy = d.energy;
@@ -242,7 +243,7 @@ size_t WebApiDatabaseClass::readchunkDay(uint8_t* buffer, size_t maxLen, size_t 
         *pr++ = '[';
     }
     while (true) {
-        r = f.read((uint8_t*)&d, sizeof(pvData)); // read from database
+        r = f.read(reinterpret_cast<uint8_t*>(&d), sizeof(pvData)); // read from database
         if (r <= 0) {
             if (last) {
                 f.close();
@@ -255,22 +256,24 @@ size_t WebApiDatabaseClass::readchunkDay(uint8_t* buffer, size_t maxLen, size_t 
             last = true;
             if (!first)
                 *pr++ = ',';
-            int len = sprintf((char*)pr, "[%d,%d,%d,%d,%f]",
+            int len = snprintf(reinterpret_cast<char*>(pr), maxLen, "[%d,%d,%d,%d,%f]",
                 endofday.tm_year, endofday.tm_mon, endofday.tm_mday, endofday.tm_hour,
                 (endofday.energy - startenergy) * 1e3);
             pr += len;
             *pr++ = ']';
             return (pr - buffer); // last chunk
         }
-        if (endofday.tm_year == 0) {
-            startenergy = d.energy;
+        if (startenergy == 0.0) {
+            if (d.energy > 0.0) {
+                startenergy = d.energy;
+            }
         } else {
             if (endofday.tm_mday != d.tm_mday) { // next day
                 if (first) {
                     first = false;
                 } else
                     *pr++ = ',';
-                int len = sprintf((char*)pr, "[%d,%d,%d,%d,%f]",
+                int len = snprintf(reinterpret_cast<char*>(pr), maxLen, "[%d,%d,%d,%d,%f]",
                     endofday.tm_year, endofday.tm_mon, endofday.tm_mday, endofday.tm_hour,
                     (endofday.energy - startenergy) * 1e3);
                 startenergy = endofday.energy;
