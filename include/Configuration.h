@@ -48,6 +48,8 @@ struct INVERTER_CONFIG_T {
     uint8_t ReachableThreshold;
     bool ZeroRuntimeDataIfUnrechable;
     bool ZeroYieldDayOnMidnight;
+    uint16_t SafeLimitMillis;
+    uint16_t SafeLimitWatts;
     CHANNEL_CONFIG_T channel[INV_MAX_CHAN_COUNT];
 };
 
