@@ -93,13 +93,9 @@ void MqttHandleInverterClass::loop()
                 MqttSettings.publish(subtopic + "/status/last_update", String(0));
             }
 
-            uint32_t lastUpdate = inv->Statistics()->getLastUpdate();
-            if (lastUpdate > 0 && (lastUpdate != _lastPublishStats[i] || ((inv->getZeroValuesIfUnreachable() || inv->getZeroYieldDayOnMidnight()) && _statsTimeout.occured()))) {
-                _lastPublishStats[i] = lastUpdate;
-
-                // At first a change of the stats have to occour. Then the stats
-                // are published on every change or every 60 seconds
-                _statsTimeout.set(PUBLISH_MAX_INTERVAL);
+            uint32_t lastUpdateInternal = inv->Statistics()->getLastUpdateFromInternal();
+            if (inv->Statistics()->getLastUpdate() > 0 && (lastUpdateInternal != _lastPublishStats[i])) {
+                _lastPublishStats[i] = lastUpdateInternal;
 
                 // Loop all channels
                 for (auto& t : inv->Statistics()->getChannelTypes()) {

@@ -141,6 +141,13 @@ public:
     void zeroRuntimeData();
     void zeroDailyData();
 
+    // Update time when new data from the inverter is received
+    void setLastUpdate(uint32_t lastUpdate);
+
+    // Update time when internal data structure changes (from inverter and by internal manipulation)
+    uint32_t getLastUpdateFromInternal();
+    void setLastUpdateFromInternal(uint32_t lastUpdate);
+
 private:
     void zeroFields(const FieldId_t* fields);
 
@@ -154,4 +161,5 @@ private:
     std::list<fieldSettings_t> _fieldSettings;
 
     uint32_t _rxFailureCount = 0;
+    uint32_t _lastUpdateFromInternal = 0;
 };
