@@ -8,6 +8,7 @@
 #include "PowerMeter.h"
 #include "PowerLimiter.h"
 #include "Configuration.h"
+#include "Battery.h"
 #include <SPI.h>
 #include <mcp_can.h>
 
@@ -274,6 +275,8 @@ void HuaweiCanClass::loop()
       return;
   }
 
+  bool verboseLogging = config.Huawei.VerboseLogging;
+
   processReceivedParameters();
 
   uint8_t com_error = HuaweiCanComm.getErrorCode(true);
@@ -285,7 +288,7 @@ void HuaweiCanClass::loop()
   }
 
   // Print updated data
-  if (HuaweiCanComm.gotNewRxDataFrame(false)) {
+  if (HuaweiCanComm.gotNewRxDataFrame(false) && verboseLogging) {
     MessageOutput.printf("[HuaweiCanClass::loop] In:  %.02fV, %.02fA, %.02fW\n", _rp.input_voltage, _rp.input_current, _rp.input_power);
     MessageOutput.printf("[HuaweiCanClass::loop] Out: %.02fV, %.02fA of %.02fA, %.02fW\n", _rp.output_voltage, _rp.output_current, _rp.max_output_current, _rp.output_power);
     MessageOutput.printf("[HuaweiCanClass::loop] Eff : %.01f%%, Temp in: %.01fC, Temp out: %.01fC\n", _rp.efficiency * 100, _rp.input_temp, _rp.output_temp);
@@ -382,7 +385,21 @@ void HuaweiCanClass::loop()
       // Calculate new power limit
       float newPowerLimit = -1 * round(PowerMeter.getPowerTotal());
       newPowerLimit += _rp.output_power;
-      MessageOutput.printf("[HuaweiCanClass::loop] PL: %f, OP: %f \r\n", newPowerLimit, _rp.output_power);
+      if (verboseLogging){
+        MessageOutput.printf("[HuaweiCanClass::loop] newPowerLimit: %f, output_power: %f \r\n", newPowerLimit, _rp.output_power);
+      }
+
+      if (config.Battery.Enabled && config.Huawei.Auto_Power_BatterySoC_Limits_Enabled) {
+        uint8_t _batterySoC = Battery.getStats()->getSoC();
+        if (_batterySoC >= config.Huawei.Auto_Power_Stop_BatterySoC_Threshold) {
+          newPowerLimit = 0;
+          if (verboseLogging) {
+            MessageOutput.printf("[HuaweiCanClass::loop] Current battery SoC %i reached "
+                    "stop threshold %i, set newPowerLimit to %f \r\n", _batterySoC,
+                    config.Huawei.Auto_Power_Stop_BatterySoC_Threshold, newPowerLimit);
+          }
+        }
+      }
 
       if (newPowerLimit > config.Huawei.Auto_Power_Lower_Power_Limit) {
 
@@ -415,7 +432,9 @@ void HuaweiCanClass::loop()
         float outputCurrent = std::min(calculatedCurrent, permissableCurrent);
         outputCurrent= outputCurrent > 0 ? outputCurrent : 0;
 
-        MessageOutput.printf("[HuaweiCanClass::loop] Setting output current to %.2fA. This is the lower value of calculated %.2fA and BMS permissable %.2fA currents\r\n", outputCurrent, calculatedCurrent, permissableCurrent);
+        if (verboseLogging) {
+            MessageOutput.printf("[HuaweiCanClass::loop] Setting output current to %.2fA. This is the lower value of calculated %.2fA and BMS permissable %.2fA currents\r\n", outputCurrent, calculatedCurrent, permissableCurrent);
+        }
         _autoPowerEnabled = true;
         _setValue(outputCurrent, HUAWEI_ONLINE_CURRENT);
 

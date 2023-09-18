@@ -24,9 +24,19 @@
                 </div>
 
                 <InputElement v-show="acChargerConfigList.enabled"
+                              :label="$t('acchargeradmin.VerboseLogging')"
+                              v-model="acChargerConfigList.verbose_logging"
+                              type="checkbox" wide/>
+
+                <InputElement v-show="acChargerConfigList.enabled"
                               :label="$t('acchargeradmin.EnableAutoPower')"
                               v-model="acChargerConfigList.auto_power_enabled"
                               type="checkbox" wide/>
+
+                <InputElement v-show="acChargerConfigList.enabled && acChargerConfigList.auto_power_enabled"
+                              :label="$t('acchargeradmin.EnableBatterySoCLimits')"
+                              v-model="acChargerConfigList.auto_power_batterysoc_limits_enabled"
+                              type="checkbox" wide />
 
                 <InputElement v-show="acChargerConfigList.enabled"
                               :label="$t('acchargeradmin.EnableEmergencyCharge')"
@@ -76,6 +86,22 @@
                                     placeholder="2000" v-model="acChargerConfigList.upper_power_limit"
                                     aria-describedby="lowerPowerLimitDescription" min="100" max="3000" required/>
                                     <span class="input-group-text" id="upperPowerLimitDescription">W</span>
+                            </div>
+                        </div>
+                    </div>
+                </CardElement>
+                <CardElement :text="$t('acchargeradmin.BatterySoCLimits')" textVariant="text-bg-primary" add-space
+                            v-show="acChargerConfigList.auto_power_enabled && acChargerConfigList.auto_power_batterysoc_limits_enabled">
+                    <div class="row mb-3">
+                        <label for="stopBatterySoCThreshold" class="col-sm-2 col-form-label">{{ $t('acchargeradmin.StopBatterySoCThreshold') }}:
+                            <BIconInfoCircle v-tooltip :title="$t('acchargeradmin.StopBatterySoCThresholdHint')" />
+                        </label>
+                        <div class="col-sm-10">
+                            <div class="input-group">
+                                <input type="number" class="form-control" id="stopBatterySoCThreshold"
+                                    placeholder="95" v-model="acChargerConfigList.stop_batterysoc_threshold"
+                                    aria-describedby="stopBatterySoCThresholdDescription" min="2" max="100" required/>
+                                    <span class="input-group-text" id="stopBatterySoCThresholdDescription">%</span>
                             </div>
                         </div>
                     </div>

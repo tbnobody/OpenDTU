@@ -238,13 +238,16 @@ struct CONFIG_T {
 
     struct {
         bool Enabled;
+        bool VerboseLogging;
         uint32_t CAN_Controller_Frequency;
         bool Auto_Power_Enabled;
+        bool Auto_Power_BatterySoC_Limits_Enabled;
         bool Emergency_Charge_Enabled;
         float Auto_Power_Voltage_Limit;
         float Auto_Power_Enable_Voltage_Limit;
         float Auto_Power_Lower_Power_Limit;
         float Auto_Power_Upper_Power_Limit;
+        uint8_t Auto_Power_Stop_BatterySoC_Threshold;
     } Huawei;
 
 
