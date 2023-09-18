@@ -63,10 +63,10 @@ private:
     void NetworkEvent(WiFiEvent_t event);
     bool adminEnabled = true;
     bool forceDisconnection = false;
-    int adminTimeoutCounter = 0;
-    int adminTimeoutCounterMax = 0;
-    int connectTimeoutTimer = 0;
-    int connectRedoTimer = 0;
+    uint32_t adminTimeoutCounter = 0;
+    uint32_t adminTimeoutCounterMax = 0;
+    uint32_t connectTimeoutTimer = 0;
+    uint32_t connectRedoTimer = 0;
     uint32_t lastTimerCall = 0;
     const byte DNS_PORT = 53;
     IPAddress apIp;

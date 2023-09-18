@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 #pragma once
 #include "Parser.h"
-#include <Arduino.h>
 
 class PowerCommandParser : public Parser {
 public:
