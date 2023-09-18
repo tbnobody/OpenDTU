@@ -180,12 +180,10 @@ void JkBmsBatteryStats::mqttPublish() const
 
 void JkBmsBatteryStats::updateFrom(JkBms::DataPointContainer const& dp)
 {
-    _dataPoints.updateFrom(dp);
-
     using Label = JkBms::DataPointLabel;
 
     _manufacturer = "JKBMS";
-    auto oProductId = _dataPoints.get<Label::ProductId>();
+    auto oProductId = dp.get<Label::ProductId>();
     if (oProductId.has_value()) {
         _manufacturer = oProductId->c_str();
         auto pos = oProductId->rfind("JK");
@@ -194,12 +192,14 @@ void JkBmsBatteryStats::updateFrom(JkBms::DataPointContainer const& dp)
         }
     }
 
-    auto oSoCValue = _dataPoints.get<Label::BatterySoCPercent>();
+    auto oSoCValue = dp.get<Label::BatterySoCPercent>();
     if (oSoCValue.has_value()) {
         _SoC = *oSoCValue;
-        auto oSoCDataPoint = _dataPoints.getDataPointFor<Label::BatterySoCPercent>();
+        auto oSoCDataPoint = dp.getDataPointFor<Label::BatterySoCPercent>();
         _lastUpdateSoC = oSoCDataPoint->getTimestamp();
     }
+
+    _dataPoints.updateFrom(dp);
 
     _lastUpdate = millis();
 }
