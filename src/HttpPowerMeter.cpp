@@ -3,7 +3,6 @@
 #include "HttpPowerMeter.h"
 #include "MessageOutput.h"
 #include <WiFiClientSecure.h>
-#include <HTTPClient.h>
 #include <FirebaseJson.h>
 #include <Crypto.h>
 #include <SHA256.h>
@@ -87,30 +86,19 @@ bool HttpPowerMeterClass::httpRequest(const char* url, Auth authType, const char
       wifiClient = std::make_unique<WiFiClient>();
     }
 
-    HTTPClient httpClient;
+   
     if (!httpClient.begin(*wifiClient, newUrl)) {
       snprintf_P(error, errorSize, "httpClient.begin(%s) failed", newUrl.c_str());
       return false;
     }
-
-    httpClient.setFollowRedirects(HTTPC_STRICT_FOLLOW_REDIRECTS);
-    httpClient.setUserAgent("OpenDTU-OnBattery");
-    httpClient.setConnectTimeout(timeout);
-    httpClient.setTimeout(timeout);
-    httpClient.addHeader("Content-Type", "application/json");
-    httpClient.addHeader("Accept", "application/json");
-
-    if (strlen(httpHeader) > 0) {
-        httpClient.addHeader(httpHeader, httpValue);
-    }
-
+    prepareRequest(timeout, httpHeader, httpValue);
+    
     if (authType == Auth::digest) {
         const char *headers[1] = {"WWW-Authenticate"};
         httpClient.collectHeaders(headers, 1);
     }
 
     int httpCode = httpClient.GET();
-
     if (httpCode == HTTP_CODE_UNAUTHORIZED && authType == Auth::digest) {
         // Handle authentication challenge
         char realm[256];  // Buffer to store the realm received from the server
@@ -160,6 +148,12 @@ bool HttpPowerMeterClass::httpRequest(const char* url, Auth authType, const char
                 authorization += "\", nc=00000001, qop=auth, response=\"";
                 authorization += response;
                 authorization += "\", algorithm=SHA-256";
+                httpClient.end();
+                if (!httpClient.begin(*wifiClient, newUrl)) {
+                    snprintf_P(error, errorSize, "httpClient.begin(%s) for digest auth failed", newUrl.c_str());
+                    return false;
+                }
+                prepareRequest(timeout, httpHeader, httpValue);
                 httpClient.addHeader("Authorization", authorization);
                 httpCode = httpClient.GET();
             }
@@ -257,6 +251,19 @@ String HttpPowerMeterClass::sha256(const String& data) {
   }
 
   return hashStr;
+}
+
+void HttpPowerMeterClass::prepareRequest(uint32_t timeout, const char* httpHeader, const char* httpValue) {
+    httpClient.setFollowRedirects(HTTPC_STRICT_FOLLOW_REDIRECTS);
+    httpClient.setUserAgent("OpenDTU-OnBattery");
+    httpClient.setConnectTimeout(timeout);
+    httpClient.setTimeout(timeout);
+    httpClient.addHeader("Content-Type", "application/json");
+    httpClient.addHeader("Accept", "application/json");
+
+    if (strlen(httpHeader) > 0) {
+        httpClient.addHeader(httpHeader, httpValue);
+    }
 }
 
 HttpPowerMeterClass HttpPowerMeter;
