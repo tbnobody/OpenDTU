@@ -61,6 +61,8 @@ void WebApiInverterClass::onInverterList(AsyncWebServerRequest* request)
             obj["reachable_threshold"] = config.Inverter[i].ReachableThreshold;
             obj["zero_runtime"] = config.Inverter[i].ZeroRuntimeDataIfUnrechable;
             obj["zero_day"] = config.Inverter[i].ZeroYieldDayOnMidnight;
+            obj["safe_limit_millis"] = config.Inverter[i].SafeLimitMillis;
+            obj["safe_limit_watts"] = config.Inverter[i].SafeLimitWatts;
 
             auto inv = Hoymiles.getInverterBySerial(config.Inverter[i].Serial);
             uint8_t max_channels;
@@ -288,6 +290,8 @@ void WebApiInverterClass::onInverterEdit(AsyncWebServerRequest* request)
         inverter.ReachableThreshold = root["reachable_threshold"] | REACHABLE_THRESHOLD;
         inverter.ZeroRuntimeDataIfUnrechable = root["zero_runtime"] | false;
         inverter.ZeroYieldDayOnMidnight = root["zero_day"] | false;
+        inverter.SafeLimitMillis = root["safe_limit_millis"] | 0;
+        inverter.SafeLimitWatts = root["safe_limit_watts"] | 0;
 
         arrayCount++;
     }
