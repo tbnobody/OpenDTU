@@ -6,6 +6,7 @@
 #include <FirebaseJson.h>
 #include <Crypto.h>
 #include <SHA256.h>
+#include <base64.h>
 #include <memory>
 
 void HttpPowerMeterClass::init()
@@ -53,8 +54,6 @@ bool HttpPowerMeterClass::updateValues()
 bool HttpPowerMeterClass::httpRequest(const char* url, Auth authType, const char* username, const char* password, const char* httpHeader, const char* httpValue, uint32_t timeout,
         char* response, size_t responseSize, char* error, size_t errorSize)
 {
-
-    String newUrl = url;
     String urlProtocol;
     String urlHostname;
     String urlUri;
@@ -63,17 +62,6 @@ bool HttpPowerMeterClass::httpRequest(const char* url, Auth authType, const char
     response[0] = '\0';
     error[0] = '\0';
 
-    if (authType == Auth::basic) {
-        newUrl = urlProtocol;
-        newUrl += "://";
-        newUrl += username;
-        newUrl += ":";
-        newUrl += password;
-        newUrl += "@";
-        newUrl += urlHostname;
-        newUrl += urlUri;
-    }
-    
     // secureWifiClient MUST be created before HTTPClient
     // see discussion: https://github.com/helgeerbe/OpenDTU-OnBattery/issues/381
     std::unique_ptr<WiFiClient> wifiClient;
@@ -87,8 +75,8 @@ bool HttpPowerMeterClass::httpRequest(const char* url, Auth authType, const char
     }
 
    
-    if (!httpClient.begin(*wifiClient, newUrl)) {
-      snprintf_P(error, errorSize, "httpClient.begin(%s) failed", newUrl.c_str());
+    if (!httpClient.begin(*wifiClient, url)) {
+      snprintf_P(error, errorSize, "httpClient.begin(%s) failed", url);
       return false;
     }
     prepareRequest(timeout, httpHeader, httpValue);
@@ -96,6 +84,13 @@ bool HttpPowerMeterClass::httpRequest(const char* url, Auth authType, const char
     if (authType == Auth::digest) {
         const char *headers[1] = {"WWW-Authenticate"};
         httpClient.collectHeaders(headers, 1);
+    } else if (authType == Auth::basic) {
+        String authString = username;
+        authString += ":";
+        authString += password;
+        String auth = "Basic ";
+        auth.concat(base64::encode(authString));
+        httpClient.addHeader("Authorization", auth);
     }
 
     int httpCode = httpClient.GET();
@@ -149,8 +144,8 @@ bool HttpPowerMeterClass::httpRequest(const char* url, Auth authType, const char
                 authorization += response;
                 authorization += "\", algorithm=SHA-256";
                 httpClient.end();
-                if (!httpClient.begin(*wifiClient, newUrl)) {
-                    snprintf_P(error, errorSize, "httpClient.begin(%s) for digest auth failed", newUrl.c_str());
+                if (!httpClient.begin(*wifiClient, url)) {
+                    snprintf_P(error, errorSize, "httpClient.begin(%s) for digest auth failed", url);
                     return false;
                 }
                 prepareRequest(timeout, httpHeader, httpValue);
@@ -170,7 +165,7 @@ bool HttpPowerMeterClass::httpRequest(const char* url, Auth authType, const char
             snprintf(response, responseSize, responseBody.c_str());
         }
     } else if (httpCode <= 0) {
-        snprintf_P(error, errorSize, "Error(%s): %s", newUrl.c_str(), httpClient.errorToString(httpCode).c_str());
+        snprintf_P(error, errorSize, "Error(%s): %s", url, httpClient.errorToString(httpCode).c_str());
     } else if (httpCode != HTTP_CODE_OK) {
         snprintf_P(error, errorSize, "Bad HTTP code: %d", httpCode);
     }
