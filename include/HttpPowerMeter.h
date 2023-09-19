@@ -3,6 +3,7 @@
 
 #include <stdint.h>
 #include <Arduino.h>
+#include <HTTPClient.h>
 
 class HttpPowerMeterClass {
 public:
@@ -14,9 +15,12 @@ public:
     float getFloatValueByJsonPath(const char* jsonString, const char* jsonPath, float &value);
 
 private:
-     float power[POWERMETER_MAX_PHASES];
      void extractUrlComponents(const String& url, String& protocol, String& hostname, String& uri);
+     void prepareRequest(uint32_t timeout, const char* httpHeader, const char* httpValue);
+     HTTPClient httpClient;
+     float power[POWERMETER_MAX_PHASES];
      String sha256(const String& data);
+     
 };
 
 extern HttpPowerMeterClass HttpPowerMeter;
