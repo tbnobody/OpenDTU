@@ -313,6 +313,7 @@ void MqttHandleHassClass::createDeviceInfo(JsonObject& object, std::shared_ptr<I
     object["mf"] = "OpenDTU";
     object["mdl"] = inv->typeName();
     object["sw"] = AUTO_GIT_HASH;
+    object["via_device"] = NetworkSettings.getHostname();
 }
 
 void MqttHandleHassClass::publish(const String& subtopic, const String& payload)
