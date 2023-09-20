@@ -46,6 +46,11 @@ void MqttHandleHassClass::publishConfig()
     }
 
     const CONFIG_T& config = Configuration.get();
+    
+    // publish DTU sensors
+    publishDTUSensor("IP", "", "diagnostic", "mdi:network-outline", "", "");
+    publishDTUSensor("WiFi Signal", "signal_strength", "diagnostic", "", "dBm", "rssi");
+    publishDTUSensor("Uptime", "duration", "diagnostic", "", "s", "");
 
     // Loop all inverters
     for (uint8_t i = 0; i < Hoymiles.getNumInverters(); i++) {
@@ -79,6 +84,42 @@ void MqttHandleHassClass::publishConfig()
 
         yield();
     }
+}
+
+void MqttHandleHassClass::publishDTUSensor(const char* name, const char* device_class, const char* category, const char* icon, const char* unit_of_measure, const char* subTopic)
+{
+    String id = name;
+    id.toLowerCase();
+    id.replace(" ", "_");
+    String topic = subTopic;
+    if (topic == "") {
+        topic = id;
+    }
+
+    DynamicJsonDocument root(1024);
+    root["name"] = name;
+    root["uniq_id"] = NetworkSettings.getHostname() + "_" + id;
+    if (strcmp(device_class, "")) {
+        root["dev_cla"] = device_class;
+    }
+    if (strcmp(category, "")) {
+        root["ent_cat"] = category;
+    }
+    if (strcmp(icon, "")) {
+        root["ic"] = icon;
+    }
+    if (strcmp(unit_of_measure, "")) {
+        root["unit_of_meas"] = unit_of_measure;
+    }
+    root["stat_t"] = MqttSettings.getPrefix() + "dtu" + "/" + topic;
+
+    JsonObject deviceObj = root.createNestedObject("dev");
+    createDTUDeviceInfo(deviceObj);
+
+    String buffer;
+    String configTopic = "sensor/" + NetworkSettings.getHostname() + "/" + id + "/config";
+    serializeJson(root, buffer);
+    publish(configTopic, buffer);
 }
 
 void MqttHandleHassClass::publishField(std::shared_ptr<InverterAbstract> inv, ChannelType_t type, ChannelNum_t channel, byteAssign_fieldDeviceClass_t fieldType, bool clear)
@@ -252,6 +293,16 @@ void MqttHandleHassClass::publishInverterBinarySensor(std::shared_ptr<InverterAb
     String buffer;
     serializeJson(root, buffer);
     publish(configTopic, buffer);
+}
+
+void MqttHandleHassClass::createDTUDeviceInfo(JsonObject& object)
+{
+    object["name"] = NetworkSettings.getHostname();
+    object["ids"] = NetworkSettings.getHostname();
+    object["cu"] = String("http://") + NetworkSettings.localIP().toString();
+    object["mf"] = "OpenDTU";
+    object["mdl"] = "OpenDTU";
+    object["sw"] = AUTO_GIT_HASH;
 }
 
 void MqttHandleHassClass::createDeviceInfo(JsonObject& object, std::shared_ptr<InverterAbstract> inv)
