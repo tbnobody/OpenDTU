@@ -51,6 +51,7 @@ void MqttHandleHassClass::publishConfig()
     publishDTUSensor("IP", "", "diagnostic", "mdi:network-outline", "", "");
     publishDTUSensor("WiFi Signal", "signal_strength", "diagnostic", "", "dBm", "rssi");
     publishDTUSensor("Uptime", "duration", "diagnostic", "", "s", "");
+    publishDTUBinarySensor("Status", "connectivity", "diagnostic", "online", "offline");
 
     // Loop all inverters
     for (uint8_t i = 0; i < Hoymiles.getNumInverters(); i++) {
@@ -118,6 +119,35 @@ void MqttHandleHassClass::publishDTUSensor(const char* name, const char* device_
 
     String buffer;
     String configTopic = "sensor/" + NetworkSettings.getHostname() + "/" + id + "/config";
+    serializeJson(root, buffer);
+    publish(configTopic, buffer);
+}
+
+void MqttHandleHassClass::publishDTUBinarySensor(const char* name, const char* device_class, const char* category, const char* payload_on, const char* payload_off)
+{
+    String sensorId = name;
+    sensorId.toLowerCase();
+    sensorId.replace(" ", "_");
+    String topic = sensorId;
+
+    DynamicJsonDocument root(1024);
+    root["name"] = name;
+    root["uniq_id"] = NetworkSettings.getHostname() + "_" + sensorId;
+    if (strcmp(device_class, "")) {
+        root["dev_cla"] = device_class;
+    }
+    if (strcmp(category, "")) {
+        root["ent_cat"] = category;
+    }
+    root["stat_t"] = MqttSettings.getPrefix() + "dtu" + "/" + topic;
+    root["pl_on"] = payload_on;
+    root["pl_off"] = payload_off;
+
+    JsonObject deviceObj = root.createNestedObject("dev");
+    createDTUDeviceInfo(deviceObj);
+
+    String buffer;
+    String configTopic = "binary_sensor/" + NetworkSettings.getHostname() + "/" + sensorId + "/config";
     serializeJson(root, buffer);
     publish(configTopic, buffer);
 }
