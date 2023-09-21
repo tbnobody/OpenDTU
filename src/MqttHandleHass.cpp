@@ -113,6 +113,7 @@ void MqttHandleHassClass::publishDTUSensor(const char* name, const char* device_
         root["unit_of_meas"] = unit_of_measure;
     }
     root["stat_t"] = MqttSettings.getPrefix() + "dtu" + "/" + topic;
+    root["avty_t"] = MqttSettings.getPrefix() + "dtu" + "/" + "status";
 
     JsonObject deviceObj = root.createNestedObject("dev");
     createDTUDeviceInfo(deviceObj);
