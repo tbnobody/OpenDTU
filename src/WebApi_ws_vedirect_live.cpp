@@ -50,8 +50,8 @@ void WebApiWsVedirectLiveClass::loop()
     _lastVedirectUpdateCheck = millis();
 
     uint32_t maxTimeStamp = 0;
-    if (VeDirect.getLastUpdate() > maxTimeStamp) {
-        maxTimeStamp = VeDirect.getLastUpdate();
+    if (VeDirectMppt.getLastUpdate() > maxTimeStamp) {
+        maxTimeStamp = VeDirectMppt.getLastUpdate();
     }
 
     // Update on ve.direct change or at least after 10 seconds
@@ -88,56 +88,56 @@ void WebApiWsVedirectLiveClass::loop()
 void WebApiWsVedirectLiveClass::generateJsonResponse(JsonVariant& root)
 {
     // device info
-    root["device"]["data_age"] = (millis() - VeDirect.getLastUpdate() ) / 1000;
-    root["device"]["age_critical"] = !VeDirect.isDataValid();
-    root["device"]["PID"] = VeDirect.getPidAsString(VeDirect.veFrame.PID);
-    root["device"]["SER"] = VeDirect.veFrame.SER;
-    root["device"]["FW"] = VeDirect.veFrame.FW;
-    root["device"]["LOAD"] = VeDirect.veFrame.LOAD == true ? "ON" : "OFF";
-    root["device"]["CS"] = VeDirect.getCsAsString(VeDirect.veFrame.CS);
-    root["device"]["ERR"] = VeDirect.getErrAsString(VeDirect.veFrame.ERR);
-    root["device"]["OR"] = VeDirect.getOrAsString(VeDirect.veFrame.OR);
-    root["device"]["MPPT"] = VeDirect.getMpptAsString(VeDirect.veFrame.MPPT);
-    root["device"]["HSDS"]["v"] = VeDirect.veFrame.HSDS;
+    root["device"]["data_age"] = (millis() - VeDirectMppt.getLastUpdate() ) / 1000;
+    root["device"]["age_critical"] = !VeDirectMppt.isDataValid();
+    root["device"]["PID"] = VeDirectMppt.getPidAsString(VeDirectMppt.veFrame.PID);
+    root["device"]["SER"] = VeDirectMppt.veFrame.SER;
+    root["device"]["FW"] = VeDirectMppt.veFrame.FW;
+    root["device"]["LOAD"] = VeDirectMppt.veFrame.LOAD == true ? "ON" : "OFF";
+    root["device"]["CS"] = VeDirectMppt.getCsAsString(VeDirectMppt.veFrame.CS);
+    root["device"]["ERR"] = VeDirectMppt.getErrAsString(VeDirectMppt.veFrame.ERR);
+    root["device"]["OR"] = VeDirectMppt.getOrAsString(VeDirectMppt.veFrame.OR);
+    root["device"]["MPPT"] = VeDirectMppt.getMpptAsString(VeDirectMppt.veFrame.MPPT);
+    root["device"]["HSDS"]["v"] = VeDirectMppt.veFrame.HSDS;
     root["device"]["HSDS"]["u"] = "d";
 
     // battery info    
-    root["output"]["P"]["v"] = VeDirect.veFrame.P;
+    root["output"]["P"]["v"] = VeDirectMppt.veFrame.P;
     root["output"]["P"]["u"] = "W";
     root["output"]["P"]["d"] = 0;
-    root["output"]["V"]["v"] = VeDirect.veFrame.V;
+    root["output"]["V"]["v"] = VeDirectMppt.veFrame.V;
     root["output"]["V"]["u"] = "V";
     root["output"]["V"]["d"] = 2;
-    root["output"]["I"]["v"] = VeDirect.veFrame.I;
+    root["output"]["I"]["v"] = VeDirectMppt.veFrame.I;
     root["output"]["I"]["u"] = "A";
     root["output"]["I"]["d"] = 2;
-    root["output"]["E"]["v"] = VeDirect.veFrame.E;
+    root["output"]["E"]["v"] = VeDirectMppt.veFrame.E;
     root["output"]["E"]["u"] = "%";
     root["output"]["E"]["d"] = 1;
 
     // panel info
-    root["input"]["PPV"]["v"] = VeDirect.veFrame.PPV;
+    root["input"]["PPV"]["v"] = VeDirectMppt.veFrame.PPV;
     root["input"]["PPV"]["u"] = "W";
     root["input"]["PPV"]["d"] = 0;
-    root["input"]["VPV"]["v"] = VeDirect.veFrame.VPV;
+    root["input"]["VPV"]["v"] = VeDirectMppt.veFrame.VPV;
     root["input"]["VPV"]["u"] = "V";
     root["input"]["VPV"]["d"] = 2;
-    root["input"]["IPV"]["v"] = VeDirect.veFrame.IPV;
+    root["input"]["IPV"]["v"] = VeDirectMppt.veFrame.IPV;
     root["input"]["IPV"]["u"] = "A";
     root["input"]["IPV"]["d"] = 2;
-    root["input"]["YieldToday"]["v"] = VeDirect.veFrame.H20;
+    root["input"]["YieldToday"]["v"] = VeDirectMppt.veFrame.H20;
     root["input"]["YieldToday"]["u"] = "kWh";
     root["input"]["YieldToday"]["d"] = 3;
-    root["input"]["YieldYesterday"]["v"] = VeDirect.veFrame.H22;
+    root["input"]["YieldYesterday"]["v"] = VeDirectMppt.veFrame.H22;
     root["input"]["YieldYesterday"]["u"] = "kWh";
     root["input"]["YieldYesterday"]["d"] = 3;
-    root["input"]["YieldTotal"]["v"] = VeDirect.veFrame.H19;
+    root["input"]["YieldTotal"]["v"] = VeDirectMppt.veFrame.H19;
     root["input"]["YieldTotal"]["u"] = "kWh";
     root["input"]["YieldTotal"]["d"] = 3;
-    root["input"]["MaximumPowerToday"]["v"] = VeDirect.veFrame.H21;
+    root["input"]["MaximumPowerToday"]["v"] = VeDirectMppt.veFrame.H21;
     root["input"]["MaximumPowerToday"]["u"] = "W";
     root["input"]["MaximumPowerToday"]["d"] = 0;
-    root["input"]["MaximumPowerYesterday"]["v"] = VeDirect.veFrame.H23;
+    root["input"]["MaximumPowerYesterday"]["v"] = VeDirectMppt.veFrame.H23;
     root["input"]["MaximumPowerYesterday"]["u"] = "W";
     root["input"]["MaximumPowerYesterday"]["d"] = 0;
 
@@ -147,8 +147,8 @@ void WebApiWsVedirectLiveClass::generateJsonResponse(JsonVariant& root)
         root["dpl"]["PLSTATE"] = PowerLimiter.getPowerLimiterState();
     root["dpl"]["PLLIMIT"] = PowerLimiter.getLastRequestedPowerLimit();
 
-    if (VeDirect.getLastUpdate() > _newestVedirectTimestamp) {
-        _newestVedirectTimestamp = VeDirect.getLastUpdate();
+    if (VeDirectMppt.getLastUpdate() > _newestVedirectTimestamp) {
+        _newestVedirectTimestamp = VeDirectMppt.getLastUpdate();
     }
 }
 
