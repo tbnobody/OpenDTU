@@ -62,8 +62,8 @@ void MqttHandleHassClass::publishConfig()
         publishInverterNumber(inv, "Limit Persistent Absolute", "mdi:speedometer", "config", "cmd/limit_persistent_absolute", "status/limit_absolute", "W", 10, 2250);
 
         publishInverterBinarySensor(inv, "Status", "connectivity", "diagnostic", "status/reachable", "1", "0");
-        publishInverterBinarySensor(inv, "Reachable", "status/reachable", "1", "0");
-        publishInverterBinarySensor(inv, "Producing", "status/producing", "1", "0");
+        publishInverterBinarySensor(inv, "Reachable", "", "", "status/reachable", "1", "0");
+        publishInverterBinarySensor(inv, "Producing", "", "", "status/producing", "1", "0");
 
         // Loop all channels
         for (auto& t : inv->Statistics()->getChannelTypes()) {
