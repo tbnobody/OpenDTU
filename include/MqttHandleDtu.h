@@ -9,7 +9,7 @@ public:
     void loop();
 
 private:
-    uint32_t _lastPublish;
+    uint32_t _lastPublish = 0;
 };
 
 extern MqttHandleDtuClass MqttHandleDtu;

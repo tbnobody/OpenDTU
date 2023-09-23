@@ -313,6 +313,22 @@ void StatisticsParser::zeroDailyData()
     zeroFields(dailyProductionFields);
 }
 
+void StatisticsParser::setLastUpdate(uint32_t lastUpdate)
+{
+    Parser::setLastUpdate(lastUpdate);
+    setLastUpdateFromInternal(lastUpdate);
+}
+
+uint32_t StatisticsParser::getLastUpdateFromInternal()
+{
+    return _lastUpdateFromInternal;
+}
+
+void StatisticsParser::setLastUpdateFromInternal(uint32_t lastUpdate)
+{
+    _lastUpdateFromInternal = lastUpdate;
+}
+
 void StatisticsParser::zeroFields(const FieldId_t* fields)
 {
     // Loop all channels
@@ -325,6 +341,7 @@ void StatisticsParser::zeroFields(const FieldId_t* fields)
             }
         }
     }
+    setLastUpdateFromInternal(millis());
 }
 
 static float calcYieldTotalCh0(StatisticsParser* iv, uint8_t arg0)
