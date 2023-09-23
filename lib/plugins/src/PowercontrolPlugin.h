@@ -5,17 +5,8 @@
 #include "messages/invertermessage.h"
 #include "messages/metermessage.h"
 #include "messages/powercontrolmessage.h"
-
-typedef struct {
-  uint64_t inverterSerial = 0;
-  String inverterSerialString;
-  String meterSerial;
-  float limit = 0.0;
-  uint32_t threshold = 0;
-  float consumption = 0.0;
-  float production = 0.0;
-  bool update = false;
-} powercontrolstruct;
+#include "base/powercontrolalgo.hpp"
+#include "defaultpowercontrolalgo.hpp"
 
 template <std::size_t N>
 class powercontrollerarray : public structarray<powercontrolstruct, N> {
@@ -42,41 +33,6 @@ public:
   powercontrolstruct *getEmptyIndex() {
     return structarray<powercontrolstruct, N>::getByKey(
         [](powercontrolstruct &s) { return s.inverterSerialString.isEmpty(); });
-  }
-};
-
-class PowercontrolAlgo {
-public:
-  PowercontrolAlgo() {}
-  virtual bool calcLimit(powercontrolstruct &powercontrol) { return false; };
-};
-
-class DefaultPowercontrolAlgo : public PowercontrolAlgo {
-public:
-  DefaultPowercontrolAlgo() : PowercontrolAlgo() {}
-  bool calcLimit(powercontrolstruct &powercontrol) {
-    MessageOutput.printf("powercontrol PowercontrolAlgo: consumption=%f "
-                         "production=%f limit=%f\n",
-                         powercontrol.consumption, powercontrol.production,
-                         powercontrol.limit);
-    // TODO: do some magic calculation here
-    // :/
-    // float newlimit =
-    // magicFunction(powercontrol.production,powercontrol.consumption);
-
-    float newLimit = powercontrol.consumption;
-    float threshold = std::abs(powercontrol.limit - newLimit);
-    if (threshold <= powercontrol.threshold) {
-      MessageOutput.printf("powercontrol PowercontrolAlgo: newlimit(%f) within "
-                           "threshold(%f) -> no limit change\n",
-                           newLimit, threshold);
-    } else {
-      MessageOutput.printf(
-          "powercontrol PowercontrolAlgo: setting limit to %f\n", newLimit);
-      powercontrol.limit = newLimit;
-      return true;
-    }
-    return false;
   }
 };
 
