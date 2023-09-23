@@ -96,7 +96,7 @@ void WebApiPluginsClass::onPluginList(AsyncWebServerRequest* request)
     for (int i = 0; i < Plugins.getPluginCount(); i++) {
         Plugin* p = Plugins.getPluginByIndex(i);
         JsonObject pjson = plugins.createNestedObject();
-        pjson[F("name")] = String(p->name);
+        pjson[F("name")] = String(p->getName());
         PluginConfiguration.writeTo(pjson, p);
     }
     response->setLength();

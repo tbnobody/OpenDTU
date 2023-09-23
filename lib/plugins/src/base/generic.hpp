@@ -26,6 +26,7 @@ public:
     }
     virtual ~Entity() { }
     virtual int getId() { return _id; }
+protected:
     int type_id;
     int _id;
 };
@@ -65,6 +66,8 @@ template <typename BASE>
 class ContainerVector {
 
 public:
+    ContainerVector() {}
+    ~ContainerVector() {}
     template <class U>
     void add(U&& v)
     {

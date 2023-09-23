@@ -42,7 +42,7 @@ void PluginConfigurationClass::debug() {
 
 void PluginConfigurationClass::reset(Plugin* p) {
     char path[32];
-    snprintf(path,sizeof(path),"/%s",p->name);
+    snprintf(path,sizeof(path),"/%s",p->getName());
     LittleFS.remove(path);
 }
 bool PluginConfigurationClass::writeTo(JsonObject o, Plugin* p)
@@ -55,10 +55,10 @@ bool PluginConfigurationClass::writeTo(JsonObject o, Plugin* p)
 bool PluginConfigurationClass::write(Plugin* p)
 {
     DynamicJsonDocument doc(PLUGIN_JSON_BUFFER_SIZE);
-    JsonObject root = doc.createNestedObject(p->name);
+    JsonObject root = doc.createNestedObject(p->getName());
     writeTo(root,p);
     char path[32];
-    snprintf(path,sizeof(path),"/%s",p->name);
+    snprintf(path,sizeof(path),"/%s",p->getName());
     File f = LittleFS.open(path, "w", true);
     if (!f) {
         return false;
@@ -66,7 +66,7 @@ bool PluginConfigurationClass::write(Plugin* p)
 
     // Serialize JSON to file
     if (serializeJson(root, f) == 0) {
-        MessageOutput.printf("Failed to write file %s\n",p->name);
+        MessageOutput.printf("Failed to write file %s\n",p->getName());
         return false;
     }
 
@@ -83,13 +83,13 @@ bool PluginConfigurationClass::readFrom(JsonObject o, Plugin* p) {
 bool PluginConfigurationClass::read(Plugin* p)
 {
     char path[32];
-    snprintf(path,sizeof(path),"/%s",p->name);
+    snprintf(path,sizeof(path),"/%s",p->getName());
     File f = LittleFS.open(path, "r", false);
     DynamicJsonDocument doc(PLUGIN_JSON_BUFFER_SIZE);
     // Deserialize the JSON document
     DeserializationError error = deserializeJson(doc, f);
     if (error) {
-        MessageOutput.printf("Failed to read file, %s, using default configuration\n",p->name);
+        MessageOutput.printf("Failed to read file, %s, using default configuration\n",p->getName());
     } else {
         JsonObject o = doc.as<JsonObject>();
         readFrom(o,p);
