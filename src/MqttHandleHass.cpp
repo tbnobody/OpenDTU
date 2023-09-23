@@ -143,7 +143,7 @@ void MqttHandleHassClass::publishField(std::shared_ptr<InverterAbstract> inv, Ch
             root["stat_cla"] = stateCls;
         }
 
-        char buffer[512];
+        String buffer;
         serializeJson(root, buffer);
         publish(configTopic, buffer);
     } else {
@@ -181,7 +181,7 @@ void MqttHandleHassClass::publishInverterButton(std::shared_ptr<InverterAbstract
     JsonObject deviceObj = root.createNestedObject("dev");
     createDeviceInfo(deviceObj, inv);
 
-    char buffer[512];
+    String buffer;
     serializeJson(root, buffer);
     publish(configTopic, buffer);
 }
@@ -220,7 +220,7 @@ void MqttHandleHassClass::publishInverterNumber(
     JsonObject deviceObj = root.createNestedObject("dev");
     createDeviceInfo(deviceObj, inv);
 
-    char buffer[512];
+    String buffer;
     serializeJson(root, buffer);
     publish(configTopic, buffer);
 }
@@ -249,7 +249,7 @@ void MqttHandleHassClass::publishInverterBinarySensor(std::shared_ptr<InverterAb
     JsonObject deviceObj = root.createNestedObject("dev");
     createDeviceInfo(deviceObj, inv);
 
-    char buffer[512];
+    String buffer;
     serializeJson(root, buffer);
     publish(configTopic, buffer);
 }
