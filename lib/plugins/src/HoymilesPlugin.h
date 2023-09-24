@@ -26,7 +26,7 @@ public:
     // notify on update would be fine!
     for (uint8_t i = 0; i < Hoymiles.getNumInverters(); i++) {
       auto inv = Hoymiles.getInverterByPos(i);
-      MessageOutput.printf(
+      PDebug.printf(PDebugLevel::DEBUG,
           "hoymilesplugin: loopInverters inv[%d] lastupdate=%d\n", i,
           inv->Statistics()->getLastUpdate());
       if (inv->Statistics()->getLastUpdate() > 0) {
@@ -80,7 +80,7 @@ public:
         break;
       }
     }
-    MessageOutput.printf(
+    PDebug.printf(PDebugLevel::DEBUG,
         "hoymilesplugin: sendActivePowerControlRequest %f W to %s\n", limit,
         inv->serialString().c_str());
     // TODO: remove :)
@@ -88,11 +88,11 @@ public:
     if (inv != nullptr) {
       if (inv->sendActivePowerControlRequest(
               limit, PowerLimitControlType::AbsolutNonPersistent)) {
-        MessageOutput.printf(
+        PDebug.printf(PDebugLevel::DEBUG,
             "hoymilesplugin: sendActivePowerControlRequest %f W to %s -> OK!\n",
             limit, inv->serialString().c_str());
       } else {
-        MessageOutput.printf("hoymilesplugin: sendActivePowerControlRequest %f "
+        PDebug.printf(PDebugLevel::DEBUG,"hoymilesplugin: sendActivePowerControlRequest %f "
                              "W to %s -> FAILED!\n",
                              limit, inv->serialString().c_str());
       }
@@ -100,7 +100,7 @@ public:
   }
 
   void publishAC(uint64_t serial, String serialString, float actpower) {
-    MessageOutput.printf("hoymilesplugin: publishAC[%s]: %f\n",
+    PDebug.printf(PDebugLevel::DEBUG,"hoymilesplugin: publishAC[%s]: %f\n",
                          serialString.c_str(), actpower);
 
     HoymilesMessage message(*this);
@@ -111,7 +111,7 @@ public:
   void inverterCallback(int fieldId, int channelNumber, uint64_t inverterSerial,
                         String inverterStringSerial, float value) {
     if (fieldId == FieldId_t::FLD_PAC && channelNumber == ChannelNum_t::CH0) {
-      MessageOutput.printf("hoymilesplugin: new ac power: %f\n", value);
+      PDebug.printf(PDebugLevel::DEBUG,"hoymilesplugin: new ac power: %f\n", value);
       publishAC(inverterSerial, inverterStringSerial, value);
     }
   }

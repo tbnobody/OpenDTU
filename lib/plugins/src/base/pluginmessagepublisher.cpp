@@ -46,13 +46,13 @@ void PluginMessagePublisher::publishInternal() {
   while (queue.size() > 0l) {
     auto message = queue.front();
 
-    //DBGPRINTMESSAGEFROMTO(DBG_INFO,"mainloop start", message);
+    PDebug.printf(PDebugLevel::DEBUG,"mainloop start", message);
     if (message->getReceiverId() != 0) {
       publishToReceiver(message);
     } else {
       publishToAll(message);
     }
-    //DBGPRINTMESSAGEDURATION(DBG_INFO,"mainloop end", message);
+    PDebug.printf(PDebugLevel::DEBUG,"mainloop end", message);
 
     queue.pop();
     // do i need this? :/

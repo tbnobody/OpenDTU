@@ -67,7 +67,7 @@ public:
 
   void setInverterLimit(inverterstruct *inverter, float limit) {
     if (limit == -1) {
-      MessageOutput.printf("inverterplugin: inverter[%s] limit -1 ignored\n",
+      PDebug.printf(PDebugLevel::DEBUG,"inverterplugin: inverter[%s] limit -1 ignored\n",
                            inverter->inverterId.c_str());
       return;
     }
@@ -80,7 +80,7 @@ public:
   }
   void setLimit(inverterstruct &inverter) {
 
-    MessageOutput.printf("inverterplugin: setLimit %f W to %s\n",
+    PDebug.printf(PDebugLevel::DEBUG,"inverterplugin: setLimit %f W to %s\n",
                          inverter.newlimit, inverter.inverterId.c_str());
     if (inverter.type == InverterEnumType::HOYMILES) {
       inverter.actlimit = inverter.newlimit;
@@ -91,19 +91,19 @@ public:
       m.limit = inverter.newlimit;
       publishMessage(m);
     } else {
-      MessageOutput.printf("inverterplugin: unknown inverter type: %d\n",
+      PDebug.printf(PDebugLevel::DEBUG,"inverterplugin: unknown inverter type: %d\n",
                            static_cast<int>(inverter.type));
     }
   }
 
   void calcLimit(inverterstruct &inverter) {
-    MessageOutput.printf("inverterplugin: calcLimit[%s]\n",
+    PDebug.printf(PDebugLevel::DEBUG,"inverterplugin: calcLimit[%s]\n",
                          inverter.inverterId.c_str());
     setLimit(inverter);
   }
 
   void publishAC(inverterstruct &inverter) {
-    MessageOutput.printf("inverterplugin: publishAC[%s]: %f\n",
+    PDebug.printf(PDebugLevel::DEBUG,"inverterplugin: publishAC[%s]: %f\n",
                          inverter.inverterId.c_str(), inverter.actpower);
 
     InverterMessage message(*this);
@@ -113,19 +113,19 @@ public:
   }
 
   void updateInverter(InverterEnumType type, String inverterId, float value) {
-    MessageOutput.printf("inverterplugin: new ac power: %f\n", value);
+    PDebug.printf(PDebugLevel::DEBUG,"inverterplugin: new ac power: %f\n", value);
     inverterstruct *index = inverters.getInverterByInverterId(inverterId);
     ;
     if (index == nullptr) {
       index = addInverter(type, inverterId);
     }
     if (index == nullptr) {
-      MessageOutput.printf(
+      PDebug.printf(PDebugLevel::DEBUG,
           "InverterPlugin: warning! no inverter with serial %s found\n",
           inverterId.c_str());
       return;
     }
-    MessageOutput.printf("inverterplugin: update inverter.acpower[%s]: %f\n",
+    PDebug.printf(PDebugLevel::DEBUG,"inverterplugin: update inverter.acpower[%s]: %f\n",
                          inverterId.c_str(), value);
     setInverterPower(index, value);
   }
@@ -152,7 +152,7 @@ public:
     String inverterId = message->inverterId;
     inverterstruct *inverter = inverters.getInverterByInverterId(inverterId);
     if (inverter != nullptr) {
-      MessageOutput.printf(
+      PDebug.printf(PDebugLevel::DEBUG,
           "InverterPlugin: found inverter with id %s\n",
           inverterId.c_str());
       setInverterLimit(inverter, limit);

@@ -33,7 +33,7 @@ public:
       addTimerCb(
           SECOND, 10,
           [this]() {
-            MessageOutput.printf("demoplugin: free heap: %d\n",
+            PDebug.printf(PDebugLevel::DEBUG,"demoplugin: free heap: %d\n",
                                  ESP.getFreeHeap());
           },
           "debugHeapTimer");
@@ -50,7 +50,7 @@ public:
 
   void mqttCallback(const MqttMessage *message) {
 
-    MessageOutput.printf("demoplugin: mqttCallback %s \n", message->topic.get());
+    PDebug.printf(PDebugLevel::DEBUG,"demoplugin: mqttCallback %s \n", message->topic.get());
   }
 
   void internalCallback(std::shared_ptr<PluginMessage> message) {

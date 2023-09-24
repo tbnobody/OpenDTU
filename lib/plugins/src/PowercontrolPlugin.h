@@ -76,10 +76,10 @@ public:
     if (powercontrol) {
       powercontrol->production = message->value;
       powercontrol->update = true;
-      MessageOutput.printf("powercontrol got production: %f\n",
+      PDebug.printf(PDebugLevel::DEBUG,"powercontrol got production: %f\n",
                            powercontrol->production);
     } else {
-      MessageOutput.printf("powercontrol inverterId(%s) not configured\n",
+      PDebug.printf(PDebugLevel::DEBUG,"powercontrol inverterId(%s) not configured\n",
                            message->inverterId.c_str());
     }
   }
@@ -91,10 +91,10 @@ public:
     if (powercontrol) {
       powercontrol->consumption = m->power;
       powercontrol->update = true;
-      MessageOutput.printf("powercontrol got consumption: %f\n",
+      PDebug.printf(PDebugLevel::DEBUG,"powercontrol got consumption: %f\n",
                            powercontrol->consumption);
     } else {
-      MessageOutput.printf("powercontrol meterserial(%s) not configured\n",
+      PDebug.printf(PDebugLevel::DEBUG,"powercontrol meterserial(%s) not configured\n",
                            meterserial.c_str());
     }
   }
@@ -108,7 +108,7 @@ public:
       MeterMessage *m = (MeterMessage *)message.get();
       handleMeterMessage(m);
     } else {
-      MessageOutput.printf("powercontrol unhandled message from sender=%d\n",
+      PDebug.printf(PDebugLevel::DEBUG,"powercontrol unhandled message from sender=%d\n",
                            message->getSenderId());
     }
   }

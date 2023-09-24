@@ -21,6 +21,7 @@ PublishPlugin publishP = PublishPlugin();
 HoymilesPlugin hoymilesP = HoymilesPlugin();
 
 void PluginsClass::init() {
+  PDebug.setPrint(&MessageOutput);
   addPlugin(&demoP);
   addPlugin(&hoymilesP);
   addPlugin(&meterP);
@@ -48,7 +49,7 @@ void PluginsClass::loop() {
     pluginsloop++;
     for (uint32_t i = 0; i < timercbs.size(); i++) {
       if ((pluginsloop % timercbs[i].interval) == 0) {
-        // MessageOutput.printf("PluginsClass timercb call: %s\n",
+        // PDebug.printf(PDebugLevel::DEBUG,"PluginsClass timercb call: %s\n",
         // timercbs[i].timername);
         timercbs[i].timerCb();
       }
@@ -71,14 +72,14 @@ void PluginsClass::start(Plugin *p) {
 }
 
 void PluginsClass::subscribeMqtt(Plugin *plugin, char *topic, bool append) {
-  //   MessageOutput.printf("PluginsClass::subscribeMqtt %s: %s\n",
+  //   PDebug.printf(PDebugLevel::DEBUG,"PluginsClass::subscribeMqtt %s: %s\n",
   //   plugin->name, topic);
   MqttSettings.subscribe(
       topic, 0,
       [&, plugin](const espMqttClientTypes::MessageProperties &properties,
                   const char *topic, const uint8_t *payload, size_t len,
                   size_t index, size_t total) {
-        //       MessageOutput.printf("PluginsClass::mqttCb topic=%s\n", topic);
+        //       PDebug.printf(PDebugLevel::DEBUG,"PluginsClass::mqttCb topic=%s\n", topic);
         MqttMessage m(0, plugin->getId());
         m.setMqtt(topic, payload, len);
         publisher.publish(m);
@@ -88,7 +89,7 @@ void PluginsClass::subscribeMqtt(Plugin *plugin, char *topic, bool append) {
 void PluginsClass::addTimerCb(Plugin *plugin, const char *timername,
                               PLUGIN_TIMER_INTVAL intval, uint32_t interval,
                               std::function<void(void)> timerCb) {
-  // MessageOutput.printf("PluginsClass::addTimerCb sender=%d\n",
+  // PDebug.printf(PDebugLevel::DEBUG,"PluginsClass::addTimerCb sender=%d\n",
   // plugin->getId());
   timerentry entry;
   entry.timername = timername;
@@ -105,11 +106,11 @@ void PluginsClass::mqttMessageCB(MqttMessage *message) {
   // we dont care about real topic length, one size fit's all ;)
   //   char topic[128];
   if (!MqttSettings.getConnected()) {
-    MessageOutput.printf(
+    PDebug.printf(PDebugLevel::DEBUG,
         "PluginsClass: mqtt not connected. can not send message!");
     return;
   }
-  MessageOutput.printf("PluginsClass: publish mqtt nmessage!");
+  PDebug.printf(PDebugLevel::DEBUG,"PluginsClass: publish mqtt nmessage!");
   auto sender = getPluginById(message->getSenderId());
   if (NULL != sender) {
     char topic[128];

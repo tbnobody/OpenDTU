@@ -7,6 +7,7 @@
 #include <ArduinoJson.h>
 #include <functional>
 #include <string>
+#include "PluginDebug.h"
 
 /**
  * Plugin interface

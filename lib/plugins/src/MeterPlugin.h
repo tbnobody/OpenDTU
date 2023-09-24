@@ -68,17 +68,17 @@ public:
     return ms;
   }
   void setMeterConsumption(String &serial, float consumption) {
-    MessageOutput.printf("meterplugin: setMeterConsumption(%s,%f)\n",
+    PDebug.printf(PDebugLevel::DEBUG,"meterplugin: setMeterConsumption(%s,%f)\n",
                          serial.c_str(), consumption);
     Meter *ms = getIndex(serial);
     if (ms == nullptr) {
-      MessageOutput.printf("meterplugin: meter[%s] not found!", serial.c_str());
+      PDebug.printf(PDebugLevel::DEBUG,"meterplugin: meter[%s] not found!", serial.c_str());
       return;
     }
     ms->setPower(consumption);
   }
   void mqttCallback( MqttMessage *message) {
-    MessageOutput.printf("meterplugin: mqttCallback %s = %s\n", message->topic.get(), message->payloadToChar().get());
+    PDebug.printf(PDebugLevel::DEBUG,"meterplugin: mqttCallback %s = %s\n", message->topic.get(), message->payloadToChar().get());
     char buffer[message->length + 1];
     buffer[message->length] = '\0';
     mempcpy(buffer, message->payload.get(), message->length);
@@ -90,7 +90,7 @@ public:
       DynamicJsonDocument doc(sizeof(buffer));
       DeserializationError error = deserializeJson(doc, buffer);
       if (error) {
-        MessageOutput.printf("meterplugin: Failed to deserialize %s\n", buffer);
+        PDebug.printf(PDebugLevel::DEBUG,"meterplugin: Failed to deserialize %s\n", buffer);
       } else {
         JsonObject o = doc.as<JsonObject>();
         if (!onRequest(o, o)) {
@@ -113,7 +113,7 @@ public:
   }
 
   void publishAC(Meter &meter) {
-    MessageOutput.printf("meterplugin: publishPower[%s]: %f W \n",
+    PDebug.printf(PDebugLevel::DEBUG,"meterplugin: publishPower[%s]: %f W \n",
                          meter.getSerial().c_str(), meter.getPower());
     MeterMessage m(*this);
     m.power = meter.getPower();

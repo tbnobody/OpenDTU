@@ -17,7 +17,7 @@ public:
     //DBGPRINTMESSAGELNCB(DBG_INFO, getName(), message);
     if (message->isMessageType<MqttMessage>()) {
       MqttMessage *m = (MqttMessage *)message.get();
-      MessageOutput.printf("publishplugin %s = %s\n",
+      PDebug.printf(PDebugLevel::DEBUG,"publishplugin %s = %s\n",
                          m->topic.get(),m->payloadToChar().get());
       if(cb!=NULL) {
         cb(m);
