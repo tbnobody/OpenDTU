@@ -28,14 +28,10 @@ void PluginMessagePublisher::publishToReceiver(
 
 void PluginMessagePublisher::publishToAll(
     std::shared_ptr<PluginMessage> message) {
-  // MessageOutput.printf("plugins publishToAll
-  // sender=%d\n",message->getSenderId());
   int pluginid = message->getSenderId();
   for (unsigned int i = 0; i < plugins.size(); i++) {
     if (plugins[i]->getId() != pluginid) {
       if (plugins[i]->isEnabled()) {
-        //                MessageOutput.printf("plugins msg sender=%d to
-        //                plugin=%d\n",message->getSenderId(),plugins[i]->getId());
         plugins[i]->internalCallback(message);
       }
     }
