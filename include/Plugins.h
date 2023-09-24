@@ -13,7 +13,7 @@
 
 class PluginsClass : public System<Plugin> {
 public:
-    PluginsClass() : publisher(msgs) {}
+    PluginsClass() : publisher(plugins,msgs) {}
     ~PluginsClass() {}
     void init();
     void loop();

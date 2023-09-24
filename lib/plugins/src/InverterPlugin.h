@@ -83,13 +83,13 @@ public:
     MessageOutput.printf("inverterplugin: setLimit %f W to %s\n",
                          inverter.newlimit, inverter.inverterId.c_str());
     if (inverter.type == InverterEnumType::HOYMILES) {
+      inverter.actlimit = inverter.newlimit;
+      inverter.limitTs = millis();
       // TODO: do we need a response message from hoymilesplugin
       HoymilesLimitMessage m(*this, PluginIds::PluginHoymilesinverter);
       m.inverterId = inverter.inverterId;
       m.limit = inverter.newlimit;
       publishMessage(m);
-      inverter.actlimit = inverter.newlimit;
-      inverter.limitTs = millis();
     } else {
       MessageOutput.printf("inverterplugin: unknown inverter type: %d\n",
                            static_cast<int>(inverter.type));
