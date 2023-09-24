@@ -7,22 +7,12 @@ public:
   InverterMessage(Plugin &p)
       : PluginMessage(TYPEIDS::INVERTERMESSAGE_TYPE, p) {}
   ~InverterMessage() {}
-  uint64_t inverterSerial;
-  String inverterStringSerial;
-  int channelNumber;
-  int channelType;
-  /**
-   *  fieldId - see hmDefines.h => field types
-   */
-  int fieldId;
-  /**
-   *value - value transmited by inverter
-   */
+  String inverterId;
   float value;
   int toString(char *buffer) {
     int c = sprintf(buffer, "InverterMessage{base=");
     c = c + PluginMessage::toString(buffer+c);
-    c = c + sprintf(buffer+c,", id=%llu, idStr=%s, power=%f}",inverterSerial,inverterStringSerial.c_str(),value);
+    c = c + sprintf(buffer+c,", id=%s, power=%f}",inverterId.c_str(),value);
     return c;
   }
 };

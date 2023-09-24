@@ -10,6 +10,7 @@
 #include "PowercontrolPlugin.h"
 #include "demoplugin.h"
 #include "PublishPlugin.h"
+#include "HoymilesPlugin.h"
 
 PluginsClass Plugins;
 demoPlugin demoP = demoPlugin();
@@ -17,14 +18,17 @@ MeterPlugin meterP = MeterPlugin();
 InverterPlugin inverterP = InverterPlugin();
 PowercontrolPlugin powercontrollerP = PowercontrolPlugin();
 PublishPlugin publishP = PublishPlugin();
+HoymilesPlugin hoymilesP = HoymilesPlugin();
 
 void PluginsClass::init() {
   addPlugin(&demoP);
+  addPlugin(&hoymilesP);
   addPlugin(&meterP);
   addPlugin(&inverterP);
   addPlugin(&powercontrollerP);
   publishP.mqttMessageCB(std::bind(&PluginsClass::mqttMessageCB, this, std::placeholders::_1));
   addPlugin(&publishP);
+
   for (unsigned int i = 0; i < plugins.size(); i++) {
     plugins[i]->setSystem(this);
     PluginConfiguration.read(plugins[i]);

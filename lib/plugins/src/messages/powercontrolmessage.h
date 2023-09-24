@@ -8,12 +8,11 @@ public:
       : PluginMessage(TYPEIDS::POWERCONTROLMESSAGE_TYPE, p) {}
   ~PowerControlMessage() {}
   float power;
-  String serialString;
-  uint64_t serial;
+  String inverterId;
   int toString(char *buffer) {
     int c = sprintf(buffer, "PowerControlMessage{base=");
     c = c + PluginMessage::toString(buffer+c);
-    c = c + sprintf(buffer+c,", serialStr=%s, serial=%llu, power=%f}",serialString.c_str(),serial,power);
+    c = c + sprintf(buffer+c,", id=%s, power=%f}",inverterId.c_str(),power);
     return c;
   }
 };

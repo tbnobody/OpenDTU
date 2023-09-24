@@ -12,16 +12,10 @@ template <std::size_t N>
 class powercontrollerarray : public structarray<powercontrolstruct, N> {
 public:
   powercontrollerarray() : structarray<powercontrolstruct, N>() {}
-  powercontrolstruct *getInverterByStringSerial(String &serial) {
+  powercontrolstruct *getInverterById(String &serial) {
     return structarray<powercontrolstruct, N>::getByKey(
         [&serial](powercontrolstruct &pc) {
-          return serial.equals(pc.inverterSerialString);
-        });
-  }
-  powercontrolstruct *getInverterByLongSerial(uint64_t serial) {
-    return structarray<powercontrolstruct, N>::getByKey(
-        [&serial](powercontrolstruct &pc) {
-          return (serial == pc.inverterSerial);
+          return serial.equals(pc.inverterId);
         });
   }
   powercontrolstruct *getMeterByStringSerial(String &serial) {
@@ -32,7 +26,7 @@ public:
   }
   powercontrolstruct *getEmptyIndex() {
     return structarray<powercontrolstruct, N>::getByKey(
-        [](powercontrolstruct &s) { return s.inverterSerialString.isEmpty(); });
+        [](powercontrolstruct &s) { return s.inverterId.isEmpty(); });
   }
 };
 
@@ -61,14 +55,14 @@ public:
 
   void publishLimit(powercontrolstruct &pc) {
     PowerControlMessage m(*this);
-    m.serialString = pc.inverterSerialString;
+    m.inverterId = pc.inverterId;
     m.power = pc.limit;
     publishMessage(m);
-    char topic[pc.inverterSerialString.length() + 7];
+    char topic[pc.inverterId.length() + 7];
     char payload[32];
     int len = snprintf(payload, sizeof(payload), "%f", pc.limit);
     snprintf(topic, sizeof(payload), "%s/updateLimit",
-             pc.inverterSerialString.c_str());
+             pc.inverterId.c_str());
     MqttMessage mqtt(getId(),PluginIds::PluginPublish);
     mqtt.setMqtt(topic,(const uint8_t*)payload,len);
     mqtt.appendTopic = true;
@@ -77,16 +71,16 @@ public:
 
   void handleInverterMessage(InverterMessage *message) {
     powercontrolstruct *powercontrol =
-        powercontrollers.getInverterByStringSerial(
-            message->inverterStringSerial);
+        powercontrollers.getInverterById(
+            message->inverterId);
     if (powercontrol) {
       powercontrol->production = message->value;
       powercontrol->update = true;
       MessageOutput.printf("powercontrol got production: %f\n",
                            powercontrol->production);
     } else {
-      MessageOutput.printf("powercontrol inverterSerial(%s) not configured\n",
-                           message->inverterStringSerial.c_str());
+      MessageOutput.printf("powercontrol inverterId(%s) not configured\n",
+                           message->inverterId.c_str());
     }
   }
 
@@ -122,7 +116,7 @@ public:
   void initPowercontrol() {
     powercontrolstruct *powercontrol = powercontrollers.getEmptyIndex();
     if (powercontrol) {
-      powercontrol->inverterSerialString = inverter_serial;
+      powercontrol->inverterId = inverter_serial;
       powercontrol->meterSerial = meter_serial;
       powercontrol->update = false;
       powercontrol->limit = 0;
