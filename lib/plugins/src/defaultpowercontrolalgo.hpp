@@ -6,7 +6,7 @@ class DefaultPowercontrolAlgo : public PowercontrolAlgo {
 public:
   DefaultPowercontrolAlgo() : PowercontrolAlgo() {}
   bool calcLimit(powercontrolstruct &powercontrol) {
-    MessageOutput.printf("powercontrol PowercontrolAlgo: consumption=%f "
+    PDebug.printf(PDebugLevel::DEBUG,"powercontrol PowercontrolAlgo: consumption=%f "
                          "production=%f limit=%f\n",
                          powercontrol.consumption, powercontrol.production,
                          powercontrol.limit);
@@ -18,11 +18,11 @@ public:
     float newLimit = powercontrol.consumption;
     float threshold = std::abs(powercontrol.limit - newLimit);
     if (threshold <= powercontrol.threshold) {
-      MessageOutput.printf("powercontrol PowercontrolAlgo: newlimit(%f) within "
+      PDebug.printf(PDebugLevel::DEBUG,"powercontrol PowercontrolAlgo: newlimit(%f) within "
                            "threshold(%f) -> no limit change\n",
                            newLimit, threshold);
     } else {
-      MessageOutput.printf(
+      PDebug.printf(PDebugLevel::DEBUG,
           "powercontrol PowercontrolAlgo: setting limit to %f\n", newLimit);
       powercontrol.limit = newLimit;
       return true;

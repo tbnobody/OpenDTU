@@ -1,8 +1,7 @@
 
 
-
-#include "plugin.h"
 #include "pluginmessagepublisher.h"
+#include "plugin.h"
 
 PluginMessagePublisher::PluginMessagePublisher(
     std::vector<Plugin *> &p,
@@ -44,14 +43,16 @@ void PluginMessagePublisher::publishInternal() {
     char buffer[128];
     message.get()->toString(buffer);
     unsigned long duration = millis();
-    PDebug.printf(PDebugLevel::DEBUG,"mainloop start\n----\n");
+    PDebug.printf(PDebugLevel::DEBUG, "mainloop start\n----\n");
     if (message->getReceiverId() != 0) {
       publishToReceiver(message);
     } else {
       publishToAll(message);
     }
     duration -= message.get()->getTS();
-    PDebug.printf(PDebugLevel::DEBUG,"----\n%s\nduration: %lu [ms]\n----\nmainloop end\n",buffer,duration);
+    PDebug.printf(PDebugLevel::DEBUG,
+                  "----\n%s\nduration: %lu [ms]\n----\nmainloop end\n", buffer,
+                  duration);
 
     queue.pop();
     // do i need this? :/

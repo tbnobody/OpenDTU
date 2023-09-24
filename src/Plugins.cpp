@@ -39,7 +39,7 @@ void PluginsClass::init() {
     }
     start(plugins[i]);
   }
-  MessageOutput.println("PluginsClass::init");
+  PDebug.printf(PDebugLevel::DEBUG, "PluginsClass::init\n");
 }
 
 void PluginsClass::loop() {

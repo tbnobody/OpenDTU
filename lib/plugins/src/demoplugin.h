@@ -10,7 +10,7 @@ public:
   demoPlugin() : Plugin(999, "demo") {}
   void setup() {}
   void onTickerSetup() {
-    MessageOutput.println("demoplugin:onTickerSetup()");
+    PDebug.printf(PDebugLevel::DEBUG,"demoplugin:onTickerSetup()\n");
 
     addTimerCb(
         SECOND, 5,

@@ -20,16 +20,15 @@ void PluginConfigurationClass::printDirectory(File dir, int numTabs) {
       break;
     }
     for (uint8_t i = 0; i < numTabs; i++) {
-      MessageOutput.print('\t');
+      PDebug.printf(PDebugLevel::DEBUG,"\t");
     }
     Serial.print(entry.name());
     if (entry.isDirectory()) {
-      MessageOutput.print("/");
+      PDebug.printf(PDebugLevel::DEBUG,"/");
       printDirectory(entry, numTabs + 1);
     } else {
       // files have sizes, directories do not
-      MessageOutput.print("\t\t");
-      MessageOutput.println(entry.size(), DEC);
+      PDebug.printf(PDebugLevel::DEBUG,"\t\t%d\n",entry.size());
     }
     entry.close();
   }
@@ -66,7 +65,7 @@ bool PluginConfigurationClass::write(Plugin* p)
 
     // Serialize JSON to file
     if (serializeJson(root, f) == 0) {
-        MessageOutput.printf("Failed to write file %s\n",p->getName());
+        PDebug.printf(PDebugLevel::DEBUG,"Failed to write file %s\n",p->getName());
         return false;
     }
 
@@ -89,7 +88,7 @@ bool PluginConfigurationClass::read(Plugin* p)
     // Deserialize the JSON document
     DeserializationError error = deserializeJson(doc, f);
     if (error) {
-        MessageOutput.printf("Failed to read file, %s, using default configuration\n",p->getName());
+        PDebug.printf(PDebugLevel::DEBUG,"Failed to read file, %s, using default configuration\n",p->getName());
     } else {
         JsonObject o = doc.as<JsonObject>();
         readFrom(o,p);

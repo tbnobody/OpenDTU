@@ -94,7 +94,7 @@ public:
       } else {
         JsonObject o = doc.as<JsonObject>();
         if (!onRequest(o, o)) {
-          MessageOutput.println("meterplugin: onRequest returned error");
+          PDebug.printf(PDebugLevel::DEBUG,"meterplugin: onRequest returned error\n");
         }
       }
     }
