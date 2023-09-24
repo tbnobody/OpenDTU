@@ -45,14 +45,17 @@ void PluginMessagePublisher::publishToAll(
 void PluginMessagePublisher::publishInternal() {
   while (queue.size() > 0l) {
     auto message = queue.front();
-
-    PDebug.printf(PDebugLevel::DEBUG,"mainloop start", message);
+    char buffer[128];
+    message.get()->toString(buffer);
+    unsigned long duration = millis();
+    PDebug.printf(PDebugLevel::DEBUG,"mainloop start\n----\n");
     if (message->getReceiverId() != 0) {
       publishToReceiver(message);
     } else {
       publishToAll(message);
     }
-    PDebug.printf(PDebugLevel::DEBUG,"mainloop end", message);
+    duration -= message.get()->getTS();
+    PDebug.printf(PDebugLevel::DEBUG,"----\n%s\nduration: %lu [ms]\n----\nmainloop end\n",buffer,duration);
 
     queue.pop();
     // do i need this? :/

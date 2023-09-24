@@ -55,7 +55,7 @@ public:
 
   void internalCallback(std::shared_ptr<PluginMessage> message) {
     if (debugPluginMessages) {
-      DBGPRINTMESSAGELN(DBG_INFO, "demoplugin", message);
+      PDebug.printf(PDebugLevel::DEBUG, "demoplugin", message);
     }
     if (message->isMessageType<MqttMessage>()) {
       const MqttMessage *m = (MqttMessage *)message.get();
