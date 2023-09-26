@@ -13,7 +13,7 @@
 
 class PluginsClass : public System<Plugin> {
 public:
-    PluginsClass() : publisher(plugins,msgs) {}
+    PluginsClass() : publisher(plugins) {}
     ~PluginsClass() {}
     void init();
     void loop();
@@ -45,8 +45,7 @@ private:
         std::function<void(void)> timerCb;
     } timerentry;
     std::vector<timerentry> timercbs;
-    ThreadSafeQueue<std::shared_ptr<PluginMessage>> msgs;
-    PluginMessagePublisher publisher;
+    PluginSingleQueueMessagePublisher publisher;
 };
 
 extern PluginsClass Plugins;

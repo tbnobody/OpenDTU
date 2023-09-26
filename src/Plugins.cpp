@@ -82,7 +82,9 @@ void PluginsClass::subscribeMqtt(Plugin *plugin, char *topic, bool append) {
         //       PDebug.printf(PDebugLevel::DEBUG,"PluginsClass::mqttCb topic=%s\n", topic);
         MqttMessage m(0, plugin->getId());
         m.setMqtt(topic, payload, len);
-        publisher.publish(m);
+        // :((
+        auto mptr = std::make_shared<MqttMessage>(m);
+        publisher.publish(mptr);
       });
 }
 
@@ -155,6 +157,6 @@ int PluginsClass::getPluginCount() { return plugins.size(); }
 
 void PluginsClass::addPlugin(Plugin *p) { plugins.push_back(p); }
 
-void PluginsClass::publishInternal() { publisher.publishInternal(); }
+void PluginsClass::publishInternal() { publisher.loop(); }
 
 PluginMessagePublisher &PluginsClass::getPublisher() { return publisher; }

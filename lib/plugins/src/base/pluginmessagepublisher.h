@@ -8,30 +8,39 @@
 
 class PluginMessagePublisher {
 public:
-  PluginMessagePublisher(std::vector<Plugin *> &p,
-                         ThreadSafeQueue<std::shared_ptr<PluginMessage>> &q);
+  PluginMessagePublisher(std::vector<Plugin *> &p);
   virtual ~PluginMessagePublisher() {}
-  template <typename T> void publish(T &message) {
-    // :/ if no broadcast (to all)
-    // we bypass queue and hand down to receiver directly
-    // maybe we need a queue per plugin? 
-    // ... over-engineering :)
-    auto m = std::make_shared<T>(message);
-    if (message.isBroadcast())
-      queue.push(m);
-    else
-      publishToReceiver(m);
-  }
 
+  void publish(std::shared_ptr<PluginMessage> message);
+
+  virtual void loop(){}
+
+protected:
   Plugin *getPluginById(int pluginid);
+Plugin *getPluginByIndex(int index);
 
-  void publishToReceiver(std::shared_ptr<PluginMessage> mes);
+  int getPluginCount() { return plugins.size(); }
 
-  void publishToAll(std::shared_ptr<PluginMessage> message);
+  virtual void publishToReceiver(std::shared_ptr<PluginMessage> mes);
 
-  void publishInternal();
+  virtual void publishToAll(std::shared_ptr<PluginMessage> message);
 
 private:
   std::vector<Plugin *> &plugins;
-  ThreadSafeQueue<std::shared_ptr<PluginMessage>> &queue;
+};
+
+class PluginSingleQueueMessagePublisher : public PluginMessagePublisher {
+public:
+  PluginSingleQueueMessagePublisher(std::vector<Plugin *> &p);
+  virtual ~PluginSingleQueueMessagePublisher() {}
+
+  void loop();
+
+protected:
+  virtual void publishToReceiver(std::shared_ptr<PluginMessage> mes);
+
+  virtual void publishToAll(std::shared_ptr<PluginMessage> message);
+
+private:
+  ThreadSafeQueue<std::shared_ptr<PluginMessage>> queue;
 };

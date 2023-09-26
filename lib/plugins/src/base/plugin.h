@@ -122,7 +122,8 @@ protected:
   template <typename T>
   void publishMessage(T &message) {
     if (system) {
-       system->getPublisher().publish(message);
+      auto m = std::make_shared<T>(message);
+      system->getPublisher().publish(m);
     }
   }
 
