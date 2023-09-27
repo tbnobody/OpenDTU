@@ -13,31 +13,26 @@
 #include "demoplugin.h"
 
 PluginsClass Plugins;
-demoPlugin demoP = demoPlugin();
-MeterPlugin meterP = MeterPlugin();
-InverterPlugin inverterP = InverterPlugin();
-PowercontrolPlugin powercontrollerP = PowercontrolPlugin();
-PublishPlugin publishP = PublishPlugin();
-HoymilesPlugin hoymilesP = HoymilesPlugin();
 
 void PluginsClass::init() {
   PDebug.setPrint(&MessageOutput);
-  addPlugin(&demoP);
-  addPlugin(&hoymilesP);
-  addPlugin(&meterP);
-  addPlugin(&inverterP);
-  addPlugin(&powercontrollerP);
+  plugins.push_back(std::make_unique<demoPlugin>(demoPlugin()));
+  plugins.push_back(std::make_unique<HoymilesPlugin>(HoymilesPlugin()));
+  plugins.push_back(std::make_unique<MeterPlugin>(MeterPlugin()));
+  plugins.push_back(std::make_unique<InverterPlugin>(InverterPlugin()));
+  plugins.push_back(std::make_unique<PowercontrolPlugin>(PowercontrolPlugin()));
+  PublishPlugin publishP = PublishPlugin();
   publishP.mqttMessageCB(
       std::bind(&PluginsClass::mqttMessageCB, this, std::placeholders::_1));
-  addPlugin(&publishP);
+  plugins.push_back(std::make_unique<PublishPlugin>(publishP));
 
   for (unsigned int i = 0; i < plugins.size(); i++) {
     plugins[i]->setSystem(this);
-    PluginConfiguration.read(plugins[i]);
+    PluginConfiguration.read(plugins[i].get());
     if (strlen(plugins[i]->getName()) > maxnamelen) {
       maxnamelen = strlen(plugins[i]->getName());
     }
-    start(plugins[i]);
+    start(plugins[i].get());
   }
   PDebug.printf(PDebugLevel::DEBUG, "PluginsClass::init\n");
 }
@@ -83,8 +78,7 @@ void PluginsClass::subscribeMqtt(Plugin *plugin, char *topic, bool append) {
         MqttMessage m(0, plugin->getId());
         m.setMqtt(topic, payload, len);
         // :((
-        auto mptr = std::make_shared<MqttMessage>(m);
-        publisher.publish(mptr);
+        publisher.publish(std::make_shared<MqttMessage>(m));
       });
 }
 
@@ -130,7 +124,7 @@ void PluginsClass::mqttMessageCB(MqttMessage *message) {
 Plugin *PluginsClass::getPluginByIndex(int pluginindex) {
 
   if (pluginindex >= 0 && pluginindex < plugins.size()) {
-    return plugins[pluginindex];
+    return plugins[pluginindex].get();
   }
   return NULL;
 }
@@ -138,7 +132,7 @@ Plugin *PluginsClass::getPluginByIndex(int pluginindex) {
 Plugin *PluginsClass::getPluginById(int pluginid) {
   for (unsigned int i = 0; i < plugins.size(); i++) {
     if (plugins[i]->getId() == pluginid) {
-      return plugins[i];
+      return plugins[i].get();
     }
   }
   return NULL;
@@ -147,7 +141,7 @@ Plugin *PluginsClass::getPluginById(int pluginid) {
 Plugin *PluginsClass::getPluginByName(const char *pluginname) {
   for (unsigned int i = 0; i < plugins.size(); i++) {
     if (strcmp(plugins[i]->getName(), pluginname) == 0) {
-      return plugins[i];
+      return plugins[i].get();
     }
   }
   return NULL;
@@ -155,7 +149,7 @@ Plugin *PluginsClass::getPluginByName(const char *pluginname) {
 
 int PluginsClass::getPluginCount() { return plugins.size(); }
 
-void PluginsClass::addPlugin(Plugin *p) { plugins.push_back(p); }
+void PluginsClass::addPlugin(std::unique_ptr<Plugin> &p) { plugins.push_back(std::move(p)); }
 
 void PluginsClass::publishInternal() { publisher.loop(); }
 

@@ -29,7 +29,7 @@ public:
     void start(Plugin* p);
     
 private:
-    void addPlugin(Plugin* p);
+    void addPlugin(std::unique_ptr<Plugin> &p);
     void publishToReceiver(std::shared_ptr<PluginMessage> mes);
     void publishToAll(std::shared_ptr<PluginMessage> message);
     void publishInternal();
@@ -38,14 +38,14 @@ private:
     uint32_t _lastUpdate = 0;
     bool saveTpSettings = false;
     unsigned int maxnamelen = 0;
-    std::vector<Plugin*> plugins;
+    std::vector<std::unique_ptr<Plugin>> plugins;
     typedef struct {
         const char* timername;
         uint32_t interval;
         std::function<void(void)> timerCb;
     } timerentry;
     std::vector<timerentry> timercbs;
-    PluginSingleQueueMessagePublisher publisher;
+    PluginMultiQueueMessagePublisher publisher;
 };
 
 extern PluginsClass Plugins;

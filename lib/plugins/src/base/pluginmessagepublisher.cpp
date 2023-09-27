@@ -4,41 +4,38 @@
 #include "plugin.h"
 
 PluginSingleQueueMessagePublisher::PluginSingleQueueMessagePublisher(
-    std::vector<Plugin *> &p)
+    std::vector<std::unique_ptr<Plugin>> &p)
     : PluginMessagePublisher(p) {}
 
-void PluginMessagePublisher::publish(std::shared_ptr<PluginMessage> m) {
-  // :/ if no broadcast (to all)
-  // we bypass queue and hand down to receiver directly
-  // maybe we need a queue per plugin?
-  // ... over-engineering :)
+void PluginMessagePublisher::publish(const std::shared_ptr<PluginMessage> &m) {
   if (m->isBroadcast())
     publishToAll(m);
   else
-    publishToReceiver(m);
+    publishToReceiver(std::move(m));
 }
 
-PluginMessagePublisher::PluginMessagePublisher(std::vector<Plugin *> &p)
+PluginMessagePublisher::PluginMessagePublisher(
+    std::vector<std::unique_ptr<Plugin>> &p)
     : plugins(p) {}
 
-Plugin* PluginMessagePublisher::getPluginByIndex(int index) {
-    if(index>=0&&index<plugins.size()) {
-      return plugins[index];
-    }
-    return NULL;
+Plugin *PluginMessagePublisher::getPluginByIndex(int index) {
+  if (index >= 0 && index < plugins.size()) {
+    return plugins[index].get();
+  }
+  return NULL;
 }
 
 Plugin *PluginMessagePublisher::getPluginById(int pluginid) {
   for (unsigned int i = 0; i < plugins.size(); i++) {
     if (plugins[i]->getId() == pluginid) {
-      return plugins[i];
+      return plugins[i].get();
     }
   }
   return NULL;
 }
 
 void PluginMessagePublisher::publishToReceiver(
-    std::shared_ptr<PluginMessage> mes) {
+    const std::shared_ptr<PluginMessage> &mes) {
   Plugin *p = getPluginById(mes->getReceiverId());
   if (NULL != p && p->isEnabled()) {
     p->internalCallback(mes);
@@ -46,11 +43,11 @@ void PluginMessagePublisher::publishToReceiver(
 };
 
 void PluginMessagePublisher::publishToAll(
-    std::shared_ptr<PluginMessage> message) {
+    const std::shared_ptr<PluginMessage> &message) {
   int pluginid = message->getSenderId();
   int pcount = getPluginCount();
-  PDebug.printf(PDebugLevel::DEBUG, "PluginMessagePublisher::publishToAll count:%d\n",
-                  pcount);
+  PDebug.printf(PDebugLevel::DEBUG,
+                "PluginMessagePublisher::publishToAll count:%d\n", pcount);
   for (unsigned int i = 0; i < pcount; i++) {
     Plugin *p = getPluginByIndex(i);
     if (p->getId() != pluginid) {
@@ -62,12 +59,12 @@ void PluginMessagePublisher::publishToAll(
 };
 
 void PluginSingleQueueMessagePublisher::publishToReceiver(
-    std::shared_ptr<PluginMessage> message) {
+    const std::shared_ptr<PluginMessage> &message) {
   queue.push(message);
 }
 
 void PluginSingleQueueMessagePublisher::publishToAll(
-    std::shared_ptr<PluginMessage> message) {
+    const std::shared_ptr<PluginMessage> &message) {
   queue.push(message);
 }
 
@@ -92,5 +89,54 @@ void PluginSingleQueueMessagePublisher::loop() {
     queue.pop();
     // do i need this? :/
     message.reset();
+  }
+}
+
+PluginMultiQueueMessagePublisher::PluginMultiQueueMessagePublisher(
+    std::vector<std::unique_ptr<Plugin>> &p)
+    : PluginMessagePublisher(p) {
+}
+
+void PluginMultiQueueMessagePublisher::publishTo(
+    int pluginId, const std::shared_ptr<PluginMessage> &message) {
+  if (!(queues.find(pluginId) != queues.end())) {
+    queues.insert({pluginId,
+                   std::make_shared<ThreadSafeQueue<std::shared_ptr<PluginMessage>>>(
+                       ThreadSafeQueue<std::shared_ptr<PluginMessage>>())});
+  }
+  queues.at(pluginId)->push(message);
+}
+void PluginMultiQueueMessagePublisher::publishToReceiver(
+    const std::shared_ptr<PluginMessage> &message) {
+  publishTo(message->getReceiverId(), message);
+}
+
+void PluginMultiQueueMessagePublisher::publishToAll(
+    const std::shared_ptr<PluginMessage> &message) {
+  for (int i = 0; i < getPluginCount(); i++) {
+    publishTo(getPluginByIndex(i)->getId(), message);
+  }
+}
+
+void PluginMultiQueueMessagePublisher::loop() {
+  for (auto &pair : queues) {
+    auto queue = pair.second;
+    while (queue.get()->size() > 0l) {
+      auto message = queue.get()->front();
+      char buffer[128];
+      message.get()->toString(buffer);
+      unsigned long duration = millis();
+      PDebug.printf(PDebugLevel::DEBUG, "pluginqueue %d\n----\n%s\n----\n",
+                    pair.first, buffer);
+      getPluginById(pair.first)->internalCallback(message);
+      duration -= message.get()->getTS();
+      PDebug.printf(PDebugLevel::DEBUG,
+                    "----\n%s\nduration: %lu [ms]\n----\npluginqueue msg end\n",
+                    buffer, duration);
+
+      queue->pop();
+      // do i need this? :/
+      message.reset();
+    }
   }
 }
