@@ -18,9 +18,11 @@ public:
 
 protected:
   Plugin *getPluginById(int pluginid);
-Plugin *getPluginByIndex(int index);
+  Plugin *getPluginByIndex(int index);
 
   int getPluginCount() { return plugins.size(); }
+
+  virtual void publishTo(int pluginId,const std::shared_ptr<PluginMessage> &mes);
 
   virtual void publishToReceiver(const std::shared_ptr<PluginMessage> &mes);
 
@@ -38,6 +40,7 @@ public:
   void loop();
 
 protected:
+  virtual void publishTo(int pluginId,const std::shared_ptr<PluginMessage> &mes);
   virtual void publishToReceiver(const std::shared_ptr<PluginMessage> &mes);
 
   virtual void publishToAll(const std::shared_ptr<PluginMessage> &message);
@@ -55,9 +58,8 @@ public:
 
 protected:
   virtual void publishToReceiver(const std::shared_ptr<PluginMessage> &mes);
-
   virtual void publishToAll(const std::shared_ptr<PluginMessage> &message);
-  void publishTo(int pluginId,const std::shared_ptr<PluginMessage> &message);
+  virtual void publishTo(int pluginId,const std::shared_ptr<PluginMessage> &message);
     
 private:
   std::map<int,std::shared_ptr<ThreadSafeQueue<std::shared_ptr<PluginMessage>>>> queues;
