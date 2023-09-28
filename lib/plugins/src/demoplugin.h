@@ -10,19 +10,27 @@ public:
   demoPlugin() : Plugin(999, "demo") {}
   void setup() {}
   void onTickerSetup() {
-    PDebug.printf(PDebugLevel::DEBUG,"demoplugin:onTickerSetup()\n");
-
+    PDebug.printf(PDebugLevel::DEBUG, "demoplugin:onTickerSetup()\n");
     addTimerCb(
         SECOND, 5,
         [&]() {
           DemoMessage m(*this);
           m.somevalue = 08.15f;
           publishMessage(m);
-          MqttMessage mqtt(getId(),PluginIds::PluginPublish);
-          mqtt.setMqtt("public/mqtt",(const uint8_t*)"{hello world}",13);
+          MqttMessage mqtt(getId(), PluginIds::PluginPublish);
+          mqtt.setMqtt("public/mqtt", (const uint8_t *)"{hello world}", 13);
           publishMessage(mqtt);
         },
         "demoplugintimer1");
+
+    addTimerCb(
+        SECOND, 2,
+        [&]() {
+          DemoMessage m(*this);
+          m.somevalue = 23.0f;
+          publishMessage(m);
+        },
+        "demoplugintimer2");
     /*
     addTimerCb(SECOND, 4, [this]() {
         enqueueMessage((char*)"out",(char*)"hello world!",false);
@@ -33,8 +41,8 @@ public:
       addTimerCb(
           SECOND, 10,
           [this]() {
-            PDebug.printf(PDebugLevel::DEBUG,"demoplugin: free heap: %d\n",
-                                 ESP.getFreeHeap());
+            PDebug.printf(PDebugLevel::DEBUG, "demoplugin: free heap: %d\n",
+                          ESP.getFreeHeap());
           },
           "debugHeapTimer");
     }
@@ -50,12 +58,13 @@ public:
 
   void mqttCallback(const MqttMessage *message) {
 
-    PDebug.printf(PDebugLevel::DEBUG,"demoplugin: mqttCallback %s \n", message->topic.get());
+    PDebug.printf(PDebugLevel::DEBUG, "demoplugin: mqttCallback %s \n",
+                  message->topic.get());
   }
 
   void internalCallback(std::shared_ptr<PluginMessage> message) {
     if (debugPluginMessages) {
-      PDebug.printf(PDebugLevel::DEBUG, "demoplugin", message);
+      // PDebug.printf(PDebugLevel::DEBUG, "demoplugin", message);
     }
     if (message->isMessageType<MqttMessage>()) {
       const MqttMessage *m = (MqttMessage *)message.get();
@@ -64,8 +73,38 @@ public:
   }
 
   bool onRequest(JsonObject request, JsonObject response) {
-    response[F("someoutput")] = millis();
-    return true;
+    if (request.containsKey("devel")) {
+      if (request.containsKey("type")) {
+        int type = request["type"];
+        switch (type) {
+        case TYPEIDS::INVERTERMESSAGE_TYPE: {
+          InverterMessage m(*this);
+          m.value = request["power"];
+          m.inverterId = request["serial"].as<String>();
+          publishMessage(m);
+          break;
+        }
+        case TYPEIDS::METERMESSAGE_TYPE: {
+          MeterMessage m(*this);
+          m.power = request["power"];
+          m.serial = request["serial"].as<String>();
+          publishMessage(m);
+          break;
+        }
+        case TYPEIDS::HOYMILESMESSAGE_TYPE: {
+          HoymilesMessage m(*this);
+          m.value = request["power"];
+          m.inverterId = request["serial"].as<String>();
+          publishMessage(m);
+          break;
+        }
+        default: {
+        }
+        }
+        return true;
+      }
+    }
+    return false;
   }
 
   void saveSettings(JsonObject settings) {
