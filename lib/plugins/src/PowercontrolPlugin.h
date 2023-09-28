@@ -2,11 +2,11 @@
 
 #include "base/plugin.h"
 #include "base/pluginmessages.h"
+#include "base/powercontrolalgo.hpp"
+#include "defaultpowercontrolalgo.hpp"
 #include "messages/invertermessage.h"
 #include "messages/metermessage.h"
 #include "messages/powercontrolmessage.h"
-#include "base/powercontrolalgo.hpp"
-#include "defaultpowercontrolalgo.hpp"
 
 template <std::size_t N>
 class powercontrollerarray : public structarray<powercontrolstruct, N> {
@@ -41,6 +41,8 @@ public:
     for (int i = 0; i < powercontrollers.size(); i++) {
       if (powercontrollers[i].update) {
         powercontrollers[i].update = false;
+        PDebug.printf(PDebugLevel::DEBUG,
+                      "powercontrol powercontrollers[%d].update\n", i);
         if (calcLimit(powercontrollers[i])) {
           publishLimit(powercontrollers[i]);
         }
@@ -48,10 +50,10 @@ public:
     }
   }
 
-  bool calcLimit(powercontrolstruct &powercontrol) {
+  inline bool calcLimit(powercontrolstruct &powercontrol) {
     return algo->calcLimit(powercontrol);
   }
-  void internalDataCallback(PluginMessage *message){}
+  void internalDataCallback(PluginMessage *message) {}
 
   void publishLimit(powercontrolstruct &pc) {
     PowerControlMessage m(*this);
@@ -61,26 +63,25 @@ public:
     char topic[pc.inverterId.length() + 7];
     char payload[32];
     int len = snprintf(payload, sizeof(payload), "%f", pc.limit);
-    snprintf(topic, sizeof(payload), "%s/updateLimit",
-             pc.inverterId.c_str());
-    MqttMessage mqtt(getId(),PluginIds::PluginPublish);
-    mqtt.setMqtt(topic,(const uint8_t*)payload,len);
+    snprintf(topic, sizeof(payload), "%s/updateLimit", pc.inverterId.c_str());
+    MqttMessage mqtt(getId(), PluginIds::PluginPublish);
+    mqtt.setMqtt(topic, (const uint8_t *)payload, len);
     mqtt.appendTopic = true;
     publishMessage(mqtt);
   }
 
   void handleInverterMessage(InverterMessage *message) {
     powercontrolstruct *powercontrol =
-        powercontrollers.getInverterById(
-            message->inverterId);
+        powercontrollers.getInverterById(message->inverterId);
     if (powercontrol) {
       powercontrol->production = message->value;
       powercontrol->update = true;
-      PDebug.printf(PDebugLevel::DEBUG,"powercontrol got production: %f\n",
-                           powercontrol->production);
+      PDebug.printf(PDebugLevel::DEBUG, "powercontrol got production: %f\n",
+                    powercontrol->production);
     } else {
-      PDebug.printf(PDebugLevel::DEBUG,"powercontrol inverterId(%s) not configured\n",
-                           message->inverterId.c_str());
+      PDebug.printf(PDebugLevel::DEBUG,
+                    "powercontrol inverterId(%s) not configured\n",
+                    message->inverterId.c_str());
     }
   }
 
@@ -91,11 +92,12 @@ public:
     if (powercontrol) {
       powercontrol->consumption = m->power;
       powercontrol->update = true;
-      PDebug.printf(PDebugLevel::DEBUG,"powercontrol got consumption: %f\n",
-                           powercontrol->consumption);
+      PDebug.printf(PDebugLevel::DEBUG, "powercontrol got consumption: %f\n",
+                    powercontrol->consumption);
     } else {
-      PDebug.printf(PDebugLevel::DEBUG,"powercontrol meterserial(%s) not configured\n",
-                           meterserial.c_str());
+      PDebug.printf(PDebugLevel::DEBUG,
+                    "powercontrol meterserial(%s) not configured\n",
+                    meterserial.c_str());
     }
   }
 
@@ -108,12 +110,14 @@ public:
       MeterMessage *m = (MeterMessage *)message.get();
       handleMeterMessage(m);
     } else {
-      PDebug.printf(PDebugLevel::DEBUG,"powercontrol unhandled message from sender=%d\n",
-                           message->getSenderId());
+      PDebug.printf(PDebugLevel::DEBUG,
+                    "powercontrol unhandled message from sender=%d\n",
+                    message->getSenderId());
     }
   }
 
   void initPowercontrol() {
+
     powercontrolstruct *powercontrol = powercontrollers.getEmptyIndex();
     if (powercontrol) {
       powercontrol->inverterId = inverter_serial;
@@ -147,6 +151,5 @@ private:
   uint32_t threshold = 20;
   // powercontrolstruct powercontrol;
   powercontrollerarray<MAX_NUM_INVERTERS> powercontrollers;
-  DefaultPowercontrolAlgo defaultAlgo = DefaultPowercontrolAlgo();
-  PowercontrolAlgo *algo = &defaultAlgo;
+  PowercontrolAlgo* algo = new DefaultPowercontrolAlgo();
 };

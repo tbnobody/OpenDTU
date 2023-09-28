@@ -5,7 +5,8 @@
 class DefaultPowercontrolAlgo : public PowercontrolAlgo {
 public:
   DefaultPowercontrolAlgo() : PowercontrolAlgo() {}
-  bool calcLimit(powercontrolstruct &powercontrol) {
+  ~DefaultPowercontrolAlgo() {}
+  virtual bool calcLimit(powercontrolstruct &powercontrol) {
     PDebug.printf(PDebugLevel::DEBUG,"powercontrol PowercontrolAlgo: consumption=%f "
                          "production=%f limit=%f\n",
                          powercontrol.consumption, powercontrol.production,

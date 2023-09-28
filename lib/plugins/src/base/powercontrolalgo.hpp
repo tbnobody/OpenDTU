@@ -9,8 +9,10 @@ typedef struct {
   float production = 0.0;
   bool update = false;
 } powercontrolstruct;
+
 class PowercontrolAlgo {
 public:
   PowercontrolAlgo() {}
+  virtual ~PowercontrolAlgo() {}
   virtual bool calcLimit(powercontrolstruct &powercontrol) { return false; };
 };
