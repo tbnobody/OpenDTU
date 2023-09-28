@@ -94,15 +94,15 @@ void PluginSingleQueueMessagePublisher::loop() {
 
 PluginMultiQueueMessagePublisher::PluginMultiQueueMessagePublisher(
     std::vector<std::unique_ptr<Plugin>> &p)
-    : PluginMessagePublisher(p) {
-}
+    : PluginMessagePublisher(p) {}
 
 void PluginMultiQueueMessagePublisher::publishTo(
     int pluginId, const std::shared_ptr<PluginMessage> &message) {
   if (!(queues.find(pluginId) != queues.end())) {
-    queues.insert({pluginId,
-                   std::make_shared<ThreadSafeQueue<std::shared_ptr<PluginMessage>>>(
-                       ThreadSafeQueue<std::shared_ptr<PluginMessage>>())});
+    queues.insert(
+        {pluginId,
+         std::make_shared<ThreadSafeQueue<std::shared_ptr<PluginMessage>>>(
+             ThreadSafeQueue<std::shared_ptr<PluginMessage>>())});
   }
   queues.at(pluginId)->push(message);
 }
@@ -119,6 +119,16 @@ void PluginMultiQueueMessagePublisher::publishToAll(
 }
 
 void PluginMultiQueueMessagePublisher::loop() {
+  bool hasMsg = false;
+  for (auto &pair : queues) {
+    auto queue = pair.second;
+    if (queue.get()->size() > 0l)
+      hasMsg = true;
+    break;
+  }
+  if (hasMsg)
+    PDebug.printf(PDebugLevel::DEBUG, "mainloop start\n----\n");
+  unsigned long mainduration = millis();
   for (auto &pair : queues) {
     auto queue = pair.second;
     while (queue.get()->size() > 0l) {
@@ -126,17 +136,20 @@ void PluginMultiQueueMessagePublisher::loop() {
       char buffer[128];
       message.get()->toString(buffer);
       unsigned long duration = millis();
-      PDebug.printf(PDebugLevel::DEBUG, "pluginqueue %d\n----\n%s\n----\n",
-                    pair.first, buffer);
       getPluginById(pair.first)->internalCallback(message);
       duration -= message.get()->getTS();
-      PDebug.printf(PDebugLevel::DEBUG,
-                    "----\n%s\nduration: %lu [ms]\n----\npluginqueue msg end\n",
-                    buffer, duration);
+      PDebug.printf(PDebugLevel::DEBUG, "pluginqueue %lu [ms] - %s\n", duration,
+                    buffer);
 
       queue->pop();
       // do i need this? :/
       message.reset();
+      yield();
     }
+  }
+  if (hasMsg) {
+    mainduration = millis() - mainduration;
+    PDebug.printf(PDebugLevel::DEBUG, "mainloop stop - %lu [ms]\n----\n",
+                  mainduration);
   }
 }
