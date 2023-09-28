@@ -47,6 +47,7 @@ void PluginsClass::loop() {
         // PDebug.printf(PDebugLevel::DEBUG,"PluginsClass timercb call: %s\n",
         // timercbs[i].timername);
         timercbs[i].timerCb();
+        yield();
       }
     }
   }
@@ -54,6 +55,7 @@ void PluginsClass::loop() {
   for (unsigned int i = 0; i < plugins.size(); i++) {
     if (plugins[i]->isEnabled()) {
       plugins[i]->loop();
+      yield();
     }
   }
 }
