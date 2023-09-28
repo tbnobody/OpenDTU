@@ -203,3 +203,52 @@ void JkBmsBatteryStats::updateFrom(JkBms::DataPointContainer const& dp)
 
     _lastUpdate = millis();
 }
+
+void VictronSmartShuntStats::updateFrom(VeDirectShuntController::veShuntStruct const& shuntData) {
+    _SoC = shuntData.SOC / 10;
+    _voltage = shuntData.V;
+    _current = shuntData.I;
+    _modelName = VeDirectShunt.getPidAsString(shuntData.PID);
+    _chargeCycles = shuntData.H4;
+    _timeToGo = shuntData.TTG / 60;
+    _chargedEnergy = shuntData.H18 / 100;
+    _dischargedEnergy = shuntData.H17 / 100;
+    _manufacturer = "Victron " + _modelName;
+    
+    // shuntData.AR is a bitfield, so we need to check each bit individually
+    _alarmLowVoltage = shuntData.AR & 1;
+    _alarmHighVoltage = shuntData.AR & 2;
+    _alarmLowSOC = shuntData.AR & 4;
+    _alarmLowTemperature = shuntData.AR & 32;
+    _alarmHighTemperature = shuntData.AR & 64;
+
+    _lastUpdate = VeDirectShunt.getLastUpdate();
+    _lastUpdateSoC = VeDirectShunt.getLastUpdate();
+}
+
+void VictronSmartShuntStats::getLiveViewData(JsonVariant& root) const {
+    BatteryStats::getLiveViewData(root);
+
+    // values go into the "Status" card of the web application
+    addLiveViewValue(root, "voltage", _voltage, "V", 2);
+    addLiveViewValue(root, "current", _current, "A", 1);   
+    addLiveViewValue(root, "chargeCycles", _chargeCycles, "", 0);
+    addLiveViewValue(root, "chargedEnergy", _chargedEnergy, "KWh", 1);
+    addLiveViewValue(root, "dischargedEnergy", _dischargedEnergy, "KWh", 1);
+    
+    addLiveViewAlarm(root, "lowVoltage", _alarmLowVoltage);
+    addLiveViewAlarm(root, "highVoltage", _alarmHighVoltage);
+    addLiveViewAlarm(root, "lowSOC", _alarmLowSOC);
+    addLiveViewAlarm(root, "lowTemperature", _alarmLowTemperature);
+    addLiveViewAlarm(root, "highTemperature", _alarmHighTemperature);     
+}
+
+void VictronSmartShuntStats::mqttPublish() const {
+    BatteryStats::mqttPublish();
+
+    MqttSettings.publish(F("battery/voltage"), String(_voltage));
+    MqttSettings.publish(F("battery/current"), String(_current));
+    MqttSettings.publish(F("battery/chargeCycles"), String(_chargeCycles));
+    MqttSettings.publish(F("battery/chargedEnergy"), String(_chargedEnergy));
+    MqttSettings.publish(F("battery/dischargedEnergy"), String(_dischargedEnergy));
+}

@@ -10,7 +10,7 @@
 #include "MqttSettings.h"
 #include "NetworkSettings.h"
 #include "Huawei_can.h"
-#include <VeDirectFrameHandler.h>
+#include <VeDirectMpptController.h>
 #include "MessageOutput.h"
 #include <ctime>
 #include <cmath>
@@ -366,12 +366,12 @@ void PowerLimiterClass::unconditionalSolarPassthrough(std::shared_ptr<InverterAb
 {
     CONFIG_T& config = Configuration.get();
 
-    if (!config.Vedirect_Enabled || !VeDirect.isDataValid()) {
+    if (!config.Vedirect_Enabled || !VeDirectMppt.isDataValid()) {
         shutdown(Status::NoVeDirect);
         return;
     }
 
-    int32_t solarPower = VeDirect.veFrame.V * VeDirect.veFrame.I;
+    int32_t solarPower = VeDirectMppt.veFrame.V * VeDirectMppt.veFrame.I;
     setNewPowerLimit(inverter, inverterPowerDcToAc(inverter, solarPower));
     announceStatus(Status::UnconditionalSolarPassthrough);
 }
@@ -407,11 +407,11 @@ bool PowerLimiterClass::canUseDirectSolarPower()
     if (!config.PowerLimiter_SolarPassThroughEnabled
             || isBelowStopThreshold()
             || !config.Vedirect_Enabled
-            || !VeDirect.isDataValid()) {
+            || !VeDirectMppt.isDataValid()) {
         return false;
     }
 
-    return VeDirect.veFrame.PPV >= 20; // enough power?
+    return VeDirectMppt.veFrame.PPV >= 20; // enough power?
 }
 
 
@@ -569,7 +569,7 @@ int32_t PowerLimiterClass::getSolarChargePower()
         return 0;
     }
 
-    return VeDirect.veFrame.V * VeDirect.veFrame.I;
+    return VeDirectMppt.veFrame.V * VeDirectMppt.veFrame.I;
 }
 
 float PowerLimiterClass::getLoadCorrectedVoltage()

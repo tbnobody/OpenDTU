@@ -6,6 +6,7 @@
 #include "AsyncJson.h"
 #include "Arduino.h"
 #include "JkBmsDataPoints.h"
+#include "VeDirectShuntController.h"
 
 // mandatory interface for all kinds of batteries
 class BatteryStats {
@@ -97,4 +98,28 @@ class JkBmsBatteryStats : public BatteryStats {
         JkBms::DataPointContainer _dataPoints;
         mutable uint32_t _lastMqttPublish = 0;
         mutable uint32_t _lastFullMqttPublish = 0;
+};
+
+class VictronSmartShuntStats : public BatteryStats {
+    public:
+        void getLiveViewData(JsonVariant& root) const final;
+        void mqttPublish() const final;
+
+        void updateFrom(VeDirectShuntController::veShuntStruct const& shuntData);
+
+    private:    
+        float _voltage; 
+        float _current;
+        float _temperature;
+        uint8_t _chargeCycles;
+        uint32_t _timeToGo;
+        float _chargedEnergy;
+        float _dischargedEnergy;
+        String _modelName;
+
+        bool _alarmLowVoltage;
+        bool _alarmHighVoltage;
+        bool _alarmLowSOC;
+        bool _alarmLowTemperature;
+        bool _alarmHighTemperature;
 };

@@ -514,6 +514,23 @@
         "UpdatesOnly": "Publish values to MQTT only when they change",
         "Save": "@:dtuadmin.Save"
     },
+    "batteryadmin": {
+        "BatterySettings": "Battery Settings",
+        "BatteryConfiguration": "General Interface Settings",
+        "EnableBattery": "Enable Interface",
+        "VerboseLogging": "@:base.VerboseLogging",
+        "Provider": "Data Provider",
+        "ProviderPylontechCan": "Pylontech using CAN bus",
+        "ProviderJkBmsSerial": "Jikong (JK) BMS using serial connection",
+        "ProviderVictron": "Victron SmartShunt using VE.Direct interface",
+        "JkBmsConfiguration": "JK BMS Settings",
+        "JkBmsInterface": "Interface Type",
+        "JkBmsInterfaceUart": "TTL-UART on MCU",
+        "JkBmsInterfaceTransceiver": "RS-485 Transceiver on MCU",
+        "PollingInterval": "Polling Interval",
+        "Seconds": "@:dtuadmin.Seconds",
+        "Save": "@:dtuadmin.Save"
+    },
     "inverteradmin": {
         "InverterSettings": "Paramètres des onduleurs",
         "AddInverter": "Ajouter un nouvel onduleur",
@@ -769,9 +786,13 @@
         "highTemperature": "High temperature",
         "overTemperature": "Overtemperature",
         "lowVoltage": "Low voltage",
+        "lowSOC": "Low state of charge",
         "underVoltage": "Undervoltage",
         "highVoltage": "High voltage",
         "overVoltage": "Overvoltage",
-        "bmsInternal": "BMS internal"
+        "bmsInternal": "BMS internal",
+        "chargeCycles": "Charge cycles",
+        "chargedEnergy": "Charged energy",
+        "dischargedEnergy": "Discharged energy"
       }
 }

@@ -2,7 +2,7 @@
 #pragma once
 
 #include <ArduinoJson.h>
-#include "VeDirectFrameHandler.h"
+#include "VeDirectMpptController.h"
 
 class MqttHandleVedirectHassClass {
 public:

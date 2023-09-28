@@ -80,6 +80,7 @@ export default defineComponent({
             providerTypeList: [
                 { key: 0, value: 'PylontechCan' },
                 { key: 1, value: 'JkBmsSerial' },
+                { key: 3, value: 'Victron' },
             ],
             jkBmsInterfaceTypeList: [
                 { key: 0, value: 'Uart' },

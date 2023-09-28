@@ -4,6 +4,7 @@
 #include "MqttSettings.h"
 #include "PylontechCanReceiver.h"
 #include "JkBmsController.h"
+#include "VictronSmartShunt.h"
 
 BatteryClass Battery;
 
@@ -40,6 +41,10 @@ void BatteryClass::init()
             break;
         case 1:
             _upProvider = std::make_unique<JkBms::Controller>();
+            if (!_upProvider->init(verboseLogging)) { _upProvider = nullptr; }
+            break;
+        case 3:
+            _upProvider = std::make_unique<VictronSmartShunt>();
             if (!_upProvider->init(verboseLogging)) { _upProvider = nullptr; }
             break;
         default:
