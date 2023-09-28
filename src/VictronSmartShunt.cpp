@@ -13,7 +13,7 @@ bool VictronSmartShunt::init(bool verboseLogging)
     MessageOutput.printf("[VictronSmartShunt] Interface rx = %d, tx = %d\r\n",
             pin.battery_rx, pin.battery_tx);
 
-    if (pin.battery_rx < 0 || pin.battery_tx < 0) {
+    if (pin.battery_rx < 0) {
         MessageOutput.println(F("[VictronSmartShunt] Invalid pin config"));
         return false;
     }

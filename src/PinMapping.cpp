@@ -307,8 +307,7 @@ bool PinMappingClass::isValidEthConfig()
 
 bool PinMappingClass::isValidVictronConfig()
 {
-    return _pinMapping.victron_rx >= 0
-        && _pinMapping.victron_tx >= 0;
+    return _pinMapping.victron_rx >= 0;
 }
 
 bool PinMappingClass::isValidHuaweiConfig()
