@@ -11,28 +11,28 @@ public:
   void setup() {}
   void onTickerSetup() {
     PDebug.printf(PDebugLevel::DEBUG, "demoplugin:onTickerSetup()\n");
- /**   addTimerCb(
-        SECOND, 5,
-        [&]() {
-          DemoMessage m(*this);
-          m.somevalue = 08.15f;
-          publishMessage(m);
-          MqttMessage mqtt(getId(), PluginIds::PluginPublish);
-          mqtt.setMqtt("public/mqtt", (const uint8_t *)"{hello world}", 13);
-          publishMessage(mqtt);
-        },
-        "demoplugintimer1");
+    /**   addTimerCb(
+           SECOND, 5,
+           [&]() {
+             DemoMessage m(*this);
+             m.somevalue = 08.15f;
+             publishMessage(m);
+             MqttMessage mqtt(getId(), PluginIds::PluginPublish);
+             mqtt.setMqtt("public/mqtt", (const uint8_t *)"{hello world}", 13);
+             publishMessage(mqtt);
+           },
+           "demoplugintimer1");
 
-    addTimerCb(
-        SECOND, 2,
-        [&]() {
-          DemoMessage m(*this);
-          m.somevalue = 23.0f;
-          publishMessage(m);
-        },
-        "demoplugintimer2");
+       addTimerCb(
+           SECOND, 2,
+           [&]() {
+             DemoMessage m(*this);
+             m.somevalue = 23.0f;
+             publishMessage(m);
+           },
+           "demoplugintimer2");
 
-    */
+       */
     if (debugHeap) {
       addTimerCb(
           SECOND, 10,
@@ -98,6 +98,56 @@ public:
         }
         }
         return true;
+      }
+      if (request.containsKey("debug")) {
+        if (request.containsKey("opendtu")) {
+          int level = request["level"];
+          switch (level) {
+          case MessageOutputDebugLevel::DEBUG_NONE: {
+            MessageOutput.setLevel(MessageOutputDebugLevel::DEBUG_NONE);
+            break;
+          }
+          case MessageOutputDebugLevel::DEBUG_INFO: {
+            MessageOutput.setLevel(MessageOutputDebugLevel::DEBUG_INFO);
+            break;
+          }
+          case MessageOutputDebugLevel::DEBUG_DEBUG: {
+            MessageOutput.setLevel(MessageOutputDebugLevel::DEBUG_DEBUG);
+            break;
+          }
+          case MessageOutputDebugLevel::DEBUG_TRACE: {
+            MessageOutput.setLevel(MessageOutputDebugLevel::DEBUG_TRACE);
+            break;
+          }
+          default: {
+          }
+          }
+          return true;
+        }
+        if (request.containsKey("plugins")) {
+          int level = request["level"];
+          switch (level) {
+          case PDebugLevel::NONE: {
+            PDebug.setLevel(PDebugLevel::NONE);
+            break;
+          }
+          case PDebugLevel::INFO: {
+            PDebug.setLevel(PDebugLevel::INFO);
+            break;
+          }
+          case PDebugLevel::DEBUG: {
+            PDebug.setLevel(PDebugLevel::DEBUG);
+            break;
+          }
+          case PDebugLevel::TRACE: {
+            PDebug.setLevel(PDebugLevel::TRACE);
+            break;
+          }
+          default: {
+          }
+          }
+          return true;
+        }
       }
     }
     return false;
