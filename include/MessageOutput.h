@@ -31,7 +31,26 @@ public:
   template <typename... Args> size_t printf(const char *f, Args... args) {
     return printf(MessageOutputDebugLevel::DEBUG_DEBUG, f, args...);
   }
+  template <typename... Args> size_t print(Args... args) {
+    return print(MessageOutputDebugLevel::DEBUG_DEBUG, args...);
+  }
+  size_t println() {
+    return print(MessageOutputDebugLevel::DEBUG_DEBUG, "\n");
+  }
 
+  template <typename... Args> size_t println(const char *f) {
+    return printf(MessageOutputDebugLevel::DEBUG_DEBUG, "%s\n", f);
+  }
+  template <typename... Args> size_t println(const __FlashStringHelper *f) {
+    return printf(MessageOutputDebugLevel::DEBUG_DEBUG, "%s\n", reinterpret_cast<const char *>(f));
+  }
+  
+  template <typename... Args>
+  size_t print(MessageOutputDebugLevel level, Args... args) {
+    if (isLevel(level))
+      return Print::print(args...);
+    return 0;
+  }
   template <typename... Args>
   size_t printf(MessageOutputDebugLevel level, const char *f, Args... args) {
     if (isLevel(level))
