@@ -26,6 +26,9 @@
 #define DEBUG 0
 
 InverterSettingsClass InverterSettings;
+#ifndef HOYMILESDEBUG
+NoOuptputClass NoOutputPrint;
+#endif
 
 void InverterSettingsClass::init()
 {
@@ -35,7 +38,11 @@ void InverterSettingsClass::init()
     // Initialize inverter communication
     MessageOutput.print("Initialize Hoymiles interface... ");
 
+#ifdef HOYMILESDEBUG
     Hoymiles.setMessageOutput(&MessageOutput);
+#else
+    Hoymiles.setMessageOutput(&NoOutputPrint);
+#endif
     Hoymiles.init();
 
     if (PinMapping.isValidNrf24Config() || PinMapping.isValidCmt2300Config()) {
