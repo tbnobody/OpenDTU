@@ -133,11 +133,17 @@ void PluginsClass::addPlugin(std::unique_ptr<Plugin> &p) {
   plugins.push_back(std::move(p));
 }
 
-void PluginsClass::publishInternal() { // publisher.loop();
+void PluginsClass::publishInternal() { 
+  #ifndef ESPSINGLECORE
+
+  #else
+  publisher.loop();
+  #endif
 }
 
 PluginMessagePublisher &PluginsClass::getPublisher() { return publisher; }
 
+#ifndef ESPSINGLECORE
 extern "C" {
 void pluginTaskFunc(void *parameter);
 }
@@ -147,6 +153,7 @@ void pluginTaskFunc(void *parameter) {
     Plugins.getPublisher().loop();
   }
 }
+#endif
 
 void PluginsClass::init() {
   PDebug.setPrint(&MessageOutput);
@@ -168,7 +175,7 @@ void PluginsClass::init() {
     }
     start(plugins[i].get());
   }
-
+#ifndef ESPSINGLECORE
   xTaskCreatePinnedToCore(pluginTaskFunc, /* Function to implement the task */
                           "pluginTask",   /* Name of the task */
                           10000,          /* Stack size in words */
@@ -176,6 +183,6 @@ void PluginsClass::init() {
                           0,              /* Priority of the task */
                           &pluginTask,    /* Task handle. */
                           0);             /* Core where the task should run */
-
+#endif
   PDebug.printf(PDebugLevel::DEBUG, "PluginsClass::init\n");
 }
