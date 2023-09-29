@@ -133,12 +133,12 @@ void PluginsClass::addPlugin(std::unique_ptr<Plugin> &p) {
   plugins.push_back(std::move(p));
 }
 
-void PluginsClass::publishInternal() { 
-  #ifndef ESPSINGLECORE
+void PluginsClass::publishInternal() {
+#ifndef ESPSINGLECORE
 
-  #else
+#else
   publisher.loop();
-  #endif
+#endif
 }
 
 PluginMessagePublisher &PluginsClass::getPublisher() { return publisher; }
@@ -156,6 +156,7 @@ void pluginTaskFunc(void *parameter) {
 #endif
 
 void PluginsClass::init() {
+  MessageOutput.setLevel(MessageOutputDebugLevel::DEBUG_INFO);
   PDebug.setPrint(&MessageOutput);
   plugins.push_back(std::make_unique<demoPlugin>(demoPlugin()));
   plugins.push_back(std::make_unique<HoymilesPlugin>(HoymilesPlugin()));
