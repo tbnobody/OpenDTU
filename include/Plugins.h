@@ -46,6 +46,7 @@ private:
     } timerentry;
     std::vector<timerentry> timercbs;
     PluginMultiQueueMessagePublisher publisher;
+    TaskHandle_t pluginTask;
 };
 
 extern PluginsClass Plugins;

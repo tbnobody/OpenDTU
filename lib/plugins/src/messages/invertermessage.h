@@ -11,10 +11,12 @@ public:
   float value;
   int toString(char *buffer) {
     int c = sprintf(buffer, "InverterMessage{base=");
-    c = c + PluginMessage::toString(buffer+c);
-    c = c + sprintf(buffer+c,", id=%s, power=%f}",inverterId.c_str(),value);
+    c = c + PluginMessage::toString(buffer + c);
+    c = c +
+        sprintf(buffer + c, ", id=%s, power=%f}", inverterId.c_str(), value);
     return c;
   }
+  virtual const char *getMessageTypeString() { return "InverterMessage"; }
 };
 
 template <> struct EntityIds<InverterMessage> {

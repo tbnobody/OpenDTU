@@ -7,10 +7,11 @@ public:
   DemoMessage(Plugin &p) : PluginMessage(TYPEIDS::DEMOMESSAGE_TYPE, p) {}
   int toString(char *buffer) {
     int c = sprintf(buffer, "DemoMessage{base=");
-    c = c + PluginMessage::toString(buffer+c);
-    c = c + sprintf(buffer+c,", somevalue=%f}",somevalue);
+    c = c + PluginMessage::toString(buffer + c);
+    c = c + sprintf(buffer + c, ", somevalue=%f}", somevalue);
     return c;
   }
+  virtual const char *getMessageTypeString() { return "DemoMessage"; }
   float somevalue = 0;
 };
 template <> struct EntityIds<DemoMessage> {

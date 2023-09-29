@@ -14,32 +14,9 @@
 
 PluginsClass Plugins;
 
-void PluginsClass::init() {
-  PDebug.setPrint(&MessageOutput);
-  plugins.push_back(std::make_unique<demoPlugin>(demoPlugin()));
-  plugins.push_back(std::make_unique<HoymilesPlugin>(HoymilesPlugin()));
-  plugins.push_back(std::make_unique<MeterPlugin>(MeterPlugin()));
-  plugins.push_back(std::make_unique<InverterPlugin>(InverterPlugin()));
-  plugins.push_back(std::make_unique<PowercontrolPlugin>(PowercontrolPlugin()));
-  PublishPlugin publishP = PublishPlugin();
-  publishP.mqttMessageCB(
-      std::bind(&PluginsClass::mqttMessageCB, this, std::placeholders::_1));
-  plugins.push_back(std::make_unique<PublishPlugin>(publishP));
-
-  for (unsigned int i = 0; i < plugins.size(); i++) {
-    plugins[i]->setSystem(this);
-    PluginConfiguration.read(plugins[i].get());
-    if (strlen(plugins[i]->getName()) > maxnamelen) {
-      maxnamelen = strlen(plugins[i]->getName());
-    }
-    start(plugins[i].get());
-  }
-  PDebug.printf(PDebugLevel::DEBUG, "PluginsClass::init\n");
-}
-
 void PluginsClass::loop() {
   static uint32_t pluginsloop = 0;
-  
+
   EVERY_N_SECONDS(1) {
     pluginsloop++;
     for (uint32_t i = 0; i < timercbs.size(); i++) {
@@ -76,7 +53,8 @@ void PluginsClass::subscribeMqtt(Plugin *plugin, char *topic, bool append) {
       [&, plugin](const espMqttClientTypes::MessageProperties &properties,
                   const char *topic, const uint8_t *payload, size_t len,
                   size_t index, size_t total) {
-        //       PDebug.printf(PDebugLevel::DEBUG,"PluginsClass::mqttCb topic=%s\n", topic);
+        //       PDebug.printf(PDebugLevel::DEBUG,"PluginsClass::mqttCb
+        //       topic=%s\n", topic);
         MqttMessage m(0, plugin->getId());
         m.setMqtt(topic, payload, len);
         // :((
@@ -105,10 +83,10 @@ void PluginsClass::mqttMessageCB(MqttMessage *message) {
   //   char topic[128];
   if (!MqttSettings.getConnected()) {
     PDebug.printf(PDebugLevel::DEBUG,
-        "PluginsClass: mqtt not connected. can not send message!");
+                  "PluginsClass: mqtt not connected. can not send message!");
     return;
   }
-  PDebug.printf(PDebugLevel::DEBUG,"PluginsClass: publish mqtt nmessage!");
+  PDebug.printf(PDebugLevel::DEBUG, "PluginsClass: publish mqtt nmessage!");
   auto sender = getPluginById(message->getSenderId());
   if (NULL != sender) {
     char topic[128];
@@ -151,8 +129,53 @@ Plugin *PluginsClass::getPluginByName(const char *pluginname) {
 
 int PluginsClass::getPluginCount() { return plugins.size(); }
 
-void PluginsClass::addPlugin(std::unique_ptr<Plugin> &p) { plugins.push_back(std::move(p)); }
+void PluginsClass::addPlugin(std::unique_ptr<Plugin> &p) {
+  plugins.push_back(std::move(p));
+}
 
-void PluginsClass::publishInternal() { publisher.loop(); }
+void PluginsClass::publishInternal() { // publisher.loop();
+}
 
 PluginMessagePublisher &PluginsClass::getPublisher() { return publisher; }
+
+extern "C" {
+void pluginTaskFunc(void *parameter);
+}
+
+void pluginTaskFunc(void *parameter) {
+  for (;;) {
+    Plugins.getPublisher().loop();
+  }
+}
+
+void PluginsClass::init() {
+  PDebug.setPrint(&MessageOutput);
+  plugins.push_back(std::make_unique<demoPlugin>(demoPlugin()));
+  plugins.push_back(std::make_unique<HoymilesPlugin>(HoymilesPlugin()));
+  plugins.push_back(std::make_unique<MeterPlugin>(MeterPlugin()));
+  plugins.push_back(std::make_unique<InverterPlugin>(InverterPlugin()));
+  plugins.push_back(std::make_unique<PowercontrolPlugin>(PowercontrolPlugin()));
+  PublishPlugin publishP = PublishPlugin();
+  publishP.mqttMessageCB(
+      std::bind(&PluginsClass::mqttMessageCB, this, std::placeholders::_1));
+  plugins.push_back(std::make_unique<PublishPlugin>(publishP));
+
+  for (unsigned int i = 0; i < plugins.size(); i++) {
+    plugins[i]->setSystem(this);
+    PluginConfiguration.read(plugins[i].get());
+    if (strlen(plugins[i]->getName()) > maxnamelen) {
+      maxnamelen = strlen(plugins[i]->getName());
+    }
+    start(plugins[i].get());
+  }
+
+  xTaskCreatePinnedToCore(pluginTaskFunc, /* Function to implement the task */
+                          "pluginTask",   /* Name of the task */
+                          10000,          /* Stack size in words */
+                          NULL,           /* Task input parameter */
+                          0,              /* Priority of the task */
+                          &pluginTask,    /* Task handle. */
+                          0);             /* Core where the task should run */
+
+  PDebug.printf(PDebugLevel::DEBUG, "PluginsClass::init\n");
+}

@@ -8,10 +8,14 @@ PluginSingleQueueMessagePublisher::PluginSingleQueueMessagePublisher(
     : PluginMessagePublisher(p) {}
 
 void PluginMessagePublisher::publish(const std::shared_ptr<PluginMessage> &m) {
+  PDebug.printf(PDebugLevel::DEBUG, "system: %s publish %s to %s\n",
+                PluginDebug::getPluginNameDebug(m.get()->getSenderId()),
+                m.get()->getMessageTypeString(),
+                PluginDebug::getPluginNameDebug(m.get()->getReceiverId()));
   if (m->isBroadcast())
     publishToAll(m);
   else
-    publishToReceiver(std::move(m));
+    publishToReceiver(m);
 }
 
 PluginMessagePublisher::PluginMessagePublisher(
@@ -36,6 +40,8 @@ Plugin *PluginMessagePublisher::getPluginById(int pluginid) {
 
 void PluginMessagePublisher::publishTo(
     int pluginId, const std::shared_ptr<PluginMessage> &mes) {
+  if (mes.get()->getSenderId() == pluginId)
+    return;
   Plugin *p = getPluginById(pluginId);
   if (NULL != p && p->isEnabled()) {
     p->internalCallback(mes);
@@ -99,7 +105,7 @@ PluginMultiQueueMessagePublisher::PluginMultiQueueMessagePublisher(
 
 void PluginMultiQueueMessagePublisher::publishTo(
     int pluginId, const std::shared_ptr<PluginMessage> &message) {
-  if (message.get()->getReceiverId() == pluginId)
+  if (message.get()->getSenderId() == pluginId)
     return;
   if (!(queues.find(pluginId) != queues.end())) {
     queues.insert(
@@ -141,7 +147,7 @@ void PluginMultiQueueMessagePublisher::loop() {
       char buffer[256];
       message.get()->toString(buffer);
       unsigned long duration = millis();
-      getPluginById(pair.first)->internalCallback(message);
+      PluginMessagePublisher::publishTo(pair.first, message);
       duration -= message.get()->getTS();
       PDebug.printf(PDebugLevel::DEBUG, "pluginqueue '%s' %lu [ms] - %s\n",
                     PluginDebug::getPluginNameDebug(pair.first), duration,

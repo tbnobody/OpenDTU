@@ -11,10 +11,12 @@ public:
   String serial;
   int toString(char *buffer) {
     int c = sprintf(buffer, "MeterMessage{base=");
-    c = c + PluginMessage::toString(buffer+c);
-    c = c + sprintf(buffer+c,", meterid=%s, power=%f}",serial.c_str(),power);
+    c = c + PluginMessage::toString(buffer + c);
+    c = c +
+        sprintf(buffer + c, ", meterid=%s, power=%f}", serial.c_str(), power);
     return c;
   }
+  virtual const char *getMessageTypeString() { return "MeterMessage"; }
 };
 template <> struct EntityIds<MeterMessage> {
   enum { type_id = TYPEIDS::METERMESSAGE_TYPE };

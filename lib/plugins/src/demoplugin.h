@@ -11,7 +11,7 @@ public:
   void setup() {}
   void onTickerSetup() {
     PDebug.printf(PDebugLevel::DEBUG, "demoplugin:onTickerSetup()\n");
-    addTimerCb(
+ /**   addTimerCb(
         SECOND, 5,
         [&]() {
           DemoMessage m(*this);
@@ -31,11 +31,7 @@ public:
           publishMessage(m);
         },
         "demoplugintimer2");
-    /*
-    addTimerCb(SECOND, 4, [this]() {
-        enqueueMessage((char*)"out",(char*)"hello world!",false);
-        enqueueMessage((char*)"out",(char*)"hello world!");
-    },"demoplugintimer2");
+
     */
     if (debugHeap) {
       addTimerCb(

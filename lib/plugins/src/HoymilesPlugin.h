@@ -1,6 +1,7 @@
 #pragma once
 
 #include "base/plugin.h"
+#include "messages/hoymileslimitmessage.h"
 #include "messages/hoymilesmessage.h"
 #include <Hoymiles.h>
 
@@ -27,8 +28,8 @@ public:
     for (uint8_t i = 0; i < Hoymiles.getNumInverters(); i++) {
       auto inv = Hoymiles.getInverterByPos(i);
       PDebug.printf(PDebugLevel::DEBUG,
-          "hoymilesplugin: loopInverters inv[%d] lastupdate=%d\n", i,
-          inv->Statistics()->getLastUpdate());
+                    "hoymilesplugin: loopInverters inv[%d] lastupdate=%d\n", i,
+                    inv->Statistics()->getLastUpdate());
       if (inv->Statistics()->getLastUpdate() > 0) {
         for (auto &t : inv->Statistics()->getChannelTypes()) {
           for (auto &c : inv->Statistics()->getChannelsByType(t)) {
@@ -71,37 +72,46 @@ public:
     }
   }
 
-  void setLimit(String& inverterId, float limit) {
+  void setLimit(String &inverterId, float limit) {
     std::shared_ptr<InverterAbstract> inv = nullptr;
     for (uint8_t i = 0; i < Hoymiles.getNumInverters(); i++) {
       auto serachinv = Hoymiles.getInverterByPos(i);
-      if(serachinv->serialString().equals(inverterId)) {
+      if (serachinv->serialString().equals(inverterId)) {
         inv = serachinv;
         break;
       }
     }
-    PDebug.printf(PDebugLevel::DEBUG,
-        "hoymilesplugin: sendActivePowerControlRequest %f W to %s\n", limit,
-        inv->serialString().c_str());
+    if (inv != nullptr) {
+      PDebug.printf(
+          PDebugLevel::DEBUG,
+          "hoymilesplugin: sendActivePowerControlRequest %f W to %s\n", limit,
+          inv->serialString().c_str());
+    } else {
+      PDebug.printf(PDebugLevel::DEBUG,
+                    "hoymilesplugin: inverter(%s) not found!\n",
+                    inverterId.c_str());
+    }
     // TODO: remove :)
     return;
     if (inv != nullptr) {
       if (inv->sendActivePowerControlRequest(
               limit, PowerLimitControlType::AbsolutNonPersistent)) {
-        PDebug.printf(PDebugLevel::DEBUG,
+        PDebug.printf(
+            PDebugLevel::DEBUG,
             "hoymilesplugin: sendActivePowerControlRequest %f W to %s -> OK!\n",
             limit, inv->serialString().c_str());
       } else {
-        PDebug.printf(PDebugLevel::DEBUG,"hoymilesplugin: sendActivePowerControlRequest %f "
-                             "W to %s -> FAILED!\n",
-                             limit, inv->serialString().c_str());
+        PDebug.printf(PDebugLevel::DEBUG,
+                      "hoymilesplugin: sendActivePowerControlRequest %f "
+                      "W to %s -> FAILED!\n",
+                      limit, inv->serialString().c_str());
       }
     }
   }
 
   void publishAC(uint64_t serial, String serialString, float actpower) {
-    PDebug.printf(PDebugLevel::DEBUG,"hoymilesplugin: publishAC[%s]: %f\n",
-                         serialString.c_str(), actpower);
+    PDebug.printf(PDebugLevel::DEBUG, "hoymilesplugin: publishAC[%s]: %f\n",
+                  serialString.c_str(), actpower);
 
     HoymilesMessage message(*this);
     message.inverterId = serialString;
@@ -111,7 +121,8 @@ public:
   void inverterCallback(int fieldId, int channelNumber, uint64_t inverterSerial,
                         String inverterStringSerial, float value) {
     if (fieldId == FieldId_t::FLD_PAC && channelNumber == ChannelNum_t::CH0) {
-      PDebug.printf(PDebugLevel::DEBUG,"hoymilesplugin: new ac power: %f\n", value);
+      PDebug.printf(PDebugLevel::DEBUG, "hoymilesplugin: new ac power: %f\n",
+                    value);
       publishAC(inverterSerial, inverterStringSerial, value);
     }
   }
@@ -120,6 +131,8 @@ public:
   }
   void internalCallback(std::shared_ptr<PluginMessage> message) {
     // DBGPRINTMESSAGELNCB(DBG_INFO, getName(), message);
+    PDebug.printf(PDebugLevel::DEBUG, "hoymilesplugin: internalCallback: %s\n",
+                  message.get()->getMessageTypeString());
     if (message->isMessageType<HoymilesLimitMessage>()) {
       HoymilesLimitMessage *m = (HoymilesLimitMessage *)message.get();
       handleMessage(m);

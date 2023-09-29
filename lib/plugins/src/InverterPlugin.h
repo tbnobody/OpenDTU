@@ -2,6 +2,7 @@
 
 #include "base/plugin.h"
 #include "messages/hoymilesmessage.h"
+#include "messages/hoymileslimitmessage.h"
 #include "messages/invertermessage.h"
 #include "messages/powercontrolmessage.h"
 

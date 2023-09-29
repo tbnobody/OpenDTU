@@ -55,6 +55,9 @@ public:
     auto v = std::static_pointer_cast<U>(this);
     return *v.get();
   }
+  virtual const char* getMessageTypeString() {
+    return "PluginMessage";
+  }
 
 protected:
   void setSenderId(int id) { senderId = id; }
