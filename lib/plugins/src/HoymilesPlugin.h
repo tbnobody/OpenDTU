@@ -85,6 +85,7 @@ public:
       PDebug.printf(PDebugLevel::INFO,
                     "hoymilesplugin: inverter[%s] set powerlimit not allowed\n",
                     inv->serialString().c_str());
+      return;
     }
     if (limit < limit_minimum_w) {
       limit = limit_minimum_w;
