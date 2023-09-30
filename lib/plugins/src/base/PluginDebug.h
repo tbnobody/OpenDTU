@@ -4,7 +4,7 @@
 #include <stddef.h>
 #include <Print.h>
 
-enum PDebugLevel { NONE, INFO, DEBUG, TRACE };
+enum PDebugLevel { NONE, WARN, INFO, DEBUG, TRACE };
 
 class PDebugClass {
     public:

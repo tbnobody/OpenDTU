@@ -102,51 +102,18 @@ public:
       if (request.containsKey("debug")) {
         if (request.containsKey("opendtu")) {
           int level = request["level"];
-          switch (level) {
-          case MessageOutputDebugLevel::DEBUG_NONE: {
-            MessageOutput.setLevel(MessageOutputDebugLevel::DEBUG_NONE);
-            break;
+          if (level >= MessageOutputDebugLevel::DEBUG_NONE &&
+              level <= MessageOutputDebugLevel::DEBUG_TRACE) {
+            MessageOutput.setLevel((MessageOutputDebugLevel)level);
+            return true;
           }
-          case MessageOutputDebugLevel::DEBUG_INFO: {
-            MessageOutput.setLevel(MessageOutputDebugLevel::DEBUG_INFO);
-            break;
-          }
-          case MessageOutputDebugLevel::DEBUG_DEBUG: {
-            MessageOutput.setLevel(MessageOutputDebugLevel::DEBUG_DEBUG);
-            break;
-          }
-          case MessageOutputDebugLevel::DEBUG_TRACE: {
-            MessageOutput.setLevel(MessageOutputDebugLevel::DEBUG_TRACE);
-            break;
-          }
-          default: {
-          }
-          }
-          return true;
         }
         if (request.containsKey("plugins")) {
           int level = request["level"];
-          switch (level) {
-          case PDebugLevel::NONE: {
-            PDebug.setLevel(PDebugLevel::NONE);
-            break;
+          if (level >= PDebugLevel::NONE && level <= PDebugLevel::TRACE) {
+            PDebug.setLevel((PDebugLevel)level);
+            return true;
           }
-          case PDebugLevel::INFO: {
-            PDebug.setLevel(PDebugLevel::INFO);
-            break;
-          }
-          case PDebugLevel::DEBUG: {
-            PDebug.setLevel(PDebugLevel::DEBUG);
-            break;
-          }
-          case PDebugLevel::TRACE: {
-            PDebug.setLevel(PDebugLevel::TRACE);
-            break;
-          }
-          default: {
-          }
-          }
-          return true;
         }
       }
     }
