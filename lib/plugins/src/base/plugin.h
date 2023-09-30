@@ -28,17 +28,15 @@ public:
   /**
    * setup
    *
-   * called at end of ahoi main setup
+   * called at end of main setup
    *
-   * @param app - pointer to ahoi settings
    */
   virtual void setup();
   /**
    * loop
    *
-   * called at end of ahoi main loop
+   * called at end of main loop
    *
-   * @param app - pointer to ahoi app
    */
   virtual void loop();
 
@@ -49,7 +47,7 @@ public:
    *
    *  @param PluginMessage
    */
-  virtual void internalCallback(std::shared_ptr<PluginMessage> message) = 0;
+  virtual void internalCallback(std::shared_ptr<PluginMessage> message);
   /**
    * called when json message was posted to /thirdpartyplugins.
    * message must contain either 'pluginid' or 'pluginname'.
@@ -107,12 +105,6 @@ protected:
   void addTimerCb(PLUGIN_TIMER_INTVAL intvaltype, uint32_t interval,
                   std::function<void(void)> timerCb, const char *timername);
 
-  // void publishInternalValues(IdEntity...  &elements) {
-  //     if (system)
-  //     {
-  //         system->publishInternalValues(this,elements);
-  //     }
-  // }
   /**
    * @brief publish internal message to all plugins
    *
