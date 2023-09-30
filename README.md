@@ -35,13 +35,13 @@ So i can continue producing core dumps.
 * [loose coupling](https://en.wikipedia.org/wiki/Loose_coupling)
 * experimental: use core1 of ESP32 (on dualcore hardware)
 
-## whats the architecture
+## the architecture
 
 ### sw parts
 
 We got a system, plugins and messages.  
 System provides some basic services (timer callbacks, mqtt subscriptions, configuration, http callbacks, etc.)  
-A Plugin is a encapsulated independend software code which is
+A Plugin is a encapsulated independent software code which is
 executed within the main application software loop function (more or less).  
 A Plugin can send and receive messages.
 Messages can be send to a specific receiver or to all (broadcast).
