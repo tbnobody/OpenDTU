@@ -81,18 +81,27 @@ public:
         break;
       }
     }
+    if (!allow_limitation) {
+      PDebug.printf(PDebugLevel::INFO,
+                    "hoymilesplugin: inverter[%s] set powerlimit not allowed\n",
+                    inv->serialString().c_str());
+    }
+    if (limit < limit_minimum_w) {
+      limit = limit_minimum_w;
+      PDebug.printf(PDebugLevel::INFO,
+                    "hoymilesplugin: inverter[%s] minimum limit is %f W\n",
+                    inv->serialString().c_str(), limit_minimum_w);
+    }
     if (inv != nullptr) {
       PDebug.printf(
-          PDebugLevel::DEBUG,
+          PDebugLevel::INFO,
           "hoymilesplugin: sendActivePowerControlRequest %f W to %s\n", limit,
           inv->serialString().c_str());
     } else {
-      PDebug.printf(PDebugLevel::DEBUG,
+      PDebug.printf(PDebugLevel::WARN,
                     "hoymilesplugin: inverter(%s) not found!\n",
                     inverterId.c_str());
     }
-    // TODO: remove :)
-    return;
     if (inv != nullptr) {
       if (inv->sendActivePowerControlRequest(
               limit, PowerLimitControlType::AbsolutNonPersistent)) {
@@ -139,5 +148,19 @@ public:
     }
   }
 
+  void saveSettings(JsonObject settings) {
+    settings[F("allow_limitation")] = allow_limitation;
+    settings[F("limit_minimum_w")] = limit_minimum_w;
+  }
+
+  void loadSettings(JsonObject settings) {
+    if (settings.containsKey(F("allow_limitation")))
+      allow_limitation = settings[F("allow_limitation")];
+    if (settings.containsKey(F("limit_minimum_w")))
+      limit_minimum_w = settings[F("limit_minimum_w")];
+  }
+
 private:
+  float limit_minimum_w = 50;
+  bool allow_limitation = false;
 };
