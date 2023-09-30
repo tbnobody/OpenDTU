@@ -11,6 +11,9 @@
 #include "PowercontrolPlugin.h"
 #include "PublishPlugin.h"
 #include "demoplugin.h"
+#if __has_include("customplugin.h")
+#include "customplugin.h"
+#endif
 
 PluginsClass Plugins;
 
@@ -155,6 +158,11 @@ void pluginTaskFunc(void *parameter) {
 }
 #endif
 
+void PluginsClass::addCustomPlugins() {
+  // add additional plugins here
+  // plugins.push_back(std::make_unique<{PluginClassName}>({PluginClassName}()));
+}
+
 void PluginsClass::init() {
   MessageOutput.setLevel(MessageOutputDebugLevel::DEBUG_INFO);
   PDebug.setPrint(&MessageOutput);
@@ -167,6 +175,10 @@ void PluginsClass::init() {
   publishP.mqttMessageCB(
       std::bind(&PluginsClass::mqttMessageCB, this, std::placeholders::_1));
   plugins.push_back(std::make_unique<PublishPlugin>(publishP));
+#if __has_include("customplugin.h")
+  plugins.push_back(std::make_unique<MyCustomPlugin>(MyCustomPlugin()));
+#endif
+  addCustomPlugins();
 
   for (unsigned int i = 0; i < plugins.size(); i++) {
     plugins[i]->setSystem(this);

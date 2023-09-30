@@ -29,6 +29,7 @@ public:
     void start(Plugin* p);
     
 private:
+    void addCustomPlugins();
     void addPlugin(std::unique_ptr<Plugin> &p);
     void publishToReceiver(std::shared_ptr<PluginMessage> mes);
     void publishToAll(std::shared_ptr<PluginMessage> message);
