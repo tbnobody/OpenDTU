@@ -59,7 +59,7 @@ WDT reset probability: 99.99%
 
 #### single queue message exchange
 
-Each sent message will be inserted into a message queue, which will be handled by 'first-in-first-out' principle.
+Each message will be inserted into a message queue, which will be processed by 'first-in-first-out' principle.
 ![singlequeue](docs/pp/singlequeue.svg)
 
 #### multi queue message exchange
@@ -118,17 +118,13 @@ save and do
 pio run -t upload -t monitor
 ```
 Plugins are disabled by default.  
-So you have to the WebUI (Settings -> Plugins -> mycustomplugin) to enable it first.
+So you have to use the WebUI (Settings -> Plugins -> mycustomplugin) to enable it first.
 
 ![webui](docs/pp/plugin_webui.png)
 
 ![plugins](docs/pp/plugin_list.png)
 
 ![mycustomplugin](docs/pp/plugin_enable.png)
-
-
-
-
 
 
 ### send mqtt message to plugin
