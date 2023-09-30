@@ -10,7 +10,7 @@
 #include "PluginConfiguration.h"
 #include "PowercontrolPlugin.h"
 #include "PublishPlugin.h"
-#include "demoplugin.h"
+#include "develsupportplugin.h"
 #if __has_include("customplugin.h")
 #include "customplugin.h"
 #endif
@@ -166,7 +166,7 @@ void PluginsClass::addCustomPlugins() {
 void PluginsClass::init() {
   MessageOutput.setLevel(MessageOutputDebugLevel::DEBUG_INFO);
   PDebug.setPrint(&MessageOutput);
-  plugins.push_back(std::make_unique<demoPlugin>(demoPlugin()));
+  plugins.push_back(std::make_unique<DevelSupportPlugin>(DevelSupportPlugin()));
   plugins.push_back(std::make_unique<HoymilesPlugin>(HoymilesPlugin()));
   plugins.push_back(std::make_unique<MeterPlugin>(MeterPlugin()));
   plugins.push_back(std::make_unique<InverterPlugin>(InverterPlugin()));

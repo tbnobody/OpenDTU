@@ -1,6 +1,5 @@
 #pragma once
 
-#include "messages/demomessage.h"
 #include "messages/invertermessage.h"
 #include "messages/metermessage.h"
 #include "messages/mqttmessage.h"
