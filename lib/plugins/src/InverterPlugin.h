@@ -157,6 +157,10 @@ public:
           "InverterPlugin: found inverter with id %s\n",
           inverterId.c_str());
       setInverterLimit(inverter, limit);
+    } else {
+      PDebug.printf(PDebugLevel::WARN,
+          "InverterPlugin: inverter(%s) not found!\n",
+          inverterId.c_str());
     }
   }
 
