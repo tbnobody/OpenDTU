@@ -100,13 +100,14 @@ void PluginSingleQueueMessagePublisher::loop() {
 }
 
 PluginMultiQueueMessagePublisher::PluginMultiQueueMessagePublisher(
-    std::vector<std::unique_ptr<Plugin>> &p)
-    : PluginMessagePublisher(p) {}
+    std::vector<std::unique_ptr<Plugin>> &p, bool subscriptionForced_)
+    : PluginMessagePublisher(p), subscriptionForced(subscriptionForced_) {}
 
 void PluginMultiQueueMessagePublisher::publishTo(
     int pluginId, const std::shared_ptr<PluginMessage> &message) {
   if (message.get()->getSenderId() == pluginId)
     return;
+
   if (!(queues.find(pluginId) != queues.end())) {
     queues.insert(
         {pluginId,
@@ -123,8 +124,17 @@ void PluginMultiQueueMessagePublisher::publishToReceiver(
 void PluginMultiQueueMessagePublisher::publishToAll(
     const std::shared_ptr<PluginMessage> &message) {
   for (int i = 0; i < getPluginCount(); i++) {
-    int pluginId = getPluginByIndex(i)->getId();
-    publishTo(pluginId, message);
+    auto plugin = getPluginByIndex(i);
+    /*
+    PDebug.printf(PDebugLevel::WARN, "%s is subscribed for %s(%d) ? %d\n",
+                  PluginDebug::getPluginNameDebug(plugin->getId()),
+                  message.get()->getMessageTypeString(),
+                  message.get()->getMessageTypeId(),
+                  plugin->isSubscribed(message));
+                  */
+    if (subscriptionForced && !plugin->isSubscribed(message))
+      continue;
+    publishTo(plugin->getId(), message);
   }
 }
 

@@ -69,3 +69,11 @@ void Plugin::removeTimerCb(const char *timername) {
     system->removeTimerCb(this, timername);
   }
 }
+
+bool Plugin::isSubscribed(const std::shared_ptr<PluginMessage>& m) {
+  auto b = subscriptions.find(m.get()->getMessageTypeId());
+  if (b != subscriptions.end())
+    return b->second;
+  else
+    return false;
+}

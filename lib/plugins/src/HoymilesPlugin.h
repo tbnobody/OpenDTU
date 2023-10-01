@@ -14,7 +14,9 @@ class HoymilesPlugin : public Plugin {
 public:
   HoymilesPlugin() : Plugin(20, "hoymilesinverter") {}
 
-  void setup() {}
+  void setup() {
+    subscribe<HoymilesLimitMessage>();
+  }
   void loop() {}
   void onTickerSetup() {
     addTimerCb(
@@ -124,8 +126,10 @@ public:
                   serialString.c_str(), actpower);
 
     HoymilesMessage message(*this);
+    message.setReceiverId(PluginIds::PluginInverter);
     message.inverterId = serialString;
     message.value = actpower;
+    message.unit = Unit::W;
     publishMessage(message);
   }
   void inverterCallback(int fieldId, int channelNumber, uint64_t inverterSerial,

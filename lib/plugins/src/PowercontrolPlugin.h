@@ -36,7 +36,10 @@ class PowercontrolPlugin : public Plugin {
 public:
   PowercontrolPlugin() : Plugin(3, "powercontrol") {}
 
-  void setup() {}
+  void setup() {
+    subscribe<MeterMessage>();
+    subscribe<InverterMessage>();
+  }
   void loop() {
     for (int i = 0; i < powercontrollers.size(); i++) {
       if (powercontrollers[i].update) {

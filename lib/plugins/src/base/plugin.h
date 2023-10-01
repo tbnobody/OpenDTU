@@ -1,18 +1,17 @@
 #pragma once
 
 #include "Hoymiles.h"
+#include "PluginDebug.h"
 #include "globals.h"
 #include "pluginmessages.h"
 #include "system.h"
 #include <ArduinoJson.h>
 #include <functional>
 #include <string>
-#include "PluginDebug.h"
 
 /**
  * Plugin interface
  */
-
 
 class Plugin {
 public:
@@ -25,6 +24,8 @@ public:
   void loadPluginSettings(JsonObject s);
   void savePluginSettings(JsonObject s);
   void setSystem(System<Plugin> *s);
+  bool isSubscribed(const std::shared_ptr<PluginMessage>& m);
+
   /**
    * setup
    *
@@ -117,17 +118,29 @@ protected:
    * @param valueid - value identifier
    * @param value
    */
-  template <typename T>
-  void publishMessage(T &message) {
+  template <typename T> void publishMessage(T &message) {
     if (system) {
       auto m = std::make_shared<T>(message);
       system->getPublisher().publish(m);
     }
   }
 
+  template <typename T> void subscribe() {
+    static_assert(std::is_base_of<PluginMessage, T>::value,
+                  "T must derive from PluginMessage");
+    subscriptions[EntityIds<T>::type_id] = true;
+  }
+    template <typename T> void unsubscribe() {
+    static_assert(std::is_base_of<PluginMessage, T>::value,
+                  "T must derive from PluginMessage");
+    subscriptions[EntityIds<T>::type_id]=false;
+  }
+
+
 private:
   int id;
   const char *name;
   System<Plugin> *system = nullptr;
+  std::map<int, bool> subscriptions;
   bool enabled = false;
 };

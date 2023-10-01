@@ -52,13 +52,12 @@ public:
   template <typename U> bool isMessageType() {
     return (EntityIds<U>::type_id == type_id);
   }
+  int getMessageTypeId() { return type_id; }
   template <typename U> U &getMessageAs() {
     auto v = std::static_pointer_cast<U>(this);
     return *v.get();
   }
-  virtual const char* getMessageTypeString() {
-    return "PluginMessage";
-  }
+  virtual const char *getMessageTypeString() { return "PluginMessage"; }
 
 protected:
   void setSenderId(int id) { senderId = id; }

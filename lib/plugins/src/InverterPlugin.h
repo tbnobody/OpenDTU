@@ -42,7 +42,9 @@ class InverterPlugin : public Plugin {
 public:
   InverterPlugin() : Plugin(1, "inverter") {}
 
-  void setup() {}
+  void setup() {
+    subscribe<PowerControlMessage>();
+  }
   void loop() {
     for (int i = 0; i < inverters.size(); i++) {
       if (inverters[i].updateInverter) {

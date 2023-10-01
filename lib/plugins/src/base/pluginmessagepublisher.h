@@ -50,7 +50,7 @@ private:
 
 class PluginMultiQueueMessagePublisher : public PluginMessagePublisher {
 public:
-  PluginMultiQueueMessagePublisher(std::vector<std::unique_ptr<Plugin>> &p);
+  PluginMultiQueueMessagePublisher(std::vector<std::unique_ptr<Plugin>> &p, bool subscriptionForced_=true);
   virtual ~PluginMultiQueueMessagePublisher() {}
 
   void loop();
@@ -61,5 +61,6 @@ protected:
   virtual void publishTo(int pluginId,const std::shared_ptr<PluginMessage> &message);
     
 private:
+  bool subscriptionForced;
   std::map<int,std::shared_ptr<ThreadSafeQueue<std::shared_ptr<PluginMessage>>>> queues;
 };
