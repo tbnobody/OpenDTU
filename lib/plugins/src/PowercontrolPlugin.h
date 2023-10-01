@@ -31,7 +31,6 @@ public:
 };
 
 class PowercontrolPlugin : public Plugin {
-  enum pluginIds { INVERTER, INVERTERSTRING, POWERLIMIT };
 
 public:
   PowercontrolPlugin() : Plugin(3, "powercontrol") {}
@@ -46,11 +45,16 @@ public:
         powercontrollers[i].update = false;
         PDebug.printf(PDebugLevel::DEBUG,
                       "powercontrol powercontrollers[%d].update\n", i);
-        if (calcLimit(powercontrollers[i])) {
+        if (isInitialized(powercontrollers[i]) &&
+            calcLimit(powercontrollers[i])) {
           publishLimit(powercontrollers[i]);
         }
       }
     }
+  }
+
+  inline bool isInitialized(powercontrolstruct &powercontrol) {
+    return (powercontrol.consumptionTs != 0 && powercontrol.productionTs != 0);
   }
 
   inline bool calcLimit(powercontrolstruct &powercontrol) {
@@ -85,7 +89,8 @@ public:
     powercontrolstruct *powercontrol =
         powercontrollers.getInverterById(m->inverterId);
     if (powercontrol) {
-      updateProduction(powercontrol, Units.convert(m->unit, Unit::W, m->value));
+      updateProduction(powercontrol, Units.convert(m->unit, Unit::W, m->value),
+                       m->getTS());
     } else {
       PDebug.printf(PDebugLevel::WARN,
                     "powercontrol inverterId(%s) not configured\n",
@@ -93,8 +98,10 @@ public:
     }
   }
 
-  void updateProduction(powercontrolstruct *powercontrol, float power) {
+  void updateProduction(powercontrolstruct *powercontrol, float power,
+                        unsigned long ts) {
     powercontrol->production = power;
+    powercontrol->productionTs = ts;
     powercontrol->update = true;
     PDebug.printf(PDebugLevel::DEBUG, "powercontrol update production: %f\n",
                   powercontrol->production);
@@ -105,8 +112,8 @@ public:
     powercontrolstruct *powercontrol =
         powercontrollers.getMeterByStringSerial(meterserial);
     if (powercontrol) {
-      updateConsumption(powercontrol,
-                        Units.convert(m->unit, Unit::W, m->power));
+      updateConsumption(powercontrol, Units.convert(m->unit, Unit::W, m->power),
+                        m->getTS());
     } else {
       PDebug.printf(PDebugLevel::WARN,
                     "powercontrol meterserial(%s) not configured\n",
@@ -114,8 +121,10 @@ public:
     }
   }
 
-  void updateConsumption(powercontrolstruct *powercontrol, float consumption) {
+  void updateConsumption(powercontrolstruct *powercontrol, float consumption,
+                         unsigned long ts) {
     powercontrol->consumption = consumption;
+    powercontrol->consumptionTs = ts;
     powercontrol->update = true;
     PDebug.printf(PDebugLevel::DEBUG, "powercontrol update consumption: %f\n",
                   powercontrol->consumption);

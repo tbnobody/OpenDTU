@@ -6,6 +6,8 @@ typedef struct {
   float limit = 0.0;
   uint32_t threshold = 0;
   float consumption = 0.0;
+  unsigned long consumptionTs = 0;
+  unsigned long productionTs = 0;
   float production = 0.0;
   bool update = false;
 } powercontrolstruct;
