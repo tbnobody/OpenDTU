@@ -44,6 +44,7 @@ public:
         case TYPEIDS::METERMESSAGE_TYPE: {
           MeterMessage m(*this);
           m.power = request["power"];
+          m.unit = Units.toUnit(request["unit"]);
           m.serial = request["serial"].as<String>();
           publishMessage(m);
           break;
@@ -51,6 +52,7 @@ public:
         case TYPEIDS::HOYMILESMESSAGE_TYPE: {
           HoymilesMessage m(*this);
           m.value = request["power"];
+          m.unit = Units.toUnit(request["unit"]);
           m.inverterId = request["serial"].as<String>();
           publishMessage(m);
           break;

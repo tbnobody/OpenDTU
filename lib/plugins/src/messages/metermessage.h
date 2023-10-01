@@ -8,12 +8,13 @@ public:
   ~MeterMessage() {}
   void setPowerValue(float power_) { power = power_; }
   float power;
+  Unit unit = Unit::W;
   String serial;
   int toString(char *buffer) {
     int c = sprintf(buffer, "MeterMessage{base=");
     c = c + PluginMessage::toString(buffer + c);
     c = c +
-        sprintf(buffer + c, ", meterid=%s, power=%f}", serial.c_str(), power);
+        sprintf(buffer + c, ", meterid=%s, power=%f, unit=%s}", serial.c_str(), power, Units.toStr(unit));
     return c;
   }
   virtual const char *getMessageTypeString() { return "MeterMessage"; }

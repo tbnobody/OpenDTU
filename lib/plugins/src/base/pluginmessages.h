@@ -4,6 +4,7 @@
 #if __has_include("base/pluginids.h")
 #include "base/pluginids.h"
 #endif
+#include "Unit.h"
 
 class Plugin;
 

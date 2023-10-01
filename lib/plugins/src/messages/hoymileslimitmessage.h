@@ -13,11 +13,12 @@ public:
   ~HoymilesLimitMessage() {}
   String inverterId;
   float limit;
+  Unit unit = Unit::W;
   int toString(char *buffer) {
     int c = sprintf(buffer, "HoymilesLimitMessage{base=");
     c = c + PluginMessage::toString(buffer + c);
     c = c +
-        sprintf(buffer + c, ", id=%s, limit=%f}", inverterId.c_str(), limit);
+        sprintf(buffer + c, ", id=%s, limit=%f, unit=%s}", inverterId.c_str(), limit, Units.toStr(unit));
     return c;
   }
   virtual const char *getMessageTypeString() { return "HoymilesLimitMessage"; }
