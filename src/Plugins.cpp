@@ -22,13 +22,28 @@ void PluginsClass::loop() {
 
   EVERY_N_SECONDS(1) {
     pluginsloop++;
-    for (uint32_t i = 0; i < timercbs.size(); i++) {
-      if ((pluginsloop % timercbs[i].interval) == 0) {
-        // PDebug.printf(PDebugLevel::DEBUG,"PluginsClass timercb call: %s\n",
-        // timercbs[i].timername);
-        timercbs[i].timerCb();
-        yield();
+    if (timercbs.size() > 0) {
+      auto it = timercbs.begin();
+      while (it != timercbs.end()) {
+        if ((pluginsloop % it->interval) == 0) {
+          PDebug.printf(PDebugLevel::INFO, "PluginsClass timercb call: %s\n",
+                        it->timername);
+          it->timerCb();
+          yield();
+        }
+        if (!it->valid) {
+          // erase while iterating should be safe .. according to the internet
+          // ;)
+          it = timercbs.erase(it);
+        } else {
+          it++;
+        }
       }
+    }
+    // move new timers
+    if (timercbsnew.size() > 0) {
+      auto it = timercbs.end();
+      timercbs.splice(it,timercbsnew);
     }
   }
   publishInternal();
@@ -70,6 +85,29 @@ void PluginsClass::addTimerCb(Plugin *plugin, const char *timername,
                               std::function<void(void)> timerCb) {
   // PDebug.printf(PDebugLevel::DEBUG,"PluginsClass::addTimerCb sender=%d\n",
   // plugin->getId());
+  if (timercbs.size() > 0) {
+    auto it =
+        std::find_if(begin(timercbs), end(timercbs), [timername](auto &e) {
+          return ((strcmp(e.timername, timername) == 0) && e.valid);
+        });
+    if (it != std::end(timercbs)) {
+      PDebug.printf(PDebugLevel::WARN,
+                    "PluginsClass: addTimerCb(%s): timername exists!\n",
+                    timername);
+      return;
+    }
+  }
+  if (timercbsnew.size() > 0) {
+    auto it = std::find_if(
+        begin(timercbsnew), end(timercbsnew),
+        [timername](auto &e) { return (strcmp(e.timername, timername) == 0); });
+    if (it != std::end(timercbsnew)) {
+      PDebug.printf(PDebugLevel::WARN,
+                    "PluginsClass: addTimerCb(%s): timername exists!\n",
+                    timername);
+      return;
+    }
+  }
   timerentry entry;
   entry.timername = timername;
   uint32_t timerintval = interval;
@@ -78,7 +116,20 @@ void PluginsClass::addTimerCb(Plugin *plugin, const char *timername,
   }
   entry.interval = timerintval;
   entry.timerCb = timerCb;
-  timercbs.push_back(entry);
+  entry.valid = true;
+  timercbsnew.push_back(entry);
+  PDebug.printf(PDebugLevel::WARN, "PluginsClass: addTimerCb(%s)\n", timername);
+}
+
+void PluginsClass::removeTimerCb(Plugin *plugin, const char *timername) {
+  for (auto &entry : timercbs) {
+    if (strcmp(entry.timername, timername) == 0) {
+      PDebug.printf(PDebugLevel::DEBUG, "PluginsClass: removeTimerCb (%s)\n",
+                    timername);
+      entry.valid = false;
+      break;
+    }
+  }
 }
 
 void PluginsClass::mqttMessageCB(MqttMessage *message) {

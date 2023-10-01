@@ -104,6 +104,12 @@ protected:
    */
   void addTimerCb(PLUGIN_TIMER_INTVAL intvaltype, uint32_t interval,
                   std::function<void(void)> timerCb, const char *timername);
+  /**
+   * @brief remove timer callback.
+   *
+   * @param timername
+   */
+  void removeTimerCb(const char *timername);
 
   /**
    * @brief publish internal message to all plugins

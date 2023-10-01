@@ -7,7 +7,8 @@
  */
 
 Plugin::Plugin(int _id, const char *_name) : id(_id), name(_name) {}
-Plugin::Plugin(int _id, const char *_name, bool alwaysActive) : id(_id), name(_name), enabled(alwaysActive) {}
+Plugin::Plugin(int _id, const char *_name, bool alwaysActive)
+    : id(_id), name(_name), enabled(alwaysActive) {}
 int Plugin::getId() { return id; }
 const char *Plugin::getName() { return name; }
 bool Plugin::isEnabled() { return enabled; }
@@ -60,5 +61,11 @@ void Plugin::addTimerCb(PLUGIN_TIMER_INTVAL intvaltype, uint32_t interval,
                         const char *timername) {
   if (system) {
     system->addTimerCb(this, timername, intvaltype, interval, timerCb);
+  }
+}
+
+void Plugin::removeTimerCb(const char *timername) {
+  if (system) {
+    system->removeTimerCb(this, timername);
   }
 }

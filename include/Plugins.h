@@ -22,6 +22,7 @@ public:
     PluginMessagePublisher& getPublisher();
     //void publishMessage(Plugin* sender, PluginMessage& message);
     void addTimerCb(Plugin* plugin, const char* timername, PLUGIN_TIMER_INTVAL intval, uint32_t interval, std::function<void(void)> timerCb);
+    void removeTimerCb(Plugin* plugin, const char* timername);
     Plugin* getPluginByIndex(int pluginindex);
     Plugin* getPluginById(int pluginid);
     Plugin* getPluginByName(const char* pluginname);
@@ -44,8 +45,10 @@ private:
         const char* timername;
         uint32_t interval;
         std::function<void(void)> timerCb;
+        bool valid = true;
     } timerentry;
-    std::vector<timerentry> timercbs;
+    std::list<timerentry> timercbs;
+    std::list<timerentry> timercbsnew;
     PluginMultiQueueMessagePublisher publisher;
     TaskHandle_t pluginTask;
 };
