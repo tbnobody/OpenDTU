@@ -69,6 +69,19 @@ A priority-based (by message or receiver) delivery could be implemented easily.
 
 ![multiqueue](docs/pp/multiqueue.svg)
 
+## ATTENTION!
+
+Multi queue message excange comes in two flavours
+### broadcast 
+Each message will be sent to every plugin (receiver)
+
+or
+
+### subscription
+  Each plugin (receiver) has to add a subscription for message types it wants to receive.
+  
+___Default: multi queue subscription message___
+
 
 ## how to add a custom plugin
 
@@ -339,7 +352,8 @@ public:
 
 ```
 
-The sender is excluded from message delivery (which makes sense), so we take a look at the debug output.
+The sender is excluded from message delivery (which makes sense), so we take a look at the debug output.  
+['multi queue broadcast mode'](#broadcast)
 
 ```
 ...
@@ -375,6 +389,25 @@ pluginqueue 'Powercontrol' 81 [ms] - MyCustomMessage{somevalue=1.000000}
 Congratulations!  
 We flooded the system with useless information.  
 Mission accomplished!
+
+---
+
+To receive a broadcast in 
+['multi queue subscription mode'](#subscription) a subscription is necessary.
+
+```c++
+class SomeOtherPlugin : public Plugin {
+
+... 
+
+void setup() {
+  subscribe<MyCustomMessage>();
+}
+
+...
+
+};
+```
 
 ### send to specific receiver
 
