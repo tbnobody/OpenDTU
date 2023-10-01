@@ -126,7 +126,6 @@ public:
                   serialString.c_str(), actpower);
 
     HoymilesMessage message(*this);
-    message.setReceiverId(PluginIds::PluginInverter);
     message.inverterId = serialString;
     message.value = actpower;
     message.unit = Unit::W;

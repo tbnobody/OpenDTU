@@ -44,6 +44,7 @@ public:
 
   void setup() {
     subscribe<PowerControlMessage>();
+    subscribe<HoymilesMessage>();
   }
   void loop() {
     for (int i = 0; i < inverters.size(); i++) {
@@ -89,7 +90,7 @@ public:
       inverter.actlimit = inverter.newlimit;
       inverter.limitTs = millis();
       // TODO: do we need a response message from hoymilesplugin
-      HoymilesLimitMessage m(*this, PluginIds::PluginHoymilesinverter);
+      HoymilesLimitMessage m(*this);
       m.inverterId = inverter.inverterId;
       m.limit = inverter.newlimit;
       publishMessage(m);
