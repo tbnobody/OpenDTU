@@ -26,7 +26,7 @@ void PluginsClass::loop() {
       auto it = timercbs.begin();
       while (it != timercbs.end()) {
         if ((pluginsloop % it->interval) == 0) {
-          PDebug.printf(PDebugLevel::INFO, "PluginsClass timercb call: %s\n",
+          PDebug.printf(PDebugLevel::TRACE, "PluginsClass timercb call: %s\n",
                         it->timername);
           it->timerCb();
           yield();
@@ -118,13 +118,13 @@ void PluginsClass::addTimerCb(Plugin *plugin, const char *timername,
   entry.timerCb = timerCb;
   entry.valid = true;
   timercbsnew.push_back(entry);
-  PDebug.printf(PDebugLevel::WARN, "PluginsClass: addTimerCb(%s)\n", timername);
+  PDebug.printf(PDebugLevel::INFO, "PluginsClass: addTimerCb(%s)\n", timername);
 }
 
 void PluginsClass::removeTimerCb(Plugin *plugin, const char *timername) {
   for (auto &entry : timercbs) {
     if (strcmp(entry.timername, timername) == 0) {
-      PDebug.printf(PDebugLevel::DEBUG, "PluginsClass: removeTimerCb (%s)\n",
+      PDebug.printf(PDebugLevel::INFO, "PluginsClass: removeTimerCb (%s)\n",
                     timername);
       entry.valid = false;
       break;
@@ -136,7 +136,7 @@ void PluginsClass::mqttMessageCB(MqttMessage *message) {
   // we dont care about real topic length, one size fit's all ;)
   //   char topic[128];
   if (!MqttSettings.getConnected()) {
-    PDebug.printf(PDebugLevel::DEBUG,
+    PDebug.printf(PDebugLevel::WARN,
                   "PluginsClass: mqtt not connected. can not send message!");
     return;
   }
@@ -248,5 +248,5 @@ void PluginsClass::init() {
                           &pluginTask,    /* Task handle. */
                           0);             /* Core where the task should run */
 #endif
-  PDebug.printf(PDebugLevel::DEBUG, "PluginsClass::init\n");
+  PDebug.printf(PDebugLevel::INFO, "PluginsClass::init\n");
 }
