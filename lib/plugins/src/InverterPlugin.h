@@ -110,6 +110,7 @@ public:
     InverterMessage message(*this);
     message.inverterId = inverter.inverterId;
     message.value = inverter.actpower;
+    message.unit = Unit::W;
     publishMessage(message);
   }
 
@@ -143,20 +144,17 @@ public:
 
   void handleMessage(HoymilesMessage *message) {
     updateInverter(InverterEnumType::HOYMILES, message->inverterId,
-                   message->value);
+                   Units.convert(message->unit,Unit::W,message->value));
   }
 
   void handleMessage(PowerControlMessage *message) {
-
-    float limit = message->power;
-
     String inverterId = message->inverterId;
     inverterstruct *inverter = inverters.getInverterByInverterId(inverterId);
     if (inverter != nullptr) {
       PDebug.printf(PDebugLevel::DEBUG,
           "InverterPlugin: found inverter with id %s\n",
           inverterId.c_str());
-      setInverterLimit(inverter, limit);
+      setInverterLimit(inverter, Units.convert(message->unit,Unit::W,message->power));
     } else {
       PDebug.printf(PDebugLevel::WARN,
           "InverterPlugin: inverter(%s) not found!\n",

@@ -1,4 +1,5 @@
 #include "Unit.h"
+#include "PluginDebug.h"
 
 UnitsClass Units;
 const char *UnitStr[] = {"", "W", "kW", "wH", "kwH"};
@@ -20,7 +21,11 @@ Unit UnitsClass::toUnit(const char *unit) {
 }
 
 float UnitsClass::convert(Unit from, Unit to, float val) {
-  if (from == Unit::W && to == Unit::kW) {
+  PDebug.printf(PDebugLevel::DEBUG, "UnitsClass: convert %f from %s to %s\n",
+                val, toStr(from), toStr(to));
+  if (from == to) {
+    return val;
+  } else if (from == Unit::W && to == Unit::kW) {
     return (val / 1000);
   } else if (from == Unit::kW && to == Unit::W) {
     return (val * 1000);
@@ -28,7 +33,10 @@ float UnitsClass::convert(Unit from, Unit to, float val) {
     return (val / 1000);
   } else if (from == Unit::kwH && to == Unit::wH) {
     return (val * 1000);
-  }  else {
+  } else {
+    PDebug.printf(PDebugLevel::WARN,
+                  "UnitsClass: convert from %s to %s not possible!\n",
+                  toStr(from), toStr(to));
     return val;
   }
 }

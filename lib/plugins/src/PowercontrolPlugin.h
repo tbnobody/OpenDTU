@@ -53,13 +53,13 @@ public:
   inline bool calcLimit(powercontrolstruct &powercontrol) {
     return algo->calcLimit(powercontrol);
   }
-  void internalDataCallback(PluginMessage *message) {}
 
   void publishLimit(powercontrolstruct &pc) {
-    PowerControlMessage m(*this);
-    m.inverterId = pc.inverterId;
-    m.power = pc.limit;
-    publishMessage(m);
+    publishLimitMessage(pc);
+    publishLimitMqtt(pc);
+  }
+
+  void publishLimitMqtt(powercontrolstruct &pc) {
     char topic[pc.inverterId.length() + 7];
     char payload[32];
     int len = snprintf(payload, sizeof(payload), "%f", pc.limit);
@@ -70,19 +70,31 @@ public:
     publishMessage(mqtt);
   }
 
-  void handleInverterMessage(InverterMessage *message) {
+  void publishLimitMessage(powercontrolstruct &pc) {
+    PowerControlMessage m(*this);
+    m.inverterId = pc.inverterId;
+    m.power = pc.limit;
+    m.unit = Unit::W;
+    publishMessage(m);
+  }
+
+  void handleInverterMessage(InverterMessage *m) {
     powercontrolstruct *powercontrol =
-        powercontrollers.getInverterById(message->inverterId);
+        powercontrollers.getInverterById(m->inverterId);
     if (powercontrol) {
-      powercontrol->production = message->value;
-      powercontrol->update = true;
-      PDebug.printf(PDebugLevel::DEBUG, "powercontrol got production: %f\n",
-                    powercontrol->production);
+      updateProduction(powercontrol, Units.convert(m->unit, Unit::W, m->value));
     } else {
-      PDebug.printf(PDebugLevel::DEBUG,
+      PDebug.printf(PDebugLevel::WARN,
                     "powercontrol inverterId(%s) not configured\n",
-                    message->inverterId.c_str());
+                    m->inverterId.c_str());
     }
+  }
+
+  void updateProduction(powercontrolstruct *powercontrol, float power) {
+    powercontrol->production = power;
+    powercontrol->update = true;
+    PDebug.printf(PDebugLevel::DEBUG, "powercontrol update production: %f\n",
+                  powercontrol->production);
   }
 
   void handleMeterMessage(MeterMessage *m) {
@@ -90,34 +102,33 @@ public:
     powercontrolstruct *powercontrol =
         powercontrollers.getMeterByStringSerial(meterserial);
     if (powercontrol) {
-      powercontrol->consumption = m->power;
-      powercontrol->update = true;
-      PDebug.printf(PDebugLevel::DEBUG, "powercontrol got consumption: %f\n",
-                    powercontrol->consumption);
+      updateConsumption(powercontrol,
+                        Units.convert(m->unit, Unit::W, m->power));
     } else {
-      PDebug.printf(PDebugLevel::DEBUG,
+      PDebug.printf(PDebugLevel::WARN,
                     "powercontrol meterserial(%s) not configured\n",
                     meterserial.c_str());
     }
   }
 
+  void updateConsumption(powercontrolstruct *powercontrol, float consumption) {
+    powercontrol->consumption = consumption;
+    powercontrol->update = true;
+    PDebug.printf(PDebugLevel::DEBUG, "powercontrol update consumption: %f\n",
+                  powercontrol->consumption);
+  }
+
   void internalCallback(std::shared_ptr<PluginMessage> message) {
-    // DBGPRINTMESSAGELNCB(DBG_INFO, getName(), message);
     if (message->isMessageType<InverterMessage>()) {
       InverterMessage *m = (InverterMessage *)message.get();
       handleInverterMessage(m);
     } else if (message->isMessageType<MeterMessage>()) {
       MeterMessage *m = (MeterMessage *)message.get();
       handleMeterMessage(m);
-    } else {
-      PDebug.printf(PDebugLevel::DEBUG,
-                    "powercontrol unhandled message from sender=%d\n",
-                    message->getSenderId());
     }
   }
 
   void initPowercontrol() {
-
     powercontrolstruct *powercontrol = powercontrollers.getEmptyIndex();
     if (powercontrol) {
       powercontrol->inverterId = inverter_serial;
@@ -151,5 +162,5 @@ private:
   uint32_t threshold = 20;
   // powercontrolstruct powercontrol;
   powercontrollerarray<MAX_NUM_INVERTERS> powercontrollers;
-  PowercontrolAlgo* algo = new DefaultPowercontrolAlgo();
+  PowercontrolAlgo *algo = new DefaultPowercontrolAlgo();
 };
