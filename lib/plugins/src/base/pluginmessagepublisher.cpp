@@ -137,7 +137,7 @@ void PluginMultiQueueMessagePublisher::loop() {
     break;
   }
   if (hasMsg)
-    PDebug.printf(PDebugLevel::DEBUG, "mainloop start @core%d\n----\n",
+    PDebug.printf(PDebugLevel::WARN, "mainloop start @core%d\n----\n",
                   xPortGetCoreID());
   unsigned long mainduration = millis();
   for (auto &pair : queues) {
@@ -148,8 +148,8 @@ void PluginMultiQueueMessagePublisher::loop() {
       message.get()->toString(buffer);
       unsigned long duration = millis();
       PluginMessagePublisher::publishTo(pair.first, message);
-      duration -= message.get()->getTS();
-      PDebug.printf(PDebugLevel::DEBUG, "pluginqueue '%s' %lu [ms] - %s\n",
+      duration = millis() - duration;
+      PDebug.printf(PDebugLevel::WARN, "pluginqueue '%s' %lu [ms] - %s\n",
                     PluginDebug::getPluginNameDebug(pair.first), duration,
                     buffer);
 
@@ -161,7 +161,7 @@ void PluginMultiQueueMessagePublisher::loop() {
   }
   if (hasMsg) {
     mainduration = millis() - mainduration;
-    PDebug.printf(PDebugLevel::DEBUG, "mainloop stop - %lu [ms]\n----\n",
+    PDebug.printf(PDebugLevel::WARN, "mainloop stop - %lu [ms]\n----\n",
                   mainduration);
   }
 }
