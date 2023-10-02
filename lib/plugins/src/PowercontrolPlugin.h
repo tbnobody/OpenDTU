@@ -4,7 +4,7 @@
 #include "base/pluginmessages.h"
 #include "base/powercontrolalgo.hpp"
 #include "defaultpowercontrolalgo.hpp"
-#include "messages/invertermessage.h"
+#include "messages/powermessage.h"
 #include "messages/metermessage.h"
 #include "messages/powercontrolmessage.h"
 
@@ -37,7 +37,7 @@ public:
 
   void setup() {
     subscribe<MeterMessage>();
-    subscribe<InverterMessage>();
+    subscribe<PowerMessage>();
   }
   void loop() {
     for (int i = 0; i < powercontrollers.size(); i++) {
@@ -78,23 +78,23 @@ public:
   }
 
   void publishLimitMessage(powercontrolstruct &pc) {
-    PowerControlMessage m(*this);
-    m.inverterId = pc.inverterId;
-    m.power = pc.limit;
+    LimitControlMessage m(*this);
+    m.deviceId = pc.inverterId;
+    m.limit = pc.limit;
     m.unit = Unit::W;
     publishMessage(m);
   }
 
-  void handleInverterMessage(InverterMessage *m) {
+  void handleInverterMessage(PowerMessage *m) {
     powercontrolstruct *powercontrol =
-        powercontrollers.getInverterById(m->inverterId);
+        powercontrollers.getInverterById(m->deviceId);
     if (powercontrol) {
       updateProduction(powercontrol, Units.convert(m->unit, Unit::W, m->value),
                        m->getTS());
     } else {
       PDebug.printf(PDebugLevel::WARN,
                     "powercontrol inverterId(%s) not configured\n",
-                    m->inverterId.c_str());
+                    m->deviceId.c_str());
     }
   }
 
@@ -131,8 +131,8 @@ public:
   }
 
   void internalCallback(std::shared_ptr<PluginMessage> message) {
-    if (message->isMessageType<InverterMessage>()) {
-      InverterMessage *m = (InverterMessage *)message.get();
+    if (message->isMessageType<PowerMessage>()) {
+      PowerMessage *m = (PowerMessage *)message.get();
       handleInverterMessage(m);
     } else if (message->isMessageType<MeterMessage>()) {
       MeterMessage *m = (MeterMessage *)message.get();

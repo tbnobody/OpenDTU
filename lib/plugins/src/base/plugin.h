@@ -24,7 +24,7 @@ public:
   void loadPluginSettings(JsonObject s);
   void savePluginSettings(JsonObject s);
   void setSystem(System<Plugin> *s);
-  bool isSubscribed(const std::shared_ptr<PluginMessage>& m);
+  bool isSubscribed(const std::shared_ptr<PluginMessage> &m);
 
   /**
    * setup
@@ -105,6 +105,19 @@ protected:
    */
   void addTimerCb(PLUGIN_TIMER_INTVAL intvaltype, uint32_t interval,
                   std::function<void(void)> timerCb, const char *timername);
+
+  bool hasTimerCb(const char *timername);
+
+  void execute(std::function<void(void)> func, uint32_t delaySeconds,
+               const char *id) {
+    addTimerCb(
+        PLUGIN_TIMER_INTVAL::SECOND, delaySeconds,
+        [this, &func, id]() {
+          func();
+          removeTimerCb(id);
+        },
+        id);
+  }
   /**
    * @brief remove timer callback.
    *
@@ -130,12 +143,11 @@ protected:
                   "T must derive from PluginMessage");
     subscriptions[EntityIds<T>::type_id] = true;
   }
-    template <typename T> void unsubscribe() {
+  template <typename T> void unsubscribe() {
     static_assert(std::is_base_of<PluginMessage, T>::value,
                   "T must derive from PluginMessage");
-    subscriptions[EntityIds<T>::type_id]=false;
+    subscriptions[EntityIds<T>::type_id] = false;
   }
-
 
 private:
   int id;

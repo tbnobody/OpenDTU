@@ -64,6 +64,13 @@ void Plugin::addTimerCb(PLUGIN_TIMER_INTVAL intvaltype, uint32_t interval,
   }
 }
 
+bool Plugin::hasTimerCb(const char *timername) {
+  if (system) {
+    return system->hasTimerCb(this, timername);
+  }
+  return false;
+}
+
 void Plugin::removeTimerCb(const char *timername) {
   if (system) {
     system->removeTimerCb(this, timername);

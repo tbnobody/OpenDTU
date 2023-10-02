@@ -23,6 +23,7 @@ public:
     //void publishMessage(Plugin* sender, PluginMessage& message);
     void addTimerCb(Plugin* plugin, const char* timername, PLUGIN_TIMER_INTVAL intval, uint32_t interval, std::function<void(void)> timerCb);
     void removeTimerCb(Plugin* plugin, const char* timername);
+    bool hasTimerCb(Plugin* plugin, const char* timername);
     Plugin* getPluginByIndex(int pluginindex);
     Plugin* getPluginById(int pluginid);
     Plugin* getPluginByName(const char* pluginname);

@@ -5,7 +5,6 @@
 #include "string.h"
 
 #include "HoymilesPlugin.h"
-#include "InverterPlugin.h"
 #include "MeterPlugin.h"
 #include "PluginConfiguration.h"
 #include "PowercontrolPlugin.h"
@@ -43,7 +42,7 @@ void PluginsClass::loop() {
     // move new timers
     if (timercbsnew.size() > 0) {
       auto it = timercbs.end();
-      timercbs.splice(it,timercbsnew);
+      timercbs.splice(it, timercbsnew);
     }
   }
   publishInternal();
@@ -130,6 +129,15 @@ void PluginsClass::removeTimerCb(Plugin *plugin, const char *timername) {
       break;
     }
   }
+}
+
+bool PluginsClass::hasTimerCb(Plugin *plugin, const char *timername) {
+  for (auto &entry : timercbs) {
+    if (strcmp(entry.timername, timername) == 0) {
+      return true;
+    }
+  }
+  return false;
 }
 
 void PluginsClass::mqttMessageCB(MqttMessage *message) {
@@ -220,7 +228,6 @@ void PluginsClass::init() {
   plugins.push_back(std::make_unique<DevelSupportPlugin>(DevelSupportPlugin()));
   plugins.push_back(std::make_unique<HoymilesPlugin>(HoymilesPlugin()));
   plugins.push_back(std::make_unique<MeterPlugin>(MeterPlugin()));
-  plugins.push_back(std::make_unique<InverterPlugin>(InverterPlugin()));
   plugins.push_back(std::make_unique<PowercontrolPlugin>(PowercontrolPlugin()));
   PublishPlugin publishP = PublishPlugin();
   publishP.mqttMessageCB(
