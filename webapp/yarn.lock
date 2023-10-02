@@ -375,10 +375,10 @@
   resolved "https://registry.yarnpkg.com/@types/semver/-/semver-7.5.1.tgz#0480eeb7221eb9bc398ad7432c9d7e14b1a5a367"
   integrity sha512-cJRQXpObxfNKkFAZbJl2yjWtJCqELQIdShsogr1d2MilP8dKD9TE/nEKHkJgUNHdGKCQaf9HbIynuV2csLGVLg==
 
-"@types/sortablejs@^1.15.2":
-  version "1.15.2"
-  resolved "https://registry.yarnpkg.com/@types/sortablejs/-/sortablejs-1.15.2.tgz#d51e5ecac00a9782aa256c1401309ce1c4031ba2"
-  integrity sha512-mOIv/EnPMzAZAVbuh9uGjOZ1BBdimP9Y6IPGntsvQJtko5yapSDKB7GwB3AOlF5N3bkpk4sBwQRpS3aEkiUbaA==
+"@types/sortablejs@^1.15.3":
+  version "1.15.3"
+  resolved "https://registry.yarnpkg.com/@types/sortablejs/-/sortablejs-1.15.3.tgz#b9c0e2740100ae94919c9f138a38600c8f8124ea"
+  integrity sha512-v+zh6TZP/cLeMUK0MDx1onp8e7Jk2/4iTQ7sb/n80rTAvBm14yJkpOEfJdrTCkHiF7IZbPjxGX2NRJfogRoYIg==
 
 "@types/spark-md5@^3.0.2":
   version "3.0.2"
