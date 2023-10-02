@@ -38,7 +38,7 @@ void WebApiPluginsClass::onPluginRequest(AsyncWebServerRequest* request)
     retMsg["code"] = WebApiError::GenericBase;
 
     for(int i = 0 ; i < request->params() ; i++) {
-        MessageOutput.printf("meter %s\n",request->getParam(i)->name().c_str());
+        PDebug.printf(PDebugLevel::DEBUG,"meter %s\n",request->getParam(i)->name().c_str());
     }
     if (!request->hasParam("body",true)) {
         retMsg["message"] = "No values found!";
@@ -49,7 +49,7 @@ void WebApiPluginsClass::onPluginRequest(AsyncWebServerRequest* request)
     }
 
     String json = request->getParam("body",true)->value();
-    MessageOutput.printf("got data (%d): %s\n",json.length(), json.c_str());
+    PDebug.printf(PDebugLevel::DEBUG,"got data (%d): %s\n",json.length(), json.c_str());
 
     if (json.length() > 1024) {
         retMsg["message"] = "Data too large!";
@@ -123,7 +123,7 @@ void WebApiPluginsClass::onPluginEdit(AsyncWebServerRequest* request)
     }
 
     String json = request->getParam("data", true)->value();
-    MessageOutput.printf("got data (%d): %s\n",json.length(), json.c_str());
+    PDebug.printf(PDebugLevel::DEBUG,"got data (%d): %s\n",json.length(), json.c_str());
 
     if (json.length() > 1024) {
         retMsg["message"] = "Data too large!";

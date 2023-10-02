@@ -2,35 +2,20 @@
 
 #include "base/plugin.h"
 #include "base/pluginmessages.h"
+#include "base/powercontrolalgo.hpp"
+#include "defaultpowercontrolalgo.hpp"
 #include "messages/invertermessage.h"
 #include "messages/metermessage.h"
 #include "messages/powercontrolmessage.h"
-
-typedef struct {
-  uint64_t inverterSerial = 0;
-  String inverterSerialString;
-  String meterSerial;
-  float limit = 0.0;
-  uint32_t threshold = 0;
-  float consumption = 0.0;
-  float production = 0.0;
-  bool update = false;
-} powercontrolstruct;
 
 template <std::size_t N>
 class powercontrollerarray : public structarray<powercontrolstruct, N> {
 public:
   powercontrollerarray() : structarray<powercontrolstruct, N>() {}
-  powercontrolstruct *getInverterByStringSerial(String &serial) {
+  powercontrolstruct *getInverterById(String &serial) {
     return structarray<powercontrolstruct, N>::getByKey(
         [&serial](powercontrolstruct &pc) {
-          return serial.equals(pc.inverterSerialString);
-        });
-  }
-  powercontrolstruct *getInverterByLongSerial(uint64_t serial) {
-    return structarray<powercontrolstruct, N>::getByKey(
-        [&serial](powercontrolstruct &pc) {
-          return (serial == pc.inverterSerial);
+          return serial.equals(pc.inverterId);
         });
   }
   powercontrolstruct *getMeterByStringSerial(String &serial) {
@@ -41,97 +26,85 @@ public:
   }
   powercontrolstruct *getEmptyIndex() {
     return structarray<powercontrolstruct, N>::getByKey(
-        [](powercontrolstruct &s) { return s.inverterSerialString.isEmpty(); });
-  }
-};
-
-class PowercontrolAlgo {
-public:
-  PowercontrolAlgo() {}
-  virtual bool calcLimit(powercontrolstruct &powercontrol) { return false; };
-};
-
-class DefaultPowercontrolAlgo : public PowercontrolAlgo {
-public:
-  DefaultPowercontrolAlgo() : PowercontrolAlgo() {}
-  bool calcLimit(powercontrolstruct &powercontrol) {
-    MessageOutput.printf("powercontrol PowercontrolAlgo: consumption=%f "
-                         "production=%f limit=%f\n",
-                         powercontrol.consumption, powercontrol.production,
-                         powercontrol.limit);
-    // TODO: do some magic calculation here
-    // :/
-    // float newlimit =
-    // magicFunction(powercontrol.production,powercontrol.consumption);
-
-    float newLimit = powercontrol.consumption;
-    float threshold = std::abs(powercontrol.limit - newLimit);
-    if (threshold <= powercontrol.threshold) {
-      MessageOutput.printf("powercontrol PowercontrolAlgo: newlimit(%f) within "
-                           "threshold(%f) -> no limit change\n",
-                           newLimit, threshold);
-    } else {
-      MessageOutput.printf(
-          "powercontrol PowercontrolAlgo: setting limit to %f\n", newLimit);
-      powercontrol.limit = newLimit;
-      return true;
-    }
-    return false;
+        [](powercontrolstruct &s) { return s.inverterId.isEmpty(); });
   }
 };
 
 class PowercontrolPlugin : public Plugin {
-  enum pluginIds { INVERTER, INVERTERSTRING, POWERLIMIT };
 
 public:
   PowercontrolPlugin() : Plugin(3, "powercontrol") {}
 
-  void setup() {}
+  void setup() {
+    subscribe<MeterMessage>();
+    subscribe<InverterMessage>();
+  }
   void loop() {
     for (int i = 0; i < powercontrollers.size(); i++) {
       if (powercontrollers[i].update) {
         powercontrollers[i].update = false;
-        if (calcLimit(powercontrollers[i])) {
+        PDebug.printf(PDebugLevel::DEBUG,
+                      "powercontrol powercontrollers[%d].update\n", i);
+        if (isInitialized(powercontrollers[i]) &&
+            calcLimit(powercontrollers[i])) {
           publishLimit(powercontrollers[i]);
         }
       }
     }
   }
 
-  bool calcLimit(powercontrolstruct &powercontrol) {
+  inline bool isInitialized(powercontrolstruct &powercontrol) {
+    return (powercontrol.consumptionTs != 0 && powercontrol.productionTs != 0);
+  }
+
+  inline bool calcLimit(powercontrolstruct &powercontrol) {
     return algo->calcLimit(powercontrol);
   }
-  void internalDataCallback(PluginMessage *message){}
 
   void publishLimit(powercontrolstruct &pc) {
-    PowerControlMessage m(*this);
-    m.serialString = pc.inverterSerialString;
-    m.power = pc.limit;
-    publishMessage(m);
-    char topic[pc.inverterSerialString.length() + 7];
+    publishLimitMessage(pc);
+    publishLimitMqtt(pc);
+  }
+
+  void publishLimitMqtt(powercontrolstruct &pc) {
+    char topic[pc.inverterId.length() + 7];
     char payload[32];
     int len = snprintf(payload, sizeof(payload), "%f", pc.limit);
-    snprintf(topic, sizeof(payload), "%s/updateLimit",
-             pc.inverterSerialString.c_str());
-    MqttMessage mqtt(getId(),PluginIds::PluginPublish);
-    mqtt.setMqtt(topic,(const uint8_t*)payload,len);
+    snprintf(topic, sizeof(payload), "%s/updateLimit", pc.inverterId.c_str());
+    MqttMessage mqtt(getId(), PluginIds::PluginPublish);
+    mqtt.setMqtt(topic, (const uint8_t *)payload, len);
     mqtt.appendTopic = true;
     publishMessage(mqtt);
   }
 
-  void handleInverterMessage(InverterMessage *message) {
+  void publishLimitMessage(powercontrolstruct &pc) {
+    PowerControlMessage m(*this);
+    m.inverterId = pc.inverterId;
+    m.power = pc.limit;
+    m.unit = Unit::W;
+    publishMessage(m);
+  }
+
+  void handleInverterMessage(InverterMessage *m) {
     powercontrolstruct *powercontrol =
-        powercontrollers.getInverterByStringSerial(
-            message->inverterStringSerial);
+        powercontrollers.getInverterById(m->inverterId);
     if (powercontrol) {
-      powercontrol->production = message->value;
-      powercontrol->update = true;
-      MessageOutput.printf("powercontrol got production: %f\n",
-                           powercontrol->production);
+      updateProduction(powercontrol, Units.convert(m->unit, Unit::W, m->value),
+                       m->getTS());
     } else {
-      MessageOutput.printf("powercontrol inverterSerial(%s) not configured\n",
-                           message->inverterStringSerial.c_str());
+      PDebug.printf(PDebugLevel::WARN,
+                    "powercontrol inverterId(%s) not configured\n",
+                    m->inverterId.c_str());
     }
+  }
+
+  void updateProduction(powercontrolstruct *powercontrol, float power,
+                        unsigned long ts) {
+    powercontrol->production = power;
+    powercontrol->productionTs = ts;
+    powercontrol->update = true;
+    PDebug.printf(PDebugLevel::DEBUG, "powercontrol update production: %f\n",
+                  powercontrol->production);
   }
 
   void handleMeterMessage(MeterMessage *m) {
@@ -139,34 +112,38 @@ public:
     powercontrolstruct *powercontrol =
         powercontrollers.getMeterByStringSerial(meterserial);
     if (powercontrol) {
-      powercontrol->consumption = m->power;
-      powercontrol->update = true;
-      MessageOutput.printf("powercontrol got consumption: %f\n",
-                           powercontrol->consumption);
+      updateConsumption(powercontrol, Units.convert(m->unit, Unit::W, m->power),
+                        m->getTS());
     } else {
-      MessageOutput.printf("powercontrol meterserial(%s) not configured\n",
-                           meterserial.c_str());
+      PDebug.printf(PDebugLevel::WARN,
+                    "powercontrol meterserial(%s) not configured\n",
+                    meterserial.c_str());
     }
   }
 
+  void updateConsumption(powercontrolstruct *powercontrol, float consumption,
+                         unsigned long ts) {
+    powercontrol->consumption = consumption;
+    powercontrol->consumptionTs = ts;
+    powercontrol->update = true;
+    PDebug.printf(PDebugLevel::DEBUG, "powercontrol update consumption: %f\n",
+                  powercontrol->consumption);
+  }
+
   void internalCallback(std::shared_ptr<PluginMessage> message) {
-    // DBGPRINTMESSAGELNCB(DBG_INFO, getName(), message);
     if (message->isMessageType<InverterMessage>()) {
       InverterMessage *m = (InverterMessage *)message.get();
       handleInverterMessage(m);
     } else if (message->isMessageType<MeterMessage>()) {
       MeterMessage *m = (MeterMessage *)message.get();
       handleMeterMessage(m);
-    } else {
-      MessageOutput.printf("powercontrol unhandled message from sender=%d\n",
-                           message->getSenderId());
     }
   }
 
   void initPowercontrol() {
     powercontrolstruct *powercontrol = powercontrollers.getEmptyIndex();
     if (powercontrol) {
-      powercontrol->inverterSerialString = inverter_serial;
+      powercontrol->inverterId = inverter_serial;
       powercontrol->meterSerial = meter_serial;
       powercontrol->update = false;
       powercontrol->limit = 0;
@@ -197,6 +174,5 @@ private:
   uint32_t threshold = 20;
   // powercontrolstruct powercontrol;
   powercontrollerarray<MAX_NUM_INVERTERS> powercontrollers;
-  DefaultPowercontrolAlgo defaultAlgo = DefaultPowercontrolAlgo();
-  PowercontrolAlgo *algo = &defaultAlgo;
+  PowercontrolAlgo *algo = new DefaultPowercontrolAlgo();
 };

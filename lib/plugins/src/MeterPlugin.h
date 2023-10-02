@@ -20,12 +20,15 @@ typedef struct {
     power = p;
     update = true;
   }
+  Unit getUnit() { return unit; }
+  void setUnit(Unit u) { unit = u; }
   virtual bool isUpdated() { return update; }
   void clearUpdated() { update = false; }
 
 private:
   String serial;
   float power = 0;
+  Unit unit = Unit::W;
   bool update = false;
 } Meter;
 
@@ -57,6 +60,23 @@ public:
       }
     }
   }
+
+  bool meterExists(String &serial) {
+    Meter *ms = meters.getMeterBySerial(serial);
+    if (ms != nullptr) {
+      return true;
+    }
+    return false;
+  }
+
+  Meter *meterCreate(String &serial) {
+    Meter *ms = meters.getEmptyIndex();
+    if (ms != nullptr) {
+      ms->setSerial(serial);
+    }
+    return ms;
+  }
+
   Meter *getIndex(String &serial) {
     Meter *ms = meters.getMeterBySerial(serial);
     if (ms == nullptr) {
@@ -67,34 +87,47 @@ public:
     }
     return ms;
   }
-  void setMeterConsumption(String &serial, float consumption) {
-    MessageOutput.printf("meterplugin: setMeterConsumption(%s,%f)\n",
-                         serial.c_str(), consumption);
-    Meter *ms = getIndex(serial);
+  void setMeterConsumption(String &serial, float consumption, Unit unit) {
+    PDebug.printf(PDebugLevel::DEBUG,
+                  "meterplugin: setMeterConsumption(%s,%f)\n", serial.c_str(),
+                  consumption);
+    Meter *ms = nullptr;
+    if (!meterExists(serial)) {
+      ms = meterCreate(serial);
+      if (ms != nullptr)
+        ms->setUnit(unit);
+    }
+    ms = getIndex(serial);
     if (ms == nullptr) {
-      MessageOutput.printf("meterplugin: meter[%s] not found!", serial.c_str());
+      PDebug.printf(PDebugLevel::WARN, "meterplugin: meter[%s] not found!",
+                    serial.c_str());
       return;
     }
-    ms->setPower(consumption);
+    float cons = Units.convert(unit, ms->getUnit(), consumption);
+    ms->setPower(cons);
   }
-  void mqttCallback( MqttMessage *message) {
-    MessageOutput.printf("meterplugin: mqttCallback %s = %s\n", message->topic.get(), message->payloadToChar().get());
+
+  void mqttCallback(MqttMessage *message) {
+    PDebug.printf(PDebugLevel::DEBUG, "meterplugin: mqttCallback %s = %s\n",
+                  message->topic.get(), message->payloadToChar().get());
     char buffer[message->length + 1];
     buffer[message->length] = '\0';
     mempcpy(buffer, message->payload.get(), message->length);
     if (topicMap.find(message->topic.get()) != topicMap.end()) {
       String serial = topicMap[message->topic.get()];
       float cons = atof(buffer);
-      setMeterConsumption(serial, cons);
+      setMeterConsumption(serial, cons, Unit::W);
     } else {
       DynamicJsonDocument doc(sizeof(buffer));
       DeserializationError error = deserializeJson(doc, buffer);
       if (error) {
-        MessageOutput.printf("meterplugin: Failed to deserialize %s\n", buffer);
+        PDebug.printf(PDebugLevel::DEBUG,
+                      "meterplugin: Failed to deserialize %s\n", buffer);
       } else {
         JsonObject o = doc.as<JsonObject>();
         if (!onRequest(o, o)) {
-          MessageOutput.println("meterplugin: onRequest returned error");
+          PDebug.printf(PDebugLevel::DEBUG,
+                        "meterplugin: onRequest returned error\n");
         }
       }
     }
@@ -105,7 +138,11 @@ public:
     if (request.containsKey("meterserial") && request.containsKey("power")) {
       String serial = request["meterserial"].as<String>();
       float consumption = request["power"];
-      setMeterConsumption(serial, consumption);
+      Unit unit = Unit::W;
+      if (request.containsKey("unit")) {
+        unit = Units.toUnit(request["meterserial"]);
+      }
+      setMeterConsumption(serial, consumption, unit);
       return true;
     } else {
       return false;
@@ -113,11 +150,13 @@ public:
   }
 
   void publishAC(Meter &meter) {
-    MessageOutput.printf("meterplugin: publishPower[%s]: %f W \n",
-                         meter.getSerial().c_str(), meter.getPower());
+    PDebug.printf(PDebugLevel::DEBUG, "meterplugin: publishPower[%s]: %f %s \n",
+                  meter.getSerial().c_str(), meter.getPower(),
+                  Units.toStr(meter.getUnit()));
     MeterMessage m(*this);
     m.power = meter.getPower();
     m.serial = meter.getSerial();
+    m.unit = meter.getUnit();
     publishMessage(m);
   }
   void saveSettings(JsonObject settings) {
@@ -157,13 +196,12 @@ public:
       subscribeMqtt((char *)topic.c_str(), false);
     }
   }
-  void internalCallback(std::shared_ptr<PluginMessage> message) {
 
-    // DBGPRINTMESSAGELNCB(DBG_INFO, getName(), message);
+  void internalCallback(std::shared_ptr<PluginMessage> message) {
     if (message->isMessageType<MqttMessage>()) {
       MqttMessage *m = (MqttMessage *)message.get();
       mqttCallback(m);
-    } 
+    }
   }
 
 private:

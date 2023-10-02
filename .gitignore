@@ -9,3 +9,5 @@ logs/device-monitor*.log
 platformio_override.ini
 .DS_Store
 lib/plugins/**/pluginids.h
+lib/plugins/src/customplugin.h
+
