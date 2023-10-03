@@ -3,7 +3,7 @@
 #include "pluginmessages.h"
 #include "plugin.h"
 
-    PluginMessage::PluginMessage(TYPEIDS tid, int senderId_) : Entity(tid) {
+    PluginMessage::PluginMessage(TYPEIDS tid, int senderId_) : Entity(tid),  ts(millis()) {
         senderId = senderId_;
         receiverId = 0;
     }
