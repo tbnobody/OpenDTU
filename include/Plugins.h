@@ -8,6 +8,7 @@
 #include <cstdint>
 #include <ThreadSafeQueue.h>
 #include <Every.h>
+#include <list>
 
 #define THIRDPARTY_MSG_BUFFERSIZE 1024
 
