@@ -1,6 +1,7 @@
 #pragma once
 
 #include "base/powercontrolalgo.hpp"
+#include "base/PluginDebug.h"
 
 class DefaultPowercontrolAlgo : public PowercontrolAlgo {
 public:
@@ -25,7 +26,7 @@ public:
     } else {
       PDebug.printf(PDebugLevel::DEBUG,
           "powercontrol PowercontrolAlgo: setting limit to %f\n", newLimit);
-      powercontrol.limit = newLimit;
+      powercontrol.newLimit = newLimit;
       return true;
     }
     return false;

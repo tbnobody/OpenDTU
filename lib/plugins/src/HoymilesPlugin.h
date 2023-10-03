@@ -2,8 +2,8 @@
 
 #include "base/plugin.h"
 #include "messages/limitcontrolmessage.h"
-#include "messages/powermessage.h"
 #include "messages/limitmessage.h"
+#include "messages/powermessage.h"
 #include <Hoymiles.h>
 
 #ifndef MAX_NUM_INVERTERS
@@ -15,11 +15,16 @@ class HoymilesPlugin : public Plugin {
 public:
   HoymilesPlugin() : Plugin(20, "hoymilesinverter") {}
 
-  void setup() { subscribe<LimitControlMessage>(); }
-  void loop() {}
-  void onTickerSetup() {
+  void setup() {
+    subscribe<LimitControlMessage>();
+    addTimerCb(SECOND, 30, std::bind(&HoymilesPlugin::securityCheck, this),
+               "hoymilessecuritycheck");
     addTimerCb(
         SECOND, 5, [this]() { loopInverters(); }, "HoymilesloopInvertersTimer");
+  }
+
+  void securityCheck() {
+    //  TODO :)
   }
 
   void loopInverters() {
@@ -178,8 +183,7 @@ public:
     PDebug.printf(PDebugLevel::DEBUG, "hoymilesplugin: internalCallback: %s\n",
                   message.get()->getMessageTypeString());
     if (message->isMessageType<LimitControlMessage>()) {
-      LimitControlMessage *m =
-          (LimitControlMessage *)message.get();
+      LimitControlMessage *m = (LimitControlMessage *)message.get();
       handleMessage(m);
     }
   }
