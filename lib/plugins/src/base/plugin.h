@@ -1,6 +1,5 @@
 #pragma once
 
-#include "Hoymiles.h"
 #include "PluginDebug.h"
 #include "globals.h"
 #include "pluginmessages.h"
@@ -109,15 +108,7 @@ protected:
   bool hasTimerCb(const char *timername);
 
   void execute(std::function<void(void)> func, uint32_t delaySeconds,
-               const char *id) {
-    addTimerCb(
-        PLUGIN_TIMER_INTVAL::SECOND, delaySeconds,
-        [this, &func, id]() {
-          func();
-          removeTimerCb(id);
-        },
-        id);
-  }
+               const char *id);
   /**
    * @brief remove timer callback.
    *
