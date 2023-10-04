@@ -343,7 +343,7 @@ int32_t PowerLimiterClass::inverterPowerDcToAc(std::shared_ptr<InverterAbstract>
     CONFIG_T& config = Configuration.get();
 
     float inverterEfficiencyPercent = inverter->Statistics()->getChannelFieldValue(
-        TYPE_AC, static_cast<ChannelNum_t>(config.PowerLimiter_InverterChannelId), FLD_EFF);
+        TYPE_AC, CH0, FLD_EFF);
 
     // fall back to hoymiles peak efficiency as per datasheet if inverter
     // is currently not producing (efficiency is zero in that case)
@@ -440,7 +440,7 @@ int32_t PowerLimiterClass::calcPowerLimit(std::shared_ptr<InverterAbstract> inve
         // the produced power of this inverter has also to be taken into account.
         // We don't use FLD_PAC from the statistics, because that
         // data might be too old and unreliable.
-        acPower = static_cast<int>(inverter->Statistics()->getChannelFieldValue(TYPE_AC, (ChannelNum_t) config.PowerLimiter_InverterChannelId, FLD_PAC)); 
+        acPower = static_cast<int>(inverter->Statistics()->getChannelFieldValue(TYPE_AC, CH0, FLD_PAC)); 
         newPowerLimit += acPower;
     }
 
@@ -583,7 +583,7 @@ float PowerLimiterClass::getLoadCorrectedVoltage()
     CONFIG_T& config = Configuration.get();
 
     auto channel = static_cast<ChannelNum_t>(config.PowerLimiter_InverterChannelId);
-    float acPower = _inverter->Statistics()->getChannelFieldValue(TYPE_AC, channel, FLD_PAC);
+    float acPower = _inverter->Statistics()->getChannelFieldValue(TYPE_AC, CH0, FLD_PAC);
     float dcVoltage = _inverter->Statistics()->getChannelFieldValue(TYPE_DC, channel, FLD_UDC);
 
     if (dcVoltage <= 0.0) {
