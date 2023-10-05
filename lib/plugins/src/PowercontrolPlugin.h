@@ -5,7 +5,10 @@
 #include "base/pluginmessages.h"
 #include "base/powercontrolalgo.hpp"
 #include "defaultpowercontrolalgo.hpp"
+#include "messages/limitcontrolmessage.h"
+#include "messages/limitmessage.h"
 #include "messages/metermessage.h"
+#include "messages/mqttmessage.h"
 #include "messages/powercontrolmessage.h"
 #include "messages/powermessage.h"
 
@@ -67,7 +70,7 @@ public:
     }
   }
   inline bool hasChanged(powercontrolstruct &powercontrol) {
-    return (powercontrol.updateConsumption||powercontrol.updateProduction);
+    return (powercontrol.updateConsumption || powercontrol.updateProduction);
   }
 
   inline bool isInitialized(powercontrolstruct &powercontrol) {
@@ -219,8 +222,8 @@ public:
   }
 
 private:
-  String inverter_serial;
-  String meter_serial;
+  String inverter_serial = "";
+  String meter_serial = "";
   int threshold = 20;
   int maxDiffW = 40;
   // powercontrolstruct powercontrol;
