@@ -94,6 +94,8 @@ Create a MyCustomPlugin.h file.
 
 class MyCustomPlugin : public Plugin {
 public:
+  //  !!!          PluginId must be unique
+  //                        \/
   MyCustomPlugin() : Plugin(42, "mycustomplugin") {}
 
   void setup() {}
@@ -111,16 +113,16 @@ public:
 ```
 easy-peasy
 
-Open src/Plugins.cpp and add your CustomPlugin to addCustomPlugins()
+Open lib/plugins/src/PluginSystem.cpp and add your CustomPlugin to addCustomPlugins()
 
 ```c++
 
 #include "MyCustomPlugin.h"
 ...
 
-void PluginsClass::addCustomPlugins() {
+void PluginSystem::addCustomPlugins(std::vector<std::unique_ptr<Plugin>> &pluginsvec) {
 
-  plugins.push_back(std::make_unique<MyCustomPlugin>(MyCustomPlugin()));
+  pluginsvec.push_back(std::make_unique<MyCustomPlugin>(MyCustomPlugin()));
 
 }
 
