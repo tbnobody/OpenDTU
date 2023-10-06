@@ -4,8 +4,6 @@
 #include <mutex>
 #include <sunset.h>
 
-#define SUNPOS_UPDATE_INTERVAL 60000l
-
 class SunPositionClass {
 public:
     SunPositionClass();
