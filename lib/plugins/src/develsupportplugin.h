@@ -71,14 +71,6 @@ public:
         return true;
       }
       if (request.containsKey("debug")) {
-        if (request.containsKey("opendtu")) {
-          int level = request["level"];
-          if (level >= MessageOutputDebugLevel::DEBUG_NONE &&
-              level <= MessageOutputDebugLevel::DEBUG_TRACE) {
-            MessageOutput.setLevel((MessageOutputDebugLevel)level);
-            return true;
-          }
-        }
         if (request.containsKey("plugins")) {
           int level = request["level"];
           if (level >= PDebugLevel::NONE && level <= PDebugLevel::TRACE) {
