@@ -29,7 +29,7 @@ void PluginSystem::setMqttPublishCb(
         publishCB) {
   mqttPublishCB = publishCB;
 }
-void PluginSystem::setConfigurator(SystemConfigurator<Plugin> c) {
+void PluginSystem::setConfigurator(SystemConfigurator<Plugin>& c) {
   configurator = c;
 }
 void PluginSystem::init() {

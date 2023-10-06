@@ -47,7 +47,7 @@ public:
   Plugin *getPluginById(int pluginid);
   Plugin *getPluginByName(const char *pluginname);
   int getPluginCount();
-  void setConfigurator(SystemConfigurator<Plugin> c);
+  void setConfigurator(SystemConfigurator<Plugin>& c);
   void publishInternal();
   PluginMessagePublisher &getPublisher();
 

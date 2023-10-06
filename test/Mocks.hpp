@@ -45,11 +45,25 @@ public:
   PluginMock() : Plugin(9999999, "pluginmock") { TEST_MESSAGE("PluginMock()"); }
 };
 
+class ConfiguratorMock : public SystemConfigurator<Plugin> {
+public:
+  std::function<void(Plugin *p)> readCB = nullptr;
+  std::function<void(Plugin *p)> saveCB = nullptr;
+  void readConfig(Plugin *t) {
+    if (readCB)
+      readCB(t);
+  }
+  void saveConfig(Plugin *t) {
+    if (saveCB)
+      saveCB(t);
+  }
+};
+
 class SystemMock : public System<Plugin> {
 public:
   SystemMock() : System<Plugin>(), publisher(plugins) {}
   ~SystemMock() {}
-
+  void setConfigurator(SystemConfigurator<Plugin> &configurator) {}
   void readPluginConfig(Plugin *p, JsonObject &config) {
     p->loadPluginSettings(config);
     p->loadSettings(config);
@@ -85,6 +99,8 @@ public:
     return std::make_shared<MeterMessage>(m);
   }
   std::function<void(const std::shared_ptr<PluginMessage> p)> cb;
+  void receiveMqtt(Plugin *plugin, const char *topic, const uint8_t *data,
+                   size_t len) {}
   void subscribeMqtt(Plugin *plugin, char *topic, bool append) {}
   PluginMessagePublisher &getPublisher() {
     publisher.cb = cb;

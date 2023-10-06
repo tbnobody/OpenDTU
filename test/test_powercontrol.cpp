@@ -19,7 +19,7 @@ SystemMock testSystem;
 void test_PowercontrolLimit(void) {
   TEST_MESSAGE("test_PowercontrolLimit");
 
-auto pmptr = testSystem.createPowerMessage(800);
+  auto pmptr = testSystem.createPowerMessage(800);
   auto mmptr = testSystem.createMeterMessage(400);
 
   DynamicJsonDocument doc(1024);
@@ -40,7 +40,6 @@ auto pmptr = testSystem.createPowerMessage(800);
   powerControl->internalCallback(pmptr);
   powerControl->internalCallback(mmptr);
   powerControl->loop();
-
 
   TEST_ASSERT_NOT_NULL(lmc);
 }

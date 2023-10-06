@@ -18,7 +18,7 @@ template <class T> class System {
 public:
   System() {}
   virtual ~System() {}
-  virtual void setConfigurator(SystemConfigurator<T> configurator);
+  virtual void setConfigurator(SystemConfigurator<T>& configurator);
   virtual void subscribeMqtt(T *plugin, char *topic, bool append) = 0;
   virtual void receiveMqtt(T *plugin, const char *topic, const uint8_t *data,
                            size_t len) = 0;
