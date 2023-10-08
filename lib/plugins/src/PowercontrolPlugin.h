@@ -228,5 +228,5 @@ private:
   int maxDiffW = 40;
   // powercontrolstruct powercontrol;
   powercontrollerarray<MAX_NUM_INVERTERS> powercontrollers;
-  PowercontrolAlgo *algo = new AvgPowercontrolAlgo();
+  PowercontrolAlgo *algo = new DefaultPowercontrolAlgo();
 };
