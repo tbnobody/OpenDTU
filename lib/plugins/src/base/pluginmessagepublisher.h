@@ -1,8 +1,6 @@
 #pragma once
 
-#include "messages/invertermessage.h"
-#include "messages/metermessage.h"
-#include "messages/mqttmessage.h"
+#include "base/pluginmessages.h"
 #include <ThreadSafeQueue.h>
 #include <map>
 

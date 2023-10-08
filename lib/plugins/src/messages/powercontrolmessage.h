@@ -9,12 +9,12 @@ public:
   ~PowerControlMessage() {}
   float power;
   Unit unit = Unit::W;
-  String inverterId;
+  String deviceId;
   int toString(char *buffer) {
     int c = sprintf(buffer, "PowerControlMessage{base=");
     c = c + PluginMessage::toString(buffer + c);
-    c = c + sprintf(buffer + c, ", id=%s, power=%f, unit=%s}",
-                    inverterId.c_str(), power, Units.toStr(unit));
+    c = c + sprintf(buffer + c, ", deviceId=%s, power=%f, unit=%s}",
+                    deviceId.c_str(), power, Units.toStr(unit));
     return c;
   }
   virtual const char *getMessageTypeString() { return "PowerControlMessage"; }

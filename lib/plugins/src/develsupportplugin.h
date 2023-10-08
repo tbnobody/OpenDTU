@@ -34,10 +34,10 @@ public:
       if (request.containsKey("type")) {
         int type = request["type"];
         switch (type) {
-        case TYPEIDS::INVERTERMESSAGE_TYPE: {
-          InverterMessage m(*this);
+        case TYPEIDS::POWERMESSAGE_TYPE: {
+          PowerMessage m(*this);
           m.value = request["power"];
-          m.inverterId = request["serial"].as<String>();
+          m.deviceId = request["serial"].as<String>();
           publishMessage(m);
           break;
         }
@@ -49,11 +49,19 @@ public:
           publishMessage(m);
           break;
         }
-        case TYPEIDS::HOYMILESMESSAGE_TYPE: {
-          HoymilesMessage m(*this);
-          m.value = request["power"];
+        case TYPEIDS::LIMITMESSAGE_TYPE: {
+          LimitMessage m(*this);
+          m.limit = request["power"];
           m.unit = Units.toUnit(request["unit"]);
-          m.inverterId = request["serial"].as<String>();
+          m.deviceId = request["serial"].as<String>();
+          publishMessage(m);
+          break;
+        }
+        case TYPEIDS::LIMITCONTROLMESSAGE_TYPE: {
+          LimitControlMessage m(*this);
+          m.limit = request["power"];
+          m.unit = Units.toUnit(request["unit"]);
+          m.deviceId = request["serial"].as<String>();
           publishMessage(m);
           break;
         }
@@ -63,14 +71,6 @@ public:
         return true;
       }
       if (request.containsKey("debug")) {
-        if (request.containsKey("opendtu")) {
-          int level = request["level"];
-          if (level >= MessageOutputDebugLevel::DEBUG_NONE &&
-              level <= MessageOutputDebugLevel::DEBUG_TRACE) {
-            MessageOutput.setLevel((MessageOutputDebugLevel)level);
-            return true;
-          }
-        }
         if (request.containsKey("plugins")) {
           int level = request["level"];
           if (level >= PDebugLevel::NONE && level <= PDebugLevel::TRACE) {

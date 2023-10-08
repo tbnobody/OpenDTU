@@ -1,8 +1,9 @@
 #pragma once
 
 #include "base/plugin.h"
-#include "messages/hoymileslimitmessage.h"
-#include "messages/hoymilesmessage.h"
+#include "messages/limitcontrolmessage.h"
+#include "messages/limitmessage.h"
+#include "messages/powermessage.h"
 #include <Hoymiles.h>
 
 #ifndef MAX_NUM_INVERTERS
@@ -15,12 +16,15 @@ public:
   HoymilesPlugin() : Plugin(20, "hoymilesinverter") {}
 
   void setup() {
-    subscribe<HoymilesLimitMessage>();
-  }
-  void loop() {}
-  void onTickerSetup() {
+    subscribe<LimitControlMessage>();
+    addTimerCb(SECOND, 30, std::bind(&HoymilesPlugin::securityCheck, this),
+               "hoymilessecuritycheck");
     addTimerCb(
         SECOND, 5, [this]() { loopInverters(); }, "HoymilesloopInvertersTimer");
+  }
+
+  void securityCheck() {
+    //  TODO :)
   }
 
   void loopInverters() {
@@ -106,27 +110,52 @@ public:
                     inverterId.c_str());
     }
     if (inv != nullptr) {
-      if (inv->sendActivePowerControlRequest(
-              limit, PowerLimitControlType::AbsolutNonPersistent)) {
-        PDebug.printf(
-            PDebugLevel::DEBUG,
-            "hoymilesplugin: sendActivePowerControlRequest %f W to %s -> OK!\n",
-            limit, inv->serialString().c_str());
-      } else {
+      inv->sendActivePowerControlRequest(
+          limit, PowerLimitControlType::AbsolutNonPersistent);
+      if (inv->SystemConfigPara()->getLastLimitCommandSuccess() !=
+          CMD_PENDING) {
         PDebug.printf(PDebugLevel::DEBUG,
                       "hoymilesplugin: sendActivePowerControlRequest %f "
                       "W to %s -> FAILED!\n",
                       limit, inv->serialString().c_str());
+      } else {
+        watch(inv.get(), limit);
+        PDebug.printf(PDebugLevel::DEBUG,
+                      "hoymilesplugin: sendActivePowerControlRequest %f W to "
+                      "%s -> PENDING\n",
+                      limit, inv->serialString().c_str());
       }
     }
+  }
+
+  bool requestPending(String &inverterId) {
+    return hasTimerCb(inverterId.c_str());
+  }
+
+  void watch(InverterAbstract *inv, float limit) {
+    addTimerCb(
+        SECOND, 2,
+        [this, inv, limit]() {
+          if (inv->SystemConfigPara()->getLastLimitCommandSuccess() == CMD_OK) {
+            PDebug.printf(PDebugLevel::DEBUG,
+                          "hoymilesplugin: Hoymiles(%s) limit %f W -> OK!\n",
+                          inv->serialString().c_str(), limit);
+            LimitMessage m(*this);
+            m.deviceId = inv->serialString();
+            m.limit = limit;
+            publishMessage(m);
+            removeTimerCb(inv->serialString().c_str());
+          }
+        },
+        inv->serialString().c_str());
   }
 
   void publishAC(uint64_t serial, String serialString, float actpower) {
     PDebug.printf(PDebugLevel::DEBUG, "hoymilesplugin: publishAC[%s]: %f\n",
                   serialString.c_str(), actpower);
 
-    HoymilesMessage message(*this);
-    message.inverterId = serialString;
+    PowerMessage message(*this);
+    message.deviceId = serialString;
     message.value = actpower;
     message.unit = Unit::W;
     publishMessage(message);
@@ -139,15 +168,22 @@ public:
       publishAC(inverterSerial, inverterStringSerial, value);
     }
   }
-  void handleMessage(HoymilesLimitMessage *message) {
-    setLimit(message->inverterId, message->limit);
+  void handleMessage(LimitControlMessage *message) {
+    if (requestPending(message->deviceId)) {
+      PDebug.printf(
+          PDebugLevel::WARN,
+          "hoymilesplugin: Hoymiles(%s) cant set limit! request pending!\n",
+          message->deviceId.c_str());
+      return;
+    }
+    setLimit(message->deviceId, message->limit);
   }
   void internalCallback(std::shared_ptr<PluginMessage> message) {
     // DBGPRINTMESSAGELNCB(DBG_INFO, getName(), message);
     PDebug.printf(PDebugLevel::DEBUG, "hoymilesplugin: internalCallback: %s\n",
                   message.get()->getMessageTypeString());
-    if (message->isMessageType<HoymilesLimitMessage>()) {
-      HoymilesLimitMessage *m = (HoymilesLimitMessage *)message.get();
+    if (message->isMessageType<LimitControlMessage>()) {
+      LimitControlMessage *m = (LimitControlMessage *)message.get();
       handleMessage(m);
     }
   }

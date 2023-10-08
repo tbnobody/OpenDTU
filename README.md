@@ -94,6 +94,8 @@ Create a MyCustomPlugin.h file.
 
 class MyCustomPlugin : public Plugin {
 public:
+  //  !!!          PluginId must be unique
+  //                        \/
   MyCustomPlugin() : Plugin(42, "mycustomplugin") {}
 
   void setup() {}
@@ -111,16 +113,16 @@ public:
 ```
 easy-peasy
 
-Open src/Plugins.cpp and add your CustomPlugin to addCustomPlugins()
+Open lib/plugins/src/PluginSystem.cpp and add your CustomPlugin to addCustomPlugins()
 
 ```c++
 
 #include "MyCustomPlugin.h"
 ...
 
-void PluginsClass::addCustomPlugins() {
+void PluginSystem::addCustomPlugins(std::vector<std::unique_ptr<Plugin>> &pluginsvec) {
 
-  plugins.push_back(std::make_unique<MyCustomPlugin>(MyCustomPlugin()));
+  pluginsvec.push_back(std::make_unique<MyCustomPlugin>(MyCustomPlugin()));
 
 }
 
@@ -463,15 +465,17 @@ void internalCallback(std::shared_ptr<PluginMessage> message)
 #pragma once
 
 #include "base/plugin.h"
+#include "messages/metermessage.h"
 
 class MyCustomPlugin : public Plugin {
 public:
   MyCustomPlugin() : Plugin(42, "mycustomplugin") {}
 
-  // not needed here
-  void setup() {}
+  void setup() {
+    subscribe<MeterMessage>();
+  }
 
-  void inverterCallback(InverterMessage *message) {
+  void inverterCallback(MeterMessage *message) {
     char buffer[128];
     message->toString(buffer);
     PDebug.printf(PDebugLevel::INFO, "MyCustomPlugin: inverterCallback %s\n",
@@ -479,8 +483,8 @@ public:
   }
 
   void internalCallback(std::shared_ptr<PluginMessage> message) {
-    if (message->isMessageType<InverterMessage>()) {
-      InverterMessage *m = (InverterMessage *)message.get();
+    if (message->isMessageType<MeterMessage>()) {
+      MeterMessage *m = (MeterMessage *)message.get();
       inverterCallback(m);
     }
   }
@@ -495,15 +499,9 @@ Somewhere in the monitor output your debug statement can be found.
 ```
 ...
 
-MyCustomPlugin: inverterCallback InverterMessage{base=PluginMessage{sender:1, receiver:0}, id=112123456789, power=155.599998}
+MyCustomPlugin: inverterCallback MeterMessage{base=PluginMessage{sender:2, receiver:0}, meterId=112123456789, power=155.0, unit=W}
 
 ...
-
-MyCustomPlugin: inverterCallback 
-InverterMessage{base=PluginMessage{sender:1, receiver:0}, id=112123456789, power=155.900002}
-
-
-```
 
 
 

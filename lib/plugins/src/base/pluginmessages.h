@@ -65,5 +65,5 @@ protected:
 protected:
   int senderId = 0;
   int receiverId = 0;
-  unsigned long ts = millis();
+  unsigned long ts;
 };

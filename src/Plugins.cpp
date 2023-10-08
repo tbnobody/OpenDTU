@@ -2,137 +2,56 @@
 #include "Plugins.h"
 #include "MessageOutput.h"
 #include "MqttSettings.h"
+#include "PluginConfiguration.h"
 #include "string.h"
 
-#include "HoymilesPlugin.h"
-#include "InverterPlugin.h"
-#include "MeterPlugin.h"
-#include "PluginConfiguration.h"
-#include "PowercontrolPlugin.h"
-#include "PublishPlugin.h"
-#include "develsupportplugin.h"
 #if __has_include("customplugin.h")
 #include "customplugin.h"
 #endif
 
+#include "PluginSystem.hpp"
+
 PluginsClass Plugins;
+PluginConfigurator configurator;
 
-void PluginsClass::loop() {
-  static uint32_t pluginsloop = 0;
+void PluginConfigurator::readConfig(Plugin *p) { PluginConfiguration.read(p); }
+void PluginConfigurator::saveConfig(Plugin *p) { PluginConfiguration.write(p); }
 
-  EVERY_N_SECONDS(1) {
-    pluginsloop++;
-    if (timercbs.size() > 0) {
-      auto it = timercbs.begin();
-      while (it != timercbs.end()) {
-        if ((pluginsloop % it->interval) == 0) {
-          PDebug.printf(PDebugLevel::TRACE, "PluginsClass timercb call: %s\n",
-                        it->timername);
-          it->timerCb();
-          yield();
-        }
-        if (!it->valid) {
-          // erase while iterating should be safe .. according to the internet
-          // ;)
-          it = timercbs.erase(it);
-        } else {
-          it++;
-        }
-      }
-    }
-    // move new timers
-    if (timercbsnew.size() > 0) {
-      auto it = timercbs.end();
-      timercbs.splice(it,timercbsnew);
-    }
-  }
-  publishInternal();
-  for (unsigned int i = 0; i < plugins.size(); i++) {
-    if (plugins[i]->isEnabled()) {
-      plugins[i]->loop();
-      yield();
-    }
-  }
-}
+PluginsClass::PluginsClass() : pluginSystem(PluginSystem(configurator)) {}
 
-void PluginsClass::start(Plugin *p) {
-  if (p->isEnabled()) {
-    p->setup();
-    p->onTickerSetup();
-    p->onMqttSubscribe();
-  }
-}
+PluginsClass::~PluginsClass() {}
 
-void PluginsClass::subscribeMqtt(Plugin *plugin, char *topic, bool append) {
+void PluginsClass::subscribeMqtt(int id, const char *topic, bool append) {
   //   PDebug.printf(PDebugLevel::DEBUG,"PluginsClass::subscribeMqtt %s: %s\n",
   //   plugin->name, topic);
   MqttSettings.subscribe(
       topic, 0,
-      [&, plugin](const espMqttClientTypes::MessageProperties &properties,
-                  const char *topic, const uint8_t *payload, size_t len,
-                  size_t index, size_t total) {
+      [&, id, append](const espMqttClientTypes::MessageProperties &properties,
+                      const char *topic, const uint8_t *payload, size_t len,
+                      size_t index, size_t total) {
         //       PDebug.printf(PDebugLevel::DEBUG,"PluginsClass::mqttCb
         //       topic=%s\n", topic);
-        MqttMessage m(0, plugin->getId());
-        m.setMqtt(topic, payload, len);
-        // :((
-        publisher.publish(std::make_shared<MqttMessage>(m));
+        pluginSystem.receiveMqtt(pluginSystem.getPluginById(id), topic, payload,
+                                 len);
       });
 }
 
-void PluginsClass::addTimerCb(Plugin *plugin, const char *timername,
-                              PLUGIN_TIMER_INTVAL intval, uint32_t interval,
-                              std::function<void(void)> timerCb) {
-  // PDebug.printf(PDebugLevel::DEBUG,"PluginsClass::addTimerCb sender=%d\n",
-  // plugin->getId());
-  if (timercbs.size() > 0) {
-    auto it =
-        std::find_if(begin(timercbs), end(timercbs), [timername](auto &e) {
-          return ((strcmp(e.timername, timername) == 0) && e.valid);
-        });
-    if (it != std::end(timercbs)) {
-      PDebug.printf(PDebugLevel::WARN,
-                    "PluginsClass: addTimerCb(%s): timername exists!\n",
-                    timername);
-      return;
-    }
-  }
-  if (timercbsnew.size() > 0) {
-    auto it = std::find_if(
-        begin(timercbsnew), end(timercbsnew),
-        [timername](auto &e) { return (strcmp(e.timername, timername) == 0); });
-    if (it != std::end(timercbsnew)) {
-      PDebug.printf(PDebugLevel::WARN,
-                    "PluginsClass: addTimerCb(%s): timername exists!\n",
-                    timername);
-      return;
-    }
-  }
-  timerentry entry;
-  entry.timername = timername;
-  uint32_t timerintval = interval;
-  if (intval == MINUTE) {
-    timerintval *= 60;
-  }
-  entry.interval = timerintval;
-  entry.timerCb = timerCb;
-  entry.valid = true;
-  timercbsnew.push_back(entry);
-  PDebug.printf(PDebugLevel::INFO, "PluginsClass: addTimerCb(%s)\n", timername);
+Plugin *PluginsClass::getPluginByIndex(int pluginindex) {
+  return pluginSystem.getPluginByIndex(pluginindex);
 }
 
-void PluginsClass::removeTimerCb(Plugin *plugin, const char *timername) {
-  for (auto &entry : timercbs) {
-    if (strcmp(entry.timername, timername) == 0) {
-      PDebug.printf(PDebugLevel::INFO, "PluginsClass: removeTimerCb (%s)\n",
-                    timername);
-      entry.valid = false;
-      break;
-    }
-  }
+Plugin *PluginsClass::getPluginById(int pluginid) {
+  return pluginSystem.getPluginById(pluginid);
 }
 
-void PluginsClass::mqttMessageCB(MqttMessage *message) {
+Plugin *PluginsClass::getPluginByName(const char *pluginname) {
+  return pluginSystem.getPluginByName(pluginname);
+}
+
+int PluginsClass::getPluginCount() { return pluginSystem.getPluginCount(); }
+
+void PluginsClass::publishMqtt(int id, const char *topic, uint8_t *data,
+                               size_t len, bool append) {
   // we dont care about real topic length, one size fit's all ;)
   //   char topic[128];
   if (!MqttSettings.getConnected()) {
@@ -141,61 +60,18 @@ void PluginsClass::mqttMessageCB(MqttMessage *message) {
     return;
   }
   PDebug.printf(PDebugLevel::DEBUG, "PluginsClass: publish mqtt nmessage!");
-  auto sender = getPluginById(message->getSenderId());
-  if (NULL != sender) {
-    char topic[128];
-    snprintf(topic, sizeof(topic), "%s/%s", sender->getName(),
-             (const char *)message->topic.get());
-    if (message->appendTopic) {
-      MqttSettings.publish(topic, (const char *)message->payloadToChar().get());
-    } else {
-      MqttSettings.publishGeneric(
-          topic, (const char *)message->payloadToChar().get(), false, 0);
-    }
-  }
+
+  MqttSettings.publishGeneric(topic, (const char *)data, append, 0);
 }
 
-Plugin *PluginsClass::getPluginByIndex(int pluginindex) {
+void PluginsClass::loopSystem() { pluginSystem.loop(); }
 
-  if (pluginindex >= 0 && pluginindex < plugins.size()) {
-    return plugins[pluginindex].get();
-  }
-  return NULL;
-}
-
-Plugin *PluginsClass::getPluginById(int pluginid) {
-  for (unsigned int i = 0; i < plugins.size(); i++) {
-    if (plugins[i]->getId() == pluginid) {
-      return plugins[i].get();
-    }
-  }
-  return NULL;
-}
-
-Plugin *PluginsClass::getPluginByName(const char *pluginname) {
-  for (unsigned int i = 0; i < plugins.size(); i++) {
-    if (strcmp(plugins[i]->getName(), pluginname) == 0) {
-      return plugins[i].get();
-    }
-  }
-  return NULL;
-}
-
-int PluginsClass::getPluginCount() { return plugins.size(); }
-
-void PluginsClass::addPlugin(std::unique_ptr<Plugin> &p) {
-  plugins.push_back(std::move(p));
-}
-
-void PluginsClass::publishInternal() {
+void PluginsClass::loop() {
 #ifndef ESPSINGLECORE
-
 #else
-  publisher.loop();
+  loopSystem();
 #endif
 }
-
-PluginMessagePublisher &PluginsClass::getPublisher() { return publisher; }
 
 #ifndef ESPSINGLECORE
 extern "C" {
@@ -204,7 +80,7 @@ void pluginTaskFunc(void *parameter);
 
 void pluginTaskFunc(void *parameter) {
   for (;;) {
-    Plugins.getPublisher().loop();
+    Plugins.loopSystem();
   }
 }
 #endif
@@ -215,30 +91,17 @@ void PluginsClass::addCustomPlugins() {
 }
 
 void PluginsClass::init() {
+  pluginSystem.setMqttPublishCb(
+      std::bind(&PluginsClass::publishMqtt, this, std::placeholders::_1,
+                std::placeholders::_2, std::placeholders::_3,
+                std::placeholders::_4, std::placeholders::_5));
+  pluginSystem.setMqttSubscribeCb(
+      std::bind(&PluginsClass::subscribeMqtt, this, std::placeholders::_1,
+                std::placeholders::_2, std::placeholders::_3));
   MessageOutput.setLevel(MessageOutputDebugLevel::DEBUG_INFO);
   PDebug.setPrint(&MessageOutput);
-  plugins.push_back(std::make_unique<DevelSupportPlugin>(DevelSupportPlugin()));
-  plugins.push_back(std::make_unique<HoymilesPlugin>(HoymilesPlugin()));
-  plugins.push_back(std::make_unique<MeterPlugin>(MeterPlugin()));
-  plugins.push_back(std::make_unique<InverterPlugin>(InverterPlugin()));
-  plugins.push_back(std::make_unique<PowercontrolPlugin>(PowercontrolPlugin()));
-  PublishPlugin publishP = PublishPlugin();
-  publishP.mqttMessageCB(
-      std::bind(&PluginsClass::mqttMessageCB, this, std::placeholders::_1));
-  plugins.push_back(std::make_unique<PublishPlugin>(publishP));
-#if __has_include("customplugin.h")
-  plugins.push_back(std::make_unique<MyCustomPlugin>(MyCustomPlugin()));
-#endif
-  addCustomPlugins();
+  pluginSystem.init();
 
-  for (unsigned int i = 0; i < plugins.size(); i++) {
-    plugins[i]->setSystem(this);
-    PluginConfiguration.read(plugins[i].get());
-    if (strlen(plugins[i]->getName()) > maxnamelen) {
-      maxnamelen = strlen(plugins[i]->getName());
-    }
-    start(plugins[i].get());
-  }
 #ifndef ESPSINGLECORE
   xTaskCreatePinnedToCore(pluginTaskFunc, /* Function to implement the task */
                           "pluginTask",   /* Name of the task */

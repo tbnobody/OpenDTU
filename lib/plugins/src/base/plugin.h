@@ -1,6 +1,5 @@
 #pragma once
 
-#include "Hoymiles.h"
 #include "PluginDebug.h"
 #include "globals.h"
 #include "pluginmessages.h"
@@ -24,7 +23,7 @@ public:
   void loadPluginSettings(JsonObject s);
   void savePluginSettings(JsonObject s);
   void setSystem(System<Plugin> *s);
-  bool isSubscribed(const std::shared_ptr<PluginMessage>& m);
+  bool isSubscribed(const std::shared_ptr<PluginMessage> &m);
 
   /**
    * setup
@@ -112,6 +111,17 @@ protected:
    */
   void removeTimerCb(const char *timername);
 
+  bool hasTimerCb(const char *timername);
+
+  void execute(std::function<void(void)> func, uint32_t delaySeconds,
+               const char *id);
+  /**
+   * @brief remove timer callback.
+   *
+   * @param timername
+   */
+  void removeTimerCb(const char *timername);
+
   /**
    * @brief publish internal message to all plugins
    *
@@ -130,12 +140,11 @@ protected:
                   "T must derive from PluginMessage");
     subscriptions[EntityIds<T>::type_id] = true;
   }
-    template <typename T> void unsubscribe() {
+  template <typename T> void unsubscribe() {
     static_assert(std::is_base_of<PluginMessage, T>::value,
                   "T must derive from PluginMessage");
-    subscriptions[EntityIds<T>::type_id]=false;
+    subscriptions[EntityIds<T>::type_id] = false;
   }
-
 
 private:
   int id;

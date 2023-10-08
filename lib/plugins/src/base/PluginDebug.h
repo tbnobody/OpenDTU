@@ -10,7 +10,7 @@ class PDebugClass {
     public:
     PDebugClass() {}
     template<typename... Args> size_t printf(PDebugLevel level, const char * f, Args... args) {
-        if(isLevel(level))
+        if(print != nullptr && isLevel(level))
            return print->printf(f, args...);
         return 0;
     }   

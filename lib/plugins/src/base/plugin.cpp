@@ -64,13 +64,31 @@ void Plugin::addTimerCb(PLUGIN_TIMER_INTVAL intvaltype, uint32_t interval,
   }
 }
 
+bool Plugin::hasTimerCb(const char *timername) {
+  if (system) {
+    return system->hasTimerCb(this, timername);
+  }
+  return false;
+}
+
 void Plugin::removeTimerCb(const char *timername) {
   if (system) {
     system->removeTimerCb(this, timername);
   }
 }
 
-bool Plugin::isSubscribed(const std::shared_ptr<PluginMessage>& m) {
+void Plugin::execute(std::function<void(void)> func, uint32_t delaySeconds,
+                     const char *id) {
+  addTimerCb(
+      PLUGIN_TIMER_INTVAL::SECOND, delaySeconds,
+      [this, &func, id]() {
+        func();
+        removeTimerCb(id);
+      },
+      id);
+}
+
+bool Plugin::isSubscribed(const std::shared_ptr<PluginMessage> &m) {
   auto b = subscriptions.find(m.get()->getMessageTypeId());
   if (b != subscriptions.end())
     return b->second;
