@@ -749,3 +749,10 @@ export default defineComponent({
     },
 });
 </script>
+
+<style>
+.btn-group {
+    border-radius: var(--bs-border-radius);
+    margin-top: 0.25rem;
+}
+</style>
