@@ -8,7 +8,7 @@
 #define ALARM_LOG_ENTRY_SIZE 12
 #define ALARM_LOG_PAYLOAD_SIZE (ALARM_LOG_ENTRY_COUNT * ALARM_LOG_ENTRY_SIZE + 4)
 
-#define ALARM_MSG_COUNT 77
+#define ALARM_MSG_COUNT 111
 
 struct AlarmLogEntry_t {
     uint16_t MessageId;
