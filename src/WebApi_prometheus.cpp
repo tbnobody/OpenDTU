@@ -26,6 +26,10 @@ void WebApiPrometheusClass::loop()
 
 void WebApiPrometheusClass::onPrometheusMetricsGet(AsyncWebServerRequest* request)
 {
+    if (!WebApi.checkCredentialsReadonly(request)) {
+        return;
+    }
+
     try {
         auto stream = request->beginResponseStream("text/plain; charset=utf-8", 4096 * INV_MAX_COUNT); // TODO(helge) check if this calculation is correct
 
