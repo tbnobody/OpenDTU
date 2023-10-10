@@ -64,6 +64,7 @@ public:
 
 private:
     int32_t _lastRequestedPowerLimit = 0;
+    uint32_t _lastPowerLimitMillis = 0;
     uint32_t _shutdownTimeout = 0;
     Status _lastStatus = Status::Initializing;
     uint32_t _lastStatusPrinted = 0;

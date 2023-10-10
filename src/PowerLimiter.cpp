@@ -496,6 +496,7 @@ void PowerLimiterClass::commitPowerLimit(std::shared_ptr<InverterAbstract> inver
             PowerLimitControlType::AbsolutNonPersistent);
 
     _lastRequestedPowerLimit = limit;
+    _lastPowerLimitMillis = millis();
 
     // enable power production only after setting the desired limit,
     // such that an older, greater limit will not cause power spikes.
@@ -546,17 +547,23 @@ bool PowerLimiterClass::setNewPowerLimit(std::shared_ptr<InverterAbstract> inver
 
     // Check if the new value is within the limits of the hysteresis
     auto diff = std::abs(effPowerLimit - _lastRequestedPowerLimit);
-    if ( diff < config.PowerLimiter_TargetPowerConsumptionHysteresis) {
+    auto hysteresis = config.PowerLimiter_TargetPowerConsumptionHysteresis;
+
+    // (re-)send power limit in case the last was sent a long time ago. avoids
+    // staleness in case a power limit update was not received by the inverter.
+    auto ageMillis = millis() - _lastPowerLimitMillis;
+
+    if (diff < hysteresis && ageMillis < 60 * 1000) {
         if (_verboseLogging) {
-            MessageOutput.printf("[DPL::setNewPowerLimit] reusing old limit: %d W, diff: %d W, hysteresis: %d W\r\n",
-                    _lastRequestedPowerLimit, diff, config.PowerLimiter_TargetPowerConsumptionHysteresis);
+            MessageOutput.printf("[DPL::setNewPowerLimit] requested: %d W, last limit: %d W, diff: %d W, hysteresis: %d W, age: %ld ms\r\n",
+                    newPowerLimit, _lastRequestedPowerLimit, diff, hysteresis, ageMillis);
         }
         return false;
     }
 
     if (_verboseLogging) {
-        MessageOutput.printf("[DPL::setNewPowerLimit] using new limit: %d W, requested power limit: %d W\r\n",
-                effPowerLimit, newPowerLimit);
+        MessageOutput.printf("[DPL::setNewPowerLimit] requested: %d W, (re-)sending limit: %d W\r\n",
+                newPowerLimit, effPowerLimit);
     }
 
     commitPowerLimit(inverter, effPowerLimit, true);
