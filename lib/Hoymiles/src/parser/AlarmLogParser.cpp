@@ -8,7 +8,7 @@
 
 const std::array<const AlarmMessage_t, ALARM_MSG_COUNT> AlarmLogParser::_alarmMessages = { {
     { AlarmMessageType_t::ALL, 1, "Inverter start" },
-    { AlarmMessageType_t::ALL, 2, "DTU command failed" },
+    { AlarmMessageType_t::ALL, 2, "Time calibration" },
     { AlarmMessageType_t::ALL, 3, "EEPROM reading and writing error during operation" },
     { AlarmMessageType_t::ALL, 4, "Offline" },
     { AlarmMessageType_t::ALL, 11, "Grid voltage surge" },
