@@ -580,7 +580,7 @@ export default defineComponent({
         },
         onShowEventlog(serial: number) {
             this.eventLogLoading = true;
-            fetch("/api/eventlog/status?inv=" + serial, { headers: authHeader() })
+            fetch("/api/eventlog/status?inv=" + serial + "&locale=" + this.$i18n.locale, { headers: authHeader() })
                 .then((response) => handleResponse(response, this.$emitter, this.$router))
                 .then((data) => {
                     this.eventLogList = data;
