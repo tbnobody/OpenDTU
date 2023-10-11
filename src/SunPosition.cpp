@@ -55,9 +55,7 @@ bool SunPositionClass::checkRecalcDayChanged()
     localtime_r(&now, &timeinfo); // don't use getLocalTime() as there could be a delay of 10ms
 
     uint32_t ymd;
-    ymd = (timeinfo.tm_year << 9) |
-          (timeinfo.tm_mon  << 5) |
-          timeinfo.tm_mday;
+    ymd = (timeinfo.tm_year << 9) | (timeinfo.tm_mon << 5) | timeinfo.tm_mday;
 
     if (_lastSunPositionCalculatedYMD != ymd) {
         return true;
@@ -65,16 +63,13 @@ bool SunPositionClass::checkRecalcDayChanged()
     return false;
 }
 
-
 void SunPositionClass::updateSunData()
 {
     struct tm timeinfo;
     bool gotLocalTime;
 
     gotLocalTime = getLocalTime(&timeinfo, 5);
-    _lastSunPositionCalculatedYMD = (timeinfo.tm_year << 9) |
-                                    (timeinfo.tm_mon << 5) |
-                                    timeinfo.tm_mday;
+    _lastSunPositionCalculatedYMD = (timeinfo.tm_year << 9) | (timeinfo.tm_mon << 5) | timeinfo.tm_mday;
     setDoRecalc(false);
 
     if (!gotLocalTime) {
