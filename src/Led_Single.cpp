@@ -22,8 +22,8 @@ void LedSingleClass::init()
     _updateTimeout.set(LEDSINGLE_UPDATE_INTERVAL);
     turnAllOn();
 
+    auto& pin = PinMapping.get();
     for (uint8_t i = 0; i < PINMAPPING_LED_COUNT; i++) {
-        auto& pin = PinMapping.get();
 
         if (pin.led[i] >= 0) {
             pinMode(pin.led[i], OUTPUT);
@@ -74,8 +74,8 @@ void LedSingleClass::loop()
         _ledState[1] = LedState_t::Off;
     }
 
+    auto& pin = PinMapping.get();
     for (uint8_t i = 0; i < PINMAPPING_LED_COUNT; i++) {
-        auto& pin = PinMapping.get();
 
         if (pin.led[i] < 0) {
             continue;
