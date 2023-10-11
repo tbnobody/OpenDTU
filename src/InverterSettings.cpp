@@ -90,7 +90,7 @@ void InverterSettingsClass::init()
 
 void InverterSettingsClass::loop()
 {
-    if (millis() - _lastUpdate > SUNPOS_UPDATE_INTERVAL) {
+    if (millis() - _lastUpdate > INVERTER_UPDATE_SETTINGS_INTERVAL) {
         const CONFIG_T& config = Configuration.get();
 
         for (uint8_t i = 0; i < INV_MAX_COUNT; i++) {
