@@ -103,6 +103,8 @@ void HoymilesRadio_CMT::loop()
                 f.len = _radio->getDynamicPayloadSize();
                 f.channel = _radio->getChannel();
                 f.rssi = _radio->getRssiDBm();
+                f.wasReceived = false;
+                f.mainCmd = 0x00;
                 if (f.len > MAX_RF_PAYLOAD_SIZE) {
                     f.len = MAX_RF_PAYLOAD_SIZE;
                 }
