@@ -1,25 +1,24 @@
 #include <Arduino.h>
+#include <map>
 #include "VeDirectMpptController.h"
-
-VeDirectMpptController VeDirectMppt;
-
-VeDirectMpptController::VeDirectMpptController()
-{
-}
 
 void VeDirectMpptController::init(int8_t rx, int8_t tx, Print* msgOut, bool verboseLogging)
 {
 	VeDirectFrameHandler::init(rx, tx, msgOut, verboseLogging, 1);
+	_spData = std::make_shared<veMpptStruct>();
 	if (_verboseLogging) { _msgOut->println("Finished init MPPTController"); }
 }
 
-bool VeDirectMpptController::isDataValid() {
-	return VeDirectFrameHandler::isDataValid(veFrame);
+bool VeDirectMpptController::isDataValid() const {
+	return VeDirectFrameHandler::isDataValid(*_spData);
 }
 
-void VeDirectMpptController::textRxEvent(char * name, char * value) {
-	if (_verboseLogging) { _msgOut->printf("[Victron MPPT] Received Text Event %s: Value: %s\r\n", name, value ); }
-	VeDirectFrameHandler::textRxEvent(name, value, _tmpFrame);
+void VeDirectMpptController::textRxEvent(char* name, char* value)
+{
+	if (VeDirectFrameHandler::textRxEvent("MPPT", name, value, _tmpFrame)) {
+		return;
+	}
+
 	if (strcmp(name, "LOAD") == 0) {
 		if (strcmp(value, "ON") == 0)
 			_tmpFrame.LOAD = true;
@@ -65,139 +64,114 @@ void VeDirectMpptController::textRxEvent(char * name, char * value) {
 }
 
 /*
- *  frameEndEvent
- *  This function is called at the end of the received frame.  If the checksum is valid, the temp buffer is read line by line.
- *  If the name exists in the public buffer, the new value is copied to the public buffer.	If not, a new name/value entry
- *  is created in the public buffer.
+ *  frameValidEvent
+ *  This function is called at the end of the received frame.
  */
-void VeDirectMpptController::frameEndEvent(bool valid) {
-	if (valid) {
-		_tmpFrame.P = _tmpFrame.V * _tmpFrame.I;
+void VeDirectMpptController::frameValidEvent() {
+	_tmpFrame.P = _tmpFrame.V * _tmpFrame.I;
 
-		_tmpFrame.IPV = 0;
-		if (_tmpFrame.VPV > 0) {
-			_tmpFrame.IPV = _tmpFrame.PPV / _tmpFrame.VPV;
-		}
-
-		_tmpFrame.E = 0;
-		if ( _tmpFrame.PPV > 0) {
-			_efficiency.addNumber(static_cast<double>(_tmpFrame.P * 100) / _tmpFrame.PPV);
-			_tmpFrame.E = _efficiency.getAverage();
-		}
-
-		veFrame = _tmpFrame;
-		_tmpFrame = {};
-		_lastUpdate = millis();
+	_tmpFrame.IPV = 0;
+	if (_tmpFrame.VPV > 0) {
+		_tmpFrame.IPV = _tmpFrame.PPV / _tmpFrame.VPV;
 	}
+
+	_tmpFrame.E = 0;
+	if ( _tmpFrame.PPV > 0) {
+		_efficiency.addNumber(static_cast<double>(_tmpFrame.P * 100) / _tmpFrame.PPV);
+		_tmpFrame.E = _efficiency.getAverage();
+	}
+
+	_spData = std::make_shared<veMpptStruct>(_tmpFrame);
+	_tmpFrame = {};
+	_lastUpdate = millis();
 }
 
 /*
  * getCsAsString
  * This function returns the state of operations (CS) as readable text.
  */
-String VeDirectMpptController::getCsAsString(uint8_t cs)
+String VeDirectMpptController::veMpptStruct::getCsAsString() const
 {
-	String strCS ="";
+	static const std::map<uint8_t, String> values = {
+		{ 0,   F("OFF") },
+		{ 2,   F("Fault") },
+		{ 3,   F("Bulk") },
+		{ 4,   F("Absorbtion") },
+		{ 5,   F("Float") },
+		{ 7,   F("Equalize (manual)") },
+		{ 245, F("Starting-up") },
+		{ 247, F("Auto equalize / Recondition") },
+		{ 252, F("External Control") }
+	};
 
-	switch(cs) {
-		case 0:
-			strCS =  "OFF";
-			break;
-		case 2:
-			strCS =  "Fault";
-			break;
-		case 3:
-			strCS =  "Bulk";
-			break;
-		case 4:
-			strCS =  "Absorbtion";
-			break;
-		case 5:
-			strCS =  "Float";
-			break;
-		case 7:
-			strCS =  "Equalize (manual)";
-			break;
-		case 245:
-			strCS =  "Starting-up";
-			break;
-		case 247:
-			strCS =  "Auto equalize / Recondition";
-			break;
-		case 252:
-			strCS =  "External Control";
-			break;
-		default:
-			strCS = cs;
-	}
-	return strCS;
+	return getAsString(values, CS);
 }
 
 /*
  * getMpptAsString
  * This function returns the state of MPPT (MPPT) as readable text.
  */
-String VeDirectMpptController::getMpptAsString(uint8_t mppt)
+String VeDirectMpptController::veMpptStruct::getMpptAsString() const
 {
-	String strMPPT ="";
+	static const std::map<uint8_t, String> values = {
+		{ 0, F("OFF") },
+		{ 1, F("Voltage or current limited") },
+		{ 2, F("MPP Tracker active") }
+	};
 
-	switch(mppt) {
-		case 0:
-			strMPPT =  "OFF";
-			break;
-		case 1:
-			strMPPT =  "Voltage or current limited";
-			break;
-		case 2:
-			strMPPT =  "MPP Tracker active";
-			break;
-		default:
-			strMPPT = mppt;
-	}
-	return strMPPT;
+	return getAsString(values, MPPT);
+}
+
+/*
+ * getErrAsString
+ * This function returns error state (ERR) as readable text.
+ */
+String VeDirectMpptController::veMpptStruct::getErrAsString() const
+{
+	static const std::map<uint8_t, String> values = {
+		{ 0,   F("No error") },
+		{ 2,   F("Battery voltage too high") },
+		{ 17,  F("Charger temperature too high") },
+		{ 18,  F("Charger over current") },
+		{ 19,  F("Charger current reversed") },
+		{ 20,  F("Bulk time limit exceeded") },
+		{ 21,  F("Current sensor issue(sensor bias/sensor broken)") },
+		{ 26,  F("Terminals overheated") },
+		{ 28,  F("Converter issue (dual converter models only)") },
+		{ 33,  F("Input voltage too high (solar panel)") },
+		{ 34,  F("Input current too high (solar panel)") },
+		{ 38,  F("Input shutdown (due to excessive battery voltage)") },
+		{ 39,  F("Input shutdown (due to current flow during off mode)") },
+		{ 40,  F("Input") },
+		{ 65,  F("Lost communication with one of devices") },
+		{ 67,  F("Synchronisedcharging device configuration issue") },
+		{ 68,  F("BMS connection lost") },
+		{ 116, F("Factory calibration data lost") },
+		{ 117, F("Invalid/incompatible firmware") },
+		{ 118, F("User settings invalid") }
+	};
+
+	return getAsString(values, ERR);
 }
 
 /*
  * getOrAsString
  * This function returns the off reason (OR) as readable text.
  */
-String VeDirectMpptController::getOrAsString(uint32_t offReason)
+String VeDirectMpptController::veMpptStruct::getOrAsString() const
 {
-	String strOR ="";
+	static const std::map<uint32_t, String> values = {
+		{ 0x00000000, F("Not off") },
+		{ 0x00000001, F("No input power") },
+		{ 0x00000002, F("Switched off (power switch)") },
+		{ 0x00000004, F("Switched off (device moderegister)") },
+		{ 0x00000008, F("Remote input") },
+		{ 0x00000010, F("Protection active") },
+		{ 0x00000020, F("Paygo") },
+		{ 0x00000040, F("BMS") },
+		{ 0x00000080, F("Engine shutdown detection") },
+		{ 0x00000100, F("Analysing input voltage") }
+	};
 
-	switch(offReason) {
-		case 0x00000000:
-			strOR =  "Not off";
-			break;
-		case 0x00000001:
-			strOR =  "No input power";
-			break;
-		case 0x00000002:
-			strOR =  "Switched off (power switch)";
-			break;
-		case 0x00000004:
-			strOR =  "Switched off (device moderegister)";
-			break;
-		case 0x00000008:
-			strOR =  "Remote input";
-			break;
-		case 0x00000010:
-			strOR =  "Protection active";
-			break;
-		case 0x00000020:
-			strOR =  "Paygo";
-			break;
-		case 0x00000040:
-			strOR =  "BMS";
-			break;
-		case 0x00000080:
-			strOR =  "Engine shutdown detection";
-			break;
-		case 0x00000100:
-			strOR =  "Analysing input voltage";
-			break;
-		default:
-			strOR = offReason;
-	}
-	return strOR;
+	return getAsString(values, OR);
 }

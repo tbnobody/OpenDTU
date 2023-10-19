@@ -10,7 +10,7 @@
 #include "MqttSettings.h"
 #include "NetworkSettings.h"
 #include "Huawei_can.h"
-#include <VeDirectMpptController.h>
+#include <VictronMppt.h>
 #include "MessageOutput.h"
 #include <ctime>
 #include <cmath>
@@ -364,14 +364,12 @@ int32_t PowerLimiterClass::inverterPowerDcToAc(std::shared_ptr<InverterAbstract>
  */
 void PowerLimiterClass::unconditionalSolarPassthrough(std::shared_ptr<InverterAbstract> inverter)
 {
-    CONFIG_T& config = Configuration.get();
-
-    if (!config.Vedirect_Enabled || !VeDirectMppt.isDataValid()) {
+    if (!VictronMppt.isDataValid()) {
         shutdown(Status::NoVeDirect);
         return;
     }
 
-    int32_t solarPower = VeDirectMppt.veFrame.V * VeDirectMppt.veFrame.I;
+    int32_t solarPower = VictronMppt.getPowerOutputWatts();
     setNewPowerLimit(inverter, inverterPowerDcToAc(inverter, solarPower));
     announceStatus(Status::UnconditionalSolarPassthrough);
 }
@@ -406,12 +404,11 @@ bool PowerLimiterClass::canUseDirectSolarPower()
 
     if (!config.PowerLimiter_SolarPassThroughEnabled
             || isBelowStopThreshold()
-            || !config.Vedirect_Enabled
-            || !VeDirectMppt.isDataValid()) {
+            || !VictronMppt.isDataValid()) {
         return false;
     }
 
-    return VeDirectMppt.veFrame.PPV >= 20; // enough power?
+    return VictronMppt.getPowerOutputWatts() >= 20; // enough power?
 }
 
 
@@ -576,7 +573,7 @@ int32_t PowerLimiterClass::getSolarChargePower()
         return 0;
     }
 
-    return VeDirectMppt.veFrame.V * VeDirectMppt.veFrame.I;
+    return VictronMppt.getPowerOutputWatts();
 }
 
 float PowerLimiterClass::getLoadCorrectedVoltage()

@@ -208,7 +208,7 @@ void VictronSmartShuntStats::updateFrom(VeDirectShuntController::veShuntStruct c
     _SoC = shuntData.SOC / 10;
     _voltage = shuntData.V;
     _current = shuntData.I;
-    _modelName = VeDirectShunt.getPidAsString(shuntData.PID);
+    _modelName = shuntData.getPidAsString();
     _chargeCycles = shuntData.H4;
     _timeToGo = shuntData.TTG / 60;
     _chargedEnergy = shuntData.H18 / 100;

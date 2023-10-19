@@ -3,7 +3,7 @@
  * Copyright (C) 2022 Thomas Basler and others
  */
 #include "WebApi_vedirect.h"
-#include "VeDirectMpptController.h"
+#include "VictronMppt.h"
 #include "ArduinoJson.h"
 #include "AsyncJson.h"
 #include "Configuration.h"
@@ -117,7 +117,7 @@ void WebApiVedirectClass::onVedirectAdminPost(AsyncWebServerRequest* request)
     config.Vedirect_UpdatesOnly = root[F("vedirect_updatesonly")].as<bool>();
     Configuration.write();
 
-    VeDirectMppt.setVerboseLogging(config.Vedirect_VerboseLogging);
+    VictronMppt.init();
 
     retMsg[F("type")] = F("success");
     retMsg[F("message")] = F("Settings saved!");

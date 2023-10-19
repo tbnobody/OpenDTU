@@ -37,17 +37,15 @@ private:
 
 class VeDirectMpptController : public VeDirectFrameHandler {
 public:
-    VeDirectMpptController();
+    VeDirectMpptController() = default;
 
     void init(int8_t rx, int8_t tx, Print* msgOut, bool verboseLogging);
-    String getMpptAsString(uint8_t mppt);    // state of mppt as string
-    String getCsAsString(uint8_t cs);        // current state as string
-    String getOrAsString(uint32_t offReason); // off reason as string
-    bool isDataValid();                      // return true if data valid and not outdated
+    bool isDataValid() const;                        // return true if data valid and not outdated
 
     struct veMpptStruct : veStruct {
         uint8_t  MPPT;                  // state of MPP tracker
         int32_t PPV;                    // panel power in W
+        int32_t P;                      // battery output power in W (calculated)
         double VPV;                     // panel voltage in V
         double IPV;                     // panel current in A (calculated)
         bool LOAD;                      // virtual load output state (on if battery voltage reaches upper limit, off if battery reaches lower limit)
@@ -60,15 +58,20 @@ public:
         int32_t H21;                    // maximum power today W
         double H22;                     // yield yesterday kWh
         int32_t H23;                    // maximum power yesterday W
+
+        String getMpptAsString() const; // state of mppt as string
+        String getCsAsString() const;   // current state as string
+        String getErrAsString() const;  // error state as string
+        String getOrAsString() const;   // off reason as string
     };
 
-    veMpptStruct veFrame{};
+    using spData_t = std::shared_ptr<veMpptStruct const>;
+    spData_t getData() const { return _spData; }
 
 private:
-    void textRxEvent(char * name, char * value) final;
-    void frameEndEvent(bool) final;                  // copy temp struct to public struct
+    void textRxEvent(char* name, char* value) final;
+    void frameValidEvent() final;
+    spData_t _spData = nullptr;
     veMpptStruct _tmpFrame{};                        // private struct for received name and value pairs
     MovingAverage<double, 5> _efficiency;
 };
-
-extern VeDirectMpptController VeDirectMppt;

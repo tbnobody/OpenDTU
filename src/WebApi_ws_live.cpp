@@ -10,7 +10,7 @@
 #include "Battery.h"
 #include "Huawei_can.h"
 #include "PowerMeter.h"
-#include "VeDirectMpptController.h"
+#include "VictronMppt.h"
 #include "defaults.h"
 #include <AsyncJson.h>
 
@@ -191,10 +191,12 @@ void WebApiWsLiveClass::generateJsonResponse(JsonVariant& root)
     JsonObject vedirectObj = root.createNestedObject("vedirect");
     vedirectObj[F("enabled")] = Configuration.get().Vedirect_Enabled;
     JsonObject totalVeObj = vedirectObj.createNestedObject("total");
-    addTotalField(totalVeObj, "Power", VeDirectMppt.veFrame.PPV, "W", 1);
-    addTotalField(totalVeObj, "YieldDay", VeDirectMppt.veFrame.H20 * 1000, "Wh", 0);
-    addTotalField(totalVeObj, "YieldTotal", VeDirectMppt.veFrame.H19, "kWh", 2);
-    
+
+    auto spMpptData = VictronMppt.getData();
+    addTotalField(totalVeObj, "Power", spMpptData->PPV, "W", 1);
+    addTotalField(totalVeObj, "YieldDay", spMpptData->H20 * 1000, "Wh", 0);
+    addTotalField(totalVeObj, "YieldTotal", spMpptData->H19, "kWh", 2);
+
     JsonObject huaweiObj = root.createNestedObject("huawei");
     huaweiObj[F("enabled")] = Configuration.get().Huawei_Enabled;
     const RectifierParameters_t * rp = HuaweiCan.get();
