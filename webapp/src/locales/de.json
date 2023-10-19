@@ -777,6 +777,7 @@
         "ChargerSettings": "AC Ladegerät Einstellungen",
         "Configuration": "AC Ladegerät Konfiguration",
         "EnableHuawei": "Huawei R4850G2 an CAN Bus Interface aktiv",
+        "CanControllerFrequency": "Frequenz des Quarzes am CAN Controller",
         "EnableAutoPower": "Automatische Leistungssteuerung",
         "Limits": "Limits",
         "VoltageLimit": "Ladespannungslimit",

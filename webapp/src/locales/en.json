@@ -787,6 +787,7 @@
         "ChargerSettings": "AC Charger Settings",
         "Configuration": "AC Charger Configuration",
         "EnableHuawei": "Enable Huawei R4850G2 on CAN Bus Interface",
+        "CanControllerFrequency": "CAN controller quarz frequency",
         "EnableAutoPower": "Automatic power control",
         "Limits": "Limits",
         "VoltageLimit": "Charge Voltage limit",

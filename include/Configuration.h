@@ -177,6 +177,7 @@ struct CONFIG_T {
     uint8_t Battery_JkBmsPollingInterval;
 
     bool Huawei_Enabled;
+    uint32_t Huawei_CAN_Controller_Frequency;
     bool Huawei_Auto_Power_Enabled;
     float Huawei_Auto_Power_Voltage_Limit;
     float Huawei_Auto_Power_Enable_Voltage_Limit;

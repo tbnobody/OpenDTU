@@ -90,7 +90,8 @@ typedef struct RectifierParameters {
 
 class HuaweiCanCommClass {
 public:
-    bool init(uint8_t huawei_miso, uint8_t huawei_mosi, uint8_t huawei_clk, uint8_t huawei_irq, uint8_t huawei_cs);
+    bool init(uint8_t huawei_miso, uint8_t huawei_mosi, uint8_t huawei_clk,
+            uint8_t huawei_irq, uint8_t huawei_cs, uint32_t frequency);
     void loop();
     bool gotNewRxDataFrame(bool clear);
     uint8_t  getErrorCode(bool clear);

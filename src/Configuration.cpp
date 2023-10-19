@@ -190,6 +190,7 @@ bool ConfigurationClass::write()
 
     JsonObject huawei = doc.createNestedObject("huawei");
     huawei["enabled"] = config.Huawei_Enabled;
+    huawei["can_controller_frequency"] = config.Huawei_CAN_Controller_Frequency;
     huawei["auto_power_enabled"] = config.Huawei_Auto_Power_Enabled;
     huawei["voltage_limit"] = config.Huawei_Auto_Power_Voltage_Limit;
     huawei["enable_voltage_limit"] = config.Huawei_Auto_Power_Enable_Voltage_Limit;
@@ -413,6 +414,7 @@ bool ConfigurationClass::read()
 
     JsonObject huawei = doc["huawei"];
     config.Huawei_Enabled = huawei["enabled"] | HUAWEI_ENABLED;
+    config.Huawei_CAN_Controller_Frequency = huawei["can_controller_frequency"] | HUAWEI_CAN_CONTROLLER_FREQUENCY;
     config.Huawei_Auto_Power_Enabled = huawei["auto_power_enabled"] | false;
     config.Huawei_Auto_Power_Voltage_Limit = huawei["voltage_limit"] | HUAWEI_AUTO_POWER_VOLTAGE_LIMIT;
     config.Huawei_Auto_Power_Enable_Voltage_Limit =  huawei["enable_voltage_limit"] | HUAWEI_AUTO_POWER_ENABLE_VOLTAGE_LIMIT;

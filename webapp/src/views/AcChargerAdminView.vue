@@ -9,6 +9,20 @@
                 <InputElement :label="$t('acchargeradmin.EnableHuawei')"
                               v-model="acChargerConfigList.enabled"
                               type="checkbox" wide/>
+
+                <div class="row mb-3" v-show="acChargerConfigList.enabled">
+                    <label class="col-sm-4 col-form-label">
+                        {{ $t('acchargeradmin.CanControllerFrequency') }}
+                    </label>
+                    <div class="col-sm-8">
+                        <select class="form-select" v-model="acChargerConfigList.can_controller_frequency">
+                            <option v-for="frequency in frequencyTypeList" :key="frequency.key" :value="frequency.value">
+                                {{ frequency.key }} MHz
+                            </option>
+                        </select>
+                    </div>
+                </div>
+
                 <InputElement v-show="acChargerConfigList.enabled"
                               :label="$t('acchargeradmin.EnableAutoPower')"
                               v-model="acChargerConfigList.auto_power_enabled"
@@ -89,6 +103,10 @@ export default defineComponent({
             alertMessage: "",
             alertType: "info",
             showAlert: false,
+            frequencyTypeList: [
+                { key:  8, value:  8000000 },
+                { key: 16, value: 16000000 },
+            ],
         };
     },
     created() {
