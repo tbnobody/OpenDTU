@@ -134,14 +134,17 @@ void PowerMeterClass::loop()
     CONFIG_T const& config = Configuration.get();
     _verboseLogging = config.PowerMeter_VerboseLogging;
 
-    if (config.PowerMeter_Enabled && config.PowerMeter_Source == SOURCE_SML) {
+    if (!config.PowerMeter_Enabled) { return; }
+
+    if (config.PowerMeter_Source == SOURCE_SML) {
         if (!smlReadLoop()) {
             return;
+        } else {
+            _lastPowerMeterUpdate = millis();
         }
     }
 
-    if (!config.PowerMeter_Enabled
-            || (millis() - _lastPowerMeterCheck) < (config.PowerMeter_Interval * 1000)) {
+    if ((millis() - _lastPowerMeterCheck) < (config.PowerMeter_Interval * 1000)) {
         return;
     }
 
