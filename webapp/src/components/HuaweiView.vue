@@ -70,7 +70,7 @@
                         </tr>
                         <tr>
                           <th scope="row">{{ $t('huawei.efficiency') }}</th>
-                          <td style="text-align: right">{{ huaweiData.efficiency.v.toFixed(3) }}</td>
+                          <td style="text-align: right">{{ huaweiData.efficiency.v.toFixed(1) }}</td>
                           <td>{{ huaweiData.efficiency.u }}</td>
                         </tr>
                       </tbody>
