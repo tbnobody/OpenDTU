@@ -111,6 +111,7 @@ class VictronSmartShuntStats : public BatteryStats {
         float _voltage; 
         float _current;
         float _temperature;
+        bool _tempPresent;
         uint8_t _chargeCycles;
         uint32_t _timeToGo;
         float _chargedEnergy;

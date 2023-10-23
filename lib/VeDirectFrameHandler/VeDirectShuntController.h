@@ -11,6 +11,7 @@ public:
 
     struct veShuntStruct : veStruct {
         int32_t T;                      // Battery temperature
+        bool tempPresent = false;       // Battery temperature sensor is attached to the shunt
         int32_t P;                      // Instantaneous power
         int32_t CE;                     // Consumed Amp Hours
         int32_t SOC;                    // State-of-charge
