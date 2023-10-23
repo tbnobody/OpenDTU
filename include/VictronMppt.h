@@ -25,6 +25,15 @@ public:
     // total output of all MPPT charge controllers in Watts
     int32_t getPowerOutputWatts() const;
 
+    // total panel input power of all MPPT charge controllers in Watts
+    int32_t getPanelPowerWatts() const;
+
+    // sum of total yield of all MPPT charge controllers in kWh
+    double getYieldTotal() const;
+
+    // sum of today's yield of all MPPT charge controllers in kWh
+    double getYieldDay() const;
+
 private:
     VictronMpptClass(VictronMpptClass const& other) = delete;
     VictronMpptClass(VictronMpptClass&& other) = delete;

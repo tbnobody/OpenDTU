@@ -78,7 +78,7 @@ VeDirectMpptController::spData_t VictronMpptClass::getData(size_t idx) const
     if (_controllers.empty() || idx >= _controllers.size()) {
         MessageOutput.printf("ERROR: MPPT controller index %d is out of bounds (%d controllers)\r\n",
                 idx, _controllers.size());
-        return VeDirectMpptController::spData_t{};
+        return std::make_shared<VeDirectMpptController::veMpptStruct>();
     }
 
     return _controllers[idx]->getData();
@@ -90,6 +90,39 @@ int32_t VictronMpptClass::getPowerOutputWatts() const
 
     for (const auto& upController : _controllers) {
         sum += upController->getData()->P;
+    }
+
+    return sum;
+}
+
+int32_t VictronMpptClass::getPanelPowerWatts() const
+{
+    int32_t sum = 0;
+
+    for (const auto& upController : _controllers) {
+        sum += upController->getData()->PPV;
+    }
+
+    return sum;
+}
+
+double VictronMpptClass::getYieldTotal() const
+{
+    double sum = 0;
+
+    for (const auto& upController : _controllers) {
+        sum += upController->getData()->H19;
+    }
+
+    return sum;
+}
+
+double VictronMpptClass::getYieldDay() const
+{
+    double sum = 0;
+
+    for (const auto& upController : _controllers) {
+        sum += upController->getData()->H20;
     }
 
     return sum;
