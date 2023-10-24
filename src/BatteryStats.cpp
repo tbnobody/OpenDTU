@@ -208,12 +208,14 @@ void VictronSmartShuntStats::updateFrom(VeDirectShuntController::veShuntStruct c
     _SoC = shuntData.SOC / 10;
     _voltage = shuntData.V;
     _current = shuntData.I;
-    _modelName = VeDirectShunt.getPidAsString(shuntData.PID);
+    _modelName = shuntData.getPidAsString();
     _chargeCycles = shuntData.H4;
     _timeToGo = shuntData.TTG / 60;
     _chargedEnergy = shuntData.H18 / 100;
     _dischargedEnergy = shuntData.H17 / 100;
     _manufacturer = "Victron " + _modelName;
+    _temperature = shuntData.T;
+    _tempPresent = shuntData.tempPresent;
     
     // shuntData.AR is a bitfield, so we need to check each bit individually
     _alarmLowVoltage = shuntData.AR & 1;
@@ -235,6 +237,9 @@ void VictronSmartShuntStats::getLiveViewData(JsonVariant& root) const {
     addLiveViewValue(root, "chargeCycles", _chargeCycles, "", 0);
     addLiveViewValue(root, "chargedEnergy", _chargedEnergy, "KWh", 1);
     addLiveViewValue(root, "dischargedEnergy", _dischargedEnergy, "KWh", 1);
+    if (_tempPresent) {
+        addLiveViewValue(root, "temperature", _temperature, "°C", 0);
+    }
     
     addLiveViewAlarm(root, "lowVoltage", _alarmLowVoltage);
     addLiveViewAlarm(root, "highVoltage", _alarmHighVoltage);

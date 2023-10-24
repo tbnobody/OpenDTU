@@ -30,7 +30,8 @@ void HuaweiCanCommunicationTask(void* parameter) {
   }
 }
 
-bool HuaweiCanCommClass::init(uint8_t huawei_miso, uint8_t huawei_mosi, uint8_t huawei_clk, uint8_t huawei_irq, uint8_t huawei_cs) {
+bool HuaweiCanCommClass::init(uint8_t huawei_miso, uint8_t huawei_mosi, uint8_t huawei_clk,
+        uint8_t huawei_irq, uint8_t huawei_cs, uint32_t frequency) {
     SPI = new SPIClass(HSPI);
     SPI->begin(huawei_clk, huawei_miso, huawei_mosi, huawei_cs);
     pinMode(huawei_cs, OUTPUT);
@@ -39,8 +40,14 @@ bool HuaweiCanCommClass::init(uint8_t huawei_miso, uint8_t huawei_mosi, uint8_t 
     pinMode(huawei_irq, INPUT_PULLUP);
     _huaweiIrq = huawei_irq;
 
+    auto mcp_frequency = MCP_8MHZ;
+    if (16000000UL == frequency) { mcp_frequency = MCP_16MHZ; }
+    else if (8000000UL != frequency) {
+        MessageOutput.printf("Huawei CAN: unknown frequency %d Hz, using 8 MHz\r\n", mcp_frequency);
+    }
+
     _CAN = new MCP_CAN(SPI, huawei_cs);
-    if (!_CAN->begin(MCP_STDEXT, CAN_125KBPS, MCP_8MHZ) == CAN_OK) {
+    if (!_CAN->begin(MCP_STDEXT, CAN_125KBPS, mcp_frequency) == CAN_OK) {
         return false;
     }
 
@@ -198,7 +205,7 @@ void HuaweiCanClass::init(uint8_t huawei_miso, uint8_t huawei_mosi, uint8_t huaw
         return;
     }
 
-    if (!HuaweiCanComm.init(huawei_miso, huawei_mosi, huawei_clk, huawei_irq, huawei_cs)) {
+    if (!HuaweiCanComm.init(huawei_miso, huawei_mosi, huawei_clk, huawei_irq, huawei_cs, config.Huawei_CAN_Controller_Frequency)) {
       MessageOutput.println("[HuaweiCanClass::init] Error Initializing Huawei CAN communication...");
       return;
     };

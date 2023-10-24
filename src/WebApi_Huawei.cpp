@@ -190,6 +190,7 @@ void WebApiHuaweiClass::onAdminGet(AsyncWebServerRequest* request)
     const CONFIG_T& config = Configuration.get();
 
     root[F("enabled")] = config.Huawei_Enabled;
+    root[F("can_controller_frequency")] = config.Huawei_CAN_Controller_Frequency;
     root[F("auto_power_enabled")] = config.Huawei_Auto_Power_Enabled;
     root[F("voltage_limit")] = static_cast<int>(config.Huawei_Auto_Power_Voltage_Limit * 100) / 100.0;
     root[F("enable_voltage_limit")] = static_cast<int>(config.Huawei_Auto_Power_Enable_Voltage_Limit * 100) / 100.0;
@@ -240,6 +241,7 @@ void WebApiHuaweiClass::onAdminPost(AsyncWebServerRequest* request)
     }
 
     if (!(root.containsKey("enabled")) ||
+        !(root.containsKey("can_controller_frequency")) ||
         !(root.containsKey("auto_power_enabled")) ||
         !(root.containsKey("voltage_limit")) ||
         !(root.containsKey("lower_power_limit")) ||
@@ -253,6 +255,7 @@ void WebApiHuaweiClass::onAdminPost(AsyncWebServerRequest* request)
 
     CONFIG_T& config = Configuration.get();
     config.Huawei_Enabled = root[F("enabled")].as<bool>();
+    config.Huawei_CAN_Controller_Frequency = root[F("can_controller_frequency")].as<uint32_t>();
     config.Huawei_Auto_Power_Enabled = root[F("auto_power_enabled")].as<bool>();
     config.Huawei_Auto_Power_Voltage_Limit = root[F("voltage_limit")].as<float>();
     config.Huawei_Auto_Power_Enable_Voltage_Limit = root[F("enable_voltage_limit")].as<float>();
@@ -266,6 +269,14 @@ void WebApiHuaweiClass::onAdminPost(AsyncWebServerRequest* request)
 
     response->setLength();
     request->send(response);
+
+    // TODO(schlimmchen): HuaweiCan has no real concept of the fact that the
+    // config might change. at least not regarding CAN parameters. until that
+    // changes, the ESP must restart for configuration changes to take effect.
+    yield();
+    delay(1000);
+    yield();
+    ESP.restart();
 
     const PinMapping_t& pin = PinMapping.get();
     // Properly turn this on

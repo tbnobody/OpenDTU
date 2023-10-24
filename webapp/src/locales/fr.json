@@ -388,7 +388,7 @@
         "Cancel": "Annuler",
         "RebootOpenDTU": "Redémarrer OpenDTU",
         "RebootQuestion": "Voulez-vous vraiment redémarrer l'appareil ?",
-        "RebootHint": "<b>Astuce :</b> Normalement, il n'est pas nécessaire de procéder à un redémarrage manuel. OpenDTU effectue automatiquement tout redémarrage nécessaire (par exemple, après une mise à jour du firmware). Les paramètres sont également adoptés sans redémarrage. Si vous devez redémarrer en raison d'une erreur, veuillez envisager de la signaler à l'adresse suivante <a href=\"https://github.com/tbnobody/OpenDTU/issues\" class=\"alert-link\" target=\"_blank\">https://github.com/tbnobody/OpenDTU/issues</a>."
+        "RebootHint": "<b>Astuce :</b> Normalement, il n'est pas nécessaire de procéder à un redémarrage manuel. OpenDTU effectue automatiquement tout redémarrage nécessaire (par exemple, après une mise à jour du firmware). Les paramètres sont également adoptés sans redémarrage. Si vous devez redémarrer en raison d'une erreur, veuillez envisager de la signaler à l'adresse suivante <a href=\"https://github.com/helgeerbe/OpenDTU-OnBattery/issues\" class=\"alert-link\" target=\"_blank\">Github</a>."
     },
     "dtuadmin": {
         "DtuSettings": "Paramètres du DTU",
@@ -667,11 +667,11 @@
         "ProjectOriginBody3": "Le logiciel a été développé au mieux de nos connaissances et de nos convictions. Néanmoins, aucune responsabilité ne peut être acceptée en cas de dysfonctionnement ou de perte de garantie de l'onduleur.",
         "ProjectOriginBody4": "OpenDTU est disponible gratuitement. Si vous avez payé pour le logiciel, vous avez probablement été arnaqué.",
         "NewsUpdates": "Actualités et mises à jour",
-        "NewsUpdatesBody": "Les nouvelles mises à jour peuvent être trouvées sur <a href=\"https://github.com/tbnobody/OpenDTU\" target=\"_blank\">https://github.com/tbnobody/OpenDTU</a>",
+        "NewsUpdatesBody": "Les nouvelles mises à jour peuvent être trouvées sur <a href=\"https://github.com/helgeerbe/OpenDTU-OnBattery/releases\" target=\"_blank\">Github</a>.",
         "ErrorReporting": "Rapport d'erreurs",
-        "ErrorReportingBody": "Veuillez signaler les problèmes en utilisant la fonction fournie par <a href=\"https://github.com/tbnobody/OpenDTU/issues\" target=\"_blank\">Github</a>.",
+        "ErrorReportingBody": "Veuillez signaler les problèmes en utilisant la fonction fournie par <a href=\"https://github.com/helgeerbe/OpenDTU-OnBattery/issues\" target=\"_blank\">Github</a>.",
         "Discussion": "Discussion",
-        "DiscussionBody": "Discutez avec nous sur <a href=\"https://discord.gg/WzhxEY62mB\" target=\"_blank\">Discord</a> ou sur <a href=\"https://github.com/tbnobody/OpenDTU/discussions\" target=\"_blank\">Github</a>"
+        "DiscussionBody": "Discutez avec nous sur <a href=\"https://discord.gg/WzhxEY62mB\" target=\"_blank\">Discord</a> ou sur <a href=\"https://github.com/helgeerbe/OpenDTU-OnBattery/discussions\" target=\"_blank\">Github</a>."
     },
     "hints": {
         "RadioProblem": "Impossible de se connecter à un module radio configuré.. Veuillez vérifier le câblage.",
@@ -743,6 +743,7 @@
         "ChargerSettings": "AC Charger Settings",
         "Configuration": "AC Charger Configuration",
         "EnableHuawei": "Enable Huawei R4850G2 on CAN Bus Interface",
+        "CanControllerFrequency": "CAN controller quarz frequency",
         "EnableAutoPower": "Automatic power control",
         "Limits": "Limits",
         "VoltageLimit": "Charge Voltage limit",

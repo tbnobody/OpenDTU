@@ -9,6 +9,7 @@
 #include "WebApi.h"
 #include "defaults.h"
 #include "PowerLimiter.h"
+#include "VictronMppt.h"
 
 WebApiWsVedirectLiveClass::WebApiWsVedirectLiveClass()
     : _ws("/vedirectlivedata")
@@ -44,18 +45,14 @@ void WebApiWsVedirectLiveClass::loop()
         return;
     }
 
-    if (millis() - _lastVedirectUpdateCheck < 1000) {
-        return;
-    }
-    _lastVedirectUpdateCheck = millis();
-
-    uint32_t maxTimeStamp = 0;
-    if (VeDirectMppt.getLastUpdate() > maxTimeStamp) {
-        maxTimeStamp = VeDirectMppt.getLastUpdate();
-    }
+    // we assume this loop to be running at least twice for every
+    // update from a VE.Direct MPPT data producer, so _dataAgeMillis
+    // acutally grows in between updates.
+    auto lastDataAgeMillis = _dataAgeMillis;
+    _dataAgeMillis = VictronMppt.getDataAgeMillis();
 
     // Update on ve.direct change or at least after 10 seconds
-    if (millis() - _lastWsPublish > (10 * 1000) || (maxTimeStamp != _newestVedirectTimestamp)) {
+    if (millis() - _lastWsPublish > (10 * 1000) || lastDataAgeMillis > _dataAgeMillis) {
         
         try {
             String buffer;
@@ -87,57 +84,59 @@ void WebApiWsVedirectLiveClass::loop()
 
 void WebApiWsVedirectLiveClass::generateJsonResponse(JsonVariant& root)
 {
+    auto spMpptData = VictronMppt.getData();
+
     // device info
-    root["device"]["data_age"] = (millis() - VeDirectMppt.getLastUpdate() ) / 1000;
-    root["device"]["age_critical"] = !VeDirectMppt.isDataValid();
-    root["device"]["PID"] = VeDirectMppt.getPidAsString(VeDirectMppt.veFrame.PID);
-    root["device"]["SER"] = VeDirectMppt.veFrame.SER;
-    root["device"]["FW"] = VeDirectMppt.veFrame.FW;
-    root["device"]["LOAD"] = VeDirectMppt.veFrame.LOAD == true ? "ON" : "OFF";
-    root["device"]["CS"] = VeDirectMppt.getCsAsString(VeDirectMppt.veFrame.CS);
-    root["device"]["ERR"] = VeDirectMppt.getErrAsString(VeDirectMppt.veFrame.ERR);
-    root["device"]["OR"] = VeDirectMppt.getOrAsString(VeDirectMppt.veFrame.OR);
-    root["device"]["MPPT"] = VeDirectMppt.getMpptAsString(VeDirectMppt.veFrame.MPPT);
-    root["device"]["HSDS"]["v"] = VeDirectMppt.veFrame.HSDS;
+    root["device"]["data_age"] = VictronMppt.getDataAgeMillis() / 1000;
+    root["device"]["age_critical"] = !VictronMppt.isDataValid();
+    root["device"]["PID"] = spMpptData->getPidAsString();
+    root["device"]["SER"] = spMpptData->SER;
+    root["device"]["FW"] = spMpptData->FW;
+    root["device"]["LOAD"] = spMpptData->LOAD == true ? "ON" : "OFF";
+    root["device"]["CS"] = spMpptData->getCsAsString();
+    root["device"]["ERR"] = spMpptData->getErrAsString();
+    root["device"]["OR"] = spMpptData->getOrAsString();
+    root["device"]["MPPT"] = spMpptData->getMpptAsString();
+    root["device"]["HSDS"]["v"] = spMpptData->HSDS;
     root["device"]["HSDS"]["u"] = "d";
 
     // battery info    
-    root["output"]["P"]["v"] = VeDirectMppt.veFrame.P;
+    root["output"]["P"]["v"] = spMpptData->P;
     root["output"]["P"]["u"] = "W";
     root["output"]["P"]["d"] = 0;
-    root["output"]["V"]["v"] = VeDirectMppt.veFrame.V;
+    root["output"]["V"]["v"] = spMpptData->V;
     root["output"]["V"]["u"] = "V";
     root["output"]["V"]["d"] = 2;
-    root["output"]["I"]["v"] = VeDirectMppt.veFrame.I;
+    root["output"]["I"]["v"] = spMpptData->I;
     root["output"]["I"]["u"] = "A";
     root["output"]["I"]["d"] = 2;
-    root["output"]["E"]["v"] = VeDirectMppt.veFrame.E;
+    root["output"]["E"]["v"] = spMpptData->E;
     root["output"]["E"]["u"] = "%";
     root["output"]["E"]["d"] = 1;
 
     // panel info
-    root["input"]["PPV"]["v"] = VeDirectMppt.veFrame.PPV;
+    root["input"]["PPV"]["v"] = spMpptData->PPV;
     root["input"]["PPV"]["u"] = "W";
     root["input"]["PPV"]["d"] = 0;
-    root["input"]["VPV"]["v"] = VeDirectMppt.veFrame.VPV;
+    root["input"]["VPV"]["v"] = spMpptData->VPV;
     root["input"]["VPV"]["u"] = "V";
     root["input"]["VPV"]["d"] = 2;
-    root["input"]["IPV"]["v"] = VeDirectMppt.veFrame.IPV;
+    root["input"]["IPV"]["v"] = spMpptData->IPV;
     root["input"]["IPV"]["u"] = "A";
     root["input"]["IPV"]["d"] = 2;
-    root["input"]["YieldToday"]["v"] = VeDirectMppt.veFrame.H20;
+    root["input"]["YieldToday"]["v"] = spMpptData->H20;
     root["input"]["YieldToday"]["u"] = "kWh";
     root["input"]["YieldToday"]["d"] = 3;
-    root["input"]["YieldYesterday"]["v"] = VeDirectMppt.veFrame.H22;
+    root["input"]["YieldYesterday"]["v"] = spMpptData->H22;
     root["input"]["YieldYesterday"]["u"] = "kWh";
     root["input"]["YieldYesterday"]["d"] = 3;
-    root["input"]["YieldTotal"]["v"] = VeDirectMppt.veFrame.H19;
+    root["input"]["YieldTotal"]["v"] = spMpptData->H19;
     root["input"]["YieldTotal"]["u"] = "kWh";
     root["input"]["YieldTotal"]["d"] = 3;
-    root["input"]["MaximumPowerToday"]["v"] = VeDirectMppt.veFrame.H21;
+    root["input"]["MaximumPowerToday"]["v"] = spMpptData->H21;
     root["input"]["MaximumPowerToday"]["u"] = "W";
     root["input"]["MaximumPowerToday"]["d"] = 0;
-    root["input"]["MaximumPowerYesterday"]["v"] = VeDirectMppt.veFrame.H23;
+    root["input"]["MaximumPowerYesterday"]["v"] = spMpptData->H23;
     root["input"]["MaximumPowerYesterday"]["u"] = "W";
     root["input"]["MaximumPowerYesterday"]["d"] = 0;
 
@@ -146,10 +145,6 @@ void WebApiWsVedirectLiveClass::generateJsonResponse(JsonVariant& root)
     if (Configuration.get().PowerLimiter_Enabled)
         root["dpl"]["PLSTATE"] = PowerLimiter.getPowerLimiterState();
     root["dpl"]["PLLIMIT"] = PowerLimiter.getLastRequestedPowerLimit();
-
-    if (VeDirectMppt.getLastUpdate() > _newestVedirectTimestamp) {
-        _newestVedirectTimestamp = VeDirectMppt.getLastUpdate();
-    }
 }
 
 void WebApiWsVedirectLiveClass::onWebsocketEvent(AsyncWebSocket* server, AsyncWebSocketClient* client, AwsEventType type, void* arg, uint8_t* data, size_t len)

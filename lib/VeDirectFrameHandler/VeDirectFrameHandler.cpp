@@ -72,19 +72,14 @@ VeDirectFrameHandler::VeDirectFrameHandler() :
 {
 }
 
-void VeDirectFrameHandler::setVerboseLogging(bool verboseLogging)
-{
-	_verboseLogging = verboseLogging;
-	if (!_verboseLogging) { _debugIn = 0; }
-}
-
 void VeDirectFrameHandler::init(int8_t rx, int8_t tx, Print* msgOut, bool verboseLogging, uint16_t hwSerialPort)
 {
 	_vedirectSerial = std::make_unique<HardwareSerial>(hwSerialPort);
 	_vedirectSerial->begin(19200, SERIAL_8N1, rx, tx);
 	_vedirectSerial->flush();
 	_msgOut = msgOut;
-	setVerboseLogging(verboseLogging);
+	_verboseLogging = verboseLogging;
+	_debugIn = 0;
 }
 
 void VeDirectFrameHandler::dumpDebugBuffer() {
@@ -211,7 +206,7 @@ void VeDirectFrameHandler::rxData(uint8_t inbyte)
 		if (_verboseLogging) { dumpDebugBuffer(); }
 		_checksum = 0;
 		_state = IDLE;
-		frameEndEvent(valid);
+		if (valid) { frameValidEvent(); }
 		break;
 	}
 	case RECORD_HEX:
@@ -224,22 +219,38 @@ void VeDirectFrameHandler::rxData(uint8_t inbyte)
  * textRxEvent
  * This function is called every time a new name/value is successfully parsed.  It writes the values to the temporary buffer.
  */
-void VeDirectFrameHandler::textRxEvent(char * name, char * value, veStruct& frame) {
+bool VeDirectFrameHandler::textRxEvent(std::string const& who, char* name, char* value, veStruct& frame) {
+	if (_verboseLogging) {
+		_msgOut->printf("[Victron %s] Text Event %s: Value: %s\r\n",
+				who.c_str(), name, value );
+	}
+
 	if (strcmp(name, "PID") == 0) {
 		frame.PID = strtol(value, nullptr, 0);
+		return true;
 	}
-	else if (strcmp(name, "SER") == 0) {
+
+	if (strcmp(name, "SER") == 0) {
 		strcpy(frame.SER, value);
+		return true;
 	}
-	else if (strcmp(name, "FW") == 0) {
+
+	if (strcmp(name, "FW") == 0) {
 		strcpy(frame.FW, value);
+		return true;
 	}
-	else if (strcmp(name, "V") == 0) {
+
+	if (strcmp(name, "V") == 0) {
 		frame.V = round(atof(value) / 10.0) / 100.0;
+		return true;
 	}
-	else if (strcmp(name, "I") == 0) {
+
+	if (strcmp(name, "I") == 0) {
 		frame.I = round(atof(value) / 10.0) / 100.0;
+		return true;
 	}
+
+	return false;
 }
 
 
@@ -269,7 +280,7 @@ int VeDirectFrameHandler::hexRxEvent(uint8_t inbyte) {
 	return ret;
 }
 
-bool VeDirectFrameHandler::isDataValid(veStruct frame) {
+bool VeDirectFrameHandler::isDataValid(veStruct const& frame) const {
 	if (_lastUpdate == 0) {
 		return false;
 	}
@@ -279,330 +290,112 @@ bool VeDirectFrameHandler::isDataValid(veStruct frame) {
 	return true;
 }
 
-unsigned long VeDirectFrameHandler::getLastUpdate()
+uint32_t VeDirectFrameHandler::getLastUpdate() const
 {
 	return _lastUpdate;
 }
+
+template<typename T>
+String const& VeDirectFrameHandler::getAsString(std::map<T, String> const& values, T val)
+{
+	auto pos = values.find(val);
+	if (pos == values.end()) {
+		static String dummy;
+		dummy = val;
+		return dummy;
+	}
+	return pos->second;
+}
+
+template String const& VeDirectFrameHandler::getAsString(std::map<uint8_t, String> const& values, uint8_t val);
+template String const& VeDirectFrameHandler::getAsString(std::map<uint16_t, String> const& values, uint16_t val);
+template String const& VeDirectFrameHandler::getAsString(std::map<uint32_t, String> const& values, uint32_t val);
 
 /*
  * getPidAsString
  * This function returns the product id (PID) as readable text.
  */
-String VeDirectFrameHandler::getPidAsString(uint16_t pid)
+String VeDirectFrameHandler::veStruct::getPidAsString() const
 {
-	String strPID ="";
+	static const std::map<uint16_t, String> values = {
+		{ 0x0300, F("BlueSolar MPPT 70|15") },
+		{ 0xA040, F("BlueSolar MPPT 75|50") },
+		{ 0xA041, F("BlueSolar MPPT 150|35") },
+		{ 0xA042, F("BlueSolar MPPT 75|15") },
+		{ 0xA043, F("BlueSolar MPPT 100|15") },
+		{ 0xA044, F("BlueSolar MPPT 100|30") },
+		{ 0xA045, F("BlueSolar MPPT 100|50") },
+		{ 0xA046, F("BlueSolar MPPT 100|70") },
+		{ 0xA047, F("BlueSolar MPPT 150|100") },
+		{ 0xA049, F("BlueSolar MPPT 100|50 rev2") },
+		{ 0xA04A, F("BlueSolar MPPT 100|30 rev2") },
+		{ 0xA04B, F("BlueSolar MPPT 150|35 rev2") },
+		{ 0xA04C, F("BlueSolar MPPT 75|10") },
+		{ 0xA04D, F("BlueSolar MPPT 150|45") },
+		{ 0xA04E, F("BlueSolar MPPT 150|60") },
+		{ 0xA04F, F("BlueSolar MPPT 150|85") },
+		{ 0xA050, F("SmartSolar MPPT 250|100") },
+		{ 0xA051, F("SmartSolar MPPT 150|100") },
+		{ 0xA052, F("SmartSolar MPPT 150|85") },
+		{ 0xA053, F("SmartSolar MPPT 75|15") },
+		{ 0xA054, F("SmartSolar MPPT 75|10") },
+		{ 0xA055, F("SmartSolar MPPT 100|15") },
+		{ 0xA056, F("SmartSolar MPPT 100|30") },
+		{ 0xA057, F("SmartSolar MPPT 100|50") },
+		{ 0xA058, F("SmartSolar MPPT 150|35") },
+		{ 0xA059, F("SmartSolar MPPT 150|10 rev2") },
+		{ 0xA05A, F("SmartSolar MPPT 150|85 rev2") },
+		{ 0xA05B, F("SmartSolar MPPT 250|70") },
+		{ 0xA05C, F("SmartSolar MPPT 250|85") },
+		{ 0xA05D, F("SmartSolar MPPT 250|60") },
+		{ 0xA05E, F("SmartSolar MPPT 250|45") },
+		{ 0xA05F, F("SmartSolar MPPT 100|20") },
+		{ 0xA060, F("SmartSolar MPPT 100|20 48V") },
+		{ 0xA061, F("SmartSolar MPPT 150|45") },
+		{ 0xA062, F("SmartSolar MPPT 150|60") },
+		{ 0xA063, F("SmartSolar MPPT 150|70") },
+		{ 0xA064, F("SmartSolar MPPT 250|85 rev2") },
+		{ 0xA065, F("SmartSolar MPPT 250|100 rev2") },
+		{ 0xA066, F("BlueSolar MPPT 100|20") },
+		{ 0xA067, F("BlueSolar MPPT 100|20 48V") },
+		{ 0xA068, F("SmartSolar MPPT 250|60 rev2") },
+		{ 0xA069, F("SmartSolar MPPT 250|70 rev2") },
+		{ 0xA06A, F("SmartSolar MPPT 150|45 rev2") },
+		{ 0xA06B, F("SmartSolar MPPT 150|60 rev2") },
+		{ 0xA06C, F("SmartSolar MPPT 150|70 rev2") },
+		{ 0xA06D, F("SmartSolar MPPT 150|85 rev3") },
+		{ 0xA06E, F("SmartSolar MPPT 150|100 rev3") },
+		{ 0xA06F, F("BlueSolar MPPT 150|45 rev2") },
+		{ 0xA070, F("BlueSolar MPPT 150|60 rev2") },
+		{ 0xA071, F("BlueSolar MPPT 150|70 rev2") },
+		{ 0xA102, F("SmartSolar MPPT VE.Can 150|70") },
+		{ 0xA103, F("SmartSolar MPPT VE.Can 150|45") },
+		{ 0xA104, F("SmartSolar MPPT VE.Can 150|60") },
+		{ 0xA105, F("SmartSolar MPPT VE.Can 150|85") },
+		{ 0xA106, F("SmartSolar MPPT VE.Can 150|100") },
+		{ 0xA107, F("SmartSolar MPPT VE.Can 250|45") },
+		{ 0xA108, F("SmartSolar MPPT VE.Can 250|60") },
+		{ 0xA109, F("SmartSolar MPPT VE.Can 250|80") },
+		{ 0xA10A, F("SmartSolar MPPT VE.Can 250|85") },
+		{ 0xA10B, F("SmartSolar MPPT VE.Can 250|100") },
+		{ 0xA10C, F("SmartSolar MPPT VE.Can 150|70 rev2") },
+		{ 0xA10D, F("SmartSolar MPPT VE.Can 150|85 rev2") },
+		{ 0xA10E, F("SmartSolar MPPT VE.Can 150|100 rev2") },
+		{ 0xA10F, F("BlueSolar MPPT VE.Can 150|100") },
+		{ 0xA110, F("SmartSolar MPPT RS 450|100") },
+		{ 0xA112, F("BlueSolar MPPT VE.Can 250|70") },
+		{ 0xA113, F("BlueSolar MPPT VE.Can 250|100") },
+		{ 0xA114, F("SmartSolar MPPT VE.Can 250|70 rev2") },
+		{ 0xA115, F("SmartSolar MPPT VE.Can 250|100 rev2") },
+		{ 0xA116, F("SmartSolar MPPT VE.Can 250|85 rev2") },
+		{ 0xA381, F("BMV-712 Smart") },
+		{ 0xA382, F("BMV-710H Smart") },
+		{ 0xA383, F("BMV-712 Smart Rev2") },
+		{ 0xA389, F("SmartShunt 500A/50mV") },
+		{ 0xA38A, F("SmartShunt 1000A/50mV") },
+		{ 0xA38B, F("SmartShunt 2000A/50mV") },
+		{ 0xA3F0, F("SmartShunt 2000A/50mV" ) }
+	};
 
-	switch(pid) {
-		case 0x0300:
-			strPID =  "BlueSolar MPPT 70|15";
-			break;
-		case 0xA040:
-			strPID =  "BlueSolar MPPT 75|50";
-			break;
-		case 0xA041:
-			strPID =  "BlueSolar MPPT 150|35";
-			break;
-		case 0xA042:
-			strPID =  "BlueSolar MPPT 75|15";
-			break;
-		case 0xA043:
-			strPID =  "BlueSolar MPPT 100|15";
-			break;
-		case 0xA044:
-			strPID =  "BlueSolar MPPT 100|30";
-			break;
-		case 0xA045:
-			strPID =  "BlueSolar MPPT 100|50";
-			break;
-		case 0xA046:
-			strPID =  "BlueSolar MPPT 100|70";
-			break;
-		case 0xA047:
-			strPID =  "BlueSolar MPPT 150|100";
-			break;
-		case 0xA049:
-			strPID =  "BlueSolar MPPT 100|50 rev2";
-			break;
-		case 0xA04A:
-			strPID =  "BlueSolar MPPT 100|30 rev2";
-			break;
-		case 0xA04B:
-			strPID =  "BlueSolar MPPT 150|35 rev2";
-			break;
-		case 0XA04C:
-			strPID =  "BlueSolar MPPT 75|10";
-			break;
-		case 0XA04D:
-			strPID =  "BlueSolar MPPT 150|45";
-			break;
-		case 0XA04E:
-			strPID =  "BlueSolar MPPT 150|60";
-			break;
-		case 0XA04F:
-			strPID =  "BlueSolar MPPT 150|85";
-			break;
-		case 0XA050:
-			strPID =  "SmartSolar MPPT 250|100";
-			break;
-		case 0XA051:
-			strPID =  "SmartSolar MPPT 150|100";
-			break;
-		case 0XA052:
-			strPID =  "SmartSolar MPPT 150|85";
-			break;
-		case 0XA053:
-			strPID =  "SmartSolar MPPT 75|15";
-			break;
-		case 0XA054:
-			strPID =  "SmartSolar MPPT 75|10";
-			break;
-		case 0XA055:
-			strPID =  "SmartSolar MPPT 100|15";
-			break;
-		case 0XA056:
-			strPID =  "SmartSolar MPPT 100|30";
-			break;
-		case 0XA057:
-			strPID =  "SmartSolar MPPT 100|50";
-			break;
-		case 0XA058:
-			strPID =  "SmartSolar MPPT 150|35";
-			break;
-		case 0XA059:
-			strPID =  "SmartSolar MPPT 150|10 rev2";
-			break;
-		case 0XA05A:
-			strPID =  "SmartSolar MPPT 150|85 rev2";
-			break;
-		case 0XA05B:
-			strPID =  "SmartSolar MPPT 250|70";
-			break;
-		case 0XA05C:
-			strPID =  "SmartSolar MPPT 250|85";
-			break;
-		case 0XA05D:
-			strPID =  "SmartSolar MPPT 250|60";
-			break;
-		case 0XA05E:
-			strPID =  "SmartSolar MPPT 250|45";
-			break;
-		case 0XA05F:
-			strPID =  "SmartSolar MPPT 100|20";
-			break;
-		case 0XA060:
-			strPID =  "SmartSolar MPPT 100|20 48V";
-			break;
-		case 0XA061:
-			strPID =  "SmartSolar MPPT 150|45";
-			break;
-		case 0XA062:
-			strPID =  "SmartSolar MPPT 150|60";
-			break;
-		case 0XA063:
-			strPID =  "SmartSolar MPPT 150|70";
-			break;
-		case 0XA064:
-			strPID =  "SmartSolar MPPT 250|85 rev2";
-			break;
-		case 0XA065:
-			strPID =  "SmartSolar MPPT 250|100 rev2";
-			break;
-		case 0XA066:
-			strPID =  "BlueSolar MPPT 100|20";
-			break;
-		case 0XA067:
-			strPID =  "BlueSolar MPPT 100|20 48V";
-			break;
-		case 0XA068:
-			strPID =  "SmartSolar MPPT 250|60 rev2";
-			break;
-		case 0XA069:
-			strPID =  "SmartSolar MPPT 250|70 rev2";
-			break;
-		case 0XA06A:
-			strPID =  "SmartSolar MPPT 150|45 rev2";
-			break;
-		case 0XA06B:
-			strPID =  "SmartSolar MPPT 150|60 rev2";
-			break;
-		case 0XA06C:
-			strPID =  "SmartSolar MPPT 150|70 rev2";
-			break;
-		case 0XA06D:
-			strPID =  "SmartSolar MPPT 150|85 rev3";
-			break;
-		case 0XA06E:
-			strPID =  "SmartSolar MPPT 150|100 rev3";
-			break;
-		case 0XA06F:
-			strPID =  "BlueSolar MPPT 150|45 rev2";
-			break;
-		case 0XA070:
-			strPID =  "BlueSolar MPPT 150|60 rev2";
-			break;
-		case 0XA071:
-			strPID =  "BlueSolar MPPT 150|70 rev2";
-			break;
-		case 0XA102:
-			strPID =  "SmartSolar MPPT VE.Can 150|70";
-			break;
-		case 0XA103:
-			strPID =  "SmartSolar MPPT VE.Can 150|45";
-			break;
-		case 0XA104:
-			strPID =  "SmartSolar MPPT VE.Can 150|60";
-			break;
-		case 0XA105:
-			strPID =  "SmartSolar MPPT VE.Can 150|85";
-			break;
-		case 0XA106:
-			strPID =  "SmartSolar MPPT VE.Can 150|100";
-			break;
-		case 0XA107:
-			strPID =  "SmartSolar MPPT VE.Can 250|45";
-			break;
-		case 0XA108:
-			strPID =  "SmartSolar MPPT VE.Can 250|60";
-			break;
-		case 0XA109:
-			strPID =  "SmartSolar MPPT VE.Can 250|80";
-			break;
-		case 0XA10A:
-			strPID =  "SmartSolar MPPT VE.Can 250|85";
-			break;
-		case 0XA10B:
-			strPID =  "SmartSolar MPPT VE.Can 250|100";
-			break;
-		case 0XA10C:
-			strPID =  "SmartSolar MPPT VE.Can 150|70 rev2";
-			break;
-		case 0XA10D:
-			strPID =  "SmartSolar MPPT VE.Can 150|85 rev2";
-			break;
-		case 0XA10E:
-			strPID =  "SmartSolar MPPT VE.Can 150|100 rev2";
-			break;
-		case 0XA10F:
-			strPID =  "BlueSolar MPPT VE.Can 150|100";
-			break;
-		case 0XA110:
-			strPID =  "SmartSolar MPPT RS 450|100";
-			break;
-		case 0XA112:
-			strPID =  "BlueSolar MPPT VE.Can 250|70";
-			break;
-		case 0XA113:
-			strPID =  "BlueSolar MPPT VE.Can 250|100";
-			break;
-		case 0XA114:
-			strPID =  "SmartSolar MPPT VE.Can 250|70 rev2";
-			break;
-		case 0XA115:
-			strPID =  "SmartSolar MPPT VE.Can 250|100 rev2";
-			break;
-		case 0XA116:
-			strPID =  "SmartSolar MPPT VE.Can 250|85 rev2";
-			break;
-		case 0xA381:
-			strPID =  "BMV-712 Smart";
-			break;
-		case 0xA382:
-			strPID =  "BMV-710H Smart";
-			break;
-		case 0xA383:
-			strPID =  "BMV-712 Smart Rev2";
-			break;
-		case 0xA389:
-			strPID =  "SmartShunt 500A/50mV";
-			break;
-		case 0xA38A:
-			strPID =  "SmartShunt 1000A/50mV";
-			break;
-		case 0xA38B:
-			strPID =  "SmartShunt 2000A/50mV";
-			break;
-		case 0xA3F0:
-			strPID =  "SmartShunt 2000A/50mV" ;
-			break;
-		default:
-			strPID = pid;
-	}
-	return strPID;
-}
-
-
-
-/*
- * getErrAsString
- * This function returns error state (ERR) as readable text.
- */
-String VeDirectFrameHandler::getErrAsString(uint8_t err)
-{
-	String strERR ="";
-
-	switch(err) {
-		case 0:
-			strERR =  "No error";
-			break;
-		case 2:
-			strERR =  "Battery voltage too high";
-			break;
-		case 17:
-			strERR =  "Charger temperature too high";
-			break;
-		case 18:
-			strERR =  "Charger over current";
-			break;
-		case 19:
-			strERR =  "Charger current reversed";
-			break;
-		case 20:
-			strERR =  "Bulk time limit exceeded";
-			break;
-		case 21:
-			strERR =  "Current sensor issue(sensor bias/sensor broken)";
-			break;
-		case 26:
-			strERR =  "Terminals overheated";
-			break;
-		case 28:
-			strERR =  "Converter issue (dual converter models only)";
-			break;
-		case 33:
-			strERR =  "Input voltage too high (solar panel)";
-			break;
-		case 34:
-			strERR =  "Input current too high (solar panel)";
-			break;
-		case 38:
-			strERR =  "Input shutdown (due to excessive battery voltage)";
-			break;
-		case 39:
-			strERR =  "Input shutdown (due to current flow during off mode)";
-			break;
-		case 40:
-			strERR =  "Input";
-			break;
-		case 65:
-			strERR =  "Lost communication with one of devices";
-			break;
-		case 67:
-			strERR =  "Synchronisedcharging device configuration issue";
-			break;
-		case 68:
-			strERR =  "BMS connection lost";
-			break;
-		case 116:
-			strERR =  "Factory calibration data lost";
-			break;
-		case 117:
-			strERR =  "Invalid/incompatible firmware";
-			break;
-		case 118:
-			strERR =  "User settings invalid";
-			break;
-		default:
-			strERR = err;
-	}
-	return strERR;
+	return getAsString(values, PID);
 }

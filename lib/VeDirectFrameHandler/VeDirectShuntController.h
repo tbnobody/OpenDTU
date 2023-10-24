@@ -11,6 +11,7 @@ public:
 
     struct veShuntStruct : veStruct {
         int32_t T;                      // Battery temperature
+        bool tempPresent = false;       // Battery temperature sensor is attached to the shunt
         int32_t P;                      // Instantaneous power
         int32_t CE;                     // Consumed Amp Hours
         int32_t SOC;                    // State-of-charge
@@ -41,7 +42,7 @@ public:
 
 private:
     void textRxEvent(char * name, char * value) final;
-    void frameEndEvent(bool) final;                   // copy temp struct to public struct
+    void frameValidEvent() final;
     veShuntStruct _tmpFrame{};                        // private struct for received name and value pairs
 };
 

@@ -7,6 +7,7 @@
 #include "MqttSettings.h"
 #include "NetworkSettings.h"
 #include "MessageOutput.h"
+#include "VictronMppt.h"
 
 MqttHandleVedirectHassClass MqttHandleVedirectHass;
 
@@ -50,7 +51,7 @@ void MqttHandleVedirectHassClass::publishConfig()
         return;
     }
     // ensure data is revieved from victron
-    if (!VeDirectMppt.isDataValid()) { 
+    if (!VictronMppt.isDataValid()) {
         return;
     }
 
@@ -67,9 +68,12 @@ void MqttHandleVedirectHassClass::publishConfig()
     // battery info
     publishSensor("Battery voltage", NULL, "V", "voltage", "measurement", "V");
     publishSensor("Battery current", NULL, "I", "current", "measurement", "A");
-
+    publishSensor("Battery power (calculated)", NULL, "P", "power", "measurement", "W");
+    publishSensor("Battery efficiency (calculated)", NULL, "E", "efficiency", "measurement", "%");
+    
     // panel info
     publishSensor("Panel voltage", NULL, "VPV", "voltage", "measurement", "V");
+    publishSensor("Panel current (calculated)", NULL, "IPV", "current", "measurement", "A");
     publishSensor("Panel power", NULL, "PPV", "power", "measurement", "W");
     publishSensor("Panel yield total", NULL, "H19", "energy", "total_increasing", "kWh");
     publishSensor("Panel yield today", NULL, "H20", "energy", "total", "kWh");
@@ -82,7 +86,7 @@ void MqttHandleVedirectHassClass::publishConfig()
 
 void MqttHandleVedirectHassClass::publishSensor(const char* caption, const char* icon, const char* subTopic, const char* deviceClass, const char* stateClass, const char* unitOfMeasurement )
 {
-    String serial = VeDirectMppt.veFrame.SER;
+    String serial = VictronMppt.getData()->SER;
 
     String sensorId = caption;
     sensorId.replace(" ", "_");
@@ -94,9 +98,9 @@ void MqttHandleVedirectHassClass::publishSensor(const char* caption, const char*
     String configTopic = "sensor/dtu_victron_" + serial
         + "/" + sensorId
         + "/config";
-    
+
     String statTopic = MqttSettings.getPrefix() + "victron/";
-    statTopic.concat(VeDirectMppt.veFrame.SER);
+    statTopic.concat(serial);
     statTopic.concat("/");
     statTopic.concat(subTopic);
 
@@ -133,7 +137,7 @@ void MqttHandleVedirectHassClass::publishSensor(const char* caption, const char*
 }
 void MqttHandleVedirectHassClass::publishBinarySensor(const char* caption, const char* icon, const char* subTopic, const char* payload_on, const char* payload_off)
 {
-    String serial = VeDirectMppt.veFrame.SER;
+    String serial = VictronMppt.getData()->SER;
 
     String sensorId = caption;
     sensorId.replace(" ", "_");
@@ -147,7 +151,7 @@ void MqttHandleVedirectHassClass::publishBinarySensor(const char* caption, const
         + "/config";
 
     String statTopic = MqttSettings.getPrefix() + "victron/";
-    statTopic.concat(VeDirectMppt.veFrame.SER);
+    statTopic.concat(serial);
     statTopic.concat("/");
     statTopic.concat(subTopic);
 
@@ -172,12 +176,13 @@ void MqttHandleVedirectHassClass::publishBinarySensor(const char* caption, const
 
 void MqttHandleVedirectHassClass::createDeviceInfo(JsonObject& object)
 {
-    String serial = VeDirectMppt.veFrame.SER;
+    auto spMpptData = VictronMppt.getData();
+    String serial = spMpptData->SER;
     object[F("name")] = "Victron(" + serial + ")";
     object[F("ids")] = serial;
     object[F("cu")] = String(F("http://")) + NetworkSettings.localIP().toString();
     object[F("mf")] = F("OpenDTU");
-    object[F("mdl")] = VeDirectMppt.getPidAsString(VeDirectMppt.veFrame.PID);
+    object[F("mdl")] = spMpptData->getPidAsString();
     object[F("sw")] = AUTO_GIT_HASH;
 }
 

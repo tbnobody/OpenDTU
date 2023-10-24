@@ -10,7 +10,7 @@
 #include "Battery.h"
 #include "Huawei_can.h"
 #include "PowerMeter.h"
-#include "VeDirectMpptController.h"
+#include "VictronMppt.h"
 #include "defaults.h"
 #include <AsyncJson.h>
 
@@ -67,20 +67,14 @@ void WebApiWsLiveClass::loop()
 
         try {
             std::lock_guard<std::mutex> lock(_mutex);
-            DynamicJsonDocument root(4096 * INV_MAX_COUNT);
+            DynamicJsonDocument root(4200 * INV_MAX_COUNT); // TODO(helge) check if this calculation is correct
             JsonVariant var = root;
             generateJsonResponse(var);
-
+                
             String buffer;
-            // free JsonDocument as soon as possible
-            {
-                DynamicJsonDocument root(4096 * INV_MAX_COUNT); // TODO(helge) check if this calculation is correct
-                JsonVariant var = root;
-                generateJsonResponse(var);
-                serializeJson(root, buffer);
-            }
-
             if (buffer) {
+                serializeJson(root, buffer);
+
                 if (Configuration.get().Security_AllowReadonly) {
                     _ws.setAuthentication("", "");
                 } else {
@@ -191,10 +185,11 @@ void WebApiWsLiveClass::generateJsonResponse(JsonVariant& root)
     JsonObject vedirectObj = root.createNestedObject("vedirect");
     vedirectObj[F("enabled")] = Configuration.get().Vedirect_Enabled;
     JsonObject totalVeObj = vedirectObj.createNestedObject("total");
-    addTotalField(totalVeObj, "Power", VeDirectMppt.veFrame.PPV, "W", 1);
-    addTotalField(totalVeObj, "YieldDay", VeDirectMppt.veFrame.H20 * 1000, "Wh", 0);
-    addTotalField(totalVeObj, "YieldTotal", VeDirectMppt.veFrame.H19, "kWh", 2);
-    
+
+    addTotalField(totalVeObj, "Power", VictronMppt.getPanelPowerWatts(), "W", 1);
+    addTotalField(totalVeObj, "YieldDay", VictronMppt.getYieldDay() * 1000, "Wh", 0);
+    addTotalField(totalVeObj, "YieldTotal", VictronMppt.getYieldTotal(), "kWh", 2);
+
     JsonObject huaweiObj = root.createNestedObject("huawei");
     huaweiObj[F("enabled")] = Configuration.get().Huawei_Enabled;
     const RectifierParameters_t * rp = HuaweiCan.get();
@@ -251,7 +246,7 @@ void WebApiWsLiveClass::onLivedataStatus(AsyncWebServerRequest* request)
 
     try {
         std::lock_guard<std::mutex> lock(_mutex);
-        AsyncJsonResponse* response = new AsyncJsonResponse(false, 4096 * INV_MAX_COUNT);
+        AsyncJsonResponse* response = new AsyncJsonResponse(false, 4200 * INV_MAX_COUNT);
         JsonVariant root = response->getRoot();
 
         generateJsonResponse(root);
