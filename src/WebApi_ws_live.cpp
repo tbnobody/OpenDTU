@@ -67,20 +67,14 @@ void WebApiWsLiveClass::loop()
 
         try {
             std::lock_guard<std::mutex> lock(_mutex);
-            DynamicJsonDocument root(4096 * INV_MAX_COUNT);
+            DynamicJsonDocument root(4200 * INV_MAX_COUNT); // TODO(helge) check if this calculation is correct
             JsonVariant var = root;
             generateJsonResponse(var);
-
+                
             String buffer;
-            // free JsonDocument as soon as possible
-            {
-                DynamicJsonDocument root(4096 * INV_MAX_COUNT); // TODO(helge) check if this calculation is correct
-                JsonVariant var = root;
-                generateJsonResponse(var);
-                serializeJson(root, buffer);
-            }
-
             if (buffer) {
+                serializeJson(root, buffer);
+
                 if (Configuration.get().Security_AllowReadonly) {
                     _ws.setAuthentication("", "");
                 } else {
@@ -252,7 +246,7 @@ void WebApiWsLiveClass::onLivedataStatus(AsyncWebServerRequest* request)
 
     try {
         std::lock_guard<std::mutex> lock(_mutex);
-        AsyncJsonResponse* response = new AsyncJsonResponse(false, 4096 * INV_MAX_COUNT);
+        AsyncJsonResponse* response = new AsyncJsonResponse(false, 4200 * INV_MAX_COUNT);
         JsonVariant root = response->getRoot();
 
         generateJsonResponse(root);
