@@ -66,6 +66,8 @@ struct CONFIG_T {
     char WiFi_Hostname[WIFI_MAX_HOSTNAME_STRLEN + 1];
     uint32_t WiFi_ApTimeout;
 
+    bool Mdns_Enabled;
+
     char Ntp_Server[NTP_MAX_SERVER_STRLEN + 1];
     char Ntp_Timezone[NTP_MAX_TIMEZONE_STRLEN + 1];
     char Ntp_TimezoneDescr[NTP_MAX_TIMEZONEDESCR_STRLEN + 1];

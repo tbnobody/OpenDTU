@@ -9,4 +9,5 @@ export interface NetworkConfig {
     dns1: string;
     dns2: string;
     aptimeout: number;
+    mdnsenabled: boolean;
 }
