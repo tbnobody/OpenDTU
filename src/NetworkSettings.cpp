@@ -121,8 +121,8 @@ void NetworkSettingsClass::setupMode()
         dnsServer->start(DNS_PORT, "*", WiFi.softAPIP());
         dnsServerStatus = true;
     } else {
-        dnsServer->stop();
         dnsServerStatus = false;
+        dnsServer->stop();
         if (_networkMode == network_mode::WiFi) {
             WiFi.mode(WIFI_STA);
         } else {
