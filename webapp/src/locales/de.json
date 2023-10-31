@@ -402,7 +402,9 @@
         "ApTimeout": "AccessPoint Zeitlimit:",
         "ApTimeoutHint": "Zeit die der AccessPoint offen gehalten wird. Ein Wert von 0 bedeutet unendlich.",
         "Minutes": "Minuten",
-        "Save": "@:dtuadmin.Save"
+        "Save": "@:dtuadmin.Save",
+        "EnableMdns": "mDNS aktivieren",
+        "MdnsSettings": "mDNS-Einstellungen"
     },
     "mqttadmin": {
         "MqttSettings": "MQTT-Einstellungen",
