@@ -8,7 +8,7 @@
             <form @submit.prevent="handleSubmit">
                 <div class="form-group">
                     <label for="username">{{ $t('login.Username') }}</label>
-                    <input type="text" v-model="username" name="username" class="form-control"
+                    <input type="text" v-model.trim="username" name="username" class="form-control"
                         :class="{ 'is-invalid': submitted && !username }" />
                     <div v-show="submitted && !username" class="invalid-feedback">{{ $t('login.UsernameRequired') }}
                     </div>
