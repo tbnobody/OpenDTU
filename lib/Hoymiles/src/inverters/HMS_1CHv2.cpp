@@ -40,7 +40,7 @@ bool HMS_1CHv2::isValidSerial(uint64_t serial)
 
 String HMS_1CHv2::typeName()
 {
-    return "HMS-500 v2";
+    return "HMS-500-1T v2";
 }
 
 const byteAssign_t* HMS_1CHv2::getByteAssignment()
