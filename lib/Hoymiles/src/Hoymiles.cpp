@@ -53,6 +53,11 @@ void HoymilesClass::loop()
 
             if (iv != nullptr && iv->getRadio()->isInitialized() && iv->getRadio()->isQueueEmpty()) {
 
+                if (iv->getZeroValuesIfUnreachable() && !iv->isReachable()) {
+                    Hoymiles.getMessageOutput()->println("Set runtime data to zero");
+                    iv->Statistics()->zeroRuntimeData();
+                }
+
                 if (iv->getEnablePolling() || iv->getEnableCommands()) {
                     _messageOutput->print("Fetch inverter: ");
                     _messageOutput->println(iv->serial(), HEX);
