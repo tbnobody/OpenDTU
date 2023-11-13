@@ -25,7 +25,7 @@
     "@intlify/unplugin-vue-i18n": "^1.4.0",
     "@rushstack/eslint-patch": "^1.5.1",
     "@tsconfig/node18": "^18.2.2",
-    "@types/bootstrap": "^5.2.7",
+    "@types/bootstrap": "^5.2.9",
     "@types/node": "^20.8.3",
     "@types/sortablejs": "^1.15.3",
     "@types/spark-md5": "^3.0.2",
