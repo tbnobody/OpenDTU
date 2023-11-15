@@ -69,7 +69,7 @@ void MqttHandleVedirectHassClass::publishConfig()
     publishSensor("Battery voltage", NULL, "V", "voltage", "measurement", "V");
     publishSensor("Battery current", NULL, "I", "current", "measurement", "A");
     publishSensor("Battery power (calculated)", NULL, "P", "power", "measurement", "W");
-    publishSensor("Battery efficiency (calculated)", NULL, "E", "efficiency", "measurement", "%");
+    publishSensor("Battery efficiency (calculated)", NULL, "E", NULL, "measurement", "%");
     
     // panel info
     publishSensor("Panel voltage", NULL, "VPV", "voltage", "measurement", "V");

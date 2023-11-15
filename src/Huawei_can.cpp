@@ -297,7 +297,7 @@ void HuaweiCanClass::loop()
     // Set voltage limit in periodic intervals
     if ( _nextAutoModePeriodicIntMillis < millis()) {
       MessageOutput.printf("[HuaweiCanClass::loop] Periodically setting voltage limit: %f \r\n", config.Huawei_Auto_Power_Voltage_Limit);
-      setValue(config.Huawei_Auto_Power_Voltage_Limit, HUAWEI_ONLINE_VOLTAGE);
+      _setValue(config.Huawei_Auto_Power_Voltage_Limit, HUAWEI_ONLINE_VOLTAGE);
       _nextAutoModePeriodicIntMillis = millis() + 60000;
     }
 
@@ -319,7 +319,7 @@ void HuaweiCanClass::loop()
 
     if (inverter != nullptr) {
         if(inverter->isProducing()) {
-          setValue(0.0, HUAWEI_ONLINE_CURRENT);
+          _setValue(0.0, HUAWEI_ONLINE_CURRENT);
           // Don't run auto mode for a second now. Otherwise we may send too much over the CAN bus 
           _autoModeBlockedTillMillis = millis() + 1000;
           MessageOutput.printf("[HuaweiCanClass::loop] Inverter is active, disable\r\n");
@@ -349,7 +349,7 @@ void HuaweiCanClass::loop()
           _autoPowerEnabledCounter--;
           if (_autoPowerEnabledCounter == 0) {
             _autoPowerEnabled = false;
-            setValue(0, HUAWEI_ONLINE_CURRENT);
+            _setValue(0, HUAWEI_ONLINE_CURRENT);
             return;
           }
         } else {
@@ -366,20 +366,27 @@ void HuaweiCanClass::loop()
         float outputCurrent = efficiency * (newPowerLimit / _rp.output_voltage);
         MessageOutput.printf("[HuaweiCanClass::loop] Output current %f \r\n", outputCurrent);
         _autoPowerEnabled = true;
-        setValue(outputCurrent, HUAWEI_ONLINE_CURRENT);
+        _setValue(outputCurrent, HUAWEI_ONLINE_CURRENT);
 
         // Don't run auto mode some time to allow for output stabilization after issuing a new value
         _autoModeBlockedTillMillis = millis() + 2 * HUAWEI_DATA_REQUEST_INTERVAL_MS;
       } else {
         // requested PL is below minium. Set current to 0
         _autoPowerEnabled = false;
-        setValue(0.0, HUAWEI_ONLINE_CURRENT);
+        _setValue(0.0, HUAWEI_ONLINE_CURRENT);
       }
     }
   } 
 }
 
 void HuaweiCanClass::setValue(float in, uint8_t parameterType)
+{
+  if (_mode != HUAWEI_MODE_AUTO_INT) {
+    _setValue(in, parameterType);
+  }
+}
+
+void HuaweiCanClass::_setValue(float in, uint8_t parameterType)
 {
 
     const CONFIG_T& config = Configuration.get();
@@ -391,7 +398,7 @@ void HuaweiCanClass::setValue(float in, uint8_t parameterType)
     uint16_t value;
 
     if (in < 0) {
-      MessageOutput.printf("[HuaweiCanClass::setValue]  Error: Tried to set voltage/current to negative value %f \r\n", in);
+      MessageOutput.printf("[HuaweiCanClass::_setValue]  Error: Tried to set voltage/current to negative value %f \r\n", in);
     }
 
     // Start PSU if needed
@@ -435,7 +442,7 @@ void HuaweiCanClass::setMode(uint8_t mode) {
 
   if (_mode == HUAWEI_MODE_AUTO_INT && mode != HUAWEI_MODE_AUTO_INT) {
     _autoPowerEnabled = false;
-    setValue(0, HUAWEI_ONLINE_CURRENT);
+    _setValue(0, HUAWEI_ONLINE_CURRENT);
   }
 
   if(mode == HUAWEI_MODE_AUTO_EXT || mode == HUAWEI_MODE_AUTO_INT) {
