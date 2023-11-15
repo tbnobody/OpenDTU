@@ -96,7 +96,7 @@ void WebApiWsHuaweiLiveClass::generateJsonResponse(JsonVariant& root)
     root[F("input_temp")]["u"] = "°C";
     root[F("output_temp")]["v"] = rp->output_temp;
     root[F("output_temp")]["u"] = "°C";
-    root[F("efficiency")]["v"] = rp->efficiency;
+    root[F("efficiency")]["v"] = rp->efficiency * 100;
     root[F("efficiency")]["u"] = "%";
 
 }
