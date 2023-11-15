@@ -129,6 +129,7 @@ public:
 
 private:
     void processReceivedParameters();
+    void _setValue(float in, uint8_t parameterType);
 
     TaskHandle_t _HuaweiCanCommunicationTaskHdl = NULL;
     bool    _initialized = false;
