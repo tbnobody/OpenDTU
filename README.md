@@ -13,6 +13,11 @@ If you are upgrading from a version before 15.03.2023 you have to upgrade the pa
 This project was started from [this](https://www.mikrocontroller.net/topic/525778) discussion (Mikrocontroller.net).
 It was the goal to replace the original Hoymiles DTU (Telemetry Gateway) with their cloud access. With a lot of reverse engineering the Hoymiles protocol was decrypted and analyzed.
 
+## Documentation
+
+Currently the documentation is separated into different locations (this README.md, the `doc` folder and the [Wiki](https://github.com/tbnobody/OpenDTU/wiki)).
+This is not very nice and it's planned to move everything into the [Wiki](https://github.com/tbnobody/OpenDTU/wiki).
+
 ## Screenshots
 
 Several screenshots of the frontend can be found here: [Screenshots](docs/screenshots/README.md)
