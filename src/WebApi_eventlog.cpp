@@ -35,6 +35,18 @@ void WebApiEventlogClass::onEventlogStatus(AsyncWebServerRequest* request)
         serial = strtoll(s.c_str(), NULL, 16);
     }
 
+    AlarmMessageLocale_t locale = AlarmMessageLocale_t::EN;
+    if (request->hasParam("locale")) {
+        String s = request->getParam("locale")->value();
+        s.toLowerCase();
+        if (s == "de") {
+            locale = AlarmMessageLocale_t::DE;
+        }
+        if (s == "fr") {
+            locale = AlarmMessageLocale_t::FR;
+        }
+    }
+
     auto inv = Hoymiles.getInverterBySerial(serial);
 
     if (inv != nullptr) {
@@ -47,7 +59,7 @@ void WebApiEventlogClass::onEventlogStatus(AsyncWebServerRequest* request)
             JsonObject eventsObject = eventsArray.createNestedObject();
 
             AlarmLogEntry_t entry;
-            inv->EventLog()->getLogEntry(logEntry, &entry);
+            inv->EventLog()->getLogEntry(logEntry, &entry, locale);
 
             eventsObject["message_id"] = entry.MessageId;
             eventsObject["message"] = entry.Message;
