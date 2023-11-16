@@ -7,6 +7,7 @@
 #include "Display_Graphic.h"
 #include "InverterSettings.h"
 #include "Led_Single.h"
+#include "Led_Strip.h"
 #include "MessageOutput.h"
 #include "MqttHandleDtu.h"
 #include "MqttHandleHass.h"
@@ -128,6 +129,11 @@ void setup()
     MessageOutput.print("Initialize LEDs... ");
     LedSingle.init();
     MessageOutput.println("done");
+    
+    // Initialize LED WS2812
+    MessageOutput.print("Initialize LED WS2812...Pin 48... ");
+    LEDStrip.init();        
+    MessageOutput.println("done");
 
     // Check for default DTU serial
     MessageOutput.print("Check for default DTU serial... ");
@@ -172,5 +178,7 @@ void loop()
     MessageOutput.loop();
     yield();
     LedSingle.loop();
+    yield();
+    LEDStrip.loop();
     yield();
 }

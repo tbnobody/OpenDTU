@@ -38,6 +38,10 @@
 #define LED1 -1
 #endif
 
+#ifndef LED_RGB
+#define LED_RGB -1
+#endif
+
 #ifndef HOYMILES_PIN_SCLK
 #define HOYMILES_PIN_SCLK -1
 #endif
