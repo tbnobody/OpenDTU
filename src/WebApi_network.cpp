@@ -76,6 +76,7 @@ void WebApiNetworkClass::onNetworkAdminGet(AsyncWebServerRequest* request)
     root["ssid"] = config.WiFi_Ssid;
     root["password"] = config.WiFi_Password;
     root["aptimeout"] = config.WiFi_ApTimeout;
+    root["mdnsenabled"] = config.Mdns_Enabled;
 
     response->setLength();
     request->send(response);
@@ -236,6 +237,7 @@ void WebApiNetworkClass::onNetworkAdminPost(AsyncWebServerRequest* request)
         config.WiFi_Dhcp = false;
     }
     config.WiFi_ApTimeout = root["aptimeout"].as<uint>();
+    config.Mdns_Enabled = root["mdnsenabled"].as<bool>();
     Configuration.write();
 
     retMsg["type"] = "success";

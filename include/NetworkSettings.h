@@ -59,6 +59,7 @@ public:
 private:
     void setHostname();
     void setStaticIp();
+    void handleMDNS();
     void setupMode();
     void NetworkEvent(WiFiEvent_t event);
     bool adminEnabled = true;
@@ -76,6 +77,7 @@ private:
     network_mode _networkMode = network_mode::Undefined;
     bool _ethConnected = false;
     std::vector<NetworkEventCbList_t> _cbEventList;
+    bool lastMdnsEnabled = false;
 };
 
 extern NetworkSettingsClass NetworkSettings;

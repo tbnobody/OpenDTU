@@ -3,6 +3,8 @@
 
 #include <cstdint>
 
+#define INVERTER_UPDATE_SETTINGS_INTERVAL 60000l
+
 class InverterSettingsClass {
 public:
     void init();

@@ -54,14 +54,14 @@ HMS_4CH::HMS_4CH(HoymilesRadio* radio, uint64_t serial)
 
 bool HMS_4CH::isValidSerial(uint64_t serial)
 {
-    // serial >= 0x114400000000 && serial <= 0x114499999999
+    // serial >= 0x116400000000 && serial <= 0x116499999999
     uint16_t preSerial = (serial >> 32) & 0xffff;
     return preSerial == 0x1164;
 }
 
 String HMS_4CH::typeName()
 {
-    return "HMS-1600, HMS-1800, HMS-2000";
+    return "HMS-1600/1800/2000";
 }
 
 const byteAssign_t* HMS_4CH::getByteAssignment()
