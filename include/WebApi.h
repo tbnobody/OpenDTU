@@ -16,6 +16,7 @@
 #include "WebApi_ntp.h"
 #include "WebApi_power.h"
 #include "WebApi_prometheus.h"
+#include "WebApi_safe_limit.h"
 #include "WebApi_security.h"
 #include "WebApi_sysstatus.h"
 #include "WebApi_webapp.h"
@@ -53,6 +54,7 @@ private:
     WebApiNtpClass _webApiNtp;
     WebApiPowerClass _webApiPower;
     WebApiPrometheusClass _webApiPrometheus;
+    WebApiSafeLimitClass _webApiSafeLimit;
     WebApiSecurityClass _webApiSecurity;
     WebApiSysstatusClass _webApiSysstatus;
     WebApiWebappClass _webApiWebapp;

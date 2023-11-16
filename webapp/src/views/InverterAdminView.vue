@@ -192,6 +192,16 @@
                                     v-model="selectedInverterData.zero_day"
                                     type="checkbox"
                                     :tooltip="$t('inverteradmin.ZeroDayHint')" wide/>
+
+				<InputElement :label="$t('inverteradmin.SafeLimitWatts')"
+				    v-model="selectedInverterData.safe_limit_watts"
+                                    type="number" min="1" max="2250"
+                                    :tooltip="$t('inverteradmin.SafeLimitWattsHint')" wide/>
+
+				<InputElement :label="$t('inverteradmin.SafeLimitMillis')"
+				    v-model="selectedInverterData.safe_limit_millis"
+				    type="number" min="0" max="65535"
+                                    :tooltip="$t('inverteradmin.SafeLimitMillisHint')" wide/>
                             </div>
                         </div>
                     </form>
@@ -269,6 +279,8 @@ declare interface Inverter {
     reachable_threshold: number;
     zero_runtime: boolean;
     zero_day: boolean;
+    safe_limit_millis: number;
+    safe_limit_watts: number;
     channel: Array<Channel>;
 }
 
