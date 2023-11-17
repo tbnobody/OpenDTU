@@ -17,6 +17,8 @@
 #include "NtpSettings.h"
 #include "PinMapping.h"
 #include "SunPosition.h"
+#include "ModbusDtu.h"
+#include "WatchDogDtu.h"
 #include "Utils.h"
 #include "WebApi.h"
 #include "defaults.h"
@@ -145,6 +147,14 @@ void setup()
     InverterSettings.init();
 
     Datastore.init();
+
+    // Initialize Modbus
+    MessageOutput.print(F("Initialize Modbus... "));
+    ModbusDtu.init();
+    MessageOutput.print(F("Initialize WatchDog... "));
+    WatchDogDtu.init();
+    MessageOutput.println(F("done"));
+
 }
 
 void loop()
@@ -152,6 +162,8 @@ void loop()
     NetworkSettings.loop();
     yield();
     InverterSettings.loop();
+    yield();
+    ModbusDtu.loop();
     yield();
     Datastore.loop();
     yield();
@@ -172,5 +184,7 @@ void loop()
     MessageOutput.loop();
     yield();
     LedSingle.loop();
+    yield();
+    WatchDogDtu.loop();
     yield();
 }
