@@ -26,7 +26,14 @@ void SunPositionClass::loop()
 
 bool SunPositionClass::isDayPeriod()
 {
-    return _isDayPeriod;
+    if (!_isValidInfo) {
+        return true;
+    }
+
+    struct tm timeinfo;
+    getLocalTime(&timeinfo, 5);
+    uint32_t minutesPastMidnight = timeinfo.tm_hour * 60 + timeinfo.tm_min;
+    return (minutesPastMidnight >= _sunriseMinutes) && (minutesPastMidnight < _sunsetMinutes);
 }
 
 bool SunPositionClass::isSunsetAvailable()
@@ -73,7 +80,6 @@ void SunPositionClass::updateSunData()
     setDoRecalc(false);
 
     if (!gotLocalTime) {
-        _isDayPeriod = true;
         _sunriseMinutes = 0;
         _sunsetMinutes = 0;
         _isValidInfo = false;
@@ -108,7 +114,6 @@ void SunPositionClass::updateSunData()
     // If no sunset/sunrise exists (e.g. astronomical calculation in summer)
     // assume it's day period
     if (std::isnan(sunriseRaw) || std::isnan(sunsetRaw)) {
-        _isDayPeriod = true;
         _isSunsetAvailable = false;
         _sunriseMinutes = 0;
         _sunsetMinutes = 0;
@@ -118,9 +123,7 @@ void SunPositionClass::updateSunData()
 
     _sunriseMinutes = static_cast<int>(sunriseRaw);
     _sunsetMinutes = static_cast<int>(sunsetRaw);
-    uint32_t minutesPastMidnight = timeinfo.tm_hour * 60 + timeinfo.tm_min;
 
-    _isDayPeriod = (minutesPastMidnight >= _sunriseMinutes) && (minutesPastMidnight < _sunsetMinutes);
     _isSunsetAvailable = true;
     _isValidInfo = true;
 }
