@@ -6,13 +6,6 @@
 
 #define LEDSINGLE_UPDATE_INTERVAL 2000
 
-enum eLedFunction {
-    CONNECTED_NETWORK,
-    CONNECTED_MQTT,
-    INV_REACHABLE,
-    INV_PRODUCING,
-};
-
 class LedSingleClass {
 public:
     LedSingleClass();
