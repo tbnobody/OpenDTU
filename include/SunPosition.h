@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 #pragma once
 
-#include <mutex>
+#include <atomic>
 #include <sunset.h>
 
 class SunPositionClass {
@@ -19,16 +19,14 @@ public:
 private:
     void updateSunData();
     bool checkRecalcDayChanged();
-    bool getDoRecalc();
+    bool getSunTime(struct tm* info, uint32_t offset);
 
-    SunSet _sun;
     bool _isSunsetAvailable = true;
     uint32_t _sunriseMinutes = 0;
     uint32_t _sunsetMinutes = 0;
 
     bool _isValidInfo = false;
-    bool _doRecalc = true;
-    std::mutex _recalcLock;
+    std::atomic_bool _doRecalc = true;
     uint32_t _lastSunPositionCalculatedYMD = 0;
 };
 
