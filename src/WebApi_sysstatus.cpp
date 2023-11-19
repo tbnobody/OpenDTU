@@ -55,10 +55,10 @@ void WebApiSysstatusClass::onSystemStatus(AsyncWebServerRequest* request)
     root["chipcores"] = ESP.getChipCores();
 
     String reason;
-    reason = ResetReason.get_reset_reason_verbose(0);
+    reason = ResetReason::get_reset_reason_verbose(0);
     root["resetreason_0"] = reason;
 
-    reason = ResetReason.get_reset_reason_verbose(1);
+    reason = ResetReason::get_reset_reason_verbose(1);
     root["resetreason_1"] = reason;
 
     root["cfgsavecount"] = Configuration.get().Cfg.SaveCount;
