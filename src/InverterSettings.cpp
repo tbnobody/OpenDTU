@@ -46,19 +46,19 @@ void InverterSettingsClass::init()
         if (PinMapping.isValidCmt2300Config()) {
             Hoymiles.initCMT(pin.cmt_sdio, pin.cmt_clk, pin.cmt_cs, pin.cmt_fcs, pin.cmt_gpio2, pin.cmt_gpio3);
             MessageOutput.println(F("  Setting CMT target frequency... "));
-            Hoymiles.getRadioCmt()->setInverterTargetFrequency(config.Dtu_CmtFrequency);
+            Hoymiles.getRadioCmt()->setInverterTargetFrequency(config.Dtu.Cmt.Frequency);
         }
 
         MessageOutput.println("  Setting radio PA level... ");
-        Hoymiles.getRadioNrf()->setPALevel((rf24_pa_dbm_e)config.Dtu_NrfPaLevel);
-        Hoymiles.getRadioCmt()->setPALevel(config.Dtu_CmtPaLevel);
+        Hoymiles.getRadioNrf()->setPALevel((rf24_pa_dbm_e)config.Dtu.Nrf.PaLevel);
+        Hoymiles.getRadioCmt()->setPALevel(config.Dtu.Cmt.PaLevel);
 
         MessageOutput.println("  Setting DTU serial... ");
-        Hoymiles.getRadioNrf()->setDtuSerial(config.Dtu_Serial);
-        Hoymiles.getRadioCmt()->setDtuSerial(config.Dtu_Serial);
+        Hoymiles.getRadioNrf()->setDtuSerial(config.Dtu.Serial);
+        Hoymiles.getRadioCmt()->setDtuSerial(config.Dtu.Serial);
 
         MessageOutput.println("  Setting poll interval... ");
-        Hoymiles.setPollInterval(config.Dtu_PollInterval);
+        Hoymiles.setPollInterval(config.Dtu.PollInterval);
 
         for (uint8_t i = 0; i < INV_MAX_COUNT; i++) {
             if (config.Inverter[i].Serial > 0) {

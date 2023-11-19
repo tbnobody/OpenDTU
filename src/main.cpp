@@ -61,7 +61,7 @@ void setup()
             MessageOutput.print("failed... ");
         }
     }
-    if (Configuration.get().Cfg_Version != CONFIG_VERSION) {
+    if (Configuration.get().Cfg.Version != CONFIG_VERSION) {
         MessageOutput.print("migrated... ");
         Configuration.migrate();
     }
@@ -116,11 +116,11 @@ void setup()
         pin.display_clk,
         pin.display_cs,
         pin.display_reset);
-    Display.setOrientation(config.Display_Rotation);
-    Display.enablePowerSafe = config.Display_PowerSafe;
-    Display.enableScreensaver = config.Display_ScreenSaver;
-    Display.setContrast(config.Display_Contrast);
-    Display.setLanguage(config.Display_Language);
+    Display.setOrientation(config.Display.Rotation);
+    Display.enablePowerSafe = config.Display.PowerSafe;
+    Display.enableScreensaver = config.Display.ScreenSaver;
+    Display.setContrast(config.Display.Contrast);
+    Display.setLanguage(config.Display.Language);
     Display.setStartupDisplay();
     MessageOutput.println("done");
 
@@ -131,13 +131,13 @@ void setup()
 
     // Check for default DTU serial
     MessageOutput.print("Check for default DTU serial... ");
-    if (config.Dtu_Serial == DTU_SERIAL) {
+    if (config.Dtu.Serial == DTU_SERIAL) {
         MessageOutput.print("generate serial based on ESP chip id: ");
         uint64_t dtuId = Utils::generateDtuSerial();
         MessageOutput.printf("%0x%08x... ",
             ((uint32_t)((dtuId >> 32) & 0xFFFFFFFF)),
             ((uint32_t)(dtuId & 0xFFFFFFFF)));
-        config.Dtu_Serial = dtuId;
+        config.Dtu.Serial = dtuId;
         Configuration.write();
     }
     MessageOutput.println("done");

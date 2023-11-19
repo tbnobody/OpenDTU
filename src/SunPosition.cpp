@@ -80,7 +80,7 @@ void SunPositionClass::updateSunData()
     CONFIG_T const& config = Configuration.get();
 
     double sunset_type;
-    switch (config.Ntp_SunsetType) {
+    switch (config.Ntp.SunsetType) {
     case 0:
         sunset_type = SunSet::SUNSET_OFFICIAL;
         break;
@@ -98,7 +98,7 @@ void SunPositionClass::updateSunData()
     int offset = Utils::getTimezoneOffset() / 3600;
 
     SunSet sun;
-    sun.setPosition(config.Ntp_Latitude, config.Ntp_Longitude, offset);
+    sun.setPosition(config.Ntp.Latitude, config.Ntp.Longitude, offset);
     sun.setCurrentDate(1900 + timeinfo.tm_year, timeinfo.tm_mon + 1, timeinfo.tm_mday);
 
     double sunriseRaw = sun.calcCustomSunrise(sunset_type);

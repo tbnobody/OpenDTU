@@ -52,7 +52,7 @@ void LedSingleClass::loop()
         }
 
         struct tm timeinfo;
-        if (getLocalTime(&timeinfo, 5) && (!config.Mqtt_Enabled || (config.Mqtt_Enabled && MqttSettings.getConnected()))) {
+        if (getLocalTime(&timeinfo, 5) && (!config.Mqtt.Enabled || (config.Mqtt.Enabled && MqttSettings.getConnected()))) {
             _ledState[0] = LedState_t::On;
         }
 

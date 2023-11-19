@@ -77,11 +77,11 @@ void WebApiDeviceClass::onDeviceAdminGet(AsyncWebServerRequest* request)
     ledPinObj["led1"] = pin.led[1];
 
     JsonObject display = root.createNestedObject("display");
-    display["rotation"] = config.Display_Rotation;
-    display["power_safe"] = config.Display_PowerSafe;
-    display["screensaver"] = config.Display_ScreenSaver;
-    display["contrast"] = config.Display_Contrast;
-    display["language"] = config.Display_Language;
+    display["rotation"] = config.Display.Rotation;
+    display["power_safe"] = config.Display.PowerSafe;
+    display["screensaver"] = config.Display.ScreenSaver;
+    display["contrast"] = config.Display.Contrast;
+    display["language"] = config.Display.Language;
 
     response->setLength();
     request->send(response);
@@ -148,17 +148,17 @@ void WebApiDeviceClass::onDeviceAdminPost(AsyncWebServerRequest* request)
     bool performRestart = root["curPin"]["name"].as<String>() != config.Dev_PinMapping;
 
     strlcpy(config.Dev_PinMapping, root["curPin"]["name"].as<String>().c_str(), sizeof(config.Dev_PinMapping));
-    config.Display_Rotation = root["display"]["rotation"].as<uint8_t>();
-    config.Display_PowerSafe = root["display"]["power_safe"].as<bool>();
-    config.Display_ScreenSaver = root["display"]["screensaver"].as<bool>();
-    config.Display_Contrast = root["display"]["contrast"].as<uint8_t>();
-    config.Display_Language = root["display"]["language"].as<uint8_t>();
+    config.Display.Rotation = root["display"]["rotation"].as<uint8_t>();
+    config.Display.PowerSafe = root["display"]["power_safe"].as<bool>();
+    config.Display.ScreenSaver = root["display"]["screensaver"].as<bool>();
+    config.Display.Contrast = root["display"]["contrast"].as<uint8_t>();
+    config.Display.Language = root["display"]["language"].as<uint8_t>();
 
-    Display.setOrientation(config.Display_Rotation);
-    Display.enablePowerSafe = config.Display_PowerSafe;
-    Display.enableScreensaver = config.Display_ScreenSaver;
-    Display.setContrast(config.Display_Contrast);
-    Display.setLanguage(config.Display_Language);
+    Display.setOrientation(config.Display.Rotation);
+    Display.enablePowerSafe = config.Display.PowerSafe;
+    Display.enableScreensaver = config.Display.ScreenSaver;
+    Display.setContrast(config.Display.Contrast);
+    Display.setLanguage(config.Display.Language);
 
     Configuration.write();
 

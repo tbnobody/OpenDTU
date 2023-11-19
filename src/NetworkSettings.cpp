@@ -113,7 +113,7 @@ void NetworkSettingsClass::raiseEvent(network_event event)
 
 void NetworkSettingsClass::handleMDNS()
 {
-    bool mdnsEnabled = Configuration.get().Mdns_Enabled;
+    bool mdnsEnabled = Configuration.get().Mdns.Enabled;
 
     if (lastMdnsEnabled == mdnsEnabled) {
         return;
@@ -146,7 +146,7 @@ void NetworkSettingsClass::setupMode()
         WiFi.mode(WIFI_AP_STA);
         String ssidString = getApName();
         WiFi.softAPConfig(apIp, apIp, apNetmask);
-        WiFi.softAP((const char*)ssidString.c_str(), Configuration.get().Security_Password);
+        WiFi.softAP((const char*)ssidString.c_str(), Configuration.get().Security.Password);
         dnsServer->setErrorReplyCode(DNSReplyCode::NoError);
         dnsServer->start(DNS_PORT, "*", WiFi.softAPIP());
         dnsServerStatus = true;
@@ -170,7 +170,7 @@ void NetworkSettingsClass::enableAdminMode()
 {
     adminEnabled = true;
     adminTimeoutCounter = 0;
-    adminTimeoutCounterMax = Configuration.get().WiFi_ApTimeout * 60;
+    adminTimeoutCounterMax = Configuration.get().WiFi.ApTimeout * 60;
     setupMode();
 }
 
@@ -255,15 +255,15 @@ void NetworkSettingsClass::loop()
 void NetworkSettingsClass::applyConfig()
 {
     setHostname();
-    if (!strcmp(Configuration.get().WiFi_Ssid, "")) {
+    if (!strcmp(Configuration.get().WiFi.Ssid, "")) {
         return;
     }
     MessageOutput.print("Configuring WiFi STA using ");
-    if (strcmp(WiFi.SSID().c_str(), Configuration.get().WiFi_Ssid) || strcmp(WiFi.psk().c_str(), Configuration.get().WiFi_Password)) {
+    if (strcmp(WiFi.SSID().c_str(), Configuration.get().WiFi.Ssid) || strcmp(WiFi.psk().c_str(), Configuration.get().WiFi.Password)) {
         MessageOutput.print("new credentials... ");
         WiFi.begin(
-            Configuration.get().WiFi_Ssid,
-            Configuration.get().WiFi_Password);
+            Configuration.get().WiFi.Ssid,
+            Configuration.get().WiFi.Password);
     } else {
         MessageOutput.print("existing credentials... ");
         WiFi.begin();
@@ -298,33 +298,33 @@ void NetworkSettingsClass::setHostname()
 void NetworkSettingsClass::setStaticIp()
 {
     if (_networkMode == network_mode::WiFi) {
-        if (Configuration.get().WiFi_Dhcp) {
+        if (Configuration.get().WiFi.Dhcp) {
             MessageOutput.print("Configuring WiFi STA DHCP IP... ");
             WiFi.config(INADDR_NONE, INADDR_NONE, INADDR_NONE);
             MessageOutput.println("done");
         } else {
             MessageOutput.print("Configuring WiFi STA static IP... ");
             WiFi.config(
-                IPAddress(Configuration.get().WiFi_Ip),
-                IPAddress(Configuration.get().WiFi_Gateway),
-                IPAddress(Configuration.get().WiFi_Netmask),
-                IPAddress(Configuration.get().WiFi_Dns1),
-                IPAddress(Configuration.get().WiFi_Dns2));
+                IPAddress(Configuration.get().WiFi.Ip),
+                IPAddress(Configuration.get().WiFi.Gateway),
+                IPAddress(Configuration.get().WiFi.Netmask),
+                IPAddress(Configuration.get().WiFi.Dns1),
+                IPAddress(Configuration.get().WiFi.Dns2));
             MessageOutput.println("done");
         }
     } else if (_networkMode == network_mode::Ethernet) {
-        if (Configuration.get().WiFi_Dhcp) {
+        if (Configuration.get().WiFi.Ssid) {
             MessageOutput.print("Configuring Ethernet DHCP IP... ");
             ETH.config(INADDR_NONE, INADDR_NONE, INADDR_NONE, INADDR_NONE);
             MessageOutput.println("done");
         } else {
             MessageOutput.print("Configuring Ethernet static IP... ");
             ETH.config(
-                IPAddress(Configuration.get().WiFi_Ip),
-                IPAddress(Configuration.get().WiFi_Gateway),
-                IPAddress(Configuration.get().WiFi_Netmask),
-                IPAddress(Configuration.get().WiFi_Dns1),
-                IPAddress(Configuration.get().WiFi_Dns2));
+                IPAddress(Configuration.get().WiFi.Ip),
+                IPAddress(Configuration.get().WiFi.Gateway),
+                IPAddress(Configuration.get().WiFi.Netmask),
+                IPAddress(Configuration.get().WiFi.Dns1),
+                IPAddress(Configuration.get().WiFi.Dns2));
             MessageOutput.println("done");
         }
     }
@@ -408,7 +408,7 @@ String NetworkSettingsClass::getHostname()
     uint8_t pos = 0;
 
     uint32_t chipId = Utils::getChipId();
-    snprintf(preparedHostname, WIFI_MAX_HOSTNAME_STRLEN + 1, config.WiFi_Hostname, chipId);
+    snprintf(preparedHostname, WIFI_MAX_HOSTNAME_STRLEN + 1, config.WiFi.Hostname, chipId);
 
     const char* pC = preparedHostname;
     while (*pC && pos < WIFI_MAX_HOSTNAME_STRLEN) { // while !null and not over length

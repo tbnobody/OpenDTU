@@ -44,7 +44,7 @@ void MqttHandleInverterClass::loop()
 
     const CONFIG_T& config = Configuration.get();
 
-    if (millis() - _lastPublish > (config.Mqtt_PublishInterval * 1000)) {
+    if (millis() - _lastPublish > (config.Mqtt.PublishInterval * 1000)) {
         // Loop all inverters
         for (uint8_t i = 0; i < Hoymiles.getNumInverters(); i++) {
             auto inv = Hoymiles.getInverterByPos(i);
@@ -166,7 +166,7 @@ void MqttHandleInverterClass::onMqttMessage(const espMqttClientTypes::MessagePro
     char* serial_str;
     char* subtopic;
     char* setting;
-    char* rest = &token_topic[strlen(config.Mqtt_Topic)];
+    char* rest = &token_topic[strlen(config.Mqtt.Topic)];
 
     serial_str = strtok_r(rest, "/", &rest);
     subtopic = strtok_r(rest, "/", &rest);

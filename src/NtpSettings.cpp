@@ -19,12 +19,12 @@ void NtpSettingsClass::init()
 
 void NtpSettingsClass::setServer()
 {
-    configTime(0, 0, Configuration.get().Ntp_Server);
+    configTime(0, 0, Configuration.get().Ntp.Server);
 }
 
 void NtpSettingsClass::setTimezone()
 {
-    setenv("TZ", Configuration.get().Ntp_Timezone, 1);
+    setenv("TZ", Configuration.get().Ntp.Timezone, 1);
     tzset();
 }
 

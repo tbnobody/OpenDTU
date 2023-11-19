@@ -38,9 +38,9 @@ void WebApiNtpClass::onNtpStatus(AsyncWebServerRequest* request)
     JsonObject root = response->getRoot();
     const CONFIG_T& config = Configuration.get();
 
-    root["ntp_server"] = config.Ntp_Server;
-    root["ntp_timezone"] = config.Ntp_Timezone;
-    root["ntp_timezone_descr"] = config.Ntp_TimezoneDescr;
+    root["ntp_server"] = config.Ntp.Server;
+    root["ntp_timezone"] = config.Ntp.Timezone;
+    root["ntp_timezone_descr"] = config.Ntp.TimezoneDescr;
 
     struct tm timeinfo;
     if (!getLocalTime(&timeinfo, 5)) {
@@ -83,12 +83,12 @@ void WebApiNtpClass::onNtpAdminGet(AsyncWebServerRequest* request)
     JsonObject root = response->getRoot();
     const CONFIG_T& config = Configuration.get();
 
-    root["ntp_server"] = config.Ntp_Server;
-    root["ntp_timezone"] = config.Ntp_Timezone;
-    root["ntp_timezone_descr"] = config.Ntp_TimezoneDescr;
-    root["longitude"] = config.Ntp_Longitude;
-    root["latitude"] = config.Ntp_Latitude;
-    root["sunsettype"] = config.Ntp_SunsetType;
+    root["ntp_server"] = config.Ntp.Server;
+    root["ntp_timezone"] = config.Ntp.Timezone;
+    root["ntp_timezone_descr"] = config.Ntp.TimezoneDescr;
+    root["longitude"] = config.Ntp.Longitude;
+    root["latitude"] = config.Ntp.Latitude;
+    root["sunsettype"] = config.Ntp.SunsetType;
 
     response->setLength();
     request->send(response);
@@ -173,12 +173,12 @@ void WebApiNtpClass::onNtpAdminPost(AsyncWebServerRequest* request)
     }
 
     CONFIG_T& config = Configuration.get();
-    strlcpy(config.Ntp_Server, root["ntp_server"].as<String>().c_str(), sizeof(config.Ntp_Server));
-    strlcpy(config.Ntp_Timezone, root["ntp_timezone"].as<String>().c_str(), sizeof(config.Ntp_Timezone));
-    strlcpy(config.Ntp_TimezoneDescr, root["ntp_timezone_descr"].as<String>().c_str(), sizeof(config.Ntp_TimezoneDescr));
-    config.Ntp_Latitude = root["latitude"].as<double>();
-    config.Ntp_Longitude = root["longitude"].as<double>();
-    config.Ntp_SunsetType = root["sunsettype"].as<uint8_t>();
+    strlcpy(config.Ntp.Server, root["ntp_server"].as<String>().c_str(), sizeof(config.Ntp.Server));
+    strlcpy(config.Ntp.Timezone, root["ntp_timezone"].as<String>().c_str(), sizeof(config.Ntp.Timezone));
+    strlcpy(config.Ntp.TimezoneDescr, root["ntp_timezone_descr"].as<String>().c_str(), sizeof(config.Ntp.TimezoneDescr));
+    config.Ntp.Latitude = root["latitude"].as<double>();
+    config.Ntp.Longitude = root["longitude"].as<double>();
+    config.Ntp.SunsetType = root["sunsettype"].as<uint8_t>();
     Configuration.write();
 
     retMsg["type"] = "success";

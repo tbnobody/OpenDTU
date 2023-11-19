@@ -12,7 +12,7 @@ MqttHandleInverterTotalClass MqttHandleInverterTotal;
 
 void MqttHandleInverterTotalClass::init()
 {
-    _lastPublish.set(Configuration.get().Mqtt_PublishInterval * 1000);
+    _lastPublish.set(Configuration.get().Mqtt.PublishInterval * 1000);
 }
 
 void MqttHandleInverterTotalClass::loop()
@@ -30,6 +30,6 @@ void MqttHandleInverterTotalClass::loop()
         MqttSettings.publish("dc/irradiation", String(Datastore.getTotalDcIrradiation(), 3));
         MqttSettings.publish("dc/is_valid", String(Datastore.getIsAllEnabledReachable()));
 
-        _lastPublish.set(Configuration.get().Mqtt_PublishInterval * 1000);
+        _lastPublish.set(Configuration.get().Mqtt.PublishInterval * 1000);
     }
 }

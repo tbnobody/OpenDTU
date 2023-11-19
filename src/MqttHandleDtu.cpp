@@ -22,7 +22,7 @@ void MqttHandleDtuClass::loop()
 
     const CONFIG_T& config = Configuration.get();
 
-    if (millis() - _lastPublish > (config.Mqtt_PublishInterval * 1000)) {
+    if (millis() - _lastPublish > (config.Mqtt.PublishInterval * 1000)) {
         MqttSettings.publish("dtu/uptime", String(millis() / 1000));
         MqttSettings.publish("dtu/ip", NetworkSettings.localIP().toString());
         MqttSettings.publish("dtu/hostname", NetworkSettings.getHostname());

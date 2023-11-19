@@ -37,7 +37,7 @@ void MqttHandleHassClass::forceUpdate()
 
 void MqttHandleHassClass::publishConfig()
 {
-    if (!Configuration.get().Mqtt_Hass_Enabled) {
+    if (!Configuration.get().Mqtt.Hass.Enabled) {
         return;
     }
 
@@ -69,7 +69,7 @@ void MqttHandleHassClass::publishConfig()
             for (auto& c : inv->Statistics()->getChannelsByType(t)) {
                 for (uint8_t f = 0; f < DEVICE_CLS_ASSIGN_LIST_LEN; f++) {
                     bool clear = false;
-                    if (t == TYPE_DC && !config.Mqtt_Hass_IndividualPanels) {
+                    if (t == TYPE_DC && !config.Mqtt.Hass.IndividualPanels) {
                         clear = true;
                     }
                     publishField(inv, t, c, deviceFieldAssignment[f], clear);
@@ -133,8 +133,8 @@ void MqttHandleHassClass::publishField(std::shared_ptr<InverterAbstract> inv, Ch
         JsonObject deviceObj = root.createNestedObject("dev");
         createDeviceInfo(deviceObj, inv);
 
-        if (Configuration.get().Mqtt_Hass_Expire) {
-            root["exp_aft"] = Hoymiles.getNumInverters() * max<uint32_t>(Hoymiles.PollInterval(), Configuration.get().Mqtt_PublishInterval) * inv->getReachableThreshold();
+        if (Configuration.get().Mqtt.Hass.Expire) {
+            root["exp_aft"] = Hoymiles.getNumInverters() * max<uint32_t>(Hoymiles.PollInterval(), Configuration.get().Mqtt.PublishInterval) * inv->getReachableThreshold();
         }
         if (devCls != 0) {
             root["dev_cla"] = devCls;
@@ -266,7 +266,7 @@ void MqttHandleHassClass::createDeviceInfo(JsonObject& object, std::shared_ptr<I
 
 void MqttHandleHassClass::publish(const String& subtopic, const String& payload)
 {
-    String topic = Configuration.get().Mqtt_Hass_Topic;
+    String topic = Configuration.get().Mqtt.Hass.Topic;
     topic += subtopic;
-    MqttSettings.publishGeneric(topic.c_str(), payload.c_str(), Configuration.get().Mqtt_Hass_Retain);
+    MqttSettings.publishGeneric(topic.c_str(), payload.c_str(), Configuration.get().Mqtt.Hass.Retain);
 }

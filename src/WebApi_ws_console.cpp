@@ -26,10 +26,10 @@ void WebApiWsConsoleClass::loop()
     if (millis() - _lastWsCleanup > 1000) {
         _ws.cleanupClients();
 
-        if (Configuration.get().Security_AllowReadonly) {
+        if (Configuration.get().Security.AllowReadonly) {
             _ws.setAuthentication("", "");
         } else {
-            _ws.setAuthentication(AUTH_USERNAME, Configuration.get().Security_Password);
+            _ws.setAuthentication(AUTH_USERNAME, Configuration.get().Security.Password);
         }
 
         _lastWsCleanup = millis();

@@ -67,7 +67,7 @@ void WebApiClass::loop()
 bool WebApiClass::checkCredentials(AsyncWebServerRequest* request)
 {
     CONFIG_T& config = Configuration.get();
-    if (request->authenticate(AUTH_USERNAME, config.Security_Password)) {
+    if (request->authenticate(AUTH_USERNAME, config.Security.Password)) {
         return true;
     }
 
@@ -85,7 +85,7 @@ bool WebApiClass::checkCredentials(AsyncWebServerRequest* request)
 bool WebApiClass::checkCredentialsReadonly(AsyncWebServerRequest* request)
 {
     CONFIG_T& config = Configuration.get();
-    if (config.Security_AllowReadonly) {
+    if (config.Security.AllowReadonly) {
         return true;
     } else {
         return checkCredentials(request);

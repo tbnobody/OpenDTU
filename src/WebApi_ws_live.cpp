@@ -71,10 +71,10 @@ void WebApiWsLiveClass::loop()
             if (buffer) {
                 serializeJson(root, buffer);
 
-                if (Configuration.get().Security_AllowReadonly) {
+                if (Configuration.get().Security.AllowReadonly) {
                     _ws.setAuthentication("", "");
                 } else {
-                    _ws.setAuthentication(AUTH_USERNAME, Configuration.get().Security_Password);
+                    _ws.setAuthentication(AUTH_USERNAME, Configuration.get().Security.Password);
                 }
 
                 _ws.textAll(buffer);
@@ -172,7 +172,7 @@ void WebApiWsLiveClass::generateJsonResponse(JsonVariant& root)
     struct tm timeinfo;
     hintObj["time_sync"] = !getLocalTime(&timeinfo, 5);
     hintObj["radio_problem"] = (Hoymiles.getRadioNrf()->isInitialized() && (!Hoymiles.getRadioNrf()->isConnected() || !Hoymiles.getRadioNrf()->isPVariant())) || (Hoymiles.getRadioCmt()->isInitialized() && (!Hoymiles.getRadioCmt()->isConnected()));
-    if (!strcmp(Configuration.get().Security_Password, ACCESS_POINT_PASSWORD)) {
+    if (!strcmp(Configuration.get().Security.Password, ACCESS_POINT_PASSWORD)) {
         hintObj["default_password"] = true;
     } else {
         hintObj["default_password"] = false;

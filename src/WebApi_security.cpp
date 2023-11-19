@@ -34,8 +34,8 @@ void WebApiSecurityClass::onSecurityGet(AsyncWebServerRequest* request)
     JsonObject root = response->getRoot();
     const CONFIG_T& config = Configuration.get();
 
-    root["password"] = config.Security_Password;
-    root["allow_readonly"] = config.Security_AllowReadonly;
+    root["password"] = config.Security.Password;
+    root["allow_readonly"] = config.Security.AllowReadonly;
 
     response->setLength();
     request->send(response);
@@ -99,8 +99,8 @@ void WebApiSecurityClass::onSecurityPost(AsyncWebServerRequest* request)
     }
 
     CONFIG_T& config = Configuration.get();
-    strlcpy(config.Security_Password, root["password"].as<String>().c_str(), sizeof(config.Security_Password));
-    config.Security_AllowReadonly = root["allow_readonly"].as<bool>();
+    strlcpy(config.Security.Password, root["password"].as<String>().c_str(), sizeof(config.Security.Password));
+    config.Security.AllowReadonly = root["allow_readonly"].as<bool>();
     Configuration.write();
 
     retMsg["type"] = "success";
