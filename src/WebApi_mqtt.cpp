@@ -85,6 +85,7 @@ void WebApiMqttClass::onMqttAdminGet(AsyncWebServerRequest* request)
     root["mqtt_lwt_topic"] = config.Mqtt.Lwt.Topic;
     root["mqtt_lwt_online"] = config.Mqtt.CleanSession;
     root["mqtt_lwt_offline"] = config.Mqtt.Lwt.Value_Offline;
+    root["mqtt_lwt_qos"] = config.Mqtt.Lwt.Qos;
     root["mqtt_publish_interval"] = config.Mqtt.PublishInterval;
     root["mqtt_clean_session"] = config.Mqtt.CleanSession;
     root["mqtt_hass_enabled"] = config.Mqtt.Hass.Enabled;
@@ -150,6 +151,7 @@ void WebApiMqttClass::onMqttAdminPost(AsyncWebServerRequest* request)
             && root.containsKey("mqtt_lwt_topic")
             && root.containsKey("mqtt_lwt_online")
             && root.containsKey("mqtt_lwt_offline")
+            && root.containsKey("mqtt_lwt_qos")
             && root.containsKey("mqtt_publish_interval")
             && root.containsKey("mqtt_clean_session")
             && root.containsKey("mqtt_hass_enabled")
@@ -269,6 +271,15 @@ void WebApiMqttClass::onMqttAdminPost(AsyncWebServerRequest* request)
             return;
         }
 
+        if (root["mqtt_lwt_qos"].as<uint8_t>() > 2) {
+            retMsg["message"] = "LWT QoS must not be greater than " STR(2) "!";
+            retMsg["code"] = WebApiError::MqttLwtQos;
+            retMsg["param"]["max"] = 2;
+            response->setLength();
+            request->send(response);
+            return;
+        }
+
         if (root["mqtt_publish_interval"].as<uint32_t>() < 5 || root["mqtt_publish_interval"].as<uint32_t>() > 65535) {
             retMsg["message"] = "Publish interval must be a number between 5 and 65535!";
             retMsg["code"] = WebApiError::MqttPublishInterval;
@@ -315,6 +326,7 @@ void WebApiMqttClass::onMqttAdminPost(AsyncWebServerRequest* request)
     strlcpy(config.Mqtt.Lwt.Topic, root["mqtt_lwt_topic"].as<String>().c_str(), sizeof(config.Mqtt.Lwt.Topic));
     strlcpy(config.Mqtt.Lwt.Value_Online, root["mqtt_lwt_online"].as<String>().c_str(), sizeof(config.Mqtt.Lwt.Value_Online));
     strlcpy(config.Mqtt.Lwt.Value_Offline, root["mqtt_lwt_offline"].as<String>().c_str(), sizeof(config.Mqtt.Lwt.Value_Offline));
+    config.Mqtt.Lwt.Qos = root["mqtt_lwt_qos"].as<uint8_t>();
     config.Mqtt.PublishInterval = root["mqtt_publish_interval"].as<uint32_t>();
     config.Mqtt.CleanSession = root["mqtt_clean_session"].as<bool>();
     config.Mqtt.Hass.Enabled = root["mqtt_hass_enabled"].as<bool>();

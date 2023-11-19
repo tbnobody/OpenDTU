@@ -67,6 +67,7 @@ bool ConfigurationClass::write()
     mqtt_lwt["topic"] = config.Mqtt.Lwt.Topic;
     mqtt_lwt["value_online"] = config.Mqtt.Lwt.Value_Online;
     mqtt_lwt["value_offline"] = config.Mqtt.Lwt.Value_Offline;
+    mqtt_lwt["qos"] = config.Mqtt.Lwt.Qos;
 
     JsonObject mqtt_tls = mqtt.createNestedObject("tls");
     mqtt_tls["enabled"] = config.Mqtt.Tls.Enabled;
@@ -220,6 +221,7 @@ bool ConfigurationClass::read()
     strlcpy(config.Mqtt.Lwt.Topic, mqtt_lwt["topic"] | MQTT_LWT_TOPIC, sizeof(config.Mqtt.Lwt.Topic));
     strlcpy(config.Mqtt.Lwt.Value_Online, mqtt_lwt["value_online"] | MQTT_LWT_ONLINE, sizeof(config.Mqtt.Lwt.Value_Online));
     strlcpy(config.Mqtt.Lwt.Value_Offline, mqtt_lwt["value_offline"] | MQTT_LWT_OFFLINE, sizeof(config.Mqtt.Lwt.Value_Offline));
+    config.Mqtt.Lwt.Qos = mqtt_lwt["qos"] | MQTT_LWT_QOS;
 
     JsonObject mqtt_tls = mqtt["tls"];
     config.Mqtt.Tls.Enabled = mqtt_tls["enabled"] | MQTT_TLS;

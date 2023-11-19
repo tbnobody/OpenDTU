@@ -75,6 +75,7 @@
 #define MQTT_LWT_TOPIC "dtu/status"
 #define MQTT_LWT_ONLINE "online"
 #define MQTT_LWT_OFFLINE "offline"
+#define MQTT_LWT_QOS 2U
 #define MQTT_PUBLISH_INTERVAL 5U
 #define MQTT_CLEAN_SESSION true
 

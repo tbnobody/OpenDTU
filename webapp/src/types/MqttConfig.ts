@@ -16,6 +16,7 @@ export interface MqttConfig {
     mqtt_lwt_topic: string;
     mqtt_lwt_online: string;
     mqtt_lwt_offline: string;
+    mqtt_lwt_qos: number;
     mqtt_hass_enabled: boolean;
     mqtt_hass_expire: boolean;
     mqtt_hass_retain: boolean;
