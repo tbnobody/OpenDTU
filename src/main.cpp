@@ -16,12 +16,14 @@
 #include "NetworkSettings.h"
 #include "NtpSettings.h"
 #include "PinMapping.h"
+#include "Scheduler.h"
 #include "SunPosition.h"
 #include "Utils.h"
 #include "WebApi.h"
 #include "defaults.h"
 #include <Arduino.h>
 #include <LittleFS.h>
+#include <TaskScheduler.h>
 
 void setup()
 {
@@ -149,6 +151,8 @@ void setup()
 
 void loop()
 {
+    scheduler.execute();
+
     NetworkSettings.loop();
     yield();
     InverterSettings.loop();
