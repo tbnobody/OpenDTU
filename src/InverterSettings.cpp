@@ -88,31 +88,38 @@ void InverterSettingsClass::init(Scheduler* scheduler)
         MessageOutput.println("Invalid pin config");
     }
 
-    scheduler->addTask(_loopTask);
-    _loopTask.setCallback(std::bind(&InverterSettingsClass::loop, this));
-    _loopTask.setIterations(TASK_FOREVER);
-    _loopTask.enable();
+    scheduler->addTask(_hoyTask);
+    _hoyTask.setCallback(std::bind(&InverterSettingsClass::hoyLoop, this));
+    _hoyTask.setIterations(TASK_FOREVER);
+    _hoyTask.enable();
+
+    scheduler->addTask(_settingsTask);
+    _settingsTask.setCallback(std::bind(&InverterSettingsClass::settingsLoop, this));
+    _settingsTask.setIterations(TASK_FOREVER);
+    _settingsTask.setInterval(INVERTER_UPDATE_SETTINGS_INTERVAL);
+    _settingsTask.enable();
 }
 
-void InverterSettingsClass::loop()
+void InverterSettingsClass::settingsLoop()
 {
-    if (millis() - _lastUpdate > INVERTER_UPDATE_SETTINGS_INTERVAL) {
-        const CONFIG_T& config = Configuration.get();
+    const CONFIG_T& config = Configuration.get();
 
-        for (uint8_t i = 0; i < INV_MAX_COUNT; i++) {
-            auto const& inv_cfg = config.Inverter[i];
-            if (inv_cfg.Serial == 0) {
-                continue;
-            }
-            auto inv = Hoymiles.getInverterBySerial(inv_cfg.Serial);
-            if (inv == nullptr) {
-                continue;
-            }
-
-            inv->setEnablePolling(inv_cfg.Poll_Enable && (SunPosition.isDayPeriod() || inv_cfg.Poll_Enable_Night));
-            inv->setEnableCommands(inv_cfg.Command_Enable && (SunPosition.isDayPeriod() || inv_cfg.Command_Enable_Night));
+    for (uint8_t i = 0; i < INV_MAX_COUNT; i++) {
+        auto const& inv_cfg = config.Inverter[i];
+        if (inv_cfg.Serial == 0) {
+            continue;
         }
-    }
+        auto inv = Hoymiles.getInverterBySerial(inv_cfg.Serial);
+        if (inv == nullptr) {
+            continue;
+        }
 
+        inv->setEnablePolling(inv_cfg.Poll_Enable && (SunPosition.isDayPeriod() || inv_cfg.Poll_Enable_Night));
+        inv->setEnableCommands(inv_cfg.Command_Enable && (SunPosition.isDayPeriod() || inv_cfg.Command_Enable_Night));
+    }
+ }
+
+void InverterSettingsClass::hoyLoop()
+{
     Hoymiles.loop();
 }

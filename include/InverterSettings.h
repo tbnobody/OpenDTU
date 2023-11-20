@@ -11,11 +11,11 @@ public:
     void init(Scheduler* scheduler);
 
 private:
-    void loop();
+    void settingsLoop();
+    void hoyLoop();
 
-    Task _loopTask;
-
-    uint32_t _lastUpdate = 0;
+    Task _settingsTask;
+    Task _hoyTask;
 };
 
 extern InverterSettingsClass InverterSettings;
