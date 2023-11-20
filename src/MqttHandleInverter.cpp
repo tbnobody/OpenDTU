@@ -18,7 +18,7 @@
 
 MqttHandleInverterClass MqttHandleInverter;
 
-void MqttHandleInverterClass::init()
+void MqttHandleInverterClass::init(Scheduler* scheduler)
 {
     using std::placeholders::_1;
     using std::placeholders::_2;
@@ -34,90 +34,93 @@ void MqttHandleInverterClass::init()
     MqttSettings.subscribe(String(topic + "+/cmd/" + TOPIC_SUB_LIMIT_NONPERSISTENT_ABSOLUTE).c_str(), 0, std::bind(&MqttHandleInverterClass::onMqttMessage, this, _1, _2, _3, _4, _5, _6));
     MqttSettings.subscribe(String(topic + "+/cmd/" + TOPIC_SUB_POWER).c_str(), 0, std::bind(&MqttHandleInverterClass::onMqttMessage, this, _1, _2, _3, _4, _5, _6));
     MqttSettings.subscribe(String(topic + "+/cmd/" + TOPIC_SUB_RESTART).c_str(), 0, std::bind(&MqttHandleInverterClass::onMqttMessage, this, _1, _2, _3, _4, _5, _6));
+
+    scheduler->addTask(_loopTask);
+    _loopTask.setCallback(std::bind(&MqttHandleInverterClass::loop, this));
+    _loopTask.setIterations(TASK_FOREVER);
+    _loopTask.setInterval(Configuration.get().Mqtt.PublishInterval * TASK_SECOND);
+    _loopTask.enable();
 }
 
 void MqttHandleInverterClass::loop()
 {
+    _loopTask.setInterval(Configuration.get().Mqtt.PublishInterval * TASK_SECOND);
+
     if (!MqttSettings.getConnected() || !Hoymiles.isAllRadioIdle()) {
+        _loopTask.forceNextIteration();
         return;
     }
 
-    const CONFIG_T& config = Configuration.get();
+    // Loop all inverters
+    for (uint8_t i = 0; i < Hoymiles.getNumInverters(); i++) {
+        auto inv = Hoymiles.getInverterByPos(i);
 
-    if (millis() - _lastPublish > (config.Mqtt.PublishInterval * 1000)) {
-        // Loop all inverters
-        for (uint8_t i = 0; i < Hoymiles.getNumInverters(); i++) {
-            auto inv = Hoymiles.getInverterByPos(i);
+        String subtopic = inv->serialString();
 
-            String subtopic = inv->serialString();
+        // Name
+        MqttSettings.publish(subtopic + "/name", inv->name());
 
-            // Name
-            MqttSettings.publish(subtopic + "/name", inv->name());
+        if (inv->DevInfo()->getLastUpdate() > 0) {
+            // Bootloader Version
+            MqttSettings.publish(subtopic + "/device/bootloaderversion", String(inv->DevInfo()->getFwBootloaderVersion()));
 
-            if (inv->DevInfo()->getLastUpdate() > 0) {
-                // Bootloader Version
-                MqttSettings.publish(subtopic + "/device/bootloaderversion", String(inv->DevInfo()->getFwBootloaderVersion()));
+            // Firmware Version
+            MqttSettings.publish(subtopic + "/device/fwbuildversion", String(inv->DevInfo()->getFwBuildVersion()));
 
-                // Firmware Version
-                MqttSettings.publish(subtopic + "/device/fwbuildversion", String(inv->DevInfo()->getFwBuildVersion()));
+            // Firmware Build DateTime
+            char timebuffer[32];
+            const time_t t = inv->DevInfo()->getFwBuildDateTime();
+            std::strftime(timebuffer, sizeof(timebuffer), "%Y-%m-%d %H:%M:%S", gmtime(&t));
+            MqttSettings.publish(subtopic + "/device/fwbuilddatetime", String(timebuffer));
 
-                // Firmware Build DateTime
-                char timebuffer[32];
-                const time_t t = inv->DevInfo()->getFwBuildDateTime();
-                std::strftime(timebuffer, sizeof(timebuffer), "%Y-%m-%d %H:%M:%S", gmtime(&t));
-                MqttSettings.publish(subtopic + "/device/fwbuilddatetime", String(timebuffer));
+            // Hardware part number
+            MqttSettings.publish(subtopic + "/device/hwpartnumber", String(inv->DevInfo()->getHwPartNumber()));
 
-                // Hardware part number
-                MqttSettings.publish(subtopic + "/device/hwpartnumber", String(inv->DevInfo()->getHwPartNumber()));
+            // Hardware version
+            MqttSettings.publish(subtopic + "/device/hwversion", inv->DevInfo()->getHwVersion());
+        }
 
-                // Hardware version
-                MqttSettings.publish(subtopic + "/device/hwversion", inv->DevInfo()->getHwVersion());
+        if (inv->SystemConfigPara()->getLastUpdate() > 0) {
+            // Limit
+            MqttSettings.publish(subtopic + "/status/limit_relative", String(inv->SystemConfigPara()->getLimitPercent()));
+
+            uint16_t maxpower = inv->DevInfo()->getMaxPower();
+            if (maxpower > 0) {
+                MqttSettings.publish(subtopic + "/status/limit_absolute", String(inv->SystemConfigPara()->getLimitPercent() * maxpower / 100));
             }
+        }
 
-            if (inv->SystemConfigPara()->getLastUpdate() > 0) {
-                // Limit
-                MqttSettings.publish(subtopic + "/status/limit_relative", String(inv->SystemConfigPara()->getLimitPercent()));
+        MqttSettings.publish(subtopic + "/status/reachable", String(inv->isReachable()));
+        MqttSettings.publish(subtopic + "/status/producing", String(inv->isProducing()));
 
-                uint16_t maxpower = inv->DevInfo()->getMaxPower();
-                if (maxpower > 0) {
-                    MqttSettings.publish(subtopic + "/status/limit_absolute", String(inv->SystemConfigPara()->getLimitPercent() * maxpower / 100));
-                }
-            }
+        if (inv->Statistics()->getLastUpdate() > 0) {
+            MqttSettings.publish(subtopic + "/status/last_update", String(std::time(0) - (millis() - inv->Statistics()->getLastUpdate()) / 1000));
+        } else {
+            MqttSettings.publish(subtopic + "/status/last_update", String(0));
+        }
 
-            MqttSettings.publish(subtopic + "/status/reachable", String(inv->isReachable()));
-            MqttSettings.publish(subtopic + "/status/producing", String(inv->isProducing()));
+        uint32_t lastUpdateInternal = inv->Statistics()->getLastUpdateFromInternal();
+        if (inv->Statistics()->getLastUpdate() > 0 && (lastUpdateInternal != _lastPublishStats[i])) {
+            _lastPublishStats[i] = lastUpdateInternal;
 
-            if (inv->Statistics()->getLastUpdate() > 0) {
-                MqttSettings.publish(subtopic + "/status/last_update", String(std::time(0) - (millis() - inv->Statistics()->getLastUpdate()) / 1000));
-            } else {
-                MqttSettings.publish(subtopic + "/status/last_update", String(0));
-            }
-
-            uint32_t lastUpdateInternal = inv->Statistics()->getLastUpdateFromInternal();
-            if (inv->Statistics()->getLastUpdate() > 0 && (lastUpdateInternal != _lastPublishStats[i])) {
-                _lastPublishStats[i] = lastUpdateInternal;
-
-                // Loop all channels
-                for (auto& t : inv->Statistics()->getChannelTypes()) {
-                    for (auto& c : inv->Statistics()->getChannelsByType(t)) {
-                        if (t == TYPE_DC) {
-                            INVERTER_CONFIG_T* inv_cfg = Configuration.getInverterConfig(inv->serial());
-                            if (inv_cfg != nullptr) {
-                                // TODO(tbnobody)
-                                MqttSettings.publish(inv->serialString() + "/" + String(static_cast<uint8_t>(c) + 1) + "/name", inv_cfg->channel[c].Name);
-                            }
+            // Loop all channels
+            for (auto& t : inv->Statistics()->getChannelTypes()) {
+                for (auto& c : inv->Statistics()->getChannelsByType(t)) {
+                    if (t == TYPE_DC) {
+                        INVERTER_CONFIG_T* inv_cfg = Configuration.getInverterConfig(inv->serial());
+                        if (inv_cfg != nullptr) {
+                            // TODO(tbnobody)
+                            MqttSettings.publish(inv->serialString() + "/" + String(static_cast<uint8_t>(c) + 1) + "/name", inv_cfg->channel[c].Name);
                         }
-                        for (uint8_t f = 0; f < sizeof(_publishFields) / sizeof(FieldId_t); f++) {
-                            publishField(inv, t, c, _publishFields[f]);
-                        }
+                    }
+                    for (uint8_t f = 0; f < sizeof(_publishFields) / sizeof(FieldId_t); f++) {
+                        publishField(inv, t, c, _publishFields[f]);
                     }
                 }
             }
-
-            yield();
         }
 
-        _lastPublish = millis();
+        yield();
     }
 }
 
