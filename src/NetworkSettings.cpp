@@ -18,7 +18,7 @@ NetworkSettingsClass::NetworkSettingsClass()
     dnsServer.reset(new DNSServer());
 }
 
-void NetworkSettingsClass::init()
+void NetworkSettingsClass::init(Scheduler* scheduler)
 {
     using std::placeholders::_1;
 
@@ -27,6 +27,11 @@ void NetworkSettingsClass::init()
 
     WiFi.onEvent(std::bind(&NetworkSettingsClass::NetworkEvent, this, _1));
     setupMode();
+
+    scheduler->addTask(_loopTask);
+    _loopTask.setCallback(std::bind(&NetworkSettingsClass::loop, this));
+    _loopTask.setIterations(TASK_FOREVER);
+    _loopTask.enable();
 }
 
 void NetworkSettingsClass::NetworkEvent(WiFiEvent_t event)

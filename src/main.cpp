@@ -82,7 +82,7 @@ void setup()
 
     // Initialize WiFi
     MessageOutput.print("Initialize Network... ");
-    NetworkSettings.init();
+    NetworkSettings.init(&scheduler);
     MessageOutput.println("done");
     NetworkSettings.applyConfig();
 
@@ -153,8 +153,6 @@ void loop()
 {
     scheduler.execute();
 
-    NetworkSettings.loop();
-    yield();
     InverterSettings.loop();
     yield();
     WebApi.loop();

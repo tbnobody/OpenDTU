@@ -2,6 +2,7 @@
 #pragma once
 
 #include <DNSServer.h>
+#include <TaskSchedulerDeclarations.h>
 #include <WiFi.h>
 #include <vector>
 
@@ -38,8 +39,7 @@ typedef struct NetworkEventCbList {
 class NetworkSettingsClass {
 public:
     NetworkSettingsClass();
-    void init();
-    void loop();
+    void init(Scheduler* scheduler);
     void applyConfig();
     void enableAdminMode();
     String getApName();
@@ -57,11 +57,15 @@ public:
     void raiseEvent(network_event event);
 
 private:
+    void loop();
     void setHostname();
     void setStaticIp();
     void handleMDNS();
     void setupMode();
     void NetworkEvent(WiFiEvent_t event);
+
+    Task _loopTask;
+
     bool adminEnabled = true;
     bool forceDisconnection = false;
     uint32_t adminTimeoutCounter = 0;
