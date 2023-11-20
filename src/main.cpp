@@ -114,6 +114,7 @@ void setup()
     // Initialize Display
     MessageOutput.print("Initialize Display... ");
     Display.init(
+        &scheduler,
         static_cast<DisplayType_t>(pin.display_type),
         pin.display_data,
         pin.display_clk,
@@ -155,7 +156,5 @@ void loop()
     scheduler.execute();
 
     WebApi.loop();
-    yield();
-    Display.loop();
     yield();
 }

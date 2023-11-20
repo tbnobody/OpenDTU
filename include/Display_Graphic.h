@@ -2,6 +2,7 @@
 #pragma once
 
 #include "defaults.h"
+#include <TaskSchedulerDeclarations.h>
 #include <U8g2lib.h>
 
 enum DisplayType_t {
@@ -16,8 +17,7 @@ public:
     DisplayGraphicClass();
     ~DisplayGraphicClass();
 
-    void init(DisplayType_t type, uint8_t data, uint8_t clk, uint8_t cs, uint8_t reset);
-    void loop();
+    void init(Scheduler* scheduler, DisplayType_t type, uint8_t data, uint8_t clk, uint8_t cs, uint8_t reset);
     void setContrast(uint8_t contrast);
     void setStatus(bool turnOn);
     void setOrientation(uint8_t rotation = DISPLAY_ROTATION);
@@ -28,9 +28,12 @@ public:
     bool enableScreensaver = true;
 
 private:
+    void loop();
     void printText(const char* text, uint8_t line);
     void calcLineHeights();
     void setFont(uint8_t line);
+
+    Task _loopTask;
 
     U8G2* _display;
 
@@ -41,7 +44,6 @@ private:
     uint8_t _mExtra;
     uint16_t _period = 1000;
     uint16_t _interval = 60000; // interval at which to power save (milliseconds)
-    uint32_t _lastDisplayUpdate = 0;
     uint32_t _previousMillis = 0;
     char _fmtText[32];
     bool _isLarge = false;
