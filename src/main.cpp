@@ -128,7 +128,7 @@ void setup()
 
     // Initialize Single LEDs
     MessageOutput.print("Initialize LEDs... ");
-    LedSingle.init();
+    LedSingle.init(&scheduler);
     MessageOutput.println("done");
 
     // Check for default DTU serial
@@ -162,7 +162,5 @@ void loop()
     Display.loop();
     yield();
     MessageOutput.loop();
-    yield();
-    LedSingle.loop();
     yield();
 }

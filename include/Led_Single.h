@@ -2,6 +2,7 @@
 #pragma once
 
 #include "PinMapping.h"
+#include <TaskSchedulerDeclarations.h>
 #include <TimeoutHelper.h>
 
 #define LEDSINGLE_UPDATE_INTERVAL 2000
@@ -9,13 +10,16 @@
 class LedSingleClass {
 public:
     LedSingleClass();
-    void init();
-    void loop();
+    void init(Scheduler* scheduler);
 
     void turnAllOff();
     void turnAllOn();
 
 private:
+    void loop();
+
+    Task _loopTask;
+
     enum class LedState_t {
         On,
         Off,

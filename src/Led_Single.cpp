@@ -16,7 +16,7 @@ LedSingleClass::LedSingleClass()
 {
 }
 
-void LedSingleClass::init()
+void LedSingleClass::init(Scheduler* scheduler)
 {
     _blinkTimeout.set(500);
     _updateTimeout.set(LEDSINGLE_UPDATE_INTERVAL);
@@ -33,6 +33,11 @@ void LedSingleClass::init()
 
         _ledState[i] = LedState_t::Off;
     }
+
+    scheduler->addTask(_loopTask);
+    _loopTask.setCallback(std::bind(&LedSingleClass::loop, this));
+    _loopTask.setIterations(TASK_FOREVER);
+    _loopTask.enable();
 }
 
 void LedSingleClass::loop()
