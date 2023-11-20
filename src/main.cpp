@@ -101,7 +101,7 @@ void setup()
     MqttSettings.init();
     MqttHandleDtu.init();
     MqttHandleInverter.init();
-    MqttHandleInverterTotal.init();
+    MqttHandleInverterTotal.init(&scheduler);
     MqttHandleHass.init();
     MessageOutput.println("done");
 
@@ -160,8 +160,6 @@ void loop()
     MqttHandleDtu.loop();
     yield();
     MqttHandleInverter.loop();
-    yield();
-    MqttHandleInverterTotal.loop();
     yield();
     MqttHandleHass.loop();
     yield();
