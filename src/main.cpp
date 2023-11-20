@@ -146,7 +146,7 @@ void setup()
 
     InverterSettings.init();
 
-    Datastore.init();
+    Datastore.init(&scheduler);
 }
 
 void loop()
@@ -156,8 +156,6 @@ void loop()
     NetworkSettings.loop();
     yield();
     InverterSettings.loop();
-    yield();
-    Datastore.loop();
     yield();
     MqttHandleDtu.loop();
     yield();
