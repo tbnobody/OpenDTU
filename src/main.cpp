@@ -144,7 +144,7 @@ void setup()
     }
     MessageOutput.println("done");
 
-    InverterSettings.init();
+    InverterSettings.init(&scheduler);
 
     Datastore.init(&scheduler);
 }
@@ -153,8 +153,6 @@ void loop()
 {
     scheduler.execute();
 
-    InverterSettings.loop();
-    yield();
     WebApi.loop();
     yield();
     Display.loop();

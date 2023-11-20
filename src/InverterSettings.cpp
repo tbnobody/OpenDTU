@@ -25,7 +25,7 @@
 
 InverterSettingsClass InverterSettings;
 
-void InverterSettingsClass::init()
+void InverterSettingsClass::init(Scheduler* scheduler)
 {
     const CONFIG_T& config = Configuration.get();
     const PinMapping_t& pin = PinMapping.get();
@@ -87,6 +87,11 @@ void InverterSettingsClass::init()
     } else {
         MessageOutput.println("Invalid pin config");
     }
+
+    scheduler->addTask(_loopTask);
+    _loopTask.setCallback(std::bind(&InverterSettingsClass::loop, this));
+    _loopTask.setIterations(TASK_FOREVER);
+    _loopTask.enable();
 }
 
 void InverterSettingsClass::loop()
