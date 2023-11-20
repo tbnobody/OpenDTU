@@ -8,6 +8,14 @@
 
 MessageOutputClass MessageOutput;
 
+void MessageOutputClass::init(Scheduler* scheduler)
+{
+    scheduler->addTask(_loopTask);
+    _loopTask.setCallback(std::bind(&MessageOutputClass::loop, this));
+    _loopTask.setIterations(TASK_FOREVER);
+    _loopTask.enable();
+}
+
 void MessageOutputClass::register_ws_output(AsyncWebSocket* output)
 {
     _ws = output;

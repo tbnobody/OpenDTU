@@ -36,6 +36,7 @@ void setup()
     while (!Serial)
         yield();
 #endif
+    MessageOutput.init(&scheduler);
     MessageOutput.println();
     MessageOutput.println("Starting OpenDTU");
 
@@ -156,7 +157,5 @@ void loop()
     WebApi.loop();
     yield();
     Display.loop();
-    yield();
-    MessageOutput.loop();
     yield();
 }
