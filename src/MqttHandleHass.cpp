@@ -9,8 +9,12 @@
 
 MqttHandleHassClass MqttHandleHass;
 
-void MqttHandleHassClass::init()
+void MqttHandleHassClass::init(Scheduler* scheduler)
 {
+    scheduler->addTask(_loopTask);
+    _loopTask.setCallback(std::bind(&MqttHandleHassClass::loop, this));
+    _loopTask.setIterations(TASK_FOREVER);
+    _loopTask.enable();
 }
 
 void MqttHandleHassClass::loop()

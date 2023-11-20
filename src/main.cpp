@@ -102,7 +102,7 @@ void setup()
     MqttHandleDtu.init();
     MqttHandleInverter.init();
     MqttHandleInverterTotal.init(&scheduler);
-    MqttHandleHass.init();
+    MqttHandleHass.init(&scheduler);
     MessageOutput.println("done");
 
     // Initialize WebApi
@@ -160,8 +160,6 @@ void loop()
     MqttHandleDtu.loop();
     yield();
     MqttHandleInverter.loop();
-    yield();
-    MqttHandleHass.loop();
     yield();
     WebApi.loop();
     yield();
