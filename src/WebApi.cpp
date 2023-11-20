@@ -13,7 +13,7 @@ WebApiClass::WebApiClass()
 {
 }
 
-void WebApiClass::init()
+void WebApiClass::init(Scheduler* scheduler)
 {
     _server.addHandler(&_events);
 
@@ -39,6 +39,11 @@ void WebApiClass::init()
     _webApiWsLive.init(&_server);
 
     _server.begin();
+
+    scheduler->addTask(_loopTask);
+    _loopTask.setCallback(std::bind(&WebApiClass::loop, this));
+    _loopTask.setIterations(TASK_FOREVER);
+    _loopTask.enable();
 }
 
 void WebApiClass::loop()

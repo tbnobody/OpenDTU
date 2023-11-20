@@ -108,7 +108,7 @@ void setup()
 
     // Initialize WebApi
     MessageOutput.print("Initialize WebApi... ");
-    WebApi.init();
+    WebApi.init(&scheduler);
     MessageOutput.println("done");
 
     // Initialize Display
@@ -154,7 +154,4 @@ void setup()
 void loop()
 {
     scheduler.execute();
-
-    WebApi.loop();
-    yield();
 }
