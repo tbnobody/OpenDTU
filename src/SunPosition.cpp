@@ -13,8 +13,12 @@ SunPositionClass::SunPositionClass()
 {
 }
 
-void SunPositionClass::init()
+void SunPositionClass::init(Scheduler* scheduler)
 {
+    scheduler->addTask(_loopTask);
+    _loopTask.setCallback(std::bind(&SunPositionClass::loop, this));
+    _loopTask.setIterations(TASK_FOREVER);
+    _loopTask.enable();
 }
 
 void SunPositionClass::loop()

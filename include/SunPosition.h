@@ -1,14 +1,14 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 #pragma once
 
+#include <TaskSchedulerDeclarations.h>
 #include <atomic>
 #include <sunset.h>
 
 class SunPositionClass {
 public:
     SunPositionClass();
-    void init();
-    void loop();
+    void init(Scheduler* scheduler);
 
     bool isDayPeriod();
     bool isSunsetAvailable();
@@ -17,9 +17,12 @@ public:
     void setDoRecalc(bool doRecalc);
 
 private:
+    void loop();
     void updateSunData();
     bool checkRecalcDayChanged();
     bool getSunTime(struct tm* info, uint32_t offset);
+
+    Task _loopTask;
 
     bool _isSunsetAvailable = true;
     uint32_t _sunriseMinutes = 0;

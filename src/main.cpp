@@ -93,7 +93,7 @@ void setup()
 
     // Initialize SunPosition
     MessageOutput.print("Initialize SunPosition... ");
-    SunPosition.init();
+    SunPosition.init(&scheduler);
     MessageOutput.println("done");
 
     // Initialize MqTT
@@ -170,8 +170,6 @@ void loop()
     WebApi.loop();
     yield();
     Display.loop();
-    yield();
-    SunPosition.loop();
     yield();
     MessageOutput.loop();
     yield();
