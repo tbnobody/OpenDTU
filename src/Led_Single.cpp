@@ -18,8 +18,9 @@ LedSingleClass::LedSingleClass()
 
 void LedSingleClass::init(Scheduler* scheduler)
 {
+    bool ledActive = false;
+
     _blinkTimeout.set(500);
-    _updateTimeout.set(LEDSINGLE_UPDATE_INTERVAL);
     turnAllOn();
 
     auto& pin = PinMapping.get();
@@ -28,25 +29,29 @@ void LedSingleClass::init(Scheduler* scheduler)
         if (pin.led[i] >= 0) {
             pinMode(pin.led[i], OUTPUT);
             digitalWrite(pin.led[i], LOW);
-            _ledActive++;
+            ledActive = true;
         }
 
         _ledState[i] = LedState_t::Off;
     }
 
-    scheduler->addTask(_loopTask);
-    _loopTask.setCallback(std::bind(&LedSingleClass::loop, this));
-    _loopTask.setIterations(TASK_FOREVER);
-    _loopTask.enable();
+    if (ledActive) {
+        scheduler->addTask(_outputTask);
+        _outputTask.setCallback(std::bind(&LedSingleClass::outputLoop, this));
+        _outputTask.setIterations(TASK_FOREVER);
+        _outputTask.enable();
+
+        scheduler->addTask(_setTask);
+        _setTask.setCallback(std::bind(&LedSingleClass::setLoop, this));
+        _setTask.setInterval(LEDSINGLE_UPDATE_INTERVAL * TASK_MILLISECOND);
+        _setTask.setIterations(TASK_FOREVER);
+        _setTask.enable();
+    }
 }
 
-void LedSingleClass::loop()
+void LedSingleClass::setLoop()
 {
-    if (_ledActive == 0) {
-        return;
-    }
-
-    if (_updateTimeout.occured() && _allState == LedState_t::On) {
+    if (_allState == LedState_t::On) {
         const CONFIG_T& config = Configuration.get();
 
         // Update network status
@@ -73,12 +78,14 @@ void LedSingleClass::loop()
             }
         }
 
-        _updateTimeout.reset();
-    } else if (_updateTimeout.occured() && _allState == LedState_t::Off) {
+    } else if (_allState == LedState_t::Off) {
         _ledState[0] = LedState_t::Off;
         _ledState[1] = LedState_t::Off;
     }
+}
 
+void LedSingleClass::outputLoop()
+{
     auto& pin = PinMapping.get();
     for (uint8_t i = 0; i < PINMAPPING_LED_COUNT; i++) {
 
