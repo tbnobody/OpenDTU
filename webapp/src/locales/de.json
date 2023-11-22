@@ -494,7 +494,9 @@
         "Cancel": "@:maintenancereboot.Cancel",
         "Save": "@:dtuadmin.Save",
         "DeleteMsg": "Soll der Wechselrichter \"{name}\" mit der Seriennummer {serial} wirklich gelöscht werden?",
-        "Delete": "Löschen"
+        "Delete": "Löschen",
+        "YieldDayCorrection": "Tagesertragskorrektur",
+        "YieldDayCorrectionHint": "Summiert den Tagesertrag, auch wenn der Wechselrichter neu gestartet wird. Der Wert wird um Mitternacht zurückgesetzt"
     },
     "configadmin": {
         "ConfigManagement": "Konfigurationsverwaltung",

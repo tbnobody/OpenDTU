@@ -82,6 +82,8 @@ void StatisticsParser::clearBuffer()
 {
     memset(_payloadStatistic, 0, STATISTIC_PACKET_SIZE);
     _statisticLength = 0;
+
+    memset(_lastYieldDay, 0, sizeof(_lastYieldDay));
 }
 
 void StatisticsParser::appendFragment(uint8_t offset, uint8_t* payload, uint8_t len)
@@ -92,6 +94,31 @@ void StatisticsParser::appendFragment(uint8_t offset, uint8_t* payload, uint8_t 
     }
     memcpy(&_payloadStatistic[offset], payload, len);
     _statisticLength += len;
+}
+
+void StatisticsParser::endAppendFragment()
+{
+    Parser::endAppendFragment();
+
+    if (!_enableYieldDayCorrection) {
+        resetYieldDayCorrection();
+        return;
+    }
+
+    for (auto& c : getChannelsByType(TYPE_DC)) {
+        // check if current yield day is smaller then last cached yield day
+        if (getChannelFieldValue(TYPE_DC, c, FLD_YD) < _lastYieldDay[static_cast<uint8_t>(c)]) {
+            // currently all values are zero --> Add last known values to offset
+            Hoymiles.getMessageOutput()->printf("Yield Day reset detected!\r\n");
+
+            setChannelFieldOffset(TYPE_DC, c, FLD_YD,
+                getChannelFieldOffset(TYPE_DC, c, FLD_YD) + _lastYieldDay[static_cast<uint8_t>(c)]);
+
+            _lastYieldDay[static_cast<uint8_t>(c)] = 0;
+        } else {
+            _lastYieldDay[static_cast<uint8_t>(c)] = getChannelFieldValue(TYPE_DC, c, FLD_YD);
+        }
+    }
 }
 
 const byteAssign_t* StatisticsParser::getAssignmentByChannelField(ChannelType_t type, ChannelNum_t channel, FieldId_t fieldId)
@@ -329,6 +356,16 @@ void StatisticsParser::setLastUpdateFromInternal(uint32_t lastUpdate)
     _lastUpdateFromInternal = lastUpdate;
 }
 
+bool StatisticsParser::getYieldDayCorrection()
+{
+    return _enableYieldDayCorrection;
+}
+
+void StatisticsParser::setYieldDayCorrection(bool enabled)
+{
+    _enableYieldDayCorrection = enabled;
+}
+
 void StatisticsParser::zeroFields(const FieldId_t* fields)
 {
     // Loop all channels
@@ -342,6 +379,15 @@ void StatisticsParser::zeroFields(const FieldId_t* fields)
         }
     }
     setLastUpdateFromInternal(millis());
+}
+
+void StatisticsParser::resetYieldDayCorrection()
+{
+    // new day detected, reset counters
+    for (auto& c : getChannelsByType(TYPE_DC)) {
+        setChannelFieldOffset(TYPE_DC, c, FLD_YD, 0);
+        _lastYieldDay[static_cast<uint8_t>(c)] = 0;
+    }
 }
 
 static float calcYieldTotalCh0(StatisticsParser* iv, uint8_t arg0)

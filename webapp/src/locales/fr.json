@@ -494,7 +494,9 @@
         "Cancel": "@:maintenancereboot.Cancel",
         "Save": "@:dtuadmin.Save",
         "DeleteMsg": "Êtes-vous sûr de vouloir supprimer l'onduleur \"{name}\" avec le numéro de série \"{serial}\" ?",
-        "Delete": "Supprimer"
+        "Delete": "Supprimer",
+        "YieldDayCorrection": "Yield Day Correction",
+        "YieldDayCorrectionHint": "Sum up daily yield even if the inverter is restarted. Value will be reset at midnight"
     },
     "configadmin": {
         "ConfigManagement": "Gestion de la configuration",

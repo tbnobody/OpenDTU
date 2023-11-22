@@ -494,7 +494,9 @@
         "Cancel": "@:maintenancereboot.Cancel",
         "Save": "@:dtuadmin.Save",
         "DeleteMsg": "Are you sure you want to delete the inverter \"{name}\" with serial number {serial}?",
-        "Delete": "Delete"
+        "Delete": "Delete",
+        "YieldDayCorrection": "Yield Day Correction",
+        "YieldDayCorrectionHint": "Sum up daily yield even if the inverter is restarted. Value will be reset at midnight"
     },
     "configadmin": {
         "ConfigManagement": "Config Management",

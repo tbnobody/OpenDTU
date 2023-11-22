@@ -106,6 +106,7 @@ public:
     StatisticsParser();
     void clearBuffer();
     void appendFragment(uint8_t offset, uint8_t* payload, uint8_t len);
+    void endAppendFragment();
 
     void setByteAssignment(const byteAssign_t* byteAssignment, uint8_t size);
 
@@ -140,6 +141,7 @@ public:
 
     void zeroRuntimeData();
     void zeroDailyData();
+    void resetYieldDayCorrection();
 
     // Update time when new data from the inverter is received
     void setLastUpdate(uint32_t lastUpdate);
@@ -148,6 +150,8 @@ public:
     uint32_t getLastUpdateFromInternal();
     void setLastUpdateFromInternal(uint32_t lastUpdate);
 
+    bool getYieldDayCorrection();
+    void setYieldDayCorrection(bool enabled);
 private:
     void zeroFields(const FieldId_t* fields);
 
@@ -162,4 +166,7 @@ private:
 
     uint32_t _rxFailureCount = 0;
     uint32_t _lastUpdateFromInternal = 0;
+
+    bool _enableYieldDayCorrection = false;
+    float _lastYieldDay[CH_CNT];
 };
