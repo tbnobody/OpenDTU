@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * Copyright (C) 2022 Thomas Basler and others
+ * Copyright (C) 2022-2023 Thomas Basler and others
  */
 #include "WebApi_webapp.h"
 
@@ -9,12 +9,14 @@ extern const uint8_t file_favicon_ico_start[] asm("_binary_webapp_dist_favicon_i
 extern const uint8_t file_favicon_png_start[] asm("_binary_webapp_dist_favicon_png_start");
 extern const uint8_t file_zones_json_start[] asm("_binary_webapp_dist_zones_json_gz_start");
 extern const uint8_t file_app_js_start[] asm("_binary_webapp_dist_js_app_js_gz_start");
+extern const uint8_t file_site_webmanifest_start[] asm("_binary_webapp_dist_site_webmanifest_start");
 
 extern const uint8_t file_index_html_end[] asm("_binary_webapp_dist_index_html_gz_end");
 extern const uint8_t file_favicon_ico_end[] asm("_binary_webapp_dist_favicon_ico_end");
 extern const uint8_t file_favicon_png_end[] asm("_binary_webapp_dist_favicon_png_end");
 extern const uint8_t file_zones_json_end[] asm("_binary_webapp_dist_zones_json_gz_end");
 extern const uint8_t file_app_js_end[] asm("_binary_webapp_dist_js_app_js_gz_end");
+extern const uint8_t file_site_webmanifest_end[] asm("_binary_webapp_dist_site_webmanifest_end");
 
 void WebApiWebappClass::init(AsyncWebServer* server)
 {
@@ -51,6 +53,11 @@ void WebApiWebappClass::init(AsyncWebServer* server)
     _server->on("/zones.json", HTTP_GET, [](AsyncWebServerRequest* request) {
         AsyncWebServerResponse* response = request->beginResponse_P(200, "application/json", file_zones_json_start, file_zones_json_end - file_zones_json_start);
         response->addHeader("Content-Encoding", "gzip");
+        request->send(response);
+    });
+
+    _server->on("/site.webmanifest", HTTP_GET, [](AsyncWebServerRequest* request) {
+        AsyncWebServerResponse* response = request->beginResponse_P(200, "application/json", file_site_webmanifest_start, file_site_webmanifest_end - file_site_webmanifest_start);
         request->send(response);
     });
 
