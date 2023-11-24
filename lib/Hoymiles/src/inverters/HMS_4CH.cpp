@@ -61,7 +61,7 @@ bool HMS_4CH::isValidSerial(uint64_t serial)
 
 String HMS_4CH::typeName()
 {
-    return "HMS-1600/1800/2000";
+    return "HMS-1600/1800/2000-4T";
 }
 
 const byteAssign_t* HMS_4CH::getByteAssignment()
