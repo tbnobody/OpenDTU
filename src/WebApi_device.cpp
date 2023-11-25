@@ -73,8 +73,9 @@ void WebApiDeviceClass::onDeviceAdminGet(AsyncWebServerRequest* request)
     displayPinObj["reset"] = pin.display_reset;
 
     JsonObject ledPinObj = curPin.createNestedObject("led");
-    ledPinObj["led0"] = pin.led[0];
-    ledPinObj["led1"] = pin.led[1];
+    for (uint8_t i = 0; i < PINMAPPING_LED_COUNT; i++) {
+        ledPinObj["led" + String(i)] = pin.led[i];
+    }
 
     JsonObject display = root.createNestedObject("display");
     display["rotation"] = config.Display.Rotation;
