@@ -30,7 +30,7 @@ private:
         {0x37, {{0x00, "Swiss - CH_NA EEA-NE7-CH2020"}}}
     };
 
-    std::map<int, std::string> profile_structs = {
+    std::map<int, std::string> profile_sections = {
         {0x00, "Voltage (H/LVRT)"},
         {0x10, "Frequency (H/LFRT)"},
         {0x20, "Island Detection (ID)"},
@@ -47,6 +47,24 @@ private:
 
     std::map<int, std::map<int, std::vector<std::vector<std::string>>>> profile_details = {
         {0x00, {
+            {0x00, {
+                {"Nominale Voltage (NV)", "V", "10"},
+                {"Low Voltage 1 (LV1)", "V", "10"},
+                {"LV1 Maximum Trip Time (MTT)", "s", "10"},
+                {"High Voltage 1 (HV1)", "V", "10"},
+                {"HV1 Maximum Trip Time (MTT)", "s", "10"}
+            }},
+            {0x03, {
+                {"Nominale Voltage (NV)", "V", "10"},
+                {"Low Voltage 1 (LV1)", "V", "10"},
+                {"LV1 Maximum Trip Time (MTT)", "s", "10"},
+                {"High Voltage 1 (HV1)", "V", "10"},
+                {"HV1 Maximum Trip Time (MTT)", "s", "10"},
+                {"Low Voltage 2 (LV2)", "V", "10"},
+                {"LV2 Maximum Trip Time (MTT)", "s", "10"},
+                {"High Voltage 2 (HV2)", "V", "10"},
+                {"HV2 Maximum Trip Time (MTT)", "s", "10"}
+            }},
             {0x0A, {
                 {"Nominale Voltage (NV)", "V", "10"},
                 {"Low Voltage 1 (LV1)", "V", "10"},
@@ -68,24 +86,6 @@ private:
                 {"High Voltage 2 (HV2)", "V", "10"},
                 {"HV2 Maximum Trip Time (MTT)", "s", "10"},
                 {"10mins Average High Voltage (AHV)", "V", "10"}
-            }},
-            {0x00, {
-                {"Nominale Voltage (NV)", "V", "10"},
-                {"Low Voltage 1 (LV1)", "V", "10"},
-                {"LV1 Maximum Trip Time (MTT)", "s", "10"},
-                {"High Voltage 1 (HV1)", "V", "10"},
-                {"HV1 Maximum Trip Time (MTT)", "s", "10"}
-            }},
-            {0x03, {
-                {"Nominale Voltage (NV)", "V", "10"},
-                {"Low Voltage 1 (LV1)", "V", "10"},
-                {"LV1 Maximum Trip Time (MTT)", "s", "10"},
-                {"High Voltage 1 (HV1)", "V", "10"},
-                {"HV1 Maximum Trip Time (MTT)", "s", "10"},
-                {"Low Voltage 2 (LV2)", "V", "10"},
-                {"LV2 Maximum Trip Time (MTT)", "s", "10"},
-                {"High Voltage 2 (HV2)", "V", "10"},
-                {"HV2 Maximum Trip Time (MTT)", "s", "10"}
             }},
             {0x0C, {
                 {"Nominale Voltage (NV)", "V", "10"},
@@ -143,14 +143,6 @@ private:
             }}
         }},
         {0x50, {
-            {0x08, {
-                {"FW Function Activated", "bool", "1"},
-                {"Start of Frequency Watt Droop (Fstart)", "Hz", "100"},
-                {"FW Droop Slope (Kpower_Freq)", "Pn%/Hz", "10"},
-                {"Recovery Ramp Rate (RRR)", "Pn%/s", "100"},
-                {"Recovery High Frequency (RVHF)", "Hz", "100"}, // may need to be div 10
-                {"Recovery Low Frequency (RVLF)", "Hz", "100"}
-            }},
             {0x00, {
                 {"FW Function Activated", "bool", "1"},
                 {"Start of Frequency Watt Droop (Fstart)", "Hz", "100"},
@@ -163,6 +155,14 @@ private:
                 {"FW Droop Slope (Kpower_Freq)", "Pn%/Hz", "10"},
                 {"Recovery Ramp Rate (RRR)", "Pn%/s", "100"},
                 {"Recovery High Frequency (RVHF)", "Hz", "100"} // may need to be div 10
+            }},
+            {0x08, {
+                {"FW Function Activated", "bool", "1"},
+                {"Start of Frequency Watt Droop (Fstart)", "Hz", "100"},
+                {"FW Droop Slope (Kpower_Freq)", "Pn%/Hz", "10"},
+                {"Recovery Ramp Rate (RRR)", "Pn%/s", "100"},
+                {"Recovery High Frequency (RVHF)", "Hz", "100"}, // may need to be div 10
+                {"Recovery Low Frequency (RVLF)", "Hz", "100"}
             }}
         }},
         {0x60, {
@@ -180,12 +180,12 @@ private:
             }}
         }},
         {0x70, {
+            {0x00, {
+                {"APC Function Activated", "bool", "1"}
+            }},
             {0x02, {
                 {"APC Function Activated", "bool", "1"},
                 {"Power Ramp Rate (PRR)", "Pn%/s", "100"}
-            }},
-            {0x00, {
-                {"APC Function Activated", "bool", "1"}
             }}
         }},
         {0x80, {
