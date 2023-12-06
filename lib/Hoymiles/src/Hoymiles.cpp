@@ -8,6 +8,7 @@
 #include "inverters/HMS_1CHv2.h"
 #include "inverters/HMS_2CH.h"
 #include "inverters/HMS_4CH.h"
+#include "inverters/HMT_4CH.h"
 #include "inverters/HMT_6CH.h"
 #include "inverters/HM_1CH.h"
 #include "inverters/HM_2CH.h"
@@ -51,6 +52,11 @@ void HoymilesClass::loop()
             }
 
             if (iv != nullptr && iv->getRadio()->isInitialized() && iv->getRadio()->isQueueEmpty()) {
+
+                if (iv->getZeroValuesIfUnreachable() && !iv->isReachable()) {
+                    Hoymiles.getMessageOutput()->println("Set runtime data to zero");
+                    iv->Statistics()->zeroRuntimeData();
+                }
 
                 if (iv->getEnablePolling() || iv->getEnableCommands()) {
                     _messageOutput->print("Fetch inverter: ");
@@ -140,7 +146,9 @@ void HoymilesClass::loop()
 std::shared_ptr<InverterAbstract> HoymilesClass::addInverter(const char* name, uint64_t serial)
 {
     std::shared_ptr<InverterAbstract> i = nullptr;
-    if (HMT_6CH::isValidSerial(serial)) {
+    if (HMT_4CH::isValidSerial(serial)) {
+        i = std::make_shared<HMT_4CH>(_radioCmt.get(), serial);
+    } else if (HMT_6CH::isValidSerial(serial)) {
         i = std::make_shared<HMT_6CH>(_radioCmt.get(), serial);
     } else if (HMS_4CH::isValidSerial(serial)) {
         i = std::make_shared<HMS_4CH>(_radioCmt.get(), serial);

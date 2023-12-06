@@ -53,7 +53,7 @@ bool HM_1CH::isValidSerial(uint64_t serial)
 
 String HM_1CH::typeName()
 {
-    return "HM-300, HM-350, HM-400";
+    return "HM-300/350/400-1T";
 }
 
 const byteAssign_t* HM_1CH::getByteAssignment()

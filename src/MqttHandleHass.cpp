@@ -115,9 +115,9 @@ void MqttHandleHassClass::publishField(std::shared_ptr<InverterAbstract> inv, Ch
 
         String name;
         if (type != TYPE_DC) {
-            name = String(inv->name()) + " " + fieldName;
+            name = fieldName;
         } else {
-            name = String(inv->name()) + " CH" + chanNum + " " + fieldName;
+            name = "CH" + chanNum + " " + fieldName;
         }
 
         DynamicJsonDocument root(1024);
@@ -166,7 +166,7 @@ void MqttHandleHassClass::publishInverterButton(std::shared_ptr<InverterAbstract
     String cmdTopic = MqttSettings.getPrefix() + serial + "/" + subTopic;
 
     DynamicJsonDocument root(1024);
-    root["name"] = String(inv->name()) + " " + caption;
+    root["name"] = caption;
     root["uniq_id"] = serial + "_" + buttonId;
     if (strcmp(icon, "")) {
         root["ic"] = icon;
@@ -205,7 +205,7 @@ void MqttHandleHassClass::publishInverterNumber(
     String statTopic = MqttSettings.getPrefix() + serial + "/" + stateTopic;
 
     DynamicJsonDocument root(1024);
-    root["name"] = String(inv->name()) + " " + caption;
+    root["name"] = caption;
     root["uniq_id"] = serial + "_" + buttonId;
     if (strcmp(icon, "")) {
         root["ic"] = icon;
@@ -240,7 +240,7 @@ void MqttHandleHassClass::publishInverterBinarySensor(std::shared_ptr<InverterAb
     String statTopic = MqttSettings.getPrefix() + serial + "/" + subTopic;
 
     DynamicJsonDocument root(1024);
-    root["name"] = String(inv->name()) + " " + caption;
+    root["name"] = caption;
     root["uniq_id"] = serial + "_" + sensorId;
     root["stat_t"] = statTopic;
     root["pl_on"] = payload_on;

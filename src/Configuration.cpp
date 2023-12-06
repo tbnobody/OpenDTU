@@ -41,6 +41,9 @@ bool ConfigurationClass::write()
     wifi["hostname"] = config.WiFi_Hostname;
     wifi["aptimeout"] = config.WiFi_ApTimeout;
 
+    JsonObject mdns = doc.createNestedObject("mdns");
+    mdns["enabled"] = config.Mdns_Enabled;
+
     JsonObject ntp = doc.createNestedObject("ntp");
     ntp["server"] = config.Ntp_Server;
     ntp["timezone"] = config.Ntp_Timezone;
@@ -190,6 +193,9 @@ bool ConfigurationClass::read()
 
     config.WiFi_Dhcp = wifi["dhcp"] | WIFI_DHCP;
     config.WiFi_ApTimeout = wifi["aptimeout"] | ACCESS_POINT_TIMEOUT;
+
+    JsonObject mdns = doc["mdns"];
+    config.Mdns_Enabled = mdns["enabled"] | MDNS_ENABLED;
 
     JsonObject ntp = doc["ntp"];
     strlcpy(config.Ntp_Server, ntp["server"] | NTP_SERVER, sizeof(config.Ntp_Server));

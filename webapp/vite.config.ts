@@ -7,7 +7,7 @@ import viteCompression from 'vite-plugin-compression';
 import cssInjectedByJsPlugin from 'vite-plugin-css-injected-by-js'
 import VueI18nPlugin from '@intlify/unplugin-vue-i18n/vite'
 
-const path = require('path')
+import path from 'path'
 
 // example 'vite.user.ts': export const proxy_target = '192.168.16.107'
 let proxy_target;
