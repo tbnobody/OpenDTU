@@ -402,7 +402,9 @@
         "ApTimeout": "Délai d'attente du point d'accès",
         "ApTimeoutHint": "Durée pendant laquelle le point d'accès reste ouvert. Une valeur de 0 signifie infini.",
         "Minutes": "minutes",
-        "Save": "@:dtuadmin.Save"
+        "Save": "@:dtuadmin.Save",
+        "EnableMdns": "Activer mDNS",
+        "MdnsSettings": "mDNS Settings"
     },
     "mqttadmin": {
         "MqttSettings": "Paramètres MQTT",

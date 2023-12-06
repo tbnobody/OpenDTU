@@ -9,7 +9,7 @@
                 <div class="form-group">
                     <label for="username">{{ $t('login.Username') }}</label>
                     <input type="text" v-model="username" name="username" class="form-control"
-                        :class="{ 'is-invalid': submitted && !username }" />
+                        :class="{ 'is-invalid': submitted && !username }" @keydown.space.prevent />
                     <div v-show="submitted && !username" class="invalid-feedback">{{ $t('login.UsernameRequired') }}
                     </div>
                 </div>

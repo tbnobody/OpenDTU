@@ -2,7 +2,7 @@
 /*
  * Copyright (C) 2023 Thomas Basler and others
  */
-#include "HMT_6CH.h"
+#include "HMT_4CH.h"
 
 static const byteAssign_t byteAssignment[] = {
     { TYPE_DC, CH0, FLD_UDC, UNIT_V, 2, 2, 10, false, 1 },
@@ -33,20 +33,6 @@ static const byteAssign_t byteAssignment[] = {
     { TYPE_DC, CH3, FLD_YD, UNIT_WH, 44, 2, 1, false, 0 },
     { TYPE_DC, CH3, FLD_IRR, UNIT_PCT, CALC_IRR_CH, CH3, CMD_CALC, false, 3 },
 
-    { TYPE_DC, CH4, FLD_UDC, UNIT_V, 46, 2, 10, false, 1 },
-    { TYPE_DC, CH4, FLD_IDC, UNIT_A, 48, 2, 100, false, 2 },
-    { TYPE_DC, CH4, FLD_PDC, UNIT_W, 52, 2, 10, false, 1 },
-    { TYPE_DC, CH4, FLD_YT, UNIT_KWH, 56, 4, 1000, false, 3 },
-    { TYPE_DC, CH4, FLD_YD, UNIT_WH, 64, 2, 1, false, 0 },
-    { TYPE_DC, CH4, FLD_IRR, UNIT_PCT, CALC_IRR_CH, CH4, CMD_CALC, false, 3 },
-
-    { TYPE_DC, CH5, FLD_UDC, UNIT_V, 46, 2, 10, false, 1 },
-    { TYPE_DC, CH5, FLD_IDC, UNIT_A, 50, 2, 100, false, 2 },
-    { TYPE_DC, CH5, FLD_PDC, UNIT_W, 54, 2, 10, false, 1 },
-    { TYPE_DC, CH5, FLD_YT, UNIT_KWH, 60, 4, 1000, false, 3 },
-    { TYPE_DC, CH5, FLD_YD, UNIT_WH, 66, 2, 1, false, 0 },
-    { TYPE_DC, CH5, FLD_IRR, UNIT_PCT, CALC_IRR_CH, CH5, CMD_CALC, false, 3 },
-
     { TYPE_AC, CH0, FLD_UAC, UNIT_V, 74, 2, 10, false, 1 }, // dummy
     { TYPE_AC, CH0, FLD_UAC_1N, UNIT_V, 68, 2, 10, false, 1 },
     { TYPE_AC, CH0, FLD_UAC_2N, UNIT_V, 70, 2, 10, false, 1 },
@@ -72,27 +58,27 @@ static const byteAssign_t byteAssignment[] = {
     { TYPE_AC, CH0, FLD_EFF, UNIT_PCT, CALC_EFF_CH0, 0, CMD_CALC, false, 3 }
 };
 
-HMT_6CH::HMT_6CH(HoymilesRadio* radio, uint64_t serial)
+HMT_4CH::HMT_4CH(HoymilesRadio* radio, uint64_t serial)
     : HMT_Abstract(radio, serial) {};
 
-bool HMT_6CH::isValidSerial(uint64_t serial)
+bool HMT_4CH::isValidSerial(uint64_t serial)
 {
-    // serial >= 0x138200000000 && serial <= 0x138299999999
+    // serial >= 0x136100000000 && serial <= 0x136199999999
     uint16_t preSerial = (serial >> 32) & 0xffff;
-    return preSerial == 0x1382;
+    return preSerial == 0x1361;
 }
 
-String HMT_6CH::typeName()
+String HMT_4CH::typeName()
 {
-    return F("HMT-1800/2250-6T");
+    return F("HMT-1600/1800/2000-4T");
 }
 
-const byteAssign_t* HMT_6CH::getByteAssignment()
+const byteAssign_t* HMT_4CH::getByteAssignment()
 {
     return byteAssignment;
 }
 
-uint8_t HMT_6CH::getByteAssignmentSize()
+uint8_t HMT_4CH::getByteAssignmentSize()
 {
     return sizeof(byteAssignment) / sizeof(byteAssignment[0]);
 }

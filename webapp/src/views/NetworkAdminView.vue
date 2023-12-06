@@ -50,6 +50,12 @@
                               type="text" maxlength="32"/>
             </CardElement>
 
+            <CardElement :text="$t('networkadmin.MdnsSettings')" textVariant="text-bg-primary" add-space>
+                <InputElement :label="$t('networkadmin.EnableMdns')"
+                              v-model="networkConfigList.mdnsenabled"
+                              type="checkbox"/>
+            </CardElement>
+
             <CardElement :text="$t('networkadmin.AdminAp')" textVariant="text-bg-primary" add-space>
                 <InputElement :label="$t('networkadmin.ApTimeout')"
                               v-model="networkConfigList.aptimeout"
@@ -67,7 +73,7 @@ import BasePage from '@/components/BasePage.vue';
 import BootstrapAlert from "@/components/BootstrapAlert.vue";
 import CardElement from '@/components/CardElement.vue';
 import InputElement from '@/components/InputElement.vue';
-import type { NetworkConfig } from "@/types/NetworkkConfig";
+import type { NetworkConfig } from "@/types/NetworkConfig";
 import { authHeader, handleResponse } from '@/utils/authentication';
 import { defineComponent } from 'vue';
 

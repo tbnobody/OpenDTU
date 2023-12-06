@@ -13,6 +13,11 @@ If you are upgrading from a version before 15.03.2023 you have to upgrade the pa
 This project was started from [this](https://www.mikrocontroller.net/topic/525778) discussion (Mikrocontroller.net).
 It was the goal to replace the original Hoymiles DTU (Telemetry Gateway) with their cloud access. With a lot of reverse engineering the Hoymiles protocol was decrypted and analyzed.
 
+## Documentation
+
+Currently the documentation is separated into different locations (this README.md, the `doc` folder and the [Wiki](https://github.com/tbnobody/OpenDTU/wiki)).
+This is not very nice and it's planned to move everything into the [Wiki](https://github.com/tbnobody/OpenDTU/wiki).
+
 ## Screenshots
 
 Several screenshots of the frontend can be found here: [Screenshots](docs/screenshots/README.md)
@@ -24,38 +29,41 @@ Like to show your own build? Just send me a Pull Request.
 
 ## Currently supported Inverters
 
-| Model               | Required RF Module | DC Inputs | MPP-Tracker | AC Phases |
-| --------------------| ------------------ | --------- | ----------- | --------- |
-| Hoymiles HM-300     | NRF24L01+          | 1         | 1           | 1         |
-| Hoymiles HM-350     | NRF24L01+          | 1         | 1           | 1         |
-| Hoymiles HM-400     | NRF24L01+          | 1         | 1           | 1         |
-| Hoymiles HM-600     | NRF24L01+          | 2         | 2           | 1         |
-| Hoymiles HM-700     | NRF24L01+          | 2         | 2           | 1         |
-| Hoymiles HM-800     | NRF24L01+          | 2         | 2           | 1         |
-| Hoymiles HM-1000    | NRF24L01+          | 4         | 2           | 1         |
-| Hoymiles HM-1200    | NRF24L01+          | 4         | 2           | 1         |
-| Hoymiles HM-1500    | NRF24L01+          | 4         | 2           | 1         |
-| Hoymiles HMS-300    | CMT2300A           | 1         | 1           | 1         |
-| Hoymiles HMS-350    | CMT2300A           | 1         | 1           | 1         |
-| Hoymiles HMS-400    | CMT2300A           | 1         | 1           | 1         |
-| Hoymiles HMS-450    | CMT2300A           | 1         | 1           | 1         |
-| Hoymiles HMS-500    | CMT2300A           | 1         | 1           | 1         |
-| Hoymiles HMS-600    | CMT2300A           | 2         | 2           | 1         |
-| Hoymiles HMS-700    | CMT2300A           | 2         | 2           | 1         |
-| Hoymiles HMS-800    | CMT2300A           | 2         | 2           | 1         |
-| Hoymiles HMS-900    | CMT2300A           | 2         | 2           | 1         |
-| Hoymiles HMS-1000   | CMT2300A           | 2         | 2           | 1         |
-| Hoymiles HMS-1600   | CMT2300A           | 4         | 4           | 1         |
-| Hoymiles HMS-1800   | CMT2300A           | 4         | 4           | 1         |
-| Hoymiles HMS-2000   | CMT2300A           | 4         | 4           | 1         |
-| Hoymiles HMT-1800   | CMT2300A           | 6         | 3           | 3         |
-| Hoymiles HMT-2250   | CMT2300A           | 6         | 3           | 3         |
-| Solenso SOL-H350    | NRF24L01+          | 1         | 1           | 1         |
-| Solenso SOL-H400    | NRF24L01+          | 1         | 1           | 1         |
-| Solenso SOL-H800    | NRF24L01+          | 2         | 2           | 1         |
-| TSUN TSOL-M350      | NRF24L01+          | 1         | 1           | 1         |
-| TSUN TSOL-M800      | NRF24L01+          | 2         | 2           | 1         |
-| TSUN TSOL-M1600     | NRF24L01+          | 4         | 2           | 1         |
+| Model                | Required RF Module | DC Inputs | MPP-Tracker | AC Phases |
+| ---------------------| ------------------ | --------- | ----------- | --------- |
+| Hoymiles HM-300-1T   | NRF24L01+          | 1         | 1           | 1         |
+| Hoymiles HM-350-1T   | NRF24L01+          | 1         | 1           | 1         |
+| Hoymiles HM-400-1T   | NRF24L01+          | 1         | 1           | 1         |
+| Hoymiles HM-600-2T   | NRF24L01+          | 2         | 2           | 1         |
+| Hoymiles HM-700-2T   | NRF24L01+          | 2         | 2           | 1         |
+| Hoymiles HM-800-2T   | NRF24L01+          | 2         | 2           | 1         |
+| Hoymiles HM-1000-4T  | NRF24L01+          | 4         | 2           | 1         |
+| Hoymiles HM-1200-4T  | NRF24L01+          | 4         | 2           | 1         |
+| Hoymiles HM-1500-4T  | NRF24L01+          | 4         | 2           | 1         |
+| Hoymiles HMS-300-1T  | CMT2300A           | 1         | 1           | 1         |
+| Hoymiles HMS-350-1T  | CMT2300A           | 1         | 1           | 1         |
+| Hoymiles HMS-400-1T  | CMT2300A           | 1         | 1           | 1         |
+| Hoymiles HMS-450-1T  | CMT2300A           | 1         | 1           | 1         |
+| Hoymiles HMS-500-1T  | CMT2300A           | 1         | 1           | 1         |
+| Hoymiles HMS-600-2T  | CMT2300A           | 2         | 2           | 1         |
+| Hoymiles HMS-700-2T  | CMT2300A           | 2         | 2           | 1         |
+| Hoymiles HMS-800-2T  | CMT2300A           | 2         | 2           | 1         |
+| Hoymiles HMS-900-2T  | CMT2300A           | 2         | 2           | 1         |
+| Hoymiles HMS-1000-2T | CMT2300A           | 2         | 2           | 1         |
+| Hoymiles HMS-1600-4T | CMT2300A           | 4         | 4           | 1         |
+| Hoymiles HMS-1800-4T | CMT2300A           | 4         | 4           | 1         |
+| Hoymiles HMS-2000-4T | CMT2300A           | 4         | 4           | 1         |
+| Hoymiles HMT-1600-4T | CMT2300A           | 4         | 4           | 3         |
+| Hoymiles HMT-1800-4T | CMT2300A           | 4         | 4           | 3         |
+| Hoymiles HMT-2000-4T | CMT2300A           | 4         | 4           | 3         |
+| Hoymiles HMT-1800-6T | CMT2300A           | 6         | 3           | 3         |
+| Hoymiles HMT-2250-6T | CMT2300A           | 6         | 3           | 3         |
+| Solenso SOL-H350     | NRF24L01+          | 1         | 1           | 1         |
+| Solenso SOL-H400     | NRF24L01+          | 1         | 1           | 1         |
+| Solenso SOL-H800     | NRF24L01+          | 2         | 2           | 1         |
+| TSUN TSOL-M350       | NRF24L01+          | 1         | 1           | 1         |
+| TSUN TSOL-M800       | NRF24L01+          | 2         | 2           | 1         |
+| TSUN TSOL-M1600      | NRF24L01+          | 4         | 2           | 1         |
 
 **TSUN compatibility remark:**
 Compatibility with OpenDTU is most likly related to the serial number of the inverter. Current findings indicate that TSUN inverters with a serial number starting with "11" are supported, whereby inverters with a serial number starting with "10" are not.
@@ -98,6 +106,8 @@ Compatibility with OpenDTU is most likly related to the serial number of the inv
 Generated using: `git log --date=short --pretty=format:"* %h%x09%ad%x09%s" | grep BREAKING`
 
 ```code
+* 71d1b3b       2023-11-07      BREAKING CHANGE: Home Assistant Auto Discovery to new naming scheme
+* 04f62e0       2023-04-20      BREAKING CHANGE: Web API Endpoint /api/eventlog/status no nested serial object
 * 59f43a8       2023-04-17      BREAKING CHANGE: Web API Endpoint /api/devinfo/status requires GET parameter inv=
 * 318136d       2023-03-15      BREAKING CHANGE: Updated partition table: Make sure you have a configuration backup and completly reflash the device!
 * 3b7aef6       2023-02-13      BREAKING CHANGE: Web API!
@@ -272,9 +282,10 @@ A documentation of all available MQTT Topics can be found here: [MQTT Documentat
 A documentation of the Web API can be found here: [Web-API Documentation](docs/Web-API.md)
 
 ## OpenDTU Breakoutboard
-We sat down together and designed a PCB. This is 100% compatible with openDTU and has space for all extensions such as display and LEDs. You can find the PCB design here: https://github.com/marove2000/openDTU_BreakoutBoard
 
-A ready to solder kit can be found here: https://shop.blinkyparts.com/en/OpenDTU-Your-evaluation-for-your-balcony-solar-system/blink237542
+We sat down together and designed a PCB. This is 100% compatible with openDTU and has space for all extensions such as display and LEDs. You can find the PCB design here: <https://github.com/marove2000/openDTU_BreakoutBoard>
+
+A ready to solder kit can be found here: <https://shop.blinkyparts.com/en/OpenDTU-Your-evaluation-for-your-balcony-solar-system/blink237542>
 
 <img src="docs/builds/opendtu_breakoutboard.jpg" alt='OpenDTU Breakout Board with Case' height='300px'><img src="docs/builds/thumbnail.jpg" alt='OpenDTU Breakout Board with Case' height='300px'>
 

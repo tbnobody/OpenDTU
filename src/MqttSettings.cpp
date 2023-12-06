@@ -182,18 +182,13 @@ String MqttSettingsClass::getPrefix()
 
 void MqttSettingsClass::publish(const String& subtopic, const String& payload)
 {
-    std::lock_guard<std::mutex> lock(_clientLock);
-    if (mqttClient == nullptr) {
-        return;
-    }
-
     String topic = getPrefix();
     topic += subtopic;
 
     String value = payload;
     value.trim();
 
-    mqttClient->publish(topic.c_str(), 0, Configuration.get().Mqtt_Retain, value.c_str());
+    publishGeneric(topic, value, Configuration.get().Mqtt_Retain, 0);
 }
 
 void MqttSettingsClass::publishGeneric(const String& topic, const String& payload, bool retain, uint8_t qos)
