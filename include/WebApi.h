@@ -40,7 +40,6 @@ private:
     Task _loopTask;
 
     AsyncWebServer _server;
-    AsyncEventSource _events;
 
     WebApiConfigClass _webApiConfig;
     WebApiDeviceClass _webApiDevice;

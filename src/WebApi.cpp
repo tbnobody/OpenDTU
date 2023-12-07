@@ -9,14 +9,11 @@
 
 WebApiClass::WebApiClass()
     : _server(HTTP_PORT)
-    , _events("/events")
 {
 }
 
 void WebApiClass::init(Scheduler* scheduler)
 {
-    _server.addHandler(&_events);
-
     _webApiConfig.init(&_server);
     _webApiDevice.init(&_server);
     _webApiDevInfo.init(&_server);
