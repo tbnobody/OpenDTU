@@ -19,6 +19,8 @@ private:
     void setLoop();
     void outputLoop();
 
+    void setLed(uint8_t ledNo, bool ledState);
+
     Task _setTask;
     Task _outputTask;
 
@@ -28,8 +30,9 @@ private:
         Blink,
     };
 
-    LedState_t _ledState[PINMAPPING_LED_COUNT];
-    LedState_t _allState;
+    LedState_t _ledMode[PINMAPPING_LED_COUNT];
+    LedState_t _allMode;
+    bool _ledStateCurrent[PINMAPPING_LED_COUNT];
     TimeoutHelper _blinkTimeout;
 };
 

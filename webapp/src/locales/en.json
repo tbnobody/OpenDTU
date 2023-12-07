@@ -580,6 +580,9 @@
         "en": "English",
         "de": "German",
         "fr": "French",
+        "Leds": "LEDs",
+        "EqualBrightness": "Equal brightness:",
+        "LedBrightness": "LED {led} brightness ({brightness}):",
         "Save": "@:dtuadmin.Save"
     },
     "pininfo": {

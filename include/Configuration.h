@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 #pragma once
 
+#include "PinMapping.h"
 #include <cstdint>
 
 #define CONFIG_FILENAME "/config.json"
@@ -143,6 +144,10 @@ struct CONFIG_T {
         uint8_t Contrast;
         uint8_t Language;
     } Display;
+
+    struct {
+        uint8_t Brightness;
+    } Led_Single[PINMAPPING_LED_COUNT];
 
     INVERTER_CONFIG_T Inverter[INV_MAX_COUNT];
     char Dev_PinMapping[DEV_MAX_MAPPING_NAME_STRLEN + 1];
