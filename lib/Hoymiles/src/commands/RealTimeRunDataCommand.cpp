@@ -2,6 +2,22 @@
 /*
  * Copyright (C) 2022-2023 Thomas Basler and others
  */
+
+/*
+This command is used to fetch live run time data from the inverter.
+
+Derives from MultiDataCommand
+
+Command structure:
+* DT: this specific command uses 0x0b
+
+00   01 02 03 04   05 06 07 08   09   10   11   12 13 14 15   16 17   18 19   20 21 22 23   24 25   26   27 28 29 30 31
+-----------------------------------------------------------------------------------------------------------------------
+                                      |<------------------- CRC16 --------------------->|
+15   71 60 35 46   80 12 23 04   80   0b   00   65 72 06 B8   00 00   00 00   00 00 00 00   00 00   00   -- -- -- -- --
+^^   ^^^^^^^^^^^   ^^^^^^^^^^^   ^^   ^^   ^^   ^^^^^^^^^^^   ^^^^^           ^^^^^^^^^^^   ^^^^^   ^^
+ID   Target Addr   Source Addr   Idx  DT   ?    Time          Gap             Password      CRC16   CRC8
+*/
 #include "RealTimeRunDataCommand.h"
 #include "Hoymiles.h"
 #include "inverters/InverterAbstract.h"

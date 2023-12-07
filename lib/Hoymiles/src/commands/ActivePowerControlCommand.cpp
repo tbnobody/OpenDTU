@@ -1,7 +1,25 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * Copyright (C) 2022 Thomas Basler and others
+ * Copyright (C) 2022-2023 Thomas Basler and others
  */
+
+/*
+This command is used to send a limit to the inverter.
+
+Derives from DevControlCommand.
+
+Command structure:
+SCmd: Sub-Command ID. Is always 0x0b
+Limit: limit to be set in the inverter
+Type: absolute / relative and persistant/non-persistant
+
+00   01 02 03 04   05 06 07 08   09   10   11   12 13   14 15   16 17   18   19 20 21 22 23 24 25 26 27 28 29 30 31
+-------------------------------------------------------------------------------------------------------------------
+                                      |<------ CRC16 ------>|
+51   71 60 35 46   80 12 23 04   81   0b   00   00 00   00 00   00 00   00   -- -- -- -- -- -- -- -- -- -- -- -- --
+^^   ^^^^^^^^^^^   ^^^^^^^^^^^   ^^   ^^   ^^   ^^^^^   ^^^^^   ^^^^^   ^^
+ID   Target Addr   Source Addr   Cmd  SCmd ?    Limit   Type    CRC16   CRC8
+*/
 #include "ActivePowerControlCommand.h"
 #include "inverters/InverterAbstract.h"
 
@@ -17,7 +35,7 @@ ActivePowerControlCommand::ActivePowerControlCommand(uint64_t target_address, ui
     _payload[14] = 0x00;
     _payload[15] = 0x00;
 
-    udpateCRC(CRC_SIZE); // 2 byte crc
+    udpateCRC(CRC_SIZE); // 6 byte crc
 
     _payload_size = 18;
 

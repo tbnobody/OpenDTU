@@ -1,8 +1,25 @@
 
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * Copyright (C) 2022 Thomas Basler and others
+ * Copyright (C) 2022-2023 Thomas Basler and others
  */
+
+/*
+Derives from CommandAbstract. Has a variable length.
+
+Command structure:
+* ID: fixed identifier and everytime 0x51
+* Cmd: Fixed at 0x81 for these types of commands
+* Payload: dynamic amount of bytes
+* CRC16: calcuclated over the highlighted amount of bytes
+
+00   01 02 03 04   05 06 07 08   09   10 11   12   13   14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31
+-------------------------------------------------------------------------------------------------------------
+                                      |<->| CRC16
+51   71 60 35 46   80 12 23 04   81   00 00   00   00   -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+^^   ^^^^^^^^^^^   ^^^^^^^^^^^   ^^   ^^^^^   ^^   ^^
+ID   Target Addr   Source Addr   Cmd  Payload CRC16 CRC8
+*/
 #include "DevControlCommand.h"
 #include "crc.h"
 

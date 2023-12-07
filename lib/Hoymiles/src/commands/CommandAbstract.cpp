@@ -1,7 +1,31 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * Copyright (C) 2022 Thomas Basler and others
+ * Copyright (C) 2022-2023 Thomas Basler and others
  */
+
+/*
+Command structure:
+* Each package has a maximum of 32 bytes
+* Target Address: the address of the inverter. Has to be read as hex value
+* Source Address the address of the dtu itself. Has to be read as hex value
+* CRC8: a crc8 checksum added to the end of the payload containing all valid data.
+  Each sub-commmand has to set it's own payload size.
+
+Conversion of Target Addr:
+Inverter Serial Number: (0x)116171603546
+Target Address: 71 60 35 46
+
+Conversion of Source Addr:
+DTU Serial Number: (0x)199980122304
+Source Address: 80 12 23 04
+
+00   01 02 03 04   05 06 07 08   09 10   11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31
+-----------------------------------------------------------------------------------------------------
+|<------------- CRC8 ------------>|
+00   71 60 35 46   80 12 23 04   00 00   00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+     ^^^^^^^^^^^   ^^^^^^^^^^^      ^^
+     Target Addr   Source Addr      CRC8
+*/
 #include "CommandAbstract.h"
 #include "crc.h"
 #include <string.h>

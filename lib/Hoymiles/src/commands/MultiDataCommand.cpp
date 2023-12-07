@@ -2,6 +2,29 @@
 /*
  * Copyright (C) 2022-2023 Thomas Basler and others
  */
+
+/*
+Derives from CommandAbstract. Has a fixed length of 26 bytes.
+
+Command structure:
+* ID: fixed identifier and everytime 0x15
+* Idx: the counter of sequencial packages to send. Currently it's only 0x80
+  because all request requests only consist of one package.
+* DT: repressents the data type and specifies which sub-command to be fetched
+* Time: represents the current unix timestamp as hex format. The time on the inverter is synced to the sent time.
+  Can be calculated e.g. using the following command
+    echo "obase=16; $(date --date='2023-12-07 18:54:00' +%s)" | bc
+* Gap: always 0x0
+* Password: currently always 0x0
+* CRC16: calcuclated over the highlighted amount of bytes
+
+00   01 02 03 04   05 06 07 08   09   10   11   12 13 14 15   16 17   18 19   20 21 22 23   24 25   26   27 28 29 30 31
+-----------------------------------------------------------------------------------------------------------------------
+                                      |<------------------- CRC16 --------------------->|
+15   71 60 35 46   80 12 23 04   80   00   00   65 72 06 B8   00 00   00 00   00 00 00 00   00 00   00   -- -- -- -- --
+^^   ^^^^^^^^^^^   ^^^^^^^^^^^   ^^   ^^   ^^   ^^^^^^^^^^^   ^^^^^           ^^^^^^^^^^^   ^^^^^   ^^
+ID   Target Addr   Source Addr   Idx  DT   ?    Time          Gap             Password      CRC16   CRC8
+*/
 #include "MultiDataCommand.h"
 #include "crc.h"
 
