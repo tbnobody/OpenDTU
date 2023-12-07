@@ -14,7 +14,7 @@ public:
 private:
     void generateJsonResponse(JsonVariant& root);
     void addField(JsonObject& root, uint8_t idx, std::shared_ptr<InverterAbstract> inv, ChannelType_t type, ChannelNum_t channel, FieldId_t fieldId, String topic = "");
-    void addTotalField(JsonObject& root, String name, float value, String unit, uint8_t digits);
+    void addTotalField(JsonObject& root, const String& name, float value, const String& unit, uint8_t digits);
     void onLivedataStatus(AsyncWebServerRequest* request);
     void onWebsocketEvent(AsyncWebSocket* server, AsyncWebSocketClient* client, AwsEventType type, void* arg, uint8_t* data, size_t len);
 

@@ -68,7 +68,7 @@ void setup()
         MessageOutput.print("migrated... ");
         Configuration.migrate();
     }
-    CONFIG_T& config = Configuration.get();
+    auto& config = Configuration.get();
     MessageOutput.println("done");
 
     // Load PinMapping
@@ -78,7 +78,7 @@ void setup()
     } else {
         MessageOutput.print("using default config ");
     }
-    const PinMapping_t& pin = PinMapping.get();
+    const auto& pin = PinMapping.get();
     MessageOutput.println("done");
 
     // Initialize WiFi
@@ -137,7 +137,7 @@ void setup()
     MessageOutput.print("Check for default DTU serial... ");
     if (config.Dtu.Serial == DTU_SERIAL) {
         MessageOutput.print("generate serial based on ESP chip id: ");
-        uint64_t dtuId = Utils::generateDtuSerial();
+        const uint64_t dtuId = Utils::generateDtuSerial();
         MessageOutput.printf("%0x%08x... ",
             ((uint32_t)((dtuId >> 32) & 0xFFFFFFFF)),
             ((uint32_t)(dtuId & 0xFFFFFFFF)));

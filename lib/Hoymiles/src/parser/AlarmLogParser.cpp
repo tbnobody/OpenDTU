@@ -216,13 +216,13 @@ void AlarmLogParser::setMessageType(AlarmMessageType_t type)
 
 void AlarmLogParser::getLogEntry(uint8_t entryId, AlarmLogEntry_t* entry, AlarmMessageLocale_t locale)
 {
-    uint8_t entryStartOffset = 2 + entryId * ALARM_LOG_ENTRY_SIZE;
+    const uint8_t entryStartOffset = 2 + entryId * ALARM_LOG_ENTRY_SIZE;
 
-    int timezoneOffset = getTimezoneOffset();
+    const int timezoneOffset = getTimezoneOffset();
 
     HOY_SEMAPHORE_TAKE();
 
-    uint32_t wcode = (uint16_t)_payloadAlarmLog[entryStartOffset] << 8 | _payloadAlarmLog[entryStartOffset + 1];
+    const uint32_t wcode = (uint16_t)_payloadAlarmLog[entryStartOffset] << 8 | _payloadAlarmLog[entryStartOffset + 1];
     uint32_t startTimeOffset = 0;
     if (((wcode >> 13) & 0x01) == 1) {
         startTimeOffset = 12 * 60 * 60;

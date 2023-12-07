@@ -144,15 +144,13 @@ fieldSettings_t* StatisticsParser::getSettingByChannelField(ChannelType_t type, 
 float StatisticsParser::getChannelFieldValue(ChannelType_t type, ChannelNum_t channel, FieldId_t fieldId)
 {
     const byteAssign_t* pos = getAssignmentByChannelField(type, channel, fieldId);
-    fieldSettings_t* setting = getSettingByChannelField(type, channel, fieldId);
-
     if (pos == NULL) {
         return 0;
     }
 
     uint8_t ptr = pos->start;
-    uint8_t end = ptr + pos->num;
-    uint16_t div = pos->div;
+    const uint8_t end = ptr + pos->num;
+    const uint16_t div = pos->div;
 
     if (CMD_CALC != div) {
         // Value is a static value
@@ -174,6 +172,8 @@ float StatisticsParser::getChannelFieldValue(ChannelType_t type, ChannelNum_t ch
         }
 
         result /= static_cast<float>(div);
+
+        const fieldSettings_t* setting = getSettingByChannelField(type, channel, fieldId);
         if (setting != NULL && _statisticLength > 0) {
             result += setting->offset;
         }
@@ -189,20 +189,19 @@ float StatisticsParser::getChannelFieldValue(ChannelType_t type, ChannelNum_t ch
 bool StatisticsParser::setChannelFieldValue(ChannelType_t type, ChannelNum_t channel, FieldId_t fieldId, float value)
 {
     const byteAssign_t* pos = getAssignmentByChannelField(type, channel, fieldId);
-    fieldSettings_t* setting = getSettingByChannelField(type, channel, fieldId);
-
     if (pos == NULL) {
         return false;
     }
 
     uint8_t ptr = pos->start + pos->num - 1;
-    uint8_t end = pos->start;
-    uint16_t div = pos->div;
+    const uint8_t end = pos->start;
+    const uint16_t div = pos->div;
 
     if (CMD_CALC == div) {
         return false;
     }
 
+    const fieldSettings_t* setting = getSettingByChannelField(type, channel, fieldId);
     if (setting != NULL) {
         value -= setting->offset;
     }
@@ -260,7 +259,7 @@ uint8_t StatisticsParser::getChannelFieldDigits(ChannelType_t type, ChannelNum_t
 
 float StatisticsParser::getChannelFieldOffset(ChannelType_t type, ChannelNum_t channel, FieldId_t fieldId)
 {
-    fieldSettings_t* setting = getSettingByChannelField(type, channel, fieldId);
+    const fieldSettings_t* setting = getSettingByChannelField(type, channel, fieldId);
     if (setting != NULL) {
         return setting->offset;
     }

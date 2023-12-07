@@ -28,7 +28,7 @@ serial_u HoymilesRadio::convertSerialToRadioId(serial_u serial)
     return radioId;
 }
 
-bool HoymilesRadio::checkFragmentCrc(fragment_t* fragment)
+bool HoymilesRadio::checkFragmentCrc(const fragment_t* fragment)
 {
     uint8_t crc = crc8(fragment->fragment, fragment->len - 1);
     return (crc == fragment->fragment[fragment->len - 1]);

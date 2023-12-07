@@ -116,7 +116,7 @@ void DevInfoParser::setLastUpdateSimple(uint32_t lastUpdate)
 uint16_t DevInfoParser::getFwBuildVersion()
 {
     HOY_SEMAPHORE_TAKE();
-    uint16_t ret = (((uint16_t)_payloadDevInfoAll[0]) << 8) | _payloadDevInfoAll[1];
+    const uint16_t ret = (((uint16_t)_payloadDevInfoAll[0]) << 8) | _payloadDevInfoAll[1];
     HOY_SEMAPHORE_GIVE();
     return ret;
 }
@@ -140,19 +140,16 @@ time_t DevInfoParser::getFwBuildDateTime()
 uint16_t DevInfoParser::getFwBootloaderVersion()
 {
     HOY_SEMAPHORE_TAKE();
-    uint16_t ret = (((uint16_t)_payloadDevInfoAll[8]) << 8) | _payloadDevInfoAll[9];
+    const uint16_t ret = (((uint16_t)_payloadDevInfoAll[8]) << 8) | _payloadDevInfoAll[9];
     HOY_SEMAPHORE_GIVE();
     return ret;
 }
 
 uint32_t DevInfoParser::getHwPartNumber()
 {
-    uint16_t hwpn_h;
-    uint16_t hwpn_l;
-
     HOY_SEMAPHORE_TAKE();
-    hwpn_h = (((uint16_t)_payloadDevInfoSimple[2]) << 8) | _payloadDevInfoSimple[3];
-    hwpn_l = (((uint16_t)_payloadDevInfoSimple[4]) << 8) | _payloadDevInfoSimple[5];
+    const uint16_t hwpn_h = (((uint16_t)_payloadDevInfoSimple[2]) << 8) | _payloadDevInfoSimple[3];
+    const uint16_t hwpn_l = (((uint16_t)_payloadDevInfoSimple[4]) << 8) | _payloadDevInfoSimple[5];
     HOY_SEMAPHORE_GIVE();
 
     return ((uint32_t)hwpn_h << 16) | ((uint32_t)hwpn_l);
@@ -169,7 +166,7 @@ String DevInfoParser::getHwVersion()
 
 uint16_t DevInfoParser::getMaxPower()
 {
-    uint8_t idx = getDevIdx();
+    const uint8_t idx = getDevIdx();
     if (idx == 0xff) {
         return 0;
     }
@@ -178,7 +175,7 @@ uint16_t DevInfoParser::getMaxPower()
 
 String DevInfoParser::getHwModelName()
 {
-    uint8_t idx = getDevIdx();
+    const uint8_t idx = getDevIdx();
     if (idx == 0xff) {
         return "";
     }
@@ -187,7 +184,7 @@ String DevInfoParser::getHwModelName()
 
 bool DevInfoParser::containsValidData()
 {
-    time_t t = getFwBuildDateTime();
+    const time_t t = getFwBuildDateTime();
 
     struct tm info;
     localtime_r(&t, &info);

@@ -196,7 +196,7 @@ void WebApiWsLiveClass::addField(JsonObject& root, uint8_t idx, std::shared_ptr<
     }
 }
 
-void WebApiWsLiveClass::addTotalField(JsonObject& root, String name, float value, String unit, uint8_t digits)
+void WebApiWsLiveClass::addTotalField(JsonObject& root, const String& name, float value, const String& unit, uint8_t digits)
 {
     root[name]["v"] = value;
     root[name]["u"] = unit;

@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * Copyright (C) 2022 Thomas Basler and others
+ * Copyright (C) 2022-2023 Thomas Basler and others
  */
 #include "Hoymiles.h"
 #include "Utils.h"
@@ -126,7 +126,7 @@ void HoymilesClass::loop()
         }
 
         // Perform housekeeping of all inverters on day change
-        int8_t currentWeekDay = Utils::getWeekDay();
+        const int8_t currentWeekDay = Utils::getWeekDay();
         static int8_t lastWeekDay = -1;
         if (lastWeekDay == -1) {
             lastWeekDay = currentWeekDay;
@@ -198,7 +198,7 @@ std::shared_ptr<InverterAbstract> HoymilesClass::getInverterBySerial(uint64_t se
     return nullptr;
 }
 
-std::shared_ptr<InverterAbstract> HoymilesClass::getInverterByFragment(fragment_t* fragment)
+std::shared_ptr<InverterAbstract> HoymilesClass::getInverterByFragment(const fragment_t* fragment)
 {
     if (fragment->len <= 4) {
         return nullptr;

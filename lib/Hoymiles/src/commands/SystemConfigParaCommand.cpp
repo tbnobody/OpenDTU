@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * Copyright (C) 2022 Thomas Basler and others
+ * Copyright (C) 2022-2023 Thomas Basler and others
  */
 #include "SystemConfigParaCommand.h"
 #include "Hoymiles.h"
@@ -29,8 +29,8 @@ bool SystemConfigParaCommand::handleResponse(InverterAbstract* inverter, fragmen
     // Check if at least all required bytes are received
     // In case of low power in the inverter it occours that some incomplete fragments
     // with a valid CRC are received.
-    uint8_t fragmentsSize = getTotalFragmentSize(fragment, max_fragment_id);
-    uint8_t expectedSize = inverter->SystemConfigPara()->getExpectedByteCount();
+    const uint8_t fragmentsSize = getTotalFragmentSize(fragment, max_fragment_id);
+    const uint8_t expectedSize = inverter->SystemConfigPara()->getExpectedByteCount();
     if (fragmentsSize < expectedSize) {
         Hoymiles.getMessageOutput()->printf("ERROR in %s: Received fragment size: %d, min expected size: %d\r\n",
             getCommandName().c_str(), fragmentsSize, expectedSize);

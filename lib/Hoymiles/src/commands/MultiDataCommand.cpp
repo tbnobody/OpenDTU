@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * Copyright (C) 2022 Thomas Basler and others
+ * Copyright (C) 2022-2023 Thomas Basler and others
  */
 #include "MultiDataCommand.h"
 #include "crc.h"
@@ -88,7 +88,7 @@ bool MultiDataCommand::handleResponse(InverterAbstract* inverter, fragment_t fra
 
 void MultiDataCommand::udpateCRC()
 {
-    uint16_t crc = crc16(&_payload[10], 14); // From data_type till password
+    const  uint16_t crc = crc16(&_payload[10], 14); // From data_type till password
     _payload[24] = (uint8_t)(crc >> 8);
     _payload[25] = (uint8_t)(crc);
 }
