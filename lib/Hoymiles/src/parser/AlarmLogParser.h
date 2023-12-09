@@ -31,9 +31,9 @@ enum class AlarmMessageLocale_t {
 typedef struct {
     AlarmMessageType_t InverterType;
     uint16_t MessageId;
-    char Message_en[62];
-    char Message_de[63];
-    char Message_fr[64];
+    const char* Message_en;
+    const char* Message_de;
+    const char* Message_fr;
 } AlarmMessage_t;
 
 class AlarmLogParser : public Parser {
@@ -52,7 +52,7 @@ public:
 
 private:
     static int getTimezoneOffset();
-    String getLocaleMessage(const AlarmMessage_t *msg, AlarmMessageLocale_t locale);
+    String getLocaleMessage(const AlarmMessage_t* msg, AlarmMessageLocale_t locale);
 
     uint8_t _payloadAlarmLog[ALARM_LOG_PAYLOAD_SIZE];
     uint8_t _alarmLogLength = 0;
