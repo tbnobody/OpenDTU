@@ -6,6 +6,19 @@
     </BootstrapAlert>
 
     <template v-if="hasValidData">
+        <table class="table table-hover">
+        <tbody>
+            <tr>
+                <td>{{ $t('gridprofile.Name') }}</td>
+                <td>{{ gridProfileList.name }}</td>
+            </tr>
+            <tr>
+                <td>{{ $t('gridprofile.Version') }}</td>
+                <td>{{ gridProfileList.version }}</td>
+            </tr>
+        </tbody>
+        </table>
+
         <BootstrapAlert :show="true" variant="danger">
             <h4 class="info-heading">
                 <BIconInfoSquare class="fs-2" />&nbsp;{{ $t('gridprofile.GridprofileSupport') }}

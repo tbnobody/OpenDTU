@@ -42,6 +42,9 @@ void WebApiGridProfileClass::onGridProfileStatus(AsyncWebServerRequest* request)
         auto data = inv->GridProfile()->getRawData();
 
         copyArray(&data[0], data.size(), raw);
+
+        root["name"] = inv->GridProfile()->getProfileName();
+        root["version"] = inv->GridProfile()->getProfileVersion();
     }
 
     response->setLength();
