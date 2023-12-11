@@ -59,7 +59,7 @@ void WebApiSecurityClass::onSecurityPost(AsyncWebServerRequest* request)
         return;
     }
 
-    String json = request->getParam("data", true)->value();
+    const String json = request->getParam("data", true)->value();
 
     if (json.length() > 1024) {
         retMsg["message"] = "Data too large!";
@@ -70,7 +70,7 @@ void WebApiSecurityClass::onSecurityPost(AsyncWebServerRequest* request)
     }
 
     DynamicJsonDocument root(1024);
-    DeserializationError error = deserializeJson(root, json);
+    const DeserializationError error = deserializeJson(root, json);
 
     if (error) {
         retMsg["message"] = "Failed to parse data!";

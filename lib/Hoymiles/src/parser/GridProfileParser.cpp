@@ -334,10 +334,10 @@ std::list<GridProfileSection_t> GridProfileParser::getProfile()
     if (_gridProfileLength > 4) {
         uint16_t pos = 4;
         do {
-            uint8_t section_id = _payloadGridProfile[pos];
-            uint8_t section_version = _payloadGridProfile[pos + 1];
-            int8_t section_start = getSectionStart(section_id, section_version);
-            uint8_t section_size = getSectionSize(section_id, section_version);
+            const uint8_t section_id = _payloadGridProfile[pos];
+            const uint8_t section_version = _payloadGridProfile[pos + 1];
+            const int8_t section_start = getSectionStart(section_id, section_version);
+            const uint8_t section_size = getSectionSize(section_id, section_version);
             pos += 2;
 
             GridProfileSection_t section;

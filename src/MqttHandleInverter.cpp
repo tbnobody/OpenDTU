@@ -27,7 +27,7 @@ void MqttHandleInverterClass::init(Scheduler* scheduler)
     using std::placeholders::_5;
     using std::placeholders::_6;
 
-    String topic = MqttSettings.getPrefix();
+    const String topic = MqttSettings.getPrefix();
     MqttSettings.subscribe(String(topic + "+/cmd/" + TOPIC_SUB_LIMIT_PERSISTENT_RELATIVE).c_str(), 0, std::bind(&MqttHandleInverterClass::onMqttMessage, this, _1, _2, _3, _4, _5, _6));
     MqttSettings.subscribe(String(topic + "+/cmd/" + TOPIC_SUB_LIMIT_PERSISTENT_ABSOLUTE).c_str(), 0, std::bind(&MqttHandleInverterClass::onMqttMessage, this, _1, _2, _3, _4, _5, _6));
     MqttSettings.subscribe(String(topic + "+/cmd/" + TOPIC_SUB_LIMIT_NONPERSISTENT_RELATIVE).c_str(), 0, std::bind(&MqttHandleInverterClass::onMqttMessage, this, _1, _2, _3, _4, _5, _6));
@@ -55,7 +55,7 @@ void MqttHandleInverterClass::loop()
     for (uint8_t i = 0; i < Hoymiles.getNumInverters(); i++) {
         auto inv = Hoymiles.getInverterByPos(i);
 
-        String subtopic = inv->serialString();
+        const String subtopic = inv->serialString();
 
         // Name
         MqttSettings.publish(subtopic + "/name", inv->name());
@@ -99,7 +99,7 @@ void MqttHandleInverterClass::loop()
             MqttSettings.publish(subtopic + "/status/last_update", String(0));
         }
 
-        uint32_t lastUpdateInternal = inv->Statistics()->getLastUpdateFromInternal();
+        const uint32_t lastUpdateInternal = inv->Statistics()->getLastUpdateFromInternal();
         if (inv->Statistics()->getLastUpdate() > 0 && (lastUpdateInternal != _lastPublishStats[i])) {
             _lastPublishStats[i] = lastUpdateInternal;
 
@@ -126,7 +126,7 @@ void MqttHandleInverterClass::loop()
 
 void MqttHandleInverterClass::publishField(std::shared_ptr<InverterAbstract> inv, ChannelType_t type, ChannelNum_t channel, FieldId_t fieldId)
 {
-    String topic = getTopic(inv, type, channel, fieldId);
+    const String topic = getTopic(inv, type, channel, fieldId);
     if (topic == "") {
         return;
     }
@@ -137,7 +137,7 @@ void MqttHandleInverterClass::publishField(std::shared_ptr<InverterAbstract> inv
 String MqttHandleInverterClass::getTopic(std::shared_ptr<InverterAbstract> inv, ChannelType_t type, ChannelNum_t channel, FieldId_t fieldId)
 {
     if (!inv->Statistics()->hasChannelFieldValue(type, channel, fieldId)) {
-        return String("");
+        return "";
     }
 
     String chanName;
@@ -179,8 +179,7 @@ void MqttHandleInverterClass::onMqttMessage(const espMqttClientTypes::MessagePro
         return;
     }
 
-    uint64_t serial;
-    serial = strtoull(serial_str, 0, 16);
+    const uint64_t serial = strtoull(serial_str, 0, 16);
 
     auto inv = Hoymiles.getInverterBySerial(serial);
 
@@ -197,7 +196,7 @@ void MqttHandleInverterClass::onMqttMessage(const espMqttClientTypes::MessagePro
     char* strlimit = new char[len + 1];
     memcpy(strlimit, payload, len);
     strlimit[len] = '\0';
-    int32_t payload_val = strtol(strlimit, NULL, 10);
+    const int32_t payload_val = strtol(strlimit, NULL, 10);
     delete[] strlimit;
 
     if (payload_val < 0) {

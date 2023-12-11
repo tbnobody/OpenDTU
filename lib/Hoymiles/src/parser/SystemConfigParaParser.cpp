@@ -31,7 +31,7 @@ void SystemConfigParaParser::appendFragment(uint8_t offset, uint8_t* payload, ui
 float SystemConfigParaParser::getLimitPercent()
 {
     HOY_SEMAPHORE_TAKE();
-    float ret = ((((uint16_t)_payload[2]) << 8) | _payload[3]) / 10.0;
+    const float ret = ((((uint16_t)_payload[2]) << 8) | _payload[3]) / 10.0;
     HOY_SEMAPHORE_GIVE();
     return ret;
 }

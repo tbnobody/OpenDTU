@@ -124,7 +124,7 @@ void HoymilesRadio_CMT::loop()
             fragment_t f = _rxBuffer.back();
             if (checkFragmentCrc(&f)) {
 
-                serial_u dtuId = convertSerialToRadioId(_dtuSerial);
+                const serial_u dtuId = convertSerialToRadioId(_dtuSerial);
 
                 // The CMT RF module does not filter foreign packages by itself.
                 // Has to be done manually here.

@@ -112,7 +112,7 @@ void WebApiDeviceClass::onDeviceAdminPost(AsyncWebServerRequest* request)
         return;
     }
 
-    String json = request->getParam("data", true)->value();
+    const String json = request->getParam("data", true)->value();
 
     if (json.length() > MQTT_JSON_DOC_SIZE) {
         retMsg["message"] = "Data too large!";
@@ -123,7 +123,7 @@ void WebApiDeviceClass::onDeviceAdminPost(AsyncWebServerRequest* request)
     }
 
     DynamicJsonDocument root(MQTT_JSON_DOC_SIZE);
-    DeserializationError error = deserializeJson(root, json);
+    const DeserializationError error = deserializeJson(root, json);
 
     if (error) {
         retMsg["message"] = "Failed to parse data!";

@@ -105,7 +105,7 @@ void WebApiInverterClass::onInverterAdd(AsyncWebServerRequest* request)
         return;
     }
 
-    String json = request->getParam("data", true)->value();
+    const String json = request->getParam("data", true)->value();
 
     if (json.length() > 1024) {
         retMsg["message"] = "Data too large!";
@@ -116,7 +116,7 @@ void WebApiInverterClass::onInverterAdd(AsyncWebServerRequest* request)
     }
 
     DynamicJsonDocument root(1024);
-    DeserializationError error = deserializeJson(root, json);
+    const DeserializationError error = deserializeJson(root, json);
 
     if (error) {
         retMsg["message"] = "Failed to parse data!";
@@ -205,7 +205,7 @@ void WebApiInverterClass::onInverterEdit(AsyncWebServerRequest* request)
         return;
     }
 
-    String json = request->getParam("data", true)->value();
+    const String json = request->getParam("data", true)->value();
 
     if (json.length() > 1024) {
         retMsg["message"] = "Data too large!";
@@ -216,7 +216,7 @@ void WebApiInverterClass::onInverterEdit(AsyncWebServerRequest* request)
     }
 
     DynamicJsonDocument root(1024);
-    DeserializationError error = deserializeJson(root, json);
+    const DeserializationError error = deserializeJson(root, json);
 
     if (error) {
         retMsg["message"] = "Failed to parse data!";
@@ -351,7 +351,7 @@ void WebApiInverterClass::onInverterDelete(AsyncWebServerRequest* request)
         return;
     }
 
-    String json = request->getParam("data", true)->value();
+    const String json = request->getParam("data", true)->value();
 
     if (json.length() > 1024) {
         retMsg["message"] = "Data too large!";
@@ -362,7 +362,7 @@ void WebApiInverterClass::onInverterDelete(AsyncWebServerRequest* request)
     }
 
     DynamicJsonDocument root(1024);
-    DeserializationError error = deserializeJson(root, json);
+    const DeserializationError error = deserializeJson(root, json);
 
     if (error) {
         retMsg["message"] = "Failed to parse data!";
@@ -425,7 +425,7 @@ void WebApiInverterClass::onInverterOrder(AsyncWebServerRequest* request)
         return;
     }
 
-    String json = request->getParam("data", true)->value();
+    const String json = request->getParam("data", true)->value();
 
     if (json.length() > 1024) {
         retMsg["message"] = "Data too large!";
@@ -436,7 +436,7 @@ void WebApiInverterClass::onInverterOrder(AsyncWebServerRequest* request)
     }
 
     DynamicJsonDocument root(1024);
-    DeserializationError error = deserializeJson(root, json);
+    const DeserializationError error = deserializeJson(root, json);
 
     if (error) {
         retMsg["message"] = "Failed to parse data!";

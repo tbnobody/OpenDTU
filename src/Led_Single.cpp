@@ -48,7 +48,7 @@ void LedSingleClass::init(Scheduler* scheduler)
     _blinkTimeout.set(500);
     turnAllOn();
 
-    auto& pin = PinMapping.get();
+    const auto& pin = PinMapping.get();
     for (uint8_t i = 0; i < PINMAPPING_LED_COUNT; i++) {
 
         if (pin.led[i] >= 0) {

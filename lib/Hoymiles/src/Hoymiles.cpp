@@ -72,7 +72,7 @@ void HoymilesClass::loop()
                 iv->sendStatsRequest();
 
                 // Fetch event log
-                bool force = iv->EventLog()->getLastAlarmRequestSuccess() == CMD_NOK;
+                const bool force = iv->EventLog()->getLastAlarmRequestSuccess() == CMD_NOK;
                 iv->sendAlarmLogRequest(force);
 
                 // Fetch limit
@@ -96,7 +96,7 @@ void HoymilesClass::loop()
 
                 // Fetch dev info (but first fetch stats)
                 if (iv->Statistics()->getLastUpdate() > 0) {
-                    bool invalidDevInfo = !iv->DevInfo()->containsValidData()
+                    const bool invalidDevInfo = !iv->DevInfo()->containsValidData()
                         && iv->DevInfo()->getLastUpdateAll() > 0
                         && iv->DevInfo()->getLastUpdateSimple() > 0;
 

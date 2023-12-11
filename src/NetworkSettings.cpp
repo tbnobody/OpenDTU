@@ -107,7 +107,7 @@ bool NetworkSettingsClass::onEvent(NetworkEventCb cbEvent, network_event event)
 void NetworkSettingsClass::raiseEvent(network_event event)
 {
     for (uint32_t i = 0; i < _cbEventList.size(); i++) {
-        NetworkEventCbList_t entry = _cbEventList[i];
+        const NetworkEventCbList_t entry = _cbEventList[i];
         if (entry.cb) {
             if (entry.event == event || entry.event == network_event::NETWORK_EVENT_MAX) {
                 entry.cb(event);
@@ -118,7 +118,7 @@ void NetworkSettingsClass::raiseEvent(network_event event)
 
 void NetworkSettingsClass::handleMDNS()
 {
-    bool mdnsEnabled = Configuration.get().Mdns.Enabled;
+    const bool mdnsEnabled = Configuration.get().Mdns.Enabled;
 
     if (lastMdnsEnabled == mdnsEnabled) {
         return;
@@ -412,7 +412,7 @@ String NetworkSettingsClass::getHostname()
     char resultHostname[WIFI_MAX_HOSTNAME_STRLEN + 1];
     uint8_t pos = 0;
 
-    uint32_t chipId = Utils::getChipId();
+    const uint32_t chipId = Utils::getChipId();
     snprintf(preparedHostname, WIFI_MAX_HOSTNAME_STRLEN + 1, config.WiFi.Hostname, chipId);
 
     const char* pC = preparedHostname;

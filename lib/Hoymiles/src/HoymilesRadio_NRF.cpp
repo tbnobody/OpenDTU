@@ -133,15 +133,13 @@ bool HoymilesRadio_NRF::isPVariant()
 
 void HoymilesRadio_NRF::openReadingPipe()
 {
-    serial_u s;
-    s = convertSerialToRadioId(_dtuSerial);
+    const serial_u s = convertSerialToRadioId(_dtuSerial);
     _radio->openReadingPipe(1, s.u64);
 }
 
 void HoymilesRadio_NRF::openWritingPipe(serial_u serial)
 {
-    serial_u s;
-    s = convertSerialToRadioId(serial);
+    const serial_u s = convertSerialToRadioId(serial);
     _radio->openWritingPipe(s.u64);
 }
 

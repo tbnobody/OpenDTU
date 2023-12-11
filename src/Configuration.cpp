@@ -150,7 +150,7 @@ bool ConfigurationClass::read()
 
     DynamicJsonDocument doc(JSON_BUFFER_SIZE);
     // Deserialize the JSON document
-    DeserializationError error = deserializeJson(doc, f);
+    const DeserializationError error = deserializeJson(doc, f);
     if (error) {
         MessageOutput.println("Failed to read file, using default configuration");
     }
@@ -309,7 +309,7 @@ void ConfigurationClass::migrate()
 
     DynamicJsonDocument doc(JSON_BUFFER_SIZE);
     // Deserialize the JSON document
-    DeserializationError error = deserializeJson(doc, f);
+    const DeserializationError error = deserializeJson(doc, f);
     if (error) {
         MessageOutput.printf("Failed to read file, cancel migration: %s\r\n", error.c_str());
         return;

@@ -187,10 +187,10 @@ void InverterAbstract::addRxFragment(uint8_t fragment[], uint8_t len)
         return;
     }
 
-    uint8_t fragmentCount = fragment[9];
+    const uint8_t fragmentCount = fragment[9];
 
     // Packets with 0x81 will be seen as 1
-    uint8_t fragmentId = fragmentCount & 0b01111111; // fragmentId is 1 based
+    const uint8_t fragmentId = fragmentCount & 0b01111111; // fragmentId is 1 based
 
     if (fragmentId == 0) {
         Hoymiles.getMessageOutput()->println("ERROR: fragment id zero received and ignored");

@@ -34,7 +34,7 @@ DevControlCommand::DevControlCommand(uint64_t target_address, uint64_t router_ad
 
 void DevControlCommand::udpateCRC(uint8_t len)
 {
-    uint16_t crc = crc16(&_payload[10], len);
+    const uint16_t crc = crc16(&_payload[10], len);
     _payload[10 + len] = (uint8_t)(crc >> 8);
     _payload[10 + len + 1] = (uint8_t)(crc);
 }

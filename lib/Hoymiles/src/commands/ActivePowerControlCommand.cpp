@@ -49,7 +49,7 @@ String ActivePowerControlCommand::getCommandName()
 
 void ActivePowerControlCommand::setActivePowerLimit(float limit, PowerLimitControlType type)
 {
-    uint16_t l = limit * 10;
+    const uint16_t l = limit * 10;
 
     // limit
     _payload[12] = (l >> 8) & 0xff;
@@ -71,7 +71,7 @@ bool ActivePowerControlCommand::handleResponse(InverterAbstract* inverter, fragm
     if ((getType() == PowerLimitControlType::RelativNonPersistent) || (getType() == PowerLimitControlType::RelativPersistent)) {
         inverter->SystemConfigPara()->setLimitPercent(getLimit());
     } else {
-        uint16_t max_power = inverter->DevInfo()->getMaxPower();
+        const uint16_t max_power = inverter->DevInfo()->getMaxPower();
         if (max_power > 0) {
             inverter->SystemConfigPara()->setLimitPercent(static_cast<float>(getLimit()) / max_power * 100);
         } else {
@@ -85,7 +85,7 @@ bool ActivePowerControlCommand::handleResponse(InverterAbstract* inverter, fragm
 
 float ActivePowerControlCommand::getLimit()
 {
-    uint16_t l = (((uint16_t)_payload[12] << 8) | _payload[13]);
+    const uint16_t l = (((uint16_t)_payload[12] << 8) | _payload[13]);
     return l / 10;
 }
 
