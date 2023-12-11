@@ -8,20 +8,20 @@ class SystemConfigParaParser : public Parser {
 public:
     SystemConfigParaParser();
     void clearBuffer();
-    void appendFragment(uint8_t offset, uint8_t* payload, uint8_t len);
+    void appendFragment(const uint8_t offset, const uint8_t* payload, const uint8_t len);
 
     float getLimitPercent();
-    void setLimitPercent(float value);
+    void setLimitPercent(const float value);
 
-    void setLastLimitCommandSuccess(LastCommandSuccess status);
+    void setLastLimitCommandSuccess(const LastCommandSuccess status);
     LastCommandSuccess getLastLimitCommandSuccess();
     uint32_t getLastUpdateCommand();
-    void setLastUpdateCommand(uint32_t lastUpdate);
+    void setLastUpdateCommand(const uint32_t lastUpdate);
 
-    void setLastLimitRequestSuccess(LastCommandSuccess status);
+    void setLastLimitRequestSuccess(const LastCommandSuccess status);
     LastCommandSuccess getLastLimitRequestSuccess();
     uint32_t getLastUpdateRequest();
-    void setLastUpdateRequest(uint32_t lastUpdate);
+    void setLastUpdateRequest(const uint32_t lastUpdate);
 
     // Returns 1 based amount of expected bytes of data
     uint8_t getExpectedByteCount();

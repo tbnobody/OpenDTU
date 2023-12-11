@@ -36,10 +36,10 @@ static const byteAssign_t byteAssignment[] = {
     { TYPE_AC, CH0, FLD_EFF, UNIT_PCT, CALC_EFF_CH0, 0, CMD_CALC, false, 3 }
 };
 
-HM_2CH::HM_2CH(HoymilesRadio* radio, uint64_t serial)
+HM_2CH::HM_2CH(HoymilesRadio* radio, const uint64_t serial)
     : HM_Abstract(radio, serial) {};
 
-bool HM_2CH::isValidSerial(uint64_t serial)
+bool HM_2CH::isValidSerial(const uint64_t serial)
 {
     // serial >= 0x114100000000 && serial <= 0x114199999999
 

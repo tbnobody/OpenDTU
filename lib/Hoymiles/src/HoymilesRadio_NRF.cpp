@@ -8,7 +8,7 @@
 #include <Every.h>
 #include <FunctionalInterrupt.h>
 
-void HoymilesRadio_NRF::init(SPIClass* initialisedSpiBus, uint8_t pinCE, uint8_t pinIRQ)
+void HoymilesRadio_NRF::init(SPIClass* initialisedSpiBus, const uint8_t pinCE, const uint8_t pinIRQ)
 {
     _dtuSerial.u64 = 0;
 
@@ -97,7 +97,7 @@ void HoymilesRadio_NRF::loop()
     handleReceivedPackage();
 }
 
-void HoymilesRadio_NRF::setPALevel(rf24_pa_dbm_e paLevel)
+void HoymilesRadio_NRF::setPALevel(const rf24_pa_dbm_e paLevel)
 {
     if (!_isInitialized) {
         return;
@@ -105,7 +105,7 @@ void HoymilesRadio_NRF::setPALevel(rf24_pa_dbm_e paLevel)
     _radio->setPALevel(paLevel);
 }
 
-void HoymilesRadio_NRF::setDtuSerial(uint64_t serial)
+void HoymilesRadio_NRF::setDtuSerial(const uint64_t serial)
 {
     HoymilesRadio::setDtuSerial(serial);
 
@@ -137,7 +137,7 @@ void HoymilesRadio_NRF::openReadingPipe()
     _radio->openReadingPipe(1, s.u64);
 }
 
-void HoymilesRadio_NRF::openWritingPipe(serial_u serial)
+void HoymilesRadio_NRF::openWritingPipe(const serial_u serial)
 {
     const serial_u s = convertSerialToRadioId(serial);
     _radio->openWritingPipe(s.u64);

@@ -24,12 +24,12 @@ void HoymilesClass::init()
     _radioCmt.reset(new HoymilesRadio_CMT());
 }
 
-void HoymilesClass::initNRF(SPIClass* initialisedSpiBus, uint8_t pinCE, uint8_t pinIRQ)
+void HoymilesClass::initNRF(SPIClass* initialisedSpiBus, const uint8_t pinCE, const uint8_t pinIRQ)
 {
     _radioNrf->init(initialisedSpiBus, pinCE, pinIRQ);
 }
 
-void HoymilesClass::initCMT(int8_t pin_sdio, int8_t pin_clk, int8_t pin_cs, int8_t pin_fcs, int8_t pin_gpio2, int8_t pin_gpio3)
+void HoymilesClass::initCMT(const int8_t pin_sdio, const int8_t pin_clk, const int8_t pin_cs, const int8_t pin_fcs, const int8_t pin_gpio2, const int8_t pin_gpio3)
 {
     _radioCmt->init(pin_sdio, pin_clk, pin_cs, pin_fcs, pin_gpio2, pin_gpio3);
 }
@@ -146,7 +146,7 @@ void HoymilesClass::loop()
     }
 }
 
-std::shared_ptr<InverterAbstract> HoymilesClass::addInverter(const char* name, uint64_t serial)
+std::shared_ptr<InverterAbstract> HoymilesClass::addInverter(const char* name, const uint64_t serial)
 {
     std::shared_ptr<InverterAbstract> i = nullptr;
     if (HMT_4CH::isValidSerial(serial)) {
@@ -179,7 +179,7 @@ std::shared_ptr<InverterAbstract> HoymilesClass::addInverter(const char* name, u
     return nullptr;
 }
 
-std::shared_ptr<InverterAbstract> HoymilesClass::getInverterByPos(uint8_t pos)
+std::shared_ptr<InverterAbstract> HoymilesClass::getInverterByPos(const uint8_t pos)
 {
     if (pos >= _inverters.size()) {
         return nullptr;
@@ -188,7 +188,7 @@ std::shared_ptr<InverterAbstract> HoymilesClass::getInverterByPos(uint8_t pos)
     }
 }
 
-std::shared_ptr<InverterAbstract> HoymilesClass::getInverterBySerial(uint64_t serial)
+std::shared_ptr<InverterAbstract> HoymilesClass::getInverterBySerial(const uint64_t serial)
 {
     for (uint8_t i = 0; i < _inverters.size(); i++) {
         if (_inverters[i]->serial() == serial) {
@@ -221,7 +221,7 @@ std::shared_ptr<InverterAbstract> HoymilesClass::getInverterByFragment(const fra
     return nullptr;
 }
 
-void HoymilesClass::removeInverterBySerial(uint64_t serial)
+void HoymilesClass::removeInverterBySerial(const uint64_t serial)
 {
     for (uint8_t i = 0; i < _inverters.size(); i++) {
         if (_inverters[i]->serial() == serial) {
@@ -257,7 +257,7 @@ uint32_t HoymilesClass::PollInterval()
     return _pollInterval;
 }
 
-void HoymilesClass::setPollInterval(uint32_t interval)
+void HoymilesClass::setPollInterval(const uint32_t interval)
 {
     _pollInterval = interval;
 }

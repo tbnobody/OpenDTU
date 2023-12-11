@@ -65,7 +65,7 @@ void DevInfoParser::clearBufferAll()
     _devInfoAllLength = 0;
 }
 
-void DevInfoParser::appendFragmentAll(uint8_t offset, uint8_t* payload, uint8_t len)
+void DevInfoParser::appendFragmentAll(const uint8_t offset, const uint8_t* payload, const uint8_t len)
 {
     if (offset + len > DEV_INFO_SIZE) {
         Hoymiles.getMessageOutput()->printf("FATAL: (%s, %d) dev info all packet too large for buffer\r\n", __FILE__, __LINE__);
@@ -81,7 +81,7 @@ void DevInfoParser::clearBufferSimple()
     _devInfoSimpleLength = 0;
 }
 
-void DevInfoParser::appendFragmentSimple(uint8_t offset, uint8_t* payload, uint8_t len)
+void DevInfoParser::appendFragmentSimple(const uint8_t offset, const uint8_t* payload, const uint8_t len)
 {
     if (offset + len > DEV_INFO_SIZE) {
         Hoymiles.getMessageOutput()->printf("FATAL: (%s, %d) dev info Simple packet too large for buffer\r\n", __FILE__, __LINE__);
@@ -96,7 +96,7 @@ uint32_t DevInfoParser::getLastUpdateAll()
     return _lastUpdateAll;
 }
 
-void DevInfoParser::setLastUpdateAll(uint32_t lastUpdate)
+void DevInfoParser::setLastUpdateAll(const uint32_t lastUpdate)
 {
     _lastUpdateAll = lastUpdate;
     setLastUpdate(lastUpdate);
@@ -107,7 +107,7 @@ uint32_t DevInfoParser::getLastUpdateSimple()
     return _lastUpdateSimple;
 }
 
-void DevInfoParser::setLastUpdateSimple(uint32_t lastUpdate)
+void DevInfoParser::setLastUpdateSimple(const uint32_t lastUpdate)
 {
     _lastUpdateSimple = lastUpdate;
     setLastUpdate(lastUpdate);
@@ -228,7 +228,7 @@ uint8_t DevInfoParser::getDevIdx()
 }
 
 /* struct tm to seconds since Unix epoch */
-time_t DevInfoParser::timegm(struct tm* t)
+time_t DevInfoParser::timegm(const struct tm* t)
 {
     uint32_t year;
     time_t result;

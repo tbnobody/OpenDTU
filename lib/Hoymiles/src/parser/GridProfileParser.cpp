@@ -287,7 +287,7 @@ void GridProfileParser::clearBuffer()
     _gridProfileLength = 0;
 }
 
-void GridProfileParser::appendFragment(uint8_t offset, uint8_t* payload, uint8_t len)
+void GridProfileParser::appendFragment(const uint8_t offset, const uint8_t* payload, const uint8_t len)
 {
     if (offset + len > GRID_PROFILE_SIZE) {
         Hoymiles.getMessageOutput()->printf("FATAL: (%s, %d) grid profile packet too large for buffer\r\n", __FILE__, __LINE__);
@@ -371,7 +371,7 @@ std::list<GridProfileSection_t> GridProfileParser::getProfile()
     return l;
 }
 
-uint8_t GridProfileParser::getSectionSize(uint8_t section_id, uint8_t section_version)
+uint8_t GridProfileParser::getSectionSize(const uint8_t section_id, const uint8_t section_version)
 {
     uint8_t count = 0;
     for (auto& values : _profileValues) {
@@ -382,7 +382,7 @@ uint8_t GridProfileParser::getSectionSize(uint8_t section_id, uint8_t section_ve
     return count;
 }
 
-int8_t GridProfileParser::getSectionStart(uint8_t section_id, uint8_t section_version)
+int8_t GridProfileParser::getSectionStart(const uint8_t section_id, const uint8_t section_version)
 {
     uint8_t count = -1;
     for (auto& values : _profileValues) {

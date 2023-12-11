@@ -40,19 +40,19 @@ class AlarmLogParser : public Parser {
 public:
     AlarmLogParser();
     void clearBuffer();
-    void appendFragment(uint8_t offset, uint8_t* payload, uint8_t len);
+    void appendFragment(const uint8_t offset, const uint8_t* payload, const uint8_t len);
 
     uint8_t getEntryCount();
-    void getLogEntry(uint8_t entryId, AlarmLogEntry_t* entry, AlarmMessageLocale_t locale = AlarmMessageLocale_t::EN);
+    void getLogEntry(const uint8_t entryId, AlarmLogEntry_t* entry, const AlarmMessageLocale_t locale = AlarmMessageLocale_t::EN);
 
-    void setLastAlarmRequestSuccess(LastCommandSuccess status);
+    void setLastAlarmRequestSuccess(const LastCommandSuccess status);
     LastCommandSuccess getLastAlarmRequestSuccess();
 
-    void setMessageType(AlarmMessageType_t type);
+    void setMessageType(const AlarmMessageType_t type);
 
 private:
     static int getTimezoneOffset();
-    String getLocaleMessage(const AlarmMessage_t* msg, AlarmMessageLocale_t locale);
+    String getLocaleMessage(const AlarmMessage_t* msg, const AlarmMessageLocale_t locale);
 
     uint8_t _payloadAlarmLog[ALARM_LOG_PAYLOAD_SIZE];
     uint8_t _alarmLogLength = 0;

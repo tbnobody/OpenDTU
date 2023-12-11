@@ -13,7 +13,7 @@ class InverterAbstract;
 
 class CommandAbstract {
 public:
-    explicit CommandAbstract(uint64_t target_address = 0, uint64_t router_address = 0);
+    explicit CommandAbstract(const uint64_t target_address = 0, const uint64_t router_address = 0);
     virtual ~CommandAbstract() {};
 
     const uint8_t* getDataPayload();
@@ -21,24 +21,24 @@ public:
 
     uint8_t getDataSize();
 
-    void setTargetAddress(uint64_t address);
+    void setTargetAddress(const uint64_t address);
     uint64_t getTargetAddress();
 
-    void setRouterAddress(uint64_t address);
+    void setRouterAddress(const uint64_t address);
     uint64_t getRouterAddress();
 
-    void setTimeout(uint32_t timeout);
+    void setTimeout(const uint32_t timeout);
     uint32_t getTimeout();
 
     virtual String getCommandName() = 0;
 
-    void setSendCount(uint8_t count);
+    void setSendCount(const uint8_t count);
     uint8_t getSendCount();
     uint8_t incrementSendCount();
 
-    virtual CommandAbstract* getRequestFrameCommand(uint8_t frame_no);
+    virtual CommandAbstract* getRequestFrameCommand(const uint8_t frame_no);
 
-    virtual bool handleResponse(InverterAbstract* inverter, fragment_t fragment[], uint8_t max_fragment_id) = 0;
+    virtual bool handleResponse(InverterAbstract* inverter, const fragment_t fragment[], const uint8_t max_fragment_id) = 0;
     virtual void gotTimeout(InverterAbstract* inverter);
 
     // Sets the amount how often the specific command is resent if all fragments where missing
@@ -57,5 +57,5 @@ protected:
     uint64_t _routerAddress;
 
 private:
-    static void convertSerialToPacketId(uint8_t buffer[], uint64_t serial);
+    static void convertSerialToPacketId(uint8_t buffer[], const uint64_t serial);
 };

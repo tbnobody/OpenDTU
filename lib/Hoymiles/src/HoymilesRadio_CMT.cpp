@@ -53,7 +53,7 @@ bool HoymilesRadio_CMT::cmtSwitchDtuFreq(const uint32_t to_freq_kHz)
     return true;
 }
 
-void HoymilesRadio_CMT::init(int8_t pin_sdio, int8_t pin_clk, int8_t pin_cs, int8_t pin_fcs, int8_t pin_gpio2, int8_t pin_gpio3)
+void HoymilesRadio_CMT::init(const int8_t pin_sdio, const int8_t pin_clk, const int8_t pin_cs, const int8_t pin_fcs, const int8_t pin_gpio2, const int8_t pin_gpio3)
 {
     _dtuSerial.u64 = 0;
 
@@ -156,7 +156,7 @@ void HoymilesRadio_CMT::loop()
     handleReceivedPackage();
 }
 
-void HoymilesRadio_CMT::setPALevel(int8_t paLevel)
+void HoymilesRadio_CMT::setPALevel(const int8_t paLevel)
 {
     if (!_isInitialized) {
         return;
@@ -169,7 +169,7 @@ void HoymilesRadio_CMT::setPALevel(int8_t paLevel)
     }
 }
 
-void HoymilesRadio_CMT::setInverterTargetFrequency(uint32_t frequency)
+void HoymilesRadio_CMT::setInverterTargetFrequency(const uint32_t frequency)
 {
     _inverterTargetFrequency = frequency;
     if (!_isInitialized) {

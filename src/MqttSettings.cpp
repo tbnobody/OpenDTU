@@ -26,7 +26,7 @@ void MqttSettingsClass::NetworkEvent(network_event event)
     }
 }
 
-void MqttSettingsClass::onMqttConnect(bool sessionPresent)
+void MqttSettingsClass::onMqttConnect(const bool sessionPresent)
 {
     MessageOutput.println("Connected to MQTT.");
     const CONFIG_T& config = Configuration.get();
@@ -40,7 +40,7 @@ void MqttSettingsClass::onMqttConnect(bool sessionPresent)
     }
 }
 
-void MqttSettingsClass::subscribe(const String& topic, uint8_t qos, const espMqttClientTypes::OnMessageCallback& cb)
+void MqttSettingsClass::subscribe(const String& topic, const uint8_t qos, const espMqttClientTypes::OnMessageCallback& cb)
 {
     _mqttSubscribeParser.register_callback(topic.c_str(), qos, cb);
     std::lock_guard<std::mutex> lock(_clientLock);
@@ -89,7 +89,7 @@ void MqttSettingsClass::onMqttDisconnect(espMqttClientTypes::DisconnectReason re
         2, +[](MqttSettingsClass* instance) { instance->performConnect(); }, this);
 }
 
-void MqttSettingsClass::onMqttMessage(const espMqttClientTypes::MessageProperties& properties, const char* topic, const uint8_t* payload, size_t len, size_t index, size_t total)
+void MqttSettingsClass::onMqttMessage(const espMqttClientTypes::MessageProperties& properties, const char* topic, const uint8_t* payload, const size_t len, const size_t index, const size_t total)
 {
     MessageOutput.print("Received MQTT message on topic: ");
     MessageOutput.println(topic);
@@ -191,7 +191,7 @@ void MqttSettingsClass::publish(const String& subtopic, const String& payload)
     publishGeneric(topic, value, Configuration.get().Mqtt.Retain, 0);
 }
 
-void MqttSettingsClass::publishGeneric(const String& topic, const String& payload, bool retain, uint8_t qos)
+void MqttSettingsClass::publishGeneric(const String& topic, const String& payload, const bool retain, const uint8_t qos)
 {
     std::lock_guard<std::mutex> lock(_clientLock);
     if (mqttClient == nullptr) {

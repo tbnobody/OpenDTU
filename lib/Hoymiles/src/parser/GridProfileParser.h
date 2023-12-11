@@ -34,7 +34,7 @@ class GridProfileParser : public Parser {
 public:
     GridProfileParser();
     void clearBuffer();
-    void appendFragment(uint8_t offset, uint8_t* payload, uint8_t len);
+    void appendFragment(const uint8_t offset, const uint8_t* payload, const uint8_t len);
 
     String getProfileName();
     String getProfileVersion();
@@ -44,8 +44,8 @@ public:
     std::list<GridProfileSection_t> getProfile();
 
 private:
-    static uint8_t getSectionSize(uint8_t section_id, uint8_t section_version);
-    static int8_t getSectionStart(uint8_t section_id, uint8_t section_version);
+    static uint8_t getSectionSize(const uint8_t section_id, const uint8_t section_version);
+    static int8_t getSectionStart(const uint8_t section_id, const uint8_t section_version);
 
     uint8_t _payloadGridProfile[GRID_PROFILE_SIZE] = {};
     uint8_t _gridProfileLength = 0;

@@ -60,7 +60,7 @@ StatisticsParser::StatisticsParser()
     clearBuffer();
 }
 
-void StatisticsParser::setByteAssignment(const byteAssign_t* byteAssignment, uint8_t size)
+void StatisticsParser::setByteAssignment(const byteAssign_t* byteAssignment, const uint8_t size)
 {
     _byteAssignment = byteAssignment;
     _byteAssignmentSize = size;
@@ -86,7 +86,7 @@ void StatisticsParser::clearBuffer()
     memset(_lastYieldDay, 0, sizeof(_lastYieldDay));
 }
 
-void StatisticsParser::appendFragment(uint8_t offset, uint8_t* payload, uint8_t len)
+void StatisticsParser::appendFragment(const uint8_t offset, const uint8_t* payload, const uint8_t len)
 {
     if (offset + len > STATISTIC_PACKET_SIZE) {
         Hoymiles.getMessageOutput()->printf("FATAL: (%s, %d) stats packet too large for buffer\r\n", __FILE__, __LINE__);
@@ -121,7 +121,7 @@ void StatisticsParser::endAppendFragment()
     }
 }
 
-const byteAssign_t* StatisticsParser::getAssignmentByChannelField(ChannelType_t type, ChannelNum_t channel, FieldId_t fieldId)
+const byteAssign_t* StatisticsParser::getAssignmentByChannelField(const ChannelType_t type, const ChannelNum_t channel, const FieldId_t fieldId)
 {
     for (uint8_t i = 0; i < _byteAssignmentSize; i++) {
         if (_byteAssignment[i].type == type && _byteAssignment[i].ch == channel && _byteAssignment[i].fieldId == fieldId) {
@@ -131,7 +131,7 @@ const byteAssign_t* StatisticsParser::getAssignmentByChannelField(ChannelType_t 
     return nullptr;
 }
 
-fieldSettings_t* StatisticsParser::getSettingByChannelField(ChannelType_t type, ChannelNum_t channel, FieldId_t fieldId)
+fieldSettings_t* StatisticsParser::getSettingByChannelField(const ChannelType_t type, const ChannelNum_t channel, const FieldId_t fieldId)
 {
     for (auto& i : _fieldSettings) {
         if (i.type == type && i.ch == channel && i.fieldId == fieldId) {
@@ -141,7 +141,7 @@ fieldSettings_t* StatisticsParser::getSettingByChannelField(ChannelType_t type, 
     return nullptr;
 }
 
-float StatisticsParser::getChannelFieldValue(ChannelType_t type, ChannelNum_t channel, FieldId_t fieldId)
+float StatisticsParser::getChannelFieldValue(const ChannelType_t type, const ChannelNum_t channel, const FieldId_t fieldId)
 {
     const byteAssign_t* pos = getAssignmentByChannelField(type, channel, fieldId);
     if (pos == nullptr) {
@@ -186,7 +186,7 @@ float StatisticsParser::getChannelFieldValue(ChannelType_t type, ChannelNum_t ch
     return 0;
 }
 
-bool StatisticsParser::setChannelFieldValue(ChannelType_t type, ChannelNum_t channel, FieldId_t fieldId, float value)
+bool StatisticsParser::setChannelFieldValue(const ChannelType_t type, const ChannelNum_t channel, const FieldId_t fieldId, float value)
 {
     const byteAssign_t* pos = getAssignmentByChannelField(type, channel, fieldId);
     if (pos == nullptr) {
@@ -226,38 +226,38 @@ bool StatisticsParser::setChannelFieldValue(ChannelType_t type, ChannelNum_t cha
     return true;
 }
 
-String StatisticsParser::getChannelFieldValueString(ChannelType_t type, ChannelNum_t channel, FieldId_t fieldId)
+String StatisticsParser::getChannelFieldValueString(const ChannelType_t type, const ChannelNum_t channel, const FieldId_t fieldId)
 {
     return String(
         getChannelFieldValue(type, channel, fieldId),
         static_cast<unsigned int>(getChannelFieldDigits(type, channel, fieldId)));
 }
 
-bool StatisticsParser::hasChannelFieldValue(ChannelType_t type, ChannelNum_t channel, FieldId_t fieldId)
+bool StatisticsParser::hasChannelFieldValue(const ChannelType_t type, const ChannelNum_t channel, const FieldId_t fieldId)
 {
     const byteAssign_t* pos = getAssignmentByChannelField(type, channel, fieldId);
     return pos != nullptr;
 }
 
-const char* StatisticsParser::getChannelFieldUnit(ChannelType_t type, ChannelNum_t channel, FieldId_t fieldId)
+const char* StatisticsParser::getChannelFieldUnit(const ChannelType_t type, const ChannelNum_t channel, const FieldId_t fieldId)
 {
     const byteAssign_t* pos = getAssignmentByChannelField(type, channel, fieldId);
     return units[pos->unitId];
 }
 
-const char* StatisticsParser::getChannelFieldName(ChannelType_t type, ChannelNum_t channel, FieldId_t fieldId)
+const char* StatisticsParser::getChannelFieldName(const ChannelType_t type, const ChannelNum_t channel, const FieldId_t fieldId)
 {
     const byteAssign_t* pos = getAssignmentByChannelField(type, channel, fieldId);
     return fields[pos->fieldId];
 }
 
-uint8_t StatisticsParser::getChannelFieldDigits(ChannelType_t type, ChannelNum_t channel, FieldId_t fieldId)
+uint8_t StatisticsParser::getChannelFieldDigits(const ChannelType_t type, const ChannelNum_t channel, const FieldId_t fieldId)
 {
     const byteAssign_t* pos = getAssignmentByChannelField(type, channel, fieldId);
     return pos->digits;
 }
 
-float StatisticsParser::getChannelFieldOffset(ChannelType_t type, ChannelNum_t channel, FieldId_t fieldId)
+float StatisticsParser::getChannelFieldOffset(const ChannelType_t type, const ChannelNum_t channel, const FieldId_t fieldId)
 {
     const fieldSettings_t* setting = getSettingByChannelField(type, channel, fieldId);
     if (setting != nullptr) {
@@ -266,7 +266,7 @@ float StatisticsParser::getChannelFieldOffset(ChannelType_t type, ChannelNum_t c
     return 0;
 }
 
-void StatisticsParser::setChannelFieldOffset(ChannelType_t type, ChannelNum_t channel, FieldId_t fieldId, float offset)
+void StatisticsParser::setChannelFieldOffset(const ChannelType_t type, const ChannelNum_t channel, const FieldId_t fieldId, const float offset)
 {
     fieldSettings_t* setting = getSettingByChannelField(type, channel, fieldId);
     if (setting != nullptr) {
@@ -285,12 +285,12 @@ std::list<ChannelType_t> StatisticsParser::getChannelTypes()
     };
 }
 
-const char* StatisticsParser::getChannelTypeName(ChannelType_t type)
+const char* StatisticsParser::getChannelTypeName(const ChannelType_t type)
 {
     return channelsTypes[type];
 }
 
-std::list<ChannelNum_t> StatisticsParser::getChannelsByType(ChannelType_t type)
+std::list<ChannelNum_t> StatisticsParser::getChannelsByType(const ChannelType_t type)
 {
     std::list<ChannelNum_t> l;
     for (uint8_t i = 0; i < _byteAssignmentSize; i++) {
@@ -302,12 +302,12 @@ std::list<ChannelNum_t> StatisticsParser::getChannelsByType(ChannelType_t type)
     return l;
 }
 
-uint16_t StatisticsParser::getStringMaxPower(uint8_t channel)
+uint16_t StatisticsParser::getStringMaxPower(const uint8_t channel)
 {
     return _stringMaxPower[channel];
 }
 
-void StatisticsParser::setStringMaxPower(uint8_t channel, uint16_t power)
+void StatisticsParser::setStringMaxPower(const uint8_t channel, const uint16_t power)
 {
     if (channel < sizeof(_stringMaxPower) / sizeof(_stringMaxPower[0])) {
         _stringMaxPower[channel] = power;
@@ -339,7 +339,7 @@ void StatisticsParser::zeroDailyData()
     zeroFields(dailyProductionFields);
 }
 
-void StatisticsParser::setLastUpdate(uint32_t lastUpdate)
+void StatisticsParser::setLastUpdate(const uint32_t lastUpdate)
 {
     Parser::setLastUpdate(lastUpdate);
     setLastUpdateFromInternal(lastUpdate);
@@ -350,7 +350,7 @@ uint32_t StatisticsParser::getLastUpdateFromInternal()
     return _lastUpdateFromInternal;
 }
 
-void StatisticsParser::setLastUpdateFromInternal(uint32_t lastUpdate)
+void StatisticsParser::setLastUpdateFromInternal(const uint32_t lastUpdate)
 {
     _lastUpdateFromInternal = lastUpdate;
 }
@@ -360,7 +360,7 @@ bool StatisticsParser::getYieldDayCorrection()
     return _enableYieldDayCorrection;
 }
 
-void StatisticsParser::setYieldDayCorrection(bool enabled)
+void StatisticsParser::setYieldDayCorrection(const bool enabled)
 {
     _enableYieldDayCorrection = enabled;
 }

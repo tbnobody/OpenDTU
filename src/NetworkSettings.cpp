@@ -34,7 +34,7 @@ void NetworkSettingsClass::init(Scheduler* scheduler)
     _loopTask.enable();
 }
 
-void NetworkSettingsClass::NetworkEvent(WiFiEvent_t event)
+void NetworkSettingsClass::NetworkEvent(const WiFiEvent_t event)
 {
     switch (event) {
     case ARDUINO_EVENT_ETH_START:
@@ -92,7 +92,7 @@ void NetworkSettingsClass::NetworkEvent(WiFiEvent_t event)
     }
 }
 
-bool NetworkSettingsClass::onEvent(NetworkEventCb cbEvent, network_event event)
+bool NetworkSettingsClass::onEvent(NetworkEventCb cbEvent, const network_event event)
 {
     if (!cbEvent) {
         return pdFALSE;
@@ -104,7 +104,7 @@ bool NetworkSettingsClass::onEvent(NetworkEventCb cbEvent, network_event event)
     return true;
 }
 
-void NetworkSettingsClass::raiseEvent(network_event event)
+void NetworkSettingsClass::raiseEvent(const network_event event)
 {
     for (uint32_t i = 0; i < _cbEventList.size(); i++) {
         const NetworkEventCbList_t entry = _cbEventList[i];
@@ -377,7 +377,7 @@ IPAddress NetworkSettingsClass::gatewayIP()
     }
 }
 
-IPAddress NetworkSettingsClass::dnsIP(uint8_t dns_no)
+IPAddress NetworkSettingsClass::dnsIP(const uint8_t dns_no)
 {
     switch (_networkMode) {
     case network_mode::Ethernet:

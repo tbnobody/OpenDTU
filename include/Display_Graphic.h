@@ -17,11 +17,11 @@ public:
     DisplayGraphicClass();
     ~DisplayGraphicClass();
 
-    void init(Scheduler* scheduler, DisplayType_t type, uint8_t data, uint8_t clk, uint8_t cs, uint8_t reset);
-    void setContrast(uint8_t contrast);
-    void setStatus(bool turnOn);
-    void setOrientation(uint8_t rotation = DISPLAY_ROTATION);
-    void setLanguage(uint8_t language);
+    void init(Scheduler* scheduler, const DisplayType_t type, const uint8_t data, const uint8_t clk, const uint8_t cs, const uint8_t reset);
+    void setContrast(const uint8_t contrast);
+    void setStatus(const bool turnOn);
+    void setOrientation(const uint8_t rotation = DISPLAY_ROTATION);
+    void setLanguage(const uint8_t language);
     void setStartupDisplay();
 
     bool enablePowerSafe = true;
@@ -29,9 +29,9 @@ public:
 
 private:
     void loop();
-    void printText(const char* text, uint8_t line);
+    void printText(const char* text, const uint8_t line);
     void calcLineHeights();
-    void setFont(uint8_t line);
+    void setFont(const uint8_t line);
 
     Task _loopTask;
 

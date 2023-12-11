@@ -47,14 +47,14 @@ public:
     IPAddress localIP();
     IPAddress subnetMask();
     IPAddress gatewayIP();
-    IPAddress dnsIP(uint8_t dns_no = 0);
+    IPAddress dnsIP(const uint8_t dns_no = 0);
     String macAddress();
     static String getHostname();
     bool isConnected();
     network_mode NetworkMode();
 
-    bool onEvent(NetworkEventCb cbEvent, network_event event = network_event::NETWORK_EVENT_MAX);
-    void raiseEvent(network_event event);
+    bool onEvent(NetworkEventCb cbEvent, const network_event event = network_event::NETWORK_EVENT_MAX);
+    void raiseEvent(const network_event event);
 
 private:
     void loop();
@@ -62,7 +62,7 @@ private:
     void setStaticIp();
     void handleMDNS();
     void setupMode();
-    void NetworkEvent(WiFiEvent_t event);
+    void NetworkEvent(const WiFiEvent_t event);
 
     Task _loopTask;
 

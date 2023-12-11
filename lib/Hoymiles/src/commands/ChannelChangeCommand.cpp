@@ -18,7 +18,7 @@ ID   Target Addr   Source Addr   ?    ?    ?    CH   ?    CRC8
 */
 #include "ChannelChangeCommand.h"
 
-ChannelChangeCommand::ChannelChangeCommand(uint64_t target_address, uint64_t router_address, uint8_t channel)
+ChannelChangeCommand::ChannelChangeCommand(const uint64_t target_address, const uint64_t router_address, const uint8_t channel)
     : CommandAbstract(target_address, router_address)
 {
     _payload[0] = 0x56;
@@ -37,7 +37,7 @@ String ChannelChangeCommand::getCommandName()
     return "ChannelChangeCommand";
 }
 
-void ChannelChangeCommand::setChannel(uint8_t channel)
+void ChannelChangeCommand::setChannel(const uint8_t channel)
 {
     _payload[12] = channel;
 }
@@ -47,7 +47,7 @@ uint8_t ChannelChangeCommand::getChannel()
     return _payload[12];
 }
 
-bool ChannelChangeCommand::handleResponse(InverterAbstract* inverter, fragment_t fragment[], uint8_t max_fragment_id)
+bool ChannelChangeCommand::handleResponse(InverterAbstract* inverter, const fragment_t fragment[], const uint8_t max_fragment_id)
 {
     return true;
 }

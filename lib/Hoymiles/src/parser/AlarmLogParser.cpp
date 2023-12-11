@@ -181,7 +181,7 @@ void AlarmLogParser::clearBuffer()
     _alarmLogLength = 0;
 }
 
-void AlarmLogParser::appendFragment(uint8_t offset, uint8_t* payload, uint8_t len)
+void AlarmLogParser::appendFragment(const uint8_t offset, const uint8_t* payload, const uint8_t len)
 {
     if (offset + len > ALARM_LOG_PAYLOAD_SIZE) {
         Hoymiles.getMessageOutput()->printf("FATAL: (%s, %d) stats packet too large for buffer (%d > %d)\r\n", __FILE__, __LINE__, offset + len, ALARM_LOG_PAYLOAD_SIZE);
@@ -199,7 +199,7 @@ uint8_t AlarmLogParser::getEntryCount()
     return (_alarmLogLength - 2) / ALARM_LOG_ENTRY_SIZE;
 }
 
-void AlarmLogParser::setLastAlarmRequestSuccess(LastCommandSuccess status)
+void AlarmLogParser::setLastAlarmRequestSuccess(const LastCommandSuccess status)
 {
     _lastAlarmRequestSuccess = status;
 }
@@ -209,12 +209,12 @@ LastCommandSuccess AlarmLogParser::getLastAlarmRequestSuccess()
     return _lastAlarmRequestSuccess;
 }
 
-void AlarmLogParser::setMessageType(AlarmMessageType_t type)
+void AlarmLogParser::setMessageType(const AlarmMessageType_t type)
 {
     _messageType = type;
 }
 
-void AlarmLogParser::getLogEntry(uint8_t entryId, AlarmLogEntry_t* entry, AlarmMessageLocale_t locale)
+void AlarmLogParser::getLogEntry(const uint8_t entryId, AlarmLogEntry_t* entry, const AlarmMessageLocale_t locale)
 {
     const uint8_t entryStartOffset = 2 + entryId * ALARM_LOG_ENTRY_SIZE;
 
@@ -266,7 +266,7 @@ void AlarmLogParser::getLogEntry(uint8_t entryId, AlarmLogEntry_t* entry, AlarmM
     }
 }
 
-String AlarmLogParser::getLocaleMessage(const AlarmMessage_t* msg, AlarmMessageLocale_t locale)
+String AlarmLogParser::getLocaleMessage(const AlarmMessage_t* msg, const AlarmMessageLocale_t locale)
 {
     if (locale == AlarmMessageLocale_t::DE) {
         return msg->Message_de[0] != '\0' ? msg->Message_de : msg->Message_en;

@@ -46,7 +46,7 @@ bool SunPositionClass::isSunsetAvailable()
     return _isSunsetAvailable;
 }
 
-void SunPositionClass::setDoRecalc(bool doRecalc)
+void SunPositionClass::setDoRecalc(const bool doRecalc)
 {
     _doRecalc = doRecalc;
 }
@@ -124,7 +124,7 @@ void SunPositionClass::updateSunData()
     _isValidInfo = true;
 }
 
-bool SunPositionClass::getSunTime(struct tm* info, uint32_t offset)
+bool SunPositionClass::getSunTime(struct tm* info, const uint32_t offset)
 {
     // Get today's date
     time_t aTime = time(NULL);

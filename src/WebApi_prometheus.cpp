@@ -99,7 +99,7 @@ void WebApiPrometheusClass::onPrometheusMetricsGet(AsyncWebServerRequest* reques
     }
 }
 
-void WebApiPrometheusClass::addField(AsyncResponseStream* stream, String& serial, uint8_t idx, std::shared_ptr<InverterAbstract> inv, ChannelType_t type, ChannelNum_t channel, FieldId_t fieldId, const char* metricName, const char* channelName)
+void WebApiPrometheusClass::addField(AsyncResponseStream* stream, const String& serial, const uint8_t idx, std::shared_ptr<InverterAbstract> inv, const ChannelType_t type, const ChannelNum_t channel, const FieldId_t fieldId, const char* metricName, const char* channelName)
 {
     if (inv->Statistics()->hasChannelFieldValue(type, channel, fieldId)) {
         const char* chanName = (channelName == nullptr) ? inv->Statistics()->getChannelFieldName(type, channel, fieldId) : channelName;
@@ -118,7 +118,7 @@ void WebApiPrometheusClass::addField(AsyncResponseStream* stream, String& serial
     }
 }
 
-void WebApiPrometheusClass::addPanelInfo(AsyncResponseStream* stream, String& serial, uint8_t idx, std::shared_ptr<InverterAbstract> inv, ChannelType_t type, ChannelNum_t channel)
+void WebApiPrometheusClass::addPanelInfo(AsyncResponseStream* stream, const String& serial, const uint8_t idx, std::shared_ptr<InverterAbstract> inv, const ChannelType_t type, const ChannelNum_t channel)
 {
     if (type != TYPE_DC) {
         return;

@@ -85,7 +85,7 @@ void MqttHandleHassClass::publishConfig()
     }
 }
 
-void MqttHandleHassClass::publishField(std::shared_ptr<InverterAbstract> inv, ChannelType_t type, ChannelNum_t channel, byteAssign_fieldDeviceClass_t fieldType, bool clear)
+void MqttHandleHassClass::publishField(std::shared_ptr<InverterAbstract> inv, const ChannelType_t type, const ChannelNum_t channel, const byteAssign_fieldDeviceClass_t fieldType, const bool clear)
 {
     if (!inv->Statistics()->hasChannelFieldValue(type, channel, fieldType.fieldId)) {
         return;
@@ -193,7 +193,7 @@ void MqttHandleHassClass::publishInverterButton(std::shared_ptr<InverterAbstract
 void MqttHandleHassClass::publishInverterNumber(
     std::shared_ptr<InverterAbstract> inv, const char* caption, const char* icon, const char* category,
     const char* commandTopic, const char* stateTopic, const char* unitOfMeasure,
-    int16_t min, int16_t max)
+    const int16_t min, const int16_t max)
 {
     const String serial = inv->serialString();
 

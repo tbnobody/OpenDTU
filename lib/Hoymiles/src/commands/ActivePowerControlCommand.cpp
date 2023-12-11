@@ -25,7 +25,7 @@ ID   Target Addr   Source Addr   Cmd  SCmd ?    Limit   Type    CRC16   CRC8
 
 #define CRC_SIZE 6
 
-ActivePowerControlCommand::ActivePowerControlCommand(uint64_t target_address, uint64_t router_address)
+ActivePowerControlCommand::ActivePowerControlCommand(const uint64_t target_address, const uint64_t router_address)
     : DevControlCommand(target_address, router_address)
 {
     _payload[10] = 0x0b;
@@ -47,7 +47,7 @@ String ActivePowerControlCommand::getCommandName()
     return "ActivePowerControl";
 }
 
-void ActivePowerControlCommand::setActivePowerLimit(float limit, PowerLimitControlType type)
+void ActivePowerControlCommand::setActivePowerLimit(const float limit, const PowerLimitControlType type)
 {
     const uint16_t l = limit * 10;
 
@@ -62,7 +62,7 @@ void ActivePowerControlCommand::setActivePowerLimit(float limit, PowerLimitContr
     udpateCRC(CRC_SIZE);
 }
 
-bool ActivePowerControlCommand::handleResponse(InverterAbstract* inverter, fragment_t fragment[], uint8_t max_fragment_id)
+bool ActivePowerControlCommand::handleResponse(InverterAbstract* inverter, const fragment_t fragment[], const uint8_t max_fragment_id)
 {
     if (!DevControlCommand::handleResponse(inverter, fragment, max_fragment_id)) {
         return false;

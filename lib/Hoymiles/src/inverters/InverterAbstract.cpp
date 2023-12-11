@@ -7,7 +7,7 @@
 #include "crc.h"
 #include <cstring>
 
-InverterAbstract::InverterAbstract(HoymilesRadio* radio, uint64_t serial)
+InverterAbstract::InverterAbstract(HoymilesRadio* radio, const uint64_t serial)
 {
     _serial.u64 = serial;
     _radio = radio;
@@ -77,7 +77,7 @@ bool InverterAbstract::isReachable()
     return _enablePolling && Statistics()->getRxFailureCount() <= _reachableThreshold;
 }
 
-void InverterAbstract::setEnablePolling(bool enabled)
+void InverterAbstract::setEnablePolling(const bool enabled)
 {
     _enablePolling = enabled;
 }
@@ -87,7 +87,7 @@ bool InverterAbstract::getEnablePolling()
     return _enablePolling;
 }
 
-void InverterAbstract::setEnableCommands(bool enabled)
+void InverterAbstract::setEnableCommands(const bool enabled)
 {
     _enableCommands = enabled;
 }
@@ -97,7 +97,7 @@ bool InverterAbstract::getEnableCommands()
     return _enableCommands;
 }
 
-void InverterAbstract::setReachableThreshold(uint8_t threshold)
+void InverterAbstract::setReachableThreshold(const uint8_t threshold)
 {
     _reachableThreshold = threshold;
 }
@@ -107,7 +107,7 @@ uint8_t InverterAbstract::getReachableThreshold()
     return _reachableThreshold;
 }
 
-void InverterAbstract::setZeroValuesIfUnreachable(bool enabled)
+void InverterAbstract::setZeroValuesIfUnreachable(const bool enabled)
 {
     _zeroValuesIfUnreachable = enabled;
 }
@@ -117,7 +117,7 @@ bool InverterAbstract::getZeroValuesIfUnreachable()
     return _zeroValuesIfUnreachable;
 }
 
-void InverterAbstract::setZeroYieldDayOnMidnight(bool enabled)
+void InverterAbstract::setZeroYieldDayOnMidnight(const bool enabled)
 {
     _zeroYieldDayOnMidnight = enabled;
 }
@@ -175,7 +175,7 @@ void InverterAbstract::clearRxFragmentBuffer()
     _rxFragmentRetransmitCnt = 0;
 }
 
-void InverterAbstract::addRxFragment(uint8_t fragment[], uint8_t len)
+void InverterAbstract::addRxFragment(const uint8_t fragment[], const uint8_t len)
 {
     if (len < 11) {
         Hoymiles.getMessageOutput()->printf("FATAL: (%s, %d) fragment too short\r\n", __FILE__, __LINE__);

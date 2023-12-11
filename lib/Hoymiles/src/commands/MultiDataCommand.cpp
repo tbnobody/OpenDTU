@@ -28,7 +28,7 @@ ID   Target Addr   Source Addr   Idx  DT   ?    Time          Gap             Pa
 #include "MultiDataCommand.h"
 #include "crc.h"
 
-MultiDataCommand::MultiDataCommand(uint64_t target_address, uint64_t router_address, uint8_t data_type, time_t time)
+MultiDataCommand::MultiDataCommand(const uint64_t target_address, const uint64_t router_address, const uint8_t data_type, const time_t time)
     : CommandAbstract(target_address, router_address)
 {
     _payload[0] = 0x15;
@@ -50,7 +50,7 @@ MultiDataCommand::MultiDataCommand(uint64_t target_address, uint64_t router_addr
     _payload_size = 26;
 }
 
-void MultiDataCommand::setDataType(uint8_t data_type)
+void MultiDataCommand::setDataType(const uint8_t data_type)
 {
     _payload[10] = data_type;
     udpateCRC();
@@ -60,7 +60,7 @@ uint8_t MultiDataCommand::getDataType()
     return _payload[10];
 }
 
-void MultiDataCommand::setTime(time_t time)
+void MultiDataCommand::setTime(const time_t time)
 {
     _payload[12] = (uint8_t)(time >> 24);
     _payload[13] = (uint8_t)(time >> 16);
@@ -77,7 +77,7 @@ time_t MultiDataCommand::getTime()
         | (time_t)(_payload[15]);
 }
 
-CommandAbstract* MultiDataCommand::getRequestFrameCommand(uint8_t frame_no)
+CommandAbstract* MultiDataCommand::getRequestFrameCommand(const uint8_t frame_no)
 {
     _cmdRequestFrame.setTargetAddress(getTargetAddress());
     _cmdRequestFrame.setFrameNo(frame_no);
@@ -85,7 +85,7 @@ CommandAbstract* MultiDataCommand::getRequestFrameCommand(uint8_t frame_no)
     return &_cmdRequestFrame;
 }
 
-bool MultiDataCommand::handleResponse(InverterAbstract* inverter, fragment_t fragment[], uint8_t max_fragment_id)
+bool MultiDataCommand::handleResponse(InverterAbstract* inverter, const fragment_t fragment[], const uint8_t max_fragment_id)
 {
     // All fragments are available --> Check CRC
     uint16_t crc = 0xffff, crcRcv = 0;
@@ -116,7 +116,7 @@ void MultiDataCommand::udpateCRC()
     _payload[25] = (uint8_t)(crc);
 }
 
-uint8_t MultiDataCommand::getTotalFragmentSize(fragment_t fragment[], uint8_t max_fragment_id)
+uint8_t MultiDataCommand::getTotalFragmentSize(const fragment_t fragment[], const uint8_t max_fragment_id)
 {
     uint8_t fragmentSize = 0;
     for (uint8_t i = 0; i < max_fragment_id; i++) {

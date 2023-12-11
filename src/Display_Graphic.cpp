@@ -39,7 +39,7 @@ DisplayGraphicClass::~DisplayGraphicClass()
     delete _display;
 }
 
-void DisplayGraphicClass::init(Scheduler* scheduler, DisplayType_t type, uint8_t data, uint8_t clk, uint8_t cs, uint8_t reset)
+void DisplayGraphicClass::init(Scheduler* scheduler, const DisplayType_t type, const uint8_t data, const uint8_t clk, const uint8_t cs, const uint8_t reset)
 {
     _display_type = type;
     if (_display_type > DisplayType_t::None) {
@@ -67,7 +67,7 @@ void DisplayGraphicClass::calcLineHeights()
     }
 }
 
-void DisplayGraphicClass::setFont(uint8_t line)
+void DisplayGraphicClass::setFont(const uint8_t line)
 {
     switch (line) {
     case 0:
@@ -82,7 +82,7 @@ void DisplayGraphicClass::setFont(uint8_t line)
     }
 }
 
-void DisplayGraphicClass::printText(const char* text, uint8_t line)
+void DisplayGraphicClass::printText(const char* text, const uint8_t line)
 {
     uint8_t dispX;
     if (!_isLarge) {
@@ -96,7 +96,7 @@ void DisplayGraphicClass::printText(const char* text, uint8_t line)
     _display->drawStr(dispX, _lineOffsets[line], text);
 }
 
-void DisplayGraphicClass::setOrientation(uint8_t rotation)
+void DisplayGraphicClass::setOrientation(const uint8_t rotation)
 {
     if (_display_type == DisplayType_t::None) {
         return;
@@ -121,7 +121,7 @@ void DisplayGraphicClass::setOrientation(uint8_t rotation)
     calcLineHeights();
 }
 
-void DisplayGraphicClass::setLanguage(uint8_t language)
+void DisplayGraphicClass::setLanguage(const uint8_t language)
 {
     _display_language = language < sizeof(languages) / sizeof(languages[0]) ? language : DISPLAY_LANGUAGE;
 }
@@ -199,7 +199,7 @@ void DisplayGraphicClass::loop()
     _display->setPowerSave(displayPowerSave);
 }
 
-void DisplayGraphicClass::setContrast(uint8_t contrast)
+void DisplayGraphicClass::setContrast(const uint8_t contrast)
 {
     if (_display_type == DisplayType_t::None) {
         return;
@@ -207,7 +207,7 @@ void DisplayGraphicClass::setContrast(uint8_t contrast)
     _display->setContrast(contrast * 2.55f);
 }
 
-void DisplayGraphicClass::setStatus(bool turnOn)
+void DisplayGraphicClass::setStatus(const bool turnOn)
 {
     _displayTurnedOn = turnOn;
 }

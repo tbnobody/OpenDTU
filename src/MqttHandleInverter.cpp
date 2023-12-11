@@ -124,7 +124,7 @@ void MqttHandleInverterClass::loop()
     }
 }
 
-void MqttHandleInverterClass::publishField(std::shared_ptr<InverterAbstract> inv, ChannelType_t type, ChannelNum_t channel, FieldId_t fieldId)
+void MqttHandleInverterClass::publishField(std::shared_ptr<InverterAbstract> inv, const ChannelType_t type, const ChannelNum_t channel, const FieldId_t fieldId)
 {
     const String topic = getTopic(inv, type, channel, fieldId);
     if (topic == "") {
@@ -134,7 +134,7 @@ void MqttHandleInverterClass::publishField(std::shared_ptr<InverterAbstract> inv
     MqttSettings.publish(topic, inv->Statistics()->getChannelFieldValueString(type, channel, fieldId));
 }
 
-String MqttHandleInverterClass::getTopic(std::shared_ptr<InverterAbstract> inv, ChannelType_t type, ChannelNum_t channel, FieldId_t fieldId)
+String MqttHandleInverterClass::getTopic(std::shared_ptr<InverterAbstract> inv, const ChannelType_t type, const ChannelNum_t channel, const FieldId_t fieldId)
 {
     if (!inv->Statistics()->hasChannelFieldValue(type, channel, fieldId)) {
         return "";
@@ -159,7 +159,7 @@ String MqttHandleInverterClass::getTopic(std::shared_ptr<InverterAbstract> inv, 
     return inv->serialString() + "/" + chanNum + "/" + chanName;
 }
 
-void MqttHandleInverterClass::onMqttMessage(const espMqttClientTypes::MessageProperties& properties, const char* topic, const uint8_t* payload, size_t len, size_t index, size_t total)
+void MqttHandleInverterClass::onMqttMessage(const espMqttClientTypes::MessageProperties& properties, const char* topic, const uint8_t* payload, const size_t len, const size_t index, const size_t total)
 {
     const CONFIG_T& config = Configuration.get();
 

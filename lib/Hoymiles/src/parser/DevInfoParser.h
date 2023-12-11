@@ -8,16 +8,16 @@ class DevInfoParser : public Parser {
 public:
     DevInfoParser();
     void clearBufferAll();
-    void appendFragmentAll(uint8_t offset, uint8_t* payload, uint8_t len);
+    void appendFragmentAll(const uint8_t offset, const uint8_t* payload, const uint8_t len);
 
     void clearBufferSimple();
-    void appendFragmentSimple(uint8_t offset, uint8_t* payload, uint8_t len);
+    void appendFragmentSimple(const uint8_t offset, const uint8_t* payload, const uint8_t len);
 
     uint32_t getLastUpdateAll();
-    void setLastUpdateAll(uint32_t lastUpdate);
+    void setLastUpdateAll(const uint32_t lastUpdate);
 
     uint32_t getLastUpdateSimple();
-    void setLastUpdateSimple(uint32_t lastUpdate);
+    void setLastUpdateSimple(const uint32_t lastUpdate);
 
     uint16_t getFwBuildVersion();
     time_t getFwBuildDateTime();
@@ -32,7 +32,7 @@ public:
     bool containsValidData();
 
 private:
-    time_t timegm(struct tm* tm);
+    time_t timegm(const struct tm* tm);
     uint8_t getDevIdx();
 
     uint32_t _lastUpdateAll = 0;

@@ -129,7 +129,7 @@ void LedSingleClass::outputLoop()
     }
 }
 
-void LedSingleClass::setLed(uint8_t ledNo, bool ledState)
+void LedSingleClass::setLed(const uint8_t ledNo, const bool ledState)
 {
     const auto& pin = PinMapping.get();
     const auto& config = Configuration.get();

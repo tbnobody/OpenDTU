@@ -11,12 +11,12 @@ serial_u HoymilesRadio::DtuSerial()
     return _dtuSerial;
 }
 
-void HoymilesRadio::setDtuSerial(uint64_t serial)
+void HoymilesRadio::setDtuSerial(const uint64_t serial)
 {
     _dtuSerial.u64 = serial;
 }
 
-serial_u HoymilesRadio::convertSerialToRadioId(serial_u serial)
+serial_u HoymilesRadio::convertSerialToRadioId(const serial_u serial)
 {
     serial_u radioId;
     radioId.u64 = 0;
@@ -34,7 +34,7 @@ bool HoymilesRadio::checkFragmentCrc(const fragment_t* fragment)
     return (crc == fragment->fragment[fragment->len - 1]);
 }
 
-void HoymilesRadio::sendRetransmitPacket(uint8_t fragment_id)
+void HoymilesRadio::sendRetransmitPacket(const uint8_t fragment_id)
 {
     CommandAbstract* cmd = _commandQueue.front().get();
 
@@ -114,7 +114,7 @@ void HoymilesRadio::handleReceivedPackage()
     }
 }
 
-void HoymilesRadio::dumpBuf(const uint8_t buf[], uint8_t len, bool appendNewline)
+void HoymilesRadio::dumpBuf(const uint8_t buf[], const uint8_t len, const bool appendNewline)
 {
     for (uint8_t i = 0; i < len; i++) {
         Hoymiles.getMessageOutput()->printf("%02X ", buf[i]);

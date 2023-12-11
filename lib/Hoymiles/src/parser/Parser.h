@@ -18,7 +18,7 @@ class Parser {
 public:
     Parser();
     uint32_t getLastUpdate();
-    void setLastUpdate(uint32_t lastUpdate);
+    void setLastUpdate(const uint32_t lastUpdate);
 
     void beginAppendFragment();
     void endAppendFragment();

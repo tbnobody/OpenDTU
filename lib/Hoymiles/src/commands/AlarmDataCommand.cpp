@@ -23,7 +23,7 @@ ID   Target Addr   Source Addr   Idx  DT   ?    Time          Gap     AlarmId Pa
 #include "AlarmDataCommand.h"
 #include "inverters/InverterAbstract.h"
 
-AlarmDataCommand::AlarmDataCommand(uint64_t target_address, uint64_t router_address, time_t time)
+AlarmDataCommand::AlarmDataCommand(const uint64_t target_address, const uint64_t router_address, const time_t time)
     : MultiDataCommand(target_address, router_address)
 {
     setTime(time);
@@ -36,7 +36,7 @@ String AlarmDataCommand::getCommandName()
     return "AlarmData";
 }
 
-bool AlarmDataCommand::handleResponse(InverterAbstract* inverter, fragment_t fragment[], uint8_t max_fragment_id)
+bool AlarmDataCommand::handleResponse(InverterAbstract* inverter, const fragment_t fragment[], const uint8_t max_fragment_id)
 {
     // Check CRC of whole payload
     if (!MultiDataCommand::handleResponse(inverter, fragment, max_fragment_id)) {

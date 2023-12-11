@@ -21,7 +21,7 @@ ID   Target Addr   Source Addr   Idx  DT   ?    Time          Gap             Pa
 #include "DevInfoAllCommand.h"
 #include "inverters/InverterAbstract.h"
 
-DevInfoAllCommand::DevInfoAllCommand(uint64_t target_address, uint64_t router_address, time_t time)
+DevInfoAllCommand::DevInfoAllCommand(const uint64_t target_address, const uint64_t router_address, const time_t time)
     : MultiDataCommand(target_address, router_address)
 {
     setTime(time);
@@ -34,7 +34,7 @@ String DevInfoAllCommand::getCommandName()
     return "DevInfoAll";
 }
 
-bool DevInfoAllCommand::handleResponse(InverterAbstract* inverter, fragment_t fragment[], uint8_t max_fragment_id)
+bool DevInfoAllCommand::handleResponse(InverterAbstract* inverter, const fragment_t fragment[], const uint8_t max_fragment_id)
 {
     // Check CRC of whole payload
     if (!MultiDataCommand::handleResponse(inverter, fragment, max_fragment_id)) {

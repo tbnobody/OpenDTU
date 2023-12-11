@@ -19,7 +19,7 @@ private:
     void setLoop();
     void outputLoop();
 
-    void setLed(uint8_t ledNo, bool ledState);
+    void setLed(const uint8_t ledNo, const bool ledState);
 
     Task _setTask;
     Task _outputTask;

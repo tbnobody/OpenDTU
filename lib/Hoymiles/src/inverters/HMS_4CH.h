@@ -5,8 +5,8 @@
 
 class HMS_4CH : public HMS_Abstract {
 public:
-    explicit HMS_4CH(HoymilesRadio* radio, uint64_t serial);
-    static bool isValidSerial(uint64_t serial);
+    explicit HMS_4CH(HoymilesRadio* radio, const uint64_t serial);
+    static bool isValidSerial(const uint64_t serial);
     String typeName();
     const byteAssign_t* getByteAssignment();
     uint8_t getByteAssignmentSize();

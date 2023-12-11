@@ -105,35 +105,35 @@ class StatisticsParser : public Parser {
 public:
     StatisticsParser();
     void clearBuffer();
-    void appendFragment(uint8_t offset, uint8_t* payload, uint8_t len);
+    void appendFragment(const uint8_t offset, const uint8_t* payload, const uint8_t len);
     void endAppendFragment();
 
-    void setByteAssignment(const byteAssign_t* byteAssignment, uint8_t size);
+    void setByteAssignment(const byteAssign_t* byteAssignment, const uint8_t size);
 
     // Returns 1 based amount of expected bytes of statistic data
     uint8_t getExpectedByteCount();
 
-    const byteAssign_t* getAssignmentByChannelField(ChannelType_t type, ChannelNum_t channel, FieldId_t fieldId);
-    fieldSettings_t* getSettingByChannelField(ChannelType_t type, ChannelNum_t channel, FieldId_t fieldId);
+    const byteAssign_t* getAssignmentByChannelField(const ChannelType_t type, const ChannelNum_t channel, const FieldId_t fieldId);
+    fieldSettings_t* getSettingByChannelField(const ChannelType_t type, const ChannelNum_t channel, const FieldId_t fieldId);
 
-    float getChannelFieldValue(ChannelType_t type, ChannelNum_t channel, FieldId_t fieldId);
-    String getChannelFieldValueString(ChannelType_t type, ChannelNum_t channel, FieldId_t fieldId);
-    bool hasChannelFieldValue(ChannelType_t type, ChannelNum_t channel, FieldId_t fieldId);
-    const char* getChannelFieldUnit(ChannelType_t type, ChannelNum_t channel, FieldId_t fieldId);
-    const char* getChannelFieldName(ChannelType_t type, ChannelNum_t channel, FieldId_t fieldId);
-    uint8_t getChannelFieldDigits(ChannelType_t type, ChannelNum_t channel, FieldId_t fieldId);
+    float getChannelFieldValue(const ChannelType_t type, const ChannelNum_t channel, const FieldId_t fieldId);
+    String getChannelFieldValueString(const ChannelType_t type, const ChannelNum_t channel, const FieldId_t fieldId);
+    bool hasChannelFieldValue(const ChannelType_t type, const ChannelNum_t channel, const FieldId_t fieldId);
+    const char* getChannelFieldUnit(const ChannelType_t type, const ChannelNum_t channel, const FieldId_t fieldId);
+    const char* getChannelFieldName(const ChannelType_t type, const ChannelNum_t channel, const FieldId_t fieldId);
+    uint8_t getChannelFieldDigits(const ChannelType_t type, const ChannelNum_t channel, const FieldId_t fieldId);
 
-    bool setChannelFieldValue(ChannelType_t type, ChannelNum_t channel, FieldId_t fieldId, float value);
+    bool setChannelFieldValue(const ChannelType_t type, const ChannelNum_t channel, const FieldId_t fieldId, float value);
 
-    float getChannelFieldOffset(ChannelType_t type, ChannelNum_t channel, FieldId_t fieldId);
-    void setChannelFieldOffset(ChannelType_t type, ChannelNum_t channel, FieldId_t fieldId, float offset);
+    float getChannelFieldOffset(const ChannelType_t type, const ChannelNum_t channel, const FieldId_t fieldId);
+    void setChannelFieldOffset(const ChannelType_t type, const ChannelNum_t channel, const FieldId_t fieldId, const float offset);
 
     std::list<ChannelType_t> getChannelTypes();
-    const char* getChannelTypeName(ChannelType_t type);
-    std::list<ChannelNum_t> getChannelsByType(ChannelType_t type);
+    const char* getChannelTypeName(const ChannelType_t type);
+    std::list<ChannelNum_t> getChannelsByType(const ChannelType_t type);
 
-    uint16_t getStringMaxPower(uint8_t channel);
-    void setStringMaxPower(uint8_t channel, uint16_t power);
+    uint16_t getStringMaxPower(const uint8_t channel);
+    void setStringMaxPower(const uint8_t channel, const uint16_t power);
 
     void resetRxFailureCount();
     void incrementRxFailureCount();
@@ -144,14 +144,14 @@ public:
     void resetYieldDayCorrection();
 
     // Update time when new data from the inverter is received
-    void setLastUpdate(uint32_t lastUpdate);
+    void setLastUpdate(const uint32_t lastUpdate);
 
     // Update time when internal data structure changes (from inverter and by internal manipulation)
     uint32_t getLastUpdateFromInternal();
-    void setLastUpdateFromInternal(uint32_t lastUpdate);
+    void setLastUpdateFromInternal(const uint32_t lastUpdate);
 
     bool getYieldDayCorrection();
-    void setYieldDayCorrection(bool enabled);
+    void setYieldDayCorrection(const bool enabled);
 private:
     void zeroFields(const FieldId_t* fields);
 

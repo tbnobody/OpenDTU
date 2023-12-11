@@ -26,7 +26,7 @@ ID   Target Addr   Source Addr   Cmd  SCmd ?    CRC16   CRC8
 
 #define CRC_SIZE 2
 
-PowerControlCommand::PowerControlCommand(uint64_t target_address, uint64_t router_address)
+PowerControlCommand::PowerControlCommand(const uint64_t target_address, const uint64_t router_address)
     : DevControlCommand(target_address, router_address)
 {
     _payload[10] = 0x00; // TurnOn
@@ -44,7 +44,7 @@ String PowerControlCommand::getCommandName()
     return "PowerControl";
 }
 
-bool PowerControlCommand::handleResponse(InverterAbstract* inverter, fragment_t fragment[], uint8_t max_fragment_id)
+bool PowerControlCommand::handleResponse(InverterAbstract* inverter, const fragment_t fragment[], const uint8_t max_fragment_id)
 {
     if (!DevControlCommand::handleResponse(inverter, fragment, max_fragment_id)) {
         return false;
@@ -60,7 +60,7 @@ void PowerControlCommand::gotTimeout(InverterAbstract* inverter)
     inverter->PowerCommand()->setLastPowerCommandSuccess(CMD_NOK);
 }
 
-void PowerControlCommand::setPowerOn(bool state)
+void PowerControlCommand::setPowerOn(const bool state)
 {
     if (state) {
         _payload[10] = 0x00; // TurnOn

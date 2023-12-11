@@ -14,13 +14,13 @@ public:
     bool isSunsetAvailable();
     bool sunsetTime(struct tm* info);
     bool sunriseTime(struct tm* info);
-    void setDoRecalc(bool doRecalc);
+    void setDoRecalc(const bool doRecalc);
 
 private:
     void loop();
     void updateSunData();
     bool checkRecalcDayChanged();
-    bool getSunTime(struct tm* info, uint32_t offset);
+    bool getSunTime(struct tm* info, const uint32_t offset);
 
     Task _loopTask;
 

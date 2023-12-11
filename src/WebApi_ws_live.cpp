@@ -179,7 +179,7 @@ void WebApiWsLiveClass::generateJsonResponse(JsonVariant& root)
     }
 }
 
-void WebApiWsLiveClass::addField(JsonObject& root, uint8_t idx, std::shared_ptr<InverterAbstract> inv, ChannelType_t type, ChannelNum_t channel, FieldId_t fieldId, String topic)
+void WebApiWsLiveClass::addField(JsonObject& root, uint8_t idx, std::shared_ptr<InverterAbstract> inv, const ChannelType_t type, const ChannelNum_t channel, const FieldId_t fieldId, String topic)
 {
     if (inv->Statistics()->hasChannelFieldValue(type, channel, fieldId)) {
         String chanName;
@@ -196,7 +196,7 @@ void WebApiWsLiveClass::addField(JsonObject& root, uint8_t idx, std::shared_ptr<
     }
 }
 
-void WebApiWsLiveClass::addTotalField(JsonObject& root, const String& name, float value, const String& unit, uint8_t digits)
+void WebApiWsLiveClass::addTotalField(JsonObject& root, const String& name, const float value, const String& unit, const uint8_t digits)
 {
     root[name]["v"] = value;
     root[name]["u"] = unit;

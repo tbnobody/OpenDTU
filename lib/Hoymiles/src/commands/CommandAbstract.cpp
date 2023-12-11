@@ -30,7 +30,7 @@ Source Address: 80 12 23 04
 #include "crc.h"
 #include <string.h>
 
-CommandAbstract::CommandAbstract(uint64_t target_address, uint64_t router_address)
+CommandAbstract::CommandAbstract(const uint64_t target_address, const uint64_t router_address)
 {
     memset(_payload, 0, RF_LEN);
     _payload_size = 0;
@@ -61,7 +61,7 @@ uint8_t CommandAbstract::getDataSize()
     return _payload_size + 1; // Original payload plus crc8
 }
 
-void CommandAbstract::setTargetAddress(uint64_t address)
+void CommandAbstract::setTargetAddress(const uint64_t address)
 {
     convertSerialToPacketId(&_payload[1], address);
     _targetAddress = address;
@@ -71,7 +71,7 @@ uint64_t CommandAbstract::getTargetAddress()
     return _targetAddress;
 }
 
-void CommandAbstract::setRouterAddress(uint64_t address)
+void CommandAbstract::setRouterAddress(const uint64_t address)
 {
     convertSerialToPacketId(&_payload[5], address);
     _routerAddress = address;
@@ -82,7 +82,7 @@ uint64_t CommandAbstract::getRouterAddress()
     return _routerAddress;
 }
 
-void CommandAbstract::setTimeout(uint32_t timeout)
+void CommandAbstract::setTimeout(const uint32_t timeout)
 {
     _timeout = timeout;
 }
@@ -92,7 +92,7 @@ uint32_t CommandAbstract::getTimeout()
     return _timeout;
 }
 
-void CommandAbstract::setSendCount(uint8_t count)
+void CommandAbstract::setSendCount(const uint8_t count)
 {
     _sendCount = count;
 }
@@ -107,12 +107,12 @@ uint8_t CommandAbstract::incrementSendCount()
     return _sendCount++;
 }
 
-CommandAbstract* CommandAbstract::getRequestFrameCommand(uint8_t frame_no)
+CommandAbstract* CommandAbstract::getRequestFrameCommand(const uint8_t frame_no)
 {
     return nullptr;
 }
 
-void CommandAbstract::convertSerialToPacketId(uint8_t buffer[], uint64_t serial)
+void CommandAbstract::convertSerialToPacketId(uint8_t buffer[], const uint64_t serial)
 {
     serial_u s;
     s.u64 = serial;

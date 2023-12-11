@@ -30,7 +30,7 @@ class CommandAbstract;
 
 class InverterAbstract {
 public:
-    explicit InverterAbstract(HoymilesRadio* radio, uint64_t serial);
+    explicit InverterAbstract(HoymilesRadio* radio, const uint64_t serial);
     void init();
     uint64_t serial();
     const String& serialString();
@@ -43,32 +43,32 @@ public:
     bool isProducing();
     bool isReachable();
 
-    void setEnablePolling(bool enabled);
+    void setEnablePolling(const bool enabled);
     bool getEnablePolling();
 
-    void setEnableCommands(bool enabled);
+    void setEnableCommands(const bool enabled);
     bool getEnableCommands();
 
-    void setReachableThreshold(uint8_t threshold);
+    void setReachableThreshold(const uint8_t threshold);
     uint8_t getReachableThreshold();
 
-    void setZeroValuesIfUnreachable(bool enabled);
+    void setZeroValuesIfUnreachable(const bool enabled);
     bool getZeroValuesIfUnreachable();
 
-    void setZeroYieldDayOnMidnight(bool enabled);
+    void setZeroYieldDayOnMidnight(const bool enabled);
     bool getZeroYieldDayOnMidnight();
 
     void clearRxFragmentBuffer();
-    void addRxFragment(uint8_t fragment[], uint8_t len);
+    void addRxFragment(const uint8_t fragment[], const uint8_t len);
     uint8_t verifyAllFragments(CommandAbstract* cmd);
 
     virtual bool sendStatsRequest() = 0;
-    virtual bool sendAlarmLogRequest(bool force = false) = 0;
+    virtual bool sendAlarmLogRequest(const bool force = false) = 0;
     virtual bool sendDevInfoRequest() = 0;
     virtual bool sendSystemConfigParaRequest() = 0;
-    virtual bool sendActivePowerControlRequest(float limit, PowerLimitControlType type) = 0;
+    virtual bool sendActivePowerControlRequest(float limit, const PowerLimitControlType type) = 0;
     virtual bool resendActivePowerControlRequest() = 0;
-    virtual bool sendPowerControlRequest(bool turnOn) = 0;
+    virtual bool sendPowerControlRequest(const bool turnOn) = 0;
     virtual bool sendRestartControlRequest() = 0;
     virtual bool resendPowerControlRequest() = 0;
     virtual bool sendChangeChannelRequest();

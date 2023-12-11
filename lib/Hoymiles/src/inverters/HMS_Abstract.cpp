@@ -7,7 +7,7 @@
 #include "HoymilesRadio_CMT.h"
 #include "commands/ChannelChangeCommand.h"
 
-HMS_Abstract::HMS_Abstract(HoymilesRadio* radio, uint64_t serial)
+HMS_Abstract::HMS_Abstract(HoymilesRadio* radio, const uint64_t serial)
     : HM_Abstract(radio, serial)
 {
 }
