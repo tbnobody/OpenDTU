@@ -33,6 +33,6 @@ void MqttHandleDtuClass::loop()
     MqttSettings.publish("dtu/hostname", NetworkSettings.getHostname());
     if (NetworkSettings.NetworkMode() == network_mode::WiFi) {
         MqttSettings.publish("dtu/rssi", String(WiFi.RSSI()));
-        MqttSettings.publish("dtu/bssid", String(WiFi.BSSIDstr()));
+        MqttSettings.publish("dtu/bssid", WiFi.BSSIDstr());
     }
 }
