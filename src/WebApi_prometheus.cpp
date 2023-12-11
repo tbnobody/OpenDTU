@@ -102,7 +102,7 @@ void WebApiPrometheusClass::onPrometheusMetricsGet(AsyncWebServerRequest* reques
 void WebApiPrometheusClass::addField(AsyncResponseStream* stream, String& serial, uint8_t idx, std::shared_ptr<InverterAbstract> inv, ChannelType_t type, ChannelNum_t channel, FieldId_t fieldId, const char* metricName, const char* channelName)
 {
     if (inv->Statistics()->hasChannelFieldValue(type, channel, fieldId)) {
-        const char* chanName = (channelName == NULL) ? inv->Statistics()->getChannelFieldName(type, channel, fieldId) : channelName;
+        const char* chanName = (channelName == nullptr) ? inv->Statistics()->getChannelFieldName(type, channel, fieldId) : channelName;
         if (idx == 0 && type == TYPE_AC && channel == 0) {
             stream->printf("# HELP opendtu_%s in %s\n", chanName, inv->Statistics()->getChannelFieldUnit(type, channel, fieldId));
             stream->printf("# TYPE opendtu_%s %s\n", chanName, metricName);

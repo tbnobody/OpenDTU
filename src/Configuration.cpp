@@ -357,7 +357,7 @@ INVERTER_CONFIG_T* ConfigurationClass::getFreeInverterSlot()
         }
     }
 
-    return NULL;
+    return nullptr;
 }
 
 INVERTER_CONFIG_T* ConfigurationClass::getInverterConfig(uint64_t serial)
@@ -368,7 +368,7 @@ INVERTER_CONFIG_T* ConfigurationClass::getInverterConfig(uint64_t serial)
         }
     }
 
-    return NULL;
+    return nullptr;
 }
 
 ConfigurationClass Configuration;

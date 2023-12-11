@@ -21,7 +21,7 @@ private:
 
     Task _loopTask;
 
-    AsyncWebSocket* _ws = NULL;
+    AsyncWebSocket* _ws = nullptr;
     char _buffer[BUFFER_SIZE];
     uint16_t _buff_pos = 0;
     uint32_t _lastSend = 0;

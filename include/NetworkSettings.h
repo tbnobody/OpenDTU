@@ -30,7 +30,7 @@ typedef struct NetworkEventCbList {
     network_event event;
 
     NetworkEventCbList()
-        : cb(NULL)
+        : cb(nullptr)
         , event(network_event::NETWORK_UNKNOWN)
     {
     }
