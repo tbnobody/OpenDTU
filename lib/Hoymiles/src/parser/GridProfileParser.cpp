@@ -18,7 +18,7 @@ const std::array<const ProfileType_t, PROFILE_TYPE_COUNT> GridProfileParser::_pr
     { 0x37, 0x00, "Swiss - CH_NA EEA-NE7-CH2020" },
 } };
 
-constexpr frozen::map<uint8_t, frozen::string, 12> profile_section = {
+constexpr frozen::map<uint8_t, frozen::string, 12> profileSection = {
     { 0x00, "Voltage (H/LVRT)" },
     { 0x10, "Frequency (H/LFRT)" },
     { 0x20, "Island Detection (ID)" },
@@ -33,19 +33,19 @@ constexpr frozen::map<uint8_t, frozen::string, 12> profile_section = {
     { 0xB0, "Watt Power Factor (WPF)" },
 };
 
-struct GridProfilePartialValue_t {
+struct GridProfileItemDefinition_t {
     frozen::string Name;
     frozen::string Unit;
     uint8_t Dividor;
 };
 
-constexpr GridProfilePartialValue_t make_value(frozen::string Name, frozen::string Unit, uint8_t divisor)
+constexpr GridProfileItemDefinition_t make_value(frozen::string Name, frozen::string Unit, uint8_t divisor)
 {
-    GridProfilePartialValue_t v = { Name, Unit, divisor };
+    GridProfileItemDefinition_t v = { Name, Unit, divisor };
     return v;
 }
 
-constexpr frozen::map<uint8_t, GridProfilePartialValue_t, 0x38> value_names = {
+constexpr frozen::map<uint8_t, GridProfileItemDefinition_t, 0x38> itemDefinitions = {
     { 0x01, make_value("Nominale Voltage (NV)", "V", 10) },
     { 0x02, make_value("Low Voltage 1 (LV1)", "V", 10) },
     { 0x03, make_value("LV1 Maximum Trip Time (MTT)", "s", 10) },
@@ -104,7 +104,7 @@ constexpr frozen::map<uint8_t, GridProfilePartialValue_t, 0x38> value_names = {
     { 0x38, make_value("Power Factor ar Rated Power (PFRP)", "", 100) },
 };
 
-const std::array<const GridProfileValue_t, SECTION_VALUE_COUNT> GridProfileParser::_profile_values = { {
+const std::array<const GridProfileValue_t, SECTION_VALUE_COUNT> GridProfileParser::_profileValues = { {
     // Voltage (H/LVRT)
     // Version 0x00
     { 0x00, 0x00, 0x01 },
@@ -342,21 +342,21 @@ std::list<GridProfileSection_t> GridProfileParser::getProfile()
 
             GridProfileSection_t section;
             try {
-                section.SectionName = profile_section.at(section_id).data();
+                section.SectionName = profileSection.at(section_id).data();
             } catch (const std::out_of_range&) {
                 section.SectionName = "Unknown";
                 break;
             }
 
             for (uint8_t val_id = 0; val_id < section_size; val_id++) {
-                auto value_setting = value_names.at(_profile_values[section_start + val_id].Type);
+                auto itemDefinition = itemDefinitions.at(_profileValues[section_start + val_id].ItemDefinition);
 
                 float value = (_payloadGridProfile[pos] << 8) | _payloadGridProfile[pos + 1];
-                value /= value_setting.Dividor;
+                value /= itemDefinition.Dividor;
 
                 GridProfileItem_t v;
-                v.Name = value_setting.Name.data();
-                v.Unit = value_setting.Unit.data();
+                v.Name = itemDefinition.Name.data();
+                v.Unit = itemDefinition.Unit.data();
                 v.Value = value;
                 section.items.push_back(v);
 
@@ -374,7 +374,7 @@ std::list<GridProfileSection_t> GridProfileParser::getProfile()
 uint8_t GridProfileParser::getSectionSize(uint8_t section_id, uint8_t section_version)
 {
     uint8_t count = 0;
-    for (auto& values : _profile_values) {
+    for (auto& values : _profileValues) {
         if (values.Section == section_id && values.Version == section_version) {
             count++;
         }
@@ -385,7 +385,7 @@ uint8_t GridProfileParser::getSectionSize(uint8_t section_id, uint8_t section_ve
 int8_t GridProfileParser::getSectionStart(uint8_t section_id, uint8_t section_version)
 {
     uint8_t count = -1;
-    for (auto& values : _profile_values) {
+    for (auto& values : _profileValues) {
         count++;
         if (values.Section == section_id && values.Version == section_version) {
             break;

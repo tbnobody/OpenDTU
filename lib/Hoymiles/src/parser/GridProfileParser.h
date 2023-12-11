@@ -16,7 +16,7 @@ typedef struct {
 struct GridProfileValue_t {
     uint8_t Section;
     uint8_t Version;
-    uint8_t Type;
+    uint8_t ItemDefinition;
 };
 
 struct GridProfileItem_t {
@@ -51,5 +51,5 @@ private:
     uint8_t _gridProfileLength = 0;
 
     static const std::array<const ProfileType_t, PROFILE_TYPE_COUNT> _profileTypes;
-    static const std::array<const GridProfileValue_t, SECTION_VALUE_COUNT> _profile_values;
+    static const std::array<const GridProfileValue_t, SECTION_VALUE_COUNT> _profileValues;
 };
