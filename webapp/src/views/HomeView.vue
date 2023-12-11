@@ -189,7 +189,7 @@
                         </div>
                     </div>
 
-                    <GridProfile v-if="!gridProfileLoading" :gridProfileList="gridProfileList" />
+                    <GridProfile v-if="!gridProfileLoading" :gridProfileList="gridProfileList" :gridProfileRawList="gridProfileRawList" />
                 </div>
 
                 <div class="modal-footer">
@@ -361,6 +361,7 @@ import InverterTotalInfo from '@/components/InverterTotalInfo.vue';
 import type { DevInfoStatus } from '@/types/DevInfoStatus';
 import type { EventlogItems } from '@/types/EventlogStatus';
 import type { GridProfileStatus } from '@/types/GridProfileStatus';
+import type { GridProfileRawdata } from '@/types/GridProfileRawdata';
 import type { LimitConfig } from '@/types/LimitConfig';
 import type { LimitStatus } from '@/types/LimitStatus';
 import type { Inverter, LiveData } from '@/types/LiveDataStatus';
@@ -421,6 +422,7 @@ export default defineComponent({
             devInfoLoading: true,
             gridProfileView: {} as bootstrap.Modal,
             gridProfileList: {} as GridProfileStatus,
+            gridProfileRawList: {} as GridProfileRawdata,
             gridProfileLoading: true,
 
             limitSettingView: {} as bootstrap.Modal,
@@ -613,7 +615,13 @@ export default defineComponent({
                 .then((response) => handleResponse(response, this.$emitter, this.$router))
                 .then((data) => {
                     this.gridProfileList = data;
-                    this.gridProfileLoading = false;
+
+                    fetch("/api/gridprofile/rawdata?inv=" + serial, { headers: authHeader() })
+                    .then((response) => handleResponse(response, this.$emitter, this.$router))
+                    .then((data) => {
+                        this.gridProfileRawList = data;
+                        this.gridProfileLoading = false;
+                    })
                 });
 
             this.gridProfileView.show();

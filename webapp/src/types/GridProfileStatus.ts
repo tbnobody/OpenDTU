@@ -1,5 +1,16 @@
+export interface GridProfileValue {
+    n: string;
+    u: string;
+    v: number;
+}
+
+export interface GridProfileSection {
+    name: string;
+    items: Array<GridProfileValue>;
+}
+
 export interface GridProfileStatus {
-    raw: Array<number>;
-    name: String;
-    version: String;
+    name: string;
+    version: string;
+    sections: Array<GridProfileSection>;
 }

@@ -157,6 +157,8 @@
         "NoInfoLong": "@:devinfo.NoInfoLong",
         "Name": "Name",
         "Version": "Version",
+        "Enabled": "@:wifistationinfo.Enabled",
+        "Disabled": "@:wifistationinfo.Disabled",
         "GridprofileSupport": "Support the development",
         "GridprofileSupportLong": "Please see <a href=\"https://github.com/tbnobody/OpenDTU/wiki/Grid-Profile-Parser\" target=\"_blank\">here</a> for further information."
     },
