@@ -33,10 +33,8 @@ private:
 
     void createMqttClientObject();
 
-    MqttClient* mqttClient = nullptr;
-    String clientId;
-    String willTopic;
-    Ticker mqttReconnectTimer;
+    MqttClient* _mqttClient = nullptr;
+    Ticker _mqttReconnectTimer;
     MqttSubscribeParser _mqttSubscribeParser;
     std::mutex _clientLock;
 };
