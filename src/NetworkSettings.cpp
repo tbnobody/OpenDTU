@@ -12,10 +12,10 @@
 #include <ETH.h>
 
 NetworkSettingsClass::NetworkSettingsClass()
-    : apIp(192, 168, 4, 1)
-    , apNetmask(255, 255, 255, 0)
+    : _apIp(192, 168, 4, 1)
+    , _apNetmask(255, 255, 255, 0)
 {
-    dnsServer.reset(new DNSServer());
+    _dnsServer.reset(new DNSServer());
 }
 
 void NetworkSettingsClass::init(Scheduler& scheduler)
@@ -120,11 +120,11 @@ void NetworkSettingsClass::handleMDNS()
 {
     const bool mdnsEnabled = Configuration.get().Mdns.Enabled;
 
-    if (lastMdnsEnabled == mdnsEnabled) {
+    if (_lastMdnsEnabled == mdnsEnabled) {
         return;
     }
 
-    lastMdnsEnabled = mdnsEnabled;
+    _lastMdnsEnabled = mdnsEnabled;
 
     MDNS.end();
 
@@ -147,17 +147,17 @@ void NetworkSettingsClass::handleMDNS()
 
 void NetworkSettingsClass::setupMode()
 {
-    if (adminEnabled) {
+    if (_adminEnabled) {
         WiFi.mode(WIFI_AP_STA);
         String ssidString = getApName();
-        WiFi.softAPConfig(apIp, apIp, apNetmask);
+        WiFi.softAPConfig(_apIp, _apIp, _apNetmask);
         WiFi.softAP(ssidString.c_str(), Configuration.get().Security.Password);
-        dnsServer->setErrorReplyCode(DNSReplyCode::NoError);
-        dnsServer->start(DNS_PORT, "*", WiFi.softAPIP());
-        dnsServerStatus = true;
+        _dnsServer->setErrorReplyCode(DNSReplyCode::NoError);
+        _dnsServer->start(DNS_PORT, "*", WiFi.softAPIP());
+        _dnsServerStatus = true;
     } else {
-        dnsServerStatus = false;
-        dnsServer->stop();
+        _dnsServerStatus = false;
+        _dnsServer->stop();
         if (_networkMode == network_mode::WiFi) {
             WiFi.mode(WIFI_STA);
         } else {
@@ -173,9 +173,9 @@ void NetworkSettingsClass::setupMode()
 
 void NetworkSettingsClass::enableAdminMode()
 {
-    adminEnabled = true;
-    adminTimeoutCounter = 0;
-    adminTimeoutCounterMax = Configuration.get().WiFi.ApTimeout * 60;
+    _adminEnabled = true;
+    _adminTimeoutCounter = 0;
+    _adminTimeoutCounterMax = Configuration.get().WiFi.ApTimeout * 60;
     setupMode();
 }
 
@@ -203,26 +203,26 @@ void NetworkSettingsClass::loop()
         applyConfig();
     }
 
-    if (millis() - lastTimerCall > 1000) {
-        if (adminEnabled && adminTimeoutCounterMax > 0) {
-            adminTimeoutCounter++;
-            if (adminTimeoutCounter % 10 == 0) {
-                MessageOutput.printf("Admin AP remaining seconds: %d / %d\r\n", adminTimeoutCounter, adminTimeoutCounterMax);
+    if (millis() - _lastTimerCall > 1000) {
+        if (_adminEnabled && _adminTimeoutCounterMax > 0) {
+            _adminTimeoutCounter++;
+            if (_adminTimeoutCounter % 10 == 0) {
+                MessageOutput.printf("Admin AP remaining seconds: %d / %d\r\n", _adminTimeoutCounter, _adminTimeoutCounterMax);
             }
         }
-        connectTimeoutTimer++;
-        connectRedoTimer++;
-        lastTimerCall = millis();
+        _connectTimeoutTimer++;
+        _connectRedoTimer++;
+        _lastTimerCall = millis();
     }
-    if (adminEnabled) {
+    if (_adminEnabled) {
         // Don't disable the admin mode when network is not available
         if (!isConnected()) {
-            adminTimeoutCounter = 0;
+            _adminTimeoutCounter = 0;
         }
         // If WiFi is connected to AP for more than adminTimeoutCounterMax
         // seconds, disable the internal Access Point
-        if (adminTimeoutCounter > adminTimeoutCounterMax) {
-            adminEnabled = false;
+        if (_adminTimeoutCounter > _adminTimeoutCounterMax) {
+            _adminEnabled = false;
             MessageOutput.println("Admin mode disabled");
             setupMode();
         }
@@ -230,28 +230,28 @@ void NetworkSettingsClass::loop()
         // WiFi is searching for an AP. So disable searching afer
         // WIFI_RECONNECT_TIMEOUT and repeat after WIFI_RECONNECT_REDO_TIMEOUT
         if (isConnected()) {
-            connectTimeoutTimer = 0;
-            connectRedoTimer = 0;
+            _connectTimeoutTimer = 0;
+            _connectRedoTimer = 0;
         } else {
-            if (connectTimeoutTimer > WIFI_RECONNECT_TIMEOUT && !forceDisconnection) {
+            if (_connectTimeoutTimer > WIFI_RECONNECT_TIMEOUT && !_forceDisconnection) {
                 MessageOutput.print("Disable search for AP... ");
                 WiFi.mode(WIFI_AP);
                 MessageOutput.println("done");
-                connectRedoTimer = 0;
-                forceDisconnection = true;
+                _connectRedoTimer = 0;
+                _forceDisconnection = true;
             }
-            if (connectRedoTimer > WIFI_RECONNECT_REDO_TIMEOUT && forceDisconnection) {
+            if (_connectRedoTimer > WIFI_RECONNECT_REDO_TIMEOUT && _forceDisconnection) {
                 MessageOutput.print("Enable search for AP... ");
                 WiFi.mode(WIFI_AP_STA);
                 MessageOutput.println("done");
                 applyConfig();
-                connectTimeoutTimer = 0;
-                forceDisconnection = false;
+                _connectTimeoutTimer = 0;
+                _forceDisconnection = false;
             }
         }
     }
-    if (dnsServerStatus) {
-        dnsServer->processNextRequest();
+    if (_dnsServerStatus) {
+        _dnsServer->processNextRequest();
     }
 
     handleMDNS();

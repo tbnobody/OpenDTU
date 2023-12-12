@@ -66,22 +66,23 @@ private:
 
     Task _loopTask;
 
-    bool adminEnabled = true;
-    bool forceDisconnection = false;
-    uint32_t adminTimeoutCounter = 0;
-    uint32_t adminTimeoutCounterMax = 0;
-    uint32_t connectTimeoutTimer = 0;
-    uint32_t connectRedoTimer = 0;
-    uint32_t lastTimerCall = 0;
-    const byte DNS_PORT = 53;
-    IPAddress apIp;
-    IPAddress apNetmask;
-    std::unique_ptr<DNSServer> dnsServer;
-    bool dnsServerStatus = false;
+    static constexpr byte DNS_PORT = 53;
+
+    bool _adminEnabled = true;
+    bool _forceDisconnection = false;
+    uint32_t _adminTimeoutCounter = 0;
+    uint32_t _adminTimeoutCounterMax = 0;
+    uint32_t _connectTimeoutTimer = 0;
+    uint32_t _connectRedoTimer = 0;
+    uint32_t _lastTimerCall = 0;
+    IPAddress _apIp;
+    IPAddress _apNetmask;
+    std::unique_ptr<DNSServer> _dnsServer;
+    bool _dnsServerStatus = false;
     network_mode _networkMode = network_mode::Undefined;
     bool _ethConnected = false;
     std::vector<NetworkEventCbList_t> _cbEventList;
-    bool lastMdnsEnabled = false;
+    bool _lastMdnsEnabled = false;
 };
 
 extern NetworkSettingsClass NetworkSettings;
