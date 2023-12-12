@@ -82,17 +82,17 @@ bool HMT_6CH::isValidSerial(const uint64_t serial)
     return preSerial == 0x1382;
 }
 
-String HMT_6CH::typeName()
+String HMT_6CH::typeName() const
 {
     return F("HMT-1800/2250-6T");
 }
 
-const byteAssign_t* HMT_6CH::getByteAssignment()
+const byteAssign_t* HMT_6CH::getByteAssignment() const
 {
     return byteAssignment;
 }
 
-uint8_t HMT_6CH::getByteAssignmentSize()
+uint8_t HMT_6CH::getByteAssignmentSize() const
 {
     return sizeof(byteAssignment) / sizeof(byteAssignment[0]);
 }

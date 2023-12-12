@@ -51,17 +51,17 @@ bool HM_1CH::isValidSerial(const uint64_t serial)
     return false;
 }
 
-String HM_1CH::typeName()
+String HM_1CH::typeName() const
 {
     return "HM-300/350/400-1T";
 }
 
-const byteAssign_t* HM_1CH::getByteAssignment()
+const byteAssign_t* HM_1CH::getByteAssignment() const
 {
     return byteAssignment;
 }
 
-uint8_t HM_1CH::getByteAssignmentSize()
+uint8_t HM_1CH::getByteAssignmentSize() const
 {
     return sizeof(byteAssignment) / sizeof(byteAssignment[0]);
 }

@@ -55,7 +55,7 @@ void MultiDataCommand::setDataType(const uint8_t data_type)
     _payload[10] = data_type;
     udpateCRC();
 }
-uint8_t MultiDataCommand::getDataType()
+uint8_t MultiDataCommand::getDataType() const
 {
     return _payload[10];
 }
@@ -69,7 +69,7 @@ void MultiDataCommand::setTime(const time_t time)
     udpateCRC();
 }
 
-time_t MultiDataCommand::getTime()
+time_t MultiDataCommand::getTime() const
 {
     return (time_t)(_payload[12] << 24)
         | (time_t)(_payload[13] << 16)

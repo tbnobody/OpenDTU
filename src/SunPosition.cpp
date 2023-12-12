@@ -29,7 +29,7 @@ void SunPositionClass::loop()
     }
 }
 
-bool SunPositionClass::isDayPeriod()
+bool SunPositionClass::isDayPeriod() const
 {
     if (!_isValidInfo) {
         return true;
@@ -41,7 +41,7 @@ bool SunPositionClass::isDayPeriod()
     return (minutesPastMidnight >= _sunriseMinutes) && (minutesPastMidnight < _sunsetMinutes);
 }
 
-bool SunPositionClass::isSunsetAvailable()
+bool SunPositionClass::isSunsetAvailable() const
 {
     return _isSunsetAvailable;
 }
@@ -51,7 +51,7 @@ void SunPositionClass::setDoRecalc(const bool doRecalc)
     _doRecalc = doRecalc;
 }
 
-bool SunPositionClass::checkRecalcDayChanged()
+bool SunPositionClass::checkRecalcDayChanged() const
 {
     time_t now;
     struct tm timeinfo;
@@ -124,7 +124,7 @@ void SunPositionClass::updateSunData()
     _isValidInfo = true;
 }
 
-bool SunPositionClass::getSunTime(struct tm* info, const uint32_t offset)
+bool SunPositionClass::getSunTime(struct tm* info, const uint32_t offset) const
 {
     // Get today's date
     time_t aTime = time(NULL);
@@ -142,12 +142,12 @@ bool SunPositionClass::getSunTime(struct tm* info, const uint32_t offset)
     return _isValidInfo;
 }
 
-bool SunPositionClass::sunsetTime(struct tm* info)
+bool SunPositionClass::sunsetTime(struct tm* info) const
 {
     return getSunTime(info, _sunsetMinutes);
 }
 
-bool SunPositionClass::sunriseTime(struct tm* info)
+bool SunPositionClass::sunriseTime(struct tm* info) const
 {
     return getSunTime(info, _sunriseMinutes);
 }

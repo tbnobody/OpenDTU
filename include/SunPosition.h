@@ -10,17 +10,17 @@ public:
     SunPositionClass();
     void init(Scheduler* scheduler);
 
-    bool isDayPeriod();
-    bool isSunsetAvailable();
-    bool sunsetTime(struct tm* info);
-    bool sunriseTime(struct tm* info);
+    bool isDayPeriod() const;
+    bool isSunsetAvailable() const;
+    bool sunsetTime(struct tm* info) const;
+    bool sunriseTime(struct tm* info) const;
     void setDoRecalc(const bool doRecalc);
 
 private:
     void loop();
     void updateSunData();
-    bool checkRecalcDayChanged();
-    bool getSunTime(struct tm* info, const uint32_t offset);
+    bool checkRecalcDayChanged() const;
+    bool getSunTime(struct tm* info, const uint32_t offset) const;
 
     Task _loopTask;
 

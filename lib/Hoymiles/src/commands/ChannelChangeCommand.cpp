@@ -32,7 +32,7 @@ ChannelChangeCommand::ChannelChangeCommand(const uint64_t target_address, const 
     setTimeout(10);
 }
 
-String ChannelChangeCommand::getCommandName()
+String ChannelChangeCommand::getCommandName() const
 {
     return "ChannelChangeCommand";
 }
@@ -42,7 +42,7 @@ void ChannelChangeCommand::setChannel(const uint8_t channel)
     _payload[12] = channel;
 }
 
-uint8_t ChannelChangeCommand::getChannel()
+uint8_t ChannelChangeCommand::getChannel() const
 {
     return _payload[12];
 }

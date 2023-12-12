@@ -232,7 +232,7 @@ void HoymilesClass::removeInverterBySerial(const uint64_t serial)
     }
 }
 
-size_t HoymilesClass::getNumInverters()
+size_t HoymilesClass::getNumInverters() const
 {
     return _inverters.size();
 }
@@ -247,12 +247,12 @@ HoymilesRadio_CMT* HoymilesClass::getRadioCmt()
     return _radioCmt.get();
 }
 
-bool HoymilesClass::isAllRadioIdle()
+bool HoymilesClass::isAllRadioIdle() const
 {
     return _radioNrf.get()->isIdle() && _radioCmt.get()->isIdle();
 }
 
-uint32_t HoymilesClass::PollInterval()
+uint32_t HoymilesClass::PollInterval() const
 {
     return _pollInterval;
 }

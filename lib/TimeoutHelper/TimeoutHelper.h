@@ -9,7 +9,7 @@ public:
     void set(const uint32_t ms);
     void extend(const uint32_t ms);
     void reset();
-    bool occured();
+    bool occured() const;
 
 private:
     uint32_t startMillis;

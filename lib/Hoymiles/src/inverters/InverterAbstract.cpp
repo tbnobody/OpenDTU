@@ -35,12 +35,12 @@ void InverterAbstract::init()
     _statisticsParser.get()->setByteAssignment(getByteAssignment(), getByteAssignmentSize());
 }
 
-uint64_t InverterAbstract::serial()
+uint64_t InverterAbstract::serial() const
 {
     return _serial.u64;
 }
 
-const String& InverterAbstract::serialString()
+const String& InverterAbstract::serialString() const
 {
     return _serialString;
 }
@@ -55,7 +55,7 @@ void InverterAbstract::setName(const char* name)
     _name[len] = '\0';
 }
 
-const char* InverterAbstract::name()
+const char* InverterAbstract::name() const
 {
     return _name;
 }
@@ -82,7 +82,7 @@ void InverterAbstract::setEnablePolling(const bool enabled)
     _enablePolling = enabled;
 }
 
-bool InverterAbstract::getEnablePolling()
+bool InverterAbstract::getEnablePolling() const
 {
     return _enablePolling;
 }
@@ -92,7 +92,7 @@ void InverterAbstract::setEnableCommands(const bool enabled)
     _enableCommands = enabled;
 }
 
-bool InverterAbstract::getEnableCommands()
+bool InverterAbstract::getEnableCommands() const
 {
     return _enableCommands;
 }
@@ -102,7 +102,7 @@ void InverterAbstract::setReachableThreshold(const uint8_t threshold)
     _reachableThreshold = threshold;
 }
 
-uint8_t InverterAbstract::getReachableThreshold()
+uint8_t InverterAbstract::getReachableThreshold() const
 {
     return _reachableThreshold;
 }
@@ -112,7 +112,7 @@ void InverterAbstract::setZeroValuesIfUnreachable(const bool enabled)
     _zeroValuesIfUnreachable = enabled;
 }
 
-bool InverterAbstract::getZeroValuesIfUnreachable()
+bool InverterAbstract::getZeroValuesIfUnreachable() const
 {
     return _zeroValuesIfUnreachable;
 }
@@ -122,7 +122,7 @@ void InverterAbstract::setZeroYieldDayOnMidnight(const bool enabled)
     _zeroYieldDayOnMidnight = enabled;
 }
 
-bool InverterAbstract::getZeroYieldDayOnMidnight()
+bool InverterAbstract::getZeroYieldDayOnMidnight() const
 {
     return _zeroYieldDayOnMidnight;
 }

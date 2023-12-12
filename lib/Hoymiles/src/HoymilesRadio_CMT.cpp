@@ -178,12 +178,12 @@ void HoymilesRadio_CMT::setInverterTargetFrequency(const uint32_t frequency)
     cmtSwitchDtuFreq(_inverterTargetFrequency);
 }
 
-uint32_t HoymilesRadio_CMT::getInverterTargetFrequency()
+uint32_t HoymilesRadio_CMT::getInverterTargetFrequency() const
 {
     return _inverterTargetFrequency;
 }
 
-bool HoymilesRadio_CMT::isConnected()
+bool HoymilesRadio_CMT::isConnected() const
 {
     if (!_isInitialized) {
         return false;

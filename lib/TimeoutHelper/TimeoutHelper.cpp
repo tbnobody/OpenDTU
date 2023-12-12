@@ -27,7 +27,7 @@ void TimeoutHelper::reset()
     startMillis = millis();
 }
 
-bool TimeoutHelper::occured()
+bool TimeoutHelper::occured() const
 {
     return millis() > (startMillis + timeout);
 }

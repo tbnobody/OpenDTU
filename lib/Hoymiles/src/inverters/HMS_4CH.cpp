@@ -59,17 +59,17 @@ bool HMS_4CH::isValidSerial(const uint64_t serial)
     return preSerial == 0x1164;
 }
 
-String HMS_4CH::typeName()
+String HMS_4CH::typeName() const
 {
     return "HMS-1600/1800/2000-4T";
 }
 
-const byteAssign_t* HMS_4CH::getByteAssignment()
+const byteAssign_t* HMS_4CH::getByteAssignment() const
 {
     return byteAssignment;
 }
 
-uint8_t HMS_4CH::getByteAssignmentSize()
+uint8_t HMS_4CH::getByteAssignmentSize() const
 {
     return sizeof(byteAssignment) / sizeof(byteAssignment[0]);
 }

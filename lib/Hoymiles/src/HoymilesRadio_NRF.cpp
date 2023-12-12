@@ -115,7 +115,7 @@ void HoymilesRadio_NRF::setDtuSerial(const uint64_t serial)
     openReadingPipe();
 }
 
-bool HoymilesRadio_NRF::isConnected()
+bool HoymilesRadio_NRF::isConnected() const
 {
     if (!_isInitialized) {
         return false;
@@ -123,7 +123,7 @@ bool HoymilesRadio_NRF::isConnected()
     return _radio->isChipConnected();
 }
 
-bool HoymilesRadio_NRF::isPVariant()
+bool HoymilesRadio_NRF::isPVariant() const
 {
     if (!_isInitialized) {
         return false;

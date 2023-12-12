@@ -17,7 +17,7 @@ typedef enum {
 class Parser {
 public:
     Parser();
-    uint32_t getLastUpdate();
+    uint32_t getLastUpdate() const;
     void setLastUpdate(const uint32_t lastUpdate);
 
     void beginAppendFragment();

@@ -29,7 +29,7 @@ DevInfoAllCommand::DevInfoAllCommand(const uint64_t target_address, const uint64
     setTimeout(200);
 }
 
-String DevInfoAllCommand::getCommandName()
+String DevInfoAllCommand::getCommandName() const
 {
     return "DevInfoAll";
 }

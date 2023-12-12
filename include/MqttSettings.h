@@ -19,7 +19,7 @@ public:
     void subscribe(const String& topic, const uint8_t qos, const espMqttClientTypes::OnMessageCallback& cb);
     void unsubscribe(const String& topic);
 
-    String getPrefix();
+    String getPrefix() const;
 
 private:
     void NetworkEvent(network_event event);

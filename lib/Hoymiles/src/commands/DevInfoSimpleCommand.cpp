@@ -29,7 +29,7 @@ DevInfoSimpleCommand::DevInfoSimpleCommand(const uint64_t target_address, const 
     setTimeout(200);
 }
 
-String DevInfoSimpleCommand::getCommandName()
+String DevInfoSimpleCommand::getCommandName() const
 {
     return "DevInfoSimple";
 }

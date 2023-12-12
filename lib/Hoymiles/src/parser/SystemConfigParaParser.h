@@ -10,21 +10,21 @@ public:
     void clearBuffer();
     void appendFragment(const uint8_t offset, const uint8_t* payload, const uint8_t len);
 
-    float getLimitPercent();
+    float getLimitPercent() const;
     void setLimitPercent(const float value);
 
     void setLastLimitCommandSuccess(const LastCommandSuccess status);
-    LastCommandSuccess getLastLimitCommandSuccess();
-    uint32_t getLastUpdateCommand();
+    LastCommandSuccess getLastLimitCommandSuccess() const;
+    uint32_t getLastUpdateCommand() const;
     void setLastUpdateCommand(const uint32_t lastUpdate);
 
     void setLastLimitRequestSuccess(const LastCommandSuccess status);
-    LastCommandSuccess getLastLimitRequestSuccess();
-    uint32_t getLastUpdateRequest();
+    LastCommandSuccess getLastLimitRequestSuccess() const;
+    uint32_t getLastUpdateRequest() const;
     void setLastUpdateRequest(const uint32_t lastUpdate);
 
     // Returns 1 based amount of expected bytes of data
-    uint8_t getExpectedByteCount();
+    uint8_t getExpectedByteCount() const;
 
 private:
     uint8_t _payload[SYSTEM_CONFIG_PARA_SIZE];

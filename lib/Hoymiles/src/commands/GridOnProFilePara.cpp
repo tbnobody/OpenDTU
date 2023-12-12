@@ -30,7 +30,7 @@ GridOnProFilePara::GridOnProFilePara(const uint64_t target_address, const uint64
     setTimeout(500);
 }
 
-String GridOnProFilePara::getCommandName()
+String GridOnProFilePara::getCommandName() const
 {
     return "GridOnProFilePara";
 }

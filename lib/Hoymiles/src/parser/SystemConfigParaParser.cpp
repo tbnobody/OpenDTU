@@ -28,7 +28,7 @@ void SystemConfigParaParser::appendFragment(const uint8_t offset, const uint8_t*
     _payloadLength += len;
 }
 
-float SystemConfigParaParser::getLimitPercent()
+float SystemConfigParaParser::getLimitPercent() const
 {
     HOY_SEMAPHORE_TAKE();
     const float ret = ((((uint16_t)_payload[2]) << 8) | _payload[3]) / 10.0;
@@ -49,12 +49,12 @@ void SystemConfigParaParser::setLastLimitCommandSuccess(const LastCommandSuccess
     _lastLimitCommandSuccess = status;
 }
 
-LastCommandSuccess SystemConfigParaParser::getLastLimitCommandSuccess()
+LastCommandSuccess SystemConfigParaParser::getLastLimitCommandSuccess() const
 {
     return _lastLimitCommandSuccess;
 }
 
-uint32_t SystemConfigParaParser::getLastUpdateCommand()
+uint32_t SystemConfigParaParser::getLastUpdateCommand() const
 {
     return _lastUpdateCommand;
 }
@@ -70,12 +70,12 @@ void SystemConfigParaParser::setLastLimitRequestSuccess(const LastCommandSuccess
     _lastLimitRequestSuccess = status;
 }
 
-LastCommandSuccess SystemConfigParaParser::getLastLimitRequestSuccess()
+LastCommandSuccess SystemConfigParaParser::getLastLimitRequestSuccess() const
 {
     return _lastLimitRequestSuccess;
 }
 
-uint32_t SystemConfigParaParser::getLastUpdateRequest()
+uint32_t SystemConfigParaParser::getLastUpdateRequest() const
 {
     return _lastUpdateRequest;
 }
@@ -86,7 +86,7 @@ void SystemConfigParaParser::setLastUpdateRequest(const uint32_t lastUpdate)
     setLastUpdate(lastUpdate);
 }
 
-uint8_t SystemConfigParaParser::getExpectedByteCount()
+uint8_t SystemConfigParaParser::getExpectedByteCount() const
 {
     return SYSTEM_CONFIG_PARA_SIZE;
 }

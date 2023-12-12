@@ -175,7 +175,7 @@ bool MqttSettingsClass::getConnected()
     return mqttClient->connected();
 }
 
-String MqttSettingsClass::getPrefix()
+String MqttSettingsClass::getPrefix() const
 {
     return Configuration.get().Mqtt.Topic;
 }

@@ -121,7 +121,7 @@ void StatisticsParser::endAppendFragment()
     }
 }
 
-const byteAssign_t* StatisticsParser::getAssignmentByChannelField(const ChannelType_t type, const ChannelNum_t channel, const FieldId_t fieldId)
+const byteAssign_t* StatisticsParser::getAssignmentByChannelField(const ChannelType_t type, const ChannelNum_t channel, const FieldId_t fieldId) const
 {
     for (uint8_t i = 0; i < _byteAssignmentSize; i++) {
         if (_byteAssignment[i].type == type && _byteAssignment[i].ch == channel && _byteAssignment[i].fieldId == fieldId) {
@@ -233,25 +233,25 @@ String StatisticsParser::getChannelFieldValueString(const ChannelType_t type, co
         static_cast<unsigned int>(getChannelFieldDigits(type, channel, fieldId)));
 }
 
-bool StatisticsParser::hasChannelFieldValue(const ChannelType_t type, const ChannelNum_t channel, const FieldId_t fieldId)
+bool StatisticsParser::hasChannelFieldValue(const ChannelType_t type, const ChannelNum_t channel, const FieldId_t fieldId) const
 {
     const byteAssign_t* pos = getAssignmentByChannelField(type, channel, fieldId);
     return pos != nullptr;
 }
 
-const char* StatisticsParser::getChannelFieldUnit(const ChannelType_t type, const ChannelNum_t channel, const FieldId_t fieldId)
+const char* StatisticsParser::getChannelFieldUnit(const ChannelType_t type, const ChannelNum_t channel, const FieldId_t fieldId) const
 {
     const byteAssign_t* pos = getAssignmentByChannelField(type, channel, fieldId);
     return units[pos->unitId];
 }
 
-const char* StatisticsParser::getChannelFieldName(const ChannelType_t type, const ChannelNum_t channel, const FieldId_t fieldId)
+const char* StatisticsParser::getChannelFieldName(const ChannelType_t type, const ChannelNum_t channel, const FieldId_t fieldId) const
 {
     const byteAssign_t* pos = getAssignmentByChannelField(type, channel, fieldId);
     return fields[pos->fieldId];
 }
 
-uint8_t StatisticsParser::getChannelFieldDigits(const ChannelType_t type, const ChannelNum_t channel, const FieldId_t fieldId)
+uint8_t StatisticsParser::getChannelFieldDigits(const ChannelType_t type, const ChannelNum_t channel, const FieldId_t fieldId) const
 {
     const byteAssign_t* pos = getAssignmentByChannelField(type, channel, fieldId);
     return pos->digits;
@@ -276,7 +276,7 @@ void StatisticsParser::setChannelFieldOffset(const ChannelType_t type, const Cha
     }
 }
 
-std::list<ChannelType_t> StatisticsParser::getChannelTypes()
+std::list<ChannelType_t> StatisticsParser::getChannelTypes() const
 {
     return {
         TYPE_AC,
@@ -285,12 +285,12 @@ std::list<ChannelType_t> StatisticsParser::getChannelTypes()
     };
 }
 
-const char* StatisticsParser::getChannelTypeName(const ChannelType_t type)
+const char* StatisticsParser::getChannelTypeName(const ChannelType_t type) const
 {
     return channelsTypes[type];
 }
 
-std::list<ChannelNum_t> StatisticsParser::getChannelsByType(const ChannelType_t type)
+std::list<ChannelNum_t> StatisticsParser::getChannelsByType(const ChannelType_t type) const
 {
     std::list<ChannelNum_t> l;
     for (uint8_t i = 0; i < _byteAssignmentSize; i++) {
@@ -302,7 +302,7 @@ std::list<ChannelNum_t> StatisticsParser::getChannelsByType(const ChannelType_t 
     return l;
 }
 
-uint16_t StatisticsParser::getStringMaxPower(const uint8_t channel)
+uint16_t StatisticsParser::getStringMaxPower(const uint8_t channel) const
 {
     return _stringMaxPower[channel];
 }
@@ -324,7 +324,7 @@ void StatisticsParser::incrementRxFailureCount()
     _rxFailureCount++;
 }
 
-uint32_t StatisticsParser::getRxFailureCount()
+uint32_t StatisticsParser::getRxFailureCount() const
 {
     return _rxFailureCount;
 }
@@ -345,7 +345,7 @@ void StatisticsParser::setLastUpdate(const uint32_t lastUpdate)
     setLastUpdateFromInternal(lastUpdate);
 }
 
-uint32_t StatisticsParser::getLastUpdateFromInternal()
+uint32_t StatisticsParser::getLastUpdateFromInternal() const
 {
     return _lastUpdateFromInternal;
 }
@@ -355,7 +355,7 @@ void StatisticsParser::setLastUpdateFromInternal(const uint32_t lastUpdate)
     _lastUpdateFromInternal = lastUpdate;
 }
 
-bool StatisticsParser::getYieldDayCorrection()
+bool StatisticsParser::getYieldDayCorrection() const
 {
     return _enableYieldDayCorrection;
 }

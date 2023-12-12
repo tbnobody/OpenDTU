@@ -32,7 +32,7 @@ RequestFrameCommand::RequestFrameCommand(const uint64_t target_address, const ui
     _payload_size = 10;
 }
 
-String RequestFrameCommand::getCommandName()
+String RequestFrameCommand::getCommandName() const
 {
     return "RequestFrame";
 }
@@ -42,7 +42,7 @@ void RequestFrameCommand::setFrameNo(const uint8_t frame_no)
     _payload[9] = frame_no | 0x80;
 }
 
-uint8_t RequestFrameCommand::getFrameNo()
+uint8_t RequestFrameCommand::getFrameNo() const
 {
     return _payload[9] & (~0x80);
 }

@@ -91,7 +91,7 @@ void DevInfoParser::appendFragmentSimple(const uint8_t offset, const uint8_t* pa
     _devInfoSimpleLength += len;
 }
 
-uint32_t DevInfoParser::getLastUpdateAll()
+uint32_t DevInfoParser::getLastUpdateAll() const
 {
     return _lastUpdateAll;
 }
@@ -102,7 +102,7 @@ void DevInfoParser::setLastUpdateAll(const uint32_t lastUpdate)
     setLastUpdate(lastUpdate);
 }
 
-uint32_t DevInfoParser::getLastUpdateSimple()
+uint32_t DevInfoParser::getLastUpdateSimple() const
 {
     return _lastUpdateSimple;
 }
@@ -113,7 +113,7 @@ void DevInfoParser::setLastUpdateSimple(const uint32_t lastUpdate)
     setLastUpdate(lastUpdate);
 }
 
-uint16_t DevInfoParser::getFwBuildVersion()
+uint16_t DevInfoParser::getFwBuildVersion() const
 {
     HOY_SEMAPHORE_TAKE();
     const uint16_t ret = (((uint16_t)_payloadDevInfoAll[0]) << 8) | _payloadDevInfoAll[1];
@@ -121,7 +121,7 @@ uint16_t DevInfoParser::getFwBuildVersion()
     return ret;
 }
 
-time_t DevInfoParser::getFwBuildDateTime()
+time_t DevInfoParser::getFwBuildDateTime() const
 {
     struct tm timeinfo = {};
     HOY_SEMAPHORE_TAKE();
@@ -137,7 +137,7 @@ time_t DevInfoParser::getFwBuildDateTime()
     return timegm(&timeinfo);
 }
 
-uint16_t DevInfoParser::getFwBootloaderVersion()
+uint16_t DevInfoParser::getFwBootloaderVersion() const
 {
     HOY_SEMAPHORE_TAKE();
     const uint16_t ret = (((uint16_t)_payloadDevInfoAll[8]) << 8) | _payloadDevInfoAll[9];
@@ -145,7 +145,7 @@ uint16_t DevInfoParser::getFwBootloaderVersion()
     return ret;
 }
 
-uint32_t DevInfoParser::getHwPartNumber()
+uint32_t DevInfoParser::getHwPartNumber() const
 {
     HOY_SEMAPHORE_TAKE();
     const uint16_t hwpn_h = (((uint16_t)_payloadDevInfoSimple[2]) << 8) | _payloadDevInfoSimple[3];
@@ -155,7 +155,7 @@ uint32_t DevInfoParser::getHwPartNumber()
     return ((uint32_t)hwpn_h << 16) | ((uint32_t)hwpn_l);
 }
 
-String DevInfoParser::getHwVersion()
+String DevInfoParser::getHwVersion() const
 {
     char buf[8];
     HOY_SEMAPHORE_TAKE();
@@ -164,7 +164,7 @@ String DevInfoParser::getHwVersion()
     return buf;
 }
 
-uint16_t DevInfoParser::getMaxPower()
+uint16_t DevInfoParser::getMaxPower() const
 {
     const uint8_t idx = getDevIdx();
     if (idx == 0xff) {
@@ -173,7 +173,7 @@ uint16_t DevInfoParser::getMaxPower()
     return devInfo[idx].maxPower;
 }
 
-String DevInfoParser::getHwModelName()
+String DevInfoParser::getHwModelName() const
 {
     const uint8_t idx = getDevIdx();
     if (idx == 0xff) {
@@ -182,7 +182,7 @@ String DevInfoParser::getHwModelName()
     return devInfo[idx].modelName;
 }
 
-bool DevInfoParser::containsValidData()
+bool DevInfoParser::containsValidData() const
 {
     const time_t t = getFwBuildDateTime();
 
@@ -192,7 +192,7 @@ bool DevInfoParser::containsValidData()
     return info.tm_year > (2016 - 1900);
 }
 
-uint8_t DevInfoParser::getDevIdx()
+uint8_t DevInfoParser::getDevIdx() const
 {
     uint8_t ret = 0xff;
     uint8_t pos;

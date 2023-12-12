@@ -6,7 +6,7 @@
 #include "Hoymiles.h"
 #include "crc.h"
 
-serial_u HoymilesRadio::DtuSerial()
+serial_u HoymilesRadio::DtuSerial() const
 {
     return _dtuSerial;
 }
@@ -28,7 +28,7 @@ serial_u HoymilesRadio::convertSerialToRadioId(const serial_u serial)
     return radioId;
 }
 
-bool HoymilesRadio::checkFragmentCrc(const fragment_t* fragment)
+bool HoymilesRadio::checkFragmentCrc(const fragment_t* fragment) const
 {
     const uint8_t crc = crc8(fragment->fragment, fragment->len - 1);
     return (crc == fragment->fragment[fragment->len - 1]);
@@ -124,17 +124,17 @@ void HoymilesRadio::dumpBuf(const uint8_t buf[], const uint8_t len, const bool a
     }
 }
 
-bool HoymilesRadio::isInitialized()
+bool HoymilesRadio::isInitialized() const
 {
     return _isInitialized;
 }
 
-bool HoymilesRadio::isIdle()
+bool HoymilesRadio::isIdle() const
 {
     return !_busyFlag;
 }
 
-bool HoymilesRadio::isQueueEmpty()
+bool HoymilesRadio::isQueueEmpty() const
 {
     return _commandQueue.size() == 0;
 }

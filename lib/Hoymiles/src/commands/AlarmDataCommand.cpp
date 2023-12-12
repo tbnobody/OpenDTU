@@ -31,7 +31,7 @@ AlarmDataCommand::AlarmDataCommand(const uint64_t target_address, const uint64_t
     setTimeout(750);
 }
 
-String AlarmDataCommand::getCommandName()
+String AlarmDataCommand::getCommandName() const
 {
     return "AlarmData";
 }

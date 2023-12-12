@@ -42,7 +42,7 @@ ActivePowerControlCommand::ActivePowerControlCommand(const uint64_t target_addre
     setTimeout(2000);
 }
 
-String ActivePowerControlCommand::getCommandName()
+String ActivePowerControlCommand::getCommandName() const
 {
     return "ActivePowerControl";
 }
@@ -83,7 +83,7 @@ bool ActivePowerControlCommand::handleResponse(InverterAbstract* inverter, const
     return true;
 }
 
-float ActivePowerControlCommand::getLimit()
+float ActivePowerControlCommand::getLimit() const
 {
     const uint16_t l = (((uint16_t)_payload[12] << 8) | _payload[13]);
     return l / 10;

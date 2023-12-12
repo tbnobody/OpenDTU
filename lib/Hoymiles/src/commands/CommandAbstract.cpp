@@ -56,7 +56,7 @@ void CommandAbstract::dumpDataPayload(Print* stream)
     stream->println("");
 }
 
-uint8_t CommandAbstract::getDataSize()
+uint8_t CommandAbstract::getDataSize() const
 {
     return _payload_size + 1; // Original payload plus crc8
 }
@@ -66,7 +66,7 @@ void CommandAbstract::setTargetAddress(const uint64_t address)
     convertSerialToPacketId(&_payload[1], address);
     _targetAddress = address;
 }
-uint64_t CommandAbstract::getTargetAddress()
+uint64_t CommandAbstract::getTargetAddress() const
 {
     return _targetAddress;
 }
@@ -77,7 +77,7 @@ void CommandAbstract::setRouterAddress(const uint64_t address)
     _routerAddress = address;
 }
 
-uint64_t CommandAbstract::getRouterAddress()
+uint64_t CommandAbstract::getRouterAddress() const
 {
     return _routerAddress;
 }
@@ -87,7 +87,7 @@ void CommandAbstract::setTimeout(const uint32_t timeout)
     _timeout = timeout;
 }
 
-uint32_t CommandAbstract::getTimeout()
+uint32_t CommandAbstract::getTimeout() const
 {
     return _timeout;
 }
@@ -97,7 +97,7 @@ void CommandAbstract::setSendCount(const uint8_t count)
     _sendCount = count;
 }
 
-uint8_t CommandAbstract::getSendCount()
+uint8_t CommandAbstract::getSendCount() const
 {
     return _sendCount;
 }
@@ -126,12 +126,12 @@ void CommandAbstract::gotTimeout(InverterAbstract* inverter)
 {
 }
 
-uint8_t CommandAbstract::getMaxResendCount()
+uint8_t CommandAbstract::getMaxResendCount() const
 {
     return MAX_RESEND_COUNT;
 }
 
-uint8_t CommandAbstract::getMaxRetransmitCount()
+uint8_t CommandAbstract::getMaxRetransmitCount() const
 {
     return MAX_RETRANSMIT_COUNT;
 }

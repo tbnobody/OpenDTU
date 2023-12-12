@@ -72,17 +72,17 @@ bool HM_4CH::isValidSerial(const uint64_t serial)
     return false;
 }
 
-String HM_4CH::typeName()
+String HM_4CH::typeName() const
 {
     return "HM-1000/1200/1500-4T";
 }
 
-const byteAssign_t* HM_4CH::getByteAssignment()
+const byteAssign_t* HM_4CH::getByteAssignment() const
 {
     return byteAssignment;
 }
 
-uint8_t HM_4CH::getByteAssignmentSize()
+uint8_t HM_4CH::getByteAssignmentSize() const
 {
     return sizeof(byteAssignment) / sizeof(byteAssignment[0]);
 }

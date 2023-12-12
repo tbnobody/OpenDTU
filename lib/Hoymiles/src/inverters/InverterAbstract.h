@@ -32,31 +32,31 @@ class InverterAbstract {
 public:
     explicit InverterAbstract(HoymilesRadio* radio, const uint64_t serial);
     void init();
-    uint64_t serial();
-    const String& serialString();
+    uint64_t serial() const;
+    const String& serialString() const;
     void setName(const char* name);
-    const char* name();
-    virtual String typeName() = 0;
-    virtual const byteAssign_t* getByteAssignment() = 0;
-    virtual uint8_t getByteAssignmentSize() = 0;
+    const char* name() const;
+    virtual String typeName() const = 0;
+    virtual const byteAssign_t* getByteAssignment() const = 0;
+    virtual uint8_t getByteAssignmentSize() const = 0;
 
     bool isProducing();
     bool isReachable();
 
     void setEnablePolling(const bool enabled);
-    bool getEnablePolling();
+    bool getEnablePolling() const;
 
     void setEnableCommands(const bool enabled);
-    bool getEnableCommands();
+    bool getEnableCommands() const;
 
     void setReachableThreshold(const uint8_t threshold);
-    uint8_t getReachableThreshold();
+    uint8_t getReachableThreshold() const;
 
     void setZeroValuesIfUnreachable(const bool enabled);
-    bool getZeroValuesIfUnreachable();
+    bool getZeroValuesIfUnreachable() const;
 
     void setZeroYieldDayOnMidnight(const bool enabled);
-    bool getZeroYieldDayOnMidnight();
+    bool getZeroYieldDayOnMidnight() const;
 
     void clearRxFragmentBuffer();
     void addRxFragment(const uint8_t fragment[], const uint8_t len);

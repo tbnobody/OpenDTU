@@ -42,17 +42,17 @@ public:
     void clearBuffer();
     void appendFragment(const uint8_t offset, const uint8_t* payload, const uint8_t len);
 
-    uint8_t getEntryCount();
+    uint8_t getEntryCount() const;
     void getLogEntry(const uint8_t entryId, AlarmLogEntry_t* entry, const AlarmMessageLocale_t locale = AlarmMessageLocale_t::EN);
 
     void setLastAlarmRequestSuccess(const LastCommandSuccess status);
-    LastCommandSuccess getLastAlarmRequestSuccess();
+    LastCommandSuccess getLastAlarmRequestSuccess() const;
 
     void setMessageType(const AlarmMessageType_t type);
 
 private:
     static int getTimezoneOffset();
-    String getLocaleMessage(const AlarmMessage_t* msg, const AlarmMessageLocale_t locale);
+    String getLocaleMessage(const AlarmMessage_t* msg, const AlarmMessageLocale_t locale) const;
 
     uint8_t _payloadAlarmLog[ALARM_LOG_PAYLOAD_SIZE];
     uint8_t _alarmLogLength = 0;

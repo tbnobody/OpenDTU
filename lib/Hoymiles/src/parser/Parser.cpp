@@ -10,7 +10,7 @@ Parser::Parser()
     HOY_SEMAPHORE_GIVE(); // release before first use
 }
 
-uint32_t Parser::getLastUpdate()
+uint32_t Parser::getLastUpdate() const
 {
     return _lastUpdate;
 }

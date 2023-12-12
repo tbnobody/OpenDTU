@@ -59,17 +59,17 @@ bool HM_2CH::isValidSerial(const uint64_t serial)
     return false;
 }
 
-String HM_2CH::typeName()
+String HM_2CH::typeName() const
 {
     return "HM-600/700/800-2T";
 }
 
-const byteAssign_t* HM_2CH::getByteAssignment()
+const byteAssign_t* HM_2CH::getByteAssignment() const
 {
     return byteAssignment;
 }
 
-uint8_t HM_2CH::getByteAssignmentSize()
+uint8_t HM_2CH::getByteAssignmentSize() const
 {
     return sizeof(byteAssignment) / sizeof(byteAssignment[0]);
 }

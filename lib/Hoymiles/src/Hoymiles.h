@@ -28,15 +28,15 @@ public:
     std::shared_ptr<InverterAbstract> getInverterBySerial(const uint64_t serial);
     std::shared_ptr<InverterAbstract> getInverterByFragment(const fragment_t* fragment);
     void removeInverterBySerial(const uint64_t serial);
-    size_t getNumInverters();
+    size_t getNumInverters() const;
 
     HoymilesRadio_NRF* getRadioNrf();
     HoymilesRadio_CMT* getRadioCmt();
 
-    uint32_t PollInterval();
+    uint32_t PollInterval() const;
     void setPollInterval(const uint32_t interval);
 
-    bool isAllRadioIdle();
+    bool isAllRadioIdle() const;
 
 private:
     std::vector<std::shared_ptr<InverterAbstract>> _inverters;

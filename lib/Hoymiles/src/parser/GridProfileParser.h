@@ -36,12 +36,12 @@ public:
     void clearBuffer();
     void appendFragment(const uint8_t offset, const uint8_t* payload, const uint8_t len);
 
-    String getProfileName();
-    String getProfileVersion();
+    String getProfileName() const;
+    String getProfileVersion() const;
 
-    std::vector<uint8_t> getRawData();
+    std::vector<uint8_t> getRawData() const;
 
-    std::list<GridProfileSection_t> getProfile();
+    std::list<GridProfileSection_t> getProfile() const;
 
 private:
     static uint8_t getSectionSize(const uint8_t section_id, const uint8_t section_version);

@@ -179,7 +179,7 @@ void NetworkSettingsClass::enableAdminMode()
     setupMode();
 }
 
-String NetworkSettingsClass::getApName()
+String NetworkSettingsClass::getApName() const
 {
     return String(ACCESS_POINT_NAME + String(Utils::getChipId()));
 }
@@ -335,7 +335,7 @@ void NetworkSettingsClass::setStaticIp()
     }
 }
 
-IPAddress NetworkSettingsClass::localIP()
+IPAddress NetworkSettingsClass::localIP() const
 {
     switch (_networkMode) {
     case network_mode::Ethernet:
@@ -349,7 +349,7 @@ IPAddress NetworkSettingsClass::localIP()
     }
 }
 
-IPAddress NetworkSettingsClass::subnetMask()
+IPAddress NetworkSettingsClass::subnetMask() const
 {
     switch (_networkMode) {
     case network_mode::Ethernet:
@@ -363,7 +363,7 @@ IPAddress NetworkSettingsClass::subnetMask()
     }
 }
 
-IPAddress NetworkSettingsClass::gatewayIP()
+IPAddress NetworkSettingsClass::gatewayIP() const
 {
     switch (_networkMode) {
     case network_mode::Ethernet:
@@ -377,7 +377,7 @@ IPAddress NetworkSettingsClass::gatewayIP()
     }
 }
 
-IPAddress NetworkSettingsClass::dnsIP(const uint8_t dns_no)
+IPAddress NetworkSettingsClass::dnsIP(const uint8_t dns_no) const
 {
     switch (_networkMode) {
     case network_mode::Ethernet:
@@ -391,7 +391,7 @@ IPAddress NetworkSettingsClass::dnsIP(const uint8_t dns_no)
     }
 }
 
-String NetworkSettingsClass::macAddress()
+String NetworkSettingsClass::macAddress() const
 {
     switch (_networkMode) {
     case network_mode::Ethernet:
@@ -444,12 +444,12 @@ String NetworkSettingsClass::getHostname()
     return resultHostname;
 }
 
-bool NetworkSettingsClass::isConnected()
+bool NetworkSettingsClass::isConnected() const
 {
     return WiFi.localIP()[0] != 0 || ETH.localIP()[0] != 0;
 }
 
-network_mode NetworkSettingsClass::NetworkMode()
+network_mode NetworkSettingsClass::NetworkMode() const
 {
     return _networkMode;
 }

@@ -19,21 +19,21 @@ public:
     const uint8_t* getDataPayload();
     void dumpDataPayload(Print* stream);
 
-    uint8_t getDataSize();
+    uint8_t getDataSize() const;
 
     void setTargetAddress(const uint64_t address);
-    uint64_t getTargetAddress();
+    uint64_t getTargetAddress() const;
 
     void setRouterAddress(const uint64_t address);
-    uint64_t getRouterAddress();
+    uint64_t getRouterAddress() const;
 
     void setTimeout(const uint32_t timeout);
-    uint32_t getTimeout();
+    uint32_t getTimeout() const;
 
-    virtual String getCommandName() = 0;
+    virtual String getCommandName() const = 0;
 
     void setSendCount(const uint8_t count);
-    uint8_t getSendCount();
+    uint8_t getSendCount() const;
     uint8_t incrementSendCount();
 
     virtual CommandAbstract* getRequestFrameCommand(const uint8_t frame_no);
@@ -42,10 +42,10 @@ public:
     virtual void gotTimeout(InverterAbstract* inverter);
 
     // Sets the amount how often the specific command is resent if all fragments where missing
-    virtual uint8_t getMaxResendCount();
+    virtual uint8_t getMaxResendCount() const;
 
     // Sets the amount how often a missing fragment is re-requested if it was not available
-    virtual uint8_t getMaxRetransmitCount();
+    virtual uint8_t getMaxRetransmitCount() const;
 
 protected:
     uint8_t _payload[RF_LEN];

@@ -19,8 +19,8 @@ public:
 
     virtual void setDtuSerial(const uint64_t serial);
 
-    bool isConnected();
-    bool isPVariant();
+    bool isConnected() const;
+    bool isPVariant() const;
 
 private:
     void ARDUINO_ISR_ATTR handleIntr();

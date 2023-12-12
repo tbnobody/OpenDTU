@@ -30,7 +30,7 @@ SystemConfigParaCommand::SystemConfigParaCommand(const uint64_t target_address, 
     setTimeout(200);
 }
 
-String SystemConfigParaCommand::getCommandName()
+String SystemConfigParaCommand::getCommandName() const
 {
     return "SystemConfigPara";
 }

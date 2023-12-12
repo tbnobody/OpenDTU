@@ -195,7 +195,7 @@ bool PinMappingClass::init(const String& deviceMapping)
     return false;
 }
 
-bool PinMappingClass::isValidNrf24Config()
+bool PinMappingClass::isValidNrf24Config() const
 {
     return _pinMapping.nrf24_clk >= 0
         && _pinMapping.nrf24_cs >= 0
@@ -205,7 +205,7 @@ bool PinMappingClass::isValidNrf24Config()
         && _pinMapping.nrf24_mosi >= 0;
 }
 
-bool PinMappingClass::isValidCmt2300Config()
+bool PinMappingClass::isValidCmt2300Config() const
 {
     return _pinMapping.cmt_clk >= 0
         && _pinMapping.cmt_cs >= 0
@@ -213,7 +213,7 @@ bool PinMappingClass::isValidCmt2300Config()
         && _pinMapping.cmt_sdio >= 0;
 }
 
-bool PinMappingClass::isValidEthConfig()
+bool PinMappingClass::isValidEthConfig() const
 {
     return _pinMapping.eth_enabled;
 }

@@ -9,12 +9,12 @@ void PowerCommandParser::setLastPowerCommandSuccess(const LastCommandSuccess sta
     _lastLimitCommandSuccess = status;
 }
 
-LastCommandSuccess PowerCommandParser::getLastPowerCommandSuccess()
+LastCommandSuccess PowerCommandParser::getLastPowerCommandSuccess() const
 {
     return _lastLimitCommandSuccess;
 }
 
-uint32_t PowerCommandParser::getLastUpdateCommand()
+uint32_t PowerCommandParser::getLastUpdateCommand() const
 {
     return _lastUpdateCommand;
 }

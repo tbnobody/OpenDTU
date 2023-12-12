@@ -22,9 +22,9 @@ public:
     void loop();
     void setPALevel(const int8_t paLevel);
     void setInverterTargetFrequency(const uint32_t frequency);
-    uint32_t getInverterTargetFrequency();
+    uint32_t getInverterTargetFrequency() const;
 
-    bool isConnected();
+    bool isConnected() const;
 
     static uint32_t getMinFrequency();
     static uint32_t getMaxFrequency();

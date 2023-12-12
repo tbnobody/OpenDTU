@@ -45,17 +45,17 @@ bool HMS_2CH::isValidSerial(const uint64_t serial)
     return preSerial == 0x1144;
 }
 
-String HMS_2CH::typeName()
+String HMS_2CH::typeName() const
 {
     return "HMS-600/700/800/900/1000-2T";
 }
 
-const byteAssign_t* HMS_2CH::getByteAssignment()
+const byteAssign_t* HMS_2CH::getByteAssignment() const
 {
     return byteAssignment;
 }
 
-uint8_t HMS_2CH::getByteAssignmentSize()
+uint8_t HMS_2CH::getByteAssignmentSize() const
 {
     return sizeof(byteAssignment) / sizeof(byteAssignment[0]);
 }

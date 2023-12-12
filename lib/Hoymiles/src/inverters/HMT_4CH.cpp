@@ -68,17 +68,17 @@ bool HMT_4CH::isValidSerial(const uint64_t serial)
     return preSerial == 0x1361;
 }
 
-String HMT_4CH::typeName()
+String HMT_4CH::typeName() const
 {
     return F("HMT-1600/1800/2000-4T");
 }
 
-const byteAssign_t* HMT_4CH::getByteAssignment()
+const byteAssign_t* HMT_4CH::getByteAssignment() const
 {
     return byteAssignment;
 }
 
-uint8_t HMT_4CH::getByteAssignmentSize()
+uint8_t HMT_4CH::getByteAssignmentSize() const
 {
     return sizeof(byteAssignment) / sizeof(byteAssignment[0]);
 }

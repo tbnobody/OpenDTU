@@ -5,8 +5,8 @@
 class PowerCommandParser : public Parser {
 public:
     void setLastPowerCommandSuccess(const LastCommandSuccess status);
-    LastCommandSuccess getLastPowerCommandSuccess();
-    uint32_t getLastUpdateCommand();
+    LastCommandSuccess getLastPowerCommandSuccess() const;
+    uint32_t getLastUpdateCommand() const;
     void setLastUpdateCommand(const uint32_t lastUpdate);
 
 private:

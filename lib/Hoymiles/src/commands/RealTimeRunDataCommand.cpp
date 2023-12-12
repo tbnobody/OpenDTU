@@ -30,7 +30,7 @@ RealTimeRunDataCommand::RealTimeRunDataCommand(const uint64_t target_address, co
     setTimeout(500);
 }
 
-String RealTimeRunDataCommand::getCommandName()
+String RealTimeRunDataCommand::getCommandName() const
 {
     return "RealTimeRunData";
 }

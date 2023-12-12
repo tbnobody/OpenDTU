@@ -39,7 +39,7 @@ PowerControlCommand::PowerControlCommand(const uint64_t target_address, const ui
     setTimeout(2000);
 }
 
-String PowerControlCommand::getCommandName()
+String PowerControlCommand::getCommandName() const
 {
     return "PowerControl";
 }

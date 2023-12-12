@@ -297,7 +297,7 @@ void GridProfileParser::appendFragment(const uint8_t offset, const uint8_t* payl
     _gridProfileLength += len;
 }
 
-String GridProfileParser::getProfileName()
+String GridProfileParser::getProfileName() const
 {
     for (auto& ptype : _profileTypes) {
         if (ptype.lIdx == _payloadGridProfile[0] && ptype.hIdx == _payloadGridProfile[1]) {
@@ -307,7 +307,7 @@ String GridProfileParser::getProfileName()
     return "Unknown";
 }
 
-String GridProfileParser::getProfileVersion()
+String GridProfileParser::getProfileVersion() const
 {
     char buffer[10];
     HOY_SEMAPHORE_TAKE();
@@ -316,7 +316,7 @@ String GridProfileParser::getProfileVersion()
     return buffer;
 }
 
-std::vector<uint8_t> GridProfileParser::getRawData()
+std::vector<uint8_t> GridProfileParser::getRawData() const
 {
     std::vector<uint8_t> ret;
     HOY_SEMAPHORE_TAKE();
@@ -327,7 +327,7 @@ std::vector<uint8_t> GridProfileParser::getRawData()
     return ret;
 }
 
-std::list<GridProfileSection_t> GridProfileParser::getProfile()
+std::list<GridProfileSection_t> GridProfileParser::getProfile() const
 {
     std::list<GridProfileSection_t> l;
 

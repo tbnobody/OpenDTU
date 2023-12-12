@@ -191,7 +191,7 @@ void AlarmLogParser::appendFragment(const uint8_t offset, const uint8_t* payload
     _alarmLogLength += len;
 }
 
-uint8_t AlarmLogParser::getEntryCount()
+uint8_t AlarmLogParser::getEntryCount() const
 {
     if (_alarmLogLength < 2) {
         return 0;
@@ -204,7 +204,7 @@ void AlarmLogParser::setLastAlarmRequestSuccess(const LastCommandSuccess status)
     _lastAlarmRequestSuccess = status;
 }
 
-LastCommandSuccess AlarmLogParser::getLastAlarmRequestSuccess()
+LastCommandSuccess AlarmLogParser::getLastAlarmRequestSuccess() const
 {
     return _lastAlarmRequestSuccess;
 }
@@ -266,7 +266,7 @@ void AlarmLogParser::getLogEntry(const uint8_t entryId, AlarmLogEntry_t* entry, 
     }
 }
 
-String AlarmLogParser::getLocaleMessage(const AlarmMessage_t* msg, const AlarmMessageLocale_t locale)
+String AlarmLogParser::getLocaleMessage(const AlarmMessage_t* msg, const AlarmMessageLocale_t locale) const
 {
     if (locale == AlarmMessageLocale_t::DE) {
         return msg->Message_de[0] != '\0' ? msg->Message_de : msg->Message_en;

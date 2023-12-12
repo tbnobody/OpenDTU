@@ -42,16 +42,16 @@ public:
     void init(Scheduler* scheduler);
     void applyConfig();
     void enableAdminMode();
-    String getApName();
+    String getApName() const;
 
-    IPAddress localIP();
-    IPAddress subnetMask();
-    IPAddress gatewayIP();
-    IPAddress dnsIP(const uint8_t dns_no = 0);
-    String macAddress();
+    IPAddress localIP() const;
+    IPAddress subnetMask() const;
+    IPAddress gatewayIP() const;
+    IPAddress dnsIP(const uint8_t dns_no = 0) const;
+    String macAddress() const;
     static String getHostname();
-    bool isConnected();
-    network_mode NetworkMode();
+    bool isConnected() const;
+    network_mode NetworkMode() const;
 
     bool onEvent(NetworkEventCb cbEvent, const network_event event = network_event::NETWORK_EVENT_MAX);
     void raiseEvent(const network_event event);
