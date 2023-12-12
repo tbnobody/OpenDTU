@@ -10,7 +10,7 @@
 class LedSingleClass {
 public:
     LedSingleClass();
-    void init(Scheduler* scheduler);
+    void init(Scheduler& scheduler);
 
     void turnAllOff();
     void turnAllOn();

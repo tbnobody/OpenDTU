@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * Copyright (C) 2022 Thomas Basler and others
+ * Copyright (C) 2022-2023 Thomas Basler and others
  */
 #include "Configuration.h"
 #include "Datastore.h"
@@ -36,7 +36,7 @@ void setup()
     while (!Serial)
         yield();
 #endif
-    MessageOutput.init(&scheduler);
+    MessageOutput.init(scheduler);
     MessageOutput.println();
     MessageOutput.println("Starting OpenDTU");
 
@@ -83,7 +83,7 @@ void setup()
 
     // Initialize WiFi
     MessageOutput.print("Initialize Network... ");
-    NetworkSettings.init(&scheduler);
+    NetworkSettings.init(scheduler);
     MessageOutput.println("done");
     NetworkSettings.applyConfig();
 
@@ -94,27 +94,27 @@ void setup()
 
     // Initialize SunPosition
     MessageOutput.print("Initialize SunPosition... ");
-    SunPosition.init(&scheduler);
+    SunPosition.init(scheduler);
     MessageOutput.println("done");
 
     // Initialize MqTT
     MessageOutput.print("Initialize MqTT... ");
     MqttSettings.init();
-    MqttHandleDtu.init(&scheduler);
-    MqttHandleInverter.init(&scheduler);
-    MqttHandleInverterTotal.init(&scheduler);
-    MqttHandleHass.init(&scheduler);
+    MqttHandleDtu.init(scheduler);
+    MqttHandleInverter.init(scheduler);
+    MqttHandleInverterTotal.init(scheduler);
+    MqttHandleHass.init(scheduler);
     MessageOutput.println("done");
 
     // Initialize WebApi
     MessageOutput.print("Initialize WebApi... ");
-    WebApi.init(&scheduler);
+    WebApi.init(scheduler);
     MessageOutput.println("done");
 
     // Initialize Display
     MessageOutput.print("Initialize Display... ");
     Display.init(
-        &scheduler,
+        scheduler,
         static_cast<DisplayType_t>(pin.display_type),
         pin.display_data,
         pin.display_clk,
@@ -130,7 +130,7 @@ void setup()
 
     // Initialize Single LEDs
     MessageOutput.print("Initialize LEDs... ");
-    LedSingle.init(&scheduler);
+    LedSingle.init(scheduler);
     MessageOutput.println("done");
 
     // Check for default DTU serial
@@ -146,9 +146,9 @@ void setup()
     }
     MessageOutput.println("done");
 
-    InverterSettings.init(&scheduler);
+    InverterSettings.init(scheduler);
 
-    Datastore.init(&scheduler);
+    Datastore.init(scheduler);
 }
 
 void loop()

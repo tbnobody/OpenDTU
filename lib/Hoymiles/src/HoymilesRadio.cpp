@@ -28,10 +28,10 @@ serial_u HoymilesRadio::convertSerialToRadioId(const serial_u serial)
     return radioId;
 }
 
-bool HoymilesRadio::checkFragmentCrc(const fragment_t* fragment) const
+bool HoymilesRadio::checkFragmentCrc(const fragment_t& fragment) const
 {
-    const uint8_t crc = crc8(fragment->fragment, fragment->len - 1);
-    return (crc == fragment->fragment[fragment->len - 1]);
+    const uint8_t crc = crc8(fragment.fragment, fragment.len - 1);
+    return (crc == fragment.fragment[fragment.len - 1]);
 }
 
 void HoymilesRadio::sendRetransmitPacket(const uint8_t fragment_id)
@@ -41,14 +41,14 @@ void HoymilesRadio::sendRetransmitPacket(const uint8_t fragment_id)
     CommandAbstract* requestCmd = cmd->getRequestFrameCommand(fragment_id);
 
     if (requestCmd != nullptr) {
-        sendEsbPacket(requestCmd);
+        sendEsbPacket(*requestCmd);
     }
 }
 
 void HoymilesRadio::sendLastPacketAgain()
 {
     CommandAbstract* cmd = _commandQueue.front().get();
-    sendEsbPacket(cmd);
+    sendEsbPacket(*cmd);
 }
 
 void HoymilesRadio::handleReceivedPackage()
@@ -59,7 +59,7 @@ void HoymilesRadio::handleReceivedPackage()
 
         if (nullptr != inv) {
             CommandAbstract* cmd = _commandQueue.front().get();
-            uint8_t verifyResult = inv->verifyAllFragments(cmd);
+            uint8_t verifyResult = inv->verifyAllFragments(*cmd);
             if (verifyResult == FRAGMENT_ALL_MISSING_RESEND) {
                 Hoymiles.getMessageOutput()->println("Nothing received, resend whole request");
                 sendLastPacketAgain();
@@ -105,7 +105,7 @@ void HoymilesRadio::handleReceivedPackage()
             auto inv = Hoymiles.getInverterBySerial(cmd->getTargetAddress());
             if (nullptr != inv) {
                 inv->clearRxFragmentBuffer();
-                sendEsbPacket(cmd);
+                sendEsbPacket(*cmd);
             } else {
                 Hoymiles.getMessageOutput()->println("TX: Invalid inverter found");
                 _commandQueue.pop();

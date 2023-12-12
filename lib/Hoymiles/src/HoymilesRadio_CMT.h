@@ -36,7 +36,7 @@ private:
     void ARDUINO_ISR_ATTR handleInt1();
     void ARDUINO_ISR_ATTR handleInt2();
 
-    void sendEsbPacket(CommandAbstract* cmd);
+    void sendEsbPacket(CommandAbstract& cmd);
 
     std::unique_ptr<CMT2300A> _radio;
 

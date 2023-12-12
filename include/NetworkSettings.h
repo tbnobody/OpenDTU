@@ -39,7 +39,7 @@ typedef struct NetworkEventCbList {
 class NetworkSettingsClass {
 public:
     NetworkSettingsClass();
-    void init(Scheduler* scheduler);
+    void init(Scheduler& scheduler);
     void applyConfig();
     void enableAdminMode();
     String getApName() const;

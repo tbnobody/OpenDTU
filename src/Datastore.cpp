@@ -8,9 +8,9 @@
 
 DatastoreClass Datastore;
 
-void DatastoreClass::init(Scheduler* scheduler)
+void DatastoreClass::init(Scheduler& scheduler)
 {
-    scheduler->addTask(_loopTask);
+    scheduler.addTask(_loopTask);
     _loopTask.setCallback(std::bind(&DatastoreClass::loop, this));
     _loopTask.setIterations(TASK_FOREVER);
     _loopTask.setInterval(1 * TASK_SECOND);

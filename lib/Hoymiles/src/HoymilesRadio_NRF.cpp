@@ -71,8 +71,8 @@ void HoymilesRadio_NRF::loop()
         // Perform package parsing only if no packages are received
         if (!_rxBuffer.empty()) {
             fragment_t f = _rxBuffer.back();
-            if (checkFragmentCrc(&f)) {
-                std::shared_ptr<InverterAbstract> inv = Hoymiles.getInverterByFragment(&f);
+            if (checkFragmentCrc(f)) {
+                std::shared_ptr<InverterAbstract> inv = Hoymiles.getInverterByFragment(f);
 
                 if (nullptr != inv) {
                     // Save packet in inverter rx buffer
@@ -169,29 +169,29 @@ void HoymilesRadio_NRF::switchRxCh()
     _radio->startListening();
 }
 
-void HoymilesRadio_NRF::sendEsbPacket(CommandAbstract* cmd)
+void HoymilesRadio_NRF::sendEsbPacket(CommandAbstract& cmd)
 {
-    cmd->incrementSendCount();
+    cmd.incrementSendCount();
 
-    cmd->setRouterAddress(DtuSerial().u64);
+    cmd.setRouterAddress(DtuSerial().u64);
 
     _radio->stopListening();
     _radio->setChannel(getTxNxtChannel());
 
     serial_u s;
-    s.u64 = cmd->getTargetAddress();
+    s.u64 = cmd.getTargetAddress();
     openWritingPipe(s);
     _radio->setRetries(3, 15);
 
     Hoymiles.getMessageOutput()->printf("TX %s Channel: %d --> ",
-        cmd->getCommandName().c_str(), _radio->getChannel());
-    cmd->dumpDataPayload(Hoymiles.getMessageOutput());
-    _radio->write(cmd->getDataPayload(), cmd->getDataSize());
+        cmd.getCommandName().c_str(), _radio->getChannel());
+    cmd.dumpDataPayload(Hoymiles.getMessageOutput());
+    _radio->write(cmd.getDataPayload(), cmd.getDataSize());
 
     _radio->setRetries(0, 0);
     openReadingPipe();
     _radio->setChannel(getRxNxtChannel());
     _radio->startListening();
     _busyFlag = true;
-    _rxTimeout.set(cmd->getTimeout());
+    _rxTimeout.set(cmd.getTimeout());
 }

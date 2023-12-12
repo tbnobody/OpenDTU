@@ -43,7 +43,7 @@ public:
     void appendFragment(const uint8_t offset, const uint8_t* payload, const uint8_t len);
 
     uint8_t getEntryCount() const;
-    void getLogEntry(const uint8_t entryId, AlarmLogEntry_t* entry, const AlarmMessageLocale_t locale = AlarmMessageLocale_t::EN);
+    void getLogEntry(const uint8_t entryId, AlarmLogEntry_t& entry, const AlarmMessageLocale_t locale = AlarmMessageLocale_t::EN);
 
     void setLastAlarmRequestSuccess(const LastCommandSuccess status);
     LastCommandSuccess getLastAlarmRequestSuccess() const;

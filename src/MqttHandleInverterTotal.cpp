@@ -10,9 +10,9 @@
 
 MqttHandleInverterTotalClass MqttHandleInverterTotal;
 
-void MqttHandleInverterTotalClass::init(Scheduler* scheduler)
+void MqttHandleInverterTotalClass::init(Scheduler& scheduler)
 {
-    scheduler->addTask(_loopTask);
+    scheduler.addTask(_loopTask);
     _loopTask.setCallback(std::bind(&MqttHandleInverterTotalClass::loop, this));
     _loopTask.setIterations(TASK_FOREVER);
     _loopTask.setInterval(Configuration.get().Mqtt.PublishInterval * TASK_SECOND);

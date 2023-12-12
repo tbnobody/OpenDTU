@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * Copyright (C) 2022 Thomas Basler and others
+ * Copyright (C) 2022-2023 Thomas Basler and others
  */
 #include "MqttHandleDtu.h"
 #include "Configuration.h"
@@ -10,9 +10,9 @@
 
 MqttHandleDtuClass MqttHandleDtu;
 
-void MqttHandleDtuClass::init(Scheduler* scheduler)
+void MqttHandleDtuClass::init(Scheduler& scheduler)
 {
-    scheduler->addTask(_loopTask);
+    scheduler.addTask(_loopTask);
     _loopTask.setCallback(std::bind(&MqttHandleDtuClass::loop, this));
     _loopTask.setIterations(TASK_FOREVER);
     _loopTask.setInterval(Configuration.get().Mqtt.PublishInterval * TASK_SECOND);

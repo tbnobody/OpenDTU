@@ -1,17 +1,17 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * Copyright (C) 2022 Thomas Basler and others
+ * Copyright (C) 2022-2023 Thomas Basler and others
  */
 #include "WebApi_eventlog.h"
 #include "WebApi.h"
 #include <AsyncJson.h>
 #include <Hoymiles.h>
 
-void WebApiEventlogClass::init(AsyncWebServer* server)
+void WebApiEventlogClass::init(AsyncWebServer& server)
 {
     using std::placeholders::_1;
 
-    _server = server;
+    _server = &server;
 
     _server->on("/api/eventlog/status", HTTP_GET, std::bind(&WebApiEventlogClass::onEventlogStatus, this, _1));
 }
@@ -59,7 +59,7 @@ void WebApiEventlogClass::onEventlogStatus(AsyncWebServerRequest* request)
             JsonObject eventsObject = eventsArray.createNestedObject();
 
             AlarmLogEntry_t entry;
-            inv->EventLog()->getLogEntry(logEntry, &entry, locale);
+            inv->EventLog()->getLogEntry(logEntry, entry, locale);
 
             eventsObject["message_id"] = entry.MessageId;
             eventsObject["message"] = entry.Message;

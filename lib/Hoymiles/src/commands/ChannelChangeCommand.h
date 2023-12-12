@@ -12,7 +12,7 @@ public:
     void setChannel(const uint8_t channel);
     uint8_t getChannel() const;
 
-    virtual bool handleResponse(InverterAbstract* inverter, const fragment_t fragment[], const uint8_t max_fragment_id);
+    virtual bool handleResponse(InverterAbstract& inverter, const fragment_t fragment[], const uint8_t max_fragment_id);
 
     virtual uint8_t getMaxResendCount();
 };

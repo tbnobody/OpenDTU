@@ -8,7 +8,7 @@
 class SunPositionClass {
 public:
     SunPositionClass();
-    void init(Scheduler* scheduler);
+    void init(Scheduler& scheduler);
 
     bool isDayPeriod() const;
     bool isSunsetAvailable() const;

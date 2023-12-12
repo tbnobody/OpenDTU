@@ -36,7 +36,7 @@ String AlarmDataCommand::getCommandName() const
     return "AlarmData";
 }
 
-bool AlarmDataCommand::handleResponse(InverterAbstract* inverter, const fragment_t fragment[], const uint8_t max_fragment_id)
+bool AlarmDataCommand::handleResponse(InverterAbstract& inverter, const fragment_t fragment[], const uint8_t max_fragment_id)
 {
     // Check CRC of whole payload
     if (!MultiDataCommand::handleResponse(inverter, fragment, max_fragment_id)) {
@@ -45,19 +45,19 @@ bool AlarmDataCommand::handleResponse(InverterAbstract* inverter, const fragment
 
     // Move all fragments into target buffer
     uint8_t offs = 0;
-    inverter->EventLog()->beginAppendFragment();
-    inverter->EventLog()->clearBuffer();
+    inverter.EventLog()->beginAppendFragment();
+    inverter.EventLog()->clearBuffer();
     for (uint8_t i = 0; i < max_fragment_id; i++) {
-        inverter->EventLog()->appendFragment(offs, fragment[i].fragment, fragment[i].len);
+        inverter.EventLog()->appendFragment(offs, fragment[i].fragment, fragment[i].len);
         offs += (fragment[i].len);
     }
-    inverter->EventLog()->endAppendFragment();
-    inverter->EventLog()->setLastAlarmRequestSuccess(CMD_OK);
-    inverter->EventLog()->setLastUpdate(millis());
+    inverter.EventLog()->endAppendFragment();
+    inverter.EventLog()->setLastAlarmRequestSuccess(CMD_OK);
+    inverter.EventLog()->setLastUpdate(millis());
     return true;
 }
 
-void AlarmDataCommand::gotTimeout(InverterAbstract* inverter)
+void AlarmDataCommand::gotTimeout(InverterAbstract& inverter)
 {
-    inverter->EventLog()->setLastAlarmRequestSuccess(CMD_NOK);
+    inverter.EventLog()->setLastAlarmRequestSuccess(CMD_NOK);
 }

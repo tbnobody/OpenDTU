@@ -1,4 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
+/*
+ * Copyright (C) 2023 Thomas Basler and others
+ */
 #include "Display_Graphic.h"
 #include "Datastore.h"
 #include <NetworkSettings.h>
@@ -39,7 +42,7 @@ DisplayGraphicClass::~DisplayGraphicClass()
     delete _display;
 }
 
-void DisplayGraphicClass::init(Scheduler* scheduler, const DisplayType_t type, const uint8_t data, const uint8_t clk, const uint8_t cs, const uint8_t reset)
+void DisplayGraphicClass::init(Scheduler& scheduler, const DisplayType_t type, const uint8_t data, const uint8_t clk, const uint8_t cs, const uint8_t reset)
 {
     _display_type = type;
     if (_display_type > DisplayType_t::None) {
@@ -50,7 +53,7 @@ void DisplayGraphicClass::init(Scheduler* scheduler, const DisplayType_t type, c
         setStatus(true);
     }
 
-    scheduler->addTask(_loopTask);
+    scheduler.addTask(_loopTask);
     _loopTask.setCallback(std::bind(&DisplayGraphicClass::loop, this));
     _loopTask.setIterations(TASK_FOREVER);
     _loopTask.setInterval(_period);

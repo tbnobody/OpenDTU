@@ -30,7 +30,7 @@ private:
     void openReadingPipe();
     void openWritingPipe(const serial_u serial);
 
-    void sendEsbPacket(CommandAbstract* cmd);
+    void sendEsbPacket(CommandAbstract& cmd);
 
     std::unique_ptr<SPIClass> _spiPtr;
     std::unique_ptr<RF24> _radio;

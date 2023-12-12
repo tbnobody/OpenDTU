@@ -47,7 +47,7 @@ uint8_t RequestFrameCommand::getFrameNo() const
     return _payload[9] & (~0x80);
 }
 
-bool RequestFrameCommand::handleResponse(InverterAbstract* inverter, const fragment_t fragment[], const uint8_t max_fragment_id)
+bool RequestFrameCommand::handleResponse(InverterAbstract& inverter, const fragment_t fragment[], const uint8_t max_fragment_id)
 {
     return true;
 }

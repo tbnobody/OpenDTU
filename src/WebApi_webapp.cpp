@@ -18,9 +18,9 @@ extern const uint8_t file_zones_json_end[] asm("_binary_webapp_dist_zones_json_g
 extern const uint8_t file_app_js_end[] asm("_binary_webapp_dist_js_app_js_gz_end");
 extern const uint8_t file_site_webmanifest_end[] asm("_binary_webapp_dist_site_webmanifest_end");
 
-void WebApiWebappClass::init(AsyncWebServer* server)
+void WebApiWebappClass::init(AsyncWebServer& server)
 {
-    _server = server;
+    _server = &server;
 
     _server->on("/", HTTP_GET, [](AsyncWebServerRequest* request) {
         AsyncWebServerResponse* response = request->beginResponse_P(200, "text/html", file_index_html_start, file_index_html_end - file_index_html_start);

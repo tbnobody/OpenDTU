@@ -122,7 +122,7 @@ void HoymilesRadio_CMT::loop()
         // Perform package parsing only if no packages are received
         if (!_rxBuffer.empty()) {
             fragment_t f = _rxBuffer.back();
-            if (checkFragmentCrc(&f)) {
+            if (checkFragmentCrc(f)) {
 
                 const serial_u dtuId = convertSerialToRadioId(_dtuSerial);
 
@@ -130,7 +130,7 @@ void HoymilesRadio_CMT::loop()
                 // Has to be done manually here.
                 if (memcmp(&f.fragment[5], &dtuId.b[1], 4) == 0) {
 
-                    std::shared_ptr<InverterAbstract> inv = Hoymiles.getInverterByFragment(&f);
+                    std::shared_ptr<InverterAbstract> inv = Hoymiles.getInverterByFragment(f);
 
                     if (nullptr != inv) {
                         // Save packet in inverter rx buffer
@@ -211,27 +211,27 @@ void ARDUINO_ISR_ATTR HoymilesRadio_CMT::handleInt2()
     _packetReceived = true;
 }
 
-void HoymilesRadio_CMT::sendEsbPacket(CommandAbstract* cmd)
+void HoymilesRadio_CMT::sendEsbPacket(CommandAbstract& cmd)
 {
-    cmd->incrementSendCount();
+    cmd.incrementSendCount();
 
-    cmd->setRouterAddress(DtuSerial().u64);
+    cmd.setRouterAddress(DtuSerial().u64);
 
     _radio->stopListening();
 
-    if (cmd->getDataPayload()[0] == 0x56) { // @todo(tbnobody) Bad hack to identify ChannelChange Command
+    if (cmd.getDataPayload()[0] == 0x56) { // @todo(tbnobody) Bad hack to identify ChannelChange Command
         cmtSwitchDtuFreq(HOY_BOOT_FREQ / 1000);
     }
 
     Hoymiles.getMessageOutput()->printf("TX %s %.2f MHz --> ",
-        cmd->getCommandName().c_str(), getFrequencyFromChannel(_radio->getChannel()));
-    cmd->dumpDataPayload(Hoymiles.getMessageOutput());
+        cmd.getCommandName().c_str(), getFrequencyFromChannel(_radio->getChannel()));
+    cmd.dumpDataPayload(Hoymiles.getMessageOutput());
 
-    if (!_radio->write(cmd->getDataPayload(), cmd->getDataSize())) {
+    if (!_radio->write(cmd.getDataPayload(), cmd.getDataSize())) {
         Hoymiles.getMessageOutput()->println("TX SPI Timeout");
     }
     cmtSwitchDtuFreq(_inverterTargetFrequency);
     _radio->startListening();
     _busyFlag = true;
-    _rxTimeout.set(cmd->getTimeout());
+    _rxTimeout.set(cmd.getTimeout());
 }

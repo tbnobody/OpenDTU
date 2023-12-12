@@ -214,7 +214,7 @@ void AlarmLogParser::setMessageType(const AlarmMessageType_t type)
     _messageType = type;
 }
 
-void AlarmLogParser::getLogEntry(const uint8_t entryId, AlarmLogEntry_t* entry, const AlarmMessageLocale_t locale)
+void AlarmLogParser::getLogEntry(const uint8_t entryId, AlarmLogEntry_t& entry, const AlarmMessageLocale_t locale)
 {
     const uint8_t entryStartOffset = 2 + entryId * ALARM_LOG_ENTRY_SIZE;
 
@@ -233,34 +233,34 @@ void AlarmLogParser::getLogEntry(const uint8_t entryId, AlarmLogEntry_t* entry, 
         endTimeOffset = 12 * 60 * 60;
     }
 
-    entry->MessageId = _payloadAlarmLog[entryStartOffset + 1];
-    entry->StartTime = (((uint16_t)_payloadAlarmLog[entryStartOffset + 4] << 8) | ((uint16_t)_payloadAlarmLog[entryStartOffset + 5])) + startTimeOffset + timezoneOffset;
-    entry->EndTime = ((uint16_t)_payloadAlarmLog[entryStartOffset + 6] << 8) | ((uint16_t)_payloadAlarmLog[entryStartOffset + 7]);
+    entry.MessageId = _payloadAlarmLog[entryStartOffset + 1];
+    entry.StartTime = (((uint16_t)_payloadAlarmLog[entryStartOffset + 4] << 8) | ((uint16_t)_payloadAlarmLog[entryStartOffset + 5])) + startTimeOffset + timezoneOffset;
+    entry.EndTime = ((uint16_t)_payloadAlarmLog[entryStartOffset + 6] << 8) | ((uint16_t)_payloadAlarmLog[entryStartOffset + 7]);
 
     HOY_SEMAPHORE_GIVE();
 
-    if (entry->EndTime > 0) {
-        entry->EndTime += (endTimeOffset + timezoneOffset);
+    if (entry.EndTime > 0) {
+        entry.EndTime += (endTimeOffset + timezoneOffset);
     }
 
     switch (locale) {
     case AlarmMessageLocale_t::DE:
-        entry->Message = "Unbekannt";
+        entry.Message = "Unbekannt";
         break;
     case AlarmMessageLocale_t::FR:
-        entry->Message = "Inconnu";
+        entry.Message = "Inconnu";
         break;
     default:
-        entry->Message = "Unknown";
+        entry.Message = "Unknown";
     }
 
     for (auto& msg : _alarmMessages) {
-        if (msg.MessageId == entry->MessageId) {
+        if (msg.MessageId == entry.MessageId) {
             if (msg.InverterType == _messageType) {
-                entry->Message = getLocaleMessage(&msg, locale);
+                entry.Message = getLocaleMessage(&msg, locale);
                 break;
             } else if (msg.InverterType == AlarmMessageType_t::ALL) {
-                entry->Message = getLocaleMessage(&msg, locale);
+                entry.Message = getLocaleMessage(&msg, locale);
             }
         }
     }

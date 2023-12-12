@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * Copyright (C) 2022 Thomas Basler and others
+ * Copyright (C) 2022-2023 Thomas Basler and others
  */
 #include "NetworkSettings.h"
 #include "Configuration.h"
@@ -18,7 +18,7 @@ NetworkSettingsClass::NetworkSettingsClass()
     dnsServer.reset(new DNSServer());
 }
 
-void NetworkSettingsClass::init(Scheduler* scheduler)
+void NetworkSettingsClass::init(Scheduler& scheduler)
 {
     using std::placeholders::_1;
 
@@ -28,7 +28,7 @@ void NetworkSettingsClass::init(Scheduler* scheduler)
     WiFi.onEvent(std::bind(&NetworkSettingsClass::NetworkEvent, this, _1));
     setupMode();
 
-    scheduler->addTask(_loopTask);
+    scheduler.addTask(_loopTask);
     _loopTask.setCallback(std::bind(&NetworkSettingsClass::loop, this));
     _loopTask.setIterations(TASK_FOREVER);
     _loopTask.enable();

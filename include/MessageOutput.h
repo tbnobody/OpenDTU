@@ -11,7 +11,7 @@
 
 class MessageOutputClass : public Print {
 public:
-    void init(Scheduler* scheduler);
+    void init(Scheduler& scheduler);
     size_t write(uint8_t c) override;
     size_t write(const uint8_t* buffer, size_t size) override;
     void register_ws_output(AsyncWebSocket* output);

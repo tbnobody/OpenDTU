@@ -41,7 +41,7 @@ LedSingleClass::LedSingleClass()
 {
 }
 
-void LedSingleClass::init(Scheduler* scheduler)
+void LedSingleClass::init(Scheduler& scheduler)
 {
     bool ledActive = false;
 
@@ -61,12 +61,12 @@ void LedSingleClass::init(Scheduler* scheduler)
     }
 
     if (ledActive) {
-        scheduler->addTask(_outputTask);
+        scheduler.addTask(_outputTask);
         _outputTask.setCallback(std::bind(&LedSingleClass::outputLoop, this));
         _outputTask.setIterations(TASK_FOREVER);
         _outputTask.enable();
 
-        scheduler->addTask(_setTask);
+        scheduler.addTask(_setTask);
         _setTask.setCallback(std::bind(&LedSingleClass::setLoop, this));
         _setTask.setInterval(LEDSINGLE_UPDATE_INTERVAL * TASK_MILLISECOND);
         _setTask.setIterations(TASK_FOREVER);

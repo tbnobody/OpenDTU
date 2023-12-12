@@ -31,8 +31,8 @@ protected:
     static serial_u convertSerialToRadioId(const serial_u serial);
     static void dumpBuf(const uint8_t buf[], const uint8_t len, const bool appendNewline = true);
 
-    bool checkFragmentCrc(const fragment_t* fragment) const;
-    virtual void sendEsbPacket(CommandAbstract* cmd) = 0;
+    bool checkFragmentCrc(const fragment_t& fragment) const;
+    virtual void sendEsbPacket(CommandAbstract& cmd) = 0;
     void sendRetransmitPacket(const uint8_t fragment_id);
     void sendLastPacketAgain();
     void handleReceivedPackage();

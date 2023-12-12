@@ -8,7 +8,7 @@
 
 class MqttHandleInverterClass {
 public:
-    void init(Scheduler* scheduler);
+    void init(Scheduler& scheduler);
 
     static String getTopic(std::shared_ptr<InverterAbstract> inv, const ChannelType_t type, const ChannelNum_t channel, const FieldId_t fieldId);
 

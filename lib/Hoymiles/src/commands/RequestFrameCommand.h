@@ -12,5 +12,5 @@ public:
     void setFrameNo(const uint8_t frame_no);
     uint8_t getFrameNo() const;
 
-    virtual bool handleResponse(InverterAbstract* inverter, const fragment_t fragment[], const uint8_t max_fragment_id);
+    virtual bool handleResponse(InverterAbstract& inverter, const fragment_t fragment[], const uint8_t max_fragment_id);
 };

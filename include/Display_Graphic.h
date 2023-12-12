@@ -17,7 +17,7 @@ public:
     DisplayGraphicClass();
     ~DisplayGraphicClass();
 
-    void init(Scheduler* scheduler, const DisplayType_t type, const uint8_t data, const uint8_t clk, const uint8_t cs, const uint8_t reset);
+    void init(Scheduler& scheduler, const DisplayType_t type, const uint8_t data, const uint8_t clk, const uint8_t cs, const uint8_t reset);
     void setContrast(const uint8_t contrast);
     void setStatus(const bool turnOn);
     void setOrientation(const uint8_t rotation = DISPLAY_ROTATION);

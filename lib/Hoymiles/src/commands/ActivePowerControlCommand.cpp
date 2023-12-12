@@ -62,24 +62,24 @@ void ActivePowerControlCommand::setActivePowerLimit(const float limit, const Pow
     udpateCRC(CRC_SIZE);
 }
 
-bool ActivePowerControlCommand::handleResponse(InverterAbstract* inverter, const fragment_t fragment[], const uint8_t max_fragment_id)
+bool ActivePowerControlCommand::handleResponse(InverterAbstract& inverter, const fragment_t fragment[], const uint8_t max_fragment_id)
 {
     if (!DevControlCommand::handleResponse(inverter, fragment, max_fragment_id)) {
         return false;
     }
 
     if ((getType() == PowerLimitControlType::RelativNonPersistent) || (getType() == PowerLimitControlType::RelativPersistent)) {
-        inverter->SystemConfigPara()->setLimitPercent(getLimit());
+        inverter.SystemConfigPara()->setLimitPercent(getLimit());
     } else {
-        const uint16_t max_power = inverter->DevInfo()->getMaxPower();
+        const uint16_t max_power = inverter.DevInfo()->getMaxPower();
         if (max_power > 0) {
-            inverter->SystemConfigPara()->setLimitPercent(static_cast<float>(getLimit()) / max_power * 100);
+            inverter.SystemConfigPara()->setLimitPercent(static_cast<float>(getLimit()) / max_power * 100);
         } else {
             // TODO(tbnobody): Not implemented yet because we only can publish the percentage value
         }
     }
-    inverter->SystemConfigPara()->setLastUpdateCommand(millis());
-    inverter->SystemConfigPara()->setLastLimitCommandSuccess(CMD_OK);
+    inverter.SystemConfigPara()->setLastUpdateCommand(millis());
+    inverter.SystemConfigPara()->setLastLimitCommandSuccess(CMD_OK);
     return true;
 }
 
@@ -94,7 +94,7 @@ PowerLimitControlType ActivePowerControlCommand::getType()
     return (PowerLimitControlType)(((uint16_t)_payload[14] << 8) | _payload[15]);
 }
 
-void ActivePowerControlCommand::gotTimeout(InverterAbstract* inverter)
+void ActivePowerControlCommand::gotTimeout(InverterAbstract& inverter)
 {
-    inverter->SystemConfigPara()->setLastLimitCommandSuccess(CMD_NOK);
+    inverter.SystemConfigPara()->setLastLimitCommandSuccess(CMD_NOK);
 }

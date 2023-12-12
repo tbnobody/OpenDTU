@@ -60,7 +60,7 @@ public:
 
     void clearRxFragmentBuffer();
     void addRxFragment(const uint8_t fragment[], const uint8_t len);
-    uint8_t verifyAllFragments(CommandAbstract* cmd);
+    uint8_t verifyAllFragments(CommandAbstract& cmd);
 
     virtual bool sendStatsRequest() = 0;
     virtual bool sendAlarmLogRequest(const bool force = false) = 0;

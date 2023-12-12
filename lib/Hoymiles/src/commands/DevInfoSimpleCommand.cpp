@@ -34,7 +34,7 @@ String DevInfoSimpleCommand::getCommandName() const
     return "DevInfoSimple";
 }
 
-bool DevInfoSimpleCommand::handleResponse(InverterAbstract* inverter, const fragment_t fragment[], const uint8_t max_fragment_id)
+bool DevInfoSimpleCommand::handleResponse(InverterAbstract& inverter, const fragment_t fragment[], const uint8_t max_fragment_id)
 {
     // Check CRC of whole payload
     if (!MultiDataCommand::handleResponse(inverter, fragment, max_fragment_id)) {
@@ -43,13 +43,13 @@ bool DevInfoSimpleCommand::handleResponse(InverterAbstract* inverter, const frag
 
     // Move all fragments into target buffer
     uint8_t offs = 0;
-    inverter->DevInfo()->beginAppendFragment();
-    inverter->DevInfo()->clearBufferSimple();
+    inverter.DevInfo()->beginAppendFragment();
+    inverter.DevInfo()->clearBufferSimple();
     for (uint8_t i = 0; i < max_fragment_id; i++) {
-        inverter->DevInfo()->appendFragmentSimple(offs, fragment[i].fragment, fragment[i].len);
+        inverter.DevInfo()->appendFragmentSimple(offs, fragment[i].fragment, fragment[i].len);
         offs += (fragment[i].len);
     }
-    inverter->DevInfo()->endAppendFragment();
-    inverter->DevInfo()->setLastUpdateSimple(millis());
+    inverter.DevInfo()->endAppendFragment();
+    inverter.DevInfo()->setLastUpdateSimple(millis());
     return true;
 }

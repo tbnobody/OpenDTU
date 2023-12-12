@@ -218,15 +218,15 @@ void InverterAbstract::addRxFragment(const uint8_t fragment[], const uint8_t len
 }
 
 // Returns Zero on Success or the Fragment ID for retransmit or error code
-uint8_t InverterAbstract::verifyAllFragments(CommandAbstract* cmd)
+uint8_t InverterAbstract::verifyAllFragments(CommandAbstract& cmd)
 {
     // All missing
     if (_rxFragmentLastPacketId == 0) {
         Hoymiles.getMessageOutput()->println("All missing");
-        if (cmd->getSendCount() <= cmd->getMaxResendCount()) {
+        if (cmd.getSendCount() <= cmd.getMaxResendCount()) {
             return FRAGMENT_ALL_MISSING_RESEND;
         } else {
-            cmd->gotTimeout(this);
+            cmd.gotTimeout(*this);
             return FRAGMENT_ALL_MISSING_TIMEOUT;
         }
     }
@@ -234,10 +234,10 @@ uint8_t InverterAbstract::verifyAllFragments(CommandAbstract* cmd)
     // Last fragment is missing (the one with 0x80)
     if (_rxFragmentMaxPacketId == 0) {
         Hoymiles.getMessageOutput()->println("Last missing");
-        if (_rxFragmentRetransmitCnt++ < cmd->getMaxRetransmitCount()) {
+        if (_rxFragmentRetransmitCnt++ < cmd.getMaxRetransmitCount()) {
             return _rxFragmentLastPacketId + 1;
         } else {
-            cmd->gotTimeout(this);
+            cmd.gotTimeout(*this);
             return FRAGMENT_RETRANSMIT_TIMEOUT;
         }
     }
@@ -246,17 +246,17 @@ uint8_t InverterAbstract::verifyAllFragments(CommandAbstract* cmd)
     for (uint8_t i = 0; i < _rxFragmentMaxPacketId - 1; i++) {
         if (!_rxFragmentBuffer[i].wasReceived) {
             Hoymiles.getMessageOutput()->println("Middle missing");
-            if (_rxFragmentRetransmitCnt++ < cmd->getMaxRetransmitCount()) {
+            if (_rxFragmentRetransmitCnt++ < cmd.getMaxRetransmitCount()) {
                 return i + 1;
             } else {
-                cmd->gotTimeout(this);
+                cmd.gotTimeout(*this);
                 return FRAGMENT_RETRANSMIT_TIMEOUT;
             }
         }
     }
 
-    if (!cmd->handleResponse(this, _rxFragmentBuffer, _rxFragmentMaxPacketId)) {
-        cmd->gotTimeout(this);
+    if (!cmd.handleResponse(*this, _rxFragmentBuffer, _rxFragmentMaxPacketId)) {
+        cmd.gotTimeout(*this);
         return FRAGMENT_HANDLE_ERROR;
     }
 

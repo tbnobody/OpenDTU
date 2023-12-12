@@ -6,7 +6,7 @@
 
 class DatastoreClass {
 public:
-    void init(Scheduler* scheduler);
+    void init(Scheduler& scheduler);
 
     // Sum of yield total of all enabled inverters, a inverter which is just disabled at night is also included
     float getTotalAcYieldTotalEnabled();

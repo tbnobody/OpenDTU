@@ -47,7 +47,7 @@ uint8_t ChannelChangeCommand::getChannel() const
     return _payload[12];
 }
 
-bool ChannelChangeCommand::handleResponse(InverterAbstract* inverter, const fragment_t fragment[], const uint8_t max_fragment_id)
+bool ChannelChangeCommand::handleResponse(InverterAbstract& inverter, const fragment_t fragment[], const uint8_t max_fragment_id)
 {
     return true;
 }

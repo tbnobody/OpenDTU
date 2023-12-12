@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * Copyright (C) 2022 Thomas Basler and others
+ * Copyright (C) 2022-2023 Thomas Basler and others
  */
 #include "WebApi_ws_live.h"
 #include "Configuration.h"
@@ -15,7 +15,7 @@ WebApiWsLiveClass::WebApiWsLiveClass()
 {
 }
 
-void WebApiWsLiveClass::init(AsyncWebServer* server)
+void WebApiWsLiveClass::init(AsyncWebServer& server)
 {
     using std::placeholders::_1;
     using std::placeholders::_2;
@@ -24,7 +24,7 @@ void WebApiWsLiveClass::init(AsyncWebServer* server)
     using std::placeholders::_5;
     using std::placeholders::_6;
 
-    _server = server;
+    _server = &server;
     _server->on("/api/livedata/status", HTTP_GET, std::bind(&WebApiWsLiveClass::onLivedataStatus, this, _1));
 
     _server->addHandler(&_ws);

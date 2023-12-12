@@ -39,7 +39,7 @@ void DevControlCommand::udpateCRC(const uint8_t len)
     _payload[10 + len + 1] = (uint8_t)(crc);
 }
 
-bool DevControlCommand::handleResponse(InverterAbstract* inverter, const fragment_t fragment[], const uint8_t max_fragment_id)
+bool DevControlCommand::handleResponse(InverterAbstract& inverter, const fragment_t fragment[], const uint8_t max_fragment_id)
 {
     for (uint8_t i = 0; i < max_fragment_id; i++) {
         if (fragment[i].mainCmd != (_payload[0] | 0x80)) {
