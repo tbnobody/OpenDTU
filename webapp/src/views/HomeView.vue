@@ -431,7 +431,7 @@ export default defineComponent({
             currentLimitList: {} as LimitStatus,
             targetLimitList: {} as LimitConfig,
 
-            targetLimitMin: 2,
+            targetLimitMin: 0,
             targetLimitMax: 100,
             targetLimitTypeText: this.$t('home.Relative'),
             targetLimitType: 1,
@@ -679,11 +679,11 @@ export default defineComponent({
         onSelectType(type: number) {
             if (type == 1) {
                 this.targetLimitTypeText = this.$t('home.Relative');
-                this.targetLimitMin = 2;
+                this.targetLimitMin = 0;
                 this.targetLimitMax = 100;
             } else {
                 this.targetLimitTypeText = this.$t('home.Absolute');
-                this.targetLimitMin = 10;
+                this.targetLimitMin = 0;
                 this.targetLimitMax = (this.currentLimitList.max_power > 0 ? this.currentLimitList.max_power : 2250);
             }
             this.targetLimitType = type;

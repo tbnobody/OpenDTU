@@ -5,6 +5,8 @@
 #include "WebApi_limit.h"
 #include "WebApi.h"
 #include "WebApi_errors.h"
+#include "defaults.h"
+#include "helper.h"
 #include <AsyncJson.h>
 #include <Hoymiles.h>
 
@@ -112,10 +114,10 @@ void WebApiLimitClass::onLimitPost(AsyncWebServerRequest* request)
         return;
     }
 
-    if (root["limit_value"].as<uint16_t>() == 0 || root["limit_value"].as<uint16_t>() > 2250) {
-        retMsg["message"] = "Limit must between 1 and 2250!";
+    if (root["limit_value"].as<uint16_t>() > MAX_INVERTER_LIMIT) {
+        retMsg["message"] = "Limit must between 0 and " STR(MAX_INVERTER_LIMIT) "!";
         retMsg["code"] = WebApiError::LimitInvalidLimit;
-        retMsg["param"]["max"] = 2250;
+        retMsg["param"]["max"] = MAX_INVERTER_LIMIT;
         response->setLength();
         request->send(response);
         return;
