@@ -24,7 +24,9 @@
     },
     "base": {
         "Loading": "Loading...",
-        "Reload": "Reload"
+        "Reload": "Reload",
+        "Cancel": "Cancel",
+        "Save": "Save"
     },
     "localeswitcher": {
         "Dark": "Dark",
@@ -330,7 +332,7 @@
         "DeviceReboot": "Device Reboot",
         "PerformReboot": "Perform Reboot",
         "Reboot": "Reboot!",
-        "Cancel": "Cancel",
+        "Cancel": "@:base.Cancel",
         "RebootOpenDTU": "Reboot OpenDTU",
         "RebootQuestion": "Do you really want to reboot the device?",
         "RebootHint": "<b>Note:</b> A manual reboot does not normally have to be performed. OpenDTU performs any required reboot (e.g. after a firmware update) automatically. Settings are also adopted without rebooting. If you need to reboot due to an error, please consider reporting it at <a href=\"https://github.com/tbnobody/OpenDTU/issues\" class=\"alert-link\" target=\"_blank\">https://github.com/tbnobody/OpenDTU/issues</a>."
@@ -351,7 +353,6 @@
         "CmtFrequencyWarning": "The selected frequency is outside the range allowed in the EU. Make sure that this selection does not violate any local regulations.",
         "MHz": "{mhz} MHz",
         "dBm": "{dbm} dBm",
-        "Save": "Save",
         "Min": "Minimum ({db} dBm)",
         "Low": "Low ({db} dBm)",
         "High": "High ({db} dBm)",
@@ -364,8 +365,7 @@
         "RepeatPassword": "Repeat Password:",
         "PasswordHint": "<b>Hint:</b> The administrator password is used to access this web interface (user 'admin'), but also to connect to the device when in AP mode. It must be 8..64 characters.",
         "Permissions": "Permissions",
-        "ReadOnly": "Allow readonly access to web interface without password",
-        "Save": "@:dtuadmin.Save"
+        "ReadOnly": "Allow readonly access to web interface without password"
     },
     "ntpadmin": {
         "NtpSettings": "NTP Settings",
@@ -383,7 +383,6 @@
         "NAUTICAL": "Nautical dawn (102°)",
         "CIVIL": "Civil dawn (96°)",
         "ASTONOMICAL": "Astronomical dawn (108°)",
-        "Save": "@:dtuadmin.Save",
         "ManualTimeSynchronization": "Manual Time Synchronization",
         "CurrentOpenDtuTime": "Current OpenDTU Time:",
         "CurrentLocalTime": "Current Local Time:",
@@ -407,7 +406,6 @@
         "ApTimeout": "AccessPoint Timeout:",
         "ApTimeoutHint": "Time which the AccessPoint is kept open. A value of 0 means infinite.",
         "Minutes": "minutes",
-        "Save": "@:dtuadmin.Save",
         "EnableMdns": "Enable mDNS",
         "MdnsSettings": "mDNS Settings"
     },
@@ -451,8 +449,7 @@
         "HassPrefixTopicHint": "The prefix for the discovery topic",
         "HassRetain": "Enable Retain Flag",
         "HassExpire": "Enable Expiration",
-        "HassIndividual": "Individual Panels",
-        "Save": "@:dtuadmin.Save"
+        "HassIndividual": "Individual Panels"
     },
     "inverteradmin": {
         "InverterSettings": "Inverter Settings",
@@ -495,8 +492,8 @@
         "ZeroRuntimeHint": "Zero runtime data (no yield data) if inverter becomes unreachable.",
         "ZeroDay": "Zero daily yield at midnight",
         "ZeroDayHint": "This only works if the inverter is unreachable. If data is read from the inverter, it's values will be used. (Reset only occours on power cycle)",
-        "Cancel": "@:maintenancereboot.Cancel",
-        "Save": "@:dtuadmin.Save",
+        "Cancel": "@:base.Cancel",
+        "Save": "@:base.Save",
         "DeleteMsg": "Are you sure you want to delete the inverter \"{name}\" with serial number {serial}?",
         "Delete": "Delete",
         "YieldDayCorrection": "Yield Day Correction",
@@ -519,7 +516,7 @@
         "FactoryReset": "Factory Reset",
         "ResetMsg": "Are you sure you want to delete the current configuration and reset all settings to their factory defaults?",
         "ResetConfirm": "Factory Reset!",
-        "Cancel": "@:maintenancereboot.Cancel"
+        "Cancel": "@:base.Cancel"
     },
     "login": {
         "Login": "Login",
@@ -586,8 +583,7 @@
         "fr": "French",
         "Leds": "LEDs",
         "EqualBrightness": "Equal brightness:",
-        "LedBrightness": "LED {led} brightness ({brightness}):",
-        "Save": "@:dtuadmin.Save"
+        "LedBrightness": "LED {led} brightness ({brightness}):"
     },
     "pininfo": {
         "PinOverview": "Connection overview",

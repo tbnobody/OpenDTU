@@ -24,7 +24,9 @@
     },
     "base": {
         "Loading": "Chargement...",
-        "Reload": "Reload"
+        "Reload": "Reload",
+        "Cancel": "Annuler",
+        "Save": "Sauvegarder"
     },
     "localeswitcher": {
         "Dark": "Sombre",
@@ -330,7 +332,7 @@
         "DeviceReboot": "Redémarrage de l'appareil",
         "PerformReboot": "Effectuer un redémarrage",
         "Reboot": "Redémarrer !",
-        "Cancel": "Annuler",
+        "Cancel": "@:base.Cancel",
         "RebootOpenDTU": "Redémarrer OpenDTU",
         "RebootQuestion": "Voulez-vous vraiment redémarrer l'appareil ?",
         "RebootHint": "<b>Astuce :</b> Normalement, il n'est pas nécessaire de procéder à un redémarrage manuel. OpenDTU effectue automatiquement tout redémarrage nécessaire (par exemple, après une mise à jour du firmware). Les paramètres sont également adoptés sans redémarrage. Si vous devez redémarrer en raison d'une erreur, veuillez envisager de la signaler à l'adresse suivante <a href=\"https://github.com/tbnobody/OpenDTU/issues\" class=\"alert-link\" target=\"_blank\">https://github.com/tbnobody/OpenDTU/issues</a>."
@@ -351,7 +353,6 @@
         "CmtFrequencyWarning": "The selected frequency is outside the range allowed in the EU. Make sure that this selection does not violate any local regulations.",
         "MHz": "{mhz} MHz",
         "dBm": "{dbm} dBm",
-        "Save": "Sauvegarder",
         "Min": "Minimum ({db} dBm)",
         "Low": "Bas ({db} dBm)",
         "High": "Haut ({db} dBm)",
@@ -364,8 +365,7 @@
         "RepeatPassword": "Répéter le mot de passe",
         "PasswordHint": "<b>Astuce :</b> Le mot de passe administrateur est utilisé pour accéder à cette interface web (utilisateur 'admin'), mais aussi pour se connecter à l'appareil en mode AP. Il doit comporter de 8 à 64 caractères.",
         "Permissions": "Autorisations",
-        "ReadOnly": "Autoriser l'accès en lecture seule à l'interface web sans mot de passe",
-        "Save": "@:dtuadmin.Save"
+        "ReadOnly": "Autoriser l'accès en lecture seule à l'interface web sans mot de passe"
     },
     "ntpadmin": {
         "NtpSettings": "Paramètres NTP",
@@ -383,7 +383,6 @@
         "NAUTICAL": "Nautical dawn (102°)",
         "CIVIL": "Civil dawn (96°)",
         "ASTONOMICAL": "Astronomical dawn (108°)",
-        "Save": "@:dtuadmin.Save",
         "ManualTimeSynchronization": "Synchronisation manuelle de l'heure",
         "CurrentOpenDtuTime": "Heure actuelle de l'OpenDTU",
         "CurrentLocalTime": "Heure locale actuelle",
@@ -495,8 +494,8 @@
         "ZeroRuntimeHint": "Zero runtime data (no yield data) if inverter becomes unreachable.",
         "ZeroDay": "Zero daily yield at midnight",
         "ZeroDayHint": "This only works if the inverter is unreachable. If data is read from the inverter, it's values will be used. (Reset only occours on power cycle)",
-        "Cancel": "@:maintenancereboot.Cancel",
-        "Save": "@:dtuadmin.Save",
+        "Cancel": "@:base.Cancel",
+        "Save": "@:base.Save",
         "DeleteMsg": "Êtes-vous sûr de vouloir supprimer l'onduleur \"{name}\" avec le numéro de série \"{serial}\" ?",
         "Delete": "Supprimer",
         "YieldDayCorrection": "Yield Day Correction",
@@ -519,7 +518,7 @@
         "FactoryReset": "Remise à zéro",
         "ResetMsg": "Êtes-vous sûr de vouloir supprimer la configuration actuelle et réinitialiser tous les paramètres à leurs valeurs par défaut ?",
         "ResetConfirm": "Remise à zéro !",
-        "Cancel": "@:maintenancereboot.Cancel"
+        "Cancel": "@:base.Cancel"
     },
     "login": {
         "Login": "Connexion",
@@ -586,8 +585,7 @@
         "fr": "Français",
         "Leds": "LEDs",
         "EqualBrightness": "Même luminosité:",
-        "LedBrightness": "LED {led} luminosité ({brightness}):",
-        "Save": "@:dtuadmin.Save"
+        "LedBrightness": "LED {led} luminosité ({brightness}):"
     },
     "pininfo": {
         "PinOverview": "Vue d'ensemble des connexions",

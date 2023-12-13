@@ -123,7 +123,7 @@
                 </div>
             </div>
 
-            <button type="submit" class="btn btn-primary mb-3">{{ $t('deviceadmin.Save') }}</button>
+            <FormFooter @reload="getDeviceConfig"/>
 
         </form>
     </BasePage>
@@ -132,6 +132,7 @@
 <script lang="ts">
 import BasePage from '@/components/BasePage.vue';
 import BootstrapAlert from "@/components/BootstrapAlert.vue";
+import FormFooter from '@/components/FormFooter.vue';
 import InputElement from '@/components/InputElement.vue';
 import PinInfo from '@/components/PinInfo.vue';
 import type { DeviceConfig, Led } from "@/types/DeviceConfig";
@@ -143,6 +144,7 @@ export default defineComponent({
     components: {
         BasePage,
         BootstrapAlert,
+        FormFooter,
         InputElement,
         PinInfo,
     },
