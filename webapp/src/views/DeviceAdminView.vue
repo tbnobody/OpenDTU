@@ -36,6 +36,15 @@
                                 </div>
                             </div>
 
+                            <div class="row mb-3">
+                                <div class="col-sm-2"></div>
+                                <div class="col-sm-10">
+                                    <div class="btn-group" v-for="doc in pinMappingList.find(i => i.name === deviceConfigList.curPin.name)?.links">
+                                        <a :href="doc.url" class="btn btn-primary" target="_blank">{{ doc.name }}</a>
+                                    </div>
+                                </div>
+                            </div>
+
                             <div class="alert alert-danger mt-3" role="alert" v-html="$t('deviceadmin.ProfileHint')">
                             </div>
 

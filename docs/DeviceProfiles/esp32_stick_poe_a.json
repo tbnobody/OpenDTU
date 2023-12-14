@@ -1,6 +1,9 @@
 [
     {
         "name": "Esp32-Stick-PoE-A",
+        "links": [
+            {"name": "Information", "url": "https://github.com/allexoK/Esp32-Stick-Boards-Docs"}
+        ],
         "nrf24": {
             "miso": 2,
             "mosi": 15,

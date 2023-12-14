@@ -59,7 +59,7 @@ export default defineComponent({
 
             let total: Array<string> = [];
             total = total.concat(curArray, selArray);
-            return Array.from(new Set(total)).filter(cat => cat != 'name').sort();
+            return Array.from(new Set(total)).filter(cat => cat !=  'name' && cat != 'links').sort();
         },
     },
     methods: {

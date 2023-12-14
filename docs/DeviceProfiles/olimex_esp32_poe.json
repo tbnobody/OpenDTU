@@ -1,6 +1,9 @@
 [
     {
         "name": "Olimex ESP32-POE",
+        "links": [
+            {"name": "Datasheet", "url": "https://www.olimex.com/Products/IoT/ESP32/ESP32-POE/open-source-hardware"}
+        ],
         "nrf24": {
             "miso": 15,
             "mosi": 2,
@@ -21,6 +24,9 @@
     },
     {
         "name": "Olimex ESP32-POE with SSD1306",
+        "links": [
+            {"name": "Datasheet", "url": "https://www.olimex.com/Products/IoT/ESP32/ESP32-POE/open-source-hardware"}
+        ],
         "nrf24": {
             "miso": 15,
             "mosi": 2,
@@ -46,6 +52,9 @@
     },
     {
         "name": "Olimex ESP32-POE with SH1106",
+        "links": [
+            {"name": "Datasheet", "url": "https://www.olimex.com/Products/IoT/ESP32/ESP32-POE/open-source-hardware"}
+        ],
         "nrf24": {
             "miso": 15,
             "mosi": 2,
