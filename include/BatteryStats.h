@@ -89,15 +89,29 @@ class PylontechBatteryStats : public BatteryStats {
 
 class JkBmsBatteryStats : public BatteryStats {
     public:
-        void getLiveViewData(JsonVariant& root) const final;
+        void getLiveViewData(JsonVariant& root) const final {
+            getJsonData(root, false);
+        }
+
+        void getInfoViewData(JsonVariant& root) const {
+            getJsonData(root, true);
+        }
+
         void mqttPublish() const final;
 
         void updateFrom(JkBms::DataPointContainer const& dp);
 
     private:
+        void getJsonData(JsonVariant& root, bool verbose) const;
+
         JkBms::DataPointContainer _dataPoints;
         mutable uint32_t _lastMqttPublish = 0;
         mutable uint32_t _lastFullMqttPublish = 0;
+
+        uint16_t _cellMinMilliVolt = 0;
+        uint16_t _cellAvgMilliVolt = 0;
+        uint16_t _cellMaxMilliVolt = 0;
+        uint32_t _cellVoltageTimestamp = 0;
 };
 
 class VictronSmartShuntStats : public BatteryStats {
@@ -107,8 +121,8 @@ class VictronSmartShuntStats : public BatteryStats {
 
         void updateFrom(VeDirectShuntController::veShuntStruct const& shuntData);
 
-    private:    
-        float _voltage; 
+    private:
+        float _voltage;
         float _current;
         float _temperature;
         bool _tempPresent;
