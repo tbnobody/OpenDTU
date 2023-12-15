@@ -9,6 +9,54 @@
 
 namespace JkBms {
 
+#define ALARM_BITS(fnc) \
+    fnc(LowCapacity, (1<<0)) \
+    fnc(BmsOvertemperature, (1<<1)) \
+    fnc(ChargingOvervoltage, (1<<2)) \
+    fnc(DischargeUndervoltage, (1<<3)) \
+    fnc(BatteryOvertemperature, (1<<4)) \
+    fnc(ChargingOvercurrent, (1<<5)) \
+    fnc(DischargeOvercurrent, (1<<6)) \
+    fnc(CellVoltageDifference, (1<<7)) \
+    fnc(BatteryBoxOvertemperature, (1<<8)) \
+    fnc(BatteryUndertemperature, (1<<9)) \
+    fnc(CellOvervoltage, (1<<10)) \
+    fnc(CellUndervoltage, (1<<11)) \
+    fnc(AProtect, (1<<12)) \
+    fnc(BProtect, (1<<13)) \
+    fnc(Reserved1, (1<<14)) \
+    fnc(Reserved2, (1<<15))
+
+enum class AlarmBits : uint16_t {
+#define ALARM_ENUM(name, value) name = value,
+    ALARM_BITS(ALARM_ENUM)
+#undef ALARM_ENUM
+};
+
+static const std::map<AlarmBits, std::string> AlarmBitTexts = {
+#define ALARM_TEXT(name, value) { AlarmBits::name, #name },
+    ALARM_BITS(ALARM_TEXT)
+#undef ALARM_TEXT
+};
+
+#define STATUS_BITS(fnc) \
+    fnc(ChargingActive, (1<<0)) \
+    fnc(DischargingActive, (1<<1)) \
+    fnc(BalancingActive, (1<<2)) \
+    fnc(BatteryOnline, (1<<3))
+
+enum class StatusBits : uint16_t {
+#define STATUS_ENUM(name, value) name = value,
+    STATUS_BITS(STATUS_ENUM)
+#undef STATUS_ENUM
+};
+
+static const std::map<StatusBits, std::string> StatusBitTexts = {
+#define STATUS_TEXT(name, value) { StatusBits::name, #name },
+    STATUS_BITS(STATUS_TEXT)
+#undef STATUS_TEXT
+};
+
 enum class DataPointLabel : uint8_t {
     CellsMilliVolt = 0x79,
     BmsTempCelsius = 0x80,
