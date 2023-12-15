@@ -68,6 +68,9 @@ Like to show your own build? Just send me a Pull Request.
 **TSUN compatibility remark:**
 Compatibility with OpenDTU is most likly related to the serial number of the inverter. Current findings indicate that TSUN inverters with a serial number starting with "11" are supported, whereby inverters with a serial number starting with "10" are not.
 
+**Hoymiles HMS-xxxx-xT-NA compatibility remark:**
+Currently it seems not to be possible to change the communication frequency of the "-NA" inverters. Please set the communication freuqency to 915MHz to get these inverters working.
+
 ## Features for end users
 
 * Read live data from inverter
