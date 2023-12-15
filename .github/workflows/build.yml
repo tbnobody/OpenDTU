@@ -101,7 +101,7 @@ jobs:
       - name: Rename Factory Firmware
         run: mv .pio/build/${{ matrix.environment }}/firmware.factory.bin .pio/build/${{ matrix.environment }}/opendtu-${{ matrix.environment }}.factory.bin
 
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
           name: opendtu-${{ matrix.environment }}
           path: |
