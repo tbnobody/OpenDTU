@@ -20,7 +20,7 @@
         </table>
 
         <div class="accordion" id="accordionProfile">
-            <div class="accordion-item" v-for="(section, index) in gridProfileList.sections">
+            <div class="accordion-item" v-for="(section, index) in gridProfileList.sections" :key="index">
                 <h2 class="accordion-header">
                     <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" :data-bs-target="`#collapse${index}`" aria-expanded="true" :aria-controls="`collapse${index}`">
                         {{ section.name }}
@@ -30,7 +30,7 @@
                     <div class="accordion-body">
                         <table class="table table-hover">
                         <tbody>
-                            <tr v-for="value in section.items">
+                            <tr v-for="value in section.items" :key="value.n">
                                 <th>{{ value.n }}</th>
                                 <td>
                                     <tempplate v-if="value.u!='bool'">
