@@ -14,7 +14,7 @@ const std::array<const ProfileType_t, PROFILE_TYPE_COUNT> GridProfileParser::_pr
     { 0x0a, 0x00, "European - EN 50549-1:2019" },
     { 0x0c, 0x00, "AT Tor - EU_EN50438" },
     { 0x0d, 0x04, "France" },
-    { 0x12, 0x00, "Poland" },
+    { 0x12, 0x00, "Poland - EU_EN50438" },
     { 0x37, 0x00, "Swiss - CH_NA EEA-NE7-CH2020" },
 } };
 
@@ -45,7 +45,7 @@ constexpr GridProfileItemDefinition_t make_value(frozen::string Name, frozen::st
     return v;
 }
 
-constexpr frozen::map<uint8_t, GridProfileItemDefinition_t, 0x38> itemDefinitions = {
+constexpr frozen::map<uint8_t, GridProfileItemDefinition_t, 0x39> itemDefinitions = {
     { 0x01, make_value("Nominale Voltage (NV)", "V", 10) },
     { 0x02, make_value("Low Voltage 1 (LV1)", "V", 10) },
     { 0x03, make_value("LV1 Maximum Trip Time (MTT)", "s", 10) },
@@ -102,6 +102,7 @@ constexpr frozen::map<uint8_t, GridProfileItemDefinition_t, 0x38> itemDefinition
     { 0x36, make_value("WPF Function Activated", "bool", 1) },
     { 0x37, make_value("Start of Power of WPF (Pstart)", "%Pn", 10) },
     { 0x38, make_value("Power Factor ar Rated Power (PFRP)", "", 100) },
+    { 0xff, make_value("Unkown Value", "", 1) },
 };
 
 const std::array<const GridProfileValue_t, SECTION_VALUE_COUNT> GridProfileParser::_profileValues = { {
@@ -122,6 +123,14 @@ const std::array<const GridProfileValue_t, SECTION_VALUE_COUNT> GridProfileParse
     { 0x00, 0x03, 0x07 },
     { 0x00, 0x03, 0x08 },
     { 0x00, 0x03, 0x09 },
+
+    // Version 0x08
+    { 0x00, 0x08, 0x01 },
+    { 0x00, 0x08, 0x02 },
+    { 0x00, 0x08, 0x03 },
+    { 0x00, 0x08, 0x04 },
+    { 0x00, 0x08, 0x05 },
+    { 0x00, 0x08, 0xff },
 
     // Version 0x0a
     { 0x00, 0x0a, 0x01 },
@@ -159,6 +168,21 @@ const std::array<const GridProfileValue_t, SECTION_VALUE_COUNT> GridProfileParse
     { 0x00, 0x0c, 0x0c },
     { 0x00, 0x0c, 0x0a },
 
+    // Version 0x35
+    { 0x00, 0x35, 0x01 },
+    { 0x00, 0x35, 0x02 },
+    { 0x00, 0x35, 0x03 },
+    { 0x00, 0x35, 0x04 },
+    { 0x00, 0x35, 0x05 },
+    { 0x00, 0x35, 0x06 },
+    { 0x00, 0x35, 0x07 },
+    { 0x00, 0x35, 0x08 },
+    { 0x00, 0x35, 0x09 },
+    { 0x00, 0x35, 0xff },
+    { 0x00, 0x35, 0xff },
+    { 0x00, 0x35, 0xff },
+    { 0x00, 0x35, 0xff },
+
     // Frequency (H/LFRT)
     // Version 0x00
     { 0x10, 0x00, 0x0d },
@@ -190,6 +214,15 @@ const std::array<const GridProfileValue_t, SECTION_VALUE_COUNT> GridProfileParse
     { 0x30, 0x03, 0x1a },
     { 0x30, 0x03, 0x1b },
 
+    // Version 0x07
+    { 0x30, 0x07, 0x17 },
+    { 0x30, 0x07, 0x18 },
+    { 0x30, 0x07, 0x19 },
+    { 0x30, 0x07, 0x1a },
+    { 0x30, 0x07, 0x1b },
+    { 0x30, 0x07, 0xff },
+    { 0x30, 0x07, 0xff },
+
     // Ramp Rates (RR)
     // Version 0x00
     { 0x40, 0x00, 0x1c },
@@ -216,6 +249,13 @@ const std::array<const GridProfileValue_t, SECTION_VALUE_COUNT> GridProfileParse
     { 0x50, 0x08, 0x21 },
     { 0x50, 0x08, 0x22 },
     { 0x50, 0x08, 0x23 },
+
+    // Version 0x11
+    { 0x50, 0x11, 0x1e },
+    { 0x50, 0x11, 0x1f },
+    { 0x50, 0x11, 0x20 },
+    { 0x50, 0x11, 0x21 },
+    { 0x50, 0x11, 0x22 },
 
     // Volt Watt (VW)
     // Version 0x00
@@ -336,7 +376,7 @@ std::list<GridProfileSection_t> GridProfileParser::getProfile() const
         do {
             const uint8_t section_id = _payloadGridProfile[pos];
             const uint8_t section_version = _payloadGridProfile[pos + 1];
-            const int8_t section_start = getSectionStart(section_id, section_version);
+            const int16_t section_start = getSectionStart(section_id, section_version);
             const uint8_t section_size = getSectionSize(section_id, section_version);
             pos += 2;
 
@@ -382,9 +422,9 @@ uint8_t GridProfileParser::getSectionSize(const uint8_t section_id, const uint8_
     return count;
 }
 
-int8_t GridProfileParser::getSectionStart(const uint8_t section_id, const uint8_t section_version)
+int16_t GridProfileParser::getSectionStart(const uint8_t section_id, const uint8_t section_version)
 {
-    uint8_t count = -1;
+    int16_t count = -1;
     for (auto& values : _profileValues) {
         count++;
         if (values.Section == section_id && values.Version == section_version) {

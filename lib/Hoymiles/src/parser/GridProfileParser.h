@@ -5,7 +5,7 @@
 
 #define GRID_PROFILE_SIZE 141
 #define PROFILE_TYPE_COUNT 7
-#define SECTION_VALUE_COUNT 113
+#define SECTION_VALUE_COUNT 144
 
 typedef struct {
     uint8_t lIdx;
@@ -45,7 +45,7 @@ public:
 
 private:
     static uint8_t getSectionSize(const uint8_t section_id, const uint8_t section_version);
-    static int8_t getSectionStart(const uint8_t section_id, const uint8_t section_version);
+    static int16_t getSectionStart(const uint8_t section_id, const uint8_t section_version);
 
     uint8_t _payloadGridProfile[GRID_PROFILE_SIZE] = {};
     uint8_t _gridProfileLength = 0;
