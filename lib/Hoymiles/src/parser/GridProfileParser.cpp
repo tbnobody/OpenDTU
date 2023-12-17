@@ -388,6 +388,11 @@ std::list<GridProfileSection_t> GridProfileParser::getProfile() const
                 break;
             }
 
+            if (section_start == -1) {
+                section.SectionName = "Unknown";
+                break;
+            }
+
             for (uint8_t val_id = 0; val_id < section_size; val_id++) {
                 auto itemDefinition = itemDefinitions.at(_profileValues[section_start + val_id].ItemDefinition);
 
