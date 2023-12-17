@@ -57,7 +57,6 @@ void HoymilesClass::loop()
         if (iv != nullptr && iv->getRadio()->isInitialized() && iv->getRadio()->isQueueEmpty()) {
 
             if (iv->getZeroValuesIfUnreachable() && !iv->isReachable()) {
-                Hoymiles.getMessageOutput()->println("Set runtime data to zero");
                 iv->Statistics()->zeroRuntimeData();
             }
 
