@@ -168,5 +168,5 @@ private:
     uint32_t _lastUpdateFromInternal = 0;
 
     bool _enableYieldDayCorrection = false;
-    float _lastYieldDay[CH_CNT];
+    float _lastYieldDay[CH_CNT] = {};
 };

@@ -82,8 +82,6 @@ void StatisticsParser::clearBuffer()
 {
     memset(_payloadStatistic, 0, STATISTIC_PACKET_SIZE);
     _statisticLength = 0;
-
-    memset(_lastYieldDay, 0, sizeof(_lastYieldDay));
 }
 
 void StatisticsParser::appendFragment(const uint8_t offset, const uint8_t* payload, const uint8_t len)
@@ -111,8 +109,7 @@ void StatisticsParser::endAppendFragment()
             // currently all values are zero --> Add last known values to offset
             Hoymiles.getMessageOutput()->printf("Yield Day reset detected!\r\n");
 
-            setChannelFieldOffset(TYPE_DC, c, FLD_YD,
-                getChannelFieldOffset(TYPE_DC, c, FLD_YD) + _lastYieldDay[static_cast<uint8_t>(c)]);
+            setChannelFieldOffset(TYPE_DC, c, FLD_YD, _lastYieldDay[static_cast<uint8_t>(c)]);
 
             _lastYieldDay[static_cast<uint8_t>(c)] = 0;
         } else {
