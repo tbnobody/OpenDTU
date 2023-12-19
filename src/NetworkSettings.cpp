@@ -318,7 +318,7 @@ void NetworkSettingsClass::setStaticIp()
             MessageOutput.println("done");
         }
     } else if (_networkMode == network_mode::Ethernet) {
-        if (Configuration.get().WiFi.Ssid) {
+        if (Configuration.get().WiFi.Dhcp) {
             MessageOutput.print("Configuring Ethernet DHCP IP... ");
             ETH.config(INADDR_NONE, INADDR_NONE, INADDR_NONE, INADDR_NONE);
             MessageOutput.println("done");
