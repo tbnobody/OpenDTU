@@ -108,6 +108,14 @@ bool VeDirectShuntController::processTextDataDerived(std::string const& name, st
 		_tmpFrame.H17 = atoi(value.c_str());
 		return true;
 	}
+	if (name == "VM") {
+		_tmpFrame.VM = atoi(value.c_str());
+		return true;
+	}
+	if (name == "DM") {
+		_tmpFrame.DM = atoi(value.c_str());
+		return true;
+	}
 	if (name == "H18") {
 		_tmpFrame.H18 = atoi(value.c_str());
 		return true;

@@ -391,6 +391,8 @@ void VictronSmartShuntStats::updateFrom(VeDirectShuntController::data_t const& s
     _manufacturer = "Victron " + _modelName;
     _temperature = shuntData.T;
     _tempPresent = shuntData.tempPresent;
+    _midpointVoltage = static_cast<float>(shuntData.VM) / 1000;
+    _midpointDeviation = static_cast<float>(shuntData.DM) / 10;
     _instantaneousPower = shuntData.P;
     _consumedAmpHours = static_cast<float>(shuntData.CE) / 1000;
     _lastFullCharge = shuntData.H9 / 60;
@@ -414,6 +416,8 @@ void VictronSmartShuntStats::getLiveViewData(JsonVariant& root) const {
     addLiveViewValue(root, "dischargedEnergy", _dischargedEnergy, "kWh", 2);
     addLiveViewValue(root, "instantaneousPower", _instantaneousPower, "W", 0);
     addLiveViewValue(root, "consumedAmpHours", _consumedAmpHours, "Ah", 3);
+    addLiveViewValue(root, "midpointVoltage", _midpointVoltage, "V", 2);
+    addLiveViewValue(root, "midpointDeviation", _midpointDeviation, "%", 1);
     addLiveViewValue(root, "lastFullCharge", _lastFullCharge, "min", 0);
     if (_tempPresent) {
         addLiveViewValue(root, "temperature", _temperature, "°C", 0);
@@ -436,4 +440,6 @@ void VictronSmartShuntStats::mqttPublish() const {
     MqttSettings.publish("battery/instantaneousPower", String(_instantaneousPower));
     MqttSettings.publish("battery/consumedAmpHours", String(_consumedAmpHours));
     MqttSettings.publish("battery/lastFullCharge", String(_lastFullCharge));
+    MqttSettings.publish("battery/midpointVoltage", String(_midpointVoltage));
+    MqttSettings.publish("battery/midpointDeviation", String(_midpointDeviation));
 }

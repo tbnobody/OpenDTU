@@ -122,6 +122,8 @@ void MqttHandleBatteryHassClass::loop()
             publishSensor("Charge Cycles", "mdi:counter", "chargeCycles");
             publishSensor("Consumed Amp Hours", NULL, "consumedAmpHours", NULL, "measurement", "Ah");
             publishSensor("Last Full Charge", "mdi:timelapse", "lastFullCharge", NULL, NULL, "min");
+            publishSensor("Midpoint Voltage", NULL, "midpointVoltage", "voltage", "measurement", "V");
+            publishSensor("Midpoint Deviation", NULL, "midpointDeviation", "battery", "measurement", "%");
             break;
     }
 

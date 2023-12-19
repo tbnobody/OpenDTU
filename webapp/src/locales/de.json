@@ -942,6 +942,8 @@
         "dischargedEnergy": "Entladene Energie",
         "instantaneousPower": "Aktuelle Leistung",
         "consumedAmpHours": "Verbrauchte Amperestunden",
+        "midpointVoltage": "Mittelpunktspannung",
+        "midpointDeviation": "Mittelpunktsabweichung",
         "lastFullCharge": "Letztes mal Vollgeladen"
     }
 }

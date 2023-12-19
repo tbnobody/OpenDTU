@@ -159,6 +159,8 @@ class VictronSmartShuntStats : public BatteryStats {
         float _dischargedEnergy;
         String _modelName;
         int32_t _instantaneousPower;
+        float _midpointVoltage;
+        float _midpointDeviation;
         float _consumedAmpHours;
         int32_t _lastFullCharge;
 

@@ -82,6 +82,8 @@ struct veShuntStruct : veStruct {
     int32_t H16;                    // Maximum auxiliary (battery) voltage
     int32_t H17;                    // Amount of discharged energy
     int32_t H18;                    // Amount of charged energy
+    int32_t VM;                     // Mid-point voltage of the battery bank
+    int32_t DM;                     // Mid-point deviation of the battery bank
     int8_t dcMonitorMode_MON;       // DC monitor mode
 };
 
