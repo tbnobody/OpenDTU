@@ -133,10 +133,12 @@ void HoymilesClass::loop()
             if (currentWeekDay != lastWeekDay) {
 
                 for (auto& inv : _inverters) {
+                    // Have to reset the offets first, otherwise it will
+                    // Substract the offset from zero which leads to a high value
+                    inv->Statistics()->resetYieldDayCorrection();
                     if (inv->getZeroYieldDayOnMidnight()) {
                         inv->Statistics()->zeroDailyData();
                     }
-                    inv->Statistics()->resetYieldDayCorrection();
                 }
 
                 lastWeekDay = currentWeekDay;
