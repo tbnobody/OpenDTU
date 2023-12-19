@@ -396,7 +396,7 @@ std::list<GridProfileSection_t> GridProfileParser::getProfile() const
             for (uint8_t val_id = 0; val_id < section_size; val_id++) {
                 auto itemDefinition = itemDefinitions.at(_profileValues[section_start + val_id].ItemDefinition);
 
-                float value = (_payloadGridProfile[pos] << 8) | _payloadGridProfile[pos + 1];
+                float value = (int16_t)((_payloadGridProfile[pos] << 8) | _payloadGridProfile[pos + 1]);
                 value /= itemDefinition.Dividor;
 
                 GridProfileItem_t v;
