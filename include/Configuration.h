@@ -143,6 +143,7 @@ struct CONFIG_T {
         uint8_t Rotation;
         uint8_t Contrast;
         uint8_t Language;
+        uint32_t DiagramDuration;
     } Display;
 
     struct {

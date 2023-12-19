@@ -103,6 +103,7 @@ bool ConfigurationClass::write()
     display["rotation"] = config.Display.Rotation;
     display["contrast"] = config.Display.Contrast;
     display["language"] = config.Display.Language;
+    display["diagram_duration"] = config.Display.DiagramDuration;
 
     JsonArray leds = device.createNestedArray("led");
     for (uint8_t i = 0; i < PINMAPPING_LED_COUNT; i++) {
@@ -264,6 +265,7 @@ bool ConfigurationClass::read()
     config.Display.Rotation = display["rotation"] | DISPLAY_ROTATION;
     config.Display.Contrast = display["contrast"] | DISPLAY_CONTRAST;
     config.Display.Language = display["language"] | DISPLAY_LANGUAGE;
+    config.Display.DiagramDuration = display["diagram_duration"] | DISPLAY_DIAGRAM_DURATION;
 
     JsonArray leds = device["led"];
     for (uint8_t i = 0; i < PINMAPPING_LED_COUNT; i++) {

@@ -6,6 +6,7 @@ export interface Display {
     screensaver: boolean;
     contrast: number;
     language: number;
+    diagramduration: number;
 }
 
 export interface Led {

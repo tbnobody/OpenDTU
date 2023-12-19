@@ -51,6 +51,7 @@ void DisplayGraphicClass::init(Scheduler& scheduler, const DisplayType_t type, c
         _display->begin();
         setContrast(DISPLAY_CONTRAST);
         setStatus(true);
+        _diagram.init(scheduler, _display);
     }
 
     scheduler.addTask(_loopTask);
@@ -91,7 +92,7 @@ void DisplayGraphicClass::printText(const char* text, const uint8_t line)
     if (!_isLarge) {
         dispX = (line == 0) ? 5 : 0;
     } else {
-        dispX = (line == 0) ? 20 : 5;
+        dispX = (line == 0) ? 10 : 5;
     }
     setFont(line);
 
@@ -140,6 +141,11 @@ void DisplayGraphicClass::setStartupDisplay()
     _display->sendBuffer();
 }
 
+DisplayGraphicDiagramClass& DisplayGraphicClass::Diagram()
+{
+    return _diagram;
+}
+
 void DisplayGraphicClass::loop()
 {
     if (_display_type == DisplayType_t::None) {
@@ -154,6 +160,9 @@ void DisplayGraphicClass::loop()
     //=====> Actual Production ==========
     if (Datastore.getIsAtLeastOneReachable()) {
         displayPowerSave = false;
+        if (_isLarge) {
+            _diagram.redraw();
+        }
         if (Datastore.getTotalAcPowerEnabled() > 999) {
             snprintf(_fmtText, sizeof(_fmtText), i18n_current_power_kw[_display_language], (Datastore.getTotalAcPowerEnabled() / 1000));
         } else {

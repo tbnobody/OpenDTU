@@ -67,6 +67,11 @@
                                 v-model="deviceConfigList.display.screensaver" type="checkbox"
                                 :tooltip="$t('deviceadmin.ScreensaverHint')" />
 
+                            <InputElement :label="$t('deviceadmin.DiagramDuration')"
+                                v-model="deviceConfigList.display.diagramduration" type="number"
+                                min=600 max=86400
+                                :tooltip="$t('deviceadmin.DiagramDurationHint')" :postfix="$t('deviceadmin.Seconds')" />
+
                             <div class="row mb-3">
                                 <label class="col-sm-2 col-form-label">
                                     {{ $t('deviceadmin.DisplayLanguage') }}

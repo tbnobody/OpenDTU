@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 #pragma once
 
+#include "Display_Graphic_Diagram.h"
 #include "defaults.h"
 #include <TaskSchedulerDeclarations.h>
 #include <U8g2lib.h>
@@ -24,6 +25,8 @@ public:
     void setLanguage(const uint8_t language);
     void setStartupDisplay();
 
+    DisplayGraphicDiagramClass& Diagram();
+
     bool enablePowerSafe = true;
     bool enableScreensaver = true;
 
@@ -36,6 +39,7 @@ private:
     Task _loopTask;
 
     U8G2* _display;
+    DisplayGraphicDiagramClass _diagram;
 
     bool _displayTurnedOn;
 
