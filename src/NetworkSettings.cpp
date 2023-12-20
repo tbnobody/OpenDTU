@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * Copyright (C) 2022 Thomas Basler and others
+ * Copyright (C) 2022-2023 Thomas Basler and others
  */
 #include "NetworkSettings.h"
 #include "Configuration.h"
@@ -8,16 +8,17 @@
 #include "PinMapping.h"
 #include "Utils.h"
 #include "defaults.h"
+#include <ESPmDNS.h>
 #include <ETH.h>
 
 NetworkSettingsClass::NetworkSettingsClass()
-    : apIp(192, 168, 4, 1)
-    , apNetmask(255, 255, 255, 0)
+    : _apIp(192, 168, 4, 1)
+    , _apNetmask(255, 255, 255, 0)
 {
-    dnsServer.reset(new DNSServer());
+    _dnsServer.reset(new DNSServer());
 }
 
-void NetworkSettingsClass::init()
+void NetworkSettingsClass::init(Scheduler& scheduler)
 {
     using std::placeholders::_1;
 
@@ -26,9 +27,14 @@ void NetworkSettingsClass::init()
 
     WiFi.onEvent(std::bind(&NetworkSettingsClass::NetworkEvent, this, _1));
     setupMode();
+
+    scheduler.addTask(_loopTask);
+    _loopTask.setCallback(std::bind(&NetworkSettingsClass::loop, this));
+    _loopTask.setIterations(TASK_FOREVER);
+    _loopTask.enable();
 }
 
-void NetworkSettingsClass::NetworkEvent(WiFiEvent_t event)
+void NetworkSettingsClass::NetworkEvent(const WiFiEvent_t event)
 {
     switch (event) {
     case ARDUINO_EVENT_ETH_START:
@@ -86,7 +92,7 @@ void NetworkSettingsClass::NetworkEvent(WiFiEvent_t event)
     }
 }
 
-bool NetworkSettingsClass::onEvent(NetworkEventCb cbEvent, network_event event)
+bool NetworkSettingsClass::onEvent(NetworkEventCb cbEvent, const network_event event)
 {
     if (!cbEvent) {
         return pdFALSE;
@@ -98,10 +104,10 @@ bool NetworkSettingsClass::onEvent(NetworkEventCb cbEvent, network_event event)
     return true;
 }
 
-void NetworkSettingsClass::raiseEvent(network_event event)
+void NetworkSettingsClass::raiseEvent(const network_event event)
 {
     for (uint32_t i = 0; i < _cbEventList.size(); i++) {
-        NetworkEventCbList_t entry = _cbEventList[i];
+        const NetworkEventCbList_t entry = _cbEventList[i];
         if (entry.cb) {
             if (entry.event == event || entry.event == network_event::NETWORK_EVENT_MAX) {
                 entry.cb(event);
@@ -110,19 +116,48 @@ void NetworkSettingsClass::raiseEvent(network_event event)
     }
 }
 
+void NetworkSettingsClass::handleMDNS()
+{
+    const bool mdnsEnabled = Configuration.get().Mdns.Enabled;
+
+    if (_lastMdnsEnabled == mdnsEnabled) {
+        return;
+    }
+
+    _lastMdnsEnabled = mdnsEnabled;
+
+    MDNS.end();
+
+    if (!mdnsEnabled) {
+        return;
+    }
+
+    if (MDNS.begin(getHostname())) {
+        MessageOutput.print("MDNS responder starting...");
+
+        MDNS.addService("http", "tcp", 80);
+        MDNS.addService("opendtu", "tcp", 80);
+        MDNS.addServiceTxt("opendtu", "tcp", "git_hash", AUTO_GIT_HASH);
+
+        MessageOutput.println("done");
+    } else {
+        MessageOutput.println("Error setting up MDNS responder!");
+    }
+}
+
 void NetworkSettingsClass::setupMode()
 {
-    if (adminEnabled) {
+    if (_adminEnabled) {
         WiFi.mode(WIFI_AP_STA);
         String ssidString = getApName();
-        WiFi.softAPConfig(apIp, apIp, apNetmask);
-        WiFi.softAP((const char*)ssidString.c_str(), Configuration.get().Security_Password);
-        dnsServer->setErrorReplyCode(DNSReplyCode::NoError);
-        dnsServer->start(DNS_PORT, "*", WiFi.softAPIP());
-        dnsServerStatus = true;
+        WiFi.softAPConfig(_apIp, _apIp, _apNetmask);
+        WiFi.softAP(ssidString.c_str(), Configuration.get().Security.Password);
+        _dnsServer->setErrorReplyCode(DNSReplyCode::NoError);
+        _dnsServer->start(DNS_PORT, "*", WiFi.softAPIP());
+        _dnsServerStatus = true;
     } else {
-        dnsServer->stop();
-        dnsServerStatus = false;
+        _dnsServerStatus = false;
+        _dnsServer->stop();
         if (_networkMode == network_mode::WiFi) {
             WiFi.mode(WIFI_STA);
         } else {
@@ -138,13 +173,13 @@ void NetworkSettingsClass::setupMode()
 
 void NetworkSettingsClass::enableAdminMode()
 {
-    adminEnabled = true;
-    adminTimeoutCounter = 0;
-    adminTimeoutCounterMax = Configuration.get().WiFi_ApTimeout * 60;
+    _adminEnabled = true;
+    _adminTimeoutCounter = 0;
+    _adminTimeoutCounterMax = Configuration.get().WiFi.ApTimeout * 60;
     setupMode();
 }
 
-String NetworkSettingsClass::getApName()
+String NetworkSettingsClass::getApName() const
 {
     return String(ACCESS_POINT_NAME + String(Utils::getChipId()));
 }
@@ -168,26 +203,26 @@ void NetworkSettingsClass::loop()
         applyConfig();
     }
 
-    if (millis() - lastTimerCall > 1000) {
-        if (adminEnabled && adminTimeoutCounterMax > 0) {
-            adminTimeoutCounter++;
-            if (adminTimeoutCounter % 10 == 0) {
-                MessageOutput.printf("Admin AP remaining seconds: %d / %d\r\n", adminTimeoutCounter, adminTimeoutCounterMax);
+    if (millis() - _lastTimerCall > 1000) {
+        if (_adminEnabled && _adminTimeoutCounterMax > 0) {
+            _adminTimeoutCounter++;
+            if (_adminTimeoutCounter % 10 == 0) {
+                MessageOutput.printf("Admin AP remaining seconds: %d / %d\r\n", _adminTimeoutCounter, _adminTimeoutCounterMax);
             }
         }
-        connectTimeoutTimer++;
-        connectRedoTimer++;
-        lastTimerCall = millis();
+        _connectTimeoutTimer++;
+        _connectRedoTimer++;
+        _lastTimerCall = millis();
     }
-    if (adminEnabled) {
+    if (_adminEnabled) {
         // Don't disable the admin mode when network is not available
         if (!isConnected()) {
-            adminTimeoutCounter = 0;
+            _adminTimeoutCounter = 0;
         }
         // If WiFi is connected to AP for more than adminTimeoutCounterMax
         // seconds, disable the internal Access Point
-        if (adminTimeoutCounter > adminTimeoutCounterMax) {
-            adminEnabled = false;
+        if (_adminTimeoutCounter > _adminTimeoutCounterMax) {
+            _adminEnabled = false;
             MessageOutput.println("Admin mode disabled");
             setupMode();
         }
@@ -195,43 +230,45 @@ void NetworkSettingsClass::loop()
         // WiFi is searching for an AP. So disable searching afer
         // WIFI_RECONNECT_TIMEOUT and repeat after WIFI_RECONNECT_REDO_TIMEOUT
         if (isConnected()) {
-            connectTimeoutTimer = 0;
-            connectRedoTimer = 0;
+            _connectTimeoutTimer = 0;
+            _connectRedoTimer = 0;
         } else {
-            if (connectTimeoutTimer > WIFI_RECONNECT_TIMEOUT && !forceDisconnection) {
+            if (_connectTimeoutTimer > WIFI_RECONNECT_TIMEOUT && !_forceDisconnection) {
                 MessageOutput.print("Disable search for AP... ");
                 WiFi.mode(WIFI_AP);
                 MessageOutput.println("done");
-                connectRedoTimer = 0;
-                forceDisconnection = true;
+                _connectRedoTimer = 0;
+                _forceDisconnection = true;
             }
-            if (connectRedoTimer > WIFI_RECONNECT_REDO_TIMEOUT && forceDisconnection) {
+            if (_connectRedoTimer > WIFI_RECONNECT_REDO_TIMEOUT && _forceDisconnection) {
                 MessageOutput.print("Enable search for AP... ");
                 WiFi.mode(WIFI_AP_STA);
                 MessageOutput.println("done");
                 applyConfig();
-                connectTimeoutTimer = 0;
-                forceDisconnection = false;
+                _connectTimeoutTimer = 0;
+                _forceDisconnection = false;
             }
         }
     }
-    if (dnsServerStatus) {
-        dnsServer->processNextRequest();
+    if (_dnsServerStatus) {
+        _dnsServer->processNextRequest();
     }
+
+    handleMDNS();
 }
 
 void NetworkSettingsClass::applyConfig()
 {
     setHostname();
-    if (!strcmp(Configuration.get().WiFi_Ssid, "")) {
+    if (!strcmp(Configuration.get().WiFi.Ssid, "")) {
         return;
     }
     MessageOutput.print("Configuring WiFi STA using ");
-    if (strcmp(WiFi.SSID().c_str(), Configuration.get().WiFi_Ssid) || strcmp(WiFi.psk().c_str(), Configuration.get().WiFi_Password)) {
+    if (strcmp(WiFi.SSID().c_str(), Configuration.get().WiFi.Ssid) || strcmp(WiFi.psk().c_str(), Configuration.get().WiFi.Password)) {
         MessageOutput.print("new credentials... ");
         WiFi.begin(
-            Configuration.get().WiFi_Ssid,
-            Configuration.get().WiFi_Password);
+            Configuration.get().WiFi.Ssid,
+            Configuration.get().WiFi.Password);
     } else {
         MessageOutput.print("existing credentials... ");
         WiFi.begin();
@@ -266,39 +303,39 @@ void NetworkSettingsClass::setHostname()
 void NetworkSettingsClass::setStaticIp()
 {
     if (_networkMode == network_mode::WiFi) {
-        if (Configuration.get().WiFi_Dhcp) {
+        if (Configuration.get().WiFi.Dhcp) {
             MessageOutput.print("Configuring WiFi STA DHCP IP... ");
             WiFi.config(INADDR_NONE, INADDR_NONE, INADDR_NONE);
             MessageOutput.println("done");
         } else {
             MessageOutput.print("Configuring WiFi STA static IP... ");
             WiFi.config(
-                IPAddress(Configuration.get().WiFi_Ip),
-                IPAddress(Configuration.get().WiFi_Gateway),
-                IPAddress(Configuration.get().WiFi_Netmask),
-                IPAddress(Configuration.get().WiFi_Dns1),
-                IPAddress(Configuration.get().WiFi_Dns2));
+                IPAddress(Configuration.get().WiFi.Ip),
+                IPAddress(Configuration.get().WiFi.Gateway),
+                IPAddress(Configuration.get().WiFi.Netmask),
+                IPAddress(Configuration.get().WiFi.Dns1),
+                IPAddress(Configuration.get().WiFi.Dns2));
             MessageOutput.println("done");
         }
     } else if (_networkMode == network_mode::Ethernet) {
-        if (Configuration.get().WiFi_Dhcp) {
+        if (Configuration.get().WiFi.Dhcp) {
             MessageOutput.print("Configuring Ethernet DHCP IP... ");
             ETH.config(INADDR_NONE, INADDR_NONE, INADDR_NONE, INADDR_NONE);
             MessageOutput.println("done");
         } else {
             MessageOutput.print("Configuring Ethernet static IP... ");
             ETH.config(
-                IPAddress(Configuration.get().WiFi_Ip),
-                IPAddress(Configuration.get().WiFi_Gateway),
-                IPAddress(Configuration.get().WiFi_Netmask),
-                IPAddress(Configuration.get().WiFi_Dns1),
-                IPAddress(Configuration.get().WiFi_Dns2));
+                IPAddress(Configuration.get().WiFi.Ip),
+                IPAddress(Configuration.get().WiFi.Gateway),
+                IPAddress(Configuration.get().WiFi.Netmask),
+                IPAddress(Configuration.get().WiFi.Dns1),
+                IPAddress(Configuration.get().WiFi.Dns2));
             MessageOutput.println("done");
         }
     }
 }
 
-IPAddress NetworkSettingsClass::localIP()
+IPAddress NetworkSettingsClass::localIP() const
 {
     switch (_networkMode) {
     case network_mode::Ethernet:
@@ -312,7 +349,7 @@ IPAddress NetworkSettingsClass::localIP()
     }
 }
 
-IPAddress NetworkSettingsClass::subnetMask()
+IPAddress NetworkSettingsClass::subnetMask() const
 {
     switch (_networkMode) {
     case network_mode::Ethernet:
@@ -326,7 +363,7 @@ IPAddress NetworkSettingsClass::subnetMask()
     }
 }
 
-IPAddress NetworkSettingsClass::gatewayIP()
+IPAddress NetworkSettingsClass::gatewayIP() const
 {
     switch (_networkMode) {
     case network_mode::Ethernet:
@@ -340,7 +377,7 @@ IPAddress NetworkSettingsClass::gatewayIP()
     }
 }
 
-IPAddress NetworkSettingsClass::dnsIP(uint8_t dns_no)
+IPAddress NetworkSettingsClass::dnsIP(const uint8_t dns_no) const
 {
     switch (_networkMode) {
     case network_mode::Ethernet:
@@ -354,7 +391,7 @@ IPAddress NetworkSettingsClass::dnsIP(uint8_t dns_no)
     }
 }
 
-String NetworkSettingsClass::macAddress()
+String NetworkSettingsClass::macAddress() const
 {
     switch (_networkMode) {
     case network_mode::Ethernet:
@@ -375,8 +412,8 @@ String NetworkSettingsClass::getHostname()
     char resultHostname[WIFI_MAX_HOSTNAME_STRLEN + 1];
     uint8_t pos = 0;
 
-    uint32_t chipId = Utils::getChipId();
-    snprintf(preparedHostname, WIFI_MAX_HOSTNAME_STRLEN + 1, config.WiFi_Hostname, chipId);
+    const uint32_t chipId = Utils::getChipId();
+    snprintf(preparedHostname, WIFI_MAX_HOSTNAME_STRLEN + 1, config.WiFi.Hostname, chipId);
 
     const char* pC = preparedHostname;
     while (*pC && pos < WIFI_MAX_HOSTNAME_STRLEN) { // while !null and not over length
@@ -407,12 +444,12 @@ String NetworkSettingsClass::getHostname()
     return resultHostname;
 }
 
-bool NetworkSettingsClass::isConnected()
+bool NetworkSettingsClass::isConnected() const
 {
     return WiFi.localIP()[0] != 0 || ETH.localIP()[0] != 0;
 }
 
-network_mode NetworkSettingsClass::NetworkMode()
+network_mode NetworkSettingsClass::NetworkMode() const
 {
     return _networkMode;
 }

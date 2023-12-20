@@ -1,6 +1,9 @@
 [
     {
         "name": "WT32-ETH01",
+        "links": [
+            {"name": "Datasheet", "url": "http://www.wireless-tag.com/portfolio/wt32-eth01/"}
+        ],
         "nrf24": {
             "miso": 4,
             "mosi": 2,
@@ -21,6 +24,9 @@
     },
     {
         "name": "WT32-ETH01 with SSD1306",
+        "links": [
+            {"name": "Datasheet", "url": "http://www.wireless-tag.com/portfolio/wt32-eth01/"}
+        ],
         "nrf24": {
             "miso": 4,
             "mosi": 2,

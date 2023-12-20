@@ -98,6 +98,19 @@
                               v-model="mqttConfigList.mqtt_lwt_offline"
                               type="text" maxlength="20"
                               :placeholder="$t('mqttadmin.LwtOfflineHint')"/>
+
+                <div class="row mb-3">
+                    <label class="col-sm-2 col-form-label">
+                        {{ $t('mqttadmin.LwtQos') }}
+                    </label>
+                    <div class="col-sm-10">
+                        <select class="form-select" v-model="mqttConfigList.mqtt_lwt_qos">
+                            <option v-for="qostype in qosTypeList" :key="qostype.key" :value="qostype.key">
+                                {{ $t(`mqttadmin.` + qostype.value) }}
+                            </option>
+                        </select>
+                    </div>
+                </div>
             </CardElement>
 
             <CardElement :text="$t('mqttadmin.HassParameters')" textVariant="text-bg-primary" add-space
@@ -121,7 +134,7 @@
                               type="checkbox"/>
             </CardElement>
 
-            <button type="submit" class="btn btn-primary mb-3">{{ $t('mqttadmin.Save') }}</button>
+            <FormFooter @reload="getMqttConfig"/>
         </form>
     </BasePage>
 </template>
@@ -130,6 +143,7 @@
 import BasePage from '@/components/BasePage.vue';
 import BootstrapAlert from "@/components/BootstrapAlert.vue";
 import CardElement from '@/components/CardElement.vue';
+import FormFooter from '@/components/FormFooter.vue';
 import InputElement from '@/components/InputElement.vue';
 import type { MqttConfig } from "@/types/MqttConfig";
 import { authHeader, handleResponse } from '@/utils/authentication';
@@ -140,6 +154,7 @@ export default defineComponent({
         BasePage,
         BootstrapAlert,
         CardElement,
+        FormFooter,
         InputElement,
     },
     data() {
@@ -149,6 +164,11 @@ export default defineComponent({
             alertMessage: "",
             alertType: "info",
             showAlert: false,
+            qosTypeList: [
+                { key: 0, value: 'QOS0' },
+                { key: 1, value: 'QOS1' },
+                { key: 2, value: 'QOS2' },
+            ],
         };
     },
     created() {

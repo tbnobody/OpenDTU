@@ -1,0 +1,13 @@
+{
+    "name": "OpenDTU",
+    "short_name": "OpenDTU",
+    "display": "standalone",
+    "orientation": "portrait",
+    "icons": [
+        {
+            "src": "/favicon.png",
+            "sizes": "144x144",
+            "type": "image/png"
+        }
+    ]
+}

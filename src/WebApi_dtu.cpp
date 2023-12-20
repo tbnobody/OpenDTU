@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * Copyright (C) 2022 Thomas Basler and others
+ * Copyright (C) 2022-2023 Thomas Basler and others
  */
 #include "WebApi_dtu.h"
 #include "Configuration.h"
@@ -9,11 +9,11 @@
 #include <AsyncJson.h>
 #include <Hoymiles.h>
 
-void WebApiDtuClass::init(AsyncWebServer* server)
+void WebApiDtuClass::init(AsyncWebServer& server)
 {
     using std::placeholders::_1;
 
-    _server = server;
+    _server = &server;
 
     _server->on("/api/dtu/config", HTTP_GET, std::bind(&WebApiDtuClass::onDtuAdminGet, this, _1));
     _server->on("/api/dtu/config", HTTP_POST, std::bind(&WebApiDtuClass::onDtuAdminPost, this, _1));
@@ -36,15 +36,15 @@ void WebApiDtuClass::onDtuAdminGet(AsyncWebServerRequest* request)
     // DTU Serial is read as HEX
     char buffer[sizeof(uint64_t) * 8 + 1];
     snprintf(buffer, sizeof(buffer), "%0x%08x",
-        ((uint32_t)((config.Dtu_Serial >> 32) & 0xFFFFFFFF)),
-        ((uint32_t)(config.Dtu_Serial & 0xFFFFFFFF)));
+        ((uint32_t)((config.Dtu.Serial >> 32) & 0xFFFFFFFF)),
+        ((uint32_t)(config.Dtu.Serial & 0xFFFFFFFF)));
     root["serial"] = buffer;
-    root["pollinterval"] = config.Dtu_PollInterval;
+    root["pollinterval"] = config.Dtu.PollInterval;
     root["nrf_enabled"] = Hoymiles.getRadioNrf()->isInitialized();
-    root["nrf_palevel"] = config.Dtu_NrfPaLevel;
+    root["nrf_palevel"] = config.Dtu.Nrf.PaLevel;
     root["cmt_enabled"] = Hoymiles.getRadioCmt()->isInitialized();
-    root["cmt_palevel"] = config.Dtu_CmtPaLevel;
-    root["cmt_frequency"] = config.Dtu_CmtFrequency;
+    root["cmt_palevel"] = config.Dtu.Cmt.PaLevel;
+    root["cmt_frequency"] = config.Dtu.Cmt.Frequency;
 
     response->setLength();
     request->send(response);
@@ -68,7 +68,7 @@ void WebApiDtuClass::onDtuAdminPost(AsyncWebServerRequest* request)
         return;
     }
 
-    String json = request->getParam("data", true)->value();
+    const String json = request->getParam("data", true)->value();
 
     if (json.length() > 1024) {
         retMsg["message"] = "Data too large!";
@@ -79,7 +79,7 @@ void WebApiDtuClass::onDtuAdminPost(AsyncWebServerRequest* request)
     }
 
     DynamicJsonDocument root(1024);
-    DeserializationError error = deserializeJson(root, json);
+    const DeserializationError error = deserializeJson(root, json);
 
     if (error) {
         retMsg["message"] = "Failed to parse data!";
@@ -149,11 +149,11 @@ void WebApiDtuClass::onDtuAdminPost(AsyncWebServerRequest* request)
     CONFIG_T& config = Configuration.get();
 
     // Interpret the string as a hex value and convert it to uint64_t
-    config.Dtu_Serial = strtoll(root["serial"].as<String>().c_str(), NULL, 16);
-    config.Dtu_PollInterval = root["pollinterval"].as<uint32_t>();
-    config.Dtu_NrfPaLevel = root["nrf_palevel"].as<uint8_t>();
-    config.Dtu_CmtPaLevel = root["cmt_palevel"].as<int8_t>();
-    config.Dtu_CmtFrequency = root["cmt_frequency"].as<uint32_t>();
+    config.Dtu.Serial = strtoll(root["serial"].as<String>().c_str(), NULL, 16);
+    config.Dtu.PollInterval = root["pollinterval"].as<uint32_t>();
+    config.Dtu.Nrf.PaLevel = root["nrf_palevel"].as<uint8_t>();
+    config.Dtu.Cmt.PaLevel = root["cmt_palevel"].as<int8_t>();
+    config.Dtu.Cmt.Frequency = root["cmt_frequency"].as<uint32_t>();
     Configuration.write();
 
     retMsg["type"] = "success";
@@ -163,10 +163,10 @@ void WebApiDtuClass::onDtuAdminPost(AsyncWebServerRequest* request)
     response->setLength();
     request->send(response);
 
-    Hoymiles.getRadioNrf()->setPALevel((rf24_pa_dbm_e)config.Dtu_NrfPaLevel);
-    Hoymiles.getRadioCmt()->setPALevel(config.Dtu_CmtPaLevel);
-    Hoymiles.getRadioNrf()->setDtuSerial(config.Dtu_Serial);
-    Hoymiles.getRadioCmt()->setDtuSerial(config.Dtu_Serial);
-    Hoymiles.getRadioCmt()->setInverterTargetFrequency(config.Dtu_CmtFrequency);
-    Hoymiles.setPollInterval(config.Dtu_PollInterval);
+    Hoymiles.getRadioNrf()->setPALevel((rf24_pa_dbm_e)config.Dtu.Nrf.PaLevel);
+    Hoymiles.getRadioCmt()->setPALevel(config.Dtu.Cmt.PaLevel);
+    Hoymiles.getRadioNrf()->setDtuSerial(config.Dtu.Serial);
+    Hoymiles.getRadioCmt()->setDtuSerial(config.Dtu.Serial);
+    Hoymiles.getRadioCmt()->setInverterTargetFrequency(config.Dtu.Cmt.Frequency);
+    Hoymiles.setPollInterval(config.Dtu.PollInterval);
 }

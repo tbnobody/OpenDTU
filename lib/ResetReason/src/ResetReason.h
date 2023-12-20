@@ -3,10 +3,8 @@
 
 #include <Arduino.h>
 
-class ResetReasonClass {
+class ResetReason {
 public:
-    String get_reset_reason_verbose(uint8_t cpu_id);
-    String get_reset_reason_short(uint8_t cpu_id);
+    static String get_reset_reason_verbose(const uint8_t cpu_id);
+    static String get_reset_reason_short(const uint8_t cpu_id);
 };
-
-extern ResetReasonClass ResetReason;

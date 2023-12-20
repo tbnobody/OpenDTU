@@ -20,6 +20,8 @@
 #define WIFI_PASSWORD ""
 #define WIFI_DHCP true
 
+#define MDNS_ENABLED false
+
 #define NTP_SERVER "pool.ntp.org"
 #define NTP_TIMEZONE "CET-1CEST,M3.5.0,M10.5.0/3"
 #define NTP_TIMEZONEDESCR "Europe/Berlin"
@@ -73,6 +75,7 @@
 #define MQTT_LWT_TOPIC "dtu/status"
 #define MQTT_LWT_ONLINE "online"
 #define MQTT_LWT_OFFLINE "offline"
+#define MQTT_LWT_QOS 2U
 #define MQTT_PUBLISH_INTERVAL 5U
 #define MQTT_CLEAN_SESSION true
 
@@ -95,5 +98,10 @@
 #define DISPLAY_ROTATION 2U
 #define DISPLAY_CONTRAST 60U
 #define DISPLAY_LANGUAGE 0U
+#define DISPLAY_DIAGRAM_DURATION (10UL * 60UL * 60UL)
 
 #define REACHABLE_THRESHOLD 2U
+
+#define LED_BRIGHTNESS 100U
+
+#define MAX_INVERTER_LIMIT 2250

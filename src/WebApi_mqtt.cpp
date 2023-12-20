@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * Copyright (C) 2022 Thomas Basler and others
+ * Copyright (C) 2022-2023 Thomas Basler and others
  */
 #include "WebApi_mqtt.h"
 #include "Configuration.h"
@@ -11,11 +11,11 @@
 #include "helper.h"
 #include <AsyncJson.h>
 
-void WebApiMqttClass::init(AsyncWebServer* server)
+void WebApiMqttClass::init(AsyncWebServer& server)
 {
     using std::placeholders::_1;
 
-    _server = server;
+    _server = &server;
 
     _server->on("/api/mqtt/status", HTTP_GET, std::bind(&WebApiMqttClass::onMqttStatus, this, _1));
     _server->on("/api/mqtt/config", HTTP_GET, std::bind(&WebApiMqttClass::onMqttAdminGet, this, _1));
@@ -36,25 +36,25 @@ void WebApiMqttClass::onMqttStatus(AsyncWebServerRequest* request)
     JsonObject root = response->getRoot();
     const CONFIG_T& config = Configuration.get();
 
-    root["mqtt_enabled"] = config.Mqtt_Enabled;
-    root["mqtt_hostname"] = config.Mqtt_Hostname;
-    root["mqtt_port"] = config.Mqtt_Port;
-    root["mqtt_username"] = config.Mqtt_Username;
-    root["mqtt_topic"] = config.Mqtt_Topic;
+    root["mqtt_enabled"] = config.Mqtt.Enabled;
+    root["mqtt_hostname"] = config.Mqtt.Hostname;
+    root["mqtt_port"] = config.Mqtt.Port;
+    root["mqtt_username"] = config.Mqtt.Username;
+    root["mqtt_topic"] = config.Mqtt.Topic;
     root["mqtt_connected"] = MqttSettings.getConnected();
-    root["mqtt_retain"] = config.Mqtt_Retain;
-    root["mqtt_tls"] = config.Mqtt_Tls;
-    root["mqtt_root_ca_cert_info"] = getTlsCertInfo(config.Mqtt_RootCaCert);
-    root["mqtt_tls_cert_login"] = config.Mqtt_TlsCertLogin;
-    root["mqtt_client_cert_info"] = getTlsCertInfo(config.Mqtt_ClientCert);
-    root["mqtt_lwt_topic"] = String(config.Mqtt_Topic) + config.Mqtt_LwtTopic;
-    root["mqtt_publish_interval"] = config.Mqtt_PublishInterval;
-    root["mqtt_clean_session"] = config.Mqtt_CleanSession;
-    root["mqtt_hass_enabled"] = config.Mqtt_Hass_Enabled;
-    root["mqtt_hass_expire"] = config.Mqtt_Hass_Expire;
-    root["mqtt_hass_retain"] = config.Mqtt_Hass_Retain;
-    root["mqtt_hass_topic"] = config.Mqtt_Hass_Topic;
-    root["mqtt_hass_individualpanels"] = config.Mqtt_Hass_IndividualPanels;
+    root["mqtt_retain"] = config.Mqtt.Retain;
+    root["mqtt_tls"] = config.Mqtt.Tls.Enabled;
+    root["mqtt_root_ca_cert_info"] = getTlsCertInfo(config.Mqtt.Tls.RootCaCert);
+    root["mqtt_tls_cert_login"] = config.Mqtt.Tls.CertLogin;
+    root["mqtt_client_cert_info"] = getTlsCertInfo(config.Mqtt.Tls.ClientCert);
+    root["mqtt_lwt_topic"] = String(config.Mqtt.Topic) + config.Mqtt.Lwt.Topic;
+    root["mqtt_publish_interval"] = config.Mqtt.PublishInterval;
+    root["mqtt_clean_session"] = config.Mqtt.CleanSession;
+    root["mqtt_hass_enabled"] = config.Mqtt.Hass.Enabled;
+    root["mqtt_hass_expire"] = config.Mqtt.Hass.Expire;
+    root["mqtt_hass_retain"] = config.Mqtt.Hass.Retain;
+    root["mqtt_hass_topic"] = config.Mqtt.Hass.Topic;
+    root["mqtt_hass_individualpanels"] = config.Mqtt.Hass.IndividualPanels;
 
     response->setLength();
     request->send(response);
@@ -70,28 +70,29 @@ void WebApiMqttClass::onMqttAdminGet(AsyncWebServerRequest* request)
     JsonObject root = response->getRoot();
     const CONFIG_T& config = Configuration.get();
 
-    root["mqtt_enabled"] = config.Mqtt_Enabled;
-    root["mqtt_hostname"] = config.Mqtt_Hostname;
-    root["mqtt_port"] = config.Mqtt_Port;
-    root["mqtt_username"] = config.Mqtt_Username;
-    root["mqtt_password"] = config.Mqtt_Password;
-    root["mqtt_topic"] = config.Mqtt_Topic;
-    root["mqtt_retain"] = config.Mqtt_Retain;
-    root["mqtt_tls"] = config.Mqtt_Tls;
-    root["mqtt_root_ca_cert"] = config.Mqtt_RootCaCert;
-    root["mqtt_tls_cert_login"] = config.Mqtt_TlsCertLogin;
-    root["mqtt_client_cert"] = config.Mqtt_ClientCert;
-    root["mqtt_client_key"] = config.Mqtt_ClientKey;
-    root["mqtt_lwt_topic"] = config.Mqtt_LwtTopic;
-    root["mqtt_lwt_online"] = config.Mqtt_LwtValue_Online;
-    root["mqtt_lwt_offline"] = config.Mqtt_LwtValue_Offline;
-    root["mqtt_publish_interval"] = config.Mqtt_PublishInterval;
-    root["mqtt_clean_session"] = config.Mqtt_CleanSession;
-    root["mqtt_hass_enabled"] = config.Mqtt_Hass_Enabled;
-    root["mqtt_hass_expire"] = config.Mqtt_Hass_Expire;
-    root["mqtt_hass_retain"] = config.Mqtt_Hass_Retain;
-    root["mqtt_hass_topic"] = config.Mqtt_Hass_Topic;
-    root["mqtt_hass_individualpanels"] = config.Mqtt_Hass_IndividualPanels;
+    root["mqtt_enabled"] = config.Mqtt.Enabled;
+    root["mqtt_hostname"] = config.Mqtt.Hostname;
+    root["mqtt_port"] = config.Mqtt.Port;
+    root["mqtt_username"] = config.Mqtt.Username;
+    root["mqtt_password"] = config.Mqtt.Password;
+    root["mqtt_topic"] = config.Mqtt.Topic;
+    root["mqtt_retain"] = config.Mqtt.Retain;
+    root["mqtt_tls"] = config.Mqtt.Tls.Enabled;
+    root["mqtt_root_ca_cert"] = config.Mqtt.Tls.RootCaCert;
+    root["mqtt_tls_cert_login"] = config.Mqtt.Tls.CertLogin;
+    root["mqtt_client_cert"] = config.Mqtt.Tls.ClientCert;
+    root["mqtt_client_key"] = config.Mqtt.Tls.ClientKey;
+    root["mqtt_lwt_topic"] = config.Mqtt.Lwt.Topic;
+    root["mqtt_lwt_online"] = config.Mqtt.CleanSession;
+    root["mqtt_lwt_offline"] = config.Mqtt.Lwt.Value_Offline;
+    root["mqtt_lwt_qos"] = config.Mqtt.Lwt.Qos;
+    root["mqtt_publish_interval"] = config.Mqtt.PublishInterval;
+    root["mqtt_clean_session"] = config.Mqtt.CleanSession;
+    root["mqtt_hass_enabled"] = config.Mqtt.Hass.Enabled;
+    root["mqtt_hass_expire"] = config.Mqtt.Hass.Expire;
+    root["mqtt_hass_retain"] = config.Mqtt.Hass.Retain;
+    root["mqtt_hass_topic"] = config.Mqtt.Hass.Topic;
+    root["mqtt_hass_individualpanels"] = config.Mqtt.Hass.IndividualPanels;
 
     response->setLength();
     request->send(response);
@@ -115,7 +116,7 @@ void WebApiMqttClass::onMqttAdminPost(AsyncWebServerRequest* request)
         return;
     }
 
-    String json = request->getParam("data", true)->value();
+    const String json = request->getParam("data", true)->value();
 
     if (json.length() > MQTT_JSON_DOC_SIZE) {
         retMsg["message"] = "Data too large!";
@@ -126,7 +127,7 @@ void WebApiMqttClass::onMqttAdminPost(AsyncWebServerRequest* request)
     }
 
     DynamicJsonDocument root(MQTT_JSON_DOC_SIZE);
-    DeserializationError error = deserializeJson(root, json);
+    const DeserializationError error = deserializeJson(root, json);
 
     if (error) {
         retMsg["message"] = "Failed to parse data!";
@@ -150,6 +151,7 @@ void WebApiMqttClass::onMqttAdminPost(AsyncWebServerRequest* request)
             && root.containsKey("mqtt_lwt_topic")
             && root.containsKey("mqtt_lwt_online")
             && root.containsKey("mqtt_lwt_offline")
+            && root.containsKey("mqtt_lwt_qos")
             && root.containsKey("mqtt_publish_interval")
             && root.containsKey("mqtt_clean_session")
             && root.containsKey("mqtt_hass_enabled")
@@ -269,6 +271,15 @@ void WebApiMqttClass::onMqttAdminPost(AsyncWebServerRequest* request)
             return;
         }
 
+        if (root["mqtt_lwt_qos"].as<uint8_t>() > 2) {
+            retMsg["message"] = "LWT QoS must not be greater than " STR(2) "!";
+            retMsg["code"] = WebApiError::MqttLwtQos;
+            retMsg["param"]["max"] = 2;
+            response->setLength();
+            request->send(response);
+            return;
+        }
+
         if (root["mqtt_publish_interval"].as<uint32_t>() < 5 || root["mqtt_publish_interval"].as<uint32_t>() > 65535) {
             retMsg["message"] = "Publish interval must be a number between 5 and 65535!";
             retMsg["code"] = WebApiError::MqttPublishInterval;
@@ -300,28 +311,29 @@ void WebApiMqttClass::onMqttAdminPost(AsyncWebServerRequest* request)
     }
 
     CONFIG_T& config = Configuration.get();
-    config.Mqtt_Enabled = root["mqtt_enabled"].as<bool>();
-    config.Mqtt_Retain = root["mqtt_retain"].as<bool>();
-    config.Mqtt_Tls = root["mqtt_tls"].as<bool>();
-    strlcpy(config.Mqtt_RootCaCert, root["mqtt_root_ca_cert"].as<String>().c_str(), sizeof(config.Mqtt_RootCaCert));
-    config.Mqtt_TlsCertLogin = root["mqtt_tls_cert_login"].as<bool>();
-    strlcpy(config.Mqtt_ClientCert, root["mqtt_client_cert"].as<String>().c_str(), sizeof(config.Mqtt_ClientCert));
-    strlcpy(config.Mqtt_ClientKey, root["mqtt_client_key"].as<String>().c_str(), sizeof(config.Mqtt_ClientKey));
-    config.Mqtt_Port = root["mqtt_port"].as<uint>();
-    strlcpy(config.Mqtt_Hostname, root["mqtt_hostname"].as<String>().c_str(), sizeof(config.Mqtt_Hostname));
-    strlcpy(config.Mqtt_Username, root["mqtt_username"].as<String>().c_str(), sizeof(config.Mqtt_Username));
-    strlcpy(config.Mqtt_Password, root["mqtt_password"].as<String>().c_str(), sizeof(config.Mqtt_Password));
-    strlcpy(config.Mqtt_Topic, root["mqtt_topic"].as<String>().c_str(), sizeof(config.Mqtt_Topic));
-    strlcpy(config.Mqtt_LwtTopic, root["mqtt_lwt_topic"].as<String>().c_str(), sizeof(config.Mqtt_LwtTopic));
-    strlcpy(config.Mqtt_LwtValue_Online, root["mqtt_lwt_online"].as<String>().c_str(), sizeof(config.Mqtt_LwtValue_Online));
-    strlcpy(config.Mqtt_LwtValue_Offline, root["mqtt_lwt_offline"].as<String>().c_str(), sizeof(config.Mqtt_LwtValue_Offline));
-    config.Mqtt_PublishInterval = root["mqtt_publish_interval"].as<uint32_t>();
-    config.Mqtt_CleanSession = root["mqtt_clean_session"].as<bool>();
-    config.Mqtt_Hass_Enabled = root["mqtt_hass_enabled"].as<bool>();
-    config.Mqtt_Hass_Expire = root["mqtt_hass_expire"].as<bool>();
-    config.Mqtt_Hass_Retain = root["mqtt_hass_retain"].as<bool>();
-    config.Mqtt_Hass_IndividualPanels = root["mqtt_hass_individualpanels"].as<bool>();
-    strlcpy(config.Mqtt_Hass_Topic, root["mqtt_hass_topic"].as<String>().c_str(), sizeof(config.Mqtt_Hass_Topic));
+    config.Mqtt.Enabled = root["mqtt_enabled"].as<bool>();
+    config.Mqtt.Retain = root["mqtt_retain"].as<bool>();
+    config.Mqtt.Tls.Enabled = root["mqtt_tls"].as<bool>();
+    strlcpy(config.Mqtt.Tls.RootCaCert, root["mqtt_root_ca_cert"].as<String>().c_str(), sizeof(config.Mqtt.Tls.RootCaCert));
+    config.Mqtt.Tls.CertLogin = root["mqtt_tls_cert_login"].as<bool>();
+    strlcpy(config.Mqtt.Tls.ClientCert, root["mqtt_client_cert"].as<String>().c_str(), sizeof(config.Mqtt.Tls.ClientCert));
+    strlcpy(config.Mqtt.Tls.ClientKey, root["mqtt_client_key"].as<String>().c_str(), sizeof(config.Mqtt.Tls.ClientKey));
+    config.Mqtt.Port = root["mqtt_port"].as<uint>();
+    strlcpy(config.Mqtt.Hostname, root["mqtt_hostname"].as<String>().c_str(), sizeof(config.Mqtt.Hostname));
+    strlcpy(config.Mqtt.Username, root["mqtt_username"].as<String>().c_str(), sizeof(config.Mqtt.Username));
+    strlcpy(config.Mqtt.Password, root["mqtt_password"].as<String>().c_str(), sizeof(config.Mqtt.Password));
+    strlcpy(config.Mqtt.Topic, root["mqtt_topic"].as<String>().c_str(), sizeof(config.Mqtt.Topic));
+    strlcpy(config.Mqtt.Lwt.Topic, root["mqtt_lwt_topic"].as<String>().c_str(), sizeof(config.Mqtt.Lwt.Topic));
+    strlcpy(config.Mqtt.Lwt.Value_Online, root["mqtt_lwt_online"].as<String>().c_str(), sizeof(config.Mqtt.Lwt.Value_Online));
+    strlcpy(config.Mqtt.Lwt.Value_Offline, root["mqtt_lwt_offline"].as<String>().c_str(), sizeof(config.Mqtt.Lwt.Value_Offline));
+    config.Mqtt.Lwt.Qos = root["mqtt_lwt_qos"].as<uint8_t>();
+    config.Mqtt.PublishInterval = root["mqtt_publish_interval"].as<uint32_t>();
+    config.Mqtt.CleanSession = root["mqtt_clean_session"].as<bool>();
+    config.Mqtt.Hass.Enabled = root["mqtt_hass_enabled"].as<bool>();
+    config.Mqtt.Hass.Expire = root["mqtt_hass_expire"].as<bool>();
+    config.Mqtt.Hass.Retain = root["mqtt_hass_retain"].as<bool>();
+    config.Mqtt.Hass.IndividualPanels = root["mqtt_hass_individualpanels"].as<bool>();
+    strlcpy(config.Mqtt.Hass.Topic, root["mqtt_hass_topic"].as<String>().c_str(), sizeof(config.Mqtt.Hass.Topic));
     Configuration.write();
 
     retMsg["type"] = "success";

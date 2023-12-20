@@ -18,13 +18,13 @@
 
 class HoymilesRadio_CMT : public HoymilesRadio {
 public:
-    void init(int8_t pin_sdio, int8_t pin_clk, int8_t pin_cs, int8_t pin_fcs, int8_t pin_gpio2, int8_t pin_gpio3);
+    void init(const int8_t pin_sdio, const int8_t pin_clk, const int8_t pin_cs, const int8_t pin_fcs, const int8_t pin_gpio2, const int8_t pin_gpio3);
     void loop();
-    void setPALevel(int8_t paLevel);
-    void setInverterTargetFrequency(uint32_t frequency);
-    uint32_t getInverterTargetFrequency();
+    void setPALevel(const int8_t paLevel);
+    void setInverterTargetFrequency(const uint32_t frequency);
+    uint32_t getInverterTargetFrequency() const;
 
-    bool isConnected();
+    bool isConnected() const;
 
     static uint32_t getMinFrequency();
     static uint32_t getMaxFrequency();
@@ -36,7 +36,7 @@ private:
     void ARDUINO_ISR_ATTR handleInt1();
     void ARDUINO_ISR_ATTR handleInt2();
 
-    void sendEsbPacket(CommandAbstract* cmd);
+    void sendEsbPacket(CommandAbstract& cmd);
 
     std::unique_ptr<CMT2300A> _radio;
 

@@ -9,6 +9,7 @@
         "cypress.config.*"
     ],
     "compilerOptions": {
+        "noEmit": false,
         "composite": true,
         "types": [
             "node"

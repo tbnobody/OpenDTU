@@ -8,7 +8,7 @@
 #include <Every.h>
 #include <FunctionalInterrupt.h>
 
-void HoymilesRadio_NRF::init(SPIClass* initialisedSpiBus, uint8_t pinCE, uint8_t pinIRQ)
+void HoymilesRadio_NRF::init(SPIClass* initialisedSpiBus, const uint8_t pinCE, const uint8_t pinIRQ)
 {
     _dtuSerial.u64 = 0;
 
@@ -71,8 +71,8 @@ void HoymilesRadio_NRF::loop()
         // Perform package parsing only if no packages are received
         if (!_rxBuffer.empty()) {
             fragment_t f = _rxBuffer.back();
-            if (checkFragmentCrc(&f)) {
-                std::shared_ptr<InverterAbstract> inv = Hoymiles.getInverterByFragment(&f);
+            if (checkFragmentCrc(f)) {
+                std::shared_ptr<InverterAbstract> inv = Hoymiles.getInverterByFragment(f);
 
                 if (nullptr != inv) {
                     // Save packet in inverter rx buffer
@@ -97,7 +97,7 @@ void HoymilesRadio_NRF::loop()
     handleReceivedPackage();
 }
 
-void HoymilesRadio_NRF::setPALevel(rf24_pa_dbm_e paLevel)
+void HoymilesRadio_NRF::setPALevel(const rf24_pa_dbm_e paLevel)
 {
     if (!_isInitialized) {
         return;
@@ -105,7 +105,7 @@ void HoymilesRadio_NRF::setPALevel(rf24_pa_dbm_e paLevel)
     _radio->setPALevel(paLevel);
 }
 
-void HoymilesRadio_NRF::setDtuSerial(uint64_t serial)
+void HoymilesRadio_NRF::setDtuSerial(const uint64_t serial)
 {
     HoymilesRadio::setDtuSerial(serial);
 
@@ -115,7 +115,7 @@ void HoymilesRadio_NRF::setDtuSerial(uint64_t serial)
     openReadingPipe();
 }
 
-bool HoymilesRadio_NRF::isConnected()
+bool HoymilesRadio_NRF::isConnected() const
 {
     if (!_isInitialized) {
         return false;
@@ -123,7 +123,7 @@ bool HoymilesRadio_NRF::isConnected()
     return _radio->isChipConnected();
 }
 
-bool HoymilesRadio_NRF::isPVariant()
+bool HoymilesRadio_NRF::isPVariant() const
 {
     if (!_isInitialized) {
         return false;
@@ -133,15 +133,13 @@ bool HoymilesRadio_NRF::isPVariant()
 
 void HoymilesRadio_NRF::openReadingPipe()
 {
-    serial_u s;
-    s = convertSerialToRadioId(_dtuSerial);
+    const serial_u s = convertSerialToRadioId(_dtuSerial);
     _radio->openReadingPipe(1, s.u64);
 }
 
-void HoymilesRadio_NRF::openWritingPipe(serial_u serial)
+void HoymilesRadio_NRF::openWritingPipe(const serial_u serial)
 {
-    serial_u s;
-    s = convertSerialToRadioId(serial);
+    const serial_u s = convertSerialToRadioId(serial);
     _radio->openWritingPipe(s.u64);
 }
 
@@ -171,29 +169,29 @@ void HoymilesRadio_NRF::switchRxCh()
     _radio->startListening();
 }
 
-void HoymilesRadio_NRF::sendEsbPacket(CommandAbstract* cmd)
+void HoymilesRadio_NRF::sendEsbPacket(CommandAbstract& cmd)
 {
-    cmd->incrementSendCount();
+    cmd.incrementSendCount();
 
-    cmd->setRouterAddress(DtuSerial().u64);
+    cmd.setRouterAddress(DtuSerial().u64);
 
     _radio->stopListening();
     _radio->setChannel(getTxNxtChannel());
 
     serial_u s;
-    s.u64 = cmd->getTargetAddress();
+    s.u64 = cmd.getTargetAddress();
     openWritingPipe(s);
     _radio->setRetries(3, 15);
 
     Hoymiles.getMessageOutput()->printf("TX %s Channel: %d --> ",
-        cmd->getCommandName().c_str(), _radio->getChannel());
-    cmd->dumpDataPayload(Hoymiles.getMessageOutput());
-    _radio->write(cmd->getDataPayload(), cmd->getDataSize());
+        cmd.getCommandName().c_str(), _radio->getChannel());
+    cmd.dumpDataPayload(Hoymiles.getMessageOutput());
+    _radio->write(cmd.getDataPayload(), cmd.getDataSize());
 
     _radio->setRetries(0, 0);
     openReadingPipe();
     _radio->setChannel(getRxNxtChannel());
     _radio->startListening();
     _busyFlag = true;
-    _rxTimeout.set(cmd->getTimeout());
+    _rxTimeout.set(cmd.getTimeout());
 }

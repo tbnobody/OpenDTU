@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 #pragma once
 
+#include "PinMapping.h"
 #include <cstdint>
 
 #define CONFIG_FILENAME "/config.json"
@@ -48,74 +49,109 @@ struct INVERTER_CONFIG_T {
     uint8_t ReachableThreshold;
     bool ZeroRuntimeDataIfUnrechable;
     bool ZeroYieldDayOnMidnight;
+    bool YieldDayCorrection;
     CHANNEL_CONFIG_T channel[INV_MAX_CHAN_COUNT];
 };
 
 struct CONFIG_T {
-    uint32_t Cfg_Version;
-    uint32_t Cfg_SaveCount;
+    struct {
+        uint32_t Version;
+        uint32_t SaveCount;
+    } Cfg;
 
-    char WiFi_Ssid[WIFI_MAX_SSID_STRLEN + 1];
-    char WiFi_Password[WIFI_MAX_PASSWORD_STRLEN + 1];
-    uint8_t WiFi_Ip[4];
-    uint8_t WiFi_Netmask[4];
-    uint8_t WiFi_Gateway[4];
-    uint8_t WiFi_Dns1[4];
-    uint8_t WiFi_Dns2[4];
-    bool WiFi_Dhcp;
-    char WiFi_Hostname[WIFI_MAX_HOSTNAME_STRLEN + 1];
-    uint32_t WiFi_ApTimeout;
+    struct {
+        char Ssid[WIFI_MAX_SSID_STRLEN + 1];
+        char Password[WIFI_MAX_PASSWORD_STRLEN + 1];
+        uint8_t Ip[4];
+        uint8_t Netmask[4];
+        uint8_t Gateway[4];
+        uint8_t Dns1[4];
+        uint8_t Dns2[4];
+        bool Dhcp;
+        char Hostname[WIFI_MAX_HOSTNAME_STRLEN + 1];
+        uint32_t ApTimeout;
+    } WiFi;
 
-    char Ntp_Server[NTP_MAX_SERVER_STRLEN + 1];
-    char Ntp_Timezone[NTP_MAX_TIMEZONE_STRLEN + 1];
-    char Ntp_TimezoneDescr[NTP_MAX_TIMEZONEDESCR_STRLEN + 1];
-    double Ntp_Longitude;
-    double Ntp_Latitude;
-    uint8_t Ntp_SunsetType;
+    struct {
+        bool Enabled;
+    } Mdns;
 
-    bool Mqtt_Enabled;
-    char Mqtt_Hostname[MQTT_MAX_HOSTNAME_STRLEN + 1];
-    uint32_t Mqtt_Port;
-    char Mqtt_Username[MQTT_MAX_USERNAME_STRLEN + 1];
-    char Mqtt_Password[MQTT_MAX_PASSWORD_STRLEN + 1];
-    char Mqtt_Topic[MQTT_MAX_TOPIC_STRLEN + 1];
-    bool Mqtt_Retain;
-    char Mqtt_LwtTopic[MQTT_MAX_TOPIC_STRLEN + 1];
-    char Mqtt_LwtValue_Online[MQTT_MAX_LWTVALUE_STRLEN + 1];
-    char Mqtt_LwtValue_Offline[MQTT_MAX_LWTVALUE_STRLEN + 1];
-    uint32_t Mqtt_PublishInterval;
-    bool Mqtt_CleanSession;
+    struct {
+        char Server[NTP_MAX_SERVER_STRLEN + 1];
+        char Timezone[NTP_MAX_TIMEZONE_STRLEN + 1];
+        char TimezoneDescr[NTP_MAX_TIMEZONEDESCR_STRLEN + 1];
+        double Longitude;
+        double Latitude;
+        uint8_t SunsetType;
+    } Ntp;
 
-    bool Mqtt_Hass_Enabled;
-    bool Mqtt_Hass_Retain;
-    char Mqtt_Hass_Topic[MQTT_MAX_TOPIC_STRLEN + 1];
-    bool Mqtt_Hass_IndividualPanels;
-    bool Mqtt_Hass_Expire;
+    struct {
+        bool Enabled;
+        char Hostname[MQTT_MAX_HOSTNAME_STRLEN + 1];
+        uint32_t Port;
+        char Username[MQTT_MAX_USERNAME_STRLEN + 1];
+        char Password[MQTT_MAX_PASSWORD_STRLEN + 1];
+        char Topic[MQTT_MAX_TOPIC_STRLEN + 1];
+        bool Retain;
+        uint32_t PublishInterval;
+        bool CleanSession;
 
-    bool Mqtt_Tls;
-    char Mqtt_RootCaCert[MQTT_MAX_CERT_STRLEN + 1];
-    bool Mqtt_TlsCertLogin;
-    char Mqtt_ClientCert[MQTT_MAX_CERT_STRLEN + 1];
-    char Mqtt_ClientKey[MQTT_MAX_CERT_STRLEN + 1];
+        struct {
+            char Topic[MQTT_MAX_TOPIC_STRLEN + 1];
+            char Value_Online[MQTT_MAX_LWTVALUE_STRLEN + 1];
+            char Value_Offline[MQTT_MAX_LWTVALUE_STRLEN + 1];
+            uint8_t Qos;
+        } Lwt;
+
+        struct {
+            bool Enabled;
+            bool Retain;
+            char Topic[MQTT_MAX_TOPIC_STRLEN + 1];
+            bool IndividualPanels;
+            bool Expire;
+        } Hass;
+
+        struct {
+            bool Enabled;
+            char RootCaCert[MQTT_MAX_CERT_STRLEN + 1];
+            bool CertLogin;
+            char ClientCert[MQTT_MAX_CERT_STRLEN + 1];
+            char ClientKey[MQTT_MAX_CERT_STRLEN + 1];
+        } Tls;
+    } Mqtt;
+
+    struct {
+        uint64_t Serial;
+        uint32_t PollInterval;
+        struct {
+            uint8_t PaLevel;
+        } Nrf;
+        struct {
+            int8_t PaLevel;
+            uint32_t Frequency;
+        } Cmt;
+    } Dtu;
+
+    struct {
+        char Password[WIFI_MAX_PASSWORD_STRLEN + 1];
+        bool AllowReadonly;
+    } Security;
+
+    struct {
+        bool PowerSafe;
+        bool ScreenSaver;
+        uint8_t Rotation;
+        uint8_t Contrast;
+        uint8_t Language;
+        uint32_t DiagramDuration;
+    } Display;
+
+    struct {
+        uint8_t Brightness;
+    } Led_Single[PINMAPPING_LED_COUNT];
 
     INVERTER_CONFIG_T Inverter[INV_MAX_COUNT];
-
-    uint64_t Dtu_Serial;
-    uint32_t Dtu_PollInterval;
-    uint8_t Dtu_NrfPaLevel;
-    int8_t Dtu_CmtPaLevel;
-    uint32_t Dtu_CmtFrequency;
-
-    char Security_Password[WIFI_MAX_PASSWORD_STRLEN + 1];
-    bool Security_AllowReadonly;
-
     char Dev_PinMapping[DEV_MAX_MAPPING_NAME_STRLEN + 1];
-
-    bool Display_PowerSafe;
-    bool Display_ScreenSaver;
-    uint8_t Display_Rotation;
-    uint8_t Display_Contrast;
-    uint8_t Display_Language;
 };
 
 class ConfigurationClass {
@@ -127,7 +163,7 @@ public:
     CONFIG_T& get();
 
     INVERTER_CONFIG_T* getFreeInverterSlot();
-    INVERTER_CONFIG_T* getInverterConfig(uint64_t serial);
+    INVERTER_CONFIG_T* getInverterConfig(const uint64_t serial);
 };
 
 extern ConfigurationClass Configuration;

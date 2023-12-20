@@ -16,27 +16,27 @@
 class HoymilesClass {
 public:
     void init();
-    void initNRF(SPIClass* initialisedSpiBus, uint8_t pinCE, uint8_t pinIRQ);
-    void initCMT(int8_t pin_sdio, int8_t pin_clk, int8_t pin_cs, int8_t pin_fcs, int8_t pin_gpio2, int8_t pin_gpio3);
+    void initNRF(SPIClass* initialisedSpiBus, const uint8_t pinCE, const uint8_t pinIRQ);
+    void initCMT(const int8_t pin_sdio, const int8_t pin_clk, const int8_t pin_cs, const int8_t pin_fcs, const int8_t pin_gpio2, const int8_t pin_gpio3);
     void loop();
 
     void setMessageOutput(Print* output);
     Print* getMessageOutput();
 
-    std::shared_ptr<InverterAbstract> addInverter(const char* name, uint64_t serial);
-    std::shared_ptr<InverterAbstract> getInverterByPos(uint8_t pos);
-    std::shared_ptr<InverterAbstract> getInverterBySerial(uint64_t serial);
-    std::shared_ptr<InverterAbstract> getInverterByFragment(fragment_t* fragment);
-    void removeInverterBySerial(uint64_t serial);
-    size_t getNumInverters();
+    std::shared_ptr<InverterAbstract> addInverter(const char* name, const uint64_t serial);
+    std::shared_ptr<InverterAbstract> getInverterByPos(const uint8_t pos);
+    std::shared_ptr<InverterAbstract> getInverterBySerial(const uint64_t serial);
+    std::shared_ptr<InverterAbstract> getInverterByFragment(const fragment_t& fragment);
+    void removeInverterBySerial(const uint64_t serial);
+    size_t getNumInverters() const;
 
     HoymilesRadio_NRF* getRadioNrf();
     HoymilesRadio_CMT* getRadioCmt();
 
-    uint32_t PollInterval();
-    void setPollInterval(uint32_t interval);
+    uint32_t PollInterval() const;
+    void setPollInterval(const uint32_t interval);
 
-    bool isAllRadioIdle();
+    bool isAllRadioIdle() const;
 
 private:
     std::vector<std::shared_ptr<InverterAbstract>> _inverters;

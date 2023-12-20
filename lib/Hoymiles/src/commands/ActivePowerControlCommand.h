@@ -12,14 +12,14 @@ typedef enum { // ToDo: to be verified by field tests
 
 class ActivePowerControlCommand : public DevControlCommand {
 public:
-    explicit ActivePowerControlCommand(uint64_t target_address = 0, uint64_t router_address = 0);
+    explicit ActivePowerControlCommand(const uint64_t target_address = 0, const uint64_t router_address = 0);
 
-    virtual String getCommandName();
+    virtual String getCommandName() const;
 
-    virtual bool handleResponse(InverterAbstract* inverter, fragment_t fragment[], uint8_t max_fragment_id);
-    virtual void gotTimeout(InverterAbstract* inverter);
+    virtual bool handleResponse(InverterAbstract& inverter, const fragment_t fragment[], const uint8_t max_fragment_id);
+    virtual void gotTimeout(InverterAbstract& inverter);
 
-    void setActivePowerLimit(float limit, PowerLimitControlType type = RelativNonPersistent);
-    float getLimit();
+    void setActivePowerLimit(const float limit, const PowerLimitControlType type = RelativNonPersistent);
+    float getLimit() const;
     PowerLimitControlType getType();
 };

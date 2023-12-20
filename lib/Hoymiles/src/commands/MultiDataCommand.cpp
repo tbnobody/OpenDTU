@@ -1,11 +1,34 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * Copyright (C) 2022 Thomas Basler and others
+ * Copyright (C) 2022-2023 Thomas Basler and others
  */
+
+/*
+Derives from CommandAbstract. Has a fixed length of 26 bytes.
+
+Command structure:
+* ID: fixed identifier and everytime 0x15
+* Idx: the counter of sequencial packages to send. Currently it's only 0x80
+  because all request requests only consist of one package.
+* DT: repressents the data type and specifies which sub-command to be fetched
+* Time: represents the current unix timestamp as hex format. The time on the inverter is synced to the sent time.
+  Can be calculated e.g. using the following command
+    echo "obase=16; $(date --date='2023-12-07 18:54:00' +%s)" | bc
+* Gap: always 0x0
+* Password: currently always 0x0
+* CRC16: calcuclated over the highlighted amount of bytes
+
+00   01 02 03 04   05 06 07 08   09   10   11   12 13 14 15   16 17   18 19   20 21 22 23   24 25   26   27 28 29 30 31
+-----------------------------------------------------------------------------------------------------------------------
+                                      |<------------------- CRC16 --------------------->|
+15   71 60 35 46   80 12 23 04   80   00   00   65 72 06 B8   00 00   00 00   00 00 00 00   00 00   00   -- -- -- -- --
+^^   ^^^^^^^^^^^   ^^^^^^^^^^^   ^^   ^^   ^^   ^^^^^^^^^^^   ^^^^^           ^^^^^^^^^^^   ^^^^^   ^^
+ID   Target Addr   Source Addr   Idx  DT   ?    Time          Gap             Password      CRC16   CRC8
+*/
 #include "MultiDataCommand.h"
 #include "crc.h"
 
-MultiDataCommand::MultiDataCommand(uint64_t target_address, uint64_t router_address, uint8_t data_type, time_t time)
+MultiDataCommand::MultiDataCommand(const uint64_t target_address, const uint64_t router_address, const uint8_t data_type, const time_t time)
     : CommandAbstract(target_address, router_address)
 {
     _payload[0] = 0x15;
@@ -27,17 +50,17 @@ MultiDataCommand::MultiDataCommand(uint64_t target_address, uint64_t router_addr
     _payload_size = 26;
 }
 
-void MultiDataCommand::setDataType(uint8_t data_type)
+void MultiDataCommand::setDataType(const uint8_t data_type)
 {
     _payload[10] = data_type;
     udpateCRC();
 }
-uint8_t MultiDataCommand::getDataType()
+uint8_t MultiDataCommand::getDataType() const
 {
     return _payload[10];
 }
 
-void MultiDataCommand::setTime(time_t time)
+void MultiDataCommand::setTime(const time_t time)
 {
     _payload[12] = (uint8_t)(time >> 24);
     _payload[13] = (uint8_t)(time >> 16);
@@ -46,7 +69,7 @@ void MultiDataCommand::setTime(time_t time)
     udpateCRC();
 }
 
-time_t MultiDataCommand::getTime()
+time_t MultiDataCommand::getTime() const
 {
     return (time_t)(_payload[12] << 24)
         | (time_t)(_payload[13] << 16)
@@ -54,7 +77,7 @@ time_t MultiDataCommand::getTime()
         | (time_t)(_payload[15]);
 }
 
-CommandAbstract* MultiDataCommand::getRequestFrameCommand(uint8_t frame_no)
+CommandAbstract* MultiDataCommand::getRequestFrameCommand(const uint8_t frame_no)
 {
     _cmdRequestFrame.setTargetAddress(getTargetAddress());
     _cmdRequestFrame.setFrameNo(frame_no);
@@ -62,7 +85,7 @@ CommandAbstract* MultiDataCommand::getRequestFrameCommand(uint8_t frame_no)
     return &_cmdRequestFrame;
 }
 
-bool MultiDataCommand::handleResponse(InverterAbstract* inverter, fragment_t fragment[], uint8_t max_fragment_id)
+bool MultiDataCommand::handleResponse(InverterAbstract& inverter, const fragment_t fragment[], const uint8_t max_fragment_id)
 {
     // All fragments are available --> Check CRC
     uint16_t crc = 0xffff, crcRcv = 0;
@@ -88,12 +111,12 @@ bool MultiDataCommand::handleResponse(InverterAbstract* inverter, fragment_t fra
 
 void MultiDataCommand::udpateCRC()
 {
-    uint16_t crc = crc16(&_payload[10], 14); // From data_type till password
+    const  uint16_t crc = crc16(&_payload[10], 14); // From data_type till password
     _payload[24] = (uint8_t)(crc >> 8);
     _payload[25] = (uint8_t)(crc);
 }
 
-uint8_t MultiDataCommand::getTotalFragmentSize(fragment_t fragment[], uint8_t max_fragment_id)
+uint8_t MultiDataCommand::getTotalFragmentSize(const fragment_t fragment[], const uint8_t max_fragment_id)
 {
     uint8_t fragmentSize = 0;
     for (uint8_t i = 0; i < max_fragment_id; i++) {
