@@ -1,19 +1,20 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 
 #include "WebApi_database.h"
+#include "WebApi.h"
 #include "Datastore.h"
 #include "MessageOutput.h"
-#include "WebApi.h"
 #include "defaults.h"
 #include <Arduino.h>
 #include <AsyncJson.h>
 #include <LittleFS.h>
 
-void WebApiDatabaseClass::init(AsyncWebServer* server)
+void WebApiDatabaseClass::init(AsyncWebServer& server)
 {
     using std::placeholders::_1;
 
-    _server = server;
+    _server = &server;
+
     _server->on("/api/database", HTTP_GET, std::bind(&WebApiDatabaseClass::onDatabase, this, _1));
     _server->on("/api/databaseHour", HTTP_GET, std::bind(&WebApiDatabaseClass::onDatabaseHour, this, _1));
     _server->on("/api/databaseDay", HTTP_GET, std::bind(&WebApiDatabaseClass::onDatabaseDay, this, _1));
@@ -70,7 +71,7 @@ bool WebApiDatabaseClass::write(float energy)
 
     File f = LittleFS.open(DATABASE_FILENAME, "a", true);
     if (!f) {
-        MessageOutput.println("Failed to append to database.");
+        MessageOutput.println("Failed to append the database.");
         return (false);
     }
     f.write((const uint8_t*)&d, sizeof(pvData));
@@ -128,9 +129,9 @@ size_t WebApiDatabaseClass::readchunk(uint8_t* buffer, size_t maxLen, size_t ind
 size_t WebApiDatabaseClass::readchunk_log(uint8_t* buffer, size_t maxLen, size_t index)
 {
     size_t x = readchunk(buffer, maxLen, index);
-    MessageOutput.println("----------");
-    MessageOutput.println(maxLen);
-    MessageOutput.println(x);
+    //MessageOutput.println("----------");
+    //MessageOutput.println(maxLen);
+    //MessageOutput.println(x);
     return (x);
 }
 

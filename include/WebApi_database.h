@@ -8,7 +8,7 @@
 
 class WebApiDatabaseClass {
 public:
-    void init(AsyncWebServer* server);
+    void init(AsyncWebServer& server);
     void loop();
     bool write(float energy);
 
