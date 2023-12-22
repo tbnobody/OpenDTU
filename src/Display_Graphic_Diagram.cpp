@@ -37,11 +37,11 @@ void DisplayGraphicDiagramClass::averageLoop()
 
 void DisplayGraphicDiagramClass::dataPointLoop()
 {
-    if (_graphValuesCount >= CHART_WIDTH) {
-        for (uint8_t i = 0; i < CHART_WIDTH - 1; i++) {
+    if (_graphValuesCount >= std::size(_graphValues)) {
+        for (uint8_t i = 0; i < std::size(_graphValues) - 1; i++) {
             _graphValues[i] = _graphValues[i + 1];
         }
-        _graphValuesCount = CHART_WIDTH - 1;
+        _graphValuesCount = std::size(_graphValues) - 1;
     }
     if (_iRunningAverageCnt != 0) {
         _graphValues[_graphValuesCount++] = _iRunningAverage / _iRunningAverageCnt;
@@ -50,6 +50,11 @@ void DisplayGraphicDiagramClass::dataPointLoop()
     }
 
     if (Configuration.get().Display.ScreenSaver) {
+        // TODO & Check:
+        //   Shouldn't the diagram move like rest of display in screensavermode?
+        //   The diagram screensaver move "stalls" also after _graphValues array is filled the first time
+        //       ( _graphValuesCount reached std::size(_graphValues) )
+        //   See Display_Graphic._mExtra variable
         _graphPosX = DIAG_POSX - (_graphValuesCount % 2);
     }
 }
