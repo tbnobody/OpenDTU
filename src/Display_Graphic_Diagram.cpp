@@ -77,7 +77,7 @@ void DisplayGraphicDiagramClass::redraw(uint8_t screenSaverOffsetX)
     // draw AC value
     _display->setFont(u8g2_font_tom_thumb_4x6_mr); // 4 pixels per char
     char fmtText[7];
-    const float maxWatts = *std::max_element(_graphValues.begin(), _graphValues.end()) + 1200;
+    const float maxWatts = *std::max_element(_graphValues.begin(), _graphValues.end());
     if (maxWatts > 999) {
         snprintf(fmtText, sizeof(fmtText), "%2.1fkW", maxWatts / 1000);
     } else {
