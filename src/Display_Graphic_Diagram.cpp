@@ -37,11 +37,11 @@ void DisplayGraphicDiagramClass::averageLoop()
 
 void DisplayGraphicDiagramClass::dataPointLoop()
 {
-    if (_graphValuesCount >= CHART_WIDTH) {
-        for (uint8_t i = 0; i < CHART_WIDTH - 1; i++) {
+    if (_graphValuesCount >= std::size(_graphValues)) {
+        for (uint8_t i = 0; i < std::size(_graphValues) - 1; i++) {
             _graphValues[i] = _graphValues[i + 1];
         }
-        _graphValuesCount = CHART_WIDTH - 1;
+        _graphValuesCount = std::size(_graphValues) - 1;
     }
     if (_iRunningAverageCnt != 0) {
         _graphValues[_graphValuesCount++] = _iRunningAverage / _iRunningAverageCnt;
