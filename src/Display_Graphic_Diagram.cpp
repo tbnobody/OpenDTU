@@ -62,17 +62,17 @@ void DisplayGraphicDiagramClass::updatePeriod()
 
 void DisplayGraphicDiagramClass::redraw(uint8_t screenSaverOffsetX)
 {
-    uint8_t __graphPosX = DIAG_POSX + ((screenSaverOffsetX > 3) ?1 :0); // screenSaverOffsetX expected to be in range 0..6
+    uint8_t graphPosX = DIAG_POSX + ((screenSaverOffsetX > 3) ?1 :0); // screenSaverOffsetX expected to be in range 0..6
     uint8_t graphPosY = DIAG_POSY;
 
     // draw diagram axis
-    _display->drawVLine(_graphPosX, graphPosY, CHART_HEIGHT);
-    _display->drawHLine(_graphPosX, graphPosY + CHART_HEIGHT - 1, CHART_WIDTH);
+    _display->drawVLine(graphPosX, graphPosY, CHART_HEIGHT);
+    _display->drawHLine(graphPosX, graphPosY + CHART_HEIGHT - 1, CHART_WIDTH);
 
-    _display->drawLine(_graphPosX + 1, graphPosY + 1, _graphPosX + 2, graphPosY + 2); // UP-arrow
-    _display->drawLine(_graphPosX - 2, graphPosY + 2, _graphPosX - 1, graphPosY + 1); // UP-arrow
-    _display->drawLine(_graphPosX + CHART_WIDTH - 3, graphPosY + CHART_HEIGHT - 3, _graphPosX + CHART_WIDTH - 2, graphPosY + CHART_HEIGHT - 2); // LEFT-arrow
-    _display->drawLine(_graphPosX + CHART_WIDTH - 3, graphPosY + CHART_HEIGHT + 1, _graphPosX + CHART_WIDTH - 2, graphPosY + CHART_HEIGHT); // LEFT-arrow
+    _display->drawLine(graphPosX + 1, graphPosY + 1, graphPosX + 2, graphPosY + 2); // UP-arrow
+    _display->drawLine(graphPosX - 2, graphPosY + 2, graphPosX - 1, graphPosY + 1); // UP-arrow
+    _display->drawLine(graphPosX + CHART_WIDTH - 3, graphPosY + CHART_HEIGHT - 3, graphPosX + CHART_WIDTH - 2, graphPosY + CHART_HEIGHT - 2); // LEFT-arrow
+    _display->drawLine(graphPosX + CHART_WIDTH - 3, graphPosY + CHART_HEIGHT + 1, graphPosX + CHART_WIDTH - 2, graphPosY + CHART_HEIGHT); // LEFT-arrow
 
     // draw AC value
     _display->setFont(u8g2_font_tom_thumb_4x6_mr); // 4 pixels per char
@@ -85,7 +85,7 @@ void DisplayGraphicDiagramClass::redraw(uint8_t screenSaverOffsetX)
     }
     const uint8_t textLength = strlen(fmtText);
     const uint8_t space_and_arrow_pixels = 2;
-    _display->drawStr(_graphPosX - space_and_arrow_pixels - (textLength * 4), graphPosY + 5, fmtText);
+    _display->drawStr(graphPosX - space_and_arrow_pixels - (textLength * 4), graphPosY + 5, fmtText);
 
     // draw chart
     const float scaleFactor = maxWatts / CHART_HEIGHT;
@@ -93,15 +93,15 @@ void DisplayGraphicDiagramClass::redraw(uint8_t screenSaverOffsetX)
     for (int i = 0; i < _graphValuesCount; i++) {
         if (scaleFactor > 0) {
             if (i == 0) {
-                _display->drawPixel(_graphPosX + 1 + i, graphPosY + CHART_HEIGHT - ((_graphValues[i] / scaleFactor) + 0.5)); // + 0.5 to round mathematical
+                _display->drawPixel(graphPosX + 1 + i, graphPosY + CHART_HEIGHT - ((_graphValues[i] / scaleFactor) + 0.5)); // + 0.5 to round mathematical
             } else {
-                _display->drawLine(_graphPosX + i, graphPosY + CHART_HEIGHT - ((_graphValues[i - 1] / scaleFactor) + 0.5), _graphPosX + 1 + i, graphPosY + CHART_HEIGHT - ((_graphValues[i] / scaleFactor) + 0.5));
+                _display->drawLine(graphPosX + i, graphPosY + CHART_HEIGHT - ((_graphValues[i - 1] / scaleFactor) + 0.5), graphPosX + 1 + i, graphPosY + CHART_HEIGHT - ((_graphValues[i] / scaleFactor) + 0.5));
             }
         }
 
         // draw one tick per hour to the x-axis
         if (i * getSecondsPerDot() > (3600u * axisTick)) {
-            _display->drawPixel(_graphPosX + 1 + i, graphPosY + CHART_HEIGHT);
+            _display->drawPixel(graphPosX + 1 + i, graphPosY + CHART_HEIGHT);
             axisTick++;
         }
     }
