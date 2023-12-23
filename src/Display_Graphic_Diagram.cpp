@@ -48,10 +48,12 @@ void DisplayGraphicDiagramClass::dataPointLoop()
         _iRunningAverage = 0;
         _iRunningAverageCnt = 0;
     }
-
     if (Configuration.get().Display.ScreenSaver) {
-        _graphPosX = DIAG_POSX - (_graphValuesCount % 2);
+        uint8_t tmp = _mExtra++ % 2;
+        _graphPosX = DIAG_POSX - tmp;
+        _graphPosY = DIAG_POSY + tmp;
     }
+
 }
 
 uint32_t DisplayGraphicDiagramClass::getSecondsPerDot()
@@ -66,15 +68,13 @@ void DisplayGraphicDiagramClass::updatePeriod()
 
 void DisplayGraphicDiagramClass::redraw()
 {
-    uint8_t graphPosY = DIAG_POSY;
-
     // draw diagram axis
-    _display->drawVLine(_graphPosX, graphPosY, CHART_HEIGHT);
-    _display->drawHLine(_graphPosX, graphPosY + CHART_HEIGHT - 1, CHART_WIDTH);
+    _display->drawVLine(_graphPosX, _graphPosY, CHART_HEIGHT);
+    _display->drawHLine(_graphPosX, _graphPosY + CHART_HEIGHT - 1, CHART_WIDTH);
 
-    _display->drawLine(_graphPosX + 1, graphPosY + 1, _graphPosX + 2, graphPosY + 2); // UP-arrow
-    _display->drawLine(_graphPosX + CHART_WIDTH - 3, graphPosY + CHART_HEIGHT - 3, _graphPosX + CHART_WIDTH - 2, graphPosY + CHART_HEIGHT - 2); // LEFT-arrow
-    _display->drawLine(_graphPosX + CHART_WIDTH - 3, graphPosY + CHART_HEIGHT + 1, _graphPosX + CHART_WIDTH - 2, graphPosY + CHART_HEIGHT); // LEFT-arrow
+    _display->drawLine(_graphPosX + 1, _graphPosY + 1, _graphPosX + 2, _graphPosY + 2); // UP-arrow
+    _display->drawLine(_graphPosX + CHART_WIDTH - 3, _graphPosY + CHART_HEIGHT - 3, _graphPosX + CHART_WIDTH - 2, _graphPosY + CHART_HEIGHT - 2); // LEFT-arrow
+    _display->drawLine(_graphPosX + CHART_WIDTH - 3, _graphPosY + CHART_HEIGHT + 1, _graphPosX + CHART_WIDTH - 2, _graphPosY + CHART_HEIGHT); // LEFT-arrow
 
     // draw AC value
     _display->setFont(u8g2_font_tom_thumb_4x6_mr);
@@ -82,7 +82,7 @@ void DisplayGraphicDiagramClass::redraw()
     const float maxWatts = *std::max_element(_graphValues.begin(), _graphValues.end());
     snprintf(fmtText, sizeof(fmtText), "%dW", static_cast<uint16_t>(maxWatts));
     const uint8_t textLength = strlen(fmtText);
-    _display->drawStr(_graphPosX - (textLength * 4), graphPosY + 5, fmtText);
+    _display->drawStr(_graphPosX - (textLength * 4), DIAG_POSY + 5, fmtText);
 
     // draw chart
     const float scaleFactor = maxWatts / CHART_HEIGHT;
@@ -90,15 +90,15 @@ void DisplayGraphicDiagramClass::redraw()
     for (int i = 0; i < _graphValuesCount; i++) {
         if (scaleFactor > 0) {
             if (i == 0) {
-                _display->drawPixel(_graphPosX + 1 + i, graphPosY + CHART_HEIGHT - ((_graphValues[i] / scaleFactor) + 0.5)); // + 0.5 to round mathematical
+                _display->drawPixel(_graphPosX + 1 + i, _graphPosY + CHART_HEIGHT - ((_graphValues[i] / scaleFactor) + 0.5)); // + 0.5 to round mathematical
             } else {
-                _display->drawLine(_graphPosX + i, graphPosY + CHART_HEIGHT - ((_graphValues[i - 1] / scaleFactor) + 0.5), _graphPosX + 1 + i, graphPosY + CHART_HEIGHT - ((_graphValues[i] / scaleFactor) + 0.5));
+                _display->drawLine(_graphPosX + i, _graphPosY + CHART_HEIGHT - ((_graphValues[i - 1] / scaleFactor) + 0.5), _graphPosX + 1 + i, _graphPosY + CHART_HEIGHT - ((_graphValues[i] / scaleFactor) + 0.5));
             }
         }
 
         // draw one tick per hour to the x-axis
         if (i * getSecondsPerDot() > (3600u * axisTick)) {
-            _display->drawPixel(_graphPosX + 1 + i, graphPosY + CHART_HEIGHT);
+            _display->drawPixel(_graphPosX + 1 + i, _graphPosY + CHART_HEIGHT);
             axisTick++;
         }
     }

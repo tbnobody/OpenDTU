@@ -30,10 +30,12 @@ private:
 
     U8G2* _display = nullptr;
     std::array<float, CHART_WIDTH> _graphValues = {};
-    uint8_t _graphValuesCount = 0;
-
     float _iRunningAverage = 0;
+
     uint16_t _iRunningAverageCnt = 0;
 
+    uint8_t _graphValuesCount = 0;
+    uint8_t _mExtra;
     uint8_t _graphPosX = DIAG_POSX;
+    uint8_t _graphPosY = DIAG_POSY;
 };
