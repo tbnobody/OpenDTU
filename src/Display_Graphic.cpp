@@ -164,7 +164,7 @@ void DisplayGraphicClass::loop()
             uint8_t screenSaverOffsetX = enableScreensaver ? (_mExtra % 7) : 0;
             _diagram.redraw(screenSaverOffsetX);
         }
-        float watts = Datastore.getTotalAcPowerEnabled();
+        const float watts = Datastore.getTotalAcPowerEnabled();
         if (watts > 999) {
             snprintf(_fmtText, sizeof(_fmtText), i18n_current_power_kw[_display_language], watts / 1000);
         } else {

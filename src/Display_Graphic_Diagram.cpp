@@ -62,8 +62,8 @@ void DisplayGraphicDiagramClass::updatePeriod()
 
 void DisplayGraphicDiagramClass::redraw(uint8_t screenSaverOffsetX)
 {
-    uint8_t graphPosX = DIAG_POSX + ((screenSaverOffsetX > 3) ? 1 : 0); // screenSaverOffsetX expected to be in range 0..6
-    uint8_t graphPosY = DIAG_POSY;
+    const uint8_t graphPosX = DIAG_POSX + ((screenSaverOffsetX > 3) ? 1 : 0); // screenSaverOffsetX expected to be in range 0..6
+    const uint8_t graphPosY = DIAG_POSY;
 
     // draw diagram axis
     _display->drawVLine(graphPosX, graphPosY, CHART_HEIGHT);
