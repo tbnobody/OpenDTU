@@ -9,7 +9,7 @@
 #include <frozen/string.h>
 
 const std::array<const ProfileType_t, PROFILE_TYPE_COUNT> GridProfileParser::_profileTypes = { {
-    { 0x02, 0x00, "no data (yet)" },
+    { 0x02, 0x00, "US - IEEE 1547 240V (2018)" },
     { 0x03, 0x00, "Germany - DE_VDE4105_2018" },
     { 0x0a, 0x00, "European - EN 50549-1:2019" },
     { 0x0c, 0x00, "AT Tor - EU_EN50438" },
@@ -45,16 +45,16 @@ constexpr GridProfileItemDefinition_t make_value(frozen::string Name, frozen::st
     return v;
 }
 
-constexpr frozen::map<uint8_t, GridProfileItemDefinition_t, 0x39> itemDefinitions = {
+constexpr frozen::map<uint8_t, GridProfileItemDefinition_t, 0x3E> itemDefinitions = {
     { 0x01, make_value("Nominale Voltage (NV)", "V", 10) },
     { 0x02, make_value("Low Voltage 1 (LV1)", "V", 10) },
     { 0x03, make_value("LV1 Maximum Trip Time (MTT)", "s", 10) },
     { 0x04, make_value("High Voltage 1 (HV1)", "V", 10) },
     { 0x05, make_value("HV1 Maximum Trip Time (MTT)", "s", 10) },
     { 0x06, make_value("Low Voltage 2 (LV2)", "V", 10) },
-    { 0x07, make_value("LV2 Maximum Trip Time (MTT)", "s", 10) },
+    { 0x07, make_value("LV2 Maximum Trip Time (MTT)", "s", 100) },
     { 0x08, make_value("High Voltage 2 (HV2)", "V", 10) },
-    { 0x09, make_value("HV2 Maximum Trip Time (MTT)", "s", 10) },
+    { 0x09, make_value("HV2 Maximum Trip Time (MTT)", "s", 100) },
     { 0x0a, make_value("10mins Average High Voltage (AHV)", "V", 10) },
     { 0x0b, make_value("High Voltage 3 (HV3)", "V", 10) },
     { 0x0c, make_value("HV3 Maximum Trip Time (MTT)", "s", 10) },
@@ -64,9 +64,9 @@ constexpr frozen::map<uint8_t, GridProfileItemDefinition_t, 0x39> itemDefinition
     { 0x10, make_value("High Frequency 1 (HF1)", "Hz", 100) },
     { 0x11, make_value("HF1 Maximum Trip time (MTT)", "s", 10) },
     { 0x12, make_value("Low Frequency 2 (LF2)", "Hz", 100) },
-    { 0x13, make_value("LF2 Maximum Trip Time (MTT)", "s", 10) },
+    { 0x13, make_value("LF2 Maximum Trip Time (MTT)", "s", 100) },
     { 0x14, make_value("High Frequency 2 (HF2)", "Hz", 100) },
-    { 0x15, make_value("HF2 Maximum Trip time (MTT)", "s", 10) },
+    { 0x15, make_value("HF2 Maximum Trip time (MTT)", "s", 100) },
     { 0x16, make_value("ID Function Activated", "bool", 1) },
     { 0x17, make_value("Reconnect Time (RT)", "s", 10) },
     { 0x18, make_value("Reconnect High Voltage (RHV)", "V", 10) },
@@ -94,19 +94,24 @@ constexpr frozen::map<uint8_t, GridProfileItemDefinition_t, 0x39> itemDefinition
     { 0x2e, make_value("Voltage Set Point V3", "V", 10) },
     { 0x2f, make_value("Voltage Set Point V4", "V", 10) },
     { 0x30, make_value("Reactive Set Point Q4", "%Pn", 10) },
-    { 0x31, make_value("Setting Time (Tr)", "s", 10) },
+    { 0x31, make_value("VV Setting Time (Tr)", "s", 10) },
     { 0x32, make_value("SPF Function Activated", "bool", 1) },
     { 0x33, make_value("Power Factor (PF)", "", 100) },
     { 0x34, make_value("RPC Function Activated", "bool", 1) },
     { 0x35, make_value("Reactive Power (VAR)", "%Sn", 1) },
     { 0x36, make_value("WPF Function Activated", "bool", 1) },
     { 0x37, make_value("Start of Power of WPF (Pstart)", "%Pn", 10) },
-    { 0x38, make_value("Power Factor ar Rated Power (PFRP)", "", 100) },
+    { 0x38, make_value("Power Factor or Rated Power (PFRP)", "", 100) },
+    { 0x39, make_value("Low Voltage 3 (LV3)", "", 10) },
+    { 0x3a, make_value("LV3 Maximum Trip Time (MTT)", "", 100) },
+    { 0x3b, make_value("Momentary Cessition Low Voltage", "", 10) },
+    { 0x3c, make_value("Momentary Cessition High Voltage", "", 10) },
+    { 0x3d, make_value("FW Settling Time (Tr)", "Hz", 10) },
     { 0xff, make_value("Unkown Value", "", 1) },
 };
 
 const std::array<const GridProfileValue_t, SECTION_VALUE_COUNT> GridProfileParser::_profileValues = { {
-    // Voltage (H/LVRT)
+    // F&C Code 0x00 Voltage (H/LVRT)
     // Version 0x00
     { 0x00, 0x00, 0x01 },
     { 0x00, 0x00, 0x02 },
@@ -178,12 +183,12 @@ const std::array<const GridProfileValue_t, SECTION_VALUE_COUNT> GridProfileParse
     { 0x00, 0x35, 0x07 },
     { 0x00, 0x35, 0x08 },
     { 0x00, 0x35, 0x09 },
-    { 0x00, 0x35, 0xff },
-    { 0x00, 0x35, 0xff },
-    { 0x00, 0x35, 0xff },
-    { 0x00, 0x35, 0xff },
+    { 0x00, 0x35, 0x39 },
+    { 0x00, 0x35, 0x3a },
+    { 0x00, 0x35, 0x3b },
+    { 0x00, 0x35, 0x3c },
 
-    // Frequency (H/LFRT)
+    // F&C Code 0x10 Frequency (H/LFRT)
     // Version 0x00
     { 0x10, 0x00, 0x0d },
     { 0x10, 0x00, 0x0e },
@@ -202,11 +207,11 @@ const std::array<const GridProfileValue_t, SECTION_VALUE_COUNT> GridProfileParse
     { 0x10, 0x03, 0x14 },
     { 0x10, 0x03, 0x15 },
 
-    // Island Detection (ID)
+    // F&C Code 0x20 Island Detection (ID)
     // Version 0x00
     { 0x20, 0x00, 0x16 },
 
-    // Reconnection (RT)
+    // F&C Code 0x30 Reconnection (RT)
     // Version 0x03
     { 0x30, 0x03, 0x17 },
     { 0x30, 0x03, 0x18 },
@@ -223,12 +228,12 @@ const std::array<const GridProfileValue_t, SECTION_VALUE_COUNT> GridProfileParse
     { 0x30, 0x07, 0xff },
     { 0x30, 0x07, 0xff },
 
-    // Ramp Rates (RR)
+    // F&C Code 0x40 Ramp Rates (RR)
     // Version 0x00
     { 0x40, 0x00, 0x1c },
     { 0x40, 0x00, 0x1d },
 
-    // Frequency Watt (FW)
+    // F&C Code 0x50 Frequency Watt (FW)
     // Version 0x00
     { 0x50, 0x00, 0x1e },
     { 0x50, 0x00, 0x1f },
@@ -255,9 +260,9 @@ const std::array<const GridProfileValue_t, SECTION_VALUE_COUNT> GridProfileParse
     { 0x50, 0x11, 0x1f },
     { 0x50, 0x11, 0x20 },
     { 0x50, 0x11, 0x21 },
-    { 0x50, 0x11, 0x22 },
+    { 0x50, 0x11, 0x3d },
 
-    // Volt Watt (VW)
+    // F&C Code 0x60 Volt Watt (VW)
     // Version 0x00
     { 0x60, 0x00, 0x24 },
     { 0x60, 0x00, 0x25 },
@@ -270,7 +275,7 @@ const std::array<const GridProfileValue_t, SECTION_VALUE_COUNT> GridProfileParse
     { 0x60, 0x04, 0x26 },
     { 0x60, 0x04, 0x27 },
 
-    // Active Power Control (APC)
+    // F&C Code 0x70 Active Power Control (APC)
     // Version 0x00
     { 0x70, 0x00, 0x28 },
 
@@ -278,7 +283,7 @@ const std::array<const GridProfileValue_t, SECTION_VALUE_COUNT> GridProfileParse
     { 0x70, 0x02, 0x28 },
     { 0x70, 0x02, 0x29 },
 
-    // Volt Var (VV)
+    // F&C Code 0x80 Volt Var (VV)
     // Version 0x00
     { 0x80, 0x00, 0x2a },
     { 0x80, 0x00, 0x2b },
@@ -298,12 +303,12 @@ const std::array<const GridProfileValue_t, SECTION_VALUE_COUNT> GridProfileParse
     { 0x80, 0x01, 0x30 },
     { 0x80, 0x01, 0x31 },
 
-    // Specified Power Factor (SPF)
+    // F&C Code 0x90 Specified Power Factor (SPF)
     // Version 0x00
     { 0x90, 0x00, 0x32 },
     { 0x90, 0x00, 0x33 },
 
-    // Reactive Power Control (RPC)
+    // F&C Code 0xA0 Reactive Power Control (RPC)
     // Version 0x02
     { 0xa0, 0x02, 0x34 },
     { 0xa0, 0x02, 0x35 },
