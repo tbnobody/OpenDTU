@@ -5,12 +5,12 @@
 
 class RequestFrameCommand : public SingleDataCommand {
 public:
-    explicit RequestFrameCommand(uint64_t target_address = 0, uint64_t router_address = 0, uint8_t frame_no = 0);
+    explicit RequestFrameCommand(const uint64_t target_address = 0, const uint64_t router_address = 0, uint8_t frame_no = 0);
 
-    virtual String getCommandName();
+    virtual String getCommandName() const;
 
-    void setFrameNo(uint8_t frame_no);
-    uint8_t getFrameNo();
+    void setFrameNo(const uint8_t frame_no);
+    uint8_t getFrameNo() const;
 
-    virtual bool handleResponse(InverterAbstract* inverter, fragment_t fragment[], uint8_t max_fragment_id);
+    virtual bool handleResponse(InverterAbstract& inverter, const fragment_t fragment[], const uint8_t max_fragment_id);
 };

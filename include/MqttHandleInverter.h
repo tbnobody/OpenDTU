@@ -3,22 +3,23 @@
 
 #include "Configuration.h"
 #include <Hoymiles.h>
-#include <TimeoutHelper.h>
+#include <TaskSchedulerDeclarations.h>
 #include <espMqttClient.h>
 
 class MqttHandleInverterClass {
 public:
-    void init();
-    void loop();
+    void init(Scheduler& scheduler);
 
-    static String getTopic(std::shared_ptr<InverterAbstract> inv, ChannelType_t type, ChannelNum_t channel, FieldId_t fieldId);
+    static String getTopic(std::shared_ptr<InverterAbstract> inv, const ChannelType_t type, const ChannelNum_t channel, const FieldId_t fieldId);
 
 private:
-    void publishField(std::shared_ptr<InverterAbstract> inv, ChannelType_t type, ChannelNum_t channel, FieldId_t fieldId);
-    void onMqttMessage(const espMqttClientTypes::MessageProperties& properties, const char* topic, const uint8_t* payload, size_t len, size_t index, size_t total);
+    void loop();
+    void publishField(std::shared_ptr<InverterAbstract> inv, const ChannelType_t type, const ChannelNum_t channel, const FieldId_t fieldId);
+    void onMqttMessage(const espMqttClientTypes::MessageProperties& properties, const char* topic, const uint8_t* payload, const size_t len, const size_t index, const size_t total);
+
+    Task _loopTask;
 
     uint32_t _lastPublishStats[INV_MAX_COUNT] = { 0 };
-    uint32_t _lastPublish = 0;
 
     FieldId_t _publishFields[14] = {
         FLD_UDC,

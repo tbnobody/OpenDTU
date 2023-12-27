@@ -1,13 +1,12 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 #pragma once
 
-#include <TimeoutHelper.h>
+#include <TaskSchedulerDeclarations.h>
 #include <mutex>
 
 class DatastoreClass {
 public:
-    void init();
-    void loop();
+    void init(Scheduler& scheduler);
 
     // Sum of yield total of all enabled inverters, a inverter which is just disabled at night is also included
     float getTotalAcYieldTotalEnabled();
@@ -58,7 +57,10 @@ public:
     bool getIsAllEnabledReachable();
 
 private:
-    TimeoutHelper _updateTimeout;
+    void loop();
+
+    Task _loopTask;
+
     std::mutex _mutex;
 
     float _totalAcYieldTotalEnabled = 0;

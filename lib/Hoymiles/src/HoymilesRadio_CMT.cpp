@@ -53,7 +53,7 @@ bool HoymilesRadio_CMT::cmtSwitchDtuFreq(const uint32_t to_freq_kHz)
     return true;
 }
 
-void HoymilesRadio_CMT::init(int8_t pin_sdio, int8_t pin_clk, int8_t pin_cs, int8_t pin_fcs, int8_t pin_gpio2, int8_t pin_gpio3)
+void HoymilesRadio_CMT::init(const int8_t pin_sdio, const int8_t pin_clk, const int8_t pin_cs, const int8_t pin_fcs, const int8_t pin_gpio2, const int8_t pin_gpio3)
 {
     _dtuSerial.u64 = 0;
 
@@ -122,15 +122,15 @@ void HoymilesRadio_CMT::loop()
         // Perform package parsing only if no packages are received
         if (!_rxBuffer.empty()) {
             fragment_t f = _rxBuffer.back();
-            if (checkFragmentCrc(&f)) {
+            if (checkFragmentCrc(f)) {
 
-                serial_u dtuId = convertSerialToRadioId(_dtuSerial);
+                const serial_u dtuId = convertSerialToRadioId(_dtuSerial);
 
                 // The CMT RF module does not filter foreign packages by itself.
                 // Has to be done manually here.
                 if (memcmp(&f.fragment[5], &dtuId.b[1], 4) == 0) {
 
-                    std::shared_ptr<InverterAbstract> inv = Hoymiles.getInverterByFragment(&f);
+                    std::shared_ptr<InverterAbstract> inv = Hoymiles.getInverterByFragment(f);
 
                     if (nullptr != inv) {
                         // Save packet in inverter rx buffer
@@ -156,7 +156,7 @@ void HoymilesRadio_CMT::loop()
     handleReceivedPackage();
 }
 
-void HoymilesRadio_CMT::setPALevel(int8_t paLevel)
+void HoymilesRadio_CMT::setPALevel(const int8_t paLevel)
 {
     if (!_isInitialized) {
         return;
@@ -169,7 +169,7 @@ void HoymilesRadio_CMT::setPALevel(int8_t paLevel)
     }
 }
 
-void HoymilesRadio_CMT::setInverterTargetFrequency(uint32_t frequency)
+void HoymilesRadio_CMT::setInverterTargetFrequency(const uint32_t frequency)
 {
     _inverterTargetFrequency = frequency;
     if (!_isInitialized) {
@@ -178,12 +178,12 @@ void HoymilesRadio_CMT::setInverterTargetFrequency(uint32_t frequency)
     cmtSwitchDtuFreq(_inverterTargetFrequency);
 }
 
-uint32_t HoymilesRadio_CMT::getInverterTargetFrequency()
+uint32_t HoymilesRadio_CMT::getInverterTargetFrequency() const
 {
     return _inverterTargetFrequency;
 }
 
-bool HoymilesRadio_CMT::isConnected()
+bool HoymilesRadio_CMT::isConnected() const
 {
     if (!_isInitialized) {
         return false;
@@ -211,27 +211,27 @@ void ARDUINO_ISR_ATTR HoymilesRadio_CMT::handleInt2()
     _packetReceived = true;
 }
 
-void HoymilesRadio_CMT::sendEsbPacket(CommandAbstract* cmd)
+void HoymilesRadio_CMT::sendEsbPacket(CommandAbstract& cmd)
 {
-    cmd->incrementSendCount();
+    cmd.incrementSendCount();
 
-    cmd->setRouterAddress(DtuSerial().u64);
+    cmd.setRouterAddress(DtuSerial().u64);
 
     _radio->stopListening();
 
-    if (cmd->getDataPayload()[0] == 0x56) { // @todo(tbnobody) Bad hack to identify ChannelChange Command
+    if (cmd.getDataPayload()[0] == 0x56) { // @todo(tbnobody) Bad hack to identify ChannelChange Command
         cmtSwitchDtuFreq(HOY_BOOT_FREQ / 1000);
     }
 
     Hoymiles.getVerboseMessageOutput()->printf("TX %s %.2f MHz --> ",
-        cmd->getCommandName().c_str(), getFrequencyFromChannel(_radio->getChannel()));
-    cmd->dumpDataPayload(Hoymiles.getVerboseMessageOutput());
+        cmd.getCommandName().c_str(), getFrequencyFromChannel(_radio->getChannel()));
+    cmd.dumpDataPayload(Hoymiles.getVerboseMessageOutput());
 
-    if (!_radio->write(cmd->getDataPayload(), cmd->getDataSize())) {
+    if (!_radio->write(cmd.getDataPayload(), cmd.getDataSize())) {
         Hoymiles.getMessageOutput()->println("TX SPI Timeout");
     }
     cmtSwitchDtuFreq(_inverterTargetFrequency);
     _radio->startListening();
     _busyFlag = true;
-    _rxTimeout.set(cmd->getTimeout());
+    _rxTimeout.set(cmd.getTimeout());
 }

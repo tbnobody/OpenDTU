@@ -5,11 +5,12 @@
 
 class WebApiGridProfileClass {
 public:
-    void init(AsyncWebServer* server);
+    void init(AsyncWebServer& server);
     void loop();
 
 private:
     void onGridProfileStatus(AsyncWebServerRequest* request);
+    void onGridProfileRawdata(AsyncWebServerRequest* request);
 
     AsyncWebServer* _server;
 };

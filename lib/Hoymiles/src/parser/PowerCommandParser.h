@@ -4,10 +4,10 @@
 
 class PowerCommandParser : public Parser {
 public:
-    void setLastPowerCommandSuccess(LastCommandSuccess status);
-    LastCommandSuccess getLastPowerCommandSuccess();
-    uint32_t getLastUpdateCommand();
-    void setLastUpdateCommand(uint32_t lastUpdate);
+    void setLastPowerCommandSuccess(const LastCommandSuccess status);
+    LastCommandSuccess getLastPowerCommandSuccess() const;
+    uint32_t getLastUpdateCommand() const;
+    void setLastUpdateCommand(const uint32_t lastUpdate);
 
 private:
     LastCommandSuccess _lastLimitCommandSuccess = CMD_OK; // Set to OK because we have to assume nothing is done at startup

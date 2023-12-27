@@ -18,8 +18,13 @@
 
 MqttHandleHuaweiClass MqttHandleHuawei;
 
-void MqttHandleHuaweiClass::init()
+void MqttHandleHuaweiClass::init(Scheduler& scheduler)
 {
+    scheduler.addTask(_loopTask);
+    _loopTask.setCallback(std::bind(&MqttHandleHuaweiClass::loop, this));
+    _loopTask.setIterations(TASK_FOREVER);
+    _loopTask.enable();
+
     using std::placeholders::_1;
     using std::placeholders::_2;
     using std::placeholders::_3;
@@ -47,13 +52,13 @@ void MqttHandleHuaweiClass::loop()
 
     const CONFIG_T& config = Configuration.get();
 
-    if (!config.Huawei_Enabled) {
+    if (!config.Huawei.Enabled) {
         return;
     }
 
     const RectifierParameters_t *rp = HuaweiCan.get();
 
-    if ((millis() - _lastPublish) > (config.Mqtt_PublishInterval * 1000) ) {
+    if ((millis() - _lastPublish) > (config.Mqtt.PublishInterval * 1000) ) {
       MqttSettings.publish("huawei/data_age", String((millis() - HuaweiCan.getLastUpdate()) / 1000));
       MqttSettings.publish("huawei/input_voltage", String(rp->input_voltage));
       MqttSettings.publish("huawei/input_current", String(rp->input_current));
@@ -78,7 +83,7 @@ void MqttHandleHuaweiClass::onMqttMessage(const espMqttClientTypes::MessagePrope
     const CONFIG_T& config = Configuration.get();
 
     // ignore messages if Huawei is disabled
-    if (!config.Huawei_Enabled) {
+    if (!config.Huawei.Enabled) {
         return;
     }
 
@@ -86,7 +91,7 @@ void MqttHandleHuaweiClass::onMqttMessage(const espMqttClientTypes::MessagePrope
     strncpy(token_topic, topic, MQTT_MAX_TOPIC_STRLEN + 40); // convert const char* to char*
 
     char* setting;
-    char* rest = &token_topic[strlen(config.Mqtt_Topic)];
+    char* rest = &token_topic[strlen(config.Mqtt.Topic)];
 
     strtok_r(rest, "/", &rest); // Remove "huawei"
     strtok_r(rest, "/", &rest); // Remove "cmd"

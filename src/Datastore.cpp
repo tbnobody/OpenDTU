@@ -8,105 +8,109 @@
 
 DatastoreClass Datastore;
 
-void DatastoreClass::init()
+void DatastoreClass::init(Scheduler& scheduler)
 {
-    _updateTimeout.set(1000);
+    scheduler.addTask(_loopTask);
+    _loopTask.setCallback(std::bind(&DatastoreClass::loop, this));
+    _loopTask.setIterations(TASK_FOREVER);
+    _loopTask.setInterval(1 * TASK_SECOND);
+    _loopTask.enable();
 }
 
 void DatastoreClass::loop()
 {
-    if (Hoymiles.isAllRadioIdle() && _updateTimeout.occured()) {
+    if (!Hoymiles.isAllRadioIdle()) {
+        _loopTask.forceNextIteration();
+        return;
+    }
 
-        uint8_t isProducing = 0;
-        uint8_t isReachable = 0;
-        uint8_t pollEnabledCount = 0;
+    uint8_t isProducing = 0;
+    uint8_t isReachable = 0;
+    uint8_t pollEnabledCount = 0;
 
-        std::lock_guard<std::mutex> lock(_mutex);
+    std::lock_guard<std::mutex> lock(_mutex);
 
-        _totalAcYieldTotalEnabled = 0;
-        _totalAcYieldTotalDigits = 0;
+    _totalAcYieldTotalEnabled = 0;
+    _totalAcYieldTotalDigits = 0;
 
-        _totalAcYieldDayEnabled = 0;
-        _totalAcYieldDayDigits = 0;
+    _totalAcYieldDayEnabled = 0;
+    _totalAcYieldDayDigits = 0;
 
-        _totalAcPowerEnabled = 0;
-        _totalAcPowerDigits = 0;
+    _totalAcPowerEnabled = 0;
+    _totalAcPowerDigits = 0;
 
-        _totalDcPowerEnabled = 0;
-        _totalDcPowerDigits = 0;
+    _totalDcPowerEnabled = 0;
+    _totalDcPowerDigits = 0;
 
-        _totalDcPowerIrradiation = 0;
-        _totalDcIrradiationInstalled = 0;
+    _totalDcPowerIrradiation = 0;
+    _totalDcIrradiationInstalled = 0;
 
-        _isAllEnabledProducing = true;
-        _isAllEnabledReachable = true;
+    _isAllEnabledProducing = true;
+    _isAllEnabledReachable = true;
 
-        for (uint8_t i = 0; i < Hoymiles.getNumInverters(); i++) {
-            auto inv = Hoymiles.getInverterByPos(i);
-            if (inv == nullptr) {
-                continue;
-            }
+    for (uint8_t i = 0; i < Hoymiles.getNumInverters(); i++) {
+        auto inv = Hoymiles.getInverterByPos(i);
+        if (inv == nullptr) {
+            continue;
+        }
 
-            auto cfg = Configuration.getInverterConfig(inv->serial());
-            if (cfg == nullptr) {
-                continue;
-            }
+        auto cfg = Configuration.getInverterConfig(inv->serial());
+        if (cfg == nullptr) {
+            continue;
+        }
 
+        if (inv->getEnablePolling()) {
+            pollEnabledCount++;
+        }
+
+        if (inv->isProducing()) {
+            isProducing++;
+        } else {
             if (inv->getEnablePolling()) {
-                pollEnabledCount++;
-            }
-
-            if (inv->isProducing()) {
-                isProducing++;
-            } else {
-                if (inv->getEnablePolling()) {
-                    _isAllEnabledProducing = false;
-                }
-            }
-
-            if (inv->isReachable()) {
-                isReachable++;
-            } else {
-                if (inv->getEnablePolling()) {
-                    _isAllEnabledReachable = false;
-                }
-            }
-
-            for (auto& c : inv->Statistics()->getChannelsByType(TYPE_AC)) {
-                if (cfg->Poll_Enable) {
-                    _totalAcYieldTotalEnabled += inv->Statistics()->getChannelFieldValue(TYPE_AC, c, FLD_YT);
-                    _totalAcYieldDayEnabled += inv->Statistics()->getChannelFieldValue(TYPE_AC, c, FLD_YD);
-
-                    _totalAcYieldTotalDigits = max<unsigned int>(_totalAcYieldTotalDigits, inv->Statistics()->getChannelFieldDigits(TYPE_AC, c, FLD_YT));
-                    _totalAcYieldDayDigits = max<unsigned int>(_totalAcYieldDayDigits, inv->Statistics()->getChannelFieldDigits(TYPE_AC, c, FLD_YD));
-                }
-                if (inv->getEnablePolling()) {
-                    _totalAcPowerEnabled += inv->Statistics()->getChannelFieldValue(TYPE_AC, c, FLD_PAC);
-                    _totalAcPowerDigits = max<unsigned int>(_totalAcPowerDigits, inv->Statistics()->getChannelFieldDigits(TYPE_AC, c, FLD_PAC));
-                }
-            }
-
-            for (auto& c : inv->Statistics()->getChannelsByType(TYPE_DC)) {
-                if (inv->getEnablePolling()) {
-                    _totalDcPowerEnabled += inv->Statistics()->getChannelFieldValue(TYPE_DC, c, FLD_PDC);
-                    _totalDcPowerDigits = max<unsigned int>(_totalDcPowerDigits, inv->Statistics()->getChannelFieldDigits(TYPE_DC, c, FLD_PDC));
-
-                    if (inv->Statistics()->getStringMaxPower(c) > 0) {
-                        _totalDcPowerIrradiation += inv->Statistics()->getChannelFieldValue(TYPE_DC, c, FLD_PDC);
-                        _totalDcIrradiationInstalled += inv->Statistics()->getStringMaxPower(c);
-                    }
-                }
+                _isAllEnabledProducing = false;
             }
         }
 
-        _isAtLeastOneProducing = isProducing > 0;
-        _isAtLeastOneReachable = isReachable > 0;
-        _isAtLeastOnePollEnabled = pollEnabledCount > 0;
+        if (inv->isReachable()) {
+            isReachable++;
+        } else {
+            if (inv->getEnablePolling()) {
+                _isAllEnabledReachable = false;
+            }
+        }
 
-        _totalDcIrradiation = _totalDcIrradiationInstalled > 0 ? _totalDcPowerIrradiation / _totalDcIrradiationInstalled * 100.0f : 0;
+        for (auto& c : inv->Statistics()->getChannelsByType(TYPE_AC)) {
+            if (cfg->Poll_Enable) {
+                _totalAcYieldTotalEnabled += inv->Statistics()->getChannelFieldValue(TYPE_AC, c, FLD_YT);
+                _totalAcYieldDayEnabled += inv->Statistics()->getChannelFieldValue(TYPE_AC, c, FLD_YD);
 
-        _updateTimeout.reset();
+                _totalAcYieldTotalDigits = max<unsigned int>(_totalAcYieldTotalDigits, inv->Statistics()->getChannelFieldDigits(TYPE_AC, c, FLD_YT));
+                _totalAcYieldDayDigits = max<unsigned int>(_totalAcYieldDayDigits, inv->Statistics()->getChannelFieldDigits(TYPE_AC, c, FLD_YD));
+            }
+            if (inv->getEnablePolling()) {
+                _totalAcPowerEnabled += inv->Statistics()->getChannelFieldValue(TYPE_AC, c, FLD_PAC);
+                _totalAcPowerDigits = max<unsigned int>(_totalAcPowerDigits, inv->Statistics()->getChannelFieldDigits(TYPE_AC, c, FLD_PAC));
+            }
+        }
+
+        for (auto& c : inv->Statistics()->getChannelsByType(TYPE_DC)) {
+            if (inv->getEnablePolling()) {
+                _totalDcPowerEnabled += inv->Statistics()->getChannelFieldValue(TYPE_DC, c, FLD_PDC);
+                _totalDcPowerDigits = max<unsigned int>(_totalDcPowerDigits, inv->Statistics()->getChannelFieldDigits(TYPE_DC, c, FLD_PDC));
+
+                if (inv->Statistics()->getStringMaxPower(c) > 0) {
+                    _totalDcPowerIrradiation += inv->Statistics()->getChannelFieldValue(TYPE_DC, c, FLD_PDC);
+                    _totalDcIrradiationInstalled += inv->Statistics()->getStringMaxPower(c);
+                }
+            }
+        }
     }
+
+    _isAtLeastOneProducing = isProducing > 0;
+    _isAtLeastOneReachable = isReachable > 0;
+    _isAtLeastOnePollEnabled = pollEnabledCount > 0;
+
+    _totalDcIrradiation = _totalDcIrradiationInstalled > 0 ? _totalDcPowerIrradiation / _totalDcIrradiationInstalled * 100.0f : 0;
 }
 
 float DatastoreClass::getTotalAcYieldTotalEnabled()

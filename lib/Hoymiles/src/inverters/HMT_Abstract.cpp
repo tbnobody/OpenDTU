@@ -8,7 +8,7 @@
 #include "commands/ChannelChangeCommand.h"
 #include "parser/AlarmLogParser.h"
 
-HMT_Abstract::HMT_Abstract(HoymilesRadio* radio, uint64_t serial)
+HMT_Abstract::HMT_Abstract(HoymilesRadio* radio, const uint64_t serial)
     : HM_Abstract(radio, serial)
 {
     EventLog()->setMessageType(AlarmMessageType_t::HMT);

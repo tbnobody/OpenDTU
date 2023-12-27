@@ -8,7 +8,7 @@
 class WebApiWsVedirectLiveClass {
 public:
     WebApiWsVedirectLiveClass();
-    void init(AsyncWebServer* server);
+    void init(AsyncWebServer& server);
     void loop();
 
 private:

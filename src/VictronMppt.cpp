@@ -6,14 +6,24 @@
 
 VictronMpptClass VictronMppt;
 
-void VictronMpptClass::init()
+void VictronMpptClass::init(Scheduler& scheduler)
+{
+    scheduler.addTask(_loopTask);
+    _loopTask.setCallback(std::bind(&VictronMpptClass::loop, this));
+    _loopTask.setIterations(TASK_FOREVER);
+    _loopTask.enable();
+
+    this->updateSettings();
+}
+
+void VictronMpptClass::updateSettings()
 {
     std::lock_guard<std::mutex> lock(_mutex);
 
     _controllers.clear();
 
     CONFIG_T& config = Configuration.get();
-    if (!config.Vedirect_Enabled) { return; }
+    if (!config.Vedirect.Enabled) { return; }
 
     const PinMapping_t& pin = PinMapping.get();
     int8_t rx = pin.victron_rx;
@@ -27,7 +37,7 @@ void VictronMpptClass::init()
     }
 
     auto upController = std::make_unique<VeDirectMpptController>();
-    upController->init(rx, tx, &MessageOutput, config.Vedirect_VerboseLogging);
+    upController->init(rx, tx, &MessageOutput, config.Vedirect.VerboseLogging);
     _controllers.push_back(std::move(upController));
 }
 

@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * Copyright (C) 2022 Thomas Basler and others
+ * Copyright (C) 2022-2023 Thomas Basler and others
  */
 #include "Configuration.h"
 #include "Datastore.h"
@@ -24,6 +24,7 @@
 #include "NetworkSettings.h"
 #include "NtpSettings.h"
 #include "PinMapping.h"
+#include "Scheduler.h"
 #include "SunPosition.h"
 #include "Utils.h"
 #include "WebApi.h"
@@ -32,6 +33,7 @@
 #include "defaults.h"
 #include <Arduino.h>
 #include <LittleFS.h>
+#include <TaskScheduler.h>
 
 void setup()
 {
@@ -44,6 +46,7 @@ void setup()
     while (!Serial)
         yield();
 #endif
+    MessageOutput.init(scheduler);
     MessageOutput.println();
     MessageOutput.println("Starting OpenDTU");
 
@@ -71,11 +74,11 @@ void setup()
             MessageOutput.print("failed... ");
         }
     }
-    if (Configuration.get().Cfg_Version != CONFIG_VERSION) {
+    if (Configuration.get().Cfg.Version != CONFIG_VERSION) {
         MessageOutput.print("migrated... ");
         Configuration.migrate();
     }
-    CONFIG_T& config = Configuration.get();
+    auto& config = Configuration.get();
     MessageOutput.println("done");
 
     // Load PinMapping
@@ -85,12 +88,12 @@ void setup()
     } else {
         MessageOutput.print("using default config ");
     }
-    const PinMapping_t& pin = PinMapping.get();
+    const auto& pin = PinMapping.get();
     MessageOutput.println("done");
 
     // Initialize WiFi
     MessageOutput.print("Initialize Network... ");
-    NetworkSettings.init();
+    NetworkSettings.init(scheduler);
     MessageOutput.println("done");
     NetworkSettings.applyConfig();
 
@@ -101,133 +104,89 @@ void setup()
 
     // Initialize SunPosition
     MessageOutput.print("Initialize SunPosition... ");
-    SunPosition.init();
+    SunPosition.init(scheduler);
     MessageOutput.println("done");
 
     // Initialize MqTT
     MessageOutput.print("Initialize MqTT... ");
     MqttSettings.init();
-    MqttHandleDtu.init();
-    MqttHandleInverter.init();
-    MqttHandleInverterTotal.init();
-    MqttHandleVedirect.init();
-    MqttHandleHass.init();
-    MqttHandleVedirectHass.init();
-    MqttHandleHuawei.init();
-    MqttHandlePowerLimiter.init();
+    MqttHandleDtu.init(scheduler);
+    MqttHandleInverter.init(scheduler);
+    MqttHandleInverterTotal.init(scheduler);
+    MqttHandleVedirect.init(scheduler);
+    MqttHandleHass.init(scheduler);
+    MqttHandleVedirectHass.init(scheduler);
+    MqttHandleHuawei.init(scheduler);
+    MqttHandlePowerLimiter.init(scheduler);
     MessageOutput.println("done");
 
     // Initialize WebApi
     MessageOutput.print("Initialize WebApi... ");
-    WebApi.init();
+    WebApi.init(scheduler);
     MessageOutput.println("done");
 
     // Initialize Display
     MessageOutput.print("Initialize Display... ");
     Display.init(
+        scheduler,
         static_cast<DisplayType_t>(pin.display_type),
         pin.display_data,
         pin.display_clk,
         pin.display_cs,
         pin.display_reset);
-    Display.setOrientation(config.Display_Rotation);
-    Display.enablePowerSafe = config.Display_PowerSafe;
-    Display.enableScreensaver = config.Display_ScreenSaver;
-    Display.setContrast(config.Display_Contrast);
-    Display.setLanguage(config.Display_Language);
+    Display.setOrientation(config.Display.Rotation);
+    Display.enablePowerSafe = config.Display.PowerSafe;
+    Display.enableScreensaver = config.Display.ScreenSaver;
+    Display.setContrast(config.Display.Contrast);
+    Display.setLanguage(config.Display.Language);
     Display.setStartupDisplay();
     MessageOutput.println("done");
 
     // Initialize Single LEDs
     MessageOutput.print("Initialize LEDs... ");
-    LedSingle.init();
+    LedSingle.init(scheduler);
     MessageOutput.println("done");
 
     // Check for default DTU serial
     MessageOutput.print("Check for default DTU serial... ");
-    if (config.Dtu_Serial == DTU_SERIAL) {
+    if (config.Dtu.Serial == DTU_SERIAL) {
         MessageOutput.print("generate serial based on ESP chip id: ");
-        uint64_t dtuId = Utils::generateDtuSerial();
+        const uint64_t dtuId = Utils::generateDtuSerial();
         MessageOutput.printf("%0x%08x... ",
             ((uint32_t)((dtuId >> 32) & 0xFFFFFFFF)),
             ((uint32_t)(dtuId & 0xFFFFFFFF)));
-        config.Dtu_Serial = dtuId;
+        config.Dtu.Serial = dtuId;
         Configuration.write();
     }
     MessageOutput.println("done");
     MessageOutput.println("done");
 
-    InverterSettings.init();
+    InverterSettings.init(scheduler);
 
-    Datastore.init();
+    Datastore.init(scheduler);
 
-    VictronMppt.init();
+    VictronMppt.init(scheduler);
 
     // Power meter
-    PowerMeter.init();
+    PowerMeter.init(scheduler);
 
     // Dynamic power limiter
-    PowerLimiter.init();
+    PowerLimiter.init(scheduler);
 
     // Initialize Huawei AC-charger PSU / CAN bus
-    MessageOutput.println(F("Initialize Huawei AC charger interface... "));
+    MessageOutput.println("Initialize Huawei AC charger interface... ");
     if (PinMapping.isValidHuaweiConfig()) {
         MessageOutput.printf("Huawei AC-charger miso = %d, mosi = %d, clk = %d, irq = %d, cs = %d, power_pin = %d\r\n", pin.huawei_miso, pin.huawei_mosi, pin.huawei_clk, pin.huawei_irq, pin.huawei_cs, pin.huawei_power);
-        HuaweiCan.init(pin.huawei_miso, pin.huawei_mosi, pin.huawei_clk, pin.huawei_irq, pin.huawei_cs, pin.huawei_power);
-        MessageOutput.println(F("done"));
+        HuaweiCan.init(scheduler, pin.huawei_miso, pin.huawei_mosi, pin.huawei_clk, pin.huawei_irq, pin.huawei_cs, pin.huawei_power);
+        MessageOutput.println("done");
     } else {
-        MessageOutput.println(F("Invalid pin config"));
+        MessageOutput.println("Invalid pin config");
     }
 
-    Battery.init();
+    Battery.init(scheduler);
 }
 
 void loop()
 {
-    NetworkSettings.loop();
-    yield();
-    PowerMeter.loop();
-    yield();
-    PowerLimiter.loop();
-    yield();
-    InverterSettings.loop();
-    yield();
-    Datastore.loop();
-    yield();
-    VictronMppt.loop();
-    yield();
-    MqttSettings.loop();
-    yield();
-    MqttHandleDtu.loop();
-    yield();
-    MqttHandleInverter.loop();
-    yield();
-    MqttHandleInverterTotal.loop();
-    yield();
-    MqttHandleVedirect.loop();
-    yield();
-    MqttHandleHass.loop();
-    yield();
-    MqttHandleVedirectHass.loop();
-    yield();
-    MqttHandleHuawei.loop();
-    yield();
-    MqttHandlePowerLimiter.loop();
-    yield();
-    WebApi.loop();
-    yield();
-    Display.loop();
-    yield();
-    SunPosition.loop();
-    yield();
-    MessageOutput.loop();
-    yield();
-    Battery.loop();
-    yield();
-    MqttHandlePylontechHass.loop();
-    yield();
-    HuaweiCan.loop();
-    yield();
-    LedSingle.loop();
-    yield();
+    scheduler.execute();
 }

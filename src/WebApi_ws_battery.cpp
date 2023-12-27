@@ -15,7 +15,7 @@ WebApiWsBatteryLiveClass::WebApiWsBatteryLiveClass()
 {
 }
 
-void WebApiWsBatteryLiveClass::init(AsyncWebServer* server)
+void WebApiWsBatteryLiveClass::init(AsyncWebServer& server)
 {
     using std::placeholders::_1;
     using std::placeholders::_2;
@@ -24,7 +24,7 @@ void WebApiWsBatteryLiveClass::init(AsyncWebServer* server)
     using std::placeholders::_5;
     using std::placeholders::_6;
 
-    _server = server;
+    _server = &server;
     _server->on("/api/batterylivedata/status", HTTP_GET, std::bind(&WebApiWsBatteryLiveClass::onLivedataStatus, this, _1));
 
     _server->addHandler(&_ws);
@@ -58,10 +58,10 @@ void WebApiWsBatteryLiveClass::loop()
         }
 
         if (buffer) {
-            if (Configuration.get().Security_AllowReadonly) {
+            if (Configuration.get().Security.AllowReadonly) {
                 _ws.setAuthentication("", "");
             } else {
-                _ws.setAuthentication(AUTH_USERNAME, Configuration.get().Security_Password);
+                _ws.setAuthentication(AUTH_USERNAME, Configuration.get().Security.Password);
             }
 
             _ws.textAll(buffer);

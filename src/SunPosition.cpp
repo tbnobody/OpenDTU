@@ -13,18 +13,23 @@ SunPositionClass::SunPositionClass()
 {
 }
 
-void SunPositionClass::init()
+void SunPositionClass::init(Scheduler& scheduler)
 {
+    scheduler.addTask(_loopTask);
+    _loopTask.setCallback(std::bind(&SunPositionClass::loop, this));
+    _loopTask.setIterations(TASK_FOREVER);
+    _loopTask.setInterval(5 * TASK_SECOND);
+    _loopTask.enable();
 }
 
 void SunPositionClass::loop()
 {
-    if (getDoRecalc() || checkRecalcDayChanged()) {
+    if (_doRecalc || checkRecalcDayChanged()) {
         updateSunData();
     }
 }
 
-bool SunPositionClass::isDayPeriod()
+bool SunPositionClass::isDayPeriod() const
 {
     if (!_isValidInfo) {
         return true;
@@ -32,28 +37,21 @@ bool SunPositionClass::isDayPeriod()
 
     struct tm timeinfo;
     getLocalTime(&timeinfo, 5);
-    uint32_t minutesPastMidnight = timeinfo.tm_hour * 60 + timeinfo.tm_min;
+    const uint32_t minutesPastMidnight = timeinfo.tm_hour * 60 + timeinfo.tm_min;
     return (minutesPastMidnight >= _sunriseMinutes) && (minutesPastMidnight < _sunsetMinutes);
 }
 
-bool SunPositionClass::isSunsetAvailable()
+bool SunPositionClass::isSunsetAvailable() const
 {
     return _isSunsetAvailable;
 }
 
-void SunPositionClass::setDoRecalc(bool doRecalc)
+void SunPositionClass::setDoRecalc(const bool doRecalc)
 {
-    std::lock_guard<std::mutex> lock(_recalcLock);
     _doRecalc = doRecalc;
 }
 
-bool SunPositionClass::getDoRecalc()
-{
-    std::lock_guard<std::mutex> lock(_recalcLock);
-    return _doRecalc;
-}
-
-bool SunPositionClass::checkRecalcDayChanged()
+bool SunPositionClass::checkRecalcDayChanged() const
 {
     time_t now;
     struct tm timeinfo;
@@ -61,39 +59,31 @@ bool SunPositionClass::checkRecalcDayChanged()
     time(&now);
     localtime_r(&now, &timeinfo); // don't use getLocalTime() as there could be a delay of 10ms
 
-    uint32_t ymd;
-    ymd = (timeinfo.tm_year << 9) | (timeinfo.tm_mon << 5) | timeinfo.tm_mday;
+    const uint32_t ymd = (timeinfo.tm_year << 9) | (timeinfo.tm_mon << 5) | timeinfo.tm_mday;
 
-    if (_lastSunPositionCalculatedYMD != ymd) {
-        return true;
-    }
-    return false;
+    return _lastSunPositionCalculatedYMD != ymd;
 }
 
 void SunPositionClass::updateSunData()
 {
     struct tm timeinfo;
-    bool gotLocalTime;
+    const bool gotLocalTime = getLocalTime(&timeinfo, 5);
 
-    gotLocalTime = getLocalTime(&timeinfo, 5);
     _lastSunPositionCalculatedYMD = (timeinfo.tm_year << 9) | (timeinfo.tm_mon << 5) | timeinfo.tm_mday;
     setDoRecalc(false);
 
     if (!gotLocalTime) {
         _sunriseMinutes = 0;
         _sunsetMinutes = 0;
+        _isSunsetAvailable = true;
         _isValidInfo = false;
         return;
     }
 
     CONFIG_T const& config = Configuration.get();
-    int offset = Utils::getTimezoneOffset() / 3600;
-
-    _sun.setPosition(config.Ntp_Latitude, config.Ntp_Longitude, offset);
-    _sun.setCurrentDate(1900 + timeinfo.tm_year, timeinfo.tm_mon + 1, timeinfo.tm_mday);
 
     double sunset_type;
-    switch (config.Ntp_SunsetType) {
+    switch (config.Ntp.SunsetType) {
     case 0:
         sunset_type = SunSet::SUNSET_OFFICIAL;
         break;
@@ -108,15 +98,21 @@ void SunPositionClass::updateSunData()
         break;
     }
 
-    double sunriseRaw = _sun.calcCustomSunrise(sunset_type);
-    double sunsetRaw = _sun.calcCustomSunset(sunset_type);
+    const int offset = Utils::getTimezoneOffset() / 3600;
+
+    SunSet sun;
+    sun.setPosition(config.Ntp.Latitude, config.Ntp.Longitude, offset);
+    sun.setCurrentDate(1900 + timeinfo.tm_year, timeinfo.tm_mon + 1, timeinfo.tm_mday);
+
+    const double sunriseRaw = sun.calcCustomSunrise(sunset_type);
+    const double sunsetRaw = sun.calcCustomSunset(sunset_type);
 
     // If no sunset/sunrise exists (e.g. astronomical calculation in summer)
     // assume it's day period
     if (std::isnan(sunriseRaw) || std::isnan(sunsetRaw)) {
-        _isSunsetAvailable = false;
         _sunriseMinutes = 0;
         _sunsetMinutes = 0;
+        _isSunsetAvailable = false;
         _isValidInfo = false;
         return;
     }
@@ -128,7 +124,7 @@ void SunPositionClass::updateSunData()
     _isValidInfo = true;
 }
 
-bool SunPositionClass::sunsetTime(struct tm* info)
+bool SunPositionClass::getSunTime(struct tm* info, const uint32_t offset) const
 {
     // Get today's date
     time_t aTime = time(NULL);
@@ -137,29 +133,21 @@ bool SunPositionClass::sunsetTime(struct tm* info)
     struct tm tm;
     localtime_r(&aTime, &tm);
     tm.tm_sec = 0;
-    tm.tm_min = _sunsetMinutes;
+    tm.tm_min = offset;
     tm.tm_hour = 0;
     tm.tm_isdst = -1;
-    time_t midnight = mktime(&tm);
+    const time_t midnight = mktime(&tm);
 
     localtime_r(&midnight, info);
     return _isValidInfo;
 }
 
-bool SunPositionClass::sunriseTime(struct tm* info)
+bool SunPositionClass::sunsetTime(struct tm* info) const
 {
-    // Get today's date
-    time_t aTime = time(NULL);
+    return getSunTime(info, _sunsetMinutes);
+}
 
-    // Set the time to midnight
-    struct tm tm;
-    localtime_r(&aTime, &tm);
-    tm.tm_sec = 0;
-    tm.tm_min = _sunriseMinutes;
-    tm.tm_hour = 0;
-    tm.tm_isdst = -1;
-    time_t midnight = mktime(&tm);
-
-    localtime_r(&midnight, info);
-    return _isValidInfo;
+bool SunPositionClass::sunriseTime(struct tm* info) const
+{
+    return getSunTime(info, _sunriseMinutes);
 }

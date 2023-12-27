@@ -5,9 +5,9 @@
 
 class HM_2CH : public HM_Abstract {
 public:
-    explicit HM_2CH(HoymilesRadio* radio, uint64_t serial);
-    static bool isValidSerial(uint64_t serial);
-    String typeName();
-    const byteAssign_t* getByteAssignment();
-    uint8_t getByteAssignmentSize();
+    explicit HM_2CH(HoymilesRadio* radio, const uint64_t serial);
+    static bool isValidSerial(const uint64_t serial);
+    String typeName() const;
+    const byteAssign_t* getByteAssignment() const;
+    uint8_t getByteAssignmentSize() const;
 };

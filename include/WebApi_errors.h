@@ -56,6 +56,7 @@ enum WebApiError {
     MqttPublishInterval,
     MqttHassTopicLength,
     MqttHassTopicCharacter,
+    MqttLwtQos,
 
     NetworkBase = 8000,
     NetworkIpInvalid,

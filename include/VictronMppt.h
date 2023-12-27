@@ -5,14 +5,15 @@
 #include <memory>
 
 #include "VeDirectMpptController.h"
+#include <TaskSchedulerDeclarations.h>
 
 class VictronMpptClass {
 public:
     VictronMpptClass() = default;
     ~VictronMpptClass() = default;
 
-    void init();
-    void loop();
+    void init(Scheduler& scheduler);
+    void updateSettings();
 
     bool isDataValid() const;
 
@@ -35,10 +36,13 @@ public:
     double getYieldDay() const;
 
 private:
+    void loop();
     VictronMpptClass(VictronMpptClass const& other) = delete;
     VictronMpptClass(VictronMpptClass&& other) = delete;
     VictronMpptClass& operator=(VictronMpptClass const& other) = delete;
     VictronMpptClass& operator=(VictronMpptClass&& other) = delete;
+
+    Task _loopTask;
 
     mutable std::mutex _mutex;
     using controller_t = std::unique_ptr<VeDirectMpptController>;

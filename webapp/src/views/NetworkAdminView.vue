@@ -63,7 +63,7 @@
                               :postfix="$t('networkadmin.Minutes')"
                               :tooltip="$t('networkadmin.ApTimeoutHint')"/>
             </CardElement>
-            <button type="submit" class="btn btn-primary mb-3">{{ $t('networkadmin.Save') }}</button>
+            <FormFooter @reload="getNetworkConfig"/>
         </form>
     </BasePage>
 </template>
@@ -72,6 +72,7 @@
 import BasePage from '@/components/BasePage.vue';
 import BootstrapAlert from "@/components/BootstrapAlert.vue";
 import CardElement from '@/components/CardElement.vue';
+import FormFooter from '@/components/FormFooter.vue';
 import InputElement from '@/components/InputElement.vue';
 import type { NetworkConfig } from "@/types/NetworkConfig";
 import { authHeader, handleResponse } from '@/utils/authentication';
@@ -82,6 +83,7 @@ export default defineComponent({
         BasePage,
         BootstrapAlert,
         CardElement,
+        FormFooter,
         InputElement,
     },
     data() {

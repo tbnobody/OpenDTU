@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * Copyright (C) 2022 Thomas Basler and others
+ * Copyright (C) 2022-2023 Thomas Basler and others
  */
 #include "WebApi_network.h"
 #include "Configuration.h"
@@ -10,11 +10,11 @@
 #include "helper.h"
 #include <AsyncJson.h>
 
-void WebApiNetworkClass::init(AsyncWebServer* server)
+void WebApiNetworkClass::init(AsyncWebServer& server)
 {
     using std::placeholders::_1;
 
-    _server = server;
+    _server = &server;
 
     _server->on("/api/network/status", HTTP_GET, std::bind(&WebApiNetworkClass::onNetworkStatus, this, _1));
     _server->on("/api/network/config", HTTP_GET, std::bind(&WebApiNetworkClass::onNetworkAdminGet, this, _1));
@@ -66,17 +66,17 @@ void WebApiNetworkClass::onNetworkAdminGet(AsyncWebServerRequest* request)
     JsonObject root = response->getRoot();
     const CONFIG_T& config = Configuration.get();
 
-    root["hostname"] = config.WiFi_Hostname;
-    root["dhcp"] = config.WiFi_Dhcp;
-    root["ipaddress"] = IPAddress(config.WiFi_Ip).toString();
-    root["netmask"] = IPAddress(config.WiFi_Netmask).toString();
-    root["gateway"] = IPAddress(config.WiFi_Gateway).toString();
-    root["dns1"] = IPAddress(config.WiFi_Dns1).toString();
-    root["dns2"] = IPAddress(config.WiFi_Dns2).toString();
-    root["ssid"] = config.WiFi_Ssid;
-    root["password"] = config.WiFi_Password;
-    root["aptimeout"] = config.WiFi_ApTimeout;
-    root["mdnsenabled"] = config.Mdns_Enabled;
+    root["hostname"] = config.WiFi.Hostname;
+    root["dhcp"] = config.WiFi.Dhcp;
+    root["ipaddress"] = IPAddress(config.WiFi.Ip).toString();
+    root["netmask"] = IPAddress(config.WiFi.Netmask).toString();
+    root["gateway"] = IPAddress(config.WiFi.Gateway).toString();
+    root["dns1"] = IPAddress(config.WiFi.Dns1).toString();
+    root["dns2"] = IPAddress(config.WiFi.Dns2).toString();
+    root["ssid"] = config.WiFi.Ssid;
+    root["password"] = config.WiFi.Password;
+    root["aptimeout"] = config.WiFi.ApTimeout;
+    root["mdnsenabled"] = config.Mdns.Enabled;
 
     response->setLength();
     request->send(response);
@@ -100,7 +100,7 @@ void WebApiNetworkClass::onNetworkAdminPost(AsyncWebServerRequest* request)
         return;
     }
 
-    String json = request->getParam("data", true)->value();
+    const String json = request->getParam("data", true)->value();
 
     if (json.length() > 1024) {
         retMsg["message"] = "Data too large!";
@@ -111,7 +111,7 @@ void WebApiNetworkClass::onNetworkAdminPost(AsyncWebServerRequest* request)
     }
 
     DynamicJsonDocument root(1024);
-    DeserializationError error = deserializeJson(root, json);
+    const DeserializationError error = deserializeJson(root, json);
 
     if (error) {
         retMsg["message"] = "Failed to parse data!";
@@ -208,36 +208,36 @@ void WebApiNetworkClass::onNetworkAdminPost(AsyncWebServerRequest* request)
     }
 
     CONFIG_T& config = Configuration.get();
-    config.WiFi_Ip[0] = ipaddress[0];
-    config.WiFi_Ip[1] = ipaddress[1];
-    config.WiFi_Ip[2] = ipaddress[2];
-    config.WiFi_Ip[3] = ipaddress[3];
-    config.WiFi_Netmask[0] = netmask[0];
-    config.WiFi_Netmask[1] = netmask[1];
-    config.WiFi_Netmask[2] = netmask[2];
-    config.WiFi_Netmask[3] = netmask[3];
-    config.WiFi_Gateway[0] = gateway[0];
-    config.WiFi_Gateway[1] = gateway[1];
-    config.WiFi_Gateway[2] = gateway[2];
-    config.WiFi_Gateway[3] = gateway[3];
-    config.WiFi_Dns1[0] = dns1[0];
-    config.WiFi_Dns1[1] = dns1[1];
-    config.WiFi_Dns1[2] = dns1[2];
-    config.WiFi_Dns1[3] = dns1[3];
-    config.WiFi_Dns2[0] = dns2[0];
-    config.WiFi_Dns2[1] = dns2[1];
-    config.WiFi_Dns2[2] = dns2[2];
-    config.WiFi_Dns2[3] = dns2[3];
-    strlcpy(config.WiFi_Ssid, root["ssid"].as<String>().c_str(), sizeof(config.WiFi_Ssid));
-    strlcpy(config.WiFi_Password, root["password"].as<String>().c_str(), sizeof(config.WiFi_Password));
-    strlcpy(config.WiFi_Hostname, root["hostname"].as<String>().c_str(), sizeof(config.WiFi_Hostname));
+    config.WiFi.Ip[0] = ipaddress[0];
+    config.WiFi.Ip[1] = ipaddress[1];
+    config.WiFi.Ip[2] = ipaddress[2];
+    config.WiFi.Ip[3] = ipaddress[3];
+    config.WiFi.Netmask[0] = netmask[0];
+    config.WiFi.Netmask[1] = netmask[1];
+    config.WiFi.Netmask[2] = netmask[2];
+    config.WiFi.Netmask[3] = netmask[3];
+    config.WiFi.Gateway[0] = gateway[0];
+    config.WiFi.Gateway[1] = gateway[1];
+    config.WiFi.Gateway[2] = gateway[2];
+    config.WiFi.Gateway[3] = gateway[3];
+    config.WiFi.Dns1[0] = dns1[0];
+    config.WiFi.Dns1[1] = dns1[1];
+    config.WiFi.Dns1[2] = dns1[2];
+    config.WiFi.Dns1[3] = dns1[3];
+    config.WiFi.Dns2[0] = dns2[0];
+    config.WiFi.Dns2[1] = dns2[1];
+    config.WiFi.Dns2[2] = dns2[2];
+    config.WiFi.Dns2[3] = dns2[3];
+    strlcpy(config.WiFi.Ssid, root["ssid"].as<String>().c_str(), sizeof(config.WiFi.Ssid));
+    strlcpy(config.WiFi.Password, root["password"].as<String>().c_str(), sizeof(config.WiFi.Password));
+    strlcpy(config.WiFi.Hostname, root["hostname"].as<String>().c_str(), sizeof(config.WiFi.Hostname));
     if (root["dhcp"].as<bool>()) {
-        config.WiFi_Dhcp = true;
+        config.WiFi.Dhcp = true;
     } else {
-        config.WiFi_Dhcp = false;
+        config.WiFi.Dhcp = false;
     }
-    config.WiFi_ApTimeout = root["aptimeout"].as<uint>();
-    config.Mdns_Enabled = root["mdnsenabled"].as<bool>();
+    config.WiFi.ApTimeout = root["aptimeout"].as<uint>();
+    config.Mdns.Enabled = root["mdnsenabled"].as<bool>();
     Configuration.write();
 
     retMsg["type"] = "success";

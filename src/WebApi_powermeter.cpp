@@ -16,11 +16,11 @@
 #include "WebApi.h"
 #include "helper.h"
 
-void WebApiPowerMeterClass::init(AsyncWebServer* server)
+void WebApiPowerMeterClass::init(AsyncWebServer& server)
 {
     using std::placeholders::_1;
 
-    _server = server;
+    _server = &server;
 
     _server->on("/api/powermeter/status", HTTP_GET, std::bind(&WebApiPowerMeterClass::onStatus, this, _1));
     _server->on("/api/powermeter/config", HTTP_GET, std::bind(&WebApiPowerMeterClass::onAdminGet, this, _1));
@@ -38,16 +38,16 @@ void WebApiPowerMeterClass::onStatus(AsyncWebServerRequest* request)
     JsonObject root = response->getRoot();
     const CONFIG_T& config = Configuration.get();
 
-    root[F("enabled")] = config.PowerMeter_Enabled;
-    root[F("verbose_logging")] = config.PowerMeter_VerboseLogging;
-    root[F("source")] = config.PowerMeter_Source;
-    root[F("interval")] = config.PowerMeter_Interval;
-    root[F("mqtt_topic_powermeter_1")] = config.PowerMeter_MqttTopicPowerMeter1;
-    root[F("mqtt_topic_powermeter_2")] = config.PowerMeter_MqttTopicPowerMeter2;
-    root[F("mqtt_topic_powermeter_3")] = config.PowerMeter_MqttTopicPowerMeter3;
-    root[F("sdmbaudrate")] = config.PowerMeter_SdmBaudrate;
-    root[F("sdmaddress")] = config.PowerMeter_SdmAddress;
-    root[F("http_individual_requests")] = config.PowerMeter_HttpIndividualRequests;
+    root[F("enabled")] = config.PowerMeter.Enabled;
+    root[F("verbose_logging")] = config.PowerMeter.VerboseLogging;
+    root[F("source")] = config.PowerMeter.Source;
+    root[F("interval")] = config.PowerMeter.Interval;
+    root[F("mqtt_topic_powermeter_1")] = config.PowerMeter.MqttTopicPowerMeter1;
+    root[F("mqtt_topic_powermeter_2")] = config.PowerMeter.MqttTopicPowerMeter2;
+    root[F("mqtt_topic_powermeter_3")] = config.PowerMeter.MqttTopicPowerMeter3;
+    root[F("sdmbaudrate")] = config.PowerMeter.SdmBaudrate;
+    root[F("sdmaddress")] = config.PowerMeter.SdmAddress;
+    root[F("http_individual_requests")] = config.PowerMeter.HttpIndividualRequests;
 
     JsonArray httpPhases = root.createNestedArray(F("http_phases"));
 
@@ -55,15 +55,15 @@ void WebApiPowerMeterClass::onStatus(AsyncWebServerRequest* request)
         JsonObject phaseObject = httpPhases.createNestedObject();
 
         phaseObject[F("index")] = i + 1;
-        phaseObject[F("enabled")] = config.Powermeter_Http_Phase[i].Enabled;
-        phaseObject[F("url")] = String(config.Powermeter_Http_Phase[i].Url);
-        phaseObject[F("auth_type")]= config.Powermeter_Http_Phase[i].AuthType;
-        phaseObject[F("username")] = String(config.Powermeter_Http_Phase[i].Username);
-        phaseObject[F("password")] = String(config.Powermeter_Http_Phase[i].Password);
-        phaseObject[F("header_key")] = String(config.Powermeter_Http_Phase[i].HeaderKey);
-        phaseObject[F("header_value")] = String(config.Powermeter_Http_Phase[i].HeaderValue);
-        phaseObject[F("json_path")] = String(config.Powermeter_Http_Phase[i].JsonPath);
-        phaseObject[F("timeout")] = config.Powermeter_Http_Phase[i].Timeout;
+        phaseObject[F("enabled")] = config.PowerMeter.Http_Phase[i].Enabled;
+        phaseObject[F("url")] = String(config.PowerMeter.Http_Phase[i].Url);
+        phaseObject[F("auth_type")]= config.PowerMeter.Http_Phase[i].AuthType;
+        phaseObject[F("username")] = String(config.PowerMeter.Http_Phase[i].Username);
+        phaseObject[F("password")] = String(config.PowerMeter.Http_Phase[i].Password);
+        phaseObject[F("header_key")] = String(config.PowerMeter.Http_Phase[i].HeaderKey);
+        phaseObject[F("header_value")] = String(config.PowerMeter.Http_Phase[i].HeaderValue);
+        phaseObject[F("json_path")] = String(config.PowerMeter.Http_Phase[i].JsonPath);
+        phaseObject[F("timeout")] = config.PowerMeter.Http_Phase[i].Timeout;
     }
 
     response->setLength();
@@ -169,30 +169,30 @@ void WebApiPowerMeterClass::onAdminPost(AsyncWebServerRequest* request)
     }
 
     CONFIG_T& config = Configuration.get();
-    config.PowerMeter_Enabled = root[F("enabled")].as<bool>();
-    config.PowerMeter_VerboseLogging = root[F("verbose_logging")].as<bool>();
-    config.PowerMeter_Source = root[F("source")].as<uint8_t>();
-    config.PowerMeter_Interval = root[F("interval")].as<uint32_t>();
-    strlcpy(config.PowerMeter_MqttTopicPowerMeter1, root[F("mqtt_topic_powermeter_1")].as<String>().c_str(), sizeof(config.PowerMeter_MqttTopicPowerMeter1));
-    strlcpy(config.PowerMeter_MqttTopicPowerMeter2, root[F("mqtt_topic_powermeter_2")].as<String>().c_str(), sizeof(config.PowerMeter_MqttTopicPowerMeter2));
-    strlcpy(config.PowerMeter_MqttTopicPowerMeter3, root[F("mqtt_topic_powermeter_3")].as<String>().c_str(), sizeof(config.PowerMeter_MqttTopicPowerMeter3));
-    config.PowerMeter_SdmBaudrate = root[F("sdmbaudrate")].as<uint32_t>();
-    config.PowerMeter_SdmAddress = root[F("sdmaddress")].as<uint8_t>();
-    config.PowerMeter_HttpIndividualRequests = root[F("http_individual_requests")].as<bool>();
+    config.PowerMeter.Enabled = root[F("enabled")].as<bool>();
+    config.PowerMeter.VerboseLogging = root[F("verbose_logging")].as<bool>();
+    config.PowerMeter.Source = root[F("source")].as<uint8_t>();
+    config.PowerMeter.Interval = root[F("interval")].as<uint32_t>();
+    strlcpy(config.PowerMeter.MqttTopicPowerMeter1, root[F("mqtt_topic_powermeter_1")].as<String>().c_str(), sizeof(config.PowerMeter.MqttTopicPowerMeter1));
+    strlcpy(config.PowerMeter.MqttTopicPowerMeter2, root[F("mqtt_topic_powermeter_2")].as<String>().c_str(), sizeof(config.PowerMeter.MqttTopicPowerMeter2));
+    strlcpy(config.PowerMeter.MqttTopicPowerMeter3, root[F("mqtt_topic_powermeter_3")].as<String>().c_str(), sizeof(config.PowerMeter.MqttTopicPowerMeter3));
+    config.PowerMeter.SdmBaudrate = root[F("sdmbaudrate")].as<uint32_t>();
+    config.PowerMeter.SdmAddress = root[F("sdmaddress")].as<uint8_t>();
+    config.PowerMeter.HttpIndividualRequests = root[F("http_individual_requests")].as<bool>();
 
     JsonArray http_phases = root[F("http_phases")];
     for (uint8_t i = 0; i < http_phases.size(); i++) {
         JsonObject phase = http_phases[i].as<JsonObject>();
 
-        config.Powermeter_Http_Phase[i].Enabled = (i == 0 ? true : phase[F("enabled")].as<bool>());
-        strlcpy(config.Powermeter_Http_Phase[i].Url, phase[F("url")].as<String>().c_str(), sizeof(config.Powermeter_Http_Phase[i].Url));
-        config.Powermeter_Http_Phase[i].AuthType = phase[F("auth_type")].as<Auth>();
-        strlcpy(config.Powermeter_Http_Phase[i].Username, phase[F("username")].as<String>().c_str(), sizeof(config.Powermeter_Http_Phase[i].Username));
-        strlcpy(config.Powermeter_Http_Phase[i].Password, phase[F("password")].as<String>().c_str(), sizeof(config.Powermeter_Http_Phase[i].Password));
-        strlcpy(config.Powermeter_Http_Phase[i].HeaderKey, phase[F("header_key")].as<String>().c_str(), sizeof(config.Powermeter_Http_Phase[i].HeaderKey));
-        strlcpy(config.Powermeter_Http_Phase[i].HeaderValue, phase[F("header_value")].as<String>().c_str(), sizeof(config.Powermeter_Http_Phase[i].HeaderValue));
-        config.Powermeter_Http_Phase[i].Timeout = phase[F("timeout")].as<uint16_t>();
-        strlcpy(config.Powermeter_Http_Phase[i].JsonPath, phase[F("json_path")].as<String>().c_str(), sizeof(config.Powermeter_Http_Phase[i].JsonPath));
+        config.PowerMeter.Http_Phase[i].Enabled = (i == 0 ? true : phase[F("enabled")].as<bool>());
+        strlcpy(config.PowerMeter.Http_Phase[i].Url, phase[F("url")].as<String>().c_str(), sizeof(config.PowerMeter.Http_Phase[i].Url));
+        config.PowerMeter.Http_Phase[i].AuthType = phase[F("auth_type")].as<Auth>();
+        strlcpy(config.PowerMeter.Http_Phase[i].Username, phase[F("username")].as<String>().c_str(), sizeof(config.PowerMeter.Http_Phase[i].Username));
+        strlcpy(config.PowerMeter.Http_Phase[i].Password, phase[F("password")].as<String>().c_str(), sizeof(config.PowerMeter.Http_Phase[i].Password));
+        strlcpy(config.PowerMeter.Http_Phase[i].HeaderKey, phase[F("header_key")].as<String>().c_str(), sizeof(config.PowerMeter.Http_Phase[i].HeaderKey));
+        strlcpy(config.PowerMeter.Http_Phase[i].HeaderValue, phase[F("header_value")].as<String>().c_str(), sizeof(config.PowerMeter.Http_Phase[i].HeaderValue));
+        config.PowerMeter.Http_Phase[i].Timeout = phase[F("timeout")].as<uint16_t>();
+        strlcpy(config.PowerMeter.Http_Phase[i].JsonPath, phase[F("json_path")].as<String>().c_str(), sizeof(config.PowerMeter.Http_Phase[i].JsonPath));
     }
 
     Configuration.write();

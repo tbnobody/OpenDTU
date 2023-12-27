@@ -20,7 +20,7 @@
 #include "rom/rtc.h"
 #endif
 
-String ResetReasonClass::get_reset_reason_verbose(uint8_t cpu_id)
+String ResetReason::get_reset_reason_verbose(const uint8_t cpu_id)
 {
     RESET_REASON reason;
     reason = rtc_get_reset_reason(cpu_id);
@@ -86,7 +86,7 @@ String ResetReasonClass::get_reset_reason_verbose(uint8_t cpu_id)
     return reason_str;
 }
 
-String ResetReasonClass::get_reset_reason_short(uint8_t cpu_id)
+String ResetReason::get_reset_reason_short(const uint8_t cpu_id)
 {
     RESET_REASON reason;
     reason = rtc_get_reset_reason(cpu_id);
@@ -151,5 +151,3 @@ String ResetReasonClass::get_reset_reason_short(uint8_t cpu_id)
 
     return reason_str;
 }
-
-ResetReasonClass ResetReason;

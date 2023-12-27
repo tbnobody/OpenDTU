@@ -5,14 +5,14 @@
 
 class HM_Abstract : public InverterAbstract {
 public:
-    explicit HM_Abstract(HoymilesRadio* radio, uint64_t serial);
+    explicit HM_Abstract(HoymilesRadio* radio, const uint64_t serial);
     bool sendStatsRequest();
-    bool sendAlarmLogRequest(bool force = false);
+    bool sendAlarmLogRequest(const bool force = false);
     bool sendDevInfoRequest();
     bool sendSystemConfigParaRequest();
-    bool sendActivePowerControlRequest(float limit, PowerLimitControlType type);
+    bool sendActivePowerControlRequest(float limit, const PowerLimitControlType type);
     bool resendActivePowerControlRequest();
-    bool sendPowerControlRequest(bool turnOn);
+    bool sendPowerControlRequest(const bool turnOn);
     bool sendRestartControlRequest();
     bool resendPowerControlRequest();
     bool sendGridOnProFileParaRequest();

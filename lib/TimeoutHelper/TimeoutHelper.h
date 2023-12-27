@@ -6,10 +6,10 @@
 class TimeoutHelper {
 public:
     TimeoutHelper();
-    void set(uint32_t ms);
-    void extend(uint32_t ms);
+    void set(const uint32_t ms);
+    void extend(const uint32_t ms);
     void reset();
-    bool occured();
+    bool occured() const;
 
 private:
     uint32_t startMillis;

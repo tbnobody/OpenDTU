@@ -1,7 +1,7 @@
 
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * Copyright (C) 2022 Thomas Basler and others
+ * Copyright (C) 2022-2023 Thomas Basler and others
  */
 #include "WebApi_prometheus.h"
 #include "Configuration.h"
@@ -11,11 +11,11 @@
 #include <Hoymiles.h>
 #include "MessageOutput.h"
 
-void WebApiPrometheusClass::init(AsyncWebServer* server)
+void WebApiPrometheusClass::init(AsyncWebServer& server)
 {
     using std::placeholders::_1;
 
-    _server = server;
+    _server = &server;
 
     _server->on("/api/prometheus/metrics", HTTP_GET, std::bind(&WebApiPrometheusClass::onPrometheusMetricsGet, this, _1));
 }
@@ -100,10 +100,10 @@ void WebApiPrometheusClass::onPrometheusMetricsGet(AsyncWebServerRequest* reques
     }
 }
 
-void WebApiPrometheusClass::addField(AsyncResponseStream* stream, String& serial, uint8_t idx, std::shared_ptr<InverterAbstract> inv, ChannelType_t type, ChannelNum_t channel, FieldId_t fieldId, const char* metricName, const char* channelName)
+void WebApiPrometheusClass::addField(AsyncResponseStream* stream, const String& serial, const uint8_t idx, std::shared_ptr<InverterAbstract> inv, const ChannelType_t type, const ChannelNum_t channel, const FieldId_t fieldId, const char* metricName, const char* channelName)
 {
     if (inv->Statistics()->hasChannelFieldValue(type, channel, fieldId)) {
-        const char* chanName = (channelName == NULL) ? inv->Statistics()->getChannelFieldName(type, channel, fieldId) : channelName;
+        const char* chanName = (channelName == nullptr) ? inv->Statistics()->getChannelFieldName(type, channel, fieldId) : channelName;
         if (idx == 0 && type == TYPE_AC && channel == 0) {
             stream->printf("# HELP opendtu_%s in %s\n", chanName, inv->Statistics()->getChannelFieldUnit(type, channel, fieldId));
             stream->printf("# TYPE opendtu_%s %s\n", chanName, metricName);
@@ -119,7 +119,7 @@ void WebApiPrometheusClass::addField(AsyncResponseStream* stream, String& serial
     }
 }
 
-void WebApiPrometheusClass::addPanelInfo(AsyncResponseStream* stream, String& serial, uint8_t idx, std::shared_ptr<InverterAbstract> inv, ChannelType_t type, ChannelNum_t channel)
+void WebApiPrometheusClass::addPanelInfo(AsyncResponseStream* stream, const String& serial, const uint8_t idx, std::shared_ptr<InverterAbstract> inv, const ChannelType_t type, const ChannelNum_t channel)
 {
     if (type != TYPE_DC) {
         return;

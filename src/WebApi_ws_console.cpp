@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * Copyright (C) 2022 Thomas Basler and others
+ * Copyright (C) 2022-2023 Thomas Basler and others
  */
 #include "WebApi_ws_console.h"
 #include "Configuration.h"
@@ -13,9 +13,9 @@ WebApiWsConsoleClass::WebApiWsConsoleClass()
 {
 }
 
-void WebApiWsConsoleClass::init(AsyncWebServer* server)
+void WebApiWsConsoleClass::init(AsyncWebServer& server)
 {
-    _server = server;
+    _server = &server;
     _server->addHandler(&_ws);
     MessageOutput.register_ws_output(&_ws);
 }
@@ -26,10 +26,10 @@ void WebApiWsConsoleClass::loop()
     if (millis() - _lastWsCleanup > 1000) {
         _ws.cleanupClients();
 
-        if (Configuration.get().Security_AllowReadonly) {
+        if (Configuration.get().Security.AllowReadonly) {
             _ws.setAuthentication("", "");
         } else {
-            _ws.setAuthentication(AUTH_USERNAME, Configuration.get().Security_Password);
+            _ws.setAuthentication(AUTH_USERNAME, Configuration.get().Security.Password);
         }
 
         _lastWsCleanup = millis();
