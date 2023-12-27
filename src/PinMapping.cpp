@@ -305,7 +305,7 @@ bool PinMappingClass::isValidEthConfig() const
     return _pinMapping.eth_enabled;
 }
 
-bool PinMappingClass::isValidHuaweiConfig()
+bool PinMappingClass::isValidHuaweiConfig() const
 {
     return _pinMapping.huawei_miso >= 0
         && _pinMapping.huawei_mosi >= 0

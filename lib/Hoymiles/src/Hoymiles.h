@@ -34,8 +34,8 @@ public:
     HoymilesRadio_NRF* getRadioNrf();
     HoymilesRadio_CMT* getRadioCmt();
 
-    uint32_t PollInterval() const const;
-    void setPollInterval(const const uint32_t interval);
+    uint32_t PollInterval() const;
+    void setPollInterval(const uint32_t interval);
     void setVerboseLogging(bool verboseLogging);
 
     bool isAllRadioIdle() const;
