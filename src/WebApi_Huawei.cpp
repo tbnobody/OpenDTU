@@ -12,11 +12,11 @@
 #include <AsyncJson.h>
 #include <Hoymiles.h>
 
-void WebApiHuaweiClass::init(AsyncWebServer* server)
+void WebApiHuaweiClass::init(AsyncWebServer& server)
 {
     using std::placeholders::_1;
 
-    _server = server;
+    _server = &server;
 
     _server->on("/api/huawei/status", HTTP_GET, std::bind(&WebApiHuaweiClass::onStatus, this, _1));
     _server->on("/api/huawei/config", HTTP_GET, std::bind(&WebApiHuaweiClass::onAdminGet, this, _1));
@@ -32,26 +32,26 @@ void WebApiHuaweiClass::getJsonData(JsonObject& root) {
     const RectifierParameters_t * rp = HuaweiCan.get();
 
     root["data_age"] = (millis() - HuaweiCan.getLastUpdate()) / 1000;
-    root[F("input_voltage")]["v"] = rp->input_voltage;
-    root[F("input_voltage")]["u"] = "V";
-    root[F("input_current")]["v"] = rp->input_current;
-    root[F("input_current")]["u"] = "A";
-    root[F("input_power")]["v"] = rp->input_power;
-    root[F("input_power")]["u"] = "W";
-    root[F("output_voltage")]["v"] = rp->output_voltage;
-    root[F("output_voltage")]["u"] = "V";
-    root[F("output_current")]["v"] = rp->output_current;
-    root[F("output_current")]["u"] = "A";
-    root[F("max_output_current")]["v"] = rp->max_output_current;
-    root[F("max_output_current")]["u"] = "A";
-    root[F("output_power")]["v"] = rp->output_power;
-    root[F("output_power")]["u"] = "W";
-    root[F("input_temp")]["v"] = rp->input_temp;
-    root[F("input_temp")]["u"] = "°C";
-    root[F("output_temp")]["v"] = rp->output_temp;
-    root[F("output_temp")]["u"] = "°C";
-    root[F("efficiency")]["v"] = rp->efficiency * 100;
-    root[F("efficiency")]["u"] = "%";
+    root["input_voltage"]["v"] = rp->input_voltage;
+    root["input_voltage"]["u"] = "V";
+    root["input_current"]["v"] = rp->input_current;
+    root["input_current"]["u"] = "A";
+    root["input_power"]["v"] = rp->input_power;
+    root["input_power"]["u"] = "W";
+    root["output_voltage"]["v"] = rp->output_voltage;
+    root["output_voltage"]["u"] = "V";
+    root["output_current"]["v"] = rp->output_current;
+    root["output_current"]["u"] = "A";
+    root["max_output_current"]["v"] = rp->max_output_current;
+    root["max_output_current"]["u"] = "A";
+    root["output_power"]["v"] = rp->output_power;
+    root["output_power"]["u"] = "W";
+    root["input_temp"]["v"] = rp->input_temp;
+    root["input_temp"]["u"] = "°C";
+    root["output_temp"]["v"] = rp->output_temp;
+    root["output_temp"]["u"] = "°C";
+    root["efficiency"]["v"] = rp->efficiency * 100;
+    root["efficiency"]["u"] = "%";
 
 }
 
@@ -77,11 +77,11 @@ void WebApiHuaweiClass::onPost(AsyncWebServerRequest* request)
 
     AsyncJsonResponse* response = new AsyncJsonResponse();
     JsonObject retMsg = response->getRoot();
-    retMsg[F("type")] = F("warning");
+    retMsg["type"] = "warning";
 
     if (!request->hasParam("data", true)) {
-        retMsg[F("message")] = F("No values found!");
-        retMsg[F("code")] = WebApiError::GenericNoValueFound;
+        retMsg["message"] = "No values found!";
+        retMsg["code"] = WebApiError::GenericNoValueFound;
         response->setLength();
         request->send(response);
         return;
@@ -90,8 +90,8 @@ void WebApiHuaweiClass::onPost(AsyncWebServerRequest* request)
     String json = request->getParam("data", true)->value();
 
     if (json.length() > 1024) {
-        retMsg[F("message")] = F("Data too large!");
-        retMsg[F("code")] = WebApiError::GenericDataTooLarge;
+        retMsg["message"] = "Data too large!";
+        retMsg["code"] = WebApiError::GenericDataTooLarge;
         response->setLength();
         request->send(response);
         return;
@@ -104,40 +104,40 @@ void WebApiHuaweiClass::onPost(AsyncWebServerRequest* request)
     float minimal_voltage;
 
     if (error) {
-        retMsg[F("message")] = F("Failed to parse data!");
-        retMsg[F("code")] = WebApiError::GenericParseError;
+        retMsg["message"] = "Failed to parse data!";
+        retMsg["code"] = WebApiError::GenericParseError;
         response->setLength();
         request->send(response);
         return;
     }
 
     if (root.containsKey("online")) {
-        online = root[F("online")].as<bool>();
+        online = root["online"].as<bool>();
         if (online) {
             minimal_voltage = HUAWEI_MINIMAL_ONLINE_VOLTAGE;
         } else {
             minimal_voltage = HUAWEI_MINIMAL_OFFLINE_VOLTAGE;
         }
     } else {
-        retMsg[F("message")] = F("Could not read info if data should be set for online/offline operation!");
-        retMsg[F("code")] = WebApiError::LimitInvalidType;
+        retMsg["message"] = "Could not read info if data should be set for online/offline operation!";
+        retMsg["code"] = WebApiError::LimitInvalidType;
         response->setLength();
         request->send(response);
         return;
     }
 
     if (root.containsKey("voltage_valid")) {
-        if (root[F("voltage_valid")].as<bool>()) {
-            if (root[F("voltage")].as<float>() < minimal_voltage || root[F("voltage")].as<float>() > 58) {
-                retMsg[F("message")] = F("voltage not in range between 42 (online)/48 (offline and 58V !");
-                retMsg[F("code")] = WebApiError::LimitInvalidLimit;
-                retMsg[F("param")][F("max")] = 58;
-                retMsg[F("param")][F("min")] = minimal_voltage;
+        if (root["voltage_valid"].as<bool>()) {
+            if (root["voltage"].as<float>() < minimal_voltage || root["voltage"].as<float>() > 58) {
+                retMsg["message"] = "voltage not in range between 42 (online)/48 (offline and 58V !";
+                retMsg["code"] = WebApiError::LimitInvalidLimit;
+                retMsg["param"]["max"] = 58;
+                retMsg["param"]["min"] = minimal_voltage;
                 response->setLength();
                 request->send(response);
                 return;
             } else {
-                value = root[F("voltage")].as<float>();
+                value = root["voltage"].as<float>();
                 if (online) {
                     HuaweiCan.setValue(value, HUAWEI_ONLINE_VOLTAGE);
                 } else {
@@ -148,17 +148,17 @@ void WebApiHuaweiClass::onPost(AsyncWebServerRequest* request)
     }
 
     if (root.containsKey("current_valid")) {
-        if (root[F("current_valid")].as<bool>()) {
-            if (root[F("current")].as<float>() < 0 || root[F("current")].as<float>() > 60) {
-                retMsg[F("message")] = F("current must be in range between 0 and 60!");
-                retMsg[F("code")] = WebApiError::LimitInvalidLimit;
-                retMsg[F("param")][F("max")] = 60;
-                retMsg[F("param")][F("min")] = 0;
+        if (root["current_valid"].as<bool>()) {
+            if (root["current"].as<float>() < 0 || root["current"].as<float>() > 60) {
+                retMsg["message"] = "current must be in range between 0 and 60!";
+                retMsg["code"] = WebApiError::LimitInvalidLimit;
+                retMsg["param"]["max"] = 60;
+                retMsg["param"]["min"] = 0;
                 response->setLength();
                 request->send(response);
                 return;
             } else {
-                value = root[F("current")].as<float>();
+                value = root["current"].as<float>();
                 if (online) {
                     HuaweiCan.setValue(value, HUAWEI_ONLINE_CURRENT);
                 } else {
@@ -168,9 +168,9 @@ void WebApiHuaweiClass::onPost(AsyncWebServerRequest* request)
         }
     }
 
-    retMsg[F("type")] = F("success");
-    retMsg[F("message")] = F("Settings saved!");
-    retMsg[F("code")] = WebApiError::GenericSuccess;
+    retMsg["type"] = "success";
+    retMsg["message"] = "Settings saved!";
+    retMsg["code"] = WebApiError::GenericSuccess;
 
     response->setLength();
     request->send(response);
@@ -189,13 +189,13 @@ void WebApiHuaweiClass::onAdminGet(AsyncWebServerRequest* request)
     JsonObject root = response->getRoot();
     const CONFIG_T& config = Configuration.get();
 
-    root[F("enabled")] = config.Huawei_Enabled;
-    root[F("can_controller_frequency")] = config.Huawei_CAN_Controller_Frequency;
-    root[F("auto_power_enabled")] = config.Huawei_Auto_Power_Enabled;
-    root[F("voltage_limit")] = static_cast<int>(config.Huawei_Auto_Power_Voltage_Limit * 100) / 100.0;
-    root[F("enable_voltage_limit")] = static_cast<int>(config.Huawei_Auto_Power_Enable_Voltage_Limit * 100) / 100.0;
-    root[F("lower_power_limit")] = config.Huawei_Auto_Power_Lower_Power_Limit;
-    root[F("upper_power_limit")] = config.Huawei_Auto_Power_Upper_Power_Limit;   
+    root["enabled"] = config.Huawei.Enabled;
+    root["can_controller_frequency"] = config.Huawei.CAN_Controller_Frequency;
+    root["auto_power_enabled"] = config.Huawei.Auto_Power_Enabled;
+    root["voltage_limit"] = static_cast<int>(config.Huawei.Auto_Power_Voltage_Limit * 100) / 100.0;
+    root["enable_voltage_limit"] = static_cast<int>(config.Huawei.Auto_Power_Enable_Voltage_Limit * 100) / 100.0;
+    root["lower_power_limit"] = config.Huawei.Auto_Power_Lower_Power_Limit;
+    root["upper_power_limit"] = config.Huawei.Auto_Power_Upper_Power_Limit;   
 
     response->setLength();
     request->send(response);
@@ -209,11 +209,11 @@ void WebApiHuaweiClass::onAdminPost(AsyncWebServerRequest* request)
     
     AsyncJsonResponse* response = new AsyncJsonResponse();
     JsonObject retMsg = response->getRoot();
-    retMsg[F("type")] = F("warning");
+    retMsg["type"] = "warning";
 
     if (!request->hasParam("data", true)) {
-        retMsg[F("message")] = F("No values found!");
-        retMsg[F("code")] = WebApiError::GenericNoValueFound;
+        retMsg["message"] = "No values found!";
+        retMsg["code"] = WebApiError::GenericNoValueFound;
         response->setLength();
         request->send(response);
         return;
@@ -222,8 +222,8 @@ void WebApiHuaweiClass::onAdminPost(AsyncWebServerRequest* request)
     String json = request->getParam("data", true)->value();
 
     if (json.length() > 1024) {
-        retMsg[F("message")] = F("Data too large!");
-        retMsg[F("code")] = WebApiError::GenericDataTooLarge;
+        retMsg["message"] = "Data too large!";
+        retMsg["code"] = WebApiError::GenericDataTooLarge;
         response->setLength();
         request->send(response);
         return;
@@ -233,8 +233,8 @@ void WebApiHuaweiClass::onAdminPost(AsyncWebServerRequest* request)
     DeserializationError error = deserializeJson(root, json);
 
     if (error) {
-        retMsg[F("message")] = F("Failed to parse data!");
-        retMsg[F("code")] = WebApiError::GenericParseError;
+        retMsg["message"] = "Failed to parse data!";
+        retMsg["code"] = WebApiError::GenericParseError;
         response->setLength();
         request->send(response);
         return;
@@ -246,26 +246,26 @@ void WebApiHuaweiClass::onAdminPost(AsyncWebServerRequest* request)
         !(root.containsKey("voltage_limit")) ||
         !(root.containsKey("lower_power_limit")) ||
         !(root.containsKey("upper_power_limit"))) {
-        retMsg[F("message")] = F("Values are missing!");
-        retMsg[F("code")] = WebApiError::GenericValueMissing;
+        retMsg["message"] = "Values are missing!";
+        retMsg["code"] = WebApiError::GenericValueMissing;
         response->setLength();
         request->send(response);
         return;
     }
 
     CONFIG_T& config = Configuration.get();
-    config.Huawei_Enabled = root[F("enabled")].as<bool>();
-    config.Huawei_CAN_Controller_Frequency = root[F("can_controller_frequency")].as<uint32_t>();
-    config.Huawei_Auto_Power_Enabled = root[F("auto_power_enabled")].as<bool>();
-    config.Huawei_Auto_Power_Voltage_Limit = root[F("voltage_limit")].as<float>();
-    config.Huawei_Auto_Power_Enable_Voltage_Limit = root[F("enable_voltage_limit")].as<float>();
-    config.Huawei_Auto_Power_Lower_Power_Limit = root[F("lower_power_limit")].as<float>();
-    config.Huawei_Auto_Power_Upper_Power_Limit = root[F("upper_power_limit")].as<float>();    
+    config.Huawei.Enabled = root["enabled"].as<bool>();
+    config.Huawei.CAN_Controller_Frequency = root["can_controller_frequency"].as<uint32_t>();
+    config.Huawei.Auto_Power_Enabled = root["auto_power_enabled"].as<bool>();
+    config.Huawei.Auto_Power_Voltage_Limit = root["voltage_limit"].as<float>();
+    config.Huawei.Auto_Power_Enable_Voltage_Limit = root["enable_voltage_limit"].as<float>();
+    config.Huawei.Auto_Power_Lower_Power_Limit = root["lower_power_limit"].as<float>();
+    config.Huawei.Auto_Power_Upper_Power_Limit = root["upper_power_limit"].as<float>();    
     Configuration.write();
 
-    retMsg[F("type")] = F("success");
-    retMsg[F("message")] = F("Settings saved!");
-    retMsg[F("code")] = WebApiError::GenericSuccess;
+    retMsg["type"] = "success";
+    retMsg["message"] = "Settings saved!";
+    retMsg["code"] = WebApiError::GenericSuccess;
 
     response->setLength();
     request->send(response);
@@ -280,26 +280,26 @@ void WebApiHuaweiClass::onAdminPost(AsyncWebServerRequest* request)
 
     const PinMapping_t& pin = PinMapping.get();
     // Properly turn this on
-    if (config.Huawei_Enabled) {
-        MessageOutput.println(F("Initialize Huawei AC charger interface... "));
+    if (config.Huawei.Enabled) {
+        MessageOutput.println("Initialize Huawei AC charger interface... ");
         if (PinMapping.isValidHuaweiConfig()) {
             MessageOutput.printf("Huawei AC-charger miso = %d, mosi = %d, clk = %d, irq = %d, cs = %d, power_pin = %d\r\n", pin.huawei_miso, pin.huawei_mosi, pin.huawei_clk, pin.huawei_irq, pin.huawei_cs, pin.huawei_power);
-            HuaweiCan.init(pin.huawei_miso, pin.huawei_mosi, pin.huawei_clk, pin.huawei_irq, pin.huawei_cs, pin.huawei_power);
-            MessageOutput.println(F("done"));
+            HuaweiCan.updateSettings(pin.huawei_miso, pin.huawei_mosi, pin.huawei_clk, pin.huawei_irq, pin.huawei_cs, pin.huawei_power);
+            MessageOutput.println("done");
         } else {
-            MessageOutput.println(F("Invalid pin config"));
+            MessageOutput.println("Invalid pin config");
         }
     }
 
     // Properly turn this off
-    if (!config.Huawei_Enabled) {
+    if (!config.Huawei.Enabled) {
       HuaweiCan.setValue(0, HUAWEI_ONLINE_CURRENT);
       delay(500);
       HuaweiCan.setMode(HUAWEI_MODE_OFF);
       return;
     }
 
-    if (config.Huawei_Auto_Power_Enabled) {
+    if (config.Huawei.Auto_Power_Enabled) {
       HuaweiCan.setMode(HUAWEI_MODE_AUTO_INT);
       return;
     }

@@ -7,6 +7,7 @@
 #include <Hoymiles.h>
 #include <memory>
 #include <functional>
+#include <TaskSchedulerDeclarations.h>
 
 #define PL_UI_STATE_INACTIVE 0
 #define PL_UI_STATE_CHARGING 1
@@ -47,8 +48,7 @@ public:
         Stable,
     };
 
-    void init();
-    void loop();
+    void init(Scheduler& scheduler);
     uint8_t getPowerLimiterState();
     int32_t getLastRequestedPowerLimit();
 
@@ -63,6 +63,10 @@ public:
     void calcNextInverterRestart();
 
 private:
+    void loop();
+
+    Task _loopTask;
+
     int32_t _lastRequestedPowerLimit = 0;
     uint32_t _lastPowerLimitMillis = 0;
     uint32_t _shutdownTimeout = 0;

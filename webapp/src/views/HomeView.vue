@@ -192,7 +192,7 @@
                         </div>
                     </div>
 
-                    <GridProfile v-if="!gridProfileLoading" :gridProfileList="gridProfileList" />
+                    <GridProfile v-if="!gridProfileLoading" :gridProfileList="gridProfileList" :gridProfileRawList="gridProfileRawList" />
                 </div>
 
                 <div class="modal-footer">
@@ -367,6 +367,7 @@ import BatteryView from '@/components/BatteryView.vue'
 import type { DevInfoStatus } from '@/types/DevInfoStatus';
 import type { EventlogItems } from '@/types/EventlogStatus';
 import type { GridProfileStatus } from '@/types/GridProfileStatus';
+import type { GridProfileRawdata } from '@/types/GridProfileRawdata';
 import type { LimitConfig } from '@/types/LimitConfig';
 import type { LimitStatus } from '@/types/LimitStatus';
 import type { Inverter, LiveData } from '@/types/LiveDataStatus';
@@ -430,6 +431,7 @@ export default defineComponent({
             devInfoLoading: true,
             gridProfileView: {} as bootstrap.Modal,
             gridProfileList: {} as GridProfileStatus,
+            gridProfileRawList: {} as GridProfileRawdata,
             gridProfileLoading: true,
 
             limitSettingView: {} as bootstrap.Modal,
@@ -438,7 +440,7 @@ export default defineComponent({
             currentLimitList: {} as LimitStatus,
             targetLimitList: {} as LimitConfig,
 
-            targetLimitMin: 2,
+            targetLimitMin: 0,
             targetLimitMax: 100,
             targetLimitTypeText: this.$t('home.Relative'),
             targetLimitType: 1,
@@ -622,7 +624,13 @@ export default defineComponent({
                 .then((response) => handleResponse(response, this.$emitter, this.$router))
                 .then((data) => {
                     this.gridProfileList = data;
-                    this.gridProfileLoading = false;
+
+                    fetch("/api/gridprofile/rawdata?inv=" + serial, { headers: authHeader() })
+                    .then((response) => handleResponse(response, this.$emitter, this.$router))
+                    .then((data) => {
+                        this.gridProfileRawList = data;
+                        this.gridProfileLoading = false;
+                    })
                 });
 
             this.gridProfileView.show();
@@ -680,11 +688,11 @@ export default defineComponent({
         onSelectType(type: number) {
             if (type == 1) {
                 this.targetLimitTypeText = this.$t('home.Relative');
-                this.targetLimitMin = 2;
+                this.targetLimitMin = 0;
                 this.targetLimitMax = 100;
             } else {
                 this.targetLimitTypeText = this.$t('home.Absolute');
-                this.targetLimitMin = 10;
+                this.targetLimitMin = 0;
                 this.targetLimitMax = (this.currentLimitList.max_power > 0 ? this.currentLimitList.max_power : 2250);
             }
             this.targetLimitType = type;

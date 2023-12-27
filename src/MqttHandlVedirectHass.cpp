@@ -11,13 +11,17 @@
 
 MqttHandleVedirectHassClass MqttHandleVedirectHass;
 
-void MqttHandleVedirectHassClass::init()
+void MqttHandleVedirectHassClass::init(Scheduler& scheduler)
 {
+    scheduler.addTask(_loopTask);
+    _loopTask.setCallback(std::bind(&MqttHandleVedirectHassClass::loop, this));
+    _loopTask.setIterations(TASK_FOREVER);
+    _loopTask.enable();
 }
 
 void MqttHandleVedirectHassClass::loop()
 {
-    if (!Configuration.get().Vedirect_Enabled) {
+    if (!Configuration.get().Vedirect.Enabled) {
         return;
     }
     if (_updateForced) {
@@ -42,8 +46,8 @@ void MqttHandleVedirectHassClass::forceUpdate()
 
 void MqttHandleVedirectHassClass::publishConfig()
 {
-    if ((!Configuration.get().Mqtt_Hass_Enabled) ||
-       (!Configuration.get().Vedirect_Enabled)) {
+    if ((!Configuration.get().Mqtt.Hass.Enabled) ||
+       (!Configuration.get().Vedirect.Enabled)) {
         return;
     }
 
@@ -120,8 +124,8 @@ void MqttHandleVedirectHassClass::publishSensor(const char* caption, const char*
     JsonObject deviceObj = root.createNestedObject("dev");
     createDeviceInfo(deviceObj);
 
-    if (Configuration.get().Mqtt_Hass_Expire) {
-        root[F("exp_aft")] = Configuration.get().Mqtt_PublishInterval * 3;
+    if (Configuration.get().Mqtt.Hass.Expire) {
+        root[F("exp_aft")] = Configuration.get().Mqtt.PublishInterval * 3;
     }
     if (deviceClass != NULL) {
         root[F("dev_cla")] = deviceClass;
@@ -188,7 +192,7 @@ void MqttHandleVedirectHassClass::createDeviceInfo(JsonObject& object)
 
 void MqttHandleVedirectHassClass::publish(const String& subtopic, const String& payload)
 {
-    String topic = Configuration.get().Mqtt_Hass_Topic;
+    String topic = Configuration.get().Mqtt.Hass.Topic;
     topic += subtopic;
-    MqttSettings.publishGeneric(topic.c_str(), payload.c_str(), Configuration.get().Mqtt_Hass_Retain);
+    MqttSettings.publishGeneric(topic.c_str(), payload.c_str(), Configuration.get().Mqtt.Hass.Retain);
 }

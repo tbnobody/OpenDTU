@@ -14,18 +14,30 @@ MqttHandleVedirectClass MqttHandleVedirect;
 
 // #define MQTTHANDLEVEDIRECT_DEBUG
 
-void MqttHandleVedirectClass::init()
+void MqttHandleVedirectClass::init(Scheduler& scheduler)
+{
+    scheduler.addTask(_loopTask);
+    _loopTask.setCallback(std::bind(&MqttHandleVedirectClass::loop, this));
+    _loopTask.setIterations(TASK_FOREVER);
+    _loopTask.enable();
+
+    // initially force a full publish
+    this->forceUpdate();
+}
+
+void MqttHandleVedirectClass::forceUpdate()
 {
     // initially force a full publish
     _nextPublishUpdatesOnly = 0;
     _nextPublishFull = 1;
 }
 
+
 void MqttHandleVedirectClass::loop()
 {
     CONFIG_T& config = Configuration.get();
 
-    if (!MqttSettings.getConnected() || !config.Vedirect_Enabled) {
+    if (!MqttSettings.getConnected() || !config.Vedirect.Enabled) {
         return;
     }
 
@@ -38,7 +50,7 @@ void MqttHandleVedirectClass::loop()
         if (_nextPublishFull <= _nextPublishUpdatesOnly) {
             _PublishFull = true;
         } else {
-            _PublishFull = !config.Vedirect_UpdatesOnly;
+            _PublishFull = !config.Vedirect.UpdatesOnly;
         }
 
         #ifdef MQTTHANDLEVEDIRECT_DEBUG
@@ -129,14 +141,14 @@ void MqttHandleVedirectClass::loop()
         }
 
         // now calculate next points of time to publish
-        _nextPublishUpdatesOnly = millis() + (config.Mqtt_PublishInterval * 1000);
+        _nextPublishUpdatesOnly = millis() + (config.Mqtt.PublishInterval * 1000);
 
         if (_PublishFull) {
             // when Home Assistant MQTT-Auto-Discovery is active,
             // and "enable expiration" is active, all values must be published at
             // least once before the announced expiry interval is reached
-            if ((config.Vedirect_UpdatesOnly) && (config.Mqtt_Hass_Enabled) && (config.Mqtt_Hass_Expire)) {
-                _nextPublishFull = millis() + (((config.Mqtt_PublishInterval * 3) - 1) * 1000);
+            if ((config.Vedirect.UpdatesOnly) && (config.Mqtt.Hass.Enabled) && (config.Mqtt.Hass.Expire)) {
+                _nextPublishFull = millis() + (((config.Mqtt.PublishInterval * 3) - 1) * 1000);
 
                 #ifdef MQTTHANDLEVEDIRECT_DEBUG
                 uint32_t _tmpNextFullSeconds = (config.Mqtt_PublishInterval * 3) - 1;

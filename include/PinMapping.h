@@ -59,9 +59,9 @@ public:
     bool init(const String& deviceMapping);
     PinMapping_t& get();
 
-    bool isValidNrf24Config();
-    bool isValidCmt2300Config();
-    bool isValidEthConfig();
+    bool isValidNrf24Config() const;
+    bool isValidCmt2300Config() const;
+    bool isValidEthConfig() const;
     bool isValidHuaweiConfig();
     
 private:

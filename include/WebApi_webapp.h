@@ -5,7 +5,7 @@
 
 class WebApiWebappClass {
 public:
-    void init(AsyncWebServer* server);
+    void init(AsyncWebServer& server);
     void loop();
 
 private:

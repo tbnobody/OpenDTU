@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * Copyright (C) 2022 Thomas Basler and others
+ * Copyright (C) 2022-2023 Thomas Basler and others
  */
 
 #include "WebApi_maintenance.h"
@@ -9,11 +9,11 @@
 #include "WebApi_errors.h"
 #include <AsyncJson.h>
 
-void WebApiMaintenanceClass::init(AsyncWebServer* server)
+void WebApiMaintenanceClass::init(AsyncWebServer& server)
 {
     using std::placeholders::_1;
 
-    _server = server;
+    _server = &server;
 
     _server->on("/api/maintenance/reboot", HTTP_POST, std::bind(&WebApiMaintenanceClass::onRebootPost, this, _1));
 }
@@ -40,7 +40,7 @@ void WebApiMaintenanceClass::onRebootPost(AsyncWebServerRequest* request)
         return;
     }
 
-    String json = request->getParam("data", true)->value();
+    const String json = request->getParam("data", true)->value();
 
     if (json.length() > MQTT_JSON_DOC_SIZE) {
         retMsg["message"] = "Data too large!";
@@ -51,7 +51,7 @@ void WebApiMaintenanceClass::onRebootPost(AsyncWebServerRequest* request)
     }
 
     DynamicJsonDocument root(MQTT_JSON_DOC_SIZE);
-    DeserializationError error = deserializeJson(root, json);
+    const DeserializationError error = deserializeJson(root, json);
 
     if (error) {
         retMsg["message"] = "Failed to parse data!";

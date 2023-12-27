@@ -18,8 +18,13 @@ SDM sdm(Serial2, 9600, NOT_A_PIN, SERIAL_8N1, SDM_RX_PIN, SDM_TX_PIN);
 
 SoftwareSerial inputSerial;
 
-void PowerMeterClass::init()
+void PowerMeterClass::init(Scheduler& scheduler)
 {
+    scheduler.addTask(_loopTask);
+    _loopTask.setCallback(std::bind(&PowerMeterClass::loop, this));
+    _loopTask.setIterations(TASK_FOREVER);
+    _loopTask.enable();
+
     _lastPowerMeterCheck = 0;
     _lastPowerMeterUpdate = 0;
 
@@ -28,11 +33,11 @@ void PowerMeterClass::init()
 
     CONFIG_T& config = Configuration.get();
 
-    if (!config.PowerMeter_Enabled) {
+    if (!config.PowerMeter.Enabled) {
         return;
     }
 
-    switch(config.PowerMeter_Source) {
+    switch(config.PowerMeter.Source) {
     case SOURCE_MQTT: {
         auto subscribe = [this](char const* topic, float* target) {
             if (strlen(topic) == 0) { return; }
@@ -45,9 +50,9 @@ void PowerMeterClass::init()
             _mqttSubscriptions.try_emplace(topic, target);
         };
 
-        subscribe(config.PowerMeter_MqttTopicPowerMeter1, &_powerMeter1Power);
-        subscribe(config.PowerMeter_MqttTopicPowerMeter2, &_powerMeter2Power);
-        subscribe(config.PowerMeter_MqttTopicPowerMeter3, &_powerMeter3Power);
+        subscribe(config.PowerMeter.MqttTopicPowerMeter1, &_powerMeter1Power);
+        subscribe(config.PowerMeter.MqttTopicPowerMeter2, &_powerMeter2Power);
+        subscribe(config.PowerMeter.MqttTopicPowerMeter3, &_powerMeter3Power);
         break;
     }
 
@@ -98,7 +103,7 @@ float PowerMeterClass::getPowerTotal(bool forceUpdate)
 {
     if (forceUpdate) {
         CONFIG_T& config = Configuration.get();
-        if (config.PowerMeter_Enabled
+        if (config.PowerMeter.Enabled
                 && (millis() - _lastPowerMeterUpdate) > (1000)) {
             readPowerMeter();
         }
@@ -132,11 +137,11 @@ void PowerMeterClass::mqtt()
 void PowerMeterClass::loop()
 {
     CONFIG_T const& config = Configuration.get();
-    _verboseLogging = config.PowerMeter_VerboseLogging;
+    _verboseLogging = config.PowerMeter.VerboseLogging;
 
-    if (!config.PowerMeter_Enabled) { return; }
+    if (!config.PowerMeter.Enabled) { return; }
 
-    if (config.PowerMeter_Source == SOURCE_SML) {
+    if (config.PowerMeter.Source == SOURCE_SML) {
         if (!smlReadLoop()) {
             return;
         } else {
@@ -144,7 +149,7 @@ void PowerMeterClass::loop()
         }
     }
 
-    if ((millis() - _lastPowerMeterCheck) < (config.PowerMeter_Interval * 1000)) {
+    if ((millis() - _lastPowerMeterCheck) < (config.PowerMeter.Interval * 1000)) {
         return;
     }
 
@@ -161,9 +166,9 @@ void PowerMeterClass::readPowerMeter()
 {
     CONFIG_T& config = Configuration.get();
     
-    uint8_t _address = config.PowerMeter_SdmAddress;
+    uint8_t _address = config.PowerMeter.SdmAddress;
 
-    if (config.PowerMeter_Source == SOURCE_SDM1PH) {
+    if (config.PowerMeter.Source == SOURCE_SDM1PH) {
         _powerMeter1Power = static_cast<float>(sdm.readVal(SDM_PHASE_1_POWER, _address));
         _powerMeter2Power = 0.0;
         _powerMeter3Power = 0.0;
@@ -174,7 +179,7 @@ void PowerMeterClass::readPowerMeter()
         _powerMeterExport = static_cast<float>(sdm.readVal(SDM_EXPORT_ACTIVE_ENERGY, _address));
         _lastPowerMeterUpdate = millis();
     }
-    else if (config.PowerMeter_Source == SOURCE_SDM3PH) {
+    else if (config.PowerMeter.Source == SOURCE_SDM3PH) {
         _powerMeter1Power = static_cast<float>(sdm.readVal(SDM_PHASE_1_POWER, _address));
         _powerMeter2Power = static_cast<float>(sdm.readVal(SDM_PHASE_2_POWER, _address));
         _powerMeter3Power = static_cast<float>(sdm.readVal(SDM_PHASE_3_POWER, _address));
@@ -185,7 +190,7 @@ void PowerMeterClass::readPowerMeter()
         _powerMeterExport = static_cast<float>(sdm.readVal(SDM_EXPORT_ACTIVE_ENERGY, _address));
         _lastPowerMeterUpdate = millis();
     }
-    else if (config.PowerMeter_Source == SOURCE_HTTP) {
+    else if (config.PowerMeter.Source == SOURCE_HTTP) {
         if (HttpPowerMeter.updateValues()) {
             _powerMeter1Power = HttpPowerMeter.getPower(1);
             _powerMeter2Power = HttpPowerMeter.getPower(2);

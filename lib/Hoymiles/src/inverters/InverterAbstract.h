@@ -30,45 +30,45 @@ class CommandAbstract;
 
 class InverterAbstract {
 public:
-    explicit InverterAbstract(HoymilesRadio* radio, uint64_t serial);
+    explicit InverterAbstract(HoymilesRadio* radio, const uint64_t serial);
     void init();
-    uint64_t serial();
-    const String& serialString();
+    uint64_t serial() const;
+    const String& serialString() const;
     void setName(const char* name);
-    const char* name();
-    virtual String typeName() = 0;
-    virtual const byteAssign_t* getByteAssignment() = 0;
-    virtual uint8_t getByteAssignmentSize() = 0;
+    const char* name() const;
+    virtual String typeName() const = 0;
+    virtual const byteAssign_t* getByteAssignment() const = 0;
+    virtual uint8_t getByteAssignmentSize() const = 0;
 
     bool isProducing();
     bool isReachable();
 
-    void setEnablePolling(bool enabled);
-    bool getEnablePolling();
+    void setEnablePolling(const bool enabled);
+    bool getEnablePolling() const;
 
-    void setEnableCommands(bool enabled);
-    bool getEnableCommands();
+    void setEnableCommands(const bool enabled);
+    bool getEnableCommands() const;
 
-    void setReachableThreshold(uint8_t threshold);
-    uint8_t getReachableThreshold();
+    void setReachableThreshold(const uint8_t threshold);
+    uint8_t getReachableThreshold() const;
 
-    void setZeroValuesIfUnreachable(bool enabled);
-    bool getZeroValuesIfUnreachable();
+    void setZeroValuesIfUnreachable(const bool enabled);
+    bool getZeroValuesIfUnreachable() const;
 
-    void setZeroYieldDayOnMidnight(bool enabled);
-    bool getZeroYieldDayOnMidnight();
+    void setZeroYieldDayOnMidnight(const bool enabled);
+    bool getZeroYieldDayOnMidnight() const;
 
     void clearRxFragmentBuffer();
-    void addRxFragment(uint8_t fragment[], uint8_t len);
-    uint8_t verifyAllFragments(CommandAbstract* cmd);
+    void addRxFragment(const uint8_t fragment[], const uint8_t len);
+    uint8_t verifyAllFragments(CommandAbstract& cmd);
 
     virtual bool sendStatsRequest() = 0;
-    virtual bool sendAlarmLogRequest(bool force = false) = 0;
+    virtual bool sendAlarmLogRequest(const bool force = false) = 0;
     virtual bool sendDevInfoRequest() = 0;
     virtual bool sendSystemConfigParaRequest() = 0;
-    virtual bool sendActivePowerControlRequest(float limit, PowerLimitControlType type) = 0;
+    virtual bool sendActivePowerControlRequest(float limit, const PowerLimitControlType type) = 0;
     virtual bool resendActivePowerControlRequest() = 0;
-    virtual bool sendPowerControlRequest(bool turnOn) = 0;
+    virtual bool sendPowerControlRequest(const bool turnOn) = 0;
     virtual bool sendRestartControlRequest() = 0;
     virtual bool resendPowerControlRequest() = 0;
     virtual bool sendChangeChannelRequest();

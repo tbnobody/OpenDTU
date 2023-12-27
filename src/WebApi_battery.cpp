@@ -13,11 +13,11 @@
 #include "WebApi_errors.h"
 #include "helper.h"
 
-void WebApiBatteryClass::init(AsyncWebServer* server)
+void WebApiBatteryClass::init(AsyncWebServer& server)
 {
     using std::placeholders::_1;
 
-    _server = server;
+    _server = &server;
 
     _server->on("/api/battery/status", HTTP_GET, std::bind(&WebApiBatteryClass::onStatus, this, _1));
     _server->on("/api/battery/config", HTTP_GET, std::bind(&WebApiBatteryClass::onAdminGet, this, _1));
@@ -38,11 +38,11 @@ void WebApiBatteryClass::onStatus(AsyncWebServerRequest* request)
     JsonObject root = response->getRoot();
     const CONFIG_T& config = Configuration.get();
 
-    root[F("enabled")] = config.Battery_Enabled;
-    root[F("verbose_logging")] = config.Battery_VerboseLogging;
-    root[F("provider")] = config.Battery_Provider;
-    root[F("jkbms_interface")] = config.Battery_JkBmsInterface;
-    root[F("jkbms_polling_interval")] = config.Battery_JkBmsPollingInterval;
+    root[F("enabled")] = config.Battery.Enabled;
+    root[F("verbose_logging")] = config.Battery.VerboseLogging;
+    root[F("provider")] = config.Battery.Provider;
+    root[F("jkbms_interface")] = config.Battery.JkBmsInterface;
+    root[F("jkbms_polling_interval")] = config.Battery.JkBmsPollingInterval;
 
     response->setLength();
     request->send(response);
@@ -101,11 +101,11 @@ void WebApiBatteryClass::onAdminPost(AsyncWebServerRequest* request)
     }
 
     CONFIG_T& config = Configuration.get();
-    config.Battery_Enabled = root[F("enabled")].as<bool>();
-    config.Battery_VerboseLogging = root[F("verbose_logging")].as<bool>();
-    config.Battery_Provider = root[F("provider")].as<uint8_t>();
-    config.Battery_JkBmsInterface = root[F("jkbms_interface")].as<uint8_t>();
-    config.Battery_JkBmsPollingInterval = root[F("jkbms_polling_interval")].as<uint8_t>();
+    config.Battery.Enabled = root[F("enabled")].as<bool>();
+    config.Battery.VerboseLogging = root[F("verbose_logging")].as<bool>();
+    config.Battery.Provider = root[F("provider")].as<uint8_t>();
+    config.Battery.JkBmsInterface = root[F("jkbms_interface")].as<uint8_t>();
+    config.Battery.JkBmsPollingInterval = root[F("jkbms_polling_interval")].as<uint8_t>();
     Configuration.write();
 
     retMsg[F("type")] = F("success");
@@ -115,5 +115,5 @@ void WebApiBatteryClass::onAdminPost(AsyncWebServerRequest* request)
     response->setLength();
     request->send(response);
 
-    Battery.init();
+    Battery.updateSettings();
 }

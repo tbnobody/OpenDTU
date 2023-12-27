@@ -32,7 +32,9 @@
         "No": "Nein",
         "VerboseLogging": "Ausführliche Protokollierung",
         "Loading": "Lade...",
-        "Reload": "Aktualisieren"
+        "Reload": "Aktualisieren",
+        "Cancel": "Abbrechen",
+        "Save": "Speichern"
     },
     "localeswitcher": {
         "Dark": "Dunkel",
@@ -81,6 +83,7 @@
         "7013": "Veröffentlichungsintervall muss zwischen {min} und {max} sein!",
         "7014": "Hass-Topic darf nicht länger als {max} Zeichen sein!",
         "7015": "Hass-Topic darf keine Leerzeichen enthalten!",
+        "7016": "LWT QOS darf icht größer als {max} sein!",
         "8001": "IP-Adresse ist ungültig!",
         "8002": "Netzmaske ist ungültig!",
         "8003": "Standardgateway ist ungültig!",
@@ -197,6 +200,10 @@
     "gridprofile": {
         "NoInfo": "@:devinfo.NoInfo",
         "NoInfoLong": "@:devinfo.NoInfoLong",
+        "Name": "Name",
+        "Version": "Version",
+        "Enabled": "@:wifistationinfo.Enabled",
+        "Disabled": "@:wifistationinfo.Disabled",
         "GridprofileSupport": "Unterstütze die Entwicklung",
         "GridprofileSupportLong": "Weitere Informationen sind <a href=\"https://github.com/tbnobody/OpenDTU/wiki/Grid-Profile-Parser\" target=\"_blank\">hier</a> zu finden."
     },
@@ -385,7 +392,7 @@
         "DeviceReboot": "Gerät neu starten",
         "PerformReboot": "Neustart durchführen",
         "Reboot": "Neustarten!",
-        "Cancel": "Abbrechen",
+        "Cancel": "@:base.Cancel",
         "RebootOpenDTU": "OpenDTU neustarten",
         "RebootQuestion": "Möchten Sie das Gerät wirklich neu starten?",
         "RebootHint": "<b>Hinweis:</b> Ein manueller Neustart muss normalerweise nicht durchgeführt werden. OpenDTU führt jeden erforderlichen Neustart (z. B. nach einem Firmware-Update) automatisch durch. Einstellungen werden auch ohne Neustart übernommen. Wenn Sie aufgrund eines Fehlers einen Neustart durchführen müssen, denken Sie bitte daran, diesen unter <a href=\"https://github.com/helgeerbe/OpenDTU-OnBattery/issues\" class=\"alert-link\" target=\"_blank\">Github</a> zu melden."
@@ -407,7 +414,6 @@
         "CmtFrequencyWarning": "Die ausgewählte Frequenz befindet außerhalb des in der EU zugelassenen Bereiches. Vergewissere dich, dass mit dieser Auswahl keine lokalen Regularien verletzt werden.",
         "MHz": "{mhz} MHz",
         "dBm": "{dbm} dBm",
-        "Save": "Speichern",
         "Min": "Minimum ({db} dBm)",
         "Low": "Niedrig ({db} dBm)",
         "High": "Hoch ({db} dBm)",
@@ -420,8 +426,7 @@
         "RepeatPassword": "Passwort wiederholen:",
         "PasswordHint": "<b>Hinweis:</b> Das Administrator-Passwort wird für den Zugriff auf die Webschnittstelle (Benutzer 'admin'), aber auch für die Verbindung mit dem Gerät im AP-Modus verwendet. Es muss zwischen 8 und 64 Zeichen lang sein.",
         "Permissions": "Berechtigungen",
-        "ReadOnly": "Nur-Lese-Zugriff auf die Weboberfläche ohne Passwort zulassen",
-        "Save": "@:dtuadmin.Save"
+        "ReadOnly": "Nur-Lese-Zugriff auf die Weboberfläche ohne Passwort zulassen"
     },
     "ntpadmin": {
         "NtpSettings": "NTP-Einstellungen",
@@ -439,7 +444,6 @@
         "NAUTICAL": "Nautische Dämmerung (102°)",
         "CIVIL": "Bürgerliche Dämmerung (96°)",
         "ASTONOMICAL": "Astronomische Dämmerung (108°)",
-        "Save": "@:dtuadmin.Save",
         "ManualTimeSynchronization": "Manuelle Zeitsynchronization",
         "CurrentOpenDtuTime": "Aktuelle OpenDTU-Zeit:",
         "CurrentLocalTime": "Aktuelle lokale Zeit:",
@@ -463,7 +467,6 @@
         "ApTimeout": "AccessPoint Zeitlimit:",
         "ApTimeoutHint": "Zeit die der AccessPoint offen gehalten wird. Ein Wert von 0 bedeutet unendlich.",
         "Minutes": "Minuten",
-        "Save": "@:dtuadmin.Save",
         "EnableMdns": "mDNS aktivieren",
         "MdnsSettings": "mDNS-Einstellungen"
     },
@@ -499,13 +502,16 @@
         "LwtOnlineHint": "Nachricht, die im LWT-Topic veröffentlicht wird, wenn OpenDTU online ist",
         "LwtOffline": "LWT-Offline-Nachricht:",
         "LwtOfflineHint": "Nachricht, die im LWT-Topic veröffentlicht wird, wenn OpenDTU offline ist",
+        "LwtQos": "QoS (Quality of Service):",
+        "QOS0": "0 (Höchstens einmal)",
+        "QOS1": "1 (Mindestens einmal)",
+        "QOS2": "2 (Exakt einmal)",
         "HassParameters": "Home Assistant MQTT-Auto-Discovery-Parameter",
         "HassPrefixTopic": "Präfix Topic:",
         "HassPrefixTopicHint": "The prefix for the discovery topic",
         "HassRetain": "Retain Flag aktivieren",
         "HassExpire": "Ablauffunktion aktivieren",
-        "HassIndividual": "Einzelne Paneele",
-        "Save": "@:dtuadmin.Save"
+        "HassIndividual": "Einzelne Paneele"
     },
     "vedirectadmin": {
         "VedirectSettings": "VE.Direct Einstellungen",
@@ -651,10 +657,12 @@
         "ZeroRuntimeHint": "Nulle Laufzeit Daten (keine Ertragsdaten), wenn der Wechselrichter nicht erreichbar ist.",
         "ZeroDay": "Nulle Tagesertrag um Mitternacht",
         "ZeroDayHint": "Das funktioniert nur wenn der Wechselrichter nicht erreichbar ist. Wenn Daten aus dem Wechselrichter gelesen werden, werden deren Werte verwendet. (Ein Reset erfolgt nur beim Neustarten)",
-        "Cancel": "@:maintenancereboot.Cancel",
-        "Save": "@:dtuadmin.Save",
+        "Cancel": "@:base.Cancel",
+        "Save": "@:base.Save",
         "DeleteMsg": "Soll der Wechselrichter \"{name}\" mit der Seriennummer {serial} wirklich gelöscht werden?",
-        "Delete": "Löschen"
+        "Delete": "Löschen",
+        "YieldDayCorrection": "Tagesertragskorrektur",
+        "YieldDayCorrectionHint": "Summiert den Tagesertrag, auch wenn der Wechselrichter neu gestartet wird. Der Wert wird um Mitternacht zurückgesetzt"
     },
     "configadmin": {
         "ConfigManagement": "Konfigurationsverwaltung",
@@ -673,7 +681,7 @@
         "FactoryReset": "Werksreset",
         "ResetMsg": "Sind Sie sicher, dass Sie die aktuelle Konfiguration löschen und alle Einstellungen auf die Werkseinstellungen zurücksetzen möchten?",
         "ResetConfirm": "Werksreset!",
-        "Cancel": "@:maintenancereboot.Cancel"
+        "Cancel": "@:base.Cancel"
     },
     "login": {
         "Login": "Anmeldung",
@@ -728,17 +736,22 @@
         "PowerSafeHint": "Schaltet das Display aus, wenn kein Wechselrichter Strom erzeugt",
         "Screensaver": "Bildschirmschoner aktivieren:",
         "ScreensaverHint": "Bewegt die Ausgabe bei jeder Aktualisierung um ein Einbrennen zu verhindern (v. a. für OLED-Displays nützlich)",
+        "DiagramDuration": "Diagramm Periode:",
+        "DiagramDurationHint": "Die Zeitperiode welche im Diagramm dargestellt wird.",
+        "Seconds": "Sekunden",
         "Contrast": "Kontrast ({contrast}):",
         "Rotation": "Rotation:",
         "rot0": "Keine Rotation",
         "rot90": "90 Grad Drehung",
+        "rot180": "180 Grad Drehung",
+        "rot270": "270 Grad Drehung",
         "DisplayLanguage": "Displaysprache:",
         "en": "Englisch",
         "de": "Deutsch",
         "fr": "Französisch",
-        "rot180": "180 Grad Drehung",
-        "rot270": "270 Grad Drehung",
-        "Save": "@:dtuadmin.Save"
+        "Leds": "LEDs",
+        "EqualBrightness": "Gleiche Helligkeit:",
+        "LedBrightness": "LED {led} Helligkeit ({brightness}):"
     },
     "pininfo": {
         "PinOverview": "Anschlussübersicht",

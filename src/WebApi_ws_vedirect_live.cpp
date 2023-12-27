@@ -16,7 +16,7 @@ WebApiWsVedirectLiveClass::WebApiWsVedirectLiveClass()
 {
 }
 
-void WebApiWsVedirectLiveClass::init(AsyncWebServer* server)
+void WebApiWsVedirectLiveClass::init(AsyncWebServer& server)
 {
     using std::placeholders::_1;
     using std::placeholders::_2;
@@ -25,7 +25,7 @@ void WebApiWsVedirectLiveClass::init(AsyncWebServer* server)
     using std::placeholders::_5;
     using std::placeholders::_6;
 
-    _server = server;
+    _server = &server;
     _server->on("/api/vedirectlivedata/status", HTTP_GET, std::bind(&WebApiWsVedirectLiveClass::onLivedataStatus, this, _1));
 
     _server->addHandler(&_ws);
@@ -65,10 +65,10 @@ void WebApiWsVedirectLiveClass::loop()
             }
             
             if (buffer) {        
-                if (Configuration.get().Security_AllowReadonly) {
+                if (Configuration.get().Security.AllowReadonly) {
                     _ws.setAuthentication("", "");
                 } else {
-                    _ws.setAuthentication(AUTH_USERNAME, Configuration.get().Security_Password);
+                    _ws.setAuthentication(AUTH_USERNAME, Configuration.get().Security.Password);
                 }
 
                 _ws.textAll(buffer);
@@ -142,7 +142,7 @@ void WebApiWsVedirectLiveClass::generateJsonResponse(JsonVariant& root)
 
     // power limiter state
     root["dpl"]["PLSTATE"] = -1;
-    if (Configuration.get().PowerLimiter_Enabled)
+    if (Configuration.get().PowerLimiter.Enabled)
         root["dpl"]["PLSTATE"] = PowerLimiter.getPowerLimiterState();
     root["dpl"]["PLLIMIT"] = PowerLimiter.getLastRequestedPowerLimit();
 }

@@ -250,8 +250,8 @@ void Controller::deinit()
 Controller::Interface Controller::getInterface() const
 {
     CONFIG_T& config = Configuration.get();
-    if (0x00 == config.Battery_JkBmsInterface) { return Interface::Uart; }
-    if (0x01 == config.Battery_JkBmsInterface) { return Interface::Transceiver; }
+    if (0x00 == config.Battery.JkBmsInterface) { return Interface::Uart; }
+    if (0x01 == config.Battery.JkBmsInterface) { return Interface::Transceiver; }
     return Interface::Invalid;
 }
 
@@ -323,7 +323,7 @@ void Controller::sendRequest(uint8_t pollInterval)
 void Controller::loop()
 {
     CONFIG_T& config = Configuration.get();
-    uint8_t pollInterval = config.Battery_JkBmsPollingInterval;
+    uint8_t pollInterval = config.Battery.JkBmsPollingInterval;
 
     while (HwSerial.available()) {
         rxData(HwSerial.read());

@@ -1,6 +1,9 @@
 [
     {
         "name": "LILYGO TTGO T-Internet-POE",
+        "links": [
+            {"name": "Datasheet", "url": "https://www.lilygo.cc/products/t-internet-poe"}
+        ],
         "nrf24": {
             "miso": 2,
             "mosi": 15,
@@ -21,6 +24,9 @@
     },
     {
         "name": "LILYGO TTGO T-Internet-POE, nrf24 direct solder",
+        "links": [
+            {"name": "Datasheet", "url": "https://www.lilygo.cc/products/t-internet-poe"}
+        ],
         "nrf24": {
             "miso": 12,
             "mosi": 4,
@@ -41,6 +47,9 @@
     },
     {
         "name": "LILYGO TTGO T-Internet-POE, nrf24 direct solder, SSD1306",
+        "links": [
+            {"name": "Datasheet", "url": "https://www.lilygo.cc/products/t-internet-poe"}
+        ],
         "nrf24": {
             "miso": 12,
             "mosi": 4,

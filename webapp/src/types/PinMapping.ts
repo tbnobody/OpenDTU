@@ -34,6 +34,11 @@ export interface Display {
     reset: number;
 }
 
+export interface Links {
+    name: string;
+    url: string;
+}
+
 export interface Victron {
     rx: number;
     tx: number;
@@ -46,6 +51,7 @@ export interface Battery {
 
 export interface Device  {
     name: string;
+    links: Array<Links>;
     nrf24: Nrf24;
     cmt: Cmt2300;
     eth: Ethernet;

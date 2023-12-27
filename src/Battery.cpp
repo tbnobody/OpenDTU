@@ -20,21 +20,30 @@ std::shared_ptr<BatteryStats const> BatteryClass::getStats() const
     return _upProvider->getStats();
 }
 
-void BatteryClass::init()
+void BatteryClass::init(Scheduler& scheduler)
 {
+    scheduler.addTask(_loopTask);
+    _loopTask.setCallback(std::bind(&BatteryClass::loop, this));
+    _loopTask.setIterations(TASK_FOREVER);
+    _loopTask.enable();
     std::lock_guard<std::mutex> lock(_mutex);
 
+    this->updateSettings();
+}
+
+void BatteryClass::updateSettings()
+{
     if (_upProvider) {
         _upProvider->deinit();
         _upProvider = nullptr;
     }
 
     CONFIG_T& config = Configuration.get();
-    if (!config.Battery_Enabled) { return; }
+    if (!config.Battery.Enabled) { return; }
 
-    bool verboseLogging = config.Battery_VerboseLogging;
+    bool verboseLogging = config.Battery.VerboseLogging;
 
-    switch (config.Battery_Provider) {
+    switch (config.Battery.Provider) {
         case 0:
             _upProvider = std::make_unique<PylontechCanReceiver>();
             if (!_upProvider->init(verboseLogging)) { _upProvider = nullptr; }
@@ -48,10 +57,11 @@ void BatteryClass::init()
             if (!_upProvider->init(verboseLogging)) { _upProvider = nullptr; }
             break;
         default:
-            MessageOutput.printf("Unknown battery provider: %d\r\n", config.Battery_Provider);
+            MessageOutput.printf("Unknown battery provider: %d\r\n", config.Battery.Provider);
             break;
     }
 }
+
 
 void BatteryClass::loop()
 {
@@ -64,7 +74,7 @@ void BatteryClass::loop()
     CONFIG_T& config = Configuration.get();
 
     if (!MqttSettings.getConnected()
-            || (millis() - _lastMqttPublish) < (config.Mqtt_PublishInterval * 1000)) {
+            || (millis() - _lastMqttPublish) < (config.Mqtt.PublishInterval * 1000)) {
         return;
     }
 

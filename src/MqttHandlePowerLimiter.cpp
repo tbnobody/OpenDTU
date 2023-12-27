@@ -11,8 +11,13 @@
 
 MqttHandlePowerLimiterClass MqttHandlePowerLimiter;
 
-void MqttHandlePowerLimiterClass::init()
+void MqttHandlePowerLimiterClass::init(Scheduler& scheduler)
 {
+    scheduler.addTask(_loopTask);
+    _loopTask.setCallback(std::bind(&MqttHandlePowerLimiterClass::loop, this));
+    _loopTask.setIterations(TASK_FOREVER);
+    _loopTask.enable();
+
     using std::placeholders::_1;
     using std::placeholders::_2;
     using std::placeholders::_3;
@@ -35,7 +40,7 @@ void MqttHandlePowerLimiterClass::loop()
 
     const CONFIG_T& config = Configuration.get();
 
-    if ((millis() - _lastPublish) > (config.Mqtt_PublishInterval * 1000) ) {
+    if ((millis() - _lastPublish) > (config.Mqtt.PublishInterval * 1000) ) {
         auto val = static_cast<unsigned>(PowerLimiter.getMode());
         MqttSettings.publish("powerlimiter/status/mode", String(val));
 
@@ -51,7 +56,7 @@ void MqttHandlePowerLimiterClass::onCmdMode(const espMqttClientTypes::MessagePro
     const CONFIG_T& config = Configuration.get();
 
     // ignore messages if PowerLimiter is disabled
-    if (!config.PowerLimiter_Enabled) {
+    if (!config.PowerLimiter.Enabled) {
         return;
     }
 

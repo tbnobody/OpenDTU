@@ -5,7 +5,7 @@
 
 class HMT_Abstract : public HM_Abstract {
 public:
-    explicit HMT_Abstract(HoymilesRadio* radio, uint64_t serial);
+    explicit HMT_Abstract(HoymilesRadio* radio, const uint64_t serial);
 
     virtual bool sendChangeChannelRequest();
 };

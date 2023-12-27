@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * Copyright (C) 2022 Thomas Basler and others
+ * Copyright (C) 2022-2023 Thomas Basler and others
  */
 #include "WebApi_security.h"
 #include "Configuration.h"
@@ -9,11 +9,11 @@
 #include "helper.h"
 #include <AsyncJson.h>
 
-void WebApiSecurityClass::init(AsyncWebServer* server)
+void WebApiSecurityClass::init(AsyncWebServer& server)
 {
     using std::placeholders::_1;
 
-    _server = server;
+    _server = &server;
 
     _server->on("/api/security/config", HTTP_GET, std::bind(&WebApiSecurityClass::onSecurityGet, this, _1));
     _server->on("/api/security/config", HTTP_POST, std::bind(&WebApiSecurityClass::onSecurityPost, this, _1));
@@ -34,8 +34,8 @@ void WebApiSecurityClass::onSecurityGet(AsyncWebServerRequest* request)
     JsonObject root = response->getRoot();
     const CONFIG_T& config = Configuration.get();
 
-    root["password"] = config.Security_Password;
-    root["allow_readonly"] = config.Security_AllowReadonly;
+    root["password"] = config.Security.Password;
+    root["allow_readonly"] = config.Security.AllowReadonly;
 
     response->setLength();
     request->send(response);
@@ -59,7 +59,7 @@ void WebApiSecurityClass::onSecurityPost(AsyncWebServerRequest* request)
         return;
     }
 
-    String json = request->getParam("data", true)->value();
+    const String json = request->getParam("data", true)->value();
 
     if (json.length() > 1024) {
         retMsg["message"] = "Data too large!";
@@ -70,7 +70,7 @@ void WebApiSecurityClass::onSecurityPost(AsyncWebServerRequest* request)
     }
 
     DynamicJsonDocument root(1024);
-    DeserializationError error = deserializeJson(root, json);
+    const DeserializationError error = deserializeJson(root, json);
 
     if (error) {
         retMsg["message"] = "Failed to parse data!";
@@ -99,8 +99,8 @@ void WebApiSecurityClass::onSecurityPost(AsyncWebServerRequest* request)
     }
 
     CONFIG_T& config = Configuration.get();
-    strlcpy(config.Security_Password, root["password"].as<String>().c_str(), sizeof(config.Security_Password));
-    config.Security_AllowReadonly = root["allow_readonly"].as<bool>();
+    strlcpy(config.Security.Password, root["password"].as<String>().c_str(), sizeof(config.Security.Password));
+    config.Security.AllowReadonly = root["allow_readonly"].as<bool>();
     Configuration.write();
 
     retMsg["type"] = "success";

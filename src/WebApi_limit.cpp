@@ -1,18 +1,20 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * Copyright (C) 2022 Thomas Basler and others
+ * Copyright (C) 2022-2023 Thomas Basler and others
  */
 #include "WebApi_limit.h"
 #include "WebApi.h"
 #include "WebApi_errors.h"
+#include "defaults.h"
+#include "helper.h"
 #include <AsyncJson.h>
 #include <Hoymiles.h>
 
-void WebApiLimitClass::init(AsyncWebServer* server)
+void WebApiLimitClass::init(AsyncWebServer& server)
 {
     using std::placeholders::_1;
 
-    _server = server;
+    _server = &server;
 
     _server->on("/api/limit/status", HTTP_GET, std::bind(&WebApiLimitClass::onLimitStatus, this, _1));
     _server->on("/api/limit/config", HTTP_POST, std::bind(&WebApiLimitClass::onLimitPost, this, _1));
@@ -73,7 +75,7 @@ void WebApiLimitClass::onLimitPost(AsyncWebServerRequest* request)
         return;
     }
 
-    String json = request->getParam("data", true)->value();
+    const String json = request->getParam("data", true)->value();
 
     if (json.length() > 1024) {
         retMsg["message"] = "Data too large!";
@@ -84,7 +86,7 @@ void WebApiLimitClass::onLimitPost(AsyncWebServerRequest* request)
     }
 
     DynamicJsonDocument root(1024);
-    DeserializationError error = deserializeJson(root, json);
+    const DeserializationError error = deserializeJson(root, json);
 
     if (error) {
         retMsg["message"] = "Failed to parse data!";
@@ -112,10 +114,10 @@ void WebApiLimitClass::onLimitPost(AsyncWebServerRequest* request)
         return;
     }
 
-    if (root["limit_value"].as<uint16_t>() == 0 || root["limit_value"].as<uint16_t>() > 2250) {
-        retMsg["message"] = "Limit must between 1 and 2250!";
+    if (root["limit_value"].as<uint16_t>() > MAX_INVERTER_LIMIT) {
+        retMsg["message"] = "Limit must between 0 and " STR(MAX_INVERTER_LIMIT) "!";
         retMsg["code"] = WebApiError::LimitInvalidLimit;
-        retMsg["param"]["max"] = 2250;
+        retMsg["param"]["max"] = MAX_INVERTER_LIMIT;
         response->setLength();
         request->send(response);
         return;

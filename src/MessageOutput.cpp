@@ -1,105 +1,63 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * Copyright (C) 2022 Thomas Basler and others
+ * Copyright (C) 2022-2023 Thomas Basler and others
  */
-#include <HardwareSerial.h>
 #include "MessageOutput.h"
+
+#include <Arduino.h>
 
 MessageOutputClass MessageOutput;
 
-void MessageOutputClass::register_ws_output(AsyncWebSocket* output)
+void MessageOutputClass::init(Scheduler& scheduler)
 {
-    std::lock_guard<std::mutex> lock(_msgLock);
-
-    _ws = output;
+    scheduler.addTask(_loopTask);
+    _loopTask.setCallback(std::bind(&MessageOutputClass::loop, this));
+    _loopTask.setIterations(TASK_FOREVER);
+    _loopTask.enable();
 }
 
-void MessageOutputClass::serialWrite(MessageOutputClass::message_t const& m)
+void MessageOutputClass::register_ws_output(AsyncWebSocket* output)
 {
-    // on ESP32-S3, Serial.flush() blocks until a serial console is attached.
-    // operator bool() of HWCDC returns false if the device is not attached to
-    // a USB host. in general it makes sense to skip writing entirely if the
-    // default serial port is not ready.
-    if (!Serial) { return; }
-
-    size_t written = 0;
-    while (written < m.size()) {
-        written += Serial.write(m.data() + written, m.size() - written);
-    }
-    Serial.flush();
+    _ws = output;
 }
 
 size_t MessageOutputClass::write(uint8_t c)
 {
-    std::lock_guard<std::mutex> lock(_msgLock);
-
-    auto res = _task_messages.emplace(xTaskGetCurrentTaskHandle(), message_t());
-    auto iter = res.first;
-    auto& message = iter->second;
-
-    message.push_back(c);
-
-    if (c == '\n') {
-        serialWrite(message);
-        _lines.emplace(std::move(message));
-        _task_messages.erase(iter);
+    if (_buff_pos < BUFFER_SIZE) {
+        std::lock_guard<std::mutex> lock(_msgLock);
+        _buffer[_buff_pos] = c;
+        _buff_pos++;
+    } else {
+        _forceSend = true;
     }
 
-    return 1;
+    return Serial.write(c);
 }
 
-size_t MessageOutputClass::write(const uint8_t *buffer, size_t size)
+size_t MessageOutputClass::write(const uint8_t* buffer, size_t size)
 {
     std::lock_guard<std::mutex> lock(_msgLock);
-
-    auto res = _task_messages.emplace(xTaskGetCurrentTaskHandle(), message_t());
-    auto iter = res.first;
-    auto& message = iter->second;
-
-    message.reserve(message.size() + size);
-
-    for (size_t idx = 0; idx < size; ++idx) {
-        uint8_t c = buffer[idx];
-
-        message.push_back(c);
-
-        if (c == '\n') {
-            serialWrite(message);
-            _lines.emplace(std::move(message));
-            message.clear();
-            message.reserve(size - idx - 1);
-        }
+    if (_buff_pos + size < BUFFER_SIZE) {
+        memcpy(&_buffer[_buff_pos], buffer, size);
+        _buff_pos += size;
     }
+    _forceSend = true;
 
-    if (message.empty()) { _task_messages.erase(iter); }
-
-    return size;
+    return Serial.write(buffer, size);
 }
 
 void MessageOutputClass::loop()
 {
-    std::lock_guard<std::mutex> lock(_msgLock);
-
-    // clean up (possibly filled) buffers of deleted tasks
-    auto map_iter = _task_messages.begin();
-    while (map_iter != _task_messages.end()) {
-        if (eTaskGetState(map_iter->first) == eDeleted) {
-            map_iter = _task_messages.erase(map_iter);
-            continue;
+    // Send data via websocket if either time is over or buffer is full
+    if (_forceSend || (millis() - _lastSend > 1000)) {
+        std::lock_guard<std::mutex> lock(_msgLock);
+        if (_ws && _buff_pos > 0) {
+            _ws->textAll(_buffer, _buff_pos);
+            _buff_pos = 0;
         }
-
-        ++map_iter;
-    }
-
-    if (!_ws) {
-        while (!_lines.empty()) {
-            _lines.pop(); // do not hog memory
+        if (_forceSend) {
+            _buff_pos = 0;
         }
-        return;
-    }
-
-    while (!_lines.empty() && _ws->availableForWriteAll()) {
-        _ws->textAll(std::make_shared<message_t>(std::move(_lines.front())));
-        _lines.pop();
+        _forceSend = false;
     }
 }

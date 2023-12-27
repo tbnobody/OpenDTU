@@ -9,14 +9,18 @@
 
 MqttHandlePylontechHassClass MqttHandlePylontechHass;
 
-void MqttHandlePylontechHassClass::init()
+void MqttHandlePylontechHassClass::init(Scheduler& scheduler)
 {
+    scheduler.addTask(_loopTask);
+    _loopTask.setCallback(std::bind(&MqttHandlePylontechHassClass::loop, this));
+    _loopTask.setIterations(TASK_FOREVER);
+    _loopTask.enable();
 }
 
 void MqttHandlePylontechHassClass::loop()
 {
     CONFIG_T& config = Configuration.get();
-    if (!config.Battery_Enabled) {
+    if (!config.Battery.Enabled) {
         return;
     }
     if (_updateForced) {
@@ -42,7 +46,7 @@ void MqttHandlePylontechHassClass::forceUpdate()
 void MqttHandlePylontechHassClass::publishConfig()
 {
     CONFIG_T& config = Configuration.get();
-    if ((!config.Mqtt_Hass_Enabled) || (!config.Battery_Enabled)) {
+    if ((!config.Mqtt.Hass.Enabled) || (!config.Battery.Enabled)) {
         return;
     }
 
@@ -111,29 +115,29 @@ void MqttHandlePylontechHassClass::publishSensor(const char* caption, const char
     statTopic.concat(subTopic);
 
     DynamicJsonDocument root(1024);
-    root[F("name")] = caption;
-    root[F("stat_t")] = statTopic;
-    root[F("uniq_id")] = serial + "_" + sensorId;
+    root["name"] = caption;
+    root["stat_t"] = statTopic;
+    root["uniq_id"] = serial + "_" + sensorId;
 
     if (icon != NULL) {
-        root[F("icon")] = icon;
+        root["icon"] = icon;
     }
 
     if (unitOfMeasurement != NULL) {
-        root[F("unit_of_meas")] = unitOfMeasurement;
+        root["unit_of_meas"] = unitOfMeasurement;
     }
 
     JsonObject deviceObj = root.createNestedObject("dev");
     createDeviceInfo(deviceObj);
 
-    if (Configuration.get().Mqtt_Hass_Expire) {
-        root[F("exp_aft")] = Configuration.get().Mqtt_PublishInterval * 3;
+    if (Configuration.get().Mqtt.Hass.Expire) {
+        root["exp_aft"] = Configuration.get().Mqtt.PublishInterval * 3;
     }
     if (deviceClass != NULL) {
-        root[F("dev_cla")] = deviceClass;
+        root["dev_cla"] = deviceClass;
     }
     if (stateClass != NULL) {
-        root[F("stat_cla")] = stateClass;
+        root["stat_cla"] = stateClass;
     }
 
     char buffer[512];
@@ -162,14 +166,14 @@ void MqttHandlePylontechHassClass::publishBinarySensor(const char* caption, cons
     statTopic.concat(subTopic);
 
     DynamicJsonDocument root(1024);
-    root[F("name")] = caption;
-    root[F("uniq_id")] = serial + "_" + sensorId;
-    root[F("stat_t")] = statTopic;
-    root[F("pl_on")] = payload_on;
-    root[F("pl_off")] = payload_off;
+    root["name"] = caption;
+    root["uniq_id"] = serial + "_" + sensorId;
+    root["stat_t"] = statTopic;
+    root["pl_on"] = payload_on;
+    root["pl_off"] = payload_off;
 
     if (icon != NULL) {
-        root[F("icon")] = icon;
+        root["icon"] = icon;
     }
 
     JsonObject deviceObj = root.createNestedObject("dev");
@@ -182,17 +186,17 @@ void MqttHandlePylontechHassClass::publishBinarySensor(const char* caption, cons
 
 void MqttHandlePylontechHassClass::createDeviceInfo(JsonObject& object)
 {
-    object[F("name")] = "Battery(" + serial + ")";
-    object[F("ids")] = serial;
-    object[F("cu")] = String(F("http://")) + NetworkSettings.localIP().toString();
-    object[F("mf")] = F("OpenDTU");
-    object[F("mdl")] = Battery.getStats()->getManufacturer();
-    object[F("sw")] = AUTO_GIT_HASH;
+    object["name"] = "Battery(" + serial + ")";
+    object["ids"] = serial;
+    object["cu"] = String("http://") + NetworkSettings.localIP().toString();
+    object["mf"] = "OpenDTU";
+    object["mdl"] = Battery.getStats()->getManufacturer();
+    object["sw"] = AUTO_GIT_HASH;
 }
 
 void MqttHandlePylontechHassClass::publish(const String& subtopic, const String& payload)
 {
-    String topic = Configuration.get().Mqtt_Hass_Topic;
+    String topic = Configuration.get().Mqtt.Hass.Topic;
     topic += subtopic;
-    MqttSettings.publishGeneric(topic.c_str(), payload.c_str(), Configuration.get().Mqtt_Hass_Retain);
+    MqttSettings.publishGeneric(topic.c_str(), payload.c_str(), Configuration.get().Mqtt.Hass.Retain);
 }

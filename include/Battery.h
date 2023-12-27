@@ -4,6 +4,7 @@
 #include <stdint.h>
 #include <memory>
 #include <mutex>
+#include <TaskSchedulerDeclarations.h>
 
 #include "BatteryStats.h"
 
@@ -19,12 +20,15 @@ class BatteryProvider {
 
 class BatteryClass {
     public:
-        void init();
-        void loop();
+        void init(Scheduler&);
+        void updateSettings();
 
         std::shared_ptr<BatteryStats const> getStats() const;
-
     private:
+        void loop();
+
+        Task _loopTask;
+
         uint32_t _lastMqttPublish = 0;
         mutable std::mutex _mutex;
         std::unique_ptr<BatteryProvider> _upProvider = nullptr;

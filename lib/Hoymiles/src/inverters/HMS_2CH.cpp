@@ -35,27 +35,27 @@ static const byteAssign_t byteAssignment[] = {
     { TYPE_AC, CH0, FLD_EFF, UNIT_PCT, CALC_EFF_CH0, 0, CMD_CALC, false, 3 }
 };
 
-HMS_2CH::HMS_2CH(HoymilesRadio* radio, uint64_t serial)
+HMS_2CH::HMS_2CH(HoymilesRadio* radio, const uint64_t serial)
     : HMS_Abstract(radio, serial) {};
 
-bool HMS_2CH::isValidSerial(uint64_t serial)
+bool HMS_2CH::isValidSerial(const uint64_t serial)
 {
     // serial >= 0x114400000000 && serial <= 0x114499999999
     uint16_t preSerial = (serial >> 32) & 0xffff;
     return preSerial == 0x1144;
 }
 
-String HMS_2CH::typeName()
+String HMS_2CH::typeName() const
 {
     return "HMS-600/700/800/900/1000-2T";
 }
 
-const byteAssign_t* HMS_2CH::getByteAssignment()
+const byteAssign_t* HMS_2CH::getByteAssignment() const
 {
     return byteAssignment;
 }
 
-uint8_t HMS_2CH::getByteAssignmentSize()
+uint8_t HMS_2CH::getByteAssignmentSize() const
 {
     return sizeof(byteAssignment) / sizeof(byteAssignment[0]);
 }

@@ -30,12 +30,12 @@
 #include "WebApi_Huawei.h"
 #include "WebApi_ws_battery.h"
 #include <ESPAsyncWebServer.h>
+#include <TaskSchedulerDeclarations.h>
 
 class WebApiClass {
 public:
     WebApiClass();
-    void init();
-    void loop();
+    void init(Scheduler& scheduler);
 
     static bool checkCredentials(AsyncWebServerRequest* request);
     static bool checkCredentialsReadonly(AsyncWebServerRequest* request);
@@ -43,8 +43,11 @@ public:
     static void sendTooManyRequests(AsyncWebServerRequest* request);
 
 private:
+    void loop();
+
+    Task _loopTask;
+
     AsyncWebServer _server;
-    AsyncEventSource _events;
 
     WebApiBatteryClass _webApiBattery;
     WebApiConfigClass _webApiConfig;

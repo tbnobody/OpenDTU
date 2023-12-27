@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 #pragma once
 
+#include "PinMapping.h"
 #include <cstdint>
 
 #define CONFIG_FILENAME "/config.json"
@@ -57,6 +58,7 @@ struct INVERTER_CONFIG_T {
     uint8_t ReachableThreshold;
     bool ZeroRuntimeDataIfUnrechable;
     bool ZeroYieldDayOnMidnight;
+    bool YieldDayCorrection;
     CHANNEL_CONFIG_T channel[INV_MAX_CHAN_COUNT];
 };
 
@@ -74,128 +76,171 @@ struct POWERMETER_HTTP_PHASE_CONFIG_T {
 };
 
 struct CONFIG_T {
-    uint32_t Cfg_Version;
-    uint32_t Cfg_SaveCount;
+    struct {
+        uint32_t Version;
+        uint32_t SaveCount;
+    } Cfg;
 
-    char WiFi_Ssid[WIFI_MAX_SSID_STRLEN + 1];
-    char WiFi_Password[WIFI_MAX_PASSWORD_STRLEN + 1];
-    uint8_t WiFi_Ip[4];
-    uint8_t WiFi_Netmask[4];
-    uint8_t WiFi_Gateway[4];
-    uint8_t WiFi_Dns1[4];
-    uint8_t WiFi_Dns2[4];
-    bool WiFi_Dhcp;
-    char WiFi_Hostname[WIFI_MAX_HOSTNAME_STRLEN + 1];
-    uint32_t WiFi_ApTimeout;
+    struct {
+        char Ssid[WIFI_MAX_SSID_STRLEN + 1];
+        char Password[WIFI_MAX_PASSWORD_STRLEN + 1];
+        uint8_t Ip[4];
+        uint8_t Netmask[4];
+        uint8_t Gateway[4];
+        uint8_t Dns1[4];
+        uint8_t Dns2[4];
+        bool Dhcp;
+        char Hostname[WIFI_MAX_HOSTNAME_STRLEN + 1];
+        uint32_t ApTimeout;
+    } WiFi;
 
-    bool Mdns_Enabled;
+    struct {
+        bool Enabled;
+    } Mdns;
 
-    char Ntp_Server[NTP_MAX_SERVER_STRLEN + 1];
-    char Ntp_Timezone[NTP_MAX_TIMEZONE_STRLEN + 1];
-    char Ntp_TimezoneDescr[NTP_MAX_TIMEZONEDESCR_STRLEN + 1];
-    double Ntp_Longitude;
-    double Ntp_Latitude;
-    uint8_t Ntp_SunsetType;
+    struct {
+        char Server[NTP_MAX_SERVER_STRLEN + 1];
+        char Timezone[NTP_MAX_TIMEZONE_STRLEN + 1];
+        char TimezoneDescr[NTP_MAX_TIMEZONEDESCR_STRLEN + 1];
+        double Longitude;
+        double Latitude;
+        uint8_t SunsetType;
+    } Ntp;
 
-    bool Mqtt_Enabled;
-    char Mqtt_Hostname[MQTT_MAX_HOSTNAME_STRLEN + 1];
-    bool Mqtt_VerboseLogging;
-    uint32_t Mqtt_Port;
-    char Mqtt_Username[MQTT_MAX_USERNAME_STRLEN + 1];
-    char Mqtt_Password[MQTT_MAX_PASSWORD_STRLEN + 1];
-    char Mqtt_Topic[MQTT_MAX_TOPIC_STRLEN + 1];
-    bool Mqtt_Retain;
-    char Mqtt_LwtTopic[MQTT_MAX_TOPIC_STRLEN + 1];
-    char Mqtt_LwtValue_Online[MQTT_MAX_LWTVALUE_STRLEN + 1];
-    char Mqtt_LwtValue_Offline[MQTT_MAX_LWTVALUE_STRLEN + 1];
-    uint32_t Mqtt_PublishInterval;
-    bool Mqtt_CleanSession;
+    struct {
+        bool Enabled;
+        char Hostname[MQTT_MAX_HOSTNAME_STRLEN + 1];
+        bool VerboseLogging;
+        uint32_t Port;
+        char Username[MQTT_MAX_USERNAME_STRLEN + 1];
+        char Password[MQTT_MAX_PASSWORD_STRLEN + 1];
+        char Topic[MQTT_MAX_TOPIC_STRLEN + 1];
+        bool Retain;
+        uint32_t PublishInterval;
+        bool CleanSession;
+
+        struct {
+            char Topic[MQTT_MAX_TOPIC_STRLEN + 1];
+            char Value_Online[MQTT_MAX_LWTVALUE_STRLEN + 1];
+            char Value_Offline[MQTT_MAX_LWTVALUE_STRLEN + 1];
+            uint8_t Qos;
+        } Lwt;
+
+        struct {
+            bool Enabled;
+            bool Retain;
+            char Topic[MQTT_MAX_TOPIC_STRLEN + 1];
+            bool IndividualPanels;
+            bool Expire;
+        } Hass;
+
+        struct {
+            bool Enabled;
+            char RootCaCert[MQTT_MAX_CERT_STRLEN + 1];
+            bool CertLogin;
+            char ClientCert[MQTT_MAX_CERT_STRLEN + 1];
+            char ClientKey[MQTT_MAX_CERT_STRLEN + 1];
+        } Tls;
+    } Mqtt;
+
+    struct {
+        uint64_t Serial;
+        uint32_t PollInterval;
+        struct {
+            uint8_t PaLevel;
+        } Nrf;
+        struct {
+            int8_t PaLevel;
+            uint32_t Frequency;
+        } Cmt;
+        bool VerboseLogging;
+    } Dtu;
+
+    struct {
+        char Password[WIFI_MAX_PASSWORD_STRLEN + 1];
+        bool AllowReadonly;
+    } Security;
+
+    struct {
+        bool PowerSafe;
+        bool ScreenSaver;
+        uint8_t Rotation;
+        uint8_t Contrast;
+        uint8_t Language;
+        uint32_t DiagramDuration;
+    } Display;
+
+    struct {
+        uint8_t Brightness;
+    } Led_Single[PINMAPPING_LED_COUNT];
+
+    struct {
+        bool Enabled;
+        bool VerboseLogging;
+        bool UpdatesOnly;
+    } Vedirect;
+
+    struct {
+        bool Enabled;
+        bool VerboseLogging;
+        uint32_t Interval;
+        uint32_t Source;
+        char MqttTopicPowerMeter1[MQTT_MAX_TOPIC_STRLEN + 1];
+        char MqttTopicPowerMeter2[MQTT_MAX_TOPIC_STRLEN + 1];
+        char MqttTopicPowerMeter3[MQTT_MAX_TOPIC_STRLEN + 1];
+        uint32_t SdmBaudrate;
+        uint32_t SdmAddress;
+        uint32_t HttpInterval;
+        bool HttpIndividualRequests;
+        POWERMETER_HTTP_PHASE_CONFIG_T Http_Phase[POWERMETER_MAX_PHASES];
+    } PowerMeter;
+    
+    struct {
+        bool Enabled;
+        bool VerboseLogging;
+        bool SolarPassThroughEnabled;
+        uint8_t SolarPassThroughLosses;
+        uint8_t BatteryDrainStategy;
+        uint32_t Interval;
+        bool IsInverterBehindPowerMeter;
+        uint8_t InverterId;
+        uint8_t InverterChannelId;
+        int32_t TargetPowerConsumption;
+        int32_t TargetPowerConsumptionHysteresis;
+        int32_t LowerPowerLimit;
+        int32_t UpperPowerLimit;
+        uint32_t BatterySocStartThreshold;
+        uint32_t BatterySocStopThreshold;
+        float VoltageStartThreshold;
+        float VoltageStopThreshold;
+        float VoltageLoadCorrectionFactor;
+        int8_t RestartHour;
+        uint32_t FullSolarPassThroughSoc;
+        float FullSolarPassThroughStartVoltage;
+        float FullSolarPassThroughStopVoltage;
+    } PowerLimiter;
+    
+    struct {
+        bool Enabled;
+        bool VerboseLogging;
+        uint8_t Provider;
+        uint8_t JkBmsInterface;
+        uint8_t JkBmsPollingInterval;
+    } Battery;
+
+    struct {
+        bool Enabled;
+        uint32_t CAN_Controller_Frequency;
+        bool Auto_Power_Enabled;
+        float Auto_Power_Voltage_Limit;
+        float Auto_Power_Enable_Voltage_Limit;
+        float Auto_Power_Lower_Power_Limit;
+        float Auto_Power_Upper_Power_Limit;   
+    } Huawei;
+
 
     INVERTER_CONFIG_T Inverter[INV_MAX_COUNT];
-
-    uint64_t Dtu_Serial;
-    uint32_t Dtu_PollInterval;
-    bool Dtu_VerboseLogging;
-    uint8_t Dtu_NrfPaLevel;
-    int8_t Dtu_CmtPaLevel;
-    uint32_t Dtu_CmtFrequency;
-
-    bool Mqtt_Hass_Enabled;
-    bool Mqtt_Hass_Retain;
-    char Mqtt_Hass_Topic[MQTT_MAX_TOPIC_STRLEN + 1];
-    bool Mqtt_Hass_IndividualPanels;
-    bool Mqtt_Hass_Expire;
-
-    bool Mqtt_Tls;
-    char Mqtt_RootCaCert[MQTT_MAX_CERT_STRLEN + 1];
-    bool Mqtt_TlsCertLogin;
-    char Mqtt_ClientCert[MQTT_MAX_CERT_STRLEN + 1];
-    char Mqtt_ClientKey[MQTT_MAX_CERT_STRLEN +1];
-
-    bool Vedirect_Enabled;
-    bool Vedirect_VerboseLogging;
-    bool Vedirect_UpdatesOnly;
-
-    bool PowerMeter_Enabled;
-    bool PowerMeter_VerboseLogging;
-    uint32_t PowerMeter_Interval;
-    uint32_t PowerMeter_Source;
-    char PowerMeter_MqttTopicPowerMeter1[MQTT_MAX_TOPIC_STRLEN + 1];
-    char PowerMeter_MqttTopicPowerMeter2[MQTT_MAX_TOPIC_STRLEN + 1];
-    char PowerMeter_MqttTopicPowerMeter3[MQTT_MAX_TOPIC_STRLEN + 1];
-    uint32_t PowerMeter_SdmBaudrate;
-    uint32_t PowerMeter_SdmAddress;
-    uint32_t PowerMeter_HttpInterval;
-    bool PowerMeter_HttpIndividualRequests;
-    POWERMETER_HTTP_PHASE_CONFIG_T Powermeter_Http_Phase[POWERMETER_MAX_PHASES];
-
-    bool PowerLimiter_Enabled;
-    bool PowerLimiter_VerboseLogging;
-    bool PowerLimiter_SolarPassThroughEnabled;
-    uint8_t PowerLimiter_SolarPassThroughLosses;
-    uint8_t PowerLimiter_BatteryDrainStategy;
-    uint32_t PowerLimiter_Interval;
-    bool PowerLimiter_IsInverterBehindPowerMeter;
-    uint8_t PowerLimiter_InverterId;
-    uint8_t PowerLimiter_InverterChannelId;
-    int32_t PowerLimiter_TargetPowerConsumption;
-    int32_t PowerLimiter_TargetPowerConsumptionHysteresis;
-    int32_t PowerLimiter_LowerPowerLimit;
-    int32_t PowerLimiter_UpperPowerLimit;
-    uint32_t PowerLimiter_BatterySocStartThreshold;
-    uint32_t PowerLimiter_BatterySocStopThreshold;
-    float PowerLimiter_VoltageStartThreshold;
-    float PowerLimiter_VoltageStopThreshold;
-    float PowerLimiter_VoltageLoadCorrectionFactor;
-    int8_t PowerLimiter_RestartHour;
-    uint32_t PowerLimiter_FullSolarPassThroughSoc;
-    float PowerLimiter_FullSolarPassThroughStartVoltage;
-    float PowerLimiter_FullSolarPassThroughStopVoltage;
-
-    bool Battery_Enabled;
-    bool Battery_VerboseLogging;
-    uint8_t Battery_Provider;
-    uint8_t Battery_JkBmsInterface;
-    uint8_t Battery_JkBmsPollingInterval;
-
-    bool Huawei_Enabled;
-    uint32_t Huawei_CAN_Controller_Frequency;
-    bool Huawei_Auto_Power_Enabled;
-    float Huawei_Auto_Power_Voltage_Limit;
-    float Huawei_Auto_Power_Enable_Voltage_Limit;
-    float Huawei_Auto_Power_Lower_Power_Limit;
-    float Huawei_Auto_Power_Upper_Power_Limit;   
-
-    char Security_Password[WIFI_MAX_PASSWORD_STRLEN + 1];
-    bool Security_AllowReadonly;
-
     char Dev_PinMapping[DEV_MAX_MAPPING_NAME_STRLEN + 1];
-
-    bool Display_PowerSafe;
-    bool Display_ScreenSaver;
-    uint8_t Display_Rotation;
-    uint8_t Display_Contrast;
-    uint8_t Display_Language;
 };
 
 class ConfigurationClass {
@@ -207,7 +252,7 @@ public:
     CONFIG_T& get();
 
     INVERTER_CONFIG_T* getFreeInverterSlot();
-    INVERTER_CONFIG_T* getInverterConfig(uint64_t serial);
+    INVERTER_CONFIG_T* getInverterConfig(const uint64_t serial);
 };
 
 extern ConfigurationClass Configuration;

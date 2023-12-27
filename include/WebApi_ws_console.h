@@ -6,12 +6,10 @@
 class WebApiWsConsoleClass {
 public:
     WebApiWsConsoleClass();
-    void init(AsyncWebServer* server);
+    void init(AsyncWebServer& server);
     void loop();
 
 private:
-    void onWebsocketEvent(AsyncWebSocket* server, AsyncWebSocketClient* client, AwsEventType type, void* arg, uint8_t* data, size_t len);
-
     AsyncWebServer* _server;
     AsyncWebSocket _ws;
 

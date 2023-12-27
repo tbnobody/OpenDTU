@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * Copyright (C) 2022 Thomas Basler and others
+ * Copyright (C) 2022-2023 Thomas Basler and others
  */
 #include "WebApi_ws_live.h"
 #include "Configuration.h"
@@ -19,7 +19,7 @@ WebApiWsLiveClass::WebApiWsLiveClass()
 {
 }
 
-void WebApiWsLiveClass::init(AsyncWebServer* server)
+void WebApiWsLiveClass::init(AsyncWebServer& server)
 {
     using std::placeholders::_1;
     using std::placeholders::_2;
@@ -28,7 +28,7 @@ void WebApiWsLiveClass::init(AsyncWebServer* server)
     using std::placeholders::_5;
     using std::placeholders::_6;
 
-    _server = server;
+    _server = &server;
     _server->on("/api/livedata/status", HTTP_GET, std::bind(&WebApiWsLiveClass::onLivedataStatus, this, _1));
 
     _server->addHandler(&_ws);
@@ -75,10 +75,10 @@ void WebApiWsLiveClass::loop()
             if (buffer) {
                 serializeJson(root, buffer);
 
-                if (Configuration.get().Security_AllowReadonly) {
+                if (Configuration.get().Security.AllowReadonly) {
                     _ws.setAuthentication("", "");
                 } else {
-                    _ws.setAuthentication(AUTH_USERNAME, Configuration.get().Security_Password);
+                    _ws.setAuthentication(AUTH_USERNAME, Configuration.get().Security.Password);
                 }
 
                 _ws.textAll(buffer);
@@ -176,14 +176,14 @@ void WebApiWsLiveClass::generateJsonResponse(JsonVariant& root)
     struct tm timeinfo;
     hintObj["time_sync"] = !getLocalTime(&timeinfo, 5);
     hintObj["radio_problem"] = (Hoymiles.getRadioNrf()->isInitialized() && (!Hoymiles.getRadioNrf()->isConnected() || !Hoymiles.getRadioNrf()->isPVariant())) || (Hoymiles.getRadioCmt()->isInitialized() && (!Hoymiles.getRadioCmt()->isConnected()));
-    if (!strcmp(Configuration.get().Security_Password, ACCESS_POINT_PASSWORD)) {
+    if (!strcmp(Configuration.get().Security.Password, ACCESS_POINT_PASSWORD)) {
         hintObj["default_password"] = true;
     } else {
         hintObj["default_password"] = false;
     }
 
     JsonObject vedirectObj = root.createNestedObject("vedirect");
-    vedirectObj[F("enabled")] = Configuration.get().Vedirect_Enabled;
+    vedirectObj[F("enabled")] = Configuration.get().Vedirect.Enabled;
     JsonObject totalVeObj = vedirectObj.createNestedObject("total");
 
     addTotalField(totalVeObj, "Power", VictronMppt.getPanelPowerWatts(), "W", 1);
@@ -191,21 +191,21 @@ void WebApiWsLiveClass::generateJsonResponse(JsonVariant& root)
     addTotalField(totalVeObj, "YieldTotal", VictronMppt.getYieldTotal(), "kWh", 2);
 
     JsonObject huaweiObj = root.createNestedObject("huawei");
-    huaweiObj[F("enabled")] = Configuration.get().Huawei_Enabled;
+    huaweiObj[F("enabled")] = Configuration.get().Huawei.Enabled;
     const RectifierParameters_t * rp = HuaweiCan.get();
     addTotalField(huaweiObj, "Power", rp->output_power, "W", 2);
     
     JsonObject batteryObj = root.createNestedObject("battery");
-    batteryObj[F("enabled")] = Configuration.get().Battery_Enabled;
+    batteryObj[F("enabled")] = Configuration.get().Battery.Enabled;
     addTotalField(batteryObj, "soc", Battery.getStats()->getSoC(), "%", 0);
 
     JsonObject powerMeterObj = root.createNestedObject("power_meter");
-    powerMeterObj[F("enabled")] = Configuration.get().PowerMeter_Enabled;
+    powerMeterObj[F("enabled")] = Configuration.get().PowerMeter.Enabled;
     addTotalField(powerMeterObj, "Power", PowerMeter.getPowerTotal(false), "W", 1);
 
 }
 
-void WebApiWsLiveClass::addField(JsonObject& root, uint8_t idx, std::shared_ptr<InverterAbstract> inv, ChannelType_t type, ChannelNum_t channel, FieldId_t fieldId, String topic)
+void WebApiWsLiveClass::addField(JsonObject& root, uint8_t idx, std::shared_ptr<InverterAbstract> inv, const ChannelType_t type, const ChannelNum_t channel, const FieldId_t fieldId, String topic)
 {
     if (inv->Statistics()->hasChannelFieldValue(type, channel, fieldId)) {
         String chanName;
@@ -222,7 +222,7 @@ void WebApiWsLiveClass::addField(JsonObject& root, uint8_t idx, std::shared_ptr<
     }
 }
 
-void WebApiWsLiveClass::addTotalField(JsonObject& root, String name, float value, String unit, uint8_t digits)
+void WebApiWsLiveClass::addTotalField(JsonObject& root, const String& name, const float value, const String& unit, const uint8_t digits)
 {
     root[name]["v"] = value;
     root[name]["u"] = unit;

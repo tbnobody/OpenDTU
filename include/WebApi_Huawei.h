@@ -6,7 +6,7 @@
 
 class WebApiHuaweiClass {
 public:
-    void init(AsyncWebServer* server);
+    void init(AsyncWebServer& server);
     void loop();
     void getJsonData(JsonObject& root);
 private:

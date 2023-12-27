@@ -18,7 +18,7 @@ void SystemConfigParaParser::clearBuffer()
     _payloadLength = 0;
 }
 
-void SystemConfigParaParser::appendFragment(uint8_t offset, uint8_t* payload, uint8_t len)
+void SystemConfigParaParser::appendFragment(const uint8_t offset, const uint8_t* payload, const uint8_t len)
 {
     if (offset + len > (SYSTEM_CONFIG_PARA_SIZE)) {
         Hoymiles.getMessageOutput()->printf("FATAL: (%s, %d) stats packet too large for buffer\r\n", __FILE__, __LINE__);
@@ -28,15 +28,15 @@ void SystemConfigParaParser::appendFragment(uint8_t offset, uint8_t* payload, ui
     _payloadLength += len;
 }
 
-float SystemConfigParaParser::getLimitPercent()
+float SystemConfigParaParser::getLimitPercent() const
 {
     HOY_SEMAPHORE_TAKE();
-    float ret = ((((uint16_t)_payload[2]) << 8) | _payload[3]) / 10.0;
+    const float ret = ((((uint16_t)_payload[2]) << 8) | _payload[3]) / 10.0;
     HOY_SEMAPHORE_GIVE();
     return ret;
 }
 
-void SystemConfigParaParser::setLimitPercent(float value)
+void SystemConfigParaParser::setLimitPercent(const float value)
 {
     HOY_SEMAPHORE_TAKE();
     _payload[2] = ((uint16_t)(value * 10)) >> 8;
@@ -44,49 +44,49 @@ void SystemConfigParaParser::setLimitPercent(float value)
     HOY_SEMAPHORE_GIVE();
 }
 
-void SystemConfigParaParser::setLastLimitCommandSuccess(LastCommandSuccess status)
+void SystemConfigParaParser::setLastLimitCommandSuccess(const LastCommandSuccess status)
 {
     _lastLimitCommandSuccess = status;
 }
 
-LastCommandSuccess SystemConfigParaParser::getLastLimitCommandSuccess()
+LastCommandSuccess SystemConfigParaParser::getLastLimitCommandSuccess() const
 {
     return _lastLimitCommandSuccess;
 }
 
-uint32_t SystemConfigParaParser::getLastUpdateCommand()
+uint32_t SystemConfigParaParser::getLastUpdateCommand() const
 {
     return _lastUpdateCommand;
 }
 
-void SystemConfigParaParser::setLastUpdateCommand(uint32_t lastUpdate)
+void SystemConfigParaParser::setLastUpdateCommand(const uint32_t lastUpdate)
 {
     _lastUpdateCommand = lastUpdate;
     setLastUpdate(lastUpdate);
 }
 
-void SystemConfigParaParser::setLastLimitRequestSuccess(LastCommandSuccess status)
+void SystemConfigParaParser::setLastLimitRequestSuccess(const LastCommandSuccess status)
 {
     _lastLimitRequestSuccess = status;
 }
 
-LastCommandSuccess SystemConfigParaParser::getLastLimitRequestSuccess()
+LastCommandSuccess SystemConfigParaParser::getLastLimitRequestSuccess() const
 {
     return _lastLimitRequestSuccess;
 }
 
-uint32_t SystemConfigParaParser::getLastUpdateRequest()
+uint32_t SystemConfigParaParser::getLastUpdateRequest() const
 {
     return _lastUpdateRequest;
 }
 
-void SystemConfigParaParser::setLastUpdateRequest(uint32_t lastUpdate)
+void SystemConfigParaParser::setLastUpdateRequest(const uint32_t lastUpdate)
 {
     _lastUpdateRequest = lastUpdate;
     setLastUpdate(lastUpdate);
 }
 
-uint8_t SystemConfigParaParser::getExpectedByteCount()
+uint8_t SystemConfigParaParser::getExpectedByteCount() const
 {
     return SYSTEM_CONFIG_PARA_SIZE;
 }

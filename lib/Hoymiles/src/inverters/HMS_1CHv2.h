@@ -6,9 +6,9 @@
 
 class HMS_1CHv2 : public HMS_Abstract {
 public:
-    explicit HMS_1CHv2(HoymilesRadio* radio, uint64_t serial);
-    static bool isValidSerial(uint64_t serial);
-    String typeName();
-    const byteAssign_t* getByteAssignment();
-    uint8_t getByteAssignmentSize();
+    explicit HMS_1CHv2(HoymilesRadio* radio, const uint64_t serial);
+    static bool isValidSerial(const uint64_t serial);
+    String typeName() const;
+    const byteAssign_t* getByteAssignment() const;
+    uint8_t getByteAssignmentSize() const;
 };

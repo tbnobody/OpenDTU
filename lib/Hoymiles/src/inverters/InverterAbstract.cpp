@@ -7,7 +7,7 @@
 #include "crc.h"
 #include <cstring>
 
-InverterAbstract::InverterAbstract(HoymilesRadio* radio, uint64_t serial)
+InverterAbstract::InverterAbstract(HoymilesRadio* radio, const uint64_t serial)
 {
     _serial.u64 = serial;
     _radio = radio;
@@ -35,12 +35,12 @@ void InverterAbstract::init()
     _statisticsParser.get()->setByteAssignment(getByteAssignment(), getByteAssignmentSize());
 }
 
-uint64_t InverterAbstract::serial()
+uint64_t InverterAbstract::serial() const
 {
     return _serial.u64;
 }
 
-const String& InverterAbstract::serialString()
+const String& InverterAbstract::serialString() const
 {
     return _serialString;
 }
@@ -55,7 +55,7 @@ void InverterAbstract::setName(const char* name)
     _name[len] = '\0';
 }
 
-const char* InverterAbstract::name()
+const char* InverterAbstract::name() const
 {
     return _name;
 }
@@ -77,52 +77,52 @@ bool InverterAbstract::isReachable()
     return _enablePolling && Statistics()->getRxFailureCount() <= _reachableThreshold;
 }
 
-void InverterAbstract::setEnablePolling(bool enabled)
+void InverterAbstract::setEnablePolling(const bool enabled)
 {
     _enablePolling = enabled;
 }
 
-bool InverterAbstract::getEnablePolling()
+bool InverterAbstract::getEnablePolling() const
 {
     return _enablePolling;
 }
 
-void InverterAbstract::setEnableCommands(bool enabled)
+void InverterAbstract::setEnableCommands(const bool enabled)
 {
     _enableCommands = enabled;
 }
 
-bool InverterAbstract::getEnableCommands()
+bool InverterAbstract::getEnableCommands() const
 {
     return _enableCommands;
 }
 
-void InverterAbstract::setReachableThreshold(uint8_t threshold)
+void InverterAbstract::setReachableThreshold(const uint8_t threshold)
 {
     _reachableThreshold = threshold;
 }
 
-uint8_t InverterAbstract::getReachableThreshold()
+uint8_t InverterAbstract::getReachableThreshold() const
 {
     return _reachableThreshold;
 }
 
-void InverterAbstract::setZeroValuesIfUnreachable(bool enabled)
+void InverterAbstract::setZeroValuesIfUnreachable(const bool enabled)
 {
     _zeroValuesIfUnreachable = enabled;
 }
 
-bool InverterAbstract::getZeroValuesIfUnreachable()
+bool InverterAbstract::getZeroValuesIfUnreachable() const
 {
     return _zeroValuesIfUnreachable;
 }
 
-void InverterAbstract::setZeroYieldDayOnMidnight(bool enabled)
+void InverterAbstract::setZeroYieldDayOnMidnight(const bool enabled)
 {
     _zeroYieldDayOnMidnight = enabled;
 }
 
-bool InverterAbstract::getZeroYieldDayOnMidnight()
+bool InverterAbstract::getZeroYieldDayOnMidnight() const
 {
     return _zeroYieldDayOnMidnight;
 }
@@ -175,7 +175,7 @@ void InverterAbstract::clearRxFragmentBuffer()
     _rxFragmentRetransmitCnt = 0;
 }
 
-void InverterAbstract::addRxFragment(uint8_t fragment[], uint8_t len)
+void InverterAbstract::addRxFragment(const uint8_t fragment[], const uint8_t len)
 {
     if (len < 11) {
         Hoymiles.getMessageOutput()->printf("FATAL: (%s, %d) fragment too short\r\n", __FILE__, __LINE__);
@@ -187,10 +187,10 @@ void InverterAbstract::addRxFragment(uint8_t fragment[], uint8_t len)
         return;
     }
 
-    uint8_t fragmentCount = fragment[9];
+    const uint8_t fragmentCount = fragment[9];
 
     // Packets with 0x81 will be seen as 1
-    uint8_t fragmentId = fragmentCount & 0b01111111; // fragmentId is 1 based
+    const uint8_t fragmentId = fragmentCount & 0b01111111; // fragmentId is 1 based
 
     if (fragmentId == 0) {
         Hoymiles.getMessageOutput()->println("ERROR: fragment id zero received and ignored");
@@ -218,15 +218,15 @@ void InverterAbstract::addRxFragment(uint8_t fragment[], uint8_t len)
 }
 
 // Returns Zero on Success or the Fragment ID for retransmit or error code
-uint8_t InverterAbstract::verifyAllFragments(CommandAbstract* cmd)
+uint8_t InverterAbstract::verifyAllFragments(CommandAbstract& cmd)
 {
     // All missing
     if (_rxFragmentLastPacketId == 0) {
         Hoymiles.getMessageOutput()->println("All missing");
-        if (cmd->getSendCount() <= cmd->getMaxResendCount()) {
+        if (cmd.getSendCount() <= cmd.getMaxResendCount()) {
             return FRAGMENT_ALL_MISSING_RESEND;
         } else {
-            cmd->gotTimeout(this);
+            cmd.gotTimeout(*this);
             return FRAGMENT_ALL_MISSING_TIMEOUT;
         }
     }
@@ -234,10 +234,10 @@ uint8_t InverterAbstract::verifyAllFragments(CommandAbstract* cmd)
     // Last fragment is missing (the one with 0x80)
     if (_rxFragmentMaxPacketId == 0) {
         Hoymiles.getMessageOutput()->println("Last missing");
-        if (_rxFragmentRetransmitCnt++ < cmd->getMaxRetransmitCount()) {
+        if (_rxFragmentRetransmitCnt++ < cmd.getMaxRetransmitCount()) {
             return _rxFragmentLastPacketId + 1;
         } else {
-            cmd->gotTimeout(this);
+            cmd.gotTimeout(*this);
             return FRAGMENT_RETRANSMIT_TIMEOUT;
         }
     }
@@ -246,17 +246,17 @@ uint8_t InverterAbstract::verifyAllFragments(CommandAbstract* cmd)
     for (uint8_t i = 0; i < _rxFragmentMaxPacketId - 1; i++) {
         if (!_rxFragmentBuffer[i].wasReceived) {
             Hoymiles.getMessageOutput()->println("Middle missing");
-            if (_rxFragmentRetransmitCnt++ < cmd->getMaxRetransmitCount()) {
+            if (_rxFragmentRetransmitCnt++ < cmd.getMaxRetransmitCount()) {
                 return i + 1;
             } else {
-                cmd->gotTimeout(this);
+                cmd.gotTimeout(*this);
                 return FRAGMENT_RETRANSMIT_TIMEOUT;
             }
         }
     }
 
-    if (!cmd->handleResponse(this, _rxFragmentBuffer, _rxFragmentMaxPacketId)) {
-        cmd->gotTimeout(this);
+    if (!cmd.handleResponse(*this, _rxFragmentBuffer, _rxFragmentMaxPacketId)) {
+        cmd.gotTimeout(*this);
         return FRAGMENT_HANDLE_ERROR;
     }
 

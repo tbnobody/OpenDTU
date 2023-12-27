@@ -232,7 +232,7 @@ void JkBmsBatteryStats::mqttPublish() const
 
     // publish all topics every minute, unless the retain flag is enabled
     bool fullPublish = _lastFullMqttPublish + 60 * 1000 < millis();
-    fullPublish &= !config.Mqtt_Retain;
+    fullPublish &= !config.Mqtt.Retain;
 
     for (auto iter = _dataPoints.cbegin(); iter != _dataPoints.cend(); ++iter) {
         // skip data points that did not change since last published

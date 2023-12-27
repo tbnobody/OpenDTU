@@ -70,7 +70,7 @@
                 </div>
 
             </CardElement>
-            <button type="submit" class="btn btn-primary mb-3">{{ $t('dtuadmin.Save') }}</button>
+            <FormFooter @reload="getDtuConfig"/>
         </form>
     </BasePage>
 </template>
@@ -79,6 +79,7 @@
 import BasePage from '@/components/BasePage.vue';
 import BootstrapAlert from "@/components/BootstrapAlert.vue";
 import CardElement from '@/components/CardElement.vue';
+import FormFooter from '@/components/FormFooter.vue';
 import InputElement from '@/components/InputElement.vue';
 import type { DtuConfig } from "@/types/DtuConfig";
 import { authHeader, handleResponse } from '@/utils/authentication';
@@ -90,6 +91,7 @@ export default defineComponent({
         BasePage,
         BootstrapAlert,
         CardElement,
+        FormFooter,
         InputElement,
         BIconInfoCircle,
     },

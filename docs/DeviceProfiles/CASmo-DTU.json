@@ -1,0 +1,20 @@
+[
+    {
+        "name": "CASmo-DTU",
+        "links": [
+            {"name": "Information", "url": "https://casmo.info/product-details/?product=2"}
+        ],
+        "nrf24": {
+            "miso": 19,
+            "mosi": 23,
+            "clk": 18,
+            "irq": 16,
+            "en": 4,
+            "cs": 5
+        },
+        "led": {
+            "led0": 25,
+            "led1": 26
+        }
+    }
+]

@@ -8,6 +8,7 @@
 #include <list>
 #include "SDM.h"
 #include "sml.h"
+#include <TaskSchedulerDeclarations.h>
 
 #ifndef SDM_RX_PIN
 #define SDM_RX_PIN 13
@@ -36,16 +37,18 @@ public:
         SOURCE_HTTP = 3,
         SOURCE_SML = 4
     };
-    void init();
-    void loop();
+    void init(Scheduler& scheduler);
     float getPowerTotal(bool forceUpdate = true);
     uint32_t getLastPowerMeterUpdate();
 
 private:
+    void loop();
     void mqtt();
 
     void onMqttMessage(const espMqttClientTypes::MessageProperties& properties,
         const char* topic, const uint8_t* payload, size_t len, size_t index, size_t total);
+
+     Task _loopTask;
 
     bool _verboseLogging = true;
     uint32_t _lastPowerMeterCheck;

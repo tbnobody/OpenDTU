@@ -26,14 +26,14 @@ bool HttpPowerMeterClass::updateValues()
         errorMessage[256];
 
     for (uint8_t i = 0; i < POWERMETER_MAX_PHASES; i++) {
-        POWERMETER_HTTP_PHASE_CONFIG_T phaseConfig = config.Powermeter_Http_Phase[i];
+        POWERMETER_HTTP_PHASE_CONFIG_T phaseConfig = config.PowerMeter.Http_Phase[i];
 
         if (!phaseConfig.Enabled) {
             power[i] = 0.0;
             continue;	
         } 
 
-        if (i == 0 || config.PowerMeter_HttpIndividualRequests) {
+        if (i == 0 || config.PowerMeter.HttpIndividualRequests) {
             if (httpRequest(phaseConfig.Url, phaseConfig.AuthType, phaseConfig.Username, phaseConfig.Password, phaseConfig.HeaderKey, phaseConfig.HeaderValue, phaseConfig.Timeout,
                 response, sizeof(response), errorMessage, sizeof(errorMessage))) {
                   if (!getFloatValueByJsonPath(response, phaseConfig.JsonPath, power[i])) {

@@ -193,7 +193,17 @@ void HuaweiCanCommClass::sendRequest()
 // Huawei CAN Controller
 // *******************************************************
 
-void HuaweiCanClass::init(uint8_t huawei_miso, uint8_t huawei_mosi, uint8_t huawei_clk, uint8_t huawei_irq, uint8_t huawei_cs, uint8_t huawei_power)
+void HuaweiCanClass::init(Scheduler& scheduler, uint8_t huawei_miso, uint8_t huawei_mosi, uint8_t huawei_clk, uint8_t huawei_irq, uint8_t huawei_cs, uint8_t huawei_power)
+{
+    scheduler.addTask(_loopTask);
+    _loopTask.setCallback(std::bind(&HuaweiCanClass::loop, this));
+    _loopTask.setIterations(TASK_FOREVER);
+    _loopTask.enable();
+
+    this->updateSettings(huawei_miso, huawei_mosi, huawei_clk, huawei_irq, huawei_cs, huawei_power);
+}
+
+void HuaweiCanClass::updateSettings(uint8_t huawei_miso, uint8_t huawei_mosi, uint8_t huawei_clk, uint8_t huawei_irq, uint8_t huawei_cs, uint8_t huawei_power)
 {
     if (_initialized) {
       return;
@@ -201,11 +211,11 @@ void HuaweiCanClass::init(uint8_t huawei_miso, uint8_t huawei_mosi, uint8_t huaw
 
     const CONFIG_T& config = Configuration.get();
 
-    if (!config.Huawei_Enabled) {
+    if (!config.Huawei.Enabled) {
         return;
     }
 
-    if (!HuaweiCanComm.init(huawei_miso, huawei_mosi, huawei_clk, huawei_irq, huawei_cs, config.Huawei_CAN_Controller_Frequency)) {
+    if (!HuaweiCanComm.init(huawei_miso, huawei_mosi, huawei_clk, huawei_irq, huawei_cs, config.Huawei.CAN_Controller_Frequency)) {
       MessageOutput.println("[HuaweiCanClass::init] Error Initializing Huawei CAN communication...");
       return;
     };
@@ -214,7 +224,7 @@ void HuaweiCanClass::init(uint8_t huawei_miso, uint8_t huawei_mosi, uint8_t huaw
     digitalWrite(huawei_power, HIGH);
     _huaweiPower = huawei_power;
 
-    if (config.Huawei_Auto_Power_Enabled) {
+    if (config.Huawei.Auto_Power_Enabled) {
       _mode = HUAWEI_MODE_AUTO_INT;
     }
 
@@ -258,17 +268,17 @@ void HuaweiCanClass::loop()
 {
   const CONFIG_T& config = Configuration.get();
 
-  if (!config.Huawei_Enabled || !_initialized) {
+  if (!config.Huawei.Enabled || !_initialized) {
       return;
   }
 
   processReceivedParameters();
 
   uint8_t com_error = HuaweiCanComm.getErrorCode(true);
-  if (com_error && HUAWEI_ERROR_CODE_RX) {
+  if (com_error & HUAWEI_ERROR_CODE_RX) {
     MessageOutput.println("[HuaweiCanClass::loop] Data request error");
   }
-  if (com_error && HUAWEI_ERROR_CODE_TX) {
+  if (com_error & HUAWEI_ERROR_CODE_TX) {
     MessageOutput.println("[HuaweiCanClass::loop] Data set error");    
   }
 
@@ -296,8 +306,8 @@ void HuaweiCanClass::loop()
 
     // Set voltage limit in periodic intervals
     if ( _nextAutoModePeriodicIntMillis < millis()) {
-      MessageOutput.printf("[HuaweiCanClass::loop] Periodically setting voltage limit: %f \r\n", config.Huawei_Auto_Power_Voltage_Limit);
-      _setValue(config.Huawei_Auto_Power_Voltage_Limit, HUAWEI_ONLINE_VOLTAGE);
+      MessageOutput.printf("[HuaweiCanClass::loop] Periodically setting voltage limit: %f \r\n", config.Huawei.Auto_Power_Voltage_Limit);
+      _setValue(config.Huawei.Auto_Power_Voltage_Limit, HUAWEI_ONLINE_VOLTAGE);
       _nextAutoModePeriodicIntMillis = millis() + 60000;
     }
 
@@ -308,14 +318,14 @@ void HuaweiCanClass::loop()
     }
 
     // Re-enable automatic power control if the output voltage has dropped below threshold
-    if(_rp.output_voltage < config.Huawei_Auto_Power_Enable_Voltage_Limit ) {
+    if(_rp.output_voltage < config.Huawei.Auto_Power_Enable_Voltage_Limit ) {
       _autoPowerEnabledCounter = 10;
     }
 
 
     // Check if inverter used by the power limiter is active
     std::shared_ptr<InverterAbstract> inverter =
-        Hoymiles.getInverterByPos(config.PowerLimiter_InverterId);
+        Hoymiles.getInverterByPos(config.PowerLimiter.InverterId);
 
     if (inverter != nullptr) {
         if(inverter->isProducing()) {
@@ -339,12 +349,12 @@ void HuaweiCanClass::loop()
       newPowerLimit += _rp.output_power;
       MessageOutput.printf("[HuaweiCanClass::loop] PL: %f, OP: %f \r\n", newPowerLimit, _rp.output_power);
 
-      if (newPowerLimit > config.Huawei_Auto_Power_Lower_Power_Limit) {
+      if (newPowerLimit > config.Huawei.Auto_Power_Lower_Power_Limit) {
 
         // Check if the output power has dropped below the lower limit (i.e. the battery is full)
         // and if the PSU should be turned off. Also we use a simple counter mechanism here to be able
         // to ramp up from zero output power when starting up
-        if (_rp.output_power < config.Huawei_Auto_Power_Lower_Power_Limit) {
+        if (_rp.output_power < config.Huawei.Auto_Power_Lower_Power_Limit) {
           MessageOutput.printf("[HuaweiCanClass::loop] Power and voltage limit reached. Disabling automatic power control .... \r\n");
           _autoPowerEnabledCounter--;
           if (_autoPowerEnabledCounter == 0) {
@@ -357,8 +367,8 @@ void HuaweiCanClass::loop()
         }
 
         // Limit power to maximum
-        if (newPowerLimit > config.Huawei_Auto_Power_Upper_Power_Limit) {
-          newPowerLimit = config.Huawei_Auto_Power_Upper_Power_Limit;
+        if (newPowerLimit > config.Huawei.Auto_Power_Upper_Power_Limit) {
+          newPowerLimit = config.Huawei.Auto_Power_Upper_Power_Limit;
         }
 
         // Set the actual output limit
@@ -391,7 +401,7 @@ void HuaweiCanClass::_setValue(float in, uint8_t parameterType)
 
     const CONFIG_T& config = Configuration.get();
 
-    if (!config.Huawei_Enabled) {
+    if (!config.Huawei.Enabled) {
         return;
     }
 
@@ -422,7 +432,7 @@ void HuaweiCanClass::_setValue(float in, uint8_t parameterType)
 void HuaweiCanClass::setMode(uint8_t mode) {
   const CONFIG_T& config = Configuration.get();
 
-  if (!config.Huawei_Enabled) {
+  if (!config.Huawei.Enabled) {
       return;
   }
 
@@ -435,7 +445,7 @@ void HuaweiCanClass::setMode(uint8_t mode) {
     _mode = HUAWEI_MODE_ON;
   }
 
-  if (mode == HUAWEI_MODE_AUTO_INT && !config.Huawei_Auto_Power_Enabled ) {
+  if (mode == HUAWEI_MODE_AUTO_INT && !config.Huawei.Auto_Power_Enabled ) {
     MessageOutput.println("[HuaweiCanClass::setMode] WARNING: Trying to setmode to internal automatic power control without being enabled in the UI. Ignoring command");
     return;
   }

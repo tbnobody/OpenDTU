@@ -5,6 +5,7 @@
 #include "SPI.h"
 #include <mcp_can.h>
 #include <mutex>
+#include <TaskSchedulerDeclarations.h>
 
 #ifndef HUAWEI_PIN_MISO
 #define HUAWEI_PIN_MISO 12
@@ -118,8 +119,8 @@ private:
 
 class HuaweiCanClass {
 public:
-    void init(uint8_t huawei_miso, uint8_t huawei_mosi, uint8_t huawei_clk, uint8_t huawei_irq, uint8_t huawei_cs, uint8_t huawei_power);
-    void loop();
+    void init(Scheduler& scheduler, uint8_t huawei_miso, uint8_t huawei_mosi, uint8_t huawei_clk, uint8_t huawei_irq, uint8_t huawei_cs, uint8_t huawei_power);
+    void updateSettings(uint8_t huawei_miso, uint8_t huawei_mosi, uint8_t huawei_clk, uint8_t huawei_irq, uint8_t huawei_cs, uint8_t huawei_power);
     void setValue(float in, uint8_t parameterType);
     void setMode(uint8_t mode);
 
@@ -128,8 +129,11 @@ public:
     bool getAutoPowerStatus();
 
 private:
+    void loop();
     void processReceivedParameters();
     void _setValue(float in, uint8_t parameterType);
+
+    Task _loopTask;
 
     TaskHandle_t _HuaweiCanCommunicationTaskHdl = NULL;
     bool    _initialized = false;

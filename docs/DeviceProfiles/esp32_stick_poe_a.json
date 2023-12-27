@@ -1,0 +1,25 @@
+[
+    {
+        "name": "Esp32-Stick-PoE-A",
+        "links": [
+            {"name": "Information", "url": "https://github.com/allexoK/Esp32-Stick-Boards-Docs"}
+        ],
+        "nrf24": {
+            "miso": 2,
+            "mosi": 15,
+            "clk": 14,
+            "irq": 34,
+            "en": 12,
+            "cs": 4
+        },
+        "eth": {
+            "enabled": true,
+            "phy_addr": 1,
+            "power": -1,
+            "mdc": 23,
+            "mdio": 18,
+            "type": 0,
+            "clk_mode": 3
+        }
+    }
+]
