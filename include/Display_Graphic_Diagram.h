@@ -7,7 +7,10 @@
 
 #define CHART_HEIGHT 20 // chart area hight in pixels
 #define CHART_WIDTH 47 // chart area width in pixels
-#define DIAG_POSX 80 // position were Diag is drawn at
+
+// Left-Upper position of diagram is drawn
+// (text of Y-axis is display left of that pos)
+#define DIAG_POSX 80
 #define DIAG_POSY 0
 
 class DisplayGraphicDiagramClass {
@@ -15,7 +18,7 @@ public:
     DisplayGraphicDiagramClass();
 
     void init(Scheduler& scheduler, U8G2* display);
-    void redraw();
+    void redraw(uint8_t screenSaverOffsetX);
 
     void updatePeriod();
 
@@ -34,6 +37,4 @@ private:
 
     float _iRunningAverage = 0;
     uint16_t _iRunningAverageCnt = 0;
-
-    uint8_t _graphPosX = DIAG_POSX;
 };

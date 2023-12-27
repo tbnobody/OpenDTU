@@ -62,7 +62,7 @@ public:
     bool isValidNrf24Config() const;
     bool isValidCmt2300Config() const;
     bool isValidEthConfig() const;
-    bool isValidHuaweiConfig();
+    bool isValidHuaweiConfig() const;
     
 private:
     PinMapping_t _pinMapping;

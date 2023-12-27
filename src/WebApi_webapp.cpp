@@ -18,6 +18,10 @@ extern const uint8_t file_zones_json_end[] asm("_binary_webapp_dist_zones_json_g
 extern const uint8_t file_app_js_end[] asm("_binary_webapp_dist_js_app_js_gz_end");
 extern const uint8_t file_site_webmanifest_end[] asm("_binary_webapp_dist_site_webmanifest_end");
 
+#ifdef AUTO_GIT_HASH
+#define ETAG_HTTP_HEADER_VAL "\"" AUTO_GIT_HASH "\"" // ETag value must be between quotes
+#endif
+
 void WebApiWebappClass::init(AsyncWebServer& server)
 {
     _server = &server;
@@ -62,12 +66,12 @@ void WebApiWebappClass::init(AsyncWebServer& server)
     });
 
     _server->on("/js/app.js", HTTP_GET, [](AsyncWebServerRequest* request) {
-#ifdef AUTO_GIT_HASH
+#ifdef ETAG_HTTP_HEADER_VAL
         // check client If-None-Match header vs ETag/AUTO_GIT_HASH
         bool eTagMatch = false;
         if (request->hasHeader("If-None-Match")) {
             const AsyncWebHeader* h = request->getHeader("If-None-Match");
-            if (strncmp(AUTO_GIT_HASH, h->value().c_str(), strlen(AUTO_GIT_HASH)) == 0) {
+            if (strncmp(ETAG_HTTP_HEADER_VAL, h->value().c_str(), strlen(ETAG_HTTP_HEADER_VAL)) == 0) {
                 eTagMatch = true;
             }
         }
@@ -82,7 +86,7 @@ void WebApiWebappClass::init(AsyncWebServer& server)
         }
         // HTTP requires cache headers in 200 and 304 to be identical
         response->addHeader("Cache-Control", "public, must-revalidate");
-        response->addHeader("ETag", AUTO_GIT_HASH);
+        response->addHeader("ETag", ETAG_HTTP_HEADER_VAL);
 #else
         AsyncWebServerResponse* response = request->beginResponse_P(200, "text/javascript", file_app_js_start, file_app_js_end - file_app_js_start);
         response->addHeader("Content-Encoding", "gzip");

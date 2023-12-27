@@ -161,12 +161,14 @@ void DisplayGraphicClass::loop()
     if (Datastore.getIsAtLeastOneReachable()) {
         displayPowerSave = false;
         if (_isLarge) {
-            _diagram.redraw();
+            uint8_t screenSaverOffsetX = enableScreensaver ? (_mExtra % 7) : 0;
+            _diagram.redraw(screenSaverOffsetX);
         }
-        if (Datastore.getTotalAcPowerEnabled() > 999) {
-            snprintf(_fmtText, sizeof(_fmtText), i18n_current_power_kw[_display_language], (Datastore.getTotalAcPowerEnabled() / 1000));
+        const float watts = Datastore.getTotalAcPowerEnabled();
+        if (watts > 999) {
+            snprintf(_fmtText, sizeof(_fmtText), i18n_current_power_kw[_display_language], watts / 1000);
         } else {
-            snprintf(_fmtText, sizeof(_fmtText), i18n_current_power_w[_display_language], Datastore.getTotalAcPowerEnabled());
+            snprintf(_fmtText, sizeof(_fmtText), i18n_current_power_w[_display_language], watts);
         }
         printText(_fmtText, 0);
         _previousMillis = millis();

@@ -92,22 +92,22 @@ void WebApiDeviceClass::onDeviceAdminGet(AsyncWebServerRequest* request)
     }
 
     JsonObject victronPinObj = curPin.createNestedObject("victron");
-    victronPinObj[F("rx")] = pin.victron_rx;
-    victronPinObj[F("tx")] = pin.victron_tx;
+    victronPinObj["rx"] = pin.victron_rx;
+    victronPinObj["tx"] = pin.victron_tx;
 
     JsonObject batteryPinObj = curPin.createNestedObject("battery");
-    batteryPinObj[F("rx")] = pin.battery_rx;
-    batteryPinObj[F("rxen")] = pin.battery_rxen;
-    batteryPinObj[F("tx")] = pin.battery_tx;
-    batteryPinObj[F("txen")] = pin.battery_txen;
+    batteryPinObj["rx"] = pin.battery_rx;
+    batteryPinObj["rxen"] = pin.battery_rxen;
+    batteryPinObj["tx"] = pin.battery_tx;
+    batteryPinObj["txen"] = pin.battery_txen;
 
     JsonObject huaweiPinObj = curPin.createNestedObject("huawei");
-    huaweiPinObj[F("miso")] = pin.huawei_miso;
-    huaweiPinObj[F("mosi")] = pin.huawei_mosi;
-    huaweiPinObj[F("clk")] = pin.huawei_clk;
-    huaweiPinObj[F("irq")] = pin.huawei_irq;
-    huaweiPinObj[F("cs")] = pin.huawei_cs;
-    huaweiPinObj[F("power")] = pin.huawei_power;
+    huaweiPinObj["miso"] = pin.huawei_miso;
+    huaweiPinObj["mosi"] = pin.huawei_mosi;
+    huaweiPinObj["clk"] = pin.huawei_clk;
+    huaweiPinObj["irq"] = pin.huawei_irq;
+    huaweiPinObj["cs"] = pin.huawei_cs;
+    huaweiPinObj["power"] = pin.huawei_power;
 
     response->setLength();
     request->send(response);
