@@ -26,13 +26,14 @@ void BatteryClass::init(Scheduler& scheduler)
     _loopTask.setCallback(std::bind(&BatteryClass::loop, this));
     _loopTask.setIterations(TASK_FOREVER);
     _loopTask.enable();
-    std::lock_guard<std::mutex> lock(_mutex);
 
     this->updateSettings();
 }
 
 void BatteryClass::updateSettings()
 {
+    std::lock_guard<std::mutex> lock(_mutex);
+
     if (_upProvider) {
         _upProvider->deinit();
         _upProvider = nullptr;
