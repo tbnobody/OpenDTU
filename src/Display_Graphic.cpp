@@ -12,6 +12,7 @@ std::map<DisplayType_t, std::function<U8G2*(uint8_t, uint8_t, uint8_t, uint8_t)>
     { DisplayType_t::PCD8544, [](uint8_t reset, uint8_t clock, uint8_t data, uint8_t cs) { return new U8G2_PCD8544_84X48_F_4W_HW_SPI(U8G2_R0, cs, data, reset); } },
     { DisplayType_t::SSD1306, [](uint8_t reset, uint8_t clock, uint8_t data, uint8_t cs) { return new U8G2_SSD1306_128X64_NONAME_F_HW_I2C(U8G2_R0, reset, clock, data); } },
     { DisplayType_t::SH1106, [](uint8_t reset, uint8_t clock, uint8_t data, uint8_t cs) { return new U8G2_SH1106_128X64_NONAME_F_HW_I2C(U8G2_R0, reset, clock, data); } },
+    { DisplayType_t::SSD1309, [](uint8_t reset, uint8_t clock, uint8_t data, uint8_t cs) { return new U8G2_SSD1309_128X64_NONAME0_F_HW_I2C(U8G2_R0, reset, clock, data); } },
 };
 
 // Language defintion, respect order in languages[] and translation lists
@@ -45,20 +46,20 @@ DisplayGraphicClass::~DisplayGraphicClass()
 void DisplayGraphicClass::init(Scheduler& scheduler, const DisplayType_t type, const uint8_t data, const uint8_t clk, const uint8_t cs, const uint8_t reset)
 {
     _display_type = type;
-    if (_display_type > DisplayType_t::None) {
+    if (isValidDisplay()) {
         auto constructor = display_types[_display_type];
         _display = constructor(reset, clk, data, cs);
         _display->begin();
         setContrast(DISPLAY_CONTRAST);
         setStatus(true);
         _diagram.init(scheduler, _display);
-    }
 
-    scheduler.addTask(_loopTask);
-    _loopTask.setCallback(std::bind(&DisplayGraphicClass::loop, this));
-    _loopTask.setIterations(TASK_FOREVER);
-    _loopTask.setInterval(_period);
-    _loopTask.enable();
+        scheduler.addTask(_loopTask);
+        _loopTask.setCallback(std::bind(&DisplayGraphicClass::loop, this));
+        _loopTask.setIterations(TASK_FOREVER);
+        _loopTask.setInterval(_period);
+        _loopTask.enable();
+    }
 }
 
 void DisplayGraphicClass::calcLineHeights()
@@ -86,6 +87,11 @@ void DisplayGraphicClass::setFont(const uint8_t line)
     }
 }
 
+bool DisplayGraphicClass::isValidDisplay()
+{
+    return _display_type > DisplayType_t::None && _display_type < DisplayType_Max;
+}
+
 void DisplayGraphicClass::printText(const char* text, const uint8_t line)
 {
     uint8_t dispX;
@@ -102,7 +108,7 @@ void DisplayGraphicClass::printText(const char* text, const uint8_t line)
 
 void DisplayGraphicClass::setOrientation(const uint8_t rotation)
 {
-    if (_display_type == DisplayType_t::None) {
+    if (!isValidDisplay()) {
         return;
     }
 
@@ -132,7 +138,7 @@ void DisplayGraphicClass::setLanguage(const uint8_t language)
 
 void DisplayGraphicClass::setStartupDisplay()
 {
-    if (_display_type == DisplayType_t::None) {
+    if (!isValidDisplay()) {
         return;
     }
 
@@ -148,10 +154,6 @@ DisplayGraphicDiagramClass& DisplayGraphicClass::Diagram()
 
 void DisplayGraphicClass::loop()
 {
-    if (_display_type == DisplayType_t::None) {
-        return;
-    }
-
     _loopTask.setInterval(_period);
 
     _display->clearBuffer();
@@ -215,7 +217,7 @@ void DisplayGraphicClass::loop()
 
 void DisplayGraphicClass::setContrast(const uint8_t contrast)
 {
-    if (_display_type == DisplayType_t::None) {
+    if (!isValidDisplay()) {
         return;
     }
     _display->setContrast(contrast * 2.55f);
