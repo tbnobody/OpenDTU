@@ -23,7 +23,7 @@
                               type="checkbox" wide/>
             </CardElement>
 
-            <button type="submit" class="btn btn-primary mb-3">{{ $t('vedirectadmin.Save') }}</button>
+            <FormFooter @reload="getVedirectConfig"/>
         </form>
     </BasePage>
 </template>
@@ -32,6 +32,7 @@
 import BasePage from '@/components/BasePage.vue';
 import BootstrapAlert from "@/components/BootstrapAlert.vue";
 import CardElement from '@/components/CardElement.vue';
+import FormFooter from '@/components/FormFooter.vue';
 import InputElement from '@/components/InputElement.vue';
 import type { VedirectConfig } from "@/types/VedirectConfig";
 import { authHeader, handleResponse } from '@/utils/authentication';
@@ -42,6 +43,7 @@ export default defineComponent({
         BasePage,
         BootstrapAlert,
         CardElement,
+        FormFooter,
         InputElement,
     },
     data() {

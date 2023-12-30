@@ -49,7 +49,7 @@
                               type="number" min="2" max="90" step="1" :postfix="$t('batteryadmin.Seconds')"/>
             </CardElement>
 
-            <button type="submit" class="btn btn-primary mb-3">{{ $t('batteryadmin.Save') }}</button>
+            <FormFooter @reload="getBatteryConfig"/>
         </form>
     </BasePage>
 </template>
@@ -58,6 +58,7 @@
 import BasePage from '@/components/BasePage.vue';
 import BootstrapAlert from "@/components/BootstrapAlert.vue";
 import CardElement from '@/components/CardElement.vue';
+import FormFooter from '@/components/FormFooter.vue';
 import InputElement from '@/components/InputElement.vue';
 import type { BatteryConfig } from "@/types/BatteryConfig";
 import { authHeader, handleResponse } from '@/utils/authentication';
@@ -68,6 +69,7 @@ export default defineComponent({
         BasePage,
         BootstrapAlert,
         CardElement,
+        FormFooter,
         InputElement,
     },
     data() {

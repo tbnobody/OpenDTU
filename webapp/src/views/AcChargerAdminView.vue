@@ -73,7 +73,7 @@
                 </CardElement>
             </CardElement>
 
-            <button type="submit" class="btn btn-primary mb-3">{{ $t('acchargeradmin.Save') }}</button>
+            <FormFooter @reload="getChargerConfig"/>
         </form>
     </BasePage>
 </template>
@@ -82,6 +82,7 @@
 import BasePage from '@/components/BasePage.vue';
 import BootstrapAlert from "@/components/BootstrapAlert.vue";
 import CardElement from '@/components/CardElement.vue';
+import FormFooter from '@/components/FormFooter.vue';
 import InputElement from '@/components/InputElement.vue';
 import { BIconInfoCircle } from 'bootstrap-icons-vue';
 import type { AcChargerConfig } from "@/types/AcChargerConfig";
@@ -93,6 +94,7 @@ export default defineComponent({
         BasePage,
         BootstrapAlert,
         CardElement,
+        FormFooter,
         InputElement,
         BIconInfoCircle,
     },

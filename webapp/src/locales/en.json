@@ -31,6 +31,7 @@
         "Yes": "Yes",
         "No": "No",
         "VerboseLogging": "Verbose Logging",
+        "Seconds": "Seconds",
         "Loading": "Loading...",
         "Reload": "Reload",
         "Cancel": "Cancel",
@@ -521,8 +522,7 @@
         "EnableVedirect": "Enable VE.Direct",
         "VedirectParameter": "VE.Direct Parameter",
         "VerboseLogging": "@:base.VerboseLogging",
-        "UpdatesOnly": "Publish values to MQTT only when they change",
-        "Save": "@:dtuadmin.Save"
+        "UpdatesOnly": "Publish values to MQTT only when they change"
     },
     "powermeteradmin":{
         "PowerMeterSettings": "Power Meter Settings",
@@ -543,7 +543,6 @@
         "SDM": "SDM-Power Meter Parameter",
         "sdmbaudrate": "Baudrate",
         "sdmaddress": "Modbus Address",
-        "Save": "@:dtuadmin.Save",
         "HTTP": "HTTP(S) + Json - General configuration",
         "httpIndividualRequests": "Individual HTTP requests per phase",
         "httpPhase": "HTTP(S) + Json configuration - Phase {phaseNumber}",
@@ -605,8 +604,7 @@
         "VoltageLoadCorrectionInfo": "<b>Hint:</b> When the power output is higher, the voltage is usually decreasing. In order to not stop the inverter too early (Stop treshold), a power factor can be specified here to correct this. Corrected voltage = DC Voltage + (Current power * correction factor).",
         "InverterRestart": "Inverter Restart",
         "InverterRestartHour": "Restart Hour",
-        "InverterRestartHint": "Restart the Inverter once a day to reset the \"YieldDay\" values.",
-        "Save": "@:dtuadmin.Save"
+        "InverterRestartHint": "Restart the Inverter once a day to reset the \"YieldDay\" values."
     },
     "batteryadmin": {
         "BatterySettings": "Battery Settings",
@@ -622,8 +620,7 @@
         "JkBmsInterfaceUart": "TTL-UART on MCU",
         "JkBmsInterfaceTransceiver": "RS-485 Transceiver on MCU",
         "PollingInterval": "Polling Interval",
-        "Seconds": "@:dtuadmin.Seconds",
-        "Save": "@:dtuadmin.Save"
+        "Seconds": "@:base.Seconds"
     },
     "inverteradmin": {
         "InverterSettings": "Inverter Settings",
@@ -810,8 +807,7 @@
         "enableVoltageLimitHint": "Automatic power control is disabled if the output voltage is higher then this value and if the output power drops below the minimum output power limit (set below).\nAutomatic power control is re-enabled if the battery voltage drops below the value set in this field.",
         "lowerPowerLimit": "Minimum output power",
         "upperPowerLimit": "Maximum output power",
-        "Seconds": "@:dtuadmin.Seconds",
-        "Save": "@:dtuadmin.Save"
+        "Seconds": "@:base.Seconds"
       },
       "battery": {
         "battery": "Battery",
