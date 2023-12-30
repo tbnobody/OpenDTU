@@ -15,7 +15,19 @@ public:
 
 private:
     void loop();
-    void onMqttMessage(const espMqttClientTypes::MessageProperties& properties, const char* topic, const uint8_t* payload, size_t len, size_t index, size_t total);
+
+    enum class Topic : unsigned {
+        LimitOnlineVoltage,
+        LimitOnlineCurrent,
+        LimitOfflineVoltage,
+        LimitOfflineCurrent,
+        Mode
+    };
+
+    void onMqttMessage(Topic t,
+            const espMqttClientTypes::MessageProperties& properties,
+            const char* topic, const uint8_t* payload, size_t len,
+            size_t index, size_t total);
 
     Task _loopTask;
 
