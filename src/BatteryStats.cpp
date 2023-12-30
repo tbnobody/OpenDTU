@@ -7,30 +7,44 @@
 #include "JkBmsDataPoints.h"
 
 template<typename T>
-void BatteryStats::addLiveViewValue(JsonVariant& root, std::string const& name,
-    T&& value, std::string const& unit, uint8_t precision) const
+static void addLiveViewInSection(JsonVariant& root,
+    std::string const& section, std::string const& name,
+    T&& value, std::string const& unit, uint8_t precision)
 {
-    auto jsonValue = root["values"][name];
+    auto jsonValue = root["values"][section][name];
     jsonValue["v"] = value;
     jsonValue["u"] = unit;
     jsonValue["d"] = precision;
 }
 
-void BatteryStats::addLiveViewText(JsonVariant& root, std::string const& name,
-    std::string const& text) const
+template<typename T>
+static void addLiveViewValue(JsonVariant& root, std::string const& name,
+    T&& value, std::string const& unit, uint8_t precision)
 {
-    root["values"][name] = text;
+    addLiveViewInSection(root, "status", name, value, unit, precision);
 }
 
-void BatteryStats::addLiveViewWarning(JsonVariant& root, std::string const& name,
-    bool warning) const
+static void addLiveViewTextInSection(JsonVariant& root,
+    std::string const& section, std::string const& name, std::string const& text)
+{
+    root["values"][section][name] = text;
+}
+
+static void addLiveViewTextValue(JsonVariant& root, std::string const& name,
+    std::string const& text)
+{
+    addLiveViewTextInSection(root, "status", name, text);
+}
+
+static void addLiveViewWarning(JsonVariant& root, std::string const& name,
+    bool warning)
 {
     if (!warning) { return; }
     root["issues"][name] = 1;
 }
 
-void BatteryStats::addLiveViewAlarm(JsonVariant& root, std::string const& name,
-    bool alarm) const
+static void addLiveViewAlarm(JsonVariant& root, std::string const& name,
+    bool alarm)
 {
     if (!alarm) { return; }
     root["issues"][name] = 2;
@@ -57,9 +71,9 @@ void PylontechBatteryStats::getLiveViewData(JsonVariant& root) const
     addLiveViewValue(root, "current", _current, "A", 1);
     addLiveViewValue(root, "temperature", _temperature, "°C", 1);
 
-    addLiveViewText(root, "chargeEnabled", (_chargeEnabled?"yes":"no"));
-    addLiveViewText(root, "dischargeEnabled", (_dischargeEnabled?"yes":"no"));
-    addLiveViewText(root, "chargeImmediately", (_chargeImmediately?"yes":"no"));
+    addLiveViewTextValue(root, "chargeEnabled", (_chargeEnabled?"yes":"no"));
+    addLiveViewTextValue(root, "dischargeEnabled", (_dischargeEnabled?"yes":"no"));
+    addLiveViewTextValue(root, "chargeImmediately", (_chargeImmediately?"yes":"no"));
 
     // alarms and warnings go into the "Issues" card of the web application
     addLiveViewWarning(root, "highCurrentDischarge", _warningHighCurrentDischarge);
@@ -108,36 +122,9 @@ void JkBmsBatteryStats::getJsonData(JsonVariant& root, bool verbose) const
         addLiveViewValue(root, "power", current * voltage , "W", 2);
     }
 
-    if (verbose) {
-        auto oTemperatureOne = _dataPoints.get<Label::BatteryTempOneCelsius>();
-        if (oTemperatureOne.has_value()) {
-            addLiveViewValue(root, "batOneTemp", *oTemperatureOne, "°C", 0);
-        }
-    }
-
-    if (verbose) {
-        auto oTemperatureTwo = _dataPoints.get<Label::BatteryTempTwoCelsius>();
-        if (oTemperatureTwo.has_value()) {
-            addLiveViewValue(root, "batTwoTemp", *oTemperatureTwo, "°C", 0);
-        }
-    }
-
     auto oTemperatureBms = _dataPoints.get<Label::BmsTempCelsius>();
     if (oTemperatureBms.has_value()) {
         addLiveViewValue(root, "bmsTemp", *oTemperatureBms, "°C", 0);
-    }
-
-    if (_cellVoltageTimestamp > 0) {
-        if (verbose) {
-            addLiveViewValue(root, "cellMinVoltage", static_cast<float>(_cellMinMilliVolt)/1000, "V", 3);
-        }
-
-        addLiveViewValue(root, "cellAvgVoltage", static_cast<float>(_cellAvgMilliVolt)/1000, "V", 3);
-
-        if (verbose) {
-            addLiveViewValue(root, "cellMaxVoltage", static_cast<float>(_cellMaxMilliVolt)/1000, "V", 3);
-            addLiveViewValue(root, "cellDiffVoltage", (_cellMaxMilliVolt - _cellMinMilliVolt), "mV", 0);
-        }
     }
 
     // labels BatteryChargeEnabled, BatteryDischargeEnabled, and
@@ -148,11 +135,32 @@ void JkBmsBatteryStats::getJsonData(JsonVariant& root, bool verbose) const
     if (oStatus.has_value()) {
         using Bits = JkBms::StatusBits;
         auto chargeEnabled = *oStatus & static_cast<uint16_t>(Bits::ChargingActive);
-        addLiveViewText(root, "chargeEnabled", (chargeEnabled?"yes":"no"));
+        addLiveViewTextValue(root, "chargeEnabled", (chargeEnabled?"yes":"no"));
         auto dischargeEnabled = *oStatus & static_cast<uint16_t>(Bits::DischargingActive);
-        addLiveViewText(root, "dischargeEnabled", (dischargeEnabled?"yes":"no"));
+        addLiveViewTextValue(root, "dischargeEnabled", (dischargeEnabled?"yes":"no"));
+    }
+
+    auto oTemperatureOne = _dataPoints.get<Label::BatteryTempOneCelsius>();
+    if (oTemperatureOne.has_value()) {
+        addLiveViewInSection(root, "cells", "batOneTemp", *oTemperatureOne, "°C", 0);
+    }
+
+    auto oTemperatureTwo = _dataPoints.get<Label::BatteryTempTwoCelsius>();
+    if (oTemperatureTwo.has_value()) {
+        addLiveViewInSection(root, "cells", "batTwoTemp", *oTemperatureTwo, "°C", 0);
+    }
+
+    if (_cellVoltageTimestamp > 0) {
+        addLiveViewInSection(root, "cells", "cellMinVoltage", static_cast<float>(_cellMinMilliVolt)/1000, "V", 3);
+        addLiveViewInSection(root, "cells", "cellAvgVoltage", static_cast<float>(_cellAvgMilliVolt)/1000, "V", 3);
+        addLiveViewInSection(root, "cells", "cellMaxVoltage", static_cast<float>(_cellMaxMilliVolt)/1000, "V", 3);
+        addLiveViewInSection(root, "cells", "cellDiffVoltage", (_cellMaxMilliVolt - _cellMinMilliVolt), "mV", 0);
+    }
+
+    if (oStatus.has_value()) {
+        using Bits = JkBms::StatusBits;
         auto balancingActive = *oStatus & static_cast<uint16_t>(Bits::BalancingActive);
-        addLiveViewText(root, "balancingActive", (balancingActive?"yes":"no"));
+        addLiveViewTextInSection(root, "cells", "balancingActive", (balancingActive?"yes":"no"));
     }
 
     auto oAlarms = _dataPoints.get<Label::AlarmsBitmask>();

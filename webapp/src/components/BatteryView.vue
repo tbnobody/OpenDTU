@@ -27,9 +27,9 @@
 
           <div class="card-body">
             <div class="row flex-row flex-wrap align-items-start g-3">
-              <div class="col order-0">
+              <div v-for="(values, section) in batteryData.values" v-bind:key="section" class="col order-0">
                 <div class="card" :class="{ 'border-info': true }">
-                  <div class="card-header text-bg-info">{{ $t('battery.Status') }}</div>
+                  <div class="card-header text-bg-info">{{ $t('battery.' + section) }}</div>
                   <div class="card-body">
                     <table class="table table-striped table-hover">
                       <thead>
@@ -40,7 +40,7 @@
                         </tr>
                       </thead>
                       <tbody>
-                        <tr v-for="(prop, key) in batteryData.values" v-bind:key="key">
+                        <tr v-for="(prop, key) in values" v-bind:key="key">
                           <th scope="row">{{ $t('battery.' + key) }}</th>
                           <td style="text-align: right">
                             <template v-if="typeof prop === 'string'">

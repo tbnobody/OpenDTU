@@ -28,16 +28,6 @@ class BatteryStats {
         bool isValid() const { return _lastUpdateSoC > 0 && _lastUpdate > 0; }
 
     protected:
-        template<typename T>
-        void addLiveViewValue(JsonVariant& root, std::string const& name,
-                T&& value, std::string const& unit, uint8_t precision) const;
-        void addLiveViewText(JsonVariant& root, std::string const& name,
-            std::string const& text) const;
-        void addLiveViewWarning(JsonVariant& root, std::string const& name,
-            bool warning) const;
-        void addLiveViewAlarm(JsonVariant& root, std::string const& name,
-            bool alarm) const;
-
         String _manufacturer = "unknown";
         uint8_t _SoC = 0;
         uint32_t _lastUpdateSoC = 0;
