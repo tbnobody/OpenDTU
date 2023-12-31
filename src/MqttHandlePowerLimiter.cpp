@@ -34,11 +34,21 @@ void MqttHandlePowerLimiterClass::init(Scheduler& scheduler)
 
 void MqttHandlePowerLimiterClass::loop()
 {
-    if (!MqttSettings.getConnected() ) {
+    std::unique_lock<std::mutex> mqttLock(_mqttMutex);
+
+    const CONFIG_T& config = Configuration.get();
+
+    if (!config.PowerLimiter.Enabled) {
+        _mqttCallbacks.clear();
         return;
     }
 
-    const CONFIG_T& config = Configuration.get();
+    for (auto& callback : _mqttCallbacks) { callback(); }
+    _mqttCallbacks.clear();
+
+    mqttLock.unlock();
+
+    if (!MqttSettings.getConnected() ) { return; }
 
     if ((millis() - _lastPublish) > (config.Mqtt.PublishInterval * 1000) ) {
         auto val = static_cast<unsigned>(PowerLimiter.getMode());
@@ -53,13 +63,6 @@ void MqttHandlePowerLimiterClass::loop()
 void MqttHandlePowerLimiterClass::onCmdMode(const espMqttClientTypes::MessageProperties& properties,
         const char* topic, const uint8_t* payload, size_t len, size_t index, size_t total)
 {
-    const CONFIG_T& config = Configuration.get();
-
-    // ignore messages if PowerLimiter is disabled
-    if (!config.PowerLimiter.Enabled) {
-        return;
-    }
-
     std::string strValue(reinterpret_cast<const char*>(payload), len);
     int intValue = -1;
     try {
@@ -71,19 +74,24 @@ void MqttHandlePowerLimiterClass::onCmdMode(const espMqttClientTypes::MessagePro
         return;
     }
 
+    std::lock_guard<std::mutex> mqttLock(_mqttMutex);
+
     using Mode = PowerLimiterClass::Mode;
     switch (static_cast<Mode>(intValue)) {
         case Mode::UnconditionalFullSolarPassthrough:
             MessageOutput.println("Power limiter unconditional full solar PT");
-            PowerLimiter.setMode(Mode::UnconditionalFullSolarPassthrough);
+            _mqttCallbacks.push_back(std::bind(&PowerLimiterClass::setMode,
+                        &PowerLimiter, Mode::UnconditionalFullSolarPassthrough));
             break;
         case Mode::Disabled:
             MessageOutput.println("Power limiter disabled (override)");
-            PowerLimiter.setMode(Mode::Disabled);
+            _mqttCallbacks.push_back(std::bind(&PowerLimiterClass::setMode,
+                        &PowerLimiter, Mode::Disabled));
             break;
         case Mode::Normal:
             MessageOutput.println("Power limiter normal operation");
-            PowerLimiter.setMode(Mode::Normal);
+            _mqttCallbacks.push_back(std::bind(&PowerLimiterClass::setMode,
+                        &PowerLimiter, Mode::Normal));
             break;
         default:
             MessageOutput.printf("PowerLimiter - unknown mode %d\r\n", intValue);
