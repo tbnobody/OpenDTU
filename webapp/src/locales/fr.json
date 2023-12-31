@@ -406,7 +406,6 @@
         "ApTimeout": "Délai d'attente du point d'accès",
         "ApTimeoutHint": "Durée pendant laquelle le point d'accès reste ouvert. Une valeur de 0 signifie infini.",
         "Minutes": "minutes",
-        "Save": "@:dtuadmin.Save",
         "EnableMdns": "Activer mDNS",
         "MdnsSettings": "mDNS Settings"
     },
@@ -450,8 +449,7 @@
         "HassPrefixTopicHint": "Le préfixe de découverte du sujet",
         "HassRetain": "Activer du maintien",
         "HassExpire": "Activer l'expiration",
-        "HassIndividual": "Panneaux individuels",
-        "Save": "@:dtuadmin.Save"
+        "HassIndividual": "Panneaux individuels"
     },
     "inverteradmin": {
         "InverterSettings": "Paramètres des onduleurs",
