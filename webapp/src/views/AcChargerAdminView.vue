@@ -56,7 +56,7 @@
                             <div class="input-group">
                                 <input type="number" class="form-control" id="lowerPowerLimit"
                                     placeholder="150" v-model="acChargerConfigList.lower_power_limit"
-                                    aria-describedby="lowerPowerLimitDescription" min="100" max="3000" required/>
+                                    aria-describedby="lowerPowerLimitDescription" min="50" max="3000" required/>
                                     <span class="input-group-text" id="lowerPowerLimitDescription">W</span>
                             </div>
                         </div>
