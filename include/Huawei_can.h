@@ -69,7 +69,7 @@
 // Wait time/current before shuting down the PSU / charger
 // This is set to allow the fan to run for some time
 #define HUAWEI_AUTO_MODE_SHUTDOWN_DELAY 60000
-#define HUAWEI_AUTO_MODE_SHUTDOWN_CURRENT 1.0
+#define HUAWEI_AUTO_MODE_SHUTDOWN_CURRENT 0.75
 
 // Updateinterval used to request new values from the PSU
 #define HUAWEI_DATA_REQUEST_INTERVAL_MS 2500
