@@ -11,6 +11,8 @@ enum DisplayType_t {
     PCD8544,
     SSD1306,
     SH1106,
+    SSD1309,
+    DisplayType_Max,
 };
 
 class DisplayGraphicClass {
@@ -35,6 +37,7 @@ private:
     void printText(const char* text, const uint8_t line);
     void calcLineHeights();
     void setFont(const uint8_t line);
+    bool isValidDisplay();
 
     Task _loopTask;
 
