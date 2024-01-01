@@ -6,11 +6,10 @@
 #define CMT2300A_ONE_STEP_SIZE 2500 // frequency channel step size for fast frequency hopping operation: One step size is 2.5 kHz.
 #define CMT_BASE_FREQ 860000000 // from Frequency Bank in cmt2300a_params.h
 #define FH_OFFSET 100 // value * CMT2300A_ONE_STEP_SIZE = channel frequency offset
-#define CMT_SPI_SPEED 4000000 // 4 MHz
 
 class CMT2300A {
 public:
-    CMT2300A(uint8_t pin_sdio, uint8_t pin_clk, uint8_t pin_cs, uint8_t pin_fcs, uint32_t _spi_speed = CMT_SPI_SPEED);
+    CMT2300A(uint8_t pin_sdio, uint8_t pin_clk, uint8_t pin_cs, uint8_t pin_fcs);
 
     bool begin(void);
 
@@ -108,5 +107,4 @@ private:
     int8_t _pin_clk;
     int8_t _pin_cs;
     int8_t _pin_fcs;
-    uint32_t _spi_speed;
 };

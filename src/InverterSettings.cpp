@@ -38,9 +38,7 @@ void InverterSettingsClass::init(Scheduler& scheduler)
 
     if (PinMapping.isValidNrf24Config() || PinMapping.isValidCmt2300Config()) {
         if (PinMapping.isValidNrf24Config()) {
-            SPIClass* spiClass = new SPIClass(SPI_NRF);
-            spiClass->begin(pin.nrf24_clk, pin.nrf24_miso, pin.nrf24_mosi, pin.nrf24_cs);
-            Hoymiles.initNRF(spiClass, pin.nrf24_en, pin.nrf24_irq);
+            Hoymiles.initNRF(pin.nrf24_mosi, pin.nrf24_miso, pin.nrf24_clk, pin.nrf24_cs, pin.nrf24_en, pin.nrf24_irq);
         }
 
         if (PinMapping.isValidCmt2300Config()) {
