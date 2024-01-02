@@ -11,7 +11,7 @@ import { authHeader, handleResponse } from '@/utils/authentication';
 var data_cal: any;
 
 export const options_cal = {
-    height: 270,
+    height: 480,
     colorAxis: {
         minValue: 0,
         colors: ['#FFFFFF', '#0000FF']

@@ -4,10 +4,8 @@
         <InverterTotalInfo :totalData="liveData.total" /><br />
         <div class="card">
             <div class="card-body">
-                <div class="row">
-                    <BarChart />
-                    <CalendarChart />
-                </div>
+                <BarChart />
+                <CalendarChart />
             </div>
         </div>
         <div class="row gy-3">
@@ -90,7 +88,8 @@
 
                                 <div class="btn-group me-2" role="group">
                                     <button type="button" class="btn btn-sm btn-info"
-                                        @click="onShowGridProfile(inverter.serial)" v-tooltip :title="$t('home.ShowGridProfile')">
+                                        @click="onShowGridProfile(inverter.serial)" v-tooltip
+                                        :title="$t('home.ShowGridProfile')">
                                         <BIconOutlet style="font-size:24px;" />
 
                                     </button>
@@ -200,12 +199,13 @@
                         </div>
                     </div>
 
-                    <GridProfile v-if="!gridProfileLoading" :gridProfileList="gridProfileList" :gridProfileRawList="gridProfileRawList" />
+                    <GridProfile v-if="!gridProfileLoading" :gridProfileList="gridProfileList"
+                        :gridProfileRawList="gridProfileRawList" />
                 </div>
 
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" @click="onHideGridProfile"
-                        data-bs-dismiss="modal">{{ $t('home.Close') }}</button>
+                    <button type="button" class="btn btn-secondary" @click="onHideGridProfile" data-bs-dismiss="modal">{{
+                        $t('home.Close') }}</button>
                 </div>
             </div>
         </div>
@@ -639,11 +639,11 @@ export default defineComponent({
                     this.gridProfileList = data;
 
                     fetch("/api/gridprofile/rawdata?inv=" + serial, { headers: authHeader() })
-                    .then((response) => handleResponse(response, this.$emitter, this.$router))
-                    .then((data) => {
-                        this.gridProfileRawList = data;
-                        this.gridProfileLoading = false;
-                    })
+                        .then((response) => handleResponse(response, this.$emitter, this.$router))
+                        .then((data) => {
+                            this.gridProfileRawList = data;
+                            this.gridProfileLoading = false;
+                        })
                 });
 
             this.gridProfileView.show();
