@@ -7,6 +7,7 @@
 #include "defaults.h"
 #include <ArduinoJson.h>
 #include <LittleFS.h>
+#include <nvs_flash.h>
 
 CONFIG_T config;
 
@@ -337,6 +338,14 @@ void ConfigurationClass::migrate()
     if (config.Cfg.Version < 0x00011900) {
         JsonObject dtu = doc["dtu"];
         config.Dtu.Nrf.PaLevel = dtu["pa_level"];
+    }
+
+    if (config.Cfg.Version < 0x00011a00) {
+        // This migration fixes this issue: https://github.com/espressif/arduino-esp32/issues/8828
+        // It occours when migrating from Core 2.0.9 to 2.0.14
+        // which was done by updating ESP32 PlatformIO from 6.3.2 to 6.5.0
+        nvs_flash_erase();
+        nvs_flash_init();
     }
 
     f.close();
