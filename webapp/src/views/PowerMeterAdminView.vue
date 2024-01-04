@@ -185,7 +185,7 @@
                 </div>
             </div>
 
-            <button type="submit" class="btn btn-primary mb-3">{{ $t('powermeteradmin.Save') }}</button>
+            <FormFooter @reload="getPowerMeterConfig"/>
 
             <div v-if="powerMeterConfigList.source === 3" class="alert alert-secondary" role="alert">
                 <h2>URL examples:</h2>
@@ -213,6 +213,7 @@ import { defineComponent } from 'vue';
 import BasePage from '@/components/BasePage.vue';
 import BootstrapAlert from "@/components/BootstrapAlert.vue";
 import CardElement from '@/components/CardElement.vue';
+import FormFooter from '@/components/FormFooter.vue';
 import InputElement from '@/components/InputElement.vue';
 import { handleResponse, authHeader } from '@/utils/authentication';
 import type { PowerMeterHttpPhaseConfig, PowerMeterConfig } from "@/types/PowerMeterConfig";
@@ -222,6 +223,7 @@ export default defineComponent({
         BasePage,
         BootstrapAlert,
         CardElement,
+        FormFooter,
         InputElement
     },
     data() {

@@ -31,6 +31,7 @@
         "Yes": "Oui",
         "No": "Non",
         "VerboseLogging": "Journalisation Détaillée",
+        "Seconds": "Secondes",
         "Loading": "Chargement...",
         "Reload": "Reload",
         "Cancel": "Annuler",
@@ -467,7 +468,6 @@
         "ApTimeout": "Délai d'attente du point d'accès",
         "ApTimeoutHint": "Durée pendant laquelle le point d'accès reste ouvert. Une valeur de 0 signifie infini.",
         "Minutes": "minutes",
-        "Save": "@:dtuadmin.Save",
         "EnableMdns": "Activer mDNS",
         "MdnsSettings": "mDNS Settings"
     },
@@ -512,8 +512,7 @@
         "HassPrefixTopicHint": "Le préfixe de découverte du sujet",
         "HassRetain": "Activer du maintien",
         "HassExpire": "Activer l'expiration",
-        "HassIndividual": "Panneaux individuels",
-        "Save": "@:dtuadmin.Save"
+        "HassIndividual": "Panneaux individuels"
     },
     "vedirectadmin": {
         "VedirectSettings": "VE.Direct Settings",
@@ -521,8 +520,7 @@
         "EnableVedirect": "Enable VE.Direct",
         "VedirectParameter": "VE.Direct Parameter",
         "VerboseLogging": "@:base.VerboseLogging",
-        "UpdatesOnly": "Publish values to MQTT only when they change",
-        "Save": "@:dtuadmin.Save"
+        "UpdatesOnly": "Publish values to MQTT only when they change"
     },
     "batteryadmin": {
         "BatterySettings": "Battery Settings",
@@ -532,14 +530,16 @@
         "Provider": "Data Provider",
         "ProviderPylontechCan": "Pylontech using CAN bus",
         "ProviderJkBmsSerial": "Jikong (JK) BMS using serial connection",
+        "ProviderMqtt": "State of Charge (SoC) value from MQTT broker",
         "ProviderVictron": "Victron SmartShunt using VE.Direct interface",
+        "MqttConfiguration": "MQTT Settings",
+        "MqttTopic": "SoC value topic",
         "JkBmsConfiguration": "JK BMS Settings",
         "JkBmsInterface": "Interface Type",
         "JkBmsInterfaceUart": "TTL-UART on MCU",
         "JkBmsInterfaceTransceiver": "RS-485 Transceiver on MCU",
         "PollingInterval": "Polling Interval",
-        "Seconds": "@:dtuadmin.Seconds",
-        "Save": "@:dtuadmin.Save"
+        "Seconds": "@:base.Seconds"
     },
     "inverteradmin": {
         "InverterSettings": "Paramètres des onduleurs",
@@ -648,8 +648,7 @@
       "BatterySocInfo": "<b>Hint:</b> The battery SoC (State of Charge) values can only be used if the battery communication interface is enabled. If the battery has not reported any SoC updates in the last minute, the voltage thresholds will be used as fallback.",
       "InverterIsBehindPowerMeter": "Inverter is behind Power meter",
       "Battery": "DC / Battery",
-      "VoltageLoadCorrectionInfo": "<b>Hint:</b> When the power output is higher, the voltage is usually decreasing. In order to not stop the inverter too early (Stop treshold), a power factor can be specified here to correct this. Corrected voltage = DC Voltage + (Current power * correction factor).",
-      "Save": "@:dtuadmin.Save"
+      "VoltageLoadCorrectionInfo": "<b>Hint:</b> When the power output is higher, the voltage is usually decreasing. In order to not stop the inverter too early (Stop treshold), a power factor can be specified here to correct this. Corrected voltage = DC Voltage + (Current power * correction factor)."
     },
     "login": {
         "Login": "Connexion",
@@ -768,14 +767,13 @@
         "enableVoltageLimitHint": "Automatic power control is disabled if the output voltage is higher then this value and if the output power drops below the minimum output power limit (set below).\nAutomatic power control is re-enabled if the battery voltage drops below the value set in this field.",
         "lowerPowerLimit": "Minimum output power",
         "upperPowerLimit": "Maximum output power",
-        "Seconds": "@:dtuadmin.Seconds",
-        "Save": "@:dtuadmin.Save"
+        "Seconds": "@:base.Seconds"
       },
       "battery": {
         "battery": "Battery",
         "DataAge": "Data Age: ",
         "Seconds": " {val} seconds",
-        "Status": "Status",
+        "status": "Status",
         "Property": "Property",
         "yes": "@:base.Yes",
         "no": "@:base.No",
@@ -793,9 +791,15 @@
         "dischargeCurrentLimitation": "Discharge current limit",
         "chargeEnabled": "Charging possible",
         "dischargeEnabled": "Discharging possible",
-        "balancingActive": "Balancing active",
         "chargeImmediately": "Immediate charging requested",
+        "cells": "Cells",
+        "batOneTemp": "Battery temperature 1",
+        "batTwoTemp": "Battery temperature 2",
+        "cellMinVoltage": "Minimum cell voltage",
         "cellAvgVoltage": "Average cell voltage",
+        "cellMaxVoltage": "Maximum cell voltage",
+        "cellDiffVoltage": "Cell voltage difference",
+        "balancingActive": "Balancing active",
         "issues": "Issues",
         "noIssues": "No Issues",
         "issueName": "Name",

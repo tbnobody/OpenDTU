@@ -5,6 +5,7 @@
 #include "PylontechCanReceiver.h"
 #include "JkBmsController.h"
 #include "VictronSmartShunt.h"
+#include "MqttBattery.h"
 
 BatteryClass Battery;
 
@@ -26,13 +27,14 @@ void BatteryClass::init(Scheduler& scheduler)
     _loopTask.setCallback(std::bind(&BatteryClass::loop, this));
     _loopTask.setIterations(TASK_FOREVER);
     _loopTask.enable();
-    std::lock_guard<std::mutex> lock(_mutex);
 
     this->updateSettings();
 }
 
 void BatteryClass::updateSettings()
 {
+    std::lock_guard<std::mutex> lock(_mutex);
+
     if (_upProvider) {
         _upProvider->deinit();
         _upProvider = nullptr;
@@ -52,6 +54,10 @@ void BatteryClass::updateSettings()
             _upProvider = std::make_unique<JkBms::Controller>();
             if (!_upProvider->init(verboseLogging)) { _upProvider = nullptr; }
             break;
+        case 2:
+            _upProvider = std::make_unique<MqttBattery>();
+            if (!_upProvider->init(verboseLogging)) { _upProvider = nullptr; }
+            break;
         case 3:
             _upProvider = std::make_unique<VictronSmartShunt>();
             if (!_upProvider->init(verboseLogging)) { _upProvider = nullptr; }
@@ -61,7 +67,6 @@ void BatteryClass::updateSettings()
             break;
     }
 }
-
 
 void BatteryClass::loop()
 {

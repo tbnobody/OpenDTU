@@ -31,6 +31,7 @@
         "Yes": "Ja",
         "No": "Nein",
         "VerboseLogging": "Ausführliche Protokollierung",
+        "Seconds": "Sekunden",
         "Loading": "Lade...",
         "Reload": "Aktualisieren",
         "Cancel": "Abbrechen",
@@ -519,8 +520,7 @@
         "EnableVedirect": "Aktiviere VE.Direct",
         "VedirectParameter": "VE.Direct Parameter",
         "VerboseLogging": "@:base.VerboseLogging",
-        "UpdatesOnly": "Werte nur bei Änderung an MQTT broker senden",
-        "Save": "@:dtuadmin.Save"
+        "UpdatesOnly": "Werte nur bei Änderung an MQTT broker senden"
     },
     "powermeteradmin":{
         "PowerMeterSettings": "Stromzähler Einstellungen",
@@ -541,7 +541,6 @@
         "SDM": "SDM-Stromzähler Konfiguration",
         "sdmbaudrate": "Baudrate",
         "sdmaddress": "Modbus Adresse",
-        "Save": "@:dtuadmin.Save",
         "HTTP": "HTTP(S) + JSON - Allgemeine Konfiguration",
         "httpIndividualRequests": "Individuelle HTTP requests pro Phase",
         "httpUrlDescription": "Die URL muss mit http:// oder https:// beginnen. Manche Zeichen wie Leerzeichen und = müssen mit URL-Kodierung kodiert werden (%xx). Achtung: Ein Überprüfung von SSL Server Zertifikaten ist nicht implementiert (MITM-Attacken sind möglich)! Beispiele gibt es unten.",
@@ -596,8 +595,7 @@
         "VoltageLoadCorrectionInfo": "<b>Hinweis:</b> Wenn Leistung von der Batterie abgegeben wird, bricht normalerweise die Spannung etwas ein. Damit nicht vorzeitig der Wechelrichter ausgeschaltet wird sobald der \"Stop\"-Schwellenwert erreicht wird, wird der hier angegebene Korrekturfaktor mit einberechnet. Korrigierte Spannung = DC Spannung + (Aktuelle Leistung (W) * Korrekturfaktor).",
         "InverterRestart": "Wechselrichter Neustart",
         "InverterRestartHour": "Stunde für Neustart",
-        "InverterRestartHint": "Neustart des Wechselrichter einmal täglich um die \"Tagesertrag\" Werte wieder auf Null zu setzen.",
-        "Save": "@:dtuadmin.Save"
+        "InverterRestartHint": "Neustart des Wechselrichter einmal täglich um die \"Tagesertrag\" Werte wieder auf Null zu setzen."
     },
     "batteryadmin": {
         "BatterySettings": "Batterie Einstellungen",
@@ -607,14 +605,16 @@
         "Provider": "Datenanbieter",
         "ProviderPylontechCan": "Pylontech per CAN-Bus",
         "ProviderJkBmsSerial": "Jikong (JK) BMS per serieller Verbindung",
+        "ProviderMqtt": "State of Charge (SoC) Wert aus MQTT Broker",
         "ProviderVictron": "Victron SmartShunt per VE.Direct Schnittstelle",
+        "MqttConfiguration": "MQTT Einstellungen",
+        "MqttTopic": "SoC-Wert Topic",
         "JkBmsConfiguration": "JK BMS Einstellungen",
         "JkBmsInterface": "Schnittstellentyp",
         "JkBmsInterfaceUart": "TTL-UART an der MCU",
         "JkBmsInterfaceTransceiver": "RS-485 Transceiver an der MCU",
         "PollingInterval": "Abfrageintervall",
-        "Seconds": "@:dtuadmin.Seconds",
-        "Save": "@:dtuadmin.Save"
+        "Seconds": "@:base.Seconds"
     },
     "inverteradmin": {
         "InverterSettings": "Wechselrichter Einstellungen",
@@ -800,14 +800,13 @@
         "enableVoltageLimitHint": "Die automatische Leistungssteuerung wird deaktiviert wenn die Ausgangsspannung über diesem Wert liegt und wenn gleichzeitig die Ausgangsleistung unter die minimale Leistung fällt.\nDie automatische Leistungssteuerung wird re-aktiveiert wenn die Batteriespannung unter diesen Wert fällt.",
         "lowerPowerLimit": "Minimale Leistung",
         "upperPowerLimit": "Maximale Leistung",
-        "Seconds": "@:dtuadmin.Seconds",
-        "Save": "@:dtuadmin.Save"
+        "Seconds": "@:base.Seconds"
       },
       "battery": {
         "battery": "Batterie",
         "DataAge": "letzte Aktualisierung: ",
         "Seconds": "vor {val} Sekunden",
-        "Status": "Status",
+        "status": "Status",
         "Property": "Eigenschaft",
         "yes": "@:base.Yes",
         "no": "@:base.No",
@@ -825,9 +824,15 @@
         "dischargeCurrentLimitation": "Entladestromlimit",
         "chargeEnabled": "Laden ermöglicht",
         "dischargeEnabled": "Entladen ermöglicht",
-        "balancingActive": "Ausgleichen aktiv",
         "chargeImmediately": "Sofortiges Laden angefordert",
+        "cells": "Zellen",
+        "batOneTemp": "Batterietemperatur 1",
+        "batTwoTemp": "Batterietemperatur 2",
+        "cellMinVoltage": "Kleinste Zellspannung",
         "cellAvgVoltage": "Durchschnittliche Zellspannung",
+        "cellMaxVoltage": "Höchste Zellspannung",
+        "cellDiffVoltage": "Zellspannungsdifferenz",
+        "balancingActive": "Ausgleichen aktiv",
         "issues": "Meldungen",
         "noIssues": "Keine Meldungen",
         "issueName": "Bezeichnung",

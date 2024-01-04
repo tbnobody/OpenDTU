@@ -9,13 +9,16 @@
 #include <frozen/string.h>
 
 const std::array<const ProfileType_t, PROFILE_TYPE_COUNT> GridProfileParser::_profileTypes = { {
-    { 0x02, 0x00, "no data (yet)" },
-    { 0x03, 0x00, "Germany - DE_VDE4105_2018" },
-    { 0x0a, 0x00, "European - EN 50549-1:2019" },
-    { 0x0c, 0x00, "AT Tor - EU_EN50438" },
-    { 0x0d, 0x04, "France" },
-    { 0x12, 0x00, "Poland - EU_EN50438" },
-    { 0x37, 0x00, "Swiss - CH_NA EEA-NE7-CH2020" },
+    { 0x02, 0x00, "US - NA_IEEE1547_240V" },
+    { 0x03, 0x00, "DE - DE_VDE4105_2018" },
+    { 0x03, 0x01, "XX - unknown" },
+    { 0x0a, 0x00, "XX - EN 50549-1:2019" },
+    { 0x0c, 0x00, "AT - AT_TOR_Erzeuger_default" },
+    { 0x0d, 0x04, "FR -" },
+    { 0x10, 0x00, "ES - ES_RD1699" },
+    { 0x12, 0x00, "PL - EU_EN50438" },
+    { 0x29, 0x00, "NL - NL_NEN-EN50549-1_2019" },
+    { 0x37, 0x00, "CH - CH_NA EEA-NE7-CH2020" },
 } };
 
 constexpr frozen::map<uint8_t, frozen::string, 12> profileSection = {
@@ -45,19 +48,19 @@ constexpr GridProfileItemDefinition_t make_value(frozen::string Name, frozen::st
     return v;
 }
 
-constexpr frozen::map<uint8_t, GridProfileItemDefinition_t, 0x39> itemDefinitions = {
+constexpr frozen::map<uint8_t, GridProfileItemDefinition_t, 0x42> itemDefinitions = {
     { 0x01, make_value("Nominale Voltage (NV)", "V", 10) },
     { 0x02, make_value("Low Voltage 1 (LV1)", "V", 10) },
     { 0x03, make_value("LV1 Maximum Trip Time (MTT)", "s", 10) },
     { 0x04, make_value("High Voltage 1 (HV1)", "V", 10) },
     { 0x05, make_value("HV1 Maximum Trip Time (MTT)", "s", 10) },
     { 0x06, make_value("Low Voltage 2 (LV2)", "V", 10) },
-    { 0x07, make_value("LV2 Maximum Trip Time (MTT)", "s", 10) },
+    { 0x07, make_value("LV2 Maximum Trip Time (MTT)", "s", 100) },
     { 0x08, make_value("High Voltage 2 (HV2)", "V", 10) },
-    { 0x09, make_value("HV2 Maximum Trip Time (MTT)", "s", 10) },
+    { 0x09, make_value("HV2 Maximum Trip Time (MTT)", "s", 100) },
     { 0x0a, make_value("10mins Average High Voltage (AHV)", "V", 10) },
     { 0x0b, make_value("High Voltage 3 (HV3)", "V", 10) },
-    { 0x0c, make_value("HV3 Maximum Trip Time (MTT)", "s", 10) },
+    { 0x0c, make_value("HV3 Maximum Trip Time (MTT)", "s", 100) },
     { 0x0d, make_value("Nominal Frequency", "Hz", 100) },
     { 0x0e, make_value("Low Frequency 1 (LF1)", "Hz", 100) },
     { 0x0f, make_value("LF1 Maximum Trip Time (MTT)", "s", 10) },
@@ -94,7 +97,7 @@ constexpr frozen::map<uint8_t, GridProfileItemDefinition_t, 0x39> itemDefinition
     { 0x2e, make_value("Voltage Set Point V3", "V", 10) },
     { 0x2f, make_value("Voltage Set Point V4", "V", 10) },
     { 0x30, make_value("Reactive Set Point Q4", "%Pn", 10) },
-    { 0x31, make_value("Setting Time (Tr)", "s", 10) },
+    { 0x31, make_value("VV Setting Time (Tr)", "s", 10) },
     { 0x32, make_value("SPF Function Activated", "bool", 1) },
     { 0x33, make_value("Power Factor (PF)", "", 100) },
     { 0x34, make_value("RPC Function Activated", "bool", 1) },
@@ -102,6 +105,15 @@ constexpr frozen::map<uint8_t, GridProfileItemDefinition_t, 0x39> itemDefinition
     { 0x36, make_value("WPF Function Activated", "bool", 1) },
     { 0x37, make_value("Start of Power of WPF (Pstart)", "%Pn", 10) },
     { 0x38, make_value("Power Factor ar Rated Power (PFRP)", "", 100) },
+    { 0x39, make_value("Low Voltage 3 (LV3)", "V", 10) },
+    { 0x3a, make_value("LV3 Maximum Trip Time (MTT)", "s", 100) },
+    { 0x3b, make_value("Momentary Cessition Low Voltage", "V", 10) },
+    { 0x3c, make_value("Momentary Cessition High Voltage", "V", 10) },
+    { 0x3d, make_value("FW Settling Time (Tr)", "s", 10) },
+    { 0x3e, make_value("LF2 Maximum Trip Time (MTT)", "s", 100) },
+    { 0x3f, make_value("HF2 Maximum Trip time (MTT)", "s", 100) },
+    { 0x40, make_value("Short Interruption Reconnect Time (SRT)", "s", 10) },
+    { 0x41, make_value("Short Interruption Time (SIT)", "s", 10) },
     { 0xff, make_value("Unkown Value", "", 1) },
 };
 
@@ -113,6 +125,24 @@ const std::array<const GridProfileValue_t, SECTION_VALUE_COUNT> GridProfileParse
     { 0x00, 0x00, 0x03 },
     { 0x00, 0x00, 0x04 },
     { 0x00, 0x00, 0x05 },
+
+    // Version 0x01
+    { 0x00, 0x01, 0x01 },
+    { 0x00, 0x01, 0x02 },
+    { 0x00, 0x01, 0x03 },
+    { 0x00, 0x01, 0x04 },
+    { 0x00, 0x01, 0x05 },
+    { 0x00, 0x01, 0x08 },
+    { 0x00, 0x01, 0x09 },
+
+    // Version 0x02
+    { 0x00, 0x02, 0x01 },
+    { 0x00, 0x02, 0x02 },
+    { 0x00, 0x02, 0x03 },
+    { 0x00, 0x02, 0x04 },
+    { 0x00, 0x02, 0x05 },
+    { 0x00, 0x02, 0x06 },
+    { 0x00, 0x02, 0x07 },
 
     // Version 0x03
     { 0x00, 0x03, 0x01 },
@@ -178,10 +208,10 @@ const std::array<const GridProfileValue_t, SECTION_VALUE_COUNT> GridProfileParse
     { 0x00, 0x35, 0x07 },
     { 0x00, 0x35, 0x08 },
     { 0x00, 0x35, 0x09 },
-    { 0x00, 0x35, 0xff },
-    { 0x00, 0x35, 0xff },
-    { 0x00, 0x35, 0xff },
-    { 0x00, 0x35, 0xff },
+    { 0x00, 0x35, 0x39 },
+    { 0x00, 0x35, 0x3a },
+    { 0x00, 0x35, 0x3b },
+    { 0x00, 0x35, 0x3c },
 
     // Frequency (H/LFRT)
     // Version 0x00
@@ -198,9 +228,9 @@ const std::array<const GridProfileValue_t, SECTION_VALUE_COUNT> GridProfileParse
     { 0x10, 0x03, 0x10 },
     { 0x10, 0x03, 0x11 },
     { 0x10, 0x03, 0x12 },
-    { 0x10, 0x03, 0x13 },
+    { 0x10, 0x03, 0x3e },
     { 0x10, 0x03, 0x14 },
-    { 0x10, 0x03, 0x15 },
+    { 0x10, 0x03, 0x3f },
 
     // Island Detection (ID)
     // Version 0x00
@@ -220,8 +250,8 @@ const std::array<const GridProfileValue_t, SECTION_VALUE_COUNT> GridProfileParse
     { 0x30, 0x07, 0x19 },
     { 0x30, 0x07, 0x1a },
     { 0x30, 0x07, 0x1b },
-    { 0x30, 0x07, 0xff },
-    { 0x30, 0x07, 0xff },
+    { 0x30, 0x07, 0x40 },
+    { 0x30, 0x07, 0x41 },
 
     // Ramp Rates (RR)
     // Version 0x00
@@ -255,7 +285,7 @@ const std::array<const GridProfileValue_t, SECTION_VALUE_COUNT> GridProfileParse
     { 0x50, 0x11, 0x1f },
     { 0x50, 0x11, 0x20 },
     { 0x50, 0x11, 0x21 },
-    { 0x50, 0x11, 0x22 },
+    { 0x50, 0x11, 0x3d },
 
     // Volt Watt (VW)
     // Version 0x00

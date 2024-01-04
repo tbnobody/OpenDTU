@@ -265,7 +265,7 @@
                 </div>
             </CardElement>
 
-            <button type="submit" class="btn btn-primary mb-3">{{ $t('powerlimiteradmin.Save') }}</button>
+            <FormFooter @reload="getPowerLimiterConfig"/>
         </form>
     </BasePage>
 </template>
@@ -276,6 +276,7 @@ import BasePage from '@/components/BasePage.vue';
 import BootstrapAlert from "@/components/BootstrapAlert.vue";
 import { handleResponse, authHeader } from '@/utils/authentication';
 import CardElement from '@/components/CardElement.vue';
+import FormFooter from '@/components/FormFooter.vue';
 import InputElement from '@/components/InputElement.vue';
 import { BIconInfoCircle } from 'bootstrap-icons-vue';
 import type { PowerLimiterConfig } from "@/types/PowerLimiterConfig";
@@ -285,6 +286,7 @@ export default defineComponent({
         BasePage,
         BootstrapAlert,
         CardElement,
+        FormFooter,
         InputElement,
         BIconInfoCircle,
     },

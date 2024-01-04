@@ -199,6 +199,7 @@ bool ConfigurationClass::write()
     battery["provider"] = config.Battery.Provider;
     battery["jkbms_interface"] = config.Battery.JkBmsInterface;
     battery["jkbms_polling_interval"] = config.Battery.JkBmsPollingInterval;
+    battery["mqtt_topic"] = config.Battery.MqttTopic;
 
     JsonObject huawei = doc.createNestedObject("huawei");
     huawei["enabled"] = config.Huawei.Enabled;
@@ -435,6 +436,7 @@ bool ConfigurationClass::read()
     config.Battery.Provider = battery["provider"] | BATTERY_PROVIDER;
     config.Battery.JkBmsInterface = battery["jkbms_interface"] | BATTERY_JKBMS_INTERFACE;
     config.Battery.JkBmsPollingInterval = battery["jkbms_polling_interval"] | BATTERY_JKBMS_POLLING_INTERVAL;
+    strlcpy(config.Battery.MqttTopic, battery["mqtt_topic"] | "", sizeof(config.Battery.MqttTopic));
 
     JsonObject huawei = doc["huawei"];
     config.Huawei.Enabled = huawei["enabled"] | HUAWEI_ENABLED;
