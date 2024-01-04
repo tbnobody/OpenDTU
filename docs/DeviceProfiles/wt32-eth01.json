@@ -49,5 +49,33 @@
             "data": 5,
             "clk": 17
         }
+    },
+    {
+        "name": "WT32-ETH01 with SSD1309",
+        "links": [
+            {"name": "Datasheet", "url": "http://www.wireless-tag.com/portfolio/wt32-eth01/"}
+        ],
+        "nrf24": {
+            "miso": 4,
+            "mosi": 2,
+            "clk": 32,
+            "irq": 33,
+            "en": 14,
+            "cs": 15
+        },
+        "eth": {
+            "enabled": true,
+            "phy_addr": 1,
+            "power": 16,
+            "mdc": 23,
+            "mdio": 18,
+            "type": 0,
+            "clk_mode": 0
+        },
+        "display": {
+            "type": 4,
+            "data": 5,
+            "clk": 17
+        }
     }
 ]
