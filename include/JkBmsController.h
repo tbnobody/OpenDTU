@@ -2,6 +2,7 @@
 
 #include <memory>
 #include <vector>
+#include <frozen/string.h>
 
 #include "Battery.h"
 #include "JkBmsSerialMessage.h"
@@ -30,7 +31,7 @@ class Controller : public BatteryProvider {
             FrameCompleted
         };
 
-        std::string const& getStatusText(Status status);
+        frozen::string const& getStatusText(Status status);
         void announceStatus(Status status);
         void sendRequest(uint8_t pollInterval);
         void rxData(uint8_t inbyte);

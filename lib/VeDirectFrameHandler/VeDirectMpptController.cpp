@@ -1,5 +1,4 @@
 #include <Arduino.h>
-#include <map>
 #include "VeDirectMpptController.h"
 
 void VeDirectMpptController::init(int8_t rx, int8_t tx, Print* msgOut, bool verboseLogging)
@@ -90,18 +89,18 @@ void VeDirectMpptController::frameValidEvent() {
  * getCsAsString
  * This function returns the state of operations (CS) as readable text.
  */
-String VeDirectMpptController::veMpptStruct::getCsAsString() const
+frozen::string const& VeDirectMpptController::veMpptStruct::getCsAsString() const
 {
-	static const std::map<uint8_t, String> values = {
-		{ 0,   F("OFF") },
-		{ 2,   F("Fault") },
-		{ 3,   F("Bulk") },
-		{ 4,   F("Absorbtion") },
-		{ 5,   F("Float") },
-		{ 7,   F("Equalize (manual)") },
-		{ 245, F("Starting-up") },
-		{ 247, F("Auto equalize / Recondition") },
-		{ 252, F("External Control") }
+	static constexpr frozen::map<uint8_t, frozen::string, 9> values = {
+		{ 0,   "OFF" },
+		{ 2,   "Fault" },
+		{ 3,   "Bulk" },
+		{ 4,   "Absorbtion" },
+		{ 5,   "Float" },
+		{ 7,   "Equalize (manual)" },
+		{ 245, "Starting-up" },
+		{ 247, "Auto equalize / Recondition" },
+		{ 252, "External Control" }
 	};
 
 	return getAsString(values, CS);
@@ -111,12 +110,12 @@ String VeDirectMpptController::veMpptStruct::getCsAsString() const
  * getMpptAsString
  * This function returns the state of MPPT (MPPT) as readable text.
  */
-String VeDirectMpptController::veMpptStruct::getMpptAsString() const
+frozen::string const& VeDirectMpptController::veMpptStruct::getMpptAsString() const
 {
-	static const std::map<uint8_t, String> values = {
-		{ 0, F("OFF") },
-		{ 1, F("Voltage or current limited") },
-		{ 2, F("MPP Tracker active") }
+	static constexpr frozen::map<uint8_t, frozen::string, 3> values = {
+		{ 0, "OFF" },
+		{ 1, "Voltage or current limited" },
+		{ 2, "MPP Tracker active" }
 	};
 
 	return getAsString(values, MPPT);
@@ -126,29 +125,29 @@ String VeDirectMpptController::veMpptStruct::getMpptAsString() const
  * getErrAsString
  * This function returns error state (ERR) as readable text.
  */
-String VeDirectMpptController::veMpptStruct::getErrAsString() const
+frozen::string const& VeDirectMpptController::veMpptStruct::getErrAsString() const
 {
-	static const std::map<uint8_t, String> values = {
-		{ 0,   F("No error") },
-		{ 2,   F("Battery voltage too high") },
-		{ 17,  F("Charger temperature too high") },
-		{ 18,  F("Charger over current") },
-		{ 19,  F("Charger current reversed") },
-		{ 20,  F("Bulk time limit exceeded") },
-		{ 21,  F("Current sensor issue(sensor bias/sensor broken)") },
-		{ 26,  F("Terminals overheated") },
-		{ 28,  F("Converter issue (dual converter models only)") },
-		{ 33,  F("Input voltage too high (solar panel)") },
-		{ 34,  F("Input current too high (solar panel)") },
-		{ 38,  F("Input shutdown (due to excessive battery voltage)") },
-		{ 39,  F("Input shutdown (due to current flow during off mode)") },
-		{ 40,  F("Input") },
-		{ 65,  F("Lost communication with one of devices") },
-		{ 67,  F("Synchronisedcharging device configuration issue") },
-		{ 68,  F("BMS connection lost") },
-		{ 116, F("Factory calibration data lost") },
-		{ 117, F("Invalid/incompatible firmware") },
-		{ 118, F("User settings invalid") }
+	static constexpr frozen::map<uint8_t, frozen::string, 20> values = {
+		{ 0,   "No error" },
+		{ 2,   "Battery voltage too high" },
+		{ 17,  "Charger temperature too high" },
+		{ 18,  "Charger over current" },
+		{ 19,  "Charger current reversed" },
+		{ 20,  "Bulk time limit exceeded" },
+		{ 21,  "Current sensor issue(sensor bias/sensor broken)" },
+		{ 26,  "Terminals overheated" },
+		{ 28,  "Converter issue (dual converter models only)" },
+		{ 33,  "Input voltage too high (solar panel)" },
+		{ 34,  "Input current too high (solar panel)" },
+		{ 38,  "Input shutdown (due to excessive battery voltage)" },
+		{ 39,  "Input shutdown (due to current flow during off mode)" },
+		{ 40,  "Input" },
+		{ 65,  "Lost communication with one of devices" },
+		{ 67,  "Synchronisedcharging device configuration issue" },
+		{ 68,  "BMS connection lost" },
+		{ 116, "Factory calibration data lost" },
+		{ 117, "Invalid/incompatible firmware" },
+		{ 118, "User settings invalid" }
 	};
 
 	return getAsString(values, ERR);
@@ -158,19 +157,19 @@ String VeDirectMpptController::veMpptStruct::getErrAsString() const
  * getOrAsString
  * This function returns the off reason (OR) as readable text.
  */
-String VeDirectMpptController::veMpptStruct::getOrAsString() const
+frozen::string const& VeDirectMpptController::veMpptStruct::getOrAsString() const
 {
-	static const std::map<uint32_t, String> values = {
-		{ 0x00000000, F("Not off") },
-		{ 0x00000001, F("No input power") },
-		{ 0x00000002, F("Switched off (power switch)") },
-		{ 0x00000004, F("Switched off (device moderegister)") },
-		{ 0x00000008, F("Remote input") },
-		{ 0x00000010, F("Protection active") },
-		{ 0x00000020, F("Paygo") },
-		{ 0x00000040, F("BMS") },
-		{ 0x00000080, F("Engine shutdown detection") },
-		{ 0x00000100, F("Analysing input voltage") }
+	static constexpr frozen::map<uint32_t, frozen::string, 10> values = {
+		{ 0x00000000, "Not off" },
+		{ 0x00000001, "No input power" },
+		{ 0x00000002, "Switched off (power switch)" },
+		{ 0x00000004, "Switched off (device moderegister)" },
+		{ 0x00000008, "Remote input" },
+		{ 0x00000010, "Protection active" },
+		{ 0x00000020, "Paygo" },
+		{ 0x00000040, "BMS" },
+		{ 0x00000080, "Engine shutdown detection" },
+		{ 0x00000100, "Analysing input voltage" }
 	};
 
 	return getAsString(values, OR);
