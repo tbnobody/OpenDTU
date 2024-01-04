@@ -6,6 +6,7 @@
 #include "Configuration.h"
 #include "Datastore.h"
 #include "MessageOutput.h"
+#include "Utils.h"
 #include "WebApi.h"
 #include "Battery.h"
 #include "Huawei_can.h"
@@ -67,20 +68,12 @@ void WebApiWsLiveClass::loop()
 
         try {
             std::lock_guard<std::mutex> lock(_mutex);
-            DynamicJsonDocument root(4200 * INV_MAX_COUNT); // TODO(helge) check if this calculation is correct
+            DynamicJsonDocument root(4096 * INV_MAX_COUNT);
+            if (Utils::checkJsonAlloc(root, __FUNCTION__, __LINE__)) {
+                JsonVariant var = root;
+                generateJsonResponse(var);
 
-            // TODO(helge) temporary dump of memory usage if allocation of DynamicJsonDocument fails (will be fixed in upstream repo)
-            if (root.capacity() == 0) {
-                MessageOutput.printf("Calling /api/livedata/status has temporarily run out of resources. Reason: Alloc memory for DynamicJsonDocument failed (FreeHeap = %d, MaxAllocHeap = %d, MinFreeHeap = %d).\r\n", ESP.getFreeHeap(), ESP.getMaxAllocHeap(), ESP.getMinFreeHeap());
-                _lastWsPublish = millis();
-                return;
-            }
-
-            JsonVariant var = root;
-            generateJsonResponse(var);
-                
-            String buffer;
-            if (buffer) {
+                String buffer;
                 serializeJson(root, buffer);
 
                 if (Configuration.get().Security.AllowReadonly) {
