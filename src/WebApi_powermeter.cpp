@@ -203,10 +203,11 @@ void WebApiPowerMeterClass::onAdminPost(AsyncWebServerRequest* request)
     response->setLength();
     request->send(response);
 
-    yield();
-    delay(1000);
-    yield();
-    ESP.restart();
+    // why reboot..WebApi_powerlimiter is also not rebooting
+    // yield();
+    // delay(1000);
+    // yield();
+    // ESP.restart();
 }
 
 void WebApiPowerMeterClass::onTestHttpRequest(AsyncWebServerRequest* request)
@@ -254,25 +255,24 @@ void WebApiPowerMeterClass::onTestHttpRequest(AsyncWebServerRequest* request)
         return;
     }
 
-    char powerMeterResponse[2000],
-        errorMessage[256];
-    char response[200];
 
-    if (HttpPowerMeter.httpRequest(root[F("url")].as<String>().c_str(), 
+    char response[256];
+
+    String urlProtocol;
+    String urlHostname;
+    String urlUri;
+
+    HttpPowerMeter.extractUrlComponents(root[F("url")].as<String>().c_str(), urlProtocol, urlHostname, urlUri);
+
+    int phase = 0;//"absuing" index 0 of the float power[3] in HttpPowerMeter to store the result
+    if (HttpPowerMeter.queryPhase(phase, urlProtocol, urlHostname, urlUri,
             root[F("auth_type")].as<Auth>(), root[F("username")].as<String>().c_str(), root[F("password")].as<String>().c_str(),
             root[F("header_key")].as<String>().c_str(), root[F("header_value")].as<String>().c_str(), root[F("timeout")].as<uint16_t>(),
-            powerMeterResponse, sizeof(powerMeterResponse), errorMessage, sizeof(errorMessage))) {
-        float power;
-
-        if (HttpPowerMeter.getFloatValueByJsonPath(powerMeterResponse,
-                root[F("json_path")].as<String>().c_str(), power)) {
-            retMsg[F("type")] = F("success");
-            snprintf_P(response, sizeof(response), "Success! Power: %5.2fW", power);
-        } else {
-            snprintf_P(response, sizeof(response), "Error: Could not find value for JSON path!");
-        }
+            root[F("json_path")].as<String>().c_str())) {
+        retMsg[F("type")] = F("success");
+        snprintf_P(response, sizeof(response), "Success! Power: %5.2fW", HttpPowerMeter.getPower(phase + 1));
     } else {
-        snprintf_P(response, sizeof(response), errorMessage);
+        snprintf_P(response, sizeof(response), "%s", HttpPowerMeter.httpPowerMeterError);
     }
 
     retMsg[F("message")] = F(response);

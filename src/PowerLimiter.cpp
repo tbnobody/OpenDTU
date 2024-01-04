@@ -187,7 +187,8 @@ void PowerLimiterClass::loop()
     // a calculated power limit will always be limited to the reported
     // device's max power. that upper limit is only known after the first
     // DevInfoSimpleCommand succeeded.
-    if (_inverter->DevInfo()->getMaxPower() <= 0) {
+    auto maxPower = _inverter->DevInfo()->getMaxPower();
+    if (maxPower <= 0) {
         return announceStatus(Status::InverterDevInfoPending);
     }
 
@@ -199,12 +200,13 @@ void PowerLimiterClass::loop()
     // the normal mode of operation requires a valid
     // power meter reading to calculate a power limit
     if (!config.PowerMeter.Enabled) {
-        shutdown(Status::PowerMeterDisabled);
+        //instead of shutting down completelty, how about setting alternativly to a save "low production" mode?
+        //Could be usefull when PowerMeter fails but we know for sure house consumption will never fall below a certain limit (say 200W)
+        shutdown(Status::PowerMeterDisabled); 
         return;
     }
 
     if (millis() - PowerMeter.getLastPowerMeterUpdate() > (30 * 1000)) {
-        shutdown(Status::PowerMeterTimeout);
         return;
     }
 
@@ -222,6 +224,7 @@ void PowerLimiterClass::loop()
     if (_inverter->Statistics()->getLastUpdate() <= settlingEnd) {
         return announceStatus(Status::InverterStatsPending);
     }
+    
 
     if (PowerMeter.getLastPowerMeterUpdate() <= settlingEnd) {
         return announceStatus(Status::PowerMeterPending);
@@ -545,8 +548,8 @@ bool PowerLimiterClass::setNewPowerLimit(std::shared_ptr<InverterAbstract> inver
                 dcTotalChnls, dcProdChnls);
         effPowerLimit = round(effPowerLimit * static_cast<float>(dcTotalChnls) / dcProdChnls);
     }
-
-    effPowerLimit = std::min<int32_t>(effPowerLimit, inverter->DevInfo()->getMaxPower());
+    auto maxPower = inverter->DevInfo()->getMaxPower();
+    effPowerLimit = std::min<int32_t>(effPowerLimit, maxPower);
 
     // Check if the new value is within the limits of the hysteresis
     auto diff = std::abs(effPowerLimit - _lastRequestedPowerLimit);
@@ -556,16 +559,23 @@ bool PowerLimiterClass::setNewPowerLimit(std::shared_ptr<InverterAbstract> inver
     // staleness in case a power limit update was not received by the inverter.
     auto ageMillis = millis() - _lastPowerLimitMillis;
 
-    if (diff < hysteresis && ageMillis < 60 * 1000) {
+    //instead pushing limit to inverter every 60 seconds no matter what, 
+    //why not query instead the currenty configured limit...and do nothing if not needed 
+    int currentLimit = round(inverter->SystemConfigPara()->getLimitPercent() * maxPower / 100);
+    auto currentDiff = std::abs(effPowerLimit - currentLimit );
+    
+    if (diff < hysteresis && currentDiff < hysteresis ){
+    //if (diff < hysteresis && ageMillis < 60 * 1000) {
+        //MessageOutput.printf("Keep limit: %d W, current limit %d W\r\n", effPowerLimit, currentLimit);
         if (_verboseLogging) {
-            MessageOutput.printf("[DPL::setNewPowerLimit] requested: %d W, last limit: %d W, diff: %d W, hysteresis: %d W, age: %ld ms\r\n",
-                    newPowerLimit, _lastRequestedPowerLimit, diff, hysteresis, ageMillis);
+            MessageOutput.printf("[DPL::setNewPowerLimit] Keep current limit. (new calculated: %d W, last limit: %d W, diff: %d W, hysteresis: %d W, age: %ld ms)\r\n",
+                    effPowerLimit, _lastRequestedPowerLimit, diff, hysteresis, ageMillis);
         }
         return false;
     }
-
+    //if we end up here, it we will set new limit
     if (_verboseLogging) {
-        MessageOutput.printf("[DPL::setNewPowerLimit] requested: %d W, (re-)sending limit: %d W\r\n",
+        MessageOutput.printf("[DPL::setNewPowerLimit] requested: %d W, sending limit: %d W\r\n",
                 newPowerLimit, effPowerLimit);
     }
 
