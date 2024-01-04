@@ -199,14 +199,15 @@ void PowerLimiterClass::loop()
 
     // the normal mode of operation requires a valid
     // power meter reading to calculate a power limit
-    if (!config.PowerMeter.Enabled) {
-        //instead of shutting down completelty, how about setting alternativly to a save "low production" mode?
-        //Could be usefull when PowerMeter fails but we know for sure house consumption will never fall below a certain limit (say 200W)
+    if (!config.PowerMeter.Enabled) {        
         shutdown(Status::PowerMeterDisabled); 
         return;
     }
 
+    //instead of shutting down on PowerMeterTimeout, how about setting alternativly to a safe "low production" mode?
+    //Could be usefull when PowerMeter fails but we know for sure house consumption will never fall below a certain limit (say 200W)
     if (millis() - PowerMeter.getLastPowerMeterUpdate() > (30 * 1000)) {
+        shutdown(Status::PowerMeterTimeout);
         return;
     }
 
