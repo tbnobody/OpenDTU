@@ -226,6 +226,7 @@ struct CONFIG_T {
         uint8_t Provider;
         uint8_t JkBmsInterface;
         uint8_t JkBmsPollingInterval;
+        char MqttTopic[MQTT_MAX_TOPIC_STRLEN + 1];
     } Battery;
 
     struct {

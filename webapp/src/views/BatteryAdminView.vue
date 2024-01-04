@@ -49,6 +49,20 @@
                               type="number" min="2" max="90" step="1" :postfix="$t('batteryadmin.Seconds')"/>
             </CardElement>
 
+            <CardElement v-show="batteryConfigList.enabled && batteryConfigList.provider == 2"
+                         :text="$t('batteryadmin.MqttConfiguration')" textVariant="text-bg-primary" addSpace>
+                <div class="row mb-3">
+                    <label class="col-sm-2 col-form-label">
+                        {{ $t('batteryadmin.MqttTopic') }}
+                    </label>
+                    <div class="col-sm-10">
+                        <div class="input-group">
+                            <input type="text" class="form-control" v-model="batteryConfigList.mqtt_topic" />
+                        </div>
+                    </div>
+                </div>
+            </CardElement>
+
             <FormFooter @reload="getBatteryConfig"/>
         </form>
     </BasePage>
@@ -82,6 +96,7 @@ export default defineComponent({
             providerTypeList: [
                 { key: 0, value: 'PylontechCan' },
                 { key: 1, value: 'JkBmsSerial' },
+                { key: 2, value: 'Mqtt' },
                 { key: 3, value: 'Victron' },
             ],
             jkBmsInterfaceTypeList: [

@@ -5,7 +5,7 @@
     </div>
   </div>
 
-  <div v-else>
+  <div v-else-if="'values' in batteryData"> <!-- suppress the card for MQTT battery provider -->
     <div class="row gy-3">
       <div class="tab-content col-sm-12 col-md-12" id="v-pills-tabContent">
         <div class="card">

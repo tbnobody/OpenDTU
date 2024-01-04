@@ -43,6 +43,7 @@ void WebApiBatteryClass::onStatus(AsyncWebServerRequest* request)
     root[F("provider")] = config.Battery.Provider;
     root[F("jkbms_interface")] = config.Battery.JkBmsInterface;
     root[F("jkbms_polling_interval")] = config.Battery.JkBmsPollingInterval;
+    root[F("mqtt_topic")] = config.Battery.MqttTopic;
 
     response->setLength();
     request->send(response);
@@ -106,6 +107,7 @@ void WebApiBatteryClass::onAdminPost(AsyncWebServerRequest* request)
     config.Battery.Provider = root[F("provider")].as<uint8_t>();
     config.Battery.JkBmsInterface = root[F("jkbms_interface")].as<uint8_t>();
     config.Battery.JkBmsPollingInterval = root[F("jkbms_polling_interval")].as<uint8_t>();
+    strlcpy(config.Battery.MqttTopic, root[F("mqtt_topic")].as<String>().c_str(), sizeof(config.Battery.MqttTopic));
     Configuration.write();
 
     retMsg[F("type")] = F("success");

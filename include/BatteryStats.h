@@ -128,3 +128,16 @@ class VictronSmartShuntStats : public BatteryStats {
         bool _alarmLowTemperature;
         bool _alarmHighTemperature;
 };
+
+class MqttBatteryStats : public BatteryStats {
+    public:
+        // since the source of information was MQTT in the first place,
+        // we do NOT publish the same data under a different topic.
+        void mqttPublish() const final { }
+
+        // the SoC is the only interesting value in this case, which is already
+        // displayed at the top of the live view. do not generate a card.
+        void getLiveViewData(JsonVariant& root) const final { }
+
+        void setSoC(uint8_t SoC) { _SoC = SoC; _lastUpdateSoC = _lastUpdate = millis(); }
+};
