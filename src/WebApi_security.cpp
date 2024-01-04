@@ -101,11 +101,8 @@ void WebApiSecurityClass::onSecurityPost(AsyncWebServerRequest* request)
     CONFIG_T& config = Configuration.get();
     strlcpy(config.Security.Password, root["password"].as<String>().c_str(), sizeof(config.Security.Password));
     config.Security.AllowReadonly = root["allow_readonly"].as<bool>();
-    Configuration.write();
 
-    retMsg["type"] = "success";
-    retMsg["message"] = "Settings saved!";
-    retMsg["code"] = WebApiError::GenericSuccess;
+    WebApi.writeConfig(retMsg);
 
     response->setLength();
     request->send(response);

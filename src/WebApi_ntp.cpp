@@ -179,11 +179,8 @@ void WebApiNtpClass::onNtpAdminPost(AsyncWebServerRequest* request)
     config.Ntp.Latitude = root["latitude"].as<double>();
     config.Ntp.Longitude = root["longitude"].as<double>();
     config.Ntp.SunsetType = root["sunsettype"].as<uint8_t>();
-    Configuration.write();
 
-    retMsg["type"] = "success";
-    retMsg["message"] = "Settings saved!";
-    retMsg["code"] = WebApiError::GenericSuccess;
+    WebApi.writeConfig(retMsg);
 
     response->setLength();
     request->send(response);

@@ -238,11 +238,8 @@ void WebApiNetworkClass::onNetworkAdminPost(AsyncWebServerRequest* request)
     }
     config.WiFi.ApTimeout = root["aptimeout"].as<uint>();
     config.Mdns.Enabled = root["mdnsenabled"].as<bool>();
-    Configuration.write();
 
-    retMsg["type"] = "success";
-    retMsg["message"] = "Settings saved!";
-    retMsg["code"] = WebApiError::GenericSuccess;
+    WebApi.writeConfig(retMsg);
 
     response->setLength();
     request->send(response);

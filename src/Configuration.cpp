@@ -26,6 +26,11 @@ bool ConfigurationClass::write()
 
     DynamicJsonDocument doc(JSON_BUFFER_SIZE);
 
+    if (doc.capacity() == 0) {
+        MessageOutput.println("Failed to allocate memory");
+        return false;
+    }
+
     JsonObject cfg = doc.createNestedObject("cfg");
     cfg["version"] = config.Cfg.Version;
     cfg["save_count"] = config.Cfg.SaveCount;
@@ -226,6 +231,12 @@ bool ConfigurationClass::read()
     File f = LittleFS.open(CONFIG_FILENAME, "r", false);
 
     DynamicJsonDocument doc(JSON_BUFFER_SIZE);
+
+    if (doc.capacity() == 0) {
+        MessageOutput.println("Failed to allocate memory");
+        return false;
+    }
+
     // Deserialize the JSON document
     const DeserializationError error = deserializeJson(doc, f);
     if (error) {
@@ -461,6 +472,12 @@ void ConfigurationClass::migrate()
     }
 
     DynamicJsonDocument doc(JSON_BUFFER_SIZE);
+
+    if (doc.capacity() == 0) {
+        MessageOutput.println("Failed to allocate memory");
+        return;
+    }
+
     // Deserialize the JSON document
     const DeserializationError error = deserializeJson(doc, f);
     if (error) {
