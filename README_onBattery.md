@@ -96,32 +96,6 @@ Several screenshots of the frontend can be found here: [Screenshots](docs/screen
   * A documentation of the Web API can be found here: [Web-API Documentation](docs/Web-API.md)
   * Home Assistant auto discovery is supported. [Example image](https://user-images.githubusercontent.com/59169507/217558862-a83846c5-6070-43cd-9a0b-90a8b2e2e8c6.png)
 
-### Dynamic Power Limiter
-
-The dynamic power limiter is responsible for automatic inverter power adjustment. It will take the Power Meter (i.e. currently consumed power), the solar power and the battery charge state into account. The dynamic power limiter supports a few different strategies that can be configured from the user interface:
-
-* Solar Passthrough is off
-  * When using this strategy the inverter is steered such that the currently consumed power (as provided by the power meter) is compensated for. This is done as long as the battery charge state is above the limit set by the stop threshold. The inverter is turned off if the battery reaches the limit and is only re-enabled if the battery charge state reaches the limit set by start threshold.  
-* Solar Passthrough is on and the battery drain strategy is empty when full
-  * This case applies the same strategy as the strategy above. In addition Solar Power will be used to compensate for the currently used energy in cases where the battery discharge is disabled. In this case the inverter power limit is constrained to the input solar power and the power meter value so that battery discharge is avoided.
-* Solar Passthrough is on and the battery drain strategy is empty at night
-  * When using this strategy the inverter is steered such that the currently consumed power (as provided by the power meter) is compensated for. During daytime energy is taken from solar and from the battery, if the battery level is above the start threshold. At night battery power is used until the battery level reaches the stop threshold. When operating on solar power only (i.e. without using the battery) the inverter power limit is constrained to the input solar power and the power meter value so that battery discharge is avoided. The daytime / nighttime switch is based on the Victron MPPT Solar Charger power and 20W input are required in this case. 
-
-Other settings are:
-* The inverter ID configures the inverter that is controlled by the power limiter. The power limiter can only control a single inverter at this point in time.
-* Channel ID is the inverter input channel ID that is used for battery voltage readings.
-* Target power consumption specifies the power to be either consumed from the grid (when set to a positive value) or fed back into the grid (when set to a negative value).
-* The hysteresis value helps optimize communication with the inverter by skipping unnecessary power limit updates. An update is only sent if the absolute difference between the newly computed power limit and the previously set limit matches or exceeds the hysteresis value. This approach can conserve both airtime and CPU resources.
-* Power limits control the min / max limits of the inverter
-* Inverter is behind power meter. Select this if your inverter power is measured by the power meter. This is typically the case.
-* Battery start and stop threshold can be configured using voltage and / or state of charge values. Stage of charge values requires a Pylontech battery at this point.
-* A Battery full solar passthrough threshold can be configured using voltage or state of charge value. Stage of charge values requires a Pylontech battery at this point. The option can be used if the battery is full and will steer the inverter according to solar power reported by the Victron MPPT Solar Charger. 
-
-![image](https://user-images.githubusercontent.com/59169507/222155765-9fff47a4-8ffa-42cf-8671-6359288e0cab.png)
-
-#### Power Limiter States
-![PowerLimiterInverterStates](https://github.com/helgeerbe/OpenDTU-OnBattery/blob/development/docs/PowerLimiterInverterStates.png)
-
 ### Huawei PSU 
 
 The Huawei PSU can be used to charge a battery. This can be be useful if an external (AC) connected solar system shall be utilized or if variable energy prices should be exploited. 
