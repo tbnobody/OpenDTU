@@ -4,6 +4,7 @@
  */
 #include "Configuration.h"
 #include "MessageOutput.h"
+#include "Utils.h"
 #include "defaults.h"
 #include <ArduinoJson.h>
 #include <LittleFS.h>
@@ -26,8 +27,7 @@ bool ConfigurationClass::write()
 
     DynamicJsonDocument doc(JSON_BUFFER_SIZE);
 
-    if (doc.capacity() == 0) {
-        MessageOutput.println("Failed to allocate memory");
+    if (!Utils::checkJsonAlloc(doc, __FUNCTION__, __LINE__)) {
         return false;
     }
 
@@ -157,8 +157,7 @@ bool ConfigurationClass::read()
 
     DynamicJsonDocument doc(JSON_BUFFER_SIZE);
 
-    if (doc.capacity() == 0) {
-        MessageOutput.println("Failed to allocate memory");
+    if (!Utils::checkJsonAlloc(doc, __FUNCTION__, __LINE__)) {
         return false;
     }
 
@@ -323,8 +322,7 @@ void ConfigurationClass::migrate()
 
     DynamicJsonDocument doc(JSON_BUFFER_SIZE);
 
-    if (doc.capacity() == 0) {
-        MessageOutput.println("Failed to allocate memory");
+    if (!Utils::checkJsonAlloc(doc, __FUNCTION__, __LINE__)) {
         return;
     }
 
