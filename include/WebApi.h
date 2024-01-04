@@ -35,7 +35,7 @@ public:
 
     static void sendTooManyRequests(AsyncWebServerRequest* request);
 
-    static void writeConfig(JsonObject& retMsg, const WebApiError code = WebApiError::GenericSuccess, const String& message = "Settings saved!");
+    static void writeConfig(JsonVariant& retMsg, const WebApiError code = WebApiError::GenericSuccess, const String& message = "Settings saved!");
 
 private:
     void loop();

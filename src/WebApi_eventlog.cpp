@@ -27,7 +27,7 @@ void WebApiEventlogClass::onEventlogStatus(AsyncWebServerRequest* request)
     }
 
     AsyncJsonResponse* response = new AsyncJsonResponse(false, 2048);
-    JsonObject root = response->getRoot();
+    auto& root = response->getRoot();
 
     uint64_t serial = 0;
     if (request->hasParam("inv")) {

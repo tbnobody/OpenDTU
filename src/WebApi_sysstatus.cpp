@@ -36,7 +36,7 @@ void WebApiSysstatusClass::onSystemStatus(AsyncWebServerRequest* request)
     }
 
     AsyncJsonResponse* response = new AsyncJsonResponse();
-    JsonObject root = response->getRoot();
+    auto& root = response->getRoot();
 
     root["hostname"] = NetworkSettings.getHostname();
 
