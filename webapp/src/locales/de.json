@@ -39,6 +39,7 @@
         "1003": "Daten zu groß!",
         "1004": "Fehler beim interpretieren der Daten!",
         "1005": "Benötigte Werte fehlen!",
+        "1006": "Schreiben fehlgeschlagen!",
         "2001": "Die Seriennummer darf nicht 0 sein!",
         "2002": "Das Abfraginterval muss größer als 0 sein!",
         "2003": "Ungültige Sendeleistung angegeben!",

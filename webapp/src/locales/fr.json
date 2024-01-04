@@ -39,6 +39,7 @@
         "1003": "Données trop importantes !",
         "1004": "Échec de l'analyse des données !",
         "1005": "Certaines valeurs sont manquantes !",
+        "1006": "Write failed!",
         "2001": "Le numéro de série ne peut pas être nul !",
         "2002": "L'intervalle de sondage doit être supérieur à zéro !",
         "2003": "Réglage du niveau de puissance invalide !",

@@ -154,11 +154,8 @@ void WebApiDtuClass::onDtuAdminPost(AsyncWebServerRequest* request)
     config.Dtu.Nrf.PaLevel = root["nrf_palevel"].as<uint8_t>();
     config.Dtu.Cmt.PaLevel = root["cmt_palevel"].as<int8_t>();
     config.Dtu.Cmt.Frequency = root["cmt_frequency"].as<uint32_t>();
-    Configuration.write();
 
-    retMsg["type"] = "success";
-    retMsg["message"] = "Settings saved!";
-    retMsg["code"] = WebApiError::GenericSuccess;
+    WebApi.writeConfig(retMsg);
 
     response->setLength();
     request->send(response);

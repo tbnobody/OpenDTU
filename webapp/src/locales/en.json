@@ -39,6 +39,7 @@
         "1003": "Data too large!",
         "1004": "Failed to parse data!",
         "1005": "Values are missing!",
+        "1006": "Write failed!",
         "2001": "Serial cannot be zero!",
         "2002": "Poll interval must be greater zero!",
         "2003": "Invalid power level setting!",
