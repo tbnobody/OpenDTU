@@ -6,6 +6,7 @@
 #include "Configuration.h"
 #include "Datastore.h"
 #include "MessageOutput.h"
+#include "Utils.h"
 #include "WebApi.h"
 #include "defaults.h"
 #include <AsyncJson.h>
@@ -64,11 +65,11 @@ void WebApiWsLiveClass::loop()
         try {
             std::lock_guard<std::mutex> lock(_mutex);
             DynamicJsonDocument root(4096 * INV_MAX_COUNT);
-            JsonVariant var = root;
-            generateJsonResponse(var);
+            if (Utils::checkJsonAlloc(root, __FUNCTION__, __LINE__)) {
+                JsonVariant var = root;
+                generateJsonResponse(var);
 
-            String buffer;
-            if (buffer) {
+                String buffer;
                 serializeJson(root, buffer);
 
                 if (Configuration.get().Security.AllowReadonly) {
