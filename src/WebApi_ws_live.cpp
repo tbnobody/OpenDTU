@@ -68,7 +68,7 @@ void WebApiWsLiveClass::loop()
 
         try {
             std::lock_guard<std::mutex> lock(_mutex);
-            DynamicJsonDocument root(4096 * INV_MAX_COUNT);
+            DynamicJsonDocument root(4200 * INV_MAX_COUNT);
             if (Utils::checkJsonAlloc(root, __FUNCTION__, __LINE__)) {
                 JsonVariant var = root;
                 generateJsonResponse(var);
@@ -248,7 +248,7 @@ void WebApiWsLiveClass::onLivedataStatus(AsyncWebServerRequest* request)
     try {
         std::lock_guard<std::mutex> lock(_mutex);
         AsyncJsonResponse* response = new AsyncJsonResponse(false, 4200 * INV_MAX_COUNT);
-        JsonVariant root = response->getRoot();
+        auto& root = response->getRoot();
 
         generateJsonResponse(root);
 
