@@ -4,6 +4,7 @@ export interface Display {
     rotation: number;
     power_safe: boolean;
     screensaver: boolean;
+    diagram: boolean;
     contrast: number;
     language: number;
     diagramduration: number;

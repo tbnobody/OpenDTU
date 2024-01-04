@@ -81,6 +81,7 @@ void WebApiDeviceClass::onDeviceAdminGet(AsyncWebServerRequest* request)
     display["rotation"] = config.Display.Rotation;
     display["power_safe"] = config.Display.PowerSafe;
     display["screensaver"] = config.Display.ScreenSaver;
+    display["diagram"] = config.Display.Diagram;
     display["contrast"] = config.Display.Contrast;
     display["language"] = config.Display.Language;
     display["diagramduration"] = config.Display.DiagramDuration;
@@ -159,6 +160,7 @@ void WebApiDeviceClass::onDeviceAdminPost(AsyncWebServerRequest* request)
     config.Display.Rotation = root["display"]["rotation"].as<uint8_t>();
     config.Display.PowerSafe = root["display"]["power_safe"].as<bool>();
     config.Display.ScreenSaver = root["display"]["screensaver"].as<bool>();
+    config.Display.Diagram = root["display"]["diagram"].as<bool>();
     config.Display.Contrast = root["display"]["contrast"].as<uint8_t>();
     config.Display.Language = root["display"]["language"].as<uint8_t>();
     config.Display.DiagramDuration = root["display"]["diagramduration"].as<uint32_t>();
@@ -171,6 +173,7 @@ void WebApiDeviceClass::onDeviceAdminPost(AsyncWebServerRequest* request)
     Display.setOrientation(config.Display.Rotation);
     Display.enablePowerSafe = config.Display.PowerSafe;
     Display.enableScreensaver = config.Display.ScreenSaver;
+    Display.enableDiagram = config.Display.Diagram;
     Display.setContrast(config.Display.Contrast);
     Display.setLanguage(config.Display.Language);
     Display.Diagram().updatePeriod();

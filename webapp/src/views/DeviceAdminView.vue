@@ -67,6 +67,10 @@
                                 v-model="deviceConfigList.display.screensaver" type="checkbox"
                                 :tooltip="$t('deviceadmin.ScreensaverHint')" />
 
+                            <InputElement :label="$t('deviceadmin.Diagram')"
+                                v-model="deviceConfigList.display.diagram" type="checkbox"
+                                :tooltip="$t('deviceadmin.DiagramHint')" />
+
                             <InputElement :label="$t('deviceadmin.DiagramDuration')"
                                 v-model="deviceConfigList.display.diagramduration" type="number"
                                 min=600 max=86400

@@ -571,6 +571,8 @@
         "PowerSafeHint": "Turn off the display if no inverter is producing.",
         "Screensaver": "Enable Screensaver:",
         "ScreensaverHint": "Move the display a little bit on each update to prevent burn-in. (Useful especially for OLED displays)",
+        "Diagram": "Activate diagram:",
+        "DiagramHint": "Shows a little diagram of how many watts have been generated",
         "DiagramDuration": "Diagram duration:",
         "DiagramDurationHint": "The time period which is shown in the diagram.",
         "Seconds": "Seconds",

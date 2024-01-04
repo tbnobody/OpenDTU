@@ -571,6 +571,8 @@
         "PowerSafeHint": "Schaltet das Display aus, wenn kein Wechselrichter Strom erzeugt",
         "Screensaver": "Bildschirmschoner aktivieren:",
         "ScreensaverHint": "Bewegt die Ausgabe bei jeder Aktualisierung um ein Einbrennen zu verhindern (v. a. für OLED-Displays nützlich)",
+        "Diagram": "Ertragsdiagram aktivieren:",
+        "DiagramHint": "Zeigt ein kleines Diagram wieviele Wh generiert wurden",
         "DiagramDuration": "Diagramm Periode:",
         "DiagramDurationHint": "Die Zeitperiode welche im Diagramm dargestellt wird.",
         "Seconds": "Sekunden",

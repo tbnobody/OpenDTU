@@ -160,7 +160,7 @@ void DisplayGraphicClass::loop()
     //=====> Actual Production ==========
     if (Datastore.getIsAtLeastOneReachable()) {
         displayPowerSave = false;
-        if (_isLarge) {
+        if (_isLarge && _diagram.isDiagramEnabled()) {
             _diagram.redraw();
         }
         if (Datastore.getTotalAcPowerEnabled() > 999) {

@@ -13,6 +13,7 @@
 class DisplayGraphicDiagramClass {
 public:
     DisplayGraphicDiagramClass();
+    boolean isDiagramEnabled();
 
     void init(Scheduler& scheduler, U8G2* display);
     void redraw();

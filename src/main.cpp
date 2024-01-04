@@ -123,6 +123,7 @@ void setup()
     Display.setOrientation(config.Display.Rotation);
     Display.enablePowerSafe = config.Display.PowerSafe;
     Display.enableScreensaver = config.Display.ScreenSaver;
+    Display.enableDiagram = config.Display.Diagram;
     Display.setContrast(config.Display.Contrast);
     Display.setLanguage(config.Display.Language);
     Display.setStartupDisplay();

@@ -140,6 +140,7 @@ struct CONFIG_T {
     struct {
         bool PowerSafe;
         bool ScreenSaver;
+        bool Diagram;
         uint8_t Rotation;
         uint8_t Contrast;
         uint8_t Language;

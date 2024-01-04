@@ -56,6 +56,11 @@ void DisplayGraphicDiagramClass::dataPointLoop()
 
 }
 
+boolean DisplayGraphicDiagramClass::isDiagramEnabled()
+{
+    return Configuration.get().Display.Diagram;
+}
+
 uint32_t DisplayGraphicDiagramClass::getSecondsPerDot()
 {
     return Configuration.get().Display.DiagramDuration / CHART_WIDTH;

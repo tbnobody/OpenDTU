@@ -29,6 +29,7 @@ public:
 
     bool enablePowerSafe = true;
     bool enableScreensaver = true;
+    bool enableDiagram = true;
 
 private:
     void loop();
