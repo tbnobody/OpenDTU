@@ -64,15 +64,15 @@ bool HttpPowerMeterClass::queryPhase(int phase, const String& url, Auth authType
         //first try locally via mDNS, then via DNS (WiFiGeneric::hostByName() will spam the console if done the otherway around)
         const bool mdnsEnabled = Configuration.get().Mdns.Enabled;
         if (!mdnsEnabled) {
-            snprintf_P(httpPowerMeterError, sizeof(httpPowerMeterError), PSTR("Error resolving url %s via DNS, try to enable mDNS in Network Settings"), url.c_str()); 
+            snprintf_P(httpPowerMeterError, sizeof(httpPowerMeterError), PSTR("Error resolving host %s via DNS, try to enable mDNS in Network Settings"), host.c_str()); 
         }
         else
         {
             ipaddr = MDNS.queryHost(host); 
             if (ipaddr == INADDR_NONE){
-                snprintf_P(httpPowerMeterError, sizeof(httpPowerMeterError), PSTR("Error resolving url %s via mDNS"), url.c_str()); 
+                snprintf_P(httpPowerMeterError, sizeof(httpPowerMeterError), PSTR("Error resolving host %s via mDNS"), host.c_str()); 
                 if(!WiFiGenericClass::hostByName(host.c_str(), ipaddr)){
-                    snprintf_P(httpPowerMeterError, sizeof(httpPowerMeterError), PSTR("Error resolving url %s via DNS"), url.c_str()); 
+                    snprintf_P(httpPowerMeterError, sizeof(httpPowerMeterError), PSTR("Error resolving host %s via DNS"), host.c_str()); 
                 }
             }
         }     
@@ -94,12 +94,12 @@ bool HttpPowerMeterClass::queryPhase(int phase, const String& url, Auth authType
     return httpRequest(phase, *wifiClient, ipaddr.toString(), uri, https, authType,  username, password, httpHeader, httpValue, timeout, jsonPath);
 }
 
-bool HttpPowerMeterClass::httpRequest(int phase, WiFiClient &wifiClient, const String& urlHostname, const String& uri, bool https, Auth authType, const char* username,
+bool HttpPowerMeterClass::httpRequest(int phase, WiFiClient &wifiClient, const String& host, const String& uri, bool https, Auth authType, const char* username,
     const char* password, const char* httpHeader, const char* httpValue, uint32_t timeout, const char* jsonPath)
 {
     int port = (https ? 443 : 80);
-    if(!httpClient.begin(wifiClient, urlHostname, port, uri, https)){      
-        snprintf_P(httpPowerMeterError, sizeof(httpPowerMeterError), PSTR("httpClient.begin() failed for %s://%s"), (https ? "https" : "http"), urlHostname.c_str()); 
+    if(!httpClient.begin(wifiClient, host, port, uri, https)){      
+        snprintf_P(httpPowerMeterError, sizeof(httpPowerMeterError), PSTR("httpClient.begin() failed for %s://%s"), (https ? "https" : "http"), host.c_str()); 
         return false;
     }
 
@@ -123,8 +123,8 @@ bool HttpPowerMeterClass::httpRequest(int phase, WiFiClient &wifiClient, const S
             String authReq  = httpClient.header("WWW-Authenticate");
             String authorization = getDigestAuth(authReq, String(username), String(password), "GET", String(uri), 1);
             httpClient.end();
-            if(!httpClient.begin(wifiClient, urlHostname, port, uri, https)){     
-                snprintf_P(httpPowerMeterError, sizeof(httpPowerMeterError), PSTR("httpClient.begin() failed for  %s://%s using digest auth"), (https ? "https" : "http"), urlHostname.c_str()); 
+            if(!httpClient.begin(wifiClient, host, port, uri, https)){     
+                snprintf_P(httpPowerMeterError, sizeof(httpPowerMeterError), PSTR("httpClient.begin() failed for  %s://%s using digest auth"), (https ? "https" : "http"), host.c_str()); 
                 return false;
             }
 

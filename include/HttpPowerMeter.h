@@ -19,9 +19,9 @@ private:
     float power[POWERMETER_MAX_PHASES];
     HTTPClient httpClient;
     String httpResponse;
-    bool httpRequest(int phase, WiFiClient &wifiClient, const String& urlHostname, const String& uri, bool https, Auth authType, const char* username,
+    bool httpRequest(int phase, WiFiClient &wifiClient, const String& host, const String& uri, bool https, Auth authType, const char* username,
            const char* password, const char* httpHeader, const char* httpValue, uint32_t timeout, const char* jsonPath);
-    void extractUrlComponents(const String& url, String& protocol, String& hostname, String& uri);
+    void extractUrlComponents(const String& url, String& protocol, String& host, String& uri);
     String extractParam(String& authReq, const String& param, const char delimit);
     String getcNonce(const int len);
     String getDigestAuth(String& authReq, const String& username, const String& password, const String& method, const String& uri, unsigned int counter);
