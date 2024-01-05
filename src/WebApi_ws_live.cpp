@@ -184,7 +184,7 @@ void WebApiWsLiveClass::generateJsonResponse(JsonVariant& root)
     }
 
     JsonObject vedirectObj = root.createNestedObject("vedirect");
-    vedirectObj[F("enabled")] = Configuration.get().Vedirect.Enabled;
+    vedirectObj["enabled"] = Configuration.get().Vedirect.Enabled;
     JsonObject totalVeObj = vedirectObj.createNestedObject("total");
 
     addTotalField(totalVeObj, "Power", VictronMppt.getPanelPowerWatts(), "W", 1);
@@ -192,16 +192,16 @@ void WebApiWsLiveClass::generateJsonResponse(JsonVariant& root)
     addTotalField(totalVeObj, "YieldTotal", VictronMppt.getYieldTotal(), "kWh", 2);
 
     JsonObject huaweiObj = root.createNestedObject("huawei");
-    huaweiObj[F("enabled")] = Configuration.get().Huawei.Enabled;
+    huaweiObj["enabled"] = Configuration.get().Huawei.Enabled;
     const RectifierParameters_t * rp = HuaweiCan.get();
     addTotalField(huaweiObj, "Power", rp->output_power, "W", 2);
     
     JsonObject batteryObj = root.createNestedObject("battery");
-    batteryObj[F("enabled")] = Configuration.get().Battery.Enabled;
+    batteryObj["enabled"] = Configuration.get().Battery.Enabled;
     addTotalField(batteryObj, "soc", Battery.getStats()->getSoC(), "%", 0);
 
     JsonObject powerMeterObj = root.createNestedObject("power_meter");
-    powerMeterObj[F("enabled")] = Configuration.get().PowerMeter.Enabled;
+    powerMeterObj["enabled"] = Configuration.get().PowerMeter.Enabled;
     addTotalField(powerMeterObj, "Power", PowerMeter.getPowerTotal(false), "W", 1);
 
 }

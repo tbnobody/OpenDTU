@@ -586,7 +586,7 @@ float PowerLimiterClass::getLoadCorrectedVoltage()
 {
     if (!_inverter) {
         // there should be no need to call this method if no target inverter is known
-        MessageOutput.println(F("DPL getLoadCorrectedVoltage: no inverter (programmer error)"));
+        MessageOutput.println("DPL getLoadCorrectedVoltage: no inverter (programmer error)");
         return 0.0;
     }
 

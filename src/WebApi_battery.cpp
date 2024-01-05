@@ -38,12 +38,12 @@ void WebApiBatteryClass::onStatus(AsyncWebServerRequest* request)
     JsonObject root = response->getRoot();
     const CONFIG_T& config = Configuration.get();
 
-    root[F("enabled")] = config.Battery.Enabled;
-    root[F("verbose_logging")] = config.Battery.VerboseLogging;
-    root[F("provider")] = config.Battery.Provider;
-    root[F("jkbms_interface")] = config.Battery.JkBmsInterface;
-    root[F("jkbms_polling_interval")] = config.Battery.JkBmsPollingInterval;
-    root[F("mqtt_topic")] = config.Battery.MqttTopic;
+    root["enabled"] = config.Battery.Enabled;
+    root["verbose_logging"] = config.Battery.VerboseLogging;
+    root["provider"] = config.Battery.Provider;
+    root["jkbms_interface"] = config.Battery.JkBmsInterface;
+    root["jkbms_polling_interval"] = config.Battery.JkBmsPollingInterval;
+    root["mqtt_topic"] = config.Battery.MqttTopic;
 
     response->setLength();
     request->send(response);
@@ -62,11 +62,11 @@ void WebApiBatteryClass::onAdminPost(AsyncWebServerRequest* request)
 
     AsyncJsonResponse* response = new AsyncJsonResponse();
     JsonObject retMsg = response->getRoot();
-    retMsg[F("type")] = F("warning");
+    retMsg["type"] = "warning";
 
     if (!request->hasParam("data", true)) {
-        retMsg[F("message")] = F("No values found!");
-        retMsg[F("code")] = WebApiError::GenericNoValueFound;
+        retMsg["message"] = "No values found!";
+        retMsg["code"] = WebApiError::GenericNoValueFound;
         response->setLength();
         request->send(response);
         return;
@@ -75,8 +75,8 @@ void WebApiBatteryClass::onAdminPost(AsyncWebServerRequest* request)
     String json = request->getParam("data", true)->value();
 
     if (json.length() > 1024) {
-        retMsg[F("message")] = F("Data too large!");
-        retMsg[F("code")] = WebApiError::GenericDataTooLarge;
+        retMsg["message"] = "Data too large!";
+        retMsg["code"] = WebApiError::GenericDataTooLarge;
         response->setLength();
         request->send(response);
         return;
@@ -86,33 +86,33 @@ void WebApiBatteryClass::onAdminPost(AsyncWebServerRequest* request)
     DeserializationError error = deserializeJson(root, json);
 
     if (error) {
-        retMsg[F("message")] = F("Failed to parse data!");
-        retMsg[F("code")] = WebApiError::GenericParseError;
+        retMsg["message"] = "Failed to parse data!";
+        retMsg["code"] = WebApiError::GenericParseError;
         response->setLength();
         request->send(response);
         return;
     }
 
-    if (!root.containsKey(F("enabled")) || !root.containsKey(F("provider"))) {
-        retMsg[F("message")] = F("Values are missing!");
-        retMsg[F("code")] = WebApiError::GenericValueMissing;
+    if (!root.containsKey("enabled") || !root.containsKey("provider")) {
+        retMsg["message"] = "Values are missing!";
+        retMsg["code"] = WebApiError::GenericValueMissing;
         response->setLength();
         request->send(response);
         return;
     }
 
     CONFIG_T& config = Configuration.get();
-    config.Battery.Enabled = root[F("enabled")].as<bool>();
-    config.Battery.VerboseLogging = root[F("verbose_logging")].as<bool>();
-    config.Battery.Provider = root[F("provider")].as<uint8_t>();
-    config.Battery.JkBmsInterface = root[F("jkbms_interface")].as<uint8_t>();
-    config.Battery.JkBmsPollingInterval = root[F("jkbms_polling_interval")].as<uint8_t>();
-    strlcpy(config.Battery.MqttTopic, root[F("mqtt_topic")].as<String>().c_str(), sizeof(config.Battery.MqttTopic));
+    config.Battery.Enabled = root["enabled"].as<bool>();
+    config.Battery.VerboseLogging = root["verbose_logging"].as<bool>();
+    config.Battery.Provider = root["provider"].as<uint8_t>();
+    config.Battery.JkBmsInterface = root["jkbms_interface"].as<uint8_t>();
+    config.Battery.JkBmsPollingInterval = root["jkbms_polling_interval"].as<uint8_t>();
+    strlcpy(config.Battery.MqttTopic, root["mqtt_topic"].as<String>().c_str(), sizeof(config.Battery.MqttTopic));
     Configuration.write();
 
-    retMsg[F("type")] = F("success");
-    retMsg[F("message")] = F("Settings saved!");
-    retMsg[F("code")] = WebApiError::GenericSuccess;
+    retMsg["type"] = "success";
+    retMsg["message"] = "Settings saved!";
+    retMsg["code"] = WebApiError::GenericSuccess;
 
     response->setLength();
     request->send(response);

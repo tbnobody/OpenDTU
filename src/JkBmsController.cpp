@@ -216,7 +216,7 @@ bool Controller::init(bool verboseLogging)
             pin.battery_rx, pin.battery_rxen, pin.battery_tx, pin.battery_txen);
 
     if (pin.battery_rx < 0 || pin.battery_tx < 0) {
-        MessageOutput.println(F("[JK BMS] Invalid RX/TX pin config"));
+        MessageOutput.println("[JK BMS] Invalid RX/TX pin config");
         return false;
     }
 
@@ -229,7 +229,7 @@ bool Controller::init(bool verboseLogging)
     _txEnablePin = pin.battery_txen;
 
     if (_rxEnablePin < 0 || _txEnablePin < 0) {
-        MessageOutput.println(F("[JK BMS] Invalid transceiver pin config"));
+        MessageOutput.println("[JK BMS] Invalid transceiver pin config");
         return false;
     }
 
