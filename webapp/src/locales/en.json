@@ -249,6 +249,13 @@
         "LittleFs": "LittleFs",
         "Sketch": "Sketch"
     },
+    "heapdetails": {
+        "HeapDetails": "Heap Details",
+        "TotalFree": "Total free",
+        "LargestFreeBlock": "Biggest contiguous free block",
+        "MaxUsage": "Maximum usage since start",
+        "Fragmentation": "Level of fragmentation"
+    },
     "radioinfo": {
         "RadioInformation": "Radio Information",
         "Status": "{module} Status",
