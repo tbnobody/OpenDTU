@@ -5,7 +5,8 @@
         "DavidAnson.vscode-markdownlint",
         "Vue.volar",
         "Vue.vscode-typescript-vue-plugin",
-        "platformio.platformio-ide"
+        "platformio.platformio-ide",
+        "EditorConfig.EditorConfig"
     ],
     "unwantedRecommendations": [
         "ms-vscode.cpptools-extension-pack"
