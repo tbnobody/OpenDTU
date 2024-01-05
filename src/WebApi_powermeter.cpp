@@ -258,14 +258,8 @@ void WebApiPowerMeterClass::onTestHttpRequest(AsyncWebServerRequest* request)
 
     char response[256];
 
-    String urlProtocol;
-    String urlHostname;
-    String urlUri;
-
-    HttpPowerMeter.extractUrlComponents(root[F("url")].as<String>().c_str(), urlProtocol, urlHostname, urlUri);
-
     int phase = 0;//"absuing" index 0 of the float power[3] in HttpPowerMeter to store the result
-    if (HttpPowerMeter.queryPhase(phase, urlProtocol, urlHostname, urlUri,
+    if (HttpPowerMeter.queryPhase(phase, root[F("url")].as<String>().c_str(),
             root[F("auth_type")].as<Auth>(), root[F("username")].as<String>().c_str(), root[F("password")].as<String>().c_str(),
             root[F("header_key")].as<String>().c_str(), root[F("header_value")].as<String>().c_str(), root[F("timeout")].as<uint16_t>(),
             root[F("json_path")].as<String>().c_str())) {

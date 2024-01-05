@@ -25,10 +25,6 @@ bool HttpPowerMeterClass::updateValues()
 
     for (uint8_t i = 0; i < POWERMETER_MAX_PHASES; i++) {
         POWERMETER_HTTP_PHASE_CONFIG_T phaseConfig = config.PowerMeter.Http_Phase[i];
-        String urlProtocol;
-        String urlHostname;
-        String urlUri;
-        extractUrlComponents(phaseConfig.Url, urlProtocol, urlHostname, urlUri);
 
         if (!phaseConfig.Enabled) {
             power[i] = 0.0;
@@ -36,7 +32,7 @@ bool HttpPowerMeterClass::updateValues()
         } 
 
         if (i == 0 || config.PowerMeter.HttpIndividualRequests) {
-            if (!queryPhase(i, urlProtocol, urlHostname, urlUri, phaseConfig.AuthType, phaseConfig.Username, phaseConfig.Password, phaseConfig.HeaderKey, phaseConfig.HeaderValue, phaseConfig.Timeout, 
+            if (!queryPhase(i, phaseConfig.Url, phaseConfig.AuthType, phaseConfig.Username, phaseConfig.Password, phaseConfig.HeaderKey, phaseConfig.HeaderValue, phaseConfig.Timeout, 
                     phaseConfig.JsonPath)) {
                 MessageOutput.printf("[HttpPowerMeter] Getting the power of phase %d failed.\r\n", i + 1);
                 MessageOutput.printf("%s\r\n", httpPowerMeterError);
@@ -47,7 +43,7 @@ bool HttpPowerMeterClass::updateValues()
     return true;
 }
 
-bool HttpPowerMeterClass::queryPhase(int phase, const String& urlProtocol, const String& urlHostname, const String& uri, Auth authType, const char* username, const char* password, 
+bool HttpPowerMeterClass::queryPhase(int phase, const String& url, Auth authType, const char* username, const char* password, 
     const char* httpHeader, const char* httpValue, uint32_t timeout, const char* jsonPath)
 {
     //hostByName in WiFiGeneric fails to resolve local names. issue described in 
@@ -55,34 +51,39 @@ bool HttpPowerMeterClass::queryPhase(int phase, const String& urlProtocol, const
     //and in depth analyzed in https://github.com/espressif/esp-idf/issues/2507#issuecomment-761836300
     //in conclusion: we cannot rely on httpClient.begin(*wifiClient, url) to resolve IP adresses.
     //have to do it manually here. Feels Hacky...
+    String protocol;
+    String host;
+    String uri;
+    extractUrlComponents(url, protocol, host, uri);
+
     IPAddress ipaddr((uint32_t)0);
     //first check if the urlHostname is already an IP adress    
-    if (!ipaddr.fromString(urlHostname))
+    if (!ipaddr.fromString(host))
     {
         //urlHostname is not an IP address so try to resolve the IP adress
-        //first, try DNS
-        if(!WiFiGenericClass::hostByName(urlHostname.c_str(), ipaddr))
+        //first try locally via mDNS, then via DNS (WiFiGeneric::hostByName() will spam the console if done the otherway around)
+        const bool mdnsEnabled = Configuration.get().Mdns.Enabled;
+        if (!mdnsEnabled) {
+            snprintf_P(httpPowerMeterError, sizeof(httpPowerMeterError), PSTR("Error resolving url %s via DNS, try to enable mDNS in Network Settings"), url.c_str()); 
+        }
+        else
         {
-            //DNS failed, so now try mDNS 
-            const bool mdnsEnabled = Configuration.get().Mdns.Enabled;
-            if (!mdnsEnabled) {
-                snprintf_P(httpPowerMeterError, sizeof(httpPowerMeterError), PSTR("Error resolving url %s via DNS, try to enable mDNS in Network Settings"), urlHostname); 
-                return false;
-            }
-
-            ipaddr = MDNS.queryHost(urlHostname); 
+            ipaddr = MDNS.queryHost(host); 
             if (ipaddr == INADDR_NONE){
-                snprintf_P(httpPowerMeterError, sizeof(httpPowerMeterError), PSTR("Error resolving url %s via DNS and mDNS"), urlHostname.c_str()); 
-                return false;
+                snprintf_P(httpPowerMeterError, sizeof(httpPowerMeterError), PSTR("Error resolving url %s via mDNS"), url.c_str()); 
+                if(!WiFiGenericClass::hostByName(host.c_str(), ipaddr)){
+                    snprintf_P(httpPowerMeterError, sizeof(httpPowerMeterError), PSTR("Error resolving url %s via DNS"), url.c_str()); 
+                }
             }
-        }        
+        }     
     }
 
     // secureWifiClient MUST be created before HTTPClient
     // see discussion: https://github.com/helgeerbe/OpenDTU-OnBattery/issues/381
     std::unique_ptr<WiFiClient> wifiClient;
 
-    if (urlProtocol == "https") {
+    bool https = protocol == "https";
+    if (https) {
       auto secureWifiClient = std::make_unique<WiFiClientSecure>();
       secureWifiClient->setInsecure();
       wifiClient = std::move(secureWifiClient);
@@ -90,18 +91,15 @@ bool HttpPowerMeterClass::queryPhase(int phase, const String& urlProtocol, const
       wifiClient = std::make_unique<WiFiClient>();
     }
     
-    return httpRequest(phase, *wifiClient, urlProtocol, ipaddr.toString(), uri, authType,  username, password, httpHeader, httpValue, timeout, jsonPath);
+    return httpRequest(phase, *wifiClient, ipaddr.toString(), uri, https, authType,  username, password, httpHeader, httpValue, timeout, jsonPath);
 }
 
-bool HttpPowerMeterClass::httpRequest(int phase, WiFiClient &wifiClient, const String& urlProtocol, const String& urlHostname, const String& uri, Auth authType, const char* username,
+bool HttpPowerMeterClass::httpRequest(int phase, WiFiClient &wifiClient, const String& urlHostname, const String& uri, bool https, Auth authType, const char* username,
     const char* password, const char* httpHeader, const char* httpValue, uint32_t timeout, const char* jsonPath)
 {
-    int port = 80;
-    if (urlProtocol == "https") {
-        port = 443;
-    }
-    if(!httpClient.begin(wifiClient, urlHostname, port, uri)){      
-        snprintf_P(httpPowerMeterError, sizeof(httpPowerMeterError), PSTR("httpClient.begin() failed for %s://%s"), urlProtocol.c_str(), urlHostname.c_str()); 
+    int port = (https ? 443 : 80);
+    if(!httpClient.begin(wifiClient, urlHostname, port, uri, https)){      
+        snprintf_P(httpPowerMeterError, sizeof(httpPowerMeterError), PSTR("httpClient.begin() failed for %s://%s"), (https ? "https" : "http"), urlHostname.c_str()); 
         return false;
     }
 
@@ -125,8 +123,8 @@ bool HttpPowerMeterClass::httpRequest(int phase, WiFiClient &wifiClient, const S
             String authReq  = httpClient.header("WWW-Authenticate");
             String authorization = getDigestAuth(authReq, String(username), String(password), "GET", String(uri), 1);
             httpClient.end();
-            if(!httpClient.begin(wifiClient, urlHostname, port, uri)){     
-                snprintf_P(httpPowerMeterError, sizeof(httpPowerMeterError), PSTR("httpClient.begin() failed for  %s://%s using digest auth"), urlProtocol.c_str(), urlHostname.c_str()); 
+            if(!httpClient.begin(wifiClient, urlHostname, port, uri, https)){     
+                snprintf_P(httpPowerMeterError, sizeof(httpPowerMeterError), PSTR("httpClient.begin() failed for  %s://%s using digest auth"), (https ? "https" : "http"), urlHostname.c_str()); 
                 return false;
             }
 
@@ -146,44 +144,51 @@ String HttpPowerMeterClass::extractParam(String& authReq, const String& param, c
     return authReq.substring(_begin + param.length(), authReq.indexOf(delimit, _begin + param.length()));
 }
 
-void HttpPowerMeterClass::getcNonce(char* cNounce) {
+String HttpPowerMeterClass::getcNonce(const int len) {
     static const char alphanum[] = "0123456789"
                                  "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
                                  "abcdefghijklmnopqrstuvwxyz";
-    auto len=sizeof(cNounce);
+    String s = "";
 
-    for (int i = 0; i < len; ++i) { cNounce[i] = alphanum[rand() % (sizeof(alphanum) - 1)]; }
+    for (int i = 0; i < len; ++i) { s += alphanum[rand() % (sizeof(alphanum) - 1)]; }
 
+    return s;
 }
 
 String HttpPowerMeterClass::getDigestAuth(String& authReq, const String& username, const String& password, const String& method, const String& uri, unsigned int counter) {
     // extracting required parameters for RFC 2617 Digest
     String realm = extractParam(authReq, "realm=\"", '"');
     String nonce = extractParam(authReq, "nonce=\"", '"');
-    char cNonce[8];
-    getcNonce(cNonce);
+    String cNonce = getcNonce(8);
 
     char nc[9];
     snprintf(nc, sizeof(nc), "%08x", counter);
 
-    // sha256 of the user:realm:user
-    char h1Prep[1024];//can username+password be longer than 255 chars each?
-    snprintf(h1Prep, sizeof(h1Prep), "%s:%s:%s", username.c_str(),realm.c_str(), password.c_str());
-    String ha1 = sha256(h1Prep);
+    //sha256 of the user:realm:password
+    String ha1 = sha256(username + ":" + realm + ":" + password);
 
     //sha256 of method:uri
-    char h2Prep[1024];//can uri be longer? 
-    snprintf(h2Prep, sizeof(h2Prep), "%s:%s", method.c_str(),uri.c_str());
-    String ha2 = sha256(h2Prep);
+    String ha2 = sha256(method + ":" + uri);
 
-    //sha256 of h1:nonce:nc:cNonce:auth:h2
-    char responsePrep[2048];//can nounce and cNounce be longer?
-    snprintf(responsePrep, sizeof(responsePrep), "%s:%s:%s:%s:auth:%s", ha1.c_str(),nonce.c_str(), nc, cNonce,ha2.c_str());
-    String response = sha256(responsePrep);
+    //sha256 of h1:nonce:nc:cNonce:auth:h2    
+    String response = sha256(ha1 + ":" + nonce + ":" + String(nc) + ":" + cNonce + ":" + "auth" + ":" + ha2);
 
     //Final authorization String;
-    char authorization[2048];//can username+password be longer than 255 chars each? can uri be longer?
-    snprintf(authorization, sizeof(authorization), "Digest username=\"%s\", realm=\"%s\", nonce=\"%s\", uri=\"%s\", algorithm=SHA-256, qop=auth, nc=%s, cnonce=\"%s\", response=\"%s\"", username.c_str(), realm.c_str(), nonce.c_str(), uri.c_str(), nc, cNonce, response.c_str());
+    String authorization = "Digest username=\""; 
+    authorization += username;
+    authorization += "\", realm=\"";
+    authorization += realm;
+    authorization += "\", nonce=\"";
+    authorization += nonce;
+    authorization += "\", uri=\"";
+    authorization += uri;
+    authorization += "\", cnonce=\"";
+    authorization += cNonce;
+    authorization += "\", nc=";
+    authorization += String(nc);
+    authorization += ", qop=auth, response=\"";
+    authorization += response;
+    authorization += "\", algorithm=SHA-256";   
 
     return authorization;
 }
