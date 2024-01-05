@@ -53,6 +53,14 @@ void WebApiPrometheusClass::onPrometheusMetricsGet(AsyncWebServerRequest* reques
         stream->print("# TYPE opendtu_free_heap_size gauge\n");
         stream->printf("opendtu_free_heap_size %zu\n", ESP.getFreeHeap());
 
+        stream->print("# HELP opendtu_biggest_heap_block Biggest free heap block\n");
+        stream->print("# TYPE opendtu_biggest_heap_block gauge\n");
+        stream->printf("opendtu_biggest_heap_block %zu\n", ESP.getMaxAllocHeap());
+
+        stream->print("# HELP opendtu_heap_min_free Minimum free memory since boot\n");
+        stream->print("# TYPE opendtu_heap_min_free gauge\n");
+        stream->printf("opendtu_heap_min_free %zu\n", ESP.getMinFreeHeap());
+
         stream->print("# HELP wifi_rssi WiFi RSSI\n");
         stream->print("# TYPE wifi_rssi gauge\n");
         stream->printf("wifi_rssi %d\n", WiFi.RSSI());

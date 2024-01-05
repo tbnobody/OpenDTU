@@ -208,6 +208,13 @@
         "LittleFs": "LittleFs",
         "Sketch": "Sketch"
     },
+    "heapdetails": {
+        "HeapDetails": "Detailinformationen zum Heap",
+        "TotalFree": "Insgesamt frei",
+        "LargestFreeBlock": "Größter zusammenhängender freier Block",
+        "MaxUsage": "Maximale Speichernutzung seit Start",
+        "Fragmentation": "Grad der Fragmentierung"
+    },
     "radioinfo": {
         "RadioInformation": "Funkmodulinformationen",
         "Status": "{module} Status",
