@@ -203,11 +203,11 @@ void WebApiPowerMeterClass::onAdminPost(AsyncWebServerRequest* request)
     response->setLength();
     request->send(response);
 
-    // why reboot..WebApi_powerlimiter is also not rebooting
-    // yield();
-    // delay(1000);
-    // yield();
-    // ESP.restart();
+    // reboot requiered as per https://github.com/helgeerbe/OpenDTU-OnBattery/issues/565#issuecomment-1872552559
+    yield();
+    delay(1000);
+    yield();
+    ESP.restart();
 }
 
 void WebApiPowerMeterClass::onTestHttpRequest(AsyncWebServerRequest* request)

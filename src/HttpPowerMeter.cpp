@@ -3,7 +3,7 @@
 #include "HttpPowerMeter.h"
 #include "MessageOutput.h"
 #include <WiFiClientSecure.h>
-#include <ArduinoJson.h>//saves 20kB to not use FirebaseJson as ArduinoJson is used already elsewhere (e.g. in WebApi_powermeter)
+#include <ArduinoJson.h>
 #include <Crypto.h>
 #include <SHA256.h>
 #include <base64.h>
@@ -59,18 +59,23 @@ bool HttpPowerMeterClass::queryPhase(int phase, const String& urlProtocol, const
     //first check if the urlHostname is already an IP adress    
     if (!ipaddr.fromString(urlHostname))
     {
-        //no it is not, so try to resolve the IP adress
-        const bool mdnsEnabled = Configuration.get().Mdns.Enabled;
-        if (!mdnsEnabled) {
-            snprintf_P(httpPowerMeterError, sizeof(httpPowerMeterError), PSTR("Enable mDNS in Network Settings")); 
-            return false;
-        }
+        //urlHostname is not an IP address so try to resolve the IP adress
+        //first, try DNS
+        if(!WiFiGenericClass::hostByName(urlHostname.c_str(), ipaddr))
+        {
+            //DNS failed, so now try mDNS 
+            const bool mdnsEnabled = Configuration.get().Mdns.Enabled;
+            if (!mdnsEnabled) {
+                snprintf_P(httpPowerMeterError, sizeof(httpPowerMeterError), PSTR("Error resolving url %s via DNS, try to enable mDNS in Network Settings"), urlHostname); 
+                return false;
+            }
 
-        ipaddr = MDNS.queryHost(urlHostname); 
-        if (ipaddr == INADDR_NONE){
-            snprintf_P(httpPowerMeterError, sizeof(httpPowerMeterError), PSTR("Error resolving url %s"), urlHostname.c_str()); 
-            return false;
-        }
+            ipaddr = MDNS.queryHost(urlHostname); 
+            if (ipaddr == INADDR_NONE){
+                snprintf_P(httpPowerMeterError, sizeof(httpPowerMeterError), PSTR("Error resolving url %s via DNS and mDNS"), urlHostname.c_str()); 
+                return false;
+            }
+        }        
     }
 
     // secureWifiClient MUST be created before HTTPClient
@@ -84,8 +89,10 @@ bool HttpPowerMeterClass::queryPhase(int phase, const String& urlProtocol, const
     } else {
       wifiClient = std::make_unique<WiFiClient>();
     }
+    
     return httpRequest(phase, *wifiClient, urlProtocol, ipaddr.toString(), uri, authType,  username, password, httpHeader, httpValue, timeout, jsonPath);
 }
+
 bool HttpPowerMeterClass::httpRequest(int phase, WiFiClient &wifiClient, const String& urlProtocol, const String& urlHostname, const String& uri, Auth authType, const char* username,
     const char* password, const char* httpHeader, const char* httpValue, uint32_t timeout, const char* jsonPath)
 {
@@ -134,51 +141,53 @@ bool HttpPowerMeterClass::httpRequest(int phase, WiFiClient &wifiClient, const S
 }
 
 String HttpPowerMeterClass::extractParam(String& authReq, const String& param, const char delimit) {
-  int _begin = authReq.indexOf(param);
-  if (_begin == -1) { return ""; }
-  return authReq.substring(_begin + param.length(), authReq.indexOf(delimit, _begin + param.length()));
+    int _begin = authReq.indexOf(param);
+    if (_begin == -1) { return ""; }
+    return authReq.substring(_begin + param.length(), authReq.indexOf(delimit, _begin + param.length()));
 }
+
 void HttpPowerMeterClass::getcNonce(char* cNounce) {
-  static const char alphanum[] = "0123456789"
+    static const char alphanum[] = "0123456789"
                                  "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
                                  "abcdefghijklmnopqrstuvwxyz";
-  auto len=sizeof(cNounce);
+    auto len=sizeof(cNounce);
 
-  for (int i = 0; i < len; ++i) { cNounce[i] = alphanum[rand() % (sizeof(alphanum) - 1)]; }
+    for (int i = 0; i < len; ++i) { cNounce[i] = alphanum[rand() % (sizeof(alphanum) - 1)]; }
 
 }
+
 String HttpPowerMeterClass::getDigestAuth(String& authReq, const String& username, const String& password, const String& method, const String& uri, unsigned int counter) {
-  // extracting required parameters for RFC 2069 simpler Digest
-  String realm = extractParam(authReq, "realm=\"", '"');
-  String nonce = extractParam(authReq, "nonce=\"", '"');
-  char cNonce[8];
-  getcNonce(cNonce);
+    // extracting required parameters for RFC 2617 Digest
+    String realm = extractParam(authReq, "realm=\"", '"');
+    String nonce = extractParam(authReq, "nonce=\"", '"');
+    char cNonce[8];
+    getcNonce(cNonce);
 
-  char nc[9];
-  snprintf(nc, sizeof(nc), "%08x", counter);
+    char nc[9];
+    snprintf(nc, sizeof(nc), "%08x", counter);
 
-  // parameters for the Digest 
-  // sha256 of the user:realm:user
-  char h1Prep[sizeof(username)+sizeof(realm)+sizeof(password)+2];
-  snprintf(h1Prep, sizeof(h1Prep), "%s:%s:%s", username.c_str(),realm.c_str(), password.c_str());
-  String ha1 = sha256(h1Prep);
+    // sha256 of the user:realm:user
+    char h1Prep[1024];//can username+password be longer than 255 chars each?
+    snprintf(h1Prep, sizeof(h1Prep), "%s:%s:%s", username.c_str(),realm.c_str(), password.c_str());
+    String ha1 = sha256(h1Prep);
 
-  //sha256 of method:uri
-  char h2Prep[sizeof(method) + sizeof(uri) + 1];
-  snprintf(h2Prep, sizeof(h2Prep), "%s:%s", method.c_str(),uri.c_str());
-  String ha2 = sha256(h2Prep);
+    //sha256 of method:uri
+    char h2Prep[1024];//can uri be longer? 
+    snprintf(h2Prep, sizeof(h2Prep), "%s:%s", method.c_str(),uri.c_str());
+    String ha2 = sha256(h2Prep);
 
-  //md5 of h1:nonce:nc:cNonce:auth:h2
-  char responsePrep[sizeof(ha1)+sizeof(nc)+sizeof(cNonce)+4+sizeof(ha2) + 5];
-  snprintf(responsePrep, sizeof(responsePrep), "%s:%s:%s:%s:auth:%s", ha1.c_str(),nonce.c_str(), nc, cNonce,ha2.c_str());
-  String response = sha256(responsePrep);
+    //sha256 of h1:nonce:nc:cNonce:auth:h2
+    char responsePrep[2048];//can nounce and cNounce be longer?
+    snprintf(responsePrep, sizeof(responsePrep), "%s:%s:%s:%s:auth:%s", ha1.c_str(),nonce.c_str(), nc, cNonce,ha2.c_str());
+    String response = sha256(responsePrep);
 
-  //Final authorization String;
-  char authorization[17 + sizeof(username) + 10 + sizeof(realm) + 10 + sizeof(nonce) + 8 + sizeof(uri) + 34 + sizeof(nc) + 10 + sizeof(cNonce) + 13 + sizeof(response)];
-  snprintf(authorization, sizeof(authorization), "Digest username=\"%s\", realm=\"%s\", nonce=\"%s\", uri=\"%s\", algorithm=SHA-256, qop=auth, nc=%s, cnonce=\"%s\", response=\"%s\"", username.c_str(), realm.c_str(), nonce.c_str(), uri.c_str(), nc, cNonce, response.c_str());
+    //Final authorization String;
+    char authorization[2048];//can username+password be longer than 255 chars each? can uri be longer?
+    snprintf(authorization, sizeof(authorization), "Digest username=\"%s\", realm=\"%s\", nonce=\"%s\", uri=\"%s\", algorithm=SHA-256, qop=auth, nc=%s, cnonce=\"%s\", response=\"%s\"", username.c_str(), realm.c_str(), nonce.c_str(), uri.c_str(), nc, cNonce, response.c_str());
 
-  return authorization;
+    return authorization;
 }
+
 bool HttpPowerMeterClass::tryGetFloatValueForPhase(int phase, int httpCode, const char* jsonPath)
 {
     bool success = false;
@@ -201,6 +210,7 @@ bool HttpPowerMeterClass::tryGetFloatValueForPhase(int phase, int httpCode, cons
     } 
     return success;
 }
+
 void HttpPowerMeterClass::extractUrlComponents(const String& url, String& protocol, String& hostname, String& uri) {
     // Find protocol delimiter
     int protocolEndIndex = url.indexOf(":");
@@ -234,23 +244,23 @@ void HttpPowerMeterClass::extractUrlComponents(const String& url, String& protoc
 #define HASH_SIZE 32
 
 String HttpPowerMeterClass::sha256(const String& data) {
-  SHA256 sha256;
-  uint8_t hash[HASH_SIZE];
+    SHA256 sha256;
+    uint8_t hash[HASH_SIZE];
 
-  sha256.reset();
-  sha256.update(data.c_str(), data.length());
-  sha256.finalize(hash, HASH_SIZE);
+    sha256.reset();
+    sha256.update(data.c_str(), data.length());
+    sha256.finalize(hash, HASH_SIZE);
 
-  String hashStr = "";
-  for (int i = 0; i < HASH_SIZE; i++) {
-    String hex = String(hash[i], HEX);
-    if (hex.length() == 1) {
-      hashStr += "0";
+    String hashStr = "";
+    for (int i = 0; i < HASH_SIZE; i++) {
+        String hex = String(hash[i], HEX);
+        if (hex.length() == 1) {
+        hashStr += "0";
+        }
+        hashStr += hex;
     }
-    hashStr += hex;
-  }
 
-  return hashStr;
+    return hashStr;
 }
 void HttpPowerMeterClass::prepareRequest(uint32_t timeout, const char* httpHeader, const char* httpValue) {
     httpClient.setFollowRedirects(HTTPC_STRICT_FOLLOW_REDIRECTS);
