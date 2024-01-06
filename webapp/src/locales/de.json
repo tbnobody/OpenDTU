@@ -26,7 +26,10 @@
         "Loading": "Lade...",
         "Reload": "Aktualisieren",
         "Cancel": "Abbrechen",
-        "Save": "Speichern"
+        "Save": "Speichern",
+        "Refreshing": "Aktualisieren",
+        "Pull": "Zum Aktualisieren nach unten ziehen",
+        "Release": "Loslassen zum Aktualisieren"
     },
     "localeswitcher": {
         "Dark": "Dunkel",

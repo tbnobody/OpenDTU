@@ -26,7 +26,10 @@
         "Loading": "Chargement...",
         "Reload": "Reload",
         "Cancel": "Annuler",
-        "Save": "Sauvegarder"
+        "Save": "Sauvegarder",
+        "Refreshing": "Refreshing",
+        "Pull": "Pull down to refresh",
+        "Release": "Release to refresh"
     },
     "localeswitcher": {
         "Dark": "Sombre",

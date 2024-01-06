@@ -26,7 +26,10 @@
         "Loading": "Loading...",
         "Reload": "Reload",
         "Cancel": "Cancel",
-        "Save": "Save"
+        "Save": "Save",
+        "Refreshing": "Refreshing",
+        "Pull": "Pull down to refresh",
+        "Release": "Release to refresh"
     },
     "localeswitcher": {
         "Dark": "Dark",
