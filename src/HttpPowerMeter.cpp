@@ -57,20 +57,25 @@ bool HttpPowerMeterClass::queryPhase(int phase, const String& url, Auth authType
     extractUrlComponents(url, protocol, host, uri);
 
     IPAddress ipaddr((uint32_t)0);
-    //first check if the urlHostname is already an IP adress    
+    //first check if "host" is already an IP adress    
     if (!ipaddr.fromString(host))
     {
-        //urlHostname is not an IP address so try to resolve the IP adress
-        //first try locally via mDNS, then via DNS (WiFiGeneric::hostByName() will spam the console if done the otherway around)
+        //"host"" is not an IP address so try to resolve the IP adress
+        //first try locally via mDNS, then via DNS. WiFiGeneric::hostByName() will spam the console if done the otherway around.
         const bool mdnsEnabled = Configuration.get().Mdns.Enabled;
         if (!mdnsEnabled) {
-            snprintf_P(httpPowerMeterError, sizeof(httpPowerMeterError), PSTR("Error resolving host %s via DNS, try to enable mDNS in Network Settings"), host.c_str()); 
+            snprintf_P(httpPowerMeterError, sizeof(httpPowerMeterError), PSTR("Error resolving host %s via DNS, try to enable mDNS in Network Settings"), host.c_str());
+            //ensure we try resolving via DNS even if mDNS is disabled
+            if(!WiFiGenericClass::hostByName(host.c_str(), ipaddr)){
+                    snprintf_P(httpPowerMeterError, sizeof(httpPowerMeterError), PSTR("Error resolving host %s via DNS"), host.c_str()); 
+                } 
         }
         else
         {
             ipaddr = MDNS.queryHost(host); 
             if (ipaddr == INADDR_NONE){
-                snprintf_P(httpPowerMeterError, sizeof(httpPowerMeterError), PSTR("Error resolving host %s via mDNS"), host.c_str()); 
+                snprintf_P(httpPowerMeterError, sizeof(httpPowerMeterError), PSTR("Error resolving host %s via mDNS"), host.c_str());
+                //when we cannot find local server via mDNS, try resolving via DNS
                 if(!WiFiGenericClass::hostByName(host.c_str(), ipaddr)){
                     snprintf_P(httpPowerMeterError, sizeof(httpPowerMeterError), PSTR("Error resolving host %s via DNS"), host.c_str()); 
                 }
