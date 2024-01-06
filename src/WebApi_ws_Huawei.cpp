@@ -123,7 +123,7 @@ void WebApiWsHuaweiLiveClass::onLivedataStatus(AsyncWebServerRequest* request)
     }
     try {
         AsyncJsonResponse* response = new AsyncJsonResponse(false, 1024U);
-        JsonVariant root = response->getRoot().as<JsonVariant>();
+        auto& root = response->getRoot();
         generateJsonResponse(root);
 
         response->setLength();

@@ -33,7 +33,7 @@ void WebApiVedirectClass::onVedirectStatus(AsyncWebServerRequest* request)
     }
     
     AsyncJsonResponse* response = new AsyncJsonResponse();
-    JsonObject root = response->getRoot();
+    auto& root = response->getRoot();
     const CONFIG_T& config = Configuration.get();
 
     root["vedirect_enabled"] = config.Vedirect.Enabled;
@@ -51,7 +51,7 @@ void WebApiVedirectClass::onVedirectAdminGet(AsyncWebServerRequest* request)
     }
 
     AsyncJsonResponse* response = new AsyncJsonResponse();
-    JsonObject root = response->getRoot();
+    auto& root = response->getRoot();
     const CONFIG_T& config = Configuration.get();
 
     root["vedirect_enabled"] = config.Vedirect.Enabled;
@@ -69,7 +69,7 @@ void WebApiVedirectClass::onVedirectAdminPost(AsyncWebServerRequest* request)
     }
 
     AsyncJsonResponse* response = new AsyncJsonResponse();
-    JsonObject retMsg = response->getRoot();
+    auto& retMsg = response->getRoot();
     retMsg["type"] = "warning";
 
     if (!request->hasParam("data", true)) {

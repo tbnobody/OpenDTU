@@ -169,7 +169,7 @@ void WebApiWsVedirectLiveClass::onLivedataStatus(AsyncWebServerRequest* request)
     }
     try {
         AsyncJsonResponse* response = new AsyncJsonResponse(false, _responseSize);
-        JsonVariant root = response->getRoot();
+        auto& root = response->getRoot();
 
         generateJsonResponse(root);
 

@@ -35,7 +35,7 @@ void WebApiPowerMeterClass::loop()
 void WebApiPowerMeterClass::onStatus(AsyncWebServerRequest* request)
 {
     AsyncJsonResponse* response = new AsyncJsonResponse(false, 2048);
-    JsonObject root = response->getRoot();
+    auto& root = response->getRoot();
     const CONFIG_T& config = Configuration.get();
 
     root["enabled"] = config.PowerMeter.Enabled;
@@ -86,7 +86,7 @@ void WebApiPowerMeterClass::onAdminPost(AsyncWebServerRequest* request)
     }
 
     AsyncJsonResponse* response = new AsyncJsonResponse();
-    JsonObject retMsg = response->getRoot();
+    auto& retMsg = response->getRoot();
     retMsg["type"] = "warning";
 
     if (!request->hasParam("data", true)) {
@@ -216,7 +216,7 @@ void WebApiPowerMeterClass::onTestHttpRequest(AsyncWebServerRequest* request)
     }
 
     AsyncJsonResponse* asyncJsonResponse = new AsyncJsonResponse();
-    JsonObject retMsg = asyncJsonResponse->getRoot();
+    auto& retMsg = asyncJsonResponse->getRoot();
     retMsg["type"] = "warning";
 
     if (!request->hasParam("data", true)) {

@@ -92,7 +92,7 @@ void WebApiWsBatteryLiveClass::onLivedataStatus(AsyncWebServerRequest* request)
     }
     try {
         AsyncJsonResponse* response = new AsyncJsonResponse(false, _responseSize);
-        JsonVariant root = response->getRoot().as<JsonVariant>();
+        auto& root = response->getRoot();
         generateJsonResponse(root);
 
         response->setLength();
