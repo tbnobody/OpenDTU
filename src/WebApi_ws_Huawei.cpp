@@ -7,6 +7,7 @@
 #include "Configuration.h"
 #include "Huawei_can.h"
 #include "MessageOutput.h"
+#include "Utils.h"
 #include "WebApi.h"
 #include "defaults.h"
 
@@ -50,16 +51,15 @@ void WebApiWsHuaweiLiveClass::loop()
     _lastUpdateCheck = millis();
 
     try {
-        String buffer;
-        // free JsonDocument as soon as possible
-        {
-            DynamicJsonDocument root(1024);
+        std::lock_guard<std::mutex> lock(_mutex);
+        DynamicJsonDocument root(1024);
+        if (Utils::checkJsonAlloc(root, __FUNCTION__, __LINE__)) {
             JsonVariant var = root;
             generateJsonResponse(var);
-            serializeJson(root, buffer);
-        }
 
-        if (buffer) {
+            String buffer;
+            serializeJson(root, buffer);
+
             if (Configuration.get().Security.AllowReadonly) {
                 _ws.setAuthentication("", "");
             } else {
@@ -69,7 +69,9 @@ void WebApiWsHuaweiLiveClass::loop()
             _ws.textAll(buffer);
         }
     } catch (std::bad_alloc& bad_alloc) {
-        MessageOutput.printf("Calling /api/livedata/status has temporarily run out of resources. Reason: \"%s\".\r\n", bad_alloc.what());
+        MessageOutput.printf("Calling /api/huaweilivedata/status has temporarily run out of resources. Reason: \"%s\".\r\n", bad_alloc.what());
+    } catch (const std::exception& exc) {
+            MessageOutput.printf("Unknown exception in /api/huaweilivedata/status. Reason: \"%s\".\r\n", exc.what());
     }
 }
 
@@ -122,15 +124,19 @@ void WebApiWsHuaweiLiveClass::onLivedataStatus(AsyncWebServerRequest* request)
         return;
     }
     try {
+        std::lock_guard<std::mutex> lock(_mutex);
         AsyncJsonResponse* response = new AsyncJsonResponse(false, 1024U);
         auto& root = response->getRoot();
+
         generateJsonResponse(root);
 
         response->setLength();
         request->send(response);
     } catch (std::bad_alloc& bad_alloc) {
-        MessageOutput.printf("Calling /api/livedata/status has temporarily run out of resources. Reason: \"%s\".\r\n", bad_alloc.what());
-
+        MessageOutput.printf("Calling /api/huaweilivedata/status has temporarily run out of resources. Reason: \"%s\".\r\n", bad_alloc.what());
+        WebApi.sendTooManyRequests(request);
+    } catch (const std::exception& exc) {
+        MessageOutput.printf("Unknown exception in /api/huaweilivedata/status. Reason: \"%s\".\r\n", exc.what());
         WebApi.sendTooManyRequests(request);
     }
 }

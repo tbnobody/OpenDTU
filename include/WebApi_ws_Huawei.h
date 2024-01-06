@@ -3,7 +3,7 @@
 
 #include "ArduinoJson.h"
 #include <ESPAsyncWebServer.h>
-//#include <HuaweiFrameHandler.h>
+#include <mutex>
 
 class WebApiWsHuaweiLiveClass {
 public:
@@ -21,4 +21,6 @@ private:
 
     uint32_t _lastWsCleanup = 0;
     uint32_t _lastUpdateCheck = 0;
+
+    std::mutex _mutex;
 };
