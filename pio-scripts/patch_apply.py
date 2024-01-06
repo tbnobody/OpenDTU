@@ -9,7 +9,10 @@ import re
 Import("env")
 
 def getPatchPath(env):
-    return os.path.join(env["PROJECT_DIR"], "patches", env.GetProjectOption('custom_patches'))
+    patchList = []
+    for patch in env.GetProjectOption('custom_patches').split(","):
+        patchList.append(os.path.join(env["PROJECT_DIR"], "patches", patch))
+    return patchList
 
 def is_tool(name):
     """Check whether `name` is on PATH and marked as executable."""
@@ -44,35 +47,36 @@ def main():
         print('Git not found. Will not apply custom patches!')
         return
 
-    directory = getPatchPath(env)
-    if (not os.path.isdir(directory)):
-        print('Patch directory not found: ' + directory)
-        return
+    directories = getPatchPath(env)
+    for directory in directories:
+        if (not os.path.isdir(directory)):
+            print('Patch directory not found: ' + directory)
+            return
 
-    for file in os.listdir(directory):
-        if (not file.endswith('.patch')):
-            continue
+        for file in os.listdir(directory):
+            if (not file.endswith('.patch')):
+                continue
 
-        fullPath = os.path.join(directory, file)
-        preparePath = fullPath + '.prepare'
-        replaceInFile(fullPath, preparePath, '$$$env$$$', env['PIOENV'])
-        print('Working on patch: ' + fullPath + '... ', end='')
+            fullPath = os.path.join(directory, file)
+            preparePath = fullPath + '.prepare'
+            replaceInFile(fullPath, preparePath, '$$$env$$$', env['PIOENV'])
+            print('Working on patch: ' + fullPath + '... ', end='')
 
-        # Check if patch was already applied
-        process = subprocess.run(['git', 'apply', '--reverse', '--check', preparePath], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-        if (process.returncode == 0):
-            print('already applied')
+            # Check if patch was already applied
+            process = subprocess.run(['git', 'apply', '--reverse', '--check', preparePath], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+            if (process.returncode == 0):
+                print('already applied')
+                os.remove(preparePath)
+                continue
+
+            # Apply patch
+            process = subprocess.run(['git', 'apply', preparePath])
+            if (process.returncode == 0):
+                print('applied')
+            else:
+                print('failed')
+
             os.remove(preparePath)
-            continue
-
-        # Apply patch
-        process = subprocess.run(['git', 'apply', preparePath])
-        if (process.returncode == 0):
-            print('applied')
-        else:
-            print('failed')
-
-        os.remove(preparePath)
 
 
 main()
