@@ -1,33 +1,23 @@
 <template>
     <div class="card row" v-if="dataLoaded">
-        <GChart type="Calendar" :data="chartData" :options="chartOptions" :settings="{ packages: ['calendar'] }" />
+        <CalendarHeatmap :values="values" :end-date="endDate" :style="{'font-size': '12px'}" tooltip-unit="Wh" />
     </div>
 </template>
 
 <script lang="ts">
 import { defineComponent } from 'vue';
-import { GChart } from 'vue-google-charts';
+import { CalendarHeatmap } from 'vue3-calendar-heatmap'
 import { authHeader, handleResponse } from '@/utils/authentication';
-var data_cal: any;
+var data: Array<{ date: Date; count: number; }>;
 
-export const options_cal = {
-    height: 480,
-    colorAxis: {
-        minValue: 0,
-        colors: ['#FFFFFF', '#0000FF']
-    },
-    calendar: {
-        cellSize: 24,
-    },
-};
 export default defineComponent({
     components: {
-        GChart,
+        CalendarHeatmap,
     },
     data() {
         return {
-            chartData: data_cal,
-            chartOptions: options_cal,
+            values: data,
+            endDate: new Date(),
             dataLoaded: false,
         }
     },
@@ -42,13 +32,11 @@ export default defineComponent({
                 .then((response) => handleResponse(response, this.$emitter, this.$router))
                 .then((energy) => {
                     if (energy) {
-                        this.chartData = [[{ type: 'date', id: 'Date' }, { type: 'number', id: 'Energy' }]];
+                        this.values = [];
                         var d: Date;
-                        var a: any;
                         energy.forEach((x: any[]) => {
                             d = new Date(x[0] + 2000, x[1] - 1, x[2], x[3])
-                            a = [d, Math.round(x[4])]
-                            this.chartData.push(a)
+                            this.values.push({ date: d, count: Math.round(x[4]) })
                         })
                         this.dataLoaded = true;
                     }
