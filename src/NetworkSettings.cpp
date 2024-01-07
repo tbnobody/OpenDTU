@@ -268,7 +268,8 @@ void NetworkSettingsClass::applyConfig()
         MessageOutput.print("new credentials... ");
         WiFi.begin(
             Configuration.get().WiFi.Ssid,
-            Configuration.get().WiFi.Password);
+            Configuration.get().WiFi.Password,
+            WIFI_ALL_CHANNEL_SCAN);
     } else {
         MessageOutput.print("existing credentials... ");
         WiFi.begin();

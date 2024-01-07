@@ -4,9 +4,11 @@
  */
 #include "Configuration.h"
 #include "MessageOutput.h"
+#include "Utils.h"
 #include "defaults.h"
 #include <ArduinoJson.h>
 #include <LittleFS.h>
+#include <nvs_flash.h>
 
 CONFIG_T config;
 
@@ -24,6 +26,10 @@ bool ConfigurationClass::write()
     config.Cfg.SaveCount++;
 
     DynamicJsonDocument doc(JSON_BUFFER_SIZE);
+
+    if (!Utils::checkJsonAlloc(doc, __FUNCTION__, __LINE__)) {
+        return false;
+    }
 
     JsonObject cfg = doc.createNestedObject("cfg");
     cfg["version"] = config.Cfg.Version;
@@ -150,6 +156,11 @@ bool ConfigurationClass::read()
     File f = LittleFS.open(CONFIG_FILENAME, "r", false);
 
     DynamicJsonDocument doc(JSON_BUFFER_SIZE);
+
+    if (!Utils::checkJsonAlloc(doc, __FUNCTION__, __LINE__)) {
+        return false;
+    }
+
     // Deserialize the JSON document
     const DeserializationError error = deserializeJson(doc, f);
     if (error) {
@@ -310,6 +321,11 @@ void ConfigurationClass::migrate()
     }
 
     DynamicJsonDocument doc(JSON_BUFFER_SIZE);
+
+    if (!Utils::checkJsonAlloc(doc, __FUNCTION__, __LINE__)) {
+        return;
+    }
+
     // Deserialize the JSON document
     const DeserializationError error = deserializeJson(doc, f);
     if (error) {
@@ -337,6 +353,14 @@ void ConfigurationClass::migrate()
     if (config.Cfg.Version < 0x00011900) {
         JsonObject dtu = doc["dtu"];
         config.Dtu.Nrf.PaLevel = dtu["pa_level"];
+    }
+
+    if (config.Cfg.Version < 0x00011a00) {
+        // This migration fixes this issue: https://github.com/espressif/arduino-esp32/issues/8828
+        // It occours when migrating from Core 2.0.9 to 2.0.14
+        // which was done by updating ESP32 PlatformIO from 6.3.2 to 6.5.0
+        nvs_flash_erase();
+        nvs_flash_init();
     }
 
     f.close();

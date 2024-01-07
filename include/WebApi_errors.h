@@ -8,6 +8,7 @@ enum WebApiError {
     GenericDataTooLarge,
     GenericParseError,
     GenericValueMissing,
+    GenericWriteFailed,
 
     DtuBase = 2000,
     DtuSerialZero,

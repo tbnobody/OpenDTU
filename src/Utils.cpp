@@ -5,6 +5,7 @@
 #include "Utils.h"
 #include "Display_Graphic.h"
 #include "Led_Single.h"
+#include "MessageOutput.h"
 #include <Esp.h>
 
 uint32_t Utils::getChipId()
@@ -64,4 +65,14 @@ void Utils::restartDtu()
     delay(1000);
     yield();
     ESP.restart();
+}
+
+bool Utils::checkJsonAlloc(const DynamicJsonDocument& doc, const char* function, const uint16_t line)
+{
+    if (doc.capacity() == 0) {
+        MessageOutput.printf("Alloc failed: %s, %d\r\n", function, line);
+        return false;
+    }
+
+    return true;
 }

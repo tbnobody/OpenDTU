@@ -135,6 +135,10 @@ void MqttHandleHassClass::publishInverterField(std::shared_ptr<InverterAbstract>
         }
 
         DynamicJsonDocument root(1024);
+        if (!Utils::checkJsonAlloc(root, __FUNCTION__, __LINE__)) {
+            return;
+        }
+
         root["name"] = name;
         root["stat_t"] = stateTopic;
         root["uniq_id"] = serial + "_ch" + chanNum + "_" + fieldName;
@@ -179,6 +183,10 @@ void MqttHandleHassClass::publishInverterButton(std::shared_ptr<InverterAbstract
     const String cmdTopic = MqttSettings.getPrefix() + serial + "/" + subTopic;
 
     DynamicJsonDocument root(1024);
+    if (!Utils::checkJsonAlloc(root, __FUNCTION__, __LINE__)) {
+        return;
+    }
+
     root["name"] = caption;
     root["uniq_id"] = serial + "_" + buttonId;
     if (strcmp(icon, "")) {
@@ -217,6 +225,10 @@ void MqttHandleHassClass::publishInverterNumber(
     const String statTopic = MqttSettings.getPrefix() + serial + "/" + stateTopic;
 
     DynamicJsonDocument root(1024);
+    if (!Utils::checkJsonAlloc(root, __FUNCTION__, __LINE__)) {
+        return;
+    }
+
     root["name"] = caption;
     root["uniq_id"] = serial + "_" + buttonId;
     if (strcmp(icon, "")) {
@@ -251,6 +263,10 @@ void MqttHandleHassClass::publishInverterBinarySensor(std::shared_ptr<InverterAb
     const String statTopic = MqttSettings.getPrefix() + serial + "/" + subTopic;
 
     DynamicJsonDocument root(1024);
+    if (!Utils::checkJsonAlloc(root, __FUNCTION__, __LINE__)) {
+        return;
+    }
+
     root["name"] = caption;
     root["uniq_id"] = serial + "_" + sensorId;
     root["stat_t"] = statTopic;
@@ -275,6 +291,10 @@ void MqttHandleHassClass::publishDtuSensor(const char* name, const char* device_
     }
 
     DynamicJsonDocument root(1024);
+    if (!Utils::checkJsonAlloc(root, __FUNCTION__, __LINE__)) {
+        return;
+    }
+
     root["name"] = name;
     root["uniq_id"] = getDtuUniqueId() + "_" + id;
     if (strcmp(device_class, "")) {
@@ -317,6 +337,10 @@ void MqttHandleHassClass::publishDtuBinarySensor(const char* name, const char* d
     }
 
     DynamicJsonDocument root(1024);
+    if (!Utils::checkJsonAlloc(root, __FUNCTION__, __LINE__)) {
+        return;
+    }
+
     root["name"] = name;
     root["uniq_id"] = getDtuUniqueId() + "_" + id;
     root["stat_t"] = MqttSettings.getPrefix() + topic;

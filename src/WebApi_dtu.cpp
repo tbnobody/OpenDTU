@@ -30,7 +30,7 @@ void WebApiDtuClass::onDtuAdminGet(AsyncWebServerRequest* request)
     }
 
     AsyncJsonResponse* response = new AsyncJsonResponse();
-    JsonObject root = response->getRoot();
+    auto& root = response->getRoot();
     const CONFIG_T& config = Configuration.get();
 
     // DTU Serial is read as HEX
@@ -57,7 +57,7 @@ void WebApiDtuClass::onDtuAdminPost(AsyncWebServerRequest* request)
     }
 
     AsyncJsonResponse* response = new AsyncJsonResponse();
-    JsonObject retMsg = response->getRoot();
+    auto& retMsg = response->getRoot();
     retMsg["type"] = "warning";
 
     if (!request->hasParam("data", true)) {
@@ -154,11 +154,8 @@ void WebApiDtuClass::onDtuAdminPost(AsyncWebServerRequest* request)
     config.Dtu.Nrf.PaLevel = root["nrf_palevel"].as<uint8_t>();
     config.Dtu.Cmt.PaLevel = root["cmt_palevel"].as<int8_t>();
     config.Dtu.Cmt.Frequency = root["cmt_frequency"].as<uint32_t>();
-    Configuration.write();
 
-    retMsg["type"] = "success";
-    retMsg["message"] = "Settings saved!";
-    retMsg["code"] = WebApiError::GenericSuccess;
+    WebApi.writeConfig(retMsg);
 
     response->setLength();
     request->send(response);

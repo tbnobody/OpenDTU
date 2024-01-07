@@ -33,14 +33,14 @@ void WebApiDeviceClass::onDeviceAdminGet(AsyncWebServerRequest* request)
     }
 
     AsyncJsonResponse* response = new AsyncJsonResponse(false, MQTT_JSON_DOC_SIZE);
-    JsonObject root = response->getRoot();
+    auto& root = response->getRoot();
     const CONFIG_T& config = Configuration.get();
     const PinMapping_t& pin = PinMapping.get();
 
-    JsonObject curPin = root.createNestedObject("curPin");
+    auto curPin = root.createNestedObject("curPin");
     curPin["name"] = config.Dev_PinMapping;
 
-    JsonObject nrfPinObj = curPin.createNestedObject("nrf24");
+    auto nrfPinObj = curPin.createNestedObject("nrf24");
     nrfPinObj["clk"] = pin.nrf24_clk;
     nrfPinObj["cs"] = pin.nrf24_cs;
     nrfPinObj["en"] = pin.nrf24_en;
@@ -48,7 +48,7 @@ void WebApiDeviceClass::onDeviceAdminGet(AsyncWebServerRequest* request)
     nrfPinObj["miso"] = pin.nrf24_miso;
     nrfPinObj["mosi"] = pin.nrf24_mosi;
 
-    JsonObject cmtPinObj = curPin.createNestedObject("cmt");
+    auto cmtPinObj = curPin.createNestedObject("cmt");
     cmtPinObj["clk"] = pin.cmt_clk;
     cmtPinObj["cs"] = pin.cmt_cs;
     cmtPinObj["fcs"] = pin.cmt_fcs;
@@ -56,7 +56,7 @@ void WebApiDeviceClass::onDeviceAdminGet(AsyncWebServerRequest* request)
     cmtPinObj["gpio2"] = pin.cmt_gpio2;
     cmtPinObj["gpio3"] = pin.cmt_gpio3;
 
-    JsonObject ethPinObj = curPin.createNestedObject("eth");
+    auto ethPinObj = curPin.createNestedObject("eth");
     ethPinObj["enabled"] = pin.eth_enabled;
     ethPinObj["phy_addr"] = pin.eth_phy_addr;
     ethPinObj["power"] = pin.eth_power;
@@ -65,19 +65,19 @@ void WebApiDeviceClass::onDeviceAdminGet(AsyncWebServerRequest* request)
     ethPinObj["type"] = pin.eth_type;
     ethPinObj["clk_mode"] = pin.eth_clk_mode;
 
-    JsonObject displayPinObj = curPin.createNestedObject("display");
+    auto displayPinObj = curPin.createNestedObject("display");
     displayPinObj["type"] = pin.display_type;
     displayPinObj["data"] = pin.display_data;
     displayPinObj["clk"] = pin.display_clk;
     displayPinObj["cs"] = pin.display_cs;
     displayPinObj["reset"] = pin.display_reset;
 
-    JsonObject ledPinObj = curPin.createNestedObject("led");
+    auto ledPinObj = curPin.createNestedObject("led");
     for (uint8_t i = 0; i < PINMAPPING_LED_COUNT; i++) {
         ledPinObj["led" + String(i)] = pin.led[i];
     }
 
-    JsonObject display = root.createNestedObject("display");
+    auto display = root.createNestedObject("display");
     display["rotation"] = config.Display.Rotation;
     display["power_safe"] = config.Display.PowerSafe;
     display["screensaver"] = config.Display.ScreenSaver;
@@ -85,9 +85,9 @@ void WebApiDeviceClass::onDeviceAdminGet(AsyncWebServerRequest* request)
     display["language"] = config.Display.Language;
     display["diagramduration"] = config.Display.DiagramDuration;
 
-    JsonArray leds = root.createNestedArray("led");
+    auto leds = root.createNestedArray("led");
     for (uint8_t i = 0; i < PINMAPPING_LED_COUNT; i++) {
-        JsonObject led = leds.createNestedObject();
+        auto led = leds.createNestedObject();
         led["brightness"] = config.Led_Single[i].Brightness;
     }
 
@@ -102,7 +102,7 @@ void WebApiDeviceClass::onDeviceAdminPost(AsyncWebServerRequest* request)
     }
 
     AsyncJsonResponse* response = new AsyncJsonResponse(false, MQTT_JSON_DOC_SIZE);
-    JsonObject retMsg = response->getRoot();
+    auto& retMsg = response->getRoot();
     retMsg["type"] = "warning";
 
     if (!request->hasParam("data", true)) {
@@ -175,11 +175,7 @@ void WebApiDeviceClass::onDeviceAdminPost(AsyncWebServerRequest* request)
     Display.setLanguage(config.Display.Language);
     Display.Diagram().updatePeriod();
 
-    Configuration.write();
-
-    retMsg["type"] = "success";
-    retMsg["message"] = "Settings saved!";
-    retMsg["code"] = WebApiError::GenericSuccess;
+    WebApi.writeConfig(retMsg);
 
     response->setLength();
     request->send(response);

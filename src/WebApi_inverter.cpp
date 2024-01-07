@@ -36,7 +36,7 @@ void WebApiInverterClass::onInverterList(AsyncWebServerRequest* request)
     }
 
     AsyncJsonResponse* response = new AsyncJsonResponse(false, 768 * INV_MAX_COUNT);
-    JsonObject root = response->getRoot();
+    auto& root = response->getRoot();
     JsonArray data = root.createNestedArray("inverter");
 
     const CONFIG_T& config = Configuration.get();
@@ -94,7 +94,7 @@ void WebApiInverterClass::onInverterAdd(AsyncWebServerRequest* request)
     }
 
     AsyncJsonResponse* response = new AsyncJsonResponse();
-    JsonObject retMsg = response->getRoot();
+    auto& retMsg = response->getRoot();
     retMsg["type"] = "warning";
 
     if (!request->hasParam("data", true)) {
@@ -167,11 +167,8 @@ void WebApiInverterClass::onInverterAdd(AsyncWebServerRequest* request)
     inverter->Serial = strtoll(root["serial"].as<String>().c_str(), NULL, 16);
 
     strncpy(inverter->Name, root["name"].as<String>().c_str(), INV_MAX_NAME_STRLEN);
-    Configuration.write();
 
-    retMsg["type"] = "success";
-    retMsg["message"] = "Inverter created!";
-    retMsg["code"] = WebApiError::InverterAdded;
+    WebApi.writeConfig(retMsg, WebApiError::InverterAdded, "Inverter created!");
 
     response->setLength();
     request->send(response);
@@ -194,7 +191,7 @@ void WebApiInverterClass::onInverterEdit(AsyncWebServerRequest* request)
     }
 
     AsyncJsonResponse* response = new AsyncJsonResponse();
-    JsonObject retMsg = response->getRoot();
+    auto& retMsg = response->getRoot();
     retMsg["type"] = "warning";
 
     if (!request->hasParam("data", true)) {
@@ -294,11 +291,7 @@ void WebApiInverterClass::onInverterEdit(AsyncWebServerRequest* request)
         arrayCount++;
     }
 
-    Configuration.write();
-
-    retMsg["type"] = "success";
-    retMsg["code"] = WebApiError::InverterChanged;
-    retMsg["message"] = "Inverter changed!";
+    WebApi.writeConfig(retMsg, WebApiError::InverterChanged, "Inverter changed!");
 
     response->setLength();
     request->send(response);
@@ -340,7 +333,7 @@ void WebApiInverterClass::onInverterDelete(AsyncWebServerRequest* request)
     }
 
     AsyncJsonResponse* response = new AsyncJsonResponse();
-    JsonObject retMsg = response->getRoot();
+    auto& retMsg = response->getRoot();
     retMsg["type"] = "warning";
 
     if (!request->hasParam("data", true)) {
@@ -395,11 +388,8 @@ void WebApiInverterClass::onInverterDelete(AsyncWebServerRequest* request)
 
     inverter.Serial = 0;
     strncpy(inverter.Name, "", sizeof(inverter.Name));
-    Configuration.write();
 
-    retMsg["type"] = "success";
-    retMsg["message"] = "Inverter deleted!";
-    retMsg["code"] = WebApiError::InverterDeleted;
+    WebApi.writeConfig(retMsg, WebApiError::InverterDeleted, "Inverter deleted!");
 
     response->setLength();
     request->send(response);
@@ -414,7 +404,7 @@ void WebApiInverterClass::onInverterOrder(AsyncWebServerRequest* request)
     }
 
     AsyncJsonResponse* response = new AsyncJsonResponse();
-    JsonObject retMsg = response->getRoot();
+    auto& retMsg = response->getRoot();
     retMsg["type"] = "warning";
 
     if (!request->hasParam("data", true)) {
@@ -466,11 +456,7 @@ void WebApiInverterClass::onInverterOrder(AsyncWebServerRequest* request)
         order++;
     }
 
-    Configuration.write();
-
-    retMsg["type"] = "success";
-    retMsg["message"] = "Inverter order saved!";
-    retMsg["code"] = WebApiError::InverterOrdered;
+    WebApi.writeConfig(retMsg, WebApiError::InverterOrdered, "Inverter order saved!");
 
     response->setLength();
     request->send(response);
