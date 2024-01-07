@@ -28,5 +28,9 @@ bool VictronSmartShunt::init(bool verboseLogging)
 void VictronSmartShunt::loop()
 {
     VeDirectShunt.loop();
+
+    if (VeDirectShunt.getLastUpdate() <= _lastUpdate) { return; }
+
     _stats->updateFrom(VeDirectShunt.veFrame);
+    _lastUpdate = VeDirectShunt.getLastUpdate();
 }

@@ -11,6 +11,7 @@ public:
     std::shared_ptr<BatteryStats> getStats() const final { return _stats; }
 
 private:
+    uint32_t _lastUpdate = 0;
     std::shared_ptr<VictronSmartShuntStats> _stats =
         std::make_shared<VictronSmartShuntStats>();
 };
