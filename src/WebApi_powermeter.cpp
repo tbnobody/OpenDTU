@@ -195,10 +195,7 @@ void WebApiPowerMeterClass::onAdminPost(AsyncWebServerRequest* request)
         strlcpy(config.PowerMeter.Http_Phase[i].JsonPath, phase["json_path"].as<String>().c_str(), sizeof(config.PowerMeter.Http_Phase[i].JsonPath));
     }
 
-    Configuration.write();
-
-    retMsg["type"] = "success";
-    retMsg["message"] = "Settings saved!";
+    WebApi.writeConfig(retMsg);
 
     response->setLength();
     request->send(response);

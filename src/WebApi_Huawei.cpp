@@ -261,11 +261,8 @@ void WebApiHuaweiClass::onAdminPost(AsyncWebServerRequest* request)
     config.Huawei.Auto_Power_Enable_Voltage_Limit = root["enable_voltage_limit"].as<float>();
     config.Huawei.Auto_Power_Lower_Power_Limit = root["lower_power_limit"].as<float>();
     config.Huawei.Auto_Power_Upper_Power_Limit = root["upper_power_limit"].as<float>();    
-    Configuration.write();
-
-    retMsg["type"] = "success";
-    retMsg["message"] = "Settings saved!";
-    retMsg["code"] = WebApiError::GenericSuccess;
+   
+    WebApi.writeConfig(retMsg);
 
     response->setLength();
     request->send(response);

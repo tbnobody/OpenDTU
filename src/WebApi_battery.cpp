@@ -108,11 +108,8 @@ void WebApiBatteryClass::onAdminPost(AsyncWebServerRequest* request)
     config.Battery.JkBmsInterface = root["jkbms_interface"].as<uint8_t>();
     config.Battery.JkBmsPollingInterval = root["jkbms_polling_interval"].as<uint8_t>();
     strlcpy(config.Battery.MqttTopic, root["mqtt_topic"].as<String>().c_str(), sizeof(config.Battery.MqttTopic));
-    Configuration.write();
-
-    retMsg["type"] = "success";
-    retMsg["message"] = "Settings saved!";
-    retMsg["code"] = WebApiError::GenericSuccess;
+    
+    WebApi.writeConfig(retMsg);
 
     response->setLength();
     request->send(response);

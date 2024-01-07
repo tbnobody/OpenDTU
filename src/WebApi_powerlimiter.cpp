@@ -149,15 +149,10 @@ void WebApiPowerLimiterClass::onAdminPost(AsyncWebServerRequest* request)
     config.PowerLimiter.FullSolarPassThroughStartVoltage = static_cast<int>(root["full_solar_passthrough_start_voltage"].as<float>() * 100) / 100.0;
     config.PowerLimiter.FullSolarPassThroughStopVoltage = static_cast<int>(root["full_solar_passthrough_stop_voltage"].as<float>() * 100) / 100.0;
 
-
-
-    Configuration.write();
-
-    PowerLimiter.calcNextInverterRestart();
-
-    retMsg["type"] = "success";
-    retMsg["message"] = "Settings saved!";
+    WebApi.writeConfig(retMsg);
 
     response->setLength();
     request->send(response);
+
+    PowerLimiter.calcNextInverterRestart();
 }

@@ -115,14 +115,11 @@ void WebApiVedirectClass::onVedirectAdminPost(AsyncWebServerRequest* request)
     config.Vedirect.Enabled = root["vedirect_enabled"].as<bool>();
     config.Vedirect.VerboseLogging = root["verbose_logging"].as<bool>();
     config.Vedirect.UpdatesOnly = root["vedirect_updatesonly"].as<bool>();
-    Configuration.write();
 
-    VictronMppt.updateSettings();
-
-    retMsg["type"] = "success";
-    retMsg["message"] = "Settings saved!";
-    retMsg["code"] = WebApiError::GenericSuccess;
+    WebApi.writeConfig(retMsg);
 
     response->setLength();
     request->send(response);
+
+    VictronMppt.updateSettings();
 }
