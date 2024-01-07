@@ -277,7 +277,7 @@ void JkBmsBatteryStats::mqttPublish() const
         for (auto iter = JkBms::AlarmBitTexts.begin(); iter != JkBms::AlarmBitTexts.end(); ++iter) {
             auto bit = iter->first;
             String value = (*oAlarms & static_cast<uint16_t>(bit))?"1":"0";
-            MqttSettings.publish(String("battery/alarms/") + iter->second.c_str(), value);
+            MqttSettings.publish(String("battery/alarms/") + iter->second.data(), value);
         }
     }
 
@@ -286,7 +286,7 @@ void JkBmsBatteryStats::mqttPublish() const
         for (auto iter = JkBms::StatusBitTexts.begin(); iter != JkBms::StatusBitTexts.end(); ++iter) {
             auto bit = iter->first;
             String value = (*oStatus & static_cast<uint16_t>(bit))?"1":"0";
-            MqttSettings.publish(String("battery/status/") + iter->second.c_str(), value);
+            MqttSettings.publish(String("battery/status/") + iter->second.data(), value);
         }
     }
 
@@ -338,7 +338,7 @@ void VictronSmartShuntStats::updateFrom(VeDirectShuntController::veShuntStruct c
     _SoC = shuntData.SOC / 10;
     _voltage = shuntData.V;
     _current = shuntData.I;
-    _modelName = shuntData.getPidAsString();
+    _modelName = shuntData.getPidAsString().data();
     _chargeCycles = shuntData.H4;
     _timeToGo = shuntData.TTG / 60;
     _chargedEnergy = shuntData.H18 / 100;

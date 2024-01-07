@@ -6,6 +6,7 @@
 #include "WebApi_device.h"
 #include "WebApi_devinfo.h"
 #include "WebApi_dtu.h"
+#include "WebApi_errors.h"
 #include "WebApi_eventlog.h"
 #include "WebApi_firmware.h"
 #include "WebApi_gridprofile.h"
@@ -41,6 +42,8 @@ public:
     static bool checkCredentialsReadonly(AsyncWebServerRequest* request);
 
     static void sendTooManyRequests(AsyncWebServerRequest* request);
+
+    static void writeConfig(JsonVariant& retMsg, const WebApiError code = WebApiError::GenericSuccess, const String& message = "Settings saved!");
 
 private:
     void loop();

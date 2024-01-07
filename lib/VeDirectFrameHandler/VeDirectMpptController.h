@@ -59,10 +59,10 @@ public:
         double H22;                     // yield yesterday kWh
         int32_t H23;                    // maximum power yesterday W
 
-        String getMpptAsString() const; // state of mppt as string
-        String getCsAsString() const;   // current state as string
-        String getErrAsString() const;  // error state as string
-        String getOrAsString() const;   // off reason as string
+        frozen::string const& getMpptAsString() const; // state of mppt as string
+        frozen::string const& getCsAsString() const;   // current state as string
+        frozen::string const& getErrAsString() const;  // error state as string
+        frozen::string const& getOrAsString() const;   // off reason as string
     };
 
     using spData_t = std::shared_ptr<veMpptStruct const>;

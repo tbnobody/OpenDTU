@@ -28,7 +28,7 @@ void WebApiDevInfoClass::onDevInfoStatus(AsyncWebServerRequest* request)
     }
 
     AsyncJsonResponse* response = new AsyncJsonResponse();
-    JsonObject root = response->getRoot();
+    auto& root = response->getRoot();
 
     uint64_t serial = 0;
     if (request->hasParam("inv")) {

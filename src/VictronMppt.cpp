@@ -32,7 +32,7 @@ void VictronMpptClass::updateSettings()
     MessageOutput.printf("[VictronMppt] rx = %d, tx = %d\r\n", rx, tx);
 
     if (rx < 0) {
-        MessageOutput.println(F("[VictronMppt] invalid pin config"));
+        MessageOutput.println("[VictronMppt] invalid pin config");
         return;
     }
 

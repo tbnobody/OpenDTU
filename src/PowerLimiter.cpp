@@ -14,7 +14,7 @@
 #include "MessageOutput.h"
 #include <ctime>
 #include <cmath>
-#include <map>
+#include <frozen/map.h>
 
 PowerLimiterClass PowerLimiter;
 
@@ -26,11 +26,11 @@ void PowerLimiterClass::init(Scheduler& scheduler)
     _loopTask.enable();
 }
 
-std::string const& PowerLimiterClass::getStatusText(PowerLimiterClass::Status status)
+frozen::string const& PowerLimiterClass::getStatusText(PowerLimiterClass::Status status)
 {
-    static const std::string missing =  "programmer error: missing status text";
+    static const frozen::string missing = "programmer error: missing status text";
 
-    static const std::map<Status, const std::string> texts = {
+    static const frozen::map<Status, frozen::string, 19> texts = {
         { Status::Initializing, "initializing (should not see me)" },
         { Status::DisabledByConfig, "disabled by configuration" },
         { Status::DisabledByMqtt, "disabled by MQTT" },
@@ -70,7 +70,7 @@ void PowerLimiterClass::announceStatus(PowerLimiterClass::Status status)
     if (status == Status::DisabledByConfig && _lastStatus == status) { return; }
 
     MessageOutput.printf("[%11.3f] DPL: %s\r\n",
-        static_cast<double>(millis())/1000, getStatusText(status).c_str());
+        static_cast<double>(millis())/1000, getStatusText(status).data());
 
     _lastStatus = status;
     _lastStatusPrinted = millis();
@@ -586,7 +586,7 @@ float PowerLimiterClass::getLoadCorrectedVoltage()
 {
     if (!_inverter) {
         // there should be no need to call this method if no target inverter is known
-        MessageOutput.println(F("DPL getLoadCorrectedVoltage: no inverter (programmer error)"));
+        MessageOutput.println("DPL getLoadCorrectedVoltage: no inverter (programmer error)");
         return 0.0;
     }
 

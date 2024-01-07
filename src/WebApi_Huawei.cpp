@@ -28,7 +28,7 @@ void WebApiHuaweiClass::loop()
 {
 }
 
-void WebApiHuaweiClass::getJsonData(JsonObject& root) {
+void WebApiHuaweiClass::getJsonData(JsonVariant& root) {
     const RectifierParameters_t * rp = HuaweiCan.get();
 
     root["data_age"] = (millis() - HuaweiCan.getLastUpdate()) / 1000;
@@ -62,7 +62,7 @@ void WebApiHuaweiClass::onStatus(AsyncWebServerRequest* request)
     }
 
     AsyncJsonResponse* response = new AsyncJsonResponse();
-    JsonObject root = response->getRoot();
+    auto& root = response->getRoot();
     getJsonData(root);
 
     response->setLength();
@@ -76,7 +76,7 @@ void WebApiHuaweiClass::onPost(AsyncWebServerRequest* request)
     }
 
     AsyncJsonResponse* response = new AsyncJsonResponse();
-    JsonObject retMsg = response->getRoot();
+    auto& retMsg = response->getRoot();
     retMsg["type"] = "warning";
 
     if (!request->hasParam("data", true)) {
@@ -186,7 +186,7 @@ void WebApiHuaweiClass::onAdminGet(AsyncWebServerRequest* request)
     }
     
     AsyncJsonResponse* response = new AsyncJsonResponse();
-    JsonObject root = response->getRoot();
+    auto& root = response->getRoot();
     const CONFIG_T& config = Configuration.get();
 
     root["enabled"] = config.Huawei.Enabled;
@@ -208,7 +208,7 @@ void WebApiHuaweiClass::onAdminPost(AsyncWebServerRequest* request)
     }
     
     AsyncJsonResponse* response = new AsyncJsonResponse();
-    JsonObject retMsg = response->getRoot();
+    auto& retMsg = response->getRoot();
     retMsg["type"] = "warning";
 
     if (!request->hasParam("data", true)) {
@@ -261,11 +261,8 @@ void WebApiHuaweiClass::onAdminPost(AsyncWebServerRequest* request)
     config.Huawei.Auto_Power_Enable_Voltage_Limit = root["enable_voltage_limit"].as<float>();
     config.Huawei.Auto_Power_Lower_Power_Limit = root["lower_power_limit"].as<float>();
     config.Huawei.Auto_Power_Upper_Power_Limit = root["upper_power_limit"].as<float>();    
-    Configuration.write();
-
-    retMsg["type"] = "success";
-    retMsg["message"] = "Settings saved!";
-    retMsg["code"] = WebApiError::GenericSuccess;
+   
+    WebApi.writeConfig(retMsg);
 
     response->setLength();
     request->send(response);
