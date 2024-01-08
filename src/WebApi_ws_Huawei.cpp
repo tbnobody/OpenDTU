@@ -7,6 +7,7 @@
 #include "Configuration.h"
 #include "Huawei_can.h"
 #include "MessageOutput.h"
+#include "Utils.h"
 #include "WebApi.h"
 #include "defaults.h"
 
@@ -50,16 +51,15 @@ void WebApiWsHuaweiLiveClass::loop()
     _lastUpdateCheck = millis();
 
     try {
-        String buffer;
-        // free JsonDocument as soon as possible
-        {
-            DynamicJsonDocument root(1024);
+        std::lock_guard<std::mutex> lock(_mutex);
+        DynamicJsonDocument root(1024);
+        if (Utils::checkJsonAlloc(root, __FUNCTION__, __LINE__)) {
             JsonVariant var = root;
             generateJsonResponse(var);
-            serializeJson(root, buffer);
-        }
 
-        if (buffer) {
+            String buffer;
+            serializeJson(root, buffer);
+
             if (Configuration.get().Security.AllowReadonly) {
                 _ws.setAuthentication("", "");
             } else {
@@ -69,7 +69,9 @@ void WebApiWsHuaweiLiveClass::loop()
             _ws.textAll(buffer);
         }
     } catch (std::bad_alloc& bad_alloc) {
-        MessageOutput.printf("Calling /api/livedata/status has temporarily run out of resources. Reason: \"%s\".\r\n", bad_alloc.what());
+        MessageOutput.printf("Calling /api/huaweilivedata/status has temporarily run out of resources. Reason: \"%s\".\r\n", bad_alloc.what());
+    } catch (const std::exception& exc) {
+            MessageOutput.printf("Unknown exception in /api/huaweilivedata/status. Reason: \"%s\".\r\n", exc.what());
     }
 }
 
@@ -78,26 +80,26 @@ void WebApiWsHuaweiLiveClass::generateJsonResponse(JsonVariant& root)
     const RectifierParameters_t * rp = HuaweiCan.get();
 
     root["data_age"] = (millis() - HuaweiCan.getLastUpdate()) / 1000;
-    root[F("input_voltage")]["v"] = rp->input_voltage;
-    root[F("input_voltage")]["u"] = "V";
-    root[F("input_current")]["v"] = rp->input_current;
-    root[F("input_current")]["u"] = "A";
-    root[F("input_power")]["v"] = rp->input_power;
-    root[F("input_power")]["u"] = "W";
-    root[F("output_voltage")]["v"] = rp->output_voltage;
-    root[F("output_voltage")]["u"] = "V";
-    root[F("output_current")]["v"] = rp->output_current;
-    root[F("output_current")]["u"] = "A";
-    root[F("max_output_current")]["v"] = rp->max_output_current;
-    root[F("max_output_current")]["u"] = "A";
-    root[F("output_power")]["v"] = rp->output_power;
-    root[F("output_power")]["u"] = "W";
-    root[F("input_temp")]["v"] = rp->input_temp;
-    root[F("input_temp")]["u"] = "°C";
-    root[F("output_temp")]["v"] = rp->output_temp;
-    root[F("output_temp")]["u"] = "°C";
-    root[F("efficiency")]["v"] = rp->efficiency * 100;
-    root[F("efficiency")]["u"] = "%";
+    root["input_voltage"]["v"] = rp->input_voltage;
+    root["input_voltage"]["u"] = "V";
+    root["input_current"]["v"] = rp->input_current;
+    root["input_current"]["u"] = "A";
+    root["input_power"]["v"] = rp->input_power;
+    root["input_power"]["u"] = "W";
+    root["output_voltage"]["v"] = rp->output_voltage;
+    root["output_voltage"]["u"] = "V";
+    root["output_current"]["v"] = rp->output_current;
+    root["output_current"]["u"] = "A";
+    root["max_output_current"]["v"] = rp->max_output_current;
+    root["max_output_current"]["u"] = "A";
+    root["output_power"]["v"] = rp->output_power;
+    root["output_power"]["u"] = "W";
+    root["input_temp"]["v"] = rp->input_temp;
+    root["input_temp"]["u"] = "°C";
+    root["output_temp"]["v"] = rp->output_temp;
+    root["output_temp"]["u"] = "°C";
+    root["efficiency"]["v"] = rp->efficiency * 100;
+    root["efficiency"]["u"] = "%";
 
 }
 
@@ -122,15 +124,19 @@ void WebApiWsHuaweiLiveClass::onLivedataStatus(AsyncWebServerRequest* request)
         return;
     }
     try {
+        std::lock_guard<std::mutex> lock(_mutex);
         AsyncJsonResponse* response = new AsyncJsonResponse(false, 1024U);
-        JsonVariant root = response->getRoot().as<JsonVariant>();
+        auto& root = response->getRoot();
+
         generateJsonResponse(root);
 
         response->setLength();
         request->send(response);
     } catch (std::bad_alloc& bad_alloc) {
-        MessageOutput.printf("Calling /api/livedata/status has temporarily run out of resources. Reason: \"%s\".\r\n", bad_alloc.what());
-
+        MessageOutput.printf("Calling /api/huaweilivedata/status has temporarily run out of resources. Reason: \"%s\".\r\n", bad_alloc.what());
+        WebApi.sendTooManyRequests(request);
+    } catch (const std::exception& exc) {
+        MessageOutput.printf("Unknown exception in /api/huaweilivedata/status. Reason: \"%s\".\r\n", exc.what());
         WebApi.sendTooManyRequests(request);
     }
 }

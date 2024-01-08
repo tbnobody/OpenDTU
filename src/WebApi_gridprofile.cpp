@@ -28,7 +28,7 @@ void WebApiGridProfileClass::onGridProfileStatus(AsyncWebServerRequest* request)
     }
 
     AsyncJsonResponse* response = new AsyncJsonResponse(false, 8192);
-    JsonObject root = response->getRoot();
+    auto& root = response->getRoot();
 
     uint64_t serial = 0;
     if (request->hasParam("inv")) {
@@ -72,7 +72,7 @@ void WebApiGridProfileClass::onGridProfileRawdata(AsyncWebServerRequest* request
     }
 
     AsyncJsonResponse* response = new AsyncJsonResponse(false, 4096);
-    JsonObject root = response->getRoot();
+    auto& root = response->getRoot();
 
     uint64_t serial = 0;
     if (request->hasParam("inv")) {

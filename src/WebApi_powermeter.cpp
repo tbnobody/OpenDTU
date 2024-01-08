@@ -35,35 +35,35 @@ void WebApiPowerMeterClass::loop()
 void WebApiPowerMeterClass::onStatus(AsyncWebServerRequest* request)
 {
     AsyncJsonResponse* response = new AsyncJsonResponse(false, 2048);
-    JsonObject root = response->getRoot();
+    auto& root = response->getRoot();
     const CONFIG_T& config = Configuration.get();
 
-    root[F("enabled")] = config.PowerMeter.Enabled;
-    root[F("verbose_logging")] = config.PowerMeter.VerboseLogging;
-    root[F("source")] = config.PowerMeter.Source;
-    root[F("interval")] = config.PowerMeter.Interval;
-    root[F("mqtt_topic_powermeter_1")] = config.PowerMeter.MqttTopicPowerMeter1;
-    root[F("mqtt_topic_powermeter_2")] = config.PowerMeter.MqttTopicPowerMeter2;
-    root[F("mqtt_topic_powermeter_3")] = config.PowerMeter.MqttTopicPowerMeter3;
-    root[F("sdmbaudrate")] = config.PowerMeter.SdmBaudrate;
-    root[F("sdmaddress")] = config.PowerMeter.SdmAddress;
-    root[F("http_individual_requests")] = config.PowerMeter.HttpIndividualRequests;
+    root["enabled"] = config.PowerMeter.Enabled;
+    root["verbose_logging"] = config.PowerMeter.VerboseLogging;
+    root["source"] = config.PowerMeter.Source;
+    root["interval"] = config.PowerMeter.Interval;
+    root["mqtt_topic_powermeter_1"] = config.PowerMeter.MqttTopicPowerMeter1;
+    root["mqtt_topic_powermeter_2"] = config.PowerMeter.MqttTopicPowerMeter2;
+    root["mqtt_topic_powermeter_3"] = config.PowerMeter.MqttTopicPowerMeter3;
+    root["sdmbaudrate"] = config.PowerMeter.SdmBaudrate;
+    root["sdmaddress"] = config.PowerMeter.SdmAddress;
+    root["http_individual_requests"] = config.PowerMeter.HttpIndividualRequests;
 
-    JsonArray httpPhases = root.createNestedArray(F("http_phases"));
+    JsonArray httpPhases = root.createNestedArray("http_phases");
 
     for (uint8_t i = 0; i < POWERMETER_MAX_PHASES; i++) {
         JsonObject phaseObject = httpPhases.createNestedObject();
 
-        phaseObject[F("index")] = i + 1;
-        phaseObject[F("enabled")] = config.PowerMeter.Http_Phase[i].Enabled;
-        phaseObject[F("url")] = String(config.PowerMeter.Http_Phase[i].Url);
-        phaseObject[F("auth_type")]= config.PowerMeter.Http_Phase[i].AuthType;
-        phaseObject[F("username")] = String(config.PowerMeter.Http_Phase[i].Username);
-        phaseObject[F("password")] = String(config.PowerMeter.Http_Phase[i].Password);
-        phaseObject[F("header_key")] = String(config.PowerMeter.Http_Phase[i].HeaderKey);
-        phaseObject[F("header_value")] = String(config.PowerMeter.Http_Phase[i].HeaderValue);
-        phaseObject[F("json_path")] = String(config.PowerMeter.Http_Phase[i].JsonPath);
-        phaseObject[F("timeout")] = config.PowerMeter.Http_Phase[i].Timeout;
+        phaseObject["index"] = i + 1;
+        phaseObject["enabled"] = config.PowerMeter.Http_Phase[i].Enabled;
+        phaseObject["url"] = String(config.PowerMeter.Http_Phase[i].Url);
+        phaseObject["auth_type"]= config.PowerMeter.Http_Phase[i].AuthType;
+        phaseObject["username"] = String(config.PowerMeter.Http_Phase[i].Username);
+        phaseObject["password"] = String(config.PowerMeter.Http_Phase[i].Password);
+        phaseObject["header_key"] = String(config.PowerMeter.Http_Phase[i].HeaderKey);
+        phaseObject["header_value"] = String(config.PowerMeter.Http_Phase[i].HeaderValue);
+        phaseObject["json_path"] = String(config.PowerMeter.Http_Phase[i].JsonPath);
+        phaseObject["timeout"] = config.PowerMeter.Http_Phase[i].Timeout;
     }
 
     response->setLength();
@@ -86,11 +86,11 @@ void WebApiPowerMeterClass::onAdminPost(AsyncWebServerRequest* request)
     }
 
     AsyncJsonResponse* response = new AsyncJsonResponse();
-    JsonObject retMsg = response->getRoot();
-    retMsg[F("type")] = F("warning");
+    auto& retMsg = response->getRoot();
+    retMsg["type"] = "warning";
 
     if (!request->hasParam("data", true)) {
-        retMsg[F("message")] = F("No values found!");
+        retMsg["message"] = "No values found!";
         response->setLength();
         request->send(response);
         return;
@@ -99,7 +99,7 @@ void WebApiPowerMeterClass::onAdminPost(AsyncWebServerRequest* request)
     String json = request->getParam("data", true)->value();
 
     if (json.length() > 4096) {
-        retMsg[F("message")] = F("Data too large!");
+        retMsg["message"] = "Data too large!";
         response->setLength();
         request->send(response);
         return;
@@ -109,49 +109,49 @@ void WebApiPowerMeterClass::onAdminPost(AsyncWebServerRequest* request)
     DeserializationError error = deserializeJson(root, json);
 
     if (error) {
-        retMsg[F("message")] = F("Failed to parse data!");
+        retMsg["message"] = "Failed to parse data!";
         response->setLength();
         request->send(response);
         return;
     }
 
     if (!(root.containsKey("enabled") && root.containsKey("source"))) {
-        retMsg[F("message")] = F("Values are missing!");
+        retMsg["message"] = "Values are missing!";
         response->setLength();
         request->send(response);
         return;
     }
 
-    if (root[F("source")].as<uint8_t>() == PowerMeter.SOURCE_HTTP) {
-        JsonArray http_phases = root[F("http_phases")];
+    if (root["source"].as<uint8_t>() == PowerMeter.SOURCE_HTTP) {
+        JsonArray http_phases = root["http_phases"];
         for (uint8_t i = 0; i < http_phases.size(); i++) {
             JsonObject phase = http_phases[i].as<JsonObject>();
 
-            if (i > 0 && !phase[F("enabled")].as<bool>()) {
+            if (i > 0 && !phase["enabled"].as<bool>()) {
                 continue;
             }
 
-            if (i == 0 || phase[F("http_individual_requests")].as<bool>()) {
+            if (i == 0 || phase["http_individual_requests"].as<bool>()) {
                 if (!phase.containsKey("url")
-                        || (!phase[F("url")].as<String>().startsWith("http://")
-                        && !phase[F("url")].as<String>().startsWith("https://"))) {
-                    retMsg[F("message")] = F("URL must either start with http:// or https://!");
+                        || (!phase["url"].as<String>().startsWith("http://")
+                        && !phase["url"].as<String>().startsWith("https://"))) {
+                    retMsg["message"] = "URL must either start with http:// or https://!";
                     response->setLength();
                     request->send(response);
                     return;
                 }
 
-                if ((phase[F("auth_type")].as<Auth>() != Auth::none)
-                    && ( phase[F("username")].as<String>().length() == 0 ||  phase[F("password")].as<String>().length() == 0)) {
-                    retMsg[F("message")] = F("Username or password must not be empty!");
+                if ((phase["auth_type"].as<Auth>() != Auth::none)
+                    && ( phase["username"].as<String>().length() == 0 ||  phase["password"].as<String>().length() == 0)) {
+                    retMsg["message"] = "Username or password must not be empty!";
                     response->setLength();
                     request->send(response);
                     return;
                 }
 
                 if (!phase.containsKey("timeout")
-                        || phase[F("timeout")].as<uint16_t>() <= 0) {
-                    retMsg[F("message")] = F("Timeout must be greater than 0 ms!");
+                        || phase["timeout"].as<uint16_t>() <= 0) {
+                    retMsg["message"] = "Timeout must be greater than 0 ms!";
                     response->setLength();
                     request->send(response);
                     return;
@@ -159,8 +159,8 @@ void WebApiPowerMeterClass::onAdminPost(AsyncWebServerRequest* request)
             }
 
             if (!phase.containsKey("json_path")
-                    || phase[F("json_path")].as<String>().length() == 0) {
-                retMsg[F("message")] = F("Json path must not be empty!");
+                    || phase["json_path"].as<String>().length() == 0) {
+                retMsg["message"] = "Json path must not be empty!";
                 response->setLength();
                 request->send(response);
                 return;
@@ -169,36 +169,33 @@ void WebApiPowerMeterClass::onAdminPost(AsyncWebServerRequest* request)
     }
 
     CONFIG_T& config = Configuration.get();
-    config.PowerMeter.Enabled = root[F("enabled")].as<bool>();
-    config.PowerMeter.VerboseLogging = root[F("verbose_logging")].as<bool>();
-    config.PowerMeter.Source = root[F("source")].as<uint8_t>();
-    config.PowerMeter.Interval = root[F("interval")].as<uint32_t>();
-    strlcpy(config.PowerMeter.MqttTopicPowerMeter1, root[F("mqtt_topic_powermeter_1")].as<String>().c_str(), sizeof(config.PowerMeter.MqttTopicPowerMeter1));
-    strlcpy(config.PowerMeter.MqttTopicPowerMeter2, root[F("mqtt_topic_powermeter_2")].as<String>().c_str(), sizeof(config.PowerMeter.MqttTopicPowerMeter2));
-    strlcpy(config.PowerMeter.MqttTopicPowerMeter3, root[F("mqtt_topic_powermeter_3")].as<String>().c_str(), sizeof(config.PowerMeter.MqttTopicPowerMeter3));
-    config.PowerMeter.SdmBaudrate = root[F("sdmbaudrate")].as<uint32_t>();
-    config.PowerMeter.SdmAddress = root[F("sdmaddress")].as<uint8_t>();
-    config.PowerMeter.HttpIndividualRequests = root[F("http_individual_requests")].as<bool>();
+    config.PowerMeter.Enabled = root["enabled"].as<bool>();
+    config.PowerMeter.VerboseLogging = root["verbose_logging"].as<bool>();
+    config.PowerMeter.Source = root["source"].as<uint8_t>();
+    config.PowerMeter.Interval = root["interval"].as<uint32_t>();
+    strlcpy(config.PowerMeter.MqttTopicPowerMeter1, root["mqtt_topic_powermeter_1"].as<String>().c_str(), sizeof(config.PowerMeter.MqttTopicPowerMeter1));
+    strlcpy(config.PowerMeter.MqttTopicPowerMeter2, root["mqtt_topic_powermeter_2"].as<String>().c_str(), sizeof(config.PowerMeter.MqttTopicPowerMeter2));
+    strlcpy(config.PowerMeter.MqttTopicPowerMeter3, root["mqtt_topic_powermeter_3"].as<String>().c_str(), sizeof(config.PowerMeter.MqttTopicPowerMeter3));
+    config.PowerMeter.SdmBaudrate = root["sdmbaudrate"].as<uint32_t>();
+    config.PowerMeter.SdmAddress = root["sdmaddress"].as<uint8_t>();
+    config.PowerMeter.HttpIndividualRequests = root["http_individual_requests"].as<bool>();
 
-    JsonArray http_phases = root[F("http_phases")];
+    JsonArray http_phases = root["http_phases"];
     for (uint8_t i = 0; i < http_phases.size(); i++) {
         JsonObject phase = http_phases[i].as<JsonObject>();
 
-        config.PowerMeter.Http_Phase[i].Enabled = (i == 0 ? true : phase[F("enabled")].as<bool>());
-        strlcpy(config.PowerMeter.Http_Phase[i].Url, phase[F("url")].as<String>().c_str(), sizeof(config.PowerMeter.Http_Phase[i].Url));
-        config.PowerMeter.Http_Phase[i].AuthType = phase[F("auth_type")].as<Auth>();
-        strlcpy(config.PowerMeter.Http_Phase[i].Username, phase[F("username")].as<String>().c_str(), sizeof(config.PowerMeter.Http_Phase[i].Username));
-        strlcpy(config.PowerMeter.Http_Phase[i].Password, phase[F("password")].as<String>().c_str(), sizeof(config.PowerMeter.Http_Phase[i].Password));
-        strlcpy(config.PowerMeter.Http_Phase[i].HeaderKey, phase[F("header_key")].as<String>().c_str(), sizeof(config.PowerMeter.Http_Phase[i].HeaderKey));
-        strlcpy(config.PowerMeter.Http_Phase[i].HeaderValue, phase[F("header_value")].as<String>().c_str(), sizeof(config.PowerMeter.Http_Phase[i].HeaderValue));
-        config.PowerMeter.Http_Phase[i].Timeout = phase[F("timeout")].as<uint16_t>();
-        strlcpy(config.PowerMeter.Http_Phase[i].JsonPath, phase[F("json_path")].as<String>().c_str(), sizeof(config.PowerMeter.Http_Phase[i].JsonPath));
+        config.PowerMeter.Http_Phase[i].Enabled = (i == 0 ? true : phase["enabled"].as<bool>());
+        strlcpy(config.PowerMeter.Http_Phase[i].Url, phase["url"].as<String>().c_str(), sizeof(config.PowerMeter.Http_Phase[i].Url));
+        config.PowerMeter.Http_Phase[i].AuthType = phase["auth_type"].as<Auth>();
+        strlcpy(config.PowerMeter.Http_Phase[i].Username, phase["username"].as<String>().c_str(), sizeof(config.PowerMeter.Http_Phase[i].Username));
+        strlcpy(config.PowerMeter.Http_Phase[i].Password, phase["password"].as<String>().c_str(), sizeof(config.PowerMeter.Http_Phase[i].Password));
+        strlcpy(config.PowerMeter.Http_Phase[i].HeaderKey, phase["header_key"].as<String>().c_str(), sizeof(config.PowerMeter.Http_Phase[i].HeaderKey));
+        strlcpy(config.PowerMeter.Http_Phase[i].HeaderValue, phase["header_value"].as<String>().c_str(), sizeof(config.PowerMeter.Http_Phase[i].HeaderValue));
+        config.PowerMeter.Http_Phase[i].Timeout = phase["timeout"].as<uint16_t>();
+        strlcpy(config.PowerMeter.Http_Phase[i].JsonPath, phase["json_path"].as<String>().c_str(), sizeof(config.PowerMeter.Http_Phase[i].JsonPath));
     }
 
-    Configuration.write();
-
-    retMsg[F("type")] = F("success");
-    retMsg[F("message")] = F("Settings saved!");
+    WebApi.writeConfig(retMsg);
 
     response->setLength();
     request->send(response);
@@ -217,11 +214,11 @@ void WebApiPowerMeterClass::onTestHttpRequest(AsyncWebServerRequest* request)
     }
 
     AsyncJsonResponse* asyncJsonResponse = new AsyncJsonResponse();
-    JsonObject retMsg = asyncJsonResponse->getRoot();
-    retMsg[F("type")] = F("warning");
+    auto& retMsg = asyncJsonResponse->getRoot();
+    retMsg["type"] = "warning";
 
     if (!request->hasParam("data", true)) {
-        retMsg[F("message")] = F("No values found!");
+        retMsg["message"] = "No values found!";
         asyncJsonResponse->setLength();
         request->send(asyncJsonResponse);
         return;
@@ -230,7 +227,7 @@ void WebApiPowerMeterClass::onTestHttpRequest(AsyncWebServerRequest* request)
     String json = request->getParam("data", true)->value();
 
     if (json.length() > 2048) {
-        retMsg[F("message")] = F("Data too large!");
+        retMsg["message"] = "Data too large!";
         asyncJsonResponse->setLength();
         request->send(asyncJsonResponse);
         return;
@@ -240,7 +237,7 @@ void WebApiPowerMeterClass::onTestHttpRequest(AsyncWebServerRequest* request)
     DeserializationError error = deserializeJson(root, json);
 
     if (error) {
-        retMsg[F("message")] = F("Failed to parse data!");
+        retMsg["message"] = "Failed to parse data!";
         asyncJsonResponse->setLength();
         request->send(asyncJsonResponse);
         return;
@@ -249,7 +246,7 @@ void WebApiPowerMeterClass::onTestHttpRequest(AsyncWebServerRequest* request)
     if (!root.containsKey("url") || !root.containsKey("auth_type") || !root.containsKey("username") || !root.containsKey("password") 
             || !root.containsKey("header_key") || !root.containsKey("header_value")
             || !root.containsKey("timeout") || !root.containsKey("json_path")) {
-        retMsg[F("message")] = F("Missing fields!");
+        retMsg["message"] = "Missing fields!";
         asyncJsonResponse->setLength();
         request->send(asyncJsonResponse);
         return;
@@ -269,7 +266,7 @@ void WebApiPowerMeterClass::onTestHttpRequest(AsyncWebServerRequest* request)
         snprintf_P(response, sizeof(response), "%s", HttpPowerMeter.httpPowerMeterError);
     }
 
-    retMsg[F("message")] = F(response);
+    retMsg["message"] = response;
     asyncJsonResponse->setLength();
     request->send(asyncJsonResponse);
 }

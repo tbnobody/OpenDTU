@@ -9,6 +9,7 @@
 #include "MessageOutput.h"
 #include "WebApi.h"
 #include "defaults.h"
+#include "Utils.h"
 
 WebApiWsBatteryLiveClass::WebApiWsBatteryLiveClass()
     : _ws("/batterylivedata")
@@ -48,16 +49,15 @@ void WebApiWsBatteryLiveClass::loop()
     _lastUpdateCheck = millis();
 
     try {
-        String buffer;
-        // free JsonDocument as soon as possible
-        {
-            DynamicJsonDocument root(_responseSize);
+        std::lock_guard<std::mutex> lock(_mutex);
+        DynamicJsonDocument root(_responseSize);
+         if (Utils::checkJsonAlloc(root, __FUNCTION__, __LINE__)) {
             JsonVariant var = root;
             generateJsonResponse(var);
-            serializeJson(root, buffer);
-        }
 
-        if (buffer) {
+            String buffer;
+            serializeJson(root, buffer);
+
             if (Configuration.get().Security.AllowReadonly) {
                 _ws.setAuthentication("", "");
             } else {
@@ -68,6 +68,8 @@ void WebApiWsBatteryLiveClass::loop()
         }
     } catch (std::bad_alloc& bad_alloc) {
         MessageOutput.printf("Calling /api/batterylivedata/status has temporarily run out of resources. Reason: \"%s\".\r\n", bad_alloc.what());
+    } catch (const std::exception& exc) {
+            MessageOutput.printf("Unknown exception in /api/batterylivedata/status. Reason: \"%s\".\r\n", exc.what());
     }
 }
 
@@ -91,15 +93,18 @@ void WebApiWsBatteryLiveClass::onLivedataStatus(AsyncWebServerRequest* request)
         return;
     }
     try {
+        std::lock_guard<std::mutex> lock(_mutex);
         AsyncJsonResponse* response = new AsyncJsonResponse(false, _responseSize);
-        JsonVariant root = response->getRoot().as<JsonVariant>();
+        auto& root = response->getRoot();
         generateJsonResponse(root);
 
         response->setLength();
         request->send(response);
     } catch (std::bad_alloc& bad_alloc) {
         MessageOutput.printf("Calling /api/batterylivedata/status has temporarily run out of resources. Reason: \"%s\".\r\n", bad_alloc.what());
-
+        WebApi.sendTooManyRequests(request);
+    } catch (const std::exception& exc) {
+        MessageOutput.printf("Unknown exception in /api/batterylivedata/status. Reason: \"%s\".\r\n", exc.what());
         WebApi.sendTooManyRequests(request);
     }
 }

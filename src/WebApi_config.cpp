@@ -59,7 +59,7 @@ void WebApiConfigClass::onConfigDelete(AsyncWebServerRequest* request)
     }
 
     AsyncJsonResponse* response = new AsyncJsonResponse();
-    JsonObject retMsg = response->getRoot();
+    auto& retMsg = response->getRoot();
     retMsg["type"] = "warning";
 
     if (!request->hasParam("data", true)) {
@@ -125,8 +125,8 @@ void WebApiConfigClass::onConfigListGet(AsyncWebServerRequest* request)
     }
 
     AsyncJsonResponse* response = new AsyncJsonResponse();
-    JsonObject root = response->getRoot();
-    JsonArray data = root.createNestedArray("configs");
+    auto& root = response->getRoot();
+    auto data = root.createNestedArray("configs");
 
     File rootfs = LittleFS.open("/");
     File file = rootfs.openNextFile();

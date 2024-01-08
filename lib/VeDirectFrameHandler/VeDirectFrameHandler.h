@@ -13,7 +13,8 @@
 
 #include <Arduino.h>
 #include <array>
-#include <map>
+#include <frozen/string.h>
+#include <frozen/map.h>
 #include <memory>
 
 #define VE_MAX_VALUE_LEN 33 // VE.Direct Protocol: max value size is 33 including /0
@@ -39,14 +40,22 @@ protected:
         double I = 0;                   // battery current in A
         double E = 0;                   // efficiency in percent (calculated, moving average)
 
-        String getPidAsString() const;  // product id as string
+        frozen::string const& getPidAsString() const; // product ID as string
     } veStruct;
 
     bool textRxEvent(std::string const& who, char* name, char* value, veStruct& frame);
     bool isDataValid(veStruct const& frame) const;      // return true if data valid and not outdated
 
-    template<typename T>
-    static String const& getAsString(std::map<T, String> const& values, T val);
+    template<typename T, size_t L>
+    static frozen::string const& getAsString(frozen::map<T, frozen::string, L> const& values, T val)
+    {
+        auto pos = values.find(val);
+        if (pos == values.end()) {
+            static constexpr frozen::string dummy("???");
+            return dummy;
+        }
+        return pos->second;
+    }
 
 private:
     void setLastUpdate();                     // set timestampt after successful frame read

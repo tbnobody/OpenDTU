@@ -7,14 +7,14 @@
 
 bool VictronSmartShunt::init(bool verboseLogging)
 {
-    MessageOutput.println(F("[VictronSmartShunt] Initialize interface..."));
+    MessageOutput.println("[VictronSmartShunt] Initialize interface...");
 
     const PinMapping_t& pin = PinMapping.get();
     MessageOutput.printf("[VictronSmartShunt] Interface rx = %d, tx = %d\r\n",
             pin.battery_rx, pin.battery_tx);
 
     if (pin.battery_rx < 0) {
-        MessageOutput.println(F("[VictronSmartShunt] Invalid pin config"));
+        MessageOutput.println("[VictronSmartShunt] Invalid pin config");
         return false;
     }
 
@@ -28,5 +28,9 @@ bool VictronSmartShunt::init(bool verboseLogging)
 void VictronSmartShunt::loop()
 {
     VeDirectShunt.loop();
+
+    if (VeDirectShunt.getLastUpdate() <= _lastUpdate) { return; }
+
     _stats->updateFrom(VeDirectShunt.veFrame);
+    _lastUpdate = VeDirectShunt.getLastUpdate();
 }

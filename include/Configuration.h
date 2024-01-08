@@ -5,7 +5,7 @@
 #include <cstdint>
 
 #define CONFIG_FILENAME "/config.json"
-#define CONFIG_VERSION 0x00011900 // 0.1.24 // make sure to clean all after change
+#define CONFIG_VERSION 0x00011a00 // 0.1.26 // make sure to clean all after change
 
 #define WIFI_MAX_SSID_STRLEN 32
 #define WIFI_MAX_PASSWORD_STRLEN 64

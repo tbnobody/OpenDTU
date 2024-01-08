@@ -6,6 +6,8 @@
 #include <string>
 #include <unordered_map>
 #include <variant>
+#include <frozen/map.h>
+#include <frozen/string.h>
 
 namespace JkBms {
 
@@ -33,7 +35,7 @@ enum class AlarmBits : uint16_t {
 #undef ALARM_ENUM
 };
 
-static const std::map<AlarmBits, std::string> AlarmBitTexts = {
+static const frozen::map<AlarmBits, frozen::string, 16> AlarmBitTexts = {
 #define ALARM_TEXT(name, value) { AlarmBits::name, #name },
     ALARM_BITS(ALARM_TEXT)
 #undef ALARM_TEXT
@@ -51,7 +53,7 @@ enum class StatusBits : uint16_t {
 #undef STATUS_ENUM
 };
 
-static const std::map<StatusBits, std::string> StatusBitTexts = {
+static const frozen::map<StatusBits, frozen::string, 4> StatusBitTexts = {
 #define STATUS_TEXT(name, value) { StatusBits::name, #name },
     STATUS_BITS(STATUS_TEXT)
 #undef STATUS_TEXT

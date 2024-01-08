@@ -8,6 +8,7 @@
 #include <memory>
 #include <functional>
 #include <TaskSchedulerDeclarations.h>
+#include <frozen/string.h>
 
 #define PL_UI_STATE_INACTIVE 0
 #define PL_UI_STATE_CHARGING 1
@@ -83,7 +84,7 @@ private:
     bool _fullSolarPassThroughEnabled = false;
     bool _verboseLogging = true;
 
-    std::string const& getStatusText(Status status);
+    frozen::string const& getStatusText(Status status);
     void announceStatus(Status status);
     bool shutdown(Status status);
     bool shutdown() { return shutdown(_lastStatus); }

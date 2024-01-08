@@ -5,7 +5,7 @@
 #include "MessageOutput.h"
 #include "JkBmsDataPoints.h"
 #include "JkBmsController.h"
-#include <map>
+#include <frozen/map.h>
 
 //#define JKBMS_DUMMY_SERIAL
 
@@ -216,7 +216,7 @@ bool Controller::init(bool verboseLogging)
             pin.battery_rx, pin.battery_rxen, pin.battery_tx, pin.battery_txen);
 
     if (pin.battery_rx < 0 || pin.battery_tx < 0) {
-        MessageOutput.println(F("[JK BMS] Invalid RX/TX pin config"));
+        MessageOutput.println("[JK BMS] Invalid RX/TX pin config");
         return false;
     }
 
@@ -229,7 +229,7 @@ bool Controller::init(bool verboseLogging)
     _txEnablePin = pin.battery_txen;
 
     if (_rxEnablePin < 0 || _txEnablePin < 0) {
-        MessageOutput.println(F("[JK BMS] Invalid transceiver pin config"));
+        MessageOutput.println("[JK BMS] Invalid transceiver pin config");
         return false;
     }
 
@@ -255,11 +255,11 @@ Controller::Interface Controller::getInterface() const
     return Interface::Invalid;
 }
 
-std::string const& Controller::getStatusText(Controller::Status status)
+frozen::string const& Controller::getStatusText(Controller::Status status)
 {
-    static const std::string missing =  "programmer error: missing status text";
+    static constexpr frozen::string missing = "programmer error: missing status text";
 
-    static const std::map<Status, const std::string> texts = {
+    static constexpr frozen::map<Status, frozen::string, 6> texts = {
         { Status::Timeout, "timeout wating for response from BMS" },
         { Status::WaitingForPollInterval, "waiting for poll interval to elapse" },
         { Status::HwSerialNotAvailableForWrite, "UART is not available for writing" },
@@ -279,7 +279,7 @@ void Controller::announceStatus(Controller::Status status)
     if (_lastStatus == status && millis() < _lastStatusPrinted + 10 * 1000) { return; }
 
     MessageOutput.printf("[%11.3f] JK BMS: %s\r\n",
-        static_cast<double>(millis())/1000, getStatusText(status).c_str());
+        static_cast<double>(millis())/1000, getStatusText(status).data());
 
     _lastStatus = status;
     _lastStatusPrinted = millis();

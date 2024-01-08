@@ -6,6 +6,7 @@
 #include "Configuration.h"
 #include "MqttSettings.h"
 #include "MessageOutput.h"
+#include "Utils.h"
 
 MqttHandlePylontechHassClass MqttHandlePylontechHass;
 
@@ -115,6 +116,9 @@ void MqttHandlePylontechHassClass::publishSensor(const char* caption, const char
     statTopic.concat(subTopic);
 
     DynamicJsonDocument root(1024);
+    if (!Utils::checkJsonAlloc(root, __FUNCTION__, __LINE__)) {
+        return;
+    }
     root["name"] = caption;
     root["stat_t"] = statTopic;
     root["uniq_id"] = serial + "_" + sensorId;
@@ -166,6 +170,9 @@ void MqttHandlePylontechHassClass::publishBinarySensor(const char* caption, cons
     statTopic.concat(subTopic);
 
     DynamicJsonDocument root(1024);
+    if (!Utils::checkJsonAlloc(root, __FUNCTION__, __LINE__)) {
+        return;
+    }
     root["name"] = caption;
     root["uniq_id"] = serial + "_" + sensorId;
     root["stat_t"] = statTopic;

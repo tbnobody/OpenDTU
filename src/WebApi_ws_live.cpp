@@ -6,6 +6,7 @@
 #include "Configuration.h"
 #include "Datastore.h"
 #include "MessageOutput.h"
+#include "Utils.h"
 #include "WebApi.h"
 #include "Battery.h"
 #include "Huawei_can.h"
@@ -67,20 +68,12 @@ void WebApiWsLiveClass::loop()
 
         try {
             std::lock_guard<std::mutex> lock(_mutex);
-            DynamicJsonDocument root(4200 * INV_MAX_COUNT); // TODO(helge) check if this calculation is correct
+            DynamicJsonDocument root(4200 * INV_MAX_COUNT);
+            if (Utils::checkJsonAlloc(root, __FUNCTION__, __LINE__)) {
+                JsonVariant var = root;
+                generateJsonResponse(var);
 
-            // TODO(helge) temporary dump of memory usage if allocation of DynamicJsonDocument fails (will be fixed in upstream repo)
-            if (root.capacity() == 0) {
-                MessageOutput.printf("Calling /api/livedata/status has temporarily run out of resources. Reason: Alloc memory for DynamicJsonDocument failed (FreeHeap = %d, MaxAllocHeap = %d, MinFreeHeap = %d).\r\n", ESP.getFreeHeap(), ESP.getMaxAllocHeap(), ESP.getMinFreeHeap());
-                _lastWsPublish = millis();
-                return;
-            }
-
-            JsonVariant var = root;
-            generateJsonResponse(var);
-                
-            String buffer;
-            if (buffer) {
+                String buffer;
                 serializeJson(root, buffer);
 
                 if (Configuration.get().Security.AllowReadonly) {
@@ -191,7 +184,7 @@ void WebApiWsLiveClass::generateJsonResponse(JsonVariant& root)
     }
 
     JsonObject vedirectObj = root.createNestedObject("vedirect");
-    vedirectObj[F("enabled")] = Configuration.get().Vedirect.Enabled;
+    vedirectObj["enabled"] = Configuration.get().Vedirect.Enabled;
     JsonObject totalVeObj = vedirectObj.createNestedObject("total");
 
     addTotalField(totalVeObj, "Power", VictronMppt.getPanelPowerWatts(), "W", 1);
@@ -199,16 +192,16 @@ void WebApiWsLiveClass::generateJsonResponse(JsonVariant& root)
     addTotalField(totalVeObj, "YieldTotal", VictronMppt.getYieldTotal(), "kWh", 2);
 
     JsonObject huaweiObj = root.createNestedObject("huawei");
-    huaweiObj[F("enabled")] = Configuration.get().Huawei.Enabled;
+    huaweiObj["enabled"] = Configuration.get().Huawei.Enabled;
     const RectifierParameters_t * rp = HuaweiCan.get();
     addTotalField(huaweiObj, "Power", rp->output_power, "W", 2);
     
     JsonObject batteryObj = root.createNestedObject("battery");
-    batteryObj[F("enabled")] = Configuration.get().Battery.Enabled;
+    batteryObj["enabled"] = Configuration.get().Battery.Enabled;
     addTotalField(batteryObj, "soc", Battery.getStats()->getSoC(), "%", 0);
 
     JsonObject powerMeterObj = root.createNestedObject("power_meter");
-    powerMeterObj[F("enabled")] = Configuration.get().PowerMeter.Enabled;
+    powerMeterObj["enabled"] = Configuration.get().PowerMeter.Enabled;
     addTotalField(powerMeterObj, "Power", PowerMeter.getPowerTotal(false), "W", 1);
 
 }
@@ -255,7 +248,7 @@ void WebApiWsLiveClass::onLivedataStatus(AsyncWebServerRequest* request)
     try {
         std::lock_guard<std::mutex> lock(_mutex);
         AsyncJsonResponse* response = new AsyncJsonResponse(false, 4200 * INV_MAX_COUNT);
-        JsonVariant root = response->getRoot();
+        auto& root = response->getRoot();
 
         generateJsonResponse(root);
 
