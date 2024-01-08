@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * Copyright (C) 2022-2023 Thomas Basler and others
+ * Copyright (C) 2022-2024 Thomas Basler and others
  */
 #include "Configuration.h"
 #include "Datastore.h"
@@ -125,6 +125,7 @@ void setup()
     Display.enableScreensaver = config.Display.ScreenSaver;
     Display.setContrast(config.Display.Contrast);
     Display.setLanguage(config.Display.Language);
+    Display.setDiagramMode(static_cast<DiagramMode_t>(config.Display.Diagram.Mode));
     Display.setStartupDisplay();
     MessageOutput.println("done");
 

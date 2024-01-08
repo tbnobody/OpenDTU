@@ -7,6 +7,7 @@ export interface Display {
     contrast: number;
     language: number;
     diagramduration: number;
+    diagrammode: number;
 }
 
 export interface Led {

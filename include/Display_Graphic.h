@@ -15,6 +15,12 @@ enum DisplayType_t {
     DisplayType_Max,
 };
 
+enum DiagramMode_t {
+    Off,
+    Small,
+    DisplayMode_Max,
+};
+
 class DisplayGraphicClass {
 public:
     DisplayGraphicClass();
@@ -25,6 +31,7 @@ public:
     void setStatus(const bool turnOn);
     void setOrientation(const uint8_t rotation = DISPLAY_ROTATION);
     void setLanguage(const uint8_t language);
+    void setDiagramMode(DiagramMode_t mode);
     void setStartupDisplay();
 
     DisplayGraphicDiagramClass& Diagram();
@@ -47,6 +54,7 @@ private:
     bool _displayTurnedOn;
 
     DisplayType_t _display_type = DisplayType_t::None;
+    DiagramMode_t _diagram_mode = DiagramMode_t::Off;
     uint8_t _display_language = DISPLAY_LANGUAGE;
     uint8_t _mExtra;
     uint16_t _period = 1000;

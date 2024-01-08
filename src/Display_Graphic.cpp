@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * Copyright (C) 2023 Thomas Basler and others
+ * Copyright (C) 2023-2024 Thomas Basler and others
  */
 #include "Display_Graphic.h"
 #include "Datastore.h"
@@ -98,7 +98,12 @@ void DisplayGraphicClass::printText(const char* text, const uint8_t line)
     if (!_isLarge) {
         dispX = (line == 0) ? 5 : 0;
     } else {
-        dispX = (line == 0) ? 10 : 5;
+        if (_diagram_mode == DiagramMode_t::Small) {
+            dispX = (line == 0) ? 10 : 5;
+        } else {
+            dispX = (line == 0) ? 20 : 5;
+        }
+
     }
     setFont(line);
 
@@ -136,6 +141,13 @@ void DisplayGraphicClass::setLanguage(const uint8_t language)
     _display_language = language < sizeof(languages) / sizeof(languages[0]) ? language : DISPLAY_LANGUAGE;
 }
 
+void DisplayGraphicClass::setDiagramMode(DiagramMode_t mode)
+{
+    if (mode < DiagramMode_t::DisplayMode_Max) {
+        _diagram_mode = mode;
+    }
+}
+
 void DisplayGraphicClass::setStartupDisplay()
 {
     if (!isValidDisplay()) {
@@ -162,7 +174,7 @@ void DisplayGraphicClass::loop()
     //=====> Actual Production ==========
     if (Datastore.getIsAtLeastOneReachable()) {
         displayPowerSave = false;
-        if (_isLarge) {
+        if (_isLarge && _diagram_mode == DiagramMode_t::Small) {
             uint8_t screenSaverOffsetX = enableScreensaver ? (_mExtra % 7) : 0;
             _diagram.redraw(screenSaverOffsetX);
         }

@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * Copyright (C) 2022 Thomas Basler and others
+ * Copyright (C) 2022-2024 Thomas Basler and others
  */
 #include "Configuration.h"
 #include "MessageOutput.h"
@@ -109,7 +109,8 @@ bool ConfigurationClass::write()
     display["rotation"] = config.Display.Rotation;
     display["contrast"] = config.Display.Contrast;
     display["language"] = config.Display.Language;
-    display["diagram_duration"] = config.Display.DiagramDuration;
+    display["diagram_duration"] = config.Display.Diagram.Duration;
+    display["diagram_mode"] = config.Display.Diagram.Mode;
 
     JsonArray leds = device.createNestedArray("led");
     for (uint8_t i = 0; i < PINMAPPING_LED_COUNT; i++) {
@@ -276,7 +277,8 @@ bool ConfigurationClass::read()
     config.Display.Rotation = display["rotation"] | DISPLAY_ROTATION;
     config.Display.Contrast = display["contrast"] | DISPLAY_CONTRAST;
     config.Display.Language = display["language"] | DISPLAY_LANGUAGE;
-    config.Display.DiagramDuration = display["diagram_duration"] | DISPLAY_DIAGRAM_DURATION;
+    config.Display.Diagram.Duration = display["diagram_duration"] | DISPLAY_DIAGRAM_DURATION;
+    config.Display.Diagram.Mode = display["diagram_mode"] | DISPLAY_DIAGRAM_MODE;
 
     JsonArray leds = device["led"];
     for (uint8_t i = 0; i < PINMAPPING_LED_COUNT; i++) {

@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * Copyright (C) 2023 Thomas Basler and others
+ * Copyright (C) 2023-2024 Thomas Basler and others
  */
 #include "Display_Graphic_Diagram.h"
 #include "Configuration.h"
@@ -52,7 +52,7 @@ void DisplayGraphicDiagramClass::dataPointLoop()
 
 uint32_t DisplayGraphicDiagramClass::getSecondsPerDot()
 {
-    return Configuration.get().Display.DiagramDuration / CHART_WIDTH;
+    return Configuration.get().Display.Diagram.Duration / CHART_WIDTH;
 }
 
 void DisplayGraphicDiagramClass::updatePeriod()
