@@ -10,4 +10,5 @@ public:
 
 private:
     AsyncWebServer* _server;
+    void responseBinaryDataWithETagCache(AsyncWebServerRequest* request, const String &contentType, const String &contentEncoding, const uint8_t *content, size_t len);
 };
