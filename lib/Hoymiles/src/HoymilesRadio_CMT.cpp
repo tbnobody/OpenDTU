@@ -201,6 +201,11 @@ uint32_t HoymilesRadio_CMT::getMaxFrequency()
     return MAX_FREQ;
 }
 
+uint32_t HoymilesRadio_CMT::getChannelWidth()
+{
+    return FH_OFFSET * CMT2300A_ONE_STEP_SIZE;
+}
+
 void ARDUINO_ISR_ATTR HoymilesRadio_CMT::handleInt1()
 {
     _packetSent = true;

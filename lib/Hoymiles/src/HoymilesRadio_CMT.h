@@ -28,6 +28,7 @@ public:
 
     static uint32_t getMinFrequency();
     static uint32_t getMaxFrequency();
+    static uint32_t getChannelWidth();
 
     static uint32_t getFrequencyFromChannel(const uint8_t channel);
     static uint8_t getChannelFromFrequency(const uint32_t frequency);

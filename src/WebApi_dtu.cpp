@@ -45,6 +45,9 @@ void WebApiDtuClass::onDtuAdminGet(AsyncWebServerRequest* request)
     root["cmt_enabled"] = Hoymiles.getRadioCmt()->isInitialized();
     root["cmt_palevel"] = config.Dtu.Cmt.PaLevel;
     root["cmt_frequency"] = config.Dtu.Cmt.Frequency;
+    root["cmt_min_freq"] = Hoymiles.getRadioCmt()->getMinFrequency();
+    root["cmt_max_freq"] = Hoymiles.getRadioCmt()->getMaxFrequency();
+    root["cmt_chan_width"] = Hoymiles.getRadioCmt()->getChannelWidth();
 
     response->setLength();
     request->send(response);

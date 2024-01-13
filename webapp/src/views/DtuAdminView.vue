@@ -56,7 +56,7 @@
                         <div class="input-group mb-3">
                             <input type="range" class="form-control form-range"
                                 v-model="dtuConfigList.cmt_frequency"
-                                min="860250000" max="923500000" step="250000"
+                                :min="dtuConfigList.cmt_min_freq" :max="dtuConfigList.cmt_max_freq" :step="dtuConfigList.cmt_chan_width"
                                 id="cmtFrequency" aria-describedby="basic-addon2"
                                 style="height: unset;" />
                             <span class="input-group-text" id="basic-addon2">{{ cmtFrequencyText }}</span>
