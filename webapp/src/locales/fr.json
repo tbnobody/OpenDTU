@@ -585,6 +585,7 @@
         "DiagramMode": "Diagram mode:",
         "off": "Off",
         "small": "Small",
+        "fullscreen": "Fullscreen",
         "DiagramDuration": "Diagram duration:",
         "DiagramDurationHint": "The time period which is shown in the diagram.",
         "Seconds": "Seconds",

@@ -6,6 +6,14 @@
 #include <TaskSchedulerDeclarations.h>
 #include <U8g2lib.h>
 
+#define CHART_HEIGHT 20 // chart area hight in pixels
+#define CHART_WIDTH 47 // chart area width in pixels
+
+// Left-Upper position of diagram is drawn
+// (text of Y-axis is display left of that pos)
+#define CHART_POSX 80
+#define CHART_POSY 0
+
 enum DisplayType_t {
     None,
     PCD8544,
@@ -18,6 +26,7 @@ enum DisplayType_t {
 enum DiagramMode_t {
     Off,
     Small,
+    Fullscreen,
     DisplayMode_Max,
 };
 
@@ -57,8 +66,8 @@ private:
     DiagramMode_t _diagram_mode = DiagramMode_t::Off;
     uint8_t _display_language = DISPLAY_LANGUAGE;
     uint8_t _mExtra;
-    uint16_t _period = 1000;
-    uint16_t _interval = 60000; // interval at which to power save (milliseconds)
+    const uint16_t _period = 1000;
+    const uint16_t _interval = 60000; // interval at which to power save (milliseconds)
     uint32_t _previousMillis = 0;
     char _fmtText[32];
     bool _isLarge = false;

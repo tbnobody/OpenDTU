@@ -199,6 +199,7 @@ export default defineComponent({
             diagramModeList: [
                 { key: 0, value: "off" },
                 { key: 1, value: "small" },
+                { key: 2, value: "fullscreen" },
             ]
         }
     },
