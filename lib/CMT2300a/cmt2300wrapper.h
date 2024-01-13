@@ -4,7 +4,6 @@
 #include <stdint.h>
 
 #define CMT2300A_ONE_STEP_SIZE 2500 // frequency channel step size for fast frequency hopping operation: One step size is 2.5 kHz.
-#define CMT_BASE_FREQ 860000000 // from Frequency Bank in cmt2300a_params.h
 #define FH_OFFSET 100 // value * CMT2300A_ONE_STEP_SIZE = channel frequency offset
 #define CMT_SPI_SPEED 4000000 // 4 MHz
 
@@ -85,6 +84,8 @@ public:
     bool setPALevel(int8_t level);
 
     bool rxFifoAvailable();
+
+    uint32_t getBaseFrequency();
 
     /**
      * Empty the RX (receive) FIFO buffers.

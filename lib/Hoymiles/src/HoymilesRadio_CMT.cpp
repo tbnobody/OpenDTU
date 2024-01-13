@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * Copyright (C) 2024 Thomas Basler and others
+ * Copyright (C) 2023-2024 Thomas Basler and others
  */
 #include "HoymilesRadio_CMT.h"
 #include "Hoymiles.h"
@@ -8,37 +8,28 @@
 #include <FunctionalInterrupt.h>
 
 #define HOY_BOOT_FREQ 868000000 // Hoymiles boot/init frequency after power up inverter or connection lost for 15 min
-#define HOY_BASE_FREQ 860000000
-// offset from initalized CMT base frequency to Hoy base frequency in channels
-#define CMT_BASE_CH_OFFSET ((CMT_BASE_FREQ - HOY_BASE_FREQ) / CMT2300A_ONE_STEP_SIZE / FH_OFFSET)
 
-// frequency can not be lower than actual initailized base freq + 250000
-#define MIN_FREQ ((HOY_BASE_FREQ + (CMT_BASE_CH_OFFSET > 1 ? CMT_BASE_CH_OFFSET : 1) * CMT2300A_ONE_STEP_SIZE * FH_OFFSET))
-
-// =923500, 0xFF does not work
-#define MAX_FREQ ((HOY_BASE_FREQ + 0xFE * CMT2300A_ONE_STEP_SIZE * FH_OFFSET))
-
-uint32_t HoymilesRadio_CMT::getFrequencyFromChannel(const uint8_t channel)
+uint32_t HoymilesRadio_CMT::getFrequencyFromChannel(const uint8_t channel) const
 {
-    return (CMT_BASE_FREQ + (CMT_BASE_CH_OFFSET + channel) * FH_OFFSET * CMT2300A_ONE_STEP_SIZE);
+    return (_radio->getBaseFrequency() + channel * getChannelWidth());
 }
 
-uint8_t HoymilesRadio_CMT::getChannelFromFrequency(const uint32_t frequency)
+uint8_t HoymilesRadio_CMT::getChannelFromFrequency(const uint32_t frequency) const
 {
-    if ((frequency % 250000) != 0) {
-        Hoymiles.getMessageOutput()->printf("%.3f MHz is not divisible by 250 kHz!\r\n", frequency / 1000000.0);
+    if ((frequency % getChannelWidth()) != 0) {
+        Hoymiles.getMessageOutput()->printf("%.3f MHz is not divisible by %d kHz!\r\n", frequency / 1000000.0, getChannelWidth());
         return 0xFF; // ERROR
     }
-    if (frequency < MIN_FREQ || frequency > MAX_FREQ) {
+    if (frequency < getMinFrequency() || frequency > getMaxFrequency()) {
         Hoymiles.getMessageOutput()->printf("%.2f MHz is out of Hoymiles/CMT range! (%.2f MHz - %.2f MHz)\r\n",
-            frequency / 1000000.0, MIN_FREQ / 1000000.0, MAX_FREQ / 1000000.0);
+            frequency / 1000000.0, getMinFrequency() / 1000000.0, getMaxFrequency() / 1000000.0);
         return 0xFF; // ERROR
     }
     if (frequency < 863000000 || frequency > 870000000) {
         Hoymiles.getMessageOutput()->printf("!!! caution: %.2f MHz is out of EU legal range! (863 - 870 MHz)\r\n",
             frequency / 1000000.0);
     }
-    return (frequency - CMT_BASE_FREQ) / CMT2300A_ONE_STEP_SIZE / FH_OFFSET - CMT_BASE_CH_OFFSET; // frequency to channel
+    return (frequency - _radio->getBaseFrequency()) / getChannelWidth(); // frequency to channel
 }
 
 bool HoymilesRadio_CMT::cmtSwitchDtuFreq(const uint32_t to_frequency)
@@ -191,14 +182,16 @@ bool HoymilesRadio_CMT::isConnected() const
     return _radio->isChipConnected();
 }
 
-uint32_t HoymilesRadio_CMT::getMinFrequency()
+uint32_t HoymilesRadio_CMT::getMinFrequency() const
 {
-    return MIN_FREQ;
+    // frequency can not be lower than actual initailized base freq + 250000
+    return _radio->getBaseFrequency() + getChannelWidth();
 }
 
-uint32_t HoymilesRadio_CMT::getMaxFrequency()
+uint32_t HoymilesRadio_CMT::getMaxFrequency() const
 {
-    return MAX_FREQ;
+    // =923500, 0xFF does not work
+    return _radio->getBaseFrequency() + 0xFE * getChannelWidth();
 }
 
 uint32_t HoymilesRadio_CMT::getChannelWidth()

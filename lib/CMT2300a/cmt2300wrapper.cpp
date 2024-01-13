@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * Copyright (C) 2023 Thomas Basler and others
+ * Copyright (C) 2023-2024 Thomas Basler and others
  */
 #include "cmt2300wrapper.h"
 #include "cmt2300a.h"
-#include "cmt2300a_params.h"
+#include "cmt2300a_params_860.h"
 
 CMT2300A::CMT2300A(uint8_t pin_sdio, uint8_t pin_clk, uint8_t pin_cs, uint8_t pin_fcs, uint32_t spi_speed)
 {
@@ -242,6 +242,11 @@ bool CMT2300A::rxFifoAvailable()
         ) & CMT2300A_ReadReg(CMT2300A_CUS_INT_FLAG);
 }
 
+uint32_t CMT2300A::getBaseFrequency()
+{
+    return CMT_BASE_FREQ_860; // from Frequency Bank in cmt2300a_params.h
+}
+
 void CMT2300A::flush_rx(void)
 {
     CMT2300A_ClearRxFifo();
@@ -261,12 +266,12 @@ bool CMT2300A::_init_radio()
     }
 
     /* config registers */
-    CMT2300A_ConfigRegBank(CMT2300A_CMT_BANK_ADDR, g_cmt2300aCmtBank, CMT2300A_CMT_BANK_SIZE);
-    CMT2300A_ConfigRegBank(CMT2300A_SYSTEM_BANK_ADDR, g_cmt2300aSystemBank, CMT2300A_SYSTEM_BANK_SIZE);
-    CMT2300A_ConfigRegBank(CMT2300A_FREQUENCY_BANK_ADDR, g_cmt2300aFrequencyBank, CMT2300A_FREQUENCY_BANK_SIZE);
-    CMT2300A_ConfigRegBank(CMT2300A_DATA_RATE_BANK_ADDR, g_cmt2300aDataRateBank, CMT2300A_DATA_RATE_BANK_SIZE);
-    CMT2300A_ConfigRegBank(CMT2300A_BASEBAND_BANK_ADDR, g_cmt2300aBasebandBank, CMT2300A_BASEBAND_BANK_SIZE);
-    CMT2300A_ConfigRegBank(CMT2300A_TX_BANK_ADDR, g_cmt2300aTxBank, CMT2300A_TX_BANK_SIZE);
+    CMT2300A_ConfigRegBank(CMT2300A_CMT_BANK_ADDR, g_cmt2300aCmtBank_860, CMT2300A_CMT_BANK_SIZE);
+    CMT2300A_ConfigRegBank(CMT2300A_SYSTEM_BANK_ADDR, g_cmt2300aSystemBank_860, CMT2300A_SYSTEM_BANK_SIZE);
+    CMT2300A_ConfigRegBank(CMT2300A_FREQUENCY_BANK_ADDR, g_cmt2300aFrequencyBank_860, CMT2300A_FREQUENCY_BANK_SIZE);
+    CMT2300A_ConfigRegBank(CMT2300A_DATA_RATE_BANK_ADDR, g_cmt2300aDataRateBank_860, CMT2300A_DATA_RATE_BANK_SIZE);
+    CMT2300A_ConfigRegBank(CMT2300A_BASEBAND_BANK_ADDR, g_cmt2300aBasebandBank_860, CMT2300A_BASEBAND_BANK_SIZE);
+    CMT2300A_ConfigRegBank(CMT2300A_TX_BANK_ADDR, g_cmt2300aTxBank_860, CMT2300A_TX_BANK_SIZE);
 
     // xosc_aac_code[2:0] = 2
     uint8_t tmp;

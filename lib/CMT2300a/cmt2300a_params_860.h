@@ -85,14 +85,16 @@
 ; RSSI Offset               = 0
 ; RSSI Offset Sign          = 0
 */
-#ifndef __CMT2300A_PARAMS_H
-#define __CMT2300A_PARAMS_H
+#ifndef __CMT2300A_PARAMS_860_H
+#define __CMT2300A_PARAMS_860_H
 
 #include "cmt2300a_defs.h"
 #include <stdint.h>
 
+#define CMT_BASE_FREQ_860 860000000
+
 /* [CMT Bank] with RSSI offset of +- 0 (and Tx power double bit not set) */
-static uint8_t g_cmt2300aCmtBank[CMT2300A_CMT_BANK_SIZE] = {
+static uint8_t g_cmt2300aCmtBank_860[CMT2300A_CMT_BANK_SIZE] = {
 0x00,
 0x66,
 0xEC,
@@ -108,7 +110,7 @@ static uint8_t g_cmt2300aCmtBank[CMT2300A_CMT_BANK_SIZE] = {
 };
 
 /* [System Bank] */
-static uint8_t g_cmt2300aSystemBank[CMT2300A_SYSTEM_BANK_SIZE] = {
+static uint8_t g_cmt2300aSystemBank_860[CMT2300A_SYSTEM_BANK_SIZE] = {
 0xAE,
 0xE0,
 0x35,
@@ -124,7 +126,7 @@ static uint8_t g_cmt2300aSystemBank[CMT2300A_SYSTEM_BANK_SIZE] = {
 };
 
 /* [Frequency Bank] 860 MHz */
-static uint8_t g_cmt2300aFrequencyBank[CMT2300A_FREQUENCY_BANK_SIZE] = {
+static uint8_t g_cmt2300aFrequencyBank_860[CMT2300A_FREQUENCY_BANK_SIZE] = {
 0x42,
 0x32,
 0xCF,
@@ -136,7 +138,7 @@ static uint8_t g_cmt2300aFrequencyBank[CMT2300A_FREQUENCY_BANK_SIZE] = {
 };
 
 /* [Data Rate Bank] */
-static uint8_t g_cmt2300aDataRateBank[CMT2300A_DATA_RATE_BANK_SIZE] = {
+static uint8_t g_cmt2300aDataRateBank_860[CMT2300A_DATA_RATE_BANK_SIZE] = {
 0xA6,
 0xC9,
 0x20,
@@ -164,7 +166,7 @@ static uint8_t g_cmt2300aDataRateBank[CMT2300A_DATA_RATE_BANK_SIZE] = {
 };
 
 /* [Baseband Bank] - EU */
-static uint8_t g_cmt2300aBasebandBank[CMT2300A_BASEBAND_BANK_SIZE] = {
+static uint8_t g_cmt2300aBasebandBank_860[CMT2300A_BASEBAND_BANK_SIZE] = {
 0x12,
 0x1E,
 0x00,
@@ -197,7 +199,7 @@ static uint8_t g_cmt2300aBasebandBank[CMT2300A_BASEBAND_BANK_SIZE] = {
 };
 
 /* [Tx Bank] 13 dBm */
-static uint8_t g_cmt2300aTxBank[CMT2300A_TX_BANK_SIZE] = {
+static uint8_t g_cmt2300aTxBank_860[CMT2300A_TX_BANK_SIZE] = {
 0x70,
 0x4D,
 0x06,
