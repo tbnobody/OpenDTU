@@ -91,8 +91,6 @@
 #include "cmt2300a_defs.h"
 #include <stdint.h>
 
-#define CMT_BASE_FREQ_860 860000000
-
 /* [CMT Bank] with RSSI offset of +- 0 (and Tx power double bit not set) */
 static uint8_t g_cmt2300aCmtBank_860[CMT2300A_CMT_BANK_SIZE] = {
 0x00,

@@ -8,17 +8,15 @@
 #include <FunctionalInterrupt.h>
 #include <frozen/map.h>
 
-struct CountryFrequencyDefinition_t {
-    FrequencyBand_t Band;
-    uint32_t Freq_Legal_Min;
-    uint32_t Freq_Legal_Max;
-    uint32_t Freq_Default;
-    uint32_t Freq_StartUp;
-};
-
 constexpr CountryFrequencyDefinition_t make_value(FrequencyBand_t Band, uint32_t Freq_Legal_Min, uint32_t Freq_Legal_Max, uint32_t Freq_Default, uint32_t Freq_StartUp)
 {
-    CountryFrequencyDefinition_t v = { Band, Freq_Legal_Min, Freq_Legal_Max, Freq_Default, Freq_StartUp };
+    // frequency can not be lower than actual initailized base freq + 250000
+    uint32_t minFrequency = CMT2300A::getBaseFrequency(Band) + HoymilesRadio_CMT::getChannelWidth();
+
+    // =923500, 0xFF does not work
+    uint32_t maxFrequency = CMT2300A::getBaseFrequency(Band) + 0xFE * HoymilesRadio_CMT::getChannelWidth();
+
+    CountryFrequencyDefinition_t v = { Band, minFrequency, maxFrequency, Freq_Legal_Min, Freq_Legal_Max, Freq_Default, Freq_StartUp };
     return v;
 }
 
@@ -52,6 +50,25 @@ uint8_t HoymilesRadio_CMT::getChannelFromFrequency(const uint32_t frequency) con
     }
 
     return (frequency - _radio->getBaseFrequency()) / getChannelWidth(); // frequency to channel
+}
+
+std::vector<CountryFrequencyList_t> HoymilesRadio_CMT::getCountryFrequencyList()
+{
+    std::vector<CountryFrequencyList_t> v;
+    for (const auto& [key, value] : countryDefinition) {
+        CountryFrequencyList_t s;
+        s.mode = key;
+        s.definition.Band = value.Band;
+        s.definition.Freq_Default = value.Freq_Default;
+        s.definition.Freq_StartUp = value.Freq_StartUp;
+        s.definition.Freq_Min = value.Freq_Min;
+        s.definition.Freq_Max = value.Freq_Max;
+        s.definition.Freq_Legal_Max = value.Freq_Legal_Max;
+        s.definition.Freq_Legal_Min = value.Freq_Legal_Min;
+
+        v.push_back(s);
+    }
+    return v;
 }
 
 bool HoymilesRadio_CMT::cmtSwitchDtuFreq(const uint32_t to_frequency)
@@ -207,19 +224,12 @@ bool HoymilesRadio_CMT::isConnected() const
 
 uint32_t HoymilesRadio_CMT::getMinFrequency() const
 {
-    // frequency can not be lower than actual initailized base freq + 250000
-    return _radio->getBaseFrequency() + getChannelWidth();
+    return countryDefinition.at(_countryMode).Freq_Min;
 }
 
 uint32_t HoymilesRadio_CMT::getMaxFrequency() const
 {
-    // =923500, 0xFF does not work
-    return _radio->getBaseFrequency() + 0xFE * getChannelWidth();
-}
-
-uint32_t HoymilesRadio_CMT::getChannelWidth()
-{
-    return FH_OFFSET * CMT2300A_ONE_STEP_SIZE;
+    return countryDefinition.at(_countryMode).Freq_Max;
 }
 
 CountryModeId_t HoymilesRadio_CMT::getCountryMode() const

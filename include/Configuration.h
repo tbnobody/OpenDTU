@@ -129,6 +129,7 @@ struct CONFIG_T {
         struct {
             int8_t PaLevel;
             uint32_t Frequency;
+            uint8_t CountryMode;
         } Cmt;
     } Dtu;
 

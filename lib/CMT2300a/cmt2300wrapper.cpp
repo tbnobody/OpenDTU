@@ -243,16 +243,9 @@ bool CMT2300A::rxFifoAvailable()
         ) & CMT2300A_ReadReg(CMT2300A_CUS_INT_FLAG);
 }
 
-uint32_t CMT2300A::getBaseFrequency()
+uint32_t CMT2300A::getBaseFrequency() const
 {
-    switch (_frequencyBand) {
-    case FrequencyBand_t::BAND_900:
-        return CMT_BASE_FREQ_900;
-        break;
-    default:
-        return CMT_BASE_FREQ_860;
-        break;
-    }
+    return getBaseFrequency(_frequencyBand);
 }
 
 FrequencyBand_t CMT2300A::getFrequencyBand() const

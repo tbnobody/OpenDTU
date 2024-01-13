@@ -7,6 +7,9 @@
 #define FH_OFFSET 100 // value * CMT2300A_ONE_STEP_SIZE = channel frequency offset
 #define CMT_SPI_SPEED 4000000 // 4 MHz
 
+#define CMT_BASE_FREQ_900 900000000
+#define CMT_BASE_FREQ_860 860000000
+
 enum FrequencyBand_t {
     BAND_860,
     BAND_900,
@@ -91,7 +94,18 @@ public:
 
     bool rxFifoAvailable();
 
-    uint32_t getBaseFrequency();
+    uint32_t getBaseFrequency() const;
+    static constexpr uint32_t getBaseFrequency(FrequencyBand_t band)
+    {
+        switch (band) {
+        case FrequencyBand_t::BAND_900:
+            return CMT_BASE_FREQ_900;
+            break;
+        default:
+            return CMT_BASE_FREQ_860;
+            break;
+        }
+    }
 
     FrequencyBand_t getFrequencyBand() const;
     void setFrequencyBand(const FrequencyBand_t mode);
