@@ -10,17 +10,17 @@
 #define HOY_BOOT_FREQ 868000000 // Hoymiles boot/init frequency after power up inverter or connection lost for 15 min
 #define HOY_BASE_FREQ 860000000
 // offset from initalized CMT base frequency to Hoy base frequency in channels
-#define CMT_BASE_CH_OFFSET860 ((CMT_BASE_FREQ - HOY_BASE_FREQ) / CMT2300A_ONE_STEP_SIZE / FH_OFFSET)
+#define CMT_BASE_CH_OFFSET ((CMT_BASE_FREQ - HOY_BASE_FREQ) / CMT2300A_ONE_STEP_SIZE / FH_OFFSET)
 
 // frequency can not be lower than actual initailized base freq
-#define MIN_FREQ_KHZ ((HOY_BASE_FREQ + (CMT_BASE_CH_OFFSET860 >= 1 ? CMT_BASE_CH_OFFSET860 : 1) * CMT2300A_ONE_STEP_SIZE * FH_OFFSET) / 1000)
+#define MIN_FREQ_KHZ ((HOY_BASE_FREQ + (CMT_BASE_CH_OFFSET >= 1 ? CMT_BASE_CH_OFFSET : 1) * CMT2300A_ONE_STEP_SIZE * FH_OFFSET) / 1000)
 
 // =923500, 0xFF does not work
 #define MAX_FREQ_KHZ ((HOY_BASE_FREQ + 0xFE * CMT2300A_ONE_STEP_SIZE * FH_OFFSET) / 1000)
 
 float HoymilesRadio_CMT::getFrequencyFromChannel(const uint8_t channel)
 {
-    return (CMT_BASE_FREQ + (CMT_BASE_CH_OFFSET860 + channel) * FH_OFFSET * CMT2300A_ONE_STEP_SIZE) / 1000000.0;
+    return (CMT_BASE_FREQ + (CMT_BASE_CH_OFFSET + channel) * FH_OFFSET * CMT2300A_ONE_STEP_SIZE) / 1000000.0;
 }
 
 uint8_t HoymilesRadio_CMT::getChannelFromFrequency(const uint32_t freq_kHz)
@@ -38,7 +38,7 @@ uint8_t HoymilesRadio_CMT::getChannelFromFrequency(const uint32_t freq_kHz)
         Hoymiles.getMessageOutput()->printf("!!! caution: %.2f MHz is out of EU legal range! (863 - 870 MHz)\r\n",
             freq_kHz / 1000.0);
     }
-    return (freq_kHz * 1000 - CMT_BASE_FREQ) / CMT2300A_ONE_STEP_SIZE / FH_OFFSET - CMT_BASE_CH_OFFSET860; // frequency to channel
+    return (freq_kHz * 1000 - CMT_BASE_FREQ) / CMT2300A_ONE_STEP_SIZE / FH_OFFSET - CMT_BASE_CH_OFFSET; // frequency to channel
 }
 
 bool HoymilesRadio_CMT::cmtSwitchDtuFreq(const uint32_t to_freq_kHz)
