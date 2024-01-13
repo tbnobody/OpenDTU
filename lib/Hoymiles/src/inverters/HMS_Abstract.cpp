@@ -19,6 +19,7 @@ bool HMS_Abstract::sendChangeChannelRequest()
     }
 
     auto cmdChannel = _radio->prepareCommand<ChannelChangeCommand>();
+    cmdChannel->setCountryMode(Hoymiles.getRadioCmt()->getCountryMode());
     cmdChannel->setChannel(Hoymiles.getRadioCmt()->getChannelFromFrequency(Hoymiles.getRadioCmt()->getInverterTargetFrequency()));
     cmdChannel->setTargetAddress(serial());
     _radio->enqueCommand(cmdChannel);

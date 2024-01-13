@@ -23,8 +23,12 @@ uint8_t HoymilesRadio_CMT::getChannelFromFrequency(const uint32_t frequency) con
             frequency / 1000000.0, getMinFrequency() / 1000000.0, getMaxFrequency() / 1000000.0);
         return 0xFF; // ERROR
     }
-    if (frequency < 863000000 || frequency > 870000000) {
+    if (_radio->getCountryMode() == CountryFrequency_t::MODE_860 && (frequency < 863000000 || frequency > 870000000)) {
         Hoymiles.getMessageOutput()->printf("!!! caution: %.2f MHz is out of EU legal range! (863 - 870 MHz)\r\n",
+            frequency / 1000000.0);
+    }
+    if (_radio->getCountryMode() == CountryFrequency_t::MODE_900 && (frequency < 902000000 || frequency > 928000000)) {
+        Hoymiles.getMessageOutput()->printf("!!! caution: %.2f MHz is out of North America legal range! (902 - 928 MHz)\r\n",
             frequency / 1000000.0);
     }
     return (frequency - _radio->getBaseFrequency()) / getChannelWidth(); // frequency to channel
@@ -197,10 +201,28 @@ uint32_t HoymilesRadio_CMT::getChannelWidth()
     return FH_OFFSET * CMT2300A_ONE_STEP_SIZE;
 }
 
-uint32_t HoymilesRadio_CMT::getInvBootFrequency()
+CountryFrequency_t HoymilesRadio_CMT::getCountryMode() const
+{
+    return _radio->getCountryMode();
+}
+
+void HoymilesRadio_CMT::setCountryMode(CountryFrequency_t mode)
+{
+    _radio->setCountryMode(mode);
+}
+
+uint32_t HoymilesRadio_CMT::getInvBootFrequency() const
 {
     // Hoymiles boot/init frequency after power up inverter or connection lost for 15 min
-    return 868000000;
+
+    switch(_radio->getCountryMode()) {
+    case CountryFrequency_t::MODE_900:
+        return 915000000;
+        break;
+    default:
+        return 868000000;
+        break;
+    }
 }
 
 void ARDUINO_ISR_ATTR HoymilesRadio_CMT::handleInt1()

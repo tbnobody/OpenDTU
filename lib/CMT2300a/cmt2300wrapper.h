@@ -7,6 +7,12 @@
 #define FH_OFFSET 100 // value * CMT2300A_ONE_STEP_SIZE = channel frequency offset
 #define CMT_SPI_SPEED 4000000 // 4 MHz
 
+enum CountryFrequency_t {
+    MODE_860,
+    MODE_900,
+    CountryFrequency_Max,
+};
+
 class CMT2300A {
 public:
     CMT2300A(uint8_t pin_sdio, uint8_t pin_clk, uint8_t pin_cs, uint8_t pin_fcs, uint32_t _spi_speed = CMT_SPI_SPEED);
@@ -87,6 +93,9 @@ public:
 
     uint32_t getBaseFrequency();
 
+    CountryFrequency_t getCountryMode() const;
+    void setCountryMode(const CountryFrequency_t mode);
+
     /**
      * Empty the RX (receive) FIFO buffers.
      */
@@ -110,4 +119,6 @@ private:
     int8_t _pin_cs;
     int8_t _pin_fcs;
     uint32_t _spi_speed;
+
+    CountryFrequency_t _countryMode = CountryFrequency_t::MODE_860;
 };
