@@ -30,6 +30,8 @@ public:
     uint32_t getMaxFrequency() const;
     static uint32_t getChannelWidth();
 
+    static uint32_t getInvBootFrequency();
+
     uint32_t getFrequencyFromChannel(const uint8_t channel) const;
     uint8_t getChannelFromFrequency(const uint32_t frequency) const;
 

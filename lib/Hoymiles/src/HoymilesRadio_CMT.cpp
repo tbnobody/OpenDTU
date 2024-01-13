@@ -7,8 +7,6 @@
 #include "crc.h"
 #include <FunctionalInterrupt.h>
 
-#define HOY_BOOT_FREQ 868000000 // Hoymiles boot/init frequency after power up inverter or connection lost for 15 min
-
 uint32_t HoymilesRadio_CMT::getFrequencyFromChannel(const uint8_t channel) const
 {
     return (_radio->getBaseFrequency() + channel * getChannelWidth());
@@ -199,6 +197,12 @@ uint32_t HoymilesRadio_CMT::getChannelWidth()
     return FH_OFFSET * CMT2300A_ONE_STEP_SIZE;
 }
 
+uint32_t HoymilesRadio_CMT::getInvBootFrequency()
+{
+    // Hoymiles boot/init frequency after power up inverter or connection lost for 15 min
+    return 868000000;
+}
+
 void ARDUINO_ISR_ATTR HoymilesRadio_CMT::handleInt1()
 {
     _packetSent = true;
@@ -218,7 +222,7 @@ void HoymilesRadio_CMT::sendEsbPacket(CommandAbstract& cmd)
     _radio->stopListening();
 
     if (cmd.getDataPayload()[0] == 0x56) { // @todo(tbnobody) Bad hack to identify ChannelChange Command
-        cmtSwitchDtuFreq(HOY_BOOT_FREQ);
+        cmtSwitchDtuFreq(getInvBootFrequency());
     }
 
     Hoymiles.getMessageOutput()->printf("TX %s %.2f MHz --> ",
