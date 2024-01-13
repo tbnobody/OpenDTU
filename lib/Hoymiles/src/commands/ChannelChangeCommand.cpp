@@ -26,7 +26,7 @@ ChannelChangeCommand::ChannelChangeCommand(const uint64_t target_address, const 
     _payload[13] = 0x14;
     _payload_size = 14;
 
-    setCountryMode(CountryFrequency_t::MODE_860);
+    setCountryMode(CountryModeId_t::MODE_EU);
     setChannel(channel);
     setTimeout(10);
 }
@@ -46,10 +46,15 @@ uint8_t ChannelChangeCommand::getChannel() const
     return _payload[12];
 }
 
-void ChannelChangeCommand::setCountryMode(const CountryFrequency_t mode)
+void ChannelChangeCommand::setCountryMode(const CountryModeId_t mode)
 {
     switch (mode) {
-    case CountryFrequency_t::MODE_900:
+    case CountryModeId_t::MODE_US:
+        _payload[9] = 0x03;
+        _payload[10] = 0x17;
+        _payload[11] = 0x3c;
+        break;
+    case CountryModeId_t::MODE_BR:
         _payload[9] = 0x03;
         _payload[10] = 0x17;
         _payload[11] = 0x3c;

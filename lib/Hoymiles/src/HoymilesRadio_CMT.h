@@ -16,6 +16,12 @@
 #define HOYMILES_CMT_WORK_FREQ 865000000
 #endif
 
+enum CountryModeId_t {
+    MODE_EU,
+    MODE_US,
+    MODE_BR,
+};
+
 class HoymilesRadio_CMT : public HoymilesRadio {
 public:
     void init(const int8_t pin_sdio, const int8_t pin_clk, const int8_t pin_cs, const int8_t pin_fcs, const int8_t pin_gpio2, const int8_t pin_gpio3);
@@ -30,8 +36,8 @@ public:
     uint32_t getMaxFrequency() const;
     static uint32_t getChannelWidth();
 
-    CountryFrequency_t getCountryMode() const;
-    void setCountryMode(CountryFrequency_t mode);
+    CountryModeId_t getCountryMode() const;
+    void setCountryMode(CountryModeId_t mode);
 
     uint32_t getInvBootFrequency() const;
 
@@ -58,4 +64,6 @@ private:
     uint32_t _inverterTargetFrequency = HOYMILES_CMT_WORK_FREQ;
 
     bool cmtSwitchDtuFreq(const uint32_t to_frequency);
+
+    CountryModeId_t _countryMode;
 };

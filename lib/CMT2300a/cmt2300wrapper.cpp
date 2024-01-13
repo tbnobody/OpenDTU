@@ -245,8 +245,8 @@ bool CMT2300A::rxFifoAvailable()
 
 uint32_t CMT2300A::getBaseFrequency()
 {
-    switch (_countryMode) {
-    case CountryFrequency_t::MODE_900:
+    switch (_frequencyBand) {
+    case FrequencyBand_t::BAND_900:
         return CMT_BASE_FREQ_900;
         break;
     default:
@@ -255,14 +255,14 @@ uint32_t CMT2300A::getBaseFrequency()
     }
 }
 
-CountryFrequency_t CMT2300A::getCountryMode() const
+FrequencyBand_t CMT2300A::getFrequencyBand() const
 {
-    return _countryMode;
+    return _frequencyBand;
 }
 
-void CMT2300A::setCountryMode(const CountryFrequency_t mode)
+void CMT2300A::setFrequencyBand(const FrequencyBand_t mode)
 {
-    _countryMode = mode;
+    _frequencyBand = mode;
     _init_radio();
 }
 
@@ -285,8 +285,8 @@ bool CMT2300A::_init_radio()
     }
 
     /* config registers */
-    switch (_countryMode) {
-    case CountryFrequency_t::MODE_900:
+    switch (_frequencyBand) {
+    case FrequencyBand_t::BAND_900:
         CMT2300A_ConfigRegBank(CMT2300A_CMT_BANK_ADDR, g_cmt2300aCmtBank_900, CMT2300A_CMT_BANK_SIZE);
         CMT2300A_ConfigRegBank(CMT2300A_SYSTEM_BANK_ADDR, g_cmt2300aSystemBank_900, CMT2300A_SYSTEM_BANK_SIZE);
         CMT2300A_ConfigRegBank(CMT2300A_FREQUENCY_BANK_ADDR, g_cmt2300aFrequencyBank_900, CMT2300A_FREQUENCY_BANK_SIZE);
