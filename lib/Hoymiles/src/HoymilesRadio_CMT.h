@@ -13,7 +13,7 @@
 #define FRAGMENT_BUFFER_SIZE 30
 
 #ifndef HOYMILES_CMT_WORK_FREQ
-#define HOYMILES_CMT_WORK_FREQ 865000
+#define HOYMILES_CMT_WORK_FREQ 865000000
 #endif
 
 class HoymilesRadio_CMT : public HoymilesRadio {
@@ -29,8 +29,8 @@ public:
     static uint32_t getMinFrequency();
     static uint32_t getMaxFrequency();
 
-    static float getFrequencyFromChannel(const uint8_t channel);
-    static uint8_t getChannelFromFrequency(const uint32_t freq_kHz);
+    static uint32_t getFrequencyFromChannel(const uint8_t channel);
+    static uint8_t getChannelFromFrequency(const uint32_t frequency);
 
 private:
     void ARDUINO_ISR_ATTR handleInt1();
@@ -51,5 +51,5 @@ private:
 
     uint32_t _inverterTargetFrequency = HOYMILES_CMT_WORK_FREQ;
 
-    bool cmtSwitchDtuFreq(const uint32_t to_freq_kHz);
+    bool cmtSwitchDtuFreq(const uint32_t to_frequency);
 };

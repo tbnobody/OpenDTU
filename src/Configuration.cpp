@@ -365,6 +365,11 @@ void ConfigurationClass::migrate()
         nvs_flash_init();
     }
 
+    if (config.Cfg.Version < 0x00011b00) {
+        // Convert from kHz to Hz
+        config.Dtu.Cmt.Frequency *= 1000;
+    }
+
     f.close();
 
     config.Cfg.Version = CONFIG_VERSION;
