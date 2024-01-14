@@ -360,7 +360,7 @@
         "CmtPaLevel": "CMT2300A Sendeleistung:",
         "NrfPaLevelHint": "Verwendet für HM-Wechselrichter. Stellen Sie sicher, dass Ihre Stromversorgung stabil genug ist, bevor Sie die Sendeleistung erhöhen.",
         "CmtPaLevelHint": "Verwendet für HMS/HMT-Wechselrichter. Stellen Sie sicher, dass Ihre Stromversorgung stabil genug ist, bevor Sie die Sendeleistung erhöhen.",
-        "CmtCountry": "Region/Land:",
+        "CmtCountry": "CMT2300A Region/Land:",
         "CmtCountryHint": "Jedes Land hat unterschiedliche Frequenzzuteilungen.",
         "country_0": "Europa ({min}MHz - {max}MHz)",
         "country_1": "Nordamerika ({min}MHz - {max}MHz)",

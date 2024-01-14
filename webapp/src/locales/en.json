@@ -360,7 +360,7 @@
         "CmtPaLevel": "CMT2300A Transmitting power:",
         "NrfPaLevelHint": "Used for HM-Inverters. Make sure your power supply is stable enough before increasing the transmit power.",
         "CmtPaLevelHint": "Used for HMS/HMT-Inverters. Make sure your power supply is stable enough before increasing the transmit power.",
-        "CmtCountry": "Region/Country:",
+        "CmtCountry": "CMT2300A Region/Country:",
         "CmtCountryHint": "Each country has different frequency allocations.",
         "country_0": "Europe ({min}MHz - {max}MHz)",
         "country_1": "North America ({min}MHz - {max}MHz)",

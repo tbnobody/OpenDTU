@@ -360,7 +360,7 @@
         "CmtPaLevel": "CMT2300A Niveau de puissance d'émission",
         "NrfPaLevelHint": "Used for HM-Inverters. Assurez-vous que votre alimentation est suffisamment stable avant d'augmenter la puissance d'émission.",
         "CmtPaLevelHint": "Used for HMS/HMT-Inverters. Assurez-vous que votre alimentation est suffisamment stable avant d'augmenter la puissance d'émission.",
-        "CmtCountry": "Region/Country:",
+        "CmtCountry": "CMT2300A Region/Country:",
         "CmtCountryHint": "Each country has different frequency allocations.",
         "country_0": "Europe ({min}MHz - {max}MHz)",
         "country_1": "North America ({min}MHz - {max}MHz)",
