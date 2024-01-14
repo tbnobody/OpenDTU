@@ -16,7 +16,7 @@ SemaphoreHandle_t paramLock = NULL;
 
 spi_device_handle_t spi_reg, spi_fifo;
 
-void cmt_spi3_init(int8_t pin_sdio, int8_t pin_clk, int8_t pin_cs, int8_t pin_fcs, uint32_t spi_speed)
+void cmt_spi3_init(const int8_t pin_sdio, const int8_t pin_clk, const int8_t pin_cs, const int8_t pin_fcs, const uint32_t spi_speed)
 {
     paramLock = xSemaphoreCreateMutex();
 
@@ -67,7 +67,7 @@ void cmt_spi3_init(int8_t pin_sdio, int8_t pin_clk, int8_t pin_cs, int8_t pin_fc
     delay(100);
 }
 
-void cmt_spi3_write(uint8_t addr, uint8_t dat)
+void cmt_spi3_write(const uint8_t addr, const uint8_t dat)
 {
     uint8_t tx_data;
     tx_data = ~dat;
@@ -84,7 +84,7 @@ void cmt_spi3_write(uint8_t addr, uint8_t dat)
     delayMicroseconds(100);
 }
 
-uint8_t cmt_spi3_read(uint8_t addr)
+uint8_t cmt_spi3_read(const uint8_t addr)
 {
     uint8_t rx_data;
     spi_transaction_t t = {
@@ -102,7 +102,7 @@ uint8_t cmt_spi3_read(uint8_t addr)
     return rx_data;
 }
 
-void cmt_spi3_write_fifo(const uint8_t* buf, uint16_t len)
+void cmt_spi3_write_fifo(const uint8_t* buf, const uint16_t len)
 {
     uint8_t tx_data;
 
@@ -121,7 +121,7 @@ void cmt_spi3_write_fifo(const uint8_t* buf, uint16_t len)
     SPI_PARAM_UNLOCK();
 }
 
-void cmt_spi3_read_fifo(uint8_t* buf, uint16_t len)
+void cmt_spi3_read_fifo(uint8_t* buf, const uint16_t len)
 {
     uint8_t rx_data;
 

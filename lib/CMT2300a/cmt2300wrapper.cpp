@@ -7,7 +7,7 @@
 #include "cmt2300a_params_860.h"
 #include "cmt2300a_params_900.h"
 
-CMT2300A::CMT2300A(uint8_t pin_sdio, uint8_t pin_clk, uint8_t pin_cs, uint8_t pin_fcs, uint32_t spi_speed)
+CMT2300A::CMT2300A(const uint8_t pin_sdio, const uint8_t pin_clk, const uint8_t pin_cs, const uint8_t pin_fcs, const uint32_t spi_speed)
 {
     _pin_sdio = pin_sdio;
     _pin_clk = pin_clk;
@@ -58,7 +58,7 @@ bool CMT2300A::available(void)
         ) & CMT2300A_ReadReg(CMT2300A_CUS_INT_FLAG);
 }
 
-void CMT2300A::read(void* buf, uint8_t len)
+void CMT2300A::read(void* buf, const uint8_t len)
 {
     // Fetch the payload
     CMT2300A_ReadFifo(static_cast<uint8_t*>(buf), len);
@@ -66,7 +66,7 @@ void CMT2300A::read(void* buf, uint8_t len)
     CMT2300A_ClearInterruptFlags();
 }
 
-bool CMT2300A::write(const uint8_t* buf, uint8_t len)
+bool CMT2300A::write(const uint8_t* buf, const uint8_t len)
 {
     CMT2300A_GoStby();
     CMT2300A_ClearInterruptFlags();
@@ -101,7 +101,7 @@ bool CMT2300A::write(const uint8_t* buf, uint8_t len)
     return true;
 }
 
-void CMT2300A::setChannel(uint8_t channel)
+void CMT2300A::setChannel(const uint8_t channel)
 {
     CMT2300A_SetFrequencyChannel(channel);
 }
@@ -123,7 +123,7 @@ int CMT2300A::getRssiDBm()
     return CMT2300A_GetRssiDBm();
 }
 
-bool CMT2300A::setPALevel(int8_t level)
+bool CMT2300A::setPALevel(const int8_t level)
 {
     uint16_t Tx_dBm_word;
     switch (level) {

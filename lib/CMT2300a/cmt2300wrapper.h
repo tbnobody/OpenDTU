@@ -18,7 +18,7 @@ enum FrequencyBand_t {
 
 class CMT2300A {
 public:
-    CMT2300A(uint8_t pin_sdio, uint8_t pin_clk, uint8_t pin_cs, uint8_t pin_fcs, uint32_t _spi_speed = CMT_SPI_SPEED);
+    CMT2300A(const uint8_t pin_sdio, const uint8_t pin_clk, const uint8_t pin_cs, const uint8_t pin_fcs, const uint32_t _spi_speed = CMT_SPI_SPEED);
 
     bool begin(void);
 
@@ -62,15 +62,15 @@ public:
      * in one call is 32 (for dynamic payload lengths) or whatever number was
      * previously passed to setPayloadSize() (for static payload lengths).
      */
-    void read(void* buf, uint8_t len);
+    void read(void* buf, const uint8_t len);
 
-    bool write(const uint8_t* buf, uint8_t len);
+    bool write(const uint8_t* buf, const uint8_t len);
 
     /**
      * Set RF communication channel. The frequency used by a channel is
      * @param channel Which RF channel to communicate on, 0-254
      */
-    void setChannel(uint8_t channel);
+    void setChannel(const uint8_t channel);
 
     /**
      * Get RF communication channel
@@ -90,7 +90,7 @@ public:
 
     int getRssiDBm();
 
-    bool setPALevel(int8_t level);
+    bool setPALevel(const int8_t level);
 
     bool rxFifoAvailable();
 

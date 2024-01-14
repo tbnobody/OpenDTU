@@ -52,7 +52,7 @@ uint8_t HoymilesRadio_CMT::getChannelFromFrequency(const uint32_t frequency) con
     return (frequency - _radio->getBaseFrequency()) / getChannelWidth(); // frequency to channel
 }
 
-std::vector<CountryFrequencyList_t> HoymilesRadio_CMT::getCountryFrequencyList()
+std::vector<CountryFrequencyList_t> HoymilesRadio_CMT::getCountryFrequencyList() const
 {
     std::vector<CountryFrequencyList_t> v;
     for (const auto& [key, value] : countryDefinition) {
@@ -237,7 +237,7 @@ CountryModeId_t HoymilesRadio_CMT::getCountryMode() const
     return _countryMode;
 }
 
-void HoymilesRadio_CMT::setCountryMode(CountryModeId_t mode)
+void HoymilesRadio_CMT::setCountryMode(const CountryModeId_t mode)
 {
     _radio->setFrequencyBand(countryDefinition.at(mode).Band);
     _countryMode = mode;

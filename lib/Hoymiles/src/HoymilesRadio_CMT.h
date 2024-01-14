@@ -57,14 +57,14 @@ public:
     }
 
     CountryModeId_t getCountryMode() const;
-    void setCountryMode(CountryModeId_t mode);
+    void setCountryMode(const CountryModeId_t mode);
 
     uint32_t getInvBootFrequency() const;
 
     uint32_t getFrequencyFromChannel(const uint8_t channel) const;
     uint8_t getChannelFromFrequency(const uint32_t frequency) const;
 
-    std::vector<CountryFrequencyList_t> getCountryFrequencyList();
+    std::vector<CountryFrequencyList_t> getCountryFrequencyList() const;
 
 private:
     void ARDUINO_ISR_ATTR handleInt1();
