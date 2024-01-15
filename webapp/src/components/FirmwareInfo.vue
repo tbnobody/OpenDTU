@@ -49,7 +49,7 @@
                     </tr>
                     <tr>
                         <th>{{ $t('firmwareinfo.Uptime') }}</th>
-                        <td>{{ timeInHours(systemStatus.uptime) }}</td>
+                        <td>{{ $t('firmwareinfo.UptimeValue', timeInHours(systemStatus.uptime)) }}</td>
                     </tr>
                 </tbody>
             </table>
@@ -73,7 +73,8 @@ export default defineComponent({
     computed: {
         timeInHours() {
             return (value: number) => {
-                return timestampToString(value, true);
+                const [count, time] = timestampToString(this.$i18n.locale, value, true);
+                return {count, time};
             };
         },
         versionInfoUrl(): string {

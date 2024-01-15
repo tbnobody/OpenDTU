@@ -188,7 +188,8 @@
         "ResetReason0": "Reset Reason CPU 0",
         "ResetReason1": "Reset Reason CPU 1",
         "ConfigSaveCount": "Config save count",
-        "Uptime": "Uptime"
+        "Uptime": "Uptime",
+        "UptimeValue": "0 days {time} | 1 day {time} | {count} days {time}"
     },
     "hardwareinfo": {
         "HardwareInformation": "Hardware Information",

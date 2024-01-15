@@ -188,7 +188,8 @@
         "ResetReason0": "Raison de la réinitialisation CPU 0",
         "ResetReason1": "Raison de la réinitialisation CPU 1",
         "ConfigSaveCount": "Nombre d'enregistrements de la configuration",
-        "Uptime": "Temps de fonctionnement"
+        "Uptime": "Durée de fonctionnement",
+        "UptimeValue": "0 jour {time} | 1 jour {time} | {count} jours {time}"
     },
     "hardwareinfo": {
         "HardwareInformation": "Informations sur le matériel",
