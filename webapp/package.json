@@ -16,7 +16,7 @@
     "bootstrap": "^5.3.2",
     "bootstrap-icons-vue": "^1.11.1",
     "mitt": "^3.0.1",
-    "sortablejs": "^1.15.1",
+    "sortablejs": "^1.15.2",
     "spark-md5": "^3.0.2",
     "vue": "^3.4.13",
     "vue-i18n": "^9.9.0",
