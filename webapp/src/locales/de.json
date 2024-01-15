@@ -188,7 +188,8 @@
         "ResetReason0": "Reset Grund CPU 0",
         "ResetReason1": "Reset Grund CPU 1",
         "ConfigSaveCount": "Anzahl der Konfigurationsspeicherungen",
-        "Uptime": "Betriebszeit"
+        "Uptime": "Betriebszeit",
+        "UptimeValue": "0 Tage {time} | 1 Tag {time} | {count} Tage {time}"
     },
     "hardwareinfo": {
         "HardwareInformation": "Hardwareinformationen",
