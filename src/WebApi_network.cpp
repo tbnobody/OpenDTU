@@ -77,6 +77,7 @@ void WebApiNetworkClass::onNetworkAdminGet(AsyncWebServerRequest* request)
     root["password"] = config.WiFi.Password;
     root["aptimeout"] = config.WiFi.ApTimeout;
     root["mdnsenabled"] = config.Mdns.Enabled;
+    root["froniussmmodbusenabled"] = config.Fronius.Fronius_SM_Simulation_Enabled;
 
     response->setLength();
     request->send(response);
@@ -238,6 +239,7 @@ void WebApiNetworkClass::onNetworkAdminPost(AsyncWebServerRequest* request)
     }
     config.WiFi.ApTimeout = root["aptimeout"].as<uint>();
     config.Mdns.Enabled = root["mdnsenabled"].as<bool>();
+    config.Fronius.Fronius_SM_Simulation_Enabled = root["froniussmmodbusenabled"].as<bool>();
 
     WebApi.writeConfig(retMsg);
 

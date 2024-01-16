@@ -77,6 +77,10 @@ struct CONFIG_T {
     } Mdns;
 
     struct {
+        bool Fronius_SM_Simulation_Enabled;
+    } Fronius;
+
+    struct {
         char Server[NTP_MAX_SERVER_STRLEN + 1];
         char Timezone[NTP_MAX_TIMEZONE_STRLEN + 1];
         char TimezoneDescr[NTP_MAX_TIMEZONEDESCR_STRLEN + 1];

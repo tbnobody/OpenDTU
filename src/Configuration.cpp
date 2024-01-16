@@ -50,6 +50,9 @@ bool ConfigurationClass::write()
     JsonObject mdns = doc.createNestedObject("mdns");
     mdns["enabled"] = config.Mdns.Enabled;
 
+    JsonObject modbus = doc.createNestedObject("modbus");
+    modbus["enable"] = config.Fronius.Fronius_SM_Simulation_Enabled;
+
     JsonObject ntp = doc.createNestedObject("ntp");
     ntp["server"] = config.Ntp.Server;
     ntp["timezone"] = config.Ntp.Timezone;
@@ -218,6 +221,9 @@ bool ConfigurationClass::read()
 
     JsonObject mdns = doc["mdns"];
     config.Mdns.Enabled = mdns["enabled"] | MDNS_ENABLED;
+
+    JsonObject modbus = doc["modbus"];
+    config.Fronius.Fronius_SM_Simulation_Enabled = modbus["enabled"] | FRONIUS_SM_SIMULATION_ENABLED;
 
     JsonObject ntp = doc["ntp"];
     strlcpy(config.Ntp.Server, ntp["server"] | NTP_SERVER, sizeof(config.Ntp.Server));
