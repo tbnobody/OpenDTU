@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * Copyright (C) 2023 Thomas Basler and others
+ * Copyright (C) 2023-2024 Thomas Basler and others
  */
 
 /*
@@ -12,7 +12,8 @@ Command structure:
 
 00   01 02 03 04   05 06 07 08   09   10   11   12   13   14   15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31
 -----------------------------------------------------------------------------------------------------------------
-56   71 60 35 46   80 12 23 04   02   15   21   00   14   00   -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+56   71 60 35 46   80 12 23 04   02   15   21   00   14   00   -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- (860 MHz band)
+56   71 60 35 46   80 12 23 04   03   17   3c   00   14   00   -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- (900 MHz band)
 ^^   ^^^^^^^^^^^   ^^^^^^^^^^^   ^^   ^^   ^^   ^^   ^^   ^^
 ID   Target Addr   Source Addr   ?    ?    ?    CH   ?    CRC8
 */
@@ -22,12 +23,10 @@ ChannelChangeCommand::ChannelChangeCommand(const uint64_t target_address, const 
     : CommandAbstract(target_address, router_address)
 {
     _payload[0] = 0x56;
-    _payload[9] = 0x02;
-    _payload[10] = 0x15;
-    _payload[11] = 0x21;
     _payload[13] = 0x14;
     _payload_size = 14;
 
+    setCountryMode(CountryModeId_t::MODE_EU);
     setChannel(channel);
     setTimeout(10);
 }
@@ -45,6 +44,27 @@ void ChannelChangeCommand::setChannel(const uint8_t channel)
 uint8_t ChannelChangeCommand::getChannel() const
 {
     return _payload[12];
+}
+
+void ChannelChangeCommand::setCountryMode(const CountryModeId_t mode)
+{
+    switch (mode) {
+    case CountryModeId_t::MODE_US:
+        _payload[9] = 0x03;
+        _payload[10] = 0x17;
+        _payload[11] = 0x3c;
+        break;
+    case CountryModeId_t::MODE_BR:
+        _payload[9] = 0x03;
+        _payload[10] = 0x17;
+        _payload[11] = 0x3c;
+        break;
+    default:
+        _payload[9] = 0x02;
+        _payload[10] = 0x15;
+        _payload[11] = 0x21;
+        break;
+    }
 }
 
 bool ChannelChangeCommand::handleResponse(InverterAbstract& inverter, const fragment_t fragment[], const uint8_t max_fragment_id)

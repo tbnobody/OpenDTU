@@ -39,7 +39,7 @@
                             <div class="row mb-3">
                                 <div class="col-sm-2"></div>
                                 <div class="col-sm-10">
-                                    <div class="btn-group" v-for="(doc, index) in pinMappingList.find(i => i.name === deviceConfigList.curPin.name)?.links" :key="index">
+                                    <div class="btn-group mb-2 me-2" v-for="(doc, index) in pinMappingList.find(i => i.name === deviceConfigList.curPin.name)?.links" :key="index">
                                         <a :href="doc.url" class="btn btn-primary" target="_blank">{{ doc.name }}</a>
                                     </div>
                                 </div>
@@ -66,6 +66,19 @@
                             <InputElement :label="$t('deviceadmin.Screensaver')"
                                 v-model="deviceConfigList.display.screensaver" type="checkbox"
                                 :tooltip="$t('deviceadmin.ScreensaverHint')" />
+
+                            <div class="row mb-3">
+                                <label class="col-sm-2 col-form-label">
+                                    {{ $t('deviceadmin.DiagramMode') }}
+                                </label>
+                                <div class="col-sm-10">
+                                    <select class="form-select" v-model="deviceConfigList.display.diagrammode">
+                                        <option v-for="mode in diagramModeList" :key="mode.key" :value="mode.key">
+                                            {{ $t(`deviceadmin.` + mode.value) }}
+                                        </option>
+                                    </select>
+                                </div>
+                            </div>
 
                             <InputElement :label="$t('deviceadmin.DiagramDuration')"
                                 v-model="deviceConfigList.display.diagramduration" type="number"
@@ -183,6 +196,11 @@ export default defineComponent({
                 { key: 1, value: "de" },
                 { key: 2, value: "fr" },
             ],
+            diagramModeList: [
+                { key: 0, value: "off" },
+                { key: 1, value: "small" },
+                { key: 2, value: "fullscreen" },
+            ]
         }
     },
     created() {

@@ -5,20 +5,14 @@
 #include <U8g2lib.h>
 #include <array>
 
-#define CHART_HEIGHT 20 // chart area hight in pixels
-#define CHART_WIDTH 47 // chart area width in pixels
-
-// Left-Upper position of diagram is drawn
-// (text of Y-axis is display left of that pos)
-#define DIAG_POSX 80
-#define DIAG_POSY 0
+#define MAX_DATAPOINTS 128
 
 class DisplayGraphicDiagramClass {
 public:
     DisplayGraphicDiagramClass();
 
     void init(Scheduler& scheduler, U8G2* display);
-    void redraw(uint8_t screenSaverOffsetX);
+    void redraw(uint8_t screenSaverOffsetX, uint8_t xPos, uint8_t yPos, uint8_t width, uint8_t height, bool isFullscreen);
 
     void updatePeriod();
 
@@ -26,14 +20,16 @@ private:
     void averageLoop();
     void dataPointLoop();
 
-    static uint32_t getSecondsPerDot();
+    uint32_t getSecondsPerDot();
 
     Task _averageTask;
     Task _dataPointTask;
 
     U8G2* _display = nullptr;
-    std::array<float, CHART_WIDTH> _graphValues = {};
+    std::array<float, MAX_DATAPOINTS> _graphValues = {};
     uint8_t _graphValuesCount = 0;
+
+    uint8_t _chartWidth = MAX_DATAPOINTS;
 
     float _iRunningAverage = 0;
     uint16_t _iRunningAverageCnt = 0;

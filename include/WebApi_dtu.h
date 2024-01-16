@@ -13,4 +13,5 @@ private:
     void onDtuAdminPost(AsyncWebServerRequest* request);
 
     AsyncWebServer* _server;
+    bool _performReload = false;
 };

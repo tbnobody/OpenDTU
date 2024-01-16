@@ -1,5 +1,5 @@
 <template>
-    <BasePage :title="$t('home.LiveData')" :isLoading="dataLoading" :isWideScreen="true">
+    <BasePage :title="$t('home.LiveData')" :isLoading="dataLoading" :isWideScreen="true" :showWebSocket="true" :isWebsocketConnected="isWebsocketConnected" @reload="reloadData">
         <HintView :hints="liveData.hints" />
         <InverterTotalInfo :totalData="liveData.total" :totalVeData="liveData.vedirect" :totalBattData="liveData.battery" :powerMeterData="liveData.power_meter" :huaweiData="liveData.huawei"/><br />
         <div class="row gy-3">
@@ -457,6 +457,8 @@ export default defineComponent({
             alertTypePower: "info",
             showAlertPower: false,
             successCommandPower: "",
+
+            isWebsocketConnected: false,
         };
     },
     created() {
@@ -484,17 +486,23 @@ export default defineComponent({
         this.closeSocket();
     },
     updated() {
+        console.log("Updated");
         // Select first tab
         if (this.isFirstFetchAfterConnect) {
-            this.isFirstFetchAfterConnect = false;
+            console.log("isFirstFetchAfterConnect");
 
-            const firstTabEl = document.querySelector(
-                "#v-pills-tab:first-child button"
-            );
-            if (firstTabEl != null) {
-                const firstTab = new bootstrap.Tab(firstTabEl);
-                firstTab.show();
-            }
+            this.$nextTick(() => {
+                console.log("nextTick");
+                const firstTabEl = document.querySelector(
+                    "#v-pills-tab:first-child button"
+                );
+                if (firstTabEl != null) {
+                    this.isFirstFetchAfterConnect = false;
+                    console.log("Show");
+                    const firstTab = new bootstrap.Tab(firstTabEl);
+                    firstTab.show();
+                }
+            });
         }
     },
     computed: {
@@ -517,14 +525,26 @@ export default defineComponent({
     },
     methods: {
         isLoggedIn,
-        getInitialData() {
-            this.dataLoading = true;
+        getInitialData(triggerLoading : boolean = true) {
+            if (triggerLoading) {
+                this.dataLoading = true;
+            }
             fetch("/api/livedata/status", { headers: authHeader() })
                 .then((response) => handleResponse(response, this.$emitter, this.$router))
                 .then((data) => {
                     this.liveData = data;
-                    this.dataLoading = false;
+                    if (triggerLoading) {
+                        this.dataLoading = false;
+                    }
                 });
+        },
+        reloadData() {
+            this.closeSocket();
+
+            setTimeout(() => {
+                this.getInitialData(false);
+                this.initSocket();
+            }, 1000);
         },
         initSocket() {
             console.log("Starting connection to WebSocket Server");
@@ -549,10 +569,18 @@ export default defineComponent({
                 }
             };
 
+            var self = this;
+
             this.socket.onopen = function (event) {
                 console.log(event);
                 console.log("Successfully connected to the echo websocket server...");
+                self.isWebsocketConnected = true;
             };
+
+            this.socket.onclose = function() {
+                console.log("Connection to websocket closed...")
+                self.isWebsocketConnected = false;
+            }
 
             // Listen to window events , When the window closes , Take the initiative to disconnect websocket Connect
             window.onbeforeunload = () => {
