@@ -317,10 +317,7 @@
     "inverterchannelinfo": {
         "String": "String {num}",
         "Phase": "Phase {num}",
-        "General": "General",
-        "Property": "Property",
-        "Value": "Value",
-        "Unit": "Unit"
+        "General": "General"
     },
     "invertertotalinfo": {
         "TotalYieldTotal": "Total Yield Total",
