@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * Copyright (C) 2022-2023 Thomas Basler and others
+ * Copyright (C) 2022-2024 Thomas Basler and others
  */
 #include "WebApi_dtu.h"
 #include "Configuration.h"
@@ -21,6 +21,18 @@ void WebApiDtuClass::init(AsyncWebServer& server)
 
 void WebApiDtuClass::loop()
 {
+    if (_performReload) {
+        // Execute stuff in main thread to avoid busy SPI bus
+        CONFIG_T& config = Configuration.get();
+        Hoymiles.getRadioNrf()->setPALevel((rf24_pa_dbm_e)config.Dtu.Nrf.PaLevel);
+        Hoymiles.getRadioCmt()->setPALevel(config.Dtu.Cmt.PaLevel);
+        Hoymiles.getRadioNrf()->setDtuSerial(config.Dtu.Serial);
+        Hoymiles.getRadioCmt()->setDtuSerial(config.Dtu.Serial);
+        Hoymiles.getRadioCmt()->setCountryMode(static_cast<CountryModeId_t>(config.Dtu.Cmt.CountryMode));
+        Hoymiles.getRadioCmt()->setInverterTargetFrequency(config.Dtu.Cmt.Frequency);
+        Hoymiles.setPollInterval(config.Dtu.PollInterval);
+        _performReload = false;
+    }
 }
 
 void WebApiDtuClass::onDtuAdminGet(AsyncWebServerRequest* request)
@@ -46,6 +58,19 @@ void WebApiDtuClass::onDtuAdminGet(AsyncWebServerRequest* request)
     root["cmt_enabled"] = Hoymiles.getRadioCmt()->isInitialized();
     root["cmt_palevel"] = config.Dtu.Cmt.PaLevel;
     root["cmt_frequency"] = config.Dtu.Cmt.Frequency;
+    root["cmt_country"] = config.Dtu.Cmt.CountryMode;
+    root["cmt_chan_width"] = Hoymiles.getRadioCmt()->getChannelWidth();
+
+    auto data = root.createNestedArray("country_def");
+    auto countryDefs = Hoymiles.getRadioCmt()->getCountryFrequencyList();
+    for (const auto& definition : countryDefs) {
+        auto obj = data.createNestedObject();
+        obj["freq_default"] = definition.definition.Freq_Default;
+        obj["freq_min"] = definition.definition.Freq_Min;
+        obj["freq_max"] = definition.definition.Freq_Max;
+        obj["freq_legal_min"] = definition.definition.Freq_Legal_Min;
+        obj["freq_legal_max"] = definition.definition.Freq_Legal_Max;
+    }
 
     response->setLength();
     request->send(response);
@@ -95,7 +120,8 @@ void WebApiDtuClass::onDtuAdminPost(AsyncWebServerRequest* request)
             && root.containsKey("verbose_logging") 
             && root.containsKey("nrf_palevel") 
             && root.containsKey("cmt_palevel") 
-            && root.containsKey("cmt_frequency"))) {
+            && root.containsKey("cmt_frequency")
+            && root.containsKey("cmt_country"))) {
         retMsg["message"] = "Values are missing!";
         retMsg["code"] = WebApiError::GenericValueMissing;
         response->setLength();
@@ -135,14 +161,23 @@ void WebApiDtuClass::onDtuAdminPost(AsyncWebServerRequest* request)
         return;
     }
 
-    if (root["cmt_frequency"].as<uint32_t>() < Hoymiles.getRadioCmt()->getMinFrequency()
-        || root["cmt_frequency"].as<uint32_t>() > Hoymiles.getRadioCmt()->getMaxFrequency()
-        || root["cmt_frequency"].as<uint32_t>() % 250 > 0) {
+    if (root["cmt_country"].as<uint8_t>() >= CountryModeId_t::CountryModeId_Max) {
+        retMsg["message"] = "Invalid country setting!";
+        retMsg["code"] = WebApiError::DtuInvalidCmtCountry;
+        response->setLength();
+        request->send(response);
+        return;
+    }
+
+    auto FrequencyDefinition = Hoymiles.getRadioCmt()->getCountryFrequencyList()[root["cmt_country"].as<CountryModeId_t>()].definition;
+    if (root["cmt_frequency"].as<uint32_t>() < FrequencyDefinition.Freq_Min
+        || root["cmt_frequency"].as<uint32_t>() > FrequencyDefinition.Freq_Max
+        || root["cmt_frequency"].as<uint32_t>() % Hoymiles.getRadioCmt()->getChannelWidth() > 0) {
 
         retMsg["message"] = "Invalid CMT frequency setting!";
         retMsg["code"] = WebApiError::DtuInvalidCmtFrequency;
-        retMsg["param"]["min"] = Hoymiles.getRadioCmt()->getMinFrequency();
-        retMsg["param"]["max"] = Hoymiles.getRadioCmt()->getMaxFrequency();
+        retMsg["param"]["min"] = FrequencyDefinition.Freq_Min;
+        retMsg["param"]["max"] = FrequencyDefinition.Freq_Max;
         response->setLength();
         request->send(response);
         return;
@@ -157,17 +192,12 @@ void WebApiDtuClass::onDtuAdminPost(AsyncWebServerRequest* request)
     config.Dtu.Nrf.PaLevel = root["nrf_palevel"].as<uint8_t>();
     config.Dtu.Cmt.PaLevel = root["cmt_palevel"].as<int8_t>();
     config.Dtu.Cmt.Frequency = root["cmt_frequency"].as<uint32_t>();
+    config.Dtu.Cmt.CountryMode = root["cmt_country"].as<CountryModeId_t>();
 
     WebApi.writeConfig(retMsg);
 
     response->setLength();
     request->send(response);
 
-    Hoymiles.getRadioNrf()->setPALevel((rf24_pa_dbm_e)config.Dtu.Nrf.PaLevel);
-    Hoymiles.getRadioCmt()->setPALevel(config.Dtu.Cmt.PaLevel);
-    Hoymiles.getRadioNrf()->setDtuSerial(config.Dtu.Serial);
-    Hoymiles.getRadioCmt()->setDtuSerial(config.Dtu.Serial);
-    Hoymiles.getRadioCmt()->setInverterTargetFrequency(config.Dtu.Cmt.Frequency);
-    Hoymiles.setPollInterval(config.Dtu.PollInterval);
-    Hoymiles.setVerboseLogging(config.Dtu.VerboseLogging);
+    _performReload = true;
 }

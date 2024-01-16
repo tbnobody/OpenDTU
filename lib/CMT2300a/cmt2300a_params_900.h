@@ -6,7 +6,7 @@
 ;---------------------------------------
 ; Mode                      = Advanced
 ; Part Number               = CMT2300A
-; Frequency                 = 860.000 MHz
+; Frequency                 = 900.000 MHz
 ; Xtal Frequency            = 26.0000 MHz
 ; Demodulation              = GFSK
 ; AGC                       = On
@@ -85,14 +85,14 @@
 ; RSSI Offset               = 0
 ; RSSI Offset Sign          = 0
 */
-#ifndef __CMT2300A_PARAMS_H
-#define __CMT2300A_PARAMS_H
+#ifndef __CMT2300A_PARAMS_900_H
+#define __CMT2300A_PARAMS_900_H
 
 #include "cmt2300a_defs.h"
 #include <stdint.h>
 
 /* [CMT Bank] with RSSI offset of +- 0 (and Tx power double bit not set) */
-static uint8_t g_cmt2300aCmtBank[CMT2300A_CMT_BANK_SIZE] = {
+static uint8_t g_cmt2300aCmtBank_900[CMT2300A_CMT_BANK_SIZE] = {
 0x00,
 0x66,
 0xEC,
@@ -108,7 +108,7 @@ static uint8_t g_cmt2300aCmtBank[CMT2300A_CMT_BANK_SIZE] = {
 };
 
 /* [System Bank] */
-static uint8_t g_cmt2300aSystemBank[CMT2300A_SYSTEM_BANK_SIZE] = {
+static uint8_t g_cmt2300aSystemBank_900[CMT2300A_SYSTEM_BANK_SIZE] = {
 0xAE,
 0xE0,
 0x35,
@@ -123,20 +123,20 @@ static uint8_t g_cmt2300aSystemBank[CMT2300A_SYSTEM_BANK_SIZE] = {
 0x81,
 };
 
-/* [Frequency Bank] 860 MHz */
-static uint8_t g_cmt2300aFrequencyBank[CMT2300A_FREQUENCY_BANK_SIZE] = {
-0x42,
-0x32,
-0xCF,
-0x82,
-0x42,
-0x27,
-0x76,
-0x12,
+/* [Frequency Bank] 900 MHz */
+static uint8_t g_cmt2300aFrequencyBank_900[CMT2300A_FREQUENCY_BANK_SIZE] = {
+0x45,
+0x46,
+0x0A,
+0x84,
+0x45,
+0x3B,
+0xB1,
+0x13,
 };
 
 /* [Data Rate Bank] */
-static uint8_t g_cmt2300aDataRateBank[CMT2300A_DATA_RATE_BANK_SIZE] = {
+static uint8_t g_cmt2300aDataRateBank_900[CMT2300A_DATA_RATE_BANK_SIZE] = {
 0xA6,
 0xC9,
 0x20,
@@ -144,7 +144,7 @@ static uint8_t g_cmt2300aDataRateBank[CMT2300A_DATA_RATE_BANK_SIZE] = {
 0xD2,
 0x35,
 0x0C,
-0x0A,
+0x0B,
 0x9F,
 0x4B,
 0x29,
@@ -164,7 +164,7 @@ static uint8_t g_cmt2300aDataRateBank[CMT2300A_DATA_RATE_BANK_SIZE] = {
 };
 
 /* [Baseband Bank] - EU */
-static uint8_t g_cmt2300aBasebandBank[CMT2300A_BASEBAND_BANK_SIZE] = {
+static uint8_t g_cmt2300aBasebandBank_900[CMT2300A_BASEBAND_BANK_SIZE] = {
 0x12,
 0x1E,
 0x00,
@@ -197,7 +197,7 @@ static uint8_t g_cmt2300aBasebandBank[CMT2300A_BASEBAND_BANK_SIZE] = {
 };
 
 /* [Tx Bank] 13 dBm */
-static uint8_t g_cmt2300aTxBank[CMT2300A_TX_BANK_SIZE] = {
+static uint8_t g_cmt2300aTxBank_900[CMT2300A_TX_BANK_SIZE] = {
 0x70,
 0x4D,
 0x06,

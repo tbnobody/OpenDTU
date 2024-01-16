@@ -2,6 +2,7 @@
 #pragma once
 
 #include "CommandAbstract.h"
+#include "../HoymilesRadio_CMT.h"
 
 class ChannelChangeCommand : public CommandAbstract {
 public:
@@ -11,6 +12,8 @@ public:
 
     void setChannel(const uint8_t channel);
     uint8_t getChannel() const;
+
+    void setCountryMode(const CountryModeId_t mode);
 
     virtual bool handleResponse(InverterAbstract& inverter, const fragment_t fragment[], const uint8_t max_fragment_id);
 
