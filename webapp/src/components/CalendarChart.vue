@@ -1,6 +1,6 @@
 <template>
     <div class="card row" v-if="dataLoaded">
-        <CalendarHeatmap :values="values" :end-date="endDate" :style="{'font-size': '12px'}" tooltip-unit="Wh" />
+        <CalendarHeatmap :values="values" :end-date="endDate" :style="{'font-size': '10px'}" tooltip-unit="Wh" />
     </div>
 </template>
 
