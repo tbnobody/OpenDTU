@@ -54,7 +54,9 @@ bool HttpPowerMeterClass::queryPhase(int phase, const String& url, Auth authType
     String protocol;
     String host;
     String uri;
-    extractUrlComponents(url, protocol, host, uri);
+    String base64Authorization;
+    uint16_t port;
+    extractUrlComponents(url, protocol, host, uri, port, base64Authorization);
 
     IPAddress ipaddr((uint32_t)0);
     //first check if "host" is already an IP adress    
@@ -96,13 +98,12 @@ bool HttpPowerMeterClass::queryPhase(int phase, const String& url, Auth authType
       wifiClient = std::make_unique<WiFiClient>();
     }
     
-    return httpRequest(phase, *wifiClient, ipaddr.toString(), uri, https, authType,  username, password, httpHeader, httpValue, timeout, jsonPath);
+    return httpRequest(phase, *wifiClient, ipaddr.toString(), port, uri, https, authType,  username, password, httpHeader, httpValue, timeout, jsonPath);
 }
 
-bool HttpPowerMeterClass::httpRequest(int phase, WiFiClient &wifiClient, const String& host, const String& uri, bool https, Auth authType, const char* username,
+bool HttpPowerMeterClass::httpRequest(int phase, WiFiClient &wifiClient, const String& host, uint16_t port, const String& uri, bool https, Auth authType, const char* username,
     const char* password, const char* httpHeader, const char* httpValue, uint32_t timeout, const char* jsonPath)
 {
-    int port = (https ? 443 : 80);
     if(!httpClient.begin(wifiClient, host, port, uri, https)){      
         snprintf_P(httpPowerMeterError, sizeof(httpPowerMeterError), PSTR("httpClient.begin() failed for %s://%s"), (https ? "https" : "http"), host.c_str()); 
         return false;
@@ -221,34 +222,55 @@ bool HttpPowerMeterClass::tryGetFloatValueForPhase(int phase, int httpCode, cons
     return success;
 }
 
-void HttpPowerMeterClass::extractUrlComponents(const String& url, String& protocol, String& hostname, String& uri) {
-    // Find protocol delimiter
-    int protocolEndIndex = url.indexOf(":");
-    if (protocolEndIndex != -1) {
-        protocol = url.substring(0, protocolEndIndex);
-
-        // Find double slash delimiter
-        int doubleSlashIndex = url.indexOf("//", protocolEndIndex);
-        if (doubleSlashIndex != -1) {
-            // Find slash after double slash delimiter
-            int slashIndex = url.indexOf("/", doubleSlashIndex + 2);
-            if (slashIndex != -1) {
-                // Extract hostname and uri
-                hostname = url.substring(doubleSlashIndex + 2, slashIndex);
-                uri = url.substring(slashIndex);
-            } else {
-                // No slash after double slash delimiter, so the whole remaining part is the hostname
-                hostname = url.substring(doubleSlashIndex + 2);
-                uri = "/";
-            }
-        }
+//extract url component as done by httpClient::begin(String url, const char* expectedProtocol) https://github.com/espressif/arduino-esp32/blob/da6325dd7e8e152094b19fe63190907f38ef1ff0/libraries/HTTPClient/src/HTTPClient.cpp#L250
+bool HttpPowerMeterClass::extractUrlComponents(String url, String& _protocol, String& _host, String& _uri, uint16_t& _port, String& _base64Authorization)
+{
+    // check for : (http: or https:
+    int index = url.indexOf(':');
+    if(index < 0) {
+        snprintf_P(httpPowerMeterError, sizeof(httpPowerMeterError), PSTR("failed to parse protocol"));
+        return false;
     }
 
-    // Remove username:password if present in the hostname
-    int atIndex = hostname.indexOf("@");
-    if (atIndex != -1) {
-        hostname = hostname.substring(atIndex + 1);
+    _protocol = url.substring(0, index);
+
+    //initialize port to default values for http or https. 
+    //port will be overwritten below in case port is explicitly defined
+    _port = (_protocol == "https" ? 443 : 80);
+
+    url.remove(0, (index + 3)); // remove http:// or https://
+
+    index = url.indexOf('/');
+    if (index == -1) {
+        index = url.length();
+        url += '/';
     }
+    String host = url.substring(0, index);
+    url.remove(0, index); // remove host part
+
+    // get Authorization
+    index = host.indexOf('@');
+    if(index >= 0) {
+        // auth info
+        String auth = host.substring(0, index);
+        host.remove(0, index + 1); // remove auth part including @
+        _base64Authorization = base64::encode(auth);
+    }
+
+    // get port
+    index = host.indexOf(':');
+    String the_host;
+    if(index >= 0) {
+        the_host = host.substring(0, index); // hostname
+        host.remove(0, (index + 1)); // remove hostname + :
+        _port = host.toInt(); // get port
+    } else {
+        the_host = host;
+    }
+
+    _host = the_host;
+    _uri = url;
+    return true;
 }
 
 #define HASH_SIZE 32
