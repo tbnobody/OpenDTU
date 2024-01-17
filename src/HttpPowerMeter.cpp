@@ -3,7 +3,7 @@
 #include "HttpPowerMeter.h"
 #include "MessageOutput.h"
 #include <WiFiClientSecure.h>
-#include <ArduinoJson.h>
+#include <FirebaseJson.h>
 #include <Crypto.h>
 #include <SHA256.h>
 #include <base64.h>
@@ -204,13 +204,13 @@ bool HttpPowerMeterClass::tryGetFloatValueForPhase(int phase, int httpCode, cons
     bool success = false;
     if (httpCode == HTTP_CODE_OK) {
         httpResponse = httpClient.getString();     //very unfortunate that we cannot parse WifiClient stream directly   
-        StaticJsonDocument<2048> json;             //however creating these allocations on stack should be fine to avoid heap fragmentation
-        deserializeJson(json, httpResponse);
-        if(!json.containsKey(jsonPath))
-        {
+        FirebaseJson json;
+        json.setJsonData(httpResponse);
+        FirebaseJsonData value;
+        if (!json.get(value, jsonPath)) {
             snprintf_P(httpPowerMeterError, sizeof(httpPowerMeterError), PSTR("[HttpPowerMeter] Couldn't find a value for phase %i with Json query \"%s\""), phase, jsonPath);
         }else {
-            power[phase] = json[jsonPath].as<float>();
+            power[phase] = value.to<float>();
             //MessageOutput.printf("Power for Phase %i: %5.2fW\r\n", phase, power[phase]);
             success = true;
         }
