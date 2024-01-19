@@ -16,9 +16,14 @@ public:
 
     void updatePeriod();
 
+    void prepareDtuRestart();
+
 private:
     void averageLoop();
     void dataPointLoop();
+
+    void backupGraphValuesBeforeRestart();
+    void restoreGraphValuesAfterRestart(bool& delayUpdateTasks);
 
     uint32_t getSecondsPerDot();
 

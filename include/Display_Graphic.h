@@ -42,6 +42,7 @@ public:
     void setLanguage(const uint8_t language);
     void setDiagramMode(DiagramMode_t mode);
     void setStartupDisplay();
+    void prepareDtuRestart();
 
     DisplayGraphicDiagramClass& Diagram();
 

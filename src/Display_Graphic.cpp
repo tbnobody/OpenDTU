@@ -272,4 +272,11 @@ void DisplayGraphicClass::setStatus(const bool turnOn)
     _displayTurnedOn = turnOn;
 }
 
+void DisplayGraphicClass::prepareDtuRestart() {
+    if (isValidDisplay()) {
+        setStatus(false);
+        _diagram.prepareDtuRestart();
+    }
+}
+
 DisplayGraphicClass Display;
