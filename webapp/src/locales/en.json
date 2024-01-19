@@ -549,7 +549,7 @@
         "Back": "Back",
         "Retry": "Retry",
         "OtaStatus": "OTA Status",
-        "OtaSuccess": "OTA Success. The unit has been automatically restarted and will be available again in a few moments. Please do not forget to reload the web interface!",
+        "OtaSuccess": "The firmware upload was successful. The device was restarted automatically. When the device is accessible again, the interface is automatically reloaded.",
         "FirmwareUpload": "Firmware Upload",
         "UploadProgress": "Upload Progress"
     },

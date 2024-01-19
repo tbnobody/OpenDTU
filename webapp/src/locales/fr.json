@@ -549,7 +549,7 @@
         "Back": "Retour",
         "Retry": "Réessayer",
         "OtaStatus": "Statut OTA",
-        "OtaSuccess": "Succès de l'OTA. L'unité a été automatiquement redémarrée et sera à nouveau disponible dans quelques instants. N'oubliez pas de recharger l'interface web !",
+        "OtaSuccess": "Le téléchargement du firmware a réussi. L'appareil a été redémarré automatiquement. Lorsque l'appareil est à nouveau accessible, l'interface est automatiquement rechargée.",
         "FirmwareUpload": "Téléversement du firmware",
         "UploadProgress": "Progression du téléversement"
     },
