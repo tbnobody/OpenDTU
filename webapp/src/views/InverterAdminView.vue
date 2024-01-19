@@ -208,41 +208,19 @@ import BootstrapAlert from "@/components/BootstrapAlert.vue";
 import CardElement from '@/components/CardElement.vue';
 import InputElement from '@/components/InputElement.vue';
 import Modal from '@/components/Modal.vue';
-import Sortable from 'sortablejs';
+import type { Inverter } from '@/types/InverterConfig';
 import { authHeader, handleResponse } from '@/utils/authentication';
 import * as bootstrap from 'bootstrap';
 import {
-    BIconInfoCircle,
-    BIconPencil,
-    BIconTrash,
     BIconArrowDown,
     BIconArrowUp,
     BIconGripHorizontal,
+    BIconInfoCircle,
+    BIconPencil,
+    BIconTrash,
 } from 'bootstrap-icons-vue';
+import Sortable from 'sortablejs';
 import { defineComponent } from 'vue';
-
-declare interface Channel {
-    name: string;
-    max_power: number;
-    yield_total_offset: number;
-}
-
-declare interface Inverter {
-    id: string;
-    serial: number;
-    name: string;
-    type: string;
-    order: number;
-    poll_enable: boolean;
-    poll_enable_night: boolean;
-    command_enable: boolean;
-    command_enable_night: boolean;
-    reachable_threshold: number;
-    zero_runtime: boolean;
-    zero_day: boolean;
-    yieldday_correction: boolean;
-    channel: Array<Channel>;
-}
 
 declare interface AlertResponse {
     message: string;
