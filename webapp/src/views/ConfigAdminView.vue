@@ -88,32 +88,21 @@
         </CardElement>
     </BasePage>
 
-    <div class="modal" id="factoryReset" tabindex="-1">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">{{ $t('configadmin.FactoryReset') }}</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    {{ $t('configadmin.ResetMsg') }}
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" @click="onFactoryResetCancel"
-                        data-bs-dismiss="modal">{{ $t('configadmin.Cancel') }}</button>
-                    <button type="button" class="btn btn-danger" @click="onFactoryResetPerform">
-                        {{ $t('configadmin.ResetConfirm') }}
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
+    <Modal modalId="factoryReset" small :title="$t('configadmin.FactoryReset')" :closeText="$t('configadmin.Cancel')">
+        {{ $t('configadmin.ResetMsg') }}
+        <template #footer>
+            <button type="button" class="btn btn-danger" @click="onFactoryResetPerform">
+                {{ $t('configadmin.ResetConfirm') }}
+            </button>
+        </template>
+    </Modal>
 </template>
 
 <script lang="ts">
 import BasePage from '@/components/BasePage.vue';
 import BootstrapAlert from "@/components/BootstrapAlert.vue";
 import CardElement from '@/components/CardElement.vue';
+import Modal from '@/components/Modal.vue';
 import type { ConfigFileList } from '@/types/Config';
 import { authHeader, handleResponse } from '@/utils/authentication';
 import * as bootstrap from 'bootstrap';
@@ -129,6 +118,7 @@ export default defineComponent({
         BasePage,
         BootstrapAlert,
         CardElement,
+        Modal,
         BIconArrowLeft,
         BIconCheckCircle,
         BIconExclamationCircleFill,

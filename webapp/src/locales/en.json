@@ -29,7 +29,8 @@
         "Save": "Save",
         "Refreshing": "Refreshing",
         "Pull": "Pull down to refresh",
-        "Release": "Release to refresh"
+        "Release": "Release to refresh",
+        "Close": "Close"
     },
     "localeswitcher": {
         "Dark": "Dark",
@@ -116,7 +117,6 @@
         "UnreadMessages": "unread messages",
         "Loading": "@:base.Loading",
         "EventLog": "Event Log",
-        "Close": "Close",
         "InverterInfo": "Inverter Info",
         "LimitSettings": "Limit Settings",
         "LastLimitSetStatus": "Last Limit Set Status:",

@@ -29,7 +29,8 @@
         "Save": "Speichern",
         "Refreshing": "Aktualisieren",
         "Pull": "Zum Aktualisieren nach unten ziehen",
-        "Release": "Loslassen zum Aktualisieren"
+        "Release": "Loslassen zum Aktualisieren",
+        "Close": "Schließen"
     },
     "localeswitcher": {
         "Dark": "Dunkel",
@@ -116,7 +117,6 @@
         "UnreadMessages": "Ungelesene Meldungen",
         "Loading": "@:base.Loading",
         "EventLog": "Ereignisanzeige",
-        "Close": "Schließen",
         "InverterInfo": "Wechselrichter-Informationen",
         "LimitSettings": "Limit-Einstellungen",
         "LastLimitSetStatus": "Letzter Übertragungsstatus:",
