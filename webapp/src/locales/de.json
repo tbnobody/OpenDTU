@@ -188,7 +188,8 @@
         "ResetReason0": "Reset Grund CPU 0",
         "ResetReason1": "Reset Grund CPU 1",
         "ConfigSaveCount": "Anzahl der Konfigurationsspeicherungen",
-        "Uptime": "Betriebszeit"
+        "Uptime": "Betriebszeit",
+        "UptimeValue": "0 Tage {time} | 1 Tag {time} | {count} Tage {time}"
     },
     "hardwareinfo": {
         "HardwareInformation": "Hardwareinformationen",
@@ -316,10 +317,7 @@
     "inverterchannelinfo": {
         "String": "String {num}",
         "Phase": "Phase {num}",
-        "General": "Allgemein",
-        "Property": "Eigenschaft",
-        "Value": "Wert",
-        "Unit": "Einheit"
+        "General": "Allgemein"
     },
     "invertertotalinfo": {
         "TotalYieldTotal": "Gesamtertrag Insgesamt",
@@ -360,7 +358,7 @@
         "CmtPaLevel": "CMT2300A Sendeleistung:",
         "NrfPaLevelHint": "Verwendet für HM-Wechselrichter. Stellen Sie sicher, dass Ihre Stromversorgung stabil genug ist, bevor Sie die Sendeleistung erhöhen.",
         "CmtPaLevelHint": "Verwendet für HMS/HMT-Wechselrichter. Stellen Sie sicher, dass Ihre Stromversorgung stabil genug ist, bevor Sie die Sendeleistung erhöhen.",
-        "CmtCountry": "Region/Land:",
+        "CmtCountry": "CMT2300A Region/Land:",
         "CmtCountryHint": "Jedes Land hat unterschiedliche Frequenzzuteilungen.",
         "country_0": "Europa ({min}MHz - {max}MHz)",
         "country_1": "Nordamerika ({min}MHz - {max}MHz)",
