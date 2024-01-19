@@ -1,7 +1,7 @@
 <template>
     <div :class="['card', addSpace ? 'mt-5' : '' ]">
         <div :class="['card-header', textVariant]">{{ text }}</div>
-        <div :class="['card-body', centerContent ? 'text-center' : '']">
+        <div :class="['card-body', 'card-text', centerContent ? 'text-center' : '']">
             <slot />
         </div>
     </div>
