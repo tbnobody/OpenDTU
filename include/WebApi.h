@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 #pragma once
 
+#include "ModbusDtu.h"
 #include "WebApi_config.h"
 #include "WebApi_device.h"
 #include "WebApi_devinfo.h"

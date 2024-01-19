@@ -55,7 +55,7 @@ void ModbusDtuClass::init()
 
 void ModbusDtuClass::loop()
 {
-    if ((Configuration.get().Fronius.Fronius_SM_Simulation_Enabled))
+    if (!(Configuration.get().Fronius.Fronius_SM_Simulation_Enabled))
         return;
     if (!_isstarted) {
         if (Datastore.getIsAllEnabledReachable() && Datastore.getTotalAcYieldTotalEnabled() != 0) {

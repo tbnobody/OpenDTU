@@ -51,7 +51,7 @@ bool ConfigurationClass::write()
     mdns["enabled"] = config.Mdns.Enabled;
 
     JsonObject modbus = doc.createNestedObject("modbus");
-    modbus["enable"] = config.Fronius.Fronius_SM_Simulation_Enabled;
+    modbus["enabled"] = config.Fronius.Fronius_SM_Simulation_Enabled;
 
     JsonObject ntp = doc.createNestedObject("ntp");
     ntp["server"] = config.Ntp.Server;

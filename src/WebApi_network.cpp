@@ -240,6 +240,7 @@ void WebApiNetworkClass::onNetworkAdminPost(AsyncWebServerRequest* request)
     config.WiFi.ApTimeout = root["aptimeout"].as<uint>();
     config.Mdns.Enabled = root["mdnsenabled"].as<bool>();
     config.Fronius.Fronius_SM_Simulation_Enabled = root["froniussmmodbusenabled"].as<bool>();
+    Configuration.write();
 
     WebApi.writeConfig(retMsg);
 
