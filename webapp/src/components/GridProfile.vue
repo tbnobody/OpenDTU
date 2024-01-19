@@ -33,9 +33,9 @@
                             <tr v-for="value in section.items" :key="value.n">
                                 <th>{{ value.n }}</th>
                                 <td>
-                                    <tempplate v-if="value.u!='bool'">
+                                    <template v-if="value.u!='bool'">
                                         {{ $n(value.v, 'decimal') }} {{ value.u }}
-                                    </tempplate>
+                                    </template>
                                     <template v-else>
                                         <StatusBadge :status="value.v==1" true_text="gridprofile.Enabled" false_text="gridprofile.Disabled"/>
                                     </template>
