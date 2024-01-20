@@ -46,11 +46,7 @@ void WebApiDevInfoClass::onDevInfoStatus(AsyncWebServerRequest* request)
         root["hw_version"] = inv->DevInfo()->getHwVersion();
         root["hw_model_name"] = inv->DevInfo()->getHwModelName();
         root["max_power"] = inv->DevInfo()->getMaxPower();
-
-        char timebuffer[32];
-        const time_t t = inv->DevInfo()->getFwBuildDateTime();
-        std::strftime(timebuffer, sizeof(timebuffer), "%Y-%m-%d %H:%M:%S", gmtime(&t));
-        root["fw_build_datetime"] = String(timebuffer);
+        root["fw_build_datetime"] = inv->DevInfo()->getFwBuildDateTimeStr();
     }
 
     response->setLength();

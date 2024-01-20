@@ -68,10 +68,7 @@ void MqttHandleInverterClass::loop()
             MqttSettings.publish(subtopic + "/device/fwbuildversion", String(inv->DevInfo()->getFwBuildVersion()));
 
             // Firmware Build DateTime
-            char timebuffer[32];
-            const time_t t = inv->DevInfo()->getFwBuildDateTime();
-            std::strftime(timebuffer, sizeof(timebuffer), "%Y-%m-%d %H:%M:%S", gmtime(&t));
-            MqttSettings.publish(subtopic + "/device/fwbuilddatetime", String(timebuffer));
+            MqttSettings.publish(subtopic + "/device/fwbuilddatetime", inv->DevInfo()->getFwBuildDateTimeStr());
 
             // Hardware part number
             MqttSettings.publish(subtopic + "/device/hwpartnumber", String(inv->DevInfo()->getHwPartNumber()));
