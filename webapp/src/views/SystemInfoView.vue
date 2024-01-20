@@ -1,6 +1,6 @@
 <template>
     <BasePage :title="$t('systeminfo.SystemInfo')" :isLoading="dataLoading" :show-reload="true" @reload="getSystemInfo">
-        <FirmwareInfo :systemStatus="systemDataList" />
+        <FirmwareInfo :systemStatus="systemDataList" v-model:allowVersionInfo="allowVersionInfo" />
         <div class="mt-5"></div>
         <HardwareInfo :systemStatus="systemDataList" />
         <div class="mt-5"></div>
@@ -37,9 +37,11 @@ export default defineComponent({
         return {
             dataLoading: true,
             systemDataList: {} as SystemStatus,
+            allowVersionInfo: false,
         }
     },
     created() {
+        this.allowVersionInfo = (localStorage.getItem("allowVersionInfo") || "0") == "1";
         this.getSystemInfo();
     },
     methods: {
@@ -50,7 +52,9 @@ export default defineComponent({
                 .then((data) => {
                     this.systemDataList = data;
                     this.dataLoading = false;
-                    this.getUpdateInfo();
+                    if (this.allowVersionInfo) {
+                        this.getUpdateInfo();
+                    }
                 })
         },
         getUpdateInfo() {
@@ -90,5 +94,13 @@ export default defineComponent({
                 });
         }
     },
+    watch: {
+        allowVersionInfo(allow: Boolean) {
+            if (allow) {
+                localStorage.setItem("allowVersionInfo", this.allowVersionInfo ? "1" : "0");
+                this.getUpdateInfo();
+            }
+        }
+    }
 });
 </script>

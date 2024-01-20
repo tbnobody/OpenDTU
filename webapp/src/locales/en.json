@@ -185,6 +185,7 @@
         "FirmwareVersionHint": "Click here to show information about your current version",
         "FirmwareUpdate": "Firmware Update",
         "FirmwareUpdateHint": "Click here to view the changes between your version and the latest version",
+        "FrmwareUpdateAllow": "By activating the update check, a request is sent to GitHub.com each time the page is called up to retrieve the currently available version. If you do not agree with this, leave this function deactivated.",
         "ResetReason0": "Reset Reason CPU 0",
         "ResetReason1": "Reset Reason CPU 1",
         "ConfigSaveCount": "Config save count",

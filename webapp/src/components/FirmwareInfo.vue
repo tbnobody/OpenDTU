@@ -28,12 +28,19 @@
                     </tr>
                     <tr>
                         <th>{{ $t('firmwareinfo.FirmwareUpdate') }}</th>
-                        <td><a :href="systemStatus.update_url" target="_blank" v-tooltip
+                        <td v-if="modelAllowVersionInfo">
+                            <a :href="systemStatus.update_url" target="_blank" v-tooltip
                                 :title="$t('firmwareinfo.FirmwareUpdateHint')">
                                 <span class="badge" :class="systemStatus.update_status">
                                     {{ systemStatus.update_text }}
                                 </span>
-                            </a></td>
+                            </a>
+                        </td>
+                        <td v-else>
+                            <div class="form-check form-switch">
+                                <input v-model="modelAllowVersionInfo" class="form-check-input" type="checkbox" role="switch" v-tooltip :title="$t('firmwareinfo.FrmwareUpdateAllow')" />
+                            </div>
+                        </td>
                     </tr>
                     <tr>
                         <th>{{ $t('firmwareinfo.ResetReason0') }}</th>
@@ -69,8 +76,17 @@ export default defineComponent({
     },
     props: {
         systemStatus: { type: Object as PropType<SystemStatus>, required: true },
+        allowVersionInfo: Boolean,
     },
     computed: {
+        modelAllowVersionInfo: {
+            get(): any {
+                return !!this.allowVersionInfo;
+            },
+            set(value: any) {
+                this.$emit('update:allowVersionInfo', value);
+            },
+        },
         timeInHours() {
             return (value: number) => {
                 const [count, time] = timestampToString(this.$i18n.locale, value, true);

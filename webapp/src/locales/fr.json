@@ -185,6 +185,7 @@
         "FirmwareVersionHint": "Cliquez ici pour afficher des informations sur votre version actuelle",
         "FirmwareUpdate": "Mise à jour du firmware",
         "FirmwareUpdateHint": "Cliquez ici pour voir les changements entre votre version et la dernière version",
+        "FrmwareUpdateAllow": "En activant le contrôle de mise à jour, une demande est envoyée à GitHub.com à chaque fois que la page est consultée afin de récupérer la dernière version disponible. Si tu n'es pas d'accord, laisse cette fonction désactivée.",
         "ResetReason0": "Raison de la réinitialisation CPU 0",
         "ResetReason1": "Raison de la réinitialisation CPU 1",
         "ConfigSaveCount": "Nombre d'enregistrements de la configuration",

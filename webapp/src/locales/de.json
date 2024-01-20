@@ -185,6 +185,7 @@
         "FirmwareVersionHint": "Klicken Sie hier, um Informationen über Ihre aktuelle Version anzuzeigen",
         "FirmwareUpdate": "Firmware-Aktualisierung",
         "FirmwareUpdateHint": "Klicken Sie hier, um die Änderungen zwischen Ihrer Version und der neuesten Version anzuzeigen",
+        "FrmwareUpdateAllow": "Durch Aktivieren der Update Prüfung wird bei jedem Seitenaufruf eine Anfrage an GitHub.com gesendet um die aktuell verfügbare Version abzurufen. Wenn du damit nicht einverstanden bist, lasse diese Funktion deaktiviert.",
         "ResetReason0": "Reset Grund CPU 0",
         "ResetReason1": "Reset Grund CPU 1",
         "ConfigSaveCount": "Anzahl der Konfigurationsspeicherungen",
