@@ -13,6 +13,8 @@
 
 WebApiWsLiveClass::WebApiWsLiveClass()
     : _ws("/livedata")
+    , _wsCleanupTask(1 * TASK_SECOND, TASK_FOREVER, std::bind(&WebApiWsLiveClass::wsCleanupTaskCb, this))
+    , _sendDataTask(1 * TASK_SECOND, TASK_FOREVER, std::bind(&WebApiWsLiveClass::sendDataTaskCb, this))
 {
 }
 
@@ -32,15 +34,9 @@ void WebApiWsLiveClass::init(AsyncWebServer& server, Scheduler& scheduler)
     _ws.onEvent(std::bind(&WebApiWsLiveClass::onWebsocketEvent, this, _1, _2, _3, _4, _5, _6));
 
     scheduler.addTask(_wsCleanupTask);
-    _wsCleanupTask.setCallback(std::bind(&WebApiWsLiveClass::wsCleanupTaskCb, this));
-    _wsCleanupTask.setIterations(TASK_FOREVER);
-    _wsCleanupTask.setInterval(1 * TASK_SECOND);
     _wsCleanupTask.enable();
 
     scheduler.addTask(_sendDataTask);
-    _sendDataTask.setCallback(std::bind(&WebApiWsLiveClass::sendDataTaskCb, this));
-    _sendDataTask.setIterations(TASK_FOREVER);
-    _sendDataTask.setInterval(1 * TASK_SECOND);
     _sendDataTask.enable();
 }
 

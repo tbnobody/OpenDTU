@@ -9,6 +9,11 @@
 #include <AsyncJson.h>
 #include <Hoymiles.h>
 
+WebApiDtuClass::WebApiDtuClass()
+    : _applyDataTask(TASK_IMMEDIATE, TASK_ONCE, std::bind(&WebApiDtuClass::applyDataTaskCb, this))
+{
+}
+
 void WebApiDtuClass::init(AsyncWebServer& server, Scheduler& scheduler)
 {
     using std::placeholders::_1;
@@ -19,8 +24,6 @@ void WebApiDtuClass::init(AsyncWebServer& server, Scheduler& scheduler)
     _server->on("/api/dtu/config", HTTP_POST, std::bind(&WebApiDtuClass::onDtuAdminPost, this, _1));
 
     scheduler.addTask(_applyDataTask);
-    _applyDataTask.setCallback(std::bind(&WebApiDtuClass::applyDataTaskCb, this));
-    _applyDataTask.setIterations(TASK_ONCE);
 }
 
 void WebApiDtuClass::applyDataTaskCb()

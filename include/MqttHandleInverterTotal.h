@@ -5,6 +5,7 @@
 
 class MqttHandleInverterTotalClass {
 public:
+    MqttHandleInverterTotalClass();
     void init(Scheduler& scheduler);
 
 private:

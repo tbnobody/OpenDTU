@@ -6,6 +6,7 @@
 
 class WebApiDtuClass {
 public:
+    WebApiDtuClass();
     void init(AsyncWebServer& server, Scheduler& scheduler);
 
 private:

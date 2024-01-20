@@ -10,6 +10,7 @@
 
 WebApiWsConsoleClass::WebApiWsConsoleClass()
     : _ws("/console")
+    , _wsCleanupTask(1 * TASK_SECOND, TASK_FOREVER, std::bind(&WebApiWsConsoleClass::wsCleanupTaskCb, this))
 {
 }
 
@@ -20,9 +21,6 @@ void WebApiWsConsoleClass::init(AsyncWebServer& server, Scheduler& scheduler)
     MessageOutput.register_ws_output(&_ws);
 
     scheduler.addTask(_wsCleanupTask);
-    _wsCleanupTask.setCallback(std::bind(&WebApiWsConsoleClass::wsCleanupTaskCb, this));
-    _wsCleanupTask.setIterations(TASK_FOREVER);
-    _wsCleanupTask.setInterval(1 * TASK_SECOND);
     _wsCleanupTask.enable();
 }
 

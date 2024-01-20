@@ -18,6 +18,11 @@
 
 MqttHandleInverterClass MqttHandleInverter;
 
+MqttHandleInverterClass::MqttHandleInverterClass()
+    : _loopTask(TASK_IMMEDIATE, TASK_FOREVER, std::bind(&MqttHandleInverterClass::loop, this))
+{
+}
+
 void MqttHandleInverterClass::init(Scheduler& scheduler)
 {
     using std::placeholders::_1;
@@ -36,8 +41,6 @@ void MqttHandleInverterClass::init(Scheduler& scheduler)
     MqttSettings.subscribe(String(topic + "+/cmd/" + TOPIC_SUB_RESTART), 0, std::bind(&MqttHandleInverterClass::onMqttMessage, this, _1, _2, _3, _4, _5, _6));
 
     scheduler.addTask(_loopTask);
-    _loopTask.setCallback(std::bind(&MqttHandleInverterClass::loop, this));
-    _loopTask.setIterations(TASK_FOREVER);
     _loopTask.setInterval(Configuration.get().Mqtt.PublishInterval * TASK_SECOND);
     _loopTask.enable();
 }
