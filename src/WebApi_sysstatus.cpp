@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * Copyright (C) 2022-2023 Thomas Basler and others
+ * Copyright (C) 2022-2024 Thomas Basler and others
  */
 #include "WebApi_sysstatus.h"
 #include "Configuration.h"
@@ -16,17 +16,13 @@
 #define AUTO_GIT_HASH ""
 #endif
 
-void WebApiSysstatusClass::init(AsyncWebServer& server)
+void WebApiSysstatusClass::init(AsyncWebServer& server, Scheduler& scheduler)
 {
     using std::placeholders::_1;
 
     _server = &server;
 
     _server->on("/api/system/status", HTTP_GET, std::bind(&WebApiSysstatusClass::onSystemStatus, this, _1));
-}
-
-void WebApiSysstatusClass::loop()
-{
 }
 
 void WebApiSysstatusClass::onSystemStatus(AsyncWebServerRequest* request)

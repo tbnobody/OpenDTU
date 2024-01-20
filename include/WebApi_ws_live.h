@@ -4,12 +4,12 @@
 #include <ArduinoJson.h>
 #include <ESPAsyncWebServer.h>
 #include <Hoymiles.h>
+#include <TaskSchedulerDeclarations.h>
 
 class WebApiWsLiveClass {
 public:
     WebApiWsLiveClass();
-    void init(AsyncWebServer& server);
-    void loop();
+    void init(AsyncWebServer& server, Scheduler& scheduler);
 
 private:
     void generateJsonResponse(JsonVariant& root);
@@ -22,9 +22,13 @@ private:
     AsyncWebSocket _ws;
 
     uint32_t _lastWsPublish = 0;
-    uint32_t _lastInvUpdateCheck = 0;
-    uint32_t _lastWsCleanup = 0;
     uint32_t _newestInverterTimestamp = 0;
 
     std::mutex _mutex;
+
+    Task _wsCleanupTask;
+    void wsCleanupTaskCb();
+
+    Task _sendDataTask;
+    void sendDataTaskCb();
 };

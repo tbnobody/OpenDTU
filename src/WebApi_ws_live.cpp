@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * Copyright (C) 2022-2023 Thomas Basler and others
+ * Copyright (C) 2022-2024 Thomas Basler and others
  */
 #include "WebApi_ws_live.h"
 #include "Configuration.h"
@@ -16,7 +16,7 @@ WebApiWsLiveClass::WebApiWsLiveClass()
 {
 }
 
-void WebApiWsLiveClass::init(AsyncWebServer& server)
+void WebApiWsLiveClass::init(AsyncWebServer& server, Scheduler& scheduler)
 {
     using std::placeholders::_1;
     using std::placeholders::_2;
@@ -30,25 +30,32 @@ void WebApiWsLiveClass::init(AsyncWebServer& server)
 
     _server->addHandler(&_ws);
     _ws.onEvent(std::bind(&WebApiWsLiveClass::onWebsocketEvent, this, _1, _2, _3, _4, _5, _6));
+
+    scheduler.addTask(_wsCleanupTask);
+    _wsCleanupTask.setCallback(std::bind(&WebApiWsLiveClass::wsCleanupTaskCb, this));
+    _wsCleanupTask.setIterations(TASK_FOREVER);
+    _wsCleanupTask.setInterval(1 * TASK_SECOND);
+    _wsCleanupTask.enable();
+
+    scheduler.addTask(_sendDataTask);
+    _sendDataTask.setCallback(std::bind(&WebApiWsLiveClass::sendDataTaskCb, this));
+    _sendDataTask.setIterations(TASK_FOREVER);
+    _sendDataTask.setInterval(1 * TASK_SECOND);
+    _sendDataTask.enable();
 }
 
-void WebApiWsLiveClass::loop()
+void WebApiWsLiveClass::wsCleanupTaskCb()
 {
     // see: https://github.com/me-no-dev/ESPAsyncWebServer#limiting-the-number-of-web-socket-clients
-    if (millis() - _lastWsCleanup > 1000) {
-        _ws.cleanupClients();
-        _lastWsCleanup = millis();
-    }
+    _ws.cleanupClients();
+}
 
+void WebApiWsLiveClass::sendDataTaskCb()
+{
     // do nothing if no WS client is connected
     if (_ws.count() == 0) {
         return;
     }
-
-    if (millis() - _lastInvUpdateCheck < 1000) {
-        return;
-    }
-    _lastInvUpdateCheck = millis();
 
     uint32_t maxTimeStamp = 0;
     for (uint8_t i = 0; i < Hoymiles.getNumInverters(); i++) {

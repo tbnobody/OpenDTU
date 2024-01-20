@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * Copyright (C) 2022-2023 Thomas Basler and others
+ * Copyright (C) 2022-2024 Thomas Basler and others
  */
 #include "WebApi_ws_console.h"
 #include "Configuration.h"
@@ -13,25 +13,27 @@ WebApiWsConsoleClass::WebApiWsConsoleClass()
 {
 }
 
-void WebApiWsConsoleClass::init(AsyncWebServer& server)
+void WebApiWsConsoleClass::init(AsyncWebServer& server, Scheduler& scheduler)
 {
     _server = &server;
     _server->addHandler(&_ws);
     MessageOutput.register_ws_output(&_ws);
+
+    scheduler.addTask(_wsCleanupTask);
+    _wsCleanupTask.setCallback(std::bind(&WebApiWsConsoleClass::wsCleanupTaskCb, this));
+    _wsCleanupTask.setIterations(TASK_FOREVER);
+    _wsCleanupTask.setInterval(1 * TASK_SECOND);
+    _wsCleanupTask.enable();
 }
 
-void WebApiWsConsoleClass::loop()
+void WebApiWsConsoleClass::wsCleanupTaskCb()
 {
     // see: https://github.com/me-no-dev/ESPAsyncWebServer#limiting-the-number-of-web-socket-clients
-    if (millis() - _lastWsCleanup > 1000) {
-        _ws.cleanupClients();
+    _ws.cleanupClients();
 
-        if (Configuration.get().Security.AllowReadonly) {
-            _ws.setAuthentication("", "");
-        } else {
-            _ws.setAuthentication(AUTH_USERNAME, Configuration.get().Security.Password);
-        }
-
-        _lastWsCleanup = millis();
+    if (Configuration.get().Security.AllowReadonly) {
+        _ws.setAuthentication("", "");
+    } else {
+        _ws.setAuthentication(AUTH_USERNAME, Configuration.get().Security.Password);
     }
 }

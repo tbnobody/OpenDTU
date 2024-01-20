@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * Copyright (C) 2022-2023 Thomas Basler and others
+ * Copyright (C) 2022-2024 Thomas Basler and others
  */
 #include "WebApi.h"
 #include "Configuration.h"
@@ -14,56 +14,28 @@ WebApiClass::WebApiClass()
 
 void WebApiClass::init(Scheduler& scheduler)
 {
-    _webApiConfig.init(_server);
-    _webApiDevice.init(_server);
-    _webApiDevInfo.init(_server);
-    _webApiDtu.init(_server);
-    _webApiEventlog.init(_server);
-    _webApiFirmware.init(_server);
-    _webApiGridprofile.init(_server);
-    _webApiInverter.init(_server);
-    _webApiLimit.init(_server);
-    _webApiMaintenance.init(_server);
-    _webApiMqtt.init(_server);
-    _webApiNetwork.init(_server);
-    _webApiNtp.init(_server);
-    _webApiPower.init(_server);
-    _webApiPrometheus.init(_server);
-    _webApiSecurity.init(_server);
-    _webApiSysstatus.init(_server);
-    _webApiWebapp.init(_server);
-    _webApiWsConsole.init(_server);
-    _webApiWsLive.init(_server);
+    _webApiConfig.init(_server, scheduler);
+    _webApiDevice.init(_server, scheduler);
+    _webApiDevInfo.init(_server, scheduler);
+    _webApiDtu.init(_server, scheduler);
+    _webApiEventlog.init(_server, scheduler);
+    _webApiFirmware.init(_server, scheduler);
+    _webApiGridprofile.init(_server, scheduler);
+    _webApiInverter.init(_server, scheduler);
+    _webApiLimit.init(_server, scheduler);
+    _webApiMaintenance.init(_server, scheduler);
+    _webApiMqtt.init(_server, scheduler);
+    _webApiNetwork.init(_server, scheduler);
+    _webApiNtp.init(_server, scheduler);
+    _webApiPower.init(_server, scheduler);
+    _webApiPrometheus.init(_server, scheduler);
+    _webApiSecurity.init(_server, scheduler);
+    _webApiSysstatus.init(_server, scheduler);
+    _webApiWebapp.init(_server, scheduler);
+    _webApiWsConsole.init(_server, scheduler);
+    _webApiWsLive.init(_server, scheduler);
 
     _server.begin();
-
-    scheduler.addTask(_loopTask);
-    _loopTask.setCallback(std::bind(&WebApiClass::loop, this));
-    _loopTask.setIterations(TASK_FOREVER);
-    _loopTask.enable();
-}
-
-void WebApiClass::loop()
-{
-    _webApiConfig.loop();
-    _webApiDevice.loop();
-    _webApiDevInfo.loop();
-    _webApiDtu.loop();
-    _webApiEventlog.loop();
-    _webApiFirmware.loop();
-    _webApiGridprofile.loop();
-    _webApiInverter.loop();
-    _webApiLimit.loop();
-    _webApiMaintenance.loop();
-    _webApiMqtt.loop();
-    _webApiNetwork.loop();
-    _webApiNtp.loop();
-    _webApiPower.loop();
-    _webApiSecurity.loop();
-    _webApiSysstatus.loop();
-    _webApiWebapp.loop();
-    _webApiWsConsole.loop();
-    _webApiWsLive.loop();
 }
 
 bool WebApiClass::checkCredentials(AsyncWebServerRequest* request)
