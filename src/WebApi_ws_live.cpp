@@ -44,6 +44,12 @@ void WebApiWsLiveClass::wsCleanupTaskCb()
 {
     // see: https://github.com/me-no-dev/ESPAsyncWebServer#limiting-the-number-of-web-socket-clients
     _ws.cleanupClients();
+
+    if (Configuration.get().Security.AllowReadonly) {
+        _ws.setAuthentication("", "");
+    } else {
+        _ws.setAuthentication(AUTH_USERNAME, Configuration.get().Security.Password);
+    }
 }
 
 void WebApiWsLiveClass::sendDataTaskCb()
@@ -56,10 +62,7 @@ void WebApiWsLiveClass::sendDataTaskCb()
     uint32_t maxTimeStamp = 0;
     for (uint8_t i = 0; i < Hoymiles.getNumInverters(); i++) {
         auto inv = Hoymiles.getInverterByPos(i);
-
-        if (inv->Statistics()->getLastUpdate() > maxTimeStamp) {
-            maxTimeStamp = inv->Statistics()->getLastUpdate();
-        }
+        maxTimeStamp = std::max<uint32_t>(maxTimeStamp, inv->Statistics()->getLastUpdate());
     }
 
     // Update on every inverter change or at least after 10 seconds
@@ -75,13 +78,8 @@ void WebApiWsLiveClass::sendDataTaskCb()
                 String buffer;
                 serializeJson(root, buffer);
 
-                if (Configuration.get().Security.AllowReadonly) {
-                    _ws.setAuthentication("", "");
-                } else {
-                    _ws.setAuthentication(AUTH_USERNAME, Configuration.get().Security.Password);
-                }
-
                 _ws.textAll(buffer);
+                _newestInverterTimestamp = maxTimeStamp;
             }
 
         } catch (const std::bad_alloc& bad_alloc) {
@@ -160,10 +158,6 @@ void WebApiWsLiveClass::generateJsonResponse(JsonVariant& root)
             invObject["events"] = inv->EventLog()->getEntryCount();
         } else {
             invObject["events"] = -1;
-        }
-
-        if (inv->Statistics()->getLastUpdate() > _newestInverterTimestamp) {
-            _newestInverterTimestamp = inv->Statistics()->getLastUpdate();
         }
     }
 
