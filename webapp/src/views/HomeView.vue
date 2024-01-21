@@ -124,19 +124,19 @@
         </div>
     </BasePage>
 
-    <Modal modalId="eventView" :title="$t('home.EventLog')" :loading="eventLogLoading">
+    <ModalDialog modalId="eventView" :title="$t('home.EventLog')" :loading="eventLogLoading">
         <EventLog :eventLogList="eventLogList" />
-    </Modal>
+    </ModalDialog>
 
-    <Modal modalId="devInfoView" :title="$t('home.InverterInfo')" :loading="devInfoLoading">
+    <ModalDialog modalId="devInfoView" :title="$t('home.InverterInfo')" :loading="devInfoLoading">
         <DevInfo :devInfoList="devInfoList" />
-    </Modal>
+    </ModalDialog>
 
-    <Modal modalId="gridProfileView" :title="$t('home.GridProfile')" :loading="gridProfileLoading">
+    <ModalDialog modalId="gridProfileView" :title="$t('home.GridProfile')" :loading="gridProfileLoading">
         <GridProfile :gridProfileList="gridProfileList" :gridProfileRawList="gridProfileRawList" />
-    </Modal>
+    </ModalDialog>
 
-    <Modal modalId="limitSettingView" :title="$t('home.LimitSettings')" :loading="limitSettingLoading">
+    <ModalDialog modalId="limitSettingView" :title="$t('home.LimitSettings')" :loading="limitSettingLoading">
         <BootstrapAlert v-model="showAlertLimit" :variant="alertTypeLimit">
             {{ alertMessageLimit }}
         </BootstrapAlert>
@@ -206,9 +206,9 @@
             <button type="button" class="btn btn-danger" @click="onSetLimitSettings(false)">{{
                 $t('home.SetNonPersistent') }}</button>
         </template>
-    </Modal>
+    </ModalDialog>
 
-    <Modal modalId="powerSettingView" :title="$t('home.PowerSettings')" :loading="powerSettingLoading">
+    <ModalDialog modalId="powerSettingView" :title="$t('home.PowerSettings')" :loading="powerSettingLoading">
         <BootstrapAlert v-model="showAlertPower" :variant="alertTypePower">
             {{ alertMessagePower }}
         </BootstrapAlert>
@@ -239,7 +239,7 @@
                 <BIconArrowCounterclockwise class="fs-4" />&nbsp;{{ $t('home.Restart') }}
             </button>
         </div>
-    </Modal>
+    </ModalDialog>
 </template>
 
 <script lang="ts">
@@ -251,7 +251,7 @@ import GridProfile from '@/components/GridProfile.vue';
 import HintView from '@/components/HintView.vue';
 import InverterChannelInfo from "@/components/InverterChannelInfo.vue";
 import InverterTotalInfo from '@/components/InverterTotalInfo.vue';
-import Modal from '@/components/Modal.vue';
+import ModalDialog from '@/components/ModalDialog.vue';
 import type { DevInfoStatus } from '@/types/DevInfoStatus';
 import type { EventlogItems } from '@/types/EventlogStatus';
 import type { GridProfileStatus } from '@/types/GridProfileStatus';
@@ -286,7 +286,7 @@ export default defineComponent({
         HintView,
         InverterChannelInfo,
         InverterTotalInfo,
-        Modal,
+        ModalDialog,
         BIconArrowCounterclockwise,
         BIconCheckCircleFill,
         BIconCpu,

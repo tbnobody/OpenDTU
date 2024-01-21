@@ -88,21 +88,21 @@
         </CardElement>
     </BasePage>
 
-    <Modal modalId="factoryReset" small :title="$t('configadmin.FactoryReset')" :closeText="$t('configadmin.Cancel')">
+    <ModalDialog modalId="factoryReset" small :title="$t('configadmin.FactoryReset')" :closeText="$t('configadmin.Cancel')">
         {{ $t('configadmin.ResetMsg') }}
         <template #footer>
             <button type="button" class="btn btn-danger" @click="onFactoryResetPerform">
                 {{ $t('configadmin.ResetConfirm') }}
             </button>
         </template>
-    </Modal>
+    </ModalDialog>
 </template>
 
 <script lang="ts">
 import BasePage from '@/components/BasePage.vue';
 import BootstrapAlert from "@/components/BootstrapAlert.vue";
 import CardElement from '@/components/CardElement.vue';
-import Modal from '@/components/Modal.vue';
+import ModalDialog from '@/components/ModalDialog.vue';
 import type { ConfigFileList } from '@/types/Config';
 import { authHeader, handleResponse } from '@/utils/authentication';
 import * as bootstrap from 'bootstrap';
@@ -118,7 +118,7 @@ export default defineComponent({
         BasePage,
         BootstrapAlert,
         CardElement,
-        Modal,
+        ModalDialog,
         BIconArrowLeft,
         BIconCheckCircle,
         BIconExclamationCircleFill,

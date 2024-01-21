@@ -12,20 +12,20 @@
         </CardElement>
     </BasePage>
 
-    <Modal modalId="performReboot" small :title="$t('maintenancereboot.RebootOpenDTU')" :closeText="$t('maintenancereboot.Cancel')">
+    <ModalDialog modalId="performReboot" small :title="$t('maintenancereboot.RebootOpenDTU')" :closeText="$t('maintenancereboot.Cancel')">
         {{ $t('maintenancereboot.RebootQuestion') }}
         <template #footer>
             <button type="button" class="btn btn-danger" @click="onReboot">
                         {{ $t('maintenancereboot.Reboot') }}</button>
         </template>
-    </Modal>
+    </ModalDialog>
 </template>
 
 <script lang="ts">
 import BasePage from '@/components/BasePage.vue';
 import BootstrapAlert from "@/components/BootstrapAlert.vue";
 import CardElement from '@/components/CardElement.vue';
-import Modal from '@/components/Modal.vue';
+import ModalDialog from '@/components/ModalDialog.vue';
 import { authHeader, handleResponse, isLoggedIn } from '@/utils/authentication';
 import * as bootstrap from 'bootstrap';
 import { defineComponent } from 'vue';
@@ -35,7 +35,7 @@ export default defineComponent({
         BasePage,
         BootstrapAlert,
         CardElement,
-        Modal,
+        ModalDialog,
     },
     data() {
         return {

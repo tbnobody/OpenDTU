@@ -71,7 +71,7 @@
         </CardElement>
     </BasePage>
 
-    <Modal modalId="inverterEdit" :title="$t('inverteradmin.EditInverter')" :closeText="$t('inverteradmin.Cancel')">
+    <ModalDialog modalId="inverterEdit" :title="$t('inverteradmin.EditInverter')" :closeText="$t('inverteradmin.Cancel')">
         <nav>
             <div class="nav nav-tabs" id="nav-tab" role="tablist">
                 <button class="nav-link active" id="nav-general-tab" data-bs-toggle="tab" data-bs-target="#nav-general"
@@ -186,9 +186,9 @@
             <button type="button" class="btn btn-primary" @click="onEditSubmit">
                 {{ $t('inverteradmin.Save') }}</button>
         </template>
-    </Modal>
+    </ModalDialog>
 
-    <Modal modalId="inverterDelete" small :title="$t('inverteradmin.DeleteInverter')"
+    <ModalDialog modalId="inverterDelete" small :title="$t('inverteradmin.DeleteInverter')"
         :closeText="$t('inverteradmin.Cancel')">
         {{ $t('inverteradmin.DeleteMsg', {
             name: selectedInverterData.name,
@@ -199,7 +199,7 @@
             <button type="button" class="btn btn-danger" @click="onDelete">
                 {{ $t('inverteradmin.Delete') }}</button>
         </template>
-    </Modal>
+    </ModalDialog>
 </template>
 
 <script lang="ts">
@@ -207,7 +207,7 @@ import BasePage from '@/components/BasePage.vue';
 import BootstrapAlert from "@/components/BootstrapAlert.vue";
 import CardElement from '@/components/CardElement.vue';
 import InputElement from '@/components/InputElement.vue';
-import Modal from '@/components/Modal.vue';
+import ModalDialog from '@/components/ModalDialog.vue';
 import type { Inverter } from '@/types/InverterConfig';
 import { authHeader, handleResponse } from '@/utils/authentication';
 import * as bootstrap from 'bootstrap';
@@ -235,7 +235,7 @@ export default defineComponent({
         BootstrapAlert,
         CardElement,
         InputElement,
-        Modal,
+        ModalDialog,
         BIconInfoCircle,
         BIconPencil,
         BIconTrash,
