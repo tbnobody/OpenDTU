@@ -19,20 +19,23 @@ std::map<DisplayType_t, std::function<U8G2*(uint8_t, uint8_t, uint8_t, uint8_t)>
 #define I18N_LOCALE_EN 0
 #define I18N_LOCALE_DE 1
 #define I18N_LOCALE_FR 2
+#define I18N_LOCALE_ES 3
+
 
 // Languages supported. Note: the order is important and must match locale_translations.h
 const uint8_t languages[] = {
     I18N_LOCALE_EN,
     I18N_LOCALE_DE,
-    I18N_LOCALE_FR
+    I18N_LOCALE_FR,
+    I18N_LOCALE_ES
 };
 
-static const char* const i18n_offline[] = { "Offline", "Offline", "Offline" };
-static const char* const i18n_current_power_w[] = { "%.0f W", "%.0f W", "%.0f W" };
-static const char* const i18n_current_power_kw[] = { "%.1f kW", "%.1f kW", "%.1f kW" };
-static const char* const i18n_yield_today_wh[] = { "today: %4.0f Wh", "Heute: %4.0f Wh", "auj.: %4.0f Wh" };
-static const char* const i18n_yield_total_kwh[] = { "total: %.1f kWh", "Ges.: %.1f kWh", "total: %.1f kWh" };
-static const char* const i18n_date_format[] = { "%m/%d/%Y %H:%M", "%d.%m.%Y %H:%M", "%d/%m/%Y %H:%M" };
+static const char* const i18n_offline[] = { "Offline", "Offline", "Offline", "Apagado" };
+static const char* const i18n_current_power_w[] = { "%.0f W", "%.0f W", "%.0f W", "%.0f W" };
+static const char* const i18n_current_power_kw[] = { "%.1f kW", "%.1f kW", "%.1f kW", "%.1f kW" };
+static const char* const i18n_yield_today_wh[] = { "today: %4.0f Wh", "Heute: %4.0f Wh", "auj.: %4.0f Wh", "Hoy: %4.0f Wh" };
+static const char* const i18n_yield_total_kwh[] = { "total: %.1f kWh", "Ges.: %.1f kWh", "total: %.1f kWh", "Total: %.1f kWh" };
+static const char* const i18n_date_format[] = { "%m/%d/%Y %H:%M", "%d.%m.%Y %H:%M", "%d/%m/%Y %H:%M", "%d/%m/%Y %H:%M" };
 
 DisplayGraphicClass::DisplayGraphicClass()
     : _loopTask(TASK_IMMEDIATE, TASK_FOREVER, std::bind(&DisplayGraphicClass::loop, this))
