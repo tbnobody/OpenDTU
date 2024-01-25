@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * Copyright (C) 2022-2023 Thomas Basler and others
+ * Copyright (C) 2022-2024 Thomas Basler and others
  */
 #include "WebApi_webapp.h"
 
@@ -22,7 +22,7 @@ extern const uint8_t file_site_webmanifest_end[] asm("_binary_webapp_dist_site_w
 #define ETAG_HTTP_HEADER_VAL "\"" AUTO_GIT_HASH "\"" // ETag value must be between quotes
 #endif
 
-void WebApiWebappClass::init(AsyncWebServer& server)
+void WebApiWebappClass::init(AsyncWebServer& server, Scheduler& scheduler)
 {
     _server = &server;
 
@@ -93,8 +93,4 @@ void WebApiWebappClass::init(AsyncWebServer& server)
 #endif
         request->send(response);
     });
-}
-
-void WebApiWebappClass::loop()
-{
 }

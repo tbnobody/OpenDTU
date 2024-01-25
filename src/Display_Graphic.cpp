@@ -35,6 +35,7 @@ static const char* const i18n_yield_total_kwh[] = { "total: %.1f kWh", "Ges.: %.
 static const char* const i18n_date_format[] = { "%m/%d/%Y %H:%M", "%d.%m.%Y %H:%M", "%d/%m/%Y %H:%M" };
 
 DisplayGraphicClass::DisplayGraphicClass()
+    : _loopTask(TASK_IMMEDIATE, TASK_FOREVER, std::bind(&DisplayGraphicClass::loop, this))
 {
 }
 
@@ -55,8 +56,6 @@ void DisplayGraphicClass::init(Scheduler& scheduler, const DisplayType_t type, c
         _diagram.init(scheduler, _display);
 
         scheduler.addTask(_loopTask);
-        _loopTask.setCallback(std::bind(&DisplayGraphicClass::loop, this));
-        _loopTask.setIterations(TASK_FOREVER);
         _loopTask.setInterval(_period);
         _loopTask.enable();
     }

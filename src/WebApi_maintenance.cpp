@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * Copyright (C) 2022-2023 Thomas Basler and others
+ * Copyright (C) 2022-2024 Thomas Basler and others
  */
 
 #include "WebApi_maintenance.h"
@@ -9,17 +9,13 @@
 #include "WebApi_errors.h"
 #include <AsyncJson.h>
 
-void WebApiMaintenanceClass::init(AsyncWebServer& server)
+void WebApiMaintenanceClass::init(AsyncWebServer& server, Scheduler& scheduler)
 {
     using std::placeholders::_1;
 
     _server = &server;
 
     _server->on("/api/maintenance/reboot", HTTP_POST, std::bind(&WebApiMaintenanceClass::onRebootPost, this, _1));
-}
-
-void WebApiMaintenanceClass::loop()
-{
 }
 
 void WebApiMaintenanceClass::onRebootPost(AsyncWebServerRequest* request)

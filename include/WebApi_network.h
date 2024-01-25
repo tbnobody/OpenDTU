@@ -2,11 +2,11 @@
 #pragma once
 
 #include <ESPAsyncWebServer.h>
+#include <TaskSchedulerDeclarations.h>
 
 class WebApiNetworkClass {
 public:
-    void init(AsyncWebServer& server);
-    void loop();
+    void init(AsyncWebServer& server, Scheduler& scheduler);
 
 private:
     void onNetworkStatus(AsyncWebServerRequest* request);

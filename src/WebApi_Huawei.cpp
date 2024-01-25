@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * Copyright (C) 2022 Thomas Basler and others
+ * Copyright (C) 2022-2024 Thomas Basler and others
  */
 #include "WebApi_Huawei.h"
 #include "Huawei_can.h"
@@ -12,7 +12,7 @@
 #include <AsyncJson.h>
 #include <Hoymiles.h>
 
-void WebApiHuaweiClass::init(AsyncWebServer& server)
+void WebApiHuaweiClass::init(AsyncWebServer& server, Scheduler& scheduler)
 {
     using std::placeholders::_1;
 
@@ -22,10 +22,6 @@ void WebApiHuaweiClass::init(AsyncWebServer& server)
     _server->on("/api/huawei/config", HTTP_GET, std::bind(&WebApiHuaweiClass::onAdminGet, this, _1));
     _server->on("/api/huawei/config", HTTP_POST, std::bind(&WebApiHuaweiClass::onAdminPost, this, _1));
     _server->on("/api/huawei/limit/config", HTTP_POST, std::bind(&WebApiHuaweiClass::onPost, this, _1));
-}
-
-void WebApiHuaweiClass::loop()
-{
 }
 
 void WebApiHuaweiClass::getJsonData(JsonVariant& root) {

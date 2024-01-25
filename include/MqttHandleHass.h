@@ -51,6 +51,7 @@ const byteAssign_fieldDeviceClass_t deviceFieldAssignment[] = {
 
 class MqttHandleHassClass {
 public:
+    MqttHandleHassClass();
     void init(Scheduler& scheduler);
     void publishConfig();
     void forceUpdate();

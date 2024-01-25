@@ -38,7 +38,8 @@
         "Save": "Save",
         "Refreshing": "Refreshing",
         "Pull": "Pull down to refresh",
-        "Release": "Release to refresh"
+        "Release": "Release to refresh",
+        "Close": "Close"
     },
     "localeswitcher": {
         "Dark": "Dark",
@@ -125,7 +126,6 @@
         "UnreadMessages": "unread messages",
         "Loading": "@:base.Loading",
         "EventLog": "Event Log",
-        "Close": "Close",
         "InverterInfo": "Inverter Info",
         "LimitSettings": "Limit Settings",
         "LastLimitSetStatus": "Last Limit Set Status:",
@@ -230,10 +230,12 @@
         "FirmwareVersionHint": "Click here to show information about your current version",
         "FirmwareUpdate": "Firmware Update",
         "FirmwareUpdateHint": "Click here to view the changes between your version and the latest version",
+        "FrmwareUpdateAllow": "By activating the update check, a request is sent to GitHub.com each time the page is called up to retrieve the currently available version. If you do not agree with this, leave this function deactivated.",
         "ResetReason0": "Reset Reason CPU 0",
         "ResetReason1": "Reset Reason CPU 1",
         "ConfigSaveCount": "Config save count",
-        "Uptime": "Uptime"
+        "Uptime": "Uptime",
+        "UptimeValue": "0 days {time} | 1 day {time} | {count} days {time}"
     },
     "hardwareinfo": {
         "HardwareInformation": "Hardware Information",
@@ -373,10 +375,7 @@
     "inverterchannelinfo": {
         "String": "String {num}",
         "Phase": "Phase {num}",
-        "General": "General",
-        "Property": "Property",
-        "Value": "Value",
-        "Unit": "Unit"
+        "General": "General"
     },
     "invertertotalinfo": {
         "InverterTotalYieldTotal": "Inverter Total Yield Total",
@@ -424,7 +423,7 @@
         "CmtPaLevel": "CMT2300A Transmitting power:",
         "NrfPaLevelHint": "Used for HM-Inverters. Make sure your power supply is stable enough before increasing the transmit power.",
         "CmtPaLevelHint": "Used for HMS/HMT-Inverters. Make sure your power supply is stable enough before increasing the transmit power.",
-        "CmtCountry": "Region/Country:",
+        "CmtCountry": "CMT2300A Region/Country:",
         "CmtCountryHint": "Each country has different frequency allocations.",
         "country_0": "Europe ({min}MHz - {max}MHz)",
         "country_1": "North America ({min}MHz - {max}MHz)",
@@ -725,7 +724,7 @@
         "Back": "Back",
         "Retry": "Retry",
         "OtaStatus": "OTA Status",
-        "OtaSuccess": "OTA Success. The unit has been automatically restarted and will be available again in a few moments. Please do not forget to reload the web interface!",
+        "OtaSuccess": "The firmware upload was successful. The device was restarted automatically. When the device is accessible again, the interface is automatically reloaded.",
         "FirmwareUpload": "Firmware Upload",
         "UploadProgress": "Upload Progress"
     },

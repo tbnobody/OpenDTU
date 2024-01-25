@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * Copyright (C) 2022-2023 Thomas Basler and others
+ * Copyright (C) 2022-2024 Thomas Basler and others
  */
 #include "NetworkSettings.h"
 #include "Configuration.h"
@@ -12,7 +12,8 @@
 #include <ETH.h>
 
 NetworkSettingsClass::NetworkSettingsClass()
-    : _apIp(192, 168, 4, 1)
+    : _loopTask(TASK_IMMEDIATE, TASK_FOREVER, std::bind(&NetworkSettingsClass::loop, this))
+    , _apIp(192, 168, 4, 1)
     , _apNetmask(255, 255, 255, 0)
 {
     _dnsServer.reset(new DNSServer());
@@ -29,8 +30,6 @@ void NetworkSettingsClass::init(Scheduler& scheduler)
     setupMode();
 
     scheduler.addTask(_loopTask);
-    _loopTask.setCallback(std::bind(&NetworkSettingsClass::loop, this));
-    _loopTask.setIterations(TASK_FOREVER);
     _loopTask.enable();
 }
 

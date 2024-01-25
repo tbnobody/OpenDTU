@@ -31,7 +31,7 @@ export default defineComponent({
     computed: {
         timeInHours() {
             return (value: number) => {
-                return timestampToString(value);
+                return timestampToString(this.$i18n.locale, value)[0];
             };
         },
     },

@@ -1,17 +1,20 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * Copyright (C) 2022-2023 Thomas Basler and others
+ * Copyright (C) 2022-2024 Thomas Basler and others
  */
 #include <HardwareSerial.h>
 #include "MessageOutput.h"
 
 MessageOutputClass MessageOutput;
 
+MessageOutputClass::MessageOutputClass()
+    : _loopTask(TASK_IMMEDIATE, TASK_FOREVER, std::bind(&MessageOutputClass::loop, this))
+{
+}
+
 void MessageOutputClass::init(Scheduler& scheduler)
 {
     scheduler.addTask(_loopTask);
-    _loopTask.setCallback(std::bind(&MessageOutputClass::loop, this));
-    _loopTask.setIterations(TASK_FOREVER);
     _loopTask.enable();
 }
 

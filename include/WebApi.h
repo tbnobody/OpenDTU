@@ -46,10 +46,6 @@ public:
     static void writeConfig(JsonVariant& retMsg, const WebApiError code = WebApiError::GenericSuccess, const String& message = "Settings saved!");
 
 private:
-    void loop();
-
-    Task _loopTask;
-
     AsyncWebServer _server;
 
     WebApiBatteryClass _webApiBattery;

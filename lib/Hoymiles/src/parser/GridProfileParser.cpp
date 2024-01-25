@@ -390,7 +390,7 @@ std::vector<uint8_t> GridProfileParser::getRawData() const
 {
     std::vector<uint8_t> ret;
     HOY_SEMAPHORE_TAKE();
-    for (uint8_t i = 0; i < GRID_PROFILE_SIZE; i++) {
+    for (uint8_t i = 0; i < _gridProfileLength; i++) {
         ret.push_back(_payloadGridProfile[i]);
     }
     HOY_SEMAPHORE_GIVE();

@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * Copyright (C) 2022-2023 Thomas Basler and others
+ * Copyright (C) 2022-2024 Thomas Basler and others
  */
 #include "WebApi_devinfo.h"
 #include "WebApi.h"
@@ -8,17 +8,13 @@
 #include <Hoymiles.h>
 #include <ctime>
 
-void WebApiDevInfoClass::init(AsyncWebServer& server)
+void WebApiDevInfoClass::init(AsyncWebServer& server, Scheduler& scheduler)
 {
     using std::placeholders::_1;
 
     _server = &server;
 
     _server->on("/api/devinfo/status", HTTP_GET, std::bind(&WebApiDevInfoClass::onDevInfoStatus, this, _1));
-}
-
-void WebApiDevInfoClass::loop()
-{
 }
 
 void WebApiDevInfoClass::onDevInfoStatus(AsyncWebServerRequest* request)
@@ -46,11 +42,7 @@ void WebApiDevInfoClass::onDevInfoStatus(AsyncWebServerRequest* request)
         root["hw_version"] = inv->DevInfo()->getHwVersion();
         root["hw_model_name"] = inv->DevInfo()->getHwModelName();
         root["max_power"] = inv->DevInfo()->getMaxPower();
-
-        char timebuffer[32];
-        const time_t t = inv->DevInfo()->getFwBuildDateTime();
-        std::strftime(timebuffer, sizeof(timebuffer), "%Y-%m-%d %H:%M:%S", gmtime(&t));
-        root["fw_build_datetime"] = String(timebuffer);
+        root["fw_build_datetime"] = inv->DevInfo()->getFwBuildDateTimeStr();
     }
 
     response->setLength();

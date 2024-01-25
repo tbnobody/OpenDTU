@@ -51,7 +51,7 @@ export default defineComponent({
         var self = this;
         console.log("init");
         PullToRefresh.init({
-            mainElement: 'main', // above which element?
+            mainElement: 'body', // above which element?
             instructionsPullToRefresh: this.$t('base.Pull'),
             instructionsReleaseToRefresh: this.$t('base.Release'),
             instructionsRefreshing: this.$t('base.Refreshing'),

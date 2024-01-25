@@ -2,12 +2,12 @@
 #pragma once
 
 #include <ESPAsyncWebServer.h>
+#include <TaskSchedulerDeclarations.h>
 
 
 class WebApiPowerMeterClass {
 public:
-    void init(AsyncWebServer& server);
-    void loop();
+    void init(AsyncWebServer& server, Scheduler& scheduler);
 
 private:
     void onStatus(AsyncWebServerRequest* request);

@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * Copyright (C) 2022 Thomas Basler and others
+ * Copyright (C) 2022-2024 Thomas Basler and others
  */
 #include "WebApi_powerlimiter.h"
 #include "VeDirectFrameHandler.h"
@@ -16,7 +16,7 @@
 #include "helper.h"
 #include "WebApi_errors.h"
 
-void WebApiPowerLimiterClass::init(AsyncWebServer& server)
+void WebApiPowerLimiterClass::init(AsyncWebServer& server, Scheduler& scheduler)
 {
     using std::placeholders::_1;
 
@@ -25,10 +25,6 @@ void WebApiPowerLimiterClass::init(AsyncWebServer& server)
     _server->on("/api/powerlimiter/status", HTTP_GET, std::bind(&WebApiPowerLimiterClass::onStatus, this, _1));
     _server->on("/api/powerlimiter/config", HTTP_GET, std::bind(&WebApiPowerLimiterClass::onAdminGet, this, _1));
     _server->on("/api/powerlimiter/config", HTTP_POST, std::bind(&WebApiPowerLimiterClass::onAdminPost, this, _1));
-}
-
-void WebApiPowerLimiterClass::loop()
-{
 }
 
 void WebApiPowerLimiterClass::onStatus(AsyncWebServerRequest* request)

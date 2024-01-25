@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * Copyright (C) 2022 Thomas Basler and others
+ * Copyright (C) 2022-2024 Thomas Basler and others
  */
 
 #include "ArduinoJson.h"
@@ -13,7 +13,7 @@
 #include "WebApi_errors.h"
 #include "helper.h"
 
-void WebApiBatteryClass::init(AsyncWebServer& server)
+void WebApiBatteryClass::init(AsyncWebServer& server, Scheduler& scheduler)
 {
     using std::placeholders::_1;
 
@@ -22,10 +22,6 @@ void WebApiBatteryClass::init(AsyncWebServer& server)
     _server->on("/api/battery/status", HTTP_GET, std::bind(&WebApiBatteryClass::onStatus, this, _1));
     _server->on("/api/battery/config", HTTP_GET, std::bind(&WebApiBatteryClass::onAdminGet, this, _1));
     _server->on("/api/battery/config", HTTP_POST, std::bind(&WebApiBatteryClass::onAdminPost, this, _1));
-}
-
-void WebApiBatteryClass::loop()
-{
 }
 
 void WebApiBatteryClass::onStatus(AsyncWebServerRequest* request)
