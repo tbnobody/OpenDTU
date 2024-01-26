@@ -72,19 +72,7 @@ Generated using: `git log --date=short --pretty=format:"* %h%x09%ad%x09%s" | gre
 | TSUN TSOL-M800       | NRF24L01+          | 2         | 2           | 1         |
 | TSUN TSOL-M1600      | NRF24L01+          | 4         | 2           | 1         |
 
-
-
 ## Hardware you need
-
-### ESP32 board
-
-For ease of use, buy a "ESP32 DEVKIT DOIT" or "ESP32 NodeMCU Development Board" with an ESP32-S3 or ESP-WROOM-32 chipset on it.
-
-Sample Picture:
-
-![NodeMCU-ESP32](docs/nodemcu-esp32.png)
-
-Also supported: Board with Ethernet-Connector and Power-over-Ethernet [Olimex ESP32-POE](https://www.olimex.com/Products/IoT/ESP32/ESP32-POE/open-source-hardware)
 
 ### Change pin assignment
 
