@@ -38,7 +38,7 @@
   </div>
   <div class="row row-cols-1 row-cols-md-3 g-3">
         <div class="col">
-            <CardElement centerContent textVariant="text-bg-success" :text="$t('invertertotalinfo.TotalYieldTotal')">
+            <CardElement centerContent textVariant="text-bg-success" :text="$t('invertertotalinfo.InverterTotalYieldTotal')">
                 <h2>
                     {{ $n(totalData.YieldTotal.v, 'decimal', {
                         minimumFractionDigits: totalData.YieldTotal.d,
@@ -49,7 +49,7 @@
             </CardElement>
         </div>
         <div class="col">
-            <CardElement centerContent textVariant="text-bg-success" :text="$t('invertertotalinfo.TotalYieldDay')">
+            <CardElement centerContent textVariant="text-bg-success" :text="$t('invertertotalinfo.InverterTotalYieldDay')">
                 <h2>
                     {{ $n(totalData.YieldDay.v, 'decimal', {
                         minimumFractionDigits: totalData.YieldDay.d,
@@ -60,7 +60,7 @@
             </CardElement>
         </div>
         <div class="col">
-            <CardElement centerContent textVariant="text-bg-success" :text="$t('invertertotalinfo.TotalPower')">
+            <CardElement centerContent textVariant="text-bg-success" :text="$t('invertertotalinfo.InverterTotalPower')">
                 <h2>
                     {{ $n(totalData.Power.v, 'decimal', {
                         minimumFractionDigits: totalData.Power.d,
