@@ -42,7 +42,7 @@ void WebApiWsVedirectLiveClass::init(AsyncWebServer& server, Scheduler& schedule
     scheduler.addTask(_sendDataTask);
     _sendDataTask.setCallback(std::bind(&WebApiWsVedirectLiveClass::sendDataTaskCb, this));
     _sendDataTask.setIterations(TASK_FOREVER);
-    _sendDataTask.setInterval(1 * TASK_SECOND);
+    _sendDataTask.setInterval(500 * TASK_MILLISECOND);
     _sendDataTask.enable();
 }
 
