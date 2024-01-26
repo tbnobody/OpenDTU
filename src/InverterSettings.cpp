@@ -106,6 +106,7 @@ void InverterSettingsClass::init(Scheduler& scheduler)
 void InverterSettingsClass::settingsLoop()
 {
     const CONFIG_T& config = Configuration.get();
+    const bool isDayPeriod = SunPosition.isDayPeriod();
 
     for (uint8_t i = 0; i < INV_MAX_COUNT; i++) {
         auto const& inv_cfg = config.Inverter[i];
@@ -117,8 +118,8 @@ void InverterSettingsClass::settingsLoop()
             continue;
         }
 
-        inv->setEnablePolling(inv_cfg.Poll_Enable && (SunPosition.isDayPeriod() || inv_cfg.Poll_Enable_Night));
-        inv->setEnableCommands(inv_cfg.Command_Enable && (SunPosition.isDayPeriod() || inv_cfg.Command_Enable_Night));
+        inv->setEnablePolling(inv_cfg.Poll_Enable && (isDayPeriod || inv_cfg.Poll_Enable_Night));
+        inv->setEnableCommands(inv_cfg.Command_Enable && (isDayPeriod || inv_cfg.Command_Enable_Night));
     }
 }
 
