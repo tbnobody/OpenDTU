@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * Copyright (C) 2022-2023 Thomas Basler and others
+ * Copyright (C) 2022-2024 Thomas Basler and others
  */
 #include "WebApi_firmware.h"
 #include "Configuration.h"
@@ -10,7 +10,7 @@
 #include "helper.h"
 #include <AsyncJson.h>
 
-void WebApiFirmwareClass::init(AsyncWebServer& server)
+void WebApiFirmwareClass::init(AsyncWebServer& server, Scheduler& scheduler)
 {
     using std::placeholders::_1;
     using std::placeholders::_2;
@@ -24,10 +24,6 @@ void WebApiFirmwareClass::init(AsyncWebServer& server)
     _server->on("/api/firmware/update", HTTP_POST,
         std::bind(&WebApiFirmwareClass::onFirmwareUpdateFinish, this, _1),
         std::bind(&WebApiFirmwareClass::onFirmwareUpdateUpload, this, _1, _2, _3, _4, _5, _6));
-}
-
-void WebApiFirmwareClass::loop()
-{
 }
 
 void WebApiFirmwareClass::onFirmwareUpdateFinish(AsyncWebServerRequest* request)

@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * Copyright (C) 2022-2023 Thomas Basler and others
+ * Copyright (C) 2022-2024 Thomas Basler and others
  */
 #include "WebApi.h"
 #include "Configuration.h"
@@ -14,72 +14,36 @@ WebApiClass::WebApiClass()
 
 void WebApiClass::init(Scheduler& scheduler)
 {
-    _webApiConfig.init(_server);
-    _webApiDevice.init(_server);
-    _webApiDevInfo.init(_server);
-    _webApiDtu.init(_server);
-    _webApiEventlog.init(_server);
-    _webApiFirmware.init(_server);
-    _webApiGridprofile.init(_server);
-    _webApiInverter.init(_server);
-    _webApiLimit.init(_server);
-    _webApiMaintenance.init(_server);
-    _webApiMqtt.init(_server);
-    _webApiNetwork.init(_server);
-    _webApiNtp.init(_server);
-    _webApiPower.init(_server);
-    _webApiPrometheus.init(_server);
-    _webApiSecurity.init(_server);
-    _webApiSysstatus.init(_server);
-    _webApiWebapp.init(_server);
-    _webApiWsConsole.init(_server);
-    _webApiWsLive.init(_server);
-    _webApiBattery.init(_server);
-    _webApiPowerMeter.init(_server);
-    _webApiPowerLimiter.init(_server);
-    _webApiWsVedirectLive.init(_server);
-    _webApiVedirect.init(_server);
-    _webApiWsHuaweiLive.init(_server);
-    _webApiHuaweiClass.init(_server);
-    _webApiWsBatteryLive.init(_server);
+    _webApiConfig.init(_server, scheduler);
+    _webApiDevice.init(_server, scheduler);
+    _webApiDevInfo.init(_server, scheduler);
+    _webApiDtu.init(_server, scheduler);
+    _webApiEventlog.init(_server, scheduler);
+    _webApiFirmware.init(_server, scheduler);
+    _webApiGridprofile.init(_server, scheduler);
+    _webApiInverter.init(_server, scheduler);
+    _webApiLimit.init(_server, scheduler);
+    _webApiMaintenance.init(_server, scheduler);
+    _webApiMqtt.init(_server, scheduler);
+    _webApiNetwork.init(_server, scheduler);
+    _webApiNtp.init(_server, scheduler);
+    _webApiPower.init(_server, scheduler);
+    _webApiPrometheus.init(_server, scheduler);
+    _webApiSecurity.init(_server, scheduler);
+    _webApiSysstatus.init(_server, scheduler);
+    _webApiWebapp.init(_server, scheduler);
+    _webApiWsConsole.init(_server, scheduler);
+    _webApiWsLive.init(_server, scheduler);
+    _webApiBattery.init(_server, scheduler);
+    _webApiPowerMeter.init(_server, scheduler);
+    _webApiPowerLimiter.init(_server, scheduler);
+    _webApiWsVedirectLive.init(_server, scheduler);
+    _webApiVedirect.init(_server, scheduler);
+    _webApiWsHuaweiLive.init(_server, scheduler);
+    _webApiHuaweiClass.init(_server, scheduler);
+    _webApiWsBatteryLive.init(_server, scheduler);
 
     _server.begin();
-
-    scheduler.addTask(_loopTask);
-    _loopTask.setCallback(std::bind(&WebApiClass::loop, this));
-    _loopTask.setIterations(TASK_FOREVER);
-    _loopTask.enable();
-}
-
-void WebApiClass::loop()
-{
-    _webApiBattery.loop();
-    _webApiConfig.loop();
-    _webApiDevice.loop();
-    _webApiDevInfo.loop();
-    _webApiDtu.loop();
-    _webApiEventlog.loop();
-    _webApiFirmware.loop();
-    _webApiGridprofile.loop();
-    _webApiInverter.loop();
-    _webApiLimit.loop();
-    _webApiMaintenance.loop();
-    _webApiMqtt.loop();
-    _webApiNetwork.loop();
-    _webApiNtp.loop();
-    _webApiPower.loop();
-    _webApiPowerMeter.loop();
-    _webApiPowerLimiter.loop();
-    _webApiSecurity.loop();
-    _webApiSysstatus.loop();
-    _webApiWebapp.loop();
-    _webApiWsConsole.loop();
-    _webApiWsLive.loop();
-    _webApiWsVedirectLive.loop();
-    _webApiVedirect.loop();
-    _webApiWsHuaweiLive.loop();
-    _webApiHuaweiClass.loop();
-    _webApiWsBatteryLive.loop();
 }
 
 bool WebApiClass::checkCredentials(AsyncWebServerRequest* request)

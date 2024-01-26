@@ -3,12 +3,12 @@
 
 #include <ESPAsyncWebServer.h>
 #include <Hoymiles.h>
+#include <TaskSchedulerDeclarations.h>
 #include <map>
 
 class WebApiPrometheusClass {
 public:
-    void init(AsyncWebServer& server);
-    void loop();
+    void init(AsyncWebServer& server, Scheduler& scheduler);
 
 private:
     void onPrometheusMetricsGet(AsyncWebServerRequest* request);

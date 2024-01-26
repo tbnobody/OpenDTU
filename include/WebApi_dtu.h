@@ -2,16 +2,19 @@
 #pragma once
 
 #include <ESPAsyncWebServer.h>
+#include <TaskSchedulerDeclarations.h>
 
 class WebApiDtuClass {
 public:
-    void init(AsyncWebServer& server);
-    void loop();
+    WebApiDtuClass();
+    void init(AsyncWebServer& server, Scheduler& scheduler);
 
 private:
     void onDtuAdminGet(AsyncWebServerRequest* request);
     void onDtuAdminPost(AsyncWebServerRequest* request);
 
     AsyncWebServer* _server;
-    bool _performReload = false;
+
+    Task _applyDataTask;
+    void applyDataTaskCb();
 };

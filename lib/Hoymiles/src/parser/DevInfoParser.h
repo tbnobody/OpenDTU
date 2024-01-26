@@ -21,6 +21,7 @@ public:
 
     uint16_t getFwBuildVersion() const;
     time_t getFwBuildDateTime() const;
+    String getFwBuildDateTimeStr() const;
     uint16_t getFwBootloaderVersion() const;
 
     uint32_t getHwPartNumber() const;

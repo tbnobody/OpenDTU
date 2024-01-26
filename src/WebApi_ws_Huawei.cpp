@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * Copyright (C) 2022 Thomas Basler and others
+ * Copyright (C) 2022-2024 Thomas Basler and others
  */
 #include "WebApi_ws_Huawei.h"
 #include "AsyncJson.h"
@@ -16,7 +16,7 @@ WebApiWsHuaweiLiveClass::WebApiWsHuaweiLiveClass()
 {
 }
 
-void WebApiWsHuaweiLiveClass::init(AsyncWebServer& server)
+void WebApiWsHuaweiLiveClass::init(AsyncWebServer& server, Scheduler& scheduler)
 {
     using std::placeholders::_1;
     using std::placeholders::_2;
@@ -30,25 +30,32 @@ void WebApiWsHuaweiLiveClass::init(AsyncWebServer& server)
 
     _server->addHandler(&_ws);
     _ws.onEvent(std::bind(&WebApiWsHuaweiLiveClass::onWebsocketEvent, this, _1, _2, _3, _4, _5, _6));
+
+    scheduler.addTask(_wsCleanupTask);
+    _wsCleanupTask.setCallback(std::bind(&WebApiWsHuaweiLiveClass::wsCleanupTaskCb, this));
+    _wsCleanupTask.setIterations(TASK_FOREVER);
+    _wsCleanupTask.setInterval(1 * TASK_SECOND);
+    _wsCleanupTask.enable();
+
+    scheduler.addTask(_sendDataTask);
+    _sendDataTask.setCallback(std::bind(&WebApiWsHuaweiLiveClass::sendDataTaskCb, this));
+    _sendDataTask.setIterations(TASK_FOREVER);
+    _sendDataTask.setInterval(1 * TASK_SECOND);
+    _sendDataTask.enable();
 }
 
-void WebApiWsHuaweiLiveClass::loop()
+void WebApiWsHuaweiLiveClass::wsCleanupTaskCb()
 {
     // see: https://github.com/me-no-dev/ESPAsyncWebServer#limiting-the-number-of-web-socket-clients
-    if (millis() - _lastWsCleanup > 1000) {
-        _ws.cleanupClients();
-        _lastWsCleanup = millis();
-    }
+    _ws.cleanupClients();
+}
 
+void WebApiWsHuaweiLiveClass::sendDataTaskCb()
+{
     // do nothing if no WS client is connected
     if (_ws.count() == 0) {
         return;
     }
-
-    if (millis() - _lastUpdateCheck < 1000) {
-        return;
-    }
-    _lastUpdateCheck = millis();
 
     try {
         std::lock_guard<std::mutex> lock(_mutex);

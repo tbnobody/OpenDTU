@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * Copyright (C) 2022 Thomas Basler and others
+ * Copyright (C) 2022-2024 Thomas Basler and others
  */
 #include "WebApi_powermeter.h"
 #include "VeDirectFrameHandler.h"
@@ -16,7 +16,7 @@
 #include "WebApi.h"
 #include "helper.h"
 
-void WebApiPowerMeterClass::init(AsyncWebServer& server)
+void WebApiPowerMeterClass::init(AsyncWebServer& server, Scheduler& scheduler)
 {
     using std::placeholders::_1;
 
@@ -26,10 +26,6 @@ void WebApiPowerMeterClass::init(AsyncWebServer& server)
     _server->on("/api/powermeter/config", HTTP_GET, std::bind(&WebApiPowerMeterClass::onAdminGet, this, _1));
     _server->on("/api/powermeter/config", HTTP_POST, std::bind(&WebApiPowerMeterClass::onAdminPost, this, _1));
     _server->on("/api/powermeter/testhttprequest", HTTP_POST, std::bind(&WebApiPowerMeterClass::onTestHttpRequest, this, _1));
-}
-
-void WebApiPowerMeterClass::loop()
-{
 }
 
 void WebApiPowerMeterClass::onStatus(AsyncWebServerRequest* request)

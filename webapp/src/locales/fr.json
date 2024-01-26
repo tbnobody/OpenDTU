@@ -38,7 +38,8 @@
         "Save": "Sauvegarder",
         "Refreshing": "Refreshing",
         "Pull": "Pull down to refresh",
-        "Release": "Release to refresh"
+        "Release": "Release to refresh",
+        "Close": "Fermer"
     },
     "localeswitcher": {
         "Dark": "Sombre",
@@ -125,7 +126,6 @@
         "UnreadMessages": "messages non lus",
         "Loading": "@:base.Loading",
         "EventLog": "Journal des événements",
-        "Close": "Fermer",
         "InverterInfo": "Informations sur l'onduleur",
         "LimitSettings": "Paramètres de la limite",
         "LastLimitSetStatus": "Statut de la dernière limite fixée",
@@ -229,10 +229,12 @@
         "FirmwareVersionHint": "Cliquez ici pour afficher des informations sur votre version actuelle",
         "FirmwareUpdate": "Mise à jour du firmware",
         "FirmwareUpdateHint": "Cliquez ici pour voir les changements entre votre version et la dernière version",
+        "FrmwareUpdateAllow": "En activant le contrôle de mise à jour, une demande est envoyée à GitHub.com à chaque fois que la page est consultée afin de récupérer la dernière version disponible. Si tu n'es pas d'accord, laisse cette fonction désactivée.",
         "ResetReason0": "Raison de la réinitialisation CPU 0",
         "ResetReason1": "Raison de la réinitialisation CPU 1",
         "ConfigSaveCount": "Nombre d'enregistrements de la configuration",
-        "Uptime": "Temps de fonctionnement"
+        "Uptime": "Durée de fonctionnement",
+        "UptimeValue": "0 jour {time} | 1 jour {time} | {count} jours {time}"
     },
     "hardwareinfo": {
         "HardwareInformation": "Informations sur le matériel",
@@ -371,10 +373,7 @@
     "inverterchannelinfo": {
         "String": "Ligne {num}",
         "Phase": "Phase {num}",
-        "General": "General",
-        "Property": "Propriété",
-        "Value": "Valeur",
-        "Unit": "Unité"
+        "General": "General"
     },
     "invertertotalinfo": {
         "InverterTotalYieldTotal": "Onduleurs rendement total",
@@ -422,7 +421,7 @@
         "CmtPaLevel": "CMT2300A Niveau de puissance d'émission",
         "NrfPaLevelHint": "Used for HM-Inverters. Assurez-vous que votre alimentation est suffisamment stable avant d'augmenter la puissance d'émission.",
         "CmtPaLevelHint": "Used for HMS/HMT-Inverters. Assurez-vous que votre alimentation est suffisamment stable avant d'augmenter la puissance d'émission.",
-        "CmtCountry": "Region/Country:",
+        "CmtCountry": "CMT2300A Region/Country:",
         "CmtCountryHint": "Each country has different frequency allocations.",
         "country_0": "Europe ({min}MHz - {max}MHz)",
         "country_1": "North America ({min}MHz - {max}MHz)",
@@ -683,7 +682,7 @@
         "Back": "Retour",
         "Retry": "Réessayer",
         "OtaStatus": "Statut OTA",
-        "OtaSuccess": "Succès de l'OTA. L'unité a été automatiquement redémarrée et sera à nouveau disponible dans quelques instants. N'oubliez pas de recharger l'interface web !",
+        "OtaSuccess": "Le téléchargement du firmware a réussi. L'appareil a été redémarré automatiquement. Lorsque l'appareil est à nouveau accessible, l'interface est automatiquement rechargée.",
         "FirmwareUpload": "Téléversement du firmware",
         "UploadProgress": "Progression du téléversement"
     },

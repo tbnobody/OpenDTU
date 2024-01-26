@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * Copyright (C) 2022 Thomas Basler and others
+ * Copyright (C) 2022-2024 Thomas Basler and others
  */
 #include "WebApi_ws_vedirect_live.h"
 #include "AsyncJson.h"
@@ -17,7 +17,7 @@ WebApiWsVedirectLiveClass::WebApiWsVedirectLiveClass()
 {
 }
 
-void WebApiWsVedirectLiveClass::init(AsyncWebServer& server)
+void WebApiWsVedirectLiveClass::init(AsyncWebServer& server, Scheduler& scheduler)
 {
     using std::placeholders::_1;
     using std::placeholders::_2;
@@ -31,16 +31,29 @@ void WebApiWsVedirectLiveClass::init(AsyncWebServer& server)
 
     _server->addHandler(&_ws);
     _ws.onEvent(std::bind(&WebApiWsVedirectLiveClass::onWebsocketEvent, this, _1, _2, _3, _4, _5, _6));
+
+    
+    scheduler.addTask(_wsCleanupTask);
+    _wsCleanupTask.setCallback(std::bind(&WebApiWsVedirectLiveClass::wsCleanupTaskCb, this));
+    _wsCleanupTask.setIterations(TASK_FOREVER);
+    _wsCleanupTask.setInterval(1 * TASK_SECOND);
+    _wsCleanupTask.enable();
+
+    scheduler.addTask(_sendDataTask);
+    _sendDataTask.setCallback(std::bind(&WebApiWsVedirectLiveClass::sendDataTaskCb, this));
+    _sendDataTask.setIterations(TASK_FOREVER);
+    _sendDataTask.setInterval(500 * TASK_MILLISECOND);
+    _sendDataTask.enable();
 }
 
-void WebApiWsVedirectLiveClass::loop()
+void WebApiWsVedirectLiveClass::wsCleanupTaskCb()
 {
     // see: https://github.com/me-no-dev/ESPAsyncWebServer#limiting-the-number-of-web-socket-clients
-    if (millis() - _lastWsCleanup > 1000) {
-        _ws.cleanupClients();
-        _lastWsCleanup = millis();
-    }
+    _ws.cleanupClients();
+}
 
+void WebApiWsVedirectLiveClass::sendDataTaskCb()
+{
     // do nothing if no WS client is connected
     if (_ws.count() == 0) {
         return;

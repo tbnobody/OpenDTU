@@ -3,13 +3,13 @@
 
 #include "ArduinoJson.h"
 #include <ESPAsyncWebServer.h>
+#include <TaskSchedulerDeclarations.h>
 #include <mutex>
 
 class WebApiWsBatteryLiveClass {
 public:
     WebApiWsBatteryLiveClass();
-    void init(AsyncWebServer& server);
-    void loop();
+    void init(AsyncWebServer& server, Scheduler& scheduler);
 
 private:
     void generateJsonResponse(JsonVariant& root);
@@ -19,9 +19,14 @@ private:
     AsyncWebServer* _server;
     AsyncWebSocket _ws;
 
-    uint32_t _lastWsCleanup = 0;
     uint32_t _lastUpdateCheck = 0;
     static constexpr uint16_t _responseSize = 1024 + 512;
 
     std::mutex _mutex;
+
+    Task _wsCleanupTask;
+    void wsCleanupTaskCb();
+
+    Task _sendDataTask;
+    void sendDataTaskCb();
 };

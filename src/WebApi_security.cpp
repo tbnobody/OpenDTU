@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * Copyright (C) 2022-2023 Thomas Basler and others
+ * Copyright (C) 2022-2024 Thomas Basler and others
  */
 #include "WebApi_security.h"
 #include "Configuration.h"
@@ -9,7 +9,7 @@
 #include "helper.h"
 #include <AsyncJson.h>
 
-void WebApiSecurityClass::init(AsyncWebServer& server)
+void WebApiSecurityClass::init(AsyncWebServer& server, Scheduler& scheduler)
 {
     using std::placeholders::_1;
 
@@ -18,10 +18,6 @@ void WebApiSecurityClass::init(AsyncWebServer& server)
     _server->on("/api/security/config", HTTP_GET, std::bind(&WebApiSecurityClass::onSecurityGet, this, _1));
     _server->on("/api/security/config", HTTP_POST, std::bind(&WebApiSecurityClass::onSecurityPost, this, _1));
     _server->on("/api/security/authenticate", HTTP_GET, std::bind(&WebApiSecurityClass::onAuthenticateGet, this, _1));
-}
-
-void WebApiSecurityClass::loop()
-{
 }
 
 void WebApiSecurityClass::onSecurityGet(AsyncWebServerRequest* request)

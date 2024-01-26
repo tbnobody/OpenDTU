@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * Copyright (C) 2023 Thomas Basler and others
+ * Copyright (C) 2023-2024 Thomas Basler and others
  */
 #include "Led_Single.h"
 #include "Configuration.h"
@@ -38,6 +38,8 @@ const uint8_t pwmTable[] = {
 #define LED_OFF 0
 
 LedSingleClass::LedSingleClass()
+    : _setTask(LEDSINGLE_UPDATE_INTERVAL * TASK_MILLISECOND, TASK_FOREVER, std::bind(&LedSingleClass::setLoop, this))
+    , _outputTask(TASK_IMMEDIATE, TASK_FOREVER, std::bind(&LedSingleClass::outputLoop, this))
 {
 }
 
@@ -62,14 +64,9 @@ void LedSingleClass::init(Scheduler& scheduler)
 
     if (ledActive) {
         scheduler.addTask(_outputTask);
-        _outputTask.setCallback(std::bind(&LedSingleClass::outputLoop, this));
-        _outputTask.setIterations(TASK_FOREVER);
         _outputTask.enable();
 
         scheduler.addTask(_setTask);
-        _setTask.setCallback(std::bind(&LedSingleClass::setLoop, this));
-        _setTask.setInterval(LEDSINGLE_UPDATE_INTERVAL * TASK_MILLISECOND);
-        _setTask.setIterations(TASK_FOREVER);
         _setTask.enable();
     }
 }

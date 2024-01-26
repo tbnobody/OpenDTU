@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * Copyright (C) 2022 Thomas Basler and others
+ * Copyright (C) 2022-2024 Thomas Basler and others
  */
 #include "WebApi_vedirect.h"
 #include "VictronMppt.h"
@@ -11,7 +11,7 @@
 #include "WebApi_errors.h"
 #include "helper.h"
 
-void WebApiVedirectClass::init(AsyncWebServer& server)
+void WebApiVedirectClass::init(AsyncWebServer& server, Scheduler& scheduler)
 {
     using std::placeholders::_1;
 
@@ -20,10 +20,6 @@ void WebApiVedirectClass::init(AsyncWebServer& server)
     _server->on("/api/vedirect/status", HTTP_GET, std::bind(&WebApiVedirectClass::onVedirectStatus, this, _1));
     _server->on("/api/vedirect/config", HTTP_GET, std::bind(&WebApiVedirectClass::onVedirectAdminGet, this, _1));
     _server->on("/api/vedirect/config", HTTP_POST, std::bind(&WebApiVedirectClass::onVedirectAdminPost, this, _1));
-}
-
-void WebApiVedirectClass::loop()
-{
 }
 
 void WebApiVedirectClass::onVedirectStatus(AsyncWebServerRequest* request)

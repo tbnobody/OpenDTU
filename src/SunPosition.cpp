@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * Copyright (C) 2023 Thomas Basler and others
+ * Copyright (C) 2023-2024 Thomas Basler and others
  */
 #include "SunPosition.h"
 #include "Configuration.h"
@@ -10,15 +10,13 @@
 SunPositionClass SunPosition;
 
 SunPositionClass::SunPositionClass()
+    : _loopTask(5 * TASK_SECOND, TASK_FOREVER, std::bind(&SunPositionClass::loop, this))
 {
 }
 
 void SunPositionClass::init(Scheduler& scheduler)
 {
     scheduler.addTask(_loopTask);
-    _loopTask.setCallback(std::bind(&SunPositionClass::loop, this));
-    _loopTask.setIterations(TASK_FOREVER);
-    _loopTask.setInterval(5 * TASK_SECOND);
     _loopTask.enable();
 }
 
