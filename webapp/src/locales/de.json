@@ -550,7 +550,7 @@
         "Back": "Zurück",
         "Retry": "Wiederholen",
         "OtaStatus": "OTA-Status",
-        "OtaSuccess": "Das Hochladen der Firmware war erfolgreich. Das Gerät wurde automatisch neu gestartet. Wenn das Gerät wieder erreichbar ist wird die automatisch Oberfläche neu geladen.",
+        "OtaSuccess": "Das Hochladen der Firmware war erfolgreich. Das Gerät wurde automatisch neu gestartet. Wenn das Gerät wieder erreichbar ist, wird die Oberfläche automatisch neu geladen.",
         "FirmwareUpload": "Firmware hochladen",
         "UploadProgress": "Hochlade-Fortschritt"
     },
