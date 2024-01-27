@@ -24,48 +24,46 @@ extern const uint8_t file_site_webmanifest_end[] asm("_binary_webapp_dist_site_w
 
 void WebApiWebappClass::init(AsyncWebServer& server, Scheduler& scheduler)
 {
-    _server = &server;
-
-    _server->on("/", HTTP_GET, [](AsyncWebServerRequest* request) {
+    server.on("/", HTTP_GET, [](AsyncWebServerRequest* request) {
         AsyncWebServerResponse* response = request->beginResponse_P(200, "text/html", file_index_html_start, file_index_html_end - file_index_html_start);
         response->addHeader("Content-Encoding", "gzip");
         request->send(response);
     });
 
-    _server->onNotFound([](AsyncWebServerRequest* request) {
+    server.onNotFound([](AsyncWebServerRequest* request) {
         AsyncWebServerResponse* response = request->beginResponse_P(200, "text/html", file_index_html_start, file_index_html_end - file_index_html_start);
         response->addHeader("Content-Encoding", "gzip");
         request->send(response);
     });
 
-    _server->on("/index.html", HTTP_GET, [](AsyncWebServerRequest* request) {
+    server.on("/index.html", HTTP_GET, [](AsyncWebServerRequest* request) {
         AsyncWebServerResponse* response = request->beginResponse_P(200, "text/html", file_index_html_start, file_index_html_end - file_index_html_start);
         response->addHeader("Content-Encoding", "gzip");
         request->send(response);
     });
 
-    _server->on("/favicon.ico", HTTP_GET, [](AsyncWebServerRequest* request) {
+    server.on("/favicon.ico", HTTP_GET, [](AsyncWebServerRequest* request) {
         AsyncWebServerResponse* response = request->beginResponse_P(200, "image/x-icon", file_favicon_ico_start, file_favicon_ico_end - file_favicon_ico_start);
         request->send(response);
     });
 
-    _server->on("/favicon.png", HTTP_GET, [](AsyncWebServerRequest* request) {
+    server.on("/favicon.png", HTTP_GET, [](AsyncWebServerRequest* request) {
         AsyncWebServerResponse* response = request->beginResponse_P(200, "image/png", file_favicon_png_start, file_favicon_png_end - file_favicon_png_start);
         request->send(response);
     });
 
-    _server->on("/zones.json", HTTP_GET, [](AsyncWebServerRequest* request) {
+    server.on("/zones.json", HTTP_GET, [](AsyncWebServerRequest* request) {
         AsyncWebServerResponse* response = request->beginResponse_P(200, "application/json", file_zones_json_start, file_zones_json_end - file_zones_json_start);
         response->addHeader("Content-Encoding", "gzip");
         request->send(response);
     });
 
-    _server->on("/site.webmanifest", HTTP_GET, [](AsyncWebServerRequest* request) {
+    server.on("/site.webmanifest", HTTP_GET, [](AsyncWebServerRequest* request) {
         AsyncWebServerResponse* response = request->beginResponse_P(200, "application/json", file_site_webmanifest_start, file_site_webmanifest_end - file_site_webmanifest_start);
         request->send(response);
     });
 
-    _server->on("/js/app.js", HTTP_GET, [](AsyncWebServerRequest* request) {
+    server.on("/js/app.js", HTTP_GET, [](AsyncWebServerRequest* request) {
 #ifdef ETAG_HTTP_HEADER_VAL
         // check client If-None-Match header vs ETag/AUTO_GIT_HASH
         bool eTagMatch = false;

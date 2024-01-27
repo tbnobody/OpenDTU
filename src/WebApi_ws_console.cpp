@@ -16,8 +16,7 @@ WebApiWsConsoleClass::WebApiWsConsoleClass()
 
 void WebApiWsConsoleClass::init(AsyncWebServer& server, Scheduler& scheduler)
 {
-    _server = &server;
-    _server->addHandler(&_ws);
+    server.addHandler(&_ws);
     MessageOutput.register_ws_output(&_ws);
 
     scheduler.addTask(_wsCleanupTask);

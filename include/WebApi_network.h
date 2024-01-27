@@ -12,6 +12,4 @@ private:
     void onNetworkStatus(AsyncWebServerRequest* request);
     void onNetworkAdminGet(AsyncWebServerRequest* request);
     void onNetworkAdminPost(AsyncWebServerRequest* request);
-
-    AsyncWebServer* _server;
 };

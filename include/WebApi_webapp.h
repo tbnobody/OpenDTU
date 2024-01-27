@@ -7,7 +7,4 @@
 class WebApiWebappClass {
 public:
     void init(AsyncWebServer& server, Scheduler& scheduler);
-
-private:
-    AsyncWebServer* _server;
 };

@@ -19,9 +19,7 @@ void WebApiFirmwareClass::init(AsyncWebServer& server, Scheduler& scheduler)
     using std::placeholders::_5;
     using std::placeholders::_6;
 
-    _server = &server;
-
-    _server->on("/api/firmware/update", HTTP_POST,
+    server.on("/api/firmware/update", HTTP_POST,
         std::bind(&WebApiFirmwareClass::onFirmwareUpdateFinish, this, _1),
         std::bind(&WebApiFirmwareClass::onFirmwareUpdateUpload, this, _1, _2, _3, _4, _5, _6));
 }
