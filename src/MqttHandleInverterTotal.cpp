@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * Copyright (C) 2023 Thomas Basler and others
+ * Copyright (C) 2023-2024 Thomas Basler and others
  */
 #include "MqttHandleInverterTotal.h"
 #include "Configuration.h"
@@ -10,11 +10,14 @@
 
 MqttHandleInverterTotalClass MqttHandleInverterTotal;
 
+MqttHandleInverterTotalClass::MqttHandleInverterTotalClass()
+    : _loopTask(TASK_IMMEDIATE, TASK_FOREVER, std::bind(&MqttHandleInverterTotalClass::loop, this))
+{
+}
+
 void MqttHandleInverterTotalClass::init(Scheduler& scheduler)
 {
     scheduler.addTask(_loopTask);
-    _loopTask.setCallback(std::bind(&MqttHandleInverterTotalClass::loop, this));
-    _loopTask.setIterations(TASK_FOREVER);
     _loopTask.setInterval(Configuration.get().Mqtt.PublishInterval * TASK_SECOND);
     _loopTask.enable();
 }

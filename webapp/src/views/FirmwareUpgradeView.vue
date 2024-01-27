@@ -37,9 +37,11 @@
             <span> {{ $t('firmwareupgrade.OtaSuccess') }} </span>
             <br />
             <br />
-            <button class="btn btn-primary" @click="clear">
-                <BIconArrowLeft /> {{ $t('firmwareupgrade.Back') }}
-            </button>
+            <div class="text-center">
+                <div class="spinner-border" role="status">
+                    <span class="visually-hidden"></span>
+                </div>
+            </div>
         </CardElement>
 
         <CardElement :text="$t('firmwareupgrade.FirmwareUpload')" textVariant="text-bg-primary" center-content
@@ -95,6 +97,7 @@ export default defineComponent({
             OTASuccess: false,
             type: "firmware",
             file: {} as Blob,
+            hostCheckInterval: 0
         };
     },
     methods: {
@@ -142,6 +145,7 @@ export default defineComponent({
                 // request.response will hold the response from the server
                 if (request.status === 200) {
                     this.OTASuccess = true;
+                    this.hostCheckInterval = setInterval(this.checkRemoteHostAndReload, 1000);
                 } else if (request.status !== 500) {
                     this.OTAError = `[HTTP ERROR] ${request.statusText}`;
                 } else {
@@ -181,6 +185,32 @@ export default defineComponent({
             this.OTAError = "";
             this.OTASuccess = false;
         },
+        checkRemoteHostAndReload(): void {
+            // Check if the browser is online
+            if (navigator.onLine) {
+                const remoteHostUrl = "/api/system/status";
+
+                // Use a simple fetch request to check if the remote host is reachable
+                fetch(remoteHostUrl, { method: 'HEAD' })
+                    .then(response => {
+                        // Check if the response status is OK (200-299 range)
+                        if (response.ok) {
+                            console.log('Remote host is available. Reloading page...');
+                            clearInterval(this.hostCheckInterval);
+                            this.hostCheckInterval = 0;
+                            // Perform a page reload
+                            window.location.replace("/");
+                        } else {
+                            console.log('Remote host is not reachable. Do something else if needed.');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error checking remote host:', error);
+                    });
+            } else {
+                console.log('Browser is offline. Cannot check remote host.');
+            }
+        },
     },
     mounted() {
         if (!isLoggedIn()) {
@@ -188,5 +218,8 @@ export default defineComponent({
         }
         this.loading = false;
     },
+    unmounted() {
+        clearInterval(this.hostCheckInterval);
+    }
 });
 </script>

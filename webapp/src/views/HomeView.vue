@@ -124,229 +124,122 @@
         </div>
     </BasePage>
 
-    <div class="modal" id="eventView" tabindex="-1">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">{{ $t('home.EventLog') }}</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <div class="text-center" v-if="eventLogLoading">
-                        <div class="spinner-border" role="status">
-                            <span class="visually-hidden">{{ $t('home.Loading') }}</span>
-                        </div>
-                    </div>
+    <ModalDialog modalId="eventView" :title="$t('home.EventLog')" :loading="eventLogLoading">
+        <EventLog :eventLogList="eventLogList" />
+    </ModalDialog>
 
-                    <EventLog v-if="!eventLogLoading" :eventLogList="eventLogList" />
-                </div>
+    <ModalDialog modalId="devInfoView" :title="$t('home.InverterInfo')" :loading="devInfoLoading">
+        <DevInfo :devInfoList="devInfoList" />
+    </ModalDialog>
 
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" @click="onHideEventlog"
-                        data-bs-dismiss="modal">{{ $t('home.Close') }}</button>
-                </div>
+    <ModalDialog modalId="gridProfileView" :title="$t('home.GridProfile')" :loading="gridProfileLoading">
+        <GridProfile :gridProfileList="gridProfileList" :gridProfileRawList="gridProfileRawList" />
+    </ModalDialog>
 
+    <ModalDialog modalId="limitSettingView" :title="$t('home.LimitSettings')" :loading="limitSettingLoading">
+        <BootstrapAlert v-model="showAlertLimit" :variant="alertTypeLimit">
+            {{ alertMessageLimit }}
+        </BootstrapAlert>
+
+        <div class="row mb-3">
+            <label for="inputCurrentLimit" class="col-sm-3 col-form-label">{{ $t('home.CurrentLimit') }}
+            </label>
+            <div class="col-sm-4">
+                <div class="input-group">
+                    <input type="text" class="form-control" id="inputCurrentLimit" aria-describedby="currentLimitType"
+                        v-model="currentLimitRelative" disabled />
+                    <span class="input-group-text" id="currentLimitType">%</span>
+                </div>
             </div>
-        </div>
-    </div>
 
-    <div class="modal" id="devInfoView" tabindex="-1">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">{{ $t('home.InverterInfo') }}</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <div class="text-center" v-if="devInfoLoading">
-                        <div class="spinner-border" role="status">
-                            <span class="visually-hidden">{{ $t('home.Loading') }}</span>
-                        </div>
-                    </div>
-
-                    <DevInfo v-if="!devInfoLoading" :devInfoList="devInfoList" />
-                </div>
-
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" @click="onHideDevInfo"
-                        data-bs-dismiss="modal">{{ $t('home.Close') }}</button>
+            <div class="col-sm-4" v-if="currentLimitList.max_power > 0">
+                <div class="input-group">
+                    <input type="text" class="form-control" id="inputCurrentLimitAbsolute"
+                        aria-describedby="currentLimitTypeAbsolute" v-model="currentLimitAbsolute" disabled />
+                    <span class="input-group-text" id="currentLimitTypeAbsolute">W</span>
                 </div>
             </div>
         </div>
-    </div>
 
-    <div class="modal" id="gridProfileView" tabindex="-1">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">{{ $t('home.GridProfile') }}</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <div class="text-center" v-if="gridProfileLoading">
-                        <div class="spinner-border" role="status">
-                            <span class="visually-hidden">{{ $t('home.Loading') }}</span>
-                        </div>
-                    </div>
-
-                    <GridProfile v-if="!gridProfileLoading" :gridProfileList="gridProfileList" :gridProfileRawList="gridProfileRawList" />
-                </div>
-
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" @click="onHideGridProfile"
-                        data-bs-dismiss="modal">{{ $t('home.Close') }}</button>
-                </div>
+        <div class="row mb-3 align-items-center">
+            <label for="inputLastLimitSet" class="col-sm-3 col-form-label">
+                {{ $t('home.LastLimitSetStatus') }}
+            </label>
+            <div class="col-sm-9">
+                <span class="badge" :class="{
+                    'text-bg-danger': currentLimitList.limit_set_status == 'Failure',
+                    'text-bg-warning': currentLimitList.limit_set_status == 'Pending',
+                    'text-bg-success': currentLimitList.limit_set_status == 'Ok',
+                    'text-bg-secondary': currentLimitList.limit_set_status == 'Unknown',
+                }">
+                    {{ $t('home.' + currentLimitList.limit_set_status) }}
+                </span>
             </div>
         </div>
-    </div>
 
-    <div class="modal" id="limitSettingView" ref="limitSettingView" tabindex="-1">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-                <form @submit="onSubmitLimit">
-                    <div class="modal-header">
-                        <h5 class="modal-title">{{ $t('home.LimitSettings') }}</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body">
-
-                        <BootstrapAlert v-model="showAlertLimit" :variant="alertTypeLimit">
-                            {{ alertMessageLimit }}
-                        </BootstrapAlert>
-                        <div class="text-center" v-if="limitSettingLoading">
-                            <div class="spinner-border" role="status">
-                                <span class="visually-hidden">{{ $t('home.Loading') }}</span>
-                            </div>
-                        </div>
-
-                        <template v-if="!limitSettingLoading">
-
-                            <div class="row mb-3">
-                                <label for="inputCurrentLimit" class="col-sm-3 col-form-label">{{ $t('home.CurrentLimit') }} </label>
-                                <div class="col-sm-4">
-                                    <div class="input-group">
-                                        <input type="text" class="form-control" id="inputCurrentLimit"
-                                            aria-describedby="currentLimitType" v-model="currentLimitRelative"
-                                            disabled />
-                                        <span class="input-group-text" id="currentLimitType">%</span>
-                                    </div>
-                                </div>
-
-                                <div class="col-sm-4" v-if="currentLimitList.max_power > 0">
-                                    <div class="input-group">
-                                        <input type="text" class="form-control" id="inputCurrentLimitAbsolute"
-                                            aria-describedby="currentLimitTypeAbsolute" v-model="currentLimitAbsolute"
-                                            disabled />
-                                        <span class="input-group-text" id="currentLimitTypeAbsolute">W</span>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="row mb-3 align-items-center">
-                                <label for="inputLastLimitSet" class="col-sm-3 col-form-label">
-                                    {{ $t('home.LastLimitSetStatus') }}
-                                </label>
-                                <div class="col-sm-9">
-                                    <span class="badge" :class="{
-                                        'text-bg-danger': currentLimitList.limit_set_status == 'Failure',
-                                        'text-bg-warning': currentLimitList.limit_set_status == 'Pending',
-                                        'text-bg-success': currentLimitList.limit_set_status == 'Ok',
-                                        'text-bg-secondary': currentLimitList.limit_set_status == 'Unknown',
-                                    }">
-                                        {{ $t('home.' + currentLimitList.limit_set_status) }}
-                                    </span>
-                                </div>
-                            </div>
-
-                            <div class="row mb-3">
-                                <label for="inputTargetLimit" class="col-sm-3 col-form-label">{{ $t('home.SetLimit') }}</label>
-                                <div class="col-sm-9">
-                                    <div class="input-group">
-                                        <input type="number" name="inputTargetLimit" class="form-control"
-                                            id="inputTargetLimit" :min="targetLimitMin" :max="targetLimitMax"
-                                            v-model="targetLimitList.limit_value">
-                                        <button class="btn btn-primary dropdown-toggle" type="button"
-                                            data-bs-toggle="dropdown" aria-expanded="false">{{ targetLimitTypeText
-                                            }}</button>
-                                        <ul class="dropdown-menu dropdown-menu-end">
-                                            <li><a class="dropdown-item" @click="onSelectType(1)" href="#">{{ $t('home.Relative') }}</a></li>
-                                            <li><a class="dropdown-item" @click="onSelectType(0)" href="#">{{ $t('home.Absolute') }}</a></li>
-                                        </ul>
-                                    </div>
-                                    <div v-if="targetLimitType == 0" class="alert alert-secondary mt-3" role="alert" v-html="$t('home.LimitHint')"></div>
-                                </div>
-                            </div>
-                        </template>
-
-                    </div>
-
-                    <div class="modal-footer">
-                        <button type="submit" class="btn btn-danger" @click="onSetLimitSettings(true)">{{ $t('home.SetPersistent') }}</button>
-
-                        <button type="submit" class="btn btn-danger" @click="onSetLimitSettings(false)">{{ $t('home.SetNonPersistent') }}</button>
-
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ $t('home.Close') }}</button>
-                    </div>
-                </form>
+        <div class="row mb-3">
+            <label for="inputTargetLimit" class="col-sm-3 col-form-label">{{ $t('home.SetLimit')
+            }}</label>
+            <div class="col-sm-9">
+                <div class="input-group">
+                    <input type="number" name="inputTargetLimit" class="form-control" id="inputTargetLimit"
+                        :min="targetLimitMin" :max="targetLimitMax" v-model="targetLimitList.limit_value">
+                    <button class="btn btn-primary dropdown-toggle" type="button" data-bs-toggle="dropdown"
+                        aria-expanded="false">{{ targetLimitTypeText
+                        }}</button>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li><a class="dropdown-item" @click="onSelectType(1)" href="#">{{
+                            $t('home.Relative') }}</a></li>
+                        <li><a class="dropdown-item" @click="onSelectType(0)" href="#">{{
+                            $t('home.Absolute') }}</a></li>
+                    </ul>
+                </div>
+                <div v-if="targetLimitType == 0" class="alert alert-secondary mt-3" role="alert"
+                    v-html="$t('home.LimitHint')"></div>
             </div>
         </div>
-    </div>
 
-    <div class="modal" id="powerSettingView" ref="powerSettingView" tabindex="-1">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">{{ $t('home.PowerSettings') }}</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
+        <template #footer>
+            <button type="button" class="btn btn-danger" @click="onSetLimitSettings(true)">{{
+                $t('home.SetPersistent') }}</button>
 
-                    <BootstrapAlert v-model="showAlertPower" :variant="alertTypePower">
-                        {{ alertMessagePower }}
-                    </BootstrapAlert>
-                    <div class="text-center" v-if="powerSettingLoading">
-                        <div class="spinner-border" role="status">
-                            <span class="visually-hidden">{{ $t('home.Loading') }}</span>
-                        </div>
-                    </div>
+            <button type="button" class="btn btn-danger" @click="onSetLimitSettings(false)">{{
+                $t('home.SetNonPersistent') }}</button>
+        </template>
+    </ModalDialog>
 
-                    <template v-if="!powerSettingLoading">
-                        <div class="row mb-3 align-items-center">
-                            <label for="inputLastPowerSet" class="col col-form-label">{{ $t('home.LastPowerSetStatus') }}</label>
-                            <div class="col">
-                                <span class="badge" :class="{
-                                    'text-bg-danger': successCommandPower == 'Failure',
-                                    'text-bg-warning': successCommandPower == 'Pending',
-                                    'text-bg-success': successCommandPower == 'Ok',
-                                    'text-bg-secondary': successCommandPower == 'Unknown',
-                                }">
-                                    {{ $t('home.' + successCommandPower) }}
-                                </span>
-                            </div>
-                        </div>
+    <ModalDialog modalId="powerSettingView" :title="$t('home.PowerSettings')" :loading="powerSettingLoading">
+        <BootstrapAlert v-model="showAlertPower" :variant="alertTypePower">
+            {{ alertMessagePower }}
+        </BootstrapAlert>
 
-                        <div class="d-grid gap-2 col-6 mx-auto">
-                            <button type="button" class="btn btn-success" @click="onSetPowerSettings(true)">
-                                <BIconToggleOn class="fs-4" />&nbsp;{{ $t('home.TurnOn') }}
-                            </button>
-                            <button type="button" class="btn btn-danger" @click="onSetPowerSettings(false)">
-                                <BIconToggleOff class="fs-4" />&nbsp;{{ $t('home.TurnOff') }}
-                            </button>
-                            <button type="button" class="btn btn-warning" @click="onSetPowerSettings(true, true)">
-                                <BIconArrowCounterclockwise class="fs-4" />&nbsp;{{ $t('home.Restart') }}
-                            </button>
-                        </div>
-                    </template>
-
-                </div>
-
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ $t('home.Close') }}</button>
-                </div>
+        <div class="row mb-3 align-items-center">
+            <label for="inputLastPowerSet" class="col col-form-label">{{ $t('home.LastPowerSetStatus')
+            }}</label>
+            <div class="col">
+                <span class="badge" :class="{
+                        'text-bg-danger': successCommandPower == 'Failure',
+                        'text-bg-warning': successCommandPower == 'Pending',
+                        'text-bg-success': successCommandPower == 'Ok',
+                        'text-bg-secondary': successCommandPower == 'Unknown',
+                    }">
+                    {{ $t('home.' + successCommandPower) }}
+                </span>
             </div>
         </div>
-    </div>
 
+        <div class="d-grid gap-2 col-6 mx-auto">
+            <button type="button" class="btn btn-success" @click="onSetPowerSettings(true)">
+                <BIconToggleOn class="fs-4" />&nbsp;{{ $t('home.TurnOn') }}
+            </button>
+            <button type="button" class="btn btn-danger" @click="onSetPowerSettings(false)">
+                <BIconToggleOff class="fs-4" />&nbsp;{{ $t('home.TurnOff') }}
+            </button>
+            <button type="button" class="btn btn-warning" @click="onSetPowerSettings(true, true)">
+                <BIconArrowCounterclockwise class="fs-4" />&nbsp;{{ $t('home.Restart') }}
+            </button>
+        </div>
+    </ModalDialog>
 </template>
 
 <script lang="ts">
@@ -358,6 +251,7 @@ import GridProfile from '@/components/GridProfile.vue';
 import HintView from '@/components/HintView.vue';
 import InverterChannelInfo from "@/components/InverterChannelInfo.vue";
 import InverterTotalInfo from '@/components/InverterTotalInfo.vue';
+import ModalDialog from '@/components/ModalDialog.vue';
 import type { DevInfoStatus } from '@/types/DevInfoStatus';
 import type { EventlogItems } from '@/types/EventlogStatus';
 import type { GridProfileStatus } from '@/types/GridProfileStatus';
@@ -392,6 +286,7 @@ export default defineComponent({
         HintView,
         InverterChannelInfo,
         InverterTotalInfo,
+        ModalDialog,
         BIconArrowCounterclockwise,
         BIconCheckCircleFill,
         BIconCpu,
@@ -435,7 +330,6 @@ export default defineComponent({
             targetLimitMax: 100,
             targetLimitTypeText: this.$t('home.Relative'),
             targetLimitType: 1,
-            targetLimitPersistent: false,
 
             alertMessageLimit: "",
             alertTypeLimit: "info",
@@ -469,9 +363,6 @@ export default defineComponent({
         this.gridProfileView = new bootstrap.Modal('#gridProfileView');
         this.limitSettingView = new bootstrap.Modal('#limitSettingView');
         this.powerSettingView = new bootstrap.Modal('#powerSettingView');
-
-        (this.$refs.limitSettingView as HTMLElement).addEventListener("hide.bs.modal", this.onHideLimitSettings);
-        (this.$refs.powerSettingView as HTMLElement).addEventListener("hide.bs.modal", this.onHidePowerSettings);
     },
     unmounted() {
         this.closeSocket();
@@ -509,14 +400,14 @@ export default defineComponent({
                 'decimalTwoDigits');
         },
         inverterData(): Inverter[] {
-            return this.liveData.inverters.slice().sort((a : Inverter, b: Inverter) => {
+            return this.liveData.inverters.slice().sort((a: Inverter, b: Inverter) => {
                 return a.order - b.order;
             });
         }
     },
     methods: {
         isLoggedIn,
-        getInitialData(triggerLoading : boolean = true) {
+        getInitialData(triggerLoading: boolean = true) {
             if (triggerLoading) {
                 this.dataLoading = true;
             }
@@ -568,7 +459,7 @@ export default defineComponent({
                 self.isWebsocketConnected = true;
             };
 
-            this.socket.onclose = function() {
+            this.socket.onclose = function () {
                 console.log("Connection to websocket closed...")
                 self.isWebsocketConnected = false;
             }
@@ -605,9 +496,6 @@ export default defineComponent({
             this.heartInterval && clearTimeout(this.heartInterval);
             this.isFirstFetchAfterConnect = true;
         },
-        onHideEventlog() {
-            this.eventLogView.hide();
-        },
         onShowEventlog(serial: number) {
             this.eventLogLoading = true;
             fetch("/api/eventlog/status?inv=" + serial + "&locale=" + this.$i18n.locale, { headers: authHeader() })
@@ -618,9 +506,6 @@ export default defineComponent({
                 });
 
             this.eventLogView.show();
-        },
-        onHideDevInfo() {
-            this.devInfoView.hide();
         },
         onShowDevInfo(serial: number) {
             this.devInfoLoading = true;
@@ -634,9 +519,6 @@ export default defineComponent({
 
             this.devInfoView.show();
         },
-        onHideGridProfile() {
-            this.devInfoView.hide();
-        },
         onShowGridProfile(serial: number) {
             this.gridProfileLoading = true;
             fetch("/api/gridprofile/status?inv=" + serial, { headers: authHeader() })
@@ -645,19 +527,17 @@ export default defineComponent({
                     this.gridProfileList = data;
 
                     fetch("/api/gridprofile/rawdata?inv=" + serial, { headers: authHeader() })
-                    .then((response) => handleResponse(response, this.$emitter, this.$router))
-                    .then((data) => {
-                        this.gridProfileRawList = data;
-                        this.gridProfileLoading = false;
-                    })
+                        .then((response) => handleResponse(response, this.$emitter, this.$router))
+                        .then((data) => {
+                            this.gridProfileRawList = data;
+                            this.gridProfileLoading = false;
+                        })
                 });
 
             this.gridProfileView.show();
         },
-        onHideLimitSettings() {
-            this.showAlertLimit = false;
-        },
         onShowLimitSettings(serial: number) {
+            this.showAlertLimit = false;
             this.targetLimitList.serial = 0;
             this.targetLimitList.limit_value = 0;
             this.targetLimitType = 1;
@@ -674,10 +554,8 @@ export default defineComponent({
 
             this.limitSettingView.show();
         },
-        onSubmitLimit(e: Event) {
-            e.preventDefault();
-
-            this.targetLimitList.limit_type = (this.targetLimitPersistent ? 256 : 0) + this.targetLimitType
+        onSetLimitSettings(setPersistent: boolean) {
+            this.targetLimitList.limit_type = (setPersistent ? 256 : 0) + this.targetLimitType
             const formData = new FormData();
             formData.append("data", JSON.stringify(this.targetLimitList));
 
@@ -701,9 +579,6 @@ export default defineComponent({
                     }
                 )
         },
-        onSetLimitSettings(setPersistent: boolean) {
-            this.targetLimitPersistent = setPersistent;
-        },
         onSelectType(type: number) {
             if (type == 1) {
                 this.targetLimitTypeText = this.$t('home.Relative');
@@ -718,6 +593,8 @@ export default defineComponent({
         },
 
         onShowPowerSettings(serial: number) {
+            this.showAlertPower = false;
+            this.powerSettingSerial = 0;
             this.powerSettingLoading = true;
             fetch("/api/power/status", { headers: authHeader() })
                 .then((response) => handleResponse(response, this.$emitter, this.$router))
@@ -727,11 +604,6 @@ export default defineComponent({
                     this.powerSettingLoading = false;
                 });
             this.powerSettingView.show();
-        },
-
-        onHidePowerSettings() {
-            this.powerSettingSerial = 0;
-            this.showAlertPower = false;
         },
 
         onSetPowerSettings(turnOn: boolean, restart = false) {

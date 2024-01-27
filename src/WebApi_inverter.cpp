@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * Copyright (C) 2022-2023 Thomas Basler and others
+ * Copyright (C) 2022-2024 Thomas Basler and others
  */
 #include "WebApi_inverter.h"
 #include "Configuration.h"
@@ -12,7 +12,7 @@
 #include <AsyncJson.h>
 #include <Hoymiles.h>
 
-void WebApiInverterClass::init(AsyncWebServer& server)
+void WebApiInverterClass::init(AsyncWebServer& server, Scheduler& scheduler)
 {
     using std::placeholders::_1;
 
@@ -23,10 +23,6 @@ void WebApiInverterClass::init(AsyncWebServer& server)
     _server->on("/api/inverter/edit", HTTP_POST, std::bind(&WebApiInverterClass::onInverterEdit, this, _1));
     _server->on("/api/inverter/del", HTTP_POST, std::bind(&WebApiInverterClass::onInverterDelete, this, _1));
     _server->on("/api/inverter/order", HTTP_POST, std::bind(&WebApiInverterClass::onInverterOrder, this, _1));
-}
-
-void WebApiInverterClass::loop()
-{
 }
 
 void WebApiInverterClass::onInverterList(AsyncWebServerRequest* request)

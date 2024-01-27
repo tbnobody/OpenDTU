@@ -9,7 +9,12 @@
 #include <AsyncJson.h>
 #include <Hoymiles.h>
 
-void WebApiDtuClass::init(AsyncWebServer& server)
+WebApiDtuClass::WebApiDtuClass()
+    : _applyDataTask(TASK_IMMEDIATE, TASK_ONCE, std::bind(&WebApiDtuClass::applyDataTaskCb, this))
+{
+}
+
+void WebApiDtuClass::init(AsyncWebServer& server, Scheduler& scheduler)
 {
     using std::placeholders::_1;
 
@@ -17,22 +22,21 @@ void WebApiDtuClass::init(AsyncWebServer& server)
 
     _server->on("/api/dtu/config", HTTP_GET, std::bind(&WebApiDtuClass::onDtuAdminGet, this, _1));
     _server->on("/api/dtu/config", HTTP_POST, std::bind(&WebApiDtuClass::onDtuAdminPost, this, _1));
+
+    scheduler.addTask(_applyDataTask);
 }
 
-void WebApiDtuClass::loop()
+void WebApiDtuClass::applyDataTaskCb()
 {
-    if (_performReload) {
-        // Execute stuff in main thread to avoid busy SPI bus
-        CONFIG_T& config = Configuration.get();
-        Hoymiles.getRadioNrf()->setPALevel((rf24_pa_dbm_e)config.Dtu.Nrf.PaLevel);
-        Hoymiles.getRadioCmt()->setPALevel(config.Dtu.Cmt.PaLevel);
-        Hoymiles.getRadioNrf()->setDtuSerial(config.Dtu.Serial);
-        Hoymiles.getRadioCmt()->setDtuSerial(config.Dtu.Serial);
-        Hoymiles.getRadioCmt()->setCountryMode(static_cast<CountryModeId_t>(config.Dtu.Cmt.CountryMode));
-        Hoymiles.getRadioCmt()->setInverterTargetFrequency(config.Dtu.Cmt.Frequency);
-        Hoymiles.setPollInterval(config.Dtu.PollInterval);
-        _performReload = false;
-    }
+    // Execute stuff in main thread to avoid busy SPI bus
+    CONFIG_T& config = Configuration.get();
+    Hoymiles.getRadioNrf()->setPALevel((rf24_pa_dbm_e)config.Dtu.Nrf.PaLevel);
+    Hoymiles.getRadioCmt()->setPALevel(config.Dtu.Cmt.PaLevel);
+    Hoymiles.getRadioNrf()->setDtuSerial(config.Dtu.Serial);
+    Hoymiles.getRadioCmt()->setDtuSerial(config.Dtu.Serial);
+    Hoymiles.getRadioCmt()->setCountryMode(static_cast<CountryModeId_t>(config.Dtu.Cmt.CountryMode));
+    Hoymiles.getRadioCmt()->setInverterTargetFrequency(config.Dtu.Cmt.Frequency);
+    Hoymiles.setPollInterval(config.Dtu.PollInterval);
 }
 
 void WebApiDtuClass::onDtuAdminGet(AsyncWebServerRequest* request)
@@ -196,5 +200,5 @@ void WebApiDtuClass::onDtuAdminPost(AsyncWebServerRequest* request)
     response->setLength();
     request->send(response);
 
-    _performReload = true;
+    _applyDataTask.enable();
 }

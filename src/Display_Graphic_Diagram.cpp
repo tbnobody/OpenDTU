@@ -8,6 +8,8 @@
 #include <algorithm>
 
 DisplayGraphicDiagramClass::DisplayGraphicDiagramClass()
+    : _averageTask(1 * TASK_SECOND, TASK_FOREVER, std::bind(&DisplayGraphicDiagramClass::averageLoop, this))
+    , _dataPointTask(TASK_IMMEDIATE, TASK_FOREVER, std::bind(&DisplayGraphicDiagramClass::dataPointLoop, this))
 {
 }
 
@@ -16,14 +18,9 @@ void DisplayGraphicDiagramClass::init(Scheduler& scheduler, U8G2* display)
     _display = display;
 
     scheduler.addTask(_averageTask);
-    _averageTask.setCallback(std::bind(&DisplayGraphicDiagramClass::averageLoop, this));
-    _averageTask.setIterations(TASK_FOREVER);
-    _averageTask.setInterval(1 * TASK_SECOND);
     _averageTask.enable();
 
     scheduler.addTask(_dataPointTask);
-    _dataPointTask.setCallback(std::bind(&DisplayGraphicDiagramClass::dataPointLoop, this));
-    _dataPointTask.setIterations(TASK_FOREVER);
     updatePeriod();
     _dataPointTask.enable();
 }
@@ -58,7 +55,7 @@ uint32_t DisplayGraphicDiagramClass::getSecondsPerDot()
 void DisplayGraphicDiagramClass::updatePeriod()
 {
     //  Calculate seconds per datapoint
-    _dataPointTask.setInterval(Configuration.get().Display.Diagram.Duration * TASK_SECOND / MAX_DATAPOINTS );
+    _dataPointTask.setInterval(Configuration.get().Display.Diagram.Duration * TASK_SECOND / MAX_DATAPOINTS);
 }
 
 void DisplayGraphicDiagramClass::redraw(uint8_t screenSaverOffsetX, uint8_t xPos, uint8_t yPos, uint8_t width, uint8_t height, bool isFullscreen)
@@ -110,7 +107,9 @@ void DisplayGraphicDiagramClass::redraw(uint8_t screenSaverOffsetX, uint8_t xPos
 
     if (maxWatts > 0 && isFullscreen) {
         // draw y axis ticks
-        const uint16_t yAxisWattPerTick = maxWatts <= 100 ? 10 : maxWatts <= 1000 ? 100 : maxWatts < 5000 ? 500 : 1000;
+        const uint16_t yAxisWattPerTick = maxWatts <= 100 ? 10 : maxWatts <= 1000 ? 100
+            : maxWatts < 5000                                                     ? 500
+                                                                                  : 1000;
         const uint8_t yAxisTickSizePixel = height / (maxWatts / yAxisWattPerTick);
 
         for (int16_t tickYPos = graphPosY + height; tickYPos > graphPosY - arrow_size; tickYPos -= yAxisTickSizePixel) {

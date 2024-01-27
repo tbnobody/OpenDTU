@@ -1,0 +1,47 @@
+[
+    {
+        "name": "Olimex ESP32-Gateway",
+        "nrf24": {
+            "miso": 14,
+            "mosi": 13,
+            "clk": 12,
+            "irq": 15,
+            "en": 2,
+            "cs": 4
+        },
+        "eth": {
+            "enabled": true,
+            "phy_addr": 0,
+            "power": 12,
+            "mdc": 23,
+            "mdio": 18,
+            "type": 0,
+            "clk_mode": 3
+        }
+    },
+    {
+        "name": "Olimex ESP32-Gateway with SSH1106",
+        "nrf24": {
+            "miso": 14,
+            "mosi": 13,
+            "clk": 12,
+            "irq": 15,
+            "en": 2,
+            "cs": 4
+        },
+        "eth": {
+            "enabled": true,
+            "phy_addr": 0,
+            "power": 12,
+            "mdc": 23,
+            "mdio": 18,
+            "type": 0,
+            "clk_mode": 3
+        },
+        "display": {
+            "type": 3,
+            "data": 32,
+            "clk": 16
+        }
+    }
+]

@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * Copyright (C) 2022-2023 Thomas Basler and others
+ * Copyright (C) 2022-2024 Thomas Basler and others
  */
 #include "WebApi_mqtt.h"
 #include "Configuration.h"
@@ -11,7 +11,7 @@
 #include "helper.h"
 #include <AsyncJson.h>
 
-void WebApiMqttClass::init(AsyncWebServer& server)
+void WebApiMqttClass::init(AsyncWebServer& server, Scheduler& scheduler)
 {
     using std::placeholders::_1;
 
@@ -20,10 +20,6 @@ void WebApiMqttClass::init(AsyncWebServer& server)
     _server->on("/api/mqtt/status", HTTP_GET, std::bind(&WebApiMqttClass::onMqttStatus, this, _1));
     _server->on("/api/mqtt/config", HTTP_GET, std::bind(&WebApiMqttClass::onMqttAdminGet, this, _1));
     _server->on("/api/mqtt/config", HTTP_POST, std::bind(&WebApiMqttClass::onMqttAdminPost, this, _1));
-}
-
-void WebApiMqttClass::loop()
-{
 }
 
 void WebApiMqttClass::onMqttStatus(AsyncWebServerRequest* request)

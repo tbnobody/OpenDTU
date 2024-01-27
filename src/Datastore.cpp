@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * Copyright (C) 2023 Thomas Basler and others
+ * Copyright (C) 2023-2024 Thomas Basler and others
  */
 #include "Datastore.h"
 #include "Configuration.h"
@@ -8,12 +8,14 @@
 
 DatastoreClass Datastore;
 
+DatastoreClass::DatastoreClass()
+    : _loopTask(1 * TASK_SECOND, TASK_FOREVER, std::bind(&DatastoreClass::loop, this))
+{
+}
+
 void DatastoreClass::init(Scheduler& scheduler)
 {
     scheduler.addTask(_loopTask);
-    _loopTask.setCallback(std::bind(&DatastoreClass::loop, this));
-    _loopTask.setIterations(TASK_FOREVER);
-    _loopTask.setInterval(1 * TASK_SECOND);
     _loopTask.enable();
 }
 

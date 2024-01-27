@@ -25,6 +25,12 @@
 
 InverterSettingsClass InverterSettings;
 
+InverterSettingsClass::InverterSettingsClass()
+    : _settingsTask(INVERTER_UPDATE_SETTINGS_INTERVAL, TASK_FOREVER, std::bind(&InverterSettingsClass::settingsLoop, this))
+    , _hoyTask(TASK_IMMEDIATE, TASK_FOREVER, std::bind(&InverterSettingsClass::hoyLoop, this))
+{
+}
+
 void InverterSettingsClass::init(Scheduler& scheduler)
 {
     const CONFIG_T& config = Configuration.get();
@@ -91,14 +97,9 @@ void InverterSettingsClass::init(Scheduler& scheduler)
     }
 
     scheduler.addTask(_hoyTask);
-    _hoyTask.setCallback(std::bind(&InverterSettingsClass::hoyLoop, this));
-    _hoyTask.setIterations(TASK_FOREVER);
     _hoyTask.enable();
 
     scheduler.addTask(_settingsTask);
-    _settingsTask.setCallback(std::bind(&InverterSettingsClass::settingsLoop, this));
-    _settingsTask.setIterations(TASK_FOREVER);
-    _settingsTask.setInterval(INVERTER_UPDATE_SETTINGS_INTERVAL);
     _settingsTask.enable();
 }
 
@@ -119,7 +120,7 @@ void InverterSettingsClass::settingsLoop()
         inv->setEnablePolling(inv_cfg.Poll_Enable && (SunPosition.isDayPeriod() || inv_cfg.Poll_Enable_Night));
         inv->setEnableCommands(inv_cfg.Command_Enable && (SunPosition.isDayPeriod() || inv_cfg.Command_Enable_Night));
     }
- }
+}
 
 void InverterSettingsClass::hoyLoop()
 {

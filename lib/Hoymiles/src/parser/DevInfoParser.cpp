@@ -137,6 +137,14 @@ time_t DevInfoParser::getFwBuildDateTime() const
     return timegm(&timeinfo);
 }
 
+String DevInfoParser::getFwBuildDateTimeStr() const
+{
+    char timebuffer[32];
+    const time_t t = getFwBuildDateTime();
+    std::strftime(timebuffer, sizeof(timebuffer), "%Y-%m-%d %H:%M:%S", gmtime(&t));
+    return timebuffer;
+}
+
 uint16_t DevInfoParser::getFwBootloaderVersion() const
 {
     HOY_SEMAPHORE_TAKE();

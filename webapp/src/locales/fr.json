@@ -29,7 +29,8 @@
         "Save": "Sauvegarder",
         "Refreshing": "Refreshing",
         "Pull": "Pull down to refresh",
-        "Release": "Release to refresh"
+        "Release": "Release to refresh",
+        "Close": "Fermer"
     },
     "localeswitcher": {
         "Dark": "Sombre",
@@ -116,7 +117,6 @@
         "UnreadMessages": "messages non lus",
         "Loading": "@:base.Loading",
         "EventLog": "Journal des événements",
-        "Close": "Fermer",
         "InverterInfo": "Informations sur l'onduleur",
         "LimitSettings": "Paramètres de la limite",
         "LastLimitSetStatus": "Statut de la dernière limite fixée",
@@ -185,6 +185,7 @@
         "FirmwareVersionHint": "Cliquez ici pour afficher des informations sur votre version actuelle",
         "FirmwareUpdate": "Mise à jour du firmware",
         "FirmwareUpdateHint": "Cliquez ici pour voir les changements entre votre version et la dernière version",
+        "FrmwareUpdateAllow": "En activant le contrôle de mise à jour, une demande est envoyée à GitHub.com à chaque fois que la page est consultée afin de récupérer la dernière version disponible. Si tu n'es pas d'accord, laisse cette fonction désactivée.",
         "ResetReason0": "Raison de la réinitialisation CPU 0",
         "ResetReason1": "Raison de la réinitialisation CPU 1",
         "ConfigSaveCount": "Nombre d'enregistrements de la configuration",
@@ -549,7 +550,7 @@
         "Back": "Retour",
         "Retry": "Réessayer",
         "OtaStatus": "Statut OTA",
-        "OtaSuccess": "Succès de l'OTA. L'unité a été automatiquement redémarrée et sera à nouveau disponible dans quelques instants. N'oubliez pas de recharger l'interface web !",
+        "OtaSuccess": "Le téléchargement du firmware a réussi. L'appareil a été redémarré automatiquement. Lorsque l'appareil est à nouveau accessible, l'interface est automatiquement rechargée.",
         "FirmwareUpload": "Téléversement du firmware",
         "UploadProgress": "Progression du téléversement"
     },

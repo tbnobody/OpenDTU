@@ -6,6 +6,7 @@
 
 class MqttHandleDtuClass {
 public:
+    MqttHandleDtuClass();
     void init(Scheduler& scheduler);
 
 private:

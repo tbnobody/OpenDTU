@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * Copyright (C) 2022-2023 Thomas Basler and others
+ * Copyright (C) 2022-2024 Thomas Basler and others
  */
 #include "WebApi_ws_live.h"
 #include "Configuration.h"
@@ -13,10 +13,12 @@
 
 WebApiWsLiveClass::WebApiWsLiveClass()
     : _ws("/livedata")
+    , _wsCleanupTask(1 * TASK_SECOND, TASK_FOREVER, std::bind(&WebApiWsLiveClass::wsCleanupTaskCb, this))
+    , _sendDataTask(1 * TASK_SECOND, TASK_FOREVER, std::bind(&WebApiWsLiveClass::sendDataTaskCb, this))
 {
 }
 
-void WebApiWsLiveClass::init(AsyncWebServer& server)
+void WebApiWsLiveClass::init(AsyncWebServer& server, Scheduler& scheduler)
 {
     using std::placeholders::_1;
     using std::placeholders::_2;
@@ -30,33 +32,37 @@ void WebApiWsLiveClass::init(AsyncWebServer& server)
 
     _server->addHandler(&_ws);
     _ws.onEvent(std::bind(&WebApiWsLiveClass::onWebsocketEvent, this, _1, _2, _3, _4, _5, _6));
+
+    scheduler.addTask(_wsCleanupTask);
+    _wsCleanupTask.enable();
+
+    scheduler.addTask(_sendDataTask);
+    _sendDataTask.enable();
 }
 
-void WebApiWsLiveClass::loop()
+void WebApiWsLiveClass::wsCleanupTaskCb()
 {
     // see: https://github.com/me-no-dev/ESPAsyncWebServer#limiting-the-number-of-web-socket-clients
-    if (millis() - _lastWsCleanup > 1000) {
-        _ws.cleanupClients();
-        _lastWsCleanup = millis();
-    }
+    _ws.cleanupClients();
 
+    if (Configuration.get().Security.AllowReadonly) {
+        _ws.setAuthentication("", "");
+    } else {
+        _ws.setAuthentication(AUTH_USERNAME, Configuration.get().Security.Password);
+    }
+}
+
+void WebApiWsLiveClass::sendDataTaskCb()
+{
     // do nothing if no WS client is connected
     if (_ws.count() == 0) {
         return;
     }
 
-    if (millis() - _lastInvUpdateCheck < 1000) {
-        return;
-    }
-    _lastInvUpdateCheck = millis();
-
     uint32_t maxTimeStamp = 0;
     for (uint8_t i = 0; i < Hoymiles.getNumInverters(); i++) {
         auto inv = Hoymiles.getInverterByPos(i);
-
-        if (inv->Statistics()->getLastUpdate() > maxTimeStamp) {
-            maxTimeStamp = inv->Statistics()->getLastUpdate();
-        }
+        maxTimeStamp = std::max<uint32_t>(maxTimeStamp, inv->Statistics()->getLastUpdate());
     }
 
     // Update on every inverter change or at least after 10 seconds
@@ -72,13 +78,8 @@ void WebApiWsLiveClass::loop()
                 String buffer;
                 serializeJson(root, buffer);
 
-                if (Configuration.get().Security.AllowReadonly) {
-                    _ws.setAuthentication("", "");
-                } else {
-                    _ws.setAuthentication(AUTH_USERNAME, Configuration.get().Security.Password);
-                }
-
                 _ws.textAll(buffer);
+                _newestInverterTimestamp = maxTimeStamp;
             }
 
         } catch (const std::bad_alloc& bad_alloc) {
@@ -129,25 +130,25 @@ void WebApiWsLiveClass::generateJsonResponse(JsonVariant& root)
                 if (t == TYPE_DC) {
                     chanTypeObj[String(static_cast<uint8_t>(c))]["name"]["u"] = inv_cfg->channel[c].Name;
                 }
-                addField(chanTypeObj, i, inv, t, c, FLD_PAC);
-                addField(chanTypeObj, i, inv, t, c, FLD_UAC);
-                addField(chanTypeObj, i, inv, t, c, FLD_IAC);
+                addField(chanTypeObj, inv, t, c, FLD_PAC);
+                addField(chanTypeObj, inv, t, c, FLD_UAC);
+                addField(chanTypeObj, inv, t, c, FLD_IAC);
                 if (t == TYPE_AC) {
-                    addField(chanTypeObj, i, inv, t, c, FLD_PDC, "Power DC");
+                    addField(chanTypeObj, inv, t, c, FLD_PDC, "Power DC");
                 } else {
-                    addField(chanTypeObj, i, inv, t, c, FLD_PDC);
+                    addField(chanTypeObj, inv, t, c, FLD_PDC);
                 }
-                addField(chanTypeObj, i, inv, t, c, FLD_UDC);
-                addField(chanTypeObj, i, inv, t, c, FLD_IDC);
-                addField(chanTypeObj, i, inv, t, c, FLD_YD);
-                addField(chanTypeObj, i, inv, t, c, FLD_YT);
-                addField(chanTypeObj, i, inv, t, c, FLD_F);
-                addField(chanTypeObj, i, inv, t, c, FLD_T);
-                addField(chanTypeObj, i, inv, t, c, FLD_PF);
-                addField(chanTypeObj, i, inv, t, c, FLD_Q);
-                addField(chanTypeObj, i, inv, t, c, FLD_EFF);
+                addField(chanTypeObj, inv, t, c, FLD_UDC);
+                addField(chanTypeObj, inv, t, c, FLD_IDC);
+                addField(chanTypeObj, inv, t, c, FLD_YD);
+                addField(chanTypeObj, inv, t, c, FLD_YT);
+                addField(chanTypeObj, inv, t, c, FLD_F);
+                addField(chanTypeObj, inv, t, c, FLD_T);
+                addField(chanTypeObj, inv, t, c, FLD_PF);
+                addField(chanTypeObj, inv, t, c, FLD_Q);
+                addField(chanTypeObj, inv, t, c, FLD_EFF);
                 if (t == TYPE_DC && inv->Statistics()->getStringMaxPower(c) > 0) {
-                    addField(chanTypeObj, i, inv, t, c, FLD_IRR);
+                    addField(chanTypeObj, inv, t, c, FLD_IRR);
                     chanTypeObj[String(c)][inv->Statistics()->getChannelFieldName(t, c, FLD_IRR)]["max"] = inv->Statistics()->getStringMaxPower(c);
                 }
             }
@@ -157,10 +158,6 @@ void WebApiWsLiveClass::generateJsonResponse(JsonVariant& root)
             invObject["events"] = inv->EventLog()->getEntryCount();
         } else {
             invObject["events"] = -1;
-        }
-
-        if (inv->Statistics()->getLastUpdate() > _newestInverterTimestamp) {
-            _newestInverterTimestamp = inv->Statistics()->getLastUpdate();
         }
     }
 
@@ -180,7 +177,7 @@ void WebApiWsLiveClass::generateJsonResponse(JsonVariant& root)
     }
 }
 
-void WebApiWsLiveClass::addField(JsonObject& root, uint8_t idx, std::shared_ptr<InverterAbstract> inv, const ChannelType_t type, const ChannelNum_t channel, const FieldId_t fieldId, String topic)
+void WebApiWsLiveClass::addField(JsonObject& root, std::shared_ptr<InverterAbstract> inv, const ChannelType_t type, const ChannelNum_t channel, const FieldId_t fieldId, String topic)
 {
     if (inv->Statistics()->hasChannelFieldValue(type, channel, fieldId)) {
         String chanName;

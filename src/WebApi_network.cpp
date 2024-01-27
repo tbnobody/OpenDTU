@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * Copyright (C) 2022-2023 Thomas Basler and others
+ * Copyright (C) 2022-2024 Thomas Basler and others
  */
 #include "WebApi_network.h"
 #include "Configuration.h"
@@ -10,7 +10,7 @@
 #include "helper.h"
 #include <AsyncJson.h>
 
-void WebApiNetworkClass::init(AsyncWebServer& server)
+void WebApiNetworkClass::init(AsyncWebServer& server, Scheduler& scheduler)
 {
     using std::placeholders::_1;
 
@@ -19,10 +19,6 @@ void WebApiNetworkClass::init(AsyncWebServer& server)
     _server->on("/api/network/status", HTTP_GET, std::bind(&WebApiNetworkClass::onNetworkStatus, this, _1));
     _server->on("/api/network/config", HTTP_GET, std::bind(&WebApiNetworkClass::onNetworkAdminGet, this, _1));
     _server->on("/api/network/config", HTTP_POST, std::bind(&WebApiNetworkClass::onNetworkAdminPost, this, _1));
-}
-
-void WebApiNetworkClass::loop()
-{
 }
 
 void WebApiNetworkClass::onNetworkStatus(AsyncWebServerRequest* request)
