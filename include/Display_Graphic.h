@@ -20,6 +20,7 @@ enum DisplayType_t {
     SSD1306,
     SH1106,
     SSD1309,
+    ST7567_GM12864I_59N,
     DisplayType_Max,
 };
 
