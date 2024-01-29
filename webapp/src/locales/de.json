@@ -136,7 +136,8 @@
         "Ok": "Ok",
         "Unknown": "Unbekannt",
         "ShowGridProfile": "Zeige Grid Profil",
-        "GridProfile": "Grid Profil"
+        "GridProfile": "Grid Profil",
+        "LoadingInverter": "Warte auf Daten... (kann bis zu 10 Sekunden dauern)"
     },
     "eventlog": {
         "Start": "Begin",
