@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 #pragma once
 
+#include "Display.h"
 #include "Display_Graphic_Diagram.h"
 #include "defaults.h"
 #include <TaskSchedulerDeclarations.h>
@@ -13,23 +14,6 @@
 // (text of Y-axis is display left of that pos)
 #define CHART_POSX 80
 #define CHART_POSY 0
-
-enum DisplayType_t {
-    None,
-    PCD8544,
-    SSD1306,
-    SH1106,
-    SSD1309,
-    ST7567_GM12864I_59N,
-    DisplayType_Max,
-};
-
-enum DiagramMode_t {
-    Off,
-    Small,
-    Fullscreen,
-    DisplayMode_Max,
-};
 
 class DisplayGraphicClass {
 public:
@@ -75,4 +59,4 @@ private:
     uint8_t _lineOffsets[5];
 };
 
-extern DisplayGraphicClass Display;
+extern DisplayGraphicClass DisplayGraphic;

@@ -276,4 +276,4 @@ void DisplayGraphicClass::setStatus(const bool turnOn)
     _displayTurnedOn = turnOn;
 }
 
-DisplayGraphicClass Display;
+DisplayGraphicClass DisplayGraphic;

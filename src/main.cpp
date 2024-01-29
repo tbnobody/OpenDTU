@@ -4,7 +4,7 @@
  */
 #include "Configuration.h"
 #include "Datastore.h"
-#include "Display_Graphic.h"
+#include "Display.h"
 #include "InverterSettings.h"
 #include "Led_Single.h"
 #include "MessageOutput.h"
@@ -24,6 +24,9 @@
 #include <Arduino.h>
 #include <LittleFS.h>
 #include <TaskScheduler.h>
+
+void displayTask(void*);
+TaskHandle_t displayTaskHandle;
 
 void setup()
 {
@@ -111,23 +114,7 @@ void setup()
     WebApi.init(scheduler);
     MessageOutput.println("done");
 
-    // Initialize Display
-    MessageOutput.print("Initialize Display... ");
-    Display.init(
-        scheduler,
-        static_cast<DisplayType_t>(pin.display_type),
-        pin.display_data,
-        pin.display_clk,
-        pin.display_cs,
-        pin.display_reset);
-    Display.setOrientation(config.Display.Rotation);
-    Display.enablePowerSafe = config.Display.PowerSafe;
-    Display.enableScreensaver = config.Display.ScreenSaver;
-    Display.setContrast(config.Display.Contrast);
-    Display.setLanguage(config.Display.Language);
-    Display.setDiagramMode(static_cast<DiagramMode_t>(config.Display.Diagram.Mode));
-    Display.setStartupDisplay();
-    MessageOutput.println("done");
+
 
     // Initialize Single LEDs
     MessageOutput.print("Initialize LEDs... ");
@@ -150,9 +137,33 @@ void setup()
     InverterSettings.init(scheduler);
 
     Datastore.init(scheduler);
+
+    // Initialize Display
+    MessageOutput.print("Initialize Display... ");
+    Display.init(
+        scheduler,
+        static_cast<DisplayType_t>(pin.display_type),
+        pin.display_data,
+        pin.display_clk,
+        pin.display_cs,
+        pin.display_reset,
+        pin.display_busy,
+        pin.display_dc);
+    Display.setOrientation(config.Display.Rotation);
+    Display.setEnablePowerSafe(config.Display.PowerSafe);
+    Display.setEnableScreensaver(config.Display.ScreenSaver);
+    Display.setContrast(config.Display.Contrast);
+    Display.setLanguage(config.Display.Language);
+    Display.setUpdatePeriod(config.Display.UpdatePeriod);
+    Display.setDiagramMode(static_cast<DiagramMode_t>(config.Display.Diagram.Mode));
+    Display.setStartupDisplay();
+    MessageOutput.println("done");
 }
 
 void loop()
 {
     scheduler.execute();
+}
+void displayTask(void* pvParameters)
+{
 }
