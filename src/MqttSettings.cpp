@@ -125,7 +125,7 @@ void MqttSettingsClass::performConnect()
             } else {
                 static_cast<espMqttClientSecure*>(_mqttClient)->setCredentials(config.Mqtt.Username, config.Mqtt.Password);
             }
-            static_cast<espMqttClientSecure*>(_mqttClient)->setWill(willTopic.c_str(), 2, config.Mqtt.Retain, config.Mqtt.Lwt.Value_Offline);
+            static_cast<espMqttClientSecure*>(_mqttClient)->setWill(willTopic.c_str(), config.Mqtt.Lwt.Qos, config.Mqtt.Retain, config.Mqtt.Lwt.Value_Offline);
             static_cast<espMqttClientSecure*>(_mqttClient)->setClientId(clientId.c_str());
             static_cast<espMqttClientSecure*>(_mqttClient)->setCleanSession(config.Mqtt.CleanSession);
             static_cast<espMqttClientSecure*>(_mqttClient)->onConnect(std::bind(&MqttSettingsClass::onMqttConnect, this, _1));
