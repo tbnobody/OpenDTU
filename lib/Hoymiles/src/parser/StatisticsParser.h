@@ -60,7 +60,8 @@ enum {
     CALC_CH_UDC,
     CALC_TOTAL_PDC,
     CALC_TOTAL_EFF,
-    CALC_CH_IRR
+    CALC_CH_IRR,
+    CALC_TOTAL_IAC
 };
 enum { CMD_CALC = 0xffff };
 
