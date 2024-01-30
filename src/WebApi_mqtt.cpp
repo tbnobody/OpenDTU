@@ -79,7 +79,7 @@ void WebApiMqttClass::onMqttAdminGet(AsyncWebServerRequest* request)
     root["mqtt_client_cert"] = config.Mqtt.Tls.ClientCert;
     root["mqtt_client_key"] = config.Mqtt.Tls.ClientKey;
     root["mqtt_lwt_topic"] = config.Mqtt.Lwt.Topic;
-    root["mqtt_lwt_online"] = config.Mqtt.CleanSession;
+    root["mqtt_lwt_online"] = config.Mqtt.Lwt.Value_Online;;
     root["mqtt_lwt_offline"] = config.Mqtt.Lwt.Value_Offline;
     root["mqtt_lwt_qos"] = config.Mqtt.Lwt.Qos;
     root["mqtt_publish_interval"] = config.Mqtt.PublishInterval;
