@@ -152,7 +152,7 @@ void WebApiWsLiveClass::generateInverterChannelJsonResponse(JsonObject& root, st
             addField(chanTypeObj, inv, t, c, FLD_PAC);
             addField(chanTypeObj, inv, t, c, FLD_UAC);
             addField(chanTypeObj, inv, t, c, FLD_IAC);
-            if (t == TYPE_AC) {
+            if (t == TYPE_INV) {
                 addField(chanTypeObj, inv, t, c, FLD_PDC, "Power DC");
             } else {
                 addField(chanTypeObj, inv, t, c, FLD_PDC);

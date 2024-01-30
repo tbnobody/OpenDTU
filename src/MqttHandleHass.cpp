@@ -107,7 +107,7 @@ void MqttHandleHassClass::publishInverterField(std::shared_ptr<InverterAbstract>
     const String serial = inv->serialString();
 
     String fieldName;
-    if (type == TYPE_AC && fieldType.fieldId == FLD_PDC) {
+    if (type == TYPE_INV && fieldType.fieldId == FLD_PDC) {
         fieldName = "PowerDC";
     } else {
         fieldName = inv->Statistics()->getChannelFieldName(type, channel, fieldType.fieldId);
