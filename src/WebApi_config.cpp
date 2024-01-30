@@ -108,7 +108,7 @@ void WebApiConfigClass::onConfigDelete(AsyncWebServerRequest* request)
     response->setLength();
     request->send(response);
 
-    LittleFS.remove(CONFIG_FILENAME);
+    Utils::removeAllFiles();
     Utils::restartDtu();
 }
 
