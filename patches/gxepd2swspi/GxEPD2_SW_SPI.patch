@@ -1,0 +1,361 @@
+diff --git a/.pio/libdeps/$$$env$$$/GxEPD2/src/GxEPD2_EPD.cpp b/.pio/libdeps/$$$env$$$/GxEPD2/src/GxEPD2_EPD.cpp
+index 1588444..592869b 100644
+--- a/.pio/libdeps/$$$env$$$/GxEPD2/src/GxEPD2_EPD.cpp
++++ b/.pio/libdeps/$$$env$$$/GxEPD2/src/GxEPD2_EPD.cpp
+@@ -19,9 +19,9 @@
+ 
+ GxEPD2_EPD::GxEPD2_EPD(int16_t cs, int16_t dc, int16_t rst, int16_t busy, int16_t busy_level, uint32_t busy_timeout,
+                        uint16_t w, uint16_t h, GxEPD2::Panel p, bool c, bool pu, bool fpu) :
+-  WIDTH(w), HEIGHT(h), panel(p), hasColor(c), hasPartialUpdate(pu), hasFastPartialUpdate(fpu),
++  WIDTH(w), HEIGHT(h), panel(p), hasColor(c), hasPartialUpdate(pu), hasFastPartialUpdate(fpu), _sck(-1), _mosi(-1),
+   _cs(cs), _dc(dc), _rst(rst), _busy(busy), _busy_level(busy_level), _busy_timeout(busy_timeout), _diag_enabled(false),
+-  _pSPIx(&SPI), _spi_settings(4000000, MSBFIRST, SPI_MODE0)
++  _spi_settings(4000000, MSBFIRST, SPI_MODE0)
+ {
+   _initial_write = true;
+   _initial_refresh = true;
+@@ -67,27 +67,30 @@ void GxEPD2_EPD::init(uint32_t serial_diag_bitrate, bool initial, uint16_t reset
+   {
+     pinMode(_busy, INPUT);
+   }
+-  _pSPIx->begin();
+-  if (_busy == MISO) // may be overridden
+-  {
+-    pinMode(_busy, INPUT);
+-  }
+-  if (_dc == MISO) // may be overridden, TTGO T5 V2.66
+-  {
+-    pinMode(_dc, OUTPUT);
+-  }
+-  if (_cs == MISO) // may be overridden
++  if (_sck < 0) SPI.begin();
++}
++
++void GxEPD2_EPD::init(int16_t sck, int16_t mosi, uint32_t serial_diag_bitrate, bool initial, uint16_t reset_duration, bool pulldown_rst_mode)
++{
++  if ((sck >= 0) && (mosi >= 0))
+   {
+-    pinMode(_cs, INPUT);
+-  }
++    _sck = sck;
++    _mosi = mosi;
++    digitalWrite(_sck, LOW);
++    digitalWrite(_mosi, LOW);
++    pinMode(_sck, OUTPUT);
++    pinMode(_mosi, OUTPUT);
++  } else _sck = -1;
++  init(serial_diag_bitrate, initial, reset_duration, pulldown_rst_mode);
+ }
+ 
+ void GxEPD2_EPD::end()
+ {
+-  _pSPIx->end();
+   if (_cs >= 0) pinMode(_cs, INPUT);
+   if (_dc >= 0) pinMode(_dc, INPUT);
+   if (_rst >= 0) pinMode(_rst, INPUT);
++  if (_sck >= 0) pinMode(_sck, INPUT);
++  if (_mosi >= 0) pinMode(_mosi, INPUT);
+ }
+ 
+ void GxEPD2_EPD::setBusyCallback(void (*busyCallback)(const void*), const void* busy_callback_parameter)
+@@ -96,12 +99,6 @@ void GxEPD2_EPD::setBusyCallback(void (*busyCallback)(const void*), const void*
+   _busy_callback_parameter = busy_callback_parameter;
+ }
+ 
+-void GxEPD2_EPD::selectSPI(SPIClass& spi, SPISettings spi_settings)
+-{
+-  _pSPIx = &spi;
+-  _spi_settings = spi_settings;
+-}
+-
+ void GxEPD2_EPD::_reset()
+ {
+   if (_rst >= 0)
+@@ -168,115 +165,201 @@ void GxEPD2_EPD::_waitWhileBusy(const char* comment, uint16_t busy_time)
+ 
+ void GxEPD2_EPD::_writeCommand(uint8_t c)
+ {
+-  _pSPIx->beginTransaction(_spi_settings);
++  _beginTransaction(_spi_settings);
+   if (_dc >= 0) digitalWrite(_dc, LOW);
+   if (_cs >= 0) digitalWrite(_cs, LOW);
+-  _pSPIx->transfer(c);
++  _spi_write(c);
+   if (_cs >= 0) digitalWrite(_cs, HIGH);
+   if (_dc >= 0) digitalWrite(_dc, HIGH);
+-  _pSPIx->endTransaction();
++  _endTransaction();
+ }
+ 
+ void GxEPD2_EPD::_writeData(uint8_t d)
+ {
+-  _pSPIx->beginTransaction(_spi_settings);
++  _beginTransaction(_spi_settings);
+   if (_cs >= 0) digitalWrite(_cs, LOW);
+-  _pSPIx->transfer(d);
++  _spi_write(d);
+   if (_cs >= 0) digitalWrite(_cs, HIGH);
+-  _pSPIx->endTransaction();
++  _endTransaction();
+ }
+ 
+ void GxEPD2_EPD::_writeData(const uint8_t* data, uint16_t n)
+ {
+-  _pSPIx->beginTransaction(_spi_settings);
++  _beginTransaction(_spi_settings);
+   if (_cs >= 0) digitalWrite(_cs, LOW);
+-  for (uint16_t i = 0; i < n; i++)
++  for (uint8_t i = 0; i < n; i++)
+   {
+-    _pSPIx->transfer(*data++);
++    _spi_write(*data++);
+   }
+   if (_cs >= 0) digitalWrite(_cs, HIGH);
+-  _pSPIx->endTransaction();
++  _endTransaction();
+ }
+ 
+ void GxEPD2_EPD::_writeDataPGM(const uint8_t* data, uint16_t n, int16_t fill_with_zeroes)
+ {
+-  _pSPIx->beginTransaction(_spi_settings);
++  _beginTransaction(_spi_settings);
+   if (_cs >= 0) digitalWrite(_cs, LOW);
+-  for (uint16_t i = 0; i < n; i++)
++  for (uint8_t i = 0; i < n; i++)
+   {
+-    _pSPIx->transfer(pgm_read_byte(&*data++));
++    _spi_write(pgm_read_byte(&*data++));
+   }
+   while (fill_with_zeroes > 0)
+   {
+-    _pSPIx->transfer(0x00);
++    _spi_write(0x00);
+     fill_with_zeroes--;
+   }
+   if (_cs >= 0) digitalWrite(_cs, HIGH);
+-  _pSPIx->endTransaction();
++  _endTransaction();
+ }
+ 
+ void GxEPD2_EPD::_writeDataPGM_sCS(const uint8_t* data, uint16_t n, int16_t fill_with_zeroes)
+ {
+-  _pSPIx->beginTransaction(_spi_settings);
++  _beginTransaction(_spi_settings);
+   for (uint8_t i = 0; i < n; i++)
+   {
+     if (_cs >= 0) digitalWrite(_cs, LOW);
+-    _pSPIx->transfer(pgm_read_byte(&*data++));
++    _spi_write(pgm_read_byte(&*data++));
+     if (_cs >= 0) digitalWrite(_cs, HIGH);
+   }
+   while (fill_with_zeroes > 0)
+   {
+     if (_cs >= 0) digitalWrite(_cs, LOW);
+-    _pSPIx->transfer(0x00);
++    _spi_write(0x00);
+     fill_with_zeroes--;
+     if (_cs >= 0) digitalWrite(_cs, HIGH);
+   }
+-  _pSPIx->endTransaction();
++  _endTransaction();
+ }
+ 
+ void GxEPD2_EPD::_writeCommandData(const uint8_t* pCommandData, uint8_t datalen)
+ {
+-  _pSPIx->beginTransaction(_spi_settings);
++  _beginTransaction(_spi_settings);
+   if (_dc >= 0) digitalWrite(_dc, LOW);
+   if (_cs >= 0) digitalWrite(_cs, LOW);
+-  _pSPIx->transfer(*pCommandData++);
++  _spi_write(*pCommandData++);
+   if (_dc >= 0) digitalWrite(_dc, HIGH);
+   for (uint8_t i = 0; i < datalen - 1; i++)  // sub the command
+   {
+-    _pSPIx->transfer(*pCommandData++);
++    _spi_write(*pCommandData++);
+   }
+   if (_cs >= 0) digitalWrite(_cs, HIGH);
+-  _pSPIx->endTransaction();
++  _endTransaction();
+ }
+ 
+ void GxEPD2_EPD::_writeCommandDataPGM(const uint8_t* pCommandData, uint8_t datalen)
+ {
+-  _pSPIx->beginTransaction(_spi_settings);
++  _beginTransaction(_spi_settings);
+   if (_dc >= 0) digitalWrite(_dc, LOW);
+   if (_cs >= 0) digitalWrite(_cs, LOW);
+-  _pSPIx->transfer(pgm_read_byte(&*pCommandData++));
++  _spi_write(pgm_read_byte(&*pCommandData++));
+   if (_dc >= 0) digitalWrite(_dc, HIGH);
+   for (uint8_t i = 0; i < datalen - 1; i++)  // sub the command
+   {
+-    _pSPIx->transfer(pgm_read_byte(&*pCommandData++));
++    _spi_write(pgm_read_byte(&*pCommandData++));
+   }
+   if (_cs >= 0) digitalWrite(_cs, HIGH);
+-  _pSPIx->endTransaction();
++  _endTransaction();
+ }
+ 
+ void GxEPD2_EPD::_startTransfer()
+ {
+-  _pSPIx->beginTransaction(_spi_settings);
++  _beginTransaction(_spi_settings);
+   if (_cs >= 0) digitalWrite(_cs, LOW);
+ }
+ 
+ void GxEPD2_EPD::_transfer(uint8_t value)
+ {
+-  _pSPIx->transfer(value);
++  _spi_write(value);
+ }
+ 
+ void GxEPD2_EPD::_endTransfer()
+ {
+   if (_cs >= 0) digitalWrite(_cs, HIGH);
+-  _pSPIx->endTransaction();
++  _endTransaction();
++}
++
++void GxEPD2_EPD::_beginTransaction(const SPISettings& settings)
++{
++  if (_sck < 0) SPI.beginTransaction(settings);
++}
++
++void GxEPD2_EPD::_spi_write(uint8_t data)
++{
++  if (_sck < 0) SPI.transfer(data);
++  else
++  {
++#if defined (ESP8266)
++    yield();
++#endif
++    for (int i = 0; i < 8; i++)
++    {
++      digitalWrite(_mosi, (data & 0x80) ? HIGH : LOW);
++      data <<= 1;
++      digitalWrite(_sck, HIGH);
++      digitalWrite(_sck, LOW);
++    }
++  }
++}
++
++void GxEPD2_EPD::_endTransaction()
++{
++  if (_sck < 0) SPI.endTransaction();
++}
++
++uint8_t GxEPD2_EPD::_readData()
++{
++  uint8_t data = 0;
++  _beginTransaction(_spi_settings);
++  if (_cs >= 0) digitalWrite(_cs, LOW);
++  if (_sck < 0)
++  {
++    data = SPI.transfer(0);
++  }
++  else
++  {
++    pinMode(_mosi, INPUT);
++    for (int i = 0; i < 8; i++)
++    {
++      data <<= 1;
++      digitalWrite(_sck, HIGH);
++      data |= digitalRead(_mosi);
++      digitalWrite(_sck, LOW);
++    }
++    pinMode(_mosi, OUTPUT);
++  }
++  if (_cs >= 0) digitalWrite(_cs, HIGH);
++  _endTransaction();
++  return data;
++}
++
++void GxEPD2_EPD::_readData(uint8_t* data, uint16_t n)
++{
++  _beginTransaction(_spi_settings);
++  if (_cs >= 0) digitalWrite(_cs, LOW);
++  if (_sck < 0)
++  {
++    for (uint8_t i = 0; i < n; i++)
++    {
++      *data++ = SPI.transfer(0);
++    }
++  }
++  else
++  {
++    pinMode(_mosi, INPUT);
++    for (uint8_t i = 0; i < n; i++)
++    {
++      *data = 0;
++      for (int i = 0; i < 8; i++)
++      {
++        *data <<= 1;
++        digitalWrite(_sck, HIGH);
++        *data |= digitalRead(_mosi);
++        digitalWrite(_sck, LOW);
++      }
++      data++;
++    }
++    pinMode(_mosi, OUTPUT);
++  }
++  if (_cs >= 0) digitalWrite(_cs, HIGH);
++  _endTransaction();
+ }
+diff --git a/.pio/libdeps/$$$env$$$/GxEPD2/src/GxEPD2_EPD.h b/.pio/libdeps/$$$env$$$/GxEPD2/src/GxEPD2_EPD.h
+index ef2318f..50aa961 100644
+--- a/.pio/libdeps/$$$env$$$/GxEPD2/src/GxEPD2_EPD.h
++++ b/.pio/libdeps/$$$env$$$/GxEPD2/src/GxEPD2_EPD.h
+@@ -8,6 +8,10 @@
+ // Version: see library.properties
+ //
+ // Library: https://github.com/ZinggJM/GxEPD2
++// To use SW SPI with GxEPD2:
++//   add the special call to the added init method BEFORE the normal init method:
++//   display.epd2.init(SW_SCK, SW_MOSI, 115200, true, 20, false); // define or replace SW_SCK, SW_MOSI
++//   display.init(115200); // needed to init upper level
+ 
+ #ifndef _GxEPD2_EPD_H_
+ #define _GxEPD2_EPD_H_
+@@ -35,6 +39,7 @@ class GxEPD2_EPD
+                uint16_t w, uint16_t h, GxEPD2::Panel p, bool c, bool pu, bool fpu);
+     virtual void init(uint32_t serial_diag_bitrate = 0); // serial_diag_bitrate = 0 : disabled
+     virtual void init(uint32_t serial_diag_bitrate, bool initial, uint16_t reset_duration = 10, bool pulldown_rst_mode = false);
++    virtual void init(int16_t sck, int16_t mosi, uint32_t serial_diag_bitrate, bool initial, uint16_t reset_duration = 20, bool pulldown_rst_mode = false);
+     virtual void end(); // release SPI and control pins
+     //  Support for Bitmaps (Sprites) to Controller Buffer and to Screen
+     virtual void clearScreen(uint8_t value) = 0; // init controller memory and screen (default white)
+@@ -97,7 +102,6 @@ class GxEPD2_EPD
+     {
+       return (a > b ? a : b);
+     };
+-    void selectSPI(SPIClass& spi, SPISettings spi_settings);
+   protected:
+     void _reset();
+     void _waitWhileBusy(const char* comment = 0, uint16_t busy_time = 5000);
+@@ -111,16 +115,21 @@ class GxEPD2_EPD
+     void _startTransfer();
+     void _transfer(uint8_t value);
+     void _endTransfer();
++    void _beginTransaction(const SPISettings& settings);
++    void _spi_write(uint8_t data);
++    void _endTransaction();
++  public:
++    uint8_t _readData();
++    void _readData(uint8_t* data, uint16_t n);
+   protected:
+-    int16_t _cs, _dc, _rst, _busy, _busy_level;
++    int16_t _sck, _mosi, _cs, _dc, _rst, _busy, _busy_level;
+     uint32_t _busy_timeout;
+     bool _diag_enabled, _pulldown_rst_mode;
+-    SPIClass* _pSPIx;
+     SPISettings _spi_settings;
+     bool _initial_write, _initial_refresh;
+     bool _power_is_on, _using_partial_mode, _hibernating;
+     uint16_t _reset_duration;
+-    void (*_busy_callback)(const void*); 
++    void (*_busy_callback)(const void*);
+     const void* _busy_callback_parameter;
+ };
+ 
