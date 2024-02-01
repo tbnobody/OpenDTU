@@ -21,6 +21,7 @@ private:
     Task _loopTask;
 
     uint32_t _lastPublishStats[INV_MAX_COUNT] = { 0 };
+    uint32_t _lastPublish = 0;
 
     FieldId_t _publishFields[14] = {
         FLD_UDC,

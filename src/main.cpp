@@ -159,6 +159,7 @@ void setup()
 void loop()
 {
     scheduler.execute();
+    yield();
     ModbusDtu.loop();
     yield();
 }

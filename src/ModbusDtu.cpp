@@ -1,5 +1,5 @@
-#include "ModbusDtu.h"
 #include "Datastore.h"
+#include "ModbusDtu.h"
 
 ModbusIP mb;
 
@@ -55,8 +55,8 @@ void ModbusDtuClass::init()
 
 void ModbusDtuClass::loop()
 {
-    if (!(Configuration.get().Fronius.Fronius_SM_Simulation_Enabled))
-        return;
+    //  if (!(Configuration.get().Fronius.Fronius_SM_Simulation_Enabled))
+    //    return;
     if (!_isstarted) {
         if (Datastore.getIsAllEnabledReachable() && Datastore.getTotalAcYieldTotalEnabled() != 0) {
             ModbusDtu.init();
