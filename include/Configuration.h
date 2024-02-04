@@ -143,6 +143,7 @@ struct CONFIG_T {
         bool ScreenSaver;
         uint8_t Rotation;
         uint8_t Contrast;
+        uint8_t Backlight;
         uint8_t Language;
         struct {
             uint32_t Duration;

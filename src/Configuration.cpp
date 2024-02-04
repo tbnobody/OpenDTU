@@ -109,6 +109,7 @@ bool ConfigurationClass::write()
     display["screensaver"] = config.Display.ScreenSaver;
     display["rotation"] = config.Display.Rotation;
     display["contrast"] = config.Display.Contrast;
+    display["backlight"] = config.Display.Backlight;
     display["language"] = config.Display.Language;
     display["diagram_duration"] = config.Display.Diagram.Duration;
     display["diagram_mode"] = config.Display.Diagram.Mode;
@@ -278,6 +279,7 @@ bool ConfigurationClass::read()
     config.Display.ScreenSaver = display["screensaver"] | DISPLAY_SCREENSAVER;
     config.Display.Rotation = display["rotation"] | DISPLAY_ROTATION;
     config.Display.Contrast = display["contrast"] | DISPLAY_CONTRAST;
+    config.Display.Backlight = display["backlight"] | DISPLAY_BACKLIGHT;
     config.Display.Language = display["language"] | DISPLAY_LANGUAGE;
     config.Display.Diagram.Duration = display["diagram_duration"] | DISPLAY_DIAGRAM_DURATION;
     config.Display.Diagram.Mode = display["diagram_mode"] | DISPLAY_DIAGRAM_MODE;

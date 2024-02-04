@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 #pragma once
 
+#include "PinMapping.h"
+#include "Configuration.h"
 #include "Display_Graphic_Diagram.h"
 #include "defaults.h"
 #include <TaskSchedulerDeclarations.h>
@@ -38,6 +40,7 @@ public:
 
     void init(Scheduler& scheduler, const DisplayType_t type, const uint8_t data, const uint8_t clk, const uint8_t cs, const uint8_t reset);
     void setContrast(const uint8_t contrast);
+    void setBacklight(const uint8_t backlight);
     void setStatus(const bool turnOn);
     void setOrientation(const uint8_t rotation = DISPLAY_ROTATION);
     void setLanguage(const uint8_t language);
