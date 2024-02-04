@@ -228,8 +228,7 @@ void DisplayGraphicClass::loop()
     else {
         printText(i18n_offline[_display_language], 0);
         // check if it's time to enter power saving mode
-        //if (millis() - _previousMillis >= (_interval * 2)) {
-        if (millis() - _previousMillis >= (5000)) {
+        if (millis() - _previousMillis >= (_interval * 2)) {
             displayPowerSave = enablePowerSafe;
         }
     }
