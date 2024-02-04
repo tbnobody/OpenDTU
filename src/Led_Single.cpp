@@ -5,6 +5,7 @@
 #include "Led_Single.h"
 #include "Configuration.h"
 #include "Datastore.h"
+#include "defaults.h"
 #include "MqttSettings.h"
 #include "NetworkSettings.h"
 #include "PinMapping.h"
@@ -21,19 +22,6 @@ LedSingleClass LedSingle;
       y = 0 if x = 0
       y = pow(2, log2(b-1) * (x+1) / a) if x > 0
 */
-const uint8_t pwmTable[] = {
-    0,
-    1, 1, 1, 1, 1, 1, 2, 2, 2, 2,
-    2, 2, 2, 2, 2, 3, 3, 3, 3, 3,
-    3, 4, 4, 4, 4, 4, 5, 5, 5, 5,
-    6, 6, 6, 7, 7, 8, 8, 8, 9, 9,
-    10, 11, 11, 12, 12, 13, 14, 15, 16, 16,
-    17, 18, 19, 20, 22, 23, 24, 25, 27, 28,
-    30, 32, 33, 35, 37, 39, 42, 44, 47, 49,
-    52, 55, 58, 61, 65, 68, 72, 76, 81, 85,
-    90, 95, 100, 106, 112, 118, 125, 132, 139, 147,
-    156, 164, 174, 183, 194, 205, 216, 228, 241, 255
-};
 
 #define LED_OFF 0
 

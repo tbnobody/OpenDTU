@@ -98,6 +98,7 @@
 #define DISPLAY_SCREENSAVER true
 #define DISPLAY_ROTATION 2U
 #define DISPLAY_CONTRAST 60U
+#define DISPLAY_BACKLIGHT 60U
 #define DISPLAY_LANGUAGE 0U
 #define DISPLAY_DIAGRAM_DURATION (10UL * 60UL * 60UL)
 #define DISPLAY_DIAGRAM_MODE 1U
@@ -107,3 +108,26 @@
 #define LED_BRIGHTNESS 100U
 
 #define MAX_INVERTER_LIMIT 2250
+
+/*
+  The table is calculated using the following formula
+  (See https://www.mikrocontroller.net/articles/LED-Fading)
+  a = Step count: 101 --> 0 - 100
+  b = PWM resolution: 256: 0 - 255
+  y = Calculated value of index x:
+      y = 0 if x = 0
+      y = pow(2, log2(b-1) * (x+1) / a) if x > 0
+*/
+const uint8_t pwmTable[] = {
+    0,
+    1, 1, 1, 1, 1, 1, 2, 2, 2, 2,
+    2, 2, 2, 2, 2, 3, 3, 3, 3, 3,
+    3, 4, 4, 4, 4, 4, 5, 5, 5, 5,
+    6, 6, 6, 7, 7, 8, 8, 8, 9, 9,
+    10, 11, 11, 12, 12, 13, 14, 15, 16, 16,
+    17, 18, 19, 20, 22, 23, 24, 25, 27, 28,
+    30, 32, 33, 35, 37, 39, 42, 44, 47, 49,
+    52, 55, 58, 61, 65, 68, 72, 76, 81, 85,
+    90, 95, 100, 106, 112, 118, 125, 132, 139, 147,
+    156, 164, 174, 183, 194, 205, 216, 228, 241, 255
+};

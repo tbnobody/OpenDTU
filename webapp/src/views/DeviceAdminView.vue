@@ -122,6 +122,20 @@
                                 </div>
                             </div>
 
+                            <div class="row mb-3">
+                                <label  for="inputDisplayBacklight" class="col-sm-2 col-form-label"
+                                >{{
+                                    $t('deviceadmin.Backlight', {
+                                        backlight: $n(deviceConfigList.display.backlight / 100,
+                                            'percent')
+                                    }) }}
+                                    </label>
+                                <div class="col-sm-10" >
+                                    <input type="range" class="form-range" min="0" max="100"  id="inputDisplayBacklight"
+                                        v-model="deviceConfigList.display.backlight" />
+                                </div>
+                            </div>
+
                         </div>
                     </div>
                 </div>

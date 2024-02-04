@@ -67,6 +67,7 @@ void WebApiDeviceClass::onDeviceAdminGet(AsyncWebServerRequest* request)
     displayPinObj["clk"] = pin.display_clk;
     displayPinObj["cs"] = pin.display_cs;
     displayPinObj["reset"] = pin.display_reset;
+    displayPinObj["bl"] = pin.display_bl;
 
     auto ledPinObj = curPin.createNestedObject("led");
     for (uint8_t i = 0; i < PINMAPPING_LED_COUNT; i++) {
@@ -78,6 +79,7 @@ void WebApiDeviceClass::onDeviceAdminGet(AsyncWebServerRequest* request)
     display["power_safe"] = config.Display.PowerSafe;
     display["screensaver"] = config.Display.ScreenSaver;
     display["contrast"] = config.Display.Contrast;
+    display["backlight"] = config.Display.Backlight;
     display["language"] = config.Display.Language;
     display["diagramduration"] = config.Display.Diagram.Duration;
     display["diagrammode"] = config.Display.Diagram.Mode;
@@ -157,6 +159,7 @@ void WebApiDeviceClass::onDeviceAdminPost(AsyncWebServerRequest* request)
     config.Display.PowerSafe = root["display"]["power_safe"].as<bool>();
     config.Display.ScreenSaver = root["display"]["screensaver"].as<bool>();
     config.Display.Contrast = root["display"]["contrast"].as<uint8_t>();
+    config.Display.Backlight = root["display"]["backlight"].as<uint8_t>();
     config.Display.Language = root["display"]["language"].as<uint8_t>();
     config.Display.Diagram.Duration = root["display"]["diagramduration"].as<uint32_t>();
     config.Display.Diagram.Mode = root["display"]["diagrammode"].as<DiagramMode_t>();
@@ -170,6 +173,7 @@ void WebApiDeviceClass::onDeviceAdminPost(AsyncWebServerRequest* request)
     Display.enablePowerSafe = config.Display.PowerSafe;
     Display.enableScreensaver = config.Display.ScreenSaver;
     Display.setContrast(config.Display.Contrast);
+    Display.setBacklight(config.Display.Backlight);
     Display.setLanguage(config.Display.Language);
     Display.setDiagramMode(static_cast<DiagramMode_t>(config.Display.Diagram.Mode));
     Display.Diagram().updatePeriod();

@@ -124,6 +124,7 @@ void setup()
     Display.enablePowerSafe = config.Display.PowerSafe;
     Display.enableScreensaver = config.Display.ScreenSaver;
     Display.setContrast(config.Display.Contrast);
+    Display.setBacklight(config.Display.Backlight);
     Display.setLanguage(config.Display.Language);
     Display.setDiagramMode(static_cast<DiagramMode_t>(config.Display.Diagram.Mode));
     Display.setStartupDisplay();

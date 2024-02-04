@@ -16,6 +16,8 @@ std::map<DisplayType_t, std::function<U8G2*(uint8_t, uint8_t, uint8_t, uint8_t)>
     { DisplayType_t::ST7567_GM12864I_59N, [](uint8_t reset, uint8_t clock, uint8_t data, uint8_t cs) { return new U8G2_ST7567_ENH_DG128064I_F_HW_I2C(U8G2_R0, reset, clock, data); } },
 };
 
+bool displayPowerSave = false;
+
 // Language defintion, respect order in languages[] and translation lists
 #define I18N_LOCALE_EN 0
 #define I18N_LOCALE_DE 1
@@ -56,6 +58,7 @@ void DisplayGraphicClass::init(Scheduler& scheduler, const DisplayType_t type, c
         }
         _display->begin();
         setContrast(DISPLAY_CONTRAST);
+        setBacklight(DISPLAY_BACKLIGHT);
         setStatus(true);
         _diagram.init(scheduler, _display);
 
@@ -185,7 +188,7 @@ void DisplayGraphicClass::loop()
     _loopTask.setInterval(_period);
 
     _display->clearBuffer();
-    bool displayPowerSave = false;
+    displayPowerSave = false;
     bool showText = true;
 
     //=====> Actual Production ==========
@@ -260,6 +263,8 @@ void DisplayGraphicClass::loop()
         displayPowerSave = true;
     }
 
+    uint8_t  bl_get = Configuration.get().Display.Backlight;
+    setBacklight(bl_get);
     _display->setPowerSave(displayPowerSave);
 }
 
@@ -268,12 +273,34 @@ void DisplayGraphicClass::setContrast(const uint8_t contrast)
     if (!isValidDisplay()) {
         return;
     }
-    _display->setContrast(contrast * 2.55f);
+
+    if (_display_type == DisplayType_t::ST7567_GM12864I_59N) {
+        _display->setContrast(255-(pwmTable[100-contrast]));
+    }
+    else {
+        _display->setContrast(contrast * 2.55f);
+    }
 }
 
 void DisplayGraphicClass::setStatus(const bool turnOn)
 {
     _displayTurnedOn = turnOn;
+}
+
+void DisplayGraphicClass::setBacklight(uint8_t backlight)
+{
+    if (!isValidDisplay()){
+        return;
+    }
+
+    uint8_t  bl_pin = PinMapping.get().display_bl;
+    if (displayPowerSave){
+        analogWrite(bl_pin,0);
+    }
+        else{
+        uint8_t  bl_value = pwmTable[backlight];
+        analogWrite(bl_pin, bl_value);
+    }
 }
 
 DisplayGraphicClass Display;
