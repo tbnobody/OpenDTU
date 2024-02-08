@@ -1,0 +1,76 @@
+[
+    {
+        "name": "AhoyDTU ESP32 Display LED",
+        "links": [
+            {"name": "Information", "url": "https://ahoydtu.de/getting_started/"}
+        ],
+        "nrf24": {
+            "miso": 19,
+            "mosi": 23,
+            "clk": 18,
+            "irq": 16,
+            "en": 4,
+            "cs": 5
+        },
+        "led": {
+            "led0": 25,
+            "led1": 26
+        },
+        "display": {
+            "type": 2,
+            "data": 21,
+            "clk": 22
+        }
+    },
+    {
+        "name": "AhoyDTU ESP32 Display",
+        "links": [
+            {"name": "Information", "url": "https://ahoydtu.de/getting_started/"}
+        ],
+        "nrf24": {
+            "miso": 19,
+            "mosi": 23,
+            "clk": 18,
+            "irq": 16,
+            "en": 4,
+            "cs": 5
+        },
+        "display": {
+            "type": 2,
+            "data": 21,
+            "clk": 22
+        }
+    },
+    {
+        "name": "AhoyDTU ESP32 LED",
+        "links": [
+            {"name": "Information", "url": "https://ahoydtu.de/getting_started/"}
+        ],
+        "nrf24": {
+            "miso": 19,
+            "mosi": 23,
+            "clk": 18,
+            "irq": 16,
+            "en": 4,
+            "cs": 5
+        },
+        "led": {
+            "led0": 25,
+            "led1": 26
+        }
+    },
+    {
+        "name": "AhoyDTU ESP32",
+        "links": [
+            {"name": "Information", "url": "https://ahoydtu.de/getting_started/"}
+        ],
+        "nrf24": {
+            "miso": 19,
+            "mosi": 23,
+            "clk": 18,
+            "irq": 16,
+            "en": 4,
+            "cs": 5
+        }
+    }
+]
