@@ -17,7 +17,7 @@
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" ref="navbarCollapse" id="navbarNavAltMarkup">
-                <ul class="navbar-nav me-auto">
+                <ul class="navbar-nav navbar-nav-scroll d-flex me-auto flex-sm-fill">
                     <li class="nav-item">
                         <router-link @click="onClick" class="nav-link" to="/">{{ $t('menu.LiveView') }}</router-link>
                     </li>
@@ -93,8 +93,7 @@
                     <li class="nav-item">
                         <router-link @click="onClick" class="nav-link" to="/about">{{ $t('menu.About') }}</router-link>
                     </li>
-                </ul>
-                <ul class="navbar-nav flex-row flex-wrap ms-md-auto">
+                    <li class="flex-sm-fill"></li>
                     <ThemeSwitcher class="me-2" />
                     <form class="d-flex" role="search">
                         <LocaleSwitcher class="me-2" />
