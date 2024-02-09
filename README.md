@@ -46,7 +46,7 @@ This project is still under development and adds following features:
 
 [Full documentation of OpenDTU-onBattery extensions can be found at the project's wiki](https://github.com/helgeerbe/OpenDTU-OnBattery/wiki).
 
-For documentation of openDTU core functionality I refer to the original [repo](https://github.com/tbnobody/OpenDTU) and its [wiki](https://github.com/tbnobody/OpenDTU/wiki).
+For documentation of openDTU core functionality I refer to the original [repo](https://github.com/tbnobody/OpenDTU) and its [documentation](https://tbnobody.github.io/OpenDTU-docs/).
 
 Please note that openDTU-onBattery may change significantly during its development.
 Bug reports, comments, feature requests and fixes are most welcome!

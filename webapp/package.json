@@ -14,7 +14,7 @@
   "dependencies": {
     "@popperjs/core": "^2.11.8",
     "bootstrap": "^5.3.2",
-    "bootstrap-icons-vue": "^1.11.1",
+    "bootstrap-icons-vue": "^1.11.3",
     "mitt": "^3.0.1",
     "sortablejs": "^1.15.2",
     "spark-md5": "^3.0.2",
@@ -24,10 +24,10 @@
   },
   "devDependencies": {
     "@intlify/unplugin-vue-i18n": "^2.0.0",
-    "@rushstack/eslint-patch": "^1.7.0",
+    "@rushstack/eslint-patch": "^1.7.2",
     "@tsconfig/node18": "^18.2.2",
     "@types/bootstrap": "^5.2.10",
-    "@types/node": "^20.11.5",
+    "@types/node": "^20.11.7",
     "@types/pulltorefreshjs": "^0.1.7",
     "@types/sortablejs": "^1.15.7",
     "@types/spark-md5": "^3.0.4",
