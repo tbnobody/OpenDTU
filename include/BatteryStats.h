@@ -23,15 +23,24 @@ class BatteryStats {
         // convert stats to JSON for web application live view
         virtual void getLiveViewData(JsonVariant& root) const;
 
-        virtual void mqttPublish() const;
+        void mqttLoop();
+
+        // the interval at which all battery datums will be re-published, even
+        // if they did not change. used to calculate Home Assistent expiration.
+        virtual uint32_t getMqttFullPublishIntervalMs() const;
 
         bool isValid() const { return _lastUpdateSoC > 0 && _lastUpdate > 0; }
 
     protected:
+        virtual void mqttPublish() const;
+
         String _manufacturer = "unknown";
         uint8_t _SoC = 0;
         uint32_t _lastUpdateSoC = 0;
         uint32_t _lastUpdate = 0;
+
+    private:
+        uint32_t _lastMqttPublish = 0;
 };
 
 class PylontechBatteryStats : public BatteryStats {
@@ -88,6 +97,8 @@ class JkBmsBatteryStats : public BatteryStats {
         }
 
         void mqttPublish() const final;
+
+        uint32_t getMqttFullPublishIntervalMs() const final { return 60 * 1000; }
 
         void updateFrom(JkBms::DataPointContainer const& dp);
 
