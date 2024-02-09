@@ -7,7 +7,7 @@
 #include "AsyncJson.h"
 #include "Battery.h"
 #include "Configuration.h"
-#include "PylontechCanReceiver.h"
+#include "MqttHandleBatteryHass.h"
 #include "WebApi.h"
 #include "WebApi_battery.h"
 #include "WebApi_errors.h"
@@ -111,4 +111,5 @@ void WebApiBatteryClass::onAdminPost(AsyncWebServerRequest* request)
     request->send(response);
 
     Battery.updateSettings();
+    MqttHandleBatteryHass.forceUpdate();
 }

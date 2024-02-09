@@ -301,7 +301,20 @@ uint32_t VeDirectFrameHandler::getLastUpdate() const
  */
 frozen::string const& VeDirectFrameHandler::veStruct::getPidAsString() const
 {
-	static constexpr frozen::map<uint16_t, frozen::string, 77> values = {
+	/**
+	 * this map is rendered from [1], which is more recent than [2]. Phoenix
+	 * inverters are not included in the map. unfortunately, the documents do
+	 * not fully align. PID 0xA07F is only present in [1]. PIDs 0xA048, 0xA110,
+	 * and 0xA111 are only present in [2]. PIDs 0xA06D and 0xA078 are rev3 in
+	 * [1] but rev2 in [2].
+	 *
+	 * [1] https://www.victronenergy.com/upload/documents/VE.Direct-Protocol-3.33.pdf
+	 * [2] https://www.victronenergy.com/upload/documents/BlueSolar-HEX-protocol.pdf
+	 */
+	static constexpr frozen::map<uint16_t, frozen::string, 105> values = {
+		{ 0x0203, "BMV-700" },
+		{ 0x0204, "BMV-702" },
+		{ 0x0205, "BMV-700H" },
 		{ 0x0300, "BlueSolar MPPT 70|15" },
 		{ 0xA040, "BlueSolar MPPT 75|50" },
 		{ 0xA041, "BlueSolar MPPT 150|35" },
@@ -309,8 +322,9 @@ frozen::string const& VeDirectFrameHandler::veStruct::getPidAsString() const
 		{ 0xA043, "BlueSolar MPPT 100|15" },
 		{ 0xA044, "BlueSolar MPPT 100|30" },
 		{ 0xA045, "BlueSolar MPPT 100|50" },
-		{ 0xA046, "BlueSolar MPPT 100|70" },
+		{ 0xA046, "BlueSolar MPPT 150|70" },
 		{ 0xA047, "BlueSolar MPPT 150|100" },
+		{ 0xA048, "BlueSolar MPPT 75|50 rev2" },
 		{ 0xA049, "BlueSolar MPPT 100|50 rev2" },
 		{ 0xA04A, "BlueSolar MPPT 100|30 rev2" },
 		{ 0xA04B, "BlueSolar MPPT 150|35 rev2" },
@@ -327,7 +341,7 @@ frozen::string const& VeDirectFrameHandler::veStruct::getPidAsString() const
 		{ 0xA056, "SmartSolar MPPT 100|30" },
 		{ 0xA057, "SmartSolar MPPT 100|50" },
 		{ 0xA058, "SmartSolar MPPT 150|35" },
-		{ 0xA059, "SmartSolar MPPT 150|10 rev2" },
+		{ 0xA059, "SmartSolar MPPT 150|100 rev2" },
 		{ 0xA05A, "SmartSolar MPPT 150|85 rev2" },
 		{ 0xA05B, "SmartSolar MPPT 250|70" },
 		{ 0xA05C, "SmartSolar MPPT 250|85" },
@@ -352,6 +366,20 @@ frozen::string const& VeDirectFrameHandler::veStruct::getPidAsString() const
 		{ 0xA06F, "BlueSolar MPPT 150|45 rev2" },
 		{ 0xA070, "BlueSolar MPPT 150|60 rev2" },
 		{ 0xA071, "BlueSolar MPPT 150|70 rev2" },
+		{ 0xA072, "BlueSolar MPPT 150|45 rev3" },
+		{ 0xA073, "SmartSolar MPPT 150|45 rev3" },
+		{ 0xA074, "SmartSolar MPPT 75|10 rev2" },
+		{ 0xA075, "SmartSolar MPPT 75|15 rev2" },
+		{ 0xA076, "BlueSolar MPPT 100|30 rev3" },
+		{ 0xA077, "BlueSolar MPPT 100|50 rev3" },
+		{ 0xA078, "BlueSolar MPPT 150|35 rev3" },
+		{ 0xA079, "BlueSolar MPPT 75|10 rev2" },
+		{ 0xA07A, "BlueSolar MPPT 75|15 rev2" },
+		{ 0xA07B, "BlueSolar MPPT 100|15 rev2" },
+		{ 0xA07C, "BlueSolar MPPT 75|10 rev3" },
+		{ 0xA07D, "BlueSolar MPPT 75|15 rev3" },
+		{ 0xA07E, "SmartSolar MPPT 100|30 12V" },
+		{ 0xA07F, "All-In-1 SmartSolar MPPT 75|15 12V" },
 		{ 0xA102, "SmartSolar MPPT VE.Can 150|70" },
 		{ 0xA103, "SmartSolar MPPT VE.Can 150|45" },
 		{ 0xA104, "SmartSolar MPPT VE.Can 150|60" },
@@ -359,7 +387,7 @@ frozen::string const& VeDirectFrameHandler::veStruct::getPidAsString() const
 		{ 0xA106, "SmartSolar MPPT VE.Can 150|100" },
 		{ 0xA107, "SmartSolar MPPT VE.Can 250|45" },
 		{ 0xA108, "SmartSolar MPPT VE.Can 250|60" },
-		{ 0xA109, "SmartSolar MPPT VE.Can 250|80" },
+		{ 0xA109, "SmartSolar MPPT VE.Can 250|70" },
 		{ 0xA10A, "SmartSolar MPPT VE.Can 250|85" },
 		{ 0xA10B, "SmartSolar MPPT VE.Can 250|100" },
 		{ 0xA10C, "SmartSolar MPPT VE.Can 150|70 rev2" },
@@ -367,18 +395,28 @@ frozen::string const& VeDirectFrameHandler::veStruct::getPidAsString() const
 		{ 0xA10E, "SmartSolar MPPT VE.Can 150|100 rev2" },
 		{ 0xA10F, "BlueSolar MPPT VE.Can 150|100" },
 		{ 0xA110, "SmartSolar MPPT RS 450|100" },
+		{ 0xA111, "SmartSolar MPPT RS 450|200" },
 		{ 0xA112, "BlueSolar MPPT VE.Can 250|70" },
 		{ 0xA113, "BlueSolar MPPT VE.Can 250|100" },
 		{ 0xA114, "SmartSolar MPPT VE.Can 250|70 rev2" },
 		{ 0xA115, "SmartSolar MPPT VE.Can 250|100 rev2" },
 		{ 0xA116, "SmartSolar MPPT VE.Can 250|85 rev2" },
+		{ 0xA117, "BlueSolar MPPT VE.Can 150|100 rev2" },
+		{ 0xA340, "Phoenix Smart IP43 Charger 12|50 (1+1)" },
+		{ 0xA341, "Phoenix Smart IP43 Charger 12|50 (3)" },
+		{ 0xA342, "Phoenix Smart IP43 Charger 24|25 (1+1)" },
+		{ 0xA343, "Phoenix Smart IP43 Charger 24|25 (3)" },
+		{ 0xA344, "Phoenix Smart IP43 Charger 12|30 (1+1)" },
+		{ 0xA345, "Phoenix Smart IP43 Charger 12|30 (3)" },
+		{ 0xA346, "Phoenix Smart IP43 Charger 24|16 (1+1)" },
+		{ 0xA347, "Phoenix Smart IP43 Charger 24|16 (3)" },
 		{ 0xA381, "BMV-712 Smart" },
 		{ 0xA382, "BMV-710H Smart" },
 		{ 0xA383, "BMV-712 Smart Rev2" },
 		{ 0xA389, "SmartShunt 500A/50mV" },
 		{ 0xA38A, "SmartShunt 1000A/50mV" },
 		{ 0xA38B, "SmartShunt 2000A/50mV" },
-		{ 0xA3F0, "SmartShunt 2000A/50mV" }
+		{ 0xA3F0, "Smart BuckBoost 12V/12V-50A" },
 	};
 
 	return getAsString(values, PID);

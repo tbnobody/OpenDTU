@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 #include "Battery.h"
 #include "MessageOutput.h"
-#include "MqttSettings.h"
 #include "PylontechCanReceiver.h"
 #include "JkBmsController.h"
 #include "VictronSmartShunt.h"
@@ -76,14 +75,5 @@ void BatteryClass::loop()
 
     _upProvider->loop();
 
-    CONFIG_T& config = Configuration.get();
-
-    if (!MqttSettings.getConnected()
-            || (millis() - _lastMqttPublish) < (config.Mqtt.PublishInterval * 1000)) {
-        return;
-    }
-
-    _upProvider->getStats()->mqttPublish();
-
-    _lastMqttPublish = millis();
+    _upProvider->getStats()->mqttLoop();
 }

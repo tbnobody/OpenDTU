@@ -5,6 +5,7 @@
 #include "Configuration.h"
 #include "MqttSettings.h"
 #include "JkBmsDataPoints.h"
+#include "MqttSettings.h"
 
 template<typename T>
 static void addLiveViewInSection(JsonVariant& root,
@@ -187,6 +188,31 @@ void JkBmsBatteryStats::getJsonData(JsonVariant& root, bool verbose) const
     }
 }
 
+void BatteryStats::mqttLoop()
+{
+    auto& config = Configuration.get();
+
+    if (!MqttSettings.getConnected()
+            || (millis() - _lastMqttPublish) < (config.Mqtt.PublishInterval * 1000)) {
+        return;
+    }
+
+    mqttPublish();
+
+    _lastMqttPublish = millis();
+}
+
+uint32_t BatteryStats::getMqttFullPublishIntervalMs() const
+{
+    auto& config = Configuration.get();
+
+    // this is the default interval, see mqttLoop(). mqttPublish()
+    // implementations in derived classes may choose to publish some values
+    // with a lower frequency and hence implement this method with a different
+    // return value.
+    return config.Mqtt.PublishInterval * 1000;
+}
+
 void BatteryStats::mqttPublish() const
 {
     MqttSettings.publish(F("battery/manufacturer"), _manufacturer);
@@ -236,11 +262,10 @@ void JkBmsBatteryStats::mqttPublish() const
         Label::BatterySoCPercent // already published by base class
     };
 
-    CONFIG_T& config = Configuration.get();
-
-    // publish all topics every minute, unless the retain flag is enabled
-    bool fullPublish = _lastFullMqttPublish + 60 * 1000 < millis();
-    fullPublish &= !config.Mqtt.Retain;
+    // regularly publish all topics regardless of whether or not their value changed
+    bool neverFullyPublished = _lastFullMqttPublish == 0;
+    bool intervalElapsed = _lastFullMqttPublish + getMqttFullPublishIntervalMs() < millis();
+    bool fullPublish = neverFullyPublished || intervalElapsed;
 
     for (auto iter = _dataPoints.cbegin(); iter != _dataPoints.cend(); ++iter) {
         // skip data points that did not change since last published
