@@ -124,12 +124,12 @@ void setup()
         pin.display_clk,
         pin.display_cs,
         pin.display_reset);
+    Display.setDiagramMode(static_cast<DiagramMode_t>(config.Display.Diagram.Mode));
     Display.setOrientation(config.Display.Rotation);
     Display.enablePowerSafe = config.Display.PowerSafe;
     Display.enableScreensaver = config.Display.ScreenSaver;
     Display.setContrast(config.Display.Contrast);
     Display.setLanguage(config.Display.Language);
-    Display.setDiagramMode(static_cast<DiagramMode_t>(config.Display.Diagram.Mode));
     Display.setStartupDisplay();
     MessageOutput.println("done");
 

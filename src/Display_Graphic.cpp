@@ -67,11 +67,19 @@ void DisplayGraphicClass::init(Scheduler& scheduler, const DisplayType_t type, c
 
 void DisplayGraphicClass::calcLineHeights()
 {
-    uint8_t yOff = 0;
+    bool diagram = (_isLarge && _diagram_mode == DiagramMode_t::Small);
+    // the diagram needs space. we need to keep
+    // away from the y-axis label in particular.
+    uint8_t yOff = (diagram?7:0);
     for (uint8_t i = 0; i < 4; i++) {
         setFont(i);
-        yOff += (_display->getMaxCharHeight());
+        yOff += _display->getAscent();
         _lineOffsets[i] = yOff;
+        yOff += ((!_isLarge || diagram)?2:3);
+        // the descent is a negative value and moves the *next* line's
+        // baseline. the first line never uses a letter with descent and
+        // we need that space when showing the small diagram.
+        yOff -= ((i == 0 && diagram)?0:_display->getDescent());
     }
 }
 
