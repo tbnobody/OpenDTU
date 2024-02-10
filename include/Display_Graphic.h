@@ -48,6 +48,7 @@ public:
 
     bool enablePowerSafe = true;
     bool enableScreensaver = true;
+    bool useIsoDate = false;
 
 private:
     void loop();

@@ -79,6 +79,7 @@ void WebApiDeviceClass::onDeviceAdminGet(AsyncWebServerRequest* request)
     display["screensaver"] = config.Display.ScreenSaver;
     display["contrast"] = config.Display.Contrast;
     display["language"] = config.Display.Language;
+    display["isodate"] = config.Display.IsoDate;
     display["diagramduration"] = config.Display.Diagram.Duration;
     display["diagrammode"] = config.Display.Diagram.Mode;
 
@@ -158,6 +159,7 @@ void WebApiDeviceClass::onDeviceAdminPost(AsyncWebServerRequest* request)
     config.Display.ScreenSaver = root["display"]["screensaver"].as<bool>();
     config.Display.Contrast = root["display"]["contrast"].as<uint8_t>();
     config.Display.Language = root["display"]["language"].as<uint8_t>();
+    config.Display.IsoDate = root["display"]["isodate"].as<bool>();
     config.Display.Diagram.Duration = root["display"]["diagramduration"].as<uint32_t>();
     config.Display.Diagram.Mode = root["display"]["diagrammode"].as<DiagramMode_t>();
 
@@ -171,6 +173,7 @@ void WebApiDeviceClass::onDeviceAdminPost(AsyncWebServerRequest* request)
     Display.enableScreensaver = config.Display.ScreenSaver;
     Display.setContrast(config.Display.Contrast);
     Display.setLanguage(config.Display.Language);
+    Display.useIsoDate = config.Display.IsoDate;
     Display.setDiagramMode(static_cast<DiagramMode_t>(config.Display.Diagram.Mode));
     Display.Diagram().updatePeriod();
 

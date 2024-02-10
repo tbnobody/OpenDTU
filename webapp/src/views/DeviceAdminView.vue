@@ -98,6 +98,9 @@
                                 </div>
                             </div>
 
+                            <InputElement :label="$t('deviceadmin.IsoDate')"
+                                v-model="deviceConfigList.display.isodate" type="checkbox" />
+
                             <div class="row mb-3">
                                 <label class="col-sm-2 col-form-label">
                                     {{ $t('deviceadmin.Rotation') }}

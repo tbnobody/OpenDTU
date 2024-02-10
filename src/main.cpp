@@ -125,6 +125,7 @@ void setup()
     Display.enableScreensaver = config.Display.ScreenSaver;
     Display.setContrast(config.Display.Contrast);
     Display.setLanguage(config.Display.Language);
+    Display.useIsoDate = config.Display.IsoDate;
     Display.setDiagramMode(static_cast<DiagramMode_t>(config.Display.Diagram.Mode));
     Display.setStartupDisplay();
     MessageOutput.println("done");

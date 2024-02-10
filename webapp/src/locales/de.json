@@ -601,6 +601,7 @@
         "rot180": "180 Grad Drehung",
         "rot270": "270 Grad Drehung",
         "DisplayLanguage": "Displaysprache:",
+        "IsoDate": "ISO 8601 Datumsformat:",
         "en": "Englisch",
         "de": "Deutsch",
         "fr": "Französisch",
