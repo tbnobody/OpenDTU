@@ -601,6 +601,7 @@
         "rot180": "Rotation de 180 degrés",
         "rot270": "Rotation de 270 degrés",
         "DisplayLanguage": "Langue d'affichage",
+        "IsoDate": "Format de date ISO 8601:",
         "en": "Anglais",
         "de": "Allemand",
         "fr": "Français",

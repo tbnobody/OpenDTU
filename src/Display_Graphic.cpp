@@ -34,6 +34,7 @@ static const char* const i18n_current_power_kw[] = { "%.1f kW", "%.1f kW", "%.1f
 static const char* const i18n_yield_today_wh[] = { "today: %4.0f Wh", "Heute: %4.0f Wh", "auj.: %4.0f Wh" };
 static const char* const i18n_yield_total_kwh[] = { "total: %.1f kWh", "Ges.: %.1f kWh", "total: %.1f kWh" };
 static const char* const i18n_date_format[] = { "%m/%d/%Y %H:%M", "%d.%m.%Y %H:%M", "%d/%m/%Y %H:%M" };
+static const char iso_date_format[] = { "%Y-%m-%d %H:%M" };
 
 DisplayGraphicClass::DisplayGraphicClass()
     : _loopTask(TASK_IMMEDIATE, TASK_FOREVER, std::bind(&DisplayGraphicClass::loop, this))
@@ -247,7 +248,9 @@ void DisplayGraphicClass::loop()
         } else {
             // Get current time
             time_t now = time(nullptr);
-            strftime(_fmtText, sizeof(_fmtText), i18n_date_format[_display_language], localtime(&now));
+            auto dateTimeFormat = i18n_date_format[_display_language];
+            if (useIsoDate) { dateTimeFormat = iso_date_format; }
+            strftime(_fmtText, sizeof(_fmtText), dateTimeFormat, localtime(&now));
             printText(_fmtText, 3);
         }
     }
