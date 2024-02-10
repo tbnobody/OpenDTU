@@ -71,16 +71,16 @@ void DisplayGraphicClass::calcLineHeights()
     bool diagram = (_isLarge && _diagram_mode == DiagramMode_t::Small);
     // the diagram needs space. we need to keep
     // away from the y-axis label in particular.
-    uint8_t yOff = (diagram?7:0);
+    uint8_t yOff = (diagram ? 7 : 0);
     for (uint8_t i = 0; i < 4; i++) {
         setFont(i);
         yOff += _display->getAscent();
         _lineOffsets[i] = yOff;
-        yOff += ((!_isLarge || diagram)?2:3);
+        yOff += ((!_isLarge || diagram) ? 2 : 3);
         // the descent is a negative value and moves the *next* line's
         // baseline. the first line never uses a letter with descent and
         // we need that space when showing the small diagram.
-        yOff -= ((i == 0 && diagram)?0:_display->getDescent());
+        yOff -= ((i == 0 && diagram) ? 0 : _display->getDescent());
     }
 }
 
@@ -122,11 +122,11 @@ void DisplayGraphicClass::printText(const char* text, const uint8_t line)
     }
 
     if (enableScreensaver) {
-        unsigned maxOffset = (_isLarge?8:6);
+        unsigned maxOffset = (_isLarge ? 8 : 6);
         unsigned period = 2 * maxOffset;
         unsigned step = _mExtra % period;
-        int offset = (step <= maxOffset)?step:(period - step);
-        offset -= (_isLarge?5:0); // oscillate around center on large screens
+        int offset = (step <= maxOffset) ? step : (period - step);
+        offset -= (_isLarge ? 5 : 0); // oscillate around center on large screens
         dispX += offset;
     }
     _display->drawStr(dispX, _lineOffsets[line], text);
@@ -242,7 +242,7 @@ void DisplayGraphicClass::loop()
         printText(_fmtText, 1);
 
         const float watts = Datastore.getTotalAcYieldTotalEnabled();
-        auto const format = (watts >= 1000)?i18n_yield_total_mwh:i18n_yield_total_kwh;
+        auto const format = (watts >= 1000) ? i18n_yield_total_mwh : i18n_yield_total_kwh;
         snprintf(_fmtText, sizeof(_fmtText), format[_display_language], watts);
         printText(_fmtText, 2);
         //<=======================
