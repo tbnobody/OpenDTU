@@ -112,27 +112,23 @@ void DisplayGraphicClass::printText(const char* text, const uint8_t line)
     if (!_isLarge) {
         dispX = (line == 0) ? 5 : 0;
     } else {
-        switch (line) {
-        case 0:
-            if (_diagram_mode == DiagramMode_t::Small) {
-                // Center between left border and diagram
-                dispX = (CHART_POSX - _display->getStrWidth(text)) / 2;
-            } else {
-                // Center on screen
-                dispX = (_display->getDisplayWidth() - _display->getStrWidth(text)) / 2;
-            }
-            break;
-        case 3:
+        if (line == 0 && _diagram_mode == DiagramMode_t::Small) {
+            // Center between left border and diagram
+            dispX = (CHART_POSX - _display->getStrWidth(text)) / 2;
+        } else {
             // Center on screen
             dispX = (_display->getDisplayWidth() - _display->getStrWidth(text)) / 2;
-            break;
-        default:
-            dispX = 5;
-            break;
         }
     }
 
-    dispX += enableScreensaver ? (_mExtra % 7) : 0;
+    if (enableScreensaver) {
+        unsigned maxOffset = (_isLarge?8:6);
+        unsigned period = 2 * maxOffset;
+        unsigned step = _mExtra % period;
+        int offset = (step <= maxOffset)?step:(period - step);
+        offset -= (_isLarge?5:0); // oscillate around center on large screens
+        dispX += offset;
+    }
     _display->drawStr(dispX, _lineOffsets[line], text);
 }
 
