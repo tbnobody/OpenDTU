@@ -325,7 +325,13 @@ void HuaweiCanClass::loop()
 
     // Check if inverter used by the power limiter is active
     std::shared_ptr<InverterAbstract> inverter =
-        Hoymiles.getInverterByPos(config.PowerLimiter.InverterId);
+        Hoymiles.getInverterBySerial(config.PowerLimiter.InverterId);
+
+    if (inverter == nullptr && config.PowerLimiter.InverterId < INV_MAX_COUNT) {
+        // we previously had an index saved as InverterId. fall back to the
+        // respective positional lookup if InverterId is not a known serial.
+        inverter = Hoymiles.getInverterByPos(config.PowerLimiter.InverterId);
+    }
 
     if (inverter != nullptr) {
         if(inverter->isProducing()) {

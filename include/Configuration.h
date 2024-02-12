@@ -206,11 +206,11 @@ struct CONFIG_T {
         bool VerboseLogging;
         bool SolarPassThroughEnabled;
         uint8_t SolarPassThroughLosses;
-        uint8_t BatteryDrainStategy;
+        bool BatteryAlwaysUseAtNight;
         uint32_t Interval;
         bool IsInverterBehindPowerMeter;
         bool IsInverterSolarPowered;
-        uint8_t InverterId;
+        uint64_t InverterId;
         uint8_t InverterChannelId;
         int32_t TargetPowerConsumption;
         int32_t TargetPowerConsumptionHysteresis;

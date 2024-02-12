@@ -137,7 +137,13 @@ void PowerLimiterClass::loop()
     }
 
     std::shared_ptr<InverterAbstract> currentInverter =
-        Hoymiles.getInverterByPos(config.PowerLimiter.InverterId);
+        Hoymiles.getInverterBySerial(config.PowerLimiter.InverterId);
+
+    if (currentInverter == nullptr && config.PowerLimiter.InverterId < INV_MAX_COUNT) {
+        // we previously had an index saved as InverterId. fall back to the
+        // respective positional lookup if InverterId is not a known serial.
+        currentInverter = Hoymiles.getInverterByPos(config.PowerLimiter.InverterId);
+    }
 
     // in case of (newly) broken configuration, shut down
     // the last inverter we worked with (if any)
@@ -242,14 +248,14 @@ void PowerLimiterClass::loop()
 
         if (isStartThresholdReached()) { return true; }
 
-        // with solar passthrough, and the respective drain strategy, we
+        // with solar passthrough, and the respective switch enabled, we
         // may start discharging the battery when it is nighttime. we also
         // stop the discharge cycle if it becomes daytime again.
         // TODO(schlimmchen): should be supported by sunrise and sunset, such
         // that a thunderstorm or other events that drastically lower the solar
         // power do not cause the start of a discharge cycle during the day.
         if (config.PowerLimiter.SolarPassThroughEnabled &&
-                config.PowerLimiter.BatteryDrainStategy == EMPTY_AT_NIGHT) {
+                config.PowerLimiter.BatteryAlwaysUseAtNight) {
             return getSolarPower() == 0;
         }
 
@@ -287,10 +293,10 @@ void PowerLimiterClass::loop()
                 (isStopThresholdReached()?"yes":"no"),
                 (_inverter->isProducing()?"is":"is NOT"));
 
-        MessageOutput.printf("[DPL::loop] battery discharging %s, SolarPT %s, Drain Strategy: %i\r\n",
+        MessageOutput.printf("[DPL::loop] battery discharging %s, SolarPT %s, use at night: %i\r\n",
                 (_batteryDischargeEnabled?"allowed":"prevented"),
                 (config.PowerLimiter.SolarPassThroughEnabled?"enabled":"disabled"),
-                config.PowerLimiter.BatteryDrainStategy);
+                config.PowerLimiter.BatteryAlwaysUseAtNight);
     };
 
     if (_verboseLogging) { logging(); }

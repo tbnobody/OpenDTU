@@ -182,7 +182,7 @@ bool ConfigurationClass::write()
     powerlimiter["verbose_logging"] = config.PowerLimiter.VerboseLogging;
     powerlimiter["solar_passtrough_enabled"] = config.PowerLimiter.SolarPassThroughEnabled;
     powerlimiter["solar_passtrough_losses"] = config.PowerLimiter.SolarPassThroughLosses;
-    powerlimiter["battery_drain_strategy"] = config.PowerLimiter.BatteryDrainStategy;
+    powerlimiter["battery_always_use_at_night"] = config.PowerLimiter.BatteryAlwaysUseAtNight;
     powerlimiter["interval"] = config.PowerLimiter.Interval;
     powerlimiter["is_inverter_behind_powermeter"] = config.PowerLimiter.IsInverterBehindPowerMeter;
     powerlimiter["is_inverter_solar_powered"] = config.PowerLimiter.IsInverterSolarPowered;
@@ -429,7 +429,8 @@ bool ConfigurationClass::read()
     config.PowerLimiter.VerboseLogging = powerlimiter["verbose_logging"] | VERBOSE_LOGGING;
     config.PowerLimiter.SolarPassThroughEnabled = powerlimiter["solar_passtrough_enabled"] | POWERLIMITER_SOLAR_PASSTHROUGH_ENABLED;
     config.PowerLimiter.SolarPassThroughLosses = powerlimiter["solar_passthrough_losses"] | POWERLIMITER_SOLAR_PASSTHROUGH_LOSSES;
-    config.PowerLimiter.BatteryDrainStategy = powerlimiter["battery_drain_strategy"] | POWERLIMITER_BATTERY_DRAIN_STRATEGY;
+    config.PowerLimiter.BatteryAlwaysUseAtNight = powerlimiter["battery_always_use_at_night"] | POWERLIMITER_BATTERY_ALWAYS_USE_AT_NIGHT;
+    if (powerlimiter["battery_drain_strategy"].as<uint8_t>() == 1) { config.PowerLimiter.BatteryAlwaysUseAtNight = true; } // convert legacy setting
     config.PowerLimiter.Interval =  powerlimiter["interval"] | POWERLIMITER_INTERVAL;
     config.PowerLimiter.IsInverterBehindPowerMeter = powerlimiter["is_inverter_behind_powermeter"] | POWERLIMITER_IS_INVERTER_BEHIND_POWER_METER;
     config.PowerLimiter.IsInverterSolarPowered = powerlimiter["is_inverter_solar_powered"] | POWERLIMITER_IS_INVERTER_SOLAR_POWERED;
