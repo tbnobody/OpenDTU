@@ -23,6 +23,10 @@ Please feel free to support and create a PR in [this](https://github.com/tbnobod
 Generated using: `git log --date=short --pretty=format:"* %h%x09%ad%x09%s" | grep BREAKING`
 
 ```code
+* 1b637f08      2024-01-30      BREAKING CHANGE: Web API Endpoint /api/livedata/status and /api/prometheus/metrics
+* e1564780      2024-01-30      BREAKING CHANGE: Web API Endpoint /api/livedata/status and /api/prometheus/metrics
+* f0b5542c      2024-01-30      BREAKING CHANGE: Web API Endpoint /api/livedata/status and /api/prometheus/metrics
+* c27ecc36      2024-01-29      BREAKING CHANGE: Web API Endpoint /api/livedata/status
 * 71d1b3b       2023-11-07      BREAKING CHANGE: Home Assistant Auto Discovery to new naming scheme
 * 04f62e0       2023-04-20      BREAKING CHANGE: Web API Endpoint /api/eventlog/status no nested serial object
 * 59f43a8       2023-04-17      BREAKING CHANGE: Web API Endpoint /api/devinfo/status requires GET parameter inv=
