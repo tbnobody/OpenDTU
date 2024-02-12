@@ -152,8 +152,8 @@ void setup()
 
     Datastore.init(scheduler);
 
-    MessageOutput.print("Initialize Modbus... ");
-    ModbusDtu.init();
+    // MessageOutput.print("Initialize Modbus... ");
+    // ModbusDtu.init();
 }
 
 void loop()
