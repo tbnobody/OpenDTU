@@ -11,6 +11,7 @@ export interface PowerLimiterConfig {
     target_power_consumption_hysteresis: number;
     lower_power_limit: number;
     upper_power_limit: number;
+    ignore_soc: boolean;
     battery_soc_start_threshold: number;
     battery_soc_stop_threshold: number;
     voltage_start_threshold: number;

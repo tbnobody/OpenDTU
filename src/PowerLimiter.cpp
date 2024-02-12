@@ -290,12 +290,13 @@ void PowerLimiterClass::loop()
     }
 
     if (_verboseLogging) {
-        MessageOutput.printf("[DPL::loop] battery interface %s, SoC: %d %%, StartTH: %d %%, StopTH: %d %%, SoC age: %d s\r\n",
+        MessageOutput.printf("[DPL::loop] battery interface %s, SoC: %d %%, StartTH: %d %%, StopTH: %d %%, SoC age: %d s, ignore: %s\r\n",
                 (config.Battery.Enabled?"enabled":"disabled"),
                 Battery.getStats()->getSoC(),
                 config.PowerLimiter.BatterySocStartThreshold,
                 config.PowerLimiter.BatterySocStopThreshold,
-                Battery.getStats()->getSoCAgeSeconds());
+                Battery.getStats()->getSoCAgeSeconds(),
+                (config.PowerLimiter.IgnoreSoc?"yes":"no"));
 
         float dcVoltage = _inverter->Statistics()->getChannelFieldValue(TYPE_DC, (ChannelNum_t)config.PowerLimiter.InverterChannelId, FLD_UDC);
         MessageOutput.printf("[DPL::loop] dcVoltage: %.2f V, loadCorrectedVoltage: %.2f V, StartTH: %.2f V, StopTH: %.2f V\r\n",
@@ -608,8 +609,10 @@ bool PowerLimiterClass::testThreshold(float socThreshold, float voltThreshold,
 {
     CONFIG_T& config = Configuration.get();
 
-    // prefer SoC provided through battery interface
-    if (config.Battery.Enabled && socThreshold > 0.0
+    // prefer SoC provided through battery interface, unless disabled by user
+    if (!config.PowerLimiter.IgnoreSoc
+            && config.Battery.Enabled
+            && socThreshold > 0.0
             && Battery.getStats()->isValid()
             && Battery.getStats()->getSoCAgeSeconds() < 60) {
               return compare(Battery.getStats()->getSoC(), socThreshold);

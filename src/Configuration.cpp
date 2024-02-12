@@ -191,6 +191,7 @@ bool ConfigurationClass::write()
     powerlimiter["target_power_consumption_hysteresis"] = config.PowerLimiter.TargetPowerConsumptionHysteresis;
     powerlimiter["lower_power_limit"] = config.PowerLimiter.LowerPowerLimit;
     powerlimiter["upper_power_limit"] = config.PowerLimiter.UpperPowerLimit;
+    powerlimiter["ignore_soc"] = config.PowerLimiter.IgnoreSoc;
     powerlimiter["battery_soc_start_threshold"] = config.PowerLimiter.BatterySocStartThreshold;
     powerlimiter["battery_soc_stop_threshold"] = config.PowerLimiter.BatterySocStopThreshold;
     powerlimiter["voltage_start_threshold"] = config.PowerLimiter.VoltageStartThreshold;
@@ -435,6 +436,7 @@ bool ConfigurationClass::read()
     config.PowerLimiter.TargetPowerConsumptionHysteresis = powerlimiter["target_power_consumption_hysteresis"] | POWERLIMITER_TARGET_POWER_CONSUMPTION_HYSTERESIS;
     config.PowerLimiter.LowerPowerLimit = powerlimiter["lower_power_limit"] | POWERLIMITER_LOWER_POWER_LIMIT;
     config.PowerLimiter.UpperPowerLimit = powerlimiter["upper_power_limit"] | POWERLIMITER_UPPER_POWER_LIMIT;
+    config.PowerLimiter.IgnoreSoc = powerlimiter["ignore_soc"] | POWERLIMITER_IGNORE_SOC;
     config.PowerLimiter.BatterySocStartThreshold = powerlimiter["battery_soc_start_threshold"] | POWERLIMITER_BATTERY_SOC_START_THRESHOLD;
     config.PowerLimiter.BatterySocStopThreshold = powerlimiter["battery_soc_stop_threshold"] | POWERLIMITER_BATTERY_SOC_STOP_THRESHOLD;
     config.PowerLimiter.VoltageStartThreshold = powerlimiter["voltage_start_threshold"] | POWERLIMITER_VOLTAGE_START_THRESHOLD;
