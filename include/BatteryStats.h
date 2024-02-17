@@ -33,6 +33,7 @@ class BatteryStats {
         virtual uint32_t getMqttFullPublishIntervalMs() const;
 
         bool isSoCValid() const { return _lastUpdateSoC > 0; }
+        bool isVoltageValid() const { return _lastUpdateVoltage > 0; }
 
     protected:
         virtual void mqttPublish() const;
