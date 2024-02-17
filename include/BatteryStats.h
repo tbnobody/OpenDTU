@@ -148,6 +148,8 @@ class VictronSmartShuntStats : public BatteryStats {
 };
 
 class MqttBatteryStats : public BatteryStats {
+    friend class MqttBattery;
+
     public:
         // since the source of information was MQTT in the first place,
         // we do NOT publish the same data under a different topic.

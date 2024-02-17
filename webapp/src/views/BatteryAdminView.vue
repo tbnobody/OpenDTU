@@ -53,11 +53,21 @@
                          :text="$t('batteryadmin.MqttConfiguration')" textVariant="text-bg-primary" addSpace>
                 <div class="row mb-3">
                     <label class="col-sm-2 col-form-label">
-                        {{ $t('batteryadmin.MqttTopic') }}
+                        {{ $t('batteryadmin.MqttSocTopic') }}
                     </label>
                     <div class="col-sm-10">
                         <div class="input-group">
-                            <input type="text" class="form-control" v-model="batteryConfigList.mqtt_topic" />
+                            <input type="text" class="form-control" v-model="batteryConfigList.mqtt_soc_topic" />
+                        </div>
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <label class="col-sm-2 col-form-label">
+                        {{ $t('batteryadmin.MqttVoltageTopic') }}
+                    </label>
+                    <div class="col-sm-10">
+                        <div class="input-group">
+                            <input type="text" class="form-control" v-model="batteryConfigList.mqtt_voltage_topic" />
                         </div>
                     </div>
                 </div>
