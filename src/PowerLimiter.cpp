@@ -610,12 +610,13 @@ bool PowerLimiterClass::testThreshold(float socThreshold, float voltThreshold,
     CONFIG_T& config = Configuration.get();
 
     // prefer SoC provided through battery interface, unless disabled by user
+    auto stats = Battery.getStats();
     if (!config.PowerLimiter.IgnoreSoc
             && config.Battery.Enabled
             && socThreshold > 0.0
-            && Battery.getStats()->isValid()
-            && Battery.getStats()->getSoCAgeSeconds() < 60) {
-              return compare(Battery.getStats()->getSoC(), socThreshold);
+            && stats->isSoCValid()
+            && stats->getSoCAgeSeconds() < 60) {
+              return compare(stats->getSoC(), socThreshold);
     }
 
     // use voltage threshold as fallback

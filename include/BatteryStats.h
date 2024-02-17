@@ -32,7 +32,7 @@ class BatteryStats {
         // if they did not change. used to calculate Home Assistent expiration.
         virtual uint32_t getMqttFullPublishIntervalMs() const;
 
-        bool isValid() const { return _lastUpdateSoC > 0 && _lastUpdate > 0; }
+        bool isSoCValid() const { return _lastUpdateSoC > 0; }
 
     protected:
         virtual void mqttPublish() const;
