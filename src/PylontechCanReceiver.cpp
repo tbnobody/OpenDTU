@@ -147,13 +147,13 @@ void PylontechCanReceiver::loop()
         }
 
         case 0x356: {
-            _stats->_voltage = this->scaleValue(this->readSignedInt16(rx_message.data), 0.01);
+            _stats->setVoltage(this->scaleValue(this->readSignedInt16(rx_message.data), 0.01), millis());
             _stats->_current = this->scaleValue(this->readSignedInt16(rx_message.data + 2), 0.1);
             _stats->_temperature = this->scaleValue(this->readSignedInt16(rx_message.data + 4), 0.1);
 
             if (_verboseLogging) {
                 MessageOutput.printf("[Pylontech] voltage: %f current: %f temperature: %f\n",
-                        _stats->_voltage, _stats->_current, _stats->_temperature);
+                        _stats->getVoltage(), _stats->_current, _stats->_temperature);
             }
             break;
         }
@@ -287,7 +287,7 @@ void PylontechCanReceiver::dummyData()
     _stats->_chargeCurrentLimitation = dummyFloat(33);
     _stats->_dischargeCurrentLimitation = dummyFloat(12);
     _stats->_stateOfHealth = 99;
-    _stats->_voltage = 48.67;
+    _stats->setVoltage(48.67, millis());
     _stats->_current = dummyFloat(-1);
     _stats->_temperature = dummyFloat(20);
 

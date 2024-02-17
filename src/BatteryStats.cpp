@@ -57,6 +57,7 @@ void BatteryStats::getLiveViewData(JsonVariant& root) const
     root[F("data_age")] = getAgeSeconds();
 
     addLiveViewValue(root, "SoC", _SoC, "%", 0);
+    addLiveViewValue(root, "voltage", _voltage, "V", 2);
 }
 
 void PylontechBatteryStats::getLiveViewData(JsonVariant& root) const
@@ -68,7 +69,6 @@ void PylontechBatteryStats::getLiveViewData(JsonVariant& root) const
     addLiveViewValue(root, "chargeCurrentLimitation", _chargeCurrentLimitation, "A", 1);
     addLiveViewValue(root, "dischargeCurrentLimitation", _dischargeCurrentLimitation, "A", 1);
     addLiveViewValue(root, "stateOfHealth", _stateOfHealth, "%", 0);
-    addLiveViewValue(root, "voltage", _voltage, "V", 2);
     addLiveViewValue(root, "current", _current, "A", 1);
     addLiveViewValue(root, "temperature", _temperature, "°C", 1);
 
@@ -105,18 +105,13 @@ void JkBmsBatteryStats::getJsonData(JsonVariant& root, bool verbose) const
 
     using Label = JkBms::DataPointLabel;
 
-    auto oVoltage = _dataPoints.get<Label::BatteryVoltageMilliVolt>();
-    if (oVoltage.has_value()) {
-        addLiveViewValue(root, "voltage",
-                static_cast<float>(*oVoltage) / 1000, "V", 2);
-    }
-
     auto oCurrent = _dataPoints.get<Label::BatteryCurrentMilliAmps>();
     if (oCurrent.has_value()) {
         addLiveViewValue(root, "current",
                 static_cast<float>(*oCurrent) / 1000, "A", 2);
     }
 
+    auto oVoltage = _dataPoints.get<Label::BatteryVoltageMilliVolt>();
     if (oVoltage.has_value() && oCurrent.has_value()) {
         auto current = static_cast<float>(*oCurrent) / 1000;
         auto voltage = static_cast<float>(*oVoltage) / 1000;
@@ -218,6 +213,7 @@ void BatteryStats::mqttPublish() const
     MqttSettings.publish(F("battery/manufacturer"), _manufacturer);
     MqttSettings.publish(F("battery/dataAge"), String(getAgeSeconds()));
     MqttSettings.publish(F("battery/stateOfCharge"), String(_SoC));
+    MqttSettings.publish(F("battery/voltage"), String(_voltage));
 }
 
 void PylontechBatteryStats::mqttPublish() const
@@ -228,7 +224,6 @@ void PylontechBatteryStats::mqttPublish() const
     MqttSettings.publish(F("battery/settings/chargeCurrentLimitation"), String(_chargeCurrentLimitation));
     MqttSettings.publish(F("battery/settings/dischargeCurrentLimitation"), String(_dischargeCurrentLimitation));
     MqttSettings.publish(F("battery/stateOfHealth"), String(_stateOfHealth));
-    MqttSettings.publish(F("battery/voltage"), String(_voltage));
     MqttSettings.publish(F("battery/current"), String(_current));
     MqttSettings.publish(F("battery/temperature"), String(_temperature));
     MqttSettings.publish(F("battery/alarm/overCurrentDischarge"), String(_alarmOverCurrentDischarge));
@@ -260,6 +255,10 @@ void JkBmsBatteryStats::mqttPublish() const
         Label::CellsMilliVolt, // complex data format
         Label::ModificationPassword, // sensitive data
         Label::BatterySoCPercent // already published by base class
+        // NOTE that voltage is also published by the base class, however, we
+        // previously published it only from here using the respective topic.
+        // to avoid a breaking change, we publish the value again using the
+        // "old" topic.
     };
 
     // regularly publish all topics regardless of whether or not their value changed
@@ -340,6 +339,13 @@ void JkBmsBatteryStats::updateFrom(JkBms::DataPointContainer const& dp)
         _lastUpdateSoC = oSoCDataPoint->getTimestamp();
     }
 
+    auto oVoltage = dp.get<Label::BatteryVoltageMilliVolt>();
+    if (oVoltage.has_value()) {
+        auto oVoltageDataPoint = dp.getDataPointFor<Label::BatteryVoltageMilliVolt>();
+        BatteryStats::setVoltage(static_cast<float>(*oVoltage) / 1000,
+                oVoltageDataPoint->getTimestamp());
+    }
+
     _dataPoints.updateFrom(dp);
 
     auto oCellVoltages = _dataPoints.get<Label::CellsMilliVolt>();
@@ -360,8 +366,9 @@ void JkBmsBatteryStats::updateFrom(JkBms::DataPointContainer const& dp)
 }
 
 void VictronSmartShuntStats::updateFrom(VeDirectShuntController::veShuntStruct const& shuntData) {
+    BatteryStats::setVoltage(shuntData.V, millis());
+
     _SoC = shuntData.SOC / 10;
-    _voltage = shuntData.V;
     _current = shuntData.I;
     _modelName = shuntData.getPidAsString().data();
     _chargeCycles = shuntData.H4;
@@ -387,7 +394,6 @@ void VictronSmartShuntStats::getLiveViewData(JsonVariant& root) const {
     BatteryStats::getLiveViewData(root);
 
     // values go into the "Status" card of the web application
-    addLiveViewValue(root, "voltage", _voltage, "V", 2);
     addLiveViewValue(root, "current", _current, "A", 1);
     addLiveViewValue(root, "chargeCycles", _chargeCycles, "", 0);
     addLiveViewValue(root, "chargedEnergy", _chargedEnergy, "KWh", 1);
@@ -406,7 +412,6 @@ void VictronSmartShuntStats::getLiveViewData(JsonVariant& root) const {
 void VictronSmartShuntStats::mqttPublish() const {
     BatteryStats::mqttPublish();
 
-    MqttSettings.publish(F("battery/voltage"), String(_voltage));
     MqttSettings.publish(F("battery/current"), String(_current));
     MqttSettings.publish(F("battery/chargeCycles"), String(_chargeCycles));
     MqttSettings.publish(F("battery/chargedEnergy"), String(_chargedEnergy));

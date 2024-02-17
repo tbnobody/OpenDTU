@@ -20,6 +20,9 @@ class BatteryStats {
         uint8_t getSoC() const { return _SoC; }
         uint32_t getSoCAgeSeconds() const { return (millis() - _lastUpdateSoC) / 1000; }
 
+        float getVoltage() const { return _voltage; }
+        uint32_t getVoltageAgeSeconds() const { return (millis() - _lastUpdateVoltage) / 1000; }
+
         // convert stats to JSON for web application live view
         virtual void getLiveViewData(JsonVariant& root) const;
 
@@ -33,6 +36,10 @@ class BatteryStats {
 
     protected:
         virtual void mqttPublish() const;
+        void setVoltage(float voltage, uint32_t timestamp) {
+            _voltage = voltage;
+            _lastUpdateVoltage = timestamp;
+        }
 
         String _manufacturer = "unknown";
         uint8_t _SoC = 0;
@@ -41,6 +48,8 @@ class BatteryStats {
 
     private:
         uint32_t _lastMqttPublish = 0;
+        float _voltage = 0; // total battery pack voltage
+        uint32_t _lastUpdateVoltage = 0;
 };
 
 class PylontechBatteryStats : public BatteryStats {
@@ -59,7 +68,6 @@ class PylontechBatteryStats : public BatteryStats {
         float _chargeCurrentLimitation;
         float _dischargeCurrentLimitation;
         uint16_t _stateOfHealth;
-        float _voltage; // total voltage of the battery pack
         // total current into (positive) or from (negative)
         // the battery, i.e., the charging current
         float _current;
@@ -123,7 +131,6 @@ class VictronSmartShuntStats : public BatteryStats {
         void updateFrom(VeDirectShuntController::veShuntStruct const& shuntData);
 
     private:
-        float _voltage;
         float _current;
         float _temperature;
         bool _tempPresent;
