@@ -136,7 +136,7 @@ void PylontechCanReceiver::loop()
         }
 
         case 0x355: {
-            _stats->setSoC(static_cast<uint8_t>(this->readUnsignedInt16(rx_message.data)));
+            _stats->setSoC(static_cast<uint8_t>(this->readUnsignedInt16(rx_message.data)), 0/*precision*/, millis());
             _stats->_stateOfHealth = this->readUnsignedInt16(rx_message.data + 2);
 
             if (_verboseLogging) {
@@ -282,7 +282,7 @@ void PylontechCanReceiver::dummyData()
     };
 
     _stats->setManufacturer("Pylontech US3000C");
-    _stats->setSoC(42);
+    _stats->setSoC(42, 0/*precision*/, millis());
     _stats->_chargeVoltage = dummyFloat(50);
     _stats->_chargeCurrentLimitation = dummyFloat(33);
     _stats->_dischargeCurrentLimitation = dummyFloat(12);

@@ -56,7 +56,7 @@ void BatteryStats::getLiveViewData(JsonVariant& root) const
     root[F("manufacturer")] = _manufacturer;
     root[F("data_age")] = getAgeSeconds();
 
-    addLiveViewValue(root, "SoC", _SoC, "%", 0);
+    addLiveViewValue(root, "SoC", _soc, "%", _socPrecision);
     addLiveViewValue(root, "voltage", _voltage, "V", 2);
 }
 
@@ -212,7 +212,7 @@ void BatteryStats::mqttPublish() const
 {
     MqttSettings.publish(F("battery/manufacturer"), _manufacturer);
     MqttSettings.publish(F("battery/dataAge"), String(getAgeSeconds()));
-    MqttSettings.publish(F("battery/stateOfCharge"), String(_SoC));
+    MqttSettings.publish(F("battery/stateOfCharge"), String(_soc));
     MqttSettings.publish(F("battery/voltage"), String(_voltage));
 }
 
@@ -334,9 +334,9 @@ void JkBmsBatteryStats::updateFrom(JkBms::DataPointContainer const& dp)
 
     auto oSoCValue = dp.get<Label::BatterySoCPercent>();
     if (oSoCValue.has_value()) {
-        _SoC = *oSoCValue;
         auto oSoCDataPoint = dp.getDataPointFor<Label::BatterySoCPercent>();
-        _lastUpdateSoC = oSoCDataPoint->getTimestamp();
+        BatteryStats::setSoC(*oSoCValue, 0/*precision*/,
+                oSoCDataPoint->getTimestamp());
     }
 
     auto oVoltage = dp.get<Label::BatteryVoltageMilliVolt>();
@@ -367,8 +367,8 @@ void JkBmsBatteryStats::updateFrom(JkBms::DataPointContainer const& dp)
 
 void VictronSmartShuntStats::updateFrom(VeDirectShuntController::veShuntStruct const& shuntData) {
     BatteryStats::setVoltage(shuntData.V, millis());
+    BatteryStats::setSoC(static_cast<float>(shuntData.SOC) / 10, 1/*precision*/, millis());
 
-    _SoC = shuntData.SOC / 10;
     _current = shuntData.I;
     _modelName = shuntData.getPidAsString().data();
     _chargeCycles = shuntData.H4;
@@ -387,7 +387,6 @@ void VictronSmartShuntStats::updateFrom(VeDirectShuntController::veShuntStruct c
     _alarmHighTemperature = shuntData.AR & 64;
 
     _lastUpdate = VeDirectShunt.getLastUpdate();
-    _lastUpdateSoC = VeDirectShunt.getLastUpdate();
 }
 
 void VictronSmartShuntStats::getLiveViewData(JsonVariant& root) const {

@@ -82,7 +82,7 @@ void MqttBattery::onMqttMessageSoC(espMqttClientTypes::MessageProperties const& 
         return;
     }
 
-    _stats->setSoC(static_cast<uint8_t>(*soc));
+    _stats->setSoC(*soc, 0/*precision*/, millis());
 
     if (_verboseLogging) {
         MessageOutput.printf("MqttBattery: Updated SoC to %d from '%s'\r\n",
