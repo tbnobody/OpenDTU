@@ -13,8 +13,6 @@ private:
     void onDtuAdminGet(AsyncWebServerRequest* request);
     void onDtuAdminPost(AsyncWebServerRequest* request);
 
-    AsyncWebServer* _server;
-
     Task _applyDataTask;
     void applyDataTaskCb();
 };

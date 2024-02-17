@@ -136,7 +136,8 @@
         "Ok": "OK",
         "Unknown": "Inconnu",
         "ShowGridProfile": "Show Grid Profile",
-        "GridProfile": "Grid Profile"
+        "GridProfile": "Grid Profile",
+        "LoadingInverter": "Waiting for data... (can take up to 10 seconds)"
     },
     "eventlog": {
         "Start": "Départ",
@@ -208,6 +209,7 @@
         "Used": "Utilisée",
         "Size": "Taille",
         "Heap": "Heap",
+        "PsRam": "PSRAM",
         "LittleFs": "LittleFs",
         "Sketch": "Sketch"
     },
@@ -556,6 +558,8 @@
     },
     "about": {
         "AboutOpendtu": "À propos d'OpenDTU",
+        "Documentation": "Documentation",
+        "DocumentationBody": "The firmware and hardware documentation can be found here: <a href=\"https://www.opendtu.solar\" target=\"_blank\">https://www.opendtu.solar</a>",
         "ProjectOrigin": "Origine du projet",
         "ProjectOriginBody1": "Ce projet a été démarré suite à cette discussion <a href=\"https://www.mikrocontroller.net/topic/525778\" target=\"_blank\">(Mikrocontroller.net)</a>.",
         "ProjectOriginBody2": "Le protocole Hoymiles a été décrypté grâce aux efforts volontaires de nombreux participants. OpenDTU, entre autres, a été développé sur la base de ce travail. Le projet est sous licence Open Source (<a href=\"https://www.gnu.de/documents/gpl-2.0.de.html\" target=\"_blank\">GNU General Public License version 2</a>).",

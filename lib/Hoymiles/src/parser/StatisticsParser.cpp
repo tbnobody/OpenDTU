@@ -5,12 +5,13 @@
 #include "StatisticsParser.h"
 #include "../Hoymiles.h"
 
-static float calcYieldTotalCh0(StatisticsParser* iv, uint8_t arg0);
-static float calcYieldDayCh0(StatisticsParser* iv, uint8_t arg0);
-static float calcUdcCh(StatisticsParser* iv, uint8_t arg0);
-static float calcPowerDcCh0(StatisticsParser* iv, uint8_t arg0);
-static float calcEffiencyCh0(StatisticsParser* iv, uint8_t arg0);
-static float calcIrradiation(StatisticsParser* iv, uint8_t arg0);
+static float calcTotalYieldTotal(StatisticsParser* iv, uint8_t arg0);
+static float calcTotalYieldDay(StatisticsParser* iv, uint8_t arg0);
+static float calcChUdc(StatisticsParser* iv, uint8_t arg0);
+static float calcTotalPowerDc(StatisticsParser* iv, uint8_t arg0);
+static float calcTotalEffiency(StatisticsParser* iv, uint8_t arg0);
+static float calcChIrradiation(StatisticsParser* iv, uint8_t arg0);
+static float calcTotalCurrentAc(StatisticsParser* iv, uint8_t arg0);
 
 using func_t = float(StatisticsParser*, uint8_t);
 
@@ -20,12 +21,13 @@ struct calcFunc_t {
 };
 
 const calcFunc_t calcFunctions[] = {
-    { CALC_YT_CH0, &calcYieldTotalCh0 },
-    { CALC_YD_CH0, &calcYieldDayCh0 },
-    { CALC_UDC_CH, &calcUdcCh },
-    { CALC_PDC_CH0, &calcPowerDcCh0 },
-    { CALC_EFF_CH0, &calcEffiencyCh0 },
-    { CALC_IRR_CH, &calcIrradiation }
+    { CALC_TOTAL_YT, &calcTotalYieldTotal },
+    { CALC_TOTAL_YD, &calcTotalYieldDay },
+    { CALC_CH_UDC, &calcChUdc },
+    { CALC_TOTAL_PDC, &calcTotalPowerDc },
+    { CALC_TOTAL_EFF, &calcTotalEffiency },
+    { CALC_CH_IRR, &calcChIrradiation },
+    { CALC_TOTAL_IAC, &calcTotalCurrentAc }
 };
 
 const FieldId_t runtimeFields[] = {
@@ -386,7 +388,7 @@ void StatisticsParser::resetYieldDayCorrection()
     }
 }
 
-static float calcYieldTotalCh0(StatisticsParser* iv, uint8_t arg0)
+static float calcTotalYieldTotal(StatisticsParser* iv, uint8_t arg0)
 {
     float yield = 0;
     for (auto& channel : iv->getChannelsByType(TYPE_DC)) {
@@ -395,7 +397,7 @@ static float calcYieldTotalCh0(StatisticsParser* iv, uint8_t arg0)
     return yield;
 }
 
-static float calcYieldDayCh0(StatisticsParser* iv, uint8_t arg0)
+static float calcTotalYieldDay(StatisticsParser* iv, uint8_t arg0)
 {
     float yield = 0;
     for (auto& channel : iv->getChannelsByType(TYPE_DC)) {
@@ -405,12 +407,12 @@ static float calcYieldDayCh0(StatisticsParser* iv, uint8_t arg0)
 }
 
 // arg0 = channel of source
-static float calcUdcCh(StatisticsParser* iv, uint8_t arg0)
+static float calcChUdc(StatisticsParser* iv, uint8_t arg0)
 {
     return iv->getChannelFieldValue(TYPE_DC, static_cast<ChannelNum_t>(arg0), FLD_UDC);
 }
 
-static float calcPowerDcCh0(StatisticsParser* iv, uint8_t arg0)
+static float calcTotalPowerDc(StatisticsParser* iv, uint8_t arg0)
 {
     float dcPower = 0;
     for (auto& channel : iv->getChannelsByType(TYPE_DC)) {
@@ -419,8 +421,7 @@ static float calcPowerDcCh0(StatisticsParser* iv, uint8_t arg0)
     return dcPower;
 }
 
-// arg0 = channel
-static float calcEffiencyCh0(StatisticsParser* iv, uint8_t arg0)
+static float calcTotalEffiency(StatisticsParser* iv, uint8_t arg0)
 {
     float acPower = 0;
     for (auto& channel : iv->getChannelsByType(TYPE_AC)) {
@@ -439,11 +440,20 @@ static float calcEffiencyCh0(StatisticsParser* iv, uint8_t arg0)
 }
 
 // arg0 = channel
-static float calcIrradiation(StatisticsParser* iv, uint8_t arg0)
+static float calcChIrradiation(StatisticsParser* iv, uint8_t arg0)
 {
     if (nullptr != iv) {
         if (iv->getStringMaxPower(arg0) > 0)
             return iv->getChannelFieldValue(TYPE_DC, static_cast<ChannelNum_t>(arg0), FLD_PDC) / iv->getStringMaxPower(arg0) * 100.0f;
     }
     return 0.0;
+}
+
+static float calcTotalCurrentAc(StatisticsParser* iv, uint8_t arg0)
+{
+    float acCurrent = 0;
+    acCurrent += iv->getChannelFieldValue(TYPE_AC, CH0, FLD_IAC_1);
+    acCurrent += iv->getChannelFieldValue(TYPE_AC, CH0, FLD_IAC_2);
+    acCurrent += iv->getChannelFieldValue(TYPE_AC, CH0, FLD_IAC_3);
+    return acCurrent;
 }

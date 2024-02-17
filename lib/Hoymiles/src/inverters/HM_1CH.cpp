@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * Copyright (C) 2022 Thomas Basler and others
+ * Copyright (C) 2022-2024 Thomas Basler and others
  */
 #include "HM_1CH.h"
 
@@ -10,7 +10,7 @@ static const byteAssign_t byteAssignment[] = {
     { TYPE_DC, CH0, FLD_PDC, UNIT_W, 6, 2, 10, false, 1 },
     { TYPE_DC, CH0, FLD_YD, UNIT_WH, 12, 2, 1, false, 0 },
     { TYPE_DC, CH0, FLD_YT, UNIT_KWH, 8, 4, 1000, false, 3 },
-    { TYPE_DC, CH0, FLD_IRR, UNIT_PCT, CALC_IRR_CH, CH0, CMD_CALC, false, 3 },
+    { TYPE_DC, CH0, FLD_IRR, UNIT_PCT, CALC_CH_IRR, CH0, CMD_CALC, false, 3 },
 
     { TYPE_AC, CH0, FLD_UAC, UNIT_V, 14, 2, 10, false, 1 },
     { TYPE_AC, CH0, FLD_IAC, UNIT_A, 22, 2, 100, false, 2 },
@@ -22,10 +22,10 @@ static const byteAssign_t byteAssignment[] = {
     { TYPE_INV, CH0, FLD_T, UNIT_C, 26, 2, 10, true, 1 },
     { TYPE_INV, CH0, FLD_EVT_LOG, UNIT_NONE, 28, 2, 1, false, 0 },
 
-    { TYPE_AC, CH0, FLD_YD, UNIT_WH, CALC_YD_CH0, 0, CMD_CALC, false, 0 },
-    { TYPE_AC, CH0, FLD_YT, UNIT_KWH, CALC_YT_CH0, 0, CMD_CALC, false, 3 },
-    { TYPE_AC, CH0, FLD_PDC, UNIT_W, CALC_PDC_CH0, 0, CMD_CALC, false, 1 },
-    { TYPE_AC, CH0, FLD_EFF, UNIT_PCT, CALC_EFF_CH0, 0, CMD_CALC, false, 3 }
+    { TYPE_INV, CH0, FLD_YD, UNIT_WH, CALC_TOTAL_YD, 0, CMD_CALC, false, 0 },
+    { TYPE_INV, CH0, FLD_YT, UNIT_KWH, CALC_TOTAL_YT, 0, CMD_CALC, false, 3 },
+    { TYPE_INV, CH0, FLD_PDC, UNIT_W, CALC_TOTAL_PDC, 0, CMD_CALC, false, 1 },
+    { TYPE_INV, CH0, FLD_EFF, UNIT_PCT, CALC_TOTAL_EFF, 0, CMD_CALC, false, 3 }
 };
 
 HM_1CH::HM_1CH(HoymilesRadio* radio, const uint64_t serial)

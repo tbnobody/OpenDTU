@@ -20,9 +20,7 @@ void WebApiSysstatusClass::init(AsyncWebServer& server, Scheduler& scheduler)
 {
     using std::placeholders::_1;
 
-    _server = &server;
-
-    _server->on("/api/system/status", HTTP_GET, std::bind(&WebApiSysstatusClass::onSystemStatus, this, _1));
+    server.on("/api/system/status", HTTP_GET, std::bind(&WebApiSysstatusClass::onSystemStatus, this, _1));
 }
 
 void WebApiSysstatusClass::onSystemStatus(AsyncWebServerRequest* request)
@@ -43,6 +41,8 @@ void WebApiSysstatusClass::onSystemStatus(AsyncWebServerRequest* request)
     root["heap_used"] = ESP.getHeapSize() - ESP.getFreeHeap();
     root["heap_max_block"] = ESP.getMaxAllocHeap();
     root["heap_min_free"] = ESP.getMinFreeHeap();
+    root["psram_total"] = ESP.getPsramSize();
+    root["psram_used"] = ESP.getPsramSize() - ESP.getFreePsram();
     root["sketch_total"] = ESP.getFreeSketchSpace();
     root["sketch_used"] = ESP.getSketchSize();
     root["littlefs_total"] = LittleFS.totalBytes();

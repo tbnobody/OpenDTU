@@ -10,7 +10,6 @@ public:
     void init(AsyncWebServer& server, Scheduler& scheduler);
 
 private:
-    AsyncWebServer* _server;
     AsyncWebSocket _ws;
 
     Task _wsCleanupTask;

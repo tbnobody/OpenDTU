@@ -239,8 +239,11 @@ CountryModeId_t HoymilesRadio_CMT::getCountryMode() const
 
 void HoymilesRadio_CMT::setCountryMode(const CountryModeId_t mode)
 {
-    _radio->setFrequencyBand(countryDefinition.at(mode).Band);
     _countryMode = mode;
+    if (!_isInitialized) {
+        return;
+    }
+    _radio->setFrequencyBand(countryDefinition.at(mode).Band);
 }
 
 uint32_t HoymilesRadio_CMT::getInvBootFrequency() const

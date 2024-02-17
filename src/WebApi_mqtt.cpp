@@ -15,11 +15,9 @@ void WebApiMqttClass::init(AsyncWebServer& server, Scheduler& scheduler)
 {
     using std::placeholders::_1;
 
-    _server = &server;
-
-    _server->on("/api/mqtt/status", HTTP_GET, std::bind(&WebApiMqttClass::onMqttStatus, this, _1));
-    _server->on("/api/mqtt/config", HTTP_GET, std::bind(&WebApiMqttClass::onMqttAdminGet, this, _1));
-    _server->on("/api/mqtt/config", HTTP_POST, std::bind(&WebApiMqttClass::onMqttAdminPost, this, _1));
+    server.on("/api/mqtt/status", HTTP_GET, std::bind(&WebApiMqttClass::onMqttStatus, this, _1));
+    server.on("/api/mqtt/config", HTTP_GET, std::bind(&WebApiMqttClass::onMqttAdminGet, this, _1));
+    server.on("/api/mqtt/config", HTTP_POST, std::bind(&WebApiMqttClass::onMqttAdminPost, this, _1));
 }
 
 void WebApiMqttClass::onMqttStatus(AsyncWebServerRequest* request)
@@ -79,7 +77,7 @@ void WebApiMqttClass::onMqttAdminGet(AsyncWebServerRequest* request)
     root["mqtt_client_cert"] = config.Mqtt.Tls.ClientCert;
     root["mqtt_client_key"] = config.Mqtt.Tls.ClientKey;
     root["mqtt_lwt_topic"] = config.Mqtt.Lwt.Topic;
-    root["mqtt_lwt_online"] = config.Mqtt.CleanSession;
+    root["mqtt_lwt_online"] = config.Mqtt.Lwt.Value_Online;;
     root["mqtt_lwt_offline"] = config.Mqtt.Lwt.Value_Offline;
     root["mqtt_lwt_qos"] = config.Mqtt.Lwt.Qos;
     root["mqtt_publish_interval"] = config.Mqtt.PublishInterval;

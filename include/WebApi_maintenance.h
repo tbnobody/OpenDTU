@@ -10,6 +10,4 @@ public:
 
 private:
     void onRebootPost(AsyncWebServerRequest* request);
-
-    AsyncWebServer* _server;
 };

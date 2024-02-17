@@ -55,12 +55,13 @@ const char* const fields[] = { "Voltage", "Current", "Power", "YieldDay", "Yield
 
 // indices to calculation functions, defined in hmInverter.h
 enum {
-    CALC_YT_CH0 = 0,
-    CALC_YD_CH0,
-    CALC_UDC_CH,
-    CALC_PDC_CH0,
-    CALC_EFF_CH0,
-    CALC_IRR_CH
+    CALC_TOTAL_YT = 0,
+    CALC_TOTAL_YD,
+    CALC_CH_UDC,
+    CALC_TOTAL_PDC,
+    CALC_TOTAL_EFF,
+    CALC_CH_IRR,
+    CALC_TOTAL_IAC
 };
 enum { CMD_CALC = 0xffff };
 

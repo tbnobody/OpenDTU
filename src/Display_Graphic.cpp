@@ -13,6 +13,7 @@ std::map<DisplayType_t, std::function<U8G2*(uint8_t, uint8_t, uint8_t, uint8_t)>
     { DisplayType_t::SSD1306, [](uint8_t reset, uint8_t clock, uint8_t data, uint8_t cs) { return new U8G2_SSD1306_128X64_NONAME_F_HW_I2C(U8G2_R0, reset, clock, data); } },
     { DisplayType_t::SH1106, [](uint8_t reset, uint8_t clock, uint8_t data, uint8_t cs) { return new U8G2_SH1106_128X64_NONAME_F_HW_I2C(U8G2_R0, reset, clock, data); } },
     { DisplayType_t::SSD1309, [](uint8_t reset, uint8_t clock, uint8_t data, uint8_t cs) { return new U8G2_SSD1309_128X64_NONAME0_F_HW_I2C(U8G2_R0, reset, clock, data); } },
+    { DisplayType_t::ST7567_GM12864I_59N, [](uint8_t reset, uint8_t clock, uint8_t data, uint8_t cs) { return new U8G2_ST7567_ENH_DG128064I_F_HW_I2C(U8G2_R0, reset, clock, data); } },
 };
 
 // Language defintion, respect order in languages[] and translation lists
@@ -35,6 +36,7 @@ static const char* const i18n_current_power_w[] = { "%.0f W", "%.0f W", "%.0f W"
 static const char* const i18n_current_power_kw[] = { "%.1f kW", "%.1f kW", "%.1f kW", "%.1f kW" };
 static const char* const i18n_yield_today_wh[] = { "today: %4.0f Wh", "Heute: %4.0f Wh", "auj.: %4.0f Wh", "Hoy: %4.0f Wh" };
 static const char* const i18n_yield_total_kwh[] = { "total: %.1f kWh", "Ges.: %.1f kWh", "total: %.1f kWh", "Total: %.1f kWh" };
+static const char* const i18n_yield_total_mwh[] = { "total: %.0f kWh", "Ges.: %.0f kWh", "total: %.0f kWh", "Total: %.0f kWh" };
 static const char* const i18n_date_format[] = { "%m/%d/%Y %H:%M", "%d.%m.%Y %H:%M", "%d/%m/%Y %H:%M", "%d/%m/%Y %H:%M" };
 
 DisplayGraphicClass::DisplayGraphicClass()
@@ -53,6 +55,9 @@ void DisplayGraphicClass::init(Scheduler& scheduler, const DisplayType_t type, c
     if (isValidDisplay()) {
         auto constructor = display_types[_display_type];
         _display = constructor(reset, clk, data, cs);
+        if (_display_type == DisplayType_t::ST7567_GM12864I_59N) {
+            _display->setI2CAddress(0x3F << 1);
+        }
         _display->begin();
         setContrast(DISPLAY_CONTRAST);
         setStatus(true);
@@ -66,11 +71,19 @@ void DisplayGraphicClass::init(Scheduler& scheduler, const DisplayType_t type, c
 
 void DisplayGraphicClass::calcLineHeights()
 {
-    uint8_t yOff = 0;
+    bool diagram = (_isLarge && _diagram_mode == DiagramMode_t::Small);
+    // the diagram needs space. we need to keep
+    // away from the y-axis label in particular.
+    uint8_t yOff = (diagram ? 7 : 0);
     for (uint8_t i = 0; i < 4; i++) {
         setFont(i);
-        yOff += (_display->getMaxCharHeight());
+        yOff += _display->getAscent();
         _lineOffsets[i] = yOff;
+        yOff += ((!_isLarge || diagram) ? 2 : 3);
+        // the descent is a negative value and moves the *next* line's
+        // baseline. the first line never uses a letter with descent and
+        // we need that space when showing the small diagram.
+        yOff -= ((i == 0 && diagram) ? 0 : _display->getDescent());
     }
 }
 
@@ -102,27 +115,23 @@ void DisplayGraphicClass::printText(const char* text, const uint8_t line)
     if (!_isLarge) {
         dispX = (line == 0) ? 5 : 0;
     } else {
-        switch (line) {
-        case 0:
-            if (_diagram_mode == DiagramMode_t::Small) {
-                // Center between left border and diagram
-                dispX = (CHART_POSX - _display->getStrWidth(text)) / 2;
-            } else {
-                // Center on screen
-                dispX = (_display->getDisplayWidth() - _display->getStrWidth(text)) / 2;
-            }
-            break;
-        case 3:
+        if (line == 0 && _diagram_mode == DiagramMode_t::Small) {
+            // Center between left border and diagram
+            dispX = (CHART_POSX - _display->getStrWidth(text)) / 2;
+        } else {
             // Center on screen
             dispX = (_display->getDisplayWidth() - _display->getStrWidth(text)) / 2;
-            break;
-        default:
-            dispX = 5;
-            break;
         }
     }
 
-    dispX += enableScreensaver ? (_mExtra % 7) : 0;
+    if (enableScreensaver) {
+        unsigned maxOffset = (_isLarge ? 8 : 6);
+        unsigned period = 2 * maxOffset;
+        unsigned step = _mExtra % period;
+        int offset = (step <= maxOffset) ? step : (period - step);
+        offset -= (_isLarge ? 5 : 0); // oscillate around center on large screens
+        dispX += offset;
+    }
     _display->drawStr(dispX, _lineOffsets[line], text);
 }
 
@@ -235,7 +244,9 @@ void DisplayGraphicClass::loop()
         snprintf(_fmtText, sizeof(_fmtText), i18n_yield_today_wh[_display_language], Datastore.getTotalAcYieldDayEnabled());
         printText(_fmtText, 1);
 
-        snprintf(_fmtText, sizeof(_fmtText), i18n_yield_total_kwh[_display_language], Datastore.getTotalAcYieldTotalEnabled());
+        const float watts = Datastore.getTotalAcYieldTotalEnabled();
+        auto const format = (watts >= 1000) ? i18n_yield_total_mwh : i18n_yield_total_kwh;
+        snprintf(_fmtText, sizeof(_fmtText), format[_display_language], watts);
         printText(_fmtText, 2);
         //<=======================
 

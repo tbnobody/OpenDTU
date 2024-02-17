@@ -15,6 +15,4 @@ private:
     void onMqttAdminGet(AsyncWebServerRequest* request);
     void onMqttAdminPost(AsyncWebServerRequest* request);
     String getTlsCertInfo(const char* cert);
-
-    AsyncWebServer* _server;
 };
