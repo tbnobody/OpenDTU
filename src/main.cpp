@@ -20,6 +20,7 @@
 #include "MqttHandleVedirect.h"
 #include "MqttHandleHuawei.h"
 #include "MqttHandlePowerLimiter.h"
+#include "MqttHandlePowerLimiterHass.h"
 #include "MqttSettings.h"
 #include "NetworkSettings.h"
 #include "NtpSettings.h"
@@ -123,6 +124,7 @@ void setup()
     MqttHandleBatteryHass.init(scheduler);
     MqttHandleHuawei.init(scheduler);
     MqttHandlePowerLimiter.init(scheduler);
+    MqttHandlePowerLimiterHass.init(scheduler);
     MessageOutput.println("done");
 
     // Initialize WebApi
