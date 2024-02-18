@@ -11,6 +11,7 @@
 
 class MessageOutputClass : public Print {
 public:
+    MessageOutputClass();
     void init(Scheduler& scheduler);
     size_t write(uint8_t c) override;
     size_t write(const uint8_t* buffer, size_t size) override;

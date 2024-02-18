@@ -21,8 +21,12 @@ export interface SystemStatus {
     // MemoryInfo
     heap_total: number;
     heap_used: number;
+    heap_max_block: number;
+    heap_min_free: number;
     littlefs_total: number;
     littlefs_used: number;
+    psram_total: number;
+    psram_used: number;
     sketch_total: number;
     sketch_used: number;
     // RadioInfo

@@ -1,24 +1,23 @@
 <template>
     <nav class="navbar navbar-expand-md fixed-top bg-body-tertiary" data-bs-theme="dark">
         <div class="container-fluid">
-            <router-link @click="onClick" class="navbar-brand" to="/">
-                <span v-if="isXmas" class="text-success">
-                    <BIconTree width="30" height="30" class="d-inline-block align-text-top" />
+            <router-link @click="onClick" class="navbar-brand" to="/" style="display: flex; height: 30px; padding: 0;">
+                <BIconTree v-if="isXmas" width="30" height="30" class="d-inline-block align-text-top text-success" />
+
+                <BIconEgg v-else-if="isEaster" width="30" height="30" class="d-inline-block align-text-top text-info" />
+
+                <BIconSun v-else width="30" height="30" class="d-inline-block align-text-top text-warning" />
+
+                <span style="margin-left: .5rem">
+                    OpenDTU
                 </span>
-                <span v-else-if="isEaster" class="text-info">
-                    <BIconEgg width="30" height="30" class="d-inline-block align-text-top" />
-                </span>
-                <span v-else class="text-warning">
-                    <BIconSun width="30" height="30" class="d-inline-block align-text-top" />
-                </span>
-                 OpenDTU
             </router-link>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup"
                 aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" ref="navbarCollapse" id="navbarNavAltMarkup">
-                <ul class="navbar-nav me-auto">
+                <ul class="navbar-nav navbar-nav-scroll d-flex me-auto flex-sm-fill">
                     <li class="nav-item">
                         <router-link @click="onClick" class="nav-link" to="/">{{ $t('menu.LiveView') }}</router-link>
                     </li>
@@ -94,8 +93,7 @@
                     <li class="nav-item">
                         <router-link @click="onClick" class="nav-link" to="/about">{{ $t('menu.About') }}</router-link>
                     </li>
-                </ul>
-                <ul class="navbar-nav flex-row flex-wrap ms-md-auto">
+                    <li class="flex-sm-fill"></li>
                     <ThemeSwitcher class="me-2" />
                     <form class="d-flex" role="search">
                         <LocaleSwitcher class="me-2" />

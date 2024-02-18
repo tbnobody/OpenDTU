@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * Copyright (C) 2023 Thomas Basler and others
+ * Copyright (C) 2023-2024 Thomas Basler and others
  */
 #include "Datastore.h"
 #include "Configuration.h"
@@ -8,12 +8,14 @@
 
 DatastoreClass Datastore;
 
+DatastoreClass::DatastoreClass()
+    : _loopTask(1 * TASK_SECOND, TASK_FOREVER, std::bind(&DatastoreClass::loop, this))
+{
+}
+
 void DatastoreClass::init(Scheduler& scheduler)
 {
     scheduler.addTask(_loopTask);
-    _loopTask.setCallback(std::bind(&DatastoreClass::loop, this));
-    _loopTask.setIterations(TASK_FOREVER);
-    _loopTask.setInterval(1 * TASK_SECOND);
     _loopTask.enable();
 }
 
@@ -79,14 +81,17 @@ void DatastoreClass::loop()
             }
         }
 
-        for (auto& c : inv->Statistics()->getChannelsByType(TYPE_AC)) {
+        for (auto& c : inv->Statistics()->getChannelsByType(TYPE_INV)) {
             if (cfg->Poll_Enable) {
-                _totalAcYieldTotalEnabled += inv->Statistics()->getChannelFieldValue(TYPE_AC, c, FLD_YT);
-                _totalAcYieldDayEnabled += inv->Statistics()->getChannelFieldValue(TYPE_AC, c, FLD_YD);
+                _totalAcYieldTotalEnabled += inv->Statistics()->getChannelFieldValue(TYPE_INV, c, FLD_YT);
+                _totalAcYieldDayEnabled += inv->Statistics()->getChannelFieldValue(TYPE_INV, c, FLD_YD);
 
-                _totalAcYieldTotalDigits = max<unsigned int>(_totalAcYieldTotalDigits, inv->Statistics()->getChannelFieldDigits(TYPE_AC, c, FLD_YT));
-                _totalAcYieldDayDigits = max<unsigned int>(_totalAcYieldDayDigits, inv->Statistics()->getChannelFieldDigits(TYPE_AC, c, FLD_YD));
+                _totalAcYieldTotalDigits = max<unsigned int>(_totalAcYieldTotalDigits, inv->Statistics()->getChannelFieldDigits(TYPE_INV, c, FLD_YT));
+                _totalAcYieldDayDigits = max<unsigned int>(_totalAcYieldDayDigits, inv->Statistics()->getChannelFieldDigits(TYPE_INV, c, FLD_YD));
             }
+        }
+
+        for (auto& c : inv->Statistics()->getChannelsByType(TYPE_AC)) {
             if (inv->getEnablePolling()) {
                 _totalAcPowerEnabled += inv->Statistics()->getChannelFieldValue(TYPE_AC, c, FLD_PAC);
                 _totalAcPowerDigits = max<unsigned int>(_totalAcPowerDigits, inv->Statistics()->getChannelFieldDigits(TYPE_AC, c, FLD_PAC));

@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * Copyright (C) 2022 Thomas Basler and others
+ * Copyright (C) 2022-2024 Thomas Basler and others
  */
 #include "Configuration.h"
 #include "MessageOutput.h"
@@ -95,6 +95,7 @@ bool ConfigurationClass::write()
     dtu["nrf_pa_level"] = config.Dtu.Nrf.PaLevel;
     dtu["cmt_pa_level"] = config.Dtu.Cmt.PaLevel;
     dtu["cmt_frequency"] = config.Dtu.Cmt.Frequency;
+    dtu["cmt_country_mode"] = config.Dtu.Cmt.CountryMode;
 
     JsonObject security = doc.createNestedObject("security");
     security["password"] = config.Security.Password;
@@ -109,7 +110,8 @@ bool ConfigurationClass::write()
     display["rotation"] = config.Display.Rotation;
     display["contrast"] = config.Display.Contrast;
     display["language"] = config.Display.Language;
-    display["diagram_duration"] = config.Display.DiagramDuration;
+    display["diagram_duration"] = config.Display.Diagram.Duration;
+    display["diagram_mode"] = config.Display.Diagram.Mode;
 
     JsonArray leds = device.createNestedArray("led");
     for (uint8_t i = 0; i < PINMAPPING_LED_COUNT; i++) {
@@ -262,6 +264,7 @@ bool ConfigurationClass::read()
     config.Dtu.Nrf.PaLevel = dtu["nrf_pa_level"] | DTU_NRF_PA_LEVEL;
     config.Dtu.Cmt.PaLevel = dtu["cmt_pa_level"] | DTU_CMT_PA_LEVEL;
     config.Dtu.Cmt.Frequency = dtu["cmt_frequency"] | DTU_CMT_FREQUENCY;
+    config.Dtu.Cmt.CountryMode = dtu["cmt_country_mode"] | DTU_CMT_COUNTRY_MODE;
 
     JsonObject security = doc["security"];
     strlcpy(config.Security.Password, security["password"] | ACCESS_POINT_PASSWORD, sizeof(config.Security.Password));
@@ -276,7 +279,8 @@ bool ConfigurationClass::read()
     config.Display.Rotation = display["rotation"] | DISPLAY_ROTATION;
     config.Display.Contrast = display["contrast"] | DISPLAY_CONTRAST;
     config.Display.Language = display["language"] | DISPLAY_LANGUAGE;
-    config.Display.DiagramDuration = display["diagram_duration"] | DISPLAY_DIAGRAM_DURATION;
+    config.Display.Diagram.Duration = display["diagram_duration"] | DISPLAY_DIAGRAM_DURATION;
+    config.Display.Diagram.Mode = display["diagram_mode"] | DISPLAY_DIAGRAM_MODE;
 
     JsonArray leds = device["led"];
     for (uint8_t i = 0; i < PINMAPPING_LED_COUNT; i++) {
@@ -361,6 +365,11 @@ void ConfigurationClass::migrate()
         // which was done by updating ESP32 PlatformIO from 6.3.2 to 6.5.0
         nvs_flash_erase();
         nvs_flash_init();
+    }
+
+    if (config.Cfg.Version < 0x00011b00) {
+        // Convert from kHz to Hz
+        config.Dtu.Cmt.Frequency *= 1000;
     }
 
     f.close();

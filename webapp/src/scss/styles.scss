@@ -1,6 +1,6 @@
 // Import all of Bootstrap's CSS
 @import "~bootstrap/scss/bootstrap";
 
-main {
+.container-fluid .row {
     font-feature-settings: "tnum";
 }

@@ -3,12 +3,13 @@
 
 #include <Arduino.h>
 #include <ESPAsyncWebServer.h>
+#include <TaskSchedulerDeclarations.h>
 
 #define DATABASE_FILENAME "/database.bin"
 
 class WebApiDatabaseClass {
 public:
-    void init(AsyncWebServer& server);
+    void init(AsyncWebServer& server, Scheduler& scheduler);
     void loop();
     bool write(float energy);
 

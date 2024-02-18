@@ -5,7 +5,7 @@
 #include <cstdint>
 
 #define CONFIG_FILENAME "/config.json"
-#define CONFIG_VERSION 0x00011a00 // 0.1.26 // make sure to clean all after change
+#define CONFIG_VERSION 0x00011b00 // 0.1.27 // make sure to clean all after change
 
 #define WIFI_MAX_SSID_STRLEN 32
 #define WIFI_MAX_PASSWORD_STRLEN 64
@@ -129,6 +129,7 @@ struct CONFIG_T {
         struct {
             int8_t PaLevel;
             uint32_t Frequency;
+            uint8_t CountryMode;
         } Cmt;
     } Dtu;
 
@@ -143,7 +144,10 @@ struct CONFIG_T {
         uint8_t Rotation;
         uint8_t Contrast;
         uint8_t Language;
-        uint32_t DiagramDuration;
+        struct {
+            uint32_t Duration;
+            uint8_t Mode;
+        } Diagram;
     } Display;
 
     struct {

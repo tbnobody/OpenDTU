@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * Copyright (C) 2022-2023 Thomas Basler and others
+ * Copyright (C) 2022-2024 Thomas Basler and others
  */
 #include "MqttHandleHass.h"
 #include "MqttHandleInverter.h"
@@ -11,11 +11,14 @@
 
 MqttHandleHassClass MqttHandleHass;
 
+MqttHandleHassClass::MqttHandleHassClass()
+    : _loopTask(TASK_IMMEDIATE, TASK_FOREVER, std::bind(&MqttHandleHassClass::loop, this))
+{
+}
+
 void MqttHandleHassClass::init(Scheduler& scheduler)
 {
     scheduler.addTask(_loopTask);
-    _loopTask.setCallback(std::bind(&MqttHandleHassClass::loop, this));
-    _loopTask.setIterations(TASK_FOREVER);
     _loopTask.enable();
 }
 
@@ -53,7 +56,7 @@ void MqttHandleHassClass::publishConfig()
 
     const CONFIG_T& config = Configuration.get();
 
-     // publish DTU sensors
+    // publish DTU sensors
     publishDtuSensor("IP", "", "diagnostic", "mdi:network-outline", "", "");
     publishDtuSensor("WiFi Signal", "signal_strength", "diagnostic", "", "dBm", "rssi");
     publishDtuSensor("Uptime", "duration", "diagnostic", "", "s", "");
@@ -104,7 +107,7 @@ void MqttHandleHassClass::publishInverterField(std::shared_ptr<InverterAbstract>
     const String serial = inv->serialString();
 
     String fieldName;
-    if (type == TYPE_AC && fieldType.fieldId == FLD_PDC) {
+    if (type == TYPE_INV && fieldType.fieldId == FLD_PDC) {
         fieldName = "PowerDC";
     } else {
         fieldName = inv->Statistics()->getChannelFieldName(type, channel, fieldType.fieldId);
@@ -421,5 +424,5 @@ void MqttHandleHassClass::publish(const String& subtopic, const String& payload)
 {
     String topic = Configuration.get().Mqtt.Hass.Topic;
     topic += subtopic;
-    MqttSettings.publishGeneric(topic.c_str(), payload.c_str(), Configuration.get().Mqtt.Hass.Retain);
+    MqttSettings.publishGeneric(topic, payload, Configuration.get().Mqtt.Hass.Retain);
 }

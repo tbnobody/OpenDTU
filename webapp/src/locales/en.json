@@ -26,7 +26,11 @@
         "Loading": "Loading...",
         "Reload": "Reload",
         "Cancel": "Cancel",
-        "Save": "Save"
+        "Save": "Save",
+        "Refreshing": "Refreshing",
+        "Pull": "Pull down to refresh",
+        "Release": "Release to refresh",
+        "Close": "Close"
     },
     "localeswitcher": {
         "Dark": "Dark",
@@ -44,6 +48,7 @@
         "2002": "Poll interval must be greater zero!",
         "2003": "Invalid power level setting!",
         "2004": "The frequency must be set between {min} and {max} kHz and must be a multiple of 250kHz!",
+        "2005": "Invalid country selection!",
         "3001": "Not deleted anything!",
         "3002": "Configuration resettet. Rebooting now...",
         "4001": "@:apiresponse.2001",
@@ -112,7 +117,6 @@
         "UnreadMessages": "unread messages",
         "Loading": "@:base.Loading",
         "EventLog": "Event Log",
-        "Close": "Close",
         "InverterInfo": "Inverter Info",
         "LimitSettings": "Limit Settings",
         "LastLimitSetStatus": "Last Limit Set Status:",
@@ -132,7 +136,8 @@
         "Ok": "Ok",
         "Unknown": "Unknown",
         "ShowGridProfile": "Show Grid Profile",
-        "GridProfile": "Grid Profile"
+        "GridProfile": "Grid Profile",
+        "LoadingInverter": "Waiting for data... (can take up to 10 seconds)"
     },
     "eventlog": {
         "Start": "Start",
@@ -181,10 +186,12 @@
         "FirmwareVersionHint": "Click here to show information about your current version",
         "FirmwareUpdate": "Firmware Update",
         "FirmwareUpdateHint": "Click here to view the changes between your version and the latest version",
+        "FrmwareUpdateAllow": "By activating the update check, a request is sent to GitHub.com each time the page is called up to retrieve the currently available version. If you do not agree with this, leave this function deactivated.",
         "ResetReason0": "Reset Reason CPU 0",
         "ResetReason1": "Reset Reason CPU 1",
         "ConfigSaveCount": "Config save count",
-        "Uptime": "Uptime"
+        "Uptime": "Uptime",
+        "UptimeValue": "0 days {time} | 1 day {time} | {count} days {time}"
     },
     "hardwareinfo": {
         "HardwareInformation": "Hardware Information",
@@ -202,8 +209,16 @@
         "Used": "Used",
         "Size": "Size",
         "Heap": "Heap",
+        "PsRam": "PSRAM",
         "LittleFs": "LittleFs",
         "Sketch": "Sketch"
+    },
+    "heapdetails": {
+        "HeapDetails": "Heap Details",
+        "TotalFree": "Total free",
+        "LargestFreeBlock": "Biggest contiguous free block",
+        "MaxUsage": "Maximum usage since start",
+        "Fragmentation": "Level of fragmentation"
     },
     "radioinfo": {
         "RadioInformation": "Radio Information",
@@ -305,10 +320,7 @@
     "inverterchannelinfo": {
         "String": "String {num}",
         "Phase": "Phase {num}",
-        "General": "General",
-        "Property": "Property",
-        "Value": "Value",
-        "Unit": "Unit"
+        "General": "General"
     },
     "invertertotalinfo": {
         "TotalYieldTotal": "Total Yield Total",
@@ -349,9 +361,14 @@
         "CmtPaLevel": "CMT2300A Transmitting power:",
         "NrfPaLevelHint": "Used for HM-Inverters. Make sure your power supply is stable enough before increasing the transmit power.",
         "CmtPaLevelHint": "Used for HMS/HMT-Inverters. Make sure your power supply is stable enough before increasing the transmit power.",
+        "CmtCountry": "CMT2300A Region/Country:",
+        "CmtCountryHint": "Each country has different frequency allocations.",
+        "country_0": "Europe ({min}MHz - {max}MHz)",
+        "country_1": "North America ({min}MHz - {max}MHz)",
+        "country_2": "Brazil ({min}MHz - {max}MHz)",
         "CmtFrequency": "CMT2300A Frequency:",
         "CmtFrequencyHint": "Make sure to only use frequencies that are allowed in the respective country! After a frequency change, it can take up to 15min until a connection is established.",
-        "CmtFrequencyWarning": "The selected frequency is outside the range allowed in the EU. Make sure that this selection does not violate any local regulations.",
+        "CmtFrequencyWarning": "The selected frequency is outside the allowed range in your selected region/country. Make sure that this selection does not violate any local regulations.",
         "MHz": "{mhz} MHz",
         "dBm": "{dbm} dBm",
         "Min": "Minimum ({db} dBm)",
@@ -535,12 +552,14 @@
         "Back": "Back",
         "Retry": "Retry",
         "OtaStatus": "OTA Status",
-        "OtaSuccess": "OTA Success. The unit has been automatically restarted and will be available again in a few moments. Please do not forget to reload the web interface!",
+        "OtaSuccess": "The firmware upload was successful. The device was restarted automatically. When the device is accessible again, the interface is automatically reloaded.",
         "FirmwareUpload": "Firmware Upload",
         "UploadProgress": "Upload Progress"
     },
     "about": {
         "AboutOpendtu": "About OpenDTU",
+        "Documentation": "Documentation",
+        "DocumentationBody": "The firmware and hardware documentation can be found here: <a href=\"https://www.opendtu.solar\" target=\"_blank\">https://www.opendtu.solar</a>",
         "ProjectOrigin": "Project Origin",
         "ProjectOriginBody1": "This project was started from <a href=\"https://www.mikrocontroller.net/topic/525778\" target=\"_blank\">this discussion. (Mikrocontroller.net)</a>",
         "ProjectOriginBody2": "The Hoymiles protocol was decrypted through the voluntary efforts of many participants. OpenDTU, among others, was developed based on this work. The project is licensed under an Open Source License (<a href=\"https://www.gnu.de/documents/gpl-2.0.de.html\" target=\"_blank\">GNU General Public License version 2</a>).",
@@ -572,6 +591,10 @@
         "PowerSafeHint": "Turn off the display if no inverter is producing.",
         "Screensaver": "Enable Screensaver:",
         "ScreensaverHint": "Move the display a little bit on each update to prevent burn-in. (Useful especially for OLED displays)",
+        "DiagramMode": "Diagram mode:",
+        "off": "Off",
+        "small": "Small",
+        "fullscreen": "Fullscreen",
         "DiagramDuration": "Diagram duration:",
         "DiagramDurationHint": "The time period which is shown in the diagram.",
         "Seconds": "Seconds",

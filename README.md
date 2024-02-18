@@ -42,6 +42,10 @@ Please feel free to support and create a PR in [this](https://github.com/tbnobod
 Generated using: `git log --date=short --pretty=format:"* %h%x09%ad%x09%s" | grep BREAKING`
 
 ```code
+* 1b637f08      2024-01-30      BREAKING CHANGE: Web API Endpoint /api/livedata/status and /api/prometheus/metrics
+* e1564780      2024-01-30      BREAKING CHANGE: Web API Endpoint /api/livedata/status and /api/prometheus/metrics
+* f0b5542c      2024-01-30      BREAKING CHANGE: Web API Endpoint /api/livedata/status and /api/prometheus/metrics
+* c27ecc36      2024-01-29      BREAKING CHANGE: Web API Endpoint /api/livedata/status
 * 71d1b3b       2023-11-07      BREAKING CHANGE: Home Assistant Auto Discovery to new naming scheme
 * 04f62e0       2023-04-20      BREAKING CHANGE: Web API Endpoint /api/eventlog/status no nested serial object
 * 59f43a8       2023-04-17      BREAKING CHANGE: Web API Endpoint /api/devinfo/status requires GET parameter inv=
@@ -90,34 +94,3 @@ Generated using: `git log --date=short --pretty=format:"* %h%x09%ad%x09%s" | gre
 | TSUN TSOL-M350       | NRF24L01+          | 1         | 1           | 1         |
 | TSUN TSOL-M800       | NRF24L01+          | 2         | 2           | 1         |
 | TSUN TSOL-M1600      | NRF24L01+          | 4         | 2           | 1         |
-
-
-
-## Hardware you need
-
-### ESP32 board
-
-For ease of use, buy a "ESP32 DEVKIT DOIT" or "ESP32 NodeMCU Development Board" with an ESP32-S3 or ESP-WROOM-32 chipset on it.
-
-Sample Picture:
-
-![NodeMCU-ESP32](docs/nodemcu-esp32.png)
-
-Also supported: Board with Ethernet-Connector and Power-over-Ethernet [Olimex ESP32-POE](https://www.olimex.com/Products/IoT/ESP32/ESP32-POE/open-source-hardware)
-
-### Change pin assignment
-
-Its possible to change all the pins of the NRF24L01+ module, the Display, the LED etc.
-The recommend way to change the pin assignment is by creating a custom [device profile](docs/DeviceProfiles.md).
-It is also possible to create a custom environment and compile the source yourself. This can be achieved by copying one of the [env:....] sections from 'platformio.ini' to 'platformio_override.ini' and editing the 'platformio_override.ini' file and add/change one or more of the following lines to the 'build_flags' parameter:
-
-```makefile
--DHOYMILES_PIN_MISO=19
--DHOYMILES_PIN_MOSI=23
--DHOYMILES_PIN_SCLK=18
--DHOYMILES_PIN_IRQ=16
--DHOYMILES_PIN_CE=4
--DHOYMILES_PIN_CS=5
-```
-
-It is recommended to make all changes only in the  'platformio_override.ini', this is your personal copy.

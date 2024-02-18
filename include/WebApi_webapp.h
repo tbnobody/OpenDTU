@@ -2,12 +2,12 @@
 #pragma once
 
 #include <ESPAsyncWebServer.h>
+#include <TaskSchedulerDeclarations.h>
 
 class WebApiWebappClass {
 public:
-    void init(AsyncWebServer& server);
-    void loop();
+    void init(AsyncWebServer& server, Scheduler& scheduler);
 
 private:
-    AsyncWebServer* _server;
+    void responseBinaryDataWithETagCache(AsyncWebServerRequest* request, const String &contentType, const String &contentEncoding, const uint8_t *content, size_t len);
 };

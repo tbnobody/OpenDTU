@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * Copyright (C) 2022-2023 Thomas Basler and others
+ * Copyright (C) 2022-2024 Thomas Basler and others
  */
 #include "Configuration.h"
 #include "Datastore.h"
@@ -24,9 +24,13 @@
 #include <Arduino.h>
 #include <LittleFS.h>
 #include <TaskScheduler.h>
+#include <esp_heap_caps.h>
 
 void setup()
 {
+    // Move all dynamic allocations >512byte to psram (if available)
+    heap_caps_malloc_extmem_enable(512);
+
     // Initialize serial output
     Serial.begin(SERIAL_BAUDRATE);
 #if ARDUINO_USB_CDC_ON_BOOT
@@ -120,6 +124,7 @@ void setup()
         pin.display_clk,
         pin.display_cs,
         pin.display_reset);
+    Display.setDiagramMode(static_cast<DiagramMode_t>(config.Display.Diagram.Mode));
     Display.setOrientation(config.Display.Rotation);
     Display.enablePowerSafe = config.Display.PowerSafe;
     Display.enableScreensaver = config.Display.ScreenSaver;

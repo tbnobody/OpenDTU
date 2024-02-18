@@ -1,12 +1,13 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * Copyright (C) 2023 Thomas Basler and others
+ * Copyright (C) 2023-2024 Thomas Basler and others
  */
 #include "cmt2300wrapper.h"
 #include "cmt2300a.h"
-#include "cmt2300a_params.h"
+#include "cmt2300a_params_860.h"
+#include "cmt2300a_params_900.h"
 
-CMT2300A::CMT2300A(uint8_t pin_sdio, uint8_t pin_clk, uint8_t pin_cs, uint8_t pin_fcs, uint32_t spi_speed)
+CMT2300A::CMT2300A(const uint8_t pin_sdio, const uint8_t pin_clk, const uint8_t pin_cs, const uint8_t pin_fcs, const uint32_t spi_speed)
 {
     _pin_sdio = pin_sdio;
     _pin_clk = pin_clk;
@@ -57,7 +58,7 @@ bool CMT2300A::available(void)
         ) & CMT2300A_ReadReg(CMT2300A_CUS_INT_FLAG);
 }
 
-void CMT2300A::read(void* buf, uint8_t len)
+void CMT2300A::read(void* buf, const uint8_t len)
 {
     // Fetch the payload
     CMT2300A_ReadFifo(static_cast<uint8_t*>(buf), len);
@@ -65,7 +66,7 @@ void CMT2300A::read(void* buf, uint8_t len)
     CMT2300A_ClearInterruptFlags();
 }
 
-bool CMT2300A::write(const uint8_t* buf, uint8_t len)
+bool CMT2300A::write(const uint8_t* buf, const uint8_t len)
 {
     CMT2300A_GoStby();
     CMT2300A_ClearInterruptFlags();
@@ -100,7 +101,7 @@ bool CMT2300A::write(const uint8_t* buf, uint8_t len)
     return true;
 }
 
-void CMT2300A::setChannel(uint8_t channel)
+void CMT2300A::setChannel(const uint8_t channel)
 {
     CMT2300A_SetFrequencyChannel(channel);
 }
@@ -122,7 +123,7 @@ int CMT2300A::getRssiDBm()
     return CMT2300A_GetRssiDBm();
 }
 
-bool CMT2300A::setPALevel(int8_t level)
+bool CMT2300A::setPALevel(const int8_t level)
 {
     uint16_t Tx_dBm_word;
     switch (level) {
@@ -242,6 +243,22 @@ bool CMT2300A::rxFifoAvailable()
         ) & CMT2300A_ReadReg(CMT2300A_CUS_INT_FLAG);
 }
 
+uint32_t CMT2300A::getBaseFrequency() const
+{
+    return getBaseFrequency(_frequencyBand);
+}
+
+FrequencyBand_t CMT2300A::getFrequencyBand() const
+{
+    return _frequencyBand;
+}
+
+void CMT2300A::setFrequencyBand(const FrequencyBand_t mode)
+{
+    _frequencyBand = mode;
+    _init_radio();
+}
+
 void CMT2300A::flush_rx(void)
 {
     CMT2300A_ClearRxFifo();
@@ -261,12 +278,24 @@ bool CMT2300A::_init_radio()
     }
 
     /* config registers */
-    CMT2300A_ConfigRegBank(CMT2300A_CMT_BANK_ADDR, g_cmt2300aCmtBank, CMT2300A_CMT_BANK_SIZE);
-    CMT2300A_ConfigRegBank(CMT2300A_SYSTEM_BANK_ADDR, g_cmt2300aSystemBank, CMT2300A_SYSTEM_BANK_SIZE);
-    CMT2300A_ConfigRegBank(CMT2300A_FREQUENCY_BANK_ADDR, g_cmt2300aFrequencyBank, CMT2300A_FREQUENCY_BANK_SIZE);
-    CMT2300A_ConfigRegBank(CMT2300A_DATA_RATE_BANK_ADDR, g_cmt2300aDataRateBank, CMT2300A_DATA_RATE_BANK_SIZE);
-    CMT2300A_ConfigRegBank(CMT2300A_BASEBAND_BANK_ADDR, g_cmt2300aBasebandBank, CMT2300A_BASEBAND_BANK_SIZE);
-    CMT2300A_ConfigRegBank(CMT2300A_TX_BANK_ADDR, g_cmt2300aTxBank, CMT2300A_TX_BANK_SIZE);
+    switch (_frequencyBand) {
+    case FrequencyBand_t::BAND_900:
+        CMT2300A_ConfigRegBank(CMT2300A_CMT_BANK_ADDR, g_cmt2300aCmtBank_900, CMT2300A_CMT_BANK_SIZE);
+        CMT2300A_ConfigRegBank(CMT2300A_SYSTEM_BANK_ADDR, g_cmt2300aSystemBank_900, CMT2300A_SYSTEM_BANK_SIZE);
+        CMT2300A_ConfigRegBank(CMT2300A_FREQUENCY_BANK_ADDR, g_cmt2300aFrequencyBank_900, CMT2300A_FREQUENCY_BANK_SIZE);
+        CMT2300A_ConfigRegBank(CMT2300A_DATA_RATE_BANK_ADDR, g_cmt2300aDataRateBank_900, CMT2300A_DATA_RATE_BANK_SIZE);
+        CMT2300A_ConfigRegBank(CMT2300A_BASEBAND_BANK_ADDR, g_cmt2300aBasebandBank_900, CMT2300A_BASEBAND_BANK_SIZE);
+        CMT2300A_ConfigRegBank(CMT2300A_TX_BANK_ADDR, g_cmt2300aTxBank_900, CMT2300A_TX_BANK_SIZE);
+        break;
+    default:
+        CMT2300A_ConfigRegBank(CMT2300A_CMT_BANK_ADDR, g_cmt2300aCmtBank_860, CMT2300A_CMT_BANK_SIZE);
+        CMT2300A_ConfigRegBank(CMT2300A_SYSTEM_BANK_ADDR, g_cmt2300aSystemBank_860, CMT2300A_SYSTEM_BANK_SIZE);
+        CMT2300A_ConfigRegBank(CMT2300A_FREQUENCY_BANK_ADDR, g_cmt2300aFrequencyBank_860, CMT2300A_FREQUENCY_BANK_SIZE);
+        CMT2300A_ConfigRegBank(CMT2300A_DATA_RATE_BANK_ADDR, g_cmt2300aDataRateBank_860, CMT2300A_DATA_RATE_BANK_SIZE);
+        CMT2300A_ConfigRegBank(CMT2300A_BASEBAND_BANK_ADDR, g_cmt2300aBasebandBank_860, CMT2300A_BASEBAND_BANK_SIZE);
+        CMT2300A_ConfigRegBank(CMT2300A_TX_BANK_ADDR, g_cmt2300aTxBank_860, CMT2300A_TX_BANK_SIZE);
+        break;
+    }
 
     // xosc_aac_code[2:0] = 2
     uint8_t tmp;

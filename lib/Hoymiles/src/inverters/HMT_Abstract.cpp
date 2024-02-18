@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * Copyright (C) 2023 Thomas Basler and others
+ * Copyright (C) 2023-2024 Thomas Basler and others
  */
 #include "HMT_Abstract.h"
 #include "Hoymiles.h"
@@ -21,7 +21,8 @@ bool HMT_Abstract::sendChangeChannelRequest()
     }
 
     auto cmdChannel = _radio->prepareCommand<ChannelChangeCommand>();
-    cmdChannel->setChannel(HoymilesRadio_CMT::getChannelFromFrequency(Hoymiles.getRadioCmt()->getInverterTargetFrequency()));
+    cmdChannel->setCountryMode(Hoymiles.getRadioCmt()->getCountryMode());
+    cmdChannel->setChannel(Hoymiles.getRadioCmt()->getChannelFromFrequency(Hoymiles.getRadioCmt()->getInverterTargetFrequency()));
     cmdChannel->setTargetAddress(serial());
     _radio->enqueCommand(cmdChannel);
 

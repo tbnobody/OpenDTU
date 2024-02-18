@@ -1,10 +1,12 @@
 <template>
     <BasePage :title="$t('systeminfo.SystemInfo')" :isLoading="dataLoading" :show-reload="true" @reload="getSystemInfo">
-        <FirmwareInfo :systemStatus="systemDataList" />
+        <FirmwareInfo :systemStatus="systemDataList" v-model:allowVersionInfo="allowVersionInfo" />
         <div class="mt-5"></div>
         <HardwareInfo :systemStatus="systemDataList" />
         <div class="mt-5"></div>
         <MemoryInfo :systemStatus="systemDataList" />
+        <div class="mt-5"></div>
+        <HeapDetails :systemStatus="systemDataList" />
         <div class="mt-5"></div>
         <RadioInfo :systemStatus="systemDataList" />
         <div class="mt-5"></div>
@@ -16,6 +18,7 @@ import BasePage from '@/components/BasePage.vue';
 import FirmwareInfo from "@/components/FirmwareInfo.vue";
 import HardwareInfo from "@/components/HardwareInfo.vue";
 import MemoryInfo from "@/components/MemoryInfo.vue";
+import HeapDetails from "@/components/HeapDetails.vue";
 import RadioInfo from "@/components/RadioInfo.vue";
 import type { SystemStatus } from '@/types/SystemStatus';
 import { authHeader, handleResponse } from '@/utils/authentication';
@@ -27,15 +30,18 @@ export default defineComponent({
         FirmwareInfo,
         HardwareInfo,
         MemoryInfo,
+        HeapDetails,
         RadioInfo,
     },
     data() {
         return {
             dataLoading: true,
             systemDataList: {} as SystemStatus,
+            allowVersionInfo: false,
         }
     },
     created() {
+        this.allowVersionInfo = (localStorage.getItem("allowVersionInfo") || "0") == "1";
         this.getSystemInfo();
     },
     methods: {
@@ -46,7 +52,9 @@ export default defineComponent({
                 .then((data) => {
                     this.systemDataList = data;
                     this.dataLoading = false;
-                    this.getUpdateInfo();
+                    if (this.allowVersionInfo) {
+                        this.getUpdateInfo();
+                    }
                 })
         },
         getUpdateInfo() {
@@ -86,5 +94,13 @@ export default defineComponent({
                 });
         }
     },
+    watch: {
+        allowVersionInfo(allow: Boolean) {
+            if (allow) {
+                localStorage.setItem("allowVersionInfo", this.allowVersionInfo ? "1" : "0");
+                this.getUpdateInfo();
+            }
+        }
+    }
 });
 </script>

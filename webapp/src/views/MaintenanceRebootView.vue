@@ -12,31 +12,20 @@
         </CardElement>
     </BasePage>
 
-    <div class="modal" id="performReboot" tabindex="-1">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">{{ $t('maintenancereboot.RebootOpenDTU') }}</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    {{ $t('maintenancereboot.RebootQuestion') }}
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" @click="onCloseModal(performReboot)"
-                        data-bs-dismiss="modal">{{ $t('maintenancereboot.Cancel') }}</button>
-                    <button type="button" class="btn btn-danger" @click="onReboot">
+    <ModalDialog modalId="performReboot" small :title="$t('maintenancereboot.RebootOpenDTU')" :closeText="$t('maintenancereboot.Cancel')">
+        {{ $t('maintenancereboot.RebootQuestion') }}
+        <template #footer>
+            <button type="button" class="btn btn-danger" @click="onReboot">
                         {{ $t('maintenancereboot.Reboot') }}</button>
-                </div>
-            </div>
-        </div>
-    </div>
+        </template>
+    </ModalDialog>
 </template>
 
 <script lang="ts">
 import BasePage from '@/components/BasePage.vue';
 import BootstrapAlert from "@/components/BootstrapAlert.vue";
 import CardElement from '@/components/CardElement.vue';
+import ModalDialog from '@/components/ModalDialog.vue';
 import { authHeader, handleResponse, isLoggedIn } from '@/utils/authentication';
 import * as bootstrap from 'bootstrap';
 import { defineComponent } from 'vue';
@@ -46,6 +35,7 @@ export default defineComponent({
         BasePage,
         BootstrapAlert,
         CardElement,
+        ModalDialog,
     },
     data() {
         return {

@@ -2,11 +2,11 @@
 #pragma once
 
 #include <ESPAsyncWebServer.h>
+#include <TaskSchedulerDeclarations.h>
 
 class WebApiConfigClass {
 public:
-    void init(AsyncWebServer& server);
-    void loop();
+    void init(AsyncWebServer& server, Scheduler& scheduler);
 
 private:
     void onConfigGet(AsyncWebServerRequest* request);
@@ -14,6 +14,4 @@ private:
     void onConfigListGet(AsyncWebServerRequest* request);
     void onConfigUploadFinish(AsyncWebServerRequest* request);
     void onConfigUpload(AsyncWebServerRequest* request, String filename, size_t index, uint8_t* data, size_t len, bool final);
-
-    AsyncWebServer* _server;
 };

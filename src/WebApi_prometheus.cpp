@@ -1,7 +1,7 @@
 
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * Copyright (C) 2022-2023 Thomas Basler and others
+ * Copyright (C) 2022-2024 Thomas Basler and others
  */
 #include "WebApi_prometheus.h"
 #include "Configuration.h"
@@ -10,17 +10,11 @@
 #include "WebApi.h"
 #include <Hoymiles.h>
 
-void WebApiPrometheusClass::init(AsyncWebServer& server)
+void WebApiPrometheusClass::init(AsyncWebServer& server, Scheduler& scheduler)
 {
     using std::placeholders::_1;
 
-    _server = &server;
-
-    _server->on("/api/prometheus/metrics", HTTP_GET, std::bind(&WebApiPrometheusClass::onPrometheusMetricsGet, this, _1));
-}
-
-void WebApiPrometheusClass::loop()
-{
+    server.on("/api/prometheus/metrics", HTTP_GET, std::bind(&WebApiPrometheusClass::onPrometheusMetricsGet, this, _1));
 }
 
 void WebApiPrometheusClass::onPrometheusMetricsGet(AsyncWebServerRequest* request)
@@ -53,6 +47,14 @@ void WebApiPrometheusClass::onPrometheusMetricsGet(AsyncWebServerRequest* reques
         stream->print("# TYPE opendtu_free_heap_size gauge\n");
         stream->printf("opendtu_free_heap_size %zu\n", ESP.getFreeHeap());
 
+        stream->print("# HELP opendtu_biggest_heap_block Biggest free heap block\n");
+        stream->print("# TYPE opendtu_biggest_heap_block gauge\n");
+        stream->printf("opendtu_biggest_heap_block %zu\n", ESP.getMaxAllocHeap());
+
+        stream->print("# HELP opendtu_heap_min_free Minimum free memory since boot\n");
+        stream->print("# TYPE opendtu_heap_min_free gauge\n");
+        stream->printf("opendtu_heap_min_free %zu\n", ESP.getMinFreeHeap());
+
         stream->print("# HELP wifi_rssi WiFi RSSI\n");
         stream->print("# TYPE wifi_rssi gauge\n");
         stream->printf("wifi_rssi %d\n", WiFi.RSSI());
@@ -73,13 +75,29 @@ void WebApiPrometheusClass::onPrometheusMetricsGet(AsyncWebServerRequest* reques
             stream->printf("opendtu_last_update{serial=\"%s\",unit=\"%d\",name=\"%s\"} %d\n",
                 serial.c_str(), i, name, inv->Statistics()->getLastUpdate() / 1000);
 
+            if (i == 0) {
+                stream->print("# HELP opendtu_inverter_limit_relative current relative limit of the inverter\n");
+                stream->print("# TYPE opendtu_inverter_limit_relative gauge\n");
+            }
+            stream->printf("opendtu_inverter_limit_relative{serial=\"%s\",unit=\"%d\",name=\"%s\"} %f\n",
+                serial.c_str(), i, name, inv->SystemConfigPara()->getLimitPercent() / 100.0);
+
+            if (inv->DevInfo()->getMaxPower() > 0) {
+                if (i == 0) {
+                    stream->print("# HELP opendtu_inverter_limit_absolute current relative limit of the inverter\n");
+                    stream->print("# TYPE opendtu_inverter_limit_absolute gauge\n");
+                }
+                stream->printf("opendtu_inverter_limit_absolute{serial=\"%s\",unit=\"%d\",name=\"%s\"} %f\n",
+                    serial.c_str(), i, name, inv->SystemConfigPara()->getLimitPercent() * inv->DevInfo()->getMaxPower() / 100.0);
+            }
+
             // Loop all channels if Statistics have been updated at least once since DTU boot
             if (inv->Statistics()->getLastUpdate() > 0) {
                 for (auto& t : inv->Statistics()->getChannelTypes()) {
                     for (auto& c : inv->Statistics()->getChannelsByType(t)) {
                         addPanelInfo(stream, serial, i, inv, t, c);
                         for (uint8_t f = 0; f < sizeof(_publishFields) / sizeof(_publishFields[0]); f++) {
-                            if (t == TYPE_AC && _publishFields[f].field == FLD_PDC) {
+                            if (t == TYPE_INV && _publishFields[f].field == FLD_PDC) {
                                 addField(stream, serial, i, inv, t, c, _publishFields[f].field, _metricTypes[_publishFields[f].type], "PowerDC");
                             } else {
                                 addField(stream, serial, i, inv, t, c, _publishFields[f].field, _metricTypes[_publishFields[f].type]);

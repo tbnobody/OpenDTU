@@ -8,6 +8,7 @@
 
 class InverterSettingsClass {
 public:
+    InverterSettingsClass();
     void init(Scheduler& scheduler);
 
 private:

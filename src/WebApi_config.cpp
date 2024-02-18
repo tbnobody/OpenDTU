@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * Copyright (C) 2022-2023 Thomas Basler and others
+ * Copyright (C) 2022-2024 Thomas Basler and others
  */
 #include "WebApi_config.h"
 #include "Configuration.h"
@@ -10,7 +10,7 @@
 #include <AsyncJson.h>
 #include <LittleFS.h>
 
-void WebApiConfigClass::init(AsyncWebServer& server)
+void WebApiConfigClass::init(AsyncWebServer& server, Scheduler& scheduler)
 {
     using std::placeholders::_1;
     using std::placeholders::_2;
@@ -19,18 +19,12 @@ void WebApiConfigClass::init(AsyncWebServer& server)
     using std::placeholders::_5;
     using std::placeholders::_6;
 
-    _server = &server;
-
-    _server->on("/api/config/get", HTTP_GET, std::bind(&WebApiConfigClass::onConfigGet, this, _1));
-    _server->on("/api/config/delete", HTTP_POST, std::bind(&WebApiConfigClass::onConfigDelete, this, _1));
-    _server->on("/api/config/list", HTTP_GET, std::bind(&WebApiConfigClass::onConfigListGet, this, _1));
-    _server->on("/api/config/upload", HTTP_POST,
+    server.on("/api/config/get", HTTP_GET, std::bind(&WebApiConfigClass::onConfigGet, this, _1));
+    server.on("/api/config/delete", HTTP_POST, std::bind(&WebApiConfigClass::onConfigDelete, this, _1));
+    server.on("/api/config/list", HTTP_GET, std::bind(&WebApiConfigClass::onConfigListGet, this, _1));
+    server.on("/api/config/upload", HTTP_POST,
         std::bind(&WebApiConfigClass::onConfigUploadFinish, this, _1),
         std::bind(&WebApiConfigClass::onConfigUpload, this, _1, _2, _3, _4, _5, _6));
-}
-
-void WebApiConfigClass::loop()
-{
 }
 
 void WebApiConfigClass::onConfigGet(AsyncWebServerRequest* request)
@@ -114,7 +108,7 @@ void WebApiConfigClass::onConfigDelete(AsyncWebServerRequest* request)
     response->setLength();
     request->send(response);
 
-    LittleFS.remove(CONFIG_FILENAME);
+    Utils::removeAllFiles();
     Utils::restartDtu();
 }
 

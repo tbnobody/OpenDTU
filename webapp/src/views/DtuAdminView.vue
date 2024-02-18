@@ -48,6 +48,20 @@
                 </div>
 
                 <div class="row mb-3" v-if="dtuConfigList.cmt_enabled">
+                    <label for="inputCmtCountry" class="col-sm-2 col-form-label">
+                        {{ $t('dtuadmin.CmtCountry') }}
+                        <BIconInfoCircle v-tooltip :title="$t('dtuadmin.CmtCountryHint')" />
+                    </label>
+                    <div class="col-sm-10">
+                        <select id="inputCmtCountry" class="form-select" v-model="dtuConfigList.cmt_country">
+                            <option v-for="(country, index) in dtuConfigList.country_def" :key="index" :value="index">
+                                {{ $t(`dtuadmin.country_` + index, {min: country.freq_min / 1e6, max: country.freq_max / 1e6}) }}
+                            </option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="row mb-3" v-if="dtuConfigList.cmt_enabled">
                     <label for="cmtFrequency" class="col-sm-2 col-form-label">
                         {{ $t('dtuadmin.CmtFrequency') }}
                         <BIconInfoCircle v-tooltip :title="$t('dtuadmin.CmtFrequencyHint')" />
@@ -56,12 +70,12 @@
                         <div class="input-group mb-3">
                             <input type="range" class="form-control form-range"
                                 v-model="dtuConfigList.cmt_frequency"
-                                min="860250" max="923500" step="250"
+                                :min="cmtMinFrequency" :max="cmtMaxFrequency" :step="dtuConfigList.cmt_chan_width"
                                 id="cmtFrequency" aria-describedby="basic-addon2"
                                 style="height: unset;" />
                             <span class="input-group-text" id="basic-addon2">{{ cmtFrequencyText }}</span>
                         </div>
-                        <div class="alert alert-danger" role="alert" v-html="$t('dtuadmin.CmtFrequencyWarning')" v-if="cmtIsOutOfEu"></div>
+                        <div class="alert alert-danger" role="alert" v-html="$t('dtuadmin.CmtFrequencyWarning')" v-if="cmtIsOutOfLegalRange"></div>
                     </div>
                 </div>
 
@@ -111,13 +125,30 @@ export default defineComponent({
     },
     computed: {
         cmtFrequencyText() {
-            return this.$t("dtuadmin.MHz", { mhz: this.$n(this.dtuConfigList.cmt_frequency / 1000, "decimalTwoDigits") });
+            return this.$t("dtuadmin.MHz", { mhz: this.$n(this.dtuConfigList.cmt_frequency / 1000000, "decimalTwoDigits") });
         },
         cmtPaLevelText() {
             return this.$t("dtuadmin.dBm", { dbm: this.$n(this.dtuConfigList.cmt_palevel * 1) });
         },
-        cmtIsOutOfEu() {
-            return this.dtuConfigList.cmt_frequency < 863000 || this.dtuConfigList.cmt_frequency > 870000;
+        cmtMinFrequency() {
+            return this.dtuConfigList.country_def[this.dtuConfigList.cmt_country].freq_min;
+        },
+        cmtMaxFrequency() {
+            return this.dtuConfigList.country_def[this.dtuConfigList.cmt_country].freq_max;
+        },
+        cmtIsOutOfLegalRange() {
+            return this.dtuConfigList.cmt_frequency < this.dtuConfigList.country_def[this.dtuConfigList.cmt_country].freq_legal_min
+                || this.dtuConfigList.cmt_frequency > this.dtuConfigList.country_def[this.dtuConfigList.cmt_country].freq_legal_max;
+        }
+    },
+    watch: {
+        'dtuConfigList.cmt_country'(newValue, oldValue) {
+            // Don't do anything on initial load (then oldValue equals undefined)
+            if (oldValue != undefined) {
+                this.$nextTick(() => {
+                    this.dtuConfigList.cmt_frequency = this.dtuConfigList.country_def[newValue].freq_default;
+                });
+            }
         }
     },
     methods: {
