@@ -4,6 +4,8 @@
  */
 #include "Display_Graphic.h"
 #include "Datastore.h"
+#include "PowerMeter.h"
+#include "Configuration.h"
 #include <NetworkSettings.h>
 #include <map>
 #include <time.h>
@@ -31,6 +33,8 @@ const uint8_t languages[] = {
 static const char* const i18n_offline[] = { "Offline", "Offline", "Offline" };
 static const char* const i18n_current_power_w[] = { "%.0f W", "%.0f W", "%.0f W" };
 static const char* const i18n_current_power_kw[] = { "%.1f kW", "%.1f kW", "%.1f kW" };
+static const char* const i18n_meter_power_w[] = { "grid:   %.0f W", "Netz:   %.0f W", "reseau: %.0f W" };
+static const char* const i18n_meter_power_kw[] = { "grid:   %.1f kW", "Netz:   %.1f kW", "reseau: %.1f kW" };
 static const char* const i18n_yield_today_wh[] = { "today: %4.0f Wh", "Heute: %4.0f Wh", "auj.: %4.0f Wh" };
 static const char* const i18n_yield_total_kwh[] = { "total: %.1f kWh", "Ges.: %.1f kWh", "total: %.1f kWh" };
 static const char* const i18n_date_format[] = { "%m/%d/%Y %H:%M", "%d.%m.%Y %H:%M", "%d/%m/%Y %H:%M" };
@@ -67,11 +71,19 @@ void DisplayGraphicClass::init(Scheduler& scheduler, const DisplayType_t type, c
 
 void DisplayGraphicClass::calcLineHeights()
 {
-    uint8_t yOff = 0;
+    bool diagram = (_isLarge && _diagram_mode == DiagramMode_t::Small);
+    // the diagram needs space. we need to keep
+    // away from the y-axis label in particular.
+    uint8_t yOff = (diagram?7:0);
     for (uint8_t i = 0; i < 4; i++) {
         setFont(i);
-        yOff += (_display->getMaxCharHeight());
+        yOff += _display->getAscent();
         _lineOffsets[i] = yOff;
+        yOff += ((!_isLarge || diagram)?2:3);
+        // the descent is a negative value and moves the *next* line's
+        // baseline. the first line never uses a letter with descent and
+        // we need that space when showing the small diagram.
+        yOff -= ((i == 0 && diagram)?0:_display->getDescent());
     }
 }
 
@@ -250,6 +262,32 @@ void DisplayGraphicClass::loop()
             strftime(_fmtText, sizeof(_fmtText), i18n_date_format[_display_language], localtime(&now));
             printText(_fmtText, 3);
         }
+    }
+
+    // the IP and time info in the third line use three-second slots. the
+    // timing for the power meter is chosen such that every third of those
+    // three-second slots is used to NOT overwrite the total inverter energy.
+    bool timing = (_mExtra % 9) >= 3;
+
+    if (showText && Configuration.get().PowerMeter.Enabled && timing && !displayPowerSave) {
+        // erase the third line and print the power meter value instead.
+        // we do it this way to touch as least upstream code as possible
+        // to make maintenance easier.
+        setFont(2);
+        auto lineHeight = _display->getAscent() - _display->getDescent();
+        auto y = _lineOffsets[2] - _display->getAscent();
+        _display->setDrawColor(0);
+        _display->drawBox(0, y, _display->getDisplayWidth(), lineHeight);
+        _display->setDrawColor(1);
+
+        auto acPower = PowerMeter.getPowerTotal(false);
+        if (acPower > 999) {
+            snprintf(_fmtText, sizeof(_fmtText), i18n_meter_power_kw[_display_language], (acPower / 1000));
+        } else {
+            snprintf(_fmtText, sizeof(_fmtText), i18n_meter_power_w[_display_language], acPower);
+        }
+
+        printText(_fmtText, 2);
     }
 
     _display->sendBuffer();
