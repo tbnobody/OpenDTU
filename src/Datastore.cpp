@@ -81,14 +81,17 @@ void DatastoreClass::loop()
             }
         }
 
-        for (auto& c : inv->Statistics()->getChannelsByType(TYPE_AC)) {
+        for (auto& c : inv->Statistics()->getChannelsByType(TYPE_INV)) {
             if (cfg->Poll_Enable) {
-                _totalAcYieldTotalEnabled += inv->Statistics()->getChannelFieldValue(TYPE_AC, c, FLD_YT);
-                _totalAcYieldDayEnabled += inv->Statistics()->getChannelFieldValue(TYPE_AC, c, FLD_YD);
+                _totalAcYieldTotalEnabled += inv->Statistics()->getChannelFieldValue(TYPE_INV, c, FLD_YT);
+                _totalAcYieldDayEnabled += inv->Statistics()->getChannelFieldValue(TYPE_INV, c, FLD_YD);
 
-                _totalAcYieldTotalDigits = max<unsigned int>(_totalAcYieldTotalDigits, inv->Statistics()->getChannelFieldDigits(TYPE_AC, c, FLD_YT));
-                _totalAcYieldDayDigits = max<unsigned int>(_totalAcYieldDayDigits, inv->Statistics()->getChannelFieldDigits(TYPE_AC, c, FLD_YD));
+                _totalAcYieldTotalDigits = max<unsigned int>(_totalAcYieldTotalDigits, inv->Statistics()->getChannelFieldDigits(TYPE_INV, c, FLD_YT));
+                _totalAcYieldDayDigits = max<unsigned int>(_totalAcYieldDayDigits, inv->Statistics()->getChannelFieldDigits(TYPE_INV, c, FLD_YD));
             }
+        }
+
+        for (auto& c : inv->Statistics()->getChannelsByType(TYPE_AC)) {
             if (inv->getEnablePolling()) {
                 _totalAcPowerEnabled += inv->Statistics()->getChannelFieldValue(TYPE_AC, c, FLD_PAC);
                 _totalAcPowerDigits = max<unsigned int>(_totalAcPowerDigits, inv->Statistics()->getChannelFieldDigits(TYPE_AC, c, FLD_PAC));

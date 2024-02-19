@@ -10,6 +10,4 @@ public:
 
 private:
     void onDevInfoStatus(AsyncWebServerRequest* request);
-
-    AsyncWebServer* _server;
 };

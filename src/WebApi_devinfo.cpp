@@ -12,9 +12,7 @@ void WebApiDevInfoClass::init(AsyncWebServer& server, Scheduler& scheduler)
 {
     using std::placeholders::_1;
 
-    _server = &server;
-
-    _server->on("/api/devinfo/status", HTTP_GET, std::bind(&WebApiDevInfoClass::onDevInfoStatus, this, _1));
+    server.on("/api/devinfo/status", HTTP_GET, std::bind(&WebApiDevInfoClass::onDevInfoStatus, this, _1));
 }
 
 void WebApiDevInfoClass::onDevInfoStatus(AsyncWebServerRequest* request)

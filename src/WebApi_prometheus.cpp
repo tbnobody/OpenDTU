@@ -15,9 +15,7 @@ void WebApiPrometheusClass::init(AsyncWebServer& server, Scheduler& scheduler)
 {
     using std::placeholders::_1;
 
-    _server = &server;
-
-    _server->on("/api/prometheus/metrics", HTTP_GET, std::bind(&WebApiPrometheusClass::onPrometheusMetricsGet, this, _1));
+    server.on("/api/prometheus/metrics", HTTP_GET, std::bind(&WebApiPrometheusClass::onPrometheusMetricsGet, this, _1));
 }
 
 void WebApiPrometheusClass::onPrometheusMetricsGet(AsyncWebServerRequest* request)
@@ -100,7 +98,7 @@ void WebApiPrometheusClass::onPrometheusMetricsGet(AsyncWebServerRequest* reques
                     for (auto& c : inv->Statistics()->getChannelsByType(t)) {
                         addPanelInfo(stream, serial, i, inv, t, c);
                         for (uint8_t f = 0; f < sizeof(_publishFields) / sizeof(_publishFields[0]); f++) {
-                            if (t == TYPE_AC && _publishFields[f].field == FLD_PDC) {
+                            if (t == TYPE_INV && _publishFields[f].field == FLD_PDC) {
                                 addField(stream, serial, i, inv, t, c, _publishFields[f].field, _metricTypes[_publishFields[f].type], "PowerDC");
                             } else {
                                 addField(stream, serial, i, inv, t, c, _publishFields[f].field, _metricTypes[_publishFields[f].type]);

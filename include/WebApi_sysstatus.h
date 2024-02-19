@@ -10,6 +10,4 @@ public:
 
 private:
     void onSystemStatus(AsyncWebServerRequest* request);
-
-    AsyncWebServer* _server;
 };

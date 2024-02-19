@@ -145,7 +145,43 @@
         "Ok": "OK",
         "Unknown": "Inconnu",
         "ShowGridProfile": "Show Grid Profile",
-        "GridProfile": "Grid Profile"
+        "GridProfile": "Grid Profile",
+        "LoadingInverter": "Waiting for data... (can take up to 10 seconds)"
+    },
+    "vedirecthome": {
+        "SerialNumber": "Serial Number: ",
+        "FirmwareNumber": "Firmware Number: ",
+        "DataAge": "Data Age: ",
+        "Seconds": "{val} seconds",
+        "DeviceInfo": "Device Info",
+        "Property": "Property",
+        "Value": "Value",
+        "Unit": "Unit",
+        "LoadOutputState": "Load output state",
+        "StateOfOperation": "State of operation",
+        "TrackerOperationMode": "Tracker operation mode",
+        "OffReason": "Off reason",
+        "ErrorCode": "Error code",
+        "DaySequenceNumber": "Day sequence number (0..364)",
+        "Battery": "Output (Battery)",
+        "output": {
+            "P": "Power (calculated)",
+            "V": "Voltage",
+            "I": "Current",
+            "E": "Efficiency (calculated)"
+        },
+        "Panel": "Input (Solar Panels)",
+        "input": {
+            "PPV": "Power",
+            "VPV": "Voltage",
+            "IPV": "Current (calculated)",
+            "YieldToday": "Yield today",
+            "YieldYesterday": "Yield yesterday",
+            "YieldTotal": "Yield total (user resettable counter)",
+            "MaximumPowerToday": "Maximum power today",
+            "MaximumPowerYesterday": "Maximum power yesterday"
+        },
+        "PowerLimiterState": "Power limiter state [off (charging), solar passthrough, on battery]"
     },
     "vedirecthome": {
         "SerialNumber": "Serial Number: ",
@@ -252,6 +288,7 @@
         "Used": "Utilisée",
         "Size": "Taille",
         "Heap": "Heap",
+        "PsRam": "PSRAM",
         "LittleFs": "LittleFs",
         "Sketch": "Sketch"
     },
@@ -687,6 +724,8 @@
     },
     "about": {
         "AboutOpendtu": "À propos d'OpenDTU",
+        "Documentation": "Documentation",
+        "DocumentationBody": "The firmware and hardware documentation can be found here: <a href=\"https://www.opendtu.solar\" target=\"_blank\">https://www.opendtu.solar</a>",
         "ProjectOrigin": "Origine du projet",
         "ProjectOriginBody1": "Ce projet a été démarré suite à cette discussion <a href=\"https://www.mikrocontroller.net/topic/525778\" target=\"_blank\">(Mikrocontroller.net)</a>.",
         "ProjectOriginBody2": "Le protocole Hoymiles a été décrypté grâce aux efforts volontaires de nombreux participants. OpenDTU, entre autres, a été développé sur la base de ce travail. Le projet est sous licence Open Source (<a href=\"https://www.gnu.de/documents/gpl-2.0.de.html\" target=\"_blank\">GNU General Public License version 2</a>).",

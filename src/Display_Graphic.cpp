@@ -37,6 +37,7 @@ static const char* const i18n_meter_power_w[] = { "grid:   %.0f W", "Netz:   %.0
 static const char* const i18n_meter_power_kw[] = { "grid:   %.1f kW", "Netz:   %.1f kW", "reseau: %.1f kW" };
 static const char* const i18n_yield_today_wh[] = { "today: %4.0f Wh", "Heute: %4.0f Wh", "auj.: %4.0f Wh" };
 static const char* const i18n_yield_total_kwh[] = { "total: %.1f kWh", "Ges.: %.1f kWh", "total: %.1f kWh" };
+static const char* const i18n_yield_total_mwh[] = { "total: %.0f kWh", "Ges.: %.0f kWh", "total: %.0f kWh" };
 static const char* const i18n_date_format[] = { "%m/%d/%Y %H:%M", "%d.%m.%Y %H:%M", "%d/%m/%Y %H:%M" };
 
 DisplayGraphicClass::DisplayGraphicClass()
@@ -74,16 +75,16 @@ void DisplayGraphicClass::calcLineHeights()
     bool diagram = (_isLarge && _diagram_mode == DiagramMode_t::Small);
     // the diagram needs space. we need to keep
     // away from the y-axis label in particular.
-    uint8_t yOff = (diagram?7:0);
+    uint8_t yOff = (diagram ? 7 : 0);
     for (uint8_t i = 0; i < 4; i++) {
         setFont(i);
         yOff += _display->getAscent();
         _lineOffsets[i] = yOff;
-        yOff += ((!_isLarge || diagram)?2:3);
+        yOff += ((!_isLarge || diagram) ? 2 : 3);
         // the descent is a negative value and moves the *next* line's
         // baseline. the first line never uses a letter with descent and
         // we need that space when showing the small diagram.
-        yOff -= ((i == 0 && diagram)?0:_display->getDescent());
+        yOff -= ((i == 0 && diagram) ? 0 : _display->getDescent());
     }
 }
 
@@ -115,27 +116,23 @@ void DisplayGraphicClass::printText(const char* text, const uint8_t line)
     if (!_isLarge) {
         dispX = (line == 0) ? 5 : 0;
     } else {
-        switch (line) {
-        case 0:
-            if (_diagram_mode == DiagramMode_t::Small) {
-                // Center between left border and diagram
-                dispX = (CHART_POSX - _display->getStrWidth(text)) / 2;
-            } else {
-                // Center on screen
-                dispX = (_display->getDisplayWidth() - _display->getStrWidth(text)) / 2;
-            }
-            break;
-        case 3:
+        if (line == 0 && _diagram_mode == DiagramMode_t::Small) {
+            // Center between left border and diagram
+            dispX = (CHART_POSX - _display->getStrWidth(text)) / 2;
+        } else {
             // Center on screen
             dispX = (_display->getDisplayWidth() - _display->getStrWidth(text)) / 2;
-            break;
-        default:
-            dispX = 5;
-            break;
         }
     }
 
-    dispX += enableScreensaver ? (_mExtra % 7) : 0;
+    if (enableScreensaver) {
+        unsigned maxOffset = (_isLarge ? 8 : 6);
+        unsigned period = 2 * maxOffset;
+        unsigned step = _mExtra % period;
+        int offset = (step <= maxOffset) ? step : (period - step);
+        offset -= (_isLarge ? 5 : 0); // oscillate around center on large screens
+        dispX += offset;
+    }
     _display->drawStr(dispX, _lineOffsets[line], text);
 }
 
@@ -248,7 +245,9 @@ void DisplayGraphicClass::loop()
         snprintf(_fmtText, sizeof(_fmtText), i18n_yield_today_wh[_display_language], Datastore.getTotalAcYieldDayEnabled());
         printText(_fmtText, 1);
 
-        snprintf(_fmtText, sizeof(_fmtText), i18n_yield_total_kwh[_display_language], Datastore.getTotalAcYieldTotalEnabled());
+        const float watts = Datastore.getTotalAcYieldTotalEnabled();
+        auto const format = (watts >= 1000) ? i18n_yield_total_mwh : i18n_yield_total_kwh;
+        snprintf(_fmtText, sizeof(_fmtText), format[_display_language], watts);
         printText(_fmtText, 2);
         //<=======================
 

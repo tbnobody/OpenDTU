@@ -14,6 +14,4 @@ private:
     void onInverterEdit(AsyncWebServerRequest* request);
     void onInverterDelete(AsyncWebServerRequest* request);
     void onInverterOrder(AsyncWebServerRequest* request);
-
-    AsyncWebServer* _server;
 };
