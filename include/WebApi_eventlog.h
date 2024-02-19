@@ -10,6 +10,4 @@ public:
 
 private:
     void onEventlogStatus(AsyncWebServerRequest* request);
-
-    AsyncWebServer* _server;
 };

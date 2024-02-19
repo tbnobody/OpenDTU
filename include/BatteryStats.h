@@ -17,8 +17,11 @@ class BatteryStats {
         uint32_t getAgeSeconds() const { return (millis() - _lastUpdate) / 1000; }
         bool updateAvailable(uint32_t since) const { return _lastUpdate > since; }
 
-        uint8_t getSoC() const { return _SoC; }
+        uint8_t getSoC() const { return _soc; }
         uint32_t getSoCAgeSeconds() const { return (millis() - _lastUpdateSoC) / 1000; }
+
+        float getVoltage() const { return _voltage; }
+        uint32_t getVoltageAgeSeconds() const { return (millis() - _lastUpdateVoltage) / 1000; }
 
         // convert stats to JSON for web application live view
         virtual void getLiveViewData(JsonVariant& root) const;
@@ -29,18 +32,33 @@ class BatteryStats {
         // if they did not change. used to calculate Home Assistent expiration.
         virtual uint32_t getMqttFullPublishIntervalMs() const;
 
-        bool isValid() const { return _lastUpdateSoC > 0 && _lastUpdate > 0; }
+        bool isSoCValid() const { return _lastUpdateSoC > 0; }
+        bool isVoltageValid() const { return _lastUpdateVoltage > 0; }
 
     protected:
         virtual void mqttPublish() const;
 
+        void setSoC(float soc, uint8_t precision, uint32_t timestamp) {
+            _soc = soc;
+            _socPrecision = precision;
+            _lastUpdateSoC = timestamp;
+        }
+
+        void setVoltage(float voltage, uint32_t timestamp) {
+            _voltage = voltage;
+            _lastUpdateVoltage = timestamp;
+        }
+
         String _manufacturer = "unknown";
-        uint8_t _SoC = 0;
-        uint32_t _lastUpdateSoC = 0;
         uint32_t _lastUpdate = 0;
 
     private:
         uint32_t _lastMqttPublish = 0;
+        float _soc = 0;
+        uint8_t _socPrecision = 0; // decimal places
+        uint32_t _lastUpdateSoC = 0;
+        float _voltage = 0; // total battery pack voltage
+        uint32_t _lastUpdateVoltage = 0;
 };
 
 class PylontechBatteryStats : public BatteryStats {
@@ -52,14 +70,12 @@ class PylontechBatteryStats : public BatteryStats {
 
     private:
         void setManufacturer(String&& m) { _manufacturer = std::move(m); }
-        void setSoC(uint8_t SoC) { _SoC = SoC; _lastUpdateSoC = millis(); }
         void setLastUpdate(uint32_t ts) { _lastUpdate = ts; }
 
         float _chargeVoltage;
         float _chargeCurrentLimitation;
         float _dischargeCurrentLimitation;
         uint16_t _stateOfHealth;
-        float _voltage; // total voltage of the battery pack
         // total current into (positive) or from (negative)
         // the battery, i.e., the charging current
         float _current;
@@ -123,7 +139,6 @@ class VictronSmartShuntStats : public BatteryStats {
         void updateFrom(VeDirectShuntController::veShuntStruct const& shuntData);
 
     private:
-        float _voltage;
         float _current;
         float _temperature;
         bool _tempPresent;
@@ -141,14 +156,14 @@ class VictronSmartShuntStats : public BatteryStats {
 };
 
 class MqttBatteryStats : public BatteryStats {
+    friend class MqttBattery;
+
     public:
         // since the source of information was MQTT in the first place,
         // we do NOT publish the same data under a different topic.
         void mqttPublish() const final { }
 
-        // the SoC is the only interesting value in this case, which is already
-        // displayed at the top of the live view. do not generate a card.
+        // if the voltage is subscribed to at all, it alone does not warrant a
+        // card in the live view, since the SoC is already displayed at the top
         void getLiveViewData(JsonVariant& root) const final { }
-
-        void setSoC(uint8_t SoC) { _SoC = SoC; _lastUpdateSoC = _lastUpdate = millis(); }
 };

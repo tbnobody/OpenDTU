@@ -14,6 +14,4 @@ private:
     void onNtpAdminPost(AsyncWebServerRequest* request);
     void onNtpTimeGet(AsyncWebServerRequest* request);
     void onNtpTimePost(AsyncWebServerRequest* request);
-
-    AsyncWebServer* _server;
 };

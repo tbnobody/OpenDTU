@@ -1,0 +1,74 @@
+[
+    {
+        "name": "LILYGO T-ETH-Lite-POE CMT",
+        "links": [
+            {"name": "Datasheet", "url": "https://www.lilygo.cc/products/t-eth-lite"}
+        ],
+        "eth": {
+            "enabled": true,
+            "phy_addr": 0,
+            "power": 12,
+            "mdc": 23,
+            "mdio": 18,
+            "type": 2,
+            "clk_mode": 0
+        },
+        "cmt": {
+            "clk": 15,
+            "cs": 32,
+            "fcs": 33,
+            "sdio": 4
+        }
+    },
+    {
+        "name": "LILYGO T-ETH-Lite-POE NRF24",
+        "links": [
+            {"name": "Datasheet", "url": "https://www.lilygo.cc/products/t-eth-lite"}
+        ],
+        "eth": {
+            "enabled": true,
+            "phy_addr": 0,
+            "power": 12,
+            "mdc": 23,
+            "mdio": 18,
+            "type": 2,
+            "clk_mode": 0
+        },
+        "nrf24": {
+            "miso": 34,
+            "mosi": 13,
+            "clk": 14,
+            "irq": 35,
+            "en": 4,
+            "cs": 2
+        }
+    },
+    {
+        "name": "LILYGO T-ETH-Lite-POE NRF24 + Display",
+        "links": [
+            {"name": "Datasheet", "url": "https://www.lilygo.cc/products/t-eth-lite"}
+        ],
+        "eth": {
+            "enabled": true,
+            "phy_addr": 0,
+            "power": 12,
+            "mdc": 23,
+            "mdio": 18,
+            "type": 2,
+            "clk_mode": 0
+        },
+        "nrf24": {
+            "miso": 34,
+            "mosi": 13,
+            "clk": 14,
+            "irq": 35,
+            "en": 4,
+            "cs": 2
+        },
+        "display": {
+            "type": 3,
+            "data": 32,
+            "clk": 33
+        }
+    }
+]

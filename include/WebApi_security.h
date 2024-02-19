@@ -13,6 +13,4 @@ private:
     void onSecurityPost(AsyncWebServerRequest* request);
 
     void onAuthenticateGet(AsyncWebServerRequest* request);
-
-    AsyncWebServer* _server;
 };

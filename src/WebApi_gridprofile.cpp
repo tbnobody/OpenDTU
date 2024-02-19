@@ -11,10 +11,8 @@ void WebApiGridProfileClass::init(AsyncWebServer& server, Scheduler& scheduler)
 {
     using std::placeholders::_1;
 
-    _server = &server;
-
-    _server->on("/api/gridprofile/status", HTTP_GET, std::bind(&WebApiGridProfileClass::onGridProfileStatus, this, _1));
-    _server->on("/api/gridprofile/rawdata", HTTP_GET, std::bind(&WebApiGridProfileClass::onGridProfileRawdata, this, _1));
+    server.on("/api/gridprofile/status", HTTP_GET, std::bind(&WebApiGridProfileClass::onGridProfileStatus, this, _1));
+    server.on("/api/gridprofile/rawdata", HTTP_GET, std::bind(&WebApiGridProfileClass::onGridProfileRawdata, this, _1));
 }
 
 void WebApiGridProfileClass::onGridProfileStatus(AsyncWebServerRequest* request)

@@ -35,6 +35,9 @@ public:
     // sum of today's yield of all MPPT charge controllers in kWh
     double getYieldDay() const;
 
+    // minimum of all MPPT charge controllers' output voltages in V
+    double getOutputVoltage() const;
+
 private:
     void loop();
     VictronMpptClass(VictronMpptClass const& other) = delete;
