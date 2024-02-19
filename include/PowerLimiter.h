@@ -88,6 +88,7 @@ private:
     void announceStatus(Status status);
     bool shutdown(Status status);
     bool shutdown() { return shutdown(_lastStatus); }
+    float getBatteryVoltage(bool log = false);
     int32_t inverterPowerDcToAc(std::shared_ptr<InverterAbstract> inverter, int32_t dcPower);
     void unconditionalSolarPassthrough(std::shared_ptr<InverterAbstract> inverter);
     bool canUseDirectSolarPower();

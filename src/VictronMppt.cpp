@@ -137,3 +137,16 @@ double VictronMpptClass::getYieldDay() const
 
     return sum;
 }
+
+double VictronMpptClass::getOutputVoltage() const
+{
+    double min = -1;
+
+    for (const auto& upController : _controllers) {
+        double volts = upController->getData()->V;
+        if (min == -1) { min = volts; }
+        min = std::min(min, volts);
+    }
+
+    return min;
+}
