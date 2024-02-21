@@ -16,11 +16,15 @@
     "bootstrap": "^5.3.2",
     "bootstrap-icons-vue": "^1.11.3",
     "mitt": "^3.0.1",
+    "pure-vue-chart": "^0.4.0",
     "sortablejs": "^1.15.2",
     "spark-md5": "^3.0.2",
+    "tippy.js": "^6.3.7",
     "vue": "^3.4.19",
+    "vue-google-charts": "^1.1.0",
     "vue-i18n": "^9.9.1",
-    "vue-router": "^4.2.5"
+    "vue-router": "^4.2.5",
+    "vue3-calendar-heatmap": "^2.0.5"
   },
   "devDependencies": {
     "@intlify/unplugin-vue-i18n": "^2.0.0",
