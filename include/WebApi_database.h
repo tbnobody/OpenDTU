@@ -9,8 +9,8 @@
 
 class WebApiDatabaseClass {
 public:
+    WebApiDatabaseClass();
     void init(AsyncWebServer& server, Scheduler& scheduler);
-    void loop();
     bool write(float energy);
 
     struct pvData {
@@ -29,6 +29,9 @@ private:
     static size_t readchunk_log(uint8_t* buffer, size_t maxLen, size_t index);
     static size_t readchunkHour(uint8_t* buffer, size_t maxLen, size_t index);
     static size_t readchunkDay(uint8_t* buffer, size_t maxLen, size_t index);
-    
+
     AsyncWebServer* _server;
+
+    Task _sendDataTask;
+    void sendDataTaskCb();
 };

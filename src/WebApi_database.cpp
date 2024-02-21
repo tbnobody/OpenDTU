@@ -9,6 +9,12 @@
 #include <AsyncJson.h>
 #include <LittleFS.h>
 
+
+WebApiDatabaseClass::WebApiDatabaseClass()
+    : _sendDataTask(1 * TASK_MINUTE, TASK_FOREVER, std::bind(&WebApiDatabaseClass::sendDataTaskCb, this))
+{
+}
+
 void WebApiDatabaseClass::init(AsyncWebServer& server, Scheduler& scheduler)
 {
     using std::placeholders::_1;
@@ -16,9 +22,12 @@ void WebApiDatabaseClass::init(AsyncWebServer& server, Scheduler& scheduler)
     server.on("/api/database", HTTP_GET, std::bind(&WebApiDatabaseClass::onDatabase, this, _1));
     server.on("/api/databaseHour", HTTP_GET, std::bind(&WebApiDatabaseClass::onDatabaseHour, this, _1));
     server.on("/api/databaseDay", HTTP_GET, std::bind(&WebApiDatabaseClass::onDatabaseDay, this, _1));
+
+    scheduler.addTask(_sendDataTask);
+    _sendDataTask.enable();
 }
 
-void WebApiDatabaseClass::loop()
+void WebApiDatabaseClass::sendDataTaskCb()
 {
     if (!Hoymiles.isAllRadioIdle()) {
         return;
