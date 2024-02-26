@@ -5,12 +5,22 @@ export interface DynamicPowerLimiter {
     PLLIMIT: number;
 }
 
+export interface Vedirect {
+    data_age: 0;
+    devices: Array<VedirectDevices>;
+}
+
+export interface VedirectDevices {
+    age_critical: boolean;
+    device: VedirectDevice;
+    input: VedirectInput;
+    output: VedirectOutput;
+}
+
 export interface VedirectDevice {
     SER: string;
     PID: string;
     FW: string;
-    age_critical: boolean;
-    data_age: 0;
     LOAD: ValueObject;
     CS: ValueObject;
     MPPT: ValueObject;

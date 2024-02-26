@@ -181,9 +181,12 @@ PinMappingClass::PinMappingClass()
     _pinMapping.display_clk = DISPLAY_CLK;
     _pinMapping.display_cs = DISPLAY_CS;
     _pinMapping.display_reset = DISPLAY_RESET;
-   
-    _pinMapping.victron_tx = VICTRON_PIN_TX;
+
     _pinMapping.victron_rx = VICTRON_PIN_RX;
+    _pinMapping.victron_tx = VICTRON_PIN_TX;
+
+    _pinMapping.victron_rx2 = VICTRON_PIN_RX;
+    _pinMapping.victron_tx2 = VICTRON_PIN_TX;
 
     _pinMapping.battery_rx = BATTERY_PIN_RX;
     _pinMapping.battery_rxen = BATTERY_PIN_RXEN;
@@ -259,6 +262,8 @@ bool PinMappingClass::init(const String& deviceMapping)
 
             _pinMapping.victron_rx = doc[i]["victron"]["rx"] | VICTRON_PIN_RX;
             _pinMapping.victron_tx = doc[i]["victron"]["tx"] | VICTRON_PIN_TX;
+            _pinMapping.victron_rx2 = doc[i]["victron"]["rx2"] | VICTRON_PIN_RX;
+            _pinMapping.victron_tx2 = doc[i]["victron"]["tx2"] | VICTRON_PIN_TX;
 
             _pinMapping.battery_rx = doc[i]["battery"]["rx"] | BATTERY_PIN_RX;
             _pinMapping.battery_rxen = doc[i]["battery"]["rxen"] | BATTERY_PIN_RXEN;

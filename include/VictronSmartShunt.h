@@ -9,6 +9,7 @@ public:
     void deinit() final { }
     void loop() final;
     std::shared_ptr<BatteryStats> getStats() const final { return _stats; }
+    bool usesHwPort2() override;
 
 private:
     uint32_t _lastUpdate = 0;

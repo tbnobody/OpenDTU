@@ -19,6 +19,7 @@ class Controller : public BatteryProvider {
         void deinit() final;
         void loop() final;
         std::shared_ptr<BatteryStats> getStats() const final { return _stats; }
+        bool usesHwPort2() override;
 
     private:
         enum class Status : unsigned {

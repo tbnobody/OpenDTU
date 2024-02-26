@@ -4,6 +4,7 @@
 #include "VeDirectMpptController.h"
 #include "Configuration.h"
 #include <Arduino.h>
+#include <map>
 #include <TaskSchedulerDeclarations.h>
 
 #ifndef VICTRON_PIN_RX
@@ -20,7 +21,7 @@ public:
     void forceUpdate();
 private:
     void loop();
-    VeDirectMpptController::veMpptStruct _kvFrame{};
+    std::map<std::string, VeDirectMpptController::veMpptStruct> _kvFrames;
 
     Task _loopTask;
 
@@ -31,6 +32,9 @@ private:
     uint32_t _nextPublishFull = 1;
 
     bool _PublishFull;
+
+    void publish_mppt_data(const VeDirectMpptController::spData_t &spMpptData,
+                           VeDirectMpptController::veMpptStruct &frame) const;
 };
 
 extern MqttHandleVedirectClass MqttHandleVedirect;

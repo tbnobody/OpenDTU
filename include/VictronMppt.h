@@ -5,6 +5,7 @@
 #include <memory>
 
 #include "VeDirectMpptController.h"
+#include "Configuration.h"
 #include <TaskSchedulerDeclarations.h>
 
 class VictronMpptClass {
@@ -16,12 +17,13 @@ public:
     void updateSettings();
 
     bool isDataValid() const;
+    bool isDataValid(size_t idx) const;
 
     // returns the data age of all controllers,
     // i.e, the youngest data's age is returned.
     uint32_t getDataAgeMillis() const;
 
-    VeDirectMpptController::spData_t getData(size_t idx = 0) const;
+    std::optional<VeDirectMpptController::spData_t> getData(size_t idx = 0) const;
 
     // total output of all MPPT charge controllers in Watts
     int32_t getPowerOutputWatts() const;
@@ -50,6 +52,8 @@ private:
     mutable std::mutex _mutex;
     using controller_t = std::unique_ptr<VeDirectMpptController>;
     std::vector<controller_t> _controllers;
+
+    bool initController(int8_t rx, int8_t tx, bool logging, int hwSerialPort);
 };
 
 extern VictronMpptClass VictronMppt;

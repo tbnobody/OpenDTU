@@ -2,6 +2,7 @@
 #pragma once
 
 #include "ArduinoJson.h"
+#include "Configuration.h"
 #include <ESPAsyncWebServer.h>
 #include <TaskSchedulerDeclarations.h>
 #include <VeDirectMpptController.h>
@@ -14,6 +15,7 @@ public:
 
 private:
     void generateJsonResponse(JsonVariant& root);
+    static void populateJson(const JsonObject &root, const VeDirectMpptController::spData_t &spMpptData);
     void onLivedataStatus(AsyncWebServerRequest* request);
     void onWebsocketEvent(AsyncWebSocket* server, AsyncWebSocketClient* client, AwsEventType type, void* arg, uint8_t* data, size_t len);
 
@@ -22,7 +24,7 @@ private:
 
     uint32_t _lastWsPublish = 0;
     uint32_t _dataAgeMillis = 0;
-    static constexpr uint16_t _responseSize = 1024 + 128;
+    static constexpr uint16_t _responseSize = VICTRON_MAX_COUNT * (1024 + 128);
 
     std::mutex _mutex;
 

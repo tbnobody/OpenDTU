@@ -30,6 +30,8 @@
 
 #define DEV_MAX_MAPPING_NAME_STRLEN 63
 
+#define VICTRON_MAX_COUNT 2
+
 #define POWERMETER_MAX_PHASES 3
 #define POWERMETER_MAX_HTTP_URL_STRLEN 1024
 #define POWERMETER_MAX_USERNAME_STRLEN 64
@@ -198,7 +200,7 @@ struct CONFIG_T {
         bool HttpIndividualRequests;
         POWERMETER_HTTP_PHASE_CONFIG_T Http_Phase[POWERMETER_MAX_PHASES];
     } PowerMeter;
-    
+
     struct {
         bool Enabled;
         bool VerboseLogging;
@@ -225,7 +227,7 @@ struct CONFIG_T {
         float FullSolarPassThroughStartVoltage;
         float FullSolarPassThroughStopVoltage;
     } PowerLimiter;
-    
+
     struct {
         bool Enabled;
         bool VerboseLogging;
@@ -243,7 +245,7 @@ struct CONFIG_T {
         float Auto_Power_Voltage_Limit;
         float Auto_Power_Enable_Voltage_Limit;
         float Auto_Power_Lower_Power_Limit;
-        float Auto_Power_Upper_Power_Limit;   
+        float Auto_Power_Upper_Power_Limit;
     } Huawei;
 
 

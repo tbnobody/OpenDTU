@@ -32,7 +32,7 @@ void WebApiWsVedirectLiveClass::init(AsyncWebServer& server, Scheduler& schedule
     _server->addHandler(&_ws);
     _ws.onEvent(std::bind(&WebApiWsVedirectLiveClass::onWebsocketEvent, this, _1, _2, _3, _4, _5, _6));
 
-    
+
     scheduler.addTask(_wsCleanupTask);
     _wsCleanupTask.setCallback(std::bind(&WebApiWsVedirectLiveClass::wsCleanupTaskCb, this));
     _wsCleanupTask.setIterations(TASK_FOREVER);
@@ -61,13 +61,13 @@ void WebApiWsVedirectLiveClass::sendDataTaskCb()
 
     // we assume this loop to be running at least twice for every
     // update from a VE.Direct MPPT data producer, so _dataAgeMillis
-    // acutally grows in between updates.
+    // actually grows in between updates.
     auto lastDataAgeMillis = _dataAgeMillis;
     _dataAgeMillis = VictronMppt.getDataAgeMillis();
 
     // Update on ve.direct change or at least after 10 seconds
     if (millis() - _lastWsPublish > (10 * 1000) || lastDataAgeMillis > _dataAgeMillis) {
-        
+
         try {
             std::lock_guard<std::mutex> lock(_mutex);
             DynamicJsonDocument root(_responseSize);
@@ -77,7 +77,7 @@ void WebApiWsVedirectLiveClass::sendDataTaskCb()
 
                 String buffer;
                 serializeJson(root, buffer);
-           
+
                 if (Configuration.get().Security.AllowReadonly) {
                     _ws.setAuthentication("", "");
                 } else {
@@ -99,15 +99,36 @@ void WebApiWsVedirectLiveClass::sendDataTaskCb()
 
 void WebApiWsVedirectLiveClass::generateJsonResponse(JsonVariant& root)
 {
-    auto spMpptData = VictronMppt.getData();
+    root["vedirect"]["data_age"] = VictronMppt.getDataAgeMillis() / 1000;
+    const JsonArray &array = root["vedirect"].createNestedArray("devices");
 
+    for (int idx = 0; idx < VICTRON_MAX_COUNT; ++idx) {
+        std::optional<VeDirectMpptController::spData_t> spOptMpptData = VictronMppt.getData(idx);
+        if (!spOptMpptData.has_value()) {
+            continue;
+        }
+
+        VeDirectMpptController::spData_t &spMpptData = spOptMpptData.value();
+
+        const JsonObject &nested = array.createNestedObject();
+        nested["age_critical"] = !VictronMppt.isDataValid(idx);
+        populateJson(nested, spMpptData);
+    }
+
+    // power limiter state
+    root["dpl"]["PLSTATE"] = -1;
+    if (Configuration.get().PowerLimiter.Enabled)
+        root["dpl"]["PLSTATE"] = PowerLimiter.getPowerLimiterState();
+    root["dpl"]["PLLIMIT"] = PowerLimiter.getLastRequestedPowerLimit();
+}
+
+void
+WebApiWsVedirectLiveClass::populateJson(const JsonObject &root, const VeDirectMpptController::spData_t &spMpptData) {
     // device info
-    root["device"]["data_age"] = VictronMppt.getDataAgeMillis() / 1000;
-    root["device"]["age_critical"] = !VictronMppt.isDataValid();
     root["device"]["PID"] = spMpptData->getPidAsString();
     root["device"]["SER"] = spMpptData->SER;
     root["device"]["FW"] = spMpptData->FW;
-    root["device"]["LOAD"] = spMpptData->LOAD == true ? "ON" : "OFF";
+    root["device"]["LOAD"] = spMpptData->LOAD ? "ON" : "OFF";
     root["device"]["CS"] = spMpptData->getCsAsString();
     root["device"]["ERR"] = spMpptData->getErrAsString();
     root["device"]["OR"] = spMpptData->getOrAsString();
@@ -115,7 +136,7 @@ void WebApiWsVedirectLiveClass::generateJsonResponse(JsonVariant& root)
     root["device"]["HSDS"]["v"] = spMpptData->HSDS;
     root["device"]["HSDS"]["u"] = "d";
 
-    // battery info    
+    // battery info
     root["output"]["P"]["v"] = spMpptData->P;
     root["output"]["P"]["u"] = "W";
     root["output"]["P"]["d"] = 0;
@@ -154,12 +175,6 @@ void WebApiWsVedirectLiveClass::generateJsonResponse(JsonVariant& root)
     root["input"]["MaximumPowerYesterday"]["v"] = spMpptData->H23;
     root["input"]["MaximumPowerYesterday"]["u"] = "W";
     root["input"]["MaximumPowerYesterday"]["d"] = 0;
-
-    // power limiter state
-    root["dpl"]["PLSTATE"] = -1;
-    if (Configuration.get().PowerLimiter.Enabled)
-        root["dpl"]["PLSTATE"] = PowerLimiter.getPowerLimiterState();
-    root["dpl"]["PLLIMIT"] = PowerLimiter.getLastRequestedPowerLimit();
 }
 
 void WebApiWsVedirectLiveClass::onWebsocketEvent(AsyncWebSocket* server, AsyncWebSocketClient* client, AwsEventType type, void* arg, uint8_t* data, size_t len)
