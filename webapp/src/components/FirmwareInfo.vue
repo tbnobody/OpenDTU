@@ -28,7 +28,7 @@
                     </tr>
                     <tr>
                         <th>{{ $t('firmwareinfo.FirmwareUpdate') }}</th>
-                        <td v-if="modelAllowVersionInfo">
+                        <td v-if="modelAllowVersionInfo && isUpdateAvailable">
                             <a :href="systemStatus.update_url" target="_blank" v-tooltip
                                 :title="$t('firmwareinfo.FirmwareUpdateHint')">
                                 <span class="badge" :class="systemStatus.update_status">
@@ -36,12 +36,16 @@
                                 </span>
                             </a>
                         </td>
+                        <td v-else-if="modelAllowVersionInfo && !isUpdateAvailable">
+                            {{ systemStatus.update_text }}
+                        </td>
                         <td v-else>
                             <div class="form-check form-switch">
                                 <input v-model="modelAllowVersionInfo" class="form-check-input" type="checkbox" role="switch" v-tooltip :title="$t('firmwareinfo.FrmwareUpdateAllow')" />
                             </div>
                         </td>
                     </tr>
+
                     <tr>
                         <th>{{ $t('firmwareinfo.ResetReason0') }}</th>
                         <td>{{ systemStatus.resetreason_0 }}</td>
