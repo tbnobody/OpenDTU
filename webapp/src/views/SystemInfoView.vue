@@ -38,6 +38,7 @@ export default defineComponent({
             dataLoading: true,
             systemDataList: {} as SystemStatus,
             allowVersionInfo: false,
+            isUpdateAvailable: false,
         }
     },
     created() {
@@ -57,42 +58,42 @@ export default defineComponent({
                     }
                 })
         },
-        getUpdateInfo() {
-            // If the left char is a "g" the value is the git hash (remove the "g")
-            this.systemDataList.git_is_hash = this.systemDataList.git_hash?.substring(0, 1) == 'g';
-            this.systemDataList.git_hash = this.systemDataList.git_is_hash ? this.systemDataList.git_hash?.substring(1) : this.systemDataList.git_hash;
-
-            // Handle format "v0.1-5-gabcdefh"
-            if (this.systemDataList.git_hash.lastIndexOf("-") >= 0) {
-                this.systemDataList.git_hash = this.systemDataList.git_hash.substring(this.systemDataList.git_hash.lastIndexOf("-") + 2)
-                this.systemDataList.git_is_hash = true;
-            }
-
-            const fetchUrl = "https://api.github.com/repos/tbnobody/OpenDTU/compare/"
-                + this.systemDataList.git_hash + "...HEAD";
-
-            fetch(fetchUrl)
-                .then((response) => {
-                    if (response.ok) {
-                        return response.json()
-                    }
-                    throw new Error(this.$t("systeminfo.VersionError"));
-                })
-                .then((data) => {
-                    if (data.total_commits > 0) {
-                        this.systemDataList.update_text = this.$t("systeminfo.VersionNew");
-                        this.systemDataList.update_status = "text-bg-danger";
-                        this.systemDataList.update_url = data.html_url;
-                    } else {
-                        this.systemDataList.update_text = this.$t("systeminfo.VersionOk");
-                        this.systemDataList.update_status = "text-bg-success";
-                    }
-                })
-                .catch((error: Error) => {
-                    this.systemDataList.update_text = error.message;
-                    this.systemDataList.update_status = "text-bg-secondary";
-                });
+    getUpdateInfo() {
+        // If the left char is a "g" the value is the git hash (remove the "g")
+        this.systemDataList.git_is_hash = this.systemDataList.git_hash?.substring(0, 1) == 'g';
+        this.systemDataList.git_hash = this.systemDataList.git_is_hash ? this.systemDataList.git_hash?.substring(1) : this.systemDataList.git_hash;
+    
+        // Handle format "v0.1-5-gabcdefh"
+        if (this.systemDataList.git_hash.lastIndexOf("-") >= 0) {
+            this.systemDataList.git_hash = this.systemDataList.git_hash.substring(this.systemDataList.git_hash.lastIndexOf("-") + 2)
+            this.systemDataList.git_is_hash = true;
         }
+    
+        const fetchUrl = "https://api.github.com/repos/tbnobody/OpenDTU/compare/"
+            + this.systemDataList.git_hash + "...HEAD";
+    
+        fetch(fetchUrl)
+            .then((response) => {
+                if (response.ok) {
+                    return response.json()
+                }
+                throw new Error(this.$t("systeminfo.VersionError"));
+            })
+            .then((data) => {
+                this.isUpdateAvailable = data.total_commits > 0; // Set isUpdateAvailable based on the presence of new commits
+                if (this.isUpdateAvailable) {
+                    this.systemDataList.update_text = this.$t("systeminfo.VersionNew");
+                    this.systemDataList.update_status = "text-bg-danger";
+                    this.systemDataList.update_url = data.html_url;
+                } else {
+                    this.systemDataList.update_text = this.$t("systeminfo.VersionOk");
+                    this.systemDataList.update_status = "text-bg-success";
+                }
+            })
+            .catch((error: Error) => {
+                this.systemDataList.update_text = error.message;
+                this.systemDataList.update_status = "text-bg-secondary";
+            });
     },
     watch: {
         allowVersionInfo(allow: Boolean) {
