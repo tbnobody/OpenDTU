@@ -463,6 +463,10 @@ export default defineComponent({
                     const newData = JSON.parse(event.data);
                     Object.assign(this.liveData.total, newData.total);
                     Object.assign(this.liveData.hints, newData.hints);
+                    Object.assign(this.liveData.vedirect, newData.vedirect);
+                    Object.assign(this.liveData.huawei, newData.huawei);
+                    Object.assign(this.liveData.battery, newData.battery);
+                    Object.assign(this.liveData.power_meter, newData.power_meter);
 
                     const foundIdx = this.liveData.inverters.findIndex((element) => element.serial == newData.inverters[0].serial);
                     if (foundIdx == -1) {

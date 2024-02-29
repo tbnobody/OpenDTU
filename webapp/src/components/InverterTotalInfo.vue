@@ -123,8 +123,8 @@ export default defineComponent({
     totalData: { type: Object as PropType<Total>, required: true },
     totalVeData: { type: Object as PropType<Vedirect>, required: true },
     totalBattData: { type: Object as PropType<Battery>, required: true },
-    powerMeterData: { type: Object as PropType<Huawei>, required: true },
-    huaweiData: { type: Object as PropType<PowerMeter>, required: true },
+    powerMeterData: { type: Object as PropType<PowerMeter>, required: true },
+    huaweiData: { type: Object as PropType<Huawei>, required: true },
   },
 });
 </script>
