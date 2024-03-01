@@ -29,11 +29,16 @@ const uint8_t languages[] = {
 };
 
 static const char* const i18n_offline[] = { "Offline", "Offline", "Offline" };
+
 static const char* const i18n_current_power_w[] = { "%.0f W", "%.0f W", "%.0f W" };
 static const char* const i18n_current_power_kw[] = { "%.1f kW", "%.1f kW", "%.1f kW" };
+
 static const char* const i18n_yield_today_wh[] = { "today: %4.0f Wh", "Heute: %4.0f Wh", "auj.: %4.0f Wh" };
+static const char* const i18n_yield_today_kwh[] = { "today: %.1f kWh", "Heute: %.1f kWh", "auj.: %.1f kWh" };
+
 static const char* const i18n_yield_total_kwh[] = { "total: %.1f kWh", "Ges.: %.1f kWh", "total: %.1f kWh" };
 static const char* const i18n_yield_total_mwh[] = { "total: %.0f kWh", "Ges.: %.0f kWh", "total: %.0f kWh" };
+
 static const char* const i18n_date_format[] = { "%m/%d/%Y %H:%M", "%d.%m.%Y %H:%M", "%d/%m/%Y %H:%M" };
 
 DisplayGraphicClass::DisplayGraphicClass()
@@ -128,6 +133,10 @@ void DisplayGraphicClass::printText(const char* text, const uint8_t line)
         int offset = (step <= maxOffset) ? step : (period - step);
         offset -= (_isLarge ? 5 : 0); // oscillate around center on large screens
         dispX += offset;
+    }
+
+    if (dispX > _display->getDisplayWidth()) {
+        dispX = 0;
     }
     _display->drawStr(dispX, _lineOffsets[line], text);
 }
@@ -237,15 +246,20 @@ void DisplayGraphicClass::loop()
     //<=======================
 
     if (showText) {
-        //=====> Today & Total Production =======
-        snprintf(_fmtText, sizeof(_fmtText), i18n_yield_today_wh[_display_language], Datastore.getTotalAcYieldDayEnabled());
+        // Daily production
+        float wattsToday = Datastore.getTotalAcYieldDayEnabled();
+        if (wattsToday >= 10000) {
+            snprintf(_fmtText, sizeof(_fmtText), i18n_yield_today_kwh[_display_language], wattsToday / 1000);
+        } else {
+            snprintf(_fmtText, sizeof(_fmtText), i18n_yield_today_wh[_display_language], wattsToday);
+        }
         printText(_fmtText, 1);
 
-        const float watts = Datastore.getTotalAcYieldTotalEnabled();
-        auto const format = (watts >= 1000) ? i18n_yield_total_mwh : i18n_yield_total_kwh;
-        snprintf(_fmtText, sizeof(_fmtText), format[_display_language], watts);
+        // Total production
+        const float wattsTotal = Datastore.getTotalAcYieldTotalEnabled();
+        auto const format = (wattsTotal >= 1000) ? i18n_yield_total_mwh : i18n_yield_total_kwh;
+        snprintf(_fmtText, sizeof(_fmtText), format[_display_language], wattsTotal);
         printText(_fmtText, 2);
-        //<=======================
 
         //=====> IP or Date-Time ========
         // Change every 3 seconds
