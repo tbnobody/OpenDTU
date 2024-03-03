@@ -60,6 +60,15 @@ jobs:
       - name: Get tags
         run: git fetch --force --tags origin
 
+      - name: Create and switch to a meaningful branch for pull-requests
+        if: github.event_name == 'pull_request'
+        run: |
+          OWNER=${{ github.repository_owner }}
+          NAME=${{ github.event.repository.name }}
+          ID=${{ github.event.pull_request.number }}
+          DATE=$(date +'%Y%m%d%H%M')
+          git switch -c ${OWNER}/${NAME}/pr${ID}-${DATE}
+
       - name: Cache pip
         uses: actions/cache@v4
         with:
