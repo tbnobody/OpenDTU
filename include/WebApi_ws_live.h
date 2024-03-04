@@ -17,6 +17,9 @@ private:
     static void generateInverterChannelJsonResponse(JsonObject& root, std::shared_ptr<InverterAbstract> inv);
     static void generateCommonJsonResponse(JsonVariant& root);
 
+    void generateOnBatteryJsonResponse(JsonVariant& root, bool all);
+    void sendOnBatteryStats();
+
     static void addField(JsonObject& root, std::shared_ptr<InverterAbstract> inv, const ChannelType_t type, const ChannelNum_t channel, const FieldId_t fieldId, String topic = "");
     static void addTotalField(JsonObject& root, const String& name, const float value, const String& unit, const uint8_t digits);
 
@@ -24,6 +27,12 @@ private:
     void onWebsocketEvent(AsyncWebSocket* server, AsyncWebSocketClient* client, AwsEventType type, void* arg, uint8_t* data, size_t len);
 
     AsyncWebSocket _ws;
+
+    uint32_t _lastPublishOnBatteryFull = 0;
+    uint32_t _lastPublishVictron = 0;
+    uint32_t _lastPublishHuawei = 0;
+    uint32_t _lastPublishBattery = 0;
+    uint32_t _lastPublishPowerMeter = 0;
 
     uint32_t _lastPublishStats[INV_MAX_COUNT] = { 0 };
 

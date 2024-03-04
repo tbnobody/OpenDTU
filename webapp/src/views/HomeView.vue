@@ -461,12 +461,16 @@ export default defineComponent({
                 console.log(event);
                 if (event.data != "{}") {
                     const newData = JSON.parse(event.data);
+
+                    if (typeof newData.vedirect !== 'undefined') { Object.assign(this.liveData.vedirect, newData.vedirect); }
+                    if (typeof newData.huawei !== 'undefined') { Object.assign(this.liveData.huawei, newData.huawei); }
+                    if (typeof newData.battery !== 'undefined') { Object.assign(this.liveData.battery, newData.battery); }
+                    if (typeof newData.power_meter !== 'undefined') { Object.assign(this.liveData.power_meter, newData.power_meter); }
+
+                    if (typeof newData.total === 'undefined') { return; }
+
                     Object.assign(this.liveData.total, newData.total);
                     Object.assign(this.liveData.hints, newData.hints);
-                    Object.assign(this.liveData.vedirect, newData.vedirect);
-                    Object.assign(this.liveData.huawei, newData.huawei);
-                    Object.assign(this.liveData.battery, newData.battery);
-                    Object.assign(this.liveData.power_meter, newData.power_meter);
 
                     const foundIdx = this.liveData.inverters.findIndex((element) => element.serial == newData.inverters[0].serial);
                     if (foundIdx == -1) {
