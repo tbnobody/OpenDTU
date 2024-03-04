@@ -51,6 +51,12 @@ static void addLiveViewAlarm(JsonVariant& root, std::string const& name,
     root["issues"][name] = 2;
 }
 
+bool BatteryStats::updateAvailable(uint32_t since) const
+{
+    auto constexpr halfOfAllMillis = std::numeric_limits<uint32_t>::max() / 2;
+    return (_lastUpdate - since) < halfOfAllMillis;
+}
+
 void BatteryStats::getLiveViewData(JsonVariant& root) const
 {
     root[F("manufacturer")] = _manufacturer;
