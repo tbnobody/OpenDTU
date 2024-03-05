@@ -46,7 +46,9 @@ void MqttHandlePowerLimiterHassClass::forceUpdate()
 
 void MqttHandlePowerLimiterHassClass::publishConfig()
 {
-    if (!Configuration.get().Mqtt.Hass.Enabled) {
+    auto const& config = Configuration.get();
+
+    if (!config.Mqtt.Hass.Enabled) {
         return;
     }
 
@@ -54,13 +56,45 @@ void MqttHandlePowerLimiterHassClass::publishConfig()
         return;
     }
 
-    if (!Configuration.get().PowerLimiter.Enabled) {
-        publishSelect("DPL Mode", "mdi:gauge", "config", "mode", "mode");
-        publishNumber("DPL battery SoC start threshold", "mdi:battery-charging", "config", "threshold/soc/start", "threshold/soc/start", "%", 0, 100);
-        publishNumber("DPL battery SoC stop threshold", "mdi:battery-charging", "config", "threshold/soc/stop", "threshold/soc/stop", "%", 0, 100);
+    if (!config.PowerLimiter.Enabled) {
+        return;
     }
-    if (!Configuration.get().Vedirect.Enabled) {
-        publishNumber("DPL full solar passthrough SoC", "mdi:transmission-tower-import", "config", "threshold/soc/full_solar_passthrough", "threshold/soc/full_solar_passthrough", "%", 0, 100);
+
+    publishSelect("DPL Mode", "mdi:gauge", "config", "mode", "mode");
+
+    if (config.PowerLimiter.IsInverterSolarPowered) {
+        return;
+    }
+
+    // as this project revolves around Hoymiles inverters, 16 - 60 V is a reasonable voltage range
+    publishNumber("DPL battery voltage start threshold", "mdi:battery-charging",
+            "config", "threshold/voltage/start", "threshold/voltage/start", "V", 16, 60);
+    publishNumber("DPL battery voltage stop threshold", "mdi:battery-charging",
+            "config", "threshold/voltage/stop", "threshold/voltage/stop", "V", 16, 60);
+
+    if (config.Vedirect.Enabled) {
+        publishNumber("DPL full solar passthrough start voltage",
+                "mdi:transmission-tower-import", "config",
+                "threshold/voltage/full_solar_passthrough_start",
+                "threshold/voltage/full_solar_passthrough_start", "V", 16, 60);
+        publishNumber("DPL full solar passthrough stop voltage",
+                "mdi:transmission-tower-import", "config",
+                "threshold/voltage/full_solar_passthrough_stop",
+                "threshold/voltage/full_solar_passthrough_stop", "V", 16, 60);
+    }
+
+    if (config.Battery.Enabled && !config.PowerLimiter.IgnoreSoc) {
+        publishNumber("DPL battery SoC start threshold", "mdi:battery-charging",
+                "config", "threshold/soc/start", "threshold/soc/start", "%", 0, 100);
+        publishNumber("DPL battery SoC stop threshold", "mdi:battery-charging",
+                "config", "threshold/soc/stop", "threshold/soc/stop", "%", 0, 100);
+
+        if (config.Vedirect.Enabled) {
+            publishNumber("DPL full solar passthrough SoC",
+                    "mdi:transmission-tower-import", "config",
+                    "threshold/soc/full_solar_passthrough",
+                    "threshold/soc/full_solar_passthrough", "%", 0, 100);
+        }
     }
 }
 
@@ -136,6 +170,11 @@ void MqttHandlePowerLimiterHassClass::publishNumber(
     root["min"] = min;
     root["max"] = max;
     root["mode"] = "box";
+
+    auto const& config = Configuration.get();
+    if (config.Mqtt.Hass.Expire) {
+        root["exp_aft"] = config.Mqtt.PublishInterval * 3;
+    }
 
     JsonObject deviceObj = root.createNestedObject("dev");
     createDeviceInfo(deviceObj);

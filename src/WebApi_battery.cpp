@@ -8,6 +8,7 @@
 #include "Battery.h"
 #include "Configuration.h"
 #include "MqttHandleBatteryHass.h"
+#include "MqttHandlePowerLimiterHass.h"
 #include "WebApi.h"
 #include "WebApi_battery.h"
 #include "WebApi_errors.h"
@@ -114,4 +115,7 @@ void WebApiBatteryClass::onAdminPost(AsyncWebServerRequest* request)
 
     Battery.updateSettings();
     MqttHandleBatteryHass.forceUpdate();
+
+    // potentially make SoC thresholds auto-discoverable
+    MqttHandlePowerLimiterHass.forceUpdate();
 }

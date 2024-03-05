@@ -7,10 +7,7 @@
 #include "ArduinoJson.h"
 #include "AsyncJson.h"
 #include "Configuration.h"
-#include "MqttHandleHass.h"
-#include "MqttHandleVedirectHass.h"
-#include "MqttSettings.h"
-#include "PowerMeter.h"
+#include "MqttHandlePowerLimiterHass.h"
 #include "PowerLimiter.h"
 #include "WebApi.h"
 #include "helper.h"
@@ -155,4 +152,7 @@ void WebApiPowerLimiterClass::onAdminPost(AsyncWebServerRequest* request)
     request->send(response);
 
     PowerLimiter.calcNextInverterRestart();
+
+    // potentially make thresholds auto-discoverable
+    MqttHandlePowerLimiterHass.forceUpdate();
 }

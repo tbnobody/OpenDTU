@@ -67,18 +67,33 @@ void MqttHandlePowerLimiterClass::loop()
 
     if (!MqttSettings.getConnected() ) { return; }
 
-    if ((millis() - _lastPublish) > (config.Mqtt.PublishInterval * 1000) ) {
-        auto val = static_cast<unsigned>(PowerLimiter.getMode());
-        MqttSettings.publish("powerlimiter/status/mode", String(val));
-        MqttSettings.publish("powerlimiter/status/threshold/soc/start", String(config.PowerLimiter.BatterySocStartThreshold));
-        MqttSettings.publish("powerlimiter/status/threshold/soc/stop", String(config.PowerLimiter.BatterySocStopThreshold));
-        MqttSettings.publish("powerlimiter/status/threshold/soc/full_solar_passthrough", String(config.PowerLimiter.FullSolarPassThroughSoc));
-        MqttSettings.publish("powerlimiter/status/threshold/voltage/start", String(config.PowerLimiter.VoltageStartThreshold));
-        MqttSettings.publish("powerlimiter/status/threshold/voltage/stop", String(config.PowerLimiter.VoltageStopThreshold));
+    if ((millis() - _lastPublish) < (config.Mqtt.PublishInterval * 1000)) {
+        return;
+    }
+
+    _lastPublish = millis();
+
+    auto val = static_cast<unsigned>(PowerLimiter.getMode());
+    MqttSettings.publish("powerlimiter/status/mode", String(val));
+
+    // no thresholds are relevant for setups without a battery
+    if (config.PowerLimiter.IsInverterSolarPowered) { return; }
+
+    MqttSettings.publish("powerlimiter/status/threshold/voltage/start", String(config.PowerLimiter.VoltageStartThreshold));
+    MqttSettings.publish("powerlimiter/status/threshold/voltage/stop", String(config.PowerLimiter.VoltageStopThreshold));
+
+    if (config.Vedirect.Enabled) {
         MqttSettings.publish("powerlimiter/status/threshold/voltage/full_solar_passthrough_start", String(config.PowerLimiter.FullSolarPassThroughStartVoltage));
         MqttSettings.publish("powerlimiter/status/threshold/voltage/full_solar_passthrough_stop", String(config.PowerLimiter.FullSolarPassThroughStopVoltage));
+    }
 
-        _lastPublish = millis();
+    if (!config.Battery.Enabled || config.PowerLimiter.IgnoreSoc) { return; }
+
+    MqttSettings.publish("powerlimiter/status/threshold/soc/start", String(config.PowerLimiter.BatterySocStartThreshold));
+    MqttSettings.publish("powerlimiter/status/threshold/soc/stop", String(config.PowerLimiter.BatterySocStopThreshold));
+
+    if (config.Vedirect.Enabled) {
+        MqttSettings.publish("powerlimiter/status/threshold/soc/full_solar_passthrough", String(config.PowerLimiter.FullSolarPassThroughSoc));
     }
 }
 
