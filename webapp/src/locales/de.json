@@ -553,6 +553,7 @@
         "typeSDM3ph": "SDM 3 phase (SDM72/630)",
         "typeHTTP": "HTTP(S) + JSON",
         "typeSML": "SML (OBIS 16.7.0)",
+        "typeSMAHM2": "SMA Homemanager 2.0",
         "MqttTopicPowerMeter1": "MQTT topic - Stromzähler #1",
         "MqttTopicPowerMeter2": "MQTT topic - Stromzähler #2 (Optional)",
         "MqttTopicPowerMeter3": "MQTT topic - Stromzähler #3 (Optional)",
@@ -817,7 +818,7 @@
         "Close": "Schließen",
         "SetVoltageLimit": "Spannungslimit:",
         "SetCurrentLimit": "Stromlimit:",
-        "CurrentLimit": "Aktuelles Limit: "  
+        "CurrentLimit": "Aktuelles Limit: "
       },
       "acchargeradmin": {
         "ChargerSettings": "AC Ladegerät Einstellungen",

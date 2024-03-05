@@ -3,7 +3,7 @@
         <BootstrapAlert v-model="showAlert" dismissible :variant="alertType" ref="alert">
             {{ alertMessage }}
         </BootstrapAlert>
-        
+
         <form @submit="savePowerMeterConfig">
             <CardElement :text="$t('powermeteradmin.PowerMeterConfiguration')"
                     textVariant="text-bg-primary">
@@ -83,7 +83,7 @@
                             </div>
                         </div>
                     </div>
-                
+
                     <div class="row mb-3">
                         <label for="sdmaddress" class="col-sm-2 col-form-label">{{ $t('powermeteradmin.sdmaddress') }}:</label>
                         <div class="col-sm-10">
@@ -126,7 +126,7 @@
                                     placeholder="http://admin:supersecret@mypowermeter.home/status"
                                     prefix="GET "
                                     :tooltip="$t('powermeteradmin.httpUrlDescription')" />
-                               
+
                                 <div class="row mb-3">
                                     <label for="inputTimezone" class="col-sm-2 col-form-label">{{ $t('powermeteradmin.httpAuthorization') }}</label>
                                     <div class="col-sm-10">
@@ -236,6 +236,7 @@ export default defineComponent({
                 { key: 2, value: this.$t('powermeteradmin.typeSDM3ph') },
                 { key: 3, value: this.$t('powermeteradmin.typeHTTP') },
                 { key: 4, value: this.$t('powermeteradmin.typeSML') },
+                { key: 5, value: this.$t('powermeteradmin.typeSMAHM2') },
             ],
             powerMeterAuthList: [
                 { key: 0, value: "None" },

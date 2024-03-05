@@ -555,6 +555,7 @@
         "typeSDM3ph": "SDM 3 phase (SDM72/630)",
         "typeHTTP": "HTTP(s) + JSON",
         "typeSML": "SML (OBIS 16.7.0)",
+        "typeSMAHM2": "SMA Homemanager 2.0",
         "MqttTopicPowerMeter1": "MQTT topic - Power meter #1",
         "MqttTopicPowerMeter2": "MQTT topic - Power meter #2",
         "MqttTopicPowerMeter3": "MQTT topic - Power meter #3",
@@ -824,7 +825,7 @@
         "Close": "close",
         "SetVoltageLimit": "Voltage limit:",
         "SetCurrentLimit": "Current limit:",
-        "CurrentLimit": "Current limit:"  
+        "CurrentLimit": "Current limit:"
       },
       "acchargeradmin": {
         "ChargerSettings": "AC Charger Settings",

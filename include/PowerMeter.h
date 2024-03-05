@@ -36,7 +36,8 @@ public:
         SOURCE_SDM1PH = 1,
         SOURCE_SDM3PH = 2,
         SOURCE_HTTP = 3,
-        SOURCE_SML = 4
+        SOURCE_SML = 4,
+        SOURCE_SMAHM2 = 5
     };
     void init(Scheduler& scheduler);
     float getPowerTotal(bool forceUpdate = true);
