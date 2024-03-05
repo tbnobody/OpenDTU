@@ -7,6 +7,7 @@
 #include <Hoymiles.h>
 #include <memory>
 #include <functional>
+#include <optional>
 #include <TaskSchedulerDeclarations.h>
 #include <frozen/string.h>
 
@@ -14,10 +15,6 @@
 #define PL_UI_STATE_CHARGING 1
 #define PL_UI_STATE_USE_SOLAR_ONLY 2
 #define PL_UI_STATE_USE_SOLAR_AND_BATTERY 3
-
-#define PL_MODE_ENABLE_NORMAL_OP 0
-#define PL_MODE_FULL_DISABLE 1
-#define PL_MODE_SOLAR_PT_ONLY 2
 
 typedef enum {
     EMPTY_WHEN_FULL= 0, 
@@ -51,7 +48,7 @@ public:
 
     void init(Scheduler& scheduler);
     uint8_t getPowerLimiterState();
-    int32_t getLastRequestedPowerLimit();
+    int32_t getLastRequestedPowerLimit() { return _lastRequestedPowerLimit; }
 
     enum class Mode : unsigned {
         Normal = 0,
@@ -69,8 +66,10 @@ private:
     Task _loopTask;
 
     int32_t _lastRequestedPowerLimit = 0;
-    uint32_t _lastPowerLimitMillis = 0;
-    uint32_t _shutdownTimeout = 0;
+    bool _shutdownPending = false;
+    std::optional<uint32_t> _oUpdateStartMillis = std::nullopt;
+    std::optional<int32_t> _oTargetPowerLimitWatts = std::nullopt;
+    std::optional<bool> _oTargetPowerState = std::nullopt;
     Status _lastStatus = Status::Initializing;
     uint32_t _lastStatusPrinted = 0;
     uint32_t _lastCalculation = 0;
@@ -93,7 +92,7 @@ private:
     void unconditionalSolarPassthrough(std::shared_ptr<InverterAbstract> inverter);
     bool canUseDirectSolarPower();
     int32_t calcPowerLimit(std::shared_ptr<InverterAbstract> inverter, bool solarPowerEnabled, bool batteryDischargeEnabled);
-    void commitPowerLimit(std::shared_ptr<InverterAbstract> inverter, int32_t limit, bool enablePowerProduction);
+    bool updateInverter();
     bool setNewPowerLimit(std::shared_ptr<InverterAbstract> inverter, int32_t newPowerLimit);
     int32_t getSolarChargePower();
     float getLoadCorrectedVoltage();
