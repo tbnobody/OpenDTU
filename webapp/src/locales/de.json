@@ -618,5 +618,12 @@
         "Name": "Name",
         "ValueSelected": "Ausgewählt",
         "ValueActive": "Aktiv"
+    },
+    "inputserial": {
+        "format_hoymiles": "Hoymiles Seriennummerformat",
+        "format_converted": "Bereits konvertierte Seriennummer",
+        "format_herf_valid": "E-Star HERF Format (wird konvertiert gespeichert): {serial}",
+        "format_herf_invalid": "E-Star HERF Format: Ungültige Prüfsumme",
+        "format_unknown": "Unbekanntes Format"
     }
 }
