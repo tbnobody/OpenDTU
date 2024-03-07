@@ -12,6 +12,7 @@
 #include "Huawei_can.h"
 #include <VictronMppt.h>
 #include "MessageOutput.h"
+#include "inverters/HMS_4CH.h"
 #include <ctime>
 #include <cmath>
 #include <frozen/map.h>
@@ -30,7 +31,7 @@ frozen::string const& PowerLimiterClass::getStatusText(PowerLimiterClass::Status
 {
     static const frozen::string missing = "programmer error: missing status text";
 
-    static const frozen::map<Status, frozen::string, 19> texts = {
+    static const frozen::map<Status, frozen::string, 18> texts = {
         { Status::Initializing, "initializing (should not see me)" },
         { Status::DisabledByConfig, "disabled by configuration" },
         { Status::DisabledByMqtt, "disabled by MQTT" },
@@ -48,7 +49,6 @@ frozen::string const& PowerLimiterClass::getStatusText(PowerLimiterClass::Status
         { Status::InverterStatsPending, "waiting for sufficiently recent inverter data" },
         { Status::UnconditionalSolarPassthrough, "unconditionally passing through all solar power (MQTT override)" },
         { Status::NoVeDirect, "VE.Direct disabled, connection broken, or data outdated" },
-        { Status::Settling, "waiting for the system to settle" },
         { Status::Stable, "the system is stable, the last power limit is still valid" },
     };
 
@@ -79,36 +79,18 @@ void PowerLimiterClass::announceStatus(PowerLimiterClass::Status status)
 /**
  * returns true if the inverter state was changed or is about to change, i.e.,
  * if it is actually in need of a shutdown. returns false otherwise, i.e., the
- * inverter is already (assumed to be) shut down.
+ * inverter is already shut down and the inverter limit is set to the configured
+ * lower power limit.
  */
 bool PowerLimiterClass::shutdown(PowerLimiterClass::Status status)
 {
     announceStatus(status);
 
-    if (_inverter == nullptr || !_inverter->isProducing() ||
-            (_shutdownTimeout > 0 && _shutdownTimeout < millis()) ) {
-        // we are actually (already) done with shutting down the inverter,
-        // or a shutdown attempt was initiated but it timed out.
-        _inverter = nullptr;
-        _shutdownTimeout = 0;
-        return false;
-    }
+    _shutdownPending = true;
 
-    if (!_inverter->isReachable()) { return true; } // retry later (until timeout)
-
-    // retry shutdown for a maximum amount of time before giving up
-    if (_shutdownTimeout == 0) { _shutdownTimeout = millis() + 10 * 1000; }
-
-    auto lastLimitCommandState = _inverter->SystemConfigPara()->getLastLimitCommandSuccess();
-    if (CMD_PENDING == lastLimitCommandState) { return true; }
-
-    auto lastPowerCommandState = _inverter->PowerCommand()->getLastPowerCommandSuccess();
-    if (CMD_PENDING == lastPowerCommandState) { return true; }
-
-    CONFIG_T& config = Configuration.get();
-    commitPowerLimit(_inverter, config.PowerLimiter.LowerPowerLimit, false);
-
-    return true;
+    _oTargetPowerState = false;
+    _oTargetPowerLimitWatts = Configuration.get().PowerLimiter.LowerPowerLimit;
+    return updateInverter();
 }
 
 void PowerLimiterClass::loop()
@@ -124,12 +106,13 @@ void PowerLimiterClass::loop()
         return announceStatus(Status::WaitingForValidTimestamp);
     }
 
-    if (_shutdownTimeout > 0) {
-        // we transition from SHUTDOWN to OFF when we know the inverter was
-        // shut down. until then, we retry shutting it down. in this case we
-        // preserve the original status that lead to the decision to shut down.
-        shutdown();
-        return;
+    // take care that the last requested power
+    // limit and power state are actually reached
+    if (updateInverter()) { return; }
+
+    if (_shutdownPending) {
+        _shutdownPending = false;
+        _inverter = nullptr;
     }
 
     if (!config.PowerLimiter.Enabled) {
@@ -172,18 +155,6 @@ void PowerLimiterClass::loop()
         return announceStatus(Status::InverterCommandsDisabled);
     }
 
-    // concerns active power commands (power limits) only (also from web app or MQTT)
-    auto lastLimitCommandState = _inverter->SystemConfigPara()->getLastLimitCommandSuccess();
-    if (CMD_PENDING == lastLimitCommandState) {
-        return announceStatus(Status::InverterLimitPending);
-    }
-
-    // concerns power commands (start, stop, restart) only (also from web app or MQTT)
-    auto lastPowerCommandState = _inverter->PowerCommand()->getLastPowerCommandSuccess();
-    if (CMD_PENDING == lastPowerCommandState) {
-        return announceStatus(Status::InverterPowerCmdPending);
-    }
-
     // a calculated power limit will always be limited to the reported
     // device's max power. that upper limit is only known after the first
     // DevInfoSimpleCommand succeeded.
@@ -214,16 +185,11 @@ void PowerLimiterClass::loop()
             _inverter->SystemConfigPara()->getLastUpdateCommand(),
             _inverter->PowerCommand()->getLastUpdateCommand());
 
-    // wait for power meter and inverter stat updates after a settling phase
-    auto settlingEnd = lastUpdateCmd + 3 * 1000;
-
-    if (millis() < settlingEnd) { return announceStatus(Status::Settling); }
-
-    if (_inverter->Statistics()->getLastUpdate() <= settlingEnd) {
+    if (_inverter->Statistics()->getLastUpdate() <= lastUpdateCmd) {
         return announceStatus(Status::InverterStatsPending);
     }
 
-    if (PowerMeter.getLastPowerMeterUpdate() <= settlingEnd) {
+    if (PowerMeter.getLastPowerMeterUpdate() <= lastUpdateCmd) {
         return announceStatus(Status::PowerMeterPending);
     }
 
@@ -322,12 +288,6 @@ void PowerLimiterClass::loop()
     // Calculate and set Power Limit (NOTE: might reset _inverter to nullptr!)
     int32_t newPowerLimit = calcPowerLimit(_inverter, canUseDirectSolarPower(), _batteryDischargeEnabled);
     bool limitUpdated = setNewPowerLimit(_inverter, newPowerLimit);
-
-    if (_verboseLogging) {
-        MessageOutput.printf("[DPL::loop] ******************* Leaving PL, calculated limit: %d W, requested limit: %d W (%s)\r\n",
-                newPowerLimit, _lastRequestedPowerLimit,
-                (limitUpdated?"updated from calculated":"kept last requested"));
-    }
 
     _lastCalculation = millis();
 
@@ -441,10 +401,6 @@ uint8_t PowerLimiterClass::getPowerLimiterState() {
     return PL_UI_STATE_INACTIVE;
 }
 
-int32_t PowerLimiterClass::getLastRequestedPowerLimit() {
-	    return _lastRequestedPowerLimit;
-}
-
 bool PowerLimiterClass::canUseDirectSolarPower()
 {
     CONFIG_T& config = Configuration.get();
@@ -527,34 +483,190 @@ int32_t PowerLimiterClass::calcPowerLimit(std::shared_ptr<InverterAbstract> inve
     return newPowerLimit;
 }
 
-void PowerLimiterClass::commitPowerLimit(std::shared_ptr<InverterAbstract> inverter, int32_t limit, bool enablePowerProduction)
+/**
+ * updates the inverter state (power production and limit). returns true if a
+ * change to its state was requested or is pending. this function only requests
+ * one change (limit value or production on/off) at a time.
+ */
+bool PowerLimiterClass::updateInverter()
 {
+    auto reset = [this]() -> bool {
+        _oTargetPowerState = std::nullopt;
+        _oTargetPowerLimitWatts = std::nullopt;
+        _oUpdateStartMillis = std::nullopt;
+        return false;
+    };
+
+    if (nullptr == _inverter) { return reset(); }
+
+    if (!_oUpdateStartMillis.has_value()) {
+        _oUpdateStartMillis = millis();
+    }
+
+    if ((millis() - *_oUpdateStartMillis) > 30 * 1000) {
+        MessageOutput.printf("[DPL::updateInverter] timeout, "
+                "state transition pending: %s, limit pending: %s\r\n",
+                (_oTargetPowerState.has_value()?"yes":"no"),
+                (_oTargetPowerLimitWatts.has_value()?"yes":"no"));
+        return reset();
+    }
+
+    auto constexpr halfOfAllMillis = std::numeric_limits<uint32_t>::max() / 2;
+
+    auto switchPowerState = [this](bool transitionOn) -> bool {
+        // no power state transition requested at all
+        if (!_oTargetPowerState.has_value()) { return false; }
+
+        // the transition that may be started is not the one which is requested
+        if (transitionOn != *_oTargetPowerState) { return false; }
+
+        // wait for pending power command(s) to complete
+        auto lastPowerCommandState = _inverter->PowerCommand()->getLastPowerCommandSuccess();
+        if (CMD_PENDING == lastPowerCommandState) {
+            announceStatus(Status::InverterPowerCmdPending);
+            return true;
+        }
+
+        // we need to wait for statistics that are more recent than the last
+        // power update command to reliably use _inverter->isProducing()
+        auto lastPowerCommandMillis = _inverter->PowerCommand()->getLastUpdateCommand();
+        auto lastStatisticsMillis = _inverter->Statistics()->getLastUpdate();
+        if ((lastStatisticsMillis - lastPowerCommandMillis) > halfOfAllMillis) { return true; }
+
+        if (_inverter->isProducing() != *_oTargetPowerState) {
+            MessageOutput.printf("[DPL::updateInverter] %s inverter...\r\n",
+                    ((*_oTargetPowerState)?"Starting":"Stopping"));
+            _inverter->sendPowerControlRequest(*_oTargetPowerState);
+            return true;
+        }
+
+        _oTargetPowerState = std::nullopt; // target power state reached
+        return false;
+    };
+
+    // we use a lambda function here to be able to use return statements,
+    // which allows to avoid if-else-indentions and improves code readability
+    auto updateLimit = [this]() -> bool {
+        // no limit update requested at all
+        if (!_oTargetPowerLimitWatts.has_value()) { return false; }
+
+        // wait for pending limit command(s) to complete
+        auto lastLimitCommandState = _inverter->SystemConfigPara()->getLastLimitCommandSuccess();
+        if (CMD_PENDING == lastLimitCommandState) {
+            announceStatus(Status::InverterLimitPending);
+            return true;
+        }
+
+        auto maxPower = _inverter->DevInfo()->getMaxPower();
+        auto newRelativeLimit = static_cast<float>(*_oTargetPowerLimitWatts * 100) / maxPower;
+
+        // if no limit command is pending, the SystemConfigPara does report the
+        // current limit, as the answer by the inverter to a limit command is
+        // the canonical source that updates the known current limit.
+        auto currentRelativeLimit = _inverter->SystemConfigPara()->getLimitPercent();
+
+        // we assume having exclusive control over the inverter. if the last
+        // limit command was successful and sent after we started the last
+        // update cycle, we should assume *our* requested limit was set.
+        uint32_t lastLimitCommandMillis = _inverter->SystemConfigPara()->getLastUpdateCommand();
+        if ((lastLimitCommandMillis - *_oUpdateStartMillis) < halfOfAllMillis &&
+                CMD_OK == lastLimitCommandState) {
+            MessageOutput.printf("[DPL:updateInverter] actual limit is %.1f %% "
+                    "(%.0f W respectively), effective %d ms after update started, "
+                    "requested were %.1f %%\r\n",
+                    currentRelativeLimit,
+                    (currentRelativeLimit * maxPower / 100),
+                    (lastLimitCommandMillis - *_oUpdateStartMillis),
+                    newRelativeLimit);
+
+            if (std::abs(newRelativeLimit - currentRelativeLimit) > 2.0) {
+                MessageOutput.printf("[DPL:updateInverter] NOTE: expected limit of %.1f %% "
+                        "and actual limit of %.1f %% mismatch by more than 2 %%, "
+                        "is the DPL in exclusive control over the inverter?\r\n",
+                        newRelativeLimit, currentRelativeLimit);
+            }
+
+            _oTargetPowerLimitWatts = std::nullopt;
+            return false;
+        }
+
+        MessageOutput.printf("[DPL::updateInverter] sending limit of %.1f %% "
+                "(%.0f W respectively), max output is %d W\r\n",
+                newRelativeLimit, (newRelativeLimit * maxPower / 100), maxPower);
+
+        _inverter->sendActivePowerControlRequest(static_cast<float>(newRelativeLimit),
+                PowerLimitControlType::RelativNonPersistent);
+
+        _lastRequestedPowerLimit = *_oTargetPowerLimitWatts;
+        return true;
+    };
+
     // disable power production as soon as possible.
-    // setting the power limit is less important.
-    if (!enablePowerProduction && inverter->isProducing()) {
-        MessageOutput.println("[DPL::commitPowerLimit] Stopping inverter...");
-        inverter->sendPowerControlRequest(false);
-    }
+    // setting the power limit is less important once the inverter is off.
+    if (switchPowerState(false)) { return true; }
 
-    inverter->sendActivePowerControlRequest(static_cast<float>(limit),
-            PowerLimitControlType::AbsolutNonPersistent);
+    if (updateLimit()) { return true; }
 
-    _lastRequestedPowerLimit = limit;
-    _lastPowerLimitMillis = millis();
+    // enable power production only after setting the desired limit
+    if (switchPowerState(true)) { return true; }
 
-    // enable power production only after setting the desired limit,
-    // such that an older, greater limit will not cause power spikes.
-    if (enablePowerProduction && !inverter->isProducing()) {
-        MessageOutput.println("[DPL::commitPowerLimit] Starting up inverter...");
-        inverter->sendPowerControlRequest(true);
-    }
+    return reset();
 }
 
 /**
- * enforces limits and a hystersis on the requested power limit, after scaling
- * the power limit to the ratio of total and producing inverter channels.
- * commits the sanitized power limit. returns true if a limit update was
- * committed, false otherwise.
+ * scale the desired inverter limit such that the actual inverter AC output is
+ * close to the desired power limit, even if some input channels are producing
+ * less than the limit allows. this happens because the inverter seems to split
+ * the total power limit equally among all MPPTs (not inputs; some inputs share
+ * the same MPPT on some models).
+ *
+ * TODO(schlimmchen): the current implementation is broken and is in need of
+ * refactoring. currently it only works for inverters that provide one MPPT for
+ * each input. it also does not work as expected if any input produces *some*
+ * energy, but is limited by its respective solar input.
+ */
+static int32_t scalePowerLimit(std::shared_ptr<InverterAbstract> inverter, int32_t newLimit, int32_t currentLimitWatts)
+{
+    // prevent scaling if inverter is not producing, as input channels are not
+    // producing energy and hence are detected as not-producing, causing
+    // unreasonable scaling.
+    if (!inverter->isProducing()) { return newLimit; }
+
+    std::list<ChannelNum_t> dcChnls = inverter->Statistics()->getChannelsByType(TYPE_DC);
+    size_t dcTotalChnls = dcChnls.size();
+
+    // according to the upstream projects README (table with supported devs),
+    // every 2 channel inverter has 2 MPPTs. then there are the HM*S* 4 channel
+    // models which have 4 MPPTs. all others have a different number of MPPTs
+    // than inputs. those are not supported by the current scaling mechanism.
+    bool supported = dcTotalChnls == 2;
+    supported |= dcTotalChnls == 4 && HMS_4CH::isValidSerial(inverter->serial());
+    if (!supported) { return newLimit; }
+
+    // test for a reasonable power limit that allows us to assume that an input
+    // channel with little energy is actually not producing, rather than
+    // producing very little due to the very low limit.
+    if (currentLimitWatts < dcTotalChnls * 10) { return newLimit; }
+
+    size_t dcProdChnls = 0;
+    for (auto& c : dcChnls) {
+        if (inverter->Statistics()->getChannelFieldValue(TYPE_DC, c, FLD_PDC) > 2.0) {
+            dcProdChnls++;
+        }
+    }
+
+    if (dcProdChnls == 0 || dcProdChnls == dcTotalChnls) { return newLimit; }
+
+    MessageOutput.printf("[DPL::scalePowerLimit] %d channels total, %d producing "
+            "channels, scaling power limit\r\n", dcTotalChnls, dcProdChnls);
+    return round(newLimit * static_cast<float>(dcTotalChnls) / dcProdChnls);
+}
+
+/**
+ * enforces limits on the requested power limit, after scaling the power limit
+ * to the ratio of total and producing inverter channels. commits the sanitized
+ * power limit. returns true if an inverter update was committed, false
+ * otherwise.
  */
 bool PowerLimiterClass::setNewPowerLimit(std::shared_ptr<InverterAbstract> inverter, int32_t newPowerLimit)
 {
@@ -570,48 +682,32 @@ bool PowerLimiterClass::setNewPowerLimit(std::shared_ptr<InverterAbstract> inver
     // enforce configured upper power limit
     int32_t effPowerLimit = std::min(newPowerLimit, config.PowerLimiter.UpperPowerLimit);
 
-    // scale the power limit by the amount of all inverter channels devided by
-    // the amount of producing inverter channels. the inverters limit each of
-    // the n channels to 1/n of the total power limit. scaling the power limit
-    // ensures the total inverter output is what we are asking for.
-    std::list<ChannelNum_t> dcChnls = inverter->Statistics()->getChannelsByType(TYPE_DC);
-    int dcProdChnls = 0, dcTotalChnls = dcChnls.size();
-    for (auto& c : dcChnls) {
-        if (inverter->Statistics()->getChannelFieldValue(TYPE_DC, c, FLD_PDC) > 2.0) {
-            dcProdChnls++;
-        }
-    }
-    if ((dcProdChnls > 0) && (dcProdChnls != dcTotalChnls)) {
-        MessageOutput.printf("[DPL::setNewPowerLimit] %d channels total, %d producing channels, scaling power limit\r\n",
-                dcTotalChnls, dcProdChnls);
-        effPowerLimit = round(effPowerLimit * static_cast<float>(dcTotalChnls) / dcProdChnls);
-    }
+    // early in the loop we make it a pre-requisite that this
+    // value is non-zero, so we can assume it to be valid.
+    auto maxPower = inverter->DevInfo()->getMaxPower();
 
-    effPowerLimit = std::min<int32_t>(effPowerLimit, inverter->DevInfo()->getMaxPower());
+    float currentLimitPercent = inverter->SystemConfigPara()->getLimitPercent();
+    auto currentLimitAbs = static_cast<int32_t>(currentLimitPercent * maxPower / 100);
 
-    // Check if the new value is within the limits of the hysteresis
-    auto diff = std::abs(effPowerLimit - _lastRequestedPowerLimit);
+    effPowerLimit = scalePowerLimit(inverter, effPowerLimit, currentLimitAbs);
+
+    effPowerLimit = std::min<int32_t>(effPowerLimit, maxPower);
+
+    auto diff = std::abs(currentLimitAbs - effPowerLimit);
     auto hysteresis = config.PowerLimiter.TargetPowerConsumptionHysteresis;
 
-    // (re-)send power limit in case the last was sent a long time ago. avoids
-    // staleness in case a power limit update was not received by the inverter.
-    auto ageMillis = millis() - _lastPowerLimitMillis;
-
-    if (diff < hysteresis && ageMillis < 60 * 1000) {
-        if (_verboseLogging) {
-            MessageOutput.printf("[DPL::setNewPowerLimit] requested: %d W, last limit: %d W, diff: %d W, hysteresis: %d W, age: %ld ms\r\n",
-                    newPowerLimit, _lastRequestedPowerLimit, diff, hysteresis, ageMillis);
-        }
-        return false;
-    }
-
     if (_verboseLogging) {
-        MessageOutput.printf("[DPL::setNewPowerLimit] requested: %d W, (re-)sending limit: %d W\r\n",
-                newPowerLimit, effPowerLimit);
+        MessageOutput.printf("[DPL::setNewPowerLimit] calculated: %d W, "
+                "requesting: %d W, reported: %d W, diff: %d W, hysteresis: %d W\r\n",
+                newPowerLimit, effPowerLimit, currentLimitAbs, diff, hysteresis);
     }
 
-    commitPowerLimit(inverter, effPowerLimit, true);
-    return true;
+    if (diff > hysteresis) {
+        _oTargetPowerLimitWatts = effPowerLimit;
+    }
+
+    _oTargetPowerState = true;
+    return updateInverter();
 }
 
 int32_t PowerLimiterClass::getSolarChargePower()

@@ -15,7 +15,7 @@ class BatteryStats {
 
         // the last time *any* datum was updated
         uint32_t getAgeSeconds() const { return (millis() - _lastUpdate) / 1000; }
-        bool updateAvailable(uint32_t since) const { return _lastUpdate > since; }
+        bool updateAvailable(uint32_t since) const;
 
         uint8_t getSoC() const { return _soc; }
         uint32_t getSoCAgeSeconds() const { return (millis() - _lastUpdateSoC) / 1000; }
