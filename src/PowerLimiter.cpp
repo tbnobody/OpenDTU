@@ -12,6 +12,7 @@
 #include "Huawei_can.h"
 #include <VictronMppt.h>
 #include "MessageOutput.h"
+#include "inverters/HMS_4CH.h"
 #include <ctime>
 #include <cmath>
 #include <frozen/map.h>
@@ -633,6 +634,14 @@ static int32_t scalePowerLimit(std::shared_ptr<InverterAbstract> inverter, int32
 
     std::list<ChannelNum_t> dcChnls = inverter->Statistics()->getChannelsByType(TYPE_DC);
     size_t dcTotalChnls = dcChnls.size();
+
+    // according to the upstream projects README (table with supported devs),
+    // every 2 channel inverter has 2 MPPTs. then there are the HM*S* 4 channel
+    // models which have 4 MPPTs. all others have a different number of MPPTs
+    // than inputs. those are not supported by the current scaling mechanism.
+    bool supported = dcTotalChnls == 2;
+    supported |= dcTotalChnls == 4 && HMS_4CH::isValidSerial(inverter->serial());
+    if (!supported) { return newLimit; }
 
     // test for a reasonable power limit that allows us to assume that an input
     // channel with little energy is actually not producing, rather than
