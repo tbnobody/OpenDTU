@@ -655,7 +655,7 @@ static int32_t scalePowerLimit(std::shared_ptr<InverterAbstract> inverter, int32
         }
     }
 
-    if (dcProdChnls == dcTotalChnls) { return newLimit; }
+    if (dcProdChnls == 0 || dcProdChnls == dcTotalChnls) { return newLimit; }
 
     MessageOutput.printf("[DPL::scalePowerLimit] %d channels total, %d producing "
             "channels, scaling power limit\r\n", dcTotalChnls, dcProdChnls);
