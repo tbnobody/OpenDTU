@@ -613,6 +613,47 @@ bool PowerLimiterClass::updateInverter()
 }
 
 /**
+ * scale the desired inverter limit such that the actual inverter AC output is
+ * close to the desired power limit, even if some input channels are producing
+ * less than the limit allows. this happens because the inverter seems to split
+ * the total power limit equally among all MPPTs (not inputs; some inputs share
+ * the same MPPT on some models).
+ *
+ * TODO(schlimmchen): the current implementation is broken and is in need of
+ * refactoring. currently it only works for inverters that provide one MPPT for
+ * each input. it also does not work as expected if any input produces *some*
+ * energy, but is limited by its respective solar input.
+ */
+static int32_t scalePowerLimit(std::shared_ptr<InverterAbstract> inverter, int32_t newLimit, int32_t currentLimitWatts)
+{
+    // prevent scaling if inverter is not producing, as input channels are not
+    // producing energy and hence are detected as not-producing, causing
+    // unreasonable scaling.
+    if (!inverter->isProducing()) { return newLimit; }
+
+    std::list<ChannelNum_t> dcChnls = inverter->Statistics()->getChannelsByType(TYPE_DC);
+    size_t dcTotalChnls = dcChnls.size();
+
+    // test for a reasonable power limit that allows us to assume that an input
+    // channel with little energy is actually not producing, rather than
+    // producing very little due to the very low limit.
+    if (currentLimitWatts < dcTotalChnls * 10) { return newLimit; }
+
+    size_t dcProdChnls = 0;
+    for (auto& c : dcChnls) {
+        if (inverter->Statistics()->getChannelFieldValue(TYPE_DC, c, FLD_PDC) > 2.0) {
+            dcProdChnls++;
+        }
+    }
+
+    if (dcProdChnls == dcTotalChnls) { return newLimit; }
+
+    MessageOutput.printf("[DPL::scalePowerLimit] %d channels total, %d producing "
+            "channels, scaling power limit\r\n", dcTotalChnls, dcProdChnls);
+    return round(newLimit * static_cast<float>(dcTotalChnls) / dcProdChnls);
+}
+
+/**
  * enforces limits on the requested power limit, after scaling the power limit
  * to the ratio of total and producing inverter channels. commits the sanitized
  * power limit. returns true if an inverter update was committed, false
@@ -632,31 +673,17 @@ bool PowerLimiterClass::setNewPowerLimit(std::shared_ptr<InverterAbstract> inver
     // enforce configured upper power limit
     int32_t effPowerLimit = std::min(newPowerLimit, config.PowerLimiter.UpperPowerLimit);
 
-    // scale the power limit by the amount of all inverter channels devided by
-    // the amount of producing inverter channels. the inverters limit each of
-    // the n channels to 1/n of the total power limit. scaling the power limit
-    // ensures the total inverter output is what we are asking for.
-    std::list<ChannelNum_t> dcChnls = inverter->Statistics()->getChannelsByType(TYPE_DC);
-    int dcProdChnls = 0, dcTotalChnls = dcChnls.size();
-    for (auto& c : dcChnls) {
-        if (inverter->Statistics()->getChannelFieldValue(TYPE_DC, c, FLD_PDC) > 2.0) {
-            dcProdChnls++;
-        }
-    }
-    if ((dcProdChnls > 0) && (dcProdChnls != dcTotalChnls)) {
-        MessageOutput.printf("[DPL::setNewPowerLimit] %d channels total, %d producing channels, scaling power limit\r\n",
-                dcTotalChnls, dcProdChnls);
-        effPowerLimit = round(effPowerLimit * static_cast<float>(dcTotalChnls) / dcProdChnls);
-    }
-
     // early in the loop we make it a pre-requisite that this
     // value is non-zero, so we can assume it to be valid.
     auto maxPower = inverter->DevInfo()->getMaxPower();
 
-    effPowerLimit = std::min<int32_t>(effPowerLimit, maxPower);
-
     float currentLimitPercent = inverter->SystemConfigPara()->getLimitPercent();
     auto currentLimitAbs = static_cast<int32_t>(currentLimitPercent * maxPower / 100);
+
+    effPowerLimit = scalePowerLimit(inverter, effPowerLimit, currentLimitAbs);
+
+    effPowerLimit = std::min<int32_t>(effPowerLimit, maxPower);
+
     auto diff = std::abs(currentLimitAbs - effPowerLimit);
     auto hysteresis = config.PowerLimiter.TargetPowerConsumptionHysteresis;
 
