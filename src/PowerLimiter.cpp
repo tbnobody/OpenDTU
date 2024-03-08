@@ -31,7 +31,7 @@ frozen::string const& PowerLimiterClass::getStatusText(PowerLimiterClass::Status
 {
     static const frozen::string missing = "programmer error: missing status text";
 
-    static const frozen::map<Status, frozen::string, 18> texts = {
+    static const frozen::map<Status, frozen::string, 21> texts = {
         { Status::Initializing, "initializing (should not see me)" },
         { Status::DisabledByConfig, "disabled by configuration" },
         { Status::DisabledByMqtt, "disabled by MQTT" },
@@ -47,8 +47,11 @@ frozen::string const& PowerLimiterClass::getStatusText(PowerLimiterClass::Status
         { Status::InverterPowerCmdPending, "waiting for a start/stop/restart command to complete" },
         { Status::InverterDevInfoPending, "waiting for inverter device information to be available" },
         { Status::InverterStatsPending, "waiting for sufficiently recent inverter data" },
+        { Status::CalculatedLimitBelowMinLimit, "calculated limit is less than lower power limit" },
         { Status::UnconditionalSolarPassthrough, "unconditionally passing through all solar power (MQTT override)" },
         { Status::NoVeDirect, "VE.Direct disabled, connection broken, or data outdated" },
+        { Status::NoEnergy, "no energy source available to power the inverter from" },
+        { Status::HuaweiPsu, "DPL stands by while Huawei PSU is enabled/charging" },
         { Status::Stable, "the system is stable, the last power limit is still valid" },
     };
 
@@ -225,6 +228,8 @@ void PowerLimiterClass::loop()
     }
 
     auto getBatteryPower = [this,&config]() -> bool {
+        if (config.PowerLimiter.IsInverterSolarPowered) { return false; }
+
         if (isStopThresholdReached()) { return false; }
 
         if (isStartThresholdReached()) { return true; }
@@ -237,7 +242,7 @@ void PowerLimiterClass::loop()
         // power do not cause the start of a discharge cycle during the day.
         if (config.PowerLimiter.SolarPassThroughEnabled &&
                 config.PowerLimiter.BatteryDrainStategy == EMPTY_AT_NIGHT) {
-            return !canUseDirectSolarPower();
+            return getSolarPower() == 0;
         }
 
         // we are between start and stop threshold and keep the state that was
@@ -251,7 +256,9 @@ void PowerLimiterClass::loop()
         MessageOutput.printf("[DPL::loop] PowerMeter: %d W, target consumption: %d W, solar power: %d W\r\n",
                 static_cast<int32_t>(round(PowerMeter.getPowerTotal())),
                 config.PowerLimiter.TargetPowerConsumption,
-                getSolarChargePower());
+                getSolarPower());
+
+        if (config.PowerLimiter.IsInverterSolarPowered) { return; }
 
         MessageOutput.printf("[DPL::loop] battery interface %s, SoC: %d %%, StartTH: %d %%, StopTH: %d %%, SoC age: %d s, ignore: %s\r\n",
                 (config.Battery.Enabled?"enabled":"disabled"),
@@ -281,8 +288,7 @@ void PowerLimiterClass::loop()
     if (_verboseLogging) { logging(); }
 
     // Calculate and set Power Limit (NOTE: might reset _inverter to nullptr!)
-    int32_t newPowerLimit = calcPowerLimit(_inverter, canUseDirectSolarPower(), _batteryDischargeEnabled);
-    bool limitUpdated = setNewPowerLimit(_inverter, newPowerLimit);
+    bool limitUpdated = calcPowerLimit(_inverter, getSolarPower(), _batteryDischargeEnabled);
 
     _lastCalculation = millis();
 
@@ -396,46 +402,39 @@ uint8_t PowerLimiterClass::getPowerLimiterState() {
     return PL_UI_STATE_INACTIVE;
 }
 
-bool PowerLimiterClass::canUseDirectSolarPower()
-{
-    CONFIG_T& config = Configuration.get();
+// Logic table
+// | Case # | batteryPower | solarPower > 0 | useFullSolarPassthrough | Result                                                      |
+// | 1      | false        | false          | doesn't matter          | PL = 0                                                      |
+// | 2      | false        | true           | doesn't matter          | PL = Victron Power                                          |
+// | 3      | true         | doesn't matter | false                   | PL = PowerMeter value (Battery can supply unlimited energy) |
+// | 4      | true         | false          | true                    | PL = PowerMeter value                                       |
+// | 5      | true         | true           | true                    | PL = max(PowerMeter value, Victron Power)                   |
 
-    if (!config.PowerLimiter.SolarPassThroughEnabled
-            || isBelowStopThreshold()
-            || !VictronMppt.isDataValid()) {
-        return false;
+bool PowerLimiterClass::calcPowerLimit(std::shared_ptr<InverterAbstract> inverter, int32_t solarPowerDC, bool batteryPower)
+{
+    if (solarPowerDC == 0 && !batteryPower) {
+        return shutdown(Status::NoEnergy);
     }
 
-    return VictronMppt.getPowerOutputWatts() >= 20; // enough power?
-}
+    // We check if the PSU is on and disable the Power Limiter in this case.
+    // The PSU should reduce power or shut down first before the Power Limiter
+    // kicks in. The only case where this is not desired is if the battery is
+    // over the Full Solar Passthrough Threshold. In this case the Power
+    // Limiter should run and the PSU will shut down as a consequence.
+    if (!useFullSolarPassthrough() && HuaweiCan.getAutoPowerStatus()) {
+        return shutdown(Status::HuaweiPsu);
+    }
 
-
-// Logic table
-// | Case # | batteryDischargeEnabled | solarPowerEnabled | useFullSolarPassthrough | Result                                                      |
-// | 1      | false                   | false             | doesn't matter          | PL = 0                                                      |
-// | 2      | false                   | true              | doesn't matter          | PL = Victron Power                                          |
-// | 3      | true                    | doesn't matter    | false                   | PL = PowerMeter value (Battery can supply unlimited energy) |
-// | 4      | true                    | false             | true                    | PL = PowerMeter value                                       |
-// | 5      | true                    | true              | true                    | PL = max(PowerMeter value, Victron Power)                   |
-
-int32_t PowerLimiterClass::calcPowerLimit(std::shared_ptr<InverterAbstract> inverter, bool solarPowerEnabled, bool batteryDischargeEnabled)
-{
-    CONFIG_T& config = Configuration.get();
-    
-    int32_t acPower = 0;
     int32_t newPowerLimit = round(PowerMeter.getPowerTotal());
 
-    if (!solarPowerEnabled && !batteryDischargeEnabled) {
-      // Case 1 - No energy sources available
-      return 0;
-    }
+    auto const& config = Configuration.get();
 
     if (config.PowerLimiter.IsInverterBehindPowerMeter) {
         // If the inverter the behind the power meter (part of measurement),
         // the produced power of this inverter has also to be taken into account.
         // We don't use FLD_PAC from the statistics, because that
         // data might be too old and unreliable.
-        acPower = static_cast<int>(inverter->Statistics()->getChannelFieldValue(TYPE_AC, CH0, FLD_PAC)); 
+        auto acPower = inverter->Statistics()->getChannelFieldValue(TYPE_AC, CH0, FLD_PAC);
         newPowerLimit += acPower;
     }
 
@@ -444,38 +443,25 @@ int32_t PowerLimiterClass::calcPowerLimit(std::shared_ptr<InverterAbstract> inve
     // Case 3
     newPowerLimit -= config.PowerLimiter.TargetPowerConsumption;
 
-    // At this point we've calculated the required energy to compensate for household consumption. 
-    // If the battery is enabled this can always be supplied since we assume that the battery can supply unlimited power
-    // The next step is to determine if the Solar power as provided by the Victron charger
-    // actually constrains or dictates another inverter power value
-    int32_t adjustedVictronChargePower = inverterPowerDcToAc(inverter, getSolarChargePower());
+    int32_t solarPowerAC = inverterPowerDcToAc(inverter, solarPowerDC);
 
-    // Battery can be discharged and we should output max (Victron solar power || power meter value)
-    if(batteryDischargeEnabled && useFullSolarPassthrough()) {
-      // Case 5
-      newPowerLimit = newPowerLimit > adjustedVictronChargePower ? newPowerLimit : adjustedVictronChargePower;
-    } else {
-      // We check if the PSU is on and disable the Power Limiter in this case. 
-      // The PSU should reduce power or shut down first before the Power Limiter kicks in
-      // The only case where this is not desired is if the battery is over the Full Solar Passthrough Threshold
-      // In this case the Power Limiter should start. The PSU will shutdown when the Power Limiter is active
-      if (HuaweiCan.getAutoPowerStatus()) {
-        return 0;
-      }
-    }
-
-    // We should use Victron solar power only (corrected by efficiency factor)
-    if (solarPowerEnabled && !batteryDischargeEnabled) {
-        // Case 2 - Limit power to solar power only
+    if (!batteryPower) {
+        // do not drain the battery. use as much power as needed to match the
+        // household consumption, but not more than the available solar power.
         if (_verboseLogging) {
-            MessageOutput.printf("[DPL::loop] Consuming Solar Power Only -> adjustedVictronChargePower: %d W, newPowerLimit: %d W\r\n",
-                adjustedVictronChargePower, newPowerLimit);
+            MessageOutput.printf("[DPL::loop] Consuming Solar Power Only -> solarPowerAC: %d W, newPowerLimit: %d W\r\n",
+                solarPowerAC, newPowerLimit);
         }
 
-        newPowerLimit = std::min(newPowerLimit, adjustedVictronChargePower);
+        return setNewPowerLimit(inverter, std::min(newPowerLimit, solarPowerAC));
     }
 
-    return newPowerLimit;
+    // convert all solar power if full solar-passthrough is active
+    if (useFullSolarPassthrough()) {
+        return setNewPowerLimit(inverter, std::max(newPowerLimit, solarPowerAC));
+    }
+
+    return setNewPowerLimit(inverter, newPowerLimit);
 }
 
 /**
@@ -665,13 +651,10 @@ static int32_t scalePowerLimit(std::shared_ptr<InverterAbstract> inverter, int32
  */
 bool PowerLimiterClass::setNewPowerLimit(std::shared_ptr<InverterAbstract> inverter, int32_t newPowerLimit)
 {
-    CONFIG_T& config = Configuration.get();
+    auto const& config = Configuration.get();
 
-    // Stop the inverter if limit is below threshold.
     if (newPowerLimit < config.PowerLimiter.LowerPowerLimit) {
-        // the status must not change outside of loop(). this condition is
-        // communicated through log messages already.
-        return shutdown();
+        return shutdown(Status::CalculatedLimitBelowMinLimit);
     }
 
     // enforce configured upper power limit
@@ -705,13 +688,26 @@ bool PowerLimiterClass::setNewPowerLimit(std::shared_ptr<InverterAbstract> inver
     return updateInverter();
 }
 
-int32_t PowerLimiterClass::getSolarChargePower()
+int32_t PowerLimiterClass::getSolarPower()
 {
-    if (!canUseDirectSolarPower()) {
+    auto const& config = Configuration.get();
+
+    if (config.PowerLimiter.IsInverterSolarPowered) {
+        // the returned value is arbitrary, as long as it's
+        // greater than the inverters max DC power consumption.
+        return 10 * 1000;
+    }
+
+    if (!config.PowerLimiter.SolarPassThroughEnabled
+            || isBelowStopThreshold()
+            || !VictronMppt.isDataValid()) {
         return 0;
     }
 
-    return VictronMppt.getPowerOutputWatts();
+    auto solarPower = VictronMppt.getPowerOutputWatts();
+    if (solarPower < 20) { return 0; } // too little to work with
+
+    return solarPower;
 }
 
 float PowerLimiterClass::getLoadCorrectedVoltage()
@@ -830,12 +826,13 @@ void PowerLimiterClass::calcNextInverterRestart()
 
 bool PowerLimiterClass::useFullSolarPassthrough()
 {
-    CONFIG_T& config = Configuration.get();
+    auto const& config = Configuration.get();
+
+    // solar passthrough only applies to setups with battery-powered inverters
+    if (config.PowerLimiter.IsInverterSolarPowered) { return false; }
 
     // We only do full solar PT if general solar PT is enabled
-    if(!config.PowerLimiter.SolarPassThroughEnabled) {
-      return false;
-    }
+    if(!config.PowerLimiter.SolarPassThroughEnabled) { return false; }
 
     if (testThreshold(config.PowerLimiter.FullSolarPassThroughSoc,
                       config.PowerLimiter.FullSolarPassThroughStartVoltage,
