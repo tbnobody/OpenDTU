@@ -207,6 +207,7 @@ struct CONFIG_T {
         uint8_t BatteryDrainStategy;
         uint32_t Interval;
         bool IsInverterBehindPowerMeter;
+        bool IsInverterSolarPowered;
         uint8_t InverterId;
         uint8_t InverterChannelId;
         int32_t TargetPowerConsumption;
