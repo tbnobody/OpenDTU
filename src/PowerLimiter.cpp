@@ -224,38 +224,35 @@ void PowerLimiterClass::loop()
         }
     }
 
-    // Battery charging cycle conditions
-    // First we always disable discharge if the battery is empty
-    if (isStopThresholdReached()) {
-      // Disable battery discharge when empty
-      _batteryDischargeEnabled = false;
-    } else {
-      // UI: Solar Passthrough Enabled -> false
-      // Battery discharge can be enabled when start threshold is reached
-      if (!config.PowerLimiter.SolarPassThroughEnabled && isStartThresholdReached()) {
-        _batteryDischargeEnabled = true;
-      }
+    auto getBatteryPower = [this,&config]() -> bool {
+        if (isStopThresholdReached()) { return false; }
 
-      // UI: Solar Passthrough Enabled -> true && EMPTY_AT_NIGHT
-      if (config.PowerLimiter.SolarPassThroughEnabled && config.PowerLimiter.BatteryDrainStategy == EMPTY_AT_NIGHT) {
-        if(isStartThresholdReached()) {
-            // In this case we should only discharge the battery as long it is above startThreshold
-            _batteryDischargeEnabled = true;
+        if (isStartThresholdReached()) { return true; }
+
+        // with solar passthrough, and the respective drain strategy, we
+        // may start discharging the battery when it is nighttime. we also
+        // stop the discharge cycle if it becomes daytime again.
+        // TODO(schlimmchen): should be supported by sunrise and sunset, such
+        // that a thunderstorm or other events that drastically lower the solar
+        // power do not cause the start of a discharge cycle during the day.
+        if (config.PowerLimiter.SolarPassThroughEnabled &&
+                config.PowerLimiter.BatteryDrainStategy == EMPTY_AT_NIGHT) {
+            return !canUseDirectSolarPower();
         }
-        else {
-            // In this case we should only discharge the battery when there is no sunshine
-            _batteryDischargeEnabled = !canUseDirectSolarPower();
-        }
-      }
 
-      // UI: Solar Passthrough Enabled -> true && EMPTY_WHEN_FULL
-      // Battery discharge can be enabled when start threshold is reached
-      if (config.PowerLimiter.SolarPassThroughEnabled && isStartThresholdReached() && config.PowerLimiter.BatteryDrainStategy == EMPTY_WHEN_FULL) {
-        _batteryDischargeEnabled = true;
-      }
-    }
+        // we are between start and stop threshold and keep the state that was
+        // last triggered, either charging or discharging.
+        return _batteryDischargeEnabled;
+    };
 
-    if (_verboseLogging) {
+    _batteryDischargeEnabled = getBatteryPower();
+
+    auto logging = [this,&config]() -> void {
+        MessageOutput.printf("[DPL::loop] PowerMeter: %d W, target consumption: %d W, solar power: %d W\r\n",
+                static_cast<int32_t>(round(PowerMeter.getPowerTotal())),
+                config.PowerLimiter.TargetPowerConsumption,
+                getSolarChargePower());
+
         MessageOutput.printf("[DPL::loop] battery interface %s, SoC: %d %%, StartTH: %d %%, StopTH: %d %%, SoC age: %d s, ignore: %s\r\n",
                 (config.Battery.Enabled?"enabled":"disabled"),
                 Battery.getStats()->getSoC(),
@@ -275,15 +272,13 @@ void PowerLimiterClass::loop()
                 (isStopThresholdReached()?"yes":"no"),
                 (_inverter->isProducing()?"is":"is NOT"));
 
-        MessageOutput.printf("[DPL::loop] SolarPT %s, Drain Strategy: %i, canUseDirectSolarPower: %s\r\n",
-                (config.PowerLimiter.SolarPassThroughEnabled?"enabled":"disabled"),
-                config.PowerLimiter.BatteryDrainStategy, (canUseDirectSolarPower()?"yes":"no"));
-
-        MessageOutput.printf("[DPL::loop] battery discharging %s, PowerMeter: %d W, target consumption: %d W\r\n",
+        MessageOutput.printf("[DPL::loop] battery discharging %s, SolarPT %s, Drain Strategy: %i\r\n",
                 (_batteryDischargeEnabled?"allowed":"prevented"),
-                static_cast<int32_t>(round(PowerMeter.getPowerTotal())),
-                config.PowerLimiter.TargetPowerConsumption);
-    }
+                (config.PowerLimiter.SolarPassThroughEnabled?"enabled":"disabled"),
+                config.PowerLimiter.BatteryDrainStategy);
+    };
+
+    if (_verboseLogging) { logging(); }
 
     // Calculate and set Power Limit (NOTE: might reset _inverter to nullptr!)
     int32_t newPowerLimit = calcPowerLimit(_inverter, canUseDirectSolarPower(), _batteryDischargeEnabled);
