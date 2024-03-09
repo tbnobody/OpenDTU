@@ -92,7 +92,15 @@ bool PowerLimiterClass::shutdown(PowerLimiterClass::Status status)
     _shutdownPending = true;
 
     _oTargetPowerState = false;
-    _oTargetPowerLimitWatts = Configuration.get().PowerLimiter.LowerPowerLimit;
+
+    auto const& config = Configuration.get();
+    if ( (Status::PowerMeterTimeout == status ||
+          Status::CalculatedLimitBelowMinLimit == status)
+        && config.PowerLimiter.IsInverterSolarPowered) {
+      _oTargetPowerState = true;
+    }
+
+    _oTargetPowerLimitWatts = config.PowerLimiter.LowerPowerLimit;
     return updateInverter();
 }
 
