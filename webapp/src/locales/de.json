@@ -610,6 +610,7 @@
         "VoltageLoadCorrectionFactor": "DC Spannung - Lastkorrekturfaktor",
         "BatterySocInfo": "<b>Hinweis:</b> Die Akku SoC (State of Charge) Werte werden nur benutzt, wenn die Batterie-Kommunikationsschnittstelle innerhalb der letzten Minute gültige Werte geschickt hat. Andernfalls werden als Fallback-Option die Spannungseinstellungen verwendet.",
         "InverterIsBehindPowerMeter": "Welchselrichter ist hinter Leistungsmesser",
+        "InverterIsSolarPowered": "Wechselrichter wird von Solarmodulen gespeist",
         "Battery": "DC / Akku",
         "VoltageLoadCorrectionInfo": "<b>Hinweis:</b> Wenn Leistung von der Batterie abgegeben wird, bricht normalerweise die Spannung etwas ein. Damit nicht vorzeitig der Wechelrichter ausgeschaltet wird sobald der \"Stop\"-Schwellenwert erreicht wird, wird der hier angegebene Korrekturfaktor mit einberechnet. Korrigierte Spannung = DC Spannung + (Aktuelle Leistung (W) * Korrekturfaktor).",
         "InverterRestart": "Wechselrichter Neustart",

@@ -77,6 +77,11 @@
                     </div>
                 </div>
 
+                <InputElement v-show="powerLimiterConfigList.enabled"
+                    :label="$t('powerlimiteradmin.InverterIsSolarPowered')"
+                    v-model="powerLimiterConfigList.is_inverter_solar_powered"
+                    type="checkbox" wide/>
+
                 <div class="row mb-3" v-show="powerLimiterConfigList.enabled">
                     <label for="targetPowerConsumption" class="col-sm-2 col-form-label">{{ $t('powerlimiteradmin.TargetPowerConsumption') }}:
                         <BIconInfoCircle v-tooltip :title="$t('powerlimiteradmin.TargetPowerConsumptionHint')" />

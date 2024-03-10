@@ -185,6 +185,7 @@ bool ConfigurationClass::write()
     powerlimiter["battery_drain_strategy"] = config.PowerLimiter.BatteryDrainStategy;
     powerlimiter["interval"] = config.PowerLimiter.Interval;
     powerlimiter["is_inverter_behind_powermeter"] = config.PowerLimiter.IsInverterBehindPowerMeter;
+    powerlimiter["is_inverter_solar_powered"] = config.PowerLimiter.IsInverterSolarPowered;
     powerlimiter["inverter_id"] = config.PowerLimiter.InverterId;
     powerlimiter["inverter_channel_id"] = config.PowerLimiter.InverterChannelId;
     powerlimiter["target_power_consumption"] = config.PowerLimiter.TargetPowerConsumption;
@@ -431,6 +432,7 @@ bool ConfigurationClass::read()
     config.PowerLimiter.BatteryDrainStategy = powerlimiter["battery_drain_strategy"] | POWERLIMITER_BATTERY_DRAIN_STRATEGY;
     config.PowerLimiter.Interval =  powerlimiter["interval"] | POWERLIMITER_INTERVAL;
     config.PowerLimiter.IsInverterBehindPowerMeter = powerlimiter["is_inverter_behind_powermeter"] | POWERLIMITER_IS_INVERTER_BEHIND_POWER_METER;
+    config.PowerLimiter.IsInverterSolarPowered = powerlimiter["is_inverter_solar_powered"] | POWERLIMITER_IS_INVERTER_SOLAR_POWERED;
     config.PowerLimiter.InverterId = powerlimiter["inverter_id"] | POWERLIMITER_INVERTER_ID;
     config.PowerLimiter.InverterChannelId = powerlimiter["inverter_channel_id"] | POWERLIMITER_INVERTER_CHANNEL_ID;
     config.PowerLimiter.TargetPowerConsumption = powerlimiter["target_power_consumption"] | POWERLIMITER_TARGET_POWER_CONSUMPTION;

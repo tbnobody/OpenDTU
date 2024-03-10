@@ -5,6 +5,7 @@ export interface PowerLimiterConfig {
     solar_passthrough_losses: number;
     battery_drain_strategy: number;
     is_inverter_behind_powermeter: boolean;
+    is_inverter_solar_powered: boolean;
     inverter_id: number;
     inverter_channel_id: number;
     target_power_consumption: number;

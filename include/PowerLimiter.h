@@ -40,8 +40,11 @@ public:
         InverterPowerCmdPending,
         InverterDevInfoPending,
         InverterStatsPending,
+        CalculatedLimitBelowMinLimit,
         UnconditionalSolarPassthrough,
         NoVeDirect,
+        NoEnergy,
+        HuaweiPsu,
         Settling,
         Stable,
     };
@@ -91,10 +94,10 @@ private:
     int32_t inverterPowerDcToAc(std::shared_ptr<InverterAbstract> inverter, int32_t dcPower);
     void unconditionalSolarPassthrough(std::shared_ptr<InverterAbstract> inverter);
     bool canUseDirectSolarPower();
-    int32_t calcPowerLimit(std::shared_ptr<InverterAbstract> inverter, bool solarPowerEnabled, bool batteryDischargeEnabled);
+    bool calcPowerLimit(std::shared_ptr<InverterAbstract> inverter, int32_t solarPower, bool batteryPower);
     bool updateInverter();
     bool setNewPowerLimit(std::shared_ptr<InverterAbstract> inverter, int32_t newPowerLimit);
-    int32_t getSolarChargePower();
+    int32_t getSolarPower();
     float getLoadCorrectedVoltage();
     bool testThreshold(float socThreshold, float voltThreshold,
             std::function<bool(float, float)> compare);

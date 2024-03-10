@@ -616,6 +616,7 @@
         "VoltageLoadCorrectionFactor": "DC Voltage - Load correction factor",
         "BatterySocInfo": "<b>Hint:</b> The battery SoC (State of Charge) values are only used if the battery communication interface reported SoC updates in the last minute. Otherwise the voltage thresholds will be used as fallback.",
         "InverterIsBehindPowerMeter": "Inverter is behind Power meter",
+        "InverterIsSolarPowered": "Inverter is powered by solar modules",
         "Battery": "DC / Battery",
         "VoltageLoadCorrectionInfo": "<b>Hint:</b> When the power output is higher, the voltage is usually decreasing. In order to not stop the inverter too early (Stop treshold), a power factor can be specified here to correct this. Corrected voltage = DC Voltage + (Current power * correction factor).",
         "InverterRestart": "Inverter Restart",
