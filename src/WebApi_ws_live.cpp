@@ -99,7 +99,7 @@ void WebApiWsLiveClass::generateOnBatteryJsonResponse(JsonVariant& root, bool al
 
 void WebApiWsLiveClass::sendOnBatteryStats()
 {
-    DynamicJsonDocument root(512);
+    DynamicJsonDocument root(1024);
     if (!Utils::checkJsonAlloc(root, __FUNCTION__, __LINE__)) { return; }
 
     JsonVariant var = root;
