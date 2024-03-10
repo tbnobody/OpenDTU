@@ -156,7 +156,7 @@ void MqttHandleBatteryHassClass::publishSensor(const char* caption, const char* 
     createDeviceInfo(deviceObj);
 
     if (Configuration.get().Mqtt.Hass.Expire) {
-        root["exp_aft"] = Battery.getStats()->getMqttFullPublishIntervalMs() * 3;
+        root["exp_aft"] = Battery.getStats()->getMqttFullPublishIntervalMs() / 1000 * 3;
     }
     if (deviceClass != NULL) {
         root["dev_cla"] = deviceClass;
