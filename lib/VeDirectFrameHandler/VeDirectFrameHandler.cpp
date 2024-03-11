@@ -30,7 +30,7 @@
  * 2020.05.05 - 0.2 - initial release
  * 2020.06.21 - 0.2 - add MIT license, no code changes
  * 2020.08.20 - 0.3 - corrected #include reference
- *
+ * 2024.03.08 - 0.4 - adds the ability to send hex commands and disassemble hex messages
  */
 
 #include <Arduino.h>
@@ -274,8 +274,6 @@ void VeDirectFrameHandler<T>::processTextData(std::string const& name, std::stri
 			_logId, name.c_str(), value.c_str());
 }
 
-
-
 /*
  *  hexRxEvent
  *  This function records hex answers or async messages
@@ -287,12 +285,19 @@ int VeDirectFrameHandler<T>::hexRxEvent(uint8_t inbyte)
 
 	switch (inbyte) {
 	case '\n':
+		// now we can analyse the hex message
+		_hexBuffer[_hexSize] = '\0';
+		VeDirectHexData data;
+		if (disassembleHexData(data))
+			hexDataHandler(data);
+
 		// restore previous state
 		ret=_prevState;
 		break;
 
 	default:
-		_hexSize++;
+		_hexBuffer[_hexSize++]=inbyte;
+
 		if (_hexSize>=VE_MAX_HEX_LEN) { // oops -buffer overflow - something went wrong, we abort
 			_msgOut->printf("%s hexRx buffer overflow - aborting read\r\n", _logId);
 			_hexSize=0;

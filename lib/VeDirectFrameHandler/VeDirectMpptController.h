@@ -44,8 +44,24 @@ public:
 
     using data_t = veMpptStruct;
 
+    virtual void loop() final;                        // main loop to read ve.direct data
+
+    struct veMPPTExStruct {
+        int32_t T;                      // temperature [m°C] from internal MPPT sensor
+        unsigned long Tts;              // time of last recieved value
+        int32_t TSBS;                   // temperature [m°C] from the "Smart Battery Sense"
+        unsigned long TSBSts;           // time of last recieved value
+        uint32_t TDCP;                  // total DC input power [mW]
+        unsigned long TDCPts;           // time of last recieved value
+    };
+    veMPPTExStruct _ExData{}; 
+    veMPPTExStruct const *getExData() const { return &_ExData; }
+
 private:
+    void hexDataHandler(VeDirectHexData const &data) final;
     bool processTextDataDerived(std::string const& name, std::string const& value) final;
     void frameValidEvent() final;
     MovingAverage<float, 5> _efficiency;
+    unsigned long _lastPingTime = 0L;               // time of last device PING/GET hex command
+    bool _veMaster = true;                          // MPPT is instance master
 };
