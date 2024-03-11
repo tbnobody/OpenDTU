@@ -108,30 +108,34 @@ float PowerMeterClass::getPowerTotal(bool forceUpdate)
             readPowerMeter();
         }
     }
+
+    std::lock_guard<std::mutex> l(_mutex);
     return _powerMeter1Power + _powerMeter2Power + _powerMeter3Power;
 }
 
 uint32_t PowerMeterClass::getLastPowerMeterUpdate()
 {
+    std::lock_guard<std::mutex> l(_mutex);
     return _lastPowerMeterUpdate;
 }
 
 void PowerMeterClass::mqtt()
 {
-    if (!MqttSettings.getConnected()) {
-        return;
-    } else {
-        String topic = "powermeter";
-        MqttSettings.publish(topic + "/power1", String(_powerMeter1Power));
-        MqttSettings.publish(topic + "/power2", String(_powerMeter2Power));
-        MqttSettings.publish(topic + "/power3", String(_powerMeter3Power));
-        MqttSettings.publish(topic + "/powertotal", String(getPowerTotal()));
-        MqttSettings.publish(topic + "/voltage1", String(_powerMeter1Voltage));
-        MqttSettings.publish(topic + "/voltage2", String(_powerMeter2Voltage));
-        MqttSettings.publish(topic + "/voltage3", String(_powerMeter3Voltage));
-        MqttSettings.publish(topic + "/import", String(_powerMeterImport));
-        MqttSettings.publish(topic + "/export", String(_powerMeterExport));
-    }
+    if (!MqttSettings.getConnected()) { return; }
+
+    String topic = "powermeter";
+    auto totalPower = getPowerTotal();
+
+    std::lock_guard<std::mutex> l(_mutex);
+    MqttSettings.publish(topic + "/power1", String(_powerMeter1Power));
+    MqttSettings.publish(topic + "/power2", String(_powerMeter2Power));
+    MqttSettings.publish(topic + "/power3", String(_powerMeter3Power));
+    MqttSettings.publish(topic + "/powertotal", String(totalPower));
+    MqttSettings.publish(topic + "/voltage1", String(_powerMeter1Voltage));
+    MqttSettings.publish(topic + "/voltage2", String(_powerMeter2Voltage));
+    MqttSettings.publish(topic + "/voltage3", String(_powerMeter3Voltage));
+    MqttSettings.publish(topic + "/import", String(_powerMeterImport));
+    MqttSettings.publish(topic + "/export", String(_powerMeterExport));
 }
 
 void PowerMeterClass::loop()
@@ -169,29 +173,50 @@ void PowerMeterClass::readPowerMeter()
     uint8_t _address = config.PowerMeter.SdmAddress;
 
     if (config.PowerMeter.Source == SOURCE_SDM1PH) {
-        _powerMeter1Power = static_cast<float>(sdm.readVal(SDM_PHASE_1_POWER, _address));
-        _powerMeter2Power = 0.0;
-        _powerMeter3Power = 0.0;
-        _powerMeter1Voltage = static_cast<float>(sdm.readVal(SDM_PHASE_1_VOLTAGE, _address));
-        _powerMeter2Voltage = 0.0;
-        _powerMeter3Voltage = 0.0;
-        _powerMeterImport = static_cast<float>(sdm.readVal(SDM_IMPORT_ACTIVE_ENERGY, _address));
-        _powerMeterExport = static_cast<float>(sdm.readVal(SDM_EXPORT_ACTIVE_ENERGY, _address));
+        // this takes a "very long" time as each readVal() is a synchronous
+        // exchange of serial messages. cache the values and write later.
+        auto phase1Power = sdm.readVal(SDM_PHASE_1_POWER, _address);
+        auto phase1Voltage = sdm.readVal(SDM_PHASE_1_VOLTAGE, _address);
+        auto energyImport = sdm.readVal(SDM_IMPORT_ACTIVE_ENERGY, _address);
+        auto energyExport = sdm.readVal(SDM_EXPORT_ACTIVE_ENERGY, _address);
+
+        std::lock_guard<std::mutex> l(_mutex);
+        _powerMeter1Power = static_cast<float>(phase1Power);
+        _powerMeter2Power = 0;
+        _powerMeter3Power = 0;
+        _powerMeter1Voltage = static_cast<float>(phase1Voltage);
+        _powerMeter2Voltage = 0;
+        _powerMeter3Voltage = 0;
+        _powerMeterImport = static_cast<float>(energyImport);
+        _powerMeterExport = static_cast<float>(energyExport);
         _lastPowerMeterUpdate = millis();
     }
     else if (config.PowerMeter.Source == SOURCE_SDM3PH) {
-        _powerMeter1Power = static_cast<float>(sdm.readVal(SDM_PHASE_1_POWER, _address));
-        _powerMeter2Power = static_cast<float>(sdm.readVal(SDM_PHASE_2_POWER, _address));
-        _powerMeter3Power = static_cast<float>(sdm.readVal(SDM_PHASE_3_POWER, _address));
-        _powerMeter1Voltage = static_cast<float>(sdm.readVal(SDM_PHASE_1_VOLTAGE, _address));
-        _powerMeter2Voltage = static_cast<float>(sdm.readVal(SDM_PHASE_2_VOLTAGE, _address));
-        _powerMeter3Voltage = static_cast<float>(sdm.readVal(SDM_PHASE_3_VOLTAGE, _address));
-        _powerMeterImport = static_cast<float>(sdm.readVal(SDM_IMPORT_ACTIVE_ENERGY, _address));
-        _powerMeterExport = static_cast<float>(sdm.readVal(SDM_EXPORT_ACTIVE_ENERGY, _address));
+        // this takes a "very long" time as each readVal() is a synchronous
+        // exchange of serial messages. cache the values and write later.
+        auto phase1Power = sdm.readVal(SDM_PHASE_1_POWER, _address);
+        auto phase2Power = sdm.readVal(SDM_PHASE_2_POWER, _address);
+        auto phase3Power = sdm.readVal(SDM_PHASE_3_POWER, _address);
+        auto phase1Voltage = sdm.readVal(SDM_PHASE_1_VOLTAGE, _address);
+        auto phase2Voltage = sdm.readVal(SDM_PHASE_2_VOLTAGE, _address);
+        auto phase3Voltage = sdm.readVal(SDM_PHASE_3_VOLTAGE, _address);
+        auto energyImport = sdm.readVal(SDM_IMPORT_ACTIVE_ENERGY, _address);
+        auto energyExport = sdm.readVal(SDM_EXPORT_ACTIVE_ENERGY, _address);
+
+        std::lock_guard<std::mutex> l(_mutex);
+        _powerMeter1Power = static_cast<float>(phase1Power);
+        _powerMeter2Power = static_cast<float>(phase2Power);
+        _powerMeter3Power = static_cast<float>(phase3Power);
+        _powerMeter1Voltage = static_cast<float>(phase1Voltage);
+        _powerMeter2Voltage = static_cast<float>(phase2Voltage);
+        _powerMeter3Voltage = static_cast<float>(phase3Voltage);
+        _powerMeterImport = static_cast<float>(energyImport);
+        _powerMeterExport = static_cast<float>(energyExport);
         _lastPowerMeterUpdate = millis();
     }
     else if (config.PowerMeter.Source == SOURCE_HTTP) {
         if (HttpPowerMeter.updateValues()) {
+            std::lock_guard<std::mutex> l(_mutex);
             _powerMeter1Power = HttpPowerMeter.getPower(1);
             _powerMeter2Power = HttpPowerMeter.getPower(2);
             _powerMeter3Power = HttpPowerMeter.getPower(3);

@@ -6,6 +6,7 @@
 #include <Arduino.h>
 #include <map>
 #include <list>
+#include <mutex>
 #include "SDM.h"
 #include "sml.h"
 #include <TaskSchedulerDeclarations.h>
@@ -65,6 +66,8 @@ private:
     float _powerMeterExport = 0.0;
 
     std::map<String, float*> _mqttSubscriptions;
+
+    mutable std::mutex _mutex;
 
     void readPowerMeter();
 
