@@ -96,8 +96,8 @@ export default defineComponent({
     },
     watch: {
         allowVersionInfo(allow: Boolean) {
+            localStorage.setItem("allowVersionInfo", allow ? "1" : "0");
             if (allow) {
-                localStorage.setItem("allowVersionInfo", this.allowVersionInfo ? "1" : "0");
                 this.getUpdateInfo();
             }
         }
