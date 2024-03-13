@@ -386,8 +386,7 @@ void WebApiInverterClass::onInverterDelete(AsyncWebServerRequest* request)
 
     Hoymiles.removeInverterBySerial(inverter.Serial);
 
-    inverter.Serial = 0;
-    strncpy(inverter.Name, "", sizeof(inverter.Name));
+    Configuration.deleteInverterById(inverter_id);
 
     WebApi.writeConfig(retMsg, WebApiError::InverterDeleted, "Inverter deleted!");
 
