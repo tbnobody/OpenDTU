@@ -35,6 +35,10 @@ class BatteryStats {
         bool isSoCValid() const { return _lastUpdateSoC > 0; }
         bool isVoltageValid() const { return _lastUpdateVoltage > 0; }
 
+        // returns true if the battery reached a critically low voltage/SoC,
+        // such that it is in need of charging to prevent degredation.
+        virtual bool needsCharging() const { return false; }
+
     protected:
         virtual void mqttPublish() const;
 
@@ -67,6 +71,7 @@ class PylontechBatteryStats : public BatteryStats {
     public:
         void getLiveViewData(JsonVariant& root) const final;
         void mqttPublish() const final;
+        bool needsCharging() const final { return _chargeImmediately; }
 
     private:
         void setManufacturer(String&& m) { _manufacturer = std::move(m); }
