@@ -56,25 +56,32 @@ void WebApiWsLiveClass::wsCleanupTaskCb()
 
 void WebApiWsLiveClass::generateOnBatteryJsonResponse(JsonVariant& root, bool all)
 {
+    auto const& config = Configuration.get();
     auto constexpr halfOfAllMillis = std::numeric_limits<uint32_t>::max() / 2;
 
-    if (all || (millis() - _lastPublishVictron) > VictronMppt.getDataAgeMillis()) {
+    auto victronAge = VictronMppt.getDataAgeMillis();
+    if (all || (victronAge > 0 && (millis() - _lastPublishVictron) > victronAge)) {
         JsonObject vedirectObj = root.createNestedObject("vedirect");
-        vedirectObj["enabled"] = Configuration.get().Vedirect.Enabled;
-        JsonObject totalVeObj = vedirectObj.createNestedObject("total");
+        vedirectObj["enabled"] = config.Vedirect.Enabled;
 
-        addTotalField(totalVeObj, "Power", VictronMppt.getPanelPowerWatts(), "W", 1);
-        addTotalField(totalVeObj, "YieldDay", VictronMppt.getYieldDay() * 1000, "Wh", 0);
-        addTotalField(totalVeObj, "YieldTotal", VictronMppt.getYieldTotal(), "kWh", 2);
+        if (config.Vedirect.Enabled) {
+            JsonObject totalVeObj = vedirectObj.createNestedObject("total");
+            addTotalField(totalVeObj, "Power", VictronMppt.getPanelPowerWatts(), "W", 1);
+            addTotalField(totalVeObj, "YieldDay", VictronMppt.getYieldDay() * 1000, "Wh", 0);
+            addTotalField(totalVeObj, "YieldTotal", VictronMppt.getYieldTotal(), "kWh", 2);
+        }
 
         if (!all) { _lastPublishVictron = millis(); }
     }
 
     if (all || (HuaweiCan.getLastUpdate() - _lastPublishHuawei) < halfOfAllMillis ) {
         JsonObject huaweiObj = root.createNestedObject("huawei");
-        huaweiObj["enabled"] = Configuration.get().Huawei.Enabled;
-        const RectifierParameters_t * rp = HuaweiCan.get();
-        addTotalField(huaweiObj, "Power", rp->output_power, "W", 2);
+        huaweiObj["enabled"] = config.Huawei.Enabled;
+
+        if (config.Huawei.Enabled) {
+            const RectifierParameters_t * rp = HuaweiCan.get();
+            addTotalField(huaweiObj, "Power", rp->output_power, "W", 2);
+        }
 
         if (!all) { _lastPublishHuawei = millis(); }
     }
@@ -82,16 +89,22 @@ void WebApiWsLiveClass::generateOnBatteryJsonResponse(JsonVariant& root, bool al
     auto spStats = Battery.getStats();
     if (all || spStats->updateAvailable(_lastPublishBattery)) {
         JsonObject batteryObj = root.createNestedObject("battery");
-        batteryObj["enabled"] = Configuration.get().Battery.Enabled;
-        addTotalField(batteryObj, "soc", spStats->getSoC(), "%", 0);
+        batteryObj["enabled"] = config.Battery.Enabled;
+
+        if (config.Battery.Enabled) {
+            addTotalField(batteryObj, "soc", spStats->getSoC(), "%", 0);
+        }
 
         if (!all) { _lastPublishBattery = millis(); }
     }
 
     if (all || (PowerMeter.getLastPowerMeterUpdate() - _lastPublishPowerMeter) < halfOfAllMillis) {
         JsonObject powerMeterObj = root.createNestedObject("power_meter");
-        powerMeterObj["enabled"] = Configuration.get().PowerMeter.Enabled;
-        addTotalField(powerMeterObj, "Power", PowerMeter.getPowerTotal(false), "W", 1);
+        powerMeterObj["enabled"] = config.PowerMeter.Enabled;
+
+        if (config.PowerMeter.Enabled) {
+            addTotalField(powerMeterObj, "Power", PowerMeter.getPowerTotal(false), "W", 1);
+        }
 
         if (!all) { _lastPublishPowerMeter = millis(); }
     }
