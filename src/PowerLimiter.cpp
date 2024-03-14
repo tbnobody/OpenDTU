@@ -804,6 +804,12 @@ void PowerLimiterClass::calcNextInverterRestart()
         return;
     }
 
+    if (config.PowerLimiter.IsInverterSolarPowered) {
+        _nextInverterRestart = 1;
+        MessageOutput.println("[DPL::calcNextInverterRestart] not restarting solar-powered inverters");
+        return;
+    }
+
     // read time from timeserver, if time is not synced then return
     struct tm timeinfo;
     if (getLocalTime(&timeinfo, 5)) {
