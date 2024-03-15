@@ -8,7 +8,7 @@
             <form class="form-inline" v-on:submit.prevent="onSubmit">
                 <div class="form-group">
                     <label>{{ $t('inverteradmin.Serial') }}</label>
-                    <input v-model="newInverterData.serial" type="number" class="form-control ml-sm-2 mr-sm-4 my-2"
+                    <input v-model="newInverterData.serial" type="text" class="form-control ml-sm-2 mr-sm-4 my-2"
                         required />
                 </div>
                 <div class="form-group">
@@ -91,7 +91,7 @@
                     <label for="inverter-serial" class="col-form-label">
                         {{ $t('inverteradmin.InverterSerial') }}
                     </label>
-                    <input v-model="selectedInverterData.serial" type="number" id="inverter-serial" class="form-control" />
+                    <input v-model="selectedInverterData.serial" type="text" id="inverter-serial" class="form-control" />
                     <label for="inverter-name" class="col-form-label">{{ $t('inverteradmin.InverterName') }}
                         <BIconInfoCircle v-tooltip :title="$t('inverteradmin.InverterNameHint')" />
                     </label>

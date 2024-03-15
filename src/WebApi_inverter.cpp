@@ -129,8 +129,14 @@ void WebApiInverterClass::onInverterAdd(AsyncWebServerRequest* request)
         return;
     }
 
-    if (root["serial"].as<uint64_t>() == 0) {
-        retMsg["message"] = "Serial must be a number > 0!";
+    // Interpret the string as a hex value and convert it to uint64_t
+    char* endPos;
+    auto serialString = root["serial"].as<String>();
+    uint64_t serial = strtoll(serialString.c_str(), &endPos, 16);
+    if (endPos != serialString.c_str() + serialString.length()) { serial = 0; }
+
+    if (serial == 0) {
+        retMsg["message"] = "Serial must (only) be a hexadecimal number > 0!";
         retMsg["code"] = WebApiError::InverterSerialZero;
         response->setLength();
         request->send(response);
@@ -157,8 +163,7 @@ void WebApiInverterClass::onInverterAdd(AsyncWebServerRequest* request)
         return;
     }
 
-    // Interpret the string as a hex value and convert it to uint64_t
-    inverter->Serial = strtoll(root["serial"].as<String>().c_str(), NULL, 16);
+    inverter->Serial = serial;
 
     strncpy(inverter->Name, root["name"].as<String>().c_str(), INV_MAX_NAME_STRLEN);
 
@@ -233,8 +238,14 @@ void WebApiInverterClass::onInverterEdit(AsyncWebServerRequest* request)
         return;
     }
 
-    if (root["serial"].as<uint64_t>() == 0) {
-        retMsg["message"] = "Serial must be a number > 0!";
+    // Interpret the string as a hex value and convert it to uint64_t
+    char* endPos;
+    auto serialString = root["serial"].as<String>();
+    uint64_t new_serial = strtoll(serialString.c_str(), &endPos, 16);
+    if (endPos != serialString.c_str() + serialString.length()) { new_serial = 0; }
+
+    if (new_serial == 0) {
+        retMsg["message"] = "Serial must (only) be a hexadecimal number > 0!";
         retMsg["code"] = WebApiError::InverterSerialZero;
         response->setLength();
         request->send(response);
@@ -261,10 +272,7 @@ void WebApiInverterClass::onInverterEdit(AsyncWebServerRequest* request)
 
     INVERTER_CONFIG_T& inverter = Configuration.get().Inverter[root["id"].as<uint8_t>()];
 
-    uint64_t new_serial = strtoll(root["serial"].as<String>().c_str(), NULL, 16);
     uint64_t old_serial = inverter.Serial;
-
-    // Interpret the string as a hex value and convert it to uint64_t
     inverter.Serial = new_serial;
     strncpy(inverter.Name, root["name"].as<String>().c_str(), INV_MAX_NAME_STRLEN);
 
