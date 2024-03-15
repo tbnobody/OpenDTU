@@ -52,7 +52,7 @@ export default defineComponent({
             this.formatShow = "info";
 
             // Contains only numbers
-            if (/^[\d]{12}$/.test(serial)) {
+            if (/^1{1}[\dA-F]{11}$/.test(serial)) {
                 this.model = serial;
                 this.formatHint = this.$t('inputserial.format_hoymiles');
             }
