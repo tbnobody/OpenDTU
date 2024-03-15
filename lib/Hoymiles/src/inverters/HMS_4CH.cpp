@@ -54,7 +54,7 @@ HMS_4CH::HMS_4CH(HoymilesRadio* radio, const uint64_t serial)
 
 bool HMS_4CH::isValidSerial(const uint64_t serial)
 {
-    // serial >= 0x116400000000 && serial <= 0x116499999999
+    // serial >= 0x116400000000 && serial <= 0x1164ffffffff
     uint16_t preSerial = (serial >> 32) & 0xffff;
     return preSerial == 0x1164;
 }

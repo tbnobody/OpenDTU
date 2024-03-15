@@ -41,7 +41,7 @@ HERF_2CH::HERF_2CH(HoymilesRadio* radio, const uint64_t serial)
 
 bool HERF_2CH::isValidSerial(const uint64_t serial)
 {
-    // serial >= 0x282100000000 && serial <= 0x282199999999
+    // serial >= 0x282100000000 && serial <= 0x2821ffffffff
     uint16_t preSerial = (serial >> 32) & 0xffff;
     return preSerial == 0x2821;
 }
