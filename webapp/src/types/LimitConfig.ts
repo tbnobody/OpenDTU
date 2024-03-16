@@ -1,5 +1,5 @@
 export interface LimitConfig {
-    serial: number;
+    serial: string;
     limit_value: number;
     limit_type: number;
 }

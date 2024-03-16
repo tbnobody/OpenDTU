@@ -58,12 +58,16 @@ export default defineComponent({
                 })
         },
         getUpdateInfo() {
+            if (this.systemDataList.git_hash === undefined) {
+                return;
+            }
+
             // If the left char is a "g" the value is the git hash (remove the "g")
             this.systemDataList.git_is_hash = this.systemDataList.git_hash?.substring(0, 1) == 'g';
             this.systemDataList.git_hash = this.systemDataList.git_is_hash ? this.systemDataList.git_hash?.substring(1) : this.systemDataList.git_hash;
 
             // Handle format "v0.1-5-gabcdefh"
-            if (this.systemDataList.git_hash.lastIndexOf("-") >= 0) {
+            if (this.systemDataList.git_hash?.lastIndexOf("-") >= 0) {
                 this.systemDataList.git_hash = this.systemDataList.git_hash.substring(this.systemDataList.git_hash.lastIndexOf("-") + 2)
                 this.systemDataList.git_is_hash = true;
             }
@@ -96,8 +100,8 @@ export default defineComponent({
     },
     watch: {
         allowVersionInfo(allow: Boolean) {
+            localStorage.setItem("allowVersionInfo", allow ? "1" : "0");
             if (allow) {
-                localStorage.setItem("allowVersionInfo", this.allowVersionInfo ? "1" : "0");
                 this.getUpdateInfo();
             }
         }

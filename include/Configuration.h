@@ -168,6 +168,7 @@ public:
 
     INVERTER_CONFIG_T* getFreeInverterSlot();
     INVERTER_CONFIG_T* getInverterConfig(const uint64_t serial);
+    void deleteInverterById(const uint8_t id);
 };
 
 extern ConfigurationClass Configuration;

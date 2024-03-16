@@ -406,4 +406,26 @@ INVERTER_CONFIG_T* ConfigurationClass::getInverterConfig(const uint64_t serial)
     return nullptr;
 }
 
+void ConfigurationClass::deleteInverterById(const uint8_t id)
+{
+    config.Inverter[id].Serial = 0ULL;
+    strlcpy(config.Inverter[id].Name, "", sizeof(config.Inverter[id].Name));
+    config.Inverter[id].Order = 0;
+
+    config.Inverter[id].Poll_Enable = true;
+    config.Inverter[id].Poll_Enable_Night = true;
+    config.Inverter[id].Command_Enable = true;
+    config.Inverter[id].Command_Enable_Night = true;
+    config.Inverter[id].ReachableThreshold = REACHABLE_THRESHOLD;
+    config.Inverter[id].ZeroRuntimeDataIfUnrechable = false;
+    config.Inverter[id].ZeroYieldDayOnMidnight = false;
+    config.Inverter[id].YieldDayCorrection = false;
+
+    for (uint8_t c = 0; c < INV_MAX_CHAN_COUNT; c++) {
+        config.Inverter[id].channel[c].MaxChannelPower = 0;
+        config.Inverter[id].channel[c].YieldTotalOffset = 0.0f;
+        strlcpy(config.Inverter[id].channel[c].Name, "", sizeof(config.Inverter[id].channel[c].Name));
+    }
+}
+
 ConfigurationClass Configuration;

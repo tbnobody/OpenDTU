@@ -346,7 +346,7 @@ export default defineComponent({
             showAlertLimit: false,
 
             powerSettingView: {} as bootstrap.Modal,
-            powerSettingSerial: 0,
+            powerSettingSerial: "",
             powerSettingLoading: true,
             alertMessagePower: "",
             alertTypePower: "info",
@@ -515,7 +515,7 @@ export default defineComponent({
             this.heartInterval && clearTimeout(this.heartInterval);
             this.isFirstFetchAfterConnect = true;
         },
-        onShowEventlog(serial: number) {
+        onShowEventlog(serial: string) {
             this.eventLogLoading = true;
             fetch("/api/eventlog/status?inv=" + serial + "&locale=" + this.$i18n.locale, { headers: authHeader() })
                 .then((response) => handleResponse(response, this.$emitter, this.$router))
@@ -526,7 +526,7 @@ export default defineComponent({
 
             this.eventLogView.show();
         },
-        onShowDevInfo(serial: number) {
+        onShowDevInfo(serial: string) {
             this.devInfoLoading = true;
             fetch("/api/devinfo/status?inv=" + serial, { headers: authHeader() })
                 .then((response) => handleResponse(response, this.$emitter, this.$router))
@@ -538,7 +538,7 @@ export default defineComponent({
 
             this.devInfoView.show();
         },
-        onShowGridProfile(serial: number) {
+        onShowGridProfile(serial: string) {
             this.gridProfileLoading = true;
             fetch("/api/gridprofile/status?inv=" + serial, { headers: authHeader() })
                 .then((response) => handleResponse(response, this.$emitter, this.$router))
@@ -555,9 +555,9 @@ export default defineComponent({
 
             this.gridProfileView.show();
         },
-        onShowLimitSettings(serial: number) {
+        onShowLimitSettings(serial: string) {
             this.showAlertLimit = false;
-            this.targetLimitList.serial = 0;
+            this.targetLimitList.serial = "";
             this.targetLimitList.limit_value = 0;
             this.targetLimitType = 1;
             this.targetLimitTypeText = this.$t('home.Relative');
@@ -611,9 +611,9 @@ export default defineComponent({
             this.targetLimitType = type;
         },
 
-        onShowPowerSettings(serial: number) {
+        onShowPowerSettings(serial: string) {
             this.showAlertPower = false;
-            this.powerSettingSerial = 0;
+            this.powerSettingSerial = "";
             this.powerSettingLoading = true;
             fetch("/api/power/status", { headers: authHeader() })
                 .then((response) => handleResponse(response, this.$emitter, this.$router))
