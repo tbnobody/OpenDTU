@@ -55,25 +55,28 @@ void WebApiWsVedirectLiveClass::wsCleanupTaskCb()
 void WebApiWsVedirectLiveClass::sendDataTaskCb()
 {
     // do nothing if no WS client is connected
-    if (_ws.count() == 0) {
-        return;
-    }
-
-    // we assume this loop to be running at least twice for every
-    // update from a VE.Direct MPPT data producer, so _dataAgeMillis
-    // actually grows in between updates.
-    auto lastDataAgeMillis = _dataAgeMillis;
-    _dataAgeMillis = VictronMppt.getDataAgeMillis();
+    if (_ws.count() == 0) { return; }
 
     // Update on ve.direct change or at least after 10 seconds
-    if (millis() - _lastWsPublish > (10 * 1000) || lastDataAgeMillis > _dataAgeMillis) {
+    bool fullUpdate = (millis() - _lastFullPublish > (10 * 1000));
+    bool updateAvailable = false;
+    if (!fullUpdate) {
+        for (int idx = 0; idx < VICTRON_MAX_COUNT; ++idx) {
+            auto currentAgeMillis = VictronMppt.getDataAgeMillis(idx);
+            if (currentAgeMillis > 0 && currentAgeMillis < _dataAgeMillis[idx]) {
+                updateAvailable = true;
+                break;
+            }
+        }
+    }
 
+    if (fullUpdate || updateAvailable) {
         try {
             std::lock_guard<std::mutex> lock(_mutex);
             DynamicJsonDocument root(_responseSize);
             if (Utils::checkJsonAlloc(root, __FUNCTION__, __LINE__)) {
                 JsonVariant var = root;
-                generateJsonResponse(var);
+                generateJsonResponse(var, fullUpdate);
 
                 String buffer;
                 serializeJson(root, buffer);
@@ -92,15 +95,17 @@ void WebApiWsVedirectLiveClass::sendDataTaskCb()
         } catch (const std::exception& exc) {
             MessageOutput.printf("Unknown exception in /api/vedirectlivedata/status. Reason: \"%s\".\r\n", exc.what());
         }
+    }
 
-        _lastWsPublish = millis();
+    if (fullUpdate) {
+        _lastFullPublish = millis();
     }
 }
 
-void WebApiWsVedirectLiveClass::generateJsonResponse(JsonVariant& root)
+void WebApiWsVedirectLiveClass::generateJsonResponse(JsonVariant& root, bool fullUpdate)
 {
-    root["vedirect"]["data_age"] = VictronMppt.getDataAgeMillis() / 1000;
-    const JsonArray &array = root["vedirect"].createNestedArray("devices");
+    const JsonObject &array = root["vedirect"].createNestedObject("instances");
+    root["vedirect"]["full_update"] = fullUpdate;
 
     for (int idx = 0; idx < VICTRON_MAX_COUNT; ++idx) {
         std::optional<VeDirectMpptController::spData_t> spOptMpptData = VictronMppt.getData(idx);
@@ -108,10 +113,16 @@ void WebApiWsVedirectLiveClass::generateJsonResponse(JsonVariant& root)
             continue;
         }
 
+        auto lastDataAgeMillis = _dataAgeMillis[idx];
+        _dataAgeMillis[idx] = VictronMppt.getDataAgeMillis(idx);
+        bool validAge = _dataAgeMillis[idx] > 0;
+        bool updateAvailable = _dataAgeMillis[idx] < lastDataAgeMillis;
+        if (!fullUpdate && !(validAge && updateAvailable)) { continue; }
+
         VeDirectMpptController::spData_t &spMpptData = spOptMpptData.value();
 
-        const JsonObject &nested = array.createNestedObject();
-        nested["age_critical"] = !VictronMppt.isDataValid(idx);
+        const JsonObject &nested = array.createNestedObject(spMpptData->SER);
+        nested["data_age_ms"] = _dataAgeMillis[idx];
         populateJson(nested, spMpptData);
     }
 
@@ -122,8 +133,7 @@ void WebApiWsVedirectLiveClass::generateJsonResponse(JsonVariant& root)
     root["dpl"]["PLLIMIT"] = PowerLimiter.getLastRequestedPowerLimit();
 }
 
-void
-WebApiWsVedirectLiveClass::populateJson(const JsonObject &root, const VeDirectMpptController::spData_t &spMpptData) {
+void WebApiWsVedirectLiveClass::populateJson(const JsonObject &root, const VeDirectMpptController::spData_t &spMpptData) {
     // device info
     root["device"]["PID"] = spMpptData->getPidAsString();
     root["device"]["SER"] = spMpptData->SER;
@@ -202,7 +212,7 @@ void WebApiWsVedirectLiveClass::onLivedataStatus(AsyncWebServerRequest* request)
         AsyncJsonResponse* response = new AsyncJsonResponse(false, _responseSize);
         auto& root = response->getRoot();
 
-        generateJsonResponse(root);
+        generateJsonResponse(root, true/*fullUpdate*/);
 
         response->setLength();
         request->send(response);

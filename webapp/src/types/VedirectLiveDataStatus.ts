@@ -6,15 +6,15 @@ export interface DynamicPowerLimiter {
 }
 
 export interface Vedirect {
-    data_age: 0;
-    devices: Array<VedirectDevices>;
+    full_update: boolean;
+    instances: { [key: string]: VedirectInstance };
 }
 
-export interface VedirectDevices {
-    age_critical: boolean;
+export interface VedirectInstance {
+    data_age_ms: number;
     device: VedirectDevice;
-    input: VedirectInput;
     output: VedirectOutput;
+    input: VedirectInput;
 }
 
 export interface VedirectDevice {

@@ -14,7 +14,7 @@ public:
     void init(AsyncWebServer& server, Scheduler& scheduler);
 
 private:
-    void generateJsonResponse(JsonVariant& root);
+    void generateJsonResponse(JsonVariant& root, bool fullUpdate);
     static void populateJson(const JsonObject &root, const VeDirectMpptController::spData_t &spMpptData);
     void onLivedataStatus(AsyncWebServerRequest* request);
     void onWebsocketEvent(AsyncWebSocket* server, AsyncWebSocketClient* client, AwsEventType type, void* arg, uint8_t* data, size_t len);
@@ -22,8 +22,8 @@ private:
     AsyncWebServer* _server;
     AsyncWebSocket _ws;
 
-    uint32_t _lastWsPublish = 0;
-    uint32_t _dataAgeMillis = 0;
+    uint32_t _lastFullPublish = 0;
+    uint32_t _dataAgeMillis[VICTRON_MAX_COUNT] = { 0 };
     static constexpr uint16_t _responseSize = VICTRON_MAX_COUNT * (1024 + 128);
 
     std::mutex _mutex;

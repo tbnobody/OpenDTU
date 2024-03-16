@@ -9,11 +9,11 @@
     <template v-else>
         <div class="row gy-3">
             <div class="tab-content col-sm-12 col-md-12" id="v-pills-tabContent">
-                <div class="card" v-for="item in vedirect.devices">
+                <div class="card" v-for="(item, serial) in vedirect.instances" :key="serial">
                     <div class="card-header d-flex justify-content-between align-items-center"
                         :class="{
-                            'text-bg-danger': item.age_critical,
-                            'text-bg-primary': !item.age_critical,
+                            'text-bg-danger': item.data_age_ms >= 10000,
+                            'text-bg-primary': item.data_age_ms < 10000,
                         }">
                         <div class="p-1 flex-grow-1">
                             <div class="d-flex flex-wrap">
@@ -27,7 +27,7 @@
                                     {{ $t('vedirecthome.FirmwareNumber') }}  {{ item.device.FW }}
                                 </div>
                                 <div style="padding-right: 2em;">
-                                    {{ $t('vedirecthome.DataAge') }} {{ $t('vedirecthome.Seconds', {'val': vedirect.data_age }) }}
+                                    {{ $t('vedirecthome.DataAge') }} {{ $t('vedirecthome.Seconds', {'val': Math.floor(item.data_age_ms / 1000)}) }}
                                 </div>
                             </div>
                         </div>
@@ -199,7 +199,7 @@ export default defineComponent({
         return {
             socket: {} as WebSocket,
             heartInterval: 0,
-            dataAgeInterval: 0,
+            dataAgeTimers: {} as Record<string, number>,
             dataLoading: true,
             dplData: {} as DynamicPowerLimiter,
             vedirect: {} as Vedirect,
@@ -209,7 +209,6 @@ export default defineComponent({
     created() {
         this.getInitialData();
         this.initSocket();
-        this.initDataAgeing();
     },
     unmounted() {
         this.closeSocket();
@@ -224,6 +223,7 @@ export default defineComponent({
                     this.dplData = root["dpl"];
                     this.vedirect = root["vedirect"];
                     this.dataLoading = false;
+                    this.resetDataAging(Object.keys(root["vedirect"]["instances"]));
                 });
         },
         initSocket() {
@@ -240,7 +240,12 @@ export default defineComponent({
                 console.log(event);
                 var root = JSON.parse(event.data);
                 this.dplData = root["dpl"];
-                this.vedirect = root["vedirect"];
+                if (root["vedirect"]["full_update"] === true) {
+                    this.vedirect = root["vedirect"];
+                } else {
+                    Object.assign(this.vedirect.instances, root["vedirect"]["instances"]);
+                }
+                this.resetDataAging(Object.keys(root["vedirect"]["instances"]));
                 this.dataLoading = false;
                 this.heartCheck(); // Reset heartbeat detection
             };
@@ -255,11 +260,25 @@ export default defineComponent({
                 this.closeSocket();
             };
         },
-        initDataAgeing() {
-            this.dataAgeInterval = setInterval(() => {
-                if (this.vedirect) {
-                    this.vedirect.data_age++;
+        resetDataAging(serials: Array<string>) {
+            serials.forEach((serial) => {
+                if (this.dataAgeTimers[serial] !== undefined) {
+                    clearTimeout(this.dataAgeTimers[serial]);
                 }
+
+                var nextMs = 1000 - (this.vedirect.instances[serial].data_age_ms % 1000);
+                this.dataAgeTimers[serial] = setTimeout(() => {
+                    this.doDataAging(serial);
+                }, nextMs);
+            });
+        },
+        doDataAging(serial: string) {
+            if (this.vedirect?.instances?.[serial] === undefined) { return; }
+
+            this.vedirect.instances[serial].data_age_ms += 1000;
+
+            this.dataAgeTimers[serial] = setTimeout(() => {
+                this.doDataAging(serial);
             }, 1000);
         },
         // Send heartbeat packets regularly * 59s Send a heartbeat
@@ -279,11 +298,6 @@ export default defineComponent({
             this.socket.close();
             this.heartInterval && clearTimeout(this.heartInterval);
             this.isFirstFetchAfterConnect = true;
-        },
-        formatNumber(num: number) {
-            return new Intl.NumberFormat(
-                undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }
-            ).format(num);
         },
     },
 });

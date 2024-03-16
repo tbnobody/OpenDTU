@@ -266,10 +266,6 @@ bool PylontechCanReceiver::getBit(uint8_t value, uint8_t bit)
     return (value & (1 << bit)) >> bit;
 }
 
-bool PylontechCanReceiver::usesHwPort2() {
-    return false;
-}
-
 #ifdef PYLONTECH_DUMMY
 void PylontechCanReceiver::dummyData()
 {

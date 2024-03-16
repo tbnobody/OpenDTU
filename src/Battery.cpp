@@ -39,7 +39,7 @@ void BatteryClass::updateSettings()
         _upProvider->deinit();
         _upProvider = nullptr;
     }
-    PortManager.invalidateBatteryPort();
+    SerialPortManager.invalidateBatteryPort();
 
     CONFIG_T& config = Configuration.get();
     if (!config.Battery.Enabled) { return; }
@@ -65,7 +65,7 @@ void BatteryClass::updateSettings()
     }
 
     if(_upProvider->usesHwPort2()) {
-        if (!PortManager.allocateBatteryPort(2)) {
+        if (!SerialPortManager.allocateBatteryPort(2)) {
             MessageOutput.printf("[Battery] Serial port %d already in use. Initialization aborted!\r\n", 2);
             _upProvider = nullptr;
             return;
@@ -73,7 +73,7 @@ void BatteryClass::updateSettings()
     }
 
     if (!_upProvider->init(verboseLogging)) {
-        PortManager.invalidateBatteryPort();
+        SerialPortManager.invalidateBatteryPort();
         _upProvider = nullptr;
     }
 }

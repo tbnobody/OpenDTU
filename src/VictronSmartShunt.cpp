@@ -34,7 +34,3 @@ void VictronSmartShunt::loop()
     _stats->updateFrom(VeDirectShunt.veFrame);
     _lastUpdate = VeDirectShunt.getLastUpdate();
 }
-
-bool VictronSmartShunt::usesHwPort2() {
-    return true;
-}

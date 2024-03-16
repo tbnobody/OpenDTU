@@ -4,19 +4,19 @@
 
 #define MAX_CONTROLLERS 3
 
-SerialPortManager PortManager;
+SerialPortManagerClass SerialPortManager;
 
-bool SerialPortManager::allocateBatteryPort(int port)
+bool SerialPortManagerClass::allocateBatteryPort(int port)
 {
     return allocatePort(port, Owner::BATTERY);
 }
 
-bool SerialPortManager::allocateMpptPort(int port)
+bool SerialPortManagerClass::allocateMpptPort(int port)
 {
     return allocatePort(port, Owner::MPPT);
 }
 
-bool SerialPortManager::allocatePort(uint8_t port, Owner owner)
+bool SerialPortManagerClass::allocatePort(uint8_t port, Owner owner)
 {
     if (port >= MAX_CONTROLLERS) {
         MessageOutput.printf("[SerialPortManager] Invalid serial port = %d \r\n", port);
@@ -26,17 +26,17 @@ bool SerialPortManager::allocatePort(uint8_t port, Owner owner)
     return allocatedPorts.insert({port, owner}).second;
 }
 
-void SerialPortManager::invalidateBatteryPort()
+void SerialPortManagerClass::invalidateBatteryPort()
 {
     invalidate(Owner::BATTERY);
 }
 
-void SerialPortManager::invalidateMpptPorts()
+void SerialPortManagerClass::invalidateMpptPorts()
 {
     invalidate(Owner::MPPT);
 }
 
-void SerialPortManager::invalidate(Owner owner)
+void SerialPortManagerClass::invalidate(Owner owner)
 {
     for (auto it = allocatedPorts.begin(); it != allocatedPorts.end();) {
         if (it->second == owner) {
@@ -48,7 +48,7 @@ void SerialPortManager::invalidate(Owner owner)
     }
 }
 
-const char* SerialPortManager::print(Owner owner)
+const char* SerialPortManagerClass::print(Owner owner)
 {
     switch (owner) {
         case BATTERY:
@@ -56,4 +56,5 @@ const char* SerialPortManager::print(Owner owner)
         case MPPT:
             return "MPPT";
     }
+    return "unknown";
 }

@@ -3,7 +3,7 @@
 
 #include <map>
 
-class SerialPortManager {
+class SerialPortManagerClass {
 public:
     bool allocateMpptPort(int port);
     bool allocateBatteryPort(int port);
@@ -24,4 +24,4 @@ private:
     static const char* print(Owner owner);
 };
 
-extern SerialPortManager PortManager;
+extern SerialPortManagerClass SerialPortManager;

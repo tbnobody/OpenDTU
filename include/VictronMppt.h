@@ -22,6 +22,7 @@ public:
     // returns the data age of all controllers,
     // i.e, the youngest data's age is returned.
     uint32_t getDataAgeMillis() const;
+    uint32_t getDataAgeMillis(size_t idx) const;
 
     std::optional<VeDirectMpptController::spData_t> getData(size_t idx = 0) const;
 

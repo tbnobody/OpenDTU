@@ -112,7 +112,3 @@ void MqttBattery::onMqttMessageVoltage(espMqttClientTypes::MessageProperties con
                 *voltage, topic);
     }
 }
-
-bool MqttBattery::usesHwPort2() {
-    return false;
-}

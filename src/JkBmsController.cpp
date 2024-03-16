@@ -427,8 +427,4 @@ void Controller::processDataPoints(DataPointContainer const& dataPoints)
     }
 }
 
-bool Controller::usesHwPort2() {
-    return true;
-}
-
 } /* namespace JkBms */

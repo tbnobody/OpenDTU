@@ -22,7 +22,7 @@ void VictronMpptClass::updateSettings()
     std::lock_guard<std::mutex> lock(_mutex);
 
     _controllers.clear();
-    PortManager.invalidateMpptPorts();
+    SerialPortManager.invalidateMpptPorts();
 
     CONFIG_T& config = Configuration.get();
     if (!config.Vedirect.Enabled) { return; }
@@ -47,7 +47,7 @@ bool VictronMpptClass::initController(int8_t rx, int8_t tx, bool logging, int hw
         return false;
     }
 
-    if (!PortManager.allocateMpptPort(hwSerialPort)) {
+    if (!SerialPortManager.allocateMpptPort(hwSerialPort)) {
         MessageOutput.printf("[VictronMppt] Serial port %d already in use. Initialization aborted!\r\n",
                              hwSerialPort);
         return false;
@@ -110,6 +110,15 @@ uint32_t VictronMpptClass::getDataAgeMillis() const
     return age;
 }
 
+uint32_t VictronMpptClass::getDataAgeMillis(size_t idx) const
+{
+    std::lock_guard<std::mutex> lock(_mutex);
+
+    if (_controllers.empty() || idx >= _controllers.size()) { return 0; }
+
+    return millis() - _controllers[idx]->getLastUpdate();
+}
+
 std::optional<VeDirectMpptController::spData_t> VictronMpptClass::getData(size_t idx) const
 {
     std::lock_guard<std::mutex> lock(_mutex);
@@ -128,6 +137,7 @@ int32_t VictronMpptClass::getPowerOutputWatts() const
     int32_t sum = 0;
 
     for (const auto& upController : _controllers) {
+        if (!upController->isDataValid()) { continue; }
         sum += upController->getData()->P;
     }
 
@@ -139,6 +149,7 @@ int32_t VictronMpptClass::getPanelPowerWatts() const
     int32_t sum = 0;
 
     for (const auto& upController : _controllers) {
+        if (!upController->isDataValid()) { continue; }
         sum += upController->getData()->PPV;
     }
 
@@ -150,6 +161,7 @@ double VictronMpptClass::getYieldTotal() const
     double sum = 0;
 
     for (const auto& upController : _controllers) {
+        if (!upController->isDataValid()) { continue; }
         sum += upController->getData()->H19;
     }
 
@@ -161,6 +173,7 @@ double VictronMpptClass::getYieldDay() const
     double sum = 0;
 
     for (const auto& upController : _controllers) {
+        if (!upController->isDataValid()) { continue; }
         sum += upController->getData()->H20;
     }
 
@@ -172,6 +185,7 @@ double VictronMpptClass::getOutputVoltage() const
     double min = -1;
 
     for (const auto& upController : _controllers) {
+        if (!upController->isDataValid()) { continue; }
         double volts = upController->getData()->V;
         if (min == -1) { min = volts; }
         min = std::min(min, volts);

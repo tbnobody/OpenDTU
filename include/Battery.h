@@ -14,7 +14,7 @@ public:
     virtual void deinit() = 0;
     virtual void loop() = 0;
     virtual std::shared_ptr<BatteryStats> getStats() const = 0;
-    virtual bool usesHwPort2() = 0;
+    virtual bool usesHwPort2() const { return false; }
 };
 
 class BatteryClass {
