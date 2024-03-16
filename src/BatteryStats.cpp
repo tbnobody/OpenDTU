@@ -379,8 +379,8 @@ void VictronSmartShuntStats::updateFrom(VeDirectShuntController::veShuntStruct c
     _modelName = shuntData.getPidAsString().data();
     _chargeCycles = shuntData.H4;
     _timeToGo = shuntData.TTG / 60;
-    _chargedEnergy = shuntData.H18 / 100;
-    _dischargedEnergy = shuntData.H17 / 100;
+    _chargedEnergy = static_cast<float>(shuntData.H18) / 100;
+    _dischargedEnergy = static_cast<float>(shuntData.H17) / 100;
     _manufacturer = "Victron " + _modelName;
     _temperature = shuntData.T;
     _tempPresent = shuntData.tempPresent;
@@ -401,8 +401,8 @@ void VictronSmartShuntStats::getLiveViewData(JsonVariant& root) const {
     // values go into the "Status" card of the web application
     addLiveViewValue(root, "current", _current, "A", 1);
     addLiveViewValue(root, "chargeCycles", _chargeCycles, "", 0);
-    addLiveViewValue(root, "chargedEnergy", _chargedEnergy, "KWh", 1);
-    addLiveViewValue(root, "dischargedEnergy", _dischargedEnergy, "KWh", 1);
+    addLiveViewValue(root, "chargedEnergy", _chargedEnergy, "kWh", 2);
+    addLiveViewValue(root, "dischargedEnergy", _dischargedEnergy, "kWh", 2);
     if (_tempPresent) {
         addLiveViewValue(root, "temperature", _temperature, "°C", 0);
     }
