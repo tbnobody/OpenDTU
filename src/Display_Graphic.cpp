@@ -29,18 +29,16 @@ const uint8_t languages[] = {
     I18N_LOCALE_FR
 };
 
-static const char* const i18n_offline[] = { "Offline", "Offline", "Offline" };
+static const char* const i18n_offline[] = { "Offline", "OFFLINE", "Offline" };
 
-static const char* const i18n_current_power_w[] = { "%.0f W", "%.0f W", "%.0f W" };
-static const char* const i18n_current_power_kw[] = { "%.1f kW", "%.1f kW", "%.1f kW" };
+static const char* const i18n_current_power_w[] = { "☀ %.1f W ☀", "☀ %.1f W ☀", "%.1f W ☀" };
+static const char* const i18n_current_power_kw[] = { "☀ %.1f kW ☀", "☀ %.1f kW ☀", "☀ %.1f kW ☀" };
 
-static const char* const i18n_yield_today_wh[] = { "today: %4.0f Wh", "Heute: %4.0f Wh", "auj.: %4.0f Wh" };
+static const char* const i18n_yield_today_wh[] = { "today: %.0f Wh", "Heute: %.0f Wh", "auj.: %.0f Wh" };
 static const char* const i18n_yield_today_kwh[] = { "today: %.1f kWh", "Heute: %.1f kWh", "auj.: %.1f kWh" };
 
-static const char* const i18n_yield_total_kwh[] = { "total: %.1f kWh", "Ges.: %.1f kWh", "total: %.1f kWh" };
-static const char* const i18n_yield_total_mwh[] = { "total: %.0f kWh", "Ges.: %.0f kWh", "total: %.0f kWh" };
-
-static const char* const i18n_date_format[] = { "%m/%d/%Y %H:%M", "%d.%m.%Y %H:%M", "%d/%m/%Y %H:%M" };
+static const char* const i18n_yield_total_kwh[] = { "total: %.3f kWh", "Σ %.3f kWh", "total: %.3f kWh" };
+static const char* const i18n_yield_total_mwh[] = { "total: %.0f kWh", "Σ %.0f kWh", "total: %.0f kWh" };
 
 DisplayGraphicClass::DisplayGraphicClass()
     : _loopTask(TASK_IMMEDIATE, TASK_FOREVER, std::bind(&DisplayGraphicClass::loop, this))
@@ -62,6 +60,7 @@ void DisplayGraphicClass::init(Scheduler& scheduler, const DisplayType_t type, c
             _display->setI2CAddress(0x3F << 1);
         }
         _display->begin();
+        _display->enableUTF8Print();
         setContrast(DISPLAY_CONTRAST);
         setStatus(true);
         _diagram.init(scheduler, _display);
@@ -74,33 +73,28 @@ void DisplayGraphicClass::init(Scheduler& scheduler, const DisplayType_t type, c
 
 void DisplayGraphicClass::calcLineHeights()
 {
-    bool diagram = (_isLarge && _diagram_mode == DiagramMode_t::Small);
-    // the diagram needs space. we need to keep
-    // away from the y-axis label in particular.
-    uint8_t yOff = (diagram ? 7 : 0);
-    for (uint8_t i = 0; i < 4; i++) {
-        setFont(i);
-        yOff += _display->getAscent();
-        _lineOffsets[i] = yOff;
-        yOff += ((!_isLarge || diagram) ? 2 : 3);
-        // the descent is a negative value and moves the *next* line's
-        // baseline. the first line never uses a letter with descent and
-        // we need that space when showing the small diagram.
-        yOff -= ((i == 0 && diagram) ? 0 : _display->getDescent());
-    }
+    setFont(0);
+    uint8_t yOff = _display->getAscent() + _display->getAscent() / 2;
+    _lineOffsets[0] = yOff;
+    _lineOffsets[1] = yOff + 16;
+    _lineOffsets[2] = yOff + 32;
 }
 
 void DisplayGraphicClass::setFont(const uint8_t line)
 {
     switch (line) {
     case 0:
-        _display->setFont((_isLarge) ? u8g2_font_ncenB14_tr : u8g2_font_logisoso16_tr);
+        _display->setFont(u8g2_font_fub20_tr);
         break;
-    case 3:
-        _display->setFont(u8g2_font_5x8_tr);
+    case 1:
+        _display->setFont(u8g2_font_unifont_t_0_76);
+        break;
+    case 2:
+        _display->setFont(u8g2_font_unifont_t_greek);
         break;
     default:
-        _display->setFont((_isLarge) ? u8g2_font_ncenB10_tr : u8g2_font_5x8_tr);
+        //_display->setFont((_isLarge) ? u8g2_font_ncenB10_tr : u8g2_font_5x8_tr);
+        _display->setFont(u8g2_font_unifont_t_0_76);
         break;
     }
 }
@@ -114,32 +108,12 @@ void DisplayGraphicClass::printText(const char* text, const uint8_t line)
 {
     setFont(line);
 
-    uint8_t dispX;
-    if (!_isLarge) {
-        dispX = (line == 0) ? 5 : 0;
-    } else {
-        if (line == 0 && _diagram_mode == DiagramMode_t::Small) {
-            // Center between left border and diagram
-            dispX = (CHART_POSX - _display->getStrWidth(text)) / 2;
-        } else {
-            // Center on screen
-            dispX = (_display->getDisplayWidth() - _display->getStrWidth(text)) / 2;
-        }
-    }
-
-    if (enableScreensaver) {
-        unsigned maxOffset = (_isLarge ? 8 : 6);
-        unsigned period = 2 * maxOffset;
-        unsigned step = _mExtra % period;
-        int offset = (step <= maxOffset) ? step : (period - step);
-        offset -= (_isLarge ? 5 : 0); // oscillate around center on large screens
-        dispX += offset;
-    }
+    uint8_t dispX = (_display->getDisplayWidth() - _display->getStrWidth(text)) / 2;
 
     if (dispX > _display->getDisplayWidth()) {
         dispX = 0;
     }
-    _display->drawStr(dispX, _lineOffsets[line], text);
+    _display->drawUTF8(dispX, _lineOffsets[line], text);
 }
 
 void DisplayGraphicClass::setOrientation(const uint8_t rotation)
@@ -261,17 +235,6 @@ void DisplayGraphicClass::loop()
         auto const format = (wattsTotal >= 1000) ? i18n_yield_total_mwh : i18n_yield_total_kwh;
         snprintf(_fmtText, sizeof(_fmtText), format[_display_language], wattsTotal);
         printText(_fmtText, 2);
-
-        //=====> IP or Date-Time ========
-        // Change every 3 seconds
-        if (!(_mExtra % (3 * 2) < 3) && NetworkSettings.localIP()) {
-            printText(NetworkSettings.localIP().toString().c_str(), 3);
-        } else {
-            // Get current time
-            time_t now = time(nullptr);
-            strftime(_fmtText, sizeof(_fmtText), i18n_date_format[_display_language], localtime(&now));
-            printText(_fmtText, 3);
-        }
     }
 
     _display->sendBuffer();
