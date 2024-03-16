@@ -130,12 +130,12 @@
             "cs": -1
         },
         "cmt": {
-            "clk": 18,
-            "cs": 4,
-            "fcs": 5,
-            "sdio": 23,
-            "gpio2": 19,
-            "gpio3": 16
+            "clk": 12,
+            "cs": 27,
+            "fcs": 26,
+            "sdio": 14,
+            "gpio2": -1,
+            "gpio3": -1
         },
         "eth": {
             "enabled": false
