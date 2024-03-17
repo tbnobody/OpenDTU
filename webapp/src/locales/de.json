@@ -901,6 +901,9 @@
         "bmsInternal": "BMS intern",
         "chargeCycles": "Ladezyklen",
         "chargedEnergy": "Geladene Energie",
-        "dischargedEnergy": "Entladene Energie"
+        "dischargedEnergy": "Entladene Energie",
+        "instantaneousPower": "Aktuelle Leistung",
+        "consumedAmpHours": "Verbrauche Amperestunden",
+        "lastFullCharge": "Letztes mal Vollgeladen"
       }
 }

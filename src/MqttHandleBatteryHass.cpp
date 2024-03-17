@@ -111,6 +111,14 @@ void MqttHandleBatteryHassClass::loop()
         case 2: // SoC from MQTT
             break;
         case 3: // Victron SmartShunt
+            publishSensor("Voltage", "mdi:battery-charging", "voltage", "voltage", "measurement", "V");
+            publishSensor("Current", "mdi:current-dc", "current", "current", "measurement", "A");
+            publishSensor("Instantaneous Power", NULL, "instantaneousPower", "power", "measurement", "W");
+            publishSensor("Charged Energy", NULL, "chargedEnergy", "energy", "total_increasing", "kWh");
+            publishSensor("Discharged Energy", NULL, "dischargedEnergy", "energy", "total_increasing", "kWh");
+            publishSensor("Charge Cycles", "mdi:counter", "chargeCycles");
+            publishSensor("Consumed Amp Hours", NULL, "consumedAmpHours", NULL, "measurement", "Ah");
+            publishSensor("Last Full Charge", "mdi:timelapse", "lastFullCharge", NULL, NULL, "min");
             break;
     }
 
