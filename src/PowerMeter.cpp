@@ -75,7 +75,7 @@ void PowerMeterClass::init(Scheduler& scheduler)
         break;
 
     case SOURCE_SMAHM2:
-        SMA_HM.init(scheduler);
+        SMA_HM.init(scheduler, config.PowerMeter.VerboseLogging);
         break;
     }
 }
@@ -229,6 +229,7 @@ void PowerMeterClass::readPowerMeter()
         }
     }
     else if (config.PowerMeter.Source == SOURCE_SMAHM2) {
+        std::lock_guard<std::mutex> l(_mutex);
         _powerMeter1Power = SMA_HM.getPowerL1();
         _powerMeter2Power = SMA_HM.getPowerL2();
         _powerMeter3Power = SMA_HM.getPowerL3();
