@@ -4,20 +4,15 @@
  */
 #include "PowerMeter.h"
 #include "Configuration.h"
+#include "PinMapping.h"
 #include "HttpPowerMeter.h"
 #include "MqttSettings.h"
 #include "NetworkSettings.h"
-#include "SDM.h"
 #include "MessageOutput.h"
 #include <ctime>
-#include <SoftwareSerial.h>
 #include <SMA_HM.h>
 
 PowerMeterClass PowerMeter;
-
-SDM sdm(Serial2, 9600, NOT_A_PIN, SERIAL_8N1, SDM_RX_PIN, SDM_TX_PIN);
-
-SoftwareSerial inputSerial;
 
 void PowerMeterClass::init(Scheduler& scheduler)
 {
@@ -38,8 +33,12 @@ void PowerMeterClass::init(Scheduler& scheduler)
         return;
     }
 
-    switch(config.PowerMeter.Source) {
-    case SOURCE_MQTT: {
+    const PinMapping_t& pin = PinMapping.get();
+    MessageOutput.printf("[PowerMeter] rx = %d, tx = %d, dere = %d\r\n",
+            pin.powermeter_rx, pin.powermeter_tx, pin.powermeter_dere);
+
+    switch(static_cast<Source>(config.PowerMeter.Source)) {
+    case Source::MQTT: {
         auto subscribe = [this](char const* topic, float* target) {
             if (strlen(topic) == 0) { return; }
             MqttSettings.subscribe(topic, 0,
@@ -57,24 +56,37 @@ void PowerMeterClass::init(Scheduler& scheduler)
         break;
     }
 
-    case SOURCE_SDM1PH:
-    case SOURCE_SDM3PH:
-        sdm.begin();
+    case Source::SDM1PH:
+    case Source::SDM3PH:
+        if (pin.powermeter_rx < 0 || pin.powermeter_tx < 0) {
+            MessageOutput.println("[PowerMeter] invalid pin config for SDM power meter (RX and TX pins must be defined)");
+            return;
+        }
+
+        _upSdm = std::make_unique<SDM>(Serial2, 9600, pin.powermeter_dere,
+                SERIAL_8N1, pin.powermeter_rx, pin.powermeter_tx);
+        _upSdm->begin();
         break;
 
-    case SOURCE_HTTP:
+    case Source::HTTP:
         HttpPowerMeter.init();
         break;
 
-    case SOURCE_SML:
-        pinMode(SML_RX_PIN, INPUT);
-        inputSerial.begin(9600, SWSERIAL_8N1, SML_RX_PIN, -1, false, 128, 95);
-        inputSerial.enableRx(true);
-        inputSerial.enableTx(false);
-        inputSerial.flush();
+    case Source::SML:
+        if (pin.powermeter_rx < 0) {
+            MessageOutput.println("[PowerMeter] invalid pin config for SML power meter (RX pin must be defined)");
+            return;
+        }
+
+        pinMode(pin.powermeter_rx, INPUT);
+        _upSmlSerial = std::make_unique<SoftwareSerial>();
+        _upSmlSerial->begin(9600, SWSERIAL_8N1, pin.powermeter_rx, -1, false, 128, 95);
+        _upSmlSerial->enableRx(true);
+        _upSmlSerial->enableTx(false);
+        _upSmlSerial->flush();
         break;
 
-    case SOURCE_SMAHM2:
+    case Source::SMAHM2:
         SMA_HM.init(scheduler, config.PowerMeter.VerboseLogging);
         break;
     }
@@ -150,12 +162,10 @@ void PowerMeterClass::loop()
 
     if (!config.PowerMeter.Enabled) { return; }
 
-    if (config.PowerMeter.Source == SOURCE_SML) {
-        if (!smlReadLoop()) {
-            return;
-        } else {
-            _lastPowerMeterUpdate = millis();
-        }
+    if (static_cast<Source>(config.PowerMeter.Source) == Source::SML &&
+            nullptr != _upSmlSerial) {
+        if (!smlReadLoop()) { return; }
+        _lastPowerMeterUpdate = millis();
     }
 
     if ((millis() - _lastPowerMeterCheck) < (config.PowerMeter.Interval * 1000)) {
@@ -176,14 +186,17 @@ void PowerMeterClass::readPowerMeter()
     CONFIG_T& config = Configuration.get();
 
     uint8_t _address = config.PowerMeter.SdmAddress;
+    Source configuredSource = static_cast<Source>(config.PowerMeter.Source);
 
-    if (config.PowerMeter.Source == SOURCE_SDM1PH) {
+    if (configuredSource == Source::SDM1PH) {
+        if (!_upSdm) { return; }
+
         // this takes a "very long" time as each readVal() is a synchronous
         // exchange of serial messages. cache the values and write later.
-        auto phase1Power = sdm.readVal(SDM_PHASE_1_POWER, _address);
-        auto phase1Voltage = sdm.readVal(SDM_PHASE_1_VOLTAGE, _address);
-        auto energyImport = sdm.readVal(SDM_IMPORT_ACTIVE_ENERGY, _address);
-        auto energyExport = sdm.readVal(SDM_EXPORT_ACTIVE_ENERGY, _address);
+        auto phase1Power = _upSdm->readVal(SDM_PHASE_1_POWER, _address);
+        auto phase1Voltage = _upSdm->readVal(SDM_PHASE_1_VOLTAGE, _address);
+        auto energyImport = _upSdm->readVal(SDM_IMPORT_ACTIVE_ENERGY, _address);
+        auto energyExport = _upSdm->readVal(SDM_EXPORT_ACTIVE_ENERGY, _address);
 
         std::lock_guard<std::mutex> l(_mutex);
         _powerMeter1Power = static_cast<float>(phase1Power);
@@ -196,17 +209,19 @@ void PowerMeterClass::readPowerMeter()
         _powerMeterExport = static_cast<float>(energyExport);
         _lastPowerMeterUpdate = millis();
     }
-    else if (config.PowerMeter.Source == SOURCE_SDM3PH) {
+    else if (configuredSource == Source::SDM3PH) {
+        if (!_upSdm) { return; }
+
         // this takes a "very long" time as each readVal() is a synchronous
         // exchange of serial messages. cache the values and write later.
-        auto phase1Power = sdm.readVal(SDM_PHASE_1_POWER, _address);
-        auto phase2Power = sdm.readVal(SDM_PHASE_2_POWER, _address);
-        auto phase3Power = sdm.readVal(SDM_PHASE_3_POWER, _address);
-        auto phase1Voltage = sdm.readVal(SDM_PHASE_1_VOLTAGE, _address);
-        auto phase2Voltage = sdm.readVal(SDM_PHASE_2_VOLTAGE, _address);
-        auto phase3Voltage = sdm.readVal(SDM_PHASE_3_VOLTAGE, _address);
-        auto energyImport = sdm.readVal(SDM_IMPORT_ACTIVE_ENERGY, _address);
-        auto energyExport = sdm.readVal(SDM_EXPORT_ACTIVE_ENERGY, _address);
+        auto phase1Power = _upSdm->readVal(SDM_PHASE_1_POWER, _address);
+        auto phase2Power = _upSdm->readVal(SDM_PHASE_2_POWER, _address);
+        auto phase3Power = _upSdm->readVal(SDM_PHASE_3_POWER, _address);
+        auto phase1Voltage = _upSdm->readVal(SDM_PHASE_1_VOLTAGE, _address);
+        auto phase2Voltage = _upSdm->readVal(SDM_PHASE_2_VOLTAGE, _address);
+        auto phase3Voltage = _upSdm->readVal(SDM_PHASE_3_VOLTAGE, _address);
+        auto energyImport = _upSdm->readVal(SDM_IMPORT_ACTIVE_ENERGY, _address);
+        auto energyExport = _upSdm->readVal(SDM_EXPORT_ACTIVE_ENERGY, _address);
 
         std::lock_guard<std::mutex> l(_mutex);
         _powerMeter1Power = static_cast<float>(phase1Power);
@@ -219,7 +234,7 @@ void PowerMeterClass::readPowerMeter()
         _powerMeterExport = static_cast<float>(energyExport);
         _lastPowerMeterUpdate = millis();
     }
-    else if (config.PowerMeter.Source == SOURCE_HTTP) {
+    else if (configuredSource == Source::HTTP) {
         if (HttpPowerMeter.updateValues()) {
             std::lock_guard<std::mutex> l(_mutex);
             _powerMeter1Power = HttpPowerMeter.getPower(1);
@@ -228,7 +243,7 @@ void PowerMeterClass::readPowerMeter()
             _lastPowerMeterUpdate = millis();
         }
     }
-    else if (config.PowerMeter.Source == SOURCE_SMAHM2) {
+    else if (configuredSource == Source::SMAHM2) {
         std::lock_guard<std::mutex> l(_mutex);
         _powerMeter1Power = SMA_HM.getPowerL1();
         _powerMeter2Power = SMA_HM.getPowerL2();
@@ -239,9 +254,9 @@ void PowerMeterClass::readPowerMeter()
 
 bool PowerMeterClass::smlReadLoop()
 {
-    while (inputSerial.available()) {
+    while (_upSmlSerial->available()) {
         double readVal = 0;
-        unsigned char smlCurrentChar = inputSerial.read();
+        unsigned char smlCurrentChar = _upSmlSerial->read();
         sml_states_t smlCurrentState = smlState(smlCurrentChar);
         if (smlCurrentState == SML_LISTEND) {
             for (auto& handler: smlHandlerList) {

@@ -144,6 +144,18 @@
 #define HUAWEI_PIN_POWER -1
 #endif
 
+#ifndef POWERMETER_PIN_RX
+#define POWERMETER_PIN_RX -1
+#endif
+
+#ifndef POWERMETER_PIN_TX
+#define POWERMETER_PIN_TX -1
+#endif
+
+#ifndef POWERMETER_PIN_DERE
+#define POWERMETER_PIN_DERE -1
+#endif
+
 PinMappingClass PinMapping;
 
 PinMappingClass::PinMappingClass()
@@ -182,6 +194,10 @@ PinMappingClass::PinMappingClass()
     _pinMapping.display_cs = DISPLAY_CS;
     _pinMapping.display_reset = DISPLAY_RESET;
 
+    _pinMapping.led[0] = LED0;
+    _pinMapping.led[1] = LED1;
+
+    // OpenDTU-OnBattery-specific pins below
     _pinMapping.victron_rx = VICTRON_PIN_RX;
     _pinMapping.victron_tx = VICTRON_PIN_TX;
 
@@ -199,8 +215,10 @@ PinMappingClass::PinMappingClass()
     _pinMapping.huawei_cs = HUAWEI_PIN_CS;
     _pinMapping.huawei_irq = HUAWEI_PIN_IRQ;
     _pinMapping.huawei_power = HUAWEI_PIN_POWER;
-    _pinMapping.led[0] = LED0;
-    _pinMapping.led[1] = LED1;
+
+    _pinMapping.powermeter_rx = POWERMETER_PIN_RX;
+    _pinMapping.powermeter_tx = POWERMETER_PIN_TX;
+    _pinMapping.powermeter_dere = POWERMETER_PIN_DERE;
 }
 
 PinMapping_t& PinMappingClass::get()
@@ -260,6 +278,10 @@ bool PinMappingClass::init(const String& deviceMapping)
             _pinMapping.display_cs = doc[i]["display"]["cs"] | DISPLAY_CS;
             _pinMapping.display_reset = doc[i]["display"]["reset"] | DISPLAY_RESET;
 
+            _pinMapping.led[0] = doc[i]["led"]["led0"] | LED0;
+            _pinMapping.led[1] = doc[i]["led"]["led1"] | LED1;
+
+            // OpenDTU-OnBattery-specific pins below
             _pinMapping.victron_rx = doc[i]["victron"]["rx"] | VICTRON_PIN_RX;
             _pinMapping.victron_tx = doc[i]["victron"]["tx"] | VICTRON_PIN_TX;
             _pinMapping.victron_rx2 = doc[i]["victron"]["rx2"] | VICTRON_PIN_RX;
@@ -277,8 +299,9 @@ bool PinMappingClass::init(const String& deviceMapping)
             _pinMapping.huawei_cs = doc[i]["huawei"]["cs"] | HUAWEI_PIN_CS;
             _pinMapping.huawei_power = doc[i]["huawei"]["power"] | HUAWEI_PIN_POWER;
 
-            _pinMapping.led[0] = doc[i]["led"]["led0"] | LED0;
-            _pinMapping.led[1] = doc[i]["led"]["led1"] | LED1;
+            _pinMapping.powermeter_rx = doc[i]["powermeter"]["rx"] | POWERMETER_PIN_RX;
+            _pinMapping.powermeter_tx = doc[i]["powermeter"]["tx"] | POWERMETER_PIN_TX;
+            _pinMapping.powermeter_dere = doc[i]["powermeter"]["dere"] | POWERMETER_PIN_DERE;
 
             return true;
         }

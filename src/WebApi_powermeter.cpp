@@ -118,7 +118,7 @@ void WebApiPowerMeterClass::onAdminPost(AsyncWebServerRequest* request)
         return;
     }
 
-    if (root["source"].as<uint8_t>() == PowerMeter.SOURCE_HTTP) {
+    if (static_cast<PowerMeterClass::Source>(root["source"].as<uint8_t>()) == PowerMeterClass::Source::HTTP) {
         JsonArray http_phases = root["http_phases"];
         for (uint8_t i = 0; i < http_phases.size(); i++) {
             JsonObject phase = http_phases[i].as<JsonObject>();
