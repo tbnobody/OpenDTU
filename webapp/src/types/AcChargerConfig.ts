@@ -6,4 +6,5 @@ export interface AcChargerConfig {
   enable_voltage_limit: number;
   lower_power_limit: number;
   upper_power_limit: number;
+  emergency_charge_enabled: boolean;
 }

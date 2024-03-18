@@ -150,6 +150,7 @@ private:
 
     uint8_t _autoPowerEnabledCounter = 0;
     bool _autoPowerEnabled = false;
+    bool _batteryEmergencyCharging = false;
 };
 
 extern HuaweiCanClass HuaweiCan;

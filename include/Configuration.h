@@ -240,6 +240,7 @@ struct CONFIG_T {
         bool Enabled;
         uint32_t CAN_Controller_Frequency;
         bool Auto_Power_Enabled;
+        bool Emergency_Charge_Enabled;
         float Auto_Power_Voltage_Limit;
         float Auto_Power_Enable_Voltage_Limit;
         float Auto_Power_Lower_Power_Limit;

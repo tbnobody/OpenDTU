@@ -2,6 +2,7 @@
 /*
  * Copyright (C) 2023 Malte Schmidt and others
  */
+#include "Battery.h"
 #include "Huawei_can.h"
 #include "MessageOutput.h"
 #include "PowerMeter.h"
@@ -13,6 +14,7 @@
 #include <freertos/FreeRTOS.h>
 #include <freertos/semphr.h>
 #include <freertos/task.h>
+#include <algorithm>
 #include <math.h>
 
 HuaweiCanClass HuaweiCan;
@@ -298,18 +300,45 @@ void HuaweiCanClass::loop()
     digitalWrite(_huaweiPower, 1);
   }
 
-  // ***********************
-  // Automatic power control
-  // ***********************
 
-  if (_mode == HUAWEI_MODE_AUTO_INT ) {
+  if (_mode == HUAWEI_MODE_AUTO_INT || _batteryEmergencyCharging) {
 
-    // Set voltage limit in periodic intervals
+    // Set voltage limit in periodic intervals if we're in auto mode or if emergency battery charge is requested.
     if ( _nextAutoModePeriodicIntMillis < millis()) {
       MessageOutput.printf("[HuaweiCanClass::loop] Periodically setting voltage limit: %f \r\n", config.Huawei.Auto_Power_Voltage_Limit);
       _setValue(config.Huawei.Auto_Power_Voltage_Limit, HUAWEI_ONLINE_VOLTAGE);
       _nextAutoModePeriodicIntMillis = millis() + 60000;
     }
+  }
+  // ***********************
+  // Emergency charge
+  // ***********************
+  auto stats = Battery.getStats();
+  if (config.Huawei.Emergency_Charge_Enabled && stats->getImmediateChargingRequest()) {
+    _batteryEmergencyCharging = true;
+
+    // Set output current
+    float efficiency =  (_rp.efficiency > 0.5 ? _rp.efficiency : 1.0); 
+    float outputCurrent = efficiency * (config.Huawei.Auto_Power_Upper_Power_Limit / _rp.output_voltage);
+    MessageOutput.printf("[HuaweiCanClass::loop] Emergency Charge Output current %f \r\n", outputCurrent);
+    _setValue(outputCurrent, HUAWEI_ONLINE_CURRENT);
+    return;
+  }
+
+  if (_batteryEmergencyCharging && !stats->getImmediateChargingRequest()) {
+    // Battery request has changed. Set current to 0, wait for PSU to respond and then clear state
+    _setValue(0, HUAWEI_ONLINE_CURRENT);
+    if (_rp.output_current < 1) {
+      _batteryEmergencyCharging = false;
+    }
+    return;
+  }
+
+  // ***********************
+  // Automatic power control
+  // ***********************
+
+  if (_mode == HUAWEI_MODE_AUTO_INT ) {
 
     // Check if we should run automatic power calculation at all. 
     // We may have set a value recently and still wait for output stabilization
@@ -377,10 +406,16 @@ void HuaweiCanClass::loop()
           newPowerLimit = config.Huawei.Auto_Power_Upper_Power_Limit;
         }
 
-        // Set the actual output limit
+        // Calculate output current
         float efficiency =  (_rp.efficiency > 0.5 ? _rp.efficiency : 1.0); 
-        float outputCurrent = efficiency * (newPowerLimit / _rp.output_voltage);
-        MessageOutput.printf("[HuaweiCanClass::loop] Output current %f \r\n", outputCurrent);
+        float calculatedCurrent = efficiency * (newPowerLimit / _rp.output_voltage);
+
+        // Limit output current to value requested by BMS
+        float permissableCurrent = stats->getChargeCurrentLimitation() - (stats->getChargeCurrent() - _rp.output_current); // BMS current limit - current from other sources
+        float outputCurrent = std::min(calculatedCurrent, permissableCurrent);
+        outputCurrent= outputCurrent > 0 ? outputCurrent : 0;
+
+        MessageOutput.printf("[HuaweiCanClass::loop] Setting output current to %.2fA. This is the lower value of calculated %.2fA and BMS permissable %.2fA currents\r\n", outputCurrent, calculatedCurrent, permissableCurrent);
         _autoPowerEnabled = true;
         _setValue(outputCurrent, HUAWEI_ONLINE_CURRENT);
 
@@ -415,6 +450,7 @@ void HuaweiCanClass::_setValue(float in, uint8_t parameterType)
 
     if (in < 0) {
       MessageOutput.printf("[HuaweiCanClass::_setValue]  Error: Tried to set voltage/current to negative value %f \r\n", in);
+      return;
     }
 
     // Start PSU if needed

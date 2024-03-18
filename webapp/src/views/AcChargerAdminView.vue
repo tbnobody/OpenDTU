@@ -28,10 +28,17 @@
                               v-model="acChargerConfigList.auto_power_enabled"
                               type="checkbox" wide/>
 
+                <InputElement v-show="acChargerConfigList.enabled"
+                              :label="$t('acchargeradmin.EnableEmergencyCharge')"
+                              v-model="acChargerConfigList.emergency_charge_enabled"
+                              type="checkbox" wide/>
+
                 <CardElement :text="$t('acchargeradmin.Limits')" textVariant="text-bg-primary" add-space
-                              v-show="acChargerConfigList.auto_power_enabled">
+                              v-show="acChargerConfigList.auto_power_enabled || acChargerConfigList.emergency_charge_enabled">
                     <div class="row mb-3">
-                        <label for="voltageLimit" class="col-sm-2 col-form-label">{{ $t('acchargeradmin.VoltageLimit') }}:</label>
+                        <label for="voltageLimit" class="col-sm-2 col-form-label">{{ $t('acchargeradmin.VoltageLimit') }}:
+                          <BIconInfoCircle v-tooltip :title="$t('acchargeradmin.stopVoltageLimitHint')" />
+                        </label>
                         <div class="col-sm-10">
                             <div class="input-group">
                                 <input type="number" step="0.01" class="form-control" id="voltageLimit"
@@ -60,7 +67,9 @@
                                     <span class="input-group-text" id="lowerPowerLimitDescription">W</span>
                             </div>
                         </div>
-                        <label for="upperPowerLimit" class="col-sm-2 col-form-label">{{ $t('acchargeradmin.upperPowerLimit') }}:</label>
+                        <label for="upperPowerLimit" class="col-sm-2 col-form-label">{{ $t('acchargeradmin.upperPowerLimit') }}:
+                          <BIconInfoCircle v-tooltip :title="$t('acchargeradmin.maxPowerLimitHint')" />
+                        </label>
                         <div class="col-sm-10">
                             <div class="input-group">
                                 <input type="number" class="form-control" id="upperPowerLimit"

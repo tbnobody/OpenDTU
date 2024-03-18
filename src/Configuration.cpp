@@ -216,6 +216,7 @@ bool ConfigurationClass::write()
     huawei["enabled"] = config.Huawei.Enabled;
     huawei["can_controller_frequency"] = config.Huawei.CAN_Controller_Frequency;
     huawei["auto_power_enabled"] = config.Huawei.Auto_Power_Enabled;
+    huawei["emergency_charge_enabled"] = config.Huawei.Emergency_Charge_Enabled;
     huawei["voltage_limit"] = config.Huawei.Auto_Power_Voltage_Limit;
     huawei["enable_voltage_limit"] = config.Huawei.Auto_Power_Enable_Voltage_Limit;
     huawei["lower_power_limit"] = config.Huawei.Auto_Power_Lower_Power_Limit;
@@ -464,6 +465,7 @@ bool ConfigurationClass::read()
     config.Huawei.Enabled = huawei["enabled"] | HUAWEI_ENABLED;
     config.Huawei.CAN_Controller_Frequency = huawei["can_controller_frequency"] | HUAWEI_CAN_CONTROLLER_FREQUENCY;
     config.Huawei.Auto_Power_Enabled = huawei["auto_power_enabled"] | false;
+    config.Huawei.Emergency_Charge_Enabled = huawei["emergency_charge_enabled"] | false;
     config.Huawei.Auto_Power_Voltage_Limit = huawei["voltage_limit"] | HUAWEI_AUTO_POWER_VOLTAGE_LIMIT;
     config.Huawei.Auto_Power_Enable_Voltage_Limit =  huawei["enable_voltage_limit"] | HUAWEI_AUTO_POWER_ENABLE_VOLTAGE_LIMIT;
     config.Huawei.Auto_Power_Lower_Power_Limit = huawei["lower_power_limit"] | HUAWEI_AUTO_POWER_LOWER_POWER_LIMIT;

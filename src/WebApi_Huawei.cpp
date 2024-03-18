@@ -188,6 +188,7 @@ void WebApiHuaweiClass::onAdminGet(AsyncWebServerRequest* request)
     root["enabled"] = config.Huawei.Enabled;
     root["can_controller_frequency"] = config.Huawei.CAN_Controller_Frequency;
     root["auto_power_enabled"] = config.Huawei.Auto_Power_Enabled;
+    root["emergency_charge_enabled"] = config.Huawei.Emergency_Charge_Enabled;
     root["voltage_limit"] = static_cast<int>(config.Huawei.Auto_Power_Voltage_Limit * 100) / 100.0;
     root["enable_voltage_limit"] = static_cast<int>(config.Huawei.Auto_Power_Enable_Voltage_Limit * 100) / 100.0;
     root["lower_power_limit"] = config.Huawei.Auto_Power_Lower_Power_Limit;
@@ -239,6 +240,7 @@ void WebApiHuaweiClass::onAdminPost(AsyncWebServerRequest* request)
     if (!(root.containsKey("enabled")) ||
         !(root.containsKey("can_controller_frequency")) ||
         !(root.containsKey("auto_power_enabled")) ||
+        !(root.containsKey("emergency_charge_enabled")) ||
         !(root.containsKey("voltage_limit")) ||
         !(root.containsKey("lower_power_limit")) ||
         !(root.containsKey("upper_power_limit"))) {
@@ -253,11 +255,11 @@ void WebApiHuaweiClass::onAdminPost(AsyncWebServerRequest* request)
     config.Huawei.Enabled = root["enabled"].as<bool>();
     config.Huawei.CAN_Controller_Frequency = root["can_controller_frequency"].as<uint32_t>();
     config.Huawei.Auto_Power_Enabled = root["auto_power_enabled"].as<bool>();
+    config.Huawei.Emergency_Charge_Enabled = root["emergency_charge_enabled"].as<bool>();
     config.Huawei.Auto_Power_Voltage_Limit = root["voltage_limit"].as<float>();
     config.Huawei.Auto_Power_Enable_Voltage_Limit = root["enable_voltage_limit"].as<float>();
     config.Huawei.Auto_Power_Lower_Power_Limit = root["lower_power_limit"].as<float>();
     config.Huawei.Auto_Power_Upper_Power_Limit = root["upper_power_limit"].as<float>();    
-   
     WebApi.writeConfig(retMsg);
 
     response->setLength();

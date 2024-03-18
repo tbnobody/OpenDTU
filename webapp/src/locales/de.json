@@ -836,10 +836,13 @@
         "Limits": "Limits",
         "VoltageLimit": "Ladespannungslimit",
         "enableVoltageLimit": "Start Spannungslimit",
+        "stopVoltageLimitHint": "Maximal Spannung des Ladegeräts. Entspricht der geünschten Ladeschlussspannung der Batterie. Verwendet für die Automatische Leistungssteuerung und beim Notfallladen",
         "enableVoltageLimitHint": "Die automatische Leistungssteuerung wird deaktiviert wenn die Ausgangsspannung über diesem Wert liegt und wenn gleichzeitig die Ausgangsleistung unter die minimale Leistung fällt.\nDie automatische Leistungssteuerung wird re-aktiveiert wenn die Batteriespannung unter diesen Wert fällt.",
+        "maxPowerLimitHint": "Maximale Ausgangsleistung. Verwendet für die Automatische Leistungssteuerung und beim Notfallladen",
         "lowerPowerLimit": "Minimale Leistung",
         "upperPowerLimit": "Maximale Leistung",
-        "Seconds": "@:base.Seconds"
+        "Seconds": "@:base.Seconds",
+        "EnableEmergencyCharge": "Notfallladen: Batterie wird mit maximaler Leistung geladen wenn durch das Batterie BMS angefordert"
     },
     "battery": {
         "battery": "Batterie",

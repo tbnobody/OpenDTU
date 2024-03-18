@@ -843,10 +843,13 @@
         "Limits": "Limits",
         "VoltageLimit": "Charge Voltage limit",
         "enableVoltageLimit": "Re-enable voltage limit",
+        "stopVoltageLimitHint": "Maximum charger voltage. Equals battery charge voltage limit. Used for automatic power control and when emergency charging",
         "enableVoltageLimitHint": "Automatic power control is disabled if the output voltage is higher then this value and if the output power drops below the minimum output power limit (set below).\nAutomatic power control is re-enabled if the battery voltage drops below the value set in this field.",
+        "maxPowerLimitHint": "Maximum output power. Used for automatic power control and when emergency charging",
         "lowerPowerLimit": "Minimum output power",
         "upperPowerLimit": "Maximum output power",
-        "Seconds": "@:base.Seconds"
+        "Seconds": "@:base.Seconds",
+        "EnableEmergencyCharge": "Emergency charge. Battery charged with maximum power if requested by Battery BMS"
     },
     "battery": {
         "battery": "Battery",
