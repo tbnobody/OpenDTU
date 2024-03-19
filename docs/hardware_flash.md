@@ -49,9 +49,7 @@ The SN65HVD230 CAN bus transceiver is used to interface with the Pylontech batte
 
 ### MCP2515 CAN bus module
 
-The MCP2515 CAN bus module consists of a CAN bus controller and a CAN bus transceiver and is used to interface with the Huawei AC charger. This CAN bus operates at 125kbit/s. The module is connected via SPI and currently requires a separate SPI bus. If you want to use the Huawei AC charger make sure to get an ESP which supports 2 SPI busses. Currently the SPI bus host is hardcoded to number 2. This may change in future. Please note: Using the Huawei AC charger in combination with the CMT2300A radio board is not supported at the moment.
-
-MCP2515 CAN bus modules that are widely available are designed for 5V supply voltage. To make them work with 3.3V / the ESP32 a modification is required. [This modification is described here.](https://forums.raspberrypi.com/viewtopic.php?t=141052)
+See [Wiki](https://github.com/helgeerbe/OpenDTU-OnBattery/wiki/Huawei-AC-PSU) for details.
 
 ### Relay module
 
