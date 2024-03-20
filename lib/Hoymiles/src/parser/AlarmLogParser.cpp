@@ -55,11 +55,12 @@ const std::array<const AlarmMessage_t, ALARM_MSG_COUNT> AlarmLogParser::_alarmMe
     { AlarmMessageType_t::ALL, 144, "Grid: Grid overfrequency", "Netz: Netzüberfrequenz", "Réseau: Surfréquence du réseau" },
     { AlarmMessageType_t::ALL, 145, "Grid: Grid underfrequency", "Netz: Netzunterfrequenz", "Réseau: Sous-fréquence du réseau" },
     { AlarmMessageType_t::ALL, 146, "Grid: Rapid grid frequency change rate", "Netz: Schnelle Wechselrate der Netzfrequenz", "Réseau: Taux de fluctuation rapide de la fréquence du réseau" },
-    { AlarmMessageType_t::ALL, 147, "Grid: Power grid outage", "Netz: Eletrizitätsnetzausfall", "Réseau: Panne du réseau électrique" },
+    { AlarmMessageType_t::ALL, 147, "Grid: Power grid outage", "Netz: Elektrizitätsnetzausfall", "Réseau: Panne du réseau électrique" },
     { AlarmMessageType_t::ALL, 148, "Grid: Grid disconnection", "Netz: Netztrennung", "Réseau: Déconnexion du réseau" },
     { AlarmMessageType_t::ALL, 149, "Grid: Island detected", "Netz: Inselbetrieb festgestellt", "Réseau: Détection d’îlots" },
 
     { AlarmMessageType_t::ALL, 150, "DCI exceeded", "", "" },
+    { AlarmMessageType_t::ALL, 152, "Grid: Phase angle difference between two phases exceeded 5° >10 times", "", "" },
     { AlarmMessageType_t::HMT, 171, "Grid: Abnormal phase difference between phase to phase", "", "" },
     { AlarmMessageType_t::ALL, 181, "Abnormal insulation impedance", "", "" },
     { AlarmMessageType_t::ALL, 182, "Abnormal grounding", "", "" },

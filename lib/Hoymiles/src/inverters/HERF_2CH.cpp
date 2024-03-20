@@ -3,18 +3,18 @@
 /*
  * Copyright (C) 2022-2024 Thomas Basler and others
  */
-#include "HM_2CH.h"
+#include "HERF_2CH.h"
 
 static const byteAssign_t byteAssignment[] = {
     { TYPE_DC, CH0, FLD_UDC, UNIT_V, 2, 2, 10, false, 1 },
-    { TYPE_DC, CH0, FLD_IDC, UNIT_A, 4, 2, 100, false, 2 },
-    { TYPE_DC, CH0, FLD_PDC, UNIT_W, 6, 2, 10, false, 1 },
+    { TYPE_DC, CH0, FLD_IDC, UNIT_A, 6, 2, 100, false, 2 },
+    { TYPE_DC, CH0, FLD_PDC, UNIT_W, 10, 2, 10, false, 1 },
     { TYPE_DC, CH0, FLD_YD, UNIT_WH, 22, 2, 1, false, 0 },
     { TYPE_DC, CH0, FLD_YT, UNIT_KWH, 14, 4, 1000, false, 3 },
     { TYPE_DC, CH0, FLD_IRR, UNIT_PCT, CALC_CH_IRR, CH0, CMD_CALC, false, 3 },
 
-    { TYPE_DC, CH1, FLD_UDC, UNIT_V, 8, 2, 10, false, 1 },
-    { TYPE_DC, CH1, FLD_IDC, UNIT_A, 10, 2, 100, false, 2 },
+    { TYPE_DC, CH1, FLD_UDC, UNIT_V, 4, 2, 10, false, 1 },
+    { TYPE_DC, CH1, FLD_IDC, UNIT_A, 8, 2, 100, false, 2 },
     { TYPE_DC, CH1, FLD_PDC, UNIT_W, 12, 2, 10, false, 1 },
     { TYPE_DC, CH1, FLD_YD, UNIT_WH, 24, 2, 1, false, 0 },
     { TYPE_DC, CH1, FLD_YT, UNIT_KWH, 18, 4, 1000, false, 3 },
@@ -36,40 +36,27 @@ static const byteAssign_t byteAssignment[] = {
     { TYPE_INV, CH0, FLD_EFF, UNIT_PCT, CALC_TOTAL_EFF, 0, CMD_CALC, false, 3 }
 };
 
-HM_2CH::HM_2CH(HoymilesRadio* radio, const uint64_t serial)
+HERF_2CH::HERF_2CH(HoymilesRadio* radio, const uint64_t serial)
     : HM_Abstract(radio, serial) {};
 
-bool HM_2CH::isValidSerial(const uint64_t serial)
+bool HERF_2CH::isValidSerial(const uint64_t serial)
 {
-    // serial >= 0x114100000000 && serial <= 0x1141ffffffff
-
-    uint8_t preId[2];
-    preId[0] = (uint8_t)(serial >> 40);
-    preId[1] = (uint8_t)(serial >> 32);
-
-    if ((uint8_t)(((((uint16_t)preId[0] << 8) | preId[1]) >> 4) & 0xff) == 0x14) {
-        return true;
-    }
-
-    if ((((preId[1] & 0xf0) == 0x30) || ((preId[1] & 0xf0) == 0x40))
-        && (((preId[0] == 0x10) && (preId[1] == 0x42)) || ((preId[0] == 0x11) && (preId[1] == 0x41)))) {
-        return true;
-    }
-
-    return false;
+    // serial >= 0x282100000000 && serial <= 0x2821ffffffff
+    uint16_t preSerial = (serial >> 32) & 0xffff;
+    return preSerial == 0x2821;
 }
 
-String HM_2CH::typeName() const
+String HERF_2CH::typeName() const
 {
-    return "HM-600/700/800-2T";
+    return "HERF-800-2T";
 }
 
-const byteAssign_t* HM_2CH::getByteAssignment() const
+const byteAssign_t* HERF_2CH::getByteAssignment() const
 {
     return byteAssignment;
 }
 
-uint8_t HM_2CH::getByteAssignmentSize() const
+uint8_t HERF_2CH::getByteAssignmentSize() const
 {
     return sizeof(byteAssignment) / sizeof(byteAssignment[0]);
 }

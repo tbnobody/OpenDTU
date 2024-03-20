@@ -77,7 +77,7 @@ HMT_6CH::HMT_6CH(HoymilesRadio* radio, const uint64_t serial)
 
 bool HMT_6CH::isValidSerial(const uint64_t serial)
 {
-    // serial >= 0x138200000000 && serial <= 0x138299999999
+    // serial >= 0x138200000000 && serial <= 0x1382ffffffff
     uint16_t preSerial = (serial >> 32) & 0xffff;
     return preSerial == 0x1382;
 }

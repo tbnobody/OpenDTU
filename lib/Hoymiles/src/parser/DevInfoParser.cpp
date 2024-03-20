@@ -52,7 +52,11 @@ const devInfo_t devInfo[] = {
     { { 0x10, 0x32, 0x71, ALL }, 2000, "HMT-2000-4T" }, // 0
 
     { { 0x10, 0x33, 0x11, ALL }, 1800, "HMT-1800-6T" }, // 01
-    { { 0x10, 0x33, 0x31, ALL }, 2250, "HMT-2250-6T" } // 01
+    { { 0x10, 0x33, 0x31, ALL }, 2250, "HMT-2250-6T" }, // 01
+
+    { { 0xF1, 0x01, 0x14, ALL }, 800, "HERF-800" }, // 00
+    { { 0xF1, 0x01, 0x24, ALL }, 1600, "HERF-1600" }, // 00
+    { { 0xF1, 0x01, 0x22, ALL }, 1800, "HERF-1800" }, // 00
 };
 
 DevInfoParser::DevInfoParser()
@@ -200,7 +204,7 @@ bool DevInfoParser::containsValidData() const
     struct tm info;
     localtime_r(&t, &info);
 
-    return info.tm_year > (2016 - 1900);
+    return info.tm_year > (2016 - 1900) || getHwPartNumber() == 124097;
 }
 
 uint8_t DevInfoParser::getDevIdx() const
