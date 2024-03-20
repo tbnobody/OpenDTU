@@ -52,6 +52,14 @@ void WebApiWsVedirectLiveClass::wsCleanupTaskCb()
     _ws.cleanupClients();
 }
 
+bool WebApiWsVedirectLiveClass::hasUpdate(size_t idx)
+{
+    auto dataAgeMillis = VictronMppt.getDataAgeMillis(idx);
+    if (dataAgeMillis == 0) { return false; }
+    auto publishAgeMillis = millis() - _lastPublish;
+    return dataAgeMillis < publishAgeMillis;
+}
+
 void WebApiWsVedirectLiveClass::sendDataTaskCb()
 {
     // do nothing if no WS client is connected
@@ -62,8 +70,7 @@ void WebApiWsVedirectLiveClass::sendDataTaskCb()
     bool updateAvailable = false;
     if (!fullUpdate) {
         for (int idx = 0; idx < VICTRON_MAX_COUNT; ++idx) {
-            auto currentAgeMillis = VictronMppt.getDataAgeMillis(idx);
-            if (currentAgeMillis > 0 && currentAgeMillis < _dataAgeMillis[idx]) {
+            if (hasUpdate(idx)) {
                 updateAvailable = true;
                 break;
             }
@@ -113,17 +120,14 @@ void WebApiWsVedirectLiveClass::generateJsonResponse(JsonVariant& root, bool ful
             continue;
         }
 
-        auto lastDataAgeMillis = _dataAgeMillis[idx];
-        _dataAgeMillis[idx] = VictronMppt.getDataAgeMillis(idx);
-        bool validAge = _dataAgeMillis[idx] > 0;
-        bool updateAvailable = _dataAgeMillis[idx] < lastDataAgeMillis;
-        if (!fullUpdate && !(validAge && updateAvailable)) { continue; }
+        if (!fullUpdate && !hasUpdate(idx)) { continue; }
 
         VeDirectMpptController::spData_t &spMpptData = spOptMpptData.value();
 
         const JsonObject &nested = array.createNestedObject(spMpptData->SER);
-        nested["data_age_ms"] = _dataAgeMillis[idx];
+        nested["data_age_ms"] = VictronMppt.getDataAgeMillis(idx);
         populateJson(nested, spMpptData);
+        _lastPublish = millis();
     }
 
     // power limiter state
