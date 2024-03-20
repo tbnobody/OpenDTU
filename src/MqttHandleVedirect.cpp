@@ -58,7 +58,7 @@ void MqttHandleVedirectClass::loop()
         }
         #endif
 
-        for (int idx = 0; idx < VICTRON_MAX_COUNT; ++idx) {
+        for (int idx = 0; idx < VictronMppt.controllerAmount(); ++idx) {
             if (!VictronMppt.isDataValid(idx)) {
                 continue;
             }

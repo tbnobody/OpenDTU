@@ -24,6 +24,7 @@ public:
     uint32_t getDataAgeMillis() const;
     uint32_t getDataAgeMillis(size_t idx) const;
 
+    size_t controllerAmount() const { return _controllers.size(); }
     std::optional<VeDirectMpptController::spData_t> getData(size_t idx = 0) const;
 
     // total output of all MPPT charge controllers in Watts

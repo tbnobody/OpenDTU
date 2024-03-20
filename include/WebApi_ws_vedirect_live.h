@@ -25,7 +25,7 @@ private:
 
     uint32_t _lastFullPublish = 0;
     uint32_t _lastPublish = 0;
-    static constexpr uint16_t _responseSize = VICTRON_MAX_COUNT * (1024 + 128);
+    uint16_t responseSize() const;
 
     std::mutex _mutex;
 

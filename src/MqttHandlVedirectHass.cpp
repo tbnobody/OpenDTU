@@ -57,7 +57,7 @@ void MqttHandleVedirectHassClass::publishConfig()
     }
 
     // device info
-    for (int idx = 0; idx < VICTRON_MAX_COUNT; ++idx) {
+    for (int idx = 0; idx < VictronMppt.controllerAmount(); ++idx) {
         // ensure data is received from victron
         if (!VictronMppt.isDataValid(idx)) {
             continue;
