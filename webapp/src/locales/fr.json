@@ -789,8 +789,15 @@
         "Name": "Nom",
         "ValueSelected": "Sélectionné",
         "ValueActive": "Activé"
-      },
-      "huawei": {
+    },
+    "inputserial": {
+        "format_hoymiles": "Hoymiles serial number format",
+        "format_converted": "Already converted serial number",
+        "format_herf_valid": "E-Star HERF format (will be saved converted): {serial}",
+        "format_herf_invalid": "E-Star HERF format: Invalid checksum",
+        "format_unknown": "Unknown format"
+    },
+    "huawei": {
         "DataAge": "Data Age: ",
         "Seconds": " {val} seconds",
         "Input": "Input",
@@ -817,8 +824,8 @@
         "SetVoltageLimit": "Voltage limit:",
         "SetCurrentLimit": "Current limit:",
         "CurrentLimit": "Current limit:"
-      },
-      "acchargeradmin": {
+    },
+    "acchargeradmin": {
         "ChargerSettings": "AC Charger Settings",
         "Configuration": "AC Charger Configuration",
         "EnableHuawei": "Enable Huawei R4850G2 on CAN Bus Interface",
@@ -831,8 +838,8 @@
         "lowerPowerLimit": "Minimum output power",
         "upperPowerLimit": "Maximum output power",
         "Seconds": "@:base.Seconds"
-      },
-      "battery": {
+    },
+    "battery": {
         "battery": "Battery",
         "DataAge": "Data Age: ",
         "Seconds": " {val} seconds",
@@ -903,5 +910,5 @@
         "instantaneousPower": "Instantaneous Power",
         "consumedAmpHours": "Consumed Amp Hours",
         "lastFullCharge": "Last full Charge"
-      }
+    }
 }
