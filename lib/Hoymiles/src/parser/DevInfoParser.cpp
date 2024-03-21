@@ -204,7 +204,7 @@ bool DevInfoParser::containsValidData() const
     struct tm info;
     localtime_r(&t, &info);
 
-    return info.tm_year > (2016 - 1900) || getHwPartNumber() == 124097;
+    return info.tm_year > (2016 - 1900) && getHwPartNumber() != 124097;
 }
 
 uint8_t DevInfoParser::getDevIdx() const
