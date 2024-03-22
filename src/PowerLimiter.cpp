@@ -72,8 +72,8 @@ void PowerLimiterClass::announceStatus(PowerLimiterClass::Status status)
     // should just be silent while it is disabled.
     if (status == Status::DisabledByConfig && _lastStatus == status) { return; }
 
-    MessageOutput.printf("[%11.3f] DPL: %s\r\n",
-        static_cast<double>(millis())/1000, getStatusText(status).data());
+    MessageOutput.printf("[DPL::announceStatus] %s\r\n",
+        getStatusText(status).data());
 
     _lastStatus = status;
     _lastStatusPrinted = millis();
@@ -266,14 +266,7 @@ void PowerLimiterClass::loop()
 
     _batteryDischargeEnabled = getBatteryPower();
 
-    auto logging = [this,&config]() -> void {
-        MessageOutput.printf("[DPL::loop] PowerMeter: %d W, target consumption: %d W, solar power: %d W\r\n",
-                static_cast<int32_t>(round(PowerMeter.getPowerTotal())),
-                config.PowerLimiter.TargetPowerConsumption,
-                getSolarPower());
-
-        if (config.PowerLimiter.IsInverterSolarPowered) { return; }
-
+    if (_verboseLogging && !config.PowerLimiter.IsInverterSolarPowered) {
         MessageOutput.printf("[DPL::loop] battery interface %s, SoC: %d %%, StartTH: %d %%, StopTH: %d %%, SoC age: %d s, ignore: %s\r\n",
                 (config.Battery.Enabled?"enabled":"disabled"),
                 Battery.getStats()->getSoC(),
@@ -288,18 +281,12 @@ void PowerLimiterClass::loop()
                 config.PowerLimiter.VoltageStartThreshold,
                 config.PowerLimiter.VoltageStopThreshold);
 
-        MessageOutput.printf("[DPL::loop] StartTH reached: %s, StopTH reached: %s, inverter %s producing\r\n",
+        MessageOutput.printf("[DPL::loop] StartTH reached: %s, StopTH reached: %s, SolarPT %sabled, use at night: %s\r\n",
                 (isStartThresholdReached()?"yes":"no"),
                 (isStopThresholdReached()?"yes":"no"),
-                (_inverter->isProducing()?"is":"is NOT"));
-
-        MessageOutput.printf("[DPL::loop] battery discharging %s, SolarPT %s, use at night: %i\r\n",
-                (_batteryDischargeEnabled?"allowed":"prevented"),
-                (config.PowerLimiter.SolarPassThroughEnabled?"enabled":"disabled"),
-                config.PowerLimiter.BatteryAlwaysUseAtNight);
+                (config.PowerLimiter.SolarPassThroughEnabled?"en":"dis"),
+                (config.PowerLimiter.BatteryAlwaysUseAtNight?"yes":"no"));
     };
-
-    if (_verboseLogging) { logging(); }
 
     // Calculate and set Power Limit (NOTE: might reset _inverter to nullptr!)
     bool limitUpdated = calcPowerLimit(_inverter, getSolarPower(), _batteryDischargeEnabled);
@@ -325,7 +312,7 @@ void PowerLimiterClass::loop()
 float PowerLimiterClass::getBatteryVoltage(bool log) {
     if (!_inverter) {
         // there should be no need to call this method if no target inverter is known
-        MessageOutput.println("DPL getBatteryVoltage: no inverter (programmer error)");
+        MessageOutput.println("[DPL::getBatteryVoltage] no inverter (programmer error)");
         return 0.0;
     }
 
@@ -426,7 +413,12 @@ uint8_t PowerLimiterClass::getPowerLimiterState() {
 
 bool PowerLimiterClass::calcPowerLimit(std::shared_ptr<InverterAbstract> inverter, int32_t solarPowerDC, bool batteryPower)
 {
-    if (solarPowerDC == 0 && !batteryPower) {
+    if (_verboseLogging) {
+        MessageOutput.printf("[DPL::calcPowerLimit] battery use %s, solar power (DC): %d W\r\n",
+                (batteryPower?"allowed":"prevented"), solarPowerDC);
+    }
+
+    if (solarPowerDC <= 0 && !batteryPower) {
         return shutdown(Status::NoEnergy);
     }
 
@@ -439,17 +431,31 @@ bool PowerLimiterClass::calcPowerLimit(std::shared_ptr<InverterAbstract> inverte
         return shutdown(Status::HuaweiPsu);
     }
 
-    int32_t newPowerLimit = round(PowerMeter.getPowerTotal());
+    auto powerMeter = static_cast<int32_t>(PowerMeter.getPowerTotal());
+
+    auto inverterOutput = static_cast<int32_t>(inverter->Statistics()->getChannelFieldValue(TYPE_AC, CH0, FLD_PAC));
+
+    auto solarPowerAC = inverterPowerDcToAc(inverter, solarPowerDC);
 
     auto const& config = Configuration.get();
+
+    if (_verboseLogging) {
+        MessageOutput.printf("[DPL::calcPowerLimit] power meter: %d W, "
+                "target consumption: %d W, inverter output: %d W, solar power (AC): %d\r\n",
+                powerMeter,
+                config.PowerLimiter.TargetPowerConsumption,
+                inverterOutput,
+                solarPowerAC);
+    }
+
+    auto newPowerLimit = powerMeter;
 
     if (config.PowerLimiter.IsInverterBehindPowerMeter) {
         // If the inverter the behind the power meter (part of measurement),
         // the produced power of this inverter has also to be taken into account.
         // We don't use FLD_PAC from the statistics, because that
         // data might be too old and unreliable.
-        auto acPower = inverter->Statistics()->getChannelFieldValue(TYPE_AC, CH0, FLD_PAC);
-        newPowerLimit += acPower;
+        newPowerLimit += inverterOutput;
     }
 
     // We're not trying to hit 0 exactly but take an offset into account
@@ -457,22 +463,34 @@ bool PowerLimiterClass::calcPowerLimit(std::shared_ptr<InverterAbstract> inverte
     // Case 3
     newPowerLimit -= config.PowerLimiter.TargetPowerConsumption;
 
-    int32_t solarPowerAC = inverterPowerDcToAc(inverter, solarPowerDC);
-
     if (!batteryPower) {
+        newPowerLimit = std::min(newPowerLimit, solarPowerAC);
+
         // do not drain the battery. use as much power as needed to match the
         // household consumption, but not more than the available solar power.
         if (_verboseLogging) {
-            MessageOutput.printf("[DPL::loop] Consuming Solar Power Only -> solarPowerAC: %d W, newPowerLimit: %d W\r\n",
-                solarPowerAC, newPowerLimit);
+            MessageOutput.printf("[DPL::calcPowerLimit] limited to solar power: %d W\r\n",
+                newPowerLimit);
         }
 
-        return setNewPowerLimit(inverter, std::min(newPowerLimit, solarPowerAC));
+        return setNewPowerLimit(inverter, newPowerLimit);
     }
 
     // convert all solar power if full solar-passthrough is active
     if (useFullSolarPassthrough()) {
-        return setNewPowerLimit(inverter, std::max(newPowerLimit, solarPowerAC));
+        newPowerLimit = std::max(newPowerLimit, solarPowerAC);
+
+        if (_verboseLogging) {
+            MessageOutput.printf("[DPL::calcPowerLimit] full solar-passthrough active: %d W\r\n",
+                newPowerLimit);
+        }
+
+        return setNewPowerLimit(inverter, newPowerLimit);
+    }
+
+    if (_verboseLogging) {
+        MessageOutput.printf("[DPL::calcPowerLimit] match power meter with limit of %d W\r\n",
+            newPowerLimit);
     }
 
     return setNewPowerLimit(inverter, newPowerLimit);
@@ -566,7 +584,7 @@ bool PowerLimiterClass::updateInverter()
         uint32_t lastLimitCommandMillis = _inverter->SystemConfigPara()->getLastUpdateCommand();
         if ((lastLimitCommandMillis - *_oUpdateStartMillis) < halfOfAllMillis &&
                 CMD_OK == lastLimitCommandState) {
-            MessageOutput.printf("[DPL:updateInverter] actual limit is %.1f %% "
+            MessageOutput.printf("[DPL::updateInverter] actual limit is %.1f %% "
                     "(%.0f W respectively), effective %d ms after update started, "
                     "requested were %.1f %%\r\n",
                     currentRelativeLimit,
@@ -575,7 +593,7 @@ bool PowerLimiterClass::updateInverter()
                     newRelativeLimit);
 
             if (std::abs(newRelativeLimit - currentRelativeLimit) > 2.0) {
-                MessageOutput.printf("[DPL:updateInverter] NOTE: expected limit of %.1f %% "
+                MessageOutput.printf("[DPL::updateInverter] NOTE: expected limit of %.1f %% "
                         "and actual limit of %.1f %% mismatch by more than 2 %%, "
                         "is the DPL in exclusive control over the inverter?\r\n",
                         newRelativeLimit, currentRelativeLimit);
@@ -652,9 +670,10 @@ static int32_t scalePowerLimit(std::shared_ptr<InverterAbstract> inverter, int32
 
     if (dcProdChnls == 0 || dcProdChnls == dcTotalChnls) { return newLimit; }
 
-    MessageOutput.printf("[DPL::scalePowerLimit] %d channels total, %d producing "
-            "channels, scaling power limit\r\n", dcTotalChnls, dcProdChnls);
-    return round(newLimit * static_cast<float>(dcTotalChnls) / dcProdChnls);
+    auto scaled = static_cast<int32_t>(newLimit * static_cast<float>(dcTotalChnls) / dcProdChnls);
+    MessageOutput.printf("[DPL::scalePowerLimit] %d/%d channels are producing, "
+            "scaling from %d to %d W\r\n", dcProdChnls, dcTotalChnls, newLimit, scaled);
+    return scaled;
 }
 
 /**
@@ -666,13 +685,22 @@ static int32_t scalePowerLimit(std::shared_ptr<InverterAbstract> inverter, int32
 bool PowerLimiterClass::setNewPowerLimit(std::shared_ptr<InverterAbstract> inverter, int32_t newPowerLimit)
 {
     auto const& config = Configuration.get();
+    auto lowerLimit = config.PowerLimiter.LowerPowerLimit;
+    auto upperLimit = config.PowerLimiter.UpperPowerLimit;
+    auto hysteresis = config.PowerLimiter.TargetPowerConsumptionHysteresis;
 
-    if (newPowerLimit < config.PowerLimiter.LowerPowerLimit) {
+    if (_verboseLogging) {
+        MessageOutput.printf("[DPL::setNewPowerLimit] input limit: %d W, "
+                "lower limit: %d W, upper limit: %d W, hysteresis: %d W\r\n",
+                newPowerLimit, lowerLimit, upperLimit, hysteresis);
+    }
+
+    if (newPowerLimit < lowerLimit) {
         return shutdown(Status::CalculatedLimitBelowMinLimit);
     }
 
     // enforce configured upper power limit
-    int32_t effPowerLimit = std::min(newPowerLimit, config.PowerLimiter.UpperPowerLimit);
+    int32_t effPowerLimit = std::min(newPowerLimit, upperLimit);
 
     // early in the loop we make it a pre-requisite that this
     // value is non-zero, so we can assume it to be valid.
@@ -686,12 +714,12 @@ bool PowerLimiterClass::setNewPowerLimit(std::shared_ptr<InverterAbstract> inver
     effPowerLimit = std::min<int32_t>(effPowerLimit, maxPower);
 
     auto diff = std::abs(currentLimitAbs - effPowerLimit);
-    auto hysteresis = config.PowerLimiter.TargetPowerConsumptionHysteresis;
 
     if (_verboseLogging) {
-        MessageOutput.printf("[DPL::setNewPowerLimit] calculated: %d W, "
-                "requesting: %d W, reported: %d W, diff: %d W, hysteresis: %d W\r\n",
-                newPowerLimit, effPowerLimit, currentLimitAbs, diff, hysteresis);
+        MessageOutput.printf("[DPL::setNewPowerLimit] inverter max: %d W, "
+                "inverter %s producing, requesting: %d W, reported: %d W, "
+                "diff: %d W\r\n", maxPower, (inverter->isProducing()?"is":"is NOT"),
+                effPowerLimit, currentLimitAbs, diff);
     }
 
     if (diff > hysteresis) {
@@ -728,7 +756,7 @@ float PowerLimiterClass::getLoadCorrectedVoltage()
 {
     if (!_inverter) {
         // there should be no need to call this method if no target inverter is known
-        MessageOutput.println("DPL getLoadCorrectedVoltage: no inverter (programmer error)");
+        MessageOutput.println("[DPL::getLoadCorrectedVoltage] no inverter (programmer error)");
         return 0.0;
     }
 
