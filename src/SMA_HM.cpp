@@ -135,10 +135,10 @@ uint8_t* SMA_HMClass::decodeGroup(uint8_t* offset, uint16_t grouplen)
             }
 
             if (count == 8) {
-                _powerMeterPower = Peinspeisung - Pbezug;
-                _powerMeterL1 = EinspeisungL1 - BezugL1;
-                _powerMeterL2 = EinspeisungL2 - BezugL2;
-                _powerMeterL3 = EinspeisungL3 - BezugL3;
+                _powerMeterPower = Pbezug - Peinspeisung;
+                _powerMeterL1 = BezugL1 - EinspeisungL1;
+                _powerMeterL2 = BezugL2 - EinspeisungL2;
+                _powerMeterL3 = BezugL3 - EinspeisungL3;
                 Soutput(kanal, index, art, tarif, "Leistung", _powerMeterPower, timestamp);
                 Soutput(kanal, index, art, tarif, "Leistung L1", _powerMeterL1, timestamp);
                 Soutput(kanal, index, art, tarif, "Leistung L2", _powerMeterL2, timestamp);
