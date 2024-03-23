@@ -62,7 +62,8 @@ bool WebApiWsVedirectLiveClass::hasUpdate(size_t idx)
 
 uint16_t WebApiWsVedirectLiveClass::responseSize() const
 {
-    return VictronMppt.controllerAmount() * (1024 + 128);
+    // estimated with ArduinoJson assistant
+    return VictronMppt.controllerAmount() * (1024 + 512) + 128/*DPL status and structure*/;
 }
 
 void WebApiWsVedirectLiveClass::sendDataTaskCb()
