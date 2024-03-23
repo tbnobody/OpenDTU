@@ -38,6 +38,13 @@ bool HttpPowerMeterClass::updateValues()
                 MessageOutput.printf("%s\r\n", httpPowerMeterError);
                 return false;
             }
+            continue;
+        }
+
+        if(!tryGetFloatValueForPhase(i, phaseConfig.JsonPath)) {
+            MessageOutput.printf("[HttpPowerMeter] Getting the power of phase %d (from JSON fetched with Phase 1 config) failed.\r\n", i + 1);
+            MessageOutput.printf("%s\r\n", httpPowerMeterError);
+            return false;
         }
     }
     return true;
