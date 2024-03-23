@@ -22,18 +22,14 @@ void WebApiPowerLimiterClass::init(AsyncWebServer& server, Scheduler& scheduler)
     _server->on("/api/powerlimiter/status", HTTP_GET, std::bind(&WebApiPowerLimiterClass::onStatus, this, _1));
     _server->on("/api/powerlimiter/config", HTTP_GET, std::bind(&WebApiPowerLimiterClass::onAdminGet, this, _1));
     _server->on("/api/powerlimiter/config", HTTP_POST, std::bind(&WebApiPowerLimiterClass::onAdminPost, this, _1));
+    _server->on("/api/powerlimiter/metadata", HTTP_GET, std::bind(&WebApiPowerLimiterClass::onMetaData, this, _1));
 }
 
 void WebApiPowerLimiterClass::onStatus(AsyncWebServerRequest* request)
 {
     auto const& config = Configuration.get();
 
-    size_t invAmount = 0;
-    for (uint8_t i = 0; i < INV_MAX_COUNT; i++) {
-        if (config.Inverter[i].Serial != 0) { ++invAmount; }
-    }
-
-    AsyncJsonResponse* response = new AsyncJsonResponse(false, 1024 + 384 * invAmount);
+    AsyncJsonResponse* response = new AsyncJsonResponse(false, 512);
     auto& root = response->getRoot();
 
     root["enabled"] = config.PowerLimiter.Enabled;
@@ -60,12 +56,29 @@ void WebApiPowerLimiterClass::onStatus(AsyncWebServerRequest* request)
     root["full_solar_passthrough_start_voltage"] = static_cast<int>(config.PowerLimiter.FullSolarPassThroughStartVoltage * 100 + 0.5) / 100.0;
     root["full_solar_passthrough_stop_voltage"] = static_cast<int>(config.PowerLimiter.FullSolarPassThroughStopVoltage * 100 + 0.5) / 100.0;
 
-    JsonObject metadata = root.createNestedObject("metadata");
-    metadata["power_meter_enabled"] = config.PowerMeter.Enabled;
-    metadata["battery_enabled"] = config.Battery.Enabled;
-    metadata["charge_controller_enabled"] = config.Vedirect.Enabled;
+    response->setLength();
+    request->send(response);
+}
 
-    JsonObject inverters = metadata.createNestedObject("inverters");
+void WebApiPowerLimiterClass::onMetaData(AsyncWebServerRequest* request)
+{
+    if (!WebApi.checkCredentials(request)) { return; }
+
+    auto const& config = Configuration.get();
+
+    size_t invAmount = 0;
+    for (uint8_t i = 0; i < INV_MAX_COUNT; i++) {
+        if (config.Inverter[i].Serial != 0) { ++invAmount; }
+    }
+
+    AsyncJsonResponse* response = new AsyncJsonResponse(false, 256 + 256 * invAmount);
+    auto& root = response->getRoot();
+
+    root["power_meter_enabled"] = config.PowerMeter.Enabled;
+    root["battery_enabled"] = config.Battery.Enabled;
+    root["charge_controller_enabled"] = config.Vedirect.Enabled;
+
+    JsonObject inverters = root.createNestedObject("inverters");
     for (uint8_t i = 0; i < INV_MAX_COUNT; i++) {
         if (config.Inverter[i].Serial == 0) { continue; }
 

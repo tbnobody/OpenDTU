@@ -57,7 +57,7 @@
                     <div class="col-sm-8">
                         <select id="inverter_serial" class="form-select" v-model="powerLimiterConfigList.inverter_serial" required>
                             <option value="" disabled hidden selected>{{ $t('powerlimiteradmin.SelectInverter') }}</option>
-                            <option v-for="(inv, serial) in powerLimiterConfigList.metadata.inverters" :key="serial" :value="serial">
+                            <option v-for="(inv, serial) in powerLimiterMetaData.inverters" :key="serial" :value="serial">
                                 {{ inv.name }} ({{ inv.type }})
                             </option>
                         </select>
@@ -74,7 +74,7 @@
                     </label>
                     <div class="col-sm-8">
                         <select id="inverter_channel" class="form-select" v-model="powerLimiterConfigList.inverter_channel_id">
-                            <option v-for="channel in range(powerLimiterConfigList.metadata.inverters[powerLimiterConfigList.inverter_serial].channels)" :key="channel" :value="channel">
+                            <option v-for="channel in range(powerLimiterMetaData.inverters[powerLimiterConfigList.inverter_serial].channels)" :key="channel" :value="channel">
                                 {{ channel + 1 }}
                             </option>
                         </select>
@@ -194,7 +194,7 @@
                 <div class="alert alert-secondary" role="alert" v-html="$t('powerlimiteradmin.VoltageLoadCorrectionInfo')"></div>
             </CardElement>
 
-            <FormFooter @reload="getPowerLimiterConfig"/>
+            <FormFooter @reload="getAllData"/>
         </form>
     </BasePage>
 </template>
@@ -208,7 +208,7 @@ import CardElement from '@/components/CardElement.vue';
 import FormFooter from '@/components/FormFooter.vue';
 import InputElement from '@/components/InputElement.vue';
 import { BIconInfoCircle } from 'bootstrap-icons-vue';
-import type { PowerLimiterConfig } from "@/types/PowerLimiterConfig";
+import type { PowerLimiterConfig, PowerLimiterMetaData } from "@/types/PowerLimiterConfig";
 
 export default defineComponent({
     components: {
@@ -223,6 +223,7 @@ export default defineComponent({
         return {
             dataLoading: true,
             powerLimiterConfigList: {} as PowerLimiterConfig,
+            powerLimiterMetaData: {} as PowerLimiterMetaData,
             alertMessage: "",
             alertType: "info",
             showAlert: false,
@@ -230,17 +231,18 @@ export default defineComponent({
         };
     },
     created() {
-        this.getPowerLimiterConfig();
+        this.getAllData();
     },
     watch: {
         'powerLimiterConfigList.inverter_serial'(newVal) {
             var cfg = this.powerLimiterConfigList;
+            var meta = this.powerLimiterMetaData;
 
             if (newVal === "") { return; } // do not try to convert the placeholder value
 
-            if (cfg.metadata.inverters[newVal] !== undefined) { return; }
+            if (meta.inverters[newVal] !== undefined) { return; }
 
-            for (const [serial, inverter] of Object.entries(cfg.metadata.inverters)) {
+            for (const [serial, inverter] of Object.entries(meta.inverters)) {
                 // cfg.inverter_serial might be too large to parse as a 32 bit
                 // int, so we make sure to only try to parse two characters. if
                 // cfg.inverter_serial is indeed an old position based index,
@@ -261,30 +263,31 @@ export default defineComponent({
     methods: {
         getConfigHints() {
             var cfg = this.powerLimiterConfigList;
+            var meta = this.powerLimiterMetaData;
             var hints = [];
 
-            if (cfg.metadata.power_meter_enabled !== true) {
+            if (meta.power_meter_enabled !== true) {
                 hints.push({severity: "requirement", subject: "PowerMeterDisabled"});
                 this.configAlert = true;
             }
 
-            if (typeof cfg.metadata.inverters === "undefined" || Object.keys(cfg.metadata.inverters).length == 0) {
+            if (typeof meta.inverters === "undefined" || Object.keys(meta.inverters).length == 0) {
                 hints.push({severity: "requirement", subject: "NoInverter"});
                 this.configAlert = true;
             }
             else {
-                var inv = cfg.metadata.inverters[cfg.inverter_serial];
+                var inv = meta.inverters[cfg.inverter_serial];
                 if (inv !== undefined && !(inv.poll_enable && inv.command_enable && inv.poll_enable_night && inv.command_enable_night)) {
                     hints.push({severity: "requirement", subject: "InverterCommunication"});
                 }
             }
 
             if (!cfg.is_inverter_solar_powered) {
-                if (!cfg.metadata.charge_controller_enabled) {
+                if (!meta.charge_controller_enabled) {
                     hints.push({severity: "optional", subject: "NoChargeController"});
                 }
 
-                if (!cfg.metadata.battery_enabled) {
+                if (!meta.battery_enabled) {
                     hints.push({severity: "optional", subject: "NoBatteryInterface"});
                 }
             }
@@ -296,13 +299,15 @@ export default defineComponent({
         },
         canUseSolarPassthrough() {
             var cfg = this.powerLimiterConfigList;
-            var canUse = this.isEnabled() && cfg.metadata.charge_controller_enabled && !cfg.is_inverter_solar_powered;
+            var meta = this.powerLimiterMetaData;
+            var canUse = this.isEnabled() && meta.charge_controller_enabled && !cfg.is_inverter_solar_powered;
             if (!canUse) { cfg.solar_passthrough_enabled = false; }
             return canUse;
         },
         canUseSoCThresholds() {
             var cfg = this.powerLimiterConfigList;
-            return this.isEnabled() && cfg.metadata.battery_enabled && !cfg.is_inverter_solar_powered;
+            var meta = this.powerLimiterMetaData;
+            return this.isEnabled() && meta.battery_enabled && !cfg.is_inverter_solar_powered;
         },
         canUseVoltageThresholds() {
             var cfg = this.powerLimiterConfigList;
@@ -316,6 +321,7 @@ export default defineComponent({
         },
         needsChannelSelection() {
             var cfg = this.powerLimiterConfigList;
+            var meta = this.powerLimiterMetaData;
 
             var reset = function() {
                 cfg.inverter_channel_id = 0;
@@ -326,7 +332,7 @@ export default defineComponent({
 
             if (cfg.is_inverter_solar_powered) { return reset(); }
 
-            var inverter = cfg.metadata.inverters[cfg.inverter_serial];
+            var inverter = meta.inverters[cfg.inverter_serial];
             if (inverter === undefined) { return reset(); }
 
             if (cfg.inverter_channel_id >= inverter.channels) {
@@ -335,24 +341,25 @@ export default defineComponent({
 
             return inverter.channels > 1;
         },
-        getPowerLimiterConfig() {
+        getAllData() {
             this.dataLoading = true;
-            fetch("/api/powerlimiter/config", { headers: authHeader() })
+            fetch("/api/powerlimiter/metadata", { headers: authHeader() })
                 .then((response) => handleResponse(response, this.$emitter, this.$router))
                 .then((data) => {
-                    this.powerLimiterConfigList = data;
-                    this.dataLoading = false;
+                    this.powerLimiterMetaData = data;
+                    fetch("/api/powerlimiter/config", { headers: authHeader() })
+                        .then((response) => handleResponse(response, this.$emitter, this.$router))
+                        .then((data) => {
+                            this.powerLimiterConfigList = data;
+                            this.dataLoading = false;
+                        });
                 });
         },
         savePowerLimiterConfig(e: Event) {
             e.preventDefault();
 
             const formData = new FormData();
-            formData.append("data", JSON.stringify(this.powerLimiterConfigList, (key, value) => {
-                // do not submit metadata
-                if (key === "metadata") { return undefined; }
-                return value;
-            }));
+            formData.append("data", JSON.stringify(this.powerLimiterConfigList));
 
             fetch("/api/powerlimiter/config", {
                 method: "POST",
