@@ -45,12 +45,12 @@ class BatteryStats {
         void setSoC(float soc, uint8_t precision, uint32_t timestamp) {
             _soc = soc;
             _socPrecision = precision;
-            _lastUpdateSoC = timestamp;
+            _lastUpdateSoC = _lastUpdate = timestamp;
         }
 
         void setVoltage(float voltage, uint32_t timestamp) {
             _voltage = voltage;
-            _lastUpdateVoltage = timestamp;
+            _lastUpdateVoltage = _lastUpdate = timestamp;
         }
 
         String _manufacturer = "unknown";

@@ -53,6 +53,8 @@ static void addLiveViewAlarm(JsonVariant& root, std::string const& name,
 
 bool BatteryStats::updateAvailable(uint32_t since) const
 {
+    if (_lastUpdate == 0) { return false; } // no data at all processed yet
+
     auto constexpr halfOfAllMillis = std::numeric_limits<uint32_t>::max() / 2;
     return (_lastUpdate - since) < halfOfAllMillis;
 }
