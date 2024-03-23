@@ -130,7 +130,10 @@ void WebApiWsVedirectLiveClass::generateJsonResponse(JsonVariant& root, bool ful
 
         VeDirectMpptController::spData_t &spMpptData = spOptMpptData.value();
 
-        const JsonObject &nested = array.createNestedObject(spMpptData->SER);
+        String serial(spMpptData->SER);
+        if (serial.isEmpty()) { continue; } // serial required as index
+
+        const JsonObject &nested = array.createNestedObject(serial);
         nested["data_age_ms"] = VictronMppt.getDataAgeMillis(idx);
         populateJson(nested, spMpptData);
         _lastPublish = millis();
