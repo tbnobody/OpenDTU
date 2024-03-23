@@ -25,7 +25,7 @@ private:
     String extractParam(String& authReq, const String& param, const char delimit);
     String getcNonce(const int len);
     String getDigestAuth(String& authReq, const String& username, const String& password, const String& method, const String& uri, unsigned int counter);
-    bool tryGetFloatValueForPhase(int phase, int httpCode, const char* jsonPath);
+    bool tryGetFloatValueForPhase(int phase, const char* jsonPath);
     void prepareRequest(uint32_t timeout, const char* httpHeader, const char* httpValue);    
     String sha256(const String& data);    
 };

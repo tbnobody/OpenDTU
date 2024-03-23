@@ -139,9 +139,21 @@ bool HttpPowerMeterClass::httpRequest(int phase, WiFiClient &wifiClient, const S
             httpCode = httpClient.GET();
         }
     }
-    bool result = tryGetFloatValueForPhase(phase, httpCode, jsonPath);
+
+    if (httpCode <= 0) {
+        snprintf_P(httpPowerMeterError, sizeof(httpPowerMeterError), PSTR("HTTP Error %s"), httpClient.errorToString(httpCode).c_str());
+        return false;
+    }
+
+    if (httpCode != HTTP_CODE_OK) {
+        snprintf_P(httpPowerMeterError, sizeof(httpPowerMeterError), PSTR("Bad HTTP code: %d"), httpCode);
+        return false;
+    }
+
+    httpResponse = httpClient.getString(); // very unfortunate that we cannot parse WifiClient stream directly
     httpClient.end();
-    return result;
+
+    return tryGetFloatValueForPhase(phase, jsonPath);
 }
 
 String HttpPowerMeterClass::extractParam(String& authReq, const String& param, const char delimit) {
@@ -199,27 +211,18 @@ String HttpPowerMeterClass::getDigestAuth(String& authReq, const String& usernam
     return authorization;
 }
 
-bool HttpPowerMeterClass::tryGetFloatValueForPhase(int phase, int httpCode, const char* jsonPath)
+bool HttpPowerMeterClass::tryGetFloatValueForPhase(int phase, const char* jsonPath)
 {
-    bool success = false;
-    if (httpCode == HTTP_CODE_OK) {
-        httpResponse = httpClient.getString();     //very unfortunate that we cannot parse WifiClient stream directly
-        FirebaseJson json;
-        json.setJsonData(httpResponse);
-        FirebaseJsonData value;
-        if (!json.get(value, jsonPath)) {
-            snprintf_P(httpPowerMeterError, sizeof(httpPowerMeterError), PSTR("[HttpPowerMeter] Couldn't find a value for phase %i with Json query \"%s\""), phase, jsonPath);
-        }else {
-            power[phase] = value.to<float>();
-            //MessageOutput.printf("Power for Phase %i: %5.2fW\r\n", phase, power[phase]);
-            success = true;
-        }
-    } else if (httpCode <= 0) {
-        snprintf_P(httpPowerMeterError, sizeof(httpPowerMeterError), PSTR("HTTP Error %s"), httpClient.errorToString(httpCode).c_str());
-    } else if (httpCode != HTTP_CODE_OK) {
-        snprintf_P(httpPowerMeterError, sizeof(httpPowerMeterError), PSTR("Bad HTTP code: %d"), httpCode);
+    FirebaseJson json;
+    json.setJsonData(httpResponse);
+    FirebaseJsonData value;
+    if (!json.get(value, jsonPath)) {
+        snprintf_P(httpPowerMeterError, sizeof(httpPowerMeterError), PSTR("[HttpPowerMeter] Couldn't find a value for phase %i with Json query \"%s\""), phase, jsonPath);
+        return false;
     }
-    return success;
+
+    power[phase] = value.to<float>();
+    return true;
 }
 
 //extract url component as done by httpClient::begin(String url, const char* expectedProtocol) https://github.com/espressif/arduino-esp32/blob/da6325dd7e8e152094b19fe63190907f38ef1ff0/libraries/HTTPClient/src/HTTPClient.cpp#L250
