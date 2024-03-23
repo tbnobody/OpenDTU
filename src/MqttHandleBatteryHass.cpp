@@ -173,6 +173,8 @@ void MqttHandleBatteryHassClass::publishSensor(const char* caption, const char* 
         root["stat_cla"] = stateClass;
     }
 
+    if (Utils::checkJsonOverflow(root, __FUNCTION__, __LINE__)) { return; }
+
     char buffer[512];
     serializeJson(root, buffer);
     publish(configTopic, buffer);
@@ -215,6 +217,8 @@ void MqttHandleBatteryHassClass::publishBinarySensor(const char* caption, const 
 
     JsonObject deviceObj = root.createNestedObject("dev");
     createDeviceInfo(deviceObj);
+
+    if (Utils::checkJsonOverflow(root, __FUNCTION__, __LINE__)) { return; }
 
     char buffer[512];
     serializeJson(root, buffer);

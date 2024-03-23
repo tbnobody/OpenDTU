@@ -123,6 +123,8 @@ void WebApiWsLiveClass::sendOnBatteryStats()
 
     if (root.isNull()) { return; }
 
+    if (Utils::checkJsonOverflow(root, __FUNCTION__, __LINE__)) { return; }
+
     String buffer;
     serializeJson(root, buffer);
 

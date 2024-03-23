@@ -67,6 +67,8 @@ void WebApiWsBatteryLiveClass::sendDataTaskCb()
             JsonVariant var = root;
             generateJsonResponse(var);
 
+            if (Utils::checkJsonOverflow(root, __FUNCTION__, __LINE__)) { return; }
+
             // battery provider does not generate a card, e.g., MQTT provider
             if (root.isNull()) { return; }
 

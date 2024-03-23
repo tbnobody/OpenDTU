@@ -91,6 +91,8 @@ void WebApiWsVedirectLiveClass::sendDataTaskCb()
                 JsonVariant var = root;
                 generateJsonResponse(var, fullUpdate);
 
+                if (Utils::checkJsonOverflow(root, __FUNCTION__, __LINE__)) { return; }
+
                 String buffer;
                 serializeJson(root, buffer);
 

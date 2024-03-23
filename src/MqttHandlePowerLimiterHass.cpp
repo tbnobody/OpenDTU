@@ -133,6 +133,8 @@ void MqttHandlePowerLimiterHassClass::publishSelect(
     JsonObject deviceObj = root.createNestedObject("dev");
     createDeviceInfo(deviceObj);
 
+    if (Utils::checkJsonOverflow(root, __FUNCTION__, __LINE__)) { return; }
+
     String buffer;
     serializeJson(root, buffer);
     publish(configTopic, buffer);
@@ -178,6 +180,8 @@ void MqttHandlePowerLimiterHassClass::publishNumber(
 
     JsonObject deviceObj = root.createNestedObject("dev");
     createDeviceInfo(deviceObj);
+
+    if (Utils::checkJsonOverflow(root, __FUNCTION__, __LINE__)) { return; }
 
     String buffer;
     serializeJson(root, buffer);
