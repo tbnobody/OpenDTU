@@ -6,21 +6,11 @@
 #include <Arduino.h>
 #include <map>
 #include <list>
+#include <mutex>
 #include "SDM.h"
 #include "sml.h"
 #include <TaskSchedulerDeclarations.h>
-
-#ifndef SDM_RX_PIN
-#define SDM_RX_PIN 13
-#endif
-
-#ifndef SDM_TX_PIN
-#define SDM_TX_PIN 32
-#endif
-
-#ifndef SML_RX_PIN
-#define SML_RX_PIN 35
-#endif
+#include <SoftwareSerial.h>
 
 typedef struct {
   const unsigned char OBIS[6];
@@ -30,12 +20,13 @@ typedef struct {
 
 class PowerMeterClass {
 public:
-    enum SOURCE {
-        SOURCE_MQTT = 0,
-        SOURCE_SDM1PH = 1,
-        SOURCE_SDM3PH = 2,
-        SOURCE_HTTP = 3,
-        SOURCE_SML = 4
+    enum class Source : unsigned {
+        MQTT = 0,
+        SDM1PH = 1,
+        SDM3PH = 2,
+        HTTP = 3,
+        SML = 4,
+        SMAHM2 = 5
     };
     void init(Scheduler& scheduler);
     float getPowerTotal(bool forceUpdate = true);
@@ -48,7 +39,7 @@ private:
     void onMqttMessage(const espMqttClientTypes::MessageProperties& properties,
         const char* topic, const uint8_t* payload, size_t len, size_t index, size_t total);
 
-     Task _loopTask;
+    Task _loopTask;
 
     bool _verboseLogging = true;
     uint32_t _lastPowerMeterCheck;
@@ -65,6 +56,11 @@ private:
     float _powerMeterExport = 0.0;
 
     std::map<String, float*> _mqttSubscriptions;
+
+    mutable std::mutex _mutex;
+
+    std::unique_ptr<SDM> _upSdm = nullptr;
+    std::unique_ptr<SoftwareSerial> _upSmlSerial = nullptr;
 
     void readPowerMeter();
 

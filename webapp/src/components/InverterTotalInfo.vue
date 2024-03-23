@@ -73,7 +73,7 @@
   </div>
   <div v-show="totalBattData.enabled || powerMeterData.enabled || huaweiData.enabled">
     <div class="row row-cols-1 row-cols-md-3 g-3">
-      <div class="col" v-show="totalBattData.enabled">
+      <div class="col" v-if="totalBattData.enabled">
             <CardElement centerContent textVariant="text-bg-success" :text="$t('invertertotalinfo.BatterySoc')">
                 <h2>
                     {{ $n(totalBattData.soc.v, 'decimal', {
@@ -84,7 +84,7 @@
                 </h2>
             </CardElement>
       </div>
-      <div class="col" v-show="powerMeterData.enabled">
+      <div class="col" v-if="powerMeterData.enabled">
             <CardElement centerContent textVariant="text-bg-success" :text="$t('invertertotalinfo.HomePower')">
                 <h2>
                     {{ $n(powerMeterData.Power.v, 'decimal', {
@@ -95,7 +95,7 @@
                 </h2>
             </CardElement>
       </div>
-      <div class="col" v-show="huaweiData.enabled">
+      <div class="col" v-if="huaweiData.enabled">
             <CardElement centerContent textVariant="text-bg-success" :text="$t('invertertotalinfo.HuaweiPower')">
                 <h2>
                     {{ $n(huaweiData.Power.v, 'decimal', {

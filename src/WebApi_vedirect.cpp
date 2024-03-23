@@ -10,6 +10,7 @@
 #include "WebApi.h"
 #include "WebApi_errors.h"
 #include "helper.h"
+#include "MqttHandlePowerLimiterHass.h"
 
 void WebApiVedirectClass::init(AsyncWebServer& server, Scheduler& scheduler)
 {
@@ -118,4 +119,7 @@ void WebApiVedirectClass::onVedirectAdminPost(AsyncWebServerRequest* request)
     request->send(response);
 
     VictronMppt.updateSettings();
+
+    // potentially make solar passthrough thresholds auto-discoverable
+    MqttHandlePowerLimiterHass.forceUpdate();
 }

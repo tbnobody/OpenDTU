@@ -39,7 +39,7 @@ class VeDirectMpptController : public VeDirectFrameHandler {
 public:
     VeDirectMpptController() = default;
 
-    void init(int8_t rx, int8_t tx, Print* msgOut, bool verboseLogging);
+    void init(int8_t rx, int8_t tx, Print* msgOut, bool verboseLogging, uint16_t hwSerialPort);
     bool isDataValid() const;                        // return true if data valid and not outdated
 
     struct veMpptStruct : veStruct {
@@ -49,7 +49,7 @@ public:
         double VPV;                     // panel voltage in V
         double IPV;                     // panel current in A (calculated)
         bool LOAD;                      // virtual load output state (on if battery voltage reaches upper limit, off if battery reaches lower limit)
-        uint8_t  CS;                    // current state of operation e. g. OFF or Bulk
+        uint8_t  CS;                    // current state of operation e.g. OFF or Bulk
         uint8_t ERR;                    // error code
         uint32_t OR;                    // off reason
         uint32_t HSDS;                  // day sequence number 1...365

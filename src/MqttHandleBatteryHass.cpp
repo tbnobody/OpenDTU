@@ -111,6 +111,14 @@ void MqttHandleBatteryHassClass::loop()
         case 2: // SoC from MQTT
             break;
         case 3: // Victron SmartShunt
+            publishSensor("Voltage", "mdi:battery-charging", "voltage", "voltage", "measurement", "V");
+            publishSensor("Current", "mdi:current-dc", "current", "current", "measurement", "A");
+            publishSensor("Instantaneous Power", NULL, "instantaneousPower", "power", "measurement", "W");
+            publishSensor("Charged Energy", NULL, "chargedEnergy", "energy", "total_increasing", "kWh");
+            publishSensor("Discharged Energy", NULL, "dischargedEnergy", "energy", "total_increasing", "kWh");
+            publishSensor("Charge Cycles", "mdi:counter", "chargeCycles");
+            publishSensor("Consumed Amp Hours", NULL, "consumedAmpHours", NULL, "measurement", "Ah");
+            publishSensor("Last Full Charge", "mdi:timelapse", "lastFullCharge", NULL, NULL, "min");
             break;
     }
 
@@ -156,7 +164,7 @@ void MqttHandleBatteryHassClass::publishSensor(const char* caption, const char* 
     createDeviceInfo(deviceObj);
 
     if (Configuration.get().Mqtt.Hass.Expire) {
-        root["exp_aft"] = Battery.getStats()->getMqttFullPublishIntervalMs() * 3;
+        root["exp_aft"] = Battery.getStats()->getMqttFullPublishIntervalMs() / 1000 * 3;
     }
     if (deviceClass != NULL) {
         root["dev_cla"] = deviceClass;
@@ -164,6 +172,8 @@ void MqttHandleBatteryHassClass::publishSensor(const char* caption, const char* 
     if (stateClass != NULL) {
         root["stat_cla"] = stateClass;
     }
+
+    if (Utils::checkJsonOverflow(root, __FUNCTION__, __LINE__)) { return; }
 
     char buffer[512];
     serializeJson(root, buffer);
@@ -207,6 +217,8 @@ void MqttHandleBatteryHassClass::publishBinarySensor(const char* caption, const 
 
     JsonObject deviceObj = root.createNestedObject("dev");
     createDeviceInfo(deviceObj);
+
+    if (Utils::checkJsonOverflow(root, __FUNCTION__, __LINE__)) { return; }
 
     char buffer[512];
     serializeJson(root, buffer);

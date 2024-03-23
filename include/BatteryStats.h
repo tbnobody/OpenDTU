@@ -35,18 +35,22 @@ class BatteryStats {
         bool isSoCValid() const { return _lastUpdateSoC > 0; }
         bool isVoltageValid() const { return _lastUpdateVoltage > 0; }
 
+        // returns true if the battery reached a critically low voltage/SoC,
+        // such that it is in need of charging to prevent degredation.
+        virtual bool needsCharging() const { return false; }
+
     protected:
         virtual void mqttPublish() const;
 
         void setSoC(float soc, uint8_t precision, uint32_t timestamp) {
             _soc = soc;
             _socPrecision = precision;
-            _lastUpdateSoC = timestamp;
+            _lastUpdateSoC = _lastUpdate = timestamp;
         }
 
         void setVoltage(float voltage, uint32_t timestamp) {
             _voltage = voltage;
-            _lastUpdateVoltage = timestamp;
+            _lastUpdateVoltage = _lastUpdate = timestamp;
         }
 
         String _manufacturer = "unknown";
@@ -67,6 +71,7 @@ class PylontechBatteryStats : public BatteryStats {
     public:
         void getLiveViewData(JsonVariant& root) const final;
         void mqttPublish() const final;
+        bool needsCharging() const final { return _chargeImmediately; }
 
     private:
         void setManufacturer(String&& m) { _manufacturer = std::move(m); }
@@ -147,6 +152,9 @@ class VictronSmartShuntStats : public BatteryStats {
         float _chargedEnergy;
         float _dischargedEnergy;
         String _modelName;
+        int32_t _instantaneousPower;
+        float _consumedAmpHours;
+        int32_t _lastFullCharge;
 
         bool _alarmLowVoltage;
         bool _alarmHighVoltage;

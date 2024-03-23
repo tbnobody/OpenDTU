@@ -21,32 +21,39 @@ float HttpPowerMeterClass::getPower(int8_t phase)
 
 bool HttpPowerMeterClass::updateValues()
 {
-    const CONFIG_T& config = Configuration.get();     
+    const CONFIG_T& config = Configuration.get();
 
     for (uint8_t i = 0; i < POWERMETER_MAX_PHASES; i++) {
         POWERMETER_HTTP_PHASE_CONFIG_T phaseConfig = config.PowerMeter.Http_Phase[i];
 
         if (!phaseConfig.Enabled) {
             power[i] = 0.0;
-            continue;	
-        } 
+            continue;
+        }
 
         if (i == 0 || config.PowerMeter.HttpIndividualRequests) {
-            if (!queryPhase(i, phaseConfig.Url, phaseConfig.AuthType, phaseConfig.Username, phaseConfig.Password, phaseConfig.HeaderKey, phaseConfig.HeaderValue, phaseConfig.Timeout, 
+            if (!queryPhase(i, phaseConfig.Url, phaseConfig.AuthType, phaseConfig.Username, phaseConfig.Password, phaseConfig.HeaderKey, phaseConfig.HeaderValue, phaseConfig.Timeout,
                     phaseConfig.JsonPath)) {
                 MessageOutput.printf("[HttpPowerMeter] Getting the power of phase %d failed.\r\n", i + 1);
                 MessageOutput.printf("%s\r\n", httpPowerMeterError);
                 return false;
             }
+            continue;
+        }
+
+        if(!tryGetFloatValueForPhase(i, phaseConfig.JsonPath)) {
+            MessageOutput.printf("[HttpPowerMeter] Getting the power of phase %d (from JSON fetched with Phase 1 config) failed.\r\n", i + 1);
+            MessageOutput.printf("%s\r\n", httpPowerMeterError);
+            return false;
         }
     }
     return true;
 }
 
-bool HttpPowerMeterClass::queryPhase(int phase, const String& url, Auth authType, const char* username, const char* password, 
+bool HttpPowerMeterClass::queryPhase(int phase, const String& url, Auth authType, const char* username, const char* password,
     const char* httpHeader, const char* httpValue, uint32_t timeout, const char* jsonPath)
 {
-    //hostByName in WiFiGeneric fails to resolve local names. issue described in 
+    //hostByName in WiFiGeneric fails to resolve local names. issue described in
     //https://github.com/espressif/arduino-esp32/issues/3822
     //and in depth analyzed in https://github.com/espressif/esp-idf/issues/2507#issuecomment-761836300
     //in conclusion: we cannot rely on httpClient.begin(*wifiClient, url) to resolve IP adresses.
@@ -59,7 +66,7 @@ bool HttpPowerMeterClass::queryPhase(int phase, const String& url, Auth authType
     extractUrlComponents(url, protocol, host, uri, port, base64Authorization);
 
     IPAddress ipaddr((uint32_t)0);
-    //first check if "host" is already an IP adress    
+    //first check if "host" is already an IP adress
     if (!ipaddr.fromString(host))
     {
         //"host"" is not an IP address so try to resolve the IP adress
@@ -69,20 +76,20 @@ bool HttpPowerMeterClass::queryPhase(int phase, const String& url, Auth authType
             snprintf_P(httpPowerMeterError, sizeof(httpPowerMeterError), PSTR("Error resolving host %s via DNS, try to enable mDNS in Network Settings"), host.c_str());
             //ensure we try resolving via DNS even if mDNS is disabled
             if(!WiFiGenericClass::hostByName(host.c_str(), ipaddr)){
-                    snprintf_P(httpPowerMeterError, sizeof(httpPowerMeterError), PSTR("Error resolving host %s via DNS"), host.c_str()); 
-                } 
+                    snprintf_P(httpPowerMeterError, sizeof(httpPowerMeterError), PSTR("Error resolving host %s via DNS"), host.c_str());
+                }
         }
         else
         {
-            ipaddr = MDNS.queryHost(host); 
+            ipaddr = MDNS.queryHost(host);
             if (ipaddr == INADDR_NONE){
                 snprintf_P(httpPowerMeterError, sizeof(httpPowerMeterError), PSTR("Error resolving host %s via mDNS"), host.c_str());
                 //when we cannot find local server via mDNS, try resolving via DNS
                 if(!WiFiGenericClass::hostByName(host.c_str(), ipaddr)){
-                    snprintf_P(httpPowerMeterError, sizeof(httpPowerMeterError), PSTR("Error resolving host %s via DNS"), host.c_str()); 
+                    snprintf_P(httpPowerMeterError, sizeof(httpPowerMeterError), PSTR("Error resolving host %s via DNS"), host.c_str());
                 }
             }
-        }     
+        }
     }
 
     // secureWifiClient MUST be created before HTTPClient
@@ -97,19 +104,19 @@ bool HttpPowerMeterClass::queryPhase(int phase, const String& url, Auth authType
     } else {
       wifiClient = std::make_unique<WiFiClient>();
     }
-    
+
     return httpRequest(phase, *wifiClient, ipaddr.toString(), port, uri, https, authType,  username, password, httpHeader, httpValue, timeout, jsonPath);
 }
 
 bool HttpPowerMeterClass::httpRequest(int phase, WiFiClient &wifiClient, const String& host, uint16_t port, const String& uri, bool https, Auth authType, const char* username,
     const char* password, const char* httpHeader, const char* httpValue, uint32_t timeout, const char* jsonPath)
 {
-    if(!httpClient.begin(wifiClient, host, port, uri, https)){      
-        snprintf_P(httpPowerMeterError, sizeof(httpPowerMeterError), PSTR("httpClient.begin() failed for %s://%s"), (https ? "https" : "http"), host.c_str()); 
+    if(!httpClient.begin(wifiClient, host, port, uri, https)){
+        snprintf_P(httpPowerMeterError, sizeof(httpPowerMeterError), PSTR("httpClient.begin() failed for %s://%s"), (https ? "https" : "http"), host.c_str());
         return false;
     }
 
-    prepareRequest(timeout, httpHeader, httpValue);    
+    prepareRequest(timeout, httpHeader, httpValue);
     if (authType == Auth::digest) {
         const char *headers[1] = {"WWW-Authenticate"};
         httpClient.collectHeaders(headers, 1);
@@ -129,8 +136,8 @@ bool HttpPowerMeterClass::httpRequest(int phase, WiFiClient &wifiClient, const S
             String authReq  = httpClient.header("WWW-Authenticate");
             String authorization = getDigestAuth(authReq, String(username), String(password), "GET", String(uri), 1);
             httpClient.end();
-            if(!httpClient.begin(wifiClient, host, port, uri, https)){     
-                snprintf_P(httpPowerMeterError, sizeof(httpPowerMeterError), PSTR("httpClient.begin() failed for  %s://%s using digest auth"), (https ? "https" : "http"), host.c_str()); 
+            if(!httpClient.begin(wifiClient, host, port, uri, https)){
+                snprintf_P(httpPowerMeterError, sizeof(httpPowerMeterError), PSTR("httpClient.begin() failed for  %s://%s using digest auth"), (https ? "https" : "http"), host.c_str());
                 return false;
             }
 
@@ -139,9 +146,21 @@ bool HttpPowerMeterClass::httpRequest(int phase, WiFiClient &wifiClient, const S
             httpCode = httpClient.GET();
         }
     }
-    bool result = tryGetFloatValueForPhase(phase, httpCode, jsonPath);
+
+    if (httpCode <= 0) {
+        snprintf_P(httpPowerMeterError, sizeof(httpPowerMeterError), PSTR("HTTP Error %s"), httpClient.errorToString(httpCode).c_str());
+        return false;
+    }
+
+    if (httpCode != HTTP_CODE_OK) {
+        snprintf_P(httpPowerMeterError, sizeof(httpPowerMeterError), PSTR("Bad HTTP code: %d"), httpCode);
+        return false;
+    }
+
+    httpResponse = httpClient.getString(); // very unfortunate that we cannot parse WifiClient stream directly
     httpClient.end();
-    return result;
+
+    return tryGetFloatValueForPhase(phase, jsonPath);
 }
 
 String HttpPowerMeterClass::extractParam(String& authReq, const String& param, const char delimit) {
@@ -176,11 +195,11 @@ String HttpPowerMeterClass::getDigestAuth(String& authReq, const String& usernam
     //sha256 of method:uri
     String ha2 = sha256(method + ":" + uri);
 
-    //sha256 of h1:nonce:nc:cNonce:auth:h2    
+    //sha256 of h1:nonce:nc:cNonce:auth:h2
     String response = sha256(ha1 + ":" + nonce + ":" + String(nc) + ":" + cNonce + ":" + "auth" + ":" + ha2);
 
     //Final authorization String;
-    String authorization = "Digest username=\""; 
+    String authorization = "Digest username=\"";
     authorization += username;
     authorization += "\", realm=\"";
     authorization += realm;
@@ -194,32 +213,23 @@ String HttpPowerMeterClass::getDigestAuth(String& authReq, const String& usernam
     authorization += String(nc);
     authorization += ", qop=auth, response=\"";
     authorization += response;
-    authorization += "\", algorithm=SHA-256";   
+    authorization += "\", algorithm=SHA-256";
 
     return authorization;
 }
 
-bool HttpPowerMeterClass::tryGetFloatValueForPhase(int phase, int httpCode, const char* jsonPath)
+bool HttpPowerMeterClass::tryGetFloatValueForPhase(int phase, const char* jsonPath)
 {
-    bool success = false;
-    if (httpCode == HTTP_CODE_OK) {
-        httpResponse = httpClient.getString();     //very unfortunate that we cannot parse WifiClient stream directly   
-        FirebaseJson json;
-        json.setJsonData(httpResponse);
-        FirebaseJsonData value;
-        if (!json.get(value, jsonPath)) {
-            snprintf_P(httpPowerMeterError, sizeof(httpPowerMeterError), PSTR("[HttpPowerMeter] Couldn't find a value for phase %i with Json query \"%s\""), phase, jsonPath);
-        }else {
-            power[phase] = value.to<float>();
-            //MessageOutput.printf("Power for Phase %i: %5.2fW\r\n", phase, power[phase]);
-            success = true;
-        }
-    } else if (httpCode <= 0) {
-        snprintf_P(httpPowerMeterError, sizeof(httpPowerMeterError), PSTR("HTTP Error %s"), httpClient.errorToString(httpCode).c_str());
-    } else if (httpCode != HTTP_CODE_OK) {
-        snprintf_P(httpPowerMeterError, sizeof(httpPowerMeterError), PSTR("Bad HTTP code: %d"), httpCode);
-    } 
-    return success;
+    FirebaseJson json;
+    json.setJsonData(httpResponse);
+    FirebaseJsonData value;
+    if (!json.get(value, jsonPath)) {
+        snprintf_P(httpPowerMeterError, sizeof(httpPowerMeterError), PSTR("[HttpPowerMeter] Couldn't find a value for phase %i with Json query \"%s\""), phase, jsonPath);
+        return false;
+    }
+
+    power[phase] = value.to<float>();
+    return true;
 }
 
 //extract url component as done by httpClient::begin(String url, const char* expectedProtocol) https://github.com/espressif/arduino-esp32/blob/da6325dd7e8e152094b19fe63190907f38ef1ff0/libraries/HTTPClient/src/HTTPClient.cpp#L250
@@ -234,7 +244,7 @@ bool HttpPowerMeterClass::extractUrlComponents(String url, String& _protocol, St
 
     _protocol = url.substring(0, index);
 
-    //initialize port to default values for http or https. 
+    //initialize port to default values for http or https.
     //port will be overwritten below in case port is explicitly defined
     _port = (_protocol == "https" ? 443 : 80);
 

@@ -182,9 +182,10 @@ bool ConfigurationClass::write()
     powerlimiter["verbose_logging"] = config.PowerLimiter.VerboseLogging;
     powerlimiter["solar_passtrough_enabled"] = config.PowerLimiter.SolarPassThroughEnabled;
     powerlimiter["solar_passtrough_losses"] = config.PowerLimiter.SolarPassThroughLosses;
-    powerlimiter["battery_drain_strategy"] = config.PowerLimiter.BatteryDrainStategy;
+    powerlimiter["battery_always_use_at_night"] = config.PowerLimiter.BatteryAlwaysUseAtNight;
     powerlimiter["interval"] = config.PowerLimiter.Interval;
     powerlimiter["is_inverter_behind_powermeter"] = config.PowerLimiter.IsInverterBehindPowerMeter;
+    powerlimiter["is_inverter_solar_powered"] = config.PowerLimiter.IsInverterSolarPowered;
     powerlimiter["inverter_id"] = config.PowerLimiter.InverterId;
     powerlimiter["inverter_channel_id"] = config.PowerLimiter.InverterChannelId;
     powerlimiter["target_power_consumption"] = config.PowerLimiter.TargetPowerConsumption;
@@ -428,9 +429,11 @@ bool ConfigurationClass::read()
     config.PowerLimiter.VerboseLogging = powerlimiter["verbose_logging"] | VERBOSE_LOGGING;
     config.PowerLimiter.SolarPassThroughEnabled = powerlimiter["solar_passtrough_enabled"] | POWERLIMITER_SOLAR_PASSTHROUGH_ENABLED;
     config.PowerLimiter.SolarPassThroughLosses = powerlimiter["solar_passthrough_losses"] | POWERLIMITER_SOLAR_PASSTHROUGH_LOSSES;
-    config.PowerLimiter.BatteryDrainStategy = powerlimiter["battery_drain_strategy"] | POWERLIMITER_BATTERY_DRAIN_STRATEGY;
+    config.PowerLimiter.BatteryAlwaysUseAtNight = powerlimiter["battery_always_use_at_night"] | POWERLIMITER_BATTERY_ALWAYS_USE_AT_NIGHT;
+    if (powerlimiter["battery_drain_strategy"].as<uint8_t>() == 1) { config.PowerLimiter.BatteryAlwaysUseAtNight = true; } // convert legacy setting
     config.PowerLimiter.Interval =  powerlimiter["interval"] | POWERLIMITER_INTERVAL;
     config.PowerLimiter.IsInverterBehindPowerMeter = powerlimiter["is_inverter_behind_powermeter"] | POWERLIMITER_IS_INVERTER_BEHIND_POWER_METER;
+    config.PowerLimiter.IsInverterSolarPowered = powerlimiter["is_inverter_solar_powered"] | POWERLIMITER_IS_INVERTER_SOLAR_POWERED;
     config.PowerLimiter.InverterId = powerlimiter["inverter_id"] | POWERLIMITER_INVERTER_ID;
     config.PowerLimiter.InverterChannelId = powerlimiter["inverter_channel_id"] | POWERLIMITER_INVERTER_CHANNEL_ID;
     config.PowerLimiter.TargetPowerConsumption = powerlimiter["target_power_consumption"] | POWERLIMITER_TARGET_POWER_CONSUMPTION;
@@ -558,6 +561,28 @@ INVERTER_CONFIG_T* ConfigurationClass::getInverterConfig(const uint64_t serial)
     }
 
     return nullptr;
+}
+
+void ConfigurationClass::deleteInverterById(const uint8_t id)
+{
+    config.Inverter[id].Serial = 0ULL;
+    strlcpy(config.Inverter[id].Name, "", sizeof(config.Inverter[id].Name));
+    config.Inverter[id].Order = 0;
+
+    config.Inverter[id].Poll_Enable = true;
+    config.Inverter[id].Poll_Enable_Night = true;
+    config.Inverter[id].Command_Enable = true;
+    config.Inverter[id].Command_Enable_Night = true;
+    config.Inverter[id].ReachableThreshold = REACHABLE_THRESHOLD;
+    config.Inverter[id].ZeroRuntimeDataIfUnrechable = false;
+    config.Inverter[id].ZeroYieldDayOnMidnight = false;
+    config.Inverter[id].YieldDayCorrection = false;
+
+    for (uint8_t c = 0; c < INV_MAX_CHAN_COUNT; c++) {
+        config.Inverter[id].channel[c].MaxChannelPower = 0;
+        config.Inverter[id].channel[c].YieldTotalOffset = 0.0f;
+        strlcpy(config.Inverter[id].channel[c].Name, "", sizeof(config.Inverter[id].channel[c].Name));
+    }
 }
 
 ConfigurationClass Configuration;

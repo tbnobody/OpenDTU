@@ -9,25 +9,25 @@
     <template v-else>
         <div class="row gy-3">
             <div class="tab-content col-sm-12 col-md-12" id="v-pills-tabContent">
-                <div class="card">
+                <div class="card" v-for="(item, serial) in vedirect.instances" :key="serial">
                     <div class="card-header d-flex justify-content-between align-items-center"
                         :class="{
-                            'text-bg-danger': vedirectData.age_critical,
-                            'text-bg-primary': !vedirectData.age_critical,
+                            'text-bg-danger': item.data_age_ms >= 10000,
+                            'text-bg-primary': item.data_age_ms < 10000,
                         }">
                         <div class="p-1 flex-grow-1">
                             <div class="d-flex flex-wrap">
                                 <div style="padding-right: 2em;">
-                                    {{ vedirectData.PID }}
+                                    {{ item.device.PID }}
                                 </div>
                                 <div style="padding-right: 2em;">
-                                    {{ $t('vedirecthome.SerialNumber') }} {{ vedirectData.SER }}
+                                    {{ $t('vedirecthome.SerialNumber') }} {{ item.device.SER }}
                                 </div>
                                 <div style="padding-right: 2em;">
-                                    {{ $t('vedirecthome.FirmwareNumber') }}  {{ vedirectData.FW }}
+                                    {{ $t('vedirecthome.FirmwareNumber') }}  {{ item.device.FW }}
                                 </div>
                                 <div style="padding-right: 2em;">
-                                    {{ $t('vedirecthome.DataAge') }} {{ $t('vedirecthome.Seconds', {'val': vedirectData.data_age }) }}
+                                    {{ $t('vedirecthome.DataAge') }} {{ $t('vedirecthome.Seconds', {'val': Math.floor(item.data_age_ms / 1000)}) }}
                                 </div>
                             </div>
                         </div>
@@ -71,33 +71,33 @@
                                                 <tbody>
                                                     <tr>
                                                         <th scope="row">{{ $t('vedirecthome.LoadOutputState') }}</th>
-                                                        <td style="text-align: right">{{vedirectData.LOAD}}</td>
+                                                        <td style="text-align: right">{{item.device.LOAD}}</td>
                                                         <td></td>
                                                     </tr>
                                                     <tr>
                                                         <th scope="row">{{ $t('vedirecthome.StateOfOperation') }}</th>
-                                                        <td style="text-align: right">{{vedirectData.CS}}</td>
+                                                        <td style="text-align: right">{{item.device.CS}}</td>
                                                         <td></td>
                                                     </tr>
                                                     <tr>
                                                         <th scope="row">{{ $t('vedirecthome.TrackerOperationMode') }}</th>
-                                                        <td style="text-align: right">{{vedirectData.MPPT}}</td>
+                                                        <td style="text-align: right">{{item.device.MPPT}}</td>
                                                         <td></td>
                                                     </tr>
                                                     <tr>
                                                         <th scope="row">{{ $t('vedirecthome.OffReason') }}</th>
-                                                        <td style="text-align: right">{{vedirectData.OR}}</td>
+                                                        <td style="text-align: right">{{item.device.OR}}</td>
                                                         <td></td>
                                                     </tr>
                                                     <tr>
                                                         <th scope="row">{{ $t('vedirecthome.ErrorCode') }}</th>
-                                                        <td style="text-align: right">{{vedirectData.ERR}}</td>
+                                                        <td style="text-align: right">{{item.device.ERR}}</td>
                                                         <td></td>
                                                     </tr>
                                                     <tr>
                                                         <th scope="row">{{ $t('vedirecthome.DaySequenceNumber') }}</th>
-                                                        <td style="text-align: right">{{vedirectData.HSDS.v}}</td>
-                                                        <td>{{vedirectData.HSDS.u}}</td>
+                                                        <td style="text-align: right">{{item.device.HSDS.v}}</td>
+                                                        <td>{{item.device.HSDS.u}}</td>
                                                     </tr>
                                                 </tbody>
                                             </table>
@@ -119,7 +119,7 @@
                                                     </tr>
                                                 </thead>
                                                 <tbody>
-                                                    <tr v-for="(prop, key) in vedirectOutput" v-bind:key="key">
+                                                    <tr v-for="(prop, key) in item.output" v-bind:key="key">
                                                         <th scope="row">{{ $t('vedirecthome.output.' + key) }}</th>
                                                         <td style="text-align: right">
                                                             {{ $n(prop.v, 'decimal', {
@@ -149,7 +149,7 @@
                                                     </tr>
                                                 </thead>
                                                 <tbody>
-                                                    <tr v-for="(prop, key) in vedirectInput" v-bind:key="key">
+                                                    <tr v-for="(prop, key) in item.input" v-bind:key="key">
                                                         <th scope="row">{{ $t('vedirecthome.input.' + key) }}</th>
                                                         <td style="text-align: right">
                                                             {{ $n(prop.v, 'decimal', {
@@ -167,7 +167,7 @@
                             </div>
                         </div>
                     </div>
-                </div>   
+                </div>
             </div>
         </div>
     </template>
@@ -178,7 +178,7 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue';
-import type { DynamicPowerLimiter, VedirectDevice, VedirectOutput, VedirectInput } from '@/types/VedirectLiveDataStatus';
+import type { DynamicPowerLimiter, Vedirect } from '@/types/VedirectLiveDataStatus';
 import { handleResponse, authHeader, authUrl } from '@/utils/authentication';
 import {
     BIconSun,
@@ -199,19 +199,16 @@ export default defineComponent({
         return {
             socket: {} as WebSocket,
             heartInterval: 0,
-            dataAgeInterval: 0,
+            dataAgeTimers: {} as Record<string, number>,
             dataLoading: true,
             dplData: {} as DynamicPowerLimiter,
-            vedirectData: {} as VedirectDevice,
-            vedirectOutput: {} as VedirectOutput,
-            vedirectInput: {} as VedirectInput,
+            vedirect: {} as Vedirect,
             isFirstFetchAfterConnect: true,
         };
     },
     created() {
         this.getInitialData();
         this.initSocket();
-        this.initDataAgeing();
     },
     unmounted() {
         this.closeSocket();
@@ -224,10 +221,9 @@ export default defineComponent({
                 .then((response) => handleResponse(response, this.$emitter, this.$router))
                 .then((root) => {
                     this.dplData = root["dpl"];
-                    this.vedirectData = root["device"];
-                    this.vedirectOutput = root["output"];
-                    this.vedirectInput = root["input"];
+                    this.vedirect = root["vedirect"];
                     this.dataLoading = false;
+                    this.resetDataAging(Object.keys(root["vedirect"]["instances"]));
                 });
         },
         initSocket() {
@@ -244,9 +240,12 @@ export default defineComponent({
                 console.log(event);
                 var root = JSON.parse(event.data);
                 this.dplData = root["dpl"];
-                this.vedirectData = root["device"];
-                this.vedirectOutput = root["output"];
-                this.vedirectInput = root["input"];
+                if (root["vedirect"]["full_update"] === true) {
+                    this.vedirect = root["vedirect"];
+                } else {
+                    Object.assign(this.vedirect.instances, root["vedirect"]["instances"]);
+                }
+                this.resetDataAging(Object.keys(root["vedirect"]["instances"]));
                 this.dataLoading = false;
                 this.heartCheck(); // Reset heartbeat detection
             };
@@ -261,11 +260,25 @@ export default defineComponent({
                 this.closeSocket();
             };
         },
-        initDataAgeing() {
-            this.dataAgeInterval = setInterval(() => {
-                if (this.vedirectData) {
-                    this.vedirectData.data_age++;
+        resetDataAging(serials: Array<string>) {
+            serials.forEach((serial) => {
+                if (this.dataAgeTimers[serial] !== undefined) {
+                    clearTimeout(this.dataAgeTimers[serial]);
                 }
+
+                var nextMs = 1000 - (this.vedirect.instances[serial].data_age_ms % 1000);
+                this.dataAgeTimers[serial] = setTimeout(() => {
+                    this.doDataAging(serial);
+                }, nextMs);
+            });
+        },
+        doDataAging(serial: string) {
+            if (this.vedirect?.instances?.[serial] === undefined) { return; }
+
+            this.vedirect.instances[serial].data_age_ms += 1000;
+
+            this.dataAgeTimers[serial] = setTimeout(() => {
+                this.doDataAging(serial);
             }, 1000);
         },
         // Send heartbeat packets regularly * 59s Send a heartbeat
@@ -285,11 +298,6 @@ export default defineComponent({
             this.socket.close();
             this.heartInterval && clearTimeout(this.heartInterval);
             this.isFirstFetchAfterConnect = true;
-        },
-        formatNumber(num: number) {
-            return new Intl.NumberFormat(
-                undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }
-            ).format(num);
         },
     },
 });

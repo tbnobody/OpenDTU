@@ -663,44 +663,49 @@
         "Cancel": "@:base.Cancel"
     },
     "powerlimiteradmin": {
-      "PowerLimiterSettings": "Power Limiter Settings",
-      "PowerLimiterConfiguration": "Power Limiter Configuration",
+      "PowerLimiterSettings": "Dynamic Power Limiter Settings",
+      "ConfigAlertMessage": "One or more prerequisites for operating the Dynamic Power Limiter are not met.",
+      "ConfigHints": "Configuration Notes",
+      "ConfigHintRequirement": "Required",
+      "ConfigHintOptional": "Optional",
+      "ConfigHintsIntro": "The following notes regarding the Dynamic Power Limiter (DPL) configuration shall be considered:",
+      "ConfigHintPowerMeterDisabled": "Operating the DPL requires the Power Meter being configured and delivering data.",
+      "ConfigHintNoInverter": "At least one inverter must be configured prior to setting up the DPL.",
+      "ConfigHintInverterCommunication": "Polling data from and sending commands to the target inverter must be enabled.",
+      "ConfigHintNoChargeController": "The solar-passthrough feature can only be used if the VE.Direct interface is configured.",
+      "ConfigHintNoBatteryInterface": "SoC-based thresholds can only be used if a battery communication interface is configured.",
       "General": "General",
       "Enable": "Enable",
       "VerboseLogging": "@:base.VerboseLogging",
+      "SolarPassthrough": "Solar-Passthrough",
       "EnableSolarPassthrough": "Enable Solar-Passthrough",
-      "SolarPassthroughLosses": "(Full) Solar Passthrough Losses:",
-      "SolarPassthroughLossesInfo": "<b>Hint:</b> Line losses are to be expected when transferring energy from the solar charge controller to the inverter. These losses can be taken into account to prevent the battery from gradually discharging in (full) solar passthrough mode. The power limit to be set on the inverter is additionally reduced by this factor after taking its efficiency into account.",
-      "BatteryDrainStrategy": "Battery drain strategy",
-      "BatteryDrainWhenFull": "Empty when full",
-      "BatteryDrainAtNight": "Empty at night",
-      "SolarpassthroughInfo": "When the sun is shining, this setting enables the sychronization of the inverter limit with the current solar power of the Victron MPPT charger. This optimizes battery degradation and loses.",
-      "InverterId": "Inverter ID",
-      "InverterIdHint": "Select proper inverter ID where battery is connected to.",
-      "InverterChannelId": "Channel ID",
-      "InverterChannelIdHint": "Select proper channel where battery is connected to.",
-      "TargetPowerConsumption": "Target power consumption from grid",
-      "TargetPowerConsumptionHint": "Set the grid power consumption the limiter tries to achieve.",
-      "TargetPowerConsumptionHysteresis": "Hysteresis for calculated power limit",
+      "SolarPassthroughLosses": "(Full) Solar-Passthrough Losses",
+      "SolarPassthroughLossesInfo": "<b>Hint:</b> Line losses are to be expected when transferring energy from the solar charge controller to the inverter. These losses can be taken into account to prevent the battery from gradually discharging in (full) solar-passthrough mode. The power limit to be set on the inverter is additionally reduced by this factor after taking its efficiency into account.",
+      "BatteryDischargeAtNight": "Use battery at night even if only partially charged",
+      "SolarpassthroughInfo": "This feature allows to use the available current solar power directly. The solar power, as reported by the MPPT charge controller, is set as the inverter's limit, even if the battery is currently charging. This avoids storing energy unnecessarily, which would be lossy.",
+      "InverterSettings": "Inverter",
+      "Inverter": "Target Inverter",
+      "SelectInverter": "Select an inverter...",
+      "InverterChannelId": "Input used for voltage measurements",
+      "TargetPowerConsumption": "Target Grid Consumption",
+      "TargetPowerConsumptionHint": "Grid power consumption the limiter tries to achieve. Value may be negative.",
+      "TargetPowerConsumptionHysteresis": "Hysteresis",
       "TargetPowerConsumptionHysteresisHint": "Only send a newly calculated power limit to the inverter if the absolute difference to the last sent power limit matches or exceeds this amount.",
-      "LowerPowerLimit": "Lower power limit",
-      "UpperPowerLimit": "Upper power limit",
-      "PowerMeters": "Power meter",
+      "LowerPowerLimit": "Lower Power Limit",
+      "UpperPowerLimit": "Upper Power Limit",
+      "SocThresholds": "Battery State of Charge (SoC) Thresholds",
       "IgnoreSoc": "Ignore Battery SoC",
-      "BatterySocStartThreshold": "Battery SoC - Start threshold",
-      "BatterySocStopThreshold": "Battery SoC - Stop threshold",
-      "BatterySocSolarPassthroughStartThreshold": "Battery SoC - Start threshold for full solar passthrough",
-      "BatterySocSolarPassthroughStartThresholdHint": "Inverter power is set according to Victron MPPT power (minus efficiency factors) if battery SOC is over this limit. Use this if you like to supply excess power to the grid when battery is full",
-      "VoltageStartThreshold": "DC Voltage - Start threshold",
-      "VoltageStopThreshold": "DC Voltage - Stop threshold",
-      "VoltageSolarPassthroughStartThreshold": "DC Voltage - Start threshold for full solar passthrough",
-      "VoltageSolarPassthroughStopThreshold": "DC Voltage - Stop threshold for full solar passthrough",
-      "VoltageSolarPassthroughStartThresholdHint": "Inverter power is set according to Victron MPPT power (minus efficiency factors) when full solar passthrough is active. Use this if you like to supply excess power to the grid when battery is full. This is started when battery voltage goes over this limit and stopped if voltage drops below stop limit.",
-      "VoltageLoadCorrectionFactor": "DC Voltage - Load correction factor",
+      "StartThreshold": "Start Threshold for Battery Discharging",
+      "StopThreshold": "Stop Threshold for Battery Discharging",
+      "FullSolarPassthroughStartThreshold": "Full Solar-Passthrough Start Threshold",
+      "FullSolarPassthroughStartThresholdHint": "Inverter power is set equal to Victron MPPT power (minus efficiency factors) while above this threshold. Use this if you want to supply excess power to the grid when the battery is full.",
+      "VoltageSolarPassthroughStopThreshold": "Full Solar-Passthrough Stop Threshold",
+      "VoltageLoadCorrectionFactor": "Load correction factor",
       "BatterySocInfo": "<b>Hint:</b> The battery SoC (State of Charge) values are only used if the battery communication interface reported SoC updates in the last minute. Otherwise the voltage thresholds will be used as fallback.",
-      "InverterIsBehindPowerMeter": "Inverter is behind Power meter",
-      "Battery": "DC / Battery",
-      "VoltageLoadCorrectionInfo": "<b>Hint:</b> When the power output is higher, the voltage is usually decreasing. In order to not stop the inverter too early (Stop treshold), a power factor can be specified here to correct this. Corrected voltage = DC Voltage + (Current power * correction factor)."
+      "InverterIsBehindPowerMeter": "PowerMeter reading includes inverter output",
+      "InverterIsSolarPowered": "Inverter is powered by solar modules",
+      "VoltageThresholds": "Battery Voltage Thresholds",
+      "VoltageLoadCorrectionInfo": "<b>Hint:</b> When the battery is discharged, its voltage drops. The voltage drop scales with the discharge current. In order to not stop the inverter too early (stop threshold), this load correction factor can be specified to calculate the battery voltage if it was idle. Corrected voltage = DC Voltage + (Current power * correction factor)."
     },
     "login": {
         "Login": "Connexion",
@@ -723,9 +728,9 @@
         "UploadProgress": "Progression du téléversement"
     },
     "about": {
-        "AboutOpendtu": "À propos d'OpenDTU",
+        "AboutOpendtu": "À propos d'OpenDTU-OnBattery",
         "Documentation": "Documentation",
-        "DocumentationBody": "The firmware and hardware documentation can be found here: <a href=\"https://www.opendtu.solar\" target=\"_blank\">https://www.opendtu.solar</a>",
+        "DocumentationBody": "The firmware and hardware documentation of the <b>upstream</b> project can be found here: <a href=\"https://www.opendtu.solar\" target=\"_blank\">https://www.opendtu.solar</a><br>Additional information, especially regarding OpenDTU-OnBattery-specific features, can be accessed at the <a href=\"https://github.com/helgeerbe/OpenDTU-OnBattery/wiki\" target=\"_blank\">Github Wiki</a>.",
         "ProjectOrigin": "Origine du projet",
         "ProjectOriginBody1": "Ce projet a été démarré suite à cette discussion <a href=\"https://www.mikrocontroller.net/topic/525778\" target=\"_blank\">(Mikrocontroller.net)</a>.",
         "ProjectOriginBody2": "Le protocole Hoymiles a été décrypté grâce aux efforts volontaires de nombreux participants. OpenDTU, entre autres, a été développé sur la base de ce travail. Le projet est sous licence Open Source (<a href=\"https://www.gnu.de/documents/gpl-2.0.de.html\" target=\"_blank\">GNU General Public License version 2</a>).",
@@ -784,8 +789,15 @@
         "Name": "Nom",
         "ValueSelected": "Sélectionné",
         "ValueActive": "Activé"
-      },
-      "huawei": {
+    },
+    "inputserial": {
+        "format_hoymiles": "Hoymiles serial number format",
+        "format_converted": "Already converted serial number",
+        "format_herf_valid": "E-Star HERF format (will be saved converted): {serial}",
+        "format_herf_invalid": "E-Star HERF format: Invalid checksum",
+        "format_unknown": "Unknown format"
+    },
+    "huawei": {
         "DataAge": "Data Age: ",
         "Seconds": " {val} seconds",
         "Input": "Input",
@@ -811,9 +823,9 @@
         "Close": "close",
         "SetVoltageLimit": "Voltage limit:",
         "SetCurrentLimit": "Current limit:",
-        "CurrentLimit": "Current limit:"  
-      },
-      "acchargeradmin": {
+        "CurrentLimit": "Current limit:"
+    },
+    "acchargeradmin": {
         "ChargerSettings": "AC Charger Settings",
         "Configuration": "AC Charger Configuration",
         "EnableHuawei": "Enable Huawei R4850G2 on CAN Bus Interface",
@@ -826,8 +838,8 @@
         "lowerPowerLimit": "Minimum output power",
         "upperPowerLimit": "Maximum output power",
         "Seconds": "@:base.Seconds"
-      },
-      "battery": {
+    },
+    "battery": {
         "battery": "Battery",
         "DataAge": "Data Age: ",
         "Seconds": " {val} seconds",
@@ -894,6 +906,9 @@
         "bmsInternal": "BMS internal",
         "chargeCycles": "Charge cycles",
         "chargedEnergy": "Charged energy",
-        "dischargedEnergy": "Discharged energy"
-      }
+        "dischargedEnergy": "Discharged energy",
+        "instantaneousPower": "Instantaneous Power",
+        "consumedAmpHours": "Consumed Amp Hours",
+        "lastFullCharge": "Last full Charge"
+    }
 }

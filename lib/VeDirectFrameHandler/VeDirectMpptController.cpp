@@ -1,9 +1,9 @@
 #include <Arduino.h>
 #include "VeDirectMpptController.h"
 
-void VeDirectMpptController::init(int8_t rx, int8_t tx, Print* msgOut, bool verboseLogging)
+void VeDirectMpptController::init(int8_t rx, int8_t tx, Print* msgOut, bool verboseLogging, uint16_t hwSerialPort)
 {
-	VeDirectFrameHandler::init(rx, tx, msgOut, verboseLogging, 1);
+	VeDirectFrameHandler::init(rx, tx, msgOut, verboseLogging, hwSerialPort);
 	_spData = std::make_shared<veMpptStruct>();
 	if (_verboseLogging) { _msgOut->println("Finished init MPPTController"); }
 }

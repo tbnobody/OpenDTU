@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 #pragma once
 
-#include <stdint.h>
 #include <memory>
 #include <mutex>
 #include <TaskSchedulerDeclarations.h>
@@ -9,28 +8,28 @@
 #include "BatteryStats.h"
 
 class BatteryProvider {
-    public:
-        // returns true if the provider is ready for use, false otherwise
-        virtual bool init(bool verboseLogging) = 0;
-
-        virtual void deinit() = 0;
-        virtual void loop() = 0;
-        virtual std::shared_ptr<BatteryStats> getStats() const = 0;
+public:
+    // returns true if the provider is ready for use, false otherwise
+    virtual bool init(bool verboseLogging) = 0;
+    virtual void deinit() = 0;
+    virtual void loop() = 0;
+    virtual std::shared_ptr<BatteryStats> getStats() const = 0;
+    virtual bool usesHwPort2() const { return false; }
 };
 
 class BatteryClass {
-    public:
-        void init(Scheduler&);
-        void updateSettings();
+public:
+    void init(Scheduler&);
+    void updateSettings();
 
-        std::shared_ptr<BatteryStats const> getStats() const;
-    private:
-        void loop();
+    std::shared_ptr<BatteryStats const> getStats() const;
 
-        Task _loopTask;
+private:
+    void loop();
 
-        mutable std::mutex _mutex;
-        std::unique_ptr<BatteryProvider> _upProvider = nullptr;
+    Task _loopTask;
+    mutable std::mutex _mutex;
+    std::unique_ptr<BatteryProvider> _upProvider = nullptr;
 };
 
 extern BatteryClass Battery;

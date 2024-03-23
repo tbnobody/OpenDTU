@@ -86,9 +86,11 @@ void WebApiDeviceClass::onDeviceAdminGet(AsyncWebServerRequest* request)
         led["brightness"] = config.Led_Single[i].Brightness;
     }
 
-    JsonObject victronPinObj = curPin.createNestedObject("victron");
+    auto victronPinObj = curPin.createNestedObject("victron");
     victronPinObj["rx"] = pin.victron_rx;
     victronPinObj["tx"] = pin.victron_tx;
+    victronPinObj["rx2"] = pin.victron_rx2;
+    victronPinObj["tx2"] = pin.victron_tx2;
 
     JsonObject batteryPinObj = curPin.createNestedObject("battery");
     batteryPinObj["rx"] = pin.battery_rx;

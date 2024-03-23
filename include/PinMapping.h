@@ -38,8 +38,13 @@ struct PinMapping_t {
     uint8_t display_clk;
     uint8_t display_cs;
     uint8_t display_reset;
+    int8_t led[PINMAPPING_LED_COUNT];
+
+    // OpenDTU-OnBattery-specific pins below
     int8_t victron_tx;
     int8_t victron_rx;
+    int8_t victron_tx2;
+    int8_t victron_rx2;
     int8_t battery_rx;
     int8_t battery_rxen;
     int8_t battery_tx;
@@ -50,7 +55,9 @@ struct PinMapping_t {
     int8_t huawei_irq;
     int8_t huawei_cs;
     int8_t huawei_power;
-    int8_t led[PINMAPPING_LED_COUNT];
+    int8_t powermeter_rx;
+    int8_t powermeter_tx;
+    int8_t powermeter_dere;
 };
 
 class PinMappingClass {
@@ -63,7 +70,7 @@ public:
     bool isValidCmt2300Config() const;
     bool isValidEthConfig() const;
     bool isValidHuaweiConfig() const;
-    
+
 private:
     PinMapping_t _pinMapping;
 };

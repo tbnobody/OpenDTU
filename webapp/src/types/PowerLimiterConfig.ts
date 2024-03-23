@@ -1,11 +1,32 @@
+export interface PowerLimiterInverterInfo {
+    pos: number;
+    name: string;
+    poll_enable: boolean;
+    poll_enable_night: boolean;
+    command_enable: boolean;
+    command_enable_night: boolean;
+    type: string;
+    channels: number;
+}
+
+// meta-data not directly part of the DPL settings,
+// to control visibility of DPL settings
+export interface PowerLimiterMetaData {
+    power_meter_enabled: boolean;
+    battery_enabled: boolean;
+    charge_controller_enabled: boolean;
+    inverters: { [key: string]: PowerLimiterInverterInfo };
+}
+
 export interface PowerLimiterConfig {
     enabled: boolean;
     verbose_logging: boolean;
     solar_passthrough_enabled: boolean;
     solar_passthrough_losses: number;
-    battery_drain_strategy: number;
+    battery_always_use_at_night: boolean;
     is_inverter_behind_powermeter: boolean;
-    inverter_id: number;
+    is_inverter_solar_powered: boolean;
+    inverter_serial: string;
     inverter_channel_id: number;
     target_power_consumption: number;
     target_power_consumption_hysteresis: number;

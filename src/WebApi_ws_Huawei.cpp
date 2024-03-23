@@ -64,6 +64,8 @@ void WebApiWsHuaweiLiveClass::sendDataTaskCb()
             JsonVariant var = root;
             generateJsonResponse(var);
 
+            if (Utils::checkJsonOverflow(root, __FUNCTION__, __LINE__)) { return; }
+
             String buffer;
             serializeJson(root, buffer);
 

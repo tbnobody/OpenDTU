@@ -129,7 +129,10 @@ void WebApiInverterClass::onInverterAdd(AsyncWebServerRequest* request)
         return;
     }
 
-    if (root["serial"].as<uint64_t>() == 0) {
+    // Interpret the string as a hex value and convert it to uint64_t
+    const uint64_t serial = strtoll(root["serial"].as<String>().c_str(), NULL, 16);
+
+    if (serial == 0) {
         retMsg["message"] = "Serial must be a number > 0!";
         retMsg["code"] = WebApiError::InverterSerialZero;
         response->setLength();
@@ -158,7 +161,7 @@ void WebApiInverterClass::onInverterAdd(AsyncWebServerRequest* request)
     }
 
     // Interpret the string as a hex value and convert it to uint64_t
-    inverter->Serial = strtoll(root["serial"].as<String>().c_str(), NULL, 16);
+    inverter->Serial = serial;
 
     strncpy(inverter->Name, root["name"].as<String>().c_str(), INV_MAX_NAME_STRLEN);
 
@@ -233,7 +236,10 @@ void WebApiInverterClass::onInverterEdit(AsyncWebServerRequest* request)
         return;
     }
 
-    if (root["serial"].as<uint64_t>() == 0) {
+    // Interpret the string as a hex value and convert it to uint64_t
+    const uint64_t serial = strtoll(root["serial"].as<String>().c_str(), NULL, 16);
+
+    if (serial == 0) {
         retMsg["message"] = "Serial must be a number > 0!";
         retMsg["code"] = WebApiError::InverterSerialZero;
         response->setLength();
@@ -261,7 +267,7 @@ void WebApiInverterClass::onInverterEdit(AsyncWebServerRequest* request)
 
     INVERTER_CONFIG_T& inverter = Configuration.get().Inverter[root["id"].as<uint8_t>()];
 
-    uint64_t new_serial = strtoll(root["serial"].as<String>().c_str(), NULL, 16);
+    uint64_t new_serial = serial;
     uint64_t old_serial = inverter.Serial;
 
     // Interpret the string as a hex value and convert it to uint64_t
@@ -380,8 +386,7 @@ void WebApiInverterClass::onInverterDelete(AsyncWebServerRequest* request)
 
     Hoymiles.removeInverterBySerial(inverter.Serial);
 
-    inverter.Serial = 0;
-    strncpy(inverter.Name, "", sizeof(inverter.Name));
+    Configuration.deleteInverterById(inverter_id);
 
     WebApi.writeConfig(retMsg, WebApiError::InverterDeleted, "Inverter deleted!");
 

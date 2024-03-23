@@ -281,13 +281,7 @@ int VeDirectFrameHandler::hexRxEvent(uint8_t inbyte) {
 }
 
 bool VeDirectFrameHandler::isDataValid(veStruct const& frame) const {
-	if (_lastUpdate == 0) {
-		return false;
-	}
-	if (strlen(frame.SER) == 0) {
-		return false;
-	}
-	return true;
+	return strlen(frame.SER) > 0 && _lastUpdate > 0 && (millis() - _lastUpdate) < (10 * 1000);
 }
 
 uint32_t VeDirectFrameHandler::getLastUpdate() const

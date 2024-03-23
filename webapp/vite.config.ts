@@ -29,6 +29,7 @@ export default defineConfig({
         fullInstall: false,
         forceStringify: true,
         strictMessage: false,
+        jitCompilation: false,
     }),
   ],
   resolve: {

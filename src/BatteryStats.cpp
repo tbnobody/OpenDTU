@@ -53,6 +53,8 @@ static void addLiveViewAlarm(JsonVariant& root, std::string const& name,
 
 bool BatteryStats::updateAvailable(uint32_t since) const
 {
+    if (_lastUpdate == 0) { return false; } // no data at all processed yet
+
     auto constexpr halfOfAllMillis = std::numeric_limits<uint32_t>::max() / 2;
     return (_lastUpdate - since) < halfOfAllMillis;
 }
@@ -379,12 +381,14 @@ void VictronSmartShuntStats::updateFrom(VeDirectShuntController::veShuntStruct c
     _modelName = shuntData.getPidAsString().data();
     _chargeCycles = shuntData.H4;
     _timeToGo = shuntData.TTG / 60;
-    _chargedEnergy = shuntData.H18 / 100;
-    _dischargedEnergy = shuntData.H17 / 100;
+    _chargedEnergy = static_cast<float>(shuntData.H18) / 100;
+    _dischargedEnergy = static_cast<float>(shuntData.H17) / 100;
     _manufacturer = "Victron " + _modelName;
     _temperature = shuntData.T;
     _tempPresent = shuntData.tempPresent;
-
+    _instantaneousPower = shuntData.P;
+    _consumedAmpHours = static_cast<float>(shuntData.CE) / 1000;
+    _lastFullCharge = shuntData.H9 / 60;
     // shuntData.AR is a bitfield, so we need to check each bit individually
     _alarmLowVoltage = shuntData.AR & 1;
     _alarmHighVoltage = shuntData.AR & 2;
@@ -401,8 +405,11 @@ void VictronSmartShuntStats::getLiveViewData(JsonVariant& root) const {
     // values go into the "Status" card of the web application
     addLiveViewValue(root, "current", _current, "A", 1);
     addLiveViewValue(root, "chargeCycles", _chargeCycles, "", 0);
-    addLiveViewValue(root, "chargedEnergy", _chargedEnergy, "KWh", 1);
-    addLiveViewValue(root, "dischargedEnergy", _dischargedEnergy, "KWh", 1);
+    addLiveViewValue(root, "chargedEnergy", _chargedEnergy, "kWh", 2);
+    addLiveViewValue(root, "dischargedEnergy", _dischargedEnergy, "kWh", 2);
+    addLiveViewValue(root, "instantaneousPower", _instantaneousPower, "W", 0);
+    addLiveViewValue(root, "consumedAmpHours", _consumedAmpHours, "Ah", 3);
+    addLiveViewValue(root, "lastFullCharge", _lastFullCharge, "min", 0);
     if (_tempPresent) {
         addLiveViewValue(root, "temperature", _temperature, "°C", 0);
     }
@@ -421,4 +428,7 @@ void VictronSmartShuntStats::mqttPublish() const {
     MqttSettings.publish(F("battery/chargeCycles"), String(_chargeCycles));
     MqttSettings.publish(F("battery/chargedEnergy"), String(_chargedEnergy));
     MqttSettings.publish(F("battery/dischargedEnergy"), String(_dischargedEnergy));
+    MqttSettings.publish(F("battery/instantaneousPower"), String(_instantaneousPower));
+    MqttSettings.publish(F("battery/consumedAmpHours"), String(_consumedAmpHours));
+    MqttSettings.publish(F("battery/lastFullCharge"), String(_lastFullCharge));
 }

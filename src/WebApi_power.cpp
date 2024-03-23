@@ -93,7 +93,10 @@ void WebApiPowerClass::onPowerPost(AsyncWebServerRequest* request)
         return;
     }
 
-    if (root["serial"].as<uint64_t>() == 0) {
+    // Interpret the string as a hex value and convert it to uint64_t
+    const uint64_t serial = strtoll(root["serial"].as<String>().c_str(), NULL, 16);
+
+    if (serial == 0) {
         retMsg["message"] = "Serial must be a number > 0!";
         retMsg["code"] = WebApiError::PowerSerialZero;
         response->setLength();
@@ -101,7 +104,6 @@ void WebApiPowerClass::onPowerPost(AsyncWebServerRequest* request)
         return;
     }
 
-    uint64_t serial = strtoll(root["serial"].as<String>().c_str(), NULL, 16);
     auto inv = Hoymiles.getInverterBySerial(serial);
     if (inv == nullptr) {
         retMsg["message"] = "Invalid inverter specified!";
