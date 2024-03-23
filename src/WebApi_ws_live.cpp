@@ -121,6 +121,8 @@ void WebApiWsLiveClass::sendOnBatteryStats()
     if (all) { _lastPublishOnBatteryFull = millis(); }
     generateOnBatteryJsonResponse(var, all);
 
+    if (root.isNull()) { return; }
+
     String buffer;
     serializeJson(root, buffer);
 

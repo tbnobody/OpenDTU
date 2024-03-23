@@ -67,6 +67,9 @@ void WebApiWsBatteryLiveClass::sendDataTaskCb()
             JsonVariant var = root;
             generateJsonResponse(var);
 
+            // battery provider does not generate a card, e.g., MQTT provider
+            if (root.isNull()) { return; }
+
             String buffer;
             serializeJson(root, buffer);
 
