@@ -55,6 +55,14 @@ bool ConfigurationClass::write()
     ntp["longitude"] = config.Ntp.Longitude;
     ntp["sunsettype"] = config.Ntp.SunsetType;
 
+    JsonObject modbus = doc["modbus"].to<JsonObject>();
+    modbus["tcp_enabled"] = config.Modbus.TCPEnabled;
+    modbus["port"] = config.Modbus.Port;
+    modbus["clients"] = config.Modbus.Clients;
+    modbus["id_dtupro"] = config.Modbus.IDDTUPro;
+    modbus["id_total"] = config.Modbus.IDTotal;
+    modbus["id_meter"] = config.Modbus.IDMeter;
+
     JsonObject mqtt = doc["mqtt"].to<JsonObject>();
     mqtt["enabled"] = config.Mqtt.Enabled;
     mqtt["hostname"] = config.Mqtt.Hostname;
@@ -229,6 +237,14 @@ bool ConfigurationClass::read()
     config.Ntp.Latitude = ntp["latitude"] | NTP_LATITUDE;
     config.Ntp.Longitude = ntp["longitude"] | NTP_LONGITUDE;
     config.Ntp.SunsetType = ntp["sunsettype"] | NTP_SUNSETTYPE;
+
+    JsonObject modbus = doc["modbus"];
+    config.Modbus.TCPEnabled = modbus["tcp_enabled"] | MODBUS_TCP_ENABLED;
+    config.Modbus.Port = modbus["port"] | MODBUS_PORT;
+    config.Modbus.Clients = modbus["clients"] | MODBUS_CLIENTS;
+    config.Modbus.IDDTUPro = modbus["id_dtupro"] | MODBUS_ID_DTUPRO;
+    config.Modbus.IDTotal = modbus["id_total"] | MODBUS_ID_TOTAL;
+    config.Modbus.IDMeter = modbus["id_meter"] | MODBUS_ID_METER;
 
     JsonObject mqtt = doc["mqtt"];
     config.Mqtt.Enabled = mqtt["enabled"] | MQTT_ENABLED;
