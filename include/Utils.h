@@ -11,5 +11,6 @@ public:
     static int getTimezoneOffset();
     static void restartDtu();
     static bool checkJsonAlloc(const DynamicJsonDocument& doc, const char* function, const uint16_t line);
+    static bool checkJsonOverflow(const DynamicJsonDocument& doc, const char* function, const uint16_t line);
     static void removeAllFiles();
 };

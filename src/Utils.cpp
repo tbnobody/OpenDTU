@@ -79,6 +79,16 @@ bool Utils::checkJsonAlloc(const DynamicJsonDocument& doc, const char* function,
     return true;
 }
 
+bool Utils::checkJsonOverflow(const DynamicJsonDocument& doc, const char* function, const uint16_t line)
+{
+    if (doc.overflowed()) {
+        MessageOutput.printf("DynamicJsonDocument overflowed: %s, %d\r\n", function, line);
+        return true;
+    }
+
+    return false;
+}
+
 /// @brief Remove all files but the PINMAPPING_FILENAME
 void Utils::removeAllFiles()
 {
