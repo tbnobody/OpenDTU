@@ -5,14 +5,20 @@
         <div class="row gy-3">
             <div class="col-sm-3 col-md-2" :style="[inverterData.length == 1 ? { 'display': 'none' } : {}]">
                 <div class="nav nav-pills row-cols-sm-1" id="v-pills-tab" role="tablist" aria-orientation="vertical">
-                    <button v-for="inverter in inverterData" :key="inverter.serial" class="nav-link"
+                    <button v-for="inverter in inverterData" :key="inverter.serial" class="nav-link border border-primary text-break" 
                         :id="'v-pills-' + inverter.serial + '-tab'" data-bs-toggle="pill"
                         :data-bs-target="'#v-pills-' + inverter.serial" type="button" role="tab"
                         aria-controls="'v-pills-' + inverter.serial" aria-selected="true">
-                        <BIconXCircleFill class="fs-4" v-if="!inverter.reachable" />
-                        <BIconExclamationCircleFill class="fs-4" v-if="inverter.reachable && !inverter.producing" />
-                        <BIconCheckCircleFill class="fs-4" v-if="inverter.reachable && inverter.producing" />
-                        {{ inverter.name }}
+                        <div class="row">
+                            <div class="col-auto col-sm-2">
+                                <BIconXCircleFill class="fs-4" v-if="!inverter.reachable" />
+                                <BIconExclamationCircleFill class="fs-4" v-if="inverter.reachable && !inverter.producing" />
+                                <BIconCheckCircleFill class="fs-4" v-if="inverter.reachable && inverter.producing" />
+                            </div>
+                            <div class="col-sm-9">
+                                {{ inverter.name }}
+                            </div>
+                        </div>
                     </button>
                 </div>
             </div>
