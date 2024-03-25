@@ -25,7 +25,7 @@
   "devDependencies": {
     "@intlify/unplugin-vue-i18n": "^3.0.1",
     "@rushstack/eslint-patch": "^1.8.0",
-    "@tsconfig/node18": "^18.2.2",
+    "@tsconfig/node18": "^18.2.3",
     "@types/bootstrap": "^5.2.10",
     "@types/node": "^20.11.30",
     "@types/pulltorefreshjs": "^0.1.7",
