@@ -404,12 +404,11 @@ uint8_t PowerLimiterClass::getPowerLimiterState() {
 }
 
 // Logic table
-// | Case # | batteryPower | solarPower > 0 | useFullSolarPassthrough | Result                                                      |
-// | 1      | false        | false          | doesn't matter          | PL = 0                                                      |
-// | 2      | false        | true           | doesn't matter          | PL = Victron Power                                          |
-// | 3      | true         | doesn't matter | false                   | PL = PowerMeter value (Battery can supply unlimited energy) |
-// | 4      | true         | false          | true                    | PL = PowerMeter value                                       |
-// | 5      | true         | true           | true                    | PL = max(PowerMeter value, Victron Power)                   |
+// | Case # | batteryPower | solarPower     | useFullSolarPassthrough | Resulting inverter limit                               |
+// | 1      | false        |  < 20 W        | doesn't matter          | 0 (inverter off)                                       |
+// | 2      | false        | >= 20 W        | doesn't matter          | min(PowerMeter value, solarPower)                      |
+// | 3      | true         | doesn't matter | false                   | PowerMeter value (Battery can supply unlimited energy) |
+// | 4      | true         | fully passed   | true                    | max(PowerMeter value, solarPower)                      |
 
 bool PowerLimiterClass::calcPowerLimit(std::shared_ptr<InverterAbstract> inverter, int32_t solarPowerDC, bool batteryPower)
 {
@@ -418,6 +417,7 @@ bool PowerLimiterClass::calcPowerLimit(std::shared_ptr<InverterAbstract> inverte
                 (batteryPower?"allowed":"prevented"), solarPowerDC);
     }
 
+    // Case 1:
     if (solarPowerDC <= 0 && !batteryPower) {
         return shutdown(Status::NoEnergy);
     }
@@ -460,9 +460,9 @@ bool PowerLimiterClass::calcPowerLimit(std::shared_ptr<InverterAbstract> inverte
 
     // We're not trying to hit 0 exactly but take an offset into account
     // This means we never fully compensate the used power with the inverter 
-    // Case 3
     newPowerLimit -= config.PowerLimiter.TargetPowerConsumption;
 
+    // Case 2:
     if (!batteryPower) {
         newPowerLimit = std::min(newPowerLimit, solarPowerAC);
 
@@ -476,6 +476,7 @@ bool PowerLimiterClass::calcPowerLimit(std::shared_ptr<InverterAbstract> inverte
         return setNewPowerLimit(inverter, newPowerLimit);
     }
 
+    // Case 4:
     // convert all solar power if full solar-passthrough is active
     if (useFullSolarPassthrough()) {
         newPowerLimit = std::max(newPowerLimit, solarPowerAC);
@@ -493,6 +494,7 @@ bool PowerLimiterClass::calcPowerLimit(std::shared_ptr<InverterAbstract> inverte
             newPowerLimit);
     }
 
+    // Case 3:
     return setNewPowerLimit(inverter, newPowerLimit);
 }
 
