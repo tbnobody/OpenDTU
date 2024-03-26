@@ -138,8 +138,9 @@ void WebApiWsVedirectLiveClass::generateJsonResponse(JsonVariant& root, bool ful
         const JsonObject &nested = array.createNestedObject(serial);
         nested["data_age_ms"] = VictronMppt.getDataAgeMillis(idx);
         populateJson(nested, spMpptData);
-        _lastPublish = millis();
     }
+
+    _lastPublish = millis();
 
     // power limiter state
     root["dpl"]["PLSTATE"] = -1;
