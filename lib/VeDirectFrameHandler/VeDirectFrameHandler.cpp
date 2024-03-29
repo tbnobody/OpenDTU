@@ -118,7 +118,7 @@ void VeDirectFrameHandler<T>::loop()
 	// there will never be a large gap between two bytes of the same frame.
 	// if such a large gap is observed, reset the state machine so it tries
 	// to decode a new frame once more data arrives.
-	if (IDLE != _state && _lastByteMillis + 500 < millis()) {
+	if (IDLE != _state && (millis() - _lastByteMillis) > 500) {
 		_msgOut->printf("%s Resetting state machine (was %d) after timeout\r\n", _logId, _state);
 		if (_verboseLogging) { dumpDebugBuffer(); }
 		reset();
