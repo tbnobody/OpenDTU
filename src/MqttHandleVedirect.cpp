@@ -103,87 +103,31 @@ void MqttHandleVedirectClass::publish_mppt_data(const VeDirectMpptController::da
     topic.concat(currentData.SER);
     topic.concat("/");
 
-    if (_PublishFull || currentData.PID != previousData.PID) {
-        MqttSettings.publish(topic + "PID", currentData.getPidAsString().data());
+#define PUBLISH(sm, t, val) \
+    if (_PublishFull || currentData.sm != previousData.sm) { \
+        MqttSettings.publish(topic + t, String(val)); \
     }
 
-    if (_PublishFull || strcmp(currentData.SER, previousData.SER) != 0) {
-        MqttSettings.publish(topic + "SER", currentData.SER);
-    }
-
-    if (_PublishFull || strcmp(currentData.FW, previousData.FW) != 0) {
-        MqttSettings.publish(topic + "FW", currentData.FW);
-    }
-
-    if (_PublishFull || currentData.LOAD != previousData.LOAD) {
-        MqttSettings.publish(topic + "LOAD", currentData.LOAD ? "ON" : "OFF");
-    }
-
-    if (_PublishFull || currentData.CS != previousData.CS) {
-        MqttSettings.publish(topic + "CS", currentData.getCsAsString().data());
-    }
-
-    if (_PublishFull || currentData.ERR != previousData.ERR) {
-        MqttSettings.publish(topic + "ERR", currentData.getErrAsString().data());
-    }
-
-    if (_PublishFull || currentData.OR != previousData.OR) {
-        MqttSettings.publish(topic + "OR", currentData.getOrAsString().data());
-    }
-
-    if (_PublishFull || currentData.MPPT != previousData.MPPT) {
-        MqttSettings.publish(topic + "MPPT", currentData.getMpptAsString().data());
-    }
-
-    if (_PublishFull || currentData.HSDS != previousData.HSDS) {
-        MqttSettings.publish(topic + "HSDS", String(currentData.HSDS));
-    }
-
-    if (_PublishFull || currentData.V != previousData.V) {
-        MqttSettings.publish(topic + "V", String(currentData.V));
-    }
-
-    if (_PublishFull || currentData.I != previousData.I) {
-        MqttSettings.publish(topic + "I", String(currentData.I));
-    }
-
-    if (_PublishFull || currentData.P != previousData.P) {
-        MqttSettings.publish(topic + "P", String(currentData.P));
-    }
-
-    if (_PublishFull || currentData.VPV != previousData.VPV) {
-        MqttSettings.publish(topic + "VPV", String(currentData.VPV));
-    }
-
-    if (_PublishFull || currentData.IPV != previousData.IPV) {
-        MqttSettings.publish(topic + "IPV", String(currentData.IPV));
-    }
-
-    if (_PublishFull || currentData.PPV != previousData.PPV) {
-        MqttSettings.publish(topic + "PPV", String(currentData.PPV));
-    }
-
-    if (_PublishFull || currentData.E != previousData.E) {
-        MqttSettings.publish(topic + "E", String(currentData.E));
-    }
-
-    if (_PublishFull || currentData.H19 != previousData.H19) {
-        MqttSettings.publish(topic + "H19", String(currentData.H19));
-    }
-
-    if (_PublishFull || currentData.H20 != previousData.H20) {
-        MqttSettings.publish(topic + "H20", String(currentData.H20));
-    }
-
-    if (_PublishFull || currentData.H21 != previousData.H21) {
-        MqttSettings.publish(topic + "H21", String(currentData.H21));
-    }
-
-    if (_PublishFull || currentData.H22 != previousData.H22) {
-        MqttSettings.publish(topic + "H22", String(currentData.H22));
-    }
-
-    if (_PublishFull || currentData.H23 != previousData.H23) {
-        MqttSettings.publish(topic + "H23", String(currentData.H23));
-    }
+    PUBLISH(PID,   "PID",  currentData.getPidAsString().data());
+    PUBLISH(SER,   "SER",  currentData.SER);
+    PUBLISH(FW,    "FW",   currentData.FW);
+    PUBLISH(LOAD,  "LOAD", (currentData.LOAD ? "ON" : "OFF"));
+    PUBLISH(CS,    "CS",   currentData.getCsAsString().data());
+    PUBLISH(ERR,   "ERR",  currentData.getErrAsString().data());
+    PUBLISH(OR,    "OR",   currentData.getOrAsString().data());
+    PUBLISH(MPPT,  "MPPT", currentData.getMpptAsString().data());
+    PUBLISH(HSDS,  "HSDS", currentData.HSDS);
+    PUBLISH(V,     "V",    currentData.V);
+    PUBLISH(I,     "I",    currentData.I);
+    PUBLISH(P,     "P",    currentData.P);
+    PUBLISH(VPV,   "VPV",  currentData.VPV);
+    PUBLISH(IPV,   "IPV",  currentData.IPV);
+    PUBLISH(PPV,   "PPV",  currentData.PPV);
+    PUBLISH(E,     "E",    currentData.E);
+    PUBLISH(H19,   "H19",  currentData.H19);
+    PUBLISH(H20,   "H20",  currentData.H20);
+    PUBLISH(H21,   "H21",  currentData.H21);
+    PUBLISH(H22,   "H22",  currentData.H22);
+    PUBLISH(H23,   "H23",  currentData.H23);
+#undef PUBLILSH
 }
