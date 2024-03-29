@@ -13,17 +13,17 @@
 
 #include <Arduino.h>
 #include <array>
-#include <frozen/string.h>
-#include <frozen/map.h>
 #include <memory>
+#include <utility>
+#include <deque>
+#include "VeDirectData.h"
 
-#define VE_MAX_VALUE_LEN 33 // VE.Direct Protocol: max value size is 33 including /0
-#define VE_MAX_HEX_LEN 100 // Maximum size of hex frame - max payload 34 byte (=68 char) + safe buffer
-
+template<typename T>
 class VeDirectFrameHandler {
 public:
     void loop();                                 // main loop to read ve.direct data
     uint32_t getLastUpdate() const;              // timestamp of last successful frame read
+    bool isDataValid() const;                    // return true if data valid and not outdated
 
 protected:
     VeDirectFrameHandler();
@@ -33,36 +33,14 @@ protected:
     Print* _msgOut;
     uint32_t _lastUpdate;
 
-    typedef struct {
-        uint16_t PID = 0;               // product id
-        char SER[VE_MAX_VALUE_LEN];     // serial number
-        char FW[VE_MAX_VALUE_LEN];      // firmware release number
-        double V = 0;                   // battery voltage in V
-        double I = 0;                   // battery current in A
-        double E = 0;                   // efficiency in percent (calculated, moving average)
-
-        frozen::string const& getPidAsString() const; // product ID as string
-    } veStruct;
-
-    bool textRxEvent(char* name, char* value, veStruct& frame);
-    bool isDataValid(veStruct const& frame) const;      // return true if data valid and not outdated
-
-    template<typename T, size_t L>
-    static frozen::string const& getAsString(frozen::map<T, frozen::string, L> const& values, T val)
-    {
-        auto pos = values.find(val);
-        if (pos == values.end()) {
-            static constexpr frozen::string dummy("???");
-            return dummy;
-        }
-        return pos->second;
-    }
+    T _tmpFrame;
 
 private:
-    void setLastUpdate();                     // set timestampt after successful frame read
+    void reset();
     void dumpDebugBuffer();
     void rxData(uint8_t inbyte);              // byte of serial data
-    virtual void textRxEvent(char *, char *) = 0;
+    void processTextData(std::string const& name, std::string const& value);
+    virtual bool processTextDataDerived(std::string const& name, std::string const& value) = 0;
     virtual void frameValidEvent() = 0;
     int hexRxEvent(uint8_t);
 
@@ -78,4 +56,18 @@ private:
     unsigned _debugIn;
     uint32_t _lastByteMillis;
     char _logId[32];
+
+    /**
+     * not every frame contains every value the device is communicating, i.e.,
+     * a set of values can be fragmented across multiple frames. frames can be
+     * invalid. in order to only process data from valid frames, we add data
+     * to this queue and only process it once the frame was found to be valid.
+     * this also handles fragmentation nicely, since there is no need to reset
+     * our data buffer. we simply update the interpreted data from this event
+     * queue, which is fine as we know the source frame was valid.
+     */
+    std::deque<std::pair<std::string, std::string>> _textData;
 };
+
+template class VeDirectFrameHandler<veMpptStruct>;
+template class VeDirectFrameHandler<veShuntStruct>;

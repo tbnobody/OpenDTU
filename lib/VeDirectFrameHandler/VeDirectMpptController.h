@@ -1,6 +1,7 @@
 #pragma once
 
 #include <Arduino.h>
+#include "VeDirectData.h"
 #include "VeDirectFrameHandler.h"
 
 template<typename T, size_t WINDOW_SIZE>
@@ -35,43 +36,19 @@ private:
     size_t _count;
 };
 
-class VeDirectMpptController : public VeDirectFrameHandler {
+class VeDirectMpptController : public VeDirectFrameHandler<veMpptStruct> {
 public:
     VeDirectMpptController() = default;
 
     void init(int8_t rx, int8_t tx, Print* msgOut, bool verboseLogging, uint16_t hwSerialPort);
-    bool isDataValid() const;                        // return true if data valid and not outdated
 
-    struct veMpptStruct : veStruct {
-        uint8_t  MPPT;                  // state of MPP tracker
-        int32_t PPV;                    // panel power in W
-        int32_t P;                      // battery output power in W (calculated)
-        double VPV;                     // panel voltage in V
-        double IPV;                     // panel current in A (calculated)
-        bool LOAD;                      // virtual load output state (on if battery voltage reaches upper limit, off if battery reaches lower limit)
-        uint8_t  CS;                    // current state of operation e.g. OFF or Bulk
-        uint8_t ERR;                    // error code
-        uint32_t OR;                    // off reason
-        uint32_t HSDS;                  // day sequence number 1...365
-        double H19;                     // yield total kWh
-        double H20;                     // yield today kWh
-        int32_t H21;                    // maximum power today W
-        double H22;                     // yield yesterday kWh
-        int32_t H23;                    // maximum power yesterday W
-
-        frozen::string const& getMpptAsString() const; // state of mppt as string
-        frozen::string const& getCsAsString() const;   // current state as string
-        frozen::string const& getErrAsString() const;  // error state as string
-        frozen::string const& getOrAsString() const;   // off reason as string
-    };
-
-    using spData_t = std::shared_ptr<veMpptStruct const>;
+    using data_t = veMpptStruct;
+    using spData_t = std::shared_ptr<data_t const>;
     spData_t getData() const { return _spData; }
 
 private:
-    void textRxEvent(char* name, char* value) final;
+    bool processTextDataDerived(std::string const& name, std::string const& value) final;
     void frameValidEvent() final;
     spData_t _spData = nullptr;
-    veMpptStruct _tmpFrame{};                        // private struct for received name and value pairs
     MovingAverage<double, 5> _efficiency;
 };

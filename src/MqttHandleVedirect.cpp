@@ -70,7 +70,7 @@ void MqttHandleVedirectClass::loop()
 
             VeDirectMpptController::spData_t &spMpptData = spOptMpptData.value();
 
-            VeDirectMpptController::veMpptStruct _kvFrame = _kvFrames[spMpptData->SER];
+            VeDirectMpptController::data_t _kvFrame = _kvFrames[spMpptData->SER];
             publish_mppt_data(spMpptData, _kvFrame);
             if (!_PublishFull) {
                 _kvFrames[spMpptData->SER] = *spMpptData;
@@ -105,7 +105,7 @@ void MqttHandleVedirectClass::loop()
 }
 
 void MqttHandleVedirectClass::publish_mppt_data(const VeDirectMpptController::spData_t &spMpptData,
-                                                VeDirectMpptController::veMpptStruct &frame) const {
+                                                const VeDirectMpptController::data_t &frame) const {
     String value;
     String topic = "victron/";
     topic.concat(spMpptData->SER);

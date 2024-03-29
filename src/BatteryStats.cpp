@@ -373,7 +373,7 @@ void JkBmsBatteryStats::updateFrom(JkBms::DataPointContainer const& dp)
     _lastUpdate = millis();
 }
 
-void VictronSmartShuntStats::updateFrom(VeDirectShuntController::veShuntStruct const& shuntData) {
+void VictronSmartShuntStats::updateFrom(VeDirectShuntController::data_t const& shuntData) {
     BatteryStats::setVoltage(shuntData.V, millis());
     BatteryStats::setSoC(static_cast<float>(shuntData.SOC) / 10, 1/*precision*/, millis());
 
