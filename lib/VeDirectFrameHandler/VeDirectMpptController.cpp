@@ -3,9 +3,8 @@
 
 void VeDirectMpptController::init(int8_t rx, int8_t tx, Print* msgOut, bool verboseLogging, uint16_t hwSerialPort)
 {
-	VeDirectFrameHandler::init(rx, tx, msgOut, verboseLogging, hwSerialPort);
+	VeDirectFrameHandler::init("MPPT", rx, tx, msgOut, verboseLogging, hwSerialPort);
 	_spData = std::make_shared<veMpptStruct>();
-	if (_verboseLogging) { _msgOut->println("Finished init MPPTController"); }
 }
 
 bool VeDirectMpptController::isDataValid() const {
@@ -14,7 +13,7 @@ bool VeDirectMpptController::isDataValid() const {
 
 void VeDirectMpptController::textRxEvent(char* name, char* value)
 {
-	if (VeDirectFrameHandler::textRxEvent("MPPT", name, value, _tmpFrame)) {
+	if (VeDirectFrameHandler::textRxEvent(name, value, _tmpFrame)) {
 		return;
 	}
 

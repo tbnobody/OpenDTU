@@ -22,12 +22,13 @@
 
 class VeDirectFrameHandler {
 public:
-    VeDirectFrameHandler();
-    virtual void init(int8_t rx, int8_t tx, Print* msgOut, bool verboseLogging, uint16_t hwSerialPort);
     void loop();                                 // main loop to read ve.direct data
     uint32_t getLastUpdate() const;              // timestamp of last successful frame read
 
 protected:
+    VeDirectFrameHandler();
+    void init(char const* who, int8_t rx, int8_t tx, Print* msgOut, bool verboseLogging, uint16_t hwSerialPort);
+
     bool _verboseLogging;
     Print* _msgOut;
     uint32_t _lastUpdate;
@@ -43,7 +44,7 @@ protected:
         frozen::string const& getPidAsString() const; // product ID as string
     } veStruct;
 
-    bool textRxEvent(std::string const& who, char* name, char* value, veStruct& frame);
+    bool textRxEvent(char* name, char* value, veStruct& frame);
     bool isDataValid(veStruct const& frame) const;      // return true if data valid and not outdated
 
     template<typename T, size_t L>
@@ -76,4 +77,5 @@ private:
     std::array<uint8_t, 512> _debugBuffer;
     unsigned _debugIn;
     uint32_t _lastByteMillis;
+    char _logId[32];
 };

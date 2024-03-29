@@ -72,7 +72,7 @@ VeDirectFrameHandler::VeDirectFrameHandler() :
 {
 }
 
-void VeDirectFrameHandler::init(int8_t rx, int8_t tx, Print* msgOut, bool verboseLogging, uint16_t hwSerialPort)
+void VeDirectFrameHandler::init(char const* who, int8_t rx, int8_t tx, Print* msgOut, bool verboseLogging, uint16_t hwSerialPort)
 {
 	_vedirectSerial = std::make_unique<HardwareSerial>(hwSerialPort);
 	_vedirectSerial->begin(19200, SERIAL_8N1, rx, tx);
@@ -80,13 +80,15 @@ void VeDirectFrameHandler::init(int8_t rx, int8_t tx, Print* msgOut, bool verbos
 	_msgOut = msgOut;
 	_verboseLogging = verboseLogging;
 	_debugIn = 0;
+	snprintf(_logId, sizeof(_logId), "[VE.Direct %s %d/%d]", who, rx, tx);
+	if (_verboseLogging) { _msgOut->printf("%s init complete\r\n", _logId); }
 }
 
 void VeDirectFrameHandler::dumpDebugBuffer() {
-	_msgOut->printf("[VE.Direct] serial input (%d Bytes):", _debugIn);
+	_msgOut->printf("%s serial input (%d Bytes):", _logId, _debugIn);
 	for (int i = 0; i < _debugIn; ++i) {
 		if (i % 16 == 0) {
-			_msgOut->printf("\r\n[VE.Direct]");
+			_msgOut->printf("\r\n%s", _logId);
 		}
 		_msgOut->printf(" %02x", _debugBuffer[i]);
 	}
@@ -105,7 +107,7 @@ void VeDirectFrameHandler::loop()
 	// if such a large gap is observed, reset the state machine so it tries
 	// to decode a new frame once more data arrives.
 	if (IDLE != _state && _lastByteMillis + 500 < millis()) {
-		_msgOut->printf("[VE.Direct] Resetting state machine (was %d) after timeout\r\n", _state);
+		_msgOut->printf("%s Resetting state machine (was %d) after timeout\r\n", _logId, _state);
 		if (_verboseLogging) { dumpDebugBuffer(); }
 		_checksum = 0;
 		_state = IDLE;
@@ -123,7 +125,7 @@ void VeDirectFrameHandler::rxData(uint8_t inbyte)
 		_debugBuffer[_debugIn] = inbyte;
 		_debugIn = (_debugIn + 1) % _debugBuffer.size();
 		if (0 == _debugIn) {
-			_msgOut->println("[VE.Direct] ERROR: debug buffer overrun!");
+			_msgOut->printf("%s ERROR: debug buffer overrun!\r\n", _logId);
 		}
 	}
 
@@ -201,7 +203,7 @@ void VeDirectFrameHandler::rxData(uint8_t inbyte)
 	{
 		bool valid = _checksum == 0;
 		if (!valid) {
-			_msgOut->printf("[VE.Direct] checksum 0x%02x != 0, invalid frame\r\n", _checksum);
+			_msgOut->printf("%s checksum 0x%02x != 0, invalid frame\r\n", _logId, _checksum);
 		}
 		if (_verboseLogging) { dumpDebugBuffer(); }
 		_checksum = 0;
@@ -219,10 +221,10 @@ void VeDirectFrameHandler::rxData(uint8_t inbyte)
  * textRxEvent
  * This function is called every time a new name/value is successfully parsed.  It writes the values to the temporary buffer.
  */
-bool VeDirectFrameHandler::textRxEvent(std::string const& who, char* name, char* value, veStruct& frame) {
+bool VeDirectFrameHandler::textRxEvent(char* name, char* value, veStruct& frame) {
 	if (_verboseLogging) {
-		_msgOut->printf("[Victron %s] Text Event %s: Value: %s\r\n",
-				who.c_str(), name, value );
+		_msgOut->printf("%s Text Event %s: Value: %s\r\n",
+				_logId, name, value );
 	}
 
 	if (strcmp(name, "PID") == 0) {
@@ -271,7 +273,7 @@ int VeDirectFrameHandler::hexRxEvent(uint8_t inbyte) {
 	default:
 		_hexSize++;
 		if (_hexSize>=VE_MAX_HEX_LEN) { // oops -buffer overflow - something went wrong, we abort
-			_msgOut->println("[VE.Direct] hexRx buffer overflow - aborting read");
+			_msgOut->printf("%s hexRx buffer overflow - aborting read\r\n", _logId);
 			_hexSize=0;
 			ret=IDLE;
 		}
