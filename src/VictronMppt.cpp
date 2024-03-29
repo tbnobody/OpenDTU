@@ -158,9 +158,9 @@ int32_t VictronMpptClass::getPanelPowerWatts() const
     return sum;
 }
 
-double VictronMpptClass::getYieldTotal() const
+float VictronMpptClass::getYieldTotal() const
 {
-    double sum = 0;
+    float sum = 0;
 
     for (const auto& upController : _controllers) {
         if (!upController->isDataValid()) { continue; }
@@ -170,9 +170,9 @@ double VictronMpptClass::getYieldTotal() const
     return sum;
 }
 
-double VictronMpptClass::getYieldDay() const
+float VictronMpptClass::getYieldDay() const
 {
-    double sum = 0;
+    float sum = 0;
 
     for (const auto& upController : _controllers) {
         if (!upController->isDataValid()) { continue; }
@@ -182,13 +182,13 @@ double VictronMpptClass::getYieldDay() const
     return sum;
 }
 
-double VictronMpptClass::getOutputVoltage() const
+float VictronMpptClass::getOutputVoltage() const
 {
-    double min = -1;
+    float min = -1;
 
     for (const auto& upController : _controllers) {
         if (!upController->isDataValid()) { continue; }
-        double volts = upController->getData().V;
+        float volts = upController->getData().V;
         if (min == -1) { min = volts; }
         min = std::min(min, volts);
     }

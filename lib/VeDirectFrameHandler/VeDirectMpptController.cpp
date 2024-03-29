@@ -76,7 +76,7 @@ void VeDirectMpptController::frameValidEvent() {
 	}
 
 	if (_tmpFrame.PPV > 0) {
-		_efficiency.addNumber(static_cast<double>(_tmpFrame.P * 100) / _tmpFrame.PPV);
+		_efficiency.addNumber(static_cast<float>(_tmpFrame.P * 100) / _tmpFrame.PPV);
 		_tmpFrame.E = _efficiency.getAverage();
 	}
 }

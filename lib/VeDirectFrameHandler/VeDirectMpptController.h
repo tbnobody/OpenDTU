@@ -24,9 +24,9 @@ public:
         _index = (_index + 1) % WINDOW_SIZE;
     }
 
-    double getAverage() const {
+    float getAverage() const {
         if (_count == 0) { return 0.0; }
-        return static_cast<double>(_sum) / _count;
+        return static_cast<float>(_sum) / _count;
     }
 
 private:
@@ -47,5 +47,5 @@ public:
 private:
     bool processTextDataDerived(std::string const& name, std::string const& value) final;
     void frameValidEvent() final;
-    MovingAverage<double, 5> _efficiency;
+    MovingAverage<float, 5> _efficiency;
 };

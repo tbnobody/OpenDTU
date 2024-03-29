@@ -10,9 +10,9 @@ typedef struct {
     uint16_t PID = 0;               // product id
     char SER[VE_MAX_VALUE_LEN];     // serial number
     char FW[VE_MAX_VALUE_LEN];      // firmware release number
-    double V = 0;                   // battery voltage in V
-    double I = 0;                   // battery current in A
-    double E = 0;                   // efficiency in percent (calculated, moving average)
+    float V = 0;                    // battery voltage in V
+    float I = 0;                    // battery current in A
+    float E = 0;                    // efficiency in percent (calculated, moving average)
 
     frozen::string const& getPidAsString() const; // product ID as string
 } veStruct;
@@ -21,17 +21,17 @@ struct veMpptStruct : veStruct {
     uint8_t MPPT;                   // state of MPP tracker
     int32_t PPV;                    // panel power in W
     int32_t P;                      // battery output power in W (calculated)
-    double VPV;                     // panel voltage in V
-    double IPV;                     // panel current in A (calculated)
+    float VPV;                      // panel voltage in V
+    float IPV;                      // panel current in A (calculated)
     bool LOAD;                      // virtual load output state (on if battery voltage reaches upper limit, off if battery reaches lower limit)
     uint8_t CS;                     // current state of operation e.g. OFF or Bulk
     uint8_t ERR;                    // error code
     uint32_t OR;                    // off reason
     uint32_t HSDS;                  // day sequence number 1...365
-    double H19;                     // yield total kWh
-    double H20;                     // yield today kWh
+    float H19;                      // yield total kWh
+    float H20;                      // yield today kWh
     int32_t H21;                    // maximum power today W
-    double H22;                     // yield yesterday kWh
+    float H22;                      // yield yesterday kWh
     int32_t H23;                    // maximum power yesterday W
 
     frozen::string const& getMpptAsString() const; // state of mppt as string

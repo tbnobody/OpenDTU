@@ -34,13 +34,13 @@ public:
     int32_t getPanelPowerWatts() const;
 
     // sum of total yield of all MPPT charge controllers in kWh
-    double getYieldTotal() const;
+    float getYieldTotal() const;
 
     // sum of today's yield of all MPPT charge controllers in kWh
-    double getYieldDay() const;
+    float getYieldDay() const;
 
     // minimum of all MPPT charge controllers' output voltages in V
-    double getOutputVoltage() const;
+    float getOutputVoltage() const;
 
 private:
     void loop();
