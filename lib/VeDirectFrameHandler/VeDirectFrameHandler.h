@@ -24,6 +24,7 @@ public:
     void loop();                                 // main loop to read ve.direct data
     uint32_t getLastUpdate() const;              // timestamp of last successful frame read
     bool isDataValid() const;                    // return true if data valid and not outdated
+    T const& getData() const { return _tmpFrame; }
 
 protected:
     VeDirectFrameHandler();
@@ -41,7 +42,7 @@ private:
     void rxData(uint8_t inbyte);              // byte of serial data
     void processTextData(std::string const& name, std::string const& value);
     virtual bool processTextDataDerived(std::string const& name, std::string const& value) = 0;
-    virtual void frameValidEvent() = 0;
+    virtual void frameValidEvent() { }
     int hexRxEvent(uint8_t);
 
     std::unique_ptr<HardwareSerial> _vedirectSerial;

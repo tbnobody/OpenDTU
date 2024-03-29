@@ -119,7 +119,7 @@ uint32_t VictronMpptClass::getDataAgeMillis(size_t idx) const
     return millis() - _controllers[idx]->getLastUpdate();
 }
 
-std::optional<VeDirectMpptController::spData_t> VictronMpptClass::getData(size_t idx) const
+std::optional<VeDirectMpptController::data_t> VictronMpptClass::getData(size_t idx) const
 {
     std::lock_guard<std::mutex> lock(_mutex);
 
@@ -129,7 +129,9 @@ std::optional<VeDirectMpptController::spData_t> VictronMpptClass::getData(size_t
         return std::nullopt;
     }
 
-    return std::optional<VeDirectMpptController::spData_t>{_controllers[idx]->getData()};
+    if (!_controllers[idx]->isDataValid()) { return std::nullopt; }
+
+    return _controllers[idx]->getData();
 }
 
 int32_t VictronMpptClass::getPowerOutputWatts() const
@@ -138,7 +140,7 @@ int32_t VictronMpptClass::getPowerOutputWatts() const
 
     for (const auto& upController : _controllers) {
         if (!upController->isDataValid()) { continue; }
-        sum += upController->getData()->P;
+        sum += upController->getData().P;
     }
 
     return sum;
@@ -150,7 +152,7 @@ int32_t VictronMpptClass::getPanelPowerWatts() const
 
     for (const auto& upController : _controllers) {
         if (!upController->isDataValid()) { continue; }
-        sum += upController->getData()->PPV;
+        sum += upController->getData().PPV;
     }
 
     return sum;
@@ -162,7 +164,7 @@ double VictronMpptClass::getYieldTotal() const
 
     for (const auto& upController : _controllers) {
         if (!upController->isDataValid()) { continue; }
-        sum += upController->getData()->H19;
+        sum += upController->getData().H19;
     }
 
     return sum;
@@ -174,7 +176,7 @@ double VictronMpptClass::getYieldDay() const
 
     for (const auto& upController : _controllers) {
         if (!upController->isDataValid()) { continue; }
-        sum += upController->getData()->H20;
+        sum += upController->getData().H20;
     }
 
     return sum;
@@ -186,7 +188,7 @@ double VictronMpptClass::getOutputVoltage() const
 
     for (const auto& upController : _controllers) {
         if (!upController->isDataValid()) { continue; }
-        double volts = upController->getData()->V;
+        double volts = upController->getData().V;
         if (min == -1) { min = volts; }
         min = std::min(min, volts);
     }

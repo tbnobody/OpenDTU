@@ -110,11 +110,3 @@ bool VeDirectShuntController::processTextDataDerived(std::string const& name, st
 
 	return false;
 }
-
-/*
- *  frameValidEvent
- *  This function is called at the end of the received frame.
- */
-void VeDirectShuntController::frameValidEvent() {
-	veFrame = _tmpFrame;
-}

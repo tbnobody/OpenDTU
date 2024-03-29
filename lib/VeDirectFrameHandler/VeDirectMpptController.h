@@ -43,12 +43,9 @@ public:
     void init(int8_t rx, int8_t tx, Print* msgOut, bool verboseLogging, uint16_t hwSerialPort);
 
     using data_t = veMpptStruct;
-    using spData_t = std::shared_ptr<data_t const>;
-    spData_t getData() const { return _spData; }
 
 private:
     bool processTextDataDerived(std::string const& name, std::string const& value) final;
     void frameValidEvent() final;
-    spData_t _spData = nullptr;
     MovingAverage<double, 5> _efficiency;
 };

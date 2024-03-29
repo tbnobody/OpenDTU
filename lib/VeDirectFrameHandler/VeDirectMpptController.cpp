@@ -4,7 +4,6 @@
 void VeDirectMpptController::init(int8_t rx, int8_t tx, Print* msgOut, bool verboseLogging, uint16_t hwSerialPort)
 {
 	VeDirectFrameHandler::init("MPPT", rx, tx, msgOut, verboseLogging, hwSerialPort);
-	_spData = std::make_shared<veMpptStruct>();
 }
 
 bool VeDirectMpptController::processTextDataDerived(std::string const& name, std::string const& value)
@@ -80,6 +79,4 @@ void VeDirectMpptController::frameValidEvent() {
 		_efficiency.addNumber(static_cast<double>(_tmpFrame.P * 100) / _tmpFrame.PPV);
 		_tmpFrame.E = _efficiency.getAverage();
 	}
-
-	_spData = std::make_shared<veMpptStruct>(_tmpFrame);
 }

@@ -33,7 +33,7 @@ private:
 
     bool _PublishFull;
 
-    void publish_mppt_data(const VeDirectMpptController::spData_t &spMpptData,
+    void publish_mppt_data(const VeDirectMpptController::data_t &mpptData,
                            const VeDirectMpptController::data_t &frame) const;
 };
 

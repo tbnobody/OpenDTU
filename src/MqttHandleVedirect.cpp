@@ -59,21 +59,13 @@ void MqttHandleVedirectClass::loop()
         #endif
 
         for (int idx = 0; idx < VictronMppt.controllerAmount(); ++idx) {
-            if (!VictronMppt.isDataValid(idx)) {
-                continue;
-            }
+            std::optional<VeDirectMpptController::data_t> optMpptData = VictronMppt.getData(idx);
+            if (!optMpptData.has_value()) { continue; }
 
-            std::optional<VeDirectMpptController::spData_t> spOptMpptData = VictronMppt.getData(idx);
-            if (!spOptMpptData.has_value()) {
-                continue;
-            }
-
-            VeDirectMpptController::spData_t &spMpptData = spOptMpptData.value();
-
-            VeDirectMpptController::data_t _kvFrame = _kvFrames[spMpptData->SER];
-            publish_mppt_data(spMpptData, _kvFrame);
+            auto const& kvFrame = _kvFrames[optMpptData->SER];
+            publish_mppt_data(*optMpptData, kvFrame);
             if (!_PublishFull) {
-                _kvFrames[spMpptData->SER] = *spMpptData;
+                _kvFrames[optMpptData->SER] = *optMpptData;
             }
         }
 
@@ -104,79 +96,94 @@ void MqttHandleVedirectClass::loop()
     }
 }
 
-void MqttHandleVedirectClass::publish_mppt_data(const VeDirectMpptController::spData_t &spMpptData,
-                                                const VeDirectMpptController::data_t &frame) const {
+void MqttHandleVedirectClass::publish_mppt_data(const VeDirectMpptController::data_t &currentData,
+                                                const VeDirectMpptController::data_t &previousData) const {
     String value;
     String topic = "victron/";
-    topic.concat(spMpptData->SER);
+    topic.concat(currentData.SER);
     topic.concat("/");
 
-    if (_PublishFull || spMpptData->PID != frame.PID)
-        MqttSettings.publish(topic + "PID", spMpptData->getPidAsString().data());
-    if (_PublishFull || strcmp(spMpptData->SER, frame.SER) != 0)
-        MqttSettings.publish(topic + "SER", spMpptData->SER );
-    if (_PublishFull || strcmp(spMpptData->FW, frame.FW) != 0)
-        MqttSettings.publish(topic + "FW", spMpptData->FW);
-    if (_PublishFull || spMpptData->LOAD != frame.LOAD)
-        MqttSettings.publish(topic + "LOAD", spMpptData->LOAD ? "ON" : "OFF");
-    if (_PublishFull || spMpptData->CS != frame.CS)
-        MqttSettings.publish(topic + "CS", spMpptData->getCsAsString().data());
-    if (_PublishFull || spMpptData->ERR != frame.ERR)
-        MqttSettings.publish(topic + "ERR", spMpptData->getErrAsString().data());
-    if (_PublishFull || spMpptData->OR != frame.OR)
-        MqttSettings.publish(topic + "OR", spMpptData->getOrAsString().data());
-    if (_PublishFull || spMpptData->MPPT != frame.MPPT)
-        MqttSettings.publish(topic + "MPPT", spMpptData->getMpptAsString().data());
-    if (_PublishFull || spMpptData->HSDS != frame.HSDS) {
-        value = spMpptData->HSDS;
-        MqttSettings.publish(topic + "HSDS", value);
+    if (_PublishFull || currentData.PID != previousData.PID) {
+        MqttSettings.publish(topic + "PID", currentData.getPidAsString().data());
     }
-    if (_PublishFull || spMpptData->V != frame.V) {
-        value = spMpptData->V;
-        MqttSettings.publish(topic + "V", value);
+
+    if (_PublishFull || strcmp(currentData.SER, previousData.SER) != 0) {
+        MqttSettings.publish(topic + "SER", currentData.SER);
     }
-    if (_PublishFull || spMpptData->I != frame.I) {
-        value = spMpptData->I;
-        MqttSettings.publish(topic + "I", value);
+
+    if (_PublishFull || strcmp(currentData.FW, previousData.FW) != 0) {
+        MqttSettings.publish(topic + "FW", currentData.FW);
     }
-    if (_PublishFull || spMpptData->P != frame.P) {
-        value = spMpptData->P;
-        MqttSettings.publish(topic + "P", value);
+
+    if (_PublishFull || currentData.LOAD != previousData.LOAD) {
+        MqttSettings.publish(topic + "LOAD", currentData.LOAD ? "ON" : "OFF");
     }
-    if (_PublishFull || spMpptData->VPV != frame.VPV) {
-        value = spMpptData->VPV;
-        MqttSettings.publish(topic + "VPV", value);
+
+    if (_PublishFull || currentData.CS != previousData.CS) {
+        MqttSettings.publish(topic + "CS", currentData.getCsAsString().data());
     }
-    if (_PublishFull || spMpptData->IPV != frame.IPV) {
-        value = spMpptData->IPV;
-        MqttSettings.publish(topic + "IPV", value);
+
+    if (_PublishFull || currentData.ERR != previousData.ERR) {
+        MqttSettings.publish(topic + "ERR", currentData.getErrAsString().data());
     }
-    if (_PublishFull || spMpptData->PPV != frame.PPV) {
-        value = spMpptData->PPV;
-        MqttSettings.publish(topic + "PPV", value);
+
+    if (_PublishFull || currentData.OR != previousData.OR) {
+        MqttSettings.publish(topic + "OR", currentData.getOrAsString().data());
     }
-    if (_PublishFull || spMpptData->E != frame.E) {
-        value = spMpptData->E;
-        MqttSettings.publish(topic + "E", value);
+
+    if (_PublishFull || currentData.MPPT != previousData.MPPT) {
+        MqttSettings.publish(topic + "MPPT", currentData.getMpptAsString().data());
     }
-    if (_PublishFull || spMpptData->H19 != frame.H19) {
-        value = spMpptData->H19;
-        MqttSettings.publish(topic + "H19", value);
+
+    if (_PublishFull || currentData.HSDS != previousData.HSDS) {
+        MqttSettings.publish(topic + "HSDS", String(currentData.HSDS));
     }
-    if (_PublishFull || spMpptData->H20 != frame.H20) {
-        value = spMpptData->H20;
-        MqttSettings.publish(topic + "H20", value);
+
+    if (_PublishFull || currentData.V != previousData.V) {
+        MqttSettings.publish(topic + "V", String(currentData.V));
     }
-    if (_PublishFull || spMpptData->H21 != frame.H21) {
-        value = spMpptData->H21;
-        MqttSettings.publish(topic + "H21", value);
+
+    if (_PublishFull || currentData.I != previousData.I) {
+        MqttSettings.publish(topic + "I", String(currentData.I));
     }
-    if (_PublishFull || spMpptData->H22 != frame.H22) {
-        value = spMpptData->H22;
-        MqttSettings.publish(topic + "H22", value);
+
+    if (_PublishFull || currentData.P != previousData.P) {
+        MqttSettings.publish(topic + "P", String(currentData.P));
     }
-    if (_PublishFull || spMpptData->H23 != frame.H23) {
-        value = spMpptData->H23;
-        MqttSettings.publish(topic + "H23", value);
+
+    if (_PublishFull || currentData.VPV != previousData.VPV) {
+        MqttSettings.publish(topic + "VPV", String(currentData.VPV));
+    }
+
+    if (_PublishFull || currentData.IPV != previousData.IPV) {
+        MqttSettings.publish(topic + "IPV", String(currentData.IPV));
+    }
+
+    if (_PublishFull || currentData.PPV != previousData.PPV) {
+        MqttSettings.publish(topic + "PPV", String(currentData.PPV));
+    }
+
+    if (_PublishFull || currentData.E != previousData.E) {
+        MqttSettings.publish(topic + "E", String(currentData.E));
+    }
+
+    if (_PublishFull || currentData.H19 != previousData.H19) {
+        MqttSettings.publish(topic + "H19", String(currentData.H19));
+    }
+
+    if (_PublishFull || currentData.H20 != previousData.H20) {
+        MqttSettings.publish(topic + "H20", String(currentData.H20));
+    }
+
+    if (_PublishFull || currentData.H21 != previousData.H21) {
+        MqttSettings.publish(topic + "H21", String(currentData.H21));
+    }
+
+    if (_PublishFull || currentData.H22 != previousData.H22) {
+        MqttSettings.publish(topic + "H22", String(currentData.H22));
+    }
+
+    if (_PublishFull || currentData.H23 != previousData.H23) {
+        MqttSettings.publish(topic + "H23", String(currentData.H23));
     }
 }

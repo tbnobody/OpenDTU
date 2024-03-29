@@ -11,11 +11,9 @@ public:
     void init(int8_t rx, int8_t tx, Print* msgOut, bool verboseLogging);
 
     using data_t = veShuntStruct;
-    data_t veFrame{};
 
 private:
     bool processTextDataDerived(std::string const& name, std::string const& value) final;
-    void frameValidEvent() final;
 };
 
 extern VeDirectShuntController VeDirectShunt;

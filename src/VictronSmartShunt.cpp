@@ -31,6 +31,6 @@ void VictronSmartShunt::loop()
 
     if (VeDirectShunt.getLastUpdate() <= _lastUpdate) { return; }
 
-    _stats->updateFrom(VeDirectShunt.veFrame);
+    _stats->updateFrom(VeDirectShunt.getData());
     _lastUpdate = VeDirectShunt.getLastUpdate();
 }

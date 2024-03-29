@@ -58,42 +58,33 @@ void MqttHandleVedirectHassClass::publishConfig()
 
     // device info
     for (int idx = 0; idx < VictronMppt.controllerAmount(); ++idx) {
-        // ensure data is received from victron
-        if (!VictronMppt.isDataValid(idx)) {
-            continue;
-        }
+        auto optMpptData = VictronMppt.getData(idx);
+        if (!optMpptData.has_value()) { continue; }
 
-        std::optional<VeDirectMpptController::spData_t> spOptMpptData = VictronMppt.getData(idx);
-        if (!spOptMpptData.has_value()) {
-            continue;
-        }
-
-        VeDirectMpptController::spData_t &spMpptData = spOptMpptData.value();
-
-        publishBinarySensor("MPPT load output state", "mdi:export", "LOAD", "ON", "OFF", spMpptData);
-        publishSensor("MPPT serial number", "mdi:counter", "SER", nullptr, nullptr, nullptr, spMpptData);
-        publishSensor("MPPT firmware number", "mdi:counter", "FW", nullptr, nullptr, nullptr, spMpptData);
-        publishSensor("MPPT state of operation", "mdi:wrench", "CS", nullptr, nullptr, nullptr, spMpptData);
-        publishSensor("MPPT error code", "mdi:bell", "ERR", nullptr, nullptr, nullptr, spMpptData);
-        publishSensor("MPPT off reason", "mdi:wrench", "OR", nullptr, nullptr, nullptr, spMpptData);
-        publishSensor("MPPT tracker operation mode", "mdi:wrench", "MPPT", nullptr, nullptr, nullptr, spMpptData);
-        publishSensor("MPPT Day sequence number (0...364)", "mdi:calendar-month-outline", "HSDS", NULL, "total", "d", spMpptData);
+        publishBinarySensor("MPPT load output state", "mdi:export", "LOAD", "ON", "OFF", *optMpptData);
+        publishSensor("MPPT serial number", "mdi:counter", "SER", nullptr, nullptr, nullptr, *optMpptData);
+        publishSensor("MPPT firmware number", "mdi:counter", "FW", nullptr, nullptr, nullptr, *optMpptData);
+        publishSensor("MPPT state of operation", "mdi:wrench", "CS", nullptr, nullptr, nullptr, *optMpptData);
+        publishSensor("MPPT error code", "mdi:bell", "ERR", nullptr, nullptr, nullptr, *optMpptData);
+        publishSensor("MPPT off reason", "mdi:wrench", "OR", nullptr, nullptr, nullptr, *optMpptData);
+        publishSensor("MPPT tracker operation mode", "mdi:wrench", "MPPT", nullptr, nullptr, nullptr, *optMpptData);
+        publishSensor("MPPT Day sequence number (0...364)", "mdi:calendar-month-outline", "HSDS", NULL, "total", "d", *optMpptData);
 
         // battery info
-        publishSensor("Battery voltage", NULL, "V", "voltage", "measurement", "V", spMpptData);
-        publishSensor("Battery current", NULL, "I", "current", "measurement", "A", spMpptData);
-        publishSensor("Battery power (calculated)", NULL, "P", "power", "measurement", "W", spMpptData);
-        publishSensor("Battery efficiency (calculated)", NULL, "E", NULL, "measurement", "%", spMpptData);
+        publishSensor("Battery voltage", NULL, "V", "voltage", "measurement", "V", *optMpptData);
+        publishSensor("Battery current", NULL, "I", "current", "measurement", "A", *optMpptData);
+        publishSensor("Battery power (calculated)", NULL, "P", "power", "measurement", "W", *optMpptData);
+        publishSensor("Battery efficiency (calculated)", NULL, "E", NULL, "measurement", "%", *optMpptData);
 
         // panel info
-        publishSensor("Panel voltage", NULL, "VPV", "voltage", "measurement", "V", spMpptData);
-        publishSensor("Panel current (calculated)", NULL, "IPV", "current", "measurement", "A", spMpptData);
-        publishSensor("Panel power", NULL, "PPV", "power", "measurement", "W", spMpptData);
-        publishSensor("Panel yield total", NULL, "H19", "energy", "total_increasing", "kWh", spMpptData);
-        publishSensor("Panel yield today", NULL, "H20", "energy", "total", "kWh", spMpptData);
-        publishSensor("Panel maximum power today", NULL, "H21", "power", "measurement", "W", spMpptData);
-        publishSensor("Panel yield yesterday", NULL, "H22", "energy", "total", "kWh", spMpptData);
-        publishSensor("Panel maximum power yesterday", NULL, "H23", "power", "measurement", "W", spMpptData);
+        publishSensor("Panel voltage", NULL, "VPV", "voltage", "measurement", "V", *optMpptData);
+        publishSensor("Panel current (calculated)", NULL, "IPV", "current", "measurement", "A", *optMpptData);
+        publishSensor("Panel power", NULL, "PPV", "power", "measurement", "W", *optMpptData);
+        publishSensor("Panel yield total", NULL, "H19", "energy", "total_increasing", "kWh", *optMpptData);
+        publishSensor("Panel yield today", NULL, "H20", "energy", "total", "kWh", *optMpptData);
+        publishSensor("Panel maximum power today", NULL, "H21", "power", "measurement", "W", *optMpptData);
+        publishSensor("Panel yield yesterday", NULL, "H22", "energy", "total", "kWh", *optMpptData);
+        publishSensor("Panel maximum power yesterday", NULL, "H23", "power", "measurement", "W", *optMpptData);
     }
 
     yield();
@@ -102,9 +93,9 @@ void MqttHandleVedirectHassClass::publishConfig()
 void MqttHandleVedirectHassClass::publishSensor(const char *caption, const char *icon, const char *subTopic,
                                                 const char *deviceClass, const char *stateClass,
                                                 const char *unitOfMeasurement,
-                                                const VeDirectMpptController::spData_t &spMpptData)
+                                                const VeDirectMpptController::data_t &mpptData)
 {
-    String serial = spMpptData->SER;
+    String serial = mpptData.SER;
 
     String sensorId = caption;
     sensorId.replace(" ", "_");
@@ -139,7 +130,7 @@ void MqttHandleVedirectHassClass::publishSensor(const char *caption, const char 
     }
 
     JsonObject deviceObj = root.createNestedObject("dev");
-    createDeviceInfo(deviceObj, spMpptData);
+    createDeviceInfo(deviceObj, mpptData);
 
     if (Configuration.get().Mqtt.Hass.Expire) {
         root["exp_aft"] = Configuration.get().Mqtt.PublishInterval * 3;
@@ -160,9 +151,9 @@ void MqttHandleVedirectHassClass::publishSensor(const char *caption, const char 
 }
 void MqttHandleVedirectHassClass::publishBinarySensor(const char *caption, const char *icon, const char *subTopic,
                                                       const char *payload_on, const char *payload_off,
-                                                      const VeDirectMpptController::spData_t &spMpptData)
+                                                      const VeDirectMpptController::data_t &mpptData)
 {
-    String serial = spMpptData->SER;
+    String serial = mpptData.SER;
 
     String sensorId = caption;
     sensorId.replace(" ", "_");
@@ -195,7 +186,7 @@ void MqttHandleVedirectHassClass::publishBinarySensor(const char *caption, const
     }
 
     JsonObject deviceObj = root.createNestedObject("dev");
-    createDeviceInfo(deviceObj, spMpptData);
+    createDeviceInfo(deviceObj, mpptData);
 
     if (Utils::checkJsonOverflow(root, __FUNCTION__, __LINE__)) { return; }
 
@@ -205,14 +196,14 @@ void MqttHandleVedirectHassClass::publishBinarySensor(const char *caption, const
 }
 
 void MqttHandleVedirectHassClass::createDeviceInfo(JsonObject &object,
-                                                   const VeDirectMpptController::spData_t &spMpptData)
+                                                   const VeDirectMpptController::data_t &mpptData)
 {
-    String serial = spMpptData->SER;
+    String serial = mpptData.SER;
     object["name"] = "Victron(" + serial + ")";
     object["ids"] = serial;
     object["cu"] = String("http://") + NetworkSettings.localIP().toString();
     object["mf"] = "OpenDTU";
-    object["mdl"] = spMpptData->getPidAsString();
+    object["mdl"] = mpptData.getPidAsString();
     object["sw"] = AUTO_GIT_HASH;
 }
 
