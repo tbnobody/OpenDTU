@@ -39,18 +39,6 @@
 // The name of the record that contains the checksum.
 static constexpr char checksumTagName[] = "CHECKSUM";
 
-// state machine
-enum States {
-	IDLE = 1,
-	RECORD_BEGIN = 2,
-	RECORD_NAME = 3,
-	RECORD_VALUE = 4,
-	CHECKSUM = 5,
-	RECORD_HEX = 6
-};
-
-
-
 class Silent : public Print {
 	public:
 		size_t write(uint8_t c) final { return 0; }
@@ -62,7 +50,7 @@ template<typename T>
 VeDirectFrameHandler<T>::VeDirectFrameHandler() :
 	_msgOut(&MessageOutputDummy),
 	_lastUpdate(0),
-	_state(IDLE),
+	_state(State::IDLE),
 	_checksum(0),
 	_textPointer(0),
 	_hexSize(0),
@@ -79,6 +67,7 @@ void VeDirectFrameHandler<T>::init(char const* who, int8_t rx, int8_t tx, Print*
 	_vedirectSerial = std::make_unique<HardwareSerial>(hwSerialPort);
 	_vedirectSerial->begin(19200, SERIAL_8N1, rx, tx);
 	_vedirectSerial->flush();
+	_canSend = (tx != -1);
 	_msgOut = msgOut;
 	_verboseLogging = verboseLogging;
 	_debugIn = 0;
@@ -103,7 +92,7 @@ template<typename T>
 void VeDirectFrameHandler<T>::reset()
 {
 	_checksum = 0;
-	_state = IDLE;
+	_state = State::IDLE;
 	_textData.clear();
 }
 
@@ -118,8 +107,9 @@ void VeDirectFrameHandler<T>::loop()
 	// there will never be a large gap between two bytes of the same frame.
 	// if such a large gap is observed, reset the state machine so it tries
 	// to decode a new frame once more data arrives.
-	if (IDLE != _state && (millis() - _lastByteMillis) > 500) {
-		_msgOut->printf("%s Resetting state machine (was %d) after timeout\r\n", _logId, _state);
+	if (State::IDLE != _state && (millis() - _lastByteMillis) > 500) {
+		_msgOut->printf("%s Resetting state machine (was %d) after timeout\r\n",
+				_logId, static_cast<unsigned>(_state));
 		if (_verboseLogging) { dumpDebugBuffer(); }
 		reset();
 	}
@@ -141,34 +131,34 @@ void VeDirectFrameHandler<T>::rxData(uint8_t inbyte)
 		}
 	}
 
-	if ( (inbyte == ':') && (_state != CHECKSUM) ) {
+	if ( (inbyte == ':') && (_state != State::CHECKSUM) ) {
 		_prevState = _state; //hex frame can interrupt TEXT
-		_state = RECORD_HEX;
+		_state = State::RECORD_HEX;
 		_hexSize = 0;
 	}
-	if (_state != RECORD_HEX) {
+	if (_state != State::RECORD_HEX) {
 		_checksum += inbyte;
 	}
 	inbyte = toupper(inbyte);
 
 	switch(_state) {
-	case IDLE:
+	case State::IDLE:
 		/* wait for \n of the start of an record */
 		switch(inbyte) {
 		case '\n':
-			_state = RECORD_BEGIN;
+			_state = State::RECORD_BEGIN;
 			break;
 		case '\r': /* Skip */
 		default:
 			break;
 		}
 		break;
-	case RECORD_BEGIN:
+	case State::RECORD_BEGIN:
 		_textPointer = _name;
 		*_textPointer++ = inbyte;
-		_state = RECORD_NAME;
+		_state = State::RECORD_NAME;
 		break;
-	case RECORD_NAME:
+	case State::RECORD_NAME:
 		// The record name is being received, terminated by a \t
 		switch(inbyte) {
 		case '\t':
@@ -176,12 +166,12 @@ void VeDirectFrameHandler<T>::rxData(uint8_t inbyte)
 			if ( _textPointer < (_name + sizeof(_name)) ) {
 				*_textPointer = 0; /* Zero terminate */
 				if (strcmp(_name, checksumTagName) == 0) {
-					_state = CHECKSUM;
+					_state = State::CHECKSUM;
 					break;
 				}
 			}
 			_textPointer = _value; /* Reset value pointer */
-			_state = RECORD_VALUE;
+			_state = State::RECORD_VALUE;
 			break;
 		case '#': /* Ignore # from serial number*/
 			break;
@@ -192,7 +182,7 @@ void VeDirectFrameHandler<T>::rxData(uint8_t inbyte)
 			break;
 		}
 		break;
-	case RECORD_VALUE:
+	case State::RECORD_VALUE:
 		// The record value is being received.  The \r indicates a new record.
 		switch(inbyte) {
 		case '\n':
@@ -200,7 +190,7 @@ void VeDirectFrameHandler<T>::rxData(uint8_t inbyte)
 				*_textPointer = 0; // make zero ended
 				_textData.push_back({_name, _value});
 			}
-			_state = RECORD_BEGIN;
+			_state = State::RECORD_BEGIN;
 			break;
 		case '\r': /* Skip */
 			break;
@@ -211,7 +201,7 @@ void VeDirectFrameHandler<T>::rxData(uint8_t inbyte)
 			break;
 		}
 		break;
-	case CHECKSUM:
+	case State::CHECKSUM:
 	{
 		if (_verboseLogging) { dumpDebugBuffer(); }
 		if (_checksum == 0) {
@@ -227,7 +217,7 @@ void VeDirectFrameHandler<T>::rxData(uint8_t inbyte)
 		reset();
 		break;
 	}
-	case RECORD_HEX:
+	case State::RECORD_HEX:
 		_state = hexRxEvent(inbyte);
 		break;
 	}
@@ -279,17 +269,23 @@ void VeDirectFrameHandler<T>::processTextData(std::string const& name, std::stri
  *  This function records hex answers or async messages
  */
 template<typename T>
-int VeDirectFrameHandler<T>::hexRxEvent(uint8_t inbyte)
+typename VeDirectFrameHandler<T>::State VeDirectFrameHandler<T>::hexRxEvent(uint8_t inbyte)
 {
-	int ret=RECORD_HEX; // default - continue recording until end of frame
+	State ret = State::RECORD_HEX; // default - continue recording until end of frame
 
 	switch (inbyte) {
 	case '\n':
 		// now we can analyse the hex message
 		_hexBuffer[_hexSize] = '\0';
 		VeDirectHexData data;
-		if (disassembleHexData(data))
-			hexDataHandler(data);
+		if (disassembleHexData(data) && !hexDataHandler(data) && _verboseLogging) {
+			_msgOut->printf("%s Unhandled Hex %s Response, addr: 0x%04X (%s), "
+					"value: 0x%08X, flags: 0x%02X\r\n", _logId,
+					data.getResponseAsString().data(),
+					static_cast<unsigned>(data.addr),
+					data.getRegisterAsString().data(),
+					data.value, data.flags);
+		}
 
 		// restore previous state
 		ret=_prevState;
@@ -301,7 +297,7 @@ int VeDirectFrameHandler<T>::hexRxEvent(uint8_t inbyte)
 		if (_hexSize>=VE_MAX_HEX_LEN) { // oops -buffer overflow - something went wrong, we abort
 			_msgOut->printf("%s hexRx buffer overflow - aborting read\r\n", _logId);
 			_hexSize=0;
-			ret=IDLE;
+			ret = State::IDLE;
 		}
 	}
 

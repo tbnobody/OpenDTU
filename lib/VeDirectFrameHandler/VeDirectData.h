@@ -34,6 +34,17 @@ struct veMpptStruct : veStruct {
     float H22;                      // yield yesterday kWh
     int32_t H23;                    // maximum power yesterday W
 
+    // these are values communicated through the HEX protocol. the pair's first
+    // value is the timestamp the respective info was last received. if it is
+    // zero, the value is deemed invalid. the timestamp is reset if no current
+    // value could be retrieved.
+    std::pair<uint32_t, int32_t> MpptTemperatureMilliCelsius;
+    std::pair<uint32_t, int32_t> SmartBatterySenseTemperatureMilliCelsius;
+    std::pair<uint32_t, uint32_t> NetworkTotalDcInputPowerMilliWatts;
+    std::pair<uint32_t, uint8_t> NetworkInfo;
+    std::pair<uint32_t, uint8_t> NetworkMode;
+    std::pair<uint32_t, uint8_t> NetworkStatus;
+
     frozen::string const& getMpptAsString() const; // state of mppt as string
     frozen::string const& getCsAsString() const;   // current state as string
     frozen::string const& getErrAsString() const;  // error state as string
@@ -67,4 +78,58 @@ struct veShuntStruct : veStruct {
     int32_t H16;                    // Maximum auxiliary (battery) voltage
     int32_t H17;                    // Amount of discharged energy
     int32_t H18;                    // Amount of charged energy
+};
+
+enum class VeDirectHexCommand : uint8_t {
+    ENTER_BOOT = 0x0,
+    PING = 0x1,
+    RSV1 = 0x2,
+    APP_VERSION = 0x3,
+    PRODUCT_ID = 0x4,
+    RSV2 = 0x5,
+    RESTART = 0x6,
+    GET = 0x7,
+    SET = 0x8,
+    RSV3 = 0x9,
+    ASYNC = 0xA,
+    RSV4 = 0xB,
+    RSV5 = 0xC,
+    RSV6 = 0xD,
+    RSV7 = 0xE,
+    RSV8 = 0xF
+};
+
+enum class VeDirectHexResponse : uint8_t {
+    DONE = 0x1,
+    UNKNOWN = 0x3,
+    ERROR = 0x4,
+    PING = 0x5,
+    GET = 0x7,
+    SET = 0x8,
+    ASYNC = 0xA
+};
+
+enum class VeDirectHexRegister : uint16_t {
+    DeviceMode = 0x0200,
+    DeviceState = 0x0201,
+    RemoteControlUsed = 0x0202,
+    PanelVoltage = 0xEDBB,
+    ChargerVoltage = 0xEDD5,
+    NetworkTotalDcInputPower = 0x2027,
+    ChargeControllerTemperature = 0xEDDB,
+    SmartBatterySenseTemperature = 0xEDEC,
+    NetworkInfo = 0x200D,
+    NetworkMode = 0x200E,
+    NetworkStatus = 0x200F
+};
+
+struct VeDirectHexData {
+    VeDirectHexResponse rsp;        // hex response code
+    VeDirectHexRegister addr;       // register address
+    uint8_t flags;                  // flags
+    uint32_t value;                 // integer value of register
+    char text[VE_MAX_HEX_LEN];      // text/string response
+
+    frozen::string const& getResponseAsString() const;
+    frozen::string const& getRegisterAsString() const;
 };

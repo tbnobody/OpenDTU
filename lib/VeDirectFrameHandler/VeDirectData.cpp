@@ -222,3 +222,39 @@ frozen::string const& veMpptStruct::getOrAsString() const
 
 	return getAsString(values, OR);
 }
+
+frozen::string const& VeDirectHexData::getResponseAsString() const
+{
+	using Response = VeDirectHexResponse;
+	static constexpr frozen::map<Response, frozen::string, 7> values = {
+		{ Response::DONE, "Done" },
+		{ Response::UNKNOWN, "Unknown" },
+		{ Response::ERROR, "Error" },
+		{ Response::PING, "Ping" },
+		{ Response::GET, "Get" },
+		{ Response::SET, "Set" },
+		{ Response::ASYNC, "Async" }
+	};
+
+	return getAsString(values, rsp);
+}
+
+frozen::string const& VeDirectHexData::getRegisterAsString() const
+{
+	using Register = VeDirectHexRegister;
+	static constexpr frozen::map<Register, frozen::string, 11> values = {
+		{ Register::DeviceMode, "Device Mode" },
+		{ Register::DeviceState, "Device State" },
+		{ Register::RemoteControlUsed, "Remote Control Used" },
+		{ Register::PanelVoltage, "Panel Voltage" },
+		{ Register::ChargerVoltage, "Charger Voltage" },
+		{ Register::NetworkTotalDcInputPower, "Network Total DC Input Power" },
+		{ Register::ChargeControllerTemperature, "Charger Controller Temperature" },
+		{ Register::SmartBatterySenseTemperature, "Smart Battery Sense Temperature" },
+		{ Register::NetworkInfo, "Network Info" },
+		{ Register::NetworkMode, "Network Mode" },
+		{ Register::NetworkStatus, "Network Status" }
+	};
+
+	return getAsString(values, addr);
+}

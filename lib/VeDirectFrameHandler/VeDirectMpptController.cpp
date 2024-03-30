@@ -1,6 +1,6 @@
 /* VeDirectMpptController.cpp
  *
- * 
+ *
  * 2020.08.20 - 0.0 - ???
  * 2024.03.18 - 0.1 - add of: - temperature from "Smart Battery Sense" connected over VE.Smart network
  * 					  		  - temperature from internal MPPT sensor
@@ -10,10 +10,7 @@
 #include <Arduino.h>
 #include "VeDirectMpptController.h"
 
-
-// support for debugging, 0=without extended logging, 1=with extended logging
-constexpr int MODUL_DEBUG = 0;
-
+//#define PROCESS_NETWORK_STATE
 
 void VeDirectMpptController::init(int8_t rx, int8_t tx, Print* msgOut, bool verboseLogging, uint16_t hwSerialPort)
 {
@@ -93,32 +90,50 @@ void VeDirectMpptController::frameValidEvent() {
 		_efficiency.addNumber(static_cast<float>(_tmpFrame.P * 100) / _tmpFrame.PPV);
 		_tmpFrame.E = _efficiency.getAverage();
 	}
-}
 
+	if (!_canSend) { return; }
 
-/*
-// loop()
-// send hex commands to MPPT every 5 seconds
-*/
-void VeDirectMpptController::loop()
-{
-	VeDirectFrameHandler::loop();
-	
 	// Copy from the "VE.Direct Protocol" documentation
 	// For firmware version v1.52 and below, when no VE.Direct queries are sent to the device, the
 	// charger periodically sends human readable (TEXT) data to the serial port. For firmware
 	// versions v1.53 and above, the charger always periodically sends TEXT data to the serial port.
 	// --> We just use hex commandes for firmware >= 1.53 to keep text messages alive
-	if (atoi(_tmpFrame.FW) >= 153 ) {
-		if ((millis() - _lastPingTime) > 5000) {
+	if (atoi(_tmpFrame.FW) < 153) { return; }
 
-			sendHexCommand(GET, 0x2027);	// MPPT total DC input power
-			sendHexCommand(GET, 0xEDDB);	// MPPT internal temperature
-			sendHexCommand(GET, 0xEDEC);	// "Smart Battery Sense" temperature
-			sendHexCommand(GET, 0x200F);	// Network info
-			_lastPingTime = millis();
+	using Command = VeDirectHexCommand;
+	using Register = VeDirectHexRegister;
+
+	sendHexCommand(Command::GET, Register::ChargeControllerTemperature);
+	sendHexCommand(Command::GET, Register::SmartBatterySenseTemperature);
+	sendHexCommand(Command::GET, Register::NetworkTotalDcInputPower);
+
+#ifdef PROCESS_NETWORK_STATE
+	sendHexCommand(Command::GET, Register::NetworkInfo);
+	sendHexCommand(Command::GET, Register::NetworkMode);
+	sendHexCommand(Command::GET, Register::NetworkStatus);
+#endif // PROCESS_NETWORK_STATE
+}
+
+
+void VeDirectMpptController::loop()
+{
+	VeDirectFrameHandler::loop();
+
+	auto resetTimestamp = [this](auto& pair) {
+		if (pair.first > 0 && (millis() - pair.first) > (10 * 1000)) {
+			pair.first = 0;
 		}
-	}
+	};
+
+	resetTimestamp(_tmpFrame.MpptTemperatureMilliCelsius);
+	resetTimestamp(_tmpFrame.SmartBatterySenseTemperatureMilliCelsius);
+	resetTimestamp(_tmpFrame.NetworkTotalDcInputPowerMilliWatts);
+
+#ifdef PROCESS_NETWORK_STATE
+	resetTimestamp(_tmpFrame.NetworkInfo);
+	resetTimestamp(_tmpFrame.NetworkMode);
+	resetTimestamp(_tmpFrame.NetworkStatus);
+#endif // PROCESS_NETWORK_STATE
 }
 
 
@@ -127,62 +142,104 @@ void VeDirectMpptController::loop()
  * analyse the content of VE.Direct hex messages
  * Handels the received hex data from the MPPT
  */
-void VeDirectMpptController::hexDataHandler(VeDirectHexData const &data) {
-    bool state = false;
+bool VeDirectMpptController::hexDataHandler(VeDirectHexData const &data) {
+	if (data.rsp != VeDirectHexResponse::GET &&
+			data.rsp != VeDirectHexResponse::ASYNC) { return false; }
 
-	switch (data.rsp) {
-	case R_GET:
-	case R_ASYNC:    
+	auto regLog = static_cast<uint16_t>(data.addr);
 
-		// check if MPPT internal temperature is available
-		if(data.id == 0xEDDB) {
-			_ExData.T = static_cast<int32_t>(data.value) * 10;	// conversion from unit [0.01°C] to unit [m°C]
-			_ExData.Tts = millis();
-			state = true;
-			
-			if constexpr(MODUL_DEBUG == 1)
-				_msgOut->printf("[VE.Direct] debug: hexDataHandler(), MTTP Temperature: %.2f°C\r\n", _ExData.T/1000.0);
-		}
+	switch (data.addr) {
+		case VeDirectHexRegister::ChargeControllerTemperature:
+			_tmpFrame.MpptTemperatureMilliCelsius =
+				{ millis(), static_cast<int32_t>(data.value) * 10 };
 
-		// check if temperature from "Smart Battery Sense" is available
-		if(data.id == 0xEDEC) {
-			_ExData.TSBS = static_cast<int32_t>(data.value) * 10 - 272150;  // conversion from unit [0.01K] to unit [m°C]
-			_ExData.TSBSts = millis();
-			state = true;
-			
-			if constexpr(MODUL_DEBUG == 1)
-				_msgOut->printf("[VE.Direct] debug: hexDataHandler(), Battery Temperature: %.2f°C\r\n", _ExData.TSBS/1000.0);
-		}
+			if (_verboseLogging) {
+				_msgOut->printf("%s Hex Data: MPPT Temperature (0x%04X): %.2f°C\r\n",
+						_logId, regLog,
+						_tmpFrame.MpptTemperatureMilliCelsius.second / 1000.0);
+			}
+			return true;
+			break;
 
-		// check if "Total DC power" is available
-		if(data.id == 0x2027) {
-			_ExData.TDCP = data.value * 10;		// conversion from unit [0.01W] to unit [mW]
-			_ExData.TDCPts = millis();
-			state = true;
+		case VeDirectHexRegister::SmartBatterySenseTemperature:
+			if (data.value == 0xFFFF) {
+				if (_verboseLogging) {
+					_msgOut->printf("%s Hex Data: Smart Battery Sense Temperature is not available\r\n", _logId);
+				}
+				return true; // we know what to do with it, and we decided to ignore the value
+			}
 
-			if constexpr(MODUL_DEBUG == 1)
-				_msgOut->printf("[VE.Direct] debug: hexDataHandler(), Total Power: %.2fW\r\n", _ExData.TDCP/1000.0);
-		}
+			_tmpFrame.SmartBatterySenseTemperatureMilliCelsius =
+				{ millis(), static_cast<int32_t>(data.value) * 10 - 272150 };
 
-		// check if connected MPPT is charge instance master
-		// Hint: not used right now but maybe necessary for future extensions
-		if(data.id == 0x200F) {
-			_veMaster = ((data.value & 0x0F) == 0x02) ? true : false;
-			state = true;
+			if (_verboseLogging) {
+				_msgOut->printf("%s Hex Data: Smart Battery Sense Temperature (0x%04X): %.2f°C\r\n",
+						_logId, regLog,
+						_tmpFrame.SmartBatterySenseTemperatureMilliCelsius.second / 1000.0);
+			}
+			return true;
+			break;
 
-			if constexpr(MODUL_DEBUG == 1)
-				_msgOut->printf("[VE.Direct] debug: hexDataHandler(), Networkmode: 0x%X\r\n", data.value);
-		}
-		break;
-	default:
-		break;	
+		case VeDirectHexRegister::NetworkTotalDcInputPower:
+			if (data.value == 0xFFFFFFFF) {
+				if (_verboseLogging) {
+					_msgOut->printf("%s Hex Data: Network total DC power value "
+							"indicates non-networked controller\r\n", _logId);
+				}
+				_tmpFrame.NetworkTotalDcInputPowerMilliWatts = { 0, 0 };
+				return true; // we know what to do with it, and we decided to ignore the value
+			}
+
+			_tmpFrame.NetworkTotalDcInputPowerMilliWatts =
+				{ millis(), data.value * 10 };
+
+			if (_verboseLogging) {
+				_msgOut->printf("%s Hex Data: Network Total DC Power (0x%04X): %.2fW\r\n",
+						_logId, regLog,
+						_tmpFrame.NetworkTotalDcInputPowerMilliWatts.second / 1000.0);
+			}
+			return true;
+			break;
+
+#ifdef PROCESS_NETWORK_STATE
+		case VeDirectHexRegister::NetworkInfo:
+			_tmpFrame.NetworkInfo =
+				{ millis(), static_cast<uint8_t>(data.value) };
+
+			if (_verboseLogging) {
+				_msgOut->printf("%s Hex Data: Network Info (0x%04X): 0x%X\r\n",
+						_logId, regLog, data.value);
+			}
+			return true;
+			break;
+
+		case VeDirectHexRegister::NetworkMode:
+			_tmpFrame.NetworkMode =
+				{ millis(), static_cast<uint8_t>(data.value) };
+
+			if (_verboseLogging) {
+				_msgOut->printf("%s Hex Data: Network Mode (0x%04X): 0x%X\r\n",
+						_logId, regLog, data.value);
+			}
+			return true;
+			break;
+
+		case VeDirectHexRegister::NetworkStatus:
+			_tmpFrame.NetworkStatus =
+				{ millis(), static_cast<uint8_t>(data.value) };
+
+			if (_verboseLogging) {
+				_msgOut->printf("%s Hex Data: Network Status (0x%04X): 0x%X\r\n",
+						_logId, regLog, data.value);
+			}
+			return true;
+			break;
+#endif // PROCESS_NETWORK_STATE
+
+		default:
+			return false;
+			break;
 	}
 
-	if constexpr(MODUL_DEBUG == 1)
-		_msgOut->printf("[VE.Direct] debug: hexDataHandler(): rsp: %i, id: 0x%04X, value: %i[0x%08X], text: %s\r\n",
-				data.rsp, data.id, data.value, data.value, data.text);
-
-	if (_verboseLogging && state) 
-		_msgOut->printf("[VE.Direct] MPPT hex message: rsp: %i, id: 0x%04X, value: %i[0x%08X], text: %s\r\n",
-			data.rsp, data.id, data.value, data.value, data.text);
-}   
+	return false;
+}

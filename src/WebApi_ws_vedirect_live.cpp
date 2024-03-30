@@ -146,57 +146,64 @@ void WebApiWsVedirectLiveClass::generateJsonResponse(JsonVariant& root, bool ful
 }
 
 void WebApiWsVedirectLiveClass::populateJson(const JsonObject &root, const VeDirectMpptController::data_t &mpptData) {
-    // device info
-    root["device"]["PID"] = mpptData.getPidAsString();
-    root["device"]["SER"] = String(mpptData.SER);
-    root["device"]["FW"] = String(mpptData.FW);
-    root["device"]["LOAD"] = mpptData.LOAD ? "ON" : "OFF";
-    root["device"]["CS"] = mpptData.getCsAsString();
-    root["device"]["ERR"] = mpptData.getErrAsString();
-    root["device"]["OR"] = mpptData.getOrAsString();
-    root["device"]["MPPT"] = mpptData.getMpptAsString();
-    root["device"]["HSDS"]["v"] = mpptData.HSDS;
-    root["device"]["HSDS"]["u"] = "d";
+    root["product_id"] = mpptData.getPidAsString();
+    root["firmware_version"] = String(mpptData.FW);
 
-    // battery info
-    root["output"]["P"]["v"] = mpptData.P;
-    root["output"]["P"]["u"] = "W";
-    root["output"]["P"]["d"] = 0;
-    root["output"]["V"]["v"] = mpptData.V;
-    root["output"]["V"]["u"] = "V";
-    root["output"]["V"]["d"] = 2;
-    root["output"]["I"]["v"] = mpptData.I;
-    root["output"]["I"]["u"] = "A";
-    root["output"]["I"]["d"] = 2;
-    root["output"]["E"]["v"] = mpptData.E;
-    root["output"]["E"]["u"] = "%";
-    root["output"]["E"]["d"] = 1;
+    const JsonObject &values = root.createNestedObject("values");
 
-    // panel info
-    root["input"]["PPV"]["v"] = mpptData.PPV;
-    root["input"]["PPV"]["u"] = "W";
-    root["input"]["PPV"]["d"] = 0;
-    root["input"]["VPV"]["v"] = mpptData.VPV;
-    root["input"]["VPV"]["u"] = "V";
-    root["input"]["VPV"]["d"] = 2;
-    root["input"]["IPV"]["v"] = mpptData.IPV;
-    root["input"]["IPV"]["u"] = "A";
-    root["input"]["IPV"]["d"] = 2;
-    root["input"]["YieldToday"]["v"] = mpptData.H20;
-    root["input"]["YieldToday"]["u"] = "kWh";
-    root["input"]["YieldToday"]["d"] = 3;
-    root["input"]["YieldYesterday"]["v"] = mpptData.H22;
-    root["input"]["YieldYesterday"]["u"] = "kWh";
-    root["input"]["YieldYesterday"]["d"] = 3;
-    root["input"]["YieldTotal"]["v"] = mpptData.H19;
-    root["input"]["YieldTotal"]["u"] = "kWh";
-    root["input"]["YieldTotal"]["d"] = 3;
-    root["input"]["MaximumPowerToday"]["v"] = mpptData.H21;
-    root["input"]["MaximumPowerToday"]["u"] = "W";
-    root["input"]["MaximumPowerToday"]["d"] = 0;
-    root["input"]["MaximumPowerYesterday"]["v"] = mpptData.H23;
-    root["input"]["MaximumPowerYesterday"]["u"] = "W";
-    root["input"]["MaximumPowerYesterday"]["d"] = 0;
+    const JsonObject &device = values.createNestedObject("device");
+    device["LOAD"] = mpptData.LOAD ? "ON" : "OFF";
+    device["CS"] = mpptData.getCsAsString();
+    device["MPPT"] = mpptData.getMpptAsString();
+    device["OR"] = mpptData.getOrAsString();
+    device["ERR"] = mpptData.getErrAsString();
+    device["HSDS"]["v"] = mpptData.HSDS;
+    device["HSDS"]["u"] = "d";
+    if (mpptData.MpptTemperatureMilliCelsius.first > 0) {
+        device["MpptTemperature"]["v"] = mpptData.MpptTemperatureMilliCelsius.second / 1000.0;
+        device["MpptTemperature"]["u"] = "°C";
+        device["MpptTemperature"]["d"] = "1";
+    }
+
+    const JsonObject &output = values.createNestedObject("output");
+    output["P"]["v"] = mpptData.P;
+    output["P"]["u"] = "W";
+    output["P"]["d"] = 0;
+    output["V"]["v"] = mpptData.V;
+    output["V"]["u"] = "V";
+    output["V"]["d"] = 2;
+    output["I"]["v"] = mpptData.I;
+    output["I"]["u"] = "A";
+    output["I"]["d"] = 2;
+    output["E"]["v"] = mpptData.E;
+    output["E"]["u"] = "%";
+    output["E"]["d"] = 1;
+
+    const JsonObject &input = values.createNestedObject("input");
+    input["PPV"]["v"] = mpptData.PPV;
+    input["PPV"]["u"] = "W";
+    input["PPV"]["d"] = 0;
+    input["VPV"]["v"] = mpptData.VPV;
+    input["VPV"]["u"] = "V";
+    input["VPV"]["d"] = 2;
+    input["IPV"]["v"] = mpptData.IPV;
+    input["IPV"]["u"] = "A";
+    input["IPV"]["d"] = 2;
+    input["YieldToday"]["v"] = mpptData.H20;
+    input["YieldToday"]["u"] = "kWh";
+    input["YieldToday"]["d"] = 3;
+    input["YieldYesterday"]["v"] = mpptData.H22;
+    input["YieldYesterday"]["u"] = "kWh";
+    input["YieldYesterday"]["d"] = 3;
+    input["YieldTotal"]["v"] = mpptData.H19;
+    input["YieldTotal"]["u"] = "kWh";
+    input["YieldTotal"]["d"] = 3;
+    input["MaximumPowerToday"]["v"] = mpptData.H21;
+    input["MaximumPowerToday"]["u"] = "W";
+    input["MaximumPowerToday"]["d"] = 0;
+    input["MaximumPowerYesterday"]["v"] = mpptData.H23;
+    input["MaximumPowerYesterday"]["u"] = "W";
+    input["MaximumPowerYesterday"]["d"] = 0;
 }
 
 void WebApiWsVedirectLiveClass::onWebsocketEvent(AsyncWebSocket* server, AsyncWebSocketClient* client, AwsEventType type, void* arg, uint8_t* data, size_t len)

@@ -19,39 +19,6 @@
 #include <deque>
 #include "VeDirectData.h"
 
-// hex send commands
-enum VeDirectHexCommand {
-    ENTER_BOOT = 0x00,
-    PING = 0x01,
-    APP_VERSION = 0x02,
-    PRODUCT_ID = 0x04,
-    RESTART = 0x06,
-    GET = 0x07,
-    SET = 0x08,
-    ASYNC = 0x0A,
-    UNKNOWN = 0x0F
-};
-
-// hex receive responses
-enum VeDirectHexResponse {
-    R_DONE = 0x01,
-    R_UNKNOWN = 0x03,
-    R_ERROR = 0x04,
-    R_PING = 0x05,
-    R_GET = 0x07,
-    R_SET = 0x08,
-    R_ASYNC = 0x0A,
-};
-
-// hex response data, contains the disassembeled hex message, forwarded to virtual funktion hexDataHandler()
-struct VeDirectHexData {
-    VeDirectHexResponse rsp;        // hex response type   
-    uint16_t id;                    // register address
-    uint8_t flag;                   // flag
-    uint32_t value;                 // value from register
-    char text[VE_MAX_HEX_LEN];      // text/string response
-};
-
 template<typename T>
 class VeDirectFrameHandler {
 public:
@@ -59,18 +26,21 @@ public:
     uint32_t getLastUpdate() const;              // timestamp of last successful frame read
     bool isDataValid() const;                    // return true if data valid and not outdated
     T const& getData() const { return _tmpFrame; }
-    bool sendHexCommand(VeDirectHexCommand cmd, uint16_t id = 0, uint32_t value = 0, uint8_t valunibble = 0);   // send hex commands via ve.direct
+    bool sendHexCommand(VeDirectHexCommand cmd, VeDirectHexRegister addr, uint32_t value = 0, uint8_t valsize = 0);
 
 protected:
     VeDirectFrameHandler();
     void init(char const* who, int8_t rx, int8_t tx, Print* msgOut, bool verboseLogging, uint16_t hwSerialPort);
-    virtual void hexDataHandler(VeDirectHexData const &data) { } // handles the disassembeled hex response
+    virtual bool hexDataHandler(VeDirectHexData const &data) { return false; } // handles the disassembeled hex response
 
     bool _verboseLogging;
     Print* _msgOut;
     uint32_t _lastUpdate;
 
     T _tmpFrame;
+
+    bool _canSend;
+    char _logId[32];
 
 private:
     void reset();
@@ -79,22 +49,32 @@ private:
     void processTextData(std::string const& name, std::string const& value);
     virtual bool processTextDataDerived(std::string const& name, std::string const& value) = 0;
     virtual void frameValidEvent() { }
-    int hexRxEvent(uint8_t);
     bool disassembleHexData(VeDirectHexData &data);     //return true if disassembling was possible
 
     std::unique_ptr<HardwareSerial> _vedirectSerial;
-    int _state;                                // current state
-    int _prevState;                            // previous state
+
+    enum class State {
+        IDLE = 1,
+        RECORD_BEGIN = 2,
+        RECORD_NAME = 3,
+        RECORD_VALUE = 4,
+        CHECKSUM = 5,
+        RECORD_HEX = 6
+    };
+    State _state;
+    State _prevState;
+
+    State hexRxEvent(uint8_t inbyte);
+
     uint8_t _checksum;                         // checksum value
     char * _textPointer;                       // pointer to the private buffer we're writing to, name or value
-    int _hexSize;                               // length of hex buffer
-    char _hexBuffer[VE_MAX_HEX_LEN] = { };	   // buffer for received hex frames
+    int _hexSize;                              // length of hex buffer
+    char _hexBuffer[VE_MAX_HEX_LEN];           // buffer for received hex frames
     char _name[VE_MAX_VALUE_LEN];              // buffer for the field name
     char _value[VE_MAX_VALUE_LEN];             // buffer for the field value
     std::array<uint8_t, 512> _debugBuffer;
     unsigned _debugIn;
     uint32_t _lastByteMillis;
-    char _logId[32];
 
     /**
      * not every frame contains every value the device is communicating, i.e.,
