@@ -372,6 +372,12 @@ void ConfigurationClass::migrate()
         config.Dtu.Cmt.Frequency *= 1000;
     }
 
+    if (config.Cfg.Version < 0x00011c00) {
+        if (!strcmp(config.Ntp.Server, NTP_SERVER_OLD)) {
+            strlcpy(config.Ntp.Server, NTP_SERVER, sizeof(config.Ntp.Server));
+        }
+    }
+
     f.close();
 
     config.Cfg.Version = CONFIG_VERSION;
