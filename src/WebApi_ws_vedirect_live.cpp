@@ -180,6 +180,11 @@ void WebApiWsVedirectLiveClass::populateJson(const JsonObject &root, const VeDir
     output["E"]["d"] = 1;
 
     const JsonObject &input = values.createNestedObject("input");
+    if (mpptData.NetworkTotalDcInputPowerMilliWatts.first > 0) {
+        input["NetworkPower"]["v"] = mpptData.NetworkTotalDcInputPowerMilliWatts.second / 1000.0;
+        input["NetworkPower"]["u"] = "W";
+        input["NetworkPower"]["d"] = "0";
+    }
     input["PPV"]["v"] = mpptData.PPV;
     input["PPV"]["u"] = "W";
     input["PPV"]["d"] = 0;

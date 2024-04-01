@@ -140,6 +140,17 @@ int32_t VictronMpptClass::getPowerOutputWatts() const
 
     for (const auto& upController : _controllers) {
         if (!upController->isDataValid()) { continue; }
+
+        // if any charge controller is part of a VE.Smart network, and if the
+        // charge controller is connected in a way that allows to send
+        // requests, we should have the "network total DC input power"
+        // available. if so, to estimate the output power, we multiply by
+        // the calculated efficiency of the connected charge controller.
+        auto networkPower = upController->getData().NetworkTotalDcInputPowerMilliWatts;
+        if (networkPower.first > 0) {
+            return static_cast<int32_t>(networkPower.second / 1000.0 * upController->getData().E / 100);
+        }
+
         sum += upController->getData().P;
     }
 
@@ -152,6 +163,15 @@ int32_t VictronMpptClass::getPanelPowerWatts() const
 
     for (const auto& upController : _controllers) {
         if (!upController->isDataValid()) { continue; }
+
+        // if any charge controller is part of a VE.Smart network, and if the
+        // charge controller is connected in a way that allows to send
+        // requests, we should have the "network total DC input power" available.
+        auto networkPower = upController->getData().NetworkTotalDcInputPowerMilliWatts;
+        if (networkPower.first > 0) {
+            return static_cast<int32_t>(networkPower.second / 1000.0);
+        }
+
         sum += upController->getData().PPV;
     }
 

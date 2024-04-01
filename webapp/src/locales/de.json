@@ -175,6 +175,7 @@
         },
         "section_input": "Eingang (Solarpanele)",
         "input": {
+            "NetworkPower": "VE.Smart Netzwerk Gesamtleistung",
             "PPV": "Leistung",
             "VPV": "Spannung",
             "IPV": "Strom (berechnet)",

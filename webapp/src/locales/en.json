@@ -175,6 +175,7 @@
         },
         "section_input": "Input (Solar Panels)",
         "input": {
+            "NetworkPower": "VE.Smart network total power",
             "PPV": "Power",
             "VPV": "Voltage",
             "IPV": "Current (calculated)",
