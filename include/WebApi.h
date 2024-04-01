@@ -22,6 +22,7 @@
 #include "WebApi_webapp.h"
 #include "WebApi_ws_console.h"
 #include "WebApi_ws_live.h"
+#include <AsyncJson.h>
 #include <ESPAsyncWebServer.h>
 #include <TaskSchedulerDeclarations.h>
 
@@ -36,6 +37,8 @@ public:
     static void sendTooManyRequests(AsyncWebServerRequest* request);
 
     static void writeConfig(JsonVariant& retMsg, const WebApiError code = WebApiError::GenericSuccess, const String& message = "Settings saved!");
+
+    static bool parseRequestData(AsyncWebServerRequest* request, AsyncJsonResponse* response, DynamicJsonDocument& json_document, size_t max_document_size = 1024);
 
 private:
     AsyncWebServer _server;
