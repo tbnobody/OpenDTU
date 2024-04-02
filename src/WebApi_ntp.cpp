@@ -95,7 +95,7 @@ void WebApiNtpClass::onNtpAdminPost(AsyncWebServerRequest* request)
     }
 
     AsyncJsonResponse* response = new AsyncJsonResponse();
-    DynamicJsonDocument root(1024);
+    JsonDocument root;
     if (!WebApi.parseRequestData(request, response, root)) {
         return;
     }
@@ -194,7 +194,7 @@ void WebApiNtpClass::onNtpTimePost(AsyncWebServerRequest* request)
     }
 
     AsyncJsonResponse* response = new AsyncJsonResponse();
-    DynamicJsonDocument root(1024);
+    JsonDocument root;
     if (!WebApi.parseRequestData(request, response, root)) {
         return;
     }

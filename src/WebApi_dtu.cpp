@@ -62,10 +62,10 @@ void WebApiDtuClass::onDtuAdminGet(AsyncWebServerRequest* request)
     root["cmt_country"] = config.Dtu.Cmt.CountryMode;
     root["cmt_chan_width"] = Hoymiles.getRadioCmt()->getChannelWidth();
 
-    auto data = root.createNestedArray("country_def");
+    auto data = root["country_def"].to<JsonArray>();
     auto countryDefs = Hoymiles.getRadioCmt()->getCountryFrequencyList();
     for (const auto& definition : countryDefs) {
-        auto obj = data.createNestedObject();
+        auto obj = data.add<JsonObject>();
         obj["freq_default"] = definition.definition.Freq_Default;
         obj["freq_min"] = definition.definition.Freq_Min;
         obj["freq_max"] = definition.definition.Freq_Max;
@@ -84,7 +84,7 @@ void WebApiDtuClass::onDtuAdminPost(AsyncWebServerRequest* request)
     }
 
     AsyncJsonResponse* response = new AsyncJsonResponse();
-    DynamicJsonDocument root(1024);
+    JsonDocument root;
     if (!WebApi.parseRequestData(request, response, root)) {
         return;
     }

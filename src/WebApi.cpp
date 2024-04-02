@@ -85,7 +85,7 @@ void WebApiClass::writeConfig(JsonVariant& retMsg, const WebApiError code, const
     }
 }
 
-bool WebApiClass::parseRequestData(AsyncWebServerRequest* request, AsyncJsonResponse* response, DynamicJsonDocument& json_document, size_t max_document_size)
+bool WebApiClass::parseRequestData(AsyncWebServerRequest* request, AsyncJsonResponse* response, JsonDocument& json_document)
 {
     auto& retMsg = response->getRoot();
     retMsg["type"] = "warning";
@@ -99,14 +99,6 @@ bool WebApiClass::parseRequestData(AsyncWebServerRequest* request, AsyncJsonResp
     }
 
     const String json = request->getParam("data", true)->value();
-    if (json.length() > max_document_size) {
-        retMsg["message"] = "Data too large!";
-        retMsg["code"] = WebApiError::GenericDataTooLarge;
-        response->setLength();
-        request->send(response);
-        return false;
-    }
-
     const DeserializationError error = deserializeJson(json_document, json);
     if (error) {
         retMsg["message"] = "Failed to parse data!";

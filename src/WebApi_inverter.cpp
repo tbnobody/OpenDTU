@@ -29,15 +29,15 @@ void WebApiInverterClass::onInverterList(AsyncWebServerRequest* request)
         return;
     }
 
-    AsyncJsonResponse* response = new AsyncJsonResponse(false, 768 * INV_MAX_COUNT);
+    AsyncJsonResponse* response = new AsyncJsonResponse();
     auto& root = response->getRoot();
-    JsonArray data = root.createNestedArray("inverter");
+    JsonArray data = root["inverter"].to<JsonArray>();
 
     const CONFIG_T& config = Configuration.get();
 
     for (uint8_t i = 0; i < INV_MAX_COUNT; i++) {
         if (config.Inverter[i].Serial > 0) {
-            JsonObject obj = data.createNestedObject();
+            JsonObject obj = data.add<JsonObject>();
             obj["id"] = i;
             obj["name"] = String(config.Inverter[i].Name);
             obj["order"] = config.Inverter[i].Order;
@@ -67,9 +67,9 @@ void WebApiInverterClass::onInverterList(AsyncWebServerRequest* request)
                 max_channels = inv->Statistics()->getChannelsByType(TYPE_DC).size();
             }
 
-            JsonArray channel = obj.createNestedArray("channel");
+            JsonArray channel = obj["channel"].to<JsonArray>();
             for (uint8_t c = 0; c < max_channels; c++) {
-                JsonObject chanData = channel.createNestedObject();
+                JsonObject chanData = channel.add<JsonObject>();
                 chanData["name"] = config.Inverter[i].channel[c].Name;
                 chanData["max_power"] = config.Inverter[i].channel[c].MaxChannelPower;
                 chanData["yield_total_offset"] = config.Inverter[i].channel[c].YieldTotalOffset;
@@ -88,7 +88,7 @@ void WebApiInverterClass::onInverterAdd(AsyncWebServerRequest* request)
     }
 
     AsyncJsonResponse* response = new AsyncJsonResponse();
-    DynamicJsonDocument root(1024);
+    JsonDocument root;
     if (!WebApi.parseRequestData(request, response, root)) {
         return;
     }
@@ -163,7 +163,7 @@ void WebApiInverterClass::onInverterEdit(AsyncWebServerRequest* request)
     }
 
     AsyncJsonResponse* response = new AsyncJsonResponse();
-    DynamicJsonDocument root(1024);
+    JsonDocument root;
     if (!WebApi.parseRequestData(request, response, root)) {
         return;
     }
@@ -283,7 +283,7 @@ void WebApiInverterClass::onInverterDelete(AsyncWebServerRequest* request)
     }
 
     AsyncJsonResponse* response = new AsyncJsonResponse();
-    DynamicJsonDocument root(1024);
+    JsonDocument root;
     if (!WebApi.parseRequestData(request, response, root)) {
         return;
     }
@@ -328,7 +328,7 @@ void WebApiInverterClass::onInverterOrder(AsyncWebServerRequest* request)
     }
 
     AsyncJsonResponse* response = new AsyncJsonResponse();
-    DynamicJsonDocument root(1024);
+    JsonDocument root;
     if (!WebApi.parseRequestData(request, response, root)) {
         return;
     }

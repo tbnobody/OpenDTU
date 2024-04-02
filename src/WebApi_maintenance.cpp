@@ -22,9 +22,9 @@ void WebApiMaintenanceClass::onRebootPost(AsyncWebServerRequest* request)
         return;
     }
 
-    AsyncJsonResponse* response = new AsyncJsonResponse(false, MQTT_JSON_DOC_SIZE);
-    DynamicJsonDocument root(MQTT_JSON_DOC_SIZE);
-    if (!WebApi.parseRequestData(request, response, root, MQTT_JSON_DOC_SIZE)) {
+    AsyncJsonResponse* response = new AsyncJsonResponse();
+    JsonDocument root;
+    if (!WebApi.parseRequestData(request, response, root)) {
         return;
     }
 

@@ -53,7 +53,7 @@ void WebApiConfigClass::onConfigDelete(AsyncWebServerRequest* request)
     }
 
     AsyncJsonResponse* response = new AsyncJsonResponse();
-    DynamicJsonDocument root(1024);
+    JsonDocument root;
     if (!WebApi.parseRequestData(request, response, root)) {
         return;
     }
@@ -95,7 +95,7 @@ void WebApiConfigClass::onConfigListGet(AsyncWebServerRequest* request)
 
     AsyncJsonResponse* response = new AsyncJsonResponse();
     auto& root = response->getRoot();
-    auto data = root.createNestedArray("configs");
+    auto data = root["configs"].to<JsonArray>();
 
     File rootfs = LittleFS.open("/");
     File file = rootfs.openNextFile();
@@ -103,7 +103,7 @@ void WebApiConfigClass::onConfigListGet(AsyncWebServerRequest* request)
         if (file.isDirectory()) {
             continue;
         }
-        JsonObject obj = data.createNestedObject();
+        JsonObject obj = data.add<JsonObject>();
         obj["name"] = String(file.name());
 
         file = rootfs.openNextFile();

@@ -38,7 +38,7 @@ public:
 
     static void writeConfig(JsonVariant& retMsg, const WebApiError code = WebApiError::GenericSuccess, const String& message = "Settings saved!");
 
-    static bool parseRequestData(AsyncWebServerRequest* request, AsyncJsonResponse* response, DynamicJsonDocument& json_document, size_t max_document_size = 1024);
+    static bool parseRequestData(AsyncWebServerRequest* request, AsyncJsonResponse* response, JsonDocument& json_document);
 
 private:
     AsyncWebServer _server;

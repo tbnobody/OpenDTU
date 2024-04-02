@@ -5,7 +5,7 @@ enum WebApiError {
     GenericBase = 1000,
     GenericSuccess,
     GenericNoValueFound,
-    GenericDataTooLarge,
+    GenericDataTooLarge, // not used anymore
     GenericParseError,
     GenericValueMissing,
     GenericWriteFailed,

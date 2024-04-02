@@ -8,8 +8,6 @@
 #include <LittleFS.h>
 #include <string.h>
 
-#define JSON_BUFFER_SIZE 6144
-
 #ifndef DISPLAY_TYPE
 #define DISPLAY_TYPE 0U
 #endif
@@ -141,7 +139,7 @@ bool PinMappingClass::init(const String& deviceMapping)
         return false;
     }
 
-    DynamicJsonDocument doc(JSON_BUFFER_SIZE);
+    JsonDocument doc;
     // Deserialize the JSON document
     DeserializationError error = deserializeJson(doc, f);
     if (error) {

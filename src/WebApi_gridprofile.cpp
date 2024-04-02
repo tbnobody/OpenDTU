@@ -21,7 +21,7 @@ void WebApiGridProfileClass::onGridProfileStatus(AsyncWebServerRequest* request)
         return;
     }
 
-    AsyncJsonResponse* response = new AsyncJsonResponse(false, 8192);
+    AsyncJsonResponse* response = new AsyncJsonResponse();
     auto& root = response->getRoot();
 
     uint64_t serial = 0;
@@ -36,17 +36,17 @@ void WebApiGridProfileClass::onGridProfileStatus(AsyncWebServerRequest* request)
         root["name"] = inv->GridProfile()->getProfileName();
         root["version"] = inv->GridProfile()->getProfileVersion();
 
-        auto jsonSections = root.createNestedArray("sections");
+        auto jsonSections = root["sections"].to<JsonArray>();
         auto profSections = inv->GridProfile()->getProfile();
 
         for (auto &profSection : profSections) {
-            auto jsonSection = jsonSections.createNestedObject();
+            auto jsonSection = jsonSections.add<JsonObject>();
             jsonSection["name"] = profSection.SectionName;
 
-            auto jsonItems = jsonSection.createNestedArray("items");
+            auto jsonItems = jsonSection["items"].to<JsonArray>();
 
             for (auto &profItem : profSection.items) {
-                auto jsonItem = jsonItems.createNestedObject();
+                auto jsonItem = jsonItems.add<JsonObject>();
 
                 jsonItem["n"] = profItem.Name;
                 jsonItem["u"] = profItem.Unit;
@@ -65,7 +65,7 @@ void WebApiGridProfileClass::onGridProfileRawdata(AsyncWebServerRequest* request
         return;
     }
 
-    AsyncJsonResponse* response = new AsyncJsonResponse(false, 4096);
+    AsyncJsonResponse* response = new AsyncJsonResponse();
     auto& root = response->getRoot();
 
     uint64_t serial = 0;
@@ -77,7 +77,7 @@ void WebApiGridProfileClass::onGridProfileRawdata(AsyncWebServerRequest* request
     auto inv = Hoymiles.getInverterBySerial(serial);
 
     if (inv != nullptr) {
-        auto raw = root.createNestedArray("raw");
+        auto raw = root["raw"].to<JsonArray>();
         auto data = inv->GridProfile()->getRawData();
 
         copyArray(&data[0], data.size(), raw);

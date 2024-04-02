@@ -30,8 +30,6 @@
 
 #define DEV_MAX_MAPPING_NAME_STRLEN 63
 
-#define JSON_BUFFER_SIZE 12288
-
 struct CHANNEL_CONFIG_T {
     uint16_t MaxChannelPower;
     char Name[CHAN_MAX_NAME_STRLEN];

@@ -20,7 +20,7 @@ void WebApiEventlogClass::onEventlogStatus(AsyncWebServerRequest* request)
         return;
     }
 
-    AsyncJsonResponse* response = new AsyncJsonResponse(false, 2048);
+    AsyncJsonResponse* response = new AsyncJsonResponse();
     auto& root = response->getRoot();
 
     uint64_t serial = 0;
@@ -47,10 +47,10 @@ void WebApiEventlogClass::onEventlogStatus(AsyncWebServerRequest* request)
         uint8_t logEntryCount = inv->EventLog()->getEntryCount();
 
         root["count"] = logEntryCount;
-        JsonArray eventsArray = root.createNestedArray("events");
+        JsonArray eventsArray = root["events"].to<JsonArray>();
 
         for (uint8_t logEntry = 0; logEntry < logEntryCount; logEntry++) {
-            JsonObject eventsObject = eventsArray.createNestedObject();
+            JsonObject eventsObject = eventsArray.add<JsonObject>();
 
             AlarmLogEntry_t entry;
             inv->EventLog()->getLogEntry(logEntry, entry, locale);

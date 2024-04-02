@@ -83,7 +83,7 @@ void WebApiNetworkClass::onNetworkAdminPost(AsyncWebServerRequest* request)
     }
 
     AsyncJsonResponse* response = new AsyncJsonResponse();
-    DynamicJsonDocument root(1024);
+    JsonDocument root;
     if (!WebApi.parseRequestData(request, response, root)) {
         return;
     }
