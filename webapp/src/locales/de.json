@@ -910,7 +910,7 @@
         "chargedEnergy": "Geladene Energie",
         "dischargedEnergy": "Entladene Energie",
         "instantaneousPower": "Aktuelle Leistung",
-        "consumedAmpHours": "Verbrauche Amperestunden",
+        "consumedAmpHours": "Verbrauchte Amperestunden",
         "lastFullCharge": "Letztes mal Vollgeladen"
     }
 }
