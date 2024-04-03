@@ -43,6 +43,8 @@ public:
 
     std::list<GridProfileSection_t> getProfile() const;
 
+    bool containsValidData() const;
+
 private:
     static uint8_t getSectionSize(const uint8_t section_id, const uint8_t section_version);
     static int16_t getSectionStart(const uint8_t section_id, const uint8_t section_version);

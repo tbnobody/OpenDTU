@@ -22,7 +22,8 @@
 
 #define MDNS_ENABLED false
 
-#define NTP_SERVER "pool.ntp.org"
+#define NTP_SERVER_OLD "pool.ntp.org"
+#define NTP_SERVER "opendtu.pool.ntp.org"
 #define NTP_TIMEZONE "CET-1CEST,M3.5.0,M10.5.0/3"
 #define NTP_TIMEZONEDESCR "Europe/Berlin"
 #define NTP_LONGITUDE 10.4515f
