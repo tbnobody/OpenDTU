@@ -148,10 +148,10 @@ int32_t VictronMpptClass::getPowerOutputWatts() const
         // the calculated efficiency of the connected charge controller.
         auto networkPower = upController->getData().NetworkTotalDcInputPowerMilliWatts;
         if (networkPower.first > 0) {
-            return static_cast<int32_t>(networkPower.second / 1000.0 * upController->getData().E / 100);
+            return static_cast<int32_t>(networkPower.second / 1000.0 * upController->getData().mpptEfficiency_Percent / 100);
         }
 
-        sum += upController->getData().P;
+        sum += upController->getData().batteryOutputPower_W;
     }
 
     return sum;
@@ -172,7 +172,7 @@ int32_t VictronMpptClass::getPanelPowerWatts() const
             return static_cast<int32_t>(networkPower.second / 1000.0);
         }
 
-        sum += upController->getData().PPV;
+        sum += upController->getData().panelPower_PPV_W;
     }
 
     return sum;
@@ -184,7 +184,7 @@ float VictronMpptClass::getYieldTotal() const
 
     for (const auto& upController : _controllers) {
         if (!upController->isDataValid()) { continue; }
-        sum += upController->getData().H19;
+        sum += upController->getData().yieldTotal_H19_Wh / 1000.0;
     }
 
     return sum;
@@ -196,7 +196,7 @@ float VictronMpptClass::getYieldDay() const
 
     for (const auto& upController : _controllers) {
         if (!upController->isDataValid()) { continue; }
-        sum += upController->getData().H20;
+        sum += upController->getData().yieldToday_H20_Wh / 1000.0;
     }
 
     return sum;
@@ -208,7 +208,7 @@ float VictronMpptClass::getOutputVoltage() const
 
     for (const auto& upController : _controllers) {
         if (!upController->isDataValid()) { continue; }
-        float volts = upController->getData().V;
+        float volts = upController->getData().batteryVoltage_V_mV / 1000.0;
         if (min == -1) { min = volts; }
         min = std::min(min, volts);
     }

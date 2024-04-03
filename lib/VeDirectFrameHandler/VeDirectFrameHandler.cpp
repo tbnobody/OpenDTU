@@ -104,10 +104,10 @@ void VeDirectFrameHandler<T>::loop()
 		_lastByteMillis = millis();
 	}
 
-	// there will never be a large gap between two bytes of the same frame.
+	// there will never be a large gap between two bytes.
 	// if such a large gap is observed, reset the state machine so it tries
-	// to decode a new frame once more data arrives.
-	if (State::IDLE != _state && (millis() - _lastByteMillis) > 500) {
+	// to decode a new frame / hex messages once more data arrives.
+	if ((State::IDLE != _state) && ((millis() - _lastByteMillis) > 500)) {
 		_msgOut->printf("%s Resetting state machine (was %d) after timeout\r\n",
 				_logId, static_cast<unsigned>(_state));
 		if (_verboseLogging) { dumpDebugBuffer(); }
@@ -236,27 +236,27 @@ void VeDirectFrameHandler<T>::processTextData(std::string const& name, std::stri
 	if (processTextDataDerived(name, value)) { return; }
 
 	if (name == "PID") {
-		_tmpFrame.PID = strtol(value.c_str(), nullptr, 0);
+		_tmpFrame.productID_PID = strtol(value.c_str(), nullptr, 0);
 		return;
 	}
 
 	if (name == "SER") {
-		strcpy(_tmpFrame.SER, value.c_str());
+		strcpy(_tmpFrame.serialNr_SER, value.c_str());
 		return;
 	}
 
 	if (name == "FW") {
-		strcpy(_tmpFrame.FW, value.c_str());
+		strcpy(_tmpFrame.firmwareNr_FW, value.c_str());
 		return;
 	}
 
 	if (name == "V") {
-		_tmpFrame.V = round(atof(value.c_str()) / 10.0) / 100.0;
+		_tmpFrame.batteryVoltage_V_mV = atol(value.c_str());
 		return;
 	}
 
 	if (name == "I") {
-		_tmpFrame.I = round(atof(value.c_str()) / 10.0) / 100.0;
+		_tmpFrame.batteryCurrent_I_mA = atol(value.c_str());
 		return;
 	}
 
@@ -307,7 +307,10 @@ typename VeDirectFrameHandler<T>::State VeDirectFrameHandler<T>::hexRxEvent(uint
 template<typename T>
 bool VeDirectFrameHandler<T>::isDataValid() const
 {
-	return strlen(_tmpFrame.SER) > 0 && _lastUpdate > 0 && (millis() - _lastUpdate) < (10 * 1000);
+	// VE.Direct text frame data is valid if we receive a device serialnumber and
+	// the data is not older as 10 seconds
+	// we accept a glitch where the data is valid for ten seconds when serialNr_SER != "" and (millis() - _lastUpdate) overflows
+	return strlen(_tmpFrame.serialNr_SER) > 0 && (millis() - _lastUpdate) < (10 * 1000);
 }
 
 template<typename T>

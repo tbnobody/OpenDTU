@@ -374,10 +374,10 @@ void JkBmsBatteryStats::updateFrom(JkBms::DataPointContainer const& dp)
 }
 
 void VictronSmartShuntStats::updateFrom(VeDirectShuntController::data_t const& shuntData) {
-    BatteryStats::setVoltage(shuntData.V, millis());
+    BatteryStats::setVoltage(shuntData.batteryVoltage_V_mV / 1000.0, millis());
     BatteryStats::setSoC(static_cast<float>(shuntData.SOC) / 10, 1/*precision*/, millis());
 
-    _current = shuntData.I;
+    _current = static_cast<float>(shuntData.batteryCurrent_I_mA) / 1000;
     _modelName = shuntData.getPidAsString().data();
     _chargeCycles = shuntData.H4;
     _timeToGo = shuntData.TTG / 60;
@@ -390,11 +390,11 @@ void VictronSmartShuntStats::updateFrom(VeDirectShuntController::data_t const& s
     _consumedAmpHours = static_cast<float>(shuntData.CE) / 1000;
     _lastFullCharge = shuntData.H9 / 60;
     // shuntData.AR is a bitfield, so we need to check each bit individually
-    _alarmLowVoltage = shuntData.AR & 1;
-    _alarmHighVoltage = shuntData.AR & 2;
-    _alarmLowSOC = shuntData.AR & 4;
-    _alarmLowTemperature = shuntData.AR & 32;
-    _alarmHighTemperature = shuntData.AR & 64;
+    _alarmLowVoltage = shuntData.alarmReason_AR & 1;
+    _alarmHighVoltage = shuntData.alarmReason_AR & 2;
+    _alarmLowSOC = shuntData.alarmReason_AR & 4;
+    _alarmLowTemperature = shuntData.alarmReason_AR & 32;
+    _alarmHighTemperature = shuntData.alarmReason_AR & 64;
 
     _lastUpdate = VeDirectShunt.getLastUpdate();
 }

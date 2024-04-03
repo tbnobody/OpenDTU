@@ -134,7 +134,7 @@ frozen::string const& veStruct::getPidAsString() const
 		{ 0xA3F0, "Smart BuckBoost 12V/12V-50A" },
 	};
 
-	return getAsString(values, PID);
+	return getAsString(values, productID_PID);
 }
 
 /*
@@ -154,7 +154,7 @@ frozen::string const& veMpptStruct::getCsAsString() const
 		{ 252, "External Control" }
 	};
 
-	return getAsString(values, CS);
+	return getAsString(values, currentState_CS);
 }
 
 /*
@@ -168,7 +168,7 @@ frozen::string const& veMpptStruct::getMpptAsString() const
 		{ 2, "MPP Tracker active" }
 	};
 
-	return getAsString(values, MPPT);
+	return getAsString(values, stateOfTracker_MPPT);
 }
 
 /*
@@ -199,7 +199,7 @@ frozen::string const& veMpptStruct::getErrAsString() const
 		{ 118, "User settings invalid" }
 	};
 
-	return getAsString(values, ERR);
+	return getAsString(values, errorCode_ERR);
 }
 
 /*
@@ -220,7 +220,7 @@ frozen::string const& veMpptStruct::getOrAsString() const
 		{ 0x00000100, "Analysing input voltage" }
 	};
 
-	return getAsString(values, OR);
+	return getAsString(values, offReason_OR);
 }
 
 frozen::string const& VeDirectHexData::getResponseAsString() const

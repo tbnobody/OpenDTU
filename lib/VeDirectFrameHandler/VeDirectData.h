@@ -7,32 +7,33 @@
 #define VE_MAX_HEX_LEN 100 // Maximum size of hex frame - max payload 34 byte (=68 char) + safe buffer
 
 typedef struct {
-    uint16_t PID = 0;               // product id
-    char SER[VE_MAX_VALUE_LEN];     // serial number
-    char FW[VE_MAX_VALUE_LEN];      // firmware release number
-    float V = 0;                    // battery voltage in V
-    float I = 0;                    // battery current in A
-    float E = 0;                    // efficiency in percent (calculated, moving average)
+    uint16_t productID_PID = 0;             // product id
+    char serialNr_SER[VE_MAX_VALUE_LEN];    // serial number
+    char firmwareNr_FW[VE_MAX_VALUE_LEN];   // firmware release number
+    uint32_t batteryVoltage_V_mV = 0;       // battery voltage in mV
+    int32_t batteryCurrent_I_mA = 0;        // battery current in mA (can be negative)
+    float mpptEfficiency_Percent = 0;       // efficiency in percent (calculated, moving average)
 
     frozen::string const& getPidAsString() const; // product ID as string
 } veStruct;
 
 struct veMpptStruct : veStruct {
-    uint8_t MPPT;                   // state of MPP tracker
-    int32_t PPV;                    // panel power in W
-    int32_t P;                      // battery output power in W (calculated)
-    float VPV;                      // panel voltage in V
-    float IPV;                      // panel current in A (calculated)
-    bool LOAD;                      // virtual load output state (on if battery voltage reaches upper limit, off if battery reaches lower limit)
-    uint8_t CS;                     // current state of operation e.g. OFF or Bulk
-    uint8_t ERR;                    // error code
-    uint32_t OR;                    // off reason
-    uint32_t HSDS;                  // day sequence number 1...365
-    float H19;                      // yield total kWh
-    float H20;                      // yield today kWh
-    int32_t H21;                    // maximum power today W
-    float H22;                      // yield yesterday kWh
-    int32_t H23;                    // maximum power yesterday W
+    uint8_t  stateOfTracker_MPPT;       // state of MPP tracker
+    uint16_t panelPower_PPV_W;          // panel power in W
+    uint32_t panelVoltage_VPV_mV;       // panel voltage in mV
+    uint32_t panelCurrent_mA;           // panel current in mA (calculated)
+    int16_t  batteryOutputPower_W;      // battery output power in W (calculated, can be negative if load output is used)
+    uint32_t loadCurrent_IL_mA;         // Load current in mA (Available only for models with a load output)
+    bool     loadOutputState_LOAD;      // virtual load output state (on if battery voltage reaches upper limit, off if battery reaches lower limit)
+    uint8_t  currentState_CS;           // current state of operation e.g. OFF or Bulk
+    uint8_t  errorCode_ERR;             // error code
+    uint32_t offReason_OR;              // off reason
+    uint16_t daySequenceNr_HSDS;        // day sequence number 1...365
+    uint32_t yieldTotal_H19_Wh;         // yield total resetable Wh
+    uint32_t yieldToday_H20_Wh;         // yield today Wh
+    uint16_t maxPowerToday_H21_W;       // maximum power today W
+    uint32_t yieldYesterday_H22_Wh;     // yield yesterday Wh
+    uint16_t maxPowerYesterday_H23_W;   // maximum power yesterday W
 
     // these are values communicated through the HEX protocol. the pair's first
     // value is the timestamp the respective info was last received. if it is
@@ -59,7 +60,7 @@ struct veShuntStruct : veStruct {
     int32_t SOC;                    // State-of-charge
     uint32_t TTG;                   // Time-to-go
     bool ALARM;                     // Alarm condition active
-    uint32_t AR;                    // Alarm Reason
+    uint16_t alarmReason_AR;        // Alarm Reason
     int32_t H1;                     // Depth of the deepest discharge
     int32_t H2;                     // Depth of the last discharge
     int32_t H3;                     // Depth of the average discharge
@@ -78,6 +79,7 @@ struct veShuntStruct : veStruct {
     int32_t H16;                    // Maximum auxiliary (battery) voltage
     int32_t H17;                    // Amount of discharged energy
     int32_t H18;                    // Amount of charged energy
+    int8_t dcMonitorMode_MON;       // DC monitor mode
 };
 
 enum class VeDirectHexCommand : uint8_t {
@@ -120,7 +122,9 @@ enum class VeDirectHexRegister : uint16_t {
     SmartBatterySenseTemperature = 0xEDEC,
     NetworkInfo = 0x200D,
     NetworkMode = 0x200E,
-    NetworkStatus = 0x200F
+    NetworkStatus = 0x200F,
+    HistoryTotal = 0x104F,
+    HistoryMPPTD30 = 0x10BE
 };
 
 struct VeDirectHexData {

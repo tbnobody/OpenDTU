@@ -95,7 +95,7 @@ void MqttHandleVedirectHassClass::publishSensor(const char *caption, const char 
                                                 const char *unitOfMeasurement,
                                                 const VeDirectMpptController::data_t &mpptData)
 {
-    String serial = mpptData.SER;
+    String serial = mpptData.serialNr_SER;
 
     String sensorId = caption;
     sensorId.replace(" ", "_");
@@ -153,7 +153,7 @@ void MqttHandleVedirectHassClass::publishBinarySensor(const char *caption, const
                                                       const char *payload_on, const char *payload_off,
                                                       const VeDirectMpptController::data_t &mpptData)
 {
-    String serial = mpptData.SER;
+    String serial = mpptData.serialNr_SER;
 
     String sensorId = caption;
     sensorId.replace(" ", "_");
@@ -198,7 +198,7 @@ void MqttHandleVedirectHassClass::publishBinarySensor(const char *caption, const
 void MqttHandleVedirectHassClass::createDeviceInfo(JsonObject &object,
                                                    const VeDirectMpptController::data_t &mpptData)
 {
-    String serial = mpptData.SER;
+    String serial = mpptData.serialNr_SER;
     object["name"] = "Victron(" + serial + ")";
     object["ids"] = serial;
     object["cu"] = String("http://") + NetworkSettings.localIP().toString();

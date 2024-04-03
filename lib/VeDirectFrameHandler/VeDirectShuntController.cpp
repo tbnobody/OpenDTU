@@ -35,6 +35,10 @@ bool VeDirectShuntController::processTextDataDerived(std::string const& name, st
 		_tmpFrame.ALARM = (value == "ON");
 		return true;
 	}
+	if (name == "AR") {
+		_tmpFrame.alarmReason_AR = atoi(value.c_str());
+		return true;
+	}
 	if (name == "H1") {
 		_tmpFrame.H1 = atoi(value.c_str());
 		return true;
@@ -107,6 +111,14 @@ bool VeDirectShuntController::processTextDataDerived(std::string const& name, st
 		_tmpFrame.H18 = atoi(value.c_str());
 		return true;
 	}
-
+	if (name == "BMV") {
+		// This field contains a textual description of the BMV model,
+		// for example 602S or 702. It is deprecated, refer to the field PID instead.
+		return true;
+	}
+	if (name == "MON") {
+		_tmpFrame.dcMonitorMode_MON = static_cast<int8_t>(atoi(value.c_str()));
+		return true;
+	}
 	return false;
 }

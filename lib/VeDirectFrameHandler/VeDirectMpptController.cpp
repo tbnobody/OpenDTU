@@ -19,56 +19,60 @@ void VeDirectMpptController::init(int8_t rx, int8_t tx, Print* msgOut, bool verb
 
 bool VeDirectMpptController::processTextDataDerived(std::string const& name, std::string const& value)
 {
+	if (name == "IL") {
+		_tmpFrame.loadCurrent_IL_mA = atol(value.c_str());
+		return true;
+	}
 	if (name == "LOAD") {
-		_tmpFrame.LOAD = (value == "ON");
+		_tmpFrame.loadOutputState_LOAD = (value == "ON");
 		return true;
 	}
 	if (name == "CS") {
-		_tmpFrame.CS = atoi(value.c_str());
+		_tmpFrame.currentState_CS = atoi(value.c_str());
 		return true;
 	}
 	if (name == "ERR") {
-		_tmpFrame.ERR = atoi(value.c_str());
+		_tmpFrame.errorCode_ERR = atoi(value.c_str());
 		return true;
 	}
 	if (name == "OR") {
-		_tmpFrame.OR = strtol(value.c_str(), nullptr, 0);
+		_tmpFrame.offReason_OR = strtol(value.c_str(), nullptr, 0);
 		return true;
 	}
 	if (name == "MPPT") {
-		_tmpFrame.MPPT = atoi(value.c_str());
+		_tmpFrame.stateOfTracker_MPPT = atoi(value.c_str());
 		return true;
 	}
 	if (name == "HSDS") {
-		_tmpFrame.HSDS = atoi(value.c_str());
+		_tmpFrame.daySequenceNr_HSDS = atoi(value.c_str());
 		return true;
 	}
 	if (name == "VPV") {
-		_tmpFrame.VPV = round(atof(value.c_str()) / 10.0) / 100.0;
+		_tmpFrame.panelVoltage_VPV_mV = atol(value.c_str());
 		return true;
 	}
 	if (name == "PPV") {
-		_tmpFrame.PPV = atoi(value.c_str());
+		_tmpFrame.panelPower_PPV_W = atoi(value.c_str());
 		return true;
 	}
 	if (name == "H19") {
-		_tmpFrame.H19 = atof(value.c_str()) / 100.0;
+		_tmpFrame.yieldTotal_H19_Wh = atol(value.c_str()) * 10;
 		return true;
 	}
 	if (name == "H20") {
-		_tmpFrame.H20 = atof(value.c_str()) / 100.0;
+		_tmpFrame.yieldToday_H20_Wh = atol(value.c_str()) * 10;
 		return true;
 	}
 	if (name == "H21") {
-		_tmpFrame.H21 = atoi(value.c_str());
+		_tmpFrame.maxPowerToday_H21_W = atoi(value.c_str());
 		return true;
 	}
 	if (name == "H22") {
-		_tmpFrame.H22 = atof(value.c_str()) / 100.0;
+		_tmpFrame.yieldYesterday_H22_Wh = atol(value.c_str()) * 10;
 		return true;
 	}
 	if (name == "H23") {
-		_tmpFrame.H23 = atoi(value.c_str());
+		_tmpFrame.maxPowerYesterday_H23_W = atoi(value.c_str());
 		return true;
 	}
 
@@ -80,15 +84,15 @@ bool VeDirectMpptController::processTextDataDerived(std::string const& name, std
  *  This function is called at the end of the received frame.
  */
 void VeDirectMpptController::frameValidEvent() {
-	_tmpFrame.P = _tmpFrame.V * _tmpFrame.I;
+	_tmpFrame.batteryOutputPower_W = static_cast<int16_t>(_tmpFrame.batteryVoltage_V_mV * _tmpFrame.batteryCurrent_I_mA / 1000000);
 
-	if (_tmpFrame.VPV > 0) {
-		_tmpFrame.IPV = _tmpFrame.PPV / _tmpFrame.VPV;
+	if ((_tmpFrame.panelVoltage_VPV_mV > 0) && (_tmpFrame.panelPower_PPV_W >= 1)) {
+		_tmpFrame.panelCurrent_mA = static_cast<uint32_t>(_tmpFrame.panelPower_PPV_W * 1000000) / _tmpFrame.panelVoltage_VPV_mV;
 	}
 
-	if (_tmpFrame.PPV > 0) {
-		_efficiency.addNumber(static_cast<float>(_tmpFrame.P * 100) / _tmpFrame.PPV);
-		_tmpFrame.E = _efficiency.getAverage();
+	if (_tmpFrame.panelPower_PPV_W > 0) {
+		_efficiency.addNumber(static_cast<float>(_tmpFrame.batteryOutputPower_W * 100) / _tmpFrame.panelPower_PPV_W);
+		_tmpFrame.mpptEfficiency_Percent = _efficiency.getAverage();
 	}
 
 	if (!_canSend) { return; }
@@ -98,7 +102,7 @@ void VeDirectMpptController::frameValidEvent() {
 	// charger periodically sends human readable (TEXT) data to the serial port. For firmware
 	// versions v1.53 and above, the charger always periodically sends TEXT data to the serial port.
 	// --> We just use hex commandes for firmware >= 1.53 to keep text messages alive
-	if (atoi(_tmpFrame.FW) < 153) { return; }
+	if (atoi(_tmpFrame.firmwareNr_FW) < 153) { return; }
 
 	using Command = VeDirectHexCommand;
 	using Register = VeDirectHexRegister;

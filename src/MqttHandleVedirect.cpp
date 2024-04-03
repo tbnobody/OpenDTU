@@ -62,10 +62,10 @@ void MqttHandleVedirectClass::loop()
             std::optional<VeDirectMpptController::data_t> optMpptData = VictronMppt.getData(idx);
             if (!optMpptData.has_value()) { continue; }
 
-            auto const& kvFrame = _kvFrames[optMpptData->SER];
+            auto const& kvFrame = _kvFrames[optMpptData->serialNr_SER];
             publish_mppt_data(*optMpptData, kvFrame);
             if (!_PublishFull) {
-                _kvFrames[optMpptData->SER] = *optMpptData;
+                _kvFrames[optMpptData->serialNr_SER] = *optMpptData;
             }
         }
 
@@ -100,7 +100,7 @@ void MqttHandleVedirectClass::publish_mppt_data(const VeDirectMpptController::da
                                                 const VeDirectMpptController::data_t &previousData) const {
     String value;
     String topic = "victron/";
-    topic.concat(currentData.SER);
+    topic.concat(currentData.serialNr_SER);
     topic.concat("/");
 
 #define PUBLISH(sm, t, val) \
@@ -108,26 +108,26 @@ void MqttHandleVedirectClass::publish_mppt_data(const VeDirectMpptController::da
         MqttSettings.publish(topic + t, String(val)); \
     }
 
-    PUBLISH(PID,   "PID",  currentData.getPidAsString().data());
-    PUBLISH(SER,   "SER",  currentData.SER);
-    PUBLISH(FW,    "FW",   currentData.FW);
-    PUBLISH(LOAD,  "LOAD", (currentData.LOAD ? "ON" : "OFF"));
-    PUBLISH(CS,    "CS",   currentData.getCsAsString().data());
-    PUBLISH(ERR,   "ERR",  currentData.getErrAsString().data());
-    PUBLISH(OR,    "OR",   currentData.getOrAsString().data());
-    PUBLISH(MPPT,  "MPPT", currentData.getMpptAsString().data());
-    PUBLISH(HSDS,  "HSDS", currentData.HSDS);
-    PUBLISH(V,     "V",    currentData.V);
-    PUBLISH(I,     "I",    currentData.I);
-    PUBLISH(P,     "P",    currentData.P);
-    PUBLISH(VPV,   "VPV",  currentData.VPV);
-    PUBLISH(IPV,   "IPV",  currentData.IPV);
-    PUBLISH(PPV,   "PPV",  currentData.PPV);
-    PUBLISH(E,     "E",    currentData.E);
-    PUBLISH(H19,   "H19",  currentData.H19);
-    PUBLISH(H20,   "H20",  currentData.H20);
-    PUBLISH(H21,   "H21",  currentData.H21);
-    PUBLISH(H22,   "H22",  currentData.H22);
-    PUBLISH(H23,   "H23",  currentData.H23);
+    PUBLISH(productID_PID,           "PID",  currentData.getPidAsString().data());
+    PUBLISH(serialNr_SER,            "SER",  currentData.serialNr_SER);
+    PUBLISH(firmwareNr_FW,            "FW",  currentData.firmwareNr_FW);
+    PUBLISH(loadOutputState_LOAD,   "LOAD",  (currentData.loadOutputState_LOAD ? "ON" : "OFF"));
+    PUBLISH(currentState_CS,          "CS",  currentData.getCsAsString().data());
+    PUBLISH(errorCode_ERR,           "ERR",  currentData.getErrAsString().data());
+    PUBLISH(offReason_OR,             "OR",  currentData.getOrAsString().data());
+    PUBLISH(stateOfTracker_MPPT,    "MPPT",  currentData.getMpptAsString().data());
+    PUBLISH(daySequenceNr_HSDS,     "HSDS",  currentData.daySequenceNr_HSDS);
+    PUBLISH(batteryVoltage_V_mV,       "V",  currentData.batteryVoltage_V_mV / 1000.0);
+    PUBLISH(batteryCurrent_I_mA,       "I",  currentData.batteryCurrent_I_mA / 1000.0);
+    PUBLISH(batteryOutputPower_W,      "P",  currentData.batteryOutputPower_W);
+    PUBLISH(panelVoltage_VPV_mV,     "VPV",  currentData.panelVoltage_VPV_mV / 1000.0);
+    PUBLISH(panelCurrent_mA,         "IPV",  currentData.panelCurrent_mA / 1000.0);
+    PUBLISH(panelPower_PPV_W,        "PPV",  currentData.panelPower_PPV_W);
+    PUBLISH(mpptEfficiency_Percent,    "E",  currentData.mpptEfficiency_Percent);
+    PUBLISH(yieldTotal_H19_Wh,       "H19",  currentData.yieldTotal_H19_Wh / 1000.0);
+    PUBLISH(yieldToday_H20_Wh,       "H20",  currentData.yieldToday_H20_Wh / 1000.0);
+    PUBLISH(maxPowerToday_H21_W,     "H21",  currentData.maxPowerToday_H21_W);
+    PUBLISH(yieldYesterday_H22_Wh,   "H22",  currentData.yieldYesterday_H22_Wh / 1000.0);
+    PUBLISH(maxPowerYesterday_H23_W, "H23",  currentData.maxPowerYesterday_H23_W);
 #undef PUBLILSH
 }

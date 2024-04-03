@@ -93,6 +93,12 @@ bool VeDirectFrameHandler<T>::disassembleHexData(VeDirectHexData &data) {
             case Response::ASYNC:
                 data.addr = static_cast<VeDirectHexRegister>(AsciiHexLE2Int(buffer+2, 4));
 
+                // future option: Up to now we do not use historical data
+                if ((data.addr >= VeDirectHexRegister::HistoryTotal) && (data.addr <= VeDirectHexRegister::HistoryMPPTD30)) {
+                    state = true;
+                    break;
+                }
+
                 // future option: to analyse the flags here?
                 data.flags = AsciiHexLE2Int(buffer+6, 2);
 
