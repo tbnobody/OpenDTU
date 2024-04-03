@@ -176,4 +176,5 @@ void WebApiDtuClass::onDtuAdminPost(AsyncWebServerRequest* request)
     request->send(response);
 
     _applyDataTask.enable();
+    _applyDataTask.restart();
 }
