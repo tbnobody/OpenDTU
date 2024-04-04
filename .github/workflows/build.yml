@@ -9,7 +9,7 @@ on:
       - master
       - development
     tags-ignore:        
-      - v*
+      - 'v**'
   pull_request:
     paths-ignore:
       - docs/**
