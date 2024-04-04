@@ -110,6 +110,16 @@ bool WebApiClass::parseRequestData(AsyncWebServerRequest* request, AsyncJsonResp
     return true;
 }
 
+uint64_t WebApiClass::parseSerialFromRequest(AsyncWebServerRequest* request, String param_name)
+{
+    if (request->hasParam(param_name)) {
+        String s = request->getParam(param_name)->value();
+        return strtoll(s.c_str(), NULL, 16);
+    }
+
+    return 0;
+}
+
 bool WebApiClass::sendJsonResponse(AsyncWebServerRequest* request, AsyncJsonResponse* response, const char* function, const uint16_t line)
 {
     bool ret_val = true;

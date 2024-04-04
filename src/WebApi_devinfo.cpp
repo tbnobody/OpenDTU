@@ -23,13 +23,7 @@ void WebApiDevInfoClass::onDevInfoStatus(AsyncWebServerRequest* request)
 
     AsyncJsonResponse* response = new AsyncJsonResponse();
     auto& root = response->getRoot();
-
-    uint64_t serial = 0;
-    if (request->hasParam("inv")) {
-        String s = request->getParam("inv")->value();
-        serial = strtoll(s.c_str(), NULL, 16);
-    }
-
+    auto serial = WebApi.parseSerialFromRequest(request);
     auto inv = Hoymiles.getInverterBySerial(serial);
 
     if (inv != nullptr) {

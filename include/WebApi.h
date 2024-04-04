@@ -39,6 +39,7 @@ public:
     static void writeConfig(JsonVariant& retMsg, const WebApiError code = WebApiError::GenericSuccess, const String& message = "Settings saved!");
 
     static bool parseRequestData(AsyncWebServerRequest* request, AsyncJsonResponse* response, JsonDocument& json_document);
+    static uint64_t parseSerialFromRequest(AsyncWebServerRequest* request, String param_name = "inv");
     static bool sendJsonResponse(AsyncWebServerRequest* request, AsyncJsonResponse* response, const char* function, const uint16_t line);
 
 private:
