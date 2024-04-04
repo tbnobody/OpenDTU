@@ -63,16 +63,14 @@ void WebApiConfigClass::onConfigDelete(AsyncWebServerRequest* request)
     if (!(root.containsKey("delete"))) {
         retMsg["message"] = "Values are missing!";
         retMsg["code"] = WebApiError::GenericValueMissing;
-        response->setLength();
-        request->send(response);
+        WebApi.sendJsonResponse(request, response, __FUNCTION__, __LINE__);
         return;
     }
 
     if (root["delete"].as<bool>() == false) {
         retMsg["message"] = "Not deleted anything!";
         retMsg["code"] = WebApiError::ConfigNotDeleted;
-        response->setLength();
-        request->send(response);
+        WebApi.sendJsonResponse(request, response, __FUNCTION__, __LINE__);
         return;
     }
 
@@ -80,8 +78,7 @@ void WebApiConfigClass::onConfigDelete(AsyncWebServerRequest* request)
     retMsg["message"] = "Configuration resettet. Rebooting now...";
     retMsg["code"] = WebApiError::ConfigSuccess;
 
-    response->setLength();
-    request->send(response);
+    WebApi.sendJsonResponse(request, response, __FUNCTION__, __LINE__);
 
     Utils::removeAllFiles();
     Utils::restartDtu();
@@ -110,8 +107,7 @@ void WebApiConfigClass::onConfigListGet(AsyncWebServerRequest* request)
     }
     file.close();
 
-    response->setLength();
-    request->send(response);
+    WebApi.sendJsonResponse(request, response, __FUNCTION__, __LINE__);
 }
 
 void WebApiConfigClass::onConfigUploadFinish(AsyncWebServerRequest* request)

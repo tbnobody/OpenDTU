@@ -77,8 +77,7 @@ void WebApiInverterClass::onInverterList(AsyncWebServerRequest* request)
         }
     }
 
-    response->setLength();
-    request->send(response);
+    WebApi.sendJsonResponse(request, response, __FUNCTION__, __LINE__);
 }
 
 void WebApiInverterClass::onInverterAdd(AsyncWebServerRequest* request)
@@ -99,8 +98,7 @@ void WebApiInverterClass::onInverterAdd(AsyncWebServerRequest* request)
             && root.containsKey("name"))) {
         retMsg["message"] = "Values are missing!";
         retMsg["code"] = WebApiError::GenericValueMissing;
-        response->setLength();
-        request->send(response);
+        WebApi.sendJsonResponse(request, response, __FUNCTION__, __LINE__);
         return;
     }
 
@@ -110,8 +108,7 @@ void WebApiInverterClass::onInverterAdd(AsyncWebServerRequest* request)
     if (serial == 0) {
         retMsg["message"] = "Serial must be a number > 0!";
         retMsg["code"] = WebApiError::InverterSerialZero;
-        response->setLength();
-        request->send(response);
+        WebApi.sendJsonResponse(request, response, __FUNCTION__, __LINE__);
         return;
     }
 
@@ -119,8 +116,7 @@ void WebApiInverterClass::onInverterAdd(AsyncWebServerRequest* request)
         retMsg["message"] = "Name must between 1 and " STR(INV_MAX_NAME_STRLEN) " characters long!";
         retMsg["code"] = WebApiError::InverterNameLength;
         retMsg["param"]["max"] = INV_MAX_NAME_STRLEN;
-        response->setLength();
-        request->send(response);
+        WebApi.sendJsonResponse(request, response, __FUNCTION__, __LINE__);
         return;
     }
 
@@ -130,8 +126,7 @@ void WebApiInverterClass::onInverterAdd(AsyncWebServerRequest* request)
         retMsg["message"] = "Only " STR(INV_MAX_COUNT) " inverters are supported!";
         retMsg["code"] = WebApiError::InverterCount;
         retMsg["param"]["max"] = INV_MAX_COUNT;
-        response->setLength();
-        request->send(response);
+        WebApi.sendJsonResponse(request, response, __FUNCTION__, __LINE__);
         return;
     }
 
@@ -142,8 +137,7 @@ void WebApiInverterClass::onInverterAdd(AsyncWebServerRequest* request)
 
     WebApi.writeConfig(retMsg, WebApiError::InverterAdded, "Inverter created!");
 
-    response->setLength();
-    request->send(response);
+    WebApi.sendJsonResponse(request, response, __FUNCTION__, __LINE__);
 
     auto inv = Hoymiles.addInverter(inverter->Name, inverter->Serial);
 
@@ -173,16 +167,14 @@ void WebApiInverterClass::onInverterEdit(AsyncWebServerRequest* request)
     if (!(root.containsKey("id") && root.containsKey("serial") && root.containsKey("name") && root.containsKey("channel"))) {
         retMsg["message"] = "Values are missing!";
         retMsg["code"] = WebApiError::GenericValueMissing;
-        response->setLength();
-        request->send(response);
+        WebApi.sendJsonResponse(request, response, __FUNCTION__, __LINE__);
         return;
     }
 
     if (root["id"].as<uint8_t>() > INV_MAX_COUNT - 1) {
         retMsg["message"] = "Invalid ID specified!";
         retMsg["code"] = WebApiError::InverterInvalidId;
-        response->setLength();
-        request->send(response);
+        WebApi.sendJsonResponse(request, response, __FUNCTION__, __LINE__);
         return;
     }
 
@@ -192,8 +184,7 @@ void WebApiInverterClass::onInverterEdit(AsyncWebServerRequest* request)
     if (serial == 0) {
         retMsg["message"] = "Serial must be a number > 0!";
         retMsg["code"] = WebApiError::InverterSerialZero;
-        response->setLength();
-        request->send(response);
+        WebApi.sendJsonResponse(request, response, __FUNCTION__, __LINE__);
         return;
     }
 
@@ -201,8 +192,7 @@ void WebApiInverterClass::onInverterEdit(AsyncWebServerRequest* request)
         retMsg["message"] = "Name must between 1 and " STR(INV_MAX_NAME_STRLEN) " characters long!";
         retMsg["code"] = WebApiError::InverterNameLength;
         retMsg["param"]["max"] = INV_MAX_NAME_STRLEN;
-        response->setLength();
-        request->send(response);
+        WebApi.sendJsonResponse(request, response, __FUNCTION__, __LINE__);
         return;
     }
 
@@ -210,8 +200,7 @@ void WebApiInverterClass::onInverterEdit(AsyncWebServerRequest* request)
     if (channelArray.size() == 0 || channelArray.size() > INV_MAX_CHAN_COUNT) {
         retMsg["message"] = "Invalid amount of max channel setting given!";
         retMsg["code"] = WebApiError::InverterInvalidMaxChannel;
-        response->setLength();
-        request->send(response);
+        WebApi.sendJsonResponse(request, response, __FUNCTION__, __LINE__);
         return;
     }
 
@@ -243,8 +232,7 @@ void WebApiInverterClass::onInverterEdit(AsyncWebServerRequest* request)
 
     WebApi.writeConfig(retMsg, WebApiError::InverterChanged, "Inverter changed!");
 
-    response->setLength();
-    request->send(response);
+    WebApi.sendJsonResponse(request, response, __FUNCTION__, __LINE__);
 
     std::shared_ptr<InverterAbstract> inv = Hoymiles.getInverterBySerial(old_serial);
 
@@ -293,16 +281,14 @@ void WebApiInverterClass::onInverterDelete(AsyncWebServerRequest* request)
     if (!(root.containsKey("id"))) {
         retMsg["message"] = "Values are missing!";
         retMsg["code"] = WebApiError::GenericValueMissing;
-        response->setLength();
-        request->send(response);
+        WebApi.sendJsonResponse(request, response, __FUNCTION__, __LINE__);
         return;
     }
 
     if (root["id"].as<uint8_t>() > INV_MAX_COUNT - 1) {
         retMsg["message"] = "Invalid ID specified!";
         retMsg["code"] = WebApiError::InverterInvalidId;
-        response->setLength();
-        request->send(response);
+        WebApi.sendJsonResponse(request, response, __FUNCTION__, __LINE__);
         return;
     }
 
@@ -315,8 +301,7 @@ void WebApiInverterClass::onInverterDelete(AsyncWebServerRequest* request)
 
     WebApi.writeConfig(retMsg, WebApiError::InverterDeleted, "Inverter deleted!");
 
-    response->setLength();
-    request->send(response);
+    WebApi.sendJsonResponse(request, response, __FUNCTION__, __LINE__);
 
     MqttHandleHass.forceUpdate();
 }
@@ -338,8 +323,7 @@ void WebApiInverterClass::onInverterOrder(AsyncWebServerRequest* request)
     if (!(root.containsKey("order"))) {
         retMsg["message"] = "Values are missing!";
         retMsg["code"] = WebApiError::GenericValueMissing;
-        response->setLength();
-        request->send(response);
+        WebApi.sendJsonResponse(request, response, __FUNCTION__, __LINE__);
         return;
     }
 
@@ -357,6 +341,5 @@ void WebApiInverterClass::onInverterOrder(AsyncWebServerRequest* request)
 
     WebApi.writeConfig(retMsg, WebApiError::InverterOrdered, "Inverter order saved!");
 
-    response->setLength();
-    request->send(response);
+    WebApi.sendJsonResponse(request, response, __FUNCTION__, __LINE__);
 }

@@ -77,6 +77,7 @@ export function handleResponse(response: Response, emitter: Emitter<Record<Event
             }
 
             const error = { message: (data && data.message) || response.statusText, status: response.status || 0 };
+            router.push({ name: "Error", params: error });
             return Promise.reject(error);
         }
 

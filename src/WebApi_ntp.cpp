@@ -63,8 +63,7 @@ void WebApiNtpClass::onNtpStatus(AsyncWebServerRequest* request)
     root["sun_isSunsetAvailable"] = SunPosition.isSunsetAvailable();
     root["sun_isDayPeriod"] = SunPosition.isDayPeriod();
 
-    response->setLength();
-    request->send(response);
+    WebApi.sendJsonResponse(request, response, __FUNCTION__, __LINE__);
 }
 
 void WebApiNtpClass::onNtpAdminGet(AsyncWebServerRequest* request)
@@ -84,8 +83,7 @@ void WebApiNtpClass::onNtpAdminGet(AsyncWebServerRequest* request)
     root["latitude"] = config.Ntp.Latitude;
     root["sunsettype"] = config.Ntp.SunsetType;
 
-    response->setLength();
-    request->send(response);
+    WebApi.sendJsonResponse(request, response, __FUNCTION__, __LINE__);
 }
 
 void WebApiNtpClass::onNtpAdminPost(AsyncWebServerRequest* request)
@@ -109,8 +107,7 @@ void WebApiNtpClass::onNtpAdminPost(AsyncWebServerRequest* request)
             && root.containsKey("sunsettype"))) {
         retMsg["message"] = "Values are missing!";
         retMsg["code"] = WebApiError::GenericValueMissing;
-        response->setLength();
-        request->send(response);
+        WebApi.sendJsonResponse(request, response, __FUNCTION__, __LINE__);
         return;
     }
 
@@ -118,8 +115,7 @@ void WebApiNtpClass::onNtpAdminPost(AsyncWebServerRequest* request)
         retMsg["message"] = "NTP Server must between 1 and " STR(NTP_MAX_SERVER_STRLEN) " characters long!";
         retMsg["code"] = WebApiError::NtpServerLength;
         retMsg["param"]["max"] = NTP_MAX_SERVER_STRLEN;
-        response->setLength();
-        request->send(response);
+        WebApi.sendJsonResponse(request, response, __FUNCTION__, __LINE__);
         return;
     }
 
@@ -127,8 +123,7 @@ void WebApiNtpClass::onNtpAdminPost(AsyncWebServerRequest* request)
         retMsg["message"] = "Timezone must between 1 and " STR(NTP_MAX_TIMEZONE_STRLEN) " characters long!";
         retMsg["code"] = WebApiError::NtpTimezoneLength;
         retMsg["param"]["max"] = NTP_MAX_TIMEZONE_STRLEN;
-        response->setLength();
-        request->send(response);
+        WebApi.sendJsonResponse(request, response, __FUNCTION__, __LINE__);
         return;
     }
 
@@ -136,8 +131,7 @@ void WebApiNtpClass::onNtpAdminPost(AsyncWebServerRequest* request)
         retMsg["message"] = "Timezone description must between 1 and " STR(NTP_MAX_TIMEZONEDESCR_STRLEN) " characters long!";
         retMsg["code"] = WebApiError::NtpTimezoneDescriptionLength;
         retMsg["param"]["max"] = NTP_MAX_TIMEZONEDESCR_STRLEN;
-        response->setLength();
-        request->send(response);
+        WebApi.sendJsonResponse(request, response, __FUNCTION__, __LINE__);
         return;
     }
 
@@ -151,8 +145,7 @@ void WebApiNtpClass::onNtpAdminPost(AsyncWebServerRequest* request)
 
     WebApi.writeConfig(retMsg);
 
-    response->setLength();
-    request->send(response);
+    WebApi.sendJsonResponse(request, response, __FUNCTION__, __LINE__);
 
     NtpSettings.setServer();
     NtpSettings.setTimezone();
@@ -183,8 +176,7 @@ void WebApiNtpClass::onNtpTimeGet(AsyncWebServerRequest* request)
     root["minute"] = timeinfo.tm_min;
     root["second"] = timeinfo.tm_sec;
 
-    response->setLength();
-    request->send(response);
+    WebApi.sendJsonResponse(request, response, __FUNCTION__, __LINE__);
 }
 
 void WebApiNtpClass::onNtpTimePost(AsyncWebServerRequest* request)
@@ -209,8 +201,7 @@ void WebApiNtpClass::onNtpTimePost(AsyncWebServerRequest* request)
             && root.containsKey("second"))) {
         retMsg["message"] = "Values are missing!";
         retMsg["code"] = WebApiError::GenericValueMissing;
-        response->setLength();
-        request->send(response);
+        WebApi.sendJsonResponse(request, response, __FUNCTION__, __LINE__);
         return;
     }
 
@@ -219,8 +210,7 @@ void WebApiNtpClass::onNtpTimePost(AsyncWebServerRequest* request)
         retMsg["code"] = WebApiError::NtpYearInvalid;
         retMsg["param"]["min"] = 2022;
         retMsg["param"]["max"] = 2100;
-        response->setLength();
-        request->send(response);
+        WebApi.sendJsonResponse(request, response, __FUNCTION__, __LINE__);
         return;
     }
 
@@ -229,8 +219,7 @@ void WebApiNtpClass::onNtpTimePost(AsyncWebServerRequest* request)
         retMsg["code"] = WebApiError::NtpMonthInvalid;
         retMsg["param"]["min"] = 1;
         retMsg["param"]["max"] = 12;
-        response->setLength();
-        request->send(response);
+        WebApi.sendJsonResponse(request, response, __FUNCTION__, __LINE__);
         return;
     }
 
@@ -239,8 +228,7 @@ void WebApiNtpClass::onNtpTimePost(AsyncWebServerRequest* request)
         retMsg["code"] = WebApiError::NtpDayInvalid;
         retMsg["param"]["min"] = 1;
         retMsg["param"]["max"] = 31;
-        response->setLength();
-        request->send(response);
+        WebApi.sendJsonResponse(request, response, __FUNCTION__, __LINE__);
         return;
     }
 
@@ -249,8 +237,7 @@ void WebApiNtpClass::onNtpTimePost(AsyncWebServerRequest* request)
         retMsg["code"] = WebApiError::NtpHourInvalid;
         retMsg["param"]["min"] = 0;
         retMsg["param"]["max"] = 23;
-        response->setLength();
-        request->send(response);
+        WebApi.sendJsonResponse(request, response, __FUNCTION__, __LINE__);
         return;
     }
 
@@ -259,8 +246,7 @@ void WebApiNtpClass::onNtpTimePost(AsyncWebServerRequest* request)
         retMsg["code"] = WebApiError::NtpMinuteInvalid;
         retMsg["param"]["min"] = 0;
         retMsg["param"]["max"] = 59;
-        response->setLength();
-        request->send(response);
+        WebApi.sendJsonResponse(request, response, __FUNCTION__, __LINE__);
         return;
     }
 
@@ -269,8 +255,7 @@ void WebApiNtpClass::onNtpTimePost(AsyncWebServerRequest* request)
         retMsg["code"] = WebApiError::NtpSecondInvalid;
         retMsg["param"]["min"] = 0;
         retMsg["param"]["max"] = 59;
-        response->setLength();
-        request->send(response);
+        WebApi.sendJsonResponse(request, response, __FUNCTION__, __LINE__);
         return;
     }
 
@@ -291,6 +276,5 @@ void WebApiNtpClass::onNtpTimePost(AsyncWebServerRequest* request)
     retMsg["message"] = "Time updated!";
     retMsg["code"] = WebApiError::NtpTimeUpdated;
 
-    response->setLength();
-    request->send(response);
+    WebApi.sendJsonResponse(request, response, __FUNCTION__, __LINE__);
 }

@@ -46,8 +46,7 @@ void WebApiNetworkClass::onNetworkStatus(AsyncWebServerRequest* request)
     root["ap_mac"] = WiFi.softAPmacAddress();
     root["ap_stationnum"] = WiFi.softAPgetStationNum();
 
-    response->setLength();
-    request->send(response);
+    WebApi.sendJsonResponse(request, response, __FUNCTION__, __LINE__);
 }
 
 void WebApiNetworkClass::onNetworkAdminGet(AsyncWebServerRequest* request)
@@ -72,8 +71,7 @@ void WebApiNetworkClass::onNetworkAdminGet(AsyncWebServerRequest* request)
     root["aptimeout"] = config.WiFi.ApTimeout;
     root["mdnsenabled"] = config.Mdns.Enabled;
 
-    response->setLength();
-    request->send(response);
+    WebApi.sendJsonResponse(request, response, __FUNCTION__, __LINE__);
 }
 
 void WebApiNetworkClass::onNetworkAdminPost(AsyncWebServerRequest* request)
@@ -102,8 +100,7 @@ void WebApiNetworkClass::onNetworkAdminPost(AsyncWebServerRequest* request)
             && root.containsKey("aptimeout"))) {
         retMsg["message"] = "Values are missing!";
         retMsg["code"] = WebApiError::GenericValueMissing;
-        response->setLength();
-        request->send(response);
+        WebApi.sendJsonResponse(request, response, __FUNCTION__, __LINE__);
         return;
     }
 
@@ -111,68 +108,59 @@ void WebApiNetworkClass::onNetworkAdminPost(AsyncWebServerRequest* request)
     if (!ipaddress.fromString(root["ipaddress"].as<String>())) {
         retMsg["message"] = "IP address is invalid!";
         retMsg["code"] = WebApiError::NetworkIpInvalid;
-        response->setLength();
-        request->send(response);
+        WebApi.sendJsonResponse(request, response, __FUNCTION__, __LINE__);
         return;
     }
     IPAddress netmask;
     if (!netmask.fromString(root["netmask"].as<String>())) {
         retMsg["message"] = "Netmask is invalid!";
         retMsg["code"] = WebApiError::NetworkNetmaskInvalid;
-        response->setLength();
-        request->send(response);
+        WebApi.sendJsonResponse(request, response, __FUNCTION__, __LINE__);
         return;
     }
     IPAddress gateway;
     if (!gateway.fromString(root["gateway"].as<String>())) {
         retMsg["message"] = "Gateway is invalid!";
         retMsg["code"] = WebApiError::NetworkGatewayInvalid;
-        response->setLength();
-        request->send(response);
+        WebApi.sendJsonResponse(request, response, __FUNCTION__, __LINE__);
         return;
     }
     IPAddress dns1;
     if (!dns1.fromString(root["dns1"].as<String>())) {
         retMsg["message"] = "DNS Server IP 1 is invalid!";
         retMsg["code"] = WebApiError::NetworkDns1Invalid;
-        response->setLength();
-        request->send(response);
+        WebApi.sendJsonResponse(request, response, __FUNCTION__, __LINE__);
         return;
     }
     IPAddress dns2;
     if (!dns2.fromString(root["dns2"].as<String>())) {
         retMsg["message"] = "DNS Server IP 2 is invalid!";
         retMsg["code"] = WebApiError::NetworkDns2Invalid;
-        response->setLength();
-        request->send(response);
+        WebApi.sendJsonResponse(request, response, __FUNCTION__, __LINE__);
         return;
     }
 
     if (root["hostname"].as<String>().length() == 0 || root["hostname"].as<String>().length() > WIFI_MAX_HOSTNAME_STRLEN) {
         retMsg["message"] = "Hostname must between 1 and " STR(WIFI_MAX_HOSTNAME_STRLEN) " characters long!";
-        response->setLength();
-        request->send(response);
+        WebApi.sendJsonResponse(request, response, __FUNCTION__, __LINE__);
         return;
     }
     if (NetworkSettings.NetworkMode() == network_mode::WiFi) {
         if (root["ssid"].as<String>().length() == 0 || root["ssid"].as<String>().length() > WIFI_MAX_SSID_STRLEN) {
             retMsg["message"] = "SSID must between 1 and " STR(WIFI_MAX_SSID_STRLEN) " characters long!";
-            response->setLength();
-            request->send(response);
+            WebApi.sendJsonResponse(request, response, __FUNCTION__, __LINE__);
             return;
         }
     }
     if (root["password"].as<String>().length() > WIFI_MAX_PASSWORD_STRLEN - 1) {
         retMsg["message"] = "Password must not be longer than " STR(WIFI_MAX_PASSWORD_STRLEN) " characters long!";
-        response->setLength();
-        request->send(response);
+        WebApi.sendJsonResponse(request, response, __FUNCTION__, __LINE__);
         return;
     }
     if (root["aptimeout"].as<uint>() > 99999) {
         retMsg["message"] = "ApTimeout must be a number between 0 and 99999!";
         retMsg["code"] = WebApiError::NetworkApTimeoutInvalid;
-        response->setLength();
-        request->send(response);
+        WebApi.sendJsonResponse(request, response, __FUNCTION__, __LINE__);
         return;
     }
 
@@ -210,8 +198,7 @@ void WebApiNetworkClass::onNetworkAdminPost(AsyncWebServerRequest* request)
 
     WebApi.writeConfig(retMsg);
 
-    response->setLength();
-    request->send(response);
+    WebApi.sendJsonResponse(request, response, __FUNCTION__, __LINE__);
 
     NetworkSettings.enableAdminMode();
     NetworkSettings.applyConfig();

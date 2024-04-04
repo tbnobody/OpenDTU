@@ -62,6 +62,5 @@ void WebApiEventlogClass::onEventlogStatus(AsyncWebServerRequest* request)
         }
     }
 
-    response->setLength();
-    request->send(response);
+    WebApi.sendJsonResponse(request, response, __FUNCTION__, __LINE__);
 }

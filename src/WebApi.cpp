@@ -4,6 +4,7 @@
  */
 #include "WebApi.h"
 #include "Configuration.h"
+#include "MessageOutput.h"
 #include "defaults.h"
 #include <AsyncJson.h>
 
@@ -93,8 +94,7 @@ bool WebApiClass::parseRequestData(AsyncWebServerRequest* request, AsyncJsonResp
     if (!request->hasParam("data", true)) {
         retMsg["message"] = "No values found!";
         retMsg["code"] = WebApiError::GenericNoValueFound;
-        response->setLength();
-        request->send(response);
+        WebApi.sendJsonResponse(request, response, __FUNCTION__, __LINE__);
         return false;
     }
 
@@ -103,12 +103,31 @@ bool WebApiClass::parseRequestData(AsyncWebServerRequest* request, AsyncJsonResp
     if (error) {
         retMsg["message"] = "Failed to parse data!";
         retMsg["code"] = WebApiError::GenericParseError;
-        response->setLength();
-        request->send(response);
+        WebApi.sendJsonResponse(request, response, __FUNCTION__, __LINE__);
         return false;
     }
 
     return true;
+}
+
+bool WebApiClass::sendJsonResponse(AsyncWebServerRequest* request, AsyncJsonResponse* response, const char* function, const uint16_t line)
+{
+    bool ret_val = true;
+    if (response->overflowed()) {
+        auto& root = response->getRoot();
+
+        root.clear();
+        root["message"] = String("500 Internal Server Error: ") + function + ", " + line;
+        root["code"] = WebApiError::GenericInternalServerError;
+        root["type"] = "danger";
+        response->setCode(500);
+        MessageOutput.printf("WebResponse failed: %s, %d\r\n", function, line);
+        ret_val = false;
+    }
+
+    response->setLength();
+    request->send(response);
+    return ret_val;
 }
 
 WebApiClass WebApi;

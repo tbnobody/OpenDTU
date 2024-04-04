@@ -9,6 +9,7 @@ enum WebApiError {
     GenericParseError,
     GenericValueMissing,
     GenericWriteFailed,
+    GenericInternalServerError,
 
     DtuBase = 2000,
     DtuSerialZero,

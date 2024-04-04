@@ -31,8 +31,7 @@ void WebApiSecurityClass::onSecurityGet(AsyncWebServerRequest* request)
     root["password"] = config.Security.Password;
     root["allow_readonly"] = config.Security.AllowReadonly;
 
-    response->setLength();
-    request->send(response);
+    WebApi.sendJsonResponse(request, response, __FUNCTION__, __LINE__);
 }
 
 void WebApiSecurityClass::onSecurityPost(AsyncWebServerRequest* request)
@@ -53,8 +52,7 @@ void WebApiSecurityClass::onSecurityPost(AsyncWebServerRequest* request)
         && root.containsKey("allow_readonly")) {
         retMsg["message"] = "Values are missing!";
         retMsg["code"] = WebApiError::GenericValueMissing;
-        response->setLength();
-        request->send(response);
+        WebApi.sendJsonResponse(request, response, __FUNCTION__, __LINE__);
         return;
     }
 
@@ -62,8 +60,7 @@ void WebApiSecurityClass::onSecurityPost(AsyncWebServerRequest* request)
         retMsg["message"] = "Password must between 8 and " STR(WIFI_MAX_PASSWORD_STRLEN) " characters long!";
         retMsg["code"] = WebApiError::SecurityPasswordLength;
         retMsg["param"]["max"] = WIFI_MAX_PASSWORD_STRLEN;
-        response->setLength();
-        request->send(response);
+        WebApi.sendJsonResponse(request, response, __FUNCTION__, __LINE__);
         return;
     }
 
@@ -73,8 +70,7 @@ void WebApiSecurityClass::onSecurityPost(AsyncWebServerRequest* request)
 
     WebApi.writeConfig(retMsg);
 
-    response->setLength();
-    request->send(response);
+    WebApi.sendJsonResponse(request, response, __FUNCTION__, __LINE__);
 }
 
 void WebApiSecurityClass::onAuthenticateGet(AsyncWebServerRequest* request)
@@ -89,6 +85,5 @@ void WebApiSecurityClass::onAuthenticateGet(AsyncWebServerRequest* request)
     retMsg["message"] = "Authentication successful!";
     retMsg["code"] = WebApiError::SecurityAuthSuccess;
 
-    response->setLength();
-    request->send(response);
+    WebApi.sendJsonResponse(request, response, __FUNCTION__, __LINE__);
 }

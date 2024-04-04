@@ -50,8 +50,7 @@ void WebApiMqttClass::onMqttStatus(AsyncWebServerRequest* request)
     root["mqtt_hass_topic"] = config.Mqtt.Hass.Topic;
     root["mqtt_hass_individualpanels"] = config.Mqtt.Hass.IndividualPanels;
 
-    response->setLength();
-    request->send(response);
+    WebApi.sendJsonResponse(request, response, __FUNCTION__, __LINE__);
 }
 
 void WebApiMqttClass::onMqttAdminGet(AsyncWebServerRequest* request)
@@ -88,8 +87,7 @@ void WebApiMqttClass::onMqttAdminGet(AsyncWebServerRequest* request)
     root["mqtt_hass_topic"] = config.Mqtt.Hass.Topic;
     root["mqtt_hass_individualpanels"] = config.Mqtt.Hass.IndividualPanels;
 
-    response->setLength();
-    request->send(response);
+    WebApi.sendJsonResponse(request, response, __FUNCTION__, __LINE__);
 }
 
 void WebApiMqttClass::onMqttAdminPost(AsyncWebServerRequest* request)
@@ -130,8 +128,7 @@ void WebApiMqttClass::onMqttAdminPost(AsyncWebServerRequest* request)
             && root.containsKey("mqtt_hass_individualpanels"))) {
         retMsg["message"] = "Values are missing!";
         retMsg["code"] = WebApiError::GenericValueMissing;
-        response->setLength();
-        request->send(response);
+        WebApi.sendJsonResponse(request, response, __FUNCTION__, __LINE__);
         return;
     }
 
@@ -140,8 +137,7 @@ void WebApiMqttClass::onMqttAdminPost(AsyncWebServerRequest* request)
             retMsg["message"] = "MqTT Server must between 1 and " STR(MQTT_MAX_HOSTNAME_STRLEN) " characters long!";
             retMsg["code"] = WebApiError::MqttHostnameLength;
             retMsg["param"]["max"] = MQTT_MAX_HOSTNAME_STRLEN;
-            response->setLength();
-            request->send(response);
+            WebApi.sendJsonResponse(request, response, __FUNCTION__, __LINE__);
             return;
         }
 
@@ -149,48 +145,42 @@ void WebApiMqttClass::onMqttAdminPost(AsyncWebServerRequest* request)
             retMsg["message"] = "Username must not be longer than " STR(MQTT_MAX_USERNAME_STRLEN) " characters!";
             retMsg["code"] = WebApiError::MqttUsernameLength;
             retMsg["param"]["max"] = MQTT_MAX_USERNAME_STRLEN;
-            response->setLength();
-            request->send(response);
+            WebApi.sendJsonResponse(request, response, __FUNCTION__, __LINE__);
             return;
         }
         if (root["mqtt_password"].as<String>().length() > MQTT_MAX_PASSWORD_STRLEN) {
             retMsg["message"] = "Password must not be longer than " STR(MQTT_MAX_PASSWORD_STRLEN) " characters!";
             retMsg["code"] = WebApiError::MqttPasswordLength;
             retMsg["param"]["max"] = MQTT_MAX_PASSWORD_STRLEN;
-            response->setLength();
-            request->send(response);
+            WebApi.sendJsonResponse(request, response, __FUNCTION__, __LINE__);
             return;
         }
         if (root["mqtt_topic"].as<String>().length() > MQTT_MAX_TOPIC_STRLEN) {
             retMsg["message"] = "Topic must not be longer than " STR(MQTT_MAX_TOPIC_STRLEN) " characters!";
             retMsg["code"] = WebApiError::MqttTopicLength;
             retMsg["param"]["max"] = MQTT_MAX_TOPIC_STRLEN;
-            response->setLength();
-            request->send(response);
+            WebApi.sendJsonResponse(request, response, __FUNCTION__, __LINE__);
             return;
         }
 
         if (root["mqtt_topic"].as<String>().indexOf(' ') != -1) {
             retMsg["message"] = "Topic must not contain space characters!";
             retMsg["code"] = WebApiError::MqttTopicCharacter;
-            response->setLength();
-            request->send(response);
+            WebApi.sendJsonResponse(request, response, __FUNCTION__, __LINE__);
             return;
         }
 
         if (!root["mqtt_topic"].as<String>().endsWith("/")) {
             retMsg["message"] = "Topic must end with a slash (/)!";
             retMsg["code"] = WebApiError::MqttTopicTrailingSlash;
-            response->setLength();
-            request->send(response);
+            WebApi.sendJsonResponse(request, response, __FUNCTION__, __LINE__);
             return;
         }
 
         if (root["mqtt_port"].as<uint>() == 0 || root["mqtt_port"].as<uint>() > 65535) {
             retMsg["message"] = "Port must be a number between 1 and 65535!";
             retMsg["code"] = WebApiError::MqttPort;
-            response->setLength();
-            request->send(response);
+            WebApi.sendJsonResponse(request, response, __FUNCTION__, __LINE__);
             return;
         }
 
@@ -200,8 +190,7 @@ void WebApiMqttClass::onMqttAdminPost(AsyncWebServerRequest* request)
             retMsg["message"] = "Certificates must not be longer than " STR(MQTT_MAX_CERT_STRLEN) " characters!";
             retMsg["code"] = WebApiError::MqttCertificateLength;
             retMsg["param"]["max"] = MQTT_MAX_CERT_STRLEN;
-            response->setLength();
-            request->send(response);
+            WebApi.sendJsonResponse(request, response, __FUNCTION__, __LINE__);
             return;
         }
 
@@ -209,16 +198,14 @@ void WebApiMqttClass::onMqttAdminPost(AsyncWebServerRequest* request)
             retMsg["message"] = "LWT topic must not be longer than " STR(MQTT_MAX_TOPIC_STRLEN) " characters!";
             retMsg["code"] = WebApiError::MqttLwtTopicLength;
             retMsg["param"]["max"] = MQTT_MAX_TOPIC_STRLEN;
-            response->setLength();
-            request->send(response);
+            WebApi.sendJsonResponse(request, response, __FUNCTION__, __LINE__);
             return;
         }
 
         if (root["mqtt_lwt_topic"].as<String>().indexOf(' ') != -1) {
             retMsg["message"] = "LWT topic must not contain space characters!";
             retMsg["code"] = WebApiError::MqttLwtTopicCharacter;
-            response->setLength();
-            request->send(response);
+            WebApi.sendJsonResponse(request, response, __FUNCTION__, __LINE__);
             return;
         }
 
@@ -226,8 +213,7 @@ void WebApiMqttClass::onMqttAdminPost(AsyncWebServerRequest* request)
             retMsg["message"] = "LWT online value must not be longer than " STR(MQTT_MAX_LWTVALUE_STRLEN) " characters!";
             retMsg["code"] = WebApiError::MqttLwtOnlineLength;
             retMsg["param"]["max"] = MQTT_MAX_LWTVALUE_STRLEN;
-            response->setLength();
-            request->send(response);
+            WebApi.sendJsonResponse(request, response, __FUNCTION__, __LINE__);
             return;
         }
 
@@ -235,8 +221,7 @@ void WebApiMqttClass::onMqttAdminPost(AsyncWebServerRequest* request)
             retMsg["message"] = "LWT offline value must not be longer than " STR(MQTT_MAX_LWTVALUE_STRLEN) " characters!";
             retMsg["code"] = WebApiError::MqttLwtOfflineLength;
             retMsg["param"]["max"] = MQTT_MAX_LWTVALUE_STRLEN;
-            response->setLength();
-            request->send(response);
+            WebApi.sendJsonResponse(request, response, __FUNCTION__, __LINE__);
             return;
         }
 
@@ -244,8 +229,7 @@ void WebApiMqttClass::onMqttAdminPost(AsyncWebServerRequest* request)
             retMsg["message"] = "LWT QoS must not be greater than " STR(2) "!";
             retMsg["code"] = WebApiError::MqttLwtQos;
             retMsg["param"]["max"] = 2;
-            response->setLength();
-            request->send(response);
+            WebApi.sendJsonResponse(request, response, __FUNCTION__, __LINE__);
             return;
         }
 
@@ -254,8 +238,7 @@ void WebApiMqttClass::onMqttAdminPost(AsyncWebServerRequest* request)
             retMsg["code"] = WebApiError::MqttPublishInterval;
             retMsg["param"]["min"] = 5;
             retMsg["param"]["max"] = 65535;
-            response->setLength();
-            request->send(response);
+            WebApi.sendJsonResponse(request, response, __FUNCTION__, __LINE__);
             return;
         }
 
@@ -264,16 +247,14 @@ void WebApiMqttClass::onMqttAdminPost(AsyncWebServerRequest* request)
                 retMsg["message"] = "Hass topic must not be longer than " STR(MQTT_MAX_TOPIC_STRLEN) " characters!";
                 retMsg["code"] = WebApiError::MqttHassTopicLength;
                 retMsg["param"]["max"] = MQTT_MAX_TOPIC_STRLEN;
-                response->setLength();
-                request->send(response);
+                WebApi.sendJsonResponse(request, response, __FUNCTION__, __LINE__);
                 return;
             }
 
             if (root["mqtt_hass_topic"].as<String>().indexOf(' ') != -1) {
                 retMsg["message"] = "Hass topic must not contain space characters!";
                 retMsg["code"] = WebApiError::MqttHassTopicCharacter;
-                response->setLength();
-                request->send(response);
+                WebApi.sendJsonResponse(request, response, __FUNCTION__, __LINE__);
                 return;
             }
         }
@@ -306,8 +287,7 @@ void WebApiMqttClass::onMqttAdminPost(AsyncWebServerRequest* request)
 
     WebApi.writeConfig(retMsg);
 
-    response->setLength();
-    request->send(response);
+    WebApi.sendJsonResponse(request, response, __FUNCTION__, __LINE__);
 
     MqttSettings.performReconnect();
     MqttHandleHass.forceUpdate();

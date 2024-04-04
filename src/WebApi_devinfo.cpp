@@ -43,6 +43,5 @@ void WebApiDevInfoClass::onDevInfoStatus(AsyncWebServerRequest* request)
         root["fw_build_datetime"] = inv->DevInfo()->getFwBuildDateTimeStr();
     }
 
-    response->setLength();
-    request->send(response);
+    WebApi.sendJsonResponse(request, response, __FUNCTION__, __LINE__);
 }

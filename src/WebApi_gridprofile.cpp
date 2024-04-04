@@ -55,8 +55,7 @@ void WebApiGridProfileClass::onGridProfileStatus(AsyncWebServerRequest* request)
         }
     }
 
-    response->setLength();
-    request->send(response);
+    WebApi.sendJsonResponse(request, response, __FUNCTION__, __LINE__);
 }
 
 void WebApiGridProfileClass::onGridProfileRawdata(AsyncWebServerRequest* request)
@@ -83,6 +82,5 @@ void WebApiGridProfileClass::onGridProfileRawdata(AsyncWebServerRequest* request
         copyArray(&data[0], data.size(), raw);
     }
 
-    response->setLength();
-    request->send(response);
+    WebApi.sendJsonResponse(request, response, __FUNCTION__, __LINE__);
 }

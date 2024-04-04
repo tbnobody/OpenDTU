@@ -32,6 +32,9 @@
         "Release": "Loslassen zum Aktualisieren",
         "Close": "Schließen"
     },
+    "Error": {
+        "Oops": "Oops!"
+    },
     "localeswitcher": {
         "Dark": "Dunkel",
         "Light": "Hell",

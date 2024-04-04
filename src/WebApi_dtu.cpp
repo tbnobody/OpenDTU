@@ -73,8 +73,7 @@ void WebApiDtuClass::onDtuAdminGet(AsyncWebServerRequest* request)
         obj["freq_legal_max"] = definition.definition.Freq_Legal_Max;
     }
 
-    response->setLength();
-    request->send(response);
+    WebApi.sendJsonResponse(request, response, __FUNCTION__, __LINE__);
 }
 
 void WebApiDtuClass::onDtuAdminPost(AsyncWebServerRequest* request)
@@ -99,8 +98,7 @@ void WebApiDtuClass::onDtuAdminPost(AsyncWebServerRequest* request)
             && root.containsKey("cmt_country"))) {
         retMsg["message"] = "Values are missing!";
         retMsg["code"] = WebApiError::GenericValueMissing;
-        response->setLength();
-        request->send(response);
+        WebApi.sendJsonResponse(request, response, __FUNCTION__, __LINE__);
         return;
     }
 
@@ -110,40 +108,35 @@ void WebApiDtuClass::onDtuAdminPost(AsyncWebServerRequest* request)
     if (serial == 0) {
         retMsg["message"] = "Serial cannot be zero!";
         retMsg["code"] = WebApiError::DtuSerialZero;
-        response->setLength();
-        request->send(response);
+        WebApi.sendJsonResponse(request, response, __FUNCTION__, __LINE__);
         return;
     }
 
     if (root["pollinterval"].as<uint32_t>() == 0) {
         retMsg["message"] = "Poll interval must be greater zero!";
         retMsg["code"] = WebApiError::DtuPollZero;
-        response->setLength();
-        request->send(response);
+        WebApi.sendJsonResponse(request, response, __FUNCTION__, __LINE__);
         return;
     }
 
     if (root["nrf_palevel"].as<uint8_t>() > 3) {
         retMsg["message"] = "Invalid power level setting!";
         retMsg["code"] = WebApiError::DtuInvalidPowerLevel;
-        response->setLength();
-        request->send(response);
+        WebApi.sendJsonResponse(request, response, __FUNCTION__, __LINE__);
         return;
     }
 
     if (root["cmt_palevel"].as<int8_t>() < -10 || root["cmt_palevel"].as<int8_t>() > 20) {
         retMsg["message"] = "Invalid power level setting!";
         retMsg["code"] = WebApiError::DtuInvalidPowerLevel;
-        response->setLength();
-        request->send(response);
+        WebApi.sendJsonResponse(request, response, __FUNCTION__, __LINE__);
         return;
     }
 
     if (root["cmt_country"].as<uint8_t>() >= CountryModeId_t::CountryModeId_Max) {
         retMsg["message"] = "Invalid country setting!";
         retMsg["code"] = WebApiError::DtuInvalidCmtCountry;
-        response->setLength();
-        request->send(response);
+        WebApi.sendJsonResponse(request, response, __FUNCTION__, __LINE__);
         return;
     }
 
@@ -156,8 +149,7 @@ void WebApiDtuClass::onDtuAdminPost(AsyncWebServerRequest* request)
         retMsg["code"] = WebApiError::DtuInvalidCmtFrequency;
         retMsg["param"]["min"] = FrequencyDefinition.Freq_Min;
         retMsg["param"]["max"] = FrequencyDefinition.Freq_Max;
-        response->setLength();
-        request->send(response);
+        WebApi.sendJsonResponse(request, response, __FUNCTION__, __LINE__);
         return;
     }
 
@@ -172,8 +164,7 @@ void WebApiDtuClass::onDtuAdminPost(AsyncWebServerRequest* request)
 
     WebApi.writeConfig(retMsg);
 
-    response->setLength();
-    request->send(response);
+    WebApi.sendJsonResponse(request, response, __FUNCTION__, __LINE__);
 
     _applyDataTask.enable();
     _applyDataTask.restart();
