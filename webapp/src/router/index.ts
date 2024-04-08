@@ -9,6 +9,8 @@ import HomeView from '@/views/HomeView.vue';
 import InverterAdminView from '@/views/InverterAdminView.vue';
 import LoginView from '@/views/LoginView.vue';
 import MaintenanceRebootView from '@/views/MaintenanceRebootView.vue';
+import ModbusAdminView from '@/views/ModbusAdminView.vue';
+import ModbusInfoView from '@/views/ModbusInfoView.vue';
 import MqttAdminView from '@/views/MqttAdminView.vue';
 import MqttInfoView from '@/views/MqttInfoView.vue';
 import NetworkAdminView from '@/views/NetworkAdminView.vue';
@@ -59,6 +61,11 @@ const router = createRouter({
         component: NtpInfoView
     },
     {
+        path: '/info/modbus',
+        name: 'Modbus',
+        component: ModbusInfoView
+    },
+    {
         path: '/info/mqtt',
         name: 'MqTT',
         component: MqttInfoView
@@ -77,6 +84,11 @@ const router = createRouter({
         path: '/settings/ntp',
         name: 'NTP Settings',
         component: NtpAdminView
+    },
+    {
+        path: '/settings/modbus',
+        name: 'Modbus Settings',
+        component: ModbusAdminView
     },
     {
         path: '/settings/mqtt',
