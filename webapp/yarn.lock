@@ -210,20 +210,20 @@
     source-map-js "^1.0.1"
     yaml-eslint-parser "^1.2.2"
 
-"@intlify/core-base@9.10.2":
-  version "9.10.2"
-  resolved "https://registry.yarnpkg.com/@intlify/core-base/-/core-base-9.10.2.tgz#e7f8857f8011184e4afbdcfae7dbd85c50ba5271"
-  integrity sha512-HGStVnKobsJL0DoYIyRCGXBH63DMQqEZxDUGrkNI05FuTcruYUtOAxyL3zoAZu/uDGO6mcUvm3VXBaHG2GdZCg==
+"@intlify/core-base@9.11.0":
+  version "9.11.0"
+  resolved "https://registry.yarnpkg.com/@intlify/core-base/-/core-base-9.11.0.tgz#e7dfd1265672f9c75cb26fd270483f5e43663300"
+  integrity sha512-cveOqAstjLZIiyatcP/HrzrQ87cZI8ScPQna3yvoM8zjcjcIRK1MRvmxUNlPdg0rTNJMZw7rixPVM58O5aHVPA==
   dependencies:
-    "@intlify/message-compiler" "9.10.2"
-    "@intlify/shared" "9.10.2"
+    "@intlify/message-compiler" "9.11.0"
+    "@intlify/shared" "9.11.0"
 
-"@intlify/message-compiler@9.10.2":
-  version "9.10.2"
-  resolved "https://registry.yarnpkg.com/@intlify/message-compiler/-/message-compiler-9.10.2.tgz#c44cbb915bdd0d62780a38595a84006c781f717a"
-  integrity sha512-ntY/kfBwQRtX5Zh6wL8cSATujPzWW2ZQd1QwKyWwAy5fMqJyyixHMeovN4fmEyCqSu+hFfYOE63nU94evsy4YA==
+"@intlify/message-compiler@9.11.0":
+  version "9.11.0"
+  resolved "https://registry.yarnpkg.com/@intlify/message-compiler/-/message-compiler-9.11.0.tgz#82e1f5c79a1182033cc18d0802299121a5441f52"
+  integrity sha512-x31Gl7cscnoI4UUY1yaIy8e7vVMVW1VVlTXZz4SIHKqoSEUkfmgqK8NAx1e7RcoHEbICR7uyCbud0ZL1s4OGXQ==
   dependencies:
-    "@intlify/shared" "9.10.2"
+    "@intlify/shared" "9.11.0"
     source-map-js "^1.0.2"
 
 "@intlify/message-compiler@^9.4.0":
@@ -234,12 +234,12 @@
     "@intlify/shared" "9.4.0"
     source-map-js "^1.0.2"
 
-"@intlify/shared@9.10.2":
-  version "9.10.2"
-  resolved "https://registry.yarnpkg.com/@intlify/shared/-/shared-9.10.2.tgz#693300ea033868cbe4086b832170612f002e24a9"
-  integrity sha512-ttHCAJkRy7R5W2S9RVnN9KYQYPIpV2+GiS79T4EE37nrPyH6/1SrOh3bmdCRC1T3ocL8qCDx7x2lBJ0xaITU7Q==
+"@intlify/shared@9.11.0", "@intlify/shared@^9.4.0":
+  version "9.11.0"
+  resolved "https://registry.yarnpkg.com/@intlify/shared/-/shared-9.11.0.tgz#49c99651bace8247bd12e1917ef2c6b2a0c68f0d"
+  integrity sha512-KHSNgi7sRjmSm7aD8QH8WFt9VfKaekJuJ473opbJlkGY3EDnDUU8ikIhG8PbasQbgNvbY3m3tWNGqk2omIdwMA==
 
-"@intlify/shared@9.4.0", "@intlify/shared@^9.4.0":
+"@intlify/shared@9.4.0":
   version "9.4.0"
   resolved "https://registry.yarnpkg.com/@intlify/shared/-/shared-9.4.0.tgz#4a78d462fc82433db900981e12eb5b1aae3d6085"
   integrity sha512-AFqymip2kToqA0B6KZPg5jSrdcVHoli9t/VhGKE2iiMq9utFuMoGdDC/JOCIZgwxo6aXAk86QyU2XtzEoMuZ6A==
@@ -673,12 +673,7 @@
     "@vue/compiler-dom" "3.4.21"
     "@vue/shared" "3.4.21"
 
-"@vue/devtools-api@^6.5.0":
-  version "6.5.0"
-  resolved "https://registry.yarnpkg.com/@vue/devtools-api/-/devtools-api-6.5.0.tgz#98b99425edee70b4c992692628fa1ea2c1e57d07"
-  integrity sha512-o9KfBeaBmCKl10usN4crU53fYtC1r7jJwdGKjPT24t348rHxgfpZ0xL3Xm/gLUYnc0oTp8LAmrxOeLyu6tbk2Q==
-
-"@vue/devtools-api@^6.5.1":
+"@vue/devtools-api@^6.5.0", "@vue/devtools-api@^6.5.1":
   version "6.6.1"
   resolved "https://registry.yarnpkg.com/@vue/devtools-api/-/devtools-api-6.6.1.tgz#7c14346383751d9f6ad4bea0963245b30220ef83"
   integrity sha512-LgPscpE3Vs0x96PzSSB4IGVSZXZBZHpfxs+ZA1d+VEPwHdOXowy/Y2CsvCAIFrf+ssVU1pD1jidj505EpUnfbA==
@@ -2581,13 +2576,13 @@ vue-eslint-parser@^9.4.2:
     lodash "^4.17.21"
     semver "^7.3.6"
 
-vue-i18n@^9.10.2:
-  version "9.10.2"
-  resolved "https://registry.yarnpkg.com/vue-i18n/-/vue-i18n-9.10.2.tgz#6f4b5d76bce649f1e18bb9b7767b72962b3e30a3"
-  integrity sha512-ECJ8RIFd+3c1d3m1pctQ6ywG5Yj8Efy1oYoAKQ9neRdkLbuKLVeW4gaY5HPkD/9ssf1pOnUrmIFjx2/gkGxmEw==
+vue-i18n@^9.11.0:
+  version "9.11.0"
+  resolved "https://registry.yarnpkg.com/vue-i18n/-/vue-i18n-9.11.0.tgz#50e0c82fa3ab331a770b02af7ca3cdd45ae8eb88"
+  integrity sha512-vU4gY6lu8Pdfs9BgKGiDAJmFDf88cceR47KcSB0VW4xJzUrXR/7qwqM7A8dQ2nedhoIDxoOm5Ro4pFd2KvJqbA==
   dependencies:
-    "@intlify/core-base" "9.10.2"
-    "@intlify/shared" "9.10.2"
+    "@intlify/core-base" "9.11.0"
+    "@intlify/shared" "9.11.0"
     "@vue/devtools-api" "^6.5.0"
 
 vue-router@^4.3.0:
