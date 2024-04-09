@@ -16,12 +16,6 @@
 #define PL_UI_STATE_USE_SOLAR_ONLY 2
 #define PL_UI_STATE_USE_SOLAR_AND_BATTERY 3
 
-typedef enum {
-    EMPTY_WHEN_FULL= 0, 
-    EMPTY_AT_NIGHT
-} batDrainStrategy;
-   
-
 class PowerLimiterClass {
 public:
     enum class Status : unsigned {
