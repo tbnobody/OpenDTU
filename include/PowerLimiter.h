@@ -24,7 +24,6 @@ public:
         DisabledByMqtt,
         WaitingForValidTimestamp,
         PowerMeterDisabled,
-        PowerMeterTimeout,
         PowerMeterPending,
         InverterInvalid,
         InverterChanged,

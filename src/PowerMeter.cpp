@@ -136,6 +136,23 @@ uint32_t PowerMeterClass::getLastPowerMeterUpdate()
     return _lastPowerMeterUpdate;
 }
 
+bool PowerMeterClass::isDataValid()
+{
+    auto const& config = Configuration.get();
+
+    std::lock_guard<std::mutex> l(_mutex);
+
+    bool valid = config.PowerMeter.Enabled &&
+        _lastPowerMeterUpdate > 0 &&
+        ((millis() - _lastPowerMeterUpdate) < (30 * 1000));
+
+    // reset if timed out to avoid glitch once
+    // (millis() - _lastPowerMeterUpdate) overflows
+    if (!valid) { _lastPowerMeterUpdate = 0; }
+
+    return valid;
+}
+
 void PowerMeterClass::mqtt()
 {
     if (!MqttSettings.getConnected()) { return; }

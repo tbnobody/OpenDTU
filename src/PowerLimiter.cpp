@@ -31,13 +31,12 @@ frozen::string const& PowerLimiterClass::getStatusText(PowerLimiterClass::Status
 {
     static const frozen::string missing = "programmer error: missing status text";
 
-    static const frozen::map<Status, frozen::string, 21> texts = {
+    static const frozen::map<Status, frozen::string, 20> texts = {
         { Status::Initializing, "initializing (should not see me)" },
         { Status::DisabledByConfig, "disabled by configuration" },
         { Status::DisabledByMqtt, "disabled by MQTT" },
         { Status::WaitingForValidTimestamp, "waiting for valid date and time to be available" },
         { Status::PowerMeterDisabled, "no power meter is configured/enabled" },
-        { Status::PowerMeterTimeout, "power meter readings are outdated" },
         { Status::PowerMeterPending, "waiting for sufficiently recent power meter reading" },
         { Status::InverterInvalid, "invalid inverter selection/configuration" },
         { Status::InverterChanged, "target inverter changed" },
@@ -47,7 +46,7 @@ frozen::string const& PowerLimiterClass::getStatusText(PowerLimiterClass::Status
         { Status::InverterPowerCmdPending, "waiting for a start/stop/restart command to complete" },
         { Status::InverterDevInfoPending, "waiting for inverter device information to be available" },
         { Status::InverterStatsPending, "waiting for sufficiently recent inverter data" },
-        { Status::CalculatedLimitBelowMinLimit, "calculated limit is less than lower power limit" },
+        { Status::CalculatedLimitBelowMinLimit, "calculated limit is less than minimum power limit" },
         { Status::UnconditionalSolarPassthrough, "unconditionally passing through all solar power (MQTT override)" },
         { Status::NoVeDirect, "VE.Direct disabled, connection broken, or data outdated" },
         { Status::NoEnergy, "no energy source available to power the inverter from" },
@@ -82,8 +81,7 @@ void PowerLimiterClass::announceStatus(PowerLimiterClass::Status status)
 /**
  * returns true if the inverter state was changed or is about to change, i.e.,
  * if it is actually in need of a shutdown. returns false otherwise, i.e., the
- * inverter is already shut down and the inverter limit is set to the configured
- * lower power limit.
+ * inverter is already shut down.
  */
 bool PowerLimiterClass::shutdown(PowerLimiterClass::Status status)
 {
@@ -93,14 +91,6 @@ bool PowerLimiterClass::shutdown(PowerLimiterClass::Status status)
 
     _oTargetPowerState = false;
 
-    auto const& config = Configuration.get();
-    if ( (Status::PowerMeterTimeout == status ||
-          Status::CalculatedLimitBelowMinLimit == status)
-        && config.PowerLimiter.IsInverterSolarPowered) {
-      _oTargetPowerState = true;
-    }
-
-    _oTargetPowerLimitWatts = config.PowerLimiter.LowerPowerLimit;
     return updateInverter();
 }
 
@@ -191,11 +181,6 @@ void PowerLimiterClass::loop()
         return;
     }
 
-    if (millis() - PowerMeter.getLastPowerMeterUpdate() > (30 * 1000)) {
-        shutdown(Status::PowerMeterTimeout);
-        return;
-    }
-
     // concerns both power limits and start/stop/restart commands and is
     // only updated if a respective response was received from the inverter
     auto lastUpdateCmd = std::max(
@@ -206,7 +191,10 @@ void PowerLimiterClass::loop()
         return announceStatus(Status::InverterStatsPending);
     }
 
-    if (PowerMeter.getLastPowerMeterUpdate() <= lastUpdateCmd) {
+    // if the power meter is being used, i.e., if its data is valid, we want to
+    // wait for a new reading after adjusting the inverter limit. otherwise, we
+    // proceed as we will use a fallback limit independent of the power meter.
+    if (PowerMeter.isDataValid() && PowerMeter.getLastPowerMeterUpdate() <= lastUpdateCmd) {
         return announceStatus(Status::PowerMeterPending);
     }
 
@@ -403,7 +391,7 @@ uint8_t PowerLimiterClass::getPowerLimiterState() {
     return PL_UI_STATE_INACTIVE;
 }
 
-// Logic table
+// Logic table ("PowerMeter value" can be "base load setting" as a fallback)
 // | Case # | batteryPower | solarPower     | useFullSolarPassthrough | Resulting inverter limit                               |
 // | 1      | false        |  < 20 W        | doesn't matter          | 0 (inverter off)                                       |
 // | 2      | false        | >= 20 W        | doesn't matter          | min(PowerMeter value, solarPower)                      |
@@ -431,36 +419,50 @@ bool PowerLimiterClass::calcPowerLimit(std::shared_ptr<InverterAbstract> inverte
         return shutdown(Status::HuaweiPsu);
     }
 
-    auto powerMeter = static_cast<int32_t>(PowerMeter.getPowerTotal());
+    auto meterValid = PowerMeter.isDataValid();
 
+    auto meterValue = static_cast<int32_t>(PowerMeter.getPowerTotal());
+
+    // We don't use FLD_PAC from the statistics, because that data might be too
+    // old and unreliable. TODO(schlimmchen): is this comment outdated?
     auto inverterOutput = static_cast<int32_t>(inverter->Statistics()->getChannelFieldValue(TYPE_AC, CH0, FLD_PAC));
 
     auto solarPowerAC = inverterPowerDcToAc(inverter, solarPowerDC);
 
     auto const& config = Configuration.get();
+    auto targetConsumption = config.PowerLimiter.TargetPowerConsumption;
+    auto baseLoad = config.PowerLimiter.BaseLoadLimit;
+    bool meterIncludesInv = config.PowerLimiter.IsInverterBehindPowerMeter;
 
     if (_verboseLogging) {
-        MessageOutput.printf("[DPL::calcPowerLimit] power meter: %d W, "
-                "target consumption: %d W, inverter output: %d W, solar power (AC): %d\r\n",
-                powerMeter,
-                config.PowerLimiter.TargetPowerConsumption,
+        MessageOutput.printf("[DPL::calcPowerLimit] target consumption: %d W, "
+                "base load: %d W, power meter does %sinclude inverter output\r\n",
+                targetConsumption,
+                baseLoad,
+                (meterIncludesInv?"":"NOT "));
+
+        MessageOutput.printf("[DPL::calcPowerLimit] power meter value: %d W, "
+                "power meter valid: %s, inverter output: %d W, solar power (AC): %d W\r\n",
+                meterValue,
+                (meterValid?"yes":"no"),
                 inverterOutput,
                 solarPowerAC);
     }
 
-    auto newPowerLimit = powerMeter;
+    auto newPowerLimit = baseLoad;
 
-    if (config.PowerLimiter.IsInverterBehindPowerMeter) {
-        // If the inverter the behind the power meter (part of measurement),
-        // the produced power of this inverter has also to be taken into account.
-        // We don't use FLD_PAC from the statistics, because that
-        // data might be too old and unreliable.
-        newPowerLimit += inverterOutput;
+    if (meterValid) {
+        newPowerLimit = meterValue;
+
+        if (meterIncludesInv) {
+            // If the inverter is wired behind the power meter, i.e., if its
+            // output is part of the power meter measurement, the produced
+            // power of this inverter has to be taken into account.
+            newPowerLimit += inverterOutput;
+        }
+
+        newPowerLimit -= targetConsumption;
     }
-
-    // We're not trying to hit 0 exactly but take an offset into account
-    // This means we never fully compensate the used power with the inverter 
-    newPowerLimit -= config.PowerLimiter.TargetPowerConsumption;
 
     // Case 2:
     if (!batteryPower) {
@@ -490,7 +492,7 @@ bool PowerLimiterClass::calcPowerLimit(std::shared_ptr<InverterAbstract> inverte
     }
 
     if (_verboseLogging) {
-        MessageOutput.printf("[DPL::calcPowerLimit] match power meter with limit of %d W\r\n",
+        MessageOutput.printf("[DPL::calcPowerLimit] match household consumption with limit of %d W\r\n",
             newPowerLimit);
     }
 
@@ -693,12 +695,18 @@ bool PowerLimiterClass::setNewPowerLimit(std::shared_ptr<InverterAbstract> inver
 
     if (_verboseLogging) {
         MessageOutput.printf("[DPL::setNewPowerLimit] input limit: %d W, "
-                "lower limit: %d W, upper limit: %d W, hysteresis: %d W\r\n",
+                "min limit: %d W, max limit: %d W, hysteresis: %d W\r\n",
                 newPowerLimit, lowerLimit, upperLimit, hysteresis);
     }
 
     if (newPowerLimit < lowerLimit) {
-        return shutdown(Status::CalculatedLimitBelowMinLimit);
+        if (!config.PowerLimiter.IsInverterSolarPowered) {
+            return shutdown(Status::CalculatedLimitBelowMinLimit);
+        }
+
+        MessageOutput.println("[DPL::setNewPowerLimit] keep solar-powered "
+                "inverter running at min limit");
+        newPowerLimit = lowerLimit;
     }
 
     // enforce configured upper power limit

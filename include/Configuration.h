@@ -213,6 +213,7 @@ struct CONFIG_T {
         int32_t TargetPowerConsumption;
         int32_t TargetPowerConsumptionHysteresis;
         int32_t LowerPowerLimit;
+        int32_t BaseLoadLimit;
         int32_t UpperPowerLimit;
         bool IgnoreSoc;
         uint32_t BatterySocStartThreshold;

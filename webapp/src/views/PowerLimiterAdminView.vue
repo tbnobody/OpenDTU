@@ -82,13 +82,21 @@
                 </div>
 
                 <InputElement :label="$t('powerlimiteradmin.LowerPowerLimit')"
+                              :tooltip="$t('powerlimiteradmin.LowerPowerLimitHint')"
                               v-model="powerLimiterConfigList.lower_power_limit"
                               placeholder="50" min="10" postfix="W"
                               type="number" wide/>
 
+                <InputElement :label="$t('powerlimiteradmin.BaseLoadLimit')"
+                              :tooltip="$t('powerlimiteradmin.BaseLoadLimitHint')"
+                              v-model="powerLimiterConfigList.base_load_limit"
+                              placeholder="200" :min="(powerLimiterConfigList.lower_power_limit + 1).toString()" postfix="W"
+                              type="number" wide/>
+
                 <InputElement :label="$t('powerlimiteradmin.UpperPowerLimit')"
                               v-model="powerLimiterConfigList.upper_power_limit"
-                              placeholder="800" min="20" postfix="W"
+                              :tooltip="$t('powerlimiteradmin.UpperPowerLimitHint')"
+                              placeholder="800" :min="(powerLimiterConfigList.base_load_limit + 1).toString()" postfix="W"
                               type="number" wide/>
 
                 <InputElement :label="$t('powerlimiteradmin.InverterIsBehindPowerMeter')"

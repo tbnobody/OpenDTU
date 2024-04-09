@@ -31,6 +31,7 @@ public:
     void init(Scheduler& scheduler);
     float getPowerTotal(bool forceUpdate = true);
     uint32_t getLastPowerMeterUpdate();
+    bool isDataValid();
 
 private:
     void loop();
