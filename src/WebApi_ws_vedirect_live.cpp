@@ -196,13 +196,13 @@ void WebApiWsVedirectLiveClass::populateJson(const JsonObject &root, const VeDir
     input["IPV"]["d"] = 2;
     input["YieldToday"]["v"] = mpptData.yieldToday_H20_Wh / 1000.0;
     input["YieldToday"]["u"] = "kWh";
-    input["YieldToday"]["d"] = 3;
+    input["YieldToday"]["d"] = 2;
     input["YieldYesterday"]["v"] = mpptData.yieldYesterday_H22_Wh / 1000.0;
     input["YieldYesterday"]["u"] = "kWh";
-    input["YieldYesterday"]["d"] = 3;
+    input["YieldYesterday"]["d"] = 2;
     input["YieldTotal"]["v"] = mpptData.yieldTotal_H19_Wh / 1000.0;
     input["YieldTotal"]["u"] = "kWh";
-    input["YieldTotal"]["d"] = 3;
+    input["YieldTotal"]["d"] = 2;
     input["MaximumPowerToday"]["v"] = mpptData.maxPowerToday_H21_W;
     input["MaximumPowerToday"]["u"] = "W";
     input["MaximumPowerToday"]["d"] = 0;
