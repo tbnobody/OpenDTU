@@ -105,6 +105,24 @@
                             wide />
                     </CardElement>
 
+                    <div class="alert alert-secondary mt-5" role="alert">
+                        <h2>URL examples:</h2>
+                        <ul>
+                            <li>http://admin:secret@shelly3em.home/status</li>
+                            <li>https://admin:secret@shelly3em.home/status</li>
+                            <li>http://tasmota-123.home/cm?cmnd=status%208</li>
+                            <li>http://12.34.56.78/emeter/0</li>
+                        </ul>
+
+                        <h2>JSON path examples:</h2>
+                        <ul>
+                            <li>total_power - { "othervalue": "blah", "total_power": 123.4 }</li>
+                            <li>testarray/[2]/myvalue - { "testarray": [ {}, { "power": 123.4 } ] }</li>
+                        </ul>
+
+                        More info: <a href="https://github.com/mobizt/FirebaseJson">https://github.com/mobizt/FirebaseJson</a>
+                    </div>
+
                     <CardElement
                             v-for="(http_phase, index) in powerMeterConfigList.http_phases"
                             :key="http_phase.index"
@@ -187,23 +205,6 @@
 
             <FormFooter @reload="getPowerMeterConfig"/>
 
-            <div v-if="powerMeterConfigList.source === 3" class="alert alert-secondary" role="alert">
-                <h2>URL examples:</h2>
-                <ul>
-                    <li>http://admin:secret@shelly3em.home/status</li>
-                    <li>https://admin:secret@shelly3em.home/status</li>
-                    <li>http://tasmota-123.home/cm?cmnd=status%208</li>
-                    <li>http://12.34.56.78/emeter/0</li>
-                </ul>
-
-                <h2>JSON path examples:</h2>
-                <ul>
-                    <li>total_power - { "othervalue": "blah", "total_power": 123.4 }</li>
-                    <li>testarray/[2]/myvalue - { "testarray": [ {}, { "power": 123.4 } ] }</li>
-                </ul>
-
-                More info: <a href="https://github.com/mobizt/FirebaseJson">https://github.com/mobizt/FirebaseJson</a>
-            </div>
         </form>
     </BasePage>
 </template>
