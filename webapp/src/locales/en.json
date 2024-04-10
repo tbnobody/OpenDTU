@@ -612,7 +612,7 @@
         "TargetPowerConsumption": "Target Grid Consumption",
         "TargetPowerConsumptionHint": "Grid power consumption the limiter tries to achieve. Value may be negative.",
         "TargetPowerConsumptionHysteresis": "Hysteresis",
-        "TargetPowerConsumptionHysteresisHint": "Only send a newly calculated power limit to the inverter if the absolute difference to the last sent power limit matches or exceeds this amount.",
+        "TargetPowerConsumptionHysteresisHint": "Only send a newly calculated power limit to the inverter if the absolute difference to the last reported power limit exceeds this amount.",
         "LowerPowerLimit": "Minimum Power Limit",
         "LowerPowerLimitHint": "This value must be selected so that stable operation is possible at this limit. If the inverter could only be operated with a lower limit, it is put into standby instead.",
         "BaseLoadLimit": "Base Load",

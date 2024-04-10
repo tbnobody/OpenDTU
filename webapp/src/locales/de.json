@@ -606,7 +606,7 @@
         "TargetPowerConsumption": "Angestrebter Netzbezug",
         "TargetPowerConsumptionHint": "Angestrebter erlaubter Stromverbrauch aus dem Netz. Wert darf negativ sein.",
         "TargetPowerConsumptionHysteresis": "Hysterese",
-        "TargetPowerConsumptionHysteresisHint": "Neu berechnetes Limit nur dann an den Inverter senden, wenn es vom zuletzt gesendeten Limit um mindestens diesen Betrag abweicht.",
+        "TargetPowerConsumptionHysteresisHint": "Neu berechnetes Limit nur dann an den Inverter senden, wenn es vom zurückgemeldeten Limit um mindestens diesen Betrag abweicht.",
         "LowerPowerLimit": "Minmales Leistungslimit",
         "LowerPowerLimitHint": "Dieser Wert muss so gewählt werden, dass ein stabiler Betrieb mit diesem Limit möglich ist. Falls der Wechselrichter nur mit einem kleineren Limit betrieben werden könnte, wird er stattdessen in Standby versetzt.",
         "BaseLoadLimit": "Grundlast",
