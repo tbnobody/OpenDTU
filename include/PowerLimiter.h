@@ -23,7 +23,6 @@ public:
         DisabledByConfig,
         DisabledByMqtt,
         WaitingForValidTimestamp,
-        PowerMeterDisabled,
         PowerMeterPending,
         InverterInvalid,
         InverterChanged,
@@ -38,7 +37,6 @@ public:
         NoVeDirect,
         NoEnergy,
         HuaweiPsu,
-        Settling,
         Stable,
     };
 

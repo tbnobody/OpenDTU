@@ -591,7 +591,7 @@
         "ConfigHintRequirement": "Required",
         "ConfigHintOptional": "Optional",
         "ConfigHintsIntro": "The following notes regarding the Dynamic Power Limiter (DPL) configuration shall be considered:",
-        "ConfigHintPowerMeterDisabled": "Operating the DPL requires the Power Meter being configured and delivering data.",
+        "ConfigHintPowerMeterDisabled": "Without a power meter interface, the inverter limit the DPL will configure equals the configured base load (exception: (full) solar-passthrough).",
         "ConfigHintNoInverter": "At least one inverter must be configured prior to setting up the DPL.",
         "ConfigHintInverterCommunication": "Polling data from and sending commands to the target inverter must be enabled.",
         "ConfigHintNoChargeController": "The solar-passthrough feature can only be used if the VE.Direct interface is configured.",

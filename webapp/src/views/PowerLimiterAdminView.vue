@@ -34,7 +34,7 @@
                               v-model="powerLimiterConfigList.verbose_logging"
                               type="checkbox" wide/>
 
-                <InputElement v-show="isEnabled()"
+                <InputElement v-show="isEnabled() && hasPowerMeter()"
                               :label="$t('powerlimiteradmin.TargetPowerConsumption')"
                               :tooltip="$t('powerlimiteradmin.TargetPowerConsumptionHint')"
                               v-model="powerLimiterConfigList.target_power_consumption"
@@ -99,7 +99,8 @@
                               placeholder="800" :min="(powerLimiterConfigList.base_load_limit + 1).toString()" postfix="W"
                               type="number" wide/>
 
-                <InputElement :label="$t('powerlimiteradmin.InverterIsBehindPowerMeter')"
+                <InputElement v-show="hasPowerMeter()"
+                              :label="$t('powerlimiteradmin.InverterIsBehindPowerMeter')"
                               v-model="powerLimiterConfigList.is_inverter_behind_powermeter"
                               type="checkbox" wide/>
 
@@ -275,8 +276,7 @@ export default defineComponent({
             var hints = [];
 
             if (meta.power_meter_enabled !== true) {
-                hints.push({severity: "requirement", subject: "PowerMeterDisabled"});
-                this.configAlert = true;
+                hints.push({severity: "optional", subject: "PowerMeterDisabled"});
             }
 
             if (typeof meta.inverters === "undefined" || Object.keys(meta.inverters).length == 0) {
@@ -304,6 +304,9 @@ export default defineComponent({
         },
         isEnabled() {
             return this.powerLimiterConfigList.enabled;
+        },
+        hasPowerMeter() {
+            return this.powerLimiterMetaData.power_meter_enabled;
         },
         canUseSolarPassthrough() {
             var cfg = this.powerLimiterConfigList;

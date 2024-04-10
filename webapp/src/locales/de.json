@@ -585,7 +585,7 @@
         "ConfigHintRequirement": "Erforderlich",
         "ConfigHintOptional": "Optional",
         "ConfigHintsIntro": "Folgende Hinweise zur Konfiguration des Dynamic Power Limiter (DPL) sollen beachtet werden:",
-        "ConfigHintPowerMeterDisabled": "Zum Betrieb des DPL muss der Power Meter konfiguriert sein und Daten liefern.",
+        "ConfigHintPowerMeterDisabled": "Der DPL stellt ohne Stromzählerschnittstelle lediglich die konfigurierte Grundlast als Limit am Wechselrichter ein (Ausnahme: (Full) Solar-Passthrough).",
         "ConfigHintNoInverter": "Vor dem Festlegen von Einstellungen des DPL muss mindestens ein Inverter konfiguriert sein.",
         "ConfigHintInverterCommunication": "Das Abrufen von Daten und Senden von Kommandos muss für den zu regelnden Wechselrichter aktiviert sein.",
         "ConfigHintNoChargeController": "Die Solar-Passthrough Funktion kann nur mit aktivierter VE.Direct Schnittstelle genutzt werden.",

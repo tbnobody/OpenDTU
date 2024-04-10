@@ -31,12 +31,11 @@ frozen::string const& PowerLimiterClass::getStatusText(PowerLimiterClass::Status
 {
     static const frozen::string missing = "programmer error: missing status text";
 
-    static const frozen::map<Status, frozen::string, 20> texts = {
+    static const frozen::map<Status, frozen::string, 19> texts = {
         { Status::Initializing, "initializing (should not see me)" },
         { Status::DisabledByConfig, "disabled by configuration" },
         { Status::DisabledByMqtt, "disabled by MQTT" },
         { Status::WaitingForValidTimestamp, "waiting for valid date and time to be available" },
-        { Status::PowerMeterDisabled, "no power meter is configured/enabled" },
         { Status::PowerMeterPending, "waiting for sufficiently recent power meter reading" },
         { Status::InverterInvalid, "invalid inverter selection/configuration" },
         { Status::InverterChanged, "target inverter changed" },
@@ -172,13 +171,6 @@ void PowerLimiterClass::loop()
     if (Mode::UnconditionalFullSolarPassthrough == _mode) {
         // handle this mode of operation separately
         return unconditionalSolarPassthrough(_inverter);
-    }
-
-    // the normal mode of operation requires a valid
-    // power meter reading to calculate a power limit
-    if (!config.PowerMeter.Enabled) {
-        shutdown(Status::PowerMeterDisabled);
-        return;
     }
 
     // concerns both power limits and start/stop/restart commands and is
