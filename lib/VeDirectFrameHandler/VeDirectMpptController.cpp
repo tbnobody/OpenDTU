@@ -84,15 +84,23 @@ bool VeDirectMpptController::processTextDataDerived(std::string const& name, std
  *  This function is called at the end of the received frame.
  */
 void VeDirectMpptController::frameValidEvent() {
-	_tmpFrame.batteryOutputPower_W = static_cast<int16_t>(_tmpFrame.batteryVoltage_V_mV * _tmpFrame.batteryCurrent_I_mA / 1000000);
+	// power into the battery, (+) means charging, (-) means discharging
+	_tmpFrame.batteryOutputPower_W = static_cast<int16_t>((_tmpFrame.batteryVoltage_V_mV / 1000.0f) * (_tmpFrame.batteryCurrent_I_mA / 1000.0f));
 
+	// calculation of the panel current
 	if ((_tmpFrame.panelVoltage_VPV_mV > 0) && (_tmpFrame.panelPower_PPV_W >= 1)) {
-		_tmpFrame.panelCurrent_mA = static_cast<uint32_t>(_tmpFrame.panelPower_PPV_W * 1000000) / _tmpFrame.panelVoltage_VPV_mV;
+		_tmpFrame.panelCurrent_mA = static_cast<uint32_t>(_tmpFrame.panelPower_PPV_W * 1000000.0f / _tmpFrame.panelVoltage_VPV_mV);
+	} else {
+		_tmpFrame.panelCurrent_mA = 0;
 	}
 
+	// calculation of the MPPT efficiency
+	float totalPower_W = (_tmpFrame.loadCurrent_IL_mA / 1000.0f + _tmpFrame.batteryCurrent_I_mA / 1000.0f) * _tmpFrame.batteryVoltage_V_mV /1000.0f;
 	if (_tmpFrame.panelPower_PPV_W > 0) {
-		_efficiency.addNumber(static_cast<float>(_tmpFrame.batteryOutputPower_W * 100) / _tmpFrame.panelPower_PPV_W);
+		_efficiency.addNumber(totalPower_W * 100.0f / _tmpFrame.panelPower_PPV_W);
 		_tmpFrame.mpptEfficiency_Percent = _efficiency.getAverage();
+	} else {
+		_tmpFrame.mpptEfficiency_Percent = 0.0f;
 	}
 
 	if (!_canSend) { return; }
