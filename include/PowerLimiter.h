@@ -61,6 +61,7 @@ private:
 
     int32_t _lastRequestedPowerLimit = 0;
     bool _shutdownPending = false;
+    std::optional<uint32_t> _oInverterStatsMillis = std::nullopt;
     std::optional<uint32_t> _oUpdateStartMillis = std::nullopt;
     std::optional<int32_t> _oTargetPowerLimitWatts = std::nullopt;
     std::optional<bool> _oTargetPowerState = std::nullopt;

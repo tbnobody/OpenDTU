@@ -179,14 +179,28 @@ void PowerLimiterClass::loop()
             _inverter->SystemConfigPara()->getLastUpdateCommand(),
             _inverter->PowerCommand()->getLastUpdateCommand());
 
-    if (_inverter->Statistics()->getLastUpdate() <= lastUpdateCmd) {
-        return announceStatus(Status::InverterStatsPending);
+    // we need inverter stats younger than the last update command
+    if (_oInverterStatsMillis.has_value() && lastUpdateCmd > *_oInverterStatsMillis) {
+        _oInverterStatsMillis = std::nullopt;
+    }
+
+    if (!_oInverterStatsMillis.has_value()) {
+        auto lastStats = _inverter->Statistics()->getLastUpdate();
+        if (lastStats <= lastUpdateCmd) {
+            return announceStatus(Status::InverterStatsPending);
+        }
+
+        _oInverterStatsMillis = lastStats;
     }
 
     // if the power meter is being used, i.e., if its data is valid, we want to
     // wait for a new reading after adjusting the inverter limit. otherwise, we
     // proceed as we will use a fallback limit independent of the power meter.
-    if (PowerMeter.isDataValid() && PowerMeter.getLastPowerMeterUpdate() <= lastUpdateCmd) {
+    // the power meter reading is expected to be at most 2 seconds old when it
+    // arrives. this can be the case for readings provided by networked meter
+    // readers, where a packet needs to travel through the network for some
+    // time after the actual measurement was done by the reader.
+    if (PowerMeter.isDataValid() && PowerMeter.getLastPowerMeterUpdate() <= (*_oInverterStatsMillis + 2000)) {
         return announceStatus(Status::PowerMeterPending);
     }
 
