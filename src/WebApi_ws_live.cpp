@@ -80,7 +80,7 @@ void WebApiWsLiveClass::generateOnBatteryJsonResponse(JsonVariant& root, bool al
 
         if (config.Huawei.Enabled) {
             const RectifierParameters_t * rp = HuaweiCan.get();
-            addTotalField(huaweiObj, "Power", rp->output_power, "W", 2);
+            addTotalField(huaweiObj, "Power", rp->input_power, "W", 2);
         }
 
         if (!all) { _lastPublishHuawei = millis(); }
