@@ -252,11 +252,11 @@ void WebApiPowerMeterClass::onTestHttpRequest(AsyncWebServerRequest* request)
     char response[256];
 
     int phase = 0;//"absuing" index 0 of the float power[3] in HttpPowerMeter to store the result
-    if (HttpPowerMeter.queryPhase(phase, root[F("url")].as<String>().c_str(),
-            root[F("auth_type")].as<Auth>(), root[F("username")].as<String>().c_str(), root[F("password")].as<String>().c_str(),
-            root[F("header_key")].as<String>().c_str(), root[F("header_value")].as<String>().c_str(), root[F("timeout")].as<uint16_t>(),
-            root[F("json_path")].as<String>().c_str())) {
-        retMsg[F("type")] = F("success");
+    if (HttpPowerMeter.queryPhase(phase, root["url"].as<String>().c_str(),
+            root["auth_type"].as<Auth>(), root["username"].as<String>().c_str(), root["password"].as<String>().c_str(),
+            root["header_key"].as<String>().c_str(), root["header_value"].as<String>().c_str(), root["timeout"].as<uint16_t>(),
+            root["json_path"].as<String>().c_str())) {
+        retMsg["type"] = "success";
         snprintf_P(response, sizeof(response), "Success! Power: %5.2fW", HttpPowerMeter.getPower(phase + 1));
     } else {
         snprintf_P(response, sizeof(response), "%s", HttpPowerMeter.httpPowerMeterError);
