@@ -74,6 +74,7 @@ export function handleResponse(response: Response, emitter: Emitter<Record<Event
                 logout();
                 emitter.emit("logged-out");
                 router.push({ path: "/login", query: { returnUrl: router.currentRoute.value.fullPath } });
+                return Promise.reject();
             }
 
             const error = { message: (data && data.message) || response.statusText, status: response.status || 0 };
