@@ -5,7 +5,7 @@
         <div class="row gy-3">
             <div class="col-sm-3 col-md-2" :style="[inverterData.length == 1 ? { 'display': 'none' } : {}]">
                 <div class="nav nav-pills row-cols-sm-1" id="v-pills-tab" role="tablist" aria-orientation="vertical">
-                    <button v-for="inverter in inverterData" :key="inverter.serial" class="nav-link border border-primary text-break" 
+                    <button v-for="inverter in inverterData" :key="inverter.serial" class="nav-link border border-primary text-break"
                         :id="'v-pills-' + inverter.serial + '-tab'" data-bs-toggle="pill"
                         :data-bs-target="'#v-pills-' + inverter.serial" type="button" role="tab"
                         aria-controls="'v-pills-' + inverter.serial" aria-selected="true">
@@ -476,17 +476,15 @@ export default defineComponent({
                 }
             };
 
-            var self = this;
-
-            this.socket.onopen = function (event) {
+            this.socket.onopen = (event) => {
                 console.log(event);
                 console.log("Successfully connected to the echo websocket server...");
-                self.isWebsocketConnected = true;
+                this.isWebsocketConnected = true;
             };
 
-            this.socket.onclose = function () {
+            this.socket.onclose = () => {
                 console.log("Connection to websocket closed...")
-                self.isWebsocketConnected = false;
+                this.isWebsocketConnected = false;
             }
 
             // Listen to window events , When the window closes , Take the initiative to disconnect websocket Connect

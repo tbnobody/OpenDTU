@@ -12,6 +12,7 @@ import path from 'path'
 // example 'vite.user.ts': export const proxy_target = '192.168.16.107'
 let proxy_target;
 try {
+    // eslint-disable-next-line
     proxy_target = require('./vite.user.ts').proxy_target;
 } catch (error) {
     proxy_target = '192.168.20.110';

@@ -146,8 +146,8 @@ export default defineComponent({
         },
         isEaster() {
             const easter = this.getEasterSunday(this.now.getFullYear());
-            var easterStart = new Date(easter);
-            var easterEnd = new Date(easter);
+            const easterStart = new Date(easter);
+            const easterEnd = new Date(easter);
             easterStart.setDate(easterStart.getDate() - 2);
             easterEnd.setDate(easterEnd.getDate() + 1);
             return this.now >= easterStart && this.now < easterEnd;
@@ -170,15 +170,15 @@ export default defineComponent({
             this.$refs.navbarCollapse && (this.$refs.navbarCollapse as HTMLElement).classList.remove("show");
         },
         getEasterSunday(year: number): Date {
-            var f = Math.floor;
-            var G = year % 19;
-            var C = f(year / 100);
-            var H = (C - f(C / 4) - f((8 * C + 13) / 25) + 19 * G + 15) % 30;
-            var I = H - f(H / 28) * (1 - f(29 / (H + 1)) * f((21 - G) / 11));
-            var J = (year + f(year / 4) + I + 2 - C + f(C / 4)) % 7;
-            var L = I - J;
-            var month = 3 + f((L + 40) / 44);
-            var day = L + 28 - 31 * f(month / 4);
+            const f = Math.floor;
+            const G = year % 19;
+            const C = f(year / 100);
+            const H = (C - f(C / 4) - f((8 * C + 13) / 25) + 19 * G + 15) % 30;
+            const I = H - f(H / 28) * (1 - f(29 / (H + 1)) * f((21 - G) / 11));
+            const J = (year + f(year / 4) + I + 2 - C + f(C / 4)) % 7;
+            const L = I - J;
+            const month = 3 + f((L + 40) / 44);
+            const day = L + 28 - 31 * f(month / 4);
 
             return new Date(year, month - 1, day);
         }

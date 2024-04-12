@@ -56,7 +56,7 @@ export default defineComponent({
     watch: {
         consoleBuffer() {
             if (this.isAutoScroll) {
-                let textarea = this.$el.querySelector("#console");
+                const textarea = this.$el.querySelector("#console");
                 setTimeout(() => {
                     textarea.scrollTop = textarea.scrollHeight;
                 }, 0);
@@ -121,7 +121,7 @@ export default defineComponent({
 
             this.heartInterval && clearTimeout(this.heartInterval);
         },
-        getOutDate(): String {
+        getOutDate(): string {
             const u = new Date();
             return ('0' + u.getHours()).slice(-2) + ':' +
                 ('0' + u.getMinutes()).slice(-2) + ':' +
@@ -132,7 +132,7 @@ export default defineComponent({
             this.consoleBuffer = "";
         },
         copyConsole() {
-            var input = document.createElement('textarea');
+            const input = document.createElement('textarea');
             input.innerHTML = this.consoleBuffer;
             document.body.appendChild(input);
             input.select();

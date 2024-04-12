@@ -41,7 +41,7 @@ export function isLoggedIn(): boolean {
     return (localStorage.getItem('user') != null);
 }
 
-export function login(username: String, password: String) {
+export function login(username: string, password: string) {
     const requestOptions = {
         method: 'GET',
         headers: {
