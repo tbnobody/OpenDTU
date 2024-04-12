@@ -84,7 +84,7 @@ bool HMT_6CH::isValidSerial(const uint64_t serial)
 
 String HMT_6CH::typeName() const
 {
-    return F("HMT-1800/2250-6T");
+    return "HMT-1800/2250-6T";
 }
 
 const byteAssign_t* HMT_6CH::getByteAssignment() const
