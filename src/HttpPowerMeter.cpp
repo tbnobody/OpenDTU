@@ -16,6 +16,8 @@ void HttpPowerMeterClass::init()
 
 float HttpPowerMeterClass::getPower(int8_t phase)
 {
+    if (phase < 1 || phase > POWERMETER_MAX_PHASES) { return 0.0; }
+
     return power[phase - 1];
 }
 
