@@ -30,6 +30,8 @@
 
 #define DEV_MAX_MAPPING_NAME_STRLEN 63
 
+#define JSON_BUFFER_SIZE 12288
+
 struct CHANNEL_CONFIG_T {
     uint16_t MaxChannelPower;
     char Name[CHAN_MAX_NAME_STRLEN];
@@ -151,6 +153,11 @@ struct CONFIG_T {
     struct {
         uint8_t Brightness;
     } Led_Single[PINMAPPING_LED_COUNT];
+
+    struct {
+        bool R01;
+        bool R02;
+    } Relay;
 
     INVERTER_CONFIG_T Inverter[INV_MAX_COUNT];
     char Dev_PinMapping[DEV_MAX_MAPPING_NAME_STRLEN + 1];
