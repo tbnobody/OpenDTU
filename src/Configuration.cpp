@@ -420,7 +420,7 @@ bool ConfigurationClass::read()
 
         config.PowerMeter.Http_Phase[i].Enabled = powermeter_phase["enabled"] | (i == 0);
         strlcpy(config.PowerMeter.Http_Phase[i].Url, powermeter_phase["url"] | "", sizeof(config.PowerMeter.Http_Phase[i].Url));
-        config.PowerMeter.Http_Phase[i].AuthType = powermeter_phase["auth_type"] | Auth::none;
+        config.PowerMeter.Http_Phase[i].AuthType = powermeter_phase["auth_type"] | PowerMeterHttpConfig::Auth::None;
         strlcpy(config.PowerMeter.Http_Phase[i].Username, powermeter_phase["username"] | "", sizeof(config.PowerMeter.Http_Phase[i].Username));
         strlcpy(config.PowerMeter.Http_Phase[i].Password, powermeter_phase["password"] | "", sizeof(config.PowerMeter.Http_Phase[i].Password));
         strlcpy(config.PowerMeter.Http_Phase[i].HeaderKey, powermeter_phase["header_key"] | "", sizeof(config.PowerMeter.Http_Phase[i].HeaderKey));

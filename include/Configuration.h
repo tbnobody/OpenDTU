@@ -62,8 +62,8 @@ struct INVERTER_CONFIG_T {
     CHANNEL_CONFIG_T channel[INV_MAX_CHAN_COUNT];
 };
 
-enum Auth { none, basic, digest };
 struct POWERMETER_HTTP_PHASE_CONFIG_T {
+    enum Auth { None, Basic, Digest };
     bool Enabled;
     char Url[POWERMETER_MAX_HTTP_URL_STRLEN + 1];
     Auth AuthType;
@@ -74,6 +74,7 @@ struct POWERMETER_HTTP_PHASE_CONFIG_T {
     uint16_t Timeout;
     char JsonPath[POWERMETER_MAX_HTTP_JSON_PATH_STRLEN + 1];
 };
+using PowerMeterHttpConfig = struct POWERMETER_HTTP_PHASE_CONFIG_T;
 
 struct CONFIG_T {
     struct {
@@ -196,7 +197,7 @@ struct CONFIG_T {
         uint32_t SdmAddress;
         uint32_t HttpInterval;
         bool HttpIndividualRequests;
-        POWERMETER_HTTP_PHASE_CONFIG_T Http_Phase[POWERMETER_MAX_PHASES];
+        PowerMeterHttpConfig Http_Phase[POWERMETER_MAX_PHASES];
     } PowerMeter;
 
     struct {

@@ -28,6 +28,19 @@ void WebApiPowerMeterClass::init(AsyncWebServer& server, Scheduler& scheduler)
     _server->on("/api/powermeter/testhttprequest", HTTP_POST, std::bind(&WebApiPowerMeterClass::onTestHttpRequest, this, _1));
 }
 
+void WebApiPowerMeterClass::decodeJsonPhaseConfig(JsonObject const& json, PowerMeterHttpConfig& config) const
+{
+    config.Enabled = json["enabled"].as<bool>();
+    strlcpy(config.Url, json["url"].as<String>().c_str(), sizeof(config.Url));
+    config.AuthType = json["auth_type"].as<PowerMeterHttpConfig::Auth>();
+    strlcpy(config.Username, json["username"].as<String>().c_str(), sizeof(config.Username));
+    strlcpy(config.Password, json["password"].as<String>().c_str(), sizeof(config.Password));
+    strlcpy(config.HeaderKey, json["header_key"].as<String>().c_str(), sizeof(config.HeaderKey));
+    strlcpy(config.HeaderValue, json["header_value"].as<String>().c_str(), sizeof(config.HeaderValue));
+    config.Timeout = json["timeout"].as<uint16_t>();
+    strlcpy(config.JsonPath, json["json_path"].as<String>().c_str(), sizeof(config.JsonPath));
+}
+
 void WebApiPowerMeterClass::onStatus(AsyncWebServerRequest* request)
 {
     AsyncJsonResponse* response = new AsyncJsonResponse(false, 2048);
@@ -137,7 +150,7 @@ void WebApiPowerMeterClass::onAdminPost(AsyncWebServerRequest* request)
                     return;
                 }
 
-                if ((phase["auth_type"].as<Auth>() != Auth::none)
+                if ((phase["auth_type"].as<uint8_t>() != PowerMeterHttpConfig::Auth::None)
                     && ( phase["username"].as<String>().length() == 0 ||  phase["password"].as<String>().length() == 0)) {
                     retMsg["message"] = "Username or password must not be empty!";
                     response->setLength();
@@ -178,18 +191,9 @@ void WebApiPowerMeterClass::onAdminPost(AsyncWebServerRequest* request)
 
     JsonArray http_phases = root["http_phases"];
     for (uint8_t i = 0; i < http_phases.size(); i++) {
-        JsonObject phase = http_phases[i].as<JsonObject>();
-
-        config.PowerMeter.Http_Phase[i].Enabled = (i == 0 ? true : phase["enabled"].as<bool>());
-        strlcpy(config.PowerMeter.Http_Phase[i].Url, phase["url"].as<String>().c_str(), sizeof(config.PowerMeter.Http_Phase[i].Url));
-        config.PowerMeter.Http_Phase[i].AuthType = phase["auth_type"].as<Auth>();
-        strlcpy(config.PowerMeter.Http_Phase[i].Username, phase["username"].as<String>().c_str(), sizeof(config.PowerMeter.Http_Phase[i].Username));
-        strlcpy(config.PowerMeter.Http_Phase[i].Password, phase["password"].as<String>().c_str(), sizeof(config.PowerMeter.Http_Phase[i].Password));
-        strlcpy(config.PowerMeter.Http_Phase[i].HeaderKey, phase["header_key"].as<String>().c_str(), sizeof(config.PowerMeter.Http_Phase[i].HeaderKey));
-        strlcpy(config.PowerMeter.Http_Phase[i].HeaderValue, phase["header_value"].as<String>().c_str(), sizeof(config.PowerMeter.Http_Phase[i].HeaderValue));
-        config.PowerMeter.Http_Phase[i].Timeout = phase["timeout"].as<uint16_t>();
-        strlcpy(config.PowerMeter.Http_Phase[i].JsonPath, phase["json_path"].as<String>().c_str(), sizeof(config.PowerMeter.Http_Phase[i].JsonPath));
+        decodeJsonPhaseConfig(http_phases[i].as<JsonObject>(), config.PowerMeter.Http_Phase[i]);
     }
+    config.PowerMeter.Http_Phase[0].Enabled = true;
 
     WebApi.writeConfig(retMsg);
 
@@ -252,10 +256,9 @@ void WebApiPowerMeterClass::onTestHttpRequest(AsyncWebServerRequest* request)
     char response[256];
 
     int phase = 0;//"absuing" index 0 of the float power[3] in HttpPowerMeter to store the result
-    if (HttpPowerMeter.queryPhase(phase, root["url"].as<String>().c_str(),
-            root["auth_type"].as<Auth>(), root["username"].as<String>().c_str(), root["password"].as<String>().c_str(),
-            root["header_key"].as<String>().c_str(), root["header_value"].as<String>().c_str(), root["timeout"].as<uint16_t>(),
-            root["json_path"].as<String>().c_str())) {
+    PowerMeterHttpConfig phaseConfig;
+    decodeJsonPhaseConfig(root.as<JsonObject>(), phaseConfig);
+    if (HttpPowerMeter.queryPhase(phase, phaseConfig)) {
         retMsg["type"] = "success";
         snprintf_P(response, sizeof(response), "Success! Power: %5.2fW", HttpPowerMeter.getPower(phase + 1));
     } else {
