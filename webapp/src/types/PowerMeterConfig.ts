@@ -9,6 +9,7 @@ export interface PowerMeterHttpPhaseConfig {
     header_value: string;
     json_path: string;
     timeout: number;
+    unit: number;
 }
 
 export interface PowerMeterConfig {

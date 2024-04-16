@@ -42,7 +42,7 @@ bool HttpPowerMeterClass::updateValues()
             continue;
         }
 
-        if(!tryGetFloatValueForPhase(i, phaseConfig.JsonPath)) {
+        if(!tryGetFloatValueForPhase(i, phaseConfig.JsonPath, phaseConfig.PowerUnit)) {
             MessageOutput.printf("[HttpPowerMeter] Getting the power of phase %d (from JSON fetched with Phase 1 config) failed.\r\n", i + 1);
             MessageOutput.printf("%s\r\n", httpPowerMeterError);
             return false;
@@ -159,7 +159,9 @@ bool HttpPowerMeterClass::httpRequest(int phase, WiFiClient &wifiClient, const S
     httpResponse = httpClient.getString(); // very unfortunate that we cannot parse WifiClient stream directly
     httpClient.end();
 
-    return tryGetFloatValueForPhase(phase, jsonPath);
+    // TODO(schlimmchen): postpone calling tryGetFloatValueForPhase, as it
+    // will be called twice for each phase when doing separate requests.
+    return tryGetFloatValueForPhase(phase, config.JsonPath, config.PowerUnit);
 }
 
 String HttpPowerMeterClass::extractParam(String& authReq, const String& param, const char delimit) {
@@ -217,7 +219,7 @@ String HttpPowerMeterClass::getDigestAuth(String& authReq, const String& usernam
     return authorization;
 }
 
-bool HttpPowerMeterClass::tryGetFloatValueForPhase(int phase, const char* jsonPath)
+bool HttpPowerMeterClass::tryGetFloatValueForPhase(int phase, const char* jsonPath, Unit_t unit)
 {
     FirebaseJson json;
     json.setJsonData(httpResponse);
@@ -227,7 +229,17 @@ bool HttpPowerMeterClass::tryGetFloatValueForPhase(int phase, const char* jsonPa
         return false;
     }
 
-    power[phase] = value.to<float>();
+    power[phase] = value.to<float>(); // this is supposed to be in Watts
+    switch (unit) {
+        case Unit_t::MilliWatts:
+            power[phase] /= 1000;
+            break;
+        case Unit_t::KiloWatts:
+            power[phase] *= 1000;
+            break;
+        default:
+            break;
+    }
     return true;
 }
 

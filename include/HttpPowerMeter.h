@@ -7,6 +7,7 @@
 #include "Configuration.h"
 
 using Auth_t = PowerMeterHttpConfig::Auth;
+using Unit_t = PowerMeterHttpConfig::Unit;
 
 class HttpPowerMeterClass {
 public:
@@ -25,7 +26,7 @@ private:
     String extractParam(String& authReq, const String& param, const char delimit);
     String getcNonce(const int len);
     String getDigestAuth(String& authReq, const String& username, const String& password, const String& method, const String& uri, unsigned int counter);
-    bool tryGetFloatValueForPhase(int phase, const char* jsonPath);
+    bool tryGetFloatValueForPhase(int phase, const char* jsonPath, Unit_t unit);
     void prepareRequest(uint32_t timeout, const char* httpHeader, const char* httpValue);
     String sha256(const String& data);
 };

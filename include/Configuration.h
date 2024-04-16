@@ -64,6 +64,7 @@ struct INVERTER_CONFIG_T {
 
 struct POWERMETER_HTTP_PHASE_CONFIG_T {
     enum Auth { None, Basic, Digest };
+    enum Unit { Watts = 0, MilliWatts = 1, KiloWatts = 2 };
     bool Enabled;
     char Url[POWERMETER_MAX_HTTP_URL_STRLEN + 1];
     Auth AuthType;
@@ -73,6 +74,7 @@ struct POWERMETER_HTTP_PHASE_CONFIG_T {
     char HeaderValue[POWERMETER_MAX_HTTP_HEADER_VALUE_STRLEN + 1];
     uint16_t Timeout;
     char JsonPath[POWERMETER_MAX_HTTP_JSON_PATH_STRLEN + 1];
+    Unit PowerUnit;
 };
 using PowerMeterHttpConfig = struct POWERMETER_HTTP_PHASE_CONFIG_T;
 

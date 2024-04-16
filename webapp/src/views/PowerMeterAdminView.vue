@@ -189,6 +189,19 @@
                                 placeholder="total_power"
                                 :tooltip="$t('powermeteradmin.httpJsonPathDescription')" />
 
+                            <div class="row mb-3">
+                                <label for="power_unit" class="col-sm-2 col-form-label">
+                                    {{ $t('powermeteradmin.httpUnit') }}
+                                </label>
+                                <div class="col-sm-10">
+                                    <select id="power_unit" class="form-select" v-model="http_phase.unit">
+                                        <option value="1">mW</option>
+                                        <option value="0">W</option>
+                                        <option value="2">kW</option>
+                                    </select>
+                                </div>
+                            </div>
+
                             <div class="text-center mb-3">
                                 <button type="button" class="btn btn-danger" @click="testHttpRequest(index)">
                                     {{ $t('powermeteradmin.testHttpRequest') }}

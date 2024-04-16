@@ -578,8 +578,9 @@
         "httpHeaderKey": "Optional: HTTP request header - Key",
         "httpHeaderKeyDescription": "A custom HTTP request header can be defined. Might be useful if you have to send something like a custom Authorization header.",
         "httpHeaderValue": "Optional: HTTP request header - Value",
-        "httpJsonPath": "Json path",
-        "httpJsonPathDescription": "JSON path to find the power value in the response. This uses the JSON path query syntax from mobizt/FirebaseJson. See below for some examples.",
+        "httpJsonPath": "JSON path",
+        "httpJsonPathDescription": "JSON path to find the power value in the response. This uses the JSON path query syntax from mobizt/FirebaseJson. See above for examples.",
+        "httpUnit": "Unit",
         "httpTimeout": "Timeout",
         "testHttpRequest": "Run test",
         "milliSeconds": "ms"

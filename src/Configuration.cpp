@@ -175,6 +175,7 @@ bool ConfigurationClass::write()
         powermeter_phase["header_value"] = config.PowerMeter.Http_Phase[i].HeaderValue;
         powermeter_phase["timeout"] = config.PowerMeter.Http_Phase[i].Timeout;
         powermeter_phase["json_path"] = config.PowerMeter.Http_Phase[i].JsonPath;
+        powermeter_phase["unit"] = config.PowerMeter.Http_Phase[i].PowerUnit;
     }
 
     JsonObject powerlimiter = doc.createNestedObject("powerlimiter");
@@ -427,6 +428,7 @@ bool ConfigurationClass::read()
         strlcpy(config.PowerMeter.Http_Phase[i].HeaderValue, powermeter_phase["header_value"] | "", sizeof(config.PowerMeter.Http_Phase[i].HeaderValue));
         config.PowerMeter.Http_Phase[i].Timeout = powermeter_phase["timeout"] | POWERMETER_HTTP_TIMEOUT;
         strlcpy(config.PowerMeter.Http_Phase[i].JsonPath, powermeter_phase["json_path"] | "", sizeof(config.PowerMeter.Http_Phase[i].JsonPath));
+        config.PowerMeter.Http_Phase[i].PowerUnit = powermeter_phase["unit"] | PowerMeterHttpConfig::Unit::Watts;
     }
 
     JsonObject powerlimiter = doc["powerlimiter"];

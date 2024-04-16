@@ -39,6 +39,7 @@ void WebApiPowerMeterClass::decodeJsonPhaseConfig(JsonObject const& json, PowerM
     strlcpy(config.HeaderValue, json["header_value"].as<String>().c_str(), sizeof(config.HeaderValue));
     config.Timeout = json["timeout"].as<uint16_t>();
     strlcpy(config.JsonPath, json["json_path"].as<String>().c_str(), sizeof(config.JsonPath));
+    config.PowerUnit = json["unit"].as<PowerMeterHttpConfig::Unit>();
 }
 
 void WebApiPowerMeterClass::onStatus(AsyncWebServerRequest* request)
@@ -71,8 +72,9 @@ void WebApiPowerMeterClass::onStatus(AsyncWebServerRequest* request)
         phaseObject["password"] = String(config.PowerMeter.Http_Phase[i].Password);
         phaseObject["header_key"] = String(config.PowerMeter.Http_Phase[i].HeaderKey);
         phaseObject["header_value"] = String(config.PowerMeter.Http_Phase[i].HeaderValue);
-        phaseObject["json_path"] = String(config.PowerMeter.Http_Phase[i].JsonPath);
         phaseObject["timeout"] = config.PowerMeter.Http_Phase[i].Timeout;
+        phaseObject["json_path"] = String(config.PowerMeter.Http_Phase[i].JsonPath);
+        phaseObject["unit"] = config.PowerMeter.Http_Phase[i].PowerUnit;
     }
 
     response->setLength();

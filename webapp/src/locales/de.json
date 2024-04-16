@@ -574,7 +574,8 @@
         "httpHeaderKeyDescription": "Ein individueller HTTP request header kann hier definiert werden. Das kann z.B. verwendet werden um einen eigenen Authorization header mitzugeben.",
         "httpHeaderValue": "Optional: HTTP request header - Wert",
         "httpJsonPath": "JSON Pfad",
-        "httpJsonPathDescription": "JSON Pfad um den Leistungswert zu finden. Es verwendet die Selektions-Syntax von mobizt/FirebaseJson. Beispiele gibt es unten.",
+        "httpJsonPathDescription": "JSON Pfad um den Leistungswert zu finden. Es verwendet die Selektions-Syntax von mobizt/FirebaseJson. Beispiele gibt es oben.",
+        "httpUnit": "Einheit",
         "httpTimeout": "Timeout",
         "testHttpRequest": "Testen"
     },
