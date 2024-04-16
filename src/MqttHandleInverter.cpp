@@ -2,6 +2,8 @@
 /*
  * Copyright (C) 2022-2024 Thomas Basler and others
  */
+#include "Relay.h"
+#include "PinMapping.h"
 #include "MqttHandleInverter.h"
 #include "MessageOutput.h"
 #include "MqttSettings.h"
@@ -13,6 +15,8 @@
 #define TOPIC_SUB_LIMIT_NONPERSISTENT_ABSOLUTE "limit_nonpersistent_absolute"
 #define TOPIC_SUB_POWER "power"
 #define TOPIC_SUB_RESTART "restart"
+#define TOPIC_SUB_RELAY_R01 "Relay R01"
+#define TOPIC_SUB_RELAY_R02 "Relay R02"
 
 #define PUBLISH_MAX_INTERVAL 60000
 
@@ -39,6 +43,8 @@ void MqttHandleInverterClass::init(Scheduler& scheduler)
     MqttSettings.subscribe(String(topic + "+/cmd/" + TOPIC_SUB_LIMIT_NONPERSISTENT_ABSOLUTE), 0, std::bind(&MqttHandleInverterClass::onMqttMessage, this, _1, _2, _3, _4, _5, _6));
     MqttSettings.subscribe(String(topic + "+/cmd/" + TOPIC_SUB_POWER), 0, std::bind(&MqttHandleInverterClass::onMqttMessage, this, _1, _2, _3, _4, _5, _6));
     MqttSettings.subscribe(String(topic + "+/cmd/" + TOPIC_SUB_RESTART), 0, std::bind(&MqttHandleInverterClass::onMqttMessage, this, _1, _2, _3, _4, _5, _6));
+    MqttSettings.subscribe(String(topic + "+/cmd/" + TOPIC_SUB_RELAY_R01), 0, std::bind(&MqttHandleInverterClass::onMqttMessage, this, _1, _2, _3, _4, _5, _6));
+    MqttSettings.subscribe(String(topic + "+/cmd/" + TOPIC_SUB_RELAY_R02), 0, std::bind(&MqttHandleInverterClass::onMqttMessage, this, _1, _2, _3, _4, _5, _6));
 
     scheduler.addTask(_loopTask);
     _loopTask.setInterval(Configuration.get().Mqtt.PublishInterval * TASK_SECOND);
@@ -163,6 +169,10 @@ void MqttHandleInverterClass::onMqttMessage(const espMqttClientTypes::MessagePro
 {
     const CONFIG_T& config = Configuration.get();
 
+    const auto& pin = PinMapping.get();
+    Relay Cmd_Relay_R01 = Relay(pin.relay_r01);
+    Relay Cmd_Relay_R02 = Relay(pin.relay_r02);
+
     char token_topic[MQTT_MAX_TOPIC_STRLEN + 40]; // respect all subtopics
     strncpy(token_topic, topic, MQTT_MAX_TOPIC_STRLEN + 40); // convert const char* to char*
 
@@ -245,5 +255,28 @@ void MqttHandleInverterClass::onMqttMessage(const espMqttClientTypes::MessagePro
         } else {
             MessageOutput.println("Ignored because retained");
         }
+
+    } else if (!strcmp(setting, TOPIC_SUB_RELAY_R01)) {
+        // Turn relay on or off
+        MessageOutput.printf("Set relay R01 to: %d\r\n", payload_val);
+        //Relay Cmd_Relay_R01 = Relay(pin.relay_r01);
+        if (payload_val == 1) {
+            Cmd_Relay_R01.on();
+        }
+        else {
+            Cmd_Relay_R01.off();
+        }
+
+    } else if (!strcmp(setting, TOPIC_SUB_RELAY_R02)) {
+        // Turn relay on or off
+        MessageOutput.printf("Set relay R02 to: %d\r\n", payload_val);
+        //Relay Cmd_Relay_R02 = Relay(pin.relay_r02);
+        if (payload_val == 1) {
+            Cmd_Relay_R02.on();
+        }
+        else {
+            Cmd_Relay_R02.off();
+        }
+
     }
 }
