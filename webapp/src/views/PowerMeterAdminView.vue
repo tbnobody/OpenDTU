@@ -202,6 +202,12 @@
                                 </div>
                             </div>
 
+                            <InputElement
+                                :label="$t('powermeteradmin.httpSignInverted')"
+                                v-model="http_phase.sign_inverted"
+                                :tooltip="$t('powermeteradmin.httpSignInvertedHint')"
+                                type="checkbox" />
+
                             <div class="text-center mb-3">
                                 <button type="button" class="btn btn-danger" @click="testHttpRequest(index)">
                                     {{ $t('powermeteradmin.testHttpRequest') }}

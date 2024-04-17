@@ -75,6 +75,7 @@ struct POWERMETER_HTTP_PHASE_CONFIG_T {
     uint16_t Timeout;
     char JsonPath[POWERMETER_MAX_HTTP_JSON_PATH_STRLEN + 1];
     Unit PowerUnit;
+    bool SignInverted;
 };
 using PowerMeterHttpConfig = struct POWERMETER_HTTP_PHASE_CONFIG_T;
 

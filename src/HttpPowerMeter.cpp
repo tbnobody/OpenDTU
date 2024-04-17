@@ -42,7 +42,7 @@ bool HttpPowerMeterClass::updateValues()
             continue;
         }
 
-        if(!tryGetFloatValueForPhase(i, phaseConfig.JsonPath, phaseConfig.PowerUnit)) {
+        if(!tryGetFloatValueForPhase(i, phaseConfig.JsonPath, phaseConfig.PowerUnit, phaseConfig.SignInverted)) {
             MessageOutput.printf("[HttpPowerMeter] Getting the power of phase %d (from JSON fetched with Phase 1 config) failed.\r\n", i + 1);
             MessageOutput.printf("%s\r\n", httpPowerMeterError);
             return false;
@@ -161,7 +161,7 @@ bool HttpPowerMeterClass::httpRequest(int phase, WiFiClient &wifiClient, const S
 
     // TODO(schlimmchen): postpone calling tryGetFloatValueForPhase, as it
     // will be called twice for each phase when doing separate requests.
-    return tryGetFloatValueForPhase(phase, config.JsonPath, config.PowerUnit);
+    return tryGetFloatValueForPhase(phase, config.JsonPath, config.PowerUnit, config.SignInverted);
 }
 
 String HttpPowerMeterClass::extractParam(String& authReq, const String& param, const char delimit) {
@@ -219,7 +219,7 @@ String HttpPowerMeterClass::getDigestAuth(String& authReq, const String& usernam
     return authorization;
 }
 
-bool HttpPowerMeterClass::tryGetFloatValueForPhase(int phase, const char* jsonPath, Unit_t unit)
+bool HttpPowerMeterClass::tryGetFloatValueForPhase(int phase, const char* jsonPath, Unit_t unit, bool signInverted)
 {
     FirebaseJson json;
     json.setJsonData(httpResponse);
@@ -229,7 +229,9 @@ bool HttpPowerMeterClass::tryGetFloatValueForPhase(int phase, const char* jsonPa
         return false;
     }
 
-    power[phase] = value.to<float>(); // this is supposed to be in Watts
+    // this value is supposed to be in Watts and positive if energy is consumed.
+    power[phase] = value.to<float>();
+
     switch (unit) {
         case Unit_t::MilliWatts:
             power[phase] /= 1000;
@@ -240,6 +242,9 @@ bool HttpPowerMeterClass::tryGetFloatValueForPhase(int phase, const char* jsonPa
         default:
             break;
     }
+
+    if (signInverted) { power[phase] *= -1; }
+
     return true;
 }
 

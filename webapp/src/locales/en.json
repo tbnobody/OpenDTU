@@ -581,6 +581,8 @@
         "httpJsonPath": "JSON path",
         "httpJsonPathDescription": "JSON path to find the power value in the response. This uses the JSON path query syntax from mobizt/FirebaseJson. See above for examples.",
         "httpUnit": "Unit",
+        "httpSignInverted": "Change Sign",
+        "httpSignInvertedHint": "Is is expected that positive values denote power usage from the grid. Check this option if the sign of this value has the opposite meaning.",
         "httpTimeout": "Timeout",
         "testHttpRequest": "Run test",
         "milliSeconds": "ms"

@@ -10,6 +10,7 @@ export interface PowerMeterHttpPhaseConfig {
     json_path: string;
     timeout: number;
     unit: number;
+    sign_inverted: boolean;
 }
 
 export interface PowerMeterConfig {

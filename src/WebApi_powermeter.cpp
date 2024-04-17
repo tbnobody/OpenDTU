@@ -40,6 +40,7 @@ void WebApiPowerMeterClass::decodeJsonPhaseConfig(JsonObject const& json, PowerM
     config.Timeout = json["timeout"].as<uint16_t>();
     strlcpy(config.JsonPath, json["json_path"].as<String>().c_str(), sizeof(config.JsonPath));
     config.PowerUnit = json["unit"].as<PowerMeterHttpConfig::Unit>();
+    config.SignInverted = json["sign_inverted"].as<bool>();
 }
 
 void WebApiPowerMeterClass::onStatus(AsyncWebServerRequest* request)
@@ -75,6 +76,7 @@ void WebApiPowerMeterClass::onStatus(AsyncWebServerRequest* request)
         phaseObject["timeout"] = config.PowerMeter.Http_Phase[i].Timeout;
         phaseObject["json_path"] = String(config.PowerMeter.Http_Phase[i].JsonPath);
         phaseObject["unit"] = config.PowerMeter.Http_Phase[i].PowerUnit;
+        phaseObject["sign_inverted"] = config.PowerMeter.Http_Phase[i].SignInverted;
     }
 
     response->setLength();

@@ -576,6 +576,8 @@
         "httpJsonPath": "JSON Pfad",
         "httpJsonPathDescription": "JSON Pfad um den Leistungswert zu finden. Es verwendet die Selektions-Syntax von mobizt/FirebaseJson. Beispiele gibt es oben.",
         "httpUnit": "Einheit",
+        "httpSignInverted": "Vorzeichen umkehren",
+        "httpSignInvertedHint": "Positive Werte werden als Leistungsabnahme aus dem Netz interpretiert. Diese Option muss aktiviert werden, wenn das Vorzeichen des Wertes die gegenteilige Bedeutung hat.",
         "httpTimeout": "Timeout",
         "testHttpRequest": "Testen"
     },
