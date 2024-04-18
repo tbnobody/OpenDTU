@@ -333,7 +333,12 @@ void JkBmsBatteryStats::updateFrom(JkBms::DataPointContainer const& dp)
     _manufacturer = "JKBMS";
     auto oProductId = dp.get<Label::ProductId>();
     if (oProductId.has_value()) {
-        _manufacturer = oProductId->c_str();
+        // the first twelve chars are expected to be the "User Private Data"
+        // setting (see smartphone app). the remainder is expected be the BMS
+        // name, which can be changed at will using the smartphone app. so
+        // there is not always a "JK" in this string. if there is, we still cut
+        // the string there to avoid possible regressions.
+        _manufacturer = oProductId->substr(12).c_str();
         auto pos = oProductId->rfind("JK");
         if (pos != std::string::npos) {
             _manufacturer = oProductId->substr(pos).c_str();
