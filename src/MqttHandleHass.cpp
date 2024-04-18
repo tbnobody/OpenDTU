@@ -8,6 +8,7 @@
 #include "NetworkSettings.h"
 #include "Utils.h"
 #include "defaults.h"
+#include "__compiled_constants.h"
 
 MqttHandleHassClass MqttHandleHass;
 
@@ -380,7 +381,7 @@ void MqttHandleHassClass::createInverterInfo(JsonDocument& root, std::shared_ptr
         getDtuUrl(),
         "OpenDTU",
         inv->typeName(),
-        AUTO_GIT_HASH,
+        __COMPILED_GIT_HASH__,
         getDtuUniqueId());
 }
 
@@ -393,7 +394,7 @@ void MqttHandleHassClass::createDtuInfo(JsonDocument& root)
         getDtuUrl(),
         "OpenDTU",
         "OpenDTU",
-        AUTO_GIT_HASH);
+        __COMPILED_GIT_HASH__);
 }
 
 void MqttHandleHassClass::createDeviceInfo(
