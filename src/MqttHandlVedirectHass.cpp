@@ -85,6 +85,17 @@ void MqttHandleVedirectHassClass::publishConfig()
         publishSensor("Panel maximum power today", NULL, "H21", "power", "measurement", "W", *optMpptData);
         publishSensor("Panel yield yesterday", NULL, "H22", "energy", "total", "kWh", *optMpptData);
         publishSensor("Panel maximum power yesterday", NULL, "H23", "power", "measurement", "W", *optMpptData);
+
+        // optional info, provided only if TX is connected to charge controller
+        if (optMpptData->NetworkTotalDcInputPowerMilliWatts.first != 0) {
+            publishSensor("VE.Smart network total DC input power", "mdi:solar-power", "NetworkTotalDcInputPower", "power", "measurement", "W", *optMpptData);
+        }
+        if (optMpptData->MpptTemperatureMilliCelsius.first != 0) {
+            publishSensor("MPPT temperature", "mdi:temperature-celsius", "MpptTemperature", "temperature", "measurement", "W", *optMpptData);
+        }
+        if (optMpptData->SmartBatterySenseTemperatureMilliCelsius.first != 0) {
+            publishSensor("Smart Battery Sense temperature", "mdi:temperature-celsius", "SmartBatterySenseTemperature", "temperature", "measurement", "W", *optMpptData);
+        }
     }
 
     yield();
