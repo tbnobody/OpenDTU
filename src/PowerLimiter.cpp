@@ -3,6 +3,7 @@
  * Copyright (C) 2022 Thomas Basler and others
  */
 
+#include "Utils.h"
 #include "Battery.h"
 #include "PowerMeter.h"
 #include "PowerLimiter.h"
@@ -537,15 +538,39 @@ bool PowerLimiterClass::updateInverter()
 
     if (nullptr == _inverter) { return reset(); }
 
+    // do not reset _inverterUpdateTimeouts below if no state change requested
+    if (!_oTargetPowerState.has_value() && !_oTargetPowerLimitWatts.has_value()) {
+        return reset();
+    }
+
     if (!_oUpdateStartMillis.has_value()) {
         _oUpdateStartMillis = millis();
     }
 
     if ((millis() - *_oUpdateStartMillis) > 30 * 1000) {
-        MessageOutput.printf("[DPL::updateInverter] timeout, "
+        ++_inverterUpdateTimeouts;
+        MessageOutput.printf("[DPL::updateInverter] timeout (%d in succession), "
                 "state transition pending: %s, limit pending: %s\r\n",
+                _inverterUpdateTimeouts,
                 (_oTargetPowerState.has_value()?"yes":"no"),
                 (_oTargetPowerLimitWatts.has_value()?"yes":"no"));
+
+        // NOTE that this is not always 5 minutes, since this counts timeouts,
+        // not absolute time. after any timeout, an update cycle ends. a new
+        // timeout can only happen after starting a new update cycle, which in
+        // turn is only started if the DPL did calculate a new limit, which in
+        // turn does not happen while the inverter is unreachable, no matter
+        // how long (a whole night) that might be.
+        if (_inverterUpdateTimeouts >= 10) {
+            MessageOutput.println("[DPL::loop] issuing inverter restart command after update timed out repeatedly");
+            _inverter->sendRestartControlRequest();
+        }
+
+        if (_inverterUpdateTimeouts >= 20) {
+            MessageOutput.println("[DPL::loop] restarting system since inverter is unresponsive");
+            Utils::restartDtu();
+        }
+
         return reset();
     }
 
@@ -647,6 +672,8 @@ bool PowerLimiterClass::updateInverter()
 
     // enable power production only after setting the desired limit
     if (switchPowerState(true)) { return true; }
+
+    _inverterUpdateTimeouts = 0;
 
     return reset();
 }

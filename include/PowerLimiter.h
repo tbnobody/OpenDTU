@@ -41,6 +41,7 @@ public:
     };
 
     void init(Scheduler& scheduler);
+    uint8_t getInverterUpdateTimeouts() const { return _inverterUpdateTimeouts; }
     uint8_t getPowerLimiterState();
     int32_t getLastRequestedPowerLimit() { return _lastRequestedPowerLimit; }
 
@@ -77,6 +78,7 @@ private:
     uint32_t _nextCalculateCheck = 5000; // time in millis for next NTP check to calulate restart
     bool _fullSolarPassThroughEnabled = false;
     bool _verboseLogging = true;
+    uint8_t _inverterUpdateTimeouts = 0;
 
     frozen::string const& getStatusText(Status status);
     void announceStatus(Status status);
