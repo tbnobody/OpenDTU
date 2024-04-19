@@ -10,4 +10,5 @@ export interface NetworkConfig {
     dns2: string;
     aptimeout: number;
     mdnsenabled: boolean;
+    froniussmmodbusenabled: boolean;
 }

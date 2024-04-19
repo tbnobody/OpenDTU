@@ -11,7 +11,7 @@ public:
 
 private:
     void loop();
-
+    uint32_t _lastPublish = 0;
     Task _loopTask;
 };
 
