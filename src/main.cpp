@@ -8,6 +8,7 @@
 #include "InverterSettings.h"
 #include "Led_Single.h"
 #include "MessageOutput.h"
+#include "ModbusDtu.h"
 #include "MqttHandleDtu.h"
 #include "MqttHandleHass.h"
 #include "MqttHandleInverter.h"
@@ -154,9 +155,15 @@ void setup()
     InverterSettings.init(scheduler);
 
     Datastore.init(scheduler);
+
+    // MessageOutput.print("Initialize Modbus... ");
+    // ModbusDtu.init();
 }
 
 void loop()
 {
     scheduler.execute();
+    yield();
+    ModbusDtu.loop();
+    yield();
 }

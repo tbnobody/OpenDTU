@@ -428,7 +428,9 @@
         "ApTimeoutHint": "Zeit die der AccessPoint offen gehalten wird. Ein Wert von 0 bedeutet unendlich.",
         "Minutes": "Minuten",
         "EnableMdns": "mDNS aktivieren",
-        "MdnsSettings": "mDNS-Einstellungen"
+        "MdnsSettings": "mDNS-Einstellungen",
+        "ModbusSettings": "Modbus-Einstellungen",
+        "EnableFroniusSM": "Fronius SmartMeter Simulation aktivieren"
     },
     "mqttadmin": {
         "MqttSettings": "MQTT-Einstellungen",

@@ -46,6 +46,9 @@ bool ConfigurationClass::write()
     JsonObject mdns = doc["mdns"].to<JsonObject>();
     mdns["enabled"] = config.Mdns.Enabled;
 
+    JsonObject modbus = doc["modbus"].to<JsonObject>();
+    modbus["enabled"] = config.Fronius.Fronius_SM_Simulation_Enabled;
+
     JsonObject ntp = doc["ntp"].to<JsonObject>();
     ntp["server"] = config.Ntp.Server;
     ntp["timezone"] = config.Ntp.Timezone;
@@ -219,6 +222,9 @@ bool ConfigurationClass::read()
     JsonObject mdns = doc["mdns"];
     config.Mdns.Enabled = mdns["enabled"] | MDNS_ENABLED;
 
+    JsonObject modbus = doc["modbus"];
+    config.Fronius.Fronius_SM_Simulation_Enabled = modbus["enabled"] | FRONIUS_SM_SIMULATION_ENABLED;
+
     JsonObject ntp = doc["ntp"];
     strlcpy(config.Ntp.Server, ntp["server"] | NTP_SERVER, sizeof(config.Ntp.Server));
     strlcpy(config.Ntp.Timezone, ntp["timezone"] | NTP_TIMEZONE, sizeof(config.Ntp.Timezone));
@@ -370,12 +376,6 @@ void ConfigurationClass::migrate()
     if (config.Cfg.Version < 0x00011b00) {
         // Convert from kHz to Hz
         config.Dtu.Cmt.Frequency *= 1000;
-    }
-
-    if (config.Cfg.Version < 0x00011c00) {
-        if (!strcmp(config.Ntp.Server, NTP_SERVER_OLD)) {
-            strlcpy(config.Ntp.Server, NTP_SERVER, sizeof(config.Ntp.Server));
-        }
     }
 
     f.close();
