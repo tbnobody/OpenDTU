@@ -363,15 +363,30 @@ int32_t PowerLimiterClass::inverterPowerDcToAc(std::shared_ptr<InverterAbstract>
  * can currently only be set using MQTT. in this mode of operation, the
  * inverter shall behave as if it was connected to the solar panels directly,
  * i.e., all solar power (and only solar power) is fed to the AC side,
- * independent from the power meter reading.
+ * independent from the power meter reading. if the inverter is actually
+ * already connected to solar modules rather than a battery, the upper power
+ * limit is set as the inverter limit.
  */
 void PowerLimiterClass::unconditionalSolarPassthrough(std::shared_ptr<InverterAbstract> inverter)
 {
+    if ((millis() - _lastCalculation) < _calculationBackoffMs) { return; }
+    _lastCalculation = millis();
+
+    auto const& config = Configuration.get();
+
+    if (config.PowerLimiter.IsInverterSolarPowered) {
+        _calculationBackoffMs = 10 * 1000;
+        setNewPowerLimit(inverter, config.PowerLimiter.UpperPowerLimit);
+        announceStatus(Status::UnconditionalSolarPassthrough);
+        return;
+    }
+
     if (!VictronMppt.isDataValid()) {
         shutdown(Status::NoVeDirect);
         return;
     }
 
+    _calculationBackoffMs = 1 * 1000;
     int32_t solarPower = VictronMppt.getPowerOutputWatts();
     setNewPowerLimit(inverter, inverterPowerDcToAc(inverter, solarPower));
     announceStatus(Status::UnconditionalSolarPassthrough);
