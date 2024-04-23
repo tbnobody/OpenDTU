@@ -13,6 +13,13 @@ export interface PowerMeterHttpPhaseConfig {
     sign_inverted: boolean;
 }
 
+export interface PowerMeterTibberConfig {
+    url: string;
+    username: string;
+    password: string;
+    timeout: number;
+}
+
 export interface PowerMeterConfig {
     enabled: boolean;
     verbose_logging: boolean;
@@ -25,4 +32,5 @@ export interface PowerMeterConfig {
     sdmaddress: number;
     http_individual_requests: boolean;
     http_phases: Array<PowerMeterHttpPhaseConfig>;
+    tibber: PowerMeterTibberConfig;
 }

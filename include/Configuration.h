@@ -78,6 +78,14 @@ struct POWERMETER_HTTP_PHASE_CONFIG_T {
 };
 using PowerMeterHttpConfig = struct POWERMETER_HTTP_PHASE_CONFIG_T;
 
+struct POWERMETER_TIBBER_CONFIG_T {
+    char Url[POWERMETER_MAX_HTTP_URL_STRLEN + 1];
+    char Username[POWERMETER_MAX_USERNAME_STRLEN + 1];
+    char Password[POWERMETER_MAX_USERNAME_STRLEN + 1];
+    uint16_t Timeout;
+};
+using PowerMeterTibberConfig = struct POWERMETER_TIBBER_CONFIG_T;
+
 struct CONFIG_T {
     struct {
         uint32_t Version;
@@ -200,6 +208,7 @@ struct CONFIG_T {
         uint32_t HttpInterval;
         bool HttpIndividualRequests;
         PowerMeterHttpConfig Http_Phase[POWERMETER_MAX_PHASES];
+        PowerMeterTibberConfig Tibber;
     } PowerMeter;
 
     struct {

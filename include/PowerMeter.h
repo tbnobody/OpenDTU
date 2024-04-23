@@ -26,13 +26,19 @@ public:
         SDM3PH = 2,
         HTTP = 3,
         SML = 4,
-        SMAHM2 = 5
+        SMAHM2 = 5,
+        TIBBER = 6
     };
     void init(Scheduler& scheduler);
     float getPowerTotal(bool forceUpdate = true);
     uint32_t getLastPowerMeterUpdate();
     bool isDataValid();
 
+    const std::list<OBISHandler> smlHandlerList{
+        {{0x01, 0x00, 0x10, 0x07, 0x00, 0xff}, &smlOBISW, &_powerMeter1Power},
+        {{0x01, 0x00, 0x01, 0x08, 0x00, 0xff}, &smlOBISWh, &_powerMeterImport},
+        {{0x01, 0x00, 0x02, 0x08, 0x00, 0xff}, &smlOBISWh, &_powerMeterExport}
+    };
 private:
     void loop();
     void mqtt();
@@ -68,11 +74,6 @@ private:
     void readPowerMeter();
 
     bool smlReadLoop();
-    const std::list<OBISHandler> smlHandlerList{
-        {{0x01, 0x00, 0x10, 0x07, 0x00, 0xff}, &smlOBISW, &_powerMeter1Power},
-        {{0x01, 0x00, 0x01, 0x08, 0x00, 0xff}, &smlOBISWh, &_powerMeterImport},
-        {{0x01, 0x00, 0x02, 0x08, 0x00, 0xff}, &smlOBISWh, &_powerMeterExport}
-    };
 };
 
 extern PowerMeterClass PowerMeter;

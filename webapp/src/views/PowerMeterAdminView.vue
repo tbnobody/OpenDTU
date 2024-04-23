@@ -220,6 +220,44 @@
                         </div>
                     </CardElement>
                 </div>
+
+                <div v-if="powerMeterConfigList.source === 6">
+                    <CardElement :text="$t('powermeteradmin.TIBBER')"
+                            textVariant="text-bg-primary"
+                            add-space>
+
+                        <InputElement :label="$t('powermeteradmin.httpUrl')"
+                            v-model="powerMeterConfigList.tibber.url"
+                            type="text"
+                            maxlength="1024"
+                            placeholder="http://admin:supersecret@mypowermeter.home/status"
+                            prefix="GET "
+                            :tooltip="$t('powermeteradmin.httpUrlDescription')" />
+
+                        <InputElement :label="$t('powermeteradmin.httpUsername')"
+                            v-model="powerMeterConfigList.tibber.username"
+                            type="text" maxlength="64"/>
+
+                        <InputElement :label="$t('powermeteradmin.httpPassword')"
+                            v-model="powerMeterConfigList.tibber.password"
+                            type="password" maxlength="64"/>
+
+                        <InputElement :label="$t('powermeteradmin.httpTimeout')"
+                            v-model="powerMeterConfigList.tibber.timeout"
+                            type="number"
+                            :postfix="$t('powermeteradmin.milliSeconds')" />
+
+                        <div class="text-center mb-3">
+                            <button type="button" class="btn btn-danger" @click="testTibberRequest()">
+                                {{ $t('powermeteradmin.testHttpRequest') }}
+                            </button>
+                        </div>
+
+                        <BootstrapAlert v-model="testTibberRequestAlert.show" dismissible :variant="testTibberRequestAlert.type">
+                            {{ testTibberRequestAlert.message }}
+                        </BootstrapAlert>
+                    </CardElement>
+                </div>
             </div>
 
             <FormFooter @reload="getPowerMeterConfig"/>
@@ -257,6 +295,7 @@ export default defineComponent({
                 { key: 3, value: this.$t('powermeteradmin.typeHTTP') },
                 { key: 4, value: this.$t('powermeteradmin.typeSML') },
                 { key: 5, value: this.$t('powermeteradmin.typeSMAHM2') },
+                { key: 6, value: this.$t('powermeteradmin.typeTIBBER') },
             ],
             powerMeterAuthList: [
                 { key: 0, value: "None" },
@@ -266,7 +305,8 @@ export default defineComponent({
             alertMessage: "",
             alertType: "info",
             showAlert: false,
-            testHttpRequestAlert:  [{message: "", type: "", show: false}] as { message: string; type: string; show: boolean; }[]
+            testHttpRequestAlert:  [{message: "", type: "", show: false}] as { message: string; type: string; show: boolean; }[],
+            testTibberRequestAlert:  {message: "", type: "", show: false} as { message: string; type: string; show: boolean; }
         };
     },
     created() {
@@ -340,6 +380,32 @@ export default defineComponent({
                 .then(
                     (response) => {
                         this.testHttpRequestAlert[index] = {
+                            message: response.message,
+                            type: response.type,
+                            show: true,
+                        };
+                    }
+                )
+        },
+        testTibberRequest() {
+            this.testTibberRequestAlert = {
+                message: "Sending Tibber request...",
+                type: "info",
+                show: true,
+            };
+
+            const formData = new FormData();
+            formData.append("data", JSON.stringify(this.powerMeterConfigList.tibber));
+
+            fetch("/api/powermeter/testtibberrequest", {
+                method: "POST",
+                headers: authHeader(),
+                body: formData,
+            })
+                .then((response) => handleResponse(response, this.$emitter, this.$router))
+                .then(
+                    (response) => {
+                        this.testTibberRequestAlert = {
                             message: response.message,
                             type: response.type,
                             show: true,

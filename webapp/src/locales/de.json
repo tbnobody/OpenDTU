@@ -563,6 +563,7 @@
         "typeHTTP": "HTTP(S) + JSON",
         "typeSML": "SML (OBIS 16.7.0)",
         "typeSMAHM2": "SMA Homemanager 2.0",
+        "typeTIBBER": "Tibber Pulse (via Tibber Bridge)",
         "MqttTopicPowerMeter1": "MQTT topic - Stromzähler #1",
         "MqttTopicPowerMeter2": "MQTT topic - Stromzähler #2 (Optional)",
         "MqttTopicPowerMeter3": "MQTT topic - Stromzähler #3 (Optional)",
@@ -587,7 +588,8 @@
         "httpSignInverted": "Vorzeichen umkehren",
         "httpSignInvertedHint": "Positive Werte werden als Leistungsabnahme aus dem Netz interpretiert. Diese Option muss aktiviert werden, wenn das Vorzeichen des Wertes die gegenteilige Bedeutung hat.",
         "httpTimeout": "Timeout",
-        "testHttpRequest": "Testen"
+        "testHttpRequest": "Testen",
+        "TIBBER": "Tibber Pulse (via Tibber Bridge) - Konfiguration"
     },
     "powerlimiteradmin": {
         "PowerLimiterSettings": "Dynamic Power Limiter Einstellungen",

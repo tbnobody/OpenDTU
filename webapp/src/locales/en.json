@@ -565,6 +565,7 @@
         "typeHTTP": "HTTP(s) + JSON",
         "typeSML": "SML (OBIS 16.7.0)",
         "typeSMAHM2": "SMA Homemanager 2.0",
+        "typeTIBBER": "Tibber Pulse (via Tibber Bridge)",
         "MqttTopicPowerMeter1": "MQTT topic - Power meter #1",
         "MqttTopicPowerMeter2": "MQTT topic - Power meter #2",
         "MqttTopicPowerMeter3": "MQTT topic - Power meter #3",
@@ -593,7 +594,8 @@
         "httpSignInvertedHint": "Is is expected that positive values denote power usage from the grid. Check this option if the sign of this value has the opposite meaning.",
         "httpTimeout": "Timeout",
         "testHttpRequest": "Run test",
-        "milliSeconds": "ms"
+        "milliSeconds": "ms",
+        "TIBBER": "Tibber Pulse (via Tibber Bridge) - Configuration"
     },
     "powerlimiteradmin": {
         "PowerLimiterSettings": "Dynamic Power Limiter Settings",

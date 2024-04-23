@@ -13,6 +13,7 @@
 #include "PowerLimiter.h"
 #include "PowerMeter.h"
 #include "HttpPowerMeter.h"
+#include "TibberPowerMeter.h"
 #include "WebApi.h"
 #include "helper.h"
 
@@ -26,6 +27,7 @@ void WebApiPowerMeterClass::init(AsyncWebServer& server, Scheduler& scheduler)
     _server->on("/api/powermeter/config", HTTP_GET, std::bind(&WebApiPowerMeterClass::onAdminGet, this, _1));
     _server->on("/api/powermeter/config", HTTP_POST, std::bind(&WebApiPowerMeterClass::onAdminPost, this, _1));
     _server->on("/api/powermeter/testhttprequest", HTTP_POST, std::bind(&WebApiPowerMeterClass::onTestHttpRequest, this, _1));
+    _server->on("/api/powermeter/testtibberrequest", HTTP_POST, std::bind(&WebApiPowerMeterClass::onTestTibberRequest, this, _1));
 }
 
 void WebApiPowerMeterClass::decodeJsonPhaseConfig(JsonObject const& json, PowerMeterHttpConfig& config) const
@@ -41,6 +43,14 @@ void WebApiPowerMeterClass::decodeJsonPhaseConfig(JsonObject const& json, PowerM
     strlcpy(config.JsonPath, json["json_path"].as<String>().c_str(), sizeof(config.JsonPath));
     config.PowerUnit = json["unit"].as<PowerMeterHttpConfig::Unit>();
     config.SignInverted = json["sign_inverted"].as<bool>();
+}
+
+void WebApiPowerMeterClass::decodeJsonTibberConfig(JsonObject const& json, PowerMeterTibberConfig& config) const
+{
+    strlcpy(config.Url, json["url"].as<String>().c_str(), sizeof(config.Url));
+    strlcpy(config.Username, json["username"].as<String>().c_str(), sizeof(config.Username));
+    strlcpy(config.Password, json["password"].as<String>().c_str(), sizeof(config.Password));
+    config.Timeout = json["timeout"].as<uint16_t>();
 }
 
 void WebApiPowerMeterClass::onStatus(AsyncWebServerRequest* request)
@@ -59,6 +69,12 @@ void WebApiPowerMeterClass::onStatus(AsyncWebServerRequest* request)
     root["sdmbaudrate"] = config.PowerMeter.SdmBaudrate;
     root["sdmaddress"] = config.PowerMeter.SdmAddress;
     root["http_individual_requests"] = config.PowerMeter.HttpIndividualRequests;
+
+    auto tibber = root["tibber"].to<JsonObject>();
+    tibber["url"] = String(config.PowerMeter.Tibber.Url);
+    tibber["username"] = String(config.PowerMeter.Tibber.Username);
+    tibber["password"] = String(config.PowerMeter.Tibber.Password);
+    tibber["timeout"] = config.PowerMeter.Tibber.Timeout;
 
     auto httpPhases = root["http_phases"].to<JsonArray>();
  
@@ -158,6 +174,34 @@ void WebApiPowerMeterClass::onAdminPost(AsyncWebServerRequest* request)
         }
     }
 
+    if (static_cast<PowerMeterClass::Source>(root["source"].as<uint8_t>()) == PowerMeterClass::Source::TIBBER) {
+        JsonObject tibber = root["tibber"];
+
+        if (!tibber.containsKey("url")
+                || (!tibber["url"].as<String>().startsWith("http://")
+                && !tibber["url"].as<String>().startsWith("https://"))) {
+            retMsg["message"] = "URL must either start with http:// or https://!";
+            response->setLength();
+            request->send(response);
+            return;
+        }
+
+        if ((tibber["username"].as<String>().length() == 0 || tibber["password"].as<String>().length() == 0)) {
+            retMsg["message"] = "Username or password must not be empty!";
+            response->setLength();
+            request->send(response);
+            return;
+        }
+
+        if (!tibber.containsKey("timeout")
+                || tibber["timeout"].as<uint16_t>() <= 0) {
+            retMsg["message"] = "Timeout must be greater than 0 ms!";
+            response->setLength();
+            request->send(response);
+            return;
+        }
+    }
+
     CONFIG_T& config = Configuration.get();
     config.PowerMeter.Enabled = root["enabled"].as<bool>();
     config.PowerMeter.VerboseLogging = root["verbose_logging"].as<bool>();
@@ -169,6 +213,8 @@ void WebApiPowerMeterClass::onAdminPost(AsyncWebServerRequest* request)
     config.PowerMeter.SdmBaudrate = root["sdmbaudrate"].as<uint32_t>();
     config.PowerMeter.SdmAddress = root["sdmaddress"].as<uint8_t>();
     config.PowerMeter.HttpIndividualRequests = root["http_individual_requests"].as<bool>();
+
+    decodeJsonTibberConfig(root["tibber"].as<JsonObject>(), config.PowerMeter.Tibber);
 
     JsonArray http_phases = root["http_phases"];
     for (uint8_t i = 0; i < http_phases.size(); i++) {
@@ -222,6 +268,45 @@ void WebApiPowerMeterClass::onTestHttpRequest(AsyncWebServerRequest* request)
         snprintf_P(response, sizeof(response), "Success! Power: %5.2fW", HttpPowerMeter.getPower(phase + 1));
     } else {
         snprintf_P(response, sizeof(response), "%s", HttpPowerMeter.httpPowerMeterError);
+    }
+
+    retMsg["message"] = response;
+    asyncJsonResponse->setLength();
+    request->send(asyncJsonResponse);
+}
+
+void WebApiPowerMeterClass::onTestTibberRequest(AsyncWebServerRequest* request)
+{
+    if (!WebApi.checkCredentials(request)) {
+        return;
+    }
+
+    AsyncJsonResponse* asyncJsonResponse = new AsyncJsonResponse();
+    JsonDocument root;
+    if (!WebApi.parseRequestData(request, asyncJsonResponse, root)) {
+        return;
+    }
+
+    auto& retMsg = asyncJsonResponse->getRoot();
+
+    if (!root.containsKey("url") || !root.containsKey("username") || !root.containsKey("password") 
+            || !root.containsKey("timeout")) {
+        retMsg["message"] = "Missing fields!";
+        asyncJsonResponse->setLength();
+        request->send(asyncJsonResponse);
+        return;
+    }
+
+
+    char response[256];
+
+    PowerMeterTibberConfig tibberConfig;
+    decodeJsonTibberConfig(root.as<JsonObject>(), tibberConfig);
+    if (TibberPowerMeter.query(tibberConfig)) {
+        retMsg["type"] = "success";
+        snprintf_P(response, sizeof(response), "Success! Power: %5.2fW", PowerMeter.getPowerTotal());
+    } else {
+        snprintf_P(response, sizeof(response), "%s", TibberPowerMeter.tibberPowerMeterError);
     }
 
     retMsg["message"] = response;

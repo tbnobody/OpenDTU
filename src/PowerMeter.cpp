@@ -6,6 +6,7 @@
 #include "Configuration.h"
 #include "PinMapping.h"
 #include "HttpPowerMeter.h"
+#include "TibberPowerMeter.h"
 #include "MqttSettings.h"
 #include "NetworkSettings.h"
 #include "MessageOutput.h"
@@ -95,6 +96,9 @@ void PowerMeterClass::init(Scheduler& scheduler)
 
     case Source::SMAHM2:
         SMA_HM.init(scheduler, config.PowerMeter.VerboseLogging);
+        break;
+
+    case Source::TIBBER:
         break;
     }
 }
@@ -273,6 +277,11 @@ void PowerMeterClass::readPowerMeter()
         _powerMeter2Power = SMA_HM.getPowerL2();
         _powerMeter3Power = SMA_HM.getPowerL3();
         _lastPowerMeterUpdate = millis();
+    }
+    else if (configuredSource == Source::TIBBER) {
+        if (TibberPowerMeter.updateValues()) {
+            _lastPowerMeterUpdate = millis();
+        }
     }
 }
 

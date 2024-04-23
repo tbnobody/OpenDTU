@@ -159,6 +159,12 @@ bool ConfigurationClass::write()
     powermeter["sdmaddress"] = config.PowerMeter.SdmAddress;
     powermeter["http_individual_requests"] = config.PowerMeter.HttpIndividualRequests;
 
+    JsonObject tibber = powermeter["tibber"].to<JsonObject>();
+    tibber["url"] = config.PowerMeter.Tibber.Url;
+    tibber["username"] = config.PowerMeter.Tibber.Username;
+    tibber["password"] = config.PowerMeter.Tibber.Password;
+    tibber["timeout"] = config.PowerMeter.Tibber.Timeout;
+
     JsonArray powermeter_http_phases = powermeter["http_phases"].to<JsonArray>();
     for (uint8_t i = 0; i < POWERMETER_MAX_PHASES; i++) {
         JsonObject powermeter_phase = powermeter_http_phases.add<JsonObject>();
@@ -419,6 +425,12 @@ bool ConfigurationClass::read()
     config.PowerMeter.SdmBaudrate =  powermeter["sdmbaudrate"] | POWERMETER_SDMBAUDRATE;
     config.PowerMeter.SdmAddress =  powermeter["sdmaddress"] | POWERMETER_SDMADDRESS;
     config.PowerMeter.HttpIndividualRequests = powermeter["http_individual_requests"] | false;
+
+    JsonObject tibber = powermeter["tibber"];
+    strlcpy(config.PowerMeter.Tibber.Url, tibber["url"] | "", sizeof(config.PowerMeter.Tibber.Url));
+    strlcpy(config.PowerMeter.Tibber.Username, tibber["username"] | "", sizeof(config.PowerMeter.Tibber.Username));
+    strlcpy(config.PowerMeter.Tibber.Password, tibber["password"] | "", sizeof(config.PowerMeter.Tibber.Password));
+    config.PowerMeter.Tibber.Timeout = tibber["timeout"] | POWERMETER_HTTP_TIMEOUT;
 
     JsonArray powermeter_http_phases = powermeter["http_phases"];
     for (uint8_t i = 0; i < POWERMETER_MAX_PHASES; i++) {
