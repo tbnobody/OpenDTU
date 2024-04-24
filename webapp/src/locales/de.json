@@ -852,13 +852,15 @@
         "enableVoltageLimit": "Start Spannungslimit",
         "stopVoltageLimitHint": "Maximal Spannung des Ladegeräts. Entspricht der geünschten Ladeschlussspannung der Batterie. Verwendet für die Automatische Leistungssteuerung und beim Notfallladen",
         "enableVoltageLimitHint": "Die automatische Leistungssteuerung wird deaktiviert wenn die Ausgangsspannung über diesem Wert liegt und wenn gleichzeitig die Ausgangsleistung unter die minimale Leistung fällt.\nDie automatische Leistungssteuerung wird re-aktiveiert wenn die Batteriespannung unter diesen Wert fällt.",
-        "maxPowerLimitHint": "Maximale Ausgangsleistung. Verwendet für die Automatische Leistungssteuerung und beim Notfallladen",
+        "upperPowerLimitHint": "Maximale Ausgangsleistung. Verwendet für die Automatische Leistungssteuerung und beim Notfallladen",
         "lowerPowerLimit": "Minimale Leistung",
         "upperPowerLimit": "Maximale Leistung",
         "StopBatterySoCThreshold": "Laden bei SoC beenden",
         "StopBatterySoCThresholdHint": "Zur Verlängerung der Akku-Lebensdauer kann der Ladevorgang bei einem bestimmten SoC gestoppt werden.\nHinweis: Manche LiFePO-Akkus müssen gelegentlich voll geladen werden, um die SoC-Anzeige akkurat zu halten.",
         "Seconds": "@:base.Seconds",
-        "EnableEmergencyCharge": "Notfallladen: Batterie wird mit maximaler Leistung geladen wenn durch das Batterie BMS angefordert"
+        "EnableEmergencyCharge": "Notfallladen: Batterie wird mit maximaler Leistung geladen wenn durch das Batterie BMS angefordert",
+        "targetPowerConsumption": "Angestrebter Netzbezug",
+        "targetPowerConsumptionHint": "Bei postiven Werten wird die eingestellte Leistung aus dem Stromnetz bezogen. Bei negativen Werten wird das Netzteil vorzeitig abgeschaltet."
     },
     "battery": {
         "battery": "Batterie",

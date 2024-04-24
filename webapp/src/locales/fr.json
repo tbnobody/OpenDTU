@@ -847,13 +847,15 @@
         "enableVoltageLimit": "Re-enable voltage limit",
         "stopVoltageLimitHint": "Maximum charger voltage. Equals battery charge voltage limit. Used for automatic power control and when emergency charging",
         "enableVoltageLimitHint": "Automatic power control is disabled if the output voltage is higher then this value and if the output power drops below the minimum output power limit (set below).\nAutomatic power control is re-enabled if the battery voltage drops below the value set in this field.",
-        "maxPowerLimitHint": "Maximum output power. Used for automatic power control and when emergency charging",
+        "upperPowerLimitHint": "Maximum output power. Used for automatic power control and when emergency charging",
         "lowerPowerLimit": "Minimum output power",
         "upperPowerLimit": "Maximum output power",
         "StopBatterySoCThreshold": "Stop charging at SoC",
         "StopBatterySoCThresholdHint": "To prolong the battery's lifespan, charging can be stopped at a certain SoC level.\nHint: In order to keep the SoC reading accurate, some LiFePO cells must be charged to full capacity regularly.",
         "Seconds": "@:base.Seconds",
-        "EnableEmergencyCharge": "Emergency charge. Battery charged with maximum power if requested by Battery BMS"
+        "EnableEmergencyCharge": "Emergency charge. Battery charged with maximum power if requested by Battery BMS",
+        "targetPowerConsumption": "Target power consumption",
+        "targetPowerConsumptionHint": "Postitive values use grid power to charge the battery. Negative values result in early shutdown"
     },
     "battery": {
         "battery": "Battery",

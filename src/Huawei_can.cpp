@@ -384,7 +384,11 @@ void HuaweiCanClass::loop()
 
       // Calculate new power limit
       float newPowerLimit = -1 * round(PowerMeter.getPowerTotal());
-      newPowerLimit += _rp.output_power;
+      float efficiency =  (_rp.efficiency > 0.5 ? _rp.efficiency : 1.0); 
+
+      // Powerlimit is the requested output power + permissable Grid consumption factoring in the efficiency factor
+      newPowerLimit += _rp.output_power + config.Huawei.Auto_Power_Target_Power_Consumption / efficiency;
+
       if (verboseLogging){
         MessageOutput.printf("[HuaweiCanClass::loop] newPowerLimit: %f, output_power: %f \r\n", newPowerLimit, _rp.output_power);
       }
@@ -424,7 +428,6 @@ void HuaweiCanClass::loop()
         }
 
         // Calculate output current
-        float efficiency =  (_rp.efficiency > 0.5 ? _rp.efficiency : 1.0); 
         float calculatedCurrent = efficiency * (newPowerLimit / _rp.output_voltage);
 
         // Limit output current to value requested by BMS

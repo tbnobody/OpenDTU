@@ -196,6 +196,7 @@ void WebApiHuaweiClass::onAdminGet(AsyncWebServerRequest* request)
     root["lower_power_limit"] = config.Huawei.Auto_Power_Lower_Power_Limit;
     root["upper_power_limit"] = config.Huawei.Auto_Power_Upper_Power_Limit;   
     root["stop_batterysoc_threshold"] = config.Huawei.Auto_Power_Stop_BatterySoC_Threshold;
+    root["target_power_consumption"] = config.Huawei.Auto_Power_Target_Power_Consumption;
 
     response->setLength();
     request->send(response);
@@ -266,6 +267,8 @@ void WebApiHuaweiClass::onAdminPost(AsyncWebServerRequest* request)
     config.Huawei.Auto_Power_Lower_Power_Limit = root["lower_power_limit"].as<float>();
     config.Huawei.Auto_Power_Upper_Power_Limit = root["upper_power_limit"].as<float>();    
     config.Huawei.Auto_Power_Stop_BatterySoC_Threshold = root["stop_batterysoc_threshold"];
+    config.Huawei.Auto_Power_Target_Power_Consumption = root["target_power_consumption"];
+
     WebApi.writeConfig(retMsg);
 
     response->setLength();

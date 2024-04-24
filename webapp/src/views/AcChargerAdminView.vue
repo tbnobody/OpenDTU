@@ -78,16 +78,28 @@
                             </div>
                         </div>
                         <label for="upperPowerLimit" class="col-sm-2 col-form-label">{{ $t('acchargeradmin.upperPowerLimit') }}:
-                          <BIconInfoCircle v-tooltip :title="$t('acchargeradmin.maxPowerLimitHint')" />
+                          <BIconInfoCircle v-tooltip :title="$t('acchargeradmin.upperPowerLimitHint')" />
                         </label>
                         <div class="col-sm-10">
                             <div class="input-group">
                                 <input type="number" class="form-control" id="upperPowerLimit"
                                     placeholder="2000" v-model="acChargerConfigList.upper_power_limit"
-                                    aria-describedby="lowerPowerLimitDescription" min="100" max="3000" required/>
+                                    aria-describedby="upperPowerLimitDescription" min="100" max="3000" required/>
                                     <span class="input-group-text" id="upperPowerLimitDescription">W</span>
                             </div>
                         </div>
+                        <label for="targetPowerConsumption" class="col-sm-2 col-form-label">{{ $t('acchargeradmin.targetPowerConsumption') }}:
+                          <BIconInfoCircle v-tooltip :title="$t('acchargeradmin.targetPowerConsumptionHint')" />
+                        </label>
+                        <div class="col-sm-10">
+                            <div class="input-group">
+                                <input type="number" class="form-control" id="targetPowerConsumption"
+                                    placeholder="0" v-model="acChargerConfigList.target_power_consumption"
+                                    aria-describedby="targetPowerConsumptionDescription" min="-3000" max="3000" required/>
+                                    <span class="input-group-text" id="targetPowerConsumptionDescription">W</span>
+                            </div>
+                        </div>
+
                     </div>
                 </CardElement>
                 <CardElement :text="$t('acchargeradmin.BatterySoCLimits')" textVariant="text-bg-primary" add-space

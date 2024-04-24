@@ -253,6 +253,7 @@ struct CONFIG_T {
         float Auto_Power_Lower_Power_Limit;
         float Auto_Power_Upper_Power_Limit;
         uint8_t Auto_Power_Stop_BatterySoC_Threshold;
+        float Auto_Power_Target_Power_Consumption;
     } Huawei;
 
 

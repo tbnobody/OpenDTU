@@ -227,6 +227,7 @@ bool ConfigurationClass::write()
     huawei["lower_power_limit"] = config.Huawei.Auto_Power_Lower_Power_Limit;
     huawei["upper_power_limit"] = config.Huawei.Auto_Power_Upper_Power_Limit;
     huawei["stop_batterysoc_threshold"] = config.Huawei.Auto_Power_Stop_BatterySoC_Threshold;
+    huawei["target_power_consumption"] = config.Huawei.Auto_Power_Target_Power_Consumption;
 
     // Serialize JSON to file
     if (serializeJson(doc, f) == 0) {
@@ -482,6 +483,7 @@ bool ConfigurationClass::read()
     config.Huawei.Auto_Power_Lower_Power_Limit = huawei["lower_power_limit"] | HUAWEI_AUTO_POWER_LOWER_POWER_LIMIT;
     config.Huawei.Auto_Power_Upper_Power_Limit = huawei["upper_power_limit"] | HUAWEI_AUTO_POWER_UPPER_POWER_LIMIT;
     config.Huawei.Auto_Power_Stop_BatterySoC_Threshold = huawei["stop_batterysoc_threshold"] | HUAWEI_AUTO_POWER_STOP_BATTERYSOC_THRESHOLD;
+    config.Huawei.Auto_Power_Target_Power_Consumption = huawei["target_power_consumption"] | HUAWEI_AUTO_POWER_TARGET_POWER_CONSUMPTION;
 
     f.close();
     return true;

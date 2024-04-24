@@ -10,4 +10,5 @@ export interface AcChargerConfig {
   upper_power_limit: number;
   emergency_charge_enabled: boolean;
   stop_batterysoc_threshold: number;
+  target_power_consumption: number;
 }
