@@ -219,7 +219,7 @@ export default defineComponent({
         getPinMappingList() {
             this.pinMappingLoading = true;
             fetch("/api/config/get?file=pin_mapping.json", { headers: authHeader() })
-                .then((response) => handleResponse(response, this.$emitter, this.$router))
+                .then((response) => handleResponse(response, this.$emitter, this.$router, true))
                 .then(
                     (data) => {
                         this.pinMappingList = data;
@@ -246,6 +246,9 @@ export default defineComponent({
                 .then(
                     (data) => {
                         this.deviceConfigList = data;
+                        if (this.deviceConfigList.curPin.name === "") {
+                            this.deviceConfigList.curPin.name = "Default";
+                        }
                         this.dataLoading = false;
                     }
                 )
