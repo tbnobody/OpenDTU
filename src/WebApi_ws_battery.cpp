@@ -62,12 +62,12 @@ void WebApiWsBatteryLiveClass::sendDataTaskCb()
 
     try {
         std::lock_guard<std::mutex> lock(_mutex);
-        DynamicJsonDocument root(_responseSize);
-         if (Utils::checkJsonAlloc(root, __FUNCTION__, __LINE__)) {
-            JsonVariant var = root;
-            generateJsonResponse(var);
+        JsonDocument root;
+        JsonVariant var = root;
+        
+        generateCommonJsonResponse(var);
 
-            if (Utils::checkJsonOverflow(root, __FUNCTION__, __LINE__)) { return; }
+        if (Utils::checkJsonAlloc(root, __FUNCTION__, __LINE__)) {
 
             // battery provider does not generate a card, e.g., MQTT provider
             if (root.isNull()) { return; }
@@ -90,7 +90,7 @@ void WebApiWsBatteryLiveClass::sendDataTaskCb()
     }
 }
 
-void WebApiWsBatteryLiveClass::generateJsonResponse(JsonVariant& root)
+void WebApiWsBatteryLiveClass::generateCommonJsonResponse(JsonVariant& root)
 {
     Battery.getStats()->getLiveViewData(root);
 }
@@ -111,12 +111,11 @@ void WebApiWsBatteryLiveClass::onLivedataStatus(AsyncWebServerRequest* request)
     }
     try {
         std::lock_guard<std::mutex> lock(_mutex);
-        AsyncJsonResponse* response = new AsyncJsonResponse(false, _responseSize);
+        AsyncJsonResponse* response = new AsyncJsonResponse();
         auto& root = response->getRoot();
-        generateJsonResponse(root);
+        generateCommonJsonResponse(root);
 
-        response->setLength();
-        request->send(response);
+        WebApi.sendJsonResponse(request, response, __FUNCTION__, __LINE__);
     } catch (std::bad_alloc& bad_alloc) {
         MessageOutput.printf("Calling /api/batterylivedata/status has temporarily run out of resources. Reason: \"%s\".\r\n", bad_alloc.what());
         WebApi.sendTooManyRequests(request);

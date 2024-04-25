@@ -93,7 +93,7 @@ void WebApiHuaweiClass::onPost(AsyncWebServerRequest* request)
         return;
     }
 
-    DynamicJsonDocument root(1024);
+    JsonDocument root;
     DeserializationError error = deserializeJson(root, json);
     float value;
     uint8_t online = true;
@@ -164,12 +164,9 @@ void WebApiHuaweiClass::onPost(AsyncWebServerRequest* request)
         }
     }
 
-    retMsg["type"] = "success";
-    retMsg["message"] = "Settings saved!";
-    retMsg["code"] = WebApiError::GenericSuccess;
+    WebApi.writeConfig(retMsg);
 
-    response->setLength();
-    request->send(response);
+    WebApi.sendJsonResponse(request, response, __FUNCTION__, __LINE__);
 }
 
 
@@ -229,7 +226,7 @@ void WebApiHuaweiClass::onAdminPost(AsyncWebServerRequest* request)
         return;
     }
 
-    DynamicJsonDocument root(1024);
+    JsonDocument root;
     DeserializationError error = deserializeJson(root, json);
 
     if (error) {
@@ -268,8 +265,7 @@ void WebApiHuaweiClass::onAdminPost(AsyncWebServerRequest* request)
     config.Huawei.Auto_Power_Stop_BatterySoC_Threshold = root["stop_batterysoc_threshold"];
     WebApi.writeConfig(retMsg);
 
-    response->setLength();
-    request->send(response);
+    WebApi.sendJsonResponse(request, response, __FUNCTION__, __LINE__);
 
     // TODO(schlimmchen): HuaweiCan has no real concept of the fact that the
     // config might change. at least not regarding CAN parameters. until that

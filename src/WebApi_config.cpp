@@ -53,51 +53,24 @@ void WebApiConfigClass::onConfigDelete(AsyncWebServerRequest* request)
     }
 
     AsyncJsonResponse* response = new AsyncJsonResponse();
+    JsonDocument root;
+    if (!WebApi.parseRequestData(request, response, root)) {
+        return;
+    }
+
     auto& retMsg = response->getRoot();
-    retMsg["type"] = "warning";
-
-    if (!request->hasParam("data", true)) {
-        retMsg["message"] = "No values found!";
-        retMsg["code"] = WebApiError::GenericNoValueFound;
-        response->setLength();
-        request->send(response);
-        return;
-    }
-
-    const String json = request->getParam("data", true)->value();
-
-    if (json.length() > 1024) {
-        retMsg["message"] = "Data too large!";
-        retMsg["code"] = WebApiError::GenericDataTooLarge;
-        response->setLength();
-        request->send(response);
-        return;
-    }
-
-    DynamicJsonDocument root(1024);
-    const DeserializationError error = deserializeJson(root, json);
-
-    if (error) {
-        retMsg["message"] = "Failed to parse data!";
-        retMsg["code"] = WebApiError::GenericDataTooLarge;
-        response->setLength();
-        request->send(response);
-        return;
-    }
 
     if (!(root.containsKey("delete"))) {
         retMsg["message"] = "Values are missing!";
         retMsg["code"] = WebApiError::GenericValueMissing;
-        response->setLength();
-        request->send(response);
+        WebApi.sendJsonResponse(request, response, __FUNCTION__, __LINE__);
         return;
     }
 
     if (root["delete"].as<bool>() == false) {
         retMsg["message"] = "Not deleted anything!";
         retMsg["code"] = WebApiError::ConfigNotDeleted;
-        response->setLength();
-        request->send(response);
+        WebApi.sendJsonResponse(request, response, __FUNCTION__, __LINE__);
         return;
     }
 
@@ -105,8 +78,7 @@ void WebApiConfigClass::onConfigDelete(AsyncWebServerRequest* request)
     retMsg["message"] = "Configuration resettet. Rebooting now...";
     retMsg["code"] = WebApiError::ConfigSuccess;
 
-    response->setLength();
-    request->send(response);
+    WebApi.sendJsonResponse(request, response, __FUNCTION__, __LINE__);
 
     Utils::removeAllFiles();
     Utils::restartDtu();
@@ -120,7 +92,7 @@ void WebApiConfigClass::onConfigListGet(AsyncWebServerRequest* request)
 
     AsyncJsonResponse* response = new AsyncJsonResponse();
     auto& root = response->getRoot();
-    auto data = root.createNestedArray("configs");
+    auto data = root["configs"].to<JsonArray>();
 
     File rootfs = LittleFS.open("/");
     File file = rootfs.openNextFile();
@@ -128,15 +100,14 @@ void WebApiConfigClass::onConfigListGet(AsyncWebServerRequest* request)
         if (file.isDirectory()) {
             continue;
         }
-        JsonObject obj = data.createNestedObject();
+        JsonObject obj = data.add<JsonObject>();
         obj["name"] = String(file.name());
 
         file = rootfs.openNextFile();
     }
     file.close();
 
-    response->setLength();
-    request->send(response);
+    WebApi.sendJsonResponse(request, response, __FUNCTION__, __LINE__);
 }
 
 void WebApiConfigClass::onConfigUploadFinish(AsyncWebServerRequest* request)

@@ -66,10 +66,10 @@ private:
     void publishInverterNumber(std::shared_ptr<InverterAbstract> inv, const char* caption, const char* icon, const char* category, const char* commandTopic, const char* stateTopic, const char* unitOfMeasure, const int16_t min = 1, const int16_t max = 100);
     void publishInverterBinarySensor(std::shared_ptr<InverterAbstract> inv, const char* caption, const char* subTopic, const char* payload_on, const char* payload_off);
 
-    static void createInverterInfo(DynamicJsonDocument& doc, std::shared_ptr<InverterAbstract> inv);
-    static void createDtuInfo(DynamicJsonDocument& doc);
+    static void createInverterInfo(JsonDocument& doc, std::shared_ptr<InverterAbstract> inv);
+    static void createDtuInfo(JsonDocument& doc);
 
-    static void createDeviceInfo(DynamicJsonDocument& doc, const String& name, const String& identifiers, const String& configuration_url, const String& manufacturer, const String& model, const String& sw_version, const String& via_device = "");
+    static void createDeviceInfo(JsonDocument& doc, const String& name, const String& identifiers, const String& configuration_url, const String& manufacturer, const String& model, const String& sw_version, const String& via_device = "");
 
     static String getDtuUniqueId();
     static String getDtuUrl();

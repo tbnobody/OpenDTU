@@ -83,10 +83,12 @@ export default defineComponent({
     },
     computed: {
         model: {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             get(): any {
                 if (this.type === 'checkbox') return !!this.modelValue;
                 return this.modelValue;
             },
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             set(value: any) {
                 this.$emit('update:modelValue', value);
             },

@@ -86,25 +86,17 @@ void WebApiWsVedirectLiveClass::sendDataTaskCb()
     if (fullUpdate || updateAvailable) {
         try {
             std::lock_guard<std::mutex> lock(_mutex);
-            DynamicJsonDocument root(responseSize());
+            JsonDocument root;
+            JsonVariant var = root;
+
+            generateCommonJsonResponse(var, fullUpdate);
+
             if (Utils::checkJsonAlloc(root, __FUNCTION__, __LINE__)) {
-                JsonVariant var = root;
-                generateJsonResponse(var, fullUpdate);
-
-                if (Utils::checkJsonOverflow(root, __FUNCTION__, __LINE__)) { return; }
-
                 String buffer;
                 serializeJson(root, buffer);
 
-                if (Configuration.get().Security.AllowReadonly) {
-                    _ws.setAuthentication("", "");
-                } else {
-                    _ws.setAuthentication(AUTH_USERNAME, Configuration.get().Security.Password);
-                }
-
-                _ws.textAll(buffer);
+                _ws.textAll(buffer);;
             }
-
         } catch (std::bad_alloc& bad_alloc) {
             MessageOutput.printf("Calling /api/vedirectlivedata/status has temporarily run out of resources. Reason: \"%s\".\r\n", bad_alloc.what());
         } catch (const std::exception& exc) {
@@ -117,9 +109,9 @@ void WebApiWsVedirectLiveClass::sendDataTaskCb()
     }
 }
 
-void WebApiWsVedirectLiveClass::generateJsonResponse(JsonVariant& root, bool fullUpdate)
+void WebApiWsVedirectLiveClass::generateCommonJsonResponse(JsonVariant& root, bool fullUpdate)
 {
-    const JsonObject &array = root["vedirect"].createNestedObject("instances");
+    auto array = root["vedirect"]["instances"].to<JsonObject>();
     root["vedirect"]["full_update"] = fullUpdate;
 
     for (size_t idx = 0; idx < VictronMppt.controllerAmount(); ++idx) {
@@ -131,7 +123,7 @@ void WebApiWsVedirectLiveClass::generateJsonResponse(JsonVariant& root, bool ful
         String serial(optMpptData->serialNr_SER);
         if (serial.isEmpty()) { continue; } // serial required as index
 
-        const JsonObject &nested = array.createNestedObject(serial);
+        JsonObject nested = array[serial].to<JsonObject>();
         nested["data_age_ms"] = VictronMppt.getDataAgeMillis(idx);
         populateJson(nested, *optMpptData);
     }
@@ -149,9 +141,9 @@ void WebApiWsVedirectLiveClass::populateJson(const JsonObject &root, const VeDir
     root["product_id"] = mpptData.getPidAsString();
     root["firmware_version"] = String(mpptData.firmwareNr_FW);
 
-    const JsonObject &values = root.createNestedObject("values");
+    const JsonObject values = root["values"].to<JsonObject>();
 
-    const JsonObject &device = values.createNestedObject("device");
+    const JsonObject device = values["device"].to<JsonObject>();
     device["LOAD"] = mpptData.loadOutputState_LOAD ? "ON" : "OFF";
     device["CS"] = mpptData.getCsAsString();
     device["MPPT"] = mpptData.getMpptAsString();
@@ -165,7 +157,7 @@ void WebApiWsVedirectLiveClass::populateJson(const JsonObject &root, const VeDir
         device["MpptTemperature"]["d"] = "1";
     }
 
-    const JsonObject &output = values.createNestedObject("output");
+    const JsonObject output = values["output"].to<JsonObject>();
     output["P"]["v"] = mpptData.batteryOutputPower_W;
     output["P"]["u"] = "W";
     output["P"]["d"] = 0;
@@ -179,7 +171,7 @@ void WebApiWsVedirectLiveClass::populateJson(const JsonObject &root, const VeDir
     output["E"]["u"] = "%";
     output["E"]["d"] = 1;
 
-    const JsonObject &input = values.createNestedObject("input");
+    const JsonObject input = values["input"].to<JsonObject>();
     if (mpptData.NetworkTotalDcInputPowerMilliWatts.first > 0) {
         input["NetworkPower"]["v"] = mpptData.NetworkTotalDcInputPowerMilliWatts.second / 1000.0;
         input["NetworkPower"]["u"] = "W";
@@ -233,14 +225,12 @@ void WebApiWsVedirectLiveClass::onLivedataStatus(AsyncWebServerRequest* request)
     }
     try {
         std::lock_guard<std::mutex> lock(_mutex);
-        AsyncJsonResponse* response = new AsyncJsonResponse(false, responseSize());
+        AsyncJsonResponse* response = new AsyncJsonResponse();
         auto& root = response->getRoot();
 
-        generateJsonResponse(root, true/*fullUpdate*/);
+        generateCommonJsonResponse(root, true/*fullUpdate*/);
 
-        response->setLength();
-        request->send(response);
-
+        WebApi.sendJsonResponse(request, response, __FUNCTION__, __LINE__);
     } catch (std::bad_alloc& bad_alloc) {
         MessageOutput.printf("Calling /api/vedirectlivedata/status has temporarily run out of resources. Reason: \"%s\".\r\n", bad_alloc.what());
         WebApi.sendTooManyRequests(request);

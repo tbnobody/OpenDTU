@@ -80,7 +80,7 @@ void WebApiBatteryClass::onAdminPost(AsyncWebServerRequest* request)
         return;
     }
 
-    DynamicJsonDocument root(1024);
+    JsonDocument root;
     DeserializationError error = deserializeJson(root, json);
 
     if (error) {
@@ -94,8 +94,7 @@ void WebApiBatteryClass::onAdminPost(AsyncWebServerRequest* request)
     if (!root.containsKey("enabled") || !root.containsKey("provider")) {
         retMsg["message"] = "Values are missing!";
         retMsg["code"] = WebApiError::GenericValueMissing;
-        response->setLength();
-        request->send(response);
+        WebApi.sendJsonResponse(request, response, __FUNCTION__, __LINE__);
         return;
     }
 
@@ -110,8 +109,7 @@ void WebApiBatteryClass::onAdminPost(AsyncWebServerRequest* request)
 
     WebApi.writeConfig(retMsg);
 
-    response->setLength();
-    request->send(response);
+    WebApi.sendJsonResponse(request, response, __FUNCTION__, __LINE__);
 
     Battery.updateSettings();
     MqttHandleBatteryHass.forceUpdate();

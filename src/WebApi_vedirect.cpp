@@ -87,7 +87,7 @@ void WebApiVedirectClass::onVedirectAdminPost(AsyncWebServerRequest* request)
         return;
     }
 
-    DynamicJsonDocument root(1024);
+    JsonDocument root;
     DeserializationError error = deserializeJson(root, json);
 
     if (error) {
@@ -115,8 +115,8 @@ void WebApiVedirectClass::onVedirectAdminPost(AsyncWebServerRequest* request)
 
     WebApi.writeConfig(retMsg);
 
-    response->setLength();
-    request->send(response);
+    WebApi.sendJsonResponse(request, response, __FUNCTION__, __LINE__);
+
 
     VictronMppt.updateSettings();
 
