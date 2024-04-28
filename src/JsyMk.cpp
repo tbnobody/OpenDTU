@@ -194,10 +194,10 @@ float JsyMkClass::getFieldValue(size_t channel, Field_t fieldId) const
         return (config.PowerMeter.channel[channel].InvertDirection ? _jsymk.getPositiveEnergy() : _jsymk.getNegativeEnergy());
 
     case Field_t::TODAY_POSITIVE_ENERGY:
-        return (config.PowerMeter.channel[channel].InvertDirection ? _jsymk.getNegativeEnergy() - _todayNegativeRef : _jsymk.getPositiveEnergy() - _todayPositiveRef);
+        return (config.PowerMeter.channel[channel].InvertDirection ? (_jsymk.getNegativeEnergy() - _todayNegativeRef) : (_jsymk.getPositiveEnergy() - _todayPositiveRef));
 
     case Field_t::TODAY_NEGATIVE_ENERGY:
-        return (config.PowerMeter.channel[channel].InvertDirection ? _jsymk.getPositiveEnergy() - _todayPositiveRef : _jsymk.getNegativeEnergy() - _todayNegativeRef);
+        return (config.PowerMeter.channel[channel].InvertDirection ? (_jsymk.getPositiveEnergy() - _todayPositiveRef) : (_jsymk.getNegativeEnergy() - _todayNegativeRef));
 
     default:
         break;
