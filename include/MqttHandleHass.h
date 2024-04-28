@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 #pragma once
 
+#include "MqttHandlePowerMeter.h"
 #include <ArduinoJson.h>
 #include <Hoymiles.h>
 #include <TaskSchedulerDeclarations.h>
@@ -66,6 +67,9 @@ private:
     void publishInverterNumber(std::shared_ptr<InverterAbstract> inv, const char* caption, const char* icon, const char* category, const char* commandTopic, const char* stateTopic, const char* unitOfMeasure, const int16_t min = 1, const int16_t max = 100);
     void publishInverterBinarySensor(std::shared_ptr<InverterAbstract> inv, const char* caption, const char* subTopic, const char* payload_on, const char* payload_off);
 
+    void publishPowerMeterField(size_t channel, JsyMkClass::Field_t fieldId, const bool clear = false);
+
+    static void createPowerMeterInfo(JsonDocument& doc, size_t channel, JsyMkClass::Field_t fieldId);
     static void createInverterInfo(JsonDocument& doc, std::shared_ptr<InverterAbstract> inv);
     static void createDtuInfo(JsonDocument& doc);
 

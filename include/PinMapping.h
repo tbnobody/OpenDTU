@@ -39,6 +39,9 @@ struct PinMapping_t {
     uint8_t display_cs;
     uint8_t display_reset;
     int8_t led[PINMAPPING_LED_COUNT];
+
+    int8_t serial_modbus_tx;
+    int8_t serial_modbus_rx;
 };
 
 class PinMappingClass {
@@ -50,6 +53,7 @@ public:
     bool isValidNrf24Config() const;
     bool isValidCmt2300Config() const;
     bool isValidEthConfig() const;
+    bool isValidSerialModbusConfig() const;
 
 private:
     PinMapping_t _pinMapping;

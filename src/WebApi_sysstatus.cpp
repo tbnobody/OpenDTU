@@ -4,6 +4,7 @@
  */
 #include "WebApi_sysstatus.h"
 #include "Configuration.h"
+#include "JsyMk.h"
 #include "NetworkSettings.h"
 #include "PinMapping.h"
 #include "WebApi.h"
@@ -75,6 +76,12 @@ void WebApiSysstatusClass::onSystemStatus(AsyncWebServerRequest* request)
 
     root["cmt_configured"] = PinMapping.isValidCmt2300Config();
     root["cmt_connected"] = Hoymiles.getRadioCmt()->isConnected();
+
+    root["modbus_configured"] = PinMapping.isValidSerialModbusConfig();
+    root["jsy_connected"] = JsyMk.isInitialised();
+    root["jsy_variant"] = JsyMk.getFieldString(0, JsyMkClass::Field_t::MODEL) + " " + JsyMk.getFieldString(0, JsyMkClass::Field_t::VERSION)
+        + JsyMk.getFieldString(0, JsyMkClass::Field_t::VOLTAGE_RANGE) + JsyMk.getFieldUnit(JsyMkClass::Field_t::VOLTAGE_RANGE)
+        + " " + JsyMk.getFieldString(0, JsyMkClass::Field_t::CURRENT_RANGE) + JsyMk.getFieldUnit(JsyMkClass::Field_t::CURRENT_RANGE);
 
     WebApi.sendJsonResponse(request, response, __FUNCTION__, __LINE__);
 }

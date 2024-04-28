@@ -30,6 +30,8 @@
 
 #define DEV_MAX_MAPPING_NAME_STRLEN 63
 
+#define PWRMTR_MAX_CHAN_COUNT 2
+
 struct CHANNEL_CONFIG_T {
     uint16_t MaxChannelPower;
     char Name[CHAN_MAX_NAME_STRLEN];
@@ -151,6 +153,18 @@ struct CONFIG_T {
     struct {
         uint8_t Brightness;
     } Led_Single[PINMAPPING_LED_COUNT];
+
+    struct {
+        uint32_t BaudRate;
+        uint32_t PollInterval;
+    } SerialModbus;
+
+    struct {
+        struct {
+            bool InvertDirection;
+            bool NegativePower;
+        } channel[PWRMTR_MAX_CHAN_COUNT];
+    } PowerMeter;
 
     INVERTER_CONFIG_T Inverter[INV_MAX_COUNT];
     char Dev_PinMapping[DEV_MAX_MAPPING_NAME_STRLEN + 1];

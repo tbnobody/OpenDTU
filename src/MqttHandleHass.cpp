@@ -96,6 +96,27 @@ void MqttHandleHassClass::publishConfig()
 
         yield();
     }
+
+    if (!JsyMk.isInitialised())
+        return;
+
+    // Loop all power meter channels
+    //    publishDtuButton("Reset energy", "", "config", "reset", "cmd/power_meter_reset", "1");
+    for (size_t i = 0; i < JsyMk.getChannelNumber(); ++i) {
+        for (auto field : {
+                 JsyMkClass::Field_t::VOLTAGE,
+                 JsyMkClass::Field_t::CURRENT,
+                 JsyMkClass::Field_t::POWER,
+                 JsyMkClass::Field_t::POWER_FACTOR,
+                 JsyMkClass::Field_t::FREQUENCY,
+                 JsyMkClass::Field_t::NEGATIVE,
+                 JsyMkClass::Field_t::TOTAL_POSITIVE_ENERGY,
+                 JsyMkClass::Field_t::TOTAL_NEGATIVE_ENERGY }) {
+            publishPowerMeterField(i, field);
+        }
+
+        yield();
+    }
 }
 
 void MqttHandleHassClass::publishInverterField(std::shared_ptr<InverterAbstract> inv, const ChannelType_t type, const ChannelNum_t channel, const byteAssign_fieldDeviceClass_t fieldType, const bool clear)
@@ -369,6 +390,75 @@ void MqttHandleHassClass::publishDtuBinarySensor(const char* name, const char* d
     const String configTopic = "binary_sensor/" + getDtuUniqueId() + "/" + id + "/config";
     serializeJson(root, buffer);
     publish(configTopic, buffer);
+}
+
+void MqttHandleHassClass::publishPowerMeterField(size_t channel, JsyMkClass::Field_t fieldId, const bool clear)
+{
+    String modelUID = JsyMk.getFieldString(channel, JsyMkClass::Field_t::MODEL) + "-" + String(channel);
+    String name = JsyMk.getFieldName(channel, fieldId);
+
+    String sensorId = name;
+    sensorId.replace(" ", "_");
+    sensorId.toLowerCase();
+
+    String configTopic = "sensor/dtu_" + modelUID
+        + "/" + sensorId
+        + "/config";
+
+    if (!clear) {
+        JsonDocument root;
+        createPowerMeterInfo(root, channel, fieldId);
+
+        root["name"] = name;
+        root["stat_t"] = MqttSettings.getPrefix() + MqttHandlePowerMeterClass::getTopic(channel, fieldId);
+        root["uniq_id"] = modelUID + "_" + sensorId;
+
+        String unit_of_measure = JsyMk.getFieldUnit(fieldId);
+        if (!unit_of_measure.isEmpty()) {
+            root["unit_of_meas"] = unit_of_measure;
+        }
+
+        if (Configuration.get().Mqtt.Hass.Expire) {
+            root["exp_aft"] = std::max<uint32_t>(JsyMk.getPollInterval(), Configuration.get().Mqtt.PublishInterval) * 2;
+        }
+
+        String deviceClass = JsyMk.getFieldDeviceClass(fieldId);
+        if (!deviceClass.isEmpty()) {
+            root["dev_cla"] = deviceClass;
+        }
+
+        String statusClass = JsyMk.getFieldStatusClass(fieldId);
+        if (!statusClass.isEmpty()) {
+            root["stat_cla"] = statusClass;
+        }
+
+        if (!Utils::checkJsonAlloc(root, __FUNCTION__, __LINE__)) {
+            return;
+        }
+
+        String buffer;
+        serializeJson(root, buffer);
+        publish(configTopic, buffer);
+    } else {
+        publish(configTopic, {});
+    }
+}
+
+void MqttHandleHassClass::createPowerMeterInfo(JsonDocument& root, size_t channel, JsyMkClass::Field_t fieldId)
+{
+    auto object = root["dev"].to<JsonObject>();
+
+    String swVersion = JsyMk.getFieldString(channel, JsyMkClass::Field_t::VOLTAGE_RANGE) + JsyMk.getFieldUnit(JsyMkClass::Field_t::VOLTAGE_RANGE)
+        + " " + JsyMk.getFieldString(channel, JsyMkClass::Field_t::CURRENT_RANGE) + JsyMk.getFieldUnit(JsyMkClass::Field_t::CURRENT_RANGE);
+
+    object["name"] = JsyMk.getFieldString(channel, JsyMkClass::Field_t::MODEL) + " Channel " + String(channel);
+    object["identifiers"] = JsyMk.getFieldString(channel, JsyMkClass::Field_t::MODEL) + "-" + String(channel);
+    object["configuration_url"] = getDtuUrl();
+    object["manufacturer"] = JsyMk.getFieldString(channel, JsyMkClass::Field_t::MANUFACTURER);
+    object["model"] = JsyMk.getFieldString(channel, JsyMkClass::Field_t::MODEL);
+    object["sw_version"] = swVersion;
+    object["hw_version"] = JsyMk.getFieldString(channel, JsyMkClass::Field_t::VERSION);
+    object["via_device"] = getDtuUniqueId();
 }
 
 void MqttHandleHassClass::createInverterInfo(JsonDocument& root, std::shared_ptr<InverterAbstract> inv)

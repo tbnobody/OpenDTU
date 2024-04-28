@@ -86,6 +86,10 @@ void WebApiDeviceClass::onDeviceAdminGet(AsyncWebServerRequest* request)
         led["brightness"] = config.Led_Single[i].Brightness;
     }
 
+    auto serialModbusPinObj = curPin["serial_modbus"].to<JsonObject>();
+    serialModbusPinObj["tx"] = pin.serial_modbus_tx;
+    serialModbusPinObj["rx"] = pin.serial_modbus_rx;
+
     WebApi.sendJsonResponse(request, response, __FUNCTION__, __LINE__);
 }
 

@@ -4,7 +4,11 @@
 [![cpplint](https://github.com/tbnobody/OpenDTU/actions/workflows/cpplint.yml/badge.svg)](https://github.com/tbnobody/OpenDTU/actions/workflows/cpplint.yml)
 [![Yarn Linting](https://github.com/tbnobody/OpenDTU/actions/workflows/yarnlint.yml/badge.svg)](https://github.com/tbnobody/OpenDTU/actions/workflows/yarnlint.yml)
 
-## !! IMPORTANT UPGRADE NOTES !!
+# Fork
+
+This fork add support of [JSY-MK power meter modules](https://www.jsypowermeter.com/).
+
+## !! IMPORTANT UPGRADE NOTES
 
 If you are upgrading from a version before 15.03.2023 you have to upgrade the partition table of the ESP32. Please follow the [this](docs/UpgradePartition.md) documentation!
 

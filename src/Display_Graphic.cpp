@@ -4,6 +4,7 @@
  */
 #include "Display_Graphic.h"
 #include "Datastore.h"
+#include "JsyMk.h"
 #include <NetworkSettings.h>
 #include <map>
 #include <time.h>
@@ -40,6 +41,15 @@ static const char* const i18n_yield_total_kwh[] = { "total: %.1f kWh", "Ges.: %.
 static const char* const i18n_yield_total_mwh[] = { "total: %.0f kWh", "Ges.: %.0f kWh", "total: %.0f kWh" };
 
 static const char* const i18n_date_format[] = { "%m/%d/%Y %H:%M", "%d.%m.%Y %H:%M", "%d/%m/%Y %H:%M" };
+
+static const char* const i18n_powermeter_power_w[] = { "%c %.0f W", "%c %.0f W", "%c %.0f W" };
+static const char* const i18n_powermeter_power_kw[] = { "%c %.1f kW", "%c %.1f kW", "%c %.1f kW" };
+
+static const char* const i18n_pm_positive_today_wh[] = { "In: %4.0f Wh", "In: %4.0f Wh", "In: %4.0f Wh" };
+static const char* const i18n_pm_positive_today_kwh[] = { "In: %.1f kWh", "In: %.1f kWh", "In: %.1f kWh" };
+
+static const char* const i18n_pm_negative_today_wh[] = { "Out: %4.0f Wh", "Out: %4.0f Wh", "Out: %4.0f Wh" };
+static const char* const i18n_pm_negative_today_kwh[] = { "Out: %.1f kWh", "Out: %.1f kWh", "Out: %.1f kWh" };
 
 DisplayGraphicClass::DisplayGraphicClass()
     : _loopTask(TASK_IMMEDIATE, TASK_FOREVER, std::bind(&DisplayGraphicClass::loop, this))
@@ -202,8 +212,21 @@ void DisplayGraphicClass::loop()
     bool displayPowerSave = false;
     bool showText = true;
 
+    bool displayPowerMeter = _mExtra % (10 * 2) < 10 && JsyMk.isInitialised(); // Every 10 seconds, swap screen
+
+    if (displayPowerMeter) {
+        const float watts = std::fabs(JsyMk.getFieldValue(0, JsyMkClass::Field_t::POWER));
+        const char direction = (JsyMk.getFieldValue(0, JsyMkClass::Field_t::NEGATIVE) > 0) ? 'O' : 'I';
+
+        if (watts > 999) {
+            snprintf(_fmtText, sizeof(_fmtText), i18n_powermeter_power_kw[_display_language], direction, watts / 1000);
+        } else {
+            snprintf(_fmtText, sizeof(_fmtText), i18n_powermeter_power_w[_display_language], direction, watts);
+        }
+        printText(_fmtText, 0);
+    }
     //=====> Actual Production ==========
-    if (Datastore.getIsAtLeastOneReachable()) {
+    else if (Datastore.getIsAtLeastOneReachable()) {
         displayPowerSave = false;
         if (_isLarge) {
             uint8_t screenSaverOffsetX = enableScreensaver ? (_mExtra % 7) : 0;
@@ -246,20 +269,40 @@ void DisplayGraphicClass::loop()
     //<=======================
 
     if (showText) {
-        // Daily production
-        float wattsToday = Datastore.getTotalAcYieldDayEnabled();
-        if (wattsToday >= 10000) {
-            snprintf(_fmtText, sizeof(_fmtText), i18n_yield_today_kwh[_display_language], wattsToday / 1000);
-        } else {
-            snprintf(_fmtText, sizeof(_fmtText), i18n_yield_today_wh[_display_language], wattsToday);
-        }
-        printText(_fmtText, 1);
+        if (displayPowerMeter) {
+            // Daily Input
+            float wattsInput = JsyMk.getFieldValue(0, JsyMkClass::Field_t::TODAY_POSITIVE_ENERGY);
+            if (wattsInput > 999) {
+                snprintf(_fmtText, sizeof(_fmtText), i18n_pm_positive_today_kwh[_display_language], wattsInput / 1000);
+            } else {
+                snprintf(_fmtText, sizeof(_fmtText), i18n_pm_positive_today_wh[_display_language], wattsInput);
+            }
+            printText(_fmtText, 1);
 
-        // Total production
-        const float wattsTotal = Datastore.getTotalAcYieldTotalEnabled();
-        auto const format = (wattsTotal >= 1000) ? i18n_yield_total_mwh : i18n_yield_total_kwh;
-        snprintf(_fmtText, sizeof(_fmtText), format[_display_language], wattsTotal);
-        printText(_fmtText, 2);
+            // Daily Output
+            float wattsOutput = JsyMk.getFieldValue(0, JsyMkClass::Field_t::TODAY_POSITIVE_ENERGY);
+            if (wattsOutput > 999) {
+                snprintf(_fmtText, sizeof(_fmtText), i18n_pm_negative_today_kwh[_display_language], wattsOutput / 1000);
+            } else {
+                snprintf(_fmtText, sizeof(_fmtText), i18n_pm_negative_today_wh[_display_language], wattsOutput);
+            }
+            printText(_fmtText, 2);
+        } else {
+            // Daily production
+            float wattsToday = Datastore.getTotalAcYieldDayEnabled();
+            if (wattsToday >= 10000) {
+                snprintf(_fmtText, sizeof(_fmtText), i18n_yield_today_kwh[_display_language], wattsToday / 1000);
+            } else {
+                snprintf(_fmtText, sizeof(_fmtText), i18n_yield_today_wh[_display_language], wattsToday);
+            }
+            printText(_fmtText, 1);
+
+            // Total production
+            const float wattsTotal = Datastore.getTotalAcYieldTotalEnabled();
+            auto const format = (wattsTotal >= 1000) ? i18n_yield_total_mwh : i18n_yield_total_kwh;
+            snprintf(_fmtText, sizeof(_fmtText), format[_display_language], wattsTotal);
+            printText(_fmtText, 2);
+        }
 
         //=====> IP or Date-Time ========
         // Change every 3 seconds

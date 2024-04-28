@@ -6,12 +6,14 @@
 #include "Datastore.h"
 #include "Display_Graphic.h"
 #include "InverterSettings.h"
+#include "JsyMk.h"
 #include "Led_Single.h"
 #include "MessageOutput.h"
 #include "MqttHandleDtu.h"
 #include "MqttHandleHass.h"
 #include "MqttHandleInverter.h"
 #include "MqttHandleInverterTotal.h"
+#include "MqttHandlePowerMeter.h"
 #include "MqttSettings.h"
 #include "NetworkSettings.h"
 #include "NtpSettings.h"
@@ -107,6 +109,7 @@ void setup()
     MqttHandleDtu.init(scheduler);
     MqttHandleInverter.init(scheduler);
     MqttHandleInverterTotal.init(scheduler);
+    MqttHandlePowerMeter.init(scheduler);
     MqttHandleHass.init(scheduler);
     MessageOutput.println("done");
 
@@ -136,6 +139,11 @@ void setup()
     // Initialize Single LEDs
     MessageOutput.print("Initialize LEDs... ");
     LedSingle.init(scheduler);
+    MessageOutput.println("done");
+
+    // Initialize JSY-MK-xxxT
+    MessageOutput.print("Initialize JSY-MK-xxxT... ");
+    JsyMk.init(scheduler);
     MessageOutput.println("done");
 
     // Check for default DTU serial

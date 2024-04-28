@@ -84,6 +84,14 @@
 #define CMT_SDIO -1
 #endif
 
+#ifndef SERIAL_MODBUS_TX
+#define SERIAL_MODBUS_TX -1
+#endif
+
+#ifndef SERIAL_MODBUS_RX
+#define SERIAL_MODBUS_RX -1
+#endif
+
 PinMappingClass PinMapping;
 
 PinMappingClass::PinMappingClass()
@@ -124,6 +132,9 @@ PinMappingClass::PinMappingClass()
 
     _pinMapping.led[0] = LED0;
     _pinMapping.led[1] = LED1;
+
+    _pinMapping.serial_modbus_tx = SERIAL_MODBUS_TX;
+    _pinMapping.serial_modbus_rx = SERIAL_MODBUS_RX;
 }
 
 PinMapping_t& PinMappingClass::get()
@@ -186,6 +197,9 @@ bool PinMappingClass::init(const String& deviceMapping)
             _pinMapping.led[0] = doc[i]["led"]["led0"] | LED0;
             _pinMapping.led[1] = doc[i]["led"]["led1"] | LED1;
 
+            _pinMapping.serial_modbus_tx = doc[i]["serial_modbus"]["tx"] | SERIAL_MODBUS_TX;
+            _pinMapping.serial_modbus_rx = doc[i]["serial_modbus"]["rx"] | SERIAL_MODBUS_RX;
+
             return true;
         }
     }
@@ -214,4 +228,9 @@ bool PinMappingClass::isValidCmt2300Config() const
 bool PinMappingClass::isValidEthConfig() const
 {
     return _pinMapping.eth_enabled;
+}
+
+bool PinMappingClass::isValidSerialModbusConfig() const
+{
+    return _pinMapping.serial_modbus_tx >= 0 && _pinMapping.serial_modbus_rx >= 0;
 }

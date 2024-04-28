@@ -1,0 +1,13 @@
+{
+    "name": "SerialModbusRTU",
+    "keywords": "serial, modbus, RTU",
+    "description": "Serial Modus RTU protocol",
+    "authors": {
+        "name": "Benoit Leforestier"
+    },
+    "version": "0.1.0",
+    "frameworks": "arduino",
+    "platforms": [
+        "espressif32"
+    ]
+}

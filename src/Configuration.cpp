@@ -139,6 +139,18 @@ bool ConfigurationClass::write()
         }
     }
 
+    JsonObject serialModbus = doc["serial_modbus"].to<JsonObject>();
+    serialModbus["baudrate"] = config.SerialModbus.BaudRate;
+    serialModbus["poll_interval"] = config.SerialModbus.PollInterval;
+
+    JsonObject powerMeter = doc["power_meter"].to<JsonObject>();
+    JsonArray channel = powerMeter["channel"].to<JsonArray>();
+    for (uint8_t c = 0; c < PWRMTR_MAX_CHAN_COUNT; c++) {
+        JsonObject chanData = channel.add<JsonObject>();
+        chanData["invert_direction"] = config.PowerMeter.channel[c].InvertDirection;
+        chanData["negative_power"] = config.PowerMeter.channel[c].NegativePower;
+    }
+
     if (!Utils::checkJsonAlloc(doc, __FUNCTION__, __LINE__)) {
         return false;
     }
@@ -310,6 +322,17 @@ bool ConfigurationClass::read()
             config.Inverter[i].channel[c].YieldTotalOffset = channel[c]["yield_total_offset"] | 0.0f;
             strlcpy(config.Inverter[i].channel[c].Name, channel[c]["name"] | "", sizeof(config.Inverter[i].channel[c].Name));
         }
+    }
+
+    JsonObject serialModbus = doc["serial_modbus"];
+    config.SerialModbus.BaudRate = serialModbus["baudrate"] | SERIAL_MODBUS_BAUDRATE;
+    config.SerialModbus.PollInterval = serialModbus["poll_interval"] | SERIAL_MODBUS_POLL_INTERVAL;
+
+    JsonObject powerMeter = doc["power_meter"];
+    JsonArray channel = powerMeter["channel"];
+    for (uint8_t c = 0; c < PWRMTR_MAX_CHAN_COUNT; c++) {
+        config.PowerMeter.channel[c].InvertDirection = channel[c]["invert_direction"] | false;
+        config.PowerMeter.channel[c].NegativePower = channel[c]["negative_power"] | false;
     }
 
     f.close();

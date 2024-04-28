@@ -4,6 +4,7 @@
  */
 #include "WebApi_ws_live.h"
 #include "Datastore.h"
+#include "JsyMk.h"
 #include "MessageOutput.h"
 #include "Utils.h"
 #include "WebApi.h"
@@ -82,6 +83,9 @@ void WebApiWsLiveClass::sendDataTaskCb()
             generateCommonJsonResponse(var);
             generateInverterCommonJsonResponse(invObject, inv);
             generateInverterChannelJsonResponse(invObject, inv);
+
+            auto powerMeter = var["power_meter"].to<JsonObject>();
+            generatePowerMeterJsonResponse(powerMeter);
 
             if (!Utils::checkJsonAlloc(root, __FUNCTION__, __LINE__)) {
                 continue;
@@ -247,6 +251,9 @@ void WebApiWsLiveClass::onLivedataStatus(AsyncWebServerRequest* request)
             }
         }
 
+        auto powerMeter = root["power_meter"].to<JsonObject>();
+        generatePowerMeterJsonResponse(powerMeter);
+
         generateCommonJsonResponse(root);
 
         WebApi.sendJsonResponse(request, response, __FUNCTION__, __LINE__);
@@ -257,5 +264,57 @@ void WebApiWsLiveClass::onLivedataStatus(AsyncWebServerRequest* request)
     } catch (const std::exception& exc) {
         MessageOutput.printf("Unknown exception in /api/livedata/status. Reason: \"%s\".\r\n", exc.what());
         WebApi.sendTooManyRequests(request);
+    }
+}
+
+void WebApiWsLiveClass::generatePowerMeterJsonResponse(JsonObject& root)
+{
+    if (!JsyMk.isInitialised())
+        return;
+
+    root["data_age"] = (millis() - JsyMk.getLastUpdate()) / 1000;
+
+    for (auto field : {
+             JsyMkClass::Field_t::ADDRESS,
+             JsyMkClass::Field_t::MANUFACTURER,
+             JsyMkClass::Field_t::MODEL,
+             JsyMkClass::Field_t::VERSION }) {
+
+        String name = JsyMk.getFieldName(0, field);
+        root[name]["v"] = JsyMk.getFieldString(0, field);
+        root[name]["u"] = JsyMk.getFieldUnit(field);
+        root[name]["d"] = JsyMk.getFieldDigits(field);
+    }
+
+    for (auto field : {
+             JsyMkClass::Field_t::VOLTAGE_RANGE,
+             JsyMkClass::Field_t::CURRENT_RANGE }) {
+
+        String name = JsyMk.getFieldName(0, field);
+        root[name]["v"] = JsyMk.getFieldValue(0, field);
+        root[name]["u"] = JsyMk.getFieldUnit(field);
+        root[name]["d"] = JsyMk.getFieldDigits(field);
+    }
+
+    for (size_t i = 0; i < JsyMk.getChannelNumber(); ++i) {
+        for (auto field : {
+                 JsyMkClass::Field_t::VOLTAGE,
+                 JsyMkClass::Field_t::CURRENT,
+                 JsyMkClass::Field_t::POWER,
+                 JsyMkClass::Field_t::POWER_FACTOR,
+                 JsyMkClass::Field_t::FREQUENCY,
+                 JsyMkClass::Field_t::NEGATIVE,
+                 JsyMkClass::Field_t::TODAY_POSITIVE_ENERGY,
+                 JsyMkClass::Field_t::TODAY_NEGATIVE_ENERGY,
+                 JsyMkClass::Field_t::TOTAL_POSITIVE_ENERGY,
+                 JsyMkClass::Field_t::TOTAL_NEGATIVE_ENERGY }) {
+
+            String channel(i);
+            String name = JsyMk.getFieldName(i, field);
+
+            root[channel][name]["v"] = JsyMk.getFieldValue(i, field);
+            root[channel][name]["u"] = JsyMk.getFieldUnit(field);
+            root[channel][name]["d"] = JsyMk.getFieldDigits(field);
+        }
     }
 }

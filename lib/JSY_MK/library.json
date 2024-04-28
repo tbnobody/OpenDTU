@@ -1,0 +1,13 @@
+{
+    "name": "JSY_MK",
+    "keywords": "modbus, RTU, energy",
+    "description": "JSY_MK",
+    "authors": {
+        "name": "Benoit Leforestier"
+    },
+    "version": "0.1.0",
+    "frameworks": "arduino",
+    "platforms": [
+        "espressif32"
+    ]
+}
