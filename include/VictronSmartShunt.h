@@ -9,7 +9,9 @@ public:
     void deinit() final { }
     void loop() final;
     std::shared_ptr<BatteryStats> getStats() const final { return _stats; }
-    bool usesHwPort2() const final { return true; }
+    bool usesHwPort2() const final {
+        return ARDUINO_USB_CDC_ON_BOOT != 1;
+    }
 
 private:
     uint32_t _lastUpdate = 0;

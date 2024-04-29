@@ -5,7 +5,8 @@ VeDirectShuntController VeDirectShunt;
 
 void VeDirectShuntController::init(int8_t rx, int8_t tx, Print* msgOut, bool verboseLogging)
 {
-	VeDirectFrameHandler::init("SmartShunt", rx, tx, msgOut, verboseLogging, 2);
+	VeDirectFrameHandler::init("SmartShunt", rx, tx, msgOut, verboseLogging,
+			((ARDUINO_USB_CDC_ON_BOOT != 1)?2:0));
 }
 
 bool VeDirectShuntController::processTextDataDerived(std::string const& name, std::string const& value)
