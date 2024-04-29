@@ -191,7 +191,7 @@ export default defineComponent({
                 const remoteHostUrl = "/api/system/status";
 
                 // Use a simple fetch request to check if the remote host is reachable
-                fetch(remoteHostUrl, { method: 'HEAD' })
+                fetch(remoteHostUrl, { method: 'GET' })
                     .then(response => {
                         // Check if the response status is OK (200-299 range)
                         if (response.ok) {

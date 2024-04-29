@@ -41,7 +41,7 @@ export function isLoggedIn(): boolean {
     return (localStorage.getItem('user') != null);
 }
 
-export function login(username: String, password: String) {
+export function login(username: string, password: string) {
     const requestOptions = {
         method: 'GET',
         headers: {
@@ -74,9 +74,11 @@ export function handleResponse(response: Response, emitter: Emitter<Record<Event
                 logout();
                 emitter.emit("logged-out");
                 router.push({ path: "/login", query: { returnUrl: router.currentRoute.value.fullPath } });
+                return Promise.reject();
             }
 
             const error = { message: (data && data.message) || response.statusText, status: response.status || 0 };
+            router.push({ name: "Error", params: error });
             return Promise.reject(error);
         }
 

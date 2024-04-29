@@ -45,7 +45,7 @@ void WebApiPowerMeterClass::decodeJsonPhaseConfig(JsonObject const& json, PowerM
 
 void WebApiPowerMeterClass::onStatus(AsyncWebServerRequest* request)
 {
-    AsyncJsonResponse* response = new AsyncJsonResponse(false, 2048);
+    AsyncJsonResponse* response = new AsyncJsonResponse();
     auto& root = response->getRoot();
     const CONFIG_T& config = Configuration.get();
 
@@ -60,11 +60,11 @@ void WebApiPowerMeterClass::onStatus(AsyncWebServerRequest* request)
     root["sdmaddress"] = config.PowerMeter.SdmAddress;
     root["http_individual_requests"] = config.PowerMeter.HttpIndividualRequests;
 
-    JsonArray httpPhases = root.createNestedArray("http_phases");
-
+    auto httpPhases = root["http_phases"].to<JsonArray>();
+ 
     for (uint8_t i = 0; i < POWERMETER_MAX_PHASES; i++) {
-        JsonObject phaseObject = httpPhases.createNestedObject();
-
+        auto phaseObject = httpPhases.add<JsonObject>();
+  
         phaseObject["index"] = i + 1;
         phaseObject["enabled"] = config.PowerMeter.Http_Phase[i].Enabled;
         phaseObject["url"] = String(config.PowerMeter.Http_Phase[i].Url);
@@ -79,8 +79,7 @@ void WebApiPowerMeterClass::onStatus(AsyncWebServerRequest* request)
         phaseObject["sign_inverted"] = config.PowerMeter.Http_Phase[i].SignInverted;
     }
 
-    response->setLength();
-    request->send(response);
+    WebApi.sendJsonResponse(request, response, __FUNCTION__, __LINE__);
 }
 
 void WebApiPowerMeterClass::onAdminGet(AsyncWebServerRequest* request)
@@ -99,34 +98,12 @@ void WebApiPowerMeterClass::onAdminPost(AsyncWebServerRequest* request)
     }
 
     AsyncJsonResponse* response = new AsyncJsonResponse();
+    JsonDocument root;
+    if (!WebApi.parseRequestData(request, response, root)) {
+        return;
+    }
+
     auto& retMsg = response->getRoot();
-    retMsg["type"] = "warning";
-
-    if (!request->hasParam("data", true)) {
-        retMsg["message"] = "No values found!";
-        response->setLength();
-        request->send(response);
-        return;
-    }
-
-    String json = request->getParam("data", true)->value();
-
-    if (json.length() > 4096) {
-        retMsg["message"] = "Data too large!";
-        response->setLength();
-        request->send(response);
-        return;
-    }
-
-    DynamicJsonDocument root(4096);
-    DeserializationError error = deserializeJson(root, json);
-
-    if (error) {
-        retMsg["message"] = "Failed to parse data!";
-        response->setLength();
-        request->send(response);
-        return;
-    }
 
     if (!(root.containsKey("enabled") && root.containsKey("source"))) {
         retMsg["message"] = "Values are missing!";
@@ -201,8 +178,8 @@ void WebApiPowerMeterClass::onAdminPost(AsyncWebServerRequest* request)
 
     WebApi.writeConfig(retMsg);
 
-    response->setLength();
-    request->send(response);
+    WebApi.sendJsonResponse(request, response, __FUNCTION__, __LINE__);
+
 
     // reboot requiered as per https://github.com/helgeerbe/OpenDTU-OnBattery/issues/565#issuecomment-1872552559
     yield();
@@ -218,34 +195,12 @@ void WebApiPowerMeterClass::onTestHttpRequest(AsyncWebServerRequest* request)
     }
 
     AsyncJsonResponse* asyncJsonResponse = new AsyncJsonResponse();
+    JsonDocument root;
+    if (!WebApi.parseRequestData(request, asyncJsonResponse, root)) {
+        return;
+    }
+
     auto& retMsg = asyncJsonResponse->getRoot();
-    retMsg["type"] = "warning";
-
-    if (!request->hasParam("data", true)) {
-        retMsg["message"] = "No values found!";
-        asyncJsonResponse->setLength();
-        request->send(asyncJsonResponse);
-        return;
-    }
-
-    String json = request->getParam("data", true)->value();
-
-    if (json.length() > 2048) {
-        retMsg["message"] = "Data too large!";
-        asyncJsonResponse->setLength();
-        request->send(asyncJsonResponse);
-        return;
-    }
-
-    DynamicJsonDocument root(2048);
-    DeserializationError error = deserializeJson(root, json);
-
-    if (error) {
-        retMsg["message"] = "Failed to parse data!";
-        asyncJsonResponse->setLength();
-        request->send(asyncJsonResponse);
-        return;
-    }
 
     if (!root.containsKey("url") || !root.containsKey("auth_type") || !root.containsKey("username") || !root.containsKey("password") 
             || !root.containsKey("header_key") || !root.containsKey("header_value")
