@@ -72,40 +72,16 @@ void WebApiHuaweiClass::onPost(AsyncWebServerRequest* request)
     }
 
     AsyncJsonResponse* response = new AsyncJsonResponse();
-    auto& retMsg = response->getRoot();
-    retMsg["type"] = "warning";
-
-    if (!request->hasParam("data", true)) {
-        retMsg["message"] = "No values found!";
-        retMsg["code"] = WebApiError::GenericNoValueFound;
-        response->setLength();
-        request->send(response);
-        return;
-    }
-
-    String json = request->getParam("data", true)->value();
-
-    if (json.length() > 1024) {
-        retMsg["message"] = "Data too large!";
-        retMsg["code"] = WebApiError::GenericDataTooLarge;
-        response->setLength();
-        request->send(response);
-        return;
-    }
-
     JsonDocument root;
-    DeserializationError error = deserializeJson(root, json);
+    if (!WebApi.parseRequestData(request, response, root)) {
+        return;
+    }
+
     float value;
     uint8_t online = true;
     float minimal_voltage;
 
-    if (error) {
-        retMsg["message"] = "Failed to parse data!";
-        retMsg["code"] = WebApiError::GenericParseError;
-        response->setLength();
-        request->send(response);
-        return;
-    }
+    auto& retMsg = response->getRoot();
 
     if (root.containsKey("online")) {
         online = root["online"].as<bool>();
@@ -203,39 +179,14 @@ void WebApiHuaweiClass::onAdminPost(AsyncWebServerRequest* request)
     if (!WebApi.checkCredentials(request)) {
         return;
     }
-    
+
     AsyncJsonResponse* response = new AsyncJsonResponse();
-    auto& retMsg = response->getRoot();
-    retMsg["type"] = "warning";
-
-    if (!request->hasParam("data", true)) {
-        retMsg["message"] = "No values found!";
-        retMsg["code"] = WebApiError::GenericNoValueFound;
-        response->setLength();
-        request->send(response);
-        return;
-    }
-
-    String json = request->getParam("data", true)->value();
-
-    if (json.length() > 1024) {
-        retMsg["message"] = "Data too large!";
-        retMsg["code"] = WebApiError::GenericDataTooLarge;
-        response->setLength();
-        request->send(response);
-        return;
-    }
-
     JsonDocument root;
-    DeserializationError error = deserializeJson(root, json);
-
-    if (error) {
-        retMsg["message"] = "Failed to parse data!";
-        retMsg["code"] = WebApiError::GenericParseError;
-        response->setLength();
-        request->send(response);
+    if (!WebApi.parseRequestData(request, response, root)) {
         return;
     }
+
+    auto& retMsg = response->getRoot();
 
     if (!(root.containsKey("enabled")) ||
         !(root.containsKey("can_controller_frequency")) ||

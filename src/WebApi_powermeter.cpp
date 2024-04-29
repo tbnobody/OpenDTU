@@ -98,34 +98,12 @@ void WebApiPowerMeterClass::onAdminPost(AsyncWebServerRequest* request)
     }
 
     AsyncJsonResponse* response = new AsyncJsonResponse();
-    auto& retMsg = response->getRoot();
-    retMsg["type"] = "warning";
-
-    if (!request->hasParam("data", true)) {
-        retMsg["message"] = "No values found!";
-        response->setLength();
-        request->send(response);
-        return;
-    }
-
-    String json = request->getParam("data", true)->value();
-
-    if (json.length() > 4096) {
-        retMsg["message"] = "Data too large!";
-        response->setLength();
-        request->send(response);
-        return;
-    }
-
     JsonDocument root;
-    DeserializationError error = deserializeJson(root, json);
-
-    if (error) {
-        retMsg["message"] = "Failed to parse data!";
-        response->setLength();
-        request->send(response);
+    if (!WebApi.parseRequestData(request, response, root)) {
         return;
     }
+
+    auto& retMsg = response->getRoot();
 
     if (!(root.containsKey("enabled") && root.containsKey("source"))) {
         retMsg["message"] = "Values are missing!";
@@ -217,34 +195,12 @@ void WebApiPowerMeterClass::onTestHttpRequest(AsyncWebServerRequest* request)
     }
 
     AsyncJsonResponse* asyncJsonResponse = new AsyncJsonResponse();
-    auto& retMsg = asyncJsonResponse->getRoot();
-    retMsg["type"] = "warning";
-
-    if (!request->hasParam("data", true)) {
-        retMsg["message"] = "No values found!";
-        asyncJsonResponse->setLength();
-        request->send(asyncJsonResponse);
-        return;
-    }
-
-    String json = request->getParam("data", true)->value();
-
-    if (json.length() > 2048) {
-        retMsg["message"] = "Data too large!";
-        asyncJsonResponse->setLength();
-        request->send(asyncJsonResponse);
-        return;
-    }
-
     JsonDocument root;
-    DeserializationError error = deserializeJson(root, json);
-
-    if (error) {
-        retMsg["message"] = "Failed to parse data!";
-        asyncJsonResponse->setLength();
-        request->send(asyncJsonResponse);
+    if (!WebApi.parseRequestData(request, asyncJsonResponse, root)) {
         return;
     }
+
+    auto& retMsg = asyncJsonResponse->getRoot();
 
     if (!root.containsKey("url") || !root.containsKey("auth_type") || !root.containsKey("username") || !root.containsKey("password") 
             || !root.containsKey("header_key") || !root.containsKey("header_value")

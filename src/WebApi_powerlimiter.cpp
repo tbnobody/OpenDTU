@@ -122,33 +122,12 @@ void WebApiPowerLimiterClass::onAdminPost(AsyncWebServerRequest* request)
     }
 
     AsyncJsonResponse* response = new AsyncJsonResponse();
-    auto& retMsg = response->getRoot();
-    retMsg["type"] = "warning";
-
-    if (!request->hasParam("data", true)) {
-        retMsg["message"] = "No values found!";
-        response->setLength();
-        request->send(response);
-        return;
-    }
-
-    String json = request->getParam("data", true)->value();
-
-    if (json.length() > 1024) {
-        retMsg["message"] = "Data too large!";
-        response->setLength();
-        request->send(response);
-        return;
-    }
-
     JsonDocument root;
-    DeserializationError error = deserializeJson(root, json);
-
-    if (error) {
-        retMsg["message"] = "Failed to parse data!";
-        WebApi.sendJsonResponse(request, response, __FUNCTION__, __LINE__);
+    if (!WebApi.parseRequestData(request, response, root)) {
         return;
     }
+
+    auto& retMsg = response->getRoot();
 
     // we were not actually checking for all the keys we (unconditionally)
     // access below for a long time, and it is technically not needed if users
