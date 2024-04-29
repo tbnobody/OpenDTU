@@ -244,8 +244,8 @@ export default defineComponent({
     },
     watch: {
         'powerLimiterConfigList.inverter_serial'(newVal) {
-            var cfg = this.powerLimiterConfigList;
-            var meta = this.powerLimiterMetaData;
+            const cfg = this.powerLimiterConfigList;
+            const meta = this.powerLimiterMetaData;
 
             if (newVal === "") { return; } // do not try to convert the placeholder value
 
@@ -271,9 +271,9 @@ export default defineComponent({
     },
     methods: {
         getConfigHints() {
-            var cfg = this.powerLimiterConfigList;
-            var meta = this.powerLimiterMetaData;
-            var hints = [];
+            const cfg = this.powerLimiterConfigList;
+            const meta = this.powerLimiterMetaData;
+            const hints = [];
 
             if (meta.power_meter_enabled !== true) {
                 hints.push({severity: "optional", subject: "PowerMeterDisabled"});
@@ -284,7 +284,7 @@ export default defineComponent({
                 this.configAlert = true;
             }
             else {
-                var inv = meta.inverters[cfg.inverter_serial];
+                const inv = meta.inverters[cfg.inverter_serial];
                 if (inv !== undefined && !(inv.poll_enable && inv.command_enable && inv.poll_enable_night && inv.command_enable_night)) {
                     hints.push({severity: "requirement", subject: "InverterCommunication"});
                 }
@@ -309,19 +309,19 @@ export default defineComponent({
             return this.powerLimiterMetaData.power_meter_enabled;
         },
         canUseSolarPassthrough() {
-            var cfg = this.powerLimiterConfigList;
-            var meta = this.powerLimiterMetaData;
-            var canUse = this.isEnabled() && meta.charge_controller_enabled && !cfg.is_inverter_solar_powered;
+            const cfg = this.powerLimiterConfigList;
+            const meta = this.powerLimiterMetaData;
+            const canUse = this.isEnabled() && meta.charge_controller_enabled && !cfg.is_inverter_solar_powered;
             if (!canUse) { cfg.solar_passthrough_enabled = false; }
             return canUse;
         },
         canUseSoCThresholds() {
-            var cfg = this.powerLimiterConfigList;
-            var meta = this.powerLimiterMetaData;
+            const cfg = this.powerLimiterConfigList;
+            const meta = this.powerLimiterMetaData;
             return this.isEnabled() && meta.battery_enabled && !cfg.is_inverter_solar_powered;
         },
         canUseVoltageThresholds() {
-            var cfg = this.powerLimiterConfigList;
+            const cfg = this.powerLimiterConfigList;
             return this.isEnabled() && !cfg.is_inverter_solar_powered;
         },
         isSolarPassthroughEnabled() {
@@ -331,10 +331,10 @@ export default defineComponent({
             return Array.from(Array(end).keys());
         },
         needsChannelSelection() {
-            var cfg = this.powerLimiterConfigList;
-            var meta = this.powerLimiterMetaData;
+            const cfg = this.powerLimiterConfigList;
+            const meta = this.powerLimiterMetaData;
 
-            var reset = function() {
+            const reset = function() {
                 cfg.inverter_channel_id = 0;
                 return false;
             };
@@ -343,7 +343,7 @@ export default defineComponent({
 
             if (cfg.is_inverter_solar_powered) { return reset(); }
 
-            var inverter = meta.inverters[cfg.inverter_serial];
+            const inverter = meta.inverters[cfg.inverter_serial];
             if (inverter === undefined) { return reset(); }
 
             if (cfg.inverter_channel_id >= inverter.channels) {

@@ -164,7 +164,7 @@ export default defineComponent({
 
             this.socket.onmessage = (event) => {
                 console.log(event);
-                var root = JSON.parse(event.data);
+                const root = JSON.parse(event.data);
                 this.dplData = root["dpl"];
                 if (root["vedirect"]["full_update"] === true) {
                     this.vedirect = root["vedirect"];
@@ -192,7 +192,7 @@ export default defineComponent({
                     clearTimeout(this.dataAgeTimers[serial]);
                 }
 
-                var nextMs = 1000 - (this.vedirect.instances[serial].data_age_ms % 1000);
+                const nextMs = 1000 - (this.vedirect.instances[serial].data_age_ms % 1000);
                 this.dataAgeTimers[serial] = setTimeout(() => {
                     this.doDataAging(serial);
                 }, nextMs);

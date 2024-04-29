@@ -281,7 +281,7 @@ export default defineComponent({
                     this.powerMeterConfigList = data;
                     this.dataLoading = false;
 
-                    for (var i = 0; i < this.powerMeterConfigList.http_phases.length; i++) {
+                    for (let i = 0; i < this.powerMeterConfigList.http_phases.length; i++) {
                         this.testHttpRequestAlert.push({
                             message: "",
                             type: "",
@@ -312,7 +312,7 @@ export default defineComponent({
                 );
         },
         testHttpRequest(index: number) {
-            var phaseConfig:PowerMeterHttpPhaseConfig;
+            let phaseConfig:PowerMeterHttpPhaseConfig;
 
             if (this.powerMeterConfigList.http_individual_requests) {
                 phaseConfig = this.powerMeterConfigList.http_phases[index];
