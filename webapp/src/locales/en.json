@@ -32,6 +32,9 @@
         "Release": "Release to refresh",
         "Close": "Close"
     },
+    "Error": {
+        "Oops": "Oops!"
+    },
     "localeswitcher": {
         "Dark": "Dark",
         "Light": "Light",

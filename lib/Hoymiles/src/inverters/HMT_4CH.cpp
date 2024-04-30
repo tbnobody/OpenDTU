@@ -70,7 +70,7 @@ bool HMT_4CH::isValidSerial(const uint64_t serial)
 
 String HMT_4CH::typeName() const
 {
-    return F("HMT-1600/1800/2000-4T");
+    return "HMT-1600/1800/2000-4T";
 }
 
 const byteAssign_t* HMT_4CH::getByteAssignment() const

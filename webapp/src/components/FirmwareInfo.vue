@@ -83,10 +83,10 @@ export default defineComponent({
     },
     computed: {
         modelAllowVersionInfo: {
-            get(): any {
+            get(): boolean {
                 return !!this.allowVersionInfo;
             },
-            set(value: any) {
+            set(value: boolean) {
                 this.$emit('update:allowVersionInfo', value);
             },
         },

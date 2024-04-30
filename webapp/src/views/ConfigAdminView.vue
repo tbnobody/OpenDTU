@@ -188,8 +188,8 @@ export default defineComponent({
             fetch("/api/config/get?file=" + this.backupFileSelect, { headers: authHeader() })
                 .then(res => res.blob())
                 .then(blob => {
-                    var file = window.URL.createObjectURL(blob);
-                    var a = document.createElement('a');
+                    const file = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
                     a.href = file;
                     a.download = this.backupFileSelect;
                     document.body.appendChild(a);

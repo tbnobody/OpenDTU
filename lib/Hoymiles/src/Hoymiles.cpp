@@ -114,7 +114,7 @@ void HoymilesClass::loop()
                 }
 
                 // Fetch grid profile
-                if (iv->Statistics()->getLastUpdate() > 0 && iv->GridProfile()->getLastUpdate() == 0) {
+                if (iv->Statistics()->getLastUpdate() > 0 && (iv->GridProfile()->getLastUpdate() == 0 || !iv->GridProfile()->containsValidData())) {
                     iv->sendGridOnProFileParaRequest();
                 }
 
