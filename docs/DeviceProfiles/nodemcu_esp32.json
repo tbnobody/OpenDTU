@@ -157,12 +157,12 @@
             "cs": -1
         },
         "cmt": {
-            "clk": 18,
-            "cs": 4,
-            "fcs": 5,
-            "sdio": 23,
-            "gpio2": 19,
-            "gpio3": 16
+            "clk": 26,
+            "cs": 32,
+            "fcs": 25,
+            "sdio": 33,
+            "gpio2": -1,
+            "gpio3": -1
         },
         "eth": {
             "enabled": false
