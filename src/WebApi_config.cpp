@@ -40,6 +40,7 @@ void WebApiConfigClass::onConfigGet(AsyncWebServerRequest* request)
             requestFile = name;
         } else {
             request->send(404);
+            return;
         }
     }
 
