@@ -105,14 +105,14 @@ private:
     SPIClass *SPI;
     MCP_CAN  *_CAN;
     uint8_t  _huaweiIrq;                         // IRQ pin
-    uint32_t _nextRequestMillis = 0;              // When to send next data request to PSU 
+    uint32_t _nextRequestMillis = 0;              // When to send next data request to PSU
 
     std::mutex _mutex;
 
     uint32_t _recValues[12];
     uint16_t _txValues[5];
     bool     _hasNewTxValue[5];
-    
+
     uint8_t _errorCode;
     bool _completeUpdateReceived;
 };
@@ -125,8 +125,9 @@ public:
     void setMode(uint8_t mode);
 
     RectifierParameters_t * get();
-    uint32_t getLastUpdate();
-    bool getAutoPowerStatus();
+    uint32_t getLastUpdate() const { return _lastUpdateReceivedMillis; };
+    bool getAutoPowerStatus() const { return _autoPowerEnabled; };
+    uint8_t getMode() const { return _mode; };
 
 private:
     void loop();
