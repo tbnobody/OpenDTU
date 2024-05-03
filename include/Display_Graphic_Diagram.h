@@ -19,6 +19,7 @@ public:
 private:
     void averageLoop();
     void dataPointLoop();
+    void resetDataPoints();
 
     uint32_t getSecondsPerDot();
 
@@ -33,4 +34,5 @@ private:
 
     float _iRunningAverage = 0;
     uint16_t _iRunningAverageCnt = 0;
+    uint32_t _daySeconds = 0;
 };

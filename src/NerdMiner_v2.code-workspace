@@ -1,0 +1,12 @@
+{
+	"folders": [
+		{
+			"path": "../../NerdMiner_v2"
+		},
+		{
+			"name": "OpenDTU",
+			"path": ".."
+		}
+	],
+	"settings": {}
+}

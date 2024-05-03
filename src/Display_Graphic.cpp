@@ -31,8 +31,8 @@ const uint8_t languages[] = {
 
 static const char* const i18n_offline[] = { "Offline", "OFFLINE", "Offline" };
 
-static const char* const i18n_current_power_w[] = { "☀ %.1f W ☀", "☀ %.1f W ☀", "%.1f W ☀" };
-static const char* const i18n_current_power_kw[] = { "☀ %.1f kW ☀", "☀ %.1f kW ☀", "☀ %.1f kW ☀" };
+static const char* const i18n_current_power_w[] = { "%.1f W", "%.1f W", "%.1f W" };
+static const char* const i18n_current_power_kw[] = { "%.1f kW", "%.1f kW", "%.1f kW" };
 
 static const char* const i18n_yield_today_wh[] = { "today: %.0f Wh", "Heute: %.0f Wh", "auj.: %.0f Wh" };
 static const char* const i18n_yield_today_kwh[] = { "today: %.1f kWh", "Heute: %.1f kWh", "auj.: %.1f kWh" };
@@ -189,7 +189,7 @@ void DisplayGraphicClass::loop()
             case DiagramMode_t::Fullscreen:
                 // Every 10 seconds
                 if (_mExtra % (10 * 2) < 10) {
-                    _diagram.redraw(screenSaverOffsetX, 10, 0, _display->getDisplayWidth() - 12, _display->getDisplayHeight() - 3, true);
+                    _diagram.redraw(screenSaverOffsetX, 0, 0, _display->getDisplayWidth(), _display->getDisplayHeight(), true);
                     showText = false;
                 }
                 break;

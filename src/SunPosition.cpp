@@ -39,6 +39,14 @@ bool SunPositionClass::isDayPeriod() const
     return (minutesPastMidnight >= _sunriseMinutes) && (minutesPastMidnight < _sunsetMinutes);
 }
 
+uint32_t SunPositionClass::dayPeriodLength() const
+{
+    if (!_isValidInfo) {
+        return 0;
+    }
+    return (60 * (_sunsetMinutes - _sunriseMinutes));
+}
+
 bool SunPositionClass::isSunsetAvailable() const
 {
     return _isSunsetAvailable;

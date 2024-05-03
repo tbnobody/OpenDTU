@@ -11,6 +11,7 @@ public:
     void init(Scheduler& scheduler);
 
     bool isDayPeriod() const;
+    uint32_t dayPeriodLength() const;
     bool isSunsetAvailable() const;
     bool sunsetTime(struct tm* info) const;
     bool sunriseTime(struct tm* info) const;
