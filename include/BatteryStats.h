@@ -7,6 +7,7 @@
 #include "Arduino.h"
 #include "JkBmsDataPoints.h"
 #include "VeDirectShuntController.h"
+#include <cfloat>
 
 // mandatory interface for all kinds of batteries
 class BatteryStats {
@@ -37,7 +38,10 @@ class BatteryStats {
 
         // returns true if the battery reached a critically low voltage/SoC,
         // such that it is in need of charging to prevent degredation.
-        virtual bool needsCharging() const { return false; }
+        virtual bool getImmediateChargingRequest() const { return false; };
+
+        virtual float getChargeCurrent() const { return 0; };
+        virtual float getChargeCurrentLimitation() const { return FLT_MAX; };
 
     protected:
         virtual void mqttPublish() const;
@@ -71,7 +75,9 @@ class PylontechBatteryStats : public BatteryStats {
     public:
         void getLiveViewData(JsonVariant& root) const final;
         void mqttPublish() const final;
-        bool needsCharging() const final { return _chargeImmediately; }
+        bool getImmediateChargingRequest() const { return _chargeImmediately; } ;
+        float getChargeCurrent() const { return _current; } ;
+        float getChargeCurrentLimitation() const { return _chargeCurrentLimitation; } ;
 
     private:
         void setManufacturer(String&& m) { _manufacturer = std::move(m); }
@@ -141,7 +147,7 @@ class VictronSmartShuntStats : public BatteryStats {
         void getLiveViewData(JsonVariant& root) const final;
         void mqttPublish() const final;
 
-        void updateFrom(VeDirectShuntController::veShuntStruct const& shuntData);
+        void updateFrom(VeDirectShuntController::data_t const& shuntData);
 
     private:
         float _current;

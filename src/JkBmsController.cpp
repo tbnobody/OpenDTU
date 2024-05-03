@@ -198,7 +198,7 @@ class DummySerial {
 };
 DummySerial HwSerial;
 #else
-HardwareSerial HwSerial(2);
+HardwareSerial HwSerial((ARDUINO_USB_CDC_ON_BOOT != 1)?2:0);
 #endif
 
 namespace JkBms {
@@ -220,6 +220,7 @@ bool Controller::init(bool verboseLogging)
         return false;
     }
 
+    HwSerial.end(); // make sure the UART will be re-initialized
     HwSerial.begin(115200, SERIAL_8N1, pin.battery_rx, pin.battery_tx);
     HwSerial.flush();
 

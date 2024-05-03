@@ -34,7 +34,7 @@
                               v-model="powerLimiterConfigList.verbose_logging"
                               type="checkbox" wide/>
 
-                <InputElement v-show="isEnabled()"
+                <InputElement v-show="isEnabled() && hasPowerMeter()"
                               :label="$t('powerlimiteradmin.TargetPowerConsumption')"
                               :tooltip="$t('powerlimiteradmin.TargetPowerConsumptionHint')"
                               v-model="powerLimiterConfigList.target_power_consumption"
@@ -82,16 +82,25 @@
                 </div>
 
                 <InputElement :label="$t('powerlimiteradmin.LowerPowerLimit')"
+                              :tooltip="$t('powerlimiteradmin.LowerPowerLimitHint')"
                               v-model="powerLimiterConfigList.lower_power_limit"
                               placeholder="50" min="10" postfix="W"
                               type="number" wide/>
 
-                <InputElement :label="$t('powerlimiteradmin.UpperPowerLimit')"
-                              v-model="powerLimiterConfigList.upper_power_limit"
-                              placeholder="800" min="20" postfix="W"
+                <InputElement :label="$t('powerlimiteradmin.BaseLoadLimit')"
+                              :tooltip="$t('powerlimiteradmin.BaseLoadLimitHint')"
+                              v-model="powerLimiterConfigList.base_load_limit"
+                              placeholder="200" :min="(powerLimiterConfigList.lower_power_limit + 1).toString()" postfix="W"
                               type="number" wide/>
 
-                <InputElement :label="$t('powerlimiteradmin.InverterIsBehindPowerMeter')"
+                <InputElement :label="$t('powerlimiteradmin.UpperPowerLimit')"
+                              v-model="powerLimiterConfigList.upper_power_limit"
+                              :tooltip="$t('powerlimiteradmin.UpperPowerLimitHint')"
+                              placeholder="800" :min="(powerLimiterConfigList.base_load_limit + 1).toString()" postfix="W"
+                              type="number" wide/>
+
+                <InputElement v-show="hasPowerMeter()"
+                              :label="$t('powerlimiteradmin.InverterIsBehindPowerMeter')"
                               v-model="powerLimiterConfigList.is_inverter_behind_powermeter"
                               type="checkbox" wide/>
 
@@ -235,8 +244,8 @@ export default defineComponent({
     },
     watch: {
         'powerLimiterConfigList.inverter_serial'(newVal) {
-            var cfg = this.powerLimiterConfigList;
-            var meta = this.powerLimiterMetaData;
+            const cfg = this.powerLimiterConfigList;
+            const meta = this.powerLimiterMetaData;
 
             if (newVal === "") { return; } // do not try to convert the placeholder value
 
@@ -262,13 +271,12 @@ export default defineComponent({
     },
     methods: {
         getConfigHints() {
-            var cfg = this.powerLimiterConfigList;
-            var meta = this.powerLimiterMetaData;
-            var hints = [];
+            const cfg = this.powerLimiterConfigList;
+            const meta = this.powerLimiterMetaData;
+            const hints = [];
 
             if (meta.power_meter_enabled !== true) {
-                hints.push({severity: "requirement", subject: "PowerMeterDisabled"});
-                this.configAlert = true;
+                hints.push({severity: "optional", subject: "PowerMeterDisabled"});
             }
 
             if (typeof meta.inverters === "undefined" || Object.keys(meta.inverters).length == 0) {
@@ -276,7 +284,7 @@ export default defineComponent({
                 this.configAlert = true;
             }
             else {
-                var inv = meta.inverters[cfg.inverter_serial];
+                const inv = meta.inverters[cfg.inverter_serial];
                 if (inv !== undefined && !(inv.poll_enable && inv.command_enable && inv.poll_enable_night && inv.command_enable_night)) {
                     hints.push({severity: "requirement", subject: "InverterCommunication"});
                 }
@@ -297,20 +305,23 @@ export default defineComponent({
         isEnabled() {
             return this.powerLimiterConfigList.enabled;
         },
+        hasPowerMeter() {
+            return this.powerLimiterMetaData.power_meter_enabled;
+        },
         canUseSolarPassthrough() {
-            var cfg = this.powerLimiterConfigList;
-            var meta = this.powerLimiterMetaData;
-            var canUse = this.isEnabled() && meta.charge_controller_enabled && !cfg.is_inverter_solar_powered;
+            const cfg = this.powerLimiterConfigList;
+            const meta = this.powerLimiterMetaData;
+            const canUse = this.isEnabled() && meta.charge_controller_enabled && !cfg.is_inverter_solar_powered;
             if (!canUse) { cfg.solar_passthrough_enabled = false; }
             return canUse;
         },
         canUseSoCThresholds() {
-            var cfg = this.powerLimiterConfigList;
-            var meta = this.powerLimiterMetaData;
+            const cfg = this.powerLimiterConfigList;
+            const meta = this.powerLimiterMetaData;
             return this.isEnabled() && meta.battery_enabled && !cfg.is_inverter_solar_powered;
         },
         canUseVoltageThresholds() {
-            var cfg = this.powerLimiterConfigList;
+            const cfg = this.powerLimiterConfigList;
             return this.isEnabled() && !cfg.is_inverter_solar_powered;
         },
         isSolarPassthroughEnabled() {
@@ -320,10 +331,10 @@ export default defineComponent({
             return Array.from(Array(end).keys());
         },
         needsChannelSelection() {
-            var cfg = this.powerLimiterConfigList;
-            var meta = this.powerLimiterMetaData;
+            const cfg = this.powerLimiterConfigList;
+            const meta = this.powerLimiterMetaData;
 
-            var reset = function() {
+            const reset = function() {
                 cfg.inverter_channel_id = 0;
                 return false;
             };
@@ -332,7 +343,7 @@ export default defineComponent({
 
             if (cfg.is_inverter_solar_powered) { return reset(); }
 
-            var inverter = meta.inverters[cfg.inverter_serial];
+            const inverter = meta.inverters[cfg.inverter_serial];
             if (inverter === undefined) { return reset(); }
 
             if (cfg.inverter_channel_id >= inverter.channels) {

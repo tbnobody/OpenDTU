@@ -16,12 +16,6 @@
 #define PL_UI_STATE_USE_SOLAR_ONLY 2
 #define PL_UI_STATE_USE_SOLAR_AND_BATTERY 3
 
-typedef enum {
-    EMPTY_WHEN_FULL= 0, 
-    EMPTY_AT_NIGHT
-} batDrainStrategy;
-   
-
 class PowerLimiterClass {
 public:
     enum class Status : unsigned {
@@ -29,8 +23,6 @@ public:
         DisabledByConfig,
         DisabledByMqtt,
         WaitingForValidTimestamp,
-        PowerMeterDisabled,
-        PowerMeterTimeout,
         PowerMeterPending,
         InverterInvalid,
         InverterChanged,
@@ -45,11 +37,11 @@ public:
         NoVeDirect,
         NoEnergy,
         HuaweiPsu,
-        Settling,
         Stable,
     };
 
     void init(Scheduler& scheduler);
+    uint8_t getInverterUpdateTimeouts() const { return _inverterUpdateTimeouts; }
     uint8_t getPowerLimiterState();
     int32_t getLastRequestedPowerLimit() { return _lastRequestedPowerLimit; }
 
@@ -70,6 +62,7 @@ private:
 
     int32_t _lastRequestedPowerLimit = 0;
     bool _shutdownPending = false;
+    std::optional<uint32_t> _oInverterStatsMillis = std::nullopt;
     std::optional<uint32_t> _oUpdateStartMillis = std::nullopt;
     std::optional<int32_t> _oTargetPowerLimitWatts = std::nullopt;
     std::optional<bool> _oTargetPowerState = std::nullopt;
@@ -85,6 +78,7 @@ private:
     uint32_t _nextCalculateCheck = 5000; // time in millis for next NTP check to calulate restart
     bool _fullSolarPassThroughEnabled = false;
     bool _verboseLogging = true;
+    uint8_t _inverterUpdateTimeouts = 0;
 
     frozen::string const& getStatusText(Status status);
     void announceStatus(Status status);

@@ -6,6 +6,7 @@
  * 2020.05.05 - 0.2 - initial release
  * 2021.02.23 - 0.3 - change frameLen to 22 per VE.Direct Protocol version 3.30
  * 2022.08.20 - 0.4 - changes for OpenDTU
+ * 2024.03.08 - 0.4 - adds the ability to send hex commands and disassemble hex messages
  *
  */
 
@@ -13,67 +14,79 @@
 
 #include <Arduino.h>
 #include <array>
-#include <frozen/string.h>
-#include <frozen/map.h>
 #include <memory>
+#include <utility>
+#include <deque>
+#include "VeDirectData.h"
 
-#define VE_MAX_VALUE_LEN 33 // VE.Direct Protocol: max value size is 33 including /0
-#define VE_MAX_HEX_LEN 100 // Maximum size of hex frame - max payload 34 byte (=68 char) + safe buffer
-
+template<typename T>
 class VeDirectFrameHandler {
 public:
-    VeDirectFrameHandler();
-    virtual void init(int8_t rx, int8_t tx, Print* msgOut, bool verboseLogging, uint16_t hwSerialPort);
-    void loop();                                 // main loop to read ve.direct data
+    virtual void loop();                         // main loop to read ve.direct data
     uint32_t getLastUpdate() const;              // timestamp of last successful frame read
+    bool isDataValid() const;                    // return true if data valid and not outdated
+    T const& getData() const { return _tmpFrame; }
+    bool sendHexCommand(VeDirectHexCommand cmd, VeDirectHexRegister addr, uint32_t value = 0, uint8_t valsize = 0);
 
 protected:
+    VeDirectFrameHandler();
+    void init(char const* who, int8_t rx, int8_t tx, Print* msgOut, bool verboseLogging, uint16_t hwSerialPort);
+    virtual bool hexDataHandler(VeDirectHexData const &data) { return false; } // handles the disassembeled hex response
+
     bool _verboseLogging;
     Print* _msgOut;
     uint32_t _lastUpdate;
 
-    typedef struct {
-        uint16_t PID = 0;               // product id
-        char SER[VE_MAX_VALUE_LEN];     // serial number
-        char FW[VE_MAX_VALUE_LEN];      // firmware release number
-        double V = 0;                   // battery voltage in V
-        double I = 0;                   // battery current in A
-        double E = 0;                   // efficiency in percent (calculated, moving average)
+    T _tmpFrame;
 
-        frozen::string const& getPidAsString() const; // product ID as string
-    } veStruct;
-
-    bool textRxEvent(std::string const& who, char* name, char* value, veStruct& frame);
-    bool isDataValid(veStruct const& frame) const;      // return true if data valid and not outdated
-
-    template<typename T, size_t L>
-    static frozen::string const& getAsString(frozen::map<T, frozen::string, L> const& values, T val)
-    {
-        auto pos = values.find(val);
-        if (pos == values.end()) {
-            static constexpr frozen::string dummy("???");
-            return dummy;
-        }
-        return pos->second;
-    }
+    bool _canSend;
+    char _logId[32];
 
 private:
-    void setLastUpdate();                     // set timestampt after successful frame read
+    void reset();
     void dumpDebugBuffer();
     void rxData(uint8_t inbyte);              // byte of serial data
-    virtual void textRxEvent(char *, char *) = 0;
-    virtual void frameValidEvent() = 0;
-    int hexRxEvent(uint8_t);
+    void processTextData(std::string const& name, std::string const& value);
+    virtual bool processTextDataDerived(std::string const& name, std::string const& value) = 0;
+    virtual void frameValidEvent() { }
+    bool disassembleHexData(VeDirectHexData &data);     //return true if disassembling was possible
 
     std::unique_ptr<HardwareSerial> _vedirectSerial;
-    int _state;                                // current state
-    int _prevState;                            // previous state
+
+    enum class State {
+        IDLE = 1,
+        RECORD_BEGIN = 2,
+        RECORD_NAME = 3,
+        RECORD_VALUE = 4,
+        CHECKSUM = 5,
+        RECORD_HEX = 6
+    };
+    State _state;
+    State _prevState;
+
+    State hexRxEvent(uint8_t inbyte);
+
     uint8_t _checksum;                         // checksum value
     char * _textPointer;                       // pointer to the private buffer we're writing to, name or value
-    int _hexSize;                               // length of hex buffer
+    int _hexSize;                              // length of hex buffer
+    char _hexBuffer[VE_MAX_HEX_LEN];           // buffer for received hex frames
     char _name[VE_MAX_VALUE_LEN];              // buffer for the field name
     char _value[VE_MAX_VALUE_LEN];             // buffer for the field value
     std::array<uint8_t, 512> _debugBuffer;
     unsigned _debugIn;
-    uint32_t _lastByteMillis;
+    uint32_t _lastByteMillis;                  // time of last parsed byte
+
+    /**
+     * not every frame contains every value the device is communicating, i.e.,
+     * a set of values can be fragmented across multiple frames. frames can be
+     * invalid. in order to only process data from valid frames, we add data
+     * to this queue and only process it once the frame was found to be valid.
+     * this also handles fragmentation nicely, since there is no need to reset
+     * our data buffer. we simply update the interpreted data from this event
+     * queue, which is fine as we know the source frame was valid.
+     */
+    std::deque<std::pair<std::string, std::string>> _textData;
 };
+
+template class VeDirectFrameHandler<veMpptStruct>;
+template class VeDirectFrameHandler<veShuntStruct>;

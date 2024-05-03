@@ -61,8 +61,8 @@ bool BatteryStats::updateAvailable(uint32_t since) const
 
 void BatteryStats::getLiveViewData(JsonVariant& root) const
 {
-    root[F("manufacturer")] = _manufacturer;
-    root[F("data_age")] = getAgeSeconds();
+    root["manufacturer"] = _manufacturer;
+    root["data_age"] = getAgeSeconds();
 
     addLiveViewValue(root, "SoC", _soc, "%", _socPrecision);
     addLiveViewValue(root, "voltage", _voltage, "V", 2);
@@ -218,39 +218,39 @@ uint32_t BatteryStats::getMqttFullPublishIntervalMs() const
 
 void BatteryStats::mqttPublish() const
 {
-    MqttSettings.publish(F("battery/manufacturer"), _manufacturer);
-    MqttSettings.publish(F("battery/dataAge"), String(getAgeSeconds()));
-    MqttSettings.publish(F("battery/stateOfCharge"), String(_soc));
-    MqttSettings.publish(F("battery/voltage"), String(_voltage));
+    MqttSettings.publish("battery/manufacturer", _manufacturer);
+    MqttSettings.publish("battery/dataAge", String(getAgeSeconds()));
+    MqttSettings.publish("battery/stateOfCharge", String(_soc));
+    MqttSettings.publish("battery/voltage", String(_voltage));
 }
 
 void PylontechBatteryStats::mqttPublish() const
 {
     BatteryStats::mqttPublish();
 
-    MqttSettings.publish(F("battery/settings/chargeVoltage"), String(_chargeVoltage));
-    MqttSettings.publish(F("battery/settings/chargeCurrentLimitation"), String(_chargeCurrentLimitation));
-    MqttSettings.publish(F("battery/settings/dischargeCurrentLimitation"), String(_dischargeCurrentLimitation));
-    MqttSettings.publish(F("battery/stateOfHealth"), String(_stateOfHealth));
-    MqttSettings.publish(F("battery/current"), String(_current));
-    MqttSettings.publish(F("battery/temperature"), String(_temperature));
-    MqttSettings.publish(F("battery/alarm/overCurrentDischarge"), String(_alarmOverCurrentDischarge));
-    MqttSettings.publish(F("battery/alarm/overCurrentCharge"), String(_alarmOverCurrentCharge));
-    MqttSettings.publish(F("battery/alarm/underTemperature"), String(_alarmUnderTemperature));
-    MqttSettings.publish(F("battery/alarm/overTemperature"), String(_alarmOverTemperature));
-    MqttSettings.publish(F("battery/alarm/underVoltage"), String(_alarmUnderVoltage));
-    MqttSettings.publish(F("battery/alarm/overVoltage"), String(_alarmOverVoltage));
-    MqttSettings.publish(F("battery/alarm/bmsInternal"), String(_alarmBmsInternal));
-    MqttSettings.publish(F("battery/warning/highCurrentDischarge"), String(_warningHighCurrentDischarge));
-    MqttSettings.publish(F("battery/warning/highCurrentCharge"), String(_warningHighCurrentCharge));
-    MqttSettings.publish(F("battery/warning/lowTemperature"), String(_warningLowTemperature));
-    MqttSettings.publish(F("battery/warning/highTemperature"), String(_warningHighTemperature));
-    MqttSettings.publish(F("battery/warning/lowVoltage"), String(_warningLowVoltage));
-    MqttSettings.publish(F("battery/warning/highVoltage"), String(_warningHighVoltage));
-    MqttSettings.publish(F("battery/warning/bmsInternal"), String(_warningBmsInternal));
-    MqttSettings.publish(F("battery/charging/chargeEnabled"), String(_chargeEnabled));
-    MqttSettings.publish(F("battery/charging/dischargeEnabled"), String(_dischargeEnabled));
-    MqttSettings.publish(F("battery/charging/chargeImmediately"), String(_chargeImmediately));
+    MqttSettings.publish("battery/settings/chargeVoltage", String(_chargeVoltage));
+    MqttSettings.publish("battery/settings/chargeCurrentLimitation", String(_chargeCurrentLimitation));
+    MqttSettings.publish("battery/settings/dischargeCurrentLimitation", String(_dischargeCurrentLimitation));
+    MqttSettings.publish("battery/stateOfHealth", String(_stateOfHealth));
+    MqttSettings.publish("battery/current", String(_current));
+    MqttSettings.publish("battery/temperature", String(_temperature));
+    MqttSettings.publish("battery/alarm/overCurrentDischarge", String(_alarmOverCurrentDischarge));
+    MqttSettings.publish("battery/alarm/overCurrentCharge", String(_alarmOverCurrentCharge));
+    MqttSettings.publish("battery/alarm/underTemperature", String(_alarmUnderTemperature));
+    MqttSettings.publish("battery/alarm/overTemperature", String(_alarmOverTemperature));
+    MqttSettings.publish("battery/alarm/underVoltage", String(_alarmUnderVoltage));
+    MqttSettings.publish("battery/alarm/overVoltage", String(_alarmOverVoltage));
+    MqttSettings.publish("battery/alarm/bmsInternal", String(_alarmBmsInternal));
+    MqttSettings.publish("battery/warning/highCurrentDischarge", String(_warningHighCurrentDischarge));
+    MqttSettings.publish("battery/warning/highCurrentCharge", String(_warningHighCurrentCharge));
+    MqttSettings.publish("battery/warning/lowTemperature", String(_warningLowTemperature));
+    MqttSettings.publish("battery/warning/highTemperature", String(_warningHighTemperature));
+    MqttSettings.publish("battery/warning/lowVoltage", String(_warningLowVoltage));
+    MqttSettings.publish("battery/warning/highVoltage", String(_warningHighVoltage));
+    MqttSettings.publish("battery/warning/bmsInternal", String(_warningBmsInternal));
+    MqttSettings.publish("battery/charging/chargeEnabled", String(_chargeEnabled));
+    MqttSettings.publish("battery/charging/dischargeEnabled", String(_dischargeEnabled));
+    MqttSettings.publish("battery/charging/chargeImmediately", String(_chargeImmediately));
 }
 
 void JkBmsBatteryStats::mqttPublish() const
@@ -333,7 +333,12 @@ void JkBmsBatteryStats::updateFrom(JkBms::DataPointContainer const& dp)
     _manufacturer = "JKBMS";
     auto oProductId = dp.get<Label::ProductId>();
     if (oProductId.has_value()) {
-        _manufacturer = oProductId->c_str();
+        // the first twelve chars are expected to be the "User Private Data"
+        // setting (see smartphone app). the remainder is expected be the BMS
+        // name, which can be changed at will using the smartphone app. so
+        // there is not always a "JK" in this string. if there is, we still cut
+        // the string there to avoid possible regressions.
+        _manufacturer = oProductId->substr(12).c_str();
         auto pos = oProductId->rfind("JK");
         if (pos != std::string::npos) {
             _manufacturer = oProductId->substr(pos).c_str();
@@ -373,11 +378,11 @@ void JkBmsBatteryStats::updateFrom(JkBms::DataPointContainer const& dp)
     _lastUpdate = millis();
 }
 
-void VictronSmartShuntStats::updateFrom(VeDirectShuntController::veShuntStruct const& shuntData) {
-    BatteryStats::setVoltage(shuntData.V, millis());
+void VictronSmartShuntStats::updateFrom(VeDirectShuntController::data_t const& shuntData) {
+    BatteryStats::setVoltage(shuntData.batteryVoltage_V_mV / 1000.0, millis());
     BatteryStats::setSoC(static_cast<float>(shuntData.SOC) / 10, 1/*precision*/, millis());
 
-    _current = shuntData.I;
+    _current = static_cast<float>(shuntData.batteryCurrent_I_mA) / 1000;
     _modelName = shuntData.getPidAsString().data();
     _chargeCycles = shuntData.H4;
     _timeToGo = shuntData.TTG / 60;
@@ -390,11 +395,11 @@ void VictronSmartShuntStats::updateFrom(VeDirectShuntController::veShuntStruct c
     _consumedAmpHours = static_cast<float>(shuntData.CE) / 1000;
     _lastFullCharge = shuntData.H9 / 60;
     // shuntData.AR is a bitfield, so we need to check each bit individually
-    _alarmLowVoltage = shuntData.AR & 1;
-    _alarmHighVoltage = shuntData.AR & 2;
-    _alarmLowSOC = shuntData.AR & 4;
-    _alarmLowTemperature = shuntData.AR & 32;
-    _alarmHighTemperature = shuntData.AR & 64;
+    _alarmLowVoltage = shuntData.alarmReason_AR & 1;
+    _alarmHighVoltage = shuntData.alarmReason_AR & 2;
+    _alarmLowSOC = shuntData.alarmReason_AR & 4;
+    _alarmLowTemperature = shuntData.alarmReason_AR & 32;
+    _alarmHighTemperature = shuntData.alarmReason_AR & 64;
 
     _lastUpdate = VeDirectShunt.getLastUpdate();
 }
@@ -424,11 +429,11 @@ void VictronSmartShuntStats::getLiveViewData(JsonVariant& root) const {
 void VictronSmartShuntStats::mqttPublish() const {
     BatteryStats::mqttPublish();
 
-    MqttSettings.publish(F("battery/current"), String(_current));
-    MqttSettings.publish(F("battery/chargeCycles"), String(_chargeCycles));
-    MqttSettings.publish(F("battery/chargedEnergy"), String(_chargedEnergy));
-    MqttSettings.publish(F("battery/dischargedEnergy"), String(_dischargedEnergy));
-    MqttSettings.publish(F("battery/instantaneousPower"), String(_instantaneousPower));
-    MqttSettings.publish(F("battery/consumedAmpHours"), String(_consumedAmpHours));
-    MqttSettings.publish(F("battery/lastFullCharge"), String(_lastFullCharge));
+    MqttSettings.publish("battery/current", String(_current));
+    MqttSettings.publish("battery/chargeCycles", String(_chargeCycles));
+    MqttSettings.publish("battery/chargedEnergy", String(_chargedEnergy));
+    MqttSettings.publish("battery/dischargedEnergy", String(_dischargedEnergy));
+    MqttSettings.publish("battery/instantaneousPower", String(_instantaneousPower));
+    MqttSettings.publish("battery/consumedAmpHours", String(_consumedAmpHours));
+    MqttSettings.publish("battery/lastFullCharge", String(_lastFullCharge));
 }

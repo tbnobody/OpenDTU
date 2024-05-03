@@ -16,15 +16,17 @@ void HttpPowerMeterClass::init()
 
 float HttpPowerMeterClass::getPower(int8_t phase)
 {
+    if (phase < 1 || phase > POWERMETER_MAX_PHASES) { return 0.0; }
+
     return power[phase - 1];
 }
 
 bool HttpPowerMeterClass::updateValues()
 {
-    const CONFIG_T& config = Configuration.get();
+    auto const& config = Configuration.get();
 
     for (uint8_t i = 0; i < POWERMETER_MAX_PHASES; i++) {
-        POWERMETER_HTTP_PHASE_CONFIG_T phaseConfig = config.PowerMeter.Http_Phase[i];
+        auto const& phaseConfig = config.PowerMeter.Http_Phase[i];
 
         if (!phaseConfig.Enabled) {
             power[i] = 0.0;
@@ -32,8 +34,7 @@ bool HttpPowerMeterClass::updateValues()
         }
 
         if (i == 0 || config.PowerMeter.HttpIndividualRequests) {
-            if (!queryPhase(i, phaseConfig.Url, phaseConfig.AuthType, phaseConfig.Username, phaseConfig.Password, phaseConfig.HeaderKey, phaseConfig.HeaderValue, phaseConfig.Timeout,
-                    phaseConfig.JsonPath)) {
+            if (!queryPhase(i, phaseConfig)) {
                 MessageOutput.printf("[HttpPowerMeter] Getting the power of phase %d failed.\r\n", i + 1);
                 MessageOutput.printf("%s\r\n", httpPowerMeterError);
                 return false;
@@ -41,7 +42,7 @@ bool HttpPowerMeterClass::updateValues()
             continue;
         }
 
-        if(!tryGetFloatValueForPhase(i, phaseConfig.JsonPath)) {
+        if(!tryGetFloatValueForPhase(i, phaseConfig.JsonPath, phaseConfig.PowerUnit, phaseConfig.SignInverted)) {
             MessageOutput.printf("[HttpPowerMeter] Getting the power of phase %d (from JSON fetched with Phase 1 config) failed.\r\n", i + 1);
             MessageOutput.printf("%s\r\n", httpPowerMeterError);
             return false;
@@ -50,8 +51,7 @@ bool HttpPowerMeterClass::updateValues()
     return true;
 }
 
-bool HttpPowerMeterClass::queryPhase(int phase, const String& url, Auth authType, const char* username, const char* password,
-    const char* httpHeader, const char* httpValue, uint32_t timeout, const char* jsonPath)
+bool HttpPowerMeterClass::queryPhase(int phase, PowerMeterHttpConfig const& config)
 {
     //hostByName in WiFiGeneric fails to resolve local names. issue described in
     //https://github.com/espressif/arduino-esp32/issues/3822
@@ -63,7 +63,7 @@ bool HttpPowerMeterClass::queryPhase(int phase, const String& url, Auth authType
     String uri;
     String base64Authorization;
     uint16_t port;
-    extractUrlComponents(url, protocol, host, uri, port, base64Authorization);
+    extractUrlComponents(config.Url, protocol, host, uri, port, base64Authorization);
 
     IPAddress ipaddr((uint32_t)0);
     //first check if "host" is already an IP adress
@@ -105,43 +105,42 @@ bool HttpPowerMeterClass::queryPhase(int phase, const String& url, Auth authType
       wifiClient = std::make_unique<WiFiClient>();
     }
 
-    return httpRequest(phase, *wifiClient, ipaddr.toString(), port, uri, https, authType,  username, password, httpHeader, httpValue, timeout, jsonPath);
+    return httpRequest(phase, *wifiClient, ipaddr.toString(), port, uri, https, config);
 }
 
-bool HttpPowerMeterClass::httpRequest(int phase, WiFiClient &wifiClient, const String& host, uint16_t port, const String& uri, bool https, Auth authType, const char* username,
-    const char* password, const char* httpHeader, const char* httpValue, uint32_t timeout, const char* jsonPath)
+bool HttpPowerMeterClass::httpRequest(int phase, WiFiClient &wifiClient, const String& host, uint16_t port, const String& uri, bool https, PowerMeterHttpConfig const& config)
 {
     if(!httpClient.begin(wifiClient, host, port, uri, https)){
         snprintf_P(httpPowerMeterError, sizeof(httpPowerMeterError), PSTR("httpClient.begin() failed for %s://%s"), (https ? "https" : "http"), host.c_str());
         return false;
     }
 
-    prepareRequest(timeout, httpHeader, httpValue);
-    if (authType == Auth::digest) {
+    prepareRequest(config.Timeout, config.HeaderKey, config.HeaderValue);
+    if (config.AuthType == Auth_t::Digest) {
         const char *headers[1] = {"WWW-Authenticate"};
         httpClient.collectHeaders(headers, 1);
-    } else if (authType == Auth::basic) {
-        String authString = username;
+    } else if (config.AuthType == Auth_t::Basic) {
+        String authString = config.Username;
         authString += ":";
-        authString += password;
+        authString += config.Password;
         String auth = "Basic ";
         auth.concat(base64::encode(authString));
         httpClient.addHeader("Authorization", auth);
     }
     int httpCode = httpClient.GET();
 
-    if (httpCode == HTTP_CODE_UNAUTHORIZED && authType == Auth::digest) {
+    if (httpCode == HTTP_CODE_UNAUTHORIZED && config.AuthType == Auth_t::Digest) {
         // Handle authentication challenge
         if (httpClient.hasHeader("WWW-Authenticate")) {
             String authReq  = httpClient.header("WWW-Authenticate");
-            String authorization = getDigestAuth(authReq, String(username), String(password), "GET", String(uri), 1);
+            String authorization = getDigestAuth(authReq, String(config.Username), String(config.Password), "GET", String(uri), 1);
             httpClient.end();
             if(!httpClient.begin(wifiClient, host, port, uri, https)){
                 snprintf_P(httpPowerMeterError, sizeof(httpPowerMeterError), PSTR("httpClient.begin() failed for  %s://%s using digest auth"), (https ? "https" : "http"), host.c_str());
                 return false;
             }
 
-            prepareRequest(timeout, httpHeader, httpValue);
+            prepareRequest(config.Timeout, config.HeaderKey, config.HeaderValue);
             httpClient.addHeader("Authorization", authorization);
             httpCode = httpClient.GET();
         }
@@ -160,7 +159,9 @@ bool HttpPowerMeterClass::httpRequest(int phase, WiFiClient &wifiClient, const S
     httpResponse = httpClient.getString(); // very unfortunate that we cannot parse WifiClient stream directly
     httpClient.end();
 
-    return tryGetFloatValueForPhase(phase, jsonPath);
+    // TODO(schlimmchen): postpone calling tryGetFloatValueForPhase, as it
+    // will be called twice for each phase when doing separate requests.
+    return tryGetFloatValueForPhase(phase, config.JsonPath, config.PowerUnit, config.SignInverted);
 }
 
 String HttpPowerMeterClass::extractParam(String& authReq, const String& param, const char delimit) {
@@ -218,7 +219,7 @@ String HttpPowerMeterClass::getDigestAuth(String& authReq, const String& usernam
     return authorization;
 }
 
-bool HttpPowerMeterClass::tryGetFloatValueForPhase(int phase, const char* jsonPath)
+bool HttpPowerMeterClass::tryGetFloatValueForPhase(int phase, const char* jsonPath, Unit_t unit, bool signInverted)
 {
     FirebaseJson json;
     json.setJsonData(httpResponse);
@@ -228,7 +229,22 @@ bool HttpPowerMeterClass::tryGetFloatValueForPhase(int phase, const char* jsonPa
         return false;
     }
 
+    // this value is supposed to be in Watts and positive if energy is consumed.
     power[phase] = value.to<float>();
+
+    switch (unit) {
+        case Unit_t::MilliWatts:
+            power[phase] /= 1000;
+            break;
+        case Unit_t::KiloWatts:
+            power[phase] *= 1000;
+            break;
+        default:
+            break;
+    }
+
+    if (signInverted) { power[phase] *= -1; }
+
     return true;
 }
 

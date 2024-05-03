@@ -18,13 +18,13 @@
                         <div class="p-1 flex-grow-1">
                             <div class="d-flex flex-wrap">
                                 <div style="padding-right: 2em;">
-                                    {{ item.device.PID }}
+                                    {{ item.product_id }}
                                 </div>
                                 <div style="padding-right: 2em;">
-                                    {{ $t('vedirecthome.SerialNumber') }} {{ item.device.SER }}
+                                    {{ $t('vedirecthome.SerialNumber') }} {{ serial }}
                                 </div>
                                 <div style="padding-right: 2em;">
-                                    {{ $t('vedirecthome.FirmwareNumber') }}  {{ item.device.FW }}
+                                    {{ $t('vedirecthome.FirmwareNumber') }}  {{ item.firmware_version }}
                                 </div>
                                 <div style="padding-right: 2em;">
                                     {{ $t('vedirecthome.DataAge') }} {{ $t('vedirecthome.Seconds', {'val': Math.floor(item.data_age_ms / 1000)}) }}
@@ -55,9 +55,9 @@
                     </div>
                     <div class="card-body">
                         <div class="row flex-row flex-wrap align-items-start g-3">
-                            <div class="col order-0">
-                                <div class="card" :class="{ 'border-info': true }">
-                                    <div class="card-header text-bg-info">{{ $t('vedirecthome.DeviceInfo') }}</div>
+                            <div v-for="(values, section) in item.values" v-bind:key="section" class="col order-0">
+                                <div class="card" :class="{ 'border-info': (section === 'device') }">
+                                    <div :class="(section === 'device')?'card-header text-bg-info':'card-header'">{{ $t('vedirecthome.section_' + section) }}</div>
                                     <div class="card-body">
                                         <div class="table-responsive">
                                             <table class="table table-striped table-hover">
@@ -69,95 +69,21 @@
                                                     </tr>
                                                 </thead>
                                                 <tbody>
-                                                    <tr>
-                                                        <th scope="row">{{ $t('vedirecthome.LoadOutputState') }}</th>
-                                                        <td style="text-align: right">{{item.device.LOAD}}</td>
-                                                        <td></td>
-                                                    </tr>
-                                                    <tr>
-                                                        <th scope="row">{{ $t('vedirecthome.StateOfOperation') }}</th>
-                                                        <td style="text-align: right">{{item.device.CS}}</td>
-                                                        <td></td>
-                                                    </tr>
-                                                    <tr>
-                                                        <th scope="row">{{ $t('vedirecthome.TrackerOperationMode') }}</th>
-                                                        <td style="text-align: right">{{item.device.MPPT}}</td>
-                                                        <td></td>
-                                                    </tr>
-                                                    <tr>
-                                                        <th scope="row">{{ $t('vedirecthome.OffReason') }}</th>
-                                                        <td style="text-align: right">{{item.device.OR}}</td>
-                                                        <td></td>
-                                                    </tr>
-                                                    <tr>
-                                                        <th scope="row">{{ $t('vedirecthome.ErrorCode') }}</th>
-                                                        <td style="text-align: right">{{item.device.ERR}}</td>
-                                                        <td></td>
-                                                    </tr>
-                                                    <tr>
-                                                        <th scope="row">{{ $t('vedirecthome.DaySequenceNumber') }}</th>
-                                                        <td style="text-align: right">{{item.device.HSDS.v}}</td>
-                                                        <td>{{item.device.HSDS.u}}</td>
-                                                    </tr>
-                                                </tbody>
-                                            </table>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col order-1">
-                                <div class="card" :class="{ 'border-info': false }">
-                                    <div class="card-header">{{ $t('vedirecthome.Battery') }}</div>
-                                    <div class="card-body">
-                                        <div class="table-responsive">
-                                            <table class="table table-striped table-hover">
-                                                <thead>
-                                                    <tr>
-                                                        <th scope="col">{{ $t('vedirecthome.Property') }}</th>
-                                                        <th style="text-align: right" scope="col">{{ $t('vedirecthome.Value') }}</th>
-                                                        <th scope="col">{{ $t('vedirecthome.Unit') }}</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    <tr v-for="(prop, key) in item.output" v-bind:key="key">
-                                                        <th scope="row">{{ $t('vedirecthome.output.' + key) }}</th>
+                                                    <tr v-for="(prop, key) in values" v-bind:key="key">
+                                                        <th scope="row">{{ $t('vedirecthome.' + section + '.' + key) }}</th>
                                                         <td style="text-align: right">
-                                                            {{ $n(prop.v, 'decimal', {
+                                                            <template v-if="typeof prop === 'string'">
+                                                                {{ prop }}
+                                                            </template>
+                                                            <template v-else>
+                                                                {{ $n(prop.v, 'decimal', {
                                                                 minimumFractionDigits: prop.d,
                                                                 maximumFractionDigits: prop.d})
-                                                            }}
+                                                                }}
+                                                            </template>
                                                         </td>
-                                                        <td>{{prop.u}}</td>
-                                                    </tr>
-                                                </tbody>
-                                            </table>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col order-2">
-                                <div class="card" :class="{ 'border-info': false }">
-                                    <div class="card-header">{{ $t('vedirecthome.Panel') }}</div>
-                                    <div class="card-body">
-                                        <div class="table-responsive">
-                                            <table class="table table-striped table-hover">
-                                                <thead>
-                                                    <tr>
-                                                        <th scope="col">{{ $t('vedirecthome.Property') }}</th>
-                                                        <th style="text-align: right" scope="col">{{ $t('vedirecthome.Value') }}</th>
-                                                        <th scope="col">{{ $t('vedirecthome.Unit') }}</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    <tr v-for="(prop, key) in item.input" v-bind:key="key">
-                                                        <th scope="row">{{ $t('vedirecthome.input.' + key) }}</th>
-                                                        <td style="text-align: right">
-                                                            {{ $n(prop.v, 'decimal', {
-                                                                minimumFractionDigits: prop.d,
-                                                                maximumFractionDigits: prop.d})
-                                                            }}
-                                                        </td>
-                                                        <td>{{prop.u}}</td>
+                                                        <td v-if="typeof prop === 'string'"></td>
+                                                        <td v-else>{{prop.u}}</td>
                                                     </tr>
                                                 </tbody>
                                             </table>
@@ -238,7 +164,7 @@ export default defineComponent({
 
             this.socket.onmessage = (event) => {
                 console.log(event);
-                var root = JSON.parse(event.data);
+                const root = JSON.parse(event.data);
                 this.dplData = root["dpl"];
                 if (root["vedirect"]["full_update"] === true) {
                     this.vedirect = root["vedirect"];
@@ -266,7 +192,7 @@ export default defineComponent({
                     clearTimeout(this.dataAgeTimers[serial]);
                 }
 
-                var nextMs = 1000 - (this.vedirect.instances[serial].data_age_ms % 1000);
+                const nextMs = 1000 - (this.vedirect.instances[serial].data_age_ms % 1000);
                 this.dataAgeTimers[serial] = setTimeout(() => {
                     this.doDataAging(serial);
                 }, nextMs);

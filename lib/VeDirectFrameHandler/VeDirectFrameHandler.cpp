@@ -30,7 +30,7 @@
  * 2020.05.05 - 0.2 - initial release
  * 2020.06.21 - 0.2 - add MIT license, no code changes
  * 2020.08.20 - 0.3 - corrected #include reference
- *
+ * 2024.03.08 - 0.4 - adds the ability to send hex commands and disassemble hex messages
  */
 
 #include <Arduino.h>
@@ -39,18 +39,6 @@
 // The name of the record that contains the checksum.
 static constexpr char checksumTagName[] = "CHECKSUM";
 
-// state machine
-enum States {
-	IDLE = 1,
-	RECORD_BEGIN = 2,
-	RECORD_NAME = 3,
-	RECORD_VALUE = 4,
-	CHECKSUM = 5,
-	RECORD_HEX = 6
-};
-
-
-
 class Silent : public Print {
 	public:
 		size_t write(uint8_t c) final { return 0; }
@@ -58,10 +46,11 @@ class Silent : public Print {
 
 static Silent MessageOutputDummy;
 
-VeDirectFrameHandler::VeDirectFrameHandler() :
+template<typename T>
+VeDirectFrameHandler<T>::VeDirectFrameHandler() :
 	_msgOut(&MessageOutputDummy),
 	_lastUpdate(0),
-	_state(IDLE),
+	_state(State::IDLE),
 	_checksum(0),
 	_textPointer(0),
 	_hexSize(0),
@@ -72,21 +61,27 @@ VeDirectFrameHandler::VeDirectFrameHandler() :
 {
 }
 
-void VeDirectFrameHandler::init(int8_t rx, int8_t tx, Print* msgOut, bool verboseLogging, uint16_t hwSerialPort)
+template<typename T>
+void VeDirectFrameHandler<T>::init(char const* who, int8_t rx, int8_t tx, Print* msgOut, bool verboseLogging, uint16_t hwSerialPort)
 {
 	_vedirectSerial = std::make_unique<HardwareSerial>(hwSerialPort);
+	_vedirectSerial->end(); // make sure the UART will be re-initialized
 	_vedirectSerial->begin(19200, SERIAL_8N1, rx, tx);
 	_vedirectSerial->flush();
+	_canSend = (tx != -1);
 	_msgOut = msgOut;
 	_verboseLogging = verboseLogging;
 	_debugIn = 0;
+	snprintf(_logId, sizeof(_logId), "[VE.Direct %s %d/%d]", who, rx, tx);
+	if (_verboseLogging) { _msgOut->printf("%s init complete\r\n", _logId); }
 }
 
-void VeDirectFrameHandler::dumpDebugBuffer() {
-	_msgOut->printf("[VE.Direct] serial input (%d Bytes):", _debugIn);
+template<typename T>
+void VeDirectFrameHandler<T>::dumpDebugBuffer() {
+	_msgOut->printf("%s serial input (%d Bytes):", _logId, _debugIn);
 	for (int i = 0; i < _debugIn; ++i) {
 		if (i % 16 == 0) {
-			_msgOut->printf("\r\n[VE.Direct]");
+			_msgOut->printf("\r\n%s", _logId);
 		}
 		_msgOut->printf(" %02x", _debugBuffer[i]);
 	}
@@ -94,21 +89,30 @@ void VeDirectFrameHandler::dumpDebugBuffer() {
 	_debugIn = 0;
 }
 
-void VeDirectFrameHandler::loop()
+template<typename T>
+void VeDirectFrameHandler<T>::reset()
+{
+	_checksum = 0;
+	_state = State::IDLE;
+	_textData.clear();
+}
+
+template<typename T>
+void VeDirectFrameHandler<T>::loop()
 {
 	while ( _vedirectSerial->available()) {
 		rxData(_vedirectSerial->read());
 		_lastByteMillis = millis();
 	}
 
-	// there will never be a large gap between two bytes of the same frame.
+	// there will never be a large gap between two bytes.
 	// if such a large gap is observed, reset the state machine so it tries
-	// to decode a new frame once more data arrives.
-	if (IDLE != _state && _lastByteMillis + 500 < millis()) {
-		_msgOut->printf("[VE.Direct] Resetting state machine (was %d) after timeout\r\n", _state);
+	// to decode a new frame / hex messages once more data arrives.
+	if ((State::IDLE != _state) && ((millis() - _lastByteMillis) > 500)) {
+		_msgOut->printf("%s Resetting state machine (was %d) after timeout\r\n",
+				_logId, static_cast<unsigned>(_state));
 		if (_verboseLogging) { dumpDebugBuffer(); }
-		_checksum = 0;
-		_state = IDLE;
+		reset();
 	}
 }
 
@@ -117,44 +121,45 @@ void VeDirectFrameHandler::loop()
  *  This function is called by loop() which passes a byte of serial data
  *  Based on Victron's example code. But using String and Map instead of pointer and arrays
  */
-void VeDirectFrameHandler::rxData(uint8_t inbyte)
+template<typename T>
+void VeDirectFrameHandler<T>::rxData(uint8_t inbyte)
 {
 	if (_verboseLogging) {
 		_debugBuffer[_debugIn] = inbyte;
 		_debugIn = (_debugIn + 1) % _debugBuffer.size();
 		if (0 == _debugIn) {
-			_msgOut->println("[VE.Direct] ERROR: debug buffer overrun!");
+			_msgOut->printf("%s ERROR: debug buffer overrun!\r\n", _logId);
 		}
 	}
 
-	if ( (inbyte == ':') && (_state != CHECKSUM) ) {
+	if ( (inbyte == ':') && (_state != State::CHECKSUM) ) {
 		_prevState = _state; //hex frame can interrupt TEXT
-		_state = RECORD_HEX;
+		_state = State::RECORD_HEX;
 		_hexSize = 0;
 	}
-	if (_state != RECORD_HEX) {
+	if (_state != State::RECORD_HEX) {
 		_checksum += inbyte;
 	}
 	inbyte = toupper(inbyte);
 
 	switch(_state) {
-	case IDLE:
+	case State::IDLE:
 		/* wait for \n of the start of an record */
 		switch(inbyte) {
 		case '\n':
-			_state = RECORD_BEGIN;
+			_state = State::RECORD_BEGIN;
 			break;
 		case '\r': /* Skip */
 		default:
 			break;
 		}
 		break;
-	case RECORD_BEGIN:
+	case State::RECORD_BEGIN:
 		_textPointer = _name;
 		*_textPointer++ = inbyte;
-		_state = RECORD_NAME;
+		_state = State::RECORD_NAME;
 		break;
-	case RECORD_NAME:
+	case State::RECORD_NAME:
 		// The record name is being received, terminated by a \t
 		switch(inbyte) {
 		case '\t':
@@ -162,12 +167,12 @@ void VeDirectFrameHandler::rxData(uint8_t inbyte)
 			if ( _textPointer < (_name + sizeof(_name)) ) {
 				*_textPointer = 0; /* Zero terminate */
 				if (strcmp(_name, checksumTagName) == 0) {
-					_state = CHECKSUM;
+					_state = State::CHECKSUM;
 					break;
 				}
 			}
 			_textPointer = _value; /* Reset value pointer */
-			_state = RECORD_VALUE;
+			_state = State::RECORD_VALUE;
 			break;
 		case '#': /* Ignore # from serial number*/
 			break;
@@ -178,15 +183,15 @@ void VeDirectFrameHandler::rxData(uint8_t inbyte)
 			break;
 		}
 		break;
-	case RECORD_VALUE:
+	case State::RECORD_VALUE:
 		// The record value is being received.  The \r indicates a new record.
 		switch(inbyte) {
 		case '\n':
 			if ( _textPointer < (_value + sizeof(_value)) ) {
 				*_textPointer = 0; // make zero ended
-				textRxEvent(_name, _value);
+				_textData.push_back({_name, _value});
 			}
-			_state = RECORD_BEGIN;
+			_state = State::RECORD_BEGIN;
 			break;
 		case '\r': /* Skip */
 			break;
@@ -197,221 +202,120 @@ void VeDirectFrameHandler::rxData(uint8_t inbyte)
 			break;
 		}
 		break;
-	case CHECKSUM:
+	case State::CHECKSUM:
 	{
-		bool valid = _checksum == 0;
-		if (!valid) {
-			_msgOut->printf("[VE.Direct] checksum 0x%02x != 0, invalid frame\r\n", _checksum);
-		}
 		if (_verboseLogging) { dumpDebugBuffer(); }
-		_checksum = 0;
-		_state = IDLE;
-		if (valid) { frameValidEvent(); }
+		if (_checksum == 0) {
+			for (auto const& event : _textData) {
+				processTextData(event.first, event.second);
+			}
+			_lastUpdate = millis();
+			frameValidEvent();
+		}
+		else {
+			_msgOut->printf("%s checksum 0x%02x != 0x00, invalid frame\r\n", _logId, _checksum);
+		}
+		reset();
 		break;
 	}
-	case RECORD_HEX:
+	case State::RECORD_HEX:
 		_state = hexRxEvent(inbyte);
 		break;
 	}
 }
 
 /*
- * textRxEvent
  * This function is called every time a new name/value is successfully parsed.  It writes the values to the temporary buffer.
  */
-bool VeDirectFrameHandler::textRxEvent(std::string const& who, char* name, char* value, veStruct& frame) {
+template<typename T>
+void VeDirectFrameHandler<T>::processTextData(std::string const& name, std::string const& value) {
 	if (_verboseLogging) {
-		_msgOut->printf("[Victron %s] Text Event %s: Value: %s\r\n",
-				who.c_str(), name, value );
+		_msgOut->printf("%s Text Data '%s' = '%s'\r\n",
+				_logId, name.c_str(), value.c_str());
 	}
 
-	if (strcmp(name, "PID") == 0) {
-		frame.PID = strtol(value, nullptr, 0);
-		return true;
+	if (processTextDataDerived(name, value)) { return; }
+
+	if (name == "PID") {
+		_tmpFrame.productID_PID = strtol(value.c_str(), nullptr, 0);
+		return;
 	}
 
-	if (strcmp(name, "SER") == 0) {
-		strcpy(frame.SER, value);
-		return true;
+	if (name == "SER") {
+		strcpy(_tmpFrame.serialNr_SER, value.c_str());
+		return;
 	}
 
-	if (strcmp(name, "FW") == 0) {
-		strcpy(frame.FW, value);
-		return true;
+	if (name == "FW") {
+		strcpy(_tmpFrame.firmwareNr_FW, value.c_str());
+		return;
 	}
 
-	if (strcmp(name, "V") == 0) {
-		frame.V = round(atof(value) / 10.0) / 100.0;
-		return true;
+	if (name == "V") {
+		_tmpFrame.batteryVoltage_V_mV = atol(value.c_str());
+		return;
 	}
 
-	if (strcmp(name, "I") == 0) {
-		frame.I = round(atof(value) / 10.0) / 100.0;
-		return true;
+	if (name == "I") {
+		_tmpFrame.batteryCurrent_I_mA = atol(value.c_str());
+		return;
 	}
 
-	return false;
+	_msgOut->printf("%s Unknown text data '%s' (value '%s')\r\n",
+			_logId, name.c_str(), value.c_str());
 }
-
-
 
 /*
  *  hexRxEvent
  *  This function records hex answers or async messages
  */
-int VeDirectFrameHandler::hexRxEvent(uint8_t inbyte) {
-	int ret=RECORD_HEX; // default - continue recording until end of frame
+template<typename T>
+typename VeDirectFrameHandler<T>::State VeDirectFrameHandler<T>::hexRxEvent(uint8_t inbyte)
+{
+	State ret = State::RECORD_HEX; // default - continue recording until end of frame
 
 	switch (inbyte) {
 	case '\n':
+		// now we can analyse the hex message
+		_hexBuffer[_hexSize] = '\0';
+		VeDirectHexData data;
+		if (disassembleHexData(data) && !hexDataHandler(data) && _verboseLogging) {
+			_msgOut->printf("%s Unhandled Hex %s Response, addr: 0x%04X (%s), "
+					"value: 0x%08X, flags: 0x%02X\r\n", _logId,
+					data.getResponseAsString().data(),
+					static_cast<unsigned>(data.addr),
+					data.getRegisterAsString().data(),
+					data.value, data.flags);
+		}
+
 		// restore previous state
 		ret=_prevState;
 		break;
 
 	default:
-		_hexSize++;
+		_hexBuffer[_hexSize++]=inbyte;
+
 		if (_hexSize>=VE_MAX_HEX_LEN) { // oops -buffer overflow - something went wrong, we abort
-			_msgOut->println("[VE.Direct] hexRx buffer overflow - aborting read");
+			_msgOut->printf("%s hexRx buffer overflow - aborting read\r\n", _logId);
 			_hexSize=0;
-			ret=IDLE;
+			ret = State::IDLE;
 		}
 	}
 
 	return ret;
 }
 
-bool VeDirectFrameHandler::isDataValid(veStruct const& frame) const {
-	return strlen(frame.SER) > 0 && _lastUpdate > 0 && (millis() - _lastUpdate) < (10 * 1000);
+template<typename T>
+bool VeDirectFrameHandler<T>::isDataValid() const
+{
+	// VE.Direct text frame data is valid if we receive a device serialnumber and
+	// the data is not older as 10 seconds
+	// we accept a glitch where the data is valid for ten seconds when serialNr_SER != "" and (millis() - _lastUpdate) overflows
+	return strlen(_tmpFrame.serialNr_SER) > 0 && (millis() - _lastUpdate) < (10 * 1000);
 }
 
-uint32_t VeDirectFrameHandler::getLastUpdate() const
+template<typename T>
+uint32_t VeDirectFrameHandler<T>::getLastUpdate() const
 {
 	return _lastUpdate;
-}
-
-/*
- * getPidAsString
- * This function returns the product id (PID) as readable text.
- */
-frozen::string const& VeDirectFrameHandler::veStruct::getPidAsString() const
-{
-	/**
-	 * this map is rendered from [1], which is more recent than [2]. Phoenix
-	 * inverters are not included in the map. unfortunately, the documents do
-	 * not fully align. PID 0xA07F is only present in [1]. PIDs 0xA048, 0xA110,
-	 * and 0xA111 are only present in [2]. PIDs 0xA06D and 0xA078 are rev3 in
-	 * [1] but rev2 in [2].
-	 *
-	 * [1] https://www.victronenergy.com/upload/documents/VE.Direct-Protocol-3.33.pdf
-	 * [2] https://www.victronenergy.com/upload/documents/BlueSolar-HEX-protocol.pdf
-	 */
-	static constexpr frozen::map<uint16_t, frozen::string, 105> values = {
-		{ 0x0203, "BMV-700" },
-		{ 0x0204, "BMV-702" },
-		{ 0x0205, "BMV-700H" },
-		{ 0x0300, "BlueSolar MPPT 70|15" },
-		{ 0xA040, "BlueSolar MPPT 75|50" },
-		{ 0xA041, "BlueSolar MPPT 150|35" },
-		{ 0xA042, "BlueSolar MPPT 75|15" },
-		{ 0xA043, "BlueSolar MPPT 100|15" },
-		{ 0xA044, "BlueSolar MPPT 100|30" },
-		{ 0xA045, "BlueSolar MPPT 100|50" },
-		{ 0xA046, "BlueSolar MPPT 150|70" },
-		{ 0xA047, "BlueSolar MPPT 150|100" },
-		{ 0xA048, "BlueSolar MPPT 75|50 rev2" },
-		{ 0xA049, "BlueSolar MPPT 100|50 rev2" },
-		{ 0xA04A, "BlueSolar MPPT 100|30 rev2" },
-		{ 0xA04B, "BlueSolar MPPT 150|35 rev2" },
-		{ 0xA04C, "BlueSolar MPPT 75|10" },
-		{ 0xA04D, "BlueSolar MPPT 150|45" },
-		{ 0xA04E, "BlueSolar MPPT 150|60" },
-		{ 0xA04F, "BlueSolar MPPT 150|85" },
-		{ 0xA050, "SmartSolar MPPT 250|100" },
-		{ 0xA051, "SmartSolar MPPT 150|100" },
-		{ 0xA052, "SmartSolar MPPT 150|85" },
-		{ 0xA053, "SmartSolar MPPT 75|15" },
-		{ 0xA054, "SmartSolar MPPT 75|10" },
-		{ 0xA055, "SmartSolar MPPT 100|15" },
-		{ 0xA056, "SmartSolar MPPT 100|30" },
-		{ 0xA057, "SmartSolar MPPT 100|50" },
-		{ 0xA058, "SmartSolar MPPT 150|35" },
-		{ 0xA059, "SmartSolar MPPT 150|100 rev2" },
-		{ 0xA05A, "SmartSolar MPPT 150|85 rev2" },
-		{ 0xA05B, "SmartSolar MPPT 250|70" },
-		{ 0xA05C, "SmartSolar MPPT 250|85" },
-		{ 0xA05D, "SmartSolar MPPT 250|60" },
-		{ 0xA05E, "SmartSolar MPPT 250|45" },
-		{ 0xA05F, "SmartSolar MPPT 100|20" },
-		{ 0xA060, "SmartSolar MPPT 100|20 48V" },
-		{ 0xA061, "SmartSolar MPPT 150|45" },
-		{ 0xA062, "SmartSolar MPPT 150|60" },
-		{ 0xA063, "SmartSolar MPPT 150|70" },
-		{ 0xA064, "SmartSolar MPPT 250|85 rev2" },
-		{ 0xA065, "SmartSolar MPPT 250|100 rev2" },
-		{ 0xA066, "BlueSolar MPPT 100|20" },
-		{ 0xA067, "BlueSolar MPPT 100|20 48V" },
-		{ 0xA068, "SmartSolar MPPT 250|60 rev2" },
-		{ 0xA069, "SmartSolar MPPT 250|70 rev2" },
-		{ 0xA06A, "SmartSolar MPPT 150|45 rev2" },
-		{ 0xA06B, "SmartSolar MPPT 150|60 rev2" },
-		{ 0xA06C, "SmartSolar MPPT 150|70 rev2" },
-		{ 0xA06D, "SmartSolar MPPT 150|85 rev3" },
-		{ 0xA06E, "SmartSolar MPPT 150|100 rev3" },
-		{ 0xA06F, "BlueSolar MPPT 150|45 rev2" },
-		{ 0xA070, "BlueSolar MPPT 150|60 rev2" },
-		{ 0xA071, "BlueSolar MPPT 150|70 rev2" },
-		{ 0xA072, "BlueSolar MPPT 150|45 rev3" },
-		{ 0xA073, "SmartSolar MPPT 150|45 rev3" },
-		{ 0xA074, "SmartSolar MPPT 75|10 rev2" },
-		{ 0xA075, "SmartSolar MPPT 75|15 rev2" },
-		{ 0xA076, "BlueSolar MPPT 100|30 rev3" },
-		{ 0xA077, "BlueSolar MPPT 100|50 rev3" },
-		{ 0xA078, "BlueSolar MPPT 150|35 rev3" },
-		{ 0xA079, "BlueSolar MPPT 75|10 rev2" },
-		{ 0xA07A, "BlueSolar MPPT 75|15 rev2" },
-		{ 0xA07B, "BlueSolar MPPT 100|15 rev2" },
-		{ 0xA07C, "BlueSolar MPPT 75|10 rev3" },
-		{ 0xA07D, "BlueSolar MPPT 75|15 rev3" },
-		{ 0xA07E, "SmartSolar MPPT 100|30 12V" },
-		{ 0xA07F, "All-In-1 SmartSolar MPPT 75|15 12V" },
-		{ 0xA102, "SmartSolar MPPT VE.Can 150|70" },
-		{ 0xA103, "SmartSolar MPPT VE.Can 150|45" },
-		{ 0xA104, "SmartSolar MPPT VE.Can 150|60" },
-		{ 0xA105, "SmartSolar MPPT VE.Can 150|85" },
-		{ 0xA106, "SmartSolar MPPT VE.Can 150|100" },
-		{ 0xA107, "SmartSolar MPPT VE.Can 250|45" },
-		{ 0xA108, "SmartSolar MPPT VE.Can 250|60" },
-		{ 0xA109, "SmartSolar MPPT VE.Can 250|70" },
-		{ 0xA10A, "SmartSolar MPPT VE.Can 250|85" },
-		{ 0xA10B, "SmartSolar MPPT VE.Can 250|100" },
-		{ 0xA10C, "SmartSolar MPPT VE.Can 150|70 rev2" },
-		{ 0xA10D, "SmartSolar MPPT VE.Can 150|85 rev2" },
-		{ 0xA10E, "SmartSolar MPPT VE.Can 150|100 rev2" },
-		{ 0xA10F, "BlueSolar MPPT VE.Can 150|100" },
-		{ 0xA110, "SmartSolar MPPT RS 450|100" },
-		{ 0xA111, "SmartSolar MPPT RS 450|200" },
-		{ 0xA112, "BlueSolar MPPT VE.Can 250|70" },
-		{ 0xA113, "BlueSolar MPPT VE.Can 250|100" },
-		{ 0xA114, "SmartSolar MPPT VE.Can 250|70 rev2" },
-		{ 0xA115, "SmartSolar MPPT VE.Can 250|100 rev2" },
-		{ 0xA116, "SmartSolar MPPT VE.Can 250|85 rev2" },
-		{ 0xA117, "BlueSolar MPPT VE.Can 150|100 rev2" },
-		{ 0xA340, "Phoenix Smart IP43 Charger 12|50 (1+1)" },
-		{ 0xA341, "Phoenix Smart IP43 Charger 12|50 (3)" },
-		{ 0xA342, "Phoenix Smart IP43 Charger 24|25 (1+1)" },
-		{ 0xA343, "Phoenix Smart IP43 Charger 24|25 (3)" },
-		{ 0xA344, "Phoenix Smart IP43 Charger 12|30 (1+1)" },
-		{ 0xA345, "Phoenix Smart IP43 Charger 12|30 (3)" },
-		{ 0xA346, "Phoenix Smart IP43 Charger 24|16 (1+1)" },
-		{ 0xA347, "Phoenix Smart IP43 Charger 24|16 (3)" },
-		{ 0xA381, "BMV-712 Smart" },
-		{ 0xA382, "BMV-710H Smart" },
-		{ 0xA383, "BMV-712 Smart Rev2" },
-		{ 0xA389, "SmartShunt 500A/50mV" },
-		{ 0xA38A, "SmartShunt 1000A/50mV" },
-		{ 0xA38B, "SmartShunt 2000A/50mV" },
-		{ 0xA3F0, "Smart BuckBoost 12V/12V-50A" },
-	};
-
-	return getAsString(values, PID);
 }

@@ -86,25 +86,17 @@ void WebApiWsVedirectLiveClass::sendDataTaskCb()
     if (fullUpdate || updateAvailable) {
         try {
             std::lock_guard<std::mutex> lock(_mutex);
-            DynamicJsonDocument root(responseSize());
+            JsonDocument root;
+            JsonVariant var = root;
+
+            generateCommonJsonResponse(var, fullUpdate);
+
             if (Utils::checkJsonAlloc(root, __FUNCTION__, __LINE__)) {
-                JsonVariant var = root;
-                generateJsonResponse(var, fullUpdate);
-
-                if (Utils::checkJsonOverflow(root, __FUNCTION__, __LINE__)) { return; }
-
                 String buffer;
                 serializeJson(root, buffer);
 
-                if (Configuration.get().Security.AllowReadonly) {
-                    _ws.setAuthentication("", "");
-                } else {
-                    _ws.setAuthentication(AUTH_USERNAME, Configuration.get().Security.Password);
-                }
-
-                _ws.textAll(buffer);
+                _ws.textAll(buffer);;
             }
-
         } catch (std::bad_alloc& bad_alloc) {
             MessageOutput.printf("Calling /api/vedirectlivedata/status has temporarily run out of resources. Reason: \"%s\".\r\n", bad_alloc.what());
         } catch (const std::exception& exc) {
@@ -117,29 +109,26 @@ void WebApiWsVedirectLiveClass::sendDataTaskCb()
     }
 }
 
-void WebApiWsVedirectLiveClass::generateJsonResponse(JsonVariant& root, bool fullUpdate)
+void WebApiWsVedirectLiveClass::generateCommonJsonResponse(JsonVariant& root, bool fullUpdate)
 {
-    const JsonObject &array = root["vedirect"].createNestedObject("instances");
+    auto array = root["vedirect"]["instances"].to<JsonObject>();
     root["vedirect"]["full_update"] = fullUpdate;
 
     for (size_t idx = 0; idx < VictronMppt.controllerAmount(); ++idx) {
-        std::optional<VeDirectMpptController::spData_t> spOptMpptData = VictronMppt.getData(idx);
-        if (!spOptMpptData.has_value()) {
-            continue;
-        }
+        auto optMpptData = VictronMppt.getData(idx);
+        if (!optMpptData.has_value()) { continue; }
 
         if (!fullUpdate && !hasUpdate(idx)) { continue; }
 
-        VeDirectMpptController::spData_t &spMpptData = spOptMpptData.value();
-
-        String serial(spMpptData->SER);
+        String serial(optMpptData->serialNr_SER);
         if (serial.isEmpty()) { continue; } // serial required as index
 
-        const JsonObject &nested = array.createNestedObject(serial);
+        JsonObject nested = array[serial].to<JsonObject>();
         nested["data_age_ms"] = VictronMppt.getDataAgeMillis(idx);
-        populateJson(nested, spMpptData);
-        _lastPublish = millis();
+        populateJson(nested, *optMpptData);
     }
+
+    _lastPublish = millis();
 
     // power limiter state
     root["dpl"]["PLSTATE"] = -1;
@@ -148,58 +137,70 @@ void WebApiWsVedirectLiveClass::generateJsonResponse(JsonVariant& root, bool ful
     root["dpl"]["PLLIMIT"] = PowerLimiter.getLastRequestedPowerLimit();
 }
 
-void WebApiWsVedirectLiveClass::populateJson(const JsonObject &root, const VeDirectMpptController::spData_t &spMpptData) {
-    // device info
-    root["device"]["PID"] = spMpptData->getPidAsString();
-    root["device"]["SER"] = spMpptData->SER;
-    root["device"]["FW"] = spMpptData->FW;
-    root["device"]["LOAD"] = spMpptData->LOAD ? "ON" : "OFF";
-    root["device"]["CS"] = spMpptData->getCsAsString();
-    root["device"]["ERR"] = spMpptData->getErrAsString();
-    root["device"]["OR"] = spMpptData->getOrAsString();
-    root["device"]["MPPT"] = spMpptData->getMpptAsString();
-    root["device"]["HSDS"]["v"] = spMpptData->HSDS;
-    root["device"]["HSDS"]["u"] = "d";
+void WebApiWsVedirectLiveClass::populateJson(const JsonObject &root, const VeDirectMpptController::data_t &mpptData) {
+    root["product_id"] = mpptData.getPidAsString();
+    root["firmware_version"] = String(mpptData.firmwareNr_FW);
 
-    // battery info
-    root["output"]["P"]["v"] = spMpptData->P;
-    root["output"]["P"]["u"] = "W";
-    root["output"]["P"]["d"] = 0;
-    root["output"]["V"]["v"] = spMpptData->V;
-    root["output"]["V"]["u"] = "V";
-    root["output"]["V"]["d"] = 2;
-    root["output"]["I"]["v"] = spMpptData->I;
-    root["output"]["I"]["u"] = "A";
-    root["output"]["I"]["d"] = 2;
-    root["output"]["E"]["v"] = spMpptData->E;
-    root["output"]["E"]["u"] = "%";
-    root["output"]["E"]["d"] = 1;
+    const JsonObject values = root["values"].to<JsonObject>();
 
-    // panel info
-    root["input"]["PPV"]["v"] = spMpptData->PPV;
-    root["input"]["PPV"]["u"] = "W";
-    root["input"]["PPV"]["d"] = 0;
-    root["input"]["VPV"]["v"] = spMpptData->VPV;
-    root["input"]["VPV"]["u"] = "V";
-    root["input"]["VPV"]["d"] = 2;
-    root["input"]["IPV"]["v"] = spMpptData->IPV;
-    root["input"]["IPV"]["u"] = "A";
-    root["input"]["IPV"]["d"] = 2;
-    root["input"]["YieldToday"]["v"] = spMpptData->H20;
-    root["input"]["YieldToday"]["u"] = "kWh";
-    root["input"]["YieldToday"]["d"] = 3;
-    root["input"]["YieldYesterday"]["v"] = spMpptData->H22;
-    root["input"]["YieldYesterday"]["u"] = "kWh";
-    root["input"]["YieldYesterday"]["d"] = 3;
-    root["input"]["YieldTotal"]["v"] = spMpptData->H19;
-    root["input"]["YieldTotal"]["u"] = "kWh";
-    root["input"]["YieldTotal"]["d"] = 3;
-    root["input"]["MaximumPowerToday"]["v"] = spMpptData->H21;
-    root["input"]["MaximumPowerToday"]["u"] = "W";
-    root["input"]["MaximumPowerToday"]["d"] = 0;
-    root["input"]["MaximumPowerYesterday"]["v"] = spMpptData->H23;
-    root["input"]["MaximumPowerYesterday"]["u"] = "W";
-    root["input"]["MaximumPowerYesterday"]["d"] = 0;
+    const JsonObject device = values["device"].to<JsonObject>();
+    device["LOAD"] = mpptData.loadOutputState_LOAD ? "ON" : "OFF";
+    device["CS"] = mpptData.getCsAsString();
+    device["MPPT"] = mpptData.getMpptAsString();
+    device["OR"] = mpptData.getOrAsString();
+    device["ERR"] = mpptData.getErrAsString();
+    device["HSDS"]["v"] = mpptData.daySequenceNr_HSDS;
+    device["HSDS"]["u"] = "d";
+    if (mpptData.MpptTemperatureMilliCelsius.first > 0) {
+        device["MpptTemperature"]["v"] = mpptData.MpptTemperatureMilliCelsius.second / 1000.0;
+        device["MpptTemperature"]["u"] = "°C";
+        device["MpptTemperature"]["d"] = "1";
+    }
+
+    const JsonObject output = values["output"].to<JsonObject>();
+    output["P"]["v"] = mpptData.batteryOutputPower_W;
+    output["P"]["u"] = "W";
+    output["P"]["d"] = 0;
+    output["V"]["v"] = mpptData.batteryVoltage_V_mV / 1000.0;
+    output["V"]["u"] = "V";
+    output["V"]["d"] = 2;
+    output["I"]["v"] = mpptData.batteryCurrent_I_mA / 1000.0;
+    output["I"]["u"] = "A";
+    output["I"]["d"] = 2;
+    output["E"]["v"] = mpptData.mpptEfficiency_Percent;
+    output["E"]["u"] = "%";
+    output["E"]["d"] = 1;
+
+    const JsonObject input = values["input"].to<JsonObject>();
+    if (mpptData.NetworkTotalDcInputPowerMilliWatts.first > 0) {
+        input["NetworkPower"]["v"] = mpptData.NetworkTotalDcInputPowerMilliWatts.second / 1000.0;
+        input["NetworkPower"]["u"] = "W";
+        input["NetworkPower"]["d"] = "0";
+    }
+    input["PPV"]["v"] = mpptData.panelPower_PPV_W;
+    input["PPV"]["u"] = "W";
+    input["PPV"]["d"] = 0;
+    input["VPV"]["v"] = mpptData.panelVoltage_VPV_mV / 1000.0;
+    input["VPV"]["u"] = "V";
+    input["VPV"]["d"] = 2;
+    input["IPV"]["v"] = mpptData.panelCurrent_mA / 1000.0;
+    input["IPV"]["u"] = "A";
+    input["IPV"]["d"] = 2;
+    input["YieldToday"]["v"] = mpptData.yieldToday_H20_Wh / 1000.0;
+    input["YieldToday"]["u"] = "kWh";
+    input["YieldToday"]["d"] = 2;
+    input["YieldYesterday"]["v"] = mpptData.yieldYesterday_H22_Wh / 1000.0;
+    input["YieldYesterday"]["u"] = "kWh";
+    input["YieldYesterday"]["d"] = 2;
+    input["YieldTotal"]["v"] = mpptData.yieldTotal_H19_Wh / 1000.0;
+    input["YieldTotal"]["u"] = "kWh";
+    input["YieldTotal"]["d"] = 2;
+    input["MaximumPowerToday"]["v"] = mpptData.maxPowerToday_H21_W;
+    input["MaximumPowerToday"]["u"] = "W";
+    input["MaximumPowerToday"]["d"] = 0;
+    input["MaximumPowerYesterday"]["v"] = mpptData.maxPowerYesterday_H23_W;
+    input["MaximumPowerYesterday"]["u"] = "W";
+    input["MaximumPowerYesterday"]["d"] = 0;
 }
 
 void WebApiWsVedirectLiveClass::onWebsocketEvent(AsyncWebSocket* server, AsyncWebSocketClient* client, AwsEventType type, void* arg, uint8_t* data, size_t len)
@@ -224,14 +225,12 @@ void WebApiWsVedirectLiveClass::onLivedataStatus(AsyncWebServerRequest* request)
     }
     try {
         std::lock_guard<std::mutex> lock(_mutex);
-        AsyncJsonResponse* response = new AsyncJsonResponse(false, responseSize());
+        AsyncJsonResponse* response = new AsyncJsonResponse();
         auto& root = response->getRoot();
 
-        generateJsonResponse(root, true/*fullUpdate*/);
+        generateCommonJsonResponse(root, true/*fullUpdate*/);
 
-        response->setLength();
-        request->send(response);
-
+        WebApi.sendJsonResponse(request, response, __FUNCTION__, __LINE__);
     } catch (std::bad_alloc& bad_alloc) {
         MessageOutput.printf("Calling /api/vedirectlivedata/status has temporarily run out of resources. Reason: \"%s\".\r\n", bad_alloc.what());
         WebApi.sendTooManyRequests(request);

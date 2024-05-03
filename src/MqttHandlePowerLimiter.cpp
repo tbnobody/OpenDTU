@@ -76,6 +76,8 @@ void MqttHandlePowerLimiterClass::loop()
     auto val = static_cast<unsigned>(PowerLimiter.getMode());
     MqttSettings.publish("powerlimiter/status/mode", String(val));
 
+    MqttSettings.publish("powerlimiter/status/inverter_update_timeouts", String(PowerLimiter.getInverterUpdateTimeouts()));
+
     // no thresholds are relevant for setups without a battery
     if (config.PowerLimiter.IsInverterSolarPowered) { return; }
 

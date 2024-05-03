@@ -105,6 +105,24 @@
                             wide />
                     </CardElement>
 
+                    <div class="alert alert-secondary mt-5" role="alert">
+                        <h2>URL examples:</h2>
+                        <ul>
+                            <li>http://admin:secret@shelly3em.home/status</li>
+                            <li>https://admin:secret@shelly3em.home/status</li>
+                            <li>http://tasmota-123.home/cm?cmnd=status%208</li>
+                            <li>http://12.34.56.78/emeter/0</li>
+                        </ul>
+
+                        <h2>JSON path examples:</h2>
+                        <ul>
+                            <li>total_power - { "othervalue": "blah", "total_power": 123.4 }</li>
+                            <li>testarray/[2]/myvalue - { "testarray": [ {}, { "power": 123.4 } ] }</li>
+                        </ul>
+
+                        More info: <a href="https://github.com/mobizt/FirebaseJson">https://github.com/mobizt/FirebaseJson</a>
+                    </div>
+
                     <CardElement
                             v-for="(http_phase, index) in powerMeterConfigList.http_phases"
                             :key="http_phase.index"
@@ -171,6 +189,25 @@
                                 placeholder="total_power"
                                 :tooltip="$t('powermeteradmin.httpJsonPathDescription')" />
 
+                            <div class="row mb-3">
+                                <label for="power_unit" class="col-sm-2 col-form-label">
+                                    {{ $t('powermeteradmin.httpUnit') }}
+                                </label>
+                                <div class="col-sm-10">
+                                    <select id="power_unit" class="form-select" v-model="http_phase.unit">
+                                        <option value="1">mW</option>
+                                        <option value="0">W</option>
+                                        <option value="2">kW</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <InputElement
+                                :label="$t('powermeteradmin.httpSignInverted')"
+                                v-model="http_phase.sign_inverted"
+                                :tooltip="$t('powermeteradmin.httpSignInvertedHint')"
+                                type="checkbox" />
+
                             <div class="text-center mb-3">
                                 <button type="button" class="btn btn-danger" @click="testHttpRequest(index)">
                                     {{ $t('powermeteradmin.testHttpRequest') }}
@@ -187,23 +224,6 @@
 
             <FormFooter @reload="getPowerMeterConfig"/>
 
-            <div v-if="powerMeterConfigList.source === 3" class="alert alert-secondary" role="alert">
-                <h2>URL examples:</h2>
-                <ul>
-                    <li>http://admin:secret@shelly3em.home/status</li>
-                    <li>https://admin:secret@shelly3em.home/status</li>
-                    <li>http://tasmota-123.home/cm?cmnd=status%208</li>
-                    <li>http://12.34.56.78/emeter/0</li>
-                </ul>
-
-                <h2>JSON path examples:</h2>
-                <ul>
-                    <li>total_power - { "othervalue": "blah", "total_power": 123.4 }</li>
-                    <li>testarray/[2]/myvalue - { "testarray": [ {}, { "power": 123.4 } ] }</li>
-                </ul>
-
-                More info: <a href="https://github.com/mobizt/FirebaseJson">https://github.com/mobizt/FirebaseJson</a>
-            </div>
         </form>
     </BasePage>
 </template>
@@ -261,7 +281,7 @@ export default defineComponent({
                     this.powerMeterConfigList = data;
                     this.dataLoading = false;
 
-                    for (var i = 0; i < this.powerMeterConfigList.http_phases.length; i++) {
+                    for (let i = 0; i < this.powerMeterConfigList.http_phases.length; i++) {
                         this.testHttpRequestAlert.push({
                             message: "",
                             type: "",
@@ -292,7 +312,7 @@ export default defineComponent({
                 );
         },
         testHttpRequest(index: number) {
-            var phaseConfig:PowerMeterHttpPhaseConfig;
+            let phaseConfig:PowerMeterHttpPhaseConfig;
 
             if (this.powerMeterConfigList.http_individual_requests) {
                 phaseConfig = this.powerMeterConfigList.http_phases[index];

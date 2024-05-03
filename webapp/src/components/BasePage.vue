@@ -48,15 +48,14 @@ export default defineComponent({
         showReload: { type: Boolean, required: false, default: false },
     },
     mounted() {
-        var self = this;
         console.log("init");
         PullToRefresh.init({
             mainElement: 'body', // above which element?
             instructionsPullToRefresh: this.$t('base.Pull'),
             instructionsReleaseToRefresh: this.$t('base.Release'),
             instructionsRefreshing: this.$t('base.Refreshing'),
-            onRefresh: function() {
-                self.$emit('reload');
+            onRefresh: () => {
+                this.$emit('reload');
             }
         });
     },

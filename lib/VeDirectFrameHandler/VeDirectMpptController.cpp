@@ -1,65 +1,82 @@
+/* VeDirectMpptController.cpp
+ *
+ *
+ * 2020.08.20 - 0.0 - ???
+ * 2024.03.18 - 0.1 - add of: - temperature from "Smart Battery Sense" connected over VE.Smart network
+ * 					  		  - temperature from internal MPPT sensor
+ * 					  		  - "total DC input power" from MPPT's connected over VE.Smart network
+ */
+
 #include <Arduino.h>
 #include "VeDirectMpptController.h"
 
+//#define PROCESS_NETWORK_STATE
+
 void VeDirectMpptController::init(int8_t rx, int8_t tx, Print* msgOut, bool verboseLogging, uint16_t hwSerialPort)
 {
-	VeDirectFrameHandler::init(rx, tx, msgOut, verboseLogging, hwSerialPort);
-	_spData = std::make_shared<veMpptStruct>();
-	if (_verboseLogging) { _msgOut->println("Finished init MPPTController"); }
+	VeDirectFrameHandler::init("MPPT", rx, tx, msgOut, verboseLogging, hwSerialPort);
 }
 
-bool VeDirectMpptController::isDataValid() const {
-	return VeDirectFrameHandler::isDataValid(*_spData);
-}
-
-void VeDirectMpptController::textRxEvent(char* name, char* value)
+bool VeDirectMpptController::processTextDataDerived(std::string const& name, std::string const& value)
 {
-	if (VeDirectFrameHandler::textRxEvent("MPPT", name, value, _tmpFrame)) {
-		return;
+	if (name == "IL") {
+		_tmpFrame.loadCurrent_IL_mA = atol(value.c_str());
+		return true;
+	}
+	if (name == "LOAD") {
+		_tmpFrame.loadOutputState_LOAD = (value == "ON");
+		return true;
+	}
+	if (name == "CS") {
+		_tmpFrame.currentState_CS = atoi(value.c_str());
+		return true;
+	}
+	if (name == "ERR") {
+		_tmpFrame.errorCode_ERR = atoi(value.c_str());
+		return true;
+	}
+	if (name == "OR") {
+		_tmpFrame.offReason_OR = strtol(value.c_str(), nullptr, 0);
+		return true;
+	}
+	if (name == "MPPT") {
+		_tmpFrame.stateOfTracker_MPPT = atoi(value.c_str());
+		return true;
+	}
+	if (name == "HSDS") {
+		_tmpFrame.daySequenceNr_HSDS = atoi(value.c_str());
+		return true;
+	}
+	if (name == "VPV") {
+		_tmpFrame.panelVoltage_VPV_mV = atol(value.c_str());
+		return true;
+	}
+	if (name == "PPV") {
+		_tmpFrame.panelPower_PPV_W = atoi(value.c_str());
+		return true;
+	}
+	if (name == "H19") {
+		_tmpFrame.yieldTotal_H19_Wh = atol(value.c_str()) * 10;
+		return true;
+	}
+	if (name == "H20") {
+		_tmpFrame.yieldToday_H20_Wh = atol(value.c_str()) * 10;
+		return true;
+	}
+	if (name == "H21") {
+		_tmpFrame.maxPowerToday_H21_W = atoi(value.c_str());
+		return true;
+	}
+	if (name == "H22") {
+		_tmpFrame.yieldYesterday_H22_Wh = atol(value.c_str()) * 10;
+		return true;
+	}
+	if (name == "H23") {
+		_tmpFrame.maxPowerYesterday_H23_W = atoi(value.c_str());
+		return true;
 	}
 
-	if (strcmp(name, "LOAD") == 0) {
-		if (strcmp(value, "ON") == 0)
-			_tmpFrame.LOAD = true;
-		else
-			_tmpFrame.LOAD = false;
-	}
-	else if (strcmp(name, "CS") == 0) {
-		_tmpFrame.CS = atoi(value);
-	}
-	else if (strcmp(name, "ERR") == 0) {
-		_tmpFrame.ERR = atoi(value);
-	}
-	else if (strcmp(name, "OR") == 0) {
-		_tmpFrame.OR = strtol(value, nullptr, 0);
-	}
-	else if (strcmp(name, "MPPT") == 0) {
-		_tmpFrame.MPPT = atoi(value);
-	}
-	else if (strcmp(name, "HSDS") == 0) {
-		_tmpFrame.HSDS = atoi(value);
-	}
-	else if (strcmp(name, "VPV") == 0) {
-		_tmpFrame.VPV = round(atof(value) / 10.0) / 100.0;
-	}
-	else if (strcmp(name, "PPV") == 0) {
-		_tmpFrame.PPV = atoi(value);
-	}
-	else if (strcmp(name, "H19") == 0) {
-		_tmpFrame.H19 = atof(value) / 100.0;
-	}
-	else if (strcmp(name, "H20") == 0) {
-		_tmpFrame.H20 = atof(value) / 100.0;
-	}
-	else if (strcmp(name, "H21") == 0) {
-		_tmpFrame.H21 = atoi(value);
-	}
-	else if (strcmp(name, "H22") == 0) {
-		_tmpFrame.H22 = atof(value) / 100.0;
-	}
-	else if (strcmp(name, "H23") == 0) {
-		_tmpFrame.H23 = atoi(value);
-	}
+	return false;
 }
 
 /*
@@ -67,110 +84,174 @@ void VeDirectMpptController::textRxEvent(char* name, char* value)
  *  This function is called at the end of the received frame.
  */
 void VeDirectMpptController::frameValidEvent() {
-	_tmpFrame.P = _tmpFrame.V * _tmpFrame.I;
+	// power into the battery, (+) means charging, (-) means discharging
+	_tmpFrame.batteryOutputPower_W = static_cast<int16_t>((_tmpFrame.batteryVoltage_V_mV / 1000.0f) * (_tmpFrame.batteryCurrent_I_mA / 1000.0f));
 
-	_tmpFrame.IPV = 0;
-	if (_tmpFrame.VPV > 0) {
-		_tmpFrame.IPV = _tmpFrame.PPV / _tmpFrame.VPV;
+	// calculation of the panel current
+	if ((_tmpFrame.panelVoltage_VPV_mV > 0) && (_tmpFrame.panelPower_PPV_W >= 1)) {
+		_tmpFrame.panelCurrent_mA = static_cast<uint32_t>(_tmpFrame.panelPower_PPV_W * 1000000.0f / _tmpFrame.panelVoltage_VPV_mV);
+	} else {
+		_tmpFrame.panelCurrent_mA = 0;
 	}
 
-	_tmpFrame.E = 0;
-	if ( _tmpFrame.PPV > 0) {
-		_efficiency.addNumber(static_cast<double>(_tmpFrame.P * 100) / _tmpFrame.PPV);
-		_tmpFrame.E = _efficiency.getAverage();
+	// calculation of the MPPT efficiency
+	float totalPower_W = (_tmpFrame.loadCurrent_IL_mA / 1000.0f + _tmpFrame.batteryCurrent_I_mA / 1000.0f) * _tmpFrame.batteryVoltage_V_mV /1000.0f;
+	if (_tmpFrame.panelPower_PPV_W > 0) {
+		_efficiency.addNumber(totalPower_W * 100.0f / _tmpFrame.panelPower_PPV_W);
+		_tmpFrame.mpptEfficiency_Percent = _efficiency.getAverage();
+	} else {
+		_tmpFrame.mpptEfficiency_Percent = 0.0f;
 	}
 
-	_spData = std::make_shared<veMpptStruct>(_tmpFrame);
-	_tmpFrame = {};
-	_lastUpdate = millis();
+	if (!_canSend) { return; }
+
+	// Copy from the "VE.Direct Protocol" documentation
+	// For firmware version v1.52 and below, when no VE.Direct queries are sent to the device, the
+	// charger periodically sends human readable (TEXT) data to the serial port. For firmware
+	// versions v1.53 and above, the charger always periodically sends TEXT data to the serial port.
+	// --> We just use hex commandes for firmware >= 1.53 to keep text messages alive
+	if (atoi(_tmpFrame.firmwareNr_FW) < 153) { return; }
+
+	using Command = VeDirectHexCommand;
+	using Register = VeDirectHexRegister;
+
+	sendHexCommand(Command::GET, Register::ChargeControllerTemperature);
+	sendHexCommand(Command::GET, Register::SmartBatterySenseTemperature);
+	sendHexCommand(Command::GET, Register::NetworkTotalDcInputPower);
+
+#ifdef PROCESS_NETWORK_STATE
+	sendHexCommand(Command::GET, Register::NetworkInfo);
+	sendHexCommand(Command::GET, Register::NetworkMode);
+	sendHexCommand(Command::GET, Register::NetworkStatus);
+#endif // PROCESS_NETWORK_STATE
 }
 
-/*
- * getCsAsString
- * This function returns the state of operations (CS) as readable text.
- */
-frozen::string const& VeDirectMpptController::veMpptStruct::getCsAsString() const
+
+void VeDirectMpptController::loop()
 {
-	static constexpr frozen::map<uint8_t, frozen::string, 9> values = {
-		{ 0,   "OFF" },
-		{ 2,   "Fault" },
-		{ 3,   "Bulk" },
-		{ 4,   "Absorbtion" },
-		{ 5,   "Float" },
-		{ 7,   "Equalize (manual)" },
-		{ 245, "Starting-up" },
-		{ 247, "Auto equalize / Recondition" },
-		{ 252, "External Control" }
+	VeDirectFrameHandler::loop();
+
+	auto resetTimestamp = [this](auto& pair) {
+		if (pair.first > 0 && (millis() - pair.first) > (10 * 1000)) {
+			pair.first = 0;
+		}
 	};
 
-	return getAsString(values, CS);
+	resetTimestamp(_tmpFrame.MpptTemperatureMilliCelsius);
+	resetTimestamp(_tmpFrame.SmartBatterySenseTemperatureMilliCelsius);
+	resetTimestamp(_tmpFrame.NetworkTotalDcInputPowerMilliWatts);
+
+#ifdef PROCESS_NETWORK_STATE
+	resetTimestamp(_tmpFrame.NetworkInfo);
+	resetTimestamp(_tmpFrame.NetworkMode);
+	resetTimestamp(_tmpFrame.NetworkStatus);
+#endif // PROCESS_NETWORK_STATE
 }
 
-/*
- * getMpptAsString
- * This function returns the state of MPPT (MPPT) as readable text.
- */
-frozen::string const& VeDirectMpptController::veMpptStruct::getMpptAsString() const
-{
-	static constexpr frozen::map<uint8_t, frozen::string, 3> values = {
-		{ 0, "OFF" },
-		{ 1, "Voltage or current limited" },
-		{ 2, "MPP Tracker active" }
-	};
-
-	return getAsString(values, MPPT);
-}
 
 /*
- * getErrAsString
- * This function returns error state (ERR) as readable text.
+ * hexDataHandler()
+ * analyse the content of VE.Direct hex messages
+ * Handels the received hex data from the MPPT
  */
-frozen::string const& VeDirectMpptController::veMpptStruct::getErrAsString() const
-{
-	static constexpr frozen::map<uint8_t, frozen::string, 20> values = {
-		{ 0,   "No error" },
-		{ 2,   "Battery voltage too high" },
-		{ 17,  "Charger temperature too high" },
-		{ 18,  "Charger over current" },
-		{ 19,  "Charger current reversed" },
-		{ 20,  "Bulk time limit exceeded" },
-		{ 21,  "Current sensor issue(sensor bias/sensor broken)" },
-		{ 26,  "Terminals overheated" },
-		{ 28,  "Converter issue (dual converter models only)" },
-		{ 33,  "Input voltage too high (solar panel)" },
-		{ 34,  "Input current too high (solar panel)" },
-		{ 38,  "Input shutdown (due to excessive battery voltage)" },
-		{ 39,  "Input shutdown (due to current flow during off mode)" },
-		{ 40,  "Input" },
-		{ 65,  "Lost communication with one of devices" },
-		{ 67,  "Synchronisedcharging device configuration issue" },
-		{ 68,  "BMS connection lost" },
-		{ 116, "Factory calibration data lost" },
-		{ 117, "Invalid/incompatible firmware" },
-		{ 118, "User settings invalid" }
-	};
+bool VeDirectMpptController::hexDataHandler(VeDirectHexData const &data) {
+	if (data.rsp != VeDirectHexResponse::GET &&
+			data.rsp != VeDirectHexResponse::ASYNC) { return false; }
 
-	return getAsString(values, ERR);
-}
+	auto regLog = static_cast<uint16_t>(data.addr);
 
-/*
- * getOrAsString
- * This function returns the off reason (OR) as readable text.
- */
-frozen::string const& VeDirectMpptController::veMpptStruct::getOrAsString() const
-{
-	static constexpr frozen::map<uint32_t, frozen::string, 10> values = {
-		{ 0x00000000, "Not off" },
-		{ 0x00000001, "No input power" },
-		{ 0x00000002, "Switched off (power switch)" },
-		{ 0x00000004, "Switched off (device moderegister)" },
-		{ 0x00000008, "Remote input" },
-		{ 0x00000010, "Protection active" },
-		{ 0x00000020, "Paygo" },
-		{ 0x00000040, "BMS" },
-		{ 0x00000080, "Engine shutdown detection" },
-		{ 0x00000100, "Analysing input voltage" }
-	};
+	switch (data.addr) {
+		case VeDirectHexRegister::ChargeControllerTemperature:
+			_tmpFrame.MpptTemperatureMilliCelsius =
+				{ millis(), static_cast<int32_t>(data.value) * 10 };
 
-	return getAsString(values, OR);
+			if (_verboseLogging) {
+				_msgOut->printf("%s Hex Data: MPPT Temperature (0x%04X): %.2f°C\r\n",
+						_logId, regLog,
+						_tmpFrame.MpptTemperatureMilliCelsius.second / 1000.0);
+			}
+			return true;
+			break;
+
+		case VeDirectHexRegister::SmartBatterySenseTemperature:
+			if (data.value == 0xFFFF) {
+				if (_verboseLogging) {
+					_msgOut->printf("%s Hex Data: Smart Battery Sense Temperature is not available\r\n", _logId);
+				}
+				return true; // we know what to do with it, and we decided to ignore the value
+			}
+
+			_tmpFrame.SmartBatterySenseTemperatureMilliCelsius =
+				{ millis(), static_cast<int32_t>(data.value) * 10 - 272150 };
+
+			if (_verboseLogging) {
+				_msgOut->printf("%s Hex Data: Smart Battery Sense Temperature (0x%04X): %.2f°C\r\n",
+						_logId, regLog,
+						_tmpFrame.SmartBatterySenseTemperatureMilliCelsius.second / 1000.0);
+			}
+			return true;
+			break;
+
+		case VeDirectHexRegister::NetworkTotalDcInputPower:
+			if (data.value == 0xFFFFFFFF) {
+				if (_verboseLogging) {
+					_msgOut->printf("%s Hex Data: Network total DC power value "
+							"indicates non-networked controller\r\n", _logId);
+				}
+				_tmpFrame.NetworkTotalDcInputPowerMilliWatts = { 0, 0 };
+				return true; // we know what to do with it, and we decided to ignore the value
+			}
+
+			_tmpFrame.NetworkTotalDcInputPowerMilliWatts =
+				{ millis(), data.value * 10 };
+
+			if (_verboseLogging) {
+				_msgOut->printf("%s Hex Data: Network Total DC Power (0x%04X): %.2fW\r\n",
+						_logId, regLog,
+						_tmpFrame.NetworkTotalDcInputPowerMilliWatts.second / 1000.0);
+			}
+			return true;
+			break;
+
+#ifdef PROCESS_NETWORK_STATE
+		case VeDirectHexRegister::NetworkInfo:
+			_tmpFrame.NetworkInfo =
+				{ millis(), static_cast<uint8_t>(data.value) };
+
+			if (_verboseLogging) {
+				_msgOut->printf("%s Hex Data: Network Info (0x%04X): 0x%X\r\n",
+						_logId, regLog, data.value);
+			}
+			return true;
+			break;
+
+		case VeDirectHexRegister::NetworkMode:
+			_tmpFrame.NetworkMode =
+				{ millis(), static_cast<uint8_t>(data.value) };
+
+			if (_verboseLogging) {
+				_msgOut->printf("%s Hex Data: Network Mode (0x%04X): 0x%X\r\n",
+						_logId, regLog, data.value);
+			}
+			return true;
+			break;
+
+		case VeDirectHexRegister::NetworkStatus:
+			_tmpFrame.NetworkStatus =
+				{ millis(), static_cast<uint8_t>(data.value) };
+
+			if (_verboseLogging) {
+				_msgOut->printf("%s Hex Data: Network Status (0x%04X): 0x%X\r\n",
+						_logId, regLog, data.value);
+			}
+			return true;
+			break;
+#endif // PROCESS_NETWORK_STATE
+
+		default:
+			return false;
+			break;
+	}
+
+	return false;
 }

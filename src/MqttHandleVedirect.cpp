@@ -59,21 +59,13 @@ void MqttHandleVedirectClass::loop()
         #endif
 
         for (int idx = 0; idx < VictronMppt.controllerAmount(); ++idx) {
-            if (!VictronMppt.isDataValid(idx)) {
-                continue;
-            }
+            std::optional<VeDirectMpptController::data_t> optMpptData = VictronMppt.getData(idx);
+            if (!optMpptData.has_value()) { continue; }
 
-            std::optional<VeDirectMpptController::spData_t> spOptMpptData = VictronMppt.getData(idx);
-            if (!spOptMpptData.has_value()) {
-                continue;
-            }
-
-            VeDirectMpptController::spData_t &spMpptData = spOptMpptData.value();
-
-            VeDirectMpptController::veMpptStruct _kvFrame = _kvFrames[spMpptData->SER];
-            publish_mppt_data(spMpptData, _kvFrame);
+            auto const& kvFrame = _kvFrames[optMpptData->serialNr_SER];
+            publish_mppt_data(*optMpptData, kvFrame);
             if (!_PublishFull) {
-                _kvFrames[spMpptData->SER] = *spMpptData;
+                _kvFrames[optMpptData->serialNr_SER] = *optMpptData;
             }
         }
 
@@ -104,79 +96,48 @@ void MqttHandleVedirectClass::loop()
     }
 }
 
-void MqttHandleVedirectClass::publish_mppt_data(const VeDirectMpptController::spData_t &spMpptData,
-                                                VeDirectMpptController::veMpptStruct &frame) const {
+void MqttHandleVedirectClass::publish_mppt_data(const VeDirectMpptController::data_t &currentData,
+                                                const VeDirectMpptController::data_t &previousData) const {
     String value;
     String topic = "victron/";
-    topic.concat(spMpptData->SER);
+    topic.concat(currentData.serialNr_SER);
     topic.concat("/");
 
-    if (_PublishFull || spMpptData->PID != frame.PID)
-        MqttSettings.publish(topic + "PID", spMpptData->getPidAsString().data());
-    if (_PublishFull || strcmp(spMpptData->SER, frame.SER) != 0)
-        MqttSettings.publish(topic + "SER", spMpptData->SER );
-    if (_PublishFull || strcmp(spMpptData->FW, frame.FW) != 0)
-        MqttSettings.publish(topic + "FW", spMpptData->FW);
-    if (_PublishFull || spMpptData->LOAD != frame.LOAD)
-        MqttSettings.publish(topic + "LOAD", spMpptData->LOAD ? "ON" : "OFF");
-    if (_PublishFull || spMpptData->CS != frame.CS)
-        MqttSettings.publish(topic + "CS", spMpptData->getCsAsString().data());
-    if (_PublishFull || spMpptData->ERR != frame.ERR)
-        MqttSettings.publish(topic + "ERR", spMpptData->getErrAsString().data());
-    if (_PublishFull || spMpptData->OR != frame.OR)
-        MqttSettings.publish(topic + "OR", spMpptData->getOrAsString().data());
-    if (_PublishFull || spMpptData->MPPT != frame.MPPT)
-        MqttSettings.publish(topic + "MPPT", spMpptData->getMpptAsString().data());
-    if (_PublishFull || spMpptData->HSDS != frame.HSDS) {
-        value = spMpptData->HSDS;
-        MqttSettings.publish(topic + "HSDS", value);
+#define PUBLISH(sm, t, val) \
+    if (_PublishFull || currentData.sm != previousData.sm) { \
+        MqttSettings.publish(topic + t, String(val)); \
     }
-    if (_PublishFull || spMpptData->V != frame.V) {
-        value = spMpptData->V;
-        MqttSettings.publish(topic + "V", value);
+
+    PUBLISH(productID_PID,           "PID",  currentData.getPidAsString().data());
+    PUBLISH(serialNr_SER,            "SER",  currentData.serialNr_SER);
+    PUBLISH(firmwareNr_FW,            "FW",  currentData.firmwareNr_FW);
+    PUBLISH(loadOutputState_LOAD,   "LOAD",  (currentData.loadOutputState_LOAD ? "ON" : "OFF"));
+    PUBLISH(currentState_CS,          "CS",  currentData.getCsAsString().data());
+    PUBLISH(errorCode_ERR,           "ERR",  currentData.getErrAsString().data());
+    PUBLISH(offReason_OR,             "OR",  currentData.getOrAsString().data());
+    PUBLISH(stateOfTracker_MPPT,    "MPPT",  currentData.getMpptAsString().data());
+    PUBLISH(daySequenceNr_HSDS,     "HSDS",  currentData.daySequenceNr_HSDS);
+    PUBLISH(batteryVoltage_V_mV,       "V",  currentData.batteryVoltage_V_mV / 1000.0);
+    PUBLISH(batteryCurrent_I_mA,       "I",  currentData.batteryCurrent_I_mA / 1000.0);
+    PUBLISH(batteryOutputPower_W,      "P",  currentData.batteryOutputPower_W);
+    PUBLISH(panelVoltage_VPV_mV,     "VPV",  currentData.panelVoltage_VPV_mV / 1000.0);
+    PUBLISH(panelCurrent_mA,         "IPV",  currentData.panelCurrent_mA / 1000.0);
+    PUBLISH(panelPower_PPV_W,        "PPV",  currentData.panelPower_PPV_W);
+    PUBLISH(mpptEfficiency_Percent,    "E",  currentData.mpptEfficiency_Percent);
+    PUBLISH(yieldTotal_H19_Wh,       "H19",  currentData.yieldTotal_H19_Wh / 1000.0);
+    PUBLISH(yieldToday_H20_Wh,       "H20",  currentData.yieldToday_H20_Wh / 1000.0);
+    PUBLISH(maxPowerToday_H21_W,     "H21",  currentData.maxPowerToday_H21_W);
+    PUBLISH(yieldYesterday_H22_Wh,   "H22",  currentData.yieldYesterday_H22_Wh / 1000.0);
+    PUBLISH(maxPowerYesterday_H23_W, "H23",  currentData.maxPowerYesterday_H23_W);
+#undef PUBLILSH
+
+#define PUBLISH_OPT(sm, t, val) \
+    if (currentData.sm.first != 0 && (_PublishFull || currentData.sm.second != previousData.sm.second)) { \
+        MqttSettings.publish(topic + t, String(val)); \
     }
-    if (_PublishFull || spMpptData->I != frame.I) {
-        value = spMpptData->I;
-        MqttSettings.publish(topic + "I", value);
-    }
-    if (_PublishFull || spMpptData->P != frame.P) {
-        value = spMpptData->P;
-        MqttSettings.publish(topic + "P", value);
-    }
-    if (_PublishFull || spMpptData->VPV != frame.VPV) {
-        value = spMpptData->VPV;
-        MqttSettings.publish(topic + "VPV", value);
-    }
-    if (_PublishFull || spMpptData->IPV != frame.IPV) {
-        value = spMpptData->IPV;
-        MqttSettings.publish(topic + "IPV", value);
-    }
-    if (_PublishFull || spMpptData->PPV != frame.PPV) {
-        value = spMpptData->PPV;
-        MqttSettings.publish(topic + "PPV", value);
-    }
-    if (_PublishFull || spMpptData->E != frame.E) {
-        value = spMpptData->E;
-        MqttSettings.publish(topic + "E", value);
-    }
-    if (_PublishFull || spMpptData->H19 != frame.H19) {
-        value = spMpptData->H19;
-        MqttSettings.publish(topic + "H19", value);
-    }
-    if (_PublishFull || spMpptData->H20 != frame.H20) {
-        value = spMpptData->H20;
-        MqttSettings.publish(topic + "H20", value);
-    }
-    if (_PublishFull || spMpptData->H21 != frame.H21) {
-        value = spMpptData->H21;
-        MqttSettings.publish(topic + "H21", value);
-    }
-    if (_PublishFull || spMpptData->H22 != frame.H22) {
-        value = spMpptData->H22;
-        MqttSettings.publish(topic + "H22", value);
-    }
-    if (_PublishFull || spMpptData->H23 != frame.H23) {
-        value = spMpptData->H23;
-        MqttSettings.publish(topic + "H23", value);
-    }
+
+    PUBLISH_OPT(NetworkTotalDcInputPowerMilliWatts,       "NetworkTotalDcInputPower",     currentData.NetworkTotalDcInputPowerMilliWatts.second / 1000.0);
+    PUBLISH_OPT(MpptTemperatureMilliCelsius,              "MpptTemperature",              currentData.MpptTemperatureMilliCelsius.second / 1000.0);
+    PUBLISH_OPT(SmartBatterySenseTemperatureMilliCelsius, "SmartBatterySenseTemperature", currentData.SmartBatterySenseTemperatureMilliCelsius.second / 1000.0);
+#undef PUBLILSH_OPT
 }

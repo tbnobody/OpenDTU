@@ -14,8 +14,8 @@ public:
     void init(AsyncWebServer& server, Scheduler& scheduler);
 
 private:
-    void generateJsonResponse(JsonVariant& root, bool fullUpdate);
-    static void populateJson(const JsonObject &root, const VeDirectMpptController::spData_t &spMpptData);
+    void generateCommonJsonResponse(JsonVariant& root, bool fullUpdate);
+    static void populateJson(const JsonObject &root, const VeDirectMpptController::data_t &mpptData);
     void onLivedataStatus(AsyncWebServerRequest* request);
     void onWebsocketEvent(AsyncWebSocket* server, AsyncWebSocketClient* client, AwsEventType type, void* arg, uint8_t* data, size_t len);
     bool hasUpdate(size_t idx);

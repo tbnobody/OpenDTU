@@ -8,8 +8,6 @@
 #include <LittleFS.h>
 #include <string.h>
 
-#define JSON_BUFFER_SIZE 6144
-
 #ifndef DISPLAY_TYPE
 #define DISPLAY_TYPE 0U
 #endif
@@ -92,6 +90,14 @@
 
 #ifndef VICTRON_PIN_RX
 #define VICTRON_PIN_RX -1
+#endif
+
+#ifndef VICTRON_PIN_TX2
+#define VICTRON_PIN_TX2 -1
+#endif
+
+#ifndef VICTRON_PIN_RX2
+#define VICTRON_PIN_RX2 -1
 #endif
 
 #ifndef BATTERY_PIN_RX
@@ -234,7 +240,7 @@ bool PinMappingClass::init(const String& deviceMapping)
         return false;
     }
 
-    DynamicJsonDocument doc(JSON_BUFFER_SIZE);
+    JsonDocument doc;
     // Deserialize the JSON document
     DeserializationError error = deserializeJson(doc, f);
     if (error) {
@@ -284,8 +290,8 @@ bool PinMappingClass::init(const String& deviceMapping)
             // OpenDTU-OnBattery-specific pins below
             _pinMapping.victron_rx = doc[i]["victron"]["rx"] | VICTRON_PIN_RX;
             _pinMapping.victron_tx = doc[i]["victron"]["tx"] | VICTRON_PIN_TX;
-            _pinMapping.victron_rx2 = doc[i]["victron"]["rx2"] | VICTRON_PIN_RX;
-            _pinMapping.victron_tx2 = doc[i]["victron"]["tx2"] | VICTRON_PIN_TX;
+            _pinMapping.victron_rx2 = doc[i]["victron"]["rx2"] | VICTRON_PIN_RX2;
+            _pinMapping.victron_tx2 = doc[i]["victron"]["tx2"] | VICTRON_PIN_TX2;
 
             _pinMapping.battery_rx = doc[i]["battery"]["rx"] | BATTERY_PIN_RX;
             _pinMapping.battery_rxen = doc[i]["battery"]["rxen"] | BATTERY_PIN_RXEN;

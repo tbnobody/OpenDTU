@@ -75,6 +75,7 @@ void MqttHandleHuaweiClass::loop()
       MqttSettings.publish("huawei/input_temp", String(rp->input_temp));
       MqttSettings.publish("huawei/output_temp", String(rp->output_temp));
       MqttSettings.publish("huawei/efficiency", String(rp->efficiency));
+      MqttSettings.publish("huawei/mode", String(HuaweiCan.getMode()));
 
 
       yield();
