@@ -582,7 +582,7 @@
         "httpHeaderKeyDescription": "A custom HTTP request header can be defined. Might be useful if you have to send something like a custom Authorization header.",
         "httpHeaderValue": "Optional: HTTP request header - Value",
         "httpJsonPath": "JSON path",
-        "httpJsonPathDescription": "JSON path to find the power value in the response. This uses the JSON path query syntax from mobizt/FirebaseJson. See above for examples.",
+        "httpJsonPathDescription": "Application specific JSON path to find the power value in the HTTP(S) response, e.g., 'power/total/watts' or simply 'total'.",
         "httpUnit": "Unit",
         "httpSignInverted": "Change Sign",
         "httpSignInvertedHint": "Is is expected that positive values denote power usage from the grid. Check this option if the sign of this value has the opposite meaning.",
