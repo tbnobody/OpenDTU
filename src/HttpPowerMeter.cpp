@@ -4,8 +4,7 @@
 #include "MessageOutput.h"
 #include <WiFiClientSecure.h>
 #include <ArduinoJson.h>
-#include <Crypto.h>
-#include <SHA256.h>
+#include "mbedtls/sha256.h"
 #include <base64.h>
 #include <memory>
 #include <ESPmDNS.h>
@@ -324,27 +323,24 @@ bool HttpPowerMeterClass::extractUrlComponents(String url, String& _protocol, St
     return true;
 }
 
-#define HASH_SIZE 32
-
 String HttpPowerMeterClass::sha256(const String& data) {
-    SHA256 sha256;
-    uint8_t hash[HASH_SIZE];
+    uint8_t hash[32];
 
-    sha256.reset();
-    sha256.update(data.c_str(), data.length());
-    sha256.finalize(hash, HASH_SIZE);
+    mbedtls_sha256_context ctx;
+    mbedtls_sha256_init(&ctx);
+    mbedtls_sha256_starts(&ctx, 0); // select SHA256
+    mbedtls_sha256_update(&ctx, reinterpret_cast<const unsigned char*>(data.c_str()), data.length());
+    mbedtls_sha256_finish(&ctx, hash);
+    mbedtls_sha256_free(&ctx);
 
-    String hashStr = "";
-    for (int i = 0; i < HASH_SIZE; i++) {
-        String hex = String(hash[i], HEX);
-        if (hex.length() == 1) {
-        hashStr += "0";
-        }
-        hashStr += hex;
+    char res[sizeof(hash) * 2 + 1];
+    for (int i = 0; i < sizeof(hash); i++) {
+        snprintf(res + (i*2), sizeof(res) - (i*2), "%02x", hash[i]);
     }
 
-    return hashStr;
+    return res;
 }
+
 void HttpPowerMeterClass::prepareRequest(uint32_t timeout, const char* httpHeader, const char* httpValue) {
     httpClient.setFollowRedirects(HTTPC_STRICT_FOLLOW_REDIRECTS);
     httpClient.setUserAgent("OpenDTU-OnBattery");
