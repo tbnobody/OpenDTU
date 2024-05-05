@@ -31,7 +31,15 @@ void DisplayGraphicDiagramClass::averageLoop()
     const float currentWatts = Datastore.getTotalAcPowerEnabled(); // get the current AC production
     _iRunningAverage += currentWatts;
     _iRunningAverageCnt++;
-    if(SunPosition.dayPeriodLength() == 0) { // noch keine Uhrzeit oder ein neuer tag
+    if(SunPosition.isDayPeriod()) {
+        if(wasNight) {  //neuer tag
+            _graphValuesCount = 0;
+            wasNight = false;
+        }
+    } else {
+        wasNight = true;
+    }
+    if(SunPosition.dayPeriodLength() == 0) { // noch keine Uhrzeit
         _graphValuesCount = 0;
     } else {
         if(SunPosition.dayPeriodLength() != _daySeconds) { // neue Tageslänge
@@ -54,11 +62,6 @@ void DisplayGraphicDiagramClass::dataPointLoop()
         _iRunningAverage = 0;
         _iRunningAverageCnt = 0;
     }
-}
-
-void DisplayGraphicDiagramClass::resetDataPoints()
-{
-
 }
 
 uint32_t DisplayGraphicDiagramClass::getSecondsPerDot()
@@ -111,7 +114,7 @@ void DisplayGraphicDiagramClass::redraw(uint8_t screenSaverOffsetX, uint8_t xPos
     }
     else {
         float wattsToday = Datastore.getTotalAcYieldDayEnabled();
-        char * text = new char[10]();
+        char text[5];
         if (wattsToday > 999) {
             snprintf(text, 10, "%.0fkWh" , wattsToday / 1000);
         } else {
@@ -139,7 +142,7 @@ void DisplayGraphicDiagramClass::redraw(uint8_t screenSaverOffsetX, uint8_t xPos
         }
 
         _display->drawLine(
-            graphPosX + i / scaleFactorX, horizontal_line_y - std::max<int16_t>(0, _graphValues[i] / scaleFactorY - 0.5),
+            graphPosX + i / scaleFactorX, horizontal_line_y - std::max<int16_t>(0, _graphValues[i] / scaleFactorY),
             graphPosX + i / scaleFactorX, horizontal_line_y);
     }
 }
