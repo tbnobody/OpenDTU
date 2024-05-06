@@ -577,7 +577,7 @@
         "httpHeaderKeyDescription": "Ein individueller HTTP request header kann hier definiert werden. Das kann z.B. verwendet werden um einen eigenen Authorization header mitzugeben.",
         "httpHeaderValue": "Optional: HTTP request header - Wert",
         "httpJsonPath": "JSON Pfad",
-        "httpJsonPathDescription": "JSON Pfad um den Leistungswert zu finden. Es verwendet die Selektions-Syntax von mobizt/FirebaseJson. Beispiele gibt es oben.",
+        "httpJsonPathDescription": "Anwendungsspezifischer JSON-Pfad um den Leistungswert in the HTTP(S) Antwort zu finden, z.B. 'power/total/watts' oder nur 'total'.",
         "httpUnit": "Einheit",
         "httpSignInverted": "Vorzeichen umkehren",
         "httpSignInvertedHint": "Positive Werte werden als Leistungsabnahme aus dem Netz interpretiert. Diese Option muss aktiviert werden, wenn das Vorzeichen des Wertes die gegenteilige Bedeutung hat.",

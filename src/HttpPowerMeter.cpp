@@ -3,9 +3,8 @@
 #include "HttpPowerMeter.h"
 #include "MessageOutput.h"
 #include <WiFiClientSecure.h>
-#include <FirebaseJson.h>
-#include <Crypto.h>
-#include <SHA256.h>
+#include <ArduinoJson.h>
+#include "mbedtls/sha256.h"
 #include <base64.h>
 #include <memory>
 #include <ESPmDNS.h>
@@ -219,18 +218,43 @@ String HttpPowerMeterClass::getDigestAuth(String& authReq, const String& usernam
     return authorization;
 }
 
-bool HttpPowerMeterClass::tryGetFloatValueForPhase(int phase, const char* jsonPath, Unit_t unit, bool signInverted)
+bool HttpPowerMeterClass::tryGetFloatValueForPhase(int phase, String jsonPath, Unit_t unit, bool signInverted)
 {
-    FirebaseJson json;
-    json.setJsonData(httpResponse);
-    FirebaseJsonData value;
-    if (!json.get(value, jsonPath)) {
-        snprintf_P(httpPowerMeterError, sizeof(httpPowerMeterError), PSTR("[HttpPowerMeter] Couldn't find a value for phase %i with Json query \"%s\""), phase, jsonPath);
+    JsonDocument root;
+    const DeserializationError error = deserializeJson(root, httpResponse);
+    if (error) {
+        snprintf_P(httpPowerMeterError, sizeof(httpPowerMeterError),
+                PSTR("[HttpPowerMeter] Unable to parse server response as JSON"));
+        return false;
+    }
+
+    constexpr char delimiter = '/';
+    int start = 0;
+    int end = jsonPath.indexOf(delimiter);
+    auto value = root.as<JsonVariantConst>();
+
+    // NOTE: "Because ArduinoJson implements the Null Object Pattern, it is
+    // always safe to read the object: if the key doesn't exist, it returns an
+    // empty value."
+    while (end != -1) {
+        String key = jsonPath.substring(start, end);
+        value = value[key];
+        start = end + 1;
+        end = jsonPath.indexOf(delimiter, start);
+    }
+
+    String lastKey = jsonPath.substring(start);
+    value = value[lastKey];
+
+    if (value.isNull()) {
+        snprintf_P(httpPowerMeterError, sizeof(httpPowerMeterError),
+                PSTR("[HttpPowerMeter] Unable to find a value for phase %i with JSON path \"%s\""),
+                phase+1, jsonPath.c_str());
         return false;
     }
 
     // this value is supposed to be in Watts and positive if energy is consumed.
-    power[phase] = value.to<float>();
+    power[phase] = value.as<float>();
 
     switch (unit) {
         case Unit_t::MilliWatts:
@@ -299,27 +323,24 @@ bool HttpPowerMeterClass::extractUrlComponents(String url, String& _protocol, St
     return true;
 }
 
-#define HASH_SIZE 32
-
 String HttpPowerMeterClass::sha256(const String& data) {
-    SHA256 sha256;
-    uint8_t hash[HASH_SIZE];
+    uint8_t hash[32];
 
-    sha256.reset();
-    sha256.update(data.c_str(), data.length());
-    sha256.finalize(hash, HASH_SIZE);
+    mbedtls_sha256_context ctx;
+    mbedtls_sha256_init(&ctx);
+    mbedtls_sha256_starts(&ctx, 0); // select SHA256
+    mbedtls_sha256_update(&ctx, reinterpret_cast<const unsigned char*>(data.c_str()), data.length());
+    mbedtls_sha256_finish(&ctx, hash);
+    mbedtls_sha256_free(&ctx);
 
-    String hashStr = "";
-    for (int i = 0; i < HASH_SIZE; i++) {
-        String hex = String(hash[i], HEX);
-        if (hex.length() == 1) {
-        hashStr += "0";
-        }
-        hashStr += hex;
+    char res[sizeof(hash) * 2 + 1];
+    for (int i = 0; i < sizeof(hash); i++) {
+        snprintf(res + (i*2), sizeof(res) - (i*2), "%02x", hash[i]);
     }
 
-    return hashStr;
+    return res;
 }
+
 void HttpPowerMeterClass::prepareRequest(uint32_t timeout, const char* httpHeader, const char* httpValue) {
     httpClient.setFollowRedirects(HTTPC_STRICT_FOLLOW_REDIRECTS);
     httpClient.setUserAgent("OpenDTU-OnBattery");

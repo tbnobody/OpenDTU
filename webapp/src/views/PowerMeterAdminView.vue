@@ -116,11 +116,9 @@
 
                         <h2>JSON path examples:</h2>
                         <ul>
-                            <li>total_power - { "othervalue": "blah", "total_power": 123.4 }</li>
-                            <li>testarray/[2]/myvalue - { "testarray": [ {}, { "power": 123.4 } ] }</li>
+                            <li><code>power/total/watts</code> - Finds 123.4 in <code>{ "power": { "phase1": { "factor": 0.98, "watts": 42 }, "total": { "watts": 123.4 } } }</code></li>
+                            <li><code>total</code> - Finds 123.4 in <code>{ "othervalue": 66, "total": 123.4 }</code></li>
                         </ul>
-
-                        More info: <a href="https://github.com/mobizt/FirebaseJson">https://github.com/mobizt/FirebaseJson</a>
                     </div>
 
                     <CardElement
