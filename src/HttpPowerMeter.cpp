@@ -233,23 +233,61 @@ bool HttpPowerMeterClass::tryGetFloatValueForPhase(int phase, String jsonPath, U
     int end = jsonPath.indexOf(delimiter);
     auto value = root.as<JsonVariantConst>();
 
+    auto getNext = [this, &value, &jsonPath, &start](String const& key) -> bool {
+        // handle double forward slashes and paths starting or ending with a slash
+        if (key.isEmpty()) { return true; }
+
+        if (key[0] == '[' && key[key.length() - 1] == ']') {
+            if (!value.is<JsonArrayConst>()) {
+                snprintf_P(httpPowerMeterError, sizeof(httpPowerMeterError),
+                        PSTR("[HttpPowerMeter] Cannot access non-array JSON node "
+                            "using array index '%s' (JSON path '%s', position %i)"),
+                        key.c_str(), jsonPath.c_str(), start);
+                return false;
+            }
+
+            auto idx = key.substring(1, key.length() - 1).toInt();
+            value = value[idx];
+
+            if (value.isNull()) {
+                snprintf_P(httpPowerMeterError, sizeof(httpPowerMeterError),
+                        PSTR("[HttpPowerMeter] Unable to access JSON array "
+                            "index %li (JSON path '%s', position %i)"),
+                        idx, jsonPath.c_str(), start);
+                return false;
+            }
+
+            return true;
+        }
+
+        value = value[key];
+
+        if (value.isNull()) {
+            snprintf_P(httpPowerMeterError, sizeof(httpPowerMeterError),
+                    PSTR("[HttpPowerMeter] Unable to access JSON key "
+                        "'%s' (JSON path '%s', position %i)"),
+                    key.c_str(), jsonPath.c_str(), start);
+            return false;
+        }
+
+        return true;
+    };
+
     // NOTE: "Because ArduinoJson implements the Null Object Pattern, it is
     // always safe to read the object: if the key doesn't exist, it returns an
     // empty value."
     while (end != -1) {
-        String key = jsonPath.substring(start, end);
-        value = value[key];
+        if (!getNext(jsonPath.substring(start, end))) { return false; }
         start = end + 1;
         end = jsonPath.indexOf(delimiter, start);
     }
 
-    String lastKey = jsonPath.substring(start);
-    value = value[lastKey];
+    if (!getNext(jsonPath.substring(start))) { return false; }
 
-    if (value.isNull()) {
+    if (!value.is<float>()) {
         snprintf_P(httpPowerMeterError, sizeof(httpPowerMeterError),
-                PSTR("[HttpPowerMeter] Unable to find a value for phase %i with JSON path \"%s\""),
-                phase+1, jsonPath.c_str());
+                PSTR("[HttpPowerMeter] not a float: '%s'"),
+                value.as<String>().c_str());
         return false;
     }
 
