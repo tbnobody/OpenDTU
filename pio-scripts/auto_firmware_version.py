@@ -81,6 +81,8 @@ def do_main():
         if 1:
             # Add the description of the current git revision
             lines += 'const char *__COMPILED_GIT_HASH__ = "%s";\n' % (get_build_version())
+            # ... and git branch
+            lines += 'const char *__COMPILED_GIT_BRANCH__ = "%s";\n' % (get_build_branch())
 
         updateFileIfChanged(targetfile, bytes(lines, "utf-8"))
 
