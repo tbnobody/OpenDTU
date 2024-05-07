@@ -11,14 +11,7 @@
 #include <Hoymiles.h>
 #include <LittleFS.h>
 #include <ResetReason.h>
-
-#ifndef AUTO_GIT_HASH
-#define AUTO_GIT_HASH ""
-#endif
-
-#ifndef AUTO_GIT_BRANCH
-#define AUTO_GIT_BRANCH ""
-#endif
+#include "__compiled_constants.h"
 
 void WebApiSysstatusClass::init(AsyncWebServer& server, Scheduler& scheduler)
 {
@@ -68,8 +61,8 @@ void WebApiSysstatusClass::onSystemStatus(AsyncWebServerRequest* request)
     char version[16];
     snprintf(version, sizeof(version), "%d.%d.%d", CONFIG_VERSION >> 24 & 0xff, CONFIG_VERSION >> 16 & 0xff, CONFIG_VERSION >> 8 & 0xff);
     root["config_version"] = version;
-    root["git_hash"] = AUTO_GIT_HASH;
-    root["git_branch"] = AUTO_GIT_BRANCH;
+    root["git_hash"] = __COMPILED_GIT_HASH__;
+    root["git_branch"] = __COMPILED_GIT_BRANCH__;
     root["pioenv"] = PIOENV;
 
     root["uptime"] = esp_timer_get_time() / 1000000;

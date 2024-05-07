@@ -8,6 +8,7 @@
 #include "NetworkSettings.h"
 #include "MessageOutput.h"
 #include "Utils.h"
+#include "__compiled_constants.h"
 
 MqttHandlePowerLimiterHassClass MqttHandlePowerLimiterHass;
 
@@ -193,7 +194,7 @@ void MqttHandlePowerLimiterHassClass::createDeviceInfo(JsonObject& object)
     object["cu"] = String("http://") + NetworkSettings.localIP().toString();
     object["mf"] = "OpenDTU";
     object["mdl"] = "Dynamic Power Limiter";
-    object["sw"] = AUTO_GIT_HASH;
+    object["sw"] = __COMPILED_GIT_HASH__;
 }
 
 void MqttHandlePowerLimiterHassClass::publish(const String& subtopic, const String& payload)

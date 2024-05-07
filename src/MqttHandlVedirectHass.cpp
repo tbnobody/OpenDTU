@@ -9,6 +9,7 @@
 #include "MessageOutput.h"
 #include "VictronMppt.h"
 #include "Utils.h"
+#include "__compiled_constants.h"
 
 MqttHandleVedirectHassClass MqttHandleVedirectHass;
 
@@ -214,7 +215,7 @@ void MqttHandleVedirectHassClass::createDeviceInfo(JsonObject &object,
     object["cu"] = String("http://") + NetworkSettings.localIP().toString();
     object["mf"] = "OpenDTU";
     object["mdl"] = mpptData.getPidAsString();
-    object["sw"] = AUTO_GIT_HASH;
+    object["sw"] = __COMPILED_GIT_HASH__;
 }
 
 void MqttHandleVedirectHassClass::publish(const String& subtopic, const String& payload)
