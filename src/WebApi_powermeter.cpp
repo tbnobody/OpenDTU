@@ -226,12 +226,7 @@ void WebApiPowerMeterClass::onAdminPost(AsyncWebServerRequest* request)
 
     WebApi.sendJsonResponse(request, response, __FUNCTION__, __LINE__);
 
-
-    // reboot requiered as per https://github.com/helgeerbe/OpenDTU-OnBattery/issues/565#issuecomment-1872552559
-    yield();
-    delay(1000);
-    yield();
-    ESP.restart();
+    PowerMeter.updateSettings();
 }
 
 void WebApiPowerMeterClass::onTestHttpRequest(AsyncWebServerRequest* request)
