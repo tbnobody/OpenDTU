@@ -128,7 +128,7 @@ void WebApiPowerMeterClass::onAdminPost(AsyncWebServerRequest* request)
         return;
     }
 
-    if (static_cast<PowerMeterProvider::Type>(root["source"].as<uint8_t>()) == PowerMeterProvider::Type::HTTP) {
+    if (static_cast<PowerMeterProvider::Type>(root["source"].as<uint8_t>()) == PowerMeterProvider::Type::HTTP_JSON) {
         JsonArray http_phases = root["http_phases"];
         for (uint8_t i = 0; i < http_phases.size(); i++) {
             JsonObject phase = http_phases[i].as<JsonObject>();
@@ -174,7 +174,7 @@ void WebApiPowerMeterClass::onAdminPost(AsyncWebServerRequest* request)
         }
     }
 
-    if (static_cast<PowerMeterProvider::Type>(root["source"].as<uint8_t>()) == PowerMeterProvider::Type::TIBBER) {
+    if (static_cast<PowerMeterProvider::Type>(root["source"].as<uint8_t>()) == PowerMeterProvider::Type::HTTP_SML) {
         JsonObject tibber = root["tibber"];
 
         if (!tibber.containsKey("url")

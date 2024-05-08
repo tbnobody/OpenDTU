@@ -41,16 +41,16 @@ void PowerMeterClass::updateSettings()
         case PowerMeterProvider::Type::SDM3PH:
             _upProvider = std::make_unique<PowerMeterSerialSdm>();
             break;
-        case PowerMeterProvider::Type::HTTP:
+        case PowerMeterProvider::Type::HTTP_JSON:
             _upProvider = std::make_unique<PowerMeterHttpJson>();
             break;
-        case PowerMeterProvider::Type::SML:
+        case PowerMeterProvider::Type::SERIAL_SML:
             _upProvider = std::make_unique<PowerMeterSerialSml>();
             break;
         case PowerMeterProvider::Type::SMAHM2:
             _upProvider = std::make_unique<PowerMeterUdpSmaHomeManager>();
             break;
-        case PowerMeterProvider::Type::TIBBER:
+        case PowerMeterProvider::Type::HTTP_SML:
             _upProvider = std::make_unique<PowerMeterHttpSml>();
             break;
     }

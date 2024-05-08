@@ -11,10 +11,10 @@ public:
         MQTT = 0,
         SDM1PH = 1,
         SDM3PH = 2,
-        HTTP = 3,
-        SML = 4,
+        HTTP_JSON = 3,
+        SERIAL_SML = 4,
         SMAHM2 = 5,
-        TIBBER = 6
+        HTTP_SML = 6
     };
 
     // returns true if the provider is ready for use, false otherwise
