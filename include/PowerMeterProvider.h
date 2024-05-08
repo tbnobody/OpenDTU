@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 #pragma once
 
+#include <atomic>
 #include "Configuration.h"
 
 class PowerMeterProvider {
@@ -41,6 +42,9 @@ protected:
 private:
     virtual void doMqttPublish() const = 0;
 
-    uint32_t _lastUpdate = 0;
+    // gotUpdate() updates this variable potentially from a different thread
+    // than users that request to read this variable through getLastUpdate().
+    std::atomic<uint32_t> _lastUpdate = 0;
+
     mutable uint32_t _lastMqttPublish = 0;
 };
