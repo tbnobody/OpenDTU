@@ -3,7 +3,7 @@
 
 #include "PowerMeterProvider.h"
 #include <espMqttClient.h>
-#include <map>
+#include <vector>
 #include <mutex>
 
 class PowerMeterMqtt : public PowerMeterProvider {
@@ -15,14 +15,16 @@ public:
     void doMqttPublish() const final;
 
 private:
-    void onMqttMessage(const espMqttClientTypes::MessageProperties& properties,
-        const char* topic, const uint8_t* payload, size_t len, size_t index, size_t total);
+    using MsgProperties = espMqttClientTypes::MessageProperties;
+    void onMessage(MsgProperties const& properties, char const* topic,
+            uint8_t const* payload, size_t len, size_t index,
+            size_t total, float* targetVariable);
 
     float _powerValueOne = 0;
     float _powerValueTwo = 0;
     float _powerValueThree = 0;
 
-    std::map<String, float*> _mqttSubscriptions;
+    std::vector<String> _mqttSubscriptions;
 
     mutable std::mutex _mutex;
 };
