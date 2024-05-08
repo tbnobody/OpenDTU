@@ -7,6 +7,11 @@ bool PowerMeterProvider::isDataValid() const
     return _lastUpdate > 0 && ((millis() - _lastUpdate) < (30 * 1000));
 }
 
+void PowerMeterProvider::mqttPublish(String const& topic, float const& value) const
+{
+    MqttSettings.publish("powermeter/" + topic, String(value));
+}
+
 void PowerMeterProvider::mqttLoop() const
 {
     if (!MqttSettings.getConnected()) { return; }
@@ -15,6 +20,8 @@ void PowerMeterProvider::mqttLoop() const
 
     auto constexpr halfOfAllMillis = std::numeric_limits<uint32_t>::max() / 2;
     if ((_lastUpdate - _lastMqttPublish) > halfOfAllMillis) { return; }
+
+    mqttPublish("powertotal", getPowerTotal());
 
     doMqttPublish();
 

@@ -37,6 +37,8 @@ protected:
 
     void gotUpdate() { _lastUpdate = millis(); }
 
+    void mqttPublish(String const& topic, float const& value) const;
+
     bool _verboseLogging;
 
 private:

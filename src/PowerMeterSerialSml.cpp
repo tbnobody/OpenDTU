@@ -3,7 +3,6 @@
 #include "Configuration.h"
 #include "PinMapping.h"
 #include "MessageOutput.h"
-#include "MqttSettings.h"
 
 bool PowerMeterSerialSml::init()
 {
@@ -35,12 +34,9 @@ void PowerMeterSerialSml::deinit()
 
 void PowerMeterSerialSml::doMqttPublish() const
 {
-    String topic = "powermeter";
-
     std::lock_guard<std::mutex> l(_mutex);
-    MqttSettings.publish(topic + "/powertotal", String(_activePower));
-    MqttSettings.publish(topic + "/import", String(_energyImport));
-    MqttSettings.publish(topic + "/export", String(_energyExport));
+    mqttPublish("import", _energyImport);
+    mqttPublish("export", _energyExport);
 }
 
 void PowerMeterSerialSml::loop()

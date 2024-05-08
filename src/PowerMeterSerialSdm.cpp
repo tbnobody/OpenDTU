@@ -3,7 +3,6 @@
 #include "Configuration.h"
 #include "PinMapping.h"
 #include "MessageOutput.h"
-#include "MqttSettings.h"
 #include "SerialPortManager.h"
 
 void PowerMeterSerialSdm::deinit()
@@ -47,19 +46,15 @@ float PowerMeterSerialSdm::getPowerTotal() const
 
 void PowerMeterSerialSdm::doMqttPublish() const
 {
-    String topic = "powermeter";
-    auto power = getPowerTotal();
-
     std::lock_guard<std::mutex> l(_mutex);
-    MqttSettings.publish(topic + "/power1", String(_phase1Power));
-    MqttSettings.publish(topic + "/power2", String(_phase2Power));
-    MqttSettings.publish(topic + "/power3", String(_phase3Power));
-    MqttSettings.publish(topic + "/powertotal", String(power));
-    MqttSettings.publish(topic + "/voltage1", String(_phase1Voltage));
-    MqttSettings.publish(topic + "/voltage2", String(_phase2Voltage));
-    MqttSettings.publish(topic + "/voltage3", String(_phase3Voltage));
-    MqttSettings.publish(topic + "/import", String(_energyImport));
-    MqttSettings.publish(topic + "/export", String(_energyExport));
+    mqttPublish("power1", _phase1Power);
+    mqttPublish("power2", _phase2Power);
+    mqttPublish("power3", _phase3Power);
+    mqttPublish("voltage1", _phase1Voltage);
+    mqttPublish("voltage2", _phase2Voltage);
+    mqttPublish("voltage3", _phase3Voltage);
+    mqttPublish("import", _energyImport);
+    mqttPublish("export", _energyExport);
 }
 
 void PowerMeterSerialSdm::loop()

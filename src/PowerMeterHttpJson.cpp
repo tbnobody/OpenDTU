@@ -2,7 +2,6 @@
 #include "Configuration.h"
 #include "PowerMeterHttpJson.h"
 #include "MessageOutput.h"
-#include "MqttSettings.h"
 #include <WiFiClientSecure.h>
 #include <ArduinoJson.h>
 #include "mbedtls/sha256.h"
@@ -57,13 +56,9 @@ float PowerMeterHttpJson::getPowerTotal() const
 
 void PowerMeterHttpJson::doMqttPublish() const
 {
-    String topic = "powermeter";
-    auto power = getPowerTotal();
-
-    MqttSettings.publish(topic + "/power1", String(_powerValues[0]));
-    MqttSettings.publish(topic + "/power2", String(_powerValues[1]));
-    MqttSettings.publish(topic + "/power3", String(_powerValues[2]));
-    MqttSettings.publish(topic + "/powertotal", String(power));
+    mqttPublish("power1", _powerValues[0]);
+    mqttPublish("power2", _powerValues[1]);
+    mqttPublish("power3", _powerValues[2]);
 }
 
 bool PowerMeterHttpJson::queryPhase(int phase, PowerMeterHttpConfig const& config)

@@ -63,12 +63,8 @@ float PowerMeterMqtt::getPowerTotal() const
 
 void PowerMeterMqtt::doMqttPublish() const
 {
-    String topic = "powermeter";
-    auto totalPower = getPowerTotal();
-
     std::lock_guard<std::mutex> l(_mutex);
-    MqttSettings.publish(topic + "/power1", String(_powerValueOne));
-    MqttSettings.publish(topic + "/power2", String(_powerValueTwo));
-    MqttSettings.publish(topic + "/power3", String(_powerValueThree));
-    MqttSettings.publish(topic + "/powertotal", String(totalPower));
+    mqttPublish("power1", _powerValueOne);
+    mqttPublish("power2", _powerValueTwo);
+    mqttPublish("power3", _powerValueThree);
 }

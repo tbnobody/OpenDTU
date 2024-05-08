@@ -2,7 +2,6 @@
 #include "Configuration.h"
 #include "PowerMeterHttpSml.h"
 #include "MessageOutput.h"
-#include "MqttSettings.h"
 #include <WiFiClientSecure.h>
 #include <base64.h>
 #include <ESPmDNS.h>
@@ -15,10 +14,6 @@ float PowerMeterHttpSml::getPowerTotal() const
 
 void PowerMeterHttpSml::doMqttPublish() const
 {
-    String topic = "powermeter";
-
-    std::lock_guard<std::mutex> l(_mutex);
-    MqttSettings.publish(topic + "/powertotal", String(_activePower));
 }
 
 void PowerMeterHttpSml::loop()

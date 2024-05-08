@@ -4,7 +4,6 @@
  */
 #include "PowerMeterUdpSmaHomeManager.h"
 #include <Arduino.h>
-#include "MqttSettings.h"
 #include <WiFiUdp.h>
 #include "MessageOutput.h"
 
@@ -37,12 +36,9 @@ void PowerMeterUdpSmaHomeManager::deinit()
 
 void PowerMeterUdpSmaHomeManager::doMqttPublish() const
 {
-    String topic = "powermeter";
-
-    MqttSettings.publish(topic + "/powertotal", String(_powerMeterPower));
-    MqttSettings.publish(topic + "/power1", String(_powerMeterL1));
-    MqttSettings.publish(topic + "/power2", String(_powerMeterL2));
-    MqttSettings.publish(topic + "/power3", String(_powerMeterL3));
+    mqttPublish("power1", _powerMeterL1);
+    mqttPublish("power2", _powerMeterL2);
+    mqttPublish("power3", _powerMeterL3);
 }
 
 uint8_t* PowerMeterUdpSmaHomeManager::decodeGroup(uint8_t* offset, uint16_t grouplen)
