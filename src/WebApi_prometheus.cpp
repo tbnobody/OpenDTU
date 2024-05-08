@@ -9,6 +9,7 @@
 #include "NetworkSettings.h"
 #include "WebApi.h"
 #include <Hoymiles.h>
+#include "__compiled_constants.h"
 
 void WebApiPrometheusClass::init(AsyncWebServer& server, Scheduler& scheduler)
 {
@@ -29,7 +30,7 @@ void WebApiPrometheusClass::onPrometheusMetricsGet(AsyncWebServerRequest* reques
         stream->print("# HELP opendtu_build Build info\n");
         stream->print("# TYPE opendtu_build gauge\n");
         stream->printf("opendtu_build{name=\"%s\",id=\"%s\",version=\"%d.%d.%d\"} 1\n",
-            NetworkSettings.getHostname().c_str(), AUTO_GIT_HASH, CONFIG_VERSION >> 24 & 0xff, CONFIG_VERSION >> 16 & 0xff, CONFIG_VERSION >> 8 & 0xff);
+            NetworkSettings.getHostname().c_str(), __COMPILED_GIT_HASH__, CONFIG_VERSION >> 24 & 0xff, CONFIG_VERSION >> 16 & 0xff, CONFIG_VERSION >> 8 & 0xff);
 
         stream->print("# HELP opendtu_platform Platform info\n");
         stream->print("# TYPE opendtu_platform gauge\n");
@@ -142,7 +143,7 @@ void WebApiPrometheusClass::addPanelInfo(AsyncResponseStream* stream, const Stri
         return;
     }
 
-    const CONFIG_T& config = Configuration.get();
+    const auto& config = Configuration.getInverterConfig(inv->serial());
 
     const bool printHelp = (idx == 0 && channel == 0);
     if (printHelp) {
@@ -154,7 +155,7 @@ void WebApiPrometheusClass::addPanelInfo(AsyncResponseStream* stream, const Stri
         idx,
         inv->name(),
         channel,
-        config.Inverter[idx].channel[channel].Name);
+        config->channel[channel].Name);
 
     if (printHelp) {
         stream->print("# HELP opendtu_MaxPower panel maximum output power\n");
@@ -165,7 +166,7 @@ void WebApiPrometheusClass::addPanelInfo(AsyncResponseStream* stream, const Stri
         idx,
         inv->name(),
         channel,
-        config.Inverter[idx].channel[channel].MaxChannelPower);
+        config->channel[channel].MaxChannelPower);
 
     if (printHelp) {
         stream->print("# HELP opendtu_YieldTotalOffset panel yield offset (for used inverters)\n");
@@ -176,5 +177,5 @@ void WebApiPrometheusClass::addPanelInfo(AsyncResponseStream* stream, const Stri
         idx,
         inv->name(),
         channel,
-        config.Inverter[idx].channel[channel].YieldTotalOffset);
+        config->channel[channel].YieldTotalOffset);
 }

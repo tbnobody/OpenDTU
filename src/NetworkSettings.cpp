@@ -10,6 +10,7 @@
 #include "defaults.h"
 #include <ESPmDNS.h>
 #include <ETH.h>
+#include "__compiled_constants.h"
 
 NetworkSettingsClass::NetworkSettingsClass()
     : _loopTask(TASK_IMMEDIATE, TASK_FOREVER, std::bind(&NetworkSettingsClass::loop, this))
@@ -136,7 +137,7 @@ void NetworkSettingsClass::handleMDNS()
 
         MDNS.addService("http", "tcp", 80);
         MDNS.addService("opendtu", "tcp", 80);
-        MDNS.addServiceTxt("opendtu", "tcp", "git_hash", AUTO_GIT_HASH);
+        MDNS.addServiceTxt("opendtu", "tcp", "git_hash", __COMPILED_GIT_HASH__);
 
         MessageOutput.println("done");
     } else {
