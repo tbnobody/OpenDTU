@@ -1,0 +1,74 @@
+// SPDX-License-Identifier: GPL-2.0-or-later
+#include "PowerMeterMqtt.h"
+#include "Configuration.h"
+#include "MqttSettings.h"
+#include "MessageOutput.h"
+
+bool PowerMeterMqtt::init()
+{
+    auto subscribe = [this](char const* topic, float* target) {
+        if (strlen(topic) == 0) { return; }
+        MqttSettings.subscribe(topic, 0,
+                std::bind(&PowerMeterMqtt::onMqttMessage,
+                    this, std::placeholders::_1, std::placeholders::_2,
+                    std::placeholders::_3, std::placeholders::_4,
+                    std::placeholders::_5, std::placeholders::_6)
+                );
+        _mqttSubscriptions.try_emplace(topic, target);
+    };
+
+    auto const& config = Configuration.get();
+    subscribe(config.PowerMeter.MqttTopicPowerMeter1, &_powerValueOne);
+    subscribe(config.PowerMeter.MqttTopicPowerMeter2, &_powerValueTwo);
+    subscribe(config.PowerMeter.MqttTopicPowerMeter3, &_powerValueThree);
+
+    return _mqttSubscriptions.size() > 0;
+}
+
+void PowerMeterMqtt::deinit()
+{
+    for (auto const& s: _mqttSubscriptions) { MqttSettings.unsubscribe(s.first); }
+    _mqttSubscriptions.clear();
+}
+
+void PowerMeterMqtt::onMqttMessage(const espMqttClientTypes::MessageProperties& properties, const char* topic, const uint8_t* payload, size_t len, size_t index, size_t total)
+{
+    for (auto const& subscription: _mqttSubscriptions) {
+        if (subscription.first != topic) { continue; }
+
+        std::string value(reinterpret_cast<const char*>(payload), len);
+        try {
+            *subscription.second = std::stof(value);
+        }
+        catch(std::invalid_argument const& e) {
+            MessageOutput.printf("[PowerMeterMqtt] cannot parse payload of topic '%s' as float: %s\r\n",
+                    topic, value.c_str());
+            return;
+        }
+
+        if (_verboseLogging) {
+            MessageOutput.printf("[PowerMeterMqtt] Updated from '%s', TotalPower: %5.2f\r\n",
+                    topic, getPowerTotal());
+        }
+
+        gotUpdate();
+    }
+}
+
+float PowerMeterMqtt::getPowerTotal() const
+{
+    std::lock_guard<std::mutex> l(_mutex);
+    return _powerValueOne + _powerValueTwo + _powerValueThree;
+}
+
+void PowerMeterMqtt::doMqttPublish() const
+{
+    String topic = "powermeter";
+    auto totalPower = getPowerTotal();
+
+    std::lock_guard<std::mutex> l(_mutex);
+    MqttSettings.publish(topic + "/power1", String(_powerValueOne));
+    MqttSettings.publish(topic + "/power2", String(_powerValueTwo));
+    MqttSettings.publish(topic + "/power3", String(_powerValueThree));
+    MqttSettings.publish(topic + "/powertotal", String(totalPower));
+}

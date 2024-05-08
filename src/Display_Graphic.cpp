@@ -294,7 +294,7 @@ void DisplayGraphicClass::loop()
         _display->drawBox(0, y, _display->getDisplayWidth(), lineHeight);
         _display->setDrawColor(1);
 
-        auto acPower = PowerMeter.getPowerTotal(false);
+        auto acPower = PowerMeter.getPowerTotal();
         if (acPower > 999) {
             snprintf(_fmtText, sizeof(_fmtText), i18n_meter_power_kw[_display_language], (acPower / 1000));
         } else {

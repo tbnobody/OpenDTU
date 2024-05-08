@@ -5,17 +5,15 @@
 #pragma once
 
 #include <cstdint>
-#include <TaskSchedulerDeclarations.h>
+#include "PowerMeterProvider.h"
 
-class SMA_HMClass {
+class PowerMeterUdpSmaHomeManager : public PowerMeterProvider {
 public:
-    void init(Scheduler& scheduler, bool verboseLogging);
-    void loop();
-    void event1();
-    float getPowerTotal() const { return _powerMeterPower; }
-    float getPowerL1() const { return _powerMeterL1; }
-    float getPowerL2() const { return _powerMeterL2; }
-    float getPowerL3() const { return _powerMeterL3; }
+    bool init() final;
+    void deinit() final;
+    void loop() final;
+    float getPowerTotal() const final { return _powerMeterPower; }
+    void doMqttPublish() const final;
 
 private:
     void Soutput(int kanal, int index, int art, int tarif,
@@ -23,14 +21,10 @@ private:
 
     uint8_t* decodeGroup(uint8_t* offset, uint16_t grouplen);
 
-    bool _verboseLogging = false;
     float _powerMeterPower = 0.0;
     float _powerMeterL1 = 0.0;
     float _powerMeterL2 = 0.0;
     float _powerMeterL3 = 0.0;
     uint32_t _previousMillis = 0;
     uint32_t _serial = 0;
-    Task _loopTask;
 };
-
-extern SMA_HMClass SMA_HM;

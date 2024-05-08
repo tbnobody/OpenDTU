@@ -1,28 +1,44 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 #include "Configuration.h"
-#include "TibberPowerMeter.h"
+#include "PowerMeterHttpSml.h"
 #include "MessageOutput.h"
+#include "MqttSettings.h"
 #include <WiFiClientSecure.h>
 #include <base64.h>
 #include <ESPmDNS.h>
-#include <PowerMeter.h>
 
-bool TibberPowerMeterClass::updateValues()
+float PowerMeterHttpSml::getPowerTotal() const
+{
+    std::lock_guard<std::mutex> l(_mutex);
+    return _activePower;
+}
+
+void PowerMeterHttpSml::doMqttPublish() const
+{
+    String topic = "powermeter";
+
+    std::lock_guard<std::mutex> l(_mutex);
+    MqttSettings.publish(topic + "/powertotal", String(_activePower));
+}
+
+void PowerMeterHttpSml::loop()
 {
     auto const& config = Configuration.get();
+    if ((millis() - _lastPoll) < (config.PowerMeter.Interval * 1000)) {
+        return;
+    }
+
+    _lastPoll = millis();
 
     auto const& tibberConfig = config.PowerMeter.Tibber;
 
     if (!query(tibberConfig)) {
-        MessageOutput.printf("[TibberPowerMeter] Getting the power of tibber failed.\r\n");
+        MessageOutput.printf("[PowerMeterHttpSml] Getting the power value failed.\r\n");
         MessageOutput.printf("%s\r\n", tibberPowerMeterError);
-        return false;
     }
-
-    return true;
 }
 
-bool TibberPowerMeterClass::query(PowerMeterTibberConfig const& config)
+bool PowerMeterHttpSml::query(PowerMeterTibberConfig const& config)
 {
     //hostByName in WiFiGeneric fails to resolve local names. issue described in
     //https://github.com/espressif/arduino-esp32/issues/3822
@@ -79,7 +95,7 @@ bool TibberPowerMeterClass::query(PowerMeterTibberConfig const& config)
     return httpRequest(*wifiClient, ipaddr.toString(), port, uri, https, config);
 }
 
-bool TibberPowerMeterClass::httpRequest(WiFiClient &wifiClient, const String& host, uint16_t port, const String& uri, bool https, PowerMeterTibberConfig const& config)
+bool PowerMeterHttpSml::httpRequest(WiFiClient &wifiClient, const String& host, uint16_t port, const String& uri, bool https, PowerMeterTibberConfig const& config)
 {
     if(!httpClient.begin(wifiClient, host, port, uri, https)){
         snprintf_P(tibberPowerMeterError, sizeof(tibberPowerMeterError), PSTR("httpClient.begin() failed for %s://%s"), (https ? "https" : "http"), host.c_str());
@@ -112,10 +128,12 @@ bool TibberPowerMeterClass::httpRequest(WiFiClient &wifiClient, const String& ho
         unsigned char smlCurrentChar = httpClient.getStream().read();
         sml_states_t smlCurrentState = smlState(smlCurrentChar);
         if (smlCurrentState == SML_LISTEND) {
-            for (auto& handler: PowerMeter.smlHandlerList) {
+            for (auto& handler: smlHandlerList) {
                 if (smlOBISCheck(handler.OBIS)) {
+                    std::lock_guard<std::mutex> l(_mutex);
                     handler.Fn(readVal);
                     *handler.Arg = readVal;
+                    gotUpdate();
                 }
             }
         }
@@ -126,7 +144,7 @@ bool TibberPowerMeterClass::httpRequest(WiFiClient &wifiClient, const String& ho
 }
 
 //extract url component as done by httpClient::begin(String url, const char* expectedProtocol) https://github.com/espressif/arduino-esp32/blob/da6325dd7e8e152094b19fe63190907f38ef1ff0/libraries/HTTPClient/src/HTTPClient.cpp#L250
-bool TibberPowerMeterClass::extractUrlComponents(String url, String& _protocol, String& _host, String& _uri, uint16_t& _port, String& _base64Authorization)
+bool PowerMeterHttpSml::extractUrlComponents(String url, String& _protocol, String& _host, String& _uri, uint16_t& _port, String& _base64Authorization)
 {
     // check for : (http: or https:
     int index = url.indexOf(':');
@@ -176,7 +194,7 @@ bool TibberPowerMeterClass::extractUrlComponents(String url, String& _protocol, 
     return true;
 }
 
-void TibberPowerMeterClass::prepareRequest(uint32_t timeout) {
+void PowerMeterHttpSml::prepareRequest(uint32_t timeout) {
     httpClient.setFollowRedirects(HTTPC_STRICT_FOLLOW_REDIRECTS);
     httpClient.setUserAgent("OpenDTU-OnBattery");
     httpClient.setConnectTimeout(timeout);
@@ -184,5 +202,3 @@ void TibberPowerMeterClass::prepareRequest(uint32_t timeout) {
     httpClient.addHeader("Content-Type", "application/json");
     httpClient.addHeader("Accept", "application/json");
 }
-
-TibberPowerMeterClass TibberPowerMeter;

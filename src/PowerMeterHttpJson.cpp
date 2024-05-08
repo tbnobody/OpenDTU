@@ -1,7 +1,8 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 #include "Configuration.h"
-#include "HttpPowerMeter.h"
+#include "PowerMeterHttpJson.h"
 #include "MessageOutput.h"
+#include "MqttSettings.h"
 #include <WiFiClientSecure.h>
 #include <ArduinoJson.h>
 #include "mbedtls/sha256.h"
@@ -9,48 +10,63 @@
 #include <memory>
 #include <ESPmDNS.h>
 
-void HttpPowerMeterClass::init()
-{
-}
-
-float HttpPowerMeterClass::getPower(int8_t phase)
-{
-    if (phase < 1 || phase > POWERMETER_MAX_PHASES) { return 0.0; }
-
-    return power[phase - 1];
-}
-
-bool HttpPowerMeterClass::updateValues()
+void PowerMeterHttpJson::loop()
 {
     auto const& config = Configuration.get();
+    if ((millis() - _lastPoll) < (config.PowerMeter.Interval * 1000)) {
+        return;
+    }
+
+    _lastPoll = millis();
 
     for (uint8_t i = 0; i < POWERMETER_MAX_PHASES; i++) {
         auto const& phaseConfig = config.PowerMeter.Http_Phase[i];
 
         if (!phaseConfig.Enabled) {
-            power[i] = 0.0;
+            _cache[i] = 0.0;
             continue;
         }
 
         if (i == 0 || config.PowerMeter.HttpIndividualRequests) {
             if (!queryPhase(i, phaseConfig)) {
-                MessageOutput.printf("[HttpPowerMeter] Getting the power of phase %d failed.\r\n", i + 1);
+                MessageOutput.printf("[PowerMeterHttpJson] Getting HTTP response for phase %d failed.\r\n", i + 1);
                 MessageOutput.printf("%s\r\n", httpPowerMeterError);
-                return false;
+                return;
             }
             continue;
         }
 
         if(!tryGetFloatValueForPhase(i, phaseConfig.JsonPath, phaseConfig.PowerUnit, phaseConfig.SignInverted)) {
-            MessageOutput.printf("[HttpPowerMeter] Getting the power of phase %d (from JSON fetched with Phase 1 config) failed.\r\n", i + 1);
+            MessageOutput.printf("[PowerMeterHttpJson] Reading power of phase %d (from JSON fetched with Phase 1 config) failed.\r\n", i + 1);
             MessageOutput.printf("%s\r\n", httpPowerMeterError);
-            return false;
+            return;
         }
     }
-    return true;
+
+    gotUpdate();
+
+    _powerValues = _cache;
 }
 
-bool HttpPowerMeterClass::queryPhase(int phase, PowerMeterHttpConfig const& config)
+float PowerMeterHttpJson::getPowerTotal() const
+{
+    float sum = 0.0;
+    for (auto v: _powerValues) { sum += v; }
+    return sum;
+}
+
+void PowerMeterHttpJson::doMqttPublish() const
+{
+    String topic = "powermeter";
+    auto power = getPowerTotal();
+
+    MqttSettings.publish(topic + "/power1", String(_powerValues[0]));
+    MqttSettings.publish(topic + "/power2", String(_powerValues[1]));
+    MqttSettings.publish(topic + "/power3", String(_powerValues[2]));
+    MqttSettings.publish(topic + "/powertotal", String(power));
+}
+
+bool PowerMeterHttpJson::queryPhase(int phase, PowerMeterHttpConfig const& config)
 {
     //hostByName in WiFiGeneric fails to resolve local names. issue described in
     //https://github.com/espressif/arduino-esp32/issues/3822
@@ -107,7 +123,7 @@ bool HttpPowerMeterClass::queryPhase(int phase, PowerMeterHttpConfig const& conf
     return httpRequest(phase, *wifiClient, ipaddr.toString(), port, uri, https, config);
 }
 
-bool HttpPowerMeterClass::httpRequest(int phase, WiFiClient &wifiClient, const String& host, uint16_t port, const String& uri, bool https, PowerMeterHttpConfig const& config)
+bool PowerMeterHttpJson::httpRequest(int phase, WiFiClient &wifiClient, const String& host, uint16_t port, const String& uri, bool https, PowerMeterHttpConfig const& config)
 {
     if(!httpClient.begin(wifiClient, host, port, uri, https)){
         snprintf_P(httpPowerMeterError, sizeof(httpPowerMeterError), PSTR("httpClient.begin() failed for %s://%s"), (https ? "https" : "http"), host.c_str());
@@ -163,13 +179,13 @@ bool HttpPowerMeterClass::httpRequest(int phase, WiFiClient &wifiClient, const S
     return tryGetFloatValueForPhase(phase, config.JsonPath, config.PowerUnit, config.SignInverted);
 }
 
-String HttpPowerMeterClass::extractParam(String& authReq, const String& param, const char delimit) {
+String PowerMeterHttpJson::extractParam(String& authReq, const String& param, const char delimit) {
     int _begin = authReq.indexOf(param);
     if (_begin == -1) { return ""; }
     return authReq.substring(_begin + param.length(), authReq.indexOf(delimit, _begin + param.length()));
 }
 
-String HttpPowerMeterClass::getcNonce(const int len) {
+String PowerMeterHttpJson::getcNonce(const int len) {
     static const char alphanum[] = "0123456789"
                                  "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
                                  "abcdefghijklmnopqrstuvwxyz";
@@ -180,7 +196,7 @@ String HttpPowerMeterClass::getcNonce(const int len) {
     return s;
 }
 
-String HttpPowerMeterClass::getDigestAuth(String& authReq, const String& username, const String& password, const String& method, const String& uri, unsigned int counter) {
+String PowerMeterHttpJson::getDigestAuth(String& authReq, const String& username, const String& password, const String& method, const String& uri, unsigned int counter) {
     // extracting required parameters for RFC 2617 Digest
     String realm = extractParam(authReq, "realm=\"", '"');
     String nonce = extractParam(authReq, "nonce=\"", '"');
@@ -218,13 +234,13 @@ String HttpPowerMeterClass::getDigestAuth(String& authReq, const String& usernam
     return authorization;
 }
 
-bool HttpPowerMeterClass::tryGetFloatValueForPhase(int phase, String jsonPath, Unit_t unit, bool signInverted)
+bool PowerMeterHttpJson::tryGetFloatValueForPhase(int phase, String jsonPath, Unit_t unit, bool signInverted)
 {
     JsonDocument root;
     const DeserializationError error = deserializeJson(root, httpResponse);
     if (error) {
         snprintf_P(httpPowerMeterError, sizeof(httpPowerMeterError),
-                PSTR("[HttpPowerMeter] Unable to parse server response as JSON"));
+                PSTR("[PowerMeterHttpJson] Unable to parse server response as JSON"));
         return false;
     }
 
@@ -286,32 +302,32 @@ bool HttpPowerMeterClass::tryGetFloatValueForPhase(int phase, String jsonPath, U
 
     if (!value.is<float>()) {
         snprintf_P(httpPowerMeterError, sizeof(httpPowerMeterError),
-                PSTR("[HttpPowerMeter] not a float: '%s'"),
+                PSTR("[PowerMeterHttpJson] not a float: '%s'"),
                 value.as<String>().c_str());
         return false;
     }
 
     // this value is supposed to be in Watts and positive if energy is consumed.
-    power[phase] = value.as<float>();
+    _cache[phase] = value.as<float>();
 
     switch (unit) {
         case Unit_t::MilliWatts:
-            power[phase] /= 1000;
+            _cache[phase] /= 1000;
             break;
         case Unit_t::KiloWatts:
-            power[phase] *= 1000;
+            _cache[phase] *= 1000;
             break;
         default:
             break;
     }
 
-    if (signInverted) { power[phase] *= -1; }
+    if (signInverted) { _cache[phase] *= -1; }
 
     return true;
 }
 
 //extract url component as done by httpClient::begin(String url, const char* expectedProtocol) https://github.com/espressif/arduino-esp32/blob/da6325dd7e8e152094b19fe63190907f38ef1ff0/libraries/HTTPClient/src/HTTPClient.cpp#L250
-bool HttpPowerMeterClass::extractUrlComponents(String url, String& _protocol, String& _host, String& _uri, uint16_t& _port, String& _base64Authorization)
+bool PowerMeterHttpJson::extractUrlComponents(String url, String& _protocol, String& _host, String& _uri, uint16_t& _port, String& _base64Authorization)
 {
     // check for : (http: or https:
     int index = url.indexOf(':');
@@ -361,7 +377,7 @@ bool HttpPowerMeterClass::extractUrlComponents(String url, String& _protocol, St
     return true;
 }
 
-String HttpPowerMeterClass::sha256(const String& data) {
+String PowerMeterHttpJson::sha256(const String& data) {
     uint8_t hash[32];
 
     mbedtls_sha256_context ctx;
@@ -379,7 +395,7 @@ String HttpPowerMeterClass::sha256(const String& data) {
     return res;
 }
 
-void HttpPowerMeterClass::prepareRequest(uint32_t timeout, const char* httpHeader, const char* httpValue) {
+void PowerMeterHttpJson::prepareRequest(uint32_t timeout, const char* httpHeader, const char* httpValue) {
     httpClient.setFollowRedirects(HTTPC_STRICT_FOLLOW_REDIRECTS);
     httpClient.setUserAgent("OpenDTU-OnBattery");
     httpClient.setConnectTimeout(timeout);
@@ -391,5 +407,3 @@ void HttpPowerMeterClass::prepareRequest(uint32_t timeout, const char* httpHeade
         httpClient.addHeader(httpHeader, httpValue);
     }
 }
-
-HttpPowerMeterClass HttpPowerMeter;

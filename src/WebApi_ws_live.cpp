@@ -98,12 +98,12 @@ void WebApiWsLiveClass::generateOnBatteryJsonResponse(JsonVariant& root, bool al
         if (!all) { _lastPublishBattery = millis(); }
     }
 
-    if (all || (PowerMeter.getLastPowerMeterUpdate() - _lastPublishPowerMeter) < halfOfAllMillis) {
+    if (all || (PowerMeter.getLastUpdate() - _lastPublishPowerMeter) < halfOfAllMillis) {
         auto powerMeterObj = root["power_meter"].to<JsonObject>();
         powerMeterObj["enabled"] = config.PowerMeter.Enabled;
 
         if (config.PowerMeter.Enabled) {
-            addTotalField(powerMeterObj, "Power", PowerMeter.getPowerTotal(false), "W", 1);
+            addTotalField(powerMeterObj, "Power", PowerMeter.getPowerTotal(), "W", 1);
         }
 
         if (!all) { _lastPublishPowerMeter = millis(); }

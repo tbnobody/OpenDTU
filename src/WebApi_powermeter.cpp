@@ -12,8 +12,8 @@
 #include "MqttSettings.h"
 #include "PowerLimiter.h"
 #include "PowerMeter.h"
-#include "HttpPowerMeter.h"
-#include "TibberPowerMeter.h"
+#include "PowerMeterHttpJson.h"
+#include "PowerMeterHttpSml.h"
 #include "WebApi.h"
 #include "helper.h"
 
@@ -128,7 +128,7 @@ void WebApiPowerMeterClass::onAdminPost(AsyncWebServerRequest* request)
         return;
     }
 
-    if (static_cast<PowerMeterClass::Source>(root["source"].as<uint8_t>()) == PowerMeterClass::Source::HTTP) {
+    if (static_cast<PowerMeterProvider::Type>(root["source"].as<uint8_t>()) == PowerMeterProvider::Type::HTTP) {
         JsonArray http_phases = root["http_phases"];
         for (uint8_t i = 0; i < http_phases.size(); i++) {
             JsonObject phase = http_phases[i].as<JsonObject>();
@@ -174,7 +174,7 @@ void WebApiPowerMeterClass::onAdminPost(AsyncWebServerRequest* request)
         }
     }
 
-    if (static_cast<PowerMeterClass::Source>(root["source"].as<uint8_t>()) == PowerMeterClass::Source::TIBBER) {
+    if (static_cast<PowerMeterProvider::Type>(root["source"].as<uint8_t>()) == PowerMeterProvider::Type::TIBBER) {
         JsonObject tibber = root["tibber"];
 
         if (!tibber.containsKey("url")
@@ -260,14 +260,14 @@ void WebApiPowerMeterClass::onTestHttpRequest(AsyncWebServerRequest* request)
 
     char response[256];
 
-    int phase = 0;//"absuing" index 0 of the float power[3] in HttpPowerMeter to store the result
     PowerMeterHttpConfig phaseConfig;
     decodeJsonPhaseConfig(root.as<JsonObject>(), phaseConfig);
-    if (HttpPowerMeter.queryPhase(phase, phaseConfig)) {
+    auto upMeter = std::make_unique<PowerMeterHttpJson>();
+    if (upMeter->queryPhase(0/*phase*/, phaseConfig)) {
         retMsg["type"] = "success";
-        snprintf_P(response, sizeof(response), "Success! Power: %5.2fW", HttpPowerMeter.getPower(phase + 1));
+        snprintf_P(response, sizeof(response), "Success! Power: %5.2fW", upMeter->getPowerTotal());
     } else {
-        snprintf_P(response, sizeof(response), "%s", HttpPowerMeter.httpPowerMeterError);
+        snprintf_P(response, sizeof(response), "%s", upMeter->httpPowerMeterError);
     }
 
     retMsg["message"] = response;
@@ -302,11 +302,12 @@ void WebApiPowerMeterClass::onTestTibberRequest(AsyncWebServerRequest* request)
 
     PowerMeterTibberConfig tibberConfig;
     decodeJsonTibberConfig(root.as<JsonObject>(), tibberConfig);
-    if (TibberPowerMeter.query(tibberConfig)) {
+    auto upMeter = std::make_unique<PowerMeterHttpSml>();
+    if (upMeter->query(tibberConfig)) {
         retMsg["type"] = "success";
-        snprintf_P(response, sizeof(response), "Success! Power: %5.2fW", PowerMeter.getPowerTotal());
+        snprintf_P(response, sizeof(response), "Success! Power: %5.2fW", upMeter->getPowerTotal());
     } else {
-        snprintf_P(response, sizeof(response), "%s", TibberPowerMeter.tibberPowerMeterError);
+        snprintf_P(response, sizeof(response), "%s", upMeter->tibberPowerMeterError);
     }
 
     retMsg["message"] = response;

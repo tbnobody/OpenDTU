@@ -5,22 +5,29 @@
 #include <Arduino.h>
 #include <HTTPClient.h>
 #include "Configuration.h"
+#include "PowerMeterProvider.h"
 
 using Auth_t = PowerMeterHttpConfig::Auth;
 using Unit_t = PowerMeterHttpConfig::Unit;
 
-class HttpPowerMeterClass {
+class PowerMeterHttpJson : public PowerMeterProvider {
 public:
-    void init();
-    bool updateValues();
-    float getPower(int8_t phase);
-    char httpPowerMeterError[256];
+    bool init() final { return true; }
+    void deinit() final { }
+    void loop() final;
+    float getPowerTotal() const final;
+    void doMqttPublish() const final;
+
     bool queryPhase(int phase, PowerMeterHttpConfig const& config);
+    char httpPowerMeterError[256];
 
 private:
-    float power[POWERMETER_MAX_PHASES];
+    uint32_t _lastPoll;
+    std::array<float,POWERMETER_MAX_PHASES> _cache;
+    std::array<float,POWERMETER_MAX_PHASES> _powerValues;
     HTTPClient httpClient;
     String httpResponse;
+
     bool httpRequest(int phase, WiFiClient &wifiClient, const String& host, uint16_t port, const String& uri, bool https, PowerMeterHttpConfig const& config);
     bool extractUrlComponents(String url, String& _protocol, String& _hostname, String& _uri, uint16_t& uint16_t, String& _base64Authorization);
     String extractParam(String& authReq, const String& param, const char delimit);
@@ -30,5 +37,3 @@ private:
     void prepareRequest(uint32_t timeout, const char* httpHeader, const char* httpValue);
     String sha256(const String& data);
 };
-
-extern HttpPowerMeterClass HttpPowerMeter;
