@@ -3,6 +3,7 @@
 
 #include <list>
 #include <mutex>
+#include <memory>
 #include <stdint.h>
 #include <Arduino.h>
 #include <HTTPClient.h>
@@ -12,6 +13,8 @@
 
 class PowerMeterHttpSml : public PowerMeterProvider {
 public:
+    ~PowerMeterHttpSml();
+
     bool init() final { return true; }
     void deinit() final { }
     void loop() final;
@@ -38,9 +41,10 @@ private:
         {{0x01, 0x00, 0x10, 0x07, 0x00, 0xff}, &smlOBISW, &_activePower}
     };
 
-    HTTPClient httpClient;
+    std::unique_ptr<WiFiClient> wifiClient;
+    std::unique_ptr<HTTPClient> httpClient;
     String httpResponse;
-    bool httpRequest(WiFiClient &wifiClient, const String& host, uint16_t port, const String& uri, bool https, PowerMeterTibberConfig const& config);
+    bool httpRequest(const String& host, uint16_t port, const String& uri, bool https, PowerMeterTibberConfig const& config);
     bool extractUrlComponents(String url, String& _protocol, String& _hostname, String& _uri, uint16_t& uint16_t, String& _base64Authorization);
     void prepareRequest(uint32_t timeout);
 };

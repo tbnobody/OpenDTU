@@ -6,8 +6,16 @@
 #include <ArduinoJson.h>
 #include "mbedtls/sha256.h"
 #include <base64.h>
-#include <memory>
 #include <ESPmDNS.h>
+
+PowerMeterHttpJson::~PowerMeterHttpJson()
+{
+    // the wifiClient instance must live longer than the httpClient instance,
+    // as the httpClient holds a pointer to the wifiClient and uses it in its
+    // destructor.
+    httpClient.reset();
+    wifiClient.reset();
+}
 
 void PowerMeterHttpJson::loop()
 {
@@ -66,7 +74,7 @@ bool PowerMeterHttpJson::queryPhase(int phase, PowerMeterHttpConfig const& confi
     //hostByName in WiFiGeneric fails to resolve local names. issue described in
     //https://github.com/espressif/arduino-esp32/issues/3822
     //and in depth analyzed in https://github.com/espressif/esp-idf/issues/2507#issuecomment-761836300
-    //in conclusion: we cannot rely on httpClient.begin(*wifiClient, url) to resolve IP adresses.
+    //in conclusion: we cannot rely on httpClient->begin(*wifiClient, url) to resolve IP adresses.
     //have to do it manually here. Feels Hacky...
     String protocol;
     String host;
@@ -102,10 +110,6 @@ bool PowerMeterHttpJson::queryPhase(int phase, PowerMeterHttpConfig const& confi
         }
     }
 
-    // secureWifiClient MUST be created before HTTPClient
-    // see discussion: https://github.com/helgeerbe/OpenDTU-OnBattery/issues/381
-    std::unique_ptr<WiFiClient> wifiClient;
-
     bool https = protocol == "https";
     if (https) {
       auto secureWifiClient = std::make_unique<WiFiClientSecure>();
@@ -115,49 +119,51 @@ bool PowerMeterHttpJson::queryPhase(int phase, PowerMeterHttpConfig const& confi
       wifiClient = std::make_unique<WiFiClient>();
     }
 
-    return httpRequest(phase, *wifiClient, ipaddr.toString(), port, uri, https, config);
+    return httpRequest(phase, ipaddr.toString(), port, uri, https, config);
 }
 
-bool PowerMeterHttpJson::httpRequest(int phase, WiFiClient &wifiClient, const String& host, uint16_t port, const String& uri, bool https, PowerMeterHttpConfig const& config)
+bool PowerMeterHttpJson::httpRequest(int phase, const String& host, uint16_t port, const String& uri, bool https, PowerMeterHttpConfig const& config)
 {
-    if(!httpClient.begin(wifiClient, host, port, uri, https)){
-        snprintf_P(httpPowerMeterError, sizeof(httpPowerMeterError), PSTR("httpClient.begin() failed for %s://%s"), (https ? "https" : "http"), host.c_str());
+    if (!httpClient) { httpClient = std::make_unique<HTTPClient>(); }
+
+    if(!httpClient->begin(*wifiClient, host, port, uri, https)){
+        snprintf_P(httpPowerMeterError, sizeof(httpPowerMeterError), PSTR("httpClient->begin() failed for %s://%s"), (https ? "https" : "http"), host.c_str());
         return false;
     }
 
     prepareRequest(config.Timeout, config.HeaderKey, config.HeaderValue);
     if (config.AuthType == Auth_t::Digest) {
         const char *headers[1] = {"WWW-Authenticate"};
-        httpClient.collectHeaders(headers, 1);
+        httpClient->collectHeaders(headers, 1);
     } else if (config.AuthType == Auth_t::Basic) {
         String authString = config.Username;
         authString += ":";
         authString += config.Password;
         String auth = "Basic ";
         auth.concat(base64::encode(authString));
-        httpClient.addHeader("Authorization", auth);
+        httpClient->addHeader("Authorization", auth);
     }
-    int httpCode = httpClient.GET();
+    int httpCode = httpClient->GET();
 
     if (httpCode == HTTP_CODE_UNAUTHORIZED && config.AuthType == Auth_t::Digest) {
         // Handle authentication challenge
-        if (httpClient.hasHeader("WWW-Authenticate")) {
-            String authReq  = httpClient.header("WWW-Authenticate");
+        if (httpClient->hasHeader("WWW-Authenticate")) {
+            String authReq  = httpClient->header("WWW-Authenticate");
             String authorization = getDigestAuth(authReq, String(config.Username), String(config.Password), "GET", String(uri), 1);
-            httpClient.end();
-            if(!httpClient.begin(wifiClient, host, port, uri, https)){
-                snprintf_P(httpPowerMeterError, sizeof(httpPowerMeterError), PSTR("httpClient.begin() failed for  %s://%s using digest auth"), (https ? "https" : "http"), host.c_str());
+            httpClient->end();
+            if(!httpClient->begin(*wifiClient, host, port, uri, https)){
+                snprintf_P(httpPowerMeterError, sizeof(httpPowerMeterError), PSTR("httpClient->begin() failed for  %s://%s using digest auth"), (https ? "https" : "http"), host.c_str());
                 return false;
             }
 
             prepareRequest(config.Timeout, config.HeaderKey, config.HeaderValue);
-            httpClient.addHeader("Authorization", authorization);
-            httpCode = httpClient.GET();
+            httpClient->addHeader("Authorization", authorization);
+            httpCode = httpClient->GET();
         }
     }
 
     if (httpCode <= 0) {
-        snprintf_P(httpPowerMeterError, sizeof(httpPowerMeterError), PSTR("HTTP Error %s"), httpClient.errorToString(httpCode).c_str());
+        snprintf_P(httpPowerMeterError, sizeof(httpPowerMeterError), PSTR("HTTP Error %s"), httpClient->errorToString(httpCode).c_str());
         return false;
     }
 
@@ -166,8 +172,8 @@ bool PowerMeterHttpJson::httpRequest(int phase, WiFiClient &wifiClient, const St
         return false;
     }
 
-    httpResponse = httpClient.getString(); // very unfortunate that we cannot parse WifiClient stream directly
-    httpClient.end();
+    httpResponse = httpClient->getString(); // very unfortunate that we cannot parse WifiClient stream directly
+    httpClient->end();
 
     // TODO(schlimmchen): postpone calling tryGetFloatValueForPhase, as it
     // will be called twice for each phase when doing separate requests.
@@ -391,14 +397,14 @@ String PowerMeterHttpJson::sha256(const String& data) {
 }
 
 void PowerMeterHttpJson::prepareRequest(uint32_t timeout, const char* httpHeader, const char* httpValue) {
-    httpClient.setFollowRedirects(HTTPC_STRICT_FOLLOW_REDIRECTS);
-    httpClient.setUserAgent("OpenDTU-OnBattery");
-    httpClient.setConnectTimeout(timeout);
-    httpClient.setTimeout(timeout);
-    httpClient.addHeader("Content-Type", "application/json");
-    httpClient.addHeader("Accept", "application/json");
+    httpClient->setFollowRedirects(HTTPC_STRICT_FOLLOW_REDIRECTS);
+    httpClient->setUserAgent("OpenDTU-OnBattery");
+    httpClient->setConnectTimeout(timeout);
+    httpClient->setTimeout(timeout);
+    httpClient->addHeader("Content-Type", "application/json");
+    httpClient->addHeader("Accept", "application/json");
 
     if (strlen(httpHeader) > 0) {
-        httpClient.addHeader(httpHeader, httpValue);
+        httpClient->addHeader(httpHeader, httpValue);
     }
 }

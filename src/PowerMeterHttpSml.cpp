@@ -16,6 +16,15 @@ void PowerMeterHttpSml::doMqttPublish() const
 {
 }
 
+PowerMeterHttpSml::~PowerMeterHttpSml()
+{
+    // the wifiClient instance must live longer than the httpClient instance,
+    // as the httpClient holds a pointer to the wifiClient and uses it in its
+    // destructor.
+    httpClient.reset();
+    wifiClient.reset();
+}
+
 void PowerMeterHttpSml::loop()
 {
     auto const& config = Configuration.get();
@@ -38,7 +47,7 @@ bool PowerMeterHttpSml::query(PowerMeterTibberConfig const& config)
     //hostByName in WiFiGeneric fails to resolve local names. issue described in
     //https://github.com/espressif/arduino-esp32/issues/3822
     //and in depth analyzed in https://github.com/espressif/esp-idf/issues/2507#issuecomment-761836300
-    //in conclusion: we cannot rely on httpClient.begin(*wifiClient, url) to resolve IP adresses.
+    //in conclusion: we cannot rely on httpClient->begin(*wifiClient, url) to resolve IP adresses.
     //have to do it manually here. Feels Hacky...
     String protocol;
     String host;
@@ -74,10 +83,6 @@ bool PowerMeterHttpSml::query(PowerMeterTibberConfig const& config)
         }
     }
 
-    // secureWifiClient MUST be created before HTTPClient
-    // see discussion: https://github.com/helgeerbe/OpenDTU-OnBattery/issues/381
-    std::unique_ptr<WiFiClient> wifiClient;
-
     bool https = protocol == "https";
     if (https) {
       auto secureWifiClient = std::make_unique<WiFiClientSecure>();
@@ -87,13 +92,15 @@ bool PowerMeterHttpSml::query(PowerMeterTibberConfig const& config)
       wifiClient = std::make_unique<WiFiClient>();
     }
 
-    return httpRequest(*wifiClient, ipaddr.toString(), port, uri, https, config);
+    return httpRequest(ipaddr.toString(), port, uri, https, config);
 }
 
-bool PowerMeterHttpSml::httpRequest(WiFiClient &wifiClient, const String& host, uint16_t port, const String& uri, bool https, PowerMeterTibberConfig const& config)
+bool PowerMeterHttpSml::httpRequest(const String& host, uint16_t port, const String& uri, bool https, PowerMeterTibberConfig const& config)
 {
-    if(!httpClient.begin(wifiClient, host, port, uri, https)){
-        snprintf_P(tibberPowerMeterError, sizeof(tibberPowerMeterError), PSTR("httpClient.begin() failed for %s://%s"), (https ? "https" : "http"), host.c_str());
+    if (!httpClient) { httpClient = std::make_unique<HTTPClient>(); }
+
+    if(!httpClient->begin(*wifiClient, host, port, uri, https)){
+        snprintf_P(tibberPowerMeterError, sizeof(tibberPowerMeterError), PSTR("httpClient->begin() failed for %s://%s"), (https ? "https" : "http"), host.c_str());
         return false;
     }
 
@@ -104,12 +111,12 @@ bool PowerMeterHttpSml::httpRequest(WiFiClient &wifiClient, const String& host, 
     authString += config.Password;
     String auth = "Basic ";
     auth.concat(base64::encode(authString));
-    httpClient.addHeader("Authorization", auth);
+    httpClient->addHeader("Authorization", auth);
 
-    int httpCode = httpClient.GET();
+    int httpCode = httpClient->GET();
 
     if (httpCode <= 0) {
-        snprintf_P(tibberPowerMeterError, sizeof(tibberPowerMeterError), PSTR("HTTP Error %s"), httpClient.errorToString(httpCode).c_str());
+        snprintf_P(tibberPowerMeterError, sizeof(tibberPowerMeterError), PSTR("HTTP Error %s"), httpClient->errorToString(httpCode).c_str());
         return false;
     }
 
@@ -118,9 +125,9 @@ bool PowerMeterHttpSml::httpRequest(WiFiClient &wifiClient, const String& host, 
         return false;
     }
 
-    while (httpClient.getStream().available()) {
+    while (httpClient->getStream().available()) {
         double readVal = 0;
-        unsigned char smlCurrentChar = httpClient.getStream().read();
+        unsigned char smlCurrentChar = httpClient->getStream().read();
         sml_states_t smlCurrentState = smlState(smlCurrentChar);
         if (smlCurrentState == SML_LISTEND) {
             for (auto& handler: smlHandlerList) {
@@ -133,7 +140,7 @@ bool PowerMeterHttpSml::httpRequest(WiFiClient &wifiClient, const String& host, 
             }
         }
     }
-    httpClient.end();
+    httpClient->end();
 
     return true;
 }
@@ -190,10 +197,10 @@ bool PowerMeterHttpSml::extractUrlComponents(String url, String& _protocol, Stri
 }
 
 void PowerMeterHttpSml::prepareRequest(uint32_t timeout) {
-    httpClient.setFollowRedirects(HTTPC_STRICT_FOLLOW_REDIRECTS);
-    httpClient.setUserAgent("OpenDTU-OnBattery");
-    httpClient.setConnectTimeout(timeout);
-    httpClient.setTimeout(timeout);
-    httpClient.addHeader("Content-Type", "application/json");
-    httpClient.addHeader("Accept", "application/json");
+    httpClient->setFollowRedirects(HTTPC_STRICT_FOLLOW_REDIRECTS);
+    httpClient->setUserAgent("OpenDTU-OnBattery");
+    httpClient->setConnectTimeout(timeout);
+    httpClient->setTimeout(timeout);
+    httpClient->addHeader("Content-Type", "application/json");
+    httpClient->addHeader("Accept", "application/json");
 }
