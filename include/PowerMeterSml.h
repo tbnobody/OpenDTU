@@ -21,7 +21,16 @@ protected:
 private:
     mutable std::mutex _mutex;
 
-    float _activePower = 0.0;
+    float _activePowerTotal = 0.0;
+    float _activePowerL1 = 0.0;
+    float _activePowerL2 = 0.0;
+    float _activePowerL3 = 0.0;
+    float _voltageL1 = 0.0;
+    float _voltageL2 = 0.0;
+    float _voltageL3 = 0.0;
+    float _currentL1 = 0.0;
+    float _currentL2 = 0.0;
+    float _currentL3 = 0.0;
     float _energyImport = 0.0;
     float _energyExport = 0.0;
 
@@ -33,7 +42,16 @@ private:
     } OBISHandler;
 
     const std::list<OBISHandler> smlHandlerList{
-        {{0x01, 0x00, 0x10, 0x07, 0x00, 0xff}, &smlOBISW, &_activePower, "active power"},
+        {{0x01, 0x00, 0x10, 0x07, 0x00, 0xff}, &smlOBISW, &_activePowerTotal, "active power total"},
+        {{0x01, 0x00, 0x24, 0x07, 0x00, 0xff}, &smlOBISW, &_activePowerL1, "active power L1"},
+        {{0x01, 0x00, 0x38, 0x07, 0x00, 0xff}, &smlOBISW, &_activePowerL2, "active power L2"},
+        {{0x01, 0x00, 0x4c, 0x07, 0x00, 0xff}, &smlOBISW, &_activePowerL3, "active power L3"},
+        {{0x01, 0x00, 0x20, 0x07, 0x00, 0xff}, &smlOBISVolt, &_voltageL1, "voltage L1"},
+        {{0x01, 0x00, 0x34, 0x07, 0x00, 0xff}, &smlOBISVolt, &_voltageL2, "voltage L2"},
+        {{0x01, 0x00, 0x48, 0x07, 0x00, 0xff}, &smlOBISVolt, &_voltageL3, "voltage L3"},
+        {{0x01, 0x00, 0x1f, 0x07, 0x00, 0xff}, &smlOBISAmpere, &_currentL1, "current L1"},
+        {{0x01, 0x00, 0x33, 0x07, 0x00, 0xff}, &smlOBISAmpere, &_currentL2, "current L2"},
+        {{0x01, 0x00, 0x47, 0x07, 0x00, 0xff}, &smlOBISAmpere, &_currentL3, "current L3"},
         {{0x01, 0x00, 0x01, 0x08, 0x00, 0xff}, &smlOBISWh, &_energyImport, "energy import"},
         {{0x01, 0x00, 0x02, 0x08, 0x00, 0xff}, &smlOBISWh, &_energyExport, "energy export"}
     };
