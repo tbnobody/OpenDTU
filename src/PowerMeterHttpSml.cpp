@@ -6,16 +6,6 @@
 #include <base64.h>
 #include <ESPmDNS.h>
 
-float PowerMeterHttpSml::getPowerTotal() const
-{
-    std::lock_guard<std::mutex> l(_mutex);
-    return _activePower;
-}
-
-void PowerMeterHttpSml::doMqttPublish() const
-{
-}
-
 PowerMeterHttpSml::~PowerMeterHttpSml()
 {
     // the wifiClient instance must live longer than the httpClient instance,
@@ -125,20 +115,9 @@ bool PowerMeterHttpSml::httpRequest(const String& host, uint16_t port, const Str
         return false;
     }
 
-    while (httpClient->getStream().available()) {
-        double readVal = 0;
-        unsigned char smlCurrentChar = httpClient->getStream().read();
-        sml_states_t smlCurrentState = smlState(smlCurrentChar);
-        if (smlCurrentState == SML_LISTEND) {
-            for (auto& handler: smlHandlerList) {
-                if (smlOBISCheck(handler.OBIS)) {
-                    std::lock_guard<std::mutex> l(_mutex);
-                    handler.Fn(readVal);
-                    *handler.Arg = readVal;
-                    gotUpdate();
-                }
-            }
-        }
+    auto& stream = httpClient->getStream();
+    while (stream.available()) {
+        processSmlByte(stream.read());
     }
     httpClient->end();
 

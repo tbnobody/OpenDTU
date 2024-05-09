@@ -1,6 +1,5 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 #include "PowerMeterSerialSml.h"
-#include "Configuration.h"
 #include "PinMapping.h"
 #include "MessageOutput.h"
 
@@ -32,32 +31,12 @@ void PowerMeterSerialSml::deinit()
     _upSmlSerial->end();
 }
 
-void PowerMeterSerialSml::doMqttPublish() const
-{
-    std::lock_guard<std::mutex> l(_mutex);
-    mqttPublish("import", _energyImport);
-    mqttPublish("export", _energyExport);
-}
-
 void PowerMeterSerialSml::loop()
 {
     if (!_upSmlSerial) { return; }
 
     while (_upSmlSerial->available()) {
-        double readVal = 0;
-        unsigned char smlCurrentChar = _upSmlSerial->read();
-        sml_states_t smlCurrentState = smlState(smlCurrentChar);
-        if (smlCurrentState == SML_LISTEND) {
-            for (auto& handler: smlHandlerList) {
-                if (smlOBISCheck(handler.OBIS)) {
-                    handler.Fn(readVal);
-                    std::lock_guard<std::mutex> l(_mutex);
-                    *handler.Arg = readVal;
-                }
-            }
-        } else if (smlCurrentState == SML_FINAL) {
-            gotUpdate();
-        }
+        processSmlByte(_upSmlSerial->read());
     }
 
     MessageOutput.printf("[PowerMeterSerialSml]: TotalPower: %5.2f\r\n", getPowerTotal());
