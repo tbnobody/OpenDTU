@@ -203,7 +203,6 @@ struct CONFIG_T {
         char MqttTopicPowerMeter1[MQTT_MAX_TOPIC_STRLEN + 1];
         char MqttTopicPowerMeter2[MQTT_MAX_TOPIC_STRLEN + 1];
         char MqttTopicPowerMeter3[MQTT_MAX_TOPIC_STRLEN + 1];
-        uint32_t SdmBaudrate;
         uint32_t SdmAddress;
         uint32_t HttpInterval;
         bool HttpIndividualRequests;

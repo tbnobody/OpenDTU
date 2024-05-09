@@ -568,7 +568,6 @@
         "MqttTopicPowerMeter2": "MQTT topic - Stromzähler #2 (Optional)",
         "MqttTopicPowerMeter3": "MQTT topic - Stromzähler #3 (Optional)",
         "SDM": "SDM-Stromzähler Konfiguration",
-        "sdmbaudrate": "Baudrate",
         "sdmaddress": "Modbus Adresse",
         "HTTP": "HTTP(S) + JSON - Allgemeine Konfiguration",
         "httpIndividualRequests": "Individuelle HTTP requests pro Phase",

@@ -75,16 +75,6 @@
                         textVariant="text-bg-primary"
                         add-space>
                     <div class="row mb-3">
-                        <label for="sdmbaudrate" class="col-sm-2 col-form-label">{{ $t('powermeteradmin.sdmbaudrate') }}:</label>
-                        <div class="col-sm-10">
-                            <div class="input-group">
-                                <input type="text" class="form-control" id="sdmbaudrate"
-                                    placeholder="9600" v-model="powerMeterConfigList.sdmbaudrate" />
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="row mb-3">
                         <label for="sdmaddress" class="col-sm-2 col-form-label">{{ $t('powermeteradmin.sdmaddress') }}:</label>
                         <div class="col-sm-10">
                             <div class="input-group">

@@ -570,7 +570,6 @@
         "MqttTopicPowerMeter2": "MQTT topic - Power meter #2",
         "MqttTopicPowerMeter3": "MQTT topic - Power meter #3",
         "SDM": "SDM-Power Meter Parameter",
-        "sdmbaudrate": "Baudrate",
         "sdmaddress": "Modbus Address",
         "HTTP": "HTTP(S) + Json - General configuration",
         "httpIndividualRequests": "Individual HTTP requests per phase",

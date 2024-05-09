@@ -66,7 +66,6 @@ void WebApiPowerMeterClass::onStatus(AsyncWebServerRequest* request)
     root["mqtt_topic_powermeter_1"] = config.PowerMeter.MqttTopicPowerMeter1;
     root["mqtt_topic_powermeter_2"] = config.PowerMeter.MqttTopicPowerMeter2;
     root["mqtt_topic_powermeter_3"] = config.PowerMeter.MqttTopicPowerMeter3;
-    root["sdmbaudrate"] = config.PowerMeter.SdmBaudrate;
     root["sdmaddress"] = config.PowerMeter.SdmAddress;
     root["http_individual_requests"] = config.PowerMeter.HttpIndividualRequests;
 
@@ -210,7 +209,6 @@ void WebApiPowerMeterClass::onAdminPost(AsyncWebServerRequest* request)
     strlcpy(config.PowerMeter.MqttTopicPowerMeter1, root["mqtt_topic_powermeter_1"].as<String>().c_str(), sizeof(config.PowerMeter.MqttTopicPowerMeter1));
     strlcpy(config.PowerMeter.MqttTopicPowerMeter2, root["mqtt_topic_powermeter_2"].as<String>().c_str(), sizeof(config.PowerMeter.MqttTopicPowerMeter2));
     strlcpy(config.PowerMeter.MqttTopicPowerMeter3, root["mqtt_topic_powermeter_3"].as<String>().c_str(), sizeof(config.PowerMeter.MqttTopicPowerMeter3));
-    config.PowerMeter.SdmBaudrate = root["sdmbaudrate"].as<uint32_t>();
     config.PowerMeter.SdmAddress = root["sdmaddress"].as<uint8_t>();
     config.PowerMeter.HttpIndividualRequests = root["http_individual_requests"].as<bool>();
 
