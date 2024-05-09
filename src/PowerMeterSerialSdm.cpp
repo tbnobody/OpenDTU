@@ -5,7 +5,7 @@
 #include "MessageOutput.h"
 #include "SerialPortManager.h"
 
-void PowerMeterSerialSdm::deinit()
+PowerMeterSerialSdm::~PowerMeterSerialSdm()
 {
     if (_upSdmSerial) {
         _upSdmSerial->end();

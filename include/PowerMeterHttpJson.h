@@ -16,7 +16,6 @@ public:
     ~PowerMeterHttpJson();
 
     bool init() final { return true; }
-    void deinit() final { }
     void loop() final;
     float getPowerTotal() const final;
     void doMqttPublish() const final;

@@ -26,7 +26,7 @@ bool PowerMeterMqtt::init()
     return _mqttSubscriptions.size() > 0;
 }
 
-void PowerMeterMqtt::deinit()
+PowerMeterMqtt::~PowerMeterMqtt()
 {
     for (auto const& t: _mqttSubscriptions) { MqttSettings.unsubscribe(t); }
     _mqttSubscriptions.clear();

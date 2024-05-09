@@ -25,7 +25,7 @@ bool PowerMeterSerialSml::init()
     return true;
 }
 
-void PowerMeterSerialSml::deinit()
+PowerMeterSerialSml::~PowerMeterSerialSml()
 {
     if (!_upSmlSerial) { return; }
     _upSmlSerial->end();

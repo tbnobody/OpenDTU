@@ -21,7 +21,6 @@ public:
     // returns true if the provider is ready for use, false otherwise
     virtual bool init() = 0;
 
-    virtual void deinit() = 0;
     virtual void loop() = 0;
     virtual float getPowerTotal() const = 0;
 

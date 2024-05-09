@@ -7,8 +7,9 @@
 
 class PowerMeterSerialSdm : public PowerMeterProvider {
 public:
+    ~PowerMeterSerialSdm();
+
     bool init() final;
-    void deinit() final;
     void loop() final;
     float getPowerTotal() const final;
     void doMqttPublish() const final;

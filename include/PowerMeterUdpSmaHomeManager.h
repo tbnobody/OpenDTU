@@ -9,8 +9,9 @@
 
 class PowerMeterUdpSmaHomeManager : public PowerMeterProvider {
 public:
+    ~PowerMeterUdpSmaHomeManager();
+
     bool init() final;
-    void deinit() final;
     void loop() final;
     float getPowerTotal() const final { return _powerMeterPower; }
     void doMqttPublish() const final;

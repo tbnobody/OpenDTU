@@ -29,7 +29,7 @@ bool PowerMeterUdpSmaHomeManager::init()
     return true;
 }
 
-void PowerMeterUdpSmaHomeManager::deinit()
+PowerMeterUdpSmaHomeManager::~PowerMeterUdpSmaHomeManager()
 {
     SMAUdp.stop();
 }

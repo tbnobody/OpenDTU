@@ -24,10 +24,7 @@ void PowerMeterClass::updateSettings()
 {
     std::lock_guard<std::mutex> l(_mutex);
 
-    if (_upProvider) {
-        _upProvider->deinit();
-        _upProvider = nullptr;
-    }
+    if (_upProvider) { _upProvider.reset(); }
 
     auto const& config = Configuration.get();
 

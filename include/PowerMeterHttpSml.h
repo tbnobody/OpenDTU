@@ -13,7 +13,6 @@ public:
     ~PowerMeterHttpSml();
 
     bool init() final { return true; }
-    void deinit() final { }
     void loop() final;
     bool updateValues();
     char tibberPowerMeterError[256];
