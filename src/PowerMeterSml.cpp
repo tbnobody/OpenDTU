@@ -22,16 +22,15 @@ void PowerMeterSml::processSmlByte(uint8_t byte)
             for (auto& handler: smlHandlerList) {
                 if (!smlOBISCheck(handler.OBIS)) { continue; }
 
-                double helper;
-                handler.decoder(helper);
-
-                std::lock_guard<std::mutex> l(_mutex);
-                *handler.target = helper;
                 gotUpdate();
 
-                if (!_verboseLogging) { continue; }
-                MessageOutput.printf("[PowerMeterSml] decoded %s to %.2f\r\n",
-                        handler.name, helper);
+                std::lock_guard<std::mutex> l(_mutex);
+                handler.decoder(*handler.target);
+
+                if (_verboseLogging) {
+                    MessageOutput.printf("[PowerMeterSml] decoded %s to %.2f\r\n",
+                            handler.name, *handler.target);
+                }
             }
             break;
         default:

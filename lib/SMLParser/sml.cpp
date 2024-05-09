@@ -317,7 +317,7 @@ void smlOBISManufacturer(unsigned char *str, int maxSize)
   }
 }
 
-void smlPow(double &val, signed char &scaler)
+void smlPow(float &val, signed char &scaler)
 {
   if (scaler < 0) {
     while (scaler++) {
@@ -372,7 +372,7 @@ void smlOBISByUnit(long long int &val, signed char &scaler, sml_units_t unit)
   }
 }
 
-void smlOBISWh(double &wh)
+void smlOBISWh(float &wh)
 {
   long long int val;
   smlOBISByUnit(val, sc, SML_WATT_HOUR);
@@ -380,7 +380,7 @@ void smlOBISWh(double &wh)
   smlPow(wh, sc);
 }
 
-void smlOBISW(double &w)
+void smlOBISW(float &w)
 {
   long long int val;
   smlOBISByUnit(val, sc, SML_WATT);
@@ -388,7 +388,7 @@ void smlOBISW(double &w)
   smlPow(w, sc);
 }
 
-void smlOBISVolt(double &v)
+void smlOBISVolt(float &v)
 {
   long long int val;
   smlOBISByUnit(val, sc, SML_VOLT);
@@ -396,7 +396,7 @@ void smlOBISVolt(double &v)
   smlPow(v, sc);
 }
 
-void smlOBISAmpere(double &a)
+void smlOBISAmpere(float &a)
 {
   long long int val;
   smlOBISByUnit(val, sc, SML_AMPERE);

@@ -27,7 +27,7 @@ private:
 
     typedef struct {
         uint8_t const OBIS[6];
-        void (*decoder)(double&);
+        void (*decoder)(float&);
         float* target;
         char const* name;
     } OBISHandler;
