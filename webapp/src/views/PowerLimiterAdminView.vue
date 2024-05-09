@@ -102,6 +102,7 @@
                 <InputElement v-show="hasPowerMeter()"
                               :label="$t('powerlimiteradmin.InverterIsBehindPowerMeter')"
                               v-model="powerLimiterConfigList.is_inverter_behind_powermeter"
+                              :tooltip="$t('powerlimiteradmin.InverterIsBehindPowerMeterHint')"
                               type="checkbox" wide/>
 
                 <div class="row mb-3" v-if="!powerLimiterConfigList.is_inverter_solar_powered">

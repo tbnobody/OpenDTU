@@ -714,6 +714,7 @@
       "VoltageLoadCorrectionFactor": "Load correction factor",
       "BatterySocInfo": "<b>Hint:</b> The battery SoC (State of Charge) values are only used if the battery communication interface reported SoC updates in the last minute. Otherwise the voltage thresholds will be used as fallback.",
       "InverterIsBehindPowerMeter": "PowerMeter reading includes inverter output",
+      "InverterIsBehindPowerMeterHint": "Enable this option if the power meter reading is reduced by the inverter's output when it produces power. This is typically true.",
       "InverterIsSolarPowered": "Inverter is powered by solar modules",
       "VoltageThresholds": "Battery Voltage Thresholds",
       "VoltageLoadCorrectionInfo": "<b>Hint:</b> When the battery is discharged, its voltage drops. The voltage drop scales with the discharge current. In order to not stop the inverter too early (stop threshold), this load correction factor can be specified to calculate the battery voltage if it was idle. Corrected voltage = DC Voltage + (Current power * correction factor)."
