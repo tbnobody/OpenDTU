@@ -258,7 +258,7 @@ void WebApiPowerMeterClass::onTestHttpRequest(AsyncWebServerRequest* request)
     auto upMeter = std::make_unique<PowerMeterHttpJson>();
     if (upMeter->queryPhase(0/*phase*/, phaseConfig)) {
         retMsg["type"] = "success";
-        snprintf_P(response, sizeof(response), "Success! Power: %5.2fW", upMeter->getPowerTotal());
+        snprintf_P(response, sizeof(response), "Success! Power: %5.2fW", upMeter->getCached(0));
     } else {
         snprintf_P(response, sizeof(response), "%s", upMeter->httpPowerMeterError);
     }

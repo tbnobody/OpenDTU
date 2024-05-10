@@ -1,4 +1,5 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
+#include "Utils.h"
 #include "Configuration.h"
 #include "PowerMeterHttpJson.h"
 #include "MessageOutput.h"
@@ -237,79 +238,16 @@ String PowerMeterHttpJson::getDigestAuth(String& authReq, const String& username
 
 bool PowerMeterHttpJson::tryGetFloatValueForPhase(int phase, String jsonPath, Unit_t unit, bool signInverted)
 {
-    JsonDocument root;
-    const DeserializationError error = deserializeJson(root, httpResponse);
-    if (error) {
+    auto pathResolutionResult = Utils::getJsonValueFromStringByPath<float>(httpResponse, jsonPath);
+    if (!pathResolutionResult.second.isEmpty()) {
         snprintf_P(httpPowerMeterError, sizeof(httpPowerMeterError),
-                PSTR("[PowerMeterHttpJson] Unable to parse server response as JSON"));
-        return false;
-    }
-
-    constexpr char delimiter = '/';
-    int start = 0;
-    int end = jsonPath.indexOf(delimiter);
-    auto value = root.as<JsonVariantConst>();
-
-    auto getNext = [this, &value, &jsonPath, &start](String const& key) -> bool {
-        // handle double forward slashes and paths starting or ending with a slash
-        if (key.isEmpty()) { return true; }
-
-        if (key[0] == '[' && key[key.length() - 1] == ']') {
-            if (!value.is<JsonArrayConst>()) {
-                snprintf_P(httpPowerMeterError, sizeof(httpPowerMeterError),
-                        PSTR("[HttpPowerMeter] Cannot access non-array JSON node "
-                            "using array index '%s' (JSON path '%s', position %i)"),
-                        key.c_str(), jsonPath.c_str(), start);
-                return false;
-            }
-
-            auto idx = key.substring(1, key.length() - 1).toInt();
-            value = value[idx];
-
-            if (value.isNull()) {
-                snprintf_P(httpPowerMeterError, sizeof(httpPowerMeterError),
-                        PSTR("[HttpPowerMeter] Unable to access JSON array "
-                            "index %li (JSON path '%s', position %i)"),
-                        idx, jsonPath.c_str(), start);
-                return false;
-            }
-
-            return true;
-        }
-
-        value = value[key];
-
-        if (value.isNull()) {
-            snprintf_P(httpPowerMeterError, sizeof(httpPowerMeterError),
-                    PSTR("[HttpPowerMeter] Unable to access JSON key "
-                        "'%s' (JSON path '%s', position %i)"),
-                    key.c_str(), jsonPath.c_str(), start);
-            return false;
-        }
-
-        return true;
-    };
-
-    // NOTE: "Because ArduinoJson implements the Null Object Pattern, it is
-    // always safe to read the object: if the key doesn't exist, it returns an
-    // empty value."
-    while (end != -1) {
-        if (!getNext(jsonPath.substring(start, end))) { return false; }
-        start = end + 1;
-        end = jsonPath.indexOf(delimiter, start);
-    }
-
-    if (!getNext(jsonPath.substring(start))) { return false; }
-
-    if (!value.is<float>()) {
-        snprintf_P(httpPowerMeterError, sizeof(httpPowerMeterError),
-                PSTR("[PowerMeterHttpJson] not a float: '%s'"),
-                value.as<String>().c_str());
+                PSTR("[PowerMeterHttpJson] %s"),
+                pathResolutionResult.second.c_str());
         return false;
     }
 
     // this value is supposed to be in Watts and positive if energy is consumed.
-    _cache[phase] = value.as<float>();
+    _cache[phase] = pathResolutionResult.first;
 
     switch (unit) {
         case Unit_t::MilliWatts:

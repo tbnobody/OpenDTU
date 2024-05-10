@@ -22,6 +22,7 @@ public:
 
     bool queryPhase(int phase, PowerMeterHttpConfig const& config);
     char httpPowerMeterError[256];
+    float getCached(size_t idx) { return _cache[idx]; }
 
 private:
     uint32_t _lastPoll;
