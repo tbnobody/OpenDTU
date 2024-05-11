@@ -14,10 +14,8 @@ private:
     void onStatus(AsyncWebServerRequest* request);
     void onAdminGet(AsyncWebServerRequest* request);
     void onAdminPost(AsyncWebServerRequest* request);
-    void decodeJsonPhaseConfig(JsonObject const& json, PowerMeterHttpConfig& config) const;
-    void decodeJsonTibberConfig(JsonObject const& json, PowerMeterTibberConfig& config) const;
-    void onTestHttpRequest(AsyncWebServerRequest* request);
-    void onTestTibberRequest(AsyncWebServerRequest* request);
+    void onTestHttpJsonRequest(AsyncWebServerRequest* request);
+    void onTestHttpSmlRequest(AsyncWebServerRequest* request);
 
     AsyncWebServer* _server;
 };

@@ -1,23 +1,16 @@
-export interface PowerMeterHttpPhaseConfig {
+import type { HttpRequestConfig } from '@/types/HttpRequestConfig';
+
+export interface PowerMeterHttpJsonConfig {
     index: number;
+    http_request: HttpRequestConfig;
     enabled: boolean;
-    url: string;
-    auth_type: number;
-    username: string;
-    password: string;
-    header_key: string;
-    header_value: string;
     json_path: string;
-    timeout: number;
     unit: number;
     sign_inverted: boolean;
 }
 
-export interface PowerMeterTibberConfig {
-    url: string;
-    username: string;
-    password: string;
-    timeout: number;
+export interface PowerMeterHttpSmlConfig {
+    http_request: HttpRequestConfig;
 }
 
 export interface PowerMeterConfig {
@@ -30,6 +23,6 @@ export interface PowerMeterConfig {
     mqtt_topic_powermeter_3: string;
     sdmaddress: number;
     http_individual_requests: boolean;
-    http_phases: Array<PowerMeterHttpPhaseConfig>;
-    tibber: PowerMeterTibberConfig;
+    http_json: Array<PowerMeterHttpJsonConfig>;
+    http_sml: PowerMeterHttpSmlConfig;
 }

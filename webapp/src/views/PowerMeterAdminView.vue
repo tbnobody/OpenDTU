@@ -114,66 +114,23 @@
                     </div>
 
                     <CardElement
-                            v-for="(http_phase, index) in powerMeterConfigList.http_phases"
-                            :key="http_phase.index"
-                            :text="$t('powermeteradmin.httpPhase', { phaseNumber: http_phase.index })"
+                            v-for="(httpJson, index) in powerMeterConfigList.http_json"
+                            :key="httpJson.index"
+                            :text="$t('powermeteradmin.httpValue', { valueNumber: httpJson.index })"
                             textVariant="text-bg-primary"
                             add-space>
                         <InputElement
                             v-if="index > 0"
                             :label="$t('powermeteradmin.httpEnabled')"
-                            v-model="http_phase.enabled"
+                            v-model="httpJson.enabled"
                             type="checkbox" wide />
 
-                        <div v-if="http_phase.enabled">
-                            <div v-if="index == 0 || powerMeterConfigList.http_individual_requests">
-                                <InputElement :label="$t('powermeteradmin.httpUrl')"
-                                    v-model="http_phase.url"
-                                    type="text"
-                                    maxlength="1024"
-                                    placeholder="http://admin:supersecret@mypowermeter.home/status"
-                                    prefix="GET "
-                                    :tooltip="$t('powermeteradmin.httpUrlDescription')" />
+                        <div v-if="httpJson.enabled">
 
-                                <div class="row mb-3">
-                                    <label for="inputTimezone" class="col-sm-2 col-form-label">{{ $t('powermeteradmin.httpAuthorization') }}</label>
-                                    <div class="col-sm-10">
-                                        <select class="form-select" v-model="http_phase.auth_type">
-                                            <option v-for="source in powerMeterAuthList" :key="source.key" :value="source.key">
-                                                {{ source.value }}
-                                            </option>
-                                        </select>
-                                    </div>
-                                </div>
-                                <div v-if="http_phase.auth_type != 0">
-                                    <InputElement :label="$t('powermeteradmin.httpUsername')"
-                                        v-model="http_phase.username"
-                                        type="text" maxlength="64"/>
-
-                                    <InputElement :label="$t('powermeteradmin.httpPassword')"
-                                        v-model="http_phase.password"
-                                        type="password" maxlength="64"/>
-                                </div>
-
-                                <InputElement :label="$t('powermeteradmin.httpHeaderKey')"
-                                    v-model="http_phase.header_key"
-                                    type="text"
-                                    maxlength="64"
-                                    :tooltip="$t('powermeteradmin.httpHeaderKeyDescription')" />
-
-                                <InputElement :label="$t('powermeteradmin.httpHeaderValue')"
-                                    v-model="http_phase.header_value"
-                                    type="text"
-                                    maxlength="256" />
-
-                                <InputElement :label="$t('powermeteradmin.httpTimeout')"
-                                    v-model="http_phase.timeout"
-                                    type="number"
-                                    :postfix="$t('powermeteradmin.milliSeconds')" />
-                            </div>
+                            <HttpRequestSettings :cfg="httpJson.http_request" v-if="index == 0 || powerMeterConfigList.http_individual_requests"/>
 
                             <InputElement :label="$t('powermeteradmin.httpJsonPath')"
-                                v-model="http_phase.json_path"
+                                v-model="httpJson.json_path"
                                 type="text"
                                 maxlength="256"
                                 placeholder="total_power"
@@ -184,67 +141,48 @@
                                     {{ $t('powermeteradmin.httpUnit') }}
                                 </label>
                                 <div class="col-sm-10">
-                                    <select id="power_unit" class="form-select" v-model="http_phase.unit">
-                                        <option value="1">mW</option>
-                                        <option value="0">W</option>
-                                        <option value="2">kW</option>
+                                    <select id="power_unit" class="form-select" v-model="httpJson.unit">
+                                        <option v-for="u in unitTypeList" :key="u.key" :value="u.key">
+                                            {{ u.value }}
+                                        </option>
                                     </select>
                                 </div>
                             </div>
 
                             <InputElement
                                 :label="$t('powermeteradmin.httpSignInverted')"
-                                v-model="http_phase.sign_inverted"
+                                v-model="httpJson.sign_inverted"
                                 :tooltip="$t('powermeteradmin.httpSignInvertedHint')"
                                 type="checkbox" />
 
                             <div class="text-center mb-3">
-                                <button type="button" class="btn btn-danger" @click="testHttpRequest(index)">
-                                    {{ $t('powermeteradmin.testHttpRequest') }}
+                                <button type="button" class="btn btn-danger" @click="testHttpJsonRequest(index)">
+                                    {{ $t('powermeteradmin.testHttpJsonRequest') }}
                                 </button>
                             </div>
 
-                            <BootstrapAlert v-model="testHttpRequestAlert[index].show" dismissible :variant="testHttpRequestAlert[index].type">
-                                {{ testHttpRequestAlert[index].message }}
+                            <BootstrapAlert v-model="testHttpJsonRequestAlert[index].show" dismissible :variant="testHttpJsonRequestAlert[index].type">
+                                {{ testHttpJsonRequestAlert[index].message }}
                             </BootstrapAlert>
                         </div>
                     </CardElement>
                 </div>
 
                 <div v-if="powerMeterConfigList.source === 6">
-                    <CardElement :text="$t('powermeteradmin.TIBBER')"
+                    <CardElement :text="$t('powermeteradmin.HTTP_SML')"
                             textVariant="text-bg-primary"
                             add-space>
 
-                        <InputElement :label="$t('powermeteradmin.httpUrl')"
-                            v-model="powerMeterConfigList.tibber.url"
-                            type="text"
-                            maxlength="1024"
-                            placeholder="http://admin:supersecret@mypowermeter.home/status"
-                            prefix="GET "
-                            :tooltip="$t('powermeteradmin.httpUrlDescription')" />
-
-                        <InputElement :label="$t('powermeteradmin.httpUsername')"
-                            v-model="powerMeterConfigList.tibber.username"
-                            type="text" maxlength="64"/>
-
-                        <InputElement :label="$t('powermeteradmin.httpPassword')"
-                            v-model="powerMeterConfigList.tibber.password"
-                            type="password" maxlength="64"/>
-
-                        <InputElement :label="$t('powermeteradmin.httpTimeout')"
-                            v-model="powerMeterConfigList.tibber.timeout"
-                            type="number"
-                            :postfix="$t('powermeteradmin.milliSeconds')" />
+                        <HttpRequestSettings :cfg="powerMeterConfigList.http_sml.http_request" />
 
                         <div class="text-center mb-3">
-                            <button type="button" class="btn btn-danger" @click="testTibberRequest()">
-                                {{ $t('powermeteradmin.testHttpRequest') }}
+                            <button type="button" class="btn btn-danger" @click="testHttpSmlRequest()">
+                                {{ $t('powermeteradmin.testHttpSmlRequest') }}
                             </button>
                         </div>
 
-                        <BootstrapAlert v-model="testTibberRequestAlert.show" dismissible :variant="testTibberRequestAlert.type">
-                            {{ testTibberRequestAlert.message }}
+                        <BootstrapAlert v-model="testHttpSmlRequestAlert.show" dismissible :variant="testHttpSmlRequestAlert.type">
+                            {{ testHttpSmlRequestAlert.message }}
                         </BootstrapAlert>
                     </CardElement>
                 </div>
@@ -263,8 +201,9 @@ import BootstrapAlert from "@/components/BootstrapAlert.vue";
 import CardElement from '@/components/CardElement.vue';
 import FormFooter from '@/components/FormFooter.vue';
 import InputElement from '@/components/InputElement.vue';
+import HttpRequestSettings from '@/components/HttpRequestSettings.vue';
 import { handleResponse, authHeader } from '@/utils/authentication';
-import type { PowerMeterHttpPhaseConfig, PowerMeterConfig } from "@/types/PowerMeterConfig";
+import type { PowerMeterHttpJsonConfig, PowerMeterConfig } from "@/types/PowerMeterConfig";
 
 export default defineComponent({
     components: {
@@ -272,6 +211,7 @@ export default defineComponent({
         BootstrapAlert,
         CardElement,
         FormFooter,
+        HttpRequestSettings,
         InputElement
     },
     data() {
@@ -282,21 +222,21 @@ export default defineComponent({
                 { key: 0, value: this.$t('powermeteradmin.typeMQTT') },
                 { key: 1, value: this.$t('powermeteradmin.typeSDM1ph') },
                 { key: 2, value: this.$t('powermeteradmin.typeSDM3ph') },
-                { key: 3, value: this.$t('powermeteradmin.typeHTTP') },
+                { key: 3, value: this.$t('powermeteradmin.typeHTTP_JSON') },
                 { key: 4, value: this.$t('powermeteradmin.typeSML') },
                 { key: 5, value: this.$t('powermeteradmin.typeSMAHM2') },
-                { key: 6, value: this.$t('powermeteradmin.typeTIBBER') },
+                { key: 6, value: this.$t('powermeteradmin.typeHTTP_SML') },
             ],
-            powerMeterAuthList: [
-                { key: 0, value: "None" },
-                { key: 1, value: "Basic" },
-                { key: 2, value: "Digest" },
+            unitTypeList: [
+                { key: 1, value: "mW" },
+                { key: 0, value: "W" },
+                { key: 2, value: "kW" },
             ],
             alertMessage: "",
             alertType: "info",
             showAlert: false,
-            testHttpRequestAlert:  [{message: "", type: "", show: false}] as { message: string; type: string; show: boolean; }[],
-            testTibberRequestAlert:  {message: "", type: "", show: false} as { message: string; type: string; show: boolean; }
+            testHttpJsonRequestAlert:  [{message: "", type: "", show: false}] as { message: string; type: string; show: boolean; }[],
+            testHttpSmlRequestAlert:  {message: "", type: "", show: false} as { message: string; type: string; show: boolean; }
         };
     },
     created() {
@@ -311,8 +251,8 @@ export default defineComponent({
                     this.powerMeterConfigList = data;
                     this.dataLoading = false;
 
-                    for (let i = 0; i < this.powerMeterConfigList.http_phases.length; i++) {
-                        this.testHttpRequestAlert.push({
+                    for (let i = 0; i < this.powerMeterConfigList.http_json.length; i++) {
+                        this.testHttpJsonRequestAlert.push({
                             message: "",
                             type: "",
                             show: false,
@@ -341,27 +281,27 @@ export default defineComponent({
                     }
                 );
         },
-        testHttpRequest(index: number) {
-            let phaseConfig:PowerMeterHttpPhaseConfig;
+        testHttpJsonRequest(index: number) {
+            let valueConfig:PowerMeterHttpJsonConfig;
 
             if (this.powerMeterConfigList.http_individual_requests) {
-                phaseConfig = this.powerMeterConfigList.http_phases[index];
+                valueConfig = this.powerMeterConfigList.http_json[index];
             } else {
-                phaseConfig = { ...this.powerMeterConfigList.http_phases[0] };
-                phaseConfig.index = this.powerMeterConfigList.http_phases[index].index;
-                phaseConfig.json_path = this.powerMeterConfigList.http_phases[index].json_path;
+                valueConfig = { ...this.powerMeterConfigList.http_json[0] };
+                valueConfig.index = this.powerMeterConfigList.http_json[index].index;
+                valueConfig.json_path = this.powerMeterConfigList.http_json[index].json_path;
             }
 
-            this.testHttpRequestAlert[index] = {
+            this.testHttpJsonRequestAlert[index] = {
                 message: "Sending HTTP request...",
                 type: "info",
                 show: true,
             };
 
             const formData = new FormData();
-            formData.append("data", JSON.stringify(phaseConfig));
+            formData.append("data", JSON.stringify(valueConfig));
 
-            fetch("/api/powermeter/testhttprequest", {
+            fetch("/api/powermeter/testhttpjsonrequest", {
                 method: "POST",
                 headers: authHeader(),
                 body: formData,
@@ -369,7 +309,7 @@ export default defineComponent({
                 .then((response) => handleResponse(response, this.$emitter, this.$router))
                 .then(
                     (response) => {
-                        this.testHttpRequestAlert[index] = {
+                        this.testHttpJsonRequestAlert[index] = {
                             message: response.message,
                             type: response.type,
                             show: true,
@@ -377,17 +317,17 @@ export default defineComponent({
                     }
                 )
         },
-        testTibberRequest() {
-            this.testTibberRequestAlert = {
-                message: "Sending Tibber request...",
+        testHttpSmlRequest() {
+            this.testHttpSmlRequestAlert = {
+                message: "Sending HTTP SML request...",
                 type: "info",
                 show: true,
             };
 
             const formData = new FormData();
-            formData.append("data", JSON.stringify(this.powerMeterConfigList.tibber));
+            formData.append("data", JSON.stringify(this.powerMeterConfigList.http_sml));
 
-            fetch("/api/powermeter/testtibberrequest", {
+            fetch("/api/powermeter/testhttpsmlrequest", {
                 method: "POST",
                 headers: authHeader(),
                 body: formData,
@@ -395,7 +335,7 @@ export default defineComponent({
                 .then((response) => handleResponse(response, this.$emitter, this.$router))
                 .then(
                     (response) => {
-                        this.testTibberRequestAlert = {
+                        this.testHttpSmlRequestAlert = {
                             message: response.message,
                             type: response.type,
                             show: true,

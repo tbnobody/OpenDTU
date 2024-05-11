@@ -24,15 +24,13 @@ void PowerMeterHttpSml::loop()
 
     _lastPoll = millis();
 
-    auto const& tibberConfig = config.PowerMeter.Tibber;
-
-    if (!query(tibberConfig)) {
+    if (!query(config.PowerMeter.HttpSml.HttpRequest)) {
         MessageOutput.printf("[PowerMeterHttpSml] Getting the power value failed.\r\n");
         MessageOutput.printf("%s\r\n", tibberPowerMeterError);
     }
 }
 
-bool PowerMeterHttpSml::query(PowerMeterTibberConfig const& config)
+bool PowerMeterHttpSml::query(HttpRequestConfig const& config)
 {
     //hostByName in WiFiGeneric fails to resolve local names. issue described in
     //https://github.com/espressif/arduino-esp32/issues/3822
@@ -85,7 +83,7 @@ bool PowerMeterHttpSml::query(PowerMeterTibberConfig const& config)
     return httpRequest(ipaddr.toString(), port, uri, https, config);
 }
 
-bool PowerMeterHttpSml::httpRequest(const String& host, uint16_t port, const String& uri, bool https, PowerMeterTibberConfig const& config)
+bool PowerMeterHttpSml::httpRequest(const String& host, uint16_t port, const String& uri, bool https, HttpRequestConfig const& config)
 {
     if (!httpClient) { httpClient = std::make_unique<HTTPClient>(); }
 

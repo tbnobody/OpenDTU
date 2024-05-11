@@ -27,16 +27,16 @@ void PowerMeterHttpJson::loop()
 
     _lastPoll = millis();
 
-    for (uint8_t i = 0; i < POWERMETER_MAX_PHASES; i++) {
-        auto const& phaseConfig = config.PowerMeter.Http_Phase[i];
+    for (uint8_t i = 0; i < POWERMETER_HTTP_JSON_MAX_VALUES; i++) {
+        auto const& valueConfig = config.PowerMeter.HttpJson[i];
 
-        if (!phaseConfig.Enabled) {
+        if (!valueConfig.Enabled) {
             _cache[i] = 0.0;
             continue;
         }
 
         if (i == 0 || config.PowerMeter.HttpIndividualRequests) {
-            if (!queryPhase(i, phaseConfig)) {
+            if (!queryValue(i, valueConfig)) {
                 MessageOutput.printf("[PowerMeterHttpJson] Getting HTTP response for phase %d failed.\r\n", i + 1);
                 MessageOutput.printf("%s\r\n", httpPowerMeterError);
                 return;
@@ -44,7 +44,7 @@ void PowerMeterHttpJson::loop()
             continue;
         }
 
-        if(!tryGetFloatValueForPhase(i, phaseConfig.JsonPath, phaseConfig.PowerUnit, phaseConfig.SignInverted)) {
+        if(!tryGetFloatValueForPhase(i, valueConfig.JsonPath, valueConfig.PowerUnit, valueConfig.SignInverted)) {
             MessageOutput.printf("[PowerMeterHttpJson] Reading power of phase %d (from JSON fetched with Phase 1 config) failed.\r\n", i + 1);
             MessageOutput.printf("%s\r\n", httpPowerMeterError);
             return;
@@ -70,7 +70,7 @@ void PowerMeterHttpJson::doMqttPublish() const
     mqttPublish("power3", _powerValues[2]);
 }
 
-bool PowerMeterHttpJson::queryPhase(int phase, PowerMeterHttpConfig const& config)
+bool PowerMeterHttpJson::queryValue(int phase, PowerMeterHttpJsonConfig const& config)
 {
     //hostByName in WiFiGeneric fails to resolve local names. issue described in
     //https://github.com/espressif/arduino-esp32/issues/3822
@@ -82,7 +82,7 @@ bool PowerMeterHttpJson::queryPhase(int phase, PowerMeterHttpConfig const& confi
     String uri;
     String base64Authorization;
     uint16_t port;
-    extractUrlComponents(config.Url, protocol, host, uri, port, base64Authorization);
+    extractUrlComponents(config.HttpRequest.Url, protocol, host, uri, port, base64Authorization);
 
     IPAddress ipaddr((uint32_t)0);
     //first check if "host" is already an IP adress
@@ -123,7 +123,7 @@ bool PowerMeterHttpJson::queryPhase(int phase, PowerMeterHttpConfig const& confi
     return httpRequest(phase, ipaddr.toString(), port, uri, https, config);
 }
 
-bool PowerMeterHttpJson::httpRequest(int phase, const String& host, uint16_t port, const String& uri, bool https, PowerMeterHttpConfig const& config)
+bool PowerMeterHttpJson::httpRequest(int phase, const String& host, uint16_t port, const String& uri, bool https, PowerMeterHttpJsonConfig const& powerMeterConfig)
 {
     if (!httpClient) { httpClient = std::make_unique<HTTPClient>(); }
 
@@ -132,6 +132,7 @@ bool PowerMeterHttpJson::httpRequest(int phase, const String& host, uint16_t por
         return false;
     }
 
+    auto const& config = powerMeterConfig.HttpRequest;
     prepareRequest(config.Timeout, config.HeaderKey, config.HeaderValue);
     if (config.AuthType == Auth_t::Digest) {
         const char *headers[1] = {"WWW-Authenticate"};
@@ -178,7 +179,7 @@ bool PowerMeterHttpJson::httpRequest(int phase, const String& host, uint16_t por
 
     // TODO(schlimmchen): postpone calling tryGetFloatValueForPhase, as it
     // will be called twice for each phase when doing separate requests.
-    return tryGetFloatValueForPhase(phase, config.JsonPath, config.PowerUnit, config.SignInverted);
+    return tryGetFloatValueForPhase(phase, powerMeterConfig.JsonPath, powerMeterConfig.PowerUnit, powerMeterConfig.SignInverted);
 }
 
 String PowerMeterHttpJson::extractParam(String& authReq, const String& param, const char delimit) {
