@@ -80,9 +80,8 @@ bool PowerMeterHttpJson::queryValue(int phase, PowerMeterHttpJsonConfig const& c
     String protocol;
     String host;
     String uri;
-    String base64Authorization;
     uint16_t port;
-    extractUrlComponents(config.HttpRequest.Url, protocol, host, uri, port, base64Authorization);
+    extractUrlComponents(config.HttpRequest.Url, protocol, host, uri, port);
 
     IPAddress ipaddr((uint32_t)0);
     //first check if "host" is already an IP adress
@@ -267,7 +266,7 @@ bool PowerMeterHttpJson::tryGetFloatValueForPhase(int phase, String jsonPath, Un
 }
 
 //extract url component as done by httpClient::begin(String url, const char* expectedProtocol) https://github.com/espressif/arduino-esp32/blob/da6325dd7e8e152094b19fe63190907f38ef1ff0/libraries/HTTPClient/src/HTTPClient.cpp#L250
-bool PowerMeterHttpJson::extractUrlComponents(String url, String& _protocol, String& _host, String& _uri, uint16_t& _port, String& _base64Authorization)
+bool PowerMeterHttpJson::extractUrlComponents(String url, String& _protocol, String& _host, String& _uri, uint16_t& _port)
 {
     // check for : (http: or https:
     int index = url.indexOf(':');
@@ -295,10 +294,9 @@ bool PowerMeterHttpJson::extractUrlComponents(String url, String& _protocol, Str
     // get Authorization
     index = host.indexOf('@');
     if(index >= 0) {
-        // auth info
-        String auth = host.substring(0, index);
+        // basic authentication is only supported through setting username
+        // and password using the respective inputs, not embedded into the URL
         host.remove(0, index + 1); // remove auth part including @
-        _base64Authorization = base64::encode(auth);
     }
 
     // get port

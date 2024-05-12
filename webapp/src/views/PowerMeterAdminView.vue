@@ -98,8 +98,8 @@
                     <div class="alert alert-secondary mt-5" role="alert">
                         <h2>{{ $t('powermeteradmin.urlExamplesHeading') }}:</h2>
                         <ul>
-                            <li>http://admin:secret@shelly3em.home/status</li>
-                            <li>https://admin:secret@shelly3em.home/status</li>
+                            <li>http://shelly3em.home/status</li>
+                            <li>https://shelly3em.home/status</li>
                             <li>http://tasmota-123.home/cm?cmnd=status%208</li>
                             <li>http://12.34.56.78/emeter/0</li>
                         </ul>

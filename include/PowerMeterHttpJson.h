@@ -33,7 +33,7 @@ private:
     String httpResponse;
 
     bool httpRequest(int phase, const String& host, uint16_t port, const String& uri, bool https, PowerMeterHttpJsonConfig const& config);
-    bool extractUrlComponents(String url, String& _protocol, String& _hostname, String& _uri, uint16_t& uint16_t, String& _base64Authorization);
+    bool extractUrlComponents(String url, String& _protocol, String& _hostname, String& _uri, uint16_t& uint16_t);
     String extractParam(String& authReq, const String& param, const char delimit);
     String getcNonce(const int len);
     String getDigestAuth(String& authReq, const String& username, const String& password, const String& method, const String& uri, unsigned int counter);
