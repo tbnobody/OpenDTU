@@ -101,7 +101,7 @@
                             <li>http://shelly3em.home/status</li>
                             <li>https://shelly3em.home/status</li>
                             <li>http://tasmota-123.home/cm?cmnd=status%208</li>
-                            <li>http://12.34.56.78/emeter/0</li>
+                            <li>http://12.34.56.78:8080/emeter/0</li>
                         </ul>
 
                         <h2>{{ $t('powermeteradmin.jsonPathExamplesHeading') }}:</h2>
