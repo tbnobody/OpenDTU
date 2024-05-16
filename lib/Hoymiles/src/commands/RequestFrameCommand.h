@@ -5,7 +5,7 @@
 
 class RequestFrameCommand : public SingleDataCommand {
 public:
-    explicit RequestFrameCommand(const uint64_t target_address = 0, const uint64_t router_address = 0, uint8_t frame_no = 0);
+    explicit RequestFrameCommand(InverterAbstract* inv, const uint64_t router_address = 0, uint8_t frame_no = 0);
 
     virtual String getCommandName() const;
 

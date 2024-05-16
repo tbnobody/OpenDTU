@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * Copyright (C) 2022-2023 Thomas Basler and others
+ * Copyright (C) 2022-2024 Thomas Basler and others
  */
 
 /*
@@ -22,8 +22,8 @@ ID   Target Addr   Source Addr   Idx  DT   ?    Time          Gap             Pa
 #include "Hoymiles.h"
 #include "inverters/InverterAbstract.h"
 
-SystemConfigParaCommand::SystemConfigParaCommand(const uint64_t target_address, const uint64_t router_address, const time_t time)
-    : MultiDataCommand(target_address, router_address)
+SystemConfigParaCommand::SystemConfigParaCommand(InverterAbstract* inv, const uint64_t router_address, const time_t time)
+    : MultiDataCommand(inv, router_address)
 {
     setTime(time);
     setDataType(0x05);

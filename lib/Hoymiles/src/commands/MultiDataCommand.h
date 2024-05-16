@@ -7,7 +7,7 @@
 
 class MultiDataCommand : public CommandAbstract {
 public:
-    explicit MultiDataCommand(const uint64_t target_address = 0, const uint64_t router_address = 0, const uint8_t data_type = 0, const time_t time = 0);
+    explicit MultiDataCommand(InverterAbstract* inv, const uint64_t router_address = 0, const uint8_t data_type = 0, const time_t time = 0);
 
     void setTime(const time_t time);
     time_t getTime() const;

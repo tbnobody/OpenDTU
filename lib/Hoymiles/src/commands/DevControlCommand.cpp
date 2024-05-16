@@ -1,7 +1,7 @@
 
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * Copyright (C) 2022-2023 Thomas Basler and others
+ * Copyright (C) 2022-2024 Thomas Basler and others
  */
 
 /*
@@ -23,8 +23,8 @@ ID   Target Addr   Source Addr   Cmd  Payload CRC16 CRC8
 #include "DevControlCommand.h"
 #include "crc.h"
 
-DevControlCommand::DevControlCommand(const uint64_t target_address, const uint64_t router_address)
-    : CommandAbstract(target_address, router_address)
+DevControlCommand::DevControlCommand(InverterAbstract* inv, const uint64_t router_address)
+    : CommandAbstract(inv, router_address)
 {
     _payload[0] = 0x51;
     _payload[9] = 0x81;

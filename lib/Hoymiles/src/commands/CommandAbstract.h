@@ -13,7 +13,7 @@ class InverterAbstract;
 
 class CommandAbstract {
 public:
-    explicit CommandAbstract(const uint64_t target_address = 0, const uint64_t router_address = 0);
+    explicit CommandAbstract(InverterAbstract* inv, const uint64_t router_address = 0);
     virtual ~CommandAbstract() {};
 
     const uint8_t* getDataPayload();
@@ -21,7 +21,6 @@ public:
 
     uint8_t getDataSize() const;
 
-    void setTargetAddress(const uint64_t address);
     uint64_t getTargetAddress() const;
 
     void setRouterAddress(const uint64_t address);
@@ -56,6 +55,9 @@ protected:
     uint64_t _targetAddress;
     uint64_t _routerAddress;
 
+    InverterAbstract* _inv;
+
 private:
+    void setTargetAddress(const uint64_t address);
     static void convertSerialToPacketId(uint8_t buffer[], const uint64_t serial);
 };

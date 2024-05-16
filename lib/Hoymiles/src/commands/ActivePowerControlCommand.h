@@ -12,7 +12,7 @@ typedef enum { // ToDo: to be verified by field tests
 
 class ActivePowerControlCommand : public DevControlCommand {
 public:
-    explicit ActivePowerControlCommand(const uint64_t target_address = 0, const uint64_t router_address = 0);
+    explicit ActivePowerControlCommand(InverterAbstract* inv, const uint64_t router_address = 0);
 
     virtual String getCommandName() const;
 

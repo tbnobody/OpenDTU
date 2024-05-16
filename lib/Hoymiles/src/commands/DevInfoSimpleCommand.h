@@ -5,7 +5,7 @@
 
 class DevInfoSimpleCommand : public MultiDataCommand {
 public:
-    explicit DevInfoSimpleCommand(const uint64_t target_address = 0, const uint64_t router_address = 0, const time_t time = 0);
+    explicit DevInfoSimpleCommand(InverterAbstract* inv, const uint64_t router_address = 0, const time_t time = 0);
 
     virtual String getCommandName() const;
 
