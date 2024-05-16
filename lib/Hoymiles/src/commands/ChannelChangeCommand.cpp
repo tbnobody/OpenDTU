@@ -67,7 +67,7 @@ void ChannelChangeCommand::setCountryMode(const CountryModeId_t mode)
     }
 }
 
-bool ChannelChangeCommand::handleResponse(InverterAbstract& inverter, const fragment_t fragment[], const uint8_t max_fragment_id)
+bool ChannelChangeCommand::handleResponse(const fragment_t fragment[], const uint8_t max_fragment_id)
 {
     return true;
 }

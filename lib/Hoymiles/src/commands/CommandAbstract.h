@@ -37,7 +37,7 @@ public:
 
     virtual CommandAbstract* getRequestFrameCommand(const uint8_t frame_no);
 
-    virtual bool handleResponse(InverterAbstract& inverter, const fragment_t fragment[], const uint8_t max_fragment_id) = 0;
+    virtual bool handleResponse(const fragment_t fragment[], const uint8_t max_fragment_id) = 0;
     virtual void gotTimeout();
 
     // Sets the amount how often the specific command is resent if all fragments where missing

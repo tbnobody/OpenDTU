@@ -14,7 +14,7 @@ public:
 
     CommandAbstract* getRequestFrameCommand(const uint8_t frame_no);
 
-    virtual bool handleResponse(InverterAbstract& inverter, const fragment_t fragment[], const uint8_t max_fragment_id);
+    virtual bool handleResponse(const fragment_t fragment[], const uint8_t max_fragment_id);
 
 protected:
     void setDataType(const uint8_t data_type);

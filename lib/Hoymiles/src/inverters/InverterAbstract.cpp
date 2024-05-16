@@ -255,7 +255,7 @@ uint8_t InverterAbstract::verifyAllFragments(CommandAbstract& cmd)
         }
     }
 
-    if (!cmd.handleResponse(*this, _rxFragmentBuffer, _rxFragmentMaxPacketId)) {
+    if (!cmd.handleResponse(_rxFragmentBuffer, _rxFragmentMaxPacketId)) {
         cmd.gotTimeout();
         return FRAGMENT_HANDLE_ERROR;
     }

@@ -36,24 +36,24 @@ String AlarmDataCommand::getCommandName() const
     return "AlarmData";
 }
 
-bool AlarmDataCommand::handleResponse(InverterAbstract& inverter, const fragment_t fragment[], const uint8_t max_fragment_id)
+bool AlarmDataCommand::handleResponse(const fragment_t fragment[], const uint8_t max_fragment_id)
 {
     // Check CRC of whole payload
-    if (!MultiDataCommand::handleResponse(inverter, fragment, max_fragment_id)) {
+    if (!MultiDataCommand::handleResponse(fragment, max_fragment_id)) {
         return false;
     }
 
     // Move all fragments into target buffer
     uint8_t offs = 0;
-    inverter.EventLog()->beginAppendFragment();
-    inverter.EventLog()->clearBuffer();
+    _inv->EventLog()->beginAppendFragment();
+    _inv->EventLog()->clearBuffer();
     for (uint8_t i = 0; i < max_fragment_id; i++) {
-        inverter.EventLog()->appendFragment(offs, fragment[i].fragment, fragment[i].len);
+        _inv->EventLog()->appendFragment(offs, fragment[i].fragment, fragment[i].len);
         offs += (fragment[i].len);
     }
-    inverter.EventLog()->endAppendFragment();
-    inverter.EventLog()->setLastAlarmRequestSuccess(CMD_OK);
-    inverter.EventLog()->setLastUpdate(millis());
+    _inv->EventLog()->endAppendFragment();
+    _inv->EventLog()->setLastAlarmRequestSuccess(CMD_OK);
+    _inv->EventLog()->setLastUpdate(millis());
     return true;
 }
 

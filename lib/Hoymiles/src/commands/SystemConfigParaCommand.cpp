@@ -35,10 +35,10 @@ String SystemConfigParaCommand::getCommandName() const
     return "SystemConfigPara";
 }
 
-bool SystemConfigParaCommand::handleResponse(InverterAbstract& inverter, const fragment_t fragment[], const uint8_t max_fragment_id)
+bool SystemConfigParaCommand::handleResponse(const fragment_t fragment[], const uint8_t max_fragment_id)
 {
     // Check CRC of whole payload
-    if (!MultiDataCommand::handleResponse(inverter, fragment, max_fragment_id)) {
+    if (!MultiDataCommand::handleResponse(fragment, max_fragment_id)) {
         return false;
     }
 
@@ -46,7 +46,7 @@ bool SystemConfigParaCommand::handleResponse(InverterAbstract& inverter, const f
     // In case of low power in the inverter it occours that some incomplete fragments
     // with a valid CRC are received.
     const uint8_t fragmentsSize = getTotalFragmentSize(fragment, max_fragment_id);
-    const uint8_t expectedSize = inverter.SystemConfigPara()->getExpectedByteCount();
+    const uint8_t expectedSize = _inv->SystemConfigPara()->getExpectedByteCount();
     if (fragmentsSize < expectedSize) {
         Hoymiles.getMessageOutput()->printf("ERROR in %s: Received fragment size: %d, min expected size: %d\r\n",
             getCommandName().c_str(), fragmentsSize, expectedSize);
@@ -56,15 +56,15 @@ bool SystemConfigParaCommand::handleResponse(InverterAbstract& inverter, const f
 
     // Move all fragments into target buffer
     uint8_t offs = 0;
-    inverter.SystemConfigPara()->beginAppendFragment();
-    inverter.SystemConfigPara()->clearBuffer();
+    _inv->SystemConfigPara()->beginAppendFragment();
+    _inv->SystemConfigPara()->clearBuffer();
     for (uint8_t i = 0; i < max_fragment_id; i++) {
-        inverter.SystemConfigPara()->appendFragment(offs, fragment[i].fragment, fragment[i].len);
+        _inv->SystemConfigPara()->appendFragment(offs, fragment[i].fragment, fragment[i].len);
         offs += (fragment[i].len);
     }
-    inverter.SystemConfigPara()->endAppendFragment();
-    inverter.SystemConfigPara()->setLastUpdateRequest(millis());
-    inverter.SystemConfigPara()->setLastLimitRequestSuccess(CMD_OK);
+    _inv->SystemConfigPara()->endAppendFragment();
+    _inv->SystemConfigPara()->setLastUpdateRequest(millis());
+    _inv->SystemConfigPara()->setLastLimitRequestSuccess(CMD_OK);
     return true;
 }
 

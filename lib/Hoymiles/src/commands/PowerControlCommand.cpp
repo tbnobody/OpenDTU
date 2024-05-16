@@ -44,14 +44,14 @@ String PowerControlCommand::getCommandName() const
     return "PowerControl";
 }
 
-bool PowerControlCommand::handleResponse(InverterAbstract& inverter, const fragment_t fragment[], const uint8_t max_fragment_id)
+bool PowerControlCommand::handleResponse(const fragment_t fragment[], const uint8_t max_fragment_id)
 {
-    if (!DevControlCommand::handleResponse(inverter, fragment, max_fragment_id)) {
+    if (!DevControlCommand::handleResponse(fragment, max_fragment_id)) {
         return false;
     }
 
-    inverter.PowerCommand()->setLastUpdateCommand(millis());
-    inverter.PowerCommand()->setLastPowerCommandSuccess(CMD_OK);
+    _inv->PowerCommand()->setLastUpdateCommand(millis());
+    _inv->PowerCommand()->setLastPowerCommandSuccess(CMD_OK);
     return true;
 }
 

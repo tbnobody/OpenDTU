@@ -9,7 +9,7 @@ public:
 
     virtual String getCommandName() const;
 
-    virtual bool handleResponse(InverterAbstract& inverter, const fragment_t fragment[], const uint8_t max_fragment_id);
+    virtual bool handleResponse(const fragment_t fragment[], const uint8_t max_fragment_id);
     virtual void gotTimeout();
 
     void setPowerOn(const bool state);
