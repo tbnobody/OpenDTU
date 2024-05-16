@@ -16,5 +16,5 @@ public:
 
     /* OpenDTU-OnBatter-specific utils go here: */
     template<typename T>
-    static std::pair<T, String> getJsonValueFromStringByPath(String const& jsonText, String const& path);
+    static std::pair<T, String> getJsonValueByPath(JsonDocument const& root, String const& path);
 };

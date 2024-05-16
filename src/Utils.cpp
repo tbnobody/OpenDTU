@@ -95,20 +95,14 @@ void Utils::removeAllFiles()
 
 /* OpenDTU-OnBatter-specific utils go here: */
 template<typename T>
-std::pair<T, String> Utils::getJsonValueFromStringByPath(String const& jsonText, String const& path)
+std::pair<T, String> Utils::getJsonValueByPath(JsonDocument const& root, String const& path)
 {
-    JsonDocument root;
-    const DeserializationError error = deserializeJson(root, jsonText);
-    if (error) {
-        return { T(), "Unable to parse server response as JSON" };
-    }
-
     size_t constexpr kErrBufferSize = 256;
     char errBuffer[kErrBufferSize];
     constexpr char delimiter = '/';
     int start = 0;
     int end = path.indexOf(delimiter);
-    auto value = root.as<JsonVariant>();
+    auto value = root.as<JsonVariantConst>();
 
     // NOTE: "Because ArduinoJson implements the Null Object Pattern, it is
     // always safe to read the object: if the key doesn't exist, it returns an
@@ -171,4 +165,4 @@ std::pair<T, String> Utils::getJsonValueFromStringByPath(String const& jsonText,
     return { value.as<T>(), "" };
 }
 
-template std::pair<float, String> Utils::getJsonValueFromStringByPath(String const& jsonText, String const& path);
+template std::pair<float, String> Utils::getJsonValueByPath(JsonDocument const& root, String const& path);

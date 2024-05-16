@@ -202,7 +202,7 @@ struct CONFIG_T {
         bool UpdatesOnly;
     } Vedirect;
 
-    struct {
+    struct PowerMeterConfig {
         bool Enabled;
         bool VerboseLogging;
         uint32_t Interval;
