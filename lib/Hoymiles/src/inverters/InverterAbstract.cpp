@@ -226,7 +226,7 @@ uint8_t InverterAbstract::verifyAllFragments(CommandAbstract& cmd)
         if (cmd.getSendCount() <= cmd.getMaxResendCount()) {
             return FRAGMENT_ALL_MISSING_RESEND;
         } else {
-            cmd.gotTimeout(*this);
+            cmd.gotTimeout();
             return FRAGMENT_ALL_MISSING_TIMEOUT;
         }
     }
@@ -237,7 +237,7 @@ uint8_t InverterAbstract::verifyAllFragments(CommandAbstract& cmd)
         if (_rxFragmentRetransmitCnt++ < cmd.getMaxRetransmitCount()) {
             return _rxFragmentLastPacketId + 1;
         } else {
-            cmd.gotTimeout(*this);
+            cmd.gotTimeout();
             return FRAGMENT_RETRANSMIT_TIMEOUT;
         }
     }
@@ -249,14 +249,14 @@ uint8_t InverterAbstract::verifyAllFragments(CommandAbstract& cmd)
             if (_rxFragmentRetransmitCnt++ < cmd.getMaxRetransmitCount()) {
                 return i + 1;
             } else {
-                cmd.gotTimeout(*this);
+                cmd.gotTimeout();
                 return FRAGMENT_RETRANSMIT_TIMEOUT;
             }
         }
     }
 
     if (!cmd.handleResponse(*this, _rxFragmentBuffer, _rxFragmentMaxPacketId)) {
-        cmd.gotTimeout(*this);
+        cmd.gotTimeout();
         return FRAGMENT_HANDLE_ERROR;
     }
 

@@ -94,7 +94,7 @@ PowerLimitControlType ActivePowerControlCommand::getType()
     return (PowerLimitControlType)(((uint16_t)_payload[14] << 8) | _payload[15]);
 }
 
-void ActivePowerControlCommand::gotTimeout(InverterAbstract& inverter)
+void ActivePowerControlCommand::gotTimeout()
 {
-    inverter.SystemConfigPara()->setLastLimitCommandSuccess(CMD_NOK);
+    _inv->SystemConfigPara()->setLastLimitCommandSuccess(CMD_NOK);
 }

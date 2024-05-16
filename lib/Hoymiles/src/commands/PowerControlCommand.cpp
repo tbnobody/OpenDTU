@@ -55,9 +55,9 @@ bool PowerControlCommand::handleResponse(InverterAbstract& inverter, const fragm
     return true;
 }
 
-void PowerControlCommand::gotTimeout(InverterAbstract& inverter)
+void PowerControlCommand::gotTimeout()
 {
-    inverter.PowerCommand()->setLastPowerCommandSuccess(CMD_NOK);
+    _inv->PowerCommand()->setLastPowerCommandSuccess(CMD_NOK);
 }
 
 void PowerControlCommand::setPowerOn(const bool state)

@@ -68,7 +68,7 @@ bool RealTimeRunDataCommand::handleResponse(InverterAbstract& inverter, const fr
     return true;
 }
 
-void RealTimeRunDataCommand::gotTimeout(InverterAbstract& inverter)
+void RealTimeRunDataCommand::gotTimeout()
 {
-    inverter.Statistics()->incrementRxFailureCount();
+    _inv->Statistics()->incrementRxFailureCount();
 }

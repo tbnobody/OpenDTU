@@ -57,7 +57,7 @@ bool AlarmDataCommand::handleResponse(InverterAbstract& inverter, const fragment
     return true;
 }
 
-void AlarmDataCommand::gotTimeout(InverterAbstract& inverter)
+void AlarmDataCommand::gotTimeout()
 {
-    inverter.EventLog()->setLastAlarmRequestSuccess(CMD_NOK);
+    _inv->EventLog()->setLastAlarmRequestSuccess(CMD_NOK);
 }

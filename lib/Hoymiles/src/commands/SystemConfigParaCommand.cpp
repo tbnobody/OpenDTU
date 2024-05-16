@@ -68,7 +68,7 @@ bool SystemConfigParaCommand::handleResponse(InverterAbstract& inverter, const f
     return true;
 }
 
-void SystemConfigParaCommand::gotTimeout(InverterAbstract& inverter)
+void SystemConfigParaCommand::gotTimeout()
 {
-    inverter.SystemConfigPara()->setLastLimitRequestSuccess(CMD_NOK);
+    _inv->SystemConfigPara()->setLastLimitRequestSuccess(CMD_NOK);
 }
