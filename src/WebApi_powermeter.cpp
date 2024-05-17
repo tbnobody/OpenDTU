@@ -192,26 +192,15 @@ void WebApiPowerMeterClass::onTestHttpJsonRequest(AsyncWebServerRequest* request
 
     auto& retMsg = asyncJsonResponse->getRoot();
 
-    JsonObject requestConfig = root["http_request"];
-    if (!requestConfig.containsKey("url")
-            || !requestConfig.containsKey("auth_type")
-            || !requestConfig.containsKey("username")
-            || !requestConfig.containsKey("password")
-            || !requestConfig.containsKey("header_key")
-            || !requestConfig.containsKey("header_value")
-            || !requestConfig.containsKey("timeout")
-            || !root.containsKey("json_path")) {
-        retMsg["message"] = "Missing fields!";
-        asyncJsonResponse->setLength();
-        request->send(asyncJsonResponse);
-        return;
-    }
-
-
     char response[256];
 
     auto powerMeterConfig = std::make_unique<CONFIG_T::PowerMeterConfig>();
-    Configuration.deserializePowerMeterHttpJsonConfig(root.as<JsonObject>(), powerMeterConfig->HttpJson[0]);
+    powerMeterConfig->HttpIndividualRequests = root["http_individual_requests"].as<bool>();
+    JsonArray httpJson = root["http_json"];
+    for (uint8_t i = 0; i < httpJson.size(); i++) {
+        Configuration.deserializePowerMeterHttpJsonConfig(httpJson[i].as<JsonObject>(),
+                powerMeterConfig->HttpJson[i]);
+    }
     auto backup = std::make_unique<CONFIG_T::PowerMeterConfig>(Configuration.get().PowerMeter);
     Configuration.get().PowerMeter = *powerMeterConfig;
     auto upMeter = std::make_unique<PowerMeterHttpJson>();
@@ -222,9 +211,14 @@ void WebApiPowerMeterClass::onTestHttpJsonRequest(AsyncWebServerRequest* request
     if (std::holds_alternative<values_t>(res)) {
         retMsg["type"] = "success";
         auto vals = std::get<values_t>(res);
-        snprintf_P(response, sizeof(response), "Result: %5.2fW", vals[0]);
+        auto pos = snprintf(response, sizeof(response), "Result: %5.2fW", vals[0]);
+        for (size_t i = 1; i < POWERMETER_HTTP_JSON_MAX_VALUES; ++i) {
+            if (!powerMeterConfig->HttpJson[i].Enabled) { continue; }
+            pos += snprintf(response + pos, sizeof(response) - pos, ", %5.2fW", vals[i]);
+        }
+        snprintf(response + pos, sizeof(response) - pos, ", Total: %5.2f", upMeter->getPowerTotal());
     } else {
-        snprintf_P(response, sizeof(response), "%s", std::get<String>(res).c_str());
+        snprintf(response, sizeof(response), "%s", std::get<String>(res).c_str());
     }
 
     retMsg["message"] = response;

@@ -581,7 +581,8 @@
         "httpUnit": "Einheit",
         "httpSignInverted": "Vorzeichen umkehren",
         "httpSignInvertedHint": "Positive Werte werden als Leistungsabnahme aus dem Netz interpretiert. Diese Option muss aktiviert werden, wenn das Vorzeichen des Wertes die gegenteilige Bedeutung hat.",
-        "testHttpJsonRequest": "Konfiguration testen (HTTP(S)-Anfrage senden)",
+        "testHttpJsonHeader": "Konfiguration testen",
+        "testHttpJsonRequest": "HTTP(S)-Anfrage(n) senden und Antwort(en) verarbeiten",
         "testHttpSmlRequest": "Konfiguration testen (HTTP(S)-Anfrage senden)",
         "HTTP_SML": "HTTP(S) + SML - Konfiguration"
     },

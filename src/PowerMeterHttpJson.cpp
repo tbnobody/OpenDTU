@@ -53,7 +53,6 @@ void PowerMeterHttpJson::loop()
         return;
     }
 
-    _powerValues = std::get<power_values_t>(res);
     gotUpdate();
 }
 
@@ -61,6 +60,12 @@ PowerMeterHttpJson::poll_result_t PowerMeterHttpJson::poll()
 {
     power_values_t cache;
     JsonDocument jsonResponse;
+
+    auto prefixedError = [](uint8_t idx, char const* err) -> String {
+        String res("Value ");
+        res.reserve(strlen(err) + 16);
+        return res + String(idx + 1) + ": " + err;
+    };
 
     for (uint8_t i = 0; i < POWERMETER_HTTP_JSON_MAX_VALUES; i++) {
         auto const& cfg = Configuration.get().PowerMeter.HttpJson[i];
@@ -75,24 +80,24 @@ PowerMeterHttpJson::poll_result_t PowerMeterHttpJson::poll()
         if (upGetter) {
             auto res = upGetter->performGetRequest();
             if (!res) {
-                return upGetter->getErrorText();
+                return prefixedError(i, upGetter->getErrorText());
             }
 
             auto pStream = res.getStream();
             if (!pStream) {
-                return String("Programmer error: HTTP request yields no stream");
+                return prefixedError(i, "Programmer error: HTTP request yields no stream");
             }
 
             const DeserializationError error = deserializeJson(jsonResponse, *pStream);
             if (error) {
                 String msg("Unable to parse server response as JSON: ");
-                return msg + error.c_str();
+                return prefixedError(i, String(msg + error.c_str()).c_str());
             }
         }
 
         auto pathResolutionResult = Utils::getJsonValueByPath<float>(jsonResponse, cfg.JsonPath);
         if (!pathResolutionResult.second.isEmpty()) {
-            return pathResolutionResult.second;
+            return prefixedError(i, pathResolutionResult.second.c_str());
         }
 
         // this value is supposed to be in Watts and positive if energy is consumed
@@ -112,6 +117,7 @@ PowerMeterHttpJson::poll_result_t PowerMeterHttpJson::poll()
         if (cfg.SignInverted) { cache[i] *= -1; }
     }
 
+    _powerValues = cache;
     return cache;
 }
 

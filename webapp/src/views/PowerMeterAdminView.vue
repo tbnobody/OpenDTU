@@ -154,17 +154,23 @@
                                 v-model="httpJson.sign_inverted"
                                 :tooltip="$t('powermeteradmin.httpSignInvertedHint')"
                                 type="checkbox" />
-
-                            <div class="text-center mb-3">
-                                <button type="button" class="btn btn-danger" @click="testHttpJsonRequest(index)">
-                                    {{ $t('powermeteradmin.testHttpJsonRequest') }}
-                                </button>
-                            </div>
-
-                            <BootstrapAlert v-model="testHttpJsonRequestAlert[index].show" dismissible :variant="testHttpJsonRequestAlert[index].type">
-                                {{ testHttpJsonRequestAlert[index].message }}
-                            </BootstrapAlert>
                         </div>
+                    </CardElement>
+
+                    <CardElement
+                            :text="$t('powermeteradmin.testHttpJsonHeader')"
+                            textVariant="text-bg-primary"
+                            add-space>
+
+                        <div class="text-center mt-3 mb-3">
+                            <button type="button" class="btn btn-primary" @click="testHttpJsonRequest()">
+                                {{ $t('powermeteradmin.testHttpJsonRequest') }}
+                            </button>
+                        </div>
+
+                        <BootstrapAlert v-model="testHttpJsonRequestAlert.show" dismissible :variant="testHttpJsonRequestAlert.type">
+                            {{ testHttpJsonRequestAlert.message }}
+                        </BootstrapAlert>
                     </CardElement>
                 </div>
 
@@ -203,7 +209,7 @@ import FormFooter from '@/components/FormFooter.vue';
 import InputElement from '@/components/InputElement.vue';
 import HttpRequestSettings from '@/components/HttpRequestSettings.vue';
 import { handleResponse, authHeader } from '@/utils/authentication';
-import type { PowerMeterHttpJsonConfig, PowerMeterConfig } from "@/types/PowerMeterConfig";
+import type { PowerMeterConfig } from "@/types/PowerMeterConfig";
 
 export default defineComponent({
     components: {
@@ -235,7 +241,7 @@ export default defineComponent({
             alertMessage: "",
             alertType: "info",
             showAlert: false,
-            testHttpJsonRequestAlert:  [{message: "", type: "", show: false}] as { message: string; type: string; show: boolean; }[],
+            testHttpJsonRequestAlert:  {message: "", type: "", show: false} as { message: string; type: string; show: boolean; },
             testHttpSmlRequestAlert:  {message: "", type: "", show: false} as { message: string; type: string; show: boolean; }
         };
     },
@@ -250,14 +256,6 @@ export default defineComponent({
                 .then((data) => {
                     this.powerMeterConfigList = data;
                     this.dataLoading = false;
-
-                    for (let i = 0; i < this.powerMeterConfigList.http_json.length; i++) {
-                        this.testHttpJsonRequestAlert.push({
-                            message: "",
-                            type: "",
-                            show: false,
-                        });
-                    }
                 });
         },
         savePowerMeterConfig(e: Event) {
@@ -281,25 +279,15 @@ export default defineComponent({
                     }
                 );
         },
-        testHttpJsonRequest(index: number) {
-            let valueConfig:PowerMeterHttpJsonConfig;
-
-            if (this.powerMeterConfigList.http_individual_requests) {
-                valueConfig = this.powerMeterConfigList.http_json[index];
-            } else {
-                valueConfig = { ...this.powerMeterConfigList.http_json[0] };
-                valueConfig.index = this.powerMeterConfigList.http_json[index].index;
-                valueConfig.json_path = this.powerMeterConfigList.http_json[index].json_path;
-            }
-
-            this.testHttpJsonRequestAlert[index] = {
+        testHttpJsonRequest() {
+            this.testHttpJsonRequestAlert = {
                 message: "Sending HTTP request...",
                 type: "info",
                 show: true,
             };
 
             const formData = new FormData();
-            formData.append("data", JSON.stringify(valueConfig));
+            formData.append("data", JSON.stringify(this.powerMeterConfigList));
 
             fetch("/api/powermeter/testhttpjsonrequest", {
                 method: "POST",
@@ -309,7 +297,7 @@ export default defineComponent({
                 .then((response) => handleResponse(response, this.$emitter, this.$router))
                 .then(
                     (response) => {
-                        this.testHttpJsonRequestAlert[index] = {
+                        this.testHttpJsonRequestAlert = {
                             message: response.message,
                             type: response.type,
                             show: true,

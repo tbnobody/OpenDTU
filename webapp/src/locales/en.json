@@ -583,7 +583,8 @@
         "httpUnit": "Unit",
         "httpSignInverted": "Change Sign",
         "httpSignInvertedHint": "Is is expected that positive values denote power usage from the grid. Check this option if the sign of this value has the opposite meaning.",
-        "testHttpJsonRequest": "Test configuration (send HTTP(S) request)",
+        "testHttpJsonHeader": "Test Configuration",
+        "testHttpJsonRequest": "Send HTTP(S) request(s) and process response(s)",
         "testHttpSmlRequest": "Test configuration (send HTTP(S) request)",
         "HTTP_SML": "Configuration"
     },
