@@ -180,16 +180,22 @@
                             add-space>
 
                         <HttpRequestSettings :cfg="powerMeterConfigList.http_sml.http_request" />
+                    </CardElement>
 
-                        <div class="text-center mb-3">
-                            <button type="button" class="btn btn-danger" @click="testHttpSmlRequest()">
-                                {{ $t('powermeteradmin.testHttpSmlRequest') }}
-                            </button>
-                        </div>
+                    <CardElement
+                            :text="$t('powermeteradmin.testHttpSmlHeader')"
+                            textVariant="text-bg-primary"
+                            add-space>
 
-                        <BootstrapAlert v-model="testHttpSmlRequestAlert.show" dismissible :variant="testHttpSmlRequestAlert.type">
-                            {{ testHttpSmlRequestAlert.message }}
-                        </BootstrapAlert>
+                            <div class="text-center mt-3 mb-3">
+                                <button type="button" class="btn btn-primary" @click="testHttpSmlRequest()">
+                                    {{ $t('powermeteradmin.testHttpSmlRequest') }}
+                                </button>
+                            </div>
+
+                            <BootstrapAlert v-model="testHttpSmlRequestAlert.show" dismissible :variant="testHttpSmlRequestAlert.type">
+                                {{ testHttpSmlRequestAlert.message }}
+                            </BootstrapAlert>
                     </CardElement>
                 </div>
             </div>
@@ -281,7 +287,7 @@ export default defineComponent({
         },
         testHttpJsonRequest() {
             this.testHttpJsonRequestAlert = {
-                message: "Sending HTTP request...",
+                message: "Triggering HTTP request...",
                 type: "info",
                 show: true,
             };
@@ -307,13 +313,13 @@ export default defineComponent({
         },
         testHttpSmlRequest() {
             this.testHttpSmlRequestAlert = {
-                message: "Sending HTTP SML request...",
+                message: "Triggering HTTP request...",
                 type: "info",
                 show: true,
             };
 
             const formData = new FormData();
-            formData.append("data", JSON.stringify(this.powerMeterConfigList.http_sml));
+            formData.append("data", JSON.stringify(this.powerMeterConfigList));
 
             fetch("/api/powermeter/testhttpsmlrequest", {
                 method: "POST",

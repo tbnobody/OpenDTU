@@ -196,6 +196,7 @@ void WebApiPowerMeterClass::onTestHttpJsonRequest(AsyncWebServerRequest* request
 
     auto powerMeterConfig = std::make_unique<CONFIG_T::PowerMeterConfig>();
     powerMeterConfig->HttpIndividualRequests = root["http_individual_requests"].as<bool>();
+    powerMeterConfig->VerboseLogging = true;
     JsonArray httpJson = root["http_json"];
     for (uint8_t i = 0; i < httpJson.size(); i++) {
         Configuration.deserializePowerMeterHttpJsonConfig(httpJson[i].as<JsonObject>(),
@@ -240,25 +241,23 @@ void WebApiPowerMeterClass::onTestHttpSmlRequest(AsyncWebServerRequest* request)
 
     auto& retMsg = asyncJsonResponse->getRoot();
 
-    if (!root.containsKey("url") || !root.containsKey("username") || !root.containsKey("password") 
-            || !root.containsKey("timeout")) {
-        retMsg["message"] = "Missing fields!";
-        asyncJsonResponse->setLength();
-        request->send(asyncJsonResponse);
-        return;
-    }
-
-
     char response[256];
 
-    PowerMeterHttpSmlConfig httpSmlConfig;
-    Configuration.deserializePowerMeterHttpSmlConfig(root.as<JsonObject>(), httpSmlConfig);
+    auto powerMeterConfig = std::make_unique<CONFIG_T::PowerMeterConfig>();
+    Configuration.deserializePowerMeterHttpSmlConfig(root["http_sml"].as<JsonObject>(),
+            powerMeterConfig->HttpSml);
+    powerMeterConfig->VerboseLogging = true;
+    auto backup = std::make_unique<CONFIG_T::PowerMeterConfig>(Configuration.get().PowerMeter);
+    Configuration.get().PowerMeter = *powerMeterConfig;
     auto upMeter = std::make_unique<PowerMeterHttpSml>();
-    if (upMeter->query(httpSmlConfig.HttpRequest)) {
+    upMeter->init();
+    auto res = upMeter->poll();
+    Configuration.get().PowerMeter = *backup;
+    if (res.isEmpty()) {
         retMsg["type"] = "success";
-        snprintf_P(response, sizeof(response), "Success! Power: %5.2fW", upMeter->getPowerTotal());
+        snprintf(response, sizeof(response), "Result: %5.2fW", upMeter->getPowerTotal());
     } else {
-        snprintf_P(response, sizeof(response), "%s", upMeter->tibberPowerMeterError);
+        snprintf(response, sizeof(response), "%s", res.c_str());
     }
 
     retMsg["message"] = response;

@@ -583,7 +583,8 @@
         "httpSignInvertedHint": "Positive Werte werden als Leistungsabnahme aus dem Netz interpretiert. Diese Option muss aktiviert werden, wenn das Vorzeichen des Wertes die gegenteilige Bedeutung hat.",
         "testHttpJsonHeader": "Konfiguration testen",
         "testHttpJsonRequest": "HTTP(S)-Anfrage(n) senden und Antwort(en) verarbeiten",
-        "testHttpSmlRequest": "Konfiguration testen (HTTP(S)-Anfrage senden)",
+        "testHttpSmlHeader": "Konfiguration testen",
+        "testHttpSmlRequest": "HTTP(S)-Anfrage senden und Antwort verarbeiten",
         "HTTP_SML": "HTTP(S) + SML - Konfiguration"
     },
     "httprequestsettings": {
