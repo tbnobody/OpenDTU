@@ -65,8 +65,8 @@
         "4009": "Wechselrichter Reihenfolge gespeichert!",
         "5001": "@:apiresponse.2001",
         "5002": "Das Limit muss zwischen 1 und {max} sein!",
-        "5003": "Ungültiten Typ angegeben!",
-        "5004": "Ungültigen Inverter angegeben!",
+        "5003": "Ungültiger Typ angegeben!",
+        "5004": "Ungültiger Inverter angegeben!",
         "6001": "Neustart durchgeführt!",
         "6002": "Neustart abgebrochen!",
         "7001": "MQTT-Server muss zwischen 1 und {max} Zeichen lang sein!",
@@ -143,7 +143,7 @@
         "LoadingInverter": "Warte auf Daten... (kann bis zu 10 Sekunden dauern)"
     },
     "eventlog": {
-        "Start": "Begin",
+        "Start": "Beginn",
         "Stop": "Ende",
         "Id": "ID",
         "Message": "Meldung"
