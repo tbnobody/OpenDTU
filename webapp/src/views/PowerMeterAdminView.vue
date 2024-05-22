@@ -36,38 +36,15 @@
 
             <div v-if="powerMeterConfigList.enabled">
                 <CardElement v-if="powerMeterConfigList.source === 0"
-                        :text="$t('powermeteradmin.MQTT')"
+                        v-for="(mqtt, index) in powerMeterConfigList.mqtt.values"
+                        :text="$t('powermeteradmin.MqttValue', { valueNumber: index + 1})"
                         textVariant="text-bg-primary"
                         add-space>
-                    <div class="row mb-3">
-                        <label for="inputMqttTopicPowerMeter1" class="col-sm-2 col-form-label">{{ $t('powermeteradmin.MqttTopicPowerMeter1') }}:</label>
-                        <div class="col-sm-10">
-                            <div class="input-group">
-                                <input type="text" class="form-control" id="inputMqttTopicPowerMeter1"
-                                    placeholder="shellies/shellyem3/emeter/0/power" v-model="powerMeterConfigList.mqtt_topic_powermeter_1" />
-                            </div>
-                        </div>
-                    </div>
 
-                    <div class="row mb-3">
-                        <label for="inputMqttTopicPowerMeter2" class="col-sm-2 col-form-label">{{ $t('powermeteradmin.MqttTopicPowerMeter2') }}:</label>
-                        <div class="col-sm-10">
-                            <div class="input-group">
-                                <input type="text" class="form-control" id="inputMqttTopicPowerMeter2"
-                                    placeholder="shellies/shellyem3/emeter/1/power" v-model="powerMeterConfigList.mqtt_topic_powermeter_2" />
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="row mb-3">
-                        <label for="inputMqttTopicPowerMeter3" class="col-sm-2 col-form-label">{{ $t('powermeteradmin.MqttTopicPowerMeter3') }}:</label>
-                        <div class="col-sm-10">
-                            <div class="input-group">
-                                <input type="text" class="form-control" id="inputMqttTopicPowerMeter3"
-                                    placeholder="shellies/shellyem3/emeter/2/power" v-model="powerMeterConfigList.mqtt_topic_powermeter_3" />
-                            </div>
-                        </div>
-                    </div>
+                    <InputElement :label="$t('powermeteradmin.MqttTopic')"
+                        v-model="mqtt.topic"
+                        type="text"
+                        maxlength="256" />
                 </CardElement>
 
                 <CardElement v-if="(powerMeterConfigList.source === 1 || powerMeterConfigList.source === 2)"
@@ -79,7 +56,7 @@
                         <div class="col-sm-10">
                             <div class="input-group">
                                 <input type="text" class="form-control" id="sdmaddress"
-                                    placeholder="1" v-model="powerMeterConfigList.sdmaddress" />
+                                    placeholder="1" v-model="powerMeterConfigList.serial_sdm.address" />
                             </div>
                         </div>
                     </div>
@@ -90,7 +67,7 @@
                             textVariant="text-bg-primary"
                             add-space>
                         <InputElement :label="$t('powermeteradmin.httpIndividualRequests')"
-                            v-model="powerMeterConfigList.http_individual_requests"
+                            v-model="powerMeterConfigList.http_json.individual_requests"
                             type="checkbox"
                             wide />
                     </CardElement>
@@ -114,9 +91,9 @@
                     </div>
 
                     <CardElement
-                            v-for="(httpJson, index) in powerMeterConfigList.http_json"
-                            :key="httpJson.index"
-                            :text="$t('powermeteradmin.httpValue', { valueNumber: httpJson.index })"
+                            v-for="(httpJson, index) in powerMeterConfigList.http_json.values"
+                            :key="index"
+                            :text="$t('powermeteradmin.httpValue', { valueNumber: index + 1 })"
                             textVariant="text-bg-primary"
                             add-space>
                         <InputElement
@@ -127,7 +104,7 @@
 
                         <div v-if="httpJson.enabled">
 
-                            <HttpRequestSettings :cfg="httpJson.http_request" v-if="index == 0 || powerMeterConfigList.http_individual_requests"/>
+                            <HttpRequestSettings :cfg="httpJson.http_request" v-if="index == 0 || powerMeterConfigList.http_json.individual_requests"/>
 
                             <InputElement :label="$t('powermeteradmin.httpJsonPath')"
                                 v-model="httpJson.json_path"

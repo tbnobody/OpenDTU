@@ -19,9 +19,9 @@ bool PowerMeterMqtt::init()
     };
 
     auto const& config = Configuration.get();
-    subscribe(config.PowerMeter.MqttTopicPowerMeter1, &_powerValueOne);
-    subscribe(config.PowerMeter.MqttTopicPowerMeter2, &_powerValueTwo);
-    subscribe(config.PowerMeter.MqttTopicPowerMeter3, &_powerValueThree);
+    subscribe(config.PowerMeter.Mqtt.Values[0].Topic, &_powerValueOne);
+    subscribe(config.PowerMeter.Mqtt.Values[1].Topic, &_powerValueTwo);
+    subscribe(config.PowerMeter.Mqtt.Values[2].Topic, &_powerValueThree);
 
     return _mqttSubscriptions.size() > 0;
 }

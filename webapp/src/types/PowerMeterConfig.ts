@@ -1,7 +1,19 @@
 import type { HttpRequestConfig } from '@/types/HttpRequestConfig';
 
-export interface PowerMeterHttpJsonConfig {
-    index: number;
+export interface PowerMeterMqttValue {
+    topic: string;
+}
+
+export interface PowerMeterMqttConfig {
+    values: Array<PowerMeterMqttValue>;
+}
+
+export interface PowerMeterSerialSdmConfig {
+    polling_interval: number;
+    address: number;
+};
+
+export interface PowerMeterHttpJsonValue {
     http_request: HttpRequestConfig;
     enabled: boolean;
     json_path: string;
@@ -9,7 +21,14 @@ export interface PowerMeterHttpJsonConfig {
     sign_inverted: boolean;
 }
 
+export interface PowerMeterHttpJsonConfig {
+    polling_interval: number;
+    individual_requests: boolean;
+    values: Array<PowerMeterHttpJsonValue>;
+}
+
 export interface PowerMeterHttpSmlConfig {
+    polling_interval: number;
     http_request: HttpRequestConfig;
 }
 
@@ -18,11 +37,8 @@ export interface PowerMeterConfig {
     verbose_logging: boolean;
     source: number;
     interval: number;
-    mqtt_topic_powermeter_1: string;
-    mqtt_topic_powermeter_2: string;
-    mqtt_topic_powermeter_3: string;
-    sdmaddress: number;
-    http_individual_requests: boolean;
-    http_json: Array<PowerMeterHttpJsonConfig>;
+    mqtt: PowerMeterMqttConfig;
+    serial_sdm: PowerMeterSerialSdmConfig;
+    http_json: PowerMeterHttpJsonConfig;
     http_sml: PowerMeterHttpSmlConfig;
 }

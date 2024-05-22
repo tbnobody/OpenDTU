@@ -10,7 +10,7 @@
 #include "PowerMeterProvider.h"
 
 using Auth_t = HttpRequestConfig::Auth;
-using Unit_t = PowerMeterHttpJsonConfig::Unit;
+using Unit_t = PowerMeterHttpJsonValue::Unit;
 
 class PowerMeterHttpJson : public PowerMeterProvider {
 public:

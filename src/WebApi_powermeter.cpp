@@ -39,22 +39,18 @@ void WebApiPowerMeterClass::onStatus(AsyncWebServerRequest* request)
     root["enabled"] = config.PowerMeter.Enabled;
     root["verbose_logging"] = config.PowerMeter.VerboseLogging;
     root["source"] = config.PowerMeter.Source;
-    root["interval"] = config.PowerMeter.Interval;
-    root["mqtt_topic_powermeter_1"] = config.PowerMeter.MqttTopicPowerMeter1;
-    root["mqtt_topic_powermeter_2"] = config.PowerMeter.MqttTopicPowerMeter2;
-    root["mqtt_topic_powermeter_3"] = config.PowerMeter.MqttTopicPowerMeter3;
-    root["sdmaddress"] = config.PowerMeter.SdmAddress;
-    root["http_individual_requests"] = config.PowerMeter.HttpIndividualRequests;
+
+    auto mqtt = root["mqtt"].to<JsonObject>();
+    Configuration.serializePowerMeterMqttConfig(config.PowerMeter.Mqtt, mqtt);
+
+    auto serialSdm = root["serial_sdm"].to<JsonObject>();
+    Configuration.serializePowerMeterSerialSdmConfig(config.PowerMeter.SerialSdm, serialSdm);
+
+    auto httpJson = root["http_json"].to<JsonObject>();
+    Configuration.serializePowerMeterHttpJsonConfig(config.PowerMeter.HttpJson, httpJson);
 
     auto httpSml = root["http_sml"].to<JsonObject>();
     Configuration.serializePowerMeterHttpSmlConfig(config.PowerMeter.HttpSml, httpSml);
-
-    auto httpJson = root["http_json"].to<JsonArray>();
-    for (uint8_t i = 0; i < POWERMETER_HTTP_JSON_MAX_VALUES; i++) {
-        auto valueConfig = httpJson.add<JsonObject>();
-        valueConfig["index"] = i + 1;
-        Configuration.serializePowerMeterHttpJsonConfig(config.PowerMeter.HttpJson[i], valueConfig);
-    }
 
     WebApi.sendJsonResponse(request, response, __FUNCTION__, __LINE__);
 }
@@ -119,15 +115,16 @@ void WebApiPowerMeterClass::onAdminPost(AsyncWebServerRequest* request)
     };
 
     if (static_cast<PowerMeterProvider::Type>(root["source"].as<uint8_t>()) == PowerMeterProvider::Type::HTTP_JSON) {
-        JsonArray httpJson = root["http_json"];
-        for (uint8_t i = 0; i < httpJson.size(); i++) {
-            JsonObject valueConfig = httpJson[i].as<JsonObject>();
+        JsonObject httpJson = root["http_json"];
+        JsonArray valueConfigs = httpJson["values"];
+        for (uint8_t i = 0; i < valueConfigs.size(); i++) {
+            JsonObject valueConfig = valueConfigs[i].as<JsonObject>();
 
             if (i > 0 && !valueConfig["enabled"].as<bool>()) {
                 continue;
             }
 
-            if (i == 0 || valueConfig["http_individual_requests"].as<bool>()) {
+            if (i == 0 || httpJson["individual_requests"].as<bool>()) {
                 if (!checkHttpConfig(valueConfig["http_request"].as<JsonObject>())) {
                     return;
                 }
@@ -154,22 +151,19 @@ void WebApiPowerMeterClass::onAdminPost(AsyncWebServerRequest* request)
     config.PowerMeter.Enabled = root["enabled"].as<bool>();
     config.PowerMeter.VerboseLogging = root["verbose_logging"].as<bool>();
     config.PowerMeter.Source = root["source"].as<uint8_t>();
-    config.PowerMeter.Interval = root["interval"].as<uint32_t>();
-    strlcpy(config.PowerMeter.MqttTopicPowerMeter1, root["mqtt_topic_powermeter_1"].as<String>().c_str(), sizeof(config.PowerMeter.MqttTopicPowerMeter1));
-    strlcpy(config.PowerMeter.MqttTopicPowerMeter2, root["mqtt_topic_powermeter_2"].as<String>().c_str(), sizeof(config.PowerMeter.MqttTopicPowerMeter2));
-    strlcpy(config.PowerMeter.MqttTopicPowerMeter3, root["mqtt_topic_powermeter_3"].as<String>().c_str(), sizeof(config.PowerMeter.MqttTopicPowerMeter3));
-    config.PowerMeter.SdmAddress = root["sdmaddress"].as<uint8_t>();
-    config.PowerMeter.HttpIndividualRequests = root["http_individual_requests"].as<bool>();
+
+    Configuration.deserializePowerMeterMqttConfig(root["mqtt"].as<JsonObject>(),
+            config.PowerMeter.Mqtt);
+
+    Configuration.deserializePowerMeterSerialSdmConfig(root["serial_sdm"].as<JsonObject>(),
+            config.PowerMeter.SerialSdm);
+
+    Configuration.deserializePowerMeterHttpJsonConfig(root["http_json"].as<JsonObject>(),
+            config.PowerMeter.HttpJson);
+    config.PowerMeter.HttpJson.Values[0].Enabled = true;
 
     Configuration.deserializePowerMeterHttpSmlConfig(root["http_sml"].as<JsonObject>(),
             config.PowerMeter.HttpSml);
-
-    JsonArray httpJson = root["http_json"];
-    for (uint8_t i = 0; i < httpJson.size(); i++) {
-        Configuration.deserializePowerMeterHttpJsonConfig(httpJson[i].as<JsonObject>(),
-                config.PowerMeter.HttpJson[i]);
-    }
-    config.PowerMeter.HttpJson[0].Enabled = true;
 
     WebApi.writeConfig(retMsg);
 
@@ -195,13 +189,11 @@ void WebApiPowerMeterClass::onTestHttpJsonRequest(AsyncWebServerRequest* request
     char response[256];
 
     auto powerMeterConfig = std::make_unique<CONFIG_T::PowerMeterConfig>();
-    powerMeterConfig->HttpIndividualRequests = root["http_individual_requests"].as<bool>();
+    JsonObject httpJson = root["http_json"];
+    powerMeterConfig->HttpJson.IndividualRequests = httpJson["individual_requests"].as<bool>();
     powerMeterConfig->VerboseLogging = true;
-    JsonArray httpJson = root["http_json"];
-    for (uint8_t i = 0; i < httpJson.size(); i++) {
-        Configuration.deserializePowerMeterHttpJsonConfig(httpJson[i].as<JsonObject>(),
-                powerMeterConfig->HttpJson[i]);
-    }
+    Configuration.deserializePowerMeterHttpJsonConfig(httpJson,
+            powerMeterConfig->HttpJson);
     auto backup = std::make_unique<CONFIG_T::PowerMeterConfig>(Configuration.get().PowerMeter);
     Configuration.get().PowerMeter = *powerMeterConfig;
     auto upMeter = std::make_unique<PowerMeterHttpJson>();
@@ -214,7 +206,7 @@ void WebApiPowerMeterClass::onTestHttpJsonRequest(AsyncWebServerRequest* request
         auto vals = std::get<values_t>(res);
         auto pos = snprintf(response, sizeof(response), "Result: %5.2fW", vals[0]);
         for (size_t i = 1; i < POWERMETER_HTTP_JSON_MAX_VALUES; ++i) {
-            if (!powerMeterConfig->HttpJson[i].Enabled) { continue; }
+            if (!powerMeterConfig->HttpJson.Values[i].Enabled) { continue; }
             pos += snprintf(response + pos, sizeof(response) - pos, ", %5.2fW", vals[i]);
         }
         snprintf(response + pos, sizeof(response) - pos, ", Total: %5.2f", upMeter->getPowerTotal());

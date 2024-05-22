@@ -63,11 +63,11 @@ void PowerMeterSerialSdm::loop()
 
     auto const& config = Configuration.get();
 
-    if ((millis() - _lastPoll) < (config.PowerMeter.Interval * 1000)) {
+    if ((millis() - _lastPoll) < (config.PowerMeter.SerialSdm.PollingInterval * 1000)) {
         return;
     }
 
-    uint8_t addr = config.PowerMeter.SdmAddress;
+    uint8_t addr = config.PowerMeter.SerialSdm.Address;
 
     // reading takes a "very long" time as each readVal() is a synchronous
     // exchange of serial messages. cache the values and write later to

@@ -37,6 +37,7 @@
 #define HTTP_REQUEST_MAX_HEADER_KEY_STRLEN 64
 #define HTTP_REQUEST_MAX_HEADER_VALUE_STRLEN 256
 
+#define POWERMETER_MQTT_MAX_VALUES 3
 #define POWERMETER_HTTP_JSON_MAX_VALUES 3
 #define POWERMETER_HTTP_JSON_MAX_PATH_STRLEN 256
 
@@ -76,7 +77,23 @@ struct HTTP_REQUEST_CONFIG_T {
 };
 using HttpRequestConfig = struct HTTP_REQUEST_CONFIG_T;
 
-struct POWERMETER_HTTP_JSON_CONFIG_T {
+struct POWERMETER_MQTT_VALUE_T {
+    char Topic[MQTT_MAX_TOPIC_STRLEN + 1];
+};
+using PowerMeterMqttValue = struct POWERMETER_MQTT_VALUE_T;
+
+struct POWERMETER_MQTT_CONFIG_T {
+    PowerMeterMqttValue Values[POWERMETER_MQTT_MAX_VALUES];
+};
+using PowerMeterMqttConfig = struct POWERMETER_MQTT_CONFIG_T;
+
+struct POWERMETER_SERIAL_SDM_CONFIG_T {
+    uint32_t Address;
+    uint32_t PollingInterval;
+};
+using PowerMeterSerialSdmConfig = struct POWERMETER_SERIAL_SDM_CONFIG_T;
+
+struct POWERMETER_HTTP_JSON_VALUE_T {
     HttpRequestConfig HttpRequest;
     bool Enabled;
     char JsonPath[POWERMETER_HTTP_JSON_MAX_PATH_STRLEN + 1];
@@ -86,9 +103,17 @@ struct POWERMETER_HTTP_JSON_CONFIG_T {
 
     bool SignInverted;
 };
+using PowerMeterHttpJsonValue = struct POWERMETER_HTTP_JSON_VALUE_T;
+
+struct POWERMETER_HTTP_JSON_CONFIG_T {
+    uint32_t PollingInterval;
+    bool IndividualRequests;
+    PowerMeterHttpJsonValue Values[POWERMETER_HTTP_JSON_MAX_VALUES];
+};
 using PowerMeterHttpJsonConfig = struct POWERMETER_HTTP_JSON_CONFIG_T;
 
 struct POWERMETER_HTTP_SML_CONFIG_T {
+    uint32_t PollingInterval;
     HttpRequestConfig HttpRequest;
 };
 using PowerMeterHttpSmlConfig = struct POWERMETER_HTTP_SML_CONFIG_T;
@@ -205,14 +230,10 @@ struct CONFIG_T {
     struct PowerMeterConfig {
         bool Enabled;
         bool VerboseLogging;
-        uint32_t Interval;
         uint32_t Source;
-        char MqttTopicPowerMeter1[MQTT_MAX_TOPIC_STRLEN + 1];
-        char MqttTopicPowerMeter2[MQTT_MAX_TOPIC_STRLEN + 1];
-        char MqttTopicPowerMeter3[MQTT_MAX_TOPIC_STRLEN + 1];
-        uint32_t SdmAddress;
-        bool HttpIndividualRequests;
-        PowerMeterHttpJsonConfig HttpJson[POWERMETER_HTTP_JSON_MAX_VALUES];
+        PowerMeterMqttConfig Mqtt;
+        PowerMeterSerialSdmConfig SerialSdm;
+        PowerMeterHttpJsonConfig HttpJson;
         PowerMeterHttpSmlConfig HttpSml;
     } PowerMeter;
 
@@ -288,10 +309,14 @@ public:
     void deleteInverterById(const uint8_t id);
 
     static void serializeHttpRequestConfig(HttpRequestConfig const& source, JsonObject& target);
+    static void serializePowerMeterMqttConfig(PowerMeterMqttConfig const& source, JsonObject& target);
+    static void serializePowerMeterSerialSdmConfig(PowerMeterSerialSdmConfig const& source, JsonObject& target);
     static void serializePowerMeterHttpJsonConfig(PowerMeterHttpJsonConfig const& source, JsonObject& target);
     static void serializePowerMeterHttpSmlConfig(PowerMeterHttpSmlConfig const& source, JsonObject& target);
 
     static void deserializeHttpRequestConfig(JsonObject const& source, HttpRequestConfig& target);
+    static void deserializePowerMeterMqttConfig(JsonObject const& source, PowerMeterMqttConfig& target);
+    static void deserializePowerMeterSerialSdmConfig(JsonObject const& source, PowerMeterSerialSdmConfig& target);
     static void deserializePowerMeterHttpJsonConfig(JsonObject const& source, PowerMeterHttpJsonConfig& target);
     static void deserializePowerMeterHttpSmlConfig(JsonObject const& source, PowerMeterHttpSmlConfig& target);
 };

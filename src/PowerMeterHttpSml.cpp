@@ -25,7 +25,7 @@ bool PowerMeterHttpSml::init()
 void PowerMeterHttpSml::loop()
 {
     auto const& config = Configuration.get();
-    if ((millis() - _lastPoll) < (config.PowerMeter.Interval * 1000)) {
+    if ((millis() - _lastPoll) < (config.PowerMeter.HttpSml.PollingInterval * 1000)) {
         return;
     }
 
