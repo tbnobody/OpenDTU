@@ -1,4 +1,7 @@
-# OpenDTU
+# OpenDTU-Dataase
+
+One year OpenDTU-Database
+![Image](docs/screenshots/Screenshot_2024-05-23_131208.png)
 
 [![OpenDTU Build](https://github.com/tbnobody/OpenDTU/actions/workflows/build.yml/badge.svg)](https://github.com/tbnobody/OpenDTU/actions/workflows/build.yml)
 [![cpplint](https://github.com/tbnobody/OpenDTU/actions/workflows/cpplint.yml/badge.svg)](https://github.com/tbnobody/OpenDTU/actions/workflows/cpplint.yml)
