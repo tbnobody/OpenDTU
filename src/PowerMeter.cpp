@@ -26,20 +26,24 @@ void PowerMeterClass::updateSettings()
 
     if (_upProvider) { _upProvider.reset(); }
 
-    auto const& config = Configuration.get();
+    auto const& pmcfg = Configuration.get().PowerMeter;
 
-    if (!config.PowerMeter.Enabled) { return; }
+    if (!pmcfg.Enabled) { return; }
 
-    switch(static_cast<PowerMeterProvider::Type>(config.PowerMeter.Source)) {
+    switch(static_cast<PowerMeterProvider::Type>(pmcfg.Source)) {
         case PowerMeterProvider::Type::MQTT:
-            _upProvider = std::make_unique<PowerMeterMqtt>();
+            _upProvider = std::make_unique<PowerMeterMqtt>(pmcfg.Mqtt);
             break;
         case PowerMeterProvider::Type::SDM1PH:
+            _upProvider = std::make_unique<PowerMeterSerialSdm>(
+                    PowerMeterSerialSdm::Phases::One, pmcfg.SerialSdm);
+            break;
         case PowerMeterProvider::Type::SDM3PH:
-            _upProvider = std::make_unique<PowerMeterSerialSdm>();
+            _upProvider = std::make_unique<PowerMeterSerialSdm>(
+                    PowerMeterSerialSdm::Phases::Three, pmcfg.SerialSdm);
             break;
         case PowerMeterProvider::Type::HTTP_JSON:
-            _upProvider = std::make_unique<PowerMeterHttpJson>();
+            _upProvider = std::make_unique<PowerMeterHttpJson>(pmcfg.HttpJson);
             break;
         case PowerMeterProvider::Type::SERIAL_SML:
             _upProvider = std::make_unique<PowerMeterSerialSml>();
@@ -48,7 +52,7 @@ void PowerMeterClass::updateSettings()
             _upProvider = std::make_unique<PowerMeterUdpSmaHomeManager>();
             break;
         case PowerMeterProvider::Type::HTTP_SML:
-            _upProvider = std::make_unique<PowerMeterHttpSml>();
+            _upProvider = std::make_unique<PowerMeterHttpSml>(pmcfg.HttpSml);
             break;
     }
 

@@ -188,25 +188,19 @@ void WebApiPowerMeterClass::onTestHttpJsonRequest(AsyncWebServerRequest* request
 
     char response[256];
 
-    auto powerMeterConfig = std::make_unique<CONFIG_T::PowerMeterConfig>();
-    JsonObject httpJson = root["http_json"];
-    powerMeterConfig->HttpJson.IndividualRequests = httpJson["individual_requests"].as<bool>();
-    powerMeterConfig->VerboseLogging = true;
-    Configuration.deserializePowerMeterHttpJsonConfig(httpJson,
-            powerMeterConfig->HttpJson);
-    auto backup = std::make_unique<CONFIG_T::PowerMeterConfig>(Configuration.get().PowerMeter);
-    Configuration.get().PowerMeter = *powerMeterConfig;
-    auto upMeter = std::make_unique<PowerMeterHttpJson>();
+    auto powerMeterConfig = std::make_unique<PowerMeterHttpJsonConfig>();
+    Configuration.deserializePowerMeterHttpJsonConfig(root["http_json"].as<JsonObject>(),
+            *powerMeterConfig);
+    auto upMeter = std::make_unique<PowerMeterHttpJson>(*powerMeterConfig);
     upMeter->init();
     auto res = upMeter->poll();
-    Configuration.get().PowerMeter = *backup;
     using values_t = PowerMeterHttpJson::power_values_t;
     if (std::holds_alternative<values_t>(res)) {
         retMsg["type"] = "success";
         auto vals = std::get<values_t>(res);
         auto pos = snprintf(response, sizeof(response), "Result: %5.2fW", vals[0]);
-        for (size_t i = 1; i < POWERMETER_HTTP_JSON_MAX_VALUES; ++i) {
-            if (!powerMeterConfig->HttpJson.Values[i].Enabled) { continue; }
+        for (size_t i = 1; i < vals.size(); ++i) {
+            if (!powerMeterConfig->Values[i].Enabled) { continue; }
             pos += snprintf(response + pos, sizeof(response) - pos, ", %5.2fW", vals[i]);
         }
         snprintf(response + pos, sizeof(response) - pos, ", Total: %5.2f", upMeter->getPowerTotal());
@@ -235,16 +229,12 @@ void WebApiPowerMeterClass::onTestHttpSmlRequest(AsyncWebServerRequest* request)
 
     char response[256];
 
-    auto powerMeterConfig = std::make_unique<CONFIG_T::PowerMeterConfig>();
+    auto powerMeterConfig = std::make_unique<PowerMeterHttpSmlConfig>();
     Configuration.deserializePowerMeterHttpSmlConfig(root["http_sml"].as<JsonObject>(),
-            powerMeterConfig->HttpSml);
-    powerMeterConfig->VerboseLogging = true;
-    auto backup = std::make_unique<CONFIG_T::PowerMeterConfig>(Configuration.get().PowerMeter);
-    Configuration.get().PowerMeter = *powerMeterConfig;
-    auto upMeter = std::make_unique<PowerMeterHttpSml>();
+            *powerMeterConfig);
+    auto upMeter = std::make_unique<PowerMeterHttpSml>(*powerMeterConfig);
     upMeter->init();
     auto res = upMeter->poll();
-    Configuration.get().PowerMeter = *backup;
     if (res.isEmpty()) {
         retMsg["type"] = "success";
         snprintf(response, sizeof(response), "Result: %5.2fW", upMeter->getPowerTotal());

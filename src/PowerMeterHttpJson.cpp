@@ -1,6 +1,5 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 #include "Utils.h"
-#include "Configuration.h"
 #include "PowerMeterHttpJson.h"
 #include "MessageOutput.h"
 #include <WiFiClientSecure.h>
@@ -11,14 +10,12 @@
 
 bool PowerMeterHttpJson::init()
 {
-    auto const& config = Configuration.get();
-
     for (uint8_t i = 0; i < POWERMETER_HTTP_JSON_MAX_VALUES; i++) {
-        auto const& valueConfig = config.PowerMeter.HttpJson.Values[i];
+        auto const& valueConfig = _cfg.Values[i];
 
         _httpGetters[i] = nullptr;
 
-        if (i == 0 || (config.PowerMeter.HttpJson.IndividualRequests && valueConfig.Enabled)) {
+        if (i == 0 || (_cfg.IndividualRequests && valueConfig.Enabled)) {
             _httpGetters[i] = std::make_unique<HttpGetter>(valueConfig.HttpRequest);
         }
 
@@ -40,8 +37,7 @@ bool PowerMeterHttpJson::init()
 
 void PowerMeterHttpJson::loop()
 {
-    auto const& config = Configuration.get();
-    if ((millis() - _lastPoll) < (config.PowerMeter.HttpJson.PollingInterval * 1000)) {
+    if ((millis() - _lastPoll) < (_cfg.PollingInterval * 1000)) {
         return;
     }
 
@@ -68,7 +64,7 @@ PowerMeterHttpJson::poll_result_t PowerMeterHttpJson::poll()
     };
 
     for (uint8_t i = 0; i < POWERMETER_HTTP_JSON_MAX_VALUES; i++) {
-        auto const& cfg = Configuration.get().PowerMeter.HttpJson.Values[i];
+        auto const& cfg = _cfg.Values[i];
 
         if (!cfg.Enabled) {
             cache[i] = 0.0;

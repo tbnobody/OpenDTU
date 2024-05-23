@@ -14,6 +14,9 @@ using Unit_t = PowerMeterHttpJsonValue::Unit;
 
 class PowerMeterHttpJson : public PowerMeterProvider {
 public:
+    explicit PowerMeterHttpJson(PowerMeterHttpJsonConfig const& cfg)
+        : _cfg(cfg) { }
+
     bool init() final;
     void loop() final;
     float getPowerTotal() const final;
@@ -24,6 +27,8 @@ public:
     poll_result_t poll();
 
 private:
+    PowerMeterHttpJsonConfig const _cfg;
+
     uint32_t _lastPoll;
 
     power_values_t _powerValues;

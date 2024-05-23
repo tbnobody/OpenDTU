@@ -1,6 +1,5 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 #include "PowerMeterMqtt.h"
-#include "Configuration.h"
 #include "MqttSettings.h"
 #include "MessageOutput.h"
 
@@ -18,10 +17,9 @@ bool PowerMeterMqtt::init()
         _mqttSubscriptions.push_back(topic);
     };
 
-    auto const& config = Configuration.get();
-    subscribe(config.PowerMeter.Mqtt.Values[0].Topic, &_powerValueOne);
-    subscribe(config.PowerMeter.Mqtt.Values[1].Topic, &_powerValueTwo);
-    subscribe(config.PowerMeter.Mqtt.Values[2].Topic, &_powerValueThree);
+    subscribe(_cfg.Values[0].Topic, &_powerValueOne);
+    subscribe(_cfg.Values[1].Topic, &_powerValueTwo);
+    subscribe(_cfg.Values[2].Topic, &_powerValueThree);
 
     return _mqttSubscriptions.size() > 0;
 }

@@ -1,6 +1,5 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 #include "PowerMeterSerialSdm.h"
-#include "Configuration.h"
 #include "PinMapping.h"
 #include "MessageOutput.h"
 #include "SerialPortManager.h"
@@ -61,13 +60,11 @@ void PowerMeterSerialSdm::loop()
 {
     if (!_upSdm) { return; }
 
-    auto const& config = Configuration.get();
-
-    if ((millis() - _lastPoll) < (config.PowerMeter.SerialSdm.PollingInterval * 1000)) {
+    if ((millis() - _lastPoll) < (_cfg.PollingInterval * 1000)) {
         return;
     }
 
-    uint8_t addr = config.PowerMeter.SerialSdm.Address;
+    uint8_t addr = _cfg.Address;
 
     // reading takes a "very long" time as each readVal() is a synchronous
     // exchange of serial messages. cache the values and write later to
@@ -81,7 +78,7 @@ void PowerMeterSerialSdm::loop()
     float energyImport = _upSdm->readVal(SDM_IMPORT_ACTIVE_ENERGY, addr);
     float energyExport = _upSdm->readVal(SDM_EXPORT_ACTIVE_ENERGY, addr);
 
-    if (static_cast<PowerMeterProvider::Type>(config.PowerMeter.Source) == PowerMeterProvider::Type::SDM3PH) {
+    if (_phases == Phases::Three) {
         phase2Power = _upSdm->readVal(SDM_PHASE_2_POWER, addr);
         phase3Power = _upSdm->readVal(SDM_PHASE_3_POWER, addr);
         phase2Voltage = _upSdm->readVal(SDM_PHASE_2_VOLTAGE, addr);

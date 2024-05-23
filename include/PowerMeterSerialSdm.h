@@ -2,11 +2,21 @@
 #pragma once
 
 #include <mutex>
+#include "Configuration.h"
 #include "PowerMeterProvider.h"
 #include "SDM.h"
 
 class PowerMeterSerialSdm : public PowerMeterProvider {
 public:
+    enum class Phases {
+        One,
+        Three
+    };
+
+    PowerMeterSerialSdm(Phases phases, PowerMeterSerialSdmConfig const& cfg)
+        : _phases(phases)
+        , _cfg(cfg) { }
+
     ~PowerMeterSerialSdm();
 
     bool init() final;
@@ -15,6 +25,9 @@ public:
     void doMqttPublish() const final;
 
 private:
+    Phases _phases;
+    PowerMeterSerialSdmConfig const _cfg;
+
     uint32_t _lastPoll;
 
     float _phase1Power = 0.0;

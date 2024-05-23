@@ -1,5 +1,4 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
-#include "Configuration.h"
 #include "PowerMeterHttpSml.h"
 #include "MessageOutput.h"
 #include <WiFiClientSecure.h>
@@ -8,9 +7,7 @@
 
 bool PowerMeterHttpSml::init()
 {
-    auto const& config = Configuration.get();
-
-    _upHttpGetter = std::make_unique<HttpGetter>(config.PowerMeter.HttpSml.HttpRequest);
+    _upHttpGetter = std::make_unique<HttpGetter>(_cfg.HttpRequest);
 
     if (_upHttpGetter->init()) { return true; }
 
@@ -24,8 +21,7 @@ bool PowerMeterHttpSml::init()
 
 void PowerMeterHttpSml::loop()
 {
-    auto const& config = Configuration.get();
-    if ((millis() - _lastPoll) < (config.PowerMeter.HttpSml.PollingInterval * 1000)) {
+    if ((millis() - _lastPoll) < (_cfg.PollingInterval * 1000)) {
         return;
     }
 
