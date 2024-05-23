@@ -36,6 +36,12 @@ void PowerMeterHttpSml::loop()
     gotUpdate();
 }
 
+bool PowerMeterHttpSml::isDataValid() const
+{
+    uint32_t age = millis() - getLastUpdate();
+    return getLastUpdate() > 0 && (age < (3 * _cfg.PollingInterval * 1000));
+}
+
 String PowerMeterHttpSml::poll()
 {
     if (!_upHttpGetter) {

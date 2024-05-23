@@ -20,6 +20,7 @@ public:
     bool init() final;
     void loop() final;
     float getPowerTotal() const final;
+    bool isDataValid() const final;
     void doMqttPublish() const final;
 
     using power_values_t = std::array<float, POWERMETER_HTTP_JSON_MAX_VALUES>;

@@ -556,8 +556,9 @@
         "PowerMeterConfiguration": "Power Meter Configuration",
         "PowerMeterEnable": "Enable Power Meter",
         "VerboseLogging": "@:base.VerboseLogging",
-        "PowerMeterParameter": "Power Meter Parameter",
         "PowerMeterSource": "Power Meter type",
+        "pollingInterval": "Polling Interval",
+        "seconds": "@:base.Seconds",
         "typeMQTT": "MQTT",
         "typeSDM1ph": "SDM for 1 phase (SDM120/220/230)",
         "typeSDM3ph": "SDM for 3 phases (SDM72/630)",
@@ -600,7 +601,7 @@
         "headerKeyDescription": "Optional. A custom HTTP header key-value pair can be defined. Useful, e.g., to send an (additional) authentication token.",
         "headerValue": "HTTP Header - Value",
         "timeout": "Timeout",
-        "milliSeconds": "ms"
+        "milliSeconds": "Milliseconds"
     },
     "powerlimiteradmin": {
         "PowerLimiterSettings": "Dynamic Power Limiter Settings",

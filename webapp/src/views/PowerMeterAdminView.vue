@@ -51,6 +51,14 @@
                         :text="$t('powermeteradmin.SDM')"
                         textVariant="text-bg-primary"
                         add-space>
+
+                    <InputElement :label="$t('powermeteradmin.pollingInterval')"
+                        v-model="powerMeterConfigList.serial_sdm.polling_interval"
+                        type="number"
+                        min=1
+                        max=15
+                        :postfix="$t('powermeteradmin.seconds')" />
+
                     <div class="row mb-3">
                         <label for="sdmaddress" class="col-sm-2 col-form-label">{{ $t('powermeteradmin.sdmaddress') }}:</label>
                         <div class="col-sm-10">
@@ -69,6 +77,14 @@
                         <InputElement :label="$t('powermeteradmin.httpIndividualRequests')"
                             v-model="powerMeterConfigList.http_json.individual_requests"
                             type="checkbox"
+                            wide />
+
+                        <InputElement :label="$t('powermeteradmin.pollingInterval')"
+                            v-model="powerMeterConfigList.http_json.polling_interval"
+                            type="number"
+                            min=1
+                            max=15
+                            :postfix="$t('powermeteradmin.seconds')"
                             wide />
                     </CardElement>
 
@@ -155,6 +171,13 @@
                     <CardElement :text="$t('powermeteradmin.HTTP_SML')"
                             textVariant="text-bg-primary"
                             add-space>
+
+                        <InputElement :label="$t('powermeteradmin.pollingInterval')"
+                            v-model="powerMeterConfigList.http_sml.polling_interval"
+                            type="number"
+                            min=1
+                            max=15
+                            :postfix="$t('powermeteradmin.seconds')" />
 
                         <HttpRequestSettings :cfg="powerMeterConfigList.http_sml.http_request" />
                     </CardElement>

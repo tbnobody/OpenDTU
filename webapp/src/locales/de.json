@@ -554,8 +554,9 @@
         "PowerMeterConfiguration": "Stromzähler Konfiguration",
         "PowerMeterEnable": "Aktiviere Stromzähler",
         "VerboseLogging": "@:base.VerboseLogging",
-        "PowerMeterParameter": "Power Meter Parameter",
         "PowerMeterSource": "Stromzählertyp",
+        "pollingInterval": "Abfrageintervall",
+        "seconds": "@:base.Seconds",
         "typeMQTT": "MQTT",
         "typeSDM1ph": "SDM mit 1 Phase (SDM120/220/230)",
         "typeSDM3ph": "SDM mit 3 Phasen (SDM72/630)",
@@ -598,7 +599,7 @@
         "headerKeyDescription": "Optional. Ein benutzerdefinierter HTTP header kann definiert werden. Nützlich um z.B. ein (zusätzlichen) Authentifizierungstoken zu übermitteln.",
         "headerValue": "HTTP Header - Wert",
         "timeout": "Zeitüberschreitung",
-        "milliSeconds": "ms"
+        "milliSeconds": "Millisekunden"
     },
     "powerlimiteradmin": {
         "PowerLimiterSettings": "Dynamic Power Limiter Einstellungen",

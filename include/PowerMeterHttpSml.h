@@ -15,6 +15,7 @@ public:
 
     bool init() final;
     void loop() final;
+    bool isDataValid() const final;
 
     // returns an empty string on success,
     // returns an error message otherwise.

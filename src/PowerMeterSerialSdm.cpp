@@ -43,6 +43,12 @@ float PowerMeterSerialSdm::getPowerTotal() const
     return _phase1Power + _phase2Power + _phase3Power;
 }
 
+bool PowerMeterSerialSdm::isDataValid() const
+{
+    uint32_t age = millis() - getLastUpdate();
+    return getLastUpdate() > 0 && (age < (3 * _cfg.PollingInterval * 1000));
+}
+
 void PowerMeterSerialSdm::doMqttPublish() const
 {
     std::lock_guard<std::mutex> l(_mutex);

@@ -23,9 +23,9 @@ public:
 
     virtual void loop() = 0;
     virtual float getPowerTotal() const = 0;
+    virtual bool isDataValid() const;
 
     uint32_t getLastUpdate() const { return _lastUpdate; }
-    bool isDataValid() const;
     void mqttLoop() const;
 
 protected:
