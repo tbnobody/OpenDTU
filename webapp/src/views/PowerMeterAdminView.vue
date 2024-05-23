@@ -7,25 +7,20 @@
         <form @submit="savePowerMeterConfig">
             <CardElement :text="$t('powermeteradmin.PowerMeterConfiguration')"
                     textVariant="text-bg-primary">
-                <div class="row mb-3">
-                    <label class="col-sm-2 form-check-label" for="inputPowerMeterEnable">{{ $t('powermeteradmin.PowerMeterEnable') }}</label>
-                    <div class="col-sm-10">
-                        <div class="form-check form-switch">
-                            <input class="form-check-input" type="checkbox" id="inputPowerMeterEnable"
-                                v-model="powerMeterConfigList.enabled" />
-                        </div>
-                    </div>
-                </div>
+
+                <InputElement :label="$t('powermeteradmin.PowerMeterEnable')"
+                              v-model="powerMeterConfigList.enabled"
+                              type="checkbox" wide />
 
                 <InputElement v-show="powerMeterConfigList.enabled"
                               :label="$t('powermeteradmin.VerboseLogging')"
                               v-model="powerMeterConfigList.verbose_logging"
-                              type="checkbox"/>
+                              type="checkbox" wide />
 
                 <div class="row mb-3" v-show="powerMeterConfigList.enabled">
-                    <label for="inputTimezone" class="col-sm-2 col-form-label">{{ $t('powermeteradmin.PowerMeterSource') }}</label>
-                    <div class="col-sm-10">
-                        <select class="form-select" v-model="powerMeterConfigList.source">
+                    <label for="inputPowerMeterSource" class="col-sm-4 col-form-label">{{ $t('powermeteradmin.PowerMeterSource') }}</label>
+                    <div class="col-sm-8">
+                        <select id="inputPowerMeterSource" class="form-select" v-model="powerMeterConfigList.source">
                             <option v-for="source in powerMeterSourceList" :key="source.key" :value="source.key">
                                 {{ source.value }}
                             </option>
@@ -44,7 +39,8 @@
                     <InputElement :label="$t('powermeteradmin.MqttTopic')"
                         v-model="mqtt.topic"
                         type="text"
-                        maxlength="256" />
+                        maxlength="256"
+                        wide />
                 </CardElement>
 
                 <CardElement v-if="(powerMeterConfigList.source === 1 || powerMeterConfigList.source === 2)"
@@ -57,17 +53,13 @@
                         type="number"
                         min=1
                         max=15
-                        :postfix="$t('powermeteradmin.seconds')" />
+                        :postfix="$t('powermeteradmin.seconds')"
+                        wide />
 
-                    <div class="row mb-3">
-                        <label for="sdmaddress" class="col-sm-2 col-form-label">{{ $t('powermeteradmin.sdmaddress') }}:</label>
-                        <div class="col-sm-10">
-                            <div class="input-group">
-                                <input type="text" class="form-control" id="sdmaddress"
-                                    placeholder="1" v-model="powerMeterConfigList.serial_sdm.address" />
-                            </div>
-                        </div>
-                    </div>
+                    <InputElement :label="$t('powermeteradmin.sdmaddress')"
+                        v-model="powerMeterConfigList.serial_sdm.address"
+                        type="number"
+                        wide />
                 </CardElement>
 
                 <div v-if="powerMeterConfigList.source === 3">
@@ -127,13 +119,14 @@
                                 type="text"
                                 maxlength="256"
                                 placeholder="total_power"
-                                :tooltip="$t('powermeteradmin.httpJsonPathDescription')" />
+                                :tooltip="$t('powermeteradmin.httpJsonPathDescription')"
+                                wide />
 
                             <div class="row mb-3">
-                                <label for="power_unit" class="col-sm-2 col-form-label">
+                                <label for="power_unit" class="col-sm-4 col-form-label">
                                     {{ $t('powermeteradmin.httpUnit') }}
                                 </label>
-                                <div class="col-sm-10">
+                                <div class="col-sm-8">
                                     <select id="power_unit" class="form-select" v-model="httpJson.unit">
                                         <option v-for="u in unitTypeList" :key="u.key" :value="u.key">
                                             {{ u.value }}
@@ -146,7 +139,8 @@
                                 :label="$t('powermeteradmin.httpSignInverted')"
                                 v-model="httpJson.sign_inverted"
                                 :tooltip="$t('powermeteradmin.httpSignInvertedHint')"
-                                type="checkbox" />
+                                type="checkbox"
+                                wide />
                         </div>
                     </CardElement>
 
@@ -177,7 +171,8 @@
                             type="number"
                             min=1
                             max=15
-                            :postfix="$t('powermeteradmin.seconds')" />
+                            :postfix="$t('powermeteradmin.seconds')"
+                            wide />
 
                         <HttpRequestSettings :cfg="powerMeterConfigList.http_sml.http_request" />
                     </CardElement>

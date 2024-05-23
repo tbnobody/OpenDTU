@@ -7,11 +7,12 @@
                 maxlength="1024"
                 placeholder="http://admin:supersecret@mypowermeter.home/status"
                 prefix="GET "
-                :tooltip="$t('httprequestsettings.urlDescription')" />
+                :tooltip="$t('httprequestsettings.urlDescription')"
+                wide />
 
         <div class="row mb-3">
-            <label for="auth_type" class="col-sm-2 col-form-label">{{ $t('httprequestsettings.authorization') }}</label>
-            <div class="col-sm-10">
+            <label for="auth_type" class="col-sm-4 col-form-label">{{ $t('httprequestsettings.authorization') }}</label>
+            <div class="col-sm-8">
                 <select id="auth_type" class="form-select" v-model="cfg.auth_type">
                     <option v-for="a in authTypeList" :key="a.key" :value="a.key">
                         {{ $t('httprequestsettings.authType' + a.value) }}
@@ -24,32 +25,39 @@
                 v-if="cfg.auth_type != 0"
                 :label="$t('httprequestsettings.username')"
                 v-model="cfg.username"
-                type="text" maxlength="64"/>
+                type="text"
+                maxlength="64"
+                wide />
 
         <InputElement
                 v-if="cfg.auth_type != 0"
                 :label="$t('httprequestsettings.password')"
                 v-model="cfg.password"
-                type="password" maxlength="64"/>
+                type="password"
+                maxlength="64"
+                wide />
 
         <InputElement
                 :label="$t('httprequestsettings.headerKey')"
                 v-model="cfg.header_key"
                 type="text"
                 maxlength="64"
-                :tooltip="$t('httprequestsettings.headerKeyDescription')" />
+                :tooltip="$t('httprequestsettings.headerKeyDescription')"
+                wide />
 
         <InputElement
                 :label="$t('httprequestsettings.headerValue')"
                 v-model="cfg.header_value"
                 type="text"
-                maxlength="256" />
+                maxlength="256"
+                wide />
 
         <InputElement
                 :label="$t('httprequestsettings.timeout')"
                 v-model="cfg.timeout"
                 type="number"
-                :postfix="$t('httprequestsettings.milliSeconds')" />
+                :postfix="$t('httprequestsettings.milliSeconds')"
+                wide />
     </div>
 </template>
 
