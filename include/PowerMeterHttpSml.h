@@ -1,7 +1,10 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 #pragma once
 
+#include <atomic>
 #include <memory>
+#include <condition_variable>
+#include <mutex>
 #include <stdint.h>
 #include <Arduino.h>
 #include "HttpGetter.h"
@@ -13,8 +16,10 @@ public:
     explicit PowerMeterHttpSml(PowerMeterHttpSmlConfig const& cfg)
         : _cfg(cfg) { }
 
+    ~PowerMeterHttpSml();
+
     bool init() final;
-    void loop() final;
+    void loop() final { } // polling is performed asynchronously
     bool isDataValid() const final;
 
     // returns an empty string on success,
@@ -22,9 +27,18 @@ public:
     String poll();
 
 private:
+    static void pollingLoopHelper(void* context);
+    std::atomic<bool> _taskDone;
+    void pollingLoop();
+
     PowerMeterHttpSmlConfig const _cfg;
 
     uint32_t _lastPoll = 0;
 
     std::unique_ptr<HttpGetter> _upHttpGetter;
+
+    TaskHandle_t _taskHandle = nullptr;
+    bool _stopPolling;
+    mutable std::mutex _pollingMutex;
+    std::condition_variable _cv;
 };

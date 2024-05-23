@@ -5,11 +5,36 @@
 #include <base64.h>
 #include <ESPmDNS.h>
 
+PowerMeterHttpSml::~PowerMeterHttpSml()
+{
+    _taskDone = false;
+
+    std::unique_lock<std::mutex> lock(_pollingMutex);
+    _stopPolling = true;
+    lock.unlock();
+
+    _cv.notify_all();
+
+    if (_taskHandle != nullptr) {
+        while (!_taskDone) { delay(10); }
+        _taskHandle = nullptr;
+    }
+}
+
 bool PowerMeterHttpSml::init()
 {
     _upHttpGetter = std::make_unique<HttpGetter>(_cfg.HttpRequest);
 
-    if (_upHttpGetter->init()) { return true; }
+    if (_upHttpGetter->init()) {
+        std::unique_lock<std::mutex> lock(_pollingMutex);
+        _stopPolling = false;
+        lock.unlock();
+
+        uint32_t constexpr stackSize = 3072;
+        xTaskCreate(PowerMeterHttpSml::pollingLoopHelper, "PM:HTTP+SML",
+                stackSize, this, 1/*prio*/, &_taskHandle);
+        return true;
+    }
 
     MessageOutput.printf("[PowerMeterHttpSml] Initializing HTTP getter failed:\r\n");
     MessageOutput.printf("[PowerMeterHttpSml] %s\r\n", _upHttpGetter->getErrorText());
@@ -19,21 +44,41 @@ bool PowerMeterHttpSml::init()
     return false;
 }
 
-void PowerMeterHttpSml::loop()
+void PowerMeterHttpSml::pollingLoopHelper(void* context)
 {
-    if ((millis() - _lastPoll) < (_cfg.PollingInterval * 1000)) {
-        return;
+    auto pInstance = static_cast<PowerMeterHttpSml*>(context);
+    pInstance->pollingLoop();
+    pInstance->_taskDone = true;
+    vTaskDelete(nullptr);
+}
+
+void PowerMeterHttpSml::pollingLoop()
+{
+    std::unique_lock<std::mutex> lock(_pollingMutex);
+
+    while (!_stopPolling) {
+        auto elapsedMillis = millis() - _lastPoll;
+        auto intervalMillis = _cfg.PollingInterval * 1000;
+        if (_lastPoll > 0 && elapsedMillis < intervalMillis) {
+            auto sleepMs = intervalMillis - elapsedMillis;
+            _cv.wait_for(lock, std::chrono::milliseconds(sleepMs),
+                    [this] { return _stopPolling; }); // releases the mutex
+            continue;
+        }
+
+        _lastPoll = millis();
+
+        lock.unlock(); // polling can take quite some time
+        auto res = poll();
+        lock.lock();
+
+        if (!res.isEmpty()) {
+            MessageOutput.printf("[PowerMeterHttpSml] %s\r\n", res.c_str());
+            continue;
+        }
+
+        gotUpdate();
     }
-
-    _lastPoll = millis();
-
-    auto res = poll();
-    if (!res.isEmpty()) {
-        MessageOutput.printf("[PowerMeterHttpJson] %s\r\n", res.c_str());
-        return;
-    }
-
-    gotUpdate();
 }
 
 bool PowerMeterHttpSml::isDataValid() const
