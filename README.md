@@ -1,4 +1,4 @@
-# OpenDTU-Dataase
+# OpenDTU-Database
 
 One year OpenDTU-Database
 ![Image](docs/screenshots/Screenshot_2024-05-23_131208.png)
