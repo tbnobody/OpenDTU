@@ -30,6 +30,18 @@
             </CardElement>
 
             <div v-if="powerMeterConfigList.enabled">
+                <div v-if="powerMeterConfigList.source === 0 || powerMeterConfigList.source === 3">
+                    <div class="alert alert-secondary mt-5" role="alert">
+                        <h2>{{ $t('powermeteradmin.jsonPathExamplesHeading') }}:</h2>
+                        {{ $t('powermeteradmin.jsonPathExamplesExplanation') }}
+                        <ul>
+                            <li><code>power/total/watts</code> &mdash; <code>{ "power": { "phase1": { "factor": 0.98, "watts": 42 }, "total": { "watts": 123.4 } } }</code></li>
+                            <li><code>data/[1]/power</code> &mdash; <code>{ "data": [ { "factor": 0.98, "power": 42 }, { "factor": 1.0, "power": 123.4 } ] } }</code></li>
+                            <li><code>total</code> &mdash; <code>{ "othervalue": 66, "total": 123.4 }</code></li>
+                        </ul>
+                    </div>
+                </div>
+
                 <CardElement v-if="powerMeterConfigList.source === 0"
                         v-for="(mqtt, index) in powerMeterConfigList.mqtt.values"
                         :text="$t('powermeteradmin.MqttValue', { valueNumber: index + 1})"
@@ -40,6 +52,33 @@
                         v-model="mqtt.topic"
                         type="text"
                         maxlength="256"
+                        wide />
+
+                    <InputElement :label="$t('powermeteradmin.mqttJsonPath')"
+                        v-model="mqtt.json_path"
+                        type="text"
+                        maxlength="256"
+                        :tooltip="$t('powermeteradmin.valueJsonPathDescription')"
+                        wide />
+
+                    <div class="row mb-3">
+                        <label for="mqtt_power_unit" class="col-sm-4 col-form-label">
+                            {{ $t('powermeteradmin.valueUnit') }}
+                        </label>
+                        <div class="col-sm-8">
+                            <select id="mqtt_power_unit" class="form-select" v-model="mqtt.unit">
+                                <option v-for="u in unitTypeList" :key="u.key" :value="u.key">
+                                    {{ u.value }}
+                                </option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <InputElement
+                        :label="$t('powermeteradmin.valueSignInverted')"
+                        v-model="mqtt.sign_inverted"
+                        :tooltip="$t('powermeteradmin.valueSignInvertedHint')"
+                        type="checkbox"
                         wide />
                 </CardElement>
 
@@ -63,6 +102,16 @@
                 </CardElement>
 
                 <div v-if="powerMeterConfigList.source === 3">
+                    <div class="alert alert-secondary mt-5" role="alert">
+                        <h2>{{ $t('powermeteradmin.urlExamplesHeading') }}:</h2>
+                        <ul>
+                            <li>http://shelly3em.home/status</li>
+                            <li>https://shelly3em.home/status</li>
+                            <li>http://tasmota-123.home/cm?cmnd=status%208</li>
+                            <li>http://12.34.56.78:8080/emeter/0</li>
+                        </ul>
+                    </div>
+
                     <CardElement :text="$t('powermeteradmin.HTTP')"
                             textVariant="text-bg-primary"
                             add-space>
@@ -80,24 +129,6 @@
                             wide />
                     </CardElement>
 
-                    <div class="alert alert-secondary mt-5" role="alert">
-                        <h2>{{ $t('powermeteradmin.urlExamplesHeading') }}:</h2>
-                        <ul>
-                            <li>http://shelly3em.home/status</li>
-                            <li>https://shelly3em.home/status</li>
-                            <li>http://tasmota-123.home/cm?cmnd=status%208</li>
-                            <li>http://12.34.56.78:8080/emeter/0</li>
-                        </ul>
-
-                        <h2>{{ $t('powermeteradmin.jsonPathExamplesHeading') }}:</h2>
-                        {{ $t('powermeteradmin.jsonPathExamplesExplanation') }}
-                        <ul>
-                            <li><code>power/total/watts</code> &mdash; <code>{ "power": { "phase1": { "factor": 0.98, "watts": 42 }, "total": { "watts": 123.4 } } }</code></li>
-                            <li><code>data/[1]/power</code> &mdash; <code>{ "data": [ { "factor": 0.98, "power": 42 }, { "factor": 1.0, "power": 123.4 } ] } }</code></li>
-                            <li><code>total</code> &mdash; <code>{ "othervalue": 66, "total": 123.4 }</code></li>
-                        </ul>
-                    </div>
-
                     <CardElement
                             v-for="(httpJson, index) in powerMeterConfigList.http_json.values"
                             :key="index"
@@ -114,17 +145,17 @@
 
                             <HttpRequestSettings :cfg="httpJson.http_request" v-if="index == 0 || powerMeterConfigList.http_json.individual_requests"/>
 
-                            <InputElement :label="$t('powermeteradmin.httpJsonPath')"
+                            <InputElement :label="$t('powermeteradmin.valueJsonPath')"
                                 v-model="httpJson.json_path"
                                 type="text"
                                 maxlength="256"
                                 placeholder="total_power"
-                                :tooltip="$t('powermeteradmin.httpJsonPathDescription')"
+                                :tooltip="$t('powermeteradmin.valueJsonPathDescription')"
                                 wide />
 
                             <div class="row mb-3">
                                 <label for="power_unit" class="col-sm-4 col-form-label">
-                                    {{ $t('powermeteradmin.httpUnit') }}
+                                    {{ $t('powermeteradmin.valueUnit') }}
                                 </label>
                                 <div class="col-sm-8">
                                     <select id="power_unit" class="form-select" v-model="httpJson.unit">
@@ -136,9 +167,9 @@
                             </div>
 
                             <InputElement
-                                :label="$t('powermeteradmin.httpSignInverted')"
+                                :label="$t('powermeteradmin.valueSignInverted')"
                                 v-model="httpJson.sign_inverted"
-                                :tooltip="$t('powermeteradmin.httpSignInvertedHint')"
+                                :tooltip="$t('powermeteradmin.valueSignInvertedHint')"
                                 type="checkbox"
                                 wide />
                         </div>

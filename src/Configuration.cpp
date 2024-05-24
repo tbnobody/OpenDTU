@@ -36,6 +36,9 @@ void ConfigurationClass::serializePowerMeterMqttConfig(PowerMeterMqttConfig cons
         PowerMeterMqttValue const& s = source.Values[i];
 
         t["topic"] = s.Topic;
+        t["json_path"] = s.JsonPath;
+        t["unit"] = s.PowerUnit;
+        t["sign_inverted"] = s.SignInverted;
     }
 }
 
@@ -301,10 +304,14 @@ void ConfigurationClass::deserializeHttpRequestConfig(JsonObject const& source, 
 
 void ConfigurationClass::deserializePowerMeterMqttConfig(JsonObject const& source, PowerMeterMqttConfig& target)
 {
-    JsonArray s = source["values"].as<JsonArray>();
     for (size_t i = 0; i < POWERMETER_MQTT_MAX_VALUES; ++i) {
         PowerMeterMqttValue& t = target.Values[i];
-        strlcpy(t.Topic, s[i]["topic"] | "", sizeof(t.Topic));
+        JsonObject s = source["values"][i];
+
+        strlcpy(t.Topic, s["topic"] | "", sizeof(t.Topic));
+        strlcpy(t.JsonPath, s["json_path"] | "", sizeof(t.JsonPath));
+        t.PowerUnit = s["unit"] | PowerMeterMqttValue::Unit::Watts;
+        t.SignInverted = s["sign_inverted"] | false;
     }
 }
 

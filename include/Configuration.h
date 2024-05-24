@@ -79,6 +79,12 @@ using HttpRequestConfig = struct HTTP_REQUEST_CONFIG_T;
 
 struct POWERMETER_MQTT_VALUE_T {
     char Topic[MQTT_MAX_TOPIC_STRLEN + 1];
+    char JsonPath[POWERMETER_HTTP_JSON_MAX_PATH_STRLEN + 1];
+
+    enum Unit { Watts = 0, MilliWatts = 1, KiloWatts = 2 };
+    Unit PowerUnit;
+
+    bool SignInverted;
 };
 using PowerMeterMqttValue = struct POWERMETER_MQTT_VALUE_T;
 

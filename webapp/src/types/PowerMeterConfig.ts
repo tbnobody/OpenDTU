@@ -2,6 +2,9 @@ import type { HttpRequestConfig } from '@/types/HttpRequestConfig';
 
 export interface PowerMeterMqttValue {
     topic: string;
+    json_path: string;
+    unit: number;
+    sign_inverted: boolean;
 }
 
 export interface PowerMeterMqttConfig {
