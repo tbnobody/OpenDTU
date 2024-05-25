@@ -5,7 +5,7 @@
 #include <cstdint>
 
 #define CONFIG_FILENAME "/config.json"
-#define CONFIG_VERSION 0x00011b00 // 0.1.27 // make sure to clean all after change
+#define CONFIG_VERSION 0x00011c00 // 0.1.28 // make sure to clean all after change
 
 #define WIFI_MAX_SSID_STRLEN 32
 #define WIFI_MAX_PASSWORD_STRLEN 64
@@ -29,8 +29,6 @@
 #define CHAN_MAX_NAME_STRLEN 31
 
 #define DEV_MAX_MAPPING_NAME_STRLEN 63
-
-#define JSON_BUFFER_SIZE 12288
 
 struct CHANNEL_CONFIG_T {
     uint16_t MaxChannelPower;
@@ -168,6 +166,7 @@ public:
 
     INVERTER_CONFIG_T* getFreeInverterSlot();
     INVERTER_CONFIG_T* getInverterConfig(const uint64_t serial);
+    void deleteInverterById(const uint8_t id);
 };
 
 extern ConfigurationClass Configuration;

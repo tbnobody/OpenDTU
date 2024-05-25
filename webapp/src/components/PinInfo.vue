@@ -84,9 +84,11 @@ export default defineComponent({
             let comCur = 999999;
 
             if (this.selectedPinAssignment && category in this.selectedPinAssignment) {
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 comSel = (this.selectedPinAssignment as any)[category][prop];
             }
             if (this.currentPinAssignment && category in this.currentPinAssignment) {
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 comCur = (this.currentPinAssignment as any)[category][prop];
             }
 

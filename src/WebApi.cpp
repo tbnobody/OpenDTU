@@ -4,6 +4,7 @@
  */
 #include "WebApi.h"
 #include "Configuration.h"
+#include "MessageOutput.h"
 #include "defaults.h"
 #include <AsyncJson.h>
 
@@ -83,6 +84,60 @@ void WebApiClass::writeConfig(JsonVariant& retMsg, const WebApiError code, const
         retMsg["message"] = message;
         retMsg["code"] = code;
     }
+}
+
+bool WebApiClass::parseRequestData(AsyncWebServerRequest* request, AsyncJsonResponse* response, JsonDocument& json_document)
+{
+    auto& retMsg = response->getRoot();
+    retMsg["type"] = "warning";
+
+    if (!request->hasParam("data", true)) {
+        retMsg["message"] = "No values found!";
+        retMsg["code"] = WebApiError::GenericNoValueFound;
+        WebApi.sendJsonResponse(request, response, __FUNCTION__, __LINE__);
+        return false;
+    }
+
+    const String json = request->getParam("data", true)->value();
+    const DeserializationError error = deserializeJson(json_document, json);
+    if (error) {
+        retMsg["message"] = "Failed to parse data!";
+        retMsg["code"] = WebApiError::GenericParseError;
+        WebApi.sendJsonResponse(request, response, __FUNCTION__, __LINE__);
+        return false;
+    }
+
+    return true;
+}
+
+uint64_t WebApiClass::parseSerialFromRequest(AsyncWebServerRequest* request, String param_name)
+{
+    if (request->hasParam(param_name)) {
+        String s = request->getParam(param_name)->value();
+        return strtoll(s.c_str(), NULL, 16);
+    }
+
+    return 0;
+}
+
+bool WebApiClass::sendJsonResponse(AsyncWebServerRequest* request, AsyncJsonResponse* response, const char* function, const uint16_t line)
+{
+    bool ret_val = true;
+    if (response->overflowed()) {
+        auto& root = response->getRoot();
+
+        root.clear();
+        root["message"] = String("500 Internal Server Error: ") + function + ", " + line;
+        root["code"] = WebApiError::GenericInternalServerError;
+        root["type"] = "danger";
+        response->setCode(500);
+        MessageOutput.printf("WebResponse failed: %s, %d\r\n", function, line);
+        ret_val = false;
+    }
+
+    response->setLength();
+    request->send(response);
+    return ret_val;
 }
 
 WebApiClass WebApi;

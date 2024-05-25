@@ -69,9 +69,9 @@ void Utils::restartDtu()
     ESP.restart();
 }
 
-bool Utils::checkJsonAlloc(const DynamicJsonDocument& doc, const char* function, const uint16_t line)
+bool Utils::checkJsonAlloc(const JsonDocument& doc, const char* function, const uint16_t line)
 {
-    if (doc.capacity() == 0) {
+    if (doc.overflowed()) {
         MessageOutput.printf("Alloc failed: %s, %d\r\n", function, line);
         return false;
     }
