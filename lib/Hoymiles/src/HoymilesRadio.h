@@ -1,11 +1,11 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 #pragma once
 
-#include "TimeoutHelper.h"
 #include "commands/CommandAbstract.h"
 #include "types.h"
-#include <memory>
 #include <ThreadSafeQueue.h>
+#include <TimeoutHelper.h>
+#include <memory>
 
 class HoymilesRadio {
 public:

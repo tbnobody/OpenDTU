@@ -1,4 +1,8 @@
 # OpenDTU-Database-Database
+# OpenDTU-Database
+
+One year OpenDTU-Database
+![Image](docs/screenshots/Screenshot_2024-05-23_131208.png)
 
 [![OpenDTU Build](https://github.com/tbnobody/OpenDTU/actions/workflows/build.yml/badge.svg)](https://github.com/tbnobody/OpenDTU/actions/workflows/build.yml)
 [![cpplint](https://github.com/tbnobody/OpenDTU/actions/workflows/cpplint.yml/badge.svg)](https://github.com/tbnobody/OpenDTU/actions/workflows/cpplint.yml)
@@ -94,3 +98,6 @@ Generated using: `git log --date=short --pretty=format:"* %h%x09%ad%x09%s" | gre
 | TSUN TSOL-M350       | NRF24L01+          | 1         | 1           | 1         |
 | TSUN TSOL-M800       | NRF24L01+          | 2         | 2           | 1         |
 | TSUN TSOL-M1600      | NRF24L01+          | 4         | 2           | 1         |
+| E-Star HERF-800      | NRF24L01+          | 2         | 2           | 1         |
+| E-Star HERF-1600     | NRF24L01+          | 4         | 2           | 1         |
+| E-Star HERF-1800     | NRF24L01+          | 4         | 2           | 1         |

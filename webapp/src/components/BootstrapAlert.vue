@@ -52,7 +52,7 @@ export default defineComponent({
             _countDownTimeout = undefined;
         };
 
-        var countDown = ref();
+        const countDown = ref();
         watch(() => props.modelValue, () => {
             countDown.value = parseCountDown(props.modelValue);
         });

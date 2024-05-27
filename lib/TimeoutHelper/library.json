@@ -1,0 +1,13 @@
+{
+    "name": "TimeoutHelper",
+    "keywords": "timeout",
+    "description": "An Arduino for ESP32 timeout helper",
+    "authors": {
+        "name": "Thomas Basler"
+    },
+    "version": "0.0.1",
+    "frameworks": "arduino",
+    "platforms": [
+        "espressif32"
+    ]
+}

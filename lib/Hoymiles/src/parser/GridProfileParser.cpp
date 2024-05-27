@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * Copyright (C) 2023 Thomas Basler and others
+ * Copyright (C) 2023 - 2024 Thomas Basler and others
  */
 #include "GridProfileParser.h"
 #include "../Hoymiles.h"
@@ -444,6 +444,11 @@ std::list<GridProfileSection_t> GridProfileParser::getProfile() const
     }
 
     return l;
+}
+
+bool GridProfileParser::containsValidData() const
+{
+    return _gridProfileLength > 6;
 }
 
 uint8_t GridProfileParser::getSectionSize(const uint8_t section_id, const uint8_t section_version)

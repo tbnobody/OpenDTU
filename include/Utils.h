@@ -10,6 +10,6 @@ public:
     static uint64_t generateDtuSerial();
     static int getTimezoneOffset();
     static void restartDtu();
-    static bool checkJsonAlloc(const DynamicJsonDocument& doc, const char* function, const uint16_t line);
+    static bool checkJsonAlloc(const JsonDocument& doc, const char* function, const uint16_t line);
     static void removeAllFiles();
 };
