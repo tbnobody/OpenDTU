@@ -76,12 +76,12 @@ export default defineComponent({
         },
         productionYear() {
             return() => {
-                return ((parseInt(this.devInfoList.serial.toString(), 16) >> (7 * 4)) & 0xF) + 2014;
+                return ((parseInt(this.devInfoList.serial, 16) >> (7 * 4)) & 0xF) + 2014;
             }
         },
         productionWeek() {
             return() => {
-                return ((parseInt(this.devInfoList.serial.toString(), 16) >> (5 * 4)) & 0xFF).toString(16);
+                return ((parseInt(this.devInfoList.serial, 16) >> (5 * 4)) & 0xFF).toString(16);
             }
         }
     }

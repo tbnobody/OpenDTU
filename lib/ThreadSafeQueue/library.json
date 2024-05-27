@@ -1,0 +1,13 @@
+{
+    "name": "ThreadSafeQueue",
+    "keywords": "queue, threadsafe",
+    "description": "An Arduino for ESP32 thread safe queue implementation",
+    "authors": {
+        "name": "Thomas Basler"
+    },
+    "version": "0.0.1",
+    "frameworks": "arduino",
+    "platforms": [
+        "espressif32"
+    ]
+}

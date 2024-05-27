@@ -3,6 +3,7 @@ import ConfigAdminView from '@/views/ConfigAdminView.vue';
 import ConsoleInfoView from '@/views/ConsoleInfoView.vue';
 import DeviceAdminView from '@/views/DeviceAdminView.vue'
 import DtuAdminView from '@/views/DtuAdminView.vue';
+import ErrorView from '@/views/ErrorView.vue';
 import FirmwareUpgradeView from '@/views/FirmwareUpgradeView.vue';
 import HomeView from '@/views/HomeView.vue';
 import InverterAdminView from '@/views/InverterAdminView.vue';
@@ -31,6 +32,11 @@ const router = createRouter({
         path: '/login',
         name: 'Login',
         component: LoginView
+    },
+    {
+        path: '/error?status=:status&message=:message',
+        name: 'Error',
+        component: ErrorView
     },
     {
         path: '/about',
