@@ -202,7 +202,10 @@
         "ChipRevision": "Révision de la puce",
         "ChipCores": "Nombre de cœurs",
         "CpuFrequency": "Fréquence du CPU",
-        "Mhz": "MHz"
+        "Mhz": "MHz",
+        "FlashSize": "Taille de la mémoire flash",
+        "Bytes": "octets",
+        "MegaBytes": "Mo"
     },
     "memoryinfo": {
         "MemoryInformation": "Informations sur la mémoire",
