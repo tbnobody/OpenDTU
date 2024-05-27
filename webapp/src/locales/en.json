@@ -251,7 +251,10 @@
         "ChipRevision": "Chip Revision",
         "ChipCores": "Chip Cores",
         "CpuFrequency": "CPU Frequency",
-        "Mhz": "MHz"
+        "Mhz": "MHz",
+        "FlashSize": "Flash Memory Size",
+        "Bytes": "Bytes",
+        "MegaBytes": "MB"
     },
     "memoryinfo": {
         "MemoryInformation": "Memory Information",
