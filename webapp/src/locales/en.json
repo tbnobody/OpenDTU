@@ -203,6 +203,8 @@
         "ChipCores": "Chip Cores",
         "CpuFrequency": "CPU Frequency",
         "Mhz": "MHz",
+        "CpuTemperature": "CPU Temperature",
+        "DegreeC": "°C",
         "FlashSize": "Flash Memory Size",
         "Bytes": "Bytes",
         "MegaBytes": "MB"
