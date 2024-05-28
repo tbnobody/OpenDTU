@@ -62,8 +62,17 @@ export const numberFormats: I18nOptions["numberFormats"] = {
         percent: {
             style: 'percent',
         },
+        byte: {
+            style: 'unit', unit: 'byte',
+        },
         kilobyte: {
             style: 'unit', unit: 'kilobyte',
+        },
+        megabyte: {
+            style: 'unit', unit: 'megabyte',
+        },
+        celsius: {
+            style: 'unit', unit: 'celsius', maximumFractionDigits: 1,
         },
     },
     [Locales.DE]: {
@@ -79,8 +88,17 @@ export const numberFormats: I18nOptions["numberFormats"] = {
         percent: {
             style: 'percent',
         },
+        byte: {
+            style: 'unit', unit: 'byte',
+        },
         kilobyte: {
             style: 'unit', unit: 'kilobyte',
+        },
+        megabyte: {
+            style: 'unit', unit: 'megabyte',
+        },
+        celsius: {
+            style: 'unit', unit: 'celsius', maximumFractionDigits: 1,
         },
     },
     [Locales.FR]: {
@@ -96,8 +114,17 @@ export const numberFormats: I18nOptions["numberFormats"] = {
         percent: {
           style: 'percent',
         },
+        byte: {
+            style: 'unit', unit: 'byte',
+        },
         kilobyte: {
             style: 'unit', unit: 'kilobyte',
+        },
+        megabyte: {
+            style: 'unit', unit: 'megabyte',
+        },
+        celsius: {
+            style: 'unit', unit: 'celsius', maximumFractionDigits: 1,
         },
     },
 };

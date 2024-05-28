@@ -205,9 +205,7 @@
         "Mhz": "MHz",
         "CpuTemperature": "CPU Temperature",
         "DegreeC": "°C",
-        "FlashSize": "Taille de la mémoire flash",
-        "Bytes": "octets",
-        "MegaBytes": "Mo"
+        "FlashSize": "Taille de la mémoire flash"
     },
     "memoryinfo": {
         "MemoryInformation": "Informations sur la mémoire",
