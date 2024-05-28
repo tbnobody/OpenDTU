@@ -48,6 +48,7 @@ void WebApiSysstatusClass::onSystemStatus(AsyncWebServerRequest* request)
     root["chiprevision"] = ESP.getChipRevision();
     root["chipmodel"] = ESP.getChipModel();
     root["chipcores"] = ESP.getChipCores();
+    root["flashsize"] = ESP.getFlashChipSize();
 
     String reason;
     reason = ResetReason::get_reset_reason_verbose(0);
