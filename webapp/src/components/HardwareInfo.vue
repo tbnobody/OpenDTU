@@ -22,8 +22,8 @@
                     <tr>
                         <th>{{ $t('hardwareinfo.FlashSize') }}</th>
                         <td>
-                            {{ systemStatus.flashsize }} {{ $t('hardwareinfo.Bytes') }}
-                            ({{ systemStatus.flashsize / 1024 / 1024 }} {{ $t('hardwareinfo.MegaBytes') }})
+                            {{ $n(systemStatus.flashsize) }} {{ $t('hardwareinfo.Bytes') }}
+                            ({{ $n(systemStatus.flashsize / 1024 / 1024) }} {{ $t('hardwareinfo.MegaBytes') }})
                         </td>
                     </tr>
                 </tbody>
