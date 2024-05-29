@@ -11,10 +11,10 @@
 const std::array<const ProfileType_t, PROFILE_TYPE_COUNT> GridProfileParser::_profileTypes = { {
     { 0x02, 0x00, "US - NA_IEEE1547_240V" },
     { 0x03, 0x00, "DE - DE_VDE4105_2018" },
-    { 0x03, 0x01, "XX - unknown" },
+    { 0x03, 0x01, "DE - DE_VDE4105_2011" },
     { 0x0a, 0x00, "XX - EN 50549-1:2019" },
     { 0x0c, 0x00, "AT - AT_TOR_Erzeuger_default" },
-    { 0x0d, 0x04, "FR -" },
+    { 0x0d, 0x04, "XX - NF_EN_50549-1:2019" },
     { 0x10, 0x00, "ES - ES_RD1699" },
     { 0x12, 0x00, "PL - EU_EN50438" },
     { 0x29, 0x00, "NL - NL_NEN-EN50549-1_2019" },
