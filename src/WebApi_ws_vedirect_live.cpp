@@ -139,7 +139,7 @@ void WebApiWsVedirectLiveClass::generateCommonJsonResponse(JsonVariant& root, bo
 
 void WebApiWsVedirectLiveClass::populateJson(const JsonObject &root, const VeDirectMpptController::data_t &mpptData) {
     root["product_id"] = mpptData.getPidAsString();
-    root["firmware_version"] = String(mpptData.firmwareNr_FW);
+    root["firmware_version"] = mpptData.getFwVersionFormatted();
 
     const JsonObject values = root["values"].to<JsonObject>();
 

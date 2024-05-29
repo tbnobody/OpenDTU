@@ -110,7 +110,7 @@ void VeDirectMpptController::frameValidEvent() {
 	// charger periodically sends human readable (TEXT) data to the serial port. For firmware
 	// versions v1.53 and above, the charger always periodically sends TEXT data to the serial port.
 	// --> We just use hex commandes for firmware >= 1.53 to keep text messages alive
-	if (atoi(_tmpFrame.firmwareNr_FW) < 153) { return; }
+	if (_tmpFrame.getFwVersionAsInteger() < 153) { return; }
 
 	using Command = VeDirectHexCommand;
 	using Register = VeDirectHexRegister;

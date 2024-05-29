@@ -138,6 +138,44 @@ frozen::string const& veStruct::getPidAsString() const
 }
 
 /*
+ * This function returns the firmware version as an integer, disregarding
+ * release candidate marks.
+ */
+uint32_t veStruct::getFwVersionAsInteger() const
+{
+	char const* strVersion = firmwareVer_FW;
+
+	// VE.Direct protocol manual states that the first char can be a non-digit,
+	// in which case that char represents a release candidate version
+	if (strVersion[0] < '0' || strVersion[0] > '9') { ++strVersion; }
+
+	return static_cast<uint32_t>(strtoul(strVersion, nullptr, 10));
+}
+
+/*
+ * This function returns the firmware version as readable text.
+ */
+String veStruct::getFwVersionFormatted() const
+{
+	char const* strVersion = firmwareVer_FW;
+
+	// VE.Direct protocol manual states that the first char can be a non-digit,
+	// in which case that char represents a release candidate version
+	if (strVersion[0] < '0' || strVersion[0] > '9') { ++strVersion; }
+
+	String res(strVersion[0]);
+	res += ".";
+	res += strVersion + 1;
+
+	if (strVersion > firmwareVer_FW) {
+		res += "-rc-";
+		res += firmwareVer_FW[0];
+	}
+
+	return res;
+}
+
+/*
  * This function returns the state of operations (CS) as readable text.
  */
 frozen::string const& veMpptStruct::getCsAsString() const

@@ -247,7 +247,7 @@ void VeDirectFrameHandler<T>::processTextData(std::string const& name, std::stri
 	}
 
 	if (name == "FW") {
-		strcpy(_tmpFrame.firmwareNr_FW, value.c_str());
+		strcpy(_tmpFrame.firmwareVer_FW, value.c_str());
 		return;
 	}
 

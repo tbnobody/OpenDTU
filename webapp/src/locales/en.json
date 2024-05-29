@@ -152,9 +152,9 @@
         "LoadingInverter": "Waiting for data... (can take up to 10 seconds)"
     },
     "vedirecthome": {
-        "SerialNumber": "Serial Number: ",
-        "FirmwareNumber": "Firmware Number: ",
-        "DataAge": "Data Age: ",
+        "SerialNumber": "Serial Number",
+        "FirmwareVersion": "Firmware Version",
+        "DataAge": "Data Age",
         "Seconds": "{val} seconds",
         "Property": "Property",
         "Value": "Value",
