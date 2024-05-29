@@ -204,7 +204,6 @@
         "CpuFrequency": "CPU Frequency",
         "Mhz": "MHz",
         "CpuTemperature": "CPU Temperature",
-        "DegreeC": "°C",
         "FlashSize": "Flash Memory Size"
     },
     "memoryinfo": {
