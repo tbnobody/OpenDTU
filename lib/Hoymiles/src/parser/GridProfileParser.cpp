@@ -2,6 +2,23 @@
 /*
  * Copyright (C) 2023 - 2024 Thomas Basler and others
  */
+
+/*
+This parser is used to parse the response of 'GridOnProFilePara'.
+It contains the whole grid profile of the inverter.
+
+Data structure:
+
+00   01 02 03 04   05 06 07 08   09   10 11        12 13             14           15                16 17   18 19   20 21   22 23   24 25   26   27 28 29 30 31
+                                      00 01        02 03             04           05                06 07   08 09   10 11   12 13
+                                                                    |<---------- Returns till the end of the payload ---------->|
+---------------------------------------------------------------------------------------------------------------------------------------------------------------
+95   80 14 82 66   80 14 33 28   01   0A 00        20 01             00           0C                08 FC   07 A3   00 0F   09 E2   00 1E   E6   -- -- -- -- --
+^^   ^^^^^^^^^^^   ^^^^^^^^^^^   ^^   ^^^^^        ^^^^^             ^^           ^^                ^^^^^   ^^^^^   ^^^^^   ^^^^^   ^^^^^   ^^
+ID   Source Addr   Target Addr   Idx  Profile ID   Profile Version   Section ID   Section Version   Value   Value   Value   Value   CRC16   CRC8
+
+The number of values depends on the respective section and its version. After the last value of a section follows the next section id.
+*/
 #include "GridProfileParser.h"
 #include "../Hoymiles.h"
 #include <cstring>
