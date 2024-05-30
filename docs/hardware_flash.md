@@ -65,7 +65,7 @@ The SN65HVD230 CAN bus transceiver is used to interface with the Pylontech batte
 
 ### MCP2515 CAN bus module
 
-See [Wiki](https://github.com/helgeerbe/OpenDTU-OnBattery/wiki/Huawei-AC-PSU) for details.
+Used to connect to the Huawei PSU (AC charger). See [the Wiki](https://github.com/helgeerbe/OpenDTU-OnBattery/wiki/Huawei-AC-PSU) for details.
 
 ### Relay module
 
