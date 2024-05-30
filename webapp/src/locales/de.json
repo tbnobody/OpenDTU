@@ -515,6 +515,7 @@
         "ZeroRuntimeHint": "Nulle Laufzeit Daten (keine Ertragsdaten), wenn der Wechselrichter nicht erreichbar ist.",
         "ZeroDay": "Nulle Tagesertrag um Mitternacht",
         "ZeroDayHint": "Das funktioniert nur wenn der Wechselrichter nicht erreichbar ist. Wenn Daten aus dem Wechselrichter gelesen werden, werden deren Werte verwendet. (Ein Reset erfolgt nur beim Neustarten)",
+        "ClearEventlog": "Lösche Ereignisanzeige um Mitternacht",
         "Cancel": "@:base.Cancel",
         "Save": "@:base.Save",
         "DeleteMsg": "Soll der Wechselrichter \"{name}\" mit der Seriennummer {serial} wirklich gelöscht werden?",

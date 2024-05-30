@@ -127,6 +127,16 @@ bool InverterAbstract::getZeroYieldDayOnMidnight() const
     return _zeroYieldDayOnMidnight;
 }
 
+void InverterAbstract::setClearEventlogOnMidnight(const bool enabled)
+{
+    _clearEventlogOnMidnight = enabled;
+}
+
+bool InverterAbstract::getClearEventlogOnMidnight() const
+{
+    return _clearEventlogOnMidnight;
+}
+
 bool InverterAbstract::sendChangeChannelRequest()
 {
     return false;

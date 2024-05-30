@@ -515,6 +515,7 @@
         "ZeroRuntimeHint": "Zero runtime data (no yield data) if inverter becomes unreachable.",
         "ZeroDay": "Zero daily yield at midnight",
         "ZeroDayHint": "This only works if the inverter is unreachable. If data is read from the inverter, it's values will be used. (Reset only occours on power cycle)",
+        "ClearEventlog": "Clear Eventlog at midnight",
         "Cancel": "@:base.Cancel",
         "Save": "@:base.Save",
         "DeleteMsg": "Are you sure you want to delete the inverter \"{name}\" with serial number {serial}?",

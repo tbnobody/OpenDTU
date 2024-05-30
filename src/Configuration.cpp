@@ -128,6 +128,7 @@ bool ConfigurationClass::write()
         inv["reachable_threshold"] = config.Inverter[i].ReachableThreshold;
         inv["zero_runtime"] = config.Inverter[i].ZeroRuntimeDataIfUnrechable;
         inv["zero_day"] = config.Inverter[i].ZeroYieldDayOnMidnight;
+        inv["clear_eventlog"] = config.Inverter[i].ClearEventlogOnMidnight;
         inv["yieldday_correction"] = config.Inverter[i].YieldDayCorrection;
 
         JsonArray channel = inv["channel"].to<JsonArray>();
@@ -302,6 +303,7 @@ bool ConfigurationClass::read()
         config.Inverter[i].ReachableThreshold = inv["reachable_threshold"] | REACHABLE_THRESHOLD;
         config.Inverter[i].ZeroRuntimeDataIfUnrechable = inv["zero_runtime"] | false;
         config.Inverter[i].ZeroYieldDayOnMidnight = inv["zero_day"] | false;
+        config.Inverter[i].ClearEventlogOnMidnight = inv["clear_eventlog"] | false;
         config.Inverter[i].YieldDayCorrection = inv["yieldday_correction"] | false;
 
         JsonArray channel = inv["channel"];
