@@ -54,7 +54,10 @@ The CMT2300A uses 3-Wire half duplex SPI communication. Due to this fact it curr
 
 ### 3.3V / 5V logic level converter
 
-The logic level converter is used to interface with the Victron MPPT charge controller and the relay board. It converts the 3.3V logic level used by the ESP32 to 5V logic used by the other devices. 
+The logic level converter is used to interface with the Victron MPPT charge
+controller and the relay board. It converts the 3.3V logic level used by the
+ESP32 to 5V logic used by the other devices. A commonly used digital isolator
+is the ADUM1201.
 
 ### SN65HVD230 CAN bus transceiver
 
