@@ -71,30 +71,8 @@ Use a power supply with 5 V and 1 A. The USB cable connected to your PC/Notebook
 
 ### Change pin assignment
 
-Its possible to change all the pins of the NRF24L01+ module, the Display, the LED etc.
-The recommend way to change the pin assignment is by creating a custom [device profile](DeviceProfiles.md).
-It is also possible to create a custom environment and compile the source yourself. This can be achieved by copying one of the [env:....] sections from 'platformio.ini' to 'platformio_override.ini' and editing the 'platformio_override.ini' file and add/change one or more of the following lines to the 'build_flags' parameter:
-
-```makefile
--DHOYMILES_PIN_MISO=19
--DHOYMILES_PIN_MOSI=23
--DHOYMILES_PIN_SCLK=18
--DHOYMILES_PIN_IRQ=16
--DHOYMILES_PIN_CE=4
--DHOYMILES_PIN_CS=5
--DVICTRON_PIN_TX=21
--DVICTRON_PIN_RX=22
--DPYLONTECH_PIN_RX=27
--DPYLONTECH_PIN_TX=14
--DHUAWEI_PIN_MISO=12
--DHUAWEI_PIN_MOSI=13
--DHUAWEI_PIN_SCLK=26
--DHUAWEI_PIN_IRQ=25
--DHUAWEI_PIN_CS=15
--DHUAWEI_PIN_POWER=33
-```
-
-It is recommended to make all changes only in the  'platformio_override.ini', this is your personal copy.
+It is possible to change all the pins of the NRF24L01+ module, the Display, the LED etc.
+The way to change the pin assignment is by creating a custom [device profile](https://github.com/helgeerbe/OpenDTU-OnBattery/wiki/Device-Profiles).
 
 ## Flashing and starting up
 
