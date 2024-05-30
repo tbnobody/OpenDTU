@@ -2,6 +2,12 @@
 
 ## Hardware you need
 
+For a highly integrated board with most peripherals already included, have a
+look at the [OpenDTU Fusion](https://shop.allianceapps.io/products/opendtu-fusion-community-edition)
+board. There are also [OpenDTU-OnBattery-specific addons](https://github.com/markusdd/OpenDTUFusionDocs/blob/main/CANIso.md).
+
+Otherwise, read on to assemble your own components.
+
 ### ESP32 board
 
 For ease of use, buy a "ESP32 DEVKIT DOIT" or "ESP32 NodeMCU Development Board" with an ESP32-S3 or ESP-WROOM-32 chipset on it.
