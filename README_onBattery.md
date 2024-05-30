@@ -6,7 +6,7 @@ This is a fork from the Hoymiles project [OpenDTU](https://github.com/tbnobody/O
 
 > **Warning**
 > 
-> In contrast to the original openDTU, with release 2023.05.23.post1 openDTU-onBattery supports only 5 inverters. Otherwise, there is not enough memory for the liveData view.
+> In contrast to the original openDTU, with release 2023.05.23.post1 openDTU-OnBattery supports only 5 inverters. Otherwise, there is not enough memory for the liveData view.
 
 ## Features
 
@@ -106,7 +106,7 @@ Some points for consideration are:
 
 #### Operation modes
 
-openDTU-onBattery supports three operation modes for the Huawei PSU:
+openDTU-OnBattery supports three operation modes for the Huawei PSU:
 1. Fully manual - In this mode the PSU needs to be turned on/off externally using MQTT and voltage and current limits need to be provided. See [MQTT Documentation](docs/MQTT_Topics.md) for details on these commands
 2. Manual with auto power on / off - In this mode the PSU is turned on when a current limit > 1A is set. If the current limit is < 1A for some time the PSU is turned off. Current and voltage limits need to be provided externally using MQTT. See [MQTT Documentation](docs/MQTT_Topics.md) for details on these commands.
 3. Automatic - In this mode the PSU power is controlled by the Power Meter and information provided in the web-interface. If excess power is present the PSU is turned on. The voltage limit is set as per web-interface and the current limit is set so that the maximum PSU output power equals the Power Meter value. Minium and maximum PSU power levels as configured in the web-interface are respected in this process. The PSU is turned off if the output current is limited and the output power drops below the minium power level. This will disable automatic mode until the battery is discharged below the start voltage level (set in the web-interface). This mode can be enabled using the web-interface and MQTT. See [MQTT Documentation](docs/MQTT_Topics.md)
@@ -135,7 +135,7 @@ It was the goal to replace the original Hoymiles DTU (Telemetry Gateway) with th
 
 ### Status
 
-[![OpenDTU-onBattery Build](https://github.com/helgeerbe/OpenDTU-OnBattery/actions/workflows/build.yml/badge.svg)](https://github.com/helgeerbe/OpenDTU-OnBattery/actions/workflows/build.yml)
+[![OpenDTU-OnBattery Build](https://github.com/helgeerbe/OpenDTU-OnBattery/actions/workflows/build.yml/badge.svg)](https://github.com/helgeerbe/OpenDTU-OnBattery/actions/workflows/build.yml)
 [![cpplint](https://github.com/helgeerbe/OpenDTU-OnBattery/actions/workflows/cpplint.yml/badge.svg)](https://github.com/helgeerbe/OpenDTU-OnBattery/actions/workflows/cpplint.yml)
 [![Yarn Linting](https://github.com/helgeerbe/OpenDTU-OnBattery/actions/workflows/yarnlint.yml/badge.svg)](https://github.com/helgeerbe/OpenDTU-OnBattery/actions/workflows/yarnlint.yml)
 

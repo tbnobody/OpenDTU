@@ -2,7 +2,7 @@
 
 This documentation will has been moved and can be found here: <https://tbnobody.github.io/OpenDTU-docs/firmware/device_profiles/>
 
-## Structure of the json file for openDTU-onBattery (outdated example)
+## Structure of the json file for openDTU-OnBattery (outdated example)
 
 ```json
 [
