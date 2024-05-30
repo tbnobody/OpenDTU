@@ -10,13 +10,20 @@ Otherwise, read on to assemble your own components.
 
 ### ESP32 board
 
-For ease of use, buy a "ESP32 DEVKIT DOIT" or "ESP32 NodeMCU Development Board" with an ESP32-S3 or ESP-WROOM-32 chipset on it.
+For ease of use, buy a "ESP32 DEVKIT DOIT" or "ESP32 NodeMCU Development Board"
+with an ESP32-S3 chipset on it, **with at least 8 MB of flash memory**.
+Preferrably, the ESP32 should also have some embedded PSRAM. Look out for
+labels like "N8R2", "N16R8", where the number after the N is the amount of
+flash in Megabytes, and the number after the R is the amount of PSRAM in
+Megabytes.
 
 Sample Picture:
 
 ![NodeMCU-ESP32](nodemcu-esp32.png)
 
-Also supported: Board with Ethernet-Connector and Power-over-Ethernet [Olimex ESP32-POE](https://www.olimex.com/Products/IoT/ESP32/ESP32-POE/open-source-hardware)
+Also supported: Board with Ethernet-Connector and Power-over-Ethernet (PoE)
+(select version with 8 MB of flash memory or more)
+[Olimex ESP32-POE](https://www.olimex.com/Products/IoT/ESP32/ESP32-POE/open-source-hardware)
 
 ### NRF24L01+ radio board (See inverter table above for supported inverters)
 
