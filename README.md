@@ -40,11 +40,11 @@ This project is still under development and adds following features:
   
 ## Documentation
 
-[Full documentation of OpenDTU-OnBattery extensions can be found at the project's wiki](https://github.com/helgeerbe/OpenDTU-OnBattery/wiki).
+Documentation of OpenDTU-OnBattery extensions can be found in [the project's wiki](https://github.com/helgeerbe/OpenDTU-OnBattery/wiki).
 
-For documentation of openDTU core functionality I refer to the original [repo](https://github.com/tbnobody/OpenDTU) and its [documentation](https://tbnobody.github.io/OpenDTU-docs/).
+For documentation of OpenDTU core functionality refer to the original [repo](https://github.com/tbnobody/OpenDTU) and its [documentation](https://opendtu.solar).
 
-Please note that openDTU-OnBattery may change significantly during its development.
+Please note that OpenDTU-OnBattery may change significantly during its development.
 Bug reports, comments, feature requests and fixes are most welcome!
 
 To find out what's new or improved have a look at the [changelog](https://github.com/helgeerbe/OpenDTU-OnBattery/releases).
