@@ -101,6 +101,11 @@ HttpRequestResult HttpGetter::performGetRequest()
     }
 
     auto upTmpHttpClient = std::make_unique<HTTPClient>();
+
+    // use HTTP1.0 to avoid problems with chunked transfer encoding when the
+    // stream is later used to read the server's response.
+    upTmpHttpClient->useHTTP10(true);
+
     if (!upTmpHttpClient->begin(*_spWiFiClient, ipaddr.toString(), _port, _uri, _useHttps)) {
         logError("HTTP client begin() failed for %s://%s",
                 (_useHttps ? "https" : "http"), _host.c_str());
