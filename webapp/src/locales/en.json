@@ -881,6 +881,8 @@
     },
     "battery": {
         "battery": "Battery",
+        "FwVersion": "Firmware Version",
+        "HwVersion": "Hardware Version",
         "DataAge": "Data Age: ",
         "Seconds": " {val} seconds",
         "status": "Status",

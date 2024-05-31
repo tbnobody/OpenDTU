@@ -158,18 +158,25 @@ uint32_t veStruct::getFwVersionAsInteger() const
 String veStruct::getFwVersionFormatted() const
 {
 	char const* strVersion = firmwareVer_FW;
+	char rc = 0;
 
 	// VE.Direct protocol manual states that the first char can be a non-digit,
 	// in which case that char represents a release candidate version
-	if (strVersion[0] < '0' || strVersion[0] > '9') { ++strVersion; }
+	if (strVersion[0] < '0' || strVersion[0] > '9') {
+		rc = strVersion[0];
+		++strVersion;
+	}
+
+	// SmartShunt firmware version is transmitted with leading zero(es)
+	while (strVersion[0] == '0') { ++strVersion; }
 
 	String res(strVersion[0]);
 	res += ".";
 	res += strVersion + 1;
 
-	if (strVersion > firmwareVer_FW) {
+	if (rc != 0) {
 		res += "-rc-";
-		res += firmwareVer_FW[0];
+		res += rc;
 	}
 
 	return res;
