@@ -1,6 +1,9 @@
 # OpenDTU-DUO-Fusion
 
 This is a fork from the Hoymiles project [OpenDTU](https://github.com/tbnobody/OpenDTU).
+# OpenDTU-DUO-Fusion
+
+This is a fork from the Hoymiles project [OpenDTU](https://github.com/tbnobody/OpenDTU).
 
 [![OpenDTU Build](https://github.com/funghi999/OpenDTU-DUO-Fusion/actions/workflows/build.yml/badge.svg)](https://github.com/funghi999/OpenDTU-DUO-Fusion/actions/workflows/build.yml)
 [![cpplint](https://github.com/funghi999/OpenDTU-DUO-Fusion/actions/workflows/cpplint.yml/badge.svg)](https://github.com/funghi999/OpenDTU-DUO-Fusion/actions/workflows/cpplint.yml)
@@ -8,6 +11,18 @@ This is a fork from the Hoymiles project [OpenDTU](https://github.com/tbnobody/O
 
 ## Documentation
 
+The origin documentation of openDTU can be found [here](https://tbnobody.github.io/OpenDTU-docs/).
+
+### Ducumentation for openDTU-DUO-Fusion
+
+* Will comming soon!
+
+## Highlights of OpenDTU-DUO-Fusion
+
+This project is still under development and adds following features:
+
+* Supports the specially designed circuit board and pre-configures the connected components (CMT2300a, NRF24l01+, display, etc.).
+* Disable the power-save mode for displays
 The origin documentation of openDTU can be found [here](https://tbnobody.github.io/OpenDTU-docs/).
 
 ### Ducumentation for openDTU-DUO-Fusion
@@ -61,6 +76,11 @@ This project is still under development and adds following features:
 | E-Star HERF-800      | NRF24L01+          | 2         | 2           | 1         |
 | E-Star HERF-1600     | NRF24L01+          | 4         | 2           | 1         |
 | E-Star HERF-1800     | NRF24L01+          | 4         | 2           | 1         |
+
+
+## Outline
+
+A very special thank you to Thomas Basler (tbnobody), the author of the original [OpenDTU](https://github.com/tbnobody/OpenDTU)  project. You are doing an excellent job!
 
 
 ## Outline
