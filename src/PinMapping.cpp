@@ -100,6 +100,14 @@
 #define VICTRON_PIN_RX2 -1
 #endif
 
+#ifndef VICTRON_PIN_TX3
+#define VICTRON_PIN_TX3 -1
+#endif
+
+#ifndef VICTRON_PIN_RX3
+#define VICTRON_PIN_RX3 -1
+#endif
+
 #ifndef BATTERY_PIN_RX
 #define BATTERY_PIN_RX -1
 #endif
@@ -207,8 +215,11 @@ PinMappingClass::PinMappingClass()
     _pinMapping.victron_rx = VICTRON_PIN_RX;
     _pinMapping.victron_tx = VICTRON_PIN_TX;
 
-    _pinMapping.victron_rx2 = VICTRON_PIN_RX;
-    _pinMapping.victron_tx2 = VICTRON_PIN_TX;
+    _pinMapping.victron_rx2 = VICTRON_PIN_RX2;
+    _pinMapping.victron_tx2 = VICTRON_PIN_TX2;
+
+    _pinMapping.victron_rx3 = VICTRON_PIN_RX3;
+    _pinMapping.victron_tx3 = VICTRON_PIN_TX3;
 
     _pinMapping.battery_rx = BATTERY_PIN_RX;
     _pinMapping.battery_rxen = BATTERY_PIN_RXEN;
@@ -292,6 +303,8 @@ bool PinMappingClass::init(const String& deviceMapping)
             _pinMapping.victron_tx = doc[i]["victron"]["tx"] | VICTRON_PIN_TX;
             _pinMapping.victron_rx2 = doc[i]["victron"]["rx2"] | VICTRON_PIN_RX2;
             _pinMapping.victron_tx2 = doc[i]["victron"]["tx2"] | VICTRON_PIN_TX2;
+            _pinMapping.victron_rx3 = doc[i]["victron"]["rx3"] | VICTRON_PIN_RX3;
+            _pinMapping.victron_tx3 = doc[i]["victron"]["tx3"] | VICTRON_PIN_TX3;
 
             _pinMapping.battery_rx = doc[i]["battery"]["rx"] | BATTERY_PIN_RX;
             _pinMapping.battery_rxen = doc[i]["battery"]["rxen"] | BATTERY_PIN_RXEN;

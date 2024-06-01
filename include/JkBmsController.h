@@ -11,6 +11,8 @@ class DataPointContainer;
 
 namespace JkBms {
 
+uint8_t constexpr HwSerialPort = ((ARDUINO_USB_CDC_ON_BOOT != 1)?2:0);
+
 class Controller : public BatteryProvider {
     public:
         Controller() = default;
@@ -19,9 +21,7 @@ class Controller : public BatteryProvider {
         void deinit() final;
         void loop() final;
         std::shared_ptr<BatteryStats> getStats() const final { return _stats; }
-        bool usesHwPort2() const final {
-            return ARDUINO_USB_CDC_ON_BOOT != 1;
-        }
+        int usedHwUart() const final { return HwSerialPort; }
 
     private:
         enum class Status : unsigned {

@@ -29,29 +29,32 @@ void VictronMpptClass::updateSettings()
 
     const PinMapping_t& pin = PinMapping.get();
 
-    int hwSerialPort = 1;
-    bool initSuccess = initController(pin.victron_rx, pin.victron_tx, config.Vedirect.VerboseLogging, hwSerialPort);
-    if (initSuccess) {
-        hwSerialPort++;
-    }
+    // HW UART 1 has always been the designated UART to connect a Victron MPPT
+    if (!initController(pin.victron_rx, pin.victron_tx,
+            config.Vedirect.VerboseLogging, 1, 1)) { return; }
 
-    initController(pin.victron_rx2, pin.victron_tx2, config.Vedirect.VerboseLogging, hwSerialPort);
+    // HW UART 2 conflicts with the SDM power meter and the battery interface
+    if (!initController(pin.victron_rx2, pin.victron_tx2,
+            config.Vedirect.VerboseLogging, 2, 2)) { return; }
+
+    // HW UART 0 is only available on ESP32-S3 with logging over USB CDC, and
+    // furthermore still conflicts with the battery interface in that case
+    initController(pin.victron_rx3, pin.victron_tx3,
+            config.Vedirect.VerboseLogging, 3, 0);
 }
 
-bool VictronMpptClass::initController(int8_t rx, int8_t tx, bool logging, int hwSerialPort)
+bool VictronMpptClass::initController(int8_t rx, int8_t tx, bool logging,
+        uint8_t instance, uint8_t hwSerialPort)
 {
-    MessageOutput.printf("[VictronMppt] rx = %d, tx = %d, hwSerialPort = %d\r\n", rx, tx, hwSerialPort);
+    MessageOutput.printf("[VictronMppt Instance %d] rx = %d, tx = %d, "
+            "hwSerialPort = %d\r\n", instance, rx, tx, hwSerialPort);
 
     if (rx < 0) {
-        MessageOutput.printf("[VictronMppt] invalid pin config rx = %d, tx = %d\r\n", rx, tx);
+        MessageOutput.printf("[VictronMppt Instance %d] invalid pin config\r\n", instance);
         return false;
     }
 
-    if (!SerialPortManager.allocateMpptPort(hwSerialPort)) {
-        MessageOutput.printf("[VictronMppt] Serial port %d already in use. Initialization aborted!\r\n",
-                             hwSerialPort);
-        return false;
-    }
+    if (!SerialPortManager.allocateMpptPort(hwSerialPort)) { return false; }
 
     auto upController = std::make_unique<VeDirectMpptController>();
     upController->init(rx, tx, &MessageOutput, logging, hwSerialPort);

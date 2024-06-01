@@ -7,6 +7,8 @@
 #include "JkBmsController.h"
 #include <frozen/map.h>
 
+namespace JkBms {
+
 //#define JKBMS_DUMMY_SERIAL
 
 #ifdef JKBMS_DUMMY_SERIAL
@@ -198,10 +200,8 @@ class DummySerial {
 };
 DummySerial HwSerial;
 #else
-HardwareSerial HwSerial((ARDUINO_USB_CDC_ON_BOOT != 1)?2:0);
+HardwareSerial HwSerial(HwSerialPort);
 #endif
-
-namespace JkBms {
 
 bool Controller::init(bool verboseLogging)
 {

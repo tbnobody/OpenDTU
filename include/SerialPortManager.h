@@ -5,14 +5,16 @@
 
 class SerialPortManagerClass {
 public:
-    bool allocateMpptPort(int port);
-    bool allocateBatteryPort(int port);
+    void init();
+    bool allocateMpptPort(uint8_t port);
+    bool allocateBatteryPort(uint8_t port);
     void invalidateBatteryPort();
     void invalidateMpptPorts();
 
 private:
-    enum Owner {
-        BATTERY,
+    enum class Owner {
+        Console,
+        Battery,
         MPPT
     };
 

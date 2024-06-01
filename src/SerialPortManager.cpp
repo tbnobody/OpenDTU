@@ -6,12 +6,19 @@
 
 SerialPortManagerClass SerialPortManager;
 
-bool SerialPortManagerClass::allocateBatteryPort(int port)
+void SerialPortManagerClass::init()
 {
-    return allocatePort(port, Owner::BATTERY);
+    if (ARDUINO_USB_CDC_ON_BOOT != 1) {
+        allocatePort(0, Owner::Console);
+    }
 }
 
-bool SerialPortManagerClass::allocateMpptPort(int port)
+bool SerialPortManagerClass::allocateBatteryPort(uint8_t port)
+{
+    return allocatePort(port, Owner::Battery);
+}
+
+bool SerialPortManagerClass::allocateMpptPort(uint8_t port)
 {
     return allocatePort(port, Owner::MPPT);
 }
@@ -19,16 +26,27 @@ bool SerialPortManagerClass::allocateMpptPort(int port)
 bool SerialPortManagerClass::allocatePort(uint8_t port, Owner owner)
 {
     if (port >= MAX_CONTROLLERS) {
-        MessageOutput.printf("[SerialPortManager] Invalid serial port = %d \r\n", port);
+        MessageOutput.printf("[SerialPortManager] Invalid serial port: %d\r\n", port);
         return false;
     }
 
-    return allocatedPorts.insert({port, owner}).second;
+    auto res = allocatedPorts.insert({port, owner});
+
+    if (!res.second) {
+        MessageOutput.printf("[SerialPortManager] Cannot assign HW UART "
+                "port %d to %s: already in use by %s\r\n",
+                port, print(owner), print(res.first->second));
+        return false;
+    }
+
+    MessageOutput.printf("[SerialPortManager] HW UART port %d now in use "
+            "by %s\r\n", port, print(owner));
+    return true;
 }
 
 void SerialPortManagerClass::invalidateBatteryPort()
 {
-    invalidate(Owner::BATTERY);
+    invalidate(Owner::Battery);
 }
 
 void SerialPortManagerClass::invalidateMpptPorts()
@@ -51,10 +69,12 @@ void SerialPortManagerClass::invalidate(Owner owner)
 const char* SerialPortManagerClass::print(Owner owner)
 {
     switch (owner) {
-        case BATTERY:
-            return "BATTERY";
-        case MPPT:
-            return "MPPT";
+        case Owner::Console:
+            return "Serial Console";
+        case Owner::Battery:
+            return "Battery Interface";
+        case Owner::MPPT:
+            return "Victron MPPT";
     }
     return "unknown";
 }

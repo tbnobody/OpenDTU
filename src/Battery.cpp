@@ -60,16 +60,16 @@ void BatteryClass::updateSettings()
             _upProvider = std::make_unique<VictronSmartShunt>();
             break;
         default:
-            MessageOutput.printf("Unknown battery provider: %d\r\n", config.Battery.Provider);
+            MessageOutput.printf("[Battery] Unknown provider: %d\r\n", config.Battery.Provider);
             return;
     }
 
-    if(_upProvider->usesHwPort2()) {
-        if (!SerialPortManager.allocateBatteryPort(2)) {
-            MessageOutput.printf("[Battery] Serial port %d already in use. Initialization aborted!\r\n", 2);
-            _upProvider = nullptr;
-            return;
-        }
+    // port is -1 if provider is neither JK BMS nor SmartShunt. otherwise, port
+    // is 2, unless running on ESP32-S3 with USB CDC, then port is 0.
+    int port = _upProvider->usedHwUart();
+    if (port >= 0 && !SerialPortManager.allocateBatteryPort(port)) {
+        _upProvider = nullptr;
+        return;
     }
 
     if (!_upProvider->init(verboseLogging)) {

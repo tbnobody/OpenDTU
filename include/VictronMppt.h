@@ -55,7 +55,8 @@ private:
     using controller_t = std::unique_ptr<VeDirectMpptController>;
     std::vector<controller_t> _controllers;
 
-    bool initController(int8_t rx, int8_t tx, bool logging, int hwSerialPort);
+    bool initController(int8_t rx, int8_t tx, bool logging,
+        uint8_t instance, uint8_t hwSerialPort);
 };
 
 extern VictronMpptClass VictronMppt;

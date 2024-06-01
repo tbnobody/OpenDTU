@@ -91,6 +91,8 @@ void WebApiDeviceClass::onDeviceAdminGet(AsyncWebServerRequest* request)
     victronPinObj["tx"] = pin.victron_tx;
     victronPinObj["rx2"] = pin.victron_rx2;
     victronPinObj["tx2"] = pin.victron_tx2;
+    victronPinObj["rx3"] = pin.victron_rx3;
+    victronPinObj["tx3"] = pin.victron_tx3;
 
     auto batteryPinObj = curPin["battery"].to<JsonObject>();
     batteryPinObj["rx"] = pin.battery_rx;
