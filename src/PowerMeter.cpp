@@ -9,6 +9,7 @@
 #include "MqttSettings.h"
 #include "NetworkSettings.h"
 #include "MessageOutput.h"
+#include "SerialPortManager.h"
 #include <ctime>
 #include <SMA_HM.h>
 
@@ -57,16 +58,22 @@ void PowerMeterClass::init(Scheduler& scheduler)
     }
 
     case Source::SDM1PH:
-    case Source::SDM3PH:
+    case Source::SDM3PH: {
         if (pin.powermeter_rx < 0 || pin.powermeter_tx < 0) {
             MessageOutput.println("[PowerMeter] invalid pin config for SDM power meter (RX and TX pins must be defined)");
             return;
         }
 
-        _upSdm = std::make_unique<SDM>(Serial2, 9600, pin.powermeter_dere,
+        auto oHwSerialPort = SerialPortManager.allocatePort(_sdmSerialPortOwner);
+        if (!oHwSerialPort) { return; }
+
+        _upSdmSerial = std::make_unique<HardwareSerial>(*oHwSerialPort);
+        _upSdmSerial->end(); // make sure the UART will be re-initialized
+        _upSdm = std::make_unique<SDM>(*_upSdmSerial, 9600, pin.powermeter_dere,
                 SERIAL_8N1, pin.powermeter_rx, pin.powermeter_tx);
         _upSdm->begin();
         break;
+    }
 
     case Source::HTTP:
         HttpPowerMeter.init();

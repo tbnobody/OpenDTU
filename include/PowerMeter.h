@@ -60,6 +60,8 @@ private:
 
     mutable std::mutex _mutex;
 
+    static char constexpr _sdmSerialPortOwner[] = "SDM power meter";
+    std::unique_ptr<HardwareSerial> _upSdmSerial = nullptr;
     std::unique_ptr<SDM> _upSdm = nullptr;
     std::unique_ptr<SoftwareSerial> _upSmlSerial = nullptr;
 
