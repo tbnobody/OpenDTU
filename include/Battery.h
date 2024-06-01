@@ -14,7 +14,6 @@ public:
     virtual void deinit() = 0;
     virtual void loop() = 0;
     virtual std::shared_ptr<BatteryStats> getStats() const = 0;
-    virtual int usedHwUart() const { return -1; } // -1 => no HW UART used
 };
 
 class BatteryClass {

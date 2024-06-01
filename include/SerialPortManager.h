@@ -1,29 +1,21 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 #pragma once
 
-#include <map>
+#include <array>
+#include <optional>
+#include <string>
 
 class SerialPortManagerClass {
 public:
     void init();
-    bool allocateMpptPort(uint8_t port);
-    bool allocateBatteryPort(uint8_t port);
-    void invalidateBatteryPort();
-    void invalidateMpptPorts();
+
+    std::optional<uint8_t> allocatePort(std::string const& owner);
+    void freePort(std::string const& owner);
 
 private:
-    enum class Owner {
-        Console,
-        Battery,
-        MPPT
-    };
-
-    std::map<uint8_t, Owner> allocatedPorts;
-
-    bool allocatePort(uint8_t port, Owner owner);
-    void invalidate(Owner owner);
-
-    static const char* print(Owner owner);
+    // the amount of hardare UARTs available on supported ESP32 chips
+    static size_t constexpr _num_controllers = 3;
+    std::array<std::string, _num_controllers> _ports = { "" };
 };
 
 extern SerialPortManagerClass SerialPortManager;

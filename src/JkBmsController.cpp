@@ -5,11 +5,10 @@
 #include "MessageOutput.h"
 #include "JkBmsDataPoints.h"
 #include "JkBmsController.h"
+#include "SerialPortManager.h"
 #include <frozen/map.h>
 
 namespace JkBms {
-
-//#define JKBMS_DUMMY_SERIAL
 
 #ifdef JKBMS_DUMMY_SERIAL
 class DummySerial {
@@ -198,9 +197,6 @@ class DummySerial {
         size_t _msg_idx = 0;
         size_t _byte_idx = 0;
 };
-DummySerial HwSerial;
-#else
-HardwareSerial HwSerial(HwSerialPort);
 #endif
 
 bool Controller::init(bool verboseLogging)
@@ -220,9 +216,18 @@ bool Controller::init(bool verboseLogging)
         return false;
     }
 
-    HwSerial.end(); // make sure the UART will be re-initialized
-    HwSerial.begin(115200, SERIAL_8N1, pin.battery_rx, pin.battery_tx);
-    HwSerial.flush();
+#ifdef JKBMS_DUMMY_SERIAL
+    _upSerial = std::make_unique<DummySerial>();
+#else
+    auto oHwSerialPort = SerialPortManager.allocatePort(_serialPortOwner);
+    if (!oHwSerialPort) { return false; }
+
+    _upSerial = std::make_unique<HardwareSerial>(*oHwSerialPort);
+#endif
+
+    _upSerial->end(); // make sure the UART will be re-initialized
+    _upSerial->begin(115200, SERIAL_8N1, pin.battery_rx, pin.battery_tx);
+    _upSerial->flush();
 
     if (Interface::Transceiver != getInterface()) { return true; }
 
@@ -242,10 +247,12 @@ bool Controller::init(bool verboseLogging)
 
 void Controller::deinit()
 {
-    HwSerial.end();
+    _upSerial->end();
 
     if (_rxEnablePin > 0) { pinMode(_rxEnablePin, INPUT); }
     if (_txEnablePin > 0) { pinMode(_txEnablePin, INPUT); }
+
+    SerialPortManager.freePort(_serialPortOwner);
 }
 
 Controller::Interface Controller::getInterface() const
@@ -296,7 +303,7 @@ void Controller::sendRequest(uint8_t pollInterval)
         return announceStatus(Status::WaitingForPollInterval);
     }
 
-    if (!HwSerial.availableForWrite()) {
+    if (!_upSerial->availableForWrite()) {
         return announceStatus(Status::HwSerialNotAvailableForWrite);
     }
 
@@ -307,10 +314,10 @@ void Controller::sendRequest(uint8_t pollInterval)
         digitalWrite(_txEnablePin, HIGH); // enable transmission
     }
 
-    HwSerial.write(readAll.data(), readAll.size());
+    _upSerial->write(readAll.data(), readAll.size());
 
     if (Interface::Transceiver == getInterface()) {
-        HwSerial.flush();
+        _upSerial->flush();
         digitalWrite(_rxEnablePin, LOW); // enable reception
         digitalWrite(_txEnablePin, LOW); // disable transmission (free the bus)
     }
@@ -326,8 +333,8 @@ void Controller::loop()
     CONFIG_T& config = Configuration.get();
     uint8_t pollInterval = config.Battery.JkBmsPollingInterval;
 
-    while (HwSerial.available()) {
-        rxData(HwSerial.read());
+    while (_upSerial->available()) {
+        rxData(_upSerial->read());
     }
 
     sendRequest(pollInterval);

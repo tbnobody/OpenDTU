@@ -7,11 +7,11 @@
 #include "Battery.h"
 #include "JkBmsSerialMessage.h"
 
+//#define JKBMS_DUMMY_SERIAL
+
 class DataPointContainer;
 
 namespace JkBms {
-
-uint8_t constexpr HwSerialPort = ((ARDUINO_USB_CDC_ON_BOOT != 1)?2:0);
 
 class Controller : public BatteryProvider {
     public:
@@ -21,9 +21,16 @@ class Controller : public BatteryProvider {
         void deinit() final;
         void loop() final;
         std::shared_ptr<BatteryStats> getStats() const final { return _stats; }
-        int usedHwUart() const final { return HwSerialPort; }
 
     private:
+        static char constexpr _serialPortOwner[] = "JK BMS";
+
+#ifdef JKBMS_DUMMY_SERIAL
+        std::unique_ptr<DummySerial> _upSerial;
+#else
+        std::unique_ptr<HardwareSerial> _upSerial;
+#endif
+
         enum class Status : unsigned {
             Initializing,
             Timeout,

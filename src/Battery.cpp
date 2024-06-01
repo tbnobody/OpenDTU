@@ -5,7 +5,6 @@
 #include "JkBmsController.h"
 #include "VictronSmartShunt.h"
 #include "MqttBattery.h"
-#include "SerialPortManager.h"
 
 BatteryClass Battery;
 
@@ -39,7 +38,6 @@ void BatteryClass::updateSettings()
         _upProvider->deinit();
         _upProvider = nullptr;
     }
-    SerialPortManager.invalidateBatteryPort();
 
     CONFIG_T& config = Configuration.get();
     if (!config.Battery.Enabled) { return; }
@@ -64,18 +62,7 @@ void BatteryClass::updateSettings()
             return;
     }
 
-    // port is -1 if provider is neither JK BMS nor SmartShunt. otherwise, port
-    // is 2, unless running on ESP32-S3 with USB CDC, then port is 0.
-    int port = _upProvider->usedHwUart();
-    if (port >= 0 && !SerialPortManager.allocateBatteryPort(port)) {
-        _upProvider = nullptr;
-        return;
-    }
-
-    if (!_upProvider->init(verboseLogging)) {
-        SerialPortManager.invalidateBatteryPort();
-        _upProvider = nullptr;
-    }
+    if (!_upProvider->init(verboseLogging)) { _upProvider = nullptr; }
 }
 
 void BatteryClass::loop()

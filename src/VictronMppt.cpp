@@ -22,42 +22,46 @@ void VictronMpptClass::updateSettings()
     std::lock_guard<std::mutex> lock(_mutex);
 
     _controllers.clear();
-    SerialPortManager.invalidateMpptPorts();
+    for (auto const& o: _serialPortOwners) {
+        SerialPortManager.freePort(o.c_str());
+    }
+    _serialPortOwners.clear();
 
     CONFIG_T& config = Configuration.get();
     if (!config.Vedirect.Enabled) { return; }
 
     const PinMapping_t& pin = PinMapping.get();
 
-    // HW UART 1 has always been the designated UART to connect a Victron MPPT
-    if (!initController(pin.victron_rx, pin.victron_tx,
-            config.Vedirect.VerboseLogging, 1, 1)) { return; }
+    initController(pin.victron_rx, pin.victron_tx,
+            config.Vedirect.VerboseLogging, 1);
 
-    // HW UART 2 conflicts with the SDM power meter and the battery interface
-    if (!initController(pin.victron_rx2, pin.victron_tx2,
-            config.Vedirect.VerboseLogging, 2, 2)) { return; }
+    initController(pin.victron_rx2, pin.victron_tx2,
+            config.Vedirect.VerboseLogging, 2);
 
-    // HW UART 0 is only available on ESP32-S3 with logging over USB CDC, and
-    // furthermore still conflicts with the battery interface in that case
     initController(pin.victron_rx3, pin.victron_tx3,
-            config.Vedirect.VerboseLogging, 3, 0);
+            config.Vedirect.VerboseLogging, 3);
 }
 
 bool VictronMpptClass::initController(int8_t rx, int8_t tx, bool logging,
-        uint8_t instance, uint8_t hwSerialPort)
+        uint8_t instance)
 {
-    MessageOutput.printf("[VictronMppt Instance %d] rx = %d, tx = %d, "
-            "hwSerialPort = %d\r\n", instance, rx, tx, hwSerialPort);
+    MessageOutput.printf("[VictronMppt Instance %d] rx = %d, tx = %d\r\n",
+            instance, rx, tx);
 
     if (rx < 0) {
         MessageOutput.printf("[VictronMppt Instance %d] invalid pin config\r\n", instance);
         return false;
     }
 
-    if (!SerialPortManager.allocateMpptPort(hwSerialPort)) { return false; }
+    String owner("Victron MPPT ");
+    owner += String(instance);
+    auto oHwSerialPort = SerialPortManager.allocatePort(owner.c_str());
+    if (!oHwSerialPort) { return false; }
+
+    _serialPortOwners.push_back(owner);
 
     auto upController = std::make_unique<VeDirectMpptController>();
-    upController->init(rx, tx, &MessageOutput, logging, hwSerialPort);
+    upController->init(rx, tx, &MessageOutput, logging, *oHwSerialPort);
     _controllers.push_back(std::move(upController));
     return true;
 }

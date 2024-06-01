@@ -2,79 +2,46 @@
 #include "SerialPortManager.h"
 #include "MessageOutput.h"
 
-#define MAX_CONTROLLERS 3
-
 SerialPortManagerClass SerialPortManager;
 
 void SerialPortManagerClass::init()
 {
     if (ARDUINO_USB_CDC_ON_BOOT != 1) {
-        allocatePort(0, Owner::Console);
+        _ports[0] = "Serial Console";
+        MessageOutput.println("[SerialPortManager] HW UART port 0 now in use "
+                "by 'Serial Console'");
     }
 }
 
-bool SerialPortManagerClass::allocateBatteryPort(uint8_t port)
+std::optional<uint8_t> SerialPortManagerClass::allocatePort(std::string const& owner)
 {
-    return allocatePort(port, Owner::Battery);
-}
-
-bool SerialPortManagerClass::allocateMpptPort(uint8_t port)
-{
-    return allocatePort(port, Owner::MPPT);
-}
-
-bool SerialPortManagerClass::allocatePort(uint8_t port, Owner owner)
-{
-    if (port >= MAX_CONTROLLERS) {
-        MessageOutput.printf("[SerialPortManager] Invalid serial port: %d\r\n", port);
-        return false;
-    }
-
-    auto res = allocatedPorts.insert({port, owner});
-
-    if (!res.second) {
-        MessageOutput.printf("[SerialPortManager] Cannot assign HW UART "
-                "port %d to %s: already in use by %s\r\n",
-                port, print(owner), print(res.first->second));
-        return false;
-    }
-
-    MessageOutput.printf("[SerialPortManager] HW UART port %d now in use "
-            "by %s\r\n", port, print(owner));
-    return true;
-}
-
-void SerialPortManagerClass::invalidateBatteryPort()
-{
-    invalidate(Owner::Battery);
-}
-
-void SerialPortManagerClass::invalidateMpptPorts()
-{
-    invalidate(Owner::MPPT);
-}
-
-void SerialPortManagerClass::invalidate(Owner owner)
-{
-    for (auto it = allocatedPorts.begin(); it != allocatedPorts.end();) {
-        if (it->second == owner) {
-            MessageOutput.printf("[SerialPortManager] Removing port = %d, owner = %s \r\n", it->first, print(owner));
-            it = allocatedPorts.erase(it);
-        } else {
-            ++it;
+    for (size_t i = 0; i < _ports.size(); ++i) {
+        if (_ports[i] != "") {
+            MessageOutput.printf("[SerialPortManager] HW UART %d already "
+                    "in use by '%s'\r\n", i, _ports[i].c_str());
+            continue;
         }
+
+        _ports[i] = owner;
+
+        MessageOutput.printf("[SerialPortManager] HW UART %d now in use "
+                "by '%s'\r\n", i, owner.c_str());
+
+        return i;
     }
+
+    MessageOutput.printf("[SerialPortManager] Cannot assign another HW "
+            "UART port to '%s'\r\n", owner.c_str());
+    return std::nullopt;
 }
 
-const char* SerialPortManagerClass::print(Owner owner)
+void SerialPortManagerClass::freePort(std::string const& owner)
 {
-    switch (owner) {
-        case Owner::Console:
-            return "Serial Console";
-        case Owner::Battery:
-            return "Battery Interface";
-        case Owner::MPPT:
-            return "Victron MPPT";
+    for (size_t i = 0; i < _ports.size(); ++i) {
+        if (_ports[i] != owner) { continue; }
+
+        MessageOutput.printf("[SerialPortManager] Freeing HW UART %d, owner "
+                "was '%s'\r\n", i, owner.c_str());
+        _ports[i] = "";
     }
-    return "unknown";
 }
