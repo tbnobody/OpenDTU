@@ -99,7 +99,7 @@ constexpr frozen::map<uint8_t, GridProfileItemDefinition_t, 0x42> itemDefinition
     { 0x1f, make_value("Start of Frequency Watt Droop (Fstart)", "Hz", 100) },
     { 0x20, make_value("FW Droop Slope (Kpower_Freq)", "Pn%/Hz", 10) },
     { 0x21, make_value("Recovery Ramp Rate (RRR)", "Pn%/s", 100) },
-    { 0x22, make_value("Recovery High Frequency (RVHF)", "Hz", 100) },
+    { 0x22, make_value("Recovery High Frequency (RVHF)", "Hz", 10) },
     { 0x23, make_value("Recovery Low Frequency (RVLF)", "Hz", 100) },
     { 0x24, make_value("VW Function Activated", "bool", 1) },
     { 0x25, make_value("Start of Voltage Watt Droop (Vstart)", "V", 10) },
