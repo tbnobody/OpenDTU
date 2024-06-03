@@ -152,10 +152,10 @@
         "LoadingInverter": "Waiting for data... (can take up to 10 seconds)"
     },
     "vedirecthome": {
-        "SerialNumber": "Serial Number: ",
-        "FirmwareNumber": "Firmware Number: ",
-        "DataAge": "Data Age: ",
-        "Seconds": "{val} seconds",
+        "SerialNumber": "Numéro de série",
+        "FirmwareVersion": "Version du Firmware",
+        "DataAge": "Âge des données",
+        "Seconds": "{val} secondes",
         "Property": "Property",
         "Value": "Value",
         "Unit": "Unit",
@@ -285,7 +285,10 @@
         "ChipRevision": "Révision de la puce",
         "ChipCores": "Nombre de cœurs",
         "CpuFrequency": "Fréquence du CPU",
-        "Mhz": "MHz"
+        "Mhz": "MHz",
+        "FlashSize": "Taille de la mémoire flash",
+        "Bytes": "octets",
+        "MegaBytes": "Mo"
     },
     "memoryinfo": {
         "MemoryInformation": "Informations sur la mémoire",
@@ -714,6 +717,7 @@
       "VoltageLoadCorrectionFactor": "Load correction factor",
       "BatterySocInfo": "<b>Hint:</b> The battery SoC (State of Charge) values are only used if the battery communication interface reported SoC updates in the last minute. Otherwise the voltage thresholds will be used as fallback.",
       "InverterIsBehindPowerMeter": "PowerMeter reading includes inverter output",
+      "InverterIsBehindPowerMeterHint": "Enable this option if the power meter reading is reduced by the inverter's output when it produces power. This is typically true.",
       "InverterIsSolarPowered": "Inverter is powered by solar modules",
       "VoltageThresholds": "Battery Voltage Thresholds",
       "VoltageLoadCorrectionInfo": "<b>Hint:</b> When the battery is discharged, its voltage drops. The voltage drop scales with the discharge current. In order to not stop the inverter too early (stop threshold), this load correction factor can be specified to calculate the battery voltage if it was idle. Corrected voltage = DC Voltage + (Current power * correction factor)."
@@ -862,6 +866,8 @@
     },
     "battery": {
         "battery": "Battery",
+        "FwVersion": "Firmware Version",
+        "HwVersion": "Hardware Version",
         "DataAge": "Data Age: ",
         "Seconds": " {val} seconds",
         "status": "Status",
@@ -930,6 +936,8 @@
         "dischargedEnergy": "Discharged energy",
         "instantaneousPower": "Instantaneous Power",
         "consumedAmpHours": "Consumed Amp Hours",
+        "midpointVoltage": "Midpoint Voltage",
+        "midpointDeviation": "Midpoint Deviation",
         "lastFullCharge": "Last full Charge"
     }
 }

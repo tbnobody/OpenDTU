@@ -18,6 +18,12 @@
                 <div style="padding-right: 2em;">
                   {{ $t('battery.battery') }}: {{ batteryData.manufacturer }}
                 </div>
+                <div style="padding-right: 2em;" v-if="'fwversion' in batteryData">
+                  {{ $t('battery.FwVersion') }}: {{ batteryData.fwversion }}
+                </div>
+                <div style="padding-right: 2em;" v-if="'hwversion' in batteryData">
+                  {{ $t('battery.HwVersion') }}: {{ batteryData.hwversion }}
+                </div>
                 <div style="padding-right: 2em;">
                   {{ $t('battery.DataAge') }} {{ $t('battery.Seconds', { 'val': batteryData.data_age }) }}
                 </div>

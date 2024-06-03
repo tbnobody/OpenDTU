@@ -2,6 +2,7 @@
 
 #include <frozen/string.h>
 #include <frozen/map.h>
+#include <Arduino.h>
 
 #define VE_MAX_VALUE_LEN 33 // VE.Direct Protocol: max value size is 33 including /0
 #define VE_MAX_HEX_LEN 100 // Maximum size of hex frame - max payload 34 byte (=68 char) + safe buffer
@@ -9,12 +10,14 @@
 typedef struct {
     uint16_t productID_PID = 0;             // product id
     char serialNr_SER[VE_MAX_VALUE_LEN];    // serial number
-    char firmwareNr_FW[VE_MAX_VALUE_LEN];   // firmware release number
+    char firmwareVer_FW[VE_MAX_VALUE_LEN];  // firmware release number
     uint32_t batteryVoltage_V_mV = 0;       // battery voltage in mV
     int32_t batteryCurrent_I_mA = 0;        // battery current in mA (can be negative)
     float mpptEfficiency_Percent = 0;       // efficiency in percent (calculated, moving average)
 
     frozen::string const& getPidAsString() const; // product ID as string
+    uint32_t getFwVersionAsInteger() const;
+    String getFwVersionFormatted() const;
 } veStruct;
 
 struct veMpptStruct : veStruct {
@@ -79,6 +82,8 @@ struct veShuntStruct : veStruct {
     int32_t H16;                    // Maximum auxiliary (battery) voltage
     int32_t H17;                    // Amount of discharged energy
     int32_t H18;                    // Amount of charged energy
+    int32_t VM;                     // Mid-point voltage of the battery bank
+    int32_t DM;                     // Mid-point deviation of the battery bank
     int8_t dcMonitorMode_MON;       // DC monitor mode
 };
 

@@ -112,7 +112,7 @@
                             <div class="input-group">
                                 <input type="number" class="form-control" id="stopBatterySoCThreshold"
                                     placeholder="95" v-model="acChargerConfigList.stop_batterysoc_threshold"
-                                    aria-describedby="stopBatterySoCThresholdDescription" min="2" max="100" required/>
+                                    aria-describedby="stopBatterySoCThresholdDescription" min="2" max="99" required/>
                                     <span class="input-group-text" id="stopBatterySoCThresholdDescription">%</span>
                             </div>
                         </div>

@@ -62,6 +62,12 @@ bool BatteryStats::updateAvailable(uint32_t since) const
 void BatteryStats::getLiveViewData(JsonVariant& root) const
 {
     root["manufacturer"] = _manufacturer;
+    if (!_fwversion.isEmpty()) {
+        root["fwversion"] = _fwversion;
+    }
+    if (!_hwversion.isEmpty()) {
+        root["hwversion"] = _hwversion;
+    }
     root["data_age"] = getAgeSeconds();
 
     addLiveViewValue(root, "SoC", _soc, "%", _socPrecision);
@@ -375,22 +381,42 @@ void JkBmsBatteryStats::updateFrom(JkBms::DataPointContainer const& dp)
         _cellVoltageTimestamp = millis();
     }
 
+    auto oVersion = _dataPoints.get<Label::BmsSoftwareVersion>();
+    if (oVersion.has_value()) {
+        // raw: "11.XW_S11.262H_"
+        //   => Hardware "V11.XW" (displayed in Android app)
+        //   => Software "V11.262H" (displayed in Android app)
+        auto first = oVersion->find('_');
+        if (first != std::string::npos) {
+            _hwversion = oVersion->substr(0, first).c_str();
+
+            auto second = oVersion->find('_', first + 1);
+
+            // the 'S' seems to be merely an indicator for "software"?
+            if (oVersion->at(first + 1) == 'S') { first++; }
+
+            _fwversion = oVersion->substr(first + 1, second - first - 1).c_str();
+        }
+    }
+
     _lastUpdate = millis();
 }
 
 void VictronSmartShuntStats::updateFrom(VeDirectShuntController::data_t const& shuntData) {
     BatteryStats::setVoltage(shuntData.batteryVoltage_V_mV / 1000.0, millis());
     BatteryStats::setSoC(static_cast<float>(shuntData.SOC) / 10, 1/*precision*/, millis());
+    _fwversion = shuntData.getFwVersionFormatted();
 
     _current = static_cast<float>(shuntData.batteryCurrent_I_mA) / 1000;
-    _modelName = shuntData.getPidAsString().data();
     _chargeCycles = shuntData.H4;
     _timeToGo = shuntData.TTG / 60;
     _chargedEnergy = static_cast<float>(shuntData.H18) / 100;
     _dischargedEnergy = static_cast<float>(shuntData.H17) / 100;
-    _manufacturer = "Victron " + _modelName;
+    _manufacturer = String("Victron ") + shuntData.getPidAsString().data();
     _temperature = shuntData.T;
     _tempPresent = shuntData.tempPresent;
+    _midpointVoltage = static_cast<float>(shuntData.VM) / 1000;
+    _midpointDeviation = static_cast<float>(shuntData.DM) / 10;
     _instantaneousPower = shuntData.P;
     _consumedAmpHours = static_cast<float>(shuntData.CE) / 1000;
     _lastFullCharge = shuntData.H9 / 60;
@@ -414,6 +440,8 @@ void VictronSmartShuntStats::getLiveViewData(JsonVariant& root) const {
     addLiveViewValue(root, "dischargedEnergy", _dischargedEnergy, "kWh", 2);
     addLiveViewValue(root, "instantaneousPower", _instantaneousPower, "W", 0);
     addLiveViewValue(root, "consumedAmpHours", _consumedAmpHours, "Ah", 3);
+    addLiveViewValue(root, "midpointVoltage", _midpointVoltage, "V", 2);
+    addLiveViewValue(root, "midpointDeviation", _midpointDeviation, "%", 1);
     addLiveViewValue(root, "lastFullCharge", _lastFullCharge, "min", 0);
     if (_tempPresent) {
         addLiveViewValue(root, "temperature", _temperature, "°C", 0);
@@ -436,4 +464,6 @@ void VictronSmartShuntStats::mqttPublish() const {
     MqttSettings.publish("battery/instantaneousPower", String(_instantaneousPower));
     MqttSettings.publish("battery/consumedAmpHours", String(_consumedAmpHours));
     MqttSettings.publish("battery/lastFullCharge", String(_lastFullCharge));
+    MqttSettings.publish("battery/midpointVoltage", String(_midpointVoltage));
+    MqttSettings.publish("battery/midpointDeviation", String(_midpointDeviation));
 }

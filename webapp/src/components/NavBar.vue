@@ -9,7 +9,7 @@
                 <BIconSun v-else width="30" height="30" class="d-inline-block align-text-top text-warning" />
 
                 <span style="margin-left: .5rem">
-                    OpenDTU-onBattery
+                    OpenDTU-OnBattery
                 </span>
                 <span class="text-info">
                     <BIconBatteryCharging width="20" height="20" class="d-inline-block align-text-center" />

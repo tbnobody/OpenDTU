@@ -106,7 +106,7 @@
                     </CardElement>
 
                     <div class="alert alert-secondary mt-5" role="alert">
-                        <h2>URL examples:</h2>
+                        <h2>{{ $t('powermeteradmin.urlExamplesHeading') }}:</h2>
                         <ul>
                             <li>http://admin:secret@shelly3em.home/status</li>
                             <li>https://admin:secret@shelly3em.home/status</li>
@@ -114,10 +114,12 @@
                             <li>http://12.34.56.78/emeter/0</li>
                         </ul>
 
-                        <h2>JSON path examples:</h2>
+                        <h2>{{ $t('powermeteradmin.jsonPathExamplesHeading') }}:</h2>
+                        {{ $t('powermeteradmin.jsonPathExamplesExplanation') }}
                         <ul>
-                            <li><code>power/total/watts</code> - Finds 123.4 in <code>{ "power": { "phase1": { "factor": 0.98, "watts": 42 }, "total": { "watts": 123.4 } } }</code></li>
-                            <li><code>total</code> - Finds 123.4 in <code>{ "othervalue": 66, "total": 123.4 }</code></li>
+                            <li><code>power/total/watts</code> &mdash; <code>{ "power": { "phase1": { "factor": 0.98, "watts": 42 }, "total": { "watts": 123.4 } } }</code></li>
+                            <li><code>data/[1]/power</code> &mdash; <code>{ "data": [ { "factor": 0.98, "power": 42 }, { "factor": 1.0, "power": 123.4 } ] } }</code></li>
+                            <li><code>total</code> &mdash; <code>{ "othervalue": 66, "total": 123.4 }</code></li>
                         </ul>
                     </div>
 

@@ -12,9 +12,11 @@
 
 //#define PROCESS_NETWORK_STATE
 
-void VeDirectMpptController::init(int8_t rx, int8_t tx, Print* msgOut, bool verboseLogging, uint16_t hwSerialPort)
+void VeDirectMpptController::init(int8_t rx, int8_t tx, Print* msgOut,
+		bool verboseLogging, uint8_t hwSerialPort)
 {
-	VeDirectFrameHandler::init("MPPT", rx, tx, msgOut, verboseLogging, hwSerialPort);
+	VeDirectFrameHandler::init("MPPT", rx, tx, msgOut,
+			verboseLogging, hwSerialPort);
 }
 
 bool VeDirectMpptController::processTextDataDerived(std::string const& name, std::string const& value)
@@ -110,7 +112,7 @@ void VeDirectMpptController::frameValidEvent() {
 	// charger periodically sends human readable (TEXT) data to the serial port. For firmware
 	// versions v1.53 and above, the charger always periodically sends TEXT data to the serial port.
 	// --> We just use hex commandes for firmware >= 1.53 to keep text messages alive
-	if (atoi(_tmpFrame.firmwareNr_FW) < 153) { return; }
+	if (_tmpFrame.getFwVersionAsInteger() < 153) { return; }
 
 	using Command = VeDirectHexCommand;
 	using Register = VeDirectHexRegister;

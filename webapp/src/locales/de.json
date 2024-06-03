@@ -152,9 +152,9 @@
         "LoadingInverter": "Warte auf Daten... (kann bis zu 10 Sekunden dauern)"
     },
     "vedirecthome": {
-        "SerialNumber": "Seriennummer: ",
-        "FirmwareNumber": "Firmware Version: ",
-        "DataAge": "letzte Aktualisierung: ",
+        "SerialNumber": "Seriennummer",
+        "FirmwareVersion": "Firmware-Version",
+        "DataAge": "letzte Aktualisierung",
         "Seconds": "vor {val} Sekunden",
         "Property": "Eigenschaft",
         "Value": "Wert",
@@ -250,7 +250,10 @@
         "ChipRevision": "Chip-Revision",
         "ChipCores": "Chip-Kerne",
         "CpuFrequency": "CPU-Frequenz",
-        "Mhz": "MHz"
+        "Mhz": "MHz",
+        "FlashSize": "Flash-Speichergröße",
+        "Bytes": "Bytes",
+        "MegaBytes": "MB"
     },
     "memoryinfo": {
         "MemoryInformation": "Speicherinformationen",
@@ -569,7 +572,10 @@
         "sdmaddress": "Modbus Adresse",
         "HTTP": "HTTP(S) + JSON - Allgemeine Konfiguration",
         "httpIndividualRequests": "Individuelle HTTP requests pro Phase",
-        "httpUrlDescription": "Die URL muss mit http:// oder https:// beginnen. Manche Zeichen wie Leerzeichen und = müssen mit URL-Kodierung kodiert werden (%xx). Achtung: Ein Überprüfung von SSL Server Zertifikaten ist nicht implementiert (MITM-Attacken sind möglich)! Beispiele gibt es unten.",
+        "urlExamplesHeading": "Beispiele für URLs",
+        "jsonPathExamplesHeading": "Beispiele für JSON Pfade",
+        "jsonPathExamplesExplanation": "Die folgenden Pfade finden jeweils den Wert '123.4' im jeweiligen Beispiel-JSON.",
+        "httpUrlDescription": "Die URL muss mit http:// oder https:// beginnen. Manche Zeichen wie Leerzeichen und = müssen mit URL-Kodierung kodiert werden (%xx). Achtung: Ein Überprüfung von SSL Server Zertifikaten ist nicht implementiert (MITM-Attacken sind möglich)!.",
         "httpPhase": "HTTP(S) + JSON Konfiguration - Phase {phaseNumber}",
         "httpEnabled": "Phase aktiviert",
         "httpUrl": "URL",
@@ -628,7 +634,8 @@
         "VoltageSolarPassthroughStopThreshold": "Full-Solar-Passthrough Stop-Schwellwert",
         "VoltageLoadCorrectionFactor": "Lastkorrekturfaktor",
         "BatterySocInfo": "<b>Hinweis:</b> Die Akku SoC (State of Charge) Werte werden nur benutzt, wenn die Batterie-Kommunikationsschnittstelle innerhalb der letzten Minute gültige Werte geschickt hat. Andernfalls werden als Fallback-Option die Spannungseinstellungen verwendet.",
-        "InverterIsBehindPowerMeter": "Stromzählermessung beinhaltet Wechselrichterleistung",
+        "InverterIsBehindPowerMeter": "Stromzählermessung beinhaltet Wechselrichter",
+        "InverterIsBehindPowerMeterHint": "Aktivieren falls sich der Stromzähler-Messwert um die Ausgangsleistung des Wechselrichters verringert, wenn dieser Strom produziert. Normalerweise ist das zutreffend.",
         "InverterIsSolarPowered": "Wechselrichter wird von Solarmodulen gespeist",
         "VoltageThresholds": "Batterie Spannungs-Schwellwerte ",
         "VoltageLoadCorrectionInfo": "<b>Hinweis:</b> Wenn Leistung von der Batterie abgegeben wird, bricht ihre Spannung etwas ein. Der Spannungseinbruch skaliert mit dem Entladestrom. Damit nicht vorzeitig der Wechselrichter ausgeschaltet wird sobald der Stop-Schwellenwert unterschritten wurde, wird der hier angegebene Korrekturfaktor mit einberechnet um die Spannung zu errechnen die der Akku in Ruhe hätte. Korrigierte Spannung = DC Spannung + (Aktuelle Leistung (W) * Korrekturfaktor).",
@@ -867,6 +874,8 @@
     },
     "battery": {
         "battery": "Batterie",
+        "FwVersion": "Firmware-Version",
+        "HwVersion": "Hardware-Version",
         "DataAge": "letzte Aktualisierung: ",
         "Seconds": "vor {val} Sekunden",
         "status": "Status",
@@ -935,6 +944,8 @@
         "dischargedEnergy": "Entladene Energie",
         "instantaneousPower": "Aktuelle Leistung",
         "consumedAmpHours": "Verbrauchte Amperestunden",
+        "midpointVoltage": "Mittelpunktspannung",
+        "midpointDeviation": "Mittelpunktsabweichung",
         "lastFullCharge": "Letztes mal Vollgeladen"
     }
 }

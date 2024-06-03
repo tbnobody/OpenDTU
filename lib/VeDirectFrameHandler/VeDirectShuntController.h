@@ -8,7 +8,8 @@ class VeDirectShuntController : public VeDirectFrameHandler<veShuntStruct> {
 public:
     VeDirectShuntController() = default;
 
-    void init(int8_t rx, int8_t tx, Print* msgOut, bool verboseLogging);
+    void init(int8_t rx, int8_t tx, Print* msgOut,
+        bool verboseLogging, uint8_t hwSerialPort);
 
     using data_t = veShuntStruct;
 

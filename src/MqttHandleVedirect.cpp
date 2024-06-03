@@ -110,7 +110,7 @@ void MqttHandleVedirectClass::publish_mppt_data(const VeDirectMpptController::da
 
     PUBLISH(productID_PID,           "PID",  currentData.getPidAsString().data());
     PUBLISH(serialNr_SER,            "SER",  currentData.serialNr_SER);
-    PUBLISH(firmwareNr_FW,            "FW",  currentData.firmwareNr_FW);
+    PUBLISH(firmwareVer_FW,           "FW",  currentData.firmwareVer_FW);
     PUBLISH(loadOutputState_LOAD,   "LOAD",  (currentData.loadOutputState_LOAD ? "ON" : "OFF"));
     PUBLISH(currentState_CS,          "CS",  currentData.getCsAsString().data());
     PUBLISH(errorCode_ERR,           "ERR",  currentData.getErrAsString().data());

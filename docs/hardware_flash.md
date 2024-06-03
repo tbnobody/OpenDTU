@@ -2,15 +2,28 @@
 
 ## Hardware you need
 
+For a highly integrated board with most peripherals already included, have a
+look at the [OpenDTU Fusion](https://shop.allianceapps.io/products/opendtu-fusion-community-edition)
+board. There are also [OpenDTU-OnBattery-specific addons](https://github.com/markusdd/OpenDTUFusionDocs/blob/main/CANIso.md).
+
+Otherwise, read on to assemble your own components.
+
 ### ESP32 board
 
-For ease of use, buy a "ESP32 DEVKIT DOIT" or "ESP32 NodeMCU Development Board" with an ESP32-S3 or ESP-WROOM-32 chipset on it.
+For ease of use, buy a "ESP32 DEVKIT DOIT" or "ESP32 NodeMCU Development Board"
+with an ESP32-S3 chipset on it, **with at least 8 MB of flash memory**.
+Preferrably, the ESP32 should also have some embedded PSRAM. Look out for
+labels like "N8R2", "N16R8", where the number after the N is the amount of
+flash in Megabytes, and the number after the R is the amount of PSRAM in
+Megabytes.
 
 Sample Picture:
 
 ![NodeMCU-ESP32](nodemcu-esp32.png)
 
-Also supported: Board with Ethernet-Connector and Power-over-Ethernet [Olimex ESP32-POE](https://www.olimex.com/Products/IoT/ESP32/ESP32-POE/open-source-hardware)
+Also supported: Board with Ethernet-Connector and Power-over-Ethernet (PoE)
+(select version with 8 MB of flash memory or more)
+[Olimex ESP32-POE](https://www.olimex.com/Products/IoT/ESP32/ESP32-POE/open-source-hardware)
 
 ### NRF24L01+ radio board (See inverter table above for supported inverters)
 
@@ -41,7 +54,10 @@ The CMT2300A uses 3-Wire half duplex SPI communication. Due to this fact it curr
 
 ### 3.3V / 5V logic level converter
 
-The logic level converter is used to interface with the Victron MPPT charge controller and the relay board. It converts the 3.3V logic level used by the ESP32 to 5V logic used by the other devices. 
+The logic level converter is used to interface with the Victron MPPT charge
+controller and the relay board. It converts the 3.3V logic level used by the
+ESP32 to 5V logic used by the other devices. A commonly used digital isolator
+is the ADUM1201.
 
 ### SN65HVD230 CAN bus transceiver
 
@@ -49,7 +65,7 @@ The SN65HVD230 CAN bus transceiver is used to interface with the Pylontech batte
 
 ### MCP2515 CAN bus module
 
-See [Wiki](https://github.com/helgeerbe/OpenDTU-OnBattery/wiki/Huawei-AC-PSU) for details.
+Used to connect to the Huawei PSU (AC charger). See [the Wiki](https://github.com/helgeerbe/OpenDTU-OnBattery/wiki/Huawei-AC-PSU) for details.
 
 ### Relay module
 
@@ -71,30 +87,8 @@ Use a power supply with 5 V and 1 A. The USB cable connected to your PC/Notebook
 
 ### Change pin assignment
 
-Its possible to change all the pins of the NRF24L01+ module, the Display, the LED etc.
-The recommend way to change the pin assignment is by creating a custom [device profile](DeviceProfiles.md).
-It is also possible to create a custom environment and compile the source yourself. This can be achieved by copying one of the [env:....] sections from 'platformio.ini' to 'platformio_override.ini' and editing the 'platformio_override.ini' file and add/change one or more of the following lines to the 'build_flags' parameter:
-
-```makefile
--DHOYMILES_PIN_MISO=19
--DHOYMILES_PIN_MOSI=23
--DHOYMILES_PIN_SCLK=18
--DHOYMILES_PIN_IRQ=16
--DHOYMILES_PIN_CE=4
--DHOYMILES_PIN_CS=5
--DVICTRON_PIN_TX=21
--DVICTRON_PIN_RX=22
--DPYLONTECH_PIN_RX=27
--DPYLONTECH_PIN_TX=14
--DHUAWEI_PIN_MISO=12
--DHUAWEI_PIN_MOSI=13
--DHUAWEI_PIN_SCLK=26
--DHUAWEI_PIN_IRQ=25
--DHUAWEI_PIN_CS=15
--DHUAWEI_PIN_POWER=33
-```
-
-It is recommended to make all changes only in the  'platformio_override.ini', this is your personal copy.
+It is possible to change all the pins of the NRF24L01+ module, the Display, the LED etc.
+The way to change the pin assignment is by creating a custom [device profile](https://github.com/helgeerbe/OpenDTU-OnBattery/wiki/Device-Profiles).
 
 ## Flashing and starting up
 

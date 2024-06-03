@@ -152,9 +152,9 @@
         "LoadingInverter": "Waiting for data... (can take up to 10 seconds)"
     },
     "vedirecthome": {
-        "SerialNumber": "Serial Number: ",
-        "FirmwareNumber": "Firmware Number: ",
-        "DataAge": "Data Age: ",
+        "SerialNumber": "Serial Number",
+        "FirmwareVersion": "Firmware Version",
+        "DataAge": "Data Age",
         "Seconds": "{val} seconds",
         "Property": "Property",
         "Value": "Value",
@@ -251,7 +251,10 @@
         "ChipRevision": "Chip Revision",
         "ChipCores": "Chip Cores",
         "CpuFrequency": "CPU Frequency",
-        "Mhz": "MHz"
+        "Mhz": "MHz",
+        "FlashSize": "Flash Memory Size",
+        "Bytes": "Bytes",
+        "MegaBytes": "MB"
     },
     "memoryinfo": {
         "MemoryInformation": "Memory Information",
@@ -571,10 +574,13 @@
         "sdmaddress": "Modbus Address",
         "HTTP": "HTTP(S) + Json - General configuration",
         "httpIndividualRequests": "Individual HTTP requests per phase",
+        "urlExamplesHeading": "URL Examples",
+        "jsonPathExamplesHeading": "JSON Path Examples",
+        "jsonPathExamplesExplanation": "The following paths each find the value '123.4' in the respective example JSON.",
         "httpPhase": "HTTP(S) + Json configuration - Phase {phaseNumber}",
         "httpEnabled": "Phase enabled",
         "httpUrl": "URL",
-        "httpUrlDescription": "URL must start with http:// or https://. Some characters like spaces and = have to be encoded with URL encoding (%xx). Warning: SSL server certificate check is not implemented (MITM attacks are possible)! See below for some examples.",
+        "httpUrlDescription": "URL must start with http:// or https://. Some characters like spaces and = have to be encoded with URL encoding (%xx). Warning: SSL server certificate check is not implemented (MITM attacks are possible)!",
         "httpAuthorization": "Authorization Type",
         "httpUsername": "Username",
         "httpPassword": "Password",
@@ -635,6 +641,7 @@
         "VoltageLoadCorrectionFactor": "Load correction factor",
         "BatterySocInfo": "<b>Hint:</b> The battery SoC (State of Charge) values are only used if the battery communication interface reported SoC updates in the last minute. Otherwise the voltage thresholds will be used as fallback.",
         "InverterIsBehindPowerMeter": "PowerMeter reading includes inverter output",
+        "InverterIsBehindPowerMeterHint": "Enable this option if the power meter reading is reduced by the inverter's output when it produces power. This is typically true.",
         "InverterIsSolarPowered": "Inverter is powered by solar modules",
         "VoltageThresholds": "Battery Voltage Thresholds",
         "VoltageLoadCorrectionInfo": "<b>Hint:</b> When the battery is discharged, its voltage drops. The voltage drop scales with the discharge current. In order to not stop the inverter too early (stop threshold), this load correction factor can be specified to calculate the battery voltage if it was idle. Corrected voltage = DC Voltage + (Current power * correction factor).",
@@ -874,6 +881,8 @@
     },
     "battery": {
         "battery": "Battery",
+        "FwVersion": "Firmware Version",
+        "HwVersion": "Hardware Version",
         "DataAge": "Data Age: ",
         "Seconds": " {val} seconds",
         "status": "Status",
@@ -942,6 +951,8 @@
         "dischargedEnergy": "Discharged energy",
         "instantaneousPower": "Instantaneous Power",
         "consumedAmpHours": "Consumed Amp Hours",
+        "midpointVoltage": "Midpoint Voltage",
+        "midpointDeviation": "Midpoint Deviation",
         "lastFullCharge": "Last full Charge"
     }
 }

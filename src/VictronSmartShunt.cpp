@@ -3,7 +3,12 @@
 #include "Configuration.h"
 #include "PinMapping.h"
 #include "MessageOutput.h"
+#include "SerialPortManager.h"
 
+void VictronSmartShunt::deinit()
+{
+    SerialPortManager.freePort(_serialPortOwner);
+}
 
 bool VictronSmartShunt::init(bool verboseLogging)
 {
@@ -21,7 +26,10 @@ bool VictronSmartShunt::init(bool verboseLogging)
     auto tx = static_cast<gpio_num_t>(pin.battery_tx);
     auto rx = static_cast<gpio_num_t>(pin.battery_rx);
 
-    VeDirectShunt.init(rx, tx, &MessageOutput, verboseLogging);
+    auto oHwSerialPort = SerialPortManager.allocatePort(_serialPortOwner);
+    if (!oHwSerialPort) { return false; }
+
+    VeDirectShunt.init(rx, tx, &MessageOutput, verboseLogging, *oHwSerialPort);
     return true;
 }
 

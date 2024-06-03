@@ -87,6 +87,8 @@ void MqttHandleBatteryHassClass::loop()
             publishSensor("Current",           "mdi:current-dc",       "BatteryCurrentMilliAmps",  "current",     "measurement", "mA");
             publishSensor("BMS Temperature",   "mdi:thermometer",      "BmsTempCelsius",           "temperature", "measurement", "°C");
             publishSensor("Cell Voltage Diff", "mdi:battery-alert",    "CellDiffMilliVolt",        "voltage",     "measurement", "mV");
+            publishSensor("Battery Temperature 1", "mdi:thermometer",  "BatteryTempOneCelsius",    "temperature", "measurement", "°C");
+            publishSensor("Battery Temperature 2", "mdi:thermometer",  "BatteryTempTwoCelsius",    "temperature", "measurement", "°C");
             publishSensor("Charge Cycles",     "mdi:counter",          "BatteryCycles");
             publishSensor("Cycle Capacity",    "mdi:battery-sync",     "BatteryCycleCapacity");
 
@@ -120,6 +122,8 @@ void MqttHandleBatteryHassClass::loop()
             publishSensor("Charge Cycles", "mdi:counter", "chargeCycles");
             publishSensor("Consumed Amp Hours", NULL, "consumedAmpHours", NULL, "measurement", "Ah");
             publishSensor("Last Full Charge", "mdi:timelapse", "lastFullCharge", NULL, NULL, "min");
+            publishSensor("Midpoint Voltage", NULL, "midpointVoltage", "voltage", "measurement", "V");
+            publishSensor("Midpoint Deviation", NULL, "midpointDeviation", "battery", "measurement", "%");
             break;
     }
 
@@ -202,7 +206,7 @@ void MqttHandleBatteryHassClass::publishBinarySensor(const char* caption, const 
     statTopic.concat(subTopic);
 
     JsonDocument root;
-  
+
     root["name"] = caption;
     root["uniq_id"] = serial + "_" + sensorId;
     root["stat_t"] = statTopic;

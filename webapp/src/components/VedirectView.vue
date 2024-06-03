@@ -21,13 +21,13 @@
                                     {{ item.product_id }}
                                 </div>
                                 <div style="padding-right: 2em;">
-                                    {{ $t('vedirecthome.SerialNumber') }} {{ serial }}
+                                    {{ $t('vedirecthome.SerialNumber') }}: {{ serial }}
                                 </div>
                                 <div style="padding-right: 2em;">
-                                    {{ $t('vedirecthome.FirmwareNumber') }}  {{ item.firmware_version }}
+                                    {{ $t('vedirecthome.FirmwareVersion') }}:  {{ item.firmware_version }}
                                 </div>
                                 <div style="padding-right: 2em;">
-                                    {{ $t('vedirecthome.DataAge') }} {{ $t('vedirecthome.Seconds', {'val': Math.floor(item.data_age_ms / 1000)}) }}
+                                    {{ $t('vedirecthome.DataAge') }}: {{ $t('vedirecthome.Seconds', {'val': Math.floor(item.data_age_ms / 1000)}) }}
                                 </div>
                             </div>
                         </div>

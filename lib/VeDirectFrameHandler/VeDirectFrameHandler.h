@@ -30,7 +30,8 @@ public:
 
 protected:
     VeDirectFrameHandler();
-    void init(char const* who, int8_t rx, int8_t tx, Print* msgOut, bool verboseLogging, uint16_t hwSerialPort);
+    void init(char const* who, int8_t rx, int8_t tx, Print* msgOut,
+        bool verboseLogging, uint8_t hwSerialPort);
     virtual bool hexDataHandler(VeDirectHexData const &data) { return false; } // handles the disassembeled hex response
 
     bool _verboseLogging;

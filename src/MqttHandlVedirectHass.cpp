@@ -92,10 +92,10 @@ void MqttHandleVedirectHassClass::publishConfig()
             publishSensor("VE.Smart network total DC input power", "mdi:solar-power", "NetworkTotalDcInputPower", "power", "measurement", "W", *optMpptData);
         }
         if (optMpptData->MpptTemperatureMilliCelsius.first != 0) {
-            publishSensor("MPPT temperature", "mdi:temperature-celsius", "MpptTemperature", "temperature", "measurement", "W", *optMpptData);
+            publishSensor("MPPT temperature", "mdi:temperature-celsius", "MpptTemperature", "temperature", "measurement", "°C", *optMpptData);
         }
         if (optMpptData->SmartBatterySenseTemperatureMilliCelsius.first != 0) {
-            publishSensor("Smart Battery Sense temperature", "mdi:temperature-celsius", "SmartBatterySenseTemperature", "temperature", "measurement", "W", *optMpptData);
+            publishSensor("Smart Battery Sense temperature", "mdi:temperature-celsius", "SmartBatterySenseTemperature", "temperature", "measurement", "°C", *optMpptData);
         }
     }
 

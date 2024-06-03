@@ -58,6 +58,8 @@ class BatteryStats {
         }
 
         String _manufacturer = "unknown";
+        String _hwversion = "";
+        String _fwversion = "";
         uint32_t _lastUpdate = 0;
 
     private:
@@ -157,8 +159,9 @@ class VictronSmartShuntStats : public BatteryStats {
         uint32_t _timeToGo;
         float _chargedEnergy;
         float _dischargedEnergy;
-        String _modelName;
         int32_t _instantaneousPower;
+        float _midpointVoltage;
+        float _midpointDeviation;
         float _consumedAmpHours;
         int32_t _lastFullCharge;
 

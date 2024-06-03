@@ -45,6 +45,8 @@ struct PinMapping_t {
     int8_t victron_rx;
     int8_t victron_tx2;
     int8_t victron_rx2;
+    int8_t victron_tx3;
+    int8_t victron_rx3;
     int8_t battery_rx;
     int8_t battery_rxen;
     int8_t battery_tx;

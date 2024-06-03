@@ -62,7 +62,8 @@ VeDirectFrameHandler<T>::VeDirectFrameHandler() :
 }
 
 template<typename T>
-void VeDirectFrameHandler<T>::init(char const* who, int8_t rx, int8_t tx, Print* msgOut, bool verboseLogging, uint16_t hwSerialPort)
+void VeDirectFrameHandler<T>::init(char const* who, int8_t rx, int8_t tx,
+		Print* msgOut, bool verboseLogging, uint8_t hwSerialPort)
 {
 	_vedirectSerial = std::make_unique<HardwareSerial>(hwSerialPort);
 	_vedirectSerial->end(); // make sure the UART will be re-initialized
@@ -242,12 +243,12 @@ void VeDirectFrameHandler<T>::processTextData(std::string const& name, std::stri
 	}
 
 	if (name == "SER") {
-		strcpy(_tmpFrame.serialNr_SER, value.c_str());
+		strncpy(_tmpFrame.serialNr_SER, value.c_str(), sizeof(_tmpFrame.serialNr_SER));
 		return;
 	}
 
 	if (name == "FW") {
-		strcpy(_tmpFrame.firmwareNr_FW, value.c_str());
+		strncpy(_tmpFrame.firmwareVer_FW, value.c_str(), sizeof(_tmpFrame.firmwareVer_FW));
 		return;
 	}
 
