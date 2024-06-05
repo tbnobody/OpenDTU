@@ -5,18 +5,18 @@
 #include "WebApi_webapp.h"
 #include <MD5Builder.h>
 
-extern const uint8_t file_index_html_start[] asm("_binary_webapp_dist_index_html_gz_start");
+extern const uint8_t file_index_html_start[] asm("_binary_webapp_dist_index_html_br_start");
 extern const uint8_t file_favicon_ico_start[] asm("_binary_webapp_dist_favicon_ico_start");
 extern const uint8_t file_favicon_png_start[] asm("_binary_webapp_dist_favicon_png_start");
-extern const uint8_t file_zones_json_start[] asm("_binary_webapp_dist_zones_json_gz_start");
-extern const uint8_t file_app_js_start[] asm("_binary_webapp_dist_js_app_js_gz_start");
+extern const uint8_t file_zones_json_start[] asm("_binary_webapp_dist_zones_json_br_start");
+extern const uint8_t file_app_js_start[] asm("_binary_webapp_dist_js_app_js_br_start");
 extern const uint8_t file_site_webmanifest_start[] asm("_binary_webapp_dist_site_webmanifest_start");
 
-extern const uint8_t file_index_html_end[] asm("_binary_webapp_dist_index_html_gz_end");
+extern const uint8_t file_index_html_end[] asm("_binary_webapp_dist_index_html_br_end");
 extern const uint8_t file_favicon_ico_end[] asm("_binary_webapp_dist_favicon_ico_end");
 extern const uint8_t file_favicon_png_end[] asm("_binary_webapp_dist_favicon_png_end");
-extern const uint8_t file_zones_json_end[] asm("_binary_webapp_dist_zones_json_gz_end");
-extern const uint8_t file_app_js_end[] asm("_binary_webapp_dist_js_app_js_gz_end");
+extern const uint8_t file_zones_json_end[] asm("_binary_webapp_dist_zones_json_br_end");
+extern const uint8_t file_app_js_end[] asm("_binary_webapp_dist_js_app_js_br_end");
 extern const uint8_t file_site_webmanifest_end[] asm("_binary_webapp_dist_site_webmanifest_end");
 
 void WebApiWebappClass::responseBinaryDataWithETagCache(AsyncWebServerRequest *request, const String &contentType, const String &contentEncoding, const uint8_t *content, size_t len)
@@ -63,15 +63,15 @@ void WebApiWebappClass::init(AsyncWebServer& server, Scheduler& scheduler)
     */
 
     server.on("/", HTTP_GET, [&](AsyncWebServerRequest* request) {
-        responseBinaryDataWithETagCache(request, "text/html", "gzip", file_index_html_start, file_index_html_end - file_index_html_start);
+        responseBinaryDataWithETagCache(request, "text/html", "br", file_index_html_start, file_index_html_end - file_index_html_start);
     });
 
     server.onNotFound([&](AsyncWebServerRequest* request) {
-        responseBinaryDataWithETagCache(request, "text/html", "gzip", file_index_html_start, file_index_html_end - file_index_html_start);
+        responseBinaryDataWithETagCache(request, "text/html", "br", file_index_html_start, file_index_html_end - file_index_html_start);
     });
 
     server.on("/index.html", HTTP_GET, [&](AsyncWebServerRequest* request) {
-        responseBinaryDataWithETagCache(request, "text/html", "gzip", file_index_html_start, file_index_html_end - file_index_html_start);
+        responseBinaryDataWithETagCache(request, "text/html", "br", file_index_html_start, file_index_html_end - file_index_html_start);
     });
 
     server.on("/favicon.ico", HTTP_GET, [&](AsyncWebServerRequest* request) {
@@ -83,7 +83,7 @@ void WebApiWebappClass::init(AsyncWebServer& server, Scheduler& scheduler)
     });
 
     server.on("/zones.json", HTTP_GET, [&](AsyncWebServerRequest* request) {
-        responseBinaryDataWithETagCache(request, "application/json", "gzip", file_zones_json_start, file_zones_json_end - file_zones_json_start);
+        responseBinaryDataWithETagCache(request, "application/json", "br", file_zones_json_start, file_zones_json_end - file_zones_json_start);
     });
 
     server.on("/site.webmanifest", HTTP_GET, [&](AsyncWebServerRequest* request) {
@@ -91,6 +91,6 @@ void WebApiWebappClass::init(AsyncWebServer& server, Scheduler& scheduler)
     });
 
     server.on("/js/app.js", HTTP_GET, [&](AsyncWebServerRequest* request) {
-        responseBinaryDataWithETagCache(request, "text/javascript", "gzip", file_app_js_start, file_app_js_end - file_app_js_start);
+        responseBinaryDataWithETagCache(request, "text/javascript", "br", file_app_js_start, file_app_js_end - file_app_js_start);
     });
 }

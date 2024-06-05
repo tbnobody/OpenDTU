@@ -22,7 +22,12 @@ try {
 export default defineConfig({
   plugins: [
     vue(),
-    viteCompression({ deleteOriginFile: true, threshold: 0 }),
+    viteCompression({
+        algorithm: 'brotliCompress',
+        compressionOptions: { level: 11 },
+        deleteOriginFile: true,
+        threshold: 0
+    }),
     cssInjectedByJsPlugin(),
     VueI18nPlugin({
         /* options */

@@ -8,3 +8,6 @@ platformio-device-monitor*.log
 logs/device-monitor*.log
 platformio_override.ini
 .DS_Store
+webapp_dist/index.html.br
+webapp_dist/zones.json.br
+webapp_dist/js/app.js.br
