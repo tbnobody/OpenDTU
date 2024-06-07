@@ -29,7 +29,7 @@ public:
 
 private:
     static void pollingLoopHelper(void* context);
-    bool readValue(uint16_t reg, float& targetVar);
+    bool readValue(std::unique_lock<std::mutex>& lock, uint16_t reg, float& targetVar);
     std::atomic<bool> _taskDone;
     void pollingLoop();
 

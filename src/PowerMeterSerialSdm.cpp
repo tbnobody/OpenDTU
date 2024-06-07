@@ -96,9 +96,16 @@ void PowerMeterSerialSdm::pollingLoopHelper(void* context)
     vTaskDelete(nullptr);
 }
 
-bool PowerMeterSerialSdm::readValue(uint16_t reg, float& targetVar)
+bool PowerMeterSerialSdm::readValue(std::unique_lock<std::mutex>& lock, uint16_t reg, float& targetVar)
 {
+    lock.unlock(); // reading values takes too long to keep holding the lock
     float val = _upSdm->readVal(reg, _cfg.Address);
+    lock.lock();
+
+    // we additionally check in between each transaction whether or not we are
+    // actually asked to stop polling altogether. otherwise, the destructor of
+    // this instance might need to wait for a whole while until the task ends.
+    if (_stopPolling) { return false; }
 
     auto err = _upSdm->getErrCode(true/*clear error code*/);
 
@@ -165,16 +172,16 @@ void PowerMeterSerialSdm::pollingLoop()
         float energyImport = 0.0;
         float energyExport = 0.0;
 
-        bool success = readValue(SDM_PHASE_1_POWER, phase1Power) &&
-            readValue(SDM_PHASE_1_VOLTAGE, phase1Voltage) &&
-            readValue(SDM_IMPORT_ACTIVE_ENERGY, energyImport) &&
-            readValue(SDM_EXPORT_ACTIVE_ENERGY, energyExport);
+        bool success = readValue(lock, SDM_PHASE_1_POWER, phase1Power) &&
+            readValue(lock, SDM_PHASE_1_VOLTAGE, phase1Voltage) &&
+            readValue(lock, SDM_IMPORT_ACTIVE_ENERGY, energyImport) &&
+            readValue(lock, SDM_EXPORT_ACTIVE_ENERGY, energyExport);
 
         if (success && _phases == Phases::Three) {
-            success = readValue(SDM_PHASE_2_POWER, phase2Power) &&
-                readValue(SDM_PHASE_3_POWER, phase3Power) &&
-                readValue(SDM_PHASE_2_VOLTAGE, phase2Voltage) &&
-                readValue(SDM_PHASE_3_VOLTAGE, phase3Voltage);
+            success = readValue(lock, SDM_PHASE_2_POWER, phase2Power) &&
+                readValue(lock, SDM_PHASE_3_POWER, phase3Power) &&
+                readValue(lock, SDM_PHASE_2_VOLTAGE, phase2Voltage) &&
+                readValue(lock, SDM_PHASE_3_VOLTAGE, phase3Voltage);
         }
 
         if (!success) { continue; }
