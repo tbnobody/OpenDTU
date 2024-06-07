@@ -96,6 +96,47 @@ void PowerMeterSerialSdm::pollingLoopHelper(void* context)
     vTaskDelete(nullptr);
 }
 
+bool PowerMeterSerialSdm::readValue(uint16_t reg, float& targetVar)
+{
+    float val = _upSdm->readVal(reg, _cfg.Address);
+
+    auto err = _upSdm->getErrCode(true/*clear error code*/);
+
+    switch (err) {
+        case SDM_ERR_NO_ERROR:
+            if (_verboseLogging) {
+                MessageOutput.printf("[PowerMeterSerialSdm]: read register %d "
+                        "(0x%04x) successfully\r\n", reg, reg);
+            }
+
+            targetVar = val;
+            return true;
+            break;
+        case SDM_ERR_CRC_ERROR:
+            MessageOutput.printf("[PowerMeterSerialSdm]: CRC error "
+                    "while reading register %d (0x%04x)\r\n", reg, reg);
+            break;
+        case SDM_ERR_WRONG_BYTES:
+            MessageOutput.printf("[PowerMeterSerialSdm]: unexpected data in "
+                    "message while reading register %d (0x%04x)\r\n", reg, reg);
+            break;
+        case SDM_ERR_NOT_ENOUGHT_BYTES:
+            MessageOutput.printf("[PowerMeterSerialSdm]: unexpected end of "
+                    "message while reading register %d (0x%04x)\r\n", reg, reg);
+            break;
+        case SDM_ERR_TIMEOUT:
+            MessageOutput.printf("[PowerMeterSerialSdm]: timeout occured "
+                    "while reading register %d (0x%04x)\r\n", reg, reg);
+            break;
+        default:
+            MessageOutput.printf("[PowerMeterSerialSdm]: unknown SDM error "
+                    "code after reading register %d (0x%04x)\r\n", reg, reg);
+            break;
+    }
+
+    return false;
+}
+
 void PowerMeterSerialSdm::pollingLoop()
 {
     std::unique_lock<std::mutex> lock(_pollingMutex);
@@ -112,26 +153,31 @@ void PowerMeterSerialSdm::pollingLoop()
 
         _lastPoll = millis();
 
-        uint8_t addr = _cfg.Address;
-
         // reading takes a "very long" time as each readVal() is a synchronous
         // exchange of serial messages. cache the values and write later to
         // enforce consistent values.
-        float phase1Power = _upSdm->readVal(SDM_PHASE_1_POWER, addr);
+        float phase1Power = 0.0;
         float phase2Power = 0.0;
         float phase3Power = 0.0;
-        float phase1Voltage = _upSdm->readVal(SDM_PHASE_1_VOLTAGE, addr);
+        float phase1Voltage = 0.0;
         float phase2Voltage = 0.0;
         float phase3Voltage = 0.0;
-        float energyImport = _upSdm->readVal(SDM_IMPORT_ACTIVE_ENERGY, addr);
-        float energyExport = _upSdm->readVal(SDM_EXPORT_ACTIVE_ENERGY, addr);
+        float energyImport = 0.0;
+        float energyExport = 0.0;
 
-        if (_phases == Phases::Three) {
-            phase2Power = _upSdm->readVal(SDM_PHASE_2_POWER, addr);
-            phase3Power = _upSdm->readVal(SDM_PHASE_3_POWER, addr);
-            phase2Voltage = _upSdm->readVal(SDM_PHASE_2_VOLTAGE, addr);
-            phase3Voltage = _upSdm->readVal(SDM_PHASE_3_VOLTAGE, addr);
+        bool success = readValue(SDM_PHASE_1_POWER, phase1Power) &&
+            readValue(SDM_PHASE_1_VOLTAGE, phase1Voltage) &&
+            readValue(SDM_IMPORT_ACTIVE_ENERGY, energyImport) &&
+            readValue(SDM_EXPORT_ACTIVE_ENERGY, energyExport);
+
+        if (success && _phases == Phases::Three) {
+            success = readValue(SDM_PHASE_2_POWER, phase2Power) &&
+                readValue(SDM_PHASE_3_POWER, phase3Power) &&
+                readValue(SDM_PHASE_2_VOLTAGE, phase2Voltage) &&
+                readValue(SDM_PHASE_3_VOLTAGE, phase3Voltage);
         }
+
+        if (!success) { continue; }
 
         {
             std::lock_guard<std::mutex> l(_valueMutex);
