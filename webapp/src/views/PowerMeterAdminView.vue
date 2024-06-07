@@ -149,7 +149,6 @@
                                 v-model="httpJson.json_path"
                                 type="text"
                                 maxlength="256"
-                                placeholder="total_power"
                                 :tooltip="$t('powermeteradmin.valueJsonPathDescription')"
                                 wide />
 
