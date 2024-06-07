@@ -23,6 +23,8 @@ PowerMeterSerialSdm::~PowerMeterSerialSdm()
         _upSdmSerial->end();
         _upSdmSerial = nullptr;
     }
+
+    SerialPortManager.freePort(_sdmSerialPortOwner);
 }
 
 bool PowerMeterSerialSdm::init()
