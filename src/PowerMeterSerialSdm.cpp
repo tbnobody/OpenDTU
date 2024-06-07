@@ -76,13 +76,16 @@ void PowerMeterSerialSdm::doMqttPublish() const
 {
     std::lock_guard<std::mutex> l(_valueMutex);
     mqttPublish("power1", _phase1Power);
-    mqttPublish("power2", _phase2Power);
-    mqttPublish("power3", _phase3Power);
     mqttPublish("voltage1", _phase1Voltage);
-    mqttPublish("voltage2", _phase2Voltage);
-    mqttPublish("voltage3", _phase3Voltage);
     mqttPublish("import", _energyImport);
     mqttPublish("export", _energyExport);
+
+    if (_phases == Phases::Three) {
+        mqttPublish("power2", _phase2Power);
+        mqttPublish("power3", _phase3Power);
+        mqttPublish("voltage2", _phase2Voltage);
+        mqttPublish("voltage3", _phase3Voltage);
+    }
 }
 
 void PowerMeterSerialSdm::pollingLoopHelper(void* context)
