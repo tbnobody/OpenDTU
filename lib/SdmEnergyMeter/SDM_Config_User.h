@@ -1,6 +1,6 @@
 /* Library for reading SDM 72/120/220/230/630 Modbus Energy meters.
 *  Reading via Hardware or Software Serial library & rs232<->rs485 converter
-*  2016-2022 Reaper7 (tested on wemos d1 mini->ESP8266 with Arduino 1.8.10 & 2.5.2 esp8266 core)
+*  2016-2023 Reaper7 (tested on wemos d1 mini->ESP8266 with Arduino 1.8.10 & 2.5.2 esp8266 core)
 *  crc calculation by Jaime García (https://github.com/peninquen/Modbus-Energy-Monitor-Arduino/)
 */
 
@@ -32,7 +32,7 @@
 #if defined ( USE_HARDWARESERIAL )
   #if defined ( ESP32 )
     #define SDM_RX_PIN                        13
-    #define SDM_TX_PIN                        32
+    #define SDM_TX_PIN                        15
   #endif
 #else
   #if defined ( ESP8266 ) || defined ( ESP32 )
