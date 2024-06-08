@@ -5,11 +5,18 @@ body:
   - type: markdown
     attributes:
       value: >
-        ### ✋ **This is bug tracker, not a support forum**
+        ### ⚠️ Please remember: issues are for *bugs*
+        That is, something you believe affects every single user of OpenDTU, not just you. If you're not sure, start with one of the other options below.
+  - type: markdown
+    attributes:
+      value: |
+        #### Have a question? 👉 [Start a new discussion](https://github.com/tbnobody/OpenDTU/discussions/new) or [ask in chat](https://discord.gg/WzhxEY62mB).
 
-        If something isn't working right, you have questions or need help, [**get in touch on the Discussions**](https://github.com/tbnobody/OpenDTU/discussions).
+        #### Before opening an issue, please double check:
 
-        Please quickly search existing issues first before submitting a bug.
+        - [Documentation](https://www.opendtu.solar).
+        - [The FAQs](https://www.opendtu.solar/firmware/faq/).
+        - [Existing issues and discussions](https://github.com/tbnobody/OpenDTU/search?q=&type=issues).
   - type: textarea
     id: what-happened
     attributes:
@@ -66,3 +73,14 @@ body:
         Tip: You can attach images or log files by clicking this area to highlight it and then dragging files in.
     validations:
       required: false
+  - type: checkboxes
+    id: required-checks
+    attributes:
+      label: Please confirm the following
+      options:
+        - label: I believe this issue is a bug that affects all users of OpenDTU, not something specific to my installation.
+          required: true
+        - label: I have already searched for relevant existing issues and discussions before opening this report.
+          required: true
+        - label: I have updated the title field above with a concise description.
+          required: true
