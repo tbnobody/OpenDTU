@@ -393,8 +393,18 @@ void SDM::modbusWrite(uint8_t* data, size_t messageLength) {
     resptime = millis() + waitForBytesSent_ms;
   }
 
+#if !defined ( USE_HARDWARESERIAL )
+  // prevent scheduler from messing up the serial message. this task shall only
+  // be scheduled after the whole serial message was transmitted.
+  vTaskSuspendAll();
+#endif
+
   sdmSer.write(data, messageLength);                                            //send 8 bytes
-  
+
+#if !defined ( USE_HARDWARESERIAL )
+  xTaskResumeAll();
+#endif
+
   if (_dere_pin != NOT_A_PIN) {
     const int32_t timeleft = (int32_t) (resptime - millis());
     if (timeleft > 0) {

@@ -14,7 +14,7 @@
 *  define or undefine USE_HARDWARESERIAL (uncomment only one or none)
 */
 //#undef USE_HARDWARESERIAL
-#define USE_HARDWARESERIAL
+//#define USE_HARDWARESERIAL
 
 //------------------------------------------------------------------------------
 

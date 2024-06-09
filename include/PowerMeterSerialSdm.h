@@ -4,6 +4,7 @@
 #include <atomic>
 #include <mutex>
 #include <condition_variable>
+#include <SoftwareSerial.h>
 #include "Configuration.h"
 #include "PowerMeterProvider.h"
 #include "SDM.h"
@@ -49,8 +50,7 @@ private:
 
     mutable std::mutex _valueMutex;
 
-    static char constexpr _sdmSerialPortOwner[] = "SDM power meter";
-    std::unique_ptr<HardwareSerial> _upSdmSerial = nullptr;
+    std::unique_ptr<SoftwareSerial> _upSdmSerial = nullptr;
     std::unique_ptr<SDM> _upSdm = nullptr;
 
     TaskHandle_t _taskHandle = nullptr;

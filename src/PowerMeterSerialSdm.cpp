@@ -23,8 +23,6 @@ PowerMeterSerialSdm::~PowerMeterSerialSdm()
         _upSdmSerial->end();
         _upSdmSerial = nullptr;
     }
-
-    SerialPortManager.freePort(_sdmSerialPortOwner);
 }
 
 bool PowerMeterSerialSdm::init()
@@ -40,13 +38,9 @@ bool PowerMeterSerialSdm::init()
         return false;
     }
 
-    auto oHwSerialPort = SerialPortManager.allocatePort(_sdmSerialPortOwner);
-    if (!oHwSerialPort) { return false; }
-
-    _upSdmSerial = std::make_unique<HardwareSerial>(*oHwSerialPort);
-    _upSdmSerial->end(); // make sure the UART will be re-initialized
+    _upSdmSerial = std::make_unique<SoftwareSerial>();
     _upSdm = std::make_unique<SDM>(*_upSdmSerial, 9600, pin.powermeter_dere,
-            SERIAL_8N1, pin.powermeter_rx, pin.powermeter_tx);
+            SWSERIAL_8N1, pin.powermeter_rx, pin.powermeter_tx);
     _upSdm->begin();
 
     std::unique_lock<std::mutex> lock(_pollingMutex);
