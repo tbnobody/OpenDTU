@@ -40,7 +40,7 @@
     "sass": "^1.76.0",
     "terser": "^5.31.0",
     "typescript": "^5.4.5",
-    "vite": "^5.2.11",
+    "vite": "^5.2.13",
     "vite-plugin-compression": "^0.5.1",
     "vite-plugin-css-injected-by-js": "^3.5.1",
     "vue-tsc": "^2.0.16"
