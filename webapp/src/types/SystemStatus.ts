@@ -4,6 +4,8 @@ export interface SystemStatus {
     chiprevision: number;
     chipcores: number;
     cpufreq: number;
+    cputemp: number;
+    flashsize: number;
     // FirmwareInfo
     hostname: string;
     sdkversion: string;

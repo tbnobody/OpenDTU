@@ -2,6 +2,23 @@
 /*
  * Copyright (C) 2023 - 2024 Thomas Basler and others
  */
+
+/*
+This parser is used to parse the response of 'GridOnProFilePara'.
+It contains the whole grid profile of the inverter.
+
+Data structure:
+
+00   01 02 03 04   05 06 07 08   09   10 11        12 13             14           15                16 17   18 19   20 21   22 23   24 25   26   27 28 29 30 31
+                                      00 01        02 03             04           05                06 07   08 09   10 11   12 13
+                                                                    |<---------- Returns till the end of the payload ---------->|
+---------------------------------------------------------------------------------------------------------------------------------------------------------------
+95   80 14 82 66   80 14 33 28   01   0A 00        20 01             00           0C                08 FC   07 A3   00 0F   09 E2   00 1E   E6   -- -- -- -- --
+^^   ^^^^^^^^^^^   ^^^^^^^^^^^   ^^   ^^^^^        ^^^^^             ^^           ^^                ^^^^^   ^^^^^   ^^^^^   ^^^^^   ^^^^^   ^^
+ID   Source Addr   Target Addr   Idx  Profile ID   Profile Version   Section ID   Section Version   Value   Value   Value   Value   CRC16   CRC8
+
+The number of values depends on the respective section and its version. After the last value of a section follows the next section id.
+*/
 #include "GridProfileParser.h"
 #include "../Hoymiles.h"
 #include <cstring>
@@ -11,10 +28,10 @@
 const std::array<const ProfileType_t, PROFILE_TYPE_COUNT> GridProfileParser::_profileTypes = { {
     { 0x02, 0x00, "US - NA_IEEE1547_240V" },
     { 0x03, 0x00, "DE - DE_VDE4105_2018" },
-    { 0x03, 0x01, "XX - unknown" },
+    { 0x03, 0x01, "DE - DE_VDE4105_2011" },
     { 0x0a, 0x00, "XX - EN 50549-1:2019" },
     { 0x0c, 0x00, "AT - AT_TOR_Erzeuger_default" },
-    { 0x0d, 0x04, "FR -" },
+    { 0x0d, 0x04, "XX - NF_EN_50549-1:2019" },
     { 0x10, 0x00, "ES - ES_RD1699" },
     { 0x12, 0x00, "PL - EU_EN50438" },
     { 0x29, 0x00, "NL - NL_NEN-EN50549-1_2019" },
@@ -82,7 +99,7 @@ constexpr frozen::map<uint8_t, GridProfileItemDefinition_t, 0x42> itemDefinition
     { 0x1f, make_value("Start of Frequency Watt Droop (Fstart)", "Hz", 100) },
     { 0x20, make_value("FW Droop Slope (Kpower_Freq)", "Pn%/Hz", 10) },
     { 0x21, make_value("Recovery Ramp Rate (RRR)", "Pn%/s", 100) },
-    { 0x22, make_value("Recovery High Frequency (RVHF)", "Hz", 100) },
+    { 0x22, make_value("Recovery High Frequency (RVHF)", "Hz", 10) },
     { 0x23, make_value("Recovery Low Frequency (RVLF)", "Hz", 100) },
     { 0x24, make_value("VW Function Activated", "bool", 1) },
     { 0x25, make_value("Start of Voltage Watt Droop (Vstart)", "V", 10) },

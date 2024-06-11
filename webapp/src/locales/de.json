@@ -65,8 +65,8 @@
         "4009": "Wechselrichter Reihenfolge gespeichert!",
         "5001": "@:apiresponse.2001",
         "5002": "Das Limit muss zwischen 1 und {max} sein!",
-        "5003": "Ungültiten Typ angegeben!",
-        "5004": "Ungültigen Inverter angegeben!",
+        "5003": "Ungültiger Typ angegeben!",
+        "5004": "Ungültiger Inverter angegeben!",
         "6001": "Neustart durchgeführt!",
         "6002": "Neustart abgebrochen!",
         "7001": "MQTT-Server muss zwischen 1 und {max} Zeichen lang sein!",
@@ -143,7 +143,7 @@
         "LoadingInverter": "Warte auf Daten... (kann bis zu 10 Sekunden dauern)"
     },
     "eventlog": {
-        "Start": "Begin",
+        "Start": "Beginn",
         "Stop": "Ende",
         "Id": "ID",
         "Message": "Meldung"
@@ -202,7 +202,9 @@
         "ChipRevision": "Chip-Revision",
         "ChipCores": "Chip-Kerne",
         "CpuFrequency": "CPU-Frequenz",
-        "Mhz": "MHz"
+        "Mhz": "MHz",
+        "CpuTemperature": "CPU-Temperatur",
+        "FlashSize": "Flash-Speichergröße"
     },
     "memoryinfo": {
         "MemoryInformation": "Speicherinformationen",
@@ -513,6 +515,7 @@
         "ZeroRuntimeHint": "Nulle Laufzeit Daten (keine Ertragsdaten), wenn der Wechselrichter nicht erreichbar ist.",
         "ZeroDay": "Nulle Tagesertrag um Mitternacht",
         "ZeroDayHint": "Das funktioniert nur wenn der Wechselrichter nicht erreichbar ist. Wenn Daten aus dem Wechselrichter gelesen werden, werden deren Werte verwendet. (Ein Reset erfolgt nur beim Neustarten)",
+        "ClearEventlog": "Lösche Ereignisanzeige um Mitternacht",
         "Cancel": "@:base.Cancel",
         "Save": "@:base.Save",
         "DeleteMsg": "Soll der Wechselrichter \"{name}\" mit der Seriennummer {serial} wirklich gelöscht werden?",
@@ -590,9 +593,9 @@
         "DefaultProfile": "(Standardeinstellungen)",
         "ProfileHint": "Ihr Gerät reagiert möglicherweise nicht mehr, wenn Sie ein inkompatibles Profil wählen. In diesem Fall müssen Sie eine Löschung über das serielle Interface durchführen.",
         "Display": "Display",
-        "PowerSafe": "Stromsparen aktivieren:",
+        "PowerSafe": "Ausschalten wenn kein Inverter erreichbar:",
         "PowerSafeHint": "Schaltet das Display aus, wenn kein Wechselrichter Strom erzeugt",
-        "Screensaver": "Bildschirmschoner aktivieren:",
+        "Screensaver": "OLED-Schutz gegen Einbrennen:",
         "ScreensaverHint": "Bewegt die Ausgabe bei jeder Aktualisierung um ein Einbrennen zu verhindern (v. a. für OLED-Displays nützlich)",
         "DiagramMode": "Diagramm Modus:",
         "off": "Deaktiviert",

@@ -1,7 +1,7 @@
 
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * Copyright (C) 2022-2023 Thomas Basler and others
+ * Copyright (C) 2022-2024 Thomas Basler and others
  */
 
 /*
@@ -23,8 +23,8 @@ ID   Target Addr   Source Addr   Cmd  Payload CRC16 CRC8
 #include "DevControlCommand.h"
 #include "crc.h"
 
-DevControlCommand::DevControlCommand(const uint64_t target_address, const uint64_t router_address)
-    : CommandAbstract(target_address, router_address)
+DevControlCommand::DevControlCommand(InverterAbstract* inv, const uint64_t router_address)
+    : CommandAbstract(inv, router_address)
 {
     _payload[0] = 0x51;
     _payload[9] = 0x81;
@@ -39,7 +39,7 @@ void DevControlCommand::udpateCRC(const uint8_t len)
     _payload[10 + len + 1] = (uint8_t)(crc);
 }
 
-bool DevControlCommand::handleResponse(InverterAbstract& inverter, const fragment_t fragment[], const uint8_t max_fragment_id)
+bool DevControlCommand::handleResponse(const fragment_t fragment[], const uint8_t max_fragment_id)
 {
     for (uint8_t i = 0; i < max_fragment_id; i++) {
         if (fragment[i].mainCmd != (_payload[0] | 0x80)) {
