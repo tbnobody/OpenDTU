@@ -27,7 +27,6 @@ void MessageOutputClass::register_ws_output(AsyncWebSocket* output)
 
 void MessageOutputClass::serialWrite(MessageOutputClass::message_t const& m)
 {
-    // on ESP32-S3, Serial.flush() blocks until a serial console is attached.
     // operator bool() of HWCDC returns false if the device is not attached to
     // a USB host. in general it makes sense to skip writing entirely if the
     // default serial port is not ready.
@@ -37,7 +36,6 @@ void MessageOutputClass::serialWrite(MessageOutputClass::message_t const& m)
     while (written < m.size()) {
         written += Serial.write(m.data() + written, m.size() - written);
     }
-    Serial.flush();
 }
 
 size_t MessageOutputClass::write(uint8_t c)
