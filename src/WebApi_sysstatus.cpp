@@ -7,11 +7,12 @@
 #include "NetworkSettings.h"
 #include "PinMapping.h"
 #include "WebApi.h"
+#include "__compiled_constants.h"
 #include <AsyncJson.h>
+#include <CpuTemperature.h>
 #include <Hoymiles.h>
 #include <LittleFS.h>
 #include <ResetReason.h>
-#include "__compiled_constants.h"
 
 void WebApiSysstatusClass::init(AsyncWebServer& server, Scheduler& scheduler)
 {
@@ -33,6 +34,7 @@ void WebApiSysstatusClass::onSystemStatus(AsyncWebServerRequest* request)
 
     root["sdkversion"] = ESP.getSdkVersion();
     root["cpufreq"] = ESP.getCpuFreqMHz();
+    root["cputemp"] = CpuTemperature.read();
 
     root["heap_total"] = ESP.getHeapSize();
     root["heap_used"] = ESP.getHeapSize() - ESP.getFreeHeap();
@@ -48,6 +50,7 @@ void WebApiSysstatusClass::onSystemStatus(AsyncWebServerRequest* request)
     root["chiprevision"] = ESP.getChipRevision();
     root["chipmodel"] = ESP.getChipModel();
     root["chipcores"] = ESP.getChipCores();
+    root["flashsize"] = ESP.getFlashChipSize();
 
     String reason;
     reason = ResetReason::get_reset_reason_verbose(0);

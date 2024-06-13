@@ -1,7 +1,32 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * Copyright (C) 2022 - 2023 Thomas Basler and others
+ * Copyright (C) 2022 - 2024 Thomas Basler and others
  */
+
+/*
+This parser is used to parse the response of 'DevInfoAllCommand' and 'DevInfoSimpleCommand'.
+It contains version information of the hardware and firmware. It can also be used to determine
+the exact inverter type.
+
+Data structure (DevInfoAllCommand):
+
+00   01 02 03 04   05 06 07 08   09   10 11       12 13    14 15          16 17           18 19       20 21   22 23   24 25   26   27 28 29 30 31
+                                      00 01       02 03    04 05          06 07           08 09       10 11   12 13
+-------------------------------------------------------------------------------------------------------------------------------------------------
+95   80 14 82 66   80 14 33 28   81   27 1C       07 E5    04 01          07 2D           00 01       00 00   00 00   DF DD   1E   -- -- -- -- --
+^^   ^^^^^^^^^^^   ^^^^^^^^^^^   ^^   ^^^^^       ^^^^^    ^^^^^          ^^^^^           ^^^^^       ^^^^^   ^^^^^   ^^^^^   ^^
+ID   Source Addr   Target Addr   Idx  FW Version  FW Year  FW Month/Date  FW Hour/Minute  Bootloader  ?       ?       CRC16   CRC8
+
+
+Data structure (DevInfoSimpleCommand):
+
+00   01 02 03 04   05 06 07 08   09   10 11       12 13 14 15   16 17        18 19   20 21   22 23   24 25   26   27 28 29 30 31
+                                      00 01       02 03 04 05   06 07        08 09   10 11   12 13
+-------------------------------------------------------------------------------------------------------------------------------------------------
+95   80 14 82 66   80 14 33 28   81   27 1C       10 12 71 01   01 00        0A 00   20 01   00 00   E5 F8   95
+^^   ^^^^^^^^^^^   ^^^^^^^^^^^   ^^   ^^^^^       ^^^^^^^^^^^   ^^^^^        ^^^^^   ^^^^^   ^^^^^   ^^^^^   ^^
+ID   Source Addr   Target Addr   Idx  FW Version  HW Part No.   HW Version   ?       ?       ?       CRC16   CRC8
+*/
 #include "DevInfoParser.h"
 #include "../Hoymiles.h"
 #include <cstring>

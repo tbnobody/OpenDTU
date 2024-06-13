@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * Copyright (C) 2022-2023 Thomas Basler and others
+ * Copyright (C) 2022-2024 Thomas Basler and others
  */
 
 /*
@@ -29,13 +29,16 @@ Source Address: 80 12 23 04
 #include "CommandAbstract.h"
 #include "crc.h"
 #include <string.h>
+#include "../inverters/InverterAbstract.h"
 
-CommandAbstract::CommandAbstract(const uint64_t target_address, const uint64_t router_address)
+CommandAbstract::CommandAbstract(InverterAbstract* inv, const uint64_t router_address)
 {
     memset(_payload, 0, RF_LEN);
     _payload_size = 0;
 
-    setTargetAddress(target_address);
+    _inv = inv;
+
+    setTargetAddress(_inv->serial());
     setRouterAddress(router_address);
     setSendCount(0);
     setTimeout(0);
@@ -122,7 +125,7 @@ void CommandAbstract::convertSerialToPacketId(uint8_t buffer[], const uint64_t s
     buffer[0] = s.b[3];
 }
 
-void CommandAbstract::gotTimeout(InverterAbstract& inverter)
+void CommandAbstract::gotTimeout()
 {
 }
 

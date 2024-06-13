@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * Copyright (C) 2022-2023 Thomas Basler and others
+ * Copyright (C) 2022-2024 Thomas Basler and others
  */
 
 /*
@@ -19,8 +19,8 @@ ID   Target Addr   Source Addr        CRC8
 */
 #include "SingleDataCommand.h"
 
-SingleDataCommand::SingleDataCommand(const uint64_t target_address, const uint64_t router_address)
-    : CommandAbstract(target_address, router_address)
+SingleDataCommand::SingleDataCommand(InverterAbstract* inv, const uint64_t router_address)
+    : CommandAbstract(inv, router_address)
 {
     _payload[0] = 0x15;
     setTimeout(100);

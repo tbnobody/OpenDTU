@@ -12,44 +12,23 @@ export const LOCALES = [
     { value: Locales.FR, caption: 'Français' },
 ]
 
-export const dateTimeFormats: I18nOptions["datetimeFormats"] = {
-    [Locales.EN]: {
-        'datetime': {
-            hour: 'numeric',
-            minute: 'numeric',
-            second: 'numeric',
-            year: 'numeric',
-            month: 'numeric',
-            day: 'numeric',
-            hour12: false
-        }
-    },
-    [Locales.DE]: {
-        'datetime': {
-            hour: 'numeric',
-            minute: 'numeric',
-            second: 'numeric',
-            year: 'numeric',
-            month: 'numeric',
-            day: 'numeric',
-            hour12: false
-        }
-    },
-    [Locales.FR]: {
-        'datetime': {
-            hour: 'numeric',
-            minute: 'numeric',
-            second: 'numeric',
-            year: 'numeric',
-            month: 'numeric',
-            day: 'numeric',
-            hour12: false
-        }
-    }
-};
+export const dateTimeFormats: I18nOptions["datetimeFormats"] = {};
+export const numberFormats: I18nOptions["numberFormats"] = {};
 
-export const numberFormats: I18nOptions["numberFormats"] = {
-    [Locales.EN]: {
+LOCALES.forEach((locale) => {
+    dateTimeFormats[locale.value] = {
+        'datetime': {
+            hour: 'numeric',
+            minute: 'numeric',
+            second: 'numeric',
+            year: 'numeric',
+            month: 'numeric',
+            day: 'numeric',
+            hour12: false
+        }
+    };
+
+    numberFormats[locale.value] = {
         decimal: {
             style: 'decimal',
         },
@@ -62,44 +41,19 @@ export const numberFormats: I18nOptions["numberFormats"] = {
         percent: {
             style: 'percent',
         },
-        kilobyte: {
-            style: 'unit', unit: 'kilobyte',
-        },
-    },
-    [Locales.DE]: {
-        decimal: {
-            style: 'decimal',
-        },
-        decimalNoDigits: {
-            style: 'decimal', minimumFractionDigits: 0, maximumFractionDigits: 0
-        },
-        decimalTwoDigits: {
-            style: 'decimal', minimumFractionDigits: 2, maximumFractionDigits: 2
-        },
-        percent: {
-            style: 'percent',
+        byte: {
+            style: 'unit', unit: 'byte',
         },
         kilobyte: {
             style: 'unit', unit: 'kilobyte',
         },
-    },
-    [Locales.FR]: {
-        decimal: {
-            style: 'decimal',
+        megabyte: {
+            style: 'unit', unit: 'megabyte',
         },
-        decimalNoDigits: {
-            style: 'decimal', minimumFractionDigits: 0, maximumFractionDigits: 0
+        celsius: {
+            style: 'unit', unit: 'celsius', maximumFractionDigits: 1,
         },
-        decimalTwoDigits: {
-            style: 'decimal', minimumFractionDigits: 2, maximumFractionDigits: 2
-        },
-        percent: {
-          style: 'percent',
-        },
-        kilobyte: {
-            style: 'unit', unit: 'kilobyte',
-        },
-    },
-};
+    };
+});
 
 export const defaultLocale = Locales.EN;
