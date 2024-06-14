@@ -171,7 +171,7 @@ void checkMagicByte(unsigned char &byte)
       // Datatype Octet String
       setState(SML_HDATA, (byte & 0x0F) << 4);
     }
-    else if (byte >= 0xF0 /*&& byte <= 0xFF*/) {
+    else if (byte >= 0xF0) {
       /* Datatype List of ...*/
       setState(SML_LISTEXTENDED, (byte & 0x0F) << 4);
     }
