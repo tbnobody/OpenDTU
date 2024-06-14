@@ -80,7 +80,7 @@ void pushListBuffer(unsigned char byte)
 
 void reduceList()
 {
-  if (currentLevel <= MAX_TREE_SIZE && nodes[currentLevel] > 0)
+  if (currentLevel < MAX_TREE_SIZE && nodes[currentLevel] > 0)
     nodes[currentLevel]--;
 }
 
