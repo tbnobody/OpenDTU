@@ -37,10 +37,18 @@ void PowerMeterSml::processSmlByte(uint8_t byte)
                 handler.decoder(*handler.target);
 
                 if (_verboseLogging) {
-                    MessageOutput.printf("[PowerMeterSml] decoded %s to %.2f\r\n",
-                            handler.name, *handler.target);
+                    MessageOutput.printf("[%s] decoded %s to %.2f\r\n",
+                            _user.c_str(), handler.name, *handler.target);
                 }
             }
+            break;
+        case SML_FINAL:
+            MessageOutput.printf("[%s] TotalPower: %5.2f\r\n",
+                    _user.c_str(), getPowerTotal());
+            break;
+        case SML_CHECKSUM_ERROR:
+            MessageOutput.printf("[%s] checksum verification failed\r\n",
+                    _user.c_str());
             break;
         default:
             break;

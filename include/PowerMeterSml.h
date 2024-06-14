@@ -16,9 +16,13 @@ public:
     void doMqttPublish() const final;
 
 protected:
+    explicit PowerMeterSml(char const* user)
+        : _user(user) { }
+
     void processSmlByte(uint8_t byte);
 
 private:
+    std::string _user;
     mutable std::mutex _mutex;
 
     float _activePowerTotal = 0.0;

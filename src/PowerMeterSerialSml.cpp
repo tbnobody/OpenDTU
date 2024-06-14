@@ -39,5 +39,4 @@ void PowerMeterSerialSml::loop()
         processSmlByte(_upSmlSerial->read());
     }
 
-    MessageOutput.printf("[PowerMeterSerialSml]: TotalPower: %5.2f\r\n", getPowerTotal());
 }

@@ -6,6 +6,9 @@
 
 class PowerMeterSerialSml : public PowerMeterSml {
 public:
+    PowerMeterSerialSml()
+        : PowerMeterSml("PowerMeterSerialSml") { }
+
     ~PowerMeterSerialSml();
 
     bool init() final;
