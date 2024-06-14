@@ -189,7 +189,7 @@ void checkMagicByte(unsigned char &byte)
   }
 }
 
-sml_states_t smlState(unsigned char &currentByte)
+sml_states_t smlState(unsigned char currentByte)
 {
   unsigned char size;
   if (len > 0)

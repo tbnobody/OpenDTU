@@ -92,7 +92,7 @@ typedef enum {
   SML_COUNT = 255
 } sml_units_t;
 
-sml_states_t smlState(unsigned char &byte);
+sml_states_t smlState(unsigned char byte);
 bool smlOBISCheck(const unsigned char *obis);
 void smlOBISManufacturer(unsigned char *str, int maxSize);
 void smlOBISByUnit(long long int &wh, signed char &scaler, sml_units_t unit);
