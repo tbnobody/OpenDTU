@@ -101,5 +101,7 @@ void smlOBISWh(float &wh);
 void smlOBISW(float &w);
 void smlOBISVolt(float &v);
 void smlOBISAmpere(float &a);
+void smlOBISHertz(float &h);
+void smlOBISDegree(float &d);
 
 #endif
