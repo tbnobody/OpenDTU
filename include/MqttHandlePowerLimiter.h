@@ -23,7 +23,8 @@ private:
         VoltageStartThreshold,
         VoltageStopThreshold,
         FullSolarPassThroughStartVoltage,
-        FullSolarPassThroughStopVoltage
+        FullSolarPassThroughStopVoltage,
+        UpperPowerLimit
     };
 
     void onMqttCmd(MqttPowerLimiterCommand command, const espMqttClientTypes::MessageProperties& properties, const char* topic, const uint8_t* payload, size_t len, size_t index, size_t total);
