@@ -5,23 +5,29 @@
 float PowerMeterSml::getPowerTotal() const
 {
     std::lock_guard<std::mutex> l(_mutex);
-    return _activePowerTotal;
+    if (_values.activePowerTotal.has_value()) { return *_values.activePowerTotal; }
+    return 0;
 }
 
 void PowerMeterSml::doMqttPublish() const
 {
+#define PUB(t, m) \
+    if (_values.m.has_value()) { mqttPublish(t, *_values.m); }
+
     std::lock_guard<std::mutex> l(_mutex);
-    mqttPublish("power1", _activePowerL1);
-    mqttPublish("power2", _activePowerL2);
-    mqttPublish("power3", _activePowerL3);
-    mqttPublish("voltage1", _voltageL1);
-    mqttPublish("voltage2", _voltageL2);
-    mqttPublish("voltage3", _voltageL3);
-    mqttPublish("current1", _currentL1);
-    mqttPublish("current2", _currentL2);
-    mqttPublish("current3", _currentL3);
-    mqttPublish("import", _energyImport);
-    mqttPublish("export", _energyExport);
+    PUB("power1", activePowerL1);
+    PUB("power2", activePowerL2);
+    PUB("power3", activePowerL3);
+    PUB("voltage1", voltageL1);
+    PUB("voltage2", voltageL2);
+    PUB("voltage3", voltageL3);
+    PUB("current1", currentL1);
+    PUB("current2", currentL2);
+    PUB("current3", currentL3);
+    PUB("import", energyImport);
+    PUB("export", energyExport);
+
+#undef PUB
 }
 
 void PowerMeterSml::processSmlByte(uint8_t byte)
@@ -31,22 +37,27 @@ void PowerMeterSml::processSmlByte(uint8_t byte)
             for (auto& handler: smlHandlerList) {
                 if (!smlOBISCheck(handler.OBIS)) { continue; }
 
-                gotUpdate();
-
-                std::lock_guard<std::mutex> l(_mutex);
-                handler.decoder(*handler.target);
+                float helper = 0.0;
+                handler.decoder(helper);
 
                 if (_verboseLogging) {
                     MessageOutput.printf("[%s] decoded %s to %.2f\r\n",
-                            _user.c_str(), handler.name, *handler.target);
+                            _user.c_str(), handler.name, helper);
                 }
+
+                std::lock_guard<std::mutex> l(_mutex);
+                *handler.target = helper;
             }
             break;
         case SML_FINAL:
+            gotUpdate();
+            _values = _cache;
+            _cache = { std::nullopt };
             MessageOutput.printf("[%s] TotalPower: %5.2f\r\n",
                     _user.c_str(), getPowerTotal());
             break;
         case SML_CHECKSUM_ERROR:
+            _cache = { std::nullopt };
             MessageOutput.printf("[%s] checksum verification failed\r\n",
                     _user.c_str());
             break;
