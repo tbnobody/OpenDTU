@@ -189,6 +189,12 @@ void checkMagicByte(unsigned char &byte)
   }
 }
 
+void smlReset(void)
+{
+  len = 4; // expect start sequence
+  currentState = SML_START;
+}
+
 sml_states_t smlState(unsigned char currentByte)
 {
   unsigned char size;

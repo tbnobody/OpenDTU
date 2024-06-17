@@ -20,6 +20,7 @@ protected:
     explicit PowerMeterSml(char const* user)
         : _user(user) { }
 
+    void reset();
     void processSmlByte(uint8_t byte);
 
 private:

@@ -110,6 +110,8 @@ void PowerMeterSerialSml::pollingLoop()
 
         lastAvailable = 0;
 
+        PowerMeterSml::reset();
+
         lock.lock();
     }
 }

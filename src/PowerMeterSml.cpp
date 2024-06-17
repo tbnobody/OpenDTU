@@ -30,6 +30,12 @@ void PowerMeterSml::doMqttPublish() const
 #undef PUB
 }
 
+void PowerMeterSml::reset()
+{
+    smlReset();
+    _cache = { std::nullopt };
+}
+
 void PowerMeterSml::processSmlByte(uint8_t byte)
 {
     switch (smlState(byte)) {
@@ -52,12 +58,12 @@ void PowerMeterSml::processSmlByte(uint8_t byte)
         case SML_FINAL:
             gotUpdate();
             _values = _cache;
-            _cache = { std::nullopt };
+            reset();
             MessageOutput.printf("[%s] TotalPower: %5.2f\r\n",
                     _user.c_str(), getPowerTotal());
             break;
         case SML_CHECKSUM_ERROR:
-            _cache = { std::nullopt };
+            reset();
             MessageOutput.printf("[%s] checksum verification failed\r\n",
                     _user.c_str());
             break;

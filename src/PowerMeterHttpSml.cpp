@@ -107,5 +107,7 @@ String PowerMeterHttpSml::poll()
         processSmlByte(pStream->read());
     }
 
+    PowerMeterSml::reset();
+
     return "";
 }
