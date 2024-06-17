@@ -48,6 +48,13 @@ bool PowerMeterHttpJson::init()
         return false;
     }
 
+    return true;
+}
+
+void PowerMeterHttpJson::loop()
+{
+    if (_taskHandle != nullptr) { return; }
+
     std::unique_lock<std::mutex> lock(_pollingMutex);
     _stopPolling = false;
     lock.unlock();
@@ -55,8 +62,6 @@ bool PowerMeterHttpJson::init()
     uint32_t constexpr stackSize = 3072;
     xTaskCreate(PowerMeterHttpJson::pollingLoopHelper, "PM:HTTP+JSON",
             stackSize, this, 1/*prio*/, &_taskHandle);
-
-    return true;
 }
 
 void PowerMeterHttpJson::pollingLoopHelper(void* context)

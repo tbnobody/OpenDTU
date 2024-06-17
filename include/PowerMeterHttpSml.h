@@ -20,7 +20,7 @@ public:
     ~PowerMeterHttpSml();
 
     bool init() final;
-    void loop() final { } // polling is performed asynchronously
+    void loop() final;
     bool isDataValid() const final;
 
     // returns an empty string on success,

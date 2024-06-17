@@ -12,7 +12,7 @@ public:
     ~PowerMeterSerialSml();
 
     bool init() final;
-    void loop() final { } // polling is performed asynchronously
+    void loop() final;
 
 private:
     // we assume that an SML datagram is complete after no additional

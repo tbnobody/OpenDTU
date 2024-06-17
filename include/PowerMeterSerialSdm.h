@@ -23,7 +23,7 @@ public:
     ~PowerMeterSerialSdm();
 
     bool init() final;
-    void loop() final { } // polling is performed asynchronously
+    void loop() final;
     float getPowerTotal() const final;
     bool isDataValid() const final;
     void doMqttPublish() const final;

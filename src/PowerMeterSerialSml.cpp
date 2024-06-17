@@ -23,6 +23,13 @@ bool PowerMeterSerialSml::init()
     _upSmlSerial->enableTx(false);
     _upSmlSerial->flush();
 
+    return true;
+}
+
+void PowerMeterSerialSml::loop()
+{
+    if (_taskHandle != nullptr) { return; }
+
     std::unique_lock<std::mutex> lock(_pollingMutex);
     _stopPolling = false;
     lock.unlock();
@@ -30,8 +37,6 @@ bool PowerMeterSerialSml::init()
     uint32_t constexpr stackSize = 3072;
     xTaskCreate(PowerMeterSerialSml::pollingLoopHelper, "PM:SML",
             stackSize, this, 1/*prio*/, &_taskHandle);
-
-    return true;
 }
 
 PowerMeterSerialSml::~PowerMeterSerialSml()

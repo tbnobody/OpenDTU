@@ -43,6 +43,13 @@ bool PowerMeterSerialSdm::init()
             SWSERIAL_8N1, pin.powermeter_rx, pin.powermeter_tx);
     _upSdm->begin();
 
+    return true;
+}
+
+void PowerMeterSerialSdm::loop()
+{
+    if (_taskHandle != nullptr) { return; }
+
     std::unique_lock<std::mutex> lock(_pollingMutex);
     _stopPolling = false;
     lock.unlock();
@@ -50,8 +57,6 @@ bool PowerMeterSerialSdm::init()
     uint32_t constexpr stackSize = 3072;
     xTaskCreate(PowerMeterSerialSdm::pollingLoopHelper, "PM:SDM",
             stackSize, this, 1/*prio*/, &_taskHandle);
-
-    return true;
 }
 
 float PowerMeterSerialSdm::getPowerTotal() const

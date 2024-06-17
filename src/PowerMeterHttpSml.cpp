@@ -25,16 +25,7 @@ bool PowerMeterHttpSml::init()
 {
     _upHttpGetter = std::make_unique<HttpGetter>(_cfg.HttpRequest);
 
-    if (_upHttpGetter->init()) {
-        std::unique_lock<std::mutex> lock(_pollingMutex);
-        _stopPolling = false;
-        lock.unlock();
-
-        uint32_t constexpr stackSize = 3072;
-        xTaskCreate(PowerMeterHttpSml::pollingLoopHelper, "PM:HTTP+SML",
-                stackSize, this, 1/*prio*/, &_taskHandle);
-        return true;
-    }
+    if (_upHttpGetter->init()) { return true; }
 
     MessageOutput.printf("[PowerMeterHttpSml] Initializing HTTP getter failed:\r\n");
     MessageOutput.printf("[PowerMeterHttpSml] %s\r\n", _upHttpGetter->getErrorText());
@@ -42,6 +33,19 @@ bool PowerMeterHttpSml::init()
     _upHttpGetter = nullptr;
 
     return false;
+}
+
+void PowerMeterHttpSml::loop()
+{
+    if (_taskHandle != nullptr) { return; }
+
+    std::unique_lock<std::mutex> lock(_pollingMutex);
+    _stopPolling = false;
+    lock.unlock();
+
+    uint32_t constexpr stackSize = 3072;
+    xTaskCreate(PowerMeterHttpSml::pollingLoopHelper, "PM:HTTP+SML",
+            stackSize, this, 1/*prio*/, &_taskHandle);
 }
 
 void PowerMeterHttpSml::pollingLoopHelper(void* context)
