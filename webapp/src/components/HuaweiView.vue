@@ -6,7 +6,7 @@
   </div>
 
   <template v-else>
-    <div class="row gy-3">
+    <div class="row gy-3 mt-0">
       <div class="tab-content col-sm-12 col-md-12" id="v-pills-tabContent">
         <div class="card">
           <div class="card-header d-flex justify-content-between align-items-center" :class="{

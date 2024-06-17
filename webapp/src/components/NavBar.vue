@@ -11,7 +11,7 @@
                 <span style="margin-left: .5rem">
                     OpenDTU-OnBattery
                 </span>
-                <span class="text-info">
+                <span class="text-info mx-2">
                     <BIconBatteryCharging width="20" height="20" class="d-inline-block align-text-center" />
                 </span>
             </router-link>

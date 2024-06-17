@@ -7,9 +7,9 @@
     </div>
 
     <template v-else>
-        <div class="row gy-3">
+        <div class="row gy-3 mt-0" v-for="(item, serial) in vedirect.instances" :key="serial">
             <div class="tab-content col-sm-12 col-md-12" id="v-pills-tabContent">
-                <div class="card" v-for="(item, serial) in vedirect.instances" :key="serial">
+                <div class="card">
                     <div class="card-header d-flex justify-content-between align-items-center"
                         :class="{
                             'text-bg-danger': item.data_age_ms >= 10000,

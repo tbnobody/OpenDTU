@@ -1,8 +1,8 @@
 <template>
     <BasePage :title="$t('home.LiveData')" :isLoading="dataLoading" :isWideScreen="true" :showWebSocket="true" :isWebsocketConnected="isWebsocketConnected" @reload="reloadData">
         <HintView :hints="liveData.hints" />
-        <InverterTotalInfo :totalData="liveData.total" :totalVeData="liveData.vedirect" :totalBattData="liveData.battery" :powerMeterData="liveData.power_meter" :huaweiData="liveData.huawei"/><br />
-        <div class="row gy-3">
+        <InverterTotalInfo :totalData="liveData.total" :totalVeData="liveData.vedirect" :totalBattData="liveData.battery" :powerMeterData="liveData.power_meter" :huaweiData="liveData.huawei"/>
+        <div class="row gy-3 mt-0">
             <div class="col-sm-3 col-md-2" :style="[inverterData.length == 1 ? { 'display': 'none' } : {}]">
                 <div class="nav nav-pills row-cols-sm-1" id="v-pills-tab" role="tablist" aria-orientation="vertical">
                     <button v-for="inverter in inverterData" :key="inverter.serial" class="nav-link border border-primary text-break"

@@ -1,7 +1,6 @@
 <template>
-  <div v-show="totalVeData.enabled">
     <div class="row row-cols-1 row-cols-md-3 g-3">
-        <div class="col">
+        <div class="col" v-if="totalVeData.enabled">
             <CardElement centerContent textVariant="text-bg-success" :text="$t('invertertotalinfo.MpptTotalYieldTotal')">
                 <h2>
                     {{ $n(totalVeData.total.YieldTotal.v, 'decimal', {
@@ -12,7 +11,7 @@
                 </h2>
             </CardElement>
         </div>
-        <div class="col">
+        <div class="col" v-if="totalVeData.enabled">
             <CardElement centerContent textVariant="text-bg-success" :text="$t('invertertotalinfo.MpptTotalYieldDay')">
                 <h2>
                     {{ $n(totalVeData.total.YieldDay.v, 'decimal', {
@@ -23,7 +22,7 @@
                 </h2>
             </CardElement>
         </div>
-        <div class="col">
+        <div class="col" v-if="totalVeData.enabled">
             <CardElement centerContent textVariant="text-bg-success" :text="$t('invertertotalinfo.MpptTotalPower')">
                 <h2>
                     {{ $n(totalVeData.total.Power.v, 'decimal', {
@@ -34,9 +33,6 @@
                 </h2>
             </CardElement>
         </div>
-    </div>
-  </div>
-  <div class="row row-cols-1 row-cols-md-3 g-3">
         <div class="col">
             <CardElement centerContent textVariant="text-bg-success" :text="$t('invertertotalinfo.InverterTotalYieldTotal')">
                 <h2>
@@ -70,10 +66,7 @@
                 </h2>
             </CardElement>
         </div>
-  </div>
-  <div v-show="totalBattData.enabled || powerMeterData.enabled || huaweiData.enabled">
-    <div class="row row-cols-1 row-cols-md-3 g-3">
-      <div class="col" v-if="totalBattData.enabled">
+        <div class="col" v-if="totalBattData.enabled">
             <CardElement centerContent textVariant="text-bg-success" :text="$t('invertertotalinfo.BatterySoc')">
                 <h2>
                     {{ $n(totalBattData.soc.v, 'decimal', {
@@ -83,8 +76,8 @@
                     <small class="text-muted">{{ totalBattData.soc.u }}</small>
                 </h2>
             </CardElement>
-      </div>
-      <div class="col" v-if="powerMeterData.enabled">
+        </div>
+        <div class="col" v-if="powerMeterData.enabled">
             <CardElement centerContent textVariant="text-bg-success" :text="$t('invertertotalinfo.HomePower')">
                 <h2>
                     {{ $n(powerMeterData.Power.v, 'decimal', {
@@ -94,8 +87,8 @@
                     <small class="text-muted">{{powerMeterData.Power.u }}</small>
                 </h2>
             </CardElement>
-      </div>
-      <div class="col" v-if="huaweiData.enabled">
+        </div>
+        <div class="col" v-if="huaweiData.enabled">
             <CardElement centerContent textVariant="text-bg-success" :text="$t('invertertotalinfo.HuaweiPower')">
                 <h2>
                     {{ $n(huaweiData.Power.v, 'decimal', {
@@ -105,9 +98,8 @@
                     <small class="text-muted">{{huaweiData.Power.u }}</small>
                 </h2>
             </CardElement>
-      </div>
+        </div>
     </div>
-  </div>
 </template>
 
 <script lang="ts">
