@@ -202,7 +202,9 @@
         "ChipRevision": "Révision de la puce",
         "ChipCores": "Nombre de cœurs",
         "CpuFrequency": "Fréquence du CPU",
-        "Mhz": "MHz"
+        "Mhz": "MHz",
+        "CpuTemperature": "CPU Temperature",
+        "FlashSize": "Taille de la mémoire flash"
     },
     "memoryinfo": {
         "MemoryInformation": "Informations sur la mémoire",
@@ -513,6 +515,7 @@
         "ZeroRuntimeHint": "Zero runtime data (no yield data) if inverter becomes unreachable.",
         "ZeroDay": "Zero daily yield at midnight",
         "ZeroDayHint": "This only works if the inverter is unreachable. If data is read from the inverter, it's values will be used. (Reset only occours on power cycle)",
+        "ClearEventlog": "Clear Eventlog at midnight",
         "Cancel": "@:base.Cancel",
         "Save": "@:base.Save",
         "DeleteMsg": "Êtes-vous sûr de vouloir supprimer l'onduleur \"{name}\" avec le numéro de série \"{serial}\" ?",
@@ -590,9 +593,9 @@
         "DefaultProfile": "(Réglages par défaut)",
         "ProfileHint": "Votre appareil peut cesser de répondre si vous sélectionnez un profil incompatible. Dans ce cas, vous devez effectuer une suppression via l'interface série.",
         "Display": "Affichage",
-        "PowerSafe": "Activer l'économiseur d'énergie",
+        "PowerSafe": "Economiseur d'énergie",
         "PowerSafeHint": "Eteindre l'écran si aucun onduleur n'est en production.",
-        "Screensaver": "Activer l'écran de veille",
+        "Screensaver": "OLED Anti burn-in",
         "ScreensaverHint": "Déplacez un peu l'écran à chaque mise à jour pour éviter le phénomène de brûlure. (Utile surtout pour les écrans OLED)",
         "DiagramMode": "Diagram mode:",
         "off": "Off",

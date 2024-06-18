@@ -25,20 +25,7 @@ MqttHandleInverterClass::MqttHandleInverterClass()
 
 void MqttHandleInverterClass::init(Scheduler& scheduler)
 {
-    using std::placeholders::_1;
-    using std::placeholders::_2;
-    using std::placeholders::_3;
-    using std::placeholders::_4;
-    using std::placeholders::_5;
-    using std::placeholders::_6;
-
-    const String topic = MqttSettings.getPrefix();
-    MqttSettings.subscribe(String(topic + "+/cmd/" + TOPIC_SUB_LIMIT_PERSISTENT_RELATIVE), 0, std::bind(&MqttHandleInverterClass::onMqttMessage, this, _1, _2, _3, _4, _5, _6));
-    MqttSettings.subscribe(String(topic + "+/cmd/" + TOPIC_SUB_LIMIT_PERSISTENT_ABSOLUTE), 0, std::bind(&MqttHandleInverterClass::onMqttMessage, this, _1, _2, _3, _4, _5, _6));
-    MqttSettings.subscribe(String(topic + "+/cmd/" + TOPIC_SUB_LIMIT_NONPERSISTENT_RELATIVE), 0, std::bind(&MqttHandleInverterClass::onMqttMessage, this, _1, _2, _3, _4, _5, _6));
-    MqttSettings.subscribe(String(topic + "+/cmd/" + TOPIC_SUB_LIMIT_NONPERSISTENT_ABSOLUTE), 0, std::bind(&MqttHandleInverterClass::onMqttMessage, this, _1, _2, _3, _4, _5, _6));
-    MqttSettings.subscribe(String(topic + "+/cmd/" + TOPIC_SUB_POWER), 0, std::bind(&MqttHandleInverterClass::onMqttMessage, this, _1, _2, _3, _4, _5, _6));
-    MqttSettings.subscribe(String(topic + "+/cmd/" + TOPIC_SUB_RESTART), 0, std::bind(&MqttHandleInverterClass::onMqttMessage, this, _1, _2, _3, _4, _5, _6));
+    subscribeTopics();
 
     scheduler.addTask(_loopTask);
     _loopTask.setInterval(Configuration.get().Mqtt.PublishInterval * TASK_SECOND);
@@ -246,4 +233,33 @@ void MqttHandleInverterClass::onMqttMessage(const espMqttClientTypes::MessagePro
             MessageOutput.println("Ignored because retained");
         }
     }
+}
+
+void MqttHandleInverterClass::subscribeTopics()
+{
+    using std::placeholders::_1;
+    using std::placeholders::_2;
+    using std::placeholders::_3;
+    using std::placeholders::_4;
+    using std::placeholders::_5;
+    using std::placeholders::_6;
+
+    const String topic = MqttSettings.getPrefix();
+    MqttSettings.subscribe(String(topic + "+/cmd/" + TOPIC_SUB_LIMIT_PERSISTENT_RELATIVE), 0, std::bind(&MqttHandleInverterClass::onMqttMessage, this, _1, _2, _3, _4, _5, _6));
+    MqttSettings.subscribe(String(topic + "+/cmd/" + TOPIC_SUB_LIMIT_PERSISTENT_ABSOLUTE), 0, std::bind(&MqttHandleInverterClass::onMqttMessage, this, _1, _2, _3, _4, _5, _6));
+    MqttSettings.subscribe(String(topic + "+/cmd/" + TOPIC_SUB_LIMIT_NONPERSISTENT_RELATIVE), 0, std::bind(&MqttHandleInverterClass::onMqttMessage, this, _1, _2, _3, _4, _5, _6));
+    MqttSettings.subscribe(String(topic + "+/cmd/" + TOPIC_SUB_LIMIT_NONPERSISTENT_ABSOLUTE), 0, std::bind(&MqttHandleInverterClass::onMqttMessage, this, _1, _2, _3, _4, _5, _6));
+    MqttSettings.subscribe(String(topic + "+/cmd/" + TOPIC_SUB_POWER), 0, std::bind(&MqttHandleInverterClass::onMqttMessage, this, _1, _2, _3, _4, _5, _6));
+    MqttSettings.subscribe(String(topic + "+/cmd/" + TOPIC_SUB_RESTART), 0, std::bind(&MqttHandleInverterClass::onMqttMessage, this, _1, _2, _3, _4, _5, _6));
+}
+
+void MqttHandleInverterClass::unsubscribeTopics()
+{
+    const String topic = MqttSettings.getPrefix();
+    MqttSettings.unsubscribe(String(topic + "+/cmd/" + TOPIC_SUB_LIMIT_PERSISTENT_RELATIVE));
+    MqttSettings.unsubscribe(String(topic + "+/cmd/" + TOPIC_SUB_LIMIT_PERSISTENT_ABSOLUTE));
+    MqttSettings.unsubscribe(String(topic + "+/cmd/" + TOPIC_SUB_LIMIT_NONPERSISTENT_RELATIVE));
+    MqttSettings.unsubscribe(String(topic + "+/cmd/" + TOPIC_SUB_LIMIT_NONPERSISTENT_ABSOLUTE));
+    MqttSettings.unsubscribe(String(topic + "+/cmd/" + TOPIC_SUB_POWER));
+    MqttSettings.unsubscribe(String(topic + "+/cmd/" + TOPIC_SUB_RESTART));
 }

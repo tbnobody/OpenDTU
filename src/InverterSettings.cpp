@@ -82,6 +82,7 @@ void InverterSettingsClass::init(Scheduler& scheduler)
                     inv->setReachableThreshold(config.Inverter[i].ReachableThreshold);
                     inv->setZeroValuesIfUnreachable(config.Inverter[i].ZeroRuntimeDataIfUnrechable);
                     inv->setZeroYieldDayOnMidnight(config.Inverter[i].ZeroYieldDayOnMidnight);
+                    inv->setClearEventlogOnMidnight(config.Inverter[i].ClearEventlogOnMidnight);
                     inv->Statistics()->setYieldDayCorrection(config.Inverter[i].YieldDayCorrection);
                     for (uint8_t c = 0; c < INV_MAX_CHAN_COUNT; c++) {
                         inv->Statistics()->setStringMaxPower(c, config.Inverter[i].channel[c].MaxChannelPower);

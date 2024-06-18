@@ -21,7 +21,7 @@ Import("env")
 platform = env.PioPlatform()
 
 import sys
-from os.path import join
+from os.path import join, getsize
 
 sys.path.append(join(platform.get_package_dir("tool-esptoolpy")))
 import esptool
@@ -59,6 +59,14 @@ def esp32_create_combined_bin(source, target, env):
         "--flash_size",
         flash_size,
     ]
+
+    # platformio estimates the amount of flash used to store the firmware. this
+    # estimate is not accurate. we perform a final check on the firmware bin
+    # size by comparing it against the respective partition size.
+    max_size = env.BoardConfig().get("upload.maximum_size", 1)
+    fw_size = getsize(firmware_name)
+    if (fw_size > max_size):
+        raise Exception("firmware binary too large: %d > %d" % (fw_size, max_size))
 
     print("    Offset | File")
     for section in sections:

@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * Copyright (C) 2022 Thomas Basler and others
+ * Copyright (C) 2022-2024 Thomas Basler and others
  */
 #include "HM_Abstract.h"
 #include "HoymilesRadio.h"
@@ -30,9 +30,8 @@ bool HM_Abstract::sendStatsRequest()
     time_t now;
     time(&now);
 
-    auto cmd = _radio->prepareCommand<RealTimeRunDataCommand>();
+    auto cmd = _radio->prepareCommand<RealTimeRunDataCommand>(this);
     cmd->setTime(now);
-    cmd->setTargetAddress(serial());
     _radio->enqueCommand(cmd);
 
     return true;
@@ -62,9 +61,8 @@ bool HM_Abstract::sendAlarmLogRequest(const bool force)
     time_t now;
     time(&now);
 
-    auto cmd = _radio->prepareCommand<AlarmDataCommand>();
+    auto cmd = _radio->prepareCommand<AlarmDataCommand>(this);
     cmd->setTime(now);
-    cmd->setTargetAddress(serial());
     EventLog()->setLastAlarmRequestSuccess(CMD_PENDING);
     _radio->enqueCommand(cmd);
 
@@ -85,14 +83,12 @@ bool HM_Abstract::sendDevInfoRequest()
     time_t now;
     time(&now);
 
-    auto cmdAll = _radio->prepareCommand<DevInfoAllCommand>();
+    auto cmdAll = _radio->prepareCommand<DevInfoAllCommand>(this);
     cmdAll->setTime(now);
-    cmdAll->setTargetAddress(serial());
     _radio->enqueCommand(cmdAll);
 
-    auto cmdSimple = _radio->prepareCommand<DevInfoSimpleCommand>();
+    auto cmdSimple = _radio->prepareCommand<DevInfoSimpleCommand>(this);
     cmdSimple->setTime(now);
-    cmdSimple->setTargetAddress(serial());
     _radio->enqueCommand(cmdSimple);
 
     return true;
@@ -112,9 +108,8 @@ bool HM_Abstract::sendSystemConfigParaRequest()
     time_t now;
     time(&now);
 
-    auto cmd = _radio->prepareCommand<SystemConfigParaCommand>();
+    auto cmd = _radio->prepareCommand<SystemConfigParaCommand>(this);
     cmd->setTime(now);
-    cmd->setTargetAddress(serial());
     SystemConfigPara()->setLastLimitRequestSuccess(CMD_PENDING);
     _radio->enqueCommand(cmd);
 
@@ -134,9 +129,8 @@ bool HM_Abstract::sendActivePowerControlRequest(float limit, const PowerLimitCon
     _activePowerControlLimit = limit;
     _activePowerControlType = type;
 
-    auto cmd = _radio->prepareCommand<ActivePowerControlCommand>();
+    auto cmd = _radio->prepareCommand<ActivePowerControlCommand>(this);
     cmd->setActivePowerLimit(limit, type);
-    cmd->setTargetAddress(serial());
     SystemConfigPara()->setLastLimitCommandSuccess(CMD_PENDING);
     _radio->enqueCommand(cmd);
 
@@ -160,9 +154,8 @@ bool HM_Abstract::sendPowerControlRequest(const bool turnOn)
         _powerState = 0;
     }
 
-    auto cmd = _radio->prepareCommand<PowerControlCommand>();
+    auto cmd = _radio->prepareCommand<PowerControlCommand>(this);
     cmd->setPowerOn(turnOn);
-    cmd->setTargetAddress(serial());
     PowerCommand()->setLastPowerCommandSuccess(CMD_PENDING);
     _radio->enqueCommand(cmd);
 
@@ -177,9 +170,8 @@ bool HM_Abstract::sendRestartControlRequest()
 
     _powerState = 2;
 
-    auto cmd = _radio->prepareCommand<PowerControlCommand>();
+    auto cmd = _radio->prepareCommand<PowerControlCommand>(this);
     cmd->setRestart();
-    cmd->setTargetAddress(serial());
     PowerCommand()->setLastPowerCommandSuccess(CMD_PENDING);
     _radio->enqueCommand(cmd);
 
@@ -219,9 +211,8 @@ bool HM_Abstract::sendGridOnProFileParaRequest()
     time_t now;
     time(&now);
 
-    auto cmd = _radio->prepareCommand<GridOnProFilePara>();
+    auto cmd = _radio->prepareCommand<GridOnProFilePara>(this);
     cmd->setTime(now);
-    cmd->setTargetAddress(serial());
     _radio->enqueCommand(cmd);
 
     return true;
