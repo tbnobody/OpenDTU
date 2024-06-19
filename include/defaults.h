@@ -3,7 +3,7 @@
 
 #define SERIAL_BAUDRATE 115200
 
-#define APP_HOSTNAME "OpenDTU-%06X"
+#define APP_HOSTNAME "OpenDTU-%06lX"
 
 #define HTTP_PORT 80
 

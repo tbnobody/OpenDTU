@@ -207,7 +207,7 @@ void NetworkSettingsClass::loop()
         if (_adminEnabled && _adminTimeoutCounterMax > 0) {
             _adminTimeoutCounter++;
             if (_adminTimeoutCounter % 10 == 0) {
-                MessageOutput.printf("Admin AP remaining seconds: %d / %d\r\n", _adminTimeoutCounter, _adminTimeoutCounterMax);
+                MessageOutput.printf("Admin AP remaining seconds: %ld / %ld\r\n", _adminTimeoutCounter, _adminTimeoutCounterMax);
             }
         }
         _connectTimeoutTimer++;

@@ -143,9 +143,9 @@ void setup()
     if (config.Dtu.Serial == DTU_SERIAL) {
         MessageOutput.print("generate serial based on ESP chip id: ");
         const uint64_t dtuId = Utils::generateDtuSerial();
-        MessageOutput.printf("%0x%08x... ",
-            ((uint32_t)((dtuId >> 32) & 0xFFFFFFFF)),
-            ((uint32_t)(dtuId & 0xFFFFFFFF)));
+        MessageOutput.printf("%0llux%08llux... ",
+            (dtuId >> 32) & 0xFFFFFFFF,
+            dtuId & 0xFFFFFFFF);
         config.Dtu.Serial = dtuId;
         Configuration.write();
     }
