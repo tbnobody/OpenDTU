@@ -20,8 +20,8 @@
 
 PowerLimiterClass PowerLimiter;
 
-void PowerLimiterClass::init(Scheduler& scheduler) 
-{ 
+void PowerLimiterClass::init(Scheduler& scheduler)
+{
     scheduler.addTask(_loopTask);
     _loopTask.setCallback(std::bind(&PowerLimiterClass::loop, this));
     _loopTask.setIterations(TASK_FOREVER);
@@ -337,6 +337,16 @@ float PowerLimiterClass::getBatteryVoltage(bool log) {
     return res;
 }
 
+static float getInverterEfficiency(std::shared_ptr<InverterAbstract> inverter)
+{
+    float inverterEfficiencyPercent = inverter->Statistics()->getChannelFieldValue(
+        TYPE_INV, CH0, FLD_EFF);
+
+    // fall back to hoymiles peak efficiency as per datasheet if inverter
+    // is currently not producing (efficiency is zero in that case)
+    return  (inverterEfficiencyPercent > 0) ? inverterEfficiencyPercent/100 : 0.967;
+}
+
 /**
  * calculate the AC output power (limit) to set, such that the inverter uses
  * the given power on its DC side, i.e., adjust the power for the inverter's
@@ -346,12 +356,7 @@ int32_t PowerLimiterClass::inverterPowerDcToAc(std::shared_ptr<InverterAbstract>
 {
     CONFIG_T& config = Configuration.get();
 
-    float inverterEfficiencyPercent = inverter->Statistics()->getChannelFieldValue(
-        TYPE_INV, CH0, FLD_EFF);
-
-    // fall back to hoymiles peak efficiency as per datasheet if inverter
-    // is currently not producing (efficiency is zero in that case)
-    float inverterEfficiencyFactor = (inverterEfficiencyPercent > 0) ? inverterEfficiencyPercent/100 : 0.967;
+    float inverterEfficiencyFactor = getInverterEfficiency(inverter);
 
     // account for losses between solar charger and inverter (cables, junctions...)
     float lossesFactor = 1.00 - static_cast<float>(config.PowerLimiter.SolarPassThroughLosses)/100;
@@ -687,8 +692,7 @@ bool PowerLimiterClass::updateInverter()
  *
  * TODO(schlimmchen): the current implementation is broken and is in need of
  * refactoring. currently it only works for inverters that provide one MPPT for
- * each input. it also does not work as expected if any input produces *some*
- * energy, but is limited by its respective solar input.
+ * each input.
  */
 static int32_t scalePowerLimit(std::shared_ptr<InverterAbstract> inverter, int32_t newLimit, int32_t currentLimitWatts)
 {
@@ -712,6 +716,54 @@ static int32_t scalePowerLimit(std::shared_ptr<InverterAbstract> inverter, int32
     // channel with little energy is actually not producing, rather than
     // producing very little due to the very low limit.
     if (currentLimitWatts < dcTotalChnls * 10) { return newLimit; }
+
+    auto const& config = Configuration.get();
+    auto allowOverscaling = config.PowerLimiter.UseOverscalingToCompensateShading;
+    auto isInverterSolarPowered = config.PowerLimiter.IsInverterSolarPowered;
+
+    // overscalling allows us to compensate for shaded panels by increasing the
+    // total power limit, if the inverter is solar powered.
+    if (allowOverscaling && isInverterSolarPowered) {
+        auto inverterOutputAC = inverter->Statistics()->getChannelFieldValue(TYPE_AC, CH0, FLD_PAC);
+        float inverterEfficiencyFactor = getInverterEfficiency(inverter);
+
+        // 98% of the expected power is good enough
+        auto expectedAcPowerPerChannel = (currentLimitWatts / dcTotalChnls) * 0.98;
+
+        size_t dcShadedChnls = 0;
+        auto shadedChannelACPowerSum = 0.0;
+
+        for (auto& c : dcChnls) {
+            auto channelPowerAC = inverter->Statistics()->getChannelFieldValue(TYPE_DC, c, FLD_PDC) * inverterEfficiencyFactor;
+
+            if (channelPowerAC < expectedAcPowerPerChannel) {
+                dcShadedChnls++;
+                shadedChannelACPowerSum += channelPowerAC;
+            }
+        }
+
+        // no shading or the shaded channels provide more power than what
+        // we currently need.
+        if (dcShadedChnls == 0 || shadedChannelACPowerSum >= newLimit) { return newLimit; }
+
+        // keep the currentLimit when all channels are shaded and we get the
+        // expected AC power or less.
+        if (dcShadedChnls == dcTotalChnls && inverterOutputAC <= newLimit) {
+            MessageOutput.printf("[DPL::scalePowerLimit] all channels are shaded, "
+                "keeping the current limit of %d W\r\n", currentLimitWatts);
+
+            return currentLimitWatts;
+        }
+
+        size_t dcNonShadedChnls = dcTotalChnls - dcShadedChnls;
+        auto overScaledLimit = static_cast<int32_t>((newLimit - shadedChannelACPowerSum) / dcNonShadedChnls * dcTotalChnls);
+
+        if (overScaledLimit <= newLimit) { return newLimit; }
+
+        MessageOutput.printf("[DPL::scalePowerLimit] %d/%d channels are shaded, "
+                "scaling %d W\r\n", dcShadedChnls, dcTotalChnls, overScaledLimit);
+        return overScaledLimit;
+    }
 
     size_t dcProdChnls = 0;
     for (auto& c : dcChnls) {

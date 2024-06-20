@@ -210,6 +210,7 @@ struct CONFIG_T {
         uint32_t Interval;
         bool IsInverterBehindPowerMeter;
         bool IsInverterSolarPowered;
+        bool UseOverscalingToCompensateShading;
         uint64_t InverterId;
         uint8_t InverterChannelId;
         int32_t TargetPowerConsumption;

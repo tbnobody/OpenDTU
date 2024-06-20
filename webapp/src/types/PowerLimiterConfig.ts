@@ -26,6 +26,7 @@ export interface PowerLimiterConfig {
     battery_always_use_at_night: boolean;
     is_inverter_behind_powermeter: boolean;
     is_inverter_solar_powered: boolean;
+    use_overscaling_to_compensate_shading: boolean;
     inverter_serial: string;
     inverter_channel_id: number;
     target_power_consumption: number;

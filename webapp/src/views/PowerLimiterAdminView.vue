@@ -68,6 +68,12 @@
                               v-model="powerLimiterConfigList.is_inverter_solar_powered"
                               type="checkbox" wide/>
 
+                <InputElement v-show="canUseOverscaling()"
+                              :label="$t('powerlimiteradmin.UseOverscalingToCompensateShading')"
+                              :tooltip="$t('powerlimiteradmin.UseOverscalingToCompensateShadingHint')"
+                              v-model="powerLimiterConfigList.use_overscaling_to_compensate_shading"
+                              type="checkbox" wide/>
+
                 <div class="row mb-3" v-if="needsChannelSelection()">
                     <label for="inverter_channel" class="col-sm-4 col-form-label">
                         {{ $t('powerlimiteradmin.InverterChannelId') }}
@@ -308,6 +314,10 @@ export default defineComponent({
         },
         hasPowerMeter() {
             return this.powerLimiterMetaData.power_meter_enabled;
+        },
+        canUseOverscaling() {
+            const cfg = this.powerLimiterConfigList;
+            return cfg.is_inverter_solar_powered;
         },
         canUseSolarPassthrough() {
             const cfg = this.powerLimiterConfigList;

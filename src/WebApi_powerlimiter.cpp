@@ -38,6 +38,7 @@ void WebApiPowerLimiterClass::onStatus(AsyncWebServerRequest* request)
     root["battery_always_use_at_night"] = config.PowerLimiter.BatteryAlwaysUseAtNight;
     root["is_inverter_behind_powermeter"] = config.PowerLimiter.IsInverterBehindPowerMeter;
     root["is_inverter_solar_powered"] = config.PowerLimiter.IsInverterSolarPowered;
+    root["use_overscaling_to_compensate_shading"] = config.PowerLimiter.UseOverscalingToCompensateShading;
     root["inverter_serial"] = String(config.PowerLimiter.InverterId);
     root["inverter_channel_id"] = config.PowerLimiter.InverterChannelId;
     root["target_power_consumption"] = config.PowerLimiter.TargetPowerConsumption;
@@ -159,6 +160,7 @@ void WebApiPowerLimiterClass::onAdminPost(AsyncWebServerRequest* request)
 
     config.PowerLimiter.IsInverterBehindPowerMeter = root["is_inverter_behind_powermeter"].as<bool>();
     config.PowerLimiter.IsInverterSolarPowered = root["is_inverter_solar_powered"].as<bool>();
+    config.PowerLimiter.UseOverscalingToCompensateShading = root["use_overscaling_to_compensate_shading"].as<bool>();
     config.PowerLimiter.InverterId = root["inverter_serial"].as<uint64_t>();
     config.PowerLimiter.InverterChannelId = root["inverter_channel_id"].as<uint8_t>();
     config.PowerLimiter.TargetPowerConsumption = root["target_power_consumption"].as<int32_t>();

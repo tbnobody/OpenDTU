@@ -637,6 +637,8 @@
         "InverterIsBehindPowerMeter": "Stromzählermessung beinhaltet Wechselrichter",
         "InverterIsBehindPowerMeterHint": "Aktivieren falls sich der Stromzähler-Messwert um die Ausgangsleistung des Wechselrichters verringert, wenn dieser Strom produziert. Normalerweise ist das zutreffend.",
         "InverterIsSolarPowered": "Wechselrichter wird von Solarmodulen gespeist",
+        "UseOverscalingToCompensateShading": "Verschattung durch Überskalierung ausgleichen",
+        "UseOverscalingToCompensateShadingHint": "Erlaubt das Überskalieren des Wechselrichter-Limits, um Verschattung eines oder mehrerer Eingänge auszugleichen",
         "VoltageThresholds": "Batterie Spannungs-Schwellwerte ",
         "VoltageLoadCorrectionInfo": "<b>Hinweis:</b> Wenn Leistung von der Batterie abgegeben wird, bricht ihre Spannung etwas ein. Der Spannungseinbruch skaliert mit dem Entladestrom. Damit nicht vorzeitig der Wechselrichter ausgeschaltet wird sobald der Stop-Schwellenwert unterschritten wurde, wird der hier angegebene Korrekturfaktor mit einberechnet um die Spannung zu errechnen die der Akku in Ruhe hätte. Korrigierte Spannung = DC Spannung + (Aktuelle Leistung (W) * Korrekturfaktor).",
         "InverterRestartHour": "Uhrzeit für geplanten Neustart",

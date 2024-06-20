@@ -184,6 +184,7 @@ bool ConfigurationClass::write()
     powerlimiter["interval"] = config.PowerLimiter.Interval;
     powerlimiter["is_inverter_behind_powermeter"] = config.PowerLimiter.IsInverterBehindPowerMeter;
     powerlimiter["is_inverter_solar_powered"] = config.PowerLimiter.IsInverterSolarPowered;
+    powerlimiter["use_overscaling_to_compensate_shading"] = config.PowerLimiter.UseOverscalingToCompensateShading;
     powerlimiter["inverter_id"] = config.PowerLimiter.InverterId;
     powerlimiter["inverter_channel_id"] = config.PowerLimiter.InverterChannelId;
     powerlimiter["target_power_consumption"] = config.PowerLimiter.TargetPowerConsumption;
@@ -444,6 +445,7 @@ bool ConfigurationClass::read()
     config.PowerLimiter.Interval =  powerlimiter["interval"] | POWERLIMITER_INTERVAL;
     config.PowerLimiter.IsInverterBehindPowerMeter = powerlimiter["is_inverter_behind_powermeter"] | POWERLIMITER_IS_INVERTER_BEHIND_POWER_METER;
     config.PowerLimiter.IsInverterSolarPowered = powerlimiter["is_inverter_solar_powered"] | POWERLIMITER_IS_INVERTER_SOLAR_POWERED;
+    config.PowerLimiter.UseOverscalingToCompensateShading = powerlimiter["use_overscaling_to_compensate_shading"] | POWERLIMITER_USE_OVERSCALING_TO_COMPENSATE_SHADING;
     config.PowerLimiter.InverterId = powerlimiter["inverter_id"] | POWERLIMITER_INVERTER_ID;
     config.PowerLimiter.InverterChannelId = powerlimiter["inverter_channel_id"] | POWERLIMITER_INVERTER_CHANNEL_ID;
     config.PowerLimiter.TargetPowerConsumption = powerlimiter["target_power_consumption"] | POWERLIMITER_TARGET_POWER_CONSUMPTION;
