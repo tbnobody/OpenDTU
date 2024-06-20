@@ -45,6 +45,7 @@ void MqttHandlePowerLimiterClass::init(Scheduler& scheduler)
     subscribe("threshold/voltage/full_solar_passthrough_stop", MqttPowerLimiterCommand::FullSolarPassThroughStopVoltage);
     subscribe("mode", MqttPowerLimiterCommand::Mode);
     subscribe("upper_power_limit", MqttPowerLimiterCommand::UpperPowerLimit);
+    subscribe("target_power_consumption", MqttPowerLimiterCommand::TargetPowerConsumption);
 
     _lastPublish = millis();
 }
@@ -78,6 +79,8 @@ void MqttHandlePowerLimiterClass::loop()
     MqttSettings.publish("powerlimiter/status/mode", String(val));
     
     MqttSettings.publish("powerlimiter/status/upper_power_limit", String(config.PowerLimiter.UpperPowerLimit));
+
+    MqttSettings.publish("powerlimiter/status/target_power_consumption", String(config.PowerLimiter.TargetPowerConsumption));
 
     MqttSettings.publish("powerlimiter/status/inverter_update_timeouts", String(PowerLimiter.getInverterUpdateTimeouts()));
 
@@ -181,6 +184,11 @@ void MqttHandlePowerLimiterClass::onMqttCmd(MqttPowerLimiterCommand command, con
             if (config.PowerLimiter.UpperPowerLimit == intValue) { return; }
             MessageOutput.printf("Setting upper power limit to: %d W\r\n", intValue);
             config.PowerLimiter.UpperPowerLimit = intValue;
+            break;
+        case MqttPowerLimiterCommand::TargetPowerConsumption:
+            if (config.PowerLimiter.TargetPowerConsumption == intValue) { return; }
+            MessageOutput.printf("Setting target power consumption to: %d W\r\n", intValue);
+            config.PowerLimiter.TargetPowerConsumption = intValue;
             break;
     }
 
