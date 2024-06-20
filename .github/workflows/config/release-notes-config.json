@@ -36,7 +36,7 @@
         }
     ],
     "template": "${{CHANGELOG}}",
-    "pr_template": "- [${{TITLE}}](https://github.com/tbnobody/OpenDTU/commit/${{MERGE_SHA}})",
+    "pr_template": "- [${{TITLE}}](https://github.com/funghi999/OpenDTU-DUO-Fusion/commit/${{MERGE_SHA}})",
     "empty_template": "- no changes",
     "label_extractor": [
         {

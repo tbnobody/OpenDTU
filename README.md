@@ -2,9 +2,9 @@
 
 This is a fork from the Hoymiles project [OpenDTU](https://github.com/tbnobody/OpenDTU).
 
-[![OpenDTU Build](https://github.com/tbnobody/OpenDTU/actions/workflows/build.yml/badge.svg)](https://github.com/tbnobody/OpenDTU/actions/workflows/build.yml)
-[![cpplint](https://github.com/tbnobody/OpenDTU/actions/workflows/cpplint.yml/badge.svg)](https://github.com/tbnobody/OpenDTU/actions/workflows/cpplint.yml)
-[![Yarn Linting](https://github.com/tbnobody/OpenDTU/actions/workflows/yarnlint.yml/badge.svg)](https://github.com/tbnobody/OpenDTU/actions/workflows/yarnlint.yml)
+[![OpenDTU Build](https://github.com/funghi999/OpenDTU-DUO-Fusion/actions/workflows/build.yml/badge.svg)](https://github.com/funghi999/OpenDTU-DUO-Fusion/actions/workflows/build.yml)
+[![cpplint](https://github.com/funghi999/OpenDTU-DUO-Fusion/actions/workflows/cpplint.yml/badge.svg)](https://github.com/funghi999/OpenDTU-DUO-Fusion/actions/workflows/cpplint.yml)
+[![Yarn Linting](https://github.com/funghi999/OpenDTU-DUO-Fusion/actions/workflows/yarnlint.yml/badge.svg)](https://github.com/funghi999/OpenDTU-DUO-Fusion/actions/workflows/yarnlint.yml)
 
 ## Documentation
 
