@@ -19,8 +19,8 @@ ID   Target Addr   Source Addr   ?    ?    ?    CH   ?    CRC8
 */
 #include "ChannelChangeCommand.h"
 
-ChannelChangeCommand::ChannelChangeCommand(const uint64_t target_address, const uint64_t router_address, const uint8_t channel)
-    : CommandAbstract(target_address, router_address)
+ChannelChangeCommand::ChannelChangeCommand(InverterAbstract* inv, const uint64_t router_address, const uint8_t channel)
+    : CommandAbstract(inv, router_address)
 {
     _payload[0] = 0x56;
     _payload[13] = 0x14;
@@ -67,7 +67,7 @@ void ChannelChangeCommand::setCountryMode(const CountryModeId_t mode)
     }
 }
 
-bool ChannelChangeCommand::handleResponse(InverterAbstract& inverter, const fragment_t fragment[], const uint8_t max_fragment_id)
+bool ChannelChangeCommand::handleResponse(const fragment_t fragment[], const uint8_t max_fragment_id)
 {
     return true;
 }

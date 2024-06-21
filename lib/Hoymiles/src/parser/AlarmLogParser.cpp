@@ -1,7 +1,27 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * Copyright (C) 2022-2023 Thomas Basler and others
+ * Copyright (C) 2022-2024 Thomas Basler and others
  */
+
+/*
+This parser is used to parse the response of 'AlarmDataCommand'.
+
+Data structure:
+* wcode:
+  * right 8 bit: Event ID
+  * bit 13: Start time = PM (12h has to be added to start time)
+  * bit 12: End time = PM (12h has to be added to start time)
+* Start: 12h based start time of the event (PM indicator in wcode)
+* End: 12h based start time of the event (PM indicator in wcode)
+
+00   01 02 03 04   05 06 07 08   09   10 11   12 13   14 15   16 17   18 19   20   21   22   23   24 25   26   27 28 29 30 31
+                                              00 01   02 03   04 05   06 07   08   09   10   11
+                                              |<-------------- First log entry -------------->|   |<->|
+-----------------------------------------------------------------------------------------------------------------------------
+95   80 14 82 66   80 14 33 28   01   00 01   80 01   00 01   91 EA   91 EA   00   00   00   00   00 8F   65   -- -- -- -- --
+^^   ^^^^^^^^^^^   ^^^^^^^^^^^   ^^   ^^^^^   ^^^^^           ^^^^^   ^^^^^   ^^   ^^   ^^   ^^   ^^^^^   ^^
+ID   Source Addr   Target Addr   Idx  ?       wcode   ?       Start   End     ?    ?    ?    ?    wcode   CRC8
+*/
 #include "AlarmLogParser.h"
 #include "../Hoymiles.h"
 #include <cstring>

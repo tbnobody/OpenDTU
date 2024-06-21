@@ -20,10 +20,14 @@
                         <td>{{ systemStatus.cpufreq }} {{ $t('hardwareinfo.Mhz') }}</td>
                     </tr>
                     <tr>
+                        <th>{{ $t('hardwareinfo.CpuTemperature') }}</th>
+                        <td>{{ $n(systemStatus.cputemp, 'celsius') }}</td>
+                    </tr>
+                    <tr>
                         <th>{{ $t('hardwareinfo.FlashSize') }}</th>
                         <td>
-                            {{ systemStatus.flashsize }} {{ $t('hardwareinfo.Bytes') }}
-                            ({{ systemStatus.flashsize / 1024 / 1024 }} {{ $t('hardwareinfo.MegaBytes') }})
+                            {{ $n(systemStatus.flashsize, 'byte') }}
+                            ({{ $n(systemStatus.flashsize / 1024 / 1024, 'megabyte') }})
                         </td>
                     </tr>
                 </tbody>

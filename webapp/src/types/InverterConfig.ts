@@ -17,6 +17,7 @@ export interface Inverter {
     reachable_threshold: number;
     zero_runtime: boolean;
     zero_day: boolean;
+    clear_eventlog: boolean;
     yieldday_correction: boolean;
     channel: Array<InverterChannel>;
 }
