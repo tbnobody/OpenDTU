@@ -38,6 +38,8 @@ struct PinMapping_t {
     uint8_t display_clk;
     uint8_t display_cs;
     uint8_t display_reset;
+    uint8_t display_busy; // for epaper
+    uint8_t display_dc;   // for epaper
     int8_t led[PINMAPPING_LED_COUNT];
 };
 

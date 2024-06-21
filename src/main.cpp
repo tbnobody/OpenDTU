@@ -4,7 +4,7 @@
  */
 #include "Configuration.h"
 #include "Datastore.h"
-#include "Display_Graphic.h"
+#include "Display.h"
 #include "InverterSettings.h"
 #include "Led_Single.h"
 #include "MessageOutput.h"
@@ -123,11 +123,13 @@ void setup()
         pin.display_data,
         pin.display_clk,
         pin.display_cs,
-        pin.display_reset);
+        pin.display_reset,
+        pin.display_busy,
+        pin.display_dc);
     Display.setDiagramMode(static_cast<DiagramMode_t>(config.Display.Diagram.Mode));
     Display.setOrientation(config.Display.Rotation);
-    Display.enablePowerSafe = config.Display.PowerSafe;
-    Display.enableScreensaver = config.Display.ScreenSaver;
+    Display.setEnablePowerSafe(config.Display.PowerSafe);
+    Display.setEnableScreensaver(config.Display.ScreenSaver);
     Display.setContrast(config.Display.Contrast);
     Display.setLanguage(config.Display.Language);
     Display.setStartupDisplay();
