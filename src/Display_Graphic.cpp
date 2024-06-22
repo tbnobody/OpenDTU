@@ -209,7 +209,7 @@ void DisplayGraphicClass::loop()
     bool displayPowerSave = false;
     bool showText = true;
 
-    bool displayPowerMeter = _mExtra % (10 * 2) < 10 && JsyMk.isInitialised(); // Every 10 seconds, swap screen
+    bool displayPowerMeter = (_mExtra % (10 * 2) < 10 || !Datastore.getIsAtLeastOneReachable()) && JsyMk.isInitialised(); // Every 10 seconds, swap screen
 
     if (displayPowerMeter) {
         const float watts = std::fabs(JsyMk.getFieldValue(0, JsyMkClass::Field_t::POWER));
