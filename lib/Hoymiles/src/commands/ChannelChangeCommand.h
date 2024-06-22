@@ -6,7 +6,7 @@
 
 class ChannelChangeCommand : public CommandAbstract {
 public:
-    explicit ChannelChangeCommand(const uint64_t target_address = 0, const uint64_t router_address = 0, const uint8_t channel = 0);
+    explicit ChannelChangeCommand(InverterAbstract* inv, const uint64_t router_address = 0, const uint8_t channel = 0);
 
     virtual String getCommandName() const;
 
@@ -15,7 +15,7 @@ public:
 
     void setCountryMode(const CountryModeId_t mode);
 
-    virtual bool handleResponse(InverterAbstract& inverter, const fragment_t fragment[], const uint8_t max_fragment_id);
+    virtual bool handleResponse(const fragment_t fragment[], const uint8_t max_fragment_id);
 
     virtual uint8_t getMaxResendCount();
 };

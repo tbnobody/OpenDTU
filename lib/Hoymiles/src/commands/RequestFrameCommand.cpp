@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * Copyright (C) 2022-2023 Thomas Basler and others
+ * Copyright (C) 2022-2024 Thomas Basler and others
  */
 
 /*
@@ -22,8 +22,8 @@ ID   Target Addr   Source Addr   Frm  CRC8
 */
 #include "RequestFrameCommand.h"
 
-RequestFrameCommand::RequestFrameCommand(const uint64_t target_address, const uint64_t router_address, uint8_t frame_no)
-    : SingleDataCommand(target_address, router_address)
+RequestFrameCommand::RequestFrameCommand(InverterAbstract* inv, const uint64_t router_address, uint8_t frame_no)
+    : SingleDataCommand(inv, router_address)
 {
     if (frame_no > 127) {
         frame_no = 0;
@@ -47,7 +47,7 @@ uint8_t RequestFrameCommand::getFrameNo() const
     return _payload[9] & (~0x80);
 }
 
-bool RequestFrameCommand::handleResponse(InverterAbstract& inverter, const fragment_t fragment[], const uint8_t max_fragment_id)
+bool RequestFrameCommand::handleResponse(const fragment_t fragment[], const uint8_t max_fragment_id)
 {
     return true;
 }

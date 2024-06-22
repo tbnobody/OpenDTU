@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * Copyright (C) 2022-2023 Thomas Basler and others
+ * Copyright (C) 2022-2024 Thomas Basler and others
  */
 
 /*
@@ -26,8 +26,8 @@ ID   Target Addr   Source Addr   Cmd  SCmd ?    CRC16   CRC8
 
 #define CRC_SIZE 2
 
-PowerControlCommand::PowerControlCommand(const uint64_t target_address, const uint64_t router_address)
-    : DevControlCommand(target_address, router_address)
+PowerControlCommand::PowerControlCommand(InverterAbstract* inv, const uint64_t router_address)
+    : DevControlCommand(inv, router_address)
 {
     _payload[10] = 0x00; // TurnOn
     _payload[11] = 0x00;
@@ -44,20 +44,20 @@ String PowerControlCommand::getCommandName() const
     return "PowerControl";
 }
 
-bool PowerControlCommand::handleResponse(InverterAbstract& inverter, const fragment_t fragment[], const uint8_t max_fragment_id)
+bool PowerControlCommand::handleResponse(const fragment_t fragment[], const uint8_t max_fragment_id)
 {
-    if (!DevControlCommand::handleResponse(inverter, fragment, max_fragment_id)) {
+    if (!DevControlCommand::handleResponse(fragment, max_fragment_id)) {
         return false;
     }
 
-    inverter.PowerCommand()->setLastUpdateCommand(millis());
-    inverter.PowerCommand()->setLastPowerCommandSuccess(CMD_OK);
+    _inv->PowerCommand()->setLastUpdateCommand(millis());
+    _inv->PowerCommand()->setLastPowerCommandSuccess(CMD_OK);
     return true;
 }
 
-void PowerControlCommand::gotTimeout(InverterAbstract& inverter)
+void PowerControlCommand::gotTimeout()
 {
-    inverter.PowerCommand()->setLastPowerCommandSuccess(CMD_NOK);
+    _inv->PowerCommand()->setLastPowerCommandSuccess(CMD_NOK);
 }
 
 void PowerControlCommand::setPowerOn(const bool state)

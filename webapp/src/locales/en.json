@@ -202,7 +202,9 @@
         "ChipRevision": "Chip Revision",
         "ChipCores": "Chip Cores",
         "CpuFrequency": "CPU Frequency",
-        "Mhz": "MHz"
+        "Mhz": "MHz",
+        "CpuTemperature": "CPU Temperature",
+        "FlashSize": "Flash Memory Size"
     },
     "memoryinfo": {
         "MemoryInformation": "Memory Information",
@@ -513,6 +515,7 @@
         "ZeroRuntimeHint": "Zero runtime data (no yield data) if inverter becomes unreachable.",
         "ZeroDay": "Zero daily yield at midnight",
         "ZeroDayHint": "This only works if the inverter is unreachable. If data is read from the inverter, it's values will be used. (Reset only occours on power cycle)",
+        "ClearEventlog": "Clear Eventlog at midnight",
         "Cancel": "@:base.Cancel",
         "Save": "@:base.Save",
         "DeleteMsg": "Are you sure you want to delete the inverter \"{name}\" with serial number {serial}?",
@@ -590,9 +593,9 @@
         "DefaultProfile": "(Default settings)",
         "ProfileHint": "Your device may stop responding if you select an incompatible profile. In this case, you must perform a deletion via the serial interface.",
         "Display": "Display",
-        "PowerSafe": "Enable Power Save:",
+        "PowerSafe": "Switch off if no solar:",
         "PowerSafeHint": "Turn off the display if no inverter is producing.",
-        "Screensaver": "Enable Screensaver:",
+        "Screensaver": "OLED Anti burn-in:",
         "ScreensaverHint": "Move the display a little bit on each update to prevent burn-in. (Useful especially for OLED displays)",
         "DiagramMode": "Diagram mode:",
         "off": "Off",

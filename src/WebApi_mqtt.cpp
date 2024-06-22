@@ -5,6 +5,7 @@
 #include "WebApi_mqtt.h"
 #include "Configuration.h"
 #include "MqttHandleHass.h"
+#include "MqttHandleInverter.h"
 #include "MqttSettings.h"
 #include "WebApi.h"
 #include "WebApi_errors.h"
@@ -76,7 +77,7 @@ void WebApiMqttClass::onMqttAdminGet(AsyncWebServerRequest* request)
     root["mqtt_client_cert"] = config.Mqtt.Tls.ClientCert;
     root["mqtt_client_key"] = config.Mqtt.Tls.ClientKey;
     root["mqtt_lwt_topic"] = config.Mqtt.Lwt.Topic;
-    root["mqtt_lwt_online"] = config.Mqtt.Lwt.Value_Online;;
+    root["mqtt_lwt_online"] = config.Mqtt.Lwt.Value_Online;
     root["mqtt_lwt_offline"] = config.Mqtt.Lwt.Value_Offline;
     root["mqtt_lwt_qos"] = config.Mqtt.Lwt.Qos;
     root["mqtt_publish_interval"] = config.Mqtt.PublishInterval;
@@ -272,7 +273,6 @@ void WebApiMqttClass::onMqttAdminPost(AsyncWebServerRequest* request)
     strlcpy(config.Mqtt.Hostname, root["mqtt_hostname"].as<String>().c_str(), sizeof(config.Mqtt.Hostname));
     strlcpy(config.Mqtt.Username, root["mqtt_username"].as<String>().c_str(), sizeof(config.Mqtt.Username));
     strlcpy(config.Mqtt.Password, root["mqtt_password"].as<String>().c_str(), sizeof(config.Mqtt.Password));
-    strlcpy(config.Mqtt.Topic, root["mqtt_topic"].as<String>().c_str(), sizeof(config.Mqtt.Topic));
     strlcpy(config.Mqtt.Lwt.Topic, root["mqtt_lwt_topic"].as<String>().c_str(), sizeof(config.Mqtt.Lwt.Topic));
     strlcpy(config.Mqtt.Lwt.Value_Online, root["mqtt_lwt_online"].as<String>().c_str(), sizeof(config.Mqtt.Lwt.Value_Online));
     strlcpy(config.Mqtt.Lwt.Value_Offline, root["mqtt_lwt_offline"].as<String>().c_str(), sizeof(config.Mqtt.Lwt.Value_Offline));
@@ -284,6 +284,13 @@ void WebApiMqttClass::onMqttAdminPost(AsyncWebServerRequest* request)
     config.Mqtt.Hass.Retain = root["mqtt_hass_retain"].as<bool>();
     config.Mqtt.Hass.IndividualPanels = root["mqtt_hass_individualpanels"].as<bool>();
     strlcpy(config.Mqtt.Hass.Topic, root["mqtt_hass_topic"].as<String>().c_str(), sizeof(config.Mqtt.Hass.Topic));
+
+    // Check if base topic was changed
+    if (strcmp(config.Mqtt.Topic, root["mqtt_topic"].as<String>().c_str())) {
+        MqttHandleInverter.unsubscribeTopics();
+        strlcpy(config.Mqtt.Topic, root["mqtt_topic"].as<String>().c_str(), sizeof(config.Mqtt.Topic));
+        MqttHandleInverter.subscribeTopics();
+    }
 
     WebApi.writeConfig(retMsg);
 

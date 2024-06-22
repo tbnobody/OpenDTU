@@ -55,6 +55,7 @@ void WebApiInverterClass::onInverterList(AsyncWebServerRequest* request)
             obj["reachable_threshold"] = config.Inverter[i].ReachableThreshold;
             obj["zero_runtime"] = config.Inverter[i].ZeroRuntimeDataIfUnrechable;
             obj["zero_day"] = config.Inverter[i].ZeroYieldDayOnMidnight;
+            obj["clear_eventlog"] = config.Inverter[i].ClearEventlogOnMidnight;
             obj["yieldday_correction"] = config.Inverter[i].YieldDayCorrection;
 
             auto inv = Hoymiles.getInverterBySerial(config.Inverter[i].Serial);
@@ -213,20 +214,21 @@ void WebApiInverterClass::onInverterEdit(AsyncWebServerRequest* request)
     inverter.Serial = new_serial;
     strncpy(inverter.Name, root["name"].as<String>().c_str(), INV_MAX_NAME_STRLEN);
 
+    inverter.Poll_Enable = root["poll_enable"] | true;
+    inverter.Poll_Enable_Night = root["poll_enable_night"] | true;
+    inverter.Command_Enable = root["command_enable"] | true;
+    inverter.Command_Enable_Night = root["command_enable_night"] | true;
+    inverter.ReachableThreshold = root["reachable_threshold"] | REACHABLE_THRESHOLD;
+    inverter.ZeroRuntimeDataIfUnrechable = root["zero_runtime"] | false;
+    inverter.ZeroYieldDayOnMidnight = root["zero_day"] | false;
+    inverter.ClearEventlogOnMidnight = root["clear_eventlog"] | false;
+    inverter.YieldDayCorrection = root["yieldday_correction"] | false;
+
     uint8_t arrayCount = 0;
     for (JsonVariant channel : channelArray) {
         inverter.channel[arrayCount].MaxChannelPower = channel["max_power"].as<uint16_t>();
         inverter.channel[arrayCount].YieldTotalOffset = channel["yield_total_offset"].as<float>();
         strncpy(inverter.channel[arrayCount].Name, channel["name"] | "", sizeof(inverter.channel[arrayCount].Name));
-        inverter.Poll_Enable = root["poll_enable"] | true;
-        inverter.Poll_Enable_Night = root["poll_enable_night"] | true;
-        inverter.Command_Enable = root["command_enable"] | true;
-        inverter.Command_Enable_Night = root["command_enable_night"] | true;
-        inverter.ReachableThreshold = root["reachable_threshold"] | REACHABLE_THRESHOLD;
-        inverter.ZeroRuntimeDataIfUnrechable = root["zero_runtime"] | false;
-        inverter.ZeroYieldDayOnMidnight = root["zero_day"] | false;
-        inverter.YieldDayCorrection = root["yieldday_correction"] | false;
-
         arrayCount++;
     }
 
@@ -254,6 +256,7 @@ void WebApiInverterClass::onInverterEdit(AsyncWebServerRequest* request)
         inv->setReachableThreshold(inverter.ReachableThreshold);
         inv->setZeroValuesIfUnreachable(inverter.ZeroRuntimeDataIfUnrechable);
         inv->setZeroYieldDayOnMidnight(inverter.ZeroYieldDayOnMidnight);
+        inv->setClearEventlogOnMidnight(inverter.ClearEventlogOnMidnight);
         inv->Statistics()->setYieldDayCorrection(inverter.YieldDayCorrection);
         for (uint8_t c = 0; c < INV_MAX_CHAN_COUNT; c++) {
             inv->Statistics()->setStringMaxPower(c, inverter.channel[c].MaxChannelPower);
