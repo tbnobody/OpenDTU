@@ -39,7 +39,7 @@
     "pulltorefreshjs": "^0.1.22",
     "sass": "^1.77.4",
     "terser": "^5.31.1",
-    "typescript": "^5.4.5",
+    "typescript": "^5.5.2",
     "vite": "^5.2.13",
     "vite-plugin-compression": "^0.5.1",
     "vite-plugin-css-injected-by-js": "^3.5.1",
