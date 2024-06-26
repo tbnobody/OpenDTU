@@ -42,45 +42,48 @@
                     </div>
                 </div>
 
-                <CardElement v-if="powerMeterConfigList.source === 0"
-                        v-for="(mqtt, index) in powerMeterConfigList.mqtt.values"
-                        :text="$t('powermeteradmin.MqttValue', { valueNumber: index + 1})"
-                        textVariant="text-bg-primary"
-                        add-space>
+                <!-- yarn linter wants us to not combine v-if with v-for, so we need to wrap the CardElements //-->
+                <div v-if="powerMeterConfigList.source === 0">
+                    <CardElement
+                            v-for="(mqtt, index) in powerMeterConfigList.mqtt.values" v-bind:key="index"
+                            :text="$t('powermeteradmin.MqttValue', { valueNumber: index + 1})"
+                            textVariant="text-bg-primary"
+                            add-space>
 
-                    <InputElement :label="$t('powermeteradmin.MqttTopic')"
-                        v-model="mqtt.topic"
-                        type="text"
-                        maxlength="256"
-                        wide />
+                        <InputElement :label="$t('powermeteradmin.MqttTopic')"
+                            v-model="mqtt.topic"
+                            type="text"
+                            maxlength="256"
+                            wide />
 
-                    <InputElement :label="$t('powermeteradmin.mqttJsonPath')"
-                        v-model="mqtt.json_path"
-                        type="text"
-                        maxlength="256"
-                        :tooltip="$t('powermeteradmin.valueJsonPathDescription')"
-                        wide />
+                        <InputElement :label="$t('powermeteradmin.mqttJsonPath')"
+                            v-model="mqtt.json_path"
+                            type="text"
+                            maxlength="256"
+                            :tooltip="$t('powermeteradmin.valueJsonPathDescription')"
+                            wide />
 
-                    <div class="row mb-3">
-                        <label for="mqtt_power_unit" class="col-sm-4 col-form-label">
-                            {{ $t('powermeteradmin.valueUnit') }}
-                        </label>
-                        <div class="col-sm-8">
-                            <select id="mqtt_power_unit" class="form-select" v-model="mqtt.unit">
-                                <option v-for="u in unitTypeList" :key="u.key" :value="u.key">
-                                    {{ u.value }}
-                                </option>
-                            </select>
+                        <div class="row mb-3">
+                            <label for="mqtt_power_unit" class="col-sm-4 col-form-label">
+                                {{ $t('powermeteradmin.valueUnit') }}
+                            </label>
+                            <div class="col-sm-8">
+                                <select id="mqtt_power_unit" class="form-select" v-model="mqtt.unit">
+                                    <option v-for="u in unitTypeList" :key="u.key" :value="u.key">
+                                        {{ u.value }}
+                                    </option>
+                                </select>
+                            </div>
                         </div>
-                    </div>
 
-                    <InputElement
-                        :label="$t('powermeteradmin.valueSignInverted')"
-                        v-model="mqtt.sign_inverted"
-                        :tooltip="$t('powermeteradmin.valueSignInvertedHint')"
-                        type="checkbox"
-                        wide />
-                </CardElement>
+                        <InputElement
+                            :label="$t('powermeteradmin.valueSignInverted')"
+                            v-model="mqtt.sign_inverted"
+                            :tooltip="$t('powermeteradmin.valueSignInvertedHint')"
+                            type="checkbox"
+                            wide />
+                    </CardElement>
+                </div>
 
                 <CardElement v-if="(powerMeterConfigList.source === 1 || powerMeterConfigList.source === 2)"
                         :text="$t('powermeteradmin.SDM')"
