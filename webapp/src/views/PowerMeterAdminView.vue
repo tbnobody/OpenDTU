@@ -143,7 +143,7 @@
 
                         <div v-if="httpJson.enabled">
 
-                            <HttpRequestSettings :cfg="httpJson.http_request" v-if="index == 0 || powerMeterConfigList.http_json.individual_requests"/>
+                            <HttpRequestSettings v-model="httpJson.http_request" v-if="index == 0 || powerMeterConfigList.http_json.individual_requests"/>
 
                             <InputElement :label="$t('powermeteradmin.valueJsonPath')"
                                 v-model="httpJson.json_path"
@@ -204,7 +204,7 @@
                             :postfix="$t('powermeteradmin.seconds')"
                             wide />
 
-                        <HttpRequestSettings :cfg="powerMeterConfigList.http_sml.http_request" />
+                        <HttpRequestSettings v-model="powerMeterConfigList.http_sml.http_request" />
                     </CardElement>
 
                     <CardElement

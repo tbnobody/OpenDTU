@@ -63,11 +63,20 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue';
+import type { HttpRequestConfig } from '@/types/HttpRequestConfig';
 import InputElement from '@/components/InputElement.vue';
 
 export default defineComponent({
-    props: {
-        'cfg': { type: Object, required: true }
+    props: { 'modelValue': Object as () => HttpRequestConfig },
+    computed: {
+        cfg: {
+            get(): HttpRequestConfig {
+                return this.modelValue || {} as HttpRequestConfig;
+            },
+            set(newValue: HttpRequestConfig): void {
+                this.$emit('update:modelValue', newValue);
+            }
+        }
     },
     components: {
         InputElement
