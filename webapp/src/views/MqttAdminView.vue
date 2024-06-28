@@ -28,6 +28,10 @@
                               v-model="mqttConfigList.mqtt_port"
                               type="number" min="1" max="65535"/>
 
+                <InputElement :label="$t('mqttadmin.ClientId')"
+                              v-model="mqttConfigList.mqtt_clientid"
+                              type="text" maxlength="64"/>
+
                 <InputElement :label="$t('mqttadmin.Username')"
                               v-model="mqttConfigList.mqtt_username"
                               type="text" maxlength="64"

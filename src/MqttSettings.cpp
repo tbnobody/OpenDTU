@@ -115,7 +115,7 @@ void MqttSettingsClass::performConnect()
         MessageOutput.println("Connecting to MQTT...");
         const CONFIG_T& config = Configuration.get();
         const String willTopic = getPrefix() + config.Mqtt.Lwt.Topic;
-        const String clientId = NetworkSettings.getApName();
+        const String clientId = config.Mqtt.ClientId;
         if (config.Mqtt.Tls.Enabled) {
             static_cast<espMqttClientSecure*>(_mqttClient)->setCACert(config.Mqtt.Tls.RootCaCert);
             static_cast<espMqttClientSecure*>(_mqttClient)->setServer(config.Mqtt.Hostname, config.Mqtt.Port);
