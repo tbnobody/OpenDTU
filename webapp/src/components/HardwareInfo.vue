@@ -19,7 +19,7 @@
                         <th>{{ $t('hardwareinfo.CpuFrequency') }}</th>
                         <td>{{ systemStatus.cpufreq }} {{ $t('hardwareinfo.Mhz') }}</td>
                     </tr>
-                    <tr>
+                    <tr v-if="systemStatus.cputemp">
                         <th>{{ $t('hardwareinfo.CpuTemperature') }}</th>
                         <td>{{ $n(systemStatus.cputemp, 'celsius') }}</td>
                     </tr>
