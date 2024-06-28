@@ -30,7 +30,7 @@ export default [
         "**/*.mts",
       ],
       languageOptions: {
-        ecmaVersion: 'latest'
+        ecmaVersion: 2022
       },
     }
   ]
