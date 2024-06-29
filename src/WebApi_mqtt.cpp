@@ -34,7 +34,7 @@ void WebApiMqttClass::onMqttStatus(AsyncWebServerRequest* request)
     root["mqtt_enabled"] = config.Mqtt.Enabled;
     root["mqtt_hostname"] = config.Mqtt.Hostname;
     root["mqtt_port"] = config.Mqtt.Port;
-    root["mqtt_clientid"] = config.Mqtt.ClientId;
+    root["mqtt_clientid"] = MqttSettings.getClientId();
     root["mqtt_username"] = config.Mqtt.Username;
     root["mqtt_topic"] = config.Mqtt.Topic;
     root["mqtt_connected"] = MqttSettings.getConnected();
