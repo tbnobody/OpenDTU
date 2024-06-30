@@ -23,10 +23,8 @@ def is_tool(name):
     return which(name) is not None
 
 def replaceInFile(in_file, out_file, text, subs, flags=0):
-    """
-        Function for replacing content for the given file
-        Taken from https://www.studytonight.com/python-howtos/search-and-replace-a-text-in-a-file-in-python
-    """
+    """Function for replacing content for the given file."""
+
     if os.path.exists(in_file):
         #read the file contents
         with open(in_file, "r", encoding="utf-8") as infile:
