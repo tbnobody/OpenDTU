@@ -3,12 +3,14 @@
  * Copyright (C) 2022-2024 Thomas Basler and others
  */
 #include "NetworkSettings.h"
+#include <driver/spi_master.h>
 #include "Configuration.h"
 #include "MessageOutput.h"
 #include "PinMapping.h"
 #include "Utils.h"
 #include "defaults.h"
 #include <ESPmDNS.h>
+#include <ETHSPI.h>
 #include <ETH.h>
 #include "__compiled_constants.h"
 
@@ -28,6 +30,27 @@ void NetworkSettingsClass::init(Scheduler& scheduler)
     WiFi.setSortMethod(WIFI_CONNECT_AP_BY_SIGNAL);
 
     WiFi.onEvent(std::bind(&NetworkSettingsClass::NetworkEvent, this, _1));
+
+    if (PinMapping.isValidW5500Config()) {
+        _spiEth = true;
+
+        PinMapping_t& pin = PinMapping.get();
+        if (PinMapping.isValidCmt2300Config() && PinMapping.isValidNrf24Config()) {
+            MessageOutput.println("No ETH connection possible with CMT and NRF enabled.");
+        } else if (PinMapping.isValidCmt2300Config()) {
+#if CONFIG_IDF_TARGET_ESP32S3
+            ETHSPI.begin(pin.w5500_sclk, pin.w5500_mosi, pin.w5500_miso, pin.w5500_cs, pin.w5500_int, pin.w5500_rst, SPI3_HOST);
+#else
+            MessageOutput.println("No SPI3_HOST avialable on current device.");
+#endif
+        } else {
+            ETHSPI.begin(pin.w5500_sclk, pin.w5500_mosi, pin.w5500_miso, pin.w5500_cs, pin.w5500_int, pin.w5500_rst, SPI2_HOST);
+        }
+    } else if (PinMapping.isValidEthConfig()) {
+        PinMapping_t& pin = PinMapping.get();
+        ETH.begin(pin.eth_phy_addr, pin.eth_power, pin.eth_mdc, pin.eth_mdio, pin.eth_type, pin.eth_clk_mode);
+    }
+
     setupMode();
 
     scheduler.addTask(_loopTask);
@@ -163,11 +186,6 @@ void NetworkSettingsClass::setupMode()
         } else {
             WiFi.mode(WIFI_MODE_NULL);
         }
-    }
-
-    if (PinMapping.isValidEthConfig()) {
-        PinMapping_t& pin = PinMapping.get();
-        ETH.begin(pin.eth_phy_addr, pin.eth_power, pin.eth_mdc, pin.eth_mdio, pin.eth_type, pin.eth_clk_mode);
     }
 }
 
@@ -396,6 +414,8 @@ String NetworkSettingsClass::macAddress() const
 {
     switch (_networkMode) {
     case network_mode::Ethernet:
+        if (_spiEth)
+            return ETHSPI.macAddress();
         return ETH.macAddress();
         break;
     case network_mode::WiFi:
