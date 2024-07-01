@@ -26,7 +26,7 @@ def replaceInFile(in_file, out_file, text, subs, flags=0):
     """Function for replacing content for the given file."""
 
     if os.path.exists(in_file):
-        #read the file contents
+        # read the file contents
         with open(in_file, "r", encoding="utf-8") as infile:
             file_contents = infile.read()
 
