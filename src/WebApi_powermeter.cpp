@@ -160,7 +160,6 @@ void WebApiPowerMeterClass::onAdminPost(AsyncWebServerRequest* request)
 
     Configuration.deserializePowerMeterHttpJsonConfig(root["http_json"].as<JsonObject>(),
             config.PowerMeter.HttpJson);
-    config.PowerMeter.HttpJson.Values[0].Enabled = true;
 
     Configuration.deserializePowerMeterHttpSmlConfig(root["http_sml"].as<JsonObject>(),
             config.PowerMeter.HttpSml);

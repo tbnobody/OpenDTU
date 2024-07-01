@@ -144,7 +144,7 @@
                             v-model="httpJson.enabled"
                             type="checkbox" wide />
 
-                        <div v-if="httpJson.enabled">
+                        <div v-if="httpJson.enabled || index == 0">
 
                             <HttpRequestSettings v-model="httpJson.http_request" v-if="index == 0 || powerMeterConfigList.http_json.individual_requests"/>
 

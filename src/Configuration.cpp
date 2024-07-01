@@ -338,6 +338,8 @@ void ConfigurationClass::deserializePowerMeterHttpJsonConfig(JsonObject const& s
         t.PowerUnit = s["unit"] | PowerMeterHttpJsonValue::Unit::Watts;
         t.SignInverted = s["sign_inverted"] | false;
     }
+
+    target.Values[0].Enabled = true;
 }
 
 void ConfigurationClass::deserializePowerMeterHttpSmlConfig(JsonObject const& source, PowerMeterHttpSmlConfig& target)
