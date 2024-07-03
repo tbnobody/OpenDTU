@@ -74,16 +74,7 @@ export default defineComponent({
                 this.systemDataList.git_is_hash = true;
             }
 
-            if (!this.allowVersionInfo) {
-                return;
-            }
-
-            if (!this.allowVersionInfo) {
-                return;
-            }
-
-            const fetchUrl =
-            'https://api.github.com/repos/funghi999/openDTU-DUO-Fusion/compare/' + this.systemDataList.git_hash + '...HEAD';
+            const fetchUrl = 'https://api.github.com/repos/funghi999/openDTU-DUO-Fusion/compare/' + this.systemDataList.git_hash + '...HEAD';
 
             fetch(fetchUrl)
                 .then((response) => {
