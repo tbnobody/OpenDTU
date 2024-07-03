@@ -78,8 +78,12 @@ export default defineComponent({
                 return;
             }
 
+            if (!this.allowVersionInfo) {
+                return;
+            }
+
             const fetchUrl =
-                'https://api.github.com/repos/tbnobody/OpenDTU/compare/' + this.systemDataList.git_hash + '...HEAD';
+            'https://api.github.com/repos/funghi999/openDTU-DUO-Fusion/compare/' + this.systemDataList.git_hash + '...HEAD';
 
             fetch(fetchUrl)
                 .then((response) => {

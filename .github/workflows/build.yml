@@ -1,4 +1,4 @@
-name: OpenDTU Build
+name: OpenDTU DUO-Fusion Build
 
 on:
   push:

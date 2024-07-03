@@ -582,7 +582,7 @@
         "ProjectOriginBody3": "The software was developed to the best of our knowledge and belief. Nevertheless, no liability can be accepted for a malfunction or guarantee loss of the inverter.",
         "ProjectOriginBody4": "OpenDTU is freely available. If you paid money for the software, you probably got ripped off.",
         "NewsUpdates": "News & Updates",
-        "NewsUpdatesBody": "New updates can be found on Github: <a href=\"https://github.com/tbnobody/OpenDTU\" target=\"_blank\">https://github.com/tbnobody/OpenDTU</a>",
+        "NewsUpdatesBody": "New updates can be found on Github: <a href=\"https://github.com/funghi999/OpenDTU-DUO-Fusion\" target=\"_blank\">https://github.com/funghi999/OpenDTU-DUO-Fusion</a>",
         "ErrorReporting": "Error Reporting",
         "ErrorReportingBody": "Please report issues using the feature provided by <a href=\"https://github.com/tbnobody/OpenDTU/issues\" target=\"_blank\">Github</a>",
         "Discussion": "Discussion",
