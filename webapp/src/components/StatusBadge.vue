@@ -10,23 +10,23 @@ import { defineComponent } from 'vue';
 
 export default defineComponent({
     props: {
-        'status': Boolean,
-        'true_text': {
+        status: Boolean,
+        true_text: {
             type: String,
-            required: true
+            required: true,
         },
-        'false_text': {
+        false_text: {
             type: String,
-            required: true
+            required: true,
         },
-        'true_class': {
+        true_class: {
             type: String,
-            default: 'text-bg-success'
+            default: 'text-bg-success',
         },
-        'false_class': {
+        false_class: {
             type: String,
-            default: 'text-bg-danger'
-        }
+            default: 'text-bg-danger',
+        },
     },
 });
 </script>
