@@ -25,6 +25,8 @@
 #include <LittleFS.h>
 #include <TaskScheduler.h>
 #include <esp_heap_caps.h>
+#include "SD.h"
+#include "DataLogger.h"
 
 void setup()
 {
@@ -84,6 +86,30 @@ void setup()
     }
     const auto& pin = PinMapping.get();
     MessageOutput.println("done");
+
+    // Initialize SD file system and datalogger
+    MessageOutput.print("Initialize SD FS... ");
+    if(PinMapping.isValidSdConfig()) {
+        SPI.begin(pin.sd_clk, pin.sd_miso, pin.sd_mosi, pin.sd_cs);
+        if (!SD.begin(pin.sd_cs)) {
+            MessageOutput.print("Card Mount Failed");
+        }
+        uint8_t cardType = SD.cardType();
+
+        MessageOutput.println("done");
+
+        if (cardType == CARD_SD || cardType == CARD_SDHC) {
+            if(config.DataLogger.Enabled) {
+                MessageOutput.print("Initialize DataLogger... ");
+                DataLogger.init(scheduler);
+                MessageOutput.println("done");
+            }
+        } else {
+            MessageOutput.println("No compatible SD card attached");
+        }
+    } else {
+        MessageOutput.println("Invalid pin config");
+    }
 
     // Initialize WiFi
     MessageOutput.print("Initialize Network... ");

@@ -216,7 +216,8 @@
         "Heap": "Heap",
         "PsRam": "PSRAM",
         "LittleFs": "LittleFs",
-        "Sketch": "Sketch"
+        "Sketch": "Sketch",
+        "Sd": "SD"
     },
     "heapdetails": {
         "HeapDetails": "Heap Details",
@@ -522,6 +523,17 @@
         "Delete": "Supprimer",
         "YieldDayCorrection": "Yield Day Correction",
         "YieldDayCorrectionHint": "Sum up daily yield even if the inverter is restarted. Value will be reset at midnight"
+    },
+    "dataloggeradmin": {
+        "DataLoggerSettings": "Datalogger Settings",
+        "DataLoggerConfiguration": "Datalogger Configuration",
+        "OutputConfiguration": "Output Configuration",
+        "EnableLogger": "Enable Datalogger",
+        "SdConfigError": "No valid pin configuration for SD cards",
+        "SaveInterval": "Save interval:",
+        "Seconds": "Seconds",
+        "FileName": "Filename:",
+        "FileNameHint": "Filename (CSV format)"
     },
     "configadmin": {
         "ConfigManagement": "Gestion de la configuration",
