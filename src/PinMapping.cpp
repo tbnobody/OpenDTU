@@ -84,6 +84,22 @@
 #define CMT_SDIO -1
 #endif
 
+#ifndef SD_PIN_SCLK
+#define SD_PIN_SCLK -1
+#endif
+
+#ifndef SD_PIN_CS
+#define SD_PIN_CS -1
+#endif
+
+#ifndef SD_PIN_MISO
+#define SD_PIN_MISO -1
+#endif
+
+#ifndef SD_PIN_MOSI
+#define SD_PIN_MOSI -1
+#endif
+
 PinMappingClass PinMapping;
 
 PinMappingClass::PinMappingClass()
@@ -124,6 +140,11 @@ PinMappingClass::PinMappingClass()
 
     _pinMapping.led[0] = LED0;
     _pinMapping.led[1] = LED1;
+
+    _pinMapping.sd_clk = SD_PIN_SCLK;
+    _pinMapping.sd_cs = SD_PIN_CS;
+    _pinMapping.sd_miso = SD_PIN_MISO;
+    _pinMapping.sd_mosi = SD_PIN_MOSI;
 }
 
 PinMapping_t& PinMappingClass::get()
@@ -186,6 +207,11 @@ bool PinMappingClass::init(const String& deviceMapping)
             _pinMapping.led[0] = doc[i]["led"]["led0"] | LED0;
             _pinMapping.led[1] = doc[i]["led"]["led1"] | LED1;
 
+            _pinMapping.sd_clk = doc[i]["sd"]["clk"] | SD_PIN_SCLK;
+            _pinMapping.sd_cs = doc[i]["sd"]["cs"] | SD_PIN_CS;
+            _pinMapping.sd_miso = doc[i]["sd"]["miso"] | SD_PIN_MISO;
+            _pinMapping.sd_mosi = doc[i]["sd"]["mosi"] | SD_PIN_MOSI;
+
             return true;
         }
     }
@@ -214,4 +240,12 @@ bool PinMappingClass::isValidCmt2300Config() const
 bool PinMappingClass::isValidEthConfig() const
 {
     return _pinMapping.eth_enabled;
+}
+
+bool PinMappingClass::isValidSdConfig() const
+{
+    return _pinMapping.sd_clk >= 0
+        && _pinMapping.sd_cs >= 0
+        && _pinMapping.sd_miso >= 0
+        && _pinMapping.sd_mosi >= 0;
 }

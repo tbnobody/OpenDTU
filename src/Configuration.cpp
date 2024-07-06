@@ -93,6 +93,16 @@ bool ConfigurationClass::write()
     dtu["cmt_frequency"] = config.Dtu.Cmt.Frequency;
     dtu["cmt_country_mode"] = config.Dtu.Cmt.CountryMode;
 
+    JsonObject datalogger = doc["datalogger"].to<JsonObject>();
+    datalogger["datalogger_enabled"] = config.DataLogger.Enabled;
+    datalogger["saveinterval"] = config.DataLogger.SaveInterval;
+    datalogger["filename"] = config.DataLogger.FileName;
+
+    JsonObject datalogger_output = datalogger["output_config"].to<JsonObject>();
+    datalogger_output["total_yield_total"] = config.DataLogger.OutputConfig.TotalYieldTotal;
+    datalogger_output["total_yield_day"] = config.DataLogger.OutputConfig.TotalYieldDay;
+    datalogger_output["total_power"] = config.DataLogger.OutputConfig.TotalPower;
+
     JsonObject security = doc["security"].to<JsonObject>();
     security["password"] = config.Security.Password;
     security["allow_readonly"] = config.Security.AllowReadonly;
@@ -266,6 +276,16 @@ bool ConfigurationClass::read()
     config.Dtu.Cmt.PaLevel = dtu["cmt_pa_level"] | DTU_CMT_PA_LEVEL;
     config.Dtu.Cmt.Frequency = dtu["cmt_frequency"] | DTU_CMT_FREQUENCY;
     config.Dtu.Cmt.CountryMode = dtu["cmt_country_mode"] | DTU_CMT_COUNTRY_MODE;
+
+    JsonObject datalogger = doc["datalogger"];
+    config.DataLogger.Enabled = datalogger["datalogger_enabled"] | DATALOGGER_ENABLED;
+    config.DataLogger.SaveInterval = datalogger["saveinterval"] | DATALOGGER_SAVE_INTERVAL;
+    strlcpy(config.DataLogger.FileName, datalogger["filename"] | DATALOGGER_FILENAME, sizeof(config.DataLogger.FileName));
+
+    JsonObject datalogger_output = datalogger["output_config"];
+    config.DataLogger.OutputConfig.TotalYieldTotal = datalogger_output["total_yield_total"] | DATALOGGER_OUTPUT_TOTAL_YIELD_TOTAL;
+    config.DataLogger.OutputConfig.TotalYieldTotal = datalogger_output["total_yield_total"] | DATALOGGER_OUTPUT_TOTAL_YIELD_DAY;
+    config.DataLogger.OutputConfig.TotalYieldTotal = datalogger_output["total_yield_total"] | DATALOGGER_OUTPUT_TOTAL_POWER;
 
     JsonObject security = doc["security"];
     strlcpy(config.Security.Password, security["password"] | ACCESS_POINT_PASSWORD, sizeof(config.Security.Password));

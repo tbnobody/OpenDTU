@@ -39,6 +39,11 @@ struct PinMapping_t {
     uint8_t display_cs;
     uint8_t display_reset;
     int8_t led[PINMAPPING_LED_COUNT];
+
+    int8_t sd_miso;
+    int8_t sd_mosi;
+    int8_t sd_clk;
+    int8_t sd_cs;
 };
 
 class PinMappingClass {
@@ -50,6 +55,7 @@ public:
     bool isValidNrf24Config() const;
     bool isValidCmt2300Config() const;
     bool isValidEthConfig() const;
+    bool isValidSdConfig() const;
 
 private:
     PinMapping_t _pinMapping;
