@@ -115,7 +115,7 @@ void MqttSettingsClass::performConnect()
         MessageOutput.println("Connecting to MQTT...");
         const CONFIG_T& config = Configuration.get();
         const String willTopic = getPrefix() + config.Mqtt.Lwt.Topic;
-        const String clientId = NetworkSettings.getApName();
+        String clientId = getClientId();
         if (config.Mqtt.Tls.Enabled) {
             static_cast<espMqttClientSecure*>(_mqttClient)->setCACert(config.Mqtt.Tls.RootCaCert);
             static_cast<espMqttClientSecure*>(_mqttClient)->setServer(config.Mqtt.Hostname, config.Mqtt.Port);
@@ -178,6 +178,15 @@ bool MqttSettingsClass::getConnected()
 String MqttSettingsClass::getPrefix() const
 {
     return Configuration.get().Mqtt.Topic;
+}
+
+String MqttSettingsClass::getClientId()
+{
+    String clientId = Configuration.get().Mqtt.ClientId;
+    if (clientId == "") {
+        clientId = NetworkSettings.getApName();
+    }
+    return clientId;
 }
 
 void MqttSettingsClass::publish(const String& subtopic, const String& payload)

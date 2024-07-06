@@ -19,6 +19,10 @@
                             <td>{{ mqttDataList.mqtt_port }}</td>
                         </tr>
                         <tr>
+                            <th>{{ $t('mqttinfo.ClientId') }}</th>
+                            <td>{{ mqttDataList.mqtt_clientid }}</td>
+                        </tr>
+                        <tr>
                             <th>{{ $t('mqttinfo.Username') }}</th>
                             <td>{{ mqttDataList.mqtt_username }}</td>
                         </tr>
