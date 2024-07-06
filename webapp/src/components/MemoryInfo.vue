@@ -20,6 +20,8 @@
                         :used="systemStatus.littlefs_used" />
                     <FsInfo :name="$t('memoryinfo.Sketch')" :total="systemStatus.sketch_total"
                         :used="systemStatus.sketch_used" />
+                    <FsInfo :name="$t('memoryinfo.Sd')" :total="systemStatus.sd_total"
+                        :used="systemStatus.sd_used" />
                 </tbody>
             </table>
         </div>

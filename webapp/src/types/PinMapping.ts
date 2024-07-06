@@ -39,6 +39,13 @@ export interface Links {
     url: string;
 }
 
+export interface Sd {
+    miso: number;
+    mosi: number;
+    clk: number;
+    cs: number;
+}
+
 export interface Device  {
     name: string;
     links: Array<Links>;
@@ -46,6 +53,7 @@ export interface Device  {
     cmt: Cmt2300;
     eth: Ethernet;
     display: Display;
+    sd: Sd;
 }
 
 export interface PinMapping extends Array<Device>{}
