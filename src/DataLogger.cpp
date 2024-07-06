@@ -1,6 +1,6 @@
 #include "DataLogger.h"
 #include "Configuration.h"
-#include "DataStore.h"
+#include "Datastore.h"
 #include "MessageOutput.h"
 #include "SD.h"
 
@@ -89,7 +89,7 @@ void DataLoggerClass::appendFile(fs::FS &fs, const String path, const char * mes
   file.close();
 }
 
-unsigned long DataLoggerClass::getTime() {
+uint64_t DataLoggerClass::getTime() {
   time_t now;
   struct tm timeinfo;
   if (!getLocalTime(&timeinfo)) {

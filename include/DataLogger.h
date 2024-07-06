@@ -21,7 +21,7 @@ private:
     void writeFile(FS &fs, const String path, const char * message);
     void appendFile(FS &fs, const String path, const char * message);
 
-    unsigned long getTime();
+    uint64_t getTime();
 };
 
 extern DataLoggerClass DataLogger;
