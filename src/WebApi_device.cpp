@@ -86,6 +86,12 @@ void WebApiDeviceClass::onDeviceAdminGet(AsyncWebServerRequest* request)
         led["brightness"] = config.Led_Single[i].Brightness;
     }
 
+    auto sdPinObj = curPin["sd"].to<JsonObject>();
+    sdPinObj["clk"] = pin.sd_clk;
+    sdPinObj["cs"] = pin.sd_cs;
+    sdPinObj["miso"] = pin.sd_miso;
+    sdPinObj["mosi"] = pin.sd_mosi;
+
     WebApi.sendJsonResponse(request, response, __FUNCTION__, __LINE__);
 }
 

@@ -31,6 +31,8 @@
 
 #define DEV_MAX_MAPPING_NAME_STRLEN 63
 
+#define DATALOGGER_MAX_FILENAME_STRLEN 128
+
 struct CHANNEL_CONFIG_T {
     uint16_t MaxChannelPower;
     char Name[CHAN_MAX_NAME_STRLEN];
@@ -133,6 +135,18 @@ struct CONFIG_T {
             uint8_t CountryMode;
         } Cmt;
     } Dtu;
+
+    struct {
+        bool Enabled;
+        uint32_t SaveInterval;
+        char FileName[DATALOGGER_MAX_FILENAME_STRLEN + 1];
+
+        struct {
+            bool TotalYieldTotal;
+            bool TotalYieldDay;
+            bool TotalPower;
+        } OutputConfig;
+    } DataLogger;
 
     struct {
         char Password[WIFI_MAX_PASSWORD_STRLEN + 1];

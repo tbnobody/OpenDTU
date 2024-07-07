@@ -13,6 +13,7 @@
 #include <Hoymiles.h>
 #include <LittleFS.h>
 #include <ResetReason.h>
+#include "SD.h"
 
 void WebApiSysstatusClass::init(AsyncWebServer& server, Scheduler& scheduler)
 {
@@ -46,6 +47,8 @@ void WebApiSysstatusClass::onSystemStatus(AsyncWebServerRequest* request)
     root["sketch_used"] = ESP.getSketchSize();
     root["littlefs_total"] = LittleFS.totalBytes();
     root["littlefs_used"] = LittleFS.usedBytes();
+    root["sd_total"] = SD.totalBytes();
+    root["sd_used"] = SD.usedBytes();
 
     root["chiprevision"] = ESP.getChipRevision();
     root["chipmodel"] = ESP.getChipModel();

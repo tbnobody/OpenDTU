@@ -31,6 +31,8 @@ export interface SystemStatus {
     psram_used: number;
     sketch_total: number;
     sketch_used: number;
+    sd_total: number;
+    sd_used: number;
     // RadioInfo
     nrf_configured: boolean;
     nrf_connected: boolean;

@@ -9,6 +9,7 @@
         "SecuritySettings": "Sicherheit",
         "DTUSettings": "DTU",
         "DeviceManager": "Hardware",
+        "DataLoggerSettings": "Datenlogger",
         "ConfigManagement": "Konfigurationsverwaltung",
         "FirmwareUpgrade": "Firmware-Aktualisierung",
         "DeviceReboot": "Neustart",
@@ -217,7 +218,8 @@
         "Heap": "Heap",
         "PsRam": "PSRAM",
         "LittleFs": "LittleFs",
-        "Sketch": "Sketch"
+        "Sketch": "Sketch",
+        "Sd": "SD"
     },
     "heapdetails": {
         "HeapDetails": "Detailinformationen zum Heap",
@@ -525,6 +527,17 @@
         "Delete": "Löschen",
         "YieldDayCorrection": "Tagesertragskorrektur",
         "YieldDayCorrectionHint": "Summiert den Tagesertrag, auch wenn der Wechselrichter neu gestartet wird. Der Wert wird um Mitternacht zurückgesetzt"
+    },
+    "dataloggeradmin": {
+        "DataLoggerSettings": "Datenlogger Einstellungen",
+        "DataLoggerConfiguration": "Datenlogger Konfiguration",
+        "OutputConfiguration": "Ausgabe Konfiguration",
+        "EnableLogger": "Datenlogger aktivieren",
+        "SdConfigError": "Keine gültige Pin-Konfiguration für SD-Karten",
+        "SaveInterval": "Speicherintervall:",
+        "Seconds": "Sekunden",
+        "FileName": "Dateiname:",
+        "FileNameHint": "Dateiname (CSV-Format)"
     },
     "configadmin": {
         "ConfigManagement": "Konfigurationsverwaltung",
