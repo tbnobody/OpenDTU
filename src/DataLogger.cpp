@@ -18,7 +18,7 @@ void DataLoggerClass::init(Scheduler& scheduler) {
     const CONFIG_T& config = Configuration.get();
     setSaveInterval(config.DataLogger.SaveInterval);
 
-    if(strlen(config.DataLogger.FileName) == 0) {
+    if(strlen(config.DataLogger.FileName) > 0) {
       File file = SD.open("/" + String(config.DataLogger.FileName));
       if(!file) {
           MessageOutput.println("Datalogger: File doesn't exist");

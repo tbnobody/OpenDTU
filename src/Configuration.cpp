@@ -284,8 +284,8 @@ bool ConfigurationClass::read()
 
     JsonObject datalogger_output = datalogger["output_config"];
     config.DataLogger.OutputConfig.TotalYieldTotal = datalogger_output["total_yield_total"] | DATALOGGER_OUTPUT_TOTAL_YIELD_TOTAL;
-    config.DataLogger.OutputConfig.TotalYieldTotal = datalogger_output["total_yield_total"] | DATALOGGER_OUTPUT_TOTAL_YIELD_DAY;
-    config.DataLogger.OutputConfig.TotalYieldTotal = datalogger_output["total_yield_total"] | DATALOGGER_OUTPUT_TOTAL_POWER;
+    config.DataLogger.OutputConfig.TotalYieldDay = datalogger_output["total_yield_day"] | DATALOGGER_OUTPUT_TOTAL_YIELD_DAY;
+    config.DataLogger.OutputConfig.TotalPower = datalogger_output["total_power"] | DATALOGGER_OUTPUT_TOTAL_POWER;
 
     JsonObject security = doc["security"];
     strlcpy(config.Security.Password, security["password"] | ACCESS_POINT_PASSWORD, sizeof(config.Security.Password));

@@ -91,8 +91,10 @@ export default defineComponent({
 
                         fetch("/api/device/config", { headers: authHeader() })
                             .then((response) => handleResponse(response, this.$emitter, this.$router))
-                            .then(() => {
+                            .then((data) => {
+                                this.deviceConfigList = data;
                                 const currentPinMapping = this.deviceConfigList.curPin;
+                                console.log(this.deviceConfigList);
 
                                 if(!currentPinMapping?.sd || !this.isValidSdConfig(currentPinMapping)) {
                                     this.alertMessage = this.$t('dataloggeradmin.SdConfigError');
