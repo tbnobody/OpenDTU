@@ -39,6 +39,7 @@ void WebApiMqttClass::onMqttStatus(AsyncWebServerRequest* request)
     root["mqtt_verbose_logging"] = config.Mqtt.VerboseLogging;
     root["mqtt_hostname"] = config.Mqtt.Hostname;
     root["mqtt_port"] = config.Mqtt.Port;
+    root["mqtt_clientid"] = MqttSettings.getClientId();
     root["mqtt_username"] = config.Mqtt.Username;
     root["mqtt_topic"] = config.Mqtt.Topic;
     root["mqtt_connected"] = MqttSettings.getConnected();
@@ -73,6 +74,7 @@ void WebApiMqttClass::onMqttAdminGet(AsyncWebServerRequest* request)
     root["mqtt_verbose_logging"] = config.Mqtt.VerboseLogging;
     root["mqtt_hostname"] = config.Mqtt.Hostname;
     root["mqtt_port"] = config.Mqtt.Port;
+    root["mqtt_clientid"] = config.Mqtt.ClientId;
     root["mqtt_username"] = config.Mqtt.Username;
     root["mqtt_password"] = config.Mqtt.Password;
     root["mqtt_topic"] = config.Mqtt.Topic;
@@ -115,6 +117,7 @@ void WebApiMqttClass::onMqttAdminPost(AsyncWebServerRequest* request)
             && root.containsKey("mqtt_verbose_logging")
             && root.containsKey("mqtt_hostname")
             && root.containsKey("mqtt_port")
+            && root.containsKey("mqtt_clientid")
             && root.containsKey("mqtt_username")
             && root.containsKey("mqtt_password")
             && root.containsKey("mqtt_topic")
@@ -149,6 +152,13 @@ void WebApiMqttClass::onMqttAdminPost(AsyncWebServerRequest* request)
             return;
         }
 
+        if (root["mqtt_clientid"].as<String>().length() > MQTT_MAX_CLIENTID_STRLEN) {
+            retMsg["message"] = "Client ID must not be longer than " STR(MQTT_MAX_CLIENTID_STRLEN) " characters!";
+            retMsg["code"] = WebApiError::MqttClientIdLength;
+            retMsg["param"]["max"] = MQTT_MAX_CLIENTID_STRLEN;
+            WebApi.sendJsonResponse(request, response, __FUNCTION__, __LINE__);
+            return;
+        }
         if (root["mqtt_username"].as<String>().length() > MQTT_MAX_USERNAME_STRLEN) {
             retMsg["message"] = "Username must not be longer than " STR(MQTT_MAX_USERNAME_STRLEN) " characters!";
             retMsg["code"] = WebApiError::MqttUsernameLength;
@@ -279,6 +289,7 @@ void WebApiMqttClass::onMqttAdminPost(AsyncWebServerRequest* request)
     strlcpy(config.Mqtt.Tls.ClientKey, root["mqtt_client_key"].as<String>().c_str(), sizeof(config.Mqtt.Tls.ClientKey));
     config.Mqtt.Port = root["mqtt_port"].as<uint>();
     strlcpy(config.Mqtt.Hostname, root["mqtt_hostname"].as<String>().c_str(), sizeof(config.Mqtt.Hostname));
+    strlcpy(config.Mqtt.ClientId, root["mqtt_clientid"].as<String>().c_str(), sizeof(config.Mqtt.ClientId));
     strlcpy(config.Mqtt.Username, root["mqtt_username"].as<String>().c_str(), sizeof(config.Mqtt.Username));
     strlcpy(config.Mqtt.Password, root["mqtt_password"].as<String>().c_str(), sizeof(config.Mqtt.Password));
     strlcpy(config.Mqtt.Lwt.Topic, root["mqtt_lwt_topic"].as<String>().c_str(), sizeof(config.Mqtt.Lwt.Topic));

@@ -3,6 +3,7 @@ export interface MqttStatus {
     mqtt_verbose_logging: boolean;
     mqtt_hostname: string;
     mqtt_port: number;
+    mqtt_clientid: string;
     mqtt_username: string;
     mqtt_topic: string;
     mqtt_publish_interval: number;

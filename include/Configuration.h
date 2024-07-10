@@ -17,6 +17,7 @@
 #define NTP_MAX_TIMEZONEDESCR_STRLEN 50
 
 #define MQTT_MAX_HOSTNAME_STRLEN 128
+#define MQTT_MAX_CLIENTID_STRLEN 64
 #define MQTT_MAX_USERNAME_STRLEN 64
 #define MQTT_MAX_PASSWORD_STRLEN 64
 #define MQTT_MAX_TOPIC_STRLEN 256
@@ -161,6 +162,7 @@ struct CONFIG_T {
         char Hostname[MQTT_MAX_HOSTNAME_STRLEN + 1];
         bool VerboseLogging;
         uint32_t Port;
+        char ClientId[MQTT_MAX_CLIENTID_STRLEN + 1];
         char Username[MQTT_MAX_USERNAME_STRLEN + 1];
         char Password[MQTT_MAX_PASSWORD_STRLEN + 1];
         char Topic[MQTT_MAX_TOPIC_STRLEN + 1];

@@ -21,6 +21,7 @@ public:
     void unsubscribe(const String& topic);
 
     String getPrefix() const;
+    String getClientId();
 
 private:
     void NetworkEvent(network_event event);
