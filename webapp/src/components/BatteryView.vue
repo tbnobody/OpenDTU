@@ -18,6 +18,9 @@
                 <div style="padding-right: 2em;">
                   {{ $t('battery.battery') }}: {{ batteryData.manufacturer }}
                 </div>
+                <div style="padding-right: 2em;" v-if="'serial' in batteryData">
+                  {{ $t('home.SerialNumber') }}{{ batteryData.serial }}
+                </div>
                 <div style="padding-right: 2em;" v-if="'fwversion' in batteryData">
                   {{ $t('battery.FwVersion') }}: {{ batteryData.fwversion }}
                 </div>
@@ -49,18 +52,24 @@
                         <tr v-for="(prop, key) in values" v-bind:key="key">
                           <th scope="row">{{ $t('battery.' + key) }}</th>
                           <td style="text-align: right">
-                            <template v-if="typeof prop === 'string'">
-                              {{ $t('battery.' + prop) }}
+                            <template v-if="isStringValue(prop) && prop.translate">
+                              {{ $t('battery.' + prop.value) }}
+                            </template>
+                            <template v-else-if="isStringValue(prop)">
+                              {{ prop.value }}
                             </template>
                             <template v-else>
-                            {{ $n(prop.v, 'decimal', {
-                                 minimumFractionDigits: prop.d,
-                                 maximumFractionDigits: prop.d})
-                            }}
+                              {{ $n(prop.v, 'decimal', {
+                                   minimumFractionDigits: prop.d,
+                                   maximumFractionDigits: prop.d})
+                              }}
                             </template>
                           </td>
-                          <td v-if="typeof prop === 'string'"></td>
-                          <td v-else>{{prop.u}}</td>
+                          <td>
+                            <template v-if="!isStringValue(prop)">
+                              {{prop.u}}
+                            </template>
+                          </td>
                         </tr>
                       </tbody>
                     </table>
@@ -114,7 +123,8 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue';
-import type { Battery } from '@/types/BatteryDataStatus';
+import type { Battery, StringValue } from '@/types/BatteryDataStatus';
+import type { ValueObject } from '@/types/LiveDataStatus';
 import { handleResponse, authHeader, authUrl } from '@/utils/authentication';
 
 export default defineComponent({
@@ -144,6 +154,9 @@ export default defineComponent({
     this.closeSocket();
   },
   methods: {
+    isStringValue(value: ValueObject | StringValue) : value is StringValue {
+      return value && typeof value === 'object' && 'translate' in value;
+    },
     getInitialData() {
       console.log("Get initalData for Battery");
       this.dataLoading = true;

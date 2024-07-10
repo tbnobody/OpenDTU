@@ -130,20 +130,38 @@ void BatteryCanReceiver::loop()
         return;
     }
 
+    if (_verboseLogging) {
+        MessageOutput.printf("[%s] Received CAN message: 0x%04X -",
+                _providerName, rx_message.identifier);
+
+        for (int i = 0; i < rx_message.data_length_code; i++) {
+            MessageOutput.printf(" %02X", rx_message.data[i]);
+        }
+
+        MessageOutput.printf("\r\n");
+    }
+
     onMessage(rx_message);
+}
+
+uint8_t BatteryCanReceiver::readUnsignedInt8(uint8_t *data)
+{
+    return data[0];
 }
 
 uint16_t BatteryCanReceiver::readUnsignedInt16(uint8_t *data)
 {
-    uint8_t bytes[2];
-    bytes[0] = *data;
-    bytes[1] = *(data + 1);
-    return (bytes[1] << 8) + bytes[0];
+    return (data[1] << 8) | data[0];
 }
 
 int16_t BatteryCanReceiver::readSignedInt16(uint8_t *data)
 {
     return this->readUnsignedInt16(data);
+}
+
+uint32_t BatteryCanReceiver::readUnsignedInt32(uint8_t *data)
+{
+    return (data[3] << 24) | (data[2] << 16) | (data[1] << 8) | data[0];
 }
 
 float BatteryCanReceiver::scaleValue(int16_t value, float factor)
