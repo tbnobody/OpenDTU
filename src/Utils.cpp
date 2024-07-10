@@ -92,3 +92,77 @@ void Utils::removeAllFiles()
         file = root.getNextFileName();
     }
 }
+
+/* OpenDTU-OnBatter-specific utils go here: */
+template<typename T>
+std::pair<T, String> Utils::getJsonValueByPath(JsonDocument const& root, String const& path)
+{
+    size_t constexpr kErrBufferSize = 256;
+    char errBuffer[kErrBufferSize];
+    constexpr char delimiter = '/';
+    int start = 0;
+    int end = path.indexOf(delimiter);
+    auto value = root.as<JsonVariantConst>();
+
+    // NOTE: "Because ArduinoJson implements the Null Object Pattern, it is
+    // always safe to read the object: if the key doesn't exist, it returns an
+    // empty value."
+    auto getNext = [&](String const& key) -> bool {
+        // handle double forward slashes and paths starting or ending with a slash
+        if (key.isEmpty()) { return true; }
+
+        if (key[0] == '[' && key[key.length() - 1] == ']') {
+            if (!value.is<JsonArrayConst>()) {
+                snprintf(errBuffer, kErrBufferSize, "Cannot access non-array "
+                        "JSON node using array index '%s' (JSON path '%s', "
+                        "position %i)", key.c_str(), path.c_str(), start);
+                return false;
+            }
+
+            auto idx = key.substring(1, key.length() - 1).toInt();
+            value = value[idx];
+
+            if (value.isNull()) {
+                snprintf(errBuffer, kErrBufferSize, "Unable to access JSON "
+                        "array index %li (JSON path '%s', position %i)",
+                        idx, path.c_str(), start);
+                return false;
+            }
+
+            return true;
+        }
+
+        value = value[key];
+
+        if (value.isNull()) {
+            snprintf(errBuffer, kErrBufferSize, "Unable to access JSON key "
+                    "'%s' (JSON path '%s', position %i)",
+                    key.c_str(), path.c_str(), start);
+            return false;
+        }
+
+        return true;
+    };
+
+    while (end != -1) {
+        if (!getNext(path.substring(start, end))) {
+              return { T(), String(errBuffer) };
+        }
+        start = end + 1;
+        end = path.indexOf(delimiter, start);
+    }
+
+    if (!getNext(path.substring(start))) {
+        return { T(), String(errBuffer) };
+    }
+
+    if (!value.is<T>()) {
+        snprintf(errBuffer, kErrBufferSize, "Value '%s' at JSON path '%s' is not "
+                "of the expected type", value.as<String>().c_str(), path.c_str());
+        return { T(), String(errBuffer) };
+    }
+
+    return { value.as<T>(), "" };
+}
+
+template std::pair<float, String> Utils::getJsonValueByPath(JsonDocument const& root, String const& path);

@@ -1,6 +1,6 @@
 /* Library for reading SDM 72/120/220/230/630 Modbus Energy meters.
 *  Reading via Hardware or Software Serial library & rs232<->rs485 converter
-*  2016-2022 Reaper7 (tested on wemos d1 mini->ESP8266 with Arduino 1.8.10 & 2.5.2 esp8266 core)
+*  2016-2023 Reaper7 (tested on wemos d1 mini->ESP8266 with Arduino 1.8.10 & 2.5.2 esp8266 core)
 *  crc calculation by Jaime García (https://github.com/peninquen/Modbus-Energy-Monitor-Arduino/)
 */
 //------------------------------------------------------------------------------
@@ -66,36 +66,47 @@
 #endif
 
 #if !defined ( WAITING_TURNAROUND_DELAY )
-  #define WAITING_TURNAROUND_DELAY                    200                       //  time in ms to wait for process current request
+  #define WAITING_TURNAROUND_DELAY                    500                       //  time in ms to wait for process current request
 #endif
 
 #if !defined ( RESPONSE_TIMEOUT )
-  #define RESPONSE_TIMEOUT                            500                       //  time in ms to wait for return response from all devices before next request
+  #define RESPONSE_TIMEOUT                            10                       //  time in ms to wait for return response from all devices before next request
 #endif
 
 #if !defined ( SDM_MIN_DELAY )
-  #define SDM_MIN_DELAY                               20                        //  minimum value (in ms) for WAITING_TURNAROUND_DELAY and RESPONSE_TIMEOUT
+  #define SDM_MIN_DELAY                               1                        //  minimum value (in ms) for WAITING_TURNAROUND_DELAY and RESPONSE_TIMEOUT
 #endif
 
 #if !defined ( SDM_MAX_DELAY )
-  #define SDM_MAX_DELAY                               5000                      //  maximum value (in ms) for WAITING_TURNAROUND_DELAY and RESPONSE_TIMEOUT
+  #define SDM_MAX_DELAY                               20                      //  maximum value (in ms) for WAITING_TURNAROUND_DELAY and RESPONSE_TIMEOUT
 #endif
 
 //------------------------------------------------------------------------------
 
 #define SDM_ERR_NO_ERROR                              0                         //  no error
-#define SDM_ERR_CRC_ERROR                             1                         //  crc error
-#define SDM_ERR_WRONG_BYTES                           2                         //  bytes b0,b1 or b2 wrong
-#define SDM_ERR_NOT_ENOUGHT_BYTES                     3                         //  not enough bytes from sdm
-#define SDM_ERR_TIMEOUT                               4                         //  timeout
+#define SDM_ERR_ILLEGAL_FUNCTION                      1
+#define SDM_ERR_ILLEGAL_DATA_ADDRESS                  2
+#define SDM_ERR_ILLEGAL_DATA_VALUE                    3
+#define SDM_ERR_SLAVE_DEVICE_FAILURE                  5
+
+#define SDM_ERR_CRC_ERROR                             11                         //  crc error
+#define SDM_ERR_WRONG_BYTES                           12                         //  bytes b0,b1 or b2 wrong
+#define SDM_ERR_NOT_ENOUGHT_BYTES                     13                         //  not enough bytes from sdm
+#define SDM_ERR_TIMEOUT                               14                         //  timeout
+#define SDM_ERR_EXCEPTION                             15
+#define SDM_ERR_STILL_WAITING                         16
 
 //------------------------------------------------------------------------------
+
+#define SDM_READ_HOLDING_REGISTER                     0x03
+#define SDM_READ_INPUT_REGISTER                       0x04
+#define SDM_WRITE_HOLDING_REGISTER                    0x10
 
 #define FRAMESIZE                                     9                         //  size of out/in array
 #define SDM_REPLY_BYTE_COUNT                          0x04                      //  number of bytes with data
 
 #define SDM_B_01                                      0x01                      //  BYTE 1 -> slave address (default value 1 read from node 1)
-#define SDM_B_02                                      0x04                      //  BYTE 2 -> function code (default value 0x04 read from 3X input registers)
+#define SDM_B_02                                      SDM_READ_INPUT_REGISTER   //  BYTE 2 -> function code (default value 0x04 read from 3X input registers)
 #define SDM_B_05                                      0x00                      //  BYTE 5
 #define SDM_B_06                                      0x02                      //  BYTE 6
                                                                                 //  BYTES 3 & 4 (BELOW)
@@ -151,6 +162,8 @@
 #define SDM_MAXIMUM_TOTAL_SYSTEM_VA_DEMAND            0x0066                    //  VA          |    1    |         |         |         |         |         |         |
 #define SDM_NEUTRAL_CURRENT_DEMAND                    0x0068                    //  A           |    1    |         |         |         |         |         |         |
 #define SDM_MAXIMUM_NEUTRAL_CURRENT                   0x006A                    //  A           |    1    |         |         |         |         |         |         |
+#define SDM_REACTIVE_POWER_DEMAND                     0x006C                    //  VAr         |    1    |         |         |         |         |         |         |
+#define SDM_MAXIMUM_REACTIVE_POWER_DEMAND             0x006E                    //  VAr         |    1    |         |         |         |         |         |         |
 #define SDM_LINE_1_TO_LINE_2_VOLTS                    0x00C8                    //  V           |    1    |         |         |         |         |         |    1    |
 #define SDM_LINE_2_TO_LINE_3_VOLTS                    0x00CA                    //  V           |    1    |         |         |         |         |         |    1    |
 #define SDM_LINE_3_TO_LINE_1_VOLTS                    0x00CC                    //  V           |    1    |         |         |         |         |         |    1    |
@@ -199,7 +212,10 @@
 #define SDM_CURRENT_RESETTABLE_TOTAL_REACTIVE_ENERGY  0x0182                    //  kVArh       |         |    1    |         |         |         |         |         |
 #define SDM_CURRENT_RESETTABLE_IMPORT_ENERGY          0x0184                    //  kWh         |         |         |         |         |         |    1    |    1    |
 #define SDM_CURRENT_RESETTABLE_EXPORT_ENERGY          0x0186                    //  kWh         |         |         |         |         |         |    1    |    1    |
+#define SDM_CURRENT_RESETTABLE_IMPORT_REACTIVE_ENERGY 0x0188                    //  kVArh       |         |         |         |         |         |    1    |    1    |
+#define SDM_CURRENT_RESETTABLE_EXPORT_REACTIVE_ENERGY 0x018A                    //  kVArh       |         |         |         |         |         |    1    |    1    |
 #define SDM_NET_KWH                                   0x018C                    //  kWh         |         |         |         |         |         |         |    1    |
+#define SDM_NET_KVARH                                 0x018E                    //  kVArh       |         |         |         |         |         |         |    1    |
 #define SDM_IMPORT_POWER                              0x0500                    //  W           |         |         |         |         |         |    1    |    1    |
 #define SDM_EXPORT_POWER                              0x0502                    //  W           |         |         |         |         |         |    1    |    1    |
 //---------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -229,6 +245,78 @@
 //#define DEVNAME_POWER                               0x0004                    //  W           |    1    |
 //---------------------------------------------------------------------------------------------------------
 
+
+//---------------------------------------------------------------------------------------------------------
+//      REGISTERS LIST FOR DEVICE SETTINGS                                                                |
+//---------------------------------------------------------------------------------------------------------
+//      REGISTER NAME                                 REGISTER ADDRESS              UNIT        | DEVNAME |
+//---------------------------------------------------------------------------------------------------------
+
+// Read minutes into first demand calculation. 
+// When the Demand Time reaches the Demand Period
+// then the demand values are valid.
+#define SDM_HOLDING_DEMAND_TIME                       0x0000
+
+// Write demand period: 0~60 minutes.
+// Default 60.
+// Range: 0~60, 0 means function disabled
+#define SDM_HOLDING_DEMAND_PERIOD                     0x0002
+
+// Write relay on period in milliseconds: 
+// 60, 100 or 200 ms.
+// default: 100 ms
+#define SDM_HOLDING_RELAY_PULSE_WIDTH                 0x000C
+
+// Parity / stop bit settings:
+// 0 = One stop bit and no parity, default. 
+// 1 = One stop bit and even parity. 
+// 2 = One s top bit and odd parity.
+// 3 = Two stop bits and no parity.
+// Requires a restart to become effective.
+#define SDM_HOLDING_NETWORK_PARITY_STOP               0x0012  
+
+// Ranges from 1 to 247. Default ID is 1.
+#define SDM_HOLDING_METER_ID                          0x0014
+
+// Write the network port baud rate for MODBUS Protocol, where:
+/*
+SDM120 / SDM230:
+  0 = 2400 baud (default)
+  1 = 4800 baud
+  2 = 9600 baud
+  5 = 1200 baud
+
+SDM320 / SDM530Y:
+  0 = 2400 baud
+  1 = 4800 baud
+  2 = 9600 baud (default)
+  5 = 1200 band
+
+SDM630 / SDM72 / SDM72V2:
+  0 = 2400 baud
+  1 = 4800 baud
+  2 = 9600 baud (default)
+  3 = 19200 baud
+  4 = 38400 baud
+*/
+#define SDM_HOLDING_BAUD_RATE                         0x001C
+
+// Write MODBUS Protocol input parameter for pulse out 1:
+// 1: Import active energy
+// 2: Import + export (total) active energy 
+// 4: Export active energy (default).
+// 5: Import reactive energy
+// 6: Import + export (total) reactive energy
+// 8: Export reactive energy
+#define SDM_HOLDING_PULSE_1_OUTPUT_MODE               0x0056
+
+
+
+#define SDM_HOLDING_SERIAL_NUMBER                     0xFC00
+#define SDM_HOLDING_SOFTWARE_VERSION                  0xFC03
+
+
+
 //-----------------------------------------------------------------------------------------------------------------------------------------------------------
 
 class SDM {
@@ -252,6 +340,16 @@ class SDM {
 
     void begin(void);
     float readVal(uint16_t reg, uint8_t node = SDM_B_01);                       //  read value from register = reg and from deviceId = node
+    void startReadVal(uint16_t reg, uint8_t node = SDM_B_01, uint8_t functionCode = SDM_B_02);                   //  Start sending out the request to read a register from a specific node (allows for async access)
+    uint16_t readValReady(uint8_t node = SDM_B_01, uint8_t functionCode = SDM_B_02);                             //  Check to see if a reply is ready reading from a node (allow for async access)
+    float decodeFloatValue() const;
+
+    float readHoldingRegister(uint16_t reg, uint8_t node = SDM_B_01);
+    bool writeHoldingRegister(float value, uint16_t reg, uint8_t node = SDM_B_01);
+
+    uint32_t getSerialNumber(uint8_t node = SDM_B_01);
+
+
     uint16_t getErrCode(bool _clear = false);                                   //  return last errorcode (optional clear this value, default flase)
     uint32_t getErrCount(bool _clear = false);                                  //  return total errors count (optional clear this value, default flase)
     uint32_t getSuccCount(bool _clear = false);                                 //  return total success count (optional clear this value, default false)
@@ -264,6 +362,11 @@ class SDM {
     uint16_t getMsTimeout();                                                    //  get current value of RESPONSE_TIMEOUT (ms)
 
   private:
+
+    bool validChecksum(const uint8_t* data, size_t messageLength) const;
+
+    void modbusWrite(uint8_t* data, size_t messageLength);
+
 #if defined ( USE_HARDWARESERIAL )
     HardwareSerial& sdmSer;
 #else
@@ -292,7 +395,9 @@ class SDM {
     uint16_t mstimeout = RESPONSE_TIMEOUT;
     uint32_t readingerrcount = 0;                                               //  total errors counter
     uint32_t readingsuccesscount = 0;                                           //  total success counter
-    uint16_t calculateCRC(uint8_t *array, uint8_t len);
+    unsigned long resptime = 0;
+    uint8_t sdmarr[FRAMESIZE] = {};
+    uint16_t calculateCRC(const uint8_t *array, uint8_t len) const;
     void flush(unsigned long _flushtime = 0);                                   //  read serial if any old data is available or for a given time in ms
     void dereSet(bool _state = LOW);                                            //  for control MAX485 DE/RE pins, LOW receive from SDM, HIGH transmit to SDM
 };
