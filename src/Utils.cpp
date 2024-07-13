@@ -113,6 +113,12 @@ std::optional<float> getFromString(char const* val)
 }
 
 template<typename T>
+char const* getTypename();
+
+template<>
+char const* getTypename<float>() { return "float"; }
+
+template<typename T>
 std::pair<T, String> Utils::getJsonValueByPath(JsonDocument const& root, String const& path)
 {
     size_t constexpr kErrBufferSize = 256;
@@ -179,15 +185,17 @@ std::pair<T, String> Utils::getJsonValueByPath(JsonDocument const& root, String 
     }
 
     if (!value.is<char const*>()) {
-        snprintf(errBuffer, kErrBufferSize, "Value '%s' at JSON path '%s' is not "
-                "of the expected type", value.as<String>().c_str(), path.c_str());
+        snprintf(errBuffer, kErrBufferSize, "Value '%s' at JSON path '%s' is "
+                "neither a string nor of type %s", value.as<String>().c_str(),
+                path.c_str(), getTypename<T>());
         return { T(), String(errBuffer) };
     }
 
     auto res = getFromString<T>(value.as<char const*>());
     if (!res.has_value()) {
         snprintf(errBuffer, kErrBufferSize, "String '%s' at JSON path '%s' cannot "
-                "be converted to the expected type", value.as<String>().c_str(), path.c_str());
+                "be converted to %s", value.as<String>().c_str(), path.c_str(),
+                getTypename<T>());
         return { T(), String(errBuffer) };
     }
 
