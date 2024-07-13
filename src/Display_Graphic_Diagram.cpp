@@ -6,6 +6,12 @@
 #include "Configuration.h"
 #include "Datastore.h"
 #include <algorithm>
+#include <Preferences.h>
+
+
+// Expected time after a restart all inverters are ready
+#define EXPECTED_SECS_INVERTERS_AVAILABLE_AFTER_RESTART 60
+
 
 DisplayGraphicDiagramClass::DisplayGraphicDiagramClass()
     : _averageTask(1 * TASK_SECOND, TASK_FOREVER, std::bind(&DisplayGraphicDiagramClass::averageLoop, this))
@@ -13,16 +19,29 @@ DisplayGraphicDiagramClass::DisplayGraphicDiagramClass()
 {
 }
 
+
 void DisplayGraphicDiagramClass::init(Scheduler& scheduler, U8G2* display)
 {
+    bool delayUpdateTasks;
+
     _display = display;
 
+    restoreGraphValuesAfterRestart(delayUpdateTasks);
+
     scheduler.addTask(_averageTask);
-    _averageTask.enable();
+    if (delayUpdateTasks) {
+        _averageTask.restartDelayed(EXPECTED_SECS_INVERTERS_AVAILABLE_AFTER_RESTART * TASK_SECOND);
+    } else {
+        _averageTask.enable();
+    }
 
     scheduler.addTask(_dataPointTask);
     updatePeriod();
-    _dataPointTask.enable();
+    if (delayUpdateTasks) {
+        _dataPointTask.restartDelayed(EXPECTED_SECS_INVERTERS_AVAILABLE_AFTER_RESTART * TASK_SECOND);
+    } else {
+        _dataPointTask.enable();
+    }
 }
 
 void DisplayGraphicDiagramClass::averageLoop()
@@ -133,4 +152,60 @@ void DisplayGraphicDiagramClass::redraw(uint8_t screenSaverOffsetX, uint8_t xPos
             graphPosX + (i - 1) / scaleFactorX, horizontal_line_y - std::max<int16_t>(0, _graphValues[i - 1] / scaleFactorY - 0.5),
             graphPosX + i / scaleFactorX, horizontal_line_y - std::max<int16_t>(0, _graphValues[i] / scaleFactorY - 0.5));
     }
+}
+
+void DisplayGraphicDiagramClass::backupGraphValuesBeforeRestart()
+{
+    auto prefs = Preferences();
+
+    if (!prefs.begin("OPENDtuGraphVal")) {
+        return;
+    }
+    _dataPointTask.disable();
+    // TODO(stefan@obssys.com)
+    // Find an easy way to wait till a possible current execution of _dataPointTask has ended
+    // Or: Use a mutex here and in dataPointLoop()
+    // For now: I assume restarting is very rare and we validate everything in restoreGraphValuesAfterRestart()
+    prefs.putUChar("count", _graphValuesCount);
+    prefs.putBytes("vars", &_graphValues[0], sizeof(_graphValues));
+    prefs.end();
+}
+
+void DisplayGraphicDiagramClass::restoreGraphValuesAfterRestart(bool& delayUpdateTasks)
+{
+    auto prefs = Preferences();
+
+    delayUpdateTasks = false;
+
+    if (!prefs.begin("OPENDtuGraphVal")) {
+        return;
+    }
+    _graphValuesCount = prefs.getUChar("count", _graphValuesCount);
+    if (_graphValuesCount >= std::size(_graphValues)) {
+        _graphValuesCount = std::size(_graphValues) - 1;
+    }
+    prefs.getBytes("vars", &_graphValues[0], sizeof(_graphValues));
+    prefs.clear(); // clear - so only after a Utils::restartDtu() the variables are available
+    prefs.end();
+
+    // Check if it was a restart due software reset
+    if (esp_reset_reason() != ESP_RST_SW) {
+        _graphValuesCount = 0;
+        return;
+    }
+
+    // Delaying the data collection makes no sense if a dot is less than the time we need
+    // to query all the inverters after a reboot.
+    // At 60secs this equals a diagram period of ~7680sec (2h8m) on a 128 dot display
+     _chartWidth = _display->getDisplayWidth(); // assume diagram use the whole display
+     if (getSecondsPerDot() <= EXPECTED_SECS_INVERTERS_AVAILABLE_AFTER_RESTART) {
+        return;
+     }
+
+    delayUpdateTasks = (_graphValuesCount != 0);
+}
+
+void DisplayGraphicDiagramClass::prepareDtuRestart()
+{
+    backupGraphValuesBeforeRestart();
 }

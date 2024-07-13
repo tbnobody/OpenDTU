@@ -62,7 +62,7 @@ int Utils::getTimezoneOffset()
 void Utils::restartDtu()
 {
     LedSingle.turnAllOff();
-    Display.setStatus(false);
+    Display.prepareDtuRestart();
     yield();
     delay(1000);
     yield();
