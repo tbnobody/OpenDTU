@@ -95,6 +95,24 @@ void Utils::removeAllFiles()
 
 /* OpenDTU-OnBatter-specific utils go here: */
 template<typename T>
+std::optional<T> getFromString(char const* val);
+
+template<>
+std::optional<float> getFromString(char const* val)
+{
+    float res = 0;
+
+    try {
+        res = std::stof(val);
+    }
+    catch (std::invalid_argument const& e) {
+        return std::nullopt;
+    }
+
+    return res;
+}
+
+template<typename T>
 std::pair<T, String> Utils::getJsonValueByPath(JsonDocument const& root, String const& path)
 {
     size_t constexpr kErrBufferSize = 256;
@@ -156,13 +174,24 @@ std::pair<T, String> Utils::getJsonValueByPath(JsonDocument const& root, String 
         return { T(), String(errBuffer) };
     }
 
-    if (!value.is<T>()) {
+    if (value.is<T>()) {
+        return { value.as<T>(), "" };
+    }
+
+    if (!value.is<char const*>()) {
         snprintf(errBuffer, kErrBufferSize, "Value '%s' at JSON path '%s' is not "
                 "of the expected type", value.as<String>().c_str(), path.c_str());
         return { T(), String(errBuffer) };
     }
 
-    return { value.as<T>(), "" };
+    auto res = getFromString<T>(value.as<char const*>());
+    if (!res.has_value()) {
+        snprintf(errBuffer, kErrBufferSize, "String '%s' at JSON path '%s' cannot "
+                "be converted to the expected type", value.as<String>().c_str(), path.c_str());
+        return { T(), String(errBuffer) };
+    }
+
+    return { *res, "" };
 }
 
 template std::pair<float, String> Utils::getJsonValueByPath(JsonDocument const& root, String const& path);
