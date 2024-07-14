@@ -4,6 +4,7 @@
         "Settings": "Einstellungen",
         "NetworkSettings": "Netzwerk",
         "NTPSettings": "NTP",
+        "ModbusSettings": "Modbus",
         "MQTTSettings": "MQTT",
         "InverterSettings": "Wechselrichter",
         "SecuritySettings": "Sicherheit",
@@ -16,6 +17,7 @@
         "System": "System",
         "Network": "Netzwerk",
         "NTP": "NTP",
+        "Modbus": "Modbus",
         "MQTT": "MQTT",
         "Console": "Konsole",
         "About": "Über",
@@ -290,6 +292,21 @@
         "Day": "Tag",
         "Night": "Nacht"
     },
+    "modbusinfo": {
+        "ModbusInformation": "Modbus-Informationen",
+        "TCPSummary": "Konfigurationszusammenfassung Modbus TCP",
+        "ServerSummary": "Informationen zu den Modbus Servern",
+        "Status": "@:mqttinfo.Status",
+        "Enabled": "@:mqttinfo.Enabled",
+        "Disabled": "@:mqttinfo.Disabled",
+        "Server": "@:mqttinfo.Server",
+        "IpAddress": "@:interfacenetworkinfo.IpAddress",
+        "Port": "@:mqttinfo.Port",
+        "Clients": "Maximale Anzahl der Modbus TCP-Clients",
+        "IDDTUPro": "ID für DTUPro Datensatz",
+        "IDTotal": "ID für OpenDTU Inverter (SunSpec) als Aggregation aller angemeldeter Inverter",
+        "IDMeter": "ID für OpenDTU Zähler (SunSpec) für alle angemeldeten Inverter"
+    },
     "mqttinfo": {
         "MqttInformation": "MQTT-Informationen",
         "ConfigurationSummary": "@:ntpinfo.ConfigurationSummary",
@@ -433,6 +450,15 @@
         "Minutes": "Minuten",
         "EnableMdns": "mDNS aktivieren",
         "MdnsSettings": "mDNS-Einstellungen"
+    },
+    "modbusadmin": {
+        "ModbusSettings": "Modbus-Einstellungen",
+        "ModbusConfiguration": "Modbus-Konfiguration",
+        "EnableModbusTCP": "Modbus TCP aktivieren",
+        "Clients": "@:modbusinfo.Clients",
+        "IDDTUPro": "@:modbusinfo.IDDTUPro",
+        "IDTotal": "@:modbusinfo.IDTotal",
+        "IDMeter": "@:modbusinfo.IDMeter"
     },
     "mqttadmin": {
         "MqttSettings": "MQTT-Einstellungen",

@@ -34,6 +34,9 @@
                                 <router-link @click="onClick" class="dropdown-item" to="/settings/ntp">{{ $t('menu.NTPSettings') }}</router-link>
                             </li>
                             <li>
+                                <router-link @click="onClick" class="dropdown-item" to="/settings/modbus">{{ $t('menu.ModbusSettings') }}</router-link>
+                            </li>
+                            <li>
                                 <router-link @click="onClick" class="dropdown-item" to="/settings/mqtt">{{ $t('menu.MQTTSettings') }}</router-link>
                             </li>
                             <li>
@@ -78,6 +81,9 @@
                             </li>
                             <li>
                                 <router-link @click="onClick" class="dropdown-item" to="/info/ntp">{{ $t('menu.NTP') }}</router-link>
+                            </li>
+                            <li>
+                                <router-link @click="onClick" class="dropdown-item" to="/info/modbus">{{ $t('menu.Modbus') }}</router-link>
                             </li>
                             <li>
                                 <router-link @click="onClick" class="dropdown-item" to="/info/mqtt">{{ $t('menu.MQTT') }}</router-link>

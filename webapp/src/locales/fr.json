@@ -4,6 +4,7 @@
         "Settings": "Paramètres",
         "NetworkSettings": "Réseau",
         "NTPSettings": "Heure locale",
+        "ModbusSettings": "Modbus",
         "MQTTSettings": "MQTT",
         "InverterSettings": "Onduleurs",
         "SecuritySettings": "Sécurité",
@@ -16,6 +17,7 @@
         "System": "Système",
         "Network": "Réseau",
         "NTP": "NTP",
+        "Modbus": "Modbus",
         "MQTT": "MQTT",
         "Console": "Console",
         "About": "A propos",
@@ -290,6 +292,21 @@
         "Day": "Jour",
         "Night": "Nuit"
     },
+    "modbusinfo": {
+        "ModbusInformation": "Informations sur le Modbus",
+        "TCPSummary": "Résumé de la configuration Modbus TCP",
+        "ServerSummary": "Informations sur le serveur Modbus",
+        "Status": "@:mqttinfo.Status",
+        "Enabled": "@:mqttinfo.Enabled",
+        "Disabled": "@:mqttinfo.Disabled",
+        "Server": "@:mqttinfo.Server",
+        "IpAddress": "@:interfacenetworkinfo.IpAddress",
+        "Port": "@:mqttinfo.Port",
+        "Clients": "Nombre maximum de clients Modbus TCP",
+        "IDDTUPro": "ID pour l'ensemble de données DTUPro",
+        "IDTotal": "ID pour OpenDTU Inverter (SunSpec) comme agrégation de tous les onduleurs enregistrés",
+        "IDMeter": "ID pour OpenDTU Compteur (SunSpec) pour tous les onduleurs enregistrés"
+    },
     "mqttinfo": {
         "MqttInformation": "MQTT Information",
         "ConfigurationSummary": "@:ntpinfo.ConfigurationSummary",
@@ -433,6 +450,15 @@
         "Minutes": "minutes",
         "EnableMdns": "Activer mDNS",
         "MdnsSettings": "mDNS Settings"
+    },
+    "modbusadmin": {
+        "ModbusSettings": "Paramètres Modbus",
+        "ModbusConfiguration": "Configuration du système Modbus",
+        "EnableModbusTCP": "Activer le Modbus TCP",
+        "Clients": "@:modbusinfo.Clients",
+        "IDDTUPro": "@:modbusinfo.IDDTUPro",
+        "IDTotal": "@:modbusinfo.IDTotal",
+        "IDMeter": "@:modbusinfo.IDMeter"
     },
     "mqttadmin": {
         "MqttSettings": "Paramètres MQTT",

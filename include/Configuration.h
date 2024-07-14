@@ -84,6 +84,14 @@ struct CONFIG_T {
         double Latitude;
         uint8_t SunsetType;
     } Ntp;
+    struct {
+        bool TCPEnabled;
+        uint32_t Port;
+        uint32_t Clients;
+        uint32_t IDDTUPro;
+        uint32_t IDTotal;
+        uint32_t IDMeter;
+    } Modbus;
 
     struct {
         bool Enabled;

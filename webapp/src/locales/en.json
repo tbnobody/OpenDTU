@@ -4,6 +4,7 @@
         "Settings": "Settings",
         "NetworkSettings": "Network Settings",
         "NTPSettings": "NTP Settings",
+        "ModbusSettings": "Modbus Settings",
         "MQTTSettings": "MQTT Settings",
         "InverterSettings": "Inverter Settings",
         "SecuritySettings": "Security Settings",
@@ -16,6 +17,7 @@
         "System": "System",
         "Network": "Network",
         "NTP": "NTP",
+        "Modbus": "Modbus",
         "MQTT": "MQTT",
         "Console": "Console",
         "About": "About",
@@ -290,6 +292,21 @@
         "Day": "Day",
         "Night": "Night"
     },
+    "modbusinfo": {
+        "ModbusInformation": "Modbus Information",
+        "TCPSummary": "Configuration Summary Modbus TCP",
+        "ServerSummary": "Modbus Server Information",
+        "Status": "@:mqttinfo.Status",
+        "Enabled": "@:mqttinfo.Enabled",
+        "Disabled": "@:mqttinfo.Disabled",
+        "Server": "@:mqttinfo.Server",
+        "IpAddress": "@:interfacenetworkinfo.IpAddress",
+        "Port": "@:mqttinfo.Port",
+        "Clients": "Maximum number of Modbus TCP clients",
+        "IDDTUPro": "ID for DTUPro dataset",
+        "IDTotal": "ID for OpenDTU Inverter (SunSpec) as aggregation of all registered inverters",
+        "IDMeter": "ID for OpenDTU Meter (SunSpec) for all registered inverters"
+    },
     "mqttinfo": {
         "MqttInformation": "MQTT Information",
         "ConfigurationSummary": "@:ntpinfo.ConfigurationSummary",
@@ -433,6 +450,15 @@
         "Minutes": "minutes",
         "EnableMdns": "Enable mDNS",
         "MdnsSettings": "mDNS Settings"
+    },
+    "modbusadmin": {
+        "ModbusSettings": "Modbus Settings",
+        "ModbusConfiguration": "Modbus Configuration",
+        "EnableModbusTCP": "Enable Modbus TCP",
+        "Clients": "@:modbusinfo.Clients",
+        "IDDTUPro": "@:modbusinfo.IDDTUPro",
+        "IDTotal": "@:modbusinfo.IDTotal",
+        "IDMeter": "@:modbusinfo.IDMeter"
     },
     "mqttadmin": {
         "MqttSettings": "MQTT Settings",

@@ -30,6 +30,13 @@
 #define NTP_LATITUDE 51.1657f
 #define NTP_SUNSETTYPE 1U
 
+#define MODBUS_TCP_ENABLED false
+#define MODBUS_PORT 502
+#define MODBUS_CLIENTS 1
+#define MODBUS_ID_DTUPRO 1
+#define MODBUS_ID_TOTAL 125
+#define MODBUS_ID_METER 243
+
 #define MQTT_ENABLED false
 #define MQTT_HOST ""
 #define MQTT_PORT 1883U
