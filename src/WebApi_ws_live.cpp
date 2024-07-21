@@ -332,9 +332,7 @@ void WebApiWsLiveClass::onLivedataStatus(AsyncWebServerRequest* request)
 
         generateOnBatteryJsonResponse(root, true);
 
-        generateOnBatteryJsonResponse(root, true);
-
-    WebApi.sendJsonResponse(request, response, __FUNCTION__, __LINE__);
+        WebApi.sendJsonResponse(request, response, __FUNCTION__, __LINE__);
     
     } catch (const std::bad_alloc& bad_alloc) {
         MessageOutput.printf("Calling /api/livedata/status has temporarily run out of resources. Reason: \"%s\".\r\n", bad_alloc.what());
