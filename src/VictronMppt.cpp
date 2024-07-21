@@ -75,12 +75,16 @@ void VictronMpptClass::loop()
     }
 }
 
+/*
+ * isDataValid()
+ * return: true = if at least one of the MPPT controllers delivers valid data
+ */
 bool VictronMpptClass::isDataValid() const
 {
     std::lock_guard<std::mutex> lock(_mutex);
 
     for (auto const& upController: _controllers) {
-        if (!upController->isDataValid()) { return false; }
+        if (upController->isDataValid()) { return true; }
     }
 
     return !_controllers.empty();
