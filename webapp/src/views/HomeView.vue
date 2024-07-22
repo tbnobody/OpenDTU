@@ -49,7 +49,7 @@
                                     <div style="padding-right: 2em;">
                                         {{ $t('home.CurrentLimit') }}<template v-if="inverter.limit_absolute > -1"> {{
                                                 $n(inverter.limit_absolute, 'decimalNoDigits')
-                                        }} W | </template>{{ $n(inverter.limit_relative / 100, 'percent') }}
+                                        }} W | </template>{{ $n(inverter.limit_relative / 100, 'percentOneDigit') }}
                                     </div>
                                     <div style="padding-right: 2em;">
                                         {{ $t('home.DataAge') }} {{ $t('home.Seconds', {'val': $n(inverter.data_age) }) }}
@@ -407,13 +407,13 @@ export default defineComponent({
         currentLimitAbsolute(): string {
             if (this.currentLimitList.max_power > 0) {
                 return this.$n(this.currentLimitList.limit_relative * this.currentLimitList.max_power / 100,
-                    'decimalTwoDigits');
+                    'decimalNoDigits');
             }
             return "0";
         },
         currentLimitRelative(): string {
             return this.$n(this.currentLimitList.limit_relative,
-                'decimalTwoDigits');
+                'decimalOneDigit');
         },
         inverterData(): Inverter[] {
             return this.liveData.inverters.slice().sort((a: Inverter, b: Inverter) => {

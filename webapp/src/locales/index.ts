@@ -35,11 +35,17 @@ LOCALES.forEach((locale) => {
         decimalNoDigits: {
             style: 'decimal', minimumFractionDigits: 0, maximumFractionDigits: 0
         },
+        decimalOneDigit: {
+            style: 'decimal', minimumFractionDigits: 1, maximumFractionDigits: 1
+        },
         decimalTwoDigits: {
             style: 'decimal', minimumFractionDigits: 2, maximumFractionDigits: 2
         },
         percent: {
             style: 'percent',
+        },
+        percentOneDigit: {
+            style: 'percent', minimumFractionDigits: 1, maximumFractionDigits: 1
         },
         byte: {
             style: 'unit', unit: 'byte',
