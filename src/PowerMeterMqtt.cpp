@@ -8,6 +8,7 @@
 bool PowerMeterMqtt::init()
 {
     auto subscribe = [this](PowerMeterMqttValue const& val, float* targetVariable) {
+        *targetVariable = 0;
         char const* topic = val.Topic;
         if (strlen(topic) == 0) { return; }
         MqttSettings.subscribe(topic, 0,
