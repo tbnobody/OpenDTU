@@ -48,10 +48,11 @@ void PowerMeterMqtt::onMessage(PowerMeterMqtt::MsgProperties const& properties,
         MessageOutput.println();
     };
 
+    float newValue = 0;
+
     if (strlen(cfg->JsonPath) == 0) {
         try {
-            std::lock_guard<std::mutex> l(_mutex);
-            *targetVariable = std::stof(value);
+            newValue = std::stof(value);
         }
         catch (std::invalid_argument const& e) {
             return log("cannot parse payload '%s' as float", logValue.c_str());
@@ -74,25 +75,30 @@ void PowerMeterMqtt::onMessage(PowerMeterMqtt::MsgProperties const& properties,
             return log("%s", pathResolutionResult.second.c_str());
         }
 
-        *targetVariable = pathResolutionResult.first;
+        newValue = pathResolutionResult.first;
     }
 
     using Unit_t = PowerMeterMqttValue::Unit;
     switch (cfg->PowerUnit) {
         case Unit_t::MilliWatts:
-            *targetVariable /= 1000;
+            newValue /= 1000;
             break;
         case Unit_t::KiloWatts:
-            *targetVariable *= 1000;
+            newValue *= 1000;
             break;
         default:
             break;
     }
 
-    if (cfg->SignInverted) { *targetVariable *= -1; }
+    if (cfg->SignInverted) { newValue *= -1; }
+
+    {
+        std::lock_guard<std::mutex> l(_mutex);
+        *targetVariable = newValue;
+    }
 
     if (_verboseLogging) {
-        log("new value: %5.2f, total: %5.2f", *targetVariable, getPowerTotal());
+        log("new value: %5.2f, total: %5.2f", newValue, getPowerTotal());
     }
 
     gotUpdate();
