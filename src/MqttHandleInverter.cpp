@@ -183,7 +183,7 @@ void MqttHandleInverterClass::onMqttMessage(const espMqttClientTypes::MessagePro
     char* strlimit = new char[len + 1];
     memcpy(strlimit, payload, len);
     strlimit[len] = '\0';
-    const int32_t payload_val = strtol(strlimit, NULL, 10);
+    const float payload_val = strtof(strlimit, NULL);
     delete[] strlimit;
 
     if (payload_val < 0) {
@@ -193,17 +193,17 @@ void MqttHandleInverterClass::onMqttMessage(const espMqttClientTypes::MessagePro
 
     if (!strcmp(setting, TOPIC_SUB_LIMIT_PERSISTENT_RELATIVE)) {
         // Set inverter limit relative persistent
-        MessageOutput.printf("Limit Persistent: %d %%\r\n", payload_val);
+        MessageOutput.printf("Limit Persistent: %.1f %%\r\n", payload_val);
         inv->sendActivePowerControlRequest(payload_val, PowerLimitControlType::RelativPersistent);
 
     } else if (!strcmp(setting, TOPIC_SUB_LIMIT_PERSISTENT_ABSOLUTE)) {
         // Set inverter limit absolute persistent
-        MessageOutput.printf("Limit Persistent: %d W\r\n", payload_val);
+        MessageOutput.printf("Limit Persistent: %.1f W\r\n", payload_val);
         inv->sendActivePowerControlRequest(payload_val, PowerLimitControlType::AbsolutPersistent);
 
     } else if (!strcmp(setting, TOPIC_SUB_LIMIT_NONPERSISTENT_RELATIVE)) {
         // Set inverter limit relative non persistent
-        MessageOutput.printf("Limit Non-Persistent: %d %%\r\n", payload_val);
+        MessageOutput.printf("Limit Non-Persistent: %.1f %%\r\n", payload_val);
         if (!properties.retain) {
             inv->sendActivePowerControlRequest(payload_val, PowerLimitControlType::RelativNonPersistent);
         } else {
@@ -212,7 +212,7 @@ void MqttHandleInverterClass::onMqttMessage(const espMqttClientTypes::MessagePro
 
     } else if (!strcmp(setting, TOPIC_SUB_LIMIT_NONPERSISTENT_ABSOLUTE)) {
         // Set inverter limit absolute non persistent
-        MessageOutput.printf("Limit Non-Persistent: %d W\r\n", payload_val);
+        MessageOutput.printf("Limit Non-Persistent: %.1f W\r\n", payload_val);
         if (!properties.retain) {
             inv->sendActivePowerControlRequest(payload_val, PowerLimitControlType::AbsolutNonPersistent);
         } else {
@@ -221,8 +221,8 @@ void MqttHandleInverterClass::onMqttMessage(const espMqttClientTypes::MessagePro
 
     } else if (!strcmp(setting, TOPIC_SUB_POWER)) {
         // Turn inverter on or off
-        MessageOutput.printf("Set inverter power to: %d\r\n", payload_val);
-        inv->sendPowerControlRequest(payload_val > 0);
+        MessageOutput.printf("Set inverter power to: %d\r\n", static_cast<int32_t>(payload_val));
+        inv->sendPowerControlRequest(static_cast<int32_t>(payload_val) > 0);
 
     } else if (!strcmp(setting, TOPIC_SUB_RESTART)) {
         // Restart inverter
@@ -230,7 +230,7 @@ void MqttHandleInverterClass::onMqttMessage(const espMqttClientTypes::MessagePro
         if (!properties.retain && payload_val == 1) {
             inv->sendRestartControlRequest();
         } else {
-            MessageOutput.println("Ignored because retained");
+            MessageOutput.println("Ignored because retained or numeric value not '1'");
         }
     }
 }
