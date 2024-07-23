@@ -17,4 +17,8 @@ public:
     /* OpenDTU-OnBatter-specific utils go here: */
     template<typename T>
     static std::pair<T, String> getJsonValueByPath(JsonDocument const& root, String const& path);
+
+    template <typename T>
+    static std::optional<T> getNumericValueFromMqttPayload(char const* client,
+            std::string const& src, char const* topic, char const* jsonPath);
 };

@@ -38,45 +38,13 @@ void PowerMeterMqtt::onMessage(PowerMeterMqtt::MsgProperties const& properties,
         char const* topic, uint8_t const* payload, size_t len, size_t index,
         size_t total, float* targetVariable, PowerMeterMqttValue const* cfg)
 {
-    std::string value(reinterpret_cast<char const*>(payload), len);
-    std::string logValue = value.substr(0, 32);
-    if (value.length() > logValue.length()) { logValue += "..."; }
+    auto extracted = Utils::getNumericValueFromMqttPayload<float>("PowerMeterMqtt",
+            std::string(reinterpret_cast<const char*>(payload), len), topic,
+            cfg->JsonPath);
 
-    auto log= [topic](char const* format, auto&&... args) -> void {
-        MessageOutput.printf("[PowerMeterMqtt] Topic '%s': ", topic);
-        MessageOutput.printf(format, args...);
-        MessageOutput.println();
-    };
+    if (!extracted.has_value()) { return; }
 
-    float newValue = 0;
-
-    if (strlen(cfg->JsonPath) == 0) {
-        try {
-            newValue = std::stof(value);
-        }
-        catch (std::invalid_argument const& e) {
-            return log("cannot parse payload '%s' as float", logValue.c_str());
-        }
-    }
-    else {
-        JsonDocument json;
-
-        const DeserializationError error = deserializeJson(json, value);
-        if (error) {
-            return log("cannot parse payload '%s' as JSON", logValue.c_str());
-        }
-
-        if (json.overflowed()) {
-            return log("payload too large to process as JSON");
-        }
-
-        auto pathResolutionResult = Utils::getJsonValueByPath<float>(json, cfg->JsonPath);
-        if (!pathResolutionResult.second.isEmpty()) {
-            return log("%s", pathResolutionResult.second.c_str());
-        }
-
-        newValue = pathResolutionResult.first;
-    }
+    float newValue = *extracted;
 
     using Unit_t = PowerMeterMqttValue::Unit;
     switch (cfg->PowerUnit) {
@@ -98,7 +66,8 @@ void PowerMeterMqtt::onMessage(PowerMeterMqtt::MsgProperties const& properties,
     }
 
     if (_verboseLogging) {
-        log("new value: %5.2f, total: %5.2f", newValue, getPowerTotal());
+        MessageOutput.printf("[PowerMeterMqtt] Topic '%s': new value: %5.2f, "
+                "total: %5.2f\r\n", topic, newValue, getPowerTotal());
     }
 
     gotUpdate();

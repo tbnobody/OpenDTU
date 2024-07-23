@@ -257,7 +257,9 @@ bool ConfigurationClass::write()
     battery["jkbms_interface"] = config.Battery.JkBmsInterface;
     battery["jkbms_polling_interval"] = config.Battery.JkBmsPollingInterval;
     battery["mqtt_topic"] = config.Battery.MqttSocTopic;
+    battery["mqtt_json_path"] = config.Battery.MqttSocJsonPath;
     battery["mqtt_voltage_topic"] = config.Battery.MqttVoltageTopic;
+    battery["mqtt_voltage_json_path"] = config.Battery.MqttVoltageJsonPath;
 
     JsonObject huawei = doc["huawei"].to<JsonObject>();
     huawei["enabled"] = config.Huawei.Enabled;
@@ -604,7 +606,9 @@ bool ConfigurationClass::read()
     config.Battery.JkBmsInterface = battery["jkbms_interface"] | BATTERY_JKBMS_INTERFACE;
     config.Battery.JkBmsPollingInterval = battery["jkbms_polling_interval"] | BATTERY_JKBMS_POLLING_INTERVAL;
     strlcpy(config.Battery.MqttSocTopic, battery["mqtt_topic"] | "", sizeof(config.Battery.MqttSocTopic));
+    strlcpy(config.Battery.MqttSocJsonPath, battery["mqtt_json_path"] | "", sizeof(config.Battery.MqttSocJsonPath));
     strlcpy(config.Battery.MqttVoltageTopic, battery["mqtt_voltage_topic"] | "", sizeof(config.Battery.MqttVoltageTopic));
+    strlcpy(config.Battery.MqttVoltageJsonPath, battery["mqtt_voltage_json_path"] | "", sizeof(config.Battery.MqttVoltageJsonPath));
 
     JsonObject huawei = doc["huawei"];
     config.Huawei.Enabled = huawei["enabled"] | HUAWEI_ENABLED;

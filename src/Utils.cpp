@@ -203,3 +203,47 @@ std::pair<T, String> Utils::getJsonValueByPath(JsonDocument const& root, String 
 }
 
 template std::pair<float, String> Utils::getJsonValueByPath(JsonDocument const& root, String const& path);
+
+template <typename T>
+std::optional<T> Utils::getNumericValueFromMqttPayload(char const* client,
+        std::string const& src, char const* topic, char const* jsonPath)
+{
+    std::string logValue = src.substr(0, 32);
+    if (src.length() > logValue.length()) { logValue += "..."; }
+
+    auto log = [client,topic](char const* format, auto&&... args) -> std::optional<T> {
+        MessageOutput.printf("[%s] Topic '%s': ", client, topic);
+        MessageOutput.printf(format, args...);
+        MessageOutput.println();
+        return std::nullopt;
+    };
+
+    if (strlen(jsonPath) == 0) {
+        auto res = getFromString<T>(src.c_str());
+        if (!res.has_value()) {
+            return log("cannot parse payload '%s' as float", logValue.c_str());
+        }
+        return res;
+    }
+
+    JsonDocument json;
+
+    const DeserializationError error = deserializeJson(json, src);
+    if (error) {
+        return log("cannot parse payload '%s' as JSON", logValue.c_str());
+    }
+
+    if (json.overflowed()) {
+        return log("payload too large to process as JSON");
+    }
+
+    auto pathResolutionResult = getJsonValueByPath<T>(json, jsonPath);
+    if (!pathResolutionResult.second.isEmpty()) {
+        return log("%s", pathResolutionResult.second.c_str());
+    }
+
+    return pathResolutionResult.first;
+}
+
+template std::optional<float> Utils::getNumericValueFromMqttPayload(char const* client,
+        std::string const& src, char const* topic, char const* jsonPath);

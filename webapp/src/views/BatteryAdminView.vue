@@ -49,29 +49,37 @@
                               type="number" min="2" max="90" step="1" :postfix="$t('batteryadmin.Seconds')"/>
             </CardElement>
 
-            <CardElement v-show="batteryConfigList.enabled && batteryConfigList.provider == 2"
-                         :text="$t('batteryadmin.MqttConfiguration')" textVariant="text-bg-primary" addSpace>
-                <div class="row mb-3">
-                    <label class="col-sm-2 col-form-label">
-                        {{ $t('batteryadmin.MqttSocTopic') }}
-                    </label>
-                    <div class="col-sm-10">
-                        <div class="input-group">
-                            <input type="text" class="form-control" v-model="batteryConfigList.mqtt_soc_topic" />
-                        </div>
-                    </div>
-                </div>
-                <div class="row mb-3">
-                    <label class="col-sm-2 col-form-label">
-                        {{ $t('batteryadmin.MqttVoltageTopic') }}
-                    </label>
-                    <div class="col-sm-10">
-                        <div class="input-group">
-                            <input type="text" class="form-control" v-model="batteryConfigList.mqtt_voltage_topic" />
-                        </div>
-                    </div>
-                </div>
-            </CardElement>
+            <template v-if="batteryConfigList.enabled && batteryConfigList.provider == 2">
+                <CardElement :text="$t('batteryadmin.MqttSocConfiguration')" textVariant="text-bg-primary" addSpace>
+
+                    <InputElement :label="$t('batteryadmin.MqttSocTopic')"
+                        v-model="batteryConfigList.mqtt_soc_topic"
+                        type="text"
+                        maxlength="256" />
+
+                    <InputElement :label="$t('batteryadmin.MqttJsonPath')"
+                        v-model="batteryConfigList.mqtt_soc_json_path"
+                        type="text"
+                        maxlength="128"
+                        :tooltip="$t('batteryadmin.MqttJsonPathDescription')" />
+
+                </CardElement>
+
+                <CardElement :text="$t('batteryadmin.MqttVoltageConfiguration')" textVariant="text-bg-primary" addSpace>
+
+                    <InputElement :label="$t('batteryadmin.MqttVoltageTopic')"
+                        v-model="batteryConfigList.mqtt_voltage_topic"
+                        type="text"
+                        maxlength="256" />
+
+                    <InputElement :label="$t('batteryadmin.MqttJsonPath')"
+                        v-model="batteryConfigList.mqtt_voltage_json_path"
+                        type="text"
+                        maxlength="128"
+                        :tooltip="$t('batteryadmin.MqttJsonPathDescription')" />
+
+                </CardElement>
+            </template>
 
             <FormFooter @reload="getBatteryConfig"/>
         </form>
