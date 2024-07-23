@@ -5,6 +5,7 @@
 #include "MqttHandleBatteryHass.h"
 #include "Configuration.h"
 #include "MqttSettings.h"
+#include "MqttHandleHass.h"
 #include "Utils.h"
 #include "__compiled_constants.h"
 
@@ -294,10 +295,11 @@ void MqttHandleBatteryHassClass::createDeviceInfo(JsonObject& object)
     }
 
     object["ids"] = serial;
-    object["cu"] = String("http://") + NetworkSettings.localIP().toString();
+    object["cu"] = MqttHandleHass.getDtuUrl();
     object["mf"] = "OpenDTU";
     object["mdl"] = Battery.getStats()->getManufacturer();
     object["sw"] = __COMPILED_GIT_HASH__;
+    object["via_device"] = MqttHandleHass.getDtuUniqueId();
 }
 
 void MqttHandleBatteryHassClass::publish(const String& subtopic, const String& payload)

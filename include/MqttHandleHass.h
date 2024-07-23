@@ -56,6 +56,9 @@ public:
     void publishConfig();
     void forceUpdate();
 
+    static String getDtuUniqueId();
+    static String getDtuUrl();
+
 private:
     void loop();
     void publish(const String& subtopic, const String& payload);
@@ -70,9 +73,6 @@ private:
     static void createDtuInfo(JsonDocument& doc);
 
     static void createDeviceInfo(JsonDocument& doc, const String& name, const String& identifiers, const String& configuration_url, const String& manufacturer, const String& model, const String& sw_version, const String& via_device = "");
-
-    static String getDtuUniqueId();
-    static String getDtuUrl();
 
     Task _loopTask;
 

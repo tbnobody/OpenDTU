@@ -3,6 +3,7 @@
  * Copyright (C) 2022 Thomas Basler and others
  */
 #include "MqttHandlePowerLimiterHass.h"
+#include "MqttHandleHass.h"
 #include "Configuration.h"
 #include "MqttSettings.h"
 #include "NetworkSettings.h"
@@ -69,32 +70,32 @@ void MqttHandlePowerLimiterHassClass::publishConfig()
 
     // as this project revolves around Hoymiles inverters, 16 - 60 V is a reasonable voltage range
     publishNumber("DPL battery voltage start threshold", "mdi:battery-charging",
-            "config", "threshold/voltage/start", "threshold/voltage/start", "V", 16, 60);
+            "config", "threshold/voltage/start", "threshold/voltage/start", "V", 16, 60, 0.1);
     publishNumber("DPL battery voltage stop threshold", "mdi:battery-charging",
-            "config", "threshold/voltage/stop", "threshold/voltage/stop", "V", 16, 60);
+            "config", "threshold/voltage/stop", "threshold/voltage/stop", "V", 16, 60, 0.1);
 
     if (config.Vedirect.Enabled) {
         publishNumber("DPL full solar passthrough start voltage",
                 "mdi:transmission-tower-import", "config",
                 "threshold/voltage/full_solar_passthrough_start",
-                "threshold/voltage/full_solar_passthrough_start", "V", 16, 60);
+                "threshold/voltage/full_solar_passthrough_start", "V", 16, 60, 0.1);
         publishNumber("DPL full solar passthrough stop voltage",
                 "mdi:transmission-tower-import", "config",
                 "threshold/voltage/full_solar_passthrough_stop",
-                "threshold/voltage/full_solar_passthrough_stop", "V", 16, 60);
+                "threshold/voltage/full_solar_passthrough_stop", "V", 16, 60, 0.1);
     }
 
     if (config.Battery.Enabled && !config.PowerLimiter.IgnoreSoc) {
         publishNumber("DPL battery SoC start threshold", "mdi:battery-charging",
-                "config", "threshold/soc/start", "threshold/soc/start", "%", 0, 100);
+                "config", "threshold/soc/start", "threshold/soc/start", "%", 0, 100, 1.0);
         publishNumber("DPL battery SoC stop threshold", "mdi:battery-charging",
-                "config", "threshold/soc/stop", "threshold/soc/stop", "%", 0, 100);
+                "config", "threshold/soc/stop", "threshold/soc/stop", "%", 0, 100, 1.0);
 
         if (config.Vedirect.Enabled) {
             publishNumber("DPL full solar passthrough SoC",
                     "mdi:transmission-tower-import", "config",
                     "threshold/soc/full_solar_passthrough",
-                    "threshold/soc/full_solar_passthrough", "%", 0, 100);
+                    "threshold/soc/full_solar_passthrough", "%", 0, 100, 1.0);
         }
     }
 }
@@ -108,7 +109,7 @@ void MqttHandlePowerLimiterHassClass::publishSelect(
     selectId.replace(" ", "_");
     selectId.toLowerCase();
 
-    const String configTopic = "select/powerlimiter/" + selectId + "/config";
+    const String configTopic = "select/" + MqttHandleHass.getDtuUniqueId() + "/" + selectId + "/config";
 
     const String cmdTopic = MqttSettings.getPrefix() + "powerlimiter/cmd/" + commandTopic;
     const String statTopic = MqttSettings.getPrefix() + "powerlimiter/status/" + stateTopic;
@@ -116,7 +117,7 @@ void MqttHandlePowerLimiterHassClass::publishSelect(
     JsonDocument root;
 
     root["name"] = caption;
-    root["uniq_id"] = selectId;
+    root["uniq_id"] = MqttHandleHass.getDtuUniqueId() + "_" + selectId;
     if (strcmp(icon, "")) {
         root["ic"] = icon;
     }
@@ -128,8 +129,7 @@ void MqttHandlePowerLimiterHassClass::publishSelect(
     options.add("1");
     options.add("2");
 
-    JsonObject deviceObj = root["dev"].to<JsonObject>();
-    createDeviceInfo(deviceObj);
+    createDeviceInfo(root);
 
     if (!Utils::checkJsonAlloc(root, __FUNCTION__, __LINE__)) {
         return;
@@ -143,14 +143,14 @@ void MqttHandlePowerLimiterHassClass::publishSelect(
 void MqttHandlePowerLimiterHassClass::publishNumber(
     const char* caption, const char* icon, const char* category,
     const char* commandTopic, const char* stateTopic, const char* unitOfMeasure,
-    const int16_t min, const int16_t max)
+    const int16_t min, const int16_t max, const float step)
 {
 
     String numberId = caption;
     numberId.replace(" ", "_");
     numberId.toLowerCase();
 
-    const String configTopic = "number/powerlimiter/" + numberId + "/config";
+    const String configTopic = "number/" + MqttHandleHass.getDtuUniqueId() + "/" + numberId + "/config";
 
     const String cmdTopic = MqttSettings.getPrefix() + "powerlimiter/cmd/" + commandTopic;
     const String statTopic = MqttSettings.getPrefix() + "powerlimiter/status/" + stateTopic;
@@ -158,7 +158,7 @@ void MqttHandlePowerLimiterHassClass::publishNumber(
     JsonDocument root;
 
     root["name"] = caption;
-    root["uniq_id"] = numberId;
+    root["uniq_id"] = MqttHandleHass.getDtuUniqueId() + "_" + numberId;
     if (strcmp(icon, "")) {
         root["ic"] = icon;
     }
@@ -168,6 +168,7 @@ void MqttHandlePowerLimiterHassClass::publishNumber(
     root["unit_of_meas"] = unitOfMeasure;
     root["min"] = min;
     root["max"] = max;
+    root["step"] = step;
     root["mode"] = "box";
 
     auto const& config = Configuration.get();
@@ -175,8 +176,7 @@ void MqttHandlePowerLimiterHassClass::publishNumber(
         root["exp_aft"] = config.Mqtt.PublishInterval * 3;
     }
 
-    JsonObject deviceObj = root["dev"].to<JsonObject>();
-    createDeviceInfo(deviceObj);
+    createDeviceInfo(root);
 
     if (!Utils::checkJsonAlloc(root, __FUNCTION__, __LINE__)) {
         return;
@@ -187,14 +187,16 @@ void MqttHandlePowerLimiterHassClass::publishNumber(
     publish(configTopic, buffer);
 }
 
-void MqttHandlePowerLimiterHassClass::createDeviceInfo(JsonObject& object)
+void MqttHandlePowerLimiterHassClass::createDeviceInfo(JsonDocument& root)
 {
+    JsonObject object = root["dev"].to<JsonObject>();
     object["name"] = "Dynamic Power Limiter";
-    object["ids"] = "0002";
-    object["cu"] = String("http://") + NetworkSettings.localIP().toString();
+    object["ids"] = MqttHandleHass.getDtuUniqueId() + "_DPL";
+    object["cu"] = MqttHandleHass.getDtuUrl();
     object["mf"] = "OpenDTU";
     object["mdl"] = "Dynamic Power Limiter";
     object["sw"] = __COMPILED_GIT_HASH__;
+    object["via_device"] = MqttHandleHass.getDtuUniqueId();
 }
 
 void MqttHandlePowerLimiterHassClass::publish(const String& subtopic, const String& payload)
