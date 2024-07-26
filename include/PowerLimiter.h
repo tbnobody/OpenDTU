@@ -44,6 +44,7 @@ public:
     uint8_t getInverterUpdateTimeouts() const { return _inverterUpdateTimeouts; }
     uint8_t getPowerLimiterState();
     int32_t getLastRequestedPowerLimit() { return _lastRequestedPowerLimit; }
+    bool getFullSolarPassThroughEnabled() const { return _fullSolarPassThroughEnabled; }
 
     enum class Mode : unsigned {
         Normal = 0,

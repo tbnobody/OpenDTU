@@ -75,6 +75,10 @@ void MqttHandlePowerLimiterHassClass::publishConfig()
             "config", "threshold/voltage/stop", "threshold/voltage/stop", "V", 16, 60, 0.1);
 
     if (config.Vedirect.Enabled) {
+        publishBinarySensor("full solar passthrough active",
+            "mdi:transmission-tower-import",
+            "full_solar_passthrough_active", "1", "0");
+
         publishNumber("DPL full solar passthrough start voltage",
                 "mdi:transmission-tower-import", "config",
                 "threshold/voltage/full_solar_passthrough_start",
@@ -186,6 +190,47 @@ void MqttHandlePowerLimiterHassClass::publishNumber(
     serializeJson(root, buffer);
     publish(configTopic, buffer);
 }
+
+void MqttHandlePowerLimiterHassClass::publishBinarySensor(
+    const char* caption, const char* icon,
+    const char* stateTopic, const char* payload_on, const char* payload_off)
+{
+
+    String numberId = caption;
+    numberId.replace(" ", "_");
+    numberId.toLowerCase();
+
+    const String configTopic = "binary_sensor/" + MqttHandleHass.getDtuUniqueId() + "/" + numberId + "/config";
+
+    const String statTopic = MqttSettings.getPrefix() + "powerlimiter/status/" + stateTopic;
+
+    JsonDocument root;
+
+    root["name"] = caption;
+    root["uniq_id"] = MqttHandleHass.getDtuUniqueId() + "_" + numberId;
+    if (strcmp(icon, "")) {
+        root["ic"] = icon;
+    }
+    root["stat_t"] = statTopic;
+    root["pl_on"] = payload_on;
+    root["pl_off"] = payload_off;
+
+    auto const& config = Configuration.get();
+    if (config.Mqtt.Hass.Expire) {
+        root["exp_aft"] = config.Mqtt.PublishInterval * 3;
+    }
+
+    createDeviceInfo(root);
+
+    if (!Utils::checkJsonAlloc(root, __FUNCTION__, __LINE__)) {
+        return;
+    }
+
+    String buffer;
+    serializeJson(root, buffer);
+    publish(configTopic, buffer);
+}
+
 
 void MqttHandlePowerLimiterHassClass::createDeviceInfo(JsonDocument& root)
 {
