@@ -40,12 +40,12 @@ void PytesCanReceiver::onMessage(twai_message_t rx_message)
 
         case 0x356: {
             _stats->setVoltage(this->scaleValue(this->readSignedInt16(rx_message.data), 0.01), millis());
-            _stats->_current = this->scaleValue(this->readSignedInt16(rx_message.data + 2), 0.1);
+            _stats->setCurrent(this->scaleValue(this->readSignedInt16(rx_message.data + 2), 0.1), 1/*precision*/, millis());
             _stats->_temperature = this->scaleValue(this->readSignedInt16(rx_message.data + 4), 0.1);
 
             if (_verboseLogging) {
                 MessageOutput.printf("[Pytes] voltage: %f current: %f temperature: %f\r\n",
-                        _stats->getVoltage(), _stats->_current, _stats->_temperature);
+                        _stats->getVoltage(), _stats->getChargeCurrent(), _stats->_temperature);
             }
             break;
         }

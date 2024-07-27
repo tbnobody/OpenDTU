@@ -397,7 +397,8 @@
         "MpptTotalYieldTotal": "MPPT Total Yield Total",
         "MpptTotalYieldDay": "MPPT Total Yield Day",
         "MpptTotalPower": "MPPT Total Power",
-        "BatterySoc": "State of charge",
+        "BatteryCharge": "Battery Charge",
+        "BatteryPower": "Battery Power",
         "HomePower": "Grid Power",
         "HuaweiPower": "Huawei AC Power"
     },

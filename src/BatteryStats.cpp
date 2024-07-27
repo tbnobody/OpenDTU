@@ -78,6 +78,7 @@ void BatteryStats::getLiveViewData(JsonVariant& root) const
 
     addLiveViewValue(root, "SoC", _soc, "%", _socPrecision);
     addLiveViewValue(root, "voltage", _voltage, "V", 2);
+    addLiveViewValue(root, "current", _current, "A", _currentPrecision);
 }
 
 void PylontechBatteryStats::getLiveViewData(JsonVariant& root) const
@@ -89,7 +90,6 @@ void PylontechBatteryStats::getLiveViewData(JsonVariant& root) const
     addLiveViewValue(root, "chargeCurrentLimitation", _chargeCurrentLimitation, "A", 1);
     addLiveViewValue(root, "dischargeCurrentLimitation", _dischargeCurrentLimitation, "A", 1);
     addLiveViewValue(root, "stateOfHealth", _stateOfHealth, "%", 0);
-    addLiveViewValue(root, "current", _current, "A", 1);
     addLiveViewValue(root, "temperature", _temperature, "°C", 1);
 
     addLiveViewTextValue(root, "chargeEnabled", (_chargeEnabled?"yes":"no"));
@@ -124,7 +124,6 @@ void PytesBatteryStats::getLiveViewData(JsonVariant& root) const
     BatteryStats::getLiveViewData(root);
 
     // values go into the "Status" card of the web application
-    addLiveViewValue(root, "current", _current, "A", 1);
     addLiveViewValue(root, "chargeVoltage", _chargeVoltageLimit, "V", 1);
     addLiveViewValue(root, "chargeCurrentLimitation", _chargeCurrentLimit, "A", 1);
     addLiveViewValue(root, "dischargeVoltageLimitation", _dischargeVoltageLimit, "V", 1);
@@ -198,11 +197,6 @@ void JkBmsBatteryStats::getJsonData(JsonVariant& root, bool verbose) const
     using Label = JkBms::DataPointLabel;
 
     auto oCurrent = _dataPoints.get<Label::BatteryCurrentMilliAmps>();
-    if (oCurrent.has_value()) {
-        addLiveViewValue(root, "current",
-                static_cast<float>(*oCurrent) / 1000, "A", 2);
-    }
-
     auto oVoltage = _dataPoints.get<Label::BatteryVoltageMilliVolt>();
     if (oVoltage.has_value() && oCurrent.has_value()) {
         auto current = static_cast<float>(*oCurrent) / 1000;
@@ -304,8 +298,15 @@ void BatteryStats::mqttPublish() const
 {
     MqttSettings.publish("battery/manufacturer", _manufacturer);
     MqttSettings.publish("battery/dataAge", String(getAgeSeconds()));
-    MqttSettings.publish("battery/stateOfCharge", String(_soc));
-    MqttSettings.publish("battery/voltage", String(_voltage));
+    if (isSoCValid()) {
+        MqttSettings.publish("battery/stateOfCharge", String(_soc));
+    }
+    if (isVoltageValid()) {
+        MqttSettings.publish("battery/voltage", String(_voltage));
+    }
+    if (isCurrentValid()) {
+        MqttSettings.publish("battery/current", String(_current));
+    }
 }
 
 void PylontechBatteryStats::mqttPublish() const
@@ -316,7 +317,6 @@ void PylontechBatteryStats::mqttPublish() const
     MqttSettings.publish("battery/settings/chargeCurrentLimitation", String(_chargeCurrentLimitation));
     MqttSettings.publish("battery/settings/dischargeCurrentLimitation", String(_dischargeCurrentLimitation));
     MqttSettings.publish("battery/stateOfHealth", String(_stateOfHealth));
-    MqttSettings.publish("battery/current", String(_current));
     MqttSettings.publish("battery/temperature", String(_temperature));
     MqttSettings.publish("battery/alarm/overCurrentDischarge", String(_alarmOverCurrentDischarge));
     MqttSettings.publish("battery/alarm/overCurrentCharge", String(_alarmOverCurrentCharge));
@@ -347,7 +347,6 @@ void PytesBatteryStats::mqttPublish() const
     MqttSettings.publish("battery/settings/dischargeVoltageLimitation", String(_dischargeVoltageLimit));
 
     MqttSettings.publish("battery/stateOfHealth", String(_stateOfHealth));
-    MqttSettings.publish("battery/current", String(_current));
     MqttSettings.publish("battery/temperature", String(_temperature));
 
     if (_chargedEnergy != -1) {
@@ -505,6 +504,13 @@ void JkBmsBatteryStats::updateFrom(JkBms::DataPointContainer const& dp)
                 oVoltageDataPoint->getTimestamp());
     }
 
+    auto oCurrent = dp.get<Label::BatteryCurrentMilliAmps>();
+    if (oCurrent.has_value()) {
+        auto oCurrentDataPoint = dp.getDataPointFor<Label::BatteryCurrentMilliAmps>();
+        BatteryStats::setCurrent(static_cast<float>(*oCurrent) / 1000, 2/*precision*/,
+                oCurrentDataPoint->getTimestamp());
+    }
+
     _dataPoints.updateFrom(dp);
 
     auto oCellVoltages = _dataPoints.get<Label::CellsMilliVolt>();
@@ -545,9 +551,9 @@ void JkBmsBatteryStats::updateFrom(JkBms::DataPointContainer const& dp)
 void VictronSmartShuntStats::updateFrom(VeDirectShuntController::data_t const& shuntData) {
     BatteryStats::setVoltage(shuntData.batteryVoltage_V_mV / 1000.0, millis());
     BatteryStats::setSoC(static_cast<float>(shuntData.SOC) / 10, 1/*precision*/, millis());
+    BatteryStats::setCurrent(static_cast<float>(shuntData.batteryCurrent_I_mA) / 1000, 2/*precision*/, millis());
     _fwversion = shuntData.getFwVersionFormatted();
 
-    _current = static_cast<float>(shuntData.batteryCurrent_I_mA) / 1000;
     _chargeCycles = shuntData.H4;
     _timeToGo = shuntData.TTG / 60;
     _chargedEnergy = static_cast<float>(shuntData.H18) / 100;
@@ -574,7 +580,6 @@ void VictronSmartShuntStats::getLiveViewData(JsonVariant& root) const {
     BatteryStats::getLiveViewData(root);
 
     // values go into the "Status" card of the web application
-    addLiveViewValue(root, "current", _current, "A", 1);
     addLiveViewValue(root, "chargeCycles", _chargeCycles, "", 0);
     addLiveViewValue(root, "chargedEnergy", _chargedEnergy, "kWh", 2);
     addLiveViewValue(root, "dischargedEnergy", _dischargedEnergy, "kWh", 2);
@@ -597,7 +602,6 @@ void VictronSmartShuntStats::getLiveViewData(JsonVariant& root) const {
 void VictronSmartShuntStats::mqttPublish() const {
     BatteryStats::mqttPublish();
 
-    MqttSettings.publish("battery/current", String(_current));
     MqttSettings.publish("battery/chargeCycles", String(_chargeCycles));
     MqttSettings.publish("battery/chargedEnergy", String(_chargedEnergy));
     MqttSettings.publish("battery/dischargedEnergy", String(_dischargedEnergy));
