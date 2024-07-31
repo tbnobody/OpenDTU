@@ -78,6 +78,18 @@
                         maxlength="128"
                         :tooltip="$t('batteryadmin.MqttJsonPathDescription')" />
 
+                    <div class="row mb-3">
+                        <label for="mqtt_voltage_unit" class="col-sm-2 col-form-label">
+                            {{ $t('batteryadmin.MqttVoltageUnit') }}
+                        </label>
+                        <div class="col-sm-10">
+                            <select id="mqtt_voltage_unit" class="form-select" v-model="batteryConfigList.mqtt_voltage_unit">
+                                <option v-for="u in voltageUnitTypeList" :key="u.key" :value="u.key">
+                                    {{ u.value }}
+                                </option>
+                            </select>
+                        </div>
+                    </div>
                 </CardElement>
             </template>
 
@@ -121,6 +133,12 @@ export default defineComponent({
             jkBmsInterfaceTypeList: [
                 { key: 0, value: 'Uart' },
                 { key: 1, value: 'Transceiver' },
+            ],
+            voltageUnitTypeList: [
+                { key: 3, value: "mV" },
+                { key: 2, value: "cV" },
+                { key: 1, value: "dV" },
+                { key: 0, value: "V" },
             ],
         };
     },

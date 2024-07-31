@@ -126,6 +126,8 @@ struct POWERMETER_HTTP_SML_CONFIG_T {
 };
 using PowerMeterHttpSmlConfig = struct POWERMETER_HTTP_SML_CONFIG_T;
 
+enum BatteryVoltageUnit { Volts = 0, DeciVolts = 1, CentiVolts = 2, MilliVolts = 3 };
+
 struct CONFIG_T {
     struct {
         uint32_t Version;
@@ -285,6 +287,7 @@ struct CONFIG_T {
         char MqttSocJsonPath[BATTERY_JSON_MAX_PATH_STRLEN + 1];
         char MqttVoltageTopic[MQTT_MAX_TOPIC_STRLEN + 1];
         char MqttVoltageJsonPath[BATTERY_JSON_MAX_PATH_STRLEN + 1];
+        BatteryVoltageUnit MqttVoltageUnit;
     } Battery;
 
     struct {

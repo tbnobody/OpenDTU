@@ -679,6 +679,7 @@
         "MqttVoltageConfiguration": "Voltage Settings",
         "MqttJsonPath": "Optional: JSON Path",
         "MqttJsonPathDescription": "Application specific JSON path to find the value in the JSON payload, e.g., 'electricLevel'. Leave empty if the topic's payload contains a plain numeric value.",
+        "MqttVoltageUnit": "Unit",
         "MqttSocTopic": "SoC Value Topic",
         "MqttVoltageTopic": "Voltage Value Topic",
         "JkBmsConfiguration": "JK BMS Settings",

@@ -8,4 +8,5 @@ export interface BatteryConfig {
     mqtt_soc_json_path: string;
     mqtt_voltage_topic: string;
     mqtt_voltage_json_path: string;
+    mqtt_voltage_unit: number;
 }

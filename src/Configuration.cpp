@@ -260,6 +260,7 @@ bool ConfigurationClass::write()
     battery["mqtt_json_path"] = config.Battery.MqttSocJsonPath;
     battery["mqtt_voltage_topic"] = config.Battery.MqttVoltageTopic;
     battery["mqtt_voltage_json_path"] = config.Battery.MqttVoltageJsonPath;
+    battery["mqtt_voltage_unit"] = config.Battery.MqttVoltageUnit;
 
     JsonObject huawei = doc["huawei"].to<JsonObject>();
     huawei["enabled"] = config.Huawei.Enabled;
@@ -609,6 +610,7 @@ bool ConfigurationClass::read()
     strlcpy(config.Battery.MqttSocJsonPath, battery["mqtt_json_path"] | "", sizeof(config.Battery.MqttSocJsonPath));
     strlcpy(config.Battery.MqttVoltageTopic, battery["mqtt_voltage_topic"] | "", sizeof(config.Battery.MqttVoltageTopic));
     strlcpy(config.Battery.MqttVoltageJsonPath, battery["mqtt_voltage_json_path"] | "", sizeof(config.Battery.MqttVoltageJsonPath));
+    config.Battery.MqttVoltageUnit = battery["mqtt_voltage_unit"] | BatteryVoltageUnit::Volts;
 
     JsonObject huawei = doc["huawei"];
     config.Huawei.Enabled = huawei["enabled"] | HUAWEI_ENABLED;

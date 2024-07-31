@@ -90,7 +90,24 @@ void MqttBattery::onMqttMessageVoltage(espMqttClientTypes::MessageProperties con
             std::string(reinterpret_cast<const char*>(payload), len), topic,
             jsonPath);
 
+
     if (!voltage.has_value()) { return; }
+
+    auto const& config = Configuration.get();
+    using Unit_t = BatteryVoltageUnit;
+    switch (config.Battery.MqttVoltageUnit) {
+        case Unit_t::DeciVolts:
+            *voltage /= 10;
+            break;
+        case Unit_t::CentiVolts:
+            *voltage /= 100;
+            break;
+        case Unit_t::MilliVolts:
+            *voltage /= 1000;
+            break;
+        default:
+            break;
+    }
 
     // since this project is revolving around Hoymiles microinverters, which can
     // only handle up to 65V of input voltage at best, it is safe to assume that

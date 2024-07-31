@@ -30,7 +30,7 @@ void WebApiBatteryClass::onStatus(AsyncWebServerRequest* request)
     if (!WebApi.checkCredentialsReadonly(request)) {
         return;
     }
-    
+
     AsyncJsonResponse* response = new AsyncJsonResponse();
     auto& root = response->getRoot();
     const CONFIG_T& config = Configuration.get();
@@ -44,6 +44,7 @@ void WebApiBatteryClass::onStatus(AsyncWebServerRequest* request)
     root["mqtt_soc_json_path"] = config.Battery.MqttSocJsonPath;
     root["mqtt_voltage_topic"] = config.Battery.MqttVoltageTopic;
     root["mqtt_voltage_json_path"] = config.Battery.MqttVoltageJsonPath;
+    root["mqtt_voltage_unit"] = config.Battery.MqttVoltageUnit;
 
     response->setLength();
     request->send(response);
@@ -85,6 +86,7 @@ void WebApiBatteryClass::onAdminPost(AsyncWebServerRequest* request)
     strlcpy(config.Battery.MqttSocJsonPath, root["mqtt_soc_json_path"].as<String>().c_str(), sizeof(config.Battery.MqttSocJsonPath));
     strlcpy(config.Battery.MqttVoltageTopic, root["mqtt_voltage_topic"].as<String>().c_str(), sizeof(config.Battery.MqttVoltageTopic));
     strlcpy(config.Battery.MqttVoltageJsonPath, root["mqtt_voltage_json_path"].as<String>().c_str(), sizeof(config.Battery.MqttVoltageJsonPath));
+    config.Battery.MqttVoltageUnit = static_cast<BatteryVoltageUnit>(root["mqtt_voltage_unit"].as<uint8_t>());
 
     WebApi.writeConfig(retMsg);
 
