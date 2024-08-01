@@ -8,7 +8,13 @@
         @reload="reloadData"
     >
         <HintView :hints="liveData.hints" />
-        <InverterTotalInfo :totalData="liveData.total" :totalVeData="liveData.vedirect" :totalBattData="liveData.battery" :powerMeterData="liveData.power_meter" :huaweiData="liveData.huawei"/>
+        <InverterTotalInfo
+            :totalData="liveData.total"
+            :totalVeData="liveData.vedirect"
+            :totalBattData="liveData.battery"
+            :powerMeterData="liveData.power_meter"
+            :huaweiData="liveData.huawei"
+        />
         <div class="row gy-3 mt-0">
             <div class="col-sm-3 col-md-2" :style="[inverterData.length == 1 ? { display: 'none' } : {}]">
                 <div class="nav nav-pills row-cols-sm-1" id="v-pills-tab" role="tablist" aria-orientation="vertical">
@@ -383,8 +389,8 @@ import InverterChannelInfo from '@/components/InverterChannelInfo.vue';
 import InverterTotalInfo from '@/components/InverterTotalInfo.vue';
 import ModalDialog from '@/components/ModalDialog.vue';
 import VedirectView from '@/components/VedirectView.vue';
-import HuaweiView from '@/components/HuaweiView.vue'
-import BatteryView from '@/components/BatteryView.vue'
+import HuaweiView from '@/components/HuaweiView.vue';
+import BatteryView from '@/components/BatteryView.vue';
 import type { DevInfoStatus } from '@/types/DevInfoStatus';
 import type { EventlogItems } from '@/types/EventlogStatus';
 import type { GridProfileStatus } from '@/types/GridProfileStatus';
@@ -433,7 +439,7 @@ export default defineComponent({
         BIconXCircleFill,
         VedirectView,
         HuaweiView,
-        BatteryView
+        BatteryView,
     },
     data() {
         return {
@@ -577,12 +583,22 @@ export default defineComponent({
                 if (event.data != '{}') {
                     const newData = JSON.parse(event.data);
 
-                    if (typeof newData.vedirect !== 'undefined') { Object.assign(this.liveData.vedirect, newData.vedirect); }
-                    if (typeof newData.huawei !== 'undefined') { Object.assign(this.liveData.huawei, newData.huawei); }
-                    if (typeof newData.battery !== 'undefined') { Object.assign(this.liveData.battery, newData.battery); }
-                    if (typeof newData.power_meter !== 'undefined') { Object.assign(this.liveData.power_meter, newData.power_meter); }
+                    if (typeof newData.vedirect !== 'undefined') {
+                        Object.assign(this.liveData.vedirect, newData.vedirect);
+                    }
+                    if (typeof newData.huawei !== 'undefined') {
+                        Object.assign(this.liveData.huawei, newData.huawei);
+                    }
+                    if (typeof newData.battery !== 'undefined') {
+                        Object.assign(this.liveData.battery, newData.battery);
+                    }
+                    if (typeof newData.power_meter !== 'undefined') {
+                        Object.assign(this.liveData.power_meter, newData.power_meter);
+                    }
 
-                    if (typeof newData.total === 'undefined') { return; }
+                    if (typeof newData.total === 'undefined') {
+                        return;
+                    }
 
                     Object.assign(this.liveData.total, newData.total);
                     Object.assign(this.liveData.hints, newData.hints);

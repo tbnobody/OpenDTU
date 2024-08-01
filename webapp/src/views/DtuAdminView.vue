@@ -24,9 +24,11 @@
                     :postfix="$t('dtuadmin.Seconds')"
                 />
 
-                <InputElement :label="$t('dtuadmin.VerboseLogging')"
-                                v-model="dtuConfigList.verbose_logging"
-                                type="checkbox"/>
+                <InputElement
+                    :label="$t('dtuadmin.VerboseLogging')"
+                    v-model="dtuConfigList.verbose_logging"
+                    type="checkbox"
+                />
 
                 <div class="row mb-3" v-if="dtuConfigList.nrf_enabled">
                     <label for="inputNrfPaLevel" class="col-sm-2 col-form-label">

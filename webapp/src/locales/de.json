@@ -366,7 +366,7 @@
         "Disconnected": "getrennt"
     },
     "vedirectinfo": {
-        "VedirectInformation" : "VE.Direct Info",
+        "VedirectInformation": "VE.Direct Info",
         "ConfigurationSummary": "@:ntpinfo.ConfigurationSummary",
         "Status": "@:ntpinfo.Status",
         "Enabled": "@:mqttinfo.Enabled",
@@ -553,7 +553,7 @@
         "VerboseLogging": "@:base.VerboseLogging",
         "UpdatesOnly": "Werte nur bei Änderung an MQTT broker senden"
     },
-    "powermeteradmin":{
+    "powermeteradmin": {
         "PowerMeterSettings": "Stromzähler Einstellungen",
         "PowerMeterConfiguration": "Stromzähler Konfiguration",
         "PowerMeterEnable": "Aktiviere Stromzähler",

@@ -22,7 +22,11 @@
                         <tr>
                             <th>{{ $t('mqttinfo.VerboseLogging') }}</th>
                             <td>
-                                <StatusBadge :status="mqttDataList.mqtt_verbose_logging" true_text="mqttinfo.Enabled" false_text="mqttinfo.Disabled" />
+                                <StatusBadge
+                                    :status="mqttDataList.mqtt_verbose_logging"
+                                    true_text="mqttinfo.Enabled"
+                                    false_text="mqttinfo.Disabled"
+                                />
                             </td>
                         </tr>
                         <tr>

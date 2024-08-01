@@ -55,21 +55,21 @@ export interface Vedirect {
 }
 
 export interface Huawei {
-  enabled: boolean;
-  Power: ValueObject;
+    enabled: boolean;
+    Power: ValueObject;
 }
 
 export interface Battery {
-  enabled: boolean;
-  soc?: ValueObject;
-  voltage?: ValueObject;
-  power?: ValueObject;
-  current?: ValueObject;
+    enabled: boolean;
+    soc?: ValueObject;
+    voltage?: ValueObject;
+    power?: ValueObject;
+    current?: ValueObject;
 }
 
 export interface PowerMeter {
-  enabled: boolean;
-  Power: ValueObject;
+    enabled: boolean;
+    Power: ValueObject;
 }
 
 export interface LiveData {

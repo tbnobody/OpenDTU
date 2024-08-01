@@ -14,7 +14,7 @@ export interface PowerMeterMqttConfig {
 export interface PowerMeterSerialSdmConfig {
     polling_interval: number;
     address: number;
-};
+}
 
 export interface PowerMeterHttpJsonValue {
     http_request: HttpRequestConfig;

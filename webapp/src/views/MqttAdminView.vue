@@ -13,10 +13,13 @@
                     wide
                 />
 
-                <InputElement v-show="mqttConfigList.mqtt_enabled"
-                              :label="$t('mqttadmin.VerboseLogging')"
-                              v-model="mqttConfigList.mqtt_verbose_logging"
-                              type="checkbox" wide/>
+                <InputElement
+                    v-show="mqttConfigList.mqtt_enabled"
+                    :label="$t('mqttadmin.VerboseLogging')"
+                    v-model="mqttConfigList.mqtt_verbose_logging"
+                    type="checkbox"
+                    wide
+                />
 
                 <InputElement
                     v-show="mqttConfigList.mqtt_enabled"

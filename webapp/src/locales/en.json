@@ -368,7 +368,7 @@
         "Disconnected": "disconnected"
     },
     "vedirectinfo": {
-        "VedirectInformation" : "VE.Direct Info",
+        "VedirectInformation": "VE.Direct Info",
         "ConfigurationSummary": "@:ntpinfo.ConfigurationSummary",
         "Status": "@:ntpinfo.Status",
         "Enabled": "@:mqttinfo.Enabled",
@@ -555,7 +555,7 @@
         "VerboseLogging": "@:base.VerboseLogging",
         "UpdatesOnly": "Publish values to MQTT only when they change"
     },
-    "powermeteradmin":{
+    "powermeteradmin": {
         "PowerMeterSettings": "Power Meter Settings",
         "PowerMeterConfiguration": "Power Meter Configuration",
         "PowerMeterEnable": "Enable Power Meter",
@@ -847,7 +847,7 @@
         "format_herf_valid": "E-Star HERF format (will be saved converted): {serial}",
         "format_herf_invalid": "E-Star HERF format: Invalid checksum",
         "format_unknown": "Unknown format"
-      },
+    },
     "huawei": {
         "DataAge": "Data Age: ",
         "Seconds": " {val} seconds",

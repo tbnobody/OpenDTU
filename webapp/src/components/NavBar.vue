@@ -9,7 +9,9 @@
                 <BIconSun v-else width="30" height="30" class="d-inline-block align-text-top text-warning" />
 
                 <span style="margin-left: 0.5rem"> OpenDTU-OnBattery </span>
-                <span class="text-info mx-2"><BIconBatteryCharging width="20" height="20" class="d-inline-block align-text-center" /></span>
+                <span class="text-info mx-2"
+                    ><BIconBatteryCharging width="20" height="20" class="d-inline-block align-text-center"
+                /></span>
             </router-link>
             <button
                 class="navbar-toggler"
@@ -69,20 +71,30 @@
                                     $t('menu.DTUSettings')
                                 }}</router-link>
                             </li>
-                             <li>
-                                <router-link @click="onClick" class="dropdown-item" to="/settings/vedirect">{{ $t('menu.VedirectSettings') }}</router-link>
+                            <li>
+                                <router-link @click="onClick" class="dropdown-item" to="/settings/vedirect">{{
+                                    $t('menu.VedirectSettings')
+                                }}</router-link>
                             </li>
                             <li>
-                                <router-link @click="onClick" class="dropdown-item" to="/settings/powermeter">{{ $t('menu.PowerMeterSettings') }}</router-link>
+                                <router-link @click="onClick" class="dropdown-item" to="/settings/powermeter">{{
+                                    $t('menu.PowerMeterSettings')
+                                }}</router-link>
                             </li>
                             <li>
-                                <router-link @click="onClick" class="dropdown-item" to="/settings/powerlimiter">Dynamic Power Limiter</router-link>
+                                <router-link @click="onClick" class="dropdown-item" to="/settings/powerlimiter"
+                                    >Dynamic Power Limiter</router-link
+                                >
                             </li>
                             <li>
-                                <router-link @click="onClick" class="dropdown-item" to="/settings/battery">{{ $t('menu.BatterySettings') }}</router-link>
+                                <router-link @click="onClick" class="dropdown-item" to="/settings/battery">{{
+                                    $t('menu.BatterySettings')
+                                }}</router-link>
                             </li>
                             <li>
-                                <router-link @click="onClick" class="dropdown-item" to="/settings/chargerac">{{ $t('menu.AcChargerSettings') }}</router-link>
+                                <router-link @click="onClick" class="dropdown-item" to="/settings/chargerac">{{
+                                    $t('menu.AcChargerSettings')
+                                }}</router-link>
                             </li>
                             <li>
                                 <router-link @click="onClick" class="dropdown-item" to="/settings/device">{{
@@ -142,7 +154,9 @@
                                 }}</router-link>
                             </li>
                             <li>
-                                <router-link @click="onClick" class="dropdown-item" to="/info/vedirect">{{ $t('menu.Vedirect') }}</router-link>
+                                <router-link @click="onClick" class="dropdown-item" to="/info/vedirect">{{
+                                    $t('menu.Vedirect')
+                                }}</router-link>
                             </li>
                             <li>
                                 <hr class="dropdown-divider" />

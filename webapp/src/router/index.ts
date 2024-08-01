@@ -8,10 +8,10 @@ import DtuAdminView from '@/views/DtuAdminView.vue';
 import ErrorView from '@/views/ErrorView.vue';
 import FirmwareUpgradeView from '@/views/FirmwareUpgradeView.vue';
 import HomeView from '@/views/HomeView.vue';
-import VedirectAdminView from '@/views/VedirectAdminView.vue'
-import PowerMeterAdminView from '@/views/PowerMeterAdminView.vue'
-import PowerLimiterAdminView from '@/views/PowerLimiterAdminView.vue'
-import VedirectInfoView from '@/views/VedirectInfoView.vue'
+import VedirectAdminView from '@/views/VedirectAdminView.vue';
+import PowerMeterAdminView from '@/views/PowerMeterAdminView.vue';
+import PowerLimiterAdminView from '@/views/PowerLimiterAdminView.vue';
+import VedirectInfoView from '@/views/VedirectInfoView.vue';
 import InverterAdminView from '@/views/InverterAdminView.vue';
 import LoginView from '@/views/LoginView.vue';
 import MaintenanceRebootView from '@/views/MaintenanceRebootView.vue';
@@ -74,11 +74,11 @@ const router = createRouter({
             name: 'Web Console',
             component: ConsoleInfoView,
         },
-    {
-        path: '/info/vedirect',
-        name: 'VE.Direct',
-        component: VedirectInfoView
-    },
+        {
+            path: '/info/vedirect',
+            name: 'VE.Direct',
+            component: VedirectInfoView,
+        },
         {
             path: '/settings/network',
             name: 'Network Settings',
@@ -89,31 +89,31 @@ const router = createRouter({
             name: 'NTP Settings',
             component: NtpAdminView,
         },
-    {
-        path: '/settings/vedirect',
-        name: 'VE.Direct Settings',
-        component: VedirectAdminView
-    },
-    {
-        path: '/settings/powermeter',
-        name: 'Power meter Settings',
-        component: PowerMeterAdminView
-    },
-    {
-        path: '/settings/powerlimiter',
-        name: 'Power limiter Settings',
-        component: PowerLimiterAdminView
-    },
-    {
-        path: '/settings/battery',
-        name: 'Battery Settings',
-        component: BatteryAdminView
-    },
-    {
-      path: '/settings/chargerac',
-      name: 'Charger Settings',
-      component: AcChargerAdminView
-    },
+        {
+            path: '/settings/vedirect',
+            name: 'VE.Direct Settings',
+            component: VedirectAdminView,
+        },
+        {
+            path: '/settings/powermeter',
+            name: 'Power meter Settings',
+            component: PowerMeterAdminView,
+        },
+        {
+            path: '/settings/powerlimiter',
+            name: 'Power limiter Settings',
+            component: PowerLimiterAdminView,
+        },
+        {
+            path: '/settings/battery',
+            name: 'Battery Settings',
+            component: BatteryAdminView,
+        },
+        {
+            path: '/settings/chargerac',
+            name: 'Charger Settings',
+            component: AcChargerAdminView,
+        },
         {
             path: '/settings/mqtt',
             name: 'MqTT Settings',
