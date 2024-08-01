@@ -6,7 +6,11 @@
                     <tr>
                         <th>{{ $t('wifiapinfo.Status') }}</th>
                         <td>
-                            <StatusBadge :status="networkStatus.ap_status" true_text="wifiapinfo.Enabled" false_text="wifiapinfo.Disabled" />
+                            <StatusBadge
+                                :status="networkStatus.ap_status"
+                                true_text="wifiapinfo.Enabled"
+                                false_text="wifiapinfo.Disabled"
+                            />
                         </td>
                     </tr>
                     <tr>

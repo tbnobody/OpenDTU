@@ -6,11 +6,11 @@ export interface ValueObject {
 }
 
 export interface InverterStatistics {
-    name: ValueObject,
+    name: ValueObject;
     Power?: ValueObject;
     Voltage?: ValueObject;
     Current?: ValueObject;
-    "Power DC"?: ValueObject;
+    'Power DC'?: ValueObject;
     YieldDay?: ValueObject;
     YieldTotal?: ValueObject;
     Frequency?: ValueObject;

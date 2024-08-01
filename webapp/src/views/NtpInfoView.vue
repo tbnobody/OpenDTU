@@ -28,7 +28,11 @@
                         <tr>
                             <th>{{ $t('ntpinfo.Status') }}</th>
                             <td>
-                                <StatusBadge :status="ntpDataList.ntp_status" true_text="ntpinfo.Synced" false_text="ntpinfo.NotSynced" />
+                                <StatusBadge
+                                    :status="ntpDataList.ntp_status"
+                                    true_text="ntpinfo.Synced"
+                                    false_text="ntpinfo.NotSynced"
+                                />
                             </td>
                         </tr>
                         <tr>
@@ -38,20 +42,28 @@
 
                         <tr>
                             <th>{{ $t('ntpinfo.Sunrise') }}</th>
-                            <td v-if="ntpDataList.sun_isSunsetAvailable">{{ ntpDataList.sun_risetime }}</td>
+                            <td v-if="ntpDataList.sun_isSunsetAvailable">
+                                {{ ntpDataList.sun_risetime }}
+                            </td>
                             <td v-else>{{ $t('ntpinfo.NotAvailable') }}</td>
                         </tr>
                         <tr>
                             <th>{{ $t('ntpinfo.Sunset') }}</th>
-                            <td v-if="ntpDataList.sun_isSunsetAvailable">{{ ntpDataList.sun_settime }}</td>
+                            <td v-if="ntpDataList.sun_isSunsetAvailable">
+                                {{ ntpDataList.sun_settime }}
+                            </td>
                             <td v-else>{{ $t('ntpinfo.NotAvailable') }}</td>
                         </tr>
                         <tr>
                             <th>{{ $t('ntpinfo.Mode') }}</th>
                             <td>
-                                <StatusBadge :status="ntpDataList.sun_isDayPeriod"
-                                    true_text="ntpinfo.Day" true_class="text-bg-warning"
-                                    false_text="ntpinfo.Night" false_class="text-bg-dark" />
+                                <StatusBadge
+                                    :status="ntpDataList.sun_isDayPeriod"
+                                    true_text="ntpinfo.Day"
+                                    true_class="text-bg-warning"
+                                    false_text="ntpinfo.Night"
+                                    false_class="text-bg-dark"
+                                />
                             </td>
                         </tr>
                     </tbody>
@@ -65,7 +77,7 @@
 import BasePage from '@/components/BasePage.vue';
 import CardElement from '@/components/CardElement.vue';
 import StatusBadge from '@/components/StatusBadge.vue';
-import type { NtpStatus } from "@/types/NtpStatus";
+import type { NtpStatus } from '@/types/NtpStatus';
 import { authHeader, handleResponse } from '@/utils/authentication';
 import { defineComponent } from 'vue';
 
@@ -87,7 +99,7 @@ export default defineComponent({
     methods: {
         getNtpInfo() {
             this.dataLoading = true;
-            fetch("/api/ntp/status", { headers: authHeader() })
+            fetch('/api/ntp/status', { headers: authHeader() })
                 .then((response) => handleResponse(response, this.$emitter, this.$router))
                 .then((data) => {
                     this.ntpDataList = data;
