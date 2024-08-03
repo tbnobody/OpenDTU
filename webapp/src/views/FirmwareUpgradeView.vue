@@ -49,6 +49,14 @@
         </CardElement>
 
         <CardElement
+            :text="$t('firmwareupgrade.OtaError')"
+            textVariant="text-bg-warning"
+            v-else-if="!loading && firmwareStatus.ota_supported === false"
+        >
+            {{ $t('firmwareupgrade.NoOtaSupport') }}
+        </CardElement>
+
+        <CardElement
             :text="$t('firmwareupgrade.FirmwareUpload')"
             textVariant="text-bg-primary"
             center-content
@@ -83,8 +91,9 @@
 
 <script lang="ts">
 import BasePage from '@/components/BasePage.vue';
+import type { FirmwareStatus } from '@/types/FirmwareStatus';
 import CardElement from '@/components/CardElement.vue';
-import { authHeader, isLoggedIn } from '@/utils/authentication';
+import { authHeader, isLoggedIn, handleResponse } from '@/utils/authentication';
 import { BIconArrowLeft, BIconArrowRepeat, BIconCheckCircle, BIconExclamationCircleFill } from 'bootstrap-icons-vue';
 import SparkMD5 from 'spark-md5';
 import { defineComponent } from 'vue';
@@ -108,6 +117,7 @@ export default defineComponent({
             type: 'firmware',
             file: {} as Blob,
             hostCheckInterval: 0,
+            firmwareStatus: {} as FirmwareStatus,
         };
     },
     methods: {
@@ -219,6 +229,14 @@ export default defineComponent({
                 console.log('Browser is offline. Cannot check remote host.');
             }
         },
+        getFirmwareStatus() {
+            fetch('/api/firmware/status', { headers: authHeader() })
+                .then((response) => handleResponse(response, this.$emitter, this.$router))
+                .then((data) => {
+                    this.firmwareStatus = data;
+                    this.loading = false;
+                });
+        },
     },
     mounted() {
         if (!isLoggedIn()) {
@@ -227,7 +245,7 @@ export default defineComponent({
                 query: { returnUrl: this.$router.currentRoute.value.fullPath },
             });
         }
-        this.loading = false;
+        this.getFirmwareStatus();
     },
     unmounted() {
         clearInterval(this.hostCheckInterval);

@@ -766,6 +766,7 @@
     "firmwareupgrade": {
         "FirmwareUpgrade": "Firmware-Aktualisierung",
         "Loading": "@:base.Loading",
+        "NoOtaSupport": "Diese Plattform unterstützt keine OTA-Updates. Neue Firmware kann über die USB-Schnittstelle in den Flash-Speicher geschrieben werden.",
         "OtaError": "OTA-Fehler",
         "Back": "Zurück",
         "Retry": "Wiederholen",

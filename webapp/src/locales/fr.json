@@ -742,6 +742,7 @@
     "firmwareupgrade": {
         "FirmwareUpgrade": "Mise à jour du firmware",
         "Loading": "@:base.Loading",
+        "NoOtaSupport": "Cette plateforme ne prend pas en charge les mises à jour OTA. Les nouveaux microprogrammes peuvent être enregistrés dans la mémoire flash à l'aide de l'interface USB.",
         "OtaError": "Erreur OTA",
         "Back": "Retour",
         "Retry": "Réessayer",

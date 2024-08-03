@@ -769,6 +769,7 @@
     "firmwareupgrade": {
         "FirmwareUpgrade": "Firmware Upgrade",
         "Loading": "@:base.Loading",
+        "NoOtaSupport": "This platform does not support OTA updates. New firmware can be written to flash memory using the USB interface.",
         "OtaError": "OTA Error",
         "Back": "Back",
         "Retry": "Retry",
