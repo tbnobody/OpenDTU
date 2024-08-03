@@ -2,25 +2,19 @@
     <div class="row mb-3">
         <label
             :for="inputId"
-            :class="[ wide ? 'col-sm-4' : 'col-sm-2', isCheckbox ? 'form-check-label' : 'col-form-label' ]"
+            :class="[wide ? 'col-sm-4' : 'col-sm-2', isCheckbox ? 'form-check-label' : 'col-form-label']"
         >
             {{ label }}
             <BIconInfoCircle v-if="tooltip !== undefined" v-tooltip :title="tooltip" />
         </label>
-        <div :class="[ wide ? 'col-sm-8' : 'col-sm-10' ]">
-            <div v-if="!isTextarea"
-                 :class="{'form-check form-switch': isCheckbox,
-                          'input-group': postfix || prefix }"
-            >
-                 <span v-if="prefix"
-                       class="input-group-text"
-                       :id="descriptionId"
-                 >
+        <div :class="[wide ? 'col-sm-8' : 'col-sm-10']">
+            <div v-if="!isTextarea" :class="{ 'form-check form-switch': isCheckbox, 'input-group': postfix || prefix }">
+                <span v-if="prefix" class="input-group-text" :id="descriptionId">
                     {{ prefix }}
                 </span>
                 <input
                     v-model="model"
-                    :class="[ isCheckbox ? 'form-check-input' : 'form-control' ]"
+                    :class="[isCheckbox ? 'form-check-input' : 'form-control']"
                     :id="inputId"
                     :placeholder="placeholder"
                     :type="type"
@@ -31,13 +25,10 @@
                     :disabled="disabled"
                     :aria-describedby="descriptionId"
                 />
-                <span v-if="postfix"
-                      class="input-group-text"
-                      :id="descriptionId"
-                >
+                <span v-if="postfix" class="input-group-text" :id="descriptionId">
                     {{ postfix }}
                 </span>
-                <slot/>
+                <slot />
             </div>
             <div v-else>
                 <textarea
@@ -63,20 +54,20 @@ export default defineComponent({
         BIconInfoCircle,
     },
     props: {
-        'modelValue': [String, Number, Boolean, Date],
-        'label': String,
-        'placeholder': String,
-        'type': String,
-        'maxlength': String,
-        'min': String,
-        'max': String,
-        'step': String,
-        'rows': String,
-        'disabled': Boolean,
-        'postfix': String,
-        'prefix': String,
-        'wide': Boolean,
-        'tooltip': String,
+        modelValue: [String, Number, Boolean, Date],
+        label: String,
+        placeholder: String,
+        type: String,
+        maxlength: String,
+        min: String,
+        max: String,
+        step: String,
+        rows: String,
+        disabled: Boolean,
+        postfix: String,
+        prefix: String,
+        wide: Boolean,
+        tooltip: String,
     },
     data() {
         return {};
@@ -97,11 +88,13 @@ export default defineComponent({
             // normally, the label is sufficient to build a unique id
             // if two inputs with the same label text on one page is required,
             // use a unique placeholder even if it is a checkbox
-            return this.label?.replace(/[^A-Za-z0-9]/g, '') +
-                (this.placeholder ? this.placeholder.replace(/[^A-Za-z0-9]/g, '') : '');
+            return (
+                this.label?.replace(/[^A-Za-z0-9]/g, '') +
+                (this.placeholder ? this.placeholder.replace(/[^A-Za-z0-9]/g, '') : '')
+            );
         },
         inputId() {
-            return 'input' + this.uniqueLabel
+            return 'input' + this.uniqueLabel;
         },
         descriptionId() {
             return 'desc' + this.uniqueLabel;
@@ -111,7 +104,7 @@ export default defineComponent({
         },
         isCheckbox() {
             return this.type === 'checkbox';
-        }
+        },
     },
 });
 </script>

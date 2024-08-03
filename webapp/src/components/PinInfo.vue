@@ -11,18 +11,23 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <template v-for="(category) in categories" :key="category">
+                    <template v-for="category in categories" :key="category">
                         <tr v-for="(prop, prop_idx) in properties(category)" :key="prop">
                             <td v-if="prop_idx == 0" :rowspan="properties(category).length">
-                                {{ capitalizeFirstLetter(category) }}</td>
-                            <td :class="{ 'table-danger': !isEqual(category, prop) }">{{ prop }}</td>
+                                {{ capitalizeFirstLetter(category) }}
+                            </td>
+                            <td :class="{ 'table-danger': !isEqual(category, prop) }">
+                                {{ prop }}
+                            </td>
                             <td>
                                 <template v-if="selectedPinAssignment && category in selectedPinAssignment">
-                                    {{ (selectedPinAssignment as any)[category][prop] }}</template>
+                                    {{ (selectedPinAssignment as any)[category][prop] }}</template
+                                >
                             </td>
                             <td>
                                 <template v-if="currentPinAssignment && category in currentPinAssignment">
-                                    {{ (currentPinAssignment as any)[category][prop] }}</template>
+                                    {{ (currentPinAssignment as any)[category][prop] }}</template
+                                >
                             </td>
                         </tr>
                     </template>
@@ -59,7 +64,9 @@ export default defineComponent({
 
             let total: Array<string> = [];
             total = total.concat(curArray, selArray);
-            return Array.from(new Set(total)).filter(cat => cat !=  'name' && cat != 'links').sort();
+            return Array.from(new Set(total))
+                .filter((cat) => cat != 'name' && cat != 'links')
+                .sort();
         },
     },
     methods: {
@@ -105,6 +112,6 @@ export default defineComponent({
         capitalizeFirstLetter(value: string): string {
             return value.charAt(0).toUpperCase() + value.slice(1);
         },
-    }
+    },
 });
 </script>
