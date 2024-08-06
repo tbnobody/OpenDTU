@@ -28,15 +28,15 @@ ID   Source Addr   Target Addr   Idx  ?       wcode   ?       Start   End     ? 
 
 const std::array<const AlarmMessage_t, ALARM_MSG_COUNT> AlarmLogParser::_alarmMessages = { {
     { AlarmMessageType_t::ALL, 1, "Inverter start", "Wechselrichter gestartet", "L'onduleur a démarré" },
-    { AlarmMessageType_t::ALL, 2, "Time calibration", "", "" },
+    { AlarmMessageType_t::ALL, 2, "Time calibration", "Zeitabgleich", "" },
     { AlarmMessageType_t::ALL, 3, "EEPROM reading and writing error during operation", "", "" },
     { AlarmMessageType_t::ALL, 4, "Offline", "Offline", "Non connecté" },
 
-    { AlarmMessageType_t::ALL, 11, "Grid voltage surge", "", "" },
-    { AlarmMessageType_t::ALL, 12, "Grid voltage sharp drop", "", "" },
-    { AlarmMessageType_t::ALL, 13, "Grid frequency mutation", "", "" },
-    { AlarmMessageType_t::ALL, 14, "Grid phase mutation", "", "" },
-    { AlarmMessageType_t::ALL, 15, "Grid transient fluctuation", "", "" },
+    { AlarmMessageType_t::ALL, 11, "Grid voltage surge", "Netz: Überspannungsimpuls", "" },
+    { AlarmMessageType_t::ALL, 12, "Grid voltage sharp drop", "Netz: Spannungseinbruch", "" },
+    { AlarmMessageType_t::ALL, 13, "Grid frequency mutation", "Netz: Frequenzänderung", "" },
+    { AlarmMessageType_t::ALL, 14, "Grid phase mutation", "Netz: Phasenänderung", "" },
+    { AlarmMessageType_t::ALL, 15, "Grid transient fluctuation", "Netz: vorübergehende Schwankung", "" },
 
     { AlarmMessageType_t::ALL, 36, "INV overvoltage or overcurrent", "", "" },
 

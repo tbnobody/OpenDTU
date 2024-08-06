@@ -3,8 +3,14 @@
         <th>{{ name }}</th>
         <td>
             <div class="progress">
-                <div class="progress-bar" role="progressbar" :style="{ width: getPercent() + '%' }"
-                    v-bind:aria-valuenow="getPercent()" aria-valuemin="0" aria-valuemax="100">
+                <div
+                    class="progress-bar"
+                    role="progressbar"
+                    :style="{ width: getPercent() + '%' }"
+                    v-bind:aria-valuenow="getPercent()"
+                    aria-valuemin="0"
+                    aria-valuemax="100"
+                >
                     {{ $n(getPercent() / 100, 'percent') }}
                 </div>
             </div>

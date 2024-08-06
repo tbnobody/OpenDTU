@@ -3,10 +3,12 @@
         <div class="col">
             <CardElement centerContent textVariant="text-bg-success" :text="$t('invertertotalinfo.TotalYieldTotal')">
                 <h2>
-                    {{ $n(totalData.YieldTotal.v, 'decimal', {
-                        minimumFractionDigits: totalData.YieldTotal.d,
-                        maximumFractionDigits: totalData.YieldTotal.d
-                    }) }}
+                    {{
+                        $n(totalData.YieldTotal.v, 'decimal', {
+                            minimumFractionDigits: totalData.YieldTotal.d,
+                            maximumFractionDigits: totalData.YieldTotal.d,
+                        })
+                    }}
                     <small class="text-muted">{{ totalData.YieldTotal.u }}</small>
                 </h2>
             </CardElement>
@@ -14,10 +16,12 @@
         <div class="col">
             <CardElement centerContent textVariant="text-bg-success" :text="$t('invertertotalinfo.TotalYieldDay')">
                 <h2>
-                    {{ $n(totalData.YieldDay.v, 'decimal', {
-                        minimumFractionDigits: totalData.YieldDay.d,
-                        maximumFractionDigits: totalData.YieldDay.d
-                    }) }}
+                    {{
+                        $n(totalData.YieldDay.v, 'decimal', {
+                            minimumFractionDigits: totalData.YieldDay.d,
+                            maximumFractionDigits: totalData.YieldDay.d,
+                        })
+                    }}
                     <small class="text-muted">{{ totalData.YieldDay.u }}</small>
                 </h2>
             </CardElement>
@@ -25,10 +29,12 @@
         <div class="col">
             <CardElement centerContent textVariant="text-bg-success" :text="$t('invertertotalinfo.TotalPower')">
                 <h2>
-                    {{ $n(totalData.Power.v, 'decimal', {
-                        minimumFractionDigits: totalData.Power.d,
-                        maximumFractionDigits: totalData.Power.d
-                    }) }}
+                    {{
+                        $n(totalData.Power.v, 'decimal', {
+                            minimumFractionDigits: totalData.Power.d,
+                            maximumFractionDigits: totalData.Power.d,
+                        })
+                    }}
                     <small class="text-muted">{{ totalData.Power.u }}</small>
                 </h2>
             </CardElement>
