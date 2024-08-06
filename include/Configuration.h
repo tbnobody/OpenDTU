@@ -145,6 +145,7 @@ struct CONFIG_T {
         uint8_t Rotation;
         uint8_t Contrast;
         uint8_t Language;
+        uint16_t UpdatePeriod;
         struct {
             uint32_t Duration;
             uint8_t Mode;

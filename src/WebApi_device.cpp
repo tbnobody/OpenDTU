@@ -4,7 +4,7 @@
  */
 #include "WebApi_device.h"
 #include "Configuration.h"
-#include "Display_Graphic.h"
+#include "Display.h"
 #include "PinMapping.h"
 #include "Utils.h"
 #include "WebApi.h"
@@ -65,6 +65,8 @@ void WebApiDeviceClass::onDeviceAdminGet(AsyncWebServerRequest* request)
     displayPinObj["clk"] = pin.display_clk;
     displayPinObj["cs"] = pin.display_cs;
     displayPinObj["reset"] = pin.display_reset;
+    displayPinObj["busy"] = pin.display_busy;
+    displayPinObj["dc"] = pin.display_dc;
 
     auto ledPinObj = curPin["led"].to<JsonObject>();
     for (uint8_t i = 0; i < PINMAPPING_LED_COUNT; i++) {
@@ -77,6 +79,7 @@ void WebApiDeviceClass::onDeviceAdminGet(AsyncWebServerRequest* request)
     display["screensaver"] = config.Display.ScreenSaver;
     display["contrast"] = config.Display.Contrast;
     display["language"] = config.Display.Language;
+    display["update"] = config.Display.UpdatePeriod;
     display["diagramduration"] = config.Display.Diagram.Duration;
     display["diagrammode"] = config.Display.Diagram.Mode;
 
@@ -128,6 +131,7 @@ void WebApiDeviceClass::onDeviceAdminPost(AsyncWebServerRequest* request)
     config.Display.ScreenSaver = root["display"]["screensaver"].as<bool>();
     config.Display.Contrast = root["display"]["contrast"].as<uint8_t>();
     config.Display.Language = root["display"]["language"].as<uint8_t>();
+    config.Display.UpdatePeriod = root["display"]["update"].as<uint16_t>();
     config.Display.Diagram.Duration = root["display"]["diagramduration"].as<uint32_t>();
     config.Display.Diagram.Mode = root["display"]["diagrammode"].as<DiagramMode_t>();
 
@@ -135,14 +139,14 @@ void WebApiDeviceClass::onDeviceAdminPost(AsyncWebServerRequest* request)
         config.Led_Single[i].Brightness = root["led"][i]["brightness"].as<uint8_t>();
         config.Led_Single[i].Brightness = min<uint8_t>(100, config.Led_Single[i].Brightness);
     }
-
     Display.setDiagramMode(static_cast<DiagramMode_t>(config.Display.Diagram.Mode));
     Display.setOrientation(config.Display.Rotation);
-    Display.enablePowerSafe = config.Display.PowerSafe;
-    Display.enableScreensaver = config.Display.ScreenSaver;
+    Display.setEnablePowerSafe(config.Display.PowerSafe);
+    Display.setEnableScreensaver(config.Display.ScreenSaver);
     Display.setContrast(config.Display.Contrast);
     Display.setLanguage(config.Display.Language);
-    Display.Diagram().updatePeriod();
+    Display.setUpdatePeriod(config.Display.UpdatePeriod);
+    Display.DiagramUpdatePeriod();
 
     WebApi.writeConfig(retMsg);
 
