@@ -79,8 +79,8 @@ void NetworkSettingsClass::NetworkEvent(const WiFiEvent_t event)
         MessageOutput.println("WiFi disconnected");
         if (_networkMode == network_mode::WiFi) {
             MessageOutput.println("Try reconnecting");
-            WiFi.disconnect(true, true);
-            WiFi.reconnect();
+            WiFi.disconnect(true, false);
+            WiFi.begin();
             raiseEvent(network_event::NETWORK_DISCONNECTED);
         }
         break;
