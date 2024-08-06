@@ -4,4 +4,4 @@ declare module '@vue/runtime-core' {
     }
 }
 
-export { }  // Important! See note.
+export {}; // Important! See note.

@@ -1,19 +1,29 @@
 <template>
-    <div :class="{'container-xxl': !isWideScreen,
-    'container-fluid': isWideScreen}" role="main">
+    <div :class="{ 'container-xxl': !isWideScreen, 'container-fluid': isWideScreen }" role="main">
         <div class="page-header">
             <div class="row">
                 <div class="col-sm-11">
-                    <h1>{{ title }}
-                        <span v-if="showWebSocket" :class="{
-                            'onlineMarker': isWebsocketConnected,
-                            'offlineMarker': !isWebsocketConnected,
-                        }"></span>
+                    <h1>
+                        {{ title }}
+                        <span
+                            v-if="showWebSocket"
+                            :class="{
+                                onlineMarker: isWebsocketConnected,
+                                offlineMarker: !isWebsocketConnected,
+                            }"
+                        ></span>
                     </h1>
                 </div>
                 <div class="col-sm-1" v-if="showReload">
-                    <button type="button" class="float-end btn btn-outline-primary"
-                        @click="$emit('reload')" v-tooltip :title="$t('base.Reload')" ><BIconArrowClockwise /></button>
+                    <button
+                        type="button"
+                        class="float-end btn btn-outline-primary"
+                        @click="$emit('reload')"
+                        v-tooltip
+                        :title="$t('base.Reload')"
+                    >
+                        <BIconArrowClockwise />
+                    </button>
                 </div>
             </div>
         </div>
@@ -48,7 +58,7 @@ export default defineComponent({
         showReload: { type: Boolean, required: false, default: false },
     },
     mounted() {
-        console.log("init");
+        console.log('init');
         PullToRefresh.init({
             mainElement: 'body', // above which element?
             instructionsPullToRefresh: this.$t('base.Pull'),
@@ -56,11 +66,11 @@ export default defineComponent({
             instructionsRefreshing: this.$t('base.Refreshing'),
             onRefresh: () => {
                 this.$emit('reload');
-            }
+            },
         });
     },
     unmounted() {
-        console.log("destroy");
+        console.log('destroy');
         PullToRefresh.destroyAll();
     },
 });
@@ -100,13 +110,15 @@ export default defineComponent({
     margin: -12px 0 0 -12px;
     border: 1px solid #00bb00;
     border-radius: 50%;
-    box-shadow: 0 0 4px #00bb00, inset 0 0 4px rgb(56, 111, 169);
+    box-shadow:
+        0 0 4px #00bb00,
+        inset 0 0 4px rgb(56, 111, 169);
     transform: scale(0);
     animation: online 2.5s ease-in-out infinite;
 }
 @keyframes online {
     0% {
-        transform: scale(.1);
+        transform: scale(0.1);
         opacity: 1;
     }
 

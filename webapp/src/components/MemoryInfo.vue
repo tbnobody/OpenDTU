@@ -12,15 +12,27 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <FsInfo :name="$t('memoryinfo.Heap')" :total="systemStatus.heap_total"
-                        :used="systemStatus.heap_used" />
-                    <FsInfo :name="$t('memoryinfo.PsRam')" :total="systemStatus.psram_total"
-                        :used="systemStatus.psram_used" />
+                    <FsInfo
+                        :name="$t('memoryinfo.Heap')"
+                        :total="systemStatus.heap_total"
+                        :used="systemStatus.heap_used"
+                    />
+                    <FsInfo
+                        :name="$t('memoryinfo.PsRam')"
+                        :total="systemStatus.psram_total"
+                        :used="systemStatus.psram_used"
+                    />
                     <a href='/api/database'>Read Database</a>
-                    <FsInfo :name="$t('memoryinfo.LittleFs')" :total="systemStatus.littlefs_total"
-                        :used="systemStatus.littlefs_used" />
-                    <FsInfo :name="$t('memoryinfo.Sketch')" :total="systemStatus.sketch_total"
-                        :used="systemStatus.sketch_used" />
+                    <FsInfo
+                        :name="$t('memoryinfo.LittleFs')"
+                        :total="systemStatus.littlefs_total"
+                        :used="systemStatus.littlefs_used"
+                    />
+                    <FsInfo
+                        :name="$t('memoryinfo.Sketch')"
+                        :total="systemStatus.sketch_total"
+                        :used="systemStatus.sketch_used"
+                    />
                 </tbody>
             </table>
         </div>
@@ -29,7 +41,7 @@
 
 <script lang="ts">
 import CardElement from '@/components/CardElement.vue';
-import FsInfo from "@/components/FsInfo.vue";
+import FsInfo from '@/components/FsInfo.vue';
 import type { SystemStatus } from '@/types/SystemStatus';
 import { defineComponent, type PropType } from 'vue';
 
