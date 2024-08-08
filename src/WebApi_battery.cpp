@@ -52,6 +52,10 @@ void WebApiBatteryClass::onStatus(AsyncWebServerRequest* request)
 
 void WebApiBatteryClass::onAdminGet(AsyncWebServerRequest* request)
 {
+    if (!WebApi.checkCredentials(request)) {
+        return;
+    }
+
     onStatus(request);
 }
 

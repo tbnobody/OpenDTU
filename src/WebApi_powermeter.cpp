@@ -32,6 +32,10 @@ void WebApiPowerMeterClass::init(AsyncWebServer& server, Scheduler& scheduler)
 
 void WebApiPowerMeterClass::onStatus(AsyncWebServerRequest* request)
 {
+    if (!WebApi.checkCredentialsReadonly(request)) {
+        return;
+    }
+
     AsyncJsonResponse* response = new AsyncJsonResponse();
     auto& root = response->getRoot();
     const CONFIG_T& config = Configuration.get();
