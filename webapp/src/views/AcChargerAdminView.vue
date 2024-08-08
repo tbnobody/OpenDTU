@@ -163,8 +163,6 @@
                                     placeholder="0"
                                     v-model="acChargerConfigList.target_power_consumption"
                                     aria-describedby="targetPowerConsumptionDescription"
-                                    min="-3000"
-                                    max="3000"
                                     required
                                 />
                                 <span class="input-group-text" id="targetPowerConsumptionDescription">W</span>
