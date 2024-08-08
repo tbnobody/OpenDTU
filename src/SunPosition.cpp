@@ -73,7 +73,7 @@ void SunPositionClass::updateSunData()
     if (!gotLocalTime) {
         _sunriseMinutes = 0;
         _sunsetMinutes = 0;
-        _isSunsetAvailable = true;
+        _isSunsetAvailable = false;
         _isValidInfo = false;
         return;
     }
