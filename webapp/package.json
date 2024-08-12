@@ -40,7 +40,7 @@
     "prettier": "^3.3.3",
     "pulltorefreshjs": "^0.1.22",
     "sass": "^1.77.6",
-    "terser": "^5.31.3",
+    "terser": "^5.31.5",
     "typescript": "^5.5.4",
     "vite": "^5.3.5",
     "vite-plugin-compression": "^0.5.1",
