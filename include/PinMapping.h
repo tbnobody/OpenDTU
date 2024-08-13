@@ -42,7 +42,6 @@ struct PinMapping_t {
 
     uint8_t relay_r01;
     uint8_t relay_r02;
-
 };
 
 class PinMappingClass {

@@ -5,10 +5,11 @@ enum WebApiError {
     GenericBase = 1000,
     GenericSuccess,
     GenericNoValueFound,
-    GenericDataTooLarge,
+    GenericDataTooLarge, // not used anymore
     GenericParseError,
     GenericValueMissing,
     GenericWriteFailed,
+    GenericInternalServerError,
 
     DtuBase = 2000,
     DtuSerialZero,
@@ -59,6 +60,7 @@ enum WebApiError {
     MqttHassTopicLength,
     MqttHassTopicCharacter,
     MqttLwtQos,
+    MqttClientIdLength,
 
     NetworkBase = 8000,
     NetworkIpInvalid,
