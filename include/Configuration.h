@@ -16,7 +16,6 @@
 #define NTP_MAX_TIMEZONEDESCR_STRLEN 50
 
 #define MQTT_MAX_HOSTNAME_STRLEN 128
-#define MQTT_MAX_CLIENTID_STRLEN 64
 #define MQTT_MAX_USERNAME_STRLEN 64
 #define MQTT_MAX_PASSWORD_STRLEN 64
 #define MQTT_MAX_TOPIC_STRLEN 32
@@ -30,6 +29,8 @@
 #define CHAN_MAX_NAME_STRLEN 31
 
 #define DEV_MAX_MAPPING_NAME_STRLEN 63
+
+#define JSON_BUFFER_SIZE 12288
 
 struct CHANNEL_CONFIG_T {
     uint16_t MaxChannelPower;
@@ -48,7 +49,6 @@ struct INVERTER_CONFIG_T {
     uint8_t ReachableThreshold;
     bool ZeroRuntimeDataIfUnrechable;
     bool ZeroYieldDayOnMidnight;
-    bool ClearEventlogOnMidnight;
     bool YieldDayCorrection;
     CHANNEL_CONFIG_T channel[INV_MAX_CHAN_COUNT];
 };
@@ -89,7 +89,6 @@ struct CONFIG_T {
         bool Enabled;
         char Hostname[MQTT_MAX_HOSTNAME_STRLEN + 1];
         uint32_t Port;
-        char ClientId[MQTT_MAX_CLIENTID_STRLEN + 1];
         char Username[MQTT_MAX_USERNAME_STRLEN + 1];
         char Password[MQTT_MAX_PASSWORD_STRLEN + 1];
         char Topic[MQTT_MAX_TOPIC_STRLEN + 1];
@@ -154,6 +153,11 @@ struct CONFIG_T {
     struct {
         uint8_t Brightness;
     } Led_Single[PINMAPPING_LED_COUNT];
+
+    struct {
+        bool R01;
+        bool R02;
+    } Relay;
 
     INVERTER_CONFIG_T Inverter[INV_MAX_COUNT];
     char Dev_PinMapping[DEV_MAX_MAPPING_NAME_STRLEN + 1];
