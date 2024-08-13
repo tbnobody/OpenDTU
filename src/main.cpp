@@ -7,6 +7,7 @@
 #include "Display_Graphic.h"
 #include "InverterSettings.h"
 #include "Led_Single.h"
+#include "Relay.h"
 #include "MessageOutput.h"
 #include "MqttHandleDtu.h"
 #include "MqttHandleHass.h"
@@ -136,6 +137,14 @@ void setup()
     // Initialize Single LEDs
     MessageOutput.print("Initialize LEDs... ");
     LedSingle.init(scheduler);
+    MessageOutput.println("done");
+
+    // Initialize Relay
+    MessageOutput.print("Initialize Relay... ");
+    Relay Cmd_Relay_R01 = Relay(pin.relay_r01);
+    Relay Cmd_Relay_R02 = Relay(pin.relay_r02);
+    Cmd_Relay_R01.off();
+    Cmd_Relay_R02.off();
     MessageOutput.println("done");
 
     // Check for default DTU serial

@@ -8,6 +8,8 @@
 #include <LittleFS.h>
 #include <string.h>
 
+#define JSON_BUFFER_SIZE 6144
+
 #ifndef DISPLAY_TYPE
 #define DISPLAY_TYPE 0U
 #endif
@@ -84,6 +86,14 @@
 #define CMT_SDIO -1
 #endif
 
+#ifndef RELAY_R01_GPIO
+#define RELAY_R01_GPIO -1
+#endif
+
+#ifndef RELAY_R02_GPIO
+#define RELAY_R02_GPIO -1
+#endif
+
 PinMappingClass PinMapping;
 
 PinMappingClass::PinMappingClass()
@@ -124,6 +134,9 @@ PinMappingClass::PinMappingClass()
 
     _pinMapping.led[0] = LED0;
     _pinMapping.led[1] = LED1;
+
+    _pinMapping.relay_r01 = RELAY_R01_GPIO;
+    _pinMapping.relay_r02 = RELAY_R02_GPIO;
 }
 
 PinMapping_t& PinMappingClass::get()
@@ -139,7 +152,7 @@ bool PinMappingClass::init(const String& deviceMapping)
         return false;
     }
 
-    JsonDocument doc;
+    DynamicJsonDocument doc(JSON_BUFFER_SIZE);
     // Deserialize the JSON document
     DeserializationError error = deserializeJson(doc, f);
     if (error) {
@@ -185,6 +198,9 @@ bool PinMappingClass::init(const String& deviceMapping)
 
             _pinMapping.led[0] = doc[i]["led"]["led0"] | LED0;
             _pinMapping.led[1] = doc[i]["led"]["led1"] | LED1;
+
+            _pinMapping.relay_r01 = doc[i]["relay"]["R01"] | RELAY_R01_GPIO;
+            _pinMapping.relay_r02 = doc[i]["relay"]["R02"] | RELAY_R02_GPIO;
 
             return true;
         }
