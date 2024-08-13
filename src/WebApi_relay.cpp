@@ -50,37 +50,12 @@ void WebApiRelayClass::onRelayPost(AsyncWebServerRequest* request)
     }
 
     AsyncJsonResponse* response = new AsyncJsonResponse();
+    JsonDocument root;
+    if (!WebApi.parseRequestData(request, response, root)) {
+        return;
+    }
+
     auto& retMsg = response->getRoot();
-    //retMsg["type"] = "warning";
-
-    if (!request->hasParam("data", true)) {
-        retMsg["message"] = "No values found!";
-        retMsg["code"] = WebApiError::GenericNoValueFound;
-        response->setLength();
-        request->send(response);
-        return;
-    }
-
-    const String json = request->getParam("data", true)->value();
-
-    if (json.length() > 1024) {
-        retMsg["message"] = "Data too large!";
-        retMsg["code"] = WebApiError::GenericDataTooLarge;
-        response->setLength();
-        request->send(response);
-        return;
-    }
-
-    DynamicJsonDocument root(1024);
-    const DeserializationError error = deserializeJson(root, json);
-
-    if (error) {
-        retMsg["message"] = "Failed to parse data!";
-        retMsg["code"] = WebApiError::GenericParseError;
-        response->setLength();
-        request->send(response);
-        return;
-    }
 
     if (!(root.containsKey("R01") || root.containsKey("R02"))) {
         retMsg["message"] = "Values are missing!";

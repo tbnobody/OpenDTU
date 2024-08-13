@@ -29,15 +29,15 @@ void WebApiInverterClass::onInverterList(AsyncWebServerRequest* request)
         return;
     }
 
-    AsyncJsonResponse* response = new AsyncJsonResponse(false, 768 * INV_MAX_COUNT);
+    AsyncJsonResponse* response = new AsyncJsonResponse();
     auto& root = response->getRoot();
-    JsonArray data = root.createNestedArray("inverter");
+    JsonArray data = root["inverter"].to<JsonArray>();
 
     const CONFIG_T& config = Configuration.get();
 
     for (uint8_t i = 0; i < INV_MAX_COUNT; i++) {
         if (config.Inverter[i].Serial > 0) {
-            JsonObject obj = data.createNestedObject();
+            JsonObject obj = data.add<JsonObject>();
             obj["id"] = i;
             obj["name"] = String(config.Inverter[i].Name);
             obj["order"] = config.Inverter[i].Order;
@@ -55,6 +55,7 @@ void WebApiInverterClass::onInverterList(AsyncWebServerRequest* request)
             obj["reachable_threshold"] = config.Inverter[i].ReachableThreshold;
             obj["zero_runtime"] = config.Inverter[i].ZeroRuntimeDataIfUnrechable;
             obj["zero_day"] = config.Inverter[i].ZeroYieldDayOnMidnight;
+            obj["clear_eventlog"] = config.Inverter[i].ClearEventlogOnMidnight;
             obj["yieldday_correction"] = config.Inverter[i].YieldDayCorrection;
 
             auto inv = Hoymiles.getInverterBySerial(config.Inverter[i].Serial);
@@ -67,9 +68,9 @@ void WebApiInverterClass::onInverterList(AsyncWebServerRequest* request)
                 max_channels = inv->Statistics()->getChannelsByType(TYPE_DC).size();
             }
 
-            JsonArray channel = obj.createNestedArray("channel");
+            JsonArray channel = obj["channel"].to<JsonArray>();
             for (uint8_t c = 0; c < max_channels; c++) {
-                JsonObject chanData = channel.createNestedObject();
+                JsonObject chanData = channel.add<JsonObject>();
                 chanData["name"] = config.Inverter[i].channel[c].Name;
                 chanData["max_power"] = config.Inverter[i].channel[c].MaxChannelPower;
                 chanData["yield_total_offset"] = config.Inverter[i].channel[c].YieldTotalOffset;
@@ -77,8 +78,7 @@ void WebApiInverterClass::onInverterList(AsyncWebServerRequest* request)
         }
     }
 
-    response->setLength();
-    request->send(response);
+    WebApi.sendJsonResponse(request, response, __FUNCTION__, __LINE__);
 }
 
 void WebApiInverterClass::onInverterAdd(AsyncWebServerRequest* request)
@@ -88,44 +88,18 @@ void WebApiInverterClass::onInverterAdd(AsyncWebServerRequest* request)
     }
 
     AsyncJsonResponse* response = new AsyncJsonResponse();
+    JsonDocument root;
+    if (!WebApi.parseRequestData(request, response, root)) {
+        return;
+    }
+
     auto& retMsg = response->getRoot();
-    retMsg["type"] = "warning";
-
-    if (!request->hasParam("data", true)) {
-        retMsg["message"] = "No values found!";
-        retMsg["code"] = WebApiError::GenericNoValueFound;
-        response->setLength();
-        request->send(response);
-        return;
-    }
-
-    const String json = request->getParam("data", true)->value();
-
-    if (json.length() > 1024) {
-        retMsg["message"] = "Data too large!";
-        retMsg["code"] = WebApiError::GenericDataTooLarge;
-        response->setLength();
-        request->send(response);
-        return;
-    }
-
-    DynamicJsonDocument root(1024);
-    const DeserializationError error = deserializeJson(root, json);
-
-    if (error) {
-        retMsg["message"] = "Failed to parse data!";
-        retMsg["code"] = WebApiError::GenericParseError;
-        response->setLength();
-        request->send(response);
-        return;
-    }
 
     if (!(root.containsKey("serial")
             && root.containsKey("name"))) {
         retMsg["message"] = "Values are missing!";
         retMsg["code"] = WebApiError::GenericValueMissing;
-        response->setLength();
-        request->send(response);
+        WebApi.sendJsonResponse(request, response, __FUNCTION__, __LINE__);
         return;
     }
 
@@ -135,8 +109,7 @@ void WebApiInverterClass::onInverterAdd(AsyncWebServerRequest* request)
     if (serial == 0) {
         retMsg["message"] = "Serial must be a number > 0!";
         retMsg["code"] = WebApiError::InverterSerialZero;
-        response->setLength();
-        request->send(response);
+        WebApi.sendJsonResponse(request, response, __FUNCTION__, __LINE__);
         return;
     }
 
@@ -144,8 +117,7 @@ void WebApiInverterClass::onInverterAdd(AsyncWebServerRequest* request)
         retMsg["message"] = "Name must between 1 and " STR(INV_MAX_NAME_STRLEN) " characters long!";
         retMsg["code"] = WebApiError::InverterNameLength;
         retMsg["param"]["max"] = INV_MAX_NAME_STRLEN;
-        response->setLength();
-        request->send(response);
+        WebApi.sendJsonResponse(request, response, __FUNCTION__, __LINE__);
         return;
     }
 
@@ -155,8 +127,7 @@ void WebApiInverterClass::onInverterAdd(AsyncWebServerRequest* request)
         retMsg["message"] = "Only " STR(INV_MAX_COUNT) " inverters are supported!";
         retMsg["code"] = WebApiError::InverterCount;
         retMsg["param"]["max"] = INV_MAX_COUNT;
-        response->setLength();
-        request->send(response);
+        WebApi.sendJsonResponse(request, response, __FUNCTION__, __LINE__);
         return;
     }
 
@@ -167,8 +138,7 @@ void WebApiInverterClass::onInverterAdd(AsyncWebServerRequest* request)
 
     WebApi.writeConfig(retMsg, WebApiError::InverterAdded, "Inverter created!");
 
-    response->setLength();
-    request->send(response);
+    WebApi.sendJsonResponse(request, response, __FUNCTION__, __LINE__);
 
     auto inv = Hoymiles.addInverter(inverter->Name, inverter->Serial);
 
@@ -188,51 +158,24 @@ void WebApiInverterClass::onInverterEdit(AsyncWebServerRequest* request)
     }
 
     AsyncJsonResponse* response = new AsyncJsonResponse();
+    JsonDocument root;
+    if (!WebApi.parseRequestData(request, response, root)) {
+        return;
+    }
+
     auto& retMsg = response->getRoot();
-    retMsg["type"] = "warning";
-
-    if (!request->hasParam("data", true)) {
-        retMsg["message"] = "No values found!";
-        retMsg["code"] = WebApiError::GenericNoValueFound;
-        response->setLength();
-        request->send(response);
-        return;
-    }
-
-    const String json = request->getParam("data", true)->value();
-
-    if (json.length() > 1024) {
-        retMsg["message"] = "Data too large!";
-        retMsg["code"] = WebApiError::GenericDataTooLarge;
-        response->setLength();
-        request->send(response);
-        return;
-    }
-
-    DynamicJsonDocument root(1024);
-    const DeserializationError error = deserializeJson(root, json);
-
-    if (error) {
-        retMsg["message"] = "Failed to parse data!";
-        retMsg["code"] = WebApiError::GenericParseError;
-        response->setLength();
-        request->send(response);
-        return;
-    }
 
     if (!(root.containsKey("id") && root.containsKey("serial") && root.containsKey("name") && root.containsKey("channel"))) {
         retMsg["message"] = "Values are missing!";
         retMsg["code"] = WebApiError::GenericValueMissing;
-        response->setLength();
-        request->send(response);
+        WebApi.sendJsonResponse(request, response, __FUNCTION__, __LINE__);
         return;
     }
 
     if (root["id"].as<uint8_t>() > INV_MAX_COUNT - 1) {
         retMsg["message"] = "Invalid ID specified!";
         retMsg["code"] = WebApiError::InverterInvalidId;
-        response->setLength();
-        request->send(response);
+        WebApi.sendJsonResponse(request, response, __FUNCTION__, __LINE__);
         return;
     }
 
@@ -242,8 +185,7 @@ void WebApiInverterClass::onInverterEdit(AsyncWebServerRequest* request)
     if (serial == 0) {
         retMsg["message"] = "Serial must be a number > 0!";
         retMsg["code"] = WebApiError::InverterSerialZero;
-        response->setLength();
-        request->send(response);
+        WebApi.sendJsonResponse(request, response, __FUNCTION__, __LINE__);
         return;
     }
 
@@ -251,8 +193,7 @@ void WebApiInverterClass::onInverterEdit(AsyncWebServerRequest* request)
         retMsg["message"] = "Name must between 1 and " STR(INV_MAX_NAME_STRLEN) " characters long!";
         retMsg["code"] = WebApiError::InverterNameLength;
         retMsg["param"]["max"] = INV_MAX_NAME_STRLEN;
-        response->setLength();
-        request->send(response);
+        WebApi.sendJsonResponse(request, response, __FUNCTION__, __LINE__);
         return;
     }
 
@@ -260,8 +201,7 @@ void WebApiInverterClass::onInverterEdit(AsyncWebServerRequest* request)
     if (channelArray.size() == 0 || channelArray.size() > INV_MAX_CHAN_COUNT) {
         retMsg["message"] = "Invalid amount of max channel setting given!";
         retMsg["code"] = WebApiError::InverterInvalidMaxChannel;
-        response->setLength();
-        request->send(response);
+        WebApi.sendJsonResponse(request, response, __FUNCTION__, __LINE__);
         return;
     }
 
@@ -274,27 +214,27 @@ void WebApiInverterClass::onInverterEdit(AsyncWebServerRequest* request)
     inverter.Serial = new_serial;
     strncpy(inverter.Name, root["name"].as<String>().c_str(), INV_MAX_NAME_STRLEN);
 
+    inverter.Poll_Enable = root["poll_enable"] | true;
+    inverter.Poll_Enable_Night = root["poll_enable_night"] | true;
+    inverter.Command_Enable = root["command_enable"] | true;
+    inverter.Command_Enable_Night = root["command_enable_night"] | true;
+    inverter.ReachableThreshold = root["reachable_threshold"] | REACHABLE_THRESHOLD;
+    inverter.ZeroRuntimeDataIfUnrechable = root["zero_runtime"] | false;
+    inverter.ZeroYieldDayOnMidnight = root["zero_day"] | false;
+    inverter.ClearEventlogOnMidnight = root["clear_eventlog"] | false;
+    inverter.YieldDayCorrection = root["yieldday_correction"] | false;
+
     uint8_t arrayCount = 0;
     for (JsonVariant channel : channelArray) {
         inverter.channel[arrayCount].MaxChannelPower = channel["max_power"].as<uint16_t>();
         inverter.channel[arrayCount].YieldTotalOffset = channel["yield_total_offset"].as<float>();
         strncpy(inverter.channel[arrayCount].Name, channel["name"] | "", sizeof(inverter.channel[arrayCount].Name));
-        inverter.Poll_Enable = root["poll_enable"] | true;
-        inverter.Poll_Enable_Night = root["poll_enable_night"] | true;
-        inverter.Command_Enable = root["command_enable"] | true;
-        inverter.Command_Enable_Night = root["command_enable_night"] | true;
-        inverter.ReachableThreshold = root["reachable_threshold"] | REACHABLE_THRESHOLD;
-        inverter.ZeroRuntimeDataIfUnrechable = root["zero_runtime"] | false;
-        inverter.ZeroYieldDayOnMidnight = root["zero_day"] | false;
-        inverter.YieldDayCorrection = root["yieldday_correction"] | false;
-
         arrayCount++;
     }
 
     WebApi.writeConfig(retMsg, WebApiError::InverterChanged, "Inverter changed!");
 
-    response->setLength();
-    request->send(response);
+    WebApi.sendJsonResponse(request, response, __FUNCTION__, __LINE__);
 
     std::shared_ptr<InverterAbstract> inv = Hoymiles.getInverterBySerial(old_serial);
 
@@ -316,6 +256,7 @@ void WebApiInverterClass::onInverterEdit(AsyncWebServerRequest* request)
         inv->setReachableThreshold(inverter.ReachableThreshold);
         inv->setZeroValuesIfUnreachable(inverter.ZeroRuntimeDataIfUnrechable);
         inv->setZeroYieldDayOnMidnight(inverter.ZeroYieldDayOnMidnight);
+        inv->setClearEventlogOnMidnight(inverter.ClearEventlogOnMidnight);
         inv->Statistics()->setYieldDayCorrection(inverter.YieldDayCorrection);
         for (uint8_t c = 0; c < INV_MAX_CHAN_COUNT; c++) {
             inv->Statistics()->setStringMaxPower(c, inverter.channel[c].MaxChannelPower);
@@ -333,51 +274,24 @@ void WebApiInverterClass::onInverterDelete(AsyncWebServerRequest* request)
     }
 
     AsyncJsonResponse* response = new AsyncJsonResponse();
+    JsonDocument root;
+    if (!WebApi.parseRequestData(request, response, root)) {
+        return;
+    }
+
     auto& retMsg = response->getRoot();
-    retMsg["type"] = "warning";
-
-    if (!request->hasParam("data", true)) {
-        retMsg["message"] = "No values found!";
-        retMsg["code"] = WebApiError::GenericNoValueFound;
-        response->setLength();
-        request->send(response);
-        return;
-    }
-
-    const String json = request->getParam("data", true)->value();
-
-    if (json.length() > 1024) {
-        retMsg["message"] = "Data too large!";
-        retMsg["code"] = WebApiError::GenericDataTooLarge;
-        response->setLength();
-        request->send(response);
-        return;
-    }
-
-    DynamicJsonDocument root(1024);
-    const DeserializationError error = deserializeJson(root, json);
-
-    if (error) {
-        retMsg["message"] = "Failed to parse data!";
-        retMsg["code"] = WebApiError::GenericParseError;
-        response->setLength();
-        request->send(response);
-        return;
-    }
 
     if (!(root.containsKey("id"))) {
         retMsg["message"] = "Values are missing!";
         retMsg["code"] = WebApiError::GenericValueMissing;
-        response->setLength();
-        request->send(response);
+        WebApi.sendJsonResponse(request, response, __FUNCTION__, __LINE__);
         return;
     }
 
     if (root["id"].as<uint8_t>() > INV_MAX_COUNT - 1) {
         retMsg["message"] = "Invalid ID specified!";
         retMsg["code"] = WebApiError::InverterInvalidId;
-        response->setLength();
-        request->send(response);
+        WebApi.sendJsonResponse(request, response, __FUNCTION__, __LINE__);
         return;
     }
 
@@ -390,8 +304,7 @@ void WebApiInverterClass::onInverterDelete(AsyncWebServerRequest* request)
 
     WebApi.writeConfig(retMsg, WebApiError::InverterDeleted, "Inverter deleted!");
 
-    response->setLength();
-    request->send(response);
+    WebApi.sendJsonResponse(request, response, __FUNCTION__, __LINE__);
 
     MqttHandleHass.forceUpdate();
 }
@@ -403,43 +316,17 @@ void WebApiInverterClass::onInverterOrder(AsyncWebServerRequest* request)
     }
 
     AsyncJsonResponse* response = new AsyncJsonResponse();
+    JsonDocument root;
+    if (!WebApi.parseRequestData(request, response, root)) {
+        return;
+    }
+
     auto& retMsg = response->getRoot();
-    retMsg["type"] = "warning";
-
-    if (!request->hasParam("data", true)) {
-        retMsg["message"] = "No values found!";
-        retMsg["code"] = WebApiError::GenericNoValueFound;
-        response->setLength();
-        request->send(response);
-        return;
-    }
-
-    const String json = request->getParam("data", true)->value();
-
-    if (json.length() > 1024) {
-        retMsg["message"] = "Data too large!";
-        retMsg["code"] = WebApiError::GenericDataTooLarge;
-        response->setLength();
-        request->send(response);
-        return;
-    }
-
-    DynamicJsonDocument root(1024);
-    const DeserializationError error = deserializeJson(root, json);
-
-    if (error) {
-        retMsg["message"] = "Failed to parse data!";
-        retMsg["code"] = WebApiError::GenericParseError;
-        response->setLength();
-        request->send(response);
-        return;
-    }
 
     if (!(root.containsKey("order"))) {
         retMsg["message"] = "Values are missing!";
         retMsg["code"] = WebApiError::GenericValueMissing;
-        response->setLength();
-        request->send(response);
+        WebApi.sendJsonResponse(request, response, __FUNCTION__, __LINE__);
         return;
     }
 
@@ -457,6 +344,5 @@ void WebApiInverterClass::onInverterOrder(AsyncWebServerRequest* request)
 
     WebApi.writeConfig(retMsg, WebApiError::InverterOrdered, "Inverter order saved!");
 
-    response->setLength();
-    request->send(response);
+    WebApi.sendJsonResponse(request, response, __FUNCTION__, __LINE__);
 }

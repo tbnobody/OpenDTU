@@ -7,14 +7,12 @@
 #include "NetworkSettings.h"
 #include "PinMapping.h"
 #include "WebApi.h"
+#include "__compiled_constants.h"
 #include <AsyncJson.h>
+#include <CpuTemperature.h>
 #include <Hoymiles.h>
 #include <LittleFS.h>
 #include <ResetReason.h>
-
-#ifndef AUTO_GIT_HASH
-#define AUTO_GIT_HASH ""
-#endif
 
 void WebApiSysstatusClass::init(AsyncWebServer& server, Scheduler& scheduler)
 {
@@ -36,6 +34,7 @@ void WebApiSysstatusClass::onSystemStatus(AsyncWebServerRequest* request)
 
     root["sdkversion"] = ESP.getSdkVersion();
     root["cpufreq"] = ESP.getCpuFreqMHz();
+    root["cputemp"] = CpuTemperature.read();
 
     root["heap_total"] = ESP.getHeapSize();
     root["heap_used"] = ESP.getHeapSize() - ESP.getFreeHeap();
@@ -51,6 +50,7 @@ void WebApiSysstatusClass::onSystemStatus(AsyncWebServerRequest* request)
     root["chiprevision"] = ESP.getChipRevision();
     root["chipmodel"] = ESP.getChipModel();
     root["chipcores"] = ESP.getChipCores();
+    root["flashsize"] = ESP.getFlashChipSize();
 
     String reason;
     reason = ResetReason::get_reset_reason_verbose(0);
@@ -64,7 +64,7 @@ void WebApiSysstatusClass::onSystemStatus(AsyncWebServerRequest* request)
     char version[16];
     snprintf(version, sizeof(version), "%d.%d.%d", CONFIG_VERSION >> 24 & 0xff, CONFIG_VERSION >> 16 & 0xff, CONFIG_VERSION >> 8 & 0xff);
     root["config_version"] = version;
-    root["git_hash"] = AUTO_GIT_HASH;
+    root["git_hash"] = __COMPILED_GIT_HASH__;
     root["pioenv"] = PIOENV;
 
     root["uptime"] = esp_timer_get_time() / 1000000;
@@ -76,6 +76,5 @@ void WebApiSysstatusClass::onSystemStatus(AsyncWebServerRequest* request)
     root["cmt_configured"] = PinMapping.isValidCmt2300Config();
     root["cmt_connected"] = Hoymiles.getRadioCmt()->isConnected();
 
-    response->setLength();
-    request->send(response);
+    WebApi.sendJsonResponse(request, response, __FUNCTION__, __LINE__);
 }

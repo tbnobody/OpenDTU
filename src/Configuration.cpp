@@ -1,10 +1,10 @@
-
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
  * Copyright (C) 2022-2024 Thomas Basler and others
  */
 #include "Configuration.h"
 #include "MessageOutput.h"
+#include "NetworkSettings.h"
 #include "Utils.h"
 #include "defaults.h"
 #include <ArduinoJson.h>
@@ -26,17 +26,13 @@ bool ConfigurationClass::write()
     }
     config.Cfg.SaveCount++;
 
-    DynamicJsonDocument doc(JSON_BUFFER_SIZE);
+    JsonDocument doc;
 
-    if (!Utils::checkJsonAlloc(doc, __FUNCTION__, __LINE__)) {
-        return false;
-    }
-
-    JsonObject cfg = doc.createNestedObject("cfg");
+    JsonObject cfg = doc["cfg"].to<JsonObject>();
     cfg["version"] = config.Cfg.Version;
     cfg["save_count"] = config.Cfg.SaveCount;
 
-    JsonObject wifi = doc.createNestedObject("wifi");
+    JsonObject wifi = doc["wifi"].to<JsonObject>();
     wifi["ssid"] = config.WiFi.Ssid;
     wifi["password"] = config.WiFi.Password;
     wifi["ip"] = IPAddress(config.WiFi.Ip).toString();
@@ -48,10 +44,10 @@ bool ConfigurationClass::write()
     wifi["hostname"] = config.WiFi.Hostname;
     wifi["aptimeout"] = config.WiFi.ApTimeout;
 
-    JsonObject mdns = doc.createNestedObject("mdns");
+    JsonObject mdns = doc["mdns"].to<JsonObject>();
     mdns["enabled"] = config.Mdns.Enabled;
 
-    JsonObject ntp = doc.createNestedObject("ntp");
+    JsonObject ntp = doc["ntp"].to<JsonObject>();
     ntp["server"] = config.Ntp.Server;
     ntp["timezone"] = config.Ntp.Timezone;
     ntp["timezone_descr"] = config.Ntp.TimezoneDescr;
@@ -59,10 +55,11 @@ bool ConfigurationClass::write()
     ntp["longitude"] = config.Ntp.Longitude;
     ntp["sunsettype"] = config.Ntp.SunsetType;
 
-    JsonObject mqtt = doc.createNestedObject("mqtt");
+    JsonObject mqtt = doc["mqtt"].to<JsonObject>();
     mqtt["enabled"] = config.Mqtt.Enabled;
     mqtt["hostname"] = config.Mqtt.Hostname;
     mqtt["port"] = config.Mqtt.Port;
+    mqtt["clientid"] = config.Mqtt.ClientId;
     mqtt["username"] = config.Mqtt.Username;
     mqtt["password"] = config.Mqtt.Password;
     mqtt["topic"] = config.Mqtt.Topic;
@@ -70,27 +67,27 @@ bool ConfigurationClass::write()
     mqtt["publish_interval"] = config.Mqtt.PublishInterval;
     mqtt["clean_session"] = config.Mqtt.CleanSession;
 
-    JsonObject mqtt_lwt = mqtt.createNestedObject("lwt");
+    JsonObject mqtt_lwt = mqtt["lwt"].to<JsonObject>();
     mqtt_lwt["topic"] = config.Mqtt.Lwt.Topic;
     mqtt_lwt["value_online"] = config.Mqtt.Lwt.Value_Online;
     mqtt_lwt["value_offline"] = config.Mqtt.Lwt.Value_Offline;
     mqtt_lwt["qos"] = config.Mqtt.Lwt.Qos;
 
-    JsonObject mqtt_tls = mqtt.createNestedObject("tls");
+    JsonObject mqtt_tls = mqtt["tls"].to<JsonObject>();
     mqtt_tls["enabled"] = config.Mqtt.Tls.Enabled;
     mqtt_tls["root_ca_cert"] = config.Mqtt.Tls.RootCaCert;
     mqtt_tls["certlogin"] = config.Mqtt.Tls.CertLogin;
     mqtt_tls["client_cert"] = config.Mqtt.Tls.ClientCert;
     mqtt_tls["client_key"] = config.Mqtt.Tls.ClientKey;
 
-    JsonObject mqtt_hass = mqtt.createNestedObject("hass");
+    JsonObject mqtt_hass = mqtt["hass"].to<JsonObject>();
     mqtt_hass["enabled"] = config.Mqtt.Hass.Enabled;
     mqtt_hass["retain"] = config.Mqtt.Hass.Retain;
     mqtt_hass["topic"] = config.Mqtt.Hass.Topic;
     mqtt_hass["individual_panels"] = config.Mqtt.Hass.IndividualPanels;
     mqtt_hass["expire"] = config.Mqtt.Hass.Expire;
 
-    JsonObject dtu = doc.createNestedObject("dtu");
+    JsonObject dtu = doc["dtu"].to<JsonObject>();
     dtu["serial"] = config.Dtu.Serial;
     dtu["poll_interval"] = config.Dtu.PollInterval;
     dtu["nrf_pa_level"] = config.Dtu.Nrf.PaLevel;
@@ -98,14 +95,14 @@ bool ConfigurationClass::write()
     dtu["cmt_frequency"] = config.Dtu.Cmt.Frequency;
     dtu["cmt_country_mode"] = config.Dtu.Cmt.CountryMode;
 
-    JsonObject security = doc.createNestedObject("security");
+    JsonObject security = doc["security"].to<JsonObject>();
     security["password"] = config.Security.Password;
     security["allow_readonly"] = config.Security.AllowReadonly;
 
-    JsonObject device = doc.createNestedObject("device");
+    JsonObject device = doc["device"].to<JsonObject>();
     device["pinmapping"] = config.Dev_PinMapping;
 
-    JsonObject display = device.createNestedObject("display");
+    JsonObject display = device["display"].to<JsonObject>();
     display["powersafe"] = config.Display.PowerSafe;
     display["screensaver"] = config.Display.ScreenSaver;
     display["rotation"] = config.Display.Rotation;
@@ -114,19 +111,15 @@ bool ConfigurationClass::write()
     display["diagram_duration"] = config.Display.Diagram.Duration;
     display["diagram_mode"] = config.Display.Diagram.Mode;
 
-    JsonArray leds = device.createNestedArray("led");
+    JsonArray leds = device["led"].to<JsonArray>();
     for (uint8_t i = 0; i < PINMAPPING_LED_COUNT; i++) {
-        JsonObject led = leds.createNestedObject();
+        JsonObject led = leds.add<JsonObject>();
         led["brightness"] = config.Led_Single[i].Brightness;
     }
 
-    JsonObject relay = device.createNestedObject("relay");
-    relay["relay_01"] = config.Relay.R01;
-    relay["relay_02"] = config.Relay.R02;
-
-    JsonArray inverters = doc.createNestedArray("inverters");
+    JsonArray inverters = doc["inverters"].to<JsonArray>();
     for (uint8_t i = 0; i < INV_MAX_COUNT; i++) {
-        JsonObject inv = inverters.createNestedObject();
+        JsonObject inv = inverters.add<JsonObject>();
         inv["serial"] = config.Inverter[i].Serial;
         inv["name"] = config.Inverter[i].Name;
         inv["order"] = config.Inverter[i].Order;
@@ -137,15 +130,24 @@ bool ConfigurationClass::write()
         inv["reachable_threshold"] = config.Inverter[i].ReachableThreshold;
         inv["zero_runtime"] = config.Inverter[i].ZeroRuntimeDataIfUnrechable;
         inv["zero_day"] = config.Inverter[i].ZeroYieldDayOnMidnight;
+        inv["clear_eventlog"] = config.Inverter[i].ClearEventlogOnMidnight;
         inv["yieldday_correction"] = config.Inverter[i].YieldDayCorrection;
 
-        JsonArray channel = inv.createNestedArray("channel");
+        JsonArray channel = inv["channel"].to<JsonArray>();
         for (uint8_t c = 0; c < INV_MAX_CHAN_COUNT; c++) {
-            JsonObject chanData = channel.createNestedObject();
+            JsonObject chanData = channel.add<JsonObject>();
             chanData["name"] = config.Inverter[i].channel[c].Name;
             chanData["max_power"] = config.Inverter[i].channel[c].MaxChannelPower;
             chanData["yield_total_offset"] = config.Inverter[i].channel[c].YieldTotalOffset;
         }
+    }
+
+    JsonObject relay = device["relay"].to<JsonObject>();
+    relay["relay_01"] = config.Relay.R01;
+    relay["relay_02"] = config.Relay.R02;
+
+    if (!Utils::checkJsonAlloc(doc, __FUNCTION__, __LINE__)) {
+        return false;
     }
 
     // Serialize JSON to file
@@ -162,16 +164,16 @@ bool ConfigurationClass::read()
 {
     File f = LittleFS.open(CONFIG_FILENAME, "r", false);
 
-    DynamicJsonDocument doc(JSON_BUFFER_SIZE);
-
-    if (!Utils::checkJsonAlloc(doc, __FUNCTION__, __LINE__)) {
-        return false;
-    }
+    JsonDocument doc;
 
     // Deserialize the JSON document
     const DeserializationError error = deserializeJson(doc, f);
     if (error) {
         MessageOutput.println("Failed to read file, using default configuration");
+    }
+
+    if (!Utils::checkJsonAlloc(doc, __FUNCTION__, __LINE__)) {
+        return false;
     }
 
     JsonObject cfg = doc["cfg"];
@@ -236,6 +238,7 @@ bool ConfigurationClass::read()
     config.Mqtt.Enabled = mqtt["enabled"] | MQTT_ENABLED;
     strlcpy(config.Mqtt.Hostname, mqtt["hostname"] | MQTT_HOST, sizeof(config.Mqtt.Hostname));
     config.Mqtt.Port = mqtt["port"] | MQTT_PORT;
+    strlcpy(config.Mqtt.ClientId, mqtt["clientid"] | NetworkSettings.getApName().c_str(), sizeof(config.Mqtt.ClientId));
     strlcpy(config.Mqtt.Username, mqtt["username"] | MQTT_USER, sizeof(config.Mqtt.Username));
     strlcpy(config.Mqtt.Password, mqtt["password"] | MQTT_PASSWORD, sizeof(config.Mqtt.Password));
     strlcpy(config.Mqtt.Topic, mqtt["topic"] | MQTT_TOPIC, sizeof(config.Mqtt.Topic));
@@ -293,10 +296,6 @@ bool ConfigurationClass::read()
         config.Led_Single[i].Brightness = led["brightness"] | LED_BRIGHTNESS;
     }
 
-    JsonObject relay = device["relay"];
-    config.Relay.R01 = relay["relay_01"];
-    config.Relay.R02 = relay["relay_02"];
-
     JsonArray inverters = doc["inverters"];
     for (uint8_t i = 0; i < INV_MAX_COUNT; i++) {
         JsonObject inv = inverters[i].as<JsonObject>();
@@ -311,6 +310,7 @@ bool ConfigurationClass::read()
         config.Inverter[i].ReachableThreshold = inv["reachable_threshold"] | REACHABLE_THRESHOLD;
         config.Inverter[i].ZeroRuntimeDataIfUnrechable = inv["zero_runtime"] | false;
         config.Inverter[i].ZeroYieldDayOnMidnight = inv["zero_day"] | false;
+        config.Inverter[i].ClearEventlogOnMidnight = inv["clear_eventlog"] | false;
         config.Inverter[i].YieldDayCorrection = inv["yieldday_correction"] | false;
 
         JsonArray channel = inv["channel"];
@@ -320,6 +320,10 @@ bool ConfigurationClass::read()
             strlcpy(config.Inverter[i].channel[c].Name, channel[c]["name"] | "", sizeof(config.Inverter[i].channel[c].Name));
         }
     }
+
+    JsonArray relay = device["relay"];
+    config.Relay.R01 = relay["relay_01"];
+    config.Relay.R02 = relay["relay_02"];
 
     f.close();
     return true;
@@ -333,16 +337,16 @@ void ConfigurationClass::migrate()
         return;
     }
 
-    DynamicJsonDocument doc(JSON_BUFFER_SIZE);
-
-    if (!Utils::checkJsonAlloc(doc, __FUNCTION__, __LINE__)) {
-        return;
-    }
+    JsonDocument doc;
 
     // Deserialize the JSON document
     const DeserializationError error = deserializeJson(doc, f);
     if (error) {
         MessageOutput.printf("Failed to read file, cancel migration: %s\r\n", error.c_str());
+        return;
+    }
+
+    if (!Utils::checkJsonAlloc(doc, __FUNCTION__, __LINE__)) {
         return;
     }
 

@@ -139,14 +139,6 @@ void setup()
     LedSingle.init(scheduler);
     MessageOutput.println("done");
 
-    // Initialize Relay
-    MessageOutput.print("Initialize Relay... ");
-    Relay Cmd_Relay_R01 = Relay(pin.relay_r01);
-    Relay Cmd_Relay_R02 = Relay(pin.relay_r02);
-    Cmd_Relay_R01.off();
-    Cmd_Relay_R02.off();
-    MessageOutput.println("done");
-
     // Check for default DTU serial
     MessageOutput.print("Check for default DTU serial... ");
     if (config.Dtu.Serial == DTU_SERIAL) {
@@ -158,6 +150,15 @@ void setup()
         config.Dtu.Serial = dtuId;
         Configuration.write();
     }
+
+    // Initialize Relay
+    MessageOutput.print("Initialize Relay... ");
+    Relay Cmd_Relay_R01 = Relay(pin.relay_r01);
+    Relay Cmd_Relay_R02 = Relay(pin.relay_r02);
+    Cmd_Relay_R01.off();
+    Cmd_Relay_R02.off();
+    MessageOutput.println("done");
+
     MessageOutput.println("done");
 
     InverterSettings.init(scheduler);
