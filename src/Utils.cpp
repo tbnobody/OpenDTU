@@ -1,12 +1,12 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * Copyright (C) 2022 - 2024 Thomas Basler and others
+ * Copyright (C) 2022 - 2023 Thomas Basler and others
  */
-
 #include "Utils.h"
 #include "Display_Graphic.h"
 #include "Led_Single.h"
 #include "MessageOutput.h"
+#include "PinMapping.h"
 #include <Esp.h>
 #include <LittleFS.h>
 
@@ -69,9 +69,9 @@ void Utils::restartDtu()
     ESP.restart();
 }
 
-bool Utils::checkJsonAlloc(const JsonDocument& doc, const char* function, const uint16_t line)
+bool Utils::checkJsonAlloc(const DynamicJsonDocument& doc, const char* function, const uint16_t line)
 {
-    if (doc.overflowed()) {
+    if (doc.capacity() == 0) {
         MessageOutput.printf("Alloc failed: %s, %d\r\n", function, line);
         return false;
     }

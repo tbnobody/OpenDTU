@@ -51,9 +51,9 @@ void InverterSettingsClass::init(Scheduler& scheduler)
 
         if (PinMapping.isValidCmt2300Config()) {
             Hoymiles.initCMT(pin.cmt_sdio, pin.cmt_clk, pin.cmt_cs, pin.cmt_fcs, pin.cmt_gpio2, pin.cmt_gpio3);
-            MessageOutput.println("  Setting country mode... ");
+            MessageOutput.println(F("  Setting country mode... "));
             Hoymiles.getRadioCmt()->setCountryMode(static_cast<CountryModeId_t>(config.Dtu.Cmt.CountryMode));
-            MessageOutput.println("  Setting CMT target frequency... ");
+            MessageOutput.println(F("  Setting CMT target frequency... "));
             Hoymiles.getRadioCmt()->setInverterTargetFrequency(config.Dtu.Cmt.Frequency);
         }
 
@@ -82,7 +82,6 @@ void InverterSettingsClass::init(Scheduler& scheduler)
                     inv->setReachableThreshold(config.Inverter[i].ReachableThreshold);
                     inv->setZeroValuesIfUnreachable(config.Inverter[i].ZeroRuntimeDataIfUnrechable);
                     inv->setZeroYieldDayOnMidnight(config.Inverter[i].ZeroYieldDayOnMidnight);
-                    inv->setClearEventlogOnMidnight(config.Inverter[i].ClearEventlogOnMidnight);
                     inv->Statistics()->setYieldDayCorrection(config.Inverter[i].YieldDayCorrection);
                     for (uint8_t c = 0; c < INV_MAX_CHAN_COUNT; c++) {
                         inv->Statistics()->setStringMaxPower(c, config.Inverter[i].channel[c].MaxChannelPower);

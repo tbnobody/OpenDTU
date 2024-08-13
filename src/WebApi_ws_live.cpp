@@ -73,19 +73,18 @@ void WebApiWsLiveClass::sendDataTaskCb()
 
         try {
             std::lock_guard<std::mutex> lock(_mutex);
-            JsonDocument root;
+            DynamicJsonDocument root(4096);
+            if (!Utils::checkJsonAlloc(root, __FUNCTION__, __LINE__)) {
+                continue;
+            }
             JsonVariant var = root;
 
-            auto invArray = var["inverters"].to<JsonArray>();
-            auto invObject = invArray.add<JsonObject>();
+            auto invArray = var.createNestedArray("inverters");
+            auto invObject = invArray.createNestedObject();
 
             generateCommonJsonResponse(var);
             generateInverterCommonJsonResponse(invObject, inv);
             generateInverterChannelJsonResponse(invObject, inv);
-
-            if (!Utils::checkJsonAlloc(root, __FUNCTION__, __LINE__)) {
-                continue;
-            }
 
             String buffer;
             serializeJson(root, buffer);
@@ -102,12 +101,12 @@ void WebApiWsLiveClass::sendDataTaskCb()
 
 void WebApiWsLiveClass::generateCommonJsonResponse(JsonVariant& root)
 {
-    auto totalObj = root["total"].to<JsonObject>();
+    JsonObject totalObj = root.createNestedObject("total");
     addTotalField(totalObj, "Power", Datastore.getTotalAcPowerEnabled(), "W", Datastore.getTotalAcPowerDigits());
     addTotalField(totalObj, "YieldDay", Datastore.getTotalAcYieldDayEnabled(), "Wh", Datastore.getTotalAcYieldDayDigits());
     addTotalField(totalObj, "YieldTotal", Datastore.getTotalAcYieldTotalEnabled(), "kWh", Datastore.getTotalAcYieldTotalDigits());
 
-    JsonObject hintObj = root["hints"].to<JsonObject>();
+    JsonObject hintObj = root.createNestedObject("hints");
     struct tm timeinfo;
     hintObj["time_sync"] = !getLocalTime(&timeinfo, 5);
     hintObj["radio_problem"] = (Hoymiles.getRadioNrf()->isInitialized() && (!Hoymiles.getRadioNrf()->isConnected() || !Hoymiles.getRadioNrf()->isPVariant())) || (Hoymiles.getRadioCmt()->isInitialized() && (!Hoymiles.getRadioCmt()->isConnected()));
@@ -145,7 +144,7 @@ void WebApiWsLiveClass::generateInverterChannelJsonResponse(JsonObject& root, st
 
     // Loop all channels
     for (auto& t : inv->Statistics()->getChannelTypes()) {
-        auto chanTypeObj = root[inv->Statistics()->getChannelTypeName(t)].to<JsonObject>();
+        JsonObject chanTypeObj = root.createNestedObject(inv->Statistics()->getChannelTypeName(t));
         for (auto& c : inv->Statistics()->getChannelsByType(t)) {
             if (t == TYPE_DC) {
                 chanTypeObj[String(static_cast<uint8_t>(c))]["name"]["u"] = inv_cfg->channel[c].Name;
@@ -222,15 +221,21 @@ void WebApiWsLiveClass::onLivedataStatus(AsyncWebServerRequest* request)
 
     try {
         std::lock_guard<std::mutex> lock(_mutex);
-        AsyncJsonResponse* response = new AsyncJsonResponse();
+        AsyncJsonResponse* response = new AsyncJsonResponse(false, 4096);
         auto& root = response->getRoot();
-        auto invArray = root["inverters"].to<JsonArray>();
-        auto serial = WebApi.parseSerialFromRequest(request);
+
+        JsonArray invArray = root.createNestedArray("inverters");
+
+        uint64_t serial = 0;
+        if (request->hasParam("inv")) {
+            String s = request->getParam("inv")->value();
+            serial = strtoll(s.c_str(), NULL, 16);
+        }
 
         if (serial > 0) {
             auto inv = Hoymiles.getInverterBySerial(serial);
             if (inv != nullptr) {
-                JsonObject invObject = invArray.add<JsonObject>();
+                JsonObject invObject = invArray.createNestedObject();
                 generateInverterCommonJsonResponse(invObject, inv);
                 generateInverterChannelJsonResponse(invObject, inv);
             }
@@ -242,14 +247,15 @@ void WebApiWsLiveClass::onLivedataStatus(AsyncWebServerRequest* request)
                     continue;
                 }
 
-                JsonObject invObject = invArray.add<JsonObject>();
+                JsonObject invObject = invArray.createNestedObject();
                 generateInverterCommonJsonResponse(invObject, inv);
             }
         }
 
         generateCommonJsonResponse(root);
 
-        WebApi.sendJsonResponse(request, response, __FUNCTION__, __LINE__);
+        response->setLength();
+        request->send(response);
 
     } catch (const std::bad_alloc& bad_alloc) {
         MessageOutput.printf("Call to /api/livedata/status temporarely out of resources. Reason: \"%s\".\r\n", bad_alloc.what());

@@ -21,26 +21,32 @@ void WebApiGridProfileClass::onGridProfileStatus(AsyncWebServerRequest* request)
         return;
     }
 
-    AsyncJsonResponse* response = new AsyncJsonResponse();
+    AsyncJsonResponse* response = new AsyncJsonResponse(false, 8192);
     auto& root = response->getRoot();
-    auto serial = WebApi.parseSerialFromRequest(request);
+
+    uint64_t serial = 0;
+    if (request->hasParam("inv")) {
+        String s = request->getParam("inv")->value();
+        serial = strtoll(s.c_str(), NULL, 16);
+    }
+
     auto inv = Hoymiles.getInverterBySerial(serial);
 
     if (inv != nullptr) {
         root["name"] = inv->GridProfile()->getProfileName();
         root["version"] = inv->GridProfile()->getProfileVersion();
 
-        auto jsonSections = root["sections"].to<JsonArray>();
+        auto jsonSections = root.createNestedArray("sections");
         auto profSections = inv->GridProfile()->getProfile();
 
         for (auto &profSection : profSections) {
-            auto jsonSection = jsonSections.add<JsonObject>();
+            auto jsonSection = jsonSections.createNestedObject();
             jsonSection["name"] = profSection.SectionName;
 
-            auto jsonItems = jsonSection["items"].to<JsonArray>();
+            auto jsonItems = jsonSection.createNestedArray("items");
 
             for (auto &profItem : profSection.items) {
-                auto jsonItem = jsonItems.add<JsonObject>();
+                auto jsonItem = jsonItems.createNestedObject();
 
                 jsonItem["n"] = profItem.Name;
                 jsonItem["u"] = profItem.Unit;
@@ -49,7 +55,8 @@ void WebApiGridProfileClass::onGridProfileStatus(AsyncWebServerRequest* request)
         }
     }
 
-    WebApi.sendJsonResponse(request, response, __FUNCTION__, __LINE__);
+    response->setLength();
+    request->send(response);
 }
 
 void WebApiGridProfileClass::onGridProfileRawdata(AsyncWebServerRequest* request)
@@ -58,17 +65,24 @@ void WebApiGridProfileClass::onGridProfileRawdata(AsyncWebServerRequest* request
         return;
     }
 
-    AsyncJsonResponse* response = new AsyncJsonResponse();
+    AsyncJsonResponse* response = new AsyncJsonResponse(false, 4096);
     auto& root = response->getRoot();
-    auto serial = WebApi.parseSerialFromRequest(request);
+
+    uint64_t serial = 0;
+    if (request->hasParam("inv")) {
+        String s = request->getParam("inv")->value();
+        serial = strtoll(s.c_str(), NULL, 16);
+    }
+
     auto inv = Hoymiles.getInverterBySerial(serial);
 
     if (inv != nullptr) {
-        auto raw = root["raw"].to<JsonArray>();
+        auto raw = root.createNestedArray("raw");
         auto data = inv->GridProfile()->getRawData();
 
         copyArray(&data[0], data.size(), raw);
     }
 
-    WebApi.sendJsonResponse(request, response, __FUNCTION__, __LINE__);
+    response->setLength();
+    request->send(response);
 }

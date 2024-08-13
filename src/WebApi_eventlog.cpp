@@ -20,9 +20,14 @@ void WebApiEventlogClass::onEventlogStatus(AsyncWebServerRequest* request)
         return;
     }
 
-    AsyncJsonResponse* response = new AsyncJsonResponse();
+    AsyncJsonResponse* response = new AsyncJsonResponse(false, 2048);
     auto& root = response->getRoot();
-    auto serial = WebApi.parseSerialFromRequest(request);
+
+    uint64_t serial = 0;
+    if (request->hasParam("inv")) {
+        String s = request->getParam("inv")->value();
+        serial = strtoll(s.c_str(), NULL, 16);
+    }
 
     AlarmMessageLocale_t locale = AlarmMessageLocale_t::EN;
     if (request->hasParam("locale")) {
@@ -42,10 +47,10 @@ void WebApiEventlogClass::onEventlogStatus(AsyncWebServerRequest* request)
         uint8_t logEntryCount = inv->EventLog()->getEntryCount();
 
         root["count"] = logEntryCount;
-        JsonArray eventsArray = root["events"].to<JsonArray>();
+        JsonArray eventsArray = root.createNestedArray("events");
 
         for (uint8_t logEntry = 0; logEntry < logEntryCount; logEntry++) {
-            JsonObject eventsObject = eventsArray.add<JsonObject>();
+            JsonObject eventsObject = eventsArray.createNestedObject();
 
             AlarmLogEntry_t entry;
             inv->EventLog()->getLogEntry(logEntry, entry, locale);
@@ -57,5 +62,6 @@ void WebApiEventlogClass::onEventlogStatus(AsyncWebServerRequest* request)
         }
     }
 
-    WebApi.sendJsonResponse(request, response, __FUNCTION__, __LINE__);
+    response->setLength();
+    request->send(response);
 }

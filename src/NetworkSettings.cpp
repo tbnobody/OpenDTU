@@ -10,7 +10,6 @@
 #include "defaults.h"
 #include <ESPmDNS.h>
 #include <ETH.h>
-#include "__compiled_constants.h"
 
 NetworkSettingsClass::NetworkSettingsClass()
     : _loopTask(TASK_IMMEDIATE, TASK_FOREVER, std::bind(&NetworkSettingsClass::loop, this))
@@ -26,8 +25,6 @@ void NetworkSettingsClass::init(Scheduler& scheduler)
 
     WiFi.setScanMethod(WIFI_ALL_CHANNEL_SCAN);
     WiFi.setSortMethod(WIFI_CONNECT_AP_BY_SIGNAL);
-
-    WiFi.disconnect(true, true);
 
     WiFi.onEvent(std::bind(&NetworkSettingsClass::NetworkEvent, this, _1));
     setupMode();
@@ -79,8 +76,7 @@ void NetworkSettingsClass::NetworkEvent(const WiFiEvent_t event)
         MessageOutput.println("WiFi disconnected");
         if (_networkMode == network_mode::WiFi) {
             MessageOutput.println("Try reconnecting");
-            WiFi.disconnect(true, false);
-            WiFi.begin();
+            WiFi.reconnect();
             raiseEvent(network_event::NETWORK_DISCONNECTED);
         }
         break;
@@ -140,7 +136,7 @@ void NetworkSettingsClass::handleMDNS()
 
         MDNS.addService("http", "tcp", 80);
         MDNS.addService("opendtu", "tcp", 80);
-        MDNS.addServiceTxt("opendtu", "tcp", "git_hash", __COMPILED_GIT_HASH__);
+        MDNS.addServiceTxt("opendtu", "tcp", "git_hash", AUTO_GIT_HASH);
 
         MessageOutput.println("done");
     } else {
