@@ -75,6 +75,7 @@ private:
     Mode _mode = Mode::Normal;
     std::shared_ptr<InverterAbstract> _inverter = nullptr;
     bool _batteryDischargeEnabled = false;
+    bool _nighttimeDischarging = false;
     uint32_t _nextInverterRestart = 0; // Values: 0->not calculated / 1->no restart configured / >1->time of next inverter restart in millis()
     uint32_t _nextCalculateCheck = 5000; // time in millis for next NTP check to calulate restart
     bool _fullSolarPassThroughEnabled = false;
