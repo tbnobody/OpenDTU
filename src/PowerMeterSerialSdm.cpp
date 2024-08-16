@@ -2,7 +2,6 @@
 #include "PowerMeterSerialSdm.h"
 #include "PinMapping.h"
 #include "MessageOutput.h"
-#include "SerialPortManager.h"
 
 PowerMeterSerialSdm::~PowerMeterSerialSdm()
 {
