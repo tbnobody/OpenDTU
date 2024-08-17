@@ -1,3 +1,3 @@
-# Device Profiles
+# Moved
 
-This documentation has been [moved to the wiki](https://github.com/helgeerbe/OpenDTU-OnBattery/wiki/Device-Profiles).
+Have a look at the [OpenDTU-OnBattery documentation](https://opendtu-onbattery.net/firmware/device_profiles/).

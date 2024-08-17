@@ -1,13 +1,13 @@
 - [OpenDTU-OnBattery](#opendtu-onbattery)
   - [What is OpenDTU-OnBattery](#what-is-opendtu-onbattery)
-  - [History of the project](#history-of-the-project)
-  - [Highlights of OpenDTU-OnBattery](#highlights-of-opendtu-onbattery)
   - [Documentation](#documentation)
+  - [State of the project](#state-of-the-project)
+  - [History of the project](#history-of-the-project)
   - [Acknowledgment](#acknowledgment)
 
 # OpenDTU-OnBattery
 
-This is a fork from the Hoymiles project [OpenDTU](https://github.com/tbnobody/OpenDTU).
+This is a fork of [OpenDTU](https://github.com/tbnobody/OpenDTU).
 
 ![GitHub tag (latest SemVer)](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/helgeerbe/68b47cc8c8994d04ab3a4fa9d8aee5e6/raw/openDTUcoreRelease.json)
 
@@ -17,40 +17,47 @@ This is a fork from the Hoymiles project [OpenDTU](https://github.com/tbnobody/O
 
 ## What is OpenDTU-OnBattery
 
-OpenDTU-OnBattery is an extension of the original OpenDTU to support battery chargers, battery management systems (BMS) and power meters on a single esp32. With the help of a dynamic power limiter, the power production can be adjusted to the actual consumption. In this way, it is possible to come as close as possible to the goal of zero feed-in.
+OpenDTU-OnBattery is an extension of the original OpenDTU to support battery
+chargers, battery management systems (BMS) and power meters on a single ESP32.
+With the help of a Dynamic Power Limiter, the power production can be adjusted
+to the actual consumption. In this way, it is possible to implement a zero
+export policy.
+
+## Documentation
+
+The canonical documentation of OpenDTU-OnBattery is hosted at
+[https://opendtu-onbattery.net](https://opendtu-onbattery.net).
+
+You may find additional helpful information in the project's
+community-maintained [Github
+Wiki](https://github.com/helgeerbe/OpenDTU-OnBattery/wiki).
+
+To find out what's new or improved have a look at the changelog of the
+[releases](https://github.com/helgeerbe/OpenDTU-OnBattery/releases).
+
+## State of the project
+
+OpenDTU-OnBattery is actively maintained. Please note that OpenDTU-OnBattery
+may change significantly during its development. Bug reports, comments, feature
+requests and pull requests are welcome!
 
 ## History of the project
 
-The original OpenDTU project was started from [this](https://www.mikrocontroller.net/topic/525778) discussion (Mikrocontroller.net). It was the goal to replace the original Hoymiles DTU (Telemetry Gateway) with their cloud access. With a lot of reverse engineering the Hoymiles protocol was decrypted and analyzed.
+The original OpenDTU project was started from [a discussion on
+Mikrocontroller.net](https://www.mikrocontroller.net/topic/525778). It was the
+goal to replace the original Hoymiles DTU (Telemetry Gateway) to avoid using
+Hoymile's cloud. With a lot of reverse engineering the Hoymiles protocol was
+decrypted and analyzed.
 
-Summer 2022 I bought my Victron MPPT battery charger, and didn't like the idea to set up a separate esp32 to recieve the charger data. I decided to fork OpenDTU and extend it with battery charger support and a dynamic power limitter to my own needs. Hoping someone can make use of it.
-
-## Highlights of OpenDTU-OnBattery
-
-This project is still under development and adds following features:
-
-* Support Victron's Ve.Direct protocol on the same chip (cable based serial interface!). Additional information about Ve.direct can be downloaded directly from [Victron's website](https://www.victronenergy.com/support-and-downloads/technical-information).
-* Dynamically sets the Hoymiles power limited according to the currently used energy in the household. Needs an HTTP JSON based power meter (e.g. Tasmota), an MQTT based power meter like Shelly 3EM or an SDM power meter.
-* Battery support: Read the voltage from Victron MPPT charge controller or from the Hoymiles DC inputs and starts/stops the power producing based on configurable voltage thresholds
-* Voltage correction that takes the voltage drop because of the current output load into account (not 100% reliable calculation)
-* Can read the current solar panel power from the Victron MPPT and adjust the limiter accordingly to not save energy in the battery (for increased system efficiency). Increases the battery lifespan and reduces energy loses.
-* Settings can be configured in the UI
-* Pylontech Battery support (via CAN bus interface). Use the SOC for starting/stopping the power output and provide the battery data via MQTT (autodiscovery for home assistant is currently not supported). Pin Mapping is supported (default RX PIN 27, TX PIN 26). Actual no live view support for Pylontech Battery.
-* Huawei R4850G2 power supply unit that can act as AC charger. Supports status shown on the web interface and options to set voltage and current limits on the web interface and via MQTT. Connection is done using CAN bus (needs to be separate from Pylontech CAN bus) via SN65HVD230 interface.
-  
-## Documentation
-
-Documentation of OpenDTU-OnBattery extensions can be found in [the project's wiki](https://github.com/helgeerbe/OpenDTU-OnBattery/wiki).
-
-For documentation of OpenDTU core functionality refer to the original [repo](https://github.com/tbnobody/OpenDTU) and its [documentation](https://opendtu.solar).
-
-Please note that OpenDTU-OnBattery may change significantly during its development.
-Bug reports, comments, feature requests and fixes are most welcome!
-
-To find out what's new or improved have a look at the [changelog](https://github.com/helgeerbe/OpenDTU-OnBattery/releases).
+In the summer of 2022 @helgeerbe bought a Victron MPPT charge cntroller, and
+didn't like the idea to set up a separate ESP32 to receive the charger's data.
+He decided to fork OpenDTU and extend it with battery charger support and a
+Dynamic Power Limiter.
 
 ## Acknowledgment
 
 A special Thank to Thomas Basler (tbnobody) the author of the original [OpenDTU](https://github.com/tbnobody/OpenDTU) project. You are doing a great job!
 
-Last but not least, I would like to thank all the contributors. With your ideas and enhancements, you have made OpenDTU-OnBattery much more than I originally had in mind.
+@helgeerbe: Last but not least, I would like to thank all the contributors.
+With your ideas and enhancements, you have made OpenDTU-OnBattery much more
+than I originally had in mind.

@@ -1,3 +1,3 @@
-# Display integration
+# Moved
 
-This documentation will has been moved and can be found here: <https://tbnobody.github.io/OpenDTU-docs/hardware/display/>
+Have a look at the [OpenDTU-OnBattery documentation](https://opendtu-onbattery.net/hardware/display/).
