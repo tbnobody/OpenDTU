@@ -1,12 +1,12 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * Copyright (C) 2022 - 2023 Thomas Basler and others
+ * Copyright (C) 2022 - 2024 Thomas Basler and others
  */
+
 #include "Utils.h"
 #include "Display_Graphic.h"
 #include "Led_Single.h"
 #include "MessageOutput.h"
-#include "PinMapping.h"
 #include <Esp.h>
 #include <LittleFS.h>
 
@@ -92,3 +92,158 @@ void Utils::removeAllFiles()
         file = root.getNextFileName();
     }
 }
+
+/* OpenDTU-OnBatter-specific utils go here: */
+template<typename T>
+std::optional<T> getFromString(char const* val);
+
+template<>
+std::optional<float> getFromString(char const* val)
+{
+    float res = 0;
+
+    try {
+        res = std::stof(val);
+    }
+    catch (std::invalid_argument const& e) {
+        return std::nullopt;
+    }
+
+    return res;
+}
+
+template<typename T>
+char const* getTypename();
+
+template<>
+char const* getTypename<float>() { return "float"; }
+
+template<typename T>
+std::pair<T, String> Utils::getJsonValueByPath(JsonDocument const& root, String const& path)
+{
+    size_t constexpr kErrBufferSize = 256;
+    char errBuffer[kErrBufferSize];
+    constexpr char delimiter = '/';
+    int start = 0;
+    int end = path.indexOf(delimiter);
+    auto value = root.as<JsonVariantConst>();
+
+    // NOTE: "Because ArduinoJson implements the Null Object Pattern, it is
+    // always safe to read the object: if the key doesn't exist, it returns an
+    // empty value."
+    auto getNext = [&](String const& key) -> bool {
+        // handle double forward slashes and paths starting or ending with a slash
+        if (key.isEmpty()) { return true; }
+
+        if (key[0] == '[' && key[key.length() - 1] == ']') {
+            if (!value.is<JsonArrayConst>()) {
+                snprintf(errBuffer, kErrBufferSize, "Cannot access non-array "
+                        "JSON node using array index '%s' (JSON path '%s', "
+                        "position %i)", key.c_str(), path.c_str(), start);
+                return false;
+            }
+
+            auto idx = key.substring(1, key.length() - 1).toInt();
+            value = value[idx];
+
+            if (value.isNull()) {
+                snprintf(errBuffer, kErrBufferSize, "Unable to access JSON "
+                        "array index %li (JSON path '%s', position %i)",
+                        idx, path.c_str(), start);
+                return false;
+            }
+
+            return true;
+        }
+
+        value = value[key];
+
+        if (value.isNull()) {
+            snprintf(errBuffer, kErrBufferSize, "Unable to access JSON key "
+                    "'%s' (JSON path '%s', position %i)",
+                    key.c_str(), path.c_str(), start);
+            return false;
+        }
+
+        return true;
+    };
+
+    while (end != -1) {
+        if (!getNext(path.substring(start, end))) {
+              return { T(), String(errBuffer) };
+        }
+        start = end + 1;
+        end = path.indexOf(delimiter, start);
+    }
+
+    if (!getNext(path.substring(start))) {
+        return { T(), String(errBuffer) };
+    }
+
+    if (value.is<T>()) {
+        return { value.as<T>(), "" };
+    }
+
+    if (!value.is<char const*>()) {
+        snprintf(errBuffer, kErrBufferSize, "Value '%s' at JSON path '%s' is "
+                "neither a string nor of type %s", value.as<String>().c_str(),
+                path.c_str(), getTypename<T>());
+        return { T(), String(errBuffer) };
+    }
+
+    auto res = getFromString<T>(value.as<char const*>());
+    if (!res.has_value()) {
+        snprintf(errBuffer, kErrBufferSize, "String '%s' at JSON path '%s' cannot "
+                "be converted to %s", value.as<String>().c_str(), path.c_str(),
+                getTypename<T>());
+        return { T(), String(errBuffer) };
+    }
+
+    return { *res, "" };
+}
+
+template std::pair<float, String> Utils::getJsonValueByPath(JsonDocument const& root, String const& path);
+
+template <typename T>
+std::optional<T> Utils::getNumericValueFromMqttPayload(char const* client,
+        std::string const& src, char const* topic, char const* jsonPath)
+{
+    std::string logValue = src.substr(0, 32);
+    if (src.length() > logValue.length()) { logValue += "..."; }
+
+    auto log = [client,topic](char const* format, auto&&... args) -> std::optional<T> {
+        MessageOutput.printf("[%s] Topic '%s': ", client, topic);
+        MessageOutput.printf(format, args...);
+        MessageOutput.println();
+        return std::nullopt;
+    };
+
+    if (strlen(jsonPath) == 0) {
+        auto res = getFromString<T>(src.c_str());
+        if (!res.has_value()) {
+            return log("cannot parse payload '%s' as float", logValue.c_str());
+        }
+        return res;
+    }
+
+    JsonDocument json;
+
+    const DeserializationError error = deserializeJson(json, src);
+    if (error) {
+        return log("cannot parse payload '%s' as JSON", logValue.c_str());
+    }
+
+    if (json.overflowed()) {
+        return log("payload too large to process as JSON");
+    }
+
+    auto pathResolutionResult = getJsonValueByPath<T>(json, jsonPath);
+    if (!pathResolutionResult.second.isEmpty()) {
+        return log("%s", pathResolutionResult.second.c_str());
+    }
+
+    return pathResolutionResult.first;
+}
+
+template std::optional<float> Utils::getNumericValueFromMqttPayload(char const* client,
+        std::string const& src, char const* topic, char const* jsonPath);

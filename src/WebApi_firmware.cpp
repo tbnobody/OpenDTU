@@ -9,6 +9,7 @@
 #include "WebApi.h"
 #include "helper.h"
 #include <AsyncJson.h>
+#include "esp_partition.h"
 
 void WebApiFirmwareClass::init(AsyncWebServer& server, Scheduler& scheduler)
 {
@@ -22,6 +23,15 @@ void WebApiFirmwareClass::init(AsyncWebServer& server, Scheduler& scheduler)
     server.on("/api/firmware/update", HTTP_POST,
         std::bind(&WebApiFirmwareClass::onFirmwareUpdateFinish, this, _1),
         std::bind(&WebApiFirmwareClass::onFirmwareUpdateUpload, this, _1, _2, _3, _4, _5, _6));
+
+    server.on("/api/firmware/status", HTTP_GET, std::bind(&WebApiFirmwareClass::onFirmwareStatus, this, _1));
+}
+
+bool WebApiFirmwareClass::otaSupported() const
+{
+    const esp_partition_t* pOtaPartition = esp_partition_find_first(
+        ESP_PARTITION_TYPE_APP, ESP_PARTITION_SUBTYPE_APP_OTA_1, NULL);
+    return (pOtaPartition != nullptr);
 }
 
 void WebApiFirmwareClass::onFirmwareUpdateFinish(AsyncWebServerRequest* request)
@@ -44,6 +54,10 @@ void WebApiFirmwareClass::onFirmwareUpdateUpload(AsyncWebServerRequest* request,
 {
     if (!WebApi.checkCredentials(request)) {
         return;
+    }
+
+    if (!otaSupported()) {
+        return request->send(500, "text/plain", "OTA updates not supported");
     }
 
     // Upload handler chunks in data
@@ -77,4 +91,18 @@ void WebApiFirmwareClass::onFirmwareUpdateUpload(AsyncWebServerRequest* request,
     } else {
         return;
     }
+}
+
+void WebApiFirmwareClass::onFirmwareStatus(AsyncWebServerRequest* request)
+{
+    if (!WebApi.checkCredentialsReadonly(request)) {
+        return;
+    }
+
+    AsyncJsonResponse* response = new AsyncJsonResponse();
+    auto& root = response->getRoot();
+
+    root["ota_supported"] = otaSupported();
+
+    WebApi.sendJsonResponse(request, response, __FUNCTION__, __LINE__);
 }

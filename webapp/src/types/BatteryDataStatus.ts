@@ -1,9 +1,15 @@
 import type { ValueObject } from '@/types/LiveDataStatus';
 
-type BatteryData = (ValueObject | string)[];
+export interface StringValue {
+    value: string;
+    translate: boolean;
+}
+
+type BatteryData = (ValueObject | StringValue)[];
 
 export interface Battery {
     manufacturer: string;
+    serial: string;
     fwversion: string;
     hwversion: string;
     data_age: number;

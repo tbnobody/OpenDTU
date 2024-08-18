@@ -73,8 +73,8 @@ void MqttHandleHassClass::publishConfig()
         publishInverterButton(inv, "Turn Inverter On", "mdi:power-plug", "config", "", "cmd/power", "1");
         publishInverterButton(inv, "Restart Inverter", "", "config", "restart", "cmd/restart", "1");
 
-        publishInverterNumber(inv, "Limit NonPersistent Relative", "mdi:speedometer", "config", "cmd/limit_nonpersistent_relative", "status/limit_relative", "%", 0, 100);
-        publishInverterNumber(inv, "Limit Persistent Relative", "mdi:speedometer", "config", "cmd/limit_persistent_relative", "status/limit_relative", "%", 0, 100);
+        publishInverterNumber(inv, "Limit NonPersistent Relative", "mdi:speedometer", "config", "cmd/limit_nonpersistent_relative", "status/limit_relative", "%", 0, 100, 0.1);
+        publishInverterNumber(inv, "Limit Persistent Relative", "mdi:speedometer", "config", "cmd/limit_persistent_relative", "status/limit_relative", "%", 0, 100, 0.1);
 
         publishInverterNumber(inv, "Limit NonPersistent Absolute", "mdi:speedometer", "config", "cmd/limit_nonpersistent_absolute", "status/limit_absolute", "W", 0, MAX_INVERTER_LIMIT);
         publishInverterNumber(inv, "Limit Persistent Absolute", "mdi:speedometer", "config", "cmd/limit_persistent_absolute", "status/limit_absolute", "W", 0, MAX_INVERTER_LIMIT);
@@ -215,7 +215,7 @@ void MqttHandleHassClass::publishInverterButton(std::shared_ptr<InverterAbstract
 void MqttHandleHassClass::publishInverterNumber(
     std::shared_ptr<InverterAbstract> inv, const char* caption, const char* icon, const char* category,
     const char* commandTopic, const char* stateTopic, const char* unitOfMeasure,
-    const int16_t min, const int16_t max)
+    const int16_t min, const int16_t max, float step)
 {
     const String serial = inv->serialString();
 
@@ -243,6 +243,7 @@ void MqttHandleHassClass::publishInverterNumber(
     root["unit_of_meas"] = unitOfMeasure;
     root["min"] = min;
     root["max"] = max;
+    root["step"] = step;
 
     createInverterInfo(root, inv);
 

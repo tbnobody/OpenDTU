@@ -56,6 +56,9 @@ public:
     void publishConfig();
     void forceUpdate();
 
+    static String getDtuUniqueId();
+    static String getDtuUrl();
+
 private:
     void loop();
     void publish(const String& subtopic, const String& payload);
@@ -63,16 +66,13 @@ private:
     void publishDtuBinarySensor(const char* name, const char* device_class, const char* category, const char* payload_on, const char* payload_off, const char* subTopic = "");
     void publishInverterField(std::shared_ptr<InverterAbstract> inv, const ChannelType_t type, const ChannelNum_t channel, const byteAssign_fieldDeviceClass_t fieldType, const bool clear = false);
     void publishInverterButton(std::shared_ptr<InverterAbstract> inv, const char* caption, const char* icon, const char* category, const char* deviceClass, const char* subTopic, const char* payload);
-    void publishInverterNumber(std::shared_ptr<InverterAbstract> inv, const char* caption, const char* icon, const char* category, const char* commandTopic, const char* stateTopic, const char* unitOfMeasure, const int16_t min = 1, const int16_t max = 100);
+    void publishInverterNumber(std::shared_ptr<InverterAbstract> inv, const char* caption, const char* icon, const char* category, const char* commandTopic, const char* stateTopic, const char* unitOfMeasure, const int16_t min = 1, const int16_t max = 100, float step = 1.0);
     void publishInverterBinarySensor(std::shared_ptr<InverterAbstract> inv, const char* caption, const char* subTopic, const char* payload_on, const char* payload_off);
 
     static void createInverterInfo(JsonDocument& doc, std::shared_ptr<InverterAbstract> inv);
     static void createDtuInfo(JsonDocument& doc);
 
     static void createDeviceInfo(JsonDocument& doc, const String& name, const String& identifiers, const String& configuration_url, const String& manufacturer, const String& model, const String& sw_version, const String& via_device = "");
-
-    static String getDtuUniqueId();
-    static String getDtuUrl();
 
     Task _loopTask;
 

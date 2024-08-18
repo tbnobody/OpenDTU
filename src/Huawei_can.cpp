@@ -371,12 +371,12 @@ void HuaweiCanClass::loop()
         }
     }
 
-    if (PowerMeter.getLastPowerMeterUpdate() > _lastPowerMeterUpdateReceivedMillis &&
+    if (PowerMeter.getLastUpdate() > _lastPowerMeterUpdateReceivedMillis &&
         _autoPowerEnabledCounter > 0) {
         // We have received a new PowerMeter value. Also we're _autoPowerEnabled
         // So we're good to calculate a new limit
 
-      _lastPowerMeterUpdateReceivedMillis = PowerMeter.getLastPowerMeterUpdate();
+      _lastPowerMeterUpdateReceivedMillis = PowerMeter.getLastUpdate();
 
       // Calculate new power limit
       float newPowerLimit = -1 * round(PowerMeter.getPowerTotal());

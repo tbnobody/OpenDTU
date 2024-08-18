@@ -80,7 +80,7 @@ void pushListBuffer(unsigned char byte)
 
 void reduceList()
 {
-  if (currentLevel <= MAX_TREE_SIZE && nodes[currentLevel] > 0)
+  if (currentLevel < MAX_TREE_SIZE && nodes[currentLevel] > 0)
     nodes[currentLevel]--;
 }
 
@@ -171,7 +171,7 @@ void checkMagicByte(unsigned char &byte)
       // Datatype Octet String
       setState(SML_HDATA, (byte & 0x0F) << 4);
     }
-    else if (byte >= 0xF0 /*&& byte <= 0xFF*/) {
+    else if (byte >= 0xF0) {
       /* Datatype List of ...*/
       setState(SML_LISTEXTENDED, (byte & 0x0F) << 4);
     }
@@ -189,7 +189,13 @@ void checkMagicByte(unsigned char &byte)
   }
 }
 
-sml_states_t smlState(unsigned char &currentByte)
+void smlReset(void)
+{
+  len = 4; // expect start sequence
+  currentState = SML_START;
+}
+
+sml_states_t smlState(unsigned char currentByte)
 {
   unsigned char size;
   if (len > 0)
@@ -317,7 +323,7 @@ void smlOBISManufacturer(unsigned char *str, int maxSize)
   }
 }
 
-void smlPow(double &val, signed char &scaler)
+void smlPow(float &val, signed char &scaler)
 {
   if (scaler < 0) {
     while (scaler++) {
@@ -372,7 +378,7 @@ void smlOBISByUnit(long long int &val, signed char &scaler, sml_units_t unit)
   }
 }
 
-void smlOBISWh(double &wh)
+void smlOBISWh(float &wh)
 {
   long long int val;
   smlOBISByUnit(val, sc, SML_WATT_HOUR);
@@ -380,7 +386,7 @@ void smlOBISWh(double &wh)
   smlPow(wh, sc);
 }
 
-void smlOBISW(double &w)
+void smlOBISW(float &w)
 {
   long long int val;
   smlOBISByUnit(val, sc, SML_WATT);
@@ -388,7 +394,7 @@ void smlOBISW(double &w)
   smlPow(w, sc);
 }
 
-void smlOBISVolt(double &v)
+void smlOBISVolt(float &v)
 {
   long long int val;
   smlOBISByUnit(val, sc, SML_VOLT);
@@ -396,10 +402,26 @@ void smlOBISVolt(double &v)
   smlPow(v, sc);
 }
 
-void smlOBISAmpere(double &a)
+void smlOBISAmpere(float &a)
 {
   long long int val;
   smlOBISByUnit(val, sc, SML_AMPERE);
   a = val;
   smlPow(a, sc);
+}
+
+void smlOBISHertz(float &h)
+{
+  long long int val;
+  smlOBISByUnit(val, sc, SML_HERTZ);
+  h = val;
+  smlPow(h, sc);
+}
+
+void smlOBISDegree(float &d)
+{
+  long long int val;
+  smlOBISByUnit(val, sc, SML_DEGREE);
+  d = val;
+  smlPow(d, sc);
 }

@@ -19,9 +19,10 @@ private:
     String _voltageTopic;
     std::shared_ptr<MqttBatteryStats> _stats = std::make_shared<MqttBatteryStats>();
 
-    std::optional<float> getFloat(std::string const& src, char const* topic);
     void onMqttMessageSoC(espMqttClientTypes::MessageProperties const& properties,
-                          char const* topic, uint8_t const* payload, size_t len, size_t index, size_t total);
+            char const* topic, uint8_t const* payload, size_t len, size_t index, size_t total,
+            char const* jsonPath);
     void onMqttMessageVoltage(espMqttClientTypes::MessageProperties const& properties,
-                              char const* topic, uint8_t const* payload, size_t len, size_t index, size_t total);
+            char const* topic, uint8_t const* payload, size_t len, size_t index, size_t total,
+            char const* jsonPath);
 };

@@ -1,22 +1,42 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * Copyright (C) 2022-2023 Thomas Basler and others
+ * Copyright (C) 2022-2024 Thomas Basler and others
  */
+
+/*
+This parser is used to parse the response of 'AlarmDataCommand'.
+
+Data structure:
+* wcode:
+  * right 8 bit: Event ID
+  * bit 13: Start time = PM (12h has to be added to start time)
+  * bit 12: End time = PM (12h has to be added to start time)
+* Start: 12h based start time of the event (PM indicator in wcode)
+* End: 12h based start time of the event (PM indicator in wcode)
+
+00   01 02 03 04   05 06 07 08   09   10 11   12 13   14 15   16 17   18 19   20   21   22   23   24 25   26   27 28 29 30 31
+                                              00 01   02 03   04 05   06 07   08   09   10   11
+                                              |<-------------- First log entry -------------->|   |<->|
+-----------------------------------------------------------------------------------------------------------------------------
+95   80 14 82 66   80 14 33 28   01   00 01   80 01   00 01   91 EA   91 EA   00   00   00   00   00 8F   65   -- -- -- -- --
+^^   ^^^^^^^^^^^   ^^^^^^^^^^^   ^^   ^^^^^   ^^^^^           ^^^^^   ^^^^^   ^^   ^^   ^^   ^^   ^^^^^   ^^
+ID   Source Addr   Target Addr   Idx  ?       wcode   ?       Start   End     ?    ?    ?    ?    wcode   CRC8
+*/
 #include "AlarmLogParser.h"
 #include "../Hoymiles.h"
 #include <cstring>
 
 const std::array<const AlarmMessage_t, ALARM_MSG_COUNT> AlarmLogParser::_alarmMessages = { {
     { AlarmMessageType_t::ALL, 1, "Inverter start", "Wechselrichter gestartet", "L'onduleur a démarré" },
-    { AlarmMessageType_t::ALL, 2, "Time calibration", "", "" },
+    { AlarmMessageType_t::ALL, 2, "Time calibration", "Zeitabgleich", "" },
     { AlarmMessageType_t::ALL, 3, "EEPROM reading and writing error during operation", "", "" },
     { AlarmMessageType_t::ALL, 4, "Offline", "Offline", "Non connecté" },
 
-    { AlarmMessageType_t::ALL, 11, "Grid voltage surge", "", "" },
-    { AlarmMessageType_t::ALL, 12, "Grid voltage sharp drop", "", "" },
-    { AlarmMessageType_t::ALL, 13, "Grid frequency mutation", "", "" },
-    { AlarmMessageType_t::ALL, 14, "Grid phase mutation", "", "" },
-    { AlarmMessageType_t::ALL, 15, "Grid transient fluctuation", "", "" },
+    { AlarmMessageType_t::ALL, 11, "Grid voltage surge", "Netz: Überspannungsimpuls", "" },
+    { AlarmMessageType_t::ALL, 12, "Grid voltage sharp drop", "Netz: Spannungseinbruch", "" },
+    { AlarmMessageType_t::ALL, 13, "Grid frequency mutation", "Netz: Frequenzänderung", "" },
+    { AlarmMessageType_t::ALL, 14, "Grid phase mutation", "Netz: Phasenänderung", "" },
+    { AlarmMessageType_t::ALL, 15, "Grid transient fluctuation", "Netz: vorübergehende Schwankung", "" },
 
     { AlarmMessageType_t::ALL, 36, "INV overvoltage or overcurrent", "", "" },
 

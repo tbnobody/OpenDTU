@@ -1,8 +1,7 @@
 <template>
     <BootstrapAlert :show="!devInfoList.valid_data">
-        <h4 class="alert-heading">
-            <BIconInfoSquare class="fs-2" />&nbsp;{{ $t('devinfo.NoInfo') }}
-        </h4>{{ $t('devinfo.NoInfoLong') }}
+        <h4 class="alert-heading"><BIconInfoSquare class="fs-2" />&nbsp;{{ $t('devinfo.NoInfo') }}</h4>
+        {{ $t('devinfo.NoInfoLong') }}
     </BootstrapAlert>
     <table v-if="devInfoList.valid_data" class="table table-hover">
         <tbody>
@@ -53,7 +52,7 @@
 
 <script lang="ts">
 import BootstrapAlert from '@/components/BootstrapAlert.vue';
-import type { DevInfoStatus } from "@/types/DevInfoStatus";
+import type { DevInfoStatus } from '@/types/DevInfoStatus';
 import { BIconInfoSquare } from 'bootstrap-icons-vue';
 import { defineComponent, type PropType } from 'vue';
 
@@ -70,20 +69,20 @@ export default defineComponent({
             return (value: number) => {
                 const version_major = Math.floor(value / 10000);
                 const version_minor = Math.floor((value - version_major * 10000) / 100);
-                const version_patch = Math.floor((value - version_major * 10000 - version_minor * 100));
-                return version_major + "." + version_minor + "." + version_patch;
+                const version_patch = Math.floor(value - version_major * 10000 - version_minor * 100);
+                return version_major + '.' + version_minor + '.' + version_patch;
             };
         },
         productionYear() {
-            return() => {
-                return ((parseInt(this.devInfoList.serial, 16) >> (7 * 4)) & 0xF) + 2014;
-            }
+            return () => {
+                return ((parseInt(this.devInfoList.serial, 16) >> (7 * 4)) & 0xf) + 2014;
+            };
         },
         productionWeek() {
-            return() => {
-                return ((parseInt(this.devInfoList.serial, 16) >> (5 * 4)) & 0xFF).toString(16);
-            }
-        }
-    }
+            return () => {
+                return ((parseInt(this.devInfoList.serial, 16) >> (5 * 4)) & 0xff).toString(16);
+            };
+        },
+    },
 });
 </script>

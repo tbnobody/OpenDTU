@@ -22,9 +22,9 @@ public:
     }
 
     template <typename T>
-    std::shared_ptr<T> prepareCommand()
+    std::shared_ptr<T> prepareCommand(InverterAbstract* inv)
     {
-        return std::make_shared<T>();
+        return std::make_shared<T>(inv);
     }
 
 protected:

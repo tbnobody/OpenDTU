@@ -3,6 +3,7 @@
 
 #include "PinMapping.h"
 #include <cstdint>
+#include <ArduinoJson.h>
 
 #define CONFIG_FILENAME "/config.json"
 #define CONFIG_VERSION 0x00011c00 // 0.1.28 // make sure to clean all after change
@@ -16,6 +17,7 @@
 #define NTP_MAX_TIMEZONEDESCR_STRLEN 50
 
 #define MQTT_MAX_HOSTNAME_STRLEN 128
+#define MQTT_MAX_CLIENTID_STRLEN 64
 #define MQTT_MAX_USERNAME_STRLEN 64
 #define MQTT_MAX_PASSWORD_STRLEN 64
 #define MQTT_MAX_TOPIC_STRLEN 256
@@ -30,14 +32,16 @@
 
 #define DEV_MAX_MAPPING_NAME_STRLEN 63
 
-#define POWERMETER_MAX_PHASES 3
-#define POWERMETER_MAX_HTTP_URL_STRLEN 1024
-#define POWERMETER_MAX_USERNAME_STRLEN 64
-#define POWERMETER_MAX_PASSWORD_STRLEN 64
-#define POWERMETER_MAX_HTTP_HEADER_KEY_STRLEN 64
-#define POWERMETER_MAX_HTTP_HEADER_VALUE_STRLEN 256
-#define POWERMETER_MAX_HTTP_JSON_PATH_STRLEN 256
-#define POWERMETER_HTTP_TIMEOUT 1000
+#define HTTP_REQUEST_MAX_URL_STRLEN 1024
+#define HTTP_REQUEST_MAX_USERNAME_STRLEN 64
+#define HTTP_REQUEST_MAX_PASSWORD_STRLEN 64
+#define HTTP_REQUEST_MAX_HEADER_KEY_STRLEN 64
+#define HTTP_REQUEST_MAX_HEADER_VALUE_STRLEN 256
+
+#define POWERMETER_MQTT_MAX_VALUES 3
+#define POWERMETER_HTTP_JSON_MAX_VALUES 3
+#define POWERMETER_HTTP_JSON_MAX_PATH_STRLEN 256
+#define BATTERY_JSON_MAX_PATH_STRLEN 128
 
 struct CHANNEL_CONFIG_T {
     uint16_t MaxChannelPower;
@@ -56,26 +60,73 @@ struct INVERTER_CONFIG_T {
     uint8_t ReachableThreshold;
     bool ZeroRuntimeDataIfUnrechable;
     bool ZeroYieldDayOnMidnight;
+    bool ClearEventlogOnMidnight;
     bool YieldDayCorrection;
     CHANNEL_CONFIG_T channel[INV_MAX_CHAN_COUNT];
 };
 
-struct POWERMETER_HTTP_PHASE_CONFIG_T {
+struct HTTP_REQUEST_CONFIG_T {
+    char Url[HTTP_REQUEST_MAX_URL_STRLEN + 1];
+
     enum Auth { None, Basic, Digest };
-    enum Unit { Watts = 0, MilliWatts = 1, KiloWatts = 2 };
-    bool Enabled;
-    char Url[POWERMETER_MAX_HTTP_URL_STRLEN + 1];
     Auth AuthType;
-    char Username[POWERMETER_MAX_USERNAME_STRLEN +1];
-    char Password[POWERMETER_MAX_USERNAME_STRLEN +1];
-    char HeaderKey[POWERMETER_MAX_HTTP_HEADER_KEY_STRLEN + 1];
-    char HeaderValue[POWERMETER_MAX_HTTP_HEADER_VALUE_STRLEN + 1];
+
+    char Username[HTTP_REQUEST_MAX_USERNAME_STRLEN + 1];
+    char Password[HTTP_REQUEST_MAX_PASSWORD_STRLEN + 1];
+    char HeaderKey[HTTP_REQUEST_MAX_HEADER_KEY_STRLEN + 1];
+    char HeaderValue[HTTP_REQUEST_MAX_HEADER_VALUE_STRLEN + 1];
     uint16_t Timeout;
-    char JsonPath[POWERMETER_MAX_HTTP_JSON_PATH_STRLEN + 1];
+};
+using HttpRequestConfig = struct HTTP_REQUEST_CONFIG_T;
+
+struct POWERMETER_MQTT_VALUE_T {
+    char Topic[MQTT_MAX_TOPIC_STRLEN + 1];
+    char JsonPath[POWERMETER_HTTP_JSON_MAX_PATH_STRLEN + 1];
+
+    enum Unit { Watts = 0, MilliWatts = 1, KiloWatts = 2 };
     Unit PowerUnit;
+
     bool SignInverted;
 };
-using PowerMeterHttpConfig = struct POWERMETER_HTTP_PHASE_CONFIG_T;
+using PowerMeterMqttValue = struct POWERMETER_MQTT_VALUE_T;
+
+struct POWERMETER_MQTT_CONFIG_T {
+    PowerMeterMqttValue Values[POWERMETER_MQTT_MAX_VALUES];
+};
+using PowerMeterMqttConfig = struct POWERMETER_MQTT_CONFIG_T;
+
+struct POWERMETER_SERIAL_SDM_CONFIG_T {
+    uint32_t Address;
+    uint32_t PollingInterval;
+};
+using PowerMeterSerialSdmConfig = struct POWERMETER_SERIAL_SDM_CONFIG_T;
+
+struct POWERMETER_HTTP_JSON_VALUE_T {
+    HttpRequestConfig HttpRequest;
+    bool Enabled;
+    char JsonPath[POWERMETER_HTTP_JSON_MAX_PATH_STRLEN + 1];
+
+    enum Unit { Watts = 0, MilliWatts = 1, KiloWatts = 2 };
+    Unit PowerUnit;
+
+    bool SignInverted;
+};
+using PowerMeterHttpJsonValue = struct POWERMETER_HTTP_JSON_VALUE_T;
+
+struct POWERMETER_HTTP_JSON_CONFIG_T {
+    uint32_t PollingInterval;
+    bool IndividualRequests;
+    PowerMeterHttpJsonValue Values[POWERMETER_HTTP_JSON_MAX_VALUES];
+};
+using PowerMeterHttpJsonConfig = struct POWERMETER_HTTP_JSON_CONFIG_T;
+
+struct POWERMETER_HTTP_SML_CONFIG_T {
+    uint32_t PollingInterval;
+    HttpRequestConfig HttpRequest;
+};
+using PowerMeterHttpSmlConfig = struct POWERMETER_HTTP_SML_CONFIG_T;
+
+enum BatteryVoltageUnit { Volts = 0, DeciVolts = 1, CentiVolts = 2, MilliVolts = 3 };
 
 struct CONFIG_T {
     struct {
@@ -114,6 +165,7 @@ struct CONFIG_T {
         char Hostname[MQTT_MAX_HOSTNAME_STRLEN + 1];
         bool VerboseLogging;
         uint32_t Port;
+        char ClientId[MQTT_MAX_CLIENTID_STRLEN + 1];
         char Username[MQTT_MAX_USERNAME_STRLEN + 1];
         char Password[MQTT_MAX_PASSWORD_STRLEN + 1];
         char Topic[MQTT_MAX_TOPIC_STRLEN + 1];
@@ -186,19 +238,14 @@ struct CONFIG_T {
         bool UpdatesOnly;
     } Vedirect;
 
-    struct {
+    struct PowerMeterConfig {
         bool Enabled;
         bool VerboseLogging;
-        uint32_t Interval;
         uint32_t Source;
-        char MqttTopicPowerMeter1[MQTT_MAX_TOPIC_STRLEN + 1];
-        char MqttTopicPowerMeter2[MQTT_MAX_TOPIC_STRLEN + 1];
-        char MqttTopicPowerMeter3[MQTT_MAX_TOPIC_STRLEN + 1];
-        uint32_t SdmBaudrate;
-        uint32_t SdmAddress;
-        uint32_t HttpInterval;
-        bool HttpIndividualRequests;
-        PowerMeterHttpConfig Http_Phase[POWERMETER_MAX_PHASES];
+        PowerMeterMqttConfig Mqtt;
+        PowerMeterSerialSdmConfig SerialSdm;
+        PowerMeterHttpJsonConfig HttpJson;
+        PowerMeterHttpSmlConfig HttpSml;
     } PowerMeter;
 
     struct {
@@ -210,6 +257,7 @@ struct CONFIG_T {
         uint32_t Interval;
         bool IsInverterBehindPowerMeter;
         bool IsInverterSolarPowered;
+        bool UseOverscalingToCompensateShading;
         uint64_t InverterId;
         uint8_t InverterChannelId;
         int32_t TargetPowerConsumption;
@@ -236,7 +284,10 @@ struct CONFIG_T {
         uint8_t JkBmsInterface;
         uint8_t JkBmsPollingInterval;
         char MqttSocTopic[MQTT_MAX_TOPIC_STRLEN + 1];
+        char MqttSocJsonPath[BATTERY_JSON_MAX_PATH_STRLEN + 1];
         char MqttVoltageTopic[MQTT_MAX_TOPIC_STRLEN + 1];
+        char MqttVoltageJsonPath[BATTERY_JSON_MAX_PATH_STRLEN + 1];
+        BatteryVoltageUnit MqttVoltageUnit;
     } Battery;
 
     struct {
@@ -270,6 +321,18 @@ public:
     INVERTER_CONFIG_T* getFreeInverterSlot();
     INVERTER_CONFIG_T* getInverterConfig(const uint64_t serial);
     void deleteInverterById(const uint8_t id);
+
+    static void serializeHttpRequestConfig(HttpRequestConfig const& source, JsonObject& target);
+    static void serializePowerMeterMqttConfig(PowerMeterMqttConfig const& source, JsonObject& target);
+    static void serializePowerMeterSerialSdmConfig(PowerMeterSerialSdmConfig const& source, JsonObject& target);
+    static void serializePowerMeterHttpJsonConfig(PowerMeterHttpJsonConfig const& source, JsonObject& target);
+    static void serializePowerMeterHttpSmlConfig(PowerMeterHttpSmlConfig const& source, JsonObject& target);
+
+    static void deserializeHttpRequestConfig(JsonObject const& source, HttpRequestConfig& target);
+    static void deserializePowerMeterMqttConfig(JsonObject const& source, PowerMeterMqttConfig& target);
+    static void deserializePowerMeterSerialSdmConfig(JsonObject const& source, PowerMeterSerialSdmConfig& target);
+    static void deserializePowerMeterHttpJsonConfig(JsonObject const& source, PowerMeterHttpJsonConfig& target);
+    static void deserializePowerMeterHttpSmlConfig(JsonObject const& source, PowerMeterHttpSmlConfig& target);
 };
 
 extern ConfigurationClass Configuration;

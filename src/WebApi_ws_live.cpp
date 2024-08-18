@@ -92,18 +92,32 @@ void WebApiWsLiveClass::generateOnBatteryJsonResponse(JsonVariant& root, bool al
         batteryObj["enabled"] = config.Battery.Enabled;
 
         if (config.Battery.Enabled) {
-            addTotalField(batteryObj, "soc", spStats->getSoC(), "%", 0);
+            if (spStats->isSoCValid()) {
+                addTotalField(batteryObj, "soc", spStats->getSoC(), "%", spStats->getSoCPrecision());
+            }
+
+            if (spStats->isVoltageValid()) {
+                addTotalField(batteryObj, "voltage", spStats->getVoltage(), "V", 2);
+            }
+
+            if (spStats->isCurrentValid()) {
+                addTotalField(batteryObj, "current", spStats->getChargeCurrent(), "A", spStats->getChargeCurrentPrecision());
+            }
+
+            if (spStats->isVoltageValid() && spStats->isCurrentValid()) {
+                addTotalField(batteryObj, "power", spStats->getVoltage() * spStats->getChargeCurrent(), "W", 1);
+            }
         }
 
         if (!all) { _lastPublishBattery = millis(); }
     }
 
-    if (all || (PowerMeter.getLastPowerMeterUpdate() - _lastPublishPowerMeter) < halfOfAllMillis) {
+    if (all || (PowerMeter.getLastUpdate() - _lastPublishPowerMeter) < halfOfAllMillis) {
         auto powerMeterObj = root["power_meter"].to<JsonObject>();
         powerMeterObj["enabled"] = config.PowerMeter.Enabled;
 
         if (config.PowerMeter.Enabled) {
-            addTotalField(powerMeterObj, "Power", PowerMeter.getPowerTotal(false), "W", 1);
+            addTotalField(powerMeterObj, "Power", PowerMeter.getPowerTotal(), "W", 1);
         }
 
         if (!all) { _lastPublishPowerMeter = millis(); }
@@ -332,9 +346,7 @@ void WebApiWsLiveClass::onLivedataStatus(AsyncWebServerRequest* request)
 
         generateOnBatteryJsonResponse(root, true);
 
-        generateOnBatteryJsonResponse(root, true);
-
-    WebApi.sendJsonResponse(request, response, __FUNCTION__, __LINE__);
+        WebApi.sendJsonResponse(request, response, __FUNCTION__, __LINE__);
     
     } catch (const std::bad_alloc& bad_alloc) {
         MessageOutput.printf("Calling /api/livedata/status has temporarily run out of resources. Reason: \"%s\".\r\n", bad_alloc.what());

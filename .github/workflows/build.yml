@@ -1,4 +1,4 @@
-name: OpenDTU-onBattery Build
+name: OpenDTU-OnBattery Build
 
 on:
   push:
@@ -8,7 +8,7 @@ on:
     branches:
       - master
       - development
-    tags-ignore:        
+    tags-ignore:
       - 'v**'
   pull_request:
     paths-ignore:
@@ -120,6 +120,7 @@ jobs:
           name: opendtu-onbattery-${{ matrix.environment }}
           path: |
             .pio/build/${{ matrix.environment }}/opendtu-onbattery-${{ matrix.environment }}.bin
+            !.pio/build/generic_esp32_4mb_no_ota/opendtu-onbattery-generic_esp32_4mb_no_ota.bin
             .pio/build/${{ matrix.environment }}/opendtu-onbattery-${{ matrix.environment }}.factory.bin
 
   release:
@@ -130,14 +131,14 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
-      
+
       - name: Get tags
         run: git fetch --force --tags origin
 
       - name: Get openDTU core release
         run: |
           echo "OPEN_DTU_CORE_RELEASE=$(git for-each-ref --sort=creatordate --format '%(refname) %(creatordate)' refs/tags | grep 'refs/tags/v' | tail -1 | sed 's#.*/##' | sed 's/ .*//')" >> $GITHUB_ENV
-      
+
       - name: Create openDTU-core-release-Badge
         uses: schneegans/dynamic-badges-action@v1.6.0
         with:

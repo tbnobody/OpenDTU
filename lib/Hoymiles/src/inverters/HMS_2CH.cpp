@@ -42,7 +42,7 @@ bool HMS_2CH::isValidSerial(const uint64_t serial)
 {
     // serial >= 0x114400000000 && serial <= 0x1144ffffffff
     uint16_t preSerial = (serial >> 32) & 0xffff;
-    return preSerial == 0x1144;
+    return preSerial == 0x1144 || preSerial == 0x1143;
 }
 
 String HMS_2CH::typeName() const

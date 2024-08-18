@@ -14,8 +14,8 @@ private:
     void onStatus(AsyncWebServerRequest* request);
     void onAdminGet(AsyncWebServerRequest* request);
     void onAdminPost(AsyncWebServerRequest* request);
-    void decodeJsonPhaseConfig(JsonObject const& json, PowerMeterHttpConfig& config) const;
-    void onTestHttpRequest(AsyncWebServerRequest* request);
+    void onTestHttpJsonRequest(AsyncWebServerRequest* request);
+    void onTestHttpSmlRequest(AsyncWebServerRequest* request);
 
     AsyncWebServer* _server;
 };

@@ -6,14 +6,18 @@
 
         <form @submit="saveBatteryConfig">
             <CardElement :text="$t('batteryadmin.BatteryConfiguration')" textVariant="text-bg-primary">
-                <InputElement :label="$t('batteryadmin.EnableBattery')"
-                              v-model="batteryConfigList.enabled"
-                              type="checkbox" />
+                <InputElement
+                    :label="$t('batteryadmin.EnableBattery')"
+                    v-model="batteryConfigList.enabled"
+                    type="checkbox"
+                />
 
-                <InputElement v-show="batteryConfigList.enabled"
-                                :label="$t('batteryadmin.VerboseLogging')"
-                                v-model="batteryConfigList.verbose_logging"
-                                type="checkbox"/>
+                <InputElement
+                    v-show="batteryConfigList.enabled"
+                    :label="$t('batteryadmin.VerboseLogging')"
+                    v-model="batteryConfigList.verbose_logging"
+                    type="checkbox"
+                />
 
                 <div class="row mb-3" v-show="batteryConfigList.enabled">
                     <label class="col-sm-2 col-form-label">
@@ -29,62 +33,105 @@
                 </div>
             </CardElement>
 
-            <CardElement v-show="batteryConfigList.enabled && batteryConfigList.provider == 1"
-                         :text="$t('batteryadmin.JkBmsConfiguration')" textVariant="text-bg-primary" addSpace>
+            <CardElement
+                v-show="batteryConfigList.enabled && batteryConfigList.provider == 1"
+                :text="$t('batteryadmin.JkBmsConfiguration')"
+                textVariant="text-bg-primary"
+                addSpace
+            >
                 <div class="row mb-3">
                     <label class="col-sm-2 col-form-label">
                         {{ $t('batteryadmin.JkBmsInterface') }}
                     </label>
                     <div class="col-sm-10">
                         <select class="form-select" v-model="batteryConfigList.jkbms_interface">
-                            <option v-for="jkBmsInterface in jkBmsInterfaceTypeList" :key="jkBmsInterface.key" :value="jkBmsInterface.key">
+                            <option
+                                v-for="jkBmsInterface in jkBmsInterfaceTypeList"
+                                :key="jkBmsInterface.key"
+                                :value="jkBmsInterface.key"
+                            >
                                 {{ $t(`batteryadmin.JkBmsInterface` + jkBmsInterface.value) }}
                             </option>
                         </select>
                     </div>
                 </div>
 
-                <InputElement :label="$t('batteryadmin.PollingInterval')"
-                              v-model="batteryConfigList.jkbms_polling_interval"
-                              type="number" min="2" max="90" step="1" :postfix="$t('batteryadmin.Seconds')"/>
+                <InputElement
+                    :label="$t('batteryadmin.PollingInterval')"
+                    v-model="batteryConfigList.jkbms_polling_interval"
+                    type="number"
+                    min="2"
+                    max="90"
+                    step="1"
+                    :postfix="$t('batteryadmin.Seconds')"
+                />
             </CardElement>
 
-            <CardElement v-show="batteryConfigList.enabled && batteryConfigList.provider == 2"
-                         :text="$t('batteryadmin.MqttConfiguration')" textVariant="text-bg-primary" addSpace>
-                <div class="row mb-3">
-                    <label class="col-sm-2 col-form-label">
-                        {{ $t('batteryadmin.MqttSocTopic') }}
-                    </label>
-                    <div class="col-sm-10">
-                        <div class="input-group">
-                            <input type="text" class="form-control" v-model="batteryConfigList.mqtt_soc_topic" />
-                        </div>
-                    </div>
-                </div>
-                <div class="row mb-3">
-                    <label class="col-sm-2 col-form-label">
-                        {{ $t('batteryadmin.MqttVoltageTopic') }}
-                    </label>
-                    <div class="col-sm-10">
-                        <div class="input-group">
-                            <input type="text" class="form-control" v-model="batteryConfigList.mqtt_voltage_topic" />
-                        </div>
-                    </div>
-                </div>
-            </CardElement>
+            <template v-if="batteryConfigList.enabled && batteryConfigList.provider == 2">
+                <CardElement :text="$t('batteryadmin.MqttSocConfiguration')" textVariant="text-bg-primary" addSpace>
+                    <InputElement
+                        :label="$t('batteryadmin.MqttSocTopic')"
+                        v-model="batteryConfigList.mqtt_soc_topic"
+                        type="text"
+                        maxlength="256"
+                    />
 
-            <FormFooter @reload="getBatteryConfig"/>
+                    <InputElement
+                        :label="$t('batteryadmin.MqttJsonPath')"
+                        v-model="batteryConfigList.mqtt_soc_json_path"
+                        type="text"
+                        maxlength="128"
+                        :tooltip="$t('batteryadmin.MqttJsonPathDescription')"
+                    />
+                </CardElement>
+
+                <CardElement :text="$t('batteryadmin.MqttVoltageConfiguration')" textVariant="text-bg-primary" addSpace>
+                    <InputElement
+                        :label="$t('batteryadmin.MqttVoltageTopic')"
+                        v-model="batteryConfigList.mqtt_voltage_topic"
+                        type="text"
+                        maxlength="256"
+                    />
+
+                    <InputElement
+                        :label="$t('batteryadmin.MqttJsonPath')"
+                        v-model="batteryConfigList.mqtt_voltage_json_path"
+                        type="text"
+                        maxlength="128"
+                        :tooltip="$t('batteryadmin.MqttJsonPathDescription')"
+                    />
+
+                    <div class="row mb-3">
+                        <label for="mqtt_voltage_unit" class="col-sm-2 col-form-label">
+                            {{ $t('batteryadmin.MqttVoltageUnit') }}
+                        </label>
+                        <div class="col-sm-10">
+                            <select
+                                id="mqtt_voltage_unit"
+                                class="form-select"
+                                v-model="batteryConfigList.mqtt_voltage_unit"
+                            >
+                                <option v-for="u in voltageUnitTypeList" :key="u.key" :value="u.key">
+                                    {{ u.value }}
+                                </option>
+                            </select>
+                        </div>
+                    </div>
+                </CardElement>
+            </template>
+
+            <FormFooter @reload="getBatteryConfig" />
         </form>
     </BasePage>
 </template>
 
 <script lang="ts">
 import BasePage from '@/components/BasePage.vue';
-import BootstrapAlert from "@/components/BootstrapAlert.vue";
+import BootstrapAlert from '@/components/BootstrapAlert.vue';
 import CardElement from '@/components/CardElement.vue';
 import FormFooter from '@/components/FormFooter.vue';
 import InputElement from '@/components/InputElement.vue';
-import type { BatteryConfig } from "@/types/BatteryConfig";
+import type { BatteryConfig } from '@/types/BatteryConfig';
 import { authHeader, handleResponse } from '@/utils/authentication';
 import { defineComponent } from 'vue';
 
@@ -100,18 +147,25 @@ export default defineComponent({
         return {
             dataLoading: true,
             batteryConfigList: {} as BatteryConfig,
-            alertMessage: "",
-            alertType: "info",
+            alertMessage: '',
+            alertType: 'info',
             showAlert: false,
             providerTypeList: [
                 { key: 0, value: 'PylontechCan' },
                 { key: 1, value: 'JkBmsSerial' },
                 { key: 2, value: 'Mqtt' },
                 { key: 3, value: 'Victron' },
+                { key: 4, value: 'PytesCan' },
             ],
             jkBmsInterfaceTypeList: [
                 { key: 0, value: 'Uart' },
                 { key: 1, value: 'Transceiver' },
+            ],
+            voltageUnitTypeList: [
+                { key: 3, value: 'mV' },
+                { key: 2, value: 'cV' },
+                { key: 1, value: 'dV' },
+                { key: 0, value: 'V' },
             ],
         };
     },
@@ -121,7 +175,7 @@ export default defineComponent({
     methods: {
         getBatteryConfig() {
             this.dataLoading = true;
-            fetch("/api/battery/config", { headers: authHeader() })
+            fetch('/api/battery/config', { headers: authHeader() })
                 .then((response) => handleResponse(response, this.$emitter, this.$router))
                 .then((data) => {
                     this.batteryConfigList = data;
@@ -132,21 +186,19 @@ export default defineComponent({
             e.preventDefault();
 
             const formData = new FormData();
-            formData.append("data", JSON.stringify(this.batteryConfigList));
+            formData.append('data', JSON.stringify(this.batteryConfigList));
 
-            fetch("/api/battery/config", {
-                method: "POST",
+            fetch('/api/battery/config', {
+                method: 'POST',
                 headers: authHeader(),
                 body: formData,
             })
                 .then((response) => handleResponse(response, this.$emitter, this.$router))
-                .then(
-                    (response) => {
-                        this.alertMessage = this.$t('apiresponse.' + response.code, response.param);
-                        this.alertType = response.type;
-                        this.showAlert = true;
-                    }
-                );
+                .then((response) => {
+                    this.alertMessage = this.$t('apiresponse.' + response.code, response.param);
+                    this.alertType = response.type;
+                    this.showAlert = true;
+                });
         },
     },
 });

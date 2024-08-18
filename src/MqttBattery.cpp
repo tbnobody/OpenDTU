@@ -4,6 +4,7 @@
 #include "MqttBattery.h"
 #include "MqttSettings.h"
 #include "MessageOutput.h"
+#include "Utils.h"
 
 bool MqttBattery::init(bool verboseLogging)
 {
@@ -17,7 +18,8 @@ bool MqttBattery::init(bool verboseLogging)
                 std::bind(&MqttBattery::onMqttMessageSoC,
                     this, std::placeholders::_1, std::placeholders::_2,
                     std::placeholders::_3, std::placeholders::_4,
-                    std::placeholders::_5, std::placeholders::_6)
+                    std::placeholders::_5, std::placeholders::_6,
+                    config.Battery.MqttSocJsonPath)
                 );
 
         if (_verboseLogging) {
@@ -32,7 +34,8 @@ bool MqttBattery::init(bool verboseLogging)
                 std::bind(&MqttBattery::onMqttMessageVoltage,
                     this, std::placeholders::_1, std::placeholders::_2,
                     std::placeholders::_3, std::placeholders::_4,
-                    std::placeholders::_5, std::placeholders::_6)
+                    std::placeholders::_5, std::placeholders::_6,
+                    config.Battery.MqttVoltageJsonPath)
                 );
 
         if (_verboseLogging) {
@@ -55,25 +58,14 @@ void MqttBattery::deinit()
     }
 }
 
-std::optional<float> MqttBattery::getFloat(std::string const& src, char const* topic) {
-    float res = 0;
-
-    try {
-        res = std::stof(src);
-    }
-    catch(std::invalid_argument const& e) {
-        MessageOutput.printf("MqttBattery: Cannot parse payload '%s' in topic '%s' as float\r\n",
-                src.c_str(), topic);
-        return std::nullopt;
-    }
-
-    return res;
-}
-
 void MqttBattery::onMqttMessageSoC(espMqttClientTypes::MessageProperties const& properties,
-        char const* topic, uint8_t const* payload, size_t len, size_t index, size_t total)
+        char const* topic, uint8_t const* payload, size_t len, size_t index, size_t total,
+        char const* jsonPath)
 {
-    auto soc = getFloat(std::string(reinterpret_cast<const char*>(payload), len), topic);
+    auto soc = Utils::getNumericValueFromMqttPayload<float>("MqttBattery",
+            std::string(reinterpret_cast<const char*>(payload), len), topic,
+            jsonPath);
+
     if (!soc.has_value()) { return; }
 
     if (*soc < 0 || *soc > 100) {
@@ -91,10 +83,31 @@ void MqttBattery::onMqttMessageSoC(espMqttClientTypes::MessageProperties const& 
 }
 
 void MqttBattery::onMqttMessageVoltage(espMqttClientTypes::MessageProperties const& properties,
-        char const* topic, uint8_t const* payload, size_t len, size_t index, size_t total)
+        char const* topic, uint8_t const* payload, size_t len, size_t index, size_t total,
+        char const* jsonPath)
 {
-    auto voltage = getFloat(std::string(reinterpret_cast<const char*>(payload), len), topic);
+    auto voltage = Utils::getNumericValueFromMqttPayload<float>("MqttBattery",
+            std::string(reinterpret_cast<const char*>(payload), len), topic,
+            jsonPath);
+
+
     if (!voltage.has_value()) { return; }
+
+    auto const& config = Configuration.get();
+    using Unit_t = BatteryVoltageUnit;
+    switch (config.Battery.MqttVoltageUnit) {
+        case Unit_t::DeciVolts:
+            *voltage /= 10;
+            break;
+        case Unit_t::CentiVolts:
+            *voltage /= 100;
+            break;
+        case Unit_t::MilliVolts:
+            *voltage /= 1000;
+            break;
+        default:
+            break;
+    }
 
     // since this project is revolving around Hoymiles microinverters, which can
     // only handle up to 65V of input voltage at best, it is safe to assume that

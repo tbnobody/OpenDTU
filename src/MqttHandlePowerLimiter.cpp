@@ -44,6 +44,8 @@ void MqttHandlePowerLimiterClass::init(Scheduler& scheduler)
     subscribe("threshold/voltage/full_solar_passthrough_start", MqttPowerLimiterCommand::FullSolarPassThroughStartVoltage);
     subscribe("threshold/voltage/full_solar_passthrough_stop", MqttPowerLimiterCommand::FullSolarPassThroughStopVoltage);
     subscribe("mode", MqttPowerLimiterCommand::Mode);
+    subscribe("upper_power_limit", MqttPowerLimiterCommand::UpperPowerLimit);
+    subscribe("target_power_consumption", MqttPowerLimiterCommand::TargetPowerConsumption);
 
     _lastPublish = millis();
 }
@@ -75,6 +77,10 @@ void MqttHandlePowerLimiterClass::loop()
 
     auto val = static_cast<unsigned>(PowerLimiter.getMode());
     MqttSettings.publish("powerlimiter/status/mode", String(val));
+    
+    MqttSettings.publish("powerlimiter/status/upper_power_limit", String(config.PowerLimiter.UpperPowerLimit));
+
+    MqttSettings.publish("powerlimiter/status/target_power_consumption", String(config.PowerLimiter.TargetPowerConsumption));
 
     MqttSettings.publish("powerlimiter/status/inverter_update_timeouts", String(PowerLimiter.getInverterUpdateTimeouts()));
 
@@ -85,6 +91,7 @@ void MqttHandlePowerLimiterClass::loop()
     MqttSettings.publish("powerlimiter/status/threshold/voltage/stop", String(config.PowerLimiter.VoltageStopThreshold));
 
     if (config.Vedirect.Enabled) {
+        MqttSettings.publish("powerlimiter/status/full_solar_passthrough_active", String(PowerLimiter.getFullSolarPassThroughEnabled()));
         MqttSettings.publish("powerlimiter/status/threshold/voltage/full_solar_passthrough_start", String(config.PowerLimiter.FullSolarPassThroughStartVoltage));
         MqttSettings.publish("powerlimiter/status/threshold/voltage/full_solar_passthrough_stop", String(config.PowerLimiter.FullSolarPassThroughStopVoltage));
     }
@@ -173,6 +180,16 @@ void MqttHandlePowerLimiterClass::onMqttCmd(MqttPowerLimiterCommand command, con
             if (config.PowerLimiter.FullSolarPassThroughStopVoltage == payload_val) { return; }
             MessageOutput.printf("Setting full solar passthrough stop voltage to: %.2f V\r\n", payload_val);
             config.PowerLimiter.FullSolarPassThroughStopVoltage = payload_val;
+            break;
+        case MqttPowerLimiterCommand::UpperPowerLimit:
+            if (config.PowerLimiter.UpperPowerLimit == intValue) { return; }
+            MessageOutput.printf("Setting upper power limit to: %d W\r\n", intValue);
+            config.PowerLimiter.UpperPowerLimit = intValue;
+            break;
+        case MqttPowerLimiterCommand::TargetPowerConsumption:
+            if (config.PowerLimiter.TargetPowerConsumption == intValue) { return; }
+            MessageOutput.printf("Setting target power consumption to: %d W\r\n", intValue);
+            config.PowerLimiter.TargetPowerConsumption = intValue;
             break;
     }
 

@@ -6,11 +6,11 @@ export interface ValueObject {
 }
 
 export interface InverterStatistics {
-    name: ValueObject,
+    name: ValueObject;
     Power?: ValueObject;
     Voltage?: ValueObject;
     Current?: ValueObject;
-    "Power DC"?: ValueObject;
+    'Power DC'?: ValueObject;
     YieldDay?: ValueObject;
     YieldTotal?: ValueObject;
     Frequency?: ValueObject;
@@ -55,18 +55,21 @@ export interface Vedirect {
 }
 
 export interface Huawei {
-  enabled: boolean;
-  Power: ValueObject;
+    enabled: boolean;
+    Power: ValueObject;
 }
 
 export interface Battery {
-  enabled: boolean;
-  soc: ValueObject;
+    enabled: boolean;
+    soc?: ValueObject;
+    voltage?: ValueObject;
+    power?: ValueObject;
+    current?: ValueObject;
 }
 
 export interface PowerMeter {
-  enabled: boolean;
-  Power: ValueObject;
+    enabled: boolean;
+    Power: ValueObject;
 }
 
 export interface LiveData {

@@ -3,27 +3,20 @@
 
 #include "Configuration.h"
 #include "Battery.h"
-#include <espMqttClient.h>
+#include "BatteryCanReceiver.h"
 #include <driver/twai.h>
 #include <Arduino.h>
-#include <memory>
 
-class PylontechCanReceiver : public BatteryProvider {
+class PylontechCanReceiver : public BatteryCanReceiver {
 public:
     bool init(bool verboseLogging) final;
-    void deinit() final;
-    void loop() final;
+    void onMessage(twai_message_t rx_message) final;
+
     std::shared_ptr<BatteryStats> getStats() const final { return _stats; }
 
 private:
-    uint16_t readUnsignedInt16(uint8_t *data);
-    int16_t readSignedInt16(uint8_t *data);
-    float scaleValue(int16_t value, float factor);
-    bool getBit(uint8_t value, uint8_t bit);
-
     void dummyData();
 
-    bool _verboseLogging = true;
     std::shared_ptr<PylontechBatteryStats> _stats =
         std::make_shared<PylontechBatteryStats>();
 };

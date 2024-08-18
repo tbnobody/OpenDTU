@@ -3,6 +3,7 @@ export interface MqttConfig {
     mqtt_verbose_logging: boolean;
     mqtt_hostname: string;
     mqtt_port: number;
+    mqtt_clientid: string;
     mqtt_username: string;
     mqtt_password: string;
     mqtt_topic: string;
