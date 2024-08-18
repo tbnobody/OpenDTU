@@ -139,15 +139,18 @@ jobs:
         run: |
           echo "OPEN_DTU_CORE_RELEASE=$(git for-each-ref --sort=creatordate --format '%(refname) %(creatordate)' refs/tags | grep 'refs/tags/v' | tail -1 | sed 's#.*/##' | sed 's/ .*//')" >> $GITHUB_ENV
 
-      - name: Create openDTU-core-release-Badge
-        uses: schneegans/dynamic-badges-action@v1.6.0
-        with:
-          auth: ${{ secrets.GIST_SECRET }}
-          gistID: 68b47cc8c8994d04ab3a4fa9d8aee5e6
-          filename: openDTUcoreRelease.json
-          label: based on original OpenDTU
-          message: ${{ env.OPEN_DTU_CORE_RELEASE }}
-          color: lightblue
+# disabled as uploading the changed gist failed repeatedly.
+# maybe the token in secrets.GIST_SECRET has expired?
+# need help from repo owner @helgeerbe to fix this.
+#      - name: Create openDTU-core-release-Badge
+#        uses: schneegans/dynamic-badges-action@v1.6.0
+#        with:
+#          auth: ${{ secrets.GIST_SECRET }}
+#          gistID: 68b47cc8c8994d04ab3a4fa9d8aee5e6
+#          filename: openDTUcoreRelease.json
+#          label: based on original OpenDTU
+#          message: ${{ env.OPEN_DTU_CORE_RELEASE }}
+#          color: lightblue
 
       - name: Build Changelog
         id: github_release
