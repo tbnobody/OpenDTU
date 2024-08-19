@@ -251,8 +251,7 @@ void PowerLimiterClass::loop()
 
         if (isStartThresholdReached()) { return true; }
 
-        if (config.PowerLimiter.SolarPassThroughEnabled &&
-                config.PowerLimiter.BatteryAlwaysUseAtNight &&
+        if (config.PowerLimiter.BatteryAlwaysUseAtNight &&
                 !isDayPeriod &&
                 !_batteryDischargeEnabled) {
             _nighttimeDischarging = true;
