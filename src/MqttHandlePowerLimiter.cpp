@@ -25,10 +25,22 @@ void MqttHandlePowerLimiterClass::init(Scheduler& scheduler)
     using std::placeholders::_5;
     using std::placeholders::_6;
 
+    subscribeTopics();
+
+    _lastPublish = millis();
+}
+
+void MqttHandlePowerLimiterClass::forceUpdate()
+{
+    _lastPublish = 0;
+}
+
+void MqttHandlePowerLimiterClass::subscribeTopics()
+{
     String const& prefix = MqttSettings.getPrefix();
 
     auto subscribe = [&prefix, this](char const* subTopic, MqttPowerLimiterCommand command) {
-        String fullTopic(prefix + "powerlimiter/cmd/" + subTopic);
+        String fullTopic(prefix + _cmdtopic.data() + subTopic);
         MqttSettings.subscribe(fullTopic.c_str(), 0,
                 std::bind(&MqttHandlePowerLimiterClass::onMqttCmd, this, command,
                     std::placeholders::_1, std::placeholders::_2,
@@ -36,20 +48,18 @@ void MqttHandlePowerLimiterClass::init(Scheduler& scheduler)
                     std::placeholders::_5, std::placeholders::_6));
     };
 
-    subscribe("threshold/soc/start", MqttPowerLimiterCommand::BatterySoCStartThreshold);
-    subscribe("threshold/soc/stop", MqttPowerLimiterCommand::BatterySoCStopThreshold);
-    subscribe("threshold/soc/full_solar_passthrough", MqttPowerLimiterCommand::FullSolarPassthroughSoC);
-    subscribe("threshold/voltage/start", MqttPowerLimiterCommand::VoltageStartThreshold);
-    subscribe("threshold/voltage/stop", MqttPowerLimiterCommand::VoltageStopThreshold);
-    subscribe("threshold/voltage/full_solar_passthrough_start", MqttPowerLimiterCommand::FullSolarPassThroughStartVoltage);
-    subscribe("threshold/voltage/full_solar_passthrough_stop", MqttPowerLimiterCommand::FullSolarPassThroughStopVoltage);
-    subscribe("mode", MqttPowerLimiterCommand::Mode);
-    subscribe("upper_power_limit", MqttPowerLimiterCommand::UpperPowerLimit);
-    subscribe("target_power_consumption", MqttPowerLimiterCommand::TargetPowerConsumption);
-
-    _lastPublish = millis();
+    for (auto const& s : _subscriptions) {
+        subscribe(s.first.data(), s.second);
+    }
 }
 
+void MqttHandlePowerLimiterClass::unsubscribeTopics()
+{
+    String const prefix = MqttSettings.getPrefix() + _cmdtopic.data();
+    for (auto const& s : _subscriptions) {
+        MqttSettings.unsubscribe(prefix + s.first.data());
+    }
+}
 
 void MqttHandlePowerLimiterClass::loop()
 {
