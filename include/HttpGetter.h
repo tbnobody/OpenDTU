@@ -69,7 +69,7 @@ public:
     char const* getErrorText() const { return _errBuffer; }
 
 private:
-    std::pair<bool, String> getAuthDigest(String const& authReq, unsigned int counter);
+    std::pair<bool, String> getAuthDigest();
     HttpRequestConfig const& _config;
 
     template<typename... Args>
@@ -80,6 +80,9 @@ private:
     String _host;
     String _uri;
     uint16_t _port;
+
+    String _wwwAuthenticate = "";
+    unsigned _nonceCounter = 0;
 
     sp_wifi_client_t _spWiFiClient; // reused for multiple HTTP requests
 

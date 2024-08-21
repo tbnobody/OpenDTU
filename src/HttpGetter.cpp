@@ -143,6 +143,16 @@ HttpRequestResult HttpGetter::performGetRequest()
 
             const char *headers[2] = {"WWW-Authenticate", "Connection"};
             upTmpHttpClient->collectHeaders(headers, 2);
+
+            // try with new auth response based on previous WWW-Authenticate
+            // header, which allows us to retrieve the resource without a
+            // second GET request. if the server decides that we reused the
+            // previous challenge too often, it will respond with HTTP401 and
+            // a new challenge, which we handle as if we had no challenge yet.
+            auto authorization = getAuthDigest();
+            if (authorization.first) {
+                upTmpHttpClient->addHeader("Authorization", authorization.second);
+            }
             break;
         }
     }
@@ -150,13 +160,21 @@ HttpRequestResult HttpGetter::performGetRequest()
     int httpCode = upTmpHttpClient->GET();
 
     if (httpCode == HTTP_CODE_UNAUTHORIZED && _config.AuthType == Auth_t::Digest) {
+        _wwwAuthenticate = "";
+
         if (!upTmpHttpClient->hasHeader("WWW-Authenticate")) {
             logError("Cannot perform digest authentication as server did "
                         "not send a WWW-Authenticate header");
             return { false };
         }
-        String authReq = upTmpHttpClient->header("WWW-Authenticate");
-        auto authorization = getAuthDigest(authReq, 1);
+
+        _wwwAuthenticate = upTmpHttpClient->header("WWW-Authenticate");
+
+        // using a new WWW-Authenticate challenge means
+        // we never used the server's nonce in a response
+        _nonceCounter = 0;
+
+        auto authorization = getAuthDigest();
         if (!authorization.first) {
             logError("Digest Error: %s", authorization.second.c_str());
             return { false };
@@ -257,16 +275,18 @@ static std::pair<bool, String> getAlgo(String const& authReq) {
     return { false, "unsupported digest algorithm" };
 }
 
-std::pair<bool, String> HttpGetter::getAuthDigest(String const& authReq, unsigned int counter) {
+std::pair<bool, String> HttpGetter::getAuthDigest() {
+    if (_wwwAuthenticate.isEmpty()) { return { false, "no digest challenge yet" }; }
+
     // extracting required parameters for RFC 2617 Digest
-    String realm = extractParam(authReq, "realm=\"", '"');
-    String nonce = extractParam(authReq, "nonce=\"", '"');
-    String cNonce = getcNonce(8);
+    String realm = extractParam(_wwwAuthenticate, "realm=\"", '"');
+    String nonce = extractParam(_wwwAuthenticate, "nonce=\"", '"');
+    String cNonce = getcNonce(8); // client nonce
 
     char nc[9];
-    snprintf(nc, sizeof(nc), "%08x", counter);
+    snprintf(nc, sizeof(nc), "%08x", ++_nonceCounter);
 
-    auto algo = getAlgo(authReq);
+    auto algo = getAlgo(_wwwAuthenticate);
     if (!algo.first) { return { false, algo.second }; }
 
     auto hash = (algo.second == "SHA-256") ? &sha256 : &md5;
