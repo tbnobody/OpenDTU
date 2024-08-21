@@ -100,7 +100,7 @@ HttpRequestResult HttpGetter::performGetRequest()
         }
     }
 
-    auto upTmpHttpClient = std::make_unique<HTTPClient>();
+    auto upTmpHttpClient = std::make_unique<HttpGetterClient>();
 
     // use HTTP1.0 to avoid problems with chunked transfer encoding when the
     // stream is later used to read the server's response.
@@ -135,8 +135,13 @@ HttpRequestResult HttpGetter::performGetRequest()
             break;
         }
         case Auth_t::Digest: {
-            const char *headers[1] = {"WWW-Authenticate"};
-            upTmpHttpClient->collectHeaders(headers, 1);
+            // send "Connection: keep-alive" (despite using HTTP/1.0, where
+            // "Connection: close" is the default) so there is a chance to
+            // reuse the TCP connection when performing the second GET request.
+            upTmpHttpClient->setReuse(true);
+
+            const char *headers[2] = {"WWW-Authenticate", "Connection"};
+            upTmpHttpClient->collectHeaders(headers, 2);
             break;
         }
     }
@@ -152,6 +157,16 @@ HttpRequestResult HttpGetter::performGetRequest()
         String authReq = upTmpHttpClient->header("WWW-Authenticate");
         String authorization = getAuthDigest(authReq, 1);
         upTmpHttpClient->addHeader("Authorization", authorization);
+
+        // use a new TCP connection if the server sent "Connection: close".
+        bool restart = true;
+        if (upTmpHttpClient->hasHeader("Connection")) {
+            String connection = upTmpHttpClient->header("Connection");
+            connection.toLowerCase();
+            restart = connection.indexOf("keep-alive") == -1;
+        }
+        if (restart) { upTmpHttpClient->restartTCP(); }
+
         httpCode = upTmpHttpClient->GET();
     }
 

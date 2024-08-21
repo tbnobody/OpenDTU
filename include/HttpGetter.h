@@ -9,7 +9,17 @@
 #include <HTTPClient.h>
 #include <WiFiClient.h>
 
-using up_http_client_t = std::unique_ptr<HTTPClient>;
+class HttpGetterClient : public HTTPClient {
+public:
+    void restartTCP() {
+        // keeps the NetworkClient, and closes the TCP connections (as we
+        // effectively do not support keep-alive with HTTP 1.0).
+        HTTPClient::disconnect(true);
+        HTTPClient::connect();
+    }
+};
+
+using up_http_client_t = std::unique_ptr<HttpGetterClient>;
 using sp_wifi_client_t = std::shared_ptr<WiFiClient>;
 
 class HttpRequestResult {
