@@ -69,7 +69,7 @@ public:
     char const* getErrorText() const { return _errBuffer; }
 
 private:
-    String getAuthDigest(String const& authReq, unsigned int counter);
+    std::pair<bool, String> getAuthDigest(String const& authReq, unsigned int counter);
     HttpRequestConfig const& _config;
 
     template<typename... Args>
