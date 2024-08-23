@@ -92,7 +92,7 @@ export default defineComponent({
                 .then((data) => {
                     if (data.total_commits > 0) {
                         this.systemDataList.update_text = this.$t('systeminfo.VersionNew');
-                        this.systemDataList.update_status = 'text-bg-danger';
+                        this.systemDataList.update_status = 'text-bg-warning';
                         this.systemDataList.update_url = data.html_url;
                     } else {
                         this.systemDataList.update_text = this.$t('systeminfo.VersionOk');
