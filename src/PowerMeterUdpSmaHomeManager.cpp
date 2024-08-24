@@ -139,6 +139,7 @@ uint8_t* PowerMeterUdpSmaHomeManager::decodeGroup(uint8_t* offset, uint16_t grou
                 Soutput(kanal, index, art, tarif, "Leistung L2", _powerMeterL2, timestamp);
                 Soutput(kanal, index, art, tarif, "Leistung L3", _powerMeterL3, timestamp);
                 count = 0;
+                gotUpdate();
             }
 
             continue;
