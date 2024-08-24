@@ -18,7 +18,7 @@ void PowerMeterUdpSmaHomeManager::Soutput(int kanal, int index, int art, int tar
 {
     if (!_verboseLogging) { return; }
 
-    MessageOutput.printf("[PowerMeterUdpSmaHomeManager] %s = %.1f (timestamp %d)\r\n",
+    MessageOutput.printf("[PowerMeterUdpSmaHomeManager] %s = %.1f (timestamp %u)\r\n",
             name, value, timestamp);
 }
 
