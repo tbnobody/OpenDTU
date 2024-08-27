@@ -26,6 +26,15 @@ bool BatteryCanReceiver::init(bool verboseLogging, char const* providerName)
     auto rx = static_cast<gpio_num_t>(pin.battery_rx);
     twai_general_config_t g_config = TWAI_GENERAL_CONFIG_DEFAULT(tx, rx, TWAI_MODE_NORMAL);
 
+    // interrupts at level 1 are in high demand, at least on ESP32-S3 boards,
+    // but only a limited amount can be allocated. failing to allocate an
+    // interrupt in the TWAI driver will cause a bootloop. we therefore
+    // register the TWAI driver's interrupt at level 2. level 2 interrupts
+    // should be available -- we don't really know. we would love to have the
+    // esp_intr_dump() function, but that's not available yet in our version
+    // of the underlying esp-idf.
+    g_config.intr_flags = ESP_INTR_FLAG_LEVEL2;
+
     // Initialize configuration structures using macro initializers
     twai_timing_config_t t_config = TWAI_TIMING_CONFIG_500KBITS();
     twai_filter_config_t f_config = TWAI_FILTER_CONFIG_ACCEPT_ALL();
