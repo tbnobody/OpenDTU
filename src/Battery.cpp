@@ -4,6 +4,7 @@
 #include "PylontechCanReceiver.h"
 #include "SBSCanReceiver.h"
 #include "JkBmsController.h"
+#include "JbdBmsController.h"
 #include "VictronSmartShunt.h"
 #include "MqttBattery.h"
 #include "PytesCanReceiver.h"
@@ -64,6 +65,9 @@ void BatteryClass::updateSettings()
             break;
         case 5:
             _upProvider = std::make_unique<SBSCanReceiver>();
+            break;
+        case 6:
+            _upProvider = std::make_unique<JbdBms::Controller>();
             break;
         default:
             MessageOutput.printf("[Battery] Unknown provider: %d\r\n", config.Battery.Provider);

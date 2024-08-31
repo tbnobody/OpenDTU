@@ -71,6 +71,41 @@
                 />
             </CardElement>
 
+            <CardElement
+                v-if="batteryConfigList.enabled && batteryConfigList.provider == 6"
+                :text="$t('batteryadmin.JbdBmsConfiguration')"
+                textVariant="text-bg-primary"
+                addSpace
+            >
+                <div class="row mb-3">
+                    <label class="col-sm-4 col-form-label">
+                        {{ $t('batteryadmin.JkBmsInterface') }}
+                    </label>
+                    <div class="col-sm-8">
+                        <select class="form-select" v-model="batteryConfigList.jkbms_interface">
+                            <option
+                                v-for="jkBmsInterface in jkBmsInterfaceTypeList"
+                                :key="jkBmsInterface.key"
+                                :value="jkBmsInterface.key"
+                            >
+                                {{ $t(`batteryadmin.JkBmsInterface` + jkBmsInterface.value) }}
+                            </option>
+                        </select>
+                    </div>
+                </div>
+
+                <InputElement
+                    :label="$t('batteryadmin.PollingInterval')"
+                    v-model="batteryConfigList.jkbms_polling_interval"
+                    type="number"
+                    min="2"
+                    max="90"
+                    step="1"
+                    :postfix="$t('batteryadmin.Seconds')"
+                    wide
+                />
+            </CardElement>
+
             <template v-if="batteryConfigList.enabled && batteryConfigList.provider == 2">
                 <CardElement :text="$t('batteryadmin.MqttSocConfiguration')" textVariant="text-bg-primary" addSpace>
                     <InputElement
@@ -279,6 +314,7 @@ export default defineComponent({
                 { key: 3, value: 'Victron' },
                 { key: 4, value: 'PytesCan' },
                 { key: 5, value: 'SBSCan' },
+                { key: 6, value: 'JbdBmsSerial' },
             ],
             jkBmsInterfaceTypeList: [
                 { key: 0, value: 'Uart' },

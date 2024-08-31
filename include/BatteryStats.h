@@ -6,6 +6,7 @@
 #include "AsyncJson.h"
 #include "Arduino.h"
 #include "JkBmsDataPoints.h"
+#include "JbdBmsDataPoints.h"
 #include "VeDirectShuntController.h"
 #include <cfloat>
 
@@ -274,6 +275,35 @@ class JkBmsBatteryStats : public BatteryStats {
         void getJsonData(JsonVariant& root, bool verbose) const;
 
         JkBms::DataPointContainer _dataPoints;
+        mutable uint32_t _lastMqttPublish = 0;
+        mutable uint32_t _lastFullMqttPublish = 0;
+
+        uint16_t _cellMinMilliVolt = 0;
+        uint16_t _cellAvgMilliVolt = 0;
+        uint16_t _cellMaxMilliVolt = 0;
+        uint32_t _cellVoltageTimestamp = 0;
+};
+
+class JbdBmsBatteryStats : public BatteryStats {
+    public:
+        void getLiveViewData(JsonVariant& root) const final {
+            getJsonData(root, false);
+        }
+
+        void getInfoViewData(JsonVariant& root) const {
+            getJsonData(root, true);
+        }
+
+        void mqttPublish() const final;
+
+        uint32_t getMqttFullPublishIntervalMs() const final { return 60 * 1000; }
+
+        void updateFrom(JbdBms::DataPointContainer const& dp);
+
+    private:
+        void getJsonData(JsonVariant& root, bool verbose) const;
+
+        JbdBms::DataPointContainer _dataPoints;
         mutable uint32_t _lastMqttPublish = 0;
         mutable uint32_t _lastFullMqttPublish = 0;
 
