@@ -501,11 +501,7 @@ export default defineComponent({
         canUseSolarPassthrough() {
             const cfg = this.powerLimiterConfigList;
             const meta = this.powerLimiterMetaData;
-            const canUse = this.isEnabled() && meta.charge_controller_enabled && !cfg.is_inverter_solar_powered;
-            if (!canUse) {
-                cfg.solar_passthrough_enabled = false;
-            }
-            return canUse;
+            return this.isEnabled() && meta.charge_controller_enabled && !cfg.is_inverter_solar_powered;
         },
         canUseSoCThresholds() {
             const cfg = this.powerLimiterConfigList;
