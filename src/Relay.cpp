@@ -47,7 +47,10 @@ boolean Relay::isStat(void)
     MessageOutput.print("Relay Status?");
     MessageOutput.print(_pin);
     MessageOutput.print(" State:");
-    MessageOutput.println(!getState());
-    return (ON == this->getState());
+    //MessageOutput.println(!getState());
+    //return (ON == this->getState());
+    bool status = digitalRead(_pin);
+    MessageOutput.println(status);
+    return (status);
 }
 
