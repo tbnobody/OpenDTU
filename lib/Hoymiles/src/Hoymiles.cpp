@@ -4,6 +4,7 @@
  */
 #include "Hoymiles.h"
 #include "Utils.h"
+#include "inverters/HERF_1CH.h"
 #include "inverters/HERF_2CH.h"
 #include "inverters/HERF_4CH.h"
 #include "inverters/HMS_1CH.h"
@@ -173,6 +174,8 @@ std::shared_ptr<InverterAbstract> HoymilesClass::addInverter(const char* name, c
         i = std::make_shared<HM_2CH>(_radioNrf.get(), serial);
     } else if (HM_1CH::isValidSerial(serial)) {
         i = std::make_shared<HM_1CH>(_radioNrf.get(), serial);
+    } else if (HERF_1CH::isValidSerial(serial)) {
+        i = std::make_shared<HERF_1CH>(_radioNrf.get(), serial);
     } else if (HERF_2CH::isValidSerial(serial)) {
         i = std::make_shared<HERF_2CH>(_radioNrf.get(), serial);
     } else if (HERF_4CH::isValidSerial(serial)) {
