@@ -23,20 +23,21 @@ NetworkSettingsClass::NetworkSettingsClass()
 void NetworkSettingsClass::init(Scheduler& scheduler)
 {
     using std::placeholders::_1;
+    using std::placeholders::_2;
 
     WiFi.setScanMethod(WIFI_ALL_CHANNEL_SCAN);
     WiFi.setSortMethod(WIFI_CONNECT_AP_BY_SIGNAL);
 
     WiFi.disconnect(true, true);
 
-    WiFi.onEvent(std::bind(&NetworkSettingsClass::NetworkEvent, this, _1));
+    WiFi.onEvent(std::bind(&NetworkSettingsClass::NetworkEvent, this, _1, _2));
     setupMode();
 
     scheduler.addTask(_loopTask);
     _loopTask.enable();
 }
 
-void NetworkSettingsClass::NetworkEvent(const WiFiEvent_t event)
+void NetworkSettingsClass::NetworkEvent(const WiFiEvent_t event, WiFiEventInfo_t info)
 {
     switch (event) {
     case ARDUINO_EVENT_ETH_START:
@@ -76,7 +77,8 @@ void NetworkSettingsClass::NetworkEvent(const WiFiEvent_t event)
         }
         break;
     case ARDUINO_EVENT_WIFI_STA_DISCONNECTED:
-        MessageOutput.println("WiFi disconnected");
+        // Reason codes can be found here: https://github.com/espressif/esp-idf/blob/5454d37d496a8c58542eb450467471404c606501/components/esp_wifi/include/esp_wifi_types_generic.h#L79-L141
+        MessageOutput.printf("WiFi disconnected: %d\r\n", info.wifi_sta_disconnected.reason);
         if (_networkMode == network_mode::WiFi) {
             MessageOutput.println("Try reconnecting");
             WiFi.disconnect(true, false);
