@@ -266,7 +266,7 @@ void PowerLimiterClass::loop()
     _batteryDischargeEnabled = getBatteryPower();
 
     if (_verboseLogging && !config.PowerLimiter.IsInverterSolarPowered) {
-        MessageOutput.printf("[DPL::loop] battery interface %s, SoC: %d %%, StartTH: %d %%, StopTH: %d %%, SoC age: %d s, ignore: %s\r\n",
+        MessageOutput.printf("[DPL::loop] battery interface %s, SoC: %f %%, StartTH: %d %%, StopTH: %d %%, SoC age: %d s, ignore: %s\r\n",
                 (config.Battery.Enabled?"enabled":"disabled"),
                 Battery.getStats()->getSoC(),
                 config.PowerLimiter.BatterySocStartThreshold,

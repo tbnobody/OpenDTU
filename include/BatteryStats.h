@@ -18,7 +18,7 @@ class BatteryStats {
         uint32_t getAgeSeconds() const { return (millis() - _lastUpdate) / 1000; }
         bool updateAvailable(uint32_t since) const;
 
-        uint8_t getSoC() const { return _soc; }
+        float getSoC() const { return _soc; }
         uint32_t getSoCAgeSeconds() const { return (millis() - _lastUpdateSoC) / 1000; }
         uint8_t getSoCPrecision() const { return _socPrecision; }
 

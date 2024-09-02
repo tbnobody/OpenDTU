@@ -32,7 +32,7 @@ void PytesCanReceiver::onMessage(twai_message_t rx_message)
             _stats->_stateOfHealth = this->readUnsignedInt16(rx_message.data + 2);
 
             if (_verboseLogging) {
-                MessageOutput.printf("[Pytes] soc: %d soh: %d\r\n",
+                MessageOutput.printf("[Pytes] soc: %f soh: %d\r\n",
                         _stats->getSoC(), _stats->_stateOfHealth);
             }
             break;
