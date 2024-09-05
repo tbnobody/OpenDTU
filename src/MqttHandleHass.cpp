@@ -82,6 +82,8 @@ void MqttHandleHassClass::publishConfig()
         publishInverterBinarySensor(inv, "Reachable", "status/reachable", "1", "0");
         publishInverterBinarySensor(inv, "Producing", "status/producing", "1", "0");
 
+        publishInverterSensor(inv, "DTU Signal", "status/rssi", "signal_strength", "diagnostic", "", "dBm");
+
         // Loop all channels
         for (auto& t : inv->Statistics()->getChannelTypes()) {
             for (auto& c : inv->Statistics()->getChannelsByType(t)) {
@@ -246,6 +248,54 @@ void MqttHandleHassClass::publishInverterNumber(
     root["step"] = step;
 
     createInverterInfo(root, inv);
+
+    if (!Utils::checkJsonAlloc(root, __FUNCTION__, __LINE__)) {
+        return;
+    }
+
+    String buffer;
+    serializeJson(root, buffer);
+    publish(configTopic, buffer);
+}
+
+void MqttHandleHassClass::publishInverterSensor(std::shared_ptr<InverterAbstract> inv, const char* caption, const char* subTopic, const char* device_class, const char* category, const char* icon, const char* unit_of_measure)
+{
+    const String serial = inv->serialString();
+
+    String sensorId = caption;
+    sensorId.replace(" ", "_");
+    sensorId.toLowerCase();
+
+    const String configTopic = "sensor/dtu_" + serial
+        + "/" + sensorId
+        + "/config";
+
+    const String statTopic = MqttSettings.getPrefix() + serial + "/" + subTopic;
+
+    JsonDocument root;
+
+    root["name"] = caption;
+    root["uniq_id"] = serial + "_" + sensorId;
+    root["stat_t"] = statTopic;
+
+    if (strcmp(device_class, "")) {
+        root["dev_cla"] = device_class;
+    }
+    if (strcmp(category, "")) {
+        root["ent_cat"] = category;
+    }
+    if (strcmp(icon, "")) {
+        root["ic"] = icon;
+    }
+    if (strcmp(unit_of_measure, "")) {
+        root["unit_of_meas"] = unit_of_measure;
+    }
+
+    createInverterInfo(root, inv);
+
+    if (Configuration.get().Mqtt.Hass.Expire) {
+        root["exp_aft"] = Hoymiles.getNumInverters() * max<uint32_t>(Hoymiles.PollInterval(), Configuration.get().Mqtt.PublishInterval) * inv->getReachableThreshold();
+    }
 
     if (!Utils::checkJsonAlloc(root, __FUNCTION__, __LINE__)) {
         return;
