@@ -79,6 +79,7 @@ void HoymilesRadio_NRF::loop()
                     Hoymiles.getMessageOutput()->printf("RX Channel: %d --> ", f.channel);
                     dumpBuf(f.fragment, f.len, false);
                     Hoymiles.getMessageOutput()->printf("| %d dBm\r\n", f.rssi);
+                    _rxLastRssi = f.rssi;
 
                     inv->addRxFragment(f.fragment, f.len);
                 } else {

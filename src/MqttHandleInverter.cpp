@@ -82,6 +82,7 @@ void MqttHandleInverterClass::loop()
 
         if (inv->Statistics()->getLastUpdate() > 0) {
             MqttSettings.publish(subtopic + "/status/last_update", String(std::time(0) - (millis() - inv->Statistics()->getLastUpdate()) / 1000));
+            MqttSettings.publish(subtopic + "/status/rssi", String(inv->getRadio()->getLastRssi()));
         } else {
             MqttSettings.publish(subtopic + "/status/last_update", String(0));
         }

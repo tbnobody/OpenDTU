@@ -134,6 +134,11 @@ bool HoymilesRadio::isIdle() const
     return !_busyFlag;
 }
 
+int8_t HoymilesRadio::getLastRssi()
+{
+    return _rxLastRssi;
+}
+
 bool HoymilesRadio::isQueueEmpty() const
 {
     return _commandQueue.size() == 0;

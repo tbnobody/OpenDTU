@@ -168,6 +168,7 @@ void HoymilesRadio_CMT::loop()
                         Hoymiles.getMessageOutput()->printf("RX %.2f MHz --> ", getFrequencyFromChannel(f.channel) / 1000000.0);
                         dumpBuf(f.fragment, f.len, false);
                         Hoymiles.getMessageOutput()->printf("| %d dBm\r\n", f.rssi);
+                        _rxLastRssi = f.rssi;
 
                         inv->addRxFragment(f.fragment, f.len);
                     } else {

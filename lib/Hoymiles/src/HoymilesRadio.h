@@ -15,6 +15,7 @@ public:
     bool isIdle() const;
     bool isQueueEmpty() const;
     bool isInitialized() const;
+    int8_t getLastRssi();
 
     void enqueCommand(std::shared_ptr<CommandAbstract> cmd)
     {
@@ -43,4 +44,5 @@ protected:
     bool _busyFlag = false;
 
     TimeoutHelper _rxTimeout;
+    int8_t _rxLastRssi = -128;
 };
