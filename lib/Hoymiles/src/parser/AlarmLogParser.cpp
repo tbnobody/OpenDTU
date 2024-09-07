@@ -29,7 +29,7 @@ ID   Source Addr   Target Addr   Idx  ?       wcode   ?       Start   End     ? 
 const std::array<const AlarmMessage_t, ALARM_MSG_COUNT> AlarmLogParser::_alarmMessages = { {
     { AlarmMessageType_t::ALL, 1, "Inverter start", "Wechselrichter gestartet", "L'onduleur a démarré" },
     { AlarmMessageType_t::ALL, 2, "Time calibration", "Zeitabgleich", "" },
-    { AlarmMessageType_t::ALL, 3, "EEPROM reading and writing error during operation", "", "" },
+    { AlarmMessageType_t::ALL, 3, "EEPROM reading and writing error during operation", "EEPROM-Lese- und Schreibfehler während des Betriebs", "" },
     { AlarmMessageType_t::ALL, 4, "Offline", "Offline", "Non connecté" },
 
     { AlarmMessageType_t::ALL, 11, "Grid voltage surge", "Netz: Überspannungsimpuls", "" },
@@ -38,34 +38,34 @@ const std::array<const AlarmMessage_t, ALARM_MSG_COUNT> AlarmLogParser::_alarmMe
     { AlarmMessageType_t::ALL, 14, "Grid phase mutation", "Netz: Phasenänderung", "" },
     { AlarmMessageType_t::ALL, 15, "Grid transient fluctuation", "Netz: vorübergehende Schwankung", "" },
 
-    { AlarmMessageType_t::ALL, 36, "INV overvoltage or overcurrent", "", "" },
+    { AlarmMessageType_t::ALL, 36, "INV overvoltage or overcurrent", "Überspannung oder Überstrom des Wechselrichters", "" },
 
-    { AlarmMessageType_t::ALL, 46, "FB overvoltage", "FB Überspannung", "" },
-    { AlarmMessageType_t::ALL, 47, "FB overcurrent", "FB Überstrom", "" },
-    { AlarmMessageType_t::ALL, 48, "FB clamp overvoltage", "", "" },
-    { AlarmMessageType_t::ALL, 49, "FB clamp overvoltage", "", "" },
+    { AlarmMessageType_t::ALL, 46, "FB overvoltage", "FB-Überspannung", "" },
+    { AlarmMessageType_t::ALL, 47, "FB overcurrent", "FB-Überstrom", "" },
+    { AlarmMessageType_t::ALL, 48, "FB clamp overvoltage", "Überspannung der FB-Klemme", "" },
+    { AlarmMessageType_t::ALL, 49, "FB clamp overvoltage", "Überspannung der FB-Klemme", "" },
 
-    { AlarmMessageType_t::ALL, 61, "Calibration parameter error", "", "" },
-    { AlarmMessageType_t::ALL, 62, "System configuration parameter error", "", "" },
-    { AlarmMessageType_t::ALL, 63, "Abnormal power generation data", "", "" },
+    { AlarmMessageType_t::ALL, 61, "Calibration parameter error", "Kalibrierungsparameterfehler", "" },
+    { AlarmMessageType_t::ALL, 62, "System configuration parameter error", "Fehler bei den Systemkonfigurationsparametern", "" },
+    { AlarmMessageType_t::ALL, 63, "Abnormal power generation data", "Ungewöhnliche Daten zur Stromerzeugung", "" },
 
-    { AlarmMessageType_t::ALL, 71, "Grid overvoltage load reduction (VW) function enable", "", "" },
-    { AlarmMessageType_t::ALL, 72, "Power grid over-frequency load reduction (FW) function enable", "", "" },
-    { AlarmMessageType_t::ALL, 73, "Over-temperature load reduction (TW) function enable", "", "" },
+    { AlarmMessageType_t::ALL, 71, "Grid overvoltage load reduction (VW) function enable", "Aktivierung der Netzüberspannungslastreduzierungsfunktion (VW)", "" },
+    { AlarmMessageType_t::ALL, 72, "Power grid over-frequency load reduction (FW) function enable", "Aktivierung der Funktion zur Reduzierung der Überfrequenzlast (FW) im Stromnetz", "" },
+    { AlarmMessageType_t::ALL, 73, "Over-temperature load reduction (TW) function enable", "Aktivierung der Funktion zur Reduzierung der Übertemperaturlast (TW)", "" },
 
-    { AlarmMessageType_t::ALL, 95, "PV-1: Module in suspected shadow", "", "" },
-    { AlarmMessageType_t::ALL, 96, "PV-2: Module in suspected shadow", "", "" },
-    { AlarmMessageType_t::ALL, 97, "PV-3: Module in suspected shadow", "", "" },
-    { AlarmMessageType_t::ALL, 98, "PV-4: Module in suspected shadow", "", "" },
+    { AlarmMessageType_t::ALL, 95, "PV-1: Module in suspected shadow", "PV-1: Modul im vermuteten Schatten", "" },
+    { AlarmMessageType_t::ALL, 96, "PV-2: Module in suspected shadow", "PV-2: Modul im vermuteten Schatten", "" },
+    { AlarmMessageType_t::ALL, 97, "PV-3: Module in suspected shadow", "PV-3: Modul im vermuteten Schatten", "" },
+    { AlarmMessageType_t::ALL, 98, "PV-4: Module in suspected shadow", "PV-4: Modul im vermuteten Schatten", "" },
 
     { AlarmMessageType_t::ALL, 121, "Over temperature protection", "Übertemperaturschutz", "Protection antisurchauffe" },
-    { AlarmMessageType_t::ALL, 122, "Microinverter is suspected of being stolen", "", "" },
-    { AlarmMessageType_t::ALL, 123, "Locked by remote control", "", "" },
+    { AlarmMessageType_t::ALL, 122, "Microinverter is suspected of being stolen", "Verdacht auf Diebstahl des Mikrowechselrichters", "" },
+    { AlarmMessageType_t::ALL, 123, "Locked by remote control", "Per Fernbedienung sperrbar", "" },
     { AlarmMessageType_t::ALL, 124, "Shut down by remote control", "Durch Fernsteuerung abgeschaltet", "Arrêt par télécommande" },
     { AlarmMessageType_t::ALL, 125, "Grid configuration parameter error", "Parameterfehler bei der Konfiguration des Elektrizitätsnetzes", "Erreur de paramètre de configuration du réseau" },
-    { AlarmMessageType_t::ALL, 126, "Software error code 126", "", "" },
+    { AlarmMessageType_t::ALL, 126, "Software error code 126", "Softwarefehlercode 126", "" },
     { AlarmMessageType_t::ALL, 127, "Firmware error", "Firmwarefehler", "Erreur du micrologiciel" },
-    { AlarmMessageType_t::ALL, 128, "Hardware configuration error", "", "" },
+    { AlarmMessageType_t::ALL, 128, "Hardware configuration error", "Hardwarekonfigurationsfehler", "" },
     { AlarmMessageType_t::ALL, 129, "Abnormal bias", "Abnormaler Trend", "Polarisation anormale" },
     { AlarmMessageType_t::ALL, 130, "Offline", "Offline", "Non connecté" },
 
@@ -79,11 +79,11 @@ const std::array<const AlarmMessage_t, ALARM_MSG_COUNT> AlarmLogParser::_alarmMe
     { AlarmMessageType_t::ALL, 148, "Grid: Grid disconnection", "Netz: Netztrennung", "Réseau: Déconnexion du réseau" },
     { AlarmMessageType_t::ALL, 149, "Grid: Island detected", "Netz: Inselbetrieb festgestellt", "Réseau: Détection d’îlots" },
 
-    { AlarmMessageType_t::ALL, 150, "DCI exceeded", "", "" },
-    { AlarmMessageType_t::ALL, 152, "Grid: Phase angle difference between two phases exceeded 5° >10 times", "", "" },
-    { AlarmMessageType_t::HMT, 171, "Grid: Abnormal phase difference between phase to phase", "", "" },
-    { AlarmMessageType_t::ALL, 181, "Abnormal insulation impedance", "", "" },
-    { AlarmMessageType_t::ALL, 182, "Abnormal grounding", "", "" },
+    { AlarmMessageType_t::ALL, 150, "DCI exceeded", "DCI überschritten", "" },
+    { AlarmMessageType_t::ALL, 152, "Grid: Phase angle difference between two phases exceeded 5° >10 times", "Netz: Der Phasenwinkelunterschied zwischen zwei Phasen hat 5° >10 Mal überschritten", "" },
+    { AlarmMessageType_t::HMT, 171, "Grid: Abnormal phase difference between phase to phase", "Netz: Ungewöhnliche Phasendifferenz zwischen Phase zu Phase", "" },
+    { AlarmMessageType_t::ALL, 181, "Abnormal insulation impedance", "Abnormale Isolationsimpedanz", "" },
+    { AlarmMessageType_t::ALL, 182, "Abnormal grounding", "Abnormale Erdung", "" },
 
     { AlarmMessageType_t::ALL, 205, "MPPT-A: Input overvoltage", "MPPT-A: Eingangsüberspannung", "MPPT-A: Surtension d’entrée" },
     { AlarmMessageType_t::ALL, 206, "MPPT-B: Input overvoltage", "MPPT-B: Eingangsüberspannung", "MPPT-B: Surtension d’entrée" },
@@ -113,17 +113,17 @@ const std::array<const AlarmMessage_t, ALARM_MSG_COUNT> AlarmLogParser::_alarmMe
     { AlarmMessageType_t::HMT, 221, "Abnormal wiring of grid neutral line", "", "" },
     { AlarmMessageType_t::ALL, 222, "PV-4: Input undervoltage", "PV-4: Eingangsunterspannung", "PV-4: Sous-tension d’entrée" },
 
-    { AlarmMessageType_t::ALL, 301, "FB-A: internal short circuit failure", "", "" },
-    { AlarmMessageType_t::ALL, 302, "FB-B: internal short circuit failure", "", "" },
+    { AlarmMessageType_t::ALL, 301, "FB-A: internal short circuit failure", "FB-A: Interner Kurzschlussfehler", "" },
+    { AlarmMessageType_t::ALL, 302, "FB-B: internal short circuit failure", "FB-B: Interner Kurzschlussfehler", "" },
 
-    { AlarmMessageType_t::ALL, 303, "FB-A: overcurrent protection failure", "", "" },
-    { AlarmMessageType_t::ALL, 304, "FB-B: overcurrent protection failure", "", "" },
+    { AlarmMessageType_t::ALL, 303, "FB-A: overcurrent protection failure", "FB-A: Überstromschutzfehler", "" },
+    { AlarmMessageType_t::ALL, 304, "FB-B: overcurrent protection failure", "FB-B: Überstromschutzfehler", "" },
 
-    { AlarmMessageType_t::ALL, 305, "FB-A: clamp circuit failure", "", "" },
-    { AlarmMessageType_t::ALL, 306, "FB-B: clamp circuit failure", "", "" },
+    { AlarmMessageType_t::ALL, 305, "FB-A: clamp circuit failure", "FB-A: Fehler im Klemmkreis", "" },
+    { AlarmMessageType_t::ALL, 306, "FB-B: clamp circuit failure", "FB-B: Fehler im Klemmkreis", "" },
 
-    { AlarmMessageType_t::ALL, 307, "INV power device failure", "", "" },
-    { AlarmMessageType_t::ALL, 308, "INV overcurrent or overvoltage protection failure", "", "" },
+    { AlarmMessageType_t::ALL, 307, "INV power device failure", "Ausfall des Wechselrichter-Leistungsgeräts", "" },
+    { AlarmMessageType_t::ALL, 308, "INV overcurrent or overvoltage protection failure", "Fehler beim Überstrom- oder Überspannungsschutz des Wechselrichters", "" },
 
     { AlarmMessageType_t::ALL, 309, "Hardware error code 309", "Hardwarefehlercode 309", "" },
     { AlarmMessageType_t::ALL, 310, "Hardware error code 310", "Hardwarefehlercode 310", "" },
@@ -140,10 +140,10 @@ const std::array<const AlarmMessage_t, ALARM_MSG_COUNT> AlarmLogParser::_alarmMe
     { AlarmMessageType_t::ALL, 2003, "Standby", "", "" },
     { AlarmMessageType_t::ALL, 2004, "Standby", "", "" },
 
-    { AlarmMessageType_t::ALL, 3001, "Reset", "", "" },
-    { AlarmMessageType_t::ALL, 3002, "Reset", "", "" },
-    { AlarmMessageType_t::ALL, 3003, "Reset", "", "" },
-    { AlarmMessageType_t::ALL, 3004, "Reset", "", "" },
+    { AlarmMessageType_t::ALL, 3001, "Reset", "Zurücksetzen", "" },
+    { AlarmMessageType_t::ALL, 3002, "Reset", "Zurücksetzen", "" },
+    { AlarmMessageType_t::ALL, 3003, "Reset", "Zurücksetzen", "" },
+    { AlarmMessageType_t::ALL, 3004, "Reset", "Zurücksetzen", "" },
 
     { AlarmMessageType_t::ALL, 5011, "PV-1: MOSFET overcurrent (II)", "PV-1: MOSFET Überstrom (II)", "" },
     { AlarmMessageType_t::ALL, 5012, "PV-2: MOSFET overcurrent (II)", "PV-2: MOSFET Überstrom (II)", "" },
@@ -151,31 +151,31 @@ const std::array<const AlarmMessage_t, ALARM_MSG_COUNT> AlarmLogParser::_alarmMe
     { AlarmMessageType_t::ALL, 5014, "PV-4: MOSFET overcurrent (II)", "PV-4: MOSFET Überstrom (II)", "" },
     { AlarmMessageType_t::ALL, 5020, "H-bridge MOSFET overcurrent or H-bridge overvoltage", "H-Brücken-MOSFET-Überstrom oder H-Brücken-Überspannung", "" },
 
-    { AlarmMessageType_t::ALL, 5041, "PV-1: current overcurrent (II)", "", "" },
-    { AlarmMessageType_t::ALL, 5042, "PV-2: current overcurrent (II)", "", "" },
-    { AlarmMessageType_t::ALL, 5043, "PV-3: current overcurrent (II)", "", "" },
-    { AlarmMessageType_t::ALL, 5044, "PV-4: current overcurrent (II)", "", "" },
+    { AlarmMessageType_t::ALL, 5041, "PV-1: current overcurrent (II)", "PV-1: aktueller Überstrom (II)", "" },
+    { AlarmMessageType_t::ALL, 5042, "PV-2: current overcurrent (II)", "PV-2: aktueller Überstrom (II)", "" },
+    { AlarmMessageType_t::ALL, 5043, "PV-3: current overcurrent (II)", "PV-3: aktueller Überstrom (II)", "" },
+    { AlarmMessageType_t::ALL, 5044, "PV-4: current overcurrent (II)", "PV-4: aktueller Überstrom (II)", "" },
 
-    { AlarmMessageType_t::ALL, 5051, "PV-1: Overvoltage/Undervoltage", "", "" },
-    { AlarmMessageType_t::ALL, 5052, "PV-2: Overvoltage/Undervoltage", "", "" },
-    { AlarmMessageType_t::ALL, 5053, "PV-3: Overvoltage/Undervoltage", "", "" },
-    { AlarmMessageType_t::ALL, 5054, "PV-4: Overvoltage/Undervoltage", "", "" },
+    { AlarmMessageType_t::ALL, 5051, "PV-1: Overvoltage/Undervoltage", "PV-1: Überspannung/Unterspannung", "" },
+    { AlarmMessageType_t::ALL, 5052, "PV-2: Overvoltage/Undervoltage", "PV-2: Überspannung/Unterspannung", "" },
+    { AlarmMessageType_t::ALL, 5053, "PV-3: Overvoltage/Undervoltage", "PV-3: Überspannung/Unterspannung", "" },
+    { AlarmMessageType_t::ALL, 5054, "PV-4: Overvoltage/Undervoltage", "PV-4: Überspannung/Unterspannung", "" },
 
     { AlarmMessageType_t::ALL, 5060, "Abnormal bias", "Abnormaler Trend", "Polarisation anormale" },
     { AlarmMessageType_t::ALL, 5070, "Over temperature protection", "Übertemperaturschutz", "Protection antisurchauffe" },
-    { AlarmMessageType_t::ALL, 5080, "Grid Overvoltage/Undervoltage", "", "" },
-    { AlarmMessageType_t::ALL, 5090, "Grid Overfrequency/Underfrequency", "", "" },
+    { AlarmMessageType_t::ALL, 5080, "Grid Overvoltage/Undervoltage", "Netzüberspannung/-unterspannung", "" },
+    { AlarmMessageType_t::ALL, 5090, "Grid Overfrequency/Underfrequency", "Netzüberfrequenz/-unterfrequenz", "" },
     { AlarmMessageType_t::ALL, 5100, "Island detected", "Inselbetrieb festgestellt", "Détection d’îlots" },
-    { AlarmMessageType_t::ALL, 5110, "GFDI failure", "", "" },
-    { AlarmMessageType_t::ALL, 5120, "EEPROM reading and writing error", "", "" },
+    { AlarmMessageType_t::ALL, 5110, "GFDI failure", "GFDI-Fehler", "" },
+    { AlarmMessageType_t::ALL, 5120, "EEPROM reading and writing error", "EEPROM-Lese- und Schreibfehler", "" },
 
-    { AlarmMessageType_t::ALL, 5141, "FB clamp overvoltage", "", "" },
-    { AlarmMessageType_t::ALL, 5142, "FB clamp overvoltage", "", "" },
-    { AlarmMessageType_t::ALL, 5143, "FB clamp overvoltage", "", "" },
-    { AlarmMessageType_t::ALL, 5144, "FB clamp overvoltage", "", "" },
+    { AlarmMessageType_t::ALL, 5141, "FB clamp overvoltage", "Überspannung der FB-Klemme", "" },
+    { AlarmMessageType_t::ALL, 5142, "FB clamp overvoltage", "Überspannung der FB-Klemme", "" },
+    { AlarmMessageType_t::ALL, 5143, "FB clamp overvoltage", "Überspannung der FB-Klemme", "" },
+    { AlarmMessageType_t::ALL, 5144, "FB clamp overvoltage", "Überspannung der FB-Klemme", "" },
 
     { AlarmMessageType_t::ALL, 5150, "10 min value grid overvoltage", "10 Minuten-Mittelwert der Netzüberspannung", "Valeur de surtension du réseau pendant 10 min" },
-    { AlarmMessageType_t::ALL, 5160, "Grid transient fluctuation", "", "" },
+    { AlarmMessageType_t::ALL, 5160, "Grid transient fluctuation", "Transiente Schwankungen im Netz", "" },
 
     { AlarmMessageType_t::ALL, 5200, "Firmware error", "Firmwarefehler", "Erreur du micrologiciel" },
 
@@ -186,8 +186,8 @@ const std::array<const AlarmMessage_t, ALARM_MSG_COUNT> AlarmLogParser::_alarmMe
     { AlarmMessageType_t::ALL, 5520, "H-bridge MOSFET overcurrent or H-bridge overvoltage", "H-Brücken-MOSFET-Überstrom oder H-Brücken-Überspannung", "" },
 
     { AlarmMessageType_t::ALL, 8310, "Shut down by remote control", "Durch Fernsteuerung abgeschaltet", "Arrêt par télécommande" },
-    { AlarmMessageType_t::ALL, 8320, "Locked by remote control", "", "" },
-    { AlarmMessageType_t::ALL, 9000, "Microinverter is suspected of being stolen", "", "" },
+    { AlarmMessageType_t::ALL, 8320, "Locked by remote control", "Per Fernbedienung sperrbar", "" },
+    { AlarmMessageType_t::ALL, 9000, "Microinverter is suspected of being stolen", "Verdacht auf Diebstahl des Mikrowechselrichters", "" },
 } };
 
 AlarmLogParser::AlarmLogParser()
