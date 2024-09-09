@@ -106,7 +106,7 @@ void PylontechCanReceiver::onMessage(twai_message_t rx_message)
                 MessageOutput.printf("[Pylontech] Manufacturer: %s\r\n", manufacturer.c_str());
             }
 
-            _stats->setManufacturer(std::move(manufacturer));
+            _stats->setManufacturer(manufacturer);
             break;
         }
 
