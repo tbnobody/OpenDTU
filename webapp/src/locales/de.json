@@ -667,7 +667,7 @@
         "EnableBattery": "Aktiviere Schnittstelle",
         "VerboseLogging": "@:base.VerboseLogging",
         "Provider": "Datenanbieter",
-        "ProviderPylontechCan": "Pylontech per CAN-Bus",
+        "ProviderPylontechCan": "Pylontech oder DEYE per CAN-Bus",
         "ProviderJkBmsSerial": "Jikong (JK) BMS per serieller Verbindung",
         "ProviderMqtt": "Batteriewerte aus MQTT Broker",
         "ProviderVictron": "Victron SmartShunt per VE.Direct Schnittstelle",
