@@ -91,11 +91,11 @@ void WebApiDtuClass::onDtuAdminPost(AsyncWebServerRequest* request)
 
     auto& retMsg = response->getRoot();
 
-    if (!(root.containsKey("serial") 
+    if (!(root.containsKey("serial")
             && root.containsKey("pollinterval")
-            && root.containsKey("verbose_logging") 
-            && root.containsKey("nrf_palevel") 
-            && root.containsKey("cmt_palevel") 
+            && root.containsKey("verbose_logging")
+            && root.containsKey("nrf_palevel")
+            && root.containsKey("cmt_palevel")
             && root.containsKey("cmt_frequency")
             && root.containsKey("cmt_country"))) {
         retMsg["message"] = "Values are missing!";
