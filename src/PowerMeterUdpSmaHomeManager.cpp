@@ -18,7 +18,7 @@ void PowerMeterUdpSmaHomeManager::Soutput(int kanal, int index, int art, int tar
 {
     if (!_verboseLogging) { return; }
 
-    MessageOutput.printf("[PowerMeterUdpSmaHomeManager] %s = %.1f (timestamp %d)\r\n",
+    MessageOutput.printf("[PowerMeterUdpSmaHomeManager] %s = %.1f (timestamp %u)\r\n",
             name, value, timestamp);
 }
 
@@ -139,6 +139,7 @@ uint8_t* PowerMeterUdpSmaHomeManager::decodeGroup(uint8_t* offset, uint16_t grou
                 Soutput(kanal, index, art, tarif, "Leistung L2", _powerMeterL2, timestamp);
                 Soutput(kanal, index, art, tarif, "Leistung L3", _powerMeterL3, timestamp);
                 count = 0;
+                gotUpdate();
             }
 
             continue;

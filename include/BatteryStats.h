@@ -18,7 +18,7 @@ class BatteryStats {
         uint32_t getAgeSeconds() const { return (millis() - _lastUpdate) / 1000; }
         bool updateAvailable(uint32_t since) const;
 
-        uint8_t getSoC() const { return _soc; }
+        float getSoC() const { return _soc; }
         uint32_t getSoCAgeSeconds() const { return (millis() - _lastUpdateSoC) / 1000; }
         uint8_t getSoCPrecision() const { return _socPrecision; }
 
@@ -67,13 +67,15 @@ class BatteryStats {
             _lastUpdateCurrent = _lastUpdate = timestamp;
         }
 
-        String _manufacturer = "unknown";
+        void setManufacturer(const String& m);
+
         String _hwversion = "";
         String _fwversion = "";
         String _serial = "";
         uint32_t _lastUpdate = 0;
 
     private:
+        String _manufacturer = "unknown";
         uint32_t _lastMqttPublish = 0;
         float _soc = 0;
         uint8_t _socPrecision = 0; // decimal places
@@ -98,7 +100,6 @@ class PylontechBatteryStats : public BatteryStats {
         float getChargeCurrentLimitation() const { return _chargeCurrentLimitation; } ;
 
     private:
-        void setManufacturer(String&& m) { _manufacturer = std::move(m); }
         void setLastUpdate(uint32_t ts) { _lastUpdate = ts; }
 
         float _chargeVoltage;
@@ -137,7 +138,6 @@ class PytesBatteryStats : public BatteryStats {
         float getChargeCurrentLimitation() const { return _chargeCurrentLimit; } ;
 
     private:
-        void setManufacturer(String&& m) { _manufacturer = std::move(m); }
         void setLastUpdate(uint32_t ts) { _lastUpdate = ts; }
         void updateSerial() {
             if (!_serialPart1.isEmpty() && !_serialPart2.isEmpty()) {

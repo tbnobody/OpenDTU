@@ -42,7 +42,7 @@ private:
     uint32_t _lastPoll = 0;
 
     mutable std::mutex _valueMutex;
-    power_values_t _powerValues;
+    power_values_t _powerValues = {};
 
     std::array<std::unique_ptr<HttpGetter>, POWERMETER_HTTP_JSON_MAX_VALUES> _httpGetters;
 

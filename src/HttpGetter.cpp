@@ -2,6 +2,7 @@
 #include "HttpGetter.h"
 #include <WiFiClientSecure.h>
 #include "mbedtls/sha256.h"
+#include "mbedtls/md5.h"
 #include <base64.h>
 #include <ESPmDNS.h>
 
@@ -100,7 +101,7 @@ HttpRequestResult HttpGetter::performGetRequest()
         }
     }
 
-    auto upTmpHttpClient = std::make_unique<HTTPClient>();
+    auto upTmpHttpClient = std::make_unique<HttpGetterClient>();
 
     // use HTTP1.0 to avoid problems with chunked transfer encoding when the
     // stream is later used to read the server's response.
@@ -135,8 +136,23 @@ HttpRequestResult HttpGetter::performGetRequest()
             break;
         }
         case Auth_t::Digest: {
-            const char *headers[1] = {"WWW-Authenticate"};
-            upTmpHttpClient->collectHeaders(headers, 1);
+            // send "Connection: keep-alive" (despite using HTTP/1.0, where
+            // "Connection: close" is the default) so there is a chance to
+            // reuse the TCP connection when performing the second GET request.
+            upTmpHttpClient->setReuse(true);
+
+            const char *headers[2] = {"WWW-Authenticate", "Connection"};
+            upTmpHttpClient->collectHeaders(headers, 2);
+
+            // try with new auth response based on previous WWW-Authenticate
+            // header, which allows us to retrieve the resource without a
+            // second GET request. if the server decides that we reused the
+            // previous challenge too often, it will respond with HTTP401 and
+            // a new challenge, which we handle as if we had no challenge yet.
+            auto authorization = getAuthDigest();
+            if (authorization.first) {
+                upTmpHttpClient->addHeader("Authorization", authorization.second);
+            }
             break;
         }
     }
@@ -144,14 +160,36 @@ HttpRequestResult HttpGetter::performGetRequest()
     int httpCode = upTmpHttpClient->GET();
 
     if (httpCode == HTTP_CODE_UNAUTHORIZED && _config.AuthType == Auth_t::Digest) {
+        _wwwAuthenticate = "";
+
         if (!upTmpHttpClient->hasHeader("WWW-Authenticate")) {
             logError("Cannot perform digest authentication as server did "
                         "not send a WWW-Authenticate header");
             return { false };
         }
-        String authReq = upTmpHttpClient->header("WWW-Authenticate");
-        String authorization = getAuthDigest(authReq, 1);
-        upTmpHttpClient->addHeader("Authorization", authorization);
+
+        _wwwAuthenticate = upTmpHttpClient->header("WWW-Authenticate");
+
+        // using a new WWW-Authenticate challenge means
+        // we never used the server's nonce in a response
+        _nonceCounter = 0;
+
+        auto authorization = getAuthDigest();
+        if (!authorization.first) {
+            logError("Digest Error: %s", authorization.second.c_str());
+            return { false };
+        }
+        upTmpHttpClient->addHeader("Authorization", authorization.second);
+
+        // use a new TCP connection if the server sent "Connection: close".
+        bool restart = true;
+        if (upTmpHttpClient->hasHeader("Connection")) {
+            String connection = upTmpHttpClient->header("Connection");
+            connection.toLowerCase();
+            restart = connection.indexOf("keep-alive") == -1;
+        }
+        if (restart) { upTmpHttpClient->restartTCP(); }
+
         httpCode = upTmpHttpClient->GET();
     }
 
@@ -168,6 +206,29 @@ HttpRequestResult HttpGetter::performGetRequest()
     return { true, std::move(upTmpHttpClient), _spWiFiClient };
 }
 
+template<size_t binLen>
+static String bin2hex(uint8_t* hash) {
+    size_t constexpr kOutLen = binLen * 2 + 1;
+    char res[kOutLen];
+    for (int i = 0; i < binLen; i++) {
+        snprintf(res + (i*2), sizeof(res) - (i*2), "%02x", hash[i]);
+    }
+    return res;
+}
+
+static String md5(const String& data) {
+    uint8_t hash[16];
+
+    mbedtls_md5_context ctx;
+    mbedtls_md5_init(&ctx);
+    mbedtls_md5_starts_ret(&ctx);
+    mbedtls_md5_update_ret(&ctx, reinterpret_cast<const unsigned char*>(data.c_str()), data.length());
+    mbedtls_md5_finish_ret(&ctx, hash);
+    mbedtls_md5_free(&ctx);
+
+    return bin2hex<sizeof(hash)>(hash);
+}
+
 static String sha256(const String& data) {
     uint8_t hash[32];
 
@@ -178,12 +239,7 @@ static String sha256(const String& data) {
     mbedtls_sha256_finish(&ctx, hash);
     mbedtls_sha256_free(&ctx);
 
-    char res[sizeof(hash) * 2 + 1];
-    for (int i = 0; i < sizeof(hash); i++) {
-        snprintf(res + (i*2), sizeof(res) - (i*2), "%02x", hash[i]);
-    }
-
-    return res;
+    return bin2hex<sizeof(hash)>(hash);
 }
 
 static String extractParam(String const& authReq, String const& param, char delimiter) {
@@ -204,30 +260,45 @@ static String getcNonce(int len) {
     return s;
 }
 
-String HttpGetter::getAuthDigest(String const& authReq, unsigned int counter) {
+static std::pair<bool, String> getAlgo(String const& authReq) {
+    // the algorithm is NOT enclosed in double quotes, so we can't use extractParam
+    auto paramBegin = authReq.indexOf("algorithm=");
+    if (paramBegin == -1) { return { true, "MD5" }; } // default as per RFC2617
+    auto valueBegin = paramBegin + 10;
+
+    String algo = authReq.substring(valueBegin, valueBegin + 3);
+    if (algo == "MD5") { return { true, algo }; }
+
+    algo = authReq.substring(valueBegin, valueBegin + 7);
+    if (algo == "SHA-256") { return { true, algo }; }
+
+    return { false, "unsupported digest algorithm" };
+}
+
+std::pair<bool, String> HttpGetter::getAuthDigest() {
+    if (_wwwAuthenticate.isEmpty()) { return { false, "no digest challenge yet" }; }
+
     // extracting required parameters for RFC 2617 Digest
-    String realm = extractParam(authReq, "realm=\"", '"');
-    String nonce = extractParam(authReq, "nonce=\"", '"');
-    String cNonce = getcNonce(8);
+    String realm = extractParam(_wwwAuthenticate, "realm=\"", '"');
+    String nonce = extractParam(_wwwAuthenticate, "nonce=\"", '"');
+    String cNonce = getcNonce(8); // client nonce
 
     char nc[9];
-    snprintf(nc, sizeof(nc), "%08x", counter);
+    snprintf(nc, sizeof(nc), "%08x", ++_nonceCounter);
 
-    // sha256 of the user:realm:password
-    String ha1 = sha256(String(_config.Username) + ":" + realm + ":" + _config.Password);
+    auto algo = getAlgo(_wwwAuthenticate);
+    if (!algo.first) { return { false, algo.second }; }
 
-    // sha256 of method:uri
-    String ha2 = sha256("GET:" + _uri);
-
-    // sha256 of h1:nonce:nc:cNonce:auth:h2
-    String response = sha256(ha1 + ":" + nonce + ":" + String(nc) +
+    auto hash = (algo.second == "SHA-256") ? &sha256 : &md5;
+    String ha1 = hash(String(_config.Username) + ":" + realm + ":" + _config.Password);
+    String ha2 = hash("GET:" + _uri);
+    String response = hash(ha1 + ":" + nonce + ":" + String(nc) +
             ":" + cNonce + ":" + "auth" + ":" + ha2);
 
-    // Final authorization String
-    return String("Digest username=\"") + _config.Username +
+    return { true, String("Digest username=\"") + _config.Username +
         "\", realm=\"" + realm + "\", nonce=\"" + nonce + "\", uri=\"" +
         _uri + "\", cnonce=\"" + cNonce + "\", nc=" + nc +
-        ", qop=auth, response=\"" + response  + "\", algorithm=SHA-256";
+        ", qop=auth, response=\"" + response  + "\", algorithm=" + algo.second };
 }
 
 void HttpGetter::addHeader(char const* key, char const* value)

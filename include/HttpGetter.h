@@ -9,7 +9,17 @@
 #include <HTTPClient.h>
 #include <WiFiClient.h>
 
-using up_http_client_t = std::unique_ptr<HTTPClient>;
+class HttpGetterClient : public HTTPClient {
+public:
+    void restartTCP() {
+        // keeps the NetworkClient, and closes the TCP connections (as we
+        // effectively do not support keep-alive with HTTP 1.0).
+        HTTPClient::disconnect(true);
+        HTTPClient::connect();
+    }
+};
+
+using up_http_client_t = std::unique_ptr<HttpGetterClient>;
 using sp_wifi_client_t = std::shared_ptr<WiFiClient>;
 
 class HttpRequestResult {
@@ -59,7 +69,7 @@ public:
     char const* getErrorText() const { return _errBuffer; }
 
 private:
-    String getAuthDigest(String const& authReq, unsigned int counter);
+    std::pair<bool, String> getAuthDigest();
     HttpRequestConfig const& _config;
 
     template<typename... Args>
@@ -70,6 +80,9 @@ private:
     String _host;
     String _uri;
     uint16_t _port;
+
+    String _wwwAuthenticate = "";
+    unsigned _nonceCounter = 0;
 
     sp_wifi_client_t _spWiFiClient; // reused for multiple HTTP requests
 

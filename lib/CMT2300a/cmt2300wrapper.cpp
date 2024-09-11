@@ -7,8 +7,9 @@
 #include "cmt2300a_params_860.h"
 #include "cmt2300a_params_900.h"
 
-CMT2300A::CMT2300A(const uint8_t pin_sdio, const uint8_t pin_clk, const uint8_t pin_cs, const uint8_t pin_fcs, const uint32_t spi_speed)
+CMT2300A::CMT2300A(const spi_host_device_t spi_host, const uint8_t pin_sdio, const uint8_t pin_clk, const uint8_t pin_cs, const uint8_t pin_fcs, const uint32_t spi_speed)
 {
+    _spi_host = spi_host;
     _pin_sdio = pin_sdio;
     _pin_clk = pin_clk;
     _pin_cs = pin_cs;
@@ -266,7 +267,7 @@ void CMT2300A::flush_rx(void)
 
 bool CMT2300A::_init_pins()
 {
-    CMT2300A_InitSpi(_pin_sdio, _pin_clk, _pin_cs, _pin_fcs, _spi_speed);
+    CMT2300A_InitSpi(_spi_host, _pin_sdio, _pin_clk, _pin_cs, _pin_fcs, _spi_speed);
 
     return true; // assuming pins are connected properly
 }

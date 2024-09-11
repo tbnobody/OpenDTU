@@ -153,13 +153,13 @@ void WebApiPowerLimiterClass::onAdminPost(AsyncWebServerRequest* request)
     if (config.Vedirect.Enabled) {
         config.PowerLimiter.SolarPassThroughEnabled = root["solar_passthrough_enabled"].as<bool>();
         config.PowerLimiter.SolarPassThroughLosses = root["solar_passthrough_losses"].as<uint8_t>();
-        config.PowerLimiter.BatteryAlwaysUseAtNight= root["battery_always_use_at_night"].as<bool>();
         config.PowerLimiter.FullSolarPassThroughStartVoltage = static_cast<int>(root["full_solar_passthrough_start_voltage"].as<float>() * 100) / 100.0;
         config.PowerLimiter.FullSolarPassThroughStopVoltage = static_cast<int>(root["full_solar_passthrough_stop_voltage"].as<float>() * 100) / 100.0;
     }
 
     config.PowerLimiter.IsInverterBehindPowerMeter = root["is_inverter_behind_powermeter"].as<bool>();
     config.PowerLimiter.IsInverterSolarPowered = root["is_inverter_solar_powered"].as<bool>();
+    config.PowerLimiter.BatteryAlwaysUseAtNight = root["battery_always_use_at_night"].as<bool>();
     config.PowerLimiter.UseOverscalingToCompensateShading = root["use_overscaling_to_compensate_shading"].as<bool>();
     config.PowerLimiter.InverterId = root["inverter_serial"].as<uint64_t>();
     config.PowerLimiter.InverterChannelId = root["inverter_channel_id"].as<uint8_t>();

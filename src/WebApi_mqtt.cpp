@@ -4,8 +4,12 @@
  */
 #include "WebApi_mqtt.h"
 #include "Configuration.h"
+#include "MqttHandleBatteryHass.h"
 #include "MqttHandleHass.h"
+#include "MqttHandlePowerLimiterHass.h"
 #include "MqttHandleInverter.h"
+#include "MqttHandleHuawei.h"
+#include "MqttHandlePowerLimiter.h"
 #include "MqttHandleVedirectHass.h"
 #include "MqttHandleVedirect.h"
 #include "MqttSettings.h"
@@ -307,8 +311,13 @@ void WebApiMqttClass::onMqttAdminPost(AsyncWebServerRequest* request)
     // Check if base topic was changed
     if (strcmp(config.Mqtt.Topic, root["mqtt_topic"].as<String>().c_str())) {
         MqttHandleInverter.unsubscribeTopics();
+        MqttHandleHuawei.unsubscribeTopics();
+        MqttHandlePowerLimiter.unsubscribeTopics();
+
         strlcpy(config.Mqtt.Topic, root["mqtt_topic"].as<String>().c_str(), sizeof(config.Mqtt.Topic));
         MqttHandleInverter.subscribeTopics();
+        MqttHandleHuawei.subscribeTopics();
+        MqttHandlePowerLimiter.subscribeTopics();
     }
 
     WebApi.writeConfig(retMsg);
@@ -316,8 +325,14 @@ void WebApiMqttClass::onMqttAdminPost(AsyncWebServerRequest* request)
     WebApi.sendJsonResponse(request, response, __FUNCTION__, __LINE__);
 
     MqttSettings.performReconnect();
+
+    MqttHandleBatteryHass.forceUpdate();
     MqttHandleHass.forceUpdate();
+    MqttHandlePowerLimiterHass.forceUpdate();
     MqttHandleVedirectHass.forceUpdate();
+
+    MqttHandleHuawei.forceUpdate();
+    MqttHandlePowerLimiter.forceUpdate();
     MqttHandleVedirect.forceUpdate();
 }
 

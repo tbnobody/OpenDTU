@@ -79,7 +79,8 @@ export default defineComponent({
             const fetchUrl =
                 'https://api.github.com/repos/helgeerbe/OpenDTU-OnBattery/compare/' +
                 this.systemDataList.git_hash +
-                '...HEAD';
+                '...' +
+                this.systemDataList.git_branch;
 
             fetch(fetchUrl)
                 .then((response) => {
@@ -91,7 +92,7 @@ export default defineComponent({
                 .then((data) => {
                     if (data.total_commits > 0) {
                         this.systemDataList.update_text = this.$t('systeminfo.VersionNew');
-                        this.systemDataList.update_status = 'text-bg-danger';
+                        this.systemDataList.update_status = 'text-bg-warning';
                         this.systemDataList.update_url = data.html_url;
                     } else {
                         this.systemDataList.update_text = this.$t('systeminfo.VersionOk');
