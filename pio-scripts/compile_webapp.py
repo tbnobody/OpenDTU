@@ -28,21 +28,27 @@ def check_files(directories, filepaths, hash_file):
             break
 
     if not update:
-        print("webapp artifacts should be up-to-date")
+        print("INFO: webapp artifacts should be up-to-date")
         return
 
-    print("compiling webapp (hang on, this can take a while and there might be little output)...")
+    print("INFO: compiling webapp (hang on, this can take a while and there might be little output)...")
 
+    yarn = "yarn"
     try:
-        # if these commands fail, an exception will prevent us from
-        # persisting the current hashes => commands will be executed again
-        subprocess.run(["yarn", "--cwd", "webapp", "install", "--frozen-lockfile"],
-                       check=True)
-
-        subprocess.run(["yarn", "--cwd", "webapp", "build"], check=True)
-
+        subprocess.check_output([yarn, "--version"])
     except FileNotFoundError:
-        raise Exception("it seems 'yarn' is not installed/available on your system")
+        yarn = "yarnpkg"
+        try:
+            subprocess.check_output([yarn, "--version"])
+        except FileNotFoundError:
+            raise Exception("it seems neither 'yarn' nor 'yarnpkg' is installed/available on your system")
+
+    # if these commands fail, an exception will prevent us from
+    # persisting the current hashes => commands will be executed again
+    subprocess.run([yarn, "--cwd", "webapp", "install", "--frozen-lockfile"],
+                   check=True)
+
+    subprocess.run([yarn, "--cwd", "webapp", "build"], check=True)
 
     with open(hash_file, 'wb') as f:
         pickle.dump(file_hashes, f)
