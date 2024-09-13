@@ -80,11 +80,3 @@ float PowerMeterMqtt::getPowerTotal() const
     for (auto v: _powerValues) { sum += v; }
     return sum;
 }
-
-void PowerMeterMqtt::doMqttPublish() const
-{
-    std::lock_guard<std::mutex> l(_mutex);
-    mqttPublish("power1", _powerValues[0]);
-    mqttPublish("power2", _powerValues[1]);
-    mqttPublish("power3", _powerValues[2]);
-}
