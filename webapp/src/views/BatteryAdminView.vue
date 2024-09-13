@@ -37,58 +37,23 @@
             </CardElement>
 
             <CardElement
-                v-if="batteryConfigList.enabled && batteryConfigList.provider == 1"
-                :text="$t('batteryadmin.JkBmsConfiguration')"
+                v-if="batteryConfigList.enabled && (batteryConfigList.provider == 1 || batteryConfigList.provider == 6)"
+                :text="$t('batteryadmin.SerialSettings')"
                 textVariant="text-bg-primary"
                 addSpace
             >
                 <div class="row mb-3">
                     <label class="col-sm-4 col-form-label">
-                        {{ $t('batteryadmin.JkBmsInterface') }}
+                        {{ $t('batteryadmin.SerialInterfaceType') }}
                     </label>
                     <div class="col-sm-8">
                         <select class="form-select" v-model="batteryConfigList.jkbms_interface">
                             <option
-                                v-for="jkBmsInterface in jkBmsInterfaceTypeList"
-                                :key="jkBmsInterface.key"
-                                :value="jkBmsInterface.key"
+                                v-for="serialInterface in serialBmsInterfaceTypeList"
+                                :key="serialInterface.key"
+                                :value="serialInterface.key"
                             >
-                                {{ $t(`batteryadmin.JkBmsInterface` + jkBmsInterface.value) }}
-                            </option>
-                        </select>
-                    </div>
-                </div>
-
-                <InputElement
-                    :label="$t('batteryadmin.PollingInterval')"
-                    v-model="batteryConfigList.jkbms_polling_interval"
-                    type="number"
-                    min="2"
-                    max="90"
-                    step="1"
-                    :postfix="$t('batteryadmin.Seconds')"
-                    wide
-                />
-            </CardElement>
-
-            <CardElement
-                v-if="batteryConfigList.enabled && batteryConfigList.provider == 6"
-                :text="$t('batteryadmin.JbdBmsConfiguration')"
-                textVariant="text-bg-primary"
-                addSpace
-            >
-                <div class="row mb-3">
-                    <label class="col-sm-4 col-form-label">
-                        {{ $t('batteryadmin.JkBmsInterface') }}
-                    </label>
-                    <div class="col-sm-8">
-                        <select class="form-select" v-model="batteryConfigList.jkbms_interface">
-                            <option
-                                v-for="jkBmsInterface in jkBmsInterfaceTypeList"
-                                :key="jkBmsInterface.key"
-                                :value="jkBmsInterface.key"
-                            >
-                                {{ $t(`batteryadmin.JkBmsInterface` + jkBmsInterface.value) }}
+                                {{ $t(`batteryadmin.SerialInterfaceType` + serialInterface.value) }}
                             </option>
                         </select>
                     </div>
@@ -316,7 +281,7 @@ export default defineComponent({
                 { key: 5, value: 'SBSCan' },
                 { key: 6, value: 'JbdBmsSerial' },
             ],
-            jkBmsInterfaceTypeList: [
+            serialBmsInterfaceTypeList: [
                 { key: 0, value: 'Uart' },
                 { key: 1, value: 'Transceiver' },
             ],
