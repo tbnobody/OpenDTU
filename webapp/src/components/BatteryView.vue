@@ -6,7 +6,6 @@
     </div>
 
     <div v-else-if="'values' in batteryData">
-        <!-- suppress the card for MQTT battery provider -->
         <div class="row gy-3 mt-0">
             <div class="tab-content col-sm-12 col-md-12" id="v-pills-tabContent">
                 <div class="card">
@@ -89,7 +88,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="col order-1">
+                            <div class="col order-1" v-show="batteryData.showIssues">
                                 <div class="card">
                                     <div :class="{ 'card-header': true, 'border-bottom-0': maxIssueValue === 0 }">
                                         <div class="d-flex flex-row justify-content-between align-items-baseline">

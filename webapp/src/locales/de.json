@@ -684,7 +684,14 @@
         "JkBmsInterfaceUart": "TTL-UART an der MCU",
         "JkBmsInterfaceTransceiver": "RS-485 Transceiver an der MCU",
         "PollingInterval": "Abfrageintervall",
-        "Seconds": "@:base.Seconds"
+        "Seconds": "@:base.Seconds",
+        "DischargeCurrentLimitConfiguration": "Einstellungen Entladestromlimit",
+        "LimitDischargeCurrent": "Entladestrom limitieren",
+        "DischargeCurrentLimit": "max. Entladestrom",
+        "UseBatteryReportedDischargeCurrentLimit": "Von der Batterie übermitteltes Limit verwenden",
+        "BatteryReportedDischargeCurrentLimitInfo": "<b>Hinweis:</b> Das niedrigste Limit wird angewendet, wobei das von der Batterie übermittelte Entladestromlimit nur verwendet wird, wenn in der letzten Minute ein Update eingegangen ist; andernfalls dient das zuvor festgelegte Limit als Fallback.",
+        "MqttDischargeCurrentTopic": "Topic für Entladestromlimit",
+        "MqttAmperageUnit": "Einheit"
     },
     "inverteradmin": {
         "InverterSettings": "Wechselrichter Einstellungen",

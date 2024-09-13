@@ -14,5 +14,6 @@ export interface Battery {
     hwversion: string;
     data_age: number;
     values: BatteryData[];
+    showIssues: boolean;
     issues: number[];
 }

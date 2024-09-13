@@ -901,7 +901,7 @@ int32_t PowerLimiterClass::getSolarPower()
 
 int32_t PowerLimiterClass::getBatteryDischargeLimit()
 {
-    auto currentLimit = Battery.getStats()->getDischargeCurrentLimitation();
+    auto currentLimit = Battery.getDischargeCurrentLimit();
 
     if (currentLimit == FLT_MAX) {
         // the returned value is arbitrary, as long as it's

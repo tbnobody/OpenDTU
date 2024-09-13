@@ -128,6 +128,28 @@ using PowerMeterHttpSmlConfig = struct POWERMETER_HTTP_SML_CONFIG_T;
 
 enum BatteryVoltageUnit { Volts = 0, DeciVolts = 1, CentiVolts = 2, MilliVolts = 3 };
 
+enum BatteryAmperageUnit { Amps = 0, MilliAmps = 1 };
+
+struct BATTERY_CONFIG_T {
+    bool Enabled;
+    bool VerboseLogging;
+    uint8_t Provider;
+    uint8_t JkBmsInterface;
+    uint8_t JkBmsPollingInterval;
+    char MqttSocTopic[MQTT_MAX_TOPIC_STRLEN + 1];
+    char MqttSocJsonPath[BATTERY_JSON_MAX_PATH_STRLEN + 1];
+    char MqttVoltageTopic[MQTT_MAX_TOPIC_STRLEN + 1];
+    char MqttVoltageJsonPath[BATTERY_JSON_MAX_PATH_STRLEN + 1];
+    BatteryVoltageUnit MqttVoltageUnit;
+    bool EnableDischargeCurrentLimit;
+    float DischargeCurrentLimit;
+    bool UseBatteryReportedDischargeCurrentLimit;
+    char MqttDischargeCurrentTopic[MQTT_MAX_TOPIC_STRLEN + 1];
+    char MqttDischargeCurrentJsonPath[BATTERY_JSON_MAX_PATH_STRLEN + 1];
+    BatteryAmperageUnit MqttAmperageUnit;
+};
+using BatteryConfig = struct BATTERY_CONFIG_T;
+
 struct CONFIG_T {
     struct {
         uint32_t Version;
@@ -277,18 +299,7 @@ struct CONFIG_T {
         float FullSolarPassThroughStopVoltage;
     } PowerLimiter;
 
-    struct {
-        bool Enabled;
-        bool VerboseLogging;
-        uint8_t Provider;
-        uint8_t JkBmsInterface;
-        uint8_t JkBmsPollingInterval;
-        char MqttSocTopic[MQTT_MAX_TOPIC_STRLEN + 1];
-        char MqttSocJsonPath[BATTERY_JSON_MAX_PATH_STRLEN + 1];
-        char MqttVoltageTopic[MQTT_MAX_TOPIC_STRLEN + 1];
-        char MqttVoltageJsonPath[BATTERY_JSON_MAX_PATH_STRLEN + 1];
-        BatteryVoltageUnit MqttVoltageUnit;
-    } Battery;
+    BatteryConfig Battery;
 
     struct {
         bool Enabled;
@@ -327,12 +338,14 @@ public:
     static void serializePowerMeterSerialSdmConfig(PowerMeterSerialSdmConfig const& source, JsonObject& target);
     static void serializePowerMeterHttpJsonConfig(PowerMeterHttpJsonConfig const& source, JsonObject& target);
     static void serializePowerMeterHttpSmlConfig(PowerMeterHttpSmlConfig const& source, JsonObject& target);
+    static void serializeBatteryConfig(BatteryConfig const& source, JsonObject& target);
 
     static void deserializeHttpRequestConfig(JsonObject const& source, HttpRequestConfig& target);
     static void deserializePowerMeterMqttConfig(JsonObject const& source, PowerMeterMqttConfig& target);
     static void deserializePowerMeterSerialSdmConfig(JsonObject const& source, PowerMeterSerialSdmConfig& target);
     static void deserializePowerMeterHttpJsonConfig(JsonObject const& source, PowerMeterHttpJsonConfig& target);
     static void deserializePowerMeterHttpSmlConfig(JsonObject const& source, PowerMeterHttpSmlConfig& target);
+    static void deserializeBatteryConfig(JsonObject const& source, BatteryConfig& target);
 };
 
 extern ConfigurationClass Configuration;

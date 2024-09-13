@@ -21,6 +21,8 @@ public:
     void init(Scheduler&);
     void updateSettings();
 
+    float getDischargeCurrentLimit();
+
     std::shared_ptr<BatteryStats const> getStats() const;
 
 private:
