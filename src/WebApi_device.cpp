@@ -50,6 +50,14 @@ void WebApiDeviceClass::onDeviceAdminGet(AsyncWebServerRequest* request)
     cmtPinObj["gpio2"] = pin.cmt_gpio2;
     cmtPinObj["gpio3"] = pin.cmt_gpio3;
 
+    auto w5500PinObj = curPin["w5500"].to<JsonObject>();
+    w5500PinObj["sclk"] = pin.w5500_sclk;
+    w5500PinObj["mosi"] = pin.w5500_mosi;
+    w5500PinObj["miso"] = pin.w5500_miso;
+    w5500PinObj["cs"] = pin.w5500_cs;
+    w5500PinObj["int"] = pin.w5500_int;
+    w5500PinObj["rst"] = pin.w5500_rst;
+
     auto ethPinObj = curPin["eth"].to<JsonObject>();
     ethPinObj["enabled"] = pin.eth_enabled;
     ethPinObj["phy_addr"] = pin.eth_phy_addr;

@@ -83,6 +83,7 @@ private:
     bool _ethConnected = false;
     std::vector<NetworkEventCbList_t> _cbEventList;
     bool _lastMdnsEnabled = false;
+    bool _spiEth = false;
 };
 
 extern NetworkSettingsClass NetworkSettings;
