@@ -10,4 +10,7 @@ export interface NetworkConfig {
     dns2: string;
     aptimeout: number;
     mdnsenabled: boolean;
+    syslogenabled: boolean;
+    sysloghostname: string;
+    syslogport: number;
 }

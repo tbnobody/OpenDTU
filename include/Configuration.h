@@ -11,6 +11,8 @@
 #define WIFI_MAX_PASSWORD_STRLEN 64
 #define WIFI_MAX_HOSTNAME_STRLEN 31
 
+#define SYSLOG_MAX_HOSTNAME_STRLEN 128
+
 #define NTP_MAX_SERVER_STRLEN 31
 #define NTP_MAX_TIMEZONE_STRLEN 50
 #define NTP_MAX_TIMEZONEDESCR_STRLEN 50
@@ -75,6 +77,12 @@ struct CONFIG_T {
     struct {
         bool Enabled;
     } Mdns;
+
+    struct {
+        bool Enabled;
+        char Hostname[SYSLOG_MAX_HOSTNAME_STRLEN + 1];
+        uint32_t Port;
+    } Syslog;
 
     struct {
         char Server[NTP_MAX_SERVER_STRLEN + 1];
