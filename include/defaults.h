@@ -24,6 +24,7 @@
 
 #define SYSLOG_ENABLED false
 #define SYSLOG_PORT 514
+#define SYSLOG_APPNAME "OpenDTU"
 
 #define NTP_SERVER_OLD "pool.ntp.org"
 #define NTP_SERVER "opendtu.pool.ntp.org"
