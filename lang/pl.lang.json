@@ -119,6 +119,8 @@
             "8004": "Adres IP serwera DNS 1 jest nieprawidłowy!",
             "8005": "Adres IP serwera DNS 2 jest nieprawidłowy!",
             "8006": "Wartość limitu czasu administracyjnego punktu dostępowego jest nieprawidłowa",
+            "8007": "Syslog Server must between 1 and {max} characters long!",
+            "8008": "Port must be a number between 1 and 65535!",
             "9001": "Serwer NTP musi mieć od 1 do {max} znaków!",
             "9002": "Strefa czasowa musi mieć długość od 1 do {max} znaków!!",
             "9003": "Opis strefy czasowej musi mieć od 1 do {max} znaków!",

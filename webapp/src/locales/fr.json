@@ -104,6 +104,8 @@
         "8004": "L'adresse IP du serveur DNS primaire n'est pas valide !",
         "8005": "L'adresse IP du serveur DNS secondaire n'est pas valide !",
         "8006": "La valeur du délai d'attente du point d'accès administratif n'est pas valide !",
+        "8007": "Syslog Server must between 1 and {max} characters long!",
+        "8008": "Port must be a number between 1 and 65535!",
         "9001": "Le serveur NTP doit avoir une longueur comprise entre 1 et {max} caractères !",
         "9002": "Le fuseau horaire doit comporter entre 1 et {max} caractères !",
         "9003": "La description du fuseau horaire doit comporter entre 1 et {max} caractères !",

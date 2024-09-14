@@ -119,6 +119,8 @@
             "8004": "¡La dirección IP del servidor DNS 1 no es válida!",
             "8005": "¡La dirección IP del servidor DNS 2 no es válida!",
             "8006": "¡El valor de tiempo de espera del punto de acceso administrativo es inválido!",
+            "8007": "Syslog Server must between 1 and {max} characters long!",
+            "8008": "Port must be a number between 1 and 65535!",
             "9001": "¡El servidor NTP debe tener entre 1 y {max} caracteres de longitud!",
             "9002": "¡La zona horaria debe tener entre 1 y {max} caracteres de longitud!",
             "9003": "¡La descripción de la zona horaria debe tener entre 1 y {max} caracteres de longitud!",
