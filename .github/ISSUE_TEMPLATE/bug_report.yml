@@ -59,6 +59,14 @@ body:
       placeholder: "e.g. 359d513"
     validations:
       required: true
+  - type: input
+    id: environment
+    attributes:
+      label: What firmware variant (PIO Environment) are you using?
+      description: You can find this in by going to Info -> System
+      placeholder: "generic_esp32s3_usb"
+    validations:
+      required: true
   - type: textarea
     id: logs
     attributes:
