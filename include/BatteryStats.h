@@ -142,6 +142,38 @@ class PylontechBatteryStats : public BatteryStats {
         bool _chargeImmediately;
 };
 
+class SBSBatteryStats : public BatteryStats {
+    friend class SBSCanReceiver;
+
+    public:
+        void getLiveViewData(JsonVariant& root) const final;
+        void mqttPublish() const final;
+        float getChargeCurrent() const { return _current; } ;
+        float getChargeCurrentLimitation() const { return _chargeCurrentLimitation; } ;
+
+    private:
+        void setLastUpdate(uint32_t ts) { _lastUpdate = ts; }
+
+        float _chargeVoltage;
+        float _chargeCurrentLimitation;
+        float _dischargeCurrentLimitation;
+        uint16_t _stateOfHealth;
+        float _current;
+        float _temperature;
+
+        bool _alarmUnderTemperature;
+        bool _alarmOverTemperature;
+        bool _alarmUnderVoltage;
+        bool _alarmOverVoltage;
+        bool _alarmBmsInternal;
+
+        bool _warningHighCurrentDischarge;
+        bool _warningHighCurrentCharge;
+
+        bool _chargeEnabled;
+        bool _dischargeEnabled;
+};
+
 class PytesBatteryStats : public BatteryStats {
     friend class PytesCanReceiver;
 
