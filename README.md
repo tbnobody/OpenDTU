@@ -40,41 +40,44 @@ Generated using: `git log --date=short --pretty=format:"* %h%x09%ad%x09%s" | gre
 
 ## Currently supported Inverters
 
-| Model                | Required RF Module | DC Inputs | MPP-Tracker | AC Phases |
-| ---------------------| ------------------ | --------- | ----------- | --------- |
-| Hoymiles HM-300-1T   | NRF24L01+          | 1         | 1           | 1         |
-| Hoymiles HM-350-1T   | NRF24L01+          | 1         | 1           | 1         |
-| Hoymiles HM-400-1T   | NRF24L01+          | 1         | 1           | 1         |
-| Hoymiles HM-600-2T   | NRF24L01+          | 2         | 2           | 1         |
-| Hoymiles HM-700-2T   | NRF24L01+          | 2         | 2           | 1         |
-| Hoymiles HM-800-2T   | NRF24L01+          | 2         | 2           | 1         |
-| Hoymiles HM-1000-4T  | NRF24L01+          | 4         | 2           | 1         |
-| Hoymiles HM-1200-4T  | NRF24L01+          | 4         | 2           | 1         |
-| Hoymiles HM-1500-4T  | NRF24L01+          | 4         | 2           | 1         |
-| Hoymiles HMS-300-1T  | CMT2300A           | 1         | 1           | 1         |
-| Hoymiles HMS-350-1T  | CMT2300A           | 1         | 1           | 1         |
-| Hoymiles HMS-400-1T  | CMT2300A           | 1         | 1           | 1         |
-| Hoymiles HMS-450-1T  | CMT2300A           | 1         | 1           | 1         |
-| Hoymiles HMS-500-1T  | CMT2300A           | 1         | 1           | 1         |
-| Hoymiles HMS-600-2T  | CMT2300A           | 2         | 2           | 1         |
-| Hoymiles HMS-700-2T  | CMT2300A           | 2         | 2           | 1         |
-| Hoymiles HMS-800-2T  | CMT2300A           | 2         | 2           | 1         |
-| Hoymiles HMS-900-2T  | CMT2300A           | 2         | 2           | 1         |
-| Hoymiles HMS-1000-2T | CMT2300A           | 2         | 2           | 1         |
-| Hoymiles HMS-1600-4T | CMT2300A           | 4         | 4           | 1         |
-| Hoymiles HMS-1800-4T | CMT2300A           | 4         | 4           | 1         |
-| Hoymiles HMS-2000-4T | CMT2300A           | 4         | 4           | 1         |
-| Hoymiles HMT-1600-4T | CMT2300A           | 4         | 2           | 3         |
-| Hoymiles HMT-1800-4T | CMT2300A           | 4         | 2           | 3         |
-| Hoymiles HMT-2000-4T | CMT2300A           | 4         | 2           | 3         |
-| Hoymiles HMT-1800-6T | CMT2300A           | 6         | 3           | 3         |
-| Hoymiles HMT-2250-6T | CMT2300A           | 6         | 3           | 3         |
-| Solenso SOL-H350     | NRF24L01+          | 1         | 1           | 1         |
-| Solenso SOL-H400     | NRF24L01+          | 1         | 1           | 1         |
-| Solenso SOL-H800     | NRF24L01+          | 2         | 2           | 1         |
-| TSUN TSOL-M350       | NRF24L01+          | 1         | 1           | 1         |
-| TSUN TSOL-M800       | NRF24L01+          | 2         | 2           | 1         |
-| TSUN TSOL-M1600      | NRF24L01+          | 4         | 2           | 1         |
-| E-Star HERF-800      | NRF24L01+          | 2         | 2           | 1         |
-| E-Star HERF-1600     | NRF24L01+          | 4         | 2           | 1         |
-| E-Star HERF-1800     | NRF24L01+          | 4         | 2           | 1         |
+see [/lib/Hoymiles/src/inverters](https://github.com/tbnobody/OpenDTU/tree/master/lib/Hoymiles/src/inverters)
+
+| Model                | Serial | Required RF Module | DC Inputs | MPP-Tracker | AC Phases |
+| ---------------------| ------ | ------------------ | --------- | ----------- | --------- |
+| Hoymiles HM-300-1T   | `1121` | NRF24L01+          | 1         | 1           | 1         |
+| Hoymiles HM-350-1T   | `1121` | NRF24L01+          | 1         | 1           | 1         |
+| Hoymiles HM-400-1T   | `1121` | NRF24L01+          | 1         | 1           | 1         |
+| Hoymiles HM-600-2T   | `1141` | NRF24L01+          | 2         | 2           | 1         |
+| Hoymiles HM-700-2T   | `1141` | NRF24L01+          | 2         | 2           | 1         |
+| Hoymiles HM-800-2T   | `1141` | NRF24L01+          | 2         | 2           | 1         |
+| Hoymiles HM-1000-4T  | `1161` | NRF24L01+          | 4         | 2           | 1         |
+| Hoymiles HM-1200-4T  | `1161` | NRF24L01+          | 4         | 2           | 1         |
+| Hoymiles HM-1500-4T  | `1161` | NRF24L01+          | 4         | 2           | 1         |
+| Hoymiles HMS-300-1T  | `1124` | CMT2300A           | 1         | 1           | 1         |
+| Hoymiles HMS-350-1T  | `1124` | CMT2300A           | 1         | 1           | 1         |
+| Hoymiles HMS-400-1T  | `1124` | CMT2300A           | 1         | 1           | 1         |
+| Hoymiles HMS-450-1T  | `1124` | CMT2300A           | 1         | 1           | 1         |
+| Hoymiles HMS-500-1T  | `1125` | CMT2300A           | 1         | 1           | 1         |
+| Hoymiles HMS-600-2T  | `1143`,`1144` | CMT2300A           | 2         | 2           | 1         |
+| Hoymiles HMS-700-2T  | `1143`,`1144` | CMT2300A           | 2         | 2           | 1         |
+| Hoymiles HMS-800-2T  | `1143`,`1144` | CMT2300A           | 2         | 2           | 1         |
+| Hoymiles HMS-900-2T  | `1143`,`1144` | CMT2300A           | 2         | 2           | 1         |
+| Hoymiles HMS-1000-2T | `1143`,`1144` | CMT2300A           | 2         | 2           | 1         |
+| Hoymiles HMS-1600-4T | `1164` | CMT2300A           | 4         | 4           | 1         |
+| Hoymiles HMS-1800-4T | `1164` | CMT2300A           | 4         | 4           | 1         |
+| Hoymiles HMS-2000-4T | `1164` | CMT2300A           | 4         | 4           | 1         |
+| Hoymiles HMT-1600-4T | `1361` | CMT2300A           | 4         | 2           | 3         |
+| Hoymiles HMT-1800-4T | `1361` | CMT2300A           | 4         | 2           | 3         |
+| Hoymiles HMT-2000-4T | `1361` | CMT2300A           | 4         | 2           | 3         |
+| Hoymiles HMT-1800-6T | `1382` | CMT2300A           | 6         | 3           | 3         |
+| Hoymiles HMT-2250-6T | `1382` | CMT2300A           | 6         | 3           | 3         |
+| Hoymiles HMS-800**W** | **n/a** | **Unsupported (DTUBI)** | x         | y           | z         |
+| Solenso SOL-H350     | `1121` | NRF24L01+          | 1         | 1           | 1         |
+| Solenso SOL-H400     | `1121` | NRF24L01+          | 1         | 1           | 1         |
+| Solenso SOL-H800     | `1141` | NRF24L01+          | 2         | 2           | 1         |
+| TSUN TSOL-M350       | `1121` | NRF24L01+          | 1         | 1           | 1         |
+| TSUN TSOL-M800       | `1141` | NRF24L01+          | 2         | 2           | 1         |
+| TSUN TSOL-M1600      | `1161` | NRF24L01+          | 4         | 2           | 1         |
+| E-Star HERF-800      | `A110`->`2821`=>`1141` | NRF24L01+          | 2         | 2           | 1         |
+| E-Star HERF-1600     | `A010`->`2801`=>`1161` | NRF24L01+          | 4         | 2           | 1         |
+| E-Star HERF-1800     | `A010`->`2801`=>`1161` | NRF24L01+          | 4         | 2           | 1         |
