@@ -48,8 +48,8 @@ void WebApiSecurityClass::onSecurityPost(AsyncWebServerRequest* request)
 
     auto& retMsg = response->getRoot();
 
-    if (!root.containsKey("password")
-        && root.containsKey("allow_readonly")) {
+    if (!root["password"].is<String>()
+        && root["allow_readonly"].is<bool>()) {
         retMsg["message"] = "Values are missing!";
         retMsg["code"] = WebApiError::GenericValueMissing;
         WebApi.sendJsonResponse(request, response, __FUNCTION__, __LINE__);

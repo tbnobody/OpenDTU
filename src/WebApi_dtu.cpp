@@ -90,12 +90,12 @@ void WebApiDtuClass::onDtuAdminPost(AsyncWebServerRequest* request)
 
     auto& retMsg = response->getRoot();
 
-    if (!(root.containsKey("serial")
-            && root.containsKey("pollinterval")
-            && root.containsKey("nrf_palevel")
-            && root.containsKey("cmt_palevel")
-            && root.containsKey("cmt_frequency")
-            && root.containsKey("cmt_country"))) {
+    if (!(root["serial"].is<String>()
+            && root["pollinterval"].is<uint32_t>()
+            && root["nrf_palevel"].is<uint8_t>()
+            && root["cmt_palevel"].is<uint8_t>()
+            && root["cmt_frequency"].is<uint32_t>()
+            && root["cmt_country"].is<uint8_t>())) {
         retMsg["message"] = "Values are missing!";
         retMsg["code"] = WebApiError::GenericValueMissing;
         WebApi.sendJsonResponse(request, response, __FUNCTION__, __LINE__);

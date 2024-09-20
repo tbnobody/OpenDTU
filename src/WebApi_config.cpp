@@ -61,7 +61,7 @@ void WebApiConfigClass::onConfigDelete(AsyncWebServerRequest* request)
 
     auto& retMsg = response->getRoot();
 
-    if (!(root.containsKey("delete"))) {
+    if (!(root["delete"].is<bool>())) {
         retMsg["message"] = "Values are missing!";
         retMsg["code"] = WebApiError::GenericValueMissing;
         WebApi.sendJsonResponse(request, response, __FUNCTION__, __LINE__);

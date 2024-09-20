@@ -103,8 +103,8 @@ void WebApiDeviceClass::onDeviceAdminPost(AsyncWebServerRequest* request)
 
     auto& retMsg = response->getRoot();
 
-    if (!(root.containsKey("curPin")
-            || root.containsKey("display"))) {
+    if (!(root["curPin"].is<JsonObject>()
+            || root["display"].is<JsonObject>())) {
         retMsg["message"] = "Values are missing!";
         retMsg["code"] = WebApiError::GenericValueMissing;
         WebApi.sendJsonResponse(request, response, __FUNCTION__, __LINE__);
