@@ -148,7 +148,12 @@
                     />
                 </template>
 
-                <template v-if="batteryConfigList.enable_discharge_current_limit && batteryConfigList.use_battery_reported_discharge_current_limit">
+                <template
+                    v-if="
+                        batteryConfigList.enable_discharge_current_limit &&
+                        batteryConfigList.use_battery_reported_discharge_current_limit
+                    "
+                >
                     <div
                         class="alert alert-secondary"
                         role="alert"
