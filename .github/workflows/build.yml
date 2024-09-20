@@ -79,6 +79,11 @@ jobs:
           python -m pip install --upgrade pip
           pip install --upgrade platformio setuptools
 
+      - name: Enable Corepack
+        run: |
+            cd webapp
+            corepack enable
+
       - name: Setup Node.js and yarn
         uses: actions/setup-node@v4
         with:
@@ -87,10 +92,14 @@ jobs:
           cache-dependency-path: "webapp/yarn.lock"
 
       - name: Install WebApp dependencies
-        run: yarn --cwd webapp install --frozen-lockfile
+        run: |
+            cd webapp
+            yarn install --frozen-lockfile
 
       - name: Build WebApp
-        run: yarn --cwd webapp build
+        run: |
+            cd webapp
+            yarn build
 
       - name: Build firmware
         run: pio run -e ${{ matrix.environment }}

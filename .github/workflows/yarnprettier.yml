@@ -6,8 +6,14 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
+    defaults:
+      run:
+        working-directory: webapp
+
     steps:
       - uses: actions/checkout@v4
+      - name: Enable Corepack
+        run: corepack enable
       - name: Setup Node.js and yarn
         uses: actions/setup-node@v4
         with:
@@ -16,7 +22,7 @@ jobs:
           cache-dependency-path: "webapp/yarn.lock"
 
       - name: Install WebApp dependencies
-        run: yarn --cwd webapp install --frozen-lockfile
+        run: yarn install --frozen-lockfile
 
       - name: Check Formatting
-        run: yarn --cwd webapp prettier --check src/
+        run: yarn prettier --check src/
