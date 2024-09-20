@@ -19,6 +19,12 @@
             ]
         },
         {
+            "title": "## 🌎 Web Application",
+            "labels": [
+                "webapp"
+            ]
+        },
+        {
             "title": "## 📚 Documentation",
             "labels": [
                 "doc"
