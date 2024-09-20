@@ -33,22 +33,26 @@ def check_files(directories, filepaths, hash_file):
 
     print("INFO: compiling webapp (hang on, this can take a while and there might be little output)...")
 
+    # we need shell=True as on Windows, path resolution to find the yarn
+    # "exectuable" (a shell script) is only performed by cmd.exe, not by
+    # Python itself. as we are calling yarn with fixed arguments, using
+    # shell=True is fine.
     yarn = "yarn"
     try:
-        subprocess.check_output([yarn, "--version"])
+        subprocess.check_output([yarn, "--version"], shell=True)
     except FileNotFoundError:
         yarn = "yarnpkg"
         try:
-            subprocess.check_output([yarn, "--version"])
+            subprocess.check_output([yarn, "--version"], shell=True)
         except FileNotFoundError:
             raise Exception("it seems neither 'yarn' nor 'yarnpkg' is installed/available on your system")
 
     # if these commands fail, an exception will prevent us from
     # persisting the current hashes => commands will be executed again
     subprocess.run([yarn, "--cwd", "webapp", "install", "--frozen-lockfile"],
-                   check=True)
+                   check=True, shell=True)
 
-    subprocess.run([yarn, "--cwd", "webapp", "build"], check=True)
+    subprocess.run([yarn, "--cwd", "webapp", "build"], check=True, shell=True)
 
     with open(hash_file, 'wb') as f:
         pickle.dump(file_hashes, f)
