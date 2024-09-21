@@ -83,7 +83,7 @@ void WebApiHuaweiClass::onPost(AsyncWebServerRequest* request)
 
     auto& retMsg = response->getRoot();
 
-    if (root.containsKey("online")) {
+    if (root["online"].is<bool>()) {
         online = root["online"].as<bool>();
         if (online) {
             minimal_voltage = HUAWEI_MINIMAL_ONLINE_VOLTAGE;
@@ -98,7 +98,7 @@ void WebApiHuaweiClass::onPost(AsyncWebServerRequest* request)
         return;
     }
 
-    if (root.containsKey("voltage_valid")) {
+    if (root["voltage_valid"].is<bool>()) {
         if (root["voltage_valid"].as<bool>()) {
             if (root["voltage"].as<float>() < minimal_voltage || root["voltage"].as<float>() > 58) {
                 retMsg["message"] = "voltage not in range between 42 (online)/48 (offline and 58V !";
@@ -119,7 +119,7 @@ void WebApiHuaweiClass::onPost(AsyncWebServerRequest* request)
         }
     }
 
-    if (root.containsKey("current_valid")) {
+    if (root["current_valid"].is<bool>()) {
         if (root["current_valid"].as<bool>()) {
             if (root["current"].as<float>() < 0 || root["current"].as<float>() > 60) {
                 retMsg["message"] = "current must be in range between 0 and 60!";
@@ -186,13 +186,13 @@ void WebApiHuaweiClass::onAdminPost(AsyncWebServerRequest* request)
 
     auto& retMsg = response->getRoot();
 
-    if (!(root.containsKey("enabled")) ||
-        !(root.containsKey("can_controller_frequency")) ||
-        !(root.containsKey("auto_power_enabled")) ||
-        !(root.containsKey("emergency_charge_enabled")) ||
-        !(root.containsKey("voltage_limit")) ||
-        !(root.containsKey("lower_power_limit")) ||
-        !(root.containsKey("upper_power_limit"))) {
+    if (!(root["enabled"].is<bool>()) ||
+        !(root["can_controller_frequency"].is<uint32_t>()) ||
+        !(root["auto_power_enabled"].is<bool>()) ||
+        !(root["emergency_charge_enabled"].is<bool>()) ||
+        !(root["voltage_limit"].is<float>()) ||
+        !(root["lower_power_limit"].is<float>()) ||
+        !(root["upper_power_limit"].is<float>())) {
         retMsg["message"] = "Values are missing!";
         retMsg["code"] = WebApiError::GenericValueMissing;
         response->setLength();

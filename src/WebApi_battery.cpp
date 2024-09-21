@@ -63,7 +63,7 @@ void WebApiBatteryClass::onAdminPost(AsyncWebServerRequest* request)
 
     auto& retMsg = response->getRoot();
 
-    if (!root.containsKey("enabled") || !root.containsKey("provider")) {
+    if (!root["enabled"].is<bool>() || !root["provider"].is<uint8_t>()) {
         retMsg["message"] = "Values are missing!";
         retMsg["code"] = WebApiError::GenericValueMissing;
         WebApi.sendJsonResponse(request, response, __FUNCTION__, __LINE__);
