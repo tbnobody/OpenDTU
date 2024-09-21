@@ -1,7 +1,38 @@
 #include "SpiManager.h"
 
+#ifdef ARDUINO
+#include <SPI.h>
+#endif
+
 SpiManager::SpiManager() {
 }
+
+#ifdef ARDUINO
+
+std::optional<uint8_t> SpiManager::to_arduino(spi_host_device_t host_device) {
+    switch (host_device) {
+#if CONFIG_IDF_TARGET_ESP32
+    case SPI1_HOST:
+        return FSPI;
+    case SPI2_HOST:
+        return HSPI;
+    case SPI3_HOST:
+        return VSPI;
+#elif CONFIG_IDF_TARGET_ESP32S2 || CONFIG_IDF_TARGET_ESP32S3
+    case SPI2_HOST:
+        return FSPI;
+    case SPI3_HOST:
+        return HSPI;
+#elif CONFIG_IDF_TARGET_ESP32C3
+    case SPI2_HOST:
+        return FSPI;
+#endif
+    default:
+        return std::nullopt;
+    }
+}
+
+#endif
 
 bool SpiManager::register_bus(spi_host_device_t host_device) {
     for (int i = 0; i < SPI_MANAGER_NUM_BUSES; ++i) {
@@ -27,6 +58,17 @@ bool SpiManager::claim_bus(spi_host_device_t &host_device) {
 
     return false;
 }
+
+#ifdef ARDUINO
+
+std::optional<uint8_t> SpiManager::claim_bus_arduino() {
+    spi_host_device_t host_device;
+    if (!claim_bus(host_device))
+        return std::nullopt;
+    return to_arduino(host_device);
+}
+
+#endif
 
 spi_device_handle_t SpiManager::alloc_device(const std::string &bus_id, const std::shared_ptr<SpiBusConfig> &bus_config, spi_device_interface_config_t &device_config) {
     std::shared_ptr<SpiBus> shared_bus = get_shared_bus(bus_id);
