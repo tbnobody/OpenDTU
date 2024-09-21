@@ -39,20 +39,20 @@ def check_files(directories, filepaths, hash_file):
     # shell=True is fine.
     yarn = "yarn"
     try:
-        subprocess.check_output([yarn, "--version"], shell=True)
+        subprocess.check_output(yarn + " --version", shell=True)
     except FileNotFoundError:
         yarn = "yarnpkg"
         try:
-            subprocess.check_output([yarn, "--version"], shell=True)
+            subprocess.check_output(yarn + " --version", shell=True)
         except FileNotFoundError:
-            raise Exception("it seems neither 'yarn' nor 'yarnpkg' is installed/available on your system")
+            raise Exception("it seems neither 'yarn' nor 'yarnpkg' is available on your system")
 
     # if these commands fail, an exception will prevent us from
     # persisting the current hashes => commands will be executed again
-    subprocess.run([yarn, "--cwd", "webapp", "install", "--frozen-lockfile"],
+    subprocess.run(yarn + " --cwd webapp install --frozen-lockfile",
                    check=True, shell=True)
 
-    subprocess.run([yarn, "--cwd", "webapp", "build"], check=True, shell=True)
+    subprocess.run(yarn + " --cwd webapp build", check=True, shell=True)
 
     with open(hash_file, 'wb') as f:
         pickle.dump(file_hashes, f)
