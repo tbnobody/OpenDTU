@@ -15,25 +15,11 @@ void cmt_spi3_init(const int8_t pin_sdio, const int8_t pin_clk, const int8_t pin
 {
     paramLock = xSemaphoreCreateMutex();
 
-    spi_host_device_t host_device;
-    if (!SpiManagerInst.claim_bus(host_device))
-        ESP_ERROR_CHECK(ESP_FAIL);
-
-    spi_bus_config_t buscfg = {
-        .mosi_io_num = pin_sdio,
-        .miso_io_num = -1, // single wire MOSI/MISO
-        .sclk_io_num = pin_clk,
-        .quadwp_io_num = -1,
-        .quadhd_io_num = -1,
-        .data4_io_num = -1,
-        .data5_io_num = -1,
-        .data6_io_num = -1,
-        .data7_io_num = -1,
-        .max_transfer_sz = 32,
-        .flags = 0,
-        .intr_flags = 0,
-    };
-    ESP_ERROR_CHECK(spi_bus_initialize(host_device, &buscfg, SPI_DMA_DISABLED));
+    auto bus_config = std::make_shared<SpiBusConfig>(
+        static_cast<gpio_num_t>(pin_sdio),
+        GPIO_NUM_NC,
+        static_cast<gpio_num_t>(pin_clk)
+    );
 
     spi_device_interface_config_t devcfg = {
         .command_bits = 1,
@@ -51,7 +37,10 @@ void cmt_spi3_init(const int8_t pin_sdio, const int8_t pin_clk, const int8_t pin
         .pre_cb = nullptr,
         .post_cb = nullptr,
     };
-    ESP_ERROR_CHECK(spi_bus_add_device(host_device, &devcfg, &spi_reg));
+
+    spi_reg = SpiManagerInst.alloc_device("", bus_config, devcfg);
+    if (!spi_reg)
+        ESP_ERROR_CHECK(ESP_FAIL);
 
     // FiFo
     spi_device_interface_config_t devcfg2 = {
@@ -70,7 +59,10 @@ void cmt_spi3_init(const int8_t pin_sdio, const int8_t pin_clk, const int8_t pin
         .pre_cb = nullptr,
         .post_cb = nullptr,
     };
-    ESP_ERROR_CHECK(spi_bus_add_device(host_device, &devcfg2, &spi_fifo));
+
+    spi_fifo = SpiManagerInst.alloc_device("", bus_config, devcfg2);
+    if (!spi_fifo)
+        ESP_ERROR_CHECK(ESP_ERR_NOT_SUPPORTED);
 }
 
 void cmt_spi3_write(const uint8_t addr, const uint8_t data)

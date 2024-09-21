@@ -12,41 +12,22 @@ W5500::W5500(int8_t pin_mosi, int8_t pin_miso, int8_t pin_sclk, int8_t pin_cs, i
     eth_handle(nullptr),
     eth_netif(nullptr)
 {
-    spi_host_device_t host_device;
-    if (!SpiManagerInst.claim_bus(host_device))
-        ESP_ERROR_CHECK(ESP_FAIL);
-
     gpio_reset_pin(static_cast<gpio_num_t>(pin_rst));
     gpio_set_level(static_cast<gpio_num_t>(pin_rst), 0);
     gpio_set_direction(static_cast<gpio_num_t>(pin_rst), GPIO_MODE_OUTPUT);
 
-    gpio_reset_pin(static_cast<gpio_num_t>(pin_mosi));
-    gpio_reset_pin(static_cast<gpio_num_t>(pin_miso));
-    gpio_reset_pin(static_cast<gpio_num_t>(pin_sclk));
     gpio_reset_pin(static_cast<gpio_num_t>(pin_cs));
-
     gpio_reset_pin(static_cast<gpio_num_t>(pin_int));
 
     esp_err_t err = gpio_install_isr_service(ARDUINO_ISR_FLAG);
     if (err != ESP_ERR_INVALID_STATE) // don't raise an error when ISR service is already installed
         ESP_ERROR_CHECK(err);
 
-    spi_bus_config_t bus_config {
-        .mosi_io_num = pin_mosi,
-        .miso_io_num = pin_miso,
-        .sclk_io_num = pin_sclk,
-        .quadwp_io_num = -1,
-        .quadhd_io_num = -1,
-        .data4_io_num = -1,
-        .data5_io_num = -1,
-        .data6_io_num = -1,
-        .data7_io_num = -1,
-        .max_transfer_sz = 0, // uses default value internally
-        .flags = 0,
-        .intr_flags = 0,
-    };
-
-    ESP_ERROR_CHECK(spi_bus_initialize(host_device, &bus_config, SPI_DMA_CH_AUTO));
+    auto bus_config = std::make_shared<SpiBusConfig>(
+        static_cast<gpio_num_t>(pin_mosi),
+        static_cast<gpio_num_t>(pin_miso),
+        static_cast<gpio_num_t>(pin_sclk)
+    );
 
     spi_device_interface_config_t device_config {
         .command_bits = 16, // actually address phase
@@ -65,8 +46,9 @@ W5500::W5500(int8_t pin_mosi, int8_t pin_miso, int8_t pin_sclk, int8_t pin_cs, i
         .post_cb = nullptr,
     };
 
-    spi_device_handle_t spi;
-    ESP_ERROR_CHECK(spi_bus_add_device(host_device, &device_config, &spi));
+    spi_device_handle_t spi = SpiManagerInst.alloc_device("", bus_config, device_config);
+    if (!spi)
+        ESP_ERROR_CHECK(ESP_FAIL);
 
     // Reset sequence
     delayMicroseconds(500);
