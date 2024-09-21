@@ -52,7 +52,7 @@ void cmt_spi3_init(const int8_t pin_sdio, const int8_t pin_clk, const int8_t pin
         .dummy_bits = 0,
         .mode = 0, // SPI mode 0
         .cs_ena_pretrans = 2,
-        .cs_ena_posttrans = (uint8_t)(1 / (spi_speed * 10e6 * 2) + 2), // >2 us
+        .cs_ena_posttrans = (uint8_t)(2 * spi_speed / 1000000), // >2 us
         .clock_speed_hz = spi_speed,
         .spics_io_num = pin_fcs,
         .flags = SPI_DEVICE_HALFDUPLEX | SPI_DEVICE_3WIRE,
