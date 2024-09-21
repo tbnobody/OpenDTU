@@ -70,7 +70,7 @@ def main():
     directories = ["webapp/src/", "webapp/public/"]
     files = ["webapp/index.html", "webapp/tsconfig.config.json",
              "webapp/tsconfig.json", "webapp/vite.config.ts",
-             "webapp/yarn.lock"]
+             "webapp/yarn.lock", "webapp/package.json"]
     hash_file = "webapp_dist/.hashes.pkl"
 
     check_files(directories, files, hash_file)
