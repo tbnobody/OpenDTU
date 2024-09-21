@@ -101,10 +101,12 @@ void cmt_spi3_write_fifo(const uint8_t* buf, const uint16_t len)
     };
 
     SPI_PARAM_LOCK();
+    spi_device_acquire_bus(spi_fifo, portMAX_DELAY);
     for (uint8_t i = 0; i < len; i++) {
         t.tx_buffer = buf + i;
         ESP_ERROR_CHECK(spi_device_polling_transmit(spi_fifo, &t));
     }
+    spi_device_release_bus(spi_fifo);
     SPI_PARAM_UNLOCK();
 }
 
@@ -116,9 +118,11 @@ void cmt_spi3_read_fifo(uint8_t* buf, const uint16_t len)
     };
 
     SPI_PARAM_LOCK();
+    spi_device_acquire_bus(spi_fifo, portMAX_DELAY);
     for (uint8_t i = 0; i < len; i++) {
         t.rx_buffer = buf + i;
         ESP_ERROR_CHECK(spi_device_polling_transmit(spi_fifo, &t));
     }
+    spi_device_release_bus(spi_fifo);
     SPI_PARAM_UNLOCK();
 }
