@@ -62,7 +62,7 @@ private:
     void setStaticIp();
     void handleMDNS();
     void setupMode();
-    void NetworkEvent(const WiFiEvent_t event);
+    void NetworkEvent(const WiFiEvent_t event, WiFiEventInfo_t info);
 
     Task _loopTask;
 

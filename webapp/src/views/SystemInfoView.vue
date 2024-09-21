@@ -52,9 +52,7 @@ export default defineComponent({
                 .then((data) => {
                     this.systemDataList = data;
                     this.dataLoading = false;
-                    if (this.allowVersionInfo) {
-                        this.getUpdateInfo();
-                    }
+                    this.getUpdateInfo();
                 });
         },
         getUpdateInfo() {
@@ -74,6 +72,10 @@ export default defineComponent({
                     this.systemDataList.git_hash.lastIndexOf('-') + 2
                 );
                 this.systemDataList.git_is_hash = true;
+            }
+
+            if (!this.allowVersionInfo) {
+                return;
             }
 
             const fetchUrl =
