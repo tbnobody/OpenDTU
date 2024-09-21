@@ -1,6 +1,7 @@
 #include "cmt_spi3.h"
 #include <Arduino.h>
 #include <driver/spi_master.h>
+#include <SpiManager.h>
 
 SemaphoreHandle_t paramLock = NULL;
 #define SPI_PARAM_LOCK() \
@@ -8,16 +9,15 @@ SemaphoreHandle_t paramLock = NULL;
     } while (xSemaphoreTake(paramLock, portMAX_DELAY) != pdPASS)
 #define SPI_PARAM_UNLOCK() xSemaphoreGive(paramLock)
 
-// for ESP32 this is the so-called HSPI
-// for ESP32-S2/S3/C3 this nomenclature does not really exist anymore,
-// it is simply the first externally usable hardware SPI master controller
-#define SPI_CMT SPI2_HOST
-
 spi_device_handle_t spi_reg, spi_fifo;
 
 void cmt_spi3_init(const int8_t pin_sdio, const int8_t pin_clk, const int8_t pin_cs, const int8_t pin_fcs, const int32_t spi_speed)
 {
     paramLock = xSemaphoreCreateMutex();
+
+    spi_host_device_t host_device;
+    if (!SpiManagerInst.claim_bus(host_device))
+        ESP_ERROR_CHECK(ESP_FAIL);
 
     spi_bus_config_t buscfg = {
         .mosi_io_num = pin_sdio,
@@ -33,7 +33,7 @@ void cmt_spi3_init(const int8_t pin_sdio, const int8_t pin_clk, const int8_t pin
         .flags = 0,
         .intr_flags = 0,
     };
-    ESP_ERROR_CHECK(spi_bus_initialize(SPI_CMT, &buscfg, SPI_DMA_DISABLED));
+    ESP_ERROR_CHECK(spi_bus_initialize(host_device, &buscfg, SPI_DMA_DISABLED));
 
     spi_device_interface_config_t devcfg = {
         .command_bits = 1,
@@ -51,7 +51,7 @@ void cmt_spi3_init(const int8_t pin_sdio, const int8_t pin_clk, const int8_t pin
         .pre_cb = nullptr,
         .post_cb = nullptr,
     };
-    ESP_ERROR_CHECK(spi_bus_add_device(SPI_CMT, &devcfg, &spi_reg));
+    ESP_ERROR_CHECK(spi_bus_add_device(host_device, &devcfg, &spi_reg));
 
     // FiFo
     spi_device_interface_config_t devcfg2 = {
@@ -70,7 +70,7 @@ void cmt_spi3_init(const int8_t pin_sdio, const int8_t pin_clk, const int8_t pin
         .pre_cb = nullptr,
         .post_cb = nullptr,
     };
-    ESP_ERROR_CHECK(spi_bus_add_device(SPI_CMT, &devcfg2, &spi_fifo));
+    ESP_ERROR_CHECK(spi_bus_add_device(host_device, &devcfg2, &spi_fifo));
 }
 
 void cmt_spi3_write(const uint8_t addr, const uint8_t data)

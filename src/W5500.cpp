@@ -1,5 +1,7 @@
 #include "W5500.h"
 
+#include <SpiManager.h>
+
 #include <driver/spi_master.h>
 
 // Internal Arduino functions from WiFiGeneric
@@ -10,6 +12,10 @@ W5500::W5500(int8_t pin_mosi, int8_t pin_miso, int8_t pin_sclk, int8_t pin_cs, i
     eth_handle(nullptr),
     eth_netif(nullptr)
 {
+    spi_host_device_t host_device;
+    if (!SpiManagerInst.claim_bus(host_device))
+        ESP_ERROR_CHECK(ESP_FAIL);
+
     gpio_reset_pin(static_cast<gpio_num_t>(pin_rst));
     gpio_set_level(static_cast<gpio_num_t>(pin_rst), 0);
     gpio_set_direction(static_cast<gpio_num_t>(pin_rst), GPIO_MODE_OUTPUT);
@@ -40,7 +46,7 @@ W5500::W5500(int8_t pin_mosi, int8_t pin_miso, int8_t pin_sclk, int8_t pin_cs, i
         .intr_flags = 0,
     };
 
-    ESP_ERROR_CHECK(spi_bus_initialize(SPI3_HOST, &bus_config, SPI_DMA_CH_AUTO));
+    ESP_ERROR_CHECK(spi_bus_initialize(host_device, &bus_config, SPI_DMA_CH_AUTO));
 
     spi_device_interface_config_t device_config {
         .command_bits = 16, // actually address phase
@@ -60,7 +66,7 @@ W5500::W5500(int8_t pin_mosi, int8_t pin_miso, int8_t pin_sclk, int8_t pin_cs, i
     };
 
     spi_device_handle_t spi;
-    ESP_ERROR_CHECK(spi_bus_add_device(SPI3_HOST, &device_config, &spi));
+    ESP_ERROR_CHECK(spi_bus_add_device(host_device, &device_config, &spi));
 
     // Reset sequence
     delayMicroseconds(500);
