@@ -93,7 +93,7 @@ void WebApiDtuClass::onDtuAdminPost(AsyncWebServerRequest* request)
     if (!(root["serial"].is<String>()
             && root["pollinterval"].is<uint32_t>()
             && root["nrf_palevel"].is<uint8_t>()
-            && root["cmt_palevel"].is<uint8_t>()
+            && root["cmt_palevel"].is<int8_t>()
             && root["cmt_frequency"].is<uint32_t>()
             && root["cmt_country"].is<uint8_t>())) {
         retMsg["message"] = "Values are missing!";
