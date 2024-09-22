@@ -50,6 +50,14 @@ void MqttHandleInverterClass::loop()
         // Name
         MqttSettings.publish(subtopic + "/name", inv->name());
 
+        // Radio Statistics
+        MqttSettings.publish(subtopic + "/radio/tx_request", String(inv->RadioStats.TxRequestData));
+        MqttSettings.publish(subtopic + "/radio/tx_re_request", String(inv->RadioStats.TxReRequestFragment));
+        MqttSettings.publish(subtopic + "/radio/rx_success", String(inv->RadioStats.RxSuccess));
+        MqttSettings.publish(subtopic + "/radio/rx_fail_nothing", String(inv->RadioStats.RxFailNoAnswer));
+        MqttSettings.publish(subtopic + "/radio/rx_fail_partial", String(inv->RadioStats.RxFailPartialAnswer));
+        MqttSettings.publish(subtopic + "/radio/rx_fail_corrupt", String(inv->RadioStats.RxFailCorruptData));
+
         if (inv->DevInfo()->getLastUpdate() > 0) {
             // Bootloader Version
             MqttSettings.publish(subtopic + "/device/bootloaderversion", String(inv->DevInfo()->getFwBootloaderVersion()));

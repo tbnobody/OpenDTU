@@ -141,7 +141,14 @@
         "Unknown": "Inconnu",
         "ShowGridProfile": "Show Grid Profile",
         "GridProfile": "Grid Profile",
-        "LoadingInverter": "Waiting for data... (can take up to 10 seconds)"
+        "LoadingInverter": "Waiting for data... (can take up to 10 seconds)",
+        "RadioStats": "Radio Statistics",
+        "TxRequest": "TX Request Count",
+        "RxSuccess": "RX Success",
+        "RxFailNothing": "RX Fail: Receive Nothing",
+        "RxFailPartial": "RX Fail: Receive Partial",
+        "RxFailCorrupt": "RX Fail: Receive Corrupt",
+        "TxReRequest": "TX Re-Request Fragment"
     },
     "eventlog": {
         "Start": "Départ",

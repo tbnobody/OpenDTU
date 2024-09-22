@@ -141,7 +141,14 @@
         "Unknown": "Unbekannt",
         "ShowGridProfile": "Zeige Grid Profil",
         "GridProfile": "Grid Profil",
-        "LoadingInverter": "Warte auf Daten... (kann bis zu 10 Sekunden dauern)"
+        "LoadingInverter": "Warte auf Daten... (kann bis zu 10 Sekunden dauern)",
+        "RadioStats": "Funkstatistik",
+        "TxRequest": "Gesendete Anfragen",
+        "RxSuccess": "Empfang Erfolgreich",
+        "RxFailNothing": "Empfang Fehler: Nichts empfangen",
+        "RxFailPartial": "Empfang Fehler: Teilweise empfangen",
+        "RxFailCorrupt": "Empfang Fehler: Beschädigt empfangen",
+        "TxReRequest": "Gesendete Fragment Wiederanforderungen"
     },
     "eventlog": {
         "Start": "Beginn",

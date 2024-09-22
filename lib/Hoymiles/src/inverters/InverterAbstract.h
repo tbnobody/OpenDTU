@@ -65,6 +65,28 @@ public:
     void addRxFragment(const uint8_t fragment[], const uint8_t len);
     uint8_t verifyAllFragments(CommandAbstract& cmd);
 
+    void resetRadioStats();
+
+    struct {
+        // TX Request Data
+        uint32_t TxRequestData;
+
+        // TX Re-Request Fragment
+        uint32_t TxReRequestFragment;
+
+        // RX Success
+        uint32_t RxSuccess;
+
+        // RX Fail Partial Answer
+        uint32_t RxFailPartialAnswer;
+
+        // RX Fail No Answer
+        uint32_t RxFailNoAnswer;
+
+        // RX Fail Corrupt Data
+        uint32_t RxFailCorruptData;
+    } RadioStats = {};
+
     virtual bool sendStatsRequest() = 0;
     virtual bool sendAlarmLogRequest(const bool force = false) = 0;
     virtual bool sendDevInfoRequest() = 0;

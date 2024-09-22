@@ -21,6 +21,15 @@ export interface InverterStatistics {
     Irradiation?: ValueObject;
 }
 
+export interface RadioStatistics {
+    tx_request: number;
+    tx_re_request: number;
+    rx_success: number;
+    rx_fail_nothing: number;
+    rx_fail_partial: number;
+    rx_fail_corrupt: number;
+}
+
 export interface Inverter {
     serial: string;
     name: string;
@@ -35,6 +44,7 @@ export interface Inverter {
     AC: InverterStatistics[];
     DC: InverterStatistics[];
     INV: InverterStatistics[];
+    radio_stats: RadioStatistics;
 }
 
 export interface Total {

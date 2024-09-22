@@ -201,6 +201,7 @@
                                     </template>
                                 </template>
                             </div>
+
                             <BootstrapAlert class="m-3" :show="!inverter.hasOwnProperty('INV')">
                                 <div class="d-flex justify-content-center align-items-center">
                                     <div class="spinner-border m-1" role="status">
@@ -209,6 +210,93 @@
                                     <span>{{ $t('home.LoadingInverter') }}</span>
                                 </div>
                             </BootstrapAlert>
+
+                            <div class="accordion mt-5" id="accordionExample">
+                                <div class="accordion-item">
+                                    <h2 class="accordion-header">
+                                        <button
+                                            class="accordion-button collapsed"
+                                            type="button"
+                                            data-bs-toggle="collapse"
+                                            data-bs-target="#collapseStats"
+                                            aria-expanded="true"
+                                            aria-controls="collapseStats"
+                                        >
+                                            {{ $t('home.RadioStats') }}
+                                        </button>
+                                    </h2>
+                                    <div
+                                        id="collapseStats"
+                                        class="accordion-collapse collapse"
+                                        data-bs-parent="#accordionExample"
+                                    >
+                                        <div class="accordion-body">
+                                            <table class="table table-striped table-hover">
+                                                <tbody>
+                                                    <tr>
+                                                        <td>{{ $t('home.TxRequest') }}</td>
+                                                        <td>{{ $n(inverter.radio_stats.tx_request) }}</td>
+                                                        <td></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>{{ $t('home.RxSuccess') }}</td>
+                                                        <td>{{ $n(inverter.radio_stats.rx_success) }}</td>
+                                                        <td>
+                                                            {{
+                                                                ratio(
+                                                                    inverter.radio_stats.rx_success,
+                                                                    inverter.radio_stats.tx_request
+                                                                )
+                                                            }}
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>{{ $t('home.RxFailNothing') }}</td>
+                                                        <td>{{ $n(inverter.radio_stats.rx_fail_nothing) }}</td>
+                                                        <td>
+                                                            {{
+                                                                ratio(
+                                                                    inverter.radio_stats.rx_fail_nothing,
+                                                                    inverter.radio_stats.tx_request
+                                                                )
+                                                            }}
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>{{ $t('home.RxFailPartial') }}</td>
+                                                        <td>{{ $n(inverter.radio_stats.rx_fail_partial) }}</td>
+                                                        <td>
+                                                            {{
+                                                                ratio(
+                                                                    inverter.radio_stats.rx_fail_partial,
+                                                                    inverter.radio_stats.tx_request
+                                                                )
+                                                            }}
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>{{ $t('home.RxFailCorrupt') }}</td>
+                                                        <td>{{ $n(inverter.radio_stats.rx_fail_corrupt) }}</td>
+                                                        <td>
+                                                            {{
+                                                                ratio(
+                                                                    inverter.radio_stats.rx_fail_corrupt,
+                                                                    inverter.radio_stats.tx_request
+                                                                )
+                                                            }}
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>{{ $t('home.TxReRequest') }}</td>
+                                                        <td>{{ $n(inverter.radio_stats.tx_re_request) }}</td>
+                                                        <td></td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -785,6 +873,12 @@ export default defineComponent({
                 total += inv.DC[key as unknown as number].Irradiation?.max || 0;
             });
             return total;
+        },
+        ratio(val_small: number, val_large: number): string {
+            if (val_large == 0) {
+                return '-';
+            }
+            return this.$n(val_small / val_large, 'percent');
         },
     },
 });
