@@ -222,7 +222,7 @@
                                             aria-expanded="true"
                                             aria-controls="collapseStats"
                                         >
-                                            {{ $t('home.RadioStats') }}
+                                            <BIconBroadcast />&nbsp;{{ $t('home.RadioStats') }}
                                         </button>
                                     </h2>
                                     <div
@@ -478,6 +478,7 @@ import { authHeader, authUrl, handleResponse, isLoggedIn } from '@/utils/authent
 import * as bootstrap from 'bootstrap';
 import {
     BIconArrowCounterclockwise,
+    BIconBroadcast,
     BIconCheckCircleFill,
     BIconCpu,
     BIconExclamationCircleFill,
@@ -503,6 +504,7 @@ export default defineComponent({
         InverterTotalInfo,
         ModalDialog,
         BIconArrowCounterclockwise,
+        BIconBroadcast,
         BIconCheckCircleFill,
         BIconCpu,
         BIconExclamationCircleFill,
