@@ -35,7 +35,6 @@ void MqttHandleDtuClass::loop()
     MqttSettings.publish("dtu/uptime", String(millis() / 1000));
     MqttSettings.publish("dtu/ip", NetworkSettings.localIP().toString());
     MqttSettings.publish("dtu/hostname", NetworkSettings.getHostname());
-    MqttSettings.publish("dtu/temperature", String(CpuTemperature.read()));
     MqttSettings.publish("dtu/heap/size", String(ESP.getHeapSize()));
     MqttSettings.publish("dtu/heap/free", String(ESP.getFreeHeap()));
     MqttSettings.publish("dtu/heap/minfree", String(ESP.getMinFreeHeap()));
@@ -43,5 +42,10 @@ void MqttHandleDtuClass::loop()
     if (NetworkSettings.NetworkMode() == network_mode::WiFi) {
         MqttSettings.publish("dtu/rssi", String(WiFi.RSSI()));
         MqttSettings.publish("dtu/bssid", WiFi.BSSIDstr());
+    }
+
+    float temperature = CpuTemperature.read();
+    if (!std::isnan(temperature)) {
+        MqttSettings.publish("dtu/temperature", String(temperature));
     }
 }
