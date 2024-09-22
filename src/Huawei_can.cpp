@@ -356,25 +356,12 @@ void HuaweiCanClass::loop()
       _autoPowerEnabledCounter = 10;
     }
 
-
-    // Check if inverter used by the power limiter is active
-    std::shared_ptr<InverterAbstract> inverter =
-        Hoymiles.getInverterBySerial(config.PowerLimiter.InverterId);
-
-    if (inverter == nullptr && config.PowerLimiter.InverterId < INV_MAX_COUNT) {
-        // we previously had an index saved as InverterId. fall back to the
-        // respective positional lookup if InverterId is not a known serial.
-        inverter = Hoymiles.getInverterByPos(config.PowerLimiter.InverterId);
-    }
-
-    if (inverter != nullptr) {
-        if(inverter->isProducing()) {
-          _setValue(0.0, HUAWEI_ONLINE_CURRENT);
-          // Don't run auto mode for a second now. Otherwise we may send too much over the CAN bus
-          _autoModeBlockedTillMillis = millis() + 1000;
-          MessageOutput.printf("[HuaweiCanClass::loop] Inverter is active, disable\r\n");
-          return;
-        }
+    if (PowerLimiter.isGovernedInverterProducing()) {
+      _setValue(0.0, HUAWEI_ONLINE_CURRENT);
+      // Don't run auto mode for a second now. Otherwise we may send too much over the CAN bus
+      _autoModeBlockedTillMillis = millis() + 1000;
+      MessageOutput.printf("[HuaweiCanClass::loop] Inverter is active, disable\r\n");
+      return;
     }
 
     if (PowerMeter.getLastUpdate() > _lastPowerMeterUpdateReceivedMillis &&

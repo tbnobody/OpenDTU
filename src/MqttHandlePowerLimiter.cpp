@@ -87,15 +87,15 @@ void MqttHandlePowerLimiterClass::loop()
 
     auto val = static_cast<unsigned>(PowerLimiter.getMode());
     MqttSettings.publish("powerlimiter/status/mode", String(val));
-    
-    MqttSettings.publish("powerlimiter/status/upper_power_limit", String(config.PowerLimiter.UpperPowerLimit));
+
+    MqttSettings.publish("powerlimiter/status/upper_power_limit", String(config.PowerLimiter.TotalUpperPowerLimit));
 
     MqttSettings.publish("powerlimiter/status/target_power_consumption", String(config.PowerLimiter.TargetPowerConsumption));
 
     MqttSettings.publish("powerlimiter/status/inverter_update_timeouts", String(PowerLimiter.getInverterUpdateTimeouts()));
 
     // no thresholds are relevant for setups without a battery
-    if (config.PowerLimiter.IsInverterSolarPowered) { return; }
+    if (!PowerLimiter.usesBatteryPoweredInverter()) { return; }
 
     MqttSettings.publish("powerlimiter/status/threshold/voltage/start", String(config.PowerLimiter.VoltageStartThreshold));
     MqttSettings.publish("powerlimiter/status/threshold/voltage/stop", String(config.PowerLimiter.VoltageStopThreshold));
@@ -195,9 +195,9 @@ void MqttHandlePowerLimiterClass::onMqttCmd(MqttPowerLimiterCommand command, con
             config.PowerLimiter.FullSolarPassThroughStopVoltage = payload_val;
             break;
         case MqttPowerLimiterCommand::UpperPowerLimit:
-            if (config.PowerLimiter.UpperPowerLimit == intValue) { return; }
-            MessageOutput.printf("Setting upper power limit to: %d W\r\n", intValue);
-            config.PowerLimiter.UpperPowerLimit = intValue;
+            if (config.PowerLimiter.TotalUpperPowerLimit == intValue) { return; }
+            MessageOutput.printf("Setting total upper power limit to: %d W\r\n", intValue);
+            config.PowerLimiter.TotalUpperPowerLimit = intValue;
             break;
         case MqttPowerLimiterCommand::TargetPowerConsumption:
             if (config.PowerLimiter.TargetPowerConsumption == intValue) { return; }

@@ -154,7 +154,7 @@ void WebApiWsVedirectLiveClass::generateCommonJsonResponse(JsonVariant& root, bo
     root["dpl"]["PLSTATE"] = -1;
     if (Configuration.get().PowerLimiter.Enabled)
         root["dpl"]["PLSTATE"] = PowerLimiter.getPowerLimiterState();
-    root["dpl"]["PLLIMIT"] = PowerLimiter.getLastRequestedPowerLimit();
+    root["dpl"]["PLLIMIT"] = PowerLimiter.getInverterOutput();
 }
 
 void WebApiWsVedirectLiveClass::populateJson(const JsonObject &root, const VeDirectMpptController::data_t &mpptData) {
