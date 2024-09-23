@@ -16,6 +16,7 @@
 #include "NetworkSettings.h"
 #include "NtpSettings.h"
 #include "PinMapping.h"
+#include "RestartHelper.h"
 #include "Scheduler.h"
 #include "SunPosition.h"
 #include "Utils.h"
@@ -154,6 +155,7 @@ void setup()
     InverterSettings.init(scheduler);
 
     Datastore.init(scheduler);
+    RestartHelper.init(scheduler);
 }
 
 void loop()

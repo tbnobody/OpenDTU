@@ -4,10 +4,8 @@
  */
 
 #include "Utils.h"
-#include "Display_Graphic.h"
-#include "Led_Single.h"
 #include "MessageOutput.h"
-#include <Esp.h>
+#include "PinMapping.h"
 #include <LittleFS.h>
 
 uint32_t Utils::getChipId()
@@ -57,16 +55,6 @@ int Utils::getTimezoneOffset()
     gmt = mktime(ptm);
 
     return static_cast<int>(difftime(rawtime, gmt));
-}
-
-void Utils::restartDtu()
-{
-    LedSingle.turnAllOff();
-    Display.setStatus(false);
-    yield();
-    delay(1000);
-    yield();
-    ESP.restart();
 }
 
 bool Utils::checkJsonAlloc(const JsonDocument& doc, const char* function, const uint16_t line)
