@@ -89,7 +89,7 @@
                             <input
                                 type="range"
                                 class="form-control form-range"
-                                v-model="dtuConfigList.cmt_frequency"
+                                v-model.number="dtuConfigList.cmt_frequency"
                                 :min="cmtMinFrequency"
                                 :max="cmtMaxFrequency"
                                 :step="dtuConfigList.cmt_chan_width"
