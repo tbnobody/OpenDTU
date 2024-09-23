@@ -116,6 +116,13 @@ void WebApiDeviceClass::onDeviceAdminGet(AsyncWebServerRequest* request)
     huaweiPinObj["cs"] = pin.huawei_cs;
     huaweiPinObj["power"] = pin.huawei_power;
 
+    auto powermeterPinObj = curPin["powermeter"].to<JsonObject>();
+    powermeterPinObj["rx"] = pin.powermeter_rx;
+    powermeterPinObj["tx"] = pin.powermeter_tx;
+    powermeterPinObj["dere"] = pin.powermeter_dere;
+    powermeterPinObj["rxen"] = pin.powermeter_rxen;
+    powermeterPinObj["txen"] = pin.powermeter_txen;
+
     WebApi.sendJsonResponse(request, response, __FUNCTION__, __LINE__);
 }
 

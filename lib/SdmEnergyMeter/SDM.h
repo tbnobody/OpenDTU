@@ -23,6 +23,7 @@
 
 #if !defined ( DERE_PIN )
   #define DERE_PIN                                    NOT_A_PIN                 //  default digital pin for control MAX485 DE/RE lines (connect DE & /RE together to this pin)
+  #define RE_PIN                                      NOT_A_PIN                 //  default digital pin for control MAX485 RE line (use DERE_PIN for DE line)
 #endif
 
 #if defined ( USE_HARDWARESERIAL )
@@ -332,6 +333,7 @@ class SDM {
 #else                                                                           //  software serial
   #if defined ( ESP8266 ) || defined ( ESP32 )                                  //  on esp8266/esp32
     SDM(SoftwareSerial& serial, long baud = SDM_UART_BAUD, int dere_pin = DERE_PIN, int config = SDM_UART_CONFIG, int8_t rx_pin = SDM_RX_PIN, int8_t tx_pin = SDM_TX_PIN);
+    SDM(SoftwareSerial& serial, long baud = SDM_UART_BAUD, int dere_pin = DERE_PIN, int re_pin = RE_PIN, int config = SDM_UART_CONFIG, int8_t rx_pin = SDM_RX_PIN, int8_t tx_pin = SDM_TX_PIN);
   #else                                                                         //  on avr
     SDM(SoftwareSerial& serial, long baud = SDM_UART_BAUD, int dere_pin = DERE_PIN);
   #endif
@@ -390,6 +392,7 @@ class SDM {
 #endif
     long _baud = SDM_UART_BAUD;
     int _dere_pin = DERE_PIN;
+    int _re_pin = RE_PIN;
     uint16_t readingerrcode = SDM_ERR_NO_ERROR;                                 //  4 = timeout; 3 = not enough bytes; 2 = number of bytes OK but bytes b0,b1 or b2 wrong, 1 = crc error
     uint16_t msturnaround = WAITING_TURNAROUND_DELAY;
     uint16_t mstimeout = RESPONSE_TIMEOUT;

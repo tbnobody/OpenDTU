@@ -67,6 +67,8 @@ struct PinMapping_t {
     int8_t powermeter_rx;
     int8_t powermeter_tx;
     int8_t powermeter_dere;
+    int8_t powermeter_rxen;
+    int8_t powermeter_txen;
 };
 
 class PinMappingClass {
