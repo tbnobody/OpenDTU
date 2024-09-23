@@ -10,7 +10,7 @@
 RestartHelperClass RestartHelper;
 
 RestartHelperClass::RestartHelperClass()
-    : _rebootTask(2 * TASK_SECOND, TASK_FOREVER, std::bind(&RestartHelperClass::loop, this))
+    : _rebootTask(1 * TASK_SECOND, TASK_FOREVER, std::bind(&RestartHelperClass::loop, this))
 {
 }
 
