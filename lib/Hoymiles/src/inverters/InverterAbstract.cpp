@@ -273,6 +273,20 @@ uint8_t InverterAbstract::verifyAllFragments(CommandAbstract& cmd)
     return FRAGMENT_OK;
 }
 
+void InverterAbstract::performDailyTask()
+{
+    // Have to reset the offets first, otherwise it will
+    // Substract the offset from zero which leads to a high value
+    Statistics()->resetYieldDayCorrection();
+    if (getZeroYieldDayOnMidnight()) {
+        Statistics()->zeroDailyData();
+    }
+    if (getClearEventlogOnMidnight()) {
+        EventLog()->clearBuffer();
+    }
+    resetRadioStats();
+}
+
 void InverterAbstract::resetRadioStats()
 {
     RadioStats = {};
