@@ -6,6 +6,9 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
+    # prevent push event from triggering if it's part of a PR
+    if: github.event_name != 'push' || github.event.pull_request == null
+
     steps:
       - uses: actions/checkout@v4
       - name: Set up Python
