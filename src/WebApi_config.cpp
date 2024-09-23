@@ -4,6 +4,7 @@
  */
 #include "WebApi_config.h"
 #include "Configuration.h"
+#include "RestartHelper.h"
 #include "Utils.h"
 #include "WebApi.h"
 #include "WebApi_errors.h"
@@ -82,7 +83,7 @@ void WebApiConfigClass::onConfigDelete(AsyncWebServerRequest* request)
     WebApi.sendJsonResponse(request, response, __FUNCTION__, __LINE__);
 
     Utils::removeAllFiles();
-    Utils::restartDtu();
+    RestartHelper.triggerRestart();
 }
 
 void WebApiConfigClass::onConfigListGet(AsyncWebServerRequest* request)
@@ -124,7 +125,7 @@ void WebApiConfigClass::onConfigUploadFinish(AsyncWebServerRequest* request)
     response->addHeader("Connection", "close");
     response->addHeader("Access-Control-Allow-Origin", "*");
     request->send(response);
-    Utils::restartDtu();
+    RestartHelper.triggerRestart();
 }
 
 void WebApiConfigClass::onConfigUpload(AsyncWebServerRequest* request, String filename, size_t index, uint8_t* data, size_t len, bool final)

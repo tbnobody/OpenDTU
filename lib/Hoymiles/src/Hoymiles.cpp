@@ -145,6 +145,7 @@ void HoymilesClass::loop()
                     if (inv->getClearEventlogOnMidnight()) {
                         inv->EventLog()->clearBuffer();
                     }
+                    inv->resetRadioStats();
                 }
 
                 lastWeekDay = currentWeekDay;

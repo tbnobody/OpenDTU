@@ -27,6 +27,7 @@
 #include "NetworkSettings.h"
 #include "NtpSettings.h"
 #include "PinMapping.h"
+#include "RestartHelper.h"
 #include "Scheduler.h"
 #include "SunPosition.h"
 #include "Utils.h"
@@ -173,11 +174,11 @@ void setup()
         Configuration.write();
     }
     MessageOutput.println("done");
-    MessageOutput.println("done");
 
     InverterSettings.init(scheduler);
 
     Datastore.init(scheduler);
+    RestartHelper.init(scheduler);
 
     VictronMppt.init(scheduler);
 

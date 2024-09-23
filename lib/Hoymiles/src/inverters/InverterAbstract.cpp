@@ -272,3 +272,8 @@ uint8_t InverterAbstract::verifyAllFragments(CommandAbstract& cmd)
 
     return FRAGMENT_OK;
 }
+
+void InverterAbstract::resetRadioStats()
+{
+    RadioStats = {};
+}

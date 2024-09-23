@@ -66,16 +66,25 @@ void HoymilesRadio::handleReceivedPackage()
 
             } else if (verifyResult == FRAGMENT_ALL_MISSING_TIMEOUT) {
                 Hoymiles.getMessageOutput()->println("Nothing received, resend count exeeded");
+                // Statistics: Count RX Fail No Answer
+                inv->RadioStats.RxFailNoAnswer++;
+
                 _commandQueue.pop();
                 _busyFlag = false;
 
             } else if (verifyResult == FRAGMENT_RETRANSMIT_TIMEOUT) {
                 Hoymiles.getMessageOutput()->println("Retransmit timeout");
+                // Statistics: Count RX Fail Partial Answer
+                inv->RadioStats.RxFailPartialAnswer++;
+
                 _commandQueue.pop();
                 _busyFlag = false;
 
             } else if (verifyResult == FRAGMENT_HANDLE_ERROR) {
                 Hoymiles.getMessageOutput()->println("Packet handling error");
+                // Statistics: Count RX Fail Corrupt Data
+                inv->RadioStats.RxFailCorruptData++;
+
                 _commandQueue.pop();
                 _busyFlag = false;
 
@@ -83,17 +92,24 @@ void HoymilesRadio::handleReceivedPackage()
                 // Perform Retransmit
                 Hoymiles.getMessageOutput()->print("Request retransmit: ");
                 Hoymiles.getMessageOutput()->println(verifyResult);
+                // Statistics: Count TX Re-Request Fragment
+                inv->RadioStats.TxReRequestFragment++;
+
                 sendRetransmitPacket(verifyResult);
 
             } else {
                 // Successful received all packages
                 Hoymiles.getMessageOutput()->println("Success");
+                // Statistics: Count RX Success
+                inv->RadioStats.RxSuccess++;
+
                 _commandQueue.pop();
                 _busyFlag = false;
             }
         } else {
             // If inverter was not found, assume the command is invalid
             Hoymiles.getMessageOutput()->println("RX: Invalid inverter found");
+            // Statistics: Count RX Fail Unknown Data
             _commandQueue.pop();
             _busyFlag = false;
         }
@@ -105,6 +121,9 @@ void HoymilesRadio::handleReceivedPackage()
             auto inv = Hoymiles.getInverterBySerial(cmd->getTargetAddress());
             if (nullptr != inv) {
                 inv->clearRxFragmentBuffer();
+                // Statistics: TX Requests
+                inv->RadioStats.TxRequestData++;
+
                 sendEsbPacket(*cmd);
             } else {
                 Hoymiles.getMessageOutput()->println("TX: Invalid inverter found");

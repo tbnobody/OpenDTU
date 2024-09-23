@@ -4,17 +4,13 @@
  */
 #include "WebApi_firmware.h"
 #include "Configuration.h"
+#include "RestartHelper.h"
 #include "Update.h"
 #include "Utils.h"
 #include "WebApi.h"
 #include "helper.h"
 #include <AsyncJson.h>
 #include "esp_partition.h"
-
-WebApiFirmwareClass::WebApiFirmwareClass()
-    : _rebootTask(TASK_IMMEDIATE, TASK_ONCE, std::bind(&WebApiFirmwareClass::rebootTaskCb, this))
-{
-}
 
 void WebApiFirmwareClass::init(AsyncWebServer& server, Scheduler& scheduler)
 {
@@ -30,8 +26,6 @@ void WebApiFirmwareClass::init(AsyncWebServer& server, Scheduler& scheduler)
         std::bind(&WebApiFirmwareClass::onFirmwareUpdateUpload, this, _1, _2, _3, _4, _5, _6));
 
     server.on("/api/firmware/status", HTTP_GET, std::bind(&WebApiFirmwareClass::onFirmwareStatus, this, _1));
-
-    scheduler.addTask(_rebootTask);
 }
 
 bool WebApiFirmwareClass::otaSupported() const
@@ -54,8 +48,7 @@ void WebApiFirmwareClass::onFirmwareUpdateFinish(AsyncWebServerRequest* request)
     response->addHeader("Connection", "close");
     response->addHeader("Access-Control-Allow-Origin", "*");
     request->send(response);
-    _rebootTask.enable();
-    _rebootTask.restart();
+    RestartHelper.triggerRestart();
 }
 
 void WebApiFirmwareClass::onFirmwareUpdateUpload(AsyncWebServerRequest* request, String filename, size_t index, uint8_t* data, size_t len, bool final)
@@ -99,11 +92,6 @@ void WebApiFirmwareClass::onFirmwareUpdateUpload(AsyncWebServerRequest* request,
     } else {
         return;
     }
-}
-
-void WebApiFirmwareClass::rebootTaskCb()
-{
-    Utils::restartDtu();
 }
 
 void WebApiFirmwareClass::onFirmwareStatus(AsyncWebServerRequest* request)

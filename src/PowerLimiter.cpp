@@ -3,7 +3,7 @@
  * Copyright (C) 2022 Thomas Basler and others
  */
 
-#include "Utils.h"
+#include "RestartHelper.h"
 #include "Battery.h"
 #include "PowerMeter.h"
 #include "PowerLimiter.h"
@@ -588,7 +588,7 @@ bool PowerLimiterClass::updateInverter()
 
         if (_inverterUpdateTimeouts >= 20) {
             MessageOutput.println("[DPL::loop] restarting system since inverter is unresponsive");
-            Utils::restartDtu();
+            RestartHelper.triggerRestart();
         }
 
         return reset();
