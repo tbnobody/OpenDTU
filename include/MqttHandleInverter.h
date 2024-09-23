@@ -50,16 +50,18 @@ private:
         LimitNonPersistentAbsolute,
         Power,
         Restart,
+        ResetRfStats,
     };
 
     static constexpr frozen::string _cmdtopic = "+/cmd/";
-    static constexpr frozen::map<frozen::string, Topic, 6> _subscriptions = {
+    static constexpr frozen::map<frozen::string, Topic, 7> _subscriptions = {
         { "limit_persistent_relative", Topic::LimitPersistentRelative },
         { "limit_persistent_absolute", Topic::LimitPersistentAbsolute },
         { "limit_nonpersistent_relative", Topic::LimitNonPersistentRelative },
         { "limit_nonpersistent_absolute", Topic::LimitNonPersistentAbsolute },
         { "power", Topic::Power },
         { "restart", Topic::Restart },
+        { "reset_rf_stats", Topic::ResetRfStats },
     };
 
     void onMqttMessage(Topic t, const espMqttClientTypes::MessageProperties& properties, const char* topic, const uint8_t* payload, const size_t len, const size_t index, const size_t total);

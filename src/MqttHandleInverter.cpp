@@ -229,6 +229,16 @@ void MqttHandleInverterClass::onMqttMessage(Topic t, const espMqttClientTypes::M
         } else {
             MessageOutput.println("Ignored because retained or numeric value not '1'");
         }
+        break;
+
+    case Topic::ResetRfStats:
+        // Reset RF Stats
+        MessageOutput.printf("Reset RF stats\r\n");
+        if (!properties.retain && payload_val == 1) {
+            inv->resetRadioStats();
+        } else {
+            MessageOutput.println("Ignored because retained or numeric value not '1'");
+        }
     }
 }
 

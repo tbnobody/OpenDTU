@@ -77,6 +77,7 @@ void MqttHandleHassClass::publishConfig()
         publishInverterButton(inv, "Turn Inverter Off", "mdi:power-plug-off", "config", "", "cmd/power", "0");
         publishInverterButton(inv, "Turn Inverter On", "mdi:power-plug", "config", "", "cmd/power", "1");
         publishInverterButton(inv, "Restart Inverter", "", "config", "restart", "cmd/restart", "1");
+        publishInverterButton(inv, "Reset Radio Statistics", "", "config", "", "cmd/reset_rf_stats", "1");
 
         publishInverterNumber(inv, "Limit NonPersistent Relative", "mdi:speedometer", "config", "cmd/limit_nonpersistent_relative", "status/limit_relative", "%", 0, 100, 0.1);
         publishInverterNumber(inv, "Limit Persistent Relative", "mdi:speedometer", "config", "cmd/limit_persistent_relative", "status/limit_relative", "%", 0, 100, 0.1);
