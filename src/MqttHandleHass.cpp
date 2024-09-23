@@ -88,6 +88,17 @@ void MqttHandleHassClass::publishConfig()
         publishInverterBinarySensor(inv, "Reachable", "status/reachable", "1", "0");
         publishInverterBinarySensor(inv, "Producing", "status/producing", "1", "0");
 
+        yield();
+
+        publishInverterSensor(inv, "TX Requests", "radio/tx_request", "", "diagnostic", "", "");
+        publishInverterSensor(inv, "RX Success", "radio/rx_success", "", "diagnostic", "", "");
+        publishInverterSensor(inv, "RX Fail Receive Nothing", "radio/rx_fail_nothing", "", "diagnostic", "", "");
+        publishInverterSensor(inv, "RX Fail Receive Partial", "radio/rx_fail_partial", "", "diagnostic", "", "");
+        publishInverterSensor(inv, "RX Fail Receive Corrupt", "radio/rx_fail_corrupt", "", "diagnostic", "", "");
+        publishInverterSensor(inv, "TX Re-Request Fragment", "radio/tx_re_request", "", "diagnostic", "", "");
+
+        yield();
+
         // Loop all channels
         for (auto& t : inv->Statistics()->getChannelTypes()) {
             for (auto& c : inv->Statistics()->getChannelsByType(t)) {
@@ -283,6 +294,55 @@ void MqttHandleHassClass::publishInverterBinarySensor(std::shared_ptr<InverterAb
     root["stat_t"] = statTopic;
     root["pl_on"] = payload_on;
     root["pl_off"] = payload_off;
+
+    createInverterInfo(root, inv);
+
+    if (!Utils::checkJsonAlloc(root, __FUNCTION__, __LINE__)) {
+        return;
+    }
+
+    String buffer;
+    serializeJson(root, buffer);
+    publish(configTopic, buffer);
+}
+
+void MqttHandleHassClass::publishInverterSensor(std::shared_ptr<InverterAbstract> inv, const char* caption, const char* subTopic, const char* icon, const char* category, const char* device_class, const char* unit_of_measure)
+{
+    const String serial = inv->serialString();
+
+    String sensorId = caption;
+    sensorId.replace(" ", "_");
+    sensorId.toLowerCase();
+
+    const String configTopic = "sensor/dtu_" + serial
+        + "/" + sensorId
+        + "/config";
+
+    const String statTopic = MqttSettings.getPrefix() + serial + "/" + subTopic;
+
+    JsonDocument root;
+
+    root["name"] = caption;
+    root["uniq_id"] = serial + "_" + sensorId;
+    if (strcmp(device_class, "")) {
+        root["dev_cla"] = device_class;
+    }
+    if (strcmp(category, "")) {
+        root["ent_cat"] = category;
+    }
+    if (strcmp(icon, "")) {
+        root["ic"] = icon;
+    }
+    if (strcmp(unit_of_measure, "")) {
+        root["unit_of_meas"] = unit_of_measure;
+    }
+    root["stat_t"] = statTopic;
+
+    root["avty_t"] = MqttSettings.getPrefix() + Configuration.get().Mqtt.Lwt.Topic;
+
+    const CONFIG_T& config = Configuration.get();
+    root["pl_avail"] = config.Mqtt.Lwt.Value_Online;
+    root["pl_not_avail"] = config.Mqtt.Lwt.Value_Offline;
 
     createInverterInfo(root, inv);
 
