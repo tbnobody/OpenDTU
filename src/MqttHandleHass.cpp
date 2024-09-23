@@ -64,8 +64,8 @@ void MqttHandleHassClass::publishConfig()
     publishDtuSensor("Temperature", "temperature", "diagnostic", "mdi:thermometer", "°C", "temperature");
     publishDtuSensor("Heap Size", "", "diagnostic", "mdi:memory", "Bytes", "heap/size");
     publishDtuSensor("Heap Free", "", "diagnostic", "mdi:memory", "Bytes", "heap/free");
-    publishDtuSensor("Largest Free Heap Block", "", "diagnostic", "mdi:memory", "Bytes", "heap/maxalloc`");
-    publishDtuSensor("Lifetime Minimum Free Heap", "", "diagnostic", "mdi:memory", "Bytes", "heap/minfree`");
+    publishDtuSensor("Largest Free Heap Block", "", "diagnostic", "mdi:memory", "Bytes", "heap/maxalloc");
+    publishDtuSensor("Lifetime Minimum Free Heap", "", "diagnostic", "mdi:memory", "Bytes", "heap/minfree");
     publishDtuBinarySensor("Status", "connectivity", "diagnostic", config.Mqtt.Lwt.Value_Online, config.Mqtt.Lwt.Value_Offline, config.Mqtt.Lwt.Topic);
 
     yield();
