@@ -75,10 +75,10 @@ void MqttHandleHassClass::publishConfig()
     for (uint8_t i = 0; i < Hoymiles.getNumInverters(); i++) {
         auto inv = Hoymiles.getInverterByPos(i);
 
-        publishInverterButton(inv, "Turn Inverter Off", "mdi:power-plug-off", "config", "", "cmd/power", "0");
-        publishInverterButton(inv, "Turn Inverter On", "mdi:power-plug", "config", "", "cmd/power", "1");
-        publishInverterButton(inv, "Restart Inverter", "", "config", "restart", "cmd/restart", "1");
-        publishInverterButton(inv, "Reset Radio Statistics", "", "config", "", "cmd/reset_rf_stats", "1");
+        publishInverterButton(inv, "Turn Inverter Off", "cmd/power", "0", "mdi:power-plug-off", "", "config");
+        publishInverterButton(inv, "Turn Inverter On", "cmd/power", "1", "mdi:power-plug", "", "config");
+        publishInverterButton(inv, "Restart Inverter", "cmd/restart", "1", "", "restart", "config");
+        publishInverterButton(inv, "Reset Radio Statistics", "cmd/reset_rf_stats", "1", "", "", "config");
 
         publishInverterNumber(inv, "Limit NonPersistent Relative", "mdi:speedometer", "config", "cmd/limit_nonpersistent_relative", "status/limit_relative", "%", 0, 100, 0.1);
         publishInverterNumber(inv, "Limit Persistent Relative", "mdi:speedometer", "config", "cmd/limit_persistent_relative", "status/limit_relative", "%", 0, 100, 0.1);
@@ -191,7 +191,7 @@ void MqttHandleHassClass::publishInverterField(std::shared_ptr<InverterAbstract>
     }
 }
 
-void MqttHandleHassClass::publishInverterButton(std::shared_ptr<InverterAbstract> inv, const String& name, const String& icon, const String& category, const String& deviceClass, const String& subTopic, const String& payload)
+void MqttHandleHassClass::publishInverterButton(std::shared_ptr<InverterAbstract> inv, const String& name, const String& subTopic, const String& payload, const String& icon, const String& deviceClass, const String& category)
 {
     const String serial = inv->serialString();
 
