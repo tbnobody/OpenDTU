@@ -58,29 +58,29 @@ void MqttHandleHassClass::publishConfig()
     const CONFIG_T& config = Configuration.get();
 
     // publish DTU sensors
-    publishDtuSensor("IP", "dtu/ip", "", "mdi:network-outline", "", CATEGORY_DIAGNOSTIC);
-    publishDtuSensor("WiFi Signal", "dtu/rssi", "dBm", "", "signal_strength", CATEGORY_DIAGNOSTIC);
-    publishDtuSensor("Uptime", "dtu/uptime", "s", "", "duration", CATEGORY_DIAGNOSTIC);
-    publishDtuSensor("Temperature", "dtu/temperature", "°C", "mdi:thermometer", "temperature", CATEGORY_DIAGNOSTIC);
-    publishDtuSensor("Heap Size", "dtu/heap/size", "Bytes", "mdi:memory", "", CATEGORY_DIAGNOSTIC);
-    publishDtuSensor("Heap Free", "dtu/heap/free", "Bytes", "mdi:memory", "", CATEGORY_DIAGNOSTIC);
-    publishDtuSensor("Largest Free Heap Block", "dtu/heap/maxalloc", "Bytes", "mdi:memory", "", CATEGORY_DIAGNOSTIC);
-    publishDtuSensor("Lifetime Minimum Free Heap", "dtu/heap/minfree", "Bytes", "mdi:memory", "", CATEGORY_DIAGNOSTIC);
+    publishDtuSensor("IP", "dtu/ip", "", "mdi:network-outline", DEVICE_CLS_NONE, CATEGORY_DIAGNOSTIC);
+    publishDtuSensor("WiFi Signal", "dtu/rssi", "dBm", "", DEVICE_CLS_SIGNAL_STRENGTH, CATEGORY_DIAGNOSTIC);
+    publishDtuSensor("Uptime", "dtu/uptime", "s", "", DEVICE_CLS_DURATION, CATEGORY_DIAGNOSTIC);
+    publishDtuSensor("Temperature", "dtu/temperature", "°C", "mdi:thermometer", DEVICE_CLS_TEMPERATURE, CATEGORY_DIAGNOSTIC);
+    publishDtuSensor("Heap Size", "dtu/heap/size", "Bytes", "mdi:memory", DEVICE_CLS_NONE, CATEGORY_DIAGNOSTIC);
+    publishDtuSensor("Heap Free", "dtu/heap/free", "Bytes", "mdi:memory", DEVICE_CLS_NONE, CATEGORY_DIAGNOSTIC);
+    publishDtuSensor("Largest Free Heap Block", "dtu/heap/maxalloc", "Bytes", "mdi:memory", DEVICE_CLS_NONE, CATEGORY_DIAGNOSTIC);
+    publishDtuSensor("Lifetime Minimum Free Heap", "dtu/heap/minfree", "Bytes", "mdi:memory", DEVICE_CLS_NONE, CATEGORY_DIAGNOSTIC);
 
-    publishDtuSensor("Yield Total", "ac/yieldtotal", "kWh", "", "energy", CATEGORY_NONE);
-    publishDtuSensor("Yield Day", "ac/yieldday", "Wh", "", "energy", CATEGORY_NONE);
-    publishDtuSensor("AC Power", "ac/power", "W", "", "power", CATEGORY_NONE);
+    publishDtuSensor("Yield Total", "ac/yieldtotal", "kWh", "", DEVICE_CLS_ENERGY, CATEGORY_NONE);
+    publishDtuSensor("Yield Day", "ac/yieldday", "Wh", "", DEVICE_CLS_ENERGY, CATEGORY_NONE);
+    publishDtuSensor("AC Power", "ac/power", "W", "", DEVICE_CLS_PWR, CATEGORY_NONE);
 
-    publishDtuBinarySensor("Status", config.Mqtt.Lwt.Topic, config.Mqtt.Lwt.Value_Online, config.Mqtt.Lwt.Value_Offline, "connectivity", CATEGORY_DIAGNOSTIC);
+    publishDtuBinarySensor("Status", config.Mqtt.Lwt.Topic, config.Mqtt.Lwt.Value_Online, config.Mqtt.Lwt.Value_Offline, DEVICE_CLS_CONNECTIVITY, CATEGORY_DIAGNOSTIC);
 
     // Loop all inverters
     for (uint8_t i = 0; i < Hoymiles.getNumInverters(); i++) {
         auto inv = Hoymiles.getInverterByPos(i);
 
-        publishInverterButton(inv, "Turn Inverter Off", "cmd/power", "0", "mdi:power-plug-off", "", CATEGORY_CONFIG);
-        publishInverterButton(inv, "Turn Inverter On", "cmd/power", "1", "mdi:power-plug", "", CATEGORY_CONFIG);
-        publishInverterButton(inv, "Restart Inverter", "cmd/restart", "1", "", "restart", CATEGORY_CONFIG);
-        publishInverterButton(inv, "Reset Radio Statistics", "cmd/reset_rf_stats", "1", "", "", CATEGORY_CONFIG);
+        publishInverterButton(inv, "Turn Inverter Off", "cmd/power", "0", "mdi:power-plug-off", DEVICE_CLS_NONE, CATEGORY_CONFIG);
+        publishInverterButton(inv, "Turn Inverter On", "cmd/power", "1", "mdi:power-plug", DEVICE_CLS_NONE, CATEGORY_CONFIG);
+        publishInverterButton(inv, "Restart Inverter", "cmd/restart", "1", "", DEVICE_CLS_RESTART, CATEGORY_CONFIG);
+        publishInverterButton(inv, "Reset Radio Statistics", "cmd/reset_rf_stats", "1", "", DEVICE_CLS_NONE, CATEGORY_CONFIG);
 
         publishInverterNumber(inv, "Limit NonPersistent Relative", "status/limit_relative", "cmd/limit_nonpersistent_relative", 0, 100, 0.1, "%", "mdi:speedometer", CATEGORY_CONFIG);
         publishInverterNumber(inv, "Limit Persistent Relative", "status/limit_relative", "cmd/limit_persistent_relative", 0, 100, 0.1, "%", "mdi:speedometer", CATEGORY_CONFIG);
@@ -88,15 +88,15 @@ void MqttHandleHassClass::publishConfig()
         publishInverterNumber(inv, "Limit NonPersistent Absolute", "status/limit_absolute", "cmd/limit_nonpersistent_absolute", 0, MAX_INVERTER_LIMIT, 1, "W", "mdi:speedometer", CATEGORY_CONFIG);
         publishInverterNumber(inv, "Limit Persistent Absolute", "status/limit_absolute", "cmd/limit_persistent_absolute", 0, MAX_INVERTER_LIMIT, 1, "W", "mdi:speedometer", CATEGORY_CONFIG);
 
-        publishInverterBinarySensor(inv, "Reachable", "status/reachable", "1", "0", "connectivity", CATEGORY_DIAGNOSTIC);
-        publishInverterBinarySensor(inv, "Producing", "status/producing", "1", "0", "", CATEGORY_NONE);
+        publishInverterBinarySensor(inv, "Reachable", "status/reachable", "1", "0", DEVICE_CLS_CONNECTIVITY, CATEGORY_DIAGNOSTIC);
+        publishInverterBinarySensor(inv, "Producing", "status/producing", "1", "0", DEVICE_CLS_NONE, CATEGORY_NONE);
 
-        publishInverterSensor(inv, "TX Requests", "radio/tx_request", "", "", "", CATEGORY_DIAGNOSTIC);
-        publishInverterSensor(inv, "RX Success", "radio/rx_success", "", "", "", CATEGORY_DIAGNOSTIC);
-        publishInverterSensor(inv, "RX Fail Receive Nothing", "radio/rx_fail_nothing", "", "", "", CATEGORY_DIAGNOSTIC);
-        publishInverterSensor(inv, "RX Fail Receive Partial", "radio/rx_fail_partial", "", "", "", CATEGORY_DIAGNOSTIC);
-        publishInverterSensor(inv, "RX Fail Receive Corrupt", "radio/rx_fail_corrupt", "", "", "", CATEGORY_DIAGNOSTIC);
-        publishInverterSensor(inv, "TX Re-Request Fragment", "radio/tx_re_request", "", "", "", CATEGORY_DIAGNOSTIC);
+        publishInverterSensor(inv, "TX Requests", "radio/tx_request", "", "", DEVICE_CLS_NONE, CATEGORY_DIAGNOSTIC);
+        publishInverterSensor(inv, "RX Success", "radio/rx_success", "", "", DEVICE_CLS_NONE, CATEGORY_DIAGNOSTIC);
+        publishInverterSensor(inv, "RX Fail Receive Nothing", "radio/rx_fail_nothing", "", "", DEVICE_CLS_NONE, CATEGORY_DIAGNOSTIC);
+        publishInverterSensor(inv, "RX Fail Receive Partial", "radio/rx_fail_partial", "", "", DEVICE_CLS_NONE, CATEGORY_DIAGNOSTIC);
+        publishInverterSensor(inv, "RX Fail Receive Corrupt", "radio/rx_fail_corrupt", "", "", DEVICE_CLS_NONE, CATEGORY_DIAGNOSTIC);
+        publishInverterSensor(inv, "TX Re-Request Fragment", "radio/tx_re_request", "", "", DEVICE_CLS_NONE, CATEGORY_DIAGNOSTIC);
 
         // Loop all channels
         for (auto& t : inv->Statistics()->getChannelTypes()) {
@@ -142,8 +142,8 @@ void MqttHandleHassClass::publishInverterField(std::shared_ptr<InverterAbstract>
 
     if (!clear) {
         const String stateTopic = MqttSettings.getPrefix() + MqttHandleInverter.getTopic(inv, type, channel, fieldType.fieldId);
-        const char* devCls = deviceClasses[fieldType.deviceClsId];
-        const char* stateCls = stateClasses[fieldType.stateClsId];
+        const char* devCls = deviceClass_name[fieldType.deviceClsId];
+        const char* stateCls = stateClass_name[fieldType.stateClsId];
 
         String name;
         if (type != TYPE_DC) {
@@ -181,7 +181,7 @@ void MqttHandleHassClass::publishInverterField(std::shared_ptr<InverterAbstract>
     }
 }
 
-void MqttHandleHassClass::publishInverterButton(std::shared_ptr<InverterAbstract> inv, const String& name, const String& state_topic, const String& payload, const String& icon, const String& device_class, const CategoryType category)
+void MqttHandleHassClass::publishInverterButton(std::shared_ptr<InverterAbstract> inv, const String& name, const String& state_topic, const String& payload, const String& icon, const DeviceClassType device_class, const CategoryType category)
 {
     const String serial = inv->serialString();
 
@@ -202,8 +202,8 @@ void MqttHandleHassClass::publishInverterButton(std::shared_ptr<InverterAbstract
     if (icon != "") {
         root["ic"] = icon;
     }
-    if (device_class != "") {
-        root["dev_cla"] = device_class;
+    if (device_class != DEVICE_CLS_NONE) {
+        root["dev_cla"] = deviceClass_name[device_class];
     }
     if (category != CATEGORY_NONE) {
         root["ent_cat"] = category_name[category];
@@ -330,7 +330,7 @@ void MqttHandleHassClass::publish(const String& subtopic, const JsonDocument& do
     publish(subtopic, buffer);
 }
 
-void MqttHandleHassClass::publishBinarySensor(JsonDocument& doc, const String& root_device, const String& unique_id_prefix, const String& name, const String& state_topic, const String& payload_on, const String& payload_off, const String& device_class, const CategoryType category)
+void MqttHandleHassClass::publishBinarySensor(JsonDocument& doc, const String& root_device, const String& unique_id_prefix, const String& name, const String& state_topic, const String& payload_on, const String& payload_off, const DeviceClassType device_class, const CategoryType category)
 {
     String sensor_id = name;
     sensor_id.toLowerCase();
@@ -342,8 +342,8 @@ void MqttHandleHassClass::publishBinarySensor(JsonDocument& doc, const String& r
     doc["pl_on"] = payload_on;
     doc["pl_off"] = payload_off;
 
-    if (device_class != "") {
-        doc["dev_cla"] = device_class;
+    if (device_class != DEVICE_CLS_NONE) {
+        doc["dev_cla"] = deviceClass_name[device_class];
     }
     if (category != CATEGORY_NONE) {
         doc["ent_cat"] = category_name[category];
@@ -353,7 +353,7 @@ void MqttHandleHassClass::publishBinarySensor(JsonDocument& doc, const String& r
     publish(configTopic, doc);
 }
 
-void MqttHandleHassClass::publishDtuBinarySensor(const String& name, const String& state_topic, const String& payload_on, const String& payload_off, const String& device_class, const CategoryType category)
+void MqttHandleHassClass::publishDtuBinarySensor(const String& name, const String& state_topic, const String& payload_on, const String& payload_off, const DeviceClassType device_class, const CategoryType category)
 {
     const String dtuId = getDtuUniqueId();
 
@@ -362,7 +362,7 @@ void MqttHandleHassClass::publishDtuBinarySensor(const String& name, const Strin
     publishBinarySensor(root, dtuId, dtuId, name, state_topic, payload_on, payload_off, device_class, category);
 }
 
-void MqttHandleHassClass::publishInverterBinarySensor(std::shared_ptr<InverterAbstract> inv, const String& name, const String& state_topic, const String& payload_on, const String& payload_off, const String& device_class, const CategoryType category)
+void MqttHandleHassClass::publishInverterBinarySensor(std::shared_ptr<InverterAbstract> inv, const String& name, const String& state_topic, const String& payload_on, const String& payload_off, const DeviceClassType device_class, const CategoryType category)
 {
     const String serial = inv->serialString();
 
@@ -371,7 +371,7 @@ void MqttHandleHassClass::publishInverterBinarySensor(std::shared_ptr<InverterAb
     publishBinarySensor(root, "dtu_" + serial, serial, name, serial + "/" + state_topic, payload_on, payload_off, device_class, category);
 }
 
-void MqttHandleHassClass::publishSensor(JsonDocument& doc, const String& root_device, const String& unique_id_prefix, const String& name, const String& state_topic, const String& unit_of_measure, const String& icon, const String& device_class, const CategoryType category)
+void MqttHandleHassClass::publishSensor(JsonDocument& doc, const String& root_device, const String& unique_id_prefix, const String& name, const String& state_topic, const String& unit_of_measure, const String& icon, const DeviceClassType device_class, const CategoryType category)
 {
     String sensor_id = name;
     sensor_id.toLowerCase();
@@ -387,8 +387,8 @@ void MqttHandleHassClass::publishSensor(JsonDocument& doc, const String& root_de
     if (icon != "") {
         doc["ic"] = icon;
     }
-    if (device_class != "") {
-        doc["dev_cla"] = device_class;
+    if (device_class != DEVICE_CLS_NONE) {
+        doc["dev_cla"] = deviceClass_name[device_class];
     }
     if (category != CATEGORY_NONE) {
         doc["ent_cat"] = category_name[category];
@@ -403,7 +403,7 @@ void MqttHandleHassClass::publishSensor(JsonDocument& doc, const String& root_de
     publish(configTopic, doc);
 }
 
-void MqttHandleHassClass::publishDtuSensor(const String& name, const String& state_topic, const String& unit_of_measure, const String& icon, const String& device_class, const CategoryType category)
+void MqttHandleHassClass::publishDtuSensor(const String& name, const String& state_topic, const String& unit_of_measure, const String& icon, const DeviceClassType device_class, const CategoryType category)
 {
     const String dtuId = getDtuUniqueId();
 
@@ -412,7 +412,7 @@ void MqttHandleHassClass::publishDtuSensor(const String& name, const String& sta
     publishSensor(root, dtuId, dtuId, name, state_topic, unit_of_measure, icon, device_class, category);
 }
 
-void MqttHandleHassClass::publishInverterSensor(std::shared_ptr<InverterAbstract> inv, const String& name, const String& state_topic, const String& unit_of_measure, const String& icon, const String& device_class, const CategoryType category)
+void MqttHandleHassClass::publishInverterSensor(std::shared_ptr<InverterAbstract> inv, const String& name, const String& state_topic, const String& unit_of_measure, const String& icon, const DeviceClassType device_class, const CategoryType category)
 {
     const String serial = inv->serialString();
 
