@@ -59,6 +59,7 @@ public:
 private:
     void loop();
     static void publish(const String& subtopic, const String& payload);
+    static void publish(const String& subtopic, const JsonDocument& doc);
 
     // Binary Sensor
     static void publishBinarySensor(JsonDocument& doc, const String& root_device, const String& unique_id_prefix, const String& name, const String& state_topic, const String& payload_on, const String& payload_off, const String& device_class, const String& category);

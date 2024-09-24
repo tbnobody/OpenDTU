@@ -171,13 +171,7 @@ void MqttHandleHassClass::publishInverterField(std::shared_ptr<InverterAbstract>
             root["stat_cla"] = stateCls;
         }
 
-        if (!Utils::checkJsonAlloc(root, __FUNCTION__, __LINE__)) {
-            return;
-        }
-
-        String buffer;
-        serializeJson(root, buffer);
-        publish(configTopic, buffer);
+        publish(configTopic, root);
     } else {
         publish(configTopic, "");
     }
@@ -213,13 +207,7 @@ void MqttHandleHassClass::publishInverterButton(std::shared_ptr<InverterAbstract
 
     createInverterInfo(root, inv);
 
-    if (!Utils::checkJsonAlloc(root, __FUNCTION__, __LINE__)) {
-        return;
-    }
-
-    String buffer;
-    serializeJson(root, buffer);
-    publish(configTopic, buffer);
+    publish(configTopic, root);
 }
 
 void MqttHandleHassClass::publishInverterNumber(
@@ -258,13 +246,7 @@ void MqttHandleHassClass::publishInverterNumber(
 
     createInverterInfo(root, inv);
 
-    if (!Utils::checkJsonAlloc(root, __FUNCTION__, __LINE__)) {
-        return;
-    }
-
-    String buffer;
-    serializeJson(root, buffer);
-    publish(configTopic, buffer);
+    publish(configTopic, root);
 }
 
 void MqttHandleHassClass::createInverterInfo(JsonDocument& root, std::shared_ptr<InverterAbstract> inv)
@@ -330,6 +312,16 @@ void MqttHandleHassClass::publish(const String& subtopic, const String& payload)
     yield();
 }
 
+void MqttHandleHassClass::publish(const String& subtopic, const JsonDocument& doc)
+{
+    if (!Utils::checkJsonAlloc(doc, __FUNCTION__, __LINE__)) {
+        return;
+    }
+    String buffer;
+    serializeJson(doc, buffer);
+    publish(subtopic, buffer);
+}
+
 void MqttHandleHassClass::publishBinarySensor(JsonDocument& doc, const String& root_device, const String& unique_id_prefix, const String& name, const String& state_topic, const String& payload_on, const String& payload_off, const String& device_class, const String& category)
 {
     String sensor_id = name;
@@ -349,14 +341,8 @@ void MqttHandleHassClass::publishBinarySensor(JsonDocument& doc, const String& r
         doc["ent_cat"] = category;
     }
 
-    if (!Utils::checkJsonAlloc(doc, __FUNCTION__, __LINE__)) {
-        return;
-    }
-
-    String buffer;
     const String configTopic = "binary_sensor/" + root_device + "/" + sensor_id + "/config";
-    serializeJson(doc, buffer);
-    publish(configTopic, buffer);
+    publish(configTopic, doc);
 }
 
 void MqttHandleHassClass::publishDtuBinarySensor(const String& name, const String& state_topic, const String& payload_on, const String& payload_off, const String& device_class, const String& category)
@@ -405,14 +391,8 @@ void MqttHandleHassClass::publishSensor(JsonDocument& doc, const String& root_de
     doc["pl_avail"] = config.Mqtt.Lwt.Value_Online;
     doc["pl_not_avail"] = config.Mqtt.Lwt.Value_Offline;
 
-    if (!Utils::checkJsonAlloc(doc, __FUNCTION__, __LINE__)) {
-        return;
-    }
-
-    String buffer;
     const String configTopic = "sensor/" + root_device + "/" + sensor_id + "/config";
-    serializeJson(doc, buffer);
-    publish(configTopic, buffer);
+    publish(configTopic, doc);
 }
 
 void MqttHandleHassClass::publishDtuSensor(const String& name, const String& state_topic, const String& unit_of_measure, const String& icon, const String& device_class, const String& category)
