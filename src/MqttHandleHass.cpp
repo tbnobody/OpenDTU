@@ -67,7 +67,7 @@ void MqttHandleHassClass::publishConfig()
     publishDtuSensor("Largest Free Heap Block", "heap/maxalloc", "Bytes", "mdi:memory", "", "diagnostic");
     publishDtuSensor("Lifetime Minimum Free Heap", "heap/minfree", "Bytes", "mdi:memory", "", "diagnostic");
 
-    publishDtuBinarySensor("Status", "connectivity", "diagnostic", config.Mqtt.Lwt.Value_Online, config.Mqtt.Lwt.Value_Offline, config.Mqtt.Lwt.Topic);
+    publishDtuBinarySensor("Status", config.Mqtt.Lwt.Topic, config.Mqtt.Lwt.Value_Online, config.Mqtt.Lwt.Value_Offline, "connectivity", "diagnostic");
 
     yield();
 
@@ -402,7 +402,7 @@ void MqttHandleHassClass::publishDtuSensor(const String& name, const String& sub
     publish(configTopic, buffer);
 }
 
-void MqttHandleHassClass::publishDtuBinarySensor(const String& name, const String& device_class, const String& category, const String& payload_on, const String& payload_off, const String& subTopic)
+void MqttHandleHassClass::publishDtuBinarySensor(const String& name, const String& subTopic, const String& payload_on, const String& payload_off, const String& device_class, const String& category)
 {
     String id = name;
     id.toLowerCase();

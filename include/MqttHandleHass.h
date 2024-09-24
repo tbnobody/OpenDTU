@@ -60,7 +60,7 @@ private:
     void loop();
     static void publish(const String& subtopic, const String& payload);
     static void publishDtuSensor(const String& name, const String& subTopic, const String& unit_of_measure, const String& icon, const String& device_class, const String& category);
-    static void publishDtuBinarySensor(const String& name, const String& device_class, const String& category, const String& payload_on, const String& payload_off, const String& subTopic = "");
+    static void publishDtuBinarySensor(const String& name, const String& subTopic, const String& payload_on, const String& payload_off, const String& device_class, const String& category);
     static void publishInverterField(std::shared_ptr<InverterAbstract> inv, const ChannelType_t type, const ChannelNum_t channel, const byteAssign_fieldDeviceClass_t fieldType, const bool clear = false);
     static void publishInverterButton(std::shared_ptr<InverterAbstract> inv, const String& name, const String& icon, const String& category, const String& deviceClass, const String& subTopic, const String& payload);
     static void publishInverterNumber(std::shared_ptr<InverterAbstract> inv, const String& name, const String& icon, const String& category, const String& commandTopic, const String& stateTopic, const String& unitOfMeasure, const int16_t min = 1, const int16_t max = 100, float step = 1.0);
