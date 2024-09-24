@@ -90,12 +90,12 @@ void MqttHandleHassClass::publishConfig()
 
         yield();
 
-        publishInverterSensor(inv, "TX Requests", "radio/tx_request", "", "diagnostic", "", "");
-        publishInverterSensor(inv, "RX Success", "radio/rx_success", "", "diagnostic", "", "");
-        publishInverterSensor(inv, "RX Fail Receive Nothing", "radio/rx_fail_nothing", "", "diagnostic", "", "");
-        publishInverterSensor(inv, "RX Fail Receive Partial", "radio/rx_fail_partial", "", "diagnostic", "", "");
-        publishInverterSensor(inv, "RX Fail Receive Corrupt", "radio/rx_fail_corrupt", "", "diagnostic", "", "");
-        publishInverterSensor(inv, "TX Re-Request Fragment", "radio/tx_re_request", "", "diagnostic", "", "");
+        publishInverterSensor(inv, "TX Requests", "radio/tx_request", "", "", "", "diagnostic");
+        publishInverterSensor(inv, "RX Success", "radio/rx_success", "", "", "", "diagnostic");
+        publishInverterSensor(inv, "RX Fail Receive Nothing", "radio/rx_fail_nothing", "", "", "", "diagnostic");
+        publishInverterSensor(inv, "RX Fail Receive Partial", "radio/rx_fail_partial", "", "", "", "diagnostic");
+        publishInverterSensor(inv, "RX Fail Receive Corrupt", "radio/rx_fail_corrupt", "", "", "", "diagnostic");
+        publishInverterSensor(inv, "TX Re-Request Fragment", "radio/tx_re_request", "", "", "", "diagnostic");
 
         yield();
 
@@ -306,7 +306,7 @@ void MqttHandleHassClass::publishInverterBinarySensor(std::shared_ptr<InverterAb
     publish(configTopic, buffer);
 }
 
-void MqttHandleHassClass::publishInverterSensor(std::shared_ptr<InverterAbstract> inv, const String& name, const String& subTopic, const String& icon, const String& category, const String& device_class, const String& unit_of_measure)
+void MqttHandleHassClass::publishInverterSensor(std::shared_ptr<InverterAbstract> inv, const String& name, const String& subTopic, const String& unit_of_measure, const String& icon, const String& device_class, const String& category)
 {
     const String serial = inv->serialString();
 
