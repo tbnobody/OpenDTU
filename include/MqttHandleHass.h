@@ -59,13 +59,13 @@ public:
 private:
     void loop();
     void publish(const String& subtopic, const String& payload);
-    void publishDtuSensor(const char* name, const char* device_class, const char* category, const char* icon, const char* unit_of_measure, const char* subTopic);
-    void publishDtuBinarySensor(const char* name, const char* device_class, const char* category, const char* payload_on, const char* payload_off, const char* subTopic = "");
+    void publishDtuSensor(const String& name, const String& device_class, const String& category, const String& icon, const String& unit_of_measure, const String& subTopic);
+    void publishDtuBinarySensor(const String& name, const String& device_class, const String& category, const String& payload_on, const String& payload_off, const String& subTopic = "");
     void publishInverterField(std::shared_ptr<InverterAbstract> inv, const ChannelType_t type, const ChannelNum_t channel, const byteAssign_fieldDeviceClass_t fieldType, const bool clear = false);
-    void publishInverterButton(std::shared_ptr<InverterAbstract> inv, const char* caption, const char* icon, const char* category, const char* deviceClass, const char* subTopic, const char* payload);
-    void publishInverterNumber(std::shared_ptr<InverterAbstract> inv, const char* caption, const char* icon, const char* category, const char* commandTopic, const char* stateTopic, const char* unitOfMeasure, const int16_t min = 1, const int16_t max = 100, float step = 1.0);
-    void publishInverterBinarySensor(std::shared_ptr<InverterAbstract> inv, const char* caption, const char* subTopic, const char* payload_on, const char* payload_off);
-    void publishInverterSensor(std::shared_ptr<InverterAbstract> inv, const char* caption, const char* subTopic, const char* icon, const char* category, const char* device_class, const char* unit_of_measure);
+    void publishInverterButton(std::shared_ptr<InverterAbstract> inv, const String& caption, const String& icon, const String& category, const String& deviceClass, const String& subTopic, const String& payload);
+    void publishInverterNumber(std::shared_ptr<InverterAbstract> inv, const String& caption, const String& icon, const String& category, const String& commandTopic, const String& stateTopic, const String& unitOfMeasure, const int16_t min = 1, const int16_t max = 100, float step = 1.0);
+    void publishInverterBinarySensor(std::shared_ptr<InverterAbstract> inv, const String& caption, const String& subTopic, const String& payload_on, const String& payload_off);
+    void publishInverterSensor(std::shared_ptr<InverterAbstract> inv, const String& caption, const String& subTopic, const String& icon, const String& category, const String& device_class, const String& unit_of_measure);
 
     static void createInverterInfo(JsonDocument& doc, std::shared_ptr<InverterAbstract> inv);
     static void createDtuInfo(JsonDocument& doc);
