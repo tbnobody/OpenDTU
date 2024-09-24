@@ -69,8 +69,6 @@ void MqttHandleHassClass::publishConfig()
 
     publishDtuBinarySensor("Status", config.Mqtt.Lwt.Topic, config.Mqtt.Lwt.Value_Online, config.Mqtt.Lwt.Value_Offline, "connectivity", "diagnostic");
 
-    yield();
-
     // Loop all inverters
     for (uint8_t i = 0; i < Hoymiles.getNumInverters(); i++) {
         auto inv = Hoymiles.getInverterByPos(i);
@@ -89,16 +87,12 @@ void MqttHandleHassClass::publishConfig()
         publishInverterBinarySensor(inv, "Reachable", "status/reachable", "1", "0");
         publishInverterBinarySensor(inv, "Producing", "status/producing", "1", "0");
 
-        yield();
-
         publishInverterSensor(inv, "TX Requests", "radio/tx_request", "", "", "", "diagnostic");
         publishInverterSensor(inv, "RX Success", "radio/rx_success", "", "", "", "diagnostic");
         publishInverterSensor(inv, "RX Fail Receive Nothing", "radio/rx_fail_nothing", "", "", "", "diagnostic");
         publishInverterSensor(inv, "RX Fail Receive Partial", "radio/rx_fail_partial", "", "", "", "diagnostic");
         publishInverterSensor(inv, "RX Fail Receive Corrupt", "radio/rx_fail_corrupt", "", "", "", "diagnostic");
         publishInverterSensor(inv, "TX Re-Request Fragment", "radio/tx_re_request", "", "", "", "diagnostic");
-
-        yield();
 
         // Loop all channels
         for (auto& t : inv->Statistics()->getChannelTypes()) {
@@ -112,8 +106,6 @@ void MqttHandleHassClass::publishConfig()
                 }
             }
         }
-
-        yield();
     }
 }
 
@@ -335,6 +327,7 @@ void MqttHandleHassClass::publish(const String& subtopic, const String& payload)
     String topic = Configuration.get().Mqtt.Hass.Topic;
     topic += subtopic;
     MqttSettings.publishGeneric(topic, payload, Configuration.get().Mqtt.Hass.Retain);
+    yield();
 }
 
 void MqttHandleHassClass::publishBinarySensor(JsonDocument& doc, const String& root_device, const String& unique_id_prefix, const String& name, const String& state_topic, const String& payload_on, const String& payload_off, const String& device_class, const String& category)
