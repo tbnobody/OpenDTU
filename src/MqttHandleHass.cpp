@@ -275,15 +275,6 @@ void MqttHandleHassClass::publishInverterNumber(
     publish(configTopic, buffer);
 }
 
-void MqttHandleHassClass::publishInverterBinarySensor(std::shared_ptr<InverterAbstract> inv, const String& name, const String& state_topic, const String& payload_on, const String& payload_off)
-{
-    const String serial = inv->serialString();
-
-    JsonDocument root;
-    createInverterInfo(root, inv);
-    publishBinarySensor(root, "dtu_" + serial, serial, name, serial + "/" + state_topic, payload_on, payload_off, "", "");
-}
-
 void MqttHandleHassClass::publishInverterSensor(std::shared_ptr<InverterAbstract> inv, const String& name, const String& state_topic, const String& unit_of_measure, const String& icon, const String& device_class, const String& category)
 {
     const String serial = inv->serialString();
@@ -375,15 +366,6 @@ void MqttHandleHassClass::publishDtuSensor(const String& name, const String& sta
     publish(configTopic, buffer);
 }
 
-void MqttHandleHassClass::publishDtuBinarySensor(const String& name, const String& state_topic, const String& payload_on, const String& payload_off, const String& device_class, const String& category)
-{
-    const String dtuId = getDtuUniqueId();
-
-    JsonDocument root;
-    createDtuInfo(root);
-    publishBinarySensor(root, dtuId, dtuId, name, state_topic, payload_on, payload_off, device_class, category);
-}
-
 void MqttHandleHassClass::createInverterInfo(JsonDocument& root, std::shared_ptr<InverterAbstract> inv)
 {
     createDeviceInfo(
@@ -473,4 +455,22 @@ void MqttHandleHassClass::publishBinarySensor(JsonDocument& doc, const String& r
     const String configTopic = "binary_sensor/" + root_device + "/" + sensor_id + "/config";
     serializeJson(doc, buffer);
     publish(configTopic, buffer);
+}
+
+void MqttHandleHassClass::publishDtuBinarySensor(const String& name, const String& state_topic, const String& payload_on, const String& payload_off, const String& device_class, const String& category)
+{
+    const String dtuId = getDtuUniqueId();
+
+    JsonDocument root;
+    createDtuInfo(root);
+    publishBinarySensor(root, dtuId, dtuId, name, state_topic, payload_on, payload_off, device_class, category);
+}
+
+void MqttHandleHassClass::publishInverterBinarySensor(std::shared_ptr<InverterAbstract> inv, const String& name, const String& state_topic, const String& payload_on, const String& payload_off)
+{
+    const String serial = inv->serialString();
+
+    JsonDocument root;
+    createInverterInfo(root, inv);
+    publishBinarySensor(root, "dtu_" + serial, serial, name, serial + "/" + state_topic, payload_on, payload_off, "", "");
 }
