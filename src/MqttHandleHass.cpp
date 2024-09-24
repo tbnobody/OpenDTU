@@ -80,11 +80,11 @@ void MqttHandleHassClass::publishConfig()
         publishInverterButton(inv, "Restart Inverter", "cmd/restart", "1", "", "restart", "config");
         publishInverterButton(inv, "Reset Radio Statistics", "cmd/reset_rf_stats", "1", "", "", "config");
 
-        publishInverterNumber(inv, "Limit NonPersistent Relative", "mdi:speedometer", "config", "cmd/limit_nonpersistent_relative", "status/limit_relative", "%", 0, 100, 0.1);
-        publishInverterNumber(inv, "Limit Persistent Relative", "mdi:speedometer", "config", "cmd/limit_persistent_relative", "status/limit_relative", "%", 0, 100, 0.1);
+        publishInverterNumber(inv, "Limit NonPersistent Relative", "status/limit_relative", "cmd/limit_nonpersistent_relative", 0, 100, 0.1, "%", "mdi:speedometer", "config");
+        publishInverterNumber(inv, "Limit Persistent Relative", "status/limit_relative", "cmd/limit_persistent_relative", 0, 100, 0.1, "%", "mdi:speedometer", "config");
 
-        publishInverterNumber(inv, "Limit NonPersistent Absolute", "mdi:speedometer", "config", "cmd/limit_nonpersistent_absolute", "status/limit_absolute", "W", 0, MAX_INVERTER_LIMIT);
-        publishInverterNumber(inv, "Limit Persistent Absolute", "mdi:speedometer", "config", "cmd/limit_persistent_absolute", "status/limit_absolute", "W", 0, MAX_INVERTER_LIMIT);
+        publishInverterNumber(inv, "Limit NonPersistent Absolute", "status/limit_absolute", "cmd/limit_nonpersistent_absolute", 0, MAX_INVERTER_LIMIT, 1, "W", "mdi:speedometer", "config");
+        publishInverterNumber(inv, "Limit Persistent Absolute", "status/limit_absolute", "cmd/limit_persistent_absolute", 0, MAX_INVERTER_LIMIT, 1, "W", "mdi:speedometer", "config");
 
         publishInverterBinarySensor(inv, "Reachable", "status/reachable", "1", "0");
         publishInverterBinarySensor(inv, "Producing", "status/producing", "1", "0");
@@ -231,9 +231,10 @@ void MqttHandleHassClass::publishInverterButton(std::shared_ptr<InverterAbstract
 }
 
 void MqttHandleHassClass::publishInverterNumber(
-    std::shared_ptr<InverterAbstract> inv, const String& name, const String& icon, const String& category,
-    const String& commandTopic, const String& stateTopic, const String& unitOfMeasure,
-    const int16_t min, const int16_t max, float step)
+    std::shared_ptr<InverterAbstract> inv, const String& name,
+    const String& stateTopic, const String& commandTopic,
+    const int16_t min, const int16_t max, float step,
+    const String& unitOfMeasure, const String& icon, const String& category)
 {
     const String serial = inv->serialString();
 
