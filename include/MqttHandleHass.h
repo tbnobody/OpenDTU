@@ -75,6 +75,8 @@ private:
     static void publish(const String& subtopic, const String& payload);
     static void publish(const String& subtopic, const JsonDocument& doc);
 
+    static void addCommonMetadata(JsonDocument& doc, const String& unit_of_measure, const String& icon, const DeviceClassType device_class, const CategoryType category);
+
     // Binary Sensor
     static void publishBinarySensor(JsonDocument& doc, const String& root_device, const String& unique_id_prefix, const String& name, const String& state_topic, const String& payload_on, const String& payload_off, const DeviceClassType device_class, const CategoryType category);
     static void publishDtuBinarySensor(const String& name, const String& state_topic, const String& payload_on, const String& payload_off, const DeviceClassType device_class, const CategoryType category);
