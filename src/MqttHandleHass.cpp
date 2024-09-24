@@ -67,6 +67,10 @@ void MqttHandleHassClass::publishConfig()
     publishDtuSensor("Largest Free Heap Block", "dtu/heap/maxalloc", "Bytes", "mdi:memory", "", "diagnostic");
     publishDtuSensor("Lifetime Minimum Free Heap", "dtu/heap/minfree", "Bytes", "mdi:memory", "", "diagnostic");
 
+    publishDtuSensor("Yield Total", "ac/yieldtotal", "kWh", "", "energy", "");
+    publishDtuSensor("Yield Day", "ac/yieldday", "Wh", "", "energy", "");
+    publishDtuSensor("AC Power", "ac/power", "W", "", "power", "");
+
     publishDtuBinarySensor("Status", config.Mqtt.Lwt.Topic, config.Mqtt.Lwt.Value_Online, config.Mqtt.Lwt.Value_Offline, "connectivity", "diagnostic");
 
     // Loop all inverters
