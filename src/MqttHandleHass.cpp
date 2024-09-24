@@ -362,10 +362,6 @@ void MqttHandleHassClass::publishDtuSensor(const String& name, const String& sta
     String id = name;
     id.toLowerCase();
     id.replace(" ", "_");
-    String topic = state_topic;
-    if (topic == "") {
-        topic = id;
-    }
 
     JsonDocument root;
 
@@ -383,7 +379,7 @@ void MqttHandleHassClass::publishDtuSensor(const String& name, const String& sta
     if (unit_of_measure != "") {
         root["unit_of_meas"] = unit_of_measure;
     }
-    root["stat_t"] = MqttSettings.getPrefix() + "dtu" + "/" + topic;
+    root["stat_t"] = MqttSettings.getPrefix() + "dtu" + "/" + state_topic;
 
     root["avty_t"] = MqttSettings.getPrefix() + Configuration.get().Mqtt.Lwt.Topic;
 
@@ -409,16 +405,11 @@ void MqttHandleHassClass::publishDtuBinarySensor(const String& name, const Strin
     id.toLowerCase();
     id.replace(" ", "_");
 
-    String topic = state_topic;
-    if (state_topic == "") {
-        topic = String("dtu/") + "/" + id;
-    }
-
     JsonDocument root;
 
     root["name"] = name;
     root["uniq_id"] = getDtuUniqueId() + "_" + id;
-    root["stat_t"] = MqttSettings.getPrefix() + topic;
+    root["stat_t"] = MqttSettings.getPrefix() + state_topic;
     root["pl_on"] = payload_on;
     root["pl_off"] = payload_off;
 
