@@ -63,7 +63,7 @@ private:
     // Binary Sensor
     static void publishBinarySensor(JsonDocument& doc, const String& root_device, const String& unique_id_prefix, const String& name, const String& state_topic, const String& payload_on, const String& payload_off, const String& device_class, const String& category);
     static void publishDtuBinarySensor(const String& name, const String& state_topic, const String& payload_on, const String& payload_off, const String& device_class, const String& category);
-    static void publishInverterBinarySensor(std::shared_ptr<InverterAbstract> inv, const String& name, const String& state_topic, const String& payload_on, const String& payload_off);
+    static void publishInverterBinarySensor(std::shared_ptr<InverterAbstract> inv, const String& name, const String& state_topic, const String& payload_on, const String& payload_off, const String& device_class, const String& category);
 
     // Sensor
     static void publishSensor(JsonDocument& doc, const String& root_device, const String& unique_id_prefix, const String& name, const String& state_topic, const String& unit_of_measure, const String& icon, const String& device_class, const String& category);
