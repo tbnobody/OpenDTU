@@ -58,14 +58,15 @@ void MqttHandleHassClass::publishConfig()
     const CONFIG_T& config = Configuration.get();
 
     // publish DTU sensors
-    publishDtuSensor("IP", "", "diagnostic", "mdi:network-outline", "", "");
-    publishDtuSensor("WiFi Signal", "signal_strength", "diagnostic", "", "dBm", "rssi");
-    publishDtuSensor("Uptime", "duration", "diagnostic", "", "s", "");
-    publishDtuSensor("Temperature", "temperature", "diagnostic", "mdi:thermometer", "°C", "temperature");
-    publishDtuSensor("Heap Size", "", "diagnostic", "mdi:memory", "Bytes", "heap/size");
-    publishDtuSensor("Heap Free", "", "diagnostic", "mdi:memory", "Bytes", "heap/free");
-    publishDtuSensor("Largest Free Heap Block", "", "diagnostic", "mdi:memory", "Bytes", "heap/maxalloc");
-    publishDtuSensor("Lifetime Minimum Free Heap", "", "diagnostic", "mdi:memory", "Bytes", "heap/minfree");
+    publishDtuSensor("IP", "ip", "", "mdi:network-outline", "", "diagnostic");
+    publishDtuSensor("WiFi Signal", "rssi", "dBm", "", "signal_strength", "diagnostic");
+    publishDtuSensor("Uptime", "uptime", "s", "", "duration", "diagnostic");
+    publishDtuSensor("Temperature", "temperature", "°C", "mdi:thermometer", "temperature", "diagnostic");
+    publishDtuSensor("Heap Size", "heap/size", "Bytes", "mdi:memory", "", "diagnostic");
+    publishDtuSensor("Heap Free", "heap/free", "Bytes", "mdi:memory", "", "diagnostic");
+    publishDtuSensor("Largest Free Heap Block", "heap/maxalloc", "Bytes", "mdi:memory", "", "diagnostic");
+    publishDtuSensor("Lifetime Minimum Free Heap", "heap/minfree", "Bytes", "mdi:memory", "", "diagnostic");
+
     publishDtuBinarySensor("Status", "connectivity", "diagnostic", config.Mqtt.Lwt.Value_Online, config.Mqtt.Lwt.Value_Offline, config.Mqtt.Lwt.Topic);
 
     yield();
@@ -355,7 +356,7 @@ void MqttHandleHassClass::publishInverterSensor(std::shared_ptr<InverterAbstract
     publish(configTopic, buffer);
 }
 
-void MqttHandleHassClass::publishDtuSensor(const String& name, const String& device_class, const String& category, const String& icon, const String& unit_of_measure, const String& subTopic)
+void MqttHandleHassClass::publishDtuSensor(const String& name, const String& subTopic, const String& unit_of_measure, const String& icon, const String& device_class, const String& category)
 {
     String id = name;
     id.toLowerCase();
