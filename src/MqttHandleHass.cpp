@@ -279,33 +279,9 @@ void MqttHandleHassClass::publishInverterBinarySensor(std::shared_ptr<InverterAb
 {
     const String serial = inv->serialString();
 
-    String sensorId = name;
-    sensorId.replace(" ", "_");
-    sensorId.toLowerCase();
-
-    const String configTopic = "binary_sensor/dtu_" + serial
-        + "/" + sensorId
-        + "/config";
-
-    const String statTopic = MqttSettings.getPrefix() + serial + "/" + state_topic;
-
     JsonDocument root;
-
-    root["name"] = name;
-    root["uniq_id"] = serial + "_" + sensorId;
-    root["stat_t"] = statTopic;
-    root["pl_on"] = payload_on;
-    root["pl_off"] = payload_off;
-
     createInverterInfo(root, inv);
-
-    if (!Utils::checkJsonAlloc(root, __FUNCTION__, __LINE__)) {
-        return;
-    }
-
-    String buffer;
-    serializeJson(root, buffer);
-    publish(configTopic, buffer);
+    publishBinarySensor(root, "dtu_" + serial, serial, name, serial + "/" + state_topic, payload_on, payload_off, "", "");
 }
 
 void MqttHandleHassClass::publishInverterSensor(std::shared_ptr<InverterAbstract> inv, const String& name, const String& state_topic, const String& unit_of_measure, const String& icon, const String& device_class, const String& category)
@@ -401,35 +377,11 @@ void MqttHandleHassClass::publishDtuSensor(const String& name, const String& sta
 
 void MqttHandleHassClass::publishDtuBinarySensor(const String& name, const String& state_topic, const String& payload_on, const String& payload_off, const String& device_class, const String& category)
 {
-    String id = name;
-    id.toLowerCase();
-    id.replace(" ", "_");
+    const String dtuId = getDtuUniqueId();
 
     JsonDocument root;
-
-    root["name"] = name;
-    root["uniq_id"] = getDtuUniqueId() + "_" + id;
-    root["stat_t"] = MqttSettings.getPrefix() + state_topic;
-    root["pl_on"] = payload_on;
-    root["pl_off"] = payload_off;
-
-    if (device_class != "") {
-        root["dev_cla"] = device_class;
-    }
-    if (category != "") {
-        root["ent_cat"] = category;
-    }
-
     createDtuInfo(root);
-
-    if (!Utils::checkJsonAlloc(root, __FUNCTION__, __LINE__)) {
-        return;
-    }
-
-    String buffer;
-    const String configTopic = "binary_sensor/" + getDtuUniqueId() + "/" + id + "/config";
-    serializeJson(root, buffer);
-    publish(configTopic, buffer);
+    publishBinarySensor(root, dtuId, dtuId, name, state_topic, payload_on, payload_off, device_class, category);
 }
 
 void MqttHandleHassClass::createInverterInfo(JsonDocument& root, std::shared_ptr<InverterAbstract> inv)
@@ -492,4 +444,33 @@ void MqttHandleHassClass::publish(const String& subtopic, const String& payload)
     String topic = Configuration.get().Mqtt.Hass.Topic;
     topic += subtopic;
     MqttSettings.publishGeneric(topic, payload, Configuration.get().Mqtt.Hass.Retain);
+}
+
+void MqttHandleHassClass::publishBinarySensor(JsonDocument& doc, const String& root_device, const String& unique_id_prefix, const String& name, const String& state_topic, const String& payload_on, const String& payload_off, const String& device_class, const String& category)
+{
+    String sensor_id = name;
+    sensor_id.toLowerCase();
+    sensor_id.replace(" ", "_");
+
+    doc["name"] = name;
+    doc["uniq_id"] = unique_id_prefix + "_" + sensor_id;
+    doc["stat_t"] = MqttSettings.getPrefix() + state_topic;
+    doc["pl_on"] = payload_on;
+    doc["pl_off"] = payload_off;
+
+    if (device_class != "") {
+        doc["dev_cla"] = device_class;
+    }
+    if (category != "") {
+        doc["ent_cat"] = category;
+    }
+
+    if (!Utils::checkJsonAlloc(doc, __FUNCTION__, __LINE__)) {
+        return;
+    }
+
+    String buffer;
+    const String configTopic = "binary_sensor/" + root_device + "/" + sensor_id + "/config";
+    serializeJson(doc, buffer);
+    publish(configTopic, buffer);
 }
