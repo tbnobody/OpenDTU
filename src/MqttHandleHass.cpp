@@ -7,8 +7,8 @@
 #include "MqttSettings.h"
 #include "NetworkSettings.h"
 #include "Utils.h"
-#include "defaults.h"
 #include "__compiled_constants.h"
+#include "defaults.h"
 
 MqttHandleHassClass MqttHandleHass;
 
