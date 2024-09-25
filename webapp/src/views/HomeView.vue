@@ -293,6 +293,20 @@
                                                     </tr>
                                                 </tbody>
                                             </table>
+                                            <button
+                                                :disabled="!isLogged || performRadioStatsReset"
+                                                type="button"
+                                                class="btn btn-danger"
+                                                @click="onResetRadioStats(inverter.serial)"
+                                            >
+                                                <template v-if="!performRadioStatsReset">
+                                                    {{ $t('home.StatsReset') }}
+                                                </template>
+                                                <template v-else>
+                                                    <span class="spinner-border spinner-border-sm" aria-hidden="true"></span>
+                                                    <span role="status"> {{ $t('home.StatsResetting') }}</span>
+                                                </template>
+                                            </button>
                                         </div>
                                     </div>
                                 </div>
@@ -551,6 +565,7 @@ export default defineComponent({
             alertMessageLimit: '',
             alertTypeLimit: 'info',
             showAlertLimit: false,
+            performRadioStatsReset: false,
 
             powerSettingView: {} as bootstrap.Modal,
             powerSettingSerial: '',
@@ -779,6 +794,14 @@ export default defineComponent({
                 });
 
             this.limitSettingView.show();
+        },
+        onResetRadioStats(serial: string) {
+            this.performRadioStatsReset = true;
+            fetch('/api/inverter/stats_reset?inv=' + serial, { headers: authHeader() })
+                .then((response) => handleResponse(response, this.$emitter, this.$router))
+                .then(() => {
+                    this.performRadioStatsReset = false;
+                });
         },
         onSetLimitSettings(setPersistent: boolean) {
             this.targetLimitList.limit_type = (setPersistent ? 256 : 0) + this.targetLimitType;

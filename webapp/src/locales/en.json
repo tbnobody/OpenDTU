@@ -148,7 +148,9 @@
         "RxFailNothing": "RX Fail: Receive Nothing",
         "RxFailPartial": "RX Fail: Receive Partial",
         "RxFailCorrupt": "RX Fail: Receive Corrupt",
-        "TxReRequest": "TX Re-Request Fragment"
+        "TxReRequest": "TX Re-Request Fragment",
+        "StatsReset": "Reset Statistics",
+        "StatsResetting": "Resetting..."
     },
     "eventlog": {
         "Start": "Start",

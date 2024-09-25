@@ -21,6 +21,7 @@ void WebApiInverterClass::init(AsyncWebServer& server, Scheduler& scheduler)
     server.on("/api/inverter/edit", HTTP_POST, std::bind(&WebApiInverterClass::onInverterEdit, this, _1));
     server.on("/api/inverter/del", HTTP_POST, std::bind(&WebApiInverterClass::onInverterDelete, this, _1));
     server.on("/api/inverter/order", HTTP_POST, std::bind(&WebApiInverterClass::onInverterOrder, this, _1));
+    server.on("/api/inverter/stats_reset", HTTP_GET, std::bind(&WebApiInverterClass::onInverterStatReset, this, _1));
 }
 
 void WebApiInverterClass::onInverterList(AsyncWebServerRequest* request)
@@ -346,6 +347,27 @@ void WebApiInverterClass::onInverterOrder(AsyncWebServerRequest* request)
     }
 
     WebApi.writeConfig(retMsg, WebApiError::InverterOrdered, "Inverter order saved!");
+
+    WebApi.sendJsonResponse(request, response, __FUNCTION__, __LINE__);
+}
+
+void WebApiInverterClass::onInverterStatReset(AsyncWebServerRequest* request)
+{
+    if (!WebApi.checkCredentials(request)) {
+        return;
+    }
+
+    AsyncJsonResponse* response = new AsyncJsonResponse();
+    auto retMsg = response->getRoot();
+    auto serial = WebApi.parseSerialFromRequest(request);
+    auto inv = Hoymiles.getInverterBySerial(serial);
+
+    if (inv != nullptr) {
+        inv->resetRadioStats();
+        retMsg["type"] = "success";
+        retMsg["message"] = "Stats resetted";
+        retMsg["code"] = WebApiError::InverterStatsResetted;
+    }
 
     WebApi.sendJsonResponse(request, response, __FUNCTION__, __LINE__);
 }

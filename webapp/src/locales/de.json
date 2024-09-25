@@ -148,7 +148,9 @@
         "RxFailNothing": "Empfang Fehler: Nichts empfangen",
         "RxFailPartial": "Empfang Fehler: Teilweise empfangen",
         "RxFailCorrupt": "Empfang Fehler: Beschädigt empfangen",
-        "TxReRequest": "Gesendete Fragment Wiederanforderungen"
+        "TxReRequest": "Gesendete Fragment Wiederanforderungen",
+        "StatsReset": "Statistiken zurücksetzen",
+        "StatsResetting": "Zurücksetzen..."
     },
     "eventlog": {
         "Start": "Beginn",
