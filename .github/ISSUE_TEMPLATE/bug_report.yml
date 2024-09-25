@@ -47,7 +47,8 @@ body:
       label: Install Method
       description: How did you install OpenDTU?
       options:
-        - Pre-Compiled binary from GitHub
+        - Pre-Compiled binary from GitHub releases
+        - Pre-Compiles binary from GitHub actions/pull-request
         - Self-Compiled
     validations:
       required: true
@@ -92,5 +93,5 @@ body:
           required: true
         - label: I have updated the title field above with a concise description.
           required: true
-        - label: I have double checked that my inverter does not contain a W in the model name (like HMS-xxxW) as they are not supported
+        - label: I have double checked that my inverter does not contain a W in the model name (like HMS-xxxW) as they are not supported.
           required: true
