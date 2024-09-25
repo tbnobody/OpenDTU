@@ -118,6 +118,7 @@ class PylontechBatteryStats : public BatteryStats {
 
         float _chargeVoltage;
         float _chargeCurrentLimitation;
+        float _dischargeVoltageLimitation;
         uint16_t _stateOfHealth;
         float _temperature;
 
@@ -140,6 +141,8 @@ class PylontechBatteryStats : public BatteryStats {
         bool _chargeEnabled;
         bool _dischargeEnabled;
         bool _chargeImmediately;
+
+        uint8_t _moduleCount;
 };
 
 class SBSBatteryStats : public BatteryStats {
