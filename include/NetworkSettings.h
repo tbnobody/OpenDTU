@@ -1,11 +1,11 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 #pragma once
 
+#include "W5500.h"
 #include <DNSServer.h>
 #include <TaskSchedulerDeclarations.h>
 #include <WiFi.h>
 #include <vector>
-#include "W5500.h"
 
 enum class network_mode {
     WiFi,

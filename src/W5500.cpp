@@ -1,16 +1,20 @@
+// SPDX-License-Identifier: GPL-2.0-or-later
+/*
+ * Copyright (C) 2024 Thomas Basler and others
+ */
+
 #include "W5500.h"
 
 #include <SpiManager.h>
-
 #include <driver/spi_master.h>
 
 // Internal Arduino functions from WiFiGeneric
 void tcpipInit();
-void add_esp_interface_netif(esp_interface_t interface, esp_netif_t *esp_netif);
+void add_esp_interface_netif(esp_interface_t interface, esp_netif_t* esp_netif);
 
-W5500::W5500(int8_t pin_mosi, int8_t pin_miso, int8_t pin_sclk, int8_t pin_cs, int8_t pin_int, int8_t pin_rst) :
-    eth_handle(nullptr),
-    eth_netif(nullptr)
+W5500::W5500(int8_t pin_mosi, int8_t pin_miso, int8_t pin_sclk, int8_t pin_cs, int8_t pin_int, int8_t pin_rst)
+    : eth_handle(nullptr)
+    , eth_netif(nullptr)
 {
     gpio_reset_pin(static_cast<gpio_num_t>(pin_rst));
     gpio_set_level(static_cast<gpio_num_t>(pin_rst), 0);
@@ -26,8 +30,7 @@ W5500::W5500(int8_t pin_mosi, int8_t pin_miso, int8_t pin_sclk, int8_t pin_cs, i
     auto bus_config = std::make_shared<SpiBusConfig>(
         static_cast<gpio_num_t>(pin_mosi),
         static_cast<gpio_num_t>(pin_miso),
-        static_cast<gpio_num_t>(pin_sclk)
-    );
+        static_cast<gpio_num_t>(pin_sclk));
 
     spi_device_interface_config_t device_config {
         .command_bits = 16, // actually address phase
@@ -65,11 +68,11 @@ W5500::W5500(int8_t pin_mosi, int8_t pin_miso, int8_t pin_sclk, int8_t pin_cs, i
 
     eth_mac_config_t mac_config = ETH_MAC_DEFAULT_CONFIG();
     mac_config.rx_task_stack_size = 4096;
-    esp_eth_mac_t *mac = esp_eth_mac_new_w5500(&w5500_config, &mac_config);
+    esp_eth_mac_t* mac = esp_eth_mac_new_w5500(&w5500_config, &mac_config);
 
     eth_phy_config_t phy_config = ETH_PHY_DEFAULT_CONFIG();
     phy_config.reset_gpio_num = -1;
-    esp_eth_phy_t *phy = esp_eth_phy_new_w5500(&phy_config);
+    esp_eth_phy_t* phy = esp_eth_phy_new_w5500(&phy_config);
 
     esp_eth_config_t eth_config = ETH_DEFAULT_CONFIG(mac, phy);
     ESP_ERROR_CHECK(esp_eth_driver_install(&eth_config, &eth_handle));
@@ -90,18 +93,19 @@ W5500::W5500(int8_t pin_mosi, int8_t pin_miso, int8_t pin_sclk, int8_t pin_cs, i
     ESP_ERROR_CHECK(esp_eth_start(eth_handle));
 }
 
-W5500::~W5500() {
+W5500::~W5500()
+{
     // TODO(LennartF22): support cleanup at some point?
 }
 
-String W5500::macAddress() {
+String W5500::macAddress()
+{
     uint8_t mac_addr[6] = {};
     esp_eth_ioctl(eth_handle, ETH_CMD_G_MAC_ADDR, mac_addr);
 
     char mac_addr_str[18];
     snprintf(
         mac_addr_str, sizeof(mac_addr_str), "%02X:%02X:%02X:%02X:%02X:%02X",
-        mac_addr[0], mac_addr[1], mac_addr[2], mac_addr[3], mac_addr[4], mac_addr[5]
-    );
+        mac_addr[0], mac_addr[1], mac_addr[2], mac_addr[3], mac_addr[4], mac_addr[5]);
     return String(mac_addr_str);
 }

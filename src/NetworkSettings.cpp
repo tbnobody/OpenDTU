@@ -7,10 +7,10 @@
 #include "MessageOutput.h"
 #include "PinMapping.h"
 #include "Utils.h"
+#include "__compiled_constants.h"
 #include "defaults.h"
 #include <ESPmDNS.h>
 #include <ETH.h>
-#include "__compiled_constants.h"
 
 NetworkSettingsClass::NetworkSettingsClass()
     : _loopTask(TASK_IMMEDIATE, TASK_FOREVER, std::bind(&NetworkSettingsClass::loop, this))
@@ -404,8 +404,9 @@ String NetworkSettingsClass::macAddress() const
 {
     switch (_networkMode) {
     case network_mode::Ethernet:
-        if (_w5500)
+        if (_w5500) {
             return _w5500->macAddress();
+        }
         return ETH.macAddress();
         break;
     case network_mode::WiFi:
