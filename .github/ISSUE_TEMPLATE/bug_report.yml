@@ -6,7 +6,7 @@ body:
     attributes:
       value: |
         ### ⚠️ Please remember: issues are for *bugs*⚠️
-        That is, something you believe affects every single user of OpenDTU, not just you. If you're not sure, start with one of the other options below.
+        That is, something you believe affects every single user of OpenDTU-OnBattery, not just you. If you're not sure, start with one of the other options below.
   - type: markdown
     attributes:
       value: |
@@ -45,7 +45,7 @@ body:
     id: install_format
     attributes:
       label: Install Method
-      description: How did you install OpenDTU?
+      description: How did you install OpenDTU-OnBattery?
       options:
         - Pre-Compiled binary from GitHub releases
         - Pre-Compiles binary from GitHub actions/pull-request
@@ -55,7 +55,7 @@ body:
   - type: input
     id: version
     attributes:
-      label: What git-hash/version of OpenDTU?
+      label: What git-hash/version of OpenDTU-OnBattery?
       description: You can find this in by going to Info -> System
       placeholder: "e.g. 359d513"
     validations:
