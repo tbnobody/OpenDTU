@@ -60,12 +60,20 @@ body:
       placeholder: "e.g. 359d513"
     validations:
       required: true
-  - type: input
+  - type: dropdown
     id: environment
     attributes:
       label: What firmware variant (PIO Environment)?
       description: You can find this in the Web UI at Info -> System.
-      placeholder: "generic_esp32s3_usb"
+      options:
+          - "generic_esp32s3_usb"
+          - "generic_esp32s3"
+          - "generic_esp32_8mb"
+          - "generic_esp32_4mb_no_ota"
+          - "generic_esp32"
+          - "generic"
+          - "opendtufusionv2"
+          - "other (tell us in 'Anything else?')"
     validations:
       required: true
   - type: textarea
