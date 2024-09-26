@@ -3,6 +3,7 @@
  * Copyright (C) 2022-2024 Thomas Basler and others
  */
 #include "MessageOutput.h"
+#include "SyslogLogger.h"
 #include <HardwareSerial.h>
 
 MessageOutputClass MessageOutput;
@@ -160,6 +161,7 @@ void MessageOutputClass::loop()
     }
 
     while (!_lines.empty()) {
+        Syslog.write(_lines.front().data(), _lines.front().size());
         send_ws_chunk(std::move(_lines.front()));
         _lines.pop();
     }

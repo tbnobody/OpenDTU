@@ -4,6 +4,7 @@
  */
 #include "NetworkSettings.h"
 #include "Configuration.h"
+#include "SyslogLogger.h"
 #include "PinMapping.h"
 #include "Utils.h"
 #include "__compiled_constants.h"
@@ -57,6 +58,8 @@ void NetworkSettingsClass::init(Scheduler& scheduler)
 
     scheduler.addTask(_loopTask);
     _loopTask.enable();
+
+    Syslog.init(scheduler);
 }
 
 void NetworkSettingsClass::NetworkEvent(const WiFiEvent_t event, WiFiEventInfo_t info)
@@ -335,6 +338,8 @@ void NetworkSettingsClass::applyConfig()
     ESP_LOG_LEVEL_LOCAL((success ? ESP_LOG_INFO : ESP_LOG_ERROR), TAG, "Configuring WiFi %s", success ? "done" : "failed");
 
     setStaticIp();
+
+    Syslog.updateSettings(getHostname());
 }
 
 void NetworkSettingsClass::setHostname()
