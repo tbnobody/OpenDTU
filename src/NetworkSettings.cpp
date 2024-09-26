@@ -111,8 +111,7 @@ bool NetworkSettingsClass::onEvent(NetworkEventCb cbEvent, const network_event e
 
 void NetworkSettingsClass::raiseEvent(const network_event event)
 {
-    for (uint32_t i = 0; i < _cbEventList.size(); i++) {
-        const NetworkEventCbList_t entry = _cbEventList[i];
+    for (auto& entry : _cbEventList) {
         if (entry.cb) {
             if (entry.event == event || entry.event == network_event::NETWORK_EVENT_MAX) {
                 entry.cb(event);
