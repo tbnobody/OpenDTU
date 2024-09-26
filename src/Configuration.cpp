@@ -123,6 +123,11 @@ bool ConfigurationClass::write()
     JsonObject mdns = doc["mdns"].to<JsonObject>();
     mdns["enabled"] = config.Mdns.Enabled;
 
+    JsonObject syslog = doc["syslog"].to<JsonObject>();
+    syslog["enabled"] = config.Syslog.Enabled;
+    syslog["hostname"] = config.Syslog.Hostname;
+    syslog["port"] = config.Syslog.Port;
+
     JsonObject ntp = doc["ntp"].to<JsonObject>();
     ntp["server"] = config.Ntp.Server;
     ntp["timezone"] = config.Ntp.Timezone;
@@ -449,6 +454,11 @@ bool ConfigurationClass::read()
 
     JsonObject mdns = doc["mdns"];
     config.Mdns.Enabled = mdns["enabled"] | MDNS_ENABLED;
+
+    JsonObject syslog = doc["syslog"];
+    config.Syslog.Enabled = syslog["enabled"] | SYSLOG_ENABLED;
+    strlcpy(config.Syslog.Hostname, syslog["hostname"] | "", sizeof(config.Syslog.Hostname));
+    config.Syslog.Port = syslog["port"] | SYSLOG_PORT;
 
     JsonObject ntp = doc["ntp"];
     strlcpy(config.Ntp.Server, ntp["server"] | NTP_SERVER, sizeof(config.Ntp.Server));
