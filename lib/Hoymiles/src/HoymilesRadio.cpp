@@ -67,7 +67,9 @@ void HoymilesRadio::handleReceivedPackage()
             } else if (verifyResult == FRAGMENT_ALL_MISSING_TIMEOUT) {
                 Hoymiles.getMessageOutput()->println("Nothing received, resend count exeeded");
                 // Statistics: Count RX Fail No Answer
-                inv->RadioStats.RxFailNoAnswer++;
+                if (inv->RadioStats.TxRequestData > 0) {
+                    inv->RadioStats.RxFailNoAnswer++;
+                }
 
                 _commandQueue.pop();
                 _busyFlag = false;
@@ -75,7 +77,9 @@ void HoymilesRadio::handleReceivedPackage()
             } else if (verifyResult == FRAGMENT_RETRANSMIT_TIMEOUT) {
                 Hoymiles.getMessageOutput()->println("Retransmit timeout");
                 // Statistics: Count RX Fail Partial Answer
-                inv->RadioStats.RxFailPartialAnswer++;
+                if (inv->RadioStats.TxRequestData > 0) {
+                    inv->RadioStats.RxFailPartialAnswer++;
+                }
 
                 _commandQueue.pop();
                 _busyFlag = false;
@@ -83,7 +87,9 @@ void HoymilesRadio::handleReceivedPackage()
             } else if (verifyResult == FRAGMENT_HANDLE_ERROR) {
                 Hoymiles.getMessageOutput()->println("Packet handling error");
                 // Statistics: Count RX Fail Corrupt Data
-                inv->RadioStats.RxFailCorruptData++;
+                if (inv->RadioStats.TxRequestData > 0) {
+                    inv->RadioStats.RxFailCorruptData++;
+                }
 
                 _commandQueue.pop();
                 _busyFlag = false;
@@ -101,7 +107,9 @@ void HoymilesRadio::handleReceivedPackage()
                 // Successful received all packages
                 Hoymiles.getMessageOutput()->println("Success");
                 // Statistics: Count RX Success
-                inv->RadioStats.RxSuccess++;
+                if (inv->RadioStats.TxRequestData > 0) {
+                    inv->RadioStats.RxSuccess++;
+                }
 
                 _commandQueue.pop();
                 _busyFlag = false;
