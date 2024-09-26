@@ -12,52 +12,10 @@
 void tcpipInit();
 void add_esp_interface_netif(esp_interface_t interface, esp_netif_t* esp_netif);
 
-W5500::W5500(int8_t pin_mosi, int8_t pin_miso, int8_t pin_sclk, int8_t pin_cs, int8_t pin_int, int8_t pin_rst)
+W5500::W5500(spi_device_handle_t spi, gpio_num_t pin_int)
     : eth_handle(nullptr)
     , eth_netif(nullptr)
 {
-    gpio_reset_pin(static_cast<gpio_num_t>(pin_rst));
-    gpio_set_level(static_cast<gpio_num_t>(pin_rst), 0);
-    gpio_set_direction(static_cast<gpio_num_t>(pin_rst), GPIO_MODE_OUTPUT);
-
-    gpio_reset_pin(static_cast<gpio_num_t>(pin_cs));
-    gpio_reset_pin(static_cast<gpio_num_t>(pin_int));
-
-    esp_err_t err = gpio_install_isr_service(ARDUINO_ISR_FLAG);
-    if (err != ESP_ERR_INVALID_STATE) // don't raise an error when ISR service is already installed
-        ESP_ERROR_CHECK(err);
-
-    auto bus_config = std::make_shared<SpiBusConfig>(
-        static_cast<gpio_num_t>(pin_mosi),
-        static_cast<gpio_num_t>(pin_miso),
-        static_cast<gpio_num_t>(pin_sclk));
-
-    spi_device_interface_config_t device_config {
-        .command_bits = 16, // actually address phase
-        .address_bits = 8, // actually command phase
-        .dummy_bits = 0,
-        .mode = 0,
-        .duty_cycle_pos = 0,
-        .cs_ena_pretrans = 0, // only 0 supported
-        .cs_ena_posttrans = 0, // only 0 supported
-        .clock_speed_hz = 20000000, // stable with OpenDTU Fusion shield
-        .input_delay_ns = 0,
-        .spics_io_num = pin_cs,
-        .flags = 0,
-        .queue_size = 20,
-        .pre_cb = nullptr,
-        .post_cb = nullptr,
-    };
-
-    spi_device_handle_t spi = SpiManagerInst.alloc_device("", bus_config, device_config);
-    if (!spi)
-        ESP_ERROR_CHECK(ESP_FAIL);
-
-    // Reset sequence
-    delayMicroseconds(500);
-    gpio_set_level(static_cast<gpio_num_t>(pin_rst), 1);
-    delayMicroseconds(1000);
-
     // Arduino function to start networking stack if not already started
     tcpipInit();
 
@@ -98,6 +56,61 @@ W5500::~W5500()
     // TODO(LennartF22): support cleanup at some point?
 }
 
+std::unique_ptr<W5500> W5500::setup(int8_t pin_mosi, int8_t pin_miso, int8_t pin_sclk, int8_t pin_cs, int8_t pin_int, int8_t pin_rst)
+{
+    gpio_reset_pin(static_cast<gpio_num_t>(pin_rst));
+    gpio_set_level(static_cast<gpio_num_t>(pin_rst), 0);
+    gpio_set_direction(static_cast<gpio_num_t>(pin_rst), GPIO_MODE_OUTPUT);
+
+    gpio_reset_pin(static_cast<gpio_num_t>(pin_cs));
+    gpio_reset_pin(static_cast<gpio_num_t>(pin_int));
+
+    esp_err_t err = gpio_install_isr_service(ARDUINO_ISR_FLAG);
+    if (err != ESP_ERR_INVALID_STATE) // don't raise an error when ISR service is already installed
+        ESP_ERROR_CHECK(err);
+
+    auto bus_config = std::make_shared<SpiBusConfig>(
+        static_cast<gpio_num_t>(pin_mosi),
+        static_cast<gpio_num_t>(pin_miso),
+        static_cast<gpio_num_t>(pin_sclk));
+
+    spi_device_interface_config_t device_config {
+        .command_bits = 16, // actually address phase
+        .address_bits = 8, // actually command phase
+        .dummy_bits = 0,
+        .mode = 0,
+        .duty_cycle_pos = 0,
+        .cs_ena_pretrans = 0, // only 0 supported
+        .cs_ena_posttrans = 0, // only 0 supported
+        .clock_speed_hz = 20000000, // stable with OpenDTU Fusion shield
+        .input_delay_ns = 0,
+        .spics_io_num = pin_cs,
+        .flags = 0,
+        .queue_size = 20,
+        .pre_cb = nullptr,
+        .post_cb = nullptr,
+    };
+
+    spi_device_handle_t spi = SpiManagerInst.alloc_device("", bus_config, device_config);
+    if (!spi)
+        return nullptr;
+
+    // Reset sequence
+    delayMicroseconds(500);
+    gpio_set_level(static_cast<gpio_num_t>(pin_rst), 1);
+    delayMicroseconds(1000);
+
+    if (!connection_check_spi(spi))
+        return nullptr;
+    if (!connection_check_interrupt(static_cast<gpio_num_t>(pin_int)))
+        return nullptr;
+
+    // Return to default state once again after connection check
+    gpio_reset_pin(static_cast<gpio_num_t>(pin_int));
+
+    return std::unique_ptr<W5500>(new W5500(spi, static_cast<gpio_num_t>(pin_int)));
+}
+
 String W5500::macAddress()
 {
     uint8_t mac_addr[6] = {};
@@ -108,4 +121,32 @@ String W5500::macAddress()
         mac_addr_str, sizeof(mac_addr_str), "%02X:%02X:%02X:%02X:%02X:%02X",
         mac_addr[0], mac_addr[1], mac_addr[2], mac_addr[3], mac_addr[4], mac_addr[5]);
     return String(mac_addr_str);
+}
+
+bool W5500::connection_check_spi(spi_device_handle_t spi)
+{
+    spi_transaction_t trans = {
+        .flags = SPI_TRANS_USE_RXDATA,
+        .cmd = 0x0039, // actually address (VERSIONR)
+        .addr = (0b00000 << 3) | (0 << 2) | (0b00 < 0), // actually command (common register, read, VDM)
+        .length = 8,
+        .rxlength = 8,
+        .user = nullptr,
+        .tx_buffer = nullptr,
+        .rx_data = {},
+    };
+    ESP_ERROR_CHECK(spi_device_polling_transmit(spi, &trans));
+
+    // Version number (VERSIONR) is always 0x04
+    return *reinterpret_cast<uint8_t*>(&trans.rx_data) == 0x04;
+}
+
+bool W5500::connection_check_interrupt(gpio_num_t pin_int)
+{
+    gpio_set_direction(pin_int, GPIO_MODE_INPUT);
+    gpio_set_pull_mode(pin_int, GPIO_PULLDOWN_ONLY);
+    int level = gpio_get_level(pin_int);
+
+    // Interrupt line must be high
+    return level == 1;
 }

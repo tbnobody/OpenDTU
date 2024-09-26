@@ -34,7 +34,11 @@ void NetworkSettingsClass::init(Scheduler& scheduler)
 
     if (PinMapping.isValidW5500Config()) {
         PinMapping_t& pin = PinMapping.get();
-        _w5500 = std::make_unique<W5500>(pin.w5500_mosi, pin.w5500_miso, pin.w5500_sclk, pin.w5500_cs, pin.w5500_int, pin.w5500_rst);
+        _w5500 = W5500::setup(pin.w5500_mosi, pin.w5500_miso, pin.w5500_sclk, pin.w5500_cs, pin.w5500_int, pin.w5500_rst);
+        if (_w5500)
+            MessageOutput.println("W5500: Connection successful");
+        else
+            MessageOutput.println("W5500: Connection error!!");
     } else if (PinMapping.isValidEthConfig()) {
         PinMapping_t& pin = PinMapping.get();
 #if ESP_ARDUINO_VERSION_MAJOR < 3
