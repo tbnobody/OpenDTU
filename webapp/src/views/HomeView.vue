@@ -303,7 +303,10 @@
                                                     {{ $t('home.StatsReset') }}
                                                 </template>
                                                 <template v-else>
-                                                    <span class="spinner-border spinner-border-sm" aria-hidden="true"></span>
+                                                    <span
+                                                        class="spinner-border spinner-border-sm"
+                                                        aria-hidden="true"
+                                                    ></span>
                                                     <span role="status"> {{ $t('home.StatsResetting') }}</span>
                                                 </template>
                                             </button>
