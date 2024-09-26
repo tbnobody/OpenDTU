@@ -1,12 +1,12 @@
+// SPDX-License-Identifier: GPL-2.0-or-later
 #include "SpiBus.h"
-
 #include "SpiBusConfig.h"
 #include "SpiCallback.h"
 
-SpiBus::SpiBus(const std::string &_id, spi_host_device_t _host_device) :
-    id(_id),
-    host_device(_host_device),
-    cur_config(nullptr)
+SpiBus::SpiBus(const std::string& _id, spi_host_device_t _host_device)
+    : id(_id)
+    , host_device(_host_device)
+    , cur_config(nullptr)
 {
     spi_bus_config_t bus_config {
         .mosi_io_num = -1,
@@ -25,11 +25,13 @@ SpiBus::SpiBus(const std::string &_id, spi_host_device_t _host_device) :
     ESP_ERROR_CHECK(spi_bus_initialize(host_device, &bus_config, SPI_DMA_CH_AUTO));
 }
 
-SpiBus::~SpiBus() {
+SpiBus::~SpiBus()
+{
     ESP_ERROR_CHECK(spi_bus_free(host_device));
 }
 
-spi_device_handle_t SpiBus::add_device(const std::shared_ptr<SpiBusConfig> &bus_config, spi_device_interface_config_t &device_config) {
+spi_device_handle_t SpiBus::add_device(const std::shared_ptr<SpiBusConfig>& bus_config, spi_device_interface_config_t& device_config)
+{
     if (!SpiCallback::patch(shared_from_this(), bus_config, device_config))
         return nullptr;
 
@@ -40,7 +42,8 @@ spi_device_handle_t SpiBus::add_device(const std::shared_ptr<SpiBusConfig> &bus_
 
 // TODO: add remove_device (with spi_device_acquire_bus)
 
-void SpiBus::apply_config(SpiBusConfig *config) {
+void SpiBus::apply_config(SpiBusConfig* config)
+{
     if (cur_config)
         cur_config->unpatch(host_device);
     cur_config = config;

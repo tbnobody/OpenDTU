@@ -1,13 +1,14 @@
+// SPDX-License-Identifier: GPL-2.0-or-later
 #include "SpiBusConfig.h"
 
 #include <driver/gpio.h>
 #include <esp_rom_gpio.h>
 #include <soc/spi_periph.h>
 
-SpiBusConfig::SpiBusConfig(gpio_num_t _pin_mosi, gpio_num_t _pin_miso, gpio_num_t _pin_sclk) :
-    pin_mosi(_pin_mosi),
-    pin_miso(_pin_miso),
-    pin_sclk(_pin_sclk)
+SpiBusConfig::SpiBusConfig(gpio_num_t _pin_mosi, gpio_num_t _pin_miso, gpio_num_t _pin_sclk)
+    : pin_mosi(_pin_mosi)
+    , pin_miso(_pin_miso)
+    , pin_sclk(_pin_sclk)
 {
     if (pin_mosi != GPIO_NUM_NC) {
         ESP_ERROR_CHECK(gpio_reset_pin(pin_mosi));
@@ -25,7 +26,8 @@ SpiBusConfig::SpiBusConfig(gpio_num_t _pin_mosi, gpio_num_t _pin_miso, gpio_num_
     }
 }
 
-SpiBusConfig::~SpiBusConfig() {
+SpiBusConfig::~SpiBusConfig()
+{
     if (pin_mosi != GPIO_NUM_NC)
         ESP_ERROR_CHECK(gpio_reset_pin(pin_mosi));
 
@@ -36,7 +38,8 @@ SpiBusConfig::~SpiBusConfig() {
         ESP_ERROR_CHECK(gpio_reset_pin(pin_sclk));
 }
 
-void SpiBusConfig::patch(spi_host_device_t host_device) {
+void SpiBusConfig::patch(spi_host_device_t host_device)
+{
     if (pin_mosi != GPIO_NUM_NC) {
         esp_rom_gpio_connect_out_signal(pin_mosi, spi_periph_signal[host_device].spid_out, false, false);
         esp_rom_gpio_connect_in_signal(pin_mosi, spi_periph_signal[host_device].spid_in, false);
@@ -51,7 +54,8 @@ void SpiBusConfig::patch(spi_host_device_t host_device) {
     }
 }
 
-void SpiBusConfig::unpatch(spi_host_device_t host_device) {
+void SpiBusConfig::unpatch(spi_host_device_t host_device)
+{
     if (pin_mosi != GPIO_NUM_NC) {
         esp_rom_gpio_connect_out_signal(pin_mosi, SIG_GPIO_OUT_IDX, false, false);
         esp_rom_gpio_connect_in_signal(GPIO_MATRIX_CONST_ONE_INPUT, spi_periph_signal[host_device].spid_in, false);
