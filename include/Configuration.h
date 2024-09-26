@@ -81,7 +81,7 @@ struct CONFIG_T {
     struct {
         bool Enabled;
         char Hostname[SYSLOG_MAX_HOSTNAME_STRLEN + 1];
-        uint32_t Port;
+        uint16_t Port;
     } Syslog;
 
     struct {

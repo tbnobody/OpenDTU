@@ -5,6 +5,7 @@
 #include "NetworkSettings.h"
 #include "Configuration.h"
 #include "MessageOutput.h"
+#include "SyslogLogger.h"
 #include "PinMapping.h"
 #include "Utils.h"
 #include "__compiled_constants.h"
@@ -52,6 +53,8 @@ void NetworkSettingsClass::init(Scheduler& scheduler)
 
     scheduler.addTask(_loopTask);
     _loopTask.enable();
+
+    Syslog.init(scheduler);
 }
 
 void NetworkSettingsClass::NetworkEvent(const WiFiEvent_t event, WiFiEventInfo_t info)
@@ -292,6 +295,8 @@ void NetworkSettingsClass::applyConfig()
     }
     MessageOutput.println("done");
     setStaticIp();
+
+    Syslog.updateSettings(getHostname());
 }
 
 void NetworkSettingsClass::setHostname()
