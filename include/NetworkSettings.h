@@ -5,6 +5,7 @@
 #include <TaskSchedulerDeclarations.h>
 #include <WiFi.h>
 #include <vector>
+#include "W5500.h"
 
 enum class network_mode {
     WiFi,
@@ -83,6 +84,7 @@ private:
     bool _ethConnected = false;
     std::vector<NetworkEventCbList_t> _cbEventList;
     bool _lastMdnsEnabled = false;
+    std::unique_ptr<W5500> _w5500;
 };
 
 extern NetworkSettingsClass NetworkSettings;
