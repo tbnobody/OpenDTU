@@ -65,10 +65,6 @@ std::unique_ptr<W5500> W5500::setup(int8_t pin_mosi, int8_t pin_miso, int8_t pin
     gpio_reset_pin(static_cast<gpio_num_t>(pin_cs));
     gpio_reset_pin(static_cast<gpio_num_t>(pin_int));
 
-    esp_err_t err = gpio_install_isr_service(ARDUINO_ISR_FLAG);
-    if (err != ESP_ERR_INVALID_STATE) // don't raise an error when ISR service is already installed
-        ESP_ERROR_CHECK(err);
-
     auto bus_config = std::make_shared<SpiBusConfig>(
         static_cast<gpio_num_t>(pin_mosi),
         static_cast<gpio_num_t>(pin_miso),
@@ -105,7 +101,12 @@ std::unique_ptr<W5500> W5500::setup(int8_t pin_mosi, int8_t pin_miso, int8_t pin
     if (!connection_check_interrupt(static_cast<gpio_num_t>(pin_int)))
         return nullptr;
 
-    // Return to default state once again after connection check
+    // Use Arduino functions to temporarily attach interrupt to enable the GPIO ISR service
+    // (if we used ESP-IDF functions, a warning would be printed the first time anyone uses attachInterrupt)
+    attachInterrupt(pin_int, nullptr, FALLING);
+    detachInterrupt(pin_int);
+
+    // Return to default state once again after connection check and temporary interrupt registration
     gpio_reset_pin(static_cast<gpio_num_t>(pin_int));
 
     return std::unique_ptr<W5500>(new W5500(spi, static_cast<gpio_num_t>(pin_int)));
