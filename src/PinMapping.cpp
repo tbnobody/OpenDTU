@@ -108,6 +108,30 @@
 #define W5500_RST -1
 #endif
 
+#ifndef ETH_PHY_ADDR
+#define ETH_PHY_ADDR -1
+#endif
+
+#ifndef ETH_PHY_POWER
+#define ETH_PHY_POWER -1
+#endif
+
+#ifndef ETH_PHY_MDC
+#define ETH_PHY_MDC -1
+#endif
+
+#ifndef ETH_PHY_MDIO
+#define ETH_PHY_MDIO -1
+#endif
+
+#ifndef ETH_PHY_TYPE
+#define ETH_PHY_TYPE ETH_PHY_LAN8720
+#endif
+
+#ifndef ETH_CLK_MODE
+#define ETH_CLK_MODE ETH_CLOCK_GPIO0_IN
+#endif
+
 PinMappingClass PinMapping;
 
 PinMappingClass::PinMappingClass()
@@ -261,5 +285,7 @@ bool PinMappingClass::isValidW5500Config() const
 
 bool PinMappingClass::isValidEthConfig() const
 {
-    return _pinMapping.eth_enabled;
+    return _pinMapping.eth_enabled
+        && _pinMapping.eth_mdc >= 0
+        && _pinMapping.eth_mdio >= 0;
 }
