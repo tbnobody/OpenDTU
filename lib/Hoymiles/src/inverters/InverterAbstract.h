@@ -65,6 +65,8 @@ public:
     void addRxFragment(const uint8_t fragment[], const uint8_t len);
     uint8_t verifyAllFragments(CommandAbstract& cmd);
 
+    void performDailyTask();
+
     void resetRadioStats();
 
     struct {

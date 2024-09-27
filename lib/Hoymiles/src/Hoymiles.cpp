@@ -136,16 +136,7 @@ void HoymilesClass::loop()
             if (currentWeekDay != lastWeekDay) {
 
                 for (auto& inv : _inverters) {
-                    // Have to reset the offets first, otherwise it will
-                    // Substract the offset from zero which leads to a high value
-                    inv->Statistics()->resetYieldDayCorrection();
-                    if (inv->getZeroYieldDayOnMidnight()) {
-                        inv->Statistics()->zeroDailyData();
-                    }
-                    if (inv->getClearEventlogOnMidnight()) {
-                        inv->EventLog()->clearBuffer();
-                    }
-                    inv->resetRadioStats();
+                    inv->performDailyTask();
                 }
 
                 lastWeekDay = currentWeekDay;
@@ -204,9 +195,9 @@ std::shared_ptr<InverterAbstract> HoymilesClass::getInverterByPos(const uint8_t 
 
 std::shared_ptr<InverterAbstract> HoymilesClass::getInverterBySerial(const uint64_t serial)
 {
-    for (uint8_t i = 0; i < _inverters.size(); i++) {
-        if (_inverters[i]->serial() == serial) {
-            return _inverters[i];
+    for (auto& inv : _inverters) {
+        if (inv->serial() == serial) {
+            return inv;
         }
     }
     return nullptr;
@@ -218,9 +209,7 @@ std::shared_ptr<InverterAbstract> HoymilesClass::getInverterByFragment(const fra
         return nullptr;
     }
 
-    std::shared_ptr<InverterAbstract> inv;
-    for (uint8_t i = 0; i < _inverters.size(); i++) {
-        inv = _inverters[i];
+    for (auto& inv : _inverters) {
         serial_u p;
         p.u64 = inv->serial();
 
