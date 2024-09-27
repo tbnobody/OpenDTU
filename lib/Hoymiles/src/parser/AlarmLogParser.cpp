@@ -60,7 +60,7 @@ const std::array<const AlarmMessage_t, ALARM_MSG_COUNT> AlarmLogParser::_alarmMe
 
     { AlarmMessageType_t::ALL, 121, "Over temperature protection", "Übertemperaturschutz", "Protection antisurchauffe" },
     { AlarmMessageType_t::ALL, 122, "Microinverter is suspected of being stolen", "Verdacht auf Diebstahl des Mikrowechselrichters", "" },
-    { AlarmMessageType_t::ALL, 123, "Locked by remote control", "Per Fernbedienung sperrbar", "" },
+    { AlarmMessageType_t::ALL, 123, "Locked by remote control", "Durch Fernbedienung gesperrt", "" },
     { AlarmMessageType_t::ALL, 124, "Shut down by remote control", "Durch Fernsteuerung abgeschaltet", "Arrêt par télécommande" },
     { AlarmMessageType_t::ALL, 125, "Grid configuration parameter error", "Parameterfehler bei der Konfiguration des Elektrizitätsnetzes", "Erreur de paramètre de configuration du réseau" },
     { AlarmMessageType_t::ALL, 126, "Software error code 126", "Softwarefehlercode 126", "" },
@@ -186,7 +186,7 @@ const std::array<const AlarmMessage_t, ALARM_MSG_COUNT> AlarmLogParser::_alarmMe
     { AlarmMessageType_t::ALL, 5520, "H-bridge MOSFET overcurrent or H-bridge overvoltage", "H-Brücken-MOSFET-Überstrom oder H-Brücken-Überspannung", "" },
 
     { AlarmMessageType_t::ALL, 8310, "Shut down by remote control", "Durch Fernsteuerung abgeschaltet", "Arrêt par télécommande" },
-    { AlarmMessageType_t::ALL, 8320, "Locked by remote control", "Per Fernbedienung sperrbar", "" },
+    { AlarmMessageType_t::ALL, 8320, "Locked by remote control", "Durch Fernbedienung gesperrt", "" },
     { AlarmMessageType_t::ALL, 9000, "Microinverter is suspected of being stolen", "Verdacht auf Diebstahl des Mikrowechselrichters", "" },
 } };
 
