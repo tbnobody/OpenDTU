@@ -106,7 +106,7 @@ void NetworkSettingsClass::NetworkEvent(const WiFiEvent_t event, WiFiEventInfo_t
     }
 }
 
-bool NetworkSettingsClass::onEvent(NetworkEventCb cbEvent, const network_event event)
+bool NetworkSettingsClass::onEvent(DtuNetworkEventCb cbEvent, const network_event event)
 {
     if (!cbEvent) {
         return pdFALSE;

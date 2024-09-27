@@ -24,10 +24,10 @@ enum class network_event {
     NETWORK_EVENT_MAX
 };
 
-typedef std::function<void(network_event event)> NetworkEventCb;
+typedef std::function<void(network_event event)> DtuNetworkEventCb;
 
 typedef struct NetworkEventCbList {
-    NetworkEventCb cb;
+    DtuNetworkEventCb cb;
     network_event event;
 
     NetworkEventCbList()
@@ -54,7 +54,7 @@ public:
     bool isConnected() const;
     network_mode NetworkMode() const;
 
-    bool onEvent(NetworkEventCb cbEvent, const network_event event = network_event::NETWORK_EVENT_MAX);
+    bool onEvent(DtuNetworkEventCb cbEvent, const network_event event = network_event::NETWORK_EVENT_MAX);
     void raiseEvent(const network_event event);
 
 private:
