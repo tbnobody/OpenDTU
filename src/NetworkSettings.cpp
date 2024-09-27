@@ -37,7 +37,11 @@ void NetworkSettingsClass::init(Scheduler& scheduler)
         _w5500 = std::make_unique<W5500>(pin.w5500_mosi, pin.w5500_miso, pin.w5500_sclk, pin.w5500_cs, pin.w5500_int, pin.w5500_rst);
     } else if (PinMapping.isValidEthConfig()) {
         PinMapping_t& pin = PinMapping.get();
+#if ESP_ARDUINO_VERSION_MAJOR < 3
         ETH.begin(pin.eth_phy_addr, pin.eth_power, pin.eth_mdc, pin.eth_mdio, pin.eth_type, pin.eth_clk_mode);
+#else
+        ETH.begin(pin.eth_type, pin.eth_phy_addr, pin.eth_mdc, pin.eth_mdio, pin.eth_power, pin.eth_clk_mode);
+#endif
     }
 
     setupMode();
