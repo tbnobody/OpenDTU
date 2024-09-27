@@ -2,6 +2,7 @@
 #pragma once
 
 #include <Arduino.h>
+#include <esp_eth.h> // required for esp_eth_handle_t
 #include <esp_netif.h>
 
 class W5500 {
