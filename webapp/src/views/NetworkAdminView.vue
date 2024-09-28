@@ -93,20 +93,22 @@
                     type="checkbox"
                 />
 
-                <InputElement
-                    :label="$t('networkadmin.Hostname', { num: 1 })"
-                    v-model="networkConfigList.sysloghostname"
-                    type="text"
-                    maxlength="128"
-                />
+                <div v-if="networkConfigList.syslogenabled">
+                    <InputElement
+                        :label="$t('networkadmin.SyslogHostname')"
+                        v-model="networkConfigList.sysloghostname"
+                        type="text"
+                        maxlength="128"
+                    />
 
-                <InputElement
-                    :label="$t('networkadmin.Port')"
-                    v-model="networkConfigList.syslogport"
-                    type="number"
-                    min="1"
-                    max="65535"
-                />
+                    <InputElement
+                        :label="$t('networkadmin.SyslogPort')"
+                        v-model="networkConfigList.syslogport"
+                        type="number"
+                        min="1"
+                        max="65535"
+                    />
+                </div>
             </CardElement>
 
             <CardElement :text="$t('networkadmin.AdminAp')" textVariant="text-bg-primary" add-space>
