@@ -108,7 +108,7 @@ float BatteryClass::getDischargeCurrentLimit()
     }
 
     if (dischargeCurrentValid) {
-        return dischargeCurrentValid;
+        return dischargeCurrentLimit;
     }
 
     return FLT_MAX;
