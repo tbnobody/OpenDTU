@@ -8,6 +8,8 @@
         <div class="mt-5"></div>
         <HeapDetails :systemStatus="systemDataList" />
         <div class="mt-5"></div>
+        <TaskDetails :taskDetails="systemDataList.task_details" />
+        <div class="mt-5"></div>
         <RadioInfo :systemStatus="systemDataList" />
         <div class="mt-5"></div>
     </BasePage>
@@ -19,6 +21,7 @@ import FirmwareInfo from '@/components/FirmwareInfo.vue';
 import HardwareInfo from '@/components/HardwareInfo.vue';
 import MemoryInfo from '@/components/MemoryInfo.vue';
 import HeapDetails from '@/components/HeapDetails.vue';
+import TaskDetails from '@/components/TaskDetails.vue';
 import RadioInfo from '@/components/RadioInfo.vue';
 import type { SystemStatus } from '@/types/SystemStatus';
 import { authHeader, handleResponse } from '@/utils/authentication';
@@ -31,6 +34,7 @@ export default defineComponent({
         HardwareInfo,
         MemoryInfo,
         HeapDetails,
+        TaskDetails,
         RadioInfo,
     },
     data() {
