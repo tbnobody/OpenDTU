@@ -145,6 +145,8 @@ struct BATTERY_CONFIG_T {
     BatteryVoltageUnit MqttVoltageUnit;
     bool EnableDischargeCurrentLimit;
     float DischargeCurrentLimit;
+    float DischargeCurrentLimitBelowSoc;
+    float DischargeCurrentLimitBelowVoltage;
     bool UseBatteryReportedDischargeCurrentLimit;
     char MqttDischargeCurrentTopic[MQTT_MAX_TOPIC_STRLEN + 1];
     char MqttDischargeCurrentJsonPath[BATTERY_JSON_MAX_PATH_STRLEN + 1];
