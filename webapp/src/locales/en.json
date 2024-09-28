@@ -238,6 +238,24 @@
         "MaxUsage": "Maximum usage since start",
         "Fragmentation": "Level of fragmentation"
     },
+    "taskdetails": {
+        "TaskDetails": "Task Details",
+        "Name": "Name",
+        "StackFree": "Stack Free",
+        "Priority": "Priority",
+        "Task_idle0": "Idle (CPU Core 0)",
+        "Task_idle1": "Idle (CPU Core 1)",
+        "Task_wifi": "Wi-Fi",
+        "Task_tit": "TCP/IP",
+        "Task_looptask": "Arduino Main Loop",
+        "Task_asynctcp": "Async TCP",
+        "Task_mqttclient": "MQTT Client",
+        "Task_huaweican0": "AC Charger CAN",
+        "Task_pmsdm": "PowerMeter (SDM)",
+        "Task_pmhttpjson": "PowerMeter (HTTP+JSON)",
+        "Task_pmsml": "PowerMeter (Serial SML)",
+        "Task_pmhttpsml": "PowerMeter (HTTP+SML)"
+    },
     "radioinfo": {
         "RadioInformation": "Radio Information",
         "Status": "{module} Status",

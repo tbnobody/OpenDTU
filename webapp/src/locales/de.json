@@ -238,6 +238,24 @@
         "MaxUsage": "Maximale Speichernutzung seit Start",
         "Fragmentation": "Grad der Fragmentierung"
     },
+    "taskdetails": {
+        "TaskDetails": "Detailinformationen zu Tasks",
+        "Name": "Name",
+        "StackFree": "Stack Frei",
+        "Priority": "Priorität",
+        "Task_idle0": "Leerlauf (CPU-Kern 0)",
+        "Task_idle1": "Leerlauf (CPU-Kern 1)",
+        "Task_wifi": "Wi-Fi",
+        "Task_tit": "TCP/IP",
+        "Task_looptask": "Arduino Hauptschleife (loop)",
+        "Task_asynctcp": "Async TCP",
+        "Task_mqttclient": "MQTT Client",
+        "Task_huaweican0": "AC Ladegerät CAN",
+        "Task_pmsdm": "Stromzähler (SDM)",
+        "Task_pmhttpjson": "Stromzähler (HTTP+JSON)",
+        "Task_pmsml": "Stromzähler (Serial SML)",
+        "Task_pmhttpsml": "Stromzähler (HTTP+SML)"
+    },
     "radioinfo": {
         "RadioInformation": "Funkmodulinformationen",
         "Status": "{module} Status",
