@@ -513,7 +513,8 @@
         "MdnsSettings": "mDNS Settings",
         "EnableSyslog": "Enable Syslog",
         "SyslogSettings": "Syslog Settings",
-        "Port": "Port:"
+        "SyslogHostname": "Syslog Server",
+        "SyslogPort": "Port"
     },
     "mqttadmin": {
         "MqttSettings": "MQTT Settings",

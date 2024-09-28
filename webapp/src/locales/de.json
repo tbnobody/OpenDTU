@@ -511,7 +511,8 @@
         "MdnsSettings": "mDNS-Einstellungen",
         "EnableSyslog": "Syslog aktivieren",
         "SyslogSettings": "Syslog-Einstellungen",
-        "Port": "Port:"
+        "SyslogHostname": "Syslog Server",
+        "SyslogPort": "Port"
     },
     "mqttadmin": {
         "MqttSettings": "MQTT-Einstellungen",
