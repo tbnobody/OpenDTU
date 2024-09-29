@@ -6,7 +6,7 @@
 #include <TaskSchedulerDeclarations.h>
 
 // mqtt discovery device classes
-enum {
+enum DeviceClassType {
     DEVICE_CLS_NONE = 0,
     DEVICE_CLS_CURRENT,
     DEVICE_CLS_ENERGY,
@@ -15,20 +15,34 @@ enum {
     DEVICE_CLS_FREQ,
     DEVICE_CLS_TEMP,
     DEVICE_CLS_POWER_FACTOR,
-    DEVICE_CLS_REACTIVE_POWER
+    DEVICE_CLS_REACTIVE_POWER,
+    DEVICE_CLS_CONNECTIVITY,
+    DEVICE_CLS_DURATION,
+    DEVICE_CLS_SIGNAL_STRENGTH,
+    DEVICE_CLS_TEMPERATURE,
+    DEVICE_CLS_RESTART
 };
-const char* const deviceClasses[] = { 0, "current", "energy", "power", "voltage", "frequency", "temperature", "power_factor", "reactive_power" };
-enum {
+const char* const deviceClass_name[] = { 0, "current", "energy", "power", "voltage", "frequency", "temperature", "power_factor", "reactive_power", "connectivity", "duration", "signal_strength", "temperature", "restart" };
+
+enum StateClassType {
     STATE_CLS_NONE = 0,
     STATE_CLS_MEASUREMENT,
     STATE_CLS_TOTAL_INCREASING
 };
-const char* const stateClasses[] = { 0, "measurement", "total_increasing" };
+const char* const stateClass_name[] = { 0, "measurement", "total_increasing" };
+
+enum CategoryType {
+    CATEGORY_NONE = 0,
+    CATEGORY_CONFIG,
+    CATEGORY_DIAGNOSTIC
+};
+const char* const category_name[] = { 0, "config", "diagnostic" };
+
 
 typedef struct {
     FieldId_t fieldId; // field id
-    uint8_t deviceClsId; // device class
-    uint8_t stateClsId; // state class
+    DeviceClassType deviceClsId; // device class
+    StateClassType stateClsId; // state class
 } byteAssign_fieldDeviceClass_t;
 
 const byteAssign_fieldDeviceClass_t deviceFieldAssignment[] = {
@@ -58,13 +72,24 @@ public:
 
 private:
     void loop();
-    void publish(const String& subtopic, const String& payload);
-    void publishDtuSensor(const char* name, const char* device_class, const char* category, const char* icon, const char* unit_of_measure, const char* subTopic);
-    void publishDtuBinarySensor(const char* name, const char* device_class, const char* category, const char* payload_on, const char* payload_off, const char* subTopic = "");
-    void publishInverterField(std::shared_ptr<InverterAbstract> inv, const ChannelType_t type, const ChannelNum_t channel, const byteAssign_fieldDeviceClass_t fieldType, const bool clear = false);
-    void publishInverterButton(std::shared_ptr<InverterAbstract> inv, const char* caption, const char* icon, const char* category, const char* deviceClass, const char* subTopic, const char* payload);
-    void publishInverterNumber(std::shared_ptr<InverterAbstract> inv, const char* caption, const char* icon, const char* category, const char* commandTopic, const char* stateTopic, const char* unitOfMeasure, const int16_t min = 1, const int16_t max = 100, float step = 1.0);
-    void publishInverterBinarySensor(std::shared_ptr<InverterAbstract> inv, const char* caption, const char* subTopic, const char* payload_on, const char* payload_off);
+    static void publish(const String& subtopic, const String& payload);
+    static void publish(const String& subtopic, const JsonDocument& doc);
+
+    static void addCommonMetadata(JsonDocument& doc, const String& unit_of_measure, const String& icon, const DeviceClassType device_class, const CategoryType category);
+
+    // Binary Sensor
+    static void publishBinarySensor(JsonDocument& doc, const String& root_device, const String& unique_id_prefix, const String& name, const String& state_topic, const String& payload_on, const String& payload_off, const DeviceClassType device_class, const CategoryType category);
+    static void publishDtuBinarySensor(const String& name, const String& state_topic, const String& payload_on, const String& payload_off, const DeviceClassType device_class, const CategoryType category);
+    static void publishInverterBinarySensor(std::shared_ptr<InverterAbstract> inv, const String& name, const String& state_topic, const String& payload_on, const String& payload_off, const DeviceClassType device_class, const CategoryType category);
+
+    // Sensor
+    static void publishSensor(JsonDocument& doc, const String& root_device, const String& unique_id_prefix, const String& name, const String& state_topic, const String& unit_of_measure, const String& icon, const DeviceClassType device_class, const CategoryType category);
+    static void publishDtuSensor(const String& name, const String& state_topic, const String& unit_of_measure, const String& icon, const DeviceClassType device_class, const CategoryType category);
+    static void publishInverterSensor(std::shared_ptr<InverterAbstract> inv, const String& name, const String& state_topic, const String& unit_of_measure, const String& icon, const DeviceClassType device_class, const CategoryType category);
+
+    static void publishInverterField(std::shared_ptr<InverterAbstract> inv, const ChannelType_t type, const ChannelNum_t channel, const byteAssign_fieldDeviceClass_t fieldType, const bool clear = false);
+    static void publishInverterButton(std::shared_ptr<InverterAbstract> inv, const String& name, const String& state_topic, const String& payload, const String& icon, const DeviceClassType device_class, const CategoryType category);
+    static void publishInverterNumber(std::shared_ptr<InverterAbstract> inv, const String& name, const String& state_topic, const String& command_topic, const int16_t min, const int16_t max, float step, const String& unit_of_measure, const String& icon, const CategoryType category);
 
     static void createInverterInfo(JsonDocument& doc, std::shared_ptr<InverterAbstract> inv);
     static void createDtuInfo(JsonDocument& doc);

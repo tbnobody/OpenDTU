@@ -32,6 +32,7 @@ enum WebApiError {
     InverterChanged,
     InverterDeleted,
     InverterOrdered,
+    InverterStatsResetted,
 
     LimitBase = 5000,
     LimitSerialZero,

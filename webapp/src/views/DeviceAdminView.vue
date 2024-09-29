@@ -202,7 +202,7 @@
                                         min="0"
                                         max="100"
                                         id="inputDisplayContrast"
-                                        v-model="deviceConfigList.display.contrast"
+                                        v-model.number="deviceConfigList.display.contrast"
                                     />
                                 </div>
                             </div>
@@ -239,7 +239,7 @@
                                         min="0"
                                         max="100"
                                         :id="getLedIdFromNumber(index)"
-                                        v-model="ledSetting.brightness"
+                                        v-model.number="ledSetting.brightness"
                                         @change="syncSliders"
                                     />
                                 </div>

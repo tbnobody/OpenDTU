@@ -16,6 +16,7 @@
 #include "NetworkSettings.h"
 #include "NtpSettings.h"
 #include "PinMapping.h"
+#include "RestartHelper.h"
 #include "Scheduler.h"
 #include "SunPosition.h"
 #include "Utils.h"
@@ -25,11 +26,20 @@
 #include <LittleFS.h>
 #include <TaskScheduler.h>
 #include <esp_heap_caps.h>
+#include <SpiManager.h>
+
+#include <driver/uart.h>
 
 void setup()
 {
     // Move all dynamic allocations >512byte to psram (if available)
     heap_caps_malloc_extmem_enable(512);
+
+    // Initialize SpiManager
+    SpiManagerInst.register_bus(SPI2_HOST);
+#if SOC_SPI_PERIPH_NUM > 2
+    SpiManagerInst.register_bus(SPI3_HOST);
+#endif
 
     // Initialize serial output
     Serial.begin(SERIAL_BAUDRATE);
@@ -154,6 +164,7 @@ void setup()
     InverterSettings.init(scheduler);
 
     Datastore.init(scheduler);
+    RestartHelper.init(scheduler);
 }
 
 void loop()
