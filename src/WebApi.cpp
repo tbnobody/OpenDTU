@@ -51,6 +51,9 @@ void WebApiClass::reload()
 {
     _webApiWsConsole.reload();
     _webApiWsLive.reload();
+    _webApiWsBatteryLive.reload();
+    _webApiWsVedirectLive.reload();
+    _webApiWsHuaweiLive.reload();
 }
 
 bool WebApiClass::checkCredentials(AsyncWebServerRequest* request)

@@ -10,6 +10,7 @@ class WebApiWsHuaweiLiveClass {
 public:
     WebApiWsHuaweiLiveClass();
     void init(AsyncWebServer& server, Scheduler& scheduler);
+    void reload();
 
 private:
     void generateCommonJsonResponse(JsonVariant& root);
@@ -18,6 +19,7 @@ private:
 
     AsyncWebServer* _server;
     AsyncWebSocket _ws;
+    AuthenticationMiddleware _simpleDigestAuth;
 
     std::mutex _mutex;
     

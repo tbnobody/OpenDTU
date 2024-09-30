@@ -10,6 +10,7 @@ class WebApiWsBatteryLiveClass {
 public:
     WebApiWsBatteryLiveClass();
     void init(AsyncWebServer& server, Scheduler& scheduler);
+    void reload();
 
 private:
     void generateCommonJsonResponse(JsonVariant& root);
@@ -18,6 +19,7 @@ private:
 
     AsyncWebServer* _server;
     AsyncWebSocket _ws;
+    AuthenticationMiddleware _simpleDigestAuth;
 
     uint32_t _lastUpdateCheck = 0;
     static constexpr uint16_t _responseSize = 1024 + 512;

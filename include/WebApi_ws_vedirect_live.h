@@ -12,6 +12,7 @@ class WebApiWsVedirectLiveClass {
 public:
     WebApiWsVedirectLiveClass();
     void init(AsyncWebServer& server, Scheduler& scheduler);
+    void reload();
 
 private:
     void generateCommonJsonResponse(JsonVariant& root, bool fullUpdate);
@@ -22,6 +23,7 @@ private:
 
     AsyncWebServer* _server;
     AsyncWebSocket _ws;
+    AuthenticationMiddleware _simpleDigestAuth;
 
     uint32_t _lastFullPublish = 0;
     uint32_t _lastPublish = 0;
