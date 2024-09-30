@@ -2,7 +2,6 @@
 #pragma once
 
 #include <stdint.h>
-#include <driver/spi_master.h>
 
 #define CMT2300A_ONE_STEP_SIZE 2500 // frequency channel step size for fast frequency hopping operation: One step size is 2.5 kHz.
 #define FH_OFFSET 100 // value * CMT2300A_ONE_STEP_SIZE = channel frequency offset
@@ -19,7 +18,7 @@ enum FrequencyBand_t {
 
 class CMT2300A {
 public:
-    CMT2300A(const spi_host_device_t spi_host, const uint8_t pin_sdio, const uint8_t pin_clk, const uint8_t pin_cs, const uint8_t pin_fcs, const uint32_t _spi_speed = CMT_SPI_SPEED);
+    CMT2300A(const uint8_t pin_sdio, const uint8_t pin_clk, const uint8_t pin_cs, const uint8_t pin_fcs, const uint32_t _spi_speed = CMT_SPI_SPEED);
 
     bool begin(void);
 
@@ -129,7 +128,6 @@ private:
      */
     bool _init_radio();
 
-    spi_host_device_t _spi_host;
     int8_t _pin_sdio;
     int8_t _pin_clk;
     int8_t _pin_cs;

@@ -9,7 +9,6 @@
 #include "PowerLimiter.h"
 #include "Configuration.h"
 #include "Battery.h"
-#include "SPIPortManager.h"
 #include <SPI.h>
 #include <mcp_can.h>
 
@@ -36,11 +35,7 @@ void HuaweiCanCommunicationTask(void* parameter) {
 
 bool HuaweiCanCommClass::init(uint8_t huawei_miso, uint8_t huawei_mosi, uint8_t huawei_clk,
         uint8_t huawei_irq, uint8_t huawei_cs, uint32_t frequency) {
-
-    auto oSPInum = SPIPortManager.allocatePort("Huawei CAN");
-    if (!oSPInum) { return false; }
-
-    SPI = new SPIClass(*oSPInum);
+    SPI = new SPIClass(HSPI);
     SPI->begin(huawei_clk, huawei_miso, huawei_mosi, huawei_cs);
     pinMode(huawei_cs, OUTPUT);
     digitalWrite(huawei_cs, HIGH);

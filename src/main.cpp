@@ -9,7 +9,6 @@
 #include "Led_Single.h"
 #include "MessageOutput.h"
 #include "SerialPortManager.h"
-#include "SPIPortManager.h"
 #include "VictronMppt.h"
 #include "Battery.h"
 #include "Huawei_can.h"
@@ -99,9 +98,7 @@ void setup()
     const auto& pin = PinMapping.get();
     MessageOutput.println("done");
 
-    // Initialize PortManagers
     SerialPortManager.init();
-    SPIPortManager.init();
 
     // Initialize WiFi
     MessageOutput.print("Initialize Network... ");

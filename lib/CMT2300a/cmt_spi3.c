@@ -1,5 +1,6 @@
 #include "cmt_spi3.h"
 #include <Arduino.h>
+#include <driver/spi_master.h>
 #include <esp_rom_gpio.h> // for esp_rom_gpio_connect_out_signal
 
 SemaphoreHandle_t paramLock = NULL;
@@ -8,9 +9,14 @@ SemaphoreHandle_t paramLock = NULL;
     } while (xSemaphoreTake(paramLock, portMAX_DELAY) != pdPASS)
 #define SPI_PARAM_UNLOCK() xSemaphoreGive(paramLock)
 
+// for ESP32 this is the so-called HSPI
+// for ESP32-S2/S3/C3 this nomenclature does not really exist anymore,
+// it is simply the first externally usable hardware SPI master controller
+#define SPI_CMT SPI2_HOST
+
 spi_device_handle_t spi_reg, spi_fifo;
 
-void cmt_spi3_init(const spi_host_device_t spi_host, const int8_t pin_sdio, const int8_t pin_clk, const int8_t pin_cs, const int8_t pin_fcs, const uint32_t spi_speed)
+void cmt_spi3_init(const int8_t pin_sdio, const int8_t pin_clk, const int8_t pin_cs, const int8_t pin_fcs, const uint32_t spi_speed)
 {
     paramLock = xSemaphoreCreateMutex();
 
@@ -37,8 +43,8 @@ void cmt_spi3_init(const spi_host_device_t spi_host, const int8_t pin_sdio, cons
         .post_cb = NULL,
     };
 
-    ESP_ERROR_CHECK(spi_bus_initialize(spi_host, &buscfg, SPI_DMA_DISABLED));
-    ESP_ERROR_CHECK(spi_bus_add_device(spi_host, &devcfg, &spi_reg));
+    ESP_ERROR_CHECK(spi_bus_initialize(SPI_CMT, &buscfg, SPI_DMA_DISABLED));
+    ESP_ERROR_CHECK(spi_bus_add_device(SPI_CMT, &devcfg, &spi_reg));
 
     // FiFo
     spi_device_interface_config_t devcfg2 = {
@@ -55,9 +61,9 @@ void cmt_spi3_init(const spi_host_device_t spi_host, const int8_t pin_sdio, cons
         .pre_cb = NULL,
         .post_cb = NULL,
     };
-    ESP_ERROR_CHECK(spi_bus_add_device(spi_host, &devcfg2, &spi_fifo));
+    ESP_ERROR_CHECK(spi_bus_add_device(SPI_CMT, &devcfg2, &spi_fifo));
 
-    esp_rom_gpio_connect_out_signal(pin_sdio, spi_periph_signal[spi_host].spid_out, true, false);
+    esp_rom_gpio_connect_out_signal(pin_sdio, spi_periph_signal[SPI_CMT].spid_out, true, false);
     delay(100);
 }
 
