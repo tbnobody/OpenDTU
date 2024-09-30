@@ -8,10 +8,10 @@
 #include "SyslogLogger.h"
 #include "PinMapping.h"
 #include "Utils.h"
+#include "__compiled_constants.h"
 #include "defaults.h"
 #include <ESPmDNS.h>
 #include <ETH.h>
-#include "__compiled_constants.h"
 
 NetworkSettingsClass::NetworkSettingsClass()
     : _loopTask(TASK_IMMEDIATE, TASK_FOREVER, std::bind(&NetworkSettingsClass::loop, this))
@@ -32,6 +32,23 @@ void NetworkSettingsClass::init(Scheduler& scheduler)
     WiFi.disconnect(true, true);
 
     WiFi.onEvent(std::bind(&NetworkSettingsClass::NetworkEvent, this, _1, _2));
+
+    if (PinMapping.isValidW5500Config()) {
+        PinMapping_t& pin = PinMapping.get();
+        _w5500 = W5500::setup(pin.w5500_mosi, pin.w5500_miso, pin.w5500_sclk, pin.w5500_cs, pin.w5500_int, pin.w5500_rst);
+        if (_w5500)
+            MessageOutput.println("W5500: Connection successful");
+        else
+            MessageOutput.println("W5500: Connection error!!");
+    } else if (PinMapping.isValidEthConfig()) {
+        PinMapping_t& pin = PinMapping.get();
+#if ESP_ARDUINO_VERSION_MAJOR < 3
+        ETH.begin(pin.eth_phy_addr, pin.eth_power, pin.eth_mdc, pin.eth_mdio, pin.eth_type, pin.eth_clk_mode);
+#else
+        ETH.begin(pin.eth_type, pin.eth_phy_addr, pin.eth_mdc, pin.eth_mdio, pin.eth_power, pin.eth_clk_mode);
+#endif
+    }
+
     setupMode();
 
     scheduler.addTask(_loopTask);
@@ -100,7 +117,7 @@ void NetworkSettingsClass::NetworkEvent(const WiFiEvent_t event, WiFiEventInfo_t
     }
 }
 
-bool NetworkSettingsClass::onEvent(NetworkEventCb cbEvent, const network_event event)
+bool NetworkSettingsClass::onEvent(DtuNetworkEventCb cbEvent, const network_event event)
 {
     if (!cbEvent) {
         return pdFALSE;
@@ -170,11 +187,6 @@ void NetworkSettingsClass::setupMode()
         } else {
             WiFi.mode(WIFI_MODE_NULL);
         }
-    }
-
-    if (PinMapping.isValidEthConfig()) {
-        PinMapping_t& pin = PinMapping.get();
-        ETH.begin(pin.eth_phy_addr, pin.eth_power, pin.eth_mdc, pin.eth_mdio, pin.eth_type, pin.eth_clk_mode);
     }
 }
 
@@ -405,6 +417,9 @@ String NetworkSettingsClass::macAddress() const
 {
     switch (_networkMode) {
     case network_mode::Ethernet:
+        if (_w5500) {
+            return _w5500->macAddress();
+        }
         return ETH.macAddress();
         break;
     case network_mode::WiFi:

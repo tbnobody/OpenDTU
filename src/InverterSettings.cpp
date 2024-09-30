@@ -8,20 +8,7 @@
 #include "PinMapping.h"
 #include "SunPosition.h"
 #include <Hoymiles.h>
-
-// the NRF shall use the second externally usable HW SPI controller
-// for ESP32 that is the so-called VSPI, for ESP32-S2/S3 it is now called implicitly
-// HSPI, as it has shifted places for these chip generations
-// for all generations, this is equivalent to SPI3_HOST in the lower level driver
-// For ESP32-C2, the only externally usable HW SPI controller is SPI2, its signal names
-// being prefixed with FSPI.
-#if CONFIG_IDF_TARGET_ESP32S2 || CONFIG_IDF_TARGET_ESP32S3
-#define SPI_NRF HSPI
-#elif CONFIG_IDF_TARGET_ESP32C3
-#define SPI_NRF FSPI
-#else
-#define SPI_NRF VSPI
-#endif
+#include <SpiManager.h>
 
 InverterSettingsClass InverterSettings;
 
@@ -44,7 +31,10 @@ void InverterSettingsClass::init(Scheduler& scheduler)
 
     if (PinMapping.isValidNrf24Config() || PinMapping.isValidCmt2300Config()) {
         if (PinMapping.isValidNrf24Config()) {
-            SPIClass* spiClass = new SPIClass(SPI_NRF);
+            auto spi_bus = SpiManagerInst.claim_bus_arduino();
+            ESP_ERROR_CHECK(spi_bus ? ESP_OK : ESP_FAIL);
+
+            SPIClass* spiClass = new SPIClass(*spi_bus);
             spiClass->begin(pin.nrf24_clk, pin.nrf24_miso, pin.nrf24_mosi, pin.nrf24_cs);
             Hoymiles.initNRF(spiClass, pin.nrf24_en, pin.nrf24_irq);
         }

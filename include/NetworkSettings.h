@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 #pragma once
 
+#include "W5500.h"
 #include <DNSServer.h>
 #include <TaskSchedulerDeclarations.h>
 #include <WiFi.h>
@@ -23,10 +24,10 @@ enum class network_event {
     NETWORK_EVENT_MAX
 };
 
-typedef std::function<void(network_event event)> NetworkEventCb;
+typedef std::function<void(network_event event)> DtuNetworkEventCb;
 
 typedef struct NetworkEventCbList {
-    NetworkEventCb cb;
+    DtuNetworkEventCb cb;
     network_event event;
 
     NetworkEventCbList()
@@ -53,7 +54,7 @@ public:
     bool isConnected() const;
     network_mode NetworkMode() const;
 
-    bool onEvent(NetworkEventCb cbEvent, const network_event event = network_event::NETWORK_EVENT_MAX);
+    bool onEvent(DtuNetworkEventCb cbEvent, const network_event event = network_event::NETWORK_EVENT_MAX);
     void raiseEvent(const network_event event);
 
 private:
@@ -83,6 +84,7 @@ private:
     bool _ethConnected = false;
     std::vector<NetworkEventCbList_t> _cbEventList;
     bool _lastMdnsEnabled = false;
+    std::unique_ptr<W5500> _w5500;
 };
 
 extern NetworkSettingsClass NetworkSettings;

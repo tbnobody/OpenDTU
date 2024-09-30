@@ -71,6 +71,8 @@ void WebApiSecurityClass::onSecurityPost(AsyncWebServerRequest* request)
     WebApi.writeConfig(retMsg);
 
     WebApi.sendJsonResponse(request, response, __FUNCTION__, __LINE__);
+
+    WebApi.reload();
 }
 
 void WebApiSecurityClass::onAuthenticateGet(AsyncWebServerRequest* request)
