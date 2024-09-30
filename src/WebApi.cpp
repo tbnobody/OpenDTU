@@ -39,6 +39,12 @@ void WebApiClass::init(Scheduler& scheduler)
     _server.begin();
 }
 
+void WebApiClass::reload()
+{
+    _webApiWsConsole.reload();
+    _webApiWsLive.reload();
+}
+
 bool WebApiClass::checkCredentials(AsyncWebServerRequest* request)
 {
     CONFIG_T& config = Configuration.get();
