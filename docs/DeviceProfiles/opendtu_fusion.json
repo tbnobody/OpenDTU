@@ -197,18 +197,6 @@
             "en": 38,
             "cs": 37
         },
-        "cmt": {
-            "clk": -1,
-            "cs": -1,
-            "fcs": -1,
-            "sdio": -1,
-            "gpio2": -1,
-            "gpio3": -1
-        },
-        "led": {
-            "led0": 17,
-            "led1": 18
-        },
         "w5500": {
             "sclk": 39,
             "mosi": 40,
@@ -220,14 +208,6 @@
     },
     {
         "name": "OpenDTU Fusion v2 with CMT2300A and W5500 ethernet",
-        "nrf24": {
-            "miso": -1,
-            "mosi": -1,
-            "clk": -1,
-            "irq": -1,
-            "en": -1,
-            "cs": -1
-        },
         "cmt": {
             "clk": 6,
             "cs": 4,
@@ -235,10 +215,6 @@
             "sdio": 5,
             "gpio2": 3,
             "gpio3": 8
-        },
-        "led": {
-            "led0": 17,
-            "led1": 18
         },
         "w5500": {
             "sclk": 39,
