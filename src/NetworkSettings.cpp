@@ -8,10 +8,8 @@
 #include "SyslogLogger.h"
 #include "PinMapping.h"
 #include "Utils.h"
-#include "SPIPortManager.h"
 #include "defaults.h"
 #include <ESPmDNS.h>
-#include <ETHSPI.h>
 #include <ETH.h>
 #include "__compiled_constants.h"
 
@@ -34,22 +32,6 @@ void NetworkSettingsClass::init(Scheduler& scheduler)
     WiFi.disconnect(true, true);
 
     WiFi.onEvent(std::bind(&NetworkSettingsClass::NetworkEvent, this, _1, _2));
-
-    if (PinMapping.isValidEthConfig()) {
-        PinMapping_t& pin = PinMapping.get();
-        ETH.begin(pin.eth_phy_addr, pin.eth_power, pin.eth_mdc, pin.eth_mdio, pin.eth_type, pin.eth_clk_mode);
-    } else if (PinMapping.isValidW5500Config()) {
-        auto oSPInum = SPIPortManager.allocatePort("ETHSPI");
-
-        if (oSPInum) {
-            spi_host_device_t host_id = SPIPortManager.SPIhostNum(*oSPInum);
-            PinMapping_t& pin = PinMapping.get();
-            ETHSPI.begin(pin.w5500_sclk, pin.w5500_mosi, pin.w5500_miso, pin.w5500_cs, pin.w5500_int, pin.w5500_rst,
-                         host_id);
-            _spiEth = true;
-        }
-    }
-
     setupMode();
 
     scheduler.addTask(_loopTask);
@@ -188,6 +170,11 @@ void NetworkSettingsClass::setupMode()
         } else {
             WiFi.mode(WIFI_MODE_NULL);
         }
+    }
+
+    if (PinMapping.isValidEthConfig()) {
+        PinMapping_t& pin = PinMapping.get();
+        ETH.begin(pin.eth_phy_addr, pin.eth_power, pin.eth_mdc, pin.eth_mdio, pin.eth_type, pin.eth_clk_mode);
     }
 }
 
@@ -418,9 +405,6 @@ String NetworkSettingsClass::macAddress() const
 {
     switch (_networkMode) {
     case network_mode::Ethernet:
-        if (_spiEth) {
-            return ETHSPI.macAddress();
-        }
         return ETH.macAddress();
         break;
     case network_mode::WiFi:

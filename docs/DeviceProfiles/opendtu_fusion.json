@@ -186,43 +186,5 @@
             "data": 2,
             "clk": 1
         }
-    },
-    {
-        "name": "OpenDTU Fusion v2 with NRF24 and W5500 ethernet",
-        "nrf24": {
-            "miso": 48,
-            "mosi": 35,
-            "clk": 36,
-            "irq": 47,
-            "en": 38,
-            "cs": 37
-        },
-        "w5500": {
-            "sclk": 39,
-            "mosi": 40,
-            "miso": 41,
-            "cs": 42,
-            "rst": 43,
-            "int": 44
-        }
-    },
-    {
-        "name": "OpenDTU Fusion v2 with CMT2300A and W5500 ethernet",
-        "cmt": {
-            "clk": 6,
-            "cs": 4,
-            "fcs": 21,
-            "sdio": 5,
-            "gpio2": 3,
-            "gpio3": 8
-        },
-        "w5500": {
-            "sclk": 39,
-            "mosi": 40,
-            "miso": 41,
-            "cs": 42,
-            "rst": 43,
-            "int": 44
-        }
     }
 ]

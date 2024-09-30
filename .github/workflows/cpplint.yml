@@ -22,4 +22,4 @@ jobs:
           pip install cpplint
       - name: Linting
         run: |
-          cpplint --repository=. --recursive --filter=-build/c++11,-runtime/references,-readability/braces,-whitespace,-legal,-build/include ./src ./include ./lib/Hoymiles ./lib/MqttSubscribeParser ./lib/TimeoutHelper ./lib/ResetReason ./lib/ETHSPI
+          cpplint --repository=. --recursive --filter=-build/c++11,-runtime/references,-readability/braces,-whitespace,-legal,-build/include ./src ./include ./lib/Hoymiles ./lib/MqttSubscribeParser ./lib/TimeoutHelper ./lib/ResetReason
