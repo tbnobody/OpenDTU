@@ -36,8 +36,11 @@ void WebApiWsConsoleClass::reload()
 
     if (config.Security.AllowReadonly) { return; }
 
+    _ws.enable(false);
     _simpleDigestAuth.setPassword(config.Security.Password);
     _ws.addMiddleware(&_simpleDigestAuth);
+    _ws.closeAll();
+    _ws.enable(true);
 }
 
 void WebApiWsConsoleClass::wsCleanupTaskCb()
