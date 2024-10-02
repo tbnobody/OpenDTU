@@ -74,21 +74,21 @@ private:
     static void publish(const String& subtopic, const String& payload);
     static void publish(const String& subtopic, const JsonDocument& doc);
 
-    static void addCommonMetadata(JsonDocument& doc, const String& unit_of_measure, const String& icon, const DeviceClassType device_class, const CategoryType category);
+    static void addCommonMetadata(JsonDocument& doc, const String& unit_of_measure, const String& icon, const DeviceClassType device_class, const StateClassType state_class, const CategoryType category);
 
     // Binary Sensor
-    static void publishBinarySensor(JsonDocument& doc, const String& root_device, const String& unique_id_prefix, const String& name, const String& state_topic, const String& payload_on, const String& payload_off, const DeviceClassType device_class, const CategoryType category);
-    static void publishDtuBinarySensor(const String& name, const String& state_topic, const String& payload_on, const String& payload_off, const DeviceClassType device_class, const CategoryType category);
-    static void publishInverterBinarySensor(std::shared_ptr<InverterAbstract> inv, const String& name, const String& state_topic, const String& payload_on, const String& payload_off, const DeviceClassType device_class, const CategoryType category);
+    static void publishBinarySensor(JsonDocument& doc, const String& root_device, const String& unique_id_prefix, const String& name, const String& state_topic, const String& payload_on, const String& payload_off, const DeviceClassType device_class, const StateClassType state_class, const CategoryType category);
+    static void publishDtuBinarySensor(const String& name, const String& state_topic, const String& payload_on, const String& payload_off, const DeviceClassType device_class, const StateClassType state_class, const CategoryType category);
+    static void publishInverterBinarySensor(std::shared_ptr<InverterAbstract> inv, const String& name, const String& state_topic, const String& payload_on, const String& payload_off, const DeviceClassType device_class, const StateClassType state_class, const CategoryType category);
 
     // Sensor
-    static void publishSensor(JsonDocument& doc, const String& root_device, const String& unique_id_prefix, const String& name, const String& state_topic, const String& unit_of_measure, const String& icon, const DeviceClassType device_class, const CategoryType category);
-    static void publishDtuSensor(const String& name, const String& state_topic, const String& unit_of_measure, const String& icon, const DeviceClassType device_class, const CategoryType category);
-    static void publishInverterSensor(std::shared_ptr<InverterAbstract> inv, const String& name, const String& state_topic, const String& unit_of_measure, const String& icon, const DeviceClassType device_class, const CategoryType category);
+    static void publishSensor(JsonDocument& doc, const String& root_device, const String& unique_id_prefix, const String& name, const String& state_topic, const String& unit_of_measure, const String& icon, const DeviceClassType device_class, const StateClassType state_class, const CategoryType category);
+    static void publishDtuSensor(const String& name, const String& state_topic, const String& unit_of_measure, const String& icon, const DeviceClassType device_class, const StateClassType state_class, const CategoryType category);
+    static void publishInverterSensor(std::shared_ptr<InverterAbstract> inv, const String& name, const String& state_topic, const String& unit_of_measure, const String& icon, const DeviceClassType device_class, const StateClassType state_class, const CategoryType category);
 
     static void publishInverterField(std::shared_ptr<InverterAbstract> inv, const ChannelType_t type, const ChannelNum_t channel, const byteAssign_fieldDeviceClass_t fieldType, const bool clear = false);
-    static void publishInverterButton(std::shared_ptr<InverterAbstract> inv, const String& name, const String& state_topic, const String& payload, const String& icon, const DeviceClassType device_class, const CategoryType category);
-    static void publishInverterNumber(std::shared_ptr<InverterAbstract> inv, const String& name, const String& state_topic, const String& command_topic, const int16_t min, const int16_t max, float step, const String& unit_of_measure, const String& icon, const CategoryType category);
+    static void publishInverterButton(std::shared_ptr<InverterAbstract> inv, const String& name, const String& state_topic, const String& payload, const String& icon, const DeviceClassType device_class, const StateClassType state_class, const CategoryType category);
+    static void publishInverterNumber(std::shared_ptr<InverterAbstract> inv, const String& name, const String& state_topic, const String& command_topic, const int16_t min, const int16_t max, float step, const String& unit_of_measure, const String& icon, const StateClassType state_class, const CategoryType category);
 
     static void createInverterInfo(JsonDocument& doc, std::shared_ptr<InverterAbstract> inv);
     static void createDtuInfo(JsonDocument& doc);
