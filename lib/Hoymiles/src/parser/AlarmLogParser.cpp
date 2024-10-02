@@ -122,7 +122,7 @@ const std::array<const AlarmMessage_t, ALARM_MSG_COUNT> AlarmLogParser::_alarmMe
     { AlarmMessageType_t::ALL, 305, "FB-A: clamp circuit failure", "FB-A: Fehler im Klemmkreis", "" },
     { AlarmMessageType_t::ALL, 306, "FB-B: clamp circuit failure", "FB-B: Fehler im Klemmkreis", "" },
 
-    { AlarmMessageType_t::ALL, 307, "INV power device failure", "Ausfall des Wechselrichter-Leistungsgeräts", "" },
+    { AlarmMessageType_t::ALL, 307, "INV power device failure", "Wechselrichter – Ausfall des Leistungsgeräts", "" },
     { AlarmMessageType_t::ALL, 308, "INV overcurrent or overvoltage protection failure", "Fehler beim Überstrom- oder Überspannungsschutz des Wechselrichters", "" },
 
     { AlarmMessageType_t::ALL, 309, "Hardware error code 309", "Hardwarefehlercode 309", "" },
