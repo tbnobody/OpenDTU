@@ -13,7 +13,6 @@ enum DeviceClassType {
     DEVICE_CLS_PWR,
     DEVICE_CLS_VOLTAGE,
     DEVICE_CLS_FREQ,
-    DEVICE_CLS_TEMP,
     DEVICE_CLS_POWER_FACTOR,
     DEVICE_CLS_REACTIVE_POWER,
     DEVICE_CLS_CONNECTIVITY,
@@ -22,7 +21,7 @@ enum DeviceClassType {
     DEVICE_CLS_TEMPERATURE,
     DEVICE_CLS_RESTART
 };
-const char* const deviceClass_name[] = { 0, "current", "energy", "power", "voltage", "frequency", "temperature", "power_factor", "reactive_power", "connectivity", "duration", "signal_strength", "temperature", "restart" };
+const char* const deviceClass_name[] = { 0, "current", "energy", "power", "voltage", "frequency", "power_factor", "reactive_power", "connectivity", "duration", "signal_strength", "temperature", "restart" };
 
 enum StateClassType {
     STATE_CLS_NONE = 0,
@@ -55,7 +54,7 @@ const byteAssign_fieldDeviceClass_t deviceFieldAssignment[] = {
     { FLD_IAC, DEVICE_CLS_CURRENT, STATE_CLS_MEASUREMENT },
     { FLD_PAC, DEVICE_CLS_PWR, STATE_CLS_MEASUREMENT },
     { FLD_F, DEVICE_CLS_FREQ, STATE_CLS_MEASUREMENT },
-    { FLD_T, DEVICE_CLS_TEMP, STATE_CLS_MEASUREMENT },
+    { FLD_T, DEVICE_CLS_TEMPERATURE, STATE_CLS_MEASUREMENT },
     { FLD_PF, DEVICE_CLS_POWER_FACTOR, STATE_CLS_MEASUREMENT },
     { FLD_EFF, DEVICE_CLS_NONE, STATE_CLS_NONE },
     { FLD_IRR, DEVICE_CLS_NONE, STATE_CLS_NONE },
