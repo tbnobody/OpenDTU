@@ -61,7 +61,7 @@ void MqttHandleHassClass::publishConfig()
     publishDtuSensor("IP", "dtu/ip", "", "mdi:network-outline", DEVICE_CLS_NONE, CATEGORY_DIAGNOSTIC);
     publishDtuSensor("WiFi Signal", "dtu/rssi", "dBm", "", DEVICE_CLS_SIGNAL_STRENGTH, CATEGORY_DIAGNOSTIC);
     publishDtuSensor("Uptime", "dtu/uptime", "s", "", DEVICE_CLS_DURATION, CATEGORY_DIAGNOSTIC);
-    publishDtuSensor("Temperature", "dtu/temperature", "°C", "mdi:thermometer", DEVICE_CLS_TEMPERATURE, CATEGORY_DIAGNOSTIC);
+    publishDtuSensor("Temperature", "dtu/temperature", "°C", "", DEVICE_CLS_TEMPERATURE, CATEGORY_DIAGNOSTIC);
     publishDtuSensor("Heap Size", "dtu/heap/size", "Bytes", "mdi:memory", DEVICE_CLS_NONE, CATEGORY_DIAGNOSTIC);
     publishDtuSensor("Heap Free", "dtu/heap/free", "Bytes", "mdi:memory", DEVICE_CLS_NONE, CATEGORY_DIAGNOSTIC);
     publishDtuSensor("Largest Free Heap Block", "dtu/heap/maxalloc", "Bytes", "mdi:memory", DEVICE_CLS_NONE, CATEGORY_DIAGNOSTIC);
