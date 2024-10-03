@@ -108,6 +108,8 @@
 #define W5500_RST -1
 #endif
 
+#if CONFIG_ETH_USE_ESP32_EMAC
+
 #ifndef ETH_PHY_ADDR
 #define ETH_PHY_ADDR -1
 #endif
@@ -130,6 +132,8 @@
 
 #ifndef ETH_CLK_MODE
 #define ETH_CLK_MODE ETH_CLOCK_GPIO0_IN
+#endif
+
 #endif
 
 PinMappingClass PinMapping;
@@ -158,18 +162,19 @@ PinMappingClass::PinMappingClass()
     _pinMapping.w5500_int = W5500_INT;
     _pinMapping.w5500_rst = W5500_RST;
 
+#if CONFIG_ETH_USE_ESP32_EMAC
 #ifdef OPENDTU_ETHERNET
     _pinMapping.eth_enabled = true;
 #else
     _pinMapping.eth_enabled = false;
 #endif
-
     _pinMapping.eth_phy_addr = ETH_PHY_ADDR;
     _pinMapping.eth_power = ETH_PHY_POWER;
     _pinMapping.eth_mdc = ETH_PHY_MDC;
     _pinMapping.eth_mdio = ETH_PHY_MDIO;
     _pinMapping.eth_type = ETH_PHY_TYPE;
     _pinMapping.eth_clk_mode = ETH_CLK_MODE;
+#endif
 
     _pinMapping.display_type = DISPLAY_TYPE;
     _pinMapping.display_data = DISPLAY_DATA;
@@ -226,18 +231,19 @@ bool PinMappingClass::init(const String& deviceMapping)
             _pinMapping.w5500_int = doc[i]["w5500"]["int"] | W5500_INT;
             _pinMapping.w5500_rst = doc[i]["w5500"]["rst"] | W5500_RST;
 
+#if CONFIG_ETH_USE_ESP32_EMAC
 #ifdef OPENDTU_ETHERNET
             _pinMapping.eth_enabled = doc[i]["eth"]["enabled"] | true;
 #else
             _pinMapping.eth_enabled = doc[i]["eth"]["enabled"] | false;
 #endif
-
             _pinMapping.eth_phy_addr = doc[i]["eth"]["phy_addr"] | ETH_PHY_ADDR;
             _pinMapping.eth_power = doc[i]["eth"]["power"] | ETH_PHY_POWER;
             _pinMapping.eth_mdc = doc[i]["eth"]["mdc"] | ETH_PHY_MDC;
             _pinMapping.eth_mdio = doc[i]["eth"]["mdio"] | ETH_PHY_MDIO;
             _pinMapping.eth_type = doc[i]["eth"]["type"] | ETH_PHY_TYPE;
             _pinMapping.eth_clk_mode = doc[i]["eth"]["clk_mode"] | ETH_CLK_MODE;
+#endif
 
             _pinMapping.display_type = doc[i]["display"]["type"] | DISPLAY_TYPE;
             _pinMapping.display_data = doc[i]["display"]["data"] | DISPLAY_DATA;
@@ -283,9 +289,11 @@ bool PinMappingClass::isValidW5500Config() const
         && _pinMapping.w5500_rst >= 0;
 }
 
+#if CONFIG_ETH_USE_ESP32_EMAC
 bool PinMappingClass::isValidEthConfig() const
 {
     return _pinMapping.eth_enabled
         && _pinMapping.eth_mdc >= 0
         && _pinMapping.eth_mdio >= 0;
 }
+#endif

@@ -12,6 +12,7 @@
 
 struct PinMapping_t {
     char name[MAPPING_NAME_STRLEN + 1];
+
     int8_t nrf24_miso;
     int8_t nrf24_mosi;
     int8_t nrf24_clk;
@@ -33,6 +34,7 @@ struct PinMapping_t {
     int8_t w5500_int;
     int8_t w5500_rst;
 
+#if CONFIG_ETH_USE_ESP32_EMAC
     int8_t eth_phy_addr;
     bool eth_enabled;
     int eth_power;
@@ -40,11 +42,14 @@ struct PinMapping_t {
     int eth_mdio;
     eth_phy_type_t eth_type;
     eth_clock_mode_t eth_clk_mode;
+#endif
+
     uint8_t display_type;
     uint8_t display_data;
     uint8_t display_clk;
     uint8_t display_cs;
     uint8_t display_reset;
+
     int8_t led[PINMAPPING_LED_COUNT];
 };
 
@@ -57,7 +62,9 @@ public:
     bool isValidNrf24Config() const;
     bool isValidCmt2300Config() const;
     bool isValidW5500Config() const;
+#if CONFIG_ETH_USE_ESP32_EMAC
     bool isValidEthConfig() const;
+#endif
 
 private:
     PinMapping_t _pinMapping;

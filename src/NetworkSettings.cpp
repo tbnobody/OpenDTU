@@ -39,7 +39,9 @@ void NetworkSettingsClass::init(Scheduler& scheduler)
             MessageOutput.println("W5500: Connection successful");
         else
             MessageOutput.println("W5500: Connection error!!");
-    } else if (PinMapping.isValidEthConfig()) {
+    }
+#if CONFIG_ETH_USE_ESP32_EMAC
+    else if (PinMapping.isValidEthConfig()) {
         PinMapping_t& pin = PinMapping.get();
 #if ESP_ARDUINO_VERSION_MAJOR < 3
         ETH.begin(pin.eth_phy_addr, pin.eth_power, pin.eth_mdc, pin.eth_mdio, pin.eth_type, pin.eth_clk_mode);
@@ -47,6 +49,7 @@ void NetworkSettingsClass::init(Scheduler& scheduler)
         ETH.begin(pin.eth_type, pin.eth_phy_addr, pin.eth_mdc, pin.eth_mdio, pin.eth_power, pin.eth_clk_mode);
 #endif
     }
+#endif
 
     setupMode();
 
