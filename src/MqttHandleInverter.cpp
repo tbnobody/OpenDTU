@@ -50,6 +50,7 @@ void MqttHandleInverterClass::loop()
         MqttSettings.publish(subtopic + "/radio/rx_fail_nothing", String(inv->RadioStats.RxFailNoAnswer));
         MqttSettings.publish(subtopic + "/radio/rx_fail_partial", String(inv->RadioStats.RxFailPartialAnswer));
         MqttSettings.publish(subtopic + "/radio/rx_fail_corrupt", String(inv->RadioStats.RxFailCorruptData));
+        MqttSettings.publish(subtopic + "/radio/rssi", String(inv->getLastRssi()));
 
         if (inv->DevInfo()->getLastUpdate() > 0) {
             // Bootloader Version

@@ -137,6 +137,11 @@ bool InverterAbstract::getClearEventlogOnMidnight() const
     return _clearEventlogOnMidnight;
 }
 
+int8_t InverterAbstract::getLastRssi() const
+{
+    return _lastRssi;
+}
+
 bool InverterAbstract::sendChangeChannelRequest()
 {
     return false;
@@ -185,8 +190,10 @@ void InverterAbstract::clearRxFragmentBuffer()
     _rxFragmentRetransmitCnt = 0;
 }
 
-void InverterAbstract::addRxFragment(const uint8_t fragment[], const uint8_t len)
+void InverterAbstract::addRxFragment(const uint8_t fragment[], const uint8_t len, const int8_t rssi)
 {
+    _lastRssi = rssi;
+
     if (len < 11) {
         Hoymiles.getMessageOutput()->printf("FATAL: (%s, %d) fragment too short\r\n", __FILE__, __LINE__);
         return;

@@ -80,7 +80,7 @@ void HoymilesRadio_NRF::loop()
                     dumpBuf(f.fragment, f.len, false);
                     Hoymiles.getMessageOutput()->printf("| %d dBm\r\n", f.rssi);
 
-                    inv->addRxFragment(f.fragment, f.len);
+                    inv->addRxFragment(f.fragment, f.len, f.rssi);
                 } else {
                     Hoymiles.getMessageOutput()->println("Inverter Not found!");
                 }

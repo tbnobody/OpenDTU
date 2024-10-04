@@ -150,7 +150,10 @@
         "RxFailCorrupt": "RX Fail: Receive Corrupt",
         "TxReRequest": "TX Re-Request Fragment",
         "StatsReset": "Reset Statistics",
-        "StatsResetting": "Resetting..."
+        "StatsResetting": "Resetting...",
+        "Rssi": "RSSI of last received packet",
+        "RssiHint": "HM inverters only support RSSI values < -64 dBm and > -64 dBm. In this case, -80 dbm and -30 dbm is shown.",
+        "dBm": "{dbm} dBm"
     },
     "eventlog": {
         "Start": "Start",
