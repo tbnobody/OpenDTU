@@ -26,16 +26,16 @@ enum class network_event {
 
 typedef std::function<void(network_event event)> DtuNetworkEventCb;
 
-typedef struct NetworkEventCbList {
+typedef struct DtuNetworkEventCbList {
     DtuNetworkEventCb cb;
     network_event event;
 
-    NetworkEventCbList()
+    DtuNetworkEventCbList()
         : cb(nullptr)
         , event(network_event::NETWORK_UNKNOWN)
     {
     }
-} NetworkEventCbList_t;
+} DtuNetworkEventCbList_t;
 
 class NetworkSettingsClass {
 public:
@@ -82,7 +82,7 @@ private:
     bool _dnsServerStatus = false;
     network_mode _networkMode = network_mode::Undefined;
     bool _ethConnected = false;
-    std::vector<NetworkEventCbList_t> _cbEventList;
+    std::vector<DtuNetworkEventCbList_t> _cbEventList;
     bool _lastMdnsEnabled = false;
     std::unique_ptr<W5500> _w5500;
 };

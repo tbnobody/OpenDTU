@@ -119,7 +119,7 @@ bool NetworkSettingsClass::onEvent(DtuNetworkEventCb cbEvent, const network_even
     if (!cbEvent) {
         return pdFALSE;
     }
-    NetworkEventCbList_t newEventHandler;
+    DtuNetworkEventCbList_t newEventHandler;
     newEventHandler.cb = cbEvent;
     newEventHandler.event = event;
     _cbEventList.push_back(newEventHandler);
