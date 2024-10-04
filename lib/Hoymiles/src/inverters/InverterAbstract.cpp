@@ -215,7 +215,7 @@ void InverterAbstract::addRxFragment(const uint8_t fragment[], const uint8_t len
     }
 
     if (fragmentId >= MAX_RF_FRAGMENT_COUNT) {
-        Hoymiles.getMessageOutput()->printf("ERROR: fragment id %d is too large for buffer and ignored\r\n", fragmentId);
+        Hoymiles.getMessageOutput()->printf("ERROR: fragment id %" PRId8 " is too large for buffer and ignored\r\n", fragmentId);
         return;
     }
 

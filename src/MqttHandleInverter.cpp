@@ -218,7 +218,7 @@ void MqttHandleInverterClass::onMqttMessage(Topic t, const espMqttClientTypes::M
 
     case Topic::Power:
         // Turn inverter on or off
-        MessageOutput.printf("Set inverter power to: %d\r\n", static_cast<int32_t>(payload_val));
+        MessageOutput.printf("Set inverter power to: %" PRId32 "\r\n", static_cast<int32_t>(payload_val));
         inv->sendPowerControlRequest(static_cast<int32_t>(payload_val) > 0);
         break;
 
