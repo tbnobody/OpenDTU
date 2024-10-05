@@ -9,6 +9,7 @@
 #include "WebApi_eventlog.h"
 #include "WebApi_firmware.h"
 #include "WebApi_gridprofile.h"
+#include "WebApi_integrations.h"
 #include "WebApi_inverter.h"
 #include "WebApi_limit.h"
 #include "WebApi_maintenance.h"
@@ -66,6 +67,7 @@ private:
     WebApiWebappClass _webApiWebapp;
     WebApiWsConsoleClass _webApiWsConsole;
     WebApiWsLiveClass _webApiWsLive;
+    WebApiIntegrationsClass _webApiIntegrations;
 };
 
 extern WebApiClass WebApi;
