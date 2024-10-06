@@ -9,7 +9,7 @@
 #include "PowerLimiter.h"
 #include "Configuration.h"
 #include "Battery.h"
-#include <SPI.h>
+#include "SpiManager.h"
 #include <mcp_can.h>
 
 #include <freertos/FreeRTOS.h>
@@ -35,7 +35,12 @@ void HuaweiCanCommunicationTask(void* parameter) {
 
 bool HuaweiCanCommClass::init(uint8_t huawei_miso, uint8_t huawei_mosi, uint8_t huawei_clk,
         uint8_t huawei_irq, uint8_t huawei_cs, uint32_t frequency) {
-    SPI = new SPIClass(HSPI);
+
+    auto spi_bus = SpiManagerInst.claim_bus_arduino();
+    if (!spi_bus) { return false; }
+
+    SPI = new SPIClass(*spi_bus);
+
     SPI->begin(huawei_clk, huawei_miso, huawei_mosi, huawei_cs);
     pinMode(huawei_cs, OUTPUT);
     digitalWrite(huawei_cs, HIGH);
