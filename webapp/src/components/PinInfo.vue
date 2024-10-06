@@ -60,6 +60,7 @@ export default defineComponent({
             let selArray: Array<string> = [];
             if (this.selectedPinAssignment) {
                 selArray = Object.keys(this.selectedPinAssignment as Device);
+                selArray = selArray.filter((item) => curArray.includes(item));
             }
 
             let total: Array<string> = [];
