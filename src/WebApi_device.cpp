@@ -58,6 +58,7 @@ void WebApiDeviceClass::onDeviceAdminGet(AsyncWebServerRequest* request)
     w5500PinObj["int"] = pin.w5500_int;
     w5500PinObj["rst"] = pin.w5500_rst;
 
+#if CONFIG_ETH_USE_ESP32_EMAC
     auto ethPinObj = curPin["eth"].to<JsonObject>();
     ethPinObj["enabled"] = pin.eth_enabled;
     ethPinObj["phy_addr"] = pin.eth_phy_addr;
@@ -66,6 +67,7 @@ void WebApiDeviceClass::onDeviceAdminGet(AsyncWebServerRequest* request)
     ethPinObj["mdio"] = pin.eth_mdio;
     ethPinObj["type"] = pin.eth_type;
     ethPinObj["clk_mode"] = pin.eth_clk_mode;
+#endif
 
     auto displayPinObj = curPin["display"].to<JsonObject>();
     displayPinObj["type"] = pin.display_type;
