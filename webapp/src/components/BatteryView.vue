@@ -227,7 +227,9 @@ export default defineComponent({
         },
         // Send heartbeat packets regularly * 59s Send a heartbeat
         heartCheck() {
-            this.heartInterval && clearTimeout(this.heartInterval);
+            if (this.heartInterval) {
+                clearTimeout(this.heartInterval);
+            }
             this.heartInterval = setInterval(() => {
                 if (this.socket.readyState === 1) {
                     // Connection status
@@ -240,7 +242,9 @@ export default defineComponent({
         /** To break off websocket Connect */
         closeSocket() {
             this.socket.close();
-            this.heartInterval && clearTimeout(this.heartInterval);
+            if (this.heartInterval) {
+                clearTimeout(this.heartInterval);
+            }
             this.isFirstFetchAfterConnect = true;
         },
     },
