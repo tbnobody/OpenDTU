@@ -23,20 +23,20 @@ def is_tool(name):
     return which(name) is not None
 
 def replaceInFile(in_file, out_file, text, subs, flags=0):
-    """
-        Function for replacing content for the given file
-        Taken from https://www.studytonight.com/python-howtos/search-and-replace-a-text-in-a-file-in-python
-    """
+    """Function for replacing content for the given file."""
+
     if os.path.exists(in_file):
-        with open(in_file, "rb") as infile:
-            with open(out_file, "wb") as outfile:
-                #read the file contents
-                file_contents = infile.read()
-                text_pattern = re.compile(re.escape(text), flags)
-                file_contents = text_pattern.sub(subs, file_contents.decode('utf-8'))
-                outfile.seek(0)
-                outfile.truncate()
-                outfile.write(file_contents.encode())
+        # read the file contents
+        with open(in_file, "r", encoding="utf-8") as infile:
+            file_contents = infile.read()
+
+        # do replacement
+        text_pattern = re.compile(re.escape(text), flags)
+        file_contents = text_pattern.sub(subs, file_contents)
+
+        # write the result
+        with open(out_file, "w", encoding="utf-8") as outfile:
+            outfile.write(file_contents)
 
 def main():
     if (env.GetProjectOption('custom_patches', '') == ''):
