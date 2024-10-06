@@ -82,6 +82,31 @@
                 />
             </CardElement>
 
+            <CardElement :text="$t('networkadmin.SyslogSettings')" textVariant="text-bg-primary" add-space>
+                <InputElement
+                    :label="$t('networkadmin.EnableSyslog')"
+                    v-model="networkConfigList.syslogenabled"
+                    type="checkbox"
+                />
+
+                <div v-if="networkConfigList.syslogenabled">
+                    <InputElement
+                        :label="$t('networkadmin.SyslogHostname')"
+                        v-model="networkConfigList.sysloghostname"
+                        type="text"
+                        maxlength="128"
+                    />
+
+                    <InputElement
+                        :label="$t('networkadmin.SyslogPort')"
+                        v-model="networkConfigList.syslogport"
+                        type="number"
+                        min="1"
+                        max="65535"
+                    />
+                </div>
+            </CardElement>
+
             <CardElement :text="$t('networkadmin.AdminAp')" textVariant="text-bg-primary" add-space>
                 <InputElement
                     :label="$t('networkadmin.ApTimeout')"

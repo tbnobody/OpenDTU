@@ -22,6 +22,9 @@
 
 #define MDNS_ENABLED false
 
+#define SYSLOG_ENABLED false
+#define SYSLOG_PORT 514
+
 #define NTP_SERVER_OLD "pool.ntp.org"
 #define NTP_SERVER "opendtu.pool.ntp.org"
 #define NTP_TIMEZONE "CET-1CEST,M3.5.0,M10.5.0/3"

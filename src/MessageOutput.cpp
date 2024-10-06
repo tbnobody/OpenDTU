@@ -3,6 +3,7 @@
  * Copyright (C) 2022-2024 Thomas Basler and others
  */
 #include "MessageOutput.h"
+#include "SyslogLogger.h"
 
 #include <Arduino.h>
 
@@ -26,6 +27,8 @@ void MessageOutputClass::register_ws_output(AsyncWebSocket* output)
 
 size_t MessageOutputClass::write(uint8_t c)
 {
+    Syslog.write(&c, 1);
+
     if (_buff_pos < BUFFER_SIZE) {
         std::lock_guard<std::mutex> lock(_msgLock);
         _buffer[_buff_pos] = c;
@@ -39,6 +42,8 @@ size_t MessageOutputClass::write(uint8_t c)
 
 size_t MessageOutputClass::write(const uint8_t* buffer, size_t size)
 {
+    Syslog.write(buffer, size);
+
     std::lock_guard<std::mutex> lock(_msgLock);
     if (_buff_pos + size < BUFFER_SIZE) {
         memcpy(&_buffer[_buff_pos], buffer, size);
