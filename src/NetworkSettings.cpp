@@ -40,7 +40,9 @@ void NetworkSettingsClass::init(Scheduler& scheduler)
             MessageOutput.println("W5500: Connection successful");
         else
             MessageOutput.println("W5500: Connection error!!");
-    } else if (PinMapping.isValidEthConfig()) {
+    }
+#if CONFIG_ETH_USE_ESP32_EMAC
+    else if (PinMapping.isValidEthConfig()) {
         PinMapping_t& pin = PinMapping.get();
 #if ESP_ARDUINO_VERSION_MAJOR < 3
         ETH.begin(pin.eth_phy_addr, pin.eth_power, pin.eth_mdc, pin.eth_mdio, pin.eth_type, pin.eth_clk_mode);
@@ -48,6 +50,7 @@ void NetworkSettingsClass::init(Scheduler& scheduler)
         ETH.begin(pin.eth_type, pin.eth_phy_addr, pin.eth_mdc, pin.eth_mdio, pin.eth_power, pin.eth_clk_mode);
 #endif
     }
+#endif
 
     setupMode();
 
@@ -98,7 +101,7 @@ void NetworkSettingsClass::NetworkEvent(const WiFiEvent_t event, WiFiEventInfo_t
         break;
     case ARDUINO_EVENT_WIFI_STA_DISCONNECTED:
         // Reason codes can be found here: https://github.com/espressif/esp-idf/blob/5454d37d496a8c58542eb450467471404c606501/components/esp_wifi/include/esp_wifi_types_generic.h#L79-L141
-        MessageOutput.printf("WiFi disconnected: %d\r\n", info.wifi_sta_disconnected.reason);
+        MessageOutput.printf("WiFi disconnected: %" PRId8 "\r\n", info.wifi_sta_disconnected.reason);
         if (_networkMode == network_mode::WiFi) {
             MessageOutput.println("Try reconnecting");
             WiFi.disconnect(true, false);
@@ -122,7 +125,7 @@ bool NetworkSettingsClass::onEvent(DtuNetworkEventCb cbEvent, const network_even
     if (!cbEvent) {
         return pdFALSE;
     }
-    NetworkEventCbList_t newEventHandler;
+    DtuNetworkEventCbList_t newEventHandler;
     newEventHandler.cb = cbEvent;
     newEventHandler.event = event;
     _cbEventList.push_back(newEventHandler);
@@ -226,7 +229,7 @@ void NetworkSettingsClass::loop()
         if (_adminEnabled && _adminTimeoutCounterMax > 0) {
             _adminTimeoutCounter++;
             if (_adminTimeoutCounter % 10 == 0) {
-                MessageOutput.printf("Admin AP remaining seconds: %d / %d\r\n", _adminTimeoutCounter, _adminTimeoutCounterMax);
+                MessageOutput.printf("Admin AP remaining seconds: %" PRId32 " / %" PRId32 "\r\n", _adminTimeoutCounter, _adminTimeoutCounterMax);
             }
         }
         _connectTimeoutTimer++;

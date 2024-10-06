@@ -60,7 +60,7 @@ int Utils::getTimezoneOffset()
 bool Utils::checkJsonAlloc(const JsonDocument& doc, const char* function, const uint16_t line)
 {
     if (doc.overflowed()) {
-        MessageOutput.printf("Alloc failed: %s, %d\r\n", function, line);
+        MessageOutput.printf("Alloc failed: %s, %" PRId16 "\r\n", function, line);
         return false;
     }
 

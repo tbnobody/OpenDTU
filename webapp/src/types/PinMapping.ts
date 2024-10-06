@@ -60,4 +60,4 @@ export interface Device {
     battery: Battery;
 }
 
-export interface PinMapping extends Array<Device> {}
+export type PinMapping = Array<Device>;

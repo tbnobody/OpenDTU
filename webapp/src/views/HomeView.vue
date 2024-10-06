@@ -297,6 +297,16 @@
                                                         <td>{{ $n(inverter.radio_stats.tx_re_request) }}</td>
                                                         <td></td>
                                                     </tr>
+                                                    <tr>
+                                                        <td>
+                                                            {{ $t('home.Rssi') }}
+                                                            <BIconInfoCircle v-tooltip :title="$t('home.RssiHint')" />
+                                                        </td>
+                                                        <td>
+                                                            {{ $t('home.dBm', { dbm: $n(inverter.radio_stats.rssi) }) }}
+                                                        </td>
+                                                        <td></td>
+                                                    </tr>
                                                 </tbody>
                                             </table>
                                             <button
@@ -511,6 +521,7 @@ import {
     BIconCheckCircleFill,
     BIconCpu,
     BIconExclamationCircleFill,
+    BIconInfoCircle,
     BIconJournalText,
     BIconOutlet,
     BIconPower,
@@ -537,6 +548,7 @@ export default defineComponent({
         BIconCheckCircleFill,
         BIconCpu,
         BIconExclamationCircleFill,
+        BIconInfoCircle,
         BIconJournalText,
         BIconOutlet,
         BIconPower,
@@ -755,7 +767,9 @@ export default defineComponent({
         },
         // Send heartbeat packets regularly * 59s Send a heartbeat
         heartCheck(duration: number = 59) {
-            this.heartInterval && clearTimeout(this.heartInterval);
+            if (this.heartInterval) {
+                clearTimeout(this.heartInterval);
+            }
             this.heartInterval = setInterval(() => {
                 if (this.socket.readyState === 1) {
                     // Connection status
@@ -768,7 +782,9 @@ export default defineComponent({
         /** To break off websocket Connect */
         closeSocket() {
             this.socket.close();
-            this.heartInterval && clearTimeout(this.heartInterval);
+            if (this.heartInterval) {
+                clearTimeout(this.heartInterval);
+            }
             this.isFirstFetchAfterConnect = true;
         },
         onShowEventlog(serial: string) {
