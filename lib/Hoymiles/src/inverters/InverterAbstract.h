@@ -133,7 +133,7 @@ private:
     bool _zeroYieldDayOnMidnight = false;
     bool _clearEventlogOnMidnight = false;
 
-    int8_t _lastRssi = 0;
+    int8_t _lastRssi = -127;
 
     std::unique_ptr<AlarmLogParser> _alarmLogParser;
     std::unique_ptr<DevInfoParser> _devInfoParser;
