@@ -385,7 +385,7 @@ export default defineComponent({
                 return;
             }
             const srcId = this.getNumberFromLedId((event.target as Element).id);
-            this.deviceConfigList.led.every((v) => (v.brightness = this.deviceConfigList.led[srcId].brightness));
+            this.deviceConfigList.led.map((v) => (v.brightness = this.deviceConfigList.led[srcId].brightness));
         },
     },
 });
