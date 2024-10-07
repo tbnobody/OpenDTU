@@ -433,7 +433,7 @@
         "Cancel": "@:base.Cancel",
         "RebootOpenDTU": "OpenDTU neu starten",
         "RebootQuestion": "Möchten Sie das Gerät wirklich neu starten?",
-        "RebootHint": "<b>Hinweis:</b> Ein manueller Neustart muss normalerweise nicht durchgeführt werden. OpenDTU führt jeden erforderlichen Neustart (z. B. nach einem Firmware-Update) automatisch durch. Einstellungen werden auch ohne Neustart übernommen. Wenn Sie aufgrund eines Fehlers einen Neustart durchführen müssen, denken Sie bitte daran, diesen unter <a href=\"https://github.com/helgeerbe/OpenDTU-OnBattery/issues\" class=\"alert-link\" target=\"_blank\">Github</a> zu melden."
+        "RebootHint": "<b>Hinweis:</b> Ein manueller Neustart muss normalerweise nicht durchgeführt werden. OpenDTU führt jeden erforderlichen Neustart (z. B. nach einem Firmware-Update) automatisch durch. Einstellungen werden auch ohne Neustart übernommen. Wenn Sie aufgrund eines Fehlers einen Neustart durchführen müssen, denken Sie bitte daran, diesen unter <a href=\"https://github.com/hoylabs/OpenDTU-OnBattery/issues\" class=\"alert-link\" target=\"_blank\">Github</a> zu melden."
     },
     "dtuadmin": {
         "DtuSettings": "DTU-Einstellungen",
@@ -809,11 +809,11 @@
         "ProjectOriginBody3": "Die Software wurde nach bestem Wissen und Gewissen entwickelt. Dennoch kann keine Haftung für eine Fehlfunktion oder einen Garantieverlust des Wechselrichters übernommen werden.",
         "ProjectOriginBody4": "OpenDTU ist frei verfügbar. Wenn Sie Geld für die Software bezahlt haben, wurden Sie wahrscheinlich abgezockt.",
         "NewsUpdates": "Neuigkeiten und Updates",
-        "NewsUpdatesBody": "Neue Updates sind auf <a href=\"https://github.com/helgeerbe/OpenDTU-OnBattery/releases\" target=\"_blank\">Github</a> zu finden.",
+        "NewsUpdatesBody": "Neue Updates sind auf <a href=\"https://github.com/hoylabs/OpenDTU-OnBattery/releases\" target=\"_blank\">Github</a> zu finden.",
         "ErrorReporting": "Fehlerberichte",
-        "ErrorReportingBody": "Bitte melden Sie Probleme über die Ticketverwaltung von <a href=\"https://github.com/helgeerbe/OpenDTU-OnBattery/issues\" target=\"_blank\">Github</a>.",
+        "ErrorReportingBody": "Bitte melden Sie Probleme über die Ticketverwaltung von <a href=\"https://github.com/hoylabs/OpenDTU-OnBattery/issues\" target=\"_blank\">Github</a>.",
         "Discussion": "Diskussion",
-        "DiscussionBody": "Diskutieren Sie mit uns auf <a href=\"https://discord.gg/WzhxEY62mB\" target=\"_blank\">Discord</a> oder <a href=\"https://github.com/helgeerbe/OpenDTU-OnBattery/discussions\" target=\"_blank\">Github</a>."
+        "DiscussionBody": "Diskutieren Sie mit uns auf <a href=\"https://discord.gg/WzhxEY62mB\" target=\"_blank\">Discord</a> oder <a href=\"https://github.com/hoylabs/OpenDTU-OnBattery/discussions\" target=\"_blank\">Github</a>."
     },
     "hints": {
         "RadioProblem": "Es konnte keine Verbindung zu einem der konfigurierten Funkmodule hergestellt werden. Bitte überprüfen Sie die Verdrahtung.",

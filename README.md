@@ -3,7 +3,7 @@
   - [Documentation](#documentation)
   - [State of the project](#state-of-the-project)
   - [History of the project](#history-of-the-project)
-  - [Acknowledgment](#acknowledgment)
+  - [Acknowledgments](#acknowledgments)
 
 # OpenDTU-OnBattery
 
@@ -14,9 +14,9 @@ disabled while "create release badge" action is broken, see .github/build.yml
 ![GitHub tag (latest SemVer)](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/helgeerbe/68b47cc8c8994d04ab3a4fa9d8aee5e6/raw/openDTUcoreRelease.json)
 --->
 
-[![OpenDTU-OnBattery Build](https://github.com/helgeerbe/OpenDTU-OnBattery/actions/workflows/build.yml/badge.svg)](https://github.com/helgeerbe/OpenDTU-OnBattery/actions/workflows/build.yml)
-[![cpplint](https://github.com/helgeerbe/OpenDTU-OnBattery/actions/workflows/cpplint.yml/badge.svg)](https://github.com/helgeerbe/OpenDTU-OnBattery/actions/workflows/cpplint.yml)
-[![Yarn Linting](https://github.com/helgeerbe/OpenDTU-OnBattery/actions/workflows/yarnlint.yml/badge.svg)](https://github.com/helgeerbe/OpenDTU-OnBattery/actions/workflows/yarnlint.yml)
+[![OpenDTU-OnBattery Build](https://github.com/hoylabs/OpenDTU-OnBattery/actions/workflows/build.yml/badge.svg)](https://github.com/hoylabs/OpenDTU-OnBattery/actions/workflows/build.yml)
+[![cpplint](https://github.com/hoylabs/OpenDTU-OnBattery/actions/workflows/cpplint.yml/badge.svg)](https://github.com/hoylabs/OpenDTU-OnBattery/actions/workflows/cpplint.yml)
+[![Yarn Linting](https://github.com/hoylabs/OpenDTU-OnBattery/actions/workflows/yarnlint.yml/badge.svg)](https://github.com/hoylabs/OpenDTU-OnBattery/actions/workflows/yarnlint.yml)
 
 ## What is OpenDTU-OnBattery
 
@@ -33,10 +33,10 @@ The canonical documentation of OpenDTU-OnBattery is hosted at
 
 You may find additional helpful information in the project's
 community-maintained [Github
-Wiki](https://github.com/helgeerbe/OpenDTU-OnBattery/wiki).
+Wiki](https://github.com/hoylabs/OpenDTU-OnBattery/wiki).
 
 To find out what's new or improved have a look at the changelog of the
-[releases](https://github.com/helgeerbe/OpenDTU-OnBattery/releases).
+[releases](https://github.com/hoylabs/OpenDTU-OnBattery/releases).
 
 ## State of the project
 
@@ -57,10 +57,15 @@ didn't like the idea to set up a separate ESP32 to receive the charger's data.
 He decided to fork OpenDTU and extend it with battery charger support and a
 Dynamic Power Limiter.
 
-## Acknowledgment
+In early October 2024, the project moved to the newly founded GitHub
+organisation `hoylabs` and is since maintained by multiple community members.
 
-A special Thank to Thomas Basler (tbnobody) the author of the original [OpenDTU](https://github.com/tbnobody/OpenDTU) project. You are doing a great job!
+## Acknowledgments
 
-@helgeerbe: Last but not least, I would like to thank all the contributors.
-With your ideas and enhancements, you have made OpenDTU-OnBattery much more
-than I originally had in mind.
+* Special thanks to Thomas Basler (@tbnobody), the author of the [upstream
+  project](https://github.com/tbnobody/OpenDTU), for hist continued effort!
+* Thanks to @helgeerbe for starting OpenDTU-OnBattery and his dedication to the
+  project, as well as his trust in the current maintainers of the project,
+  which act as part of the `hoylabs` GitHub organisation.
+* We like to thank all contributors. With your ideas and enhancements, you have
+  made OpenDTU-OnBattery much more than @helgeerbe originally had in mind.

@@ -79,7 +79,7 @@ export default defineComponent({
             }
 
             const fetchUrl =
-                'https://api.github.com/repos/helgeerbe/OpenDTU-OnBattery/compare/' +
+                'https://api.github.com/repos/hoylabs/OpenDTU-OnBattery/compare/' +
                 this.systemDataList.git_hash +
                 '...' +
                 this.systemDataList.git_branch;
