@@ -6,17 +6,23 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
+    defaults:
+      run:
+        working-directory: webapp
+
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
+      - name: Enable Corepack
+        run: corepack enable
       - name: Setup Node.js and yarn
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
-          node-version: "18"
+          node-version: "22"
           cache: "yarn"
           cache-dependency-path: "webapp/yarn.lock"
 
       - name: Install WebApp dependencies
-        run: yarn --cwd webapp install --frozen-lockfile
+        run: yarn install --frozen-lockfile
 
       - name: Linting
-        run: yarn --cwd webapp lint
+        run: yarn lint

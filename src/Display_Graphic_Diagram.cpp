@@ -87,7 +87,7 @@ void DisplayGraphicDiagramClass::redraw(uint8_t screenSaverOffsetX, uint8_t xPos
     if (maxWatts > 999) {
         snprintf(fmtText, sizeof(fmtText), "%2.1fkW", maxWatts / 1000);
     } else {
-        snprintf(fmtText, sizeof(fmtText), "%dW", static_cast<uint16_t>(maxWatts));
+        snprintf(fmtText, sizeof(fmtText), "%" PRId16 "W", static_cast<uint16_t>(maxWatts));
     }
 
     if (isFullscreen) {

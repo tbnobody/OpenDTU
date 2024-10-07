@@ -1,0 +1,28 @@
+name: Yarn Prettier
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: webapp
+
+    steps:
+      - uses: actions/checkout@v4
+      - name: Enable Corepack
+        run: corepack enable
+      - name: Setup Node.js and yarn
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: "yarn"
+          cache-dependency-path: "webapp/yarn.lock"
+
+      - name: Install WebApp dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Check Formatting
+        run: yarn prettier --check src/

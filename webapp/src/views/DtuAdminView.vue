@@ -48,7 +48,7 @@
                             <input
                                 type="range"
                                 class="form-control form-range"
-                                v-model="dtuConfigList.cmt_palevel"
+                                v-model.number="dtuConfigList.cmt_palevel"
                                 min="-10"
                                 max="20"
                                 id="inputCmtPaLevel"
@@ -89,7 +89,7 @@
                             <input
                                 type="range"
                                 class="form-control form-range"
-                                v-model="dtuConfigList.cmt_frequency"
+                                v-model.number="dtuConfigList.cmt_frequency"
                                 :min="cmtMinFrequency"
                                 :max="cmtMaxFrequency"
                                 :step="dtuConfigList.cmt_chan_width"

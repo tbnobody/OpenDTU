@@ -141,7 +141,19 @@
         "Unknown": "Unbekannt",
         "ShowGridProfile": "Zeige Grid Profil",
         "GridProfile": "Grid Profil",
-        "LoadingInverter": "Warte auf Daten... (kann bis zu 10 Sekunden dauern)"
+        "LoadingInverter": "Warte auf Daten... (kann bis zu 10 Sekunden dauern)",
+        "RadioStats": "Funkstatistik",
+        "TxRequest": "Gesendete Anfragen",
+        "RxSuccess": "Empfang Erfolgreich",
+        "RxFailNothing": "Empfang Fehler: Nichts empfangen",
+        "RxFailPartial": "Empfang Fehler: Teilweise empfangen",
+        "RxFailCorrupt": "Empfang Fehler: Beschädigt empfangen",
+        "TxReRequest": "Gesendete Fragment Wiederanforderungen",
+        "StatsReset": "Statistiken zurücksetzen",
+        "StatsResetting": "Zurücksetzen...",
+        "Rssi": "RSSI des zuletzt empfangenen Paketes",
+        "RssiHint": "HM-Wechselrichter unterstützen nur RSSI-Werte  < -64 dBm und > -64 dBm. In diesem Fall wird -80 dBm und -30 dBm angezeigt.",
+        "dBm": "{dbm} dBm"
     },
     "eventlog": {
         "Start": "Beginn",

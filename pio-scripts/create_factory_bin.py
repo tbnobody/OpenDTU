@@ -18,13 +18,35 @@
 
 Import("env")
 
+env = DefaultEnvironment()
 platform = env.PioPlatform()
 
 import sys
-from os.path import join, getsize
+import csv
+import subprocess
+import shutil
+from os.path import join, getsize, exists, isdir
+from os import listdir
 
 sys.path.append(join(platform.get_package_dir("tool-esptoolpy")))
 import esptool
+
+def esp32_build_filesystem(fs_name, fs_size):
+    filesystem_dir = env.subst("$PROJECT_DATA_DIR")
+    print("Creating %dKiB filesystem with content:" % (int(fs_size, 0)/1024) )
+    if not isdir(filesystem_dir) or not listdir(filesystem_dir):
+        print("No files added -> will NOT create littlefs.bin and NOT overwrite fs partition!")
+        return False
+    # this does not work on GitHub, results in 'mklittlefs: No such file or directory'
+    tool =  shutil.which(env.subst(env["MKFSTOOL"]))
+    if tool is None or not exists(tool):
+        print("Using fallback mklittlefs")
+        tool = "~/.platformio/packages/tool-mklittlefs/mklittlefs"
+
+    cmd = (tool, "-c", filesystem_dir, "-s", fs_size, fs_name)
+    returncode = subprocess.call(cmd, shell=False)
+    print("Return Code:", returncode)
+    return True
 
 def esp32_create_combined_bin(source, target, env):
     print("Generating combined binary for serial flashing")
@@ -32,6 +54,28 @@ def esp32_create_combined_bin(source, target, env):
     # The offset from begin of the file where the app0 partition starts
     # This is defined in the partition .csv file
     app_offset = 0x10000
+    fs_offset = -1
+    fs_name = env.subst("$BUILD_DIR/littlefs.bin")
+
+    with open(env.BoardConfig().get("build.partitions")) as csv_file:
+        print("Read partitions from ", env.BoardConfig().get("build.partitions"))
+        csv_reader = csv.reader(csv_file, delimiter=',')
+        line_count = 0
+        for row in csv_reader:
+            if line_count == 0:
+                print(f'{",  ".join(row)}')
+                line_count += 1
+            else:
+                if (len(row) < 4):
+                    continue
+                print(f'{row[0]}   {row[1]}   {row[2]}   {row[3]}   {row[4]}')
+                line_count += 1
+                if(row[0] == 'app0'):
+                    app_offset = int(row[3], base=16)
+                elif(row[0] == 'spiffs'):
+                    partition_size = row[4]
+                    if esp32_build_filesystem(fs_name, partition_size):
+                        fs_offset = int(row[3], base=16)
 
     new_file_name = env.subst("$BUILD_DIR/${PROGNAME}.factory.bin")
     sections = env.subst(env.get("FLASH_EXTRA_IMAGES"))
@@ -76,6 +120,10 @@ def esp32_create_combined_bin(source, target, env):
 
     print(f" - {hex(app_offset)} | {firmware_name}")
     cmd += [hex(app_offset), firmware_name]
+
+    if fs_offset != -1:
+        print(f" - {hex(fs_offset)} | {fs_name}")
+        cmd += [hex(fs_offset), fs_name]
 
     print('Using esptool.py arguments: %s' % ' '.join(cmd))
 

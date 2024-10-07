@@ -141,7 +141,19 @@
         "Unknown": "Inconnu",
         "ShowGridProfile": "Show Grid Profile",
         "GridProfile": "Grid Profile",
-        "LoadingInverter": "Waiting for data... (can take up to 10 seconds)"
+        "LoadingInverter": "Waiting for data... (can take up to 10 seconds)",
+        "RadioStats": "Radio Statistics",
+        "TxRequest": "TX Request Count",
+        "RxSuccess": "RX Success",
+        "RxFailNothing": "RX Fail: Receive Nothing",
+        "RxFailPartial": "RX Fail: Receive Partial",
+        "RxFailCorrupt": "RX Fail: Receive Corrupt",
+        "TxReRequest": "TX Re-Request Fragment",
+        "StatsReset": "Reset Statistics",
+        "StatsResetting": "Resetting...",
+        "Rssi": "RSSI of last received packet",
+        "RssiHint": "HM inverters only support RSSI values < -64 dBm and > -64 dBm. In this case, -80 dbm and -30 dbm is shown.",
+        "dBm": "{dbm} dBm"
     },
     "eventlog": {
         "Start": "Départ",

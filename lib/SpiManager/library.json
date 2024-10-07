@@ -1,0 +1,13 @@
+{
+    "name": "SpiManager",
+    "keywords": "spi",
+    "description": "Library for managing the allocation of dedicated or shared SPI buses on the ESP32.",
+    "authors": {
+        "name": "Lennart Ferlemann"
+    },
+    "version": "0.0.1",
+    "frameworks": "arduino",
+    "platforms": [
+        "espressif32"
+    ]
+}

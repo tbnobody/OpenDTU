@@ -6,7 +6,7 @@
     "paths": {
       "@/*": ["./src/*"]
     },
-    "lib": ["ES2021", "DOM"],
+    "lib": ["ES2023", "DOM"],
     "moduleResolution": "Node",
 
     /* Linting */

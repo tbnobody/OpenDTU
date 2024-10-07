@@ -49,7 +49,7 @@ void WebApiDtuClass::onDtuAdminGet(AsyncWebServerRequest* request)
 
     // DTU Serial is read as HEX
     char buffer[sizeof(uint64_t) * 8 + 1];
-    snprintf(buffer, sizeof(buffer), "%0x%08x",
+    snprintf(buffer, sizeof(buffer), "%0" PRIx32 "%08" PRIx32,
         ((uint32_t)((config.Dtu.Serial >> 32) & 0xFFFFFFFF)),
         ((uint32_t)(config.Dtu.Serial & 0xFFFFFFFF)));
     root["serial"] = buffer;
@@ -90,12 +90,12 @@ void WebApiDtuClass::onDtuAdminPost(AsyncWebServerRequest* request)
 
     auto& retMsg = response->getRoot();
 
-    if (!(root.containsKey("serial")
-            && root.containsKey("pollinterval")
-            && root.containsKey("nrf_palevel")
-            && root.containsKey("cmt_palevel")
-            && root.containsKey("cmt_frequency")
-            && root.containsKey("cmt_country"))) {
+    if (!(root["serial"].is<String>()
+            && root["pollinterval"].is<uint32_t>()
+            && root["nrf_palevel"].is<uint8_t>()
+            && root["cmt_palevel"].is<int8_t>()
+            && root["cmt_frequency"].is<uint32_t>()
+            && root["cmt_country"].is<uint8_t>())) {
         retMsg["message"] = "Values are missing!";
         retMsg["code"] = WebApiError::GenericValueMissing;
         WebApi.sendJsonResponse(request, response, __FUNCTION__, __LINE__);

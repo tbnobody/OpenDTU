@@ -6,7 +6,7 @@
 #include "Configuration.h"
 #include "Display_Graphic.h"
 #include "PinMapping.h"
-#include "Utils.h"
+#include "RestartHelper.h"
 #include "WebApi.h"
 #include "WebApi_errors.h"
 #include "helper.h"
@@ -50,6 +50,15 @@ void WebApiDeviceClass::onDeviceAdminGet(AsyncWebServerRequest* request)
     cmtPinObj["gpio2"] = pin.cmt_gpio2;
     cmtPinObj["gpio3"] = pin.cmt_gpio3;
 
+    auto w5500PinObj = curPin["w5500"].to<JsonObject>();
+    w5500PinObj["sclk"] = pin.w5500_sclk;
+    w5500PinObj["mosi"] = pin.w5500_mosi;
+    w5500PinObj["miso"] = pin.w5500_miso;
+    w5500PinObj["cs"] = pin.w5500_cs;
+    w5500PinObj["int"] = pin.w5500_int;
+    w5500PinObj["rst"] = pin.w5500_rst;
+
+#if CONFIG_ETH_USE_ESP32_EMAC
     auto ethPinObj = curPin["eth"].to<JsonObject>();
     ethPinObj["enabled"] = pin.eth_enabled;
     ethPinObj["phy_addr"] = pin.eth_phy_addr;
@@ -58,6 +67,7 @@ void WebApiDeviceClass::onDeviceAdminGet(AsyncWebServerRequest* request)
     ethPinObj["mdio"] = pin.eth_mdio;
     ethPinObj["type"] = pin.eth_type;
     ethPinObj["clk_mode"] = pin.eth_clk_mode;
+#endif
 
     auto displayPinObj = curPin["display"].to<JsonObject>();
     displayPinObj["type"] = pin.display_type;
@@ -103,8 +113,8 @@ void WebApiDeviceClass::onDeviceAdminPost(AsyncWebServerRequest* request)
 
     auto& retMsg = response->getRoot();
 
-    if (!(root.containsKey("curPin")
-            || root.containsKey("display"))) {
+    if (!(root["curPin"].is<JsonObject>()
+            || root["display"].is<JsonObject>())) {
         retMsg["message"] = "Values are missing!";
         retMsg["code"] = WebApiError::GenericValueMissing;
         WebApi.sendJsonResponse(request, response, __FUNCTION__, __LINE__);
@@ -149,6 +159,6 @@ void WebApiDeviceClass::onDeviceAdminPost(AsyncWebServerRequest* request)
     WebApi.sendJsonResponse(request, response, __FUNCTION__, __LINE__);
 
     if (performRestart) {
-        Utils::restartDtu();
+        RestartHelper.triggerRestart();
     }
 }

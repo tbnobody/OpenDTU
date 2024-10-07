@@ -84,7 +84,7 @@ export default defineComponent({
             this.socket.onmessage = (event) => {
                 console.log(event);
 
-                let outstr = new String(event.data);
+                let outstr = String(event.data);
                 let removedNewline = false;
                 if (outstr.endsWith('\n')) {
                     outstr = outstr.substring(0, outstr.length - 1);
@@ -108,7 +108,9 @@ export default defineComponent({
         },
         // Send heartbeat packets regularly * 59s Send a heartbeat
         heartCheck() {
-            this.heartInterval && clearTimeout(this.heartInterval);
+            if (this.heartInterval) {
+                clearTimeout(this.heartInterval);
+            }
             this.heartInterval = setInterval(() => {
                 if (this.socket.readyState === 1) {
                     // Connection status
@@ -126,7 +128,9 @@ export default defineComponent({
                 // continue regardless of error
             }
 
-            this.heartInterval && clearTimeout(this.heartInterval);
+            if (this.heartInterval) {
+                clearTimeout(this.heartInterval);
+            }
         },
         getOutDate(): string {
             const u = new Date();

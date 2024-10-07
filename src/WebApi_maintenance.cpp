@@ -4,7 +4,7 @@
  */
 
 #include "WebApi_maintenance.h"
-#include "Utils.h"
+#include "RestartHelper.h"
 #include "WebApi.h"
 #include "WebApi_errors.h"
 #include <AsyncJson.h>
@@ -30,7 +30,7 @@ void WebApiMaintenanceClass::onRebootPost(AsyncWebServerRequest* request)
 
     auto& retMsg = response->getRoot();
 
-    if (!(root.containsKey("reboot"))) {
+    if (!(root["reboot"].is<bool>())) {
         retMsg["message"] = "Values are missing!";
         retMsg["code"] = WebApiError::GenericValueMissing;
         WebApi.sendJsonResponse(request, response, __FUNCTION__, __LINE__);
@@ -43,7 +43,7 @@ void WebApiMaintenanceClass::onRebootPost(AsyncWebServerRequest* request)
         retMsg["code"] = WebApiError::MaintenanceRebootTriggered;
 
         WebApi.sendJsonResponse(request, response, __FUNCTION__, __LINE__);
-        Utils::restartDtu();
+        RestartHelper.triggerRestart();
     } else {
         retMsg["message"] = "Reboot cancled!";
         retMsg["code"] = WebApiError::MaintenanceRebootCancled;

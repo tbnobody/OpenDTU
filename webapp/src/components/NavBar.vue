@@ -216,7 +216,9 @@ export default defineComponent({
             this.$router.push('/');
         },
         onClick() {
-            this.$refs.navbarCollapse && (this.$refs.navbarCollapse as HTMLElement).classList.remove('show');
+            if (this.$refs.navbarCollapse) {
+                (this.$refs.navbarCollapse as HTMLElement).classList.remove('show');
+            }
         },
         getEasterSunday(year: number): Date {
             const f = Math.floor;

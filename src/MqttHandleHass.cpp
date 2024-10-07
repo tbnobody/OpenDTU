@@ -7,8 +7,8 @@
 #include "MqttSettings.h"
 #include "NetworkSettings.h"
 #include "Utils.h"
-#include "defaults.h"
 #include "__compiled_constants.h"
+#include "defaults.h"
 
 MqttHandleHassClass MqttHandleHass;
 
@@ -58,29 +58,46 @@ void MqttHandleHassClass::publishConfig()
     const CONFIG_T& config = Configuration.get();
 
     // publish DTU sensors
-    publishDtuSensor("IP", "", "diagnostic", "mdi:network-outline", "", "");
-    publishDtuSensor("WiFi Signal", "signal_strength", "diagnostic", "", "dBm", "rssi");
-    publishDtuSensor("Uptime", "duration", "diagnostic", "", "s", "");
-    publishDtuBinarySensor("Status", "connectivity", "diagnostic", config.Mqtt.Lwt.Value_Online, config.Mqtt.Lwt.Value_Offline, config.Mqtt.Lwt.Topic);
+    publishDtuSensor("IP", "dtu/ip", "", "mdi:network-outline", DEVICE_CLS_NONE, STATE_CLS_NONE, CATEGORY_DIAGNOSTIC);
+    publishDtuSensor("WiFi Signal", "dtu/rssi", "dBm", "", DEVICE_CLS_SIGNAL_STRENGTH, STATE_CLS_NONE, CATEGORY_DIAGNOSTIC);
+    publishDtuSensor("Uptime", "dtu/uptime", "s", "", DEVICE_CLS_DURATION, STATE_CLS_NONE, CATEGORY_DIAGNOSTIC);
+    publishDtuSensor("Temperature", "dtu/temperature", "°C", "", DEVICE_CLS_TEMPERATURE, STATE_CLS_MEASUREMENT, CATEGORY_DIAGNOSTIC);
+    publishDtuSensor("Heap Size", "dtu/heap/size", "Bytes", "mdi:memory", DEVICE_CLS_NONE, STATE_CLS_NONE, CATEGORY_DIAGNOSTIC);
+    publishDtuSensor("Heap Free", "dtu/heap/free", "Bytes", "mdi:memory", DEVICE_CLS_NONE, STATE_CLS_NONE, CATEGORY_DIAGNOSTIC);
+    publishDtuSensor("Largest Free Heap Block", "dtu/heap/maxalloc", "Bytes", "mdi:memory", DEVICE_CLS_NONE, STATE_CLS_NONE, CATEGORY_DIAGNOSTIC);
+    publishDtuSensor("Lifetime Minimum Free Heap", "dtu/heap/minfree", "Bytes", "mdi:memory", DEVICE_CLS_NONE, STATE_CLS_NONE, CATEGORY_DIAGNOSTIC);
 
-    yield();
+    publishDtuSensor("Yield Total", "ac/yieldtotal", "kWh", "", DEVICE_CLS_ENERGY, STATE_CLS_TOTAL_INCREASING, CATEGORY_NONE);
+    publishDtuSensor("Yield Day", "ac/yieldday", "Wh", "", DEVICE_CLS_ENERGY, STATE_CLS_TOTAL_INCREASING, CATEGORY_NONE);
+    publishDtuSensor("AC Power", "ac/power", "W", "", DEVICE_CLS_PWR, STATE_CLS_MEASUREMENT, CATEGORY_NONE);
+
+    publishDtuBinarySensor("Status", config.Mqtt.Lwt.Topic, config.Mqtt.Lwt.Value_Online, config.Mqtt.Lwt.Value_Offline, DEVICE_CLS_CONNECTIVITY, STATE_CLS_NONE, CATEGORY_DIAGNOSTIC);
 
     // Loop all inverters
     for (uint8_t i = 0; i < Hoymiles.getNumInverters(); i++) {
         auto inv = Hoymiles.getInverterByPos(i);
 
-        publishInverterButton(inv, "Turn Inverter Off", "mdi:power-plug-off", "config", "", "cmd/power", "0");
-        publishInverterButton(inv, "Turn Inverter On", "mdi:power-plug", "config", "", "cmd/power", "1");
-        publishInverterButton(inv, "Restart Inverter", "", "config", "restart", "cmd/restart", "1");
+        publishInverterButton(inv, "Turn Inverter Off", "cmd/power", "0", "mdi:power-plug-off", DEVICE_CLS_NONE, STATE_CLS_NONE, CATEGORY_CONFIG);
+        publishInverterButton(inv, "Turn Inverter On", "cmd/power", "1", "mdi:power-plug", DEVICE_CLS_NONE, STATE_CLS_NONE, CATEGORY_CONFIG);
+        publishInverterButton(inv, "Restart Inverter", "cmd/restart", "1", "", DEVICE_CLS_RESTART, STATE_CLS_NONE, CATEGORY_CONFIG);
+        publishInverterButton(inv, "Reset Radio Statistics", "cmd/reset_rf_stats", "1", "", DEVICE_CLS_NONE, STATE_CLS_NONE, CATEGORY_CONFIG);
 
-        publishInverterNumber(inv, "Limit NonPersistent Relative", "mdi:speedometer", "config", "cmd/limit_nonpersistent_relative", "status/limit_relative", "%", 0, 100, 0.1);
-        publishInverterNumber(inv, "Limit Persistent Relative", "mdi:speedometer", "config", "cmd/limit_persistent_relative", "status/limit_relative", "%", 0, 100, 0.1);
+        publishInverterNumber(inv, "Limit NonPersistent Relative", "status/limit_relative", "cmd/limit_nonpersistent_relative", 0, 100, 0.1, "%", "mdi:speedometer", STATE_CLS_NONE, CATEGORY_CONFIG);
+        publishInverterNumber(inv, "Limit Persistent Relative", "status/limit_relative", "cmd/limit_persistent_relative", 0, 100, 0.1, "%", "mdi:speedometer", STATE_CLS_NONE, CATEGORY_CONFIG);
 
-        publishInverterNumber(inv, "Limit NonPersistent Absolute", "mdi:speedometer", "config", "cmd/limit_nonpersistent_absolute", "status/limit_absolute", "W", 0, MAX_INVERTER_LIMIT);
-        publishInverterNumber(inv, "Limit Persistent Absolute", "mdi:speedometer", "config", "cmd/limit_persistent_absolute", "status/limit_absolute", "W", 0, MAX_INVERTER_LIMIT);
+        publishInverterNumber(inv, "Limit NonPersistent Absolute", "status/limit_absolute", "cmd/limit_nonpersistent_absolute", 0, MAX_INVERTER_LIMIT, 1, "W", "mdi:speedometer", STATE_CLS_NONE, CATEGORY_CONFIG);
+        publishInverterNumber(inv, "Limit Persistent Absolute", "status/limit_absolute", "cmd/limit_persistent_absolute", 0, MAX_INVERTER_LIMIT, 1, "W", "mdi:speedometer", STATE_CLS_NONE, CATEGORY_CONFIG);
 
-        publishInverterBinarySensor(inv, "Reachable", "status/reachable", "1", "0");
-        publishInverterBinarySensor(inv, "Producing", "status/producing", "1", "0");
+        publishInverterBinarySensor(inv, "Reachable", "status/reachable", "1", "0", DEVICE_CLS_CONNECTIVITY, STATE_CLS_NONE, CATEGORY_DIAGNOSTIC);
+        publishInverterBinarySensor(inv, "Producing", "status/producing", "1", "0", DEVICE_CLS_NONE, STATE_CLS_NONE, CATEGORY_NONE);
+
+        publishInverterSensor(inv, "TX Requests", "radio/tx_request", "", "", DEVICE_CLS_NONE, STATE_CLS_NONE, CATEGORY_DIAGNOSTIC);
+        publishInverterSensor(inv, "RX Success", "radio/rx_success", "", "", DEVICE_CLS_NONE, STATE_CLS_NONE, CATEGORY_DIAGNOSTIC);
+        publishInverterSensor(inv, "RX Fail Receive Nothing", "radio/rx_fail_nothing", "", "", DEVICE_CLS_NONE, STATE_CLS_NONE, CATEGORY_DIAGNOSTIC);
+        publishInverterSensor(inv, "RX Fail Receive Partial", "radio/rx_fail_partial", "", "", DEVICE_CLS_NONE, STATE_CLS_NONE, CATEGORY_DIAGNOSTIC);
+        publishInverterSensor(inv, "RX Fail Receive Corrupt", "radio/rx_fail_corrupt", "", "", DEVICE_CLS_NONE, STATE_CLS_NONE, CATEGORY_DIAGNOSTIC);
+        publishInverterSensor(inv, "TX Re-Request Fragment", "radio/tx_re_request", "", "", DEVICE_CLS_NONE, STATE_CLS_NONE, CATEGORY_DIAGNOSTIC);
+        publishInverterSensor(inv, "RSSI", "radio/rssi", "dBm", "", DEVICE_CLS_SIGNAL_STRENGTH, STATE_CLS_NONE, CATEGORY_DIAGNOSTIC);
 
         // Loop all channels
         for (auto& t : inv->Statistics()->getChannelTypes()) {
@@ -94,8 +111,6 @@ void MqttHandleHassClass::publishConfig()
                 }
             }
         }
-
-        yield();
     }
 }
 
@@ -128,8 +143,6 @@ void MqttHandleHassClass::publishInverterField(std::shared_ptr<InverterAbstract>
 
     if (!clear) {
         const String stateTopic = MqttSettings.getPrefix() + MqttHandleInverter.getTopic(inv, type, channel, fieldType.fieldId);
-        const char* devCls = deviceClasses[fieldType.deviceClsId];
-        const char* stateCls = stateClasses[fieldType.stateClsId];
 
         String name;
         if (type != TYPE_DC) {
@@ -138,46 +151,34 @@ void MqttHandleHassClass::publishInverterField(std::shared_ptr<InverterAbstract>
             name = "CH" + chanNum + " " + fieldName;
         }
 
+        String unit_of_measure = inv->Statistics()->getChannelFieldUnit(type, channel, fieldType.fieldId);
+
         JsonDocument root;
+        createInverterInfo(root, inv);
+        addCommonMetadata(root, unit_of_measure, "", fieldType.deviceClsId, fieldType.stateClsId, CATEGORY_NONE);
 
         root["name"] = name;
         root["stat_t"] = stateTopic;
         root["uniq_id"] = serial + "_ch" + chanNum + "_" + fieldName;
 
-        String unit_of_measure = inv->Statistics()->getChannelFieldUnit(type, channel, fieldType.fieldId);
-        if (unit_of_measure != "") {
-            root["unit_of_meas"] = unit_of_measure;
-        }
-
-        createInverterInfo(root, inv);
-
         if (Configuration.get().Mqtt.Hass.Expire) {
             root["exp_aft"] = Hoymiles.getNumInverters() * max<uint32_t>(Hoymiles.PollInterval(), Configuration.get().Mqtt.PublishInterval) * inv->getReachableThreshold();
         }
-        if (devCls != 0) {
-            root["dev_cla"] = devCls;
-        }
-        if (stateCls != 0) {
-            root["stat_cla"] = stateCls;
-        }
 
-        if (!Utils::checkJsonAlloc(root, __FUNCTION__, __LINE__)) {
-            return;
-        }
-
-        String buffer;
-        serializeJson(root, buffer);
-        publish(configTopic, buffer);
+        publish(configTopic, root);
     } else {
         publish(configTopic, "");
     }
 }
 
-void MqttHandleHassClass::publishInverterButton(std::shared_ptr<InverterAbstract> inv, const char* caption, const char* icon, const char* category, const char* deviceClass, const char* subTopic, const char* payload)
+void MqttHandleHassClass::publishInverterButton(
+    std::shared_ptr<InverterAbstract> inv, const String& name, const String& state_topic, const String& payload,
+    const String& icon,
+    const DeviceClassType device_class, const StateClassType state_class, const CategoryType category)
 {
     const String serial = inv->serialString();
 
-    String buttonId = caption;
+    String buttonId = name;
     buttonId.replace(" ", "_");
     buttonId.toLowerCase();
 
@@ -185,41 +186,30 @@ void MqttHandleHassClass::publishInverterButton(std::shared_ptr<InverterAbstract
         + "/" + buttonId
         + "/config";
 
-    const String cmdTopic = MqttSettings.getPrefix() + serial + "/" + subTopic;
+    const String cmdTopic = MqttSettings.getPrefix() + serial + "/" + state_topic;
 
     JsonDocument root;
+    createInverterInfo(root, inv);
+    addCommonMetadata(root, "", icon, device_class, state_class, category);
 
-    root["name"] = caption;
+    root["name"] = name;
     root["uniq_id"] = serial + "_" + buttonId;
-    if (strcmp(icon, "")) {
-        root["ic"] = icon;
-    }
-    if (strcmp(deviceClass, "")) {
-        root["dev_cla"] = deviceClass;
-    }
-    root["ent_cat"] = category;
     root["cmd_t"] = cmdTopic;
     root["payload_press"] = payload;
 
-    createInverterInfo(root, inv);
-
-    if (!Utils::checkJsonAlloc(root, __FUNCTION__, __LINE__)) {
-        return;
-    }
-
-    String buffer;
-    serializeJson(root, buffer);
-    publish(configTopic, buffer);
+    publish(configTopic, root);
 }
 
 void MqttHandleHassClass::publishInverterNumber(
-    std::shared_ptr<InverterAbstract> inv, const char* caption, const char* icon, const char* category,
-    const char* commandTopic, const char* stateTopic, const char* unitOfMeasure,
-    const int16_t min, const int16_t max, float step)
+    std::shared_ptr<InverterAbstract> inv, const String& name,
+    const String& stateTopic, const String& command_topic,
+    const int16_t min, const int16_t max, float step,
+    const String& unit_of_measure, const String& icon,
+    const StateClassType state_class, const CategoryType category)
 {
     const String serial = inv->serialString();
 
-    String buttonId = caption;
+    String buttonId = name;
     buttonId.replace(" ", "_");
     buttonId.toLowerCase();
 
@@ -227,150 +217,22 @@ void MqttHandleHassClass::publishInverterNumber(
         + "/" + buttonId
         + "/config";
 
-    const String cmdTopic = MqttSettings.getPrefix() + serial + "/" + commandTopic;
+    const String cmdTopic = MqttSettings.getPrefix() + serial + "/" + command_topic;
     const String statTopic = MqttSettings.getPrefix() + serial + "/" + stateTopic;
 
     JsonDocument root;
+    createInverterInfo(root, inv);
+    addCommonMetadata(root, unit_of_measure, icon, DEVICE_CLS_NONE, state_class, category);
 
-    root["name"] = caption;
+    root["name"] = name;
     root["uniq_id"] = serial + "_" + buttonId;
-    if (strcmp(icon, "")) {
-        root["ic"] = icon;
-    }
-    root["ent_cat"] = category;
     root["cmd_t"] = cmdTopic;
     root["stat_t"] = statTopic;
-    root["unit_of_meas"] = unitOfMeasure;
     root["min"] = min;
     root["max"] = max;
     root["step"] = step;
 
-    createInverterInfo(root, inv);
-
-    if (!Utils::checkJsonAlloc(root, __FUNCTION__, __LINE__)) {
-        return;
-    }
-
-    String buffer;
-    serializeJson(root, buffer);
-    publish(configTopic, buffer);
-}
-
-void MqttHandleHassClass::publishInverterBinarySensor(std::shared_ptr<InverterAbstract> inv, const char* caption, const char* subTopic, const char* payload_on, const char* payload_off)
-{
-    const String serial = inv->serialString();
-
-    String sensorId = caption;
-    sensorId.replace(" ", "_");
-    sensorId.toLowerCase();
-
-    const String configTopic = "binary_sensor/dtu_" + serial
-        + "/" + sensorId
-        + "/config";
-
-    const String statTopic = MqttSettings.getPrefix() + serial + "/" + subTopic;
-
-    JsonDocument root;
-
-    root["name"] = caption;
-    root["uniq_id"] = serial + "_" + sensorId;
-    root["stat_t"] = statTopic;
-    root["pl_on"] = payload_on;
-    root["pl_off"] = payload_off;
-
-    createInverterInfo(root, inv);
-
-    if (!Utils::checkJsonAlloc(root, __FUNCTION__, __LINE__)) {
-        return;
-    }
-
-    String buffer;
-    serializeJson(root, buffer);
-    publish(configTopic, buffer);
-}
-
-void MqttHandleHassClass::publishDtuSensor(const char* name, const char* device_class, const char* category, const char* icon, const char* unit_of_measure, const char* subTopic)
-{
-    String id = name;
-    id.toLowerCase();
-    id.replace(" ", "_");
-    String topic = subTopic;
-    if (topic == "") {
-        topic = id;
-    }
-
-    JsonDocument root;
-
-    root["name"] = name;
-    root["uniq_id"] = getDtuUniqueId() + "_" + id;
-    if (strcmp(device_class, "")) {
-        root["dev_cla"] = device_class;
-    }
-    if (strcmp(category, "")) {
-        root["ent_cat"] = category;
-    }
-    if (strcmp(icon, "")) {
-        root["ic"] = icon;
-    }
-    if (strcmp(unit_of_measure, "")) {
-        root["unit_of_meas"] = unit_of_measure;
-    }
-    root["stat_t"] = MqttSettings.getPrefix() + "dtu" + "/" + topic;
-
-    root["avty_t"] = MqttSettings.getPrefix() + Configuration.get().Mqtt.Lwt.Topic;
-
-    const CONFIG_T& config = Configuration.get();
-    root["pl_avail"] = config.Mqtt.Lwt.Value_Online;
-    root["pl_not_avail"] = config.Mqtt.Lwt.Value_Offline;
-
-    createDtuInfo(root);
-
-    if (!Utils::checkJsonAlloc(root, __FUNCTION__, __LINE__)) {
-        return;
-    }
-
-    String buffer;
-    const String configTopic = "sensor/" + getDtuUniqueId() + "/" + id + "/config";
-    serializeJson(root, buffer);
-    publish(configTopic, buffer);
-}
-
-void MqttHandleHassClass::publishDtuBinarySensor(const char* name, const char* device_class, const char* category, const char* payload_on, const char* payload_off, const char* subTopic)
-{
-    String id = name;
-    id.toLowerCase();
-    id.replace(" ", "_");
-
-    String topic = subTopic;
-    if (!strcmp(subTopic, "")) {
-        topic = String("dtu/") + "/" + id;
-    }
-
-    JsonDocument root;
-
-    root["name"] = name;
-    root["uniq_id"] = getDtuUniqueId() + "_" + id;
-    root["stat_t"] = MqttSettings.getPrefix() + topic;
-    root["pl_on"] = payload_on;
-    root["pl_off"] = payload_off;
-
-    if (strcmp(device_class, "")) {
-        root["dev_cla"] = device_class;
-    }
-    if (strcmp(category, "")) {
-        root["ent_cat"] = category;
-    }
-
-    createDtuInfo(root);
-
-    if (!Utils::checkJsonAlloc(root, __FUNCTION__, __LINE__)) {
-        return;
-    }
-
-    String buffer;
-    const String configTopic = "binary_sensor/" + getDtuUniqueId() + "/" + id + "/config";
-    serializeJson(root, buffer);
-    publish(configTopic, buffer);
+    publish(configTopic, root);
 }
 
 void MqttHandleHassClass::createInverterInfo(JsonDocument& root, std::shared_ptr<InverterAbstract> inv)
@@ -433,4 +295,129 @@ void MqttHandleHassClass::publish(const String& subtopic, const String& payload)
     String topic = Configuration.get().Mqtt.Hass.Topic;
     topic += subtopic;
     MqttSettings.publishGeneric(topic, payload, Configuration.get().Mqtt.Hass.Retain);
+    yield();
+}
+
+void MqttHandleHassClass::publish(const String& subtopic, const JsonDocument& doc)
+{
+    if (!Utils::checkJsonAlloc(doc, __FUNCTION__, __LINE__)) {
+        return;
+    }
+    String buffer;
+    serializeJson(doc, buffer);
+    publish(subtopic, buffer);
+}
+
+void MqttHandleHassClass::addCommonMetadata(
+    JsonDocument& doc,
+    const String& unit_of_measure, const String& icon,
+    const DeviceClassType device_class, const StateClassType state_class, const CategoryType category)
+{
+    if (unit_of_measure != "") {
+        doc["unit_of_meas"] = unit_of_measure;
+    }
+    if (icon != "") {
+        doc["ic"] = icon;
+    }
+    if (device_class != DEVICE_CLS_NONE) {
+        doc["dev_cla"] = deviceClass_name[device_class];
+    }
+    if (state_class != STATE_CLS_NONE) {
+        doc["stat_cla"] = stateClass_name[state_class];;
+    }
+    if (category != CATEGORY_NONE) {
+        doc["ent_cat"] = category_name[category];
+    }
+}
+
+void MqttHandleHassClass::publishBinarySensor(
+    JsonDocument& doc,
+    const String& root_device, const String& unique_id_prefix, const String& name, const String& state_topic, const String& payload_on, const String& payload_off,
+    const DeviceClassType device_class, const StateClassType state_class, const CategoryType category)
+{
+    String sensor_id = name;
+    sensor_id.toLowerCase();
+    sensor_id.replace(" ", "_");
+
+    doc["name"] = name;
+    doc["uniq_id"] = unique_id_prefix + "_" + sensor_id;
+    doc["stat_t"] = MqttSettings.getPrefix() + state_topic;
+    doc["pl_on"] = payload_on;
+    doc["pl_off"] = payload_off;
+
+    addCommonMetadata(doc, "", "", device_class, state_class, category);
+
+    const String configTopic = "binary_sensor/" + root_device + "/" + sensor_id + "/config";
+    publish(configTopic, doc);
+}
+
+void MqttHandleHassClass::publishDtuBinarySensor(
+    const String& name, const String& state_topic, const String& payload_on, const String& payload_off,
+    const DeviceClassType device_class, const StateClassType state_class, const CategoryType category)
+{
+    const String dtuId = getDtuUniqueId();
+
+    JsonDocument root;
+    createDtuInfo(root);
+    publishBinarySensor(root, dtuId, dtuId, name, state_topic, payload_on, payload_off, device_class, state_class, category);
+}
+
+void MqttHandleHassClass::publishInverterBinarySensor(
+    std::shared_ptr<InverterAbstract> inv, const String& name, const String& state_topic, const String& payload_on, const String& payload_off,
+    const DeviceClassType device_class, const StateClassType state_class, const CategoryType category)
+{
+    const String serial = inv->serialString();
+
+    JsonDocument root;
+    createInverterInfo(root, inv);
+    publishBinarySensor(root, "dtu_" + serial, serial, name, serial + "/" + state_topic, payload_on, payload_off, device_class, state_class, category);
+}
+
+void MqttHandleHassClass::publishSensor(
+    JsonDocument& doc,
+    const String& root_device, const String& unique_id_prefix, const String& name, const String& state_topic,
+    const String& unit_of_measure, const String& icon,
+    const DeviceClassType device_class, const StateClassType state_class, const CategoryType category)
+{
+    String sensor_id = name;
+    sensor_id.toLowerCase();
+    sensor_id.replace(" ", "_");
+
+    doc["name"] = name;
+    doc["uniq_id"] = unique_id_prefix + "_" + sensor_id;
+    doc["stat_t"] = MqttSettings.getPrefix() + state_topic;
+
+    addCommonMetadata(doc, unit_of_measure, icon, device_class, state_class, category);
+
+    const CONFIG_T& config = Configuration.get();
+    doc["avty_t"] = MqttSettings.getPrefix() + config.Mqtt.Lwt.Topic;
+    doc["pl_avail"] = config.Mqtt.Lwt.Value_Online;
+    doc["pl_not_avail"] = config.Mqtt.Lwt.Value_Offline;
+
+    const String configTopic = "sensor/" + root_device + "/" + sensor_id + "/config";
+    publish(configTopic, doc);
+}
+
+void MqttHandleHassClass::publishDtuSensor(
+    const String& name, const String& state_topic,
+    const String& unit_of_measure, const String& icon,
+    const DeviceClassType device_class, const StateClassType state_class, const CategoryType category)
+{
+    const String dtuId = getDtuUniqueId();
+
+    JsonDocument root;
+    createDtuInfo(root);
+    publishSensor(root, dtuId, dtuId, name, state_topic, unit_of_measure, icon, device_class, state_class, category);
+}
+
+void MqttHandleHassClass::publishInverterSensor(
+    std::shared_ptr<InverterAbstract> inv, const String& name, const String& state_topic,
+    const String& unit_of_measure, const String& icon,
+    const DeviceClassType device_class, const StateClassType state_class, const CategoryType category)
+{
+    const String serial = inv->serialString();
+
+    JsonDocument root;
+    createInverterInfo(root, inv);
+    publishSensor(root, "dtu_" + serial, serial, name, serial + "/" + state_topic, unit_of_measure, icon, device_class, state_class, category);
 }

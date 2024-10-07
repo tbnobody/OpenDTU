@@ -88,16 +88,16 @@ void WebApiNetworkClass::onNetworkAdminPost(AsyncWebServerRequest* request)
 
     auto& retMsg = response->getRoot();
 
-    if (!(root.containsKey("ssid")
-            && root.containsKey("password")
-            && root.containsKey("hostname")
-            && root.containsKey("dhcp")
-            && root.containsKey("ipaddress")
-            && root.containsKey("netmask")
-            && root.containsKey("gateway")
-            && root.containsKey("dns1")
-            && root.containsKey("dns2")
-            && root.containsKey("aptimeout"))) {
+    if (!(root["ssid"].is<String>()
+            && root["password"].is<String>()
+            && root["hostname"].is<String>()
+            && root["dhcp"].is<bool>()
+            && root["ipaddress"].is<String>()
+            && root["netmask"].is<String>()
+            && root["gateway"].is<String>()
+            && root["dns1"].is<String>()
+            && root["dns2"].is<String>()
+            && root["aptimeout"].is<uint>())) {
         retMsg["message"] = "Values are missing!";
         retMsg["code"] = WebApiError::GenericValueMissing;
         WebApi.sendJsonResponse(request, response, __FUNCTION__, __LINE__);
