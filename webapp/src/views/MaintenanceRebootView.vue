@@ -5,38 +5,34 @@
         </BootstrapAlert>
 
         <CardElement :text="$t('maintenancereboot.PerformReboot')" textVariant="text-bg-primary" center-content>
-            <button class="btn btn-danger" @click="onOpenModal(performReboot)">{{ $t('maintenancereboot.Reboot') }}
+            <button class="btn btn-danger" @click="onOpenModal(performReboot)">
+                {{ $t('maintenancereboot.Reboot') }}
             </button>
 
             <div class="alert alert-danger mt-3" role="alert" v-html="$t('maintenancereboot.RebootHint')"></div>
         </CardElement>
     </BasePage>
 
-    <div class="modal" id="performReboot" tabindex="-1">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">{{ $t('maintenancereboot.RebootOpenDTU') }}</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    {{ $t('maintenancereboot.RebootQuestion') }}
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" @click="onCloseModal(performReboot)"
-                        data-bs-dismiss="modal">{{ $t('maintenancereboot.Cancel') }}</button>
-                    <button type="button" class="btn btn-danger" @click="onReboot">
-                        {{ $t('maintenancereboot.Reboot') }}</button>
-                </div>
-            </div>
-        </div>
-    </div>
+    <ModalDialog
+        modalId="performReboot"
+        small
+        :title="$t('maintenancereboot.RebootOpenDTU')"
+        :closeText="$t('maintenancereboot.Cancel')"
+    >
+        {{ $t('maintenancereboot.RebootQuestion') }}
+        <template #footer>
+            <button type="button" class="btn btn-danger" @click="onReboot">
+                {{ $t('maintenancereboot.Reboot') }}
+            </button>
+        </template>
+    </ModalDialog>
 </template>
 
 <script lang="ts">
 import BasePage from '@/components/BasePage.vue';
-import BootstrapAlert from "@/components/BootstrapAlert.vue";
+import BootstrapAlert from '@/components/BootstrapAlert.vue';
 import CardElement from '@/components/CardElement.vue';
+import ModalDialog from '@/components/ModalDialog.vue';
 import { authHeader, handleResponse, isLoggedIn } from '@/utils/authentication';
 import * as bootstrap from 'bootstrap';
 import { defineComponent } from 'vue';
@@ -46,6 +42,7 @@ export default defineComponent({
         BasePage,
         BootstrapAlert,
         CardElement,
+        ModalDialog,
     },
     data() {
         return {
@@ -53,14 +50,17 @@ export default defineComponent({
 
             dataLoading: false,
 
-            alertMessage: "",
-            alertType: "info",
+            alertMessage: '',
+            alertType: 'info',
             showAlert: false,
         };
     },
     mounted() {
         if (!isLoggedIn()) {
-            this.$router.push({ path: "/login", query: { returnUrl: this.$router.currentRoute.value.fullPath } });
+            this.$router.push({
+                path: '/login',
+                query: { returnUrl: this.$router.currentRoute.value.fullPath },
+            });
         }
 
         this.performReboot = new bootstrap.Modal('#performReboot');
@@ -68,10 +68,10 @@ export default defineComponent({
     methods: {
         onReboot() {
             const formData = new FormData();
-            formData.append("data", JSON.stringify({ reboot: true }));
+            formData.append('data', JSON.stringify({ reboot: true }));
 
-            fetch("/api/maintenance/reboot", {
-                method: "POST",
+            fetch('/api/maintenance/reboot', {
+                method: 'POST',
                 headers: authHeader(),
                 body: formData,
             })
@@ -88,7 +88,7 @@ export default defineComponent({
         },
         onCloseModal(modal: bootstrap.Modal) {
             modal.hide();
-        }
+        },
     },
 });
 </script>

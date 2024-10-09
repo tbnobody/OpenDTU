@@ -14,7 +14,7 @@ export interface Cmt2300 {
     sdio: number;
     gpio2: number;
     gpio3: number;
- }
+}
 
 export interface Ethernet {
     enabled: boolean;
@@ -34,12 +34,18 @@ export interface Display {
     reset: number;
 }
 
-export interface Device  {
+export interface Links {
     name: string;
+    url: string;
+}
+
+export interface Device {
+    name: string;
+    links: Array<Links>;
     nrf24: Nrf24;
     cmt: Cmt2300;
     eth: Ethernet;
     display: Display;
 }
 
-export interface PinMapping extends Array<Device>{}
+export type PinMapping = Array<Device>;

@@ -1,29 +1,23 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * Copyright (C) 2022 Thomas Basler and others
+ * Copyright (C) 2022-2024 Thomas Basler and others
  */
 #include "WebApi_device.h"
 #include "Configuration.h"
 #include "Display_Graphic.h"
 #include "PinMapping.h"
-#include "Utils.h"
+#include "RestartHelper.h"
 #include "WebApi.h"
 #include "WebApi_errors.h"
 #include "helper.h"
 #include <AsyncJson.h>
 
-void WebApiDeviceClass::init(AsyncWebServer* server)
+void WebApiDeviceClass::init(AsyncWebServer& server, Scheduler& scheduler)
 {
     using std::placeholders::_1;
 
-    _server = server;
-
-    _server->on("/api/device/config", HTTP_GET, std::bind(&WebApiDeviceClass::onDeviceAdminGet, this, _1));
-    _server->on("/api/device/config", HTTP_POST, std::bind(&WebApiDeviceClass::onDeviceAdminPost, this, _1));
-}
-
-void WebApiDeviceClass::loop()
-{
+    server.on("/api/device/config", HTTP_GET, std::bind(&WebApiDeviceClass::onDeviceAdminGet, this, _1));
+    server.on("/api/device/config", HTTP_POST, std::bind(&WebApiDeviceClass::onDeviceAdminPost, this, _1));
 }
 
 void WebApiDeviceClass::onDeviceAdminGet(AsyncWebServerRequest* request)
@@ -32,15 +26,15 @@ void WebApiDeviceClass::onDeviceAdminGet(AsyncWebServerRequest* request)
         return;
     }
 
-    AsyncJsonResponse* response = new AsyncJsonResponse(false, MQTT_JSON_DOC_SIZE);
-    JsonObject root = response->getRoot();
+    AsyncJsonResponse* response = new AsyncJsonResponse();
+    auto& root = response->getRoot();
     const CONFIG_T& config = Configuration.get();
     const PinMapping_t& pin = PinMapping.get();
 
-    JsonObject curPin = root.createNestedObject("curPin");
+    auto curPin = root["curPin"].to<JsonObject>();
     curPin["name"] = config.Dev_PinMapping;
 
-    JsonObject nrfPinObj = curPin.createNestedObject("nrf24");
+    auto nrfPinObj = curPin["nrf24"].to<JsonObject>();
     nrfPinObj["clk"] = pin.nrf24_clk;
     nrfPinObj["cs"] = pin.nrf24_cs;
     nrfPinObj["en"] = pin.nrf24_en;
@@ -48,7 +42,7 @@ void WebApiDeviceClass::onDeviceAdminGet(AsyncWebServerRequest* request)
     nrfPinObj["miso"] = pin.nrf24_miso;
     nrfPinObj["mosi"] = pin.nrf24_mosi;
 
-    JsonObject cmtPinObj = curPin.createNestedObject("cmt");
+    auto cmtPinObj = curPin["cmt"].to<JsonObject>();
     cmtPinObj["clk"] = pin.cmt_clk;
     cmtPinObj["cs"] = pin.cmt_cs;
     cmtPinObj["fcs"] = pin.cmt_fcs;
@@ -56,7 +50,16 @@ void WebApiDeviceClass::onDeviceAdminGet(AsyncWebServerRequest* request)
     cmtPinObj["gpio2"] = pin.cmt_gpio2;
     cmtPinObj["gpio3"] = pin.cmt_gpio3;
 
-    JsonObject ethPinObj = curPin.createNestedObject("eth");
+    auto w5500PinObj = curPin["w5500"].to<JsonObject>();
+    w5500PinObj["sclk"] = pin.w5500_sclk;
+    w5500PinObj["mosi"] = pin.w5500_mosi;
+    w5500PinObj["miso"] = pin.w5500_miso;
+    w5500PinObj["cs"] = pin.w5500_cs;
+    w5500PinObj["int"] = pin.w5500_int;
+    w5500PinObj["rst"] = pin.w5500_rst;
+
+#if CONFIG_ETH_USE_ESP32_EMAC
+    auto ethPinObj = curPin["eth"].to<JsonObject>();
     ethPinObj["enabled"] = pin.eth_enabled;
     ethPinObj["phy_addr"] = pin.eth_phy_addr;
     ethPinObj["power"] = pin.eth_power;
@@ -64,27 +67,36 @@ void WebApiDeviceClass::onDeviceAdminGet(AsyncWebServerRequest* request)
     ethPinObj["mdio"] = pin.eth_mdio;
     ethPinObj["type"] = pin.eth_type;
     ethPinObj["clk_mode"] = pin.eth_clk_mode;
+#endif
 
-    JsonObject displayPinObj = curPin.createNestedObject("display");
+    auto displayPinObj = curPin["display"].to<JsonObject>();
     displayPinObj["type"] = pin.display_type;
     displayPinObj["data"] = pin.display_data;
     displayPinObj["clk"] = pin.display_clk;
     displayPinObj["cs"] = pin.display_cs;
     displayPinObj["reset"] = pin.display_reset;
 
-    JsonObject ledPinObj = curPin.createNestedObject("led");
-    ledPinObj["led0"] = pin.led[0];
-    ledPinObj["led1"] = pin.led[1];
+    auto ledPinObj = curPin["led"].to<JsonObject>();
+    for (uint8_t i = 0; i < PINMAPPING_LED_COUNT; i++) {
+        ledPinObj["led" + String(i)] = pin.led[i];
+    }
 
-    JsonObject display = root.createNestedObject("display");
-    display["rotation"] = config.Display_Rotation;
-    display["power_safe"] = config.Display_PowerSafe;
-    display["screensaver"] = config.Display_ScreenSaver;
-    display["contrast"] = config.Display_Contrast;
-    display["language"] = config.Display_Language;
+    auto display = root["display"].to<JsonObject>();
+    display["rotation"] = config.Display.Rotation;
+    display["power_safe"] = config.Display.PowerSafe;
+    display["screensaver"] = config.Display.ScreenSaver;
+    display["contrast"] = config.Display.Contrast;
+    display["language"] = config.Display.Language;
+    display["diagramduration"] = config.Display.Diagram.Duration;
+    display["diagrammode"] = config.Display.Diagram.Mode;
 
-    response->setLength();
-    request->send(response);
+    auto leds = root["led"].to<JsonArray>();
+    for (uint8_t i = 0; i < PINMAPPING_LED_COUNT; i++) {
+        auto led = leds.add<JsonObject>();
+        led["brightness"] = config.Led_Single[i].Brightness;
+    }
+
+    WebApi.sendJsonResponse(request, response, __FUNCTION__, __LINE__);
 }
 
 void WebApiDeviceClass::onDeviceAdminPost(AsyncWebServerRequest* request)
@@ -93,45 +105,19 @@ void WebApiDeviceClass::onDeviceAdminPost(AsyncWebServerRequest* request)
         return;
     }
 
-    AsyncJsonResponse* response = new AsyncJsonResponse(false, MQTT_JSON_DOC_SIZE);
-    JsonObject retMsg = response->getRoot();
-    retMsg["type"] = "warning";
-
-    if (!request->hasParam("data", true)) {
-        retMsg["message"] = "No values found!";
-        retMsg["code"] = WebApiError::GenericNoValueFound;
-        response->setLength();
-        request->send(response);
+    AsyncJsonResponse* response = new AsyncJsonResponse();
+    JsonDocument root;
+    if (!WebApi.parseRequestData(request, response, root)) {
         return;
     }
 
-    String json = request->getParam("data", true)->value();
+    auto& retMsg = response->getRoot();
 
-    if (json.length() > MQTT_JSON_DOC_SIZE) {
-        retMsg["message"] = "Data too large!";
-        retMsg["code"] = WebApiError::GenericDataTooLarge;
-        response->setLength();
-        request->send(response);
-        return;
-    }
-
-    DynamicJsonDocument root(MQTT_JSON_DOC_SIZE);
-    DeserializationError error = deserializeJson(root, json);
-
-    if (error) {
-        retMsg["message"] = "Failed to parse data!";
-        retMsg["code"] = WebApiError::GenericParseError;
-        response->setLength();
-        request->send(response);
-        return;
-    }
-
-    if (!(root.containsKey("curPin")
-            || root.containsKey("display"))) {
+    if (!(root["curPin"].is<JsonObject>()
+            || root["display"].is<JsonObject>())) {
         retMsg["message"] = "Values are missing!";
         retMsg["code"] = WebApiError::GenericValueMissing;
-        response->setLength();
-        request->send(response);
+        WebApi.sendJsonResponse(request, response, __FUNCTION__, __LINE__);
         return;
     }
 
@@ -139,8 +125,7 @@ void WebApiDeviceClass::onDeviceAdminPost(AsyncWebServerRequest* request)
         retMsg["message"] = "Pin mapping must between 1 and " STR(DEV_MAX_MAPPING_NAME_STRLEN) " characters long!";
         retMsg["code"] = WebApiError::HardwarePinMappingLength;
         retMsg["param"]["max"] = DEV_MAX_MAPPING_NAME_STRLEN;
-        response->setLength();
-        request->send(response);
+        WebApi.sendJsonResponse(request, response, __FUNCTION__, __LINE__);
         return;
     }
 
@@ -148,28 +133,32 @@ void WebApiDeviceClass::onDeviceAdminPost(AsyncWebServerRequest* request)
     bool performRestart = root["curPin"]["name"].as<String>() != config.Dev_PinMapping;
 
     strlcpy(config.Dev_PinMapping, root["curPin"]["name"].as<String>().c_str(), sizeof(config.Dev_PinMapping));
-    config.Display_Rotation = root["display"]["rotation"].as<uint8_t>();
-    config.Display_PowerSafe = root["display"]["power_safe"].as<bool>();
-    config.Display_ScreenSaver = root["display"]["screensaver"].as<bool>();
-    config.Display_Contrast = root["display"]["contrast"].as<uint8_t>();
-    config.Display_Language = root["display"]["language"].as<uint8_t>();
+    config.Display.Rotation = root["display"]["rotation"].as<uint8_t>();
+    config.Display.PowerSafe = root["display"]["power_safe"].as<bool>();
+    config.Display.ScreenSaver = root["display"]["screensaver"].as<bool>();
+    config.Display.Contrast = root["display"]["contrast"].as<uint8_t>();
+    config.Display.Language = root["display"]["language"].as<uint8_t>();
+    config.Display.Diagram.Duration = root["display"]["diagramduration"].as<uint32_t>();
+    config.Display.Diagram.Mode = root["display"]["diagrammode"].as<DiagramMode_t>();
 
-    Display.setOrientation(config.Display_Rotation);
-    Display.enablePowerSafe = config.Display_PowerSafe;
-    Display.enableScreensaver = config.Display_ScreenSaver;
-    Display.setContrast(config.Display_Contrast);
-    Display.setLanguage(config.Display_Language);
+    for (uint8_t i = 0; i < PINMAPPING_LED_COUNT; i++) {
+        config.Led_Single[i].Brightness = root["led"][i]["brightness"].as<uint8_t>();
+        config.Led_Single[i].Brightness = min<uint8_t>(100, config.Led_Single[i].Brightness);
+    }
 
-    Configuration.write();
+    Display.setDiagramMode(static_cast<DiagramMode_t>(config.Display.Diagram.Mode));
+    Display.setOrientation(config.Display.Rotation);
+    Display.enablePowerSafe = config.Display.PowerSafe;
+    Display.enableScreensaver = config.Display.ScreenSaver;
+    Display.setContrast(config.Display.Contrast);
+    Display.setLanguage(config.Display.Language);
+    Display.Diagram().updatePeriod();
 
-    retMsg["type"] = "success";
-    retMsg["message"] = "Settings saved!";
-    retMsg["code"] = WebApiError::GenericSuccess;
+    WebApi.writeConfig(retMsg);
 
-    response->setLength();
-    request->send(response);
+    WebApi.sendJsonResponse(request, response, __FUNCTION__, __LINE__);
 
     if (performRestart) {
-        Utils::restartDtu();
+        RestartHelper.triggerRestart();
     }
 }

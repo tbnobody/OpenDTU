@@ -1,12 +1,15 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * Copyright (C) 2022 Thomas Basler and others
+ * Copyright (C) 2022-2024 Thomas Basler and others
  */
 #include "Configuration.h"
 #include "MessageOutput.h"
+#include "NetworkSettings.h"
+#include "Utils.h"
 #include "defaults.h"
 #include <ArduinoJson.h>
 #include <LittleFS.h>
+#include <nvs_flash.h>
 
 CONFIG_T config;
 
@@ -21,88 +24,102 @@ bool ConfigurationClass::write()
     if (!f) {
         return false;
     }
-    config.Cfg_SaveCount++;
+    config.Cfg.SaveCount++;
 
-    DynamicJsonDocument doc(JSON_BUFFER_SIZE);
+    JsonDocument doc;
 
-    JsonObject cfg = doc.createNestedObject("cfg");
-    cfg["version"] = config.Cfg_Version;
-    cfg["save_count"] = config.Cfg_SaveCount;
+    JsonObject cfg = doc["cfg"].to<JsonObject>();
+    cfg["version"] = config.Cfg.Version;
+    cfg["save_count"] = config.Cfg.SaveCount;
 
-    JsonObject wifi = doc.createNestedObject("wifi");
-    wifi["ssid"] = config.WiFi_Ssid;
-    wifi["password"] = config.WiFi_Password;
-    wifi["ip"] = IPAddress(config.WiFi_Ip).toString();
-    wifi["netmask"] = IPAddress(config.WiFi_Netmask).toString();
-    wifi["gateway"] = IPAddress(config.WiFi_Gateway).toString();
-    wifi["dns1"] = IPAddress(config.WiFi_Dns1).toString();
-    wifi["dns2"] = IPAddress(config.WiFi_Dns2).toString();
-    wifi["dhcp"] = config.WiFi_Dhcp;
-    wifi["hostname"] = config.WiFi_Hostname;
-    wifi["aptimeout"] = config.WiFi_ApTimeout;
+    JsonObject wifi = doc["wifi"].to<JsonObject>();
+    wifi["ssid"] = config.WiFi.Ssid;
+    wifi["password"] = config.WiFi.Password;
+    wifi["ip"] = IPAddress(config.WiFi.Ip).toString();
+    wifi["netmask"] = IPAddress(config.WiFi.Netmask).toString();
+    wifi["gateway"] = IPAddress(config.WiFi.Gateway).toString();
+    wifi["dns1"] = IPAddress(config.WiFi.Dns1).toString();
+    wifi["dns2"] = IPAddress(config.WiFi.Dns2).toString();
+    wifi["dhcp"] = config.WiFi.Dhcp;
+    wifi["hostname"] = config.WiFi.Hostname;
+    wifi["aptimeout"] = config.WiFi.ApTimeout;
 
-    JsonObject ntp = doc.createNestedObject("ntp");
-    ntp["server"] = config.Ntp_Server;
-    ntp["timezone"] = config.Ntp_Timezone;
-    ntp["timezone_descr"] = config.Ntp_TimezoneDescr;
-    ntp["latitude"] = config.Ntp_Latitude;
-    ntp["longitude"] = config.Ntp_Longitude;
-    ntp["sunsettype"] = config.Ntp_SunsetType;
+    JsonObject mdns = doc["mdns"].to<JsonObject>();
+    mdns["enabled"] = config.Mdns.Enabled;
 
-    JsonObject mqtt = doc.createNestedObject("mqtt");
-    mqtt["enabled"] = config.Mqtt_Enabled;
-    mqtt["hostname"] = config.Mqtt_Hostname;
-    mqtt["port"] = config.Mqtt_Port;
-    mqtt["username"] = config.Mqtt_Username;
-    mqtt["password"] = config.Mqtt_Password;
-    mqtt["topic"] = config.Mqtt_Topic;
-    mqtt["retain"] = config.Mqtt_Retain;
-    mqtt["publish_interval"] = config.Mqtt_PublishInterval;
-    mqtt["clean_session"] = config.Mqtt_CleanSession;
+    JsonObject ntp = doc["ntp"].to<JsonObject>();
+    ntp["server"] = config.Ntp.Server;
+    ntp["timezone"] = config.Ntp.Timezone;
+    ntp["timezone_descr"] = config.Ntp.TimezoneDescr;
+    ntp["latitude"] = config.Ntp.Latitude;
+    ntp["longitude"] = config.Ntp.Longitude;
+    ntp["sunsettype"] = config.Ntp.SunsetType;
 
-    JsonObject mqtt_lwt = mqtt.createNestedObject("lwt");
-    mqtt_lwt["topic"] = config.Mqtt_LwtTopic;
-    mqtt_lwt["value_online"] = config.Mqtt_LwtValue_Online;
-    mqtt_lwt["value_offline"] = config.Mqtt_LwtValue_Offline;
+    JsonObject mqtt = doc["mqtt"].to<JsonObject>();
+    mqtt["enabled"] = config.Mqtt.Enabled;
+    mqtt["hostname"] = config.Mqtt.Hostname;
+    mqtt["port"] = config.Mqtt.Port;
+    mqtt["clientid"] = config.Mqtt.ClientId;
+    mqtt["username"] = config.Mqtt.Username;
+    mqtt["password"] = config.Mqtt.Password;
+    mqtt["topic"] = config.Mqtt.Topic;
+    mqtt["retain"] = config.Mqtt.Retain;
+    mqtt["publish_interval"] = config.Mqtt.PublishInterval;
+    mqtt["clean_session"] = config.Mqtt.CleanSession;
 
-    JsonObject mqtt_tls = mqtt.createNestedObject("tls");
-    mqtt_tls["enabled"] = config.Mqtt_Tls;
-    mqtt_tls["root_ca_cert"] = config.Mqtt_RootCaCert;
-    mqtt_tls["certlogin"] = config.Mqtt_TlsCertLogin;
-    mqtt_tls["client_cert"] = config.Mqtt_ClientCert;
-    mqtt_tls["client_key"] = config.Mqtt_ClientKey;
+    JsonObject mqtt_lwt = mqtt["lwt"].to<JsonObject>();
+    mqtt_lwt["topic"] = config.Mqtt.Lwt.Topic;
+    mqtt_lwt["value_online"] = config.Mqtt.Lwt.Value_Online;
+    mqtt_lwt["value_offline"] = config.Mqtt.Lwt.Value_Offline;
+    mqtt_lwt["qos"] = config.Mqtt.Lwt.Qos;
 
-    JsonObject mqtt_hass = mqtt.createNestedObject("hass");
-    mqtt_hass["enabled"] = config.Mqtt_Hass_Enabled;
-    mqtt_hass["retain"] = config.Mqtt_Hass_Retain;
-    mqtt_hass["topic"] = config.Mqtt_Hass_Topic;
-    mqtt_hass["individual_panels"] = config.Mqtt_Hass_IndividualPanels;
-    mqtt_hass["expire"] = config.Mqtt_Hass_Expire;
+    JsonObject mqtt_tls = mqtt["tls"].to<JsonObject>();
+    mqtt_tls["enabled"] = config.Mqtt.Tls.Enabled;
+    mqtt_tls["root_ca_cert"] = config.Mqtt.Tls.RootCaCert;
+    mqtt_tls["certlogin"] = config.Mqtt.Tls.CertLogin;
+    mqtt_tls["client_cert"] = config.Mqtt.Tls.ClientCert;
+    mqtt_tls["client_key"] = config.Mqtt.Tls.ClientKey;
 
-    JsonObject dtu = doc.createNestedObject("dtu");
-    dtu["serial"] = config.Dtu_Serial;
-    dtu["poll_interval"] = config.Dtu_PollInterval;
-    dtu["nrf_pa_level"] = config.Dtu_NrfPaLevel;
-    dtu["cmt_pa_level"] = config.Dtu_CmtPaLevel;
-    dtu["cmt_frequency"] = config.Dtu_CmtFrequency;
+    JsonObject mqtt_hass = mqtt["hass"].to<JsonObject>();
+    mqtt_hass["enabled"] = config.Mqtt.Hass.Enabled;
+    mqtt_hass["retain"] = config.Mqtt.Hass.Retain;
+    mqtt_hass["topic"] = config.Mqtt.Hass.Topic;
+    mqtt_hass["individual_panels"] = config.Mqtt.Hass.IndividualPanels;
+    mqtt_hass["expire"] = config.Mqtt.Hass.Expire;
 
-    JsonObject security = doc.createNestedObject("security");
-    security["password"] = config.Security_Password;
-    security["allow_readonly"] = config.Security_AllowReadonly;
+    JsonObject dtu = doc["dtu"].to<JsonObject>();
+    dtu["serial"] = config.Dtu.Serial;
+    dtu["poll_interval"] = config.Dtu.PollInterval;
+    dtu["nrf_pa_level"] = config.Dtu.Nrf.PaLevel;
+    dtu["cmt_pa_level"] = config.Dtu.Cmt.PaLevel;
+    dtu["cmt_frequency"] = config.Dtu.Cmt.Frequency;
+    dtu["cmt_country_mode"] = config.Dtu.Cmt.CountryMode;
 
-    JsonObject device = doc.createNestedObject("device");
+    JsonObject security = doc["security"].to<JsonObject>();
+    security["password"] = config.Security.Password;
+    security["allow_readonly"] = config.Security.AllowReadonly;
+
+    JsonObject device = doc["device"].to<JsonObject>();
     device["pinmapping"] = config.Dev_PinMapping;
 
-    JsonObject display = device.createNestedObject("display");
-    display["powersafe"] = config.Display_PowerSafe;
-    display["screensaver"] = config.Display_ScreenSaver;
-    display["rotation"] = config.Display_Rotation;
-    display["contrast"] = config.Display_Contrast;
-    display["language"] = config.Display_Language;
+    JsonObject display = device["display"].to<JsonObject>();
+    display["powersafe"] = config.Display.PowerSafe;
+    display["screensaver"] = config.Display.ScreenSaver;
+    display["rotation"] = config.Display.Rotation;
+    display["contrast"] = config.Display.Contrast;
+    display["language"] = config.Display.Language;
+    display["diagram_duration"] = config.Display.Diagram.Duration;
+    display["diagram_mode"] = config.Display.Diagram.Mode;
 
-    JsonArray inverters = doc.createNestedArray("inverters");
+    JsonArray leds = device["led"].to<JsonArray>();
+    for (uint8_t i = 0; i < PINMAPPING_LED_COUNT; i++) {
+        JsonObject led = leds.add<JsonObject>();
+        led["brightness"] = config.Led_Single[i].Brightness;
+    }
+
+    JsonArray inverters = doc["inverters"].to<JsonArray>();
     for (uint8_t i = 0; i < INV_MAX_COUNT; i++) {
-        JsonObject inv = inverters.createNestedObject();
+        JsonObject inv = inverters.add<JsonObject>();
         inv["serial"] = config.Inverter[i].Serial;
         inv["name"] = config.Inverter[i].Name;
         inv["order"] = config.Inverter[i].Order;
@@ -113,14 +130,20 @@ bool ConfigurationClass::write()
         inv["reachable_threshold"] = config.Inverter[i].ReachableThreshold;
         inv["zero_runtime"] = config.Inverter[i].ZeroRuntimeDataIfUnrechable;
         inv["zero_day"] = config.Inverter[i].ZeroYieldDayOnMidnight;
+        inv["clear_eventlog"] = config.Inverter[i].ClearEventlogOnMidnight;
+        inv["yieldday_correction"] = config.Inverter[i].YieldDayCorrection;
 
-        JsonArray channel = inv.createNestedArray("channel");
+        JsonArray channel = inv["channel"].to<JsonArray>();
         for (uint8_t c = 0; c < INV_MAX_CHAN_COUNT; c++) {
-            JsonObject chanData = channel.createNestedObject();
+            JsonObject chanData = channel.add<JsonObject>();
             chanData["name"] = config.Inverter[i].channel[c].Name;
             chanData["max_power"] = config.Inverter[i].channel[c].MaxChannelPower;
             chanData["yield_total_offset"] = config.Inverter[i].channel[c].YieldTotalOffset;
         }
+    }
+
+    if (!Utils::checkJsonAlloc(doc, __FUNCTION__, __LINE__)) {
+        return false;
     }
 
     // Serialize JSON to file
@@ -137,118 +160,137 @@ bool ConfigurationClass::read()
 {
     File f = LittleFS.open(CONFIG_FILENAME, "r", false);
 
-    DynamicJsonDocument doc(JSON_BUFFER_SIZE);
+    JsonDocument doc;
+
     // Deserialize the JSON document
-    DeserializationError error = deserializeJson(doc, f);
+    const DeserializationError error = deserializeJson(doc, f);
     if (error) {
         MessageOutput.println("Failed to read file, using default configuration");
     }
 
+    if (!Utils::checkJsonAlloc(doc, __FUNCTION__, __LINE__)) {
+        return false;
+    }
+
     JsonObject cfg = doc["cfg"];
-    config.Cfg_Version = cfg["version"] | CONFIG_VERSION;
-    config.Cfg_SaveCount = cfg["save_count"] | 0;
+    config.Cfg.Version = cfg["version"] | CONFIG_VERSION;
+    config.Cfg.SaveCount = cfg["save_count"] | 0;
 
     JsonObject wifi = doc["wifi"];
-    strlcpy(config.WiFi_Ssid, wifi["ssid"] | WIFI_SSID, sizeof(config.WiFi_Ssid));
-    strlcpy(config.WiFi_Password, wifi["password"] | WIFI_PASSWORD, sizeof(config.WiFi_Password));
-    strlcpy(config.WiFi_Hostname, wifi["hostname"] | APP_HOSTNAME, sizeof(config.WiFi_Hostname));
+    strlcpy(config.WiFi.Ssid, wifi["ssid"] | WIFI_SSID, sizeof(config.WiFi.Ssid));
+    strlcpy(config.WiFi.Password, wifi["password"] | WIFI_PASSWORD, sizeof(config.WiFi.Password));
+    strlcpy(config.WiFi.Hostname, wifi["hostname"] | APP_HOSTNAME, sizeof(config.WiFi.Hostname));
 
     IPAddress wifi_ip;
     wifi_ip.fromString(wifi["ip"] | "");
-    config.WiFi_Ip[0] = wifi_ip[0];
-    config.WiFi_Ip[1] = wifi_ip[1];
-    config.WiFi_Ip[2] = wifi_ip[2];
-    config.WiFi_Ip[3] = wifi_ip[3];
+    config.WiFi.Ip[0] = wifi_ip[0];
+    config.WiFi.Ip[1] = wifi_ip[1];
+    config.WiFi.Ip[2] = wifi_ip[2];
+    config.WiFi.Ip[3] = wifi_ip[3];
 
     IPAddress wifi_netmask;
     wifi_netmask.fromString(wifi["netmask"] | "");
-    config.WiFi_Netmask[0] = wifi_netmask[0];
-    config.WiFi_Netmask[1] = wifi_netmask[1];
-    config.WiFi_Netmask[2] = wifi_netmask[2];
-    config.WiFi_Netmask[3] = wifi_netmask[3];
+    config.WiFi.Netmask[0] = wifi_netmask[0];
+    config.WiFi.Netmask[1] = wifi_netmask[1];
+    config.WiFi.Netmask[2] = wifi_netmask[2];
+    config.WiFi.Netmask[3] = wifi_netmask[3];
 
     IPAddress wifi_gateway;
     wifi_gateway.fromString(wifi["gateway"] | "");
-    config.WiFi_Gateway[0] = wifi_gateway[0];
-    config.WiFi_Gateway[1] = wifi_gateway[1];
-    config.WiFi_Gateway[2] = wifi_gateway[2];
-    config.WiFi_Gateway[3] = wifi_gateway[3];
+    config.WiFi.Gateway[0] = wifi_gateway[0];
+    config.WiFi.Gateway[1] = wifi_gateway[1];
+    config.WiFi.Gateway[2] = wifi_gateway[2];
+    config.WiFi.Gateway[3] = wifi_gateway[3];
 
     IPAddress wifi_dns1;
     wifi_dns1.fromString(wifi["dns1"] | "");
-    config.WiFi_Dns1[0] = wifi_dns1[0];
-    config.WiFi_Dns1[1] = wifi_dns1[1];
-    config.WiFi_Dns1[2] = wifi_dns1[2];
-    config.WiFi_Dns1[3] = wifi_dns1[3];
+    config.WiFi.Dns1[0] = wifi_dns1[0];
+    config.WiFi.Dns1[1] = wifi_dns1[1];
+    config.WiFi.Dns1[2] = wifi_dns1[2];
+    config.WiFi.Dns1[3] = wifi_dns1[3];
 
     IPAddress wifi_dns2;
     wifi_dns2.fromString(wifi["dns2"] | "");
-    config.WiFi_Dns2[0] = wifi_dns2[0];
-    config.WiFi_Dns2[1] = wifi_dns2[1];
-    config.WiFi_Dns2[2] = wifi_dns2[2];
-    config.WiFi_Dns2[3] = wifi_dns2[3];
+    config.WiFi.Dns2[0] = wifi_dns2[0];
+    config.WiFi.Dns2[1] = wifi_dns2[1];
+    config.WiFi.Dns2[2] = wifi_dns2[2];
+    config.WiFi.Dns2[3] = wifi_dns2[3];
 
-    config.WiFi_Dhcp = wifi["dhcp"] | WIFI_DHCP;
-    config.WiFi_ApTimeout = wifi["aptimeout"] | ACCESS_POINT_TIMEOUT;
+    config.WiFi.Dhcp = wifi["dhcp"] | WIFI_DHCP;
+    config.WiFi.ApTimeout = wifi["aptimeout"] | ACCESS_POINT_TIMEOUT;
+
+    JsonObject mdns = doc["mdns"];
+    config.Mdns.Enabled = mdns["enabled"] | MDNS_ENABLED;
 
     JsonObject ntp = doc["ntp"];
-    strlcpy(config.Ntp_Server, ntp["server"] | NTP_SERVER, sizeof(config.Ntp_Server));
-    strlcpy(config.Ntp_Timezone, ntp["timezone"] | NTP_TIMEZONE, sizeof(config.Ntp_Timezone));
-    strlcpy(config.Ntp_TimezoneDescr, ntp["timezone_descr"] | NTP_TIMEZONEDESCR, sizeof(config.Ntp_TimezoneDescr));
-    config.Ntp_Latitude = ntp["latitude"] | NTP_LATITUDE;
-    config.Ntp_Longitude = ntp["longitude"] | NTP_LONGITUDE;
-    config.Ntp_SunsetType = ntp["sunsettype"] | NTP_SUNSETTYPE;
+    strlcpy(config.Ntp.Server, ntp["server"] | NTP_SERVER, sizeof(config.Ntp.Server));
+    strlcpy(config.Ntp.Timezone, ntp["timezone"] | NTP_TIMEZONE, sizeof(config.Ntp.Timezone));
+    strlcpy(config.Ntp.TimezoneDescr, ntp["timezone_descr"] | NTP_TIMEZONEDESCR, sizeof(config.Ntp.TimezoneDescr));
+    config.Ntp.Latitude = ntp["latitude"] | NTP_LATITUDE;
+    config.Ntp.Longitude = ntp["longitude"] | NTP_LONGITUDE;
+    config.Ntp.SunsetType = ntp["sunsettype"] | NTP_SUNSETTYPE;
 
     JsonObject mqtt = doc["mqtt"];
-    config.Mqtt_Enabled = mqtt["enabled"] | MQTT_ENABLED;
-    strlcpy(config.Mqtt_Hostname, mqtt["hostname"] | MQTT_HOST, sizeof(config.Mqtt_Hostname));
-    config.Mqtt_Port = mqtt["port"] | MQTT_PORT;
-    strlcpy(config.Mqtt_Username, mqtt["username"] | MQTT_USER, sizeof(config.Mqtt_Username));
-    strlcpy(config.Mqtt_Password, mqtt["password"] | MQTT_PASSWORD, sizeof(config.Mqtt_Password));
-    strlcpy(config.Mqtt_Topic, mqtt["topic"] | MQTT_TOPIC, sizeof(config.Mqtt_Topic));
-    config.Mqtt_Retain = mqtt["retain"] | MQTT_RETAIN;
-    config.Mqtt_PublishInterval = mqtt["publish_interval"] | MQTT_PUBLISH_INTERVAL;
-    config.Mqtt_CleanSession = mqtt["clean_session"] | MQTT_CLEAN_SESSION;
+    config.Mqtt.Enabled = mqtt["enabled"] | MQTT_ENABLED;
+    strlcpy(config.Mqtt.Hostname, mqtt["hostname"] | MQTT_HOST, sizeof(config.Mqtt.Hostname));
+    config.Mqtt.Port = mqtt["port"] | MQTT_PORT;
+    strlcpy(config.Mqtt.ClientId, mqtt["clientid"] | NetworkSettings.getApName().c_str(), sizeof(config.Mqtt.ClientId));
+    strlcpy(config.Mqtt.Username, mqtt["username"] | MQTT_USER, sizeof(config.Mqtt.Username));
+    strlcpy(config.Mqtt.Password, mqtt["password"] | MQTT_PASSWORD, sizeof(config.Mqtt.Password));
+    strlcpy(config.Mqtt.Topic, mqtt["topic"] | MQTT_TOPIC, sizeof(config.Mqtt.Topic));
+    config.Mqtt.Retain = mqtt["retain"] | MQTT_RETAIN;
+    config.Mqtt.PublishInterval = mqtt["publish_interval"] | MQTT_PUBLISH_INTERVAL;
+    config.Mqtt.CleanSession = mqtt["clean_session"] | MQTT_CLEAN_SESSION;
 
     JsonObject mqtt_lwt = mqtt["lwt"];
-    strlcpy(config.Mqtt_LwtTopic, mqtt_lwt["topic"] | MQTT_LWT_TOPIC, sizeof(config.Mqtt_LwtTopic));
-    strlcpy(config.Mqtt_LwtValue_Online, mqtt_lwt["value_online"] | MQTT_LWT_ONLINE, sizeof(config.Mqtt_LwtValue_Online));
-    strlcpy(config.Mqtt_LwtValue_Offline, mqtt_lwt["value_offline"] | MQTT_LWT_OFFLINE, sizeof(config.Mqtt_LwtValue_Offline));
+    strlcpy(config.Mqtt.Lwt.Topic, mqtt_lwt["topic"] | MQTT_LWT_TOPIC, sizeof(config.Mqtt.Lwt.Topic));
+    strlcpy(config.Mqtt.Lwt.Value_Online, mqtt_lwt["value_online"] | MQTT_LWT_ONLINE, sizeof(config.Mqtt.Lwt.Value_Online));
+    strlcpy(config.Mqtt.Lwt.Value_Offline, mqtt_lwt["value_offline"] | MQTT_LWT_OFFLINE, sizeof(config.Mqtt.Lwt.Value_Offline));
+    config.Mqtt.Lwt.Qos = mqtt_lwt["qos"] | MQTT_LWT_QOS;
 
     JsonObject mqtt_tls = mqtt["tls"];
-    config.Mqtt_Tls = mqtt_tls["enabled"] | MQTT_TLS;
-    strlcpy(config.Mqtt_RootCaCert, mqtt_tls["root_ca_cert"] | MQTT_ROOT_CA_CERT, sizeof(config.Mqtt_RootCaCert));
-    config.Mqtt_TlsCertLogin = mqtt_tls["certlogin"] | MQTT_TLSCERTLOGIN;
-    strlcpy(config.Mqtt_ClientCert, mqtt_tls["client_cert"] | MQTT_TLSCLIENTCERT, sizeof(config.Mqtt_ClientCert));
-    strlcpy(config.Mqtt_ClientKey, mqtt_tls["client_key"] | MQTT_TLSCLIENTKEY, sizeof(config.Mqtt_ClientKey));
+    config.Mqtt.Tls.Enabled = mqtt_tls["enabled"] | MQTT_TLS;
+    strlcpy(config.Mqtt.Tls.RootCaCert, mqtt_tls["root_ca_cert"] | MQTT_ROOT_CA_CERT, sizeof(config.Mqtt.Tls.RootCaCert));
+    config.Mqtt.Tls.CertLogin = mqtt_tls["certlogin"] | MQTT_TLSCERTLOGIN;
+    strlcpy(config.Mqtt.Tls.ClientCert, mqtt_tls["client_cert"] | MQTT_TLSCLIENTCERT, sizeof(config.Mqtt.Tls.ClientCert));
+    strlcpy(config.Mqtt.Tls.ClientKey, mqtt_tls["client_key"] | MQTT_TLSCLIENTKEY, sizeof(config.Mqtt.Tls.ClientKey));
 
     JsonObject mqtt_hass = mqtt["hass"];
-    config.Mqtt_Hass_Enabled = mqtt_hass["enabled"] | MQTT_HASS_ENABLED;
-    config.Mqtt_Hass_Retain = mqtt_hass["retain"] | MQTT_HASS_RETAIN;
-    config.Mqtt_Hass_Expire = mqtt_hass["expire"] | MQTT_HASS_EXPIRE;
-    config.Mqtt_Hass_IndividualPanels = mqtt_hass["individual_panels"] | MQTT_HASS_INDIVIDUALPANELS;
-    strlcpy(config.Mqtt_Hass_Topic, mqtt_hass["topic"] | MQTT_HASS_TOPIC, sizeof(config.Mqtt_Hass_Topic));
+    config.Mqtt.Hass.Enabled = mqtt_hass["enabled"] | MQTT_HASS_ENABLED;
+    config.Mqtt.Hass.Retain = mqtt_hass["retain"] | MQTT_HASS_RETAIN;
+    config.Mqtt.Hass.Expire = mqtt_hass["expire"] | MQTT_HASS_EXPIRE;
+    config.Mqtt.Hass.IndividualPanels = mqtt_hass["individual_panels"] | MQTT_HASS_INDIVIDUALPANELS;
+    strlcpy(config.Mqtt.Hass.Topic, mqtt_hass["topic"] | MQTT_HASS_TOPIC, sizeof(config.Mqtt.Hass.Topic));
 
     JsonObject dtu = doc["dtu"];
-    config.Dtu_Serial = dtu["serial"] | DTU_SERIAL;
-    config.Dtu_PollInterval = dtu["poll_interval"] | DTU_POLL_INTERVAL;
-    config.Dtu_NrfPaLevel = dtu["nrf_pa_level"] | DTU_NRF_PA_LEVEL;
-    config.Dtu_CmtPaLevel = dtu["cmt_pa_level"] | DTU_CMT_PA_LEVEL;
-    config.Dtu_CmtFrequency = dtu["cmt_frequency"] | DTU_CMT_FREQUENCY;
+    config.Dtu.Serial = dtu["serial"] | DTU_SERIAL;
+    config.Dtu.PollInterval = dtu["poll_interval"] | DTU_POLL_INTERVAL;
+    config.Dtu.Nrf.PaLevel = dtu["nrf_pa_level"] | DTU_NRF_PA_LEVEL;
+    config.Dtu.Cmt.PaLevel = dtu["cmt_pa_level"] | DTU_CMT_PA_LEVEL;
+    config.Dtu.Cmt.Frequency = dtu["cmt_frequency"] | DTU_CMT_FREQUENCY;
+    config.Dtu.Cmt.CountryMode = dtu["cmt_country_mode"] | DTU_CMT_COUNTRY_MODE;
 
     JsonObject security = doc["security"];
-    strlcpy(config.Security_Password, security["password"] | ACCESS_POINT_PASSWORD, sizeof(config.Security_Password));
-    config.Security_AllowReadonly = security["allow_readonly"] | SECURITY_ALLOW_READONLY;
+    strlcpy(config.Security.Password, security["password"] | ACCESS_POINT_PASSWORD, sizeof(config.Security.Password));
+    config.Security.AllowReadonly = security["allow_readonly"] | SECURITY_ALLOW_READONLY;
 
     JsonObject device = doc["device"];
     strlcpy(config.Dev_PinMapping, device["pinmapping"] | DEV_PINMAPPING, sizeof(config.Dev_PinMapping));
 
     JsonObject display = device["display"];
-    config.Display_PowerSafe = display["powersafe"] | DISPLAY_POWERSAFE;
-    config.Display_ScreenSaver = display["screensaver"] | DISPLAY_SCREENSAVER;
-    config.Display_Rotation = display["rotation"] | DISPLAY_ROTATION;
-    config.Display_Contrast = display["contrast"] | DISPLAY_CONTRAST;
-    config.Display_Language = display["language"] | DISPLAY_LANGUAGE;
+    config.Display.PowerSafe = display["powersafe"] | DISPLAY_POWERSAFE;
+    config.Display.ScreenSaver = display["screensaver"] | DISPLAY_SCREENSAVER;
+    config.Display.Rotation = display["rotation"] | DISPLAY_ROTATION;
+    config.Display.Contrast = display["contrast"] | DISPLAY_CONTRAST;
+    config.Display.Language = display["language"] | DISPLAY_LANGUAGE;
+    config.Display.Diagram.Duration = display["diagram_duration"] | DISPLAY_DIAGRAM_DURATION;
+    config.Display.Diagram.Mode = display["diagram_mode"] | DISPLAY_DIAGRAM_MODE;
+
+    JsonArray leds = device["led"];
+    for (uint8_t i = 0; i < PINMAPPING_LED_COUNT; i++) {
+        JsonObject led = leds[i].as<JsonObject>();
+        config.Led_Single[i].Brightness = led["brightness"] | LED_BRIGHTNESS;
+    }
 
     JsonArray inverters = doc["inverters"];
     for (uint8_t i = 0; i < INV_MAX_COUNT; i++) {
@@ -264,6 +306,8 @@ bool ConfigurationClass::read()
         config.Inverter[i].ReachableThreshold = inv["reachable_threshold"] | REACHABLE_THRESHOLD;
         config.Inverter[i].ZeroRuntimeDataIfUnrechable = inv["zero_runtime"] | false;
         config.Inverter[i].ZeroYieldDayOnMidnight = inv["zero_day"] | false;
+        config.Inverter[i].ClearEventlogOnMidnight = inv["clear_eventlog"] | false;
+        config.Inverter[i].YieldDayCorrection = inv["yieldday_correction"] | false;
 
         JsonArray channel = inv["channel"];
         for (uint8_t c = 0; c < INV_MAX_CHAN_COUNT; c++) {
@@ -285,15 +329,20 @@ void ConfigurationClass::migrate()
         return;
     }
 
-    DynamicJsonDocument doc(JSON_BUFFER_SIZE);
+    JsonDocument doc;
+
     // Deserialize the JSON document
-    DeserializationError error = deserializeJson(doc, f);
+    const DeserializationError error = deserializeJson(doc, f);
     if (error) {
         MessageOutput.printf("Failed to read file, cancel migration: %s\r\n", error.c_str());
         return;
     }
 
-    if (config.Cfg_Version < 0x00011700) {
+    if (!Utils::checkJsonAlloc(doc, __FUNCTION__, __LINE__)) {
+        return;
+    }
+
+    if (config.Cfg.Version < 0x00011700) {
         JsonArray inverters = doc["inverters"];
         for (uint8_t i = 0; i < INV_MAX_COUNT; i++) {
             JsonObject inv = inverters[i].as<JsonObject>();
@@ -305,19 +354,38 @@ void ConfigurationClass::migrate()
         }
     }
 
-    if (config.Cfg_Version < 0x00011800) {
+    if (config.Cfg.Version < 0x00011800) {
         JsonObject mqtt = doc["mqtt"];
-        config.Mqtt_PublishInterval = mqtt["publish_invterval"];
+        config.Mqtt.PublishInterval = mqtt["publish_invterval"];
     }
 
-    if (config.Cfg_Version < 0x00011900) {
+    if (config.Cfg.Version < 0x00011900) {
         JsonObject dtu = doc["dtu"];
-        config.Dtu_NrfPaLevel = dtu["pa_level"];
+        config.Dtu.Nrf.PaLevel = dtu["pa_level"];
+    }
+
+    if (config.Cfg.Version < 0x00011a00) {
+        // This migration fixes this issue: https://github.com/espressif/arduino-esp32/issues/8828
+        // It occours when migrating from Core 2.0.9 to 2.0.14
+        // which was done by updating ESP32 PlatformIO from 6.3.2 to 6.5.0
+        nvs_flash_erase();
+        nvs_flash_init();
+    }
+
+    if (config.Cfg.Version < 0x00011b00) {
+        // Convert from kHz to Hz
+        config.Dtu.Cmt.Frequency *= 1000;
+    }
+
+    if (config.Cfg.Version < 0x00011c00) {
+        if (!strcmp(config.Ntp.Server, NTP_SERVER_OLD)) {
+            strlcpy(config.Ntp.Server, NTP_SERVER, sizeof(config.Ntp.Server));
+        }
     }
 
     f.close();
 
-    config.Cfg_Version = CONFIG_VERSION;
+    config.Cfg.Version = CONFIG_VERSION;
     write();
     read();
 }
@@ -335,10 +403,10 @@ INVERTER_CONFIG_T* ConfigurationClass::getFreeInverterSlot()
         }
     }
 
-    return NULL;
+    return nullptr;
 }
 
-INVERTER_CONFIG_T* ConfigurationClass::getInverterConfig(uint64_t serial)
+INVERTER_CONFIG_T* ConfigurationClass::getInverterConfig(const uint64_t serial)
 {
     for (uint8_t i = 0; i < INV_MAX_COUNT; i++) {
         if (config.Inverter[i].Serial == serial) {
@@ -346,7 +414,29 @@ INVERTER_CONFIG_T* ConfigurationClass::getInverterConfig(uint64_t serial)
         }
     }
 
-    return NULL;
+    return nullptr;
+}
+
+void ConfigurationClass::deleteInverterById(const uint8_t id)
+{
+    config.Inverter[id].Serial = 0ULL;
+    strlcpy(config.Inverter[id].Name, "", sizeof(config.Inverter[id].Name));
+    config.Inverter[id].Order = 0;
+
+    config.Inverter[id].Poll_Enable = true;
+    config.Inverter[id].Poll_Enable_Night = true;
+    config.Inverter[id].Command_Enable = true;
+    config.Inverter[id].Command_Enable_Night = true;
+    config.Inverter[id].ReachableThreshold = REACHABLE_THRESHOLD;
+    config.Inverter[id].ZeroRuntimeDataIfUnrechable = false;
+    config.Inverter[id].ZeroYieldDayOnMidnight = false;
+    config.Inverter[id].YieldDayCorrection = false;
+
+    for (uint8_t c = 0; c < INV_MAX_CHAN_COUNT; c++) {
+        config.Inverter[id].channel[c].MaxChannelPower = 0;
+        config.Inverter[id].channel[c].YieldTotalOffset = 0.0f;
+        strlcpy(config.Inverter[id].channel[c].Name, "", sizeof(config.Inverter[id].channel[c].Name));
+    }
 }
 
 ConfigurationClass Configuration;

@@ -5,15 +5,18 @@ enum WebApiError {
     GenericBase = 1000,
     GenericSuccess,
     GenericNoValueFound,
-    GenericDataTooLarge,
+    GenericDataTooLarge, // not used anymore
     GenericParseError,
     GenericValueMissing,
+    GenericWriteFailed,
+    GenericInternalServerError,
 
     DtuBase = 2000,
     DtuSerialZero,
     DtuPollZero,
     DtuInvalidPowerLevel,
     DtuInvalidCmtFrequency,
+    DtuInvalidCmtCountry,
 
     ConfigBase = 3000,
     ConfigNotDeleted,
@@ -29,6 +32,7 @@ enum WebApiError {
     InverterChanged,
     InverterDeleted,
     InverterOrdered,
+    InverterStatsResetted,
 
     LimitBase = 5000,
     LimitSerialZero,
@@ -56,6 +60,8 @@ enum WebApiError {
     MqttPublishInterval,
     MqttHassTopicLength,
     MqttHassTopicCharacter,
+    MqttLwtQos,
+    MqttClientIdLength,
 
     NetworkBase = 8000,
     NetworkIpInvalid,

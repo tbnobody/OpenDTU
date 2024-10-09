@@ -1,73 +1,54 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * Copyright (C) 2022 Thomas Basler and others
+ * Copyright (C) 2022-2024 Thomas Basler and others
  */
 #include "WebApi.h"
 #include "Configuration.h"
+#include "MessageOutput.h"
 #include "defaults.h"
 #include <AsyncJson.h>
 
 WebApiClass::WebApiClass()
     : _server(HTTP_PORT)
-    , _events("/events")
 {
 }
 
-void WebApiClass::init()
+void WebApiClass::init(Scheduler& scheduler)
 {
-    _server.addHandler(&_events);
-
-    _webApiConfig.init(&_server);
-    _webApiDevice.init(&_server);
-    _webApiDevInfo.init(&_server);
-    _webApiDtu.init(&_server);
-    _webApiEventlog.init(&_server);
-    _webApiFirmware.init(&_server);
-    _webApiGridprofile.init(&_server);
-    _webApiInverter.init(&_server);
-    _webApiLimit.init(&_server);
-    _webApiMaintenance.init(&_server);
-    _webApiMqtt.init(&_server);
-    _webApiNetwork.init(&_server);
-    _webApiNtp.init(&_server);
-    _webApiPower.init(&_server);
-    _webApiPrometheus.init(&_server);
-    _webApiSecurity.init(&_server);
-    _webApiSysstatus.init(&_server);
-    _webApiWebapp.init(&_server);
-    _webApiWsConsole.init(&_server);
-    _webApiWsLive.init(&_server);
+    _webApiConfig.init(_server, scheduler);
+    _webApiDevice.init(_server, scheduler);
+    _webApiDevInfo.init(_server, scheduler);
+    _webApiDtu.init(_server, scheduler);
+    _webApiEventlog.init(_server, scheduler);
+    _webApiFirmware.init(_server, scheduler);
+    _webApiGridprofile.init(_server, scheduler);
+    _webApiInverter.init(_server, scheduler);
+    _webApiLimit.init(_server, scheduler);
+    _webApiMaintenance.init(_server, scheduler);
+    _webApiMqtt.init(_server, scheduler);
+    _webApiNetwork.init(_server, scheduler);
+    _webApiNtp.init(_server, scheduler);
+    _webApiPower.init(_server, scheduler);
+    _webApiPrometheus.init(_server, scheduler);
+    _webApiSecurity.init(_server, scheduler);
+    _webApiSysstatus.init(_server, scheduler);
+    _webApiWebapp.init(_server, scheduler);
+    _webApiWsConsole.init(_server, scheduler);
+    _webApiWsLive.init(_server, scheduler);
 
     _server.begin();
 }
 
-void WebApiClass::loop()
+void WebApiClass::reload()
 {
-    _webApiConfig.loop();
-    _webApiDevice.loop();
-    _webApiDevInfo.loop();
-    _webApiDtu.loop();
-    _webApiEventlog.loop();
-    _webApiFirmware.loop();
-    _webApiGridprofile.loop();
-    _webApiInverter.loop();
-    _webApiLimit.loop();
-    _webApiMaintenance.loop();
-    _webApiMqtt.loop();
-    _webApiNetwork.loop();
-    _webApiNtp.loop();
-    _webApiPower.loop();
-    _webApiSecurity.loop();
-    _webApiSysstatus.loop();
-    _webApiWebapp.loop();
-    _webApiWsConsole.loop();
-    _webApiWsLive.loop();
+    _webApiWsConsole.reload();
+    _webApiWsLive.reload();
 }
 
 bool WebApiClass::checkCredentials(AsyncWebServerRequest* request)
 {
     CONFIG_T& config = Configuration.get();
-    if (request->authenticate(AUTH_USERNAME, config.Security_Password)) {
+    if (request->authenticate(AUTH_USERNAME, config.Security.Password)) {
         return true;
     }
 
@@ -85,7 +66,7 @@ bool WebApiClass::checkCredentials(AsyncWebServerRequest* request)
 bool WebApiClass::checkCredentialsReadonly(AsyncWebServerRequest* request)
 {
     CONFIG_T& config = Configuration.get();
-    if (config.Security_AllowReadonly) {
+    if (config.Security.AllowReadonly) {
         return true;
     } else {
         return checkCredentials(request);
@@ -97,6 +78,72 @@ void WebApiClass::sendTooManyRequests(AsyncWebServerRequest* request)
     auto response = request->beginResponse(429, "text/plain", "Too Many Requests");
     response->addHeader("Retry-After", "60");
     request->send(response);
+}
+
+void WebApiClass::writeConfig(JsonVariant& retMsg, const WebApiError code, const String& message)
+{
+    if (!Configuration.write()) {
+        retMsg["message"] = "Write failed!";
+        retMsg["code"] = WebApiError::GenericWriteFailed;
+    } else {
+        retMsg["type"] = "success";
+        retMsg["message"] = message;
+        retMsg["code"] = code;
+    }
+}
+
+bool WebApiClass::parseRequestData(AsyncWebServerRequest* request, AsyncJsonResponse* response, JsonDocument& json_document)
+{
+    auto& retMsg = response->getRoot();
+    retMsg["type"] = "warning";
+
+    if (!request->hasParam("data", true)) {
+        retMsg["message"] = "No values found!";
+        retMsg["code"] = WebApiError::GenericNoValueFound;
+        WebApi.sendJsonResponse(request, response, __FUNCTION__, __LINE__);
+        return false;
+    }
+
+    const String json = request->getParam("data", true)->value();
+    const DeserializationError error = deserializeJson(json_document, json);
+    if (error) {
+        retMsg["message"] = "Failed to parse data!";
+        retMsg["code"] = WebApiError::GenericParseError;
+        WebApi.sendJsonResponse(request, response, __FUNCTION__, __LINE__);
+        return false;
+    }
+
+    return true;
+}
+
+uint64_t WebApiClass::parseSerialFromRequest(AsyncWebServerRequest* request, String param_name)
+{
+    if (request->hasParam(param_name)) {
+        String s = request->getParam(param_name)->value();
+        return strtoll(s.c_str(), NULL, 16);
+    }
+
+    return 0;
+}
+
+bool WebApiClass::sendJsonResponse(AsyncWebServerRequest* request, AsyncJsonResponse* response, const char* function, const uint16_t line)
+{
+    bool ret_val = true;
+    if (response->overflowed()) {
+        auto& root = response->getRoot();
+
+        root.clear();
+        root["message"] = String("500 Internal Server Error: ") + function + ", " + line;
+        root["code"] = WebApiError::GenericInternalServerError;
+        root["type"] = "danger";
+        response->setCode(500);
+        MessageOutput.printf("WebResponse failed: %s, %" PRId16 "\r\n", function, line);
+        ret_val = false;
+    }
+
+    response->setLength();
+    request->send(response);
+    return ret_val;
 }
 
 WebApiClass WebApi;

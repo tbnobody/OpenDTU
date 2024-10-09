@@ -9,18 +9,21 @@
 
 #define ACCESS_POINT_NAME "OpenDTU-"
 #define ACCESS_POINT_PASSWORD "openDTU42"
-#define ACCESS_POINT_TIMEOUT 3;
+#define ACCESS_POINT_TIMEOUT 3
 #define AUTH_USERNAME "admin"
 #define SECURITY_ALLOW_READONLY true
 
-#define WIFI_RECONNECT_TIMEOUT 15
+#define WIFI_RECONNECT_TIMEOUT 30
 #define WIFI_RECONNECT_REDO_TIMEOUT 600
 
 #define WIFI_SSID ""
 #define WIFI_PASSWORD ""
 #define WIFI_DHCP true
 
-#define NTP_SERVER "pool.ntp.org"
+#define MDNS_ENABLED false
+
+#define NTP_SERVER_OLD "pool.ntp.org"
+#define NTP_SERVER "opendtu.pool.ntp.org"
 #define NTP_TIMEZONE "CET-1CEST,M3.5.0,M10.5.0/3"
 #define NTP_TIMEZONEDESCR "Europe/Berlin"
 #define NTP_LONGITUDE 10.4515f
@@ -73,6 +76,7 @@
 #define MQTT_LWT_TOPIC "dtu/status"
 #define MQTT_LWT_ONLINE "online"
 #define MQTT_LWT_OFFLINE "offline"
+#define MQTT_LWT_QOS 2U
 #define MQTT_PUBLISH_INTERVAL 5U
 #define MQTT_CLEAN_SESSION true
 
@@ -80,7 +84,8 @@
 #define DTU_POLL_INTERVAL 5U
 #define DTU_NRF_PA_LEVEL 0U
 #define DTU_CMT_PA_LEVEL 0
-#define DTU_CMT_FREQUENCY 865000U
+#define DTU_CMT_FREQUENCY 865000000U
+#define DTU_CMT_COUNTRY_MODE 0U
 
 #define MQTT_HASS_ENABLED false
 #define MQTT_HASS_EXPIRE true
@@ -95,5 +100,11 @@
 #define DISPLAY_ROTATION 2U
 #define DISPLAY_CONTRAST 60U
 #define DISPLAY_LANGUAGE 0U
+#define DISPLAY_DIAGRAM_DURATION (10UL * 60UL * 60UL)
+#define DISPLAY_DIAGRAM_MODE 1U
 
 #define REACHABLE_THRESHOLD 2U
+
+#define LED_BRIGHTNESS 100U
+
+#define MAX_INVERTER_LIMIT 2250

@@ -1,11 +1,12 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * Copyright (C) 2022 - 2023 Thomas Basler and others
+ * Copyright (C) 2022 - 2024 Thomas Basler and others
  */
+
 #include "Utils.h"
-#include "Display_Graphic.h"
-#include "Led_Single.h"
-#include <Esp.h>
+#include "MessageOutput.h"
+#include "PinMapping.h"
+#include <LittleFS.h>
 
 uint32_t Utils::getChipId()
 {
@@ -56,12 +57,26 @@ int Utils::getTimezoneOffset()
     return static_cast<int>(difftime(rawtime, gmt));
 }
 
-void Utils::restartDtu()
+bool Utils::checkJsonAlloc(const JsonDocument& doc, const char* function, const uint16_t line)
 {
-    LedSingle.turnAllOff();
-    Display.setStatus(false);
-    yield();
-    delay(1000);
-    yield();
-    ESP.restart();
+    if (doc.overflowed()) {
+        MessageOutput.printf("Alloc failed: %s, %" PRId16 "\r\n", function, line);
+        return false;
+    }
+
+    return true;
+}
+
+/// @brief Remove all files but the PINMAPPING_FILENAME
+void Utils::removeAllFiles()
+{
+    auto root = LittleFS.open("/");
+    auto file = root.getNextFileName();
+
+    while (file != "") {
+        if (file != PINMAPPING_FILENAME) {
+            LittleFS.remove(file);
+        }
+        file = root.getNextFileName();
+    }
 }

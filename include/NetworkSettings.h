@@ -1,7 +1,9 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 #pragma once
 
+#include "W5500.h"
 #include <DNSServer.h>
+#include <TaskSchedulerDeclarations.h>
 #include <WiFi.h>
 #include <vector>
 
@@ -22,60 +24,67 @@ enum class network_event {
     NETWORK_EVENT_MAX
 };
 
-typedef std::function<void(network_event event)> NetworkEventCb;
+typedef std::function<void(network_event event)> DtuNetworkEventCb;
 
-typedef struct NetworkEventCbList {
-    NetworkEventCb cb;
+typedef struct DtuNetworkEventCbList {
+    DtuNetworkEventCb cb;
     network_event event;
 
-    NetworkEventCbList()
-        : cb(NULL)
+    DtuNetworkEventCbList()
+        : cb(nullptr)
         , event(network_event::NETWORK_UNKNOWN)
     {
     }
-} NetworkEventCbList_t;
+} DtuNetworkEventCbList_t;
 
 class NetworkSettingsClass {
 public:
     NetworkSettingsClass();
-    void init();
-    void loop();
+    void init(Scheduler& scheduler);
     void applyConfig();
     void enableAdminMode();
-    String getApName();
+    String getApName() const;
 
-    IPAddress localIP();
-    IPAddress subnetMask();
-    IPAddress gatewayIP();
-    IPAddress dnsIP(uint8_t dns_no = 0);
-    String macAddress();
+    IPAddress localIP() const;
+    IPAddress subnetMask() const;
+    IPAddress gatewayIP() const;
+    IPAddress dnsIP(const uint8_t dns_no = 0) const;
+    String macAddress() const;
     static String getHostname();
-    bool isConnected();
-    network_mode NetworkMode();
+    bool isConnected() const;
+    network_mode NetworkMode() const;
 
-    bool onEvent(NetworkEventCb cbEvent, network_event event = network_event::NETWORK_EVENT_MAX);
-    void raiseEvent(network_event event);
+    bool onEvent(DtuNetworkEventCb cbEvent, const network_event event = network_event::NETWORK_EVENT_MAX);
+    void raiseEvent(const network_event event);
 
 private:
+    void loop();
     void setHostname();
     void setStaticIp();
+    void handleMDNS();
     void setupMode();
-    void NetworkEvent(WiFiEvent_t event);
-    bool adminEnabled = true;
-    bool forceDisconnection = false;
-    uint32_t adminTimeoutCounter = 0;
-    uint32_t adminTimeoutCounterMax = 0;
-    uint32_t connectTimeoutTimer = 0;
-    uint32_t connectRedoTimer = 0;
-    uint32_t lastTimerCall = 0;
-    const byte DNS_PORT = 53;
-    IPAddress apIp;
-    IPAddress apNetmask;
-    std::unique_ptr<DNSServer> dnsServer;
-    bool dnsServerStatus = false;
+    void NetworkEvent(const WiFiEvent_t event, WiFiEventInfo_t info);
+
+    Task _loopTask;
+
+    static constexpr byte DNS_PORT = 53;
+
+    bool _adminEnabled = true;
+    bool _forceDisconnection = false;
+    uint32_t _adminTimeoutCounter = 0;
+    uint32_t _adminTimeoutCounterMax = 0;
+    uint32_t _connectTimeoutTimer = 0;
+    uint32_t _connectRedoTimer = 0;
+    uint32_t _lastTimerCall = 0;
+    IPAddress _apIp;
+    IPAddress _apNetmask;
+    std::unique_ptr<DNSServer> _dnsServer;
+    bool _dnsServerStatus = false;
     network_mode _networkMode = network_mode::Undefined;
     bool _ethConnected = false;
-    std::vector<NetworkEventCbList_t> _cbEventList;
+    std::vector<DtuNetworkEventCbList_t> _cbEventList;
+    bool _lastMdnsEnabled = false;
+    std::unique_ptr<W5500> _w5500;
 };
 
 extern NetworkSettingsClass NetworkSettings;

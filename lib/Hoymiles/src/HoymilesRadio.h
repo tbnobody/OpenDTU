@@ -1,20 +1,20 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 #pragma once
 
-#include "TimeoutHelper.h"
 #include "commands/CommandAbstract.h"
 #include "types.h"
-#include <memory>
 #include <ThreadSafeQueue.h>
+#include <TimeoutHelper.h>
+#include <memory>
 
 class HoymilesRadio {
 public:
-    serial_u DtuSerial();
-    virtual void setDtuSerial(uint64_t serial);
+    serial_u DtuSerial() const;
+    virtual void setDtuSerial(const uint64_t serial);
 
-    bool isIdle();
-    bool isQueueEmpty();
-    bool isInitialized();
+    bool isIdle() const;
+    bool isQueueEmpty() const;
+    bool isInitialized() const;
 
     void enqueCommand(std::shared_ptr<CommandAbstract> cmd)
     {
@@ -22,18 +22,18 @@ public:
     }
 
     template <typename T>
-    std::shared_ptr<T> prepareCommand()
+    std::shared_ptr<T> prepareCommand(InverterAbstract* inv)
     {
-        return std::make_shared<T>();
+        return std::make_shared<T>(inv);
     }
 
 protected:
-    static serial_u convertSerialToRadioId(serial_u serial);
-    void dumpBuf(const uint8_t buf[], uint8_t len, bool appendNewline = true);
+    static serial_u convertSerialToRadioId(const serial_u serial);
+    static void dumpBuf(const uint8_t buf[], const uint8_t len, const bool appendNewline = true);
 
-    bool checkFragmentCrc(fragment_t* fragment);
-    virtual void sendEsbPacket(CommandAbstract* cmd) = 0;
-    void sendRetransmitPacket(uint8_t fragment_id);
+    bool checkFragmentCrc(const fragment_t& fragment) const;
+    virtual void sendEsbPacket(CommandAbstract& cmd) = 0;
+    void sendRetransmitPacket(const uint8_t fragment_id);
     void sendLastPacketAgain();
     void handleReceivedPackage();
 

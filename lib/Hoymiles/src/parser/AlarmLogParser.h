@@ -8,7 +8,7 @@
 #define ALARM_LOG_ENTRY_SIZE 12
 #define ALARM_LOG_PAYLOAD_SIZE (ALARM_LOG_ENTRY_COUNT * ALARM_LOG_ENTRY_SIZE + 4)
 
-#define ALARM_MSG_COUNT 77
+#define ALARM_MSG_COUNT 131
 
 struct AlarmLogEntry_t {
     uint16_t MessageId;
@@ -22,28 +22,37 @@ enum class AlarmMessageType_t {
     HMT
 };
 
+enum class AlarmMessageLocale_t {
+    EN,
+    DE,
+    FR
+};
+
 typedef struct {
     AlarmMessageType_t InverterType;
     uint16_t MessageId;
-    String Message;
+    const char* Message_en;
+    const char* Message_de;
+    const char* Message_fr;
 } AlarmMessage_t;
 
 class AlarmLogParser : public Parser {
 public:
     AlarmLogParser();
     void clearBuffer();
-    void appendFragment(uint8_t offset, uint8_t* payload, uint8_t len);
+    void appendFragment(const uint8_t offset, const uint8_t* payload, const uint8_t len);
 
-    uint8_t getEntryCount();
-    void getLogEntry(uint8_t entryId, AlarmLogEntry_t* entry);
+    uint8_t getEntryCount() const;
+    void getLogEntry(const uint8_t entryId, AlarmLogEntry_t& entry, const AlarmMessageLocale_t locale = AlarmMessageLocale_t::EN);
 
-    void setLastAlarmRequestSuccess(LastCommandSuccess status);
-    LastCommandSuccess getLastAlarmRequestSuccess();
+    void setLastAlarmRequestSuccess(const LastCommandSuccess status);
+    LastCommandSuccess getLastAlarmRequestSuccess() const;
 
-    void setMessageType(AlarmMessageType_t type);
+    void setMessageType(const AlarmMessageType_t type);
 
 private:
     static int getTimezoneOffset();
+    String getLocaleMessage(const AlarmMessage_t* msg, const AlarmMessageLocale_t locale) const;
 
     uint8_t _payloadAlarmLog[ALARM_LOG_PAYLOAD_SIZE];
     uint8_t _alarmLogLength = 0;

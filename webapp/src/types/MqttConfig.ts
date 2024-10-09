@@ -2,6 +2,7 @@ export interface MqttConfig {
     mqtt_enabled: boolean;
     mqtt_hostname: string;
     mqtt_port: number;
+    mqtt_clientid: string;
     mqtt_username: string;
     mqtt_password: string;
     mqtt_topic: string;
@@ -16,6 +17,7 @@ export interface MqttConfig {
     mqtt_lwt_topic: string;
     mqtt_lwt_online: string;
     mqtt_lwt_offline: string;
+    mqtt_lwt_qos: number;
     mqtt_hass_enabled: boolean;
     mqtt_hass_expire: boolean;
     mqtt_hass_retain: boolean;

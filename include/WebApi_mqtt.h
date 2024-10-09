@@ -2,19 +2,15 @@
 #pragma once
 
 #include <ESPAsyncWebServer.h>
-
-#define MQTT_JSON_DOC_SIZE 10240
+#include <TaskSchedulerDeclarations.h>
 
 class WebApiMqttClass {
 public:
-    void init(AsyncWebServer* server);
-    void loop();
+    void init(AsyncWebServer& server, Scheduler& scheduler);
 
 private:
     void onMqttStatus(AsyncWebServerRequest* request);
     void onMqttAdminGet(AsyncWebServerRequest* request);
     void onMqttAdminPost(AsyncWebServerRequest* request);
     String getTlsCertInfo(const char* cert);
-
-    AsyncWebServer* _server;
 };

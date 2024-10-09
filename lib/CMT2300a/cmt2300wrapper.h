@@ -4,13 +4,21 @@
 #include <stdint.h>
 
 #define CMT2300A_ONE_STEP_SIZE 2500 // frequency channel step size for fast frequency hopping operation: One step size is 2.5 kHz.
-#define CMT_BASE_FREQ 860000000 // from Frequency Bank in cmt2300a_params.h
 #define FH_OFFSET 100 // value * CMT2300A_ONE_STEP_SIZE = channel frequency offset
 #define CMT_SPI_SPEED 4000000 // 4 MHz
 
+#define CMT_BASE_FREQ_900 900000000
+#define CMT_BASE_FREQ_860 860000000
+
+enum FrequencyBand_t {
+    BAND_860,
+    BAND_900,
+    FrequencyBand_Max,
+};
+
 class CMT2300A {
 public:
-    CMT2300A(uint8_t pin_sdio, uint8_t pin_clk, uint8_t pin_cs, uint8_t pin_fcs, uint32_t _spi_speed = CMT_SPI_SPEED);
+    CMT2300A(const uint8_t pin_sdio, const uint8_t pin_clk, const uint8_t pin_cs, const uint8_t pin_fcs, const uint32_t _spi_speed = CMT_SPI_SPEED);
 
     bool begin(void);
 
@@ -54,15 +62,15 @@ public:
      * in one call is 32 (for dynamic payload lengths) or whatever number was
      * previously passed to setPayloadSize() (for static payload lengths).
      */
-    void read(void* buf, uint8_t len);
+    void read(void* buf, const uint8_t len);
 
-    bool write(const uint8_t* buf, uint8_t len);
+    bool write(const uint8_t* buf, const uint8_t len);
 
     /**
      * Set RF communication channel. The frequency used by a channel is
      * @param channel Which RF channel to communicate on, 0-254
      */
-    void setChannel(uint8_t channel);
+    void setChannel(const uint8_t channel);
 
     /**
      * Get RF communication channel
@@ -82,9 +90,25 @@ public:
 
     int getRssiDBm();
 
-    bool setPALevel(int8_t level);
+    bool setPALevel(const int8_t level);
 
     bool rxFifoAvailable();
+
+    uint32_t getBaseFrequency() const;
+    static constexpr uint32_t getBaseFrequency(FrequencyBand_t band)
+    {
+        switch (band) {
+        case FrequencyBand_t::BAND_900:
+            return CMT_BASE_FREQ_900;
+            break;
+        default:
+            return CMT_BASE_FREQ_860;
+            break;
+        }
+    }
+
+    FrequencyBand_t getFrequencyBand() const;
+    void setFrequencyBand(const FrequencyBand_t mode);
 
     /**
      * Empty the RX (receive) FIFO buffers.
@@ -109,4 +133,6 @@ private:
     int8_t _pin_cs;
     int8_t _pin_fcs;
     uint32_t _spi_speed;
+
+    FrequencyBand_t _frequencyBand = FrequencyBand_t::BAND_860;
 };

@@ -2,11 +2,11 @@
 #pragma once
 
 #include <ESPAsyncWebServer.h>
+#include <TaskSchedulerDeclarations.h>
 
 class WebApiInverterClass {
 public:
-    void init(AsyncWebServer* server);
-    void loop();
+    void init(AsyncWebServer& server, Scheduler& scheduler);
 
 private:
     void onInverterList(AsyncWebServerRequest* request);
@@ -14,6 +14,5 @@ private:
     void onInverterEdit(AsyncWebServerRequest* request);
     void onInverterDelete(AsyncWebServerRequest* request);
     void onInverterOrder(AsyncWebServerRequest* request);
-
-    AsyncWebServer* _server;
+    void onInverterStatReset(AsyncWebServerRequest* request);
 };

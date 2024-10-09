@@ -17,11 +17,7 @@
 <script lang="ts">
 import BootstrapAlert from '@/components/BootstrapAlert.vue';
 import type { Hints } from '@/types/LiveDataStatus';
-import {
-    BIconBroadcast,
-    BIconClock,
-    BIconExclamationCircle
-} from 'bootstrap-icons-vue';
+import { BIconBroadcast, BIconClock, BIconExclamationCircle } from 'bootstrap-icons-vue';
 import { defineComponent, type PropType } from 'vue';
 
 export default defineComponent({
@@ -36,11 +32,11 @@ export default defineComponent({
     },
     methods: {
         gotoTimeSettings() {
-            this.$router.push("/settings/ntp");
+            this.$router.push('/settings/ntp');
         },
         gotoPasswordSettings() {
-            this.$router.push("/settings/security");
-        }
-    }
+            this.$router.push('/settings/security');
+        },
+    },
 });
 </script>

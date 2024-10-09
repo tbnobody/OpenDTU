@@ -75,7 +75,7 @@ void CMT2300A_EnableTxDinInvert(bool bEnable);
 bool CMT2300A_IsExist(void);
 uint8_t CMT2300A_GetRssiCode(void);
 int CMT2300A_GetRssiDBm(void);
-void CMT2300A_SetFrequencyChannel(uint8_t nChann);
+void CMT2300A_SetFrequencyChannel(const uint8_t nChann);
 void CMT2300A_SetFrequencyStep(uint8_t nOffset);
 void CMT2300A_SetPayloadLength(uint16_t nLength);
 void CMT2300A_EnableLfosc(bool bEnable);

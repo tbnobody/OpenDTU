@@ -1,10 +1,12 @@
 <template>
     <table class="table table-hover">
         <thead>
-            <th scope="col">{{ $t('eventlog.Start') }}</th>
-            <th scope="col">{{ $t('eventlog.Stop') }}</th>
-            <th scope="col">{{ $t('eventlog.Id') }}</th>
-            <th scope="col">{{ $t('eventlog.Message') }}</th>
+            <tr>
+                <th scope="col">{{ $t('eventlog.Start') }}</th>
+                <th scope="col">{{ $t('eventlog.Stop') }}</th>
+                <th scope="col">{{ $t('eventlog.Id') }}</th>
+                <th scope="col">{{ $t('eventlog.Message') }}</th>
+            </tr>
         </thead>
         <tbody>
             <template v-for="event in eventLogList.count" :key="event">
@@ -31,7 +33,7 @@ export default defineComponent({
     computed: {
         timeInHours() {
             return (value: number) => {
-                return timestampToString(value);
+                return timestampToString(this.$i18n.locale, value)[0];
             };
         },
     },
