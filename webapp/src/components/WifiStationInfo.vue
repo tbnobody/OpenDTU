@@ -6,7 +6,11 @@
                     <tr>
                         <th>{{ $t('wifistationinfo.Status') }}</th>
                         <td>
-                            <StatusBadge :status="networkStatus.sta_status" true_text="wifistationinfo.Enabled" false_text="wifistationinfo.Disabled" />
+                            <StatusBadge
+                                :status="networkStatus.sta_status"
+                                true_text="wifistationinfo.Enabled"
+                                false_text="wifistationinfo.Disabled"
+                            />
                         </td>
                     </tr>
                     <tr>
@@ -40,7 +44,7 @@ import { defineComponent, type PropType } from 'vue';
 export default defineComponent({
     components: {
         CardElement,
-        StatusBadge
+        StatusBadge,
     },
     props: {
         networkStatus: { type: Object as PropType<NetworkStatus>, required: true },

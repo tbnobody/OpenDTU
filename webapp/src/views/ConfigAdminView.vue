@@ -11,13 +11,14 @@
                 </div>
                 <div class="col-sm">
                     <select class="form-select" v-model="backupFileSelect">
-                        <option v-for="(file) in fileList.configs" :key="file.name" :value="file.name">
+                        <option v-for="file in fileList.configs" :key="file.name" :value="file.name">
                             {{ file.name }}
                         </option>
                     </select>
                 </div>
                 <div class="col-sm">
-                    <button class="btn btn-primary" @click="downloadConfig">{{ $t('configadmin.Backup') }}
+                    <button class="btn btn-primary" @click="downloadConfig">
+                        {{ $t('configadmin.Backup') }}
                     </button>
                 </div>
             </div>
@@ -33,9 +34,7 @@
                 </span>
                 <br />
                 <br />
-                <button class="btn btn-light" @click="clear">
-                    <BIconArrowLeft /> {{ $t('configadmin.Back') }}
-                </button>
+                <button class="btn btn-light" @click="clear"><BIconArrowLeft /> {{ $t('configadmin.Back') }}</button>
             </div>
 
             <div v-else-if="!uploading && UploadSuccess">
@@ -45,9 +44,7 @@
                 <span> {{ $t('configadmin.UploadSuccess') }} </span>
                 <br />
                 <br />
-                <button class="btn btn-primary" @click="clear">
-                    <BIconArrowLeft /> {{ $t('configadmin.Back') }}
-                </button>
+                <button class="btn btn-primary" @click="clear"><BIconArrowLeft /> {{ $t('configadmin.Back') }}</button>
             </div>
 
             <div v-else-if="!uploading">
@@ -62,7 +59,8 @@
                         <input class="form-control" type="file" ref="file" accept=".json" />
                     </div>
                     <div class="col-sm">
-                        <button class="btn btn-primary" @click="uploadConfig">{{ $t('configadmin.Restore') }}
+                        <button class="btn btn-primary" @click="uploadConfig">
+                            {{ $t('configadmin.Restore') }}
                         </button>
                     </div>
                 </div>
@@ -70,8 +68,14 @@
 
             <div v-else-if="uploading">
                 <div class="progress">
-                    <div class="progress-bar" role="progressbar" :style="{ width: progress + '%' }"
-                        v-bind:aria-valuenow="progress" aria-valuemin="0" aria-valuemax="100">
+                    <div
+                        class="progress-bar"
+                        role="progressbar"
+                        :style="{ width: progress + '%' }"
+                        v-bind:aria-valuenow="progress"
+                        aria-valuemin="0"
+                        aria-valuemax="100"
+                    >
                         {{ progress }}%
                     </div>
                 </div>
@@ -81,14 +85,20 @@
         </CardElement>
 
         <CardElement :text="$t('configadmin.ResetHeader')" textVariant="text-bg-primary" center-content add-space>
-            <button class="btn btn-danger" @click="onFactoryResetModal">{{ $t('configadmin.FactoryResetButton') }}
+            <button class="btn btn-danger" @click="onFactoryResetModal">
+                {{ $t('configadmin.FactoryResetButton') }}
             </button>
 
             <div class="alert alert-danger mt-3" role="alert" v-html="$t('configadmin.ResetHint')"></div>
         </CardElement>
     </BasePage>
 
-    <ModalDialog modalId="factoryReset" small :title="$t('configadmin.FactoryReset')" :closeText="$t('configadmin.Cancel')">
+    <ModalDialog
+        modalId="factoryReset"
+        small
+        :title="$t('configadmin.FactoryReset')"
+        :closeText="$t('configadmin.Cancel')"
+    >
         {{ $t('configadmin.ResetMsg') }}
         <template #footer>
             <button type="button" class="btn btn-danger" @click="onFactoryResetPerform">
@@ -100,17 +110,13 @@
 
 <script lang="ts">
 import BasePage from '@/components/BasePage.vue';
-import BootstrapAlert from "@/components/BootstrapAlert.vue";
+import BootstrapAlert from '@/components/BootstrapAlert.vue';
 import CardElement from '@/components/CardElement.vue';
 import ModalDialog from '@/components/ModalDialog.vue';
 import type { ConfigFileList } from '@/types/Config';
 import { authHeader, handleResponse } from '@/utils/authentication';
 import * as bootstrap from 'bootstrap';
-import {
-    BIconArrowLeft,
-    BIconCheckCircle,
-    BIconExclamationCircleFill
-} from 'bootstrap-icons-vue';
+import { BIconArrowLeft, BIconCheckCircle, BIconExclamationCircleFill } from 'bootstrap-icons-vue';
 import { defineComponent } from 'vue';
 
 export default defineComponent({
@@ -126,18 +132,18 @@ export default defineComponent({
     data() {
         return {
             modalFactoryReset: {} as bootstrap.Modal,
-            alertMessage: "",
-            alertType: "info",
+            alertMessage: '',
+            alertType: 'info',
             showAlert: false,
             loading: true,
             uploading: false,
             progress: 0,
-            UploadError: "",
+            UploadError: '',
             UploadSuccess: false,
             file: {} as Blob,
             fileList: {} as ConfigFileList,
-            backupFileSelect: "",
-            restoreFileSelect: "config.json",
+            backupFileSelect: '',
+            restoreFileSelect: 'config.json',
         };
     },
     mounted() {
@@ -155,26 +161,24 @@ export default defineComponent({
         },
         onFactoryResetPerform() {
             const formData = new FormData();
-            formData.append("data", JSON.stringify({ delete: true }));
+            formData.append('data', JSON.stringify({ delete: true }));
 
-            fetch("/api/config/delete", {
-                method: "POST",
+            fetch('/api/config/delete', {
+                method: 'POST',
                 headers: authHeader(),
                 body: formData,
             })
                 .then((response) => handleResponse(response, this.$emitter, this.$router))
-                .then(
-                    (response) => {
-                        this.alertMessage = this.$t('apiresponse.' + response.code, response.param);
-                        this.alertType = response.type;
-                        this.showAlert = true;
-                    }
-                )
+                .then((response) => {
+                    this.alertMessage = this.$t('apiresponse.' + response.code, response.param);
+                    this.alertType = response.type;
+                    this.showAlert = true;
+                });
             this.modalFactoryReset.hide();
         },
         getFileList() {
             this.loading = true;
-            fetch("/api/config/list", { headers: authHeader() })
+            fetch('/api/config/list', { headers: authHeader() })
                 .then((response) => handleResponse(response, this.$emitter, this.$router))
                 .then((data) => {
                     this.fileList = data;
@@ -185,9 +189,9 @@ export default defineComponent({
                 });
         },
         downloadConfig() {
-            fetch("/api/config/get?file=" + this.backupFileSelect, { headers: authHeader() })
-                .then(res => res.blob())
-                .then(blob => {
+            fetch('/api/config/get?file=' + this.backupFileSelect, { headers: authHeader() })
+                .then((res) => res.blob())
+                .then((blob) => {
                     const file = window.URL.createObjectURL(blob);
                     const a = document.createElement('a');
                     a.href = file;
@@ -204,13 +208,13 @@ export default defineComponent({
             if (target.files !== null && target.files?.length > 0) {
                 this.file = target.files[0];
             } else {
-                this.UploadError = this.$t("configadmin.NoFileSelected");
+                this.UploadError = this.$t('configadmin.NoFileSelected');
                 this.uploading = false;
                 this.progress = 0;
                 return;
             }
             const request = new XMLHttpRequest();
-            request.addEventListener("load", () => {
+            request.addEventListener('load', () => {
                 // request.response will hold the response from the server
                 if (request.status === 200) {
                     this.UploadSuccess = true;
@@ -223,20 +227,20 @@ export default defineComponent({
                 this.progress = 0;
             });
             // Upload progress
-            request.upload.addEventListener("progress", (e) => {
+            request.upload.addEventListener('progress', (e) => {
                 this.progress = Math.trunc((e.loaded / e.total) * 100);
             });
             request.withCredentials = true;
 
-            formData.append("config", this.file, "config");
-            request.open("post", "/api/config/upload?file=" + this.restoreFileSelect);
+            formData.append('config', this.file, 'config');
+            request.open('post', '/api/config/upload?file=' + this.restoreFileSelect);
             authHeader().forEach((value, key) => {
                 request.setRequestHeader(key, value);
             });
             request.send(formData);
         },
         clear() {
-            this.UploadError = "";
+            this.UploadError = '';
             this.UploadSuccess = false;
             this.getFileList();
         },

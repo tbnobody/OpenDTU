@@ -4,6 +4,7 @@
  */
 #include "Configuration.h"
 #include "MessageOutput.h"
+#include "NetworkSettings.h"
 #include "Utils.h"
 #include "defaults.h"
 #include <ArduinoJson.h>
@@ -58,6 +59,7 @@ bool ConfigurationClass::write()
     mqtt["enabled"] = config.Mqtt.Enabled;
     mqtt["hostname"] = config.Mqtt.Hostname;
     mqtt["port"] = config.Mqtt.Port;
+    mqtt["clientid"] = config.Mqtt.ClientId;
     mqtt["username"] = config.Mqtt.Username;
     mqtt["password"] = config.Mqtt.Password;
     mqtt["topic"] = config.Mqtt.Topic;
@@ -232,6 +234,7 @@ bool ConfigurationClass::read()
     config.Mqtt.Enabled = mqtt["enabled"] | MQTT_ENABLED;
     strlcpy(config.Mqtt.Hostname, mqtt["hostname"] | MQTT_HOST, sizeof(config.Mqtt.Hostname));
     config.Mqtt.Port = mqtt["port"] | MQTT_PORT;
+    strlcpy(config.Mqtt.ClientId, mqtt["clientid"] | NetworkSettings.getApName().c_str(), sizeof(config.Mqtt.ClientId));
     strlcpy(config.Mqtt.Username, mqtt["username"] | MQTT_USER, sizeof(config.Mqtt.Username));
     strlcpy(config.Mqtt.Password, mqtt["password"] | MQTT_PASSWORD, sizeof(config.Mqtt.Password));
     strlcpy(config.Mqtt.Topic, mqtt["topic"] | MQTT_TOPIC, sizeof(config.Mqtt.Topic));

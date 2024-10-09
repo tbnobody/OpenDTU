@@ -17,10 +17,16 @@
                     </tr>
                     <tr>
                         <th>{{ $t('firmwareinfo.FirmwareVersion') }}</th>
-                        <td><a :href="versionInfoUrl"
-                                target="_blank" v-tooltip :title="$t('firmwareinfo.FirmwareVersionHint')">
+                        <td>
+                            <a
+                                :href="versionInfoUrl"
+                                target="_blank"
+                                v-tooltip
+                                :title="$t('firmwareinfo.FirmwareVersionHint')"
+                            >
                                 {{ systemStatus.git_hash }}
-                            </a></td>
+                            </a>
+                        </td>
                     </tr>
                     <tr>
                         <th>{{ $t('firmwareinfo.PioEnv') }}</th>
@@ -30,16 +36,32 @@
                         <th>{{ $t('firmwareinfo.FirmwareUpdate') }}</th>
                         <td>
                             <div class="form-check form-check-inline form-switch">
-                                <input v-model="modelAllowVersionInfo" class="form-check-input" type="checkbox" role="switch" v-tooltip :title="$t('firmwareinfo.FrmwareUpdateAllow')" />
+                                <input
+                                    v-model="modelAllowVersionInfo"
+                                    class="form-check-input"
+                                    type="checkbox"
+                                    role="switch"
+                                    v-tooltip
+                                    :title="$t('firmwareinfo.FrmwareUpdateAllow')"
+                                />
                                 <label class="form-check-label">
-                                    <a v-if="modelAllowVersionInfo && systemStatus.update_url !== undefined" :href="systemStatus.update_url" target="_blank" v-tooltip
-                                        :title="$t('firmwareinfo.FirmwareUpdateHint')">
+                                    <a
+                                        v-if="modelAllowVersionInfo && systemStatus.update_url !== undefined"
+                                        :href="systemStatus.update_url"
+                                        target="_blank"
+                                        v-tooltip
+                                        :title="$t('firmwareinfo.FirmwareUpdateHint')"
+                                    >
                                         <span class="badge" :class="systemStatus.update_status">
                                             {{ systemStatus.update_text }}
                                         </span>
                                     </a>
-                                    <span v-else-if="modelAllowVersionInfo" class="badge" :class="systemStatus.update_status">
-                                            {{ systemStatus.update_text }}
+                                    <span
+                                        v-else-if="modelAllowVersionInfo"
+                                        class="badge"
+                                        :class="systemStatus.update_status"
+                                    >
+                                        {{ systemStatus.update_text }}
                                     </span>
                                 </label>
                             </div>
@@ -59,7 +81,9 @@
                     </tr>
                     <tr>
                         <th>{{ $t('firmwareinfo.Uptime') }}</th>
-                        <td>{{ $t('firmwareinfo.UptimeValue', timeInHours(systemStatus.uptime)) }}</td>
+                        <td>
+                            {{ $t('firmwareinfo.UptimeValue', timeInHours(systemStatus.uptime)) }}
+                        </td>
                     </tr>
                 </tbody>
             </table>
@@ -93,7 +117,7 @@ export default defineComponent({
         timeInHours() {
             return (value: number) => {
                 const [count, time] = timestampToString(this.$i18n.locale, value, true);
-                return {count, time};
+                return { count, time };
             };
         },
         versionInfoUrl(): string {
@@ -101,7 +125,7 @@ export default defineComponent({
                 return 'https://github.com/tbnobody/OpenDTU/commits/' + this.systemStatus.git_hash;
             }
             return 'https://github.com/tbnobody/OpenDTU/releases/tag/' + this.systemStatus.git_hash;
-        }
+        },
     },
 });
 </script>

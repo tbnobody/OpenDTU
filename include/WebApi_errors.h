@@ -32,6 +32,7 @@ enum WebApiError {
     InverterChanged,
     InverterDeleted,
     InverterOrdered,
+    InverterStatsResetted,
 
     LimitBase = 5000,
     LimitSerialZero,
@@ -60,6 +61,7 @@ enum WebApiError {
     MqttHassTopicLength,
     MqttHassTopicCharacter,
     MqttLwtQos,
+    MqttClientIdLength,
 
     NetworkBase = 8000,
     NetworkIpInvalid,

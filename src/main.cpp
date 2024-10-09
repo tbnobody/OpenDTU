@@ -16,6 +16,7 @@
 #include "NetworkSettings.h"
 #include "NtpSettings.h"
 #include "PinMapping.h"
+#include "RestartHelper.h"
 #include "Scheduler.h"
 #include "SunPosition.h"
 #include "Utils.h"
@@ -25,11 +26,20 @@
 #include <LittleFS.h>
 #include <TaskScheduler.h>
 #include <esp_heap_caps.h>
+#include <SpiManager.h>
+
+#include <driver/uart.h>
 
 void setup()
 {
     // Move all dynamic allocations >512byte to psram (if available)
     heap_caps_malloc_extmem_enable(512);
+
+    // Initialize SpiManager
+    SpiManagerInst.register_bus(SPI2_HOST);
+#if SOC_SPI_PERIPH_NUM > 2
+    SpiManagerInst.register_bus(SPI3_HOST);
+#endif
 
     // Initialize serial output
     Serial.begin(SERIAL_BAUDRATE);
@@ -143,7 +153,7 @@ void setup()
     if (config.Dtu.Serial == DTU_SERIAL) {
         MessageOutput.print("generate serial based on ESP chip id: ");
         const uint64_t dtuId = Utils::generateDtuSerial();
-        MessageOutput.printf("%0x%08x... ",
+        MessageOutput.printf("%0" PRIx32 "%08" PRIx32 "... ",
             ((uint32_t)((dtuId >> 32) & 0xFFFFFFFF)),
             ((uint32_t)(dtuId & 0xFFFFFFFF)));
         config.Dtu.Serial = dtuId;
@@ -154,6 +164,7 @@ void setup()
     InverterSettings.init(scheduler);
 
     Datastore.init(scheduler);
+    RestartHelper.init(scheduler);
 }
 
 void loop()

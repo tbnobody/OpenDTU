@@ -42,7 +42,7 @@ void WebApiWebappClass::responseBinaryDataWithETagCache(AsyncWebServerRequest *r
     if (eTagMatch) {
         response = request->beginResponse(304);
     } else {
-        response = request->beginResponse_P(200, contentType, content, len);
+        response = request->beginResponse(200, contentType, content, len);
         if (contentEncoding.length() > 0) {
             response->addHeader("Content-Encoding", contentEncoding);
         }

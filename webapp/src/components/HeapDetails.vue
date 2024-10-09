@@ -9,7 +9,9 @@
                     </tr>
                     <tr>
                         <th>{{ $t('heapdetails.LargestFreeBlock') }}</th>
-                        <td>{{ $n(Math.round(systemStatus.heap_max_block / 1024), 'kilobyte') }}</td>
+                        <td>
+                            {{ $n(Math.round(systemStatus.heap_max_block / 1024), 'kilobyte') }}
+                        </td>
                     </tr>
                     <tr>
                         <th>{{ $t('heapdetails.Fragmentation') }}</th>
@@ -17,7 +19,11 @@
                     </tr>
                     <tr>
                         <th>{{ $t('heapdetails.MaxUsage') }}</th>
-                        <td>{{ $n(Math.round(getMaxUsageAbs() / 1024), 'kilobyte') }} ({{ $n(getMaxUsageRel(), 'percent') }})</td>
+                        <td>
+                            {{ $n(Math.round(getMaxUsageAbs() / 1024), 'kilobyte') }} ({{
+                                $n(getMaxUsageRel(), 'percent')
+                            }})
+                        </td>
                     </tr>
                 </tbody>
             </table>
@@ -48,7 +54,7 @@ export default defineComponent({
             return this.getMaxUsageAbs() / this.systemStatus.heap_total;
         },
         getFragmentation() {
-            return 1 - (this.systemStatus.heap_max_block / this.getFreeHeap());
+            return 1 - this.systemStatus.heap_max_block / this.getFreeHeap();
         },
     },
 });

@@ -11,20 +11,20 @@ import { defineComponent } from 'vue';
 import { LOCALES } from '@/locales';
 
 export default defineComponent({
-    name: "LocaleSwitcher",
+    name: 'LocaleSwitcher',
     methods: {
         updateLanguage() {
-            localStorage.setItem("locale", this.$i18n.locale);
+            localStorage.setItem('locale', this.$i18n.locale);
         },
         getLocaleName(locale: string): string {
-            return LOCALES.find(i => i.value === locale)?.caption || "";
-        }
+            return LOCALES.find((i) => i.value === locale)?.caption || '';
+        },
     },
     mounted() {
-        if (localStorage.getItem("locale")) {
-            this.$i18n.locale = localStorage.getItem("locale") || "en";
+        if (localStorage.getItem('locale')) {
+            this.$i18n.locale = localStorage.getItem('locale') || 'en';
         } else {
-            localStorage.setItem("locale", this.$i18n.locale);
+            localStorage.setItem('locale', this.$i18n.locale);
         }
     },
 });

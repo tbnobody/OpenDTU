@@ -85,7 +85,7 @@ bool ActivePowerControlCommand::handleResponse(const fragment_t fragment[], cons
 
 float ActivePowerControlCommand::getLimit() const
 {
-    const uint16_t l = (((uint16_t)_payload[12] << 8) | _payload[13]);
+    const float l = (((uint16_t)_payload[12] << 8) | _payload[13]);
     return l / 10;
 }
 

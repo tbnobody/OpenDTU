@@ -4,8 +4,13 @@
             <div class="row g-3 align-items-center">
                 <div class="col">
                     <div class="form-check form-switch">
-                        <input class="form-check-input" type="checkbox" role="switch" id="autoScroll"
-                            v-model="isAutoScroll">
+                        <input
+                            class="form-check-input"
+                            type="checkbox"
+                            role="switch"
+                            id="autoScroll"
+                            v-model="isAutoScroll"
+                        />
                         <label class="form-check-label" for="autoScroll">
                             {{ $t('console.EnableAutoScroll') }}
                         </label>
@@ -14,9 +19,11 @@
                 <div class="col text-end">
                     <div class="btn-group" role="group">
                         <button type="button" class="btn btn-primary" :onClick="clearConsole">
-                            {{ $t('console.ClearConsole') }}</button>
+                            {{ $t('console.ClearConsole') }}
+                        </button>
                         <button type="button" class="btn btn-secondary" :onClick="copyConsole">
-                            {{ $t('console.CopyToClipboard') }}</button>
+                            {{ $t('console.CopyToClipboard') }}
+                        </button>
                     </div>
                 </div>
             </div>
@@ -41,7 +48,7 @@ export default defineComponent({
             socket: {} as WebSocket,
             heartInterval: 0,
             dataLoading: true,
-            consoleBuffer: "",
+            consoleBuffer: '',
             isAutoScroll: true,
             endWithNewline: false,
         };
@@ -56,21 +63,20 @@ export default defineComponent({
     watch: {
         consoleBuffer() {
             if (this.isAutoScroll) {
-                const textarea = this.$el.querySelector("#console");
+                const textarea = this.$el.querySelector('#console');
                 setTimeout(() => {
                     textarea.scrollTop = textarea.scrollHeight;
                 }, 0);
             }
-        }
+        },
     },
     methods: {
         initSocket() {
-            console.log("Starting connection to WebSocket Server");
+            console.log('Starting connection to WebSocket Server');
 
             const { protocol, host } = location;
             const authString = authUrl();
-            const webSocketUrl = `${protocol === "https:" ? "wss" : "ws"
-                }://${authString}${host}/console`;
+            const webSocketUrl = `${protocol === 'https:' ? 'wss' : 'ws'}://${authString}${host}/console`;
 
             this.closeSocket();
             this.socket = new WebSocket(webSocketUrl);
@@ -78,20 +84,21 @@ export default defineComponent({
             this.socket.onmessage = (event) => {
                 console.log(event);
 
-                let outstr = new String(event.data);
+                let outstr = String(event.data);
                 let removedNewline = false;
                 if (outstr.endsWith('\n')) {
                     outstr = outstr.substring(0, outstr.length - 1);
                     removedNewline = true;
                 }
-                this.consoleBuffer += (this.endWithNewline ? this.getOutDate() : '') + outstr.replaceAll("\n", "\n" + this.getOutDate());
+                this.consoleBuffer +=
+                    (this.endWithNewline ? this.getOutDate() : '') + outstr.replaceAll('\n', '\n' + this.getOutDate());
                 this.endWithNewline = removedNewline;
                 this.heartCheck(); // Reset heartbeat detection
             };
 
             this.socket.onopen = function (event) {
                 console.log(event);
-                console.log("Successfully connected to the echo websocket server...");
+                console.log('Successfully connected to the echo websocket server...');
             };
 
             // Listen to window events , When the window closes , Take the initiative to disconnect websocket Connect
@@ -101,11 +108,13 @@ export default defineComponent({
         },
         // Send heartbeat packets regularly * 59s Send a heartbeat
         heartCheck() {
-            this.heartInterval && clearTimeout(this.heartInterval);
+            if (this.heartInterval) {
+                clearTimeout(this.heartInterval);
+            }
             this.heartInterval = setInterval(() => {
                 if (this.socket.readyState === 1) {
                     // Connection status
-                    this.socket.send("ping");
+                    this.socket.send('ping');
                 } else {
                     this.initSocket(); // Breakpoint reconnection 5 Time
                 }
@@ -119,17 +128,25 @@ export default defineComponent({
                 // continue regardless of error
             }
 
-            this.heartInterval && clearTimeout(this.heartInterval);
+            if (this.heartInterval) {
+                clearTimeout(this.heartInterval);
+            }
         },
         getOutDate(): string {
             const u = new Date();
-            return ('0' + u.getHours()).slice(-2) + ':' +
-                ('0' + u.getMinutes()).slice(-2) + ':' +
-                ('0' + u.getSeconds()).slice(-2) + '.' +
-                (u.getMilliseconds() / 1000).toFixed(3).slice(2, 5) + ' > ';
+            return (
+                ('0' + u.getHours()).slice(-2) +
+                ':' +
+                ('0' + u.getMinutes()).slice(-2) +
+                ':' +
+                ('0' + u.getSeconds()).slice(-2) +
+                '.' +
+                (u.getMilliseconds() / 1000).toFixed(3).slice(2, 5) +
+                ' > '
+            );
         },
         clearConsole() {
-            this.consoleBuffer = "";
+            this.consoleBuffer = '';
         },
         copyConsole() {
             const input = document.createElement('textarea');
@@ -138,17 +155,17 @@ export default defineComponent({
             input.select();
             document.execCommand('copy');
             document.body.removeChild(input);
-        }
-    }
+        },
+    },
 });
 </script>
 
 <style>
 #console {
-    background-color: #0C0C0C;
-    color: #CCCCCC;
+    background-color: #0c0c0c;
+    color: #cccccc;
     padding: 8px;
     font-family: courier new;
-    font-size: .875em;
+    font-size: 0.875em;
 }
 </style>

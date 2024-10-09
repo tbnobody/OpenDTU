@@ -64,9 +64,9 @@ void WebApiLimitClass::onLimitPost(AsyncWebServerRequest* request)
 
     auto& retMsg = response->getRoot();
 
-    if (!(root.containsKey("serial")
-            && root.containsKey("limit_value")
-            && root.containsKey("limit_type"))) {
+    if (!(root["serial"].is<String>()
+            && root["limit_value"].is<float>()
+            && root["limit_type"].is<uint16_t>())) {
         retMsg["message"] = "Values are missing!";
         retMsg["code"] = WebApiError::GenericValueMissing;
         WebApi.sendJsonResponse(request, response, __FUNCTION__, __LINE__);
@@ -83,7 +83,7 @@ void WebApiLimitClass::onLimitPost(AsyncWebServerRequest* request)
         return;
     }
 
-    if (root["limit_value"].as<uint16_t>() > MAX_INVERTER_LIMIT) {
+    if (root["limit_value"].as<float>() > MAX_INVERTER_LIMIT) {
         retMsg["message"] = "Limit must between 0 and " STR(MAX_INVERTER_LIMIT) "!";
         retMsg["code"] = WebApiError::LimitInvalidLimit;
         retMsg["param"]["max"] = MAX_INVERTER_LIMIT;
@@ -102,7 +102,7 @@ void WebApiLimitClass::onLimitPost(AsyncWebServerRequest* request)
         return;
     }
 
-    uint16_t limit = root["limit_value"].as<uint16_t>();
+    float limit = root["limit_value"].as<float>();
     PowerLimitControlType type = root["limit_type"].as<PowerLimitControlType>();
 
     auto inv = Hoymiles.getInverterBySerial(serial);
