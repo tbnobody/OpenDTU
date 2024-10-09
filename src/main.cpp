@@ -43,10 +43,8 @@ void setup()
 
     // Initialize serial output
     Serial.begin(SERIAL_BAUDRATE);
-#if ARDUINO_USB_CDC_ON_BOOT
-    Serial.setTxTimeoutMs(0);
-    delay(100);
-#else
+#if !ARDUINO_USB_CDC_ON_BOOT
+    // Only wait for serial interface to be set up when not using CDC
     while (!Serial)
         yield();
 #endif
