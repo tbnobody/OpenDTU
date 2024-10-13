@@ -187,7 +187,8 @@
             "P": "Leistung (berechnet)",
             "V": "Spannung",
             "I": "Strom",
-            "E": "Effizienz (berechnet)"
+            "E": "Effizienz (berechnet)",
+            "SBSTemperature": "SBS Temperatur"
         },
         "section_input": "Eingang (Solarpanele)",
         "input": {

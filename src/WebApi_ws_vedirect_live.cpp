@@ -190,6 +190,11 @@ void WebApiWsVedirectLiveClass::populateJson(const JsonObject &root, const VeDir
     output["E"]["v"] = mpptData.mpptEfficiency_Percent;
     output["E"]["u"] = "%";
     output["E"]["d"] = 1;
+    if (mpptData.SmartBatterySenseTemperatureMilliCelsius.first > 0) {
+        output["SBSTemperature"]["v"] = mpptData.SmartBatterySenseTemperatureMilliCelsius.second / 1000.0;
+        output["SBSTemperature"]["u"] = "°C";
+        output["SBSTemperature"]["d"] = "0";
+    }
 
     const JsonObject input = values["input"].to<JsonObject>();
     if (mpptData.NetworkTotalDcInputPowerMilliWatts.first > 0) {
