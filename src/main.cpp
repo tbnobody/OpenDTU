@@ -152,8 +152,8 @@ void setup()
         MessageOutput.print("generate serial based on ESP chip id: ");
         const uint64_t dtuId = Utils::generateDtuSerial();
         MessageOutput.printf("%0" PRIx32 "%08" PRIx32 "... ",
-            ((uint32_t)((dtuId >> 32) & 0xFFFFFFFF)),
-            ((uint32_t)(dtuId & 0xFFFFFFFF)));
+            static_cast<uint32_t>((dtuId >> 32) & 0xFFFFFFFF),
+            static_cast<uint32_t>(dtuId & 0xFFFFFFFF));
         config.Dtu.Serial = dtuId;
         Configuration.write();
     }
