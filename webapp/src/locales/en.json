@@ -462,7 +462,11 @@
         "ApTimeoutHint": "Time which the AccessPoint is kept open. A value of 0 means infinite.",
         "Minutes": "minutes",
         "EnableMdns": "Enable mDNS",
-        "MdnsSettings": "mDNS Settings"
+        "MdnsSettings": "mDNS Settings",
+        "EnableSyslog": "Enable Syslog",
+        "SyslogSettings": "Syslog Settings",
+        "SyslogHostname": "Syslog Server",
+        "SyslogPort": "Port"
     },
     "mqttadmin": {
         "MqttSettings": "MQTT Settings",
