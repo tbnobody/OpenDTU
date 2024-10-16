@@ -1,0 +1,72 @@
+// SPDX-License-Identifier: GPL-2.0-or-later
+/*
+ * Copyright (C) 2024 Thomas Basler and others
+ */
+#include "I18n.h"
+#include "MessageOutput.h"
+#include "Utils.h"
+#include "defaults.h"
+#include <ArduinoJson.h>
+#include <LittleFS.h>
+
+I18nClass I18n;
+
+I18nClass::I18nClass()
+{
+}
+
+void I18nClass::init(Scheduler& scheduler)
+{
+    readLangPacks();
+}
+
+std::list<LanguageInfo_t> I18nClass::getAvailableLanguages()
+{
+    return _availLanguages;
+}
+
+void I18nClass::readLangPacks()
+{
+    auto root = LittleFS.open("/");
+    auto file = root.getNextFileName();
+
+    while (file != "") {
+        if (file.endsWith(LANG_PACK_SUFFIX)) {
+            MessageOutput.printf("Read File %s\r\n", file.c_str());
+            readConfig(file);
+        }
+        file = root.getNextFileName();
+    }
+    root.close();
+}
+
+void I18nClass::readConfig(String file)
+{
+    JsonDocument filter;
+    filter["meta"] = true;
+
+    File f = LittleFS.open(file, "r", false);
+
+    JsonDocument doc;
+
+    // Deserialize the JSON document
+    const DeserializationError error = deserializeJson(doc, f, DeserializationOption::Filter(filter));
+    if (error) {
+        MessageOutput.printf("Failed to read file %s\r\n", file.c_str());
+        f.close();
+        return;
+    }
+
+    if (!Utils::checkJsonAlloc(doc, __FUNCTION__, __LINE__)) {
+        return;
+    }
+
+    LanguageInfo_t lang;
+    lang.code = String(doc["meta"]["code"]);
+    lang.name = String(doc["meta"]["name"]);
+    lang.filename = file;
+
+    _availLanguages.push_back(lang);
+
+    f.close();
+}

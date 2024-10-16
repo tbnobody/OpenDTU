@@ -108,3 +108,5 @@
 #define LED_BRIGHTNESS 100U
 
 #define MAX_INVERTER_LIMIT 2250
+
+#define LANG_PACK_SUFFIX ".lang.json"

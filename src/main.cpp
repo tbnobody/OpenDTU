@@ -5,6 +5,7 @@
 #include "Configuration.h"
 #include "Datastore.h"
 #include "Display_Graphic.h"
+#include "I18n.h"
 #include "InverterSettings.h"
 #include "Led_Single.h"
 #include "MessageOutput.h"
@@ -24,9 +25,9 @@
 #include "defaults.h"
 #include <Arduino.h>
 #include <LittleFS.h>
+#include <SpiManager.h>
 #include <TaskScheduler.h>
 #include <esp_heap_caps.h>
-#include <SpiManager.h>
 
 #include <driver/uart.h>
 
@@ -81,6 +82,11 @@ void setup()
         Configuration.migrate();
     }
     auto& config = Configuration.get();
+    MessageOutput.println("done");
+
+    // Read languate pack
+    MessageOutput.print("Reading language pack... ");
+    I18n.init(scheduler);
     MessageOutput.println("done");
 
     // Load PinMapping

@@ -11,4 +11,5 @@ public:
     static int getTimezoneOffset();
     static bool checkJsonAlloc(const JsonDocument& doc, const char* function, const uint16_t line);
     static void removeAllFiles();
+    static String generateMd5FromFile(String file);
 };
