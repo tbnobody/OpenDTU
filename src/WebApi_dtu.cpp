@@ -27,7 +27,7 @@ void WebApiDtuClass::init(AsyncWebServer& server, Scheduler& scheduler)
 void WebApiDtuClass::applyDataTaskCb()
 {
     // Execute stuff in main thread to avoid busy SPI bus
-    CONFIG_T& config = Configuration.get();
+    auto const& config = Configuration.get();
     Hoymiles.getRadioNrf()->setPALevel((rf24_pa_dbm_e)config.Dtu.Nrf.PaLevel);
     Hoymiles.getRadioCmt()->setPALevel(config.Dtu.Cmt.PaLevel);
     Hoymiles.getRadioNrf()->setDtuSerial(config.Dtu.Serial);
@@ -153,14 +153,16 @@ void WebApiDtuClass::onDtuAdminPost(AsyncWebServerRequest* request)
         return;
     }
 
-    CONFIG_T& config = Configuration.get();
-
-    config.Dtu.Serial = serial;
-    config.Dtu.PollInterval = root["pollinterval"].as<uint32_t>();
-    config.Dtu.Nrf.PaLevel = root["nrf_palevel"].as<uint8_t>();
-    config.Dtu.Cmt.PaLevel = root["cmt_palevel"].as<int8_t>();
-    config.Dtu.Cmt.Frequency = root["cmt_frequency"].as<uint32_t>();
-    config.Dtu.Cmt.CountryMode = root["cmt_country"].as<CountryModeId_t>();
+    {
+        auto guard = Configuration.getWriteGuard();
+        auto& config = guard.getConfig();
+        config.Dtu.Serial = serial;
+        config.Dtu.PollInterval = root["pollinterval"].as<uint32_t>();
+        config.Dtu.Nrf.PaLevel = root["nrf_palevel"].as<uint8_t>();
+        config.Dtu.Cmt.PaLevel = root["cmt_palevel"].as<int8_t>();
+        config.Dtu.Cmt.Frequency = root["cmt_frequency"].as<uint32_t>();
+        config.Dtu.Cmt.CountryMode = root["cmt_country"].as<CountryModeId_t>();
+    }
 
     WebApi.writeConfig(retMsg);
 
