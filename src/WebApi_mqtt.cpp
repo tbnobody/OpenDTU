@@ -271,36 +271,40 @@ void WebApiMqttClass::onMqttAdminPost(AsyncWebServerRequest* request)
         }
     }
 
-    CONFIG_T& config = Configuration.get();
-    config.Mqtt.Enabled = root["mqtt_enabled"].as<bool>();
-    config.Mqtt.Retain = root["mqtt_retain"].as<bool>();
-    config.Mqtt.Tls.Enabled = root["mqtt_tls"].as<bool>();
-    strlcpy(config.Mqtt.Tls.RootCaCert, root["mqtt_root_ca_cert"].as<String>().c_str(), sizeof(config.Mqtt.Tls.RootCaCert));
-    config.Mqtt.Tls.CertLogin = root["mqtt_tls_cert_login"].as<bool>();
-    strlcpy(config.Mqtt.Tls.ClientCert, root["mqtt_client_cert"].as<String>().c_str(), sizeof(config.Mqtt.Tls.ClientCert));
-    strlcpy(config.Mqtt.Tls.ClientKey, root["mqtt_client_key"].as<String>().c_str(), sizeof(config.Mqtt.Tls.ClientKey));
-    config.Mqtt.Port = root["mqtt_port"].as<uint>();
-    strlcpy(config.Mqtt.Hostname, root["mqtt_hostname"].as<String>().c_str(), sizeof(config.Mqtt.Hostname));
-    strlcpy(config.Mqtt.ClientId, root["mqtt_clientid"].as<String>().c_str(), sizeof(config.Mqtt.ClientId));
-    strlcpy(config.Mqtt.Username, root["mqtt_username"].as<String>().c_str(), sizeof(config.Mqtt.Username));
-    strlcpy(config.Mqtt.Password, root["mqtt_password"].as<String>().c_str(), sizeof(config.Mqtt.Password));
-    strlcpy(config.Mqtt.Lwt.Topic, root["mqtt_lwt_topic"].as<String>().c_str(), sizeof(config.Mqtt.Lwt.Topic));
-    strlcpy(config.Mqtt.Lwt.Value_Online, root["mqtt_lwt_online"].as<String>().c_str(), sizeof(config.Mqtt.Lwt.Value_Online));
-    strlcpy(config.Mqtt.Lwt.Value_Offline, root["mqtt_lwt_offline"].as<String>().c_str(), sizeof(config.Mqtt.Lwt.Value_Offline));
-    config.Mqtt.Lwt.Qos = root["mqtt_lwt_qos"].as<uint8_t>();
-    config.Mqtt.PublishInterval = root["mqtt_publish_interval"].as<uint32_t>();
-    config.Mqtt.CleanSession = root["mqtt_clean_session"].as<bool>();
-    config.Mqtt.Hass.Enabled = root["mqtt_hass_enabled"].as<bool>();
-    config.Mqtt.Hass.Expire = root["mqtt_hass_expire"].as<bool>();
-    config.Mqtt.Hass.Retain = root["mqtt_hass_retain"].as<bool>();
-    config.Mqtt.Hass.IndividualPanels = root["mqtt_hass_individualpanels"].as<bool>();
-    strlcpy(config.Mqtt.Hass.Topic, root["mqtt_hass_topic"].as<String>().c_str(), sizeof(config.Mqtt.Hass.Topic));
+    {
+        auto guard = Configuration.getWriteGuard();
+        auto& config = guard.getConfig();
 
-    // Check if base topic was changed
-    if (strcmp(config.Mqtt.Topic, root["mqtt_topic"].as<String>().c_str())) {
-        MqttHandleInverter.unsubscribeTopics();
-        strlcpy(config.Mqtt.Topic, root["mqtt_topic"].as<String>().c_str(), sizeof(config.Mqtt.Topic));
-        MqttHandleInverter.subscribeTopics();
+        config.Mqtt.Enabled = root["mqtt_enabled"].as<bool>();
+        config.Mqtt.Retain = root["mqtt_retain"].as<bool>();
+        config.Mqtt.Tls.Enabled = root["mqtt_tls"].as<bool>();
+        strlcpy(config.Mqtt.Tls.RootCaCert, root["mqtt_root_ca_cert"].as<String>().c_str(), sizeof(config.Mqtt.Tls.RootCaCert));
+        config.Mqtt.Tls.CertLogin = root["mqtt_tls_cert_login"].as<bool>();
+        strlcpy(config.Mqtt.Tls.ClientCert, root["mqtt_client_cert"].as<String>().c_str(), sizeof(config.Mqtt.Tls.ClientCert));
+        strlcpy(config.Mqtt.Tls.ClientKey, root["mqtt_client_key"].as<String>().c_str(), sizeof(config.Mqtt.Tls.ClientKey));
+        config.Mqtt.Port = root["mqtt_port"].as<uint>();
+        strlcpy(config.Mqtt.Hostname, root["mqtt_hostname"].as<String>().c_str(), sizeof(config.Mqtt.Hostname));
+        strlcpy(config.Mqtt.ClientId, root["mqtt_clientid"].as<String>().c_str(), sizeof(config.Mqtt.ClientId));
+        strlcpy(config.Mqtt.Username, root["mqtt_username"].as<String>().c_str(), sizeof(config.Mqtt.Username));
+        strlcpy(config.Mqtt.Password, root["mqtt_password"].as<String>().c_str(), sizeof(config.Mqtt.Password));
+        strlcpy(config.Mqtt.Lwt.Topic, root["mqtt_lwt_topic"].as<String>().c_str(), sizeof(config.Mqtt.Lwt.Topic));
+        strlcpy(config.Mqtt.Lwt.Value_Online, root["mqtt_lwt_online"].as<String>().c_str(), sizeof(config.Mqtt.Lwt.Value_Online));
+        strlcpy(config.Mqtt.Lwt.Value_Offline, root["mqtt_lwt_offline"].as<String>().c_str(), sizeof(config.Mqtt.Lwt.Value_Offline));
+        config.Mqtt.Lwt.Qos = root["mqtt_lwt_qos"].as<uint8_t>();
+        config.Mqtt.PublishInterval = root["mqtt_publish_interval"].as<uint32_t>();
+        config.Mqtt.CleanSession = root["mqtt_clean_session"].as<bool>();
+        config.Mqtt.Hass.Enabled = root["mqtt_hass_enabled"].as<bool>();
+        config.Mqtt.Hass.Expire = root["mqtt_hass_expire"].as<bool>();
+        config.Mqtt.Hass.Retain = root["mqtt_hass_retain"].as<bool>();
+        config.Mqtt.Hass.IndividualPanels = root["mqtt_hass_individualpanels"].as<bool>();
+        strlcpy(config.Mqtt.Hass.Topic, root["mqtt_hass_topic"].as<String>().c_str(), sizeof(config.Mqtt.Hass.Topic));
+
+        // Check if base topic was changed
+        if (strcmp(config.Mqtt.Topic, root["mqtt_topic"].as<String>().c_str())) {
+            MqttHandleInverter.unsubscribeTopics();
+            strlcpy(config.Mqtt.Topic, root["mqtt_topic"].as<String>().c_str(), sizeof(config.Mqtt.Topic));
+            MqttHandleInverter.subscribeTopics();
+        }
     }
 
     WebApi.writeConfig(retMsg);
