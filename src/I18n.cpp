@@ -25,6 +25,19 @@ std::list<LanguageInfo_t> I18nClass::getAvailableLanguages()
     return _availLanguages;
 }
 
+String I18nClass::getFilenameByLocale(String& locale) const
+{
+    auto it = std::find_if(_availLanguages.begin(), _availLanguages.end(), [locale](const LanguageInfo_t& elem) {
+        return elem.code == locale;
+    });
+
+    if (it != _availLanguages.end()) {
+        return it->filename;
+    } else {
+        return String();
+    }
+}
+
 void I18nClass::readLangPacks()
 {
     auto root = LittleFS.open("/");

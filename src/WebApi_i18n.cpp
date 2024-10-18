@@ -40,13 +40,10 @@ void WebApiI18nClass::onI18nLanguage(AsyncWebServerRequest* request)
     if (request->hasParam("code")) {
         String code = request->getParam("code")->value();
 
-        const auto& languages = I18n.getAvailableLanguages();
-        auto it = std::find_if(languages.begin(), languages.end(), [code](const LanguageInfo_t& elem) {
-            return elem.code == code;
-        });
+        String filename = I18n.getFilenameByLocale(code);
 
-        if (it != languages.end()) {
-            String md5 = Utils::generateMd5FromFile(it->filename);
+        if (filename != "") {
+            String md5 = Utils::generateMd5FromFile(filename);
 
             String expectedEtag;
             expectedEtag = "\"";
@@ -64,7 +61,7 @@ void WebApiI18nClass::onI18nLanguage(AsyncWebServerRequest* request)
             if (eTagMatch) {
                 response = request->beginResponse(304);
             } else {
-                response = request->beginResponse(LittleFS, it->filename, asyncsrv::T_application_json);
+                response = request->beginResponse(LittleFS, filename, asyncsrv::T_application_json);
             }
 
             // HTTP requires cache headers in 200 and 304 to be identical

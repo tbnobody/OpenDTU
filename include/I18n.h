@@ -16,6 +16,7 @@ public:
     I18nClass();
     void init(Scheduler& scheduler);
     std::list<LanguageInfo_t> getAvailableLanguages();
+    String getFilenameByLocale(String& locale) const;
 
 private:
     void readLangPacks();
