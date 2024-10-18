@@ -27,6 +27,7 @@ export default defineConfig({
     VueI18nPlugin({
         /* options */
         include: path.resolve(path.dirname(fileURLToPath(import.meta.url)), './src/locales/**.json'),
+        runtimeOnly: false,
         fullInstall: false,
         forceStringify: true,
         strictMessage: false,
@@ -55,6 +56,7 @@ export default defineConfig({
         assetFileNames: "assets/[name].[ext]",
       },
     },
+    target: 'es2022',
   },
   esbuild: {
     drop: ['console', 'debugger'],
