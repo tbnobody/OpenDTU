@@ -22,10 +22,38 @@ void WebApiFileClass::init(AsyncWebServer& server, Scheduler& scheduler)
 
     server.on("/api/file/get", HTTP_GET, std::bind(&WebApiFileClass::onFileGet, this, _1));
     server.on("/api/file/delete", HTTP_POST, std::bind(&WebApiFileClass::onFileDelete, this, _1));
+    server.on("/api/file/delete_all", HTTP_POST, std::bind(&WebApiFileClass::onFileDeleteAll, this, _1));
     server.on("/api/file/list", HTTP_GET, std::bind(&WebApiFileClass::onFileListGet, this, _1));
     server.on("/api/file/upload", HTTP_POST,
         std::bind(&WebApiFileClass::onFileUploadFinish, this, _1),
         std::bind(&WebApiFileClass::onFileUpload, this, _1, _2, _3, _4, _5, _6));
+}
+
+void WebApiFileClass::onFileListGet(AsyncWebServerRequest* request)
+{
+    if (!WebApi.checkCredentials(request)) {
+        return;
+    }
+
+    AsyncJsonResponse* response = new AsyncJsonResponse();
+    auto& root = response->getRoot();
+    auto data = root.to<JsonArray>();
+
+    File rootfs = LittleFS.open("/");
+    File file = rootfs.openNextFile();
+    while (file) {
+        if (file.isDirectory()) {
+            continue;
+        }
+        JsonObject obj = data.add<JsonObject>();
+        obj["name"] = String(file.name());
+        obj["size"] = file.size();
+
+        file = rootfs.openNextFile();
+    }
+    file.close();
+
+    WebApi.sendJsonResponse(request, response, __FUNCTION__, __LINE__);
 }
 
 void WebApiFileClass::onFileGet(AsyncWebServerRequest* request)
@@ -62,6 +90,42 @@ void WebApiFileClass::onFileDelete(AsyncWebServerRequest* request)
 
     auto& retMsg = response->getRoot();
 
+    if (!(root["file"].is<String>())) {
+        retMsg["message"] = "Values are missing!";
+        retMsg["code"] = WebApiError::GenericValueMissing;
+        WebApi.sendJsonResponse(request, response, __FUNCTION__, __LINE__);
+        return;
+    }
+
+    String name = "/" + root["file"].as<String>();
+    if (!LittleFS.exists(name)) {
+        request->send(404);
+        return;
+    }
+
+    LittleFS.remove(name);
+
+    retMsg["type"] = "success";
+    retMsg["message"] = "File deleted";
+    retMsg["code"] = WebApiError::FileDeleteSuccess;
+
+    WebApi.sendJsonResponse(request, response, __FUNCTION__, __LINE__);
+}
+
+void WebApiFileClass::onFileDeleteAll(AsyncWebServerRequest* request)
+{
+    if (!WebApi.checkCredentials(request)) {
+        return;
+    }
+
+    AsyncJsonResponse* response = new AsyncJsonResponse();
+    JsonDocument root;
+    if (!WebApi.parseRequestData(request, response, root)) {
+        return;
+    }
+
+    auto& retMsg = response->getRoot();
+
     if (!(root["delete"].is<bool>())) {
         retMsg["message"] = "Values are missing!";
         retMsg["code"] = WebApiError::GenericValueMissing;
@@ -71,60 +135,18 @@ void WebApiFileClass::onFileDelete(AsyncWebServerRequest* request)
 
     if (root["delete"].as<bool>() == false) {
         retMsg["message"] = "Not deleted anything!";
-        retMsg["code"] = WebApiError::ConfigNotDeleted;
+        retMsg["code"] = WebApiError::FileNotDeleted;
         WebApi.sendJsonResponse(request, response, __FUNCTION__, __LINE__);
         return;
     }
 
     retMsg["type"] = "success";
     retMsg["message"] = "Configuration resettet. Rebooting now...";
-    retMsg["code"] = WebApiError::ConfigSuccess;
+    retMsg["code"] = WebApiError::FileSuccess;
 
     WebApi.sendJsonResponse(request, response, __FUNCTION__, __LINE__);
 
     Utils::removeAllFiles();
-    RestartHelper.triggerRestart();
-}
-
-void WebApiFileClass::onFileListGet(AsyncWebServerRequest* request)
-{
-    if (!WebApi.checkCredentials(request)) {
-        return;
-    }
-
-    AsyncJsonResponse* response = new AsyncJsonResponse();
-    auto& root = response->getRoot();
-    auto data = root["configs"].to<JsonArray>();
-
-    File rootfs = LittleFS.open("/");
-    File file = rootfs.openNextFile();
-    while (file) {
-        if (file.isDirectory()) {
-            continue;
-        }
-        JsonObject obj = data.add<JsonObject>();
-        obj["name"] = String(file.name());
-
-        file = rootfs.openNextFile();
-    }
-    file.close();
-
-    WebApi.sendJsonResponse(request, response, __FUNCTION__, __LINE__);
-}
-
-void WebApiFileClass::onFileUploadFinish(AsyncWebServerRequest* request)
-{
-    if (!WebApi.checkCredentials(request)) {
-        return;
-    }
-
-    // the request handler is triggered after the upload has finished...
-    // create the response, add header, and send response
-
-    AsyncWebServerResponse* response = request->beginResponse(200, "text/plain", "OK");
-    response->addHeader("Connection", "close");
-    response->addHeader("Access-Control-Allow-Origin", "*");
-    request->send(response);
     RestartHelper.triggerRestart();
 }
 
@@ -153,4 +175,20 @@ void WebApiFileClass::onFileUpload(AsyncWebServerRequest* request, String filena
         // close the file handle as the upload is now done
         request->_tempFile.close();
     }
+}
+
+void WebApiFileClass::onFileUploadFinish(AsyncWebServerRequest* request)
+{
+    if (!WebApi.checkCredentials(request)) {
+        return;
+    }
+
+    // the request handler is triggered after the upload has finished...
+    // create the response, add header, and send response
+
+    AsyncWebServerResponse* response = request->beginResponse(200, "text/plain", "OK");
+    response->addHeader("Connection", "close");
+    response->addHeader("Access-Control-Allow-Origin", "*");
+    request->send(response);
+    RestartHelper.triggerRestart();
 }
