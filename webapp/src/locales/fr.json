@@ -54,6 +54,7 @@
         "2005": "Invalid country selection !",
         "3001": "Rien n'a été supprimé !",
         "3002": "Configuration réinitialisée. Redémarrage maintenant...",
+        "3003": "File successful deleted. Restart to apply changes!",
         "4001": "@:apiresponse.2001",
         "4002": "Le nom doit comporter entre 1 et {max} caractères !",
         "4003": "Seulement {max} onduleurs sont supportés !",
@@ -538,11 +539,9 @@
         "YieldDayCorrection": "Yield Day Correction",
         "YieldDayCorrectionHint": "Sum up daily yield even if the inverter is restarted. Value will be reset at midnight"
     },
-    "configadmin": {
+    "fileadmin": {
         "ConfigManagement": "Gestion de la configuration",
         "BackupHeader": "Sauvegarder le fichier de configuration",
-        "BackupConfig": "Fichier de configuration",
-        "Backup": "Sauvegarder",
         "Restore": "Restaurer",
         "NoFileSelected": "Aucun fichier sélectionné",
         "RestoreHeader": "Restaurer le fichier de configuration",
@@ -555,6 +554,12 @@
         "FactoryReset": "Remise à zéro",
         "ResetMsg": "Êtes-vous sûr de vouloir supprimer la configuration actuelle et réinitialiser tous les paramètres à leurs valeurs par défaut ?",
         "ResetConfirm": "Remise à zéro !",
+        "Download": "Download",
+        "Delete": "Supprimer",
+        "DeleteMsg": "Are you sure you want to delete file: '{name}'? You have to manually reboot the device to apply config changes!",
+        "Name": "Name",
+        "Size": "Size",
+        "Action": "Action",
         "Cancel": "@:base.Cancel"
     },
     "login": {

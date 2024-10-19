@@ -54,6 +54,7 @@
         "2005": "Ungültige Landesauswahl!",
         "3001": "Nichts gelöscht!",
         "3002": "Konfiguration zurückgesetzt. Starte jetzt neu...",
+        "3003": "Datei erfolgreich gelöscht. Neustarten um Änderungen anzuwenden!",
         "4001": "@:apiresponse.2001",
         "4002": "Der Name muss zwischen 1 und {max} Zeichen lang sein!",
         "4003": "Es werden nur {max} Wechselrichter unterstützt!",
@@ -556,11 +557,9 @@
         "YieldDayCorrection": "Tagesertragskorrektur",
         "YieldDayCorrectionHint": "Summiert den Tagesertrag, auch wenn der Wechselrichter neu gestartet wird. Der Wert wird um Mitternacht zurückgesetzt"
     },
-    "configadmin": {
+    "fileadmin": {
         "ConfigManagement": "Konfigurationsverwaltung",
         "BackupHeader": "Sicherung: Sicherung der Konfigurationsdatei",
-        "BackupConfig": "Sicherung der Konfigurationsdatei",
-        "Backup": "Sichern",
         "Restore": "Wiederherstellen",
         "NoFileSelected": "Keine Datei ausgewählt",
         "RestoreHeader": "Wiederherstellen: Wiederherstellen der Konfigurationsdatei",
@@ -573,6 +572,12 @@
         "FactoryReset": "Werksreset",
         "ResetMsg": "Sind Sie sicher, dass Sie die aktuelle Konfiguration löschen und alle Einstellungen auf die Werkseinstellungen zurücksetzen möchten?",
         "ResetConfirm": "Werksreset!",
+        "Download": "Herunterladen",
+        "Delete": "Löschen",
+        "DeleteMsg": "Sind Sie sicher, dass Sie die Datei löschen wollen: '{name}'? Es muss manuell neu gestartet werden um die Konfigurationsänderungen zu übernehmen!",
+        "Name": "Name",
+        "Size": "Größe",
+        "Action": "Aktion",
         "Cancel": "@:base.Cancel"
     },
     "login": {
