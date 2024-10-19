@@ -349,6 +349,7 @@ import CardElement from '@/components/CardElement.vue';
 import InputElement from '@/components/InputElement.vue';
 import InputSerial from '@/components/InputSerial.vue';
 import ModalDialog from '@/components/ModalDialog.vue';
+import type { AlertResponse } from '@/types/Alert';
 import type { Inverter } from '@/types/InverterConfig';
 import { authHeader, handleResponse } from '@/utils/authentication';
 import * as bootstrap from 'bootstrap';
@@ -362,13 +363,6 @@ import {
 } from 'bootstrap-icons-vue';
 import Sortable from 'sortablejs';
 import { defineComponent } from 'vue';
-
-declare interface AlertResponse {
-    message: string;
-    type: string;
-    code: number;
-    show: boolean;
-}
 
 export default defineComponent({
     components: {
