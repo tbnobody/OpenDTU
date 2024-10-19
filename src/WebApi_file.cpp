@@ -2,7 +2,7 @@
 /*
  * Copyright (C) 2022-2024 Thomas Basler and others
  */
-#include "WebApi_config.h"
+#include "WebApi_file.h"
 #include "Configuration.h"
 #include "RestartHelper.h"
 #include "Utils.h"
@@ -11,7 +11,7 @@
 #include <AsyncJson.h>
 #include <LittleFS.h>
 
-void WebApiConfigClass::init(AsyncWebServer& server, Scheduler& scheduler)
+void WebApiFileClass::init(AsyncWebServer& server, Scheduler& scheduler)
 {
     using std::placeholders::_1;
     using std::placeholders::_2;
@@ -20,15 +20,15 @@ void WebApiConfigClass::init(AsyncWebServer& server, Scheduler& scheduler)
     using std::placeholders::_5;
     using std::placeholders::_6;
 
-    server.on("/api/config/get", HTTP_GET, std::bind(&WebApiConfigClass::onConfigGet, this, _1));
-    server.on("/api/config/delete", HTTP_POST, std::bind(&WebApiConfigClass::onConfigDelete, this, _1));
-    server.on("/api/config/list", HTTP_GET, std::bind(&WebApiConfigClass::onConfigListGet, this, _1));
-    server.on("/api/config/upload", HTTP_POST,
-        std::bind(&WebApiConfigClass::onConfigUploadFinish, this, _1),
-        std::bind(&WebApiConfigClass::onConfigUpload, this, _1, _2, _3, _4, _5, _6));
+    server.on("/api/file/get", HTTP_GET, std::bind(&WebApiFileClass::onFileGet, this, _1));
+    server.on("/api/file/delete", HTTP_POST, std::bind(&WebApiFileClass::onFileDelete, this, _1));
+    server.on("/api/file/list", HTTP_GET, std::bind(&WebApiFileClass::onFileListGet, this, _1));
+    server.on("/api/file/upload", HTTP_POST,
+        std::bind(&WebApiFileClass::onFileUploadFinish, this, _1),
+        std::bind(&WebApiFileClass::onFileUpload, this, _1, _2, _3, _4, _5, _6));
 }
 
-void WebApiConfigClass::onConfigGet(AsyncWebServerRequest* request)
+void WebApiFileClass::onFileGet(AsyncWebServerRequest* request)
 {
     if (!WebApi.checkCredentials(request)) {
         return;
@@ -48,7 +48,7 @@ void WebApiConfigClass::onConfigGet(AsyncWebServerRequest* request)
     request->send(LittleFS, requestFile, String(), true);
 }
 
-void WebApiConfigClass::onConfigDelete(AsyncWebServerRequest* request)
+void WebApiFileClass::onFileDelete(AsyncWebServerRequest* request)
 {
     if (!WebApi.checkCredentials(request)) {
         return;
@@ -86,7 +86,7 @@ void WebApiConfigClass::onConfigDelete(AsyncWebServerRequest* request)
     RestartHelper.triggerRestart();
 }
 
-void WebApiConfigClass::onConfigListGet(AsyncWebServerRequest* request)
+void WebApiFileClass::onFileListGet(AsyncWebServerRequest* request)
 {
     if (!WebApi.checkCredentials(request)) {
         return;
@@ -112,7 +112,7 @@ void WebApiConfigClass::onConfigListGet(AsyncWebServerRequest* request)
     WebApi.sendJsonResponse(request, response, __FUNCTION__, __LINE__);
 }
 
-void WebApiConfigClass::onConfigUploadFinish(AsyncWebServerRequest* request)
+void WebApiFileClass::onFileUploadFinish(AsyncWebServerRequest* request)
 {
     if (!WebApi.checkCredentials(request)) {
         return;
@@ -128,7 +128,7 @@ void WebApiConfigClass::onConfigUploadFinish(AsyncWebServerRequest* request)
     RestartHelper.triggerRestart();
 }
 
-void WebApiConfigClass::onConfigUpload(AsyncWebServerRequest* request, String filename, size_t index, uint8_t* data, size_t len, bool final)
+void WebApiFileClass::onFileUpload(AsyncWebServerRequest* request, String filename, size_t index, uint8_t* data, size_t len, bool final)
 {
     if (!WebApi.checkCredentials(request)) {
         return;

@@ -163,7 +163,7 @@ export default defineComponent({
             const formData = new FormData();
             formData.append('data', JSON.stringify({ delete: true }));
 
-            fetch('/api/config/delete', {
+            fetch('/api/file/delete', {
                 method: 'POST',
                 headers: authHeader(),
                 body: formData,
@@ -178,7 +178,7 @@ export default defineComponent({
         },
         getFileList() {
             this.loading = true;
-            fetch('/api/config/list', { headers: authHeader() })
+            fetch('/api/file/list', { headers: authHeader() })
                 .then((response) => handleResponse(response, this.$emitter, this.$router))
                 .then((data) => {
                     this.fileList = data;
@@ -189,7 +189,7 @@ export default defineComponent({
                 });
         },
         downloadConfig() {
-            fetch('/api/config/get?file=' + this.backupFileSelect, { headers: authHeader() })
+            fetch('/api/file/get?file=' + this.backupFileSelect, { headers: authHeader() })
                 .then((res) => res.blob())
                 .then((blob) => {
                     const file = window.URL.createObjectURL(blob);
@@ -233,7 +233,7 @@ export default defineComponent({
             request.withCredentials = true;
 
             formData.append('config', this.file, 'config');
-            request.open('post', '/api/config/upload?file=' + this.restoreFileSelect);
+            request.open('post', '/api/file/upload?file=' + this.restoreFileSelect);
             authHeader().forEach((value, key) => {
                 request.setRequestHeader(key, value);
             });

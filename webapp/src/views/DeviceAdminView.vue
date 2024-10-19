@@ -316,7 +316,7 @@ export default defineComponent({
     methods: {
         getPinMappingList() {
             this.pinMappingLoading = true;
-            fetch('/api/config/get?file=pin_mapping.json', { headers: authHeader() })
+            fetch('/api/file/get?file=pin_mapping.json', { headers: authHeader() })
                 .then((response) => handleResponse(response, this.$emitter, this.$router, true))
                 .then((data) => {
                     this.pinMappingList = data;
