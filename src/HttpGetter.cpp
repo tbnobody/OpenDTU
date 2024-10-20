@@ -61,8 +61,8 @@ bool HttpGetter::init()
     // get port
     index = _host.indexOf(':');
     if (index >= 0) {
-        _host = _host.substring(0, index); // up until colon
         _port = _host.substring(index + 1).toInt(); // after colon
+        _host = _host.substring(0, index); // up until colon
     }
 
     if (_useHttps) {
