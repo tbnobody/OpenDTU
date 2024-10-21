@@ -129,7 +129,7 @@ import BasePage from '@/components/BasePage.vue';
 import BootstrapAlert from '@/components/BootstrapAlert.vue';
 import CardElement from '@/components/CardElement.vue';
 import ModalDialog from '@/components/ModalDialog.vue';
-import type { AlertResponse } from '@/types/Alert';
+import type { AlertResponse } from '@/types/AlertResponse';
 import type { FileInfo } from '@/types/File';
 import { authHeader, handleResponse } from '@/utils/authentication';
 import { waitRestart } from '@/utils/waitRestart';

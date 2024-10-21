@@ -349,7 +349,7 @@ import CardElement from '@/components/CardElement.vue';
 import InputElement from '@/components/InputElement.vue';
 import InputSerial from '@/components/InputSerial.vue';
 import ModalDialog from '@/components/ModalDialog.vue';
-import type { AlertResponse } from '@/types/Alert';
+import type { AlertResponse } from '@/types/AlertResponse';
 import type { Inverter } from '@/types/InverterConfig';
 import { authHeader, handleResponse } from '@/utils/authentication';
 import * as bootstrap from 'bootstrap';
