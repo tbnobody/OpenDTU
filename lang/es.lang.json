@@ -37,6 +37,13 @@
             "Release": "Soltar para refrescar",
             "Close": "Cerrar"
         },
+        "wait": {
+            "NotReady": "OpenDTU is not yet ready",
+            "PleaseWait": "Please wait. You will be automatically redirected to the home page."
+        },
+        "Error": {
+            "Oops": "Oops!"
+        },
         "localeswitcher": {
             "Dark": "Oscuro",
             "Light": "Claro",

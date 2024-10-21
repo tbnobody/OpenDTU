@@ -52,11 +52,6 @@
                     <BIconCheckCircle />
                 </span>
                 <span> {{ $t('fileadmin.UploadSuccess') }} </span>
-                <br />
-                <br />
-                <button class="btn btn-primary" @click="clearUpload">
-                    <BIconArrowLeft /> {{ $t('fileadmin.Back') }}
-                </button>
             </div>
 
             <div v-else-if="!uploading">
@@ -137,6 +132,7 @@ import ModalDialog from '@/components/ModalDialog.vue';
 import type { AlertResponse } from '@/types/Alert';
 import type { FileInfo } from '@/types/File';
 import { authHeader, handleResponse } from '@/utils/authentication';
+import { waitRestart } from '@/utils/waitRestart';
 import * as bootstrap from 'bootstrap';
 import {
     BIconArrowLeft,
@@ -251,6 +247,7 @@ export default defineComponent({
                 // request.response will hold the response from the server
                 if (request.status === 200) {
                     this.UploadSuccess = true;
+                    waitRestart(this.$router);
                 } else if (request.status !== 500) {
                     this.UploadError = `[HTTP ERROR] ${request.statusText}`;
                 } else {

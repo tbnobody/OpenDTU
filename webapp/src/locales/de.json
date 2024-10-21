@@ -32,6 +32,10 @@
         "Release": "Loslassen zum Aktualisieren",
         "Close": "Schließen"
     },
+    "wait": {
+        "NotReady": "OpenDTU ist noch nicht bereit",
+        "PleaseWait": "Bitte warten. Sie werden automatisch auf die Startseite weitergeleitet."
+    },
     "Error": {
         "Oops": "Oops!"
     },
