@@ -75,11 +75,15 @@ void I18nClass::readConfig(String file)
     }
 
     LanguageInfo_t lang;
-    lang.code = String(doc["meta"]["code"]);
-    lang.name = String(doc["meta"]["name"]);
+    lang.code = String(doc["meta"]["code"] | "");
+    lang.name = String(doc["meta"]["name"] | "");
     lang.filename = file;
 
-    _availLanguages.push_back(lang);
+    if (lang.code !=  "" && lang.name != "") {
+        _availLanguages.push_back(lang);
+    } else {
+        MessageOutput.printf("Invalid meta data\r\n");
+    }
 
     f.close();
 }
