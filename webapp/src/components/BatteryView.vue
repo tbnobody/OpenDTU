@@ -48,43 +48,45 @@
                                 <div class="card" :class="{ 'border-info': true }">
                                     <div class="card-header text-bg-info">{{ $t('battery.' + section) }}</div>
                                     <div class="card-body">
-                                        <table class="table table-striped table-hover">
-                                            <thead>
-                                                <tr>
-                                                    <th scope="col">{{ $t('battery.Property') }}</th>
-                                                    <th style="text-align: right" scope="col">
-                                                        {{ $t('battery.Value') }}
-                                                    </th>
-                                                    <th scope="col">{{ $t('battery.Unit') }}</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                <tr v-for="(prop, key) in values" v-bind:key="key">
-                                                    <th scope="row">{{ $t('battery.' + key) }}</th>
-                                                    <td style="text-align: right">
-                                                        <template v-if="isStringValue(prop) && prop.translate">
-                                                            {{ $t('battery.' + prop.value) }}
-                                                        </template>
-                                                        <template v-else-if="isStringValue(prop)">
-                                                            {{ prop.value }}
-                                                        </template>
-                                                        <template v-else>
-                                                            {{
-                                                                $n(prop.v, 'decimal', {
-                                                                    minimumFractionDigits: prop.d,
-                                                                    maximumFractionDigits: prop.d,
-                                                                })
-                                                            }}
-                                                        </template>
-                                                    </td>
-                                                    <td>
-                                                        <template v-if="!isStringValue(prop)">
-                                                            {{ prop.u }}
-                                                        </template>
-                                                    </td>
-                                                </tr>
-                                            </tbody>
-                                        </table>
+                                        <div class="table-responsive">
+                                            <table class="table table-striped table-hover">
+                                                <thead>
+                                                    <tr>
+                                                        <th scope="col">{{ $t('battery.Property') }}</th>
+                                                        <th style="text-align: right" scope="col">
+                                                            {{ $t('battery.Value') }}
+                                                        </th>
+                                                        <th scope="col">{{ $t('battery.Unit') }}</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr v-for="(prop, key) in values" v-bind:key="key">
+                                                        <th scope="row">{{ $t('battery.' + key) }}</th>
+                                                        <td style="text-align: right">
+                                                            <template v-if="isStringValue(prop) && prop.translate">
+                                                                {{ $t('battery.' + prop.value) }}
+                                                            </template>
+                                                            <template v-else-if="isStringValue(prop)">
+                                                                {{ prop.value }}
+                                                            </template>
+                                                            <template v-else>
+                                                                {{
+                                                                    $n(prop.v, 'decimal', {
+                                                                        minimumFractionDigits: prop.d,
+                                                                        maximumFractionDigits: prop.d,
+                                                                    })
+                                                                }}
+                                                            </template>
+                                                        </td>
+                                                        <td>
+                                                            <template v-if="!isStringValue(prop)">
+                                                                {{ prop.u }}
+                                                            </template>
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
