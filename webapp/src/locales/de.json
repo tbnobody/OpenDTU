@@ -174,7 +174,7 @@
         "Unit": "Einheit",
         "section_device": "Geräteinformation",
         "device": {
-            "LOAD": "Status Ladeausgang",
+            "LOAD": "Status Lastausgang",
             "CS": "Betriebszustand",
             "MPPT": "Betriebszustand des Trackers",
             "OR": "Grund für das Ausschalten",
