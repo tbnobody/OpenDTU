@@ -3,7 +3,6 @@
 #include "PowerLimiterInverter.h"
 #include "PowerLimiterBatteryInverter.h"
 #include "PowerLimiterSolarInverter.h"
-#include "inverters/HMS_4CH.h"
 
 std::unique_ptr<PowerLimiterInverter> PowerLimiterInverter::create(
         bool verboseLogging, PowerLimiterInverterConfig const& config)

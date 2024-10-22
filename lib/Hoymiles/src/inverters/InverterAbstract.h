@@ -24,6 +24,20 @@ enum {
     FRAGMENT_OK = 0
 };
 
+enum MpptNum_t {
+    MPPT_A = 0,
+    MPPT_B,
+    MPPT_C,
+    MPPT_D,
+    MPPT_CNT
+};
+
+// additional meta data per input channel
+typedef struct {
+    ChannelNum_t ch; // channel 0 - 5
+    MpptNum_t mppt; // mppt a - d (0 - 3)
+} channelMetaData_t;
+
 #define MAX_RF_FRAGMENT_COUNT 13
 
 class CommandAbstract;
@@ -39,6 +53,9 @@ public:
     virtual String typeName() const = 0;
     virtual const byteAssign_t* getByteAssignment() const = 0;
     virtual uint8_t getByteAssignmentSize() const = 0;
+
+    virtual const channelMetaData_t* getChannelMetaData() const = 0;
+    virtual uint8_t getChannelMetaDataSize() const = 0;
 
     bool isProducing();
     bool isReachable();
@@ -111,6 +128,10 @@ public:
     PowerCommandParser* PowerCommand();
     StatisticsParser* Statistics();
     SystemConfigParaParser* SystemConfigPara();
+
+    std::vector<MpptNum_t> getMppts() const;
+    std::vector<ChannelNum_t> getChannelsDC() const;
+    std::vector<ChannelNum_t> getChannelsDCByMppt(const MpptNum_t mppt) const;
 
 protected:
     HoymilesRadio* _radio;
