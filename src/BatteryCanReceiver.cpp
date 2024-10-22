@@ -168,12 +168,17 @@ int16_t BatteryCanReceiver::readSignedInt16(uint8_t *data)
     return this->readUnsignedInt16(data);
 }
 
+int32_t BatteryCanReceiver::readSignedInt24(uint8_t *data)
+{
+    return (data[2] << 16) | (data[1] << 8) | data[0];
+}
+
 uint32_t BatteryCanReceiver::readUnsignedInt32(uint8_t *data)
 {
     return (data[3] << 24) | (data[2] << 16) | (data[1] << 8) | data[0];
 }
 
-float BatteryCanReceiver::scaleValue(int16_t value, float factor)
+float BatteryCanReceiver::scaleValue(int32_t value, float factor)
 {
     return value * factor;
 }

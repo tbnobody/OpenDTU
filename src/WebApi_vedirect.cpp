@@ -73,9 +73,9 @@ void WebApiVedirectClass::onVedirectAdminPost(AsyncWebServerRequest* request)
 
     auto& retMsg = response->getRoot();
 
-    if (!root.containsKey("vedirect_enabled") ||
-            !root.containsKey("verbose_logging") ||
-            !root.containsKey("vedirect_updatesonly") ) {
+    if (!root["vedirect_enabled"].is<bool>() ||
+            !root["verbose_logging"].is<bool>() ||
+            !root["vedirect_updatesonly"].is<bool>() ) {
         retMsg["message"] = "Values are missing!";
         retMsg["code"] = WebApiError::GenericValueMissing;
         response->setLength();

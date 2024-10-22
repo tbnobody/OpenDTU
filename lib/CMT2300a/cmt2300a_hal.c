@@ -26,9 +26,9 @@
  * @name    CMT2300A_InitSpi
  * @desc    Initializes the CMT2300A SPI interface.
  * *********************************************************/
-void CMT2300A_InitSpi(const spi_host_device_t spi_host, const int8_t pin_sdio, const int8_t pin_clk, const int8_t pin_cs, const int8_t pin_fcs, const uint32_t spi_speed)
+void CMT2300A_InitSpi(const int8_t pin_sdio, const int8_t pin_clk, const int8_t pin_cs, const int8_t pin_fcs, const uint32_t spi_speed)
 {
-    cmt_spi3_init(spi_host, pin_sdio, pin_clk, pin_cs, pin_fcs, spi_speed);
+    cmt_spi3_init(pin_sdio, pin_clk, pin_cs, pin_fcs, spi_speed);
 }
 
 /*! ********************************************************

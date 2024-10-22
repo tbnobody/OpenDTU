@@ -4,6 +4,7 @@
  */
 #include "WebApi_firmware.h"
 #include "Configuration.h"
+#include "RestartHelper.h"
 #include "Update.h"
 #include "Utils.h"
 #include "WebApi.h"
@@ -47,7 +48,7 @@ void WebApiFirmwareClass::onFirmwareUpdateFinish(AsyncWebServerRequest* request)
     response->addHeader("Connection", "close");
     response->addHeader("Access-Control-Allow-Origin", "*");
     request->send(response);
-    Utils::restartDtu();
+    RestartHelper.triggerRestart();
 }
 
 void WebApiFirmwareClass::onFirmwareUpdateUpload(AsyncWebServerRequest* request, String filename, size_t index, uint8_t* data, size_t len, bool final)

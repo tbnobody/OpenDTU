@@ -32,6 +32,7 @@ enum WebApiError {
     InverterChanged,
     InverterDeleted,
     InverterOrdered,
+    InverterStatsResetted,
 
     LimitBase = 5000,
     LimitSerialZero,
@@ -69,6 +70,8 @@ enum WebApiError {
     NetworkDns1Invalid,
     NetworkDns2Invalid,
     NetworkApTimeoutInvalid,
+    NetworkSyslogHostnameLength,
+    NetworkSyslogPort,
 
     NtpBase = 9000,
     NtpServerLength,

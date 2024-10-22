@@ -70,6 +70,9 @@ void WebApiNetworkClass::onNetworkAdminGet(AsyncWebServerRequest* request)
     root["password"] = config.WiFi.Password;
     root["aptimeout"] = config.WiFi.ApTimeout;
     root["mdnsenabled"] = config.Mdns.Enabled;
+    root["syslogenabled"] = config.Syslog.Enabled;
+    root["sysloghostname"] = config.Syslog.Hostname;
+    root["syslogport"] = config.Syslog.Port;
 
     WebApi.sendJsonResponse(request, response, __FUNCTION__, __LINE__);
 }
@@ -88,16 +91,16 @@ void WebApiNetworkClass::onNetworkAdminPost(AsyncWebServerRequest* request)
 
     auto& retMsg = response->getRoot();
 
-    if (!(root.containsKey("ssid")
-            && root.containsKey("password")
-            && root.containsKey("hostname")
-            && root.containsKey("dhcp")
-            && root.containsKey("ipaddress")
-            && root.containsKey("netmask")
-            && root.containsKey("gateway")
-            && root.containsKey("dns1")
-            && root.containsKey("dns2")
-            && root.containsKey("aptimeout"))) {
+    if (!(root["ssid"].is<String>()
+            && root["password"].is<String>()
+            && root["hostname"].is<String>()
+            && root["dhcp"].is<bool>()
+            && root["ipaddress"].is<String>()
+            && root["netmask"].is<String>()
+            && root["gateway"].is<String>()
+            && root["dns1"].is<String>()
+            && root["dns2"].is<String>()
+            && root["aptimeout"].is<uint>())) {
         retMsg["message"] = "Values are missing!";
         retMsg["code"] = WebApiError::GenericValueMissing;
         WebApi.sendJsonResponse(request, response, __FUNCTION__, __LINE__);
@@ -163,6 +166,23 @@ void WebApiNetworkClass::onNetworkAdminPost(AsyncWebServerRequest* request)
         WebApi.sendJsonResponse(request, response, __FUNCTION__, __LINE__);
         return;
     }
+    if (root["syslogenabled"].as<bool>()) {
+        if (root["sysloghostname"].as<String>().length() == 0 || root["sysloghostname"].as<String>().length() > SYSLOG_MAX_HOSTNAME_STRLEN) {
+            retMsg["message"] = "Syslog Server must between 1 and " STR(SYSLOG_MAX_HOSTNAME_STRLEN) " characters long!";
+            retMsg["code"] = WebApiError::NetworkSyslogHostnameLength;
+            retMsg["param"]["max"] = SYSLOG_MAX_HOSTNAME_STRLEN;
+            WebApi.sendJsonResponse(request, response, __FUNCTION__, __LINE__);
+            return;
+        }
+
+        if (root["syslogport"].as<uint>() == 0 || root["syslogport"].as<uint>() > 65535) {
+            retMsg["message"] = "Port must be a number between 1 and 65535!";
+            retMsg["code"] = WebApiError::NetworkSyslogPort;
+            WebApi.sendJsonResponse(request, response, __FUNCTION__, __LINE__);
+            return;
+        }
+
+    }
 
     CONFIG_T& config = Configuration.get();
     config.WiFi.Ip[0] = ipaddress[0];
@@ -195,6 +215,9 @@ void WebApiNetworkClass::onNetworkAdminPost(AsyncWebServerRequest* request)
     }
     config.WiFi.ApTimeout = root["aptimeout"].as<uint>();
     config.Mdns.Enabled = root["mdnsenabled"].as<bool>();
+    config.Syslog.Enabled = root["syslogenabled"].as<bool>();
+    strlcpy(config.Syslog.Hostname, root["sysloghostname"].as<String>().c_str(), sizeof(config.Syslog.Hostname));
+    config.Syslog.Port = root["syslogport"].as<uint>();
 
     WebApi.writeConfig(retMsg);
 

@@ -2,6 +2,7 @@
 #include "Battery.h"
 #include "MessageOutput.h"
 #include "PylontechCanReceiver.h"
+#include "SBSCanReceiver.h"
 #include "JkBmsController.h"
 #include "VictronSmartShunt.h"
 #include "MqttBattery.h"
@@ -61,6 +62,9 @@ void BatteryClass::updateSettings()
         case 4:
             _upProvider = std::make_unique<PytesCanReceiver>();
             break;
+        case 5:
+            _upProvider = std::make_unique<SBSCanReceiver>();
+            break;
         default:
             MessageOutput.printf("[Battery] Unknown provider: %d\r\n", config.Battery.Provider);
             return;
@@ -78,4 +82,34 @@ void BatteryClass::loop()
     _upProvider->loop();
 
     _upProvider->getStats()->mqttLoop();
+}
+
+float BatteryClass::getDischargeCurrentLimit()
+{
+    CONFIG_T& config = Configuration.get();
+
+    if (!config.Battery.EnableDischargeCurrentLimit) { return FLT_MAX; }
+
+    auto dischargeCurrentLimit = config.Battery.DischargeCurrentLimit;
+    auto dischargeCurrentValid = dischargeCurrentLimit > 0.0f;
+
+    auto statsCurrentLimit = getStats()->getDischargeCurrentLimit();
+    auto statsLimitValid = config.Battery.UseBatteryReportedDischargeCurrentLimit
+        && statsCurrentLimit >= 0.0f
+        && getStats()->getDischargeCurrentLimitAgeSeconds() <= 60;
+
+    if (statsLimitValid && dischargeCurrentValid) {
+        // take the lowest limit
+        return min(statsCurrentLimit, dischargeCurrentLimit);
+    }
+
+    if (statsLimitValid) {
+        return statsCurrentLimit;
+    }
+
+    if (dischargeCurrentValid) {
+        return dischargeCurrentLimit;
+    }
+
+    return FLT_MAX;
 }

@@ -42,6 +42,26 @@ void WebApiWsHuaweiLiveClass::init(AsyncWebServer& server, Scheduler& scheduler)
     _sendDataTask.setIterations(TASK_FOREVER);
     _sendDataTask.setInterval(1 * TASK_SECOND);
     _sendDataTask.enable();
+
+    _simpleDigestAuth.setUsername(AUTH_USERNAME);
+    _simpleDigestAuth.setRealm("AC charger websocket");
+
+    reload();
+}
+
+void WebApiWsHuaweiLiveClass::reload()
+{
+    _ws.removeMiddleware(&_simpleDigestAuth);
+
+    auto const& config = Configuration.get();
+
+    if (config.Security.AllowReadonly) { return; }
+
+    _ws.enable(false);
+    _simpleDigestAuth.setPassword(config.Security.Password);
+    _ws.addMiddleware(&_simpleDigestAuth);
+    _ws.closeAll();
+    _ws.enable(true);
 }
 
 void WebApiWsHuaweiLiveClass::wsCleanupTaskCb()

@@ -44,6 +44,26 @@ void WebApiWsVedirectLiveClass::init(AsyncWebServer& server, Scheduler& schedule
     _sendDataTask.setIterations(TASK_FOREVER);
     _sendDataTask.setInterval(500 * TASK_MILLISECOND);
     _sendDataTask.enable();
+
+    _simpleDigestAuth.setUsername(AUTH_USERNAME);
+    _simpleDigestAuth.setRealm("vedirect websocket");
+
+    reload();
+}
+
+void WebApiWsVedirectLiveClass::reload()
+{
+    _ws.removeMiddleware(&_simpleDigestAuth);
+
+    auto const& config = Configuration.get();
+
+    if (config.Security.AllowReadonly) { return; }
+
+    _ws.enable(false);
+    _simpleDigestAuth.setPassword(config.Security.Password);
+    _ws.addMiddleware(&_simpleDigestAuth);
+    _ws.closeAll();
+    _ws.enable(true);
 }
 
 void WebApiWsVedirectLiveClass::wsCleanupTaskCb()
@@ -170,6 +190,11 @@ void WebApiWsVedirectLiveClass::populateJson(const JsonObject &root, const VeDir
     output["E"]["v"] = mpptData.mpptEfficiency_Percent;
     output["E"]["u"] = "%";
     output["E"]["d"] = 1;
+    if (mpptData.SmartBatterySenseTemperatureMilliCelsius.first > 0) {
+        output["SBSTemperature"]["v"] = mpptData.SmartBatterySenseTemperatureMilliCelsius.second / 1000.0;
+        output["SBSTemperature"]["u"] = "°C";
+        output["SBSTemperature"]["d"] = "0";
+    }
 
     const JsonObject input = values["input"].to<JsonObject>();
     if (mpptData.NetworkTotalDcInputPowerMilliWatts.first > 0) {

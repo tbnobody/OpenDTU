@@ -202,7 +202,7 @@
                                         min="0"
                                         max="100"
                                         id="inputDisplayContrast"
-                                        v-model="deviceConfigList.display.contrast"
+                                        v-model.number="deviceConfigList.display.contrast"
                                     />
                                 </div>
                             </div>
@@ -239,7 +239,7 @@
                                         min="0"
                                         max="100"
                                         :id="getLedIdFromNumber(index)"
-                                        v-model="ledSetting.brightness"
+                                        v-model.number="ledSetting.brightness"
                                         @change="syncSliders"
                                     />
                                 </div>
@@ -385,7 +385,7 @@ export default defineComponent({
                 return;
             }
             const srcId = this.getNumberFromLedId((event.target as Element).id);
-            this.deviceConfigList.led.every((v) => (v.brightness = this.deviceConfigList.led[srcId].brightness));
+            this.deviceConfigList.led.map((v) => (v.brightness = this.deviceConfigList.led[srcId].brightness));
         },
     },
 });

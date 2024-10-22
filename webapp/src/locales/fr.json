@@ -150,7 +150,19 @@
         "Unknown": "Inconnu",
         "ShowGridProfile": "Show Grid Profile",
         "GridProfile": "Grid Profile",
-        "LoadingInverter": "Waiting for data... (can take up to 10 seconds)"
+        "LoadingInverter": "Waiting for data... (can take up to 10 seconds)",
+        "RadioStats": "Radio Statistics",
+        "TxRequest": "TX Request Count",
+        "RxSuccess": "RX Success",
+        "RxFailNothing": "RX Fail: Receive Nothing",
+        "RxFailPartial": "RX Fail: Receive Partial",
+        "RxFailCorrupt": "RX Fail: Receive Corrupt",
+        "TxReRequest": "TX Re-Request Fragment",
+        "StatsReset": "Reset Statistics",
+        "StatsResetting": "Resetting...",
+        "Rssi": "RSSI of last received packet",
+        "RssiHint": "HM inverters only support RSSI values < -64 dBm and > -64 dBm. In this case, -80 dbm and -30 dbm is shown.",
+        "dBm": "{dbm} dBm"
     },
     "vedirecthome": {
         "SerialNumber": "Numéro de série",
@@ -175,7 +187,8 @@
             "P": "Power (calculated)",
             "V": "Voltage",
             "I": "Current",
-            "E": "Efficiency (calculated)"
+            "E": "Efficiency (calculated)",
+            "SBSTemperature": "SBS temperature"
         },
         "section_input": "Input (Solar Panels)",
         "input": {
@@ -456,7 +469,7 @@
         "Cancel": "@:base.Cancel",
         "RebootOpenDTU": "Redémarrer OpenDTU",
         "RebootQuestion": "Voulez-vous vraiment redémarrer l'appareil ?",
-        "RebootHint": "<b>Astuce :</b> Normalement, il n'est pas nécessaire de procéder à un redémarrage manuel. OpenDTU effectue automatiquement tout redémarrage nécessaire (par exemple, après une mise à jour du firmware). Les paramètres sont également adoptés sans redémarrage. Si vous devez redémarrer en raison d'une erreur, veuillez envisager de la signaler à l'adresse suivante <a href=\"https://github.com/helgeerbe/OpenDTU-OnBattery/issues\" class=\"alert-link\" target=\"_blank\">Github</a>."
+        "RebootHint": "<b>Astuce :</b> Normalement, il n'est pas nécessaire de procéder à un redémarrage manuel. OpenDTU effectue automatiquement tout redémarrage nécessaire (par exemple, après une mise à jour du firmware). Les paramètres sont également adoptés sans redémarrage. Si vous devez redémarrer en raison d'une erreur, veuillez envisager de la signaler à l'adresse suivante <a href=\"https://github.com/hoylabs/OpenDTU-OnBattery/issues\" class=\"alert-link\" target=\"_blank\">Github</a>."
     },
     "dtuadmin": {
         "DtuSettings": "Paramètres du DTU",
@@ -595,6 +608,7 @@
         "VerboseLogging": "@:base.VerboseLogging",
         "Provider": "Data Provider",
         "ProviderPylontechCan": "Pylontech using CAN bus",
+        "ProviderSBSCan": "SBS Unipower using CAN bus",
         "ProviderJkBmsSerial": "Jikong (JK) BMS using serial connection",
         "ProviderMqtt": "Battery data from MQTT broker",
         "ProviderVictron": "Victron SmartShunt using VE.Direct interface",
@@ -610,7 +624,14 @@
         "JkBmsInterfaceUart": "TTL-UART on MCU",
         "JkBmsInterfaceTransceiver": "RS-485 Transceiver on MCU",
         "PollingInterval": "Polling Interval",
-        "Seconds": "@:base.Seconds"
+        "Seconds": "@:base.Seconds",
+        "DischargeCurrentLimitConfiguration": "Discharge Current Limit Settings",
+        "LimitDischargeCurrent": "Limit Discharge Current",
+        "DischargeCurrentLimit": "max. Discharge Current",
+        "UseBatteryReportedDischargeCurrentLimit": "Use Battery-Reported limit",
+        "BatteryReportedDischargeCurrentLimitInfo": "<b>Hint:</b> The lowest limit will be applied, with the battery-reported discharge current limit used only if an update was received in the last minute; otherwise, the previously specified limit will act as a fallback.",
+        "MqttDischargeCurrentTopic": "Discharge Current Limit Value Topic",
+        "MqttAmperageUnit": "Unit"
     },
     "inverteradmin": {
         "InverterSettings": "Paramètres des onduleurs",
@@ -761,11 +782,11 @@
         "ProjectOriginBody3": "Le logiciel a été développé au mieux de nos connaissances et de nos convictions. Néanmoins, aucune responsabilité ne peut être acceptée en cas de dysfonctionnement ou de perte de garantie de l'onduleur.",
         "ProjectOriginBody4": "OpenDTU est disponible gratuitement. Si vous avez payé pour le logiciel, vous avez probablement été arnaqué.",
         "NewsUpdates": "Actualités et mises à jour",
-        "NewsUpdatesBody": "Les nouvelles mises à jour peuvent être trouvées sur <a href=\"https://github.com/helgeerbe/OpenDTU-OnBattery/releases\" target=\"_blank\">Github</a>.",
+        "NewsUpdatesBody": "Les nouvelles mises à jour peuvent être trouvées sur <a href=\"https://github.com/hoylabs/OpenDTU-OnBattery/releases\" target=\"_blank\">Github</a>.",
         "ErrorReporting": "Rapport d'erreurs",
-        "ErrorReportingBody": "Veuillez signaler les problèmes en utilisant la fonction fournie par <a href=\"https://github.com/helgeerbe/OpenDTU-OnBattery/issues\" target=\"_blank\">Github</a>.",
+        "ErrorReportingBody": "Veuillez signaler les problèmes en utilisant la fonction fournie par <a href=\"https://github.com/hoylabs/OpenDTU-OnBattery/issues\" target=\"_blank\">Github</a>.",
         "Discussion": "Discussion",
-        "DiscussionBody": "Discutez avec nous sur <a href=\"https://discord.gg/WzhxEY62mB\" target=\"_blank\">Discord</a> ou sur <a href=\"https://github.com/helgeerbe/OpenDTU-OnBattery/discussions\" target=\"_blank\">Github</a>."
+        "DiscussionBody": "Discutez avec nous sur <a href=\"https://discord.gg/WzhxEY62mB\" target=\"_blank\">Discord</a> ou sur <a href=\"https://github.com/hoylabs/OpenDTU-OnBattery/discussions\" target=\"_blank\">Github</a>."
     },
     "hints": {
         "RadioProblem": "Impossible de se connecter à un module radio configuré.. Veuillez vérifier le câblage.",

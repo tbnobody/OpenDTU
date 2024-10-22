@@ -7,8 +7,8 @@
 #include "MessageOutput.h"
 #include "PinMapping.h"
 #include "SunPosition.h"
-#include "SPIPortManager.h"
 #include <Hoymiles.h>
+#include <SpiManager.h>
 
 InverterSettingsClass InverterSettings;
 
@@ -24,32 +24,27 @@ void InverterSettingsClass::init(Scheduler& scheduler)
     const PinMapping_t& pin = PinMapping.get();
 
     // Initialize inverter communication
-    MessageOutput.println("Initialize Hoymiles interface... ");
+    MessageOutput.print("Initialize Hoymiles interface... ");
 
     Hoymiles.setMessageOutput(&MessageOutput);
     Hoymiles.init();
 
     if (PinMapping.isValidNrf24Config() || PinMapping.isValidCmt2300Config()) {
         if (PinMapping.isValidNrf24Config()) {
-            auto oSPInum = SPIPortManager.allocatePort("NRF24");
+            auto spi_bus = SpiManagerInst.claim_bus_arduino();
+            ESP_ERROR_CHECK(spi_bus ? ESP_OK : ESP_FAIL);
 
-            if (oSPInum) {
-                SPIClass* spiClass = new SPIClass(*oSPInum);
-                spiClass->begin(pin.nrf24_clk, pin.nrf24_miso, pin.nrf24_mosi, pin.nrf24_cs);
-                Hoymiles.initNRF(spiClass, pin.nrf24_en, pin.nrf24_irq);
-            }
+            SPIClass* spiClass = new SPIClass(*spi_bus);
+            spiClass->begin(pin.nrf24_clk, pin.nrf24_miso, pin.nrf24_mosi, pin.nrf24_cs);
+            Hoymiles.initNRF(spiClass, pin.nrf24_en, pin.nrf24_irq);
         }
 
         if (PinMapping.isValidCmt2300Config()) {
-            auto oSPInum = SPIPortManager.allocatePort("CMT2300A");
-
-            if (oSPInum) {
-                Hoymiles.initCMT(SPIPortManager.SPIhostNum(*oSPInum), pin.cmt_sdio, pin.cmt_clk, pin.cmt_cs, pin.cmt_fcs, pin.cmt_gpio2, pin.cmt_gpio3);
-                MessageOutput.println("  Setting country mode... ");
-                Hoymiles.getRadioCmt()->setCountryMode(static_cast<CountryModeId_t>(config.Dtu.Cmt.CountryMode));
-                MessageOutput.println("  Setting CMT target frequency... ");
-                Hoymiles.getRadioCmt()->setInverterTargetFrequency(config.Dtu.Cmt.Frequency);
-            }
+            Hoymiles.initCMT(pin.cmt_sdio, pin.cmt_clk, pin.cmt_cs, pin.cmt_fcs, pin.cmt_gpio2, pin.cmt_gpio3);
+            MessageOutput.println("  Setting country mode... ");
+            Hoymiles.getRadioCmt()->setCountryMode(static_cast<CountryModeId_t>(config.Dtu.Cmt.CountryMode));
+            MessageOutput.println("  Setting CMT target frequency... ");
+            Hoymiles.getRadioCmt()->setInverterTargetFrequency(config.Dtu.Cmt.Frequency);
         }
 
         MessageOutput.println("  Setting radio PA level... ");

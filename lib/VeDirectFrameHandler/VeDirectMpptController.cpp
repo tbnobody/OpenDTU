@@ -184,7 +184,7 @@ bool VeDirectMpptController::hexDataHandler(VeDirectHexData const &data) {
 			}
 
 			_tmpFrame.SmartBatterySenseTemperatureMilliCelsius =
-				{ millis(), static_cast<int32_t>(data.value) * 10 - 272150 };
+				{ millis(), static_cast<int32_t>(data.value) * 10 - 273150 };
 
 			if (_verboseLogging) {
 				_msgOut->printf("%s Hex Data: Smart Battery Sense Temperature (0x%04X): %.2f°C\r\n",

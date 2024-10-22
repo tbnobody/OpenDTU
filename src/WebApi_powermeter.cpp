@@ -82,7 +82,7 @@ void WebApiPowerMeterClass::onAdminPost(AsyncWebServerRequest* request)
 
     auto& retMsg = response->getRoot();
 
-    if (!(root.containsKey("enabled") && root.containsKey("source"))) {
+    if (!(root["enabled"].is<bool>() && root["source"].is<uint32_t>())) {
         retMsg["message"] = "Values are missing!";
         response->setLength();
         request->send(response);
@@ -90,7 +90,7 @@ void WebApiPowerMeterClass::onAdminPost(AsyncWebServerRequest* request)
     }
 
     auto checkHttpConfig = [&](JsonObject const& cfg) -> bool {
-        if (!cfg.containsKey("url")
+        if (!cfg["url"].is<String>()
                 || (!cfg["url"].as<String>().startsWith("http://")
                     && !cfg["url"].as<String>().startsWith("https://"))) {
             retMsg["message"] = "URL must either start with http:// or https://!";
@@ -107,7 +107,7 @@ void WebApiPowerMeterClass::onAdminPost(AsyncWebServerRequest* request)
             return false;
         }
 
-        if (!cfg.containsKey("timeout")
+        if (!cfg["timeout"].is<uint16_t>()
                 || cfg["timeout"].as<uint16_t>() <= 0) {
             retMsg["message"] = "Timeout must be greater than 0 ms!";
             response->setLength();
@@ -134,7 +134,7 @@ void WebApiPowerMeterClass::onAdminPost(AsyncWebServerRequest* request)
                 }
             }
 
-            if (!valueConfig.containsKey("json_path")
+            if (!valueConfig["json_path"].is<String>()
                     || valueConfig["json_path"].as<String>().length() == 0) {
                 retMsg["message"] = "Json path must not be empty!";
                 response->setLength();

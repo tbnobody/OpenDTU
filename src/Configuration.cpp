@@ -74,6 +74,26 @@ void ConfigurationClass::serializePowerMeterHttpSmlConfig(PowerMeterHttpSmlConfi
     serializeHttpRequestConfig(source.HttpRequest, target);
 }
 
+void ConfigurationClass::serializeBatteryConfig(BatteryConfig const& source, JsonObject& target)
+{
+    target["enabled"] = config.Battery.Enabled;
+    target["verbose_logging"] = config.Battery.VerboseLogging;
+    target["provider"] = config.Battery.Provider;
+    target["jkbms_interface"] = config.Battery.JkBmsInterface;
+    target["jkbms_polling_interval"] = config.Battery.JkBmsPollingInterval;
+    target["mqtt_soc_topic"] = config.Battery.MqttSocTopic;
+    target["mqtt_soc_json_path"] = config.Battery.MqttSocJsonPath;
+    target["mqtt_voltage_topic"] = config.Battery.MqttVoltageTopic;
+    target["mqtt_voltage_json_path"] = config.Battery.MqttVoltageJsonPath;
+    target["mqtt_voltage_unit"] = config.Battery.MqttVoltageUnit;
+    target["enable_discharge_current_limit"] = config.Battery.EnableDischargeCurrentLimit;
+    target["discharge_current_limit"] = config.Battery.DischargeCurrentLimit;
+    target["use_battery_reported_discharge_current_limit"] = config.Battery.UseBatteryReportedDischargeCurrentLimit;
+    target["mqtt_discharge_current_topic"] = config.Battery.MqttDischargeCurrentTopic;
+    target["mqtt_discharge_current_json_path"] = config.Battery.MqttDischargeCurrentJsonPath;
+    target["mqtt_amperage_unit"] = config.Battery.MqttAmperageUnit;
+}
+
 bool ConfigurationClass::write()
 {
     File f = LittleFS.open(CONFIG_FILENAME, "w");
@@ -102,6 +122,11 @@ bool ConfigurationClass::write()
 
     JsonObject mdns = doc["mdns"].to<JsonObject>();
     mdns["enabled"] = config.Mdns.Enabled;
+
+    JsonObject syslog = doc["syslog"].to<JsonObject>();
+    syslog["enabled"] = config.Syslog.Enabled;
+    syslog["hostname"] = config.Syslog.Hostname;
+    syslog["port"] = config.Syslog.Port;
 
     JsonObject ntp = doc["ntp"].to<JsonObject>();
     ntp["server"] = config.Ntp.Server;
@@ -251,16 +276,7 @@ bool ConfigurationClass::write()
     powerlimiter["full_solar_passthrough_stop_voltage"] = config.PowerLimiter.FullSolarPassThroughStopVoltage;
 
     JsonObject battery = doc["battery"].to<JsonObject>();
-    battery["enabled"] = config.Battery.Enabled;
-    battery["verbose_logging"] = config.Battery.VerboseLogging;
-    battery["provider"] = config.Battery.Provider;
-    battery["jkbms_interface"] = config.Battery.JkBmsInterface;
-    battery["jkbms_polling_interval"] = config.Battery.JkBmsPollingInterval;
-    battery["mqtt_topic"] = config.Battery.MqttSocTopic;
-    battery["mqtt_json_path"] = config.Battery.MqttSocJsonPath;
-    battery["mqtt_voltage_topic"] = config.Battery.MqttVoltageTopic;
-    battery["mqtt_voltage_json_path"] = config.Battery.MqttVoltageJsonPath;
-    battery["mqtt_voltage_unit"] = config.Battery.MqttVoltageUnit;
+    serializeBatteryConfig(config.Battery, battery);
 
     JsonObject huawei = doc["huawei"].to<JsonObject>();
     huawei["enabled"] = config.Huawei.Enabled;
@@ -353,6 +369,26 @@ void ConfigurationClass::deserializePowerMeterHttpSmlConfig(JsonObject const& so
     deserializeHttpRequestConfig(source, target.HttpRequest);
 }
 
+void ConfigurationClass::deserializeBatteryConfig(JsonObject const& source, BatteryConfig& target)
+{
+    target.Enabled = source["enabled"] | BATTERY_ENABLED;
+    target.VerboseLogging = source["verbose_logging"] | VERBOSE_LOGGING;
+    target.Provider = source["provider"] | BATTERY_PROVIDER;
+    target.JkBmsInterface = source["jkbms_interface"] | BATTERY_JKBMS_INTERFACE;
+    target.JkBmsPollingInterval = source["jkbms_polling_interval"] | BATTERY_JKBMS_POLLING_INTERVAL;
+    strlcpy(target.MqttSocTopic, source["mqtt_soc_topic"] | source["mqtt_topic"] | "", sizeof(config.Battery.MqttSocTopic)); // mqtt_soc_topic was previously saved as mqtt_topic. Be nice and also try old key.
+    strlcpy(target.MqttSocJsonPath, source["mqtt_soc_json_path"] | source["mqtt_json_path"] | "", sizeof(config.Battery.MqttSocJsonPath)); // mqtt_soc_json_path was previously saved as mqtt_json_path. Be nice and also try old key.
+    strlcpy(target.MqttVoltageTopic, source["mqtt_voltage_topic"] | "", sizeof(config.Battery.MqttVoltageTopic));
+    strlcpy(target.MqttVoltageJsonPath, source["mqtt_voltage_json_path"] | "", sizeof(config.Battery.MqttVoltageJsonPath));
+    target.MqttVoltageUnit = source["mqtt_voltage_unit"] | BatteryVoltageUnit::Volts;
+    target.EnableDischargeCurrentLimit = source["enable_discharge_current_limit"] | BATTERY_ENABLE_DISCHARGE_CURRENT_LIMIT;
+    target.DischargeCurrentLimit = source["discharge_current_limit"] | BATTERY_DISCHARGE_CURRENT_LIMIT;
+    target.UseBatteryReportedDischargeCurrentLimit = source["use_battery_reported_discharge_current_limit"] | BATTERY_USE_BATTERY_REPORTED_DISCHARGE_CURRENT_LIMIT;
+    strlcpy(target.MqttDischargeCurrentTopic, source["mqtt_discharge_current_topic"] | "", sizeof(config.Battery.MqttDischargeCurrentTopic));
+    strlcpy(target.MqttDischargeCurrentJsonPath, source["mqtt_discharge_current_json_path"] | "", sizeof(config.Battery.MqttDischargeCurrentJsonPath));
+    target.MqttAmperageUnit = source["mqtt_amperage_unit"] | BatteryAmperageUnit::Amps;
+}
+
 bool ConfigurationClass::read()
 {
     File f = LittleFS.open(CONFIG_FILENAME, "r", false);
@@ -418,6 +454,11 @@ bool ConfigurationClass::read()
 
     JsonObject mdns = doc["mdns"];
     config.Mdns.Enabled = mdns["enabled"] | MDNS_ENABLED;
+
+    JsonObject syslog = doc["syslog"];
+    config.Syslog.Enabled = syslog["enabled"] | SYSLOG_ENABLED;
+    strlcpy(config.Syslog.Hostname, syslog["hostname"] | "", sizeof(config.Syslog.Hostname));
+    config.Syslog.Port = syslog["port"] | SYSLOG_PORT;
 
     JsonObject ntp = doc["ntp"];
     strlcpy(config.Ntp.Server, ntp["server"] | NTP_SERVER, sizeof(config.Ntp.Server));
@@ -600,17 +641,7 @@ bool ConfigurationClass::read()
     config.PowerLimiter.FullSolarPassThroughStartVoltage = powerlimiter["full_solar_passthrough_start_voltage"] | POWERLIMITER_FULL_SOLAR_PASSTHROUGH_START_VOLTAGE;
     config.PowerLimiter.FullSolarPassThroughStopVoltage = powerlimiter["full_solar_passthrough_stop_voltage"] | POWERLIMITER_FULL_SOLAR_PASSTHROUGH_STOP_VOLTAGE;
 
-    JsonObject battery = doc["battery"];
-    config.Battery.Enabled = battery["enabled"] | BATTERY_ENABLED;
-    config.Battery.VerboseLogging = battery["verbose_logging"] | VERBOSE_LOGGING;
-    config.Battery.Provider = battery["provider"] | BATTERY_PROVIDER;
-    config.Battery.JkBmsInterface = battery["jkbms_interface"] | BATTERY_JKBMS_INTERFACE;
-    config.Battery.JkBmsPollingInterval = battery["jkbms_polling_interval"] | BATTERY_JKBMS_POLLING_INTERVAL;
-    strlcpy(config.Battery.MqttSocTopic, battery["mqtt_topic"] | "", sizeof(config.Battery.MqttSocTopic));
-    strlcpy(config.Battery.MqttSocJsonPath, battery["mqtt_json_path"] | "", sizeof(config.Battery.MqttSocJsonPath));
-    strlcpy(config.Battery.MqttVoltageTopic, battery["mqtt_voltage_topic"] | "", sizeof(config.Battery.MqttVoltageTopic));
-    strlcpy(config.Battery.MqttVoltageJsonPath, battery["mqtt_voltage_json_path"] | "", sizeof(config.Battery.MqttVoltageJsonPath));
-    config.Battery.MqttVoltageUnit = battery["mqtt_voltage_unit"] | BatteryVoltageUnit::Volts;
+    deserializeBatteryConfig(doc["battery"], config.Battery);
 
     JsonObject huawei = doc["huawei"];
     config.Huawei.Enabled = huawei["enabled"] | HUAWEI_ENABLED;

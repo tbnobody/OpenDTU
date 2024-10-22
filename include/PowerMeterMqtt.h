@@ -18,13 +18,15 @@ public:
     bool init() final;
     void loop() final { }
     float getPowerTotal() const final;
-    void doMqttPublish() const final;
 
 private:
     using MsgProperties = espMqttClientTypes::MessageProperties;
     void onMessage(MsgProperties const& properties, char const* topic,
             uint8_t const* payload, size_t len, size_t index,
             size_t total, float* targetVariable, PowerMeterMqttValue const* cfg);
+
+    // we don't need to republish data received from MQTT
+    void doMqttPublish() const final { };
 
     PowerMeterMqttConfig const _cfg;
 

@@ -76,11 +76,11 @@ void HoymilesRadio_NRF::loop()
 
                 if (nullptr != inv) {
                     // Save packet in inverter rx buffer
-                    Hoymiles.getVerboseMessageOutput()->printf("RX Channel: %d --> ", f.channel);
+                    Hoymiles.getVerboseMessageOutput()->printf("RX Channel: %" PRId8 " --> ", f.channel);
                     dumpBuf(f.fragment, f.len, false);
-                    Hoymiles.getVerboseMessageOutput()->printf("| %d dBm\r\n", f.rssi);
+                    Hoymiles.getVerboseMessageOutput()->printf("| %" PRId8 " dBm\r\n", f.rssi);
 
-                    inv->addRxFragment(f.fragment, f.len);
+                    inv->addRxFragment(f.fragment, f.len, f.rssi);
                 } else {
                     Hoymiles.getMessageOutput()->println("Inverter Not found!");
                 }
@@ -183,7 +183,7 @@ void HoymilesRadio_NRF::sendEsbPacket(CommandAbstract& cmd)
     openWritingPipe(s);
     _radio->setRetries(3, 15);
 
-    Hoymiles.getVerboseMessageOutput()->printf("TX %s Channel: %d --> ",
+    Hoymiles.getVerboseMessageOutput()->printf("TX %s Channel: %" PRId8 " --> ",
         cmd.getCommandName().c_str(), _radio->getChannel());
     cmd.dumpDataPayload(Hoymiles.getVerboseMessageOutput());
     _radio->write(cmd.getDataPayload(), cmd.getDataSize());

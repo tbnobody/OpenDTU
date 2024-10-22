@@ -32,22 +32,12 @@ void WebApiBatteryClass::onStatus(AsyncWebServerRequest* request)
     }
 
     AsyncJsonResponse* response = new AsyncJsonResponse();
-    auto& root = response->getRoot();
-    const CONFIG_T& config = Configuration.get();
+    auto root = response->getRoot().as<JsonObject>();
+    auto& config = Configuration.get();
 
-    root["enabled"] = config.Battery.Enabled;
-    root["verbose_logging"] = config.Battery.VerboseLogging;
-    root["provider"] = config.Battery.Provider;
-    root["jkbms_interface"] = config.Battery.JkBmsInterface;
-    root["jkbms_polling_interval"] = config.Battery.JkBmsPollingInterval;
-    root["mqtt_soc_topic"] = config.Battery.MqttSocTopic;
-    root["mqtt_soc_json_path"] = config.Battery.MqttSocJsonPath;
-    root["mqtt_voltage_topic"] = config.Battery.MqttVoltageTopic;
-    root["mqtt_voltage_json_path"] = config.Battery.MqttVoltageJsonPath;
-    root["mqtt_voltage_unit"] = config.Battery.MqttVoltageUnit;
+    ConfigurationClass::serializeBatteryConfig(config.Battery, root);
 
-    response->setLength();
-    request->send(response);
+    WebApi.sendJsonResponse(request, response, __FUNCTION__, __LINE__);
 }
 
 void WebApiBatteryClass::onAdminGet(AsyncWebServerRequest* request)
@@ -73,24 +63,15 @@ void WebApiBatteryClass::onAdminPost(AsyncWebServerRequest* request)
 
     auto& retMsg = response->getRoot();
 
-    if (!root.containsKey("enabled") || !root.containsKey("provider")) {
+    if (!root["enabled"].is<bool>() || !root["provider"].is<uint8_t>()) {
         retMsg["message"] = "Values are missing!";
         retMsg["code"] = WebApiError::GenericValueMissing;
         WebApi.sendJsonResponse(request, response, __FUNCTION__, __LINE__);
         return;
     }
 
-    CONFIG_T& config = Configuration.get();
-    config.Battery.Enabled = root["enabled"].as<bool>();
-    config.Battery.VerboseLogging = root["verbose_logging"].as<bool>();
-    config.Battery.Provider = root["provider"].as<uint8_t>();
-    config.Battery.JkBmsInterface = root["jkbms_interface"].as<uint8_t>();
-    config.Battery.JkBmsPollingInterval = root["jkbms_polling_interval"].as<uint8_t>();
-    strlcpy(config.Battery.MqttSocTopic, root["mqtt_soc_topic"].as<String>().c_str(), sizeof(config.Battery.MqttSocTopic));
-    strlcpy(config.Battery.MqttSocJsonPath, root["mqtt_soc_json_path"].as<String>().c_str(), sizeof(config.Battery.MqttSocJsonPath));
-    strlcpy(config.Battery.MqttVoltageTopic, root["mqtt_voltage_topic"].as<String>().c_str(), sizeof(config.Battery.MqttVoltageTopic));
-    strlcpy(config.Battery.MqttVoltageJsonPath, root["mqtt_voltage_json_path"].as<String>().c_str(), sizeof(config.Battery.MqttVoltageJsonPath));
-    config.Battery.MqttVoltageUnit = static_cast<BatteryVoltageUnit>(root["mqtt_voltage_unit"].as<uint8_t>());
+    auto& config = Configuration.get();
+    ConfigurationClass::deserializeBatteryConfig(root.as<JsonObject>(), config.Battery);
 
     WebApi.writeConfig(retMsg);
 

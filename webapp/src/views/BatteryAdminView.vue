@@ -120,6 +120,83 @@
                 </CardElement>
             </template>
 
+            <CardElement
+                :text="$t('batteryadmin.DischargeCurrentLimitConfiguration')"
+                textVariant="text-bg-primary"
+                addSpace
+            >
+                <InputElement
+                    :label="$t('batteryadmin.LimitDischargeCurrent')"
+                    v-model="batteryConfigList.enable_discharge_current_limit"
+                    type="checkbox"
+                />
+
+                <template v-if="batteryConfigList.enable_discharge_current_limit">
+                    <InputElement
+                        :label="$t('batteryadmin.DischargeCurrentLimit')"
+                        v-model="batteryConfigList.discharge_current_limit"
+                        type="number"
+                        min="0"
+                        step="0.1"
+                        postfix="A"
+                    />
+
+                    <InputElement
+                        :label="$t('batteryadmin.UseBatteryReportedDischargeCurrentLimit')"
+                        v-model="batteryConfigList.use_battery_reported_discharge_current_limit"
+                        type="checkbox"
+                    />
+                </template>
+
+                <template
+                    v-if="
+                        batteryConfigList.enable_discharge_current_limit &&
+                        batteryConfigList.use_battery_reported_discharge_current_limit
+                    "
+                >
+                    <div
+                        class="alert alert-secondary"
+                        role="alert"
+                        v-html="$t('batteryadmin.BatteryReportedDischargeCurrentLimitInfo')"
+                    ></div>
+
+                    <template v-if="batteryConfigList.provider == 2">
+                        <InputElement
+                            :label="$t('batteryadmin.MqttDischargeCurrentTopic')"
+                            v-model="batteryConfigList.mqtt_discharge_current_topic"
+                            type="text"
+                            maxlength="256"
+                        />
+
+                        <InputElement
+                            :label="$t('batteryadmin.MqttJsonPath')"
+                            v-model="batteryConfigList.mqtt_discharge_current_json_path"
+                            type="text"
+                            maxlength="128"
+                            :tooltip="$t('batteryadmin.MqttJsonPathDescription')"
+                        />
+
+                        <div class="row mb-3">
+                            <label for="mqtt_amperage_unit" class="col-sm-2 col-form-label">
+                                {{ $t('batteryadmin.MqttAmperageUnit') }}
+                            </label>
+
+                            <div class="col-sm-10">
+                                <select
+                                    id="mqtt_amperage_unit"
+                                    class="form-select"
+                                    v-model="batteryConfigList.mqtt_amperage_unit"
+                                >
+                                    <option v-for="u in amperageUnitTypeList" :key="u.key" :value="u.key">
+                                        {{ u.value }}
+                                    </option>
+                                </select>
+                            </div>
+                        </div>
+                    </template>
+                </template>
+            </CardElement>
+
             <FormFooter @reload="getBatteryConfig" />
         </form>
     </BasePage>
@@ -156,6 +233,7 @@ export default defineComponent({
                 { key: 2, value: 'Mqtt' },
                 { key: 3, value: 'Victron' },
                 { key: 4, value: 'PytesCan' },
+                { key: 5, value: 'SBSCan' },
             ],
             jkBmsInterfaceTypeList: [
                 { key: 0, value: 'Uart' },
@@ -166,6 +244,10 @@ export default defineComponent({
                 { key: 2, value: 'cV' },
                 { key: 1, value: 'dV' },
                 { key: 0, value: 'V' },
+            ],
+            amperageUnitTypeList: [
+                { key: 1, value: 'mA' },
+                { key: 0, value: 'A' },
             ],
         };
     },

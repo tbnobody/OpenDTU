@@ -4,19 +4,19 @@ labels: ["bug"]
 body:
   - type: markdown
     attributes:
-      value: >
-        ### ⚠️ Please remember: issues are for *bugs*
-        That is, something you believe affects every single user of OpenDTU, not just you. If you're not sure, start with one of the other options below.
+      value: |
+        ### ⚠️ Please remember: issues are for *bugs*⚠️
+        That is, something you believe affects every single user of OpenDTU-OnBattery, not just you. If you're not sure, start with one of the other options below.
   - type: markdown
     attributes:
       value: |
-        #### Have a question? 👉 [Start a new discussion](https://github.com/tbnobody/OpenDTU/discussions/new) or [ask in chat](https://discord.gg/WzhxEY62mB).
+        #### Have a question? 👉 [Start a new discussion](https://github.com/helgeerbe/OpenDTU-OnBattery/discussions/new/choose) or [ask in chat](https://discord.gg/WzhxEY62mB).
 
         #### Before opening an issue, please double check:
 
-        - [Documentation](https://www.opendtu.solar).
-        - [The FAQs](https://www.opendtu.solar/firmware/faq/).
-        - [Existing issues and discussions](https://github.com/tbnobody/OpenDTU/search?q=&type=issues).
+        - [Documentation](https://opendtu-onbattery.net)
+        - [The FAQs](https://opendtu-onbattery.net/firmware/faq/)
+        - [Existing issues and discussions](https://github.com/helgeerbe/OpenDTU-OnBattery/search?q=&type=issues)
   - type: textarea
     id: what-happened
     attributes:
@@ -45,18 +45,35 @@ body:
     id: install_format
     attributes:
       label: Install Method
-      description: How did you install OpenDTU?
+      description: How did you install OpenDTU-OnBattery?
       options:
-        - Pre-Compiled binary from GitHub
+        - Pre-Compiled binary from GitHub releases
+        - Pre-Compiled binary from GitHub actions/pull-request
         - Self-Compiled
     validations:
       required: true
   - type: input
     id: version
     attributes:
-      label: What git-hash/version of OpenDTU?
-      description: You can find this in by going to Info -> System
+      label: What git-hash/version of OpenDTU-OnBattery?
+      description: You can find this in the Web UI at Info -> System.
       placeholder: "e.g. 359d513"
+    validations:
+      required: true
+  - type: dropdown
+    id: environment
+    attributes:
+      label: What firmware variant (PIO Environment)?
+      description: You can find this in the Web UI at Info -> System.
+      options:
+          - "generic_esp32s3_usb"
+          - "generic_esp32s3"
+          - "generic_esp32_8mb"
+          - "generic_esp32_4mb_no_ota"
+          - "generic_esp32"
+          - "generic"
+          - "opendtufusionv2"
+          - "other (tell us in 'Anything else?')"
     validations:
       required: true
   - type: textarea
@@ -78,11 +95,11 @@ body:
     attributes:
       label: Please confirm the following
       options:
-        - label: I believe this issue is a bug that affects all users of OpenDTU, not something specific to my installation.
+        - label: I believe this issue is a bug that affects all users of OpenDTU-OnBattery, not something specific to my installation.
           required: true
         - label: I have already searched for relevant existing issues and discussions before opening this report.
           required: true
         - label: I have updated the title field above with a concise description.
           required: true
-        - label: I have double checked that my inverter does not contain a W in the model name (like HMS-xxxW) as they are not supported
+        - label: I have double checked that my inverter does not contain a W in the model name (like HMS-xxxW) as they are not supported.
           required: true

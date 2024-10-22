@@ -150,7 +150,19 @@
         "Unknown": "Unbekannt",
         "ShowGridProfile": "Zeige Grid Profil",
         "GridProfile": "Grid Profil",
-        "LoadingInverter": "Warte auf Daten... (kann bis zu 10 Sekunden dauern)"
+        "LoadingInverter": "Warte auf Daten... (kann bis zu 10 Sekunden dauern)",
+        "RadioStats": "Funkstatistik",
+        "TxRequest": "Gesendete Anfragen",
+        "RxSuccess": "Empfang Erfolgreich",
+        "RxFailNothing": "Empfang Fehler: Nichts empfangen",
+        "RxFailPartial": "Empfang Fehler: Teilweise empfangen",
+        "RxFailCorrupt": "Empfang Fehler: Beschädigt empfangen",
+        "TxReRequest": "Gesendete Fragment Wiederanforderungen",
+        "StatsReset": "Statistiken zurücksetzen",
+        "StatsResetting": "Zurücksetzen...",
+        "Rssi": "RSSI des zuletzt empfangenen Paketes",
+        "RssiHint": "HM-Wechselrichter unterstützen nur RSSI-Werte  < -64 dBm und > -64 dBm. In diesem Fall wird -80 dBm und -30 dBm angezeigt.",
+        "dBm": "{dbm} dBm"
     },
     "vedirecthome": {
         "SerialNumber": "Seriennummer",
@@ -162,7 +174,7 @@
         "Unit": "Einheit",
         "section_device": "Geräteinformation",
         "device": {
-            "LOAD": "Status Ladeausgang",
+            "LOAD": "Status Lastausgang",
             "CS": "Betriebszustand",
             "MPPT": "Betriebszustand des Trackers",
             "OR": "Grund für das Ausschalten",
@@ -175,7 +187,8 @@
             "P": "Leistung (berechnet)",
             "V": "Spannung",
             "I": "Strom",
-            "E": "Effizienz (berechnet)"
+            "E": "Effizienz (berechnet)",
+            "SBSTemperature": "SBS Temperatur"
         },
         "section_input": "Eingang (Solarpanele)",
         "input": {
@@ -273,6 +286,24 @@
         "LargestFreeBlock": "Größter zusammenhängender freier Block",
         "MaxUsage": "Maximale Speichernutzung seit Start",
         "Fragmentation": "Grad der Fragmentierung"
+    },
+    "taskdetails": {
+        "TaskDetails": "Detailinformationen zu Tasks",
+        "Name": "Name",
+        "StackFree": "Stack Frei",
+        "Priority": "Priorität",
+        "Task_idle0": "Leerlauf (CPU-Kern 0)",
+        "Task_idle1": "Leerlauf (CPU-Kern 1)",
+        "Task_wifi": "Wi-Fi",
+        "Task_tit": "TCP/IP",
+        "Task_looptask": "Arduino Hauptschleife (loop)",
+        "Task_asynctcp": "Async TCP",
+        "Task_mqttclient": "MQTT Client",
+        "Task_huaweican0": "AC Ladegerät CAN",
+        "Task_pmsdm": "Stromzähler (SDM)",
+        "Task_pmhttpjson": "Stromzähler (HTTP+JSON)",
+        "Task_pmsml": "Stromzähler (Serial SML)",
+        "Task_pmhttpsml": "Stromzähler (HTTP+SML)"
     },
     "radioinfo": {
         "RadioInformation": "Funkmodulinformationen",
@@ -421,7 +452,7 @@
         "Cancel": "@:base.Cancel",
         "RebootOpenDTU": "OpenDTU neu starten",
         "RebootQuestion": "Möchten Sie das Gerät wirklich neu starten?",
-        "RebootHint": "<b>Hinweis:</b> Ein manueller Neustart muss normalerweise nicht durchgeführt werden. OpenDTU führt jeden erforderlichen Neustart (z. B. nach einem Firmware-Update) automatisch durch. Einstellungen werden auch ohne Neustart übernommen. Wenn Sie aufgrund eines Fehlers einen Neustart durchführen müssen, denken Sie bitte daran, diesen unter <a href=\"https://github.com/helgeerbe/OpenDTU-OnBattery/issues\" class=\"alert-link\" target=\"_blank\">Github</a> zu melden."
+        "RebootHint": "<b>Hinweis:</b> Ein manueller Neustart muss normalerweise nicht durchgeführt werden. OpenDTU führt jeden erforderlichen Neustart (z. B. nach einem Firmware-Update) automatisch durch. Einstellungen werden auch ohne Neustart übernommen. Wenn Sie aufgrund eines Fehlers einen Neustart durchführen müssen, denken Sie bitte daran, diesen unter <a href=\"https://github.com/hoylabs/OpenDTU-OnBattery/issues\" class=\"alert-link\" target=\"_blank\">Github</a> zu melden."
     },
     "dtuadmin": {
         "DtuSettings": "DTU-Einstellungen",
@@ -499,7 +530,11 @@
         "ApTimeoutHint": "Zeit die der AccessPoint offen gehalten wird. Ein Wert von 0 bedeutet unendlich.",
         "Minutes": "Minuten",
         "EnableMdns": "mDNS aktivieren",
-        "MdnsSettings": "mDNS-Einstellungen"
+        "MdnsSettings": "mDNS-Einstellungen",
+        "EnableSyslog": "Syslog aktivieren",
+        "SyslogSettings": "Syslog-Einstellungen",
+        "SyslogHostname": "Syslog Server",
+        "SyslogPort": "Port"
     },
     "mqttadmin": {
         "MqttSettings": "MQTT-Einstellungen",
@@ -668,6 +703,7 @@
         "VerboseLogging": "@:base.VerboseLogging",
         "Provider": "Datenanbieter",
         "ProviderPylontechCan": "Pylontech per CAN-Bus",
+        "ProviderSBSCan": "SBS Unipower per CAN-Bus",
         "ProviderJkBmsSerial": "Jikong (JK) BMS per serieller Verbindung",
         "ProviderMqtt": "Batteriewerte aus MQTT Broker",
         "ProviderVictron": "Victron SmartShunt per VE.Direct Schnittstelle",
@@ -684,7 +720,14 @@
         "JkBmsInterfaceUart": "TTL-UART an der MCU",
         "JkBmsInterfaceTransceiver": "RS-485 Transceiver an der MCU",
         "PollingInterval": "Abfrageintervall",
-        "Seconds": "@:base.Seconds"
+        "Seconds": "@:base.Seconds",
+        "DischargeCurrentLimitConfiguration": "Einstellungen Entladestromlimit",
+        "LimitDischargeCurrent": "Entladestrom limitieren",
+        "DischargeCurrentLimit": "max. Entladestrom",
+        "UseBatteryReportedDischargeCurrentLimit": "Von der Batterie übermitteltes Limit verwenden",
+        "BatteryReportedDischargeCurrentLimitInfo": "<b>Hinweis:</b> Das niedrigste Limit wird angewendet, wobei das von der Batterie übermittelte Entladestromlimit nur verwendet wird, wenn in der letzten Minute ein Update eingegangen ist; andernfalls dient das zuvor festgelegte Limit als Fallback.",
+        "MqttDischargeCurrentTopic": "Topic für Entladestromlimit",
+        "MqttAmperageUnit": "Einheit"
     },
     "inverteradmin": {
         "InverterSettings": "Wechselrichter Einstellungen",
@@ -785,11 +828,11 @@
         "ProjectOriginBody3": "Die Software wurde nach bestem Wissen und Gewissen entwickelt. Dennoch kann keine Haftung für eine Fehlfunktion oder einen Garantieverlust des Wechselrichters übernommen werden.",
         "ProjectOriginBody4": "OpenDTU ist frei verfügbar. Wenn Sie Geld für die Software bezahlt haben, wurden Sie wahrscheinlich abgezockt.",
         "NewsUpdates": "Neuigkeiten und Updates",
-        "NewsUpdatesBody": "Neue Updates sind auf <a href=\"https://github.com/helgeerbe/OpenDTU-OnBattery/releases\" target=\"_blank\">Github</a> zu finden.",
+        "NewsUpdatesBody": "Neue Updates sind auf <a href=\"https://github.com/hoylabs/OpenDTU-OnBattery/releases\" target=\"_blank\">Github</a> zu finden.",
         "ErrorReporting": "Fehlerberichte",
-        "ErrorReportingBody": "Bitte melden Sie Probleme über die Ticketverwaltung von <a href=\"https://github.com/helgeerbe/OpenDTU-OnBattery/issues\" target=\"_blank\">Github</a>.",
+        "ErrorReportingBody": "Bitte melden Sie Probleme über die Ticketverwaltung von <a href=\"https://github.com/hoylabs/OpenDTU-OnBattery/issues\" target=\"_blank\">Github</a>.",
         "Discussion": "Diskussion",
-        "DiscussionBody": "Diskutieren Sie mit uns auf <a href=\"https://discord.gg/WzhxEY62mB\" target=\"_blank\">Discord</a> oder <a href=\"https://github.com/helgeerbe/OpenDTU-OnBattery/discussions\" target=\"_blank\">Github</a>."
+        "DiscussionBody": "Diskutieren Sie mit uns auf <a href=\"https://discord.gg/WzhxEY62mB\" target=\"_blank\">Discord</a> oder <a href=\"https://github.com/hoylabs/OpenDTU-OnBattery/discussions\" target=\"_blank\">Github</a>."
     },
     "hints": {
         "RadioProblem": "Es konnte keine Verbindung zu einem der konfigurierten Funkmodule hergestellt werden. Bitte überprüfen Sie die Verdrahtung.",

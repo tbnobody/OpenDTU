@@ -28,8 +28,8 @@ bool PowerMeterSerialSdm::init()
 {
     const PinMapping_t& pin = PinMapping.get();
 
-    MessageOutput.printf("[PowerMeterSerialSdm] rx = %d, tx = %d, dere = %d\r\n",
-            pin.powermeter_rx, pin.powermeter_tx, pin.powermeter_dere);
+    MessageOutput.printf("[PowerMeterSerialSdm] rx = %d, tx = %d, dere = %d, rxen = %d, txen = %d \r\n",
+            pin.powermeter_rx, pin.powermeter_tx, pin.powermeter_dere, pin.powermeter_rxen, pin.powermeter_txen);
 
     if (pin.powermeter_rx < 0 || pin.powermeter_tx < 0) {
         MessageOutput.println("[PowerMeterSerialSdm] invalid pin config for SDM "
@@ -38,8 +38,17 @@ bool PowerMeterSerialSdm::init()
     }
 
     _upSdmSerial = std::make_unique<SoftwareSerial>();
-    _upSdm = std::make_unique<SDM>(*_upSdmSerial, 9600, pin.powermeter_dere,
+
+    if (pin.powermeter_rxen > -1 && pin.powermeter_txen > -1){
+        _upSdm = std::make_unique<SDM>(*_upSdmSerial, 9600, pin.powermeter_rxen, pin.powermeter_txen,
             SWSERIAL_8N1, pin.powermeter_rx, pin.powermeter_tx);
+    }
+    else
+    {
+        _upSdm = std::make_unique<SDM>(*_upSdmSerial, 9600, pin.powermeter_dere,
+            SWSERIAL_8N1, pin.powermeter_rx, pin.powermeter_tx);
+    }
+    
     _upSdm->begin();
 
     return true;

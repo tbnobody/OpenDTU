@@ -47,6 +47,15 @@ void WebApiClass::init(Scheduler& scheduler)
     _server.begin();
 }
 
+void WebApiClass::reload()
+{
+    _webApiWsConsole.reload();
+    _webApiWsLive.reload();
+    _webApiWsBatteryLive.reload();
+    _webApiWsVedirectLive.reload();
+    _webApiWsHuaweiLive.reload();
+}
+
 bool WebApiClass::checkCredentials(AsyncWebServerRequest* request)
 {
     CONFIG_T& config = Configuration.get();
@@ -139,7 +148,7 @@ bool WebApiClass::sendJsonResponse(AsyncWebServerRequest* request, AsyncJsonResp
         root["code"] = WebApiError::GenericInternalServerError;
         root["type"] = "danger";
         response->setCode(500);
-        MessageOutput.printf("WebResponse failed: %s, %d\r\n", function, line);
+        MessageOutput.printf("WebResponse failed: %s, %" PRId16 "\r\n", function, line);
         ret_val = false;
     }
 

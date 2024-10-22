@@ -137,7 +137,7 @@ void WebApiPowerLimiterClass::onAdminPost(AsyncWebServerRequest* request)
     // anyways to always include the keys accessed below. if we wanted to
     // support a simpler API, like only sending the "enabled" key which only
     // changes that key, we need to refactor all of the code below.
-    if (!root.containsKey("enabled")) {
+    if (!root["enabled"].is<bool>()) {
         retMsg["message"] = "Values are missing!";
         retMsg["code"] = WebApiError::GenericValueMissing;
         response->setLength();

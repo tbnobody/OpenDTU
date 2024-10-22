@@ -150,7 +150,19 @@
         "Unknown": "Unknown",
         "ShowGridProfile": "Show Grid Profile",
         "GridProfile": "Grid Profile",
-        "LoadingInverter": "Waiting for data... (can take up to 10 seconds)"
+        "LoadingInverter": "Waiting for data... (can take up to 10 seconds)",
+        "RadioStats": "Radio Statistics",
+        "TxRequest": "TX Request Count",
+        "RxSuccess": "RX Success",
+        "RxFailNothing": "RX Fail: Receive Nothing",
+        "RxFailPartial": "RX Fail: Receive Partial",
+        "RxFailCorrupt": "RX Fail: Receive Corrupt",
+        "TxReRequest": "TX Re-Request Fragment",
+        "StatsReset": "Reset Statistics",
+        "StatsResetting": "Resetting...",
+        "Rssi": "RSSI of last received packet",
+        "RssiHint": "HM inverters only support RSSI values < -64 dBm and > -64 dBm. In this case, -80 dbm and -30 dbm is shown.",
+        "dBm": "{dbm} dBm"
     },
     "vedirecthome": {
         "SerialNumber": "Serial Number",
@@ -175,7 +187,8 @@
             "P": "Power (calculated)",
             "V": "Voltage",
             "I": "Current",
-            "E": "Efficiency (calculated)"
+            "E": "Efficiency (calculated)",
+            "SBSTemperature": "SBS temperature"
         },
         "section_input": "Input (Solar Panels)",
         "input": {
@@ -274,6 +287,24 @@
         "LargestFreeBlock": "Biggest contiguous free block",
         "MaxUsage": "Maximum usage since start",
         "Fragmentation": "Level of fragmentation"
+    },
+    "taskdetails": {
+        "TaskDetails": "Task Details",
+        "Name": "Name",
+        "StackFree": "Stack Free",
+        "Priority": "Priority",
+        "Task_idle0": "Idle (CPU Core 0)",
+        "Task_idle1": "Idle (CPU Core 1)",
+        "Task_wifi": "Wi-Fi",
+        "Task_tit": "TCP/IP",
+        "Task_looptask": "Arduino Main Loop",
+        "Task_asynctcp": "Async TCP",
+        "Task_mqttclient": "MQTT Client",
+        "Task_huaweican0": "AC Charger CAN",
+        "Task_pmsdm": "PowerMeter (SDM)",
+        "Task_pmhttpjson": "PowerMeter (HTTP+JSON)",
+        "Task_pmsml": "PowerMeter (Serial SML)",
+        "Task_pmhttpsml": "PowerMeter (HTTP+SML)"
     },
     "radioinfo": {
         "RadioInformation": "Radio Information",
@@ -423,7 +454,7 @@
         "Cancel": "@:base.Cancel",
         "RebootOpenDTU": "Reboot OpenDTU",
         "RebootQuestion": "Do you really want to reboot the device?",
-        "RebootHint": "<b>Note:</b> A manual reboot does not normally have to be performed. OpenDTU performs any required reboot (e.g. after a firmware update) automatically. Settings are also adopted without rebooting. If you need to reboot due to an error, please consider reporting it at <a href=\"https://github.com/helgeerbe/OpenDTU-OnBattery/issues\" class=\"alert-link\" target=\"_blank\">Github</a>."
+        "RebootHint": "<b>Note:</b> A manual reboot does not normally have to be performed. OpenDTU performs any required reboot (e.g. after a firmware update) automatically. Settings are also adopted without rebooting. If you need to reboot due to an error, please consider reporting it at <a href=\"https://github.com/hoylabs/OpenDTU-OnBattery/issues\" class=\"alert-link\" target=\"_blank\">Github</a>."
     },
     "dtuadmin": {
         "DtuSettings": "DTU Settings",
@@ -501,7 +532,11 @@
         "ApTimeoutHint": "Time which the AccessPoint is kept open. A value of 0 means infinite.",
         "Minutes": "minutes",
         "EnableMdns": "Enable mDNS",
-        "MdnsSettings": "mDNS Settings"
+        "MdnsSettings": "mDNS Settings",
+        "EnableSyslog": "Enable Syslog",
+        "SyslogSettings": "Syslog Settings",
+        "SyslogHostname": "Syslog Server",
+        "SyslogPort": "Port"
     },
     "mqttadmin": {
         "MqttSettings": "MQTT Settings",
@@ -670,6 +705,7 @@
         "VerboseLogging": "@:base.VerboseLogging",
         "Provider": "Data Provider",
         "ProviderPylontechCan": "Pylontech using CAN bus",
+        "ProviderSBSCan": "SBS Unipower using CAN bus",
         "ProviderJkBmsSerial": "Jikong (JK) BMS using serial connection",
         "ProviderMqtt": "Battery data from MQTT broker",
         "ProviderVictron": "Victron SmartShunt using VE.Direct interface",
@@ -687,7 +723,14 @@
         "JkBmsInterfaceUart": "TTL-UART on MCU",
         "JkBmsInterfaceTransceiver": "RS-485 Transceiver on MCU",
         "PollingInterval": "Polling Interval",
-        "Seconds": "@:base.Seconds"
+        "Seconds": "@:base.Seconds",
+        "DischargeCurrentLimitConfiguration": "Discharge Current Limit Settings",
+        "LimitDischargeCurrent": "Limit Discharge Current",
+        "DischargeCurrentLimit": "max. Discharge Current",
+        "UseBatteryReportedDischargeCurrentLimit": "Use Battery-Reported limit",
+        "BatteryReportedDischargeCurrentLimitInfo": "<b>Hint:</b> The lowest limit will be applied, with the battery-reported discharge current limit used only if an update was received in the last minute; otherwise, the previously specified limit will act as a fallback.",
+        "MqttDischargeCurrentTopic": "Discharge Current Limit Value Topic",
+        "MqttAmperageUnit": "Unit"
     },
     "inverteradmin": {
         "InverterSettings": "Inverter Settings",
@@ -788,11 +831,11 @@
         "ProjectOriginBody3": "The software was developed to the best of our knowledge and belief. Nevertheless, no liability can be accepted for a malfunction or guarantee loss of the inverter.",
         "ProjectOriginBody4": "OpenDTU is freely available. If you paid money for the software, you probably got ripped off.",
         "NewsUpdates": "News & Updates",
-        "NewsUpdatesBody": "New updates can be found on <a href=\"https://github.com/helgeerbe/OpenDTU-OnBattery/releases\" target=\"_blank\">Github</a>.",
+        "NewsUpdatesBody": "New updates can be found on <a href=\"https://github.com/hoylabs/OpenDTU-OnBattery/releases\" target=\"_blank\">Github</a>.",
         "ErrorReporting": "Error Reporting",
-        "ErrorReportingBody": "Please report issues using the feature provided by <a href=\"https://github.com/helgeerbe/OpenDTU-OnBattery/issues\" target=\"_blank\">Github</a>.",
+        "ErrorReportingBody": "Please report issues using the feature provided by <a href=\"https://github.com/hoylabs/OpenDTU-OnBattery/issues\" target=\"_blank\">Github</a>.",
         "Discussion": "Discussion",
-        "DiscussionBody": "Discuss with us on <a href=\"https://discord.gg/WzhxEY62mB\" target=\"_blank\">Discord</a> or <a href=\"https://github.com/helgeerbe/OpenDTU-OnBattery/discussions\" target=\"_blank\">Github</a>."
+        "DiscussionBody": "Discuss with us on <a href=\"https://discord.gg/WzhxEY62mB\" target=\"_blank\">Discord</a> or <a href=\"https://github.com/hoylabs/OpenDTU-OnBattery/discussions\" target=\"_blank\">Github</a>."
     },
     "hints": {
         "RadioProblem": "Could not connect to a configured radio module. Please check the wiring.",
