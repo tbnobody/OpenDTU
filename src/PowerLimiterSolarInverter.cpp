@@ -18,8 +18,59 @@ uint16_t PowerLimiterSolarInverter::getMaxIncreaseWatts() const
 {
     if (!isEligible()) { return 0; }
 
-    // TODO(schlimmchen): left for the author of the scaling method: @AndreasBoehm
-    return std::min(getConfiguredMaxPowerWatts() - getCurrentOutputAcWatts(), 100);
+    // the maximum increase possible for this inverter
+    int16_t maxTotalIncrease = getConfiguredMaxPowerWatts() - getCurrentOutputAcWatts();
+
+    if (!isProducing()) {
+        // the inverter is not producing, we don't know how much we can increase
+        // the power, so we return the maximum possible increase
+        return maxTotalIncrease;
+    }
+
+    auto pStats = _spInverter->Statistics();
+    std::vector<MpptNum_t> dcMppts = _spInverter->getMppts();
+    size_t dcTotalMppts = dcMppts.size();
+
+    float inverterEfficiencyFactor = pStats->getChannelFieldValue(TYPE_INV, CH0, FLD_EFF) / 100;
+
+    // 98% of the expected power is good enough
+    auto expectedAcPowerPerMppt = (getCurrentLimitWatts() / dcTotalMppts) * 0.98;
+
+    size_t dcNonShadedMppts = 0;
+    auto nonShadedMpptACPowerSum = 0.0;
+
+    for (auto& m : dcMppts) {
+        float mpptPowerAC = 0.0;
+        std::vector<ChannelNum_t> mpptChnls = _spInverter->getChannelsDCByMppt(m);
+
+        for (auto& c : mpptChnls) {
+            mpptPowerAC += pStats->getChannelFieldValue(TYPE_DC, c, FLD_PDC) * inverterEfficiencyFactor;
+        }
+
+        if (mpptPowerAC >= expectedAcPowerPerMppt) {
+            nonShadedMpptACPowerSum += mpptPowerAC;
+            dcNonShadedMppts++;
+        }
+    }
+
+    if (dcNonShadedMppts == 0) {
+        // all mppts are shaded, we can't increase the power
+        return 0;
+    }
+
+    if (dcNonShadedMppts == dcTotalMppts) {
+        // no MPPT is shaded, we assume that we can increase the power by the maximum
+        return maxTotalIncrease;
+    }
+
+    int16_t maxPowerPerMppt = getConfiguredMaxPowerWatts() / dcTotalMppts;
+
+    int16_t currentPowerPerNonShadedMppt = nonShadedMpptACPowerSum / dcNonShadedMppts;
+
+    int16_t maxIncreasePerNonShadedMppt = maxPowerPerMppt - currentPowerPerNonShadedMppt;
+
+    // maximum increase based on the non-shaded mppts
+    return maxIncreasePerNonShadedMppt * dcNonShadedMppts;
 }
 
 uint16_t PowerLimiterSolarInverter::applyReduction(uint16_t reduction, bool)
@@ -100,7 +151,7 @@ uint16_t PowerLimiterSolarInverter::scaleLimit(uint16_t expectedOutputWatts)
         auto expectedAcPowerPerMppt = (getCurrentLimitWatts() / dcTotalMppts) * 0.98;
 
         if (_verboseLogging) {
-            MessageOutput.printf("%s expected AC power per mppt %f W\r\n",
+            MessageOutput.printf("%s expected AC power per MPPT %.0f W\r\n",
                     _logPrefix, expectedAcPowerPerMppt);
         }
 
@@ -121,7 +172,7 @@ uint16_t PowerLimiterSolarInverter::scaleLimit(uint16_t expectedOutputWatts)
             }
 
             if (_verboseLogging) {
-                MessageOutput.printf("%s mppt-%c AC power %f W\r\n",
+                MessageOutput.printf("%s MPPT-%c AC power %.0f W\r\n",
                         _logPrefix, m + 'a', mpptPowerAC);
             }
         }
