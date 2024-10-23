@@ -163,7 +163,6 @@ void SBSBatteryStats::getLiveViewData(JsonVariant& root) const
     // values go into the "Status" card of the web application
     addLiveViewValue(root, "chargeVoltage", _chargeVoltage, "V", 1);
     addLiveViewValue(root, "chargeCurrentLimitation", _chargeCurrentLimitation, "A", 1);
-    addLiveViewValue(root, "dischargeCurrentLimitation", _dischargeCurrentLimitation, "A", 1);
     addLiveViewValue(root, "stateOfHealth", _stateOfHealth, "%", 0);
     addLiveViewValue(root, "current", _current, "A", 1);
     addLiveViewValue(root, "temperature", _temperature, "°C", 1);
@@ -419,7 +418,6 @@ void SBSBatteryStats::mqttPublish() const
 
     MqttSettings.publish("battery/settings/chargeVoltage", String(_chargeVoltage));
     MqttSettings.publish("battery/settings/chargeCurrentLimitation", String(_chargeCurrentLimitation));
-    MqttSettings.publish("battery/settings/dischargeCurrentLimitation", String(_dischargeCurrentLimitation));
     MqttSettings.publish("battery/stateOfHealth", String(_stateOfHealth));
     MqttSettings.publish("battery/current", String(_current));
     MqttSettings.publish("battery/temperature", String(_temperature));

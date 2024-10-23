@@ -159,7 +159,6 @@ class SBSBatteryStats : public BatteryStats {
 
         float _chargeVoltage;
         float _chargeCurrentLimitation;
-        float _dischargeCurrentLimitation;
         uint16_t _stateOfHealth;
         float _current;
         float _temperature;

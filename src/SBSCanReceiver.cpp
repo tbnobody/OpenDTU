@@ -74,10 +74,10 @@ void SBSCanReceiver::onMessage(twai_message_t rx_message)
 
         case 0x640: {
             _stats->_chargeCurrentLimitation = (this->readSignedInt24(rx_message.data + 3) * 0.001);
-            _stats->_dischargeCurrentLimitation = (this->readSignedInt24(rx_message.data)) * 0.001;
+            _stats->setDischargeCurrentLimit(this->readSignedInt24(rx_message.data) * 0.001, millis());
 
             if (_verboseLogging) {
-                MessageOutput.printf("[SBS Unipower] 1600 Currents  %f, %f \r\n", _stats->_chargeCurrentLimitation, _stats->_dischargeCurrentLimitation);
+                MessageOutput.printf("[SBS Unipower] 1600 Currents  %f, %f \r\n", _stats->_chargeCurrentLimitation, _stats->getDischargeCurrentLimit());
             }
             break;
         }
@@ -144,7 +144,7 @@ void SBSCanReceiver::dummyData()
     _stats->setSoC(42, 0/*precision*/, millis());
     _stats->_chargeVoltage = dummyFloat(50);
     _stats->_chargeCurrentLimitation = dummyFloat(33);
-    _stats->_dischargeCurrentLimitation = dummyFloat(12);
+    _stats->setDischargeCurrentLimit(dummyFloat(12), millis());
     _stats->_stateOfHealth = 99;
     _stats->setVoltage(48.67, millis());
     _stats->_current = dummyFloat(-1);
