@@ -10,6 +10,7 @@
                     :label="$t('batteryadmin.EnableBattery')"
                     v-model="batteryConfigList.enabled"
                     type="checkbox"
+                    wide
                 />
 
                 <InputElement
@@ -17,13 +18,14 @@
                     :label="$t('batteryadmin.VerboseLogging')"
                     v-model="batteryConfigList.verbose_logging"
                     type="checkbox"
+                    wide
                 />
 
                 <div class="row mb-3" v-show="batteryConfigList.enabled">
-                    <label class="col-sm-2 col-form-label">
+                    <label class="col-sm-4 col-form-label">
                         {{ $t('batteryadmin.Provider') }}
                     </label>
-                    <div class="col-sm-10">
+                    <div class="col-sm-8">
                         <select class="form-select" v-model="batteryConfigList.provider">
                             <option v-for="provider in providerTypeList" :key="provider.key" :value="provider.key">
                                 {{ $t(`batteryadmin.Provider` + provider.value) }}
@@ -40,10 +42,10 @@
                 addSpace
             >
                 <div class="row mb-3">
-                    <label class="col-sm-2 col-form-label">
+                    <label class="col-sm-4 col-form-label">
                         {{ $t('batteryadmin.JkBmsInterface') }}
                     </label>
-                    <div class="col-sm-10">
+                    <div class="col-sm-8">
                         <select class="form-select" v-model="batteryConfigList.jkbms_interface">
                             <option
                                 v-for="jkBmsInterface in jkBmsInterfaceTypeList"
@@ -64,6 +66,7 @@
                     max="90"
                     step="1"
                     :postfix="$t('batteryadmin.Seconds')"
+                    wide
                 />
             </CardElement>
 
@@ -74,6 +77,7 @@
                         v-model="batteryConfigList.mqtt_soc_topic"
                         type="text"
                         maxlength="256"
+                        wide
                     />
 
                     <InputElement
@@ -82,6 +86,7 @@
                         type="text"
                         maxlength="128"
                         :tooltip="$t('batteryadmin.MqttJsonPathDescription')"
+                        wide
                     />
                 </CardElement>
 
@@ -91,6 +96,7 @@
                         v-model="batteryConfigList.mqtt_voltage_topic"
                         type="text"
                         maxlength="256"
+                        wide
                     />
 
                     <InputElement
@@ -99,13 +105,14 @@
                         type="text"
                         maxlength="128"
                         :tooltip="$t('batteryadmin.MqttJsonPathDescription')"
+                        wide
                     />
 
                     <div class="row mb-3">
-                        <label for="mqtt_voltage_unit" class="col-sm-2 col-form-label">
+                        <label for="mqtt_voltage_unit" class="col-sm-4 col-form-label">
                             {{ $t('batteryadmin.MqttVoltageUnit') }}
                         </label>
-                        <div class="col-sm-10">
+                        <div class="col-sm-8">
                             <select
                                 id="mqtt_voltage_unit"
                                 class="form-select"
@@ -129,6 +136,7 @@
                     :label="$t('batteryadmin.LimitDischargeCurrent')"
                     v-model="batteryConfigList.enable_discharge_current_limit"
                     type="checkbox"
+                    wide
                 />
 
                 <template v-if="batteryConfigList.enable_discharge_current_limit">
@@ -139,10 +147,12 @@
                         min="0"
                         step="0.1"
                         postfix="A"
+                        wide
                     />
 
                     <InputElement
                         :label="$t('batteryadmin.DischargeCurrentLimitBelowSoc')"
+                        v-show="batteryConfigList.enabled"
                         v-model="batteryConfigList.discharge_current_limit_below_soc"
                         type="number"
                         min="0"
@@ -150,10 +160,12 @@
                         step="0.1"
                         postfix="%"
                         :tooltip="$t('batteryadmin.DischargeCurrentLimitBelowSocInfo')"
+                        wide
                     />
 
                     <InputElement
                         :label="$t('batteryadmin.DischargeCurrentLimitBelowVoltage')"
+                        v-show="batteryConfigList.enabled"
                         v-model="batteryConfigList.discharge_current_limit_below_voltage"
                         type="number"
                         min="0"
@@ -161,60 +173,70 @@
                         step="0.01"
                         postfix="V"
                         :tooltip="$t('batteryadmin.DischargeCurrentLimitBelowVoltageInfo')"
+                        wide
                     />
 
-                    <InputElement
-                        :label="$t('batteryadmin.UseBatteryReportedDischargeCurrentLimit')"
-                        v-model="batteryConfigList.use_battery_reported_discharge_current_limit"
-                        type="checkbox"
-                    />
-                </template>
-
-                <template
-                    v-if="
-                        batteryConfigList.enable_discharge_current_limit &&
-                        batteryConfigList.use_battery_reported_discharge_current_limit
-                    "
-                >
-                    <div
-                        class="alert alert-secondary"
-                        role="alert"
-                        v-html="$t('batteryadmin.BatteryReportedDischargeCurrentLimitInfo')"
-                    ></div>
-
-                    <template v-if="batteryConfigList.provider == 2">
+                    <template
+                        v-if="
+                            batteryConfigList.enabled &&
+                            (batteryConfigList.provider == 0 ||
+                                batteryConfigList.provider == 2 ||
+                                batteryConfigList.provider == 4 ||
+                                batteryConfigList.provider == 5)
+                        "
+                    >
                         <InputElement
-                            :label="$t('batteryadmin.MqttDischargeCurrentTopic')"
-                            v-model="batteryConfigList.mqtt_discharge_current_topic"
-                            type="text"
-                            maxlength="256"
+                            :label="$t('batteryadmin.UseBatteryReportedDischargeCurrentLimit')"
+                            v-model="batteryConfigList.use_battery_reported_discharge_current_limit"
+                            type="checkbox"
+                            wide
                         />
 
-                        <InputElement
-                            :label="$t('batteryadmin.MqttJsonPath')"
-                            v-model="batteryConfigList.mqtt_discharge_current_json_path"
-                            type="text"
-                            maxlength="128"
-                            :tooltip="$t('batteryadmin.MqttJsonPathDescription')"
-                        />
+                        <template v-if="batteryConfigList.use_battery_reported_discharge_current_limit">
+                            <div
+                                class="alert alert-secondary"
+                                role="alert"
+                                v-show="batteryConfigList.enabled"
+                                v-html="$t('batteryadmin.BatteryReportedDischargeCurrentLimitInfo')"
+                            ></div>
 
-                        <div class="row mb-3">
-                            <label for="mqtt_amperage_unit" class="col-sm-2 col-form-label">
-                                {{ $t('batteryadmin.MqttAmperageUnit') }}
-                            </label>
+                            <template v-if="batteryConfigList.provider == 2">
+                                <InputElement
+                                    :label="$t('batteryadmin.MqttDischargeCurrentTopic')"
+                                    v-model="batteryConfigList.mqtt_discharge_current_topic"
+                                    wide
+                                    type="text"
+                                    maxlength="256"
+                                />
 
-                            <div class="col-sm-10">
-                                <select
-                                    id="mqtt_amperage_unit"
-                                    class="form-select"
-                                    v-model="batteryConfigList.mqtt_amperage_unit"
-                                >
-                                    <option v-for="u in amperageUnitTypeList" :key="u.key" :value="u.key">
-                                        {{ u.value }}
-                                    </option>
-                                </select>
-                            </div>
-                        </div>
+                                <InputElement
+                                    :label="$t('batteryadmin.MqttJsonPath')"
+                                    v-model="batteryConfigList.mqtt_discharge_current_json_path"
+                                    wide
+                                    type="text"
+                                    maxlength="128"
+                                    :tooltip="$t('batteryadmin.MqttJsonPathDescription')"
+                                />
+
+                                <div class="row mb-3">
+                                    <label for="mqtt_amperage_unit" class="col-sm-4 col-form-label">
+                                        {{ $t('batteryadmin.MqttAmperageUnit') }}
+                                    </label>
+
+                                    <div class="col-sm-8">
+                                        <select
+                                            id="mqtt_amperage_unit"
+                                            class="form-select"
+                                            v-model="batteryConfigList.mqtt_amperage_unit"
+                                        >
+                                            <option v-for="u in amperageUnitTypeList" :key="u.key" :value="u.key">
+                                                {{ u.value }}
+                                            </option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </template>
+                        </template>
                     </template>
                 </template>
             </CardElement>
