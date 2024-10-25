@@ -3,6 +3,16 @@
         "name": "Italiano",
         "code": "it"
     },
+    "display": {
+        "date_format": "%d/%m/%Y %H:%M",
+        "offline": "Offline",
+        "power_w": "%.0f W",
+        "power_kw": "%.1f kW",
+        "yield_today_wh": "oggi: %4.0f Wh",
+        "yield_today_kwh": "oggi: %.1f kWh",
+        "yield_total_kwh": "totale: %.1f kWh",
+        "yield_total_mwh": "totale: %.0f kWh"
+    },
     "webapp": {
         "menu": {
             "LiveView": "Dati in tempo reale",
