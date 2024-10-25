@@ -4,3 +4,10 @@
 .container-fluid .row {
     font-feature-settings: 'tnum';
 }
+
+@include media-breakpoint-up(sm) {
+    label.col-form-label,
+    label.form-check-label {
+        text-align: end;
+    }
+}
