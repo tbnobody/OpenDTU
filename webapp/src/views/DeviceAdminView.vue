@@ -160,13 +160,13 @@
                                     {{ $t('deviceadmin.DisplayLanguage') }}
                                 </label>
                                 <div class="col-sm-10">
-                                    <select class="form-select" v-model="deviceConfigList.display.language">
+                                    <select class="form-select" v-model="deviceConfigList.display.locale">
                                         <option
-                                            v-for="language in displayLanguageList"
-                                            :key="language.key"
-                                            :value="language.key"
+                                            v-for="locale in displayLocaleList"
+                                            :key="locale.key"
+                                            :value="locale.key"
                                         >
-                                            {{ $t(`deviceadmin.` + language.value) }}
+                                            {{ $t(`deviceadmin.` + locale.value) }}
                                         </option>
                                     </select>
                                 </div>
@@ -289,10 +289,10 @@ export default defineComponent({
                 { key: 2, value: 'rot180' },
                 { key: 3, value: 'rot270' },
             ],
-            displayLanguageList: [
-                { key: 0, value: 'en' },
-                { key: 1, value: 'de' },
-                { key: 2, value: 'fr' },
+            displayLocaleList: [
+                { key: 'en', value: 'en' },
+                { key: 'de', value: 'de' },
+                { key: 'fr', value: 'fr' },
             ],
             diagramModeList: [
                 { key: 0, value: 'off' },

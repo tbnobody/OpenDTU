@@ -86,7 +86,7 @@ void WebApiDeviceClass::onDeviceAdminGet(AsyncWebServerRequest* request)
     display["power_safe"] = config.Display.PowerSafe;
     display["screensaver"] = config.Display.ScreenSaver;
     display["contrast"] = config.Display.Contrast;
-    display["language"] = config.Display.Language;
+    display["locale"] = config.Display.Locale;
     display["diagramduration"] = config.Display.Diagram.Duration;
     display["diagrammode"] = config.Display.Diagram.Mode;
 
@@ -137,7 +137,7 @@ void WebApiDeviceClass::onDeviceAdminPost(AsyncWebServerRequest* request)
     config.Display.PowerSafe = root["display"]["power_safe"].as<bool>();
     config.Display.ScreenSaver = root["display"]["screensaver"].as<bool>();
     config.Display.Contrast = root["display"]["contrast"].as<uint8_t>();
-    config.Display.Language = root["display"]["language"].as<uint8_t>();
+    strlcpy(config.Display.Locale, root["display"]["locale"].as<String>().c_str(), sizeof(config.Display.Locale));
     config.Display.Diagram.Duration = root["display"]["diagramduration"].as<uint32_t>();
     config.Display.Diagram.Mode = root["display"]["diagrammode"].as<DiagramMode_t>();
 
@@ -151,7 +151,7 @@ void WebApiDeviceClass::onDeviceAdminPost(AsyncWebServerRequest* request)
     Display.enablePowerSafe = config.Display.PowerSafe;
     Display.enableScreensaver = config.Display.ScreenSaver;
     Display.setContrast(config.Display.Contrast);
-    Display.setLanguage(config.Display.Language);
+    Display.setLocale(config.Display.Locale);
     Display.Diagram().updatePeriod();
 
     WebApi.writeConfig(retMsg);

@@ -107,7 +107,7 @@ bool ConfigurationClass::write()
     display["screensaver"] = config.Display.ScreenSaver;
     display["rotation"] = config.Display.Rotation;
     display["contrast"] = config.Display.Contrast;
-    display["language"] = config.Display.Language;
+    display["locale"] = config.Display.Locale;
     display["diagram_duration"] = config.Display.Diagram.Duration;
     display["diagram_mode"] = config.Display.Diagram.Mode;
 
@@ -282,7 +282,7 @@ bool ConfigurationClass::read()
     config.Display.ScreenSaver = display["screensaver"] | DISPLAY_SCREENSAVER;
     config.Display.Rotation = display["rotation"] | DISPLAY_ROTATION;
     config.Display.Contrast = display["contrast"] | DISPLAY_CONTRAST;
-    config.Display.Language = display["language"] | DISPLAY_LANGUAGE;
+    strlcpy(config.Display.Locale, display["locale"] | DISPLAY_LOCALE, sizeof(config.Display.Locale));
     config.Display.Diagram.Duration = display["diagram_duration"] | DISPLAY_DIAGRAM_DURATION;
     config.Display.Diagram.Mode = display["diagram_mode"] | DISPLAY_DIAGRAM_MODE;
 
@@ -380,6 +380,22 @@ void ConfigurationClass::migrate()
     if (config.Cfg.Version < 0x00011c00) {
         if (!strcmp(config.Ntp.Server, NTP_SERVER_OLD)) {
             strlcpy(config.Ntp.Server, NTP_SERVER, sizeof(config.Ntp.Server));
+        }
+    }
+
+    if (config.Cfg.Version < 0x00011d00) {
+        JsonObject device = doc["device"];
+        JsonObject display = device["display"];
+        switch (display["language"] | 0U) {
+        case 0U:
+            strlcpy(config.Display.Locale, "en", sizeof(config.Display.Locale));
+            break;
+        case 1U:
+            strlcpy(config.Display.Locale, "de", sizeof(config.Display.Locale));
+            break;
+        case 2U:
+            strlcpy(config.Display.Locale, "fr", sizeof(config.Display.Locale));
+            break;
         }
     }
 
