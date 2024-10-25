@@ -222,7 +222,7 @@
                                 </div>
                             </BootstrapAlert>
 
-                            <div class="accordion mt-5" id="accordionExample">
+                            <div class="accordion mt-5" id="accordionRadioStats">
                                 <div class="accordion-item">
                                     <h2 class="accordion-header">
                                         <button
@@ -239,7 +239,7 @@
                                     <div
                                         id="collapseStats"
                                         class="accordion-collapse collapse"
-                                        data-bs-parent="#accordionExample"
+                                        data-bs-parent="#accordionRadioStats"
                                     >
                                         <div class="accordion-body">
                                             <table class="table table-striped table-hover">
