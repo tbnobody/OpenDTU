@@ -13,6 +13,7 @@
 <script lang="ts">
 import BasePage from '@/components/BasePage.vue';
 import CardElement from '@/components/CardElement.vue';
+import { authHeader } from '@/utils/authentication';
 import { defineComponent } from 'vue';
 
 export default defineComponent({
@@ -38,7 +39,7 @@ export default defineComponent({
                 const remoteHostUrl = '/api/system/status';
 
                 // Use a simple fetch request to check if the remote host is reachable
-                fetch(remoteHostUrl, { method: 'GET' })
+                fetch(remoteHostUrl, { headers: authHeader() })
                     .then((response) => {
                         // Check if the response status is OK (200-299 range)
                         if (response.ok) {
