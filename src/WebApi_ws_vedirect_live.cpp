@@ -195,6 +195,16 @@ void WebApiWsVedirectLiveClass::populateJson(const JsonObject &root, const VeDir
         output["SBSTemperature"]["u"] = "°C";
         output["SBSTemperature"]["d"] = "0";
     }
+    if (mpptData.BatteryAbsorptionMilliVolt.first > 0) {
+        output["AbsorptionVoltage"]["v"] = mpptData.BatteryAbsorptionMilliVolt.second / 1000.0;
+        output["AbsorptionVoltage"]["u"] = "V";
+        output["AbsorptionVoltage"]["d"] = "2";
+    }
+    if (mpptData.BatteryFloatMilliVolt.first > 0) {
+        output["FloatVoltage"]["v"] = mpptData.BatteryFloatMilliVolt.second / 1000.0;
+        output["FloatVoltage"]["u"] = "V";
+        output["FloatVoltage"]["d"] = "2";
+    }
 
     const JsonObject input = values["input"].to<JsonObject>();
     if (mpptData.NetworkTotalDcInputPowerMilliWatts.first > 0) {

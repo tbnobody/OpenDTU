@@ -95,6 +95,12 @@ void MqttHandleVedirectHassClass::publishConfig()
         if (optMpptData->MpptTemperatureMilliCelsius.first != 0) {
             publishSensor("MPPT temperature", "mdi:temperature-celsius", "MpptTemperature", "temperature", "measurement", "°C", *optMpptData);
         }
+        if (optMpptData->BatteryAbsorptionMilliVolt.first != 0) {
+            publishSensor("Battery absorption voltage", "mdi:battery-charging-90", "BatteryAbsorption", "voltage", "measurement", "V", *optMpptData);
+        }
+        if (optMpptData->BatteryFloatMilliVolt.first != 0) {
+            publishSensor("Battery float voltage", "mdi:battery-charging-100", "BatteryFloat", "voltage", "measurement", "V", *optMpptData);
+        }
         if (optMpptData->SmartBatterySenseTemperatureMilliCelsius.first != 0) {
             publishSensor("Smart Battery Sense temperature", "mdi:temperature-celsius", "SmartBatterySenseTemperature", "temperature", "measurement", "°C", *optMpptData);
         }

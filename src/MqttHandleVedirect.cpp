@@ -138,6 +138,8 @@ void MqttHandleVedirectClass::publish_mppt_data(const VeDirectMpptController::da
 
     PUBLISH_OPT(NetworkTotalDcInputPowerMilliWatts,       "NetworkTotalDcInputPower",     currentData.NetworkTotalDcInputPowerMilliWatts.second / 1000.0);
     PUBLISH_OPT(MpptTemperatureMilliCelsius,              "MpptTemperature",              currentData.MpptTemperatureMilliCelsius.second / 1000.0);
+    PUBLISH_OPT(BatteryAbsorptionMilliVolt,               "BatteryAbsorption",            currentData.BatteryAbsorptionMilliVolt.second / 1000.0);
+    PUBLISH_OPT(BatteryFloatMilliVolt,                    "BatteryFloat",                 currentData.BatteryFloatMilliVolt.second / 1000.0);
     PUBLISH_OPT(SmartBatterySenseTemperatureMilliCelsius, "SmartBatterySenseTemperature", currentData.SmartBatterySenseTemperatureMilliCelsius.second / 1000.0);
 #undef PUBLILSH_OPT
 }

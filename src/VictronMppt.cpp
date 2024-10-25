@@ -226,3 +226,39 @@ float VictronMpptClass::getOutputVoltage() const
 
     return min;
 }
+
+std::optional<uint8_t> VictronMpptClass::getStateOfOperation() const
+{
+    for (const auto& upController : _controllers) {
+        if (upController->isDataValid()) {
+            return upController->getData().currentState_CS;
+        }
+    }
+
+    return std::nullopt;
+}
+
+std::optional<float> VictronMpptClass::getVoltage(MPPTVoltage kindOf) const
+{
+    for (const auto& upController : _controllers) {
+        switch (kindOf) {
+            case MPPTVoltage::ABSORPTION: {
+                auto const& absorptionVoltage = upController->getData().BatteryAbsorptionMilliVolt;
+                if (absorptionVoltage.first > 0) { return absorptionVoltage.second; }
+                break;
+            }
+            case MPPTVoltage::FLOAT: {
+                auto const& floatVoltage = upController->getData().BatteryFloatMilliVolt;
+                if (floatVoltage.first > 0) { return floatVoltage.second; }
+                break;
+            }
+            case MPPTVoltage::BATTERY: {
+                auto const& batteryVoltage = upController->getData().batteryVoltage_V_mV;
+                if (upController->isDataValid()) { return batteryVoltage; }
+                break;
+            }
+        }
+    }
+
+    return std::nullopt;
+}

@@ -191,7 +191,7 @@ frozen::string const& veMpptStruct::getCsAsString() const
 		{ 0,   "OFF" },
 		{ 2,   "Fault" },
 		{ 3,   "Bulk" },
-		{ 4,   "Absorbtion" },
+		{ 4,   "Absorption" },
 		{ 5,   "Float" },
 		{ 7,   "Equalize (manual)" },
 		{ 245, "Starting-up" },
@@ -287,18 +287,27 @@ frozen::string const& VeDirectHexData::getResponseAsString() const
 frozen::string const& VeDirectHexData::getRegisterAsString() const
 {
 	using Register = VeDirectHexRegister;
-	static constexpr frozen::map<Register, frozen::string, 11> values = {
+	static constexpr frozen::map<Register, frozen::string, 20> values = {
 		{ Register::DeviceMode, "Device Mode" },
 		{ Register::DeviceState, "Device State" },
 		{ Register::RemoteControlUsed, "Remote Control Used" },
 		{ Register::PanelVoltage, "Panel Voltage" },
+		{ Register::PanelPower, "Panel Power" },
 		{ Register::ChargerVoltage, "Charger Voltage" },
+		{ Register::ChargerCurrent, "Charger Current" },
 		{ Register::NetworkTotalDcInputPower, "Network Total DC Input Power" },
 		{ Register::ChargeControllerTemperature, "Charger Controller Temperature" },
 		{ Register::SmartBatterySenseTemperature, "Smart Battery Sense Temperature" },
 		{ Register::NetworkInfo, "Network Info" },
 		{ Register::NetworkMode, "Network Mode" },
-		{ Register::NetworkStatus, "Network Status" }
+		{ Register::NetworkStatus, "Network Status" },
+		{ Register::BatteryAbsorptionVoltage, "Battery Absorption Voltage" },
+		{ Register::BatteryFloatVoltage, "Battery Float Voltage" },
+		{ Register::TotalChargeCurrent, "Total Charge Current" },
+		{ Register::ChargeStateElapsedTime, "Charge State Elapsed Time" },
+		{ Register::BatteryVoltageSense, "Battery Voltage Sense" },
+		{ Register::LoadCurrent, "Load current" },
+		{ Register::LoadOutputVoltage, "Load Output Voltage" }
 	};
 
 	return getAsString(values, addr);
