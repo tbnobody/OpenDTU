@@ -3,6 +3,16 @@
         "name": "Español",
         "code": "es"
     },
+    "display": {
+        "date_format": "%d/%m/%Y %H:%M",
+        "offline": "Apagado",
+        "power_w": "%.0f W",
+        "power_kw": "%.1f kW",
+        "yield_today_wh": "Hoy: %4.0f Wh",
+        "yield_today_kwh": "Hoy: %.1f kWh",
+        "yield_total_kwh": "Total: %.1f kWh",
+        "yield_total_mwh": "Total: %.0f kWh"
+    },
     "webapp": {
         "menu": {
             "LiveView": "Vista en directo",
