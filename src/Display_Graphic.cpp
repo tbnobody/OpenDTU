@@ -4,6 +4,7 @@
  */
 #include "Display_Graphic.h"
 #include "Datastore.h"
+#include "I18n.h"
 #include <NetworkSettings.h>
 #include <map>
 #include <time.h>
@@ -169,14 +170,24 @@ void DisplayGraphicClass::setLocale(const String& locale)
         idx = I18N_LOCALE_FR;
     }
 
-    _i18n_offline = i18n_offline[idx];
-    _i18n_yield_today_kwh = i18n_yield_today_kwh[idx];
-    _i18n_yield_today_wh = i18n_yield_today_wh[idx];
     _i18n_date_format = i18n_date_format[idx];
-    _i18n_current_power_kw = i18n_current_power_kw[idx];
+    _i18n_offline = i18n_offline[idx];
     _i18n_current_power_w = i18n_current_power_w[idx];
-    _i18n_yield_total_mwh = i18n_yield_total_mwh[idx];
+    _i18n_current_power_kw = i18n_current_power_kw[idx];
+    _i18n_yield_today_wh = i18n_yield_today_wh[idx];
+    _i18n_yield_today_kwh = i18n_yield_today_kwh[idx];
     _i18n_yield_total_kwh = i18n_yield_total_kwh[idx];
+    _i18n_yield_total_mwh = i18n_yield_total_mwh[idx];
+
+    I18n.readDisplayStrings(locale,
+        _i18n_date_format,
+        _i18n_offline,
+        _i18n_current_power_w,
+        _i18n_current_power_kw,
+        _i18n_yield_today_wh,
+        _i18n_yield_today_kwh,
+        _i18n_yield_total_kwh,
+        _i18n_yield_total_mwh);
 }
 
 void DisplayGraphicClass::setDiagramMode(DiagramMode_t mode)
