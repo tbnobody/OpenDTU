@@ -21,7 +21,7 @@
         </div>
 
         <div class="table-responsive">
-            <table class="table table-striped table-hover" style="margin: 0">
+            <table class="table table-striped table-hover">
                 <tbody>
                     <tr v-for="(property, key) in channelData" :key="`prop-${key}`">
                         <template v-if="key != 'name' && property">
