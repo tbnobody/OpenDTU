@@ -27,6 +27,14 @@ div.card.card-table {
     overflow: hidden;
 }
 
+div.card.card-table tr > :first-child {
+    padding-left: var(--bs-card-cap-padding-x);
+}
+
+div.card.card-table tr > :last-child {
+    padding-right: var(--bs-card-cap-padding-x);
+}
+
 div.card.card-table div.card-body {
     padding: 0;
 }
