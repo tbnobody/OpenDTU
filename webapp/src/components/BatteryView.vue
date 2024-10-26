@@ -45,7 +45,7 @@
                                 v-bind:key="section"
                                 class="col order-0"
                             >
-                                <div class="card" :class="{ 'border-info': true }">
+                                <div class="card card-table" :class="{ 'border-info': true }">
                                     <div class="card-header text-bg-info">{{ $t('battery.' + section) }}</div>
                                     <div class="card-body">
                                         <div class="table-responsive">
@@ -91,7 +91,7 @@
                                 </div>
                             </div>
                             <div class="col order-1" v-show="batteryData.showIssues">
-                                <div class="card">
+                                <div class="card card-table">
                                     <div :class="{ 'card-header': true, 'border-bottom-0': maxIssueValue === 0 }">
                                         <div class="d-flex flex-row justify-content-between align-items-baseline">
                                             {{ $t('battery.issues') }}

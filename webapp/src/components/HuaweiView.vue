@@ -43,7 +43,7 @@
                     <div class="card-body">
                         <div class="row flex-row flex-wrap align-items-start g-3">
                             <div class="col order-0">
-                                <div class="card" :class="{ 'border-info': true }">
+                                <div class="card card-table" :class="{ 'border-info': true }">
                                     <div class="card-header bg-info">{{ $t('huawei.Input') }}</div>
                                     <div class="card-body">
                                         <table class="table table-striped table-hover">
@@ -98,7 +98,7 @@
                                 </div>
                             </div>
                             <div class="col order-1">
-                                <div class="card" :class="{ 'border-info': false }">
+                                <div class="card card-table" :class="{ 'border-info': false }">
                                     <div class="card-header bg-info">{{ $t('huawei.Output') }}</div>
                                     <div class="card-body">
                                         <table class="table table-striped table-hover">

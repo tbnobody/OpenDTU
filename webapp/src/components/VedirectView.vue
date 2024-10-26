@@ -64,7 +64,7 @@
                     <div class="card-body">
                         <div class="row flex-row flex-wrap align-items-start g-3">
                             <div v-for="(values, section) in item.values" v-bind:key="section" class="col order-0">
-                                <div class="card" :class="{ 'border-info': section === 'device' }">
+                                <div class="card card-table" :class="{ 'border-info': section === 'device' }">
                                     <div :class="section === 'device' ? 'card-header text-bg-info' : 'card-header'">
                                         {{ $t('vedirecthome.section_' + section) }}
                                     </div>
