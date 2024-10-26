@@ -308,23 +308,25 @@
                                                     </tr>
                                                 </tbody>
                                             </table>
-                                            <button
-                                                :disabled="!isLogged || performRadioStatsReset"
-                                                type="button"
-                                                class="btn btn-danger"
-                                                @click="onResetRadioStats(inverter.serial)"
-                                            >
-                                                <template v-if="!performRadioStatsReset">
-                                                    {{ $t('home.StatsReset') }}
-                                                </template>
-                                                <template v-else>
-                                                    <span
-                                                        class="spinner-border spinner-border-sm"
-                                                        aria-hidden="true"
-                                                    ></span>
-                                                    <span role="status"> {{ $t('home.StatsResetting') }}</span>
-                                                </template>
-                                            </button>
+                                            <div class="d-flex">
+                                                <button
+                                                    :disabled="!isLogged || performRadioStatsReset"
+                                                    type="button"
+                                                    class="btn btn-danger ms-auto me-3 mt-3"
+                                                    @click="onResetRadioStats(inverter.serial)"
+                                                >
+                                                    <template v-if="!performRadioStatsReset">
+                                                        <BIconArrowCounterclockwise />&nbsp;{{ $t('home.StatsReset') }}
+                                                    </template>
+                                                    <template v-else>
+                                                        <span
+                                                            class="spinner-border spinner-border-sm"
+                                                            aria-hidden="true"
+                                                        ></span>
+                                                        <span role="status">&nbsp;{{ $t('home.StatsResetting') }}</span>
+                                                    </template>
+                                                </button>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
