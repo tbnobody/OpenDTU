@@ -5,7 +5,7 @@
         :show-reload="true"
         @reload="getMqttInfo"
     >
-        <CardElement :text="$t('mqttinfo.ConfigurationSummary')" textVariant="text-bg-primary">
+        <CardElement :text="$t('mqttinfo.ConfigurationSummary')" textVariant="text-bg-primary" table>
             <div class="table-responsive">
                 <table class="table table-hover table-condensed">
                     <tbody>
@@ -112,7 +112,7 @@
             </div>
         </CardElement>
 
-        <CardElement :text="$t('mqttinfo.HassSummary')" textVariant="text-bg-primary" add-space>
+        <CardElement :text="$t('mqttinfo.HassSummary')" textVariant="text-bg-primary" add-space table>
             <div class="table-responsive">
                 <table class="table table-hover table-condensed">
                     <tbody>
@@ -165,7 +165,7 @@
             </div>
         </CardElement>
 
-        <CardElement :text="$t('mqttinfo.RuntimeSummary')" textVariant="text-bg-primary" add-space>
+        <CardElement :text="$t('mqttinfo.RuntimeSummary')" textVariant="text-bg-primary" add-space table>
             <div class="table-responsive">
                 <table class="table table-hover table-condensed">
                     <tbody>
