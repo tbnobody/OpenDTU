@@ -20,3 +20,9 @@ table.table tr:last-child td {
 table.table {
     margin-bottom: 0;
 }
+
+div.card.card-table {
+    // prevent tables in cards from
+    // messing up the bottom corner radii
+    overflow: hidden;
+}
