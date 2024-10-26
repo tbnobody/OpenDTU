@@ -1,11 +1,10 @@
 <template>
     <div
-        class="card"
+        class="card card-table"
         :class="{
             'border-info': channelType == 'AC',
             'border-secondary': channelType == 'INV',
         }"
-        style="overflow: hidden"
     >
         <div v-if="channelType == 'INV'" class="card-header text-bg-secondary">
             {{ $t('inverterchannelinfo.General') }}
