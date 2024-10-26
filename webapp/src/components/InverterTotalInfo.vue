@@ -99,7 +99,7 @@
                     :text="$t('invertertotalinfo.BatteryCharge')"
                 >
                     <div class="flex-fill" v-if="totalBattData.soc">
-                        <h2>
+                        <h2 class="mb-0">
                             {{
                                 $n(totalBattData.soc.v, 'decimal', {
                                     minimumFractionDigits: totalBattData.soc.d,
@@ -111,7 +111,7 @@
                     </div>
 
                     <div class="flex-fill" v-if="totalBattData.voltage">
-                        <h2>
+                        <h2 class="mb-0">
                             {{
                                 $n(totalBattData.voltage.v, 'decimal', {
                                     minimumFractionDigits: totalBattData.voltage.d,
@@ -131,7 +131,7 @@
                     :text="$t('invertertotalinfo.BatteryPower')"
                 >
                     <div class="flex-fill" v-if="totalBattData.power">
-                        <h2>
+                        <h2 class="mb-0">
                             {{
                                 $n(totalBattData.power.v, 'decimal', {
                                     minimumFractionDigits: totalBattData.power.d,
@@ -143,7 +143,7 @@
                     </div>
 
                     <div class="flex-fill" v-if="totalBattData.current">
-                        <h2>
+                        <h2 class="mb-0">
                             {{
                                 $n(totalBattData.current.v, 'decimal', {
                                     minimumFractionDigits: totalBattData.current.d,
