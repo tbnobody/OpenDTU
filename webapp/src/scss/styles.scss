@@ -52,3 +52,8 @@ div.card.card-table div.card-body {
 div.card div.card-body > :last-child {
     margin-bottom: auto !important;
 }
+
+div.card.card-table table .value {
+    text-align: right;
+    padding-right: 0;
+}
