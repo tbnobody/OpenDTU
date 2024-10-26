@@ -25,8 +25,8 @@
                         {{ $t('inverteradmin.Add') }}
                     </button>
                 </div>
-                <div class="alert alert-secondary" role="alert" v-html="$t('inverteradmin.AddHint')"></div>
             </form>
+            <div class="alert alert-secondary" role="alert" v-html="$t('inverteradmin.AddHint')"></div>
         </CardElement>
 
         <CardElement :text="$t('inverteradmin.InverterList')" textVariant="text-bg-primary" add-space>
