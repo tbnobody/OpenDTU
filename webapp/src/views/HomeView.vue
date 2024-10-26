@@ -217,7 +217,7 @@
                             </BootstrapAlert>
 
                             <div class="accordion mt-5" id="accordionRadioStats">
-                                <div class="accordion-item">
+                                <div class="accordion-item accordion-table">
                                     <h2 class="accordion-header">
                                         <button
                                             class="accordion-button collapsed"
