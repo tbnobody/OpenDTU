@@ -469,9 +469,9 @@
         "PerformReboot": "Effectuer un redémarrage",
         "Reboot": "Redémarrer !",
         "Cancel": "@:base.Cancel",
-        "RebootOpenDTU": "Redémarrer OpenDTU",
+        "RebootOpenDTU": "Redémarrer OpenDTU-OnBattery",
         "RebootQuestion": "Voulez-vous vraiment redémarrer l'appareil ?",
-        "RebootHint": "<b>Astuce :</b> Normalement, il n'est pas nécessaire de procéder à un redémarrage manuel. OpenDTU effectue automatiquement tout redémarrage nécessaire (par exemple, après une mise à jour du firmware). Les paramètres sont également adoptés sans redémarrage. Si vous devez redémarrer en raison d'une erreur, veuillez envisager de la signaler à l'adresse suivante <a href=\"https://github.com/hoylabs/OpenDTU-OnBattery/issues\" class=\"alert-link\" target=\"_blank\">Github</a>."
+        "RebootHint": "<b>Astuce :</b> Normalement, il n'est pas nécessaire de procéder à un redémarrage manuel. OpenDTU-OnBattery effectue automatiquement tout redémarrage nécessaire (par exemple, après une mise à jour du firmware). Les paramètres sont également adoptés sans redémarrage. Si vous devez redémarrer en raison d'une erreur, veuillez envisager de la signaler à l'adresse suivante <a href=\"https://github.com/hoylabs/OpenDTU-OnBattery/issues\" class=\"alert-link\" target=\"_blank\">Github</a>."
     },
     "dtuadmin": {
         "DtuSettings": "Paramètres du DTU",
@@ -513,7 +513,7 @@
         "NtpSettings": "Paramètres NTP",
         "NtpConfiguration": "Configuration du protocole NTP",
         "TimeServer": "Serveur horaire",
-        "TimeServerHint": "La valeur par défaut convient tant que OpenDTU a un accès direct à Internet.",
+        "TimeServerHint": "La valeur par défaut convient tant que OpenDTU-OnBattery a un accès direct à Internet.",
         "Timezone": "Fuseau horaire",
         "TimezoneConfig": "Configuration du fuseau horaire",
         "LocationConfiguration": "Géolocalisation",
@@ -526,10 +526,10 @@
         "CIVIL": "Civil dawn (96°)",
         "ASTONOMICAL": "Astronomical dawn (108°)",
         "ManualTimeSynchronization": "Synchronisation manuelle de l'heure",
-        "CurrentOpenDtuTime": "Heure actuelle de l'OpenDTU",
+        "CurrentOpenDtuTime": "Heure actuelle de l'OpenDTU-OnBattery",
         "CurrentLocalTime": "Heure locale actuelle",
         "SynchronizeTime": "Synchroniser l'heure",
-        "SynchronizeTimeHint": "<b>Astuce :</b> Vous pouvez utiliser la synchronisation horaire manuelle pour définir l'heure actuelle d'OpenDTU si aucun serveur NTP n'est disponible. Mais attention, en cas de mise sous tension, l'heure est perdue. Notez également que la précision de l'heure sera faussée, car elle ne peut pas être resynchronisée régulièrement et le microcontrôleur ESP32 ne dispose pas d'une horloge temps réel."
+        "SynchronizeTimeHint": "<b>Astuce :</b> Vous pouvez utiliser la synchronisation horaire manuelle pour définir l'heure actuelle d'OpenDTU-OnBattery si aucun serveur NTP n'est disponible. Mais attention, en cas de mise sous tension, l'heure est perdue. Notez également que la précision de l'heure sera faussée, car elle ne peut pas être resynchronisée régulièrement et le microcontrôleur ESP32 ne dispose pas d'une horloge temps réel."
     },
     "networkadmin": {
         "NetworkSettings": "Paramètres réseau",
@@ -694,7 +694,7 @@
         "RestoreHeader": "Restaurer le fichier de configuration",
         "Back": "Retour",
         "UploadSuccess": "Succès du téléversement",
-        "RestoreHint": "<b>Note :</b> Cette opération remplace le fichier de configuration par la configuration restaurée et redémarre OpenDTU pour appliquer tous les paramètres.",
+        "RestoreHint": "<b>Note :</b> Cette opération remplace le fichier de configuration par la configuration restaurée et redémarre OpenDTU-OnBattery pour appliquer tous les paramètres.",
         "ResetHeader": "Effectuer une réinitialisation d'usine",
         "FactoryResetButton": "Restaurer les paramètres d'usine",
         "ResetHint": "<b>Note :</b> Cliquez sur \"Restaurer les paramètres d'usine\" pour restaurer et initialiser les paramètres d'usine par défaut et redémarrer.",
@@ -782,7 +782,7 @@
         "ProjectOriginBody1": "Ce projet a été démarré suite à cette discussion <a href=\"https://www.mikrocontroller.net/topic/525778\" target=\"_blank\">(Mikrocontroller.net)</a>.",
         "ProjectOriginBody2": "Le protocole Hoymiles a été décrypté grâce aux efforts volontaires de nombreux participants. OpenDTU, entre autres, a été développé sur la base de ce travail. Le projet est sous licence Open Source (<a href=\"https://www.gnu.de/documents/gpl-2.0.de.html\" target=\"_blank\">GNU General Public License version 2</a>).",
         "ProjectOriginBody3": "Le logiciel a été développé au mieux de nos connaissances et de nos convictions. Néanmoins, aucune responsabilité ne peut être acceptée en cas de dysfonctionnement ou de perte de garantie de l'onduleur.",
-        "ProjectOriginBody4": "OpenDTU est disponible gratuitement. Si vous avez payé pour le logiciel, vous avez probablement été arnaqué.",
+        "ProjectOriginBody4": "OpenDTU et OpenDTU-OnBattery sont disponible gratuitement. Si vous avez payé pour le logiciel, vous avez probablement été arnaqué.",
         "NewsUpdates": "Actualités et mises à jour",
         "NewsUpdatesBody": "Les nouvelles mises à jour peuvent être trouvées sur <a href=\"https://github.com/hoylabs/OpenDTU-OnBattery/releases\" target=\"_blank\">Github</a>.",
         "ErrorReporting": "Rapport d'erreurs",

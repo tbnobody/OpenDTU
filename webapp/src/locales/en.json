@@ -454,9 +454,9 @@
         "PerformReboot": "Perform Reboot",
         "Reboot": "Reboot!",
         "Cancel": "@:base.Cancel",
-        "RebootOpenDTU": "Reboot OpenDTU",
+        "RebootOpenDTU": "Reboot OpenDTU-OnBattery",
         "RebootQuestion": "Do you really want to reboot the device?",
-        "RebootHint": "<b>Note:</b> A manual reboot does not normally have to be performed. OpenDTU performs any required reboot (e.g. after a firmware update) automatically. Settings are also adopted without rebooting. If you need to reboot due to an error, please consider reporting it at <a href=\"https://github.com/hoylabs/OpenDTU-OnBattery/issues\" class=\"alert-link\" target=\"_blank\">Github</a>."
+        "RebootHint": "<b>Note:</b> A manual reboot does not normally have to be performed. OpenDTU-OnBattery performs any required reboot (e.g. after a firmware update) automatically. Settings are also adopted without rebooting. If you need to reboot due to an error, please consider reporting it at <a href=\"https://github.com/hoylabs/OpenDTU-OnBattery/issues\" class=\"alert-link\" target=\"_blank\">Github</a>."
     },
     "dtuadmin": {
         "DtuSettings": "DTU Settings",
@@ -498,7 +498,7 @@
         "NtpSettings": "NTP Settings",
         "NtpConfiguration": "NTP Configuration",
         "TimeServer": "Time Server",
-        "TimeServerHint": "The default value is fine as long as OpenDTU has direct access to the internet.",
+        "TimeServerHint": "The default value is fine as long as OpenDTU-OnBattery has direct access to the internet.",
         "Timezone": "Timezone",
         "TimezoneConfig": "Timezone Config",
         "LocationConfiguration": "Location Configuration",
@@ -511,10 +511,10 @@
         "CIVIL": "Civil dawn (96°)",
         "ASTONOMICAL": "Astronomical dawn (108°)",
         "ManualTimeSynchronization": "Manual Time Synchronization",
-        "CurrentOpenDtuTime": "Current OpenDTU Time",
+        "CurrentOpenDtuTime": "Current OpenDTU-OnBattery Time",
         "CurrentLocalTime": "Current Local Time",
         "SynchronizeTime": "Synchronize Time",
-        "SynchronizeTimeHint": "<b>Hint:</b> You can use the manual time synchronization to set the current time of OpenDTU if no NTP server is available. But be aware, that in case of power cycle the time gets lost. Also note that time accuracy will be skewed badly, as it can not be resynchronised regularly and the ESP32 microcontroller does not have a real time clock."
+        "SynchronizeTimeHint": "<b>Hint:</b> You can use the manual time synchronization to set the current time of OpenDTU-OnBattery if no NTP server is available. But be aware, that in case of power cycle the time gets lost. Also note that time accuracy will be skewed badly, as it can not be resynchronised regularly and the ESP32 microcontroller does not have a real time clock."
     },
     "networkadmin": {
         "NetworkSettings": "Network Settings",
@@ -797,7 +797,7 @@
         "RestoreHeader": "Restore: Restore the Configuration File",
         "Back": "Back",
         "UploadSuccess": "Upload Success",
-        "RestoreHint": "<b>Note:</b> This operation replaces the configuration file with the restored configuration and restarts OpenDTU to apply all settings.",
+        "RestoreHint": "<b>Note:</b> This operation replaces the configuration file with the restored configuration and restarts OpenDTU-OnBattery to apply all settings.",
         "ResetHeader": "Initialize: Perform Factory Reset",
         "FactoryResetButton": "Restore Factory-Default Settings",
         "ResetHint": "<b>Note:</b> Click Restore Factory-Default Settings to restore and initialize the factory-default settings and reboot.",
@@ -835,7 +835,7 @@
         "ProjectOriginBody1": "OpenDTU-OnBattery is a fork of OpenDTU. The upstream project OpenDTU was started from <a href=\"https://www.mikrocontroller.net/topic/525778\" target=\"_blank\">this discussion. (Mikrocontroller.net)</a>",
         "ProjectOriginBody2": "The Hoymiles protocol was decrypted through the voluntary efforts of many participants. OpenDTU, among others, was developed based on this work. The project is licensed under an Open Source License (<a href=\"https://www.gnu.de/documents/gpl-2.0.de.html\" target=\"_blank\">GNU General Public License version 2</a>).",
         "ProjectOriginBody3": "The software was developed to the best of our knowledge and belief. Nevertheless, no liability can be accepted for a malfunction or guarantee loss of the inverter.",
-        "ProjectOriginBody4": "OpenDTU is freely available. If you paid money for the software, you probably got ripped off.",
+        "ProjectOriginBody4": "OpenDTU and OpenDTU-OnBattery are freely available. If you paid money for the software, you probably got ripped off.",
         "NewsUpdates": "News & Updates",
         "NewsUpdatesBody": "New updates can be found on <a href=\"https://github.com/hoylabs/OpenDTU-OnBattery/releases\" target=\"_blank\">Github</a>.",
         "ErrorReporting": "Error Reporting",

@@ -452,9 +452,9 @@
         "PerformReboot": "Neustart durchführen",
         "Reboot": "Neustarten!",
         "Cancel": "@:base.Cancel",
-        "RebootOpenDTU": "OpenDTU neu starten",
+        "RebootOpenDTU": "OpenDTU-OnBattery neu starten",
         "RebootQuestion": "Möchten Sie das Gerät wirklich neu starten?",
-        "RebootHint": "<b>Hinweis:</b> Ein manueller Neustart muss normalerweise nicht durchgeführt werden. OpenDTU führt jeden erforderlichen Neustart (z. B. nach einem Firmware-Update) automatisch durch. Einstellungen werden auch ohne Neustart übernommen. Wenn Sie aufgrund eines Fehlers einen Neustart durchführen müssen, denken Sie bitte daran, diesen unter <a href=\"https://github.com/hoylabs/OpenDTU-OnBattery/issues\" class=\"alert-link\" target=\"_blank\">Github</a> zu melden."
+        "RebootHint": "<b>Hinweis:</b> Ein manueller Neustart muss normalerweise nicht durchgeführt werden. OpenDTU-OnBattery führt jeden erforderlichen Neustart (z. B. nach einem Firmware-Update) automatisch durch. Einstellungen werden auch ohne Neustart übernommen. Wenn Sie aufgrund eines Fehlers einen Neustart durchführen müssen, denken Sie bitte daran, diesen unter <a href=\"https://github.com/hoylabs/OpenDTU-OnBattery/issues\" class=\"alert-link\" target=\"_blank\">Github</a> zu melden."
     },
     "dtuadmin": {
         "DtuSettings": "DTU-Einstellungen",
@@ -496,7 +496,7 @@
         "NtpSettings": "NTP-Einstellungen",
         "NtpConfiguration": "NTP-Konfiguration",
         "TimeServer": "Zeitserver",
-        "TimeServerHint": "Der Standardwert ist in Ordnung, solange OpenDTU direkten Zugang zum Internet hat.",
+        "TimeServerHint": "Der Standardwert ist in Ordnung, solange OpenDTU-OnBattery direkten Zugang zum Internet hat.",
         "Timezone": "Zeitzone",
         "TimezoneConfig": "Zeitzonenkonfiguration",
         "LocationConfiguration": "Standortkonfiguration",
@@ -512,7 +512,7 @@
         "CurrentOpenDtuTime": "Aktuelle OpenDTU-Zeit",
         "CurrentLocalTime": "Aktuelle lokale Zeit",
         "SynchronizeTime": "Zeit synchronisieren",
-        "SynchronizeTimeHint": "<b>Hinweis:</b> Sie können die manuelle Zeitsynchronisation verwenden, um die aktuelle Zeit von OpenDTU einzustellen, wenn kein NTP-Server verfügbar ist. Beachten Sie aber, dass im Falle eines Stromausfalls die Zeit verloren geht. Beachten Sie auch, dass die Zeitgenauigkeit stark verzerrt wird, da sie nicht regelmäßig neu synchronisiert werden kann und der ESP32-Mikrocontroller nicht über eine Echtzeituhr verfügt."
+        "SynchronizeTimeHint": "<b>Hinweis:</b> Sie können die manuelle Zeitsynchronisation verwenden, um die aktuelle Zeit von OpenDTU-OnBattery einzustellen, wenn kein NTP-Server verfügbar ist. Beachten Sie aber, dass im Falle eines Stromausfalls die Zeit verloren geht. Beachten Sie auch, dass die Zeitgenauigkeit stark verzerrt wird, da sie nicht regelmäßig neu synchronisiert werden kann und der ESP32-Mikrocontroller nicht über eine Echtzeituhr verfügt."
     },
     "networkadmin": {
         "NetworkSettings": "Netzwerkeinstellungen",
@@ -568,9 +568,9 @@
         "LwtTopic": "LWT-Topic",
         "LwtTopicHint": "LWT-Topic, wird der Basis-Topic angehängt",
         "LwtOnline": "LWT-Online-Nachricht",
-        "LwtOnlineHint": "Nachricht, die im LWT-Topic veröffentlicht wird, wenn OpenDTU online ist",
+        "LwtOnlineHint": "Nachricht, die im LWT-Topic veröffentlicht wird, wenn OpenDTU-OnBattery online ist",
         "LwtOffline": "LWT-Offline-Nachricht",
-        "LwtOfflineHint": "Nachricht, die im LWT-Topic veröffentlicht wird, wenn OpenDTU offline ist",
+        "LwtOfflineHint": "Nachricht, die im LWT-Topic veröffentlicht wird, wenn OpenDTU-OnBattery offline ist",
         "LwtQos": "QoS (Quality of Service)",
         "QOS0": "0 (Höchstens einmal)",
         "QOS1": "1 (Mindestens einmal)",
@@ -794,7 +794,7 @@
         "RestoreHeader": "Wiederherstellen: Wiederherstellen der Konfigurationsdatei",
         "Back": "Zurück",
         "UploadSuccess": "Erfolgreich hochgeladen",
-        "RestoreHint": "<b>Hinweis:</b> Bei diesem Vorgang wird die Konfigurationsdatei durch die wiederhergestellte Konfiguration ersetzt und OpenDTU neu gestartet, um alle Einstellungen zu übernehmen.",
+        "RestoreHint": "<b>Hinweis:</b> Bei diesem Vorgang wird die Konfigurationsdatei durch die wiederhergestellte Konfiguration ersetzt und OpenDTU-OnBattery neu gestartet, um alle Einstellungen zu übernehmen.",
         "ResetHeader": "Initialisieren: Werksreset durchführen",
         "FactoryResetButton": "Werkseinstellungen wiederherstellen",
         "ResetHint": "<b>Hinweis:</b> Klicken Sie auf Werkseinstellungen wiederherstellen, um die Werkseinstellungen wiederherzustellen und neu zu starten.",
@@ -832,7 +832,7 @@
         "ProjectOriginBody1": "OpenDTU-OnBattery ist eine Erweiterung von OpenDTU. Das Basis-Projekt OpenDTU wurde aus <a href=\"https://www.mikrocontroller.net/topic/525778\" target=\"_blank\">dieser Diskussion (mikrocontroller.net)</a> heraus gestartet.",
         "ProjectOriginBody2": "Das Hoymiles-Protokoll wurde durch die freiwilligen Bemühungen vieler Teilnehmer entschlüsselt. OpenDTU wurde unter anderem auf der Grundlage dieser Arbeit entwickelt. Das Projekt ist unter einer Open-Source-Lizenz lizenziert (<a href=\"https://www.gnu.de/documents/gpl-2.0.de.html\" target=\"_blank\">GNU General Public License version 2</a>).",
         "ProjectOriginBody3": "Die Software wurde nach bestem Wissen und Gewissen entwickelt. Dennoch kann keine Haftung für eine Fehlfunktion oder einen Garantieverlust des Wechselrichters übernommen werden.",
-        "ProjectOriginBody4": "OpenDTU ist frei verfügbar. Wenn Sie Geld für die Software bezahlt haben, wurden Sie wahrscheinlich abgezockt.",
+        "ProjectOriginBody4": "OpenDTU und OpenDTU-OnBattery sind frei verfügbar. Wenn Sie Geld für die Software bezahlt haben, wurden Sie wahrscheinlich abgezockt.",
         "NewsUpdates": "Neuigkeiten und Updates",
         "NewsUpdatesBody": "Neue Updates sind auf <a href=\"https://github.com/hoylabs/OpenDTU-OnBattery/releases\" target=\"_blank\">Github</a> zu finden.",
         "ErrorReporting": "Fehlerberichte",
