@@ -89,7 +89,7 @@
                                 />
                             </td>
                         </tr>
-                        <tr v-show="mqttDataList.mqtt_tls">
+                        <tr v-if="mqttDataList.mqtt_tls">
                             <th>{{ $t('mqttinfo.RootCertifcateInfo') }}</th>
                             <td>{{ mqttDataList.mqtt_root_ca_cert_info }}</td>
                         </tr>
@@ -103,7 +103,7 @@
                                 />
                             </td>
                         </tr>
-                        <tr v-show="mqttDataList.mqtt_tls_cert_login">
+                        <tr v-if="mqttDataList.mqtt_tls_cert_login">
                             <th>{{ $t('mqttinfo.ClientCertifcateInfo') }}</th>
                             <td>{{ mqttDataList.mqtt_client_cert_info }}</td>
                         </tr>
