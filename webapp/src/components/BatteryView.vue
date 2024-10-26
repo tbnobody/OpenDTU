@@ -53,7 +53,7 @@
                                                 <thead>
                                                     <tr>
                                                         <th scope="col">{{ $t('battery.Property') }}</th>
-                                                        <th style="text-align: right" scope="col">
+                                                        <th class="value" scope="col">
                                                             {{ $t('battery.Value') }}
                                                         </th>
                                                         <th scope="col">{{ $t('battery.Unit') }}</th>
@@ -62,7 +62,7 @@
                                                 <tbody>
                                                     <tr v-for="(prop, key) in values" v-bind:key="key">
                                                         <th scope="row">{{ $t('battery.' + key) }}</th>
-                                                        <td style="text-align: right">
+                                                        <td class="value">
                                                             <template v-if="isStringValue(prop) && prop.translate">
                                                                 {{ $t('battery.' + prop.value) }}
                                                             </template>

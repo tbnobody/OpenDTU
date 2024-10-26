@@ -50,7 +50,7 @@
                                             <thead>
                                                 <tr>
                                                     <th scope="col">{{ $t('huawei.Property') }}</th>
-                                                    <th style="text-align: right" scope="col">
+                                                    <th class="value" scope="col">
                                                         {{ $t('huawei.Value') }}
                                                     </th>
                                                     <th scope="col">{{ $t('huawei.Unit') }}</th>
@@ -59,35 +59,35 @@
                                             <tbody>
                                                 <tr>
                                                     <th scope="row">{{ $t('huawei.input_voltage') }}</th>
-                                                    <td style="text-align: right">
+                                                    <td class="value">
                                                         {{ formatNumber(huaweiData.input_voltage.v) }}
                                                     </td>
                                                     <td>{{ huaweiData.input_voltage.u }}</td>
                                                 </tr>
                                                 <tr>
                                                     <th scope="row">{{ $t('huawei.input_current') }}</th>
-                                                    <td style="text-align: right">
+                                                    <td class="value">
                                                         {{ formatNumber(huaweiData.input_current.v) }}
                                                     </td>
                                                     <td>{{ huaweiData.input_current.u }}</td>
                                                 </tr>
                                                 <tr>
                                                     <th scope="row">{{ $t('huawei.input_power') }}</th>
-                                                    <td style="text-align: right">
+                                                    <td class="value">
                                                         {{ formatNumber(huaweiData.input_power.v) }}
                                                     </td>
                                                     <td>{{ huaweiData.input_power.u }}</td>
                                                 </tr>
                                                 <tr>
                                                     <th scope="row">{{ $t('huawei.input_temp') }}</th>
-                                                    <td style="text-align: right">
+                                                    <td class="value">
                                                         {{ Math.round(huaweiData.input_temp.v) }}
                                                     </td>
                                                     <td>{{ huaweiData.input_temp.u }}</td>
                                                 </tr>
                                                 <tr>
                                                     <th scope="row">{{ $t('huawei.efficiency') }}</th>
-                                                    <td style="text-align: right">
+                                                    <td class="value">
                                                         {{ huaweiData.efficiency.v.toFixed(1) }}
                                                     </td>
                                                     <td>{{ huaweiData.efficiency.u }}</td>
@@ -105,7 +105,7 @@
                                             <thead>
                                                 <tr>
                                                     <th scope="col">{{ $t('huawei.Property') }}</th>
-                                                    <th style="text-align: right" scope="col">
+                                                    <th class="value" scope="col">
                                                         {{ $t('huawei.Value') }}
                                                     </th>
                                                     <th scope="col">{{ $t('huawei.Unit') }}</th>
@@ -114,35 +114,35 @@
                                             <tbody>
                                                 <tr>
                                                     <th scope="row">{{ $t('huawei.output_voltage') }}</th>
-                                                    <td style="text-align: right">
+                                                    <td class="value">
                                                         {{ huaweiData.output_voltage.v.toFixed(1) }}
                                                     </td>
                                                     <td>{{ huaweiData.output_voltage.u }}</td>
                                                 </tr>
                                                 <tr>
                                                     <th scope="row">{{ $t('huawei.output_current') }}</th>
-                                                    <td style="text-align: right">
+                                                    <td class="value">
                                                         {{ huaweiData.output_current.v.toFixed(2) }}
                                                     </td>
                                                     <td>{{ huaweiData.output_current.u }}</td>
                                                 </tr>
                                                 <tr>
                                                     <th scope="row">{{ $t('huawei.max_output_current') }}</th>
-                                                    <td style="text-align: right">
+                                                    <td class="value">
                                                         {{ huaweiData.max_output_current.v.toFixed(1) }}
                                                     </td>
                                                     <td>{{ huaweiData.max_output_current.u }}</td>
                                                 </tr>
                                                 <tr>
                                                     <th scope="row">{{ $t('huawei.output_power') }}</th>
-                                                    <td style="text-align: right">
+                                                    <td class="value">
                                                         {{ huaweiData.output_power.v.toFixed(1) }}
                                                     </td>
                                                     <td>{{ huaweiData.output_power.u }}</td>
                                                 </tr>
                                                 <tr>
                                                     <th scope="row">{{ $t('huawei.output_temp') }}</th>
-                                                    <td style="text-align: right">
+                                                    <td class="value">
                                                         {{ Math.round(huaweiData.output_temp.v) }}
                                                     </td>
                                                     <td>{{ huaweiData.output_temp.u }}</td>

@@ -74,7 +74,7 @@
                                                 <thead>
                                                     <tr>
                                                         <th scope="col">{{ $t('vedirecthome.Property') }}</th>
-                                                        <th style="text-align: right" scope="col">
+                                                        <th class="value" scope="col">
                                                             {{ $t('vedirecthome.Value') }}
                                                         </th>
                                                         <th scope="col">{{ $t('vedirecthome.Unit') }}</th>
@@ -85,7 +85,7 @@
                                                         <th scope="row">
                                                             {{ $t('vedirecthome.' + section + '.' + key) }}
                                                         </th>
-                                                        <td style="text-align: right">
+                                                        <td class="value">
                                                             <template v-if="typeof prop === 'string'">
                                                                 {{ prop }}
                                                             </template>
