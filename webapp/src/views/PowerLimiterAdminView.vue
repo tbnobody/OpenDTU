@@ -228,7 +228,7 @@
                     wide
                 />
 
-                <div v-if="powerLimiterConfigList.solar_passthrough_enabled">
+                <template v-if="powerLimiterConfigList.solar_passthrough_enabled">
                     <InputElement
                         :label="$t('powerlimiteradmin.SolarPassthroughLosses')"
                         v-model="powerLimiterConfigList.solar_passthrough_losses"
@@ -245,7 +245,7 @@
                         role="alert"
                         v-html="$t('powerlimiteradmin.SolarPassthroughLossesInfo')"
                     ></div>
-                </div>
+                </template>
             </CardElement>
 
             <CardElement
@@ -261,7 +261,7 @@
                     wide
                 />
 
-                <div v-if="!powerLimiterConfigList.ignore_soc">
+                <template v-if="!powerLimiterConfigList.ignore_soc">
                     <div
                         class="alert alert-secondary"
                         role="alert"
@@ -302,7 +302,7 @@
                         type="number"
                         wide
                     />
-                </div>
+                </template>
             </CardElement>
 
             <CardElement
@@ -335,7 +335,7 @@
                     wide
                 />
 
-                <div v-if="isSolarPassthroughEnabled()">
+                <template v-if="isSolarPassthroughEnabled()">
                     <InputElement
                         :label="$t('powerlimiteradmin.FullSolarPassthroughStartThreshold')"
                         :tooltip="$t('powerlimiteradmin.FullSolarPassthroughStartThresholdHint')"
@@ -360,7 +360,7 @@
                         step="0.01"
                         wide
                     />
-                </div>
+                </template>
 
                 <InputElement
                     :label="$t('powerlimiteradmin.VoltageLoadCorrectionFactor')"

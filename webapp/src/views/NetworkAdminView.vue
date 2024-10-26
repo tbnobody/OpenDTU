@@ -89,7 +89,7 @@
                     type="checkbox"
                 />
 
-                <div v-if="networkConfigList.syslogenabled">
+                <template v-if="networkConfigList.syslogenabled">
                     <InputElement
                         :label="$t('networkadmin.SyslogHostname')"
                         v-model="networkConfigList.sysloghostname"
@@ -104,7 +104,7 @@
                         min="1"
                         max="65535"
                     />
-                </div>
+                </template>
             </CardElement>
 
             <CardElement :text="$t('networkadmin.AdminAp')" textVariant="text-bg-primary" add-space>
