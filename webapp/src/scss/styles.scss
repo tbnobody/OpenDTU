@@ -48,3 +48,7 @@ div.accordion-item.accordion-table div.accordion-body {
 div.card.card-table div.card-body {
     padding: 0;
 }
+
+div.card div.card-body > :last-child {
+    margin-bottom: auto !important;
+}
