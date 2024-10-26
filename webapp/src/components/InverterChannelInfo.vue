@@ -25,7 +25,7 @@
                     <tr v-for="(property, key) in channelData" :key="`prop-${key}`">
                         <template v-if="key != 'name' && property">
                             <th scope="row">{{ $t('inverterchannelproperty.' + key) }}</th>
-                            <td style="text-align: right; padding-right: 0">
+                            <td class="value">
                                 {{
                                     $n(property.v, 'decimal', {
                                         minimumFractionDigits: property.d,
