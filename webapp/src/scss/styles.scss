@@ -26,3 +26,7 @@ div.card.card-table {
     // messing up the bottom corner radii
     overflow: hidden;
 }
+
+div.card.card-table div.card-body {
+    padding: 0;
+}
