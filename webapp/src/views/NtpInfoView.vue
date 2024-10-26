@@ -1,6 +1,6 @@
 <template>
     <BasePage :title="$t('ntpinfo.NtpInformation')" :isLoading="dataLoading" :show-reload="true" @reload="getNtpInfo">
-        <CardElement :text="$t('ntpinfo.ConfigurationSummary')" textVariant="text-bg-primary">
+        <CardElement :text="$t('ntpinfo.ConfigurationSummary')" textVariant="text-bg-primary" table>
             <div class="table-responsive">
                 <table class="table table-hover table-condensed">
                     <tbody>
@@ -21,7 +21,7 @@
             </div>
         </CardElement>
 
-        <CardElement :text="$t('ntpinfo.CurrentTime')" textVariant="text-bg-primary" add-space>
+        <CardElement :text="$t('ntpinfo.CurrentTime')" textVariant="text-bg-primary" add-space table>
             <div class="table-responsive">
                 <table class="table table-hover table-condensed">
                     <tbody>
