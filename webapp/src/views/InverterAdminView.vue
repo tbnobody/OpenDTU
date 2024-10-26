@@ -20,8 +20,8 @@
                         required
                     />
                 </div>
-                <div class="ml-auto text-right">
-                    <button type="submit" class="btn btn-primary my-2">
+                <div class="d-flex my-3">
+                    <button type="submit" class="btn btn-primary ms-auto">
                         {{ $t('inverteradmin.Add') }}
                     </button>
                 </div>
@@ -81,8 +81,8 @@
                     </tbody>
                 </table>
             </div>
-            <div class="ml-auto text-right">
-                <button class="btn btn-primary my-2" @click="onSaveOrder()">
+            <div class="d-flex mt-1 mb-3">
+                <button class="btn btn-primary ms-auto" @click="onSaveOrder()">
                     {{ $t('inverteradmin.SaveOrder') }}
                 </button>
             </div>
