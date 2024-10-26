@@ -19,7 +19,11 @@
         </table>
 
         <div class="accordion" id="accordionProfile">
-            <div class="accordion-item" v-for="(section, index) in gridProfileList.sections" :key="index">
+            <div
+                class="accordion-item accordion-table"
+                v-for="(section, index) in gridProfileList.sections"
+                :key="index"
+            >
                 <h2 class="accordion-header">
                     <button
                         class="accordion-button collapsed"
