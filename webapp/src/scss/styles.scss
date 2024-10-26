@@ -35,6 +35,16 @@ div.card.card-table tr > :last-child {
     padding-right: var(--bs-card-cap-padding-x);
 }
 
+div.accordion-item.accordion-table tr > :first-child {
+    padding-left: var(--bs-accordion-btn-padding-x);
+}
+
+div.accordion-item.accordion-table div.accordion-body {
+    padding-top: 0;
+    padding-left: 0;
+    padding-right: 0;
+}
+
 div.card.card-table div.card-body {
     padding: 0;
 }
