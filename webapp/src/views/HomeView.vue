@@ -11,7 +11,12 @@
         <InverterTotalInfo :totalData="liveData.total" /><br />
         <div class="row gy-3">
             <div class="col-sm-3 col-md-2" :style="[inverterData.length == 1 ? { display: 'none' } : {}]">
-                <div class="nav nav-pills row-cols-sm-1" id="v-pills-tab" role="tablist" aria-orientation="vertical">
+                <div
+                    class="nav nav-pills row-cols-sm-1 gap-3"
+                    id="v-pills-tab"
+                    role="tablist"
+                    aria-orientation="vertical"
+                >
                     <button
                         v-for="inverter in inverterData"
                         :key="inverter.serial"
