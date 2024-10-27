@@ -13,60 +13,59 @@
                     wide
                 />
 
-                <div class="row mb-3" v-show="acChargerConfigList.enabled">
-                    <label class="col-sm-4 col-form-label">
-                        {{ $t('acchargeradmin.CanControllerFrequency') }}
-                    </label>
-                    <div class="col-sm-8">
-                        <select class="form-select" v-model="acChargerConfigList.can_controller_frequency">
-                            <option
-                                v-for="frequency in frequencyTypeList"
-                                :key="frequency.key"
-                                :value="frequency.value"
-                            >
-                                {{ frequency.key }} MHz
-                            </option>
-                        </select>
+                <template v-if="acChargerConfigList.enabled">
+                    <div class="row mb-3">
+                        <label class="col-sm-4 col-form-label">
+                            {{ $t('acchargeradmin.CanControllerFrequency') }}
+                        </label>
+                        <div class="col-sm-8">
+                            <select class="form-select" v-model="acChargerConfigList.can_controller_frequency">
+                                <option
+                                    v-for="frequency in frequencyTypeList"
+                                    :key="frequency.key"
+                                    :value="frequency.value"
+                                >
+                                    {{ frequency.key }} MHz
+                                </option>
+                            </select>
+                        </div>
                     </div>
-                </div>
 
-                <InputElement
-                    v-show="acChargerConfigList.enabled"
-                    :label="$t('acchargeradmin.VerboseLogging')"
-                    v-model="acChargerConfigList.verbose_logging"
-                    type="checkbox"
-                    wide
-                />
+                    <InputElement
+                        :label="$t('acchargeradmin.VerboseLogging')"
+                        v-model="acChargerConfigList.verbose_logging"
+                        type="checkbox"
+                        wide
+                    />
 
-                <InputElement
-                    v-show="acChargerConfigList.enabled"
-                    :label="$t('acchargeradmin.EnableAutoPower')"
-                    v-model="acChargerConfigList.auto_power_enabled"
-                    type="checkbox"
-                    wide
-                />
+                    <InputElement
+                        :label="$t('acchargeradmin.EnableAutoPower')"
+                        v-model="acChargerConfigList.auto_power_enabled"
+                        type="checkbox"
+                        wide
+                    />
 
-                <InputElement
-                    v-show="acChargerConfigList.enabled && acChargerConfigList.auto_power_enabled"
-                    :label="$t('acchargeradmin.EnableBatterySoCLimits')"
-                    v-model="acChargerConfigList.auto_power_batterysoc_limits_enabled"
-                    type="checkbox"
-                    wide
-                />
+                    <InputElement
+                        v-if="acChargerConfigList.auto_power_enabled"
+                        :label="$t('acchargeradmin.EnableBatterySoCLimits')"
+                        v-model="acChargerConfigList.auto_power_batterysoc_limits_enabled"
+                        type="checkbox"
+                        wide
+                    />
 
-                <InputElement
-                    v-show="acChargerConfigList.enabled"
-                    :label="$t('acchargeradmin.EnableEmergencyCharge')"
-                    v-model="acChargerConfigList.emergency_charge_enabled"
-                    type="checkbox"
-                    wide
-                />
+                    <InputElement
+                        :label="$t('acchargeradmin.EnableEmergencyCharge')"
+                        v-model="acChargerConfigList.emergency_charge_enabled"
+                        type="checkbox"
+                        wide
+                    />
+                </template>
 
                 <CardElement
                     :text="$t('acchargeradmin.Limits')"
                     textVariant="text-bg-primary"
                     add-space
-                    v-show="acChargerConfigList.auto_power_enabled || acChargerConfigList.emergency_charge_enabled"
+                    v-if="acChargerConfigList.auto_power_enabled || acChargerConfigList.emergency_charge_enabled"
                 >
                     <div class="row mb-3">
                         <label for="voltageLimit" class="col-sm-2 col-form-label"
@@ -174,7 +173,7 @@
                     :text="$t('acchargeradmin.BatterySoCLimits')"
                     textVariant="text-bg-primary"
                     add-space
-                    v-show="
+                    v-if="
                         acChargerConfigList.auto_power_enabled &&
                         acChargerConfigList.auto_power_batterysoc_limits_enabled
                     "

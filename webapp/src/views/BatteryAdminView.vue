@@ -13,30 +13,31 @@
                     wide
                 />
 
-                <InputElement
-                    v-show="batteryConfigList.enabled"
-                    :label="$t('batteryadmin.VerboseLogging')"
-                    v-model="batteryConfigList.verbose_logging"
-                    type="checkbox"
-                    wide
-                />
+                <template v-if="batteryConfigList.enabled">
+                    <InputElement
+                        :label="$t('batteryadmin.VerboseLogging')"
+                        v-model="batteryConfigList.verbose_logging"
+                        type="checkbox"
+                        wide
+                    />
 
-                <div class="row mb-3" v-show="batteryConfigList.enabled">
-                    <label class="col-sm-4 col-form-label">
-                        {{ $t('batteryadmin.Provider') }}
-                    </label>
-                    <div class="col-sm-8">
-                        <select class="form-select" v-model="batteryConfigList.provider">
-                            <option v-for="provider in providerTypeList" :key="provider.key" :value="provider.key">
-                                {{ $t(`batteryadmin.Provider` + provider.value) }}
-                            </option>
-                        </select>
+                    <div class="row mb-3">
+                        <label class="col-sm-4 col-form-label">
+                            {{ $t('batteryadmin.Provider') }}
+                        </label>
+                        <div class="col-sm-8">
+                            <select class="form-select" v-model="batteryConfigList.provider">
+                                <option v-for="provider in providerTypeList" :key="provider.key" :value="provider.key">
+                                    {{ $t(`batteryadmin.Provider` + provider.value) }}
+                                </option>
+                            </select>
+                        </div>
                     </div>
-                </div>
+                </template>
             </CardElement>
 
             <CardElement
-                v-show="batteryConfigList.enabled && batteryConfigList.provider == 1"
+                v-if="batteryConfigList.enabled && batteryConfigList.provider == 1"
                 :text="$t('batteryadmin.JkBmsConfiguration')"
                 textVariant="text-bg-primary"
                 addSpace
@@ -152,7 +153,7 @@
 
                     <InputElement
                         :label="$t('batteryadmin.DischargeCurrentLimitBelowSoc')"
-                        v-show="batteryConfigList.enabled"
+                        v-if="batteryConfigList.enabled"
                         v-model="batteryConfigList.discharge_current_limit_below_soc"
                         type="number"
                         min="0"
@@ -165,7 +166,7 @@
 
                     <InputElement
                         :label="$t('batteryadmin.DischargeCurrentLimitBelowVoltage')"
-                        v-show="batteryConfigList.enabled"
+                        v-if="batteryConfigList.enabled"
                         v-model="batteryConfigList.discharge_current_limit_below_voltage"
                         type="number"
                         min="0"
@@ -196,7 +197,7 @@
                             <div
                                 class="alert alert-secondary"
                                 role="alert"
-                                v-show="batteryConfigList.enabled"
+                                v-if="batteryConfigList.enabled"
                                 v-html="$t('batteryadmin.BatteryReportedDischargeCurrentLimitInfo')"
                             ></div>
 
