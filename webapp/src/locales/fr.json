@@ -634,7 +634,6 @@
         "LedBrightness": "LED {led} luminosité ({brightness})"
     },
     "pininfo": {
-        "PinOverview": "Vue d'ensemble des connexions",
         "Category": "Catégorie",
         "Name": "Nom",
         "ValueSelected": "Sélectionné",
