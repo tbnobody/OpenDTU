@@ -884,7 +884,6 @@
         "LedBrightness": "LED {led} brightness ({brightness})"
     },
     "pininfo": {
-        "PinOverview": "Connection overview",
         "Category": "Category",
         "Name": "Name",
         "Number": "Number",
