@@ -17,16 +17,15 @@
             <p class="h1 mb-2">
                 <BIconExclamationCircleFill />
             </p>
-
-            <span style="vertical-align: middle" class="ml-2">
-                {{ OTAError }}
-            </span>
-            <br />
-            <br />
-            <button class="btn btn-light" @click="clear"><BIconArrowLeft /> {{ $t('firmwareupgrade.Back') }}</button>
-            <button class="btn btn-primary" @click="retryOTA">
-                <BIconArrowRepeat /> {{ $t('firmwareupgrade.Retry') }}
-            </button>
+            {{ OTAError }}
+            <div class="mt-3 d-flex gap-3 justify-content-center">
+                <button class="btn btn-light" @click="clear">
+                    <BIconArrowLeft /> {{ $t('firmwareupgrade.Back') }}
+                </button>
+                <button class="btn btn-primary" @click="retryOTA">
+                    <BIconArrowRepeat /> {{ $t('firmwareupgrade.Retry') }}
+                </button>
+            </div>
         </CardElement>
 
         <CardElement
@@ -35,13 +34,8 @@
             center-content
             v-else-if="!loading && !uploading && OTASuccess"
         >
-            <span class="h1 mb-2">
-                <BIconCheckCircle />
-            </span>
-            <span> {{ $t('firmwareupgrade.OtaSuccess') }} </span>
-            <br />
-            <br />
-            <div class="text-center">
+            <BIconCheckCircle class="fs-1" />&nbsp;{{ $t('firmwareupgrade.OtaSuccess') }}
+            <div>
                 <div class="spinner-border" role="status">
                     <span class="visually-hidden"></span>
                 </div>
@@ -62,7 +56,7 @@
             center-content
             v-else-if="!loading && !uploading"
         >
-            <div class="form-group pt-2 mt-3">
+            <div class="form-group">
                 <input class="form-control" type="file" ref="file" accept=".bin,.bin.gz" @change="uploadOTA" />
             </div>
         </CardElement>
