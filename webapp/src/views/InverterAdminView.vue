@@ -267,7 +267,7 @@
             </div>
 
             <div
-                class="tab-pane fade show"
+                class="tab-pane fade show pt-3"
                 id="nav-advanced"
                 role="tabpanel"
                 aria-labelledby="nav-advanced-tab"
