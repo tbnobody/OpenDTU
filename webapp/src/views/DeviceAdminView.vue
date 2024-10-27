@@ -78,19 +78,15 @@
                                 </div>
                             </div>
 
-                            <div class="row mb-3">
-                                <div class="col-sm-2"></div>
-                                <div class="col-sm-10">
-                                    <div
-                                        class="btn-group mb-2 me-2"
-                                        v-for="(doc, index) in pinMappingList.find(
-                                            (i) => i.name === deviceConfigList.curPin.name
-                                        )?.links"
-                                        :key="index"
-                                    >
-                                        <a :href="doc.url" class="btn btn-primary" target="_blank">{{ doc.name }}</a>
-                                    </div>
-                                </div>
+                            <div class="mb-3 d-flex justify-content-end gap-3" v-if="docLinks.length">
+                                <a
+                                    v-for="(doc, index) in docLinks"
+                                    :key="index"
+                                    :href="doc.url"
+                                    class="btn btn-primary"
+                                    target="_blank"
+                                    >{{ doc.name }}</a
+                                >
                             </div>
 
                             <div
@@ -311,6 +307,12 @@ export default defineComponent({
                 return;
             }
             this.deviceConfigList.led.every((v) => (v.brightness = this.deviceConfigList.led[0].brightness));
+        },
+    },
+    computed: {
+        docLinks() {
+            const mapping = this.pinMappingList.find((i) => i.name === this.deviceConfigList.curPin.name);
+            return mapping?.links || [];
         },
     },
     methods: {
