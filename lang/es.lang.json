@@ -673,7 +673,6 @@
             "LedBrightness": "Brillo del LED {led} ({brightness})"
         },
         "pininfo": {
-            "PinOverview": "Resumen de Conexiones",
             "Category": "Categoría",
             "Name": "Nombre",
             "Number": "Número",
