@@ -941,7 +941,8 @@
         "StopBatterySoCThreshold": "Laden bei SoC beenden",
         "StopBatterySoCThresholdHint": "Zur Verlängerung der Akku-Lebensdauer kann der Ladevorgang bei einem bestimmten SoC gestoppt werden.\nHinweis: Manche LiFePO-Akkus müssen gelegentlich voll geladen werden, um die SoC-Anzeige akkurat zu halten.",
         "Seconds": "@:base.Seconds",
-        "EnableEmergencyCharge": "Notfallladen: Batterie wird mit maximaler Leistung geladen wenn durch das Batterie BMS angefordert",
+        "EnableEmergencyCharge": "Notfallladen",
+        "EnableEmergencyChargeHint": "Batterie wird mit maximaler Leistung geladen wenn durch das Batterie BMS angefordert",
         "targetPowerConsumption": "Angestrebter Netzbezug",
         "targetPowerConsumptionHint": "Bei postiven Werten wird die eingestellte Leistung aus dem Stromnetz bezogen. Bei negativen Werten wird das Netzteil vorzeitig abgeschaltet."
     },
