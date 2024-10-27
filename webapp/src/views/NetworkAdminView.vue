@@ -26,7 +26,11 @@
                     type="text"
                     maxlength="32"
                 >
-                    <div class="alert alert-secondary" role="alert" v-html="$t('networkadmin.HostnameHint')"></div>
+                    <div
+                        class="alert alert-secondary mb-0 mt-3"
+                        role="alert"
+                        v-html="$t('networkadmin.HostnameHint')"
+                    ></div>
                 </InputElement>
 
                 <InputElement :label="$t('networkadmin.EnableDhcp')" v-model="networkConfigList.dhcp" type="checkbox" />
