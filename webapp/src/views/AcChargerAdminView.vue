@@ -69,7 +69,7 @@
                 >
                     <div class="row mb-3">
                         <label for="voltageLimit" class="col-sm-2 col-form-label"
-                            >{{ $t('acchargeradmin.VoltageLimit') }}:
+                            >{{ $t('acchargeradmin.VoltageLimit') }}
                             <BIconInfoCircle v-tooltip :title="$t('acchargeradmin.stopVoltageLimitHint')" />
                         </label>
                         <div class="col-sm-10">
@@ -90,7 +90,7 @@
                             </div>
                         </div>
                         <label for="enableVoltageLimit" class="col-sm-2 col-form-label"
-                            >{{ $t('acchargeradmin.enableVoltageLimit') }}:
+                            >{{ $t('acchargeradmin.enableVoltageLimit') }}
                             <BIconInfoCircle v-tooltip :title="$t('acchargeradmin.enableVoltageLimitHint')" />
                         </label>
                         <div class="col-sm-10">
@@ -110,9 +110,9 @@
                                 <span class="input-group-text" id="enableVoltageLimitDescription">V</span>
                             </div>
                         </div>
-                        <label for="lowerPowerLimit" class="col-sm-2 col-form-label"
-                            >{{ $t('acchargeradmin.lowerPowerLimit') }}:</label
-                        >
+                        <label for="lowerPowerLimit" class="col-sm-2 col-form-label">{{
+                            $t('acchargeradmin.lowerPowerLimit')
+                        }}</label>
                         <div class="col-sm-10">
                             <div class="input-group">
                                 <input
@@ -130,7 +130,7 @@
                             </div>
                         </div>
                         <label for="upperPowerLimit" class="col-sm-2 col-form-label"
-                            >{{ $t('acchargeradmin.upperPowerLimit') }}:
+                            >{{ $t('acchargeradmin.upperPowerLimit') }}
                             <BIconInfoCircle v-tooltip :title="$t('acchargeradmin.upperPowerLimitHint')" />
                         </label>
                         <div class="col-sm-10">
@@ -150,7 +150,7 @@
                             </div>
                         </div>
                         <label for="targetPowerConsumption" class="col-sm-2 col-form-label"
-                            >{{ $t('acchargeradmin.targetPowerConsumption') }}:
+                            >{{ $t('acchargeradmin.targetPowerConsumption') }}
                             <BIconInfoCircle v-tooltip :title="$t('acchargeradmin.targetPowerConsumptionHint')" />
                         </label>
                         <div class="col-sm-10">
@@ -180,7 +180,7 @@
                 >
                     <div class="row mb-3">
                         <label for="stopBatterySoCThreshold" class="col-sm-2 col-form-label"
-                            >{{ $t('acchargeradmin.StopBatterySoCThreshold') }}:
+                            >{{ $t('acchargeradmin.StopBatterySoCThreshold') }}
                             <BIconInfoCircle v-tooltip :title="$t('acchargeradmin.StopBatterySoCThresholdHint')" />
                         </label>
                         <div class="col-sm-10">
