@@ -57,3 +57,10 @@ div.card.card-table table .value {
     text-align: right;
     padding-right: 0;
 }
+
+// blend cards into tabbed navigation (device admin view)
+div.card-tabbed {
+    border-top: 0;
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+}

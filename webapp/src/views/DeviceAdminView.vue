@@ -51,7 +51,7 @@
                     aria-labelledby="nav-pin-tab"
                     tabindex="0"
                 >
-                    <div class="card">
+                    <div class="card card-tabbed">
                         <div class="card-body">
                             <div class="row mb-3">
                                 <label for="inputPinProfile" class="col-sm-2 col-form-label">{{
@@ -115,7 +115,7 @@
                     aria-labelledby="nav-display-tab"
                     tabindex="0"
                 >
-                    <div class="card">
+                    <div class="card card-tabbed">
                         <div class="card-body">
                             <InputElement
                                 :label="$t('deviceadmin.PowerSafe')"
@@ -216,7 +216,7 @@
                     aria-labelledby="nav-leds-tab"
                     tabindex="0"
                 >
-                    <div class="card">
+                    <div class="card card-tabbed">
                         <div class="card-body">
                             <InputElement
                                 :label="$t('deviceadmin.EqualBrightness')"
