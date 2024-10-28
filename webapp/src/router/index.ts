@@ -28,6 +28,13 @@ import { createRouter, createWebHistory } from 'vue-router';
 const router = createRouter({
     history: createWebHistory(import.meta.env.BASE_URL),
     linkActiveClass: 'active',
+    scrollBehavior() {
+        return new Promise((resolve) => {
+            setTimeout(() => {
+                resolve({ top: 0 });
+            }, 100);
+        });
+    },
     routes: [
         {
             path: '/',
