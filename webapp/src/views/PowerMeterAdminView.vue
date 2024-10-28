@@ -226,7 +226,7 @@
                         textVariant="text-bg-primary"
                         add-space
                     >
-                        <div class="text-center mt-3 mb-3">
+                        <div class="text-center mb-3">
                             <button type="button" class="btn btn-primary" @click="testHttpJsonRequest()">
                                 {{ $t('powermeteradmin.testHttpJsonRequest') }}
                             </button>
@@ -262,7 +262,7 @@
                         textVariant="text-bg-primary"
                         add-space
                     >
-                        <div class="text-center mt-3 mb-3">
+                        <div class="text-center mb-3">
                             <button type="button" class="btn btn-primary" @click="testHttpSmlRequest()">
                                 {{ $t('powermeteradmin.testHttpSmlRequest') }}
                             </button>
