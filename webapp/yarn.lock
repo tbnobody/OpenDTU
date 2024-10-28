@@ -743,10 +743,10 @@
   resolved "https://registry.yarnpkg.com/@vue/devtools-api/-/devtools-api-6.6.4.tgz#cbe97fe0162b365edc1dba80e173f90492535343"
   integrity sha512-sGhTPMuXqZ1rVOk32RylztWkfXTRhuS7vgAKv0zjqk8gbsHkJ7xfFf+jbySxt7tWObEJwyKaHMikV/WGDiQm8g==
 
-"@vue/eslint-config-typescript@^14.1.1":
-  version "14.1.1"
-  resolved "https://registry.yarnpkg.com/@vue/eslint-config-typescript/-/eslint-config-typescript-14.1.1.tgz#7a1956cca1e71cd3678b60486a8030dfd30076d6"
-  integrity sha512-zw6q8pXUuFHfdZsdKYr344giBRhnq6WmWSO2abFHajxR8wDX2p2hkj0/Mf6W2phTkerU4b8WF2jgq2Z/c+PdMA==
+"@vue/eslint-config-typescript@^14.1.3":
+  version "14.1.3"
+  resolved "https://registry.yarnpkg.com/@vue/eslint-config-typescript/-/eslint-config-typescript-14.1.3.tgz#6df0d2fab863585def1f4c3e41b6fee1b0806f9b"
+  integrity sha512-L4NUJQz/0We2QYtrNwRAGRy4KfpOagl5V3MpZZ+rQ51a+bKjlKYYrugi7lp7PIX8LolRgu06ZwDoswnSGWnAmA==
   dependencies:
     "@typescript-eslint/eslint-plugin" "^8.8.1"
     fast-glob "^3.3.2"
