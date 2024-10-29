@@ -7,6 +7,7 @@ disabled while "create release badge" action is broken, see .github/build.yml
 --->
 
 - [OpenDTU-OnBattery](#opendtu-onbattery)
+  - [Important Differences](#important-differences)
   - [Documentation](#documentation)
   - [Project State](#project-state)
   - [Project History](#project-history)
@@ -19,6 +20,21 @@ which adds support for battery chargers, battery management systems (BMS), and
 power meters on a single ESP32. Its Dynamic Power Limiter can adjust the
 inverter's power production to the actual houshold consumption. In this way, it
 is possible to implement a zero export policy.
+
+## Important Differences
+
+Generally speaking, OpenDTU-OnBattery and the upstream project are compatible
+with each other, because OpenDTU-OnBattery mostly only extends the upstream
+project. However, there are a few notable differences aside from the added functionality:
+
+* OpenDTU-OnBattery, due to its code footprint, cannot offer support for
+  over-the-air (OTA) updates on ESP32 with only 4MB of flash memory. Consult
+  the [documentation](https://opendtu-onbattery.net/firmware/howto/upgrade_8mb/#background)
+  to learn more.
+* Unlike in the upstream project, you **must** compile the web application
+  yourself when attempting to build your own firmware blob. See the
+  [documentation](https://opendtu-onbattery.net/firmware/compile_webapp/) for
+  details.
 
 ## Documentation
 
