@@ -321,6 +321,13 @@ bool PinMappingClass::init(const String& deviceMapping)
         return false;
     }
 
+    // skip Byte Order Mask (BOM). valid JSON docs always start with '{' or '['.
+    while (f.available() > 0) {
+        int c = f.peek();
+        if (c == '{' || c == '[') { break; }
+        f.read();
+    }
+
     JsonDocument doc;
     // Deserialize the JSON document
     DeserializationError error = deserializeJson(doc, f);
