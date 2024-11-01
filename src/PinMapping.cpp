@@ -4,6 +4,7 @@
  */
 #include "PinMapping.h"
 #include "MessageOutput.h"
+#include "Utils.h"
 #include <ArduinoJson.h>
 #include <LittleFS.h>
 #include <string.h>
@@ -198,6 +199,8 @@ bool PinMappingClass::init(const String& deviceMapping)
     if (!f) {
         return false;
     }
+
+    Utils::skipBom(f);
 
     JsonDocument doc;
     // Deserialize the JSON document

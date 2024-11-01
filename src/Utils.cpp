@@ -111,3 +111,15 @@ String Utils::generateMd5FromFile(String file)
 
     return md5.toString();
 }
+
+void Utils::skipBom(File& f)
+{
+    // skip Byte Order Mask (BOM). valid JSON docs always start with '{' or '['.
+    while (f.available() > 0) {
+        int c = f.peek();
+        if (c == '{' || c == '[') {
+            break;
+        }
+        f.read();
+    }
+}

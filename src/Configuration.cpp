@@ -159,6 +159,7 @@ bool ConfigurationClass::write()
 bool ConfigurationClass::read()
 {
     File f = LittleFS.open(CONFIG_FILENAME, "r", false);
+    Utils::skipBom(f);
 
     JsonDocument doc;
 
