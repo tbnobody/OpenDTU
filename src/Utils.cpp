@@ -97,11 +97,10 @@ String Utils::generateMd5FromFile(String file)
     md5.begin();
 
     // Read the file in chunks to avoid using too much memory
-    const size_t bufferSize = 512;
-    uint8_t buffer[bufferSize];
+    uint8_t buffer[512];
 
     while (f.available()) {
-        size_t bytesRead = f.read(buffer, bufferSize);
+        size_t bytesRead = f.read(buffer, sizeof(buffer) / sizeof(buffer[0]));
         md5.add(buffer, bytesRead);
     }
 
