@@ -575,7 +575,7 @@
             "YieldDayCorrection": "Correzione energia giornaliera",
             "YieldDayCorrectionHint": "Aggiungi questo valore all'energia giornaliera se l'inverter è stato riavviato. Questo valore sarò resettato a mezzanotte"
         },
-        "configadmin": {
+        "fileadmin": {
             "ConfigManagement": "Configurazione Gestione",
             "BackupHeader": "Backup: Configurazione File Backup",
             "BackupConfig": "Esegui il backup del file:",
@@ -592,7 +592,9 @@
             "FactoryReset": "Factory Reset",
             "ResetMsg": "Sei sicuro di voler cancellare la configurazione attuale e applicare la configurazione di fabbrica?",
             "ResetConfirm": "Factory Reset!",
-            "Cancel": "@:base.Cancel"
+            "Cancel": "@:base.Cancel",
+            "InvalidJson": "JSON file is formatted incorrectly.",
+            "InvalidJsonContent": "JSON file has the wrong content."
         },
         "login": {
             "Login": "Login",

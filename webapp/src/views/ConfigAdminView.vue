@@ -57,17 +57,23 @@
             <div v-else-if="!uploading">
                 <div class="row g-3 align-items-center form-group pt-2">
                     <div class="col-sm">
-                        <select class="form-select" v-model="restoreFileSelect">
-                            <option selected value="config.json">Main Config (config.json)</option>
-                            <option selected value="pin_mapping.json">Pin Mapping (pin_mapping.json)</option>
-                            <option selected value="pack.lang.json">Language Pack (pack.lang.json)</option>
+                        <select class="form-select" v-model="restoreFileSelect" @change="onUploadFileChange">
+                            <option v-for="file in restoreList" :key="file.name" :value="file.name">
+                                {{ file.descr }}
+                            </option>
                         </select>
                     </div>
                     <div class="col-sm">
-                        <input class="form-control" type="file" ref="file" accept=".json" />
+                        <input
+                            class="form-control"
+                            type="file"
+                            ref="file"
+                            accept=".json"
+                            @change="onUploadFileChange"
+                        />
                     </div>
                     <div class="col-sm">
-                        <button class="btn btn-primary" @click="onUpload">
+                        <button class="btn btn-primary" @click="onUpload" :disabled="!isValidJson">
                             {{ $t('fileadmin.Restore') }}
                         </button>
                     </div>
@@ -132,6 +138,8 @@ import ModalDialog from '@/components/ModalDialog.vue';
 import type { AlertResponse } from '@/types/AlertResponse';
 import type { FileInfo } from '@/types/File';
 import { authHeader, handleResponse } from '@/utils/authentication';
+import type { Schema } from '@/utils/structure';
+import { hasStructure } from '@/utils/structure';
 import { waitRestart } from '@/utils/waitRestart';
 import * as bootstrap from 'bootstrap';
 import {
@@ -169,6 +177,24 @@ export default defineComponent({
             UploadError: '',
             UploadSuccess: false,
             restoreFileSelect: 'config.json',
+            restoreList: [
+                {
+                    name: 'config.json',
+                    descr: 'Main Config (config.json)',
+                    template: { cfg: 'object' } as Schema,
+                },
+                {
+                    name: 'pin_mapping.json',
+                    descr: 'Pin Mapping (pin_mapping.json)',
+                    template: { name: 'string' } as Schema,
+                },
+                {
+                    name: 'pack.lang.json',
+                    descr: 'Language Pack (pack.lang.json)',
+                    template: { meta: 'object' } as Schema,
+                },
+            ],
+            isValidJson: false,
         };
     },
     mounted() {
@@ -229,6 +255,43 @@ export default defineComponent({
         onDelete() {
             this.callFileApiEndpoint('delete', JSON.stringify({ file: this.selectedFile.name }));
             this.onCloseModal(this.modalDelete);
+        },
+        onUploadFileChange() {
+            const target = this.$refs.file as HTMLInputElement;
+            if (target.files !== null) {
+                this.file = target.files[0];
+            }
+            if (!this.file) return;
+
+            // Read the file content
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                try {
+                    const checkTemplate = this.restoreList.find((i) => i.name == this.restoreFileSelect)?.template;
+                    // Parse the file content as JSON
+                    let checkValue = JSON.parse(e.target?.result as string);
+                    if (Array.isArray(checkValue)) {
+                        checkValue = checkValue[0];
+                    }
+
+                    if (checkValue && checkTemplate && hasStructure(checkValue, checkTemplate)) {
+                        this.isValidJson = true;
+                        this.alert.show = false;
+                    } else {
+                        this.isValidJson = false;
+                        this.alert.message = this.$t('fileadmin.InvalidJsonContent');
+                    }
+                } catch {
+                    this.isValidJson = false;
+                    this.alert.message = this.$t('fileadmin.InvalidJson');
+                }
+
+                if (!this.isValidJson) {
+                    this.alert.type = 'warning';
+                    this.alert.show = true;
+                }
+            };
+            reader.readAsText(this.file);
         },
         onUpload() {
             this.uploading = true;

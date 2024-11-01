@@ -575,7 +575,7 @@
             "YieldDayCorrection": "Corrección de Rendimiento Diario",
             "YieldDayCorrectionHint": "Sumar el rendimiento diario incluso si el inversor se reinicia. El valor se restablecerá a medianoche"
         },
-        "configadmin": {
+        "fileadmin": {
             "ConfigManagement": "Gestión de Configuración",
             "BackupHeader": "Copia de seguridad: Copia de Seguridad del Archivo de Configuración",
             "BackupConfig": "Copia de seguridad del archivo de configuración",
@@ -592,7 +592,9 @@
             "FactoryReset": "Restablecimiento de Fábrica",
             "ResetMsg": "¿Está seguro de que desea eliminar la configuración actual y restablecer todas las configuraciones a sus valores predeterminados de fábrica?",
             "ResetConfirm": "Restablecimiento de Fábrica",
-            "Cancel": "@:base.Cancel"
+            "Cancel": "@:base.Cancel",
+            "InvalidJson": "JSON file is formatted incorrectly.",
+            "InvalidJsonContent": "JSON file has the wrong content."
         },
         "login": {
             "Login": "Iniciar Sesión",

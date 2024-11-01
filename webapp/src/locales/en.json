@@ -582,7 +582,9 @@
         "Name": "Name",
         "Size": "Size",
         "Action": "Action",
-        "Cancel": "@:base.Cancel"
+        "Cancel": "@:base.Cancel",
+        "InvalidJson": "JSON file is formatted incorrectly.",
+        "InvalidJsonContent": "JSON file has the wrong content."
     },
     "login": {
         "Login": "Login",
