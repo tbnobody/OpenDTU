@@ -27,6 +27,10 @@ void WebApiPowerLimiterClass::init(AsyncWebServer& server, Scheduler& scheduler)
 
 void WebApiPowerLimiterClass::onStatus(AsyncWebServerRequest* request)
 {
+    if (!WebApi.checkCredentialsReadonly(request)) {
+        return;
+    }
+
     AsyncJsonResponse* response = new AsyncJsonResponse();
     auto& root = response->getRoot();
     auto const& config = Configuration.get();
