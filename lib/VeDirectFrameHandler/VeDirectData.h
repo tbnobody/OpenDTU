@@ -26,8 +26,6 @@ struct veMpptStruct : veStruct {
     uint32_t panelVoltage_VPV_mV;       // panel voltage in mV
     uint32_t panelCurrent_mA;           // panel current in mA (calculated)
     int16_t  batteryOutputPower_W;      // battery output power in W (calculated, can be negative if load output is used)
-    uint32_t loadCurrent_IL_mA;         // Load current in mA (Available only for models with a load output)
-    bool     loadOutputState_LOAD;      // virtual load output state (on if battery voltage reaches upper limit, off if battery reaches lower limit)
     uint8_t  currentState_CS;           // current state of operation e.g. OFF or Bulk
     uint8_t  errorCode_ERR;             // error code
     uint32_t offReason_OR;              // off reason
@@ -37,6 +35,14 @@ struct veMpptStruct : veStruct {
     uint16_t maxPowerToday_H21_W;       // maximum power today W
     uint32_t yieldYesterday_H22_Wh;     // yield yesterday Wh
     uint16_t maxPowerYesterday_H23_W;   // maximum power yesterday W
+
+    // these are optional values communicated through the TEXT protocol. the pair's first
+    // value is the timestamp the respective info was last received. if it is
+    // zero, the value is deemed invalid. the timestamp is reset if no current
+    // value could be retrieved.
+    std::pair<uint32_t, bool> loadOutputState_LOAD;     // physical load output or virtual load output state (on if battery voltage
+                                                        // reaches upper limit, off if battery reaches lower limit)
+    std::pair<uint32_t, uint32_t> loadCurrent_IL_mA;    // Load current in mA (Available only for models with a physical load output)
 
     // these are values communicated through the HEX protocol. the pair's first
     // value is the timestamp the respective info was last received. if it is

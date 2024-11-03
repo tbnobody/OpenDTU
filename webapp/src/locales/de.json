@@ -175,6 +175,8 @@
         "section_device": "Geräteinformation",
         "device": {
             "LOAD": "Status Lastausgang",
+            "VIRTLOAD": "Status virtueller Lastausgang",
+            "IL": "Laststrom",
             "CS": "Betriebszustand",
             "MPPT": "Betriebszustand des Trackers",
             "OR": "Grund für das Ausschalten",

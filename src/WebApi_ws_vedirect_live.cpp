@@ -164,7 +164,20 @@ void WebApiWsVedirectLiveClass::populateJson(const JsonObject &root, const VeDir
     const JsonObject values = root["values"].to<JsonObject>();
 
     const JsonObject device = values["device"].to<JsonObject>();
-    device["LOAD"] = mpptData.loadOutputState_LOAD ? "ON" : "OFF";
+
+    // LOAD     IL      UI label    result
+    // ------------------------------------
+    // false    false               Do not display LOAD and IL (device has no physical load output and virtual load is not configured)
+    // true     false   "VIRTLOAD"  We display just LOAD (device has no physical load output and virtual load is configured)
+    // true     true    "LOAD"      We display LOAD and IL (device has physical load output, regardless if virtual load is configured or not)
+    if (mpptData.loadOutputState_LOAD.first > 0) {
+        device[(mpptData.loadCurrent_IL_mA.first > 0) ? "LOAD" : "VIRTLOAD"] = mpptData.loadOutputState_LOAD.second ? "ON" : "OFF";
+    }
+    if (mpptData.loadCurrent_IL_mA.first > 0) {
+        device["IL"]["v"] = mpptData.loadCurrent_IL_mA.second / 1000.0;
+        device["IL"]["u"] = "A";
+        device["IL"]["d"] = 2;
+    }
     device["CS"] = mpptData.getCsAsString();
     device["MPPT"] = mpptData.getMpptAsString();
     device["OR"] = mpptData.getOrAsString();

@@ -111,7 +111,6 @@ void MqttHandleVedirectClass::publish_mppt_data(const VeDirectMpptController::da
     PUBLISH(productID_PID,           "PID",  currentData.getPidAsString().data());
     PUBLISH(serialNr_SER,            "SER",  currentData.serialNr_SER);
     PUBLISH(firmwareVer_FW,           "FW",  currentData.firmwareVer_FW);
-    PUBLISH(loadOutputState_LOAD,   "LOAD",  (currentData.loadOutputState_LOAD ? "ON" : "OFF"));
     PUBLISH(currentState_CS,          "CS",  currentData.getCsAsString().data());
     PUBLISH(errorCode_ERR,           "ERR",  currentData.getErrAsString().data());
     PUBLISH(offReason_OR,             "OR",  currentData.getOrAsString().data());
@@ -136,6 +135,8 @@ void MqttHandleVedirectClass::publish_mppt_data(const VeDirectMpptController::da
         MqttSettings.publish(topic + t, String(val)); \
     }
 
+    PUBLISH_OPT(loadOutputState_LOAD,                     "LOAD",                         currentData.loadOutputState_LOAD.second ? "ON" : "OFF");
+    PUBLISH_OPT(loadCurrent_IL_mA,                        "IL",                           currentData.loadCurrent_IL_mA.second / 1000.0);
     PUBLISH_OPT(NetworkTotalDcInputPowerMilliWatts,       "NetworkTotalDcInputPower",     currentData.NetworkTotalDcInputPowerMilliWatts.second / 1000.0);
     PUBLISH_OPT(MpptTemperatureMilliCelsius,              "MpptTemperature",              currentData.MpptTemperatureMilliCelsius.second / 1000.0);
     PUBLISH_OPT(BatteryAbsorptionMilliVolt,               "BatteryAbsorption",            currentData.BatteryAbsorptionMilliVolt.second / 1000.0);
