@@ -29,8 +29,8 @@
                         aria-controls="'v-pills-' + inverter.serial"
                         aria-selected="true"
                     >
-                        <div class="row">
-                            <div class="col-auto col-sm-2">
+                        <div class="d-flex align-items-center">
+                            <div class="me-2">
                                 <BIconXCircleFill class="fs-4" v-if="!inverter.reachable" />
                                 <BIconExclamationCircleFill
                                     class="fs-4"
@@ -38,7 +38,7 @@
                                 />
                                 <BIconCheckCircleFill class="fs-4" v-if="inverter.reachable && inverter.producing" />
                             </div>
-                            <div class="col-sm-9">
+                            <div class="ms-auto me-auto">
                                 {{ inverter.name }}
                             </div>
                         </div>
