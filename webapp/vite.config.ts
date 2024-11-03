@@ -19,7 +19,7 @@ try {
 }
 
 // https://vitejs.dev/config/
-export default defineConfig({
+export default defineConfig(({ command }) => { return {
   plugins: [
     vue(),
     viteCompression({ deleteOriginFile: true, threshold: 0 }),
@@ -59,7 +59,7 @@ export default defineConfig({
     target: 'es2022',
   },
   esbuild: {
-    drop: ['console', 'debugger'],
+    drop: command !== 'serve' ? ['console', 'debugger'] : []
   },
   server: {
     proxy: {
@@ -78,4 +78,4 @@ export default defineConfig({
       }
     }
   }
-})
+} })
