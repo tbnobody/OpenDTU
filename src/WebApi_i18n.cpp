@@ -9,8 +9,6 @@
 #include <AsyncJson.h>
 #include <LittleFS.h>
 
-#include "MessageOutput.h"
-
 void WebApiI18nClass::init(AsyncWebServer& server, Scheduler& scheduler)
 {
     using std::placeholders::_1;
