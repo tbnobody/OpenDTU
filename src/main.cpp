@@ -29,8 +29,6 @@
 #include <TaskScheduler.h>
 #include <esp_heap_caps.h>
 
-#include <driver/uart.h>
-
 void setup()
 {
     // Move all dynamic allocations >512byte to psram (if available)
