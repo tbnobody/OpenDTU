@@ -60,10 +60,10 @@ void InverterSettingsClass::init(Scheduler& scheduler)
 
         for (uint8_t i = 0; i < INV_MAX_COUNT; i++) {
             if (config.Inverter[i].Serial > 0) {
-                MessageOutput.print("  Adding inverter: ");
-                MessageOutput.print(config.Inverter[i].Serial, HEX);
-                MessageOutput.print(" - ");
-                MessageOutput.print(config.Inverter[i].Name);
+                MessageOutput.printf("  Adding inverter: %0" PRIx32 "%08" PRIx32 " - %s",
+                    static_cast<uint32_t>((config.Inverter[i].Serial >> 32) & 0xFFFFFFFF),
+                    static_cast<uint32_t>(config.Inverter[i].Serial & 0xFFFFFFFF),
+                    config.Inverter[i].Name);
                 auto inv = Hoymiles.addInverter(
                     config.Inverter[i].Name,
                     config.Inverter[i].Serial);
