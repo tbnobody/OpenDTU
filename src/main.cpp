@@ -65,10 +65,9 @@ void setup()
     }
 
     // Read configuration values
+    Configuration.init(scheduler);
     MessageOutput.print("Reading configuration... ");
     if (!Configuration.read()) {
-        MessageOutput.print("initializing... ");
-        Configuration.init();
         if (Configuration.write()) {
             MessageOutput.print("written... ");
         } else {
@@ -148,19 +147,6 @@ void setup()
     // Initialize Single LEDs
     MessageOutput.print("Initialize LEDs... ");
     LedSingle.init(scheduler);
-    MessageOutput.println("done");
-
-    // Check for default DTU serial
-    MessageOutput.print("Check for default DTU serial... ");
-    if (config.Dtu.Serial == DTU_SERIAL) {
-        MessageOutput.print("generate serial based on ESP chip id: ");
-        const uint64_t dtuId = Utils::generateDtuSerial();
-        MessageOutput.printf("%0" PRIx32 "%08" PRIx32 "... ",
-            static_cast<uint32_t>((dtuId >> 32) & 0xFFFFFFFF),
-            static_cast<uint32_t>(dtuId & 0xFFFFFFFF));
-        config.Dtu.Serial = dtuId;
-        Configuration.write();
-    }
     MessageOutput.println("done");
 
     InverterSettings.init(scheduler);

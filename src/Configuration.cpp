@@ -13,8 +13,17 @@
 
 CONFIG_T config;
 
-void ConfigurationClass::init()
+static std::condition_variable sWriterCv;
+static std::mutex sWriterMutex;
+static unsigned sWriterCount = 0;
+
+void ConfigurationClass::init(Scheduler& scheduler)
 {
+    scheduler.addTask(_loopTask);
+    _loopTask.setCallback(std::bind(&ConfigurationClass::loop, this));
+    _loopTask.setIterations(TASK_FOREVER);
+    _loopTask.enable();
+
     memset(&config, 0x0, sizeof(config));
 }
 
@@ -319,6 +328,20 @@ bool ConfigurationClass::read()
     }
 
     f.close();
+
+    // Check for default DTU serial
+    MessageOutput.print("Check for default DTU serial... ");
+    if (config.Dtu.Serial == DTU_SERIAL) {
+        MessageOutput.print("generate serial based on ESP chip id: ");
+        const uint64_t dtuId = Utils::generateDtuSerial();
+        MessageOutput.printf("%0" PRIx32 "%08" PRIx32 "... ",
+            ((uint32_t)((dtuId >> 32) & 0xFFFFFFFF)),
+            ((uint32_t)(dtuId & 0xFFFFFFFF)));
+        config.Dtu.Serial = dtuId;
+        write();
+    }
+    MessageOutput.println("done");
+
     return true;
 }
 
@@ -407,9 +430,14 @@ void ConfigurationClass::migrate()
     read();
 }
 
-CONFIG_T& ConfigurationClass::get()
+CONFIG_T const& ConfigurationClass::get()
 {
     return config;
+}
+
+ConfigurationClass::WriteGuard ConfigurationClass::getWriteGuard()
+{
+    return WriteGuard();
 }
 
 INVERTER_CONFIG_T* ConfigurationClass::getFreeInverterSlot()
@@ -454,6 +482,32 @@ void ConfigurationClass::deleteInverterById(const uint8_t id)
         config.Inverter[id].channel[c].YieldTotalOffset = 0.0f;
         strlcpy(config.Inverter[id].channel[c].Name, "", sizeof(config.Inverter[id].channel[c].Name));
     }
+}
+
+void ConfigurationClass::loop()
+{
+    std::unique_lock<std::mutex> lock(sWriterMutex);
+    if (sWriterCount == 0) { return; }
+
+    sWriterCv.notify_all();
+    sWriterCv.wait(lock, [] { return sWriterCount == 0; });
+}
+
+CONFIG_T& ConfigurationClass::WriteGuard::getConfig()
+{
+    return config;
+}
+
+ConfigurationClass::WriteGuard::WriteGuard()
+    : _lock(sWriterMutex)
+{
+    sWriterCount++;
+    sWriterCv.wait(_lock);
+}
+
+ConfigurationClass::WriteGuard::~WriteGuard() {
+    sWriterCount--;
+    if (sWriterCount == 0) { sWriterCv.notify_all(); }
 }
 
 ConfigurationClass Configuration;

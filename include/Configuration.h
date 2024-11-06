@@ -3,6 +3,9 @@
 
 #include "PinMapping.h"
 #include <cstdint>
+#include <TaskSchedulerDeclarations.h>
+#include <mutex>
+#include <condition_variable>
 
 #define CONFIG_FILENAME "/config.json"
 #define CONFIG_VERSION 0x00011d00 // 0.1.29 // make sure to clean all after change
@@ -162,15 +165,32 @@ struct CONFIG_T {
 
 class ConfigurationClass {
 public:
-    void init();
+    void init(Scheduler& scheduler);
     bool read();
     bool write();
     void migrate();
-    CONFIG_T& get();
+    CONFIG_T const& get();
+
+    class WriteGuard {
+    public:
+        WriteGuard();
+        CONFIG_T& getConfig();
+        ~WriteGuard();
+
+    private:
+        std::unique_lock<std::mutex> _lock;
+    };
+
+    WriteGuard getWriteGuard();
 
     INVERTER_CONFIG_T* getFreeInverterSlot();
     INVERTER_CONFIG_T* getInverterConfig(const uint64_t serial);
     void deleteInverterById(const uint8_t id);
+
+private:
+    void loop();
+
+    Task _loopTask;
 };
 
 extern ConfigurationClass Configuration;
