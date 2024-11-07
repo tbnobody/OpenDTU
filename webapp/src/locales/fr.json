@@ -185,6 +185,7 @@
             "CS": "State of operation",
             "MPPT": "Tracker operation mode",
             "OR": "Off reason",
+            "RELAY": "Error relay state",
             "ERR": "Error code",
             "HSDS": "Day sequence number (0..364)",
             "MpptTemperature": "Charge controller temperature"

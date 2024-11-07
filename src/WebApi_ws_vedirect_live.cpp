@@ -181,6 +181,9 @@ void WebApiWsVedirectLiveClass::populateJson(const JsonObject &root, const VeDir
     device["CS"] = mpptData.getCsAsString();
     device["MPPT"] = mpptData.getMpptAsString();
     device["OR"] = mpptData.getOrAsString();
+    if (mpptData.relayState_RELAY.first > 0) {
+        device["RELAY"] = mpptData.relayState_RELAY.second ? "ON" : "OFF";
+    }
     device["ERR"] = mpptData.getErrAsString();
     device["HSDS"]["v"] = mpptData.daySequenceNr_HSDS;
     device["HSDS"]["u"] = "d";

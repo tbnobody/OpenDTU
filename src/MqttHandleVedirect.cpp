@@ -135,6 +135,7 @@ void MqttHandleVedirectClass::publish_mppt_data(const VeDirectMpptController::da
         MqttSettings.publish(topic + t, String(val)); \
     }
 
+    PUBLISH_OPT(relayState_RELAY,                         "RELAY",                        currentData.relayState_RELAY.second ? "ON" : "OFF");
     PUBLISH_OPT(loadOutputState_LOAD,                     "LOAD",                         currentData.loadOutputState_LOAD.second ? "ON" : "OFF");
     PUBLISH_OPT(loadCurrent_IL_mA,                        "IL",                           currentData.loadCurrent_IL_mA.second / 1000.0);
     PUBLISH_OPT(NetworkTotalDcInputPowerMilliWatts,       "NetworkTotalDcInputPower",     currentData.NetworkTotalDcInputPowerMilliWatts.second / 1000.0);

@@ -88,6 +88,9 @@ void MqttHandleVedirectHassClass::publishConfig()
         publishSensor("Panel maximum power yesterday", NULL, "H23", "power", "measurement", "W", *optMpptData);
 
         // optional info, provided only if the charge controller delivers the information
+        if (optMpptData->relayState_RELAY.first != 0) {
+            publishBinarySensor("MPPT error relay state", "mdi:electric-switch", "RELAY", "ON", "OFF", *optMpptData);
+        }
         if (optMpptData->loadOutputState_LOAD.first != 0) {
             publishBinarySensor("MPPT load output state", "mdi:export", "LOAD", "ON", "OFF", *optMpptData);
         }

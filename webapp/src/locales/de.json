@@ -185,6 +185,7 @@
             "CS": "Betriebszustand",
             "MPPT": "Betriebszustand des Trackers",
             "OR": "Grund für das Ausschalten",
+            "RELAY": "Status Fehlerrelais",
             "ERR": "Fehlerbeschreibung",
             "HSDS": "Anzahl der Tage (0..364)",
             "MpptTemperature": "Ladereglertemperatur"

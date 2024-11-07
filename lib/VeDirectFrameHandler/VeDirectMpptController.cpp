@@ -31,6 +31,11 @@ bool VeDirectMpptController::processTextDataDerived(std::string const& name, std
         _tmpFrame.loadOutputState_LOAD.first = millis();
 		return true;
 	}
+    if (name == "RELAY") {
+		_tmpFrame.relayState_RELAY.second = (value == "ON");
+        _tmpFrame.relayState_RELAY.first = millis();
+		return true;
+	}
 	if (name == "CS") {
 		_tmpFrame.currentState_CS = atoi(value.c_str());
 		return true;
@@ -130,6 +135,7 @@ void VeDirectMpptController::loop()
     // Check if optional TEXT-Data is outdated
     resetTimestamp(_tmpFrame.loadOutputState_LOAD);
 	resetTimestamp(_tmpFrame.loadCurrent_IL_mA);
+    resetTimestamp(_tmpFrame.relayState_RELAY);
 
 	// Third we check if HEX-Data is outdated
     if (!isHexCommandPossible()) { return; }

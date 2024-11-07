@@ -43,6 +43,7 @@ struct veMpptStruct : veStruct {
     std::pair<uint32_t, bool> loadOutputState_LOAD;     // physical load output or virtual load output state (on if battery voltage
                                                         // reaches upper limit, off if battery reaches lower limit)
     std::pair<uint32_t, uint32_t> loadCurrent_IL_mA;    // Load current in mA (Available only for models with a physical load output)
+    std::pair<uint32_t, bool> relayState_RELAY;         // relay alarm state. On=true, Off=false
 
     // these are values communicated through the HEX protocol. the pair's first
     // value is the timestamp the respective info was last received. if it is
