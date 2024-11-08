@@ -293,7 +293,7 @@ void NetworkSettingsClass::applyConfig()
         MessageOutput.print("existing credentials... ");
         WiFi.begin();
     }
-    MessageOutput.println("done");
+    MessageOutput.println("done. Connecting to " + String(Configuration.get().WiFi.Ssid));
     setStaticIp();
 }
 

@@ -74,6 +74,11 @@
                                 }}</router-link>
                             </li>
                             <li>
+                                <router-link @click="onClick" class="dropdown-item" to="/settings/integrations">{{
+                                    $t('menu.Integrations')
+                                }}</router-link>
+                            </li>
+                            <li>
                                 <hr class="dropdown-divider" />
                             </li>
                             <li>
