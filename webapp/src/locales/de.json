@@ -111,7 +111,9 @@
         "10002": "Authentifizierung erfolgreich!",
         "11001": "@:apiresponse.2001",
         "11002": "@:apiresponse:5004",
-        "12001": "Profil muss zwischen 1 und {max} Zeichen lang sein!"
+        "12001": "Profil muss zwischen 1 und {max} Zeichen lang sein!",
+        "13001": "Hostname muss zwischen 1 und {max} Zeichen lang sein!",
+        "13002": "Aktualisierungsintervall muss zwischen {min} und {max} Sekunden liegen!"
     },
     "home": {
         "LiveData": "Live-Daten",
@@ -661,6 +663,18 @@
         "Leds": "LEDs",
         "EqualBrightness": "Gleiche Helligkeit",
         "LedBrightness": "LED {led} Helligkeit ({brightness})"
+    },
+    "integrationsadmin": {
+        "IntegrationSettings": "Integrationseinstellungen",
+        "Save": "@:base.Save",
+        "Cancel": "@:base.Cancel",
+        "goecontroller": "go-e Controller",
+        "goecontrollerEnabled": "go-e Controller aktivieren",
+        "goecontrollerEnabledHint": "Aktiviere die go-e Controller-Integration. Dadurch wird der 'ecp' API-Key gesetzt, um dem Controller mitzuteilen, wie viel Solarenergie produziert wird.",
+        "goecontrollerHostname": "Hostname",
+        "goecontrollerUpdateInterval": "Aktualisierungsintervall",
+        "goecontrollerEnableHomeCategory": "Heim-Kategorie aktivieren",
+        "goecontrollerEnableHomeCategoryHint": "Setze auch den Wert für die Heim-Kategorie. Auf diese Weise kannst du den korrekten Verbrauch deines Hauses haben, wenn dein Wechselrichter auch in der Heim-Kategorie enthalten ist."
     },
     "pininfo": {
         "Category": "Kategorie",

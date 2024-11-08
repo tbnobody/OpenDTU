@@ -111,7 +111,9 @@
         "10002": "Authentification réussie !",
         "11001": "@:apiresponse.2001",
         "11002": "@:apiresponse:5004",
-        "12001": "Le profil doit comporter entre 1 et {max} caractères !"
+        "12001": "Le profil doit comporter entre 1 et {max} caractères !",
+        "13001": "Hostname must between 1 and {max} characters long!",
+        "13002": "Update interval must between {min} and {max} seconds!"
     },
     "home": {
         "LiveData": "Données en direct",
@@ -643,6 +645,18 @@
         "Leds": "LEDs",
         "EqualBrightness": "Même luminosité",
         "LedBrightness": "LED {led} luminosité ({brightness})"
+    },
+    "integrationsadmin": {
+        "IntegrationSettings": "Integration Settings",
+        "Save": "@:base.Save",
+        "Cancel": "@:base.Cancel",
+        "goecontroller": "go-e Controller",
+        "goecontrollerEnabled": "Enable go-e Controller",
+        "goecontrollerEnabledHint": "Enable the go-e controller integration. This will set the 'ecp' api-key to let the controller know how much solar energy is produced",
+        "goecontrollerHostname": "Hostname",
+        "goecontrollerUpdateInterval": "Update Interval",
+        "goecontrollerEnableHomeCategory": "Enable Home Category",
+        "goecontrollerEnableHomeCategoryHint": "Also set the value for the home category. This way you can have the correct consumption of your home if your inverter is also included in the home category."
     },
     "pininfo": {
         "Category": "Catégorie",
