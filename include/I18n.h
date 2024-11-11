@@ -22,6 +22,7 @@ public:
         String& date_format,
         String& offline,
         String& power_w, String& power_kw,
+        String& meter_power_w, String& meter_power_kw,
         String& yield_today_wh, String& yield_today_kwh,
         String& yield_total_kwh, String& yield_total_mwh);
 

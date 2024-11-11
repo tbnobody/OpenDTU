@@ -179,6 +179,8 @@ void DisplayGraphicClass::setLocale(const String& locale)
     _i18n_offline = i18n_offline[idx];
     _i18n_current_power_w = i18n_current_power_w[idx];
     _i18n_current_power_kw = i18n_current_power_kw[idx];
+    _i18n_meter_power_w = i18n_meter_power_w[idx];
+    _i18n_meter_power_kw = i18n_meter_power_kw[idx];
     _i18n_yield_today_wh = i18n_yield_today_wh[idx];
     _i18n_yield_today_kwh = i18n_yield_today_kwh[idx];
     _i18n_yield_total_kwh = i18n_yield_total_kwh[idx];
@@ -189,6 +191,8 @@ void DisplayGraphicClass::setLocale(const String& locale)
         _i18n_offline,
         _i18n_current_power_w,
         _i18n_current_power_kw,
+        _i18n_meter_power_w,
+        _i18n_meter_power_kw,
         _i18n_yield_today_wh,
         _i18n_yield_today_kwh,
         _i18n_yield_total_kwh,
@@ -315,9 +319,9 @@ void DisplayGraphicClass::loop()
 
         auto acPower = PowerMeter.getPowerTotal();
         if (acPower > 999) {
-            snprintf(_fmtText, sizeof(_fmtText), i18n_meter_power_kw[_display_language], (acPower / 1000));
+            snprintf(_fmtText, sizeof(_fmtText), _i18n_meter_power_kw.c_str(), (acPower / 1000));
         } else {
-            snprintf(_fmtText, sizeof(_fmtText), i18n_meter_power_w[_display_language], acPower);
+            snprintf(_fmtText, sizeof(_fmtText), _i18n_meter_power_w.c_str(), acPower);
         }
 
         printText(_fmtText, 2);

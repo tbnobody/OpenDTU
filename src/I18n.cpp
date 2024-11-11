@@ -43,6 +43,7 @@ void I18nClass::readDisplayStrings(
     String& date_format,
     String& offline,
     String& power_w, String& power_kw,
+    String& meter_power_w, String& meter_power_kw,
     String& yield_today_wh, String& yield_today_kwh,
     String& yield_total_kwh, String& yield_total_mwh)
 {
@@ -86,6 +87,14 @@ void I18nClass::readDisplayStrings(
 
     if (displayData["power_kw"].as<String>() != "null") {
         power_kw = displayData["power_kw"].as<String>();
+    }
+
+    if (displayData["meter_power_w"].as<String>() != "null") {
+        meter_power_w = displayData["meter_power_w"].as<String>();
+    }
+
+    if (displayData["meter_power_kw"].as<String>() != "null") {
+        meter_power_kw = displayData["meter_power_kw"].as<String>();
     }
 
     if (displayData["yield_today_wh"].as<String>() != "null") {

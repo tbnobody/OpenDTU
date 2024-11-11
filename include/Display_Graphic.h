@@ -80,6 +80,8 @@ private:
     String _i18n_date_format;
     String _i18n_current_power_kw;
     String _i18n_current_power_w;
+    String _i18n_meter_power_w;
+    String _i18n_meter_power_kw;
     String _i18n_yield_total_mwh;
     String _i18n_yield_total_kwh;
 };
