@@ -853,10 +853,10 @@
   resolved "https://registry.yarnpkg.com/@vue/shared/-/shared-3.5.12.tgz#f9e45b7f63f2c3f40d84237b1194b7f67de192e3"
   integrity sha512-L2RPSAwUFbgZH20etwrXyVyCBu9OxRSi8T/38QsvnkJyvq2LufW2lDCOzm7t/U9C1mkhJGWYfCuFBCmIuNivrg==
 
-"@vue/tsconfig@^0.5.1":
-  version "0.5.1"
-  resolved "https://registry.yarnpkg.com/@vue/tsconfig/-/tsconfig-0.5.1.tgz#3124ec16cc0c7e04165b88dc091e6b97782fffa9"
-  integrity sha512-VcZK7MvpjuTPx2w6blwnwZAu5/LgBUtejFOi3pPGQFXQN5Ela03FUtd2Qtg4yWGGissVL0dr6Ro1LfOFh+PCuQ==
+"@vue/tsconfig@^0.6.0":
+  version "0.6.0"
+  resolved "https://registry.yarnpkg.com/@vue/tsconfig/-/tsconfig-0.6.0.tgz#238de64e5296aac3fc076f77b5b74c8f4a493d53"
+  integrity sha512-MHXNd6lzugsEHvuA6l1GqrF5jROqUon8sP/HInLPnthJiYvB0VvpHMywg7em1dBZfFZNBSkR68qH37zOdRHmCw==
 
 acorn-jsx@^5.3.2:
   version "5.3.2"
