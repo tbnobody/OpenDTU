@@ -130,4 +130,5 @@ def esp32_create_combined_bin(source, target, env):
     esptool.main(cmd)
 
 
-env.AddPostAction("buildprog", esp32_create_combined_bin)
+from SCons.Script import AlwaysBuild
+AlwaysBuild(env.AddPostAction("buildprog", esp32_create_combined_bin))
