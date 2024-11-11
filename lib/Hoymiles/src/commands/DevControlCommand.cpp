@@ -35,8 +35,8 @@ DevControlCommand::DevControlCommand(InverterAbstract* inv, const uint64_t route
 void DevControlCommand::udpateCRC(const uint8_t len)
 {
     const uint16_t crc = crc16(&_payload[10], len);
-    _payload[10 + len] = (uint8_t)(crc >> 8);
-    _payload[10 + len + 1] = (uint8_t)(crc);
+    _payload[10 + len] = static_cast<uint8_t>(crc >> 8);
+    _payload[10 + len + 1] = static_cast<uint8_t>(crc);
 }
 
 bool DevControlCommand::handleResponse(const fragment_t fragment[], const uint8_t max_fragment_id)

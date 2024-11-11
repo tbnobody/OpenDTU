@@ -1,31 +1,24 @@
 <template>
-    <select class="form-select" @change="updateLanguage()" v-model="$i18n.locale">
-        <option v-for="locale in $i18n.availableLocales" :key="`locale-${locale}`" :value="locale">
-            {{ getLocaleName(locale) }}
+    <select class="form-select" @change="setLocale(($event.target as HTMLSelectElement).value)" :value="$i18n.locale">
+        <option v-for="locale in allLocales" :key="`locale-${locale.code}`" :value="locale.code">
+            {{ locale.name }}
         </option>
     </select>
 </template>
 
 <script lang="ts">
 import { defineComponent } from 'vue';
-import { LOCALES } from '@/locales';
+import { allLocales, setLocale } from '@/i18n';
 
 export default defineComponent({
     name: 'LocaleSwitcher',
-    methods: {
-        updateLanguage() {
-            localStorage.setItem('locale', this.$i18n.locale);
-        },
-        getLocaleName(locale: string): string {
-            return LOCALES.find((i) => i.value === locale)?.caption || '';
-        },
+    data() {
+        return {
+            allLocales,
+        };
     },
-    mounted() {
-        if (localStorage.getItem('locale')) {
-            this.$i18n.locale = localStorage.getItem('locale') || 'en';
-        } else {
-            localStorage.setItem('locale', this.$i18n.locale);
-        }
+    methods: {
+        setLocale,
     },
 });
 </script>

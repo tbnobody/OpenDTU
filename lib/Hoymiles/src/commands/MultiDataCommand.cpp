@@ -63,10 +63,10 @@ uint8_t MultiDataCommand::getDataType() const
 
 void MultiDataCommand::setTime(const time_t time)
 {
-    _payload[12] = (uint8_t)(time >> 24);
-    _payload[13] = (uint8_t)(time >> 16);
-    _payload[14] = (uint8_t)(time >> 8);
-    _payload[15] = (uint8_t)(time);
+    _payload[12] = static_cast<uint8_t>(time >> 24);
+    _payload[13] = static_cast<uint8_t>(time >> 16);
+    _payload[14] = static_cast<uint8_t>(time >> 8);
+    _payload[15] = static_cast<uint8_t>(time);
     udpateCRC();
 }
 
@@ -112,8 +112,8 @@ bool MultiDataCommand::handleResponse(const fragment_t fragment[], const uint8_t
 void MultiDataCommand::udpateCRC()
 {
     const  uint16_t crc = crc16(&_payload[10], 14); // From data_type till password
-    _payload[24] = (uint8_t)(crc >> 8);
-    _payload[25] = (uint8_t)(crc);
+    _payload[24] = static_cast<uint8_t>(crc >> 8);
+    _payload[25] = static_cast<uint8_t>(crc);
 }
 
 uint8_t MultiDataCommand::getTotalFragmentSize(const fragment_t fragment[], const uint8_t max_fragment_id)

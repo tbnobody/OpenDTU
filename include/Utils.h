@@ -2,6 +2,7 @@
 #pragma once
 
 #include <ArduinoJson.h>
+#include <LittleFS.h>
 #include <cstdint>
 #include <utility>
 
@@ -12,6 +13,8 @@ public:
     static int getTimezoneOffset();
     static bool checkJsonAlloc(const JsonDocument& doc, const char* function, const uint16_t line);
     static void removeAllFiles();
+    static String generateMd5FromFile(String file);
+    static void skipBom(File& f);
 
     /* OpenDTU-OnBatter-specific utils go here: */
     template<typename T>

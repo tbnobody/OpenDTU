@@ -15,13 +15,14 @@ WebApiClass::WebApiClass()
 
 void WebApiClass::init(Scheduler& scheduler)
 {
-    _webApiConfig.init(_server, scheduler);
     _webApiDevice.init(_server, scheduler);
     _webApiDevInfo.init(_server, scheduler);
     _webApiDtu.init(_server, scheduler);
     _webApiEventlog.init(_server, scheduler);
+    _webApiFile.init(_server, scheduler);
     _webApiFirmware.init(_server, scheduler);
     _webApiGridprofile.init(_server, scheduler);
+    _webApiI18n.init(_server, scheduler);
     _webApiInverter.init(_server, scheduler);
     _webApiLimit.init(_server, scheduler);
     _webApiMaintenance.init(_server, scheduler);
@@ -58,7 +59,7 @@ void WebApiClass::reload()
 
 bool WebApiClass::checkCredentials(AsyncWebServerRequest* request)
 {
-    CONFIG_T& config = Configuration.get();
+    auto const& config = Configuration.get();
     if (request->authenticate(AUTH_USERNAME, config.Security.Password)) {
         return true;
     }
@@ -76,7 +77,7 @@ bool WebApiClass::checkCredentials(AsyncWebServerRequest* request)
 
 bool WebApiClass::checkCredentialsReadonly(AsyncWebServerRequest* request)
 {
-    CONFIG_T& config = Configuration.get();
+    auto const& config = Configuration.get();
     if (config.Security.AllowReadonly) {
         return true;
     } else {

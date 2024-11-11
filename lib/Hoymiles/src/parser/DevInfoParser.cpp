@@ -61,6 +61,7 @@ const devInfo_t devInfo[] = {
     { { 0x10, 0x10, 0x71, ALL }, 500, "HMS-500-1T" }, // 02
     { { 0x10, 0x20, 0x71, ALL }, 500, "HMS-500-1T v2" }, // 02
     { { 0x10, 0x21, 0x11, ALL }, 600, "HMS-600-2T" }, // 01
+    { { 0x10, 0x21, 0x21, ALL }, 700, "HMS-700-2T" }, // 00
     { { 0x10, 0x21, 0x41, ALL }, 800, "HMS-800-2T" }, // 00
     { { 0x10, 0x11, 0x41, ALL }, 800, "HMS-800-2T-LV" }, // 00
     { { 0x10, 0x11, 0x51, ALL }, 900, "HMS-900-2T" }, // 01
@@ -149,7 +150,7 @@ void DevInfoParser::setLastUpdateSimple(const uint32_t lastUpdate)
 uint16_t DevInfoParser::getFwBuildVersion() const
 {
     HOY_SEMAPHORE_TAKE();
-    const uint16_t ret = (((uint16_t)_payloadDevInfoAll[0]) << 8) | _payloadDevInfoAll[1];
+    const uint16_t ret = (static_cast<uint16_t>(_payloadDevInfoAll[0]) << 8) | _payloadDevInfoAll[1];
     HOY_SEMAPHORE_GIVE();
     return ret;
 }
@@ -158,13 +159,13 @@ time_t DevInfoParser::getFwBuildDateTime() const
 {
     struct tm timeinfo = {};
     HOY_SEMAPHORE_TAKE();
-    timeinfo.tm_year = ((((uint16_t)_payloadDevInfoAll[2]) << 8) | _payloadDevInfoAll[3]) - 1900;
+    timeinfo.tm_year = ((static_cast<uint16_t>(_payloadDevInfoAll[2]) << 8) | _payloadDevInfoAll[3]) - 1900;
 
-    timeinfo.tm_mon = ((((uint16_t)_payloadDevInfoAll[4]) << 8) | _payloadDevInfoAll[5]) / 100 - 1;
-    timeinfo.tm_mday = ((((uint16_t)_payloadDevInfoAll[4]) << 8) | _payloadDevInfoAll[5]) % 100;
+    timeinfo.tm_mon = ((static_cast<uint16_t>(_payloadDevInfoAll[4]) << 8) | _payloadDevInfoAll[5]) / 100 - 1;
+    timeinfo.tm_mday = ((static_cast<uint16_t>(_payloadDevInfoAll[4]) << 8) | _payloadDevInfoAll[5]) % 100;
 
-    timeinfo.tm_hour = ((((uint16_t)_payloadDevInfoAll[6]) << 8) | _payloadDevInfoAll[7]) / 100;
-    timeinfo.tm_min = ((((uint16_t)_payloadDevInfoAll[6]) << 8) | _payloadDevInfoAll[7]) % 100;
+    timeinfo.tm_hour = ((static_cast<uint16_t>(_payloadDevInfoAll[6]) << 8) | _payloadDevInfoAll[7]) / 100;
+    timeinfo.tm_min = ((static_cast<uint16_t>(_payloadDevInfoAll[6]) << 8) | _payloadDevInfoAll[7]) % 100;
     HOY_SEMAPHORE_GIVE();
 
     return timegm(&timeinfo);
@@ -181,7 +182,7 @@ String DevInfoParser::getFwBuildDateTimeStr() const
 uint16_t DevInfoParser::getFwBootloaderVersion() const
 {
     HOY_SEMAPHORE_TAKE();
-    const uint16_t ret = (((uint16_t)_payloadDevInfoAll[8]) << 8) | _payloadDevInfoAll[9];
+    const uint16_t ret = (static_cast<uint16_t>(_payloadDevInfoAll[8]) << 8) | _payloadDevInfoAll[9];
     HOY_SEMAPHORE_GIVE();
     return ret;
 }
@@ -189,11 +190,11 @@ uint16_t DevInfoParser::getFwBootloaderVersion() const
 uint32_t DevInfoParser::getHwPartNumber() const
 {
     HOY_SEMAPHORE_TAKE();
-    const uint16_t hwpn_h = (((uint16_t)_payloadDevInfoSimple[2]) << 8) | _payloadDevInfoSimple[3];
-    const uint16_t hwpn_l = (((uint16_t)_payloadDevInfoSimple[4]) << 8) | _payloadDevInfoSimple[5];
+    const uint16_t hwpn_h = (static_cast<uint16_t>(_payloadDevInfoSimple[2]) << 8) | _payloadDevInfoSimple[3];
+    const uint16_t hwpn_l = (static_cast<uint16_t>(_payloadDevInfoSimple[4]) << 8) | _payloadDevInfoSimple[5];
     HOY_SEMAPHORE_GIVE();
 
-    return ((uint32_t)hwpn_h << 16) | ((uint32_t)hwpn_l);
+    return (static_cast<uint32_t>(hwpn_h) << 16) | static_cast<uint32_t>(hwpn_l);
 }
 
 String DevInfoParser::getHwVersion() const

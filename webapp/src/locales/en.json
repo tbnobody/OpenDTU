@@ -41,6 +41,10 @@
         "Release": "Release to refresh",
         "Close": "Close"
     },
+    "wait": {
+        "NotReady": "OpenDTU is not yet ready",
+        "PleaseWait": "Please wait. You will be automatically redirected to the home page."
+    },
     "Error": {
         "Oops": "Oops!"
     },
@@ -63,6 +67,7 @@
         "2005": "Invalid country selection!",
         "3001": "Not deleted anything!",
         "3002": "Configuration resettet. Rebooting now...",
+        "3003": "File successful deleted. Restart to apply changes!",
         "4001": "@:apiresponse.2001",
         "4002": "Name must between 1 and {max} characters long!",
         "4003": "Only {max} inverters are supported!",
@@ -791,11 +796,9 @@
         "YieldDayCorrection": "Yield Day Correction",
         "YieldDayCorrectionHint": "Sum up daily yield even if the inverter is restarted. Value will be reset at midnight"
     },
-    "configadmin": {
+    "fileadmin": {
         "ConfigManagement": "Config Management",
         "BackupHeader": "Backup: Configuration File Backup",
-        "BackupConfig": "Backup the configuration file",
-        "Backup": "Backup",
         "Restore": "Restore",
         "NoFileSelected": "No file selected",
         "RestoreHeader": "Restore: Restore the Configuration File",
@@ -808,7 +811,15 @@
         "FactoryReset": "Factory Reset",
         "ResetMsg": "Are you sure you want to delete the current configuration and reset all settings to their factory defaults?",
         "ResetConfirm": "Factory Reset!",
-        "Cancel": "@:base.Cancel"
+        "Download": "Download",
+        "Delete": "Delete",
+        "DeleteMsg": "Are you sure you want to delete file: '{name}'? You have to manually reboot the device to apply config changes!",
+        "Name": "Name",
+        "Size": "Size",
+        "Action": "Action",
+        "Cancel": "@:base.Cancel",
+        "InvalidJson": "JSON file is formatted incorrectly.",
+        "InvalidJsonContent": "JSON file has the wrong content."
     },
     "login": {
         "Login": "Login",

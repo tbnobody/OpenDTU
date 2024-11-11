@@ -2,14 +2,15 @@
 #pragma once
 
 #include "WebApi_battery.h"
-#include "WebApi_config.h"
 #include "WebApi_device.h"
 #include "WebApi_devinfo.h"
 #include "WebApi_dtu.h"
 #include "WebApi_errors.h"
 #include "WebApi_eventlog.h"
+#include "WebApi_file.h"
 #include "WebApi_firmware.h"
 #include "WebApi_gridprofile.h"
+#include "WebApi_i18n.h"
 #include "WebApi_inverter.h"
 #include "WebApi_limit.h"
 #include "WebApi_maintenance.h"
@@ -55,13 +56,14 @@ private:
     AsyncWebServer _server;
 
     WebApiBatteryClass _webApiBattery;
-    WebApiConfigClass _webApiConfig;
     WebApiDeviceClass _webApiDevice;
     WebApiDevInfoClass _webApiDevInfo;
     WebApiDtuClass _webApiDtu;
     WebApiEventlogClass _webApiEventlog;
+    WebApiFileClass _webApiFile;
     WebApiFirmwareClass _webApiFirmware;
     WebApiGridProfileClass _webApiGridprofile;
+    WebApiI18nClass _webApiI18n;
     WebApiInverterClass _webApiInverter;
     WebApiLimitClass _webApiLimit;
     WebApiMaintenanceClass _webApiMaintenance;

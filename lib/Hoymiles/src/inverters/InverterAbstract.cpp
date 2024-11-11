@@ -14,8 +14,8 @@ InverterAbstract::InverterAbstract(HoymilesRadio* radio, const uint64_t serial)
 
     char serial_buff[sizeof(uint64_t) * 8 + 1];
     snprintf(serial_buff, sizeof(serial_buff), "%0x%08x",
-        ((uint32_t)((serial >> 32) & 0xFFFFFFFF)),
-        ((uint32_t)(serial & 0xFFFFFFFF)));
+        static_cast<uint32_t>((serial >> 32) & 0xFFFFFFFF),
+        static_cast<uint32_t>(serial & 0xFFFFFFFF));
     _serialString = serial_buff;
 
     _alarmLogParser.reset(new AlarmLogParser());
