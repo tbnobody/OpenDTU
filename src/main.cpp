@@ -96,7 +96,7 @@ void setup()
     const auto& pin = PinMapping.get();
     MessageOutput.println("done");
 
-    // Initialize WiFi
+    // Initialize Network
     MessageOutput.print("Initialize Network... ");
     NetworkSettings.init(scheduler);
     MessageOutput.println("done");
