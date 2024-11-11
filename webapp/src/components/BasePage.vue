@@ -1,9 +1,9 @@
 <template>
     <div :class="{ 'container-xxl': !isWideScreen, 'container-fluid': isWideScreen }" role="main">
         <div class="page-header">
-            <div class="row">
-                <div class="col-sm-11">
-                    <h1>
+            <div class="row mb-3">
+                <div :class="'align-content-center ' + (showReload ? 'col-10' : 'col-12')">
+                    <h1 class="mb-0">
                         {{ title }}
                         <span
                             v-if="showWebSocket"
@@ -14,10 +14,10 @@
                         ></span>
                     </h1>
                 </div>
-                <div class="col-sm-1" v-if="showReload">
+                <div class="col-2 align-content-center" v-if="showReload">
                     <button
                         type="button"
-                        class="float-end btn btn-outline-primary"
+                        class="float-end btn btn-outline-primary fs-5"
                         @click="$emit('reload')"
                         v-tooltip
                         :title="$t('base.Reload')"
