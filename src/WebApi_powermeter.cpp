@@ -38,7 +38,7 @@ void WebApiPowerMeterClass::onStatus(AsyncWebServerRequest* request)
 
     AsyncJsonResponse* response = new AsyncJsonResponse();
     auto& root = response->getRoot();
-    const CONFIG_T& config = Configuration.get();
+    auto const& config = Configuration.get();
 
     root["enabled"] = config.PowerMeter.Enabled;
     root["verbose_logging"] = config.PowerMeter.VerboseLogging;
@@ -151,22 +151,25 @@ void WebApiPowerMeterClass::onAdminPost(AsyncWebServerRequest* request)
         }
     }
 
-    CONFIG_T& config = Configuration.get();
-    config.PowerMeter.Enabled = root["enabled"].as<bool>();
-    config.PowerMeter.VerboseLogging = root["verbose_logging"].as<bool>();
-    config.PowerMeter.Source = root["source"].as<uint8_t>();
+    {
+        auto guard = Configuration.getWriteGuard();
+        auto& config = guard.getConfig();
+        config.PowerMeter.Enabled = root["enabled"].as<bool>();
+        config.PowerMeter.VerboseLogging = root["verbose_logging"].as<bool>();
+        config.PowerMeter.Source = root["source"].as<uint8_t>();
 
-    Configuration.deserializePowerMeterMqttConfig(root["mqtt"].as<JsonObject>(),
-            config.PowerMeter.Mqtt);
+        Configuration.deserializePowerMeterMqttConfig(root["mqtt"].as<JsonObject>(),
+                config.PowerMeter.Mqtt);
 
-    Configuration.deserializePowerMeterSerialSdmConfig(root["serial_sdm"].as<JsonObject>(),
-            config.PowerMeter.SerialSdm);
+        Configuration.deserializePowerMeterSerialSdmConfig(root["serial_sdm"].as<JsonObject>(),
+                config.PowerMeter.SerialSdm);
 
-    Configuration.deserializePowerMeterHttpJsonConfig(root["http_json"].as<JsonObject>(),
-            config.PowerMeter.HttpJson);
+        Configuration.deserializePowerMeterHttpJsonConfig(root["http_json"].as<JsonObject>(),
+                config.PowerMeter.HttpJson);
 
-    Configuration.deserializePowerMeterHttpSmlConfig(root["http_sml"].as<JsonObject>(),
-            config.PowerMeter.HttpSml);
+        Configuration.deserializePowerMeterHttpSmlConfig(root["http_sml"].as<JsonObject>(),
+                config.PowerMeter.HttpSml);
+    }
 
     WebApi.writeConfig(retMsg);
 

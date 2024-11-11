@@ -21,7 +21,7 @@ void MqttHandleBatteryHassClass::init(Scheduler& scheduler)
 
 void MqttHandleBatteryHassClass::loop()
 {
-    CONFIG_T& config = Configuration.get();
+    auto const& config = Configuration.get();
 
     if (!config.Battery.Enabled) { return; }
 
@@ -360,7 +360,7 @@ void MqttHandleBatteryHassClass::createDeviceInfo(JsonObject& object)
 {
     object["name"] = "Battery(" + serial + ")";
 
-    auto& config = Configuration.get();
+    auto const& config = Configuration.get();
     if (config.Battery.Provider == 1) {
         object["name"] = "JK BMS (" + Battery.getStats()->getManufacturer() + ")";
     }

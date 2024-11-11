@@ -149,45 +149,48 @@ void WebApiPowerLimiterClass::onAdminPost(AsyncWebServerRequest* request)
         return;
     }
 
-    CONFIG_T& config = Configuration.get();
-    config.PowerLimiter.Enabled = root["enabled"].as<bool>();
-    PowerLimiter.setMode(PowerLimiterClass::Mode::Normal);  // User input sets PL to normal operation
-    config.PowerLimiter.VerboseLogging = root["verbose_logging"].as<bool>();
+    {
+        auto guard = Configuration.getWriteGuard();
+        auto& config = guard.getConfig();
+        config.PowerLimiter.Enabled = root["enabled"].as<bool>();
+        PowerLimiter.setMode(PowerLimiterClass::Mode::Normal);  // User input sets PL to normal operation
+        config.PowerLimiter.VerboseLogging = root["verbose_logging"].as<bool>();
 
-    if (config.Vedirect.Enabled) {
-        config.PowerLimiter.SolarPassThroughEnabled = root["solar_passthrough_enabled"].as<bool>();
-        config.PowerLimiter.SolarPassThroughLosses = root["solar_passthrough_losses"].as<uint8_t>();
-        config.PowerLimiter.FullSolarPassThroughStartVoltage = static_cast<int>(root["full_solar_passthrough_start_voltage"].as<float>() * 100) / 100.0;
-        config.PowerLimiter.FullSolarPassThroughStopVoltage = static_cast<int>(root["full_solar_passthrough_stop_voltage"].as<float>() * 100) / 100.0;
-    }
-
-    config.PowerLimiter.IsInverterBehindPowerMeter = root["is_inverter_behind_powermeter"].as<bool>();
-    config.PowerLimiter.IsInverterSolarPowered = root["is_inverter_solar_powered"].as<bool>();
-    config.PowerLimiter.BatteryAlwaysUseAtNight = root["battery_always_use_at_night"].as<bool>();
-    config.PowerLimiter.UseOverscalingToCompensateShading = root["use_overscaling_to_compensate_shading"].as<bool>();
-    config.PowerLimiter.InverterId = root["inverter_serial"].as<uint64_t>();
-    config.PowerLimiter.InverterChannelId = root["inverter_channel_id"].as<uint8_t>();
-    config.PowerLimiter.TargetPowerConsumption = root["target_power_consumption"].as<int32_t>();
-    config.PowerLimiter.TargetPowerConsumptionHysteresis = root["target_power_consumption_hysteresis"].as<int32_t>();
-    config.PowerLimiter.LowerPowerLimit = root["lower_power_limit"].as<int32_t>();
-    config.PowerLimiter.BaseLoadLimit = root["base_load_limit"].as<int32_t>();
-    config.PowerLimiter.UpperPowerLimit = root["upper_power_limit"].as<int32_t>();
-
-    if (config.Battery.Enabled) {
-        config.PowerLimiter.IgnoreSoc = root["ignore_soc"].as<bool>();
-        config.PowerLimiter.BatterySocStartThreshold = root["battery_soc_start_threshold"].as<uint32_t>();
-        config.PowerLimiter.BatterySocStopThreshold = root["battery_soc_stop_threshold"].as<uint32_t>();
         if (config.Vedirect.Enabled) {
-            config.PowerLimiter.FullSolarPassThroughSoc = root["full_solar_passthrough_soc"].as<uint32_t>();
+            config.PowerLimiter.SolarPassThroughEnabled = root["solar_passthrough_enabled"].as<bool>();
+            config.PowerLimiter.SolarPassThroughLosses = root["solar_passthrough_losses"].as<uint8_t>();
+            config.PowerLimiter.FullSolarPassThroughStartVoltage = static_cast<int>(root["full_solar_passthrough_start_voltage"].as<float>() * 100) / 100.0;
+            config.PowerLimiter.FullSolarPassThroughStopVoltage = static_cast<int>(root["full_solar_passthrough_stop_voltage"].as<float>() * 100) / 100.0;
         }
-    }
 
-    config.PowerLimiter.VoltageStartThreshold = root["voltage_start_threshold"].as<float>();
-    config.PowerLimiter.VoltageStartThreshold = static_cast<int>(config.PowerLimiter.VoltageStartThreshold * 100) / 100.0;
-    config.PowerLimiter.VoltageStopThreshold = root["voltage_stop_threshold"].as<float>();
-    config.PowerLimiter.VoltageStopThreshold = static_cast<int>(config.PowerLimiter.VoltageStopThreshold * 100) / 100.0;
-    config.PowerLimiter.VoltageLoadCorrectionFactor = root["voltage_load_correction_factor"].as<float>();
-    config.PowerLimiter.RestartHour = root["inverter_restart_hour"].as<int8_t>();
+        config.PowerLimiter.IsInverterBehindPowerMeter = root["is_inverter_behind_powermeter"].as<bool>();
+        config.PowerLimiter.IsInverterSolarPowered = root["is_inverter_solar_powered"].as<bool>();
+        config.PowerLimiter.BatteryAlwaysUseAtNight = root["battery_always_use_at_night"].as<bool>();
+        config.PowerLimiter.UseOverscalingToCompensateShading = root["use_overscaling_to_compensate_shading"].as<bool>();
+        config.PowerLimiter.InverterId = root["inverter_serial"].as<uint64_t>();
+        config.PowerLimiter.InverterChannelId = root["inverter_channel_id"].as<uint8_t>();
+        config.PowerLimiter.TargetPowerConsumption = root["target_power_consumption"].as<int32_t>();
+        config.PowerLimiter.TargetPowerConsumptionHysteresis = root["target_power_consumption_hysteresis"].as<int32_t>();
+        config.PowerLimiter.LowerPowerLimit = root["lower_power_limit"].as<int32_t>();
+        config.PowerLimiter.BaseLoadLimit = root["base_load_limit"].as<int32_t>();
+        config.PowerLimiter.UpperPowerLimit = root["upper_power_limit"].as<int32_t>();
+
+        if (config.Battery.Enabled) {
+            config.PowerLimiter.IgnoreSoc = root["ignore_soc"].as<bool>();
+            config.PowerLimiter.BatterySocStartThreshold = root["battery_soc_start_threshold"].as<uint32_t>();
+            config.PowerLimiter.BatterySocStopThreshold = root["battery_soc_stop_threshold"].as<uint32_t>();
+            if (config.Vedirect.Enabled) {
+                config.PowerLimiter.FullSolarPassThroughSoc = root["full_solar_passthrough_soc"].as<uint32_t>();
+            }
+        }
+
+        config.PowerLimiter.VoltageStartThreshold = root["voltage_start_threshold"].as<float>();
+        config.PowerLimiter.VoltageStartThreshold = static_cast<int>(config.PowerLimiter.VoltageStartThreshold * 100) / 100.0;
+        config.PowerLimiter.VoltageStopThreshold = root["voltage_stop_threshold"].as<float>();
+        config.PowerLimiter.VoltageStopThreshold = static_cast<int>(config.PowerLimiter.VoltageStopThreshold * 100) / 100.0;
+        config.PowerLimiter.VoltageLoadCorrectionFactor = root["voltage_load_correction_factor"].as<float>();
+        config.PowerLimiter.RestartHour = root["inverter_restart_hour"].as<int8_t>();
+    }
 
     WebApi.writeConfig(retMsg);
 

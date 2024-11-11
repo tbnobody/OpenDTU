@@ -27,7 +27,7 @@ void VictronMpptClass::updateSettings()
     }
     _serialPortOwners.clear();
 
-    CONFIG_T& config = Configuration.get();
+    auto const& config = Configuration.get();
     if (!config.Vedirect.Enabled) { return; }
 
     const PinMapping_t& pin = PinMapping.get();

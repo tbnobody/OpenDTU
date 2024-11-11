@@ -31,7 +31,7 @@ void WebApiVedirectClass::onVedirectStatus(AsyncWebServerRequest* request)
     
     AsyncJsonResponse* response = new AsyncJsonResponse();
     auto& root = response->getRoot();
-    const CONFIG_T& config = Configuration.get();
+    auto const& config = Configuration.get();
 
     root["vedirect_enabled"] = config.Vedirect.Enabled;
     root["verbose_logging"] = config.Vedirect.VerboseLogging;
@@ -49,7 +49,7 @@ void WebApiVedirectClass::onVedirectAdminGet(AsyncWebServerRequest* request)
 
     AsyncJsonResponse* response = new AsyncJsonResponse();
     auto& root = response->getRoot();
-    const CONFIG_T& config = Configuration.get();
+    auto const& config = Configuration.get();
 
     root["vedirect_enabled"] = config.Vedirect.Enabled;
     root["verbose_logging"] = config.Vedirect.VerboseLogging;
@@ -83,10 +83,13 @@ void WebApiVedirectClass::onVedirectAdminPost(AsyncWebServerRequest* request)
         return;
     }
 
-    CONFIG_T& config = Configuration.get();
-    config.Vedirect.Enabled = root["vedirect_enabled"].as<bool>();
-    config.Vedirect.VerboseLogging = root["verbose_logging"].as<bool>();
-    config.Vedirect.UpdatesOnly = root["vedirect_updatesonly"].as<bool>();
+    {
+        auto guard = Configuration.getWriteGuard();
+        auto& config = guard.getConfig();
+        config.Vedirect.Enabled = root["vedirect_enabled"].as<bool>();
+        config.Vedirect.VerboseLogging = root["verbose_logging"].as<bool>();
+        config.Vedirect.UpdatesOnly = root["vedirect_updatesonly"].as<bool>();
+    }
 
     WebApi.writeConfig(retMsg);
 

@@ -42,7 +42,7 @@ void BatteryClass::updateSettings()
         _upProvider = nullptr;
     }
 
-    CONFIG_T& config = Configuration.get();
+    auto const& config = Configuration.get();
     if (!config.Battery.Enabled) { return; }
 
     bool verboseLogging = config.Battery.VerboseLogging;
@@ -90,7 +90,7 @@ void BatteryClass::loop()
 
 float BatteryClass::getDischargeCurrentLimit()
 {
-    CONFIG_T& config = Configuration.get();
+    auto const& config = Configuration.get();
 
     if (!config.Battery.EnableDischargeCurrentLimit) { return FLT_MAX; }
 

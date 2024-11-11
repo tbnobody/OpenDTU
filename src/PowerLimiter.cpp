@@ -97,7 +97,7 @@ bool PowerLimiterClass::shutdown(PowerLimiterClass::Status status)
 
 void PowerLimiterClass::loop()
 {
-    CONFIG_T const& config = Configuration.get();
+    auto const& config = Configuration.get();
     _verboseLogging = config.PowerLimiter.VerboseLogging;
 
     // we know that the Hoymiles library refuses to send any message to any
@@ -358,7 +358,7 @@ static float getInverterEfficiency(std::shared_ptr<InverterAbstract> inverter)
  */
 int32_t PowerLimiterClass::inverterPowerDcToAc(std::shared_ptr<InverterAbstract> inverter, int32_t dcPower)
 {
-    CONFIG_T& config = Configuration.get();
+    auto const& config = Configuration.get();
 
     float inverterEfficiencyFactor = getInverterEfficiency(inverter);
 
@@ -927,7 +927,7 @@ float PowerLimiterClass::getLoadCorrectedVoltage()
         return 0.0;
     }
 
-    CONFIG_T& config = Configuration.get();
+    auto const& config = Configuration.get();
 
     float acPower = _inverter->Statistics()->getChannelFieldValue(TYPE_AC, CH0, FLD_PAC);
     float dcVoltage = getBatteryVoltage();
@@ -942,7 +942,7 @@ float PowerLimiterClass::getLoadCorrectedVoltage()
 bool PowerLimiterClass::testThreshold(float socThreshold, float voltThreshold,
         std::function<bool(float, float)> compare)
 {
-    CONFIG_T& config = Configuration.get();
+    auto const& config = Configuration.get();
 
     // prefer SoC provided through battery interface, unless disabled by user
     auto stats = Battery.getStats();
@@ -962,7 +962,7 @@ bool PowerLimiterClass::testThreshold(float socThreshold, float voltThreshold,
 
 bool PowerLimiterClass::isStartThresholdReached()
 {
-    CONFIG_T& config = Configuration.get();
+    auto const& config = Configuration.get();
 
     return testThreshold(
             config.PowerLimiter.BatterySocStartThreshold,
@@ -973,7 +973,7 @@ bool PowerLimiterClass::isStartThresholdReached()
 
 bool PowerLimiterClass::isStopThresholdReached()
 {
-    CONFIG_T& config = Configuration.get();
+    auto const& config = Configuration.get();
 
     return testThreshold(
             config.PowerLimiter.BatterySocStopThreshold,
@@ -984,7 +984,7 @@ bool PowerLimiterClass::isStopThresholdReached()
 
 bool PowerLimiterClass::isBelowStopThreshold()
 {
-    CONFIG_T& config = Configuration.get();
+    auto const& config = Configuration.get();
 
     return testThreshold(
             config.PowerLimiter.BatterySocStopThreshold,
@@ -996,7 +996,7 @@ bool PowerLimiterClass::isBelowStopThreshold()
 /// @brief calculate next inverter restart in millis
 void PowerLimiterClass::calcNextInverterRestart()
 {
-    CONFIG_T& config = Configuration.get();
+    auto const& config = Configuration.get();
 
     // first check if restart is configured at all
     if (config.PowerLimiter.RestartHour < 0) {
