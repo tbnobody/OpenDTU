@@ -245,7 +245,8 @@ bool SerialResponse::isValid() const {
     Status const actualStatus = getStatus();
     if (actualStatus != Status::Ok) {
         MessageOutput.printf("JbdBms::SerialMessage: invalid status 0x%02x, expected 0x%02x\r\n",
-            (uint32_t) actualStatus, (uint32_t) Status::Ok);
+            static_cast<uint32_t>(actualStatus),
+            static_cast<uint32_t>(Status::Ok));
         return false;
     }
 
@@ -259,7 +260,9 @@ bool SerialCommand::isValid() const {
     Status const actualStatus = getStatus();
     if (actualStatus != Status::Read || actualStatus != Status::Write) {
         MessageOutput.printf("JbdBms::SerialMessage: invalid status 0x%02x, expected 0x%02x or 0x%02x\r\n",
-            (uint32_t) actualStatus, (uint32_t) Status::Read, (uint32_t) Status::Write);
+            static_cast<uint32_t>(actualStatus),
+            static_cast<uint32_t>(Status::Read),
+            static_cast<uint32_t>(Status::Write));
         return false;
     }
 
