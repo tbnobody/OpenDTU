@@ -1,0 +1,1129 @@
+openapi: 3.0.3
+info:
+  title: OpenDTU
+  description: |
+    This API allows querying the inverters monitored by OpenDTU
+    and configuring individual settings.
+  version: 2024.07.09
+tags:
+  - name: PV Solar Power Generation
+paths:
+  /api/config/get:
+    get:
+      summary: Get the config from SPIFFS
+      description: Retrieves the current configuration.
+      tags:
+        - Configuration
+      operationId: get-config
+      parameters:
+        - name: file
+          description: Config File
+          in: query
+          schema:
+            type: string
+            enum: 
+              - 'config.json'
+              - 'pin_mapping.json'
+          required: true
+      responses:
+        "200":
+          description: "OK"
+#          content:
+#            application/json:
+#              schema:
+#                $ref: "#/components/schemas/config"
+#                $ref: "#/components/schemas/pin_mapping"
+      security:
+        - BasicAuth: []
+  /api/config/delete:
+    post:
+      tags:
+        - Settings
+      responses:
+        "200":
+          description: "OK"
+      security:
+        - BasicAuth: []
+  /api/config/list:
+    get:
+      tags:
+        - Settings
+      responses:
+        "200":
+          description: "OK"
+      security:
+        - BasicAuth: []
+  /api/config/upload:
+    post:
+      tags:
+        - Settings
+      responses:
+        "200":
+          description: "OK"
+      security:
+        - BasicAuth: []
+  /api/device/config:
+    get:
+      tags:
+        - Settings
+      responses:
+        "200":
+          description: "OK"
+          content:
+            application/json:
+              schema: 
+                $ref: '#/components/schemas/device-config'
+      security:
+        - BasicAuth: []
+    post:
+      responses:
+        "200":
+          description: "OK"
+      security:
+        - BasicAuth: []
+  /api/devinfo/status:
+    get:
+      tags:
+        - Info 
+      responses:
+        "200":
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: 
+                  valid_data:
+                    type: boolean
+                  fw_bootloader_version:
+                    type: integer
+                  fw_build_version: 
+                    type: integer
+                  hw_part_number:
+                    type: integer
+                  hw_version:
+                    type: string
+                  hw_model_name:
+                    type: string
+                  max_power:
+                    type: integer
+                  fw_build_datetime:
+                    type: string
+                example:
+                    valid_data: true
+                    fw_bootloader_version: 104
+                    fw_build_version: 10008
+                    hw_part_number: 269553683
+                    hw_version: "01.00"
+                    hw_model_name: "HM-600-2T"
+                    max_power: 600
+                    fw_build_datetime: "2020-07-01 12:00:00"
+  /api/dtu/config:
+    get:
+      tags:
+        - Settings
+      responses:
+        "200":
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: 
+                  serial:
+                    type: string
+                  pollinterval:
+                    type: integer
+                  verbose_logging:
+                    type: boolean
+                  nrf_enabled:
+                    type: boolean
+                  nrf_palevel:
+                    type: integer
+                  cmt_enabled:
+                    type: boolean
+                  cmt_palevel:
+                    type: integer
+                  cmt_frequency:
+                    type: integer
+                  cmt_country:
+                    type: integer
+                  cmt_chan_width:
+                    type: integer
+                  country_def:
+                    type: object
+                    properties:
+                      freq_default:
+                        type: integer
+                      freq_min:
+                        type: integer
+                      freq_max:
+                        type: integer
+                      freq_legal_min:
+                        type: integer
+                      freq_legal_max:
+                        type: integer
+                example:
+                  serial: '199980112345'
+                  pollinterval: 5
+                  verbose_logging: true
+                  nrf_enabled: true
+                  nrf_palevel: 0
+                  cmt_enabled: true
+                  cmt_palevel: 0
+                  cmt_frequency: 865000000
+                  cmt_country: 0
+                  cmt_chan_width: 250000
+                  country_def:
+                    - freq_default: 865000000
+                      freq_min: 860250000
+                      freq_max: 923500000
+                      freq_legal_min: 863000000
+                      freq_legal_max: 870000000
+                    - freq_default: 918000000
+                      freq_min: 900250000
+                      freq_max: 963500000
+                      freq_legal_min: 905000000
+                      freq_legal_max: 925000000
+                    - freq_default: 918000000
+                      freq_min: 900250000
+                      freq_max: 963500000
+                      freq_legal_min: 915000000
+                      freq_legal_max: 928000000
+      security:
+        - BasicAuth: []
+    post:
+      tags:
+        - Settings
+      requestBody:
+        description: |
+          Optional description in *Markdown*
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties: 
+                serial:
+                  type: string
+                pollinterval:
+                  type: integer
+                verbose_logging:
+                  type: boolean
+                nrf_enabled:
+                  type: boolean
+                nrf_palevel:
+                  type: integer
+                cmt_enabled:
+                  type: boolean
+                cmt_palevel:
+                  type: integer
+                cmt_frequency:
+                  type: integer
+                cmt_country:
+                  type: integer
+                cmt_chan_width:
+                  type: integer
+                country_def:
+                  type: object
+                  properties:
+                    freq_default:
+                      type: integer
+                    freq_min:
+                      type: integer
+                    freq_max:
+                      type: integer
+                    freq_legal_min:
+                      type: integer
+                    freq_legal_max:
+                      type: integer
+              example:
+                serial: '199980112345'
+                pollinterval: 5
+                verbose_logging: true
+                nrf_enabled: true
+                nrf_palevel: 0
+                cmt_enabled: true
+                cmt_palevel: 0
+                cmt_frequency: 865000000
+                cmt_country: 0
+                cmt_chan_width: 250000
+                country_def:
+                  - freq_default: 865000000
+                    freq_min: 860250000
+                    freq_max: 923500000
+                    freq_legal_min: 863000000
+                    freq_legal_max: 870000000
+                  - freq_default: 918000000
+                    freq_min: 900250000
+                    freq_max: 963500000
+                    freq_legal_min: 905000000
+                    freq_legal_max: 925000000
+                  - freq_default: 918000000
+                    freq_min: 900250000
+                    freq_max: 963500000
+                    freq_legal_min: 915000000
+                    freq_legal_max: 928000000
+      responses:
+        "200":
+          description: "OK"
+      security:
+        - BasicAuth: []
+  /api/eventlog/status:
+    get:
+      tags:
+        - Inverter
+      responses:
+        "200":
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: 
+                  count:
+                    type: integer
+                  events:
+                    type: object
+                    properties:
+                      message_id: 
+                        type: integer
+                      message:
+                        type: string
+                      start_time:
+                        type: integer
+                      end_time:
+                        type: integer
+                example:
+                    count: 1
+                    events: 
+                      message_id: 1
+                      message: "Inverter start"
+                      start_time: 19185
+                      end_time: 19185
+      parameters:
+        - name: inv
+          description: Inverter Serial Number
+          in: query
+          schema:
+            $ref: "#/components/schemas/serialNumber"
+          required: true
+  /api/firmware/update:
+    post:
+      responses:
+        "200":
+          description: "OK"
+      security:
+        - BasicAuth: []
+  /api/gridprofile/status:
+    get:
+      tags:
+        - Inverter
+      responses:
+        "200":
+          description: "OK"
+      security:
+        - BasicAuth: []
+  /api/gridprofile/rawdata:
+    get:
+      tags:
+        - Inverter
+      responses:
+        "200":
+          description: "OK"
+      security:
+        - BasicAuth: []
+  /api/inverter/list:
+    get:
+      tags:
+        - Inverter
+      responses:
+        "200":
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: 
+                  inverter:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        properties:
+                          name:
+                            type: string
+                          order:
+                            type: integer
+                          serial:
+                            type: string
+                          poll_enable:
+                            type: boolean
+                          poll_enable_night:
+                            type: boolean
+                          command_enable:
+                            type: boolean
+                          command_enable_night:
+                            type: boolean
+                          reachable_threshold:
+                            type: integer
+                          zero_runtime:
+                            type: boolean
+                          zero_day:
+                            type: boolean
+                          yieldday_correction:
+                            type: boolean
+                          type:
+                            type: string
+                          channel:
+                            type: object
+                            properties:
+                              name:
+                                type: string
+                              max_power:
+                                type: integer
+                              yield_total_offset:
+                                type: integer
+                example:
+                  inverter:
+                    - id: 0
+                      name: "Ahoy-600"
+                      order: 0
+                      serial: '114173212345'
+                      poll_enable: true
+                      poll_enable_night: false
+                      command_enable: true
+                      command_enable_night: false
+                      reachable_threshold: 2
+                      zero_runtime: false
+                      zero_day: false
+                      yieldday_correction: false
+                      type: "HM-600/700/800-2T"
+                      channel:
+                        - name: "links"
+                          max_power: 300
+                          yield_total_offset: 0
+                        - name: "rechts"
+                          max_power: 300
+                          yield_total_offset: 0
+      security:
+        - BasicAuth: []
+  /api/inverter/add:
+    post:
+      tags:
+        - Inverter
+      responses:
+        "200":
+          description: "OK"
+      security:
+        - BasicAuth: []
+  /api/inverter/edit:
+    post:
+      tags:
+        - Inverter
+      responses:
+        "200":
+          description: "OK"
+      security:
+        - BasicAuth: []
+  /api/inverter/del:
+    post:
+      tags:
+        - Inverter
+      responses:
+        "200":
+          description: "OK"
+      security:
+        - BasicAuth: []
+  /api/inverter/order:
+    post:
+      tags:
+        - Inverter
+      responses:
+        "200":
+          description: "OK"
+      security:
+        - BasicAuth: []
+  /api/limit/config:
+    post:
+      tags:
+        - Inverter
+      responses:
+        "200":
+          description: "OK"
+      security:
+        - BasicAuth: []
+  /api/limit/status:
+    get:
+      tags:
+        - Inverter
+      responses:
+        "200":
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: 
+                  inverter-serial:
+                    type: string
+                    properties:
+                      limit_relative: 
+                        type: integer
+                      max_power:
+                        type: integer
+                      limit_set_status:
+                        type: string
+                example:
+                    114173212345:
+                      limit_relative: 100
+                      max_power: 600
+                      limit_set_status: Ok
+  /api/livedata/status:
+    get:
+      tags:
+        - Info 
+      responses:
+        "200":
+          description: "OK"
+      parameters:
+        - name: inv
+          description: Inverter Serial Number
+          in: query
+          schema:
+            $ref: "#/components/schemas/serialNumber"
+          required: false
+  /api/maintenance/reboot:
+    post:
+      responses:
+        "200":
+          description: "OK"
+      security:
+        - BasicAuth: []
+  /api/mqtt/config:
+    get:
+      tags:
+        - Settings
+      responses:
+        "200":
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: 
+                  mqtt_enabled:
+                    type: boolean
+                  mqtt_verbose_logging:
+                    type: boolean
+                  mqtt_hostname:
+                    type: string
+                  mqtt_port:
+                    type: integer
+                  mqtt_username:
+                    type: string
+                  mqtt_password:
+                    type: string
+                  mqtt_topic:
+                    type: string
+                  mqtt_retain:
+                    type: boolean
+                  mqtt_tls:
+                    type: boolean
+                  mqtt_root_ca_cert:
+                    type: string
+                  mqtt_tls_cert_login:
+                    type: boolean
+                  mqtt_client_cert:
+                    type: string
+                  mqtt_client_key:
+                    type: string
+                  mqtt_lwt_topic:
+                    type: string
+                  mqtt_lwt_online:
+                    type: string
+                  mqtt_lwt_offline:
+                    type: string
+                  mqtt_lwt_qos:
+                    type: integer
+                  mqtt_publish_interval:
+                    type: integer
+                  mqtt_clean_session:
+                    type: boolean
+                  mqtt_hass_enabled:
+                    type: boolean
+                  mqtt_hass_expire:
+                    type: boolean
+                  mqtt_hass_retain:
+                    type: boolean
+                  mqtt_hass_topic:
+                    type: string
+                  mqtt_hass_individualpanels:
+                    type: boolean
+                example:
+                  mqtt_enabled: true
+                  mqtt_verbose_logging: true
+                  mqtt_hostname: "test.mosquitto.org"
+                  mqtt_port: 1883
+                  mqtt_username: "admin"
+                  mqtt_password: "openDTU42"
+                  mqtt_topic: "solar/"
+                  mqtt_retain: true
+                  mqtt_tls: false
+                  mqtt_root_ca_cert: |
+                    -----BEGIN CERTIFICATE-----
+                    MIIFazCCA1OgAwIBAgIRAIIQz7DSQONZRGPgu2OCiwAwDQYJKoZIhvcNAQELBQAw
+                    TzELMAkGA1UEBhMCVVMxKTAnBgNVBAoTIEludGVybmV0IFNlY3VyaXR5IFJlc2Vh
+                    cmNoIEdyb3VwMRUwEwYDVQQDEwxJU1JHIFJvb3QgWDEwHhcNMTUwNjA0MTEwNDM4
+                    WhcNMzUwNjA0MTEwNDM4WjBPMQswCQYDVQQGEwJVUzEpMCcGA1UEChMgSW50ZXJu
+                    ZXQgU2VjdXJpdHkgUmVzZWFyY2ggR3JvdXAxFTATBgNVBAMTDElTUkcgUm9vdCBY
+                    MTCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBAK3oJHP0FDfzm54rVygc
+                    h77ct984kIxuPOZXoHj3dcKi/vVqbvYATyjb3miGbESTtrFj/RQSa78f0uoxmyF+
+                    0TM8ukj13Xnfs7j/EvEhmkvBioZxaUpmZmyPfjxwv60pIgbz5MDmgK7iS4+3mX6U
+                    A5/TR5d8mUgjU+g4rk8Kb4Mu0UlXjIB0ttov0DiNewNwIRt18jA8+o+u3dpjq+sW
+                    T8KOEUt+zwvo/7V3LvSye0rgTBIlDHCNAymg4VMk7BPZ7hm/ELNKjD+Jo2FR3qyH
+                    B5T0Y3HsLuJvW5iB4YlcNHlsdu87kGJ55tukmi8mxdAQ4Q7e2RCOFvu396j3x+UC
+                    B5iPNgiV5+I3lg02dZ77DnKxHZu8A/lJBdiB3QW0KtZB6awBdpUKD9jf1b0SHzUv
+                    KBds0pjBqAlkd25HN7rOrFleaJ1/ctaJxQZBKT5ZPt0m9STJEadao0xAH0ahmbWn
+                    OlFuhjuefXKnEgV4We0+UXgVCwOPjdAvBbI+e0ocS3MFEvzG6uBQE3xDk3SzynTn
+                    jh8BCNAw1FtxNrQHusEwMFxIt4I7mKZ9YIqioymCzLq9gwQbooMDQaHWBfEbwrbw
+                    qHyGO0aoSCqI3Haadr8faqU9GY/rOPNk3sgrDQoo//fb4hVC1CLQJ13hef4Y53CI
+                    rU7m2Ys6xt0nUW7/vGT1M0NPAgMBAAGjQjBAMA4GA1UdDwEB/wQEAwIBBjAPBgNV
+                    HRMBAf8EBTADAQH/MB0GA1UdDgQWBBR5tFnme7bl5AFzgAiIyBpY9umbbjANBgkq
+                    hkiG9w0BAQsFAAOCAgEAVR9YqbyyqFDQDLHYGmkgJykIrGF1XIpu+ILlaS/V9lZL
+                    ubhzEFnTIZd+50xx+7LSYK05qAvqFyFWhfFQDlnrzuBZ6brJFe+GnY+EgPbk6ZGQ
+                    3BebYhtF8GaV0nxvwuo77x/Py9auJ/GpsMiu/X1+mvoiBOv/2X/qkSsisRcOj/KK
+                    NFtY2PwByVS5uCbMiogziUwthDyC3+6WVwW6LLv3xLfHTjuCvjHIInNzktHCgKQ5
+                    ORAzI4JMPJ+GslWYHb4phowim57iaztXOoJwTdwJx4nLCgdNbOhdjsnvzqvHu7Ur
+                    TkXWStAmzOVyyghqpZXjFaH3pO3JLF+l+/+sKAIuvtd7u+Nxe5AW0wdeRlN8NwdC
+                    jNPElpzVmbUq4JUagEiuTDkHzsxHpFKVK7q4+63SM1N95R1NbdWhscdCb+ZAJzVc
+                    oyi3B43njTOQ5yOf+1CceWxG1bQVs5ZufpsMljq4Ui0/1lvh+wjChP4kqKOJ2qxq
+                    4RgqsahDYVvTH9w7jXbyLeiNdd8XM2w9U/t7y0Ff/9yi0GE44Za4rF2LN9d11TPA
+                    mRGunUHBcnWEvgJBQl9nJEiU0Zsnvgc/ubhPgXRR4Xq37Z0j4r7g1SgEEzwxA57d
+                    emyPxgcYxn/eR44/KJ4EBs+lVDR3veyJm+kXQ99b21/+jh5Xos1AnX5iItreGCc=
+                    -----END CERTIFICATE-----
+                  mqtt_tls_cert_login: false
+                  mqtt_client_cert: ''
+                  mqtt_client_key: ''
+                  mqtt_lwt_topic: "dtu/status"
+                  mqtt_lwt_online: "online"
+                  mqtt_lwt_offline: "offline"
+                  mqtt_lwt_qos: 2
+                  mqtt_publish_interval: 5
+                  mqtt_clean_session: true
+                  mqtt_hass_enabled: true
+                  mqtt_hass_expire: true
+                  mqtt_hass_retain: true
+                  mqtt_hass_topic: "homeassistant/"
+                  mqtt_hass_individualpanels: false
+      security:
+        - BasicAuth: []
+    post:
+      tags:
+        - Settings
+      responses:
+        "200":
+          description: "OK"
+      security:
+        - BasicAuth: []
+  /api/mqtt/status:
+    get:
+      tags:
+        - Info 
+      responses:
+        "200":
+          description: "OK"
+  /api/network/config:
+    get:
+      tags:
+        - Configuration
+      responses:
+        "200":
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  hostname:
+                    type: string
+                  dhcp:
+                    type: boolean
+                  ipaddress:
+                    type: string
+                  netmask:
+                    type: string
+                  gateway:
+                    type: string
+                  dns1:
+                    type: string
+                  dns2:
+                    type: string
+                  ssid:
+                    type: string
+                  password:
+                    type: string
+                  aptimeout:
+                    type: integer
+                  mdnsenabled:
+                    type: boolean
+                example:
+                  hostname: "OpenDTU-ABCDEF"
+                  dhcp: true
+                  ipaddress: "0.0.0.0"
+                  netmask: "0.0.0.0"
+                  gateway: "0.0.0.0"
+                  dns1: "0.0.0.0"
+                  dns2: "0.0.0.0"
+                  ssid: "Your WLAN Network SSID"
+                  password: "Secure.WPA2.Password!"
+                  aptimeout: 3
+                  mdnsenabled: false
+      security:
+        - BasicAuth: []
+    post:
+      tags:
+        - Configuration
+      responses:
+        "200":
+          description: "OK"
+      security:
+        - BasicAuth: []
+  /api/network/status:
+    get:
+      tags:
+        - Info 
+      responses:
+        "200":
+          description: "OK"
+  /api/ntp/config:
+    get:
+      tags:
+        - Settings
+      responses:
+        "200":
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ntp_server:
+                    type: string
+                  ntp_timezone:
+                    type: string
+                  ntp_timezone_descr:
+                    type: string
+                  longitude:
+                    type: integer
+                  latitude:
+                    type: integer
+                  sunsettype:
+                    type: integer
+                    enum:
+                      - 0 # Standard dawn (90.8°)
+                      - 1 # Nautical dawn (102°)
+                      - 2 # Civil dawn (96°)
+                      - 3 # Astronomical dawn (108°)
+                example:
+                  ntp_server: "opendtu.pool.ntp.org"
+                  ntp_timezone: "CET-1CEST,M3.5.0,M10.5.0/3"
+                  ntp_timezone_descr: "Europe/Berlin"
+                  longitude: 10.123456789
+                  latitude: 48.123456789
+                  sunsettype: 2
+      security:
+        - BasicAuth: []
+    post:
+      tags:
+        - Configuration
+      responses:
+        "200":
+          description: "OK"
+      security:
+        - BasicAuth: []
+  /api/ntp/status:
+    get:
+      tags:
+        - Info 
+      responses:
+        "200":
+          description: "OK"
+  /api/ntp/time:
+    get:
+      tags:
+        - Settings 
+      responses:
+        "200":
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ntp_status:
+                    type: boolean
+                  year:
+                    type: integer
+                  month:
+                    type: integer
+                  day:
+                    type: integer
+                  hour:
+                    type: integer
+                  minute:
+                    type: integer
+                  second:
+                    type: integer
+                example:
+                  ntp_status: true
+                  year: 2024
+                  month: 1
+                  day: 1
+                  hour: 12
+                  minute: 0
+                  second: 0
+      security:
+        - BasicAuth: []
+    post:
+      tags:
+        - Info 
+      responses:
+        "200":
+          description: "OK"
+      security:
+        - BasicAuth: []
+  /api/power/config:
+    post:
+      tags:
+        - Inverter
+      responses:
+        "200":
+          description: "OK"
+      security:
+        - BasicAuth: []
+  /api/power/status:
+    get:
+      tags:
+        - Inverter 
+      responses:
+        "200":
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: 
+                  inverter-serial:
+                    type: string
+                    properties:
+                      power_set_status: 
+                        type: string
+                example:
+                    114173212345:
+                      power_set_status: Ok
+  /api/prometheus/metrics:
+    get:
+      responses:
+        "200":
+          description: "OK"
+  /api/security/config:
+    get:
+      tags:
+        - Configuration
+      responses:
+        "200":
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/securityConfig'              
+      security:
+        - BasicAuth: []
+    post:
+      tags:
+        - Configuration
+      requestBody:
+        description: |
+          Optional description in *Markdown*
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/securityConfig'              
+      responses:
+        "200":
+          description: "OK"
+      security:
+        - BasicAuth: []
+  /api/security/authenticate:
+    get:
+      responses:
+        "200":
+          description: "OK"
+      security:
+        - BasicAuth: []
+  /api/system/status:
+    get:
+      tags:
+        - Info 
+      responses:
+        "200":
+          description: "OK"
+
+components:
+  parameters:
+    inverter-serialnumber:
+      description: Inverter Serial Number
+      name: inv
+      in: query
+      required: false
+      schema:
+        $ref: "#/components/schemas/serialNumber"
+  schemas:
+    serialNumber:
+      type: integer
+      minimum: 100000000000
+      maximum: 999999999999
+      example: 114173212345
+    securityConfig:
+      type: object
+      properties:
+        password:
+          type: string
+          description: "Admin password - Hint: The administrator password is used to access this web interface (user 'admin'), but also to connect to the device when in AP mode. It must be 8..64 characters."
+        allow_readonly: 
+          type: boolean
+          description: "Permissions - Allow readonly access to web interface without password"
+      example:
+        password: "openDTU42"
+        allow_readonly: true
+    device-config:
+      type: object
+      properties: 
+        curPin:
+          type: object
+          properties:
+            name:
+              type: string
+            nrf24:
+              type: object
+              properties:
+                schema:
+                  $ref: '#/components/schemas/device-config-pins-nrf24'
+            cmt:
+              type: object
+              properties:
+                schema:
+                  $ref: '#/components/schemas/device-config-pins-cmt'
+            eth:
+              type: object
+              properties:
+                schema:
+                  $ref: '#/components/schemas/device-config-pins-eth'
+            display:
+              type: object
+              properties:
+                schema:
+                  $ref: '#/components/schemas/device-config-pins-display'
+            led:
+              type: object
+              properties:
+                schema:
+                  $ref: '#/components/schemas/device-config-pins-led'
+        display:
+          type: object
+          properties:
+            schema:
+              $ref: '#/components/schemas/device-config-display'
+        led:
+          type: array
+          items: 
+            type: object
+          properties:
+            schema:
+              $ref: '#/components/schemas/device-config-led'
+      example:
+        curPin:
+          name: "OpenDTU Fusion v2 with CMT2300A, NRF24 and W5500 Shield"
+          nrf24:
+            clk: 36
+            cs: 37
+            en: 38
+            irq: 47
+            miso: 48
+            mosi: 35
+          cmt:
+            clk: 6
+            cs: 4
+            fcs: 21
+            sdio: 5
+            gpio2: 3
+            gpio3: 8
+          eth:
+            enabled: false
+            phy_addr: 0
+            power: -1
+            mdc: 23
+            mdio: 18
+            type: 0
+            clk_mode: 0
+          display:
+            type: 0
+            data: 255
+            clk: 255
+            cs: 255
+            reset: 255
+          led:
+            led0: 17
+            led1: 18
+        display:
+          rotation: 2
+          power_safe: true
+          screensaver: true
+          contrast: 60
+          language: 0
+          diagramduration: 36000
+          diagrammode: 1
+        led:
+          - brightness: 67
+          - brightness: 33
+    device-config-pins-nrf24:
+      type: object
+      properties:
+        clk:
+          type: integer
+        cs:
+          type: integer
+        en:
+          type: integer
+        irq:
+          type: integer
+        miso:
+          type: integer
+        mosi:
+          type: integer
+      example:
+        clk: 36
+        cs: 37
+        en: 38
+        irq: 47
+        miso: 48
+        mosi: 35
+    device-config-pins-cmt:
+      type: object
+      properties:
+        clk:
+          type: integer
+        cs:
+          type: integer
+        fcs:
+          type: integer
+        sdio:
+          type: integer
+        gpio2:
+          type: integer
+        gpio3:
+          type: integer
+      example:
+        clk: 6
+        cs: 4
+        fcs: 21
+        sdio: 5
+        gpio2: 3
+        gpio3: 8
+    device-config-pins-eth:
+      type: object
+      properties:
+        enabled:
+          type: boolean
+        phy_addr:
+          type: integer
+        power:
+          type: integer
+        mdc:
+          type: integer
+        mdio:
+          type: integer
+        type:
+          type: integer
+        clk_mode:
+          type: integer
+      example:
+        enabled: false
+        phy_addr: 0
+        power: -1
+        mdc: 23
+        mdio: 18
+        type: 0
+        clk_mode: 0
+    device-config-pins-display:
+      type: object
+      properties:
+        type:
+          type: integer
+        data:
+          type: integer
+        clk:
+          type: integer
+        cs:
+          type: integer
+        reset:
+          type: integer
+      example:
+        type: 0
+        data: 255
+        clk: 255
+        cs: 255
+        reset: 255
+    device-config-pins-led:
+      type: object
+      properties:
+        led0:
+          type: integer
+        led1:
+          type: integer
+      example:
+        led0: 17
+        led1: 18
+    device-config-display:
+      type: object
+      properties:
+        rotation:
+          type: integer
+        power_safe:
+          type: boolean
+        screensaver:
+          type: boolean
+        contrast:
+          type: integer
+        language:
+          type: integer
+        diagramduration:
+          type: integer
+        diagrammode:
+          type: integer
+      example:
+        rotation: 2
+        power_safe: true
+        screensaver: true
+        contrast: 60
+        language: 0
+        diagramduration: 36000
+        diagrammode: 1
+    device-config-led:
+      type: array
+      items:
+        type: string
+      properties:
+        brightness:
+          type: integer
+      example:
+          - brightness: 67
+          - brightness: 33
+  securitySchemes:
+    BasicAuth:
+      description: Basic HTTP Authentication
+      type: http
+      scheme: basic
+
