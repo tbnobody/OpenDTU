@@ -54,7 +54,6 @@ public:
     Mode getMode() const { return _mode; }
     bool usesBatteryPoweredInverter();
     bool isGovernedInverterProducing();
-    void calcNextInverterRestart();
 
 private:
     void loop();
@@ -73,8 +72,7 @@ private:
     std::deque<std::unique_ptr<PowerLimiterInverter>> _inverters;
     bool _batteryDischargeEnabled = false;
     bool _nighttimeDischarging = false;
-    uint32_t _nextInverterRestart = 0; // Values: 0->not calculated / 1->no restart configured / >1->time of next inverter restart in millis()
-    uint32_t _nextCalculateCheck = 5000; // time in millis for next NTP check to calulate restart
+    std::pair<bool, uint32_t> _nextInverterRestart = { false, 0 };
     bool _fullSolarPassThroughEnabled = false;
     bool _verboseLogging = true;
 
@@ -100,6 +98,7 @@ private:
     bool isStartThresholdReached();
     bool isStopThresholdReached();
     bool isBelowStopThreshold();
+    void calcNextInverterRestart();
     bool isFullSolarPassthroughActive();
 };
 

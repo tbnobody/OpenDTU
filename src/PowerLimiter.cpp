@@ -135,6 +135,8 @@ void PowerLimiterClass::reloadConfig()
         if (upInv) { _inverters.push_back(std::move(upInv)); }
     }
 
+    calcNextInverterRestart();
+
     _reloadConfigFlag = false;
 }
 
@@ -215,29 +217,22 @@ void PowerLimiterClass::loop()
         MessageOutput.println("[DPL::loop] ******************* ENTER **********************");
     }
 
-    // TODO(schlimmchen): comparison breaks when millis() wraps around.
-    // Check if next inverter restart time is reached
-    if ((_nextInverterRestart > 1) && (_nextInverterRestart <= millis())) {
-        MessageOutput.println("[DPL::loop] send inverter restart");
+    auto autoRestartInverters = [this]() -> void {
+        if (!_nextInverterRestart.first) { return; } // no automatic restarts
+
+        auto constexpr halfOfAllMillis = std::numeric_limits<uint32_t>::max() / 2;
+        auto diff = _nextInverterRestart.second - millis();
+        if (diff < halfOfAllMillis) { return; }
+
+        MessageOutput.println("[DPL::loop] send inverter restart command");
         for (auto& upInv : _inverters) {
             if (!upInv->isSolarPowered()) { upInv->restart(); }
         }
-        calcNextInverterRestart();
-    }
 
-    // Check if NTP time is set and next inverter restart not calculated yet
-    if ((config.PowerLimiter.RestartHour >= 0)  && (_nextInverterRestart == 0) ) {
-        // check every 5 seconds
-        if (_nextCalculateCheck < millis()) {
-            struct tm timeinfo;
-            if (getLocalTime(&timeinfo, 5)) {
-                calcNextInverterRestart();
-            } else {
-                MessageOutput.println("[DPL::loop] inverter restart calculation: NTP not ready");
-                _nextCalculateCheck += 5000;
-            }
-        }
-    }
+        calcNextInverterRestart();
+    };
+
+    autoRestartInverters();
 
     auto getBatteryPower = [this,&config]() -> bool {
         if (!usesBatteryPoweredInverter()) { return false; }
@@ -775,44 +770,51 @@ bool PowerLimiterClass::isBelowStopThreshold()
     );
 }
 
-/// @brief calculate next inverter restart in millis
 void PowerLimiterClass::calcNextInverterRestart()
 {
     auto const& config = Configuration.get();
 
-    // first check if restart is configured at all
     if (config.PowerLimiter.RestartHour < 0) {
-        _nextInverterRestart = 1;
-        MessageOutput.println("[DPL::calcNextInverterRestart] _nextInverterRestart disabled");
+        _nextInverterRestart = { false, 0 };
+        MessageOutput.println("[DPL::calcNextInverterRestart] automatic inverter restart disabled");
         return;
     }
 
-    // read time from timeserver, if time is not synced then return
     struct tm timeinfo;
-    if (getLocalTime(&timeinfo, 5)) {
-        // calculation first step is offset to next restart in minutes
-        uint16_t dayMinutes = timeinfo.tm_hour * 60 + timeinfo.tm_min;
-        uint16_t targetMinutes = config.PowerLimiter.RestartHour * 60;
-        if (config.PowerLimiter.RestartHour > timeinfo.tm_hour) {
-            // next restart is on the same day
-            _nextInverterRestart = targetMinutes - dayMinutes;
-        } else {
-            // next restart is on next day
-            _nextInverterRestart = 1440 - dayMinutes + targetMinutes;
-        }
-        if (_verboseLogging) {
-            MessageOutput.printf("[DPL::calcNextInverterRestart] Localtime read %d %d / configured RestartHour %d\r\n", timeinfo.tm_hour, timeinfo.tm_min, config.PowerLimiter.RestartHour);
-            MessageOutput.printf("[DPL::calcNextInverterRestart] dayMinutes %d / targetMinutes %d\r\n", dayMinutes, targetMinutes);
-            MessageOutput.printf("[DPL::calcNextInverterRestart] next inverter restart in %d minutes\r\n", _nextInverterRestart);
-        }
-        // then convert unit for next restart to milliseconds and add current uptime millis()
-        _nextInverterRestart *= 60000;
-        _nextInverterRestart += millis();
+    getLocalTime(&timeinfo, 5); // always succeeds as we call this method only
+                                // from the DPL loop *after* we already made
+                                // sure that time information is available.
+
+    // calculation first step is offset to next restart in minutes
+    uint16_t dayMinutes = timeinfo.tm_hour * 60 + timeinfo.tm_min;
+    uint16_t targetMinutes = config.PowerLimiter.RestartHour * 60;
+    uint32_t restartMillis = 0;
+    if (config.PowerLimiter.RestartHour > timeinfo.tm_hour) {
+        // next restart is on the same day
+        restartMillis = targetMinutes - dayMinutes;
     } else {
-        MessageOutput.println("[DPL::calcNextInverterRestart] getLocalTime not successful, no calculation");
-        _nextInverterRestart = 0;
+        // next restart is on next day
+        restartMillis = 1440 - dayMinutes + targetMinutes;
     }
-    MessageOutput.printf("[DPL::calcNextInverterRestart] _nextInverterRestart @ %d millis\r\n", _nextInverterRestart);
+
+    if (_verboseLogging) {
+        MessageOutput.printf("[DPL::calcNextInverterRestart] Localtime "
+                "read %02d:%02d / configured RestartHour %d\r\n", timeinfo.tm_hour,
+                timeinfo.tm_min, config.PowerLimiter.RestartHour);
+        MessageOutput.printf("[DPL::calcNextInverterRestart] dayMinutes %d / "
+                "targetMinutes %d\r\n", dayMinutes, targetMinutes);
+        MessageOutput.printf("[DPL::calcNextInverterRestart] next inverter "
+                "restart in %d minutes\r\n", restartMillis);
+    }
+
+    // convert unit for next restart to milliseconds and add current uptime
+    restartMillis *= 60000;
+    restartMillis += millis();
+
+    MessageOutput.printf("[DPL::calcNextInverterRestart] next inverter "
+            "restart @ %d millis\r\n", restartMillis);
+
+    _nextInverterRestart = { true, restartMillis };
 }
 
 bool PowerLimiterClass::isFullSolarPassthroughActive()
