@@ -1,6 +1,7 @@
 export interface PowerLimiterInverterInfo {
     serial: string;
     pos: number;
+    order: number;
     name: string;
     poll_enable: boolean;
     poll_enable_night: boolean;

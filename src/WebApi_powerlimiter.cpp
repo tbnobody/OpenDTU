@@ -60,6 +60,7 @@ void WebApiPowerLimiterClass::onMetaData(AsyncWebServerRequest* request)
         JsonObject obj = inverters.add<JsonObject>();
         obj["serial"] = inv->serialString();
         obj["pos"] = i;
+        obj["order"] = config.Inverter[i].Order;
         obj["name"] = String(config.Inverter[i].Name);
         obj["poll_enable"] = config.Inverter[i].Poll_Enable;
         obj["poll_enable_night"] = config.Inverter[i].Poll_Enable_Night;

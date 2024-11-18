@@ -651,6 +651,12 @@ export default defineComponent({
                 inverters.push(newInv);
             }
 
+            inverters = inverters.sort((a, b) => {
+                const orderA = this.getInverterInfo(a.serial).order;
+                const orderB = this.getInverterInfo(b.serial).order;
+                return orderA < orderB ? -1 : 1;
+            });
+
             return inverters;
         },
         savePowerLimiterConfig(e: Event) {
