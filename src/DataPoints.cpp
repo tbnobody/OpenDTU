@@ -1,8 +1,6 @@
 #include <stdio.h>
 
-#include "JkBmsDataPoints.h"
-
-namespace JkBms {
+#include "DataPoints.h"
 
 static char conversionBuffer[16];
 
@@ -30,7 +28,7 @@ std::string dataPointValueToStr(bool const& v) {
 }
 
 template<>
-std::string dataPointValueToStr(tCells const& v) {
+std::string dataPointValueToStr(tCellVoltages const& v) {
     std::string res;
     res.reserve(v.size()*(2+2+1+4)); // separator, index, equal sign, value
     res += "(";
@@ -44,20 +42,3 @@ std::string dataPointValueToStr(tCells const& v) {
     res += ")";
     return std::move(res);
 }
-
-void DataPointContainer::updateFrom(DataPointContainer const& source)
-{
-    for (auto iter = source.cbegin(); iter != source.cend(); ++iter) {
-        auto pos = _dataPoints.find(iter->first);
-
-        if (pos != _dataPoints.end()) {
-            // do not update existing data points with the same value
-            if (pos->second == iter->second) { continue; }
-
-            _dataPoints.erase(pos);
-        }
-        _dataPoints.insert(*iter);
-    }
-}
-
-} /* namespace JkBms */

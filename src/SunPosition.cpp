@@ -7,6 +7,8 @@
 #include "Utils.h"
 #include <Arduino.h>
 
+#define CALC_UNIQUE_ID (((timeinfo.tm_year << 9) | (timeinfo.tm_mon << 5) | timeinfo.tm_mday) << 1 | timeinfo.tm_isdst)
+
 SunPositionClass SunPosition;
 
 SunPositionClass::SunPositionClass()
@@ -57,7 +59,7 @@ bool SunPositionClass::checkRecalcDayChanged() const
     time(&now);
     localtime_r(&now, &timeinfo); // don't use getLocalTime() as there could be a delay of 10ms
 
-    const uint32_t ymd = (timeinfo.tm_year << 9) | (timeinfo.tm_mon << 5) | timeinfo.tm_mday;
+    const uint32_t ymd = CALC_UNIQUE_ID;
 
     return _lastSunPositionCalculatedYMD != ymd;
 }
@@ -67,7 +69,7 @@ void SunPositionClass::updateSunData()
     struct tm timeinfo;
     const bool gotLocalTime = getLocalTime(&timeinfo, 5);
 
-    _lastSunPositionCalculatedYMD = (timeinfo.tm_year << 9) | (timeinfo.tm_mon << 5) | timeinfo.tm_mday;
+    _lastSunPositionCalculatedYMD = CALC_UNIQUE_ID;
     setDoRecalc(false);
 
     if (!gotLocalTime) {

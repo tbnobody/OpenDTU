@@ -45,7 +45,7 @@
                                 v-bind:key="section"
                                 class="col order-0"
                             >
-                                <div class="card" :class="{ 'border-info': true }">
+                                <div class="card card-table" :class="{ 'border-info': true }">
                                     <div class="card-header text-bg-info">{{ $t('battery.' + section) }}</div>
                                     <div class="card-body">
                                         <div class="table-responsive">
@@ -53,7 +53,7 @@
                                                 <thead>
                                                     <tr>
                                                         <th scope="col">{{ $t('battery.Property') }}</th>
-                                                        <th style="text-align: right" scope="col">
+                                                        <th class="value" scope="col">
                                                             {{ $t('battery.Value') }}
                                                         </th>
                                                         <th scope="col">{{ $t('battery.Unit') }}</th>
@@ -62,7 +62,7 @@
                                                 <tbody>
                                                     <tr v-for="(prop, key) in values" v-bind:key="key">
                                                         <th scope="row">{{ $t('battery.' + key) }}</th>
-                                                        <td style="text-align: right">
+                                                        <td class="value">
                                                             <template v-if="isStringValue(prop) && prop.translate">
                                                                 {{ $t('battery.' + prop.value) }}
                                                             </template>
@@ -91,7 +91,7 @@
                                 </div>
                             </div>
                             <div class="col order-1" v-show="batteryData.showIssues">
-                                <div class="card">
+                                <div class="card card-table">
                                     <div :class="{ 'card-header': true, 'border-bottom-0': maxIssueValue === 0 }">
                                         <div class="d-flex flex-row justify-content-between align-items-baseline">
                                             {{ $t('battery.issues') }}

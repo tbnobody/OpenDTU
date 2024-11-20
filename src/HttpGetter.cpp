@@ -83,7 +83,7 @@ HttpRequestResult HttpGetter::performGetRequest()
     // depth at https://github.com/espressif/esp-idf/issues/2507#issuecomment-761836300
     // in conclusion: we cannot rely on _upHttpClient->begin(*wifiClient, url) to resolve
     // IP adresses. have to do it manually.
-    IPAddress ipaddr((uint32_t)0);
+    IPAddress ipaddr(static_cast<uint32_t>(0));
 
     if (!ipaddr.fromString(_host)) {
         // host is not an IP address, so try to resolve the name to an address.

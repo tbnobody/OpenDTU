@@ -65,7 +65,7 @@ void MqttHandlePowerLimiterClass::loop()
 {
     std::unique_lock<std::mutex> mqttLock(_mqttMutex);
 
-    const CONFIG_T& config = Configuration.get();
+    auto const& config = Configuration.get();
 
     if (!config.PowerLimiter.Enabled) {
         _mqttCallbacks.clear();
@@ -87,15 +87,15 @@ void MqttHandlePowerLimiterClass::loop()
 
     auto val = static_cast<unsigned>(PowerLimiter.getMode());
     MqttSettings.publish("powerlimiter/status/mode", String(val));
-    
-    MqttSettings.publish("powerlimiter/status/upper_power_limit", String(config.PowerLimiter.UpperPowerLimit));
+
+    MqttSettings.publish("powerlimiter/status/upper_power_limit", String(config.PowerLimiter.TotalUpperPowerLimit));
 
     MqttSettings.publish("powerlimiter/status/target_power_consumption", String(config.PowerLimiter.TargetPowerConsumption));
 
     MqttSettings.publish("powerlimiter/status/inverter_update_timeouts", String(PowerLimiter.getInverterUpdateTimeouts()));
 
     // no thresholds are relevant for setups without a battery
-    if (config.PowerLimiter.IsInverterSolarPowered) { return; }
+    if (!PowerLimiter.usesBatteryPoweredInverter()) { return; }
 
     MqttSettings.publish("powerlimiter/status/threshold/voltage/start", String(config.PowerLimiter.VoltageStartThreshold));
     MqttSettings.publish("powerlimiter/status/threshold/voltage/stop", String(config.PowerLimiter.VoltageStopThreshold));
@@ -118,8 +118,6 @@ void MqttHandlePowerLimiterClass::loop()
 
 void MqttHandlePowerLimiterClass::onMqttCmd(MqttPowerLimiterCommand command, const espMqttClientTypes::MessageProperties& properties, const char* topic, const uint8_t* payload, size_t len, size_t index, size_t total)
 {
-    CONFIG_T& config = Configuration.get();
-
     std::string strValue(reinterpret_cast<const char*>(payload), len);
     float payload_val = -1;
     try {
@@ -132,30 +130,35 @@ void MqttHandlePowerLimiterClass::onMqttCmd(MqttPowerLimiterCommand command, con
     }
     const int intValue = static_cast<int>(payload_val);
 
-    std::lock_guard<std::mutex> mqttLock(_mqttMutex);
+    if (command == MqttPowerLimiterCommand::Mode) {
+        std::lock_guard<std::mutex> mqttLock(_mqttMutex);
+        using Mode = PowerLimiterClass::Mode;
+        Mode mode = static_cast<Mode>(intValue);
+        if (mode == Mode::UnconditionalFullSolarPassthrough) {
+            MessageOutput.println("Power limiter unconditional full solar PT");
+            _mqttCallbacks.push_back(std::bind(&PowerLimiterClass::setMode,
+                        &PowerLimiter, Mode::UnconditionalFullSolarPassthrough));
+        } else if (mode == Mode::Disabled) {
+            MessageOutput.println("Power limiter disabled (override)");
+            _mqttCallbacks.push_back(std::bind(&PowerLimiterClass::setMode,
+                        &PowerLimiter, Mode::Disabled));
+        } else if (mode == Mode::Normal) {
+            MessageOutput.println("Power limiter normal operation");
+            _mqttCallbacks.push_back(std::bind(&PowerLimiterClass::setMode,
+                        &PowerLimiter, Mode::Normal));
+        } else {
+            MessageOutput.printf("PowerLimiter - unknown mode %d\r\n", intValue);
+        }
+        return;
+    }
+
+    auto guard = Configuration.getWriteGuard();
+    auto& config = guard.getConfig();
 
     switch (command) {
         case MqttPowerLimiterCommand::Mode:
-            {
-                using Mode = PowerLimiterClass::Mode;
-                Mode mode = static_cast<Mode>(intValue);
-                if (mode == Mode::UnconditionalFullSolarPassthrough) {
-                    MessageOutput.println("Power limiter unconditional full solar PT");
-                    _mqttCallbacks.push_back(std::bind(&PowerLimiterClass::setMode,
-                                &PowerLimiter, Mode::UnconditionalFullSolarPassthrough));
-                } else if (mode == Mode::Disabled) {
-                    MessageOutput.println("Power limiter disabled (override)");
-                    _mqttCallbacks.push_back(std::bind(&PowerLimiterClass::setMode,
-                                &PowerLimiter, Mode::Disabled));
-                } else if (mode == Mode::Normal) {
-                    MessageOutput.println("Power limiter normal operation");
-                    _mqttCallbacks.push_back(std::bind(&PowerLimiterClass::setMode,
-                                &PowerLimiter, Mode::Normal));
-                } else {
-                    MessageOutput.printf("PowerLimiter - unknown mode %d\r\n", intValue);
-                }
-                return;
-            }
+            // handled separately above to avoid locking two mutexes
+            break;
         case MqttPowerLimiterCommand::BatterySoCStartThreshold:
             if (config.PowerLimiter.BatterySocStartThreshold == intValue) { return; }
             MessageOutput.printf("Setting battery SoC start threshold to: %d %%\r\n", intValue);
@@ -192,9 +195,9 @@ void MqttHandlePowerLimiterClass::onMqttCmd(MqttPowerLimiterCommand command, con
             config.PowerLimiter.FullSolarPassThroughStopVoltage = payload_val;
             break;
         case MqttPowerLimiterCommand::UpperPowerLimit:
-            if (config.PowerLimiter.UpperPowerLimit == intValue) { return; }
-            MessageOutput.printf("Setting upper power limit to: %d W\r\n", intValue);
-            config.PowerLimiter.UpperPowerLimit = intValue;
+            if (config.PowerLimiter.TotalUpperPowerLimit == intValue) { return; }
+            MessageOutput.printf("Setting total upper power limit to: %d W\r\n", intValue);
+            config.PowerLimiter.TotalUpperPowerLimit = intValue;
             break;
         case MqttPowerLimiterCommand::TargetPowerConsumption:
             if (config.PowerLimiter.TargetPowerConsumption == intValue) { return; }

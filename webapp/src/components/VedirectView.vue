@@ -64,7 +64,7 @@
                     <div class="card-body">
                         <div class="row flex-row flex-wrap align-items-start g-3">
                             <div v-for="(values, section) in item.values" v-bind:key="section" class="col order-0">
-                                <div class="card" :class="{ 'border-info': section === 'device' }">
+                                <div class="card card-table" :class="{ 'border-info': section === 'device' }">
                                     <div :class="section === 'device' ? 'card-header text-bg-info' : 'card-header'">
                                         {{ $t('vedirecthome.section_' + section) }}
                                     </div>
@@ -74,7 +74,7 @@
                                                 <thead>
                                                     <tr>
                                                         <th scope="col">{{ $t('vedirecthome.Property') }}</th>
-                                                        <th style="text-align: right" scope="col">
+                                                        <th class="value" scope="col">
                                                             {{ $t('vedirecthome.Value') }}
                                                         </th>
                                                         <th scope="col">{{ $t('vedirecthome.Unit') }}</th>
@@ -85,7 +85,7 @@
                                                         <th scope="row">
                                                             {{ $t('vedirecthome.' + section + '.' + key) }}
                                                         </th>
-                                                        <td style="text-align: right">
+                                                        <td class="value">
                                                             <template v-if="typeof prop === 'string'">
                                                                 {{ prop }}
                                                             </template>

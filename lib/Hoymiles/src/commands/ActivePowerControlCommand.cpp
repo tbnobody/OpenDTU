@@ -85,13 +85,13 @@ bool ActivePowerControlCommand::handleResponse(const fragment_t fragment[], cons
 
 float ActivePowerControlCommand::getLimit() const
 {
-    const float l = (((uint16_t)_payload[12] << 8) | _payload[13]);
+    const float l = (static_cast<uint16_t>(_payload[12]) << 8) | _payload[13];
     return l / 10;
 }
 
 PowerLimitControlType ActivePowerControlCommand::getType()
 {
-    return (PowerLimitControlType)(((uint16_t)_payload[14] << 8) | _payload[15]);
+    return (PowerLimitControlType)((static_cast<uint16_t>(_payload[14]) << 8) | _payload[15]);
 }
 
 void ActivePowerControlCommand::gotTimeout()

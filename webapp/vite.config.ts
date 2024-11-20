@@ -19,7 +19,7 @@ try {
 }
 
 // https://vitejs.dev/config/
-export default defineConfig({
+export default defineConfig(({ command }) => { return {
   plugins: [
     vue(),
     viteCompression({ deleteOriginFile: true, threshold: 0 }),
@@ -27,6 +27,7 @@ export default defineConfig({
     VueI18nPlugin({
         /* options */
         include: path.resolve(path.dirname(fileURLToPath(import.meta.url)), './src/locales/**.json'),
+        runtimeOnly: false,
         fullInstall: false,
         forceStringify: true,
         strictMessage: false,
@@ -55,9 +56,10 @@ export default defineConfig({
         assetFileNames: "assets/[name].[ext]",
       },
     },
+    target: 'es2022',
   },
   esbuild: {
-    drop: ['console', 'debugger'],
+    drop: command !== 'serve' ? ['console', 'debugger'] : []
   },
   server: {
     proxy: {
@@ -86,4 +88,4 @@ export default defineConfig({
       }
     }
   }
-})
+} })

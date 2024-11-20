@@ -49,6 +49,13 @@ static const byteAssign_t byteAssignment[] = {
     { TYPE_INV, CH0, FLD_EFF, UNIT_PCT, CALC_TOTAL_EFF, 0, CMD_CALC, false, 3 }
 };
 
+static const channelMetaData_t channelMetaData[] = {
+    { CH0, MPPT_A },
+    { CH1, MPPT_A },
+    { CH2, MPPT_B },
+    { CH3, MPPT_B }
+};
+
 HM_4CH::HM_4CH(HoymilesRadio* radio, const uint64_t serial)
     : HM_Abstract(radio, serial) {};
 
@@ -57,10 +64,10 @@ bool HM_4CH::isValidSerial(const uint64_t serial)
     // serial >= 0x116100000000 && serial <= 0x1161ffffffff
 
     uint8_t preId[2];
-    preId[0] = (uint8_t)(serial >> 40);
-    preId[1] = (uint8_t)(serial >> 32);
+    preId[0] = static_cast<uint8_t>(serial >> 40);
+    preId[1] = static_cast<uint8_t>(serial >> 32);
 
-    if ((uint8_t)(((((uint16_t)preId[0] << 8) | preId[1]) >> 4) & 0xff) == 0x16) {
+    if (static_cast<uint8_t>((((static_cast<uint16_t>(preId[0]) << 8) | preId[1]) >> 4) & 0xff) == 0x16) {
         return true;
     }
 
@@ -85,4 +92,14 @@ const byteAssign_t* HM_4CH::getByteAssignment() const
 uint8_t HM_4CH::getByteAssignmentSize() const
 {
     return sizeof(byteAssignment) / sizeof(byteAssignment[0]);
+}
+
+const channelMetaData_t* HM_4CH::getChannelMetaData() const
+{
+    return channelMetaData;
+}
+
+uint8_t HM_4CH::getChannelMetaDataSize() const
+{
+    return sizeof(channelMetaData) / sizeof(channelMetaData[0]);
 }

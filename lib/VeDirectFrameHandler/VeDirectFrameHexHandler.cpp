@@ -8,7 +8,7 @@ HexHandler.cpp
  * 1. Use sendHexCommand() to send hex messages. Use the Victron documentation to find the parameter.
  * 2. The from class "VeDirectFrameHandler" derived class X must overwrite the function
  *    void VeDirectFrameHandler::hexDataHandler(VeDirectHexData const &data)
- *    to handle the received hex messages. All hex messages will be forwarted to function hexDataHandler()
+ *    to handle the received hex messages. All hex messages will be forwarded to function hexDataHandler()
  * 3. Analyse the content of data (struct VeDirectHexData) to check if a message fits.
  *
  * 2024.03.08 - 0.4 - adds the ability to send hex commands and to parse hex messages
@@ -63,9 +63,9 @@ static uint32_t AsciiHexLE2Int(const char *ascii, const uint8_t anz) {
  * disassembleHexData()
  * analysis the hex message and extract: response, address, flags and value/text
  * buffer:  pointer to message (ascii hex little endian format)
- * data:    disassembeled message
- * return:  true = successful disassembeld, false = hex sum fault or message
- *          do not aligin with VE.Diekt syntax
+ * data:    disassembled message
+ * return:  true = successful disassembled, false = hex sum fault or message
+ *          do not align with VE.Direct syntax
  */
 template<typename T>
 bool VeDirectFrameHandler<T>::disassembleHexData(VeDirectHexData &data) {
@@ -164,14 +164,14 @@ static String Int2HexLEString(uint32_t value, uint8_t anz) {
  * addr:    register address, default 0
  * value:   value to write into a register, default 0
  * valsize: size of the value, 8, 16 or 32 bit, default 0
- * return:  true = message assembeld and send, false = it was not possible to put the message together
+ * return:  true = message assembled and send, false = it was not possible to put the message together
  * SAMPLE:  ping command: sendHexCommand(PING),
  *          read total DC input power sendHexCommand(GET, 0xEDEC)
  *          set Charge current limit 10A sendHexCommand(SET, 0x2015, 64, 16)
  *
  * WARNING: some values are stored in non-volatile memory. Continuous writing, for example from a control loop, will
  *          lead to early failure.
- *          On MPPT for example 0xEDE0 - 0xEDFF. Check the Vivtron doc "BlueSolar-HEX-protocol.pdf"
+ *          On MPPT for example 0xEDE0 - 0xEDFF. Check the Victron doc "BlueSolar-HEX-protocol.pdf"
  */
 template<typename T>
 bool VeDirectFrameHandler<T>::sendHexCommand(VeDirectHexCommand cmd, VeDirectHexRegister addr, uint32_t value, uint8_t valsize) {

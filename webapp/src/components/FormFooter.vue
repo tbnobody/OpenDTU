@@ -7,3 +7,9 @@
         <button type="submit" class="btn btn-primary">{{ $t('base.Save') }}</button>
     </div>
 </template>
+
+<script lang="ts">
+export default {
+    emits: ['reload'],
+};
+</script>

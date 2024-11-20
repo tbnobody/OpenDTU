@@ -11,6 +11,8 @@ typedef struct {
     uint16_t productID_PID = 0;             // product id
     char serialNr_SER[VE_MAX_VALUE_LEN];    // serial number
     char firmwareVer_FW[VE_MAX_VALUE_LEN];  // firmware release number
+    // some devices use "FWE" instead of "FW" for the firmware version.
+    char firmwareVer_FWE[VE_MAX_VALUE_LEN]; // firmware release number (alternative field)
     uint32_t batteryVoltage_V_mV = 0;       // battery voltage in mV
     int32_t batteryCurrent_I_mA = 0;        // battery current in mA (can be negative)
     float mpptEfficiency_Percent = 0;       // efficiency in percent (calculated, moving average)
@@ -26,8 +28,6 @@ struct veMpptStruct : veStruct {
     uint32_t panelVoltage_VPV_mV;       // panel voltage in mV
     uint32_t panelCurrent_mA;           // panel current in mA (calculated)
     int16_t  batteryOutputPower_W;      // battery output power in W (calculated, can be negative if load output is used)
-    uint32_t loadCurrent_IL_mA;         // Load current in mA (Available only for models with a load output)
-    bool     loadOutputState_LOAD;      // virtual load output state (on if battery voltage reaches upper limit, off if battery reaches lower limit)
     uint8_t  currentState_CS;           // current state of operation e.g. OFF or Bulk
     uint8_t  errorCode_ERR;             // error code
     uint32_t offReason_OR;              // off reason
@@ -38,6 +38,15 @@ struct veMpptStruct : veStruct {
     uint32_t yieldYesterday_H22_Wh;     // yield yesterday Wh
     uint16_t maxPowerYesterday_H23_W;   // maximum power yesterday W
 
+    // these are optional values communicated through the TEXT protocol. the pair's first
+    // value is the timestamp the respective info was last received. if it is
+    // zero, the value is deemed invalid. the timestamp is reset if no current
+    // value could be retrieved.
+    std::pair<uint32_t, bool> loadOutputState_LOAD;     // physical load output or virtual load output state (on if battery voltage
+                                                        // reaches upper limit, off if battery reaches lower limit)
+    std::pair<uint32_t, uint32_t> loadCurrent_IL_mA;    // Load current in mA (Available only for models with a physical load output)
+    std::pair<uint32_t, bool> relayState_RELAY;         // relay alarm state. On=true, Off=false
+
     // these are values communicated through the HEX protocol. the pair's first
     // value is the timestamp the respective info was last received. if it is
     // zero, the value is deemed invalid. the timestamp is reset if no current
@@ -45,6 +54,8 @@ struct veMpptStruct : veStruct {
     std::pair<uint32_t, int32_t> MpptTemperatureMilliCelsius;
     std::pair<uint32_t, int32_t> SmartBatterySenseTemperatureMilliCelsius;
     std::pair<uint32_t, uint32_t> NetworkTotalDcInputPowerMilliWatts;
+    std::pair<uint32_t, uint32_t> BatteryAbsorptionMilliVolt;
+    std::pair<uint32_t, uint32_t> BatteryFloatMilliVolt;
     std::pair<uint32_t, uint8_t> NetworkInfo;
     std::pair<uint32_t, uint8_t> NetworkMode;
     std::pair<uint32_t, uint8_t> NetworkStatus;
@@ -121,7 +132,9 @@ enum class VeDirectHexRegister : uint16_t {
     DeviceState = 0x0201,
     RemoteControlUsed = 0x0202,
     PanelVoltage = 0xEDBB,
+    PanelPower = 0xEDBC,
     ChargerVoltage = 0xEDD5,
+    ChargerCurrent = 0xEDD7,
     NetworkTotalDcInputPower = 0x2027,
     ChargeControllerTemperature = 0xEDDB,
     SmartBatterySenseTemperature = 0xEDEC,
@@ -129,7 +142,14 @@ enum class VeDirectHexRegister : uint16_t {
     NetworkMode = 0x200E,
     NetworkStatus = 0x200F,
     HistoryTotal = 0x104F,
-    HistoryMPPTD30 = 0x10BE
+    HistoryMPPTD30 = 0x10BE,
+    BatteryAbsorptionVoltage = 0xEDF7,
+    BatteryFloatVoltage = 0xEDF6,
+    TotalChargeCurrent = 0x2013,
+    ChargeStateElapsedTime= 0x2007,
+    BatteryVoltageSense = 0x2002,
+    LoadCurrent = 0xEDAD,
+    LoadOutputVoltage = 0xEDA9
 };
 
 struct VeDirectHexData {

@@ -22,11 +22,18 @@ void VeDirectMpptController::init(int8_t rx, int8_t tx, Print* msgOut,
 bool VeDirectMpptController::processTextDataDerived(std::string const& name, std::string const& value)
 {
 	if (name == "IL") {
-		_tmpFrame.loadCurrent_IL_mA = atol(value.c_str());
+		_tmpFrame.loadCurrent_IL_mA.second = atol(value.c_str());
+        _tmpFrame.loadCurrent_IL_mA.first = millis();
 		return true;
 	}
 	if (name == "LOAD") {
-		_tmpFrame.loadOutputState_LOAD = (value == "ON");
+		_tmpFrame.loadOutputState_LOAD.second = (value == "ON");
+        _tmpFrame.loadOutputState_LOAD.first = millis();
+		return true;
+	}
+    if (name == "RELAY") {
+		_tmpFrame.relayState_RELAY.second = (value == "ON");
+        _tmpFrame.relayState_RELAY.first = millis();
 		return true;
 	}
 	if (name == "CS") {
@@ -97,51 +104,46 @@ void VeDirectMpptController::frameValidEvent() {
 	}
 
 	// calculation of the MPPT efficiency
-	float totalPower_W = (_tmpFrame.loadCurrent_IL_mA / 1000.0f + _tmpFrame.batteryCurrent_I_mA / 1000.0f) * _tmpFrame.batteryVoltage_V_mV /1000.0f;
+    float loadCurrent = (_tmpFrame.loadCurrent_IL_mA.first > 0) ? _tmpFrame.loadCurrent_IL_mA.second / 1000.0f : 0.0f;
+	float totalPower_W = (loadCurrent + _tmpFrame.batteryCurrent_I_mA / 1000.0f) * _tmpFrame.batteryVoltage_V_mV / 1000.0f;
 	if (_tmpFrame.panelPower_PPV_W > 0) {
 		_efficiency.addNumber(totalPower_W * 100.0f / _tmpFrame.panelPower_PPV_W);
 		_tmpFrame.mpptEfficiency_Percent = _efficiency.getAverage();
 	} else {
 		_tmpFrame.mpptEfficiency_Percent = 0.0f;
 	}
-
-	if (!_canSend) { return; }
-
-	// Copy from the "VE.Direct Protocol" documentation
-	// For firmware version v1.52 and below, when no VE.Direct queries are sent to the device, the
-	// charger periodically sends human readable (TEXT) data to the serial port. For firmware
-	// versions v1.53 and above, the charger always periodically sends TEXT data to the serial port.
-	// --> We just use hex commandes for firmware >= 1.53 to keep text messages alive
-	if (_tmpFrame.getFwVersionAsInteger() < 153) { return; }
-
-	using Command = VeDirectHexCommand;
-	using Register = VeDirectHexRegister;
-
-	sendHexCommand(Command::GET, Register::ChargeControllerTemperature);
-	sendHexCommand(Command::GET, Register::SmartBatterySenseTemperature);
-	sendHexCommand(Command::GET, Register::NetworkTotalDcInputPower);
-
-#ifdef PROCESS_NETWORK_STATE
-	sendHexCommand(Command::GET, Register::NetworkInfo);
-	sendHexCommand(Command::GET, Register::NetworkMode);
-	sendHexCommand(Command::GET, Register::NetworkStatus);
-#endif // PROCESS_NETWORK_STATE
 }
 
 
 void VeDirectMpptController::loop()
 {
+	// First we send HEX-Commands (timing improvement)
+	if (isHexCommandPossible()) {
+		sendNextHexCommandFromQueue();
+	}
+
+	// Second we read Text- and HEX-Messages
 	VeDirectFrameHandler::loop();
 
+	// Note: Room for improvement, longer data valid time for slow changing values?
 	auto resetTimestamp = [this](auto& pair) {
 		if (pair.first > 0 && (millis() - pair.first) > (10 * 1000)) {
 			pair.first = 0;
 		}
 	};
 
+    // Check if optional TEXT-Data is outdated
+    resetTimestamp(_tmpFrame.loadOutputState_LOAD);
+	resetTimestamp(_tmpFrame.loadCurrent_IL_mA);
+    resetTimestamp(_tmpFrame.relayState_RELAY);
+
+	// Third we check if HEX-Data is outdated
+    if (!isHexCommandPossible()) { return; }
 	resetTimestamp(_tmpFrame.MpptTemperatureMilliCelsius);
 	resetTimestamp(_tmpFrame.SmartBatterySenseTemperatureMilliCelsius);
 	resetTimestamp(_tmpFrame.NetworkTotalDcInputPowerMilliWatts);
+	resetTimestamp(_tmpFrame.BatteryFloatMilliVolt);
+	resetTimestamp(_tmpFrame.BatteryAbsorptionMilliVolt);
 
 #ifdef PROCESS_NETWORK_STATE
 	resetTimestamp(_tmpFrame.NetworkInfo);
@@ -153,14 +155,19 @@ void VeDirectMpptController::loop()
 
 /*
  * hexDataHandler()
- * analyse the content of VE.Direct hex messages
- * Handels the received hex data from the MPPT
+ * analyze the content of VE.Direct hex messages
+ * handles the received hex data from the MPPT
  */
 bool VeDirectMpptController::hexDataHandler(VeDirectHexData const &data) {
 	if (data.rsp != VeDirectHexResponse::GET &&
 			data.rsp != VeDirectHexResponse::ASYNC) { return false; }
 
 	auto regLog = static_cast<uint16_t>(data.addr);
+
+	// we check whether the answer matches a previously asked query
+	if ((data.rsp == VeDirectHexResponse::GET) && (data.addr == _hexQueue[_sendQueueNr]._hexRegister)) {
+		_sendTimeout = 0;
+	}
 
 	switch (data.addr) {
 		case VeDirectHexRegister::ChargeControllerTemperature:
@@ -215,6 +222,29 @@ bool VeDirectMpptController::hexDataHandler(VeDirectHexData const &data) {
 			return true;
 			break;
 
+		case VeDirectHexRegister::BatteryAbsorptionVoltage:
+			_tmpFrame.BatteryAbsorptionMilliVolt =
+				{ millis(), static_cast<uint32_t>(data.value) * 10 };
+			if (_verboseLogging) {
+				_msgOut->printf("%s Hex Data: MPPT Absorption Voltage (0x%04X): %.2fV\r\n",
+						_logId, regLog,
+						_tmpFrame.BatteryAbsorptionMilliVolt.second / 1000.0);
+			}
+			return true;
+			break;
+
+		case VeDirectHexRegister::BatteryFloatVoltage:
+			_tmpFrame.BatteryFloatMilliVolt =
+				{ millis(), static_cast<uint32_t>(data.value) * 10 };
+
+			if (_verboseLogging) {
+				_msgOut->printf("%s Hex Data: MPPT Float Voltage (0x%04X): %.2fV\r\n",
+						_logId, regLog,
+						_tmpFrame.BatteryFloatMilliVolt.second / 1000.0);
+			}
+			return true;
+			break;
+
 #ifdef PROCESS_NETWORK_STATE
 		case VeDirectHexRegister::NetworkInfo:
 			_tmpFrame.NetworkInfo =
@@ -256,4 +286,67 @@ bool VeDirectMpptController::hexDataHandler(VeDirectHexData const &data) {
 	}
 
 	return false;
+}
+
+
+/*
+ * isHexCommandPossible()
+ * return: true = yes we can use Hex-Commands
+ */
+bool VeDirectMpptController::isHexCommandPossible(void) {
+	// Copy from the "VE.Direct Protocol" documentation
+	// For firmware version v1.52 and below, when no VE.Direct queries are sent to the device, the
+	// charger periodically sends human readable (TEXT) data to the serial port. For firmware
+	// versions v1.53 and above, the charger always periodically sends TEXT data to the serial port.
+	// --> We just use hex commands for firmware >= 1.53 to keep text messages alive
+	return (_canSend && (_tmpFrame.getFwVersionAsInteger() >= 153));
+}
+
+
+/*
+ * sendNextHexCommandFromQueue()
+ * send one Hex Commands from the Hex Command Queue
+ * handles the received hex data from the MPPT
+ */
+void VeDirectMpptController::sendNextHexCommandFromQueue(void) {
+	// It seems some commands get lost if we send to fast the next command.
+	// maybe we produce an overflow on the MPPT receive buffer or we have to
+	// wait for the MPPT answer before we can send the next command. We only
+	// send a new query in VE.Direct idle state and if no query is pending. In
+	// case we do not get an answer we send the next query from the queue after
+	// a timeout of 500ms. NOTE: _sendTimeout will be set to 0 after receiving
+	// an answer, see function hexDataHandler().
+	auto millisTime = millis();
+	if (isStateIdle() && ((millisTime - _hexQueue[_sendQueueNr]._lastSendTime) > _sendTimeout)) {
+
+		// we do 2 loops, first for high prio commands and second for low prio commands
+		bool prio = true;
+		for (auto idy = 0; idy < 2; ++idy) {
+
+			// we start searching the queue with the next queue index
+			auto idx = _sendQueueNr + 1;
+			if (idx >= _hexQueue.size()) { idx = 0; }
+
+			do {
+				// we check if it is time to send the command again
+				if (((prio && (_hexQueue[idx]._readPeriod == HIGH_PRIO_COMMAND)) ||
+					(!prio && (_hexQueue[idx]._readPeriod != HIGH_PRIO_COMMAND))) &&
+					(millisTime - _hexQueue[idx]._lastSendTime) > (_hexQueue[idx]._readPeriod * 1000)) {
+
+					sendHexCommand(VeDirectHexCommand::GET, _hexQueue[idx]._hexRegister);
+					_hexQueue[idx]._lastSendTime = millisTime;
+
+					// we need this information to check if we get an answer, see hexDataHandler()
+					_sendTimeout = 500;
+					_sendQueueNr = idx;
+					return;
+				}
+
+				++idx;
+				if (idx == _hexQueue.size()) { idx = 0; }
+			} while (idx != _sendQueueNr);
+
+			prio = false; // second loop for low prio commands
+		}
+	}
 }

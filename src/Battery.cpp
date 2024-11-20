@@ -4,6 +4,7 @@
 #include "PylontechCanReceiver.h"
 #include "SBSCanReceiver.h"
 #include "JkBmsController.h"
+#include "JbdBmsController.h"
 #include "VictronSmartShunt.h"
 #include "MqttBattery.h"
 #include "PytesCanReceiver.h"
@@ -41,7 +42,7 @@ void BatteryClass::updateSettings()
         _upProvider = nullptr;
     }
 
-    CONFIG_T& config = Configuration.get();
+    auto const& config = Configuration.get();
     if (!config.Battery.Enabled) { return; }
 
     bool verboseLogging = config.Battery.VerboseLogging;
@@ -65,6 +66,9 @@ void BatteryClass::updateSettings()
         case 5:
             _upProvider = std::make_unique<SBSCanReceiver>();
             break;
+        case 6:
+            _upProvider = std::make_unique<JbdBms::Controller>();
+            break;
         default:
             MessageOutput.printf("[Battery] Unknown provider: %d\r\n", config.Battery.Provider);
             return;
@@ -86,19 +90,31 @@ void BatteryClass::loop()
 
 float BatteryClass::getDischargeCurrentLimit()
 {
-    CONFIG_T& config = Configuration.get();
+    auto const& config = Configuration.get();
 
     if (!config.Battery.EnableDischargeCurrentLimit) { return FLT_MAX; }
 
     auto dischargeCurrentLimit = config.Battery.DischargeCurrentLimit;
-    auto dischargeCurrentValid = dischargeCurrentLimit > 0.0f;
-
+    auto dischargeCurrentLimitValid = dischargeCurrentLimit > 0.0f;
+    auto dischargeCurrentLimitBelowSoc = config.Battery.DischargeCurrentLimitBelowSoc;
+    auto dischargeCurrentLimitBelowVoltage = config.Battery.DischargeCurrentLimitBelowVoltage;
+    auto statsSoCValid = getStats()->getSoCAgeSeconds() <= 60 && !config.PowerLimiter.IgnoreSoc;
+    auto statsSoC = statsSoCValid ? getStats()->getSoC() : 100.0; // fail open so we use voltage instead
+    auto statsVoltageValid = getStats()->getVoltageAgeSeconds() <= 60;
+    auto statsVoltage = statsVoltageValid ? getStats()->getVoltage() : 0.0; // fail closed
     auto statsCurrentLimit = getStats()->getDischargeCurrentLimit();
     auto statsLimitValid = config.Battery.UseBatteryReportedDischargeCurrentLimit
         && statsCurrentLimit >= 0.0f
         && getStats()->getDischargeCurrentLimitAgeSeconds() <= 60;
 
-    if (statsLimitValid && dischargeCurrentValid) {
+
+    if (statsSoC > dischargeCurrentLimitBelowSoc && statsVoltage > dischargeCurrentLimitBelowVoltage) {
+        // Above SoC and Voltage thresholds, ignore custom limit.
+        // Battery-provided limit will still be applied.
+        dischargeCurrentLimitValid = false;
+    }
+
+    if (statsLimitValid && dischargeCurrentLimitValid) {
         // take the lowest limit
         return min(statsCurrentLimit, dischargeCurrentLimit);
     }
@@ -107,7 +123,7 @@ float BatteryClass::getDischargeCurrentLimit()
         return statsCurrentLimit;
     }
 
-    if (dischargeCurrentValid) {
+    if (dischargeCurrentLimitValid) {
         return dischargeCurrentLimit;
     }
 

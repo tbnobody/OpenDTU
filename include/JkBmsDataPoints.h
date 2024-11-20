@@ -2,12 +2,10 @@
 
 #include <Arduino.h>
 #include <map>
-#include <optional>
-#include <string>
-#include <unordered_map>
-#include <variant>
 #include <frozen/map.h>
 #include <frozen/string.h>
+
+#include "DataPoints.h"
 
 namespace JkBms {
 
@@ -121,7 +119,7 @@ enum class DataPointLabel : uint8_t {
     ProtocolVersion = 0xc0
 };
 
-using tCells = std::map<uint8_t, uint16_t>;
+using tCells = tCellVoltages;
 
 template<DataPointLabel> struct DataPointLabelTraits;
 
@@ -206,99 +204,13 @@ LABEL_TRAIT(ProductId,                              std::string, "");
 LABEL_TRAIT(ProtocolVersion,                        uint8_t,     "");
 #undef LABEL_TRAIT
 
-class DataPoint {
-    friend class DataPointContainer;
+} /* namespace JkBms */
 
-    public:
-        using tValue = std::variant<bool, uint8_t, uint16_t, uint32_t,
-              int16_t, int32_t, std::string, tCells>;
+using JkBmsDataPoint = DataPoint<bool, uint8_t, uint16_t, uint32_t,
+              int16_t, int32_t, std::string, JkBms::tCells>;
 
-        DataPoint() = delete;
+template class DataPointContainer<JkBmsDataPoint, JkBms::DataPointLabel, JkBms::DataPointLabelTraits>;
 
-        DataPoint(DataPoint const& other)
-            : _strLabel(other._strLabel)
-            , _strValue(other._strValue)
-            , _strUnit(other._strUnit)
-            , _value(other._value)
-            , _timestamp(other._timestamp) { }
-
-        DataPoint(std::string const& strLabel, std::string const& strValue,
-                std::string const& strUnit, tValue value, uint32_t timestamp)
-            : _strLabel(strLabel)
-            , _strValue(strValue)
-            , _strUnit(strUnit)
-            , _value(std::move(value))
-            , _timestamp(timestamp) { }
-
-        std::string const& getLabelText() const { return _strLabel; }
-        std::string const& getValueText() const { return _strValue; }
-        std::string const& getUnitText() const { return _strUnit; }
-        uint32_t getTimestamp() const { return _timestamp; }
-
-        bool operator==(DataPoint const& other) const {
-            return _value == other._value;
-        }
-
-    private:
-        std::string _strLabel;
-        std::string _strValue;
-        std::string _strUnit;
-        tValue _value;
-        uint32_t _timestamp;
-};
-
-template<typename T> std::string dataPointValueToStr(T const& v);
-
-class DataPointContainer {
-    public:
-        DataPointContainer() = default;
-
-        using Label = DataPointLabel;
-        template<Label L> using Traits = JkBms::DataPointLabelTraits<L>;
-
-        template<Label L>
-        void add(typename Traits<L>::type val) {
-            _dataPoints.emplace(
-                    L,
-                    DataPoint(
-                        Traits<L>::name,
-                        dataPointValueToStr(val),
-                        Traits<L>::unit,
-                        DataPoint::tValue(std::move(val)),
-                        millis()
-                    )
-            );
-        }
-
-        // make sure add() is only called with the type expected for the
-        // respective label, no implicit conversions allowed.
-        template<Label L, typename T>
-        void add(T) = delete;
-
-        template<Label L>
-        std::optional<DataPoint const> getDataPointFor() const {
-            auto it = _dataPoints.find(L);
-            if (it == _dataPoints.end()) { return std::nullopt; }
-            return it->second;
-        }
-
-        template<Label L>
-        std::optional<typename Traits<L>::type> get() const {
-            auto optionalDataPoint = getDataPointFor<L>();
-            if (!optionalDataPoint.has_value()) { return std::nullopt; }
-            return std::get<typename Traits<L>::type>(optionalDataPoint->_value);
-        }
-
-        using tMap = std::unordered_map<Label, DataPoint const>;
-        tMap::const_iterator cbegin() const { return _dataPoints.cbegin(); }
-        tMap::const_iterator cend() const { return _dataPoints.cend(); }
-
-        // copy all data points from source into this instance, overwriting
-        // existing data points in this instance.
-        void updateFrom(DataPointContainer const& source);
-
-    private:
-        tMap _dataPoints;
-};
-
+namespace JkBms {
+    using DataPointContainer = DataPointContainer<JkBmsDataPoint, DataPointLabel, DataPointLabelTraits>;
 } /* namespace JkBms */

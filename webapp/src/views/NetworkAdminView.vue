@@ -26,7 +26,11 @@
                     type="text"
                     maxlength="32"
                 >
-                    <div class="alert alert-secondary" role="alert" v-html="$t('networkadmin.HostnameHint')"></div>
+                    <div
+                        class="alert alert-secondary mb-0 mt-3"
+                        role="alert"
+                        v-html="$t('networkadmin.HostnameHint')"
+                    ></div>
                 </InputElement>
 
                 <InputElement :label="$t('networkadmin.EnableDhcp')" v-model="networkConfigList.dhcp" type="checkbox" />
@@ -89,7 +93,7 @@
                     type="checkbox"
                 />
 
-                <div v-if="networkConfigList.syslogenabled">
+                <template v-if="networkConfigList.syslogenabled">
                     <InputElement
                         :label="$t('networkadmin.SyslogHostname')"
                         v-model="networkConfigList.sysloghostname"
@@ -104,7 +108,7 @@
                         min="1"
                         max="65535"
                     />
-                </div>
+                </template>
             </CardElement>
 
             <CardElement :text="$t('networkadmin.AdminAp')" textVariant="text-bg-primary" add-space>

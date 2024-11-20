@@ -1,40 +1,36 @@
 <template>
-    <CardElement :text="$t('pininfo.PinOverview')" textVariant="text-bg-primary">
-        <div class="table-responsive">
-            <table class="table table-hover table-condensed">
-                <thead>
-                    <tr>
-                        <th>{{ $t('pininfo.Category') }}</th>
-                        <th>{{ $t('pininfo.Name') }}</th>
-                        <th>{{ $t('pininfo.ValueSelected') }}</th>
-                        <th>{{ $t('pininfo.ValueActive') }}</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <template v-for="category in categories" :key="category">
-                        <tr v-for="(prop, prop_idx) in properties(category)" :key="prop">
-                            <td v-if="prop_idx == 0" :rowspan="properties(category).length">
-                                {{ capitalizeFirstLetter(category) }}
-                            </td>
-                            <td :class="{ 'table-danger': !isEqual(category, prop) }">
-                                {{ prop }}
-                            </td>
-                            <td>
-                                <template v-if="selectedPinAssignment && category in selectedPinAssignment">
-                                    {{ (selectedPinAssignment as any)[category][prop] }}</template
-                                >
-                            </td>
-                            <td>
-                                <template v-if="currentPinAssignment && category in currentPinAssignment">
-                                    {{ (currentPinAssignment as any)[category][prop] }}</template
-                                >
-                            </td>
-                        </tr>
-                    </template>
-                </tbody>
-            </table>
+    <div class="row flex-row flex-wrap g-3">
+        <div class="col" v-for="category in categories" :key="category">
+            <CardElement :text="capitalizeFirstLetter(category)" textVariant="text-bg-primary" table>
+                <div class="table-responsive">
+                    <table class="table table-hover table-condensed">
+                        <tbody>
+                            <tr>
+                                <th>{{ $t('pininfo.Name') }}</th>
+                                <th class="text-center">{{ $t('pininfo.ValueSelected') }}</th>
+                                <th class="text-center">{{ $t('pininfo.ValueActive') }}</th>
+                            </tr>
+                            <tr v-for="(prop, prop_idx) in properties(category)" :key="prop_idx">
+                                <td :class="{ 'table-danger': !isEqual(category, prop) }">
+                                    {{ prop }}
+                                </td>
+                                <td class="text-center">
+                                    <template v-if="selectedPinAssignment && category in selectedPinAssignment">
+                                        {{ (selectedPinAssignment as any)[category][prop] }}</template
+                                    >
+                                </td>
+                                <td class="text-center">
+                                    <template v-if="currentPinAssignment && category in currentPinAssignment">
+                                        {{ (currentPinAssignment as any)[category][prop] }}</template
+                                    >
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </CardElement>
         </div>
-    </CardElement>
+    </div>
 </template>
 
 <script lang="ts">

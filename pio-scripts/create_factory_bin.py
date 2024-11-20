@@ -130,4 +130,4 @@ def esp32_create_combined_bin(source, target, env):
     esptool.main(cmd)
 
 
-env.AddPostAction("$BUILD_DIR/${PROGNAME}.bin", esp32_create_combined_bin)
+env.AddPostAction("buildprog", esp32_create_combined_bin)

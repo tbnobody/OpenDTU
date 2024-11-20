@@ -5,12 +5,11 @@
 #include <frozen/string.h>
 
 #include "Battery.h"
+#include "JkBmsDataPoints.h"
 #include "JkBmsSerialMessage.h"
 #include "JkBmsDummy.h"
 
 //#define JKBMS_DUMMY_SERIAL
-
-class DataPointContainer;
 
 namespace JkBms {
 

@@ -13,30 +13,35 @@
                     wide
                 />
 
-                <InputElement
-                    v-show="powerMeterConfigList.enabled"
-                    :label="$t('powermeteradmin.VerboseLogging')"
-                    v-model="powerMeterConfigList.verbose_logging"
-                    type="checkbox"
-                    wide
-                />
+                <template v-if="powerMeterConfigList.enabled">
+                    <InputElement
+                        :label="$t('powermeteradmin.VerboseLogging')"
+                        v-model="powerMeterConfigList.verbose_logging"
+                        type="checkbox"
+                        wide
+                    />
 
-                <div class="row mb-3" v-show="powerMeterConfigList.enabled">
-                    <label for="inputPowerMeterSource" class="col-sm-4 col-form-label">{{
-                        $t('powermeteradmin.PowerMeterSource')
-                    }}</label>
-                    <div class="col-sm-8">
-                        <select id="inputPowerMeterSource" class="form-select" v-model="powerMeterConfigList.source">
-                            <option v-for="source in powerMeterSourceList" :key="source.key" :value="source.key">
-                                {{ source.value }}
-                            </option>
-                        </select>
+                    <div class="row mb-3">
+                        <label for="inputPowerMeterSource" class="col-sm-4 col-form-label">{{
+                            $t('powermeteradmin.PowerMeterSource')
+                        }}</label>
+                        <div class="col-sm-8">
+                            <select
+                                id="inputPowerMeterSource"
+                                class="form-select"
+                                v-model="powerMeterConfigList.source"
+                            >
+                                <option v-for="source in powerMeterSourceList" :key="source.key" :value="source.key">
+                                    {{ source.value }}
+                                </option>
+                            </select>
+                        </div>
                     </div>
-                </div>
+                </template>
             </CardElement>
 
-            <div v-if="powerMeterConfigList.enabled">
-                <div v-if="powerMeterConfigList.source === 0 || powerMeterConfigList.source === 3">
+            <template v-if="powerMeterConfigList.enabled">
+                <template v-if="powerMeterConfigList.source === 0 || powerMeterConfigList.source === 3">
                     <div class="alert alert-secondary mt-5" role="alert">
                         <h2>{{ $t('powermeteradmin.jsonPathExamplesHeading') }}:</h2>
                         {{ $t('powermeteradmin.jsonPathExamplesExplanation') }}
@@ -58,10 +63,10 @@
                             <li><code>total</code> &mdash; <code>{ "othervalue": 66, "total": 123.4 }</code></li>
                         </ul>
                     </div>
-                </div>
+                </template>
 
                 <!-- yarn linter wants us to not combine v-if with v-for, so we need to wrap the CardElements //-->
-                <div v-if="powerMeterConfigList.source === 0">
+                <template v-if="powerMeterConfigList.source === 0">
                     <CardElement
                         v-for="(mqtt, index) in powerMeterConfigList.mqtt.values"
                         v-bind:key="index"
@@ -107,7 +112,7 @@
                             wide
                         />
                     </CardElement>
-                </div>
+                </template>
 
                 <CardElement
                     v-if="powerMeterConfigList.source === 1 || powerMeterConfigList.source === 2"
@@ -133,7 +138,7 @@
                     />
                 </CardElement>
 
-                <div v-if="powerMeterConfigList.source === 3">
+                <template v-if="powerMeterConfigList.source === 3">
                     <div class="alert alert-secondary mt-5" role="alert">
                         <h2>{{ $t('powermeteradmin.urlExamplesHeading') }}:</h2>
                         <ul>
@@ -178,7 +183,7 @@
                             wide
                         />
 
-                        <div v-if="httpJson.enabled || index == 0">
+                        <template v-if="httpJson.enabled || index == 0">
                             <HttpRequestSettings
                                 v-model="httpJson.http_request"
                                 v-if="index == 0 || powerMeterConfigList.http_json.individual_requests"
@@ -213,7 +218,7 @@
                                 type="checkbox"
                                 wide
                             />
-                        </div>
+                        </template>
                     </CardElement>
 
                     <CardElement
@@ -221,7 +226,7 @@
                         textVariant="text-bg-primary"
                         add-space
                     >
-                        <div class="text-center mt-3 mb-3">
+                        <div class="text-center mb-3">
                             <button type="button" class="btn btn-primary" @click="testHttpJsonRequest()">
                                 {{ $t('powermeteradmin.testHttpJsonRequest') }}
                             </button>
@@ -235,9 +240,9 @@
                             {{ testHttpJsonRequestAlert.message }}
                         </BootstrapAlert>
                     </CardElement>
-                </div>
+                </template>
 
-                <div v-if="powerMeterConfigList.source === 6">
+                <template v-if="powerMeterConfigList.source === 6">
                     <CardElement :text="$t('powermeteradmin.HTTP_SML')" textVariant="text-bg-primary" add-space>
                         <InputElement
                             :label="$t('powermeteradmin.pollingInterval')"
@@ -257,7 +262,7 @@
                         textVariant="text-bg-primary"
                         add-space
                     >
-                        <div class="text-center mt-3 mb-3">
+                        <div class="text-center mb-3">
                             <button type="button" class="btn btn-primary" @click="testHttpSmlRequest()">
                                 {{ $t('powermeteradmin.testHttpSmlRequest') }}
                             </button>
@@ -271,8 +276,8 @@
                             {{ testHttpSmlRequestAlert.message }}
                         </BootstrapAlert>
                     </CardElement>
-                </div>
-            </div>
+                </template>
+            </template>
 
             <FormFooter @reload="getPowerMeterConfig" />
         </form>

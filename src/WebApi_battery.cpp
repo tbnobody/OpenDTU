@@ -33,7 +33,7 @@ void WebApiBatteryClass::onStatus(AsyncWebServerRequest* request)
 
     AsyncJsonResponse* response = new AsyncJsonResponse();
     auto root = response->getRoot().as<JsonObject>();
-    auto& config = Configuration.get();
+    auto const& config = Configuration.get();
 
     ConfigurationClass::serializeBatteryConfig(config.Battery, root);
 
@@ -70,8 +70,11 @@ void WebApiBatteryClass::onAdminPost(AsyncWebServerRequest* request)
         return;
     }
 
-    auto& config = Configuration.get();
-    ConfigurationClass::deserializeBatteryConfig(root.as<JsonObject>(), config.Battery);
+    {
+        auto guard = Configuration.getWriteGuard();
+        auto& config = guard.getConfig();
+        ConfigurationClass::deserializeBatteryConfig(root.as<JsonObject>(), config.Battery);
+    }
 
     WebApi.writeConfig(retMsg);
 

@@ -9,6 +9,7 @@
 #include "NetworkSettings.h"
 #include "MessageOutput.h"
 #include "Utils.h"
+#include "PowerLimiter.h"
 #include "__compiled_constants.h"
 
 MqttHandlePowerLimiterHassClass MqttHandlePowerLimiterHass;
@@ -64,7 +65,7 @@ void MqttHandlePowerLimiterHassClass::publishConfig()
 
     publishSelect("DPL Mode", "mdi:gauge", "config", "mode", "mode");
 
-    if (config.PowerLimiter.IsInverterSolarPowered) {
+    if (!PowerLimiter.usesBatteryPoweredInverter()) {
         return;
     }
 

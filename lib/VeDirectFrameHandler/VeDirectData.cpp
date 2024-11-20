@@ -143,6 +143,17 @@ frozen::string const& veStruct::getPidAsString() const
  */
 uint32_t veStruct::getFwVersionAsInteger() const
 {
+	if (strlen(firmwareVer_FW) == 0) {
+		if (strlen(firmwareVer_FWE) == 0) { return 0; }
+
+		// the firmware version from the FWE field may be preceeded by a zero
+		// for padding as per VE.Direct protocol, which is fine for strtoul()
+		// when we use a fixed base. however, the postfix (2 chars) might be
+		// numeric as well to indicate a beta release, which we must not parse.
+		std::string strVer(firmwareVer_FWE, strlen(firmwareVer_FWE) - 2);
+		return static_cast<uint32_t>(strtoul(strVer.c_str(), nullptr, 10));
+	}
+
 	char const* strVersion = firmwareVer_FW;
 
 	// VE.Direct protocol manual states that the first char can be a non-digit,
@@ -157,6 +168,34 @@ uint32_t veStruct::getFwVersionAsInteger() const
  */
 String veStruct::getFwVersionFormatted() const
 {
+	if (strlen(firmwareVer_FW) == 0 && strlen(firmwareVer_FWE) == 0) {
+		return "n/a";
+	}
+
+	if (strlen(firmwareVer_FWE) > 0) {
+		char const* strVersion = firmwareVer_FWE;
+
+		// the firmware version from the FWE field may be preceeded by a zero
+		// for padding as per VE.Direct protocol.
+		while (strVersion[0] == '0') { ++strVersion; }
+
+		String res(strVersion[0]);
+		strVersion++;
+		res += ".";
+		res += strVersion[0];
+		strVersion++;
+		res += strVersion[0];
+		strVersion++;
+
+		String suffix(strVersion);
+		suffix.toUpperCase();
+		if (suffix == "FF") { return res; }
+
+		res += "-beta-";
+		res += suffix;
+		return res;
+	}
+
 	char const* strVersion = firmwareVer_FW;
 	char rc = 0;
 
@@ -191,7 +230,7 @@ frozen::string const& veMpptStruct::getCsAsString() const
 		{ 0,   "OFF" },
 		{ 2,   "Fault" },
 		{ 3,   "Bulk" },
-		{ 4,   "Absorbtion" },
+		{ 4,   "Absorption" },
 		{ 5,   "Float" },
 		{ 7,   "Equalize (manual)" },
 		{ 245, "Starting-up" },
@@ -287,18 +326,27 @@ frozen::string const& VeDirectHexData::getResponseAsString() const
 frozen::string const& VeDirectHexData::getRegisterAsString() const
 {
 	using Register = VeDirectHexRegister;
-	static constexpr frozen::map<Register, frozen::string, 11> values = {
+	static constexpr frozen::map<Register, frozen::string, 20> values = {
 		{ Register::DeviceMode, "Device Mode" },
 		{ Register::DeviceState, "Device State" },
 		{ Register::RemoteControlUsed, "Remote Control Used" },
 		{ Register::PanelVoltage, "Panel Voltage" },
+		{ Register::PanelPower, "Panel Power" },
 		{ Register::ChargerVoltage, "Charger Voltage" },
+		{ Register::ChargerCurrent, "Charger Current" },
 		{ Register::NetworkTotalDcInputPower, "Network Total DC Input Power" },
 		{ Register::ChargeControllerTemperature, "Charger Controller Temperature" },
 		{ Register::SmartBatterySenseTemperature, "Smart Battery Sense Temperature" },
 		{ Register::NetworkInfo, "Network Info" },
 		{ Register::NetworkMode, "Network Mode" },
-		{ Register::NetworkStatus, "Network Status" }
+		{ Register::NetworkStatus, "Network Status" },
+		{ Register::BatteryAbsorptionVoltage, "Battery Absorption Voltage" },
+		{ Register::BatteryFloatVoltage, "Battery Float Voltage" },
+		{ Register::TotalChargeCurrent, "Total Charge Current" },
+		{ Register::ChargeStateElapsedTime, "Charge State Elapsed Time" },
+		{ Register::BatteryVoltageSense, "Battery Voltage Sense" },
+		{ Register::LoadCurrent, "Load current" },
+		{ Register::LoadOutputVoltage, "Load Output Voltage" }
 	};
 
 	return getAsString(values, addr);
