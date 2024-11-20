@@ -7,6 +7,7 @@ disabled while "create release badge" action is broken, see .github/build.yml
 --->
 
 - [OpenDTU-OnBattery](#opendtu-onbattery)
+  - [Getting Started](#getting-started)
   - [Important Differences](#important-differences)
   - [Documentation](#documentation)
   - [Project State](#project-state)
@@ -20,6 +21,14 @@ which adds support for battery chargers, battery management systems (BMS), and
 power meters on a single ESP32. Its Dynamic Power Limiter can adjust the
 inverter's power production to the actual houshold consumption. In this way, it
 is possible to implement a zero export policy.
+
+## Getting Started
+
+See the documentation to learn [what hardware](https://opendtu-onbattery.net/hardware/)
+to acquire, how to [initialize](https://opendtu-onbattery.net/firmware/) it
+with OpenDTU-OnBattery firmware, and how to
+[configure](https://opendtu-onbattery.net/firmware/device_profiles/)
+OpenDTU-OnBattery for your hardware.
 
 ## Important Differences
 
