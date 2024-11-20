@@ -249,7 +249,15 @@ void VeDirectFrameHandler<T>::processTextData(std::string const& name, std::stri
 	}
 
 	if (name == "FW") {
+		_tmpFrame.firmwareVer_FWE[0] = '\0';
 		strncpy(_tmpFrame.firmwareVer_FW, value.c_str(), sizeof(_tmpFrame.firmwareVer_FW));
+		return;
+	}
+
+	// some devices use "FWE" instead of "FW" for the firmware version.
+	if (name == "FWE") {
+		_tmpFrame.firmwareVer_FW[0] = '\0';
+		strncpy(_tmpFrame.firmwareVer_FWE, value.c_str(), sizeof(_tmpFrame.firmwareVer_FWE));
 		return;
 	}
 

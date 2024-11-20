@@ -11,6 +11,8 @@ typedef struct {
     uint16_t productID_PID = 0;             // product id
     char serialNr_SER[VE_MAX_VALUE_LEN];    // serial number
     char firmwareVer_FW[VE_MAX_VALUE_LEN];  // firmware release number
+    // some devices use "FWE" instead of "FW" for the firmware version.
+    char firmwareVer_FWE[VE_MAX_VALUE_LEN]; // firmware release number (alternative field)
     uint32_t batteryVoltage_V_mV = 0;       // battery voltage in mV
     int32_t batteryCurrent_I_mA = 0;        // battery current in mA (can be negative)
     float mpptEfficiency_Percent = 0;       // efficiency in percent (calculated, moving average)

@@ -64,7 +64,10 @@ void MqttHandleVedirectHassClass::publishConfig()
         if (!optMpptData.has_value()) { continue; }
 
         publishSensor("MPPT serial number", "mdi:counter", "SER", nullptr, nullptr, nullptr, *optMpptData);
-        publishSensor("MPPT firmware number", "mdi:counter", "FW", nullptr, nullptr, nullptr, *optMpptData);
+        publishSensor("MPPT firmware version integer", "mdi:counter", "FWI", nullptr, nullptr, nullptr, *optMpptData);
+        publishSensor("MPPT firmware version formatted", "mdi:counter", "FWF", nullptr, nullptr, nullptr, *optMpptData);
+        publishSensor("MPPT firmware version FW", "mdi:counter", "FW", nullptr, nullptr, nullptr, *optMpptData);
+        publishSensor("MPPT firmware version FWE", "mdi:counter", "FWE", nullptr, nullptr, nullptr, *optMpptData);
         publishSensor("MPPT state of operation", "mdi:wrench", "CS", nullptr, nullptr, nullptr, *optMpptData);
         publishSensor("MPPT error code", "mdi:bell", "ERR", nullptr, nullptr, nullptr, *optMpptData);
         publishSensor("MPPT off reason", "mdi:wrench", "OR", nullptr, nullptr, nullptr, *optMpptData);

@@ -143,6 +143,17 @@ frozen::string const& veStruct::getPidAsString() const
  */
 uint32_t veStruct::getFwVersionAsInteger() const
 {
+	if (strlen(firmwareVer_FW) == 0) {
+		if (strlen(firmwareVer_FWE) == 0) { return 0; }
+
+		// the firmware version from the FWE field may be preceeded by a zero
+		// for padding as per VE.Direct protocol, which is fine for strtoul()
+		// when we use a fixed base. however, the postfix (2 chars) might be
+		// numeric as well to indicate a beta release, which we must not parse.
+		std::string strVer(firmwareVer_FWE, strlen(firmwareVer_FWE) - 2);
+		return static_cast<uint32_t>(strtoul(strVer.c_str(), nullptr, 10));
+	}
+
 	char const* strVersion = firmwareVer_FW;
 
 	// VE.Direct protocol manual states that the first char can be a non-digit,
@@ -157,6 +168,34 @@ uint32_t veStruct::getFwVersionAsInteger() const
  */
 String veStruct::getFwVersionFormatted() const
 {
+	if (strlen(firmwareVer_FW) == 0 && strlen(firmwareVer_FWE) == 0) {
+		return "n/a";
+	}
+
+	if (strlen(firmwareVer_FWE) > 0) {
+		char const* strVersion = firmwareVer_FWE;
+
+		// the firmware version from the FWE field may be preceeded by a zero
+		// for padding as per VE.Direct protocol.
+		while (strVersion[0] == '0') { ++strVersion; }
+
+		String res(strVersion[0]);
+		strVersion++;
+		res += ".";
+		res += strVersion[0];
+		strVersion++;
+		res += strVersion[0];
+		strVersion++;
+
+		String suffix(strVersion);
+		suffix.toUpperCase();
+		if (suffix == "FF") { return res; }
+
+		res += "-beta-";
+		res += suffix;
+		return res;
+	}
+
 	char const* strVersion = firmwareVer_FW;
 	char rc = 0;
 
