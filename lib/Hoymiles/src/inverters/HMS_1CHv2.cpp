@@ -35,12 +35,12 @@ bool HMS_1CHv2::isValidSerial(const uint64_t serial)
 {
     // serial >= 0x112500000000 && serial <= 0x1125ffffffff
     uint16_t preSerial = (serial >> 32) & 0xffff;
-    return preSerial == 0x1125;
+    return preSerial == 0x1125 || preSerial == 0x1400;
 }
 
 String HMS_1CHv2::typeName() const
 {
-    return "HMS-500-1T v2";
+    return "HMS-450/500-1T v2";
 }
 
 const byteAssign_t* HMS_1CHv2::getByteAssignment() const
