@@ -377,7 +377,7 @@
         "inverterchannelinfo": {
             "String": "Είσοδος {num}",
             "Phase": "Φάση {num}",
-            "General": "Γενικός"
+            "General": "Γενικά"
         },
         "invertertotalinfo": {
             "TotalYieldTotal": "Συνολική Απόδοση",
