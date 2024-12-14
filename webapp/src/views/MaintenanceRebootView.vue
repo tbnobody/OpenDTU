@@ -36,6 +36,7 @@ import ModalDialog from '@/components/ModalDialog.vue';
 import { authHeader, handleResponse, isLoggedIn } from '@/utils/authentication';
 import * as bootstrap from 'bootstrap';
 import { defineComponent } from 'vue';
+import { waitRestart } from '@/utils/waitRestart';
 
 export default defineComponent({
     components: {
@@ -80,6 +81,7 @@ export default defineComponent({
                     this.alertMessage = this.$t('apiresponse.' + data.code, data.param);
                     this.alertType = data.type;
                     this.showAlert = true;
+                    waitRestart(this.$router);
                 });
             this.onCloseModal(this.performReboot);
         },

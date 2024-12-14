@@ -44,11 +44,11 @@
                         <BIconInfoCircle v-tooltip :title="$t('dtuadmin.CmtPaLevelHint')" />
                     </label>
                     <div class="col-sm-10">
-                        <div class="input-group mb-3">
+                        <div class="input-group">
                             <input
                                 type="range"
                                 class="form-control form-range"
-                                v-model="dtuConfigList.cmt_palevel"
+                                v-model.number="dtuConfigList.cmt_palevel"
                                 min="-10"
                                 max="20"
                                 id="inputCmtPaLevel"
@@ -85,11 +85,11 @@
                         <BIconInfoCircle v-tooltip :title="$t('dtuadmin.CmtFrequencyHint')" />
                     </label>
                     <div class="col-sm-10">
-                        <div class="input-group mb-3">
+                        <div class="input-group">
                             <input
                                 type="range"
                                 class="form-control form-range"
-                                v-model="dtuConfigList.cmt_frequency"
+                                v-model.number="dtuConfigList.cmt_frequency"
                                 :min="cmtMinFrequency"
                                 :max="cmtMaxFrequency"
                                 :step="dtuConfigList.cmt_chan_width"

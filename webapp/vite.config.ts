@@ -14,12 +14,12 @@ let proxy_target;
 try {
     // eslint-disable-next-line
     proxy_target = require('./vite.user.ts').proxy_target;
-} catch (error) {
+} catch {
     proxy_target = '192.168.20.110';
 }
 
 // https://vitejs.dev/config/
-export default defineConfig({
+export default defineConfig(({ command }) => { return {
   plugins: [
     vue(),
     viteCompression({ deleteOriginFile: true, threshold: 0 }),
@@ -27,10 +27,10 @@ export default defineConfig({
     VueI18nPlugin({
         /* options */
         include: path.resolve(path.dirname(fileURLToPath(import.meta.url)), './src/locales/**.json'),
+        runtimeOnly: false,
         fullInstall: false,
         forceStringify: true,
         strictMessage: false,
-        jitCompilation: false,
     }),
   ],
   resolve: {
@@ -45,6 +45,7 @@ export default defineConfig({
     outDir: '../webapp_dist',
     emptyOutDir: true,
     minify: 'terser',
+    chunkSizeWarningLimit: 1024,
     rollupOptions: {
       output: {
         // Only create one js file
@@ -55,9 +56,10 @@ export default defineConfig({
         assetFileNames: "assets/[name].[ext]",
       },
     },
+    target: 'es2022',
   },
   esbuild: {
-    drop: ['console', 'debugger'],
+    drop: command !== 'serve' ? ['console', 'debugger'] : []
   },
   server: {
     proxy: {
@@ -76,4 +78,4 @@ export default defineConfig({
       }
     }
   }
-})
+} })

@@ -6,7 +6,7 @@
 #include "Configuration.h"
 #include "Display_Graphic.h"
 #include "PinMapping.h"
-#include "Utils.h"
+#include "RestartHelper.h"
 #include "WebApi.h"
 #include "WebApi_errors.h"
 #include "helper.h"
@@ -50,6 +50,15 @@ void WebApiDeviceClass::onDeviceAdminGet(AsyncWebServerRequest* request)
     cmtPinObj["gpio2"] = pin.cmt_gpio2;
     cmtPinObj["gpio3"] = pin.cmt_gpio3;
 
+    auto w5500PinObj = curPin["w5500"].to<JsonObject>();
+    w5500PinObj["sclk"] = pin.w5500_sclk;
+    w5500PinObj["mosi"] = pin.w5500_mosi;
+    w5500PinObj["miso"] = pin.w5500_miso;
+    w5500PinObj["cs"] = pin.w5500_cs;
+    w5500PinObj["int"] = pin.w5500_int;
+    w5500PinObj["rst"] = pin.w5500_rst;
+
+#if CONFIG_ETH_USE_ESP32_EMAC
     auto ethPinObj = curPin["eth"].to<JsonObject>();
     ethPinObj["enabled"] = pin.eth_enabled;
     ethPinObj["phy_addr"] = pin.eth_phy_addr;
@@ -58,6 +67,7 @@ void WebApiDeviceClass::onDeviceAdminGet(AsyncWebServerRequest* request)
     ethPinObj["mdio"] = pin.eth_mdio;
     ethPinObj["type"] = pin.eth_type;
     ethPinObj["clk_mode"] = pin.eth_clk_mode;
+#endif
 
     auto displayPinObj = curPin["display"].to<JsonObject>();
     displayPinObj["type"] = pin.display_type;
@@ -76,7 +86,7 @@ void WebApiDeviceClass::onDeviceAdminGet(AsyncWebServerRequest* request)
     display["power_safe"] = config.Display.PowerSafe;
     display["screensaver"] = config.Display.ScreenSaver;
     display["contrast"] = config.Display.Contrast;
-    display["language"] = config.Display.Language;
+    display["locale"] = config.Display.Locale;
     display["diagramduration"] = config.Display.Diagram.Duration;
     display["diagrammode"] = config.Display.Diagram.Mode;
 
@@ -107,8 +117,8 @@ void WebApiDeviceClass::onDeviceAdminPost(AsyncWebServerRequest* request)
 
     auto& retMsg = response->getRoot();
 
-    if (!(root.containsKey("curPin")
-            || root.containsKey("display"))) {
+    if (!(root["curPin"].is<JsonObject>()
+            || root["display"].is<JsonObject>())) {
         retMsg["message"] = "Values are missing!";
         retMsg["code"] = WebApiError::GenericValueMissing;
         WebApi.sendJsonResponse(request, response, __FUNCTION__, __LINE__);
@@ -123,29 +133,34 @@ void WebApiDeviceClass::onDeviceAdminPost(AsyncWebServerRequest* request)
         return;
     }
 
-    CONFIG_T& config = Configuration.get();
-    bool performRestart = root["curPin"]["name"].as<String>() != config.Dev_PinMapping;
+    {
+        auto guard = Configuration.getWriteGuard();
+        auto& config = guard.getConfig();
 
-    strlcpy(config.Dev_PinMapping, root["curPin"]["name"].as<String>().c_str(), sizeof(config.Dev_PinMapping));
-    config.Display.Rotation = root["display"]["rotation"].as<uint8_t>();
-    config.Display.PowerSafe = root["display"]["power_safe"].as<bool>();
-    config.Display.ScreenSaver = root["display"]["screensaver"].as<bool>();
-    config.Display.Contrast = root["display"]["contrast"].as<uint8_t>();
-    config.Display.Language = root["display"]["language"].as<uint8_t>();
-    config.Display.Diagram.Duration = root["display"]["diagramduration"].as<uint32_t>();
-    config.Display.Diagram.Mode = root["display"]["diagrammode"].as<DiagramMode_t>();
+        strlcpy(config.Dev_PinMapping, root["curPin"]["name"].as<String>().c_str(), sizeof(config.Dev_PinMapping));
+        config.Display.Rotation = root["display"]["rotation"].as<uint8_t>();
+        config.Display.PowerSafe = root["display"]["power_safe"].as<bool>();
+        config.Display.ScreenSaver = root["display"]["screensaver"].as<bool>();
+        config.Display.Contrast = root["display"]["contrast"].as<uint8_t>();
+        strlcpy(config.Display.Locale, root["display"]["locale"].as<String>().c_str(), sizeof(config.Display.Locale));
+        config.Display.Diagram.Duration = root["display"]["diagramduration"].as<uint32_t>();
+        config.Display.Diagram.Mode = root["display"]["diagrammode"].as<DiagramMode_t>();
 
-    for (uint8_t i = 0; i < PINMAPPING_LED_COUNT; i++) {
-        config.Led_Single[i].Brightness = root["led"][i]["brightness"].as<uint8_t>();
-        config.Led_Single[i].Brightness = min<uint8_t>(100, config.Led_Single[i].Brightness);
+        for (uint8_t i = 0; i < PINMAPPING_LED_COUNT; i++) {
+            config.Led_Single[i].Brightness = root["led"][i]["brightness"].as<uint8_t>();
+            config.Led_Single[i].Brightness = min<uint8_t>(100, config.Led_Single[i].Brightness);
+        }
     }
+
+    auto const& config = Configuration.get();
+    bool performRestart = root["curPin"]["name"].as<String>() != config.Dev_PinMapping;
 
     Display.setDiagramMode(static_cast<DiagramMode_t>(config.Display.Diagram.Mode));
     Display.setOrientation(config.Display.Rotation);
     Display.enablePowerSafe = config.Display.PowerSafe;
     Display.enableScreensaver = config.Display.ScreenSaver;
     Display.setContrast(config.Display.Contrast);
-    Display.setLanguage(config.Display.Language);
+    Display.setLocale(config.Display.Locale);
     Display.Diagram().updatePeriod();
 
     WebApi.writeConfig(retMsg);
@@ -153,6 +168,6 @@ void WebApiDeviceClass::onDeviceAdminPost(AsyncWebServerRequest* request)
     WebApi.sendJsonResponse(request, response, __FUNCTION__, __LINE__);
 
     if (performRestart) {
-        Utils::restartDtu();
+        RestartHelper.triggerRestart();
     }
 }

@@ -14,7 +14,7 @@
                 />
 
                 <InputElement
-                    v-show="mqttConfigList.mqtt_enabled"
+                    v-if="mqttConfigList.mqtt_enabled"
                     :label="$t('mqttadmin.EnableHass')"
                     v-model="mqttConfigList.mqtt_hass_enabled"
                     type="checkbox"
@@ -26,7 +26,7 @@
                 :text="$t('mqttadmin.MqttBrokerParameter')"
                 textVariant="text-bg-primary"
                 add-space
-                v-show="mqttConfigList.mqtt_enabled"
+                v-if="mqttConfigList.mqtt_enabled"
             >
                 <InputElement
                     :label="$t('mqttadmin.Hostname')"
@@ -99,7 +99,7 @@
                 <InputElement :label="$t('mqttadmin.EnableTls')" v-model="mqttConfigList.mqtt_tls" type="checkbox" />
 
                 <InputElement
-                    v-show="mqttConfigList.mqtt_tls"
+                    v-if="mqttConfigList.mqtt_tls"
                     :label="$t('mqttadmin.RootCa')"
                     v-model="mqttConfigList.mqtt_root_ca_cert"
                     type="textarea"
@@ -108,14 +108,14 @@
                 />
 
                 <InputElement
-                    v-show="mqttConfigList.mqtt_tls"
+                    v-if="mqttConfigList.mqtt_tls"
                     :label="$t('mqttadmin.TlsCertLoginEnable')"
                     v-model="mqttConfigList.mqtt_tls_cert_login"
                     type="checkbox"
                 />
 
                 <InputElement
-                    v-show="mqttConfigList.mqtt_tls_cert_login"
+                    v-if="mqttConfigList.mqtt_tls_cert_login"
                     :label="$t('mqttadmin.ClientCert')"
                     v-model="mqttConfigList.mqtt_client_cert"
                     type="textarea"
@@ -124,7 +124,7 @@
                 />
 
                 <InputElement
-                    v-show="mqttConfigList.mqtt_tls_cert_login"
+                    v-if="mqttConfigList.mqtt_tls_cert_login"
                     :label="$t('mqttadmin.ClientKey')"
                     v-model="mqttConfigList.mqtt_client_key"
                     type="textarea"
@@ -137,7 +137,7 @@
                 :text="$t('mqttadmin.LwtParameters')"
                 textVariant="text-bg-primary"
                 add-space
-                v-show="mqttConfigList.mqtt_enabled"
+                v-if="mqttConfigList.mqtt_enabled"
             >
                 <InputElement
                     :label="$t('mqttadmin.LwtTopic')"
@@ -182,7 +182,7 @@
                 :text="$t('mqttadmin.HassParameters')"
                 textVariant="text-bg-primary"
                 add-space
-                v-show="mqttConfigList.mqtt_enabled && mqttConfigList.mqtt_hass_enabled"
+                v-if="mqttConfigList.mqtt_enabled && mqttConfigList.mqtt_hass_enabled"
             >
                 <InputElement
                     :label="$t('mqttadmin.HassPrefixTopic')"

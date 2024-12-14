@@ -5,7 +5,7 @@
         :show-reload="true"
         @reload="getMqttInfo"
     >
-        <CardElement :text="$t('mqttinfo.ConfigurationSummary')" textVariant="text-bg-primary">
+        <CardElement :text="$t('mqttinfo.ConfigurationSummary')" textVariant="text-bg-primary" table>
             <div class="table-responsive">
                 <table class="table table-hover table-condensed">
                     <tbody>
@@ -79,11 +79,11 @@
                                 />
                             </td>
                         </tr>
-                        <tr v-show="mqttDataList.mqtt_tls">
+                        <tr v-if="mqttDataList.mqtt_tls">
                             <th>{{ $t('mqttinfo.RootCertifcateInfo') }}</th>
                             <td>{{ mqttDataList.mqtt_root_ca_cert_info }}</td>
                         </tr>
-                        <tr>
+                        <tr v-if="mqttDataList.mqtt_tls">
                             <th>{{ $t('mqttinfo.TlsCertLogin') }}</th>
                             <td>
                                 <StatusBadge
@@ -93,7 +93,7 @@
                                 />
                             </td>
                         </tr>
-                        <tr v-show="mqttDataList.mqtt_tls_cert_login">
+                        <tr v-if="mqttDataList.mqtt_tls && mqttDataList.mqtt_tls_cert_login">
                             <th>{{ $t('mqttinfo.ClientCertifcateInfo') }}</th>
                             <td>{{ mqttDataList.mqtt_client_cert_info }}</td>
                         </tr>
@@ -102,7 +102,7 @@
             </div>
         </CardElement>
 
-        <CardElement :text="$t('mqttinfo.HassSummary')" textVariant="text-bg-primary" add-space>
+        <CardElement :text="$t('mqttinfo.HassSummary')" textVariant="text-bg-primary" add-space table>
             <div class="table-responsive">
                 <table class="table table-hover table-condensed">
                     <tbody>
@@ -155,7 +155,7 @@
             </div>
         </CardElement>
 
-        <CardElement :text="$t('mqttinfo.RuntimeSummary')" textVariant="text-bg-primary" add-space>
+        <CardElement :text="$t('mqttinfo.RuntimeSummary')" textVariant="text-bg-primary" add-space table>
             <div class="table-responsive">
                 <table class="table table-hover table-condensed">
                     <tbody>

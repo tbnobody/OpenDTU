@@ -4,3 +4,63 @@
 .container-fluid .row {
     font-feature-settings: 'tnum';
 }
+
+@include media-breakpoint-up(sm) {
+    label.col-form-label,
+    label.form-check-label {
+        text-align: end;
+    }
+}
+
+table.table tr:last-child th,
+table.table tr:last-child td {
+    border-bottom: 0;
+}
+
+table.table {
+    margin-bottom: 0;
+}
+
+div.card.card-table {
+    // prevent tables in cards from
+    // messing up the bottom corner radii
+    overflow: hidden;
+}
+
+div.card.card-table tr > :first-child {
+    padding-left: var(--bs-card-cap-padding-x);
+}
+
+div.card.card-table tr > :last-child {
+    padding-right: var(--bs-card-cap-padding-x);
+}
+
+div.accordion-item.accordion-table tr > :first-child {
+    padding-left: var(--bs-accordion-btn-padding-x);
+}
+
+div.accordion-item.accordion-table div.accordion-body {
+    padding-top: 0;
+    padding-left: 0;
+    padding-right: 0;
+}
+
+div.card.card-table div.card-body {
+    padding: 0;
+}
+
+div.card div.card-body > :last-child {
+    margin-bottom: auto !important;
+}
+
+div.card.card-table table .value {
+    text-align: right;
+    padding-right: 0;
+}
+
+// blend cards into tabbed navigation (device admin view)
+div.card-tabbed {
+    border-top: 0;
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+}

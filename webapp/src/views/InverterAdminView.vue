@@ -20,13 +20,13 @@
                         required
                     />
                 </div>
-                <div class="ml-auto text-right">
-                    <button type="submit" class="btn btn-primary my-2">
+                <div class="d-flex my-3">
+                    <button type="submit" class="btn btn-primary ms-auto">
                         {{ $t('inverteradmin.Add') }}
                     </button>
                 </div>
-                <div class="alert alert-secondary" role="alert" v-html="$t('inverteradmin.AddHint')"></div>
             </form>
+            <div class="alert alert-secondary" role="alert" v-html="$t('inverteradmin.AddHint')"></div>
         </CardElement>
 
         <CardElement :text="$t('inverteradmin.InverterList')" textVariant="text-bg-primary" add-space>
@@ -81,8 +81,8 @@
                     </tbody>
                 </table>
             </div>
-            <div class="ml-auto text-right">
-                <button class="btn btn-primary my-2" @click="onSaveOrder()">
+            <div class="d-flex mt-1 mb-3">
+                <button class="btn btn-primary ms-auto" @click="onSaveOrder()">
                     {{ $t('inverteradmin.SaveOrder') }}
                 </button>
             </div>
@@ -267,7 +267,7 @@
             </div>
 
             <div
-                class="tab-pane fade show"
+                class="tab-pane fade show pt-3"
                 id="nav-advanced"
                 role="tabpanel"
                 aria-labelledby="nav-advanced-tab"
@@ -349,6 +349,7 @@ import CardElement from '@/components/CardElement.vue';
 import InputElement from '@/components/InputElement.vue';
 import InputSerial from '@/components/InputSerial.vue';
 import ModalDialog from '@/components/ModalDialog.vue';
+import type { AlertResponse } from '@/types/AlertResponse';
 import type { Inverter } from '@/types/InverterConfig';
 import { authHeader, handleResponse } from '@/utils/authentication';
 import * as bootstrap from 'bootstrap';
@@ -362,13 +363,6 @@ import {
 } from 'bootstrap-icons-vue';
 import Sortable from 'sortablejs';
 import { defineComponent } from 'vue';
-
-declare interface AlertResponse {
-    message: string;
-    type: string;
-    code: number;
-    show: boolean;
-}
 
 export default defineComponent({
     components: {

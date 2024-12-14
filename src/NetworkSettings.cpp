@@ -7,10 +7,10 @@
 #include "MessageOutput.h"
 #include "PinMapping.h"
 #include "Utils.h"
+#include "__compiled_constants.h"
 #include "defaults.h"
 #include <ESPmDNS.h>
 #include <ETH.h>
-#include "__compiled_constants.h"
 
 NetworkSettingsClass::NetworkSettingsClass()
     : _loopTask(TASK_IMMEDIATE, TASK_FOREVER, std::bind(&NetworkSettingsClass::loop, this))
@@ -23,20 +23,41 @@ NetworkSettingsClass::NetworkSettingsClass()
 void NetworkSettingsClass::init(Scheduler& scheduler)
 {
     using std::placeholders::_1;
+    using std::placeholders::_2;
 
     WiFi.setScanMethod(WIFI_ALL_CHANNEL_SCAN);
     WiFi.setSortMethod(WIFI_CONNECT_AP_BY_SIGNAL);
 
     WiFi.disconnect(true, true);
 
-    WiFi.onEvent(std::bind(&NetworkSettingsClass::NetworkEvent, this, _1));
+    WiFi.onEvent(std::bind(&NetworkSettingsClass::NetworkEvent, this, _1, _2));
+
+    if (PinMapping.isValidW5500Config()) {
+        PinMapping_t& pin = PinMapping.get();
+        _w5500 = W5500::setup(pin.w5500_mosi, pin.w5500_miso, pin.w5500_sclk, pin.w5500_cs, pin.w5500_int, pin.w5500_rst);
+        if (_w5500)
+            MessageOutput.println("W5500: Connection successful");
+        else
+            MessageOutput.println("W5500: Connection error!!");
+    }
+#if CONFIG_ETH_USE_ESP32_EMAC
+    else if (PinMapping.isValidEthConfig()) {
+        PinMapping_t& pin = PinMapping.get();
+#if ESP_ARDUINO_VERSION_MAJOR < 3
+        ETH.begin(pin.eth_phy_addr, pin.eth_power, pin.eth_mdc, pin.eth_mdio, pin.eth_type, pin.eth_clk_mode);
+#else
+        ETH.begin(pin.eth_type, pin.eth_phy_addr, pin.eth_mdc, pin.eth_mdio, pin.eth_power, pin.eth_clk_mode);
+#endif
+    }
+#endif
+
     setupMode();
 
     scheduler.addTask(_loopTask);
     _loopTask.enable();
 }
 
-void NetworkSettingsClass::NetworkEvent(const WiFiEvent_t event)
+void NetworkSettingsClass::NetworkEvent(const WiFiEvent_t event, WiFiEventInfo_t info)
 {
     switch (event) {
     case ARDUINO_EVENT_ETH_START:
@@ -76,7 +97,8 @@ void NetworkSettingsClass::NetworkEvent(const WiFiEvent_t event)
         }
         break;
     case ARDUINO_EVENT_WIFI_STA_DISCONNECTED:
-        MessageOutput.println("WiFi disconnected");
+        // Reason codes can be found here: https://github.com/espressif/esp-idf/blob/5454d37d496a8c58542eb450467471404c606501/components/esp_wifi/include/esp_wifi_types_generic.h#L79-L141
+        MessageOutput.printf("WiFi disconnected: %" PRIu8 "\r\n", info.wifi_sta_disconnected.reason);
         if (_networkMode == network_mode::WiFi) {
             MessageOutput.println("Try reconnecting");
             WiFi.disconnect(true, false);
@@ -95,12 +117,12 @@ void NetworkSettingsClass::NetworkEvent(const WiFiEvent_t event)
     }
 }
 
-bool NetworkSettingsClass::onEvent(NetworkEventCb cbEvent, const network_event event)
+bool NetworkSettingsClass::onEvent(DtuNetworkEventCb cbEvent, const network_event event)
 {
     if (!cbEvent) {
         return pdFALSE;
     }
-    NetworkEventCbList_t newEventHandler;
+    DtuNetworkEventCbList_t newEventHandler;
     newEventHandler.cb = cbEvent;
     newEventHandler.event = event;
     _cbEventList.push_back(newEventHandler);
@@ -109,8 +131,7 @@ bool NetworkSettingsClass::onEvent(NetworkEventCb cbEvent, const network_event e
 
 void NetworkSettingsClass::raiseEvent(const network_event event)
 {
-    for (uint32_t i = 0; i < _cbEventList.size(); i++) {
-        const NetworkEventCbList_t entry = _cbEventList[i];
+    for (auto& entry : _cbEventList) {
         if (entry.cb) {
             if (entry.event == event || entry.event == network_event::NETWORK_EVENT_MAX) {
                 entry.cb(event);
@@ -167,11 +188,6 @@ void NetworkSettingsClass::setupMode()
             WiFi.mode(WIFI_MODE_NULL);
         }
     }
-
-    if (PinMapping.isValidEthConfig()) {
-        PinMapping_t& pin = PinMapping.get();
-        ETH.begin(pin.eth_phy_addr, pin.eth_power, pin.eth_mdc, pin.eth_mdio, pin.eth_type, pin.eth_clk_mode);
-    }
 }
 
 void NetworkSettingsClass::enableAdminMode()
@@ -210,7 +226,7 @@ void NetworkSettingsClass::loop()
         if (_adminEnabled && _adminTimeoutCounterMax > 0) {
             _adminTimeoutCounter++;
             if (_adminTimeoutCounter % 10 == 0) {
-                MessageOutput.printf("Admin AP remaining seconds: %d / %d\r\n", _adminTimeoutCounter, _adminTimeoutCounterMax);
+                MessageOutput.printf("Admin AP remaining seconds: %" PRId32 " / %" PRId32 "\r\n", _adminTimeoutCounter, _adminTimeoutCounterMax);
             }
         }
         _connectTimeoutTimer++;
@@ -399,6 +415,9 @@ String NetworkSettingsClass::macAddress() const
 {
     switch (_networkMode) {
     case network_mode::Ethernet:
+        if (_w5500) {
+            return _w5500->macAddress();
+        }
         return ETH.macAddress();
         break;
     case network_mode::WiFi:

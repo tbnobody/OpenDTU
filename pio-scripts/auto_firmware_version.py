@@ -36,9 +36,20 @@ def get_build_version():
     return build_version
 
 
+def get_build_branch():
+    try:
+        branch_name = porcelain.active_branch('.').decode('utf-8')  # '.' refers to the repository root dir
+    except Exception as err:
+        branch_name = "master"
+    print("Firmware Branch: " + branch_name)
+    return branch_name
+
+
 def get_firmware_specifier_build_flag():
     build_version = get_build_version()
     build_flag = "-D AUTO_GIT_HASH=\\\"" + build_version + "\\\""
+    build_branch = get_build_branch()
+    build_flag += " -D AUTO_GIT_BRANCH=\\\"" + branch_name + "\\\""
     return (build_flag)
 
 
@@ -64,6 +75,8 @@ def do_main():
         if 1:
             # Add the description of the current git revision
             lines += 'const char *__COMPILED_GIT_HASH__ = "%s";\n' % (get_build_version())
+            # ... and git branch
+            lines += 'const char *__COMPILED_GIT_BRANCH__ = "%s";\n' % (get_build_branch())
 
         updateFileIfChanged(targetfile, bytes(lines, "utf-8"))
 

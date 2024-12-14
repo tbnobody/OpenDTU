@@ -17,16 +17,15 @@
             <p class="h1 mb-2">
                 <BIconExclamationCircleFill />
             </p>
-
-            <span style="vertical-align: middle" class="ml-2">
-                {{ OTAError }}
-            </span>
-            <br />
-            <br />
-            <button class="btn btn-light" @click="clear"><BIconArrowLeft /> {{ $t('firmwareupgrade.Back') }}</button>
-            <button class="btn btn-primary" @click="retryOTA">
-                <BIconArrowRepeat /> {{ $t('firmwareupgrade.Retry') }}
-            </button>
+            {{ OTAError }}
+            <div class="mt-3 d-flex gap-3 justify-content-center">
+                <button class="btn btn-light" @click="clear">
+                    <BIconArrowLeft /> {{ $t('firmwareupgrade.Back') }}
+                </button>
+                <button class="btn btn-primary" @click="retryOTA">
+                    <BIconArrowRepeat /> {{ $t('firmwareupgrade.Retry') }}
+                </button>
+            </div>
         </CardElement>
 
         <CardElement
@@ -35,17 +34,7 @@
             center-content
             v-else-if="!loading && !uploading && OTASuccess"
         >
-            <span class="h1 mb-2">
-                <BIconCheckCircle />
-            </span>
-            <span> {{ $t('firmwareupgrade.OtaSuccess') }} </span>
-            <br />
-            <br />
-            <div class="text-center">
-                <div class="spinner-border" role="status">
-                    <span class="visually-hidden"></span>
-                </div>
-            </div>
+            <BIconCheckCircle class="fs-1" />&nbsp;{{ $t('firmwareupgrade.OtaSuccess') }}
         </CardElement>
 
         <CardElement
@@ -54,7 +43,7 @@
             center-content
             v-else-if="!loading && !uploading"
         >
-            <div class="form-group pt-2 mt-3">
+            <div class="form-group">
                 <input class="form-control" type="file" ref="file" accept=".bin,.bin.gz" @change="uploadOTA" />
             </div>
         </CardElement>
@@ -88,6 +77,7 @@ import { authHeader, isLoggedIn } from '@/utils/authentication';
 import { BIconArrowLeft, BIconArrowRepeat, BIconCheckCircle, BIconExclamationCircleFill } from 'bootstrap-icons-vue';
 import SparkMD5 from 'spark-md5';
 import { defineComponent } from 'vue';
+import { waitRestart } from '@/utils/waitRestart';
 
 export default defineComponent({
     components: {
@@ -107,7 +97,6 @@ export default defineComponent({
             OTASuccess: false,
             type: 'firmware',
             file: {} as Blob,
-            hostCheckInterval: 0,
         };
     },
     methods: {
@@ -154,7 +143,7 @@ export default defineComponent({
                 // request.response will hold the response from the server
                 if (request.status === 200) {
                     this.OTASuccess = true;
-                    this.hostCheckInterval = setInterval(this.checkRemoteHostAndReload, 1000);
+                    waitRestart(this.$router);
                 } else if (request.status !== 500) {
                     this.OTAError = `[HTTP ERROR] ${request.statusText}`;
                 } else {
@@ -193,32 +182,6 @@ export default defineComponent({
             this.OTAError = '';
             this.OTASuccess = false;
         },
-        checkRemoteHostAndReload(): void {
-            // Check if the browser is online
-            if (navigator.onLine) {
-                const remoteHostUrl = '/api/system/status';
-
-                // Use a simple fetch request to check if the remote host is reachable
-                fetch(remoteHostUrl, { method: 'GET' })
-                    .then((response) => {
-                        // Check if the response status is OK (200-299 range)
-                        if (response.ok) {
-                            console.log('Remote host is available. Reloading page...');
-                            clearInterval(this.hostCheckInterval);
-                            this.hostCheckInterval = 0;
-                            // Perform a page reload
-                            window.location.replace('/');
-                        } else {
-                            console.log('Remote host is not reachable. Do something else if needed.');
-                        }
-                    })
-                    .catch((error) => {
-                        console.error('Error checking remote host:', error);
-                    });
-            } else {
-                console.log('Browser is offline. Cannot check remote host.');
-            }
-        },
     },
     mounted() {
         if (!isLoggedIn()) {
@@ -228,9 +191,6 @@ export default defineComponent({
             });
         }
         this.loading = false;
-    },
-    unmounted() {
-        clearInterval(this.hostCheckInterval);
     },
 });
 </script>

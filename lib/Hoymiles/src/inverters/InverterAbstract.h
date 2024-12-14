@@ -61,9 +61,35 @@ public:
     void setClearEventlogOnMidnight(const bool enabled);
     bool getClearEventlogOnMidnight() const;
 
+    int8_t getLastRssi() const;
+
     void clearRxFragmentBuffer();
-    void addRxFragment(const uint8_t fragment[], const uint8_t len);
+    void addRxFragment(const uint8_t fragment[], const uint8_t len, const int8_t rssi);
     uint8_t verifyAllFragments(CommandAbstract& cmd);
+
+    void performDailyTask();
+
+    void resetRadioStats();
+
+    struct {
+        // TX Request Data
+        uint32_t TxRequestData;
+
+        // TX Re-Request Fragment
+        uint32_t TxReRequestFragment;
+
+        // RX Success
+        uint32_t RxSuccess;
+
+        // RX Fail Partial Answer
+        uint32_t RxFailPartialAnswer;
+
+        // RX Fail No Answer
+        uint32_t RxFailNoAnswer;
+
+        // RX Fail Corrupt Data
+        uint32_t RxFailCorruptData;
+    } RadioStats = {};
 
     virtual bool sendStatsRequest() = 0;
     virtual bool sendAlarmLogRequest(const bool force = false) = 0;
@@ -106,6 +132,8 @@ private:
     bool _zeroValuesIfUnreachable = false;
     bool _zeroYieldDayOnMidnight = false;
     bool _clearEventlogOnMidnight = false;
+
+    int8_t _lastRssi = -127;
 
     std::unique_ptr<AlarmLogParser> _alarmLogParser;
     std::unique_ptr<DevInfoParser> _devInfoParser;

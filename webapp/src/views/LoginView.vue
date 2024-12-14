@@ -20,7 +20,7 @@
                         {{ $t('login.UsernameRequired') }}
                     </div>
                 </div>
-                <div class="form-group">
+                <div class="form-group mt-3">
                     <label htmlFor="password">{{ $t('login.Password') }}</label>
                     <input
                         type="password"
@@ -33,7 +33,7 @@
                         {{ $t('login.PasswordRequired') }}
                     </div>
                 </div>
-                <div class="form-group">
+                <div class="d-flex justify-content-end mt-3">
                     <button class="btn btn-primary" :disabled="dataLoading">
                         {{ $t('login.LoginButton') }}
                     </button>
