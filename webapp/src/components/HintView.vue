@@ -25,6 +25,13 @@
             </div>
         </div>
     </BootstrapAlert>
+
+    <BootstrapAlert :show="hints.pin_mapping_issue" variant="warning">
+        <div class="d-flex">
+            <div class="align-content-center"><BIconExclamationCircle class="fs-4" /></div>
+            <div class="align-content-center ms-3" v-html="$t('hints.PinMappingIssue')"></div>
+        </div>
+    </BootstrapAlert>
 </template>
 
 <script lang="ts">
