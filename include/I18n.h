@@ -23,7 +23,9 @@ public:
         String& offline,
         String& power_w, String& power_kw,
         String& yield_today_wh, String& yield_today_kwh,
-        String& yield_total_kwh, String& yield_total_mwh);
+        String& yield_total_kwh, String& yield_total_mwh,
+        String& yield_powermeter_power_w, String& yield_powermeter_power_kw,
+        String& yield_pm_positive_today_kwh, String& yield_pm_negative_today_kwh);
 
 private:
     void readLangPacks();

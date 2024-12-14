@@ -82,6 +82,10 @@ private:
     String _i18n_current_power_w;
     String _i18n_yield_total_mwh;
     String _i18n_yield_total_kwh;
+    String _i18n_powermeter_power_w;
+    String _i18n_powermeter_power_kw;
+    String _i18n_pm_positive_today_kwh;
+    String _i18n_pm_negative_today_kwh;
 };
 
 extern DisplayGraphicClass Display;

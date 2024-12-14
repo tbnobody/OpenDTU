@@ -304,7 +304,7 @@ void MqttHandleHassClass::publishPowerMeterField(size_t channel, JsyMkClass::Fie
         serializeJson(root, buffer);
         publish(configTopic, buffer);
     } else {
-        publish(configTopic, {});
+        publish(configTopic, String {});
     }
 }
 

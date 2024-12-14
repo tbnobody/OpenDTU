@@ -44,7 +44,9 @@ void I18nClass::readDisplayStrings(
     String& offline,
     String& power_w, String& power_kw,
     String& yield_today_wh, String& yield_today_kwh,
-    String& yield_total_kwh, String& yield_total_mwh)
+    String& yield_total_kwh, String& yield_total_mwh,
+    String& yield_powermeter_power_w, String& yield_powermeter_power_kw,
+    String& yield_pm_positive_today_kwh, String& yield_pm_negative_today_kwh)
 {
     auto filename = getFilenameByLocale(locale);
     if (filename == "") {
@@ -102,6 +104,22 @@ void I18nClass::readDisplayStrings(
 
     if (displayData["yield_total_mwh"].as<String>() != "null") {
         yield_total_mwh = displayData["yield_total_mwh"].as<String>();
+    }
+
+    if (displayData["yield_powermeter_power_w"].as<String>() != "null") {
+        yield_powermeter_power_w = displayData["yield_powermeter_power_w"].as<String>();
+    }
+
+    if (displayData["yield_powermeter_power_kw"].as<String>() != "null") {
+        yield_powermeter_power_kw = displayData["yield_powermeter_power_kw"].as<String>();
+    }
+
+    if (displayData["yield_pm_positive_today_kwh"].as<String>() != "null") {
+        yield_pm_positive_today_kwh = displayData["yield_pm_positive_today_kwh"].as<String>();
+    }
+
+    if (displayData["yield_pm_negative_today_kwh"].as<String>() != "null") {
+        yield_pm_negative_today_kwh = displayData["yield_pm_negative_today_kwh"].as<String>();
     }
 
     f.close();

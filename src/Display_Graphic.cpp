@@ -4,8 +4,8 @@
  */
 #include "Display_Graphic.h"
 #include "Datastore.h"
-#include "JsyMk.h"
 #include "I18n.h"
+#include "JsyMk.h"
 #include <NetworkSettings.h>
 #include <map>
 #include <time.h>
@@ -185,6 +185,10 @@ void DisplayGraphicClass::setLocale(const String& locale)
     _i18n_yield_today_kwh = i18n_yield_today_kwh[idx];
     _i18n_yield_total_kwh = i18n_yield_total_kwh[idx];
     _i18n_yield_total_mwh = i18n_yield_total_mwh[idx];
+    _i18n_powermeter_power_w = i18n_powermeter_power_w[idx];
+    _i18n_powermeter_power_kw = i18n_powermeter_power_kw[idx];
+    _i18n_pm_positive_today_kwh = i18n_pm_positive_today_kwh[idx];
+    _i18n_pm_negative_today_kwh = i18n_pm_negative_today_kwh[idx];
 
     I18n.readDisplayStrings(locale,
         _i18n_date_format,
@@ -194,7 +198,11 @@ void DisplayGraphicClass::setLocale(const String& locale)
         _i18n_yield_today_wh,
         _i18n_yield_today_kwh,
         _i18n_yield_total_kwh,
-        _i18n_yield_total_mwh);
+        _i18n_yield_total_mwh,
+        _i18n_powermeter_power_w,
+        _i18n_powermeter_power_kw,
+        _i18n_pm_positive_today_kwh,
+        _i18n_pm_negative_today_kwh);
 }
 
 void DisplayGraphicClass::setDiagramMode(DiagramMode_t mode)
@@ -235,9 +243,11 @@ void DisplayGraphicClass::loop()
         const char direction = (JsyMk.getFieldValue(0, JsyMkClass::Field_t::NEGATIVE) > 0) ? 'O' : 'I';
 
         if (watts > 999) {
-            snprintf(_fmtText, sizeof(_fmtText), i18n_powermeter_power_kw[_display_language], direction, watts / 1000);
+            //            snprintf(_fmtText, sizeof(_fmtText), i18n_powermeter_power_kw[_display_language], direction, watts / 1000);
+            snprintf(_fmtText, sizeof(_fmtText), _i18n_powermeter_power_kw.c_str(), direction, watts / 1000);
         } else {
-            snprintf(_fmtText, sizeof(_fmtText), i18n_powermeter_power_w[_display_language], direction, watts);
+            //            snprintf(_fmtText, sizeof(_fmtText), i18n_powermeter_power_w[_display_language], direction, watts);
+            snprintf(_fmtText, sizeof(_fmtText), _i18n_powermeter_power_w.c_str(), direction, watts);
         }
         printText(_fmtText, 0);
     }
@@ -288,28 +298,28 @@ void DisplayGraphicClass::loop()
         if (displayPowerMeter) {
             // Daily Input
             float wattsInput = JsyMk.getFieldValue(0, JsyMkClass::Field_t::TODAY_POSITIVE_ENERGY);
-            snprintf(_fmtText, sizeof(_fmtText), i18n_pm_positive_today_kwh[_display_language], wattsInput);
+            snprintf(_fmtText, sizeof(_fmtText), _i18n_pm_positive_today_kwh.c_str(), wattsInput);
             printText(_fmtText, 1);
 
             // Daily Output
             float wattsOutput = JsyMk.getFieldValue(0, JsyMkClass::Field_t::TODAY_NEGATIVE_ENERGY);
-            snprintf(_fmtText, sizeof(_fmtText), i18n_pm_negative_today_kwh[_display_language], wattsOutput);
+            snprintf(_fmtText, sizeof(_fmtText), _i18n_pm_negative_today_kwh.c_str(), wattsOutput);
             printText(_fmtText, 2);
         } else {
-			// Daily production
-			float wattsToday = Datastore.getTotalAcYieldDayEnabled();
-			if (wattsToday >= 10000) {
-				snprintf(_fmtText, sizeof(_fmtText), _i18n_yield_today_kwh.c_str(), wattsToday / 1000);
-			} else {
-				snprintf(_fmtText, sizeof(_fmtText), _i18n_yield_today_wh.c_str(), wattsToday);
-			}
-			printText(_fmtText, 1);
+            // Daily production
+            float wattsToday = Datastore.getTotalAcYieldDayEnabled();
+            if (wattsToday >= 10000) {
+                snprintf(_fmtText, sizeof(_fmtText), _i18n_yield_today_kwh.c_str(), wattsToday / 1000);
+            } else {
+                snprintf(_fmtText, sizeof(_fmtText), _i18n_yield_today_wh.c_str(), wattsToday);
+            }
+            printText(_fmtText, 1);
 
-			// Total production
-			const float wattsTotal = Datastore.getTotalAcYieldTotalEnabled();
-			auto const format = (wattsTotal >= 1000) ? _i18n_yield_total_mwh : _i18n_yield_total_kwh;
-			snprintf(_fmtText, sizeof(_fmtText), format.c_str(), wattsTotal);
-			printText(_fmtText, 2);
+            // Total production
+            const float wattsTotal = Datastore.getTotalAcYieldTotalEnabled();
+            auto const format = (wattsTotal >= 1000) ? _i18n_yield_total_mwh : _i18n_yield_total_kwh;
+            snprintf(_fmtText, sizeof(_fmtText), format.c_str(), wattsTotal);
+            printText(_fmtText, 2);
         }
 
         //=====> IP or Date-Time ========
