@@ -8,6 +8,7 @@ public:
     explicit PowerControlCommand(InverterAbstract* inv, const uint64_t router_address = 0);
 
     virtual String getCommandName() const;
+    virtual QueueInsertType getQueueInsertType() const { return QueueInsertType::AllowMultiple; }
 
     virtual bool handleResponse(const fragment_t fragment[], const uint8_t max_fragment_id);
     virtual void gotTimeout();

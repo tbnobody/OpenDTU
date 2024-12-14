@@ -44,7 +44,15 @@ ActivePowerControlCommand::ActivePowerControlCommand(InverterAbstract* inv, cons
 
 String ActivePowerControlCommand::getCommandName() const
 {
-    return "ActivePowerControl";
+    char buffer[30];
+    snprintf(buffer, sizeof(buffer), "ActivePowerControl (%02X)", getType());
+    return buffer;
+}
+
+bool ActivePowerControlCommand::areSameParameter(CommandAbstract* other)
+{
+    return CommandAbstract::areSameParameter(other)
+        && this->getType() == static_cast<ActivePowerControlCommand*>(other)->getType();
 }
 
 void ActivePowerControlCommand::setActivePowerLimit(const float limit, const PowerLimitControlType type)
@@ -89,7 +97,7 @@ float ActivePowerControlCommand::getLimit() const
     return l / 10;
 }
 
-PowerLimitControlType ActivePowerControlCommand::getType()
+PowerLimitControlType ActivePowerControlCommand::getType() const
 {
     return (PowerLimitControlType)((static_cast<uint16_t>(_payload[14]) << 8) | _payload[15]);
 }

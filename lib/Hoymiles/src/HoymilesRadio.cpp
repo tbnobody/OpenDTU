@@ -156,6 +156,11 @@ bool HoymilesRadio::isInitialized() const
     return _isInitialized;
 }
 
+void HoymilesRadio::removeCommands(InverterAbstract* inv)
+{
+    _commandQueue.removeAllEntriesForInverter(inv);
+}
+
 bool HoymilesRadio::isIdle() const
 {
     return !_busyFlag;
@@ -164,4 +169,9 @@ bool HoymilesRadio::isIdle() const
 bool HoymilesRadio::isQueueEmpty() const
 {
     return _commandQueue.size() == 0;
+}
+
+unsigned long HoymilesRadio::getQueueSize() const
+{
+    return _commandQueue.size();
 }
