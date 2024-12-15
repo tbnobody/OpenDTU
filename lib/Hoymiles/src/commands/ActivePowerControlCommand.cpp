@@ -87,7 +87,10 @@ bool ActivePowerControlCommand::handleResponse(const fragment_t fragment[], cons
         }
     }
     _inv->SystemConfigPara()->setLastUpdateCommand(millis());
-    _inv->SystemConfigPara()->setLastLimitCommandSuccess(CMD_OK);
+    std::shared_ptr<ActivePowerControlCommand> cmd(std::shared_ptr<ActivePowerControlCommand>(), this);
+    if (_inv->getRadio()->countSimilarCommands(cmd) == 1) {
+        _inv->SystemConfigPara()->setLastLimitCommandSuccess(CMD_OK);
+    }
     return true;
 }
 

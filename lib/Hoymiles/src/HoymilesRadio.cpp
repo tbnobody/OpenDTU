@@ -161,6 +161,11 @@ void HoymilesRadio::removeCommands(InverterAbstract* inv)
     _commandQueue.removeAllEntriesForInverter(inv);
 }
 
+uint8_t HoymilesRadio::countSimilarCommands(std::shared_ptr<CommandAbstract> cmd)
+{
+    return _commandQueue.countSimilarCommands(cmd);
+}
+
 bool HoymilesRadio::isIdle() const
 {
     return !_busyFlag;
