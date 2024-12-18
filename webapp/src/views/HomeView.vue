@@ -80,7 +80,7 @@
                                 'text-bg-tertiary': !inverter.poll_enabled,
                                 'text-bg-danger': inverter.poll_enabled && !inverter.reachable,
                                 'text-bg-warning': inverter.poll_enabled && inverter.reachable && !inverter.producing,
-                                'text-bg-primary': inverter.poll_enabled && inverter.reachable && inverter.producing,
+                                'text-bg-success': inverter.poll_enabled && inverter.reachable && inverter.producing,
                             }"
                         >
                             <div class="p-1 flex-grow-1">
