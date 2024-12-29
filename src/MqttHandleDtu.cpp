@@ -32,7 +32,7 @@ void MqttHandleDtuClass::loop()
         return;
     }
 
-    MqttSettings.publish("dtu/uptime", String(millis() / 1000));
+    MqttSettings.publish("dtu/uptime", String(esp_timer_get_time() / 1000000));
     MqttSettings.publish("dtu/ip", NetworkSettings.localIP().toString());
     MqttSettings.publish("dtu/hostname", NetworkSettings.getHostname());
     MqttSettings.publish("dtu/heap/size", String(ESP.getHeapSize()));
