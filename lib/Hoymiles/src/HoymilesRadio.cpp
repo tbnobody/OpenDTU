@@ -176,7 +176,7 @@ bool HoymilesRadio::isQueueEmpty() const
     return _commandQueue.size() == 0;
 }
 
-unsigned long HoymilesRadio::getQueueSize() const
+uint32_t HoymilesRadio::getQueueSize() const
 {
     return _commandQueue.size();
 }

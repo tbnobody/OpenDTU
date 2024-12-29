@@ -20,7 +20,7 @@ public:
 
     bool isIdle() const;
     bool isQueueEmpty() const;
-    unsigned long getQueueSize() const;
+    uint32_t getQueueSize() const;
     bool isInitialized() const;
 
     void removeCommands(InverterAbstract* inv);

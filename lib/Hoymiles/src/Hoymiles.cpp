@@ -119,7 +119,7 @@ void HoymilesClass::loop()
                     iv->sendGridOnProFileParaRequest();
                 }
 
-                 _messageOutput->printf("Queue size - NRF: %ld CMT: %ld\r\n", _radioNrf->getQueueSize(), _radioCmt->getQueueSize());
+                 _messageOutput->printf("Queue size - NRF: %" PRId32 " CMT: %" PRId32 "\r\n", _radioNrf->getQueueSize(), _radioCmt->getQueueSize());
                 _lastPoll = millis();
             }
 
