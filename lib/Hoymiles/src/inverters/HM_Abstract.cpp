@@ -14,7 +14,9 @@
 #include "commands/SystemConfigParaCommand.h"
 
 HM_Abstract::HM_Abstract(HoymilesRadio* radio, const uint64_t serial)
-    : InverterAbstract(radio, serial) {};
+    : InverterAbstract(radio, serial)
+{
+}
 
 bool HM_Abstract::sendStatsRequest()
 {

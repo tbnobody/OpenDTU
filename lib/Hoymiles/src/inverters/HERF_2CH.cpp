@@ -37,7 +37,9 @@ static const byteAssign_t byteAssignment[] = {
 };
 
 HERF_2CH::HERF_2CH(HoymilesRadio* radio, const uint64_t serial)
-    : HM_Abstract(radio, serial) {};
+    : HM_Abstract(radio, serial)
+{
+}
 
 bool HERF_2CH::isValidSerial(const uint64_t serial)
 {
