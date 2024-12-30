@@ -257,12 +257,28 @@
     "@intlify/message-compiler" "10.0.4"
     "@intlify/shared" "10.0.4"
 
+"@intlify/core-base@11.0.1":
+  version "11.0.1"
+  resolved "https://registry.yarnpkg.com/@intlify/core-base/-/core-base-11.0.1.tgz#f84564a5bd313879b32cea70e6e3d2fe9e1f128b"
+  integrity sha512-NAmhw1l/llM0HZRpagR/ChJTNymW4ll6/4EDSJML5c8L5Hl/+k6UyF8EIgE6DeHpfheQujkSRngauViHqq6jJQ==
+  dependencies:
+    "@intlify/message-compiler" "11.0.1"
+    "@intlify/shared" "11.0.1"
+
 "@intlify/message-compiler@10.0.4":
   version "10.0.4"
   resolved "https://registry.yarnpkg.com/@intlify/message-compiler/-/message-compiler-10.0.4.tgz#82471b9ba3e3371aa74eee12baf0555490d581d3"
   integrity sha512-AFbhEo10DP095/45EauinQJ5hJ3rJUmuuqltGguvc3WsvezZN+g8qNHLGWKu60FHQVizMrQY7VJ+zVlBXlQQkQ==
   dependencies:
     "@intlify/shared" "10.0.4"
+    source-map-js "^1.0.2"
+
+"@intlify/message-compiler@11.0.1":
+  version "11.0.1"
+  resolved "https://registry.yarnpkg.com/@intlify/message-compiler/-/message-compiler-11.0.1.tgz#7c159642e3a3c160dd25a15c17127c69d56b0561"
+  integrity sha512-5RFH8x+Mn3mbjcHXnb6KCXGiczBdiQkWkv99iiA0JpKrNuTAQeW59Pjq/uObMB0eR0shnKYGTkIJxum+DbL3sw==
+  dependencies:
+    "@intlify/shared" "11.0.1"
     source-map-js "^1.0.2"
 
 "@intlify/message-compiler@next":
@@ -282,6 +298,11 @@
   version "10.0.4"
   resolved "https://registry.yarnpkg.com/@intlify/shared/-/shared-10.0.4.tgz#3acc71e162ffd77a7de9f486e082cc135ec4cdef"
   integrity sha512-ukFn0I01HsSgr3VYhYcvkTCLS7rGa0gw4A4AMpcy/A9xx/zRJy7PS2BElMXLwUazVFMAr5zuiTk3MQeoeGXaJg==
+
+"@intlify/shared@11.0.1":
+  version "11.0.1"
+  resolved "https://registry.yarnpkg.com/@intlify/shared/-/shared-11.0.1.tgz#25ff7f038bbae903e2bc75bf862b2380fde07cc8"
+  integrity sha512-lH164+aDDptHZ3dBDbIhRa1dOPQUp+83iugpc+1upTOWCnwyC1PVis6rSWNMMJ8VQxvtHQB9JMib48K55y0PvQ==
 
 "@intlify/unplugin-vue-i18n@^5.2.0":
   version "5.2.0"
@@ -2796,7 +2817,16 @@ vue-eslint-parser@^9.4.3:
     lodash "^4.17.21"
     semver "^7.3.6"
 
-vue-i18n@10.0.4, vue-i18n@^10.0.0:
+vue-i18n@11.0.1:
+  version "11.0.1"
+  resolved "https://registry.yarnpkg.com/vue-i18n/-/vue-i18n-11.0.1.tgz#aa4c20d6f7c127bc46028ae3325659be47dd338e"
+  integrity sha512-pWAT8CusK8q9/EpN7V3oxwHwxWm6+Kp2PeTZmRGvdZTkUzMQDpbbmHp0TwQ8xw04XKm23cr6B4GL72y3W8Yekg==
+  dependencies:
+    "@intlify/core-base" "11.0.1"
+    "@intlify/shared" "11.0.1"
+    "@vue/devtools-api" "^6.5.0"
+
+vue-i18n@^10.0.0:
   version "10.0.4"
   resolved "https://registry.yarnpkg.com/vue-i18n/-/vue-i18n-10.0.4.tgz#289dd2284292125fd9cec87f0df5148214ffb2f5"
   integrity sha512-1xkzVxqBLk2ZFOmeI+B5r1J7aD/WtNJ4j9k2mcFcQo5BnOmHBmD7z4/oZohh96AAaRZ4Q7mNQvxc9h+aT+Md3w==
