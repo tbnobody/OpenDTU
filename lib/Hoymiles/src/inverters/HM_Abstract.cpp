@@ -219,3 +219,8 @@ bool HM_Abstract::sendGridOnProFileParaRequest()
 
     return true;
 }
+
+bool HM_Abstract::supportsPowerDistributionLogic()
+{
+    return false;
+}

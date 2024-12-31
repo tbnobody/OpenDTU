@@ -10,4 +10,5 @@ public:
     String typeName() const;
     const byteAssign_t* getByteAssignment() const;
     uint8_t getByteAssignmentSize() const;
+    bool supportsPowerDistributionLogic() final;
 };

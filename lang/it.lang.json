@@ -45,7 +45,9 @@
             "Refreshing": "Aggiorna",
             "Pull": "Trascina in basso per aggiornare",
             "Release": "Rilascia per aggiornare",
-            "Close": "Chiudi"
+            "Close": "Chiudi",
+            "Yes": "Yes",
+            "No": "No"
         },
         "wait": {
             "NotReady": "OpenDTU is not yet ready",
@@ -193,7 +195,10 @@
             "FirmwareVersion": "Versione Firmware",
             "FirmwareBuildDate": "Data Firmware",
             "HardwarePartNumber": "Hardware Part Number",
-            "HardwareVersion": "Hardware Version"
+            "HardwareVersion": "Hardware Version",
+            "SupportsPowerDistributionLogic": "'Power Distribution Logic' supported",
+            "Yes": "@:base.Yes",
+            "No": "@:base.No"
         },
         "gridprofile": {
             "NoInfo": "@:devinfo.NoInfo",

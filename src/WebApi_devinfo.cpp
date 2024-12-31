@@ -35,6 +35,7 @@ void WebApiDevInfoClass::onDevInfoStatus(AsyncWebServerRequest* request)
         root["hw_model_name"] = inv->DevInfo()->getHwModelName();
         root["max_power"] = inv->DevInfo()->getMaxPower();
         root["fw_build_datetime"] = inv->DevInfo()->getFwBuildDateTimeStr();
+        root["pdl_supported"] = inv->supportsPowerDistributionLogic();
     }
 
     WebApi.sendJsonResponse(request, response, __FUNCTION__, __LINE__);
