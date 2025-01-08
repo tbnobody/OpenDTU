@@ -50,7 +50,7 @@ bool HERF_2CH::isValidSerial(const uint64_t serial)
 
 String HERF_2CH::typeName() const
 {
-    return "HERF-800-2T";
+    return "HERF-600/800-2T";
 }
 
 const byteAssign_t* HERF_2CH::getByteAssignment() const

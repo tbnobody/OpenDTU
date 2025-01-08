@@ -12,5 +12,5 @@
 | HMT_4CH       | HMT-1600/1800/2000-4T       | 1361             |
 | HMT_6CH       | HMT-1800/2250-6T            | 1382             |
 | HERF_1CH      | HERF 300                    | 2841             |
-| HERF_2CH      | HERF 800                    | 2821             |
+| HERF_2CH      | HERF 600/800                | 2821             |
 | HERF_4CH      | HERF 1800                   | 2801             |
