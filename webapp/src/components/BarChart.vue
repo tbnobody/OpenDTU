@@ -60,6 +60,7 @@ export default defineComponent({
                 .then((energy) => {
                     if (energy) {
                         this.chartData = [[{ type: 'date', id: 'Time' }, { type: 'number', id: 'Energy' }]];
+                        // eslint-disable-next-line @typescript-eslint/no-explicit-any
                         energy.forEach((x: any[]) => {
                             const d = new Date(x[0] + 2000, x[1] - 1, x[2], x[3]);
                             this.chartData.push([d, Math.round(x[4])])
