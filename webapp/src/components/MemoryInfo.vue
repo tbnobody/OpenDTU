@@ -22,6 +22,7 @@
                         :total="systemStatus.psram_total"
                         :used="systemStatus.psram_used"
                     />
+                    <a href='/api/database'>Read Database</a>
                     <FsInfo
                         :name="$t('memoryinfo.LittleFs')"
                         :total="systemStatus.littlefs_total"

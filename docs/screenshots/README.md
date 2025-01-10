@@ -89,3 +89,7 @@ here are some screenshots of OpenDTU's web interface.
 ***
 
 ![Console](18_Console.png)
+
+***
+
+![Console](23_Database.png)
