@@ -9,7 +9,7 @@ import { defineComponent } from 'vue';
 import { GChart } from 'vue-google-charts';
 import { authHeader, handleResponse } from '@/utils/authentication';
 //import { DatetimeFormat } from 'vue-i18n';
-var data_col: any;
+let data_col: any;
 
 const options_col = {
     height: 300,
@@ -59,14 +59,14 @@ export default defineComponent({
                     if (energy) {
                         this.chartData = [[{ type: 'date', id: 'Time' }, { type: 'number', id: 'Energy' }]];
                         energy.forEach((x: any[]) => {
-                            var d = new Date(x[0] + 2000, x[1] - 1, x[2], x[3]);
+                            let d = new Date(x[0] + 2000, x[1] - 1, x[2], x[3]);
                             this.chartData.push([d, Math.round(x[4])])
                         });
                         this.dataLoaded = true;
                     }
                 });
 
-            // var date_formatter = new google.visualization.DateFormat({
+            // let date_formatter = new google.visualization.DateFormat({
             //     pattern: "dd.MM.YY HH:mm"
             // });
             // date_formatter.format(data, 0);
@@ -76,11 +76,11 @@ export default defineComponent({
             setInterval(this.getInitialData, 1000 * 60 * 60);   // refresh every hour
         },
         startautorefresh() {
-            var nextDate = new Date();
+            let nextDate = new Date();
             nextDate.setHours(nextDate.getHours() + 1);
             nextDate.setMinutes(0);
             nextDate.setSeconds(5);
-            var difference: number = nextDate.valueOf() - Date.now();
+            let difference: number = nextDate.valueOf() - Date.now();
             setTimeout(this.callEveryHour, difference);
         },
     }
