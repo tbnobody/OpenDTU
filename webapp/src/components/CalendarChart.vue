@@ -34,6 +34,7 @@ export default defineComponent({
                     if (energy) {
                         this.values = [];
                         let d: Date;
+                        // eslint-disable-next-line @typescript-eslint/no-explicit-any
                         energy.forEach((x: any[]) => {
                             d = new Date(x[0] + 2000, x[1] - 1, x[2], x[3])
                             this.values.push({ date: d, count: Math.round(x[4]) })
@@ -47,11 +48,11 @@ export default defineComponent({
             setInterval(this.getInitialData, 1000 * 60 * 60);   // refresh every hour
         },
         startautorefresh() {
-            let nextDate = new Date();
+            const nextDate = new Date();
             nextDate.setHours(nextDate.getHours() + 1);
             nextDate.setMinutes(0);
             nextDate.setSeconds(5);
-            let difference: number = nextDate.valueOf() - Date.now();
+            const difference: number = nextDate.valueOf() - Date.now();
             setTimeout(this.callEveryHour, difference);
         },
     }
