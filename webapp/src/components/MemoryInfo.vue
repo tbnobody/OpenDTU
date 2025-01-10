@@ -1,5 +1,5 @@
 <template>
-    <CardElement :text="$t('memoryinfo.MemoryInformation')" textVariant="text-bg-primary">
+    <CardElement :text="$t('memoryinfo.MemoryInformation')" textVariant="text-bg-primary" table>
         <div class="table-responsive">
             <table class="table table-hover table-condensed">
                 <thead>

@@ -4,6 +4,7 @@
  */
 #include "Display_Graphic.h"
 #include "Datastore.h"
+#include "I18n.h"
 #include <NetworkSettings.h>
 #include <map>
 #include <time.h>
@@ -16,17 +17,10 @@ std::map<DisplayType_t, std::function<U8G2*(uint8_t, uint8_t, uint8_t, uint8_t)>
     { DisplayType_t::ST7567_GM12864I_59N, [](uint8_t reset, uint8_t clock, uint8_t data, uint8_t cs) { return new U8G2_ST7567_ENH_DG128064I_F_HW_I2C(U8G2_R0, reset, clock, data); } },
 };
 
-// Language defintion, respect order in languages[] and translation lists
+// Language defintion, respect order in translation lists
 #define I18N_LOCALE_EN 0
 #define I18N_LOCALE_DE 1
 #define I18N_LOCALE_FR 2
-
-// Languages supported. Note: the order is important and must match locale_translations.h
-const uint8_t languages[] = {
-    I18N_LOCALE_EN,
-    I18N_LOCALE_DE,
-    I18N_LOCALE_FR
-};
 
 static const char* const i18n_offline[] = { "Offline", "Offline", "Offline" };
 
@@ -166,9 +160,34 @@ void DisplayGraphicClass::setOrientation(const uint8_t rotation)
     calcLineHeights();
 }
 
-void DisplayGraphicClass::setLanguage(const uint8_t language)
+void DisplayGraphicClass::setLocale(const String& locale)
 {
-    _display_language = language < sizeof(languages) / sizeof(languages[0]) ? language : DISPLAY_LANGUAGE;
+    _display_language = locale;
+    uint8_t idx = I18N_LOCALE_EN;
+    if (locale == "de") {
+        idx = I18N_LOCALE_DE;
+    } else if (locale == "fr") {
+        idx = I18N_LOCALE_FR;
+    }
+
+    _i18n_date_format = i18n_date_format[idx];
+    _i18n_offline = i18n_offline[idx];
+    _i18n_current_power_w = i18n_current_power_w[idx];
+    _i18n_current_power_kw = i18n_current_power_kw[idx];
+    _i18n_yield_today_wh = i18n_yield_today_wh[idx];
+    _i18n_yield_today_kwh = i18n_yield_today_kwh[idx];
+    _i18n_yield_total_kwh = i18n_yield_total_kwh[idx];
+    _i18n_yield_total_mwh = i18n_yield_total_mwh[idx];
+
+    I18n.readDisplayStrings(locale,
+        _i18n_date_format,
+        _i18n_offline,
+        _i18n_current_power_w,
+        _i18n_current_power_kw,
+        _i18n_yield_today_wh,
+        _i18n_yield_today_kwh,
+        _i18n_yield_total_kwh,
+        _i18n_yield_total_mwh);
 }
 
 void DisplayGraphicClass::setDiagramMode(DiagramMode_t mode)
@@ -225,9 +244,9 @@ void DisplayGraphicClass::loop()
         if (showText) {
             const float watts = Datastore.getTotalAcPowerEnabled();
             if (watts > 999) {
-                snprintf(_fmtText, sizeof(_fmtText), i18n_current_power_kw[_display_language], watts / 1000);
+                snprintf(_fmtText, sizeof(_fmtText), _i18n_current_power_kw.c_str(), watts / 1000);
             } else {
-                snprintf(_fmtText, sizeof(_fmtText), i18n_current_power_w[_display_language], watts);
+                snprintf(_fmtText, sizeof(_fmtText), _i18n_current_power_w.c_str(), watts);
             }
             printText(_fmtText, 0);
         }
@@ -237,7 +256,7 @@ void DisplayGraphicClass::loop()
 
     //=====> Offline ===========
     else {
-        printText(i18n_offline[_display_language], 0);
+        printText(_i18n_offline.c_str(), 0);
         // check if it's time to enter power saving mode
         if (millis() - _previousMillis >= (_interval * 2)) {
             displayPowerSave = enablePowerSafe;
@@ -249,16 +268,16 @@ void DisplayGraphicClass::loop()
         // Daily production
         float wattsToday = Datastore.getTotalAcYieldDayEnabled();
         if (wattsToday >= 10000) {
-            snprintf(_fmtText, sizeof(_fmtText), i18n_yield_today_kwh[_display_language], wattsToday / 1000);
+            snprintf(_fmtText, sizeof(_fmtText), _i18n_yield_today_kwh.c_str(), wattsToday / 1000);
         } else {
-            snprintf(_fmtText, sizeof(_fmtText), i18n_yield_today_wh[_display_language], wattsToday);
+            snprintf(_fmtText, sizeof(_fmtText), _i18n_yield_today_wh.c_str(), wattsToday);
         }
         printText(_fmtText, 1);
 
         // Total production
         const float wattsTotal = Datastore.getTotalAcYieldTotalEnabled();
-        auto const format = (wattsTotal >= 1000) ? i18n_yield_total_mwh : i18n_yield_total_kwh;
-        snprintf(_fmtText, sizeof(_fmtText), format[_display_language], wattsTotal);
+        auto const format = (wattsTotal >= 1000) ? _i18n_yield_total_mwh : _i18n_yield_total_kwh;
+        snprintf(_fmtText, sizeof(_fmtText), format.c_str(), wattsTotal);
         printText(_fmtText, 2);
 
         //=====> IP or Date-Time ========
@@ -268,7 +287,7 @@ void DisplayGraphicClass::loop()
         } else {
             // Get current time
             time_t now = time(nullptr);
-            strftime(_fmtText, sizeof(_fmtText), i18n_date_format[_display_language], localtime(&now));
+            strftime(_fmtText, sizeof(_fmtText), _i18n_date_format.c_str(), localtime(&now));
             printText(_fmtText, 3);
         }
     }

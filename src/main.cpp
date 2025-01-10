@@ -5,6 +5,7 @@
 #include "Configuration.h"
 #include "Datastore.h"
 #include "Display_Graphic.h"
+#include "I18n.h"
 #include "InverterSettings.h"
 #include "Led_Single.h"
 #include "MessageOutput.h"
@@ -24,11 +25,9 @@
 #include "defaults.h"
 #include <Arduino.h>
 #include <LittleFS.h>
+#include <SpiManager.h>
 #include <TaskScheduler.h>
 #include <esp_heap_caps.h>
-#include <SpiManager.h>
-
-#include <driver/uart.h>
 
 void setup()
 {
@@ -43,10 +42,8 @@ void setup()
 
     // Initialize serial output
     Serial.begin(SERIAL_BAUDRATE);
-#if ARDUINO_USB_CDC_ON_BOOT
-    Serial.setTxTimeoutMs(0);
-    delay(100);
-#else
+#if !ARDUINO_USB_CDC_ON_BOOT
+    // Only wait for serial interface to be set up when not using CDC
     while (!Serial)
         yield();
 #endif
@@ -68,10 +65,9 @@ void setup()
     }
 
     // Read configuration values
+    Configuration.init(scheduler);
     MessageOutput.print("Reading configuration... ");
     if (!Configuration.read()) {
-        MessageOutput.print("initializing... ");
-        Configuration.init();
         if (Configuration.write()) {
             MessageOutput.print("written... ");
         } else {
@@ -83,6 +79,11 @@ void setup()
         Configuration.migrate();
     }
     auto& config = Configuration.get();
+    MessageOutput.println("done");
+
+    // Read languate pack
+    MessageOutput.print("Reading language pack... ");
+    I18n.init(scheduler);
     MessageOutput.println("done");
 
     // Load PinMapping
@@ -139,26 +140,13 @@ void setup()
     Display.enablePowerSafe = config.Display.PowerSafe;
     Display.enableScreensaver = config.Display.ScreenSaver;
     Display.setContrast(config.Display.Contrast);
-    Display.setLanguage(config.Display.Language);
+    Display.setLocale(config.Display.Locale);
     Display.setStartupDisplay();
     MessageOutput.println("done");
 
     // Initialize Single LEDs
     MessageOutput.print("Initialize LEDs... ");
     LedSingle.init(scheduler);
-    MessageOutput.println("done");
-
-    // Check for default DTU serial
-    MessageOutput.print("Check for default DTU serial... ");
-    if (config.Dtu.Serial == DTU_SERIAL) {
-        MessageOutput.print("generate serial based on ESP chip id: ");
-        const uint64_t dtuId = Utils::generateDtuSerial();
-        MessageOutput.printf("%0x%08x... ",
-            ((uint32_t)((dtuId >> 32) & 0xFFFFFFFF)),
-            ((uint32_t)(dtuId & 0xFFFFFFFF)));
-        config.Dtu.Serial = dtuId;
-        Configuration.write();
-    }
     MessageOutput.println("done");
 
     InverterSettings.init(scheduler);

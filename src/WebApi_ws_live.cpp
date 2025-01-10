@@ -36,18 +36,31 @@ void WebApiWsLiveClass::init(AsyncWebServer& server, Scheduler& scheduler)
 
     scheduler.addTask(_sendDataTask);
     _sendDataTask.enable();
+    _simpleDigestAuth.setUsername(AUTH_USERNAME);
+    _simpleDigestAuth.setRealm("live websocket");
+
+    reload();
+}
+
+void WebApiWsLiveClass::reload()
+{
+    _ws.removeMiddleware(&_simpleDigestAuth);
+
+    auto const& config = Configuration.get();
+
+    if (config.Security.AllowReadonly) { return; }
+
+    _ws.enable(false);
+    _simpleDigestAuth.setPassword(config.Security.Password);
+    _ws.addMiddleware(&_simpleDigestAuth);
+    _ws.closeAll();
+    _ws.enable(true);
 }
 
 void WebApiWsLiveClass::wsCleanupTaskCb()
 {
     // see: https://github.com/me-no-dev/ESPAsyncWebServer#limiting-the-number-of-web-socket-clients
     _ws.cleanupClients();
-
-    if (Configuration.get().Security.AllowReadonly) {
-        _ws.setAuthentication("", "");
-    } else {
-        _ws.setAuthentication(AUTH_USERNAME, Configuration.get().Security.Password);
-    }
 }
 
 void WebApiWsLiveClass::sendDataTaskCb()
@@ -140,6 +153,7 @@ void WebApiWsLiveClass::generateInverterCommonJsonResponse(JsonObject& root, std
     root["radio_stats"]["rx_fail_nothing"] = inv->RadioStats.RxFailNoAnswer;
     root["radio_stats"]["rx_fail_partial"] = inv->RadioStats.RxFailPartialAnswer;
     root["radio_stats"]["rx_fail_corrupt"] = inv->RadioStats.RxFailCorruptData;
+    root["radio_stats"]["rssi"] = inv->getLastRssi();
 }
 
 void WebApiWsLiveClass::generateInverterChannelJsonResponse(JsonObject& root, std::shared_ptr<InverterAbstract> inv)

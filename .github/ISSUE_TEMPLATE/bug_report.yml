@@ -48,7 +48,7 @@ body:
       description: How did you install OpenDTU?
       options:
         - Pre-Compiled binary from GitHub releases
-        - Pre-Compiles binary from GitHub actions/pull-request
+        - Pre-Compiled binary from GitHub actions/pull-request
         - Self-Compiled
     validations:
       required: true

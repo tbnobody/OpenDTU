@@ -5,7 +5,7 @@ export interface Display {
     power_safe: boolean;
     screensaver: boolean;
     contrast: number;
-    language: number;
+    locale: string;
     diagramduration: number;
     diagrammode: number;
 }

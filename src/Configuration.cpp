@@ -13,8 +13,17 @@
 
 CONFIG_T config;
 
-void ConfigurationClass::init()
+static std::condition_variable sWriterCv;
+static std::mutex sWriterMutex;
+static unsigned sWriterCount = 0;
+
+void ConfigurationClass::init(Scheduler& scheduler)
 {
+    scheduler.addTask(_loopTask);
+    _loopTask.setCallback(std::bind(&ConfigurationClass::loop, this));
+    _loopTask.setIterations(TASK_FOREVER);
+    _loopTask.enable();
+
     memset(&config, 0x0, sizeof(config));
 }
 
@@ -107,7 +116,7 @@ bool ConfigurationClass::write()
     display["screensaver"] = config.Display.ScreenSaver;
     display["rotation"] = config.Display.Rotation;
     display["contrast"] = config.Display.Contrast;
-    display["language"] = config.Display.Language;
+    display["locale"] = config.Display.Locale;
     display["diagram_duration"] = config.Display.Diagram.Duration;
     display["diagram_mode"] = config.Display.Diagram.Mode;
 
@@ -159,6 +168,7 @@ bool ConfigurationClass::write()
 bool ConfigurationClass::read()
 {
     File f = LittleFS.open(CONFIG_FILENAME, "r", false);
+    Utils::skipBom(f);
 
     JsonDocument doc;
 
@@ -282,7 +292,7 @@ bool ConfigurationClass::read()
     config.Display.ScreenSaver = display["screensaver"] | DISPLAY_SCREENSAVER;
     config.Display.Rotation = display["rotation"] | DISPLAY_ROTATION;
     config.Display.Contrast = display["contrast"] | DISPLAY_CONTRAST;
-    config.Display.Language = display["language"] | DISPLAY_LANGUAGE;
+    strlcpy(config.Display.Locale, display["locale"] | DISPLAY_LOCALE, sizeof(config.Display.Locale));
     config.Display.Diagram.Duration = display["diagram_duration"] | DISPLAY_DIAGRAM_DURATION;
     config.Display.Diagram.Mode = display["diagram_mode"] | DISPLAY_DIAGRAM_MODE;
 
@@ -318,6 +328,20 @@ bool ConfigurationClass::read()
     }
 
     f.close();
+
+    // Check for default DTU serial
+    MessageOutput.print("Check for default DTU serial... ");
+    if (config.Dtu.Serial == DTU_SERIAL) {
+        MessageOutput.print("generate serial based on ESP chip id: ");
+        const uint64_t dtuId = Utils::generateDtuSerial();
+        MessageOutput.printf("%0" PRIx32 "%08" PRIx32 "... ",
+            static_cast<uint32_t>((dtuId >> 32) & 0xFFFFFFFF),
+            static_cast<uint32_t>(dtuId & 0xFFFFFFFF));
+        config.Dtu.Serial = dtuId;
+        write();
+    }
+    MessageOutput.println("done");
+
     return true;
 }
 
@@ -383,6 +407,22 @@ void ConfigurationClass::migrate()
         }
     }
 
+    if (config.Cfg.Version < 0x00011d00) {
+        JsonObject device = doc["device"];
+        JsonObject display = device["display"];
+        switch (display["language"] | 0U) {
+        case 0U:
+            strlcpy(config.Display.Locale, "en", sizeof(config.Display.Locale));
+            break;
+        case 1U:
+            strlcpy(config.Display.Locale, "de", sizeof(config.Display.Locale));
+            break;
+        case 2U:
+            strlcpy(config.Display.Locale, "fr", sizeof(config.Display.Locale));
+            break;
+        }
+    }
+
     f.close();
 
     config.Cfg.Version = CONFIG_VERSION;
@@ -390,9 +430,14 @@ void ConfigurationClass::migrate()
     read();
 }
 
-CONFIG_T& ConfigurationClass::get()
+CONFIG_T const& ConfigurationClass::get()
 {
     return config;
+}
+
+ConfigurationClass::WriteGuard ConfigurationClass::getWriteGuard()
+{
+    return WriteGuard();
 }
 
 INVERTER_CONFIG_T* ConfigurationClass::getFreeInverterSlot()
@@ -437,6 +482,32 @@ void ConfigurationClass::deleteInverterById(const uint8_t id)
         config.Inverter[id].channel[c].YieldTotalOffset = 0.0f;
         strlcpy(config.Inverter[id].channel[c].Name, "", sizeof(config.Inverter[id].channel[c].Name));
     }
+}
+
+void ConfigurationClass::loop()
+{
+    std::unique_lock<std::mutex> lock(sWriterMutex);
+    if (sWriterCount == 0) { return; }
+
+    sWriterCv.notify_all();
+    sWriterCv.wait(lock, [] { return sWriterCount == 0; });
+}
+
+CONFIG_T& ConfigurationClass::WriteGuard::getConfig()
+{
+    return config;
+}
+
+ConfigurationClass::WriteGuard::WriteGuard()
+    : _lock(sWriterMutex)
+{
+    sWriterCount++;
+    sWriterCv.wait(_lock);
+}
+
+ConfigurationClass::WriteGuard::~WriteGuard() {
+    sWriterCount--;
+    if (sWriterCount == 0) { sWriterCv.notify_all(); }
 }
 
 ConfigurationClass Configuration;

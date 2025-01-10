@@ -50,6 +50,7 @@ void MqttHandleInverterClass::loop()
         MqttSettings.publish(subtopic + "/radio/rx_fail_nothing", String(inv->RadioStats.RxFailNoAnswer));
         MqttSettings.publish(subtopic + "/radio/rx_fail_partial", String(inv->RadioStats.RxFailPartialAnswer));
         MqttSettings.publish(subtopic + "/radio/rx_fail_corrupt", String(inv->RadioStats.RxFailCorruptData));
+        MqttSettings.publish(subtopic + "/radio/rssi", String(inv->getLastRssi()));
 
         if (inv->DevInfo()->getLastUpdate() > 0) {
             // Bootloader Version
@@ -217,7 +218,7 @@ void MqttHandleInverterClass::onMqttMessage(Topic t, const espMqttClientTypes::M
 
     case Topic::Power:
         // Turn inverter on or off
-        MessageOutput.printf("Set inverter power to: %d\r\n", static_cast<int32_t>(payload_val));
+        MessageOutput.printf("Set inverter power to: %" PRId32 "\r\n", static_cast<int32_t>(payload_val));
         inv->sendPowerControlRequest(static_cast<int32_t>(payload_val) > 0);
         break;
 

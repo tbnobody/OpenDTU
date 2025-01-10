@@ -243,5 +243,83 @@
             "data": 2,
             "clk": 1
         }
+    },
+    {
+        "name": "OpenDTU Fusion v2 PoE with SH1106 Display",
+        "links": [
+            {"name": "Information", "url": "https://github.com/markusdd/OpenDTUFusionDocs"}
+        ],
+        "nrf24": {
+            "miso": 48,
+            "mosi": 35,
+            "clk": 36,
+            "irq": 47,
+            "en": 38,
+            "cs": 37
+        },
+        "cmt": {
+            "clk": 6,
+            "cs": 4,
+            "fcs": 21,
+            "sdio": 5,
+            "gpio2": 3,
+            "gpio3": 8
+        },
+        "w5500": {
+            "mosi": 40,
+            "miso": 41,
+            "sclk": 39,
+            "cs": 42,
+            "int": 44,
+            "rst": 43
+        },
+        "led": {
+            "led0": 17,
+            "led1": 18
+        },
+        "display": {
+            "type": 3,
+            "data": 2,
+            "clk": 1
+        }
+    },
+    {
+        "name": "OpenDTU Fusion v2 PoE with SSD1306 Display",
+        "links": [
+            {"name": "Information", "url": "https://github.com/markusdd/OpenDTUFusionDocs"}
+        ],
+        "nrf24": {
+            "miso": 48,
+            "mosi": 35,
+            "clk": 36,
+            "irq": 47,
+            "en": 38,
+            "cs": 37
+        },
+        "cmt": {
+            "clk": 6,
+            "cs": 4,
+            "fcs": 21,
+            "sdio": 5,
+            "gpio2": 3,
+            "gpio3": 8
+        },
+        "w5500": {
+            "mosi": 40,
+            "miso": 41,
+            "sclk": 39,
+            "cs": 42,
+            "int": 44,
+            "rst": 43
+        },
+        "led": {
+            "led0": 17,
+            "led1": 18
+        },
+        "display": {
+            "type": 2,
+            "data": 2,
+            "clk": 1
+        }
     }
 ]

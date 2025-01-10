@@ -64,13 +64,19 @@ void WebApiSecurityClass::onSecurityPost(AsyncWebServerRequest* request)
         return;
     }
 
-    CONFIG_T& config = Configuration.get();
-    strlcpy(config.Security.Password, root["password"].as<String>().c_str(), sizeof(config.Security.Password));
-    config.Security.AllowReadonly = root["allow_readonly"].as<bool>();
+    {
+        auto guard = Configuration.getWriteGuard();
+        auto& config = guard.getConfig();
+
+        strlcpy(config.Security.Password, root["password"].as<String>().c_str(), sizeof(config.Security.Password));
+        config.Security.AllowReadonly = root["allow_readonly"].as<bool>();
+    }
 
     WebApi.writeConfig(retMsg);
 
     WebApi.sendJsonResponse(request, response, __FUNCTION__, __LINE__);
+
+    WebApi.reload();
 }
 
 void WebApiSecurityClass::onAuthenticateGet(AsyncWebServerRequest* request)

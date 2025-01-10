@@ -91,8 +91,7 @@ void MqttSettingsClass::onMqttDisconnect(espMqttClientTypes::DisconnectReason re
 
 void MqttSettingsClass::onMqttMessage(const espMqttClientTypes::MessageProperties& properties, const char* topic, const uint8_t* payload, const size_t len, const size_t index, const size_t total)
 {
-    MessageOutput.print("Received MQTT message on topic: ");
-    MessageOutput.println(topic);
+    MessageOutput.printf("Received MQTT message on topic: %s\r\n", topic);
 
     _mqttSubscribeParser.handle_message(properties, topic, payload, len, index, total);
 }
