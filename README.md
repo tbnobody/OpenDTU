@@ -1,3 +1,4 @@
+# OpenDTU-Database-Database
 # OpenDTU-Database
 
 One year OpenDTU-Database
@@ -7,9 +8,28 @@ One year OpenDTU-Database
 [![cpplint](https://github.com/tbnobody/OpenDTU/actions/workflows/cpplint.yml/badge.svg)](https://github.com/tbnobody/OpenDTU/actions/workflows/cpplint.yml)
 [![Yarn Linting](https://github.com/tbnobody/OpenDTU/actions/workflows/yarnlint.yml/badge.svg)](https://github.com/tbnobody/OpenDTU/actions/workflows/yarnlint.yml)
 
-## !! IMPORTANT UPGRADE NOTES !!
+OpenDTU-Database adds an ESP32 LittleFS Database and two energy charts, a column chart of the last 25 hours and a full calendar chart.
 
-If you are upgrading from a version before 15.03.2023 you have to upgrade the partition table of the ESP32. Please follow the [this](docs/UpgradePartition.md) documentation!
+![Screenshot](https://github.com/RaBa64/OpenDTU/blob/Database/docs/screenshots/23_Database.png)
+
+OpenDTU-Database adds an ESP32 LittleFS Database and two energy charts, a column chart of the last 25 hours and a full calendar chart.
+
+There are 3 new APIs available, returning JSON strings:
+
+| API               | returned values |
+|-------------------|-----------------|
+| /api/database     | returns all recored data points from the database with total energy value |
+| /api/databaseHour | returns the energy per hour for the last 25 hours |
+| /api/databaseDay  | returns the energy for each day |
+
+Each data point has the following format:
+[ _year (00-99)_, _month (1-12)_, _day (1-31)_, _hour (0-23)_, _energy (Wh)_ ]
+
+Example: [23,6,30,15,132.995605]
+
+The 192KB LittleFS in OpenDTU can store around 6 years of data, because each data point needs only 8 bytes of memory.
+
+![Screenshot](docs/screenshots/23_Database.png)
 
 ## Background
 

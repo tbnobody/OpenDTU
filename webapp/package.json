@@ -13,6 +13,9 @@
     "format": "prettier --write src/"
   },
   "dependencies": {
+    "vue-google-charts": "^1.1.0",
+    "vue3-calendar-heatmap": "^2.0.5",
+    "tippy.js": "^6.3.7",
     "@popperjs/core": "^2.11.8",
     "bootstrap": "^5.3.3",
     "bootstrap-icons-vue": "^1.11.3",

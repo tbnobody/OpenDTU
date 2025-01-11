@@ -61,6 +61,7 @@
                             <option v-for="file in restoreList" :key="file.name" :value="file.name">
                                 {{ file.descr }}
                             </option>
+                            <option selected value="database.bin">Database (database.bin)</option>
                         </select>
                     </div>
                     <div class="col-sm">
