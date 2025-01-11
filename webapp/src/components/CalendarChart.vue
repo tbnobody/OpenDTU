@@ -8,7 +8,7 @@
 import { defineComponent } from 'vue';
 import { CalendarHeatmap } from 'vue3-calendar-heatmap'
 import { authHeader, handleResponse } from '@/utils/authentication';
-let data: Array<{ date: Date; count: number; }> = [];
+const data: Array<{ date: Date; count: number; }> = [];
 
 export default defineComponent({
     components: {
