@@ -18,24 +18,24 @@ const options_col = {
     chartArea: {
         top: 25,
         width: '85%',
-        height: '80%'
+        height: '80%',
     },
     bar: {
-        groupWidth: '90%'
+        groupWidth: '90%',
     },
     legend: {
-        position: 'none'
+        position: 'none',
     },
     hAxis: {
         format: 'HH',
         minorGridlines: {
-            count: 0
-        }
+            count: 0,
+        },
     },
     vAxis: {
         minValue: 0,
-        format: '# Wh'
-    }
+        format: '# Wh',
+    },
 };
 export default defineComponent({
     components: {
@@ -46,7 +46,7 @@ export default defineComponent({
             chartData: data_col,
             chartOptions: options_col,
             dataLoaded: false,
-        }
+        };
     },
     created() {
         this.getInitialData();
@@ -55,15 +55,20 @@ export default defineComponent({
     methods: {
         getInitialData() {
             this.dataLoaded = false;
-            fetch("/api/databaseHour", { headers: authHeader() })
+            fetch('/api/databaseHour', { headers: authHeader() })
                 .then((response) => handleResponse(response, this.$emitter, this.$router))
                 .then((energy) => {
                     if (energy) {
-                        this.chartData = [[{ type: 'date', id: 'Time' }, { type: 'number', id: 'Energy' }]];
+                        this.chartData = [
+                            [
+                                { type: 'date', id: 'Time' },
+                                { type: 'number', id: 'Energy' },
+                            ],
+                        ];
                         // eslint-disable-next-line @typescript-eslint/no-explicit-any
                         energy.forEach((x: any[]) => {
                             const d = new Date(x[0] + 2000, x[1] - 1, x[2], x[3]);
-                            this.chartData.push([d, Math.round(x[4])])
+                            this.chartData.push([d, Math.round(x[4])]);
                         });
                         this.dataLoaded = true;
                     }
@@ -76,7 +81,7 @@ export default defineComponent({
         },
         callEveryHour() {
             this.getInitialData();
-            setInterval(this.getInitialData, 1000 * 60 * 60);   // refresh every hour
+            setInterval(this.getInitialData, 1000 * 60 * 60); // refresh every hour
         },
         startautorefresh() {
             const nextDate = new Date();
@@ -86,6 +91,6 @@ export default defineComponent({
             const difference: number = nextDate.valueOf() - Date.now();
             setTimeout(this.callEveryHour, difference);
         },
-    }
+    },
 });
 </script>
