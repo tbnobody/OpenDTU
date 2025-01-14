@@ -11,7 +11,7 @@
 #include <AsyncJson.h>
 
 #ifndef PIN_MAPPING_REQUIRED
-    #define DPIN_MAPPING_REQUIRED 0
+    #define PIN_MAPPING_REQUIRED 0
 #endif
 
 WebApiWsLiveClass::WebApiWsLiveClass()
