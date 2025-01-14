@@ -25,7 +25,7 @@ private:
     void onWebsocketEvent(AsyncWebSocket* server, AsyncWebSocketClient* client, AwsEventType type, void* arg, uint8_t* data, size_t len);
 
     AsyncWebSocket _ws;
-    AuthenticationMiddleware _simpleDigestAuth;
+    AsyncAuthenticationMiddleware _simpleDigestAuth;
 
     uint32_t _lastPublishStats[INV_MAX_COUNT] = { 0 };
 
