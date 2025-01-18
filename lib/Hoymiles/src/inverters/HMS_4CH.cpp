@@ -58,7 +58,7 @@ bool HMS_4CH::isValidSerial(const uint64_t serial)
 {
     // serial >= 0x116400000000 && serial <= 0x1164ffffffff
     uint16_t preSerial = (serial >> 32) & 0xffff;
-    return preSerial == 0x1164;
+    return preSerial == 0x1164 || preSerial == 0x1420;
 }
 
 String HMS_4CH::typeName() const
