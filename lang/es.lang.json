@@ -45,7 +45,9 @@
             "Refreshing": "Refrescando",
             "Pull": "Tira hacia abajo para refrescar",
             "Release": "Soltar para refrescar",
-            "Close": "Cerrar"
+            "Close": "Cerrar",
+            "Yes": "Yes",
+            "No": "No"
         },
         "wait": {
             "NotReady": "OpenDTU is not yet ready",
@@ -193,7 +195,10 @@
             "FirmwareVersion": "Versión del firmware",
             "FirmwareBuildDate": "Fecha de construcción del firmware",
             "HardwarePartNumber": "Número de parte de hardware",
-            "HardwareVersion": "Versión de hardware"
+            "HardwareVersion": "Versión de hardware",
+            "SupportsPowerDistributionLogic": "'Power Distribution Logic' supported",
+            "Yes": "@:base.Yes",
+            "No": "@:base.No"
         },
         "gridprofile": {
             "NoInfo": "@:devinfo.NoInfo",
@@ -637,7 +642,8 @@
             "TimeSync": "El reloj aún no ha sido sincronizado. Sin un reloj correctamente ajustado, no se realizan solicitudes al inversor. Esto es normal poco después del inicio. Sin embargo, después de un tiempo de ejecución más largo (>1 minuto), indica que el servidor NTP no es accesible.",
             "TimeSyncLink": "Por favor, verifica la configuración de tu hora.",
             "DefaultPassword": "Estás utilizando la contraseña predeterminada para la interfaz web y el punto de acceso de emergencia. Esto potencialmente es inseguro.",
-            "DefaultPasswordLink": "Por favor, cambia la contraseña."
+            "DefaultPasswordLink": "Por favor, cambia la contraseña.",
+            "PinMappingIssue": "You are using a generic firmware image, but have not yet uploaded a file with device profiles (<code>pin_mapping.json</code>) or have not selected a profile defined there. Please refer to the <a href=\"https://opendtu.solar/firmware/device_profiles/\" target=\"_blank\" class=\"alert-link\">documentation</a> for details."
         },
         "deviceadmin": {
             "DeviceManager": "Administrador de Dispositivos",

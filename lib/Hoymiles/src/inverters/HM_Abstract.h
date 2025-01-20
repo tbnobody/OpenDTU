@@ -16,6 +16,7 @@ public:
     bool sendRestartControlRequest();
     bool resendPowerControlRequest();
     bool sendGridOnProFileParaRequest();
+    bool supportsPowerDistributionLogic() override;
 
 private:
     uint8_t _lastAlarmLogCnt = 0;

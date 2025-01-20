@@ -45,7 +45,9 @@
             "Refreshing": "Aggiorna",
             "Pull": "Trascina in basso per aggiornare",
             "Release": "Rilascia per aggiornare",
-            "Close": "Chiudi"
+            "Close": "Chiudi",
+            "Yes": "Yes",
+            "No": "No"
         },
         "wait": {
             "NotReady": "OpenDTU is not yet ready",
@@ -193,7 +195,10 @@
             "FirmwareVersion": "Versione Firmware",
             "FirmwareBuildDate": "Data Firmware",
             "HardwarePartNumber": "Hardware Part Number",
-            "HardwareVersion": "Hardware Version"
+            "HardwareVersion": "Hardware Version",
+            "SupportsPowerDistributionLogic": "'Power Distribution Logic' supported",
+            "Yes": "@:base.Yes",
+            "No": "@:base.No"
         },
         "gridprofile": {
             "NoInfo": "@:devinfo.NoInfo",
@@ -637,7 +642,8 @@
             "TimeSync": "La Data/Ora non sono state sincronizzate, ed in tal caso non è possibile eseguire richieste all'inverter. Questa condizione è normale appena avviato, tuttavia dopo un po' (>1 minuto), questa situazione potrebbe indicare un problema di accesso al server NTP.",
             "TimeSyncLink": "Controlla le impostazioni Data/Ora.",
             "DefaultPassword": "Stai usando la password di default per accedere all'interfaccia web e per la modalità Access Point di emergenza. Questo può portare ad un rischio di sicurezza.",
-            "DefaultPasswordLink": "Per favore cambia la password."
+            "DefaultPasswordLink": "Per favore cambia la password.",
+            "PinMappingIssue": "You are using a generic firmware image, but have not yet uploaded a file with device profiles (<code>pin_mapping.json</code>) or have not selected a profile defined there. Please refer to the <a href=\"https://opendtu.solar/firmware/device_profiles/\" target=\"_blank\" class=\"alert-link\">documentation</a> for details."
         },
         "deviceadmin": {
             "DeviceManager": "Device-Manager",

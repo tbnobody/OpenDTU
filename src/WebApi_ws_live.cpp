@@ -10,6 +10,10 @@
 #include "defaults.h"
 #include <AsyncJson.h>
 
+#ifndef PIN_MAPPING_REQUIRED
+    #define PIN_MAPPING_REQUIRED 0
+#endif
+
 WebApiWsLiveClass::WebApiWsLiveClass()
     : _ws("/livedata")
     , _wsCleanupTask(1 * TASK_SECOND, TASK_FOREVER, std::bind(&WebApiWsLiveClass::wsCleanupTaskCb, this))
@@ -125,6 +129,8 @@ void WebApiWsLiveClass::generateCommonJsonResponse(JsonVariant& root)
     hintObj["time_sync"] = !getLocalTime(&timeinfo, 5);
     hintObj["radio_problem"] = (Hoymiles.getRadioNrf()->isInitialized() && (!Hoymiles.getRadioNrf()->isConnected() || !Hoymiles.getRadioNrf()->isPVariant())) || (Hoymiles.getRadioCmt()->isInitialized() && (!Hoymiles.getRadioCmt()->isConnected()));
     hintObj["default_password"] = strcmp(Configuration.get().Security.Password, ACCESS_POINT_PASSWORD) == 0;
+
+    hintObj["pin_mapping_issue"] = PIN_MAPPING_REQUIRED && !PinMapping.isMappingSelected();
 }
 
 void WebApiWsLiveClass::generateInverterCommonJsonResponse(JsonObject& root, std::shared_ptr<InverterAbstract> inv)

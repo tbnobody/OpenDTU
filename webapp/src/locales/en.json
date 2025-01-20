@@ -30,7 +30,9 @@
         "Refreshing": "Refreshing",
         "Pull": "Pull down to refresh",
         "Release": "Release to refresh",
-        "Close": "Close"
+        "Close": "Close",
+        "Yes": "Yes",
+        "No": "No"
     },
     "wait": {
         "NotReady": "OpenDTU is not yet ready",
@@ -179,7 +181,10 @@
         "FirmwareVersion": "Firmware Version",
         "FirmwareBuildDate": "Firmware Build Date",
         "HardwarePartNumber": "Hardware Part Number",
-        "HardwareVersion": "Hardware Version"
+        "HardwareVersion": "Hardware Version",
+        "SupportsPowerDistributionLogic": "'Power Distribution Logic' supported",
+        "Yes": "@:base.Yes",
+        "No": "@:base.No"
     },
     "gridprofile": {
         "NoInfo": "@:devinfo.NoInfo",
@@ -627,7 +632,8 @@
         "TimeSync": "The clock has not yet been synchronised. Without a correctly set clock, no requests are made to the inverter. This is normal shortly after the start. However, after a longer runtime (>1 minute), it indicates that the NTP server is not accessible.",
         "TimeSyncLink": "Please check your time settings.",
         "DefaultPassword": "You are using the default password for the web interface and the emergency access point. This is potentially insecure.",
-        "DefaultPasswordLink": "Please change the password."
+        "DefaultPasswordLink": "Please change the password.",
+        "PinMappingIssue": "You are using a generic firmware image, but have not yet uploaded a file with device profiles (<code>pin_mapping.json</code>) or have not selected a profile defined there. Please refer to the <a href=\"https://opendtu.solar/firmware/device_profiles/\" target=\"_blank\" class=\"alert-link\">documentation</a> for details."
     },
     "deviceadmin": {
         "DeviceManager": "Device-Manager",

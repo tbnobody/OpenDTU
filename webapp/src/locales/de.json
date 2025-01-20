@@ -30,7 +30,9 @@
         "Refreshing": "Aktualisieren",
         "Pull": "Zum Aktualisieren nach unten ziehen",
         "Release": "Loslassen zum Aktualisieren",
-        "Close": "Schließen"
+        "Close": "Schließen",
+        "Yes": "Ja",
+        "No": "Nein"
     },
     "wait": {
         "NotReady": "OpenDTU ist noch nicht bereit",
@@ -179,7 +181,10 @@
         "FirmwareVersion": "Firmware-Version",
         "FirmwareBuildDate": "Firmware-Erstellungsdatum",
         "HardwarePartNumber": "Hardware-Teilenummer",
-        "HardwareVersion": "Hardware-Version"
+        "HardwareVersion": "Hardware-Version",
+        "SupportsPowerDistributionLogic": "'Power Distribution Logic' unterstützt",
+        "Yes": "@:base.Yes",
+        "No": "@:base.No"
     },
     "gridprofile": {
         "NoInfo": "@:devinfo.NoInfo",
@@ -627,7 +632,8 @@
         "TimeSync": "Die Uhr wurde noch nicht synchronisiert. Ohne eine korrekt eingestellte Uhr werden keine Anfragen an den Wechselrichter gesendet. Dies ist kurz nach dem Start normal. Nach einer längeren Laufzeit (>1 Minute) bedeutet es jedoch, dass der NTP-Server nicht erreichbar ist.",
         "TimeSyncLink": "Bitte überprüfen Sie Ihre Zeiteinstellungen.",
         "DefaultPassword": "Sie verwenden das Standardpasswort für die Weboberfläche und den Notfall Access Point. Dies ist potenziell unsicher.",
-        "DefaultPasswordLink": "Bitte ändern Sie das Passwort."
+        "DefaultPasswordLink": "Bitte ändern Sie das Passwort.",
+        "PinMappingIssue": "Sie verwenden eine generische Firmware, haben jedoch noch keine Datei mit Verdrahtungsprofilen (<code>pin_mapping.json</code>) hochgeladen oder kein dort definiertes Profil ausgewählt. Details hierzu entnehmen Sie bitte der <a href=\"https://opendtu.solar/firmware/device_profiles/\" target=\"_blank\" class=\"alert-link\">Dokumentation</a>."
     },
     "deviceadmin": {
         "DeviceManager": "Hardware-Einstellungen",

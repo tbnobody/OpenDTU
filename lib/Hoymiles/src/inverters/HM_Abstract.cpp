@@ -14,7 +14,9 @@
 #include "commands/SystemConfigParaCommand.h"
 
 HM_Abstract::HM_Abstract(HoymilesRadio* radio, const uint64_t serial)
-    : InverterAbstract(radio, serial) {};
+    : InverterAbstract(radio, serial)
+{
+}
 
 bool HM_Abstract::sendStatsRequest()
 {
@@ -216,4 +218,9 @@ bool HM_Abstract::sendGridOnProFileParaRequest()
     _radio->enqueCommand(cmd);
 
     return true;
+}
+
+bool HM_Abstract::supportsPowerDistributionLogic()
+{
+    return false;
 }

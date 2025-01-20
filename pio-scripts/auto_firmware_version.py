@@ -49,7 +49,7 @@ def get_firmware_specifier_build_flag():
     build_version = get_build_version()
     build_flag = "-D AUTO_GIT_HASH=\\\"" + build_version + "\\\""
     build_branch = get_build_branch()
-    build_flag += " -D AUTO_GIT_BRANCH=\\\"" + branch_name + "\\\""
+    build_flag += " -D AUTO_GIT_BRANCH=\\\"" + build_branch + "\\\""
     return (build_flag)
 
 

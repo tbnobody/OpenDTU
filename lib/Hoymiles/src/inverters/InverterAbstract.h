@@ -103,6 +103,9 @@ public:
     virtual bool sendChangeChannelRequest();
     virtual bool sendGridOnProFileParaRequest() = 0;
 
+    // This feature will limit the AC output instead of limiting the DC inputs.
+    virtual bool supportsPowerDistributionLogic() = 0;
+
     HoymilesRadio* getRadio();
 
     AlarmLogParser* EventLog();

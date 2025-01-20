@@ -57,7 +57,7 @@ void HoymilesClass::loop()
             }
         }
 
-        if (iv != nullptr && iv->getRadio()->isInitialized() && iv->getRadio()->isQueueEmpty()) {
+        if (iv != nullptr && iv->getRadio()->isInitialized()) {
 
             if (iv->getZeroValuesIfUnreachable() && !iv->isReachable()) {
                 iv->Statistics()->zeroRuntimeData();
@@ -119,6 +119,7 @@ void HoymilesClass::loop()
                     iv->sendGridOnProFileParaRequest();
                 }
 
+                 _messageOutput->printf("Queue size - NRF: %" PRId32 " CMT: %" PRId32 "\r\n", _radioNrf->getQueueSize(), _radioCmt->getQueueSize());
                 _lastPoll = millis();
             }
 
@@ -229,6 +230,7 @@ void HoymilesClass::removeInverterBySerial(const uint64_t serial)
     for (uint8_t i = 0; i < _inverters.size(); i++) {
         if (_inverters[i]->serial() == serial) {
             std::lock_guard<std::mutex> lock(_mutex);
+            _inverters[i]->getRadio()->removeCommands(_inverters[i].get());
             _inverters.erase(_inverters.begin() + i);
             return;
         }
