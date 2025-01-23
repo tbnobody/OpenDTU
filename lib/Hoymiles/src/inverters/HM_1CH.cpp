@@ -29,9 +29,7 @@ static const byteAssign_t byteAssignment[] = {
 };
 
 HM_1CH::HM_1CH(HoymilesRadio* radio, const uint64_t serial)
-    : HM_Abstract(radio, serial)
-{
-}
+    : HM_Abstract(radio, serial) {};
 
 bool HM_1CH::isValidSerial(const uint64_t serial)
 {

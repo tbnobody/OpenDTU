@@ -5,9 +5,7 @@
 #include "HERF_4CH.h"
 
 HERF_4CH::HERF_4CH(HoymilesRadio* radio, const uint64_t serial)
-    : HM_4CH(radio, serial)
-{
-}
+    : HM_4CH(radio, serial) {};
 
 bool HERF_4CH::isValidSerial(const uint64_t serial)
 {

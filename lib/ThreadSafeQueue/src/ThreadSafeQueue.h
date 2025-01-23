@@ -3,7 +3,7 @@
 
 #include <mutex>
 #include <optional>
-#include <deque>
+#include <queue>
 
 template <typename T>
 class ThreadSafeQueue {
@@ -33,14 +33,14 @@ public:
             return {};
         }
         T tmp = _queue.front();
-        _queue.pop_front();
+        _queue.pop();
         return tmp;
     }
 
     void push(const T& item)
     {
         std::lock_guard<std::mutex> lock(_mutex);
-        _queue.push_back(item);
+        _queue.push(item);
     }
 
     T front()
@@ -49,10 +49,6 @@ public:
         return _queue.front();
     }
 
-protected:
-    std::deque<T> _queue;
-    mutable std::mutex _mutex;
-
 private:
     // Moved out of public interface to prevent races between this
     // and pop().
@@ -60,4 +56,7 @@ private:
     {
         return _queue.empty();
     }
+
+    std::queue<T> _queue;
+    mutable std::mutex _mutex;
 };

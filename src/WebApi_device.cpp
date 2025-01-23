@@ -129,13 +129,9 @@ void WebApiDeviceClass::onDeviceAdminPost(AsyncWebServerRequest* request)
         return;
     }
 
-    bool performRestart = false;
-
     {
         auto guard = Configuration.getWriteGuard();
         auto& config = guard.getConfig();
-
-        performRestart = root["curPin"]["name"].as<String>() != config.Dev_PinMapping;
 
         strlcpy(config.Dev_PinMapping, root["curPin"]["name"].as<String>().c_str(), sizeof(config.Dev_PinMapping));
         config.Display.Rotation = root["display"]["rotation"].as<uint8_t>();
@@ -153,6 +149,7 @@ void WebApiDeviceClass::onDeviceAdminPost(AsyncWebServerRequest* request)
     }
 
     auto const& config = Configuration.get();
+    bool performRestart = root["curPin"]["name"].as<String>() != config.Dev_PinMapping;
 
     Display.setDiagramMode(static_cast<DiagramMode_t>(config.Display.Diagram.Mode));
     Display.setOrientation(config.Display.Rotation);

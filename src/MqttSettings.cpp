@@ -179,7 +179,7 @@ String MqttSettingsClass::getPrefix() const
     return Configuration.get().Mqtt.Topic;
 }
 
-String MqttSettingsClass::getClientId() const
+String MqttSettingsClass::getClientId()
 {
     String clientId = Configuration.get().Mqtt.ClientId;
     if (clientId == "") {

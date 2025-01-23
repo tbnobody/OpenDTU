@@ -58,7 +58,6 @@ export interface Hints {
     time_sync: boolean;
     default_password: boolean;
     radio_problem: boolean;
-    pin_mapping_issue: boolean;
 }
 
 export interface LiveData {

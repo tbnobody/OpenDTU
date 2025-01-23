@@ -138,9 +138,3 @@ uint8_t CommandAbstract::getMaxRetransmitCount() const
 {
     return MAX_RETRANSMIT_COUNT;
 }
-
-bool CommandAbstract::areSameParameter(CommandAbstract* other)
-{
-    return this->getCommandName() == other->getCommandName()
-        && this->_targetAddress == other->getTargetAddress();
-}

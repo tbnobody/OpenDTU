@@ -37,9 +37,7 @@ static const byteAssign_t byteAssignment[] = {
 };
 
 HERF_2CH::HERF_2CH(HoymilesRadio* radio, const uint64_t serial)
-    : HM_Abstract(radio, serial)
-{
-}
+    : HM_Abstract(radio, serial) {};
 
 bool HERF_2CH::isValidSerial(const uint64_t serial)
 {
@@ -50,7 +48,7 @@ bool HERF_2CH::isValidSerial(const uint64_t serial)
 
 String HERF_2CH::typeName() const
 {
-    return "HERF-600/800-2T";
+    return "HERF-800-2T";
 }
 
 const byteAssign_t* HERF_2CH::getByteAssignment() const

@@ -30,9 +30,7 @@
         "Refreshing": "Refreshing",
         "Pull": "Pull down to refresh",
         "Release": "Release to refresh",
-        "Close": "Fermer",
-        "Yes": "Yes",
-        "No": "No"
+        "Close": "Fermer"
     },
     "wait": {
         "NotReady": "OpenDTU is not yet ready",
@@ -181,10 +179,7 @@
         "FirmwareVersion": "Version du firmware",
         "FirmwareBuildDate": "Date de création du firmware",
         "HardwarePartNumber": "Numéro d'article matériel",
-        "HardwareVersion": "Version du matériel",
-        "SupportsPowerDistributionLogic": "'Power Distribution Logic' supported",
-        "Yes": "@:base.Yes",
-        "No": "@:base.No"
+        "HardwareVersion": "Version du matériel"
     },
     "gridprofile": {
         "NoInfo": "@:devinfo.NoInfo",
@@ -614,8 +609,7 @@
         "TimeSync": "L'horloge n'a pas encore été synchronisée. Sans une horloge correctement réglée, aucune demande n'est adressée à l'onduleur. Ceci est normal peu de temps après le démarrage. Cependant, après un temps de fonctionnement plus long (>1 minute), cela indique que le serveur NTP n'est pas accessible.",
         "TimeSyncLink": "Veuillez vérifier vos paramètres horaires.",
         "DefaultPassword": "Vous utilisez le mot de passe par défaut pour l'interface Web et le point d'accès d'urgence. Ceci est potentiellement non sécurisé.",
-        "DefaultPasswordLink": "Merci de changer le mot de passe.",
-        "PinMappingIssue": "Vous utilisez une image générique du micrologiciel, mais vous n'avez pas encore téléchargé un fichier contenant les profils de l'appareil (<code>pin_mapping.json</code>) ou vous n'avez pas sélectionné un profil défini dans ce fichier. Veuillez vous référer à la <a href=\"https://opendtu.solar/firmware/device_profiles/\" target=\"_blank\" class=\"alert-link\">documentation</a> pour plus de détails."
+        "DefaultPasswordLink": "Merci de changer le mot de passe."
     },
     "deviceadmin": {
         "DeviceManager": "Gestionnaire de périphériques",

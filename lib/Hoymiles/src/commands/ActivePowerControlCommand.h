@@ -15,13 +15,11 @@ public:
     explicit ActivePowerControlCommand(InverterAbstract* inv, const uint64_t router_address = 0);
 
     virtual String getCommandName() const;
-    virtual QueueInsertType getQueueInsertType() const { return QueueInsertType::RemoveOldest; }
-    virtual bool areSameParameter(CommandAbstract* other);
 
     virtual bool handleResponse(const fragment_t fragment[], const uint8_t max_fragment_id);
     virtual void gotTimeout();
 
     void setActivePowerLimit(const float limit, const PowerLimitControlType type = RelativNonPersistent);
     float getLimit() const;
-    PowerLimitControlType getType() const;
+    PowerLimitControlType getType();
 };
