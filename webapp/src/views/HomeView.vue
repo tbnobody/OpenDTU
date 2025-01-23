@@ -434,7 +434,7 @@
                     </button>
                     <ul class="dropdown-menu dropdown-menu-end">
                         <li>
-                            <a class="dropdown-item" @click="onSelectType(1)" href="#">{{ $t('home.Relative') }}</a>
+                            <a class="dropdown-item" @click="onSelectType(3)" href="#">{{ $t('home.Relative') }}</a>
                         </li>
                         <li>
                             <a class="dropdown-item" @click="onSelectType(0)" href="#">{{ $t('home.Absolute') }}</a>
@@ -823,7 +823,7 @@ export default defineComponent({
             this.showAlertLimit = false;
             this.targetLimitList.serial = '';
             this.targetLimitList.limit_value = 0;
-            this.targetLimitType = 1;
+            this.targetLimitType = 3;
             this.targetLimitTypeText = this.$t('home.Relative');
 
             this.limitSettingLoading = true;
@@ -869,7 +869,7 @@ export default defineComponent({
                 });
         },
         onSelectType(type: number) {
-            if (type == 1) {
+            if (type == 3) {
                 this.targetLimitTypeText = this.$t('home.Relative');
                 this.targetLimitMin = 0;
                 this.targetLimitMax = 100;

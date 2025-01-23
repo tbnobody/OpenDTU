@@ -5,7 +5,7 @@
 
 typedef enum { // ToDo: to be verified by field tests
     AbsolutNonPersistent = 0x0000, // 0
-    RelativNonPersistent = 0x0001, // 1
+    RelativNonPersistent = 0x0003, // 3 TODO(andreasboehm): not sure why this is now 3 instead of 1. Probably only works for inverters that support PDL
     AbsolutPersistent = 0x0100, // 256
     RelativPersistent = 0x0101 // 257
 } PowerLimitControlType;
