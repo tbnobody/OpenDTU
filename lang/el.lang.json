@@ -45,7 +45,9 @@
             "Refreshing": "Ανανέωση",
             "Pull": "Τραβήξτε προς τα κάτω για ανανέωση",
             "Release": "Ανακοινώνω",
-            "Close": "Κλείνω"
+            "Close": "Κλείνω",
+            "Yes": "Yes",
+            "No": "No"
         },
         "wait": {
             "NotReady": "Το OpenDTU δεν είναι έτοιμο ακόμα",
@@ -194,7 +196,10 @@
             "FirmwareVersion": "Έκδοση υλικολογισμικού",
             "FirmwareBuildDate": "Ημερομηνία δημιουργίας υλικολογισμικού",
             "HardwarePartNumber": "Αριθμός εξαρτήματος υλικού",
-            "HardwareVersion": "Έκδοση υλικού"
+            "HardwareVersion": "Έκδοση υλικού",
+            "SupportsPowerDistributionLogic": "'Power Distribution Logic' supported",
+            "Yes": "@:base.Yes",
+            "No": "@:base.No"
         },
         "gridprofile": {
             "NoInfo": "@:devinfo.NoInfo",
@@ -642,7 +647,8 @@
             "TimeSync": "Το ρολόι δεν έχει συγχρονιστεί ακόμα. Χωρίς σωστά ρυθμισμένο ρολόι, δεν υποβάλλονται αιτήματα στον επενδυτή. Αυτό είναι φυσιολογικό λίγο μετά την έναρξη. Ωστόσο, μετά από μεγαλύτερο χρόνο εκτέλεσης (>1 λεπτό), υποδεικνύει ότι ο διακομιστής NTP δεν είναι προσβάσιμος.",
             "TimeSyncLink": "Ελέγξτε τις ρυθμίσεις ώρας.",
             "DefaultPassword": "Χρησιμοποιείτε τον προεπιλεγμένο κωδικό πρόσβασης για τη διεπαφή ιστού και το σημείο πρόσβασης έκτακτης ανάγκης. Αυτό είναι δυνητικά μη ασφαλές.",
-            "DefaultPasswordLink": "Αλλάξτε τον κωδικό πρόσβασης."
+            "DefaultPasswordLink": "Αλλάξτε τον κωδικό πρόσβασης.",
+            "PinMappingIssue": "You are using a generic firmware image, but have not yet uploaded a file with device profiles (<code>pin_mapping.json</code>) or have not selected a profile defined there. Please refer to the <a href=\"https://opendtu.solar/firmware/device_profiles/\" target=\"_blank\" class=\"alert-link\">documentation</a> for details."
         },
         "deviceadmin": {
             "DeviceManager": "Διαχείριση Συσκευών",
