@@ -10,6 +10,11 @@
 #include "helper.h"
 #include <AsyncJson.h>
 
+WebApiNetworkClass::WebApiNetworkClass()
+    : _applyDataTask(500 * TASK_MILLISECOND, TASK_ONCE, std::bind(&WebApiNetworkClass::applyDataTaskCb, this))
+{
+}
+
 void WebApiNetworkClass::init(AsyncWebServer& server, Scheduler& scheduler)
 {
     using std::placeholders::_1;
@@ -17,6 +22,8 @@ void WebApiNetworkClass::init(AsyncWebServer& server, Scheduler& scheduler)
     server.on("/api/network/status", HTTP_GET, std::bind(&WebApiNetworkClass::onNetworkStatus, this, _1));
     server.on("/api/network/config", HTTP_GET, std::bind(&WebApiNetworkClass::onNetworkAdminGet, this, _1));
     server.on("/api/network/config", HTTP_POST, std::bind(&WebApiNetworkClass::onNetworkAdminPost, this, _1));
+
+    scheduler.addTask(_applyDataTask);
 }
 
 void WebApiNetworkClass::onNetworkStatus(AsyncWebServerRequest* request)
@@ -204,6 +211,12 @@ void WebApiNetworkClass::onNetworkAdminPost(AsyncWebServerRequest* request)
 
     WebApi.sendJsonResponse(request, response, __FUNCTION__, __LINE__);
 
+    _applyDataTask.enable();
+    _applyDataTask.restart();
+}
+
+void WebApiNetworkClass::applyDataTaskCb()
+{
     NetworkSettings.enableAdminMode();
     NetworkSettings.applyConfig();
 }
