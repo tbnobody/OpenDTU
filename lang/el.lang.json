@@ -381,7 +381,7 @@
         },
         "inverterchannelinfo": {
             "String": "Είσοδος {num}",
-            "Phase": "Φάση {num}",
+            "Phase": "Παροχή {num}",
             "General": "Γενικά"
         },
         "invertertotalinfo": {
