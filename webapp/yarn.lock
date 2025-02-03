@@ -530,10 +530,10 @@
   resolved "https://registry.yarnpkg.com/@types/json-schema/-/json-schema-7.0.15.tgz#596a1747233694d50f6ad8a7869fcb6f56cf5841"
   integrity sha512-5+fP8P8MFNC+AyZCDxrB2pkZFPGzqQWUzpSeuuVLvm8VMcorNYavBqoFcxK8bQz4Qsbn4oUEEem4wDLfcysGHA==
 
-"@types/node@^22.10.6":
-  version "22.10.6"
-  resolved "https://registry.yarnpkg.com/@types/node/-/node-22.10.6.tgz#5c6795e71635876039f853cbccd59f523d9e4239"
-  integrity sha512-qNiuwC4ZDAUNcY47xgaSuS92cjf8JbSUoaKS77bmLG1rU7MlATVSiw/IlrjtIyyskXBZ8KkNfjK/P5na7rgXbQ==
+"@types/node@^22.13.0":
+  version "22.13.0"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-22.13.0.tgz#d376dd9a0ee2f9382d86c2d5d7beb4d198b4ea8c"
+  integrity sha512-ClIbNe36lawluuvq3+YYhnIN2CELi+6q8NpnM7PYp4hBn/TatfboPgVSm2rwKRfnV2M+Ty9GWDFI64KEe+kysA==
   dependencies:
     undici-types "~6.20.0"
 
