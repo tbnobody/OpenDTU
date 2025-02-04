@@ -80,7 +80,7 @@
                     v-model="mqttConfigList.mqtt_publish_interval"
                     type="number"
                     min="5"
-                    max="86400"
+                    max="65535"
                     :postfix="$t('mqttadmin.Seconds')"
                 />
 

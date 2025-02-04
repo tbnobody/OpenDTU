@@ -5,7 +5,7 @@
             :class="[wide ? 'col-sm-4' : 'col-sm-2', isCheckbox ? 'form-check-label' : 'col-form-label']"
         >
             {{ label }}
-            <BIconInfoCircle v-if="tooltip !== undefined" v-tooltip :title="tooltip" />
+            <BIconInfoCircle v-if="tooltip !== undefined" v-tooltip :title="tooltip" class="ms-1" />
         </label>
         <div :class="[wide ? 'col-sm-8' : 'col-sm-10']">
             <div v-if="!isTextarea" :class="{ 'form-check form-switch': isCheckbox, 'input-group': postfix || prefix }">

@@ -35,6 +35,8 @@
 #define DEV_MAX_MAPPING_NAME_STRLEN 63
 #define LOCALE_STRLEN 2
 
+#define INTEGRATIONS_GOE_MAX_HOSTNAME_STRLEN 128
+
 struct CHANNEL_CONFIG_T {
     uint16_t MaxChannelPower;
     char Name[CHAN_MAX_NAME_STRLEN];
@@ -161,6 +163,14 @@ struct CONFIG_T {
 
     INVERTER_CONFIG_T Inverter[INV_MAX_COUNT];
     char Dev_PinMapping[DEV_MAX_MAPPING_NAME_STRLEN + 1];
+
+    struct {
+        // go-e Controller
+        bool GoeControllerEnabled;
+        bool GoeControllerPublishHomeCategory;
+        char GoeControllerHostname[INTEGRATIONS_GOE_MAX_HOSTNAME_STRLEN + 1];
+        uint32_t GoeControllerUpdateInterval;
+    } Integrations;
 };
 
 class ConfigurationClass {
