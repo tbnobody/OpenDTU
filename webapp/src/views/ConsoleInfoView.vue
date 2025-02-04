@@ -106,16 +106,17 @@ export default defineComponent({
                 this.closeSocket();
             };
         },
-        // Send heartbeat packets regularly * 59s Send a heartbeat
+        // Send heartbeat packets regularly * 5s Send a heartbeat
         heartCheck() {
             if (this.heartInterval) {
-                clearTimeout(this.heartInterval);
+                clearInterval(this.heartInterval);
             }
             this.heartInterval = setInterval(() => {
-                if (this.socket.readyState === 1) {
+                if (this.socket.readyState === WebSocket.OPEN) {
                     // Connection status
                     this.socket.send('ping');
                 } else {
+                    clearInterval(this.heartInterval);
                     this.initSocket(); // Breakpoint reconnection 5 Time
                 }
             }, 5 * 1000);
@@ -129,7 +130,7 @@ export default defineComponent({
             }
 
             if (this.heartInterval) {
-                clearTimeout(this.heartInterval);
+                clearInterval(this.heartInterval);
             }
         },
         getOutDate(): string {
