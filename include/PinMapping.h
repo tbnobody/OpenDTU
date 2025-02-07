@@ -50,7 +50,7 @@ struct PinMapping_t {
     uint8_t display_cs;
     uint8_t display_reset;
 
-    int8_t led[PINMAPPING_LED_COUNT];
+    gpio_num_t led[PINMAPPING_LED_COUNT];
 };
 
 class PinMappingClass {

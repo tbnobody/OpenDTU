@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * Copyright (C) 2022 - 2023 Thomas Basler and others
+ * Copyright (C) 2022 - 2025 Thomas Basler and others
  */
 #include "PinMapping.h"
 #include "MessageOutput.h"
@@ -30,11 +30,11 @@
 #endif
 
 #ifndef LED0
-#define LED0 -1
+#define LED0 GPIO_NUM_NC
 #endif
 
 #ifndef LED1
-#define LED1 -1
+#define LED1 GPIO_NUM_NC
 #endif
 
 #ifndef HOYMILES_PIN_SCLK

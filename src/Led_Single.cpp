@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * Copyright (C) 2023-2024 Thomas Basler and others
+ * Copyright (C) 2023-2025 Thomas Basler and others
  */
 #include "Led_Single.h"
 #include "Configuration.h"
@@ -53,7 +53,7 @@ void LedSingleClass::init(Scheduler& scheduler)
     const auto& pin = PinMapping.get();
     for (uint8_t i = 0; i < PINMAPPING_LED_COUNT; i++) {
 
-        if (pin.led[i] >= 0) {
+        if (pin.led[i] > GPIO_NUM_NC) {
             pinMode(pin.led[i], OUTPUT);
             setLed(i, false);
             ledActive = true;
@@ -131,7 +131,7 @@ void LedSingleClass::setLed(const uint8_t ledNo, const bool ledState)
     const auto& pin = PinMapping.get();
     const auto& config = Configuration.get();
 
-    if (pin.led[ledNo] < 0) {
+    if (pin.led[ledNo] == GPIO_NUM_NC) {
         return;
     }
 
