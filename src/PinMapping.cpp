@@ -38,27 +38,27 @@
 #endif
 
 #ifndef HOYMILES_PIN_SCLK
-#define HOYMILES_PIN_SCLK -1
+#define HOYMILES_PIN_SCLK GPIO_NUM_NC
 #endif
 
 #ifndef HOYMILES_PIN_CS
-#define HOYMILES_PIN_CS -1
+#define HOYMILES_PIN_CS GPIO_NUM_NC
 #endif
 
 #ifndef HOYMILES_PIN_CE
-#define HOYMILES_PIN_CE -1
+#define HOYMILES_PIN_CE GPIO_NUM_NC
 #endif
 
 #ifndef HOYMILES_PIN_IRQ
-#define HOYMILES_PIN_IRQ -1
+#define HOYMILES_PIN_IRQ GPIO_NUM_NC
 #endif
 
 #ifndef HOYMILES_PIN_MISO
-#define HOYMILES_PIN_MISO -1
+#define HOYMILES_PIN_MISO GPIO_NUM_NC
 #endif
 
 #ifndef HOYMILES_PIN_MOSI
-#define HOYMILES_PIN_MOSI -1
+#define HOYMILES_PIN_MOSI GPIO_NUM_NC
 #endif
 
 #ifndef CMT_CLK
@@ -268,12 +268,12 @@ bool PinMappingClass::init(const String& deviceMapping)
 
 bool PinMappingClass::isValidNrf24Config() const
 {
-    return _pinMapping.nrf24_clk >= 0
-        && _pinMapping.nrf24_cs >= 0
-        && _pinMapping.nrf24_en >= 0
-        && _pinMapping.nrf24_irq >= 0
-        && _pinMapping.nrf24_miso >= 0
-        && _pinMapping.nrf24_mosi >= 0;
+    return _pinMapping.nrf24_clk > GPIO_NUM_NC
+        && _pinMapping.nrf24_cs > GPIO_NUM_NC
+        && _pinMapping.nrf24_en > GPIO_NUM_NC
+        && _pinMapping.nrf24_irq > GPIO_NUM_NC
+        && _pinMapping.nrf24_miso > GPIO_NUM_NC
+        && _pinMapping.nrf24_mosi > GPIO_NUM_NC;
 }
 
 bool PinMappingClass::isValidCmt2300Config() const

@@ -13,12 +13,12 @@
 struct PinMapping_t {
     char name[MAPPING_NAME_STRLEN + 1];
 
-    int8_t nrf24_miso;
-    int8_t nrf24_mosi;
-    int8_t nrf24_clk;
-    int8_t nrf24_irq;
-    int8_t nrf24_en;
-    int8_t nrf24_cs;
+    gpio_num_t nrf24_miso;
+    gpio_num_t nrf24_mosi;
+    gpio_num_t nrf24_clk;
+    gpio_num_t nrf24_irq;
+    gpio_num_t nrf24_en;
+    gpio_num_t nrf24_cs;
 
     int8_t cmt_clk;
     int8_t cmt_cs;
