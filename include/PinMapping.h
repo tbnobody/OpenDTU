@@ -20,12 +20,12 @@ struct PinMapping_t {
     gpio_num_t nrf24_en;
     gpio_num_t nrf24_cs;
 
-    int8_t cmt_clk;
-    int8_t cmt_cs;
-    int8_t cmt_fcs;
-    int8_t cmt_gpio2;
-    int8_t cmt_gpio3;
-    int8_t cmt_sdio;
+    gpio_num_t cmt_clk;
+    gpio_num_t cmt_cs;
+    gpio_num_t cmt_fcs;
+    gpio_num_t cmt_gpio2;
+    gpio_num_t cmt_gpio3;
+    gpio_num_t cmt_sdio;
 
     int8_t w5500_mosi;
     int8_t w5500_miso;

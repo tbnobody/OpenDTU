@@ -62,27 +62,27 @@
 #endif
 
 #ifndef CMT_CLK
-#define CMT_CLK -1
+#define CMT_CLK GPIO_NUM_NC
 #endif
 
 #ifndef CMT_CS
-#define CMT_CS -1
+#define CMT_CS GPIO_NUM_NC
 #endif
 
 #ifndef CMT_FCS
-#define CMT_FCS -1
+#define CMT_FCS GPIO_NUM_NC
 #endif
 
 #ifndef CMT_GPIO2
-#define CMT_GPIO2 -1
+#define CMT_GPIO2 GPIO_NUM_NC
 #endif
 
 #ifndef CMT_GPIO3
-#define CMT_GPIO3 -1
+#define CMT_GPIO3 GPIO_NUM_NC
 #endif
 
 #ifndef CMT_SDIO
-#define CMT_SDIO -1
+#define CMT_SDIO GPIO_NUM_NC
 #endif
 
 #ifndef W5500_MOSI
@@ -278,10 +278,10 @@ bool PinMappingClass::isValidNrf24Config() const
 
 bool PinMappingClass::isValidCmt2300Config() const
 {
-    return _pinMapping.cmt_clk >= 0
-        && _pinMapping.cmt_cs >= 0
-        && _pinMapping.cmt_fcs >= 0
-        && _pinMapping.cmt_sdio >= 0;
+    return _pinMapping.cmt_clk > GPIO_NUM_NC
+        && _pinMapping.cmt_cs > GPIO_NUM_NC
+        && _pinMapping.cmt_fcs > GPIO_NUM_NC
+        && _pinMapping.cmt_sdio > GPIO_NUM_NC;
 }
 
 bool PinMappingClass::isValidW5500Config() const
