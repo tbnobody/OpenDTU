@@ -33,7 +33,7 @@ void NetworkSettingsClass::init(Scheduler& scheduler)
     WiFi.onEvent(std::bind(&NetworkSettingsClass::NetworkEvent, this, _1, _2));
 
     if (PinMapping.isValidW5500Config()) {
-        PinMapping_t& pin = PinMapping.get();
+        const PinMapping_t& pin = PinMapping.get();
         _w5500 = W5500::setup(pin.w5500_mosi, pin.w5500_miso, pin.w5500_sclk, pin.w5500_cs, pin.w5500_int, pin.w5500_rst);
         if (_w5500)
             MessageOutput.println("W5500: Connection successful");
@@ -42,7 +42,7 @@ void NetworkSettingsClass::init(Scheduler& scheduler)
     }
 #if CONFIG_ETH_USE_ESP32_EMAC
     else if (PinMapping.isValidEthConfig()) {
-        PinMapping_t& pin = PinMapping.get();
+        const PinMapping_t& pin = PinMapping.get();
 #if ESP_ARDUINO_VERSION_MAJOR < 3
         ETH.begin(pin.eth_phy_addr, pin.eth_power, pin.eth_mdc, pin.eth_mdio, pin.eth_type, pin.eth_clk_mode);
 #else
