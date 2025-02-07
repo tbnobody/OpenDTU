@@ -86,27 +86,27 @@
 #endif
 
 #ifndef W5500_MOSI
-#define W5500_MOSI -1
+#define W5500_MOSI GPIO_NUM_NC
 #endif
 
 #ifndef W5500_MISO
-#define W5500_MISO -1
+#define W5500_MISO GPIO_NUM_NC
 #endif
 
 #ifndef W5500_SCLK
-#define W5500_SCLK -1
+#define W5500_SCLK GPIO_NUM_NC
 #endif
 
 #ifndef W5500_CS
-#define W5500_CS -1
+#define W5500_CS GPIO_NUM_NC
 #endif
 
 #ifndef W5500_INT
-#define W5500_INT -1
+#define W5500_INT GPIO_NUM_NC
 #endif
 
 #ifndef W5500_RST
-#define W5500_RST -1
+#define W5500_RST GPIO_NUM_NC
 #endif
 
 #if CONFIG_ETH_USE_ESP32_EMAC
@@ -286,12 +286,12 @@ bool PinMappingClass::isValidCmt2300Config() const
 
 bool PinMappingClass::isValidW5500Config() const
 {
-    return _pinMapping.w5500_mosi >= 0
-        && _pinMapping.w5500_miso >= 0
-        && _pinMapping.w5500_sclk >= 0
-        && _pinMapping.w5500_cs >= 0
-        && _pinMapping.w5500_int >= 0
-        && _pinMapping.w5500_rst >= 0;
+    return _pinMapping.w5500_mosi > GPIO_NUM_NC
+        && _pinMapping.w5500_miso > GPIO_NUM_NC
+        && _pinMapping.w5500_sclk > GPIO_NUM_NC
+        && _pinMapping.w5500_cs > GPIO_NUM_NC
+        && _pinMapping.w5500_int > GPIO_NUM_NC
+        && _pinMapping.w5500_rst > GPIO_NUM_NC;
 }
 
 #if CONFIG_ETH_USE_ESP32_EMAC

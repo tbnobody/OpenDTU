@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * Copyright (C) 2024 Thomas Basler and others
+ * Copyright (C) 2024-2025 Thomas Basler and others
  */
 
 #include "W5500.h"
@@ -56,19 +56,17 @@ W5500::~W5500()
     // TODO(LennartF22): support cleanup at some point?
 }
 
-std::unique_ptr<W5500> W5500::setup(int8_t pin_mosi, int8_t pin_miso, int8_t pin_sclk, int8_t pin_cs, int8_t pin_int, int8_t pin_rst)
+std::unique_ptr<W5500> W5500::setup(gpio_num_t pin_mosi, gpio_num_t pin_miso, gpio_num_t pin_sclk, gpio_num_t pin_cs, gpio_num_t pin_int, gpio_num_t pin_rst)
 {
-    gpio_reset_pin(static_cast<gpio_num_t>(pin_rst));
-    gpio_set_level(static_cast<gpio_num_t>(pin_rst), 0);
-    gpio_set_direction(static_cast<gpio_num_t>(pin_rst), GPIO_MODE_OUTPUT);
+    gpio_reset_pin(pin_rst);
+    gpio_set_level(pin_rst, 0);
+    gpio_set_direction(pin_rst, GPIO_MODE_OUTPUT);
 
-    gpio_reset_pin(static_cast<gpio_num_t>(pin_cs));
-    gpio_reset_pin(static_cast<gpio_num_t>(pin_int));
+    gpio_reset_pin(pin_cs);
+    gpio_reset_pin(pin_int);
 
     auto bus_config = std::make_shared<SpiBusConfig>(
-        static_cast<gpio_num_t>(pin_mosi),
-        static_cast<gpio_num_t>(pin_miso),
-        static_cast<gpio_num_t>(pin_sclk));
+        pin_mosi, pin_miso, pin_sclk);
 
     spi_device_interface_config_t device_config {
         .command_bits = 16, // actually address phase
@@ -93,12 +91,12 @@ std::unique_ptr<W5500> W5500::setup(int8_t pin_mosi, int8_t pin_miso, int8_t pin
 
     // Reset sequence
     delayMicroseconds(500);
-    gpio_set_level(static_cast<gpio_num_t>(pin_rst), 1);
+    gpio_set_level(pin_rst, 1);
     delayMicroseconds(1000);
 
     if (!connection_check_spi(spi))
         return nullptr;
-    if (!connection_check_interrupt(static_cast<gpio_num_t>(pin_int)))
+    if (!connection_check_interrupt(pin_int))
         return nullptr;
 
     // Use Arduino functions to temporarily attach interrupt to enable the GPIO ISR service
@@ -107,9 +105,9 @@ std::unique_ptr<W5500> W5500::setup(int8_t pin_mosi, int8_t pin_miso, int8_t pin
     detachInterrupt(pin_int);
 
     // Return to default state once again after connection check and temporary interrupt registration
-    gpio_reset_pin(static_cast<gpio_num_t>(pin_int));
+    gpio_reset_pin(pin_int);
 
-    return std::unique_ptr<W5500>(new W5500(spi, static_cast<gpio_num_t>(pin_int)));
+    return std::unique_ptr<W5500>(new W5500(spi, pin_int));
 }
 
 String W5500::macAddress()

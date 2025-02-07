@@ -27,12 +27,12 @@ struct PinMapping_t {
     gpio_num_t cmt_gpio3;
     gpio_num_t cmt_sdio;
 
-    int8_t w5500_mosi;
-    int8_t w5500_miso;
-    int8_t w5500_sclk;
-    int8_t w5500_cs;
-    int8_t w5500_int;
-    int8_t w5500_rst;
+    gpio_num_t w5500_mosi;
+    gpio_num_t w5500_miso;
+    gpio_num_t w5500_sclk;
+    gpio_num_t w5500_cs;
+    gpio_num_t w5500_int;
+    gpio_num_t w5500_rst;
 
 #if CONFIG_ETH_USE_ESP32_EMAC
     int8_t eth_phy_addr;
