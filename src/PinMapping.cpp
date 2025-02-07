@@ -116,15 +116,15 @@
 #endif
 
 #ifndef ETH_PHY_POWER
-#define ETH_PHY_POWER -1
+#define ETH_PHY_POWER GPIO_NUM_NC
 #endif
 
 #ifndef ETH_PHY_MDC
-#define ETH_PHY_MDC -1
+#define ETH_PHY_MDC GPIO_NUM_NC
 #endif
 
 #ifndef ETH_PHY_MDIO
-#define ETH_PHY_MDIO -1
+#define ETH_PHY_MDIO GPIO_NUM_NC
 #endif
 
 #ifndef ETH_PHY_TYPE
@@ -170,9 +170,9 @@ PinMappingClass::PinMappingClass()
     _pinMapping.eth_enabled = false;
 #endif
     _pinMapping.eth_phy_addr = ETH_PHY_ADDR;
-    _pinMapping.eth_power = ETH_PHY_POWER;
-    _pinMapping.eth_mdc = ETH_PHY_MDC;
-    _pinMapping.eth_mdio = ETH_PHY_MDIO;
+    _pinMapping.eth_power = static_cast<gpio_num_t>(ETH_PHY_POWER);
+    _pinMapping.eth_mdc = static_cast<gpio_num_t>(ETH_PHY_MDC);
+    _pinMapping.eth_mdio = static_cast<gpio_num_t>(ETH_PHY_MDIO);
     _pinMapping.eth_type = ETH_PHY_TYPE;
     _pinMapping.eth_clk_mode = ETH_CLK_MODE;
 #endif
@@ -243,9 +243,9 @@ bool PinMappingClass::init(const String& deviceMapping)
             _pinMapping.eth_enabled = doc[i]["eth"]["enabled"] | false;
 #endif
             _pinMapping.eth_phy_addr = doc[i]["eth"]["phy_addr"] | ETH_PHY_ADDR;
-            _pinMapping.eth_power = doc[i]["eth"]["power"] | ETH_PHY_POWER;
-            _pinMapping.eth_mdc = doc[i]["eth"]["mdc"] | ETH_PHY_MDC;
-            _pinMapping.eth_mdio = doc[i]["eth"]["mdio"] | ETH_PHY_MDIO;
+            _pinMapping.eth_power = doc[i]["eth"]["power"] | static_cast<gpio_num_t>(ETH_PHY_POWER);
+            _pinMapping.eth_mdc = doc[i]["eth"]["mdc"] | static_cast<gpio_num_t>(ETH_PHY_MDC);
+            _pinMapping.eth_mdio = doc[i]["eth"]["mdio"] | static_cast<gpio_num_t>(ETH_PHY_MDIO);
             _pinMapping.eth_type = doc[i]["eth"]["type"] | ETH_PHY_TYPE;
             _pinMapping.eth_clk_mode = doc[i]["eth"]["clk_mode"] | ETH_CLK_MODE;
 #endif
@@ -298,7 +298,7 @@ bool PinMappingClass::isValidW5500Config() const
 bool PinMappingClass::isValidEthConfig() const
 {
     return _pinMapping.eth_enabled
-        && _pinMapping.eth_mdc >= 0
-        && _pinMapping.eth_mdio >= 0;
+        && _pinMapping.eth_mdc > GPIO_NUM_NC
+        && _pinMapping.eth_mdio > GPIO_NUM_NC;
 }
 #endif

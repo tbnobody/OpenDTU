@@ -37,9 +37,9 @@ struct PinMapping_t {
 #if CONFIG_ETH_USE_ESP32_EMAC
     int8_t eth_phy_addr;
     bool eth_enabled;
-    int eth_power;
-    int eth_mdc;
-    int eth_mdio;
+    gpio_num_t eth_power;
+    gpio_num_t eth_mdc;
+    gpio_num_t eth_mdio;
     eth_phy_type_t eth_type;
     eth_clock_mode_t eth_clk_mode;
 #endif
