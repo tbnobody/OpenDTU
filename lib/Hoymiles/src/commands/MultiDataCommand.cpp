@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * Copyright (C) 2022-2024 Thomas Basler and others
+ * Copyright (C) 2022-2025 Thomas Basler and others
  */
 
 /*
@@ -111,7 +111,7 @@ bool MultiDataCommand::handleResponse(const fragment_t fragment[], const uint8_t
 
 void MultiDataCommand::udpateCRC()
 {
-    const  uint16_t crc = crc16(&_payload[10], 14); // From data_type till password
+    const uint16_t crc = crc16(&_payload[10], 14); // From data_type till password
     _payload[24] = static_cast<uint8_t>(crc >> 8);
     _payload[25] = static_cast<uint8_t>(crc);
 }

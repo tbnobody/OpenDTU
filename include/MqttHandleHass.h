@@ -37,7 +37,6 @@ enum CategoryType {
 };
 const char* const category_name[] = { 0, "config", "diagnostic" };
 
-
 typedef struct {
     FieldId_t fieldId; // field id
     DeviceClassType deviceClsId; // device class

@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * Copyright (C) 2022-2024 Thomas Basler and others
+ * Copyright (C) 2022-2025 Thomas Basler and others
  */
 #include "WebApi_sysstatus.h"
 #include "Configuration.h"
@@ -59,7 +59,9 @@ void WebApiSysstatusClass::onSystemStatus(AsyncWebServerRequest* request)
     };
     for (char const* task_name : task_names) {
         TaskHandle_t const handle = xTaskGetHandle(task_name);
-        if (!handle) { continue; }
+        if (!handle) {
+            continue;
+        }
         JsonObject task = taskDetails.add<JsonObject>();
         task["name"] = task_name;
         task["stack_watermark"] = uxTaskGetStackHighWaterMark(handle);

@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * Copyright (C) 2022-2024 Thomas Basler and others
+ * Copyright (C) 2022-2025 Thomas Basler and others
  */
 #include "WebApi_webapp.h"
 #include <MD5Builder.h>
@@ -19,11 +19,11 @@ extern const uint8_t file_zones_json_end[] asm("_binary_webapp_dist_zones_json_g
 extern const uint8_t file_app_js_end[] asm("_binary_webapp_dist_js_app_js_gz_end");
 extern const uint8_t file_site_webmanifest_end[] asm("_binary_webapp_dist_site_webmanifest_end");
 
-void WebApiWebappClass::responseBinaryDataWithETagCache(AsyncWebServerRequest *request, const String &contentType, const String &contentEncoding, const uint8_t *content, size_t len)
+void WebApiWebappClass::responseBinaryDataWithETagCache(AsyncWebServerRequest* request, const String& contentType, const String& contentEncoding, const uint8_t* content, size_t len)
 {
     auto md5 = MD5Builder();
     md5.begin();
-    md5.add(const_cast<uint8_t *>(content), len);
+    md5.add(const_cast<uint8_t*>(content), len);
     md5.calculate();
 
     String expectedEtag;

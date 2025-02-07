@@ -1,15 +1,15 @@
 
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * Copyright (C) 2022-2024 Thomas Basler and others
+ * Copyright (C) 2022-2025 Thomas Basler and others
  */
 #include "WebApi_prometheus.h"
 #include "Configuration.h"
 #include "MessageOutput.h"
 #include "NetworkSettings.h"
 #include "WebApi.h"
-#include <Hoymiles.h>
 #include "__compiled_constants.h"
+#include <Hoymiles.h>
 
 void WebApiPrometheusClass::init(AsyncWebServer& server, Scheduler& scheduler)
 {

@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 #pragma once
 
+#include <deque>
 #include <mutex>
 #include <optional>
-#include <deque>
 
 template <typename T>
 class ThreadSafeQueue {

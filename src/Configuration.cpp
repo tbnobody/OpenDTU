@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * Copyright (C) 2022-2024 Thomas Basler and others
+ * Copyright (C) 2022-2025 Thomas Basler and others
  */
 #include "Configuration.h"
 #include "MessageOutput.h"
@@ -489,7 +489,9 @@ void ConfigurationClass::deleteInverterById(const uint8_t id)
 void ConfigurationClass::loop()
 {
     std::unique_lock<std::mutex> lock(sWriterMutex);
-    if (sWriterCount == 0) { return; }
+    if (sWriterCount == 0) {
+        return;
+    }
 
     sWriterCv.notify_all();
     sWriterCv.wait(lock, [] { return sWriterCount == 0; });
@@ -507,9 +509,12 @@ ConfigurationClass::WriteGuard::WriteGuard()
     sWriterCv.wait(_lock);
 }
 
-ConfigurationClass::WriteGuard::~WriteGuard() {
+ConfigurationClass::WriteGuard::~WriteGuard()
+{
     sWriterCount--;
-    if (sWriterCount == 0) { sWriterCv.notify_all(); }
+    if (sWriterCount == 0) {
+        sWriterCv.notify_all();
+    }
 }
 
 ConfigurationClass Configuration;

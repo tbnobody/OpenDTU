@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * Copyright (C) 2022-2024 Thomas Basler and others
+ * Copyright (C) 2022-2025 Thomas Basler and others
  */
 #include "Hoymiles.h"
 #include "Utils.h"
@@ -119,7 +119,7 @@ void HoymilesClass::loop()
                     iv->sendGridOnProFileParaRequest();
                 }
 
-                 _messageOutput->printf("Queue size - NRF: %" PRId32 " CMT: %" PRId32 "\r\n", _radioNrf->getQueueSize(), _radioCmt->getQueueSize());
+                _messageOutput->printf("Queue size - NRF: %" PRId32 " CMT: %" PRId32 "\r\n", _radioNrf->getQueueSize(), _radioCmt->getQueueSize());
                 _lastPoll = millis();
             }
 

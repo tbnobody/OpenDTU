@@ -13,7 +13,7 @@ class InverterAbstract;
 
 enum class QueueInsertType {
     AllowMultiple,
-     // Remove from  beginning of the queue
+    // Remove from  beginning of the queue
     RemoveOldest,
 
     // Don't insert command if it already exist

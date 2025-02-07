@@ -1,7 +1,7 @@
 #include "cmt_spi3.h"
 #include <Arduino.h>
-#include <driver/spi_master.h>
 #include <SpiManager.h>
+#include <driver/spi_master.h>
 
 SemaphoreHandle_t paramLock = NULL;
 #define SPI_PARAM_LOCK() \
@@ -9,11 +9,13 @@ SemaphoreHandle_t paramLock = NULL;
     } while (xSemaphoreTake(paramLock, portMAX_DELAY) != pdPASS)
 #define SPI_PARAM_UNLOCK() xSemaphoreGive(paramLock)
 
-static void IRAM_ATTR pre_cb(spi_transaction_t *trans) {
+static void IRAM_ATTR pre_cb(spi_transaction_t* trans)
+{
     gpio_set_level(*reinterpret_cast<gpio_num_t*>(trans->user), 0);
 }
 
-static void IRAM_ATTR post_cb(spi_transaction_t *trans) {
+static void IRAM_ATTR post_cb(spi_transaction_t* trans)
+{
     gpio_set_level(*reinterpret_cast<gpio_num_t*>(trans->user), 1);
 }
 
@@ -27,8 +29,7 @@ void cmt_spi3_init(const int8_t pin_sdio, const int8_t pin_clk, const int8_t pin
     auto bus_config = std::make_shared<SpiBusConfig>(
         static_cast<gpio_num_t>(pin_sdio),
         GPIO_NUM_NC,
-        static_cast<gpio_num_t>(pin_clk)
-    );
+        static_cast<gpio_num_t>(pin_clk));
 
     spi_device_interface_config_t device_config {
         .command_bits = 0, // set by transactions individually

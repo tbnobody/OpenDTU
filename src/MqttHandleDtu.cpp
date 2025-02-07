@@ -1,13 +1,13 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * Copyright (C) 2022-2024 Thomas Basler and others
+ * Copyright (C) 2022-2025 Thomas Basler and others
  */
 #include "MqttHandleDtu.h"
 #include "Configuration.h"
 #include "MqttSettings.h"
 #include "NetworkSettings.h"
-#include <Hoymiles.h>
 #include <CpuTemperature.h>
+#include <Hoymiles.h>
 
 MqttHandleDtuClass MqttHandleDtu;
 

@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * Copyright (C) 2022-2024 Thomas Basler and others
+ * Copyright (C) 2022-2025 Thomas Basler and others
  */
 
 /*
@@ -27,9 +27,9 @@ Source Address: 80 12 23 04
      Target Addr   Source Addr      CRC8
 */
 #include "CommandAbstract.h"
+#include "../inverters/InverterAbstract.h"
 #include "crc.h"
 #include <string.h>
-#include "../inverters/InverterAbstract.h"
 
 CommandAbstract::CommandAbstract(InverterAbstract* inv, const uint64_t router_address)
 {

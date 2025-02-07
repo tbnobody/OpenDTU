@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 #pragma once
 
-#include "CommandAbstract.h"
 #include "../HoymilesRadio_CMT.h"
+#include "CommandAbstract.h"
 
 class ChannelChangeCommand : public CommandAbstract {
 public:

@@ -2,10 +2,10 @@
 #pragma once
 
 #include "PinMapping.h"
-#include <cstdint>
 #include <TaskSchedulerDeclarations.h>
-#include <mutex>
 #include <condition_variable>
+#include <cstdint>
+#include <mutex>
 
 #define CONFIG_FILENAME "/config.json"
 #define CONFIG_VERSION 0x00011d00 // 0.1.29 // make sure to clean all after change

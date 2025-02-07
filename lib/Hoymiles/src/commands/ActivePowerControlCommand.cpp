@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * Copyright (C) 2022-2024 Thomas Basler and others
+ * Copyright (C) 2022-2025 Thomas Basler and others
  */
 
 /*
@@ -61,11 +61,11 @@ void ActivePowerControlCommand::setActivePowerLimit(const float limit, const Pow
 
     // limit
     _payload[12] = (l >> 8) & 0xff;
-    _payload[13] = (l)&0xff;
+    _payload[13] = (l) & 0xff;
 
     // type
     _payload[14] = (type >> 8) & 0xff;
-    _payload[15] = (type)&0xff;
+    _payload[15] = (type) & 0xff;
 
     udpateCRC(CRC_SIZE);
 }
