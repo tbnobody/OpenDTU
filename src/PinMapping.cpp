@@ -14,19 +14,19 @@
 #endif
 
 #ifndef DISPLAY_DATA
-#define DISPLAY_DATA 255U
+#define DISPLAY_DATA GPIO_NUM_NC
 #endif
 
 #ifndef DISPLAY_CLK
-#define DISPLAY_CLK 255U
+#define DISPLAY_CLK GPIO_NUM_NC
 #endif
 
 #ifndef DISPLAY_CS
-#define DISPLAY_CS 255U
+#define DISPLAY_CS GPIO_NUM_NC
 #endif
 
 #ifndef DISPLAY_RESET
-#define DISPLAY_RESET 255U
+#define DISPLAY_RESET GPIO_NUM_NC
 #endif
 
 #ifndef LED0

@@ -45,10 +45,10 @@ struct PinMapping_t {
 #endif
 
     uint8_t display_type;
-    uint8_t display_data;
-    uint8_t display_clk;
-    uint8_t display_cs;
-    uint8_t display_reset;
+    gpio_num_t display_data;
+    gpio_num_t display_clk;
+    gpio_num_t display_cs;
+    gpio_num_t display_reset;
 
     gpio_num_t led[PINMAPPING_LED_COUNT];
 };
