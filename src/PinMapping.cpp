@@ -7,6 +7,7 @@
 #include "Utils.h"
 #include <ArduinoJson.h>
 #include <LittleFS.h>
+#include <SpiManager.h>
 #include <string.h>
 
 #ifndef DISPLAY_TYPE
@@ -194,6 +195,13 @@ PinMapping_t& PinMappingClass::get()
 
 bool PinMappingClass::init(const String& deviceMapping)
 {
+
+    // Initialize SpiManager
+    SpiManagerInst.register_bus(SPI2_HOST);
+#if SOC_SPI_PERIPH_NUM > 2
+    SpiManagerInst.register_bus(SPI3_HOST);
+#endif
+
     File f = LittleFS.open(PINMAPPING_FILENAME, "r", false);
 
     if (!f) {
