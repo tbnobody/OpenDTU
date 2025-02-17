@@ -27,7 +27,7 @@ void WebApiDtuClass::init(AsyncWebServer& server, Scheduler& scheduler)
 void WebApiDtuClass::applyDataTaskCb()
 {
     // Execute stuff in main thread to avoid busy SPI bus
-    CONFIG_T& config = Configuration.get();
+    auto const& config = Configuration.get();
     Hoymiles.getRadioNrf()->setPALevel((rf24_pa_dbm_e)config.Dtu.Nrf.PaLevel);
     Hoymiles.getRadioCmt()->setPALevel(config.Dtu.Cmt.PaLevel);
     Hoymiles.getRadioNrf()->setDtuSerial(config.Dtu.Serial);
@@ -50,8 +50,8 @@ void WebApiDtuClass::onDtuAdminGet(AsyncWebServerRequest* request)
     // DTU Serial is read as HEX
     char buffer[sizeof(uint64_t) * 8 + 1];
     snprintf(buffer, sizeof(buffer), "%0" PRIx32 "%08" PRIx32,
-        ((uint32_t)((config.Dtu.Serial >> 32) & 0xFFFFFFFF)),
-        ((uint32_t)(config.Dtu.Serial & 0xFFFFFFFF)));
+        static_cast<uint32_t>((config.Dtu.Serial >> 32) & 0xFFFFFFFF),
+        static_cast<uint32_t>(config.Dtu.Serial & 0xFFFFFFFF));
     root["serial"] = buffer;
     root["pollinterval"] = config.Dtu.PollInterval;
     root["nrf_enabled"] = Hoymiles.getRadioNrf()->isInitialized();
@@ -153,14 +153,16 @@ void WebApiDtuClass::onDtuAdminPost(AsyncWebServerRequest* request)
         return;
     }
 
-    CONFIG_T& config = Configuration.get();
-
-    config.Dtu.Serial = serial;
-    config.Dtu.PollInterval = root["pollinterval"].as<uint32_t>();
-    config.Dtu.Nrf.PaLevel = root["nrf_palevel"].as<uint8_t>();
-    config.Dtu.Cmt.PaLevel = root["cmt_palevel"].as<int8_t>();
-    config.Dtu.Cmt.Frequency = root["cmt_frequency"].as<uint32_t>();
-    config.Dtu.Cmt.CountryMode = root["cmt_country"].as<CountryModeId_t>();
+    {
+        auto guard = Configuration.getWriteGuard();
+        auto& config = guard.getConfig();
+        config.Dtu.Serial = serial;
+        config.Dtu.PollInterval = root["pollinterval"].as<uint32_t>();
+        config.Dtu.Nrf.PaLevel = root["nrf_palevel"].as<uint8_t>();
+        config.Dtu.Cmt.PaLevel = root["cmt_palevel"].as<int8_t>();
+        config.Dtu.Cmt.Frequency = root["cmt_frequency"].as<uint32_t>();
+        config.Dtu.Cmt.CountryMode = root["cmt_country"].as<CountryModeId_t>();
+    }
 
     WebApi.writeConfig(retMsg);
 

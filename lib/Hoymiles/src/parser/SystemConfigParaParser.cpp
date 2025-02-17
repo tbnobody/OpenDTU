@@ -45,16 +45,20 @@ void SystemConfigParaParser::appendFragment(const uint8_t offset, const uint8_t*
 float SystemConfigParaParser::getLimitPercent() const
 {
     HOY_SEMAPHORE_TAKE();
-    const float ret = ((((uint16_t)_payload[2]) << 8) | _payload[3]) / 10.0;
+    const float ret = ((static_cast<uint16_t>(_payload[2]) << 8) | _payload[3]) / 10.0;
     HOY_SEMAPHORE_GIVE();
-    return ret;
+
+    // don't pretend the inverter could produce more than its rated power,
+    // even though it does process, accept, and even save limit values beyond
+    // its rated power.
+    return min<float>(100, ret);
 }
 
 void SystemConfigParaParser::setLimitPercent(const float value)
 {
     HOY_SEMAPHORE_TAKE();
-    _payload[2] = ((uint16_t)(value * 10)) >> 8;
-    _payload[3] = ((uint16_t)(value * 10));
+    _payload[2] = static_cast<uint16_t>(value * 10) >> 8;
+    _payload[3] = static_cast<uint16_t>(value * 10);
     HOY_SEMAPHORE_GIVE();
 }
 

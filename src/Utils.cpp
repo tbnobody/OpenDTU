@@ -7,6 +7,7 @@
 #include "MessageOutput.h"
 #include "PinMapping.h"
 #include <LittleFS.h>
+#include <MD5Builder.h>
 
 uint32_t Utils::getChipId()
 {
@@ -78,5 +79,47 @@ void Utils::removeAllFiles()
             LittleFS.remove(file);
         }
         file = root.getNextFileName();
+    }
+}
+
+String Utils::generateMd5FromFile(String file)
+{
+    if (!LittleFS.exists(file)) {
+        return String();
+    }
+
+    File f = LittleFS.open(file, "r");
+    if (!file) {
+        return String();
+    }
+
+    MD5Builder md5;
+    md5.begin();
+
+    // Read the file in chunks to avoid using too much memory
+    uint8_t buffer[512];
+
+    while (f.available()) {
+        size_t bytesRead = f.read(buffer, sizeof(buffer) / sizeof(buffer[0]));
+        md5.add(buffer, bytesRead);
+    }
+
+    // Finalize and calculate the MD5 hash
+    md5.calculate();
+
+    f.close();
+
+    return md5.toString();
+}
+
+void Utils::skipBom(File& f)
+{
+    // skip Byte Order Mask (BOM). valid JSON docs always start with '{' or '['.
+    while (f.available() > 0) {
+        int c = f.peek();
+        if (c == '{' || c == '[') {
+            break;
+        }
+        f.read();
     }
 }

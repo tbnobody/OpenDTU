@@ -37,17 +37,19 @@ static const byteAssign_t byteAssignment[] = {
 };
 
 HM_2CH::HM_2CH(HoymilesRadio* radio, const uint64_t serial)
-    : HM_Abstract(radio, serial) {};
+    : HM_Abstract(radio, serial)
+{
+}
 
 bool HM_2CH::isValidSerial(const uint64_t serial)
 {
     // serial >= 0x114100000000 && serial <= 0x1141ffffffff
 
     uint8_t preId[2];
-    preId[0] = (uint8_t)(serial >> 40);
-    preId[1] = (uint8_t)(serial >> 32);
+    preId[0] = static_cast<uint8_t>(serial >> 40);
+    preId[1] = static_cast<uint8_t>(serial >> 32);
 
-    if ((uint8_t)(((((uint16_t)preId[0] << 8) | preId[1]) >> 4) & 0xff) == 0x14) {
+    if (static_cast<uint8_t>((((static_cast<uint16_t>(preId[0]) << 8) | preId[1]) >> 4) & 0xff) == 0x14) {
         return true;
     }
 

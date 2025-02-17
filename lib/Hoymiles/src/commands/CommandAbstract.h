@@ -11,6 +11,18 @@
 
 class InverterAbstract;
 
+enum class QueueInsertType {
+    AllowMultiple,
+     // Remove from  beginning of the queue
+    RemoveOldest,
+
+    // Don't insert command if it already exist
+    RemoveNewest,
+
+    // Replace the existing entry in the queue by the one to be added
+    ReplaceExistent,
+};
+
 class CommandAbstract {
 public:
     explicit CommandAbstract(InverterAbstract* inv, const uint64_t router_address = 0);
@@ -45,6 +57,10 @@ public:
 
     // Sets the amount how often a missing fragment is re-requested if it was not available
     virtual uint8_t getMaxRetransmitCount() const;
+
+    // Returns whether multiple instances of this command are allowed in the command queue.
+    virtual QueueInsertType getQueueInsertType() const { return QueueInsertType::RemoveNewest; }
+    virtual bool areSameParameter(CommandAbstract* other);
 
 protected:
     uint8_t _payload[RF_LEN];

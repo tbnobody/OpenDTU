@@ -18,7 +18,7 @@ export default defineComponent({
 <style>
 /* Show it is fixed to the top */
 body {
-    min-height: 75rem;
+    padding-bottom: 1rem;
     padding-top: 4.5rem;
 }
 </style>

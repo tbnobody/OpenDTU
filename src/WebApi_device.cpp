@@ -86,7 +86,7 @@ void WebApiDeviceClass::onDeviceAdminGet(AsyncWebServerRequest* request)
     display["power_safe"] = config.Display.PowerSafe;
     display["screensaver"] = config.Display.ScreenSaver;
     display["contrast"] = config.Display.Contrast;
-    display["language"] = config.Display.Language;
+    display["locale"] = config.Display.Locale;
     display["diagramduration"] = config.Display.Diagram.Duration;
     display["diagrammode"] = config.Display.Diagram.Mode;
 
@@ -129,29 +129,37 @@ void WebApiDeviceClass::onDeviceAdminPost(AsyncWebServerRequest* request)
         return;
     }
 
-    CONFIG_T& config = Configuration.get();
-    bool performRestart = root["curPin"]["name"].as<String>() != config.Dev_PinMapping;
+    bool performRestart = false;
 
-    strlcpy(config.Dev_PinMapping, root["curPin"]["name"].as<String>().c_str(), sizeof(config.Dev_PinMapping));
-    config.Display.Rotation = root["display"]["rotation"].as<uint8_t>();
-    config.Display.PowerSafe = root["display"]["power_safe"].as<bool>();
-    config.Display.ScreenSaver = root["display"]["screensaver"].as<bool>();
-    config.Display.Contrast = root["display"]["contrast"].as<uint8_t>();
-    config.Display.Language = root["display"]["language"].as<uint8_t>();
-    config.Display.Diagram.Duration = root["display"]["diagramduration"].as<uint32_t>();
-    config.Display.Diagram.Mode = root["display"]["diagrammode"].as<DiagramMode_t>();
+    {
+        auto guard = Configuration.getWriteGuard();
+        auto& config = guard.getConfig();
 
-    for (uint8_t i = 0; i < PINMAPPING_LED_COUNT; i++) {
-        config.Led_Single[i].Brightness = root["led"][i]["brightness"].as<uint8_t>();
-        config.Led_Single[i].Brightness = min<uint8_t>(100, config.Led_Single[i].Brightness);
+        performRestart = root["curPin"]["name"].as<String>() != config.Dev_PinMapping;
+
+        strlcpy(config.Dev_PinMapping, root["curPin"]["name"].as<String>().c_str(), sizeof(config.Dev_PinMapping));
+        config.Display.Rotation = root["display"]["rotation"].as<uint8_t>();
+        config.Display.PowerSafe = root["display"]["power_safe"].as<bool>();
+        config.Display.ScreenSaver = root["display"]["screensaver"].as<bool>();
+        config.Display.Contrast = root["display"]["contrast"].as<uint8_t>();
+        strlcpy(config.Display.Locale, root["display"]["locale"].as<String>().c_str(), sizeof(config.Display.Locale));
+        config.Display.Diagram.Duration = root["display"]["diagramduration"].as<uint32_t>();
+        config.Display.Diagram.Mode = root["display"]["diagrammode"].as<DiagramMode_t>();
+
+        for (uint8_t i = 0; i < PINMAPPING_LED_COUNT; i++) {
+            config.Led_Single[i].Brightness = root["led"][i]["brightness"].as<uint8_t>();
+            config.Led_Single[i].Brightness = min<uint8_t>(100, config.Led_Single[i].Brightness);
+        }
     }
+
+    auto const& config = Configuration.get();
 
     Display.setDiagramMode(static_cast<DiagramMode_t>(config.Display.Diagram.Mode));
     Display.setOrientation(config.Display.Rotation);
     Display.enablePowerSafe = config.Display.PowerSafe;
     Display.enableScreensaver = config.Display.ScreenSaver;
     Display.setContrast(config.Display.Contrast);
-    Display.setLanguage(config.Display.Language);
+    Display.setLocale(config.Display.Locale);
     Display.Diagram().updatePeriod();
 
     WebApi.writeConfig(retMsg);

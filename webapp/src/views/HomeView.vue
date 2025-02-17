@@ -11,7 +11,12 @@
         <InverterTotalInfo :totalData="liveData.total" /><br />
         <div class="row gy-3">
             <div class="col-sm-3 col-md-2" :style="[inverterData.length == 1 ? { display: 'none' } : {}]">
-                <div class="nav nav-pills row-cols-sm-1" id="v-pills-tab" role="tablist" aria-orientation="vertical">
+                <div
+                    class="nav nav-pills row-cols-sm-1 gap-3"
+                    id="v-pills-tab"
+                    role="tablist"
+                    aria-orientation="vertical"
+                >
                     <button
                         v-for="inverter in inverterData"
                         :key="inverter.serial"
@@ -24,16 +29,26 @@
                         aria-controls="'v-pills-' + inverter.serial"
                         aria-selected="true"
                     >
-                        <div class="row">
-                            <div class="col-auto col-sm-2">
-                                <BIconXCircleFill class="fs-4" v-if="!inverter.reachable" />
-                                <BIconExclamationCircleFill
-                                    class="fs-4"
-                                    v-if="inverter.reachable && !inverter.producing"
-                                />
-                                <BIconCheckCircleFill class="fs-4" v-if="inverter.reachable && inverter.producing" />
+                        <div class="d-flex align-items-center">
+                            <div class="me-2">
+                                <span
+                                    v-if="inverter.AC"
+                                    class="badge"
+                                    :class="{
+                                        'text-bg-secondary': !inverter.poll_enabled,
+                                        'text-bg-danger': inverter.poll_enabled && !inverter.reachable,
+                                        'text-bg-warning':
+                                            inverter.poll_enabled && inverter.reachable && !inverter.producing,
+                                        'text-bg-success':
+                                            inverter.poll_enabled && inverter.reachable && inverter.producing,
+                                    }"
+                                >
+                                    {{ $n(inverter.AC[0]?.Power?.v || 0, 'decimalNoDigits') }}
+                                    {{ inverter.AC[0].Power?.u }}
+                                </span>
+                                <span v-else class="badge text-bg-light">-</span>
                             </div>
-                            <div class="col-sm-9">
+                            <div class="ms-auto me-auto">
                                 {{ inverter.name }}
                             </div>
                         </div>
@@ -65,7 +80,7 @@
                                 'text-bg-tertiary': !inverter.poll_enabled,
                                 'text-bg-danger': inverter.poll_enabled && !inverter.reachable,
                                 'text-bg-warning': inverter.poll_enabled && inverter.reachable && !inverter.producing,
-                                'text-bg-primary': inverter.poll_enabled && inverter.reachable && inverter.producing,
+                                'text-bg-success': inverter.poll_enabled && inverter.reachable && inverter.producing,
                             }"
                         >
                             <div class="p-1 flex-grow-1">
@@ -211,8 +226,8 @@
                                 </div>
                             </BootstrapAlert>
 
-                            <div class="accordion mt-5" id="accordionExample">
-                                <div class="accordion-item">
+                            <div class="accordion mt-5" id="accordionRadioStats">
+                                <div class="accordion-item accordion-table">
                                     <h2 class="accordion-header">
                                         <button
                                             class="accordion-button collapsed"
@@ -228,7 +243,7 @@
                                     <div
                                         id="collapseStats"
                                         class="accordion-collapse collapse"
-                                        data-bs-parent="#accordionExample"
+                                        data-bs-parent="#accordionRadioStats"
                                     >
                                         <div class="accordion-body">
                                             <table class="table table-striped table-hover">
@@ -303,23 +318,25 @@
                                                     </tr>
                                                 </tbody>
                                             </table>
-                                            <button
-                                                :disabled="!isLogged || performRadioStatsReset"
-                                                type="button"
-                                                class="btn btn-danger"
-                                                @click="onResetRadioStats(inverter.serial)"
-                                            >
-                                                <template v-if="!performRadioStatsReset">
-                                                    {{ $t('home.StatsReset') }}
-                                                </template>
-                                                <template v-else>
-                                                    <span
-                                                        class="spinner-border spinner-border-sm"
-                                                        aria-hidden="true"
-                                                    ></span>
-                                                    <span role="status"> {{ $t('home.StatsResetting') }}</span>
-                                                </template>
-                                            </button>
+                                            <div class="d-flex">
+                                                <button
+                                                    :disabled="!isLogged || performRadioStatsReset"
+                                                    type="button"
+                                                    class="btn btn-danger ms-auto me-3 mt-3"
+                                                    @click="onResetRadioStats(inverter.serial)"
+                                                >
+                                                    <template v-if="!performRadioStatsReset">
+                                                        <BIconArrowCounterclockwise />&nbsp;{{ $t('home.StatsReset') }}
+                                                    </template>
+                                                    <template v-else>
+                                                        <span
+                                                            class="spinner-border spinner-border-sm"
+                                                            aria-hidden="true"
+                                                        ></span>
+                                                        <span role="status">&nbsp;{{ $t('home.StatsResetting') }}</span>
+                                                    </template>
+                                                </button>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -506,9 +523,7 @@ import * as bootstrap from 'bootstrap';
 import {
     BIconArrowCounterclockwise,
     BIconBroadcast,
-    BIconCheckCircleFill,
     BIconCpu,
-    BIconExclamationCircleFill,
     BIconInfoCircle,
     BIconJournalText,
     BIconOutlet,
@@ -516,7 +531,6 @@ import {
     BIconSpeedometer,
     BIconToggleOff,
     BIconToggleOn,
-    BIconXCircleFill,
 } from 'bootstrap-icons-vue';
 import { defineComponent } from 'vue';
 
@@ -533,9 +547,7 @@ export default defineComponent({
         ModalDialog,
         BIconArrowCounterclockwise,
         BIconBroadcast,
-        BIconCheckCircleFill,
         BIconCpu,
-        BIconExclamationCircleFill,
         BIconInfoCircle,
         BIconJournalText,
         BIconOutlet,
@@ -543,7 +555,6 @@ export default defineComponent({
         BIconSpeedometer,
         BIconToggleOff,
         BIconToggleOn,
-        BIconXCircleFill,
     },
     data() {
         return {

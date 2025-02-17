@@ -243,7 +243,7 @@ void AlarmLogParser::getLogEntry(const uint8_t entryId, AlarmLogEntry_t& entry, 
 
     HOY_SEMAPHORE_TAKE();
 
-    const uint32_t wcode = (uint16_t)_payloadAlarmLog[entryStartOffset] << 8 | _payloadAlarmLog[entryStartOffset + 1];
+    const uint32_t wcode = static_cast<uint16_t>(_payloadAlarmLog[entryStartOffset]) << 8 | _payloadAlarmLog[entryStartOffset + 1];
     uint32_t startTimeOffset = 0;
     if (((wcode >> 13) & 0x01) == 1) {
         startTimeOffset = 12 * 60 * 60;
@@ -255,8 +255,8 @@ void AlarmLogParser::getLogEntry(const uint8_t entryId, AlarmLogEntry_t& entry, 
     }
 
     entry.MessageId = _payloadAlarmLog[entryStartOffset + 1];
-    entry.StartTime = (((uint16_t)_payloadAlarmLog[entryStartOffset + 4] << 8) | ((uint16_t)_payloadAlarmLog[entryStartOffset + 5])) + startTimeOffset + timezoneOffset;
-    entry.EndTime = ((uint16_t)_payloadAlarmLog[entryStartOffset + 6] << 8) | ((uint16_t)_payloadAlarmLog[entryStartOffset + 7]);
+    entry.StartTime = ((static_cast<uint16_t>(_payloadAlarmLog[entryStartOffset + 4]) << 8) | static_cast<uint16_t>(_payloadAlarmLog[entryStartOffset + 5])) + startTimeOffset + timezoneOffset;
+    entry.EndTime = (static_cast<uint16_t>(_payloadAlarmLog[entryStartOffset + 6]) << 8) | static_cast<uint16_t>(_payloadAlarmLog[entryStartOffset + 7]);
 
     HOY_SEMAPHORE_GIVE();
 

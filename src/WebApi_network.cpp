@@ -10,6 +10,11 @@
 #include "helper.h"
 #include <AsyncJson.h>
 
+WebApiNetworkClass::WebApiNetworkClass()
+    : _applyDataTask(500 * TASK_MILLISECOND, TASK_ONCE, std::bind(&WebApiNetworkClass::applyDataTaskCb, this))
+{
+}
+
 void WebApiNetworkClass::init(AsyncWebServer& server, Scheduler& scheduler)
 {
     using std::placeholders::_1;
@@ -17,6 +22,8 @@ void WebApiNetworkClass::init(AsyncWebServer& server, Scheduler& scheduler)
     server.on("/api/network/status", HTTP_GET, std::bind(&WebApiNetworkClass::onNetworkStatus, this, _1));
     server.on("/api/network/config", HTTP_GET, std::bind(&WebApiNetworkClass::onNetworkAdminGet, this, _1));
     server.on("/api/network/config", HTTP_POST, std::bind(&WebApiNetworkClass::onNetworkAdminPost, this, _1));
+
+    scheduler.addTask(_applyDataTask);
 }
 
 void WebApiNetworkClass::onNetworkStatus(AsyncWebServerRequest* request)
@@ -164,42 +171,52 @@ void WebApiNetworkClass::onNetworkAdminPost(AsyncWebServerRequest* request)
         return;
     }
 
-    CONFIG_T& config = Configuration.get();
-    config.WiFi.Ip[0] = ipaddress[0];
-    config.WiFi.Ip[1] = ipaddress[1];
-    config.WiFi.Ip[2] = ipaddress[2];
-    config.WiFi.Ip[3] = ipaddress[3];
-    config.WiFi.Netmask[0] = netmask[0];
-    config.WiFi.Netmask[1] = netmask[1];
-    config.WiFi.Netmask[2] = netmask[2];
-    config.WiFi.Netmask[3] = netmask[3];
-    config.WiFi.Gateway[0] = gateway[0];
-    config.WiFi.Gateway[1] = gateway[1];
-    config.WiFi.Gateway[2] = gateway[2];
-    config.WiFi.Gateway[3] = gateway[3];
-    config.WiFi.Dns1[0] = dns1[0];
-    config.WiFi.Dns1[1] = dns1[1];
-    config.WiFi.Dns1[2] = dns1[2];
-    config.WiFi.Dns1[3] = dns1[3];
-    config.WiFi.Dns2[0] = dns2[0];
-    config.WiFi.Dns2[1] = dns2[1];
-    config.WiFi.Dns2[2] = dns2[2];
-    config.WiFi.Dns2[3] = dns2[3];
-    strlcpy(config.WiFi.Ssid, root["ssid"].as<String>().c_str(), sizeof(config.WiFi.Ssid));
-    strlcpy(config.WiFi.Password, root["password"].as<String>().c_str(), sizeof(config.WiFi.Password));
-    strlcpy(config.WiFi.Hostname, root["hostname"].as<String>().c_str(), sizeof(config.WiFi.Hostname));
-    if (root["dhcp"].as<bool>()) {
-        config.WiFi.Dhcp = true;
-    } else {
-        config.WiFi.Dhcp = false;
+    {
+        auto guard = Configuration.getWriteGuard();
+        auto& config = guard.getConfig();
+
+        config.WiFi.Ip[0] = ipaddress[0];
+        config.WiFi.Ip[1] = ipaddress[1];
+        config.WiFi.Ip[2] = ipaddress[2];
+        config.WiFi.Ip[3] = ipaddress[3];
+        config.WiFi.Netmask[0] = netmask[0];
+        config.WiFi.Netmask[1] = netmask[1];
+        config.WiFi.Netmask[2] = netmask[2];
+        config.WiFi.Netmask[3] = netmask[3];
+        config.WiFi.Gateway[0] = gateway[0];
+        config.WiFi.Gateway[1] = gateway[1];
+        config.WiFi.Gateway[2] = gateway[2];
+        config.WiFi.Gateway[3] = gateway[3];
+        config.WiFi.Dns1[0] = dns1[0];
+        config.WiFi.Dns1[1] = dns1[1];
+        config.WiFi.Dns1[2] = dns1[2];
+        config.WiFi.Dns1[3] = dns1[3];
+        config.WiFi.Dns2[0] = dns2[0];
+        config.WiFi.Dns2[1] = dns2[1];
+        config.WiFi.Dns2[2] = dns2[2];
+        config.WiFi.Dns2[3] = dns2[3];
+        strlcpy(config.WiFi.Ssid, root["ssid"].as<String>().c_str(), sizeof(config.WiFi.Ssid));
+        strlcpy(config.WiFi.Password, root["password"].as<String>().c_str(), sizeof(config.WiFi.Password));
+        strlcpy(config.WiFi.Hostname, root["hostname"].as<String>().c_str(), sizeof(config.WiFi.Hostname));
+        if (root["dhcp"].as<bool>()) {
+            config.WiFi.Dhcp = true;
+        } else {
+            config.WiFi.Dhcp = false;
+        }
+        config.WiFi.ApTimeout = root["aptimeout"].as<uint>();
+        config.Mdns.Enabled = root["mdnsenabled"].as<bool>();
     }
-    config.WiFi.ApTimeout = root["aptimeout"].as<uint>();
-    config.Mdns.Enabled = root["mdnsenabled"].as<bool>();
 
     WebApi.writeConfig(retMsg);
 
     WebApi.sendJsonResponse(request, response, __FUNCTION__, __LINE__);
 
+    _applyDataTask.enable();
+    _applyDataTask.restart();
+}
+
+void WebApiNetworkClass::applyDataTaskCb()
+{
     NetworkSettings.enableAdminMode();
     NetworkSettings.applyConfig();
 }

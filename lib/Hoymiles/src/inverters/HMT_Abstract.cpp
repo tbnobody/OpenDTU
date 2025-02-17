@@ -12,7 +12,7 @@ HMT_Abstract::HMT_Abstract(HoymilesRadio* radio, const uint64_t serial)
     : HM_Abstract(radio, serial)
 {
     EventLog()->setMessageType(AlarmMessageType_t::HMT);
-};
+}
 
 bool HMT_Abstract::sendChangeChannelRequest()
 {
@@ -26,4 +26,4 @@ bool HMT_Abstract::sendChangeChannelRequest()
     _radio->enqueCommand(cmdChannel);
 
     return true;
-};
+}

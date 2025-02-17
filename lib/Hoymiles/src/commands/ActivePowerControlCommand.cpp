@@ -44,7 +44,15 @@ ActivePowerControlCommand::ActivePowerControlCommand(InverterAbstract* inv, cons
 
 String ActivePowerControlCommand::getCommandName() const
 {
-    return "ActivePowerControl";
+    char buffer[30];
+    snprintf(buffer, sizeof(buffer), "ActivePowerControl (%02X)", getType());
+    return buffer;
+}
+
+bool ActivePowerControlCommand::areSameParameter(CommandAbstract* other)
+{
+    return CommandAbstract::areSameParameter(other)
+        && this->getType() == static_cast<ActivePowerControlCommand*>(other)->getType();
 }
 
 void ActivePowerControlCommand::setActivePowerLimit(const float limit, const PowerLimitControlType type)
@@ -79,19 +87,22 @@ bool ActivePowerControlCommand::handleResponse(const fragment_t fragment[], cons
         }
     }
     _inv->SystemConfigPara()->setLastUpdateCommand(millis());
-    _inv->SystemConfigPara()->setLastLimitCommandSuccess(CMD_OK);
+    std::shared_ptr<ActivePowerControlCommand> cmd(std::shared_ptr<ActivePowerControlCommand>(), this);
+    if (_inv->getRadio()->countSimilarCommands(cmd) == 1) {
+        _inv->SystemConfigPara()->setLastLimitCommandSuccess(CMD_OK);
+    }
     return true;
 }
 
 float ActivePowerControlCommand::getLimit() const
 {
-    const float l = (((uint16_t)_payload[12] << 8) | _payload[13]);
+    const float l = (static_cast<uint16_t>(_payload[12]) << 8) | _payload[13];
     return l / 10;
 }
 
-PowerLimitControlType ActivePowerControlCommand::getType()
+PowerLimitControlType ActivePowerControlCommand::getType() const
 {
-    return (PowerLimitControlType)(((uint16_t)_payload[14] << 8) | _payload[15]);
+    return (PowerLimitControlType)((static_cast<uint16_t>(_payload[14]) << 8) | _payload[15]);
 }
 
 void ActivePowerControlCommand::gotTimeout()

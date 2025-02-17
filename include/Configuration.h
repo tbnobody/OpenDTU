@@ -3,9 +3,12 @@
 
 #include "PinMapping.h"
 #include <cstdint>
+#include <TaskSchedulerDeclarations.h>
+#include <mutex>
+#include <condition_variable>
 
 #define CONFIG_FILENAME "/config.json"
-#define CONFIG_VERSION 0x00011c00 // 0.1.28 // make sure to clean all after change
+#define CONFIG_VERSION 0x00011d00 // 0.1.29 // make sure to clean all after change
 
 #define WIFI_MAX_SSID_STRLEN 32
 #define WIFI_MAX_PASSWORD_STRLEN 64
@@ -30,6 +33,7 @@
 #define CHAN_MAX_NAME_STRLEN 31
 
 #define DEV_MAX_MAPPING_NAME_STRLEN 63
+#define LOCALE_STRLEN 2
 
 struct CHANNEL_CONFIG_T {
     uint16_t MaxChannelPower;
@@ -144,7 +148,7 @@ struct CONFIG_T {
         bool ScreenSaver;
         uint8_t Rotation;
         uint8_t Contrast;
-        uint8_t Language;
+        char Locale[LOCALE_STRLEN + 1];
         struct {
             uint32_t Duration;
             uint8_t Mode;
@@ -161,15 +165,32 @@ struct CONFIG_T {
 
 class ConfigurationClass {
 public:
-    void init();
+    void init(Scheduler& scheduler);
     bool read();
     bool write();
     void migrate();
-    CONFIG_T& get();
+    CONFIG_T const& get();
+
+    class WriteGuard {
+    public:
+        WriteGuard();
+        CONFIG_T& getConfig();
+        ~WriteGuard();
+
+    private:
+        std::unique_lock<std::mutex> _lock;
+    };
+
+    WriteGuard getWriteGuard();
 
     INVERTER_CONFIG_T* getFreeInverterSlot();
     INVERTER_CONFIG_T* getInverterConfig(const uint64_t serial);
     void deleteInverterById(const uint8_t id);
+
+private:
+    void loop();
+
+    Task _loopTask;
 };
 
 extern ConfigurationClass Configuration;

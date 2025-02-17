@@ -18,11 +18,19 @@ SpiBus::SpiBus(const std::string& _id, spi_host_device_t _host_device)
         .data5_io_num = -1,
         .data6_io_num = -1,
         .data7_io_num = -1,
-        .max_transfer_sz = SPI_MAX_DMA_LEN,
+        .max_transfer_sz = 0, // defaults to SPI_MAX_DMA_LEN (=4092) or SOC_SPI_MAXIMUM_BUFFER_SIZE (=64)
         .flags = 0,
         .intr_flags = 0
     };
-    ESP_ERROR_CHECK(spi_bus_initialize(host_device, &bus_config, SPI_DMA_CH_AUTO));
+
+#if !CONFIG_IDF_TARGET_ESP32S2
+    spi_dma_chan_t dma_channel = SPI_DMA_CH_AUTO;
+#else
+    // DMA for SPI3 on ESP32-S2 is shared with ADC/DAC, so we cannot use it here
+    spi_dma_chan_t dma_channel = (host_device != SPI3_HOST ? SPI_DMA_CH_AUTO : SPI_DMA_DISABLED);
+#endif
+
+    ESP_ERROR_CHECK(spi_bus_initialize(host_device, &bus_config, dma_channel));
 }
 
 SpiBus::~SpiBus()

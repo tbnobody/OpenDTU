@@ -19,6 +19,12 @@ CpuTemperatureClass CpuTemperature;
 
 float CpuTemperatureClass::read()
 {
+#ifdef CONFIG_IDF_TARGET_ESP32S2
+    // Disabling temperature reading for ESP32-S2 models as it might lead to WDT resets.
+    // See: https://github.com/espressif/esp-idf/issues/8088
+    return NAN;
+#endif
+
     std::lock_guard<std::mutex> lock(_mutex);
 
     float temperature = NAN;

@@ -1,5 +1,5 @@
 <template>
-    <BasePage :title="$t('deviceadmin.DeviceManager')" :isLoading="dataLoading || pinMappingLoading">
+    <BasePage :title="$t('deviceadmin.DeviceManager')" :isLoading="dataLoading || pinMappingLoading || languageLoading">
         <BootstrapAlert v-model="showAlert" dismissible :variant="alertType">
             {{ alertMessage }}
         </BootstrapAlert>
@@ -51,7 +51,7 @@
                     aria-labelledby="nav-pin-tab"
                     tabindex="0"
                 >
-                    <div class="card">
+                    <div class="card card-tabbed">
                         <div class="card-body">
                             <div class="row mb-3">
                                 <label for="inputPinProfile" class="col-sm-2 col-form-label">{{
@@ -78,18 +78,17 @@
                                 </div>
                             </div>
 
-                            <div class="row mb-3">
+                            <div class="row mb-3" v-if="docLinks.length">
                                 <div class="col-sm-2"></div>
-                                <div class="col-sm-10">
-                                    <div
-                                        class="btn-group mb-2 me-2"
-                                        v-for="(doc, index) in pinMappingList.find(
-                                            (i) => i.name === deviceConfigList.curPin.name
-                                        )?.links"
+                                <div class="col-sm-10 d-flex gap-3">
+                                    <a
+                                        v-for="(doc, index) in docLinks"
                                         :key="index"
+                                        :href="doc.url"
+                                        class="btn btn-primary"
+                                        target="_blank"
+                                        >{{ doc.name }}</a
                                     >
-                                        <a :href="doc.url" class="btn btn-primary" target="_blank">{{ doc.name }}</a>
-                                    </div>
                                 </div>
                             </div>
 
@@ -116,7 +115,7 @@
                     aria-labelledby="nav-display-tab"
                     tabindex="0"
                 >
-                    <div class="card">
+                    <div class="card card-tabbed">
                         <div class="card-body">
                             <InputElement
                                 :label="$t('deviceadmin.PowerSafe')"
@@ -160,13 +159,13 @@
                                     {{ $t('deviceadmin.DisplayLanguage') }}
                                 </label>
                                 <div class="col-sm-10">
-                                    <select class="form-select" v-model="deviceConfigList.display.language">
+                                    <select class="form-select" v-model="deviceConfigList.display.locale">
                                         <option
-                                            v-for="language in displayLanguageList"
-                                            :key="language.key"
-                                            :value="language.key"
+                                            v-for="(locale, index) in displayLocaleList"
+                                            :key="locale.code"
+                                            :value="locale.code"
                                         >
-                                            {{ $t(`deviceadmin.` + language.value) }}
+                                            {{ $t((index < 3 ? `deviceadmin.` : ``) + locale.name) }}
                                         </option>
                                     </select>
                                 </div>
@@ -217,7 +216,7 @@
                     aria-labelledby="nav-leds-tab"
                     tabindex="0"
                 >
-                    <div class="card">
+                    <div class="card card-tabbed">
                         <div class="card-body">
                             <InputElement
                                 :label="$t('deviceadmin.EqualBrightness')"
@@ -277,6 +276,7 @@ export default defineComponent({
         return {
             dataLoading: true,
             pinMappingLoading: true,
+            languageLoading: true,
             deviceConfigList: {} as DeviceConfig,
             pinMappingList: {} as PinMapping,
             alertMessage: '',
@@ -289,10 +289,10 @@ export default defineComponent({
                 { key: 2, value: 'rot180' },
                 { key: 3, value: 'rot270' },
             ],
-            displayLanguageList: [
-                { key: 0, value: 'en' },
-                { key: 1, value: 'de' },
-                { key: 2, value: 'fr' },
+            displayLocaleList: [
+                { code: 'en', name: 'en' },
+                { code: 'de', name: 'de' },
+                { code: 'fr', name: 'fr' },
             ],
             diagramModeList: [
                 { key: 0, value: 'off' },
@@ -304,6 +304,7 @@ export default defineComponent({
     created() {
         this.getDeviceConfig();
         this.getPinMappingList();
+        this.getLanguageList();
     },
     watch: {
         equalBrightnessCheckVal: function (val) {
@@ -313,10 +314,25 @@ export default defineComponent({
             this.deviceConfigList.led.every((v) => (v.brightness = this.deviceConfigList.led[0].brightness));
         },
     },
+    computed: {
+        docLinks() {
+            const mapping = this.pinMappingList.find((i) => i.name === this.deviceConfigList.curPin.name);
+            return mapping?.links || [];
+        },
+    },
     methods: {
+        getLanguageList() {
+            this.languageLoading = true;
+            fetch('/api/i18n/languages')
+                .then((response) => handleResponse(response, this.$emitter, this.$router))
+                .then((data) => {
+                    this.displayLocaleList.push(...data);
+                    this.languageLoading = false;
+                });
+        },
         getPinMappingList() {
             this.pinMappingLoading = true;
-            fetch('/api/config/get?file=pin_mapping.json', { headers: authHeader() })
+            fetch('/api/file/get?file=pin_mapping.json', { headers: authHeader() })
                 .then((response) => handleResponse(response, this.$emitter, this.$router, true))
                 .then((data) => {
                     this.pinMappingList = data;
