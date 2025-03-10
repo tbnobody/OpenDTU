@@ -6,6 +6,7 @@
 #include "../Hoymiles.h"
 #include "crc.h"
 #include <cstring>
+#include "frequencymanagers/FrequencyManager_NOOP.h"
 
 InverterAbstract::InverterAbstract(HoymilesRadio* radio, const uint64_t serial)
 {
@@ -150,6 +151,14 @@ bool InverterAbstract::sendChangeChannelRequest()
 HoymilesRadio* InverterAbstract::getRadio()
 {
     return _radio;
+}
+
+FrequencyManagerAbstract* InverterAbstract::getFrequencyManager()
+{
+    if (_frequencyManager.get() == nullptr) {
+        _frequencyManager.reset(new FrequencyManager_NOOP(this));
+    }
+    return _frequencyManager.get();
 }
 
 AlarmLogParser* InverterAbstract::EventLog()

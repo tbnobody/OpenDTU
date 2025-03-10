@@ -155,6 +155,7 @@
         "RxFailNothing": "Empfang Fehler: Nichts empfangen",
         "RxFailPartial": "Empfang Fehler: Teilweise empfangen",
         "RxFailCorrupt": "Empfang Fehler: Beschädigt empfangen",
+        "RxLastFrequency": "Frequenz wo zuletzt erfolgreich empfangen wurde",
         "TxReRequest": "Gesendete Fragment Wiederanforderungen",
         "StatsReset": "Statistiken zurücksetzen",
         "StatsResetting": "Zurücksetzen...",

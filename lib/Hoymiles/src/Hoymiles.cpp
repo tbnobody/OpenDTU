@@ -67,7 +67,9 @@ void HoymilesClass::loop()
                 _messageOutput->print("Fetch inverter: ");
                 _messageOutput->println(iv->serial(), HEX);
 
-                if (!iv->isReachable()) {
+                iv->getFrequencyManager()->startNextFetch();
+
+                if (!iv->isReachable() || iv->getFrequencyManager()->shouldSendChangeChannelCommand()) {
                     iv->sendChangeChannelRequest();
                 }
 

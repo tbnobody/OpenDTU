@@ -159,6 +159,7 @@ void WebApiWsLiveClass::generateInverterCommonJsonResponse(JsonObject& root, std
     root["radio_stats"]["rx_fail_nothing"] = inv->RadioStats.RxFailNoAnswer;
     root["radio_stats"]["rx_fail_partial"] = inv->RadioStats.RxFailPartialAnswer;
     root["radio_stats"]["rx_fail_corrupt"] = inv->RadioStats.RxFailCorruptData;
+    root["radio_stats"]["rx_last_frequency"] = inv->RadioStats.RxLastFrequency;
     root["radio_stats"]["rssi"] = inv->getLastRssi();
 }
 

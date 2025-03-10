@@ -5,6 +5,7 @@
 #include "HoymilesRadio.h"
 #include "Hoymiles.h"
 #include "crc.h"
+#include "frequencymanagers/FrequencyManagerAbstract.h"
 
 serial_u HoymilesRadio::DtuSerial() const
 {
@@ -34,21 +35,21 @@ bool HoymilesRadio::checkFragmentCrc(const fragment_t& fragment) const
     return (crc == fragment.fragment[fragment.len - 1]);
 }
 
-void HoymilesRadio::sendRetransmitPacket(const uint8_t fragment_id)
+void HoymilesRadio::sendRetransmitPacket(const uint8_t fragment_id, FrequencyManagerAbstract& freq_mgr)
 {
     CommandAbstract* cmd = _commandQueue.front().get();
 
     CommandAbstract* requestCmd = cmd->getRequestFrameCommand(fragment_id);
 
     if (requestCmd != nullptr) {
-        sendEsbPacket(*requestCmd);
+        sendEsbPacket(*requestCmd, freq_mgr);
     }
 }
 
-void HoymilesRadio::sendLastPacketAgain()
+void HoymilesRadio::sendLastPacketAgain(FrequencyManagerAbstract &freq_mgr)
 {
     CommandAbstract* cmd = _commandQueue.front().get();
-    sendEsbPacket(*cmd);
+    sendEsbPacket(*cmd, freq_mgr);
 }
 
 void HoymilesRadio::handleReceivedPackage()
@@ -60,9 +61,10 @@ void HoymilesRadio::handleReceivedPackage()
         if (nullptr != inv) {
             CommandAbstract* cmd = _commandQueue.front().get();
             uint8_t verifyResult = inv->verifyAllFragments(*cmd);
+            inv->getFrequencyManager()->processRXResult(cmd, verifyResult);
             if (verifyResult == FRAGMENT_ALL_MISSING_RESEND) {
                 Hoymiles.getMessageOutput()->println("Nothing received, resend whole request");
-                sendLastPacketAgain();
+                sendLastPacketAgain(*inv->getFrequencyManager());
 
             } else if (verifyResult == FRAGMENT_ALL_MISSING_TIMEOUT) {
                 Hoymiles.getMessageOutput()->println("Nothing received, resend count exeeded");
@@ -101,7 +103,7 @@ void HoymilesRadio::handleReceivedPackage()
                 // Statistics: Count TX Re-Request Fragment
                 inv->RadioStats.TxReRequestFragment++;
 
-                sendRetransmitPacket(verifyResult);
+                sendRetransmitPacket(verifyResult, *inv->getFrequencyManager());
 
             } else {
                 // Successful received all packages
@@ -132,7 +134,7 @@ void HoymilesRadio::handleReceivedPackage()
                 // Statistics: TX Requests
                 inv->RadioStats.TxRequestData++;
 
-                sendEsbPacket(*cmd);
+                sendEsbPacket(*cmd, *inv->getFrequencyManager());
             } else {
                 Hoymiles.getMessageOutput()->println("TX: Invalid inverter found");
                 _commandQueue.pop();

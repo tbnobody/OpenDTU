@@ -169,8 +169,10 @@ void HoymilesRadio_NRF::switchRxCh()
     _radio->startListening();
 }
 
-void HoymilesRadio_NRF::sendEsbPacket(CommandAbstract& cmd)
+void HoymilesRadio_NRF::sendEsbPacket(CommandAbstract& cmd, FrequencyManagerAbstract& freq_mgr)
 {
+    (void) freq_mgr;
+    
     cmd.incrementSendCount();
 
     cmd.setRouterAddress(DtuSerial().u64);

@@ -293,6 +293,13 @@
                                                         <td>{{ $t('home.RxFailCorrupt') }}</td>
                                                         <td>{{ $n(inverter.radio_stats.rx_fail_corrupt) }}</td>
                                                         <td>
+                                                            MHz
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>{{ $t('home.RxLastFrequency') }}</td>
+                                                        <td>{{ $n(inverter.radio_stats.rx_last_frequency) }}</td>
+                                                        <td>
                                                             {{
                                                                 ratio(
                                                                     inverter.radio_stats.rx_fail_corrupt,

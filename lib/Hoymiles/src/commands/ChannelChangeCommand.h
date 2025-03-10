@@ -17,5 +17,5 @@ public:
 
     virtual bool handleResponse(const fragment_t fragment[], const uint8_t max_fragment_id);
 
-    virtual uint8_t getMaxResendCount();
+    virtual uint8_t getMaxResendCount() const;
 };
