@@ -17,6 +17,7 @@ MqttHandleInverterTotalClass::MqttHandleInverterTotalClass()
 
 void MqttHandleInverterTotalClass::init(Scheduler& scheduler)
 {
+    this->_connected_iterations = 0;
     scheduler.addTask(_loopTask);
     _loopTask.setInterval(Configuration.get().Mqtt.PublishInterval * TASK_SECOND);
     _loopTask.enable();
@@ -27,8 +28,21 @@ void MqttHandleInverterTotalClass::loop()
     // Update interval from config
     _loopTask.setInterval(Configuration.get().Mqtt.PublishInterval * TASK_SECOND);
 
+    if (!MqttSettings.getConnected()) {
+        this->_connected_iterations = 0;
+    } else {
+        this->_connected_iterations++;
+    }
+
     if (!MqttSettings.getConnected() || !Hoymiles.isAllRadioIdle()) {
         _loopTask.forceNextIteration();
+        return;
+    }
+
+    if(this->_connected_iterations < 2) {
+        // publish is_valid false after connecting to ensure statistics don't get a wrong value during startup
+        MqttSettings.publish("ac/is_valid", String(false));
+        MqttSettings.publish("dc/is_valid", String(false));
         return;
     }
 

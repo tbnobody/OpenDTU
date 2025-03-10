@@ -12,6 +12,8 @@ private:
     void loop();
 
     Task _loopTask;
+
+    unsigned int _connected_iterations = 0;
 };
 
 extern MqttHandleInverterTotalClass MqttHandleInverterTotal;
