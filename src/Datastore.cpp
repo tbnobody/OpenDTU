@@ -76,7 +76,7 @@ void DatastoreClass::loop()
         if (inv->isReachable()) {
             isReachable++;
         } else {
-            if (inv->getEnablePolling()) {
+            if (cfg->Poll_Enable) {
                 _isAllEnabledReachable = false;
             }
         }
