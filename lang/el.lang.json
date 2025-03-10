@@ -171,6 +171,7 @@
             "RxFailPartial": "Αποτυχημένα RX: Μερική λήψη",
             "RxFailCorrupt": "Αποτυχημένα RX: Λήψη κατεστραμμένου",
             "RxLastFrequency": "RX frequency of the latest package received",
+            "MHz": "{mhz} MHz",
             "TxReRequest": "TX Επαναίτηση Fragment",
             "StatsReset": "Επαναφορά Στατιστικών",
             "StatsResetting": "Επαναφορά...",

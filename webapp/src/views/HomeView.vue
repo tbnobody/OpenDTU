@@ -293,13 +293,6 @@
                                                         <td>{{ $t('home.RxFailCorrupt') }}</td>
                                                         <td>{{ $n(inverter.radio_stats.rx_fail_corrupt) }}</td>
                                                         <td>
-                                                            MHz
-                                                        </td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td>{{ $t('home.RxLastFrequency') }}</td>
-                                                        <td>{{ $n(inverter.radio_stats.rx_last_frequency) }}</td>
-                                                        <td>
                                                             {{
                                                                 ratio(
                                                                     inverter.radio_stats.rx_fail_corrupt,
@@ -307,6 +300,21 @@
                                                                 )
                                                             }}
                                                         </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>{{ $t('home.RxLastFrequency') }}</td>
+                                                        <td>
+                                                            {{
+                                                                $t('home.MHz', {
+                                                                    mhz: $n(
+                                                                        inverter.radio_stats.rx_last_frequency /
+                                                                            1000000.0,
+                                                                        { minimumFractionDigits: 2 }
+                                                                    ),
+                                                                })
+                                                            }}
+                                                        </td>
+                                                        <td></td>
                                                     </tr>
                                                     <tr>
                                                         <td>{{ $t('home.TxReRequest') }}</td>
