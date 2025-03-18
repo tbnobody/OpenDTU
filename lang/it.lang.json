@@ -61,6 +61,10 @@
             "Light": "Chiaro",
             "Auto": "Automatico"
         },
+        "dataagedisplay": {
+            "DataAge": "Aggiornamento Dati",
+            "SecondsSince": "0 secondi | 1 secondi | {n} secondi"
+        },
         "apiresponse": {
             "1001": "Settings saved!",
             "1002": "No values found!",
@@ -134,8 +138,6 @@
             "LiveData": "Dati in tempo reale",
             "SerialNumber": "Numero seriale: ",
             "CurrentLimit": "Limite attuale: ",
-            "DataAge": "Aggiornamento Dati: ",
-            "Seconds": "{val} secondi",
             "ShowSetInverterLimit": "Mostra / Imposta Limite di Potenza",
             "TurnOnOff": "Accendi/Spegni Inverter",
             "ShowInverterInfo": "Mostra info Inverter",

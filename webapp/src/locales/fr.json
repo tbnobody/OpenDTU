@@ -46,6 +46,10 @@
         "Light": "Clair",
         "Auto": "Auto"
     },
+    "dataagedisplay": {
+        "DataAge": "Âge des données",
+        "SecondsSince": "0 secondes | 1 seconde | {n} secondes"
+    },
     "apiresponse": {
         "1001": "Paramètres enregistrés !",
         "1002": "Aucune valeur trouvée !",
@@ -119,8 +123,6 @@
         "LiveData": "Données en direct",
         "SerialNumber": "Numéro de série : ",
         "CurrentLimit": "Limite de courant : ",
-        "DataAge": "Âge des données : ",
-        "Seconds": "{val} secondes",
         "ShowSetInverterLimit": "Afficher / Régler la limite de l'onduleur",
         "TurnOnOff": "Allumer / Eteindre l'onduleur",
         "ShowInverterInfo": "Afficher les informations sur l'onduleur",

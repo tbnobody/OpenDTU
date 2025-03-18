@@ -61,6 +61,10 @@
             "Light": "Claro",
             "Auto": "Automático"
         },
+        "dataagedisplay": {
+            "DataAge": "Edad de los Datos",
+            "SecondsSince": "0 segundos | 1 segundos | {n} segundos"
+        },
         "apiresponse": {
             "1001": "¡Opciones guardadas!",
             "1002": "No se encontraron valores",
@@ -134,8 +138,6 @@
             "LiveData": "Datos en Vivo",
             "SerialNumber": "Número de Serie: ",
             "CurrentLimit": "Límite de Corriente: ",
-            "DataAge": "Edad de los Datos: ",
-            "Seconds": "{val} segundos",
             "ShowSetInverterLimit": "Ver / Establecer Límite del Inversor",
             "TurnOnOff": "Encender/Apagar el Inversor",
             "ShowInverterInfo": "Ver Información del Inversor",

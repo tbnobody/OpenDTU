@@ -46,6 +46,10 @@
         "Light": "Hell",
         "Auto": "Automatisch"
     },
+    "dataagedisplay": {
+        "DataAge": "Letzte Aktualisierung",
+        "SecondsSince": "vor 0 Sekunden | vor 1 Sekunde | vor {n} Sekunden"
+    },
     "apiresponse": {
         "1001": "Einstellungen gespeichert!",
         "1002": "Keine Werte gefunden!",
@@ -119,8 +123,6 @@
         "LiveData": "Live-Daten",
         "SerialNumber": "Seriennummer: ",
         "CurrentLimit": "Aktuelles Limit: ",
-        "DataAge": "Letzte Aktualisierung: ",
-        "Seconds": "vor {val} Sekunden",
         "ShowSetInverterLimit": "Zeige / Setze Wechselrichterlimit",
         "TurnOnOff": "Schalte Wechselrichter ein oder aus",
         "ShowInverterInfo": "Zeige Wechselrichter-Informationen",

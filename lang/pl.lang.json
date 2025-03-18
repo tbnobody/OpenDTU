@@ -61,6 +61,10 @@
             "Light": "Jasny",
             "Auto": "Automatyczny"
         },
+        "dataagedisplay": {
+            "DataAge": "Aktualizacja danych",
+            "SecondsSince": "0 sekund | 1 sekund | {n} sekund"
+        },
         "apiresponse": {
             "1001": "Ustawienia zapisane!",
             "1002": "Nie znaleziono żadnych wartości!",
@@ -134,8 +138,6 @@
             "LiveData": "Dane na żywo",
             "SerialNumber": "Numer seryjny: ",
             "CurrentLimit": "Aktualny limit: ",
-            "DataAge": "Aktualizacja danych: ",
-            "Seconds": "{val} sekund",
             "ShowSetInverterLimit": "Pokaż / ustaw limit mocy",
             "TurnOnOff": "Włącz  /wyłącz falownik",
             "ShowInverterInfo": "Pokaż informacje o falowniku",

@@ -46,6 +46,10 @@
         "Light": "Light",
         "Auto": "Auto"
     },
+    "dataagedisplay": {
+        "DataAge": "Data Age",
+        "SecondsSince": "0 seconds | 1 second | {n} seconds"
+    },
     "apiresponse": {
         "1001": "Settings saved!",
         "1002": "No values found!",
@@ -119,8 +123,6 @@
         "LiveData": "Live Data",
         "SerialNumber": "Serial Number: ",
         "CurrentLimit": "Current Limit: ",
-        "DataAge": "Data Age: ",
-        "Seconds": "{val} seconds",
         "ShowSetInverterLimit": "Show / Set Inverter Limit",
         "TurnOnOff": "Turn Inverter on/off",
         "ShowInverterInfo": "Show Inverter Info",
