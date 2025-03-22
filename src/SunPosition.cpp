@@ -1,13 +1,13 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * Copyright (C) 2023-2024 Thomas Basler and others
+ * Copyright (C) 2023-2025 Thomas Basler and others
  */
 #include "SunPosition.h"
 #include "Configuration.h"
 #include "Utils.h"
 #include <Arduino.h>
 
-#define CALC_UNIQUE_ID (((timeinfo.tm_year << 9) | (timeinfo.tm_mon << 5) | timeinfo.tm_mday) << 1 | timeinfo.tm_isdst)
+#define CALC_UNIQUE_ID(tm) (((tm.tm_year << 9) | (tm.tm_mon << 5) | tm.tm_mday) << 1 | tm.tm_isdst)
 
 SunPositionClass SunPosition;
 
@@ -35,9 +35,9 @@ bool SunPositionClass::isDayPeriod() const
         return true;
     }
 
-    struct tm timeinfo;
-    getLocalTime(&timeinfo, 5);
-    const uint32_t minutesPastMidnight = timeinfo.tm_hour * 60 + timeinfo.tm_min;
+    time_t now = time(NULL);
+    struct tm tm = *localtime(&now);
+    const uint32_t minutesPastMidnight = tm.tm_hour * 60 + tm.tm_min;
     return (minutesPastMidnight >= _sunriseMinutes) && (minutesPastMidnight < _sunsetMinutes);
 }
 
@@ -53,15 +53,10 @@ void SunPositionClass::setDoRecalc(const bool doRecalc)
 
 bool SunPositionClass::checkRecalcDayChanged() const
 {
-    time_t now;
-    struct tm timeinfo;
+    time_t now = time(NULL);
+    struct tm tm = *localtime(&now);
 
-    time(&now);
-    localtime_r(&now, &timeinfo); // don't use getLocalTime() as there could be a delay of 10ms
-
-    const uint32_t ymd = CALC_UNIQUE_ID;
-
-    return _lastSunPositionCalculatedYMD != ymd;
+    return _lastSunPositionCalculatedYMD != CALC_UNIQUE_ID(tm);
 }
 
 void SunPositionClass::updateSunData()
@@ -69,7 +64,7 @@ void SunPositionClass::updateSunData()
     struct tm timeinfo;
     const bool gotLocalTime = getLocalTime(&timeinfo, 5);
 
-    _lastSunPositionCalculatedYMD = CALC_UNIQUE_ID;
+    _lastSunPositionCalculatedYMD = CALC_UNIQUE_ID(timeinfo);
     setDoRecalc(false);
 
     if (!gotLocalTime) {
@@ -126,18 +121,15 @@ void SunPositionClass::updateSunData()
 
 bool SunPositionClass::getSunTime(struct tm* info, const uint32_t offset) const
 {
-    // Get today's date
-    time_t aTime = time(NULL);
+    time_t now = time(NULL);
+    struct tm tm = *localtime(&now);
 
-    // Set the time to midnight
-    struct tm tm;
-    localtime_r(&aTime, &tm);
     tm.tm_sec = 0;
     tm.tm_min = offset;
     tm.tm_hour = 0;
     tm.tm_isdst = -1;
-    const time_t midnight = mktime(&tm);
 
+    const time_t midnight = mktime(&tm);
     localtime_r(&midnight, info);
     return _isValidInfo;
 }
