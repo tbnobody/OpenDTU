@@ -56,9 +56,10 @@ float SystemConfigParaParser::getLimitPercent() const
 
 void SystemConfigParaParser::setLimitPercent(const float value)
 {
+    const uint16_t val = static_cast<uint16_t>(value * 10);
     HOY_SEMAPHORE_TAKE();
-    _payload[2] = static_cast<uint16_t>(value * 10) >> 8;
-    _payload[3] = static_cast<uint16_t>(value * 10);
+    _payload[2] = val >> 8;
+    _payload[3] = val & 0xFF;
     HOY_SEMAPHORE_GIVE();
 }
 
