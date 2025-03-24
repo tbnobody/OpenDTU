@@ -25,7 +25,7 @@
   },
   "devDependencies": {
     "@intlify/unplugin-vue-i18n": "^6.0.3",
-    "@tsconfig/node22": "^22.0.0",
+    "@tsconfig/node22": "^22.0.1",
     "@types/bootstrap": "^5.2.10",
     "@types/node": "^22.13.0",
     "@types/pulltorefreshjs": "^0.1.7",
