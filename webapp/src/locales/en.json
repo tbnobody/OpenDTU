@@ -1,6 +1,7 @@
 {
     "menu": {
         "LiveView": "Live View",
+        "Charts": "Charts",
         "Settings": "Settings",
         "NetworkSettings": "Network Settings",
         "NTPSettings": "NTP Settings",
