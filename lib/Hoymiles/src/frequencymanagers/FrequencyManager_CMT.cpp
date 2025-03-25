@@ -17,7 +17,7 @@ bool isChangeChannelCmd(CommandAbstract &cmd) {
 
 uint32_t FrequencyManager_CMT::getTXFrequency(CommandAbstract& cmd) {
     uint32_t freq = this->_getFrequency(cmd);
-    if (isChangeChannelCmd(cmd) && freq == Hoymiles.getRadioCmt()->getInverterTargetFrequency()) {
+    if (isChangeChannelCmd(cmd)) {
         return Hoymiles.getRadioCmt()->getInvBootFrequency();
     }
     return freq;
