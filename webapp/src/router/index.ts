@@ -18,6 +18,7 @@ import NtpInfoView from '@/views/NtpInfoView.vue';
 import SecurityAdminView from '@/views/SecurityAdminView.vue';
 import SystemInfoView from '@/views/SystemInfoView.vue';
 import WaitRestartView from '@/views/WaitRestartView.vue';
+import ChartsView from '@/views/ChartsView.vue';
 import { createRouter, createWebHistory } from 'vue-router';
 
 const router = createRouter({
@@ -130,6 +131,11 @@ const router = createRouter({
             path: '/wait',
             name: 'Wait Restart',
             component: WaitRestartView,
+        },
+        {
+            path: '/charts',
+            name: 'Power Production Charts',
+            component: ChartsView,
         },
     ],
 });

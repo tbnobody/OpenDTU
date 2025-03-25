@@ -22,6 +22,7 @@ void WebApiClass::init(Scheduler& scheduler)
     _webApiFile.init(_server, scheduler);
     _webApiFirmware.init(_server, scheduler);
     _webApiGridprofile.init(_server, scheduler);
+    _webApiHistory.init(_server, scheduler); // Initialize our history component
     _webApiI18n.init(_server, scheduler);
     _webApiInverter.init(_server, scheduler);
     _webApiLimit.init(_server, scheduler);

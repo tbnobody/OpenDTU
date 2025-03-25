@@ -28,6 +28,8 @@
 #include <SpiManager.h>
 #include <TaskScheduler.h>
 #include <esp_heap_caps.h>
+#include "HistoricalDatastore.h"
+#include "WebApi_history.h"
 
 void setup()
 {
@@ -124,6 +126,11 @@ void setup()
     // Initialize WebApi
     MessageOutput.print("Initialize WebApi... ");
     WebApi.init(scheduler);
+    MessageOutput.println("done");
+
+    // Initialize historical data storage
+    MessageOutput.print("Initialize Historical Data Storage... ");
+    HistoricalDatastore.init(scheduler);
     MessageOutput.println("done");
 
     // Initialize Display
