@@ -8,6 +8,7 @@
 #include "../parser/PowerCommandParser.h"
 #include "../parser/StatisticsParser.h"
 #include "../parser/SystemConfigParaParser.h"
+#include "frequencymanagers/FrequencyManagerAbstract.h"
 #include "HoymilesRadio.h"
 #include "types.h"
 #include <Arduino.h>
@@ -89,6 +90,9 @@ public:
 
         // RX Fail Corrupt Data
         uint32_t RxFailCorruptData;
+
+        // RX Frequency of last package. CMT only.
+        uint32_t RxLastFrequency;
     } RadioStats = {};
 
     virtual bool sendStatsRequest() = 0;
@@ -107,6 +111,7 @@ public:
     virtual bool supportsPowerDistributionLogic() = 0;
 
     HoymilesRadio* getRadio();
+    FrequencyManagerAbstract* getFrequencyManager();
 
     AlarmLogParser* EventLog();
     DevInfoParser* DevInfo();
@@ -117,6 +122,7 @@ public:
 
 protected:
     HoymilesRadio* _radio;
+    std::unique_ptr<FrequencyManagerAbstract> _frequencyManager;
 
 private:
     serial_u _serial;

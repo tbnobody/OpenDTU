@@ -6,10 +6,12 @@
 #include "Hoymiles.h"
 #include "HoymilesRadio_CMT.h"
 #include "commands/ChannelChangeCommand.h"
+#include "frequencymanagers/FrequencyManager_CMT.h"
 
 HMS_Abstract::HMS_Abstract(HoymilesRadio* radio, const uint64_t serial)
     : HM_Abstract(radio, serial)
 {
+    _frequencyManager.reset(new FrequencyManager_CMT(this));
 }
 
 bool HMS_Abstract::sendChangeChannelRequest()

@@ -72,8 +72,8 @@ bool ChannelChangeCommand::handleResponse(const fragment_t fragment[], const uin
     return true;
 }
 
-uint8_t ChannelChangeCommand::getMaxResendCount()
+uint8_t ChannelChangeCommand::getMaxResendCount() const
 {
-    // This command will never retrieve an answer. Therefor it's not required to repeat it
-    return 0;
+    // This command will never retrieve an answer. Repeat anyway to allow FrequencyManager to send it on a few different frequencies.
+    return MAX_RESEND_COUNT;
 }

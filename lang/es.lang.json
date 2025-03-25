@@ -170,6 +170,8 @@
             "RxFailNothing": "RX Fail: Receive Nothing",
             "RxFailPartial": "RX Fail: Receive Partial",
             "RxFailCorrupt": "RX Fail: Receive Corrupt",
+            "RxLastFrequency": "RX frequency of the latest package received",
+            "MHz": "{mhz} MHz",
             "TxReRequest": "TX Re-Request Fragment",
             "StatsReset": "Reset Statistics",
             "StatsResetting": "Resetting...",

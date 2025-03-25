@@ -51,6 +51,8 @@ public:
 
     uint32_t getMinFrequency() const;
     uint32_t getMaxFrequency() const;
+    uint32_t getLegalMinFrequency() const;
+    uint32_t getLegalMaxFrequency() const;
     static constexpr uint32_t getChannelWidth()
     {
         return FH_OFFSET * CMT2300A_ONE_STEP_SIZE;
@@ -70,7 +72,7 @@ private:
     void ARDUINO_ISR_ATTR handleInt1();
     void ARDUINO_ISR_ATTR handleInt2();
 
-    void sendEsbPacket(CommandAbstract& cmd);
+    void sendEsbPacket(CommandAbstract& cmd, FrequencyManagerAbstract &freq_mgr);
 
     std::unique_ptr<CMT2300A> _radio;
 
@@ -79,6 +81,7 @@ private:
 
     bool _gpio2_configured = false;
     bool _gpio3_configured = false;
+    int8_t _pa_level = 0;
 
     std::queue<fragment_t> _rxBuffer;
     TimeoutHelper _txTimeout;
@@ -88,4 +91,7 @@ private:
     bool cmtSwitchDtuFreq(const uint32_t to_frequency);
 
     CountryModeId_t _countryMode;
+
+    int _tx_error_counter = 0;
+    void handleTxError(bool is_error);
 };

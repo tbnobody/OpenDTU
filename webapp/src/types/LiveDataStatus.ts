@@ -28,6 +28,7 @@ export interface RadioStatistics {
     rx_fail_nothing: number;
     rx_fail_partial: number;
     rx_fail_corrupt: number;
+    rx_last_frequency: number;
     rssi: number;
 }
 

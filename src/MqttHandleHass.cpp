@@ -70,7 +70,7 @@ void MqttHandleHassClass::publishConfig()
     publishDtuSensor("Yield Total", "ac/yieldtotal", "kWh", "", DEVICE_CLS_ENERGY, STATE_CLS_TOTAL_INCREASING, CATEGORY_NONE);
     publishDtuSensor("Yield Day", "ac/yieldday", "Wh", "", DEVICE_CLS_ENERGY, STATE_CLS_TOTAL_INCREASING, CATEGORY_NONE);
     publishDtuSensor("AC Power", "ac/power", "W", "", DEVICE_CLS_PWR, STATE_CLS_MEASUREMENT, CATEGORY_NONE);
-    publishDtuSensor("DC Power", "dc/power", "W", "", DEVICE_CLS_PWR, STATE_CLS_MEASUREMENT, CATEGORY_NONE);  
+    publishDtuSensor("DC Power", "dc/power", "W", "", DEVICE_CLS_PWR, STATE_CLS_MEASUREMENT, CATEGORY_NONE);
 
     publishDtuBinarySensor("Status", config.Mqtt.Lwt.Topic, config.Mqtt.Lwt.Value_Online, config.Mqtt.Lwt.Value_Offline, DEVICE_CLS_CONNECTIVITY, STATE_CLS_NONE, CATEGORY_DIAGNOSTIC);
 
@@ -97,6 +97,7 @@ void MqttHandleHassClass::publishConfig()
         publishInverterSensor(inv, "RX Fail Receive Nothing", "radio/rx_fail_nothing", "", "", DEVICE_CLS_NONE, STATE_CLS_NONE, CATEGORY_DIAGNOSTIC);
         publishInverterSensor(inv, "RX Fail Receive Partial", "radio/rx_fail_partial", "", "", DEVICE_CLS_NONE, STATE_CLS_NONE, CATEGORY_DIAGNOSTIC);
         publishInverterSensor(inv, "RX Fail Receive Corrupt", "radio/rx_fail_corrupt", "", "", DEVICE_CLS_NONE, STATE_CLS_NONE, CATEGORY_DIAGNOSTIC);
+        publishInverterSensor(inv, "RX Last Frequency", "radio/rx_last_frequency", "MHz", "", DEVICE_CLS_FREQ, STATE_CLS_NONE, CATEGORY_DIAGNOSTIC);
         publishInverterSensor(inv, "TX Re-Request Fragment", "radio/tx_re_request", "", "", DEVICE_CLS_NONE, STATE_CLS_NONE, CATEGORY_DIAGNOSTIC);
         publishInverterSensor(inv, "RSSI", "radio/rssi", "dBm", "", DEVICE_CLS_SIGNAL_STRENGTH, STATE_CLS_NONE, CATEGORY_DIAGNOSTIC);
 

@@ -7,6 +7,7 @@
 #include "crc.h"
 #include <FunctionalInterrupt.h>
 #include <frozen/map.h>
+#include "frequencymanagers/FrequencyManagerAbstract.h"
 
 constexpr CountryFrequencyDefinition_t make_value(FrequencyBand_t Band, uint32_t Freq_Legal_Min, uint32_t Freq_Legal_Max, uint32_t Freq_Default, uint32_t Freq_StartUp)
 {
@@ -192,6 +193,7 @@ void HoymilesRadio_CMT::setPALevel(const int8_t paLevel)
     if (!_isInitialized) {
         return;
     }
+    this->_pa_level = paLevel;
 
     if (_radio->setPALevel(paLevel)) {
         Hoymiles.getMessageOutput()->printf("CMT TX power set to %" PRId8 " dBm\r\n", paLevel);
@@ -232,6 +234,16 @@ uint32_t HoymilesRadio_CMT::getMaxFrequency() const
     return countryDefinition.at(_countryMode).Freq_Max;
 }
 
+uint32_t HoymilesRadio_CMT::getLegalMinFrequency() const
+{
+    return countryDefinition.at(_countryMode).Freq_Legal_Min;
+}
+
+uint32_t HoymilesRadio_CMT::getLegalMaxFrequency() const
+{
+    return countryDefinition.at(_countryMode).Freq_Legal_Max;
+}
+
 CountryModeId_t HoymilesRadio_CMT::getCountryMode() const
 {
     return _countryMode;
@@ -262,7 +274,29 @@ void ARDUINO_ISR_ATTR HoymilesRadio_CMT::handleInt2()
     _packetReceived = true;
 }
 
-void HoymilesRadio_CMT::sendEsbPacket(CommandAbstract& cmd)
+void HoymilesRadio_CMT::handleTxError(bool is_error) {
+    if(!is_error) {
+        this->_tx_error_counter = 0;
+        return;
+    }
+    this->_tx_error_counter++;
+    if(_tx_error_counter==5 || _tx_error_counter == 10 || _tx_error_counter == 15) {
+        Hoymiles.getMessageOutput()->println("TX recovery: Re-applying PA level");
+        this->setPALevel(this->_pa_level);
+        return;
+    }
+    if(_tx_error_counter==20 || _tx_error_counter == 25) {
+        Hoymiles.getMessageOutput()->println("TX recovery: Re-initializing radio");
+        this->_radio->begin();
+    }
+    if(_tx_error_counter >= 30) {
+        Hoymiles.getMessageOutput()->println("TX recovery: Giving up");
+        this->_isInitialized = false;
+    }
+
+}
+
+void HoymilesRadio_CMT::sendEsbPacket(CommandAbstract& cmd, FrequencyManagerAbstract &freq_mgr)
 {
     cmd.incrementSendCount();
 
@@ -270,18 +304,20 @@ void HoymilesRadio_CMT::sendEsbPacket(CommandAbstract& cmd)
 
     _radio->stopListening();
 
-    if (cmd.getDataPayload()[0] == 0x56) { // @todo(tbnobody) Bad hack to identify ChannelChange Command
-        cmtSwitchDtuFreq(getInvBootFrequency());
-    }
+    cmtSwitchDtuFreq(freq_mgr.getTXFrequency(cmd));
 
     Hoymiles.getMessageOutput()->printf("TX %s %.2f MHz --> ",
         cmd.getCommandName().c_str(), getFrequencyFromChannel(_radio->getChannel()) / 1000000.0);
     cmd.dumpDataPayload(Hoymiles.getMessageOutput());
 
-    if (!_radio->write(cmd.getDataPayload(), cmd.getDataSize())) {
+    bool tx_worked = _radio->write(cmd.getDataPayload(), cmd.getDataSize());
+    if (!tx_worked) {
         Hoymiles.getMessageOutput()->println("TX SPI Timeout");
     }
-    cmtSwitchDtuFreq(_inverterTargetFrequency);
+    this->handleTxError(!tx_worked);
+
+
+    cmtSwitchDtuFreq(freq_mgr.getRXFrequency(cmd));
     _radio->startListening();
     _busyFlag = true;
     _rxTimeout.set(cmd.getTimeout());

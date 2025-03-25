@@ -302,6 +302,21 @@
                                                         </td>
                                                     </tr>
                                                     <tr>
+                                                        <td>{{ $t('home.RxLastFrequency') }}</td>
+                                                        <td>
+                                                            {{
+                                                                $t('home.MHz', {
+                                                                    mhz: $n(
+                                                                        inverter.radio_stats.rx_last_frequency /
+                                                                            1000000.0,
+                                                                        { minimumFractionDigits: 2 }
+                                                                    ),
+                                                                })
+                                                            }}
+                                                        </td>
+                                                        <td></td>
+                                                    </tr>
+                                                    <tr>
                                                         <td>{{ $t('home.TxReRequest') }}</td>
                                                         <td>{{ $n(inverter.radio_stats.tx_re_request) }}</td>
                                                         <td></td>
