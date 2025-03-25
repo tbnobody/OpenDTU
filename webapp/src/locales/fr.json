@@ -20,7 +20,8 @@
         "Console": "Console",
         "About": "A propos",
         "Logout": "Déconnexion",
-        "Login": "Connexion"
+        "Login": "Connexion",
+        "Charts": "Graphiques"
     },
     "base": {
         "Loading": "Chargement...",
@@ -662,5 +663,21 @@
         "format_herf_valid": "E-Star HERF format (will be saved converted): {serial}",
         "format_herf_invalid": "E-Star HERF format: Invalid checksum",
         "format_unknown": "Unknown format"
+    },
+    "charts": {
+        "PowerProductionCharts": "Graphiques de production d'énergie",
+        "TimeRange": "Période",
+        "Resolution": "Résolution",
+        "Resolution20Min": "20 minutes",
+        "ResolutionHourly": "Horaire",
+        "ResolutionDaily": "Quotidien",
+        "ResolutionMonthly": "Mensuel",
+        "StartDate": "Date de début",
+        "EndDate": "Date de fin",
+        "LoadData": "Charger les données",
+        "PowerProduction": "Production d'énergie",
+        "PeakPower": "Puissance maximale",
+        "NoDataAvailable": "Aucune donnée disponible pour la période sélectionnée",
+        "DataLoadError": "Erreur lors du chargement des données historiques"
     }
 }

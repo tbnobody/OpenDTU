@@ -26,6 +26,9 @@
                     <li class="nav-item">
                         <router-link @click="onClick" class="nav-link" to="/">{{ $t('menu.LiveView') }}</router-link>
                     </li>
+                    <li class="nav-item">
+                        <router-link @click="onClick" class="nav-link" to="/charts">{{ $t('menu.Charts') }}</router-link>
+                    </li>
                     <li class="nav-item dropdown">
                         <a
                             class="nav-link dropdown-toggle"

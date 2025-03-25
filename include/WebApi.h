@@ -9,6 +9,7 @@
 #include "WebApi_file.h"
 #include "WebApi_firmware.h"
 #include "WebApi_gridprofile.h"
+#include "WebApi_history.h"  // Add the history header file here
 #include "WebApi_i18n.h"
 #include "WebApi_inverter.h"
 #include "WebApi_limit.h"
@@ -54,6 +55,7 @@ private:
     WebApiFileClass _webApiFile;
     WebApiFirmwareClass _webApiFirmware;
     WebApiGridProfileClass _webApiGridprofile;
+    WebApiHistoryClass _webApiHistory; // Add our history class here
     WebApiI18nClass _webApiI18n;
     WebApiInverterClass _webApiInverter;
     WebApiLimitClass _webApiLimit;
