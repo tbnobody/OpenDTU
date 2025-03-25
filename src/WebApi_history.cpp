@@ -17,10 +17,9 @@ void WebApiHistoryClass::init(AsyncWebServer& server, Scheduler& scheduler)
 
 void WebApiHistoryClass::onHistoryData(AsyncWebServerRequest* request)
 {
-    // For ArduinoJson v7, the constructor only takes a single parameter (isArray)
-    AsyncJsonResponse* response = new AsyncJsonResponse(false);
-    JsonVariant root = response->getRoot();
-
+    // Limit the number of data points to prevent memory issues
+    const size_t MAX_DATA_POINTS = 500;
+    
     // Parse query parameters
     uint8_t resolution = 1; // Default to hourly
     time_t startTime = 0;
@@ -40,7 +39,23 @@ void WebApiHistoryClass::onHistoryData(AsyncWebServerRequest* request)
 
     // Get data points for the requested time range and resolution
     DataPointCollection dataPoints = HistoricalDatastore.getDataRange(startTime, endTime, resolution);
+    
+    // Limit number of data points if necessary to prevent memory issues
+    if (dataPoints.size() > MAX_DATA_POINTS) {
+        // Simple approach: just take most recent points up to the limit
+        dataPoints.erase(dataPoints.begin(), dataPoints.begin() + (dataPoints.size() - MAX_DATA_POINTS));
+    }
 
+    // For ArduinoJson v7, the constructor only takes a single parameter (isArray)
+    // Create the response with an appropriate buffer size based on the number of data points
+    AsyncJsonResponse* response = new AsyncJsonResponse(false);
+    if (!response) {
+        request->send(500, "text/plain", "Memory allocation failed");
+        return;
+    }
+    
+    JsonVariant root = response->getRoot();
+    
     // Add information about the request
     JsonObject info = root["info"].to<JsonObject>();
     info["resolution"] = resolution;
