@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * Copyright (C) 2023-2024 Thomas Basler and others
+ * Copyright (C) 2023-2025 Thomas Basler and others
  */
 #include "Display_Graphic.h"
 #include "Configuration.h"
@@ -51,34 +51,37 @@ void DisplayGraphicClass::init(Scheduler& scheduler)
 {
     const PinMapping_t& pin = PinMapping.get();
     _display_type = static_cast<DisplayType_t>(pin.display_type);
-    if (isValidDisplay()) {
-        auto constructor = display_types[_display_type];
-        _display = constructor(
-            pin.display_reset == GPIO_NUM_NC ? 255U : static_cast<uint8_t>(pin.display_reset),
-            pin.display_clk == GPIO_NUM_NC ? 255U : static_cast<uint8_t>(pin.display_clk),
-            pin.display_data == GPIO_NUM_NC ? 255U : static_cast<uint8_t>(pin.display_data),
-            pin.display_cs == GPIO_NUM_NC ? 255U : static_cast<uint8_t>(pin.display_cs));
-        if (_display_type == DisplayType_t::ST7567_GM12864I_59N) {
-            _display->setI2CAddress(0x3F << 1);
-        }
-        _display->begin();
-        setContrast(DISPLAY_CONTRAST);
-        setStatus(true);
-        _diagram.init(scheduler, _display);
-
-        scheduler.addTask(_loopTask);
-        _loopTask.setInterval(_period);
-        _loopTask.enable();
-
-        auto& config = Configuration.get();
-        setDiagramMode(static_cast<DiagramMode_t>(config.Display.Diagram.Mode));
-        setOrientation(config.Display.Rotation);
-        enablePowerSafe = config.Display.PowerSafe;
-        enableScreensaver = config.Display.ScreenSaver;
-        setContrast(config.Display.Contrast);
-        setLocale(config.Display.Locale);
-        setStartupDisplay();
+    if (!isValidDisplay()) {
+        return;
     }
+
+    auto constructor = display_types[_display_type];
+    _display = constructor(
+        pin.display_reset == GPIO_NUM_NC ? 255U : static_cast<uint8_t>(pin.display_reset),
+        pin.display_clk == GPIO_NUM_NC ? 255U : static_cast<uint8_t>(pin.display_clk),
+        pin.display_data == GPIO_NUM_NC ? 255U : static_cast<uint8_t>(pin.display_data),
+        pin.display_cs == GPIO_NUM_NC ? 255U : static_cast<uint8_t>(pin.display_cs));
+
+    if (_display_type == DisplayType_t::ST7567_GM12864I_59N) {
+        _display->setI2CAddress(0x3F << 1);
+    }
+
+    _display->begin();
+    setStatus(true);
+    _diagram.init(scheduler, _display);
+
+    scheduler.addTask(_loopTask);
+    _loopTask.setInterval(_period);
+    _loopTask.enable();
+
+    auto& config = Configuration.get();
+    setDiagramMode(static_cast<DiagramMode_t>(config.Display.Diagram.Mode));
+    setOrientation(config.Display.Rotation);
+    enablePowerSafe = config.Display.PowerSafe;
+    enableScreensaver = config.Display.ScreenSaver;
+    setContrast(config.Display.Contrast);
+    setLocale(config.Display.Locale);
+    setStartupDisplay();
 }
 
 void DisplayGraphicClass::calcLineHeights()
