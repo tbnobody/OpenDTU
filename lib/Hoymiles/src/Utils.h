@@ -6,4 +6,5 @@
 class Utils {
 public:
     static uint8_t getWeekDay();
+    static bool getTimeAvailable();
 };

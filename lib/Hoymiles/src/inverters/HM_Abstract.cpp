@@ -24,11 +24,6 @@ bool HM_Abstract::sendStatsRequest()
         return false;
     }
 
-    struct tm timeinfo;
-    if (!getLocalTime(&timeinfo, 5)) {
-        return false;
-    }
-
     time_t now;
     time(&now);
 
@@ -42,11 +37,6 @@ bool HM_Abstract::sendStatsRequest()
 bool HM_Abstract::sendAlarmLogRequest(const bool force)
 {
     if (!getEnablePolling()) {
-        return false;
-    }
-
-    struct tm timeinfo;
-    if (!getLocalTime(&timeinfo, 5)) {
         return false;
     }
 
@@ -77,11 +67,6 @@ bool HM_Abstract::sendDevInfoRequest()
         return false;
     }
 
-    struct tm timeinfo;
-    if (!getLocalTime(&timeinfo, 5)) {
-        return false;
-    }
-
     time_t now;
     time(&now);
 
@@ -99,11 +84,6 @@ bool HM_Abstract::sendDevInfoRequest()
 bool HM_Abstract::sendSystemConfigParaRequest()
 {
     if (!getEnablePolling()) {
-        return false;
-    }
-
-    struct tm timeinfo;
-    if (!getLocalTime(&timeinfo, 5)) {
         return false;
     }
 
@@ -202,11 +182,6 @@ bool HM_Abstract::resendPowerControlRequest()
 bool HM_Abstract::sendGridOnProFileParaRequest()
 {
     if (!getEnablePolling()) {
-        return false;
-    }
-
-    struct tm timeinfo;
-    if (!getLocalTime(&timeinfo, 5)) {
         return false;
     }
 
