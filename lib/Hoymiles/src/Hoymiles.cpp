@@ -43,105 +43,103 @@ void HoymilesClass::loop()
     _radioNrf->loop();
     _radioCmt->loop();
 
-    if (getNumInverters() == 0) {
+    if (getNumInverters() == 0 || millis() - _lastPoll <= (_pollInterval * 1000)) {
         return;
     }
 
-    if (millis() - _lastPoll > (_pollInterval * 1000)) {
-        static uint8_t inverterPos = 0;
+    static uint8_t inverterPos = 0;
 
-        std::shared_ptr<InverterAbstract> iv = getInverterByPos(inverterPos);
-        if ((iv == nullptr) || ((iv != nullptr) && (!iv->getRadio()->isInitialized()))) {
-            if (++inverterPos >= getNumInverters()) {
-                inverterPos = 0;
-            }
+    std::shared_ptr<InverterAbstract> iv = getInverterByPos(inverterPos);
+    if ((iv == nullptr) || ((iv != nullptr) && (!iv->getRadio()->isInitialized()))) {
+        if (++inverterPos >= getNumInverters()) {
+            inverterPos = 0;
+        }
+    }
+
+    if (iv != nullptr && iv->getRadio()->isInitialized()) {
+
+        if (iv->getZeroValuesIfUnreachable() && !iv->isReachable()) {
+            iv->Statistics()->zeroRuntimeData();
         }
 
-        if (iv != nullptr && iv->getRadio()->isInitialized()) {
+        if (iv->getEnablePolling() || iv->getEnableCommands()) {
+            _messageOutput->print("Fetch inverter: ");
+            _messageOutput->println(iv->serial(), HEX);
 
-            if (iv->getZeroValuesIfUnreachable() && !iv->isReachable()) {
-                iv->Statistics()->zeroRuntimeData();
+            if (!iv->isReachable()) {
+                iv->sendChangeChannelRequest();
             }
 
-            if (iv->getEnablePolling() || iv->getEnableCommands()) {
-                _messageOutput->print("Fetch inverter: ");
-                _messageOutput->println(iv->serial(), HEX);
+            iv->sendStatsRequest();
 
-                if (!iv->isReachable()) {
-                    iv->sendChangeChannelRequest();
-                }
+            // Fetch event log
+            const bool force = iv->EventLog()->getLastAlarmRequestSuccess() == CMD_NOK;
+            iv->sendAlarmLogRequest(force);
 
-                iv->sendStatsRequest();
-
-                // Fetch event log
-                const bool force = iv->EventLog()->getLastAlarmRequestSuccess() == CMD_NOK;
-                iv->sendAlarmLogRequest(force);
-
-                // Fetch limit
-                if (((millis() - iv->SystemConfigPara()->getLastUpdateRequest() > HOY_SYSTEM_CONFIG_PARA_POLL_INTERVAL)
-                        && (millis() - iv->SystemConfigPara()->getLastUpdateCommand() > HOY_SYSTEM_CONFIG_PARA_POLL_MIN_DURATION))) {
-                    _messageOutput->println("Request SystemConfigPara");
-                    iv->sendSystemConfigParaRequest();
-                }
-
-                // Set limit if required
-                if (iv->SystemConfigPara()->getLastLimitCommandSuccess() == CMD_NOK) {
-                    _messageOutput->println("Resend ActivePowerControl");
-                    iv->resendActivePowerControlRequest();
-                }
-
-                // Set power status if required
-                if (iv->PowerCommand()->getLastPowerCommandSuccess() == CMD_NOK) {
-                    _messageOutput->println("Resend PowerCommand");
-                    iv->resendPowerControlRequest();
-                }
-
-                // Fetch dev info (but first fetch stats)
-                if (iv->Statistics()->getLastUpdate() > 0) {
-                    const bool invalidDevInfo = !iv->DevInfo()->containsValidData()
-                        && iv->DevInfo()->getLastUpdateAll() > 0
-                        && iv->DevInfo()->getLastUpdateSimple() > 0;
-
-                    if (invalidDevInfo) {
-                        _messageOutput->println("DevInfo: No Valid Data");
-                    }
-
-                    if ((iv->DevInfo()->getLastUpdateAll() == 0)
-                        || (iv->DevInfo()->getLastUpdateSimple() == 0)
-                        || invalidDevInfo) {
-                        _messageOutput->println("Request device info");
-                        iv->sendDevInfoRequest();
-                    }
-                }
-
-                // Fetch grid profile
-                if (iv->Statistics()->getLastUpdate() > 0 && (iv->GridProfile()->getLastUpdate() == 0 || !iv->GridProfile()->containsValidData())) {
-                    iv->sendGridOnProFileParaRequest();
-                }
-
-                _messageOutput->printf("Queue size - NRF: %" PRId32 " CMT: %" PRId32 "\r\n", _radioNrf->getQueueSize(), _radioCmt->getQueueSize());
-                _lastPoll = millis();
+            // Fetch limit
+            if (((millis() - iv->SystemConfigPara()->getLastUpdateRequest() > HOY_SYSTEM_CONFIG_PARA_POLL_INTERVAL)
+                    && (millis() - iv->SystemConfigPara()->getLastUpdateCommand() > HOY_SYSTEM_CONFIG_PARA_POLL_MIN_DURATION))) {
+                _messageOutput->println("Request SystemConfigPara");
+                iv->sendSystemConfigParaRequest();
             }
 
-            if (++inverterPos >= getNumInverters()) {
-                inverterPos = 0;
+            // Set limit if required
+            if (iv->SystemConfigPara()->getLastLimitCommandSuccess() == CMD_NOK) {
+                _messageOutput->println("Resend ActivePowerControl");
+                iv->resendActivePowerControlRequest();
             }
+
+            // Set power status if required
+            if (iv->PowerCommand()->getLastPowerCommandSuccess() == CMD_NOK) {
+                _messageOutput->println("Resend PowerCommand");
+                iv->resendPowerControlRequest();
+            }
+
+            // Fetch dev info (but first fetch stats)
+            if (iv->Statistics()->getLastUpdate() > 0) {
+                const bool invalidDevInfo = !iv->DevInfo()->containsValidData()
+                    && iv->DevInfo()->getLastUpdateAll() > 0
+                    && iv->DevInfo()->getLastUpdateSimple() > 0;
+
+                if (invalidDevInfo) {
+                    _messageOutput->println("DevInfo: No Valid Data");
+                }
+
+                if ((iv->DevInfo()->getLastUpdateAll() == 0)
+                    || (iv->DevInfo()->getLastUpdateSimple() == 0)
+                    || invalidDevInfo) {
+                    _messageOutput->println("Request device info");
+                    iv->sendDevInfoRequest();
+                }
+            }
+
+            // Fetch grid profile
+            if (iv->Statistics()->getLastUpdate() > 0 && (iv->GridProfile()->getLastUpdate() == 0 || !iv->GridProfile()->containsValidData())) {
+                iv->sendGridOnProFileParaRequest();
+            }
+
+            _messageOutput->printf("Queue size - NRF: %" PRId32 " CMT: %" PRId32 "\r\n", _radioNrf->getQueueSize(), _radioCmt->getQueueSize());
+            _lastPoll = millis();
         }
 
-        // Perform housekeeping of all inverters on day change
-        const int8_t currentWeekDay = Utils::getWeekDay();
-        static int8_t lastWeekDay = -1;
-        if (lastWeekDay == -1) {
+        if (++inverterPos >= getNumInverters()) {
+            inverterPos = 0;
+        }
+    }
+
+    // Perform housekeeping of all inverters on day change
+    const int8_t currentWeekDay = Utils::getWeekDay();
+    static int8_t lastWeekDay = -1;
+    if (lastWeekDay == -1) {
+        lastWeekDay = currentWeekDay;
+    } else {
+        if (currentWeekDay != lastWeekDay) {
+
+            for (auto& inv : _inverters) {
+                inv->performDailyTask();
+            }
+
             lastWeekDay = currentWeekDay;
-        } else {
-            if (currentWeekDay != lastWeekDay) {
-
-                for (auto& inv : _inverters) {
-                    inv->performDailyTask();
-                }
-
-                lastWeekDay = currentWeekDay;
-            }
         }
     }
 }
