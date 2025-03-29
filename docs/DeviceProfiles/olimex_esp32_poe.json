@@ -105,5 +105,29 @@
             "data": 33,
             "clk": 32
         }
+    },
+    {
+        "name": "Olimex ESP32-POE with CMT2300A",
+        "links": [
+            {"name": "Datasheet", "url": "https://www.olimex.com/Products/IoT/ESP32/ESP32-POE/open-source-hardware"},
+            {"name": "CMT 2300A Datasheet", "url": "https://shop.blinkyparts.com/de/Ebyte-Funkmodul-CMT2300A-868-915MHz-Breakoutboard/blink238542.4"}
+        ],
+        "cmt": {
+            "clk": 14,
+            "cs": 5,
+            "fcs": 15,
+            "sdio": 2,
+            "gpio2": -1,
+            "gpio3": -1
+        },
+        "eth": {
+            "enabled": true,
+            "phy_addr": 0,
+            "power": 12,
+            "mdc": 23,
+            "mdio": 18,
+            "type": 0,
+            "clk_mode": 3
+        }
     }
 ]
