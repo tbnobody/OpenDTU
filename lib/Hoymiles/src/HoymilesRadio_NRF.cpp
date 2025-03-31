@@ -50,20 +50,19 @@ void HoymilesRadio_NRF::loop()
     if (_packetReceived) {
         Hoymiles.getMessageOutput()->println("Interrupt received");
         while (_radio->available()) {
-            if (!(_rxBuffer.size() > FRAGMENT_BUFFER_SIZE)) {
-                fragment_t f;
-                memset(f.fragment, 0xcc, MAX_RF_PAYLOAD_SIZE);
-                f.len = _radio->getDynamicPayloadSize();
-                f.channel = _radio->getChannel();
-                f.rssi = _radio->testRPD() ? -30 : -80;
-                if (f.len > MAX_RF_PAYLOAD_SIZE)
-                    f.len = MAX_RF_PAYLOAD_SIZE;
-                _radio->read(f.fragment, f.len);
-                _rxBuffer.push(f);
-            } else {
+            if (_rxBuffer.size() > FRAGMENT_BUFFER_SIZE) {
                 Hoymiles.getMessageOutput()->println("NRF: Buffer full");
                 _radio->flush_rx();
+                continue;
             }
+
+            fragment_t f;
+            memset(f.fragment, 0xcc, MAX_RF_PAYLOAD_SIZE);
+            f.len = std::min<uint8_t>(_radio->getDynamicPayloadSize(), MAX_RF_PAYLOAD_SIZE);
+            f.channel = _radio->getChannel();
+            f.rssi = _radio->testRPD() ? -30 : -80;
+            _radio->read(f.fragment, f.len);
+            _rxBuffer.push(f);
         }
         _packetReceived = false;
 

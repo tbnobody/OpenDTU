@@ -128,23 +128,21 @@ void HoymilesRadio_CMT::loop()
     if (_packetReceived) {
         Hoymiles.getMessageOutput()->println("Interrupt received");
         while (_radio->available()) {
-            if (!(_rxBuffer.size() > FRAGMENT_BUFFER_SIZE)) {
-                fragment_t f;
-                memset(f.fragment, 0xcc, MAX_RF_PAYLOAD_SIZE);
-                f.len = _radio->getDynamicPayloadSize();
-                f.channel = _radio->getChannel();
-                f.rssi = _radio->getRssiDBm();
-                f.wasReceived = false;
-                f.mainCmd = 0x00;
-                if (f.len > MAX_RF_PAYLOAD_SIZE) {
-                    f.len = MAX_RF_PAYLOAD_SIZE;
-                }
-                _radio->read(f.fragment, f.len);
-                _rxBuffer.push(f);
-            } else {
+            if (_rxBuffer.size() > FRAGMENT_BUFFER_SIZE) {
                 Hoymiles.getMessageOutput()->println("CMT: Buffer full");
                 _radio->flush_rx();
+                continue;
             }
+
+            fragment_t f;
+            memset(f.fragment, 0xcc, MAX_RF_PAYLOAD_SIZE);
+            f.len = std::min<uint8_t>(_radio->getDynamicPayloadSize(), MAX_RF_PAYLOAD_SIZE);
+            f.channel = _radio->getChannel();
+            f.rssi = _radio->getRssiDBm();
+            f.wasReceived = false;
+            f.mainCmd = 0x00;
+            _radio->read(f.fragment, f.len);
+            _rxBuffer.push(f);
         }
         _radio->flush_rx();
         _packetReceived = false;
