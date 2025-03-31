@@ -122,7 +122,7 @@
     "home": {
         "LiveData": "Données en direct",
         "SerialNumber": "Numéro de série : ",
-        "CurrentLimit": "Limite de courant : ",
+        "CurrentLimit": "Limite de courant",
         "ShowSetInverterLimit": "Afficher / Régler la limite de l'onduleur",
         "TurnOnOff": "Allumer / Eteindre l'onduleur",
         "ShowInverterInfo": "Afficher les informations sur l'onduleur",
