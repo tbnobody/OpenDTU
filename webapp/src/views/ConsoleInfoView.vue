@@ -1,8 +1,8 @@
 <template>
     <BasePage :title="$t('console.Console')" :isLoading="dataLoading">
         <CardElement :text="$t('console.VirtualDebugConsole')" textVariant="text-bg-primary">
-            <div class="row g-3 align-items-center">
-                <div class="col">
+            <div class="row align-items-center mb-3">
+                <div class="col-auto mt-2">
                     <div class="form-check form-switch">
                         <input
                             class="form-check-input"
@@ -16,7 +16,7 @@
                         </label>
                     </div>
                 </div>
-                <div class="col text-end">
+                <div class="col-auto ms-auto">
                     <div class="btn-group" role="group">
                         <button type="button" class="btn btn-primary" :onClick="clearConsole">
                             {{ $t('console.ClearConsole') }}
