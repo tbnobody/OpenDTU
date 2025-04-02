@@ -9,7 +9,8 @@
 uint8_t Utils::getWeekDay()
 {
     time_t now = time(NULL);
-    struct tm tm = *localtime(&now);
+    struct tm tm;
+    localtime_r(&now, &tm);
     return tm.tm_mday;
 }
 

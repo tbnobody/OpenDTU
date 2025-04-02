@@ -36,7 +36,8 @@ bool SunPositionClass::isDayPeriod() const
     }
 
     time_t now = time(NULL);
-    struct tm tm = *localtime(&now);
+    struct tm tm;
+    localtime_r(&now, &tm);
     const uint32_t minutesPastMidnight = tm.tm_hour * 60 + tm.tm_min;
     return (minutesPastMidnight >= _sunriseMinutes) && (minutesPastMidnight < _sunsetMinutes);
 }
@@ -54,7 +55,8 @@ void SunPositionClass::setDoRecalc(const bool doRecalc)
 bool SunPositionClass::checkRecalcDayChanged() const
 {
     time_t now = time(NULL);
-    struct tm tm = *localtime(&now);
+    struct tm tm;
+    localtime_r(&now, &tm);
 
     return _lastSunPositionCalculatedYMD != CALC_UNIQUE_ID(tm);
 }
@@ -122,7 +124,8 @@ void SunPositionClass::updateSunData()
 bool SunPositionClass::getSunTime(struct tm* info, const uint32_t offset) const
 {
     time_t now = time(NULL);
-    struct tm tm = *localtime(&now);
+    struct tm tm;
+    localtime_r(&now, &tm);
 
     tm.tm_sec = 0;
     tm.tm_min = offset;
