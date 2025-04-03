@@ -16,8 +16,8 @@ NetworkSettingsClass::NetworkSettingsClass()
     : _loopTask(TASK_IMMEDIATE, TASK_FOREVER, std::bind(&NetworkSettingsClass::loop, this))
     , _apIp(192, 168, 4, 1)
     , _apNetmask(255, 255, 255, 0)
+    , _dnsServer(std::make_unique<DNSServer>())
 {
-    _dnsServer.reset(new DNSServer());
 }
 
 void NetworkSettingsClass::init(Scheduler& scheduler)
