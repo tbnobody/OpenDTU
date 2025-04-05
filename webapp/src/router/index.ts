@@ -18,6 +18,7 @@ import NtpInfoView from '@/views/NtpInfoView.vue';
 import SecurityAdminView from '@/views/SecurityAdminView.vue';
 import SystemInfoView from '@/views/SystemInfoView.vue';
 import WaitRestartView from '@/views/WaitRestartView.vue';
+import IntegrationsAdminView from '@/views/IntegrationsAdminView.vue';
 import { createRouter, createWebHistory } from 'vue-router';
 
 const router = createRouter({
@@ -105,6 +106,11 @@ const router = createRouter({
             path: '/settings/device',
             name: 'Device Manager',
             component: DeviceAdminView,
+        },
+        {
+            path: '/settings/integrations',
+            name: 'Integrations',
+            component: IntegrationsAdminView,
         },
         {
             path: '/firmware/upgrade',
