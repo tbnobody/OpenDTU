@@ -5,6 +5,7 @@
 #include "Datastore.h"
 #include "Configuration.h"
 #include <Hoymiles.h>
+#include <SunPosition.h>
 
 DatastoreClass Datastore;
 
@@ -25,6 +26,8 @@ void DatastoreClass::loop()
         _loopTask.forceNextIteration();
         return;
     }
+
+    const bool isDayPeriod = SunPosition.isDayPeriod();
 
     uint8_t isProducing = 0;
     uint8_t isReachable = 0;
@@ -73,29 +76,29 @@ void DatastoreClass::loop()
             }
         }
 
-        if (inv->isReachable()) {
-            isReachable++;
-        } else {
-            if (inv->getEnablePolling()) {
-                _isAllEnabledReachable = false;
-            }
-        }
-
+        float inverterYieldTotal = 0;
         for (auto& c : inv->Statistics()->getChannelsByType(TYPE_INV)) {
             if (cfg->Poll_Enable) {
-                _totalAcYieldTotalEnabled += inv->Statistics()->getChannelFieldValue(TYPE_INV, c, FLD_YT);
+                inverterYieldTotal += inv->Statistics()->getChannelFieldValue(TYPE_INV, c, FLD_YT);
                 _totalAcYieldDayEnabled += inv->Statistics()->getChannelFieldValue(TYPE_INV, c, FLD_YD);
 
                 _totalAcYieldTotalDigits = max<unsigned int>(_totalAcYieldTotalDigits, inv->Statistics()->getChannelFieldDigits(TYPE_INV, c, FLD_YT));
                 _totalAcYieldDayDigits = max<unsigned int>(_totalAcYieldDayDigits, inv->Statistics()->getChannelFieldDigits(TYPE_INV, c, FLD_YD));
             }
         }
+        _totalAcYieldTotalEnabled += inverterYieldTotal;
 
+        float inverterAcPower = 0;
         for (auto& c : inv->Statistics()->getChannelsByType(TYPE_AC)) {
+            if (cfg->Poll_Enable) {
+                inverterAcPower += inv->Statistics()->getChannelFieldValue(TYPE_AC, c, FLD_PAC);
+            }
             if (inv->getEnablePolling()) {
-                _totalAcPowerEnabled += inv->Statistics()->getChannelFieldValue(TYPE_AC, c, FLD_PAC);
                 _totalAcPowerDigits = max<unsigned int>(_totalAcPowerDigits, inv->Statistics()->getChannelFieldDigits(TYPE_AC, c, FLD_PAC));
             }
+        }
+        if (inv->getEnablePolling()) {
+            _totalAcPowerEnabled += inverterAcPower;
         }
 
         for (auto& c : inv->Statistics()->getChannelsByType(TYPE_DC)) {
@@ -106,6 +109,24 @@ void DatastoreClass::loop()
                 if (inv->Statistics()->getStringMaxPower(c) > 0) {
                     _totalDcPowerIrradiation += inv->Statistics()->getChannelFieldValue(TYPE_DC, c, FLD_PDC);
                     _totalDcIrradiationInstalled += inv->Statistics()->getStringMaxPower(c);
+                }
+            }
+        }
+
+        if (inv->isReachable()) {
+            isReachable++;
+        } else {
+            if (inv->getEnablePolling()) {
+                _isAllEnabledReachable = false;
+            }
+            if(cfg->Poll_Enable && !isDayPeriod && !cfg->Poll_Enable_Night) {
+                // enabled, but we are not polling because we are at night
+                // such inverters still count as "working properly" as long as we have valid data from sunset
+                // at sunset, we expect low power, but nonzero YieldTotal
+
+                if(inv->Statistics()->getLastUpdate() == 0 || inverterYieldTotal < 1 || inverterAcPower > 1 || !SunPosition.wasAroundSunset(inv->Statistics()->getLastUpdate())) {
+                    // no valid data -> unreachable
+                    _isAllEnabledReachable = false;
                 }
             }
         }
