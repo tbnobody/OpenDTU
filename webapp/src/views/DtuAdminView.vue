@@ -9,9 +9,9 @@
                 <InputElement
                     :label="$t('dtuadmin.Serial')"
                     v-model="dtuConfigList.serial"
-                    type="number"
-                    min="1"
-                    max="199999999999"
+                    type="text"
+                    minlength="12"
+                    maxlength="12"
                     :tooltip="$t('dtuadmin.SerialHint')"
                 />
 
