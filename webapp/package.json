@@ -14,7 +14,7 @@
   },
   "dependencies": {
     "@popperjs/core": "^2.11.8",
-    "bootstrap": "^5.3.3",
+    "bootstrap": "^5.3.5",
     "bootstrap-icons-vue": "^1.11.3",
     "mitt": "^3.0.1",
     "sortablejs": "^1.15.6",
