@@ -48,7 +48,7 @@ bool RealTimeRunDataCommand::handleResponse(const fragment_t fragment[], const u
     const uint8_t fragmentsSize = getTotalFragmentSize(fragment, max_fragment_id);
     const uint8_t expectedSize = _inv->Statistics()->getExpectedByteCount();
     if (fragmentsSize < expectedSize) {
-        Hoymiles.getMessageOutput()->printf("ERROR in %s: Received fragment size: %" PRId8 ", min expected size: %" PRId8 "\r\n",
+        Hoymiles.getMessageOutput()->printf("ERROR in %s: Received fragment size: %" PRIu8 ", min expected size: %" PRIu8 "\r\n",
             getCommandName().c_str(), fragmentsSize, expectedSize);
 
         return false;

@@ -121,7 +121,7 @@ void HoymilesClass::loop()
                 iv->resendPowerControlRequest();
             }
 
-            _messageOutput->printf("Queue size - NRF: %" PRId32 " CMT: %" PRId32 "\r\n", _radioNrf->getQueueSize(), _radioCmt->getQueueSize());
+            _messageOutput->printf("Queue size - NRF: %" PRIu32 " CMT: %" PRIu32 "\r\n", _radioNrf->getQueueSize(), _radioCmt->getQueueSize());
             _lastPoll = millis();
         }
 

@@ -13,7 +13,7 @@ InverterAbstract::InverterAbstract(HoymilesRadio* radio, const uint64_t serial)
     _radio = radio;
 
     char serial_buff[sizeof(uint64_t) * 8 + 1];
-    snprintf(serial_buff, sizeof(serial_buff), "%0x%08x",
+    snprintf(serial_buff, sizeof(serial_buff), "%0" PRIx32 "%08" PRIx32,
         static_cast<uint32_t>((serial >> 32) & 0xFFFFFFFF),
         static_cast<uint32_t>(serial & 0xFFFFFFFF));
     _serialString = serial_buff;
@@ -215,7 +215,7 @@ void InverterAbstract::addRxFragment(const uint8_t fragment[], const uint8_t len
     }
 
     if (fragmentId >= MAX_RF_FRAGMENT_COUNT) {
-        Hoymiles.getMessageOutput()->printf("ERROR: fragment id %" PRId8 " is too large for buffer and ignored\r\n", fragmentId);
+        Hoymiles.getMessageOutput()->printf("ERROR: fragment id %" PRIu8 " is too large for buffer and ignored\r\n", fragmentId);
         return;
     }
 
