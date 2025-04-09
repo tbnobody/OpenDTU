@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * Copyright (C) 2022-2024 Thomas Basler and others
+ * Copyright (C) 2022-2025 Thomas Basler and others
  */
 #include "MqttHandleInverter.h"
 #include "MessageOutput.h"
@@ -148,7 +148,7 @@ String MqttHandleInverterClass::getTopic(std::shared_ptr<InverterAbstract> inv, 
     return inv->serialString() + "/" + chanNum + "/" + chanName;
 }
 
-void MqttHandleInverterClass::onMqttMessage(Topic t, const espMqttClientTypes::MessageProperties& properties, const char* topic, const uint8_t* payload, const size_t len, const size_t index, const size_t total)
+void MqttHandleInverterClass::onMqttMessage(Topic t, const espMqttClientTypes::MessageProperties& properties, const char* topic, const uint8_t* payload, const size_t len)
 {
     const CONFIG_T& config = Configuration.get();
 
@@ -252,8 +252,7 @@ void MqttHandleInverterClass::subscribeTopics()
         MqttSettings.subscribe(fullTopic.c_str(), 0,
             std::bind(&MqttHandleInverterClass::onMqttMessage, this, t,
                 std::placeholders::_1, std::placeholders::_2,
-                std::placeholders::_3, std::placeholders::_4,
-                std::placeholders::_5, std::placeholders::_6));
+                std::placeholders::_3, std::placeholders::_4));
     };
 
     for (auto const& s : _subscriptions) {

@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * Copyright (C) 2022 Thomas Basler and others
+ * Copyright (C) 2022-2025 Thomas Basler and others
  */
 #include "MqttSettings.h"
 #include "Configuration.h"
@@ -40,7 +40,7 @@ void MqttSettingsClass::onMqttConnect(const bool sessionPresent)
     }
 }
 
-void MqttSettingsClass::subscribe(const String& topic, const uint8_t qos, const espMqttClientTypes::OnMessageCallback& cb)
+void MqttSettingsClass::subscribe(const String& topic, const uint8_t qos, const OnMessageCallback& cb)
 {
     _mqttSubscribeParser.register_callback(topic.c_str(), qos, cb);
     std::lock_guard<std::mutex> lock(_clientLock);
@@ -93,7 +93,7 @@ void MqttSettingsClass::onMqttMessage(const espMqttClientTypes::MessagePropertie
 {
     MessageOutput.printf("Received MQTT message on topic: %s\r\n", topic);
 
-    _mqttSubscribeParser.handle_message(properties, topic, payload, len, index, total);
+    _mqttSubscribeParser.handle_message(properties, topic, payload, len);
 }
 
 void MqttSettingsClass::performConnect()
