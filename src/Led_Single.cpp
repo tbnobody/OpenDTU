@@ -135,7 +135,12 @@ void LedSingleClass::setLed(const uint8_t ledNo, const bool ledState)
         return;
     }
 
+#if ESP_ARDUINO_VERSION_MAJOR < 3
     const uint32_t currentPWM = ledcRead(analogGetChannel(pin.led[ledNo]));
+#else
+    const uint32_t currentPWM = ledcRead(pin.led[ledNo]);
+#endif
+
     const uint32_t targetPWM = ledState ? pwmTable[config.Led_Single[ledNo].Brightness] : LED_OFF;
 
     if (currentPWM == targetPWM) {
