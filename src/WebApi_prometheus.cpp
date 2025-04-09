@@ -20,12 +20,14 @@ void WebApiPrometheusClass::init(AsyncWebServer& server, Scheduler& scheduler)
 
 void WebApiPrometheusClass::onPrometheusMetricsGet(AsyncWebServerRequest* request)
 {
+    static size_t initialResponseBufferSize = 1024;
+
     if (!WebApi.checkCredentialsReadonly(request)) {
         return;
     }
 
     try {
-        auto stream = request->beginResponseStream("text/plain; charset=utf-8", 40960);
+        auto stream = request->beginResponseStream("text/plain; charset=utf-8", initialResponseBufferSize);
 
         stream->print("# HELP opendtu_build Build info\n");
         stream->print("# TYPE opendtu_build gauge\n");
@@ -109,6 +111,10 @@ void WebApiPrometheusClass::onPrometheusMetricsGet(AsyncWebServerRequest* reques
             }
         }
         stream->addHeader("Cache-Control", "no-cache");
+        if (stream->available() > initialResponseBufferSize) {
+            initialResponseBufferSize = stream->available();
+            MessageOutput.printf("Increased /api/prometheus/metrics initialResponseBufferSize to %" PRIu32 " bytes\r\n", initialResponseBufferSize);
+        }
         request->send(stream);
 
     } catch (std::bad_alloc& bad_alloc) {
