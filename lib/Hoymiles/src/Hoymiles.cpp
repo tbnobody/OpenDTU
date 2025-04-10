@@ -63,8 +63,7 @@ void HoymilesClass::loop()
         }
 
         if (iv->getEnablePolling() || iv->getEnableCommands()) {
-            _messageOutput->print("Fetch inverter: ");
-            _messageOutput->println(iv->serial(), HEX);
+            _messageOutput->printf("Fetch inverter: %s\r\n", iv->serialString().c_str());
 
             if (!iv->isReachable()) {
                 iv->sendChangeChannelRequest();
