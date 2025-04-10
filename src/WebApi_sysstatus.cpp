@@ -81,6 +81,7 @@ void WebApiSysstatusClass::onSystemStatus(AsyncWebServerRequest* request)
     snprintf(version, sizeof(version), "%d.%d.%d", CONFIG_VERSION >> 24 & 0xff, CONFIG_VERSION >> 16 & 0xff, CONFIG_VERSION >> 8 & 0xff);
     root["config_version"] = version;
     root["git_hash"] = __COMPILED_GIT_HASH__;
+    root["git_branch"] = __COMPILED_GIT_BRANCH__;
     root["pioenv"] = PIOENV;
 
     root["uptime"] = esp_timer_get_time() / 1000000;

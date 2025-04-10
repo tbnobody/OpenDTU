@@ -225,6 +225,7 @@
             "SdkVersion": "Wersja SDK",
             "ConfigVersion": "Wersja konfiguracji",
             "FirmwareVersion": "Wersja oprogramowania / Git Hash",
+            "FirmwareBranch": "Firmware Branch",
             "PioEnv": "Środowisko PIO",
             "FirmwareVersionHint": "Kliknij tutaj, aby wyświetlić informacje o aktualnej wersji",
             "FirmwareUpdate": "Aktualizacja oprogramowania",
