@@ -95,10 +95,10 @@ void HoymilesRadio_CMT::init(const int8_t pin_sdio, const int8_t pin_clk, const 
     cmtSwitchDtuFreq(_inverterTargetFrequency); // start dtu at work freqency, for fast Rx if inverter is already on and frequency switched
 
     if (!_radio->isChipConnected()) {
-        Hoymiles.getMessageOutput()->println("CMT: Connection error!!");
+        Hoymiles.getMessageOutput()->printf("CMT: Connection error!!\r\n");
         return;
     }
-    Hoymiles.getMessageOutput()->println("CMT: Connection successful");
+    Hoymiles.getMessageOutput()->printf("CMT: Connection successful\r\n");
 
     if (pin_gpio2 >= 0) {
         attachInterrupt(digitalPinToInterrupt(pin_gpio2), std::bind(&HoymilesRadio_CMT::handleInt1, this), RISING);
@@ -126,10 +126,10 @@ void HoymilesRadio_CMT::loop()
     }
 
     if (_packetReceived) {
-        Hoymiles.getMessageOutput()->println("Interrupt received");
+        Hoymiles.getMessageOutput()->printf("Interrupt received\r\n");
         while (_radio->available()) {
             if (_rxBuffer.size() > FRAGMENT_BUFFER_SIZE) {
-                Hoymiles.getMessageOutput()->println("CMT: Buffer full");
+                Hoymiles.getMessageOutput()->printf("CMT: Buffer full\r\n");
                 _radio->flush_rx();
                 continue;
             }
@@ -169,12 +169,12 @@ void HoymilesRadio_CMT::loop()
 
                         inv->addRxFragment(f.fragment, f.len, f.rssi);
                     } else {
-                        Hoymiles.getMessageOutput()->println("Inverter Not found!");
+                        Hoymiles.getMessageOutput()->printf("Inverter Not found!\r\n");
                     }
                 }
 
             } else {
-                Hoymiles.getMessageOutput()->println("Frame kaputt"); // ;-)
+                Hoymiles.getMessageOutput()->printf("Frame kaputt\r\n"); // ;-)
             }
 
             // Remove paket from buffer even it was corrupted
@@ -277,7 +277,7 @@ void HoymilesRadio_CMT::sendEsbPacket(CommandAbstract& cmd)
     cmd.dumpDataPayload(Hoymiles.getMessageOutput());
 
     if (!_radio->write(cmd.getDataPayload(), cmd.getDataSize())) {
-        Hoymiles.getMessageOutput()->println("TX SPI Timeout");
+        Hoymiles.getMessageOutput()->printf("TX SPI Timeout\r\n");
     }
     cmtSwitchDtuFreq(_inverterTargetFrequency);
     _radio->startListening();

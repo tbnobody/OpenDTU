@@ -54,18 +54,18 @@ void HoymilesRadio::sendLastPacketAgain()
 void HoymilesRadio::handleReceivedPackage()
 {
     if (_busyFlag && _rxTimeout.occured()) {
-        Hoymiles.getMessageOutput()->println("RX Period End");
+        Hoymiles.getMessageOutput()->printf("RX Period End\r\n");
         std::shared_ptr<InverterAbstract> inv = Hoymiles.getInverterBySerial(_commandQueue.front().get()->getTargetAddress());
 
         if (nullptr != inv) {
             CommandAbstract* cmd = _commandQueue.front().get();
             uint8_t verifyResult = inv->verifyAllFragments(*cmd);
             if (verifyResult == FRAGMENT_ALL_MISSING_RESEND) {
-                Hoymiles.getMessageOutput()->println("Nothing received, resend whole request");
+                Hoymiles.getMessageOutput()->printf("Nothing received, resend whole request\r\n");
                 sendLastPacketAgain();
 
             } else if (verifyResult == FRAGMENT_ALL_MISSING_TIMEOUT) {
-                Hoymiles.getMessageOutput()->println("Nothing received, resend count exeeded");
+                Hoymiles.getMessageOutput()->printf("Nothing received, resend count exeeded\r\n");
                 // Statistics: Count RX Fail No Answer
                 if (inv->RadioStats.TxRequestData > 0) {
                     inv->RadioStats.RxFailNoAnswer++;
@@ -75,7 +75,7 @@ void HoymilesRadio::handleReceivedPackage()
                 _busyFlag = false;
 
             } else if (verifyResult == FRAGMENT_RETRANSMIT_TIMEOUT) {
-                Hoymiles.getMessageOutput()->println("Retransmit timeout");
+                Hoymiles.getMessageOutput()->printf("Retransmit timeout\r\n");
                 // Statistics: Count RX Fail Partial Answer
                 if (inv->RadioStats.TxRequestData > 0) {
                     inv->RadioStats.RxFailPartialAnswer++;
@@ -85,7 +85,7 @@ void HoymilesRadio::handleReceivedPackage()
                 _busyFlag = false;
 
             } else if (verifyResult == FRAGMENT_HANDLE_ERROR) {
-                Hoymiles.getMessageOutput()->println("Packet handling error");
+                Hoymiles.getMessageOutput()->printf("Packet handling error\r\n");
                 // Statistics: Count RX Fail Corrupt Data
                 if (inv->RadioStats.TxRequestData > 0) {
                     inv->RadioStats.RxFailCorruptData++;
@@ -96,8 +96,7 @@ void HoymilesRadio::handleReceivedPackage()
 
             } else if (verifyResult > 0) {
                 // Perform Retransmit
-                Hoymiles.getMessageOutput()->print("Request retransmit: ");
-                Hoymiles.getMessageOutput()->println(verifyResult);
+                Hoymiles.getMessageOutput()->printf("Request retransmit: %" PRIu8 "\r\n", verifyResult);
                 // Statistics: Count TX Re-Request Fragment
                 inv->RadioStats.TxReRequestFragment++;
 
@@ -105,7 +104,7 @@ void HoymilesRadio::handleReceivedPackage()
 
             } else {
                 // Successful received all packages
-                Hoymiles.getMessageOutput()->println("Success");
+                Hoymiles.getMessageOutput()->printf("Success\r\n");
                 // Statistics: Count RX Success
                 if (inv->RadioStats.TxRequestData > 0) {
                     inv->RadioStats.RxSuccess++;
@@ -116,7 +115,7 @@ void HoymilesRadio::handleReceivedPackage()
             }
         } else {
             // If inverter was not found, assume the command is invalid
-            Hoymiles.getMessageOutput()->println("RX: Invalid inverter found");
+            Hoymiles.getMessageOutput()->printf("RX: Invalid inverter found\r\n");
             // Statistics: Count RX Fail Unknown Data
             _commandQueue.pop();
             _busyFlag = false;
@@ -134,7 +133,7 @@ void HoymilesRadio::handleReceivedPackage()
 
                 sendEsbPacket(*cmd);
             } else {
-                Hoymiles.getMessageOutput()->println("TX: Invalid inverter found");
+                Hoymiles.getMessageOutput()->printf("TX: Invalid inverter found\r\n");
                 _commandQueue.pop();
             }
         }

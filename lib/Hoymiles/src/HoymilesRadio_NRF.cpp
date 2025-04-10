@@ -24,10 +24,10 @@ void HoymilesRadio_NRF::init(SPIClass* initialisedSpiBus, const uint8_t pinCE, c
     _radio->setRetries(0, 0);
     _radio->maskIRQ(true, true, false); // enable only receiving interrupts
     if (!_radio->isChipConnected()) {
-        Hoymiles.getMessageOutput()->println("NRF: Connection error!!");
+        Hoymiles.getMessageOutput()->printf("NRF: Connection error!!\r\n");
         return;
     }
-    Hoymiles.getMessageOutput()->println("NRF: Connection successful");
+    Hoymiles.getMessageOutput()->printf("NRF: Connection successful\r\n");
 
     attachInterrupt(digitalPinToInterrupt(pinIRQ), std::bind(&HoymilesRadio_NRF::handleIntr, this), FALLING);
 
@@ -48,10 +48,10 @@ void HoymilesRadio_NRF::loop()
     }
 
     if (_packetReceived) {
-        Hoymiles.getMessageOutput()->println("Interrupt received");
+        Hoymiles.getMessageOutput()->printf("Interrupt received\r\n");
         while (_radio->available()) {
             if (_rxBuffer.size() > FRAGMENT_BUFFER_SIZE) {
-                Hoymiles.getMessageOutput()->println("NRF: Buffer full");
+                Hoymiles.getMessageOutput()->printf("NRF: Buffer full\r\n");
                 _radio->flush_rx();
                 continue;
             }
@@ -81,11 +81,11 @@ void HoymilesRadio_NRF::loop()
 
                     inv->addRxFragment(f.fragment, f.len, f.rssi);
                 } else {
-                    Hoymiles.getMessageOutput()->println("Inverter Not found!");
+                    Hoymiles.getMessageOutput()->printf("Inverter Not found!\r\n");
                 }
 
             } else {
-                Hoymiles.getMessageOutput()->println("Frame kaputt");
+                Hoymiles.getMessageOutput()->printf("Frame kaputt\r\n");
             }
 
             // Remove paket from buffer even it was corrupted

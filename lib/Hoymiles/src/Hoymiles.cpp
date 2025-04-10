@@ -81,7 +81,7 @@ void HoymilesClass::loop()
                 // Fetch limit
                 if (((millis() - iv->SystemConfigPara()->getLastUpdateRequest() > HOY_SYSTEM_CONFIG_PARA_POLL_INTERVAL)
                         && (millis() - iv->SystemConfigPara()->getLastUpdateCommand() > HOY_SYSTEM_CONFIG_PARA_POLL_MIN_DURATION))) {
-                    _messageOutput->println("Request SystemConfigPara");
+                    _messageOutput->printf("Request SystemConfigPara\r\n");
                     iv->sendSystemConfigParaRequest();
                 }
 
@@ -97,13 +97,13 @@ void HoymilesClass::loop()
                         && iv->DevInfo()->getLastUpdateSimple() > 0;
 
                     if (invalidDevInfo) {
-                        _messageOutput->println("DevInfo: No Valid Data");
+                        _messageOutput->printf("DevInfo: No Valid Data\r\n");
                     }
 
                     if ((iv->DevInfo()->getLastUpdateAll() == 0)
                         || (iv->DevInfo()->getLastUpdateSimple() == 0)
                         || invalidDevInfo) {
-                        _messageOutput->println("Request device info");
+                        _messageOutput->printf("Request device info\r\n");
                         iv->sendDevInfoRequest();
                     }
                 }
@@ -111,13 +111,13 @@ void HoymilesClass::loop()
 
             // Set limit if required
             if (iv->SystemConfigPara()->getLastLimitCommandSuccess() == CMD_NOK) {
-                _messageOutput->println("Resend ActivePowerControl");
+                _messageOutput->printf("Resend ActivePowerControl\r\n");
                 iv->resendActivePowerControlRequest();
             }
 
             // Set power status if required
             if (iv->PowerCommand()->getLastPowerCommandSuccess() == CMD_NOK) {
-                _messageOutput->println("Resend PowerCommand");
+                _messageOutput->printf("Resend PowerCommand\r\n");
                 iv->resendPowerControlRequest();
             }
 
