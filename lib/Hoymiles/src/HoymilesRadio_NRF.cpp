@@ -4,6 +4,7 @@
  */
 #include "HoymilesRadio_NRF.h"
 #include "Hoymiles.h"
+#include "Utils.h"
 #include "commands/RequestFrameCommand.h"
 #include <Every.h>
 #include <FunctionalInterrupt.h>
@@ -75,9 +76,8 @@ void HoymilesRadio_NRF::loop()
 
                 if (nullptr != inv) {
                     // Save packet in inverter rx buffer
-                    Hoymiles.getMessageOutput()->printf("RX Channel: %" PRIu8 " --> ", f.channel);
-                    dumpBuf(f.fragment, f.len, false);
-                    Hoymiles.getMessageOutput()->printf("| %" PRId8 " dBm\r\n", f.rssi);
+                    Hoymiles.getMessageOutput()->printf("RX Channel: %" PRIu8 " --> %s | %" PRId8 " dBm\r\n",
+                        f.channel, Utils::dumpArray(f.fragment, f.len).c_str(), f.rssi);
 
                     inv->addRxFragment(f.fragment, f.len, f.rssi);
                 } else {

@@ -4,6 +4,7 @@
  */
 #include "HoymilesRadio_CMT.h"
 #include "Hoymiles.h"
+#include "Utils.h"
 #include "crc.h"
 #include <FunctionalInterrupt.h>
 #include <frozen/map.h>
@@ -163,9 +164,8 @@ void HoymilesRadio_CMT::loop()
 
                     if (nullptr != inv) {
                         // Save packet in inverter rx buffer
-                        Hoymiles.getMessageOutput()->printf("RX %.2f MHz --> ", getFrequencyFromChannel(f.channel) / 1000000.0);
-                        dumpBuf(f.fragment, f.len, false);
-                        Hoymiles.getMessageOutput()->printf("| %" PRId8 " dBm\r\n", f.rssi);
+                        Hoymiles.getMessageOutput()->printf("RX %.2f MHz --> %s | %" PRId8 " dBm\r\n",
+                        getFrequencyFromChannel(f.channel) / 1000000.0, Utils::dumpArray(f.fragment, f.len).c_str(), f.rssi);
 
                         inv->addRxFragment(f.fragment, f.len, f.rssi);
                     } else {

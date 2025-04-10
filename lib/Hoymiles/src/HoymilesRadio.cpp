@@ -140,16 +140,6 @@ void HoymilesRadio::handleReceivedPackage()
     }
 }
 
-void HoymilesRadio::dumpBuf(const uint8_t buf[], const uint8_t len, const bool appendNewline)
-{
-    for (uint8_t i = 0; i < len; i++) {
-        Hoymiles.getMessageOutput()->printf("%02X ", buf[i]);
-    }
-    if (appendNewline) {
-        Hoymiles.getMessageOutput()->println("");
-    }
-}
-
 bool HoymilesRadio::isInitialized() const
 {
     return _isInitialized;
