@@ -3,6 +3,7 @@
 
 #include "types.h"
 #include <Stream.h>
+#include <WString.h>
 #include <cstdint>
 
 #define RF_LEN 32
@@ -26,10 +27,10 @@ enum class QueueInsertType {
 class CommandAbstract {
 public:
     explicit CommandAbstract(InverterAbstract* inv, const uint64_t router_address = 0);
-    virtual ~CommandAbstract() {};
+    virtual ~CommandAbstract() { };
 
     const uint8_t* getDataPayload();
-    void dumpDataPayload(Print* stream);
+    String dumpDataPayload();
 
     uint8_t getDataSize() const;
 

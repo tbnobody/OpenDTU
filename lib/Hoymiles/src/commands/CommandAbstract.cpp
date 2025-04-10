@@ -51,10 +51,10 @@ const uint8_t* CommandAbstract::getDataPayload()
     return _payload;
 }
 
-void CommandAbstract::dumpDataPayload(Print* stream)
+String CommandAbstract::dumpDataPayload()
 {
     const uint8_t* payload = getDataPayload();
-    stream->printf("%s\r\n", Utils::dumpArray(payload, getDataSize()).c_str());
+    return Utils::dumpArray(payload, getDataSize());
 }
 
 uint8_t CommandAbstract::getDataSize() const

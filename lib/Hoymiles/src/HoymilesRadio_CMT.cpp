@@ -165,7 +165,7 @@ void HoymilesRadio_CMT::loop()
                     if (nullptr != inv) {
                         // Save packet in inverter rx buffer
                         Hoymiles.getMessageOutput()->printf("RX %.2f MHz --> %s | %" PRId8 " dBm\r\n",
-                        getFrequencyFromChannel(f.channel) / 1000000.0, Utils::dumpArray(f.fragment, f.len).c_str(), f.rssi);
+                            getFrequencyFromChannel(f.channel) / 1000000.0, Utils::dumpArray(f.fragment, f.len).c_str(), f.rssi);
 
                         inv->addRxFragment(f.fragment, f.len, f.rssi);
                     } else {
@@ -272,9 +272,8 @@ void HoymilesRadio_CMT::sendEsbPacket(CommandAbstract& cmd)
         cmtSwitchDtuFreq(getInvBootFrequency());
     }
 
-    Hoymiles.getMessageOutput()->printf("TX %s %.2f MHz --> ",
-        cmd.getCommandName().c_str(), getFrequencyFromChannel(_radio->getChannel()) / 1000000.0);
-    cmd.dumpDataPayload(Hoymiles.getMessageOutput());
+    Hoymiles.getMessageOutput()->printf("TX %s %.2f MHz --> %s\r\n",
+        cmd.getCommandName().c_str(), getFrequencyFromChannel(_radio->getChannel()) / 1000000.0, cmd.dumpDataPayload().c_str());
 
     if (!_radio->write(cmd.getDataPayload(), cmd.getDataSize())) {
         Hoymiles.getMessageOutput()->printf("TX SPI Timeout\r\n");
