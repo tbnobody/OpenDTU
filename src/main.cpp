@@ -5,6 +5,7 @@
 #include "Configuration.h"
 #include "Datastore.h"
 #include "Display_Graphic.h"
+#include "IntegrationsGoeController.h"
 #include "I18n.h"
 #include "InverterSettings.h"
 #include "Led_Single.h"
@@ -110,6 +111,11 @@ void setup()
     MqttHandleInverter.init(scheduler);
     MqttHandleInverterTotal.init(scheduler);
     MqttHandleHass.init(scheduler);
+    MessageOutput.println("done");
+
+    // Initialize go-e Integration
+    MessageOutput.print("Initialize go-e Integration... ");
+    IntegrationsGoeController.init(scheduler);
     MessageOutput.println("done");
 
     // Initialize WebApi

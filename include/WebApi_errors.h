@@ -94,4 +94,8 @@ enum WebApiError {
 
     HardwareBase = 12000,
     HardwarePinMappingLength,
+
+    IntegrationsBase = 13000,
+    IntegrationsGoeControllerHostnameLength,
+    IntegrationsGoeControllerUpdateInterval,
 };

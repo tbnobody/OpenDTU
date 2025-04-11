@@ -151,6 +151,12 @@ bool ConfigurationClass::write()
         }
     }
 
+    JsonObject integrations = doc["integrations"].to<JsonObject>();
+    integrations["goe_ctrl_hostname"] = config.Integrations.GoeControllerHostname;
+    integrations["goe_ctrl_enabled"] = config.Integrations.GoeControllerEnabled;
+    integrations["goe_ctrl_publish_home_category"] = config.Integrations.GoeControllerPublishHomeCategory;
+    integrations["goe_ctrl_update_interval"] = config.Integrations.GoeControllerUpdateInterval;
+
     if (!Utils::checkJsonAlloc(doc, __FUNCTION__, __LINE__)) {
         return false;
     }
@@ -326,6 +332,12 @@ bool ConfigurationClass::read()
             strlcpy(config.Inverter[i].channel[c].Name, channel[c]["name"] | "", sizeof(config.Inverter[i].channel[c].Name));
         }
     }
+
+    JsonObject integrations = doc["integrations"];
+    strlcpy(config.Integrations.GoeControllerHostname, integrations["goe_ctrl_hostname"] | INTEGRATIONS_GOE_CTRL_HOSTNAME, sizeof(config.Integrations.GoeControllerHostname));
+    config.Integrations.GoeControllerEnabled = integrations["goe_ctrl_enabled"] | INTEGRATIONS_GOE_CTRL_ENABLED;
+    config.Integrations.GoeControllerPublishHomeCategory = integrations["goe_ctrl_publish_home_category"] | INTEGRATIONS_GOE_CTRL_ENABLE_HOME_CATEGORY;
+    config.Integrations.GoeControllerUpdateInterval = integrations["goe_ctrl_update_interval"] | INTEGRATIONS_GOE_CTRL_UPDATE_INTERVAL;
 
     f.close();
 
