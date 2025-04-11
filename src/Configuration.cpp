@@ -157,7 +157,7 @@ bool ConfigurationClass::write()
 
     // Serialize JSON to file
     if (serializeJson(doc, f) == 0) {
-        MessageOutput.println("Failed to write file");
+        MessageOutput.printf("Failed to write file\r\n");
         return false;
     }
 
@@ -175,7 +175,7 @@ bool ConfigurationClass::read()
     // Deserialize the JSON document
     const DeserializationError error = deserializeJson(doc, f);
     if (error) {
-        MessageOutput.println("Failed to read file, using default configuration");
+        MessageOutput.printf("Failed to read file, using default configuration\r\n");
     }
 
     if (!Utils::checkJsonAlloc(doc, __FUNCTION__, __LINE__)) {
@@ -330,17 +330,16 @@ bool ConfigurationClass::read()
     f.close();
 
     // Check for default DTU serial
-    MessageOutput.print("Check for default DTU serial... ");
     if (config.Dtu.Serial == DTU_SERIAL) {
-        MessageOutput.print("generate serial based on ESP chip id: ");
         const uint64_t dtuId = Utils::generateDtuSerial();
-        MessageOutput.printf("%0" PRIx32 "%08" PRIx32 "... ",
-            static_cast<uint32_t>((dtuId >> 32) & 0xFFFFFFFF),
-            static_cast<uint32_t>(dtuId & 0xFFFFFFFF));
         config.Dtu.Serial = dtuId;
         write();
+        MessageOutput.printf("DTU serial check: Generated new serial based on ESP chip id: %0" PRIx32 "%08" PRIx32 "\r\n",
+            static_cast<uint32_t>((dtuId >> 32) & 0xFFFFFFFF),
+            static_cast<uint32_t>(dtuId & 0xFFFFFFFF));
+    } else {
+        MessageOutput.printf("DTU serial check: Using existing serial\r\n");
     }
-    MessageOutput.println("done");
 
     return true;
 }
@@ -349,7 +348,7 @@ void ConfigurationClass::migrate()
 {
     File f = LittleFS.open(CONFIG_FILENAME, "r", false);
     if (!f) {
-        MessageOutput.println("Failed to open file, cancel migration");
+        MessageOutput.printf("Failed to open file, cancel migration\r\n");
         return;
     }
 
