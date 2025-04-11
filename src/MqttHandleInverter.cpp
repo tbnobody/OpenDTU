@@ -169,7 +169,7 @@ void MqttHandleInverterClass::onMqttMessage(Topic t, const espMqttClientTypes::M
     auto inv = Hoymiles.getInverterBySerial(serial);
 
     if (inv == nullptr) {
-        MessageOutput.println("Inverter not found");
+        MessageOutput.printf("Inverter not found\r\n");
         return;
     }
 
@@ -202,7 +202,7 @@ void MqttHandleInverterClass::onMqttMessage(Topic t, const espMqttClientTypes::M
         if (!properties.retain) {
             inv->sendActivePowerControlRequest(payload_val, PowerLimitControlType::RelativNonPersistent);
         } else {
-            MessageOutput.println("Ignored because retained");
+            MessageOutput.printf("Ignored because retained\r\n");
         }
         break;
 
@@ -212,7 +212,7 @@ void MqttHandleInverterClass::onMqttMessage(Topic t, const espMqttClientTypes::M
         if (!properties.retain) {
             inv->sendActivePowerControlRequest(payload_val, PowerLimitControlType::AbsolutNonPersistent);
         } else {
-            MessageOutput.println("Ignored because retained");
+            MessageOutput.printf("Ignored because retained\r\n");
         }
         break;
 
@@ -228,7 +228,7 @@ void MqttHandleInverterClass::onMqttMessage(Topic t, const espMqttClientTypes::M
         if (!properties.retain && payload_val == 1) {
             inv->sendRestartControlRequest();
         } else {
-            MessageOutput.println("Ignored because retained or numeric value not '1'");
+            MessageOutput.printf("Ignored because retained or numeric value not '1'\r\n");
         }
         break;
 
@@ -238,7 +238,7 @@ void MqttHandleInverterClass::onMqttMessage(Topic t, const espMqttClientTypes::M
         if (!properties.retain && payload_val == 1) {
             inv->resetRadioStats();
         } else {
-            MessageOutput.println("Ignored because retained or numeric value not '1'");
+            MessageOutput.printf("Ignored because retained or numeric value not '1'\r\n");
         }
     }
 }
