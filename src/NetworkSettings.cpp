@@ -144,29 +144,31 @@ void NetworkSettingsClass::handleMDNS()
 {
     const bool mdnsEnabled = Configuration.get().Mdns.Enabled;
 
+    // Return if no state change
     if (_lastMdnsEnabled == mdnsEnabled) {
         return;
     }
 
     _lastMdnsEnabled = mdnsEnabled;
-
     MDNS.end();
 
     if (!mdnsEnabled) {
+        MessageOutput.printf("MDNS disabled\r\n");
         return;
     }
 
-    if (MDNS.begin(getHostname())) {
-        MessageOutput.print("MDNS responder starting...");
+    MessageOutput.printf("Starting MDNS responder...\r\n");
 
-        MDNS.addService("http", "tcp", 80);
-        MDNS.addService("opendtu", "tcp", 80);
-        MDNS.addServiceTxt("opendtu", "tcp", "git_hash", __COMPILED_GIT_HASH__);
-
-        MessageOutput.println("done");
-    } else {
-        MessageOutput.println("Error setting up MDNS responder!");
+    if (!MDNS.begin(getHostname())) {
+        MessageOutput.printf("Error setting up MDNS responder!\r\n");
+        return;
     }
+
+    MDNS.addService("http", "tcp", 80);
+    MDNS.addService("opendtu", "tcp", 80);
+    MDNS.addServiceTxt("opendtu", "tcp", "git_hash", __COMPILED_GIT_HASH__);
+
+    MessageOutput.printf("MDNS started\r\n");
 }
 
 void NetworkSettingsClass::setupMode()
