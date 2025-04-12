@@ -255,16 +255,14 @@ void NetworkSettingsClass::loop()
             _connectRedoTimer = 0;
         } else {
             if (_connectTimeoutTimer > WIFI_RECONNECT_TIMEOUT && !_forceDisconnection) {
-                MessageOutput.print("Disable search for AP... ");
+                MessageOutput.printf("Disabling search for AP...\r\n");
                 WiFi.mode(WIFI_AP);
-                MessageOutput.println("done");
                 _connectRedoTimer = 0;
                 _forceDisconnection = true;
             }
             if (_connectRedoTimer > WIFI_RECONNECT_REDO_TIMEOUT && _forceDisconnection) {
-                MessageOutput.print("Enable search for AP... ");
+                MessageOutput.printf("Enable search for AP...\r\n");
                 WiFi.mode(WIFI_AP_STA);
-                MessageOutput.println("done");
                 applyConfig();
                 _connectTimeoutTimer = 0;
                 _forceDisconnection = false;
