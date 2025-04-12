@@ -298,25 +298,26 @@ void NetworkSettingsClass::applyConfig()
 
 void NetworkSettingsClass::setHostname()
 {
-    MessageOutput.print("Setting Hostname... ");
+    if (_networkMode == network_mode::Undefined) {
+        return;
+    }
+
+    const String hostname = getHostname();
+    bool success = false;
+
+    MessageOutput.printf("Start setting hostname...\r\n");
     if (_networkMode == network_mode::WiFi) {
-        if (WiFi.hostname(getHostname())) {
-            MessageOutput.println("done");
-        } else {
-            MessageOutput.println("failed");
-        }
+        success = WiFi.hostname(hostname);
 
         // Evil bad hack to get the hostname set up correctly
         WiFi.mode(WIFI_MODE_APSTA);
         WiFi.mode(WIFI_MODE_STA);
         setupMode();
     } else if (_networkMode == network_mode::Ethernet) {
-        if (ETH.setHostname(getHostname().c_str())) {
-            MessageOutput.println("done");
-        } else {
-            MessageOutput.println("failed");
-        }
+        success = ETH.setHostname(hostname.c_str());
     }
+
+    MessageOutput.printf("Setting hostname %s\r\n", success ? "done" : "failed");
 }
 
 void NetworkSettingsClass::setStaticIp()
