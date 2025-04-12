@@ -332,37 +332,42 @@ void NetworkSettingsClass::setHostname()
 
 void NetworkSettingsClass::setStaticIp()
 {
+    if (_networkMode == network_mode::Undefined) {
+        return;
+    }
+
+    const auto& config = Configuration.get().WiFi;
+    const char* mode = (_networkMode == network_mode::WiFi) ? "WiFi" : "Ethernet";
+    const char* ipType = config.Dhcp ? "DHCP" : "static";
+
+    MessageOutput.printf("Start configuring %s %s IP...\r\n", mode, ipType);
+
+    bool success = false;
     if (_networkMode == network_mode::WiFi) {
-        if (Configuration.get().WiFi.Dhcp) {
-            MessageOutput.print("Configuring WiFi STA DHCP IP... ");
-            WiFi.config(INADDR_NONE, INADDR_NONE, INADDR_NONE);
-            MessageOutput.println("done");
+        if (config.Dhcp) {
+            success = WiFi.config(INADDR_NONE, INADDR_NONE, INADDR_NONE);
         } else {
-            MessageOutput.print("Configuring WiFi STA static IP... ");
-            WiFi.config(
-                IPAddress(Configuration.get().WiFi.Ip),
-                IPAddress(Configuration.get().WiFi.Gateway),
-                IPAddress(Configuration.get().WiFi.Netmask),
-                IPAddress(Configuration.get().WiFi.Dns1),
-                IPAddress(Configuration.get().WiFi.Dns2));
-            MessageOutput.println("done");
+            success = WiFi.config(
+                IPAddress(config.Ip),
+                IPAddress(config.Gateway),
+                IPAddress(config.Netmask),
+                IPAddress(config.Dns1),
+                IPAddress(config.Dns2));
         }
     } else if (_networkMode == network_mode::Ethernet) {
-        if (Configuration.get().WiFi.Dhcp) {
-            MessageOutput.print("Configuring Ethernet DHCP IP... ");
-            ETH.config(INADDR_NONE, INADDR_NONE, INADDR_NONE, INADDR_NONE);
-            MessageOutput.println("done");
+        if (config.Dhcp) {
+            success = ETH.config(INADDR_NONE, INADDR_NONE, INADDR_NONE, INADDR_NONE);
         } else {
-            MessageOutput.print("Configuring Ethernet static IP... ");
-            ETH.config(
-                IPAddress(Configuration.get().WiFi.Ip),
-                IPAddress(Configuration.get().WiFi.Gateway),
-                IPAddress(Configuration.get().WiFi.Netmask),
-                IPAddress(Configuration.get().WiFi.Dns1),
-                IPAddress(Configuration.get().WiFi.Dns2));
-            MessageOutput.println("done");
+            success = ETH.config(
+                IPAddress(config.Ip),
+                IPAddress(config.Gateway),
+                IPAddress(config.Netmask),
+                IPAddress(config.Dns1),
+                IPAddress(config.Dns2));
         }
     }
+
+    MessageOutput.printf("Configure IP %s\r\n", success ? "done" : "failed");
 }
 
 IPAddress NetworkSettingsClass::localIP() const
