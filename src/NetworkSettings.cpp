@@ -279,20 +279,30 @@ void NetworkSettingsClass::loop()
 void NetworkSettingsClass::applyConfig()
 {
     setHostname();
-    if (!strcmp(Configuration.get().WiFi.Ssid, "")) {
+
+    const auto& config = Configuration.get().WiFi;
+
+    // Check if SSID is empty
+    if (!strcmp(config.Ssid, "")) {
         return;
     }
-    MessageOutput.print("Configuring WiFi STA using ");
-    if (strcmp(WiFi.SSID().c_str(), Configuration.get().WiFi.Ssid) || strcmp(WiFi.psk().c_str(), Configuration.get().WiFi.Password)) {
-        MessageOutput.print("new credentials... ");
-        WiFi.begin(
-            Configuration.get().WiFi.Ssid,
-            Configuration.get().WiFi.Password);
+
+    const bool newCredentials = strcmp(WiFi.SSID().c_str(), config.Ssid) || strcmp(WiFi.psk().c_str(), config.Password);
+
+    MessageOutput.printf("Start configuring WiFi STA using %s credentials\r\n",
+        newCredentials ? "new" : "existing");
+
+    bool success = false;
+    if (newCredentials) {
+        success = WiFi.begin(
+            config.Ssid,
+            config.Password) != WL_CONNECT_FAILED;
     } else {
-        MessageOutput.print("existing credentials... ");
-        WiFi.begin();
+        success = WiFi.begin() != WL_CONNECT_FAILED;
     }
-    MessageOutput.println("done");
+
+    MessageOutput.printf("Configuring WiFi %s\r\n", success ? "done" : "failed");
+
     setStaticIp();
 }
 
