@@ -36,9 +36,9 @@ void NetworkSettingsClass::init(Scheduler& scheduler)
         const PinMapping_t& pin = PinMapping.get();
         _w5500 = W5500::setup(pin.w5500_mosi, pin.w5500_miso, pin.w5500_sclk, pin.w5500_cs, pin.w5500_int, pin.w5500_rst);
         if (_w5500)
-            MessageOutput.println("W5500: Connection successful");
+            MessageOutput.printf("W5500: Connection successful\r\n");
         else
-            MessageOutput.println("W5500: Connection error!!");
+            MessageOutput.printf("W5500: Connection error!!\r\n");
     }
 #if CONFIG_ETH_USE_ESP32_EMAC
     else if (PinMapping.isValidEthConfig()) {
@@ -61,19 +61,19 @@ void NetworkSettingsClass::NetworkEvent(const WiFiEvent_t event, WiFiEventInfo_t
 {
     switch (event) {
     case ARDUINO_EVENT_ETH_START:
-        MessageOutput.println("ETH start");
+        MessageOutput.printf("ETH start\r\n");
         if (_networkMode == network_mode::Ethernet) {
             raiseEvent(network_event::NETWORK_START);
         }
         break;
     case ARDUINO_EVENT_ETH_STOP:
-        MessageOutput.println("ETH stop");
+        MessageOutput.printf("ETH stop\r\n");
         if (_networkMode == network_mode::Ethernet) {
             raiseEvent(network_event::NETWORK_STOP);
         }
         break;
     case ARDUINO_EVENT_ETH_CONNECTED:
-        MessageOutput.println("ETH connected");
+        MessageOutput.printf("ETH connected\r\n");
         _ethConnected = true;
         raiseEvent(network_event::NETWORK_CONNECTED);
         break;
@@ -84,14 +84,14 @@ void NetworkSettingsClass::NetworkEvent(const WiFiEvent_t event, WiFiEventInfo_t
         }
         break;
     case ARDUINO_EVENT_ETH_DISCONNECTED:
-        MessageOutput.println("ETH disconnected");
+        MessageOutput.printf("ETH disconnected\r\n");
         _ethConnected = false;
         if (_networkMode == network_mode::Ethernet) {
             raiseEvent(network_event::NETWORK_DISCONNECTED);
         }
         break;
     case ARDUINO_EVENT_WIFI_STA_CONNECTED:
-        MessageOutput.println("WiFi connected");
+        MessageOutput.printf("WiFi connected\r\n");
         if (_networkMode == network_mode::WiFi) {
             raiseEvent(network_event::NETWORK_CONNECTED);
         }
@@ -100,7 +100,7 @@ void NetworkSettingsClass::NetworkEvent(const WiFiEvent_t event, WiFiEventInfo_t
         // Reason codes can be found here: https://github.com/espressif/esp-idf/blob/5454d37d496a8c58542eb450467471404c606501/components/esp_wifi/include/esp_wifi_types_generic.h#L79-L141
         MessageOutput.printf("WiFi disconnected: %" PRIu8 "\r\n", info.wifi_sta_disconnected.reason);
         if (_networkMode == network_mode::WiFi) {
-            MessageOutput.println("Try reconnecting");
+            MessageOutput.printf("Try reconnecting\r\n");
             WiFi.disconnect(true, false);
             WiFi.begin();
             raiseEvent(network_event::NETWORK_DISCONNECTED);
@@ -208,7 +208,7 @@ void NetworkSettingsClass::loop()
     if (_ethConnected) {
         if (_networkMode != network_mode::Ethernet) {
             // Do stuff when switching to Ethernet mode
-            MessageOutput.println("Switch to Ethernet mode");
+            MessageOutput.printf("Switch to Ethernet mode\r\n");
             _networkMode = network_mode::Ethernet;
             WiFi.mode(WIFI_MODE_NULL);
             setStaticIp();
@@ -216,7 +216,7 @@ void NetworkSettingsClass::loop()
         }
     } else if (_networkMode != network_mode::WiFi) {
         // Do stuff when switching to Ethernet mode
-        MessageOutput.println("Switch to WiFi mode");
+        MessageOutput.printf("Switch to WiFi mode\r\n");
         _networkMode = network_mode::WiFi;
         enableAdminMode();
         applyConfig();
@@ -242,7 +242,7 @@ void NetworkSettingsClass::loop()
         // seconds, disable the internal Access Point
         if (_adminTimeoutCounter > _adminTimeoutCounterMax) {
             _adminEnabled = false;
-            MessageOutput.println("Admin mode disabled");
+            MessageOutput.printf("Admin mode disabled\r\n");
             setupMode();
         }
         // It's nearly not possible to use the internal AP if the
