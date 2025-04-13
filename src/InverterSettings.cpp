@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * Copyright (C) 2023-2024 Thomas Basler and others
+ * Copyright (C) 2023-2025 Thomas Basler and others
  */
 #include "InverterSettings.h"
 #include "Configuration.h"
@@ -24,68 +24,79 @@ void InverterSettingsClass::init(Scheduler& scheduler)
     const PinMapping_t& pin = PinMapping.get();
 
     // Initialize inverter communication
-    MessageOutput.print("Initialize Hoymiles interface... ");
-
+    MessageOutput.printf("Initialize Hoymiles interface...\r\n");
     Hoymiles.setMessageOutput(&MessageOutput);
     Hoymiles.init();
 
-    if (PinMapping.isValidNrf24Config() || PinMapping.isValidCmt2300Config()) {
-        if (PinMapping.isValidNrf24Config()) {
-            auto spi_bus = SpiManagerInst.claim_bus_arduino();
-            ESP_ERROR_CHECK(spi_bus ? ESP_OK : ESP_FAIL);
-
-            SPIClass* spiClass = new SPIClass(*spi_bus);
-            spiClass->begin(pin.nrf24_clk, pin.nrf24_miso, pin.nrf24_mosi, pin.nrf24_cs);
-            Hoymiles.initNRF(spiClass, pin.nrf24_en, pin.nrf24_irq);
-        }
-
-        if (PinMapping.isValidCmt2300Config()) {
-            Hoymiles.initCMT(pin.cmt_sdio, pin.cmt_clk, pin.cmt_cs, pin.cmt_fcs, pin.cmt_gpio2, pin.cmt_gpio3);
-            MessageOutput.println("  Setting country mode... ");
-            Hoymiles.getRadioCmt()->setCountryMode(static_cast<CountryModeId_t>(config.Dtu.Cmt.CountryMode));
-            MessageOutput.println("  Setting CMT target frequency... ");
-            Hoymiles.getRadioCmt()->setInverterTargetFrequency(config.Dtu.Cmt.Frequency);
-        }
-
-        MessageOutput.println("  Setting radio PA level... ");
-        Hoymiles.getRadioNrf()->setPALevel((rf24_pa_dbm_e)config.Dtu.Nrf.PaLevel);
-        Hoymiles.getRadioCmt()->setPALevel(config.Dtu.Cmt.PaLevel);
-
-        MessageOutput.println("  Setting DTU serial... ");
-        Hoymiles.getRadioNrf()->setDtuSerial(config.Dtu.Serial);
-        Hoymiles.getRadioCmt()->setDtuSerial(config.Dtu.Serial);
-
-        MessageOutput.println("  Setting poll interval... ");
-        Hoymiles.setPollInterval(config.Dtu.PollInterval);
-
-        for (uint8_t i = 0; i < INV_MAX_COUNT; i++) {
-            if (config.Inverter[i].Serial > 0) {
-                MessageOutput.printf("  Adding inverter: %0" PRIx32 "%08" PRIx32 " - %s",
-                    static_cast<uint32_t>((config.Inverter[i].Serial >> 32) & 0xFFFFFFFF),
-                    static_cast<uint32_t>(config.Inverter[i].Serial & 0xFFFFFFFF),
-                    config.Inverter[i].Name);
-                auto inv = Hoymiles.addInverter(
-                    config.Inverter[i].Name,
-                    config.Inverter[i].Serial);
-
-                if (inv != nullptr) {
-                    inv->setReachableThreshold(config.Inverter[i].ReachableThreshold);
-                    inv->setZeroValuesIfUnreachable(config.Inverter[i].ZeroRuntimeDataIfUnrechable);
-                    inv->setZeroYieldDayOnMidnight(config.Inverter[i].ZeroYieldDayOnMidnight);
-                    inv->setClearEventlogOnMidnight(config.Inverter[i].ClearEventlogOnMidnight);
-                    inv->Statistics()->setYieldDayCorrection(config.Inverter[i].YieldDayCorrection);
-                    for (uint8_t c = 0; c < INV_MAX_CHAN_COUNT; c++) {
-                        inv->Statistics()->setStringMaxPower(c, config.Inverter[i].channel[c].MaxChannelPower);
-                        inv->Statistics()->setChannelFieldOffset(TYPE_DC, static_cast<ChannelNum_t>(c), FLD_YT, config.Inverter[i].channel[c].YieldTotalOffset);
-                    }
-                }
-                MessageOutput.println(" done");
-            }
-        }
-        MessageOutput.println("done");
-    } else {
-        MessageOutput.println("Invalid pin config");
+    if (!PinMapping.isValidNrf24Config() && !PinMapping.isValidCmt2300Config()) {
+        MessageOutput.printf("Invalid pin config\r\n");
+        return;
     }
+
+    // Initialize NRF24 if configured
+    if (PinMapping.isValidNrf24Config()) {
+        MessageOutput.printf("NRF: Initialize communication\r\n");
+        auto spi_bus = SpiManagerInst.claim_bus_arduino();
+        ESP_ERROR_CHECK(spi_bus ? ESP_OK : ESP_FAIL);
+
+        SPIClass* spiClass = new SPIClass(*spi_bus);
+        spiClass->begin(pin.nrf24_clk, pin.nrf24_miso, pin.nrf24_mosi, pin.nrf24_cs);
+        Hoymiles.initNRF(spiClass, pin.nrf24_en, pin.nrf24_irq);
+    }
+
+    // Initialize CMT2300 if configured
+    if (PinMapping.isValidCmt2300Config()) {
+        MessageOutput.printf("CMT2300A: Initialize communication\r\n");
+        Hoymiles.initCMT(pin.cmt_sdio, pin.cmt_clk, pin.cmt_cs, pin.cmt_fcs, pin.cmt_gpio2, pin.cmt_gpio3);
+        MessageOutput.printf("CMT2300A: Setting country mode...\r\n");
+        Hoymiles.getRadioCmt()->setCountryMode(static_cast<CountryModeId_t>(config.Dtu.Cmt.CountryMode));
+        MessageOutput.printf("CMT2300A: Setting CMT target frequency...\r\n");
+        Hoymiles.getRadioCmt()->setInverterTargetFrequency(config.Dtu.Cmt.Frequency);
+    }
+
+    // Configure common radio settings
+    MessageOutput.printf("RF: Setting radio PA level...\r\n");
+    Hoymiles.getRadioNrf()->setPALevel((rf24_pa_dbm_e)config.Dtu.Nrf.PaLevel);
+    Hoymiles.getRadioCmt()->setPALevel(config.Dtu.Cmt.PaLevel);
+
+    MessageOutput.printf("RF: Setting DTU serial...\r\n");
+    Hoymiles.getRadioNrf()->setDtuSerial(config.Dtu.Serial);
+    Hoymiles.getRadioCmt()->setDtuSerial(config.Dtu.Serial);
+
+    MessageOutput.printf("RF: Setting poll interval...\r\n");
+    Hoymiles.setPollInterval(config.Dtu.PollInterval);
+
+    // Configure inverters
+    for (uint8_t i = 0; i < INV_MAX_COUNT; i++) {
+        const auto& inv_cfg = config.Inverter[i];
+        if (inv_cfg.Serial == 0) {
+            continue;
+        }
+
+        MessageOutput.printf("Adding inverter: %0" PRIx32 "%08" PRIx32 " - %s\r\n",
+            static_cast<uint32_t>((inv_cfg.Serial >> 32) & 0xFFFFFFFF),
+            static_cast<uint32_t>(inv_cfg.Serial & 0xFFFFFFFF),
+            inv_cfg.Name);
+
+        auto inv = Hoymiles.addInverter(inv_cfg.Name, inv_cfg.Serial);
+        if (inv == nullptr) {
+            MessageOutput.printf("Adding inverter failed: Unsupported type\r\n");
+            continue;
+        }
+
+        inv->setReachableThreshold(inv_cfg.ReachableThreshold);
+        inv->setZeroValuesIfUnreachable(inv_cfg.ZeroRuntimeDataIfUnrechable);
+        inv->setZeroYieldDayOnMidnight(inv_cfg.ZeroYieldDayOnMidnight);
+        inv->setClearEventlogOnMidnight(inv_cfg.ClearEventlogOnMidnight);
+        inv->Statistics()->setYieldDayCorrection(inv_cfg.YieldDayCorrection);
+        for (uint8_t c = 0; c < INV_MAX_CHAN_COUNT; c++) {
+            inv->Statistics()->setStringMaxPower(c, inv_cfg.channel[c].MaxChannelPower);
+            inv->Statistics()->setChannelFieldOffset(TYPE_DC, static_cast<ChannelNum_t>(c), FLD_YT, inv_cfg.channel[c].YieldTotalOffset);
+        }
+
+        MessageOutput.printf("Adding complete\r\n");
+    }
+    MessageOutput.printf("Initialization complete\r\n");
 
     scheduler.addTask(_hoyTask);
     _hoyTask.enable();
