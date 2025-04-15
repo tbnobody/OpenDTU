@@ -86,9 +86,33 @@ void MqttSettingsClass::onMqttDisconnect(espMqttClientTypes::DisconnectReason re
 
 void MqttSettingsClass::onMqttMessage(const espMqttClientTypes::MessageProperties& properties, const char* topic, const uint8_t* payload, const size_t len, const size_t index, const size_t total)
 {
-    ESP_LOGD(TAG, "Received MQTT message on topic: %s", topic);
+    ESP_LOGD(TAG, "Received MQTT message on topic '%s' (Bytes %zu-%zu/%zu)",
+        topic, index + 1, (index + len), total);
 
-    _mqttSubscribeParser.handle_message(properties, topic, payload, len);
+    // shortcut for most MQTT messages, which are not fragmented
+    if (index == 0 && len == total) {
+        return _mqttSubscribeParser.handle_message(properties, topic, payload, len);
+    }
+
+    auto& fragment = _fragments[String(topic)];
+
+    // first fragment of a new message
+    if (index == 0) {
+        fragment.clear();
+        fragment.reserve(total);
+    }
+
+    fragment.insert(fragment.end(), payload, payload + len);
+
+    if (fragment.size() < total) {
+        return;
+    } // wait for last fragment
+
+    ESP_LOGD(TAG, "Fragmented MQTT message reassembled for topic '%s'", topic);
+
+    _mqttSubscribeParser.handle_message(properties, topic, fragment.data(), total);
+
+    _fragments.erase(String(topic));
 }
 
 void MqttSettingsClass::performConnect()

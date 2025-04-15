@@ -6,6 +6,8 @@
 #include <Ticker.h>
 #include <espMqttClient.h>
 #include <mutex>
+#include <map>
+#include <vector>
 
 class MqttSettingsClass {
 public:
@@ -36,6 +38,7 @@ private:
 
     MqttClient* _mqttClient = nullptr;
     Ticker _mqttReconnectTimer;
+    std::map<String, std::vector<uint8_t>> _fragments;
     MqttSubscribeParser _mqttSubscribeParser;
     std::mutex _clientLock;
 };
