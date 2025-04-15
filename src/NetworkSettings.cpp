@@ -206,6 +206,13 @@ void NetworkSettingsClass::enableAdminMode()
     setupMode();
 }
 
+void NetworkSettingsClass::disableAdminMode()
+{
+    _adminEnabled = false;
+    MessageOutput.printf("Admin mode disabled\r\n");
+    setupMode();
+}
+
 String NetworkSettingsClass::getApName() const
 {
     return String(ACCESS_POINT_NAME + String(Utils::getChipId()));
@@ -249,9 +256,7 @@ void NetworkSettingsClass::loop()
         // If WiFi is connected to AP for more than adminTimeoutCounterMax
         // seconds, disable the internal Access Point
         if (_adminTimeoutCounter > _adminTimeoutCounterMax) {
-            _adminEnabled = false;
-            MessageOutput.printf("Admin mode disabled\r\n");
-            setupMode();
+            disableAdminMode();
         }
         // It's nearly not possible to use the internal AP if the
         // WiFi is searching for an AP. So disable searching afer

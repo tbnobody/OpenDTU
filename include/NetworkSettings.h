@@ -64,6 +64,7 @@ private:
     void handleMDNS();
     void setupMode();
     void NetworkEvent(const WiFiEvent_t event, WiFiEventInfo_t info);
+    void disableAdminMode();
 
     Task _loopTask;
 
