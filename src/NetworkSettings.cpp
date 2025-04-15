@@ -101,6 +101,7 @@ void NetworkSettingsClass::NetworkEvent(const WiFiEvent_t event, WiFiEventInfo_t
         MessageOutput.printf("WiFi disconnected: %" PRIu8 "\r\n", info.wifi_sta_disconnected.reason);
         if (_networkMode == network_mode::WiFi) {
             MessageOutput.printf("Try reconnecting\r\n");
+            _lastReconnectAttempt = millis();
             WiFi.disconnect(true, false);
             WiFi.begin();
             raiseEvent(network_event::NETWORK_DISCONNECTED);
@@ -213,6 +214,12 @@ void NetworkSettingsClass::disableAdminMode()
     setupMode();
 }
 
+bool NetworkSettingsClass::wifiConfigured() const
+{
+    // Check if SSID is empty
+    return strcmp(Configuration.get().WiFi.Ssid, "");
+}
+
 String NetworkSettingsClass::getApName() const
 {
     return String(ACCESS_POINT_NAME + String(Utils::getChipId()));
@@ -244,6 +251,18 @@ void NetworkSettingsClass::loop()
                 MessageOutput.printf("Admin AP remaining seconds: %" PRIu32 " / %" PRIu32 "\r\n", _adminTimeoutCounter, _adminTimeoutCounterMax);
             }
         }
+        if (_performConnection && !isConnected() && wifiConfigured() && millis() - _lastReconnectAttempt > 60000) {
+            MessageOutput.printf("Wifi reconnect watchdog triggered... Resetting Wifi hardware\r\n");
+            WiFi.disconnect(true, false);
+            WiFi.mode(WIFI_MODE_NULL);
+            if (_adminEnabled) {
+                // Call enableAdminMode to reset all the timeout values.
+                // Otherwise the search for AP gets disabled immediatly after wifi reset.
+                enableAdminMode();
+            }
+            applyConfig();
+            _lastReconnectAttempt = millis(); // Just in case if the reconnect method gets not triggered
+        }
         _connectTimeoutTimer++;
         _connectRedoTimer++;
         _lastTimerCall = millis();
@@ -265,18 +284,18 @@ void NetworkSettingsClass::loop()
             _connectTimeoutTimer = 0;
             _connectRedoTimer = 0;
         } else {
-            if (_connectTimeoutTimer > WIFI_RECONNECT_TIMEOUT && !_forceDisconnection) {
+            if (_connectTimeoutTimer > WIFI_RECONNECT_TIMEOUT && _performConnection) {
                 MessageOutput.printf("Disabling search for AP...\r\n");
                 WiFi.mode(WIFI_AP);
                 _connectRedoTimer = 0;
-                _forceDisconnection = true;
+                _performConnection = false;
             }
-            if (_connectRedoTimer > WIFI_RECONNECT_REDO_TIMEOUT && _forceDisconnection) {
+            if (_connectRedoTimer > WIFI_RECONNECT_REDO_TIMEOUT && !_performConnection) {
                 MessageOutput.printf("Enable search for AP...\r\n");
                 WiFi.mode(WIFI_AP_STA);
                 applyConfig();
                 _connectTimeoutTimer = 0;
-                _forceDisconnection = false;
+                _performConnection = true;
             }
         }
     }
@@ -293,8 +312,7 @@ void NetworkSettingsClass::applyConfig()
 
     const auto& config = Configuration.get().WiFi;
 
-    // Check if SSID is empty
-    if (!strcmp(config.Ssid, "")) {
+    if (!wifiConfigured()) {
         return;
     }
 
