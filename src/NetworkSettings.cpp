@@ -194,9 +194,9 @@ void NetworkSettingsClass::setupMode()
 
 void NetworkSettingsClass::enableAdminMode()
 {
-    _adminEnabled = true;
     _adminTimeoutCounter = 0;
     _adminTimeoutCounterMax = Configuration.get().WiFi.ApTimeout * 60;
+    _adminEnabled = true;
     setupMode();
 }
 
