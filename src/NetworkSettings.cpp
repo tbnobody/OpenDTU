@@ -194,6 +194,12 @@ void NetworkSettingsClass::setupMode()
 
 void NetworkSettingsClass::enableAdminMode()
 {
+    // This prevents a immediate "Disabling search for AP" when
+    // the network connection persists for a long time and the
+    // credentials gets changed.
+    _connectTimeoutTimer = 0;
+    _connectRedoTimer = 0;
+
     _adminTimeoutCounter = 0;
     _adminTimeoutCounterMax = Configuration.get().WiFi.ApTimeout * 60;
     _adminEnabled = true;
