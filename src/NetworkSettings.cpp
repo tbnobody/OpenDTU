@@ -484,7 +484,7 @@ String NetworkSettingsClass::getHostname()
 
 bool NetworkSettingsClass::isConnected() const
 {
-    return WiFi.localIP()[0] != 0 || ETH.localIP()[0] != 0;
+    return (WiFi.localIP()[0] != 0 && WiFi.isConnected() ) || ETH.localIP()[0] != 0;
 }
 
 network_mode NetworkSettingsClass::NetworkMode() const
