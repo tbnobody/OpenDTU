@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * Copyright (C) 2022-2024 Thomas Basler and others
+ * Copyright (C) 2022-2025 Thomas Basler and others
  */
 #include "Configuration.h"
 #include "Datastore.h"
@@ -41,96 +41,81 @@ void setup()
         yield();
 #endif
     MessageOutput.init(scheduler);
-    MessageOutput.println();
-    MessageOutput.println("Starting OpenDTU");
+    MessageOutput.printf("Starting OpenDTU\r\n");
 
     // Initialize file system
-    MessageOutput.print("Initialize FS... ");
+    MessageOutput.printf("Mounting FS...\r\n");
     if (!LittleFS.begin(false)) { // Do not format if mount failed
-        MessageOutput.print("failed... trying to format...");
-        if (!LittleFS.begin(true)) {
-            MessageOutput.print("success");
-        } else {
-            MessageOutput.print("failed");
-        }
-    } else {
-        MessageOutput.println("done");
+        MessageOutput.printf("Failed mounting FS... Trying to format...\r\n");
+        const bool success = LittleFS.begin(true);
+        MessageOutput.printf("FS reformat %s\r\n", success ? "successful" : "failed");
     }
 
     // Read configuration values
+    MessageOutput.printf("Reading configuration...\r\n");
     Configuration.init(scheduler);
-    MessageOutput.print("Reading configuration... ");
     if (!Configuration.read()) {
-        if (Configuration.write()) {
-            MessageOutput.print("written... ");
-        } else {
-            MessageOutput.print("failed... ");
-        }
+        bool success = Configuration.write();
+        MessageOutput.printf("Failed to read configuration. New default configuration written %s\r\n",
+            success ? "successful" : "failed");
     }
     if (Configuration.get().Cfg.Version != CONFIG_VERSION) {
-        MessageOutput.print("migrated... ");
+        MessageOutput.printf("Performing configuration migration from %" PRIX32 " to %" PRIX32 "\r\n",
+            Configuration.get().Cfg.Version, CONFIG_VERSION);
         Configuration.migrate();
     }
-    MessageOutput.println("done");
 
     // Read languate pack
-    MessageOutput.print("Reading language pack... ");
+    MessageOutput.printf("Reading language pack...\r\n");
     I18n.init(scheduler);
-    MessageOutput.println("done");
 
     // Load PinMapping
-    MessageOutput.print("Reading PinMapping... ");
+    MessageOutput.printf("Reading PinMapping...\r\n");
     if (PinMapping.init(Configuration.get().Dev_PinMapping)) {
-        MessageOutput.print("found valid mapping ");
+        MessageOutput.printf("Found valid mapping\r\n");
     } else {
-        MessageOutput.print("using default config ");
+        MessageOutput.printf("Didn't found valid mapping. Using default.\r\n");
     }
-    MessageOutput.println("done");
 
     // Initialize Network
-    MessageOutput.print("Initialize Network... ");
+    MessageOutput.printf("Initializing Network...\r\n");
     NetworkSettings.init(scheduler);
-    MessageOutput.println("done");
     NetworkSettings.applyConfig();
 
     // Initialize NTP
-    MessageOutput.print("Initialize NTP... ");
+    MessageOutput.printf("Initializing NTP...\r\n");
     NtpSettings.init();
-    MessageOutput.println("done");
 
     // Initialize SunPosition
-    MessageOutput.print("Initialize SunPosition... ");
+    MessageOutput.printf("Initializing SunPosition...\r\n");
     SunPosition.init(scheduler);
-    MessageOutput.println("done");
 
     // Initialize MqTT
-    MessageOutput.print("Initialize MqTT... ");
+    MessageOutput.printf("Initializing MQTT...\r\n");
     MqttSettings.init();
     MqttHandleDtu.init(scheduler);
     MqttHandleInverter.init(scheduler);
     MqttHandleInverterTotal.init(scheduler);
     MqttHandleHass.init(scheduler);
-    MessageOutput.println("done");
 
     // Initialize WebApi
-    MessageOutput.print("Initialize WebApi... ");
+    MessageOutput.printf("Initializing WebApi...\r\n");
     WebApi.init(scheduler);
-    MessageOutput.println("done");
 
     // Initialize Display
-    MessageOutput.print("Initialize Display... ");
+    MessageOutput.printf("Initializing Display...\r\n");
     Display.init(scheduler);
-    MessageOutput.println("done");
 
     // Initialize Single LEDs
-    MessageOutput.print("Initialize LEDs... ");
+    MessageOutput.printf("Initializing LEDs...\r\n");
     LedSingle.init(scheduler);
-    MessageOutput.println("done");
 
     InverterSettings.init(scheduler);
 
     Datastore.init(scheduler);
     RestartHelper.init(scheduler);
+
+    MessageOutput.printf("Startup complete\r\n");
 }
 
 void loop()
