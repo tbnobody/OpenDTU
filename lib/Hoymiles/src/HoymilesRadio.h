@@ -8,7 +8,12 @@
 #include <TimeoutHelper.h>
 
 #ifdef HOY_DEBUG_QUEUE
-#define DEBUG_PRINT(fmt, args...) Serial.printf(fmt, ##args)
+#include <esp_log.h>
+
+#undef TAG
+static const char* TAG = "hoymiles";
+
+#define DEBUG_PRINT(fmt, args...) ESP_LOGD(TAG, fmt, ##args)
 #else
 #define DEBUG_PRINT(fmt, args...) /* Don't do anything in release builds */
 #endif
@@ -28,8 +33,8 @@ public:
 
     void enqueCommand(std::shared_ptr<CommandAbstract> cmd)
     {
-        DEBUG_PRINT("Queue size before: %ld\n", _commandQueue.size());
-        DEBUG_PRINT("Handling command %s with type %d\n", cmd.get()->getCommandName().c_str(), static_cast<uint8_t>(cmd.get()->getQueueInsertType()));
+        DEBUG_PRINT("Queue size before: %ld", _commandQueue.size());
+        DEBUG_PRINT("Handling command %s with type %d", cmd.get()->getCommandName().c_str(), static_cast<uint8_t>(cmd.get()->getQueueInsertType()));
         switch (cmd.get()->getQueueInsertType()) {
         case QueueInsertType::RemoveOldest:
             _commandQueue.removeDuplicatedEntries(cmd);
@@ -39,7 +44,7 @@ public:
             // and replaces the existing one with the new one.
             // (The new one will not be pushed at the end of the queue)
             if (_commandQueue.countSimilarCommands(cmd) > 0) {
-                DEBUG_PRINT("    ... existing entry will be replaced\n");
+                DEBUG_PRINT("    ... existing entry will be replaced");
                 _commandQueue.replaceEntries(cmd);
                 return;
             }
@@ -48,7 +53,7 @@ public:
             // Checks if the queue already contains a command like the new one
             // and drops the new one. The new one will not be inserted.
             if (_commandQueue.countSimilarCommands(cmd) > 0) {
-                DEBUG_PRINT("    ... new entry will be dropped\n");
+                DEBUG_PRINT("    ... new entry will be dropped");
                 return;
             }
             break;
@@ -58,10 +63,10 @@ public:
         }
 
         // Push the command into the queue if we reach this position of the code
-        DEBUG_PRINT("    ... new entry will be appended\n");
+        DEBUG_PRINT("    ... new entry will be appended");
         _commandQueue.push(cmd);
 
-        DEBUG_PRINT("Queue size after: %ld\n", _commandQueue.size());
+        DEBUG_PRINT("Queue size after: %ld", _commandQueue.size());
     }
 
     template <typename T>

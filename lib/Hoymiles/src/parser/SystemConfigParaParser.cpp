@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * Copyright (C) 2022 - 2024 Thomas Basler and others
+ * Copyright (C) 2022 - 2025 Thomas Basler and others
  */
 
 /*
@@ -17,8 +17,11 @@ Data structure:
 ID   Source Addr   Target Addr   Idx  ?       Limit percent   ?       ?       ?       ?       ?       CRC16   CRC8
 */
 #include "SystemConfigParaParser.h"
-#include "../Hoymiles.h"
 #include <cstring>
+#include <esp_log.h>
+
+#undef TAG
+static const char* TAG = "hoymiles";
 
 SystemConfigParaParser::SystemConfigParaParser()
     : Parser()
@@ -35,7 +38,7 @@ void SystemConfigParaParser::clearBuffer()
 void SystemConfigParaParser::appendFragment(const uint8_t offset, const uint8_t* payload, const uint8_t len)
 {
     if (offset + len > (SYSTEM_CONFIG_PARA_SIZE)) {
-        Hoymiles.getMessageOutput()->printf("FATAL: (%s, %d) stats packet too large for buffer\n", __FILE__, __LINE__);
+        ESP_LOGE(TAG, "(%s, %d) stats packet too large for buffer", __FILE__, __LINE__);
         return;
     }
     memcpy(&_payload[offset], payload, len);

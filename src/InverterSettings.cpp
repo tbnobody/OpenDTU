@@ -4,7 +4,6 @@
  */
 #include "InverterSettings.h"
 #include "Configuration.h"
-#include "MessageOutput.h"
 #include "PinMapping.h"
 #include "SunPosition.h"
 #include <Hoymiles.h>
@@ -28,7 +27,6 @@ void InverterSettingsClass::init(Scheduler& scheduler)
 
     // Initialize inverter communication
     ESP_LOGI(TAG, "Initialize Hoymiles interface...");
-    Hoymiles.setMessageOutput(&MessageOutput);
     Hoymiles.init();
 
     if (!PinMapping.isValidNrf24Config() && !PinMapping.isValidCmt2300Config()) {
