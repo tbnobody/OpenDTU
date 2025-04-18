@@ -380,7 +380,8 @@
             "VirtualDebugConsole": "Consola de Depuración Virtual",
             "EnableAutoScroll": "Habilitar Desplazamiento Automático",
             "ClearConsole": "Limpiar Consola",
-            "CopyToClipboard": "Copiar al Portapapeles"
+            "CopyToClipboard": "Copiar al Portapapeles",
+            "Download": "Download"
         },
         "inverterchannelinfo": {
             "String": "Cadena {num}",

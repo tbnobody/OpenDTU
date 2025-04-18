@@ -365,7 +365,8 @@
         "VirtualDebugConsole": "Virtual Debug Console",
         "EnableAutoScroll": "Enable Auto Scroll",
         "ClearConsole": "Clear Console",
-        "CopyToClipboard": "Copy to clipboard"
+        "CopyToClipboard": "Copy to clipboard",
+        "Download": "Download"
     },
     "inverterchannelinfo": {
         "String": "String {num}",

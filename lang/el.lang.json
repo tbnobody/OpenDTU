@@ -380,7 +380,8 @@
             "VirtualDebugConsole": "Εικονική κονσόλα εντοπισμού σφαλμάτων",
             "EnableAutoScroll": "Ενεργοποίηση αυτόματης κύλισης",
             "ClearConsole": "Εκκαθάριση κονσόλας",
-            "CopyToClipboard": "Αντιγραφή στο πρόχειρο"
+            "CopyToClipboard": "Αντιγραφή στο πρόχειρο",
+            "Download": "Download"
         },
         "inverterchannelinfo": {
             "String": "Είσοδος {num}",

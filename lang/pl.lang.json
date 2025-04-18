@@ -380,7 +380,8 @@
             "VirtualDebugConsole": "Wirtualna konsola debugowania",
             "EnableAutoScroll": "Włącz automatyczne przewijani",
             "ClearConsole": "Wyczyść konsolę",
-            "CopyToClipboard": "Kopiuj do schowka"
+            "CopyToClipboard": "Kopiuj do schowka",
+            "Download": "Download"
         },
         "inverterchannelinfo": {
             "String": "Numer panelu {num}",

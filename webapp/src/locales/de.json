@@ -365,7 +365,8 @@
         "VirtualDebugConsole": "Virtuelle Debug-Konsole",
         "EnableAutoScroll": "Automatisches Scrollen aktivieren",
         "ClearConsole": "Konsole leeren",
-        "CopyToClipboard": "In die Zwischenablage kopieren"
+        "CopyToClipboard": "In die Zwischenablage kopieren",
+        "Download": "Herunterladen"
     },
     "inverterchannelinfo": {
         "String": "String {num}",

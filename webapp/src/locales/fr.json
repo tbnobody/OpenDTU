@@ -347,7 +347,8 @@
         "VirtualDebugConsole": "Console de débogage",
         "EnableAutoScroll": "Activer le défilement automatique",
         "ClearConsole": "Vider la console",
-        "CopyToClipboard": "Copier dans le presse-papiers"
+        "CopyToClipboard": "Copier dans le presse-papiers",
+        "Download": "Download"
     },
     "inverterchannelinfo": {
         "String": "Ligne {num}",
