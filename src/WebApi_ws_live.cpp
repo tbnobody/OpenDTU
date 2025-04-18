@@ -112,9 +112,9 @@ void WebApiWsLiveClass::sendDataTaskCb()
             _ws.textAll(buffer);
 
         } catch (const std::bad_alloc& bad_alloc) {
-            MessageOutput.printf("Call to /api/livedata/status temporarely out of resources. Reason: \"%s\".\r\n", bad_alloc.what());
+            MessageOutput.printf("Call to /api/livedata/status temporarely out of resources. Reason: \"%s\".\n", bad_alloc.what());
         } catch (const std::exception& exc) {
-            MessageOutput.printf("Unknown exception in /api/livedata/status. Reason: \"%s\".\r\n", exc.what());
+            MessageOutput.printf("Unknown exception in /api/livedata/status. Reason: \"%s\".\n", exc.what());
         }
     }
 }
@@ -237,9 +237,9 @@ void WebApiWsLiveClass::addTotalField(JsonObject& root, const String& name, cons
 void WebApiWsLiveClass::onWebsocketEvent(AsyncWebSocket* server, AsyncWebSocketClient* client, AwsEventType type, void* arg, uint8_t* data, size_t len)
 {
     if (type == WS_EVT_CONNECT) {
-        MessageOutput.printf("Websocket: [%s][%" PRIu32 "] connect\r\n", server->url(), client->id());
+        MessageOutput.printf("Websocket: [%s][%" PRIu32 "] connect\n", server->url(), client->id());
     } else if (type == WS_EVT_DISCONNECT) {
-        MessageOutput.printf("Websocket: [%s][%" PRIu32 "] disconnect\r\n", server->url(), client->id());
+        MessageOutput.printf("Websocket: [%s][%" PRIu32 "] disconnect\n", server->url(), client->id());
     }
 }
 
@@ -281,10 +281,10 @@ void WebApiWsLiveClass::onLivedataStatus(AsyncWebServerRequest* request)
         WebApi.sendJsonResponse(request, response, __FUNCTION__, __LINE__);
 
     } catch (const std::bad_alloc& bad_alloc) {
-        MessageOutput.printf("Call to /api/livedata/status temporarely out of resources. Reason: \"%s\".\r\n", bad_alloc.what());
+        MessageOutput.printf("Call to /api/livedata/status temporarely out of resources. Reason: \"%s\".\n", bad_alloc.what());
         WebApi.sendTooManyRequests(request);
     } catch (const std::exception& exc) {
-        MessageOutput.printf("Unknown exception in /api/livedata/status. Reason: \"%s\".\r\n", exc.what());
+        MessageOutput.printf("Unknown exception in /api/livedata/status. Reason: \"%s\".\n", exc.what());
         WebApi.sendTooManyRequests(request);
     }
 }

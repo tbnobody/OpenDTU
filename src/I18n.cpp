@@ -61,7 +61,7 @@ void I18nClass::readDisplayStrings(
     // Deserialize the JSON document
     const DeserializationError error = deserializeJson(doc, f, DeserializationOption::Filter(filter));
     if (error) {
-        MessageOutput.printf("Failed to read file %s\r\n", filename.c_str());
+        MessageOutput.printf("Failed to read file %s\n", filename.c_str());
         f.close();
         return;
     }
@@ -114,7 +114,7 @@ void I18nClass::readLangPacks()
 
     while (file != "") {
         if (file.endsWith(LANG_PACK_SUFFIX)) {
-            MessageOutput.printf("Read File %s\r\n", file.c_str());
+            MessageOutput.printf("Read File %s\n", file.c_str());
             readConfig(file);
         }
         file = root.getNextFileName();
@@ -134,7 +134,7 @@ void I18nClass::readConfig(String file)
     // Deserialize the JSON document
     const DeserializationError error = deserializeJson(doc, f, DeserializationOption::Filter(filter));
     if (error) {
-        MessageOutput.printf("Failed to read file %s\r\n", file.c_str());
+        MessageOutput.printf("Failed to read file %s\n", file.c_str());
         f.close();
         return;
     }
@@ -151,7 +151,7 @@ void I18nClass::readConfig(String file)
     if (lang.code != "" && lang.name != "") {
         _availLanguages.push_back(lang);
     } else {
-        MessageOutput.printf("Invalid meta data\r\n");
+        MessageOutput.printf("Invalid meta data\n");
     }
 
     f.close();

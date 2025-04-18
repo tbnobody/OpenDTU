@@ -113,12 +113,12 @@ void WebApiPrometheusClass::onPrometheusMetricsGet(AsyncWebServerRequest* reques
         stream->addHeader("Cache-Control", "no-cache");
         if (stream->available() > initialResponseBufferSize) {
             initialResponseBufferSize = stream->available();
-            MessageOutput.printf("Increased /api/prometheus/metrics initialResponseBufferSize to %" PRIu32 " bytes\r\n", initialResponseBufferSize);
+            MessageOutput.printf("Increased /api/prometheus/metrics initialResponseBufferSize to %" PRIu32 " bytes\n", initialResponseBufferSize);
         }
         request->send(stream);
 
     } catch (std::bad_alloc& bad_alloc) {
-        MessageOutput.printf("Call to /api/prometheus/metrics temporarely out of resources. Reason: \"%s\".\r\n", bad_alloc.what());
+        MessageOutput.printf("Call to /api/prometheus/metrics temporarely out of resources. Reason: \"%s\".\n", bad_alloc.what());
 
         WebApi.sendTooManyRequests(request);
     }

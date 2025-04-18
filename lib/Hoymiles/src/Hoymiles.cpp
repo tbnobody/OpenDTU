@@ -63,7 +63,7 @@ void HoymilesClass::loop()
         }
 
         if (iv->getEnablePolling() || iv->getEnableCommands()) {
-            _messageOutput->printf("Fetch inverter: %s\r\n", iv->serialString().c_str());
+            _messageOutput->printf("Fetch inverter: %s\n", iv->serialString().c_str());
 
             if (!iv->isReachable()) {
                 iv->sendChangeChannelRequest();
@@ -80,7 +80,7 @@ void HoymilesClass::loop()
                 // Fetch limit
                 if (((millis() - iv->SystemConfigPara()->getLastUpdateRequest() > HOY_SYSTEM_CONFIG_PARA_POLL_INTERVAL)
                         && (millis() - iv->SystemConfigPara()->getLastUpdateCommand() > HOY_SYSTEM_CONFIG_PARA_POLL_MIN_DURATION))) {
-                    _messageOutput->printf("Request SystemConfigPara\r\n");
+                    _messageOutput->printf("Request SystemConfigPara\n");
                     iv->sendSystemConfigParaRequest();
                 }
 
@@ -96,13 +96,13 @@ void HoymilesClass::loop()
                         && iv->DevInfo()->getLastUpdateSimple() > 0;
 
                     if (invalidDevInfo) {
-                        _messageOutput->printf("DevInfo: No Valid Data\r\n");
+                        _messageOutput->printf("DevInfo: No Valid Data\n");
                     }
 
                     if ((iv->DevInfo()->getLastUpdateAll() == 0)
                         || (iv->DevInfo()->getLastUpdateSimple() == 0)
                         || invalidDevInfo) {
-                        _messageOutput->printf("Request device info\r\n");
+                        _messageOutput->printf("Request device info\n");
                         iv->sendDevInfoRequest();
                     }
                 }
@@ -110,17 +110,17 @@ void HoymilesClass::loop()
 
             // Set limit if required
             if (iv->SystemConfigPara()->getLastLimitCommandSuccess() == CMD_NOK) {
-                _messageOutput->printf("Resend ActivePowerControl\r\n");
+                _messageOutput->printf("Resend ActivePowerControl\n");
                 iv->resendActivePowerControlRequest();
             }
 
             // Set power status if required
             if (iv->PowerCommand()->getLastPowerCommandSuccess() == CMD_NOK) {
-                _messageOutput->printf("Resend PowerCommand\r\n");
+                _messageOutput->printf("Resend PowerCommand\n");
                 iv->resendPowerControlRequest();
             }
 
-            _messageOutput->printf("Queue size - NRF: %" PRIu32 " CMT: %" PRIu32 "\r\n", _radioNrf->getQueueSize(), _radioCmt->getQueueSize());
+            _messageOutput->printf("Queue size - NRF: %" PRIu32 " CMT: %" PRIu32 "\n", _radioNrf->getQueueSize(), _radioCmt->getQueueSize());
             _lastPoll = millis();
         }
 

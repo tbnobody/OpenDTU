@@ -126,7 +126,7 @@ void MessageOutputClass::send_ws_chunk(message_t&& line)
         // won't be copying chunks around to avoid this. we do however,
         // avoid adding the warning multiple times.
         if (client.queueIsFull() && !added_warning) {
-            static char const warningStr[] = "\r\nWARNING: websocket client's queue is full, expect log lines missing\r\n";
+            static char const warningStr[] = "\nWARNING: websocket client's queue is full, expect log lines missing\n";
             _ws_chunk->insert(_ws_chunk->end(), warningStr, warningStr + sizeof(warningStr) - 1);
             added_warning = true;
         }

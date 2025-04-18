@@ -377,7 +377,7 @@ void GridProfileParser::clearBuffer()
 void GridProfileParser::appendFragment(const uint8_t offset, const uint8_t* payload, const uint8_t len)
 {
     if (offset + len > GRID_PROFILE_SIZE) {
-        Hoymiles.getMessageOutput()->printf("FATAL: (%s, %d) grid profile packet too large for buffer\r\n", __FILE__, __LINE__);
+        Hoymiles.getMessageOutput()->printf("FATAL: (%s, %d) grid profile packet too large for buffer\n", __FILE__, __LINE__);
         return;
     }
     memcpy(&_payloadGridProfile[offset], payload, len);

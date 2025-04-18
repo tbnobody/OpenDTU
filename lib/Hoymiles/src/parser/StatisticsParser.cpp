@@ -89,7 +89,7 @@ void StatisticsParser::clearBuffer()
 void StatisticsParser::appendFragment(const uint8_t offset, const uint8_t* payload, const uint8_t len)
 {
     if (offset + len > STATISTIC_PACKET_SIZE) {
-        Hoymiles.getMessageOutput()->printf("FATAL: (%s, %d) stats packet too large for buffer\r\n", __FILE__, __LINE__);
+        Hoymiles.getMessageOutput()->printf("FATAL: (%s, %d) stats packet too large for buffer\n", __FILE__, __LINE__);
         return;
     }
     memcpy(&_payloadStatistic[offset], payload, len);
@@ -109,7 +109,7 @@ void StatisticsParser::endAppendFragment()
         // check if current yield day is smaller then last cached yield day
         if (getChannelFieldValue(TYPE_DC, c, FLD_YD) < _lastYieldDay[static_cast<uint8_t>(c)]) {
             // currently all values are zero --> Add last known values to offset
-            Hoymiles.getMessageOutput()->printf("Yield Day reset detected!\r\n");
+            Hoymiles.getMessageOutput()->printf("Yield Day reset detected!\n");
 
             setChannelFieldOffset(TYPE_DC, c, FLD_YD, _lastYieldDay[static_cast<uint8_t>(c)]);
 

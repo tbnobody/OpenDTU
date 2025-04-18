@@ -169,7 +169,7 @@ void MqttHandleInverterClass::onMqttMessage(Topic t, const espMqttClientTypes::M
     auto inv = Hoymiles.getInverterBySerial(serial);
 
     if (inv == nullptr) {
-        MessageOutput.printf("Inverter not found\r\n");
+        MessageOutput.printf("Inverter not found\n");
         return;
     }
 
@@ -178,7 +178,7 @@ void MqttHandleInverterClass::onMqttMessage(Topic t, const espMqttClientTypes::M
     try {
         payload_val = std::stof(strValue);
     } catch (std::invalid_argument const& e) {
-        MessageOutput.printf("MQTT handler: cannot parse payload of topic '%s' as float: %s\r\n",
+        MessageOutput.printf("MQTT handler: cannot parse payload of topic '%s' as float: %s\n",
             topic, strValue.c_str());
         return;
     }
@@ -186,59 +186,59 @@ void MqttHandleInverterClass::onMqttMessage(Topic t, const espMqttClientTypes::M
     switch (t) {
     case Topic::LimitPersistentRelative:
         // Set inverter limit relative persistent
-        MessageOutput.printf("Limit Persistent: %.1f %%\r\n", payload_val);
+        MessageOutput.printf("Limit Persistent: %.1f %%\n", payload_val);
         inv->sendActivePowerControlRequest(payload_val, PowerLimitControlType::RelativPersistent);
         break;
 
     case Topic::LimitPersistentAbsolute:
         // Set inverter limit absolute persistent
-        MessageOutput.printf("Limit Persistent: %.1f W\r\n", payload_val);
+        MessageOutput.printf("Limit Persistent: %.1f W\n", payload_val);
         inv->sendActivePowerControlRequest(payload_val, PowerLimitControlType::AbsolutPersistent);
         break;
 
     case Topic::LimitNonPersistentRelative:
         // Set inverter limit relative non persistent
-        MessageOutput.printf("Limit Non-Persistent: %.1f %%\r\n", payload_val);
+        MessageOutput.printf("Limit Non-Persistent: %.1f %%\n", payload_val);
         if (!properties.retain) {
             inv->sendActivePowerControlRequest(payload_val, PowerLimitControlType::RelativNonPersistent);
         } else {
-            MessageOutput.printf("Ignored because retained\r\n");
+            MessageOutput.printf("Ignored because retained\n");
         }
         break;
 
     case Topic::LimitNonPersistentAbsolute:
         // Set inverter limit absolute non persistent
-        MessageOutput.printf("Limit Non-Persistent: %.1f W\r\n", payload_val);
+        MessageOutput.printf("Limit Non-Persistent: %.1f W\n", payload_val);
         if (!properties.retain) {
             inv->sendActivePowerControlRequest(payload_val, PowerLimitControlType::AbsolutNonPersistent);
         } else {
-            MessageOutput.printf("Ignored because retained\r\n");
+            MessageOutput.printf("Ignored because retained\n");
         }
         break;
 
     case Topic::Power:
         // Turn inverter on or off
-        MessageOutput.printf("Set inverter power to: %" PRId32 "\r\n", static_cast<int32_t>(payload_val));
+        MessageOutput.printf("Set inverter power to: %" PRId32 "\n", static_cast<int32_t>(payload_val));
         inv->sendPowerControlRequest(static_cast<int32_t>(payload_val) > 0);
         break;
 
     case Topic::Restart:
         // Restart inverter
-        MessageOutput.printf("Restart inverter\r\n");
+        MessageOutput.printf("Restart inverter\n");
         if (!properties.retain && payload_val == 1) {
             inv->sendRestartControlRequest();
         } else {
-            MessageOutput.printf("Ignored because retained or numeric value not '1'\r\n");
+            MessageOutput.printf("Ignored because retained or numeric value not '1'\n");
         }
         break;
 
     case Topic::ResetRfStats:
         // Reset RF Stats
-        MessageOutput.printf("Reset RF stats\r\n");
+        MessageOutput.printf("Reset RF stats\n");
         if (!properties.retain && payload_val == 1) {
             inv->resetRadioStats();
         } else {
-            MessageOutput.printf("Ignored because retained or numeric value not '1'\r\n");
+            MessageOutput.printf("Ignored because retained or numeric value not '1'\n");
         }
     }
 }

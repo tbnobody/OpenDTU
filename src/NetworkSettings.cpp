@@ -36,9 +36,9 @@ void NetworkSettingsClass::init(Scheduler& scheduler)
         const PinMapping_t& pin = PinMapping.get();
         _w5500 = W5500::setup(pin.w5500_mosi, pin.w5500_miso, pin.w5500_sclk, pin.w5500_cs, pin.w5500_int, pin.w5500_rst);
         if (_w5500)
-            MessageOutput.printf("W5500: Connection successful\r\n");
+            MessageOutput.printf("W5500: Connection successful\n");
         else
-            MessageOutput.printf("W5500: Connection error!!\r\n");
+            MessageOutput.printf("W5500: Connection error!!\n");
     }
 #if CONFIG_ETH_USE_ESP32_EMAC
     else if (PinMapping.isValidEthConfig()) {
@@ -61,46 +61,46 @@ void NetworkSettingsClass::NetworkEvent(const WiFiEvent_t event, WiFiEventInfo_t
 {
     switch (event) {
     case ARDUINO_EVENT_ETH_START:
-        MessageOutput.printf("ETH start\r\n");
+        MessageOutput.printf("ETH start\n");
         if (_networkMode == network_mode::Ethernet) {
             raiseEvent(network_event::NETWORK_START);
         }
         break;
     case ARDUINO_EVENT_ETH_STOP:
-        MessageOutput.printf("ETH stop\r\n");
+        MessageOutput.printf("ETH stop\n");
         if (_networkMode == network_mode::Ethernet) {
             raiseEvent(network_event::NETWORK_STOP);
         }
         break;
     case ARDUINO_EVENT_ETH_CONNECTED:
-        MessageOutput.printf("ETH connected\r\n");
+        MessageOutput.printf("ETH connected\n");
         _ethConnected = true;
         raiseEvent(network_event::NETWORK_CONNECTED);
         break;
     case ARDUINO_EVENT_ETH_GOT_IP:
-        MessageOutput.printf("ETH got IP: %s\r\n", ETH.localIP().toString().c_str());
+        MessageOutput.printf("ETH got IP: %s\n", ETH.localIP().toString().c_str());
         if (_networkMode == network_mode::Ethernet) {
             raiseEvent(network_event::NETWORK_GOT_IP);
         }
         break;
     case ARDUINO_EVENT_ETH_DISCONNECTED:
-        MessageOutput.printf("ETH disconnected\r\n");
+        MessageOutput.printf("ETH disconnected\n");
         _ethConnected = false;
         if (_networkMode == network_mode::Ethernet) {
             raiseEvent(network_event::NETWORK_DISCONNECTED);
         }
         break;
     case ARDUINO_EVENT_WIFI_STA_CONNECTED:
-        MessageOutput.printf("WiFi connected\r\n");
+        MessageOutput.printf("WiFi connected\n");
         if (_networkMode == network_mode::WiFi) {
             raiseEvent(network_event::NETWORK_CONNECTED);
         }
         break;
     case ARDUINO_EVENT_WIFI_STA_DISCONNECTED:
         // Reason codes can be found here: https://github.com/espressif/esp-idf/blob/5454d37d496a8c58542eb450467471404c606501/components/esp_wifi/include/esp_wifi_types_generic.h#L79-L141
-        MessageOutput.printf("WiFi disconnected: %" PRIu8 "\r\n", info.wifi_sta_disconnected.reason);
+        MessageOutput.printf("WiFi disconnected: %" PRIu8 "\n", info.wifi_sta_disconnected.reason);
         if (_networkMode == network_mode::WiFi) {
-            MessageOutput.printf("Try reconnecting\r\n");
+            MessageOutput.printf("Try reconnecting\n");
             _lastReconnectAttempt = millis();
             WiFi.disconnect(true, false);
             WiFi.begin();
@@ -108,7 +108,7 @@ void NetworkSettingsClass::NetworkEvent(const WiFiEvent_t event, WiFiEventInfo_t
         }
         break;
     case ARDUINO_EVENT_WIFI_STA_GOT_IP:
-        MessageOutput.printf("WiFi got ip: %s\r\n", WiFi.localIP().toString().c_str());
+        MessageOutput.printf("WiFi got ip: %s\n", WiFi.localIP().toString().c_str());
         if (_networkMode == network_mode::WiFi) {
             raiseEvent(network_event::NETWORK_GOT_IP);
         }
@@ -154,14 +154,14 @@ void NetworkSettingsClass::handleMDNS()
     MDNS.end();
 
     if (!mdnsEnabled) {
-        MessageOutput.printf("MDNS disabled\r\n");
+        MessageOutput.printf("MDNS disabled\n");
         return;
     }
 
-    MessageOutput.printf("Starting MDNS responder...\r\n");
+    MessageOutput.printf("Starting MDNS responder...\n");
 
     if (!MDNS.begin(getHostname())) {
-        MessageOutput.printf("Error setting up MDNS responder!\r\n");
+        MessageOutput.printf("Error setting up MDNS responder!\n");
         return;
     }
 
@@ -169,7 +169,7 @@ void NetworkSettingsClass::handleMDNS()
     MDNS.addService("opendtu", "tcp", 80);
     MDNS.addServiceTxt("opendtu", "tcp", "git_hash", __COMPILED_GIT_HASH__);
 
-    MessageOutput.printf("MDNS started\r\n");
+    MessageOutput.printf("MDNS started\n");
 }
 
 void NetworkSettingsClass::setupMode()
@@ -210,7 +210,7 @@ void NetworkSettingsClass::enableAdminMode()
 void NetworkSettingsClass::disableAdminMode()
 {
     _adminEnabled = false;
-    MessageOutput.printf("Admin mode disabled\r\n");
+    MessageOutput.printf("Admin mode disabled\n");
     setupMode();
 }
 
@@ -230,7 +230,7 @@ void NetworkSettingsClass::loop()
     if (_ethConnected) {
         if (_networkMode != network_mode::Ethernet) {
             // Do stuff when switching to Ethernet mode
-            MessageOutput.printf("Switch to Ethernet mode\r\n");
+            MessageOutput.printf("Switch to Ethernet mode\n");
             _networkMode = network_mode::Ethernet;
             WiFi.mode(WIFI_MODE_NULL);
             setStaticIp();
@@ -238,7 +238,7 @@ void NetworkSettingsClass::loop()
         }
     } else if (_networkMode != network_mode::WiFi) {
         // Do stuff when switching to Ethernet mode
-        MessageOutput.printf("Switch to WiFi mode\r\n");
+        MessageOutput.printf("Switch to WiFi mode\n");
         _networkMode = network_mode::WiFi;
         enableAdminMode();
         applyConfig();
@@ -248,11 +248,11 @@ void NetworkSettingsClass::loop()
         if (_adminEnabled && _adminTimeoutCounterMax > 0) {
             _adminTimeoutCounter++;
             if (_adminTimeoutCounter % 10 == 0) {
-                MessageOutput.printf("Admin AP remaining seconds: %" PRIu32 " / %" PRIu32 "\r\n", _adminTimeoutCounter, _adminTimeoutCounterMax);
+                MessageOutput.printf("Admin AP remaining seconds: %" PRIu32 " / %" PRIu32 "\n", _adminTimeoutCounter, _adminTimeoutCounterMax);
             }
         }
         if (_performConnection && !isConnected() && wifiConfigured() && millis() - _lastReconnectAttempt > 60000) {
-            MessageOutput.printf("Wifi reconnect watchdog triggered... Resetting Wifi hardware\r\n");
+            MessageOutput.printf("Wifi reconnect watchdog triggered... Resetting Wifi hardware\n");
             WiFi.disconnect(true, false);
             WiFi.mode(WIFI_MODE_NULL);
             if (_adminEnabled) {
@@ -285,13 +285,13 @@ void NetworkSettingsClass::loop()
             _connectRedoTimer = 0;
         } else {
             if (_connectTimeoutTimer > WIFI_RECONNECT_TIMEOUT && _performConnection) {
-                MessageOutput.printf("Disabling search for AP...\r\n");
+                MessageOutput.printf("Disabling search for AP...\n");
                 WiFi.mode(WIFI_AP);
                 _connectRedoTimer = 0;
                 _performConnection = false;
             }
             if (_connectRedoTimer > WIFI_RECONNECT_REDO_TIMEOUT && !_performConnection) {
-                MessageOutput.printf("Enable search for AP...\r\n");
+                MessageOutput.printf("Enable search for AP...\n");
                 WiFi.mode(WIFI_AP_STA);
                 applyConfig();
                 _connectTimeoutTimer = 0;
@@ -318,7 +318,7 @@ void NetworkSettingsClass::applyConfig()
 
     const bool newCredentials = strcmp(WiFi.SSID().c_str(), config.Ssid) || strcmp(WiFi.psk().c_str(), config.Password);
 
-    MessageOutput.printf("Start configuring WiFi STA using %s credentials\r\n",
+    MessageOutput.printf("Start configuring WiFi STA using %s credentials\n",
         newCredentials ? "new" : "existing");
 
     bool success = false;
@@ -330,7 +330,7 @@ void NetworkSettingsClass::applyConfig()
         success = WiFi.begin() != WL_CONNECT_FAILED;
     }
 
-    MessageOutput.printf("Configuring WiFi %s\r\n", success ? "done" : "failed");
+    MessageOutput.printf("Configuring WiFi %s\n", success ? "done" : "failed");
 
     setStaticIp();
 }
@@ -344,7 +344,7 @@ void NetworkSettingsClass::setHostname()
     const String hostname = getHostname();
     bool success = false;
 
-    MessageOutput.printf("Start setting hostname...\r\n");
+    MessageOutput.printf("Start setting hostname...\n");
     if (_networkMode == network_mode::WiFi) {
         success = WiFi.hostname(hostname);
 
@@ -356,7 +356,7 @@ void NetworkSettingsClass::setHostname()
         success = ETH.setHostname(hostname.c_str());
     }
 
-    MessageOutput.printf("Setting hostname %s\r\n", success ? "done" : "failed");
+    MessageOutput.printf("Setting hostname %s\n", success ? "done" : "failed");
 }
 
 void NetworkSettingsClass::setStaticIp()
@@ -369,7 +369,7 @@ void NetworkSettingsClass::setStaticIp()
     const char* mode = (_networkMode == network_mode::WiFi) ? "WiFi" : "Ethernet";
     const char* ipType = config.Dhcp ? "DHCP" : "static";
 
-    MessageOutput.printf("Start configuring %s %s IP...\r\n", mode, ipType);
+    MessageOutput.printf("Start configuring %s %s IP...\n", mode, ipType);
 
     bool success = false;
     if (_networkMode == network_mode::WiFi) {
@@ -396,7 +396,7 @@ void NetworkSettingsClass::setStaticIp()
         }
     }
 
-    MessageOutput.printf("Configure IP %s\r\n", success ? "done" : "failed");
+    MessageOutput.printf("Configure IP %s\n", success ? "done" : "failed");
 }
 
 IPAddress NetworkSettingsClass::localIP() const

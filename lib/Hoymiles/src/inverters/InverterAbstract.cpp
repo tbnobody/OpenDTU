@@ -195,12 +195,12 @@ void InverterAbstract::addRxFragment(const uint8_t fragment[], const uint8_t len
     _lastRssi = rssi;
 
     if (len < 11) {
-        Hoymiles.getMessageOutput()->printf("FATAL: (%s, %d) fragment too short\r\n", __FILE__, __LINE__);
+        Hoymiles.getMessageOutput()->printf("FATAL: (%s, %d) fragment too short\n", __FILE__, __LINE__);
         return;
     }
 
     if (len - 11 > MAX_RF_PAYLOAD_SIZE) {
-        Hoymiles.getMessageOutput()->printf("FATAL: (%s, %d) fragment too large\r\n", __FILE__, __LINE__);
+        Hoymiles.getMessageOutput()->printf("FATAL: (%s, %d) fragment too large\n", __FILE__, __LINE__);
         return;
     }
 
@@ -210,12 +210,12 @@ void InverterAbstract::addRxFragment(const uint8_t fragment[], const uint8_t len
     const uint8_t fragmentId = fragmentCount & 0b01111111; // fragmentId is 1 based
 
     if (fragmentId == 0) {
-        Hoymiles.getMessageOutput()->printf("ERROR: fragment id zero received and ignored\r\n");
+        Hoymiles.getMessageOutput()->printf("ERROR: fragment id zero received and ignored\n");
         return;
     }
 
     if (fragmentId >= MAX_RF_FRAGMENT_COUNT) {
-        Hoymiles.getMessageOutput()->printf("ERROR: fragment id %" PRIu8 " is too large for buffer and ignored\r\n", fragmentId);
+        Hoymiles.getMessageOutput()->printf("ERROR: fragment id %" PRIu8 " is too large for buffer and ignored\n", fragmentId);
         return;
     }
 
@@ -239,7 +239,7 @@ uint8_t InverterAbstract::verifyAllFragments(CommandAbstract& cmd)
 {
     // All missing
     if (_rxFragmentLastPacketId == 0) {
-        Hoymiles.getMessageOutput()->printf("All missing\r\n");
+        Hoymiles.getMessageOutput()->printf("All missing\n");
         if (cmd.getSendCount() <= cmd.getMaxResendCount()) {
             return FRAGMENT_ALL_MISSING_RESEND;
         } else {
@@ -250,7 +250,7 @@ uint8_t InverterAbstract::verifyAllFragments(CommandAbstract& cmd)
 
     // Last fragment is missing (the one with 0x80)
     if (_rxFragmentMaxPacketId == 0) {
-        Hoymiles.getMessageOutput()->printf("Last missing\r\n");
+        Hoymiles.getMessageOutput()->printf("Last missing\n");
         if (_rxFragmentRetransmitCnt++ < cmd.getMaxRetransmitCount()) {
             return _rxFragmentLastPacketId + 1;
         } else {
@@ -262,7 +262,7 @@ uint8_t InverterAbstract::verifyAllFragments(CommandAbstract& cmd)
     // Middle fragment is missing
     for (uint8_t i = 0; i < _rxFragmentMaxPacketId - 1; i++) {
         if (!_rxFragmentBuffer[i].wasReceived) {
-            Hoymiles.getMessageOutput()->printf("Middle missing\r\n");
+            Hoymiles.getMessageOutput()->printf("Middle missing\n");
             if (_rxFragmentRetransmitCnt++ < cmd.getMaxRetransmitCount()) {
                 return i + 1;
             } else {
