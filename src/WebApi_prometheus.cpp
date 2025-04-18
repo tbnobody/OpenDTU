@@ -5,11 +5,13 @@
  */
 #include "WebApi_prometheus.h"
 #include "Configuration.h"
-#include "MessageOutput.h"
 #include "NetworkSettings.h"
 #include "WebApi.h"
 #include "__compiled_constants.h"
 #include <Hoymiles.h>
+
+#undef TAG
+static const char* TAG = "webapi";
 
 void WebApiPrometheusClass::init(AsyncWebServer& server, Scheduler& scheduler)
 {
@@ -113,12 +115,12 @@ void WebApiPrometheusClass::onPrometheusMetricsGet(AsyncWebServerRequest* reques
         stream->addHeader("Cache-Control", "no-cache");
         if (stream->available() > initialResponseBufferSize) {
             initialResponseBufferSize = stream->available();
-            MessageOutput.printf("Increased /api/prometheus/metrics initialResponseBufferSize to %" PRIu32 " bytes\n", initialResponseBufferSize);
+            ESP_LOGI(TAG, "Increased /api/prometheus/metrics initialResponseBufferSize to %" PRIu32 " bytes", initialResponseBufferSize);
         }
         request->send(stream);
 
     } catch (std::bad_alloc& bad_alloc) {
-        MessageOutput.printf("Call to /api/prometheus/metrics temporarely out of resources. Reason: \"%s\".\n", bad_alloc.what());
+        ESP_LOGE(TAG, "Call to /api/prometheus/metrics temporarely out of resources. Reason: \"%s\".", bad_alloc.what());
 
         WebApi.sendTooManyRequests(request);
     }

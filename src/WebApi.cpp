@@ -1,12 +1,14 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * Copyright (C) 2022-2024 Thomas Basler and others
+ * Copyright (C) 2022-2025 Thomas Basler and others
  */
 #include "WebApi.h"
 #include "Configuration.h"
-#include "MessageOutput.h"
 #include "defaults.h"
 #include <AsyncJson.h>
+
+#undef TAG
+static const char* TAG = "webapi";
 
 WebApiClass::WebApiClass()
     : _server(HTTP_PORT)
@@ -138,7 +140,7 @@ bool WebApiClass::sendJsonResponse(AsyncWebServerRequest* request, AsyncJsonResp
         root["code"] = WebApiError::GenericInternalServerError;
         root["type"] = "danger";
         response->setCode(500);
-        MessageOutput.printf("WebResponse failed: %s, %" PRIu16 "\n", function, line);
+        ESP_LOGE(TAG, "WebResponse failed: %s, %" PRIu16 "", function, line);
         ret_val = false;
     }
 
