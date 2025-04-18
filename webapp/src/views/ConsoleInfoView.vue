@@ -239,6 +239,7 @@ export default defineComponent({
     height: 500px;
     max-height: 500px;
     overflow-y: auto;
+    overflow-x: auto;
     padding: 8px;
     background: #111;
     border: 1px solid #333;
@@ -249,7 +250,7 @@ export default defineComponent({
 
 .log-line {
     margin: 3px 0;
-    white-space: pre-wrap;
+    white-space: pre;
 }
 
 .timestamp {
