@@ -3,13 +3,15 @@
  * Copyright (C) 2022-2025 Thomas Basler and others
  */
 #include "Configuration.h"
-#include "MessageOutput.h"
 #include "NetworkSettings.h"
 #include "Utils.h"
 #include "defaults.h"
 #include <ArduinoJson.h>
 #include <LittleFS.h>
 #include <nvs_flash.h>
+
+#undef TAG
+static const char* TAG = "configuration";
 
 CONFIG_T config;
 
@@ -157,7 +159,7 @@ bool ConfigurationClass::write()
 
     // Serialize JSON to file
     if (serializeJson(doc, f) == 0) {
-        MessageOutput.printf("Failed to write file\n");
+        ESP_LOGE(TAG, "Failed to write file");
         return false;
     }
 
@@ -175,7 +177,7 @@ bool ConfigurationClass::read()
     // Deserialize the JSON document
     const DeserializationError error = deserializeJson(doc, f);
     if (error) {
-        MessageOutput.printf("Failed to read file, using default configuration\n");
+        ESP_LOGW(TAG, "Failed to read file, using default configuration");
     }
 
     if (!Utils::checkJsonAlloc(doc, __FUNCTION__, __LINE__)) {
@@ -334,11 +336,11 @@ bool ConfigurationClass::read()
         const uint64_t dtuId = Utils::generateDtuSerial();
         config.Dtu.Serial = dtuId;
         write();
-        MessageOutput.printf("DTU serial check: Generated new serial based on ESP chip id: %0" PRIx32 "%08" PRIx32 "\n",
+        ESP_LOGI(TAG, "DTU serial check: Generated new serial based on ESP chip id: %0" PRIx32 "%08" PRIx32 "",
             static_cast<uint32_t>((dtuId >> 32) & 0xFFFFFFFF),
             static_cast<uint32_t>(dtuId & 0xFFFFFFFF));
     } else {
-        MessageOutput.printf("DTU serial check: Using existing serial\n");
+        ESP_LOGI(TAG, "DTU serial check: Using existing serial");
     }
 
     return true;
@@ -348,7 +350,7 @@ void ConfigurationClass::migrate()
 {
     File f = LittleFS.open(CONFIG_FILENAME, "r", false);
     if (!f) {
-        MessageOutput.printf("Failed to open file, cancel migration\n");
+        ESP_LOGE(TAG, "Failed to open file, cancel migration");
         return;
     }
 
@@ -359,7 +361,7 @@ void ConfigurationClass::migrate()
     // Deserialize the JSON document
     const DeserializationError error = deserializeJson(doc, f);
     if (error) {
-        MessageOutput.printf("Failed to read file, cancel migration: %s\n", error.c_str());
+        ESP_LOGE(TAG, "Failed to read file, cancel migration: %s", error.c_str());
         return;
     }
 
