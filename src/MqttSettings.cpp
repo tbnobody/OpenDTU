@@ -4,9 +4,11 @@
  */
 #include "MqttSettings.h"
 #include "Configuration.h"
-#include "MessageOutput.h"
 #include <frozen/map.h>
 #include <frozen/string.h>
+
+#undef TAG
+static const char* TAG = "mqtt";
 
 MqttSettingsClass::MqttSettingsClass()
 {
@@ -16,11 +18,11 @@ void MqttSettingsClass::NetworkEvent(network_event event)
 {
     switch (event) {
     case network_event::NETWORK_GOT_IP:
-        MessageOutput.printf("Network connected\n");
+        ESP_LOGD(TAG, "Network connected");
         performConnect();
         break;
     case network_event::NETWORK_DISCONNECTED:
-        MessageOutput.printf("Network lost connection\n");
+        ESP_LOGD(TAG, "Network lost connection");
         _mqttReconnectTimer.detach(); // ensure we don't reconnect to MQTT while reconnecting to Wi-Fi
         break;
     default:
@@ -30,7 +32,7 @@ void MqttSettingsClass::NetworkEvent(network_event event)
 
 void MqttSettingsClass::onMqttConnect(const bool sessionPresent)
 {
-    MessageOutput.printf("Connected to MQTT.\n");
+    ESP_LOGI(TAG, "Connected to MQTT.");
     const CONFIG_T& config = Configuration.get();
     publish(config.Mqtt.Lwt.Topic, config.Mqtt.Lwt.Value_Online);
 
@@ -76,7 +78,7 @@ void MqttSettingsClass::onMqttDisconnect(espMqttClientTypes::DisconnectReason re
     auto it = reasons.find(reason);
     const char* reasonStr = (it != reasons.end()) ? it->second.data() : "Unknown";
 
-    MessageOutput.printf("Disconnected from MQTT. Reason: %s\n", reasonStr);
+    ESP_LOGW(TAG, "Disconnected from MQTT. Reason: %s", reasonStr);
 
     _mqttReconnectTimer.once(
         2, +[](MqttSettingsClass* instance) { instance->performConnect(); }, this);
@@ -84,7 +86,7 @@ void MqttSettingsClass::onMqttDisconnect(espMqttClientTypes::DisconnectReason re
 
 void MqttSettingsClass::onMqttMessage(const espMqttClientTypes::MessageProperties& properties, const char* topic, const uint8_t* payload, const size_t len, const size_t index, const size_t total)
 {
-    MessageOutput.printf("Received MQTT message on topic: %s\n", topic);
+    ESP_LOGD(TAG, "Received MQTT message on topic: %s", topic);
 
     _mqttSubscribeParser.handle_message(properties, topic, payload, len);
 }
@@ -104,7 +106,7 @@ void MqttSettingsClass::performConnect()
             return;
         }
 
-        MessageOutput.printf("Connecting to MQTT...\n");
+        ESP_LOGI(TAG, "Connecting to MQTT...");
         const CONFIG_T& config = Configuration.get();
         const String willTopic = getPrefix() + config.Mqtt.Lwt.Topic;
         String clientId = getClientId();
