@@ -10,6 +10,9 @@
 #include <Hoymiles.h>
 #include <SpiManager.h>
 
+#undef TAG
+static const char* TAG = "invertersetup";
+
 InverterSettingsClass InverterSettings;
 
 InverterSettingsClass::InverterSettingsClass()
@@ -24,18 +27,18 @@ void InverterSettingsClass::init(Scheduler& scheduler)
     const PinMapping_t& pin = PinMapping.get();
 
     // Initialize inverter communication
-    MessageOutput.printf("Initialize Hoymiles interface...\n");
+    ESP_LOGI(TAG, "Initialize Hoymiles interface...");
     Hoymiles.setMessageOutput(&MessageOutput);
     Hoymiles.init();
 
     if (!PinMapping.isValidNrf24Config() && !PinMapping.isValidCmt2300Config()) {
-        MessageOutput.printf("Invalid pin config\n");
+        ESP_LOGE(TAG, "Invalid pin config");
         return;
     }
 
     // Initialize NRF24 if configured
     if (PinMapping.isValidNrf24Config()) {
-        MessageOutput.printf("NRF: Initialize communication\n");
+        ESP_LOGI(TAG, "NRF: Initialize communication");
         auto spi_bus = SpiManagerInst.claim_bus_arduino();
         ESP_ERROR_CHECK(spi_bus ? ESP_OK : ESP_FAIL);
 
@@ -46,24 +49,24 @@ void InverterSettingsClass::init(Scheduler& scheduler)
 
     // Initialize CMT2300 if configured
     if (PinMapping.isValidCmt2300Config()) {
-        MessageOutput.printf("CMT2300A: Initialize communication\n");
+        ESP_LOGI(TAG, "CMT2300A: Initialize communication");
         Hoymiles.initCMT(pin.cmt_sdio, pin.cmt_clk, pin.cmt_cs, pin.cmt_fcs, pin.cmt_gpio2, pin.cmt_gpio3);
-        MessageOutput.printf("CMT2300A: Setting country mode...\n");
+        ESP_LOGI(TAG, "CMT2300A: Setting country mode...");
         Hoymiles.getRadioCmt()->setCountryMode(static_cast<CountryModeId_t>(config.Dtu.Cmt.CountryMode));
-        MessageOutput.printf("CMT2300A: Setting CMT target frequency...\n");
+        ESP_LOGI(TAG, "CMT2300A: Setting CMT target frequency...");
         Hoymiles.getRadioCmt()->setInverterTargetFrequency(config.Dtu.Cmt.Frequency);
     }
 
     // Configure common radio settings
-    MessageOutput.printf("RF: Setting radio PA level...\n");
+    ESP_LOGI(TAG, "RF: Setting radio PA level...");
     Hoymiles.getRadioNrf()->setPALevel((rf24_pa_dbm_e)config.Dtu.Nrf.PaLevel);
     Hoymiles.getRadioCmt()->setPALevel(config.Dtu.Cmt.PaLevel);
 
-    MessageOutput.printf("RF: Setting DTU serial...\n");
+    ESP_LOGI(TAG, "RF: Setting DTU serial...");
     Hoymiles.getRadioNrf()->setDtuSerial(config.Dtu.Serial);
     Hoymiles.getRadioCmt()->setDtuSerial(config.Dtu.Serial);
 
-    MessageOutput.printf("RF: Setting poll interval...\n");
+    ESP_LOGI(TAG, "RF: Setting poll interval...");
     Hoymiles.setPollInterval(config.Dtu.PollInterval);
 
     // Configure inverters
@@ -73,14 +76,14 @@ void InverterSettingsClass::init(Scheduler& scheduler)
             continue;
         }
 
-        MessageOutput.printf("Adding inverter: %0" PRIx32 "%08" PRIx32 " - %s\n",
+        ESP_LOGI(TAG, "Adding inverter: %0" PRIx32 "%08" PRIx32 " - %s",
             static_cast<uint32_t>((inv_cfg.Serial >> 32) & 0xFFFFFFFF),
             static_cast<uint32_t>(inv_cfg.Serial & 0xFFFFFFFF),
             inv_cfg.Name);
 
         auto inv = Hoymiles.addInverter(inv_cfg.Name, inv_cfg.Serial);
         if (inv == nullptr) {
-            MessageOutput.printf("Adding inverter failed: Unsupported type\n");
+            ESP_LOGW(TAG, "Adding inverter failed: Unsupported type");
             continue;
         }
 
@@ -94,9 +97,9 @@ void InverterSettingsClass::init(Scheduler& scheduler)
             inv->Statistics()->setChannelFieldOffset(TYPE_DC, static_cast<ChannelNum_t>(c), FLD_YT, inv_cfg.channel[c].YieldTotalOffset);
         }
 
-        MessageOutput.printf("Adding complete\n");
+        ESP_LOGI(TAG, "Adding complete");
     }
-    MessageOutput.printf("Initialization complete\n");
+    ESP_LOGI(TAG, "Initialization complete");
 
     scheduler.addTask(_hoyTask);
     _hoyTask.enable();
