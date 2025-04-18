@@ -19,6 +19,7 @@ void MessageOutputClass::init(Scheduler& scheduler)
 {
     scheduler.addTask(_loopTask);
     _loopTask.enable();
+    esp_log_set_vprintf(log_vprintf);
 }
 
 void MessageOutputClass::register_ws_output(AsyncWebSocket* output)
@@ -26,6 +27,13 @@ void MessageOutputClass::register_ws_output(AsyncWebSocket* output)
     std::lock_guard<std::mutex> lock(_msgLock);
 
     _ws = output;
+}
+
+int MessageOutputClass::log_vprintf(const char* fmt, va_list arguments)
+{
+    char log_buffer[WS_CHUNK_SIZE_BYTES];
+    vsnprintf(log_buffer, sizeof(log_buffer), fmt, arguments);
+    return MessageOutput.print(log_buffer);
 }
 
 void MessageOutputClass::serialWrite(MessageOutputClass::message_t const& m)

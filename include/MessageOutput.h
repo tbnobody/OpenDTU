@@ -19,6 +19,8 @@ public:
     size_t write(const uint8_t* buffer, size_t size) override;
     void register_ws_output(AsyncWebSocket* output);
 
+    static int log_vprintf(const char *fmt, va_list arguments);
+
 private:
     void loop();
 
