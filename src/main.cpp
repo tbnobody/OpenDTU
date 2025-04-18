@@ -28,6 +28,9 @@
 #include <TaskScheduler.h>
 #include <esp_heap_caps.h>
 
+#undef TAG
+static const char* TAG = "main";
+
 void setup()
 {
     // Move all dynamic allocations >512byte to psram (if available)
@@ -41,57 +44,62 @@ void setup()
         yield();
 #endif
     MessageOutput.init(scheduler);
-    MessageOutput.printf("Starting OpenDTU\n");
+
+    // For now, the log levels are just hard coded
+    esp_log_level_set("*", ESP_LOG_VERBOSE);
+    esp_log_level_set("CORE", ESP_LOG_ERROR);
+
+    ESP_LOGI(TAG, "Starting OpenDTU");
 
     // Initialize file system
-    MessageOutput.printf("Mounting FS...\n");
+    ESP_LOGI(TAG, "Mounting FS...");
     if (!LittleFS.begin(false)) { // Do not format if mount failed
-        MessageOutput.printf("Failed mounting FS... Trying to format...\n");
+        ESP_LOGW(TAG, "Failed mounting FS... Trying to format...");
         const bool success = LittleFS.begin(true);
-        MessageOutput.printf("FS reformat %s\n", success ? "successful" : "failed");
+        ESP_LOG_LEVEL_LOCAL((success ? ESP_LOG_INFO : ESP_LOG_ERROR), TAG, "FS reformat %s", success ? "successful" : "failed");
     }
 
     // Read configuration values
-    MessageOutput.printf("Reading configuration...\n");
+    ESP_LOGI(TAG, "Reading configuration...");
     Configuration.init(scheduler);
     if (!Configuration.read()) {
         bool success = Configuration.write();
-        MessageOutput.printf("Failed to read configuration. New default configuration written %s\n",
+        ESP_LOG_LEVEL_LOCAL((success ? ESP_LOG_INFO : ESP_LOG_WARN), TAG, "Failed to read configuration. New default configuration written %s",
             success ? "successful" : "failed");
     }
     if (Configuration.get().Cfg.Version != CONFIG_VERSION) {
-        MessageOutput.printf("Performing configuration migration from %" PRIX32 " to %" PRIX32 "\n",
+        ESP_LOGI(TAG, "Performing configuration migration from %" PRIX32 " to %" PRIX32 "",
             Configuration.get().Cfg.Version, CONFIG_VERSION);
         Configuration.migrate();
     }
 
     // Read languate pack
-    MessageOutput.printf("Reading language pack...\n");
+    ESP_LOGI(TAG, "Reading language pack...");
     I18n.init(scheduler);
 
     // Load PinMapping
-    MessageOutput.printf("Reading PinMapping...\n");
+    ESP_LOGI(TAG, "Reading PinMapping...");
     if (PinMapping.init(Configuration.get().Dev_PinMapping)) {
-        MessageOutput.printf("Found valid mapping\n");
+        ESP_LOGI(TAG, "Found valid mapping");
     } else {
-        MessageOutput.printf("Didn't found valid mapping. Using default.\n");
+        ESP_LOGW(TAG, "Didn't found valid mapping. Using default.");
     }
 
     // Initialize Network
-    MessageOutput.printf("Initializing Network...\n");
+    ESP_LOGI(TAG, "Initializing Network...");
     NetworkSettings.init(scheduler);
     NetworkSettings.applyConfig();
 
     // Initialize NTP
-    MessageOutput.printf("Initializing NTP...\n");
+    ESP_LOGI(TAG, "Initializing NTP...");
     NtpSettings.init();
 
     // Initialize SunPosition
-    MessageOutput.printf("Initializing SunPosition...\n");
+    ESP_LOGI(TAG, "Initializing SunPosition...");
     SunPosition.init(scheduler);
 
     // Initialize MqTT
-    MessageOutput.printf("Initializing MQTT...\n");
+    ESP_LOGI(TAG, "Initializing MQTT...");
     MqttSettings.init();
     MqttHandleDtu.init(scheduler);
     MqttHandleInverter.init(scheduler);
@@ -99,15 +107,15 @@ void setup()
     MqttHandleHass.init(scheduler);
 
     // Initialize WebApi
-    MessageOutput.printf("Initializing WebApi...\n");
+    ESP_LOGI(TAG, "Initializing WebApi...");
     WebApi.init(scheduler);
 
     // Initialize Display
-    MessageOutput.printf("Initializing Display...\n");
+    ESP_LOGI(TAG, "Initializing Display...");
     Display.init(scheduler);
 
     // Initialize Single LEDs
-    MessageOutput.printf("Initializing LEDs...\n");
+    ESP_LOGI(TAG, "Initializing LEDs...");
     LedSingle.init(scheduler);
 
     InverterSettings.init(scheduler);
@@ -115,7 +123,7 @@ void setup()
     Datastore.init(scheduler);
     RestartHelper.init(scheduler);
 
-    MessageOutput.printf("Startup complete\n");
+    ESP_LOGI(TAG, "Startup complete");
 }
 
 void loop()
