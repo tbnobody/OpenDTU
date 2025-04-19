@@ -12,6 +12,7 @@
 #include "WebApi_i18n.h"
 #include "WebApi_inverter.h"
 #include "WebApi_limit.h"
+#include "WebApi_logging.h"
 #include "WebApi_maintenance.h"
 #include "WebApi_mqtt.h"
 #include "WebApi_network.h"
@@ -57,6 +58,7 @@ private:
     WebApiI18nClass _webApiI18n;
     WebApiInverterClass _webApiInverter;
     WebApiLimitClass _webApiLimit;
+    WebApiLoggingClass _webApiLogging;
     WebApiMaintenanceClass _webApiMaintenance;
     WebApiMqttClass _webApiMqtt;
     WebApiNetworkClass _webApiNetwork;

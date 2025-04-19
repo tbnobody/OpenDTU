@@ -22,6 +22,7 @@
             "MQTTSettings": "Ustawienia serwera MQTT",
             "InverterSettings": "Ustawienia falownika",
             "SecuritySettings": "Ustawienia zabezpieczeń",
+            "LoggingSettings": "Logging Settings",
             "DTUSettings": "Ustawienia DTU",
             "DeviceManager": "Zarządzanie urządzeniami",
             "ConfigManagement": "Zarządzanie konfiguracją",
@@ -700,6 +701,19 @@
             "format_herf_valid": "Format E-Star HERF (zostanie zapisany po konwersji): {serial}",
             "format_herf_invalid": "Format E-Star HERF: Nieprawidłowa suma kontrolna",
             "format_unknown": "Nieznany format"
+        },
+        "loggingadmin": {
+            "LoggingSettings": "Logging Settings",
+            "LogLevel": "Log Level",
+            "DefaultLevel": "Default log level",
+            "Module": "Module",
+            "log_inherit": "Inherit from default",
+            "log_none": "None",
+            "log_error": "(E) Error",
+            "log_warn": "(W) Warning",
+            "log_info": "(I) Info",
+            "log_debug": "(D) Debug",
+            "log_verbose": "(V) Verbose"
         }
     }
 }

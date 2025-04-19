@@ -22,6 +22,7 @@
             "MQTTSettings": "MQTT Ρυθμίσεις",
             "InverterSettings": "Ρυθμίσεις Μετατροπέα",
             "SecuritySettings": "Ρυθμίσεις Ασφάλειας",
+            "LoggingSettings": "Logging Settings",
             "DTUSettings": "DTU Ρυθμίσεις",
             "DeviceManager": "Διαχείριση Συσκευών",
             "ConfigManagement": "Διαχείριση διαμόρφωσης",
@@ -700,6 +701,19 @@
             "format_herf_valid": "Μορφή E-Star HERF (θα αποθηκευτεί μετατρεπόμενη): {serial}",
             "format_herf_invalid": "Μορφή E-Star HERF: Μη έγκυρο άθροισμα ελέγχου",
             "format_unknown": "Άγνωστη μορφή"
+        },
+        "loggingadmin": {
+            "LoggingSettings": "Logging Settings",
+            "LogLevel": "Log Level",
+            "DefaultLevel": "Default log level",
+            "Module": "Module",
+            "log_inherit": "Inherit from default",
+            "log_none": "None",
+            "log_error": "(E) Error",
+            "log_warn": "(W) Warning",
+            "log_info": "(I) Info",
+            "log_debug": "(D) Debug",
+            "log_verbose": "(V) Verbose"
         }
     }
 }

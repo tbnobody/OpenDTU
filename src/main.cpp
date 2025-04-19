@@ -8,6 +8,7 @@
 #include "I18n.h"
 #include "InverterSettings.h"
 #include "Led_Single.h"
+#include "Logging.h"
 #include "MessageOutput.h"
 #include "MqttHandleDtu.h"
 #include "MqttHandleHass.h"
@@ -72,6 +73,10 @@ void setup()
             Configuration.get().Cfg.Version, CONFIG_VERSION);
         Configuration.migrate();
     }
+
+    // Set configured log levels
+    Logging.applyLogLevels();
+    esp_log_level_set(TAG, ESP_LOG_VERBOSE);
 
     // Read languate pack
     ESP_LOGI(TAG, "Reading language pack...");

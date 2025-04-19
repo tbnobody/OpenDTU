@@ -7,6 +7,7 @@
         "MQTTSettings": "MQTT",
         "InverterSettings": "Wechselrichter",
         "SecuritySettings": "Sicherheit",
+        "LoggingSettings": "Protokollierung",
         "DTUSettings": "DTU",
         "DeviceManager": "Hardware",
         "ConfigManagement": "Konfigurationsverwaltung",
@@ -684,5 +685,18 @@
         "format_herf_valid": "E-Star HERF Format (wird konvertiert gespeichert): {serial}",
         "format_herf_invalid": "E-Star HERF Format: Ungültige Prüfsumme",
         "format_unknown": "Unbekanntes Format"
+    },
+    "loggingadmin": {
+        "LoggingSettings": "Protokollierungseinstellungen",
+        "LogLevel": "Protokollierungsstufe",
+        "DefaultLevel": "Standard-Protokollierungsstufe",
+        "Module": "Modul",
+        "log_inherit": "Von Standard erben",
+        "log_none": "Keine",
+        "log_error": "(E) Fehler",
+        "log_warn": "(W) Warnung",
+        "log_info": "(I) Info",
+        "log_debug": "(D) Debug",
+        "log_verbose": "(V) Ausführlich"
     }
 }
