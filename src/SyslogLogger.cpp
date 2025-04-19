@@ -1,14 +1,16 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * Copyright (C) 2022-2024 Thomas Basler and others
+ * Copyright (C) 2022-2025 Thomas Basler and others
  */
 #include <HardwareSerial.h>
 #include <ESPmDNS.h>
 #include "defaults.h"
 #include "SyslogLogger.h"
 #include "Configuration.h"
-#include "MessageOutput.h"
 #include "NetworkSettings.h"
+
+#undef TAG
+static const char* TAG = "syslog";
 
 SyslogLogger::SyslogLogger()
     : _loopTask(TASK_IMMEDIATE, TASK_FOREVER, std::bind(&SyslogLogger::loop, this))
@@ -32,18 +34,18 @@ void SyslogLogger::updateSettings(const String&& hostname)
     disable();
 
     if (!config.Enabled) {
-        MessageOutput.println("[SyslogLogger] Syslog not enabled");
+        ESP_LOGI(TAG, "Syslog not enabled");
         return;
     }
 
     _port = config.Port;
     _syslog_hostname = config.Hostname;
     if (_syslog_hostname.isEmpty()) {
-        MessageOutput.println("[SyslogLogger] Hostname not configured");
+        ESP_LOGW(TAG, "Hostname not configured");
         return;
     }
 
-    MessageOutput.printf("[SyslogLogger] Logging to %s!\r\n", _syslog_hostname.c_str());
+    ESP_LOGI(TAG, "Logging to %s!", _syslog_hostname.c_str());
 
     _header = "<14>1 - ";  // RFC5424: Facility USER, severity INFO, version 1, NIL timestamp.
     _header += hostname;
@@ -79,7 +81,7 @@ void SyslogLogger::write(const uint8_t *buffer, size_t size)
 
 void SyslogLogger::disable()
 {
-    MessageOutput.println("[SyslogLogger] Disable");
+    ESP_LOGI(TAG, "Disable");
     std::lock_guard<std::mutex> lock(_mutex);
     if (_enabled) {
         _enabled = false;
@@ -92,7 +94,7 @@ void SyslogLogger::enable()
 {
     // Bind random source port.
     if (!_udp.begin(0)) {
-        MessageOutput.println("[SyslogLogger] No sockets available");
+        ESP_LOGE(TAG, "No sockets available");
         return;
     }
 
@@ -115,10 +117,6 @@ bool SyslogLogger::resolveAndStart()
         }
         _address = _udp.remoteIP();  // Store resolved address.
     }
-    _udp.print(_header);
-    _udp.print("[SyslogLogger] Logging to ");
-    _udp.print(_syslog_hostname);
-    _udp.endPacket();
     _udp.beginPacket(_address, _port);
     _udp.print(_header);
     return true;
