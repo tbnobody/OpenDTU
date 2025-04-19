@@ -47,7 +47,7 @@ void SyslogLogger::updateSettings(const String&& hostname)
 
     ESP_LOGI(TAG, "Logging to %s!", _syslog_hostname.c_str());
 
-    _header = "<14>1 - ";  // RFC5424: Facility USER, severity INFO, version 1, NIL timestamp.
+    _header = ">1 - ";  // RFC5424: Facility USER, severity INFO, version 1, NIL timestamp.
     _header += hostname;
     _header += " OpenDTU ";
     _header += _proc_id;
@@ -64,19 +64,22 @@ void SyslogLogger::write(const uint8_t *buffer, size_t size)
     if (!_enabled || !isResolved()) {
         return;
     }
+
+    String header = "<";
+    header += String(calculatePrival(1, buffer[0]));
+
+    _udp.beginPacket(_address, _port);
+    _udp.print(header);
+    _udp.print(_header);
+
     for (int i = 0; i < size; i++) {
         uint8_t c = buffer[i];
-        bool overflow = false;
         if (c != '\r' && c != '\n') {
             // Replace control and non-ASCII characters with '?'.
-            overflow = !_udp.write(c >= 0x20 && c < 0x7f ? c : '?');
-        }
-        if (c == '\n' || overflow) {
-            _udp.endPacket();
-            _udp.beginPacket(_address, _port);
-            _udp.print(_header);
+            _udp.write(c >= 0x20 && c < 0x7f ? c : '?');
         }
     }
+    _udp.endPacket();
 }
 
 void SyslogLogger::disable()
@@ -117,9 +120,24 @@ bool SyslogLogger::resolveAndStart()
         }
         _address = _udp.remoteIP();  // Store resolved address.
     }
-    _udp.beginPacket(_address, _port);
-    _udp.print(_header);
     return true;
+}
+
+uint8_t SyslogLogger::calculatePrival(uint8_t facility, char errorCode)
+{
+    // ESP LOG ID's are two ahead of syslog ID's
+    // e.g. ESP_LOG_ERROR (1) = Syslog ERROR 3
+    if (errorCode == 'E') {
+        return facility * 8 + ESP_LOG_ERROR + 2;
+    } else if (errorCode == 'W') {
+        return facility * 8 + ESP_LOG_WARN + 2;
+    } else if (errorCode == 'D') {
+        return facility * 8 + ESP_LOG_DEBUG + 2;
+    } else if (errorCode == 'V') {
+        return facility * 8 + ESP_LOG_VERBOSE + 2;
+    }
+
+    return facility * 8 + ESP_LOG_INFO + 2;
 }
 
 void SyslogLogger::loop()

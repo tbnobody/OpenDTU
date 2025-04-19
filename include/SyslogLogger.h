@@ -19,6 +19,7 @@ private:
     bool isResolved() const {
         return _address != INADDR_NONE;
     }
+    static uint8_t calculatePrival(uint8_t facility, char errorCode);
 
     Task _loopTask;
     std::mutex _mutex;
