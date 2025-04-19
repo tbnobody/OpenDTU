@@ -6,6 +6,9 @@
 #include "CpuTemperature.h"
 #include <Arduino.h>
 
+#undef TAG
+static const char* TAG = "temperature";
+
 #if defined(CONFIG_IDF_TARGET_ESP32)
 // there is no official API available on the original ESP32
 extern "C" {
@@ -52,7 +55,7 @@ float CpuTemperatureClass::read()
     if (success && std::isfinite(temperature)) {
         return temperature;
     } else {
-        ESP_LOGD(TAG, "Ignoring invalid temperature (success=%" PRId8 ", value=%.1f)", success, temperature);
+        ESP_LOGD(TAG, "Ignoring invalid temperature (success=%s, value=%.1f)", (success ? "true" : "false"), temperature);
         return NAN;
     }
 }
