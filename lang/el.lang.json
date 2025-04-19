@@ -494,7 +494,11 @@
             "ApTimeoutHint": "Χρόνος που το σημείου πρόσβασης παραμένει ανοιχτό. Η τιμή του 0 σημαίνει άπειρο.",
             "Minutes": "λεπτά",
             "EnableMdns": "Ενεργοποίηση mDNS",
-            "MdnsSettings": "Ρυθμίσεις mDNS"
+            "MdnsSettings": "Ρυθμίσεις mDNS",
+            "EnableSyslog": "Enable Syslog",
+            "SyslogSettings": "Syslog Settings",
+            "SyslogHostname": "Syslog Server",
+            "SyslogPort": "Port"
         },
         "mqttadmin": {
             "MqttSettings": "Ρυθμίσεις MQTT",

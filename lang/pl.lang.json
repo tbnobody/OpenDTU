@@ -494,7 +494,11 @@
             "ApTimeoutHint": "Tryb Time AccessPoint pozostanie aktywny. 0=na zawsze",
             "Minutes": "minuty",
             "EnableMdns": "Włącz mDNS",
-            "MdnsSettings": "Konfiguracja mDNS"
+            "MdnsSettings": "Konfiguracja mDNS",
+            "EnableSyslog": "Enable Syslog",
+            "SyslogSettings": "Syslog Settings",
+            "SyslogHostname": "Syslog Server",
+            "SyslogPort": "Port"
         },
         "mqttadmin": {
             "MqttSettings": "Ustawienia MQTT",

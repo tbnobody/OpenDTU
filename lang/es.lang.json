@@ -494,7 +494,11 @@
             "ApTimeoutHint": "Tiempo que se mantiene abierto el Punto de Acceso. Un valor de 0 significa infinito.",
             "Minutes": "minutos",
             "EnableMdns": "Habilitar mDNS",
-            "MdnsSettings": "Configuración de mDNS"
+            "MdnsSettings": "Configuración de mDNS",
+            "EnableSyslog": "Enable Syslog",
+            "SyslogSettings": "Syslog Settings",
+            "SyslogHostname": "Syslog Server",
+            "SyslogPort": "Port"
         },
         "mqttadmin": {
             "MqttSettings": "Configuración de MQTT",

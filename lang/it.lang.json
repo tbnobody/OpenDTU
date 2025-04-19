@@ -494,7 +494,11 @@
             "ApTimeoutHint": "Tempo in cui la modalità AccessPoint rimarrà attiva. 0=per sempre.",
             "Minutes": "minuti",
             "EnableMdns": "Abilita mDNS",
-            "MdnsSettings": "Configurazione mDNS"
+            "MdnsSettings": "Configurazione mDNS",
+            "EnableSyslog": "Enable Syslog",
+            "SyslogSettings": "Syslog Settings",
+            "SyslogHostname": "Syslog Server",
+            "SyslogPort": "Port"
         },
         "mqttadmin": {
             "MqttSettings": "Impostazioni MQTT",
