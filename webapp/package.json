@@ -24,7 +24,7 @@
     "vue-router": "^4.5.0"
   },
   "devDependencies": {
-    "@intlify/unplugin-vue-i18n": "^6.0.5",
+    "@intlify/unplugin-vue-i18n": "^6.0.8",
     "@tsconfig/node22": "^22.0.1",
     "@types/bootstrap": "^5.2.10",
     "@types/node": "^22.14.0",
