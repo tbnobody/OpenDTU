@@ -4,6 +4,7 @@
  */
 #include "WebApi_webapp.h"
 #include <MD5Builder.h>
+#include <__compiled_constants.h>
 
 extern const uint8_t file_index_html_start[] asm("_binary_webapp_dist_index_html_gz_start");
 extern const uint8_t file_favicon_ico_start[] asm("_binary_webapp_dist_favicon_ico_start");
@@ -24,6 +25,12 @@ void WebApiWebappClass::responseBinaryDataWithETagCache(AsyncWebServerRequest* r
     auto md5 = MD5Builder();
     md5.begin();
     md5.add(const_cast<uint8_t*>(content), len);
+
+    // ensure ETag uniqueness per version by including Git commit hash. force
+    // browsers to reload dependent resources like app.js and zones.json even
+    // when index.html content hasn't actually changed between versions.
+    md5.add(String(__COMPILED_GIT_HASH__));
+
     md5.calculate();
 
     String expectedEtag;
