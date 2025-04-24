@@ -7,6 +7,9 @@
 
 LoggingClass Logging;
 
+#undef TAG
+static const char* TAG = "logging";
+
 LoggingClass::LoggingClass()
 {
     _configurableModules.reserve(3);
@@ -24,14 +27,21 @@ const std::vector<String>& LoggingClass::getConfigurableModules() const
 
 void LoggingClass::applyLogLevels()
 {
-    const CONFIG_T& config = Configuration.get();
+    const auto& config = Configuration.get().Logging;
 
-    esp_log_level_set("*", static_cast<esp_log_level_t>(config.Logging.Default));
+    ESP_LOGD(TAG, "Set default log level: %" PRId8, config.Default);
+    esp_log_level_set("*", static_cast<esp_log_level_t>(config.Default));
+
     for (int8_t i = 0; i < LOG_MODULE_COUNT; i++) {
-        if (strlen(config.Logging.Modules[i].Name) == 0 || config.Logging.Modules[i].Level < ESP_LOG_NONE || config.Logging.Modules[i].Level > ESP_LOG_VERBOSE) {
+        bool isValidModule = std::find(_configurableModules.begin(), _configurableModules.end(), config.Modules[i].Name) != _configurableModules.end();
+        if (!isValidModule
+            || strlen(config.Modules[i].Name) == 0
+            || config.Modules[i].Level < ESP_LOG_NONE
+            || config.Modules[i].Level > ESP_LOG_VERBOSE) {
             continue;
         }
 
-        esp_log_level_set(config.Logging.Modules[i].Name, static_cast<esp_log_level_t>(config.Logging.Modules[i].Level));
+        ESP_LOGD(TAG, "Set log level for %s: %" PRId8, config.Modules[i].Name, config.Modules[i].Level);
+        esp_log_level_set(config.Modules[i].Name, static_cast<esp_log_level_t>(config.Modules[i].Level));
     }
 }
