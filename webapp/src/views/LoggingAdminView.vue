@@ -51,6 +51,8 @@
                 </div>
             </CardElement>
 
+            <div class="alert alert-danger mt-3" role="alert" v-html="$t('loggingadmin.CoreHint')"></div>
+
             <FormFooter @reload="getLogConfig" />
         </form>
     </BasePage>

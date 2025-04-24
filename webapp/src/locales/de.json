@@ -697,6 +697,7 @@
         "LogLevel": "Protokollierungsstufe",
         "DefaultLevel": "Standard-Protokollierungsstufe",
         "Module": "Modul",
+        "CoreHint": "Achtung: Ein zu detaillierte Protokollierungsstufe des CORE-Moduls kann die Performanz signifikant beeinträchtigen und zu unvorhersehbarem Verhalten führen. Die Log-Level-Einstellung sollte nur bei gezielter Fehlersuche temporär angepasst werden. Die Standardeinstellung 'Fehler' ist für den normalen Betrieb ausreichend.",
         "log_inherit": "Von Standard erben",
         "log_none": "Keine",
         "log_error": "(E) Fehler",
