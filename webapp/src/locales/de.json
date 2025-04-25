@@ -37,7 +37,7 @@
     },
     "wait": {
         "NotReady": "OpenDTU ist noch nicht bereit",
-        "PleaseWait": "Bitte warten. Sie werden automatisch auf die Startseite weitergeleitet."
+        "PleaseWait": "Bitte warte. Du wirst automatisch auf die Startseite weitergeleitet."
     },
     "Error": {
         "Oops": "Ups!"
@@ -176,7 +176,7 @@
     "devinfo": {
         "NoInfo": "Keine Informationen verfügbar",
         "NoInfoLong": "Bisher wurden noch keine gültigen Daten vom Wechselrichter empfangen. Versuche es weiter...",
-        "UnknownModel": "Unbekanntes Modell! Bitte melden Sie die \"Hardware Teilenummer\" und das Modell (z.B. HM-350) <a href=\"https://github.com/tbnobody/OpenDTU/issues\" target=\"_blank\">hier</a> als Problem.",
+        "UnknownModel": "Unbekanntes Modell! Bitte melde die \"Hardware Teilenummer\" und das Modell (z.B. HM-350) <a href=\"https://github.com/tbnobody/OpenDTU/issues\" target=\"_blank\">hier</a> als Problem.",
         "Serial": "Seriennummer",
         "ProdYear": "Produktionsjahr",
         "ProdWeek": "Produktionswoche",
@@ -215,9 +215,9 @@
         "FirmwareVersion": "Firmwareversion / Git Hash",
         "FirmwareBranch": "Firmware Branch",
         "PioEnv": "PIO Umgebung",
-        "FirmwareVersionHint": "Klicken Sie hier, um Informationen über Ihre aktuelle Version anzuzeigen",
+        "FirmwareVersionHint": "Klicke hier, um Informationen über die installierte Version anzuzeigen",
         "FirmwareUpdate": "Firmware-Aktualisierung",
-        "FirmwareUpdateHint": "Klicken Sie hier, um die Änderungen zwischen Ihrer Version und der neuesten Version anzuzeigen",
+        "FirmwareUpdateHint": "Klicke hier, um die Änderungen zwischen der installierten und neuesten Version anzuzeigen",
         "FrmwareUpdateAllow": "Durch das Aktivieren der Update-Prüfung wird bei jedem Seitenaufruf eine Anfrage an GitHub.com gesendet, um die aktuelle Version abzurufen. Wenn du damit nicht einverstanden bist, lasse diese Funktion deaktiviert.",
         "ResetReason0": "Reset Grund CPU 0",
         "ResetReason1": "Reset Grund CPU 1",
@@ -404,8 +404,8 @@
         "Reboot": "Neustarten!",
         "Cancel": "@:base.Cancel",
         "RebootOpenDTU": "OpenDTU neu starten",
-        "RebootQuestion": "Möchten Sie das Gerät wirklich neu starten?",
-        "RebootHint": "<b>Hinweis:</b> Ein manueller Neustart muss normalerweise nicht durchgeführt werden. OpenDTU führt jeden erforderlichen Neustart (z. B. nach einem Firmware-Update) automatisch durch. Einstellungen werden auch ohne Neustart übernommen. Wenn Sie aufgrund eines Fehlers einen Neustart durchführen müssen, denken Sie bitte daran, diesen unter <a href=\"https://github.com/tbnobody/OpenDTU/issues\" class=\"alert-link\" target=\"_blank\">https://github.com/tbnobody/OpenDTU/issues</a> zu melden."
+        "RebootQuestion": "Möchtest du das Gerät wirklich neu starten?",
+        "RebootHint": "<b>Hinweis:</b> Ein manueller Neustart muss normalerweise nicht durchgeführt werden. OpenDTU führt jeden erforderlichen Neustart (z. B. nach einem Firmware-Update) automatisch durch. Einstellungen werden auch ohne Neustart übernommen. Wenn du aufgrund eines Fehlers einen Neustart durchführen musst, denke bitte daran, diesen unter <a href=\"https://github.com/tbnobody/OpenDTU/issues\" class=\"alert-link\" target=\"_blank\">https://github.com/tbnobody/OpenDTU/issues</a> zu melden."
     },
     "dtuadmin": {
         "DtuSettings": "DTU-Einstellungen",
@@ -416,8 +416,8 @@
         "Seconds": "Sekunden",
         "NrfPaLevel": "NRF24 Sendeleistung",
         "CmtPaLevel": "CMT2300A Sendeleistung",
-        "NrfPaLevelHint": "Verwendet für HM-Wechselrichter. Stellen Sie sicher, dass Ihre Stromversorgung stabil genug ist, bevor Sie die Sendeleistung erhöhen.",
-        "CmtPaLevelHint": "Verwendet für HMS/HMT-Wechselrichter. Stellen Sie sicher, dass Ihre Stromversorgung stabil genug ist, bevor Sie die Sendeleistung erhöhen.",
+        "NrfPaLevelHint": "Verwendet für HM-Wechselrichter. Stelle sicher, dass die Stromversorgung des ESP32-Mikrocontroller stabil genug ist, bevor du die Sendeleistung erhöhst.",
+        "CmtPaLevelHint": "Verwendet für HMS/HMT-Wechselrichter. Stelle sicher, dass die Stromversorgung des ESP32-Mikrocontroller stabil genug ist, bevor du die Sendeleistung erhöhst.",
         "CmtCountry": "CMT2300A Region/Land",
         "CmtCountryHint": "Jedes Land hat unterschiedliche Frequenzzuteilungen.",
         "country_0": "Europa ({min}MHz - {max}MHz)",
@@ -462,7 +462,7 @@
         "CurrentOpenDtuTime": "Aktuelle OpenDTU-Zeit",
         "CurrentLocalTime": "Aktuelle lokale Zeit",
         "SynchronizeTime": "Zeit synchronisieren",
-        "SynchronizeTimeHint": "<b>Hinweis:</b> Sie können die manuelle Zeitsynchronisation verwenden, um die aktuelle Zeit von OpenDTU einzustellen, wenn kein NTP-Server verfügbar ist. Beachten Sie aber, dass im Falle eines Stromausfalls die Zeit verloren geht. Beachten Sie auch, dass die Zeitgenauigkeit stark verzerrt wird, da sie nicht regelmäßig neu synchronisiert werden kann und der ESP32-Mikrocontroller nicht über eine Echtzeituhr verfügt."
+        "SynchronizeTimeHint": "<b>Hinweis:</b> Du kannst die manuelle Zeitsynchronisation verwenden, um die aktuelle Zeit von OpenDTU auf die Zeit deines Browsers einzustellen, wenn kein NTP-Server verfügbar ist. Beachte aber, dass im Falle eines Stromausfalls die Zeit verloren geht. Beachte auch, dass die Zeitgenauigkeit stark verzerrt wird, da sie nicht regelmäßig neu synchronisiert werden kann und der ESP32-Mikrocontroller nicht über eine Echtzeituhr verfügt."
     },
     "networkadmin": {
         "NetworkSettings": "Netzwerkeinstellungen",
@@ -537,7 +537,7 @@
         "Serial": "Seriennummer",
         "Name": "Name",
         "Add": "Hinzufügen",
-        "AddHint": "<b>Hinweis:</b> Sie können zusätzliche Parameter einstellen, nachdem Sie den Wechselrichter erstellt haben. Verwenden Sie dazu das Stiftsymbol in der Wechselrichterliste.",
+        "AddHint": "<b>Hinweis:</b> Du kannst zusätzliche Parameter einstellen, nachdem du den Wechselrichter erstellt hast. Verwende dazu das Stiftsymbol in der Wechselrichterliste.",
         "InverterList": "Wechselrichterliste",
         "Status": "Status",
         "Send": "Senden",
@@ -565,7 +565,7 @@
         "StringMaxPowerHint": "Eingabe der maximalen Leistung der angeschlossenen Solarmodule.",
         "StringYtOffset": "Ertragsversatz String {num}:",
         "StringYtOffsetHint": "Dieser Offset wird beim Auslesen des Gesamtertragswertes des Wechselrichters angewendet. Damit kann der Gesamtertrag des Wechselrichters auf Null gesetzt werden, wenn ein gebrauchter Wechselrichter verwendet wird.",
-        "InverterHint": "*) Geben Sie die W<sub>p</sub> des Ports ein, um die Einstrahlung zu errechnen.",
+        "InverterHint": "*) Gib die W<sub>p</sub> des Ports ein, um die Einstrahlung zu errechnen.",
         "ReachableThreshold": "Erreichbarkeit Schwellenwert",
         "ReachableThresholdHint": "Legt fest, wie viele Anfragen fehlschlagen dürfen, bis der Wechselrichter als unerreichbar eingestuft wird.",
         "ZeroRuntime": "Nulle Laufzeit Daten",
@@ -591,13 +591,13 @@
         "RestoreHint": "<b>Hinweis:</b> Bei diesem Vorgang wird die Konfigurationsdatei durch die wiederhergestellte Konfiguration ersetzt und OpenDTU neu gestartet, um alle Einstellungen zu übernehmen.",
         "ResetHeader": "Initialisieren: Werksreset durchführen",
         "FactoryResetButton": "Werkseinstellungen wiederherstellen",
-        "ResetHint": "<b>Hinweis:</b> Klicken Sie auf Werkseinstellungen wiederherstellen, um die Werkseinstellungen wiederherzustellen und neu zu starten.",
+        "ResetHint": "<b>Hinweis:</b> Klicke auf Werkseinstellungen wiederherstellen, um die Werkseinstellungen wiederherzustellen und neu zu starten.",
         "FactoryReset": "Werksreset",
-        "ResetMsg": "Sind Sie sicher, dass Sie die aktuelle Konfiguration löschen und alle Einstellungen auf die Werkseinstellungen zurücksetzen möchten?",
+        "ResetMsg": "Bist du sicher, dass du die aktuelle Konfiguration löschen und alle Einstellungen auf die Werkseinstellungen zurücksetzen möchtest?",
         "ResetConfirm": "Werksreset!",
         "Download": "Herunterladen",
         "Delete": "Löschen",
-        "DeleteMsg": "Sind Sie sicher, dass Sie die Datei löschen wollen: '{name}'? Es muss manuell neu gestartet werden um die Konfigurationsänderungen zu übernehmen!",
+        "DeleteMsg": "Bist du sicher, dass du die Datei löschen willst: '{name}'? Ein Neustart wird benötigt um die Konfigurationsänderungen zu übernehmen!",
         "Name": "Name",
         "Size": "Größe",
         "Action": "Aktion",
@@ -633,21 +633,21 @@
         "ProjectOriginBody1": "Das Projekt wurde aus <a href=\"https://www.mikrocontroller.net/topic/525778\" target=\"_blank\">dieser Diskussion (mikrocontroller.net)</a> heraus gestartet.",
         "ProjectOriginBody2": "Das Hoymiles-Protokoll wurde durch die freiwilligen Bemühungen vieler Teilnehmer entschlüsselt. OpenDTU wurde unter anderem auf der Grundlage dieser Arbeit entwickelt. Das Projekt ist unter einer Open-Source-Lizenz lizenziert (<a href=\"https://www.gnu.de/documents/gpl-2.0.de.html\" target=\"_blank\">GNU General Public License version 2</a>).",
         "ProjectOriginBody3": "Die Software wurde nach bestem Wissen und Gewissen entwickelt. Dennoch kann keine Haftung für eine Fehlfunktion oder einen Garantieverlust des Wechselrichters übernommen werden.",
-        "ProjectOriginBody4": "OpenDTU ist frei verfügbar. Wenn Sie Geld für die Software bezahlt haben, wurden Sie wahrscheinlich abgezockt.",
+        "ProjectOriginBody4": "OpenDTU ist frei verfügbar. Wenn du Geld für die Software bezahlt hast, wurdest du wahrscheinlich abgezockt.",
         "NewsUpdates": "Neuigkeiten und Updates",
-        "NewsUpdatesBody": "Neue Updates sind auf Github zu finden: <a href=\"https://github.com/tbnobody/OpenDTU\" target=\"_blank\">https://github.com/tbnobody/OpenDTU</a>",
+        "NewsUpdatesBody": "Neue Updates findest du auf <a href=\"https://github.com/tbnobody/OpenDTU\" target=\"_blank\">Github</a>",
         "ErrorReporting": "Fehlerberichte",
-        "ErrorReportingBody": "Bitte melden Sie Probleme über die Ticketverwaltung von <a href=\"https://github.com/tbnobody/OpenDTU/issues\" target=\"_blank\">Github</a>.",
+        "ErrorReportingBody": "Bitte melde Probleme über die Ticketverwaltung von <a href=\"https://github.com/tbnobody/OpenDTU/issues\" target=\"_blank\">Github</a>.",
         "Discussion": "Diskussion",
-        "DiscussionBody": "Diskutieren Sie mit uns auf <a href=\"https://discord.gg/WzhxEY62mB\" target=\"_blank\">Discord</a> oder <a href=\"https://github.com/tbnobody/OpenDTU/discussions\" target=\"_blank\">Github</a>"
+        "DiscussionBody": "Diskutiere mit uns auf <a href=\"https://discord.gg/WzhxEY62mB\" target=\"_blank\">Discord</a> oder <a href=\"https://github.com/tbnobody/OpenDTU/discussions\" target=\"_blank\">Github</a>"
     },
     "hints": {
-        "RadioProblem": "Es konnte keine Verbindung zu einem der konfigurierten Funkmodule hergestellt werden. Bitte überprüfen Sie die Verdrahtung.",
+        "RadioProblem": "Es konnte keine Verbindung zu einem der konfigurierten Funkmodule hergestellt werden. Bitte überprüfe die Verdrahtung.",
         "TimeSync": "Die Uhr wurde noch nicht synchronisiert. Ohne eine korrekt eingestellte Uhr werden keine Anfragen an den Wechselrichter gesendet. Dies ist kurz nach dem Start normal. Nach einer längeren Laufzeit (>1 Minute) bedeutet es jedoch, dass der NTP-Server nicht erreichbar ist.",
-        "TimeSyncLink": "Bitte überprüfen Sie Ihre Zeiteinstellungen.",
-        "DefaultPassword": "Sie verwenden das Standardpasswort für die Weboberfläche und den Notfall Access Point. Dies ist potenziell unsicher.",
-        "DefaultPasswordLink": "Bitte ändern Sie das Passwort.",
-        "PinMappingIssue": "Sie verwenden eine generische Firmware, haben jedoch noch keine Datei mit Verdrahtungsprofilen (<code>pin_mapping.json</code>) hochgeladen oder kein dort definiertes Profil ausgewählt. Details hierzu entnehmen Sie bitte der <a href=\"https://opendtu.solar/firmware/device_profiles/\" target=\"_blank\" class=\"alert-link\">Dokumentation</a>."
+        "TimeSyncLink": "Bitte überprüfe die Zeiteinstellungen.",
+        "DefaultPassword": "Du verwendest das Standardpasswort für die Weboberfläche und den Notfall Access Point. Dies ist potenziell unsicher.",
+        "DefaultPasswordLink": "Bitte ändere das Passwort.",
+        "PinMappingIssue": "Du verwendest eine generische Firmware, hast jedoch noch keine Datei mit Verdrahtungsprofilen (<code>pin_mapping.json</code>) hochgeladen oder kein dort definiertes Profil ausgewählt. Details hierzu findest du in der <a href=\"https://opendtu.solar/firmware/device_profiles/\" target=\"_blank\" class=\"alert-link\">Dokumentation</a>."
     },
     "deviceadmin": {
         "DeviceManager": "Hardware-Einstellungen",
@@ -655,7 +655,7 @@
         "PinAssignment": "Anschlusseinstellungen",
         "SelectedProfile": "Ausgewähltes Profil",
         "DefaultProfile": "(Standardeinstellungen)",
-        "ProfileHint": "Ihr Gerät reagiert möglicherweise nicht mehr, wenn Sie ein inkompatibles Profil wählen. In diesem Fall müssen Sie eine Löschung über das serielle Interface durchführen.",
+        "ProfileHint": "Dein Gerät reagiert möglicherweise nicht mehr, wenn du ein inkompatibles Profil wählst. In diesem Fall musst du eine Löschung über das serielle Interface durchführen.",
         "Display": "Display",
         "PowerSafe": "Ausschalten wenn kein Inverter erreichbar",
         "PowerSafeHint": "Schaltet das Display aus, wenn kein Wechselrichter Strom erzeugt",
