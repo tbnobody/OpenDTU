@@ -384,7 +384,10 @@
             "EnableAutoScroll": "Ενεργοποίηση αυτόματης κύλισης",
             "ClearConsole": "Εκκαθάριση κονσόλας",
             "CopyToClipboard": "Αντιγραφή στο πρόχειρο",
-            "Download": "Download"
+            "Download": "Download",
+            "RegularExpression": "Regular Expression",
+            "Lines": "{lines} Lines",
+            "LogLevel": "Log Level ({cnt})"
         },
         "inverterchannelinfo": {
             "String": "Είσοδος {num}",

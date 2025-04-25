@@ -369,7 +369,10 @@
         "EnableAutoScroll": "Enable Auto Scroll",
         "ClearConsole": "Clear Console",
         "CopyToClipboard": "Copy to clipboard",
-        "Download": "Download"
+        "Download": "Download",
+        "RegularExpression": "Regular Expression",
+        "Lines": "{lines} Lines",
+        "LogLevel": "Log Level ({cnt})"
     },
     "inverterchannelinfo": {
         "String": "String {num}",

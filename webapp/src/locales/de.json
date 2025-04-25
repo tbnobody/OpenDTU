@@ -369,7 +369,10 @@
         "EnableAutoScroll": "Automatisches Scrollen aktivieren",
         "ClearConsole": "Konsole leeren",
         "CopyToClipboard": "In die Zwischenablage kopieren",
-        "Download": "Herunterladen"
+        "Download": "Herunterladen",
+        "RegularExpression": "Regulärer Ausdruck",
+        "Lines": "{lines} Zeilen",
+        "LogLevel": "Protokollierungsstufe ({cnt})"
     },
     "inverterchannelinfo": {
         "String": "String {num}",

@@ -351,7 +351,10 @@
         "EnableAutoScroll": "Activer le défilement automatique",
         "ClearConsole": "Vider la console",
         "CopyToClipboard": "Copier dans le presse-papiers",
-        "Download": "Download"
+        "Download": "Download",
+        "RegularExpression": "Regular Expression",
+        "Lines": "{lines} Lines",
+        "LogLevel": "Log Level ({cnt})"
     },
     "inverterchannelinfo": {
         "String": "Ligne {num}",

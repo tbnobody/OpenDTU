@@ -1,8 +1,85 @@
 <template>
     <BasePage :title="$t('console.Console')" :isLoading="dataLoading">
         <CardElement :text="$t('console.VirtualDebugConsole')" textVariant="text-bg-primary">
-            <div class="row align-items-center mb-3">
-                <div class="col-auto mt-2">
+            <div class="btn-toolbar mb-3" role="toolbar">
+                <div class="input-group me-2">
+                    <div class="input-group-text" id="btnSearch">
+                        <BIconSearch />
+                    </div>
+                    <input
+                        v-model="searchText"
+                        type="text"
+                        class="form-control"
+                        :placeholder="$t('console.RegularExpression')"
+                        aria-label="Search"
+                        aria-describedby="btnSearch"
+                    />
+                </div>
+
+                <div class="btn-group me-2" role="group" aria-label="Filter by level">
+                    <div class="dropdown">
+                        <button
+                            class="btn btn-outline-secondary dropdown-toggle"
+                            type="button"
+                            id="logLevelDropdown"
+                            data-bs-toggle="dropdown"
+                            aria-expanded="false"
+                        >
+                            <BIconFilter /> {{ $t('console.LogLevel', { cnt: activeLevels.length }) }}
+                        </button>
+                        <ul
+                            class="dropdown-menu dropdown-menu-dark p-2"
+                            aria-labelledby="logLevelDropdown"
+                            style="min-width: 200px"
+                        >
+                            <li v-for="(label, tag) in levelMap" :key="tag">
+                                <div class="form-check">
+                                    <input
+                                        class="form-check-input"
+                                        type="checkbox"
+                                        :id="`dropdown-filter-${label}`"
+                                        v-model="activeLevels"
+                                        :value="levelMap[tag]"
+                                    />
+                                    <label class="form-check-label" :for="`dropdown-filter-${label}`">
+                                        {{ label.toUpperCase() }}
+                                    </label>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="btn-group me-2" role="group">
+                    <button
+                        type="button"
+                        class="btn btn-primary"
+                        :onClick="clearConsole"
+                        :title="$t('console.ClearConsole')"
+                    >
+                        <BIconTrash />
+                    </button>
+                </div>
+                <div class="btn-group me-2" role="group">
+                    <button
+                        type="button"
+                        class="btn btn-secondary"
+                        :onClick="copyConsole"
+                        :title="$t('console.CopyToClipboard')"
+                    >
+                        <BIconClipboard />
+                    </button>
+                    <button
+                        type="button"
+                        class="btn btn-secondary"
+                        :onClick="exportConsole"
+                        :title="$t('console.Download')"
+                    >
+                        <BIconDownload />
+                    </button>
+                </div>
+
+                <div class="col-auto ms-auto mt-2">
                     <div class="form-check form-switch">
                         <input
                             class="form-check-input"
@@ -16,27 +93,15 @@
                         </label>
                     </div>
                 </div>
-                <div class="col-auto ms-auto">
-                    <div class="btn-group" role="group">
-                        <button type="button" class="btn btn-primary" :onClick="clearConsole">
-                            {{ $t('console.ClearConsole') }}
-                        </button>
-                        <button type="button" class="btn btn-secondary" :onClick="copyConsole">
-                            {{ $t('console.CopyToClipboard') }}
-                        </button>
-                        <button type="button" class="btn btn-secondary" :onClick="exportConsole">
-                            {{ $t('console.Download') }}
-                        </button>
-                    </div>
-                </div>
             </div>
 
             <div id="log" ref="logRef" class="log-output" @scroll="handleScroll">
-                <div v-for="(line, index) in lines" :key="index" class="log-line" :class="getLineClass(line.text)">
+                <div v-for="(line, index) in filteredLines" :key="index" class="log-line" :class="line.level">
                     <span class="timestamp">[{{ formatTimestamp(line.timestamp) }}]</span>
                     {{ line.text }}
                 </div>
             </div>
+            {{ $t('console.Lines', { lines: $n(filteredLines.length) }) }}
         </CardElement>
     </BasePage>
 </template>
@@ -45,17 +110,24 @@
 import BasePage from '@/components/BasePage.vue';
 import CardElement from '@/components/CardElement.vue';
 import { authUrl } from '@/utils/authentication';
+import { BIconClipboard, BIconDownload, BIconFilter, BIconSearch, BIconTrash } from 'bootstrap-icons-vue';
 import { defineComponent } from 'vue';
 
 interface LogLine {
     text: string;
     timestamp: Date;
+    level: string;
 }
 
 export default defineComponent({
     components: {
         BasePage,
         CardElement,
+        BIconDownload,
+        BIconClipboard,
+        BIconTrash,
+        BIconFilter,
+        BIconSearch,
     },
     data() {
         return {
@@ -63,6 +135,8 @@ export default defineComponent({
             heartInterval: 0,
             dataLoading: true,
             autoScroll: true,
+            activeLevels: ['error', 'warning', 'info', 'debug', 'verbose'],
+            searchText: '',
             lines: [] as LogLine[],
             buffer: '',
             levelMap: {
@@ -80,6 +154,15 @@ export default defineComponent({
     },
     unmounted() {
         this.closeSocket();
+    },
+    computed: {
+        filteredLines(): LogLine[] {
+            return this.lines.filter((line) => {
+                const regexp = new RegExp(this.searchText, 'i');
+                const found = regexp.test(line.text);
+                return this.activeLevels.includes(line.level) && found;
+            });
+        },
     },
     methods: {
         initSocket() {
@@ -104,6 +187,7 @@ export default defineComponent({
                     this.lines.push({
                         text: line,
                         timestamp: new Date(), // assign time of message arrival
+                        level: this.getLineClass(line),
                     });
                     this.$nextTick(() => {
                         if (this.autoScroll) {
@@ -189,7 +273,7 @@ export default defineComponent({
             this.buffer = '';
         },
         copyConsole() {
-            const content = this.lines
+            const content = this.filteredLines
                 .map((line) => `[${this.formatTimestamp(line.timestamp)}] ${line.text}`)
                 .join('\n');
             navigator.clipboard
@@ -202,7 +286,7 @@ export default defineComponent({
                 });
         },
         exportConsole() {
-            const content = this.lines
+            const content = this.filteredLines
                 .map((line) => `[${this.formatTimestamp(line.timestamp)}] ${line.text}`)
                 .join('\n');
             const timestamp = this.getFileTimestamp();
@@ -234,7 +318,7 @@ export default defineComponent({
 });
 </script>
 
-<style>
+<style scoped>
 .log-output {
     height: 500px;
     max-height: 500px;
