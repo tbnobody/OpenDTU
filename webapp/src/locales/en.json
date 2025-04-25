@@ -119,8 +119,8 @@
         "10001": "Password must between 8 and {max} characters long!",
         "10002": "Authentication successful!",
         "11001": "@:apiresponse.2001",
-        "11002": "@:apiresponse:5004",
-        "12001": "Profil must between 1 and {max} characters long!"
+        "11002": "@:apiresponse.5004",
+        "12001": "Profile name must between 1 and {max} characters long!"
     },
     "home": {
         "LiveData": "Live Data",

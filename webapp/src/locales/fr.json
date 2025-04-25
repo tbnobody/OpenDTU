@@ -119,7 +119,7 @@
         "10001": "Le mot de passe doit comporter entre 8 et {max} caractères !",
         "10002": "Authentification réussie !",
         "11001": "@:apiresponse.2001",
-        "11002": "@:apiresponse:5004",
+        "11002": "@:apiresponse.5004",
         "12001": "Le profil doit comporter entre 1 et {max} caractères !"
     },
     "home": {
