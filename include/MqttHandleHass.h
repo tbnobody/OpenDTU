@@ -4,6 +4,7 @@
 #include <ArduinoJson.h>
 #include <Hoymiles.h>
 #include <TaskSchedulerDeclarations.h>
+#include <TimeoutHelper.h>
 
 // mqtt discovery device classes
 enum DeviceClassType {
@@ -98,6 +99,7 @@ private:
     static String getDtuUrl();
 
     Task _loopTask;
+    TimeoutHelper _publishConfigTimeout;
 
     bool _wasConnected = false;
     bool _updateForced = false;

@@ -10,6 +10,11 @@
 #include "__compiled_constants.h"
 #include "defaults.h"
 
+#define MAX_CONFIG_PUBLISH_RATIO 60000
+
+#undef TAG
+static const char* TAG = "mqtt";
+
 MqttHandleHassClass MqttHandleHass;
 
 MqttHandleHassClass::MqttHandleHassClass()
@@ -25,18 +30,18 @@ void MqttHandleHassClass::init(Scheduler& scheduler)
 
 void MqttHandleHassClass::loop()
 {
-    if (_updateForced) {
-        publishConfig();
-        _updateForced = false;
-    }
-
     if (MqttSettings.getConnected() && !_wasConnected) {
         // Connection established
         _wasConnected = true;
-        publishConfig();
+        _updateForced = true;
     } else if (!MqttSettings.getConnected() && _wasConnected) {
         // Connection lost
         _wasConnected = false;
+    }
+
+    if (_updateForced && _publishConfigTimeout.occured()) {
+        publishConfig();
+        _updateForced = false;
     }
 }
 
@@ -54,6 +59,9 @@ void MqttHandleHassClass::publishConfig()
     if (!MqttSettings.getConnected() && Hoymiles.isAllRadioIdle()) {
         return;
     }
+
+    ESP_LOGI(TAG, "Publish HA config");
+    _publishConfigTimeout.set(MAX_CONFIG_PUBLISH_RATIO);
 
     const CONFIG_T& config = Configuration.get();
 
@@ -77,6 +85,7 @@ void MqttHandleHassClass::publishConfig()
     // Loop all inverters
     for (uint8_t i = 0; i < Hoymiles.getNumInverters(); i++) {
         auto inv = Hoymiles.getInverterByPos(i);
+        yield();
 
         publishInverterButton(inv, "Turn Inverter Off", "cmd/power", "0", "mdi:power-plug-off", DEVICE_CLS_NONE, STATE_CLS_NONE, CATEGORY_CONFIG);
         publishInverterButton(inv, "Turn Inverter On", "cmd/power", "1", "mdi:power-plug", DEVICE_CLS_NONE, STATE_CLS_NONE, CATEGORY_CONFIG);
@@ -109,6 +118,7 @@ void MqttHandleHassClass::publishConfig()
                         clear = true;
                     }
                     publishInverterField(inv, t, c, deviceFieldAssignment[f], clear);
+                    yield();
                 }
             }
         }
