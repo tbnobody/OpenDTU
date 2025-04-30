@@ -1,6 +1,6 @@
 <template>
     <BasePage :title="$t('inverteradmin.InverterSettings')" :isLoading="dataLoading">
-        <BootstrapAlert v-model="alert.show" dismissible :variant="alert.type">
+        <BootstrapAlert v-model="alert.show" dismissible :variant="alert.type" :auto-dismiss="0">
             {{ alert.message }}
         </BootstrapAlert>
 

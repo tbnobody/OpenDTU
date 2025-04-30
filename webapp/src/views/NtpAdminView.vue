@@ -1,6 +1,11 @@
 <template>
     <BasePage :title="$t('ntpadmin.NtpSettings')" :isLoading="dataLoading || timezoneLoading">
-        <BootstrapAlert v-model="alert.show" dismissible :variant="alert.type">
+        <BootstrapAlert
+            v-model="alert.show"
+            dismissible
+            :variant="alert.type"
+            :auto-dismiss="alert.type != 'success' ? 0 : 5000"
+        >
             {{ alert.message }}
         </BootstrapAlert>
 
