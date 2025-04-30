@@ -76,7 +76,7 @@ export default defineComponent({
 });
 </script>
 
-<style>
+<style scoped>
 .ptr--text {
     color: var(--bs-primary-text-emphasis) !important;
 }

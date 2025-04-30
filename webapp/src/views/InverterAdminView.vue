@@ -465,7 +465,7 @@ export default defineComponent({
 });
 </script>
 
-<style>
+<style scoped>
 .drag-handle {
     cursor: grab;
 }
