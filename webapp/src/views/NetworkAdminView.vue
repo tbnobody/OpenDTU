@@ -1,7 +1,7 @@
 <template>
     <BasePage :title="$t('networkadmin.NetworkSettings')" :isLoading="dataLoading">
-        <BootstrapAlert v-model="showAlert" dismissible :variant="alertType">
-            {{ alertMessage }}
+        <BootstrapAlert v-model="alert.show" dismissible :variant="alert.type">
+            {{ alert.message }}
         </BootstrapAlert>
 
         <form @submit="saveNetworkConfig">
@@ -133,6 +133,7 @@ import BootstrapAlert from '@/components/BootstrapAlert.vue';
 import CardElement from '@/components/CardElement.vue';
 import FormFooter from '@/components/FormFooter.vue';
 import InputElement from '@/components/InputElement.vue';
+import type { AlertResponse } from '@/types/AlertResponse';
 import type { NetworkConfig } from '@/types/NetworkConfig';
 import { authHeader, handleResponse } from '@/utils/authentication';
 import { defineComponent } from 'vue';
@@ -149,9 +150,7 @@ export default defineComponent({
         return {
             dataLoading: true,
             networkConfigList: {} as NetworkConfig,
-            alertMessage: '',
-            alertType: 'info',
-            showAlert: false,
+            alert: {} as AlertResponse,
         };
     },
     created() {
@@ -180,9 +179,9 @@ export default defineComponent({
             })
                 .then((response) => handleResponse(response, this.$emitter, this.$router))
                 .then((response) => {
-                    this.alertMessage = this.$t('apiresponse.' + response.code, response.param);
-                    this.alertType = response.type;
-                    this.showAlert = true;
+                    this.alert.message = this.$t('apiresponse.' + response.code, response.param);
+                    this.alert.type = response.type;
+                    this.alert.show = true;
                 });
         },
     },

@@ -1,7 +1,7 @@
 <template>
     <BasePage :title="$t('maintenancereboot.DeviceReboot')" :isLoading="dataLoading">
-        <BootstrapAlert v-model="showAlert" dismissible :variant="alertType">
-            {{ alertMessage }}
+        <BootstrapAlert v-model="alert.show" dismissible :variant="alert.type">
+            {{ alert.message }}
         </BootstrapAlert>
 
         <CardElement :text="$t('maintenancereboot.PerformReboot')" textVariant="text-bg-primary" center-content>
@@ -33,6 +33,7 @@ import BasePage from '@/components/BasePage.vue';
 import BootstrapAlert from '@/components/BootstrapAlert.vue';
 import CardElement from '@/components/CardElement.vue';
 import ModalDialog from '@/components/ModalDialog.vue';
+import type { AlertResponse } from '@/types/AlertResponse';
 import { authHeader, handleResponse, isLoggedIn } from '@/utils/authentication';
 import * as bootstrap from 'bootstrap';
 import { defineComponent } from 'vue';
@@ -48,12 +49,8 @@ export default defineComponent({
     data() {
         return {
             performReboot: {} as bootstrap.Modal,
-
             dataLoading: false,
-
-            alertMessage: '',
-            alertType: 'info',
-            showAlert: false,
+            alert: {} as AlertResponse,
         };
     },
     mounted() {
@@ -78,9 +75,9 @@ export default defineComponent({
             })
                 .then((response) => handleResponse(response, this.$emitter, this.$router))
                 .then((data) => {
-                    this.alertMessage = this.$t('apiresponse.' + data.code, data.param);
-                    this.alertType = data.type;
-                    this.showAlert = true;
+                    this.alert.message = this.$t('apiresponse.' + data.code, data.param);
+                    this.alert.type = data.type;
+                    this.alert.show = true;
                     waitRestart(this.$router);
                 });
             this.onCloseModal(this.performReboot);
