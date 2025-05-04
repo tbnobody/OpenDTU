@@ -188,7 +188,6 @@ void WebApiNetworkClass::onNetworkAdminPost(AsyncWebServerRequest* request)
             WebApi.sendJsonResponse(request, response, __FUNCTION__, __LINE__);
             return;
         }
-
     }
 
     {

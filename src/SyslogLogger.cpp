@@ -2,12 +2,12 @@
 /*
  * Copyright (C) 2022-2025 Thomas Basler and others
  */
-#include <HardwareSerial.h>
-#include <ESPmDNS.h>
-#include "defaults.h"
 #include "SyslogLogger.h"
 #include "Configuration.h"
 #include "NetworkSettings.h"
+#include "defaults.h"
+#include <ESPmDNS.h>
+#include <HardwareSerial.h>
 
 #undef TAG
 static const char* TAG = "syslog";
@@ -47,7 +47,7 @@ void SyslogLogger::updateSettings(const String&& hostname)
 
     ESP_LOGI(TAG, "Logging to %s!", _syslog_hostname.c_str());
 
-    _header = ">1 - ";  // RFC5424: Facility USER, severity INFO, version 1, NIL timestamp.
+    _header = ">1 - "; // RFC5424: Facility USER, severity INFO, version 1, NIL timestamp.
     _header += hostname;
     _header += " OpenDTU ";
     _header += _proc_id;
@@ -58,7 +58,7 @@ void SyslogLogger::updateSettings(const String&& hostname)
     enable();
 }
 
-void SyslogLogger::write(const uint8_t *buffer, size_t size)
+void SyslogLogger::write(const uint8_t* buffer, size_t size)
 {
     std::lock_guard<std::mutex> lock(_mutex);
     if (!_enabled || !isResolved()) {
@@ -118,7 +118,7 @@ bool SyslogLogger::resolveAndStart()
         if (!_udp.beginPacket(_syslog_hostname.c_str(), _port)) {
             return false;
         }
-        _address = _udp.remoteIP();  // Store resolved address.
+        _address = _udp.remoteIP(); // Store resolved address.
     }
     return true;
 }
