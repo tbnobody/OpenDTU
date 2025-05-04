@@ -12,7 +12,7 @@ static const char* TAG = "logging";
 
 LoggingClass::LoggingClass()
 {
-    _configurableModules.reserve(3);
+    _configurableModules.reserve(5);
     _configurableModules.push_back("CORE");
     _configurableModules.push_back("hoymiles");
     _configurableModules.push_back("mqtt");
