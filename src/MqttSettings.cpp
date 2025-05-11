@@ -149,6 +149,7 @@ void MqttSettingsClass::performConnect()
             static_cast<espMqttClientSecure*>(_mqttClient)->onConnect(std::bind(&MqttSettingsClass::onMqttConnect, this, _1));
             static_cast<espMqttClientSecure*>(_mqttClient)->onDisconnect(std::bind(&MqttSettingsClass::onMqttDisconnect, this, _1));
             static_cast<espMqttClientSecure*>(_mqttClient)->onMessage(std::bind(&MqttSettingsClass::onMqttMessage, this, _1, _2, _3, _4, _5, _6));
+            static_cast<espMqttClientSecure*>(_mqttClient)->onPublish(std::bind(&MqttSettingsClass::onMqttPublish, this, _1));
         } else {
             static_cast<espMqttClient*>(_mqttClient)->setServer(config.Mqtt.Hostname, config.Mqtt.Port);
             static_cast<espMqttClient*>(_mqttClient)->setCredentials(config.Mqtt.Username, config.Mqtt.Password);
@@ -158,9 +159,20 @@ void MqttSettingsClass::performConnect()
             static_cast<espMqttClient*>(_mqttClient)->onConnect(std::bind(&MqttSettingsClass::onMqttConnect, this, _1));
             static_cast<espMqttClient*>(_mqttClient)->onDisconnect(std::bind(&MqttSettingsClass::onMqttDisconnect, this, _1));
             static_cast<espMqttClient*>(_mqttClient)->onMessage(std::bind(&MqttSettingsClass::onMqttMessage, this, _1, _2, _3, _4, _5, _6));
+            static_cast<espMqttClient*>(_mqttClient)->onPublish(std::bind(&MqttSettingsClass::onMqttPublish, this, _1));
         }
         _mqttClient->connect();
     }
+}
+
+void MqttSettingsClass::onMqttPublish(PacketId packageId) {
+    if (this->_onPacketCallback != nullptr) {
+        this->_onPacketCallback(packageId);
+    }
+}
+
+void MqttSettingsClass::addOnPublishCallback(MqttOnPublishCallback callback) {
+    this->_onPacketCallback = callback;
 }
 
 void MqttSettingsClass::performDisconnect()
@@ -207,7 +219,7 @@ String MqttSettingsClass::getClientId() const
     return clientId;
 }
 
-void MqttSettingsClass::publish(const String& subtopic, const String& payload)
+uint16_t MqttSettingsClass::publish(const String& subtopic, const String& payload, const uint8_t qos)
 {
     String topic = getPrefix();
     topic += subtopic;
@@ -215,16 +227,16 @@ void MqttSettingsClass::publish(const String& subtopic, const String& payload)
     String value = payload;
     value.trim();
 
-    publishGeneric(topic, value, Configuration.get().Mqtt.Retain, 0);
+    return publishGeneric(topic, value, Configuration.get().Mqtt.Retain, qos);
 }
 
-void MqttSettingsClass::publishGeneric(const String& topic, const String& payload, const bool retain, const uint8_t qos)
+uint16_t MqttSettingsClass::publishGeneric(const String& topic, const String& payload, const bool retain, const uint8_t qos)
 {
     std::lock_guard<std::mutex> lock(_clientLock);
     if (_mqttClient == nullptr) {
-        return;
+        return 0;
     }
-    _mqttClient->publish(topic.c_str(), qos, retain, payload.c_str());
+    return _mqttClient->publish(topic.c_str(), qos, retain, payload.c_str());
 }
 
 void MqttSettingsClass::init()
