@@ -10,7 +10,7 @@
 #include <string.h>
 
 #undef TAG
-static const char* TAG = "pingmapping";
+static const char* TAG = "pinmapping";
 
 #ifndef DISPLAY_TYPE
 #define DISPLAY_TYPE 0U
