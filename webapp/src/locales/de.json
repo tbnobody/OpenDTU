@@ -98,6 +98,7 @@
         "7015": "Hass-Topic darf keine Leerzeichen enthalten!",
         "7016": "LWT QoS darf nicht größer als {max} sein!",
         "7017": "Client ID darf nicht länger als {max} Zeichen sein!",
+        "7018": "Hass-Topic muss mit einem Slash (/) enden!",
         "8001": "IP-Adresse ist ungültig!",
         "8002": "Netzmaske ist ungültig!",
         "8003": "Standardgateway ist ungültig!",

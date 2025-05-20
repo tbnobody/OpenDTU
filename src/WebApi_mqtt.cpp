@@ -268,6 +268,13 @@ void WebApiMqttClass::onMqttAdminPost(AsyncWebServerRequest* request)
                 WebApi.sendJsonResponse(request, response, __FUNCTION__, __LINE__);
                 return;
             }
+
+            if (!root["mqtt_hass_topic"].as<String>().endsWith("/")) {
+                retMsg["message"] = "Hass topic must end with a slash (/)!";
+                retMsg["code"] = WebApiError::MqttHassTopicTrailingSlash;
+                WebApi.sendJsonResponse(request, response, __FUNCTION__, __LINE__);
+                return;
+            }
         }
     }
 

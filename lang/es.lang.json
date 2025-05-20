@@ -113,6 +113,7 @@
             "7015": "¡El tema Hass no debe contener caracteres de espacio!",
             "7016": "¡La QoS LWT no debe ser mayor que {max}!",
             "7017": "Client ID must not longer then {max} characters!",
+            "7018": "Hass topic must end with slash (/)!",
             "8001": "¡La dirección IP no es válida!",
             "8002": "¡La máscara de red no es válida!",
             "8003": "¡El gateway no es válido!",

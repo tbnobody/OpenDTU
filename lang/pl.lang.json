@@ -113,6 +113,7 @@
             "7015": "Temat Hass nie może zawierać spacji!",
             "7016": "LWT QOS nie może być większy niż {max}!",
             "7017": "Identyfikator klienta nie może być dłuższy niż {max} znaków!",
+            "7018": "Hass topic must end with slash (/)!",
             "8001": "Adres IP jest nieprawidłowy!!",
             "8002": "Maska sieci jest nieprawidłowa!",
             "8003": "Brama jest nieprawidłowa!",

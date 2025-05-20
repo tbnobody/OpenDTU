@@ -113,6 +113,7 @@
             "7015": "Hass topic must not contain space characters!",
             "7016": "LWT QOS must not greater then {max}!",
             "7017": "Client ID must not longer then {max} characters!",
+            "7018": "Hass topic must end with slash (/)!",
             "8001": "IP address is invalid!",
             "8002": "Netmask is invalid!",
             "8003": "Gateway is invalid!",
