@@ -32,8 +32,8 @@ void MessageOutputClass::register_ws_output(AsyncWebSocket* output)
 int MessageOutputClass::log_vprintf(const char* fmt, va_list arguments)
 {
     char log_buffer[WS_CHUNK_SIZE_BYTES];
-    vsnprintf(log_buffer, sizeof(log_buffer), fmt, arguments);
-    return MessageOutput.print(log_buffer);
+    auto written = vsnprintf(log_buffer, sizeof(log_buffer), fmt, arguments);
+    return MessageOutput.write(reinterpret_cast<uint8_t*>(log_buffer), written);
 }
 
 void MessageOutputClass::serialWrite(MessageOutputClass::message_t const& m)
@@ -51,25 +51,6 @@ void MessageOutputClass::serialWrite(MessageOutputClass::message_t const& m)
     }
 
     Serial.flush();
-}
-
-size_t MessageOutputClass::write(uint8_t c)
-{
-    std::lock_guard<std::mutex> lock(_msgLock);
-
-    auto res = _task_messages.emplace(xTaskGetCurrentTaskHandle(), message_t());
-    auto iter = res.first;
-    auto& message = iter->second;
-
-    message.push_back(c);
-
-    if (c == '\n') {
-        serialWrite(message);
-        _lines.emplace(std::move(message));
-        _task_messages.erase(iter);
-    }
-
-    return 1;
 }
 
 size_t MessageOutputClass::write(const uint8_t* buffer, size_t size)
