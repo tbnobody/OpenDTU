@@ -4,7 +4,6 @@
  */
 #include "MessageOutput.h"
 #include "SyslogLogger.h"
-#include <HardwareSerial.h>
 
 MessageOutputClass MessageOutput;
 
