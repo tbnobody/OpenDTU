@@ -221,7 +221,7 @@ jobs:
 
       - name: Build Changelog
         id: github_release
-        uses: mikepenz/release-changelog-builder-action@v5.3.0
+        uses: mikepenz/release-changelog-builder-action@v5.3.1
         with:
           failOnError: true
           commitMode: true
