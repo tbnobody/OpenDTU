@@ -325,8 +325,8 @@ export default defineComponent({
     overflow-y: auto;
     overflow-x: auto;
     padding: 8px;
-    background: #111;
-    border: 1px solid #333;
+    background: #002b36;
+    border: 1px solid #073642;
     border-radius: 6px;
     font-family: courier new;
     font-size: 0.875em;
@@ -338,31 +338,31 @@ export default defineComponent({
 }
 
 .timestamp {
-    color: #888;
+    color: #586e75;
     margin-right: 8px;
 }
 
 .error {
-    color: #ff5555;
+    color: #dc322f;
 }
 
 .warning {
-    color: #ffcc00;
+    color: #b58900;
 }
 
 .info {
-    color: #a8ff60;
+    color: #859900;
 }
 
 .debug {
-    color: #57c7ff;
+    color: #268bd2;
 }
 
 .verbose {
-    color: #bbbbbb;
+    color: #839496;
 }
 
 .default {
-    color: #ddd;
+    color: #586e75;
 }
 </style>
