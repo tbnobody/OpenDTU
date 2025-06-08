@@ -265,12 +265,7 @@
         "Task_tit": "TCP/IP",
         "Task_looptask": "Arduino Main Loop",
         "Task_asynctcp": "Async TCP",
-        "Task_mqttclient": "MQTT Client",
-        "Task_huaweican0": "AC Charger CAN",
-        "Task_pmsdm": "PowerMeter (SDM)",
-        "Task_pmhttpjson": "PowerMeter (HTTP+JSON)",
-        "Task_pmsml": "PowerMeter (Serial SML)",
-        "Task_pmhttpsml": "PowerMeter (HTTP+SML)"
+        "Task_mqttclient": "MQTT Client"
     },
     "radioinfo": {
         "RadioInformation": "Radio Information",
