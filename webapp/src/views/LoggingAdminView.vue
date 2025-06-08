@@ -42,7 +42,7 @@
                                 :data-id="module.name"
                                 class="align-middle"
                             >
-                                <td>{{ module.name }}</td>
+                                <td>{{ $t('loggingadmin.Module_' + module.name) }}</td>
                                 <td>
                                     <select class="form-select" v-model="module.level">
                                         <option v-for="level in logLevelList" :value="level.key" :key="level.key">
