@@ -461,6 +461,17 @@ void ConfigurationClass::migrate()
         config.Logging.Modules[0].Level = ESP_LOG_ERROR;
     }
 
+    if (config.Cfg.Version < 0x00011f00) {
+        switch (config.Ntp.SunsetType) {
+        case 1U:
+            config.Ntp.SunsetType = 2U;
+            break;
+        case 2U:
+            config.Ntp.SunsetType = 1U;
+            break;
+        }
+    }
+
     f.close();
 
     config.Cfg.Version = CONFIG_VERSION;

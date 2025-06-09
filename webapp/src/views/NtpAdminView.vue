@@ -128,9 +128,9 @@ export default defineComponent({
             alert: {} as AlertResponse,
             sunsetTypeList: [
                 { key: 0, value: 'OFFICIAL' },
-                { key: 1, value: 'NAUTICAL' },
-                { key: 2, value: 'CIVIL' },
-                { key: 3, value: 'ASTONOMICAL' },
+                { key: 1, value: 'CIVIL' },
+                { key: 2, value: 'NAUTICAL' },
+                { key: 3, value: 'ASTRONOMICAL' },
             ],
         };
     },
