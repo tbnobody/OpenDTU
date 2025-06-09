@@ -6,7 +6,6 @@
         "NTPSettings": "NTP Settings",
         "MQTTSettings": "MQTT Settings",
         "InverterSettings": "Inverter Settings",
-        "ScaleSettings": "Scale Settings",
         "SecuritySettings": "Security Settings",
         "LoggingSettings": "Logging Settings",
         "DTUSettings": "DTU Settings",
@@ -19,7 +18,6 @@
         "Network": "Network",
         "NTP": "NTP",
         "MQTT": "MQTT",
-        "Scale": "Scale",
         "Console": "Console",
         "About": "About",
         "Logout": "Logout",
@@ -34,7 +32,7 @@
         "Pull": "Pull down to refresh",
         "Release": "Release to refresh",
         "Close": "Close",
-        "Yes": "Yes"
+        "Yes": "Yes",
         "No": "No"
     },
     "wait": {
