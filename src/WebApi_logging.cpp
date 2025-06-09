@@ -42,7 +42,7 @@ void WebApiLoggingClass::onLoggingAdminGet(AsyncWebServerRequest* request)
 
         int8_t idx = Configuration.getIndexForLogModule(availModule);
         // Set to inherit if unknown
-        logModule["level"] = idx < 0 || idx > ESP_LOG_VERBOSE ? -1 : config.Logging.Modules[idx].Level;
+        logModule["level"] = idx < 0 || idx >= LOG_MODULE_COUNT ? -1 : config.Logging.Modules[idx].Level;
     }
 
     WebApi.sendJsonResponse(request, response, __FUNCTION__, __LINE__);
