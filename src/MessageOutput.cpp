@@ -7,9 +7,6 @@
 
 MessageOutputClass MessageOutput;
 
-#undef TAG
-#define TAG "MessageOutput"
-
 MessageOutputClass::MessageOutputClass()
     : _loopTask(TASK_IMMEDIATE, TASK_FOREVER, std::bind(&MessageOutputClass::loop, this))
 {
