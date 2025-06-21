@@ -15,7 +15,6 @@ class MessageOutputClass {
 public:
     MessageOutputClass();
     void init(Scheduler& scheduler);
-    size_t write(const uint8_t* buffer, size_t size);
     void register_ws_output(AsyncWebSocket* output);
 
     static int log_vprintf(const char *fmt, va_list arguments);
@@ -24,6 +23,13 @@ private:
     void loop();
 
     Task _loopTask;
+
+    int log_vprintf_locked(const char *fmt, va_list arguments);
+
+    static constexpr size_t BUFFER_SIZE = 8192;
+    char _buffer[BUFFER_SIZE];
+    size_t _buffer_in = 0;
+    size_t _buffer_out = 0;
 
     using message_t = std::vector<uint8_t>;
 
@@ -42,9 +48,10 @@ private:
     // "motivate" the client to send out ACKs immediately as the TCP packets are
     // "large", or we will wait long enough for the TCP stack to send out the
     // ACK anyways.
-    void send_ws_chunk(message_t&& line);
+    void send_ws_chunk(const uint8_t* buffer, size_t size);
     static constexpr size_t WS_CHUNK_SIZE_BYTES = 512;
     static constexpr uint32_t WS_CHUNK_INTERVAL_MS = 250;
+    static constexpr size_t TYPICAL_LINE_LENGTH = 150;
     std::shared_ptr<message_t> _ws_chunk = nullptr;
     uint32_t _last_ws_chunk_sent = 0;
 
@@ -52,7 +59,7 @@ private:
 
     std::mutex _msgLock;
 
-    void serialWrite(message_t const& m);
+    void serialWrite(const uint8_t* buffer, size_t size);
 };
 
 extern MessageOutputClass MessageOutput;
