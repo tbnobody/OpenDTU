@@ -162,6 +162,15 @@
                         </div>
 
                         <InputElement
+                            :label="$t('powerlimiteradmin.AllowStandby')"
+                            :tooltip="$t('powerlimiteradmin.AllowStandbyHint')"
+                            v-if="powerLimiterConfigList.inverters[idx].power_source == 2"
+                            v-model="powerLimiterConfigList.inverters[idx].allow_standby"
+                            type="checkbox"
+                            wide
+                        />
+
+                        <InputElement
                             v-if="
                                 powerLimiterConfigList.inverters[idx].power_source != 0 &&
                                 inverterSupportsOverscaling(inv.serial)
@@ -726,6 +735,7 @@ export default defineComponent({
                 newInv.upper_power_limit = Math.max(metaInv.max_power, 300);
                 newInv.power_source = 0; // battery
                 newInv.use_overscaling_to_compensate_shading = false;
+                newInv.allow_standby = true;
                 inverters.push(newInv);
             }
 

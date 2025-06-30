@@ -28,6 +28,7 @@ export interface PowerLimiterInverterConfig {
     is_behind_power_meter: boolean;
     power_source: number;
     use_overscaling_to_compensate_shading: boolean;
+    allow_standby: boolean;
     lower_power_limit: number;
     upper_power_limit: number;
 }

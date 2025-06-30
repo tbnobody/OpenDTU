@@ -725,6 +725,8 @@
         "TotalUpperPowerLimitHint": "The inverters are configured to output this maximum amount of power in total.",
         "UpperPowerLimit": "Maximum Power Limit",
         "UpperPowerLimitHint": "The inverter is always set such that no more than this output power is achieved. This value must be selected to comply with the current carrying capacity of the AC connection cables.",
+        "AllowStandby": "Allow Standby",
+        "AllowStandbyHint": "Allow the inverter to go into standby if the calculated power limit is below the minimum power limit.",
         "SocThresholds": "Battery State of Charge (SoC) Thresholds",
         "IgnoreSoc": "Use Voltage Thresholds Only",
         "IgnoreSocHint": "When enabled, only voltage thresholds are considered. Disable this switch to configure and use battery State of Charge (SoC) thresholds (not recommended as the SoC value is often inaccurate).",

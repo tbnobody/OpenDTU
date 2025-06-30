@@ -725,6 +725,8 @@
         "TotalUpperPowerLimitHint": "Die Wechselrichter werden so eingestellt, dass sie in Summe höchstens diese Leistung erbringen.",
         "UpperPowerLimit": "Maximales Leistungslimit",
         "UpperPowerLimitHint": "Der Wechselrichter wird stets so eingestellt, dass höchstens diese Ausgangsleistung erreicht wird. Dieser Wert muss so gewählt werden, dass die Strombelastbarkeit der AC-Anschlussleitungen eingehalten wird.",
+        "AllowStandby": "Standby erlauben",
+        "AllowStandbyHint": "Erlaubt dem Wechselrichter in Standby zu gehen, wenn das berechnete Leistungslimit unter dem minimalen Leistungslimit liegt.",
         "SocThresholds": "Batterie State of Charge (SoC) Schwellwerte",
         "IgnoreSoc": "Nur Spannungs-Schwellwerte nutzen",
         "IgnoreSocHint": "Falls aktiviert werden nur die Spannungs-Schwellwerte berücksichtigt. Deaktiviere diesen Schalter, um Batterie State of Charge (SoC) Schwellwerte zu konfigurieren (nicht empfohlen, da der SoC-Wert häufig ungenau ist).",
