@@ -108,21 +108,15 @@ uint16_t PowerLimiterSolarInverter::applyReduction(uint16_t reduction, bool)
 
     if (reduction == 0) { return 0; }
 
-    uint16_t baseline = getCurrentLimitWatts();
+    uint16_t currentOutputAcWatts = getCurrentOutputAcWatts();
 
-    // when overscaling is in use we must not use the current limit
-    // because it might be scaled.
-    if (overscalingEnabled()) {
-        baseline = getCurrentOutputAcWatts();
-    }
-
-    if ((baseline - _config.LowerPowerLimit) >= reduction) {
-        setAcOutput(baseline - reduction);
+    if ((currentOutputAcWatts - _config.LowerPowerLimit) >= reduction) {
+        setAcOutput(currentOutputAcWatts - reduction);
         return reduction;
     }
 
     setAcOutput(_config.LowerPowerLimit);
-    return getCurrentOutputAcWatts() - _config.LowerPowerLimit;
+    return currentOutputAcWatts - _config.LowerPowerLimit;
 }
 
 uint16_t PowerLimiterSolarInverter::standby()

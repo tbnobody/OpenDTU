@@ -44,20 +44,8 @@ uint16_t PowerLimiterOverscalingInverter::applyIncrease(uint16_t increase)
     // do not wake inverter up if it would produce too much power
     if (!isProducing() && _config.LowerPowerLimit > increase) { return 0; }
 
-    uint16_t baseline = getCurrentLimitWatts();
-
-    // when overscaling is in use we must not use the current limit
-    // because it might be scaled.
-    if (overscalingEnabled()) {
-        baseline = getCurrentOutputAcWatts();
-    }
-
-    // inverters in standby can have an arbitrary limit, yet
-    // the baseline is 0 in case we are about to wake it up from standby.
-    if (!isProducing()) { baseline = 0; }
-
     auto actualIncrease = std::min(increase, getMaxIncreaseWatts());
-    setAcOutput(baseline + actualIncrease);
+    setAcOutput(getCurrentOutputAcWatts() + actualIncrease);
     return actualIncrease;
 }
 
