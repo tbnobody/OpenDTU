@@ -79,11 +79,11 @@ void Provider::onMessage(twai_message_t rx_message)
         }
 
         case 0x640: {
-            _stats->_chargeCurrentLimitation = (this->readSignedInt24(rx_message.data + 3) * 0.001);
+            _stats->setChargeCurrentLimit(this->readSignedInt24(rx_message.data + 3) * 0.001, millis());
             _stats->setDischargeCurrentLimit(this->readSignedInt24(rx_message.data) * 0.001, millis());
 
             DTU_LOGD("1600 Currents  %f, %f",
-                    _stats->_chargeCurrentLimitation, _stats->getDischargeCurrentLimit());
+                    _stats->getChargeCurrentLimit(), _stats->getDischargeCurrentLimit());
             break;
         }
 
@@ -145,7 +145,7 @@ void Provider::dummyData()
     _stats->setManufacturer("SBS Unipower XL");
     _stats->setSoC(42, 0/*precision*/, millis());
     _stats->_chargeVoltage = dummyFloat(50);
-    _stats->_chargeCurrentLimitation = dummyFloat(33);
+    _stats->setChargeCurrentLimit(dummyFloat(33), millis());
     _stats->setDischargeCurrentLimit(dummyFloat(12), millis());
     _stats->_stateOfHealth = 99;
     _stats->setVoltage(48.67, millis());

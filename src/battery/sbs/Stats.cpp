@@ -10,7 +10,6 @@ void Stats::getLiveViewData(JsonVariant& root) const
 
     // values go into the "Status" card of the web application
     addLiveViewValue(root, "chargeVoltage", _chargeVoltage, "V", 1);
-    addLiveViewValue(root, "chargeCurrentLimitation", _chargeCurrentLimitation, "A", 1);
     addLiveViewValue(root, "stateOfHealth", _stateOfHealth, "%", 0);
     addLiveViewValue(root, "temperature", _temperature, "°C", 1);
     addLiveViewTextValue(root, "chargeEnabled", (_chargeEnabled?"yes":"no"));
@@ -31,7 +30,6 @@ void Stats::mqttPublish() const
     ::Batteries::Stats::mqttPublish();
 
     MqttSettings.publish("battery/settings/chargeVoltage", String(_chargeVoltage));
-    MqttSettings.publish("battery/settings/chargeCurrentLimitation", String(_chargeCurrentLimitation));
     MqttSettings.publish("battery/stateOfHealth", String(_stateOfHealth));
     MqttSettings.publish("battery/temperature", String(_temperature));
     MqttSettings.publish("battery/alarm/underVoltage", String(_alarmUnderVoltage));

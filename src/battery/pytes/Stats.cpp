@@ -10,7 +10,6 @@ void Stats::getLiveViewData(JsonVariant& root) const
 
     // values go into the "Status" card of the web application
     addLiveViewValue(root, "chargeVoltage", _chargeVoltageLimit, "V", 1);
-    addLiveViewValue(root, "chargeCurrentLimitation", _chargeCurrentLimit, "A", 1);
     addLiveViewValue(root, "dischargeVoltageLimitation", _dischargeVoltageLimit, "V", 1);
     addLiveViewValue(root, "stateOfHealth", _stateOfHealth, "%", 0);
     if (_chargeCycles != -1) {
@@ -87,7 +86,6 @@ void Stats::mqttPublish() const
     ::Batteries::Stats::mqttPublish();
 
     MqttSettings.publish("battery/settings/chargeVoltage", String(_chargeVoltageLimit));
-    MqttSettings.publish("battery/settings/chargeCurrentLimitation", String(_chargeCurrentLimit));
     MqttSettings.publish("battery/settings/dischargeVoltageLimitation", String(_dischargeVoltageLimit));
 
     MqttSettings.publish("battery/stateOfHealth", String(_stateOfHealth));

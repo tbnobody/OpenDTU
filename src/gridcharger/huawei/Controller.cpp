@@ -257,13 +257,13 @@ void Controller::loop()
                 float calculatedCurrent = newOutputPowerTarget / *oOutputVoltage;
 
                 // Limit output current to value requested by BMS
-                float permissableCurrent = stats->getChargeCurrentLimitation() - (stats->getChargeCurrent() - *oOutputCurrent); // BMS current limit - current from other sources, e.g. Victron MPPT charger
-                float outputCurrent = std::min(calculatedCurrent, permissableCurrent);
+                float permissibleCurrent = stats->getChargeCurrentLimit() - (stats->getChargeCurrent() - *oOutputCurrent); // BMS current limit - current from other sources, e.g. Victron MPPT charger
+                float outputCurrent = std::min(calculatedCurrent, permissibleCurrent);
                 outputCurrent = outputCurrent > 0 ? outputCurrent : 0;
 
                 DTU_LOGD("Setting output current to %.2fA. This is the lower value of "
                         "calculated %.2fA and BMS permissable %.2fA currents",
-                        outputCurrent, calculatedCurrent, permissableCurrent);
+                        outputCurrent, calculatedCurrent, permissibleCurrent);
 
                 _autoPowerEnabled = true;
                 _setParameter(outputCurrent, Setting::OnlineCurrent);

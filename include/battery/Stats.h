@@ -32,6 +32,9 @@ public:
     float getDischargeCurrentLimit() const { return _dischargeCurrentLimit; };
     uint32_t getDischargeCurrentLimitAgeSeconds() const { return (millis() - _lastUpdateDischargeCurrentLimit) / 1000; }
 
+    float getChargeCurrentLimit() const { return _chargeCurrentLimit; };
+    uint32_t getChargeCurrentLimitAgeSeconds() const { return (millis() - _lastUpdateChargeCurrentLimit) / 1000; }
+
     // convert stats to JSON for web application live view
     virtual void getLiveViewData(JsonVariant& root) const;
 
@@ -45,12 +48,11 @@ public:
     bool isVoltageValid() const { return _lastUpdateVoltage > 0; }
     bool isCurrentValid() const { return _lastUpdateCurrent > 0; }
     bool isDischargeCurrentLimitValid() const { return _lastUpdateDischargeCurrentLimit > 0; }
+    bool isChargeCurrentLimitValid() const { return _lastUpdateChargeCurrentLimit > 0; }
 
     // returns true if the battery reached a critically low voltage/SoC,
     // such that it is in need of charging to prevent degredation.
     virtual bool getImmediateChargingRequest() const { return false; };
-
-    virtual float getChargeCurrentLimitation() const { return FLT_MAX; };
 
     virtual bool supportsAlarmsAndWarnings() const { return true; };
 
@@ -77,6 +79,11 @@ protected:
     void setDischargeCurrentLimit(float dischargeCurrentLimit, uint32_t timestamp) {
         _dischargeCurrentLimit = dischargeCurrentLimit;
         _lastUpdateDischargeCurrentLimit = _lastUpdate = timestamp;
+    }
+
+    void setChargeCurrentLimit(float chargeCurrentLimit, uint32_t timestamp) {
+        _chargeCurrentLimit = chargeCurrentLimit;
+        _lastUpdateChargeCurrentLimit = _lastUpdate = timestamp;
     }
 
     void setManufacturer(const String& m);
@@ -180,6 +187,8 @@ private:
 
     float _dischargeCurrentLimit = 0;
     uint32_t _lastUpdateDischargeCurrentLimit = 0;
+    float _chargeCurrentLimit = FLT_MAX;
+    uint32_t _lastUpdateChargeCurrentLimit = 0;
 };
 
 } // namespace Batteries

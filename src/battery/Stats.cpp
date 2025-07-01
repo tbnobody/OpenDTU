@@ -60,6 +60,10 @@ void Stats::getLiveViewData(JsonVariant& root) const
         addLiveViewValue(root, "dischargeCurrentLimitation", _dischargeCurrentLimit, "A", 1);
     }
 
+    if (isChargeCurrentLimitValid()) {
+        addLiveViewValue(root, "chargeCurrentLimitation", _chargeCurrentLimit, "A", 1);
+    }
+
     root["showIssues"] = supportsAlarmsAndWarnings();
 }
 
@@ -110,6 +114,10 @@ void Stats::mqttPublish() const
 
     if (isDischargeCurrentLimitValid()) {
         MqttSettings.publish("battery/settings/dischargeCurrentLimitation", String(_dischargeCurrentLimit));
+    }
+
+    if (isChargeCurrentLimitValid()) {
+        MqttSettings.publish("battery/settings/chargeCurrentLimitation", String(_chargeCurrentLimit));
     }
 }
 
