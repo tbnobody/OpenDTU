@@ -134,7 +134,7 @@ constexpr frozen::map<uint8_t, GridProfileItemDefinition_t, 0x42> itemDefinition
     { 0x3f, make_value("HF2 Maximum Trip time (MTT)", "s", 100) },
     { 0x40, make_value("Short Interruption Reconnect Time (SRT)", "s", 10) },
     { 0x41, make_value("Short Interruption Time (SIT)", "s", 10) },
-    { 0xff, make_value("Unkown Value", "", 1) },
+    { 0xff, make_value("Unknown Value", "", 1) },
 };
 
 const std::array<const GridProfileValue_t, SECTION_VALUE_COUNT> GridProfileParser::_profileValues = { {
