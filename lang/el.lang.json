@@ -281,12 +281,7 @@
             "Task_tit": "TCP/IP",
             "Task_looptask": "Κύριος βρόχος Arduino",
             "Task_asynctcp": "Ασυγχρονισμός TCP",
-            "Task_mqttclient": "Πελάτης MQTT",
-            "Task_huaweican0": "Φορτιστής AC CAN",
-            "Task_pmsdm": "Μετρητής ενέργειας (SDM)",
-            "Task_pmhttpjson": "Μετρητής ενέργειας (HTTP+JSON)",
-            "Task_pmsml": "Μετρητής ενέργειας (Serial SML)",
-            "Task_pmhttpsml": "Μετρητής ενέργειας (HTTP+SML)"
+            "Task_mqttclient": "Πελάτης MQTT"
         },
         "radioinfo": {
             "RadioInformation": "Πληροφορίες Ραδιοφώνου",

@@ -281,12 +281,7 @@
             "Task_tit": "TCP/IP",
             "Task_looptask": "Główna pętla Arduino",
             "Task_asynctcp": "Asynchroniczny TCP",
-            "Task_mqttclient": "Klient MQTT",
-            "Task_huaweican0": "AC Charger CAN",
-            "Task_pmsdm": "Miernik mocy (SDM)",
-            "Task_pmhttpjson": "Miernik mocy (HTTP+JSON)",
-            "Task_pmsml": "Miernik mocy (Serial SML)",
-            "Task_pmhttpsml": "Miernik mocy (HTTP+SML)"
+            "Task_mqttclient": "Klient MQTT"
         },
         "radioinfo": {
             "RadioInformation": "Informacje o nadajniku-odbiorniku radiowy",
