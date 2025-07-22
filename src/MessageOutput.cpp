@@ -200,7 +200,7 @@ void MessageOutputClass::send_ws_chunk(const uint8_t* buffer, size_t size)
 
 void MessageOutputClass::loop()
 {
-    std::lock_guard<std::mutex> lock(_msgLock);
+    std::unique_lock<std::mutex> lock(_msgLock);
 
     while (_buffer_out != _buffer_in) {
         uint8_t msg_len = static_cast<uint8_t>(_buffer[_buffer_out]);
@@ -212,10 +212,15 @@ void MessageOutputClass::loop()
             continue;
         }
 
+        lock.unlock();
+        taskYIELD(); // allow high priority tasks to log while we process the buffer
+
         auto msg_start = reinterpret_cast<const uint8_t*>(&_buffer[_buffer_out]) + 1;
         serialWrite(msg_start, msg_len);
         Syslog.write(msg_start, msg_len);
         send_ws_chunk(msg_start, msg_len);
+
+        lock.lock();
 
         _buffer_out += 1 + msg_len;
     }
