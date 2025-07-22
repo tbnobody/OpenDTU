@@ -30,10 +30,63 @@ void MessageOutputClass::register_ws_output(AsyncWebSocket* output)
 int MessageOutputClass::log_vprintf(const char* fmt, va_list arguments)
 {
     std::lock_guard<std::mutex> lock(MessageOutput._msgLock);
-    return MessageOutput.log_vprintf_locked(fmt, arguments);
+    return MessageOutput.log_vprintf_rate_limited(fmt, arguments);
 }
 
-int MessageOutputClass::log_vprintf_locked(const char* fmt, va_list arguments)
+bool MessageOutputClass::consumeToken()
+{
+    uint32_t now = millis();
+
+    uint32_t elapsed = now - _last_token_refill_millis;
+    size_t new_tokens = RATE_LIMIT_MAX_TOKENS * elapsed / RATE_LIMIT_WINDOW_MS;
+
+    if (new_tokens > 0) {
+        _available_tokens = std::min(_available_tokens + new_tokens, RATE_LIMIT_MAX_TOKENS);
+        _last_token_refill_millis = now;
+    }
+
+    if (_available_tokens > 0) {
+        --_available_tokens;
+        return true;
+    }
+
+    return false;
+}
+
+int MessageOutputClass::log_self(const char* fmt, ...)
+{
+    va_list args;
+    va_start(args, fmt);
+    int ret = log_vprintf_recursive(fmt, args);
+    va_end(args);
+    return ret;
+}
+
+int MessageOutputClass::log_vprintf_rate_limited(const char* fmt, va_list arguments)
+{
+    if (!consumeToken()) {
+        if (_rate_limited_packets == 0) {
+            _last_rate_limit_warning_millis = millis();
+        }
+        ++_rate_limited_packets;
+        return 0;
+    }
+
+    if (_rate_limited_packets > 0) {
+        uint32_t elapsed = millis() - _last_rate_limit_warning_millis;
+        if (elapsed > RATE_LIMIT_WARNING_INTERVAL_MS) {
+            log_self("W (%d) logging: Rate limited %d message%s in the last %d ms\n",
+                millis(), _rate_limited_packets,
+                (_rate_limited_packets > 1 ? "s" : ""), elapsed);
+            _rate_limited_packets = 0;
+            _last_rate_limit_warning_millis = millis();
+        }
+    }
+
+    return log_vprintf_recursive(fmt, arguments);
+}
+
+int MessageOutputClass::log_vprintf_recursive(const char* fmt, va_list arguments)
 {
     // we can only write up to the end of the buffer
     auto len = sizeof(_buffer) - _buffer_in;
@@ -71,7 +124,7 @@ int MessageOutputClass::log_vprintf_locked(const char* fmt, va_list arguments)
             // we can safely reset the buffer as there is no data ahead that
             // still needs processing, so we try again from the beginning.
             _buffer_in = 0;
-            return log_vprintf_locked(fmt, arguments);
+            return log_vprintf_recursive(fmt, arguments);
         }
 
         if (Serial) {

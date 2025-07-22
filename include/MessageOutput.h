@@ -24,8 +24,6 @@ private:
 
     Task _loopTask;
 
-    int log_vprintf_locked(const char *fmt, va_list arguments);
-
     static constexpr size_t BUFFER_SIZE = 8192;
     char _buffer[BUFFER_SIZE];
     size_t _buffer_in = 0;
@@ -60,6 +58,18 @@ private:
     std::mutex _msgLock;
 
     void serialWrite(const uint8_t* buffer, size_t size);
+
+    static constexpr uint32_t RATE_LIMIT_WINDOW_MS = 1000;
+    static constexpr size_t RATE_LIMIT_MAX_TOKENS = 128;
+    size_t _available_tokens = RATE_LIMIT_MAX_TOKENS;
+    uint32_t _last_token_refill_millis = 0;
+    size_t _rate_limited_packets = 0;
+    uint32_t _last_rate_limit_warning_millis = 0;
+    static constexpr uint32_t RATE_LIMIT_WARNING_INTERVAL_MS = 1000;
+    bool consumeToken();
+    int log_self(const char* fmt, ...);
+    int log_vprintf_rate_limited(const char* fmt, va_list arguments);
+    int log_vprintf_recursive(const char* fmt, va_list arguments);
 };
 
 extern MessageOutputClass MessageOutput;

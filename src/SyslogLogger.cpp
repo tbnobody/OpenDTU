@@ -8,7 +8,6 @@
 #include "defaults.h"
 #include <ESPmDNS.h>
 #include <HardwareSerial.h>
-#include <algorithm>
 
 #undef TAG
 static const char* TAG = "syslog";
@@ -66,27 +65,6 @@ void SyslogLogger::write(const uint8_t* buffer, size_t size)
         return;
     }
 
-    // Check rate limiting using token bucket
-    if (!consumeToken()) {
-        if (_rate_limited_packets == 0) {
-            _last_rate_limit_warning_millis = millis();
-        }
-        ++_rate_limited_packets;
-        return;
-    }
-
-    if (_rate_limited_packets > 0) {
-        uint32_t elapsed = (millis() - _last_rate_limit_warning_millis);
-        if (elapsed > RATE_LIMIT_WARNING_INTERVAL_MS) {
-            char buffer[128];
-            snprintf(buffer, sizeof(buffer), "Rate limited %d packets in the last %dms",
-                _rate_limited_packets, elapsed);
-            Serial.println(buffer);
-            _rate_limited_packets = 0;
-            _last_rate_limit_warning_millis = millis();
-        }
-    }
-
     String header = "<";
     header += String(calculatePrival(1, buffer[0]));
 
@@ -102,26 +80,6 @@ void SyslogLogger::write(const uint8_t* buffer, size_t size)
         }
     }
     _udp.endPacket();
-}
-
-bool SyslogLogger::consumeToken()
-{
-    uint32_t now = millis();
-
-    uint32_t elapsed = now - _last_token_refill_millis;
-    size_t new_tokens = RATE_LIMIT_MAX_TOKENS * elapsed / RATE_LIMIT_WINDOW_MS;
-
-    if (new_tokens > 0) {
-        _available_tokens = std::min(_available_tokens + new_tokens, RATE_LIMIT_MAX_TOKENS);
-        _last_token_refill_millis = now;
-    }
-
-    if (_available_tokens > 0) {
-        --_available_tokens;
-        return true;
-    }
-
-    return false;
 }
 
 void SyslogLogger::disable()
@@ -145,8 +103,6 @@ void SyslogLogger::enable()
 
     std::lock_guard<std::mutex> lock(_mutex);
     _enabled = true;
-    _available_tokens = RATE_LIMIT_MAX_TOKENS;
-    _last_token_refill_millis = millis();
 }
 
 bool SyslogLogger::resolveAndStart()
