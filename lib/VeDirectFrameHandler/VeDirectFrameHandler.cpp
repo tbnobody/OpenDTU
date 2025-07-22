@@ -71,7 +71,7 @@ void VeDirectFrameHandler<T>::init(char const* who, gpio_num_t rx, gpio_num_t tx
 	_debugIn = 0;
 	_startUpPassed = false; // to obtain a complete dataset after a new start or restart
 	_dataValid = false;     // data is not valid on start or restart
-	snprintf(_logId, sizeof(_logId), "[%s %d/%d]", who, rx, tx);
+	snprintf(_logId, sizeof(_logId), "%s %d/%d", who, rx, tx);
 	DTU_LOGI("init complete");
 }
 
