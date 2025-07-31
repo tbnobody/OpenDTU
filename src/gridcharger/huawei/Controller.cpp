@@ -161,7 +161,7 @@ void Controller::loop()
         _batteryEmergencyCharging = true;
 
         // Set output current
-        float outputCurrent = efficiency * (config.GridCharger.AutoPowerUpperPowerLimit / *oOutputVoltage);
+        float outputCurrent = config.GridCharger.AutoPowerUpperPowerLimit / *oOutputVoltage;
         DTU_LOGI("Emergency Charge Output current %.02f", outputCurrent);
         _setParameter(outputCurrent, Setting::OnlineCurrent);
         return;
@@ -218,7 +218,7 @@ void Controller::loop()
             float newPowerLimit = -1 * round(PowerMeter.getPowerTotal());
 
             // Powerlimit is the requested output power + permissable Grid consumption factoring in the efficiency factor
-            newPowerLimit += *oOutputPower + config.GridCharger.AutoPowerTargetPowerConsumption / efficiency;
+            newPowerLimit += (*oOutputPower / efficiency) + config.GridCharger.AutoPowerTargetPowerConsumption;
 
             DTU_LOGD("newPowerLimit: %.0f, output_power: %.01f", newPowerLimit, *oOutputPower);
 
@@ -233,7 +233,9 @@ void Controller::loop()
                 }
             }
 
-            if (newPowerLimit > config.GridCharger.AutoPowerLowerPowerLimit) {
+            // Convert output power limit to input power limit for comparison
+            float inputPowerLowerLimit = config.GridCharger.AutoPowerLowerPowerLimit / efficiency;
+            if (newPowerLimit > inputPowerLowerLimit) {
 
                 // Check if the output power has dropped below the lower limit (i.e. the battery is full)
                 // and if the PSU should be turned off. Also we use a simple counter mechanism here to be able
@@ -251,8 +253,10 @@ void Controller::loop()
                 }
 
                 // Limit power to maximum
-                if (newPowerLimit > config.GridCharger.AutoPowerUpperPowerLimit) {
-                    newPowerLimit = config.GridCharger.AutoPowerUpperPowerLimit;
+                // Convert output power limit to input power limit for comparison
+                float inputPowerLimit = config.GridCharger.AutoPowerUpperPowerLimit / efficiency;
+                if (newPowerLimit > inputPowerLimit) {
+                    newPowerLimit = inputPowerLimit;
                 }
 
                 // Calculate output current
