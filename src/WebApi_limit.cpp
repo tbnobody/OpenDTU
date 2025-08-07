@@ -91,11 +91,7 @@ void WebApiLimitClass::onLimitPost(AsyncWebServerRequest* request)
         return;
     }
 
-    if (!((root["limit_type"].as<uint16_t>() == PowerLimitControlType::AbsolutNonPersistent)
-            || (root["limit_type"].as<uint16_t>() == PowerLimitControlType::AbsolutPersistent)
-            || (root["limit_type"].as<uint16_t>() == PowerLimitControlType::RelativNonPersistent)
-            || (root["limit_type"].as<uint16_t>() == PowerLimitControlType::RelativPersistent))) {
-
+    if (!(root["limit_type"].as<uint16_t>() < PowerLimitControlType::PowerLimitControl_Max)) {
         retMsg["message"] = "Invalid type specified!";
         retMsg["code"] = WebApiError::LimitInvalidType;
         WebApi.sendJsonResponse(request, response, __FUNCTION__, __LINE__);

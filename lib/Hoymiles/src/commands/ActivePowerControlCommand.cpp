@@ -25,6 +25,13 @@ ID   Target Addr   Source Addr   Cmd  SCmd ?    Limit   Type    CRC16   CRC8
 
 #define CRC_SIZE 6
 
+const uint32_t _powerLimitControlTypeValue[] = {
+    0x0000,
+    0x0001,
+    0x0100,
+    0x0101,
+};
+
 ActivePowerControlCommand::ActivePowerControlCommand(InverterAbstract* inv, const uint64_t router_address)
     : DevControlCommand(inv, router_address)
 {
@@ -64,8 +71,9 @@ void ActivePowerControlCommand::setActivePowerLimit(const float limit, const Pow
     _payload[13] = (l) & 0xff;
 
     // type
-    _payload[14] = (type >> 8) & 0xff;
-    _payload[15] = (type) & 0xff;
+    uint32_t type_value = _powerLimitControlTypeValue[type];
+    _payload[14] = (type_value >> 8) & 0xff;
+    _payload[15] = (type_value) & 0xff;
 
     udpateCRC(CRC_SIZE);
 }
@@ -102,7 +110,13 @@ float ActivePowerControlCommand::getLimit() const
 
 PowerLimitControlType ActivePowerControlCommand::getType() const
 {
-    return (PowerLimitControlType)((static_cast<uint16_t>(_payload[14]) << 8) | _payload[15]);
+    uint32_t type_val = ((static_cast<uint16_t>(_payload[14]) << 8) | _payload[15]);
+    for (uint8_t i = 0; i < PowerLimitControl_Max; i++) {
+        if (type_val == _powerLimitControlTypeValue[i]) {
+            return static_cast<PowerLimitControlType>(i);
+        }
+    }
+    return PowerLimitControlType::RelativNonPersistent;
 }
 
 void ActivePowerControlCommand::gotTimeout()

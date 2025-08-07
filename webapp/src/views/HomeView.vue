@@ -434,15 +434,15 @@
                     </button>
                     <ul class="dropdown-menu dropdown-menu-end">
                         <li>
-                            <a class="dropdown-item" @click="onSelectType(1)" href="#">{{ $t('home.Relative') }}</a>
+                            <a class="dropdown-item" @click="onSelectType(true)" href="#">{{ $t('home.Relative') }}</a>
                         </li>
                         <li>
-                            <a class="dropdown-item" @click="onSelectType(0)" href="#">{{ $t('home.Absolute') }}</a>
+                            <a class="dropdown-item" @click="onSelectType(false)" href="#">{{ $t('home.Absolute') }}</a>
                         </li>
                     </ul>
                 </div>
                 <div
-                    v-if="targetLimitType == 0"
+                    v-if="!targetLimitRelative"
                     class="alert alert-secondary mt-3"
                     role="alert"
                     v-html="$t('home.LimitHint')"
@@ -507,6 +507,7 @@ import GridProfile from '@/components/GridProfile.vue';
 import HintView from '@/components/HintView.vue';
 import InverterChannelInfo from '@/components/InverterChannelInfo.vue';
 import InverterTotalInfo from '@/components/InverterTotalInfo.vue';
+import { LimitType } from '@/types/LimitConfig';
 import ModalDialog from '@/components/ModalDialog.vue';
 import type { DevInfoStatus } from '@/types/DevInfoStatus';
 import type { EventlogItems } from '@/types/EventlogStatus';
@@ -584,7 +585,7 @@ export default defineComponent({
             targetLimitMin: 0,
             targetLimitMax: 100,
             targetLimitTypeText: this.$t('home.Relative'),
-            targetLimitType: 1,
+            targetLimitRelative: true,
 
             alertMessageLimit: '',
             alertTypeLimit: 'info',
@@ -823,8 +824,7 @@ export default defineComponent({
             this.showAlertLimit = false;
             this.targetLimitList.serial = '';
             this.targetLimitList.limit_value = 0;
-            this.targetLimitType = 1;
-            this.targetLimitTypeText = this.$t('home.Relative');
+            this.onSelectType(true);
 
             this.limitSettingLoading = true;
             fetch('/api/limit/status', { headers: authHeader() })
@@ -846,7 +846,19 @@ export default defineComponent({
                 });
         },
         onSetLimitSettings(setPersistent: boolean) {
-            this.targetLimitList.limit_type = (setPersistent ? 256 : 0) + this.targetLimitType;
+            if (setPersistent) {
+                if (this.targetLimitRelative) {
+                    this.targetLimitList.limit_type = LimitType.RelativPersistent;
+                } else {
+                    this.targetLimitList.limit_type = LimitType.AbsolutPersistent;
+                }
+            } else {
+                if (this.targetLimitRelative) {
+                    this.targetLimitList.limit_type = LimitType.RelativNonPersistent;
+                } else {
+                    this.targetLimitList.limit_type = LimitType.AbsolutNonPersistent;
+                }
+            }
             const formData = new FormData();
             formData.append('data', JSON.stringify(this.targetLimitList));
 
@@ -868,8 +880,8 @@ export default defineComponent({
                     }
                 });
         },
-        onSelectType(type: number) {
-            if (type == 1) {
+        onSelectType(isRelative: boolean) {
+            if (isRelative) {
                 this.targetLimitTypeText = this.$t('home.Relative');
                 this.targetLimitMin = 0;
                 this.targetLimitMax = 100;
@@ -878,7 +890,7 @@ export default defineComponent({
                 this.targetLimitMin = 0;
                 this.targetLimitMax = this.currentLimitList.max_power > 0 ? this.currentLimitList.max_power : 2250;
             }
-            this.targetLimitType = type;
+            this.targetLimitRelative = isRelative;
         },
 
         onShowPowerSettings(serial: string) {
