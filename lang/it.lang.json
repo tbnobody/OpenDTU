@@ -650,7 +650,7 @@
             "ErrorReporting": "Segnalazione Errori",
             "ErrorReportingBody": "Per favore segnala eventuali problemi utilizzando le funzionalità della piattaforma <a href=\"https://github.com/tbnobody/OpenDTU/issues\" target=\"_blank\">Github</a>",
             "Discussion": "Discussioni",
-            "DiscussionBody": "Puoi avviare una discussione con noi su <a href=\"https://discord.gg/WzhxEY62mB\" target=\"_blank\">Discord</a> o <a href=\"https://github.com/tbnobody/OpenDTU/discussions\" target=\"_blank\">Github</a>"
+            "DiscussionBody": "Puoi avviare una discussione con noi su <a href=\"https://discord.gg/46hWaXsn\" target=\"_blank\">Discord</a> o <a href=\"https://github.com/tbnobody/OpenDTU/discussions\" target=\"_blank\">Github</a>"
         },
         "hints": {
             "RadioProblem": "Non è possibile dialogare con il modulo radio selezionato. Controlla i collegamenti alla radio.",

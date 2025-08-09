@@ -622,7 +622,7 @@
         "ErrorReporting": "Rapport d'erreurs",
         "ErrorReportingBody": "Veuillez signaler les problèmes en utilisant la fonction fournie par <a href=\"https://github.com/tbnobody/OpenDTU/issues\" target=\"_blank\">Github</a>.",
         "Discussion": "Discussion",
-        "DiscussionBody": "Discutez avec nous sur <a href=\"https://discord.gg/WzhxEY62mB\" target=\"_blank\">Discord</a> ou sur <a href=\"https://github.com/tbnobody/OpenDTU/discussions\" target=\"_blank\">Github</a>"
+        "DiscussionBody": "Discutez avec nous sur <a href=\"https://discord.gg/46hWaXsn\" target=\"_blank\">Discord</a> ou sur <a href=\"https://github.com/tbnobody/OpenDTU/discussions\" target=\"_blank\">Github</a>"
     },
     "hints": {
         "RadioProblem": "Impossible de se connecter à un module radio configuré.. Veuillez vérifier le câblage.",

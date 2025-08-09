@@ -635,7 +635,7 @@
         "ErrorReporting": "Fehlerberichte",
         "ErrorReportingBody": "Bitte melde Probleme über die Ticketverwaltung von <a href=\"https://github.com/tbnobody/OpenDTU/issues\" target=\"_blank\">Github</a>.",
         "Discussion": "Diskussion",
-        "DiscussionBody": "Diskutiere mit uns auf <a href=\"https://discord.gg/WzhxEY62mB\" target=\"_blank\">Discord</a> oder <a href=\"https://github.com/tbnobody/OpenDTU/discussions\" target=\"_blank\">Github</a>"
+        "DiscussionBody": "Diskutiere mit uns auf <a href=\"https://discord.gg/46hWaXsn\" target=\"_blank\">Discord</a> oder <a href=\"https://github.com/tbnobody/OpenDTU/discussions\" target=\"_blank\">Github</a>"
     },
     "hints": {
         "RadioProblem": "Es konnte keine Verbindung zu einem der konfigurierten Funkmodule hergestellt werden. Bitte überprüfe die Verdrahtung.",
