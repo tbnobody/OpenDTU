@@ -639,7 +639,7 @@
         "ErrorReporting": "Error Reporting",
         "ErrorReportingBody": "Please report issues using the feature provided by <a href=\"https://github.com/tbnobody/OpenDTU/issues\" target=\"_blank\">Github</a>",
         "Discussion": "Discussion",
-        "DiscussionBody": "Discuss with us on <a href=\"https://discord.gg/WzhxEY62mB\" target=\"_blank\">Discord</a> or <a href=\"https://github.com/tbnobody/OpenDTU/discussions\" target=\"_blank\">Github</a>"
+        "DiscussionBody": "Discuss with us on <a href=\"https://discord.gg/3QnqGdcq\" target=\"_blank\">Discord</a> or <a href=\"https://github.com/tbnobody/OpenDTU/discussions\" target=\"_blank\">Github</a>"
     },
     "hints": {
         "RadioProblem": "Could not connect to a configured radio module. Please check the wiring.",
