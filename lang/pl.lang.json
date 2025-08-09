@@ -654,7 +654,7 @@
             "ErrorReporting": "Raportowanie błędów",
             "ErrorReportingBody": "Prosimy o zgłaszanie wszelkich problemów związanych z korzystaniem z funkcji platformy <a href=\"https://github.com/tbnobody/OpenDTU/issues\" target=\"_blank\">Github</a>",
             "Discussion": "Dyskusje",
-            "DiscussionBody": "Możesz rozpocząć z nami dyskusję na <a href=\"https://discord.gg/WzhxEY62mB\" target=\"_blank\">Discord</a> o <a href=\"https://github.com/tbnobody/OpenDTU/discussions\" target=\"_blank\">Github</a>"
+            "DiscussionBody": "Możesz rozpocząć z nami dyskusję na <a href=\"https://discord.gg/3QnqGdcq\" target=\"_blank\">Discord</a> o <a href=\"https://github.com/tbnobody/OpenDTU/discussions\" target=\"_blank\">Github</a>"
         },
         "hints": {
             "RadioProblem": "Nie można komunikować się z wybranym modułem radiowym. Sprawdź połączenia z radiem.",
