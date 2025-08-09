@@ -420,7 +420,7 @@
             "Cancel": "@:base.Cancel",
             "RebootOpenDTU": "Riavvio OpenDTU",
             "RebootQuestion": "Vuoi veramente riavvia il DTU?",
-            "RebootHint": "<b>Nota:</b> Normalmente non serve riavviare OpenDTU, in quanto esegue automaticamente il ravvio quando necessario (ad esempio dopo aggiornamento firmware). Modifiche alla configurazione vengono apprese subito, senza richiedere riavvio. Se devi riavviare a causa di un errore, ti preghiamo di segnalarcelo cliccando su <a href=\"https://github.com/tbnobody/OpenDTU/issues\" class=\"alert-link\" target=\"_blank\">https://github.com/tbnobody/OpenDTU/issues</a>."
+            "RebootHint": "<b>Nota:</b> Normalmente non serve riavviare OpenDTU, in quanto esegue automaticamente il ravvio quando necessario (ad esempio dopo aggiornamento firmware). Modifiche alla configurazione vengono apprese subito, senza richiedere riavvio. Se devi riavviare a causa di un errore, ti preghiamo di segnalarcelo cliccando su <a href=\"https://github.com/hoylabs/OpenDTU-OnBattery/issues\" class=\"alert-link\" target=\"_blank\">https://github.com/hoylabs/OpenDTU-OnBattery/issues</a>."
         },
         "dtuadmin": {
             "DtuSettings": "Impostazioni DTU",
@@ -650,11 +650,11 @@
             "ProjectOriginBody3": "Il software è stato sviluppato con le nostre migliori conoscenze e convinzioni. Tuttavia, non si assume alcuna responsabilità per malfunzionamenti o perdita di garanzia dell'inverter.",
             "ProjectOriginBody4": "OpenDTU è disponibile gratuitamente. Se hai pagato per questo software, probabilmente sei stato truffato.",
             "NewsUpdates": "Novità e Aggiornamenti",
-            "NewsUpdatesBody": "Nuovi aggiornamenti sono disponibili su Github: <a href=\"https://github.com/tbnobody/OpenDTU\" target=\"_blank\">https://github.com/tbnobody/OpenDTU</a>",
+            "NewsUpdatesBody": "Nuovi aggiornamenti sono disponibili su Github: <a href=\"https://github.com/hoylabs/OpenDTU-OnBattery\" target=\"_blank\">https://github.com/hoylabs/OpenDTU-OnBattery</a>",
             "ErrorReporting": "Segnalazione Errori",
-            "ErrorReportingBody": "Per favore segnala eventuali problemi utilizzando le funzionalità della piattaforma <a href=\"https://github.com/tbnobody/OpenDTU/issues\" target=\"_blank\">Github</a>",
+            "ErrorReportingBody": "Per favore segnala eventuali problemi utilizzando le funzionalità della piattaforma <a href=\"https://github.com/hoylabs/OpenDTU-OnBattery/issues\" target=\"_blank\">Github</a>",
             "Discussion": "Discussioni",
-            "DiscussionBody": "Puoi avviare una discussione con noi su <a href=\"https://discord.gg/46hWaXsn\" target=\"_blank\">Discord</a> o <a href=\"https://github.com/tbnobody/OpenDTU/discussions\" target=\"_blank\">Github</a>"
+            "DiscussionBody": "Puoi avviare una discussione con noi su <a href=\"https://discord.gg/46hWaXsn\" target=\"_blank\">Discord</a> o <a href=\"https://github.com/hoylabs/OpenDTU-OnBattery/discussions\" target=\"_blank\">Github</a>"
         },
         "hints": {
             "RadioProblem": "Non è possibile dialogare con il modulo radio selezionato. Controlla i collegamenti alla radio.",

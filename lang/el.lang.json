@@ -420,7 +420,7 @@
             "Cancel": "@:base.Cancel",
             "RebootOpenDTU": "Επανεκκινήστε το OpenDTU",
             "RebootQuestion": "Θέλετε πραγματικά να κάνετε επανεκκίνηση της συσκευής;",
-            "RebootHint": "<b>Σημείωση:</b> Δεν χρειάζεται κανονικά να εκτελείται χειροκίνητη επανεκκίνηση. Το OpenDTU εκτελεί αυτόματα οποιαδήποτε απαιτούμενη επανεκκίνηση (π.χ. μετά από ενημέρωση υλικολογισμικού). Οι ρυθμίσεις υιοθετούνται επίσης χωρίς επανεκκίνηση. Εάν χρειάζεται να κάνετε επανεκκίνηση λόγω σφάλματος, εξετάστε το ενδεχόμενο να το αναφέρετε στη διεύθυνση <a href=\"https://github.com/tbnobody/OpenDTU/issues\" class=\"alert-link\" target=\"_blank\">https://github.com/tbnobody/OpenDTU/issues</a>."
+            "RebootHint": "<b>Σημείωση:</b> Δεν χρειάζεται κανονικά να εκτελείται χειροκίνητη επανεκκίνηση. Το OpenDTU εκτελεί αυτόματα οποιαδήποτε απαιτούμενη επανεκκίνηση (π.χ. μετά από ενημέρωση υλικολογισμικού). Οι ρυθμίσεις υιοθετούνται επίσης χωρίς επανεκκίνηση. Εάν χρειάζεται να κάνετε επανεκκίνηση λόγω σφάλματος, εξετάστε το ενδεχόμενο να το αναφέρετε στη διεύθυνση <a href=\"https://github.com/hoylabs/OpenDTU-OnBattery/issues\" class=\"alert-link\" target=\"_blank\">https://github.com/hoylabs/OpenDTU-OnBattery/issues</a>."
         },
         "dtuadmin": {
             "DtuSettings": "Ρυθμίσεις DTU",
@@ -650,11 +650,11 @@
             "ProjectOriginBody3": "Το λογισμικό αναπτύχθηκε σύμφωνα με τις γνώσεις και τις πεποιθήσεις μας. Ωστόσο, δεν φέρουμε καμία ευθύνη για δυσλειτουργία ή απώλεια της εγγύησης του μετατροπέα.",
             "ProjectOriginBody4": "Το OpenDTU διατίθεται δωρεάν. Εάν πληρώσατε χρήματα για το λογισμικό, πιθανότατα σας απάτησαν.",
             "NewsUpdates": "Νέα και ενημερώσεις",
-            "NewsUpdatesBody": "Μπορείτε να βρείτε νέες ενημερώσεις στο Github: <a href=\"https://github.com/tbnobody/OpenDTU\" target=\"_blank\">https://github.com/tbnobody/OpenDTU</a >",
+            "NewsUpdatesBody": "Μπορείτε να βρείτε νέες ενημερώσεις στο Github: <a href=\"https://github.com/hoylabs/OpenDTU-OnBattery\" target=\"_blank\">https://github.com/hoylabs/OpenDTU-OnBattery</a >",
             "ErrorReporting": "Αναφορά σφαλμάτων",
-            "ErrorReportingBody": "Αναφέρετε προβλήματα χρησιμοποιώντας τη δυνατότητα που παρέχεται από το <a href=\"https://github.com/tbnobody/OpenDTU/issues\" target=\"_blank\">Github</a>",
+            "ErrorReportingBody": "Αναφέρετε προβλήματα χρησιμοποιώντας τη δυνατότητα που παρέχεται από το <a href=\"https://github.com/hoylabs/OpenDTU-OnBattery/issues\" target=\"_blank\">Github</a>",
             "Discussion": "Συζήτηση",
-            "DiscussionBody": "Συζητήστε μαζί μας στο <a href=\"https://discord.gg/46hWaXsn\" target=\"_blank\">Discord</a> ή στο <a href=\"https://github.com/tbnobody /OpenDTU/discussions\" target=\"_blank\">Github</a>"
+            "DiscussionBody": "Συζητήστε μαζί μας στο <a href=\"https://discord.gg/46hWaXsn\" target=\"_blank\">Discord</a> ή στο <a href=\"https://github.com/hoylabs/OpenDTU-OnBattery/discussions\" target=\"_blank\">Github</a>"
         },
         "hints": {
             "RadioProblem": "Δεν ήταν δυνατή η σύνδεση σε μια διαμορφωμένη μονάδα ραδιοφώνου. Επαληθεύστε τη σύνδεση.",

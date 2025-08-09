@@ -420,7 +420,7 @@
             "Cancel": "@:base.Cancel",
             "RebootOpenDTU": "Uruchom ponownie OpenDTU",
             "RebootQuestion": "Czy na pewno chcesz zrestartować DTU?",
-            "RebootHint": "<b>Uwaga:</b> Zwykle nie ma potrzeby ponownego uruchamiania OpenDTU, ponieważ w razie potrzeby automatycznie uruchamia się ponownie (na przykład po aktualizacji oprogramowania sprzętowego). Zmiany w konfiguracji są zapamiętywane natychmiast, bez konieczności ponownego uruchamiania. Jeśli konieczne jest ponowne uruchomienie komputera z powodu błędu. Zgłoś to nam, klikając <a href=\"https://github.com/tbnobody/OpenDTU/issues\" class=\"alert-link\" target=\"_blank\">https://github.com/tbnobody/OpenDTU/issues</a>."
+            "RebootHint": "<b>Uwaga:</b> Zwykle nie ma potrzeby ponownego uruchamiania OpenDTU, ponieważ w razie potrzeby automatycznie uruchamia się ponownie (na przykład po aktualizacji oprogramowania sprzętowego). Zmiany w konfiguracji są zapamiętywane natychmiast, bez konieczności ponownego uruchamiania. Jeśli konieczne jest ponowne uruchomienie komputera z powodu błędu. Zgłoś to nam, klikając <a href=\"https://github.com/hoylabs/OpenDTU-OnBattery/issues\" class=\"alert-link\" target=\"_blank\">https://github.com/hoylabs/OpenDTU-OnBattery/issues</a>."
         },
         "dtuadmin": {
             "DtuSettings": "Ustawienia DTU",
@@ -650,11 +650,11 @@
             "ProjectOriginBody3": "Oprogramowanie zostało opracowane zgodnie z naszą najlepszą wiedzą i przekonaniem. Jednakże nie ponosimy żadnej odpowiedzialności za nieprawidłowe działanie lub utratę gwarancji na falownik.",
             "ProjectOriginBody4": "OpenDTU jest dostępne za darmo. Jeśli zapłaciłeś za to oprogramowanie, prawdopodobnie zostałeś oszukany.",
             "NewsUpdates": "Nowości i aktualizacje",
-            "NewsUpdatesBody": "Nowe aktualizacje są dostępne na Githubie: <a href=\"https://github.com/tbnobody/OpenDTU\" target=\"_blank\">https://github.com/tbnobody/OpenDTU</a>",
+            "NewsUpdatesBody": "Nowe aktualizacje są dostępne na Githubie: <a href=\"https://github.com/hoylabs/OpenDTU-OnBattery\" target=\"_blank\">https://github.com/hoylabs/OpenDTU-OnBattery</a>",
             "ErrorReporting": "Raportowanie błędów",
-            "ErrorReportingBody": "Prosimy o zgłaszanie wszelkich problemów związanych z korzystaniem z funkcji platformy <a href=\"https://github.com/tbnobody/OpenDTU/issues\" target=\"_blank\">Github</a>",
+            "ErrorReportingBody": "Prosimy o zgłaszanie wszelkich problemów związanych z korzystaniem z funkcji platformy <a href=\"https://github.com/hoylabs/OpenDTU-OnBattery/issues\" target=\"_blank\">Github</a>",
             "Discussion": "Dyskusje",
-            "DiscussionBody": "Możesz rozpocząć z nami dyskusję na <a href=\"https://discord.gg/46hWaXsn\" target=\"_blank\">Discord</a> o <a href=\"https://github.com/tbnobody/OpenDTU/discussions\" target=\"_blank\">Github</a>"
+            "DiscussionBody": "Możesz rozpocząć z nami dyskusję na <a href=\"https://discord.gg/46hWaXsn\" target=\"_blank\">Discord</a> o <a href=\"https://github.com/hoylabs/OpenDTU-OnBattery/discussions\" target=\"_blank\">Github</a>"
         },
         "hints": {
             "RadioProblem": "Nie można komunikować się z wybranym modułem radiowym. Sprawdź połączenia z radiem.",
