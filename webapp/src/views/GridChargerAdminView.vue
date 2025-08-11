@@ -180,7 +180,7 @@
                     wide
                     required
                     min="50"
-                    max="3000"
+                    max="4000"
                 />
 
                 <InputElement
@@ -192,7 +192,7 @@
                     wide
                     required
                     min="100"
-                    max="3000"
+                    max="4000"
                 />
 
                 <InputElement
