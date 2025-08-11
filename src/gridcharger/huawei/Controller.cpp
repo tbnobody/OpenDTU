@@ -214,29 +214,29 @@ void Controller::loop()
 
             _lastPowerMeterUpdateReceivedMillis = PowerMeter.getLastUpdate();
 
-            // Calculate new power limit
-            float newPowerLimit = -1 * round(PowerMeter.getPowerTotal());
+            // input power diff will be (close to) zero if the power meter value
+            // reads what the user specified as the target power consumption.
+            float inputPowerDiff = -1 * round(PowerMeter.getPowerTotal());
+            inputPowerDiff += config.GridCharger.AutoPowerTargetPowerConsumption;
 
-            // Powerlimit is the requested output power + permissable Grid consumption factoring in the efficiency factor
-            newPowerLimit += (*oOutputPower / efficiency) + config.GridCharger.AutoPowerTargetPowerConsumption;
+            // target output power is current output adjusted for difference to desired input power
+            float newOutputPowerTarget = *oOutputPower + (inputPowerDiff * efficiency);
 
-            DTU_LOGD("newPowerLimit: %.0f, output_power: %.01f", newPowerLimit, *oOutputPower);
+            DTU_LOGD("input diff: %.0f, new output target: %.0f, current output: %.01f",
+                inputPowerDiff, newOutputPowerTarget, *oOutputPower);
 
             // Check whether the battery SoC limit setting is enabled
             if (config.Battery.Enabled && config.GridCharger.AutoPowerBatterySoCLimitsEnabled) {
                 uint8_t _batterySoC = Battery.getStats()->getSoC();
                 // Sets power limit to 0 if the BMS reported SoC reaches or exceeds the user configured value
                 if (_batterySoC >= config.GridCharger.AutoPowerStopBatterySoCThreshold) {
-                    newPowerLimit = 0;
-                    DTU_LOGD("Current battery SoC %i reached stop threshold %i, set newPowerLimit to %f",
-                            _batterySoC, config.GridCharger.AutoPowerStopBatterySoCThreshold, newPowerLimit);
+                    newOutputPowerTarget = 0;
+                    DTU_LOGD("Current battery SoC %i reached stop threshold %i, so new output target is %f",
+                            _batterySoC, config.GridCharger.AutoPowerStopBatterySoCThreshold, newOutputPowerTarget);
                 }
             }
 
-            // Convert output power limit to input power limit for comparison
-            float inputPowerLowerLimit = config.GridCharger.AutoPowerLowerPowerLimit / efficiency;
-            if (newPowerLimit > inputPowerLowerLimit) {
-
+            if (newOutputPowerTarget > config.GridCharger.AutoPowerLowerPowerLimit) {
                 // Check if the output power has dropped below the lower limit (i.e. the battery is full)
                 // and if the PSU should be turned off. Also we use a simple counter mechanism here to be able
                 // to ramp up from zero output power when starting up
@@ -252,20 +252,14 @@ void Controller::loop()
                     _autoPowerEnabledCounter = 10;
                 }
 
-                // Limit power to maximum
-                // Convert output power limit to input power limit for comparison
-                float inputPowerLimit = config.GridCharger.AutoPowerUpperPowerLimit / efficiency;
-                if (newPowerLimit > inputPowerLimit) {
-                    newPowerLimit = inputPowerLimit;
-                }
+                newOutputPowerTarget = std::min(newOutputPowerTarget, config.GridCharger.AutoPowerUpperPowerLimit);
 
-                // Calculate output current
-                float calculatedCurrent = efficiency * (newPowerLimit / *oOutputVoltage);
+                float calculatedCurrent = newOutputPowerTarget / *oOutputVoltage;
 
                 // Limit output current to value requested by BMS
                 float permissableCurrent = stats->getChargeCurrentLimitation() - (stats->getChargeCurrent() - *oOutputCurrent); // BMS current limit - current from other sources, e.g. Victron MPPT charger
                 float outputCurrent = std::min(calculatedCurrent, permissableCurrent);
-                outputCurrent= outputCurrent > 0 ? outputCurrent : 0;
+                outputCurrent = outputCurrent > 0 ? outputCurrent : 0;
 
                 DTU_LOGD("Setting output current to %.2fA. This is the lower value of "
                         "calculated %.2fA and BMS permissable %.2fA currents",
