@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * Copyright (C) 2022 Thomas Basler and others
+ * Copyright (C) 2022-2025 Thomas Basler and others
  */
 #include "TimeoutHelper.h"
 #include <Arduino.h>
@@ -29,5 +29,5 @@ void TimeoutHelper::reset()
 
 bool TimeoutHelper::occured() const
 {
-    return millis() > (startMillis + timeout);
+    return millis() - startMillis > timeout;
 }

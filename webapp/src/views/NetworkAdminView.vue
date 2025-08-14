@@ -1,7 +1,12 @@
 <template>
     <BasePage :title="$t('networkadmin.NetworkSettings')" :isLoading="dataLoading">
-        <BootstrapAlert v-model="showAlert" dismissible :variant="alertType">
-            {{ alertMessage }}
+        <BootstrapAlert
+            v-model="alert.show"
+            dismissible
+            :variant="alert.type"
+            :auto-dismiss="alert.type != 'success' ? 0 : 5000"
+        >
+            {{ alert.message }}
         </BootstrapAlert>
 
         <form @submit="saveNetworkConfig">
@@ -86,6 +91,31 @@
                 />
             </CardElement>
 
+            <CardElement :text="$t('networkadmin.SyslogSettings')" textVariant="text-bg-primary" add-space>
+                <InputElement
+                    :label="$t('networkadmin.EnableSyslog')"
+                    v-model="networkConfigList.syslogenabled"
+                    type="checkbox"
+                />
+
+                <div v-if="networkConfigList.syslogenabled">
+                    <InputElement
+                        :label="$t('networkadmin.SyslogHostname')"
+                        v-model="networkConfigList.sysloghostname"
+                        type="text"
+                        maxlength="128"
+                    />
+
+                    <InputElement
+                        :label="$t('networkadmin.SyslogPort')"
+                        v-model="networkConfigList.syslogport"
+                        type="number"
+                        min="1"
+                        max="65535"
+                    />
+                </div>
+            </CardElement>
+
             <CardElement :text="$t('networkadmin.AdminAp')" textVariant="text-bg-primary" add-space>
                 <InputElement
                     :label="$t('networkadmin.ApTimeout')"
@@ -108,6 +138,7 @@ import BootstrapAlert from '@/components/BootstrapAlert.vue';
 import CardElement from '@/components/CardElement.vue';
 import FormFooter from '@/components/FormFooter.vue';
 import InputElement from '@/components/InputElement.vue';
+import type { AlertResponse } from '@/types/AlertResponse';
 import type { NetworkConfig } from '@/types/NetworkConfig';
 import { authHeader, handleResponse } from '@/utils/authentication';
 import { defineComponent } from 'vue';
@@ -124,9 +155,7 @@ export default defineComponent({
         return {
             dataLoading: true,
             networkConfigList: {} as NetworkConfig,
-            alertMessage: '',
-            alertType: 'info',
-            showAlert: false,
+            alert: {} as AlertResponse,
         };
     },
     created() {
@@ -155,9 +184,9 @@ export default defineComponent({
             })
                 .then((response) => handleResponse(response, this.$emitter, this.$router))
                 .then((response) => {
-                    this.alertMessage = this.$t('apiresponse.' + response.code, response.param);
-                    this.alertType = response.type;
-                    this.showAlert = true;
+                    this.alert.message = this.$t('apiresponse.' + response.code, response.param);
+                    this.alert.type = response.type;
+                    this.alert.show = true;
                 });
         },
     },

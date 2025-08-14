@@ -1,7 +1,12 @@
 <template>
     <BasePage :title="$t('deviceadmin.DeviceManager')" :isLoading="dataLoading || pinMappingLoading || languageLoading">
-        <BootstrapAlert v-model="showAlert" dismissible :variant="alertType">
-            {{ alertMessage }}
+        <BootstrapAlert
+            v-model="alert.show"
+            dismissible
+            :variant="alert.type"
+            :auto-dismiss="alert.type != 'success' ? 0 : 5000"
+        >
+            {{ alert.message }}
         </BootstrapAlert>
 
         <form @submit="savePinConfig">
@@ -259,6 +264,7 @@ import BootstrapAlert from '@/components/BootstrapAlert.vue';
 import FormFooter from '@/components/FormFooter.vue';
 import InputElement from '@/components/InputElement.vue';
 import PinInfo from '@/components/PinInfo.vue';
+import type { AlertResponse } from '@/types/AlertResponse';
 import type { DeviceConfig, Led } from '@/types/DeviceConfig';
 import type { PinMapping, Device } from '@/types/PinMapping';
 import { authHeader, handleResponse } from '@/utils/authentication';
@@ -279,9 +285,7 @@ export default defineComponent({
             languageLoading: true,
             deviceConfigList: {} as DeviceConfig,
             pinMappingList: {} as PinMapping,
-            alertMessage: '',
-            alertType: 'info',
-            showAlert: false,
+            alert: {} as AlertResponse,
             equalBrightnessCheckVal: false,
             displayRotationList: [
                 { key: 0, value: 'rot0' },
@@ -339,11 +343,11 @@ export default defineComponent({
                 })
                 .catch((error) => {
                     if (error.status != 404) {
-                        this.alertMessage = this.$t('deviceadmin.ParseError', {
+                        this.alert.message = this.$t('deviceadmin.ParseError', {
                             error: error.message,
                         });
-                        this.alertType = 'danger';
-                        this.showAlert = true;
+                        this.alert.type = 'danger';
+                        this.alert.show = true;
                     }
                     this.pinMappingList = Array<Device>();
                 })
@@ -381,9 +385,9 @@ export default defineComponent({
             })
                 .then((response) => handleResponse(response, this.$emitter, this.$router))
                 .then((response) => {
-                    this.alertMessage = this.$t('apiresponse.' + response.code, response.param);
-                    this.alertType = response.type;
-                    this.showAlert = true;
+                    this.alert.message = this.$t('apiresponse.' + response.code, response.param);
+                    this.alert.type = response.type;
+                    this.alert.show = true;
                 });
         },
         getLedIdFromNumber(ledNo: number): string {

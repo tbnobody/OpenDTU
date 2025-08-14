@@ -21,8 +21,8 @@
 #ifndef __CMT2300A_HAL_H
 #define __CMT2300A_HAL_H
 
-#include <stdint.h>
 #include <Arduino.h>
+#include <stdint.h>
 
 #ifdef __cplusplus
 extern "C" {

@@ -1,13 +1,15 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * Copyright (C) 2024 Thomas Basler and others
+ * Copyright (C) 2024-2025 Thomas Basler and others
  */
 #include "I18n.h"
-#include "MessageOutput.h"
 #include "Utils.h"
 #include "defaults.h"
 #include <ArduinoJson.h>
 #include <LittleFS.h>
+
+#undef TAG
+static const char* TAG = "i18n";
 
 I18nClass I18n;
 
@@ -61,7 +63,7 @@ void I18nClass::readDisplayStrings(
     // Deserialize the JSON document
     const DeserializationError error = deserializeJson(doc, f, DeserializationOption::Filter(filter));
     if (error) {
-        MessageOutput.printf("Failed to read file %s\r\n", filename.c_str());
+        ESP_LOGE(TAG, "Failed to read file %s", filename.c_str());
         f.close();
         return;
     }
@@ -114,7 +116,7 @@ void I18nClass::readLangPacks()
 
     while (file != "") {
         if (file.endsWith(LANG_PACK_SUFFIX)) {
-            MessageOutput.printf("Read File %s\r\n", file.c_str());
+            ESP_LOGI(TAG, "Read File %s", file.c_str());
             readConfig(file);
         }
         file = root.getNextFileName();
@@ -134,7 +136,7 @@ void I18nClass::readConfig(String file)
     // Deserialize the JSON document
     const DeserializationError error = deserializeJson(doc, f, DeserializationOption::Filter(filter));
     if (error) {
-        MessageOutput.printf("Failed to read file %s\r\n", file.c_str());
+        ESP_LOGE(TAG, "Failed to read file %s", file.c_str());
         f.close();
         return;
     }
@@ -151,7 +153,7 @@ void I18nClass::readConfig(String file)
     if (lang.code != "" && lang.name != "") {
         _availLanguages.push_back(lang);
     } else {
-        MessageOutput.printf("Invalid meta data\r\n");
+        ESP_LOGE(TAG, "Invalid meta data");
     }
 
     f.close();

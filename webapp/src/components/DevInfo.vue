@@ -46,6 +46,12 @@
                 <td>{{ $t('devinfo.HardwareVersion') }}</td>
                 <td>{{ devInfoList.hw_version }}</td>
             </tr>
+            <tr>
+                <td>{{ $t('devinfo.SupportsPowerDistributionLogic') }}</td>
+                <td>
+                    <StatusBadge :status="devInfoList.pdl_supported" true_text="devinfo.Yes" false_text="devinfo.No" />
+                </td>
+            </tr>
         </tbody>
     </table>
 </template>
@@ -53,6 +59,7 @@
 <script lang="ts">
 import BootstrapAlert from '@/components/BootstrapAlert.vue';
 import type { DevInfoStatus } from '@/types/DevInfoStatus';
+import StatusBadge from '@/components/StatusBadge.vue';
 import { BIconInfoSquare } from 'bootstrap-icons-vue';
 import { defineComponent, type PropType } from 'vue';
 
@@ -60,6 +67,7 @@ export default defineComponent({
     components: {
         BootstrapAlert,
         BIconInfoSquare,
+        StatusBadge,
     },
     props: {
         devInfoList: { type: Object as PropType<DevInfoStatus>, required: true },

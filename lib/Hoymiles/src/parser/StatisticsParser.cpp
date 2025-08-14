@@ -1,9 +1,12 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * Copyright (C) 2022 - 2023 Thomas Basler and others
+ * Copyright (C) 2022 - 2025 Thomas Basler and others
  */
 #include "StatisticsParser.h"
-#include "../Hoymiles.h"
+#include <esp_log.h>
+
+#undef TAG
+static const char* TAG = "hoymiles";
 
 static float calcTotalYieldTotal(StatisticsParser* iv, uint8_t arg0);
 static float calcTotalYieldDay(StatisticsParser* iv, uint8_t arg0);
@@ -89,7 +92,7 @@ void StatisticsParser::clearBuffer()
 void StatisticsParser::appendFragment(const uint8_t offset, const uint8_t* payload, const uint8_t len)
 {
     if (offset + len > STATISTIC_PACKET_SIZE) {
-        Hoymiles.getMessageOutput()->printf("FATAL: (%s, %d) stats packet too large for buffer\r\n", __FILE__, __LINE__);
+        ESP_LOGE(TAG, "(%s, %d) stats packet too large for buffer", __FILE__, __LINE__);
         return;
     }
     memcpy(&_payloadStatistic[offset], payload, len);
@@ -109,7 +112,7 @@ void StatisticsParser::endAppendFragment()
         // check if current yield day is smaller then last cached yield day
         if (getChannelFieldValue(TYPE_DC, c, FLD_YD) < _lastYieldDay[static_cast<uint8_t>(c)]) {
             // currently all values are zero --> Add last known values to offset
-            Hoymiles.getMessageOutput()->printf("Yield Day reset detected!\r\n");
+            ESP_LOGI(TAG, "Yield Day reset detected!");
 
             setChannelFieldOffset(TYPE_DC, c, FLD_YD, _lastYieldDay[static_cast<uint8_t>(c)]);
 

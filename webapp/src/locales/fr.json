@@ -7,6 +7,7 @@
         "MQTTSettings": "MQTT",
         "InverterSettings": "Onduleurs",
         "SecuritySettings": "Sécurité",
+        "LoggingSettings": "Logging Settings",
         "DTUSettings": "DTU",
         "DeviceManager": "Périphériques",
         "ConfigManagement": "Gestion de la configuration",
@@ -30,7 +31,9 @@
         "Refreshing": "Refreshing",
         "Pull": "Pull down to refresh",
         "Release": "Release to refresh",
-        "Close": "Fermer"
+        "Close": "Fermer",
+        "Yes": "Yes",
+        "No": "No"
     },
     "wait": {
         "NotReady": "OpenDTU is not yet ready",
@@ -43,6 +46,10 @@
         "Dark": "Sombre",
         "Light": "Clair",
         "Auto": "Auto"
+    },
+    "dataagedisplay": {
+        "DataAge": "Âge des données",
+        "SecondsSince": "0 secondes | 1 seconde | {n} secondes"
     },
     "apiresponse": {
         "1001": "Paramètres enregistrés !",
@@ -97,6 +104,8 @@
         "8004": "L'adresse IP du serveur DNS primaire n'est pas valide !",
         "8005": "L'adresse IP du serveur DNS secondaire n'est pas valide !",
         "8006": "La valeur du délai d'attente du point d'accès administratif n'est pas valide !",
+        "8007": "Syslog Server must between 1 and {max} characters long!",
+        "8008": "Port must be a number between 1 and 65535!",
         "9001": "Le serveur NTP doit avoir une longueur comprise entre 1 et {max} caractères !",
         "9002": "Le fuseau horaire doit comporter entre 1 et {max} caractères !",
         "9003": "La description du fuseau horaire doit comporter entre 1 et {max} caractères !",
@@ -110,15 +119,13 @@
         "10001": "Le mot de passe doit comporter entre 8 et {max} caractères !",
         "10002": "Authentification réussie !",
         "11001": "@:apiresponse.2001",
-        "11002": "@:apiresponse:5004",
+        "11002": "@:apiresponse.5004",
         "12001": "Le profil doit comporter entre 1 et {max} caractères !"
     },
     "home": {
         "LiveData": "Données en direct",
         "SerialNumber": "Numéro de série : ",
-        "CurrentLimit": "Limite de courant : ",
-        "DataAge": "Âge des données : ",
-        "Seconds": "{val} secondes",
+        "CurrentLimit": "Limite de courant",
         "ShowSetInverterLimit": "Afficher / Régler la limite de l'onduleur",
         "TurnOnOff": "Allumer / Eteindre l'onduleur",
         "ShowInverterInfo": "Afficher les informations sur l'onduleur",
@@ -179,7 +186,10 @@
         "FirmwareVersion": "Version du firmware",
         "FirmwareBuildDate": "Date de création du firmware",
         "HardwarePartNumber": "Numéro d'article matériel",
-        "HardwareVersion": "Version du matériel"
+        "HardwareVersion": "Version du matériel",
+        "SupportsPowerDistributionLogic": "'Power Distribution Logic' supported",
+        "Yes": "@:base.Yes",
+        "No": "@:base.No"
     },
     "gridprofile": {
         "NoInfo": "@:devinfo.NoInfo",
@@ -203,6 +213,7 @@
         "SdkVersion": "Version du SDK",
         "ConfigVersion": "Version de la configuration",
         "FirmwareVersion": "Version du firmware / Hash Git",
+        "FirmwareBranch": "Firmware Branch",
         "PioEnv": "PIO Environment",
         "FirmwareVersionHint": "Cliquez ici pour afficher des informations sur votre version actuelle",
         "FirmwareUpdate": "Mise à jour du firmware",
@@ -339,7 +350,11 @@
         "VirtualDebugConsole": "Console de débogage",
         "EnableAutoScroll": "Activer le défilement automatique",
         "ClearConsole": "Vider la console",
-        "CopyToClipboard": "Copier dans le presse-papiers"
+        "CopyToClipboard": "Copier dans le presse-papiers",
+        "Download": "Download",
+        "RegularExpression": "Regular Expression",
+        "Lines": "{lines} Lines",
+        "LogLevel": "Log Level ({cnt})"
     },
     "inverterchannelinfo": {
         "String": "Ligne {num}",
@@ -449,7 +464,11 @@
         "ApTimeoutHint": "Durée pendant laquelle le point d'accès reste ouvert. Une valeur de 0 signifie infini.",
         "Minutes": "minutes",
         "EnableMdns": "Activer mDNS",
-        "MdnsSettings": "mDNS Settings"
+        "MdnsSettings": "mDNS Settings",
+        "EnableSyslog": "Enable Syslog",
+        "SyslogSettings": "Syslog Settings",
+        "SyslogHostname": "Syslog Server",
+        "SyslogPort": "Port"
     },
     "mqttadmin": {
         "MqttSettings": "Paramètres MQTT",
@@ -609,7 +628,8 @@
         "TimeSync": "L'horloge n'a pas encore été synchronisée. Sans une horloge correctement réglée, aucune demande n'est adressée à l'onduleur. Ceci est normal peu de temps après le démarrage. Cependant, après un temps de fonctionnement plus long (>1 minute), cela indique que le serveur NTP n'est pas accessible.",
         "TimeSyncLink": "Veuillez vérifier vos paramètres horaires.",
         "DefaultPassword": "Vous utilisez le mot de passe par défaut pour l'interface Web et le point d'accès d'urgence. Ceci est potentiellement non sécurisé.",
-        "DefaultPasswordLink": "Merci de changer le mot de passe."
+        "DefaultPasswordLink": "Merci de changer le mot de passe.",
+        "PinMappingIssue": "Vous utilisez une image générique du micrologiciel, mais vous n'avez pas encore téléchargé un fichier contenant les profils de l'appareil (<code>pin_mapping.json</code>) ou vous n'avez pas sélectionné un profil défini dans ce fichier. Veuillez vous référer à la <a href=\"https://opendtu.solar/firmware/device_profiles/\" target=\"_blank\" class=\"alert-link\">documentation</a> pour plus de détails."
     },
     "deviceadmin": {
         "DeviceManager": "Gestionnaire de périphériques",
@@ -656,5 +676,19 @@
         "format_herf_valid": "E-Star HERF format (will be saved converted): {serial}",
         "format_herf_invalid": "E-Star HERF format: Invalid checksum",
         "format_unknown": "Unknown format"
+    },
+    "loggingadmin": {
+        "LoggingSettings": "Logging Settings",
+        "LogLevel": "Log Level",
+        "DefaultLevel": "Default log level",
+        "Module": "Module",
+        "CoreHint": "Warning: A too detailed log level of the CORE module can significantly impact performance and lead to unpredictable behavior. The log level setting should only be temporarily adjusted for targeted troubleshooting. The default setting 'Error' is sufficient for normal operation.",
+        "log_inherit": "Inherit from default",
+        "log_none": "None",
+        "log_error": "(E) Error",
+        "log_warn": "(W) Warning",
+        "log_info": "(I) Info",
+        "log_debug": "(D) Debug",
+        "log_verbose": "(V) Verbose"
     }
 }

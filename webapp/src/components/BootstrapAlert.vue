@@ -1,6 +1,13 @@
 <template>
-    <div v-if="isAlertVisible" ref="element" class="alert" role="alert" :class="classes">
+    <div
+        v-if="isAlertVisible"
+        ref="element"
+        class="alert"
+        role="alert"
+        :class="[classes, { 'alert-with-progress': autoDismiss }]"
+    >
         <slot />
+        <div v-if="autoDismiss" class="alert-progress-bar" :style="progressBarStyle"></div>
         <button
             v-if="dismissible"
             type="button"
@@ -23,14 +30,16 @@ export const toInteger = (value: number, defaultValue = NaN) => {
 export default defineComponent({
     name: 'BootstrapAlert',
     props: {
+        autoDismiss: { type: Number, default: 0 },
         dismissLabel: { type: String, default: 'Close' },
         dismissible: { type: Boolean, default: false },
         fade: { type: Boolean, default: false },
+        jumpToTop: { type: Boolean, default: true },
         modelValue: { type: [Boolean, Number], default: false },
         show: { type: Boolean, default: false },
         variant: { type: String, default: 'info' },
     },
-    emits: ['dismissed', 'dismiss-count-down', 'update:modelValue'],
+    emits: ['dismissed', 'update:modelValue'],
     setup(props, { emit }) {
         const element = ref<HTMLElement>();
         const instance = ref<Alert>();
@@ -41,35 +50,9 @@ export default defineComponent({
             fade: props.modelValue,
         }));
 
-        let _countDownTimeout: number | undefined = 0;
-
-        const parseCountDown = (value: boolean | number) => {
-            if (typeof value === 'boolean') {
-                return 0;
-            }
-
-            const numberValue = toInteger(value, 0);
-            return numberValue > 0 ? numberValue : 0;
-        };
-
-        const clearCountDownInterval = () => {
-            if (_countDownTimeout === undefined) return;
-            clearTimeout(_countDownTimeout);
-            _countDownTimeout = undefined;
-        };
-
-        const countDown = ref();
-        watch(
-            () => props.modelValue,
-            () => {
-                countDown.value = parseCountDown(props.modelValue);
-            }
-        );
-
         const isAlertVisible = computed(() => props.modelValue || props.show);
 
         onBeforeUnmount(() => {
-            clearCountDownInterval();
             instance.value?.dispose();
             instance.value = undefined;
         });
@@ -88,7 +71,6 @@ export default defineComponent({
         });
 
         const handleShowAndModelChanged = () => {
-            countDown.value = parseCountDown(props.modelValue);
             if ((parsedModelValue.value || props.show) && !instance.value)
                 instance.value = new Alert(element.value as HTMLElement);
         };
@@ -104,25 +86,63 @@ export default defineComponent({
 
         watch(() => props.modelValue, handleShowAndModelChanged);
         watch(() => props.show, handleShowAndModelChanged);
-
-        watch(countDown, (newValue) => {
-            clearCountDownInterval();
-            if (typeof props.modelValue === 'boolean') return;
-            emit('dismiss-count-down', newValue);
-            if (newValue === 0 && props.modelValue > 0) emit('dismissed');
-            if (props.modelValue !== newValue) emit('update:modelValue', newValue);
-            if (newValue > 0) {
-                _countDownTimeout = setTimeout(() => {
-                    countDown.value--;
-                }, 1000);
-            }
+        watch(isAlertVisible, (visible) => {
+            if (visible && props.jumpToTop) window.scrollTo({ top: 0, behavior: 'smooth' });
         });
+
+        const progressBarStyle = computed(() => {
+            if (!props.autoDismiss) return {};
+            return {
+                animation: `slide-progress ${props.autoDismiss}ms linear`,
+            };
+        });
+
+        // Auto-Dismiss Logic
+        watch(
+            () => props.modelValue,
+            (newValue) => {
+                if (newValue && props.autoDismiss > 0) {
+                    setTimeout(() => {
+                        dismissClicked();
+                    }, props.autoDismiss);
+                }
+            }
+        );
         return {
             dismissClicked,
             isAlertVisible,
             element,
             classes,
+            progressBarStyle,
         };
     },
 });
 </script>
+
+<style scoped>
+.alert-with-progress {
+    position: relative;
+    overflow: hidden;
+}
+
+.alert-progress-bar {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background: rgba(255, 255, 255, 0.5);
+    transform-origin: left;
+}
+</style>
+
+<style>
+@keyframes slide-progress {
+    from {
+        transform: scaleX(1);
+    }
+    to {
+        transform: scaleX(0);
+    }
+}
+</style>

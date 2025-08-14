@@ -36,6 +36,7 @@ export interface Inverter {
     name: string;
     order: number;
     data_age: number;
+    data_age_ms: number;
     poll_enabled: boolean;
     reachable: boolean;
     producing: boolean;
@@ -58,6 +59,7 @@ export interface Hints {
     time_sync: boolean;
     default_password: boolean;
     radio_problem: boolean;
+    pin_mapping_issue: boolean;
 }
 
 export interface LiveData {

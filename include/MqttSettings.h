@@ -6,6 +6,8 @@
 #include <Ticker.h>
 #include <espMqttClient.h>
 #include <mutex>
+#include <map>
+#include <vector>
 
 class MqttSettingsClass {
 public:
@@ -16,11 +18,11 @@ public:
     void publish(const String& subtopic, const String& payload);
     void publishGeneric(const String& topic, const String& payload, const bool retain, const uint8_t qos = 0);
 
-    void subscribe(const String& topic, const uint8_t qos, const espMqttClientTypes::OnMessageCallback& cb);
+    void subscribe(const String& topic, const uint8_t qos, const OnMessageCallback& cb);
     void unsubscribe(const String& topic);
 
     String getPrefix() const;
-    String getClientId();
+    String getClientId() const;
 
 private:
     void NetworkEvent(network_event event);
@@ -36,6 +38,7 @@ private:
 
     MqttClient* _mqttClient = nullptr;
     Ticker _mqttReconnectTimer;
+    std::map<String, std::vector<uint8_t>> _fragments;
     MqttSubscribeParser _mqttSubscribeParser;
     std::mutex _clientLock;
 };

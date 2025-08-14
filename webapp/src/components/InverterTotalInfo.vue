@@ -1,7 +1,7 @@
 <template>
     <div class="row row-cols-1 row-cols-md-3 g-3">
         <div class="col">
-            <CardElement centerContent textVariant="text-bg-success" :text="$t('invertertotalinfo.TotalYieldTotal')">
+            <CardElement centerContent textVariant="text-bg-primary" :text="$t('invertertotalinfo.TotalYieldTotal')">
                 <h2>
                     {{
                         $n(totalData.YieldTotal.v, 'decimal', {
@@ -14,7 +14,7 @@
             </CardElement>
         </div>
         <div class="col">
-            <CardElement centerContent textVariant="text-bg-success" :text="$t('invertertotalinfo.TotalYieldDay')">
+            <CardElement centerContent textVariant="text-bg-primary" :text="$t('invertertotalinfo.TotalYieldDay')">
                 <h2>
                     {{
                         $n(totalData.YieldDay.v, 'decimal', {
@@ -27,7 +27,7 @@
             </CardElement>
         </div>
         <div class="col">
-            <CardElement centerContent textVariant="text-bg-success" :text="$t('invertertotalinfo.TotalPower')">
+            <CardElement centerContent textVariant="text-bg-primary" :text="$t('invertertotalinfo.TotalPower')">
                 <h2>
                     {{
                         $n(totalData.Power.v, 'decimal', {

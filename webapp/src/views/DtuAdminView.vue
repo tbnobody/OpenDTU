@@ -1,7 +1,12 @@
 <template>
     <BasePage :title="$t('dtuadmin.DtuSettings')" :isLoading="dataLoading">
-        <BootstrapAlert v-model="showAlert" dismissible :variant="alertType">
-            {{ alertMessage }}
+        <BootstrapAlert
+            v-model="alert.show"
+            dismissible
+            :variant="alert.type"
+            :auto-dismiss="alert.type != 'success' ? 0 : 5000"
+        >
+            {{ alert.message }}
         </BootstrapAlert>
 
         <form @submit="saveDtuConfig">
@@ -9,9 +14,9 @@
                 <InputElement
                     :label="$t('dtuadmin.Serial')"
                     v-model="dtuConfigList.serial"
-                    type="number"
-                    min="1"
-                    max="199999999999"
+                    type="text"
+                    minlength="12"
+                    maxlength="12"
                     :tooltip="$t('dtuadmin.SerialHint')"
                 />
 
@@ -119,6 +124,7 @@ import BootstrapAlert from '@/components/BootstrapAlert.vue';
 import CardElement from '@/components/CardElement.vue';
 import FormFooter from '@/components/FormFooter.vue';
 import InputElement from '@/components/InputElement.vue';
+import type { AlertResponse } from '@/types/AlertResponse';
 import type { DtuConfig } from '@/types/DtuConfig';
 import { authHeader, handleResponse } from '@/utils/authentication';
 import { BIconInfoCircle } from 'bootstrap-icons-vue';
@@ -143,9 +149,7 @@ export default defineComponent({
                 { key: 2, value: 'High', db: '-6' },
                 { key: 3, value: 'Max', db: '0' },
             ],
-            alertMessage: '',
-            alertType: 'info',
-            showAlert: false,
+            alert: {} as AlertResponse,
         };
     },
     created() {
@@ -208,9 +212,9 @@ export default defineComponent({
             })
                 .then((response) => handleResponse(response, this.$emitter, this.$router))
                 .then((response) => {
-                    this.alertMessage = this.$t('apiresponse.' + response.code, response.param);
-                    this.alertType = response.type;
-                    this.showAlert = true;
+                    this.alert.message = this.$t('apiresponse.' + response.code, response.param);
+                    this.alert.type = response.type;
+                    this.alert.show = true;
                 });
         },
     },

@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * Copyright (C) 2022-2024 Thomas Basler and others
+ * Copyright (C) 2022-2025 Thomas Basler and others
  */
 #include "Hoymiles.h"
 #include "Utils.h"
@@ -17,6 +17,10 @@
 #include "inverters/HM_2CH.h"
 #include "inverters/HM_4CH.h"
 #include <Arduino.h>
+#include <esp_log.h>
+
+#undef TAG
+static const char* TAG = "hoymiles";
 
 HoymilesClass Hoymiles;
 
@@ -43,34 +47,34 @@ void HoymilesClass::loop()
     _radioNrf->loop();
     _radioCmt->loop();
 
-    if (getNumInverters() == 0) {
+    if (getNumInverters() == 0 || millis() - _lastPoll <= (_pollInterval * 1000)) {
         return;
     }
 
-    if (millis() - _lastPoll > (_pollInterval * 1000)) {
-        static uint8_t inverterPos = 0;
+    static uint8_t inverterPos = 0;
 
-        std::shared_ptr<InverterAbstract> iv = getInverterByPos(inverterPos);
-        if ((iv == nullptr) || ((iv != nullptr) && (!iv->getRadio()->isInitialized()))) {
-            if (++inverterPos >= getNumInverters()) {
-                inverterPos = 0;
-            }
+    std::shared_ptr<InverterAbstract> iv = getInverterByPos(inverterPos);
+    if ((iv == nullptr) || ((iv != nullptr) && (!iv->getRadio()->isInitialized()))) {
+        if (++inverterPos >= getNumInverters()) {
+            inverterPos = 0;
+        }
+    }
+
+    if (iv != nullptr && iv->getRadio()->isInitialized()) {
+
+        if (iv->getZeroValuesIfUnreachable() && !iv->isReachable()) {
+            iv->Statistics()->zeroRuntimeData();
         }
 
-        if (iv != nullptr && iv->getRadio()->isInitialized() && iv->getRadio()->isQueueEmpty()) {
+        if (iv->getEnablePolling() || iv->getEnableCommands()) {
+            ESP_LOGI(TAG, "Fetch inverter: %s", iv->serialString().c_str());
 
-            if (iv->getZeroValuesIfUnreachable() && !iv->isReachable()) {
-                iv->Statistics()->zeroRuntimeData();
+            if (!iv->isReachable()) {
+                iv->sendChangeChannelRequest();
             }
 
-            if (iv->getEnablePolling() || iv->getEnableCommands()) {
-                _messageOutput->print("Fetch inverter: ");
-                _messageOutput->println(iv->serial(), HEX);
-
-                if (!iv->isReachable()) {
-                    iv->sendChangeChannelRequest();
-                }
-
+            if (Utils::getTimeAvailable()) {
+                // Fetch statistics
                 iv->sendStatsRequest();
 
                 // Fetch event log
@@ -80,20 +84,13 @@ void HoymilesClass::loop()
                 // Fetch limit
                 if (((millis() - iv->SystemConfigPara()->getLastUpdateRequest() > HOY_SYSTEM_CONFIG_PARA_POLL_INTERVAL)
                         && (millis() - iv->SystemConfigPara()->getLastUpdateCommand() > HOY_SYSTEM_CONFIG_PARA_POLL_MIN_DURATION))) {
-                    _messageOutput->println("Request SystemConfigPara");
+                    ESP_LOGI(TAG, "Request SystemConfigPara");
                     iv->sendSystemConfigParaRequest();
                 }
 
-                // Set limit if required
-                if (iv->SystemConfigPara()->getLastLimitCommandSuccess() == CMD_NOK) {
-                    _messageOutput->println("Resend ActivePowerControl");
-                    iv->resendActivePowerControlRequest();
-                }
-
-                // Set power status if required
-                if (iv->PowerCommand()->getLastPowerCommandSuccess() == CMD_NOK) {
-                    _messageOutput->println("Resend PowerCommand");
-                    iv->resendPowerControlRequest();
+                // Fetch grid profile
+                if (iv->Statistics()->getLastUpdate() > 0 && (iv->GridProfile()->getLastUpdate() == 0 || !iv->GridProfile()->containsValidData())) {
+                    iv->sendGridOnProFileParaRequest();
                 }
 
                 // Fetch dev info (but first fetch stats)
@@ -103,44 +100,52 @@ void HoymilesClass::loop()
                         && iv->DevInfo()->getLastUpdateSimple() > 0;
 
                     if (invalidDevInfo) {
-                        _messageOutput->println("DevInfo: No Valid Data");
+                        ESP_LOGW(TAG, "DevInfo: No Valid Data");
                     }
 
                     if ((iv->DevInfo()->getLastUpdateAll() == 0)
                         || (iv->DevInfo()->getLastUpdateSimple() == 0)
                         || invalidDevInfo) {
-                        _messageOutput->println("Request device info");
+                        ESP_LOGI(TAG, "Request device info");
                         iv->sendDevInfoRequest();
                     }
                 }
-
-                // Fetch grid profile
-                if (iv->Statistics()->getLastUpdate() > 0 && (iv->GridProfile()->getLastUpdate() == 0 || !iv->GridProfile()->containsValidData())) {
-                    iv->sendGridOnProFileParaRequest();
-                }
-
-                _lastPoll = millis();
             }
 
-            if (++inverterPos >= getNumInverters()) {
-                inverterPos = 0;
+            // Set limit if required
+            if (iv->SystemConfigPara()->getLastLimitCommandSuccess() == CMD_NOK) {
+                ESP_LOGI(TAG, "Resend ActivePowerControl");
+                iv->resendActivePowerControlRequest();
             }
+
+            // Set power status if required
+            if (iv->PowerCommand()->getLastPowerCommandSuccess() == CMD_NOK) {
+                ESP_LOGI(TAG, "Resend PowerCommand");
+                iv->resendPowerControlRequest();
+            }
+
+            ESP_LOGI(TAG, "Queue size - NRF: %" PRIu32 " CMT: %" PRIu32 "", _radioNrf->getQueueSize(), _radioCmt->getQueueSize());
+            _lastPoll = millis();
         }
 
-        // Perform housekeeping of all inverters on day change
-        const int8_t currentWeekDay = Utils::getWeekDay();
-        static int8_t lastWeekDay = -1;
-        if (lastWeekDay == -1) {
-            lastWeekDay = currentWeekDay;
-        } else {
-            if (currentWeekDay != lastWeekDay) {
+        if (++inverterPos >= getNumInverters()) {
+            inverterPos = 0;
+        }
+    }
 
-                for (auto& inv : _inverters) {
-                    inv->performDailyTask();
-                }
+    // Perform housekeeping of all inverters on day change
+    const int8_t currentWeekDay = Utils::getWeekDay();
+    static int8_t lastWeekDay = -1;
+    if (lastWeekDay == -1) {
+        lastWeekDay = currentWeekDay;
+    } else {
+        if (currentWeekDay != lastWeekDay) {
 
-                lastWeekDay = currentWeekDay;
+            for (auto& inv : _inverters) {
+                inv->performDailyTask();
             }
+
+            lastWeekDay = currentWeekDay;
         }
     }
 }
@@ -229,6 +234,7 @@ void HoymilesClass::removeInverterBySerial(const uint64_t serial)
     for (uint8_t i = 0; i < _inverters.size(); i++) {
         if (_inverters[i]->serial() == serial) {
             std::lock_guard<std::mutex> lock(_mutex);
+            _inverters[i]->getRadio()->removeCommands(_inverters[i].get());
             _inverters.erase(_inverters.begin() + i);
             return;
         }
@@ -263,14 +269,4 @@ uint32_t HoymilesClass::PollInterval() const
 void HoymilesClass::setPollInterval(const uint32_t interval)
 {
     _pollInterval = interval;
-}
-
-void HoymilesClass::setMessageOutput(Print* output)
-{
-    _messageOutput = output;
-}
-
-Print* HoymilesClass::getMessageOutput()
-{
-    return _messageOutput;
 }

@@ -2,17 +2,19 @@
 #pragma once
 
 #include "PinMapping.h"
-#include <cstdint>
 #include <TaskSchedulerDeclarations.h>
-#include <mutex>
 #include <condition_variable>
+#include <cstdint>
+#include <mutex>
 
 #define CONFIG_FILENAME "/config.json"
-#define CONFIG_VERSION 0x00011d00 // 0.1.29 // make sure to clean all after change
+#define CONFIG_VERSION 0x00011e00 // 0.1.30 // make sure to clean all after change
 
 #define WIFI_MAX_SSID_STRLEN 32
 #define WIFI_MAX_PASSWORD_STRLEN 64
 #define WIFI_MAX_HOSTNAME_STRLEN 31
+
+#define SYSLOG_MAX_HOSTNAME_STRLEN 128
 
 #define NTP_MAX_SERVER_STRLEN 31
 #define NTP_MAX_TIMEZONE_STRLEN 50
@@ -34,6 +36,9 @@
 
 #define DEV_MAX_MAPPING_NAME_STRLEN 63
 #define LOCALE_STRLEN 2
+
+#define LOG_MODULE_COUNT 16
+#define LOG_MODULE_NAME_STRLEN 32
 
 struct CHANNEL_CONFIG_T {
     uint16_t MaxChannelPower;
@@ -79,6 +84,12 @@ struct CONFIG_T {
     struct {
         bool Enabled;
     } Mdns;
+
+    struct {
+        bool Enabled;
+        char Hostname[SYSLOG_MAX_HOSTNAME_STRLEN + 1];
+        uint16_t Port;
+    } Syslog;
 
     struct {
         char Server[NTP_MAX_SERVER_STRLEN + 1];
@@ -161,6 +172,14 @@ struct CONFIG_T {
 
     INVERTER_CONFIG_T Inverter[INV_MAX_COUNT];
     char Dev_PinMapping[DEV_MAX_MAPPING_NAME_STRLEN + 1];
+
+    struct {
+        int8_t Default;
+        struct {
+            char Name[LOG_MODULE_NAME_STRLEN + 1];
+            int8_t Level;
+        } Modules[LOG_MODULE_COUNT];
+    } Logging;
 };
 
 class ConfigurationClass {
@@ -186,6 +205,8 @@ public:
     INVERTER_CONFIG_T* getFreeInverterSlot();
     INVERTER_CONFIG_T* getInverterConfig(const uint64_t serial);
     void deleteInverterById(const uint8_t id);
+
+    int8_t getIndexForLogModule(const String& moduleName) const;
 
 private:
     void loop();

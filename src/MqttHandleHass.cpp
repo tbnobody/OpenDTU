@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * Copyright (C) 2022-2024 Thomas Basler and others
+ * Copyright (C) 2022-2025 Thomas Basler and others
  */
 #include "MqttHandleHass.h"
 #include "MqttHandleInverter.h"
@@ -9,6 +9,11 @@
 #include "Utils.h"
 #include "__compiled_constants.h"
 #include "defaults.h"
+
+#define MAX_CONFIG_PUBLISH_RATIO 60000
+
+#undef TAG
+static const char* TAG = "mqtt";
 
 MqttHandleHassClass MqttHandleHass;
 
@@ -25,18 +30,18 @@ void MqttHandleHassClass::init(Scheduler& scheduler)
 
 void MqttHandleHassClass::loop()
 {
-    if (_updateForced) {
-        publishConfig();
-        _updateForced = false;
-    }
-
     if (MqttSettings.getConnected() && !_wasConnected) {
         // Connection established
         _wasConnected = true;
-        publishConfig();
+        _updateForced = true;
     } else if (!MqttSettings.getConnected() && _wasConnected) {
         // Connection lost
         _wasConnected = false;
+    }
+
+    if (_updateForced && _publishConfigTimeout.occured()) {
+        publishConfig();
+        _updateForced = false;
     }
 }
 
@@ -55,6 +60,9 @@ void MqttHandleHassClass::publishConfig()
         return;
     }
 
+    ESP_LOGI(TAG, "Publish HA config");
+    _publishConfigTimeout.set(MAX_CONFIG_PUBLISH_RATIO);
+
     const CONFIG_T& config = Configuration.get();
 
     // publish DTU sensors
@@ -70,12 +78,14 @@ void MqttHandleHassClass::publishConfig()
     publishDtuSensor("Yield Total", "ac/yieldtotal", "kWh", "", DEVICE_CLS_ENERGY, STATE_CLS_TOTAL_INCREASING, CATEGORY_NONE);
     publishDtuSensor("Yield Day", "ac/yieldday", "Wh", "", DEVICE_CLS_ENERGY, STATE_CLS_TOTAL_INCREASING, CATEGORY_NONE);
     publishDtuSensor("AC Power", "ac/power", "W", "", DEVICE_CLS_PWR, STATE_CLS_MEASUREMENT, CATEGORY_NONE);
+    publishDtuSensor("DC Power", "dc/power", "W", "", DEVICE_CLS_PWR, STATE_CLS_MEASUREMENT, CATEGORY_NONE);
 
     publishDtuBinarySensor("Status", config.Mqtt.Lwt.Topic, config.Mqtt.Lwt.Value_Online, config.Mqtt.Lwt.Value_Offline, DEVICE_CLS_CONNECTIVITY, STATE_CLS_NONE, CATEGORY_DIAGNOSTIC);
 
     // Loop all inverters
     for (uint8_t i = 0; i < Hoymiles.getNumInverters(); i++) {
         auto inv = Hoymiles.getInverterByPos(i);
+        yield();
 
         publishInverterButton(inv, "Turn Inverter Off", "cmd/power", "0", "mdi:power-plug-off", DEVICE_CLS_NONE, STATE_CLS_NONE, CATEGORY_CONFIG);
         publishInverterButton(inv, "Turn Inverter On", "cmd/power", "1", "mdi:power-plug", DEVICE_CLS_NONE, STATE_CLS_NONE, CATEGORY_CONFIG);
@@ -108,6 +118,7 @@ void MqttHandleHassClass::publishConfig()
                         clear = true;
                     }
                     publishInverterField(inv, t, c, deviceFieldAssignment[f], clear);
+                    yield();
                 }
             }
         }
@@ -323,7 +334,7 @@ void MqttHandleHassClass::addCommonMetadata(
         doc["dev_cla"] = deviceClass_name[device_class];
     }
     if (state_class != STATE_CLS_NONE) {
-        doc["stat_cla"] = stateClass_name[state_class];;
+        doc["stat_cla"] = stateClass_name[state_class];
     }
     if (category != CATEGORY_NONE) {
         doc["ent_cat"] = category_name[category];

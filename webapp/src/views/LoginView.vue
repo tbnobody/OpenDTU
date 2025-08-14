@@ -1,7 +1,12 @@
 <template>
     <BasePage :title="$t('login.Login')" :isLoading="dataLoading">
-        <BootstrapAlert v-model="showAlert" dismissible :variant="alertType">
-            {{ alertMessage }}
+        <BootstrapAlert
+            v-model="alert.show"
+            dismissible
+            :variant="alert.type"
+            :auto-dismiss="alert.type != 'success' ? 0 : 5000"
+        >
+            {{ alert.message }}
         </BootstrapAlert>
 
         <CardElement :text="$t('login.SystemLogin')" textVariant="text-bg-danger">
@@ -48,6 +53,7 @@ import BasePage from '@/components/BasePage.vue';
 import BootstrapAlert from '@/components/BootstrapAlert.vue';
 import CardElement from '@/components/CardElement.vue';
 import router from '@/router';
+import type { AlertResponse } from '@/types/AlertResponse';
 import { login } from '@/utils';
 import { defineComponent } from 'vue';
 
@@ -60,9 +66,7 @@ export default defineComponent({
     data() {
         return {
             dataLoading: false,
-            alertMessage: '',
-            alertType: 'info',
-            showAlert: false,
+            alert: {} as AlertResponse,
             returnUrl: '',
             username: '',
             password: '',
@@ -91,9 +95,9 @@ export default defineComponent({
                 },
                 (error) => {
                     this.$emitter.emit('logged-out');
-                    this.alertMessage = error;
-                    this.alertType = 'danger';
-                    this.showAlert = true;
+                    this.alert.message = error;
+                    this.alert.type = 'danger';
+                    this.alert.show = true;
                     this.dataLoading = false;
                 }
             );

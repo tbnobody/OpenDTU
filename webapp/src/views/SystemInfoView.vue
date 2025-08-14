@@ -83,7 +83,10 @@ export default defineComponent({
             }
 
             const fetchUrl =
-                'https://api.github.com/repos/tbnobody/OpenDTU/compare/' + this.systemDataList.git_hash + '...HEAD';
+                'https://api.github.com/repos/tbnobody/OpenDTU/compare/' +
+                this.systemDataList.git_hash +
+                '...' +
+                this.systemDataList.git_branch;
 
             fetch(fetchUrl)
                 .then((response) => {

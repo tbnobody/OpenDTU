@@ -22,6 +22,7 @@
             "MQTTSettings": "Ajustes MQTT",
             "InverterSettings": "Ajustes Inversor",
             "SecuritySettings": "Ajustes Seguridad",
+            "LoggingSettings": "Logging Settings",
             "DTUSettings": "Ajustes DTU",
             "DeviceManager": "Administrador Dispositivos",
             "ConfigManagement": "Gestión configuración",
@@ -45,7 +46,9 @@
             "Refreshing": "Refrescando",
             "Pull": "Tira hacia abajo para refrescar",
             "Release": "Soltar para refrescar",
-            "Close": "Cerrar"
+            "Close": "Cerrar",
+            "Yes": "Yes",
+            "No": "No"
         },
         "wait": {
             "NotReady": "OpenDTU is not yet ready",
@@ -58,6 +61,10 @@
             "Dark": "Oscuro",
             "Light": "Claro",
             "Auto": "Automático"
+        },
+        "dataagedisplay": {
+            "DataAge": "Edad de los Datos",
+            "SecondsSince": "0 segundos | 1 segundos | {n} segundos"
         },
         "apiresponse": {
             "1001": "¡Opciones guardadas!",
@@ -73,6 +80,7 @@
             "2005": "Modelo desconocido! Por favor, informe el \"Modelo de pieza de hardware\" y el modelo (por ejemplo, HM-350) como un problema en <a href=\"https://github.com/tbnobody/OpenDTU/issues\" target=\"_blank\">aquí</a>.",
             "3001": "No se eliminó nada",
             "3002": "Configuración borrada. Reinicio en curso...",
+            "3003": "File successful deleted. Restart to apply changes!",
             "4001": "@:apiresponse.2001",
             "4002": "El nombre debe tener entre 1 y {max} caracteres de longitud!",
             "4003": "Solo se admiten {max} inversores!",
@@ -111,6 +119,8 @@
             "8004": "¡La dirección IP del servidor DNS 1 no es válida!",
             "8005": "¡La dirección IP del servidor DNS 2 no es válida!",
             "8006": "¡El valor de tiempo de espera del punto de acceso administrativo es inválido!",
+            "8007": "Syslog Server must between 1 and {max} characters long!",
+            "8008": "Port must be a number between 1 and 65535!",
             "9001": "¡El servidor NTP debe tener entre 1 y {max} caracteres de longitud!",
             "9002": "¡La zona horaria debe tener entre 1 y {max} caracteres de longitud!",
             "9003": "¡La descripción de la zona horaria debe tener entre 1 y {max} caracteres de longitud!",
@@ -130,9 +140,7 @@
         "home": {
             "LiveData": "Datos en Vivo",
             "SerialNumber": "Número de Serie: ",
-            "CurrentLimit": "Límite de Corriente: ",
-            "DataAge": "Edad de los Datos: ",
-            "Seconds": "{val} segundos",
+            "CurrentLimit": "Límite de Corriente",
             "ShowSetInverterLimit": "Ver / Establecer Límite del Inversor",
             "TurnOnOff": "Encender/Apagar el Inversor",
             "ShowInverterInfo": "Ver Información del Inversor",
@@ -142,15 +150,15 @@
             "EventLog": "Registro de Eventos",
             "InverterInfo": "Información del Inversor",
             "LimitSettings": "Configuración de Límites",
-            "LastLimitSetStatus": "Último Estado de Configuración del Límite:",
-            "SetLimit": "Establecer Límite:",
+            "LastLimitSetStatus": "Último Estado de Configuración del Límite",
+            "SetLimit": "Establecer Límite",
             "Relative": "Relativo (%)",
             "Absolute": "Absoluto (W)",
             "LimitHint": "<b>Consejo:</b> Si establece el límite como un valor absoluto, la visualización del valor actual solo se actualizará después de ~4 minutos.",
             "SetPersistent": "Establecer Límite Permanente",
             "SetNonPersistent": "Establecer Límite No Permanente",
             "PowerSettings": "Configuración de Energía",
-            "LastPowerSetStatus": "Último Estado de Configuración de Energía:",
+            "LastPowerSetStatus": "Último Estado de Configuración de Energía",
             "TurnOn": "Encender",
             "TurnOff": "Apagar",
             "Restart": "Reiniciar",
@@ -193,7 +201,10 @@
             "FirmwareVersion": "Versión del firmware",
             "FirmwareBuildDate": "Fecha de construcción del firmware",
             "HardwarePartNumber": "Número de parte de hardware",
-            "HardwareVersion": "Versión de hardware"
+            "HardwareVersion": "Versión de hardware",
+            "SupportsPowerDistributionLogic": "'Power Distribution Logic' supported",
+            "Yes": "@:base.Yes",
+            "No": "@:base.No"
         },
         "gridprofile": {
             "NoInfo": "@:devinfo.NoInfo",
@@ -217,6 +228,7 @@
             "SdkVersion": "Versión del SDK",
             "ConfigVersion": "Versión de la configuración",
             "FirmwareVersion": "Versión del firmware / Hash de Git",
+            "FirmwareBranch": "Firmware Branch",
             "PioEnv": "Entorno PIO",
             "FirmwareVersionHint": "Haga clic aquí para mostrar información sobre su versión actual",
             "FirmwareUpdate": "Actualización de firmware",
@@ -371,7 +383,11 @@
             "VirtualDebugConsole": "Consola de Depuración Virtual",
             "EnableAutoScroll": "Habilitar Desplazamiento Automático",
             "ClearConsole": "Limpiar Consola",
-            "CopyToClipboard": "Copiar al Portapapeles"
+            "CopyToClipboard": "Copiar al Portapapeles",
+            "Download": "Download",
+            "RegularExpression": "Regular Expression",
+            "Lines": "{lines} Lines",
+            "LogLevel": "Log Level ({cnt})"
         },
         "inverterchannelinfo": {
             "String": "Cadena {num}",
@@ -481,7 +497,11 @@
             "ApTimeoutHint": "Tiempo que se mantiene abierto el Punto de Acceso. Un valor de 0 significa infinito.",
             "Minutes": "minutos",
             "EnableMdns": "Habilitar mDNS",
-            "MdnsSettings": "Configuración de mDNS"
+            "MdnsSettings": "Configuración de mDNS",
+            "EnableSyslog": "Enable Syslog",
+            "SyslogSettings": "Syslog Settings",
+            "SyslogHostname": "Syslog Server",
+            "SyslogPort": "Port"
         },
         "mqttadmin": {
             "MqttSettings": "Configuración de MQTT",
@@ -578,8 +598,6 @@
         "fileadmin": {
             "ConfigManagement": "Gestión de Configuración",
             "BackupHeader": "Copia de seguridad: Copia de Seguridad del Archivo de Configuración",
-            "BackupConfig": "Copia de seguridad del archivo de configuración",
-            "Backup": "Copia de seguridad",
             "Restore": "Restaurar",
             "NoFileSelected": "Ningún archivo seleccionado",
             "RestoreHeader": "Restaurar: Restaurar el Archivo de Configuración",
@@ -592,6 +610,12 @@
             "FactoryReset": "Restablecimiento de Fábrica",
             "ResetMsg": "¿Está seguro de que desea eliminar la configuración actual y restablecer todas las configuraciones a sus valores predeterminados de fábrica?",
             "ResetConfirm": "Restablecimiento de Fábrica",
+            "Download": "Download",
+            "Delete": "Delete",
+            "DeleteMsg": "Are you sure you want to delete file: '{name}'? You have to manually reboot the device to apply config changes!",
+            "Name": "Name",
+            "Size": "Size",
+            "Action": "Action",
             "Cancel": "@:base.Cancel",
             "InvalidJson": "JSON file is formatted incorrectly.",
             "InvalidJsonContent": "JSON file has the wrong content."
@@ -637,7 +661,8 @@
             "TimeSync": "El reloj aún no ha sido sincronizado. Sin un reloj correctamente ajustado, no se realizan solicitudes al inversor. Esto es normal poco después del inicio. Sin embargo, después de un tiempo de ejecución más largo (>1 minuto), indica que el servidor NTP no es accesible.",
             "TimeSyncLink": "Por favor, verifica la configuración de tu hora.",
             "DefaultPassword": "Estás utilizando la contraseña predeterminada para la interfaz web y el punto de acceso de emergencia. Esto potencialmente es inseguro.",
-            "DefaultPasswordLink": "Por favor, cambia la contraseña."
+            "DefaultPasswordLink": "Por favor, cambia la contraseña.",
+            "PinMappingIssue": "You are using a generic firmware image, but have not yet uploaded a file with device profiles (<code>pin_mapping.json</code>) or have not selected a profile defined there. Please refer to the <a href=\"https://opendtu.solar/firmware/device_profiles/\" target=\"_blank\" class=\"alert-link\">documentation</a> for details."
         },
         "deviceadmin": {
             "DeviceManager": "Administrador de Dispositivos",
@@ -685,6 +710,20 @@
             "format_herf_valid": "E-Star HERF format (will be saved converted): {serial}",
             "format_herf_invalid": "E-Star HERF format: Invalid checksum",
             "format_unknown": "Unknown format"
+        },
+        "loggingadmin": {
+            "LoggingSettings": "Logging Settings",
+            "LogLevel": "Log Level",
+            "DefaultLevel": "Default log level",
+            "Module": "Module",
+            "CoreHint": "Warning: A too detailed log level of the CORE module can significantly impact performance and lead to unpredictable behavior. The log level setting should only be temporarily adjusted for targeted troubleshooting. The default setting 'Error' is sufficient for normal operation.",
+            "log_inherit": "Inherit from default",
+            "log_none": "None",
+            "log_error": "(E) Error",
+            "log_warn": "(W) Warning",
+            "log_info": "(I) Info",
+            "log_debug": "(D) Debug",
+            "log_verbose": "(V) Verbose"
         }
     }
 }

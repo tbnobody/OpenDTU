@@ -64,7 +64,7 @@ private:
         { "reset_rf_stats", Topic::ResetRfStats },
     };
 
-    void onMqttMessage(Topic t, const espMqttClientTypes::MessageProperties& properties, const char* topic, const uint8_t* payload, const size_t len, const size_t index, const size_t total);
+    void onMqttMessage(Topic t, const espMqttClientTypes::MessageProperties& properties, const char* topic, const uint8_t* payload, const size_t len);
 };
 
 extern MqttHandleInverterClass MqttHandleInverter;

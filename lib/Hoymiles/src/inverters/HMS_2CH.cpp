@@ -22,7 +22,7 @@ static const byteAssign_t byteAssignment[] = {
     { TYPE_AC, CH0, FLD_UAC, UNIT_V, 26, 2, 10, false, 1 },
     { TYPE_AC, CH0, FLD_IAC, UNIT_A, 34, 2, 100, false, 2 },
     { TYPE_AC, CH0, FLD_PAC, UNIT_W, 30, 2, 10, false, 1 },
-    { TYPE_AC, CH0, FLD_Q, UNIT_VAR, 32, 2, 10, false, 1 },
+    { TYPE_AC, CH0, FLD_Q, UNIT_VAR, 32, 2, 10, true, 1 },
     { TYPE_AC, CH0, FLD_F, UNIT_HZ, 28, 2, 100, false, 2 },
     { TYPE_AC, CH0, FLD_PF, UNIT_NONE, 36, 2, 1000, false, 3 },
 
@@ -36,7 +36,9 @@ static const byteAssign_t byteAssignment[] = {
 };
 
 HMS_2CH::HMS_2CH(HoymilesRadio* radio, const uint64_t serial)
-    : HMS_Abstract(radio, serial) {};
+    : HMS_Abstract(radio, serial)
+{
+}
 
 bool HMS_2CH::isValidSerial(const uint64_t serial)
 {

@@ -1,11 +1,13 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * Copyright (C) 2022-2024 Thomas Basler and others
+ * Copyright (C) 2022-2025 Thomas Basler and others
  */
 #include "MqttHandleInverter.h"
-#include "MessageOutput.h"
 #include "MqttSettings.h"
 #include <ctime>
+
+#undef TAG
+static const char* TAG = "mqtt";
 
 #define PUBLISH_MAX_INTERVAL 60000
 
@@ -148,7 +150,7 @@ String MqttHandleInverterClass::getTopic(std::shared_ptr<InverterAbstract> inv, 
     return inv->serialString() + "/" + chanNum + "/" + chanName;
 }
 
-void MqttHandleInverterClass::onMqttMessage(Topic t, const espMqttClientTypes::MessageProperties& properties, const char* topic, const uint8_t* payload, const size_t len, const size_t index, const size_t total)
+void MqttHandleInverterClass::onMqttMessage(Topic t, const espMqttClientTypes::MessageProperties& properties, const char* topic, const uint8_t* payload, const size_t len)
 {
     const CONFIG_T& config = Configuration.get();
 
@@ -169,7 +171,7 @@ void MqttHandleInverterClass::onMqttMessage(Topic t, const espMqttClientTypes::M
     auto inv = Hoymiles.getInverterBySerial(serial);
 
     if (inv == nullptr) {
-        MessageOutput.println("Inverter not found");
+        ESP_LOGW(TAG, "Inverter not found");
         return;
     }
 
@@ -178,7 +180,7 @@ void MqttHandleInverterClass::onMqttMessage(Topic t, const espMqttClientTypes::M
     try {
         payload_val = std::stof(strValue);
     } catch (std::invalid_argument const& e) {
-        MessageOutput.printf("MQTT handler: cannot parse payload of topic '%s' as float: %s\r\n",
+        ESP_LOGW(TAG, "MQTT handler: cannot parse payload of topic '%s' as float: %s",
             topic, strValue.c_str());
         return;
     }
@@ -186,59 +188,59 @@ void MqttHandleInverterClass::onMqttMessage(Topic t, const espMqttClientTypes::M
     switch (t) {
     case Topic::LimitPersistentRelative:
         // Set inverter limit relative persistent
-        MessageOutput.printf("Limit Persistent: %.1f %%\r\n", payload_val);
+        ESP_LOGI(TAG, "Limit Persistent: %.1f %%", payload_val);
         inv->sendActivePowerControlRequest(payload_val, PowerLimitControlType::RelativPersistent);
         break;
 
     case Topic::LimitPersistentAbsolute:
         // Set inverter limit absolute persistent
-        MessageOutput.printf("Limit Persistent: %.1f W\r\n", payload_val);
+        ESP_LOGI(TAG, "Limit Persistent: %.1f W", payload_val);
         inv->sendActivePowerControlRequest(payload_val, PowerLimitControlType::AbsolutPersistent);
         break;
 
     case Topic::LimitNonPersistentRelative:
         // Set inverter limit relative non persistent
-        MessageOutput.printf("Limit Non-Persistent: %.1f %%\r\n", payload_val);
+        ESP_LOGI(TAG, "Limit Non-Persistent: %.1f %%", payload_val);
         if (!properties.retain) {
             inv->sendActivePowerControlRequest(payload_val, PowerLimitControlType::RelativNonPersistent);
         } else {
-            MessageOutput.println("Ignored because retained");
+            ESP_LOGW(TAG, "Ignored because retained");
         }
         break;
 
     case Topic::LimitNonPersistentAbsolute:
         // Set inverter limit absolute non persistent
-        MessageOutput.printf("Limit Non-Persistent: %.1f W\r\n", payload_val);
+        ESP_LOGI(TAG, "Limit Non-Persistent: %.1f W", payload_val);
         if (!properties.retain) {
             inv->sendActivePowerControlRequest(payload_val, PowerLimitControlType::AbsolutNonPersistent);
         } else {
-            MessageOutput.println("Ignored because retained");
+            ESP_LOGW(TAG, "Ignored because retained");
         }
         break;
 
     case Topic::Power:
         // Turn inverter on or off
-        MessageOutput.printf("Set inverter power to: %" PRId32 "\r\n", static_cast<int32_t>(payload_val));
+        ESP_LOGI(TAG, "Set inverter power to: %" PRId32 "", static_cast<int32_t>(payload_val));
         inv->sendPowerControlRequest(static_cast<int32_t>(payload_val) > 0);
         break;
 
     case Topic::Restart:
         // Restart inverter
-        MessageOutput.printf("Restart inverter\r\n");
+        ESP_LOGI(TAG, "Restart inverter");
         if (!properties.retain && payload_val == 1) {
             inv->sendRestartControlRequest();
         } else {
-            MessageOutput.println("Ignored because retained or numeric value not '1'");
+            ESP_LOGW(TAG, "Ignored because retained or numeric value not '1'");
         }
         break;
 
     case Topic::ResetRfStats:
         // Reset RF Stats
-        MessageOutput.printf("Reset RF stats\r\n");
+        ESP_LOGI(TAG, "Reset RF stats");
         if (!properties.retain && payload_val == 1) {
             inv->resetRadioStats();
         } else {
-            MessageOutput.println("Ignored because retained or numeric value not '1'");
+            ESP_LOGW(TAG, "Ignored because retained or numeric value not '1'");
         }
     }
 }
@@ -252,8 +254,7 @@ void MqttHandleInverterClass::subscribeTopics()
         MqttSettings.subscribe(fullTopic.c_str(), 0,
             std::bind(&MqttHandleInverterClass::onMqttMessage, this, t,
                 std::placeholders::_1, std::placeholders::_2,
-                std::placeholders::_3, std::placeholders::_4,
-                std::placeholders::_5, std::placeholders::_6));
+                std::placeholders::_3, std::placeholders::_4));
     };
 
     for (auto const& s : _subscriptions) {

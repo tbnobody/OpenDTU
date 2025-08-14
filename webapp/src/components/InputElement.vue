@@ -18,6 +18,7 @@
                     :id="inputId"
                     :placeholder="placeholder"
                     :type="type"
+                    :minlength="minlength"
                     :maxlength="maxlength"
                     :min="min"
                     :max="max"
@@ -58,6 +59,7 @@ export default defineComponent({
         label: String,
         placeholder: String,
         type: String,
+        minlength: String,
         maxlength: String,
         min: String,
         max: String,

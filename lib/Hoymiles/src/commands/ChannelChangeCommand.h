@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 #pragma once
 
-#include "CommandAbstract.h"
 #include "../HoymilesRadio_CMT.h"
+#include "CommandAbstract.h"
 
 class ChannelChangeCommand : public CommandAbstract {
 public:
@@ -17,5 +17,5 @@ public:
 
     virtual bool handleResponse(const fragment_t fragment[], const uint8_t max_fragment_id);
 
-    virtual uint8_t getMaxResendCount();
+    virtual uint8_t getMaxResendCount() const;
 };

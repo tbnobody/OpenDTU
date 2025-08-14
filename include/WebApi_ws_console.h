@@ -12,7 +12,7 @@ public:
 
 private:
     AsyncWebSocket _ws;
-    AuthenticationMiddleware _simpleDigestAuth;
+    AsyncAuthenticationMiddleware _simpleDigestAuth;
 
     Task _wsCleanupTask;
     void wsCleanupTaskCb();

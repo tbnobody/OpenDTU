@@ -17,7 +17,7 @@ public:
     W5500& operator=(const W5500&) = delete;
     ~W5500();
 
-    static std::unique_ptr<W5500> setup(int8_t pin_mosi, int8_t pin_miso, int8_t pin_sclk, int8_t pin_cs, int8_t pin_int, int8_t pin_rst);
+    static std::unique_ptr<W5500> setup(gpio_num_t pin_mosi, gpio_num_t pin_miso, gpio_num_t pin_sclk, gpio_num_t pin_cs, gpio_num_t pin_int, gpio_num_t pin_rst);
     String macAddress();
 
 private:

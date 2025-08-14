@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * Copyright (C) 2022 Thomas Basler and others
+ * Copyright (C) 2022-2025 Thomas Basler and others
  */
 #include "MqttSubscribeParser.h"
 
-void MqttSubscribeParser::register_callback(const std::string& topic, uint8_t qos, const espMqttClientTypes::OnMessageCallback& cb)
+void MqttSubscribeParser::register_callback(const std::string& topic, uint8_t qos, const OnMessageCallback& cb)
 {
     cb_filter_t cbf;
     cbf.topic = topic;
@@ -24,13 +24,13 @@ void MqttSubscribeParser::unregister_callback(const std::string& topic)
     }
 }
 
-void MqttSubscribeParser::handle_message(const espMqttClientTypes::MessageProperties& properties, const char* topic, const uint8_t* payload, size_t len, size_t index, size_t total)
+void MqttSubscribeParser::handle_message(const espMqttClientTypes::MessageProperties& properties, const char* topic, const uint8_t* payload, size_t len)
 {
     bool result = false;
     for (const auto& cb : _callbacks) {
         if (mosquitto_topic_matches_sub(cb.topic.c_str(), topic, &result) == MOSQ_ERR_SUCCESS) {
             if (result) {
-                cb.cb(properties, topic, payload, len, index, total);
+                cb.cb(properties, topic, payload, len);
             }
         }
     }

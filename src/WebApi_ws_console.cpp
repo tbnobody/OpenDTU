@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * Copyright (C) 2022-2024 Thomas Basler and others
+ * Copyright (C) 2022-2025 Thomas Basler and others
  */
 #include "WebApi_ws_console.h"
 #include "Configuration.h"
@@ -34,7 +34,9 @@ void WebApiWsConsoleClass::reload()
 
     auto const& config = Configuration.get();
 
-    if (config.Security.AllowReadonly) { return; }
+    if (config.Security.AllowReadonly) {
+        return;
+    }
 
     _ws.enable(false);
     _simpleDigestAuth.setPassword(config.Security.Password);

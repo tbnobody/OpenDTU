@@ -16,7 +16,7 @@ static const byteAssign_t byteAssignment[] = {
     { TYPE_AC, CH0, FLD_UAC, UNIT_V, 26, 2, 10, false, 1 },
     { TYPE_AC, CH0, FLD_IAC, UNIT_A, 34, 2, 100, false, 2 },
     { TYPE_AC, CH0, FLD_PAC, UNIT_W, 30, 2, 10, false, 1 },
-    { TYPE_AC, CH0, FLD_Q, UNIT_VAR, 40, 2, 10, false, 1 }, // to be verified
+    { TYPE_AC, CH0, FLD_Q, UNIT_VAR, 40, 2, 10, true, 1 }, // to be verified
     { TYPE_AC, CH0, FLD_F, UNIT_HZ, 28, 2, 100, false, 2 },
     { TYPE_AC, CH0, FLD_PF, UNIT_NONE, 36, 2, 1000, false, 3 },
 
@@ -30,7 +30,9 @@ static const byteAssign_t byteAssignment[] = {
 };
 
 HERF_1CH::HERF_1CH(HoymilesRadio* radio, const uint64_t serial)
-    : HM_Abstract(radio, serial) {};
+    : HM_Abstract(radio, serial)
+{
+}
 
 bool HERF_1CH::isValidSerial(const uint64_t serial)
 {

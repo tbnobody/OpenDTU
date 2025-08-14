@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * Copyright (C) 2022 - 2024 Thomas Basler and others
+ * Copyright (C) 2022 - 2025 Thomas Basler and others
  */
 
 /*
@@ -28,8 +28,12 @@ Data structure (DevInfoSimpleCommand):
 ID   Source Addr   Target Addr   Idx  FW Version  HW Part No.   HW Version   ?       ?       ?       CRC16   CRC8
 */
 #include "DevInfoParser.h"
-#include "../Hoymiles.h"
 #include <cstring>
+#include <ctime>
+#include <esp_log.h>
+
+#undef TAG
+static const char* TAG = "hoymiles";
 
 #define ALL 0xff
 
@@ -81,6 +85,7 @@ const devInfo_t devInfo[] = {
     { { 0x10, 0x33, 0x11, ALL }, 1800, "HMT-1800-6T" }, // 01
     { { 0x10, 0x33, 0x31, ALL }, 2250, "HMT-2250-6T" }, // 01
 
+    { { 0xF1, 0x01, 0x10, ALL }, 600, "HERF-600" }, // 00
     { { 0xF1, 0x01, 0x14, ALL }, 800, "HERF-800" }, // 00
     { { 0xF1, 0x01, 0x24, ALL }, 1600, "HERF-1600" }, // 00
     { { 0xF1, 0x01, 0x22, ALL }, 1800, "HERF-1800" }, // 00
@@ -102,7 +107,7 @@ void DevInfoParser::clearBufferAll()
 void DevInfoParser::appendFragmentAll(const uint8_t offset, const uint8_t* payload, const uint8_t len)
 {
     if (offset + len > DEV_INFO_SIZE) {
-        Hoymiles.getMessageOutput()->printf("FATAL: (%s, %d) dev info all packet too large for buffer\r\n", __FILE__, __LINE__);
+        ESP_LOGE(TAG, "(%s, %d) dev info all packet too large for buffer", __FILE__, __LINE__);
         return;
     }
     memcpy(&_payloadDevInfoAll[offset], payload, len);
@@ -118,7 +123,7 @@ void DevInfoParser::clearBufferSimple()
 void DevInfoParser::appendFragmentSimple(const uint8_t offset, const uint8_t* payload, const uint8_t len)
 {
     if (offset + len > DEV_INFO_SIZE) {
-        Hoymiles.getMessageOutput()->printf("FATAL: (%s, %d) dev info Simple packet too large for buffer\r\n", __FILE__, __LINE__);
+        ESP_LOGE(TAG, "(%s, %d) dev info Simple packet too large for buffer", __FILE__, __LINE__);
         return;
     }
     memcpy(&_payloadDevInfoSimple[offset], payload, len);

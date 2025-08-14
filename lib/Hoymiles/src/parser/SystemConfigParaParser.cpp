@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * Copyright (C) 2022 - 2024 Thomas Basler and others
+ * Copyright (C) 2022 - 2025 Thomas Basler and others
  */
 
 /*
@@ -17,8 +17,11 @@ Data structure:
 ID   Source Addr   Target Addr   Idx  ?       Limit percent   ?       ?       ?       ?       ?       CRC16   CRC8
 */
 #include "SystemConfigParaParser.h"
-#include "../Hoymiles.h"
 #include <cstring>
+#include <esp_log.h>
+
+#undef TAG
+static const char* TAG = "hoymiles";
 
 SystemConfigParaParser::SystemConfigParaParser()
     : Parser()
@@ -35,7 +38,7 @@ void SystemConfigParaParser::clearBuffer()
 void SystemConfigParaParser::appendFragment(const uint8_t offset, const uint8_t* payload, const uint8_t len)
 {
     if (offset + len > (SYSTEM_CONFIG_PARA_SIZE)) {
-        Hoymiles.getMessageOutput()->printf("FATAL: (%s, %d) stats packet too large for buffer\r\n", __FILE__, __LINE__);
+        ESP_LOGE(TAG, "(%s, %d) stats packet too large for buffer", __FILE__, __LINE__);
         return;
     }
     memcpy(&_payload[offset], payload, len);
@@ -47,14 +50,19 @@ float SystemConfigParaParser::getLimitPercent() const
     HOY_SEMAPHORE_TAKE();
     const float ret = ((static_cast<uint16_t>(_payload[2]) << 8) | _payload[3]) / 10.0;
     HOY_SEMAPHORE_GIVE();
-    return ret;
+
+    // don't pretend the inverter could produce more than its rated power,
+    // even though it does process, accept, and even save limit values beyond
+    // its rated power.
+    return min<float>(100, ret);
 }
 
 void SystemConfigParaParser::setLimitPercent(const float value)
 {
+    const uint16_t val = static_cast<uint16_t>(value * 10);
     HOY_SEMAPHORE_TAKE();
-    _payload[2] = static_cast<uint16_t>(value * 10) >> 8;
-    _payload[3] = static_cast<uint16_t>(value * 10);
+    _payload[2] = val >> 8;
+    _payload[3] = val & 0xFF;
     HOY_SEMAPHORE_GIVE();
 }
 

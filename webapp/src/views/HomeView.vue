@@ -37,12 +37,22 @@
                     >
                         <div class="d-flex align-items-center">
                             <div class="me-2">
-                                <BIconXCircleFill class="fs-4" v-if="!inverter.reachable" />
-                                <BIconExclamationCircleFill
-                                    class="fs-4"
-                                    v-if="inverter.reachable && !inverter.producing"
-                                />
-                                <BIconCheckCircleFill class="fs-4" v-if="inverter.reachable && inverter.producing" />
+                                <span
+                                    v-if="inverter.AC"
+                                    class="badge"
+                                    :class="{
+                                        'text-bg-secondary': !inverter.poll_enabled,
+                                        'text-bg-danger': inverter.poll_enabled && !inverter.reachable,
+                                        'text-bg-warning':
+                                            inverter.poll_enabled && inverter.reachable && !inverter.producing,
+                                        'text-bg-success':
+                                            inverter.poll_enabled && inverter.reachable && inverter.producing,
+                                    }"
+                                >
+                                    {{ $n(inverter.AC[0]?.Power?.v || 0, 'decimalNoDigits') }}
+                                    {{ inverter.AC[0].Power?.u }}
+                                </span>
+                                <span v-else class="badge text-bg-light">-</span>
                             </div>
                             <div class="ms-auto me-auto">
                                 {{ inverter.name }}
@@ -76,7 +86,7 @@
                                 'text-bg-tertiary': !inverter.poll_enabled,
                                 'text-bg-danger': inverter.poll_enabled && !inverter.reachable,
                                 'text-bg-warning': inverter.poll_enabled && inverter.reachable && !inverter.producing,
-                                'text-bg-primary': inverter.poll_enabled && inverter.reachable && inverter.producing,
+                                'text-bg-success': inverter.poll_enabled && inverter.reachable && inverter.producing,
                             }"
                         >
                             <div class="p-1 flex-grow-1">
@@ -88,17 +98,13 @@
                                         {{ $t('home.SerialNumber') }}{{ inverter.serial }}
                                     </div>
                                     <div style="padding-right: 2em">
-                                        {{ $t('home.CurrentLimit')
-                                        }}<template v-if="inverter.limit_absolute > -1">
+                                        {{ $t('home.CurrentLimit') }}:
+                                        <template v-if="inverter.limit_absolute > -1">
                                             {{ $n(inverter.limit_absolute, 'decimalNoDigits') }} W | </template
                                         >{{ $n(inverter.limit_relative / 100, 'percentOneDigit') }}
                                     </div>
                                     <div style="padding-right: 2em">
-                                        {{ $t('home.DataAge') }}
-                                        {{ $t('home.Seconds', { val: $n(inverter.data_age) }) }}
-                                        <template v-if="inverter.data_age > 300">
-                                            / {{ calculateAbsoluteTime(inverter.data_age) }}
-                                        </template>
+                                        <DataAgeDisplay :data-age-ms="inverter.data_age_ms" />
                                     </div>
                                 </div>
                             </div>
@@ -500,6 +506,7 @@
 <script lang="ts">
 import BasePage from '@/components/BasePage.vue';
 import BootstrapAlert from '@/components/BootstrapAlert.vue';
+import DataAgeDisplay from '@/components/DataAgeDisplay.vue';
 import DevInfo from '@/components/DevInfo.vue';
 import EventLog from '@/components/EventLog.vue';
 import GridProfile from '@/components/GridProfile.vue';
@@ -511,8 +518,8 @@ import InverterTotalInfo from '@/components/InverterTotalInfo.vue';
 import ModalDialog from '@/components/ModalDialog.vue';
 import type { DevInfoStatus } from '@/types/DevInfoStatus';
 import type { EventlogItems } from '@/types/EventlogStatus';
-import type { GridProfileStatus } from '@/types/GridProfileStatus';
 import type { GridProfileRawdata } from '@/types/GridProfileRawdata';
+import type { GridProfileStatus } from '@/types/GridProfileStatus';
 import type { LimitConfig } from '@/types/LimitConfig';
 import type { LimitStatus } from '@/types/LimitStatus';
 import type { Inverter, LiveData } from '@/types/LiveDataStatus';
@@ -521,9 +528,7 @@ import * as bootstrap from 'bootstrap';
 import {
     BIconArrowCounterclockwise,
     BIconBroadcast,
-    BIconCheckCircleFill,
     BIconCpu,
-    BIconExclamationCircleFill,
     BIconInfoCircle,
     BIconJournalText,
     BIconOutlet,
@@ -531,7 +536,6 @@ import {
     BIconSpeedometer,
     BIconToggleOff,
     BIconToggleOn,
-    BIconXCircleFill,
 } from 'bootstrap-icons-vue';
 import { defineComponent } from 'vue';
 
@@ -539,6 +543,7 @@ export default defineComponent({
     components: {
         BasePage,
         BootstrapAlert,
+        DataAgeDisplay,
         DevInfo,
         EventLog,
         GridProfile,
@@ -550,9 +555,7 @@ export default defineComponent({
         ModalDialog,
         BIconArrowCounterclockwise,
         BIconBroadcast,
-        BIconCheckCircleFill,
         BIconCpu,
-        BIconExclamationCircleFill,
         BIconInfoCircle,
         BIconJournalText,
         BIconOutlet,
@@ -560,7 +563,6 @@ export default defineComponent({
         BIconSpeedometer,
         BIconToggleOff,
         BIconToggleOn,
-        BIconXCircleFill,
     },
     data() {
         return {
@@ -568,7 +570,7 @@ export default defineComponent({
 
             socket: {} as WebSocket,
             heartInterval: 0,
-            dataAgeInterval: 0,
+            dataAgeTimers: {} as Record<string, number>,
             dataLoading: true,
             liveData: {} as LiveData,
             isFirstFetchAfterConnect: true,
@@ -613,7 +615,6 @@ export default defineComponent({
     created() {
         this.getInitialData();
         this.initSocket();
-        this.initDataAgeing();
         this.$emitter.on('logged-in', () => {
             this.isLogged = this.isLoggedIn();
         });
@@ -712,8 +713,10 @@ export default defineComponent({
                     );
                     if (foundIdx == -1) {
                         Object.assign(this.liveData.inverters, newData.inverters);
+                        this.liveData.inverters.forEach((inv) => this.resetDataAging(inv));
                     } else {
                         Object.assign(this.liveData.inverters[foundIdx], newData.inverters[0]);
+                        this.resetDataAging(this.liveData.inverters[foundIdx]);
                     }
                     this.dataLoading = false;
                     this.heartCheck(); // Reset heartbeat detection
@@ -740,13 +743,26 @@ export default defineComponent({
                 this.closeSocket();
             };
         },
-        initDataAgeing() {
-            this.dataAgeInterval = setInterval(() => {
-                if (this.inverterData) {
-                    this.inverterData.forEach((element) => {
-                        element.data_age++;
-                    });
-                }
+        resetDataAging(inv: Inverter) {
+            if (this.dataAgeTimers[inv.serial] !== undefined) {
+                clearTimeout(this.dataAgeTimers[inv.serial]);
+            }
+
+            const nextMs = 1000 - (inv.data_age_ms % 1000);
+            this.dataAgeTimers[inv.serial] = setTimeout(() => {
+                this.doDataAging(inv.serial);
+            }, nextMs);
+        },
+        doDataAging(serial: string) {
+            const inv = this.liveData?.inverters?.find((inv) => inv.serial === serial);
+            if (inv === undefined) {
+                return;
+            }
+
+            inv.data_age_ms += 1000;
+
+            this.dataAgeTimers[serial] = setTimeout(() => {
+                this.doDataAging(serial);
             }, 1000);
         },
         // Send heartbeat packets regularly * 59s Send a heartbeat
@@ -924,10 +940,6 @@ export default defineComponent({
                     }
                 });
         },
-        calculateAbsoluteTime(lastTime: number): string {
-            const date = new Date(Date.now() - lastTime * 1000);
-            return this.$d(date, 'datetime');
-        },
         getSumIrridiation(inv: Inverter): number {
             let total = 0;
             Object.keys(inv.DC).forEach((key) => {
@@ -945,7 +957,7 @@ export default defineComponent({
 });
 </script>
 
-<style>
+<style scoped>
 .btn-group {
     border-radius: var(--bs-border-radius);
     margin-top: 0.25rem;

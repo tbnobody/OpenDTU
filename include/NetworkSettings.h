@@ -64,17 +64,20 @@ private:
     void handleMDNS();
     void setupMode();
     void NetworkEvent(const WiFiEvent_t event, WiFiEventInfo_t info);
+    void disableAdminMode();
+    bool wifiConfigured() const;
 
     Task _loopTask;
 
     static constexpr byte DNS_PORT = 53;
 
     bool _adminEnabled = true;
-    bool _forceDisconnection = false;
+    bool _performConnection = true;
     uint32_t _adminTimeoutCounter = 0;
     uint32_t _adminTimeoutCounterMax = 0;
     uint32_t _connectTimeoutTimer = 0;
     uint32_t _connectRedoTimer = 0;
+    uint32_t _lastReconnectAttempt = 0;
     uint32_t _lastTimerCall = 0;
     IPAddress _apIp;
     IPAddress _apNetmask;

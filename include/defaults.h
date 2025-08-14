@@ -13,7 +13,7 @@
 #define AUTH_USERNAME "admin"
 #define SECURITY_ALLOW_READONLY true
 
-#define WIFI_RECONNECT_TIMEOUT 30
+#define WIFI_RECONNECT_TIMEOUT 60
 #define WIFI_RECONNECT_REDO_TIMEOUT 600
 
 #define WIFI_SSID ""
@@ -21,6 +21,9 @@
 #define WIFI_DHCP true
 
 #define MDNS_ENABLED false
+
+#define SYSLOG_ENABLED false
+#define SYSLOG_PORT 514
 
 #define NTP_SERVER_OLD "pool.ntp.org"
 #define NTP_SERVER "opendtu.pool.ntp.org"

@@ -1,15 +1,18 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * Copyright (C) 2022-2024 Thomas Basler and others
+ * Copyright (C) 2022-2025 Thomas Basler and others
  */
 #include "Configuration.h"
-#include "MessageOutput.h"
 #include "NetworkSettings.h"
 #include "Utils.h"
 #include "defaults.h"
 #include <ArduinoJson.h>
 #include <LittleFS.h>
+#include <esp_log.h>
 #include <nvs_flash.h>
+
+#undef TAG
+static const char* TAG = "configuration";
 
 CONFIG_T config;
 
@@ -55,6 +58,11 @@ bool ConfigurationClass::write()
 
     JsonObject mdns = doc["mdns"].to<JsonObject>();
     mdns["enabled"] = config.Mdns.Enabled;
+
+    JsonObject syslog = doc["syslog"].to<JsonObject>();
+    syslog["enabled"] = config.Syslog.Enabled;
+    syslog["hostname"] = config.Syslog.Hostname;
+    syslog["port"] = config.Syslog.Port;
 
     JsonObject ntp = doc["ntp"].to<JsonObject>();
     ntp["server"] = config.Ntp.Server;
@@ -151,13 +159,22 @@ bool ConfigurationClass::write()
         }
     }
 
+    JsonObject logging = doc["logging"].to<JsonObject>();
+    logging["default"] = config.Logging.Default;
+    JsonArray modules = logging["modules"].to<JsonArray>();
+    for (uint8_t i = 0; i < LOG_MODULE_COUNT; i++) {
+        JsonObject module = modules.add<JsonObject>();
+        module["level"] = config.Logging.Modules[i].Level;
+        module["name"] = config.Logging.Modules[i].Name;
+    }
+
     if (!Utils::checkJsonAlloc(doc, __FUNCTION__, __LINE__)) {
         return false;
     }
 
     // Serialize JSON to file
     if (serializeJson(doc, f) == 0) {
-        MessageOutput.println("Failed to write file");
+        ESP_LOGE(TAG, "Failed to write file");
         return false;
     }
 
@@ -175,7 +192,7 @@ bool ConfigurationClass::read()
     // Deserialize the JSON document
     const DeserializationError error = deserializeJson(doc, f);
     if (error) {
-        MessageOutput.println("Failed to read file, using default configuration");
+        ESP_LOGW(TAG, "Failed to read file, using default configuration");
     }
 
     if (!Utils::checkJsonAlloc(doc, __FUNCTION__, __LINE__)) {
@@ -231,6 +248,11 @@ bool ConfigurationClass::read()
 
     JsonObject mdns = doc["mdns"];
     config.Mdns.Enabled = mdns["enabled"] | MDNS_ENABLED;
+
+    JsonObject syslog = doc["syslog"];
+    config.Syslog.Enabled = syslog["enabled"] | SYSLOG_ENABLED;
+    strlcpy(config.Syslog.Hostname, syslog["hostname"] | "", sizeof(config.Syslog.Hostname));
+    config.Syslog.Port = syslog["port"] | SYSLOG_PORT;
 
     JsonObject ntp = doc["ntp"];
     strlcpy(config.Ntp.Server, ntp["server"] | NTP_SERVER, sizeof(config.Ntp.Server));
@@ -327,20 +349,28 @@ bool ConfigurationClass::read()
         }
     }
 
+    JsonObject logging = doc["logging"];
+    config.Logging.Default = logging["default"] | ESP_LOG_ERROR;
+    JsonArray modules = logging["modules"];
+    for (uint8_t i = 0; i < LOG_MODULE_COUNT; i++) {
+        JsonObject module = modules[i].as<JsonObject>();
+        strlcpy(config.Logging.Modules[i].Name, module["name"] | "", sizeof(config.Logging.Modules[i].Name));
+        config.Logging.Modules[i].Level = module["level"] | ESP_LOG_VERBOSE;
+    }
+
     f.close();
 
     // Check for default DTU serial
-    MessageOutput.print("Check for default DTU serial... ");
     if (config.Dtu.Serial == DTU_SERIAL) {
-        MessageOutput.print("generate serial based on ESP chip id: ");
         const uint64_t dtuId = Utils::generateDtuSerial();
-        MessageOutput.printf("%0" PRIx32 "%08" PRIx32 "... ",
-            static_cast<uint32_t>((dtuId >> 32) & 0xFFFFFFFF),
-            static_cast<uint32_t>(dtuId & 0xFFFFFFFF));
         config.Dtu.Serial = dtuId;
         write();
+        ESP_LOGI(TAG, "DTU serial check: Generated new serial based on ESP chip id: %0" PRIx32 "%08" PRIx32 "",
+            static_cast<uint32_t>((dtuId >> 32) & 0xFFFFFFFF),
+            static_cast<uint32_t>(dtuId & 0xFFFFFFFF));
+    } else {
+        ESP_LOGI(TAG, "DTU serial check: Using existing serial");
     }
-    MessageOutput.println("done");
 
     return true;
 }
@@ -349,16 +379,18 @@ void ConfigurationClass::migrate()
 {
     File f = LittleFS.open(CONFIG_FILENAME, "r", false);
     if (!f) {
-        MessageOutput.println("Failed to open file, cancel migration");
+        ESP_LOGE(TAG, "Failed to open file, cancel migration");
         return;
     }
+
+    Utils::skipBom(f);
 
     JsonDocument doc;
 
     // Deserialize the JSON document
     const DeserializationError error = deserializeJson(doc, f);
     if (error) {
-        MessageOutput.printf("Failed to read file, cancel migration: %s\r\n", error.c_str());
+        ESP_LOGE(TAG, "Failed to read file, cancel migration: %s", error.c_str());
         return;
     }
 
@@ -423,6 +455,12 @@ void ConfigurationClass::migrate()
         }
     }
 
+    if (config.Cfg.Version < 0x00011e00) {
+        config.Logging.Default = ESP_LOG_VERBOSE;
+        strlcpy(config.Logging.Modules[0].Name, "CORE", sizeof(config.Logging.Modules[0].Name));
+        config.Logging.Modules[0].Level = ESP_LOG_ERROR;
+    }
+
     f.close();
 
     config.Cfg.Version = CONFIG_VERSION;
@@ -484,10 +522,23 @@ void ConfigurationClass::deleteInverterById(const uint8_t id)
     }
 }
 
+int8_t ConfigurationClass::getIndexForLogModule(const String& moduleName) const
+{
+    for (uint8_t i = 0; i < LOG_MODULE_COUNT; i++) {
+        if (strcmp(config.Logging.Modules[i].Name, moduleName.c_str()) == 0) {
+            return i;
+        }
+    }
+
+    return -1;
+}
+
 void ConfigurationClass::loop()
 {
     std::unique_lock<std::mutex> lock(sWriterMutex);
-    if (sWriterCount == 0) { return; }
+    if (sWriterCount == 0) {
+        return;
+    }
 
     sWriterCv.notify_all();
     sWriterCv.wait(lock, [] { return sWriterCount == 0; });
@@ -505,9 +556,12 @@ ConfigurationClass::WriteGuard::WriteGuard()
     sWriterCv.wait(_lock);
 }
 
-ConfigurationClass::WriteGuard::~WriteGuard() {
+ConfigurationClass::WriteGuard::~WriteGuard()
+{
     sWriterCount--;
-    if (sWriterCount == 0) { sWriterCv.notify_all(); }
+    if (sWriterCount == 0) {
+        sWriterCv.notify_all();
+    }
 }
 
 ConfigurationClass Configuration;

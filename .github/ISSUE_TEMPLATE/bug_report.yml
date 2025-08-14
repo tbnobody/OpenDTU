@@ -4,8 +4,8 @@ labels: ["bug"]
 body:
   - type: markdown
     attributes:
-      value: >
-        ### ⚠️ Please remember: issues are for *bugs*
+      value: |
+        ### ⚠️ Please remember: issues are for *bugs*⚠️
         That is, something you believe affects every single user of OpenDTU, not just you. If you're not sure, start with one of the other options below.
   - type: markdown
     attributes:
@@ -56,15 +56,15 @@ body:
     id: version
     attributes:
       label: What git-hash/version of OpenDTU?
-      description: You can find this in by going to Info -> System
+      description: You can find this in the Web UI at Info -> System.
       placeholder: "e.g. 359d513"
     validations:
       required: true
   - type: input
     id: environment
     attributes:
-      label: What firmware variant (PIO Environment) are you using?
-      description: You can find this in by going to Info -> System
+      label: What firmware variant (PIO Environment)?
+      description: You can find this in the Web UI at Info -> System.
       placeholder: "generic_esp32s3_usb"
     validations:
       required: true

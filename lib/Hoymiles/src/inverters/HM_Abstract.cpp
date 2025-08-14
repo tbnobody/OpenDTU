@@ -14,16 +14,13 @@
 #include "commands/SystemConfigParaCommand.h"
 
 HM_Abstract::HM_Abstract(HoymilesRadio* radio, const uint64_t serial)
-    : InverterAbstract(radio, serial) {};
+    : InverterAbstract(radio, serial)
+{
+}
 
 bool HM_Abstract::sendStatsRequest()
 {
     if (!getEnablePolling()) {
-        return false;
-    }
-
-    struct tm timeinfo;
-    if (!getLocalTime(&timeinfo, 5)) {
         return false;
     }
 
@@ -40,11 +37,6 @@ bool HM_Abstract::sendStatsRequest()
 bool HM_Abstract::sendAlarmLogRequest(const bool force)
 {
     if (!getEnablePolling()) {
-        return false;
-    }
-
-    struct tm timeinfo;
-    if (!getLocalTime(&timeinfo, 5)) {
         return false;
     }
 
@@ -75,11 +67,6 @@ bool HM_Abstract::sendDevInfoRequest()
         return false;
     }
 
-    struct tm timeinfo;
-    if (!getLocalTime(&timeinfo, 5)) {
-        return false;
-    }
-
     time_t now;
     time(&now);
 
@@ -97,11 +84,6 @@ bool HM_Abstract::sendDevInfoRequest()
 bool HM_Abstract::sendSystemConfigParaRequest()
 {
     if (!getEnablePolling()) {
-        return false;
-    }
-
-    struct tm timeinfo;
-    if (!getLocalTime(&timeinfo, 5)) {
         return false;
     }
 
@@ -203,11 +185,6 @@ bool HM_Abstract::sendGridOnProFileParaRequest()
         return false;
     }
 
-    struct tm timeinfo;
-    if (!getLocalTime(&timeinfo, 5)) {
-        return false;
-    }
-
     time_t now;
     time(&now);
 
@@ -216,4 +193,9 @@ bool HM_Abstract::sendGridOnProFileParaRequest()
     _radio->enqueCommand(cmd);
 
     return true;
+}
+
+bool HM_Abstract::supportsPowerDistributionLogic()
+{
+    return false;
 }

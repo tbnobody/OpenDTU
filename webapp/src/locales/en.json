@@ -7,6 +7,7 @@
         "MQTTSettings": "MQTT Settings",
         "InverterSettings": "Inverter Settings",
         "SecuritySettings": "Security Settings",
+        "LoggingSettings": "Logging Settings",
         "DTUSettings": "DTU Settings",
         "DeviceManager": "Device-Manager",
         "ConfigManagement": "Config Management",
@@ -30,7 +31,9 @@
         "Refreshing": "Refreshing",
         "Pull": "Pull down to refresh",
         "Release": "Release to refresh",
-        "Close": "Close"
+        "Close": "Close",
+        "Yes": "Yes",
+        "No": "No"
     },
     "wait": {
         "NotReady": "OpenDTU is not yet ready",
@@ -43,6 +46,10 @@
         "Dark": "Dark",
         "Light": "Light",
         "Auto": "Auto"
+    },
+    "dataagedisplay": {
+        "DataAge": "Data Age",
+        "SecondsSince": "0 seconds | 1 second | {n} seconds"
     },
     "apiresponse": {
         "1001": "Settings saved!",
@@ -97,6 +104,8 @@
         "8004": "DNS Server IP 1 is invalid!",
         "8005": "DNS Server IP 2 is invalid!",
         "8006": "Administrative AccessPoint Timeout value is invalid",
+        "8007": "Syslog Server must between 1 and {max} characters long!",
+        "8008": "Port must be a number between 1 and 65535!",
         "9001": "NTP Server must between 1 and {max} characters long!",
         "9002": "Timezone must between 1 and {max} characters long!",
         "9003": "Timezone description must between 1 and {max} characters long!",
@@ -110,15 +119,13 @@
         "10001": "Password must between 8 and {max} characters long!",
         "10002": "Authentication successful!",
         "11001": "@:apiresponse.2001",
-        "11002": "@:apiresponse:5004",
-        "12001": "Profil must between 1 and {max} characters long!"
+        "11002": "@:apiresponse.5004",
+        "12001": "Profile name must between 1 and {max} characters long!"
     },
     "home": {
         "LiveData": "Live Data",
         "SerialNumber": "Serial Number: ",
-        "CurrentLimit": "Current Limit: ",
-        "DataAge": "Data Age: ",
-        "Seconds": "{val} seconds",
+        "CurrentLimit": "Current Limit",
         "ShowSetInverterLimit": "Show / Set Inverter Limit",
         "TurnOnOff": "Turn Inverter on/off",
         "ShowInverterInfo": "Show Inverter Info",
@@ -128,15 +135,15 @@
         "EventLog": "Event Log",
         "InverterInfo": "Inverter Info",
         "LimitSettings": "Limit Settings",
-        "LastLimitSetStatus": "Last Limit Set Status:",
-        "SetLimit": "Set Limit:",
+        "LastLimitSetStatus": "Last Limit Set Status",
+        "SetLimit": "Set Limit",
         "Relative": "Relative (%)",
         "Absolute": "Absolute (W)",
         "LimitHint": "<b>Hint:</b> If you set the limit as absolute value the display of the current value will only be updated after ~4 minutes.",
         "SetPersistent": "Set Limit Persistent",
         "SetNonPersistent": "Set Limit Non-Persistent",
         "PowerSettings": "Power Settings",
-        "LastPowerSetStatus": "Last Power Set Status:",
+        "LastPowerSetStatus": "Last Power Set Status",
         "TurnOn": "Turn On",
         "TurnOff": "Turn Off",
         "Restart": "Restart",
@@ -179,7 +186,10 @@
         "FirmwareVersion": "Firmware Version",
         "FirmwareBuildDate": "Firmware Build Date",
         "HardwarePartNumber": "Hardware Part Number",
-        "HardwareVersion": "Hardware Version"
+        "HardwareVersion": "Hardware Version",
+        "SupportsPowerDistributionLogic": "'Power Distribution Logic' supported",
+        "Yes": "@:base.Yes",
+        "No": "@:base.No"
     },
     "gridprofile": {
         "NoInfo": "@:devinfo.NoInfo",
@@ -203,6 +213,7 @@
         "SdkVersion": "SDK Version",
         "ConfigVersion": "Config Version",
         "FirmwareVersion": "Firmware Version / Git Hash",
+        "FirmwareBranch": "Firmware Branch",
         "PioEnv": "PIO Environment",
         "FirmwareVersionHint": "Click here to show information about your current version",
         "FirmwareUpdate": "Firmware Update",
@@ -357,7 +368,11 @@
         "VirtualDebugConsole": "Virtual Debug Console",
         "EnableAutoScroll": "Enable Auto Scroll",
         "ClearConsole": "Clear Console",
-        "CopyToClipboard": "Copy to clipboard"
+        "CopyToClipboard": "Copy to clipboard",
+        "Download": "Download",
+        "RegularExpression": "Regular Expression",
+        "Lines": "{lines} Lines",
+        "LogLevel": "Log Level ({cnt})"
     },
     "inverterchannelinfo": {
         "String": "String {num}",
@@ -467,7 +482,11 @@
         "ApTimeoutHint": "Time which the AccessPoint is kept open. A value of 0 means infinite.",
         "Minutes": "minutes",
         "EnableMdns": "Enable mDNS",
-        "MdnsSettings": "mDNS Settings"
+        "MdnsSettings": "mDNS Settings",
+        "EnableSyslog": "Enable Syslog",
+        "SyslogSettings": "Syslog Settings",
+        "SyslogHostname": "Syslog Server",
+        "SyslogPort": "Port"
     },
     "mqttadmin": {
         "MqttSettings": "MQTT Settings",
@@ -627,7 +646,8 @@
         "TimeSync": "The clock has not yet been synchronised. Without a correctly set clock, no requests are made to the inverter. This is normal shortly after the start. However, after a longer runtime (>1 minute), it indicates that the NTP server is not accessible.",
         "TimeSyncLink": "Please check your time settings.",
         "DefaultPassword": "You are using the default password for the web interface and the emergency access point. This is potentially insecure.",
-        "DefaultPasswordLink": "Please change the password."
+        "DefaultPasswordLink": "Please change the password.",
+        "PinMappingIssue": "You are using a generic firmware image, but have not yet uploaded a file with device profiles (<code>pin_mapping.json</code>) or have not selected a profile defined there. Please refer to the <a href=\"https://opendtu.solar/firmware/device_profiles/\" target=\"_blank\" class=\"alert-link\">documentation</a> for details."
     },
     "deviceadmin": {
         "DeviceManager": "Device-Manager",
@@ -675,5 +695,19 @@
         "format_herf_valid": "E-Star HERF format (will be saved converted): {serial}",
         "format_herf_invalid": "E-Star HERF format: Invalid checksum",
         "format_unknown": "Unknown format"
+    },
+    "loggingadmin": {
+        "LoggingSettings": "Logging Settings",
+        "LogLevel": "Log Level",
+        "DefaultLevel": "Default log level",
+        "Module": "Module",
+        "CoreHint": "Warning: A too detailed log level of the CORE module can significantly impact performance and lead to unpredictable behavior. The log level setting should only be temporarily adjusted for targeted troubleshooting. The default setting 'Error' is sufficient for normal operation.",
+        "log_inherit": "Inherit from default",
+        "log_none": "None",
+        "log_error": "(E) Error",
+        "log_warn": "(W) Warning",
+        "log_info": "(I) Info",
+        "log_debug": "(D) Debug",
+        "log_verbose": "(V) Verbose"
     }
 }

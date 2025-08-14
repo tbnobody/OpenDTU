@@ -1,7 +1,12 @@
 <template>
     <BasePage :title="$t('securityadmin.SecuritySettings')" :isLoading="dataLoading">
-        <BootstrapAlert v-model="showAlert" dismissible :variant="alertType">
-            {{ alertMessage }}
+        <BootstrapAlert
+            v-model="alert.show"
+            dismissible
+            :variant="alert.type"
+            :auto-dismiss="alert.type != 'success' ? 0 : 5000"
+        >
+            {{ alert.message }}
         </BootstrapAlert>
 
         <form @submit="savePasswordConfig">
@@ -43,6 +48,7 @@ import BootstrapAlert from '@/components/BootstrapAlert.vue';
 import CardElement from '@/components/CardElement.vue';
 import FormFooter from '@/components/FormFooter.vue';
 import InputElement from '@/components/InputElement.vue';
+import type { AlertResponse } from '@/types/AlertResponse';
 import type { SecurityConfig } from '@/types/SecurityConfig';
 import { authHeader, handleResponse } from '@/utils/authentication';
 import { defineComponent } from 'vue';
@@ -58,9 +64,7 @@ export default defineComponent({
     data() {
         return {
             dataLoading: true,
-            alertMessage: '',
-            alertType: 'info',
-            showAlert: false,
+            alert: {} as AlertResponse,
 
             securityConfigList: {} as SecurityConfig,
             passwordRepeat: '',
@@ -84,9 +88,9 @@ export default defineComponent({
             e.preventDefault();
 
             if (this.securityConfigList.password != this.passwordRepeat) {
-                this.alertMessage = 'Passwords are not equal';
-                this.alertType = 'warning';
-                this.showAlert = true;
+                this.alert.message = 'Passwords are not equal';
+                this.alert.type = 'warning';
+                this.alert.show = true;
                 return;
             }
 
@@ -100,9 +104,9 @@ export default defineComponent({
             })
                 .then((response) => handleResponse(response, this.$emitter, this.$router))
                 .then((response) => {
-                    this.alertMessage = this.$t('apiresponse.' + response.code, response.param);
-                    this.alertType = response.type;
-                    this.showAlert = true;
+                    this.alert.message = this.$t('apiresponse.' + response.code, response.param);
+                    this.alert.type = response.type;
+                    this.alert.show = true;
                 });
         },
     },

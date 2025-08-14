@@ -20,9 +20,6 @@ public:
     void initCMT(const int8_t pin_sdio, const int8_t pin_clk, const int8_t pin_cs, const int8_t pin_fcs, const int8_t pin_gpio2, const int8_t pin_gpio3);
     void loop();
 
-    void setMessageOutput(Print* output);
-    Print* getMessageOutput();
-
     std::shared_ptr<InverterAbstract> addInverter(const char* name, const uint64_t serial);
     std::shared_ptr<InverterAbstract> getInverterByPos(const uint8_t pos);
     std::shared_ptr<InverterAbstract> getInverterBySerial(const uint64_t serial);
@@ -47,8 +44,6 @@ private:
 
     uint32_t _pollInterval = 0;
     uint32_t _lastPoll = 0;
-
-    Print* _messageOutput = &Serial;
 };
 
 extern HoymilesClass Hoymiles;

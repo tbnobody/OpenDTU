@@ -1,112 +1,115 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * Copyright (C) 2022 - 2023 Thomas Basler and others
+ * Copyright (C) 2022 - 2025 Thomas Basler and others
  */
 #include "PinMapping.h"
-#include "MessageOutput.h"
 #include "Utils.h"
 #include <ArduinoJson.h>
 #include <LittleFS.h>
+#include <SpiManager.h>
 #include <string.h>
+
+#undef TAG
+static const char* TAG = "pingmapping";
 
 #ifndef DISPLAY_TYPE
 #define DISPLAY_TYPE 0U
 #endif
 
 #ifndef DISPLAY_DATA
-#define DISPLAY_DATA 255U
+#define DISPLAY_DATA GPIO_NUM_NC
 #endif
 
 #ifndef DISPLAY_CLK
-#define DISPLAY_CLK 255U
+#define DISPLAY_CLK GPIO_NUM_NC
 #endif
 
 #ifndef DISPLAY_CS
-#define DISPLAY_CS 255U
+#define DISPLAY_CS GPIO_NUM_NC
 #endif
 
 #ifndef DISPLAY_RESET
-#define DISPLAY_RESET 255U
+#define DISPLAY_RESET GPIO_NUM_NC
 #endif
 
 #ifndef LED0
-#define LED0 -1
+#define LED0 GPIO_NUM_NC
 #endif
 
 #ifndef LED1
-#define LED1 -1
+#define LED1 GPIO_NUM_NC
 #endif
 
 #ifndef HOYMILES_PIN_SCLK
-#define HOYMILES_PIN_SCLK -1
+#define HOYMILES_PIN_SCLK GPIO_NUM_NC
 #endif
 
 #ifndef HOYMILES_PIN_CS
-#define HOYMILES_PIN_CS -1
+#define HOYMILES_PIN_CS GPIO_NUM_NC
 #endif
 
 #ifndef HOYMILES_PIN_CE
-#define HOYMILES_PIN_CE -1
+#define HOYMILES_PIN_CE GPIO_NUM_NC
 #endif
 
 #ifndef HOYMILES_PIN_IRQ
-#define HOYMILES_PIN_IRQ -1
+#define HOYMILES_PIN_IRQ GPIO_NUM_NC
 #endif
 
 #ifndef HOYMILES_PIN_MISO
-#define HOYMILES_PIN_MISO -1
+#define HOYMILES_PIN_MISO GPIO_NUM_NC
 #endif
 
 #ifndef HOYMILES_PIN_MOSI
-#define HOYMILES_PIN_MOSI -1
+#define HOYMILES_PIN_MOSI GPIO_NUM_NC
 #endif
 
 #ifndef CMT_CLK
-#define CMT_CLK -1
+#define CMT_CLK GPIO_NUM_NC
 #endif
 
 #ifndef CMT_CS
-#define CMT_CS -1
+#define CMT_CS GPIO_NUM_NC
 #endif
 
 #ifndef CMT_FCS
-#define CMT_FCS -1
+#define CMT_FCS GPIO_NUM_NC
 #endif
 
 #ifndef CMT_GPIO2
-#define CMT_GPIO2 -1
+#define CMT_GPIO2 GPIO_NUM_NC
 #endif
 
 #ifndef CMT_GPIO3
-#define CMT_GPIO3 -1
+#define CMT_GPIO3 GPIO_NUM_NC
 #endif
 
 #ifndef CMT_SDIO
-#define CMT_SDIO -1
+#define CMT_SDIO GPIO_NUM_NC
 #endif
 
 #ifndef W5500_MOSI
-#define W5500_MOSI -1
+#define W5500_MOSI GPIO_NUM_NC
 #endif
 
 #ifndef W5500_MISO
-#define W5500_MISO -1
+#define W5500_MISO GPIO_NUM_NC
 #endif
 
 #ifndef W5500_SCLK
-#define W5500_SCLK -1
+#define W5500_SCLK GPIO_NUM_NC
 #endif
 
 #ifndef W5500_CS
-#define W5500_CS -1
+#define W5500_CS GPIO_NUM_NC
 #endif
 
 #ifndef W5500_INT
-#define W5500_INT -1
+#define W5500_INT GPIO_NUM_NC
 #endif
 
 #ifndef W5500_RST
-#define W5500_RST -1
+#define W5500_RST GPIO_NUM_NC
 #endif
 
 #if CONFIG_ETH_USE_ESP32_EMAC
@@ -116,15 +119,15 @@
 #endif
 
 #ifndef ETH_PHY_POWER
-#define ETH_PHY_POWER -1
+#define ETH_PHY_POWER GPIO_NUM_NC
 #endif
 
 #ifndef ETH_PHY_MDC
-#define ETH_PHY_MDC -1
+#define ETH_PHY_MDC GPIO_NUM_NC
 #endif
 
 #ifndef ETH_PHY_MDIO
-#define ETH_PHY_MDIO -1
+#define ETH_PHY_MDIO GPIO_NUM_NC
 #endif
 
 #ifndef ETH_PHY_TYPE
@@ -170,9 +173,9 @@ PinMappingClass::PinMappingClass()
     _pinMapping.eth_enabled = false;
 #endif
     _pinMapping.eth_phy_addr = ETH_PHY_ADDR;
-    _pinMapping.eth_power = ETH_PHY_POWER;
-    _pinMapping.eth_mdc = ETH_PHY_MDC;
-    _pinMapping.eth_mdio = ETH_PHY_MDIO;
+    _pinMapping.eth_power = static_cast<gpio_num_t>(ETH_PHY_POWER);
+    _pinMapping.eth_mdc = static_cast<gpio_num_t>(ETH_PHY_MDC);
+    _pinMapping.eth_mdio = static_cast<gpio_num_t>(ETH_PHY_MDIO);
     _pinMapping.eth_type = ETH_PHY_TYPE;
     _pinMapping.eth_clk_mode = ETH_CLK_MODE;
 #endif
@@ -194,6 +197,15 @@ PinMapping_t& PinMappingClass::get()
 
 bool PinMappingClass::init(const String& deviceMapping)
 {
+
+    // Initialize SpiManager
+    SpiManagerInst.register_bus(SPI2_HOST);
+#if SOC_SPI_PERIPH_NUM > 2
+#ifndef CONFIG_IDF_TARGET_ESP32S2
+    SpiManagerInst.register_bus(SPI3_HOST);
+#endif
+#endif
+
     File f = LittleFS.open(PINMAPPING_FILENAME, "r", false);
 
     if (!f) {
@@ -206,12 +218,14 @@ bool PinMappingClass::init(const String& deviceMapping)
     // Deserialize the JSON document
     DeserializationError error = deserializeJson(doc, f);
     if (error) {
-        MessageOutput.println("Failed to read file, using default configuration");
+        ESP_LOGW(TAG, "Failed to read file, using default configuration");
     }
 
     for (uint8_t i = 0; i < doc.size(); i++) {
         String devName = doc[i]["name"] | "";
         if (devName == deviceMapping) {
+            _mappingSelected = true;
+
             strlcpy(_pinMapping.name, devName.c_str(), sizeof(_pinMapping.name));
             _pinMapping.nrf24_clk = doc[i]["nrf24"]["clk"] | HOYMILES_PIN_SCLK;
             _pinMapping.nrf24_cs = doc[i]["nrf24"]["cs"] | HOYMILES_PIN_CS;
@@ -241,9 +255,9 @@ bool PinMappingClass::init(const String& deviceMapping)
             _pinMapping.eth_enabled = doc[i]["eth"]["enabled"] | false;
 #endif
             _pinMapping.eth_phy_addr = doc[i]["eth"]["phy_addr"] | ETH_PHY_ADDR;
-            _pinMapping.eth_power = doc[i]["eth"]["power"] | ETH_PHY_POWER;
-            _pinMapping.eth_mdc = doc[i]["eth"]["mdc"] | ETH_PHY_MDC;
-            _pinMapping.eth_mdio = doc[i]["eth"]["mdio"] | ETH_PHY_MDIO;
+            _pinMapping.eth_power = doc[i]["eth"]["power"] | static_cast<gpio_num_t>(ETH_PHY_POWER);
+            _pinMapping.eth_mdc = doc[i]["eth"]["mdc"] | static_cast<gpio_num_t>(ETH_PHY_MDC);
+            _pinMapping.eth_mdio = doc[i]["eth"]["mdio"] | static_cast<gpio_num_t>(ETH_PHY_MDIO);
             _pinMapping.eth_type = doc[i]["eth"]["type"] | ETH_PHY_TYPE;
             _pinMapping.eth_clk_mode = doc[i]["eth"]["clk_mode"] | ETH_CLK_MODE;
 #endif
@@ -266,37 +280,37 @@ bool PinMappingClass::init(const String& deviceMapping)
 
 bool PinMappingClass::isValidNrf24Config() const
 {
-    return _pinMapping.nrf24_clk >= 0
-        && _pinMapping.nrf24_cs >= 0
-        && _pinMapping.nrf24_en >= 0
-        && _pinMapping.nrf24_irq >= 0
-        && _pinMapping.nrf24_miso >= 0
-        && _pinMapping.nrf24_mosi >= 0;
+    return _pinMapping.nrf24_clk > GPIO_NUM_NC
+        && _pinMapping.nrf24_cs > GPIO_NUM_NC
+        && _pinMapping.nrf24_en > GPIO_NUM_NC
+        && _pinMapping.nrf24_irq > GPIO_NUM_NC
+        && _pinMapping.nrf24_miso > GPIO_NUM_NC
+        && _pinMapping.nrf24_mosi > GPIO_NUM_NC;
 }
 
 bool PinMappingClass::isValidCmt2300Config() const
 {
-    return _pinMapping.cmt_clk >= 0
-        && _pinMapping.cmt_cs >= 0
-        && _pinMapping.cmt_fcs >= 0
-        && _pinMapping.cmt_sdio >= 0;
+    return _pinMapping.cmt_clk > GPIO_NUM_NC
+        && _pinMapping.cmt_cs > GPIO_NUM_NC
+        && _pinMapping.cmt_fcs > GPIO_NUM_NC
+        && _pinMapping.cmt_sdio > GPIO_NUM_NC;
 }
 
 bool PinMappingClass::isValidW5500Config() const
 {
-    return _pinMapping.w5500_mosi >= 0
-        && _pinMapping.w5500_miso >= 0
-        && _pinMapping.w5500_sclk >= 0
-        && _pinMapping.w5500_cs >= 0
-        && _pinMapping.w5500_int >= 0
-        && _pinMapping.w5500_rst >= 0;
+    return _pinMapping.w5500_mosi > GPIO_NUM_NC
+        && _pinMapping.w5500_miso > GPIO_NUM_NC
+        && _pinMapping.w5500_sclk > GPIO_NUM_NC
+        && _pinMapping.w5500_cs > GPIO_NUM_NC
+        && _pinMapping.w5500_int > GPIO_NUM_NC
+        && _pinMapping.w5500_rst > GPIO_NUM_NC;
 }
 
 #if CONFIG_ETH_USE_ESP32_EMAC
 bool PinMappingClass::isValidEthConfig() const
 {
     return _pinMapping.eth_enabled
-        && _pinMapping.eth_mdc >= 0
-        && _pinMapping.eth_mdio >= 0;
+        && _pinMapping.eth_mdc > GPIO_NUM_NC
+        && _pinMapping.eth_mdio > GPIO_NUM_NC;
 }
 #endif

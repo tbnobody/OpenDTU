@@ -20,13 +20,27 @@ jobs:
         steps:
           - uses: actions/stale@v9
             with:
-                days-before-stale: 14
-                days-before-close: 60
-                any-of-labels: 'cant-reproduce,not a bug'
-                stale-issue-label: stale
-                stale-pr-label: stale
+                operations-per-run: 300
+                remove-stale-when-updated: true
+                days-before-issue-stale: 30
+                days-before-issue-close: 14 # days after the issue is marked as stale
                 stale-issue-message: >
                     This issue has been automatically marked as stale because it has not had
+                    recent activity. It will be closed if no further activity occurs. Thank you
+                    for your contributions.
+                close-issue-message: >
+                    This issue has been automatically closed because it has not had
+                    recent activity. Please add a comment if you want to get this issue re-opened. Thank you
+                    for your contributions.
+                stale-issue-label: stale
+                exempt-issue-labels: 'acknowledged, contribution needed, enhancement' # exclude issues with label
+
+                days-before-pr-stale: 30
+                days-before-pr-close: -1 # never close prs
+                stale-pr-label: stale # adds a label
+                any-of-pr-labels: 'changes requested' # only consider prs with this label
+                stale-pr-message: >
+                    This pull-request has been automatically marked as stale because it has not had
                     recent activity. It will be closed if no further activity occurs. Thank you
                     for your contributions.
 

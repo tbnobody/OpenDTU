@@ -6,10 +6,14 @@
 
 class WebApiNetworkClass {
 public:
+    WebApiNetworkClass();
     void init(AsyncWebServer& server, Scheduler& scheduler);
 
 private:
     void onNetworkStatus(AsyncWebServerRequest* request);
     void onNetworkAdminGet(AsyncWebServerRequest* request);
     void onNetworkAdminPost(AsyncWebServerRequest* request);
+
+    Task _applyDataTask;
+    void applyDataTaskCb();
 };

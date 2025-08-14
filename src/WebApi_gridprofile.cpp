@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * Copyright (C) 2022-2024 Thomas Basler and others
+ * Copyright (C) 2022-2025 Thomas Basler and others
  */
 #include "WebApi_gridprofile.h"
 #include "WebApi.h"
@@ -33,13 +33,13 @@ void WebApiGridProfileClass::onGridProfileStatus(AsyncWebServerRequest* request)
         auto jsonSections = root["sections"].to<JsonArray>();
         auto profSections = inv->GridProfile()->getProfile();
 
-        for (auto &profSection : profSections) {
+        for (auto& profSection : profSections) {
             auto jsonSection = jsonSections.add<JsonObject>();
             jsonSection["name"] = profSection.SectionName;
 
             auto jsonItems = jsonSection["items"].to<JsonArray>();
 
-            for (auto &profItem : profSection.items) {
+            for (auto& profItem : profSection.items) {
                 auto jsonItem = jsonItems.add<JsonObject>();
 
                 jsonItem["n"] = profItem.Name;

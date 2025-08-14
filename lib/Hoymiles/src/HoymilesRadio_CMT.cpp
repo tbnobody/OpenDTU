@@ -1,12 +1,17 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * Copyright (C) 2023-2024 Thomas Basler and others
+ * Copyright (C) 2023-2025 Thomas Basler and others
  */
 #include "HoymilesRadio_CMT.h"
 #include "Hoymiles.h"
+#include "Utils.h"
 #include "crc.h"
 #include <FunctionalInterrupt.h>
 #include <frozen/map.h>
+#include <esp_log.h>
+
+#undef TAG
+static const char* TAG = "hoymiles";
 
 constexpr CountryFrequencyDefinition_t make_value(FrequencyBand_t Band, uint32_t Freq_Legal_Min, uint32_t Freq_Legal_Max, uint32_t Freq_Default, uint32_t Freq_StartUp)
 {
@@ -34,16 +39,16 @@ uint32_t HoymilesRadio_CMT::getFrequencyFromChannel(const uint8_t channel) const
 uint8_t HoymilesRadio_CMT::getChannelFromFrequency(const uint32_t frequency) const
 {
     if ((frequency % getChannelWidth()) != 0) {
-        Hoymiles.getMessageOutput()->printf("%.3f MHz is not divisible by %" PRId32 " kHz!\r\n", frequency / 1000000.0, getChannelWidth());
+        ESP_LOGE(TAG, "%.3f MHz is not divisible by %" PRIu32 " kHz!", frequency / 1000000.0, getChannelWidth());
         return 0xFF; // ERROR
     }
     if (frequency < getMinFrequency() || frequency > getMaxFrequency()) {
-        Hoymiles.getMessageOutput()->printf("%.2f MHz is out of Hoymiles/CMT range! (%.2f MHz - %.2f MHz)\r\n",
+        ESP_LOGE(TAG, "%.2f MHz is out of Hoymiles/CMT range! (%.2f MHz - %.2f MHz)",
             frequency / 1000000.0, getMinFrequency() / 1000000.0, getMaxFrequency() / 1000000.0);
         return 0xFF; // ERROR
     }
     if (frequency < countryDefinition.at(_countryMode).Freq_Legal_Min || frequency > countryDefinition.at(_countryMode).Freq_Legal_Max) {
-        Hoymiles.getMessageOutput()->printf("!!! caution: %.2f MHz is out of region legal range! (%" PRId32 " - %" PRId32 " MHz)\r\n",
+        ESP_LOGE(TAG, "!!! caution: %.2f MHz is out of region legal range! (%" PRIu32 " - %" PRIu32 " MHz)",
             frequency / 1000000.0,
             static_cast<uint32_t>(countryDefinition.at(_countryMode).Freq_Legal_Min / 1e6),
             static_cast<uint32_t>(countryDefinition.at(_countryMode).Freq_Legal_Max / 1e6));
@@ -95,10 +100,10 @@ void HoymilesRadio_CMT::init(const int8_t pin_sdio, const int8_t pin_clk, const 
     cmtSwitchDtuFreq(_inverterTargetFrequency); // start dtu at work freqency, for fast Rx if inverter is already on and frequency switched
 
     if (!_radio->isChipConnected()) {
-        Hoymiles.getMessageOutput()->println("CMT: Connection error!!");
+        ESP_LOGE(TAG, "CMT2300A: Connection error!!");
         return;
     }
-    Hoymiles.getMessageOutput()->println("CMT: Connection successful");
+    ESP_LOGI(TAG, "CMT2300A: Connection successful");
 
     if (pin_gpio2 >= 0) {
         attachInterrupt(digitalPinToInterrupt(pin_gpio2), std::bind(&HoymilesRadio_CMT::handleInt1, this), RISING);
@@ -126,25 +131,23 @@ void HoymilesRadio_CMT::loop()
     }
 
     if (_packetReceived) {
-        Hoymiles.getMessageOutput()->println("Interrupt received");
+        ESP_LOGV(TAG, "Interrupt received");
         while (_radio->available()) {
-            if (!(_rxBuffer.size() > FRAGMENT_BUFFER_SIZE)) {
-                fragment_t f;
-                memset(f.fragment, 0xcc, MAX_RF_PAYLOAD_SIZE);
-                f.len = _radio->getDynamicPayloadSize();
-                f.channel = _radio->getChannel();
-                f.rssi = _radio->getRssiDBm();
-                f.wasReceived = false;
-                f.mainCmd = 0x00;
-                if (f.len > MAX_RF_PAYLOAD_SIZE) {
-                    f.len = MAX_RF_PAYLOAD_SIZE;
-                }
-                _radio->read(f.fragment, f.len);
-                _rxBuffer.push(f);
-            } else {
-                Hoymiles.getMessageOutput()->println("CMT: Buffer full");
+            if (_rxBuffer.size() > FRAGMENT_BUFFER_SIZE) {
+                ESP_LOGE(TAG, "CMT2300A: Buffer full");
                 _radio->flush_rx();
+                continue;
             }
+
+            fragment_t f;
+            memset(f.fragment, 0xcc, MAX_RF_PAYLOAD_SIZE);
+            f.len = std::min<uint8_t>(_radio->getDynamicPayloadSize(), MAX_RF_PAYLOAD_SIZE);
+            f.channel = _radio->getChannel();
+            f.rssi = _radio->getRssiDBm();
+            f.wasReceived = false;
+            f.mainCmd = 0x00;
+            _radio->read(f.fragment, f.len);
+            _rxBuffer.push(f);
         }
         _radio->flush_rx();
         _packetReceived = false;
@@ -165,18 +168,17 @@ void HoymilesRadio_CMT::loop()
 
                     if (nullptr != inv) {
                         // Save packet in inverter rx buffer
-                        Hoymiles.getMessageOutput()->printf("RX %.2f MHz --> ", getFrequencyFromChannel(f.channel) / 1000000.0);
-                        dumpBuf(f.fragment, f.len, false);
-                        Hoymiles.getMessageOutput()->printf("| %" PRId8 " dBm\r\n", f.rssi);
+                        ESP_LOGD(TAG, "RX %.2f MHz --> %s | %" PRId8 " dBm",
+                            getFrequencyFromChannel(f.channel) / 1000000.0, Utils::dumpArray(f.fragment, f.len).c_str(), f.rssi);
 
                         inv->addRxFragment(f.fragment, f.len, f.rssi);
                     } else {
-                        Hoymiles.getMessageOutput()->println("Inverter Not found!");
+                        ESP_LOGE(TAG, "Inverter Not found!");
                     }
                 }
 
             } else {
-                Hoymiles.getMessageOutput()->println("Frame kaputt"); // ;-)
+                ESP_LOGW(TAG, "Frame kaputt"); // ;-)
             }
 
             // Remove paket from buffer even it was corrupted
@@ -194,9 +196,9 @@ void HoymilesRadio_CMT::setPALevel(const int8_t paLevel)
     }
 
     if (_radio->setPALevel(paLevel)) {
-        Hoymiles.getMessageOutput()->printf("CMT TX power set to %" PRId8 " dBm\r\n", paLevel);
+        ESP_LOGI(TAG, "CMT TX power set to %" PRId8 " dBm", paLevel);
     } else {
-        Hoymiles.getMessageOutput()->printf("CMT TX power %" PRId8 " dBm is not defined! (min: -10 dBm, max: 20 dBm)\r\n", paLevel);
+        ESP_LOGE(TAG, "CMT TX power %" PRId8 " dBm is not defined! (min: -10 dBm, max: 20 dBm)", paLevel);
     }
 }
 
@@ -274,12 +276,11 @@ void HoymilesRadio_CMT::sendEsbPacket(CommandAbstract& cmd)
         cmtSwitchDtuFreq(getInvBootFrequency());
     }
 
-    Hoymiles.getMessageOutput()->printf("TX %s %.2f MHz --> ",
-        cmd.getCommandName().c_str(), getFrequencyFromChannel(_radio->getChannel()) / 1000000.0);
-    cmd.dumpDataPayload(Hoymiles.getMessageOutput());
+    ESP_LOGD(TAG, "TX %s %.2f MHz --> %s",
+        cmd.getCommandName().c_str(), getFrequencyFromChannel(_radio->getChannel()) / 1000000.0, cmd.dumpDataPayload().c_str());
 
     if (!_radio->write(cmd.getDataPayload(), cmd.getDataSize())) {
-        Hoymiles.getMessageOutput()->println("TX SPI Timeout");
+        ESP_LOGE(TAG, "TX SPI Timeout");
     }
     cmtSwitchDtuFreq(_inverterTargetFrequency);
     _radio->startListening();

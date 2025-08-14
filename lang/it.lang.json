@@ -22,6 +22,7 @@
             "MQTTSettings": "Impostazioni MQTT",
             "InverterSettings": "Impostazioni Inverter",
             "SecuritySettings": "Impostazioni di Sicurezza",
+            "LoggingSettings": "Logging Settings",
             "DTUSettings": "Impostazioni DTU",
             "DeviceManager": "Gestione Dispositivi",
             "ConfigManagement": "Gestione Configurazione",
@@ -45,7 +46,9 @@
             "Refreshing": "Aggiorna",
             "Pull": "Trascina in basso per aggiornare",
             "Release": "Rilascia per aggiornare",
-            "Close": "Chiudi"
+            "Close": "Chiudi",
+            "Yes": "Yes",
+            "No": "No"
         },
         "wait": {
             "NotReady": "OpenDTU is not yet ready",
@@ -58,6 +61,10 @@
             "Dark": "Scuro",
             "Light": "Chiaro",
             "Auto": "Automatico"
+        },
+        "dataagedisplay": {
+            "DataAge": "Aggiornamento Dati",
+            "SecondsSince": "0 secondi | 1 secondi | {n} secondi"
         },
         "apiresponse": {
             "1001": "Settings saved!",
@@ -73,6 +80,7 @@
             "2005": "Invalid country selection!",
             "3001": "Not deleted anything!",
             "3002": "Configuration resettet. Rebooting now...",
+            "3003": "File successful deleted. Restart to apply changes!",
             "4001": "@:apiresponse.2001",
             "4002": "Name must between 1 and {max} characters long!",
             "4003": "Only {max} inverters are supported!",
@@ -111,6 +119,8 @@
             "8004": "DNS Server IP 1 is invalid!",
             "8005": "DNS Server IP 2 is invalid!",
             "8006": "Administrative AccessPoint Timeout value is invalid",
+            "8007": "Syslog Server must between 1 and {max} characters long!",
+            "8008": "Port must be a number between 1 and 65535!",
             "9001": "NTP Server must between 1 and {max} characters long!",
             "9002": "Timezone must between 1 and {max} characters long!",
             "9003": "Timezone description must between 1 and {max} characters long!",
@@ -130,9 +140,7 @@
         "home": {
             "LiveData": "Dati in tempo reale",
             "SerialNumber": "Numero seriale: ",
-            "CurrentLimit": "Limite attuale: ",
-            "DataAge": "Aggiornamento Dati: ",
-            "Seconds": "{val} secondi",
+            "CurrentLimit": "Limite attuale",
             "ShowSetInverterLimit": "Mostra / Imposta Limite di Potenza",
             "TurnOnOff": "Accendi/Spegni Inverter",
             "ShowInverterInfo": "Mostra info Inverter",
@@ -142,15 +150,15 @@
             "EventLog": "Log Eventi",
             "InverterInfo": "Info Inverter",
             "LimitSettings": "Impostazioni Limite Potenza",
-            "LastLimitSetStatus": "Stato ultimo limite impostato:",
-            "SetLimit": "Imposta Limite a:",
+            "LastLimitSetStatus": "Stato ultimo limite impostato",
+            "SetLimit": "Imposta Limite a",
             "Relative": "Percentuale (%)",
             "Absolute": "Assoluto (W)",
             "LimitHint": "<b>Nota:</b> Se imposti il limite assoluto, il valore sul display sarà aggiornato dopo circa 4 minuti.",
             "SetPersistent": "Imposta Limite in Modo Persistente",
             "SetNonPersistent": "Imposta Limite Temporaneamente",
             "PowerSettings": "Impostazioni Potenza",
-            "LastPowerSetStatus": "Ultimo Stato dell'Inverter:",
+            "LastPowerSetStatus": "Ultimo Stato dell'Inverter",
             "TurnOn": "Accendi Inverter",
             "TurnOff": "Spegni Inverter",
             "Restart": "Riavvia Inverter",
@@ -193,7 +201,10 @@
             "FirmwareVersion": "Versione Firmware",
             "FirmwareBuildDate": "Data Firmware",
             "HardwarePartNumber": "Hardware Part Number",
-            "HardwareVersion": "Hardware Version"
+            "HardwareVersion": "Hardware Version",
+            "SupportsPowerDistributionLogic": "'Power Distribution Logic' supported",
+            "Yes": "@:base.Yes",
+            "No": "@:base.No"
         },
         "gridprofile": {
             "NoInfo": "@:devinfo.NoInfo",
@@ -217,6 +228,7 @@
             "SdkVersion": "SDK Version",
             "ConfigVersion": "Config Version",
             "FirmwareVersion": "Firmware Version / Git Hash",
+            "FirmwareBranch": "Firmware Branch",
             "PioEnv": "PIO Environment",
             "FirmwareVersionHint": "Click here to show information about your current version",
             "FirmwareUpdate": "Firmware Update",
@@ -371,7 +383,11 @@
             "VirtualDebugConsole": "Virtual Debug Console",
             "EnableAutoScroll": "Abilita AutoScroll",
             "ClearConsole": "Pulisci Console",
-            "CopyToClipboard": "Copia nella clipboard"
+            "CopyToClipboard": "Copia nella clipboard",
+            "Download": "Download",
+            "RegularExpression": "Regular Expression",
+            "Lines": "{lines} Lines",
+            "LogLevel": "Log Level ({cnt})"
         },
         "inverterchannelinfo": {
             "String": "Stringa {num}",
@@ -481,7 +497,11 @@
             "ApTimeoutHint": "Tempo in cui la modalità AccessPoint rimarrà attiva. 0=per sempre.",
             "Minutes": "minuti",
             "EnableMdns": "Abilita mDNS",
-            "MdnsSettings": "Configurazione mDNS"
+            "MdnsSettings": "Configurazione mDNS",
+            "EnableSyslog": "Enable Syslog",
+            "SyslogSettings": "Syslog Settings",
+            "SyslogHostname": "Syslog Server",
+            "SyslogPort": "Port"
         },
         "mqttadmin": {
             "MqttSettings": "Impostazioni MQTT",
@@ -578,8 +598,6 @@
         "fileadmin": {
             "ConfigManagement": "Configurazione Gestione",
             "BackupHeader": "Backup: Configurazione File Backup",
-            "BackupConfig": "Esegui il backup del file",
-            "Backup": "Backup",
             "Restore": "Ripristina",
             "NoFileSelected": "Nessun file selezionato",
             "RestoreHeader": "Ripristina: Ripristina File Configurazione",
@@ -592,6 +610,12 @@
             "FactoryReset": "Factory Reset",
             "ResetMsg": "Sei sicuro di voler cancellare la configurazione attuale e applicare la configurazione di fabbrica?",
             "ResetConfirm": "Factory Reset!",
+            "Download": "Download",
+            "Delete": "Delete",
+            "DeleteMsg": "Are you sure you want to delete file: '{name}'? You have to manually reboot the device to apply config changes!",
+            "Name": "Name",
+            "Size": "Size",
+            "Action": "Action",
             "Cancel": "@:base.Cancel",
             "InvalidJson": "JSON file is formatted incorrectly.",
             "InvalidJsonContent": "JSON file has the wrong content."
@@ -637,7 +661,8 @@
             "TimeSync": "La Data/Ora non sono state sincronizzate, ed in tal caso non è possibile eseguire richieste all'inverter. Questa condizione è normale appena avviato, tuttavia dopo un po' (>1 minuto), questa situazione potrebbe indicare un problema di accesso al server NTP.",
             "TimeSyncLink": "Controlla le impostazioni Data/Ora.",
             "DefaultPassword": "Stai usando la password di default per accedere all'interfaccia web e per la modalità Access Point di emergenza. Questo può portare ad un rischio di sicurezza.",
-            "DefaultPasswordLink": "Per favore cambia la password."
+            "DefaultPasswordLink": "Per favore cambia la password.",
+            "PinMappingIssue": "You are using a generic firmware image, but have not yet uploaded a file with device profiles (<code>pin_mapping.json</code>) or have not selected a profile defined there. Please refer to the <a href=\"https://opendtu.solar/firmware/device_profiles/\" target=\"_blank\" class=\"alert-link\">documentation</a> for details."
         },
         "deviceadmin": {
             "DeviceManager": "Device-Manager",
@@ -685,6 +710,20 @@
             "format_herf_valid": "E-Star HERF format (will be saved converted): {serial}",
             "format_herf_invalid": "E-Star HERF format: Invalid checksum",
             "format_unknown": "Unknown format"
+        },
+        "loggingadmin": {
+            "LoggingSettings": "Logging Settings",
+            "LogLevel": "Log Level",
+            "DefaultLevel": "Default log level",
+            "Module": "Module",
+            "CoreHint": "Warning: A too detailed log level of the CORE module can significantly impact performance and lead to unpredictable behavior. The log level setting should only be temporarily adjusted for targeted troubleshooting. The default setting 'Error' is sufficient for normal operation.",
+            "log_inherit": "Inherit from default",
+            "log_none": "None",
+            "log_error": "(E) Error",
+            "log_warn": "(W) Warning",
+            "log_info": "(I) Info",
+            "log_debug": "(D) Debug",
+            "log_verbose": "(V) Verbose"
         }
     }
 }
