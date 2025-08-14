@@ -1,3 +1,4 @@
 {
-    "C_Cpp.clang_format_style": "WebKit"
+    "C_Cpp.clang_format_style": "WebKit",
+    "cmake.sourceDirectory": "C:/git/OpenDTU-Database/.pio/libdeps/generic_esp32/ArduinoJson/src"
 }

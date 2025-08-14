@@ -9,6 +9,12 @@
     >
         <HintView :hints="liveData.hints" />
         <InverterTotalInfo :totalData="liveData.total" /><br />
+        <div class="card">
+            <div class="card-body">
+                <BarChart />
+                <CalendarChart />
+            </div>
+        </div>
         <div class="row gy-3">
             <div class="col-sm-3 col-md-2" :style="[inverterData.length == 1 ? { display: 'none' } : {}]">
                 <div
@@ -505,6 +511,8 @@ import DevInfo from '@/components/DevInfo.vue';
 import EventLog from '@/components/EventLog.vue';
 import GridProfile from '@/components/GridProfile.vue';
 import HintView from '@/components/HintView.vue';
+import BarChart from '@/components/BarChart.vue';
+import CalendarChart from '@/components/CalendarChart.vue';
 import InverterChannelInfo from '@/components/InverterChannelInfo.vue';
 import InverterTotalInfo from '@/components/InverterTotalInfo.vue';
 import ModalDialog from '@/components/ModalDialog.vue';
@@ -541,6 +549,8 @@ export default defineComponent({
         GridProfile,
         HintView,
         InverterChannelInfo,
+        BarChart,
+        CalendarChart,
         InverterTotalInfo,
         ModalDialog,
         BIconArrowCounterclockwise,
