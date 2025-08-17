@@ -280,6 +280,9 @@ class PackStats {
                 if (serial.startsWith("AO4H")) {
                     return std::make_shared<PackStats>(PackStats(serial, "AB1000", 960));
                 }
+                if (serial.startsWith("BO4N")) {
+                    return std::make_shared<PackStats>(PackStats(serial, "AB1000S", 960));
+                }
                 if (serial.startsWith("CO4H")) {
                     return std::make_shared<PackStats>(PackStats(serial, "AB2000", 1920));
                 }
