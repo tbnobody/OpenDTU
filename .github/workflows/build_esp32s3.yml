@@ -27,10 +27,6 @@ jobs:
         . ./export.sh
         idf.py --version
 
-    - name: Copy default sdkconfig
-      run: |
-        cp sdkconfig.4mb sdkconfig
-
     - name: Build OpenDTU
       run: |
         cd $GITHUB_WORKSPACE
