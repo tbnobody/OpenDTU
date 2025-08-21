@@ -1,0 +1,41 @@
+name: Build OpenDTU ESP32-S3 4MB
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: 3.11
+
+    - name: Install ESP-IDF
+      run: |
+        git clone --recursive https://github.com/espressif/esp-idf.git ~/esp-idf
+        cd ~/esp-idf
+        git checkout v5.2
+        ./install.sh
+        . ./export.sh
+        idf.py --version
+
+    - name: Build OpenDTU
+      run: |
+        cd $GITHUB_WORKSPACE
+        . ~/esp-idf/export.sh
+        idf.py set-target esp32s3
+        idf.py build
+
+    - name: Upload Artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: open-dtu-esp32s3-4mb
+        path: build/*.bin
