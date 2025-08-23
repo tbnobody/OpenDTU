@@ -3,7 +3,7 @@
 
 #include "DevControlCommand.h"
 
-typedef enum { // ToDo: to be verified by field tests
+typedef enum {
     AbsolutNonPersistent,
     RelativNonPersistent,
     AbsolutPersistent,
