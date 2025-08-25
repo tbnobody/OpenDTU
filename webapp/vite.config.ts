@@ -61,6 +61,17 @@ export default defineConfig(({ command }) => { return {
   esbuild: {
     drop: command !== 'serve' ? ['console', 'debugger'] : []
   },
+  css: {
+    preprocessorOptions: {
+      scss: {
+        silenceDeprecations: [
+          'import',
+          'color-functions',
+          'global-builtin',
+        ],
+      },
+    },
+  },
   server: {
     proxy: {
       '^/api': {
