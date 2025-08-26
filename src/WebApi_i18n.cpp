@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * Copyright (C) 2024 Thomas Basler and others
+ * Copyright (C) 2024-2025 Thomas Basler and others
  */
 #include "WebApi_i18n.h"
 #include "I18n.h"
@@ -49,8 +49,8 @@ void WebApiI18nClass::onI18nLanguage(AsyncWebServerRequest* request)
             expectedEtag += "\"";
 
             bool eTagMatch = false;
-            if (request->hasHeader("If-None-Match")) {
-                const AsyncWebHeader* h = request->getHeader("If-None-Match");
+            if (request->hasHeader(asyncsrv::T_INM)) {
+                const AsyncWebHeader* h = request->getHeader(asyncsrv::T_INM);
                 eTagMatch = h->value().equals(expectedEtag);
             }
 
@@ -63,8 +63,8 @@ void WebApiI18nClass::onI18nLanguage(AsyncWebServerRequest* request)
             }
 
             // HTTP requires cache headers in 200 and 304 to be identical
-            response->addHeader("Cache-Control", "public, must-revalidate");
-            response->addHeader("ETag", expectedEtag);
+            response->addHeader(asyncsrv::T_Cache_Control, "public, must-revalidate");
+            response->addHeader(asyncsrv::T_ETag, expectedEtag);
 
             request->send(response);
             return;

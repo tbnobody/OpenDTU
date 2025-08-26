@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * Copyright (C) 2022-2024 Thomas Basler and others
+ * Copyright (C) 2022-2025 Thomas Basler and others
  */
 #include "WebApi_file.h"
 #include "Configuration.h"
@@ -186,9 +186,9 @@ void WebApiFileClass::onFileUploadFinish(AsyncWebServerRequest* request)
     // the request handler is triggered after the upload has finished...
     // create the response, add header, and send response
 
-    AsyncWebServerResponse* response = request->beginResponse(200, "text/plain", "OK");
-    response->addHeader("Connection", "close");
-    response->addHeader("Access-Control-Allow-Origin", "*");
+    AsyncWebServerResponse* response = request->beginResponse(200, asyncsrv::T_text_plain, "OK");
+    response->addHeader(asyncsrv::T_Connection, asyncsrv::T_close);
+    response->addHeader(asyncsrv::T_CORS_ACAO, "*");
     request->send(response);
     RestartHelper.triggerRestart();
 }

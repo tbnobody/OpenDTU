@@ -60,7 +60,7 @@ bool WebApiClass::checkCredentials(AsyncWebServerRequest* request)
 
     // WebAPI should set the X-Requested-With to prevent browser internal auth dialogs
     if (!request->hasHeader("X-Requested-With")) {
-        r->addHeader("WWW-Authenticate", "Basic realm=\"Login Required\"");
+        r->addHeader(asyncsrv::T_WWW_AUTH, "Basic realm=\"Login Required\"");
     }
     request->send(r);
 
@@ -79,8 +79,8 @@ bool WebApiClass::checkCredentialsReadonly(AsyncWebServerRequest* request)
 
 void WebApiClass::sendTooManyRequests(AsyncWebServerRequest* request)
 {
-    auto response = request->beginResponse(429, "text/plain", "Too Many Requests");
-    response->addHeader("Retry-After", "60");
+    auto response = request->beginResponse(429, asyncsrv::T_text_plain, "Too Many Requests");
+    response->addHeader(asyncsrv::T_retry_after, "60");
     request->send(response);
 }
 
