@@ -9,7 +9,7 @@
             </tr>
         </thead>
         <tbody>
-            <template v-for="event in eventLogList.events">
+            <template v-for="event in eventLogList.events" :key="event">
                 <tr>
                     <td>{{ timeInHours(event.start_time) }}</td>
                     <td>{{ timeInHours(event.end_time) }}</td>
