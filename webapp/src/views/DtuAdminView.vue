@@ -165,17 +165,19 @@ export default defineComponent({
             return this.$t('dtuadmin.dBm', { dbm: this.$n(this.dtuConfigList.cmt_palevel * 1) });
         },
         cmtMinFrequency() {
-            return this.dtuConfigList.country_def[this.dtuConfigList.cmt_country].freq_min;
+            return this.dtuConfigList.country_def?.[this.dtuConfigList.cmt_country]?.freq_min;
         },
         cmtMaxFrequency() {
-            return this.dtuConfigList.country_def[this.dtuConfigList.cmt_country].freq_max;
+            return this.dtuConfigList.country_def?.[this.dtuConfigList.cmt_country]?.freq_max;
         },
         cmtIsOutOfLegalRange() {
+            const country = this.dtuConfigList.country_def?.[this.dtuConfigList.cmt_country];
+            if (!country) {
+                return false;
+            }
             return (
-                this.dtuConfigList.cmt_frequency <
-                    this.dtuConfigList.country_def[this.dtuConfigList.cmt_country].freq_legal_min ||
-                this.dtuConfigList.cmt_frequency >
-                    this.dtuConfigList.country_def[this.dtuConfigList.cmt_country].freq_legal_max
+                this.dtuConfigList.cmt_frequency < country.freq_legal_min ||
+                this.dtuConfigList.cmt_frequency > country.freq_legal_max
             );
         },
     },
@@ -184,7 +186,9 @@ export default defineComponent({
             // Don't do anything on initial load (then oldValue equals undefined)
             if (oldValue != undefined) {
                 this.$nextTick(() => {
-                    this.dtuConfigList.cmt_frequency = this.dtuConfigList.country_def[newValue].freq_default;
+                    if (this.dtuConfigList.country_def[newValue]) {
+                        this.dtuConfigList.cmt_frequency = this.dtuConfigList.country_def[newValue].freq_default;
+                    }
                 });
             }
         },

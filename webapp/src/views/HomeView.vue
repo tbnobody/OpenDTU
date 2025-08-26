@@ -44,7 +44,7 @@
                                     }"
                                 >
                                     {{ $n(inverter.AC[0]?.Power?.v || 0, 'decimalNoDigits') }}
-                                    {{ inverter.AC[0].Power?.u }}
+                                    {{ inverter.AC[0]?.Power?.u }}
                                 </span>
                                 <span v-else class="badge text-bg-light">-</span>
                             </div>
@@ -196,11 +196,11 @@
                                                     (chanType.name == 'DC' && getSumIrridiation(inverter) == 0) ||
                                                     (chanType.name == 'DC' &&
                                                         getSumIrridiation(inverter) > 0 &&
-                                                        chanType.obj[channel].Irradiation?.max) ||
+                                                        chanType.obj[channel]?.Irradiation?.max) ||
                                                     0 > 0
                                                 "
                                             >
-                                                <div class="col">
+                                                <div class="col" v-if="chanType.obj[channel]">
                                                     <InverterChannelInfo
                                                         :channelData="chanType.obj[channel]"
                                                         :channelType="chanType.name"
@@ -557,7 +557,7 @@ export default defineComponent({
     },
     data() {
         return {
-            isLogged: this.isLoggedIn(),
+            isLogged: isLoggedIn(),
 
             socket: {} as WebSocket,
             heartInterval: 0,
@@ -705,7 +705,7 @@ export default defineComponent({
                     if (foundIdx == -1) {
                         Object.assign(this.liveData.inverters, newData.inverters);
                         this.liveData.inverters.forEach((inv) => this.resetDataAging(inv));
-                    } else {
+                    } else if (this.liveData.inverters[foundIdx]) {
                         Object.assign(this.liveData.inverters[foundIdx], newData.inverters[0]);
                         this.resetDataAging(this.liveData.inverters[foundIdx]);
                     }
@@ -945,7 +945,7 @@ export default defineComponent({
         getSumIrridiation(inv: Inverter): number {
             let total = 0;
             Object.keys(inv.DC).forEach((key) => {
-                total += inv.DC[key as unknown as number].Irradiation?.max || 0;
+                total += inv.DC[key as unknown as number]?.Irradiation?.max || 0;
             });
             return total;
         },
