@@ -64,6 +64,7 @@ export default defineConfig(({ command }) => { return {
   css: {
     preprocessorOptions: {
       scss: {
+        // Required to make bootstrap compile without errors
         silenceDeprecations: [
           'import',
           'color-functions',
