@@ -263,7 +263,7 @@ export default defineComponent({
         },
         onUploadFileChange() {
             const target = this.$refs.file as HTMLInputElement;
-            if (target.files !== null) {
+            if (target.files !== null && target.files[0]) {
                 this.file = target.files[0];
             }
             if (!this.file) return;
@@ -302,7 +302,7 @@ export default defineComponent({
             this.uploading = true;
             const formData = new FormData();
             const target = this.$refs.file as HTMLInputElement; //  event.target as HTMLInputElement;
-            if (target.files !== null && target.files?.length > 0) {
+            if (target.files !== null && target.files[0]) {
                 this.file = target.files[0];
             } else {
                 this.UploadError = this.$t('fileadmin.NoFileSelected');

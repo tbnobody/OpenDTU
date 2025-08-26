@@ -134,7 +134,7 @@ export default defineComponent({
             const formData = new FormData();
             if (event !== null) {
                 const target = event.target as HTMLInputElement;
-                if (target.files !== null) {
+                if (target.files !== null && target.files[0]) {
                     this.file = target.files[0];
                 }
             }
