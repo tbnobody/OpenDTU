@@ -18,10 +18,11 @@ public:
     bool sendGridOnProFileParaRequest();
     bool supportsPowerDistributionLogic() override;
 
-private:
-    uint8_t _lastAlarmLogCnt = 0;
+protected:
     float _activePowerControlLimit = 0;
     PowerLimitControlType _activePowerControlType = PowerLimitControlType::AbsolutNonPersistent;
 
+private:
+    uint8_t _lastAlarmLogCnt = 0;
     uint8_t _powerState = 1;
 };
