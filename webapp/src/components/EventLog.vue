@@ -9,12 +9,12 @@
             </tr>
         </thead>
         <tbody>
-            <template v-for="event in eventLogList.count" :key="event">
+            <template v-for="event in eventLogList.events">
                 <tr>
-                    <td>{{ timeInHours(eventLogList.events[event - 1].start_time) }}</td>
-                    <td>{{ timeInHours(eventLogList.events[event - 1].end_time) }}</td>
-                    <td>{{ eventLogList.events[event - 1].message_id }}</td>
-                    <td>{{ eventLogList.events[event - 1].message }}</td>
+                    <td>{{ timeInHours(event.start_time) }}</td>
+                    <td>{{ timeInHours(event.end_time) }}</td>
+                    <td>{{ event.message_id }}</td>
+                    <td>{{ event.message }}</td>
                 </tr>
             </template>
         </tbody>
