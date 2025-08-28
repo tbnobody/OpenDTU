@@ -45,6 +45,15 @@ export default defineConfig(({ command }) => { return {
     outDir: '../webapp_dist',
     emptyOutDir: true,
     minify: 'terser',
+    terserOptions: {
+      compress: {
+        drop_console: true,
+        drop_debugger: true,
+      },
+      format: {
+        comments: false,
+      },
+    },
     chunkSizeWarningLimit: 1024,
     rollupOptions: {
       output: {
@@ -57,9 +66,6 @@ export default defineConfig(({ command }) => { return {
       },
     },
     target: 'es2022',
-  },
-  esbuild: {
-    drop: command !== 'serve' ? ['console', 'debugger'] : []
   },
   css: {
     preprocessorOptions: {
