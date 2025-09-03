@@ -183,7 +183,7 @@ export default defineComponent({
             this.fileMD5(this.file)
                 .then((md5) => {
                     formData.append('MD5', md5 as string);
-                    formData.append('firmware', this.file, 'firmware');
+                    formData.append('firmware', this.file, this.file.name);
                     request.open('post', '/api/firmware/update');
                     authHeader().forEach((value, key) => {
                         request.setRequestHeader(key, value);

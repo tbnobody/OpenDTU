@@ -60,21 +60,23 @@ void WebApiFirmwareClass::onFirmwareUpdateUpload(AsyncWebServerRequest* request,
         return request->send(500, "text/plain", "OTA updates not supported");
     }
 
+    // Validate filename extension
+    String lowerFilename = filename;
+    lowerFilename.toLowerCase();
+    if (!lowerFilename.endsWith(".bin") && !lowerFilename.endsWith(".bin.gz")) {
+        Update.abort();
+        return request->send(400, "text/plain", "Invalid file type. Only .bin and .bin.gz files are allowed");
+    }
+
     // Upload handler chunks in data
     if (!index) {
-        // Validate filename extension
-        String lowerFilename = filename;
-        lowerFilename.toLowerCase();
-        if (!lowerFilename.endsWith(".bin") && !lowerFilename.endsWith(".bin.gz")) {
-            Update.abort();
-            return request->send(400, "text/plain", "Invalid file type. Only .bin and .bin.gz files are allowed");
-        }
-
         if (!request->hasParam("MD5", true)) {
+            Update.abort();
             return request->send(400, "text/plain", "MD5 parameter missing");
         }
 
         if (!Update.setMD5(request->getParam("MD5", true)->value().c_str())) {
+            Update.abort();
             return request->send(400, "text/plain", "MD5 parameter invalid");
         }
 
