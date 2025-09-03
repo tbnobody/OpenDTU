@@ -932,7 +932,8 @@
         "OtaStatus": "OTA Status",
         "OtaSuccess": "The firmware upload was successful. The device was restarted automatically. When the device is accessible again, the interface is automatically reloaded.",
         "FirmwareUpload": "Firmware Upload",
-        "UploadProgress": "Upload Progress"
+        "UploadProgress": "Upload Progress",
+        "InvalidFileType": "Invalid file type. Please select a firmware file with valid extensions: {validTypes}"
     },
     "about": {
         "AboutOpendtu": "About OpenDTU-OnBattery",

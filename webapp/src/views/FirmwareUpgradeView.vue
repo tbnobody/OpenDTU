@@ -105,12 +105,12 @@ export default defineComponent({
             OTAError: '',
             OTASuccess: false,
             type: 'firmware',
-            file: {} as Blob,
+            file: {} as File,
             firmwareStatus: {} as FirmwareStatus,
         };
     },
     methods: {
-        fileMD5(file: Blob) {
+        fileMD5(file: File) {
             return new Promise((resolve, reject) => {
                 const blobSlice = File.prototype.slice;
                 const chunkSize = 2097152; // Read in chunks of 2MB
@@ -139,6 +139,11 @@ export default defineComponent({
                 loadNext();
             });
         },
+        isValidFirmwareFile(filename: string): boolean {
+            const validExtensions = ['.bin', '.bin.gz'];
+            const lowerFilename = filename.toLowerCase();
+            return validExtensions.some((ext) => lowerFilename.endsWith(ext));
+        },
         uploadOTA(event: Event | null) {
             this.uploading = true;
             const formData = new FormData();
@@ -148,6 +153,14 @@ export default defineComponent({
                     this.file = target.files[0];
                 }
             }
+
+            // Validate file type
+            if (this.file && !this.isValidFirmwareFile(this.file.name)) {
+                this.OTAError = this.$t('firmwareupgrade.InvalidFileType', { validTypes: '.bin, .bin.gz' });
+                this.uploading = false;
+                return;
+            }
+
             const request = new XMLHttpRequest();
             request.addEventListener('load', () => {
                 // request.response will hold the response from the server

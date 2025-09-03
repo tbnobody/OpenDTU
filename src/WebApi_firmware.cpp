@@ -62,6 +62,14 @@ void WebApiFirmwareClass::onFirmwareUpdateUpload(AsyncWebServerRequest* request,
 
     // Upload handler chunks in data
     if (!index) {
+        // Validate filename extension
+        String lowerFilename = filename;
+        lowerFilename.toLowerCase();
+        if (!lowerFilename.endsWith(".bin") && !lowerFilename.endsWith(".bin.gz")) {
+            Update.abort();
+            return request->send(400, "text/plain", "Invalid file type. Only .bin and .bin.gz files are allowed");
+        }
+
         if (!request->hasParam("MD5", true)) {
             return request->send(400, "text/plain", "MD5 parameter missing");
         }
