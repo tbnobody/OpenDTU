@@ -146,7 +146,7 @@ jobs:
     steps:
       - name: Generate PR artifacts comment
         id: generate_pr_artifacts_comment
-        uses: actions/github-script@v7
+        uses: actions/github-script@v8
         with:
           script: |
             const {owner, repo} = context.repo;
