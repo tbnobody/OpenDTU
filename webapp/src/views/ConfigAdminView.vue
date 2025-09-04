@@ -265,8 +265,9 @@ export default defineComponent({
             const target = this.$refs.file as HTMLInputElement;
             if (target.files !== null && target.files[0]) {
                 this.file = target.files[0];
+            } else {
+                return;
             }
-            if (!this.file) return;
 
             // Read the file content
             const reader = new FileReader();
