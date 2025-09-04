@@ -19,7 +19,7 @@ try {
 }
 
 // https://vitejs.dev/config/
-export default defineConfig(({ command }) => { return {
+export default defineConfig({
   plugins: [
     vue(),
     viteCompression({ deleteOriginFile: true, threshold: 0 }),
@@ -96,4 +96,4 @@ export default defineConfig(({ command }) => { return {
       }
     }
   }
-} })
+})
