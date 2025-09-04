@@ -84,6 +84,9 @@ private:
     String _i18n_meter_power_kw;
     String _i18n_yield_total_mwh;
     String _i18n_yield_total_kwh;
+    String _i18n_battery_soc_0_fractions;
+    String _i18n_battery_soc_1_fraction;
+    String _i18n_battery_soc_2_fractions;
 };
 
 extern DisplayGraphicClass Display;

@@ -7,6 +7,7 @@
 #include "Datastore.h"
 #include "I18n.h"
 #include "PinMapping.h"
+#include <battery/Controller.h>
 #include <powermeter/Controller.h>
 #include <NetworkSettings.h>
 #include <map>
@@ -38,6 +39,10 @@ static const char* const i18n_yield_today_kwh[] = { "today: %.1f kWh", "Heute: %
 
 static const char* const i18n_yield_total_kwh[] = { "total: %.1f kWh", "Ges.: %.1f kWh", "total: %.1f kWh" };
 static const char* const i18n_yield_total_mwh[] = { "total: %.0f kWh", "Ges.: %.0f kWh", "total: %.0f kWh" };
+
+static const char* const i18n_battery_soc_0_fractions[] = { "SoC: %.0f%%", "SoC: %.0f%%", "SoC: %.0f%%" };
+static const char* const i18n_battery_soc_1_fraction[] = { "SoC: %.1f%%", "SoC: %.1f%%", "SoC: %.1f%%" };
+static const char* const i18n_battery_soc_2_fractions[] = { "SoC: %.2f%%", "SoC: %.2f%%", "SoC: %.2f%%" };
 
 static const char* const i18n_date_format[] = { "%m/%d/%Y %H:%M", "%d.%m.%Y %H:%M", "%d/%m/%Y %H:%M" };
 
@@ -203,6 +208,9 @@ void DisplayGraphicClass::setLocale(const String& locale)
     _i18n_yield_today_kwh = i18n_yield_today_kwh[idx];
     _i18n_yield_total_kwh = i18n_yield_total_kwh[idx];
     _i18n_yield_total_mwh = i18n_yield_total_mwh[idx];
+    _i18n_battery_soc_0_fractions = i18n_battery_soc_0_fractions[idx];
+    _i18n_battery_soc_1_fraction = i18n_battery_soc_1_fraction[idx];
+    _i18n_battery_soc_2_fractions = i18n_battery_soc_2_fractions[idx];
 
     I18n.readDisplayStrings(locale,
         _i18n_date_format,
@@ -214,7 +222,10 @@ void DisplayGraphicClass::setLocale(const String& locale)
         _i18n_yield_today_wh,
         _i18n_yield_today_kwh,
         _i18n_yield_total_kwh,
-        _i18n_yield_total_mwh);
+        _i18n_yield_total_mwh,
+        _i18n_battery_soc_0_fractions,
+        _i18n_battery_soc_1_fraction,
+        _i18n_battery_soc_2_fractions);
 }
 
 void DisplayGraphicClass::setDiagramMode(DiagramMode_t mode)
@@ -320,12 +331,15 @@ void DisplayGraphicClass::loop()
     }
 
     // the IP and time info in the third line use three-second slots. the
-    // timing for the power meter is chosen such that every third of those
+    // timing for the power meter and battery is chosen such that every third of those
     // three-second slots is used to NOT overwrite the total inverter energy.
     bool timing = (_mExtra % 9) >= 3;
 
-    if (showText && Configuration.get().PowerMeter.Enabled && timing && !displayPowerSave) {
-        // erase the third line and print the power meter value instead.
+    bool powerMeterAvailable = Configuration.get().PowerMeter.Enabled;
+    bool batteryAvailable = Configuration.get().Battery.Enabled && Battery.getStats()->isSoCValid();
+
+    if (showText && timing && !displayPowerSave && (powerMeterAvailable || batteryAvailable)) {
+        // erase the third line and print the battery SoC or power meter value instead.
         // we do it this way to touch as least upstream code as possible
         // to make maintenance easier.
         setFont(2);
@@ -335,11 +349,40 @@ void DisplayGraphicClass::loop()
         _display->drawBox(0, y, _display->getDisplayWidth(), lineHeight);
         _display->setDrawColor(1);
 
-        auto acPower = PowerMeter.getPowerTotal();
-        if (acPower > 999) {
-            snprintf(_fmtText, sizeof(_fmtText), _i18n_meter_power_kw.c_str(), (acPower / 1000));
+        bool showPowerMeter = false;
+
+        // Prioritize power meter and battery alternation when both are available
+        if (powerMeterAvailable && batteryAvailable) {
+            // Alternate between power meter and battery every 3 seconds within the timing window
+            showPowerMeter = ((_mExtra / 3) % 2) == 0;
+        }
+        // Show power meter only if battery not available
+        else if (powerMeterAvailable) {
+            showPowerMeter = true;
+        }
+        // Show battery only if power meter not enabled
+        else if (batteryAvailable) {
+            showPowerMeter = false;
+        }
+
+        if (showPowerMeter) {
+            auto acPower = PowerMeter.getPowerTotal();
+            if (acPower > 999) {
+                snprintf(_fmtText, sizeof(_fmtText), _i18n_meter_power_kw.c_str(), (acPower / 1000));
+            } else {
+                snprintf(_fmtText, sizeof(_fmtText), _i18n_meter_power_w.c_str(), acPower);
+            }
         } else {
-            snprintf(_fmtText, sizeof(_fmtText), _i18n_meter_power_w.c_str(), acPower);
+            auto precision = Battery.getStats()->getSoCPrecision();
+            float soc = Battery.getStats()->getSoC();
+
+            if (precision == 1) {
+                snprintf(_fmtText, sizeof(_fmtText), _i18n_battery_soc_1_fraction.c_str(), soc);
+            } else if (precision == 2) {
+                snprintf(_fmtText, sizeof(_fmtText), _i18n_battery_soc_2_fractions.c_str(), soc);
+            } else {
+                snprintf(_fmtText, sizeof(_fmtText), _i18n_battery_soc_0_fractions.c_str(), soc);
+            }
         }
 
         printText(_fmtText, 2);
