@@ -301,7 +301,6 @@ export default defineComponent({
         },
         onUpload() {
             this.uploading = true;
-            const formData = new FormData();
             const target = this.$refs.file as HTMLInputElement; //  event.target as HTMLInputElement;
             if (target.files !== null && target.files[0]) {
                 this.file = target.files[0];
@@ -311,32 +310,55 @@ export default defineComponent({
                 this.progress = 0;
                 return;
             }
-            const request = new XMLHttpRequest();
-            request.addEventListener('load', () => {
-                // request.response will hold the response from the server
-                if (request.status === 200) {
-                    this.UploadSuccess = true;
-                    waitRestart(this.$router);
-                } else if (request.status !== 500) {
-                    this.UploadError = `[HTTP ERROR] ${request.statusText}`;
-                } else {
-                    this.UploadError = request.responseText;
-                }
-                this.uploading = false;
-                this.progress = 0;
-            });
-            // Upload progress
-            request.upload.addEventListener('progress', (e) => {
-                this.progress = Math.trunc((e.loaded / e.total) * 100);
-            });
-            request.withCredentials = true;
 
-            formData.append('config', this.file, 'config');
-            request.open('post', '/api/file/upload?file=' + this.restoreFileSelect);
-            authHeader().forEach((value, key) => {
-                request.setRequestHeader(key, value);
-            });
-            request.send(formData);
+            const reader = new FileReader();
+
+            reader.onload = async () => {
+                try {
+                    // Step 1: Parse JSON and minify
+                    const json = JSON.parse(reader.result as string);
+                    const minified = JSON.stringify(json); // minified string
+
+                    // Step 2: Create a new Blob from the minified JSON
+                    const minifiedBlob = new Blob([minified], { type: 'application/json' });
+                    const formData = new FormData();
+                    formData.append('config', minifiedBlob, 'config');
+
+                    // Step 3: Upload logic
+                    const request = new XMLHttpRequest();
+                    request.addEventListener('load', () => {
+                        // request.response will hold the response from the server
+                        if (request.status === 200) {
+                            this.UploadSuccess = true;
+                            waitRestart(this.$router);
+                        } else if (request.status !== 500) {
+                            this.UploadError = `[HTTP ERROR] ${request.statusText}`;
+                        } else {
+                            this.UploadError = request.responseText;
+                        }
+                        this.uploading = false;
+                        this.progress = 0;
+                    });
+                    // Upload progress
+                    request.upload.addEventListener('progress', (e) => {
+                        this.progress = Math.trunc((e.loaded / e.total) * 100);
+                    });
+                    request.withCredentials = true;
+
+                    request.open('post', '/api/file/upload?file=' + this.restoreFileSelect);
+                    authHeader().forEach((value, key) => {
+                        request.setRequestHeader(key, value);
+                    });
+                    request.send(formData);
+                } catch {
+                    this.UploadError = this.$t('fileadmin.InvalidJson');
+                    this.uploading = false;
+                    this.progress = 0;
+                }
+            };
+
+            // Read the file as text
+            reader.readAsText(this.file);
         },
         clearUpload() {
             this.UploadError = '';
