@@ -761,8 +761,8 @@ uint16_t PowerLimiterClass::getSolarPassthroughPower() const
 
     std::optional<float> oSolarChargerOutput = SolarCharger.getStats()->getOutputPowerWatts();
 
-    // do not trust this value to be positive. in particular, the MQTT solar
-    // provider happily processes negative values as well.
+    // This value can be negative if a charge controller with a load output is used
+    // and the load is consuming more power than the charge controller is producing.
     return std::max<float>(0, oSolarChargerOutput.value_or(0));
 }
 

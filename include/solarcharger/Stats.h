@@ -11,7 +11,9 @@ public:
     // the last time *any* data was updated
     virtual uint32_t getAgeMillis() const;
 
-    // total output of all MPPT charge controllers in Watts
+    // Total output of all MPPT charge controllers in Watts.
+    // This value can be negative if a charge controller with a load output is used
+    // and the load is consuming more power than the charge controller is producing.
     virtual std::optional<float> getOutputPowerWatts() const;
 
     // minimum of all MPPT charge controllers' output voltages in V

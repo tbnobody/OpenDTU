@@ -109,11 +109,6 @@ void Provider::onMqttMessageOutputPower(espMqttClientTypes::MessageProperties co
             break;
     }
 
-    if (*outputPower < 0) {
-        DTU_LOGW("Implausible output_power '%.1f' in topic '%s'", *outputPower, topic);
-        return;
-    }
-
     _stats->setOutputPowerWatts(*outputPower);
 
     DTU_LOGD("Updated output_power to %.1f from '%s'", *outputPower, topic);
@@ -179,11 +174,6 @@ void Provider::onMqttMessageOutputCurrent(espMqttClientTypes::MessageProperties 
     }
 
     _stats->setOutputCurrent(*outputCurrent);
-
-    if (*outputCurrent < 0) {
-        DTU_LOGW("Implausible output_current '%.2f' in topic '%s'", *outputCurrent, topic);
-        return;
-    }
 
     DTU_LOGD("Updated output_current to %.2f from '%s'", *outputCurrent, topic);
 }
