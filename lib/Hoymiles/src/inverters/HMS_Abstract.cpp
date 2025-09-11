@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * Copyright (C) 2023-2024 Thomas Basler and others
+ * Copyright (C) 2023-2025 Thomas Basler and others
  */
 #include "HMS_Abstract.h"
 #include "Hoymiles.h"
@@ -25,3 +25,25 @@ bool HMS_Abstract::sendChangeChannelRequest()
 
     return true;
 };
+
+bool HMS_Abstract::sendActivePowerControlRequest(float limit, const PowerLimitControlType type)
+{
+    if (!getEnableCommands()) {
+        return false;
+    }
+
+    if (type == PowerLimitControlType::RelativNonPersistent || type == PowerLimitControlType::RelativPersistent) {
+        limit = min<float>(100, limit);
+    }
+
+    _activePowerControlLimit = limit;
+    _activePowerControlType = type;
+
+    auto cmd = _radio->prepareCommand<ActivePowerControlCommand>(this);
+    cmd->setDeviceType(ActivePowerControlDeviceType::HmsActivePowerControl);
+    cmd->setActivePowerLimit(limit, type);
+    SystemConfigPara()->setLastLimitCommandSuccess(CMD_PENDING);
+    _radio->enqueCommand(cmd);
+
+    return true;
+}

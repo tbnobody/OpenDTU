@@ -315,7 +315,7 @@ export default defineComponent({
             if (!val) {
                 return;
             }
-            this.deviceConfigList.led.every((v) => (v.brightness = this.deviceConfigList.led[0].brightness));
+            this.deviceConfigList.led.every((v) => (v.brightness = this.deviceConfigList.led[0]?.brightness ?? 0));
         },
     },
     computed: {
@@ -397,7 +397,7 @@ export default defineComponent({
             return parseInt(id.replace('inputLED', '').replace('Brightness', ''));
         },
         isEqualBrightness(): boolean {
-            const allEqual = (arr: Led[]) => arr.every((v) => v.brightness === arr[0].brightness);
+            const allEqual = (arr: Led[]) => arr.every((v) => v.brightness === arr[0]?.brightness);
             return allEqual(this.deviceConfigList.led);
         },
         syncSliders(event: Event) {
@@ -405,7 +405,7 @@ export default defineComponent({
                 return;
             }
             const srcId = this.getNumberFromLedId((event.target as Element).id);
-            this.deviceConfigList.led.map((v) => (v.brightness = this.deviceConfigList.led[srcId].brightness));
+            this.deviceConfigList.led.map((v) => (v.brightness = this.deviceConfigList.led[srcId]?.brightness ?? 0));
         },
     },
 });

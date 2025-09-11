@@ -206,7 +206,7 @@ export default defineComponent({
     },
     data() {
         return {
-            isLogged: this.isLoggedIn(),
+            isLogged: isLoggedIn(),
             now: {} as Date,
         };
     },

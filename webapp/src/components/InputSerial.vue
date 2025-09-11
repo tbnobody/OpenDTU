@@ -105,9 +105,12 @@ export default defineComponent({
             let sn_int: bigint = 0n;
 
             for (let i = 0; i < 9; i++) {
-                const pos: bigint = BigInt(chars32.indexOf(sn[i].toUpperCase()));
-                const shift: bigint = BigInt(42 - 5 * i - (i <= 2 ? 0 : 2));
-                sn_int |= pos << shift;
+                const c = sn[i];
+                if (typeof c === 'string') {
+                    const pos: bigint = BigInt(chars32.indexOf(c.toUpperCase()));
+                    const shift: bigint = BigInt(42 - 5 * i - (i <= 2 ? 0 : 2));
+                    sn_int |= pos << shift;
+                }
             }
 
             return sn_int.toString(16);

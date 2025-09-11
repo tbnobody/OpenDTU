@@ -112,7 +112,7 @@ void WebApiPrometheusClass::onPrometheusMetricsGet(AsyncWebServerRequest* reques
                 }
             }
         }
-        stream->addHeader("Cache-Control", "no-cache");
+        stream->addHeader(asyncsrv::T_Cache_Control, asyncsrv::T_no_cache);
         if (stream->available() > initialResponseBufferSize) {
             initialResponseBufferSize = stream->available();
             ESP_LOGI(TAG, "Increased /api/prometheus/metrics initialResponseBufferSize to %" PRIu32 " bytes", initialResponseBufferSize);

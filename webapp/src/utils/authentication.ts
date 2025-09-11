@@ -1,33 +1,29 @@
 import type { Emitter, EventType } from 'mitt';
 import type { Router } from 'vue-router';
 
+function getUserAuthData(): string | null {
+    try {
+        const user = JSON.parse(localStorage.getItem('user') || '');
+        return user?.authdata || null;
+    } catch {
+        return null;
+    }
+}
+
 export function authHeader(): Headers {
     // return authorization header with basic auth credentials
-    let user = null;
-    try {
-        user = JSON.parse(localStorage.getItem('user') || '');
-    } catch {
-        // continue regardless of error
+    const authdata = getUserAuthData();
+    const headers = new Headers({ 'X-Requested-With': 'XMLHttpRequest' });
+    if (authdata) {
+        headers.append('Authorization', 'Basic ' + authdata);
     }
-
-    const headers = new Headers();
-    headers.append('X-Requested-With', 'XMLHttpRequest');
-    if (user && user.authdata) {
-        headers.append('Authorization', 'Basic ' + user.authdata);
-    }
-    return new Headers(headers);
+    return headers;
 }
 
 export function authUrl(): string {
-    let user = null;
-    try {
-        user = JSON.parse(localStorage.getItem('user') || '');
-    } catch {
-        // continue regardless of error
-    }
-
-    if (user && user.authdata) {
-        return encodeURIComponent(atob(user.authdata)).replace('%3A', ':') + '@';
+    const authdata = getUserAuthData();
+    if (authdata) {
+        return encodeURIComponent(atob(authdata)).replace('%3A', ':') + '@';
     }
     return '';
 }
@@ -38,7 +34,7 @@ export function logout() {
 }
 
 export function isLoggedIn(): boolean {
-    return localStorage.getItem('user') != null;
+    return getUserAuthData() != null;
 }
 
 export function login(username: string, password: string) {

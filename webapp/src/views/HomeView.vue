@@ -51,7 +51,7 @@
                                     }"
                                 >
                                     {{ $n(inverter.AC[0]?.Power?.v || 0, 'decimalNoDigits') }}
-                                    {{ inverter.AC[0].Power?.u }}
+                                    {{ inverter.AC[0]?.Power?.u }}
                                 </span>
                                 <span v-else class="badge text-bg-light">-</span>
                             </div>
@@ -203,11 +203,11 @@
                                                     (chanType.name == 'DC' && getSumIrridiation(inverter) == 0) ||
                                                     (chanType.name == 'DC' &&
                                                         getSumIrridiation(inverter) > 0 &&
-                                                        chanType.obj[channel].Irradiation?.max) ||
+                                                        chanType.obj[channel]?.Irradiation?.max) ||
                                                     0 > 0
                                                 "
                                             >
-                                                <div class="col">
+                                                <div class="col" v-if="chanType.obj[channel]">
                                                     <InverterChannelInfo
                                                         :channelData="chanType.obj[channel]"
                                                         :channelType="chanType.name"
@@ -444,15 +444,15 @@
                     </button>
                     <ul class="dropdown-menu dropdown-menu-end">
                         <li>
-                            <a class="dropdown-item" @click="onSelectType(1)" href="#">{{ $t('home.Relative') }}</a>
+                            <a class="dropdown-item" @click="onSelectType(true)" href="#">{{ $t('home.Relative') }}</a>
                         </li>
                         <li>
-                            <a class="dropdown-item" @click="onSelectType(0)" href="#">{{ $t('home.Absolute') }}</a>
+                            <a class="dropdown-item" @click="onSelectType(false)" href="#">{{ $t('home.Absolute') }}</a>
                         </li>
                     </ul>
                 </div>
                 <div
-                    v-if="targetLimitType == 0"
+                    v-if="!targetLimitRelative"
                     class="alert alert-secondary mt-3"
                     role="alert"
                     v-html="$t('home.LimitHint')"
@@ -517,6 +517,7 @@ import GridProfile from '@/components/GridProfile.vue';
 import HintView from '@/components/HintView.vue';
 import InverterChannelInfo from '@/components/InverterChannelInfo.vue';
 import InverterTotalInfo from '@/components/InverterTotalInfo.vue';
+import { LimitType } from '@/types/LimitConfig';
 import ModalDialog from '@/components/ModalDialog.vue';
 import SolarChargerView from '@/components/SolarChargerView.vue';
 import GridChargerView from '@/components/GridChargerView.vue';
@@ -572,7 +573,7 @@ export default defineComponent({
     },
     data() {
         return {
-            isLogged: this.isLoggedIn(),
+            isLogged: isLoggedIn(),
 
             socket: {} as WebSocket,
             heartInterval: 0,
@@ -600,7 +601,7 @@ export default defineComponent({
             targetLimitMin: 0,
             targetLimitMax: 100,
             targetLimitTypeText: this.$t('home.Relative'),
-            targetLimitType: 1,
+            targetLimitRelative: true,
 
             alertMessageLimit: '',
             alertTypeLimit: 'info',
@@ -741,7 +742,7 @@ export default defineComponent({
                     if (foundIdx == -1) {
                         Object.assign(this.liveData.inverters, newData.inverters);
                         this.liveData.inverters.forEach((inv) => this.resetDataAging(inv));
-                    } else {
+                    } else if (this.liveData.inverters[foundIdx]) {
                         Object.assign(this.liveData.inverters[foundIdx], newData.inverters[0]);
                         this.resetDataAging(this.liveData.inverters[foundIdx]);
                     }
@@ -860,8 +861,7 @@ export default defineComponent({
             this.showAlertLimit = false;
             this.targetLimitList.serial = '';
             this.targetLimitList.limit_value = 0;
-            this.targetLimitType = 1;
-            this.targetLimitTypeText = this.$t('home.Relative');
+            this.onSelectType(true);
 
             this.limitSettingLoading = true;
             fetch('/api/limit/status', { headers: authHeader() })
@@ -883,7 +883,19 @@ export default defineComponent({
                 });
         },
         onSetLimitSettings(setPersistent: boolean) {
-            this.targetLimitList.limit_type = (setPersistent ? 256 : 0) + this.targetLimitType;
+            if (setPersistent) {
+                if (this.targetLimitRelative) {
+                    this.targetLimitList.limit_type = LimitType.RelativPersistent;
+                } else {
+                    this.targetLimitList.limit_type = LimitType.AbsolutPersistent;
+                }
+            } else {
+                if (this.targetLimitRelative) {
+                    this.targetLimitList.limit_type = LimitType.RelativNonPersistent;
+                } else {
+                    this.targetLimitList.limit_type = LimitType.AbsolutNonPersistent;
+                }
+            }
             const formData = new FormData();
             formData.append('data', JSON.stringify(this.targetLimitList));
 
@@ -905,8 +917,8 @@ export default defineComponent({
                     }
                 });
         },
-        onSelectType(type: number) {
-            if (type == 1) {
+        onSelectType(isRelative: boolean) {
+            if (isRelative) {
                 this.targetLimitTypeText = this.$t('home.Relative');
                 this.targetLimitMin = 0;
                 this.targetLimitMax = 100;
@@ -915,7 +927,7 @@ export default defineComponent({
                 this.targetLimitMin = 0;
                 this.targetLimitMax = this.currentLimitList.max_power > 0 ? this.currentLimitList.max_power : 2250;
             }
-            this.targetLimitType = type;
+            this.targetLimitRelative = isRelative;
         },
 
         onShowPowerSettings(serial: string) {
@@ -970,7 +982,7 @@ export default defineComponent({
         getSumIrridiation(inv: Inverter): number {
             let total = 0;
             Object.keys(inv.DC).forEach((key) => {
-                total += inv.DC[key as unknown as number].Irradiation?.max || 0;
+                total += inv.DC[key as unknown as number]?.Irradiation?.max || 0;
             });
             return total;
         },

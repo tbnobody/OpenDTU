@@ -25,6 +25,18 @@ ID   Target Addr   Source Addr   Cmd  SCmd ?    Limit   Type    CRC16   CRC8
 
 #define CRC_SIZE 6
 
+const std::array<const ActivePowerControlValue_t, PowerLimitControlType::PowerLimitControl_Max * 2> ActivePowerControlCommand::_powerLimitControlTypeValues = { {
+    { HmActivePowerControl, AbsolutNonPersistent, 0x0000 },
+    { HmActivePowerControl, RelativNonPersistent, 0x0001 },
+    { HmActivePowerControl, AbsolutPersistent, 0x0100 },
+    { HmActivePowerControl, RelativPersistent, 0x0101 },
+
+    { HmsActivePowerControl, AbsolutNonPersistent, 0x0000 },
+    { HmsActivePowerControl, RelativNonPersistent, 0x0001 },
+    { HmsActivePowerControl, AbsolutPersistent, 0x0002 },
+    { HmsActivePowerControl, RelativPersistent, 0x0003 },
+} };
+
 ActivePowerControlCommand::ActivePowerControlCommand(InverterAbstract* inv, const uint64_t router_address)
     : DevControlCommand(inv, router_address)
 {
@@ -44,8 +56,9 @@ ActivePowerControlCommand::ActivePowerControlCommand(InverterAbstract* inv, cons
 
 String ActivePowerControlCommand::getCommandName() const
 {
+    const char* typeName = getDeviceType() == ActivePowerControlDeviceType::HmActivePowerControl ? "HM" : "HMS";
     char buffer[30];
-    snprintf(buffer, sizeof(buffer), "ActivePowerControl (%02X)", getType());
+    snprintf(buffer, sizeof(buffer), "ActivePowerControl (%s, %02X)", typeName, getType());
     return buffer;
 }
 
@@ -64,8 +77,9 @@ void ActivePowerControlCommand::setActivePowerLimit(const float limit, const Pow
     _payload[13] = (l) & 0xff;
 
     // type
-    _payload[14] = (type >> 8) & 0xff;
-    _payload[15] = (type) & 0xff;
+    uint32_t type_value = getControlTypeValue(_deviceType, type);
+    _payload[14] = (type_value >> 8) & 0xff;
+    _payload[15] = (type_value) & 0xff;
 
     udpateCRC(CRC_SIZE);
 }
@@ -102,7 +116,34 @@ float ActivePowerControlCommand::getLimit() const
 
 PowerLimitControlType ActivePowerControlCommand::getType() const
 {
-    return (PowerLimitControlType)((static_cast<uint16_t>(_payload[14]) << 8) | _payload[15]);
+    uint32_t type_val = ((static_cast<uint16_t>(_payload[14]) << 8) | _payload[15]);
+    for (uint8_t i = 0; i < PowerLimitControl_Max; i++) {
+        if (type_val ==  getControlTypeValue(_deviceType, static_cast<PowerLimitControlType>(i))) {
+            return static_cast<PowerLimitControlType>(i);
+        }
+    }
+    return PowerLimitControlType::RelativNonPersistent;
+}
+
+void ActivePowerControlCommand::setDeviceType(ActivePowerControlDeviceType type)
+{
+    _deviceType = type;
+}
+
+ActivePowerControlDeviceType ActivePowerControlCommand::getDeviceType() const
+{
+    return _deviceType;
+}
+
+uint32_t ActivePowerControlCommand::getControlTypeValue(ActivePowerControlDeviceType deviceType, PowerLimitControlType limitType)
+{
+    for (auto& val : _powerLimitControlTypeValues) {
+        if (val.device == deviceType && val.controlType == limitType) {
+            return val.value;
+        }
+    }
+
+    return 0;
 }
 
 void ActivePowerControlCommand::gotTimeout()

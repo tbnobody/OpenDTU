@@ -212,12 +212,8 @@ export default defineComponent({
             };
         },
         getLineClass(line: string): string {
-            for (const tag in this.levelMap) {
-                if (line.includes(tag)) {
-                    return this.levelMap[tag];
-                }
-            }
-            return 'default';
+            const found = Object.entries(this.levelMap).find(([tag]) => line.includes(tag));
+            return found ? found[1] : 'default';
         },
         handleScroll() {
             const el = this.$refs.logRef as HTMLDivElement;

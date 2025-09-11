@@ -2,13 +2,26 @@
 #pragma once
 
 #include "DevControlCommand.h"
+#include <array>
 
-typedef enum { // ToDo: to be verified by field tests
-    AbsolutNonPersistent = 0x0000, // 0
-    RelativNonPersistent = 0x0001, // 1
-    AbsolutPersistent = 0x0100, // 256
-    RelativPersistent = 0x0101 // 257
+typedef enum {
+    AbsolutNonPersistent,
+    RelativNonPersistent,
+    AbsolutPersistent,
+    RelativPersistent,
+    PowerLimitControl_Max
 } PowerLimitControlType;
+
+typedef enum {
+    HmActivePowerControl,
+    HmsActivePowerControl,
+} ActivePowerControlDeviceType;
+
+typedef struct {
+    ActivePowerControlDeviceType device;
+    PowerLimitControlType controlType;
+    uint32_t value;
+} ActivePowerControlValue_t;
 
 class ActivePowerControlCommand : public DevControlCommand {
 public:
@@ -24,4 +37,13 @@ public:
     void setActivePowerLimit(const float limit, const PowerLimitControlType type = RelativNonPersistent);
     float getLimit() const;
     PowerLimitControlType getType() const;
+
+    void setDeviceType(ActivePowerControlDeviceType type);
+    ActivePowerControlDeviceType getDeviceType() const;
+
+private:
+    static uint32_t getControlTypeValue(ActivePowerControlDeviceType deviceType, PowerLimitControlType limitType);
+
+    ActivePowerControlDeviceType _deviceType = ActivePowerControlDeviceType::HmActivePowerControl;
+    static const std::array<const ActivePowerControlValue_t, PowerLimitControlType::PowerLimitControl_Max * 2> _powerLimitControlTypeValues;
 };

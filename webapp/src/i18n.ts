@@ -78,7 +78,7 @@ export const i18n = createI18n({
     legacy: false,
     globalInjection: true,
     locale: navigator.language.split('-')[0],
-    fallbackLocale: allLocales[0].code,
+    fallbackLocale: allLocales[0]?.code ?? 'en',
     messages,
     datetimeFormats: dateTimeFormats,
     numberFormats: numberFormats,
@@ -101,7 +101,7 @@ export async function setLocale(locale: string) {
 
         // fetch() error occurred.
         if (messages === undefined) {
-            i18n.global.locale.value = allLocales[0].code;
+            i18n.global.locale.value = allLocales[0]?.code ?? 'en';
             return;
         }
 

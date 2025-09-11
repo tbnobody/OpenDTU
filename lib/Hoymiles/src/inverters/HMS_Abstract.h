@@ -8,4 +8,5 @@ public:
     explicit HMS_Abstract(HoymilesRadio* radio, const uint64_t serial);
 
     virtual bool sendChangeChannelRequest();
+    bool sendActivePowerControlRequest(float limit, const PowerLimitControlType type);
 };

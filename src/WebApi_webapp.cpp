@@ -39,8 +39,8 @@ void WebApiWebappClass::responseBinaryDataWithETagCache(AsyncWebServerRequest* r
     expectedEtag += "\"";
 
     bool eTagMatch = false;
-    if (request->hasHeader("If-None-Match")) {
-        const AsyncWebHeader* h = request->getHeader("If-None-Match");
+    if (request->hasHeader(asyncsrv::T_INM)) {
+        const AsyncWebHeader* h = request->getHeader(asyncsrv::T_INM);
         eTagMatch = h->value().equals(expectedEtag);
     }
 
@@ -51,13 +51,13 @@ void WebApiWebappClass::responseBinaryDataWithETagCache(AsyncWebServerRequest* r
     } else {
         response = request->beginResponse(200, contentType, content, len);
         if (contentEncoding.length() > 0) {
-            response->addHeader("Content-Encoding", contentEncoding);
+            response->addHeader(asyncsrv::T_Content_Encoding, contentEncoding);
         }
     }
 
     // HTTP requires cache headers in 200 and 304 to be identical
-    response->addHeader("Cache-Control", "public, must-revalidate");
-    response->addHeader("ETag", expectedEtag);
+    response->addHeader(asyncsrv::T_Cache_Control, "public, must-revalidate");
+    response->addHeader(asyncsrv::T_ETag, expectedEtag);
 
     request->send(response);
 }
@@ -70,34 +70,34 @@ void WebApiWebappClass::init(AsyncWebServer& server, Scheduler& scheduler)
     */
 
     server.on("/", HTTP_GET, [&](AsyncWebServerRequest* request) {
-        responseBinaryDataWithETagCache(request, "text/html", "gzip", file_index_html_start, file_index_html_end - file_index_html_start);
+        responseBinaryDataWithETagCache(request, asyncsrv::T_text_html, asyncsrv::T_gzip, file_index_html_start, file_index_html_end - file_index_html_start);
     });
 
     server.onNotFound([&](AsyncWebServerRequest* request) {
-        responseBinaryDataWithETagCache(request, "text/html", "gzip", file_index_html_start, file_index_html_end - file_index_html_start);
+        responseBinaryDataWithETagCache(request, asyncsrv::T_text_html, asyncsrv::T_gzip, file_index_html_start, file_index_html_end - file_index_html_start);
     });
 
     server.on("/index.html", HTTP_GET, [&](AsyncWebServerRequest* request) {
-        responseBinaryDataWithETagCache(request, "text/html", "gzip", file_index_html_start, file_index_html_end - file_index_html_start);
+        responseBinaryDataWithETagCache(request, asyncsrv::T_text_html, asyncsrv::T_gzip, file_index_html_start, file_index_html_end - file_index_html_start);
     });
 
     server.on("/favicon.ico", HTTP_GET, [&](AsyncWebServerRequest* request) {
-        responseBinaryDataWithETagCache(request, "image/x-icon", "", file_favicon_ico_start, file_favicon_ico_end - file_favicon_ico_start);
+        responseBinaryDataWithETagCache(request, asyncsrv::T_image_x_icon, "", file_favicon_ico_start, file_favicon_ico_end - file_favicon_ico_start);
     });
 
     server.on("/favicon.png", HTTP_GET, [&](AsyncWebServerRequest* request) {
-        responseBinaryDataWithETagCache(request, "image/png", "", file_favicon_png_start, file_favicon_png_end - file_favicon_png_start);
+        responseBinaryDataWithETagCache(request, asyncsrv::T_image_png, "", file_favicon_png_start, file_favicon_png_end - file_favicon_png_start);
     });
 
     server.on("/zones.json", HTTP_GET, [&](AsyncWebServerRequest* request) {
-        responseBinaryDataWithETagCache(request, "application/json", "gzip", file_zones_json_start, file_zones_json_end - file_zones_json_start);
+        responseBinaryDataWithETagCache(request, asyncsrv::T_application_json, asyncsrv::T_gzip, file_zones_json_start, file_zones_json_end - file_zones_json_start);
     });
 
     server.on("/site.webmanifest", HTTP_GET, [&](AsyncWebServerRequest* request) {
-        responseBinaryDataWithETagCache(request, "application/json", "", file_site_webmanifest_start, file_site_webmanifest_end - file_site_webmanifest_start);
+        responseBinaryDataWithETagCache(request, asyncsrv::T_application_json, "", file_site_webmanifest_start, file_site_webmanifest_end - file_site_webmanifest_start);
     });
 
     server.on("/js/app.js", HTTP_GET, [&](AsyncWebServerRequest* request) {
-        responseBinaryDataWithETagCache(request, "text/javascript", "gzip", file_app_js_start, file_app_js_end - file_app_js_start);
+        responseBinaryDataWithETagCache(request, asyncsrv::T_text_javascript, asyncsrv::T_gzip, file_app_js_start, file_app_js_end - file_app_js_start);
     });
 }
