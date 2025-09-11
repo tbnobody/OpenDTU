@@ -10,13 +10,13 @@ OpenDTU-OnBattery is an ESP32-based firmware project that provides solar inverte
 Install dependencies in this exact order:
 
 ```bash
-# Install Node.js 22 (REQUIRED - do not use older versions)
-curl -fsSL https://deb.nodesource.com/setup_22.x | sudo -E bash -
+# Install Node.js 24 (REQUIRED - do not use older versions)
+curl -fsSL https://deb.nodesource.com/setup_24.x | sudo -E bash -
 sudo apt-get install nodejs -y
 
-# Verify Node.js 22 installation
+# Verify Node.js 24 installation
 export PATH=/usr/bin:$PATH
-node --version  # Should show v22.x.x
+node --version  # Should show v24.x.x
 
 # Enable corepack for yarn
 sudo corepack enable
@@ -50,7 +50,7 @@ pio run -e generic_esp32s3_usb   # NEVER CANCEL - requires 60+ minute timeout
 
 ### Timing Expectations and Warnings
 - **Webapp dependencies**: ~25 seconds
-- **Webapp build**: ~15 seconds - NEVER CANCEL, set timeout to 60+ seconds  
+- **Webapp build**: ~15 seconds - NEVER CANCEL, set timeout to 60+ seconds
 - **Firmware build**: 10-45 minutes on first run - NEVER CANCEL, set timeout to 60+ minutes
 - **PlatformIO platform downloads**: 5-15 minutes - NEVER CANCEL, requires internet access
 
@@ -62,7 +62,7 @@ pio run -e generic_esp32s3_usb   # NEVER CANCEL - requires 60+ minute timeout
 
 If you encounter `HTTPClientError` during `pio run`, this indicates network restrictions that prevent PlatformIO from downloading required components. In restricted environments:
 - Webapp builds work without internet
-- Linting works without internet  
+- Linting works without internet
 - Firmware builds will fail without internet access
 
 ## Development and Validation
@@ -88,7 +88,7 @@ cpplint --repository=. --recursive \
 Default CI environments (use any of these with `pio run -e <environment>`):
 - `generic_esp32_4mb_no_ota` - 4MB ESP32, no OTA support
 - `generic_esp32_8mb` - 8MB ESP32 with OTA
-- `generic_esp32s3` - ESP32-S3 
+- `generic_esp32s3` - ESP32-S3
 - `generic_esp32s3_usb` - ESP32-S3 with USB (default)
 
 ### Webapp Development
@@ -105,7 +105,7 @@ yarn preview  # Preview production build on port 4173
 ### Repository Layout
 ```
 ├── .github/workflows/     # CI/CD pipelines
-├── webapp/               # Vue.js web application  
+├── webapp/               # Vue.js web application
 │   ├── src/             # Vue.js source code
 │   ├── package.json     # Node.js dependencies
 │   └── yarn.lock        # Lockfile for dependencies
@@ -161,7 +161,7 @@ The project uses these automated workflows:
 ### Build Failures
 1. **"HTTPClientError" during pio run**: Ensure unrestricted internet access is available for ESP32 platform downloads. Network firewalls or restrictions will cause firmware builds to fail. Contact repository administrators to configure network access if builds fail with network errors.
 2. **"yarn: command not found"**: Run `sudo corepack enable`
-3. **"Node version too old"**: Ensure Node.js 22 is installed and in PATH
+3. **"Node version too old"**: Ensure Node.js 24 is installed and in PATH
 4. **"webapp_dist not found"**: Run `yarn build` in webapp directory first
 
 ### Development Workflow

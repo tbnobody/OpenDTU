@@ -16,23 +16,24 @@ jobs:
     permissions:
       contents: read
     steps:
-      - name: Setup Node.js 22
+      - name: Setup Node.js 24
         uses: actions/setup-node@v4
         with:
-          node-version: '22'
+          node-version: '24'
+
       - name: Enable corepack for yarn
         run: corepack enable
-        
+
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
           python-version: '3.x'
-          
+
       - name: Install Python dependencies
         run: |
           python3 -m pip install --upgrade pip
           pip install --upgrade platformio setuptools cpplint
-          
+
       - name: Verify installations
         run: |
           node --version
