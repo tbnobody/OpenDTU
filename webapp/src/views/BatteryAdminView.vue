@@ -435,7 +435,7 @@
                                 v-model="batteryConfigList.zendure.output_control"
                             >
                                 <option :key="0" :value="0">
-                                    {{ $t('batteryadmin.ZendureOutputMode' + zendureOutputControlList[0].value) }}
+                                    {{ $t('batteryadmin.ZendureOutputMode' + zendureOutputControlList[0]?.value) }}
                                 </option>
                                 <option
                                     :key="1"
@@ -445,10 +445,10 @@
                                         batteryConfigList.zendure.control_mode == 1
                                     "
                                 >
-                                    {{ $t('batteryadmin.ZendureOutputMode' + zendureOutputControlList[1].value) }}
+                                    {{ $t('batteryadmin.ZendureOutputMode' + zendureOutputControlList[1]?.value) }}
                                 </option>
                                 <option :key="2" :value="2" v-if="batteryConfigList.zendure.control_mode == 0">
-                                    {{ $t('batteryadmin.ZendureOutputMode' + zendureOutputControlList[2].value) }}
+                                    {{ $t('batteryadmin.ZendureOutputMode' + zendureOutputControlList[2]?.value) }}
                                 </option>
                             </select>
                         </div>

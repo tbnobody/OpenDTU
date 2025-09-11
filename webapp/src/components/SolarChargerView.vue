@@ -202,7 +202,7 @@ export default defineComponent({
                     clearTimeout(this.dataAgeTimers[serial]);
                 }
 
-                const nextMs = 1000 - (this.solarcharger.instances[serial].data_age_ms % 1000);
+                const nextMs = 1000 - ((this.solarcharger?.instances?.[serial]?.data_age_ms ?? 0) % 1000);
                 this.dataAgeTimers[serial] = setTimeout(() => {
                     this.doDataAging(serial);
                 }, nextMs);
