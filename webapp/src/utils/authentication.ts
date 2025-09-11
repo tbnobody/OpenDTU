@@ -23,7 +23,7 @@ export function authHeader(): Headers {
 export function authUrl(): string {
     const authdata = getUserAuthData();
     if (authdata) {
-        return encodeURIComponent(atob(authdata)).replace('%3A', ':') + '@';
+        return encodeURIComponent(atob(authdata)).replace(/%3A/g, ':') + '@';
     }
     return '';
 }
