@@ -28,22 +28,19 @@ zero export policy.
 
 | Version | PDL\*) | Temporary Limit | Persistent Limit | Recommendation                  |
 |:--------|:------:|:---------------:|:----------------:|---------------------------------|
-| 1.0.x   | ❌     | ✅              | ✅               | Best Option if PDL not required |
-| 1.1.12  | ✅     | ✅              | ❌               | Not recommended                 |
+| 1.0.x   | ❌     | ✅              | ✅               | Good Option if PDL not required |
+| 1.1.12  | ✅     | ✅              | ✅               | Best Option                     |
 | 2.0.4   | ❌     | ❌              | ❌               | Avoid/Downgrade                 |
 
 \*) PDL = Power Distribution Logic, i.e., the inverter's ability to limit the
 inputs individually to achieve the desired AC output power.
 
 **Key Issues:**
-- **Version 1.1.12**: PDL works fine, but persistent limit changes are not
-  supported ([#1890](https://github.com/hoylabs/OpenDTU-OnBattery/issues/1890)).
 - **Version 2.0.4**: Inverter reports 100% power limit after 4 minutes without
   limit updates, causing the DPL to stop working
   ([#1901](https://github.com/hoylabs/OpenDTU-OnBattery/issues/1901)).
 
-**Recommendation**: Version 1.1.12 has working PDL but is still not recommended
-due to persistent limit issues. Avoid version 2.0.4 completely.
+**Recommendation**: Avoid version 2.0.4 completely.
 
 ## ⚠️  About Hardware For Sale
 
