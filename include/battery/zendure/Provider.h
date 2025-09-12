@@ -24,7 +24,7 @@ private:
     uint16_t setInverterMax(uint16_t limit) const;
     void shutdown() const;
 
-    bool checkChargeThrough(uint32_t predictHours = 0U);
+    void checkChargeThrough(uint32_t predictHours = 0U);
 
     void timesync();
     static String parseVersion(uint32_t version);
@@ -44,7 +44,7 @@ private:
     void publishProperties(const String& topic, Arg&&... args) const;
 
     void setSoC(const float soc, const uint32_t timestamp = 0, const uint8_t precision = 2);
-    bool setChargeThrough(const bool value, const bool publish = true);
+    void setChargeThroughState(const ChargeThroughState value, const bool publish = true);
 
     void rescheduleSunCalc() { _nextSunCalc = 0; }
     bool alive() const { return _stats->getAgeSeconds() < ZENDURE_ALIVE_SECONDS; }

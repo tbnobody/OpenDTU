@@ -21,7 +21,7 @@ bool Provider::init()
     auto const& config = Configuration.get();
     String deviceType = String();
 
-    DTU_LOGD("Settings %d", config.Battery.Zendure.DeviceType);
+    DTU_LOGD("Settings %" PRIu8, config.Battery.Zendure.DeviceType);
     {
         String deviceName = String();
         switch (config.Battery.Zendure.DeviceType) {
@@ -140,7 +140,7 @@ bool Provider::init()
 
     // disable charge through cycle if disable by config
     if (!config.Battery.Zendure.ChargeThroughEnable) {
-        setChargeThrough(false);
+        setChargeThroughState(ChargeThroughState::Disabled);
     }
 
     // check if we are allowed to write stuff
@@ -233,14 +233,21 @@ void Provider::loop()
         }
 
         // ensure charge through settings
-        if (_stats->_charge_through_state.value_or(false) && config.Battery.Zendure.ChargeThroughEnable) {
-            setTargetSoCs(config.Battery.Zendure.MinSoC, 100);
-            setOutputLimit(0);
-        }else{
-            setTargetSoCs(config.Battery.Zendure.MinSoC, config.Battery.Zendure.MaxSoC);
-            if (config.Battery.Zendure.OutputControl == BatteryZendureConfig::ZendureBatteryOutputControl::ControlFixed) {
-                setOutputLimit(min(config.Battery.Zendure.MaxOutput, config.Battery.Zendure.OutputLimit));
-            }
+        switch (_stats->_charge_through_state.value_or(ChargeThroughState::Disabled)) {
+            case ChargeThroughState::Soft:
+            case ChargeThroughState::Keep:
+                setTargetSoCs(config.Battery.Zendure.MinSoC, 100);
+                break;
+            case ChargeThroughState::Hard:
+                setTargetSoCs(config.Battery.Zendure.MinSoC, 100);
+                setOutputLimit(0);
+                break;
+            default:
+                setTargetSoCs(config.Battery.Zendure.MinSoC, config.Battery.Zendure.MaxSoC);
+                if (config.Battery.Zendure.OutputControl == BatteryZendureConfig::ZendureBatteryOutputControl::ControlFixed) {
+                    setOutputLimit(min(config.Battery.Zendure.MaxOutput, config.Battery.Zendure.OutputLimit));
+                }
+                break;
         }
     }
 
@@ -282,28 +289,59 @@ void Provider::writeSettings() {
 void Provider::calculateFullChargeAge()
 {
     time_t now;
-    if (Utils::getEpoch(&now) && _stats->_last_full_timestamp.has_value()) {
+    if (!Utils::getEpoch(&now)) {
+        return;
+    }
+
+    if(_stats->_last_full_timestamp.has_value()) {
         auto last_full = *(_stats->_last_full_timestamp);
         uint32_t age = now > last_full  ? (now - last_full) / 3600U : 0U;
 
         DTU_LOGD("Now: %ld, LastFull: %" PRIu64 ", Diff: %" PRIu32, now, last_full, age);
 
         // store for webview
-        _stats->_last_full_charge_hours = age;
+        _stats->_last_full_hours = age;
     }
+
+    if(_stats->_last_empty_timestamp.has_value()) {
+        auto last_empty = *(_stats->_last_empty_timestamp);
+        uint32_t age = now > last_empty  ? (now - last_empty) / 3600U : 0U;
+
+        DTU_LOGD("Now: %ld, LastEmpty: %" PRIu64 ", Diff: %" PRIu32, now, last_empty, age);
+
+        // store for webview
+        _stats->_last_empty_hours = age;
+    }
+
 }
 
-bool Provider::checkChargeThrough(uint32_t predictHours /* = 0 */)
+void Provider::checkChargeThrough(uint32_t predictHours /* = 0 */)
 {
     auto const& config = Configuration.get();
-    if (config.Battery.Zendure.ChargeThroughEnable && (
-        !_stats->_last_full_timestamp.has_value() ||
-        _stats->_last_full_charge_hours.value_or(0) + predictHours > config.Battery.Zendure.ChargeThroughInterval )
-    ) {
-        return setChargeThrough(true);
+    if (!config.Battery.Zendure.ChargeThroughEnable) {
+        return;
     }
 
-    return false;
+
+    // hard charge through will start after configured interval (given in hours)
+    auto hardChargeThrough = config.Battery.Zendure.ChargeThroughInterval;
+
+    // soft charge through will be triggered one day (aka. 24 hours) before hard charge through
+    auto softChargeThrough = hardChargeThrough - 24;
+
+    auto currentValue      = _stats->_last_full_hours.value_or(0) + predictHours;
+    auto noValue           = !_stats->_last_full_timestamp.has_value();
+
+    if (noValue || currentValue > hardChargeThrough) {
+        return setChargeThroughState(ChargeThroughState::Hard);
+    }
+
+    if (noValue || currentValue > softChargeThrough) {
+        return setChargeThroughState(ChargeThroughState::Soft);
+    }
+
+    // force IDLE state to prevent sticking at KEEP state
+    setChargeThroughState(ChargeThroughState::Idle);
 }
 
 void Provider::setTargetSoCs(const float soc_min, const float soc_max)
@@ -341,19 +379,20 @@ uint16_t Provider::setOutputLimit(uint16_t limit) const
     // force valid limit and ensure fixed output is always dominant
     if (config.Battery.Zendure.OutputControl == BatteryZendureConfig::ZendureBatteryOutputControl::ControlFixed) {
         limit = config.Battery.Zendure.OutputLimit;
-    } else {
-        limit = min(config.Battery.Zendure.MaxOutput, limit);
     }
 
     // enforce output limit during charge through
-    if (_stats->_charge_through_state.value_or(false)) {
+    if (_stats->_charge_through_state.value_or(ChargeThroughState::Disabled) == ChargeThroughState::Hard) {
         limit = 0;
     }
+
+    // keep limit below MaxOutput
+    limit = min(config.Battery.Zendure.MaxOutput, limit);
 
     if (_stats->_output_limit != limit) {
         limit = calcOutputLimit(limit);
         publishProperty(_topicWrite, ZENDURE_REPORT_OUTPUT_LIMIT, String(limit));
-        DTU_LOGD("Adjusting outputlimit from %d W to %d W", _stats->_output_limit, limit);
+        DTU_LOGD("Adjusting outputlimit from %" PRIu32 " W to %" PRIu32 " W", _stats->_output_limit, limit);
     }
 
     return limit;
@@ -368,7 +407,7 @@ uint16_t Provider::setInverterMax(uint16_t limit) const
     if (_stats->_inverse_max != limit) {
         limit = calcOutputLimit(limit);
         publishProperty(_topicWrite, ZENDURE_REPORT_INVERSE_MAX_POWER, String(limit));
-        DTU_LOGD("Adjusting inverter max output from %d W to %d W", _stats->_inverse_max, limit);
+        DTU_LOGD("Adjusting inverter max output from %" PRIu32 " W to %" PRIu32 " W", _stats->_inverse_max, limit);
     }
 
     return limit;
@@ -421,30 +460,30 @@ void Provider::timesync()
     }
 }
 
-bool Provider::setChargeThrough(const bool value, const bool publish /* = true */)
+void Provider::setChargeThroughState(const ChargeThroughState value, const bool publish /* = true */)
 {
-    if (!_stats->_charge_through_state.has_value() || value != _stats->_charge_through_state) {
-        _stats->_charge_through_state = value;
-        DTU_LOGD("%s charge-through mode!", value ? "Enabling" : "Disabling");
-        if (publish) {
-            publishPersistentSettings(ZENDURE_PERSISTENT_SETTINGS_CHARGE_THROUGH, value ? "1" : "0");
-        }
-
-        // re-run suncalc to force updates in schedule mode
-        rescheduleSunCalc();
+    if (_stats->_charge_through_state.has_value() && value == *_stats->_charge_through_state) {
+        return;
     }
 
-    return value;
+    _stats->_charge_through_state = value;
+    DTU_LOGD("Setting charge-through mode to '%s'!", Stats::chargeThroughStateToString(value));
+    if (publish) {
+        publishPersistentSettings(ZENDURE_PERSISTENT_SETTINGS_CHARGE_THROUGH, String(Stats::chargeThroughStateToString(value)));
+    }
+
+    // re-run suncalc to force updates in schedule mode
+    rescheduleSunCalc();
 }
 
 void Provider::onMqttMessagePersistentSettings(espMqttClientTypes::MessageProperties const& properties,
         char const* topic, uint8_t const* payload, size_t len)
 {
     String t(topic);
-    String p(reinterpret_cast<const char*>(payload), len);
-    auto integer = static_cast<uint64_t>(p.toInt());
+    String string(reinterpret_cast<const char*>(payload), len);
+    auto integer = static_cast<uint64_t>(string.toInt());
 
-    DTU_LOGD("Received Persistent Settings %s = %s [aka %" PRId64 "]", topic, p.substring(0, 32).c_str(), integer);
+    DTU_LOGD("Received Persistent Settings %s = %s [aka %" PRId64 "]", topic, string.substring(0, 32).c_str(), integer);
 
     if (t.endsWith(ZENDURE_PERSISTENT_SETTINGS_LAST_FULL) && integer) {
         _stats->_last_full_timestamp = integer;
@@ -455,7 +494,18 @@ void Provider::onMqttMessagePersistentSettings(espMqttClientTypes::MessageProper
         return;
     }
     if (t.endsWith(ZENDURE_PERSISTENT_SETTINGS_CHARGE_THROUGH)) {
-        setChargeThrough(integer > 0, false);
+        // only accept state from MQTT if not set during init
+        if (_stats->_charge_through_state.has_value()) { return; }
+
+        auto mode = Stats::chargeThroughStateFromString(string);
+        if (mode.has_value()) {
+            // interpret recent values if decodeable
+            setChargeThroughState(*mode, false);
+        } else {
+            // otherwise, interpret legacy values that might be stored on broker
+            setChargeThroughState(integer > 0 ? ChargeThroughState::Hard : ChargeThroughState::Idle, false);
+        }
+
         return;
     }
 }
@@ -835,7 +885,7 @@ String Provider::parseVersion(uint32_t version)
     uint8_t bugfix = version & 0xFF;
 
     char buffer[16];
-    snprintf(buffer, sizeof(buffer), "%d.%d.%d", major, minor, bugfix);
+    snprintf(buffer, sizeof(buffer), "%" PRIu32 ".%" PRIu32 ".%" PRIu32, major, minor, bugfix);
     return String(buffer);
 }
 
@@ -871,7 +921,13 @@ void Provider::setSoC(const float soc, const uint32_t timestamp /* = 0 */, const
         if (soc >= 100.0) {
             _stats->_last_full_timestamp = now;
             publishPersistentSettings(ZENDURE_PERSISTENT_SETTINGS_LAST_FULL, String(now));
-            publishPersistentSettings(ZENDURE_PERSISTENT_SETTINGS_CHARGE_THROUGH, "0");
+
+            if (Configuration.get().Battery.Zendure.ChargeThroughEnable) {
+                setChargeThroughState(ChargeThroughState::Keep);
+            }
+        }
+        if (soc < static_cast<float>(Configuration.get().Battery.Zendure.ChargeThroughResetLevel) && _stats->_charge_through_state.value_or(ChargeThroughState::Disabled) == ChargeThroughState::Keep) {
+            setChargeThroughState(ChargeThroughState::Idle);
         }
         if (soc <= 0.0) {
             _stats->_last_empty_timestamp = now;

@@ -1032,7 +1032,6 @@
         "remainOutTime": "Remaining discharge time",
         "remainInTime": "Remaining charge time",
         "unavail": "N/A",
-        "useableCapacity": "Useable capacity",
-        "chargethrough": "Charge through cycle"
+        "useableCapacity": "Useable capacity"
     }
 }

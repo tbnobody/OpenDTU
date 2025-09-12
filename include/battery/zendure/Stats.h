@@ -4,7 +4,10 @@
 #include <MqttSettings.h>
 #include <battery/Stats.h>
 #include <map>
+#include <optional>
 #include <Configuration.h>
+#include <frozen/string.h>
+#include <frozen/map.h>
 
 namespace Batteries::Zendure {
 
@@ -22,10 +25,52 @@ enum class BypassMode : uint8_t {
     Invalid     = 255
 };
 
+enum class ChargeThroughState : uint8_t {
+    Disabled = 0,   // ChargeThrough is disabled by configuration
+    Idle = 1,       // ChargeThrough is in standby
+    Soft = 2,       // ChargeThrough trying to charge battery to 100 % during normal operation
+    Hard = 3,       // ChargeThrough enforcing battery charging to 100 % while setting OutputLimit to 0 W
+    Keep = 4        // ChargeThrough keeping target at 100% till discharing or new day begins
+};
+
+static constexpr frozen::map<ChargeThroughState, const char*, 5> _chargeThroughStateStrings {
+    { ChargeThroughState::Disabled, "disabled" },
+    { ChargeThroughState::Idle,     "idle" },
+    { ChargeThroughState::Soft,     "soft" },
+    { ChargeThroughState::Hard,     "hard" },
+    { ChargeThroughState::Keep,     "keep" }
+};
+
 class PackStats;
 
 class Stats : public ::Batteries::Stats {
     friend class Provider;
+
+    static const char* chargeThroughStateToString(std::optional<ChargeThroughState> mode) {
+        if (!mode.has_value()) {
+            return "invalid";
+        }
+
+        return chargeThroughStateToString(*mode);
+    }
+
+    static const char* chargeThroughStateToString(ChargeThroughState mode) {
+        if (_chargeThroughStateStrings.contains(mode)) {
+            return _chargeThroughStateStrings.at(mode);
+        }
+
+        return "invalid";
+    }
+
+    static std::optional<ChargeThroughState> chargeThroughStateFromString(String value) {
+        for (auto entry : _chargeThroughStateStrings) {
+            if (String(entry.second) == value) {
+                return entry.first;
+            }
+        }
+
+        return std::nullopt;
+    }
 
     static const char* controlModeToString(uint8_t controlMode) {
         switch (controlMode) {
@@ -256,9 +301,10 @@ private:
     bool _buzzer = false;
 
     std::optional<uint64_t> _last_full_timestamp = std::nullopt;
-    std::optional<uint32_t> _last_full_charge_hours = std::nullopt;
+    std::optional<uint32_t> _last_full_hours = std::nullopt;
     std::optional<uint64_t> _last_empty_timestamp = std::nullopt;
-    std::optional<bool>  _charge_through_state = std::nullopt;
+    std::optional<uint32_t> _last_empty_hours = std::nullopt;
+    std::optional<ChargeThroughState>  _charge_through_state = std::nullopt;
 };
 
 class PackStats {

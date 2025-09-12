@@ -157,6 +157,7 @@ void ConfigurationClass::serializeBatteryZendureConfig(BatteryZendureConfig cons
     target["charge_through_interval"] = source.ChargeThroughInterval;
     target["buzzer_enable"] = source.BuzzerEnable;
     target["control_mode"] = source.ControlMode;
+    target["charge_through_reset"] = source.ChargeThroughResetLevel;
 }
 
 void ConfigurationClass::serializeBatteryMqttConfig(BatteryMqttConfig const& source, JsonObject& target)
@@ -577,6 +578,7 @@ void ConfigurationClass::deserializeBatteryZendureConfig(JsonObject const& sourc
     target.SunriseOffset = source["sunrise_offset"] | BATTERY_ZENDURE_SUNRISE_OFFSET;
     target.SunsetOffset = source["sunset_offset"] | BATTERY_ZENDURE_SUNSET_OFFSET;
     target.ChargeThroughEnable = source["charge_through_enable"] | BATTERY_ZENDURE_CHARGE_THROUGH_ENABLE;
+    target.ChargeThroughResetLevel = source["charge_through_reset"] | BATTERY_ZENDURE_CHARGE_THROUGH_RESET_LEVEL;
     target.ChargeThroughInterval = source["charge_through_interval"] | BATTERY_ZENDURE_CHARGE_THROUGH_INTERVAL;
     target.BuzzerEnable = source["buzzer_enable"] |BATTERY_ZENDURE_BUZZER_ENABLE;
     target.ControlMode = source["control_mode"] | BatteryZendureConfig::ControlMode::ControlModeFull;

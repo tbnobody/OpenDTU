@@ -25,8 +25,9 @@ void Stats::getLiveViewData(JsonVariant& root) const
     addLiveViewTextInSection(root, section, "state", std::string(stateToString(_state)));
     addLiveViewBooleanInSection(root, section, "heatState", _heat_state);
     addLiveViewBooleanInSection(root, section, "bypassState", _bypass_state);
-    addLiveViewBooleanInSection(root, section, "chargethrough", _charge_through_state);
-    addLiveViewInSection(root, section, "lastFullCharge", _last_full_charge_hours, "h", 0);
+    addLiveViewTextInSection(root, section, "zendure.chargeThroughState", "zendure.chargeThroughStates." + std::string(chargeThroughStateToString(_charge_through_state)));
+    addLiveViewInSection(root, section, "lastFullCharge", _last_full_hours, "h", 0);
+    addLiveViewInSection(root, section, "lastEmptyCharge", _last_empty_hours, "h", 0);
     addLiveViewInSection(root, section, "remainOutTime", _remain_out_time, "min", 0);
     addLiveViewInSection(root, section, "remainInTime", _remain_in_time, "min", 0);
 
@@ -112,7 +113,10 @@ void Stats::mqttPublish() const
     publish("battery/outputPower", _output_power);
     publish("battery/inputPower", _input_power);
     publish("battery/bypass", static_cast<uint8_t>(_bypass_state));
-    publish("battery/lastFullCharge", _last_full_charge_hours);
+    publish("battery/lastFullCharge", _last_full_hours);
+    publish("battery/lastEmpty", _last_empty_hours);
+
+    publish("battery/chargeThroughState", String(chargeThroughStateToString(_charge_through_state)));
 
     publish("battery/settings/controlMode", String(controlModeToString(config.Battery.Zendure.ControlMode)));
     publish("battery/settings/outputLimitPower", _output_limit);

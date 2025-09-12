@@ -17,6 +17,7 @@ export interface BatteryZendureConfig {
     charge_through_interval: number;
     buzzer_enable: boolean;
     control_mode: number;
+    charge_through_reset: number;
 }
 
 export interface BatteryMqttConfig {

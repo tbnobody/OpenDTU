@@ -821,9 +821,6 @@
         "ZendureSunsetOffset": "@:ntpinfo.Sunset offset",
         "ZendureOutputLimitDay": "@:batteryadmin.ZendureOutputLimit (@:ntpinfo.Day)",
         "ZendureOutputLimitNight": "@:batteryadmin.ZendureOutputLimit (@:ntpinfo.Night)",
-        "ZendureChargeThrough": "Charge Through Settings",
-        "ZendureChargeThroughEnabled": "Charge Through",
-        "ZendureChargeThroughInterval": "Maximum time without full charge",
         "zendure": {
             "deviceTypes": {
                 "Hub1200": "Hub 1200",
@@ -839,7 +836,11 @@
                 "Full": "Full control",
                 "Once": "Write settings only once",
                 "ReadOnly": "Read-Only"
-            }
+            },
+            "chargeThrough": "Charge Through Settings",
+            "chargeThroughEnabled": "Charge Through",
+            "chargeThroughInterval": "Maximum time without full charge",
+            "chargeThroughReset": "Reset Threshold"
         }
     },
     "inverteradmin": {
@@ -1229,6 +1230,7 @@
         "midpointVoltage": "Midpoint Voltage",
         "midpointDeviation": "Midpoint Deviation",
         "lastFullCharge": "Last full Charge",
+        "lastEmptyCharge": "Last empty",
         "solarInputPower1": "MPPT1 power",
         "solarInputPower2": "MPPT2 power",
         "totalInputPower": "Total input power",
@@ -1264,10 +1266,20 @@
         "remainInTime": "Remaining charge time",
         "unavail": "N/A",
         "useableCapacity": "Useable capacity",
-        "chargethrough": "Charge through cycle",
         "controlMode": "@:batteryadmin.zendure.controlMode",
         "full-access": "@:batteryadmin.zendure.controlModes.Full",
         "write-once": "Write Once",
-        "read-only": "@:batteryadmin.zendure.controlModes.ReadOnly"
+        "read-only": "@:batteryadmin.zendure.controlModes.ReadOnly",
+        "zendure": {
+            "chargeThroughState": "Charge through state",
+            "chargeThroughStates": {
+                "disabled": "@:battery.disabled",
+                "idle": "@:battery.idle",
+                "soft": "Soft",
+                "hard": "Hard",
+                "keep": "Hold",
+                "invalid": "@:battery.invalid"
+            }
+        }
     }
 }

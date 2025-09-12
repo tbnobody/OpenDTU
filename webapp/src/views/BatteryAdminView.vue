@@ -403,21 +403,34 @@
                 </CardElement>
 
                 <template v-if="batteryConfigList.zendure.control_mode == 0">
-                    <CardElement :text="$t('batteryadmin.ZendureChargeThrough')" textVariant="text-bg-primary" addSpace>
+                    <CardElement
+                        :text="$t('batteryadmin.zendure.chargeThrough')"
+                        textVariant="text-bg-primary"
+                        addSpace
+                    >
                         <InputElement
-                            :label="$t('batteryadmin.ZendureChargeThroughEnabled')"
+                            :label="$t('batteryadmin.zendure.chargeThroughEnabled')"
                             v-model="batteryConfigList.zendure.charge_through_enable"
                             type="checkbox"
                         />
                         <template v-if="batteryConfigList.zendure.charge_through_enable">
                             <InputElement
-                                :label="$t('batteryadmin.ZendureChargeThroughInterval')"
+                                :label="$t('batteryadmin.zendure.chargeThroughInterval')"
                                 v-model="batteryConfigList.zendure.charge_through_interval"
                                 type="number"
                                 min="0"
                                 max="8766"
                                 step="1"
                                 :postfix="$t('batteryadmin.Hours')"
+                            />
+                            <InputElement
+                                :label="$t('batteryadmin.zendure.chargeThroughReset')"
+                                v-model="batteryConfigList.zendure.charge_through_reset"
+                                type="number"
+                                min="25"
+                                max="100"
+                                step="1"
+                                :postfix="$t('batteryadmin.Percent')"
                             />
                         </template>
                     </CardElement>
