@@ -30,7 +30,7 @@ zero export policy.
 |:--------|:------:|:---------------:|:----------------:|---------------------------------|
 | 1.0.x   | ❌     | ✅              | ✅               | Good Option if PDL not required |
 | 1.1.12  | ✅     | ✅              | ✅               | Best Option                     |
-| 2.0.4   | ❌     | ❌              | ❌               | Avoid/Downgrade                 |
+| 2.0.4   | ❌     | ❌              | ✅               | Avoid/Downgrade                 |
 
 \*) PDL = Power Distribution Logic, i.e., the inverter's ability to limit the
 inputs individually to achieve the desired AC output power.
