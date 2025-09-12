@@ -9,6 +9,7 @@
 #include <string>
 #include <LogHelper.h>
 
+#undef TAG
 static const char* TAG = "dynamicPowerLimiter";
 static const char* SUBTAG = "MQTT";
 

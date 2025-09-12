@@ -19,6 +19,7 @@
 #include "SunPosition.h"
 #include <LogHelper.h>
 
+#undef TAG
 static const char* TAG = "dynamicPowerLimiter";
 static const char* SUBTAG = "Controller";
 

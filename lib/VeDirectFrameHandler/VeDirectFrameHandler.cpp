@@ -40,6 +40,7 @@
 // The name of the record that contains the checksum.
 static constexpr char checksumTagName[] = "CHECKSUM";
 
+#undef TAG
 static const char* TAG = "veDirect";
 #define SUBTAG _logId
 

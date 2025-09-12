@@ -2,6 +2,7 @@
 #include <battery/jkbms/SerialMessage.h>
 #include <LogHelper.h>
 
+#undef TAG
 static const char* TAG = "battery";
 static const char* SUBTAG = "JK BMS";
 

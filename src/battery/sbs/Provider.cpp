@@ -5,6 +5,7 @@
 #include <ctime>
 #include <LogHelper.h>
 
+#undef TAG
 static const char* TAG = "battery";
 static const char* SUBTAG = "SBS";
 

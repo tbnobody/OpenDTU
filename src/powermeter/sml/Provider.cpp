@@ -2,6 +2,7 @@
 #include <powermeter/sml/Provider.h>
 #include <LogHelper.h>
 
+#undef TAG
 static const char* TAG = "powerMeter";
 #define SUBTAG _user
 

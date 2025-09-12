@@ -8,6 +8,7 @@
 #include <ESPmDNS.h>
 #include <LogHelper.h>
 
+#undef TAG
 static const char* TAG = "powerMeter";
 static const char* SUBTAG = "HTTP/JSON";
 

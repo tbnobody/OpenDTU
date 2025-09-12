@@ -5,6 +5,7 @@
 #include <Utils.h>
 #include <LogHelper.h>
 
+#undef TAG
 static const char* TAG = "solarCharger";
 static const char* SUBTAG = "MQTT";
 

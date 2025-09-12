@@ -13,6 +13,7 @@
 
 //#define PROCESS_NETWORK_STATE
 
+#undef TAG
 static const char* TAG = "veDirect";
 #define SUBTAG _logId
 

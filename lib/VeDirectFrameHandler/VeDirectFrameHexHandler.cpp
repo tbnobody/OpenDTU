@@ -18,6 +18,7 @@ HexHandler.cpp
 #include "VeDirectFrameHandler.h"
 #include <LogHelper.h>
 
+#undef TAG
 static const char* TAG = "veDirect";
 #define SUBTAG _logId
 

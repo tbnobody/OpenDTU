@@ -1,6 +1,7 @@
 #include "PowerLimiterOverscalingInverter.h"
 #include <LogHelper.h>
 
+#undef TAG
 static const char* TAG = "dynamicPowerLimiter";
 #define SUBTAG _logPrefix
 

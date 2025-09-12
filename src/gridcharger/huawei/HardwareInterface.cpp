@@ -6,6 +6,7 @@
 #include <LogHelper.h>
 #include <sstream>
 
+#undef TAG
 static const char* TAG = "gridCharger";
 static const char* SUBTAG = "HwIfc";
 

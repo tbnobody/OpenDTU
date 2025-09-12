@@ -10,6 +10,7 @@
 #include <SerialPortManager.h>
 #include <frozen/map.h>
 
+#undef TAG
 static const char* TAG = "battery";
 static const char* SUBTAG = "JBD BMS";
 

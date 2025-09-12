@@ -4,6 +4,7 @@
 #include <driver/twai.h>
 #include <LogHelper.h>
 
+#undef TAG
 static const char* TAG = "battery";
 #define SUBTAG _providerName
 

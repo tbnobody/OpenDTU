@@ -7,6 +7,7 @@
 #include <driver/twai.h>
 #include <LogHelper.h>
 
+#undef TAG
 static const char* TAG = "gridCharger";
 static const char* SUBTAG = "TWAI";
 

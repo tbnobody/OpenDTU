@@ -7,6 +7,7 @@
 #include <solarcharger/mqtt/Provider.h>
 #include <LogHelper.h>
 
+#undef TAG
 static const char* TAG = "solarCharger";
 static const char* SUBTAG = "Controller";
 
