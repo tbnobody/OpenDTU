@@ -5,3 +5,4 @@ logs/device-monitor*.log
 platformio_override.ini
 webapp_dist/
 .DS_Store
+/test/test_overscaling

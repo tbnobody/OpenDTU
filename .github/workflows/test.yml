@@ -1,0 +1,39 @@
+name: OpenDTU-OnBattery Tests
+
+permissions:
+  contents: read
+
+on:
+  push:
+    paths-ignore:
+      - docs/**
+      - '**/*.md'
+    branches:
+      - master
+      - development
+    tags-ignore:
+      - 'v**'
+  pull_request:
+    paths-ignore:
+      - docs/**
+      - '**/*.md'
+
+jobs:
+  test:
+    name: Run Tests
+    runs-on: ubuntu-24.04
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v5
+
+      - name: Install build dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential g++
+
+      - name: Run tests
+        run: |
+          cd test
+          make clean
+          make test

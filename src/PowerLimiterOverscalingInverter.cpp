@@ -1,4 +1,5 @@
 #include "PowerLimiterOverscalingInverter.h"
+#include "OverscalingCalculator.h"
 #include <LogHelper.h>
 
 #undef TAG
@@ -78,78 +79,40 @@ uint16_t PowerLimiterOverscalingInverter::scaleLimit(uint16_t newExpectedOutputW
     // producing very little due to the very low limit.
     if (getCurrentLimitWatts() < dcTotalChnls * 10) { return newExpectedOutputWatts; }
 
-    float requiredOutputThreshold = calculateRequiredOutputThreshold(getCurrentLimitWatts());
-    float currentExpectedMpptPowerAc = (getCurrentLimitWatts() / dcTotalMppts) * requiredOutputThreshold;
-
-    float newRequiredOutputThreshold = calculateRequiredOutputThreshold(newExpectedOutputWatts);
-    float newExpectedMpptPowerAc = (newExpectedOutputWatts / dcTotalMppts) * newRequiredOutputThreshold;
-
-    DTU_LOGD("expected AC power per MPPT %.0f W", currentExpectedMpptPowerAc);
-
-    size_t currentlyShadedMpptCount = 0;
-    float currentlyShadedChannelACPowerSum = 0.0;
-
-    size_t newlyShadedMpptCount = 0;
-    float newlyShadedChannelACPowerSum = 0.0;
-
+    // Convert MPPT data to the format expected by OverscalingCalculator
+    std::vector<OverscalingCalculator::MpptData> mpptData;
     for (auto& m : dcMppts) {
-        float mpptPowerAC = calculateMpptPowerAC(m);
-
-        // currently shaded
-        if (mpptPowerAC < currentExpectedMpptPowerAc) {
-            currentlyShadedMpptCount++;
-            currentlyShadedChannelACPowerSum += mpptPowerAC;
-        }
-
-        // newly shaded
-        if (mpptPowerAC < newExpectedMpptPowerAc) {
-            newlyShadedMpptCount++;
-            newlyShadedChannelACPowerSum += mpptPowerAC;
-        }
+        OverscalingCalculator::MpptData mppt;
+        mppt.powerAC = calculateMpptPowerAC(m);
+        mpptData.push_back(mppt);
     }
 
-    // no shading now or then
-    if (currentlyShadedMpptCount == 0 || newlyShadedMpptCount == 0) {
+    // Calculate thresholds for current and new limits
+    float currentThreshold = calculateRequiredOutputThreshold(getCurrentLimitWatts());
+    float newThreshold = calculateRequiredOutputThreshold(newExpectedOutputWatts);
+
+    // Calculate overscaled limit using the extracted calculator
+    uint16_t overScaledLimit = OverscalingCalculator::calculateOverscaledLimit(
+        getCurrentLimitWatts(), newExpectedOutputWatts, mpptData, getInverterMaxPowerWatts(),
+        currentThreshold, newThreshold);
+
+    if (overScaledLimit <= newExpectedOutputWatts) {
         return newExpectedOutputWatts;
     }
 
-    size_t dcNonShadedMppts = dcTotalMppts - currentlyShadedMpptCount;
-    float shadedChannelACPowerSum = currentlyShadedChannelACPowerSum;
+    // Count newly shaded MPPTs for logging
+    float newExpectedMpptPowerAc = (newExpectedOutputWatts / dcTotalMppts) * newThreshold;
 
-    // all mppts are currently shaded
-    if (dcNonShadedMppts == 0) {
-        if (newExpectedOutputWatts >= getCurrentLimitWatts()) {
-            return newExpectedOutputWatts;
-        }
-
-        // new output is greater than the current output
-        // we can't do anything, so we keep the current limit
-        if (newExpectedOutputWatts >= getCurrentOutputAcWatts()) {
-            return getCurrentLimitWatts();
-        }
-
-        // prepare for overscaling based on newExpectedOutputWatts
-        dcNonShadedMppts = dcTotalMppts - newlyShadedMpptCount;
-        shadedChannelACPowerSum = newlyShadedChannelACPowerSum;
-
-        // newExpectedOutputWatts is smaller than the current output
-        // and all mppts are shaded with the new expected output,
-        // so we keep the current limit
-        if (dcNonShadedMppts == 0) {
-            return getCurrentLimitWatts();
+    size_t newlyShadedMpptCount = 0;
+    for (auto& m : dcMppts) {
+        float mpptPowerAC = calculateMpptPowerAC(m);
+        if (mpptPowerAC < newExpectedMpptPowerAc) {
+            newlyShadedMpptCount++;
         }
     }
 
-    uint16_t limitPerMppt = (newExpectedOutputWatts - shadedChannelACPowerSum) / dcNonShadedMppts;
-    uint16_t overScaledLimit = limitPerMppt * dcTotalMppts;
-
-    // make sure the overscaling does not exceed the inverter's max power
-    overScaledLimit = std::min(overScaledLimit, getInverterMaxPowerWatts());
-
-    if (overScaledLimit <= newExpectedOutputWatts) { return newExpectedOutputWatts; }
-
     DTU_LOGD("%d/%d mppts are not-producing/shaded, scaling %d W",
-            currentlyShadedMpptCount, dcTotalMppts, overScaledLimit);
+            newlyShadedMpptCount, dcTotalMppts, overScaledLimit);
 
     return overScaledLimit;
 }
