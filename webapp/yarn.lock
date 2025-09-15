@@ -625,12 +625,12 @@
   resolved "https://registry.yarnpkg.com/@types/json-schema/-/json-schema-7.0.15.tgz#596a1747233694d50f6ad8a7869fcb6f56cf5841"
   integrity sha512-5+fP8P8MFNC+AyZCDxrB2pkZFPGzqQWUzpSeuuVLvm8VMcorNYavBqoFcxK8bQz4Qsbn4oUEEem4wDLfcysGHA==
 
-"@types/node@^24.2.0":
-  version "24.3.0"
-  resolved "https://registry.yarnpkg.com/@types/node/-/node-24.3.0.tgz#89b09f45cb9a8ee69466f18ee5864e4c3eb84dec"
-  integrity sha512-aPTXCrfwnDLj4VvXrm+UUCQjNEvJgNA8s5F1cvwQU+3KNltTOkBm1j30uNLyqqPNe7gE3KFzImYoZEfLhp4Yow==
+"@types/node@^24.4.0":
+  version "24.4.0"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-24.4.0.tgz#4ca9168c016a55ab15b7765ad1674ab807489600"
+  integrity sha512-gUuVEAK4/u6F9wRLznPUU4WGUacSEBDPoC2TrBkw3GAnOLHBL45QdfHOXp1kJ4ypBGLxTOB+t7NJLpKoC3gznQ==
   dependencies:
-    undici-types "~7.10.0"
+    undici-types "~7.11.0"
 
 "@types/pulltorefreshjs@^0.1.7":
   version "0.1.7"
@@ -2879,10 +2879,10 @@ unbox-primitive@^1.1.0:
     has-symbols "^1.1.0"
     which-boxed-primitive "^1.1.1"
 
-undici-types@~7.10.0:
-  version "7.10.0"
-  resolved "https://registry.yarnpkg.com/undici-types/-/undici-types-7.10.0.tgz#4ac2e058ce56b462b056e629cc6a02393d3ff350"
-  integrity sha512-t5Fy/nfn+14LuOc2KNYg75vZqClpAiqscVvMygNnlsHBFpSXdJaYtXMcdNLpl/Qvc3P2cB3s6lOV51nqsFq4ag==
+undici-types@~7.11.0:
+  version "7.11.0"
+  resolved "https://registry.yarnpkg.com/undici-types/-/undici-types-7.11.0.tgz#075798115d0bbc4e4fc7c173f38727ca66bfb592"
+  integrity sha512-kt1ZriHTi7MU+Z/r9DOdAI3ONdaR3M3csEaRc6ewa4f4dTvX4cQCbJ4NkEn0ohE4hHtq85+PhPSTY+pO/1PwgA==
 
 universalify@^2.0.0:
   version "2.0.1"
