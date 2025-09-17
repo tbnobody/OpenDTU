@@ -2,16 +2,16 @@
 /*
  * Copyright (C) 2024 Holger-Steffen Stapf
  */
-#include <powermeter/udp/victron/Provider.h>
+#include <powermeter/modbus/udp/victron/Provider.h>
 #include <Arduino.h>
 #include <WiFiUdp.h>
 #include <LogHelper.h>
 
 #undef TAG
 static const char* TAG = "powerMeter";
-static const char* SUBTAG = "ModbusUDP/Victron";
+static const char* SUBTAG = "Modbus/UDP/Victron";
 
-namespace PowerMeters::Udp::Victron {
+namespace PowerMeters::Modbus::Udp::Victron {
 
 static constexpr unsigned int modbusPort = 502;  // local port to listen on
 
@@ -212,4 +212,4 @@ void Provider::loop()
     parseModbusResponse();
 }
 
-} // namespace PowerMeters::Udp::Victron
+} // namespace PowerMeters::Modbus::Udp::Victron

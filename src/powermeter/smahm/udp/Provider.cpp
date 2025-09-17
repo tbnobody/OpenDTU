@@ -2,16 +2,16 @@
 /*
  * Copyright (C) 2024 Holger-Steffen Stapf
  */
-#include <powermeter/udp/smahm/Provider.h>
+#include <powermeter/smahm/udp/Provider.h>
 #include <Arduino.h>
 #include <WiFiUdp.h>
 #include <LogHelper.h>
 
 #undef TAG
 static const char* TAG = "powerMeter";
-static const char* SUBTAG = "UDP/SMAHM";
+static const char* SUBTAG = "SMAHM/UDP";
 
-namespace PowerMeters::Udp::SmaHM {
+namespace PowerMeters::SmaHM::Udp {
 
 static constexpr unsigned int multicastPort = 9522;  // local port to listen on
 static const IPAddress multicastIP(239, 12, 255, 254);
@@ -205,4 +205,4 @@ void Provider::loop()
     } while (grouplen > 0 && offset + 4 < buffer + rSize);
 }
 
-} // namespace PowerMeters::Udp::SmaHM
+} // namespace PowerMeters::SmaHM::Udp

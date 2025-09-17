@@ -19,7 +19,7 @@ public:
         SERIAL_SML = 4,
         SMAHM2 = 5,
         HTTP_SML = 6,
-        UDP_VICTRON = 7
+        MODBUS_UDP_VICTRON = 7
     };
 
     // returns true if the provider is ready for use, false otherwise

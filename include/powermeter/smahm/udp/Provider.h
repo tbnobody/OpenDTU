@@ -7,7 +7,7 @@
 #include <cstdint>
 #include <powermeter/Provider.h>
 
-namespace PowerMeters::Udp::SmaHM {
+namespace PowerMeters::SmaHM::Udp {
 
 class Provider : public ::PowerMeters::Provider {
 public:
@@ -26,4 +26,4 @@ private:
     uint32_t _serial = 0;
 };
 
-} // namespace PowerMeters::Udp::SmaHM
+} // namespace PowerMeters::SmaHM::Udp

@@ -151,7 +151,7 @@ void WebApiPowerMeterClass::onAdminPost(AsyncWebServerRequest* request)
         }
     }
 
-    if (static_cast<::PowerMeters::Provider::Type>(root["source"].as<uint8_t>()) == ::PowerMeters::Provider::Type::UDP_VICTRON) {
+    if (static_cast<::PowerMeters::Provider::Type>(root["source"].as<uint8_t>()) == ::PowerMeters::Provider::Type::MODBUS_UDP_VICTRON) {
         JsonObject udpVictron = root["udp_victron"];
         if (!udpVictron["ip_address"].is<String>()
                 || udpVictron["ip_address"].as<String>().length() == 0) {

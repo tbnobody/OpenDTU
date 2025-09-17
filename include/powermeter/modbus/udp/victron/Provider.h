@@ -8,7 +8,7 @@
 #include <Configuration.h>
 #include <powermeter/Provider.h>
 
-namespace PowerMeters::Udp::Victron {
+namespace PowerMeters::Modbus::Udp::Victron {
 
 class Provider : public ::PowerMeters::Provider {
 public:
@@ -26,4 +26,4 @@ private:
     PowerMeterUdpVictronConfig _cfg;
 };
 
-} // namespace PowerMeters::Udp::Victron
+} // namespace PowerMeters::Modbus::Udp::Victron
