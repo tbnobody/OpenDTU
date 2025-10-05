@@ -4,7 +4,6 @@
 #include <Configuration.h>
 #include <gridcharger/huawei/HardwareInterface.h>
 #include <LogHelper.h>
-#include <sstream>
 
 #undef TAG
 static const char* TAG = "gridCharger";
@@ -214,7 +213,7 @@ void HardwareInterface::requestDeviceConfig()
     });
 }
 
-bool HardwareInterface::readRectifierState(can_message_t const& msg)
+bool HardwareInterface::readRectifierState(can_message_t const& msg) const
 {
     // we will receive a bunch of messages with CAN ID 0x1081407F,
     // and one (the last one) with ID 0x1081407E.
@@ -310,7 +309,7 @@ bool HardwareInterface::readRectifierState(can_message_t const& msg)
     return true;
 }
 
-bool HardwareInterface::readAcks(can_message_t const& msg)
+bool HardwareInterface::readAcks(can_message_t const& msg) const
 {
     if (msg.canId != 0x1081807e) { return false; }
 

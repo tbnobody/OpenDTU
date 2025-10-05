@@ -3,7 +3,8 @@
  * Copyright (C) 2022-2024 Thomas Basler and others
  */
 #include "WebApi_gridcharger.h"
-#include <gridcharger/huawei/Controller.h>
+#include <gridcharger/Controller.h>
+#include <gridcharger/huawei/Provider.h>
 #include "Configuration.h"
 #include "PinMapping.h"
 #include "WebApi.h"
@@ -32,7 +33,7 @@ void WebApiGridChargerClass::onStatus(AsyncWebServerRequest* request)
 
     AsyncJsonResponse* response = new AsyncJsonResponse();
     auto& root = response->getRoot();
-    HuaweiCan.getJsonData(root);
+    GridCharger.getStats()->getLiveViewData(root);
 
     response->setLength();
     request->send(response);
@@ -68,23 +69,35 @@ void WebApiGridChargerClass::onLimitPost(AsyncWebServerRequest* request)
             return false;
         }
 
-        HuaweiCan.setParameter(value, setting);
-        return true;
+        // Only call Huawei-specific methods when Huawei provider is active
+        auto const& config = Configuration.get();
+        if (config.GridCharger.Provider == GridChargerProviderType::HUAWEI) {
+            auto* huaweiProvider = GridCharger.getProvider<GridChargers::Huawei::Provider>();
+            if (huaweiProvider) {
+                huaweiProvider->setParameter(value, setting);
+                return true;
+            }
+        }
+
+        retMsg["message"] = "Current provider does not support this feature!";
+        retMsg["code"] = WebApiError::GenericNoValueFound;
+        WebApi.sendJsonResponse(request, response, __FUNCTION__, __LINE__);
+        return false;
     };
 
-    using Controller = GridChargers::Huawei::Controller;
+    using Provider = GridChargers::Huawei::Provider;
 
     if (!applySetting("voltage",
-        Controller::MIN_ONLINE_VOLTAGE,
-        Controller::MAX_ONLINE_VOLTAGE,
+        Provider::MIN_ONLINE_VOLTAGE,
+        Provider::MAX_ONLINE_VOLTAGE,
         WebApiError::R48xxVoltageLimitOutOfRange,
         Setting::OnlineVoltage)) {
         return;
     }
 
     if (!applySetting("current",
-        Controller::MIN_ONLINE_CURRENT,
-        Controller::MAX_ONLINE_CURRENT,
+        Provider::MIN_ONLINE_CURRENT,
+        Provider::MAX_ONLINE_CURRENT,
         WebApiError::R48xxCurrentLimitOutOfRange,
         Setting::OnlineCurrent)) {
         return;
@@ -119,12 +132,25 @@ void WebApiGridChargerClass::onPowerPost(AsyncWebServerRequest* request)
     }
 
     bool power = root["power"].as<bool>();
-    HuaweiCan.setProduction(power);
 
-    retMsg["type"] = "success";
-    retMsg["message"] = "Power production " + String(power ? "en" : "dis") + "abled!";
-    retMsg["code"] = WebApiError::GenericSuccess;
+    // Only call Huawei-specific methods when Huawei provider is active
+    auto const& config = Configuration.get();
+    if (config.GridCharger.Provider == GridChargerProviderType::HUAWEI) {
+        auto* huaweiProvider = GridCharger.getProvider<GridChargers::Huawei::Provider>();
+        if (huaweiProvider) {
+            huaweiProvider->setProduction(power);
 
+            retMsg["type"] = "success";
+            retMsg["message"] = "Power production " + String(power ? "en" : "dis") + "abled!";
+            retMsg["code"] = WebApiError::GenericSuccess;
+
+            WebApi.sendJsonResponse(request, response, __FUNCTION__, __LINE__);
+            return;
+        }
+    }
+
+    retMsg["message"] = "Current provider does not support this feature!";
+    retMsg["code"] = WebApiError::GenericNoValueFound;
     WebApi.sendJsonResponse(request, response, __FUNCTION__, __LINE__);
 }
 
@@ -184,7 +210,7 @@ void WebApiGridChargerClass::onAdminPost(AsyncWebServerRequest* request)
         return;
     }
 
-    using Controller = GridChargers::Huawei::Controller;
+    using Provider = GridChargers::Huawei::Provider;
 
     auto isValidRange = [&](const char* valueName, float min, float max, WebApiError error) -> bool {
         if (root["huawei"][valueName].as<float>() < min || root["huawei"][valueName].as<float>() > max) {
@@ -198,9 +224,9 @@ void WebApiGridChargerClass::onAdminPost(AsyncWebServerRequest* request)
         return true;
     };
 
-    if (!isValidRange("offline_voltage", Controller::MIN_OFFLINE_VOLTAGE, Controller::MAX_OFFLINE_VOLTAGE, WebApiError::R48xxVoltageLimitOutOfRange) ||
-        !isValidRange("offline_current", Controller::MIN_OFFLINE_CURRENT, Controller::MAX_OFFLINE_CURRENT, WebApiError::R48xxCurrentLimitOutOfRange) ||
-        !isValidRange("input_current_limit", Controller::MIN_INPUT_CURRENT_LIMIT, Controller::MAX_INPUT_CURRENT_LIMIT, WebApiError::R48xxCurrentLimitOutOfRange)) {
+    if (!isValidRange("offline_voltage", Provider::MIN_OFFLINE_VOLTAGE, Provider::MAX_OFFLINE_VOLTAGE, WebApiError::R48xxVoltageLimitOutOfRange) ||
+        !isValidRange("offline_current", Provider::MIN_OFFLINE_CURRENT, Provider::MAX_OFFLINE_CURRENT, WebApiError::R48xxCurrentLimitOutOfRange) ||
+        !isValidRange("input_current_limit", Provider::MIN_INPUT_CURRENT_LIMIT, Provider::MAX_INPUT_CURRENT_LIMIT, WebApiError::R48xxCurrentLimitOutOfRange)) {
         return;
     }
 
@@ -216,5 +242,5 @@ void WebApiGridChargerClass::onAdminPost(AsyncWebServerRequest* request)
 
     WebApi.sendJsonResponse(request, response, __FUNCTION__, __LINE__);
 
-    HuaweiCan.updateSettings();
+    GridCharger.updateSettings();
 }

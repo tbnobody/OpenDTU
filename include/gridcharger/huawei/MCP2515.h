@@ -11,7 +11,7 @@ namespace GridChargers::Huawei {
 
 class MCP2515 : public HardwareInterface {
 public:
-    ~MCP2515();
+    ~MCP2515() override;
 
     bool init() final;
 

@@ -8,7 +8,7 @@ namespace GridChargers::Huawei {
 
 class TWAI : public HardwareInterface {
 public:
-    ~TWAI();
+    ~TWAI() override;
 
     bool init() final;
 

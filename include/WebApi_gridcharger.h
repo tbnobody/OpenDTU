@@ -3,7 +3,6 @@
 
 #include <ESPAsyncWebServer.h>
 #include <TaskSchedulerDeclarations.h>
-#include <AsyncJson.h>
 
 class WebApiGridChargerClass {
 public:

@@ -5,7 +5,7 @@
 #include "WebApi_ws_gridcharger.h"
 #include "AsyncJson.h"
 #include "Configuration.h"
-#include <gridcharger/huawei/Controller.h>
+#include <gridcharger/Controller.h>
 #include "Utils.h"
 #include "WebApi.h"
 #include "defaults.h"
@@ -101,7 +101,7 @@ void WebApiWsGridChargerLiveClass::sendDataTaskCb()
 
 void WebApiWsGridChargerLiveClass::generateCommonJsonResponse(JsonVariant& root)
 {
-    HuaweiCan.getJsonData(root);
+    GridCharger.getStats()->getLiveViewData(root);
 }
 
 void WebApiWsGridChargerLiveClass::onWebsocketEvent(AsyncWebSocket* server, AsyncWebSocketClient* client, AwsEventType type, void* arg, uint8_t* data, size_t len)

@@ -27,7 +27,7 @@
                                 <DataAgeDisplay :data-age-ms="data.dataAge" />
                             </div>
                         </div>
-                        <div class="btn-toolbar p-2" role="toolbar">
+                        <div class="btn-toolbar p-2" role="toolbar" v-if="data.provider === 0">
                             <div class="btn-group me-2" role="group">
                                 <button
                                     :disabled="!data.reachable"
@@ -115,47 +115,49 @@
             </div>
         </div>
 
-        <ModalDialog
-            modalId="gridChargerLimitSettingView"
-            :title="$t('gridcharger.LimitSettings')"
-            :loading="dataLoading"
-        >
-            <BootstrapAlert v-model="showAlertLimit" :variant="alertTypeLimit">
-                {{ alertMessageLimit }}
-            </BootstrapAlert>
+        <template v-if="data.provider === 0">
+            <ModalDialog
+                modalId="gridChargerLimitSettingView"
+                :title="$t('gridcharger.LimitSettings')"
+                :loading="dataLoading"
+            >
+                <BootstrapAlert v-model="showAlertLimit" :variant="alertTypeLimit">
+                    {{ alertMessageLimit }}
+                </BootstrapAlert>
 
-            <InputElement
-                :label="$t('gridcharger.SetVoltageLimit')"
-                type="number"
-                step="0.01"
-                v-model="targetLimitList.voltage"
-                postfix="V"
-            />
+                <InputElement
+                    :label="$t('gridcharger.SetVoltageLimit')"
+                    type="number"
+                    step="0.01"
+                    v-model="targetLimitList.voltage"
+                    postfix="V"
+                />
 
-            <InputElement
-                :label="$t('gridcharger.SetCurrentLimit')"
-                type="number"
-                step="0.1"
-                v-model="targetLimitList.current"
-                postfix="A"
-            />
-            <template #footer>
-                <button type="button" class="btn btn-danger" @click="onSubmitLimit">
-                    {{ $t('gridcharger.SetLimits') }}
-                </button>
-            </template>
-        </ModalDialog>
+                <InputElement
+                    :label="$t('gridcharger.SetCurrentLimit')"
+                    type="number"
+                    step="0.1"
+                    v-model="targetLimitList.current"
+                    postfix="A"
+                />
+                <template #footer>
+                    <button type="button" class="btn btn-danger" @click="onSubmitLimit">
+                        {{ $t('gridcharger.SetLimits') }}
+                    </button>
+                </template>
+            </ModalDialog>
 
-        <ModalDialog modalId="gridChargerPowerView" :title="$t('gridcharger.PowerControl')" :loading="dataLoading">
-            <div class="d-grid gap-2 col-6 mx-auto">
-                <button type="button" class="btn btn-success" @click="onSetPower(true)">
-                    <BIconToggleOn class="fs-4" />&nbsp;{{ $t('gridcharger.TurnOn') }}
-                </button>
-                <button type="button" class="btn btn-danger" @click="onSetPower(false)">
-                    <BIconToggleOff class="fs-4" />&nbsp;{{ $t('gridcharger.TurnOff') }}
-                </button>
-            </div>
-        </ModalDialog>
+            <ModalDialog modalId="gridChargerPowerView" :title="$t('gridcharger.PowerControl')" :loading="dataLoading">
+                <div class="d-grid gap-2 col-6 mx-auto">
+                    <button type="button" class="btn btn-success" @click="onSetPower(true)">
+                        <BIconToggleOn class="fs-4" />&nbsp;{{ $t('gridcharger.TurnOn') }}
+                    </button>
+                    <button type="button" class="btn btn-danger" @click="onSetPower(false)">
+                        <BIconToggleOff class="fs-4" />&nbsp;{{ $t('gridcharger.TurnOff') }}
+                    </button>
+                </div>
+            </ModalDialog>
+        </template>
     </template>
 </template>
 
