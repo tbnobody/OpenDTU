@@ -60,6 +60,16 @@ body:
       placeholder: "e.g. 359d513"
     validations:
       required: true
+  - type: input
+    id: inverter_firmware_version
+    attributes:
+      label: What is your inverter firmware version?
+      description: |
+        Please provide the firmware version of your inverter (e.g., 1.0.17, 1.1.12, 2.0.4).
+        Check the [Inverter Firmware Compatibility Matrix](https://github.com/hoylabs/OpenDTU-OnBattery/blob/development/README.md#inverter-firmware-compatibility) to see if your firmware version is supported.
+      placeholder: "e.g. 1.1.12"
+    validations:
+      required: false
   - type: dropdown
     id: environment
     attributes:
