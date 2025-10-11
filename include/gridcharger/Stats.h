@@ -28,7 +28,7 @@ protected:
     static void addValueInSection(JsonVariant& root,
                                   std::string const& section, std::string const& name,
                                   T value, std::string const& unit,
-                                  int precision = 2)
+                                  int precision)
     {
         auto jsonValue = root["values"][section][name];
         jsonValue["v"] = value;

@@ -22,6 +22,7 @@
                     :maxlength="maxlength"
                     :min="min"
                     :max="max"
+                    :pattern="pattern"
                     :step="step"
                     :disabled="disabled"
                     :aria-describedby="descriptionId"
@@ -63,6 +64,7 @@ export default defineComponent({
         maxlength: String,
         min: String,
         max: String,
+        pattern: String,
         step: String,
         rows: String,
         disabled: Boolean,

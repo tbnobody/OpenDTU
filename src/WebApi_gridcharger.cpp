@@ -172,6 +172,9 @@ void WebApiGridChargerClass::onAdminGet(AsyncWebServerRequest* request)
     auto huawei = root["huawei"].to<JsonObject>();
     ConfigurationClass::serializeGridChargerHuaweiConfig(config.GridCharger.Huawei, huawei);
 
+    auto trucki = root["trucki"].to<JsonObject>();
+    ConfigurationClass::serializeGridChargerTruckiConfig(config.GridCharger.Trucki, trucki);
+
     response->setLength();
     request->send(response);
 }
@@ -200,6 +203,8 @@ void WebApiGridChargerClass::onAdminPost(AsyncWebServerRequest* request)
         !(root["huawei"]["input_current_limit"].is<float>()) ||
         !(root["huawei"]["fan_online_full_speed"].is<bool>()) ||
         !(root["huawei"]["fan_offline_full_speed"].is<bool>()) ||
+        !(root["trucki"]["ip_address"].is<const char*>()) ||
+        !(root["trucki"]["password"].is<const char*>()) ||
         !(root["voltage_limit"].is<float>()) ||
         !(root["lower_power_limit"].is<float>()) ||
         !(root["upper_power_limit"].is<float>())) {
@@ -210,7 +215,7 @@ void WebApiGridChargerClass::onAdminPost(AsyncWebServerRequest* request)
         return;
     }
 
-    using Provider = GridChargers::Huawei::Provider;
+    using HuaweiProvider = GridChargers::Huawei::Provider;
 
     auto isValidRange = [&](const char* valueName, float min, float max, WebApiError error) -> bool {
         if (root["huawei"][valueName].as<float>() < min || root["huawei"][valueName].as<float>() > max) {
@@ -224,9 +229,9 @@ void WebApiGridChargerClass::onAdminPost(AsyncWebServerRequest* request)
         return true;
     };
 
-    if (!isValidRange("offline_voltage", Provider::MIN_OFFLINE_VOLTAGE, Provider::MAX_OFFLINE_VOLTAGE, WebApiError::R48xxVoltageLimitOutOfRange) ||
-        !isValidRange("offline_current", Provider::MIN_OFFLINE_CURRENT, Provider::MAX_OFFLINE_CURRENT, WebApiError::R48xxCurrentLimitOutOfRange) ||
-        !isValidRange("input_current_limit", Provider::MIN_INPUT_CURRENT_LIMIT, Provider::MAX_INPUT_CURRENT_LIMIT, WebApiError::R48xxCurrentLimitOutOfRange)) {
+    if (!isValidRange("offline_voltage", HuaweiProvider::MIN_OFFLINE_VOLTAGE, HuaweiProvider::MAX_OFFLINE_VOLTAGE, WebApiError::R48xxVoltageLimitOutOfRange) ||
+        !isValidRange("offline_current", HuaweiProvider::MIN_OFFLINE_CURRENT, HuaweiProvider::MAX_OFFLINE_CURRENT, WebApiError::R48xxCurrentLimitOutOfRange) ||
+        !isValidRange("input_current_limit", HuaweiProvider::MIN_INPUT_CURRENT_LIMIT, HuaweiProvider::MAX_INPUT_CURRENT_LIMIT, WebApiError::R48xxCurrentLimitOutOfRange)) {
         return;
     }
 
@@ -236,6 +241,7 @@ void WebApiGridChargerClass::onAdminPost(AsyncWebServerRequest* request)
         ConfigurationClass::deserializeGridChargerConfig(root.as<JsonObject>(), config.GridCharger);
         ConfigurationClass::deserializeGridChargerCanConfig(root["can"].as<JsonObject>(), config.GridCharger.Can);
         ConfigurationClass::deserializeGridChargerHuaweiConfig(root["huawei"].as<JsonObject>(), config.GridCharger.Huawei);
+        ConfigurationClass::deserializeGridChargerTruckiConfig(root["trucki"].as<JsonObject>(), config.GridCharger.Trucki);
     }
 
     WebApi.writeConfig(retMsg);

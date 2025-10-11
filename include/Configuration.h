@@ -244,8 +244,14 @@ struct BATTERY_CONFIG_T {
 };
 using BatteryConfig = struct BATTERY_CONFIG_T;
 
-enum GridChargerProviderType { HUAWEI = 0 };
+enum GridChargerProviderType { HUAWEI = 0, TRUCKI = 1 };
 enum GridChargerHardwareInterface { MCP2515 = 0, TWAI = 1 };
+
+struct GRID_CHARGER_TRUCKI_CONFIG_T {
+    uint8_t IpAddress[4];
+    char Password[HTTP_REQUEST_MAX_PASSWORD_STRLEN + 1];
+};
+using GridChargerTruckiConfig = struct GRID_CHARGER_TRUCKI_CONFIG_T;
 
 struct GRID_CHARGER_CAN_CONFIG_T {
     GridChargerHardwareInterface HardwareInterface;
@@ -276,6 +282,7 @@ struct GRID_CHARGER_CONFIG_T {
     GridChargerProviderType Provider;
     GridChargerCanConfig Can;
     GridChargerHuaweiConfig Huawei;
+    GridChargerTruckiConfig Trucki;
 };
 using GridChargerConfig = struct GRID_CHARGER_CONFIG_T;
 
@@ -491,6 +498,7 @@ public:
     static void serializeGridChargerConfig(GridChargerConfig const& source, JsonObject& target);
     static void serializeGridChargerCanConfig(GridChargerCanConfig const& source, JsonObject& target);
     static void serializeGridChargerHuaweiConfig(GridChargerHuaweiConfig const& source, JsonObject& target);
+    static void serializeGridChargerTruckiConfig(GridChargerTruckiConfig const& source, JsonObject& target);
 
     static void deserializeHttpRequestConfig(JsonObject const& source_http_config, HttpRequestConfig& target);
     static void deserializeSolarChargerConfig(JsonObject const& source, SolarChargerConfig& target);
@@ -508,6 +516,8 @@ public:
     static void deserializeGridChargerConfig(JsonObject const& source, GridChargerConfig& target);
     static void deserializeGridChargerCanConfig(JsonObject const& source, GridChargerCanConfig& target);
     static void deserializeGridChargerHuaweiConfig(JsonObject const& source, GridChargerHuaweiConfig& target);
+    static void deserializeGridChargerTruckiConfig(JsonObject const& source, GridChargerTruckiConfig& target);
+
 private:
     void loop();
     static double roundedFloat(float val);

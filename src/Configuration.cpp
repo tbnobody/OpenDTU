@@ -259,6 +259,12 @@ void ConfigurationClass::serializeGridChargerHuaweiConfig(GridChargerHuaweiConfi
     target["fan_offline_full_speed"] = source.FanOfflineFullSpeed;
 }
 
+void ConfigurationClass::serializeGridChargerTruckiConfig(GridChargerTruckiConfig const& source, JsonObject& target)
+{
+    target["ip_address"] = IPAddress(source.IpAddress).toString();
+    target["password"] = source.Password;
+}
+
 bool ConfigurationClass::write()
 {
     File f = LittleFS.open(CONFIG_FILENAME, "w");
@@ -446,6 +452,9 @@ bool ConfigurationClass::write()
 
     JsonObject gridcharger_huawei = gridcharger["huawei"].to<JsonObject>();
     serializeGridChargerHuaweiConfig(config.GridCharger.Huawei, gridcharger_huawei);
+
+    JsonObject gridcharger_trucki = gridcharger["trucki"].to<JsonObject>();
+    serializeGridChargerTruckiConfig(config.GridCharger.Trucki, gridcharger_trucki);
 
     if (!Utils::checkJsonAlloc(doc, __FUNCTION__, __LINE__)) {
         return false;
@@ -678,6 +687,17 @@ void ConfigurationClass::deserializeGridChargerHuaweiConfig(JsonObject const& so
     target.FanOfflineFullSpeed = source["fan_offline_full_speed"] | GRIDCHARGER_HUAWEI_FAN_OFFLINE_FULL_SPEED;
 }
 
+void ConfigurationClass::deserializeGridChargerTruckiConfig(JsonObject const& source, GridChargerTruckiConfig& target)
+{
+    IPAddress ip;
+    ip.fromString(source["ip_address"] | "");
+    target.IpAddress[0] = ip[0];
+    target.IpAddress[1] = ip[1];
+    target.IpAddress[2] = ip[2];
+    target.IpAddress[3] = ip[3];
+    strlcpy(target.Password, source["password"] | "", sizeof(target.Password));
+}
+
 bool ConfigurationClass::read()
 {
     File f = LittleFS.open(CONFIG_FILENAME, "r", false);
@@ -891,6 +911,7 @@ bool ConfigurationClass::read()
     deserializeGridChargerConfig(gridcharger, config.GridCharger);
     deserializeGridChargerCanConfig(gridcharger["can"], config.GridCharger.Can);
     deserializeGridChargerHuaweiConfig(gridcharger["huawei"], config.GridCharger.Huawei);
+    deserializeGridChargerTruckiConfig(gridcharger["trucki"], config.GridCharger.Trucki);
 
     f.close();
 

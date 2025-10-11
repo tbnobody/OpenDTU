@@ -1,3 +1,8 @@
+export interface GridChargerTruckiConfig {
+    ip_address: string;
+    password: string;
+}
+
 export interface GridChargerCanConfig {
     hardware_interface: number;
     controller_frequency: number;
@@ -25,4 +30,5 @@ export interface GridChargerConfig {
     target_power_consumption: number;
     can: GridChargerCanConfig;
     huawei: GridChargerHuaweiConfig;
+    trucki: GridChargerTruckiConfig;
 }

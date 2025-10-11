@@ -7,6 +7,7 @@ namespace GridChargers {
 
 class Provider {
 public:
+    virtual ~Provider() = default;
     virtual bool init() = 0;
     virtual void deinit() = 0;
     virtual void loop() = 0;
