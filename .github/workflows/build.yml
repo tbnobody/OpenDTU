@@ -195,6 +195,8 @@ jobs:
   release:
     name: Create Release
     runs-on: ubuntu-24.04
+    permissions:
+      contents: write
     needs: [get_default_envs, build]
     if: startsWith(github.ref, 'refs/tags/2')
     steps:
@@ -226,8 +228,6 @@ jobs:
           failOnError: true
           commitMode: true
           configuration: ".github/workflows/config/release-notes-config.json"
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - uses: actions/download-artifact@v8
         with:
@@ -261,5 +261,3 @@ jobs:
           draft: False
           files: |
             release-artifacts/*.bin
-        env:
-          GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
