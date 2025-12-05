@@ -11,7 +11,7 @@ void WebApiEventlogClass::init(AsyncWebServer& server, Scheduler& scheduler)
 {
     using std::placeholders::_1;
 
-    server.on("/api/eventlog/status", HTTP_GET, std::bind(&WebApiEventlogClass::onEventlogStatus, this, _1));
+    server.on("/api/eventlog/status", HTTP_GET, static_cast<ArRequestHandlerFunction>(std::bind(&WebApiEventlogClass::onEventlogStatus, this, _1)));
 }
 
 void WebApiEventlogClass::onEventlogStatus(AsyncWebServerRequest* request)

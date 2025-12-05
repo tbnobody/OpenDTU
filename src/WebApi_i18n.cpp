@@ -13,8 +13,8 @@ void WebApiI18nClass::init(AsyncWebServer& server, Scheduler& scheduler)
 {
     using std::placeholders::_1;
 
-    server.on("/api/i18n/languages", HTTP_GET, std::bind(&WebApiI18nClass::onI18nLanguages, this, _1));
-    server.on("/api/i18n/language", HTTP_GET, std::bind(&WebApiI18nClass::onI18nLanguage, this, _1));
+    server.on("/api/i18n/languages", HTTP_GET, static_cast<ArRequestHandlerFunction>(std::bind(&WebApiI18nClass::onI18nLanguages, this, _1)));
+    server.on("/api/i18n/language", HTTP_GET, static_cast<ArRequestHandlerFunction>(std::bind(&WebApiI18nClass::onI18nLanguage, this, _1)));
 }
 
 void WebApiI18nClass::onI18nLanguages(AsyncWebServerRequest* request)
