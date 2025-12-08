@@ -603,10 +603,10 @@
   resolved "https://registry.yarnpkg.com/@rollup/rollup-win32-x64-msvc/-/rollup-win32-x64-msvc-4.48.1.tgz#6821b48385af21ba55c7a5f9f64d19f38ea26014"
   integrity sha512-8a/caCUN4vkTChxkaIJcMtwIVcBhi4X2PQRoT+yCK3qRYaZ7cURrmJFL5Ux9H9RaMIXj9RuihckdmkBX3zZsgg==
 
-"@tsconfig/node24@^24.0.1":
-  version "24.0.1"
-  resolved "https://registry.yarnpkg.com/@tsconfig/node24/-/node24-24.0.1.tgz#5e6f9ca0574896161fa5f6ea3975021ad0d8956a"
-  integrity sha512-3+IXshza3bIrT0tbHBr9CixQDVf4iBf0HTR0hCYowhpLqkzJjswu3UY8aZWjRXZep31kYB+o2SQeD8KwIoUHYw==
+"@tsconfig/node24@^24.0.3":
+  version "24.0.3"
+  resolved "https://registry.yarnpkg.com/@tsconfig/node24/-/node24-24.0.3.tgz#168b7ac691e9fcfc23ec75a25c8d3c44df981681"
+  integrity sha512-vcERKtKQKHgzt/vfS3Gjasd8SUI2a0WZXpgJURdJsMySpS5+ctgbPfuLj2z/W+w4lAfTWxoN4upKfu2WzIRYnw==
 
 "@types/bootstrap@^5.2.10":
   version "5.2.10"
