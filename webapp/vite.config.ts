@@ -73,6 +73,7 @@ export default defineConfig({
         // Required to make bootstrap compile without errors
         silenceDeprecations: [
           'import',
+          'if-function',
           'color-functions',
           'global-builtin',
         ],
