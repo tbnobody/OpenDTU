@@ -20,10 +20,10 @@ void WebApiFileClass::init(AsyncWebServer& server, Scheduler& scheduler)
     using std::placeholders::_5;
     using std::placeholders::_6;
 
-    server.on("/api/file/get", HTTP_GET, std::bind(&WebApiFileClass::onFileGet, this, _1));
-    server.on("/api/file/delete", HTTP_POST, std::bind(&WebApiFileClass::onFileDelete, this, _1));
-    server.on("/api/file/delete_all", HTTP_POST, std::bind(&WebApiFileClass::onFileDeleteAll, this, _1));
-    server.on("/api/file/list", HTTP_GET, std::bind(&WebApiFileClass::onFileListGet, this, _1));
+    server.on("/api/file/get", HTTP_GET, static_cast<ArRequestHandlerFunction>(std::bind(&WebApiFileClass::onFileGet, this, _1)));
+    server.on("/api/file/delete", HTTP_POST, static_cast<ArRequestHandlerFunction>(std::bind(&WebApiFileClass::onFileDelete, this, _1)));
+    server.on("/api/file/delete_all", HTTP_POST, static_cast<ArRequestHandlerFunction>(std::bind(&WebApiFileClass::onFileDeleteAll, this, _1)));
+    server.on("/api/file/list", HTTP_GET, static_cast<ArRequestHandlerFunction>(std::bind(&WebApiFileClass::onFileListGet, this, _1)));
     server.on("/api/file/upload", HTTP_POST,
         std::bind(&WebApiFileClass::onFileUploadFinish, this, _1),
         std::bind(&WebApiFileClass::onFileUpload, this, _1, _2, _3, _4, _5, _6));

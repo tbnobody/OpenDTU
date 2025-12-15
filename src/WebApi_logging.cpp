@@ -16,8 +16,8 @@ void WebApiLoggingClass::init(AsyncWebServer& server, Scheduler& scheduler)
 {
     using std::placeholders::_1;
 
-    server.on("/api/logging/config", HTTP_GET, std::bind(&WebApiLoggingClass::onLoggingAdminGet, this, _1));
-    server.on("/api/logging/config", HTTP_POST, std::bind(&WebApiLoggingClass::onLoggingAdminPost, this, _1));
+    server.on("/api/logging/config", HTTP_GET, static_cast<ArRequestHandlerFunction>(std::bind(&WebApiLoggingClass::onLoggingAdminGet, this, _1)));
+    server.on("/api/logging/config", HTTP_POST, static_cast<ArRequestHandlerFunction>(std::bind(&WebApiLoggingClass::onLoggingAdminPost, this, _1)));
 }
 
 void WebApiLoggingClass::onLoggingAdminGet(AsyncWebServerRequest* request)

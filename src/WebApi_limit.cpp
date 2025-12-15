@@ -14,8 +14,8 @@ void WebApiLimitClass::init(AsyncWebServer& server, Scheduler& scheduler)
 {
     using std::placeholders::_1;
 
-    server.on("/api/limit/status", HTTP_GET, std::bind(&WebApiLimitClass::onLimitStatus, this, _1));
-    server.on("/api/limit/config", HTTP_POST, std::bind(&WebApiLimitClass::onLimitPost, this, _1));
+    server.on("/api/limit/status", HTTP_GET, static_cast<ArRequestHandlerFunction>(std::bind(&WebApiLimitClass::onLimitStatus, this, _1)));
+    server.on("/api/limit/config", HTTP_POST, static_cast<ArRequestHandlerFunction>(std::bind(&WebApiLimitClass::onLimitPost, this, _1)));
 }
 
 void WebApiLimitClass::onLimitStatus(AsyncWebServerRequest* request)

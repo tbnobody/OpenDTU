@@ -16,8 +16,8 @@ void WebApiDeviceClass::init(AsyncWebServer& server, Scheduler& scheduler)
 {
     using std::placeholders::_1;
 
-    server.on("/api/device/config", HTTP_GET, std::bind(&WebApiDeviceClass::onDeviceAdminGet, this, _1));
-    server.on("/api/device/config", HTTP_POST, std::bind(&WebApiDeviceClass::onDeviceAdminPost, this, _1));
+    server.on("/api/device/config", HTTP_GET, static_cast<ArRequestHandlerFunction>(std::bind(&WebApiDeviceClass::onDeviceAdminGet, this, _1)));
+    server.on("/api/device/config", HTTP_POST, static_cast<ArRequestHandlerFunction>(std::bind(&WebApiDeviceClass::onDeviceAdminPost, this, _1)));
 }
 
 void WebApiDeviceClass::onDeviceAdminGet(AsyncWebServerRequest* request)

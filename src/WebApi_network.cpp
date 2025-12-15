@@ -19,9 +19,9 @@ void WebApiNetworkClass::init(AsyncWebServer& server, Scheduler& scheduler)
 {
     using std::placeholders::_1;
 
-    server.on("/api/network/status", HTTP_GET, std::bind(&WebApiNetworkClass::onNetworkStatus, this, _1));
-    server.on("/api/network/config", HTTP_GET, std::bind(&WebApiNetworkClass::onNetworkAdminGet, this, _1));
-    server.on("/api/network/config", HTTP_POST, std::bind(&WebApiNetworkClass::onNetworkAdminPost, this, _1));
+    server.on("/api/network/status", HTTP_GET, static_cast<ArRequestHandlerFunction>(std::bind(&WebApiNetworkClass::onNetworkStatus, this, _1)));
+    server.on("/api/network/config", HTTP_GET, static_cast<ArRequestHandlerFunction>(std::bind(&WebApiNetworkClass::onNetworkAdminGet, this, _1)));
+    server.on("/api/network/config", HTTP_POST, static_cast<ArRequestHandlerFunction>(std::bind(&WebApiNetworkClass::onNetworkAdminPost, this, _1)));
 
     scheduler.addTask(_applyDataTask);
 }
