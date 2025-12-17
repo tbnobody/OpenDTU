@@ -73,31 +73,35 @@ void WebApiPrometheusClass::onPrometheusMetricsGet(AsyncWebServerRequest* reques
 
             String serial = inv->serialString();
             const char* name = inv->name();
+            const uint32_t lastUpdate = inv->Statistics()->getLastUpdate();
+            const float limitPercent = inv->SystemConfigPara()->getLimitPercent();
+            const uint16_t maxPower = inv->DevInfo()->getMaxPower();
+
             if (i == 0) {
                 stream->print("# HELP opendtu_last_update last update from inverter in s\n");
                 stream->print("# TYPE opendtu_last_update gauge\n");
             }
             stream->printf("opendtu_last_update{serial=\"%s\",unit=\"%" PRIu8 "\",name=\"%s\"} %" PRIu32 "\n",
-                serial.c_str(), i, name, inv->Statistics()->getLastUpdate() / 1000);
+                serial.c_str(), i, name, lastUpdate / 1000);
 
             if (i == 0) {
                 stream->print("# HELP opendtu_inverter_limit_relative current relative limit of the inverter\n");
                 stream->print("# TYPE opendtu_inverter_limit_relative gauge\n");
             }
             stream->printf("opendtu_inverter_limit_relative{serial=\"%s\",unit=\"%" PRIu8 "\",name=\"%s\"} %f\n",
-                serial.c_str(), i, name, inv->SystemConfigPara()->getLimitPercent() / 100.0);
+                serial.c_str(), i, name, limitPercent / 100.0);
 
-            if (inv->DevInfo()->getMaxPower() > 0) {
+            if (maxPower > 0) {
                 if (i == 0) {
                     stream->print("# HELP opendtu_inverter_limit_absolute current relative limit of the inverter\n");
                     stream->print("# TYPE opendtu_inverter_limit_absolute gauge\n");
                 }
                 stream->printf("opendtu_inverter_limit_absolute{serial=\"%s\",unit=\"%" PRIu8 "\",name=\"%s\"} %f\n",
-                    serial.c_str(), i, name, inv->SystemConfigPara()->getLimitPercent() * inv->DevInfo()->getMaxPower() / 100.0);
+                    serial.c_str(), i, name, limitPercent * maxPower / 100.0);
             }
 
             // Loop all channels if Statistics have been updated at least once since DTU boot
-            if (inv->Statistics()->getLastUpdate() > 0) {
+            if (lastUpdate > 0) {
                 for (auto& t : inv->Statistics()->getChannelTypes()) {
                     for (auto& c : inv->Statistics()->getChannelsByType(t)) {
                         addPanelInfo(stream, serial, i, inv, t, c);

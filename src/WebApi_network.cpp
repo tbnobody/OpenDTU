@@ -150,13 +150,15 @@ void WebApiNetworkClass::onNetworkAdminPost(AsyncWebServerRequest* request)
         return;
     }
 
-    if (root["hostname"].as<String>().length() == 0 || root["hostname"].as<String>().length() > WIFI_MAX_HOSTNAME_STRLEN) {
+    const String hostname = root["hostname"].as<String>();
+    if (hostname.length() == 0 || hostname.length() > WIFI_MAX_HOSTNAME_STRLEN) {
         retMsg["message"] = "Hostname must between 1 and " STR(WIFI_MAX_HOSTNAME_STRLEN) " characters long!";
         WebApi.sendJsonResponse(request, response, __FUNCTION__, __LINE__);
         return;
     }
     if (NetworkSettings.NetworkMode() == network_mode::WiFi) {
-        if (root["ssid"].as<String>().length() == 0 || root["ssid"].as<String>().length() > WIFI_MAX_SSID_STRLEN) {
+        const String ssid = root["ssid"].as<String>();
+        if (ssid.length() == 0 || ssid.length() > WIFI_MAX_SSID_STRLEN) {
             retMsg["message"] = "SSID must between 1 and " STR(WIFI_MAX_SSID_STRLEN) " characters long!";
             WebApi.sendJsonResponse(request, response, __FUNCTION__, __LINE__);
             return;
@@ -174,7 +176,8 @@ void WebApiNetworkClass::onNetworkAdminPost(AsyncWebServerRequest* request)
         return;
     }
     if (root["syslogenabled"].as<bool>()) {
-        if (root["sysloghostname"].as<String>().length() == 0 || root["sysloghostname"].as<String>().length() > SYSLOG_MAX_HOSTNAME_STRLEN) {
+        const String sysloghostname = root["sysloghostname"].as<String>();
+        if (sysloghostname.length() == 0 || sysloghostname.length() > SYSLOG_MAX_HOSTNAME_STRLEN) {
             retMsg["message"] = "Syslog Server must between 1 and " STR(SYSLOG_MAX_HOSTNAME_STRLEN) " characters long!";
             retMsg["code"] = WebApiError::NetworkSyslogHostnameLength;
             retMsg["param"]["max"] = SYSLOG_MAX_HOSTNAME_STRLEN;
@@ -182,7 +185,8 @@ void WebApiNetworkClass::onNetworkAdminPost(AsyncWebServerRequest* request)
             return;
         }
 
-        if (root["syslogport"].as<uint>() == 0 || root["syslogport"].as<uint>() > 65535) {
+        const uint syslogport = root["syslogport"].as<uint>();
+        if (syslogport == 0 || syslogport > 65535) {
             retMsg["message"] = "Port must be a number between 1 and 65535!";
             retMsg["code"] = WebApiError::NetworkSyslogPort;
             WebApi.sendJsonResponse(request, response, __FUNCTION__, __LINE__);

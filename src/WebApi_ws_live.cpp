@@ -147,14 +147,18 @@ void WebApiWsLiveClass::generateInverterCommonJsonResponse(JsonObject& root, std
     root["serial"] = inv->serialString();
     root["name"] = inv->name();
     root["order"] = inv_cfg->Order;
-    root["data_age"] = (millis() - inv->Statistics()->getLastUpdate()) / 1000;
-    root["data_age_ms"] = millis() - inv->Statistics()->getLastUpdate();
+    const uint32_t lastUpdate = inv->Statistics()->getLastUpdate();
+    const uint32_t dataAgeMs = millis() - lastUpdate;
+    root["data_age"] = dataAgeMs / 1000;
+    root["data_age_ms"] = dataAgeMs;
     root["poll_enabled"] = inv->getEnablePolling();
     root["reachable"] = inv->isReachable();
     root["producing"] = inv->isProducing();
-    root["limit_relative"] = inv->SystemConfigPara()->getLimitPercent();
-    if (inv->DevInfo()->getMaxPower() > 0) {
-        root["limit_absolute"] = inv->SystemConfigPara()->getLimitPercent() * inv->DevInfo()->getMaxPower() / 100.0;
+    const float limitPercent = inv->SystemConfigPara()->getLimitPercent();
+    const uint16_t maxPower = inv->DevInfo()->getMaxPower();
+    root["limit_relative"] = limitPercent;
+    if (maxPower > 0) {
+        root["limit_absolute"] = limitPercent * maxPower / 100.0;
     } else {
         root["limit_absolute"] = -1;
     }

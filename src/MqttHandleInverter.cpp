@@ -73,25 +73,27 @@ void MqttHandleInverterClass::loop()
 
         if (inv->SystemConfigPara()->getLastUpdate() > 0) {
             // Limit
-            MqttSettings.publish(subtopic + "/status/limit_relative", String(inv->SystemConfigPara()->getLimitPercent()));
+            const float limitPercent = inv->SystemConfigPara()->getLimitPercent();
+            MqttSettings.publish(subtopic + "/status/limit_relative", String(limitPercent));
 
-            uint16_t maxpower = inv->DevInfo()->getMaxPower();
+            const uint16_t maxpower = inv->DevInfo()->getMaxPower();
             if (maxpower > 0) {
-                MqttSettings.publish(subtopic + "/status/limit_absolute", String(inv->SystemConfigPara()->getLimitPercent() * maxpower / 100));
+                MqttSettings.publish(subtopic + "/status/limit_absolute", String(limitPercent * maxpower / 100));
             }
         }
 
         MqttSettings.publish(subtopic + "/status/reachable", String(inv->isReachable()));
         MqttSettings.publish(subtopic + "/status/producing", String(inv->isProducing()));
 
-        if (inv->Statistics()->getLastUpdate() > 0) {
-            MqttSettings.publish(subtopic + "/status/last_update", String(std::time(0) - (millis() - inv->Statistics()->getLastUpdate()) / 1000));
+        const uint32_t lastUpdate = inv->Statistics()->getLastUpdate();
+        if (lastUpdate > 0) {
+            MqttSettings.publish(subtopic + "/status/last_update", String(std::time(0) - (millis() - lastUpdate) / 1000));
         } else {
             MqttSettings.publish(subtopic + "/status/last_update", String(0));
         }
 
         const uint32_t lastUpdateInternal = inv->Statistics()->getLastUpdateFromInternal();
-        if (inv->Statistics()->getLastUpdate() > 0 && (lastUpdateInternal != _lastPublishStats[i])) {
+        if (lastUpdate > 0 && (lastUpdateInternal != _lastPublishStats[i])) {
             _lastPublishStats[i] = lastUpdateInternal;
 
             // Loop all channels

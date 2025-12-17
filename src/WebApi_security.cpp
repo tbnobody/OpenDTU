@@ -49,14 +49,15 @@ void WebApiSecurityClass::onSecurityPost(AsyncWebServerRequest* request)
     auto& retMsg = response->getRoot();
 
     if (!root["password"].is<String>()
-        && root["allow_readonly"].is<bool>()) {
+        || !root["allow_readonly"].is<bool>()) {
         retMsg["message"] = "Values are missing!";
         retMsg["code"] = WebApiError::GenericValueMissing;
         WebApi.sendJsonResponse(request, response, __FUNCTION__, __LINE__);
         return;
     }
 
-    if (root["password"].as<String>().length() < 8 || root["password"].as<String>().length() > WIFI_MAX_PASSWORD_STRLEN) {
+    const String password = root["password"].as<String>();
+    if (password.length() < 8 || password.length() > WIFI_MAX_PASSWORD_STRLEN) {
         retMsg["message"] = "Password must between 8 and " STR(WIFI_MAX_PASSWORD_STRLEN) " characters long!";
         retMsg["code"] = WebApiError::SecurityPasswordLength;
         retMsg["param"]["max"] = WIFI_MAX_PASSWORD_STRLEN;
