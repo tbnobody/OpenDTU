@@ -27,7 +27,7 @@
     "@intlify/unplugin-vue-i18n": "^6.0.8",
     "@tsconfig/node24": "^24.0.1",
     "@types/bootstrap": "^5.2.10",
-    "@types/node": "^24.2.0",
+    "@types/node": "^25.0.9",
     "@types/pulltorefreshjs": "^0.1.7",
     "@types/sortablejs": "^1.15.8",
     "@types/spark-md5": "^3.0.5",
