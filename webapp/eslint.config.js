@@ -1,4 +1,4 @@
-/* eslint-env node */
+/* global */
 import js from "@eslint/js";
 import pluginVue from 'eslint-plugin-vue'
 import vueTsEslintConfig from '@vue/eslint-config-typescript'
