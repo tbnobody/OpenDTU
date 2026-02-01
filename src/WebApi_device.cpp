@@ -122,7 +122,7 @@ void WebApiDeviceClass::onDeviceAdminPost(AsyncWebServerRequest* request)
     }
 
     if (root["curPin"]["name"].as<String>().length() == 0 || root["curPin"]["name"].as<String>().length() > DEV_MAX_MAPPING_NAME_STRLEN) {
-        retMsg["message"] = "Pin mapping must between 1 and " STR(DEV_MAX_MAPPING_NAME_STRLEN) " characters long!";
+        retMsg["message"] = "Pin mapping must between 1 and " STR_EXTRACT(DEV_MAX_MAPPING_NAME_STRLEN) " characters long!";
         retMsg["code"] = WebApiError::HardwarePinMappingLength;
         retMsg["param"]["max"] = DEV_MAX_MAPPING_NAME_STRLEN;
         WebApi.sendJsonResponse(request, response, __FUNCTION__, __LINE__);

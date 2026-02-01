@@ -112,7 +112,7 @@ void WebApiNtpClass::onNtpAdminPost(AsyncWebServerRequest* request)
     }
 
     if (root["ntp_server"].as<String>().length() == 0 || root["ntp_server"].as<String>().length() > NTP_MAX_SERVER_STRLEN) {
-        retMsg["message"] = "NTP Server must between 1 and " STR(NTP_MAX_SERVER_STRLEN) " characters long!";
+        retMsg["message"] = "NTP Server must between 1 and " STR_EXTRACT(NTP_MAX_SERVER_STRLEN) " characters long!";
         retMsg["code"] = WebApiError::NtpServerLength;
         retMsg["param"]["max"] = NTP_MAX_SERVER_STRLEN;
         WebApi.sendJsonResponse(request, response, __FUNCTION__, __LINE__);
@@ -120,7 +120,7 @@ void WebApiNtpClass::onNtpAdminPost(AsyncWebServerRequest* request)
     }
 
     if (root["ntp_timezone"].as<String>().length() == 0 || root["ntp_timezone"].as<String>().length() > NTP_MAX_TIMEZONE_STRLEN) {
-        retMsg["message"] = "Timezone must between 1 and " STR(NTP_MAX_TIMEZONE_STRLEN) " characters long!";
+        retMsg["message"] = "Timezone must between 1 and " STR_EXTRACT(NTP_MAX_TIMEZONE_STRLEN) " characters long!";
         retMsg["code"] = WebApiError::NtpTimezoneLength;
         retMsg["param"]["max"] = NTP_MAX_TIMEZONE_STRLEN;
         WebApi.sendJsonResponse(request, response, __FUNCTION__, __LINE__);
@@ -128,7 +128,7 @@ void WebApiNtpClass::onNtpAdminPost(AsyncWebServerRequest* request)
     }
 
     if (root["ntp_timezone_descr"].as<String>().length() == 0 || root["ntp_timezone_descr"].as<String>().length() > NTP_MAX_TIMEZONEDESCR_STRLEN) {
-        retMsg["message"] = "Timezone description must between 1 and " STR(NTP_MAX_TIMEZONEDESCR_STRLEN) " characters long!";
+        retMsg["message"] = "Timezone description must between 1 and " STR_EXTRACT(NTP_MAX_TIMEZONEDESCR_STRLEN) " characters long!";
         retMsg["code"] = WebApiError::NtpTimezoneDescriptionLength;
         retMsg["param"]["max"] = NTP_MAX_TIMEZONEDESCR_STRLEN;
         WebApi.sendJsonResponse(request, response, __FUNCTION__, __LINE__);

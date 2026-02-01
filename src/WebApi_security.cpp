@@ -57,7 +57,7 @@ void WebApiSecurityClass::onSecurityPost(AsyncWebServerRequest* request)
     }
 
     if (root["password"].as<String>().length() < 8 || root["password"].as<String>().length() > WIFI_MAX_PASSWORD_STRLEN) {
-        retMsg["message"] = "Password must between 8 and " STR(WIFI_MAX_PASSWORD_STRLEN) " characters long!";
+        retMsg["message"] = "Password must between 8 and " STR_EXTRACT(WIFI_MAX_PASSWORD_STRLEN) " characters long!";
         retMsg["code"] = WebApiError::SecurityPasswordLength;
         retMsg["param"]["max"] = WIFI_MAX_PASSWORD_STRLEN;
         WebApi.sendJsonResponse(request, response, __FUNCTION__, __LINE__);
