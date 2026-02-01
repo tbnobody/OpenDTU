@@ -1,6 +1,6 @@
 {
     "meta": {
-        "name": "Poland",
+        "name": "Polski",
         "code": "pl"
     },
     "display": {
@@ -22,7 +22,7 @@
             "MQTTSettings": "Ustawienia serwera MQTT",
             "InverterSettings": "Ustawienia falownika",
             "SecuritySettings": "Ustawienia zabezpieczeń",
-            "LoggingSettings": "Logging Settings",
+            "LoggingSettings": "Ustawienia logowania",
             "DTUSettings": "Ustawienia DTU",
             "DeviceManager": "Zarządzanie urządzeniami",
             "ConfigManagement": "Zarządzanie konfiguracją",
@@ -47,8 +47,8 @@
             "Pull": "Przeciągnij w dół, aby zaktualizować",
             "Release": "Wydanie w celu aktualizacji",
             "Close": "Zamknij",
-            "Yes": "Yes",
-            "No": "No"
+            "Yes": "Tak",
+            "No": "Nie"
         },
         "wait": {
             "NotReady": "OpenDTU nie jest jeszcze gotowy",
@@ -95,7 +95,7 @@
             "5003": "Podano nieprawidłowy typ!",
             "5004": "Określono nieprawidłowy falownik!",
             "6001": "Wykonano ponowne uruchomienie!",
-            "6002": "onowne uruchomienie anulowane!",
+            "6002": "Ponowne uruchomienie anulowane!",
             "7001": "Serwer MQTT musi mieć od 1 do {max} znaków!",
             "7002": "Nazwa użytkownika nie może być dłuższa niż {max} znaków!",
             "7003": "Hasło nie może być dłuższe niż {max} znaków!",
@@ -143,7 +143,7 @@
             "SerialNumber": "Numer seryjny: ",
             "CurrentLimit": "Aktualny limit",
             "ShowSetInverterLimit": "Pokaż / ustaw limit mocy",
-            "TurnOnOff": "Włącz  /wyłącz falownik",
+            "TurnOnOff": "Włącz / wyłącz falownik",
             "ShowInverterInfo": "Pokaż informacje o falowniku",
             "ShowEventlog": "Pokaż dziennik zdarzeń",
             "UnreadMessages": "nieprzeczytane wiadomości",
@@ -229,7 +229,7 @@
             "SdkVersion": "Wersja SDK",
             "ConfigVersion": "Wersja konfiguracji",
             "FirmwareVersion": "Wersja oprogramowania / Git Hash",
-            "FirmwareBranch": "Firmware Branch",
+            "FirmwareBranch": "Gałąź oprogramowania",
             "PioEnv": "Środowisko PIO",
             "FirmwareVersionHint": "Kliknij tutaj, aby wyświetlić informacje o aktualnej wersji",
             "FirmwareUpdate": "Aktualizacja oprogramowania",
@@ -284,7 +284,7 @@
             "Task_mqttclient": "Klient MQTT"
         },
         "radioinfo": {
-            "RadioInformation": "Informacje o nadajniku-odbiorniku radiowy",
+            "RadioInformation": "Informacje o nadajniku-odbiorniku radiowym",
             "Status": "{module} Status",
             "ChipStatus": "{module} Stan chipa",
             "ChipType": "{module} Typ chipa",
@@ -295,7 +295,7 @@
             "Unknown": "Nieznany"
         },
         "networkinfo": {
-            "NetworkInformation": "Informazioni Rete"
+            "NetworkInformation": "Informacje o sieci"
         },
         "wifistationinfo": {
             "WifiStationInfo": "Informacje o Wi-Fi (stacja)",
@@ -366,11 +366,11 @@
             "RootCertifcateInfo": "Informacje o certyfikacie głównego urzędu certyfikacji",
             "TlsCertLogin": "Zaloguj się przy użyciu certyfikatu TLS",
             "ClientCertifcateInfo": "Informacje o certyfikacie klienta",
-            "HassSummary": "Podsumowanie konfiguracji automatycznego wykrywania MQTT Home Assistan",
+            "HassSummary": "Podsumowanie konfiguracji automatycznego wykrywania MQTT Home Assistant",
             "Expire": "Wygasa",
             "IndividualPanels": "Indywidualny Panel",
             "RuntimeSummary": "Podsumowanie czasu wykonania",
-            "ConnectionStatus": "Stan połączeni",
+            "ConnectionStatus": "Stan połączenia",
             "Connected": "połączony",
             "Disconnected": "rozłączony"
         },
@@ -380,9 +380,9 @@
             "EnableAutoScroll": "Włącz automatyczne przewijani",
             "ClearConsole": "Wyczyść konsolę",
             "CopyToClipboard": "Kopiuj do schowka",
-            "Download": "Download",
-            "RegularExpression": "Regular Expression",
-            "Lines": "{lines} Lines",
+            "Download": "Pobierz",
+            "RegularExpression": "Wyrażenie regularne",
+            "Lines": "{lines} Linii",
             "LogLevel": "Log Level ({cnt})"
         },
         "inverterchannelinfo": {
@@ -564,7 +564,7 @@
             "Advanced": "Zaawansowane",
             "InverterSerial": "Serial falownika:",
             "InverterName": "Nazwa falownika:",
-            "InverterNameHint": "PMożesz podać dowolną nazwę falownika.",
+            "InverterNameHint": "Możesz podać dowolną nazwę falownika.",
             "InverterStatus": "Odbierz / Wyślij",
             "PollEnable": "Odpytywania inwertera",
             "PollEnableNight": "Zapytanie o falownik w nocy",
@@ -600,18 +600,18 @@
             "Back": "Wstecz",
             "UploadSuccess": "Przesłanie pliku powiodło się",
             "RestoreHint": "<b>Uwaga:</b> Ta operacja zastępuje konfigurację zawartą w pliku, a następnie automatycznie uruchamia ponownie OpenDTU w celu zastosowania nowej konfiguracji.",
-            "ResetHeader": "IInicjuj: Wykonaj reset do ustawień fabrycznych",
+            "ResetHeader": "Inicjuj: Wykonaj reset do ustawień fabrycznych",
             "FactoryResetButton": "Przywróć domyślną konfigurację fabryczną",
             "ResetHint": "<b>Uwaga:</b> Ta operacja zastępuje konfigurację tą zawartą w pliku, a następnie automatycznie uruchamia ponownie OpenDTU w celu zastosowania nowej konfiguracji",
             "FactoryReset": "Reset do ustawień fabrycznych",
             "ResetMsg": "Czy na pewno chcesz usunąć bieżącą konfigurację i zastosować konfigurację fabryczną?",
             "ResetConfirm": "Reset do ustawień fabrycznych!",
-            "Download": "Download",
-            "Delete": "Delete",
-            "DeleteMsg": "Are you sure you want to delete file: '{name}'? You have to manually reboot the device to apply config changes!",
-            "Name": "Name",
-            "Size": "Size",
-            "Action": "Action",
+            "Download": "Pobierz",
+            "Delete": "Usuń",
+            "DeleteMsg": "Jesteś pewien, że chcesz skasować plik: '{name}'? Możesz ręcznie zrestartować urządzenie aby zastosować zmiany!",
+            "Name": "Nazwa",
+            "Size": "Rozmiar",
+            "Action": "Akcja",
             "Cancel": "@:base.Cancel",
             "InvalidJson": "Plik JSON jest nieprawidłowo sformatowany.",
             "InvalidJsonContent": "Plik JSON ma niewłaściwą zawartość."
@@ -687,8 +687,8 @@
             "rot270": "Obrót o 270 stopni",
             "DisplayLanguage": "Język wyświetlacza",
             "en": "English",
-            "de": "German",
-            "fr": "French",
+            "de": "Deutsch",
+            "fr": "Français",
             "Leds": "Diody LED",
             "EqualBrightness": "Wyrównaj jasność",
             "LedBrightness": "Dioda LED {led}, Jasność ({brightness})"
@@ -708,10 +708,10 @@
             "format_unknown": "Nieznany format"
         },
         "loggingadmin": {
-            "LoggingSettings": "Logging Settings",
+            "LoggingSettings": "Ustawienia logowania",
             "LogLevel": "Log Level",
             "DefaultLevel": "Default log level",
-            "Module": "Module",
+            "Module": "Moduł",
             "Module_CORE": "Rdzeń ESP-IDF",
             "Module_hoymiles": "Komunikacja radiowa Hoymiles",
             "Module_mqtt": "Klient MQTT",
