@@ -130,13 +130,18 @@ void HoymilesRadio_CMT::loop()
         }
     }
 
+    // Step 1: Drain all available packets from the hardware FIFO into the
+    // software ring buffer. This runs every iteration — not just when the
+    // interrupt flag is set — so that back-to-back packets from MIT inverters
+    // (which send 6 rapid response fragments) are captured before the 64-byte
+    // hardware FIFO overflows.
     if (_packetReceived) {
         ESP_LOGV(TAG, "Interrupt received");
         while (_radio->available()) {
             if (_rxBuffer.size() > FRAGMENT_BUFFER_SIZE) {
                 ESP_LOGE(TAG, "CMT2300A: Buffer full");
                 _radio->flush_rx();
-                continue;
+                break;
             }
 
             fragment_t f;
@@ -151,39 +156,41 @@ void HoymilesRadio_CMT::loop()
         }
         _radio->flush_rx();
         _packetReceived = false;
+    }
 
-    } else {
-        // Perform package parsing only if no packages are received
-        if (!_rxBuffer.empty()) {
-            fragment_t f = _rxBuffer.back();
-            if (checkFragmentCrc(f)) {
+    // Step 2: Process all buffered packets. Previously only one packet was
+    // processed per loop() call, and only when no new packet was arriving.
+    // Processing the entire buffer each iteration reduces latency and prevents
+    // the software buffer from growing unboundedly during bursts.
+    while (!_rxBuffer.empty()) {
+        fragment_t f = _rxBuffer.back();
+        if (checkFragmentCrc(f)) {
 
-                const serial_u dtuId = convertSerialToRadioId(_dtuSerial);
+            const serial_u dtuId = convertSerialToRadioId(_dtuSerial);
 
-                // The CMT RF module does not filter foreign packages by itself.
-                // Has to be done manually here.
-                if (memcmp(&f.fragment[5], &dtuId.b[1], 4) == 0) {
+            // The CMT RF module does not filter foreign packages by itself.
+            // Has to be done manually here.
+            if (memcmp(&f.fragment[5], &dtuId.b[1], 4) == 0) {
 
-                    std::shared_ptr<InverterAbstract> inv = Hoymiles.getInverterByFragment(f);
+                std::shared_ptr<InverterAbstract> inv = Hoymiles.getInverterByFragment(f);
 
-                    if (nullptr != inv) {
-                        // Save packet in inverter rx buffer
-                        ESP_LOGD(TAG, "RX %.2f MHz --> %s | %" PRId8 " dBm",
-                            getFrequencyFromChannel(f.channel) / 1000000.0, Utils::dumpArray(f.fragment, f.len).c_str(), f.rssi);
+                if (nullptr != inv) {
+                    // Save packet in inverter rx buffer
+                    ESP_LOGD(TAG, "RX %.2f MHz --> %s | %" PRId8 " dBm",
+                        getFrequencyFromChannel(f.channel) / 1000000.0, Utils::dumpArray(f.fragment, f.len).c_str(), f.rssi);
 
-                        inv->addRxFragment(f.fragment, f.len, f.rssi);
-                    } else {
-                        ESP_LOGE(TAG, "Inverter Not found!");
-                    }
+                    inv->addRxFragment(f.fragment, f.len, f.rssi);
+                } else {
+                    ESP_LOGE(TAG, "Inverter Not found!");
                 }
-
-            } else {
-                ESP_LOGW(TAG, "Frame kaputt"); // ;-)
             }
 
-            // Remove paket from buffer even it was corrupted
-            _rxBuffer.pop();
+        } else {
+            ESP_LOGW(TAG, "Frame kaputt"); // ;-)
         }
+
+        // Remove packet from buffer even if it was corrupted
+        _rxBuffer.pop();
     }
 
     handleReceivedPackage();
