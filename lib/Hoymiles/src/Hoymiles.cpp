@@ -13,6 +13,7 @@
 #include "inverters/HMS_4CH.h"
 #include "inverters/HMT_4CH.h"
 #include "inverters/HMT_6CH.h"
+#include "inverters/MIT_8CH.h"
 #include "inverters/HM_1CH.h"
 #include "inverters/HM_2CH.h"
 #include "inverters/HM_4CH.h"
@@ -153,7 +154,9 @@ void HoymilesClass::loop()
 std::shared_ptr<InverterAbstract> HoymilesClass::addInverter(const char* name, const uint64_t serial)
 {
     std::shared_ptr<InverterAbstract> i = nullptr;
-    if (HMT_4CH::isValidSerial(serial)) {
+    if (MIT_8CH::isValidSerial(serial)) {
+        i = std::make_shared<MIT_8CH>(_radioCmt.get(), serial);
+    } else if (HMT_4CH::isValidSerial(serial)) {
         i = std::make_shared<HMT_4CH>(_radioCmt.get(), serial);
     } else if (HMT_6CH::isValidSerial(serial)) {
         i = std::make_shared<HMT_6CH>(_radioCmt.get(), serial);
