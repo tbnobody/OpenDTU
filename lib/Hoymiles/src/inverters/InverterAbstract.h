@@ -41,6 +41,11 @@ public:
     virtual const byteAssign_t* getByteAssignment() const = 0;
     virtual uint8_t getByteAssignmentSize() const = 0;
 
+    virtual uint32_t getSingleDataCommandTimeout() const;
+    virtual uint32_t getRealTimeRunDataCommandTimeout() const;
+    virtual uint32_t getAlarmDataCommandTimeout() const;
+    virtual uint8_t getMaxRetransmitCount() const;
+
     bool isProducing();
     bool isReachable();
 
