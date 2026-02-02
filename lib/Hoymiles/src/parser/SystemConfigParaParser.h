@@ -2,7 +2,7 @@
 #pragma once
 #include "Parser.h"
 
-#define SYSTEM_CONFIG_PARA_SIZE 16
+#define SYSTEM_CONFIG_PARA_SIZE 48
 
 class SystemConfigParaParser : public Parser {
 public:
@@ -25,10 +25,12 @@ public:
 
     // Returns 1 based amount of expected bytes of data
     uint8_t getExpectedByteCount() const;
+    void setExpectedByteCount(const uint8_t count);
 
 private:
     uint8_t _payload[SYSTEM_CONFIG_PARA_SIZE];
     uint8_t _payloadLength;
+    uint8_t _expectedByteCount = SYSTEM_CONFIG_PARA_SIZE;
 
     LastCommandSuccess _lastLimitCommandSuccess = CMD_OK; // Set to OK because we have to assume nothing is done at startup
     LastCommandSuccess _lastLimitRequestSuccess = CMD_NOK; // Set to NOK to fetch at startup

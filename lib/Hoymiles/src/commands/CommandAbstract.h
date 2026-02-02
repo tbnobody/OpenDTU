@@ -8,7 +8,7 @@
 
 #define RF_LEN 32
 #define MAX_RESEND_COUNT 4 // Used if all packages are missing
-#define MAX_RETRANSMIT_COUNT 5 // Used to send the retransmit package
+#define MAX_RETRANSMIT_COUNT 20 // MIT-5000-8T: 2 frags/burst, ~3-4 retransmits per remaining frag, need margin
 
 class InverterAbstract;
 

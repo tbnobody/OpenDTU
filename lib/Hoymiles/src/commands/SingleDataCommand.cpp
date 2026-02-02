@@ -18,10 +18,18 @@ Command structure:
 ID   Target Addr   Source Addr        CRC8
 */
 #include "SingleDataCommand.h"
+#include "inverters/InverterAbstract.h"
 
 SingleDataCommand::SingleDataCommand(InverterAbstract* inv, const uint64_t router_address)
     : CommandAbstract(inv, router_address)
 {
     _payload[0] = 0x15;
-    setTimeout(100);
+
+    // MIT-5000-8T responds to retransmit requests at ~835ms intervals
+    const uint16_t prefix = (inv->serial() >> 32) & 0xffff;
+    if (prefix == 0x1520) {
+        setTimeout(2000);
+    } else {
+        setTimeout(250);
+    }
 }
