@@ -61,6 +61,9 @@ public:
 
     uint32_t getInvBootFrequency() const;
 
+    void setCaptureMode(const bool enabled);
+    bool getCaptureMode() const;
+
     uint32_t getFrequencyFromChannel(const uint8_t channel) const;
     uint8_t getChannelFromFrequency(const uint32_t frequency) const;
 
@@ -73,6 +76,8 @@ private:
     void sendEsbPacket(CommandAbstract& cmd);
 
     std::unique_ptr<CMT2300A> _radio;
+
+    bool _captureMode = false;
 
     volatile bool _packetReceived = false;
     volatile bool _packetSent = false;
@@ -88,4 +93,9 @@ private:
     bool cmtSwitchDtuFreq(const uint32_t to_frequency);
 
     CountryModeId_t _countryMode;
+
+    // Channel hopping for capture mode
+    uint8_t _captureChIdx = 0;
+    uint32_t _captureLastHop = 0;
+    static constexpr uint32_t CAPTURE_HOP_INTERVAL_MS = 50; // dwell time per channel (50ms × 29ch = ~1.5s sweep)
 };

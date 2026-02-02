@@ -23,5 +23,5 @@ SingleDataCommand::SingleDataCommand(InverterAbstract* inv, const uint64_t route
     : CommandAbstract(inv, router_address)
 {
     _payload[0] = 0x15;
-    setTimeout(100);
+    setTimeout(250);
 }
