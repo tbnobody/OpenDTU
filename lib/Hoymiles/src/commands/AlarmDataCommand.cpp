@@ -28,7 +28,14 @@ AlarmDataCommand::AlarmDataCommand(InverterAbstract* inv, const uint64_t router_
 {
     setTime(time);
     setDataType(0x11);
-    setTimeout(750);
+
+    // MIT-5000-8T: ~835ms per fragment, AlarmData can have 12+ fragments
+    const uint16_t prefix = (inv->serial() >> 32) & 0xffff;
+    if (prefix == 0x1520) {
+        setTimeout(12000);
+    } else {
+        setTimeout(750);
+    }
 }
 
 String AlarmDataCommand::getCommandName() const

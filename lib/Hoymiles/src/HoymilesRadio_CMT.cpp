@@ -171,7 +171,8 @@ void HoymilesRadio_CMT::loop()
     // (which send 6 rapid response fragments) are captured before the 64-byte
     // hardware FIFO overflows.
     if (_packetReceived) {
-        ESP_LOGV(TAG, "Interrupt received");
+        uint8_t drainCount = 0;
+        const uint32_t drainStart = millis();
         while (_radio->available()) {
             if (_rxBuffer.size() > FRAGMENT_BUFFER_SIZE) {
                 ESP_LOGE(TAG, "CMT2300A: Buffer full");
@@ -188,6 +189,7 @@ void HoymilesRadio_CMT::loop()
             f.mainCmd = 0x00;
             _radio->read(f.fragment, f.len);
             _rxBuffer.push(f);
+            drainCount++;
         }
         _radio->flush_rx();
         _packetReceived = false;

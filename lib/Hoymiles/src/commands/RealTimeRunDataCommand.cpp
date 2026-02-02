@@ -30,7 +30,15 @@ RealTimeRunDataCommand::RealTimeRunDataCommand(InverterAbstract* inv, const uint
 {
     setTime(time);
     setDataType(0x0b);
-    setTimeout(500);
+
+    // MIT-5000-8T sends response fragments at ~835ms intervals (vs ~50ms for HMS/HMT)
+    // Need 6s for 6 fragments at 835ms spacing + margin
+    const uint16_t prefix = (inv->serial() >> 32) & 0xffff;
+    if (prefix == 0x1520) {
+        setTimeout(6000);
+    } else {
+        setTimeout(500);
+    }
 }
 
 String RealTimeRunDataCommand::getCommandName() const
