@@ -173,7 +173,7 @@ void HoymilesRadio_CMT::loop()
         uint8_t drainCount = 0;
         uint32_t lastRxTime = millis();
         while (true) {
-            if (_radio->available()) {
+            if (_radio->available() || _radio->rxFifoAvailable()) {
                 if (_rxBuffer.size() > FRAGMENT_BUFFER_SIZE) {
                     ESP_LOGE(TAG, "CMT2300A: Buffer full");
                     _radio->flush_rx();
