@@ -35,13 +35,6 @@ bool CMT2300A::startListening(void)
     CMT2300A_EnableReadFifo();
     CMT2300A_ClearRxFifo();
 
-    // Disable RX auto-exit: keep the radio in RX mode after receiving a packet.
-    // Without this, the CMT2300A transitions to STBY after each packet, causing
-    // subsequent fragments in a multi-packet burst to be missed.
-    uint8_t modeCtl = CMT2300A_ReadReg(CMT2300A_CUS_MODE_CTL);
-    modeCtl |= CMT2300A_MASK_RX_AUTO_EXIT_DIS;
-    CMT2300A_WriteReg(CMT2300A_CUS_MODE_CTL, modeCtl);
-
     if (!CMT2300A_GoRx()) {
         return false;
     } else {
