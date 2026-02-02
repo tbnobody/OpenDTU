@@ -166,30 +166,35 @@ void HoymilesRadio_CMT::loop()
     }
 
     // Step 1: Drain all available packets from the hardware FIFO into the
-    // software ring buffer. This runs every iteration — not just when the
-    // interrupt flag is set — so that back-to-back packets from MIT inverters
-    // (which send 6 rapid response fragments) are captured before the 64-byte
-    // hardware FIFO overflows.
+    // software ring buffer. After receiving a packet, poll for additional
+    // packets for up to 80ms to catch back-to-back fragments in a burst
+    // (fragments arrive at ~50ms intervals from HMS/HMT/MIT inverters).
     if (_packetReceived) {
         uint8_t drainCount = 0;
-        const uint32_t drainStart = millis();
-        while (_radio->available()) {
-            if (_rxBuffer.size() > FRAGMENT_BUFFER_SIZE) {
-                ESP_LOGE(TAG, "CMT2300A: Buffer full");
-                _radio->flush_rx();
+        uint32_t lastRxTime = millis();
+        while (true) {
+            if (_radio->available()) {
+                if (_rxBuffer.size() > FRAGMENT_BUFFER_SIZE) {
+                    ESP_LOGE(TAG, "CMT2300A: Buffer full");
+                    _radio->flush_rx();
+                    break;
+                }
+
+                fragment_t f;
+                memset(f.fragment, 0xcc, MAX_RF_PAYLOAD_SIZE);
+                f.len = std::min<uint8_t>(_radio->getDynamicPayloadSize(), MAX_RF_PAYLOAD_SIZE);
+                f.channel = _radio->getChannel();
+                f.rssi = _radio->getRssiDBm();
+                f.wasReceived = false;
+                f.mainCmd = 0x00;
+                _radio->read(f.fragment, f.len);
+                _rxBuffer.push(f);
+                drainCount++;
+                lastRxTime = millis();
+            } else if (millis() - lastRxTime > 80) {
+                // No new packet for 80ms — burst is over
                 break;
             }
-
-            fragment_t f;
-            memset(f.fragment, 0xcc, MAX_RF_PAYLOAD_SIZE);
-            f.len = std::min<uint8_t>(_radio->getDynamicPayloadSize(), MAX_RF_PAYLOAD_SIZE);
-            f.channel = _radio->getChannel();
-            f.rssi = _radio->getRssiDBm();
-            f.wasReceived = false;
-            f.mainCmd = 0x00;
-            _radio->read(f.fragment, f.len);
-            _rxBuffer.push(f);
-            drainCount++;
         }
         _radio->flush_rx();
         _packetReceived = false;
