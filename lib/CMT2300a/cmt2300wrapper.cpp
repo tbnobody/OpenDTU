@@ -64,6 +64,13 @@ void CMT2300A::read(void* buf, const uint8_t len)
     CMT2300A_ReadFifo(static_cast<uint8_t*>(buf), len);
 
     CMT2300A_ClearInterruptFlags();
+
+    // The CMT2300A auto-exits RX mode after receiving a packet (goes to STBY).
+    // Re-enter RX immediately so back-to-back fragments from MIT inverters
+    // (which arrive at ~50ms intervals within a burst) are not missed.
+    CMT2300A_EnableReadFifo();
+    CMT2300A_ClearRxFifo();
+    CMT2300A_GoRx();
 }
 
 bool CMT2300A::write(const uint8_t* buf, const uint8_t len)
