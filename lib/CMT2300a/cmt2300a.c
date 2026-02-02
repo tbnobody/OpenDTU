@@ -82,13 +82,6 @@ bool CMT2300A_AutoSwitchStatus(uint8_t nGoCmd)
         break;
     }
 
-    /* When entering RX, set RX_AUTO_EXIT_DIS so the radio stays in RX
-     * after receiving a packet. Without this, back-to-back fragments
-     * in multi-packet responses are missed during the STBY gap. */
-    if (CMT2300A_GO_RX == nGoCmd) {
-        nGoCmd |= CMT2300A_MASK_RX_AUTO_EXIT_DIS;
-    }
-
     CMT2300A_WriteReg(CMT2300A_CUS_MODE_CTL, nGoCmd);
 
     while (CMT2300A_GetTickCount() - nBegTick < 10) {
@@ -97,14 +90,14 @@ bool CMT2300A_AutoSwitchStatus(uint8_t nGoCmd)
         if (nWaitStatus == CMT2300A_GetChipStatus())
             return true;
 
-        if (CMT2300A_GO_TX == (nGoCmd & ~CMT2300A_MASK_RX_AUTO_EXIT_DIS)) {
+        if (CMT2300A_GO_TX == nGoCmd) {
             CMT2300A_DelayUs(100);
 
             if (CMT2300A_MASK_TX_DONE_FLG & CMT2300A_ReadReg(CMT2300A_CUS_INT_CLR1))
                 return true;
         }
 
-        if (CMT2300A_GO_RX == (nGoCmd & ~CMT2300A_MASK_RX_AUTO_EXIT_DIS)) {
+        if (CMT2300A_GO_RX == nGoCmd) {
             CMT2300A_DelayUs(100);
 
             if (CMT2300A_MASK_PKT_OK_FLG & CMT2300A_ReadReg(CMT2300A_CUS_INT_FLAG))
@@ -115,9 +108,6 @@ bool CMT2300A_AutoSwitchStatus(uint8_t nGoCmd)
     return false;
 
 #else
-    if (CMT2300A_GO_RX == nGoCmd) {
-        nGoCmd |= CMT2300A_MASK_RX_AUTO_EXIT_DIS;
-    }
     CMT2300A_WriteReg(CMT2300A_CUS_MODE_CTL, nGoCmd);
     return true;
 #endif

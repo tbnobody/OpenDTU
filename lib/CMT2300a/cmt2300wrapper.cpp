@@ -64,6 +64,13 @@ void CMT2300A::read(void* buf, const uint8_t len)
     CMT2300A_ReadFifo(static_cast<uint8_t*>(buf), len);
 
     CMT2300A_ClearInterruptFlags();
+
+    // After receiving a packet, the CMT2300A exits RX mode (goes to STBY).
+    // Re-enter RX as fast as possible to catch the next fragment in a burst.
+    // Skip the full startListening() sequence (GoStby + EnableReadFifo +
+    // ClearRxFifo + GoRx) — just write GO_RX directly to MODE_CTL.
+    // This is ~4x faster and catches more fragments in rapid bursts.
+    CMT2300A_WriteReg(CMT2300A_CUS_MODE_CTL, CMT2300A_GO_RX);
 }
 
 bool CMT2300A::write(const uint8_t* buf, const uint8_t len)
