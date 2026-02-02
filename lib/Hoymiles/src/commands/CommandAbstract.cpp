@@ -135,7 +135,7 @@ uint8_t CommandAbstract::getMaxResendCount() const
 
 uint8_t CommandAbstract::getMaxRetransmitCount() const
 {
-    return MAX_RETRANSMIT_COUNT;
+    return _inv->getMaxRetransmitCount();
 }
 
 bool CommandAbstract::areSameParameter(CommandAbstract* other)

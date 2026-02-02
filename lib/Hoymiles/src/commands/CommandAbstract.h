@@ -8,7 +8,8 @@
 
 #define RF_LEN 32
 #define MAX_RESEND_COUNT 4 // Used if all packages are missing
-#define MAX_RETRANSMIT_COUNT 5 // Used to send the retransmit package
+#define MAX_DEFAULT_RETRANSMIT_COUNT 5 // Used to send the retransmit package
+#define MAX_MIT_RETRANSMIT_COUNT 20 // Used to send the retransmit package to MIT inverters
 
 class InverterAbstract;
 
