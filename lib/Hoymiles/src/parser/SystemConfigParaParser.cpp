@@ -110,5 +110,10 @@ void SystemConfigParaParser::setLastUpdateRequest(const uint32_t lastUpdate)
 
 uint8_t SystemConfigParaParser::getExpectedByteCount() const
 {
-    return SYSTEM_CONFIG_PARA_SIZE;
+    return _expectedByteCount;
+}
+
+void SystemConfigParaParser::setExpectedByteCount(const uint8_t count)
+{
+    _expectedByteCount = min(count, static_cast<uint8_t>(SYSTEM_CONFIG_PARA_SIZE));
 }
