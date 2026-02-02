@@ -21,6 +21,8 @@ void WebApiDtuClass::init(AsyncWebServer& server, Scheduler& scheduler)
 
     server.on("/api/dtu/config", HTTP_GET, static_cast<ArRequestHandlerFunction>(std::bind(&WebApiDtuClass::onDtuAdminGet, this, _1)));
     server.on("/api/dtu/config", HTTP_POST, static_cast<ArRequestHandlerFunction>(std::bind(&WebApiDtuClass::onDtuAdminPost, this, _1)));
+    server.on("/api/dtu/capture", HTTP_GET, static_cast<ArRequestHandlerFunction>(std::bind(&WebApiDtuClass::onCaptureGet, this, _1)));
+    server.on("/api/dtu/capture", HTTP_POST, static_cast<ArRequestHandlerFunction>(std::bind(&WebApiDtuClass::onCapturePost, this, _1)));
 
     scheduler.addTask(_applyDataTask);
 }
@@ -169,4 +171,47 @@ void WebApiDtuClass::onDtuAdminPost(AsyncWebServerRequest* request)
 
     _applyDataTask.enable();
     _applyDataTask.restart();
+}
+
+void WebApiDtuClass::onCaptureGet(AsyncWebServerRequest* request)
+{
+    if (!WebApi.checkCredentials(request)) {
+        return;
+    }
+
+    AsyncJsonResponse* response = new AsyncJsonResponse();
+    auto& root = response->getRoot();
+    root["capture_mode"] = Hoymiles.getRadioCmt()->getCaptureMode();
+
+    WebApi.sendJsonResponse(request, response, __FUNCTION__, __LINE__);
+}
+
+void WebApiDtuClass::onCapturePost(AsyncWebServerRequest* request)
+{
+    if (!WebApi.checkCredentials(request)) {
+        return;
+    }
+
+    AsyncJsonResponse* response = new AsyncJsonResponse();
+    JsonDocument root;
+    if (!WebApi.parseRequestData(request, response, root)) {
+        return;
+    }
+
+    auto& retMsg = response->getRoot();
+
+    if (!root["capture_mode"].is<bool>()) {
+        retMsg["message"] = "Values are missing!";
+        retMsg["code"] = WebApiError::GenericValueMissing;
+        WebApi.sendJsonResponse(request, response, __FUNCTION__, __LINE__);
+        return;
+    }
+
+    Hoymiles.getRadioCmt()->setCaptureMode(root["capture_mode"].as<bool>());
+
+    retMsg["type"] = "success";
+    retMsg["message"] = "Capture mode updated!";
+    retMsg["code"] = 0;
+
+    WebApi.sendJsonResponse(request, response, __FUNCTION__, __LINE__);
 }
