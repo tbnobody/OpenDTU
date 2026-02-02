@@ -166,35 +166,24 @@ void HoymilesRadio_CMT::loop()
     }
 
     // Step 1: Drain all available packets from the hardware FIFO into the
-    // software ring buffer. After receiving a packet, poll for additional
-    // packets for up to 80ms to catch back-to-back fragments in a burst
-    // (fragments arrive at ~50ms intervals from HMS/HMT/MIT inverters).
+    // software ring buffer.
     if (_packetReceived) {
-        uint8_t drainCount = 0;
-        uint32_t lastRxTime = millis();
-        while (true) {
-            if (_radio->available() || _radio->rxFifoAvailable()) {
-                if (_rxBuffer.size() > FRAGMENT_BUFFER_SIZE) {
-                    ESP_LOGE(TAG, "CMT2300A: Buffer full");
-                    _radio->flush_rx();
-                    break;
-                }
-
-                fragment_t f;
-                memset(f.fragment, 0xcc, MAX_RF_PAYLOAD_SIZE);
-                f.len = std::min<uint8_t>(_radio->getDynamicPayloadSize(), MAX_RF_PAYLOAD_SIZE);
-                f.channel = _radio->getChannel();
-                f.rssi = _radio->getRssiDBm();
-                f.wasReceived = false;
-                f.mainCmd = 0x00;
-                _radio->read(f.fragment, f.len);
-                _rxBuffer.push(f);
-                drainCount++;
-                lastRxTime = millis();
-            } else if (millis() - lastRxTime > 80) {
-                // No new packet for 80ms — burst is over
+        while (_radio->available()) {
+            if (_rxBuffer.size() > FRAGMENT_BUFFER_SIZE) {
+                ESP_LOGE(TAG, "CMT2300A: Buffer full");
+                _radio->flush_rx();
                 break;
             }
+
+            fragment_t f;
+            memset(f.fragment, 0xcc, MAX_RF_PAYLOAD_SIZE);
+            f.len = std::min<uint8_t>(_radio->getDynamicPayloadSize(), MAX_RF_PAYLOAD_SIZE);
+            f.channel = _radio->getChannel();
+            f.rssi = _radio->getRssiDBm();
+            f.wasReceived = false;
+            f.mainCmd = 0x00;
+            _radio->read(f.fragment, f.len);
+            _rxBuffer.push(f);
         }
         _radio->flush_rx();
         _packetReceived = false;

@@ -64,15 +64,6 @@ void CMT2300A::read(void* buf, const uint8_t len)
     CMT2300A_ReadFifo(static_cast<uint8_t*>(buf), len);
 
     CMT2300A_ClearInterruptFlags();
-
-    // Re-enter RX mode so the next fragment in a burst can be received.
-    // The CMT2300A exits RX after each packet (goes to STBY).
-    // Use the full startListening() sequence to properly reset the FIFO
-    // and re-enter RX — a bare GoRx write corrupts FIFO reads.
-    CMT2300A_GoStby();
-    CMT2300A_EnableReadFifo();
-    CMT2300A_ClearRxFifo();
-    CMT2300A_GoRx();
 }
 
 bool CMT2300A::write(const uint8_t* buf, const uint8_t len)
