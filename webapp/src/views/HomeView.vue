@@ -908,18 +908,15 @@ export default defineComponent({
         },
 
         onSetPowerSettings(turnOn: boolean, restart = false) {
-            let data = {};
-            if (restart) {
-                data = {
-                    serial: this.powerSettingSerial,
-                    restart: true,
-                };
-            } else {
-                data = {
-                    serial: this.powerSettingSerial,
-                    power: turnOn,
-                };
-            }
+            const data = restart
+                ? {
+                      serial: this.powerSettingSerial,
+                      restart: true,
+                  }
+                : {
+                      serial: this.powerSettingSerial,
+                      power: turnOn,
+                  };
 
             const formData = new FormData();
             formData.append('data', JSON.stringify(data));
