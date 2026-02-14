@@ -17,7 +17,6 @@
 #define SYSLOG_MAX_HOSTNAME_STRLEN 128
 
 #define NTP_MAX_SERVER_STRLEN 31
-#define NTP_MAX_TIMEZONE_STRLEN 50
 #define NTP_MAX_TIMEZONEDESCR_STRLEN 50
 
 #define MQTT_MAX_HOSTNAME_STRLEN 128
@@ -93,7 +92,6 @@ struct CONFIG_T {
 
     struct {
         char Server[NTP_MAX_SERVER_STRLEN + 1];
-        char Timezone[NTP_MAX_TIMEZONE_STRLEN + 1];
         char TimezoneDescr[NTP_MAX_TIMEZONEDESCR_STRLEN + 1];
         double Longitude;
         double Latitude;
