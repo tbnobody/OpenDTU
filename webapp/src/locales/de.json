@@ -701,6 +701,8 @@
         "Module_mqtt": "MQTT Client",
         "Module_network": "Netzwerk",
         "Module_webapi": "Web API",
+        "Module_async_ws": "Async WebSockets",
+        "Module_async_tcp": "Async TCP",
         "CoreHint": "Achtung: Eine zu detaillierte Protokollierungsstufe des ESP-IDF-Kern-Moduls kann die Performanz signifikant beeinträchtigen und zu unvorhersehbarem Verhalten führen. Die Log-Level-Einstellung sollte nur bei gezielter Fehlersuche temporär angepasst werden. Die Standardeinstellung 'Fehler' ist für den normalen Betrieb ausreichend.",
         "log_inherit": "Von Standard erben",
         "log_none": "Keine",
