@@ -13,6 +13,10 @@
 #undef TAG
 static const char* TAG = "hoymiles";
 
+#define NEW_TX_METHOD
+#define NEW_RX_METHOD
+#define HOPPING_MICROS 4000
+
 void HoymilesRadio_NRF::init(SPIClass* initialisedSpiBus, const uint8_t pinCE, const uint8_t pinIRQ)
 {
     _dtuSerial.u64 = 0;
@@ -47,10 +51,14 @@ void HoymilesRadio_NRF::loop()
         return;
     }
 
+    #ifdef NEW_RX_METHOD
+    checkRxCh(); // first check
+    #else
     EVERY_N_MILLIS(4)
     {
         switchRxCh();
     }
+    #endif
 
     if (_packetReceived) {
         ESP_LOGV(TAG, "Interrupt received");
@@ -98,6 +106,10 @@ void HoymilesRadio_NRF::loop()
     }
 
     handleReceivedPackage();
+
+    #ifdef NEW_RX_METHOD
+    checkRxCh(); // second check
+    #endif
 }
 
 void HoymilesRadio_NRF::setPALevel(const rf24_pa_dbm_e paLevel)
@@ -172,6 +184,50 @@ void HoymilesRadio_NRF::switchRxCh()
     _radio->startListening();
 }
 
+void HoymilesRadio_NRF::checkRxCh(bool const immediately)
+{
+    // channel hopping should be kept as precise as possible,
+    // even if the function has not been called for a longer
+    // period of time or if the function is called multiple times
+    // in the same period.
+    // Only if the immediately flag is set, the channel will be
+    // switched without checking the time.
+    uint32_t diffMicros = micros() - _refMicros;
+    if (diffMicros >= HOPPING_MICROS || immediately) {
+        uint32_t addCh = diffMicros / HOPPING_MICROS;
+        _rxChIdx = (_rxChIdx + addCh) % sizeof(_rxChLst);
+        _refMicros = _refMicros + addCh * HOPPING_MICROS;
+
+        _radio->stopListening();
+        _radio->setChannel(_rxChLst[_rxChIdx]);
+        _radio->startListening();
+    }
+}
+
+uint8_t HoymilesRadio_NRF::syncToRxCh()
+{
+    // we sync to the next rx channel to avoid long delays.
+    // That means the tx channel is randomly switched between the 5 channels.
+    // If we want to step continuously through all tx channels,
+    // we would have to accept longer delays.
+    uint32_t nowMicros = micros();
+    uint32_t diffMicros = nowMicros - _refMicros;
+    uint32_t addCh = diffMicros / HOPPING_MICROS + 1;
+    _refMicros = _refMicros + addCh * HOPPING_MICROS;
+    uint32_t delayMicros = _refMicros - nowMicros;
+    if (delayMicros < HOPPING_MICROS) {
+        delayMicroseconds(delayMicros); // delay of 0-4ms
+    }
+
+    // we sync transmit to the next rx channel.
+    //For example, if we are on channel 61, we will sync to channel 75
+    // rx-Channel:     40|61|75|03|23|40|61
+    // transmit sync:       |75|
+    _rxChIdx = (_rxChIdx + addCh) % sizeof(_rxChLst);
+
+    return _rxChLst[_rxChIdx];
+}
+
 void HoymilesRadio_NRF::sendEsbPacket(CommandAbstract& cmd)
 {
     cmd.incrementSendCount();
@@ -179,12 +235,29 @@ void HoymilesRadio_NRF::sendEsbPacket(CommandAbstract& cmd)
     cmd.setRouterAddress(DtuSerial().u64);
 
     _radio->stopListening();
+
+    #ifdef NEW_TX_METHOD
+    _radio->setChannel(syncToRxCh());
+    #else
     _radio->setChannel(getTxNxtChannel());
+    #endif
 
     serial_u s;
     s.u64 = cmd.getTargetAddress();
     openWritingPipe(s);
-    _radio->setRetries(3, 15);
+
+    #ifdef NEW_TX_METHOD
+    // the Automatic Retry Delay and the Automatic Retry Attempts are dynamically adjusted based
+    // on the payload to optimize transmission time and success rate. (5 * 4ms = 20ms)
+    uint8_t dataSize = std::min<uint8_t>(cmd.getDataSize(), sizeof(_ARD) - 1);
+    uint8_t ard = _ARD[dataSize];
+    uint8_t art = _ART[dataSize];
+    #else
+    uint8_t ard = 3;
+    uint8_t art = 15;
+    #endif
+
+    _radio->setRetries(ard, art);
 
     ESP_LOGD(TAG, "TX %s Channel: %" PRIu8 " --> %s",
         cmd.getCommandName().c_str(), _radio->getChannel(), cmd.dumpDataPayload().c_str());
@@ -192,8 +265,14 @@ void HoymilesRadio_NRF::sendEsbPacket(CommandAbstract& cmd)
 
     _radio->setRetries(0, 0);
     openReadingPipe();
+
+    #ifdef NEW_RX_METHOD
+    checkRxCh(true); // switch back to the correct RX channel to be ready for the response.
+    #else
     _radio->setChannel(getRxNxtChannel());
     _radio->startListening();
+    #endif
+
     _busyFlag = true;
     _rxTimeout.set(cmd.getTimeout());
 }
