@@ -273,7 +273,8 @@ void PowerLimiterClass::loop()
 
     auto getFullSolarPassthrough = [this,&config]() -> bool {
         // we only do full solar PT if general solar PT is enabled
-        if (!isSolarPassThroughEnabled()) { return false; }
+        // and we are above the 'battery start threshold'
+        if (!isSolarPassThroughEnabled() || !isStartThresholdReached()) { return false; }
 
         if (testThreshold(config.PowerLimiter.FullSolarPassThroughSoc,
                         config.PowerLimiter.FullSolarPassThroughStartVoltage,
