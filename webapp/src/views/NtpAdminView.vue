@@ -151,7 +151,7 @@ export default defineComponent({
         },
         getTimezoneList() {
             this.timezoneLoading = true;
-            fetch('/api/ntp/zones')
+            fetch('/api/ntp/zones', { headers: authHeader() })
                 .then((response) => response.json())
                 .then((data) => {
                     this.timezoneList = data;
