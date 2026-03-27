@@ -27,7 +27,7 @@ void HoymilesRadio_NRF::init(SPIClass* initialisedSpiBus, const uint8_t pinCE, c
     _radio->setCRCLength(RF24_CRC_16);
     _radio->setAddressWidth(5);
     _radio->setRetries(0, 0);
-    _radio->maskIRQ(true, true, false); // enable only receiving interrupts
+    _radio->setStatusFlags(RF24_RX_DR); // enable only receiving interrupts
     if (!_radio->isChipConnected()) {
         ESP_LOGE(TAG, "NRF: Connection error!!");
         return;
@@ -143,7 +143,7 @@ void HoymilesRadio_NRF::openReadingPipe()
 void HoymilesRadio_NRF::openWritingPipe(const serial_u serial)
 {
     const serial_u s = convertSerialToRadioId(serial);
-    _radio->openWritingPipe(s.u64);
+    _radio->stopListening(s.u64);
 }
 
 void ARDUINO_ISR_ATTR HoymilesRadio_NRF::handleIntr()
