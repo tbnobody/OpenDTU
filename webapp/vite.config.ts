@@ -58,7 +58,7 @@ export default defineConfig({
     rollupOptions: {
       output: {
         // Only create one js file
-        inlineDynamicImports: true,
+        codeSplitting: false,
         // Get rid of hash on js file
         entryFileNames: 'js/app.js',
         // Get rid of hash on css file
