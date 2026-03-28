@@ -68,9 +68,10 @@ def main():
     print("INFO: testing for up-to-date webapp artifacts")
 
     directories = ["webapp/src/", "webapp/public/"]
-    files = ["webapp/index.html", "webapp/tsconfig.config.json",
-             "webapp/tsconfig.json", "webapp/vite.config.ts",
-             "webapp/yarn.lock", "webapp/package.json"]
+    files = ["webapp/index.html", "webapp/tsconfig.json",
+             "webapp/tsconfig.app.json", "webapp/tsconfig.node.json",
+             "webapp/vite.config.ts", "webapp/yarn.lock",
+             "webapp/package.json"]
     hash_file = "webapp_dist/.hashes.pkl"
 
     check_files(directories, files, hash_file)
