@@ -18,11 +18,11 @@ void WebApiGridChargerClass::init(AsyncWebServer& server, Scheduler& scheduler)
 
     _server = &server;
 
-    _server->on("/api/gridcharger/status", HTTP_GET, std::bind(&WebApiGridChargerClass::onStatus, this, _1));
-    _server->on("/api/gridcharger/config", HTTP_GET, std::bind(&WebApiGridChargerClass::onAdminGet, this, _1));
-    _server->on("/api/gridcharger/config", HTTP_POST, std::bind(&WebApiGridChargerClass::onAdminPost, this, _1));
-    _server->on("/api/gridcharger/limit", HTTP_POST, std::bind(&WebApiGridChargerClass::onLimitPost, this, _1));
-    _server->on("/api/gridcharger/power", HTTP_POST, std::bind(&WebApiGridChargerClass::onPowerPost, this, _1));
+    _server->on("/api/gridcharger/status", HTTP_GET, static_cast<ArRequestHandlerFunction>(std::bind(&WebApiGridChargerClass::onStatus, this, _1)));
+    _server->on("/api/gridcharger/config", HTTP_GET, static_cast<ArRequestHandlerFunction>(std::bind(&WebApiGridChargerClass::onAdminGet, this, _1)));
+    _server->on("/api/gridcharger/config", HTTP_POST, static_cast<ArRequestHandlerFunction>(std::bind(&WebApiGridChargerClass::onAdminPost, this, _1)));
+    _server->on("/api/gridcharger/limit", HTTP_POST, static_cast<ArRequestHandlerFunction>(std::bind(&WebApiGridChargerClass::onLimitPost, this, _1)));
+    _server->on("/api/gridcharger/power", HTTP_POST, static_cast<ArRequestHandlerFunction>(std::bind(&WebApiGridChargerClass::onPowerPost, this, _1)));
 }
 
 void WebApiGridChargerClass::onStatus(AsyncWebServerRequest* request)

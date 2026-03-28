@@ -19,10 +19,10 @@ void WebApiPowerLimiterClass::init(AsyncWebServer& server, Scheduler& scheduler)
 
     _server = &server;
 
-    _server->on("/api/powerlimiter/status", HTTP_GET, std::bind(&WebApiPowerLimiterClass::onStatus, this, _1));
-    _server->on("/api/powerlimiter/config", HTTP_GET, std::bind(&WebApiPowerLimiterClass::onAdminGet, this, _1));
-    _server->on("/api/powerlimiter/config", HTTP_POST, std::bind(&WebApiPowerLimiterClass::onAdminPost, this, _1));
-    _server->on("/api/powerlimiter/metadata", HTTP_GET, std::bind(&WebApiPowerLimiterClass::onMetaData, this, _1));
+    _server->on("/api/powerlimiter/status", HTTP_GET, static_cast<ArRequestHandlerFunction>(std::bind(&WebApiPowerLimiterClass::onStatus, this, _1)));
+    _server->on("/api/powerlimiter/config", HTTP_GET, static_cast<ArRequestHandlerFunction>(std::bind(&WebApiPowerLimiterClass::onAdminGet, this, _1)));
+    _server->on("/api/powerlimiter/config", HTTP_POST, static_cast<ArRequestHandlerFunction>(std::bind(&WebApiPowerLimiterClass::onAdminPost, this, _1)));
+    _server->on("/api/powerlimiter/metadata", HTTP_GET, static_cast<ArRequestHandlerFunction>(std::bind(&WebApiPowerLimiterClass::onMetaData, this, _1)));
 }
 
 void WebApiPowerLimiterClass::onStatus(AsyncWebServerRequest* request)

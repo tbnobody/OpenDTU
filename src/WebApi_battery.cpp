@@ -19,9 +19,9 @@ void WebApiBatteryClass::init(AsyncWebServer& server, Scheduler& scheduler)
 
     _server = &server;
 
-    _server->on("/api/battery/status", HTTP_GET, std::bind(&WebApiBatteryClass::onStatus, this, _1));
-    _server->on("/api/battery/config", HTTP_GET, std::bind(&WebApiBatteryClass::onAdminGet, this, _1));
-    _server->on("/api/battery/config", HTTP_POST, std::bind(&WebApiBatteryClass::onAdminPost, this, _1));
+    _server->on("/api/battery/status", HTTP_GET, static_cast<ArRequestHandlerFunction>(std::bind(&WebApiBatteryClass::onStatus, this, _1)));
+    _server->on("/api/battery/config", HTTP_GET, static_cast<ArRequestHandlerFunction>(std::bind(&WebApiBatteryClass::onAdminGet, this, _1)));
+    _server->on("/api/battery/config", HTTP_POST, static_cast<ArRequestHandlerFunction>(std::bind(&WebApiBatteryClass::onAdminPost, this, _1)));
 }
 
 void WebApiBatteryClass::onStatus(AsyncWebServerRequest* request)

@@ -15,8 +15,8 @@ void WebApiSolarChargerlass::init(AsyncWebServer& server, Scheduler& scheduler)
 
     _server = &server;
 
-    _server->on("/api/solarcharger/config", HTTP_GET, std::bind(&WebApiSolarChargerlass::onAdminGet, this, _1));
-    _server->on("/api/solarcharger/config", HTTP_POST, std::bind(&WebApiSolarChargerlass::onAdminPost, this, _1));
+    _server->on("/api/solarcharger/config", HTTP_GET, static_cast<ArRequestHandlerFunction>(std::bind(&WebApiSolarChargerlass::onAdminGet, this, _1)));
+    _server->on("/api/solarcharger/config", HTTP_POST, static_cast<ArRequestHandlerFunction>(std::bind(&WebApiSolarChargerlass::onAdminPost, this, _1)));
 }
 
 void WebApiSolarChargerlass::onAdminGet(AsyncWebServerRequest* request)

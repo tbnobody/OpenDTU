@@ -29,7 +29,7 @@ void WebApiWsBatteryLiveClass::init(AsyncWebServer& server, Scheduler& scheduler
     using std::placeholders::_6;
 
     _server = &server;
-    _server->on("/api/batterylivedata/status", HTTP_GET, std::bind(&WebApiWsBatteryLiveClass::onLivedataStatus, this, _1));
+    _server->on("/api/batterylivedata/status", HTTP_GET, static_cast<ArRequestHandlerFunction>(std::bind(&WebApiWsBatteryLiveClass::onLivedataStatus, this, _1)));
 
     _server->addHandler(&_ws);
     _ws.onEvent(std::bind(&WebApiWsBatteryLiveClass::onWebsocketEvent, this, _1, _2, _3, _4, _5, _6));
@@ -87,7 +87,7 @@ void WebApiWsBatteryLiveClass::sendDataTaskCb()
         std::lock_guard<std::mutex> lock(_mutex);
         JsonDocument root;
         JsonVariant var = root;
-        
+
         generateCommonJsonResponse(var);
 
         if (Utils::checkJsonAlloc(root, __FUNCTION__, __LINE__)) {
