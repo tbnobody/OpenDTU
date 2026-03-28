@@ -137,13 +137,13 @@ bool HoymilesRadio_NRF::isPVariant() const
 void HoymilesRadio_NRF::openReadingPipe()
 {
     const serial_u s = convertSerialToRadioId(_dtuSerial);
-    _radio->openReadingPipe(1, s.u64);
+    _radio->openReadingPipe(1, s.b);
 }
 
 void HoymilesRadio_NRF::openWritingPipe(const serial_u serial)
 {
     const serial_u s = convertSerialToRadioId(serial);
-    _radio->stopListening(s.u64);
+    _radio->stopListening(s.b);
 }
 
 void ARDUINO_ISR_ATTR HoymilesRadio_NRF::handleIntr()
