@@ -83,7 +83,7 @@ void WebApiLimitClass::onLimitPost(AsyncWebServerRequest* request)
         return;
     }
 
-    if (root["limit_value"].as<float>() > MAX_INVERTER_LIMIT) {
+    if (root["limit_value"].as<float>() < 0 || root["limit_value"].as<float>() > MAX_INVERTER_LIMIT) {
         retMsg["message"] = "Limit must between 0 and " STR_EXTRACT(MAX_INVERTER_LIMIT) "!";
         retMsg["code"] = WebApiError::LimitInvalidLimit;
         retMsg["param"]["max"] = MAX_INVERTER_LIMIT;
