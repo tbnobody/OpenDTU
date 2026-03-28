@@ -14,8 +14,8 @@ void WebApiLimitClass::init(AsyncWebServer& server, Scheduler& scheduler)
 {
     using std::placeholders::_1;
 
-    server.on("/api/limit/status", HTTP_GET, std::bind(&WebApiLimitClass::onLimitStatus, this, _1));
-    server.on("/api/limit/config", HTTP_POST, std::bind(&WebApiLimitClass::onLimitPost, this, _1));
+    server.on("/api/limit/status", HTTP_GET, static_cast<ArRequestHandlerFunction>(std::bind(&WebApiLimitClass::onLimitStatus, this, _1)));
+    server.on("/api/limit/config", HTTP_POST, static_cast<ArRequestHandlerFunction>(std::bind(&WebApiLimitClass::onLimitPost, this, _1)));
 }
 
 void WebApiLimitClass::onLimitStatus(AsyncWebServerRequest* request)
@@ -84,7 +84,7 @@ void WebApiLimitClass::onLimitPost(AsyncWebServerRequest* request)
     }
 
     if (root["limit_value"].as<float>() > MAX_INVERTER_LIMIT) {
-        retMsg["message"] = "Limit must between 0 and " STR(MAX_INVERTER_LIMIT) "!";
+        retMsg["message"] = "Limit must between 0 and " STR_EXTRACT(MAX_INVERTER_LIMIT) "!";
         retMsg["code"] = WebApiError::LimitInvalidLimit;
         retMsg["param"]["max"] = MAX_INVERTER_LIMIT;
         WebApi.sendJsonResponse(request, response, __FUNCTION__, __LINE__);

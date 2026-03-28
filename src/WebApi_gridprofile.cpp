@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * Copyright (C) 2022-2025 Thomas Basler and others
+ * Copyright (C) 2022-2026 Thomas Basler and others
  */
 #include "WebApi_gridprofile.h"
 #include "WebApi.h"
@@ -11,8 +11,8 @@ void WebApiGridProfileClass::init(AsyncWebServer& server, Scheduler& scheduler)
 {
     using std::placeholders::_1;
 
-    server.on("/api/gridprofile/status", HTTP_GET, std::bind(&WebApiGridProfileClass::onGridProfileStatus, this, _1));
-    server.on("/api/gridprofile/rawdata", HTTP_GET, std::bind(&WebApiGridProfileClass::onGridProfileRawdata, this, _1));
+    server.on("/api/gridprofile/status", HTTP_GET, static_cast<ArRequestHandlerFunction>(std::bind(&WebApiGridProfileClass::onGridProfileStatus, this, _1)));
+    server.on("/api/gridprofile/rawdata", HTTP_GET, static_cast<ArRequestHandlerFunction>(std::bind(&WebApiGridProfileClass::onGridProfileRawdata, this, _1)));
 }
 
 void WebApiGridProfileClass::onGridProfileStatus(AsyncWebServerRequest* request)

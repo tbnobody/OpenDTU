@@ -544,6 +544,7 @@ import {
     BIconToggleOn,
 } from 'bootstrap-icons-vue';
 import { defineComponent } from 'vue';
+import WebSocketService from '@/utils/websocketService';
 
 export default defineComponent({
     components: {
@@ -575,7 +576,7 @@ export default defineComponent({
         return {
             isLogged: isLoggedIn(),
 
-            socket: {} as WebSocket,
+            socket: {} as WebSocketService,
             heartInterval: 0,
             dataAgeTimers: {} as Record<string, number>,
             dataLoading: true,
@@ -637,7 +638,7 @@ export default defineComponent({
         this.powerSettingView = new bootstrap.Modal('#powerSettingView');
     },
     unmounted() {
-        this.closeSocket();
+        this.socket?.close();
     },
     updated() {
         console.log('Updated');
@@ -695,12 +696,49 @@ export default defineComponent({
                 });
         },
         reloadData() {
-            this.closeSocket();
+            this.socket?.close();
 
-            setTimeout(() => {
-                this.getInitialData(false);
+            this.getInitialData(false);
+            this.initSocket();
+        },
+        handleMessage(event: MessageEvent) {
+            if (!event.data || event.data === '{}') {
+                this.socket?.close(); // force reconnect
                 this.initSocket();
-            }, 1000);
+                return;
+            }
+
+            const newData = JSON.parse(event.data);
+
+            if (typeof newData.solarcharger !== 'undefined') {
+                Object.assign(this.liveData.solarcharger, newData.solarcharger);
+            }
+            if (typeof newData.gridcharger !== 'undefined') {
+                Object.assign(this.liveData.gridcharger, newData.gridcharger);
+            }
+            if (typeof newData.battery !== 'undefined') {
+                Object.assign(this.liveData.battery, newData.battery);
+            }
+            if (typeof newData.power_meter !== 'undefined') {
+                Object.assign(this.liveData.power_meter, newData.power_meter);
+            }
+
+            if (typeof newData.total === 'undefined') {
+                return;
+            }
+
+            Object.assign(this.liveData.total, newData.total);
+            Object.assign(this.liveData.hints, newData.hints);
+
+            const idx = this.liveData.inverters.findIndex((i) => i.serial === newData.inverters[0].serial);
+
+            if (idx == -1) {
+                Object.assign(this.liveData.inverters, newData.inverters);
+                this.liveData.inverters.forEach((inv) => this.resetDataAging(inv));
+            } else if (this.liveData.inverters[idx]) {
+                Object.assign(this.liveData.inverters[idx], newData.inverters[0]);
+                this.resetDataAging(this.liveData.inverters[idx]);
+            }
         },
         initSocket() {
             console.log('Starting connection to WebSocket Server');
@@ -709,67 +747,24 @@ export default defineComponent({
             const authString = authUrl();
             const webSocketUrl = `${protocol === 'https:' ? 'wss' : 'ws'}://${authString}${host}/livedata`;
 
-            this.socket = new WebSocket(webSocketUrl);
-
-            this.socket.onmessage = (event) => {
-                console.log(event);
-                if (event.data != '{}') {
-                    const newData = JSON.parse(event.data);
-
-                    if (typeof newData.solarcharger !== 'undefined') {
-                        Object.assign(this.liveData.solarcharger, newData.solarcharger);
-                    }
-                    if (typeof newData.gridcharger !== 'undefined') {
-                        Object.assign(this.liveData.gridcharger, newData.gridcharger);
-                    }
-                    if (typeof newData.battery !== 'undefined') {
-                        Object.assign(this.liveData.battery, newData.battery);
-                    }
-                    if (typeof newData.power_meter !== 'undefined') {
-                        Object.assign(this.liveData.power_meter, newData.power_meter);
-                    }
-
-                    if (typeof newData.total === 'undefined') {
-                        return;
-                    }
-
-                    Object.assign(this.liveData.total, newData.total);
-                    Object.assign(this.liveData.hints, newData.hints);
-
-                    const foundIdx = this.liveData.inverters.findIndex(
-                        (element) => element.serial == newData.inverters[0].serial
-                    );
-                    if (foundIdx == -1) {
-                        Object.assign(this.liveData.inverters, newData.inverters);
-                        this.liveData.inverters.forEach((inv) => this.resetDataAging(inv));
-                    } else if (this.liveData.inverters[foundIdx]) {
-                        Object.assign(this.liveData.inverters[foundIdx], newData.inverters[0]);
-                        this.resetDataAging(this.liveData.inverters[foundIdx]);
-                    }
-                    this.dataLoading = false;
-                    this.heartCheck(); // Reset heartbeat detection
-                } else {
-                    // Sometimes it does not recover automatically so have to force a reconnect
-                    this.closeSocket();
-                    this.heartCheck(10); // Reconnect faster
-                }
-            };
-
-            this.socket.onopen = (event) => {
-                console.log(event);
-                console.log('Successfully connected to the echo websocket server...');
-                this.isWebsocketConnected = true;
-            };
-
-            this.socket.onclose = () => {
-                console.log('Connection to websocket closed...');
-                this.isWebsocketConnected = false;
-            };
+            this.socket = new WebSocketService(webSocketUrl, {
+                onMessage: this.handleMessage,
+                onOpen: () => {
+                    console.log('WebSocket connected');
+                    this.isWebsocketConnected = true;
+                },
+                onClose: () => {
+                    console.log('WebSocket closed');
+                    this.isWebsocketConnected = false;
+                },
+            });
 
             // Listen to window events , When the window closes , Take the initiative to disconnect websocket Connect
             window.onbeforeunload = () => {
-                this.closeSocket();
+                this.socket?.close();
             };
+
+            this.socket?.connect();
         },
         resetDataAging(inv: Inverter) {
             if (this.dataAgeTimers[inv.serial] !== undefined) {
@@ -792,28 +787,6 @@ export default defineComponent({
             this.dataAgeTimers[serial] = setTimeout(() => {
                 this.doDataAging(serial);
             }, 1000);
-        },
-        // Send heartbeat packets regularly * 59s Send a heartbeat
-        heartCheck(duration: number = 59) {
-            if (this.heartInterval) {
-                clearTimeout(this.heartInterval);
-            }
-            this.heartInterval = setInterval(() => {
-                if (this.socket.readyState === 1) {
-                    // Connection status
-                    this.socket.send('ping');
-                } else {
-                    this.initSocket(); // Breakpoint reconnection 5 Time
-                }
-            }, duration * 1000);
-        },
-        /** To break off websocket Connect */
-        closeSocket() {
-            this.socket.close();
-            if (this.heartInterval) {
-                clearTimeout(this.heartInterval);
-            }
-            this.isFirstFetchAfterConnect = true;
         },
         onShowEventlog(serial: string) {
             this.eventLogLoading = true;
@@ -945,18 +918,15 @@ export default defineComponent({
         },
 
         onSetPowerSettings(turnOn: boolean, restart = false) {
-            let data = {};
-            if (restart) {
-                data = {
-                    serial: this.powerSettingSerial,
-                    restart: true,
-                };
-            } else {
-                data = {
-                    serial: this.powerSettingSerial,
-                    power: turnOn,
-                };
-            }
+            const data = restart
+                ? {
+                      serial: this.powerSettingSerial,
+                      restart: true,
+                  }
+                : {
+                      serial: this.powerSettingSerial,
+                      power: turnOn,
+                  };
 
             const formData = new FormData();
             formData.append('data', JSON.stringify(data));

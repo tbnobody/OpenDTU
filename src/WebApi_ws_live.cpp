@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * Copyright (C) 2022-2025 Thomas Basler and others
+ * Copyright (C) 2022-2026 Thomas Basler and others
  */
 #include "WebApi_ws_live.h"
 #include "Datastore.h"
@@ -38,7 +38,7 @@ void WebApiWsLiveClass::init(AsyncWebServer& server, Scheduler& scheduler)
     using std::placeholders::_5;
     using std::placeholders::_6;
 
-    server.on("/api/livedata/status", HTTP_GET, std::bind(&WebApiWsLiveClass::onLivedataStatus, this, _1));
+    server.on("/api/livedata/status", HTTP_GET, static_cast<ArRequestHandlerFunction>(std::bind(&WebApiWsLiveClass::onLivedataStatus, this, _1)));
 
     server.addHandler(&_ws);
     _ws.onEvent(std::bind(&WebApiWsLiveClass::onWebsocketEvent, this, _1, _2, _3, _4, _5, _6));

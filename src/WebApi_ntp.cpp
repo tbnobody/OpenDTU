@@ -10,16 +10,18 @@
 #include "WebApi_errors.h"
 #include "helper.h"
 #include <AsyncJson.h>
+#include <MycilaNTP.h>
 
 void WebApiNtpClass::init(AsyncWebServer& server, Scheduler& scheduler)
 {
     using std::placeholders::_1;
 
-    server.on("/api/ntp/status", HTTP_GET, std::bind(&WebApiNtpClass::onNtpStatus, this, _1));
-    server.on("/api/ntp/config", HTTP_GET, std::bind(&WebApiNtpClass::onNtpAdminGet, this, _1));
-    server.on("/api/ntp/config", HTTP_POST, std::bind(&WebApiNtpClass::onNtpAdminPost, this, _1));
-    server.on("/api/ntp/time", HTTP_GET, std::bind(&WebApiNtpClass::onNtpTimeGet, this, _1));
-    server.on("/api/ntp/time", HTTP_POST, std::bind(&WebApiNtpClass::onNtpTimePost, this, _1));
+    server.on("/api/ntp/status", HTTP_GET, static_cast<ArRequestHandlerFunction>(std::bind(&WebApiNtpClass::onNtpStatus, this, _1)));
+    server.on("/api/ntp/config", HTTP_GET, static_cast<ArRequestHandlerFunction>(std::bind(&WebApiNtpClass::onNtpAdminGet, this, _1)));
+    server.on("/api/ntp/config", HTTP_POST, static_cast<ArRequestHandlerFunction>(std::bind(&WebApiNtpClass::onNtpAdminPost, this, _1)));
+    server.on("/api/ntp/time", HTTP_GET, static_cast<ArRequestHandlerFunction>(std::bind(&WebApiNtpClass::onNtpTimeGet, this, _1)));
+    server.on("/api/ntp/time", HTTP_POST, static_cast<ArRequestHandlerFunction>(std::bind(&WebApiNtpClass::onNtpTimePost, this, _1)));
+    server.on("/api/ntp/zones", HTTP_GET, static_cast<ArRequestHandlerFunction>(std::bind(&WebApiNtpClass::onNtpTimezonesGet, this, _1)));
 }
 
 void WebApiNtpClass::onNtpStatus(AsyncWebServerRequest* request)
@@ -33,15 +35,12 @@ void WebApiNtpClass::onNtpStatus(AsyncWebServerRequest* request)
     const CONFIG_T& config = Configuration.get();
 
     root["ntp_server"] = config.Ntp.Server;
-    root["ntp_timezone"] = config.Ntp.Timezone;
+    root["ntp_timezone"] = Mycila::NTP.getTimezoneInfo();
     root["ntp_timezone_descr"] = config.Ntp.TimezoneDescr;
+    root["ntp_status"] = Mycila::NTP.isSynced();
 
     struct tm timeinfo;
-    if (!getLocalTime(&timeinfo, 5)) {
-        root["ntp_status"] = false;
-    } else {
-        root["ntp_status"] = true;
-    }
+    getLocalTime(&timeinfo, 5);
     char timeStringBuff[50];
     strftime(timeStringBuff, sizeof(timeStringBuff), "%A, %B %d %Y %H:%M:%S", &timeinfo);
     root["ntp_localtime"] = timeStringBuff;
@@ -77,7 +76,6 @@ void WebApiNtpClass::onNtpAdminGet(AsyncWebServerRequest* request)
     const CONFIG_T& config = Configuration.get();
 
     root["ntp_server"] = config.Ntp.Server;
-    root["ntp_timezone"] = config.Ntp.Timezone;
     root["ntp_timezone_descr"] = config.Ntp.TimezoneDescr;
     root["longitude"] = config.Ntp.Longitude;
     root["latitude"] = config.Ntp.Latitude;
@@ -101,7 +99,7 @@ void WebApiNtpClass::onNtpAdminPost(AsyncWebServerRequest* request)
     auto& retMsg = response->getRoot();
 
     if (!(root["ntp_server"].is<String>()
-            && root["ntp_timezone"].is<String>()
+            && root["ntp_timezone_descr"].is<String>()
             && root["longitude"].is<double>()
             && root["latitude"].is<double>()
             && root["sunsettype"].is<uint8_t>())) {
@@ -112,23 +110,15 @@ void WebApiNtpClass::onNtpAdminPost(AsyncWebServerRequest* request)
     }
 
     if (root["ntp_server"].as<String>().length() == 0 || root["ntp_server"].as<String>().length() > NTP_MAX_SERVER_STRLEN) {
-        retMsg["message"] = "NTP Server must between 1 and " STR(NTP_MAX_SERVER_STRLEN) " characters long!";
+        retMsg["message"] = "NTP Server must between 1 and " STR_EXTRACT(NTP_MAX_SERVER_STRLEN) " characters long!";
         retMsg["code"] = WebApiError::NtpServerLength;
         retMsg["param"]["max"] = NTP_MAX_SERVER_STRLEN;
         WebApi.sendJsonResponse(request, response, __FUNCTION__, __LINE__);
         return;
     }
 
-    if (root["ntp_timezone"].as<String>().length() == 0 || root["ntp_timezone"].as<String>().length() > NTP_MAX_TIMEZONE_STRLEN) {
-        retMsg["message"] = "Timezone must between 1 and " STR(NTP_MAX_TIMEZONE_STRLEN) " characters long!";
-        retMsg["code"] = WebApiError::NtpTimezoneLength;
-        retMsg["param"]["max"] = NTP_MAX_TIMEZONE_STRLEN;
-        WebApi.sendJsonResponse(request, response, __FUNCTION__, __LINE__);
-        return;
-    }
-
     if (root["ntp_timezone_descr"].as<String>().length() == 0 || root["ntp_timezone_descr"].as<String>().length() > NTP_MAX_TIMEZONEDESCR_STRLEN) {
-        retMsg["message"] = "Timezone description must between 1 and " STR(NTP_MAX_TIMEZONEDESCR_STRLEN) " characters long!";
+        retMsg["message"] = "Timezone description must between 1 and " STR_EXTRACT(NTP_MAX_TIMEZONEDESCR_STRLEN) " characters long!";
         retMsg["code"] = WebApiError::NtpTimezoneDescriptionLength;
         retMsg["param"]["max"] = NTP_MAX_TIMEZONEDESCR_STRLEN;
         WebApi.sendJsonResponse(request, response, __FUNCTION__, __LINE__);
@@ -140,7 +130,6 @@ void WebApiNtpClass::onNtpAdminPost(AsyncWebServerRequest* request)
         auto& config = guard.getConfig();
 
         strlcpy(config.Ntp.Server, root["ntp_server"].as<String>().c_str(), sizeof(config.Ntp.Server));
-        strlcpy(config.Ntp.Timezone, root["ntp_timezone"].as<String>().c_str(), sizeof(config.Ntp.Timezone));
         strlcpy(config.Ntp.TimezoneDescr, root["ntp_timezone_descr"].as<String>().c_str(), sizeof(config.Ntp.TimezoneDescr));
         config.Ntp.Latitude = root["latitude"].as<double>();
         config.Ntp.Longitude = root["longitude"].as<double>();
@@ -151,8 +140,8 @@ void WebApiNtpClass::onNtpAdminPost(AsyncWebServerRequest* request)
 
     WebApi.sendJsonResponse(request, response, __FUNCTION__, __LINE__);
 
-    NtpSettings.setServer();
     NtpSettings.setTimezone();
+    NtpSettings.setServer();
 
     SunPosition.setDoRecalc(true);
 }
@@ -274,11 +263,25 @@ void WebApiNtpClass::onNtpTimePost(AsyncWebServerRequest* request)
 
     time_t t = mktime(&local);
     struct timeval now = { .tv_sec = t, .tv_usec = 0 };
-    settimeofday(&now, NULL);
+    Mycila::NTP.sync(now);
 
     retMsg["type"] = "success";
     retMsg["message"] = "Time updated!";
     retMsg["code"] = WebApiError::NtpTimeUpdated;
+
+    WebApi.sendJsonResponse(request, response, __FUNCTION__, __LINE__);
+}
+
+void WebApiNtpClass::onNtpTimezonesGet(AsyncWebServerRequest* request)
+{
+    if (!WebApi.checkCredentialsReadonly(request)) {
+        return;
+    }
+
+    AsyncJsonResponse* response = new AsyncJsonResponse();
+    auto& root = response->getRoot();
+
+    Mycila::NTP.timezonesToJsonObject(root);
 
     WebApi.sendJsonResponse(request, response, __FUNCTION__, __LINE__);
 }

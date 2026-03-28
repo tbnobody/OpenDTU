@@ -16,8 +16,8 @@ void WebApiDeviceClass::init(AsyncWebServer& server, Scheduler& scheduler)
 {
     using std::placeholders::_1;
 
-    server.on("/api/device/config", HTTP_GET, std::bind(&WebApiDeviceClass::onDeviceAdminGet, this, _1));
-    server.on("/api/device/config", HTTP_POST, std::bind(&WebApiDeviceClass::onDeviceAdminPost, this, _1));
+    server.on("/api/device/config", HTTP_GET, static_cast<ArRequestHandlerFunction>(std::bind(&WebApiDeviceClass::onDeviceAdminGet, this, _1)));
+    server.on("/api/device/config", HTTP_POST, static_cast<ArRequestHandlerFunction>(std::bind(&WebApiDeviceClass::onDeviceAdminPost, this, _1)));
 }
 
 void WebApiDeviceClass::onDeviceAdminGet(AsyncWebServerRequest* request)
@@ -153,7 +153,7 @@ void WebApiDeviceClass::onDeviceAdminPost(AsyncWebServerRequest* request)
     }
 
     if (root["curPin"]["name"].as<String>().length() == 0 || root["curPin"]["name"].as<String>().length() > DEV_MAX_MAPPING_NAME_STRLEN) {
-        retMsg["message"] = "Pin mapping must between 1 and " STR(DEV_MAX_MAPPING_NAME_STRLEN) " characters long!";
+        retMsg["message"] = "Pin mapping must between 1 and " STR_EXTRACT(DEV_MAX_MAPPING_NAME_STRLEN) " characters long!";
         retMsg["code"] = WebApiError::HardwarePinMappingLength;
         retMsg["param"]["max"] = DEV_MAX_MAPPING_NAME_STRLEN;
         WebApi.sendJsonResponse(request, response, __FUNCTION__, __LINE__);

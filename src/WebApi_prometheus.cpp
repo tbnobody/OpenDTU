@@ -1,7 +1,7 @@
 
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * Copyright (C) 2022-2025 Thomas Basler and others
+ * Copyright (C) 2022-2026 Thomas Basler and others
  */
 #include "WebApi_prometheus.h"
 #include "Configuration.h"
@@ -17,7 +17,7 @@ void WebApiPrometheusClass::init(AsyncWebServer& server, Scheduler& scheduler)
 {
     using std::placeholders::_1;
 
-    server.on("/api/prometheus/metrics", HTTP_GET, std::bind(&WebApiPrometheusClass::onPrometheusMetricsGet, this, _1));
+    server.on("/api/prometheus/metrics", HTTP_GET, static_cast<ArRequestHandlerFunction>(std::bind(&WebApiPrometheusClass::onPrometheusMetricsGet, this, _1)));
 }
 
 void WebApiPrometheusClass::onPrometheusMetricsGet(AsyncWebServerRequest* request)

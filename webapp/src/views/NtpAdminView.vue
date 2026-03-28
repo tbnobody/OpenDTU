@@ -23,11 +23,7 @@
                     <label for="inputTimezone" class="col-sm-2 col-form-label">{{ $t('ntpadmin.Timezone') }}</label>
                     <div class="col-sm-10">
                         <select class="form-select" v-model="timezoneSelect">
-                            <option
-                                v-for="(config, name) in timezoneList"
-                                :key="name + '---' + config"
-                                :value="name + '---' + config"
-                            >
+                            <option v-for="name in Object.keys(timezoneList ?? {})" :key="name" :value="name">
                                 {{ name }}
                             </option>
                         </select>
@@ -36,7 +32,7 @@
 
                 <InputElement
                     :label="$t('ntpadmin.TimezoneConfig')"
-                    v-model="ntpConfigList.ntp_timezone"
+                    v-model="timezoneInfo"
                     type="text"
                     maxlength="32"
                     disabled
@@ -120,8 +116,9 @@ export default defineComponent({
             dataLoading: true,
             timezoneLoading: true,
             ntpConfigList: {} as NtpConfig,
-            timezoneList: {},
+            timezoneList: {} as Record<string, string>,
             timezoneSelect: '',
+            timezoneInfo: '',
             mcuTime: new Date(),
             localTime: new Date(),
             dataAgeInterval: 0,
@@ -136,13 +133,12 @@ export default defineComponent({
     },
     watch: {
         timezoneSelect: function (newValue) {
-            this.ntpConfigList.ntp_timezone = newValue.split('---')[1];
-            this.ntpConfigList.ntp_timezone_descr = newValue.split('---')[0];
+            this.timezoneInfo = this.timezoneList[newValue] ?? '';
+            this.ntpConfigList.ntp_timezone_descr = newValue;
         },
     },
     created() {
         this.getTimezoneList();
-        this.getNtpConfig();
         this.getCurrentTime();
         this.initDataAgeing();
     },
@@ -155,11 +151,12 @@ export default defineComponent({
         },
         getTimezoneList() {
             this.timezoneLoading = true;
-            fetch('/zones.json')
+            fetch('/api/ntp/zones', { headers: authHeader() })
                 .then((response) => response.json())
                 .then((data) => {
                     this.timezoneList = data;
                     this.timezoneLoading = false;
+                    this.getNtpConfig();
                 });
         },
         getNtpConfig() {
@@ -168,8 +165,7 @@ export default defineComponent({
                 .then((response) => handleResponse(response, this.$emitter, this.$router))
                 .then((data) => {
                     this.ntpConfigList = data;
-                    this.timezoneSelect =
-                        this.ntpConfigList.ntp_timezone_descr + '---' + this.ntpConfigList.ntp_timezone;
+                    this.timezoneSelect = this.ntpConfigList.ntp_timezone_descr;
                     this.dataLoading = false;
                 });
         },
@@ -226,6 +222,9 @@ export default defineComponent({
                     this.alert.message = this.$t('apiresponse.' + response.code, response.param);
                     this.alert.type = response.type;
                     this.alert.show = true;
+                })
+                .then(() => {
+                    this.getCurrentTime();
                 });
         },
     },

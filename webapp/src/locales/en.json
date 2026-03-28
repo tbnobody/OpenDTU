@@ -1022,6 +1022,8 @@
         "Module_mqtt": "MQTT Client",
         "Module_network": "Network",
         "Module_webapi": "Web API",
+        "Module_async_ws": "Async WebSockets",
+        "Module_async_tcp": "Async TCP",
         "Module_battery": "Battery",
         "Module_dynamicPowerLimiter": "Dynamic Power Limiter",
         "Module_gridCharger": "AC Charger",

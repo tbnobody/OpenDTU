@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * Copyright (C) 2024-2025 Thomas Basler and others
+ * Copyright (C) 2024-2026 Thomas Basler and others
  */
 #include "I18n.h"
 #include "Utils.h"

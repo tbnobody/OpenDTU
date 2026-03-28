@@ -1,5 +1,10 @@
 <template>
-    <BasePage :title="$t('console.Console')" :isLoading="dataLoading">
+    <BasePage
+        :title="$t('console.Console')"
+        :isLoading="dataLoading"
+        :showWebSocket="true"
+        :isWebsocketConnected="isWebsocketConnected"
+    >
         <CardElement :text="$t('console.VirtualDebugConsole')" textVariant="text-bg-primary">
             <div class="btn-toolbar mb-3" role="toolbar">
                 <div class="input-group me-2">
@@ -112,6 +117,7 @@ import CardElement from '@/components/CardElement.vue';
 import { authUrl } from '@/utils/authentication';
 import { BIconClipboard, BIconDownload, BIconFilter, BIconSearch, BIconTrash } from 'bootstrap-icons-vue';
 import { defineComponent } from 'vue';
+import WebSocketService from '@/utils/websocketService';
 
 interface LogLine {
     text: string;
@@ -131,7 +137,7 @@ export default defineComponent({
     },
     data() {
         return {
-            socket: {} as WebSocket,
+            socket: {} as WebSocketService,
             heartInterval: 0,
             dataLoading: true,
             autoScroll: true,
@@ -146,6 +152,8 @@ export default defineComponent({
                 'D (': 'debug',
                 'V (': 'verbose',
             } as Record<string, string>,
+
+            isWebsocketConnected: false,
         };
     },
     created() {
@@ -153,7 +161,7 @@ export default defineComponent({
         this.dataLoading = false;
     },
     unmounted() {
-        this.closeSocket();
+        this.socket?.close();
     },
     computed: {
         filteredLines(): LogLine[] {
@@ -165,6 +173,30 @@ export default defineComponent({
         },
     },
     methods: {
+        handleMessage(event: MessageEvent) {
+            console.log(event);
+
+            this.buffer += event.data;
+            const splitLines = this.buffer.split('\n');
+
+            this.buffer = splitLines.pop() || ''; // Save the incomplete line
+
+            splitLines.forEach((line) => {
+                this.lines.push({
+                    text: line,
+                    timestamp: new Date(), // assign time of message arrival
+                    level: this.getLineClass(line),
+                });
+                this.$nextTick(() => {
+                    if (this.autoScroll) {
+                        const el = this.$refs.logRef as HTMLDivElement;
+                        if (el) {
+                            el.scrollTop = el.scrollHeight;
+                        }
+                    }
+                });
+            });
+        },
         initSocket() {
             console.log('Starting connection to WebSocket Server');
 
@@ -172,44 +204,24 @@ export default defineComponent({
             const authString = authUrl();
             const webSocketUrl = `${protocol === 'https:' ? 'wss' : 'ws'}://${authString}${host}/console`;
 
-            this.closeSocket();
-            this.socket = new WebSocket(webSocketUrl);
-
-            this.socket.onmessage = (event) => {
-                console.log(event);
-
-                this.buffer += event.data;
-                const splitLines = this.buffer.split('\n');
-
-                this.buffer = splitLines.pop() || ''; // Save the incomplete line
-
-                splitLines.forEach((line) => {
-                    this.lines.push({
-                        text: line,
-                        timestamp: new Date(), // assign time of message arrival
-                        level: this.getLineClass(line),
-                    });
-                    this.$nextTick(() => {
-                        if (this.autoScroll) {
-                            const el = this.$refs.logRef as HTMLDivElement;
-                            if (el) {
-                                el.scrollTop = el.scrollHeight;
-                            }
-                        }
-                    });
-                });
-                this.heartCheck(); // Reset heartbeat detection
-            };
-
-            this.socket.onopen = function (event) {
-                console.log(event);
-                console.log('Successfully connected to the echo websocket server...');
-            };
+            this.socket = new WebSocketService(webSocketUrl, {
+                onMessage: this.handleMessage,
+                onOpen: () => {
+                    console.log('WebSocket connected');
+                    this.isWebsocketConnected = true;
+                },
+                onClose: () => {
+                    console.log('WebSocket closed');
+                    this.isWebsocketConnected = false;
+                },
+            });
 
             // Listen to window events , When the window closes , Take the initiative to disconnect websocket Connect
             window.onbeforeunload = () => {
-                this.closeSocket();
+                this.socket?.close();
             };
+
+            this.socket?.connect();
         },
         getLineClass(line: string): string {
             const found = Object.entries(this.levelMap).find(([tag]) => line.includes(tag));
@@ -225,33 +237,6 @@ export default defineComponent({
             const atBottom = el.scrollTop + el.clientHeight >= el.scrollHeight - threshold;
 
             this.autoScroll = atBottom;
-        },
-        // Send heartbeat packets regularly * 5s Send a heartbeat
-        heartCheck() {
-            if (this.heartInterval) {
-                clearInterval(this.heartInterval);
-            }
-            this.heartInterval = setInterval(() => {
-                if (this.socket.readyState === WebSocket.OPEN) {
-                    // Connection status
-                    this.socket.send('ping');
-                } else {
-                    clearInterval(this.heartInterval);
-                    this.initSocket(); // Breakpoint reconnection 5 Time
-                }
-            }, 5 * 1000);
-        },
-        /** To break off websocket Connect */
-        closeSocket() {
-            try {
-                this.socket.close();
-            } catch {
-                // continue regardless of error
-            }
-
-            if (this.heartInterval) {
-                clearInterval(this.heartInterval);
-            }
         },
         formatTimestamp(date: Date): string {
             return (

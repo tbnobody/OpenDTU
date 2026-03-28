@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * Copyright (C) 2022-2025 Thomas Basler and others
+ * Copyright (C) 2022-2026 Thomas Basler and others
  */
 #include "WebApi_sysstatus.h"
 #include "Configuration.h"
@@ -19,7 +19,7 @@ void WebApiSysstatusClass::init(AsyncWebServer& server, Scheduler& scheduler)
 {
     using std::placeholders::_1;
 
-    server.on("/api/system/status", HTTP_GET, std::bind(&WebApiSysstatusClass::onSystemStatus, this, _1));
+    server.on("/api/system/status", HTTP_GET, static_cast<ArRequestHandlerFunction>(std::bind(&WebApiSysstatusClass::onSystemStatus, this, _1)));
 }
 
 void WebApiSysstatusClass::onSystemStatus(AsyncWebServerRequest* request)

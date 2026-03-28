@@ -17,12 +17,12 @@ void WebApiInverterClass::init(AsyncWebServer& server, Scheduler& scheduler)
 {
     using std::placeholders::_1;
 
-    server.on("/api/inverter/list", HTTP_GET, std::bind(&WebApiInverterClass::onInverterList, this, _1));
-    server.on("/api/inverter/add", HTTP_POST, std::bind(&WebApiInverterClass::onInverterAdd, this, _1));
-    server.on("/api/inverter/edit", HTTP_POST, std::bind(&WebApiInverterClass::onInverterEdit, this, _1));
-    server.on("/api/inverter/del", HTTP_POST, std::bind(&WebApiInverterClass::onInverterDelete, this, _1));
-    server.on("/api/inverter/order", HTTP_POST, std::bind(&WebApiInverterClass::onInverterOrder, this, _1));
-    server.on("/api/inverter/stats_reset", HTTP_GET, std::bind(&WebApiInverterClass::onInverterStatReset, this, _1));
+    server.on("/api/inverter/list", HTTP_GET, static_cast<ArRequestHandlerFunction>(std::bind(&WebApiInverterClass::onInverterList, this, _1)));
+    server.on("/api/inverter/add", HTTP_POST, static_cast<ArRequestHandlerFunction>(std::bind(&WebApiInverterClass::onInverterAdd, this, _1)));
+    server.on("/api/inverter/edit", HTTP_POST, static_cast<ArRequestHandlerFunction>(std::bind(&WebApiInverterClass::onInverterEdit, this, _1)));
+    server.on("/api/inverter/del", HTTP_POST, static_cast<ArRequestHandlerFunction>(std::bind(&WebApiInverterClass::onInverterDelete, this, _1)));
+    server.on("/api/inverter/order", HTTP_POST, static_cast<ArRequestHandlerFunction>(std::bind(&WebApiInverterClass::onInverterOrder, this, _1)));
+    server.on("/api/inverter/stats_reset", HTTP_GET, static_cast<ArRequestHandlerFunction>(std::bind(&WebApiInverterClass::onInverterStatReset, this, _1)));
 }
 
 void WebApiInverterClass::onInverterList(AsyncWebServerRequest* request)
@@ -116,7 +116,7 @@ void WebApiInverterClass::onInverterAdd(AsyncWebServerRequest* request)
     }
 
     if (root["name"].as<String>().length() == 0 || root["name"].as<String>().length() > INV_MAX_NAME_STRLEN) {
-        retMsg["message"] = "Name must between 1 and " STR(INV_MAX_NAME_STRLEN) " characters long!";
+        retMsg["message"] = "Name must between 1 and " STR_EXTRACT(INV_MAX_NAME_STRLEN) " characters long!";
         retMsg["code"] = WebApiError::InverterNameLength;
         retMsg["param"]["max"] = INV_MAX_NAME_STRLEN;
         WebApi.sendJsonResponse(request, response, __FUNCTION__, __LINE__);
@@ -126,7 +126,7 @@ void WebApiInverterClass::onInverterAdd(AsyncWebServerRequest* request)
     INVERTER_CONFIG_T* inverter = Configuration.getFreeInverterSlot();
 
     if (!inverter) {
-        retMsg["message"] = "Only " STR(INV_MAX_COUNT) " inverters are supported!";
+        retMsg["message"] = "Only " STR_EXTRACT(INV_MAX_COUNT) " inverters are supported!";
         retMsg["code"] = WebApiError::InverterCount;
         retMsg["param"]["max"] = INV_MAX_COUNT;
         WebApi.sendJsonResponse(request, response, __FUNCTION__, __LINE__);
@@ -197,7 +197,7 @@ void WebApiInverterClass::onInverterEdit(AsyncWebServerRequest* request)
     }
 
     if (root["name"].as<String>().length() == 0 || root["name"].as<String>().length() > INV_MAX_NAME_STRLEN) {
-        retMsg["message"] = "Name must between 1 and " STR(INV_MAX_NAME_STRLEN) " characters long!";
+        retMsg["message"] = "Name must between 1 and " STR_EXTRACT(INV_MAX_NAME_STRLEN) " characters long!";
         retMsg["code"] = WebApiError::InverterNameLength;
         retMsg["param"]["max"] = INV_MAX_NAME_STRLEN;
         WebApi.sendJsonResponse(request, response, __FUNCTION__, __LINE__);

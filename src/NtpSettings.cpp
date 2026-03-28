@@ -4,8 +4,7 @@
  */
 #include "NtpSettings.h"
 #include "Configuration.h"
-#include <Arduino.h>
-#include <time.h>
+#include <MycilaNTP.h>
 
 NtpSettingsClass::NtpSettingsClass()
 {
@@ -19,13 +18,12 @@ void NtpSettingsClass::init()
 
 void NtpSettingsClass::setServer()
 {
-    configTime(0, 0, Configuration.get().Ntp.Server);
+    Mycila::NTP.sync(Configuration.get().Ntp.Server);
 }
 
 void NtpSettingsClass::setTimezone()
 {
-    setenv("TZ", Configuration.get().Ntp.Timezone, 1);
-    tzset();
+    Mycila::NTP.setTimeZone(Configuration.get().Ntp.TimezoneDescr);
 }
 
 NtpSettingsClass NtpSettings;

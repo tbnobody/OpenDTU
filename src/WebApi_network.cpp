@@ -19,9 +19,9 @@ void WebApiNetworkClass::init(AsyncWebServer& server, Scheduler& scheduler)
 {
     using std::placeholders::_1;
 
-    server.on("/api/network/status", HTTP_GET, std::bind(&WebApiNetworkClass::onNetworkStatus, this, _1));
-    server.on("/api/network/config", HTTP_GET, std::bind(&WebApiNetworkClass::onNetworkAdminGet, this, _1));
-    server.on("/api/network/config", HTTP_POST, std::bind(&WebApiNetworkClass::onNetworkAdminPost, this, _1));
+    server.on("/api/network/status", HTTP_GET, static_cast<ArRequestHandlerFunction>(std::bind(&WebApiNetworkClass::onNetworkStatus, this, _1)));
+    server.on("/api/network/config", HTTP_GET, static_cast<ArRequestHandlerFunction>(std::bind(&WebApiNetworkClass::onNetworkAdminGet, this, _1)));
+    server.on("/api/network/config", HTTP_POST, static_cast<ArRequestHandlerFunction>(std::bind(&WebApiNetworkClass::onNetworkAdminPost, this, _1)));
 
     scheduler.addTask(_applyDataTask);
 }
@@ -151,19 +151,19 @@ void WebApiNetworkClass::onNetworkAdminPost(AsyncWebServerRequest* request)
     }
 
     if (root["hostname"].as<String>().length() == 0 || root["hostname"].as<String>().length() > WIFI_MAX_HOSTNAME_STRLEN) {
-        retMsg["message"] = "Hostname must between 1 and " STR(WIFI_MAX_HOSTNAME_STRLEN) " characters long!";
+        retMsg["message"] = "Hostname must between 1 and " STR_EXTRACT(WIFI_MAX_HOSTNAME_STRLEN) " characters long!";
         WebApi.sendJsonResponse(request, response, __FUNCTION__, __LINE__);
         return;
     }
     if (NetworkSettings.NetworkMode() == network_mode::WiFi) {
         if (root["ssid"].as<String>().length() == 0 || root["ssid"].as<String>().length() > WIFI_MAX_SSID_STRLEN) {
-            retMsg["message"] = "SSID must between 1 and " STR(WIFI_MAX_SSID_STRLEN) " characters long!";
+            retMsg["message"] = "SSID must between 1 and " STR_EXTRACT(WIFI_MAX_SSID_STRLEN) " characters long!";
             WebApi.sendJsonResponse(request, response, __FUNCTION__, __LINE__);
             return;
         }
     }
     if (root["password"].as<String>().length() > WIFI_MAX_PASSWORD_STRLEN - 1) {
-        retMsg["message"] = "Password must not be longer than " STR(WIFI_MAX_PASSWORD_STRLEN) " characters long!";
+        retMsg["message"] = "Password must not be longer than " STR_EXTRACT(WIFI_MAX_PASSWORD_STRLEN) " characters long!";
         WebApi.sendJsonResponse(request, response, __FUNCTION__, __LINE__);
         return;
     }
@@ -175,7 +175,7 @@ void WebApiNetworkClass::onNetworkAdminPost(AsyncWebServerRequest* request)
     }
     if (root["syslogenabled"].as<bool>()) {
         if (root["sysloghostname"].as<String>().length() == 0 || root["sysloghostname"].as<String>().length() > SYSLOG_MAX_HOSTNAME_STRLEN) {
-            retMsg["message"] = "Syslog Server must between 1 and " STR(SYSLOG_MAX_HOSTNAME_STRLEN) " characters long!";
+            retMsg["message"] = "Syslog Server must between 1 and " STR_EXTRACT(SYSLOG_MAX_HOSTNAME_STRLEN) " characters long!";
             retMsg["code"] = WebApiError::NetworkSyslogHostnameLength;
             retMsg["param"]["max"] = SYSLOG_MAX_HOSTNAME_STRLEN;
             WebApi.sendJsonResponse(request, response, __FUNCTION__, __LINE__);

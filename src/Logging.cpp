@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * Copyright (C) 2025 Thomas Basler and others
+ * Copyright (C) 2026 Thomas Basler and others
  */
 #include "Logging.h"
 #include "Configuration.h"
@@ -12,12 +12,14 @@ static const char* TAG = "logging";
 
 LoggingClass::LoggingClass()
 {
-    _configurableModules.reserve(11);
+    _configurableModules.reserve(13);
     _configurableModules.push_back("CORE");
     _configurableModules.push_back("hoymiles");
     _configurableModules.push_back("mqtt");
     _configurableModules.push_back("network");
     _configurableModules.push_back("webapi");
+    _configurableModules.push_back("async_ws");
+    _configurableModules.push_back("async_tcp");
     _configurableModules.push_back("battery");
     _configurableModules.push_back("dynamicPowerLimiter");
     _configurableModules.push_back("gridCharger");

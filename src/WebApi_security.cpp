@@ -13,9 +13,9 @@ void WebApiSecurityClass::init(AsyncWebServer& server, Scheduler& scheduler)
 {
     using std::placeholders::_1;
 
-    server.on("/api/security/config", HTTP_GET, std::bind(&WebApiSecurityClass::onSecurityGet, this, _1));
-    server.on("/api/security/config", HTTP_POST, std::bind(&WebApiSecurityClass::onSecurityPost, this, _1));
-    server.on("/api/security/authenticate", HTTP_GET, std::bind(&WebApiSecurityClass::onAuthenticateGet, this, _1));
+    server.on("/api/security/config", HTTP_GET, static_cast<ArRequestHandlerFunction>(std::bind(&WebApiSecurityClass::onSecurityGet, this, _1)));
+    server.on("/api/security/config", HTTP_POST, static_cast<ArRequestHandlerFunction>(std::bind(&WebApiSecurityClass::onSecurityPost, this, _1)));
+    server.on("/api/security/authenticate", HTTP_GET, static_cast<ArRequestHandlerFunction>(std::bind(&WebApiSecurityClass::onAuthenticateGet, this, _1)));
 }
 
 void WebApiSecurityClass::onSecurityGet(AsyncWebServerRequest* request)
@@ -57,7 +57,7 @@ void WebApiSecurityClass::onSecurityPost(AsyncWebServerRequest* request)
     }
 
     if (root["password"].as<String>().length() < 8 || root["password"].as<String>().length() > WIFI_MAX_PASSWORD_STRLEN) {
-        retMsg["message"] = "Password must between 8 and " STR(WIFI_MAX_PASSWORD_STRLEN) " characters long!";
+        retMsg["message"] = "Password must between 8 and " STR_EXTRACT(WIFI_MAX_PASSWORD_STRLEN) " characters long!";
         retMsg["code"] = WebApiError::SecurityPasswordLength;
         retMsg["param"]["max"] = WIFI_MAX_PASSWORD_STRLEN;
         WebApi.sendJsonResponse(request, response, __FUNCTION__, __LINE__);
