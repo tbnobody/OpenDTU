@@ -561,6 +561,10 @@ export default defineComponent({
 
             socket: {} as WebSocket,
             heartInterval: 0,
+            connectTimeout: 0,
+            reconnectTimeout: 0,
+            shouldReconnect: true,
+            consecutiveConnectFailures: 0,
             dataAgeTimers: {} as Record<string, number>,
             dataLoading: true,
             liveData: {} as LiveData,
@@ -621,6 +625,7 @@ export default defineComponent({
         this.powerSettingView = new bootstrap.Modal('#powerSettingView');
     },
     unmounted() {
+        this.shouldReconnect = false;
         this.closeSocket();
     },
     updated() {
@@ -684,50 +689,80 @@ export default defineComponent({
             }, 1000);
         },
         initSocket() {
+            if (!this.shouldReconnect) {
+                return;
+            }
+
             console.log('Starting connection to WebSocket Server');
 
             const { protocol, host } = location;
             const authString = authUrl();
             const webSocketUrl = `${protocol === 'https:' ? 'wss' : 'ws'}://${authString}${host}/livedata`;
 
-            this.socket = new WebSocket(webSocketUrl);
-
-            this.socket.onmessage = (event) => {
-                console.log(event);
-                if (event.data != '{}') {
-                    const newData = JSON.parse(event.data);
-                    Object.assign(this.liveData.total, newData.total);
-                    Object.assign(this.liveData.hints, newData.hints);
-
-                    const foundIdx = this.liveData.inverters.findIndex(
-                        (element) => element.serial == newData.inverters[0].serial
-                    );
-                    if (foundIdx == -1) {
-                        Object.assign(this.liveData.inverters, newData.inverters);
-                        this.liveData.inverters.forEach((inv) => this.resetDataAging(inv));
-                    } else if (this.liveData.inverters[foundIdx]) {
-                        Object.assign(this.liveData.inverters[foundIdx], newData.inverters[0]);
-                        this.resetDataAging(this.liveData.inverters[foundIdx]);
-                    }
-                    this.dataLoading = false;
-                    this.heartCheck(); // Reset heartbeat detection
-                } else {
-                    // Sometimes it does not recover automatically so have to force a reconnect
-                    this.closeSocket();
-                    this.heartCheck(10); // Reconnect faster
+            // Safari/iOS may immediately close very early WebSocket attempts.
+            const connectDelayMs = this.consecutiveConnectFailures === 0 ? 100 : 0;
+            clearTimeout(this.connectTimeout);
+            this.connectTimeout = window.setTimeout(() => {
+                if (!this.shouldReconnect) {
+                    return;
                 }
-            };
 
-            this.socket.onopen = (event) => {
-                console.log(event);
-                console.log('Successfully connected to the echo websocket server...');
-                this.isWebsocketConnected = true;
-            };
+                if (this.socket &&
+                    (this.socket.readyState === WebSocket.OPEN || this.socket.readyState === WebSocket.CONNECTING)
+                ) {
+                    return;
+                }
 
-            this.socket.onclose = () => {
-                console.log('Connection to websocket closed...');
-                this.isWebsocketConnected = false;
-            };
+                this.socket = new WebSocket(webSocketUrl);
+
+                this.socket.onmessage = (event) => {
+                    console.log(event);
+                    if (event.data != '{}') {
+                        const newData = JSON.parse(event.data);
+                        Object.assign(this.liveData.total, newData.total);
+                        Object.assign(this.liveData.hints, newData.hints);
+
+                        const foundIdx = this.liveData.inverters.findIndex(
+                            (element) => element.serial == newData.inverters[0].serial
+                        );
+                        if (foundIdx == -1) {
+                            Object.assign(this.liveData.inverters, newData.inverters);
+                            this.liveData.inverters.forEach((inv) => this.resetDataAging(inv));
+                        } else if (this.liveData.inverters[foundIdx]) {
+                            Object.assign(this.liveData.inverters[foundIdx], newData.inverters[0]);
+                            this.resetDataAging(this.liveData.inverters[foundIdx]);
+                        }
+                        this.dataLoading = false;
+                        this.heartCheck(); // Reset heartbeat detection
+                    } else {
+                        // Sometimes it does not recover automatically so have to force a reconnect
+                        this.closeSocket();
+                        this.heartCheck(10); // Reconnect faster
+                    }
+                };
+
+                this.socket.onopen = (event) => {
+                    console.log(event);
+                    console.log('Successfully connected to the echo websocket server...');
+                    this.consecutiveConnectFailures = 0;
+                    this.isWebsocketConnected = true;
+                };
+
+                this.socket.onclose = () => {
+                    console.log('Connection to websocket closed...');
+                    this.isWebsocketConnected = false;
+
+                    if (!this.shouldReconnect) {
+                        return;
+                    }
+
+                    this.consecutiveConnectFailures += 1;
+                    clearTimeout(this.reconnectTimeout);
+                    this.reconnectTimeout = window.setTimeout(() => {
+                        this.initSocket();
+                    }, 100);
+                };
+            }, connectDelayMs);
 
             // Listen to window events , When the window closes , Take the initiative to disconnect websocket Connect
             window.onbeforeunload = () => {
@@ -772,10 +807,17 @@ export default defineComponent({
         },
         /** To break off websocket Connect */
         closeSocket() {
-            this.socket.close();
-            if (this.heartInterval) {
-                clearTimeout(this.heartInterval);
+            try {
+                this.socket.close();
+            } catch {
+                // continue regardless of error
             }
+
+            if (this.heartInterval) {
+                clearInterval(this.heartInterval);
+            }
+            clearTimeout(this.connectTimeout);
+            clearTimeout(this.reconnectTimeout);
             this.isFirstFetchAfterConnect = true;
         },
         onShowEventlog(serial: string) {

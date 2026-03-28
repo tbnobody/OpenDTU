@@ -133,6 +133,10 @@ export default defineComponent({
         return {
             socket: {} as WebSocket,
             heartInterval: 0,
+            connectTimeout: 0,
+            reconnectTimeout: 0,
+            shouldReconnect: true,
+            consecutiveConnectFailures: 0,
             dataLoading: true,
             autoScroll: true,
             activeLevels: ['error', 'warning', 'info', 'debug', 'verbose'],
@@ -153,6 +157,7 @@ export default defineComponent({
         this.dataLoading = false;
     },
     unmounted() {
+        this.shouldReconnect = false;
         this.closeSocket();
     },
     computed: {
@@ -166,6 +171,10 @@ export default defineComponent({
     },
     methods: {
         initSocket() {
+            if (!this.shouldReconnect) {
+                return;
+            }
+
             console.log('Starting connection to WebSocket Server');
 
             const { protocol, host } = location;
@@ -173,38 +182,67 @@ export default defineComponent({
             const webSocketUrl = `${protocol === 'https:' ? 'wss' : 'ws'}://${authString}${host}/console`;
 
             this.closeSocket();
-            this.socket = new WebSocket(webSocketUrl);
 
-            this.socket.onmessage = (event) => {
-                console.log(event);
+            // Safari/iOS may immediately close very early WebSocket attempts.
+            const connectDelayMs = this.consecutiveConnectFailures === 0 ? 100 : 0;
+            clearTimeout(this.connectTimeout);
+            this.connectTimeout = window.setTimeout(() => {
+                if (!this.shouldReconnect) {
+                    return;
+                }
 
-                this.buffer += event.data;
-                const splitLines = this.buffer.split('\n');
+                if (this.socket &&
+                    (this.socket.readyState === WebSocket.OPEN || this.socket.readyState === WebSocket.CONNECTING)
+                ) {
+                    return;
+                }
 
-                this.buffer = splitLines.pop() || ''; // Save the incomplete line
+                this.socket = new WebSocket(webSocketUrl);
 
-                splitLines.forEach((line) => {
-                    this.lines.push({
-                        text: line,
-                        timestamp: new Date(), // assign time of message arrival
-                        level: this.getLineClass(line),
-                    });
-                    this.$nextTick(() => {
-                        if (this.autoScroll) {
-                            const el = this.$refs.logRef as HTMLDivElement;
-                            if (el) {
-                                el.scrollTop = el.scrollHeight;
+                this.socket.onmessage = (event) => {
+                    console.log(event);
+
+                    this.buffer += event.data;
+                    const splitLines = this.buffer.split('\n');
+
+                    this.buffer = splitLines.pop() || ''; // Save the incomplete line
+
+                    splitLines.forEach((line) => {
+                        this.lines.push({
+                            text: line,
+                            timestamp: new Date(), // assign time of message arrival
+                            level: this.getLineClass(line),
+                        });
+                        this.$nextTick(() => {
+                            if (this.autoScroll) {
+                                const el = this.$refs.logRef as HTMLDivElement;
+                                if (el) {
+                                    el.scrollTop = el.scrollHeight;
+                                }
                             }
-                        }
+                        });
                     });
-                });
-                this.heartCheck(); // Reset heartbeat detection
-            };
+                    this.heartCheck(); // Reset heartbeat detection
+                };
 
-            this.socket.onopen = function (event) {
-                console.log(event);
-                console.log('Successfully connected to the echo websocket server...');
-            };
+                this.socket.onopen = (event) => {
+                    console.log(event);
+                    console.log('Successfully connected to the echo websocket server...');
+                    this.consecutiveConnectFailures = 0;
+                };
+
+                this.socket.onclose = () => {
+                    if (!this.shouldReconnect) {
+                        return;
+                    }
+
+                    this.consecutiveConnectFailures += 1;
+                    clearTimeout(this.reconnectTimeout);
+                    this.reconnectTimeout = window.setTimeout(() => {
+                        this.initSocket();
+                    }, 100);
+                };
+            }, connectDelayMs);
 
             // Listen to window events , When the window closes , Take the initiative to disconnect websocket Connect
             window.onbeforeunload = () => {
@@ -252,6 +290,9 @@ export default defineComponent({
             if (this.heartInterval) {
                 clearInterval(this.heartInterval);
             }
+
+            clearTimeout(this.connectTimeout);
+            clearTimeout(this.reconnectTimeout);
         },
         formatTimestamp(date: Date): string {
             return (
