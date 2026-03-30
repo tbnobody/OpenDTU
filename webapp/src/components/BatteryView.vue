@@ -158,6 +158,7 @@ import type { Battery } from '@/types/BatteryDataStatus';
 import { isStringValue } from '@/types/StringValue';
 import { handleResponse, authHeader, authUrl } from '@/utils/authentication';
 import DataAgeDisplay from '@/components/DataAgeDisplay.vue';
+import WebSocketService from '@/utils/websocketService.ts';
 
 export default defineComponent({
     components: {
@@ -165,7 +166,7 @@ export default defineComponent({
     },
     data() {
         return {
-            socket: {} as WebSocket,
+            socket: {} as WebSocketService,
             heartInterval: 0,
             dataAgeInterval: 0,
             dataLoading: true,
@@ -184,7 +185,7 @@ export default defineComponent({
         this.initDataAgeing();
     },
     unmounted() {
-        this.closeSocket();
+        this.socket?.close();
     },
     methods: {
         isStringValue,
@@ -199,6 +200,11 @@ export default defineComponent({
                     this.dataLoading = false;
                 });
         },
+        handleMessage(event: MessageEvent) {
+            console.log(event);
+            this.batteryData = JSON.parse(event.data);
+            this.dataLoading = false;
+        },
         initSocket() {
             console.log('Starting connection to Battery WebSocket Server');
 
@@ -206,24 +212,22 @@ export default defineComponent({
             const authString = authUrl();
             const webSocketUrl = `${protocol === 'https:' ? 'wss' : 'ws'}://${authString}${host}/batterylivedata`;
 
-            this.socket = new WebSocket(webSocketUrl);
-
-            this.socket.onmessage = (event) => {
-                console.log(event);
-                this.batteryData = JSON.parse(event.data);
-                this.dataLoading = false;
-                this.heartCheck(); // Reset heartbeat detection
-            };
-
-            this.socket.onopen = function (event) {
-                console.log(event);
-                console.log('Successfully connected to the Battery websocket server...');
-            };
+            this.socket = new WebSocketService(webSocketUrl, {
+                onMessage: this.handleMessage,
+                onOpen: () => {
+                    console.log('Battery WebSocket connected');
+                },
+                onClose: () => {
+                    console.log('Battery WebSocket closed');
+                },
+            });
 
             // Listen to window events , When the window closes , Take the initiative to disconnect websocket Connect
             window.onbeforeunload = () => {
-                this.closeSocket();
+                this.socket?.close();
             };
+
+            this.socket?.connect();
         },
         initDataAgeing() {
             this.dataAgeInterval = setInterval(() => {
@@ -231,28 +235,6 @@ export default defineComponent({
                     this.batteryData.data_age++;
                 }
             }, 1000);
-        },
-        // Send heartbeat packets regularly * 59s Send a heartbeat
-        heartCheck() {
-            if (this.heartInterval) {
-                clearTimeout(this.heartInterval);
-            }
-            this.heartInterval = setInterval(() => {
-                if (this.socket.readyState === 1) {
-                    // Connection status
-                    this.socket.send('ping');
-                } else {
-                    this.initSocket(); // Breakpoint reconnection 5 Time
-                }
-            }, 59 * 1000);
-        },
-        /** To break off websocket Connect */
-        closeSocket() {
-            this.socket.close();
-            if (this.heartInterval) {
-                clearTimeout(this.heartInterval);
-            }
-            this.isFirstFetchAfterConnect = true;
         },
     },
     computed: {
