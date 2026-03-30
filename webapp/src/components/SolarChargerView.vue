@@ -123,7 +123,7 @@ import type { DynamicPowerLimiter, SolarCharger } from '@/types/SolarChargerLive
 import { handleResponse, authHeader, authUrl } from '@/utils/authentication';
 import { BIconSun, BIconBatteryCharging, BIconBatteryHalf, BIconXCircleFill } from 'bootstrap-icons-vue';
 import DataAgeDisplay from '@/components/DataAgeDisplay.vue';
-import WebSocketService from '@/utils/websocketService.ts';
+import WebSocketService from '@/utils/websocketService';
 
 export default defineComponent({
     components: {
@@ -150,6 +150,8 @@ export default defineComponent({
     },
     unmounted() {
         this.socket?.close();
+        Object.values(this.dataAgeTimers).forEach((timer) => clearInterval(timer));
+        this.dataAgeTimers = {};
     },
     methods: {
         getInitialData() {
@@ -168,7 +170,7 @@ export default defineComponent({
             const root = JSON.parse(event.data);
             this.dplData = root['dpl'];
 
-            if (root['solarcharger']['full_update'] === true) {
+            if (root['solarcharger']['full_update'] === true || this.solarcharger.instances === undefined) {
                 this.solarcharger = root['solarcharger'];
             } else {
                 Object.assign(this.solarcharger.instances, root['solarcharger']['instances']);

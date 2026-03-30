@@ -158,7 +158,7 @@ import type { Battery } from '@/types/BatteryDataStatus';
 import { isStringValue } from '@/types/StringValue';
 import { handleResponse, authHeader, authUrl } from '@/utils/authentication';
 import DataAgeDisplay from '@/components/DataAgeDisplay.vue';
-import WebSocketService from '@/utils/websocketService.ts';
+import WebSocketService from '@/utils/websocketService';
 
 export default defineComponent({
     components: {
@@ -186,6 +186,7 @@ export default defineComponent({
     },
     unmounted() {
         this.socket?.close();
+        clearInterval(this.dataAgeInterval);
     },
     methods: {
         isStringValue,

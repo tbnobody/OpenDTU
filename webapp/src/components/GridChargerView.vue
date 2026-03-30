@@ -174,7 +174,7 @@ import DataAgeDisplay from '@/components/DataAgeDisplay.vue';
 import InputElement from '@/components/InputElement.vue';
 import BootstrapAlert from '@/components/BootstrapAlert.vue';
 import ModalDialog from '@/components/ModalDialog.vue';
-import WebSocketService from '@/utils/websocketService.ts';
+import WebSocketService from '@/utils/websocketService';
 
 export default defineComponent({
     components: {
@@ -196,8 +196,8 @@ export default defineComponent({
             data: {} as GridCharger,
             isFirstFetchAfterConnect: true,
             targetLimitList: {} as GridChargerLimitConfig,
-            gridChargerLimitSettingView: {} as bootstrap.Modal,
-            gridChargerPowerView: {} as bootstrap.Modal,
+            gridChargerLimitSettingView: null as bootstrap.Modal | null,
+            gridChargerPowerView: null as bootstrap.Modal | null,
             alertMessageLimit: '',
             alertTypeLimit: 'info',
             showAlertLimit: false,
@@ -211,8 +211,8 @@ export default defineComponent({
     unmounted() {
         this.socket?.close();
         clearInterval(this.dataAgeInterval);
-        this.gridChargerLimitSettingView.dispose();
-        this.gridChargerPowerView.dispose();
+        this.gridChargerLimitSettingView?.dispose();
+        this.gridChargerPowerView?.dispose();
     },
     methods: {
         isStringValue,
@@ -265,11 +265,11 @@ export default defineComponent({
         },
         onShowLimitSettings() {
             this.gridChargerLimitSettingView = new bootstrap.Modal('#gridChargerLimitSettingView');
-            this.gridChargerLimitSettingView.show();
+            this.gridChargerLimitSettingView?.show();
         },
         onShowPowerModal() {
             this.gridChargerPowerView = new bootstrap.Modal('#gridChargerPowerView');
-            this.gridChargerPowerView.show();
+            this.gridChargerPowerView?.show();
         },
         onSubmitLimit(e: Event) {
             e.preventDefault();
@@ -287,7 +287,7 @@ export default defineComponent({
                 .then((response) => handleResponse(response, this.$emitter, this.$router))
                 .then((response) => {
                     if (response.type === 'success') {
-                        this.gridChargerLimitSettingView.hide();
+                        this.gridChargerLimitSettingView?.hide();
                         this.showAlertLimit = false;
                     } else {
                         this.alertMessageLimit = this.$t('onbatteryapiresponse.' + response.code, response.param);
@@ -309,7 +309,7 @@ export default defineComponent({
                 .then((response) => {
                     console.log(response);
                     if (response.type === 'success') {
-                        this.gridChargerPowerView.hide();
+                        this.gridChargerPowerView?.hide();
                     }
                 });
         },
