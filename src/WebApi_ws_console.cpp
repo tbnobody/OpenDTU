@@ -24,6 +24,7 @@ void WebApiWsConsoleClass::init(AsyncWebServer& server, Scheduler& scheduler)
 
     _simpleDigestAuth.setUsername(AUTH_USERNAME);
     _simpleDigestAuth.setRealm("console websocket");
+    _simpleDigestAuth.setAuthType(AsyncAuthType::AUTH_DIGEST);
 
     reload();
 }
