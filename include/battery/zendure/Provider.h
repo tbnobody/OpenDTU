@@ -7,6 +7,7 @@
 #include <battery/zendure/HassIntegration.h>
 #include <battery/zendure/Constants.h>
 #include <espMqttClient.h>
+#include <Configuration.h>
 
 namespace Batteries::Zendure {
 
@@ -22,6 +23,10 @@ public:
 private:
     uint16_t setOutputLimit(uint16_t limit) const;
     uint16_t setInverterMax(uint16_t limit) const;
+    void setBypassMode(BatteryZendureConfig::BypassMode_t mode) const;
+    void setBuzzer(bool enable) const;
+    void setAutoshutdown(bool enable) const;
+
     void shutdown() const;
 
     void checkChargeThrough(uint32_t predictHours = 0U);
@@ -51,6 +56,8 @@ private:
 
     void publishPersistentSettings(const char* subtopic, const String& payload);
 
+    void setTopics(const String& deviceType, const String& deviceId);
+
     uint32_t _rateFullUpdateMs = 0;
     uint64_t _nextFullUpdate = 0;
 
@@ -62,18 +69,15 @@ private:
 
     uint32_t _messageCounter = 0;
 
-    String _deviceId = String();
-
-    String _baseTopic = String();
     String _topicLog = String();
     String _topicReadReply = String();
     String _topicReport = String();
     String _topicRead = String();
     String _topicWrite = String();
     String _topicTimesync = String();
+    String _topicTimesyncReply = String();
     String _topicPersistentSettings = String();
 
-    String _payloadSettings = String();
     String _payloadFullUpdate = String();
 
     bool _full_log_supported = false;

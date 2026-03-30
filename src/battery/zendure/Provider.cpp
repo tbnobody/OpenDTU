@@ -69,11 +69,7 @@ bool Provider::init()
     }
 
     // store device ID as we will need them for checking when receiving messages
-    _deviceId = config.Battery.Zendure.DeviceId;
-
-    _baseTopic = "/" + deviceType + "/" + _deviceId + "/";
-    _topicRead = "iot" + _baseTopic + "properties/read";
-    _topicWrite = "iot" + _baseTopic + "properties/write";
+    setTopics(deviceType, config.Battery.Zendure.DeviceId);
 
     _topicPersistentSettings = MqttSettings.getPrefix() + "battery/persistent/";
 
@@ -86,7 +82,6 @@ bool Provider::init()
     DTU_LOGD("Subscribed to '%s' for persistent settings", topic.c_str());
 
     // subscribe for log messages
-    _topicLog = _baseTopic + "log";
     MqttSettings.subscribe(_topicLog, 0/*QoS*/,
             std::bind(&Provider::onMqttMessageLog,
                 this, std::placeholders::_1, std::placeholders::_2,
@@ -95,7 +90,6 @@ bool Provider::init()
     DTU_LOGD("Subscribed to '%s' for status readings", _topicLog.c_str());
 
     // subscribe for report messages
-    _topicReport = _baseTopic + "properties/report";
     MqttSettings.subscribe(_topicReport, 0/*QoS*/,
             std::bind(&Provider::onMqttMessageReport,
                 this, std::placeholders::_1, std::placeholders::_2,
@@ -104,7 +98,6 @@ bool Provider::init()
     DTU_LOGD("Subscribed to '%s' for status readings", _topicReport.c_str());
 
     // subscribe for timesync messages
-    _topicTimesync = _baseTopic + "time-sync";
     MqttSettings.subscribe(_topicTimesync, 0/*QoS*/,
             std::bind(&Provider::onMqttMessageTimesync,
                 this, std::placeholders::_1, std::placeholders::_2,
@@ -119,20 +112,9 @@ bool Provider::init()
     _rateSunCalcMs      = ZENDURE_SECONDS_SUNPOSITION * 1000;
     _nextSunCalc        = millis() + _rateSunCalcMs / 2;
 
-    // pre-generate the settings request
-    JsonDocument root;
-    JsonVariant prop = root[ZENDURE_REPORT_PROPERTIES].to<JsonObject>();
-    prop[ZENDURE_REPORT_PV_BRAND] = 1; // means Hoymiles
-    prop[ZENDURE_REPORT_PV_AUTO_MODEL] = 0; // we did static setup
-    prop[ZENDURE_REPORT_AUTO_RECOVER] = static_cast<uint8_t>(config.Battery.Zendure.BypassMode == static_cast<uint8_t>(BypassMode::Automatic));
-    prop[ZENDURE_REPORT_AUTO_SHUTDOWN] = static_cast<uint8_t>(config.Battery.Zendure.AutoShutdown);
-    prop[ZENDURE_REPORT_BUZZER_SWITCH] = static_cast<uint8_t>(config.Battery.Zendure.BuzzerEnable);
-    prop[ZENDURE_REPORT_BYPASS_MODE] = config.Battery.Zendure.BypassMode;
-    prop[ZENDURE_REPORT_SMART_MODE] = 0; // should be disabled
-    serializeJson(root, _payloadSettings);
 
     // pre-generate the full update request
-    root.clear();
+    JsonDocument root;
     JsonArray array = root[ZENDURE_REPORT_PROPERTIES].to<JsonArray>();
     array.add("getAll");
     array.add("getInfo");
@@ -147,13 +129,24 @@ bool Provider::init()
     if (config.Battery.Zendure.ControlMode == BatteryZendureConfig::ControlMode::ControlModeReadOnly) {
         DTU_LOGI("Running in READ-ONLY mode");
 
-        // forget about write topic and payload to prevent it will ever be written
-        _payloadSettings.clear();
+        // forget about write topic to prevent it will ever be written
         _topicWrite.clear();
     }
 
     DTU_LOGI("INIT DONE");
     return true;
+}
+
+void Provider::setTopics(const String& deviceType, const String& deviceId) {
+    String baseTopic = "/" + deviceType + "/" + deviceId + "/";
+
+    _topicRead   = "iot" + baseTopic + "properties/read";
+    _topicWrite  = "iot" + baseTopic + "properties/write";
+    _topicLog    = baseTopic + "log";
+    _topicReport = baseTopic + "properties/report";
+
+    _topicTimesync      = baseTopic + "time-sync";
+    _topicTimesyncReply = "iot" + baseTopic + "time-sync/reply";
 }
 
 void Provider::deinit()
@@ -181,6 +174,7 @@ void Provider::loop()
     auto ms = millis();
     auto const& config = Configuration.get();
     const bool isDayPeriod = SunPosition.isSunsetAvailable() ? SunPosition.isDayPeriod() : true;
+    auto const chargeThroughState = _stats->_charge_through_state.value_or(ChargeThroughState::Disabled);
 
     // if auto shutdown is enabled and battery switches to idle at night, turn off status requests to prevent keeping battery awake
     if (config.Battery.Zendure.AutoShutdown && !isDayPeriod && _stats->_state == State::Idle) {
@@ -220,7 +214,7 @@ void Provider::loop()
                 }
 
                 // running in appointment mode - set outputlimit accordingly
-                if (config.Battery.Zendure.OutputControl == BatteryZendureConfig::ZendureBatteryOutputControl::ControlSchedule) {
+                if (config.Battery.Zendure.OutputControl == BatteryZendureConfig::OutputControl_t::ControlSchedule && chargeThroughState != ChargeThroughState::Hard) {
                     if (current >= sunrise && current < sunset) {
                         setOutputLimit(min(config.Battery.Zendure.MaxOutput, config.Battery.Zendure.OutputLimitDay));
                     } else if (current >= sunset || current < sunrise) {
@@ -233,22 +227,25 @@ void Provider::loop()
         }
 
         // ensure charge through settings
-        switch (_stats->_charge_through_state.value_or(ChargeThroughState::Disabled)) {
+        switch (chargeThroughState) {
             case ChargeThroughState::Soft:
             case ChargeThroughState::Keep:
                 setTargetSoCs(config.Battery.Zendure.MinSoC, 100);
+                setBypassMode(BatteryZendureConfig::BypassMode_t::AlwaysOff);
+                setOutputLimit(config.Battery.Zendure.OutputLimit);
                 break;
             case ChargeThroughState::Hard:
                 setTargetSoCs(config.Battery.Zendure.MinSoC, 100);
+                setBypassMode(BatteryZendureConfig::BypassMode_t::AlwaysOff);
                 setOutputLimit(0);
                 break;
             default:
                 setTargetSoCs(config.Battery.Zendure.MinSoC, config.Battery.Zendure.MaxSoC);
-                if (config.Battery.Zendure.OutputControl == BatteryZendureConfig::ZendureBatteryOutputControl::ControlFixed) {
-                    setOutputLimit(min(config.Battery.Zendure.MaxOutput, config.Battery.Zendure.OutputLimit));
-                }
+                setBypassMode(config.Battery.Zendure.BypassMode);
+                setOutputLimit(config.Battery.Zendure.OutputLimit);
                 break;
         }
+
     }
 
     if (!_topicRead.isEmpty()) {
@@ -271,17 +268,23 @@ void Provider::loop()
 }
 
 void Provider::writeSettings() {
-    if (_topicWrite.isEmpty() || _payloadSettings.isEmpty()) {
+    if (_topicWrite.isEmpty()) {
         return;
     }
 
-    MqttSettings.publishGeneric(_topicWrite, _payloadSettings, false, 0);
-
     auto const& config = Configuration.get();
 
-    // if running in OnlyOnce mode, forget about write topic and payload to prevent it will ever be written again
+    setBuzzer(config.Battery.Zendure.BuzzerEnable);
+    setAutoshutdown(config.Battery.Zendure.AutoShutdown);
+
+    publishProperties(_topicWrite,
+        ZENDURE_REPORT_PV_BRAND,        "1",    // means Hoymiles
+        ZENDURE_REPORT_PV_AUTO_MODEL,   "0",    // we did static setup
+        ZENDURE_REPORT_SMART_MODE,      "0"     // disable smart mode
+    );
+
+    // if running in OnlyOnce mode, forget about write topic to prevent it will ever be written again
     if (config.Battery.Zendure.ControlMode == BatteryZendureConfig::ControlMode::ControlModeOnce) {
-        _payloadSettings.clear();
         _topicWrite.clear();
     }
 }
@@ -321,7 +324,6 @@ void Provider::checkChargeThrough(uint32_t predictHours /* = 0 */)
     if (!config.Battery.Zendure.ChargeThroughEnable) {
         return;
     }
-
 
     // hard charge through will start after configured interval (given in hours)
     auto hardChargeThrough = config.Battery.Zendure.ChargeThroughInterval;
@@ -372,18 +374,9 @@ uint16_t Provider::setOutputLimit(uint16_t limit) const
 {
     auto const& config = Configuration.get();
 
-    if (_topicWrite.isEmpty() || !alive()) {
+    if (config.Battery.Zendure.OutputControl == BatteryZendureConfig::OutputControl_t::ControlNone ||
+        _topicWrite.isEmpty() || !alive() ) {
         return _stats->_output_limit;
-    }
-
-    // force valid limit and ensure fixed output is always dominant
-    if (config.Battery.Zendure.OutputControl == BatteryZendureConfig::ZendureBatteryOutputControl::ControlFixed) {
-        limit = config.Battery.Zendure.OutputLimit;
-    }
-
-    // enforce output limit during charge through
-    if (_stats->_charge_through_state.value_or(ChargeThroughState::Disabled) == ChargeThroughState::Hard) {
-        limit = 0;
     }
 
     // keep limit below MaxOutput
@@ -392,10 +385,28 @@ uint16_t Provider::setOutputLimit(uint16_t limit) const
     if (_stats->_output_limit != limit) {
         limit = calcOutputLimit(limit);
         publishProperty(_topicWrite, ZENDURE_REPORT_OUTPUT_LIMIT, String(limit));
-        DTU_LOGD("Adjusting outputlimit from %" PRIu32 " W to %" PRIu32 " W", _stats->_output_limit, limit);
+        DTU_LOGD("Adjusting outputlimit from %" PRIu16 " W to %" PRIu16 " W", _stats->_output_limit, limit);
     }
 
     return limit;
+}
+
+void Provider::setBypassMode(BatteryZendureConfig::BypassMode_t mode) const
+{
+    if (_topicWrite.isEmpty() || !alive()) {
+        return;
+    }
+
+    if (_stats->_bypass_mode != mode) {
+        publishProperty(_topicWrite, ZENDURE_REPORT_BYPASS_MODE, String(static_cast<uint8_t>(mode)));
+        DTU_LOGD("Adjusting bypassmode from %" PRIu8 " to %" PRIu8 "", _stats->_bypass_mode, mode);
+    }
+
+    bool recover = (mode == BatteryZendureConfig::BypassMode_t::Automatic);
+    if (_stats->_auto_recover != recover) {
+        publishProperty(_topicWrite, ZENDURE_REPORT_AUTO_RECOVER, String(static_cast<uint8_t>(recover)));
+        DTU_LOGD("Adjusting autorecover from %" PRIu8 " to %" PRIu8 "", _stats->_auto_recover, recover);
+    }
 }
 
 uint16_t Provider::setInverterMax(uint16_t limit) const
@@ -407,10 +418,30 @@ uint16_t Provider::setInverterMax(uint16_t limit) const
     if (_stats->_inverse_max != limit) {
         limit = calcOutputLimit(limit);
         publishProperty(_topicWrite, ZENDURE_REPORT_INVERSE_MAX_POWER, String(limit));
-        DTU_LOGD("Adjusting inverter max output from %" PRIu32 " W to %" PRIu32 " W", _stats->_inverse_max, limit);
+        DTU_LOGD("Adjusting inverter max output from %" PRIu16 " W to %" PRIu16 " W", _stats->_inverse_max, limit);
     }
 
     return limit;
+}
+
+void Provider::setBuzzer(bool enable) const
+{
+    if (_topicWrite.isEmpty() || !alive() || _stats->_buzzer == enable) {
+        return;
+    }
+
+    publishProperty(_topicWrite, ZENDURE_REPORT_BUZZER_SWITCH, String(enable ? "1" : "0"));
+    DTU_LOGD("%s buzzer", enable ? "Enabling" : "Disabling");
+}
+
+void Provider::setAutoshutdown(bool enable) const
+{
+    if (_topicWrite.isEmpty() || !alive() || _stats->_auto_shutdown == enable) {
+        return;
+    }
+
+    publishProperty(_topicWrite, ZENDURE_REPORT_AUTO_SHUTDOWN, String(enable ? "1" : "0"));
+    DTU_LOGD("%s autoshutdown", enable ? "Enabling" : "Disabling");
 }
 
 void Provider::shutdown() const
@@ -454,8 +485,8 @@ void Provider::publishProperties(const String& topic, Arg&&... args) const
 void Provider::timesync()
 {
     time_t now;
-    if (!_baseTopic.isEmpty() && Utils::getEpoch(&now)) {
-        MqttSettings.publishGeneric("iot" + _baseTopic + "time-sync/reply", "{\"zoneOffset\": \"+00:00\", \"messageId\": " + String(++_messageCounter) + ", \"timestamp\": " + String(now) + "}", false, 0);
+    if (!_topicTimesyncReply.isEmpty() && Utils::getEpoch(&now)) {
+        MqttSettings.publishGeneric(_topicTimesyncReply, "{\"zoneOffset\": \"+00:00\", \"messageId\": " + String(++_messageCounter) + ", \"timestamp\": " + String(now) + "}", false, 0);
         DTU_LOGD("Timesync Reply");
     }
 }
@@ -547,7 +578,7 @@ void Provider::onMqttMessageReport(espMqttClientTypes::MessageProperties const& 
         DTU_LOGE("Invalid or missing 'messageId' in '%s'", logValue.c_str());
         return;
     }
-    if (!json["deviceId"].as<String>().equals(_deviceId)) {
+    if (!json["deviceId"].as<String>().equals(Configuration.get().Battery.Zendure.DeviceId)) {
         DTU_LOGE("Invalid or missing 'deviceId' in '%s'", logValue.c_str());
         return;
     }
@@ -641,7 +672,7 @@ void Provider::onMqttMessageReport(espMqttClientTypes::MessageProperties const& 
 
         auto bypass_mode = Utils::getJsonElement<uint8_t>(*props, ZENDURE_REPORT_BYPASS_MODE);
         if (bypass_mode.has_value() && *bypass_mode <= 2) {
-            _stats->_bypass_mode = static_cast<BypassMode>(*bypass_mode);
+            _stats->_bypass_mode = static_cast<BatteryZendureConfig::BypassMode_t>(*bypass_mode);
         }
 
         auto bypass_state = Utils::getJsonElement<uint8_t>(*props, ZENDURE_REPORT_BYPASS_STATE);
@@ -759,7 +790,7 @@ void Provider::onMqttMessageLog(espMqttClientTypes::MessageProperties const& pro
     // validate input data
     // deviceId has to be set to the configured deviceId
     // logType has to be set to "2"
-    if (!json["deviceId"].as<String>().equals(_deviceId)) {
+    if (!json["deviceId"].as<String>().equals(Configuration.get().Battery.Zendure.DeviceId)) {
         DTU_LOGE("Invalid or missing 'deviceId' in '%s'", logValue.c_str());
         return;
     }
@@ -885,7 +916,7 @@ String Provider::parseVersion(uint32_t version)
     uint8_t bugfix = version & 0xFF;
 
     char buffer[16];
-    snprintf(buffer, sizeof(buffer), "%" PRIu32 ".%" PRIu32 ".%" PRIu32, major, minor, bugfix);
+    snprintf(buffer, sizeof(buffer), "%" PRIu8 ".%" PRIu8 ".%" PRIu8, major, minor, bugfix);
     return String(buffer);
 }
 
@@ -916,17 +947,19 @@ void Provider::calculateEfficiency()
 void Provider::setSoC(const float soc, const uint32_t timestamp /* = 0 */, const uint8_t precision /* = 2 */)
 {
     time_t now;
+    auto const& config = Configuration.get();
+    auto const chargeThroughState = _stats->_charge_through_state.value_or(ChargeThroughState::Disabled);
 
     if (Utils::getEpoch(&now)) {
         if (soc >= 100.0) {
             _stats->_last_full_timestamp = now;
             publishPersistentSettings(ZENDURE_PERSISTENT_SETTINGS_LAST_FULL, String(now));
 
-            if (Configuration.get().Battery.Zendure.ChargeThroughEnable) {
+            if (chargeThroughState == ChargeThroughState::Soft || chargeThroughState == ChargeThroughState::Hard) {
                 setChargeThroughState(ChargeThroughState::Keep);
             }
         }
-        if (soc < static_cast<float>(Configuration.get().Battery.Zendure.ChargeThroughResetLevel) && _stats->_charge_through_state.value_or(ChargeThroughState::Disabled) == ChargeThroughState::Keep) {
+        if (soc < static_cast<float>(config.Battery.Zendure.ChargeThroughResetLevel) && chargeThroughState == ChargeThroughState::Keep) {
             setChargeThroughState(ChargeThroughState::Idle);
         }
         if (soc <= 0.0) {

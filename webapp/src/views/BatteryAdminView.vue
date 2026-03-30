@@ -402,7 +402,9 @@
                     </template>
                 </CardElement>
 
-                <template v-if="batteryConfigList.zendure.control_mode == 0">
+                <template
+                    v-if="batteryConfigList.zendure.control_mode == 0 && batteryConfigList.zendure.output_control != 0"
+                >
                     <CardElement
                         :text="$t('batteryadmin.zendure.chargeThrough')"
                         textVariant="text-bg-primary"
@@ -446,6 +448,7 @@
                                 id="zendure_output_mode"
                                 class="form-select"
                                 v-model="batteryConfigList.zendure.output_control"
+                                @change="batteryConfigList.zendure.charge_through_enable = false"
                             >
                                 <option :key="0" :value="0">
                                     {{ $t('batteryadmin.ZendureOutputMode' + zendureOutputControlList[0]?.value) }}

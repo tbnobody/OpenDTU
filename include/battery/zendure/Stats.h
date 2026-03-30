@@ -11,17 +11,12 @@
 
 namespace Batteries::Zendure {
 
+static constexpr const char* invalid = "invalid";
+
 enum class State : uint8_t {
     Idle        = 0,
     Charging    = 1,
     Discharging = 2,
-    Invalid     = 255
-};
-
-enum class BypassMode : uint8_t {
-    Automatic   = 0,
-    AlwaysOff   = 1,
-    AlwaysOn    = 2,
     Invalid     = 255
 };
 
@@ -41,6 +36,13 @@ static constexpr frozen::map<ChargeThroughState, const char*, 5> _chargeThroughS
     { ChargeThroughState::Keep,     "keep" }
 };
 
+static constexpr frozen::map<BatteryZendureConfig::BypassMode_t, const char*, 3> _bypassModeStrings {
+    { BatteryZendureConfig::BypassMode_t::Automatic, "automatic" },
+    { BatteryZendureConfig::BypassMode_t::AlwaysOff, "alwaysoff" },
+    { BatteryZendureConfig::BypassMode_t::AlwaysOn,  "alwayson" }
+};
+
+
 class PackStats;
 
 class Stats : public ::Batteries::Stats {
@@ -48,7 +50,7 @@ class Stats : public ::Batteries::Stats {
 
     static const char* chargeThroughStateToString(std::optional<ChargeThroughState> mode) {
         if (!mode.has_value()) {
-            return "invalid";
+            return invalid;
         }
 
         return chargeThroughStateToString(*mode);
@@ -59,7 +61,7 @@ class Stats : public ::Batteries::Stats {
             return _chargeThroughStateStrings.at(mode);
         }
 
-        return "invalid";
+        return invalid;
     }
 
     static std::optional<ChargeThroughState> chargeThroughStateFromString(String value) {
@@ -83,7 +85,7 @@ class Stats : public ::Batteries::Stats {
             default:
                 break;
         }
-        return "invalid";
+        return invalid;
     }
 
     static const char* stateToString(State state) {
@@ -97,21 +99,15 @@ class Stats : public ::Batteries::Stats {
             default:
                 break;
         }
-        return "invalid";
+        return invalid;
     }
 
-    static const char* bypassModeToString(BypassMode state) {
-        switch (state) {
-            case BypassMode::Automatic:
-                return "automatic";
-            case BypassMode::AlwaysOff:
-                return "alwaysoff";
-            case BypassMode::AlwaysOn:
-                return "alwayson";
-            default:
-                break;
+    static const char* bypassModeToString(BatteryZendureConfig::BypassMode_t mode) {
+        if (_bypassModeStrings.contains(mode)) {
+            return _bypassModeStrings.at(mode);
         }
-        return "invalid";
+
+        return invalid;
     }
 
     inline static bool isDischarging(State state) {
@@ -293,7 +289,7 @@ private:
 
     State _state = State::Invalid;
     uint8_t _num_batteries = 0;
-    BypassMode _bypass_mode = BypassMode::Invalid;
+    BatteryZendureConfig::BypassMode_t _bypass_mode = BatteryZendureConfig::BypassMode_t::Automatic;
     bool _bypass_state = false;
     bool _auto_recover = false;
     bool _heat_state = false;
