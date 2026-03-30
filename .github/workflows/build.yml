@@ -196,6 +196,8 @@ jobs:
     name: Create Release
     runs-on: ubuntu-24.04
     permissions:
+      actions: read
+      pull-requests: read
       contents: write
     needs: [get_default_envs, build]
     if: startsWith(github.ref, 'refs/tags/2')
