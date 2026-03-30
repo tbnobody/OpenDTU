@@ -282,7 +282,7 @@
                             :label="$t('powermeteradmin.pollingInterval')"
                             v-model="udpVictronPollIntervalSeconds"
                             type="number"
-                            min="0.5"
+                            min="0.1"
                             max="15.0"
                             step="0.1"
                             :postfix="$t('powermeteradmin.seconds')"

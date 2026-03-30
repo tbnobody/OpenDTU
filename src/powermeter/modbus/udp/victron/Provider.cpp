@@ -21,6 +21,7 @@ static constexpr uint8_t sUnitId = 0x01;
 static constexpr uint8_t sFunctionCode = 0x03; // read holding registers
 static constexpr uint16_t sRegisterAddress = 0x3032;
 static constexpr uint16_t sRegisterCount = 0x005A;
+static constexpr uint16_t sMinPollingIntervalMs = 100;
 
 static WiFiUDP VictronUdp;
 
@@ -42,7 +43,9 @@ Provider::~Provider()
 
 void Provider::sendModbusRequest()
 {
-    auto interval = _cfg.PollingIntervalMs;
+    auto interval = _cfg.PollingIntervalMs < sMinPollingIntervalMs
+        ? sMinPollingIntervalMs
+        : _cfg.PollingIntervalMs;
 
     uint32_t currentMillis = millis();
 
@@ -186,24 +189,47 @@ void Provider::parseModbusResponse()
     p += 2; // skip register 0x3032 (AC frequency)
     p += 2; // skip register 0x3033 (PEN voltage)
 
-    _dataCurrent.add<Label::Import>(readUint32(&p, 100)); // 0x3034f
-    _dataCurrent.add<Label::Export>(readUint32(&p, 100)); // 0x3036f
+    float importEnergy = readUint32(&p, 100); // 0x3034f
+    float exportEnergy = readUint32(&p, 100); // 0x3036f
+    _dataCurrent.add<Label::Import>(importEnergy);
+    _dataCurrent.add<Label::Export>(exportEnergy);
     p += 16; // jump to register 0x3040
-    _dataCurrent.add<Label::VoltageL1>(readInt16(&p, 100)); // 0x3040
-    _dataCurrent.add<Label::CurrentL1>(readInt16(&p, 100)); // 0x3041
+    float voltageL1 = readInt16(&p, 100); // 0x3040
+    float currentL1 = readInt16(&p, 100); // 0x3041
+    _dataCurrent.add<Label::VoltageL1>(voltageL1);
+    _dataCurrent.add<Label::CurrentL1>(currentL1);
     p += 12; // jump to register 0x3048
-    _dataCurrent.add<Label::VoltageL2>(readInt16(&p, 100)); // 0x3048
-    _dataCurrent.add<Label::CurrentL2>(readInt16(&p, 100)); // 0x3049
+    float voltageL2 = readInt16(&p, 100); // 0x3048
+    float currentL2 = readInt16(&p, 100); // 0x3049
+    _dataCurrent.add<Label::VoltageL2>(voltageL2);
+    _dataCurrent.add<Label::CurrentL2>(currentL2);
     p += 12; // jump to register 0x3050
-    _dataCurrent.add<Label::VoltageL3>(readInt16(&p, 100)); // 0x3050
-    _dataCurrent.add<Label::CurrentL3>(readInt16(&p, 100)); // 0x3051
+    float voltageL3 = readInt16(&p, 100); // 0x3050
+    float currentL3 = readInt16(&p, 100); // 0x3051
+    _dataCurrent.add<Label::VoltageL3>(voltageL3);
+    _dataCurrent.add<Label::CurrentL3>(currentL3);
     p += 92; // jump from 0x3052 to 0x3080 (0x2E registers = 92 bytes)
-    _dataCurrent.add<Label::PowerTotal>(readInt32(&p, 1)); // 0x3080f
-    _dataCurrent.add<Label::PowerL1>(readInt32(&p, 1)); // 0x3082f
+    float powerTotal = readInt32(&p, 1); // 0x3080f
+    float powerL1 = readInt32(&p, 1); // 0x3082f
+    _dataCurrent.add<Label::PowerTotal>(powerTotal);
+    _dataCurrent.add<Label::PowerL1>(powerL1);
     p += 4; // jump to 0x3086
-    _dataCurrent.add<Label::PowerL2>(readInt32(&p, 1)); // 0x3086f
+    float powerL2 = readInt32(&p, 1); // 0x3086f
+    _dataCurrent.add<Label::PowerL2>(powerL2);
     p += 4; // jump to 0x308A
-    _dataCurrent.add<Label::PowerL3>(readInt32(&p, 1)); // 0x308Af
+    float powerL3 = readInt32(&p, 1); // 0x308Af
+    _dataCurrent.add<Label::PowerL3>(powerL3);
+
+    DTU_LOGD("Import=%.3f, Export=%.3f, "
+             "V1=%.2f, I1=%.2f, P1=%.2f, "
+             "V2=%.2f, I2=%.2f, P2=%.2f, "
+             "V3=%.2f, I3=%.2f, P3=%.2f, "
+             "Ptotal=%.2f",
+             importEnergy, exportEnergy,
+             voltageL1, currentL1, powerL1,
+             voltageL2, currentL2, powerL2,
+             voltageL3, currentL3, powerL3,
+             powerTotal);
 }
 
 void Provider::loop()
