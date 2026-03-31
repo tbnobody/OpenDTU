@@ -1,7 +1,7 @@
 
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * Copyright (C) 2022-2024 Thomas Basler and others
+ * Copyright (C) 2022-2026 Thomas Basler and others
  */
 #include "HERF_1CH.h"
 
