@@ -47,6 +47,7 @@ void WebApiWsGridChargerLiveClass::init(AsyncWebServer& server, Scheduler& sched
 
     _simpleDigestAuth.setUsername(AUTH_USERNAME);
     _simpleDigestAuth.setRealm("AC charger websocket");
+    _simpleDigestAuth.setAuthType(AsyncAuthType::AUTH_DIGEST);
 
     reload();
 }

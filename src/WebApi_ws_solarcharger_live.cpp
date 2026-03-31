@@ -49,6 +49,7 @@ void WebApiWsSolarChargerLiveClass::init(AsyncWebServer& server, Scheduler& sche
 
     _simpleDigestAuth.setUsername(AUTH_USERNAME);
     _simpleDigestAuth.setRealm("solarcharger websocket");
+    _simpleDigestAuth.setAuthType(AsyncAuthType::AUTH_DIGEST);
 
     reload();
 }

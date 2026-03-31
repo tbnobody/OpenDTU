@@ -48,6 +48,7 @@ void WebApiWsBatteryLiveClass::init(AsyncWebServer& server, Scheduler& scheduler
 
     _simpleDigestAuth.setUsername(AUTH_USERNAME);
     _simpleDigestAuth.setRealm("battery websocket");
+    _simpleDigestAuth.setAuthType(AsyncAuthType::AUTH_DIGEST);
 
     reload();
 }
