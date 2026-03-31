@@ -73,8 +73,12 @@ private:
 
     std::deque<std::unique_ptr<PowerLimiterInverter>> _inverters;
     std::deque<std::unique_ptr<PowerLimiterInverter>> _retirees;
-    bool _batteryDischargeEnabled = false;
-    bool _nighttimeDischarging = false;
+
+    enum class BatteryState : uint8_t { STOP = 0, NO_DISCHARGE = 1, DISCHARGE_ALLOWED = 2, DISCHARGE_NIGHT = 3 };
+    BatteryState _batteryState = BatteryState::STOP;
+    bool _fromStart = false;
+    bool _oneStopPerNightDone = false;
+
     std::pair<bool, uint32_t> _nextInverterRestart = { false, 0 };
     bool _fullSolarPassThroughActive = false;
     float _loadCorrectedVoltage = 0.0f;
