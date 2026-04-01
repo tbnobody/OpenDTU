@@ -4,6 +4,7 @@
 #include "HoymilesRadio.h"
 #include "commands/CommandAbstract.h"
 #include <RF24.h>
+#include <cstdint>
 #include <memory>
 #include <nRF24L01.h>
 #include <queue>
@@ -34,10 +35,12 @@ private:
 
     std::unique_ptr<SPIClass> _spiPtr;
     std::unique_ptr<RF24> _radio;
-    uint8_t _rxChLst[5] = { 3, 23, 40, 61, 75 };
+    static constexpr uint8_t RF_CHANNELS = 5;
+
+    uint8_t _rxChLst[RF_CHANNELS] = { 3, 23, 40, 61, 75 };
     uint8_t _rxChIdx = 0;
 
-    uint8_t _txChLst[5] = { 3, 23, 40, 61, 75 };
+    uint8_t _txChLst[RF_CHANNELS] = { 3, 23, 40, 61, 75 };
     uint8_t _txChIdx = 0;
 
     volatile bool _packetReceived = false;
