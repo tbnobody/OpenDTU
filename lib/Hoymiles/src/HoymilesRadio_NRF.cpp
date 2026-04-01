@@ -153,14 +153,14 @@ void ARDUINO_ISR_ATTR HoymilesRadio_NRF::handleIntr()
 
 uint8_t HoymilesRadio_NRF::getRxNxtChannel()
 {
-    if (++_rxChIdx >= sizeof(_rxChLst))
+    if (++_rxChIdx >= RF_CHANNELS)
         _rxChIdx = 0;
     return _rxChLst[_rxChIdx];
 }
 
 uint8_t HoymilesRadio_NRF::getTxNxtChannel()
 {
-    if (++_txChIdx >= sizeof(_txChLst))
+    if (++_txChIdx >= RF_CHANNELS)
         _txChIdx = 0;
     return _txChLst[_txChIdx];
 }
@@ -192,7 +192,10 @@ void HoymilesRadio_NRF::sendEsbPacket(CommandAbstract& cmd)
 
     _radio->setRetries(0, 0);
     openReadingPipe();
-    _radio->setChannel(getRxNxtChannel());
+
+    // Set initial RX to protocol-correct response channel: (txChIdx + 3) % 5
+    _rxChIdx = (_txChIdx + 3) % RF_CHANNELS;
+    _radio->setChannel(_rxChLst[_rxChIdx]);
     _radio->startListening();
     _busyFlag = true;
     _rxTimeout.set(cmd.getTimeout());
