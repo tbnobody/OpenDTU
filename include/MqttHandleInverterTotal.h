@@ -2,6 +2,8 @@
 #pragma once
 
 #include <TaskSchedulerDeclarations.h>
+#include "MqttAvailableHandler.h"
+#include <memory>
 
 class MqttHandleInverterTotalClass {
 public:
@@ -10,8 +12,11 @@ public:
 
 private:
     void loop();
+    bool isDataValid();
+    void sendData();
 
     Task _loopTask;
+    std::unique_ptr<MqttAvailableHandler> _availableHandler;
 };
 
 extern MqttHandleInverterTotalClass MqttHandleInverterTotal;

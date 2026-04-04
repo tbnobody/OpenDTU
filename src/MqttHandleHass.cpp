@@ -75,8 +75,8 @@ void MqttHandleHassClass::publishConfig()
     publishDtuSensor("Largest Free Heap Block", "dtu/heap/maxalloc", "Bytes", "mdi:memory", DEVICE_CLS_NONE, STATE_CLS_NONE, CATEGORY_DIAGNOSTIC);
     publishDtuSensor("Lifetime Minimum Free Heap", "dtu/heap/minfree", "Bytes", "mdi:memory", DEVICE_CLS_NONE, STATE_CLS_NONE, CATEGORY_DIAGNOSTIC);
 
-    publishDtuSensor("Yield Total", "ac/yieldtotal", "kWh", "", DEVICE_CLS_ENERGY, STATE_CLS_TOTAL_INCREASING, CATEGORY_NONE);
-    publishDtuSensor("Yield Day", "ac/yieldday", "Wh", "", DEVICE_CLS_ENERGY, STATE_CLS_TOTAL_INCREASING, CATEGORY_NONE);
+    publishDtuSensor("Yield Total", "ac/yieldtotal", "kWh", "", DEVICE_CLS_ENERGY, STATE_CLS_TOTAL_INCREASING, CATEGORY_NONE, "ac/is_valid");
+    publishDtuSensor("Yield Day", "ac/yieldday", "Wh", "", DEVICE_CLS_ENERGY, STATE_CLS_TOTAL_INCREASING, CATEGORY_NONE, "ac/is_valid");
     publishDtuSensor("AC Power", "ac/power", "W", "", DEVICE_CLS_PWR, STATE_CLS_MEASUREMENT, CATEGORY_NONE);
     publishDtuSensor("DC Power", "dc/power", "W", "", DEVICE_CLS_PWR, STATE_CLS_MEASUREMENT, CATEGORY_NONE);
 
@@ -175,6 +175,15 @@ void MqttHandleHassClass::publishInverterField(std::shared_ptr<InverterAbstract>
         if (Configuration.get().Mqtt.Hass.Expire) {
             root["exp_aft"] = Hoymiles.getNumInverters() * max<uint32_t>(Hoymiles.PollInterval(), Configuration.get().Mqtt.PublishInterval) * inv->getReachableThreshold();
         }
+
+        const CONFIG_T& config = Configuration.get();
+        root["avty_mode"] = "all";
+        root["avty"][0]["t"] = MqttSettings.getPrefix() + config.Mqtt.Lwt.Topic;
+        root["avty"][0]["pl_avail"] = config.Mqtt.Lwt.Value_Online;
+        root["avty"][0]["pl_not_avail"] = config.Mqtt.Lwt.Value_Offline;
+        root["avty"][1]["t"] = MqttSettings.getPrefix() + serial + "/" + "status/reachable";
+        root["avty"][1]["pl_avail"] = "1";
+        root["avty"][1]["pl_not_avail"] = "0";
 
         publish(configTopic, root);
     } else {
@@ -388,7 +397,7 @@ void MqttHandleHassClass::publishSensor(
     JsonDocument& doc,
     const String& root_device, const String& unique_id_prefix, const String& name, const String& state_topic,
     const String& unit_of_measure, const String& icon,
-    const DeviceClassType device_class, const StateClassType state_class, const CategoryType category)
+    const DeviceClassType device_class, const StateClassType state_class, const CategoryType category, const String& extra_availability_topic)
 {
     String sensor_id = name;
     sensor_id.toLowerCase();
@@ -401,9 +410,16 @@ void MqttHandleHassClass::publishSensor(
     addCommonMetadata(doc, unit_of_measure, icon, device_class, state_class, category);
 
     const CONFIG_T& config = Configuration.get();
-    doc["avty_t"] = MqttSettings.getPrefix() + config.Mqtt.Lwt.Topic;
-    doc["pl_avail"] = config.Mqtt.Lwt.Value_Online;
-    doc["pl_not_avail"] = config.Mqtt.Lwt.Value_Offline;
+    doc["avty_mode"] = "all";
+    doc["avty"][0]["t"] = MqttSettings.getPrefix() + config.Mqtt.Lwt.Topic;
+    doc["avty"][0]["pl_avail"] = config.Mqtt.Lwt.Value_Online;
+    doc["avty"][0]["pl_not_avail"] = config.Mqtt.Lwt.Value_Offline;
+    if (extra_availability_topic.length() > 0) {
+        doc["avty"][1]["t"] = MqttSettings.getPrefix() + extra_availability_topic;
+        doc["avty"][1]["pl_avail"] = "1";
+        doc["avty"][1]["pl_not_avail"] = "0";
+    }
+
 
     const String configTopic = "sensor/" + root_device + "/" + sensor_id + "/config";
     publish(configTopic, doc);
@@ -412,13 +428,13 @@ void MqttHandleHassClass::publishSensor(
 void MqttHandleHassClass::publishDtuSensor(
     const String& name, const String& state_topic,
     const String& unit_of_measure, const String& icon,
-    const DeviceClassType device_class, const StateClassType state_class, const CategoryType category)
+    const DeviceClassType device_class, const StateClassType state_class, const CategoryType category, const String& extra_availability_topic)
 {
     const String dtuId = getDtuUniqueId();
 
     JsonDocument root;
     createDtuInfo(root);
-    publishSensor(root, dtuId, dtuId, name, state_topic, unit_of_measure, icon, device_class, state_class, category);
+    publishSensor(root, dtuId, dtuId, name, state_topic, unit_of_measure, icon, device_class, state_class, category, extra_availability_topic);
 }
 
 void MqttHandleHassClass::publishInverterSensor(
