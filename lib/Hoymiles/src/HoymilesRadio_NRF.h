@@ -27,6 +27,8 @@ private:
     uint8_t getRxNxtChannel();
     uint8_t getTxNxtChannel();
     void switchRxCh();
+    void checkRxCh(bool const immediately = false);
+    uint8_t syncToRxCh();
     void openReadingPipe();
     void openWritingPipe(const serial_u serial);
 
@@ -40,7 +42,18 @@ private:
     uint8_t _txChLst[5] = { 3, 23, 40, 61, 75 };
     uint8_t _txChIdx = 0;
 
+    uint8_t _ARD[33] = {  4,  3,  3,  3,  3,  3,  3,  3,  3,  3,  3,
+                              3,  3,  3,  3,  3,  3,  3,  3,  3,  3,
+                              2,  2,  2,  2,  2,  2,  2,  2,  2,  2,
+                              2,  2 };
+    uint8_t _ART[33] = { 14, 15, 15, 15, 15, 15, 14, 14, 14, 13, 13,
+                             13, 12, 12, 12, 12, 11, 11, 11, 11, 11,
+                             12, 12, 12, 11, 11, 11, 11, 11, 10, 10,
+                             10, 10 };
+
     volatile bool _packetReceived = false;
 
     std::queue<fragment_t> _rxBuffer;
+
+    uint32_t _refMicros = 0;
 };
