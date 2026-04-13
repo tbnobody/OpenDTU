@@ -147,7 +147,7 @@ jobs:
           for i in */; do cp ${i}opendtu-*.bin ./; done
 
       - name: Create release
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@v3
         with:
           body: ${{steps.github_release.outputs.changelog}}
           draft: False
