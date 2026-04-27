@@ -27,7 +27,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
-    "@intlify/unplugin-vue-i18n": "^11.0.7",
+    "@intlify/unplugin-vue-i18n": "^11.1.2",
     "@tsconfig/node24": "^24.0.4",
     "@types/bootstrap": "^5.2.10",
     "@types/node": "^25.5.0",
