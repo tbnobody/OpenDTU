@@ -75,6 +75,13 @@ void MqttHandleHassClass::publishConfig()
     publishDtuSensor("Largest Free Heap Block", "dtu/heap/maxalloc", "Bytes", "mdi:memory", DEVICE_CLS_NONE, STATE_CLS_NONE, CATEGORY_DIAGNOSTIC);
     publishDtuSensor("Lifetime Minimum Free Heap", "dtu/heap/minfree", "Bytes", "mdi:memory", DEVICE_CLS_NONE, STATE_CLS_NONE, CATEGORY_DIAGNOSTIC);
 
+    if (ESP.getPsramSize() > 0) {
+        publishDtuSensor("PSRAM Size", "dtu/psram/size", "Bytes", "mdi:memory", DEVICE_CLS_NONE, STATE_CLS_NONE, CATEGORY_DIAGNOSTIC);
+        publishDtuSensor("PSRAM Free", "dtu/psram/free", "Bytes", "mdi:memory", DEVICE_CLS_NONE, STATE_CLS_NONE, CATEGORY_DIAGNOSTIC);
+        publishDtuSensor("Largest Free PSRAM Block", "dtu/psram/maxalloc", "Bytes", "mdi:memory", DEVICE_CLS_NONE, STATE_CLS_NONE, CATEGORY_DIAGNOSTIC);
+        publishDtuSensor("Lifetime Minimum Free PSRAM", "dtu/psram/minfree", "Bytes", "mdi:memory", DEVICE_CLS_NONE, STATE_CLS_NONE, CATEGORY_DIAGNOSTIC);
+    }
+
     publishDtuSensor("Yield Total", "ac/yieldtotal", "kWh", "", DEVICE_CLS_ENERGY, STATE_CLS_TOTAL_INCREASING, CATEGORY_NONE);
     publishDtuSensor("Yield Day", "ac/yieldday", "Wh", "", DEVICE_CLS_ENERGY, STATE_CLS_TOTAL_INCREASING, CATEGORY_NONE);
     publishDtuSensor("AC Power", "ac/power", "W", "", DEVICE_CLS_PWR, STATE_CLS_MEASUREMENT, CATEGORY_NONE);
