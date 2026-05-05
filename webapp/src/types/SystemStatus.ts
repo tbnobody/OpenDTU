@@ -38,6 +38,8 @@ export interface SystemStatus {
     littlefs_used: number;
     psram_total: number;
     psram_used: number;
+    psram_max_block: number;
+    psram_min_free: number;
     sketch_total: number;
     sketch_used: number;
     // RadioInfo

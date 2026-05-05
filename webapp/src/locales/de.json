@@ -250,8 +250,9 @@
         "LittleFs": "LittleFs",
         "Sketch": "Sketch"
     },
-    "heapdetails": {
+    "memorydetails": {
         "HeapDetails": "Detailinformationen zum Heap",
+        "PsramDetails": "Detailinformationen zum PSRAM",
         "TotalFree": "Insgesamt frei",
         "LargestFreeBlock": "Größter zusammenhängender freier Block",
         "MaxUsage": "Maximale Speichernutzung seit Start",

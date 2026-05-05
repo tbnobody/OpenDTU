@@ -6,8 +6,24 @@
         <div class="mt-5"></div>
         <MemoryInfo :systemStatus="systemDataList" />
         <div class="mt-5"></div>
-        <HeapDetails :systemStatus="systemDataList" />
+        <MemoryDetails
+            :title="$t('memorydetails.HeapDetails')"
+            :total="systemDataList.heap_total"
+            :used="systemDataList.heap_used"
+            :min-free="systemDataList.heap_min_free"
+            :max-block="systemDataList.heap_max_block"
+        />
         <div class="mt-5"></div>
+        <template v-if="systemDataList.psram_total > 0">
+            <MemoryDetails
+                :title="$t('memorydetails.PsramDetails')"
+                :total="systemDataList.psram_total"
+                :used="systemDataList.psram_used"
+                :min-free="systemDataList.psram_min_free"
+                :max-block="systemDataList.psram_max_block"
+            />
+            <div class="mt-5"></div>
+        </template>
         <TaskDetails :taskDetails="systemDataList.task_details" />
         <div class="mt-5"></div>
         <RadioInfo :systemStatus="systemDataList" />
@@ -20,7 +36,7 @@ import BasePage from '@/components/BasePage.vue';
 import FirmwareInfo from '@/components/FirmwareInfo.vue';
 import HardwareInfo from '@/components/HardwareInfo.vue';
 import MemoryInfo from '@/components/MemoryInfo.vue';
-import HeapDetails from '@/components/HeapDetails.vue';
+import MemoryDetails from '@/components/MemoryDetails.vue';
 import TaskDetails from '@/components/TaskDetails.vue';
 import RadioInfo from '@/components/RadioInfo.vue';
 import type { SystemStatus } from '@/types/SystemStatus';
@@ -33,7 +49,7 @@ export default defineComponent({
         FirmwareInfo,
         HardwareInfo,
         MemoryInfo,
-        HeapDetails,
+        MemoryDetails,
         TaskDetails,
         RadioInfo,
     },

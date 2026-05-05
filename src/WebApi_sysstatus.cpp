@@ -40,8 +40,12 @@ void WebApiSysstatusClass::onSystemStatus(AsyncWebServerRequest* request)
     root["heap_used"] = ESP.getHeapSize() - ESP.getFreeHeap();
     root["heap_max_block"] = ESP.getMaxAllocHeap();
     root["heap_min_free"] = ESP.getMinFreeHeap();
+
     root["psram_total"] = ESP.getPsramSize();
     root["psram_used"] = ESP.getPsramSize() - ESP.getFreePsram();
+    root["psram_max_block"] = ESP.getMaxAllocPsram();
+    root["psram_min_free"] = ESP.getMinFreePsram();
+
     root["sketch_total"] = ESP.getFreeSketchSpace();
     root["sketch_used"] = ESP.getSketchSize();
     root["littlefs_total"] = LittleFS.totalBytes();
