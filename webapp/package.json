@@ -29,7 +29,7 @@
     "@eslint/js": "^10.0.1",
     "@intlify/unplugin-vue-i18n": "^11.0.7",
     "@tsconfig/node24": "^24.0.4",
-    "@types/bootstrap": "^5.2.10",
+    "@types/bootstrap": "^5.2.11",
     "@types/node": "^25.5.0",
     "@types/pulltorefreshjs": "^0.1.7",
     "@types/sortablejs": "^1.15.9",
