@@ -26,7 +26,7 @@
                         :data-bs-target="'#v-pills-' + inverter.serial"
                         type="button"
                         role="tab"
-                        aria-controls="'v-pills-' + inverter.serial"
+                        :aria-controls="'v-pills-' + inverter.serial"
                         aria-selected="true"
                     >
                         <div class="d-flex align-items-center">
