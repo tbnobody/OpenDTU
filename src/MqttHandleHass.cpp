@@ -82,6 +82,8 @@ void MqttHandleHassClass::publishConfig()
 
     publishDtuBinarySensor("Status", config.Mqtt.Lwt.Topic, config.Mqtt.Lwt.Value_Online, config.Mqtt.Lwt.Value_Offline, DEVICE_CLS_CONNECTIVITY, STATE_CLS_NONE, CATEGORY_DIAGNOSTIC);
 
+    publishDtuButton("Restart OpenDTU", "dtu/cmd/restart", "1", "", DEVICE_CLS_RESTART, STATE_CLS_NONE, CATEGORY_CONFIG);
+
     // Loop all inverters
     for (uint8_t i = 0; i < Hoymiles.getNumInverters(); i++) {
         auto inv = Hoymiles.getInverterByPos(i);
@@ -371,6 +373,35 @@ void MqttHandleHassClass::publishDtuBinarySensor(
     JsonDocument root;
     createDtuInfo(root);
     publishBinarySensor(root, dtuId, dtuId, name, state_topic, payload_on, payload_off, device_class, state_class, category);
+}
+
+void MqttHandleHassClass::publishDtuButton(
+    const String& name, const String& cmd_topic, const String& payload,
+    const String& icon,
+    const DeviceClassType device_class, const StateClassType state_class, const CategoryType category)
+{
+    const String dtuId = getDtuUniqueId();
+
+    String buttonId = name;
+    buttonId.replace(" ", "_");
+    buttonId.toLowerCase();
+
+    const String configTopic = "button/" + dtuId
+        + "/" + buttonId
+        + "/config";
+
+    const String fullCmdTopic = MqttSettings.getPrefix() + cmd_topic;
+
+    JsonDocument root;
+    createDtuInfo(root);
+    addCommonMetadata(root, "", icon, device_class, state_class, category);
+
+    root["name"] = name;
+    root["uniq_id"] = dtuId + "_" + buttonId;
+    root["cmd_t"] = fullCmdTopic;
+    root["payload_press"] = payload;
+
+    publish(configTopic, root);
 }
 
 void MqttHandleHassClass::publishInverterBinarySensor(
