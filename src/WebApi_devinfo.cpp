@@ -5,6 +5,7 @@
 #include "WebApi_devinfo.h"
 #include "WebApi.h"
 #include <AsyncJson.h>
+#include <HmsWifiInverter.h>
 #include <Hoymiles.h>
 #include <ctime>
 
@@ -32,10 +33,21 @@ void WebApiDevInfoClass::onDevInfoStatus(AsyncWebServerRequest* request)
         root["fw_build_version"] = inv->DevInfo()->getFwBuildVersion();
         root["hw_part_number"] = inv->DevInfo()->getHwPartNumber();
         root["hw_version"] = inv->DevInfo()->getHwVersion();
-        root["hw_model_name"] = inv->DevInfo()->getHwModelName();
         root["max_power"] = inv->DevInfo()->getMaxPower();
         root["fw_build_datetime"] = inv->DevInfo()->getFwBuildDateTimeStr();
         root["pdl_supported"] = inv->supportsPowerDistributionLogic();
+
+        // HW part number lookup gives the exact model name for RF inverters.
+        // WiFi inverters also have pv_hw_pn from AppInfo which feeds the same
+        // lookup table. Fall back to the serial-derived model name if the HW
+        // part number isn't in the table.
+        String modelName = inv->DevInfo()->getHwModelName();
+        if (modelName.isEmpty() && inv->isWifiInverter()) {
+            auto* wifiInv = static_cast<HmsWifiInverter*>(inv.get());
+            const String& wifiModel = wifiInv->wifiModelName();
+            modelName = wifiModel.isEmpty() ? inv->typeName() : wifiModel;
+        }
+        root["hw_model_name"] = modelName;
     }
 
     WebApi.sendJsonResponse(request, response, __FUNCTION__, __LINE__);

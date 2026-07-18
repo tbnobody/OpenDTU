@@ -215,8 +215,26 @@ void AlarmLogParser::appendFragment(const uint8_t offset, const uint8_t* payload
     _alarmLogLength += len;
 }
 
+void AlarmLogParser::setDirectEntries(const AlarmLogEntry_t* entries, uint8_t count)
+{
+    _directEntryCount = (count > ALARM_LOG_ENTRY_COUNT) ? ALARM_LOG_ENTRY_COUNT : count;
+    HOY_SEMAPHORE_TAKE();
+    for (uint8_t i = 0; i < _directEntryCount; i++) {
+        _directEntries[i] = entries[i];
+    }
+    HOY_SEMAPHORE_GIVE();
+}
+
+void AlarmLogParser::clearDirectEntries()
+{
+    _directEntryCount = 0;
+}
+
 uint8_t AlarmLogParser::getEntryCount() const
 {
+    if (_directEntryCount > 0) {
+        return _directEntryCount;
+    }
     if (_alarmLogLength < 2) {
         return 0;
     }
@@ -240,6 +258,39 @@ void AlarmLogParser::setMessageType(const AlarmMessageType_t type)
 
 void AlarmLogParser::getLogEntry(const uint8_t entryId, AlarmLogEntry_t& entry, const AlarmMessageLocale_t locale)
 {
+    // --- Direct entries path (WiFi inverters) ---
+    if (_directEntryCount > 0 && entryId < _directEntryCount) {
+        HOY_SEMAPHORE_TAKE();
+        entry.MessageId = _directEntries[entryId].MessageId;
+        entry.StartTime = _directEntries[entryId].StartTime;
+        entry.EndTime   = _directEntries[entryId].EndTime;
+        HOY_SEMAPHORE_GIVE();
+
+        // Look up message string from alarm table
+        switch (locale) {
+        case AlarmMessageLocale_t::DE:
+            entry.Message = "Unbekannt";
+            break;
+        case AlarmMessageLocale_t::FR:
+            entry.Message = "Inconnu";
+            break;
+        default:
+            entry.Message = "Unknown";
+        }
+        for (auto& msg : _alarmMessages) {
+            if (msg.MessageId == entry.MessageId) {
+                if (msg.InverterType == _messageType) {
+                    entry.Message = getLocaleMessage(&msg, locale);
+                    break;
+                } else if (msg.InverterType == AlarmMessageType_t::ALL) {
+                    entry.Message = getLocaleMessage(&msg, locale);
+                }
+            }
+        }
+        return;
+    }
+
+    // --- Raw byte buffer path (RF inverters) ---
     const uint8_t entryStartOffset = 2 + entryId * ALARM_LOG_ENTRY_SIZE;
 
     const int timezoneOffset = getTimezoneOffset();

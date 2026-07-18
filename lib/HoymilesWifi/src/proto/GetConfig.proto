@@ -1,0 +1,73 @@
+syntax = "proto3";
+
+import "nanopb.proto";
+
+message GetConfigResDTO {
+  int32 offset = 1;                     // Offset in the response
+  uint32 time = 2;                      // Timestamp of the response
+}
+
+message GetConfigReqDTO {
+  int32 request_offset = 1;              // Offset in the request
+  uint32 request_time = 2;               // Timestamp of the request
+  int32 lock_password = 3;               // Lock password
+  int32 lock_time = 4;                   // Lock time
+  int32 limit_power_mypower = 5;         // Limit power mypower
+  int32 zero_export_433_addr = 6;        // Zero export 433 address
+  int32 zero_export_enable = 7;          // Zero export enable
+  int32 netmode_select = 8;              // Netmode select
+  int32 channel_select = 9;              // Channel select
+  int32 server_send_time = 10;           // Server send time
+  int32 wifi_rssi = 11;                  // Wifi RSSI
+  int32 serverport = 12;                 // Server port
+  string apn_set = 13;                   // Access Point Name (APN) set
+  string meter_kind = 14;                // Meter kind
+  string meter_interface = 15;           // Meter interface
+  string wifi_ssid = 16 [(nanopb).max_length = 128];  // Wifi SSID
+  string wifi_password = 17 [(nanopb).max_length = 128]; // Wifi password
+  string server_domain_name = 18;        // Server domain name
+  int32 inv_type = 19;                   // Inverter type
+  string dtu_sn = 20 [(nanopb).max_length = 16];  // DTU serial number
+  int32 access_model = 21;               // Access model
+  int32 mac_0 = 22;                      // MAC address byte 0
+  int32 mac_1 = 23;                      // MAC address byte 1
+  int32 mac_2 = 24;                      // MAC address byte 2
+  int32 mac_3 = 25;                      // MAC address byte 3
+  int32 dhcp_switch = 26;                // DHCP switch
+  int32 ip_addr_0 = 27;                  // IP address byte 0
+  int32 ip_addr_1 = 28;                  // IP address byte 1
+  int32 ip_addr_2 = 29;                  // IP address byte 2
+  int32 ip_addr_3 = 30;                  // IP address byte 3
+  int32 subnet_mask_0 = 31;              // Subnet mask byte 0
+  int32 subnet_mask_1 = 32;              // Subnet mask byte 1
+  int32 subnet_mask_2 = 33;              // Subnet mask byte 2
+  int32 subnet_mask_3 = 34;              // Subnet mask byte 3
+  int32 default_gateway_0 = 35;          // Default gateway byte 0
+  int32 default_gateway_1 = 36;          // Default gateway byte 1
+  int32 default_gateway_2 = 37;          // Default gateway byte 2
+  int32 default_gateway_3 = 38;          // Default gateway byte 3
+  string ka_nub = 39;                    // KA number
+  string apn_name = 40 [(nanopb).max_length = 64];      // APN name
+  string apn_password = 41 [(nanopb).max_length = 64];  // APN password
+  int32 sub1g_sweep_switch = 42;        // Sub1G sweep switch
+  int32 sub1g_work_channel = 43;        // Sub1G work channel
+  int32 cable_dns_0 = 44;                // Cable DNS byte 0
+  int32 cable_dns_1 = 45;                // Cable DNS byte 1
+  int32 cable_dns_2 = 46;                // Cable DNS byte 2
+  int32 cable_dns_3 = 47;                // Cable DNS byte 3
+  int32 wifi_ip_addr_0 = 48;             // Wifi IP address byte 0
+  int32 wifi_ip_addr_1 = 49;             // Wifi IP address byte 1
+  int32 wifi_ip_addr_2 = 50;             // Wifi IP address byte 2
+  int32 wifi_ip_addr_3 = 51;             // Wifi IP address byte 3
+  int32 mac_4 = 52;                      // MAC address byte 4
+  int32 mac_5 = 53;                      // MAC address byte 5
+  int32 wifi_mac_0 = 54;                 // Wifi MAC address byte 0
+  int32 wifi_mac_1 = 55;                 // Wifi MAC address byte 1
+  int32 wifi_mac_2 = 56;                 // Wifi MAC address byte 2
+  int32 wifi_mac_3 = 57;                 // Wifi MAC address byte 3
+  int32 wifi_mac_4 = 58;                 // Wifi MAC address byte 4
+  int32 wifi_mac_5 = 59;                 // Wifi MAC address byte 5
+  string gprs_imei = 60;                 // GPRS IMEI
+  string dtu_ap_ssid = 61 [(nanopb).max_length = 64];      // DTU Access Point (AP) SSID
+  string dtu_ap_pass = 62 [(nanopb).max_length = 64];      // DTU AP password
+}

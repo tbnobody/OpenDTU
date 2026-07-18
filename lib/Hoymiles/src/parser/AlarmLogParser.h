@@ -42,6 +42,10 @@ public:
     void clearBuffer();
     void appendFragment(const uint8_t offset, const uint8_t* payload, const uint8_t len);
 
+    // Direct entry API for WiFi inverters (bypasses raw byte buffer)
+    void setDirectEntries(const AlarmLogEntry_t* entries, uint8_t count);
+    void clearDirectEntries();
+
     uint8_t getEntryCount() const;
     void getLogEntry(const uint8_t entryId, AlarmLogEntry_t& entry, const AlarmMessageLocale_t locale = AlarmMessageLocale_t::EN);
 
@@ -50,12 +54,17 @@ public:
 
     void setMessageType(const AlarmMessageType_t type);
 
-private:
     static int getTimezoneOffset();
+
+private:
     String getLocaleMessage(const AlarmMessage_t* msg, const AlarmMessageLocale_t locale) const;
 
     uint8_t _payloadAlarmLog[ALARM_LOG_PAYLOAD_SIZE];
     uint8_t _alarmLogLength = 0;
+
+    // Direct entries from WiFi inverters (structured data, not raw bytes)
+    AlarmLogEntry_t _directEntries[ALARM_LOG_ENTRY_COUNT];
+    uint8_t _directEntryCount = 0;
 
     LastCommandSuccess _lastAlarmRequestSuccess = CMD_NOK; // Set to NOK to fetch at startup
 

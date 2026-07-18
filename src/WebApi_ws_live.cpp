@@ -159,13 +159,16 @@ void WebApiWsLiveClass::generateInverterCommonJsonResponse(JsonObject& root, std
     } else {
         root["limit_absolute"] = -1;
     }
-    root["radio_stats"]["tx_request"] = inv->RadioStats.TxRequestData;
-    root["radio_stats"]["tx_re_request"] = inv->RadioStats.TxReRequestFragment;
-    root["radio_stats"]["rx_success"] = inv->RadioStats.RxSuccess;
-    root["radio_stats"]["rx_fail_nothing"] = inv->RadioStats.RxFailNoAnswer;
-    root["radio_stats"]["rx_fail_partial"] = inv->RadioStats.RxFailPartialAnswer;
-    root["radio_stats"]["rx_fail_corrupt"] = inv->RadioStats.RxFailCorruptData;
-    root["radio_stats"]["rssi"] = inv->getLastRssi();
+    root["wifi_inverter"] = inv->isWifiInverter();
+    if (!inv->isWifiInverter()) {
+        root["radio_stats"]["tx_request"] = inv->RadioStats.TxRequestData;
+        root["radio_stats"]["tx_re_request"] = inv->RadioStats.TxReRequestFragment;
+        root["radio_stats"]["rx_success"] = inv->RadioStats.RxSuccess;
+        root["radio_stats"]["rx_fail_nothing"] = inv->RadioStats.RxFailNoAnswer;
+        root["radio_stats"]["rx_fail_partial"] = inv->RadioStats.RxFailPartialAnswer;
+        root["radio_stats"]["rx_fail_corrupt"] = inv->RadioStats.RxFailCorruptData;
+        root["radio_stats"]["rssi"] = inv->getLastRssi();
+    }
 }
 
 void WebApiWsLiveClass::generateInverterChannelJsonResponse(JsonObject& root, std::shared_ptr<InverterAbstract> inv)

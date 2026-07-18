@@ -8,7 +8,7 @@
 #include <mutex>
 
 #define CONFIG_FILENAME "/config.json"
-#define CONFIG_VERSION 0x00011e00 // 0.1.30 // make sure to clean all after change
+#define CONFIG_VERSION 0x00011f00 // 0.1.31 // make sure to clean all after change
 
 #define WIFI_MAX_SSID_STRLEN 32
 #define WIFI_MAX_PASSWORD_STRLEN 64
@@ -30,6 +30,7 @@
 #define INV_MAX_NAME_STRLEN 31
 #define INV_MAX_COUNT 10
 #define INV_MAX_CHAN_COUNT 6
+#define INV_MAX_DTU_IP_STRLEN 39
 
 #define CHAN_MAX_NAME_STRLEN 31
 
@@ -59,6 +60,8 @@ struct INVERTER_CONFIG_T {
     bool ClearEventlogOnMidnight;
     bool YieldDayCorrection;
     CHANNEL_CONFIG_T channel[INV_MAX_CHAN_COUNT];
+    // WiFi inverter: non-empty = connect via TCP instead of RF
+    char DtuIpAddress[INV_MAX_DTU_IP_STRLEN + 1];
 };
 
 struct CONFIG_T {

@@ -27,6 +27,7 @@ void WebApiGridProfileClass::onGridProfileStatus(AsyncWebServerRequest* request)
     auto inv = Hoymiles.getInverterBySerial(serial);
 
     if (inv != nullptr) {
+        root["wifi_inverter"] = inv->isWifiInverter();
         root["name"] = inv->GridProfile()->getProfileName();
         root["version"] = inv->GridProfile()->getProfileVersion();
 

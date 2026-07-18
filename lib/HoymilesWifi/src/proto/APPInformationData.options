@@ -1,0 +1,13 @@
+# Options for APPInformationData.proto nanopb generation
+APPDtuInfoMO.gprs_vsn         max_length:16
+APPDtuInfoMO.wifi_version     max_length:16
+APPDtuInfoMO.ka_nub           max_length:16
+APPDtuInfoMO.gprs_imei        max_length:32
+APPMeterInfoMO.meter_val      max_length:32
+APPFeatureMO.value            max_length:32
+APPInfoDataReqDTO.dtu_sn      max_length:16
+APPInfoDataReqDTO.mAPPMeterInfo max_count:2
+APPInfoDataReqDTO.mAPPRpInfo  max_count:2
+APPInfoDataReqDTO.mAPPpvInfo  max_count:2
+APPInfoDataReqDTO.m_app_feature max_count:5
+APPInfoDataResDTO.ymd_hms     max_length:32

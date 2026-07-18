@@ -1,5 +1,10 @@
 <template>
-    <BootstrapAlert :show="!hasValidData">
+    <BootstrapAlert :show="gridProfileList.wifi_inverter">
+        <h4 class="alert-heading"><BIconInfoSquare class="fs-2" />&nbsp;{{ $t('gridprofile.NotSupported') }}</h4>
+        {{ $t('gridprofile.NotSupportedLong') }}
+    </BootstrapAlert>
+
+    <BootstrapAlert :show="!gridProfileList.wifi_inverter && !hasValidData">
         <h4 class="alert-heading"><BIconInfoSquare class="fs-2" />&nbsp;{{ $t('gridprofile.NoInfo') }}</h4>
         {{ $t('gridprofile.NoInfoLong') }}
     </BootstrapAlert>

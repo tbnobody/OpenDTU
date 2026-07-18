@@ -1,0 +1,27 @@
+syntax = "proto3";
+
+import "nanopb.proto";
+
+message AppGetHistPowerResDTO {
+  int32 control_point = 1;       // Control point identifier
+  int32 offset = 2;              // Offset value
+  uint32 requested_time = 3;     // Time requested
+  uint32 requested_day = 4;      // Day requested
+}
+
+message AppGetHistPowerReqDTO {
+  int64 serial_number = 1;       // Device serial number
+  int32 access_point = 2;        // Access point identifier
+  int32 control_point = 3;       // Control point identifier
+  int32 offset = 4;              // Offset value
+  uint32 request_time = 5;       // Timestamp of the request
+  uint32 start_time = 6;          // Start timestamp
+  uint32 long_term_start = 7;    // Long-term start timestamp
+  uint32 absolute_start = 8;     // Absolute start timestamp
+  uint32 step_time = 9;           // Step time
+  uint32 relative_power = 10;    // Relative power
+  uint32 total_energy = 11;      // Total energy
+  uint32 daily_energy = 12;      // Daily energy
+  repeated int32 power_array = 13 [(nanopb).max_count = 100]; // Array of power values
+  uint32 warning_number = 14;    // Warning number
+}

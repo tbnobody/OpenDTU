@@ -1,0 +1,89 @@
+syntax = "proto3";
+
+message APPDtuInfoMO {
+  int32 device_kind = 1;
+  int32 dtu_sw_version = 2;
+  int32 dtu_hw_version = 3;
+  int32 dtu_step_time = 4;
+  int32 dtu_rf_hw = 5;
+  int32 dtu_rf_sw = 6;
+  int32 access_model = 7;
+  int32 communication_time = 8;
+  int32 signal_strength = 9;
+  string gprs_vsn = 10;
+  string wifi_version = 11;
+  string ka_nub = 12;
+  int32 dtu_rule_id = 13;
+  int32 dtu_error_code = 14;
+  int32 dtu485_mode = 15;
+  int32 dtu485_addr = 16;
+  int32 sub1g_fqband = 17;
+  int32 sub1g_chtnum = 18;
+  int32 sub1g_chnum = 19;
+  int32 sub1g_rp = 20;
+  int32 sub1g_chtotal = 21;
+  string gprs_imei = 22;
+  int32 dfs = 23;
+}
+
+message APPMeterInfoMO {
+  int32 device_kind = 1;
+  int64 meter_sn = 2;
+  int32 meter_model = 3;
+  int32 meter_ct = 4;
+  int32 com_way = 5;
+  int32 access_mode = 6;
+  int32 sw_vsn = 7;
+  string meter_val = 8;
+}
+
+message APPRpInfoMO {
+  int32 device_kind = 1;
+  int64 rp_sn = 2;
+  int32 rp_sw = 3;
+  int32 rp_hw = 4;
+  int32 rp_rule_id = 5;
+}
+
+message APPPvInfoMO {
+  int32 device_kind = 1;
+  int64 pv_sn = 2;
+  int32 pv_usfw = 3;
+  int32 pv_sw_version = 4;
+  int32 pv_hw_pn = 5;
+  int32 pv_hw_version = 6;
+  int32 pv_gpf_code = 7;
+  int32 pv_gpf = 8;
+  int32 pv_rf_hw = 9;
+  int32 pv_rf_sw = 10;
+  int32 mi_rule_id = 11;
+}
+
+message APPFeatureMO {
+  int32 key = 1;
+  string value = 2;
+}
+
+message APPInfoDataReqDTO {
+  string dtu_sn = 1;       // Serial number of the device
+  uint32 time = 2;
+  int32 device_nub = 3;
+  int32 pv_nub = 4;
+  int32 package_nub = 5;
+  int32 package_now = 6;
+  int32 channel = 7;
+  optional APPDtuInfoMO mAPPDtuInfo = 8;
+  repeated APPMeterInfoMO mAPPMeterInfo = 9;
+  repeated APPRpInfoMO mAPPRpInfo = 10;
+  repeated APPPvInfoMO mAPPpvInfo = 11;
+  uint32 mf = 12;
+  repeated APPFeatureMO m_app_feature = 13;
+}
+
+message APPInfoDataResDTO {
+  string ymd_hms = 1;
+  int32 offset = 2;
+  int32 package_now = 3;
+  int32 err_code = 4;
+  uint32 time = 5;
+}

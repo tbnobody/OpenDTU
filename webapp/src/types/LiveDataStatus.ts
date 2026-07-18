@@ -42,6 +42,7 @@ export interface Inverter {
     producing: boolean;
     limit_relative: number;
     limit_absolute: number;
+    wifi_inverter: boolean;
     events: number;
     AC: InverterStatistics[];
     DC: InverterStatistics[];

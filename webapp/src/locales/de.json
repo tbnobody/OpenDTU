@@ -195,6 +195,8 @@
     "gridprofile": {
         "NoInfo": "@:devinfo.NoInfo",
         "NoInfoLong": "@:devinfo.NoInfoLong",
+        "NotSupported": "Nicht verfügbar",
+        "NotSupportedLong": "Das Netzprofil ist für WiFi-Wechselrichter nicht verfügbar. Die DTU-Firmware unterstützt das Auslesen des Netzprofils über das lokale TCP-Protokoll nicht.",
         "Name": "Name",
         "Version": "Version",
         "Enabled": "@:wifistationinfo.Enabled",
@@ -574,7 +576,10 @@
         "DeleteMsg": "Soll der Wechselrichter \"{name}\" mit der Seriennummer {serial} wirklich gelöscht werden?",
         "Delete": "Löschen",
         "YieldDayCorrection": "Tagesertragskorrektur",
-        "YieldDayCorrectionHint": "Summiert den Tagesertrag, auch wenn der Wechselrichter neu gestartet wird. Der Wert wird um Mitternacht zurückgesetzt"
+        "YieldDayCorrectionHint": "Summiert den Tagesertrag, auch wenn der Wechselrichter neu gestartet wird. Der Wert wird um Mitternacht zurückgesetzt",
+        "WifiInverter": "WLAN-Wechselrichter",
+        "DtuIpAddress": "DTU IP-Adresse",
+        "DtuIpAddressHint": "IP-Adresse des WiFi-fähigen Hoymiles DTU (HMS-xxxW-2T-Serie). Leer lassen für RF-Verbindung."
     },
     "fileadmin": {
         "ConfigManagement": "Konfigurationsverwaltung",

@@ -20,6 +20,28 @@
                         required
                     />
                 </div>
+                <div class="form-group">
+                    <label>{{ $t('inverteradmin.WifiInverter') }}</label>
+                    <div class="form-check form-switch ml-sm-2 mr-sm-4 my-2">
+                        <input
+                            class="form-check-input"
+                            type="checkbox"
+                            id="newIsWifi"
+                            v-model="newInverterIsWifi"
+                            @change="newInverterIsWifi || (newInverterData.dtu_ip = '')"
+                        />
+                    </div>
+                </div>
+                <div class="form-group" v-if="newInverterIsWifi">
+                    <label>{{ $t('inverteradmin.DtuIpAddress') }}</label>
+                    <input
+                        v-model="newInverterData.dtu_ip"
+                        type="text"
+                        class="form-control ml-sm-2 mr-sm-4 my-2"
+                        maxlength="39"
+                        :required="newInverterIsWifi"
+                    />
+                </div>
                 <div class="d-flex my-3">
                     <button type="submit" class="btn btn-primary ms-auto">
                         {{ $t('inverteradmin.Add') }}
@@ -155,6 +177,17 @@
                         id="inverter-name"
                         class="form-control"
                         maxlength="31"
+                    />
+                    <label for="inverter-dtu-ip" class="col-form-label">
+                        {{ $t('inverteradmin.DtuIpAddress') }}
+                        <BIconInfoCircle v-tooltip :title="$t('inverteradmin.DtuIpAddressHint')" />
+                    </label>
+                    <input
+                        v-model="selectedInverterData.dtu_ip"
+                        type="text"
+                        id="inverter-dtu-ip"
+                        class="form-control"
+                        maxlength="39"
                     />
 
                     <CardElement :text="$t('inverteradmin.InverterStatus')" addSpace>
@@ -383,8 +416,9 @@ export default defineComponent({
         return {
             modal: {} as bootstrap.Modal,
             modalDelete: {} as bootstrap.Modal,
-            newInverterData: { serial: '' } as Inverter,
-            selectedInverterData: { serial: '' } as Inverter,
+            newInverterData: { serial: '', dtu_ip: '' } as Inverter,
+            newInverterIsWifi: false,
+            selectedInverterData: { serial: '', dtu_ip: '' } as Inverter,
             inverters: [] as Inverter[],
             dataLoading: true,
             alert: {} as AlertResponse,
@@ -440,7 +474,8 @@ export default defineComponent({
         },
         onSubmit() {
             this.callInverterApiEndpoint('add', JSON.stringify(this.newInverterData));
-            this.newInverterData = { serial: '' } as Inverter;
+            this.newInverterData = { serial: '', dtu_ip: '' } as Inverter;
+            this.newInverterIsWifi = false;
         },
         onDelete() {
             this.callInverterApiEndpoint('del', JSON.stringify({ id: this.selectedInverterData.id }));

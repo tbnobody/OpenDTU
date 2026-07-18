@@ -195,6 +195,8 @@
     "gridprofile": {
         "NoInfo": "@:devinfo.NoInfo",
         "NoInfoLong": "@:devinfo.NoInfoLong",
+        "NotSupported": "Not available",
+        "NotSupportedLong": "Grid profile is not available for WiFi inverters. The DTU firmware does not support reading the grid profile over the local TCP protocol.",
         "Name": "Name",
         "Version": "Version",
         "Enabled": "@:wifistationinfo.Enabled",
@@ -574,7 +576,10 @@
         "DeleteMsg": "Are you sure you want to delete the inverter \"{name}\" with serial number {serial}?",
         "Delete": "Delete",
         "YieldDayCorrection": "Yield Day Correction",
-        "YieldDayCorrectionHint": "Sum up daily yield even if the inverter is restarted. Value will be reset at midnight"
+        "YieldDayCorrectionHint": "Sum up daily yield even if the inverter is restarted. Value will be reset at midnight",
+        "WifiInverter": "WiFi Inverter",
+        "DtuIpAddress": "DTU IP Address",
+        "DtuIpAddressHint": "IP address of the WiFi-enabled Hoymiles DTU (HMS-xxxW-2T series). Leave empty for RF connection."
     },
     "fileadmin": {
         "ConfigManagement": "Config Management",

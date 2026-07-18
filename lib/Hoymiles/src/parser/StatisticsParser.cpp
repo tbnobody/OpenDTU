@@ -222,7 +222,9 @@ bool StatisticsParser::setChannelFieldValue(const ChannelType_t type, const Chan
     do {
         _payloadStatistic[ptr] = val;
         val >>= 8;
-    } while (--ptr >= end);
+        if (ptr == end) break;
+        --ptr;
+    } while (true);
     HOY_SEMAPHORE_GIVE();
 
     return true;

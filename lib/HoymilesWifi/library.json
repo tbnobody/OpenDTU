@@ -1,0 +1,8 @@
+{
+  "name": "HoymilesWifi",
+  "version": "1.0.0",
+  "description": "WiFi-based Hoymiles inverter support for OpenDTU (HMS-xxxW-2T series)",
+  "license": "GPL-3.0-or-later",
+  "frameworks": "arduino",
+  "platforms": "espressif32"
+}

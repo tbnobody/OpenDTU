@@ -1,0 +1,80 @@
+syntax = "proto3";
+
+import "nanopb.proto";
+
+message CommandResDTO {
+  int32 time = 1;
+  int32 action = 2;
+  int32 dev_kind = 3;
+  int32 package_nub = 4;
+  int32 package_now = 5;
+  int64 tid = 6;
+  string data = 7 [(nanopb).max_length = 60];
+  repeated string es_to_sn = 8;
+  repeated int64 mi_to_sn = 9;
+  int32 system_total_a = 10;
+  int32 system_total_b = 11;
+  int32 system_total_c = 12;
+  repeated int64 mi_sn_item_a = 13;
+  repeated int64 mi_sn_item_b = 14;
+  repeated int64 mi_sn_item_c = 15;
+}
+
+message CommandReqDTO {
+  string dtu_sn = 1 [(nanopb).max_length = 60];
+  int32 time = 2;
+  int32 action = 3;
+  int32 package_now = 4;
+  int32 err_code = 5;
+  int64 tid = 6;
+}
+
+message ESOperatingStatusMO {
+  string es_sn = 1;
+  int32 progress_rate = 2;
+}
+
+message MIOperatingStatusMO {
+  int64 mi_sn = 1;
+  int32 progress_rate = 2;
+}
+
+message MIErrorStatusMO {
+  int64 mi_sn = 1;
+  int64 error_code = 2;
+}
+
+message ESSucStatusMO {
+  string es_sn = 1;
+}
+
+message ESErrorStatusMO {
+  string es_sn = 1;
+  int64 error_code = 2;
+}
+
+message CommandStatusReqDTO {
+  string dtu_sn = 1;
+  int32 time = 2;
+  int32 action = 3;
+  int32 package_nub = 4;
+  int32 package_now = 5;
+  int64 tid = 6;
+  repeated string es_sns_sucs = 7;
+  repeated int64 mi_sns_sucs = 8;
+  repeated string es_sns_failds = 9;
+  repeated int64 mi_sns_failds = 10;
+  repeated ESOperatingStatusMO es_mOperatingStatus = 11;
+  repeated MIOperatingStatusMO mi_mOperatingStatus = 12;
+  repeated MIErrorStatusMO mi_mErrorStatus = 13;
+  repeated ESSucStatusMO es_mSucStatus = 14;
+  repeated ESErrorStatusMO es_mErrorStatus = 15;
+}
+
+message CommandStatusResDTO {
+  int32 time = 1;
+  int32 action = 2;
+  int32 package_now = 3;
+  int64 tid = 4;
+  int32 err_code = 5;
+}

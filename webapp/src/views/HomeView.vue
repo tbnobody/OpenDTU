@@ -222,7 +222,8 @@
                                 </div>
                             </BootstrapAlert>
 
-                            <div class="accordion mt-5" id="accordionRadioStats">
+                            <div class="accordion mt-5" id="accordionRadioStats" v-if="!inverter.wifi_inverter">
+
                                 <div class="accordion-item accordion-table">
                                     <h2 class="accordion-header">
                                         <button

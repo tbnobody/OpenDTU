@@ -10,6 +10,7 @@ export interface GridProfileSection {
 }
 
 export interface GridProfileStatus {
+    wifi_inverter: boolean;
     name: string;
     version: string;
     sections: Array<GridProfileSection>;

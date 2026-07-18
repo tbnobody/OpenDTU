@@ -1,0 +1,125 @@
+syntax = "proto3";
+
+import "nanopb.proto";
+
+message MeterMO {
+    int32 device_type = 1;                 // Device type identifier
+    int64 serial_number = 2;               // Serial number of the meter
+    int32 phase_total_power = 3;           // Total power across all phases (Watts)
+    int32 phase_A_power = 4;               // Power in phase A (Watts)
+    int32 phase_B_power = 5;               // Power in phase B (Watts)
+    int32 phase_C_power = 6;               // Power in phase C (Watts)
+    int32 power_factor_total = 7;          // Total power factor
+    int32 energy_total_power = 8;          // Total energy generated (Watt-hours)
+    int32 energy_phase_A = 9;              // Energy generated in phase A (Watt-hours)
+    int32 energy_phase_B = 10;             // Energy generated in phase B (Watt-hours)
+    int32 energy_phase_C = 11;             // Energy generated in phase C (Watt-hours)
+    int32 energy_total_consumed = 12;      // Total energy consumed (Watt-hours)
+    int32 energy_phase_A_consumed = 13;    // Energy consumed in phase A (Watt-hours)
+    int32 energy_phase_B_consumed = 14;    // Energy consumed in phase B (Watt-hours)
+    int32 energy_phase_C_consumed = 15;    // Energy consumed in phase C (Watt-hours)
+    int32 fault_code = 16;                 // Fault code indicator
+    int32 voltage_phase_A = 17;            // Voltage in phase A (Volts)
+    int32 voltage_phase_B = 18;            // Voltage in phase B (Volts)
+    int32 voltage_phase_C = 19;            // Voltage in phase C (Volts)
+    int32 current_phase_A = 20;            // Current in phase A (Amperes)
+    int32 current_phase_B = 21;            // Current in phase B (Amperes)
+    int32 current_phase_C = 22;            // Current in phase C (Amperes)
+    int32 power_factor_phase_A = 23;       // Power factor in phase A
+    int32 power_factor_phase_B = 24;       // Power factor in phase B
+    int32 power_factor_phase_C = 25;       // Power factor in phase C
+}
+
+message RpMO {
+    int64 serial_number = 1;               // Serial number of the device
+    int32 signature = 2;                   // Signature value
+    int32 channel = 3;                     // Channel number
+    int32 pv_number = 4;                   // Photovoltaic (PV) number
+    int32 link_status = 5;                 // Link status indicator
+}
+
+message RSDMO {
+    int64 serial_number = 1;               // Serial number of the device
+    int32 firmware_version = 2;            // Firmware version
+    int32 voltage = 3;                     // Voltage value
+    int32 power = 4;                       // Power value
+    int32 temperature = 5;                 // Temperature value
+    int32 warning_number = 6;              // Warning number
+    int32 crc_checksum = 7;                // CRC checksum
+    int32 link_status = 8;                 // Link status indicator
+}
+
+message SGSMO {
+    int64 serial_number = 1;               // Serial number of the device
+    int32 firmware_version = 2;            // Firmware version
+    int32 voltage = 3;                     // Grid voltage (Volts)
+    int32 frequency = 4;                   // Grid frequency (Hertz)
+    int32 active_power = 5;                // Active power (Watts)
+    int32 reactive_power = 6;              // Reactive power (VAR)
+    int32 current = 7;                     // Current (Amperes)
+    int32 power_factor = 8;                // Power factor
+    int32 temperature = 9;                 // Temperature value
+    int32 warning_number = 10;             // Warning number
+    int32 crc_checksum = 11;               // CRC checksum
+    int32 link_status = 12;                // Link status indicator
+    int32 power_limit = 13;                 // Power limit (Watts)
+    int32 modulation_index_signal = 20;   // Modulation index signal
+}
+
+message TGSMO {
+    int64 serial_number = 1;               // Serial number of the device
+    int32 firmware_version = 2;            // Firmware version
+    int32 voltage_phase_A = 3;             // Voltage in phase A (Volts)
+    int32 voltage_phase_B = 4;             // Voltage in phase B (Volts)
+    int32 voltage_phase_C = 5;             // Voltage in phase C (Volts)
+    int32 voltage_line_AB = 6;             // Voltage between lines A and B (Volts)
+    int32 voltage_line_BC = 7;             // Voltage between lines B and C (Volts)
+    int32 voltage_line_CA = 8;             // Voltage between lines C and A (Volts)
+    int32 frequency = 9;                   // Frequency (Hertz)
+    int32 active_power = 10;               // Active power (Watts)
+    int32 reactive_power = 11;             // Reactive power (VAR)
+    int32 current_phase_A = 12;            // Current in phase A (Amperes)
+    int32 current_phase_B = 13;            // Current in phase B (Amperes)
+    int32 current_phase_C = 14;            // Current in phase C (Amperes)
+    int32 power_factor = 15;               // Power factor
+    int32 temperature = 16;                // Temperature value
+    int32 warning_number = 17;             // Warning number
+    int32 crc_checksum = 18;               // CRC checksum
+    int32 link_status = 19;                // Link status indicator
+    int32 modulation_index_signal = 20;    // Modulation index signal
+}
+
+message PvMO {
+    int64 serial_number = 1;               // Serial number of the device
+    int32 port_number = 2;                  // Port number
+    int32 voltage = 3;                     // Voltage (Volts)
+    int32 current = 4;                     // Current (Amperes)
+    int32 power = 5;                       // Power (Watts)
+    int32 energy_total = 6;                // Total energy generated (Watt-hours)
+    int32 energy_daily = 7;                // Daily energy generated (Watt-hours)
+    int32 error_code = 8;                  // Error code indicator
+}
+
+message RealDataNewReqDTO {
+    string device_serial_number = 1[(nanopb).max_length = 16];       // Serial number of the device
+    int32 timestamp = 2;                   // Timestamp of the data
+    int32 ap = 3;                          // Number of packages
+    int32 cp = 4;                          // Current package
+    int32 firmware_version = 5;            // Firmware version
+    repeated MeterMO meter_data = 6;       // Meter data array
+    repeated RpMO rp_data = 7;             // RpMO data array
+    repeated RSDMO rsd_data = 8;           // RSDMO data array
+    repeated SGSMO sgs_data = 9 [(nanopb).max_count = 2]; // SGSMO data array
+    repeated TGSMO tgs_data = 10;          // TGSMO data array
+    repeated PvMO pv_data = 11 [(nanopb).max_count = 4]; // PvMO data array
+    uint64 dtu_power = 12;                 // Power of the DTU (Watts)
+    uint64 dtu_daily_energy = 13;          // Daily energy of the DTU (Watt-hours)
+}
+
+message RealDataNewResDTO {
+    string time_ymd_hms = 1;               // Timestamp in the format YMD_HMS
+    int32 cp = 2;                          // Current Package
+    int32 error_code = 3;                  // Error code indicator
+    int32 offset = 4;                      // Offset value
+    int32 time = 5;                        // Timestamp value
+}

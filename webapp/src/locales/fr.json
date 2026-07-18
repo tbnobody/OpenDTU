@@ -195,6 +195,8 @@
     "gridprofile": {
         "NoInfo": "@:devinfo.NoInfo",
         "NoInfoLong": "@:devinfo.NoInfoLong",
+        "NotSupported": "Non disponible",
+        "NotSupportedLong": "Le profil réseau n'est pas disponible pour les onduleurs WiFi. Le firmware du DTU ne prend pas en charge la lecture du profil réseau via le protocole TCP local.",
         "Name": "Name",
         "Version": "Version",
         "Enabled": "@:wifistationinfo.Enabled",
@@ -561,7 +563,10 @@
         "DeleteMsg": "Êtes-vous sûr de vouloir supprimer l'onduleur \"{name}\" avec le numéro de série \"{serial}\" ?",
         "Delete": "Supprimer",
         "YieldDayCorrection": "Yield Day Correction",
-        "YieldDayCorrectionHint": "Sum up daily yield even if the inverter is restarted. Value will be reset at midnight"
+        "YieldDayCorrectionHint": "Sum up daily yield even if the inverter is restarted. Value will be reset at midnight",
+        "WifiInverter": "Onduleur WiFi",
+        "DtuIpAddress": "Adresse IP DTU",
+        "DtuIpAddressHint": "Adresse IP du DTU Hoymiles compatible WiFi (série HMS-xxxW-2T). Laisser vide pour la connexion RF."
     },
     "fileadmin": {
         "ConfigManagement": "Gestion de la configuration",

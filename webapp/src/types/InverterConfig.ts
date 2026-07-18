@@ -19,5 +19,6 @@ export interface Inverter {
     zero_day: boolean;
     clear_eventlog: boolean;
     yieldday_correction: boolean;
+    dtu_ip: string;
     channel: Array<InverterChannel>;
 }

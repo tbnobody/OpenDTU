@@ -21,6 +21,7 @@ public:
     void loop();
 
     std::shared_ptr<InverterAbstract> addInverter(const char* name, const uint64_t serial);
+    std::shared_ptr<InverterAbstract> registerInverter(std::shared_ptr<InverterAbstract> inv);
     std::shared_ptr<InverterAbstract> getInverterByPos(const uint8_t pos);
     std::shared_ptr<InverterAbstract> getInverterBySerial(const uint64_t serial);
     std::shared_ptr<InverterAbstract> getInverterByFragment(const fragment_t& fragment);

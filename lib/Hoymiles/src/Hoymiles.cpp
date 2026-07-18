@@ -47,6 +47,14 @@ void HoymilesClass::loop()
     _radioNrf->loop();
     _radioCmt->loop();
 
+    // Deliver deferred WiFi inverter data callbacks from the main task.
+    // Must run every loop, not just on poll intervals.
+    for (auto& iv : _inverters) {
+        if (iv->isWifiInverter()) {
+            iv->tick();
+        }
+    }
+
     if (getNumInverters() == 0 || millis() - _lastPoll <= (_pollInterval * 1000)) {
         return;
     }
@@ -54,13 +62,13 @@ void HoymilesClass::loop()
     static uint8_t inverterPos = 0;
 
     std::shared_ptr<InverterAbstract> iv = getInverterByPos(inverterPos);
-    if ((iv == nullptr) || ((iv != nullptr) && (!iv->getRadio()->isInitialized()))) {
+    if ((iv == nullptr) || (iv->isWifiInverter()) || ((iv != nullptr) && (!iv->getRadio()->isInitialized()))) {
         if (++inverterPos >= getNumInverters()) {
             inverterPos = 0;
         }
     }
 
-    if (iv != nullptr && iv->getRadio()->isInitialized()) {
+    if (iv != nullptr && !iv->isWifiInverter() && iv->getRadio()->isInitialized()) {
 
         if (iv->getZeroValuesIfUnreachable() && !iv->isReachable()) {
             iv->Statistics()->zeroRuntimeData();
@@ -189,6 +197,15 @@ std::shared_ptr<InverterAbstract> HoymilesClass::addInverter(const char* name, c
     return nullptr;
 }
 
+std::shared_ptr<InverterAbstract> HoymilesClass::registerInverter(std::shared_ptr<InverterAbstract> inv)
+{
+    if (!inv) {
+        return nullptr;
+    }
+    _inverters.push_back(std::move(inv));
+    return _inverters.back();
+}
+
 std::shared_ptr<InverterAbstract> HoymilesClass::getInverterByPos(const uint8_t pos)
 {
     if (pos >= _inverters.size()) {
@@ -234,7 +251,9 @@ void HoymilesClass::removeInverterBySerial(const uint64_t serial)
     for (uint8_t i = 0; i < _inverters.size(); i++) {
         if (_inverters[i]->serial() == serial) {
             std::lock_guard<std::mutex> lock(_mutex);
-            _inverters[i]->getRadio()->removeCommands(_inverters[i].get());
+            if (!_inverters[i]->isWifiInverter()) {
+                _inverters[i]->getRadio()->removeCommands(_inverters[i].get());
+            }
             _inverters.erase(_inverters.begin() + i);
             return;
         }

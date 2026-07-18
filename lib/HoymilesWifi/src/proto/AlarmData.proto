@@ -1,0 +1,51 @@
+syntax = "proto3";
+
+import "nanopb.proto";
+
+message WInfoMO {
+  int64 pv_sn = 1;        // PV serial number
+  int32 WCode = 2;        // WCode identifier
+  int32 WNum = 3;         // WNum value
+  int32 WTime1 = 4;       // First timestamp value
+  int32 WTime2 = 5;       // Second timestamp value
+  int32 WData1 = 6;       // First data value
+  int32 WData2 = 7;       // Second data value
+}
+
+message WInfoReqDTO {
+  string dtu_sn = 1 [(nanopb).max_length = 20];      // DTU serial number
+  int32 time = 2;         // Timestamp of the request
+  int32 package_count = 3;
+  int32 package_idx = 4;
+  int32 warn_device = 5;
+  repeated WInfoMO mWInfo = 6 [(nanopb).max_count = 30];  // WInfoMO data array
+}
+
+message WInfoResDTO {
+  string time_ymd_hms = 1 [(nanopb).max_length = 60];     // Timestamp in the format YMD_HMS
+  int32 error_code = 2;     // Error code indicator
+  int32 offset = 3;       // Offset value
+  int32 time = 4;         // Timestamp value
+}
+
+message WWVDataReqDTO {
+  string dtu_sn = 1 [(nanopb).max_length = 20];      // DTU serial number
+  int32 time = 2;         // Timestamp of the request
+  int32 package_nub = 3;  // Package number
+  int32 package_now = 4;  // Current package number
+  int64 pv_sn = 5;        // PV serial number
+  int32 WCode = 6;        // WCode identifier
+  int32 WNum = 7;         // WNum value
+  int32 WTime1 = 8;       // First timestamp value
+  int32 WVDataL = 9;      // Length of WWVData
+  int32 WPos = 10;        // WPos value
+  string mWVData = 11;    // WWVData string
+}
+
+message WWVDataResDTO {
+  string time_ymd_hms = 1 [(nanopb).max_length = 60];     // Timestamp in the format YMD_HMS
+  int32 package_now = 2;  // Current package number
+  int32 error_code = 3;     // Error code indicator
+  int32 offset = 4;       // Offset value
+  int32 time = 5;         // Timestamp value
+}

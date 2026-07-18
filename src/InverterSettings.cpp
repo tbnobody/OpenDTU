@@ -6,6 +6,7 @@
 #include "Configuration.h"
 #include "PinMapping.h"
 #include "SunPosition.h"
+#include <HmsWifiInverter.h>
 #include <Hoymiles.h>
 #include <SpiManager.h>
 
@@ -29,7 +30,16 @@ void InverterSettingsClass::init(Scheduler& scheduler)
     ESP_LOGI(TAG, "Initialize Hoymiles interface...");
     Hoymiles.init();
 
-    if (!PinMapping.isValidNrf24Config() && !PinMapping.isValidCmt2300Config()) {
+    // Allow a radio-less setup when at least one WiFi inverter is configured
+    // (WiFi inverters talk TCP, not NRF24/CMT2300).
+    bool hasWifiInverter = false;
+    for (uint8_t i = 0; i < INV_MAX_COUNT; i++) {
+        if (config.Inverter[i].Serial != 0 && config.Inverter[i].DtuIpAddress[0] != '\0') {
+            hasWifiInverter = true;
+            break;
+        }
+    }
+    if (!PinMapping.isValidNrf24Config() && !PinMapping.isValidCmt2300Config() && !hasWifiInverter) {
         ESP_LOGE(TAG, "Invalid pin config");
         return;
     }
@@ -79,7 +89,16 @@ void InverterSettingsClass::init(Scheduler& scheduler)
             static_cast<uint32_t>(inv_cfg.Serial & 0xFFFFFFFF),
             inv_cfg.Name);
 
-        auto inv = Hoymiles.addInverter(inv_cfg.Name, inv_cfg.Serial);
+        std::shared_ptr<InverterAbstract> inv;
+        if (inv_cfg.DtuIpAddress[0] != '\0') {
+            ESP_LOGI(TAG, "WiFi inverter at %s", inv_cfg.DtuIpAddress);
+            auto wifiInv = std::make_shared<HmsWifiInverter>(inv_cfg.Serial, inv_cfg.DtuIpAddress);
+            wifiInv->setName(inv_cfg.Name);
+            wifiInv->init();
+            inv = Hoymiles.registerInverter(wifiInv);
+        } else {
+            inv = Hoymiles.addInverter(inv_cfg.Name, inv_cfg.Serial);
+        }
         if (inv == nullptr) {
             ESP_LOGW(TAG, "Adding inverter failed: Unsupported type");
             continue;
