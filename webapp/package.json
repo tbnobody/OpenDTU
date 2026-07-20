@@ -28,9 +28,9 @@
   "devDependencies": {
     "@eslint/js": "^10.0.1",
     "@intlify/unplugin-vue-i18n": "^11.2.4",
-    "@tsconfig/node24": "^24.0.4",
+    "@tsconfig/node26": "^26.0.0",
     "@types/bootstrap": "^5.2.11",
-    "@types/node": "^25.5.0",
+    "@types/node": "^26.1.1",
     "@types/pulltorefreshjs": "^0.1.7",
     "@types/sortablejs": "^1.15.9",
     "@types/spark-md5": "^3.0.5",
