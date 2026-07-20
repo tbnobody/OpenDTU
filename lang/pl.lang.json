@@ -694,9 +694,7 @@
             "LedBrightness": "Dioda LED {led}, Jasność ({brightness})"
         },
         "pininfo": {
-            "Category": "Kategoria",
             "Name": "Nazwa",
-            "Number": "Numer",
             "ValueSelected": "Wybrana",
             "ValueActive": "Aktywna"
         },

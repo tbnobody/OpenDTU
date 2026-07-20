@@ -679,7 +679,6 @@
         "LedBrightness": "LED {led} Helligkeit ({brightness})"
     },
     "pininfo": {
-        "Category": "Kategorie",
         "Name": "Name",
         "ValueSelected": "Ausgewählt",
         "ValueActive": "Aktiv"

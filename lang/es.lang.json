@@ -694,9 +694,7 @@
             "LedBrightness": "Brillo del LED {led} ({brightness})"
         },
         "pininfo": {
-            "Category": "Categoría",
             "Name": "Nombre",
-            "Number": "Número",
             "ValueSelected": "Seleccionado",
             "ValueActive": "Activo"
         },

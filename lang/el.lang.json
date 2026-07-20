@@ -694,9 +694,7 @@
             "LedBrightness": "Φωτεινότητα LED {led} ({brightness})"
         },
         "pininfo": {
-            "Category": "Κατηγορία",
             "Name": "Ονομα",
-            "Number": "Αριθμός",
             "ValueSelected": "Επιλεγμένο",
             "ValueActive": "Ενεργό"
         },
