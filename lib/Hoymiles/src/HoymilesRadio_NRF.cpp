@@ -74,7 +74,7 @@ void HoymilesRadio_NRF::loop()
     } else {
         // Perform package parsing only if no packages are received
         if (!_rxBuffer.empty()) {
-            fragment_t f = _rxBuffer.back();
+            fragment_t f = _rxBuffer.front();
             if (checkFragmentCrc(f)) {
                 std::shared_ptr<InverterAbstract> inv = Hoymiles.getInverterByFragment(f);
 

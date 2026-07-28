@@ -155,7 +155,7 @@ void HoymilesRadio_CMT::loop()
     } else {
         // Perform package parsing only if no packages are received
         if (!_rxBuffer.empty()) {
-            fragment_t f = _rxBuffer.back();
+            fragment_t f = _rxBuffer.front();
             if (checkFragmentCrc(f)) {
 
                 const serial_u dtuId = convertSerialToRadioId(_dtuSerial);
