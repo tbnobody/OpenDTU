@@ -63,9 +63,16 @@ public:
     virtual QueueInsertType getQueueInsertType() const { return QueueInsertType::RemoveNewest; }
     virtual bool areSameParameter(CommandAbstract* other);
 
+    // Some inverters answer certain commands with a single fragment that does
+    // not carry the "last fragment" flag (0x80) which the generic fragment
+    // reassembly otherwise requires. If set, the highest numbered fragment
+    // received so far is accepted as the complete answer.
+    bool acceptsSingleFragmentAnswer() const { return _singleFragmentAnswer; }
+
 protected:
     uint8_t _payload[RF_LEN];
     uint8_t _payload_size;
+    bool _singleFragmentAnswer;
     uint32_t _timeout;
     uint8_t _sendCount;
 

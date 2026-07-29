@@ -189,6 +189,8 @@
         "HardwarePartNumber": "Numéro d'article matériel",
         "HardwareVersion": "Version du matériel",
         "SupportsPowerDistributionLogic": "'Power Distribution Logic' supported",
+        "RfHardwareVersion": "Version matérielle du module RF",
+        "RfFirmwareVersion": "Version du firmware du module RF",
         "Yes": "@:base.Yes",
         "No": "@:base.No"
     },

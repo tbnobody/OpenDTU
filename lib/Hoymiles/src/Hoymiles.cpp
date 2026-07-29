@@ -109,6 +109,12 @@ void HoymilesClass::loop()
                         ESP_LOGI(TAG, "Request device info");
                         iv->sendDevInfoRequest();
                     }
+
+                    // Fetch RF module info (only required once)
+                    if (!iv->RfInfo()->containsValidData()) {
+                        ESP_LOGI(TAG, "Request RF info");
+                        iv->sendRfInfoRequest();
+                    }
                 }
             }
 

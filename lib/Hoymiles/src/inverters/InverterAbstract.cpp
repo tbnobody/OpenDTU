@@ -25,6 +25,7 @@ InverterAbstract::InverterAbstract(HoymilesRadio* radio, const uint64_t serial)
     _devInfoParser.reset(new DevInfoParser());
     _gridProfileParser.reset(new GridProfileParser());
     _powerCommandParser.reset(new PowerCommandParser());
+    _rfInfoParser.reset(new RfInfoParser());
     _statisticsParser.reset(new StatisticsParser());
     _systemConfigParaParser.reset(new SystemConfigParaParser());
 }
@@ -175,6 +176,11 @@ PowerCommandParser* InverterAbstract::PowerCommand()
     return _powerCommandParser.get();
 }
 
+RfInfoParser* InverterAbstract::RfInfo()
+{
+    return _rfInfoParser.get();
+}
+
 StatisticsParser* InverterAbstract::Statistics()
 {
     return _statisticsParser.get();
@@ -249,6 +255,17 @@ uint8_t InverterAbstract::verifyAllFragments(CommandAbstract& cmd)
             cmd.gotTimeout();
             return FRAGMENT_ALL_MISSING_TIMEOUT;
         }
+    }
+
+    if (cmd.acceptsSingleFragmentAnswer()) {
+        // The command doesn't rely on the 0x80 flag or gapless fragment
+        // numbering. Whatever was received last is treated as complete.
+        if (!cmd.handleResponse(_rxFragmentBuffer, _rxFragmentLastPacketId)) {
+            cmd.gotTimeout();
+            return FRAGMENT_HANDLE_ERROR;
+        }
+
+        return FRAGMENT_OK;
     }
 
     // Last fragment is missing (the one with 0x80)
