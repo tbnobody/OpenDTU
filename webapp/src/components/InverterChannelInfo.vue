@@ -16,14 +16,21 @@
         </div>
 
         <div v-if="channelType == 'AC'" class="card-header text-bg-info">
-            {{ $t('inverterchannelinfo.Phase', { num: channelNumber + 1 }) }}
+            <template v-if="hasPhaseDetails">{{ $t('inverterchannelinfo.ACOutput') }}</template>
+            <template v-else>{{ $t('inverterchannelinfo.Phase', { num: channelNumber + 1 }) }}</template>
         </div>
 
         <div class="table-responsive">
             <table class="table table-striped table-hover">
                 <tbody>
                     <tr v-for="(property, key) in channelData" :key="`prop-${key}`">
-                        <template v-if="key != 'name' && property">
+                        <template
+                            v-if="
+                                key != 'name' &&
+                                property &&
+                                !(hasPhaseDetails && (key == 'Voltage' || key == 'Current'))
+                            "
+                        >
                             <th scope="row">{{ $t('inverterchannelproperty.' + key) }}</th>
                             <td class="value">
                                 {{
@@ -51,6 +58,11 @@ export default defineComponent({
         channelData: { type: Object as PropType<InverterStatistics>, required: true },
         channelType: { type: String, required: true },
         channelNumber: { type: Number, required: true },
+    },
+    computed: {
+        hasPhaseDetails(): boolean {
+            return this.channelType == 'AC' && this.channelData['Voltage Ph1-N'] !== undefined;
+        },
     },
 });
 </script>

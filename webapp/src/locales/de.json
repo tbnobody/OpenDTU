@@ -373,6 +373,7 @@
     "inverterchannelinfo": {
         "String": "String {num}",
         "Phase": "Phase {num}",
+        "ACOutput": "AC-Ausgang",
         "General": "Allgemein"
     },
     "invertertotalinfo": {
@@ -384,6 +385,12 @@
         "Power": "Leistung",
         "Voltage": "Spannung",
         "Current": "Strom",
+        "Voltage Ph1-N": "Spannung L1-N",
+        "Current Ph1": "Strom L1",
+        "Voltage Ph2-N": "Spannung L2-N",
+        "Current Ph2": "Strom L2",
+        "Voltage Ph3-N": "Spannung L3-N",
+        "Current Ph3": "Strom L3",
         "Power DC": "DC-Leistung",
         "YieldDay": "Tagesertrag",
         "YieldTotal": "Gesamtertrag",
