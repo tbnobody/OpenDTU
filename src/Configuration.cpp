@@ -82,6 +82,7 @@ bool ConfigurationClass::write()
     mqtt["retain"] = config.Mqtt.Retain;
     mqtt["publish_interval"] = config.Mqtt.PublishInterval;
     mqtt["clean_session"] = config.Mqtt.CleanSession;
+    mqtt["eventlog_enabled"] = config.Mqtt.EventlogEnabled;
 
     JsonObject mqtt_lwt = mqtt["lwt"].to<JsonObject>();
     mqtt_lwt["topic"] = config.Mqtt.Lwt.Topic;
@@ -271,6 +272,7 @@ bool ConfigurationClass::read()
     config.Mqtt.Retain = mqtt["retain"] | MQTT_RETAIN;
     config.Mqtt.PublishInterval = mqtt["publish_interval"] | MQTT_PUBLISH_INTERVAL;
     config.Mqtt.CleanSession = mqtt["clean_session"] | MQTT_CLEAN_SESSION;
+    config.Mqtt.EventlogEnabled = mqtt["eventlog_enabled"] | MQTT_EVENTLOG_ENABLED;
 
     JsonObject mqtt_lwt = mqtt["lwt"];
     strlcpy(config.Mqtt.Lwt.Topic, mqtt_lwt["topic"] | MQTT_LWT_TOPIC, sizeof(config.Mqtt.Lwt.Topic));

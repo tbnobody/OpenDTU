@@ -1,0 +1,89 @@
+# lokalKraft fork of OpenDTU -- GitLab CI
+#
+# Minimal translation of the upstream GitHub workflow (.github/workflows/build.yml):
+# build the Vue web app, then run one PlatformIO build per environment and
+# keep the resulting .bin files as artifacts. The upstream release job
+# (GitHub releases, changelog generation) is deliberately NOT translated --
+# the fork ships firmware via CI artifacts, not via releases.
+#
+# Environments: the same list upstream drives its matrix from, i.e. the
+# `custom_ci_action` property in platformio.ini's [env] section
+# (generic, generic_esp32, generic_esp32s3, generic_esp32s3_usb). Keep the
+# two lists in sync manually after a rebase.
+
+stages:
+  - webapp
+  - firmware
+
+variables:
+  GIT_DEPTH: "0" # full history + tags, `git describe` is used for the artifact name
+  PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
+
+webapp:
+  stage: webapp
+  image: node:24-bookworm
+  cache:
+    key:
+      files:
+        - webapp/yarn.lock
+    paths:
+      - webapp/.yarn/cache
+      - .yarn-cache
+  before_script:
+    - corepack enable
+  script:
+    - cd webapp
+    - yarn install --frozen-lockfile
+    - yarn build
+  artifacts:
+    # vite writes to ../webapp_dist (webapp/vite.config.ts) -- the firmware
+    # build embeds exactly this directory, so without this artifact the
+    # image would carry the webapp committed in git, NOT the one built here.
+    paths:
+      - webapp_dist/
+    expire_in: 1 week
+
+.firmware:
+  stage: firmware
+  image: python:3.12-bookworm
+  needs:
+    - job: webapp
+      artifacts: true
+  cache:
+    key: "pio-$CI_COMMIT_REF_SLUG"
+    paths:
+      - .cache/pip
+      - .platformio
+  before_script:
+    - export PLATFORMIO_CORE_DIR="$CI_PROJECT_DIR/.platformio"
+    - pip install --upgrade platformio setuptools
+  script:
+    - pio run -e "$PIO_ENV"
+    - VERSION=$(git describe --tags --always)
+    - mv ".pio/build/$PIO_ENV/firmware.bin" ".pio/build/$PIO_ENV/opendtu-lokalkraft-$PIO_ENV-$VERSION.bin"
+    - mv ".pio/build/$PIO_ENV/firmware.factory.bin" ".pio/build/$PIO_ENV/opendtu-lokalkraft-$PIO_ENV-$VERSION.factory.bin"
+  artifacts:
+    name: "opendtu-lokalkraft-$PIO_ENV"
+    paths:
+      - .pio/build/$PIO_ENV/opendtu-lokalkraft-*.bin
+    expire_in: 4 weeks
+
+firmware:generic_esp32:
+  extends: .firmware
+  variables:
+    PIO_ENV: generic_esp32
+
+firmware:generic_esp32s3:
+  extends: .firmware
+  variables:
+    PIO_ENV: generic_esp32s3
+
+firmware:generic_esp32s3_usb:
+  extends: .firmware
+  variables:
+    PIO_ENV: generic_esp32s3_usb
+
+firmware:generic:
+  extends: .firmware
+  variables:
+    PIO_ENV: generic
