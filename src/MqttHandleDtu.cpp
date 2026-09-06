@@ -25,12 +25,17 @@ void MqttHandleDtuClass::init(Scheduler& scheduler)
 
 void MqttHandleDtuClass::loop()
 {
-    _loopTask.setInterval(Configuration.get().Mqtt.PublishInterval * TASK_SECOND);
+    const CONFIG_T& config = Configuration.get();
+    _loopTask.setInterval(config.Mqtt.PublishInterval * TASK_SECOND);
+
 
     if (!MqttSettings.getConnected() || !Hoymiles.isAllRadioIdle()) {
         _loopTask.forceNextIteration();
         return;
     }
+
+    // Resend LWT message as ONLINE to ensure that the MQTT broker knows that we are still alive
+    MqttSettings.publish(config.Mqtt.Lwt.Topic, config.Mqtt.Lwt.Value_Online);
 
     MqttSettings.publish("dtu/uptime", String(esp_timer_get_time() / 1000000));
     MqttSettings.publish("dtu/ip", NetworkSettings.localIP().toString());
