@@ -594,7 +594,9 @@
         "DeleteMsg": "Êtes-vous sûr de vouloir supprimer l'onduleur \"{name}\" avec le numéro de série \"{serial}\" ?",
         "Delete": "Supprimer",
         "YieldDayCorrection": "Yield Day Correction",
-        "YieldDayCorrectionHint": "Sum up daily yield even if the inverter is restarted. Value will be reset at midnight"
+        "YieldDayCorrectionHint": "Sum up daily yield even if the inverter is restarted. Value will be reset at midnight",
+        "YieldTotalContribution": "Inclure le rendement dans les totaux du site",
+        "YieldTotalContributionHint": "Inclut le rendement quotidien et total de cet onduleur dans les totaux du site. Ses propres mesures et les totaux de puissance restent inchangés."
     },
     "fileadmin": {
         "ConfigManagement": "Gestion de la configuration",

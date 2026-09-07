@@ -594,7 +594,9 @@
         "DeleteMsg": "Are you sure you want to delete the inverter \"{name}\" with serial number {serial}?",
         "Delete": "Delete",
         "YieldDayCorrection": "Yield Day Correction",
-        "YieldDayCorrectionHint": "Sum up daily yield even if the inverter is restarted. Value will be reset at midnight"
+        "YieldDayCorrectionHint": "Sum up daily yield even if the inverter is restarted. Value will be reset at midnight",
+        "YieldTotalContribution": "Include yield in site totals",
+        "YieldTotalContributionHint": "Include this inverter's daily and lifetime yield in the site totals. Its own readings and the power totals remain unchanged."
     },
     "fileadmin": {
         "ConfigManagement": "Config Management",

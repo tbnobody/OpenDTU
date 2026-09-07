@@ -594,7 +594,9 @@
         "DeleteMsg": "Soll der Wechselrichter \"{name}\" mit der Seriennummer {serial} wirklich gelöscht werden?",
         "Delete": "Löschen",
         "YieldDayCorrection": "Tagesertragskorrektur",
-        "YieldDayCorrectionHint": "Summiert den Tagesertrag, auch wenn der Wechselrichter neu gestartet wird. Der Wert wird um Mitternacht zurückgesetzt"
+        "YieldDayCorrectionHint": "Summiert den Tagesertrag, auch wenn der Wechselrichter neu gestartet wird. Der Wert wird um Mitternacht zurückgesetzt",
+        "YieldTotalContribution": "Ertrag in Anlagensummen einbeziehen",
+        "YieldTotalContributionHint": "Bezieht Tages- und Gesamtertrag dieses Wechselrichters in die Anlagensummen ein. Seine eigenen Messwerte und die Leistungssummen bleiben unverändert."
     },
     "fileadmin": {
         "ConfigManagement": "Konfigurationsverwaltung",
