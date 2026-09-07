@@ -3,6 +3,7 @@ export interface ValueObject {
     u: string; // unit
     d: number; // digits
     max: number;
+    f?: string; // optional preformatted value
 }
 
 export interface InverterStatistics {
@@ -25,6 +26,7 @@ export interface InverterStatistics {
     ReactivePower?: ValueObject;
     Efficiency?: ValueObject;
     Irradiation?: ValueObject;
+    RawStatus?: ValueObject;
 }
 
 export interface RadioStatistics {
@@ -49,6 +51,7 @@ export interface Inverter {
     limit_relative: number;
     limit_absolute: number;
     events: number;
+    event_count: number;
     AC: InverterStatistics[];
     DC: InverterStatistics[];
     INV: InverterStatistics[];

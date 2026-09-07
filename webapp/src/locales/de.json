@@ -131,7 +131,7 @@
         "TurnOnOff": "Schalte Wechselrichter ein oder aus",
         "ShowInverterInfo": "Zeige Wechselrichter-Informationen",
         "ShowEventlog": "Zeige Ereignisanzeige",
-        "UnreadMessages": "Ungelesene Meldungen",
+        "ReportedEventCount": "Vom Wechselrichter gemeldeter Ereigniszähler: {count}",
         "Loading": "@:base.Loading",
         "EventLog": "Ereignisanzeige",
         "InverterInfo": "Wechselrichter-Informationen",
@@ -172,7 +172,12 @@
         "Start": "Beginn",
         "Stop": "Ende",
         "Id": "ID",
-        "Message": "Meldung"
+        "Message": "Meldung",
+        "ReportedCount": "Vom Wechselrichter gemeldeter Ereigniszähler",
+        "StoredCount": "In OpenDTU vorhandene Ereignisdetails",
+        "ReportedCountHint": "Der Zähler steigt, wenn der Wechselrichter ein neues Ereignis speichert. Er ist nicht die Anzahl der zurzeit aktiven Fehler.",
+        "DetailsUnavailable": "Aktuelle Ereignisdetails wurden noch nicht empfangen. OpenDTU versucht es automatisch erneut.",
+        "DetailsPending": "OpenDTU fragt aktuelle Ereignisdetails ab."
     },
     "devinfo": {
         "NoInfo": "Keine Informationen verfügbar",
@@ -406,7 +411,8 @@
         "PowerFactor": "Leistungsfaktor",
         "ReactivePower": "Blindleistung",
         "Efficiency": "Wirkungsgrad",
-        "Irradiation": "Einstrahlung"
+        "Irradiation": "Einstrahlung",
+        "RawStatus": "Statuswert (nicht entschlüsselt)"
     },
     "maintenancereboot": {
         "DeviceReboot": "Gerät neu starten",

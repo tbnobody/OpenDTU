@@ -33,12 +33,13 @@
                         >
                             <th scope="row">{{ $t('inverterchannelproperty.' + key) }}</th>
                             <td class="value">
-                                {{
+                                <template v-if="property.f !== undefined">{{ property.f }}</template>
+                                <template v-else>{{
                                     $n(property.v, 'decimal', {
                                         minimumFractionDigits: property.d,
                                         maximumFractionDigits: property.d,
                                     })
-                                }}
+                                }}</template>
                             </td>
                             <td>{{ property.u }}</td>
                         </template>

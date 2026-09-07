@@ -131,7 +131,7 @@
         "TurnOnOff": "Turn Inverter on/off",
         "ShowInverterInfo": "Show Inverter Info",
         "ShowEventlog": "Show Eventlog",
-        "UnreadMessages": "unread messages",
+        "ReportedEventCount": "Event counter reported by inverter: {count}",
         "Loading": "@:base.Loading",
         "EventLog": "Event Log",
         "InverterInfo": "Inverter Info",
@@ -172,7 +172,12 @@
         "Start": "Start",
         "Stop": "Stop",
         "Id": "ID",
-        "Message": "Message"
+        "Message": "Message",
+        "ReportedCount": "Event counter reported by inverter",
+        "StoredCount": "Event details held by OpenDTU",
+        "ReportedCountHint": "The counter increases when the inverter records a new event. It is not the number of faults currently active.",
+        "DetailsUnavailable": "Current event details have not been received. OpenDTU will try again automatically.",
+        "DetailsPending": "OpenDTU is requesting current event details."
     },
     "devinfo": {
         "NoInfo": "No Information available",
@@ -406,7 +411,8 @@
         "PowerFactor": "PowerFactor",
         "ReactivePower": "ReactivePower",
         "Efficiency": "Efficiency",
-        "Irradiation": "Irradiation"
+        "Irradiation": "Irradiation",
+        "RawStatus": "Status value (not decoded)"
     },
     "maintenancereboot": {
         "DeviceReboot": "Device Reboot",

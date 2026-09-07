@@ -131,7 +131,7 @@
         "TurnOnOff": "Allumer / Eteindre l'onduleur",
         "ShowInverterInfo": "Afficher les informations sur l'onduleur",
         "ShowEventlog": "Afficher le journal des événements",
-        "UnreadMessages": "messages non lus",
+        "ReportedEventCount": "Compteur d'événements signalé par l'onduleur : {count}",
         "Loading": "@:base.Loading",
         "EventLog": "Journal des événements",
         "InverterInfo": "Informations sur l'onduleur",
@@ -172,7 +172,12 @@
         "Start": "Départ",
         "Stop": "Arrêt",
         "Id": "ID",
-        "Message": "Message"
+        "Message": "Message",
+        "ReportedCount": "Compteur d'événements signalé par l'onduleur",
+        "StoredCount": "Détails des événements disponibles dans OpenDTU",
+        "ReportedCountHint": "Le compteur augmente lorsque l'onduleur enregistre un nouvel événement. Ce n'est pas le nombre de défauts actuellement actifs.",
+        "DetailsUnavailable": "Les détails actuels des événements n'ont pas encore été reçus. OpenDTU réessaiera automatiquement.",
+        "DetailsPending": "OpenDTU demande les détails actuels des événements."
     },
     "devinfo": {
         "NoInfo": "Aucune information disponible",
@@ -406,7 +411,8 @@
         "PowerFactor": "Facteur de puissance",
         "ReactivePower": "Puissance réactive",
         "Efficiency": "Efficacité",
-        "Irradiation": "Irradiation"
+        "Irradiation": "Irradiation",
+        "RawStatus": "Valeur d'état (non décodée)"
     },
     "maintenancereboot": {
         "DeviceReboot": "Redémarrage de l'appareil",
