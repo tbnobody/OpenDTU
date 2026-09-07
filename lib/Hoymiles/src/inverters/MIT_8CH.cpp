@@ -85,6 +85,8 @@ static const byteAssign_t byteAssignment[] = {
     // Inverter - offset 80
     { TYPE_INV, CH0, FLD_T, UNIT_C, 80, 2, 10, true, 1 },
     { TYPE_INV, CH0, FLD_EVT_LOG, UNIT_NONE, 82, 2, 1, false, 0 },
+    // Meaning is not decoded yet. Keep all four bytes visible for field diagnostics.
+    { TYPE_INV, CH0, FLD_RAW_STATUS, UNIT_NONE, 84, 4, 1, false, 0 },
 
     // Calculated totals
     { TYPE_INV, CH0, FLD_YD, UNIT_WH, CALC_TOTAL_YD, 0, CMD_CALC, false, 0 },
@@ -96,6 +98,7 @@ static const byteAssign_t byteAssignment[] = {
 MIT_8CH::MIT_8CH(HoymilesRadio* radio, const uint64_t serial)
     : HMT_Abstract(radio, serial)
 {
+    EventLog()->setMessageType(AlarmMessageType_t::MIT);
 }
 
 uint32_t MIT_8CH::getSingleDataCommandTimeout() const

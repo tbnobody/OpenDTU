@@ -57,6 +57,7 @@ const FieldId_t runtimeFields[] = {
     FLD_IAC_1,
     FLD_IAC_2,
     FLD_IAC_3,
+    FLD_RAW_STATUS,
 };
 
 const FieldId_t dailyProductionFields[] = {
@@ -190,6 +191,27 @@ float StatisticsParser::getChannelFieldValue(const ChannelType_t type, const Cha
     }
 
     return 0;
+}
+
+uint32_t StatisticsParser::getChannelFieldRawValue(const ChannelType_t type, const ChannelNum_t channel, const FieldId_t fieldId)
+{
+    const byteAssign_t* pos = getAssignmentByChannelField(type, channel, fieldId);
+    if (pos == nullptr || pos->div == CMD_CALC || pos->num > sizeof(uint32_t)) {
+        return 0;
+    }
+
+    uint32_t value = 0;
+    uint8_t ptr = pos->start;
+    const uint8_t end = ptr + pos->num;
+
+    HOY_SEMAPHORE_TAKE();
+    do {
+        value <<= 8;
+        value |= _payloadStatistic[ptr];
+    } while (++ptr != end);
+    HOY_SEMAPHORE_GIVE();
+
+    return value;
 }
 
 bool StatisticsParser::setChannelFieldValue(const ChannelType_t type, const ChannelNum_t channel, const FieldId_t fieldId, float value)
