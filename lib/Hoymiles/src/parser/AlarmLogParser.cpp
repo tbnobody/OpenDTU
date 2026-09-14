@@ -8,7 +8,7 @@ This parser is used to parse the response of 'AlarmDataCommand'.
 
 Data structure:
 * wcode:
-  * right 8 bit: Event ID
+  * right 12 bit (bits 0-11): Event ID
   * bit 13: Start time = PM (12h has to be added to start time)
   * bit 12: End time = PM (12h has to be added to start time)
 * Start: 12h based start time of the event (PM indicator in wcode)
@@ -257,7 +257,7 @@ void AlarmLogParser::getLogEntry(const uint8_t entryId, AlarmLogEntry_t& entry, 
         endTimeOffset = 12 * 60 * 60;
     }
 
-    entry.MessageId = _payloadAlarmLog[entryStartOffset + 1];
+    entry.MessageId = wcode & 0x0FFF;
     entry.StartTime = ((static_cast<uint16_t>(_payloadAlarmLog[entryStartOffset + 4]) << 8) | static_cast<uint16_t>(_payloadAlarmLog[entryStartOffset + 5])) + startTimeOffset + timezoneOffset;
     entry.EndTime = (static_cast<uint16_t>(_payloadAlarmLog[entryStartOffset + 6]) << 8) | static_cast<uint16_t>(_payloadAlarmLog[entryStartOffset + 7]);
 
