@@ -19,6 +19,7 @@ import NtpInfoView from '@/views/NtpInfoView.vue';
 import SecurityAdminView from '@/views/SecurityAdminView.vue';
 import SystemInfoView from '@/views/SystemInfoView.vue';
 import WaitRestartView from '@/views/WaitRestartView.vue';
+import ZeroExportAdminView from '@/views/ZeroExportAdminView.vue';
 import { createRouter, createWebHistory } from 'vue-router';
 
 const router = createRouter({
@@ -91,6 +92,11 @@ const router = createRouter({
             path: '/settings/mqtt',
             name: 'MqTT Settings',
             component: MqttAdminView,
+        },
+        {
+            path: '/settings/zeroexport',
+            name: 'Zero-Export Settings',
+            component: ZeroExportAdminView,
         },
         {
             path: '/settings/inverter',
