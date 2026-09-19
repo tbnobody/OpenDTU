@@ -222,6 +222,10 @@ void InverterAbstract::addRxFragment(const uint8_t fragment[], const uint8_t len
         return;
     }
 
+    if (_rxFragmentRetransmitCnt > 0 && !_rxFragmentBuffer[fragmentId - 1].wasReceived) {
+        _rxFragmentRetransmitCnt = 0;
+    }
+
     memcpy(_rxFragmentBuffer[fragmentId - 1].fragment, &fragment[10], len - 11);
     _rxFragmentBuffer[fragmentId - 1].len = len - 11;
     _rxFragmentBuffer[fragmentId - 1].mainCmd = fragment[0];
