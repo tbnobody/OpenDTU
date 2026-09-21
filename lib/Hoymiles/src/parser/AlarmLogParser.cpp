@@ -83,6 +83,7 @@ const std::array<const AlarmMessage_t, ALARM_MSG_COUNT> AlarmLogParser::_alarmMe
     { AlarmMessageType_t::ALL, 149, "Grid: Island detected", "Netz: Inselbetrieb festgestellt", "Réseau: Détection d’îlots" },
 
     { AlarmMessageType_t::ALL, 150, "DCI exceeded", "", "" },
+    { AlarmMessageType_t::ALL, 151, "Grid: Severe grid wave distortion", "Netz: Starke Netzverzerrung", "Réseau: Distorsion sévère du réseau" },
     { AlarmMessageType_t::ALL, 152, "Grid: Phase angle difference between two phases exceeded 5° >10 times", "", "" },
     { AlarmMessageType_t::HMT, 171, "Grid: Abnormal phase difference between phase to phase", "", "" },
     { AlarmMessageType_t::ALL, 181, "Abnormal insulation impedance", "", "" },
@@ -115,6 +116,8 @@ const std::array<const AlarmMessage_t, ALARM_MSG_COUNT> AlarmLogParser::_alarmMe
     { AlarmMessageType_t::ALL, 221, "PV-4: Input overvoltage", "PV-4: Eingangsüberspannung", "PV-4: Surtension d’entrée" },
     { AlarmMessageType_t::HMT, 221, "Abnormal wiring of grid neutral line", "", "" },
     { AlarmMessageType_t::ALL, 222, "PV-4: Input undervoltage", "PV-4: Eingangsunterspannung", "PV-4: Sous-tension d’entrée" },
+
+    { AlarmMessageType_t::ALL, 223, "Grid: Connection attempt failed", "Netz: Netzaufschaltung fehlgeschlagen", "Réseau: Échec de la connexion au réseau" },
 
     { AlarmMessageType_t::ALL, 301, "FB-A: internal short circuit failure", "", "" },
     { AlarmMessageType_t::ALL, 302, "FB-B: internal short circuit failure", "", "" },
