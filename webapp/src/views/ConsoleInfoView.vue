@@ -224,7 +224,11 @@ export default defineComponent({
             this.socket?.connect();
         },
         getLineClass(line: string): string {
-            const found = Object.entries(this.levelMap).find(([tag]) => line.includes(tag));
+            // Only match the level tag at the start of the line. Matching it
+            // anywhere misclassifies lines whose message contains the tag as
+            // plain text, e.g. "I (...) ... 372 W (max 1000 W)" would match
+            // 'W (' and be treated as a warning.
+            const found = Object.entries(this.levelMap).find(([tag]) => line.startsWith(tag));
             return found ? found[1] : 'default';
         },
         handleScroll() {
