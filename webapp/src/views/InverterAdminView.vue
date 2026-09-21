@@ -251,7 +251,6 @@
                                         type="number"
                                         class="form-control"
                                         :id="`inverter-ytoffset_${index}`"
-                                        min="0"
                                         v-model="ch.yield_total_offset"
                                         :aria-describedby="`inverter-ytoffsetDescription_${index} inverter-customizer`"
                                     />
