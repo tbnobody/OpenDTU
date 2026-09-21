@@ -19,6 +19,7 @@ CONFIG_T config;
 static std::condition_variable sWriterCv;
 static std::mutex sWriterMutex;
 static unsigned sWriterCount = 0;
+static bool sWriterActive = false;
 
 void ConfigurationClass::init(Scheduler& scheduler)
 {
@@ -538,8 +539,14 @@ void ConfigurationClass::loop()
         return;
     }
 
+    // close the write guard for new writers, inform all existing writers and wait for them to finish
+    sWriterActive = true;
     sWriterCv.notify_all();
     sWriterCv.wait(lock, [] { return sWriterCount == 0; });
+
+    // open the write guard for new writers and inform all waiting writers that they can continue
+    sWriterActive = false;
+    sWriterCv.notify_all();
 }
 
 CONFIG_T& ConfigurationClass::WriteGuard::getConfig()
@@ -550,8 +557,14 @@ CONFIG_T& ConfigurationClass::WriteGuard::getConfig()
 ConfigurationClass::WriteGuard::WriteGuard()
     : _lock(sWriterMutex)
 {
+    // if writers are currently processed, we must wait for them to finish before we can add ourselves to the writer count
+    if (sWriterActive) {
+        sWriterCv.wait(_lock, [] { return !sWriterActive; });
+    }
+
+    // add ourselves to the writer count and wait to be processed
     sWriterCount++;
-    sWriterCv.wait(_lock);
+    sWriterCv.wait(_lock, [] { return sWriterActive; });
 }
 
 ConfigurationClass::WriteGuard::~WriteGuard()
