@@ -24,9 +24,8 @@ public:
 
 private:
     void ARDUINO_ISR_ATTR handleIntr();
-    uint8_t getRxNxtChannel();
     uint8_t getTxNxtChannel();
-    void switchRxCh();
+    void switchRxCh(bool const immediately = false);
     void openReadingPipe();
     void openWritingPipe(const serial_u serial);
 
@@ -36,9 +35,14 @@ private:
     std::unique_ptr<RF24> _radio;
     uint8_t _rxChLst[5] = { 3, 23, 40, 61, 75 };
     uint8_t _rxChIdx = 0;
+    uint32_t _refMicros = 0;
+    uint32_t _txCounter = 0;
+    uint32_t _txFailCounter = 0;
 
-    uint8_t _txChLst[5] = { 3, 23, 40, 61, 75 };
-    uint8_t _txChIdx = 0;
+    uint8_t _ARD[33] = {  8,  8,  8,  8,  8,  8,  7,  7,  7,  7,  7,
+                              7,  7,  7,  6,  6,  6,  6,  6,  6,  6,
+                              6,  5,  5,  5,  5,  5,  5,  5,  4,  4,
+                              4,  4 };
 
     volatile bool _packetReceived = false;
 
