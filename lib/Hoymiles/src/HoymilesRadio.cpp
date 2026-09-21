@@ -58,18 +58,18 @@ void HoymilesRadio::sendLastPacketAgain()
 void HoymilesRadio::handleReceivedPackage()
 {
     if (_busyFlag && _rxTimeout.occured()) {
-        ESP_LOGI(TAG, "RX Period End");
-        std::shared_ptr<InverterAbstract> inv = Hoymiles.getInverterBySerial(_commandQueue.front().get()->getTargetAddress());
+        CommandAbstract* cmd = _commandQueue.front().get();
+        ESP_LOGI(TAG, "RX Period End: %s", cmd->getCommandDescription().c_str());
+        std::shared_ptr<InverterAbstract> inv = Hoymiles.getInverterBySerial(cmd->getTargetAddress());
 
         if (nullptr != inv) {
-            CommandAbstract* cmd = _commandQueue.front().get();
             uint8_t verifyResult = inv->verifyAllFragments(*cmd);
             if (verifyResult == FRAGMENT_ALL_MISSING_RESEND) {
-                ESP_LOGW(TAG, "Nothing received, resend whole request");
+                ESP_LOGW(TAG, "Nothing received, resend whole request: %s", cmd->getCommandDescription().c_str());
                 sendLastPacketAgain();
 
             } else if (verifyResult == FRAGMENT_ALL_MISSING_TIMEOUT) {
-                ESP_LOGW(TAG, "Nothing received, resend count exeeded");
+                ESP_LOGW(TAG, "Nothing received, resend count exeeded: %s", cmd->getCommandDescription().c_str());
                 // Statistics: Count RX Fail No Answer
                 if (inv->RadioStats.TxRequestData > 0) {
                     inv->RadioStats.RxFailNoAnswer++;
@@ -79,7 +79,7 @@ void HoymilesRadio::handleReceivedPackage()
                 _busyFlag = false;
 
             } else if (verifyResult == FRAGMENT_RETRANSMIT_TIMEOUT) {
-                ESP_LOGW(TAG, "Retransmit timeout");
+                ESP_LOGW(TAG, "Retransmit timeout: %s", cmd->getCommandDescription().c_str());
                 // Statistics: Count RX Fail Partial Answer
                 if (inv->RadioStats.TxRequestData > 0) {
                     inv->RadioStats.RxFailPartialAnswer++;
@@ -89,7 +89,7 @@ void HoymilesRadio::handleReceivedPackage()
                 _busyFlag = false;
 
             } else if (verifyResult == FRAGMENT_HANDLE_ERROR) {
-                ESP_LOGW(TAG, "Packet handling error");
+                ESP_LOGW(TAG, "Packet handling error: %s", cmd->getCommandDescription().c_str());
                 // Statistics: Count RX Fail Corrupt Data
                 if (inv->RadioStats.TxRequestData > 0) {
                     inv->RadioStats.RxFailCorruptData++;
@@ -100,7 +100,7 @@ void HoymilesRadio::handleReceivedPackage()
 
             } else if (verifyResult > 0) {
                 // Perform Retransmit
-                ESP_LOGI(TAG, "Request retransmit: %" PRIu8 "", verifyResult);
+                ESP_LOGI(TAG, "Request retransmit: %" PRIu8 " (%s)", verifyResult, cmd->getCommandDescription().c_str());
                 // Statistics: Count TX Re-Request Fragment
                 inv->RadioStats.TxReRequestFragment++;
 
@@ -108,7 +108,7 @@ void HoymilesRadio::handleReceivedPackage()
 
             } else {
                 // Successful received all packages
-                ESP_LOGI(TAG, "Success");
+                ESP_LOGI(TAG, "Success: %s", cmd->getCommandDescription().c_str());
                 // Statistics: Count RX Success
                 if (inv->RadioStats.TxRequestData > 0) {
                     inv->RadioStats.RxSuccess++;
@@ -119,7 +119,7 @@ void HoymilesRadio::handleReceivedPackage()
             }
         } else {
             // If inverter was not found, assume the command is invalid
-            ESP_LOGW(TAG, "RX: Invalid inverter found");
+            ESP_LOGW(TAG, "RX: Invalid inverter found: %s", cmd->getCommandDescription().c_str());
             // Statistics: Count RX Fail Unknown Data
             _commandQueue.pop();
             _busyFlag = false;
@@ -137,7 +137,7 @@ void HoymilesRadio::handleReceivedPackage()
 
                 sendEsbPacket(*cmd);
             } else {
-                ESP_LOGE(TAG, "TX: Invalid inverter found");
+                ESP_LOGE(TAG, "TX: Invalid inverter found: %s", cmd->getCommandDescription().c_str());
                 _commandQueue.pop();
             }
         }

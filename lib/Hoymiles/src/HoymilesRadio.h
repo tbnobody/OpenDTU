@@ -31,6 +31,10 @@ public:
     void removeCommands(InverterAbstract* inv);
     uint8_t countSimilarCommands(std::shared_ptr<CommandAbstract> cmd);
 
+    // Logs a compact description of every command currently waiting in the
+    // radio's command queue (most recently used for debugging).
+    void dumpQueue() const { _commandQueue.dumpQueue(); }
+
     void enqueCommand(std::shared_ptr<CommandAbstract> cmd)
     {
         DEBUG_PRINT("Queue size before: %ld", _commandQueue.size());
@@ -44,7 +48,7 @@ public:
             // and replaces the existing one with the new one.
             // (The new one will not be pushed at the end of the queue)
             if (_commandQueue.countSimilarCommands(cmd) > 0) {
-                DEBUG_PRINT("    ... existing entry will be replaced");
+                DEBUG_PRINT("    ... Enqueue %s: replaced existing entry", cmd.get()->getCommandDescription().c_str());
                 _commandQueue.replaceEntries(cmd);
                 return;
             }
@@ -53,7 +57,7 @@ public:
             // Checks if the queue already contains a command like the new one
             // and drops the new one. The new one will not be inserted.
             if (_commandQueue.countSimilarCommands(cmd) > 0) {
-                DEBUG_PRINT("    ... new entry will be dropped");
+                DEBUG_PRINT("    ... Enqueue %s: dropped, similar command already queued", cmd.get()->getCommandDescription().c_str());
                 return;
             }
             break;
@@ -63,8 +67,8 @@ public:
         }
 
         // Push the command into the queue if we reach this position of the code
-        DEBUG_PRINT("    ... new entry will be appended");
         _commandQueue.push(cmd);
+        DEBUG_PRINT("    ... Enqueue %s (queue: %ld)", cmd.get()->getCommandDescription().c_str(), _commandQueue.size());
 
         DEBUG_PRINT("Queue size after: %ld", _commandQueue.size());
     }

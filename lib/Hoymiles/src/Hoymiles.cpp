@@ -125,6 +125,8 @@ void HoymilesClass::loop()
             }
 
             ESP_LOGI(TAG, "Queue size - NRF: %" PRIu32 " CMT: %" PRIu32 "", _radioNrf->getQueueSize(), _radioCmt->getQueueSize());
+            _radioCmt->dumpQueue();
+            _radioNrf->dumpQueue();
             _lastPoll = millis();
         }
 

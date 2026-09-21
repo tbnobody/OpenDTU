@@ -14,4 +14,7 @@ public:
     void replaceEntries(std::shared_ptr<CommandAbstract> cmd);
 
     uint8_t countSimilarCommands(std::shared_ptr<CommandAbstract> cmd);
+
+    // Logs a compact description of every entry currently waiting in the queue.
+    void dumpQueue() const;
 };

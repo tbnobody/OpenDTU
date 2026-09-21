@@ -63,6 +63,11 @@ public:
     virtual QueueInsertType getQueueInsertType() const { return QueueInsertType::RemoveNewest; }
     virtual bool areSameParameter(CommandAbstract* other);
 
+    // Returns "[<id>] <command name> (<inverter serial>)" for use in log messages.
+    // The string is built once on first call and cached for the lifetime of the
+    // command, so repeated log lines cause no repeated formatting/allocations.
+    const String& getCommandDescription() const;
+
 protected:
     uint8_t _payload[RF_LEN];
     uint8_t _payload_size;
@@ -77,4 +82,11 @@ protected:
 private:
     void setTargetAddress(const uint64_t address);
     static void convertSerialToPacketId(uint8_t buffer[], const uint64_t serial);
+
+    uint32_t _commandId;
+
+    // Cached description ("[id] name (serial)") built once on first use
+    // by getCommandDescription() and reused for the whole command lifetime,
+    // which avoids repeated heap allocations on every log line.
+    mutable String _commandDescription;
 };

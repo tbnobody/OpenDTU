@@ -5,6 +5,10 @@
 #include "CommandQueue.h"
 #include "../inverters/InverterAbstract.h"
 #include <algorithm>
+#include <esp_log.h>
+
+#undef TAG
+static const char* TAG = "hoymiles";
 
 void CommandQueue::removeAllEntriesForInverter(InverterAbstract* inv)
 {
@@ -48,4 +52,28 @@ uint8_t CommandQueue::countSimilarCommands(std::shared_ptr<CommandAbstract> cmd)
         [&](const auto& v) {
             return cmd->areSameParameter(v.get());
         });
+}
+
+void CommandQueue::dumpQueue() const
+{
+    // Only dump the queue when DEBUG logging is enabled for the hoymiles
+    // module. This runs on every poll cycle for every inverter; dumping at
+    // INFO level floods the log pipeline (MessageOutput buffer -> WebSocket
+    // console -> async TCP stack) and starves the scheduler, freezing MQTT
+    // and Live View updates.
+    if (esp_log_level_get(TAG) < ESP_LOG_DEBUG) {
+        return;
+    }
+
+    std::lock_guard<std::mutex> lock(_mutex);
+
+    if (_queue.empty()) {
+        return;
+    }
+
+    size_t pos = 0;
+    for (const auto& entry : _queue) {
+        ESP_LOGD(TAG, "%zu: %s", pos, entry->getCommandDescription().c_str());
+        pos++;
+    }
 }

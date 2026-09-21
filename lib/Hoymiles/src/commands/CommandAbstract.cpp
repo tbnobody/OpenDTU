@@ -31,6 +31,7 @@ Source Address: 80 12 23 04
 #include "../inverters/InverterAbstract.h"
 #include "crc.h"
 #include <string.h>
+#include <atomic>
 
 CommandAbstract::CommandAbstract(InverterAbstract* inv, const uint64_t router_address)
 {
@@ -43,6 +44,28 @@ CommandAbstract::CommandAbstract(InverterAbstract* inv, const uint64_t router_ad
     setRouterAddress(router_address);
     setSendCount(0);
     setTimeout(0);
+
+    // Atomic increment: commands are constructed concurrently from multiple
+    // FreeRTOS tasks: loopTask (poll cycle in Hoymiles.loop()), the espMqttClient
+    // task (MQTT callbacks) and the AsyncTCP task (web API handlers). The queue
+    // mutex only serializes insertion, which happens after construction.
+    static std::atomic_uint32_t nextId = 0;
+    _commandId = nextId.fetch_add(1, std::memory_order_relaxed);
+}
+
+const String& CommandAbstract::getCommandDescription() const
+{
+    // Lazy caching: the description is requested on every log line of a
+    // command's lifecycle (enqueue, TX, RX period end, success), so it is
+    // built only once and reused instead of being re-formatted (and
+    // re-allocated) several times per command.
+    if (_commandDescription.isEmpty()) {
+        char buffer[96];
+        snprintf(buffer, sizeof(buffer), "[%" PRIu32 "] %s (%s)",
+            _commandId, getCommandName().c_str(), _inv->serialString().c_str());
+        _commandDescription = buffer;
+    }
+    return _commandDescription;
 }
 
 const uint8_t* CommandAbstract::getDataPayload()
