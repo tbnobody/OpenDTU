@@ -263,8 +263,9 @@
             "LittleFs": "LittleFs",
             "Sketch": "Boceto"
         },
-        "heapdetails": {
+        "memorydetails": {
             "HeapDetails": "Detalles del montón",
+            "PsramDetails": "PSRAM Details",
             "TotalFree": "Total libre",
             "LargestFreeBlock": "Bloque libre contiguo más grande",
             "MaxUsage": "Uso máximo desde el inicio",

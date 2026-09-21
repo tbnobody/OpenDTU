@@ -263,8 +263,9 @@
             "LittleFs": "LittleFs",
             "Sketch": "Σκίτσο"
         },
-        "heapdetails": {
+        "memorydetails": {
             "HeapDetails": "Λεπτομέρειες Δυναμική μνήμης",
+            "PsramDetails": "PSRAM Details",
             "TotalFree": "Συνολικά ελεύθερη",
             "LargestFreeBlock": "Το μεγαλύτερο συνεχόμενο ελεύθερο μπλοκ",
             "MaxUsage": "Μέγιστη χρήση από το ξεκίνημα",

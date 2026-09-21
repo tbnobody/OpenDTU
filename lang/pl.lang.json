@@ -263,8 +263,9 @@
             "LittleFs": "MałeFs",
             "Sketch": "Szkic"
         },
-        "heapdetails": {
+        "memorydetails": {
             "HeapDetails": "Szczegóły pamięci sterty",
+            "PsramDetails": "PSRAM Details",
             "TotalFree": "Całkowita wolna pamięć",
             "LargestFreeBlock": "Największy wolny ciągły blok",
             "MaxUsage": "Maksymalne użycie od uruchomienia",
