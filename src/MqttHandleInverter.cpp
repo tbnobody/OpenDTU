@@ -71,6 +71,14 @@ void MqttHandleInverterClass::loop()
             MqttSettings.publish(subtopic + "/device/hwversion", inv->DevInfo()->getHwVersion());
         }
 
+        if (inv->RfInfo()->containsValidData()) {
+            // RF module hardware version
+            MqttSettings.publish(subtopic + "/device/rf_hwversion", inv->RfInfo()->getRfHardwareVersionStr());
+
+            // RF module firmware version
+            MqttSettings.publish(subtopic + "/device/rf_fwversion", inv->RfInfo()->getRfFirmwareVersionStr());
+        }
+
         if (inv->SystemConfigPara()->getLastUpdate() > 0) {
             // Limit
             MqttSettings.publish(subtopic + "/status/limit_relative", String(inv->SystemConfigPara()->getLimitPercent()));

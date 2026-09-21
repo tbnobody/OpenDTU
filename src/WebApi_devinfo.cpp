@@ -36,6 +36,9 @@ void WebApiDevInfoClass::onDevInfoStatus(AsyncWebServerRequest* request)
         root["max_power"] = inv->DevInfo()->getMaxPower();
         root["fw_build_datetime"] = inv->DevInfo()->getFwBuildDateTimeStr();
         root["pdl_supported"] = inv->supportsPowerDistributionLogic();
+        root["rf_valid_data"] = inv->RfInfo()->containsValidData();
+        root["rf_hw_version"] = inv->RfInfo()->getRfHardwareVersionStr();
+        root["rf_fw_version"] = inv->RfInfo()->getRfFirmwareVersionStr();
     }
 
     WebApi.sendJsonResponse(request, response, __FUNCTION__, __LINE__);

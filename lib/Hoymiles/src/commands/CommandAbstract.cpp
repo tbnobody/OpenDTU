@@ -36,6 +36,7 @@ CommandAbstract::CommandAbstract(InverterAbstract* inv, const uint64_t router_ad
 {
     memset(_payload, 0, RF_LEN);
     _payload_size = 0;
+    _singleFragmentAnswer = false;
 
     _inv = inv;
 
