@@ -39,7 +39,7 @@ bool RfInfoParser::setPayload(const uint8_t* payload, const uint8_t len)
 String RfInfoParser::versionStr(const uint8_t* payload, const size_t offset)
 {
     std::array<char, 16> buf = {};
-    snprintf(buf.data(), buf.size(), "%d.%d.%d.%d",
+    snprintf(buf.data(), buf.size(), "%02x.%02x.%02x.%02x",
         payload[offset], payload[offset + 1], payload[offset + 2], payload[offset + 3]);
     return buf.data();
 }
