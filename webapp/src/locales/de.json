@@ -371,7 +371,7 @@
         "LogLevel": "Protokollierungsstufe ({cnt})"
     },
     "inverterchannelinfo": {
-        "String": "String {num}",
+        "String": "Strang {num}",
         "Phase": "Phase {num}",
         "General": "Allgemein"
     },
