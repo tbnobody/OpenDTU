@@ -34,6 +34,10 @@ serial_u HoymilesRadio::convertSerialToRadioId(const serial_u serial)
 
 bool HoymilesRadio::checkFragmentCrc(const fragment_t& fragment) const
 {
+    if (fragment.len == 0 || fragment.len > MAX_RF_PAYLOAD_SIZE) {
+        return false;
+    }
+
     const uint8_t crc = crc8(fragment.fragment, fragment.len - 1);
     return (crc == fragment.fragment[fragment.len - 1]);
 }
