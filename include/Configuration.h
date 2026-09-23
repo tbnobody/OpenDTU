@@ -2,10 +2,12 @@
 #pragma once
 
 #include "PinMapping.h"
-#include <TaskSchedulerDeclarations.h>
-#include <condition_variable>
 #include <cstdint>
+#include <functional>
 #include <mutex>
+#include <shared_mutex>
+#include <type_traits>
+#include <utility>
 
 #define CONFIG_FILENAME "/config.json"
 #define CONFIG_VERSION 0x00011e00 // 0.1.30 // make sure to clean all after change
@@ -182,34 +184,79 @@ struct CONFIG_T {
 
 class ConfigurationClass {
 public:
-    void init(Scheduler& scheduler);
+    void init();
     bool read();
     bool write();
     void migrate();
     CONFIG_T const& get();
 
-    class WriteGuard {
-    public:
-        WriteGuard();
-        CONFIG_T& getConfig();
-        ~WriteGuard();
+    // Runs fn with exclusive write access to the configuration, holding the
+    // config mutex for the duration of the call. Safe to call from any task,
+    // including the AsyncTCP task that runs the web API callbacks.
+    //
+    // The return type is deduced from the callable: a lambda returning a
+    // value forwards it to the caller, a lambda returning void simply
+    // mutates. Plain lambdas work (same deduction pattern as read(Fn)).
+    //
+    // Usage (mutation):
+    //   Configuration.update([](CONFIG_T& cfg) {
+    //       cfg.foo = bar;
+    //   });
+    //
+    // Usage (mutation with result):
+    //   auto* slot = Configuration.update([](CONFIG_T& cfg) {
+    //       return getFreeInverterSlot(cfg);
+    //   });
+    template <typename Fn>
+    auto update(Fn&& fn) -> decltype(fn(std::declval<CONFIG_T&>()))
+    {
+        std::unique_lock<std::shared_mutex> lock(sConfigMutex);
+        return fn(config);
+    }
 
-    private:
-        std::unique_lock<std::mutex> _lock;
-    };
+    // Consistent read: runs fn on the config while holding the shared lock,
+    // so the values fn reads can never be torn by a concurrent update().
+    // Multiple readers can run at the same time; writes stay exclusive.
+    // fn must only read (not mutate) the config and must not block; use it
+    // when several related fields must be captured atomically. For single
+    // scalar fields, the lock-free Configuration.get() is fine.
+    //
+    // Usage:
+    //   auto pos = Configuration.read([](CONFIG_T const& cfg) {
+    //       return std::make_pair(cfg.Ntp.Latitude, cfg.Ntp.Longitude);
+    //   });
+    template <typename Fn>
+    auto read(Fn&& fn) const -> decltype(fn(std::declval<CONFIG_T const&>()))
+    {
+        std::shared_lock<std::shared_mutex> lock(sConfigMutex);
+        return fn(config);
+    }
 
-    WriteGuard getWriteGuard();
-
-    INVERTER_CONFIG_T* getFreeInverterSlot();
+    // Read helpers operating on the global configuration. Kept as-is for now;
+    // reads are intentionally not locked.
     INVERTER_CONFIG_T* getInverterConfig(const uint64_t serial);
-    void deleteInverterById(const uint8_t id);
-
     int8_t getIndexForLogModule(const String& moduleName) const;
 
-private:
-    void loop();
+    // Write helpers, meant to be used within update() on the passed config.
+    static INVERTER_CONFIG_T* getFreeInverterSlot(CONFIG_T& config);
+    static void deleteInverterById(CONFIG_T& config, const uint8_t id);
 
-    Task _loopTask;
+private:
+    // The in-RAM configuration and the read-write mutex protecting it.
+    // Config is written from the AsyncTCP task (web API callbacks) and read
+    // from the main task (scheduler loop) as well as from AsyncTCP. Readers
+    // take a shared lock (read(Fn)), writers a unique lock (update(),
+    // read()/write()/migrate()) — multiple readers can run concurrently,
+    // writes are exclusive.
+    // NOT recursive: never call update()/read(Fn)/read()/write()
+    // from inside another update() lambda — that would deadlock on the
+    // lock this thread already holds.
+    static CONFIG_T config;
+    static std::shared_mutex sConfigMutex;
+
+    // Flash I/O helpers; call only while sConfigMutex is held.
+    static bool writeConfigLocked();
+    static bool readConfigLocked();
 };
 
 extern ConfigurationClass Configuration;
