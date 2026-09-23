@@ -28,18 +28,31 @@ void SyslogLogger::init(Scheduler& scheduler)
 
 void SyslogLogger::updateSettings(const String&& hostname)
 {
-    auto& config = Configuration.get().Syslog;
+    // Multi-field read: Enabled, Port and Hostname form one logical unit; a
+    // concurrent update() must not mix them (for example Port of the new
+    // configuration with the Hostname of the old one).
+    const auto syslogCfg = Configuration.read([](CONFIG_T const& cfg) {
+        struct S {
+            bool enabled;
+            uint16_t port;
+            String hostname;
+        } s;
+        s.enabled = cfg.Syslog.Enabled;
+        s.port = cfg.Syslog.Port;
+        s.hostname = String(cfg.Syslog.Hostname);
+        return s;
+    });
 
     // Disable logger while it is reconfigured.
     disable();
 
-    if (!config.Enabled) {
+    if (!syslogCfg.enabled) {
         ESP_LOGI(TAG, "Syslog not enabled");
         return;
     }
 
-    _port = config.Port;
-    _syslog_hostname = config.Hostname;
+    _port = syslogCfg.port;
+    _syslog_hostname = syslogCfg.hostname;
     if (_syslog_hostname.isEmpty()) {
         ESP_LOGW(TAG, "Hostname not configured");
         return;

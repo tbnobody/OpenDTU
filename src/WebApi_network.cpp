@@ -64,22 +64,25 @@ void WebApiNetworkClass::onNetworkAdminGet(AsyncWebServerRequest* request)
 
     AsyncJsonResponse* response = new AsyncJsonResponse();
     auto& root = response->getRoot();
-    const CONFIG_T& config = Configuration.get();
 
-    root["hostname"] = config.WiFi.Hostname;
-    root["dhcp"] = config.WiFi.Dhcp;
-    root["ipaddress"] = IPAddress(config.WiFi.Ip).toString();
-    root["netmask"] = IPAddress(config.WiFi.Netmask).toString();
-    root["gateway"] = IPAddress(config.WiFi.Gateway).toString();
-    root["dns1"] = IPAddress(config.WiFi.Dns1).toString();
-    root["dns2"] = IPAddress(config.WiFi.Dns2).toString();
-    root["ssid"] = config.WiFi.Ssid;
-    root["password"] = config.WiFi.Password;
-    root["aptimeout"] = config.WiFi.ApTimeout;
-    root["mdnsenabled"] = config.Mdns.Enabled;
-    root["syslogenabled"] = config.Syslog.Enabled;
-    root["sysloghostname"] = config.Syslog.Hostname;
-    root["syslogport"] = config.Syslog.Port;
+    // Multi-field read: hold the shared lock while the response is built so
+    // a concurrent update() cannot tear the values.
+    Configuration.read([&](CONFIG_T const& config) {
+        root["hostname"] = config.WiFi.Hostname;
+        root["dhcp"] = config.WiFi.Dhcp;
+        root["ipaddress"] = IPAddress(config.WiFi.Ip).toString();
+        root["netmask"] = IPAddress(config.WiFi.Netmask).toString();
+        root["gateway"] = IPAddress(config.WiFi.Gateway).toString();
+        root["dns1"] = IPAddress(config.WiFi.Dns1).toString();
+        root["dns2"] = IPAddress(config.WiFi.Dns2).toString();
+        root["ssid"] = config.WiFi.Ssid;
+        root["password"] = config.WiFi.Password;
+        root["aptimeout"] = config.WiFi.ApTimeout;
+        root["mdnsenabled"] = config.Mdns.Enabled;
+        root["syslogenabled"] = config.Syslog.Enabled;
+        root["sysloghostname"] = config.Syslog.Hostname;
+        root["syslogport"] = config.Syslog.Port;
+    });
 
     WebApi.sendJsonResponse(request, response, __FUNCTION__, __LINE__);
 }
@@ -190,10 +193,8 @@ void WebApiNetworkClass::onNetworkAdminPost(AsyncWebServerRequest* request)
         }
     }
 
+    Configuration.update([&](CONFIG_T& config)
     {
-        auto guard = Configuration.getWriteGuard();
-        auto& config = guard.getConfig();
-
         config.WiFi.Ip[0] = ipaddress[0];
         config.WiFi.Ip[1] = ipaddress[1];
         config.WiFi.Ip[2] = ipaddress[2];
@@ -227,7 +228,7 @@ void WebApiNetworkClass::onNetworkAdminPost(AsyncWebServerRequest* request)
         config.Syslog.Enabled = root["syslogenabled"].as<bool>();
         strlcpy(config.Syslog.Hostname, root["sysloghostname"].as<String>().c_str(), sizeof(config.Syslog.Hostname));
         config.Syslog.Port = root["syslogport"].as<uint>();
-    }
+    });
 
     WebApi.writeConfig(retMsg);
 

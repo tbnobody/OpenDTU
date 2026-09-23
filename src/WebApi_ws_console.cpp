@@ -33,14 +33,24 @@ void WebApiWsConsoleClass::reload()
 {
     _ws.removeMiddleware(&_simpleDigestAuth);
 
-    auto const& config = Configuration.get();
+    // Multi-field read: Password and AllowReadonly form one credentials unit;
+    // a concurrent update() must not mix them.
+    const auto credentials = Configuration.read([](CONFIG_T const& cfg) {
+        struct C {
+            String password;
+            bool allowReadonly;
+        } c;
+        c.password = String(cfg.Security.Password);
+        c.allowReadonly = cfg.Security.AllowReadonly;
+        return c;
+    });
 
-    if (config.Security.AllowReadonly) {
+    if (credentials.allowReadonly) {
         return;
     }
 
     _ws.enable(false);
-    _simpleDigestAuth.setPassword(config.Security.Password);
+    _simpleDigestAuth.setPassword(credentials.password.c_str());
     _ws.addMiddleware(&_simpleDigestAuth);
     _ws.closeAll();
     _ws.enable(true);
