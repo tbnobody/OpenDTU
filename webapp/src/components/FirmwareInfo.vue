@@ -33,6 +33,10 @@
                         <td>{{ systemStatus.git_branch }}</td>
                     </tr>
                     <tr>
+                        <th>{{ $t('firmwareinfo.CompileDateTime') }}</th>
+                        <td>{{ $d(systemStatus.compile_datetime, 'datetime') }}</td>
+                    </tr>
+                    <tr>
                         <th>{{ $t('firmwareinfo.PioEnv') }}</th>
                         <td>{{ systemStatus.pioenv }}</td>
                     </tr>

@@ -230,6 +230,7 @@
             "ConfigVersion": "Έκδοση διαμόρφωσης",
             "FirmwareVersion": "Έκδοση υλικολογισμικού / Git Hash",
             "FirmwareBranch": "Firmware Branch",
+            "CompileDateTime": "Compile Date/Time (UTC)",
             "PioEnv": "Περιβάλλον PIO",
             "FirmwareVersionHint": "Κάντε κλικ εδώ για να εμφανίσετε πληροφορίες σχετικά με την τρέχουσα έκδοση",
             "FirmwareUpdate": "Ενημέρωση υλικολογισμικού",

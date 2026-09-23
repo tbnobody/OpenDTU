@@ -217,6 +217,7 @@
         "ConfigVersion": "Version de la configuration",
         "FirmwareVersion": "Version du firmware / Hash Git",
         "FirmwareBranch": "Firmware Branch",
+        "CompileDateTime": "Compile Date/Time (UTC)",
         "PioEnv": "PIO Environment",
         "FirmwareVersionHint": "Cliquez ici pour afficher des informations sur votre version actuelle",
         "FirmwareUpdate": "Mise à jour du firmware",
