@@ -68,6 +68,12 @@ public:
     void addRxFragment(const uint8_t fragment[], const uint8_t len, const int8_t rssi);
     uint8_t verifyAllFragments(CommandAbstract& cmd);
 
+    // Side-effect-free check whether all fragments of the current transaction
+    // have been received (i.e. the last fragment flag was seen and every
+    // fragment up to it is present). Unlike verifyAllFragments() it does not
+    // touch any retry counters and can be called on every loop iteration.
+    bool isTransactionComplete() const;
+
     void performDailyTask();
 
     void resetRadioStats();

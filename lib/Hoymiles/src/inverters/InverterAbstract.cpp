@@ -314,6 +314,26 @@ void InverterAbstract::performDailyTask()
     resetRadioStats();
 }
 
+bool InverterAbstract::isTransactionComplete() const
+{
+    // The inverter marks the last fragment of a response with the 0x80 bit
+    // (stored in _rxFragmentMaxPacketId by addRxFragment()). Once this flag
+    // was seen and every fragment up to it has been received, the
+    // transaction is complete for sure and waiting for the rx timeout is
+    // pure latency.
+    if (_rxFragmentMaxPacketId == 0) {
+        return false;
+    }
+
+    for (uint8_t i = 0; i < _rxFragmentMaxPacketId; i++) {
+        if (!_rxFragmentBuffer[i].wasReceived) {
+            return false;
+        }
+    }
+
+    return true;
+}
+
 void InverterAbstract::resetRadioStats()
 {
     RadioStats = {};

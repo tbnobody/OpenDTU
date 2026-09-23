@@ -72,6 +72,10 @@ private:
 
     void sendEsbPacket(CommandAbstract& cmd);
 
+    // The CMT radio queues received fragments in _rxBuffer which are parsed
+    // one per loop iteration in loop().
+    virtual bool isRxBufferEmpty() const { return _rxBuffer.empty(); }
+
     std::unique_ptr<CMT2300A> _radio;
 
     volatile bool _packetReceived = false;

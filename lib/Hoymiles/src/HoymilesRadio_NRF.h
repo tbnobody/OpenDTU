@@ -31,6 +31,10 @@ private:
 
     void sendEsbPacket(CommandAbstract& cmd);
 
+    // The NRF radio queues received fragments in _rxBuffer which are parsed
+    // one per loop iteration in loop().
+    virtual bool isRxBufferEmpty() const { return _rxBuffer.empty(); }
+
     std::unique_ptr<SPIClass> _spiPtr;
     std::unique_ptr<RF24> _radio;
     uint8_t _rxChLst[5] = { 3, 23, 40, 61, 75 };
