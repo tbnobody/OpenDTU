@@ -16,7 +16,7 @@ It was the goal to replace the original Hoymiles DTU (Telemetry Gateway) with th
 
 ## Documentation
 
-The documentation can be found [here](https://tbnobody.github.io/OpenDTU-docs/).
+The documentation can be found [here](https://opendtu.solar/).
 Please feel free to support and create a PR in [this](https://github.com/tbnobody/OpenDTU-docs) repository to make the documentation even better.
 
 ## Breaking changes
