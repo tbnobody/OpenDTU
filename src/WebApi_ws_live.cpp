@@ -183,6 +183,7 @@ void WebApiWsLiveClass::generateInverterChannelJsonResponse(JsonObject& root, st
                 chanTypeObj[String(static_cast<uint8_t>(c))]["name"]["u"] = inv_cfg->channel[c].Name;
             }
             addField(chanTypeObj, inv, t, c, FLD_PAC);
+            addField(chanTypeObj, inv, t, c, FLD_MPAC);
             addField(chanTypeObj, inv, t, c, FLD_UAC);
             addField(chanTypeObj, inv, t, c, FLD_IAC);
             if (t == TYPE_INV) {

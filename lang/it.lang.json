@@ -399,6 +399,7 @@
         },
         "inverterchannelproperty": {
             "Power": "Potenza",
+            "MaxDailyPower": "Max Power",
             "Voltage": "Tensione",
             "Current": "Corrente",
             "Power DC": "PotenzaDC",

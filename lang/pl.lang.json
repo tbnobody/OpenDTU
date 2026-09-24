@@ -399,6 +399,7 @@
         },
         "inverterchannelproperty": {
             "Power": "Moc",
+            "MaxDailyPower": "Max Power",
             "Voltage": "Napięcie",
             "Current": "Prąd",
             "Power DC": "Zasilanie DC",

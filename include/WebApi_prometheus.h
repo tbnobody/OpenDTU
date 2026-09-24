@@ -29,8 +29,9 @@ private:
         MetricType_t type;
     };
 
-    const publish_type_t _publishFields[15] = {
+    const publish_type_t _publishFields[16] = {
         { FLD_PAC, MetricType_t::GAUGE },
+        { FLD_MPAC, MetricType_t::GAUGE },
         { FLD_UAC, MetricType_t::GAUGE },
         { FLD_IAC, MetricType_t::GAUGE },
         { FLD_PDC, MetricType_t::GAUGE },

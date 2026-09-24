@@ -26,7 +26,7 @@ private:
 
     uint32_t _lastPublishStats[INV_MAX_COUNT] = { 0 };
 
-    FieldId_t _publishFields[15] = {
+    FieldId_t _publishFields[16] = {
         FLD_UDC,
         FLD_IDC,
         FLD_PDC,
@@ -35,6 +35,7 @@ private:
         FLD_UAC,
         FLD_IAC,
         FLD_PAC,
+        FLD_MPAC,
         FLD_F,
         FLD_T,
         FLD_MT,

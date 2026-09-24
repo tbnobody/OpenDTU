@@ -31,6 +31,7 @@ enum FieldId_t {
     FLD_UAC, // AC Voltage
     FLD_IAC, // AC Current
     FLD_PAC, // AC Power
+    FLD_MPAC, // Max AC Power
     FLD_F, // Frequency
     FLD_T, // Temperature
     FLD_MT, // MaxTemperature
@@ -51,7 +52,7 @@ enum FieldId_t {
     FLD_IAC_3
 };
 const char* const fields[] = { "Voltage", "Current", "Power", "YieldDay", "YieldTotal",
-    "Voltage", "Current", "Power", "Frequency", "Temperature", "MaxTemperature", "PowerFactor", "Efficiency", "Irradiation", "ReactivePower", "EventLogCount",
+    "Voltage", "Current", "Power", "MaxDailyPower", "Frequency", "Temperature", "MaxTemperature", "PowerFactor", "Efficiency", "Irradiation", "ReactivePower", "EventLogCount",
     "Voltage Ph1-N", "Voltage Ph2-N", "Voltage Ph3-N", "Voltage Ph1-Ph2", "Voltage Ph2-Ph3", "Voltage Ph3-Ph1", "Current Ph1", "Current Ph2", "Current Ph3" };
 
 // indices to calculation functions, defined in hmInverter.h
@@ -64,6 +65,7 @@ enum {
     CALC_CH_IRR,
     CALC_TOTAL_IAC,
     CALC_MAX_TEMPERATURE,
+    CALC_MAX_PAC,
 };
 enum { CMD_CALC = 0xffff };
 
@@ -160,6 +162,9 @@ public:
     float getMaxTemperature() const;
     void setMaxTemperature(const float temperature);
 
+    float getMaxDailyPower() const;
+    void setMaxDailyPower(const float power);
+
 private:
     void zeroFields(const FieldId_t* fields);
 
@@ -179,4 +184,5 @@ private:
     float _lastYieldDay[CH_CNT] = {};
 
     float _maxTemperature = 0;
+    float _maxDailyPower = 0;
 };

@@ -16,6 +16,7 @@ static float calcTotalEffiency(StatisticsParser* iv, uint8_t arg0);
 static float calcChIrradiation(StatisticsParser* iv, uint8_t arg0);
 static float calcTotalCurrentAc(StatisticsParser* iv, uint8_t arg0);
 static float calcMaxTemperature(StatisticsParser* iv, uint8_t arg0);
+static float calcMaxDailyPower(StatisticsParser* iv, uint8_t arg0);
 
 using func_t = float(StatisticsParser*, uint8_t);
 
@@ -33,6 +34,7 @@ const calcFunc_t calcFunctions[] = {
     { CALC_CH_IRR, &calcChIrradiation },
     { CALC_TOTAL_IAC, &calcTotalCurrentAc },
     { CALC_MAX_TEMPERATURE, &calcMaxTemperature },
+    { CALC_MAX_PAC, &calcMaxDailyPower },
 };
 
 const FieldId_t runtimeFields[] = {
@@ -346,6 +348,7 @@ void StatisticsParser::zeroDailyYieldData()
 void StatisticsParser::zeroDailyRuntimeData()
 {
     _maxTemperature = 0;
+    _maxDailyPower = 0;
 }
 
 void StatisticsParser::setLastUpdate(const uint32_t lastUpdate)
@@ -382,6 +385,16 @@ float StatisticsParser::getMaxTemperature() const
 void StatisticsParser::setMaxTemperature(const float temperature)
 {
     _maxTemperature = temperature;
+}
+
+float StatisticsParser::getMaxDailyPower() const
+{
+    return _maxDailyPower;
+}
+
+void StatisticsParser::setMaxDailyPower(const float power)
+{
+    _maxDailyPower = power;
 }
 
 void StatisticsParser::zeroFields(const FieldId_t* fields)
@@ -489,4 +502,17 @@ static float calcMaxTemperature(StatisticsParser* iv, uint8_t arg0)
     }
 
     return maxTemp;
+}
+
+static float calcMaxDailyPower(StatisticsParser* iv, uint8_t arg0)
+{
+    auto power = iv->getChannelFieldValue(TYPE_AC, CH0, FLD_PAC);
+    auto maxPower = iv->getMaxDailyPower();
+
+    if (power > maxPower) {
+        maxPower = power;
+        iv->setMaxDailyPower(maxPower);
+    }
+
+    return maxPower;
 }

@@ -399,6 +399,7 @@
         },
         "inverterchannelproperty": {
             "Power": "Ισχύς",
+            "MaxDailyPower": "Max Power",
             "Voltage": "Τάση",
             "Current": "Ένταση",
             "Power DC": "Ισχύ DC",
