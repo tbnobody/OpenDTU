@@ -406,6 +406,7 @@
             "YieldTotal": "Σύνολο απόδοσης",
             "Frequency": "Συχνότητα",
             "Temperature": "Θερμοκρασία",
+            "MaxTemperature": "Max Temperature",
             "PowerFactor": "Συντελεστής ισχύος",
             "ReactivePower": "Αέργου Ισχύς",
             "Efficiency": "Αποδοτικότητα",

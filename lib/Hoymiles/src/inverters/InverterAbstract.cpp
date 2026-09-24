@@ -305,8 +305,9 @@ void InverterAbstract::performDailyTask()
     // Have to reset the offets first, otherwise it will
     // Substract the offset from zero which leads to a high value
     Statistics()->resetYieldDayCorrection();
+    Statistics()->zeroDailyRuntimeData();
     if (getZeroYieldDayOnMidnight()) {
-        Statistics()->zeroDailyData();
+        Statistics()->zeroDailyYieldData();
     }
     if (getClearEventlogOnMidnight()) {
         EventLog()->clearBuffer();

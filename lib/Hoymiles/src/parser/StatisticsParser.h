@@ -8,13 +8,13 @@
 
 // units
 enum UnitId_t {
-    UNIT_V = 0,
-    UNIT_A,
-    UNIT_W,
-    UNIT_WH,
-    UNIT_KWH,
-    UNIT_HZ,
-    UNIT_C,
+    UNIT_V = 0, // Voltage
+    UNIT_A, // Ampere
+    UNIT_W, // Watt
+    UNIT_WH, // Watt hours
+    UNIT_KWH, // Kilo watt hours
+    UNIT_HZ, // Hertz
+    UNIT_C, // Celsius
     UNIT_PCT,
     UNIT_VAR,
     UNIT_NONE
@@ -23,21 +23,22 @@ const char* const units[] = { "V", "A", "W", "Wh", "kWh", "Hz", "°C", "%", "var
 
 // field types
 enum FieldId_t {
-    FLD_UDC = 0,
-    FLD_IDC,
-    FLD_PDC,
-    FLD_YD,
-    FLD_YT,
-    FLD_UAC,
-    FLD_IAC,
-    FLD_PAC,
-    FLD_F,
-    FLD_T,
-    FLD_PF,
-    FLD_EFF,
-    FLD_IRR,
-    FLD_Q,
-    FLD_EVT_LOG,
+    FLD_UDC = 0, // DC Voltage
+    FLD_IDC, // DC Current
+    FLD_PDC, // DC Power
+    FLD_YD, // YieldDay
+    FLD_YT, // YieldTotal
+    FLD_UAC, // AC Voltage
+    FLD_IAC, // AC Current
+    FLD_PAC, // AC Power
+    FLD_F, // Frequency
+    FLD_T, // Temperature
+    FLD_MT, // MaxTemperature
+    FLD_PF, // PowerFactor
+    FLD_EFF, // Efficiency
+    FLD_IRR, // Irradiation
+    FLD_Q, // ReactivePower
+    FLD_EVT_LOG, // EventLogCount
     // HMT only
     FLD_UAC_1N,
     FLD_UAC_2N,
@@ -50,7 +51,7 @@ enum FieldId_t {
     FLD_IAC_3
 };
 const char* const fields[] = { "Voltage", "Current", "Power", "YieldDay", "YieldTotal",
-    "Voltage", "Current", "Power", "Frequency", "Temperature", "PowerFactor", "Efficiency", "Irradiation", "ReactivePower", "EventLogCount",
+    "Voltage", "Current", "Power", "Frequency", "Temperature", "MaxTemperature", "PowerFactor", "Efficiency", "Irradiation", "ReactivePower", "EventLogCount",
     "Voltage Ph1-N", "Voltage Ph2-N", "Voltage Ph3-N", "Voltage Ph1-Ph2", "Voltage Ph2-Ph3", "Voltage Ph3-Ph1", "Current Ph1", "Current Ph2", "Current Ph3" };
 
 // indices to calculation functions, defined in hmInverter.h
@@ -61,7 +62,8 @@ enum {
     CALC_TOTAL_PDC,
     CALC_TOTAL_EFF,
     CALC_CH_IRR,
-    CALC_TOTAL_IAC
+    CALC_TOTAL_IAC,
+    CALC_MAX_TEMPERATURE,
 };
 enum { CMD_CALC = 0xffff };
 
@@ -141,7 +143,8 @@ public:
     uint32_t getRxFailureCount() const;
 
     void zeroRuntimeData();
-    void zeroDailyData();
+    void zeroDailyYieldData();
+    void zeroDailyRuntimeData();
     void resetYieldDayCorrection();
 
     // Update time when new data from the inverter is received
@@ -153,6 +156,9 @@ public:
 
     bool getYieldDayCorrection() const;
     void setYieldDayCorrection(const bool enabled);
+
+    float getMaxTemperature() const;
+    void setMaxTemperature(const float temperature);
 
 private:
     void zeroFields(const FieldId_t* fields);
@@ -171,4 +177,6 @@ private:
 
     bool _enableYieldDayCorrection = false;
     float _lastYieldDay[CH_CNT] = {};
+
+    float _maxTemperature = 0;
 };

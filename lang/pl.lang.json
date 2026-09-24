@@ -406,6 +406,7 @@
             "YieldTotal": "Całkowita produkcja energii",
             "Frequency": "Częstotliwość",
             "Temperature": "Temperatura",
+            "MaxTemperature": "Max Temperature",
             "PowerFactor": "Współczynnik mocy",
             "ReactivePower": "Moc bierna",
             "Efficiency": "Wydajność",

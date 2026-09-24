@@ -55,7 +55,8 @@ static const byteAssign_t byteAssignment[] = {
     { TYPE_INV, CH0, FLD_YD, UNIT_WH, CALC_TOTAL_YD, 0, CMD_CALC, false, 0 },
     { TYPE_INV, CH0, FLD_YT, UNIT_KWH, CALC_TOTAL_YT, 0, CMD_CALC, false, 3 },
     { TYPE_INV, CH0, FLD_PDC, UNIT_W, CALC_TOTAL_PDC, 0, CMD_CALC, false, 1 },
-    { TYPE_INV, CH0, FLD_EFF, UNIT_PCT, CALC_TOTAL_EFF, 0, CMD_CALC, false, 3 }
+    { TYPE_INV, CH0, FLD_EFF, UNIT_PCT, CALC_TOTAL_EFF, 0, CMD_CALC, false, 3 },
+    { TYPE_INV, CH0, FLD_MT, UNIT_C, CALC_MAX_TEMPERATURE, 0, CMD_CALC, true, 1 },
 };
 
 HMT_4CH::HMT_4CH(HoymilesRadio* radio, const uint64_t serial)

@@ -406,6 +406,7 @@
             "YieldTotal": "EnergiaTotale",
             "Frequency": "Frequenza",
             "Temperature": "Temperatura",
+            "MaxTemperature": "Max Temperature",
             "PowerFactor": "FattorePotenza",
             "ReactivePower": "PotenzaReattiva",
             "Efficiency": "Efficienza",

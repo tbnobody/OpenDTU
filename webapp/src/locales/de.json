@@ -393,6 +393,7 @@
         "YieldTotal": "Gesamtertrag",
         "Frequency": "Frequenz",
         "Temperature": "Temperatur",
+        "MaxTemperature": "Max. Temperatur",
         "PowerFactor": "Leistungsfaktor",
         "ReactivePower": "Blindleistung",
         "Efficiency": "Wirkungsgrad",

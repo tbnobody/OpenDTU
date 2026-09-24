@@ -393,6 +393,7 @@
         "YieldTotal": "YieldTotal",
         "Frequency": "Frequency",
         "Temperature": "Temperature",
+        "MaxTemperature": "Max Temperature",
         "PowerFactor": "PowerFactor",
         "ReactivePower": "ReactivePower",
         "Efficiency": "Efficiency",

@@ -29,7 +29,7 @@ private:
         MetricType_t type;
     };
 
-    const publish_type_t _publishFields[14] = {
+    const publish_type_t _publishFields[15] = {
         { FLD_PAC, MetricType_t::GAUGE },
         { FLD_UAC, MetricType_t::GAUGE },
         { FLD_IAC, MetricType_t::GAUGE },
@@ -40,6 +40,7 @@ private:
         { FLD_YT, MetricType_t::COUNTER },
         { FLD_F, MetricType_t::GAUGE },
         { FLD_T, MetricType_t::GAUGE },
+        { FLD_MT, MetricType_t::GAUGE },
         { FLD_PF, MetricType_t::GAUGE },
         { FLD_Q, MetricType_t::GAUGE },
         { FLD_EFF, MetricType_t::GAUGE },
