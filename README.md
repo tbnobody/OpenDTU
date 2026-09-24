@@ -43,4 +43,17 @@ Generated using: `git log --date=short --pretty=format:"* %h%x09%ad%x09%s" | gre
 
 ## Currently supported Inverters
 
-A list of all currently supported inverters can be found [here](https://www.opendtu.solar/hardware/inverter_overview/)
+A list of all currently supported inverters can be found in the [supported inverter overview](https://www.opendtu.solar/hardware/inverter_overview/).
+
+## LLM/AI Development Policy
+
+LLM output is expressly prohibited for any direct communication, including the following:
+
+- issues or comments
+- feature requests or comments
+- pull request bodies or comments
+- forum/chat/etc. posts or comments
+
+In short, if you are posting **any** of those things, the output must be your own words, explanation, description, etc., not a verbatim dump of an LLM's output. We expect you to understand what you're posting. Violating this rule will result in closure/deletion of the offending item(s).
+
+An exception will be made for **LLM-assisted translations** if you are having trouble accurately conveying your intent in English. Please explicitly note this ("I have translated this from MyLanguage with an LLM") and, if possible, post in your original language as well.
