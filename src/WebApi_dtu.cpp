@@ -8,6 +8,7 @@
 #include "WebApi_errors.h"
 #include <AsyncJson.h>
 #include <Hoymiles.h>
+#include <HoymilesUtils.h>
 
 WebApiDtuClass::WebApiDtuClass()
     : _applyDataTask(TASK_IMMEDIATE, TASK_ONCE, std::bind(&WebApiDtuClass::applyDataTaskCb, this))
@@ -50,11 +51,7 @@ void WebApiDtuClass::onDtuAdminGet(AsyncWebServerRequest* request)
     const CONFIG_T& config = Configuration.get();
 
     // DTU Serial is read as HEX
-    char buffer[sizeof(uint64_t) * 8 + 1];
-    snprintf(buffer, sizeof(buffer), "%0" PRIx32 "%08" PRIx32,
-        static_cast<uint32_t>((config.Dtu.Serial >> 32) & 0xFFFFFFFF),
-        static_cast<uint32_t>(config.Dtu.Serial & 0xFFFFFFFF));
-    root["serial"] = buffer;
+    root["serial"] = HoymilesUtils::formatSerial(config.Dtu.Serial);
     root["pollinterval"] = config.Dtu.PollInterval;
     root["nrf_enabled"] = Hoymiles.getRadioNrf()->isInitialized();
     root["nrf_palevel"] = config.Dtu.Nrf.PaLevel;

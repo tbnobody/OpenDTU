@@ -4,6 +4,7 @@
  */
 #include "InverterAbstract.h"
 #include "crc.h"
+#include <HoymilesUtils.h>
 #include <cstring>
 #include <esp_log.h>
 
@@ -15,11 +16,7 @@ InverterAbstract::InverterAbstract(HoymilesRadio* radio, const uint64_t serial)
     _serial.u64 = serial;
     _radio = radio;
 
-    char serial_buff[sizeof(uint64_t) * 8 + 1];
-    snprintf(serial_buff, sizeof(serial_buff), "%0" PRIx32 "%08" PRIx32,
-        static_cast<uint32_t>((serial >> 32) & 0xFFFFFFFF),
-        static_cast<uint32_t>(serial & 0xFFFFFFFF));
-    _serialString = serial_buff;
+    _serialString = HoymilesUtils::formatSerial(serial);
 
     _alarmLogParser.reset(new AlarmLogParser());
     _devInfoParser.reset(new DevInfoParser());
@@ -337,5 +334,5 @@ bool InverterAbstract::isTransactionComplete() const
 
 void InverterAbstract::resetRadioStats()
 {
-    RadioStats = {};
+    RadioStats = { };
 }

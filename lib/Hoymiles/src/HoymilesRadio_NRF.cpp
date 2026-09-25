@@ -4,7 +4,7 @@
  */
 #include "HoymilesRadio_NRF.h"
 #include "Hoymiles.h"
-#include "Utils.h"
+#include "HoymilesUtils.h"
 #include "commands/RequestFrameCommand.h"
 #include <Every.h>
 #include <FunctionalInterrupt.h>
@@ -79,7 +79,7 @@ void HoymilesRadio_NRF::loop()
             if (nullptr != inv) {
                 // Save packet in inverter rx buffer
                 ESP_LOGD(TAG, "RX Channel: %" PRIu8 " --> %s | %" PRId8 " dBm",
-                    f.channel, Utils::dumpArray(f.fragment, f.len).c_str(), f.rssi);
+                    f.channel, HoymilesUtils::dumpArray(f.fragment, f.len).c_str(), f.rssi);
 
                 inv->addRxFragment(f.fragment, f.len, f.rssi);
             } else {
@@ -167,7 +167,6 @@ uint8_t HoymilesRadio_NRF::getTxNxtChannel()
     // For example, if we are on channel 61, we will sync start of transmitting to channel 75
     _rxChIdx = (_rxChIdx + addCh) % sizeof(_rxChLst);
     return _rxChLst[_rxChIdx];
-
 }
 
 void HoymilesRadio_NRF::switchRxCh(bool const immediately)
@@ -205,8 +204,8 @@ void HoymilesRadio_NRF::sendEsbPacket(CommandAbstract& cmd)
     // the Automatic Retry Delay and the Automatic Retry Attempts are dynamically adjusted based
     // on the payload to optimize transmission time and success rate.
     uint8_t dataSize = std::min<uint8_t>(cmd.getDataSize(), sizeof(_ARD) - 1);
-    uint8_t ard = _ARD[dataSize];   // ARD based on payload size, 0-32 bytes
-    uint8_t art = 9;                // ART = 9 means that we try to send the packet up to 10 times
+    uint8_t ard = _ARD[dataSize]; // ARD based on payload size, 0-32 bytes
+    uint8_t art = 9; // ART = 9 means that we try to send the packet up to 10 times
     _radio->setRetries(ard, art);
 
     ESP_LOGD(TAG, "TX %s Channel: %" PRIu8 " --> %s",
@@ -220,8 +219,13 @@ void HoymilesRadio_NRF::sendEsbPacket(CommandAbstract& cmd)
     _rxTimeout.set(cmd.getTimeout());
 
     _txCounter++;
-    if (!result) { _txFailCounter++; }
-    if (_txCounter > 100000) { _txCounter /= 2; _txFailCounter /= 2; }
+    if (!result) {
+        _txFailCounter++;
+    }
+    if (_txCounter > 100000) {
+        _txCounter /= 2;
+        _txFailCounter /= 2;
+    }
 
     ESP_LOGD(TAG, "TX Result: %s, ARC Count: %u, Rx-Channel: %u", result ? "Ok" : "Fail",
         _radio->getARC(), _radio->getChannel());
