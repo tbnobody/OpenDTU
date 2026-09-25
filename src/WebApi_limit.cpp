@@ -36,15 +36,7 @@ void WebApiLimitClass::onLimitStatus(AsyncWebServerRequest* request)
         root[serial]["max_power"] = inv->DevInfo()->getMaxPower();
 
         LastCommandSuccess status = inv->SystemConfigPara()->getLastLimitCommandSuccess();
-        String limitStatus = "Unknown";
-        if (status == LastCommandSuccess::CMD_OK) {
-            limitStatus = "Ok";
-        } else if (status == LastCommandSuccess::CMD_NOK) {
-            limitStatus = "Failure";
-        } else if (status == LastCommandSuccess::CMD_PENDING) {
-            limitStatus = "Pending";
-        }
-        root[serial]["limit_set_status"] = limitStatus;
+        root[serial]["limit_set_status"] = WebApi.formatCommandStatus(status);
     }
 
     WebApi.sendJsonResponse(request, response, __FUNCTION__, __LINE__);

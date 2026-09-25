@@ -29,15 +29,7 @@ void WebApiPowerClass::onPowerStatus(AsyncWebServerRequest* request)
         auto inv = Hoymiles.getInverterByPos(i);
 
         LastCommandSuccess status = inv->PowerCommand()->getLastPowerCommandSuccess();
-        String limitStatus = "Unknown";
-        if (status == LastCommandSuccess::CMD_OK) {
-            limitStatus = "Ok";
-        } else if (status == LastCommandSuccess::CMD_NOK) {
-            limitStatus = "Failure";
-        } else if (status == LastCommandSuccess::CMD_PENDING) {
-            limitStatus = "Pending";
-        }
-        root[inv->serialString()]["power_set_status"] = limitStatus;
+        root[inv->serialString()]["power_set_status"] = WebApi.formatCommandStatus(status);
     }
 
     WebApi.sendJsonResponse(request, response, __FUNCTION__, __LINE__);
