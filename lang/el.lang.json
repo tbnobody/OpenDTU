@@ -275,6 +275,7 @@
             "Name": "Ονομα",
             "StackFree": "Stack Free",
             "Priority": "Προτεραιότητα",
+            "Core": "Πυρήνας",
             "Task_idle0": "Αδράνεια (CPU Core 0)",
             "Task_idle1": "Αδράνεια (CPU Core 1)",
             "Task_wifi": "Wi-Fi",

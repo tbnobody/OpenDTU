@@ -7,11 +7,13 @@
                         <th>{{ $t('taskdetails.Name') }}</th>
                         <th>{{ $t('taskdetails.StackFree') }}</th>
                         <th>{{ $t('taskdetails.Priority') }}</th>
+                        <th>{{ $t('taskdetails.Core') }}</th>
                     </tr>
                     <tr v-for="task in taskDetails" v-bind:key="task.name">
                         <td>{{ $te(taskLangToken(task.name)) ? $t(taskLangToken(task.name)) : task.name }}</td>
                         <td>{{ $n(task.stack_watermark, 'byte') }}</td>
                         <td>{{ task.priority }}</td>
+                        <td>{{ task.core }}</td>
                     </tr>
                 </tbody>
             </table>
