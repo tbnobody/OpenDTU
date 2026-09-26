@@ -203,7 +203,7 @@
             "FirmwareBuildDate": "Data oprogramowania sprzętowego",
             "HardwarePartNumber": "Numer części sprzętu",
             "HardwareVersion": "Wersja sprzętu",
-            "SupportsPowerDistributionLogic": "'Power Distribution Logic' supported",
+            "SupportsPowerDistributionLogic": "Obsługa funkcji 'Power Distribution Logic'",
             "Yes": "@:base.Yes",
             "No": "@:base.No"
         },
@@ -383,7 +383,7 @@
             "Download": "Pobierz",
             "RegularExpression": "Wyrażenie regularne",
             "Lines": "{lines} Linii",
-            "LogLevel": "Log Level ({cnt})"
+            "LogLevel": "Poziom logowania ({cnt})"
         },
         "inverterchannelinfo": {
             "String": "Numer panelu {num}",
@@ -658,7 +658,7 @@
             "TimeSyncLink": "Sprawdź ustawienia daty/godziny.",
             "DefaultPassword": "Używasz domyślnego hasła, aby uzyskać dostęp do interfejsu internetowego i do awaryjnego trybu punktu dostępu. Może to prowadzić do zagrożenia bezpieczeństwa.",
             "DefaultPasswordLink": "Zmień hasło.",
-            "PinMappingIssue": "You are using a generic firmware image, but have not yet uploaded a file with device profiles (<code>pin_mapping.json</code>) or have not selected a profile defined there. Please refer to the <a href=\"https://opendtu.solar/firmware/device_profiles/\" target=\"_blank\" class=\"alert-link\">documentation</a> for details."
+            "PinMappingIssue": "Używasz ogólnego obrazu oprogramowania układowego, ale nie przesłano jeszcze pliku z profilami urządzeń (<code>pin_mapping.json</code>) ani nie wybrano zdefiniowanego w nim profilu. Szczegółowe informacje znajdziesz w <a href=\"https://opendtu.solar/firmware/device_profiles/\" target=\"_blank\" class=\"alert-link\">dokumentacji</a>."
         },
         "deviceadmin": {
             "DeviceManager": "Menedżer urządzeń",
@@ -694,9 +694,7 @@
             "LedBrightness": "Dioda LED {led}, Jasność ({brightness})"
         },
         "pininfo": {
-            "Category": "Kategoria",
             "Name": "Nazwa",
-            "Number": "Numer",
             "ValueSelected": "Wybrana",
             "ValueActive": "Aktywna"
         },
@@ -709,7 +707,7 @@
         },
         "loggingadmin": {
             "LoggingSettings": "Ustawienia logowania",
-            "LogLevel": "Log Level",
+            "LogLevel": "Poziom logowania",
             "DefaultLevel": "Default log level",
             "Module": "Moduł",
             "Module_CORE": "Rdzeń ESP-IDF",
@@ -719,7 +717,7 @@
             "Module_webapi": "Interfejs API Web",
             "Module_async_ws": "Async WebSockets",
             "Module_async_tcp": "Async TCP",
-            "CoreHint": "Warning: A too detailed log level of the CORE module can significantly impact performance and lead to unpredictable behavior. The log level setting should only be temporarily adjusted for targeted troubleshooting. The default setting 'Error' is sufficient for normal operation.",
+            "CoreHint": "Ostrzeżenie: zbyt szczegółowy poziom logowania modułu CORE może znacząco obniżyć wydajność i prowadzić do nieprzewidywalnego działania. Poziom logowania należy zmieniać tylko tymczasowo, na potrzeby konkretnej diagnostyki. Domyślne ustawienie „Error” jest wystarczające do normalnej pracy.",
             "log_inherit": "Inherit from default",
             "log_none": "None",
             "log_error": "(E) Error",
