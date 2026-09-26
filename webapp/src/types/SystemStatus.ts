@@ -2,6 +2,7 @@ export interface TaskDetail {
     name: string;
     stack_watermark: number;
     priority: number;
+    core: number;
 }
 
 export interface SystemStatus {

@@ -70,6 +70,7 @@ void WebApiSysstatusClass::onSystemStatus(AsyncWebServerRequest* request)
         task["name"] = task_name;
         task["stack_watermark"] = uxTaskGetStackHighWaterMark(handle);
         task["priority"] = uxTaskPriorityGet(handle);
+        task["core"] = xTaskGetAffinity(handle);
     }
 
     String reason;

@@ -277,6 +277,7 @@
             "Name": "Name",
             "StackFree": "Stack Free",
             "Priority": "Priority",
+            "Core": "Núcleo",
             "Task_idle0": "Idle (CPU Core 0)",
             "Task_idle1": "Idle (CPU Core 1)",
             "Task_wifi": "Wi-Fi",
