@@ -5,6 +5,7 @@
 #include <DNSServer.h>
 #include <TaskSchedulerDeclarations.h>
 #include <WiFi.h>
+#include <atomic>
 #include <vector>
 
 enum class network_mode {
@@ -53,6 +54,9 @@ public:
     static String getHostname();
     bool isConnected() const;
     network_mode NetworkMode() const;
+    const char* getStationConnectionState() const;
+    int getStationDisconnectReason() const;
+    int getStationRetryIn() const;
 
     bool onEvent(DtuNetworkEventCb cbEvent, const network_event event = network_event::NETWORK_EVENT_MAX);
     void raiseEvent(const network_event event);
@@ -72,11 +76,14 @@ private:
     static constexpr byte DNS_PORT = 53;
 
     bool _adminEnabled = true;
-    bool _performConnection = true;
+    std::atomic<bool> _performConnection { true };
+    // Wi-Fi callbacks and status requests run on separate tasks from the scheduler.
+    std::atomic<bool> _stationAssociated { false };
+    std::atomic<int> _stationDisconnectReason { -1 };
     uint32_t _adminTimeoutCounter = 0;
     uint32_t _adminTimeoutCounterMax = 0;
     uint32_t _connectTimeoutTimer = 0;
-    uint32_t _connectRedoTimer = 0;
+    std::atomic<uint32_t> _connectRedoTimer { 0 };
     uint32_t _lastReconnectAttempt = 0;
     uint32_t _lastTimerCall = 0;
     IPAddress _apIp;

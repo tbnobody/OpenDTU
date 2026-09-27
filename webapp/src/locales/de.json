@@ -289,6 +289,35 @@
         "NotConfigured": "nicht konfiguriert",
         "Unknown": "unbekannt"
     },
+    "networkstatus": {
+        "Title": "Aktueller Netzwerkstatus",
+        "Unavailable": "OpenDTU ist nicht erreichbar. Verbinde dich erneut mit seinem AccessPoint oder dem Heimnetz. Der Status wird automatisch aktualisiert; der letzte Verbindungsstatus ist nicht mehr aktuell.",
+        "TargetSsid": "Gespeichertes WLAN",
+        "ConnectedSsid": "Verbundenes WLAN",
+        "NextAttempt": "Nächster Verbindungsversuch",
+        "RetryIn": "In {seconds} Sekunden",
+        "DisconnectReason": "Letzte Trennung",
+        "AccessPoint": "OpenDTU-AccessPoint",
+        "EthernetConnected": "Ethernet verbunden",
+        "EthernetDisconnected": "Ethernet getrennt",
+        "States": {
+            "not_configured": "Kein WLAN eingerichtet",
+            "disabled": "WLAN-Station deaktiviert",
+            "paused": "WLAN-Verbindungsversuche pausieren, damit der AccessPoint nutzbar bleibt",
+            "connecting": "Verbindung zum gespeicherten WLAN wird hergestellt",
+            "waiting_for_ip": "WLAN verbunden; wartet auf eine IP-Adresse",
+            "connected": "WLAN verbunden"
+        },
+        "Reasons": {
+            "StationLeft": "Station hat das WLAN verlassen",
+            "HandshakeTimeout": "Zeitüberschreitung beim Handshake; Passwort und Signal prüfen",
+            "SignalLost": "WLAN-Signal verloren",
+            "NetworkNotFound": "WLAN nicht gefunden",
+            "AuthenticationFailed": "Anmeldung fehlgeschlagen; WLAN-Passwort prüfen",
+            "AssociationFailed": "Verbindung zum WLAN-AccessPoint fehlgeschlagen",
+            "Other": "Verbindung getrennt"
+        }
+    },
     "networkinfo": {
         "NetworkInformation": "Netzwerkinformationen"
     },
@@ -481,6 +510,13 @@
         "SynchronizeTimeHint": "<b>Hinweis:</b> Du kannst die manuelle Zeitsynchronisation verwenden, um die aktuelle Zeit von OpenDTU auf die Zeit deines Browsers einzustellen, wenn kein NTP-Server verfügbar ist. Beachte aber, dass im Falle eines Stromausfalls die Zeit verloren geht. Beachte auch, dass die Zeitgenauigkeit stark verzerrt wird, da sie nicht regelmäßig neu synchronisiert werden kann und der ESP32-Mikrocontroller nicht über eine Echtzeituhr verfügt."
     },
     "networkadmin": {
+        "ShowPassword": "Passwort anzeigen",
+        "HidePassword": "Passwort verbergen",
+        "ApCoexistenceHint": "OpenDTU kann sich mit dem Heim-WLAN verbinden und gleichzeitig seinen eigenen AccessPoint bereitstellen. Dieser bietet lokalen Zugriff auf OpenDTU; er leitet keinen Internetzugang weiter.",
+        "ReconnectHint": "Das Speichern der Netzwerkeinstellungen kann diese Seite kurz unterbrechen. Verbinde dich erneut mit dem OpenDTU-AccessPoint oder dem Heim-WLAN und öffne OpenDTU wieder. Solange die Verbindung zum Heimnetz fehlt, bleibt der AccessPoint verfügbar; nach erfolgreicher Verbindung gilt das Zeitlimit unten.",
+        "Saving": "Netzwerkeinstellungen werden gespeichert…",
+        "LoadFailed": "Netzwerkeinstellungen konnten nicht geladen werden. Verbinde dich erneut mit OpenDTU und versuche es mit Neu laden noch einmal.",
+        "SaveUnconfirmed": "Das Speichern konnte nicht bestätigt werden. Eine Netzwerkänderung könnte die Verbindung zu dieser Seite unterbrochen haben. Verbinde dich erneut mit OpenDTU und lade die Einstellungen zur Kontrolle neu, bevor du erneut speicherst.",
         "NetworkSettings": "Netzwerkeinstellungen",
         "WifiConfiguration": "WLAN-Konfiguration",
         "WifiSsid": "WLAN-SSID",

@@ -289,6 +289,35 @@
         "NotConfigured": "not configured",
         "Unknown": "Unknown"
     },
+    "networkstatus": {
+        "Title": "Live network status",
+        "Unavailable": "Cannot reach OpenDTU. Reconnect to its access point or home network. Status will refresh automatically; the last connection state is no longer current.",
+        "TargetSsid": "Saved WiFi network",
+        "ConnectedSsid": "Connected WiFi network",
+        "NextAttempt": "Next connection attempt",
+        "RetryIn": "In {seconds} seconds",
+        "DisconnectReason": "Last disconnection",
+        "AccessPoint": "OpenDTU access point",
+        "EthernetConnected": "Ethernet connected",
+        "EthernetDisconnected": "Ethernet disconnected",
+        "States": {
+            "not_configured": "No WiFi network configured",
+            "disabled": "WiFi station disabled",
+            "paused": "WiFi retry paused to keep the access point usable",
+            "connecting": "Connecting to the saved WiFi network",
+            "waiting_for_ip": "WiFi joined; waiting for an IP address",
+            "connected": "WiFi connected"
+        },
+        "Reasons": {
+            "StationLeft": "Station left the network",
+            "HandshakeTimeout": "Handshake timed out; check password and signal",
+            "SignalLost": "WiFi signal lost",
+            "NetworkNotFound": "WiFi network not found",
+            "AuthenticationFailed": "Authentication failed; check the WiFi password",
+            "AssociationFailed": "Could not join the WiFi access point",
+            "Other": "Disconnected"
+        }
+    },
     "networkinfo": {
         "NetworkInformation": "Network Information"
     },
@@ -481,6 +510,13 @@
         "SynchronizeTimeHint": "<b>Hint:</b> You can use the manual time synchronization to set the current time of OpenDTU if no NTP server is available. But be aware, that in case of power cycle the time gets lost. Also note that time accuracy will be skewed badly, as it can not be resynchronised regularly and the ESP32 microcontroller does not have a real time clock."
     },
     "networkadmin": {
+        "ShowPassword": "Show password",
+        "HidePassword": "Hide password",
+        "ApCoexistenceHint": "OpenDTU can connect to your home WiFi while keeping its own access point available. Its access point provides local access to OpenDTU; it does not forward Internet access.",
+        "ReconnectHint": "Saving network settings may briefly interrupt this page. Reconnect to OpenDTU’s access point or your home WiFi, then reopen OpenDTU. The access point stays available while the home connection is unavailable; after connecting, the timeout below applies.",
+        "Saving": "Saving network settings…",
+        "LoadFailed": "Could not load network settings. Reconnect to OpenDTU and use Reload to try again.",
+        "SaveUnconfirmed": "Could not confirm that the settings were saved. A network change may have disconnected this page. Reconnect to OpenDTU and reload the settings to verify before saving again.",
         "NetworkSettings": "Network Settings",
         "WifiConfiguration": "WiFi Configuration",
         "WifiSsid": "WiFi SSID",
