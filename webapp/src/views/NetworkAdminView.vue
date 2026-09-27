@@ -18,6 +18,7 @@
 
         <form v-if="configLoaded" @submit="saveNetworkConfig" :aria-busy="saving">
             <CardElement :text="$t('networkadmin.WifiConfiguration')" textVariant="text-bg-primary">
+                <WifiNetworkScan v-model="networkConfigList.ssid" :disabled="saving" />
                 <InputElement
                     :label="$t('networkadmin.WifiSsid')"
                     v-model="networkConfigList.ssid"
@@ -158,6 +159,7 @@ import CardElement from '@/components/CardElement.vue';
 import FormFooter from '@/components/FormFooter.vue';
 import InputElement from '@/components/InputElement.vue';
 import NetworkConnectionStatus from '@/components/NetworkConnectionStatus.vue';
+import WifiNetworkScan from '@/components/WifiNetworkScan.vue';
 import type { AlertResponse } from '@/types/AlertResponse';
 import type { NetworkConfig } from '@/types/NetworkConfig';
 import { authHeader, handleResponse } from '@/utils/authentication';
@@ -171,6 +173,7 @@ export default defineComponent({
         FormFooter,
         InputElement,
         NetworkConnectionStatus,
+        WifiNetworkScan,
     },
     data() {
         return {
