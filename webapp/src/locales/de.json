@@ -509,6 +509,26 @@
         "SynchronizeTime": "Zeit synchronisieren",
         "SynchronizeTimeHint": "<b>Hinweis:</b> Du kannst die manuelle Zeitsynchronisation verwenden, um die aktuelle Zeit von OpenDTU auf die Zeit deines Browsers einzustellen, wenn kein NTP-Server verfügbar ist. Beachte aber, dass im Falle eines Stromausfalls die Zeit verloren geht. Beachte auch, dass die Zeitgenauigkeit stark verzerrt wird, da sie nicht regelmäßig neu synchronisiert werden kann und der ESP32-Mikrocontroller nicht über eine Echtzeituhr verfügt."
     },
+    "networkscan": {
+        "NearbyNetworks": "WLANs in der Nähe",
+        "SelectNetwork": "WLAN auswählen",
+        "Secured": "Verschlüsselt",
+        "Open": "Offen",
+        "Scan": "WLANs suchen",
+        "Refresh": "Aktualisieren",
+        "Scanning": "Suche läuft…",
+        "ManualHint": "Wähle ein WLAN aus oder gib unten eine SSID ein, auch für verborgene WLANs. Die Auswahl übernimmt nur die SSID; gib das zugehörige Passwort ein und wähle Speichern, um dich zu verbinden.",
+        "ScanningHint": "WLANs in der Nähe werden gesucht. Der Zugriff auf OpenDTU kann kurz langsamer werden.",
+        "Found": "Gefundene WLANs: {count}",
+        "NoNetworks": "Keine sichtbaren WLANs gefunden. Wähle Aktualisieren oder gib die SSID unten manuell ein.",
+        "Errors": {
+            "wifi_disabled": "Die WLAN-Suche ist bei aktiver Ethernet-Verbindung nicht verfügbar. Gib die SSID unten manuell ein.",
+            "busy": "OpenDTU versucht gerade, eine Verbindung herzustellen. Warte, bis der Versuch endet oder pausiert, und wähle dann Aktualisieren.",
+            "scan_failed": "Die WLAN-Suche ist fehlgeschlagen. Wähle Aktualisieren oder gib die SSID unten manuell ein.",
+            "timeout": "Die WLAN-Suche wurde nicht rechtzeitig abgeschlossen. Verbinde dich bei Bedarf erneut mit OpenDTU und wähle Aktualisieren.",
+            "unavailable": "Die WLAN-Suche konnte nicht abgerufen werden. Prüfe die Verbindung zu OpenDTU und wähle Aktualisieren."
+        }
+    },
     "networkadmin": {
         "ShowPassword": "Passwort anzeigen",
         "HidePassword": "Passwort verbergen",

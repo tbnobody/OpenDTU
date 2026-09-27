@@ -509,6 +509,26 @@
         "SynchronizeTime": "Synchronize Time",
         "SynchronizeTimeHint": "<b>Hint:</b> You can use the manual time synchronization to set the current time of OpenDTU if no NTP server is available. But be aware, that in case of power cycle the time gets lost. Also note that time accuracy will be skewed badly, as it can not be resynchronised regularly and the ESP32 microcontroller does not have a real time clock."
     },
+    "networkscan": {
+        "NearbyNetworks": "Nearby WiFi networks",
+        "SelectNetwork": "Select a network",
+        "Secured": "Secured",
+        "Open": "Open",
+        "Scan": "Scan networks",
+        "Refresh": "Refresh",
+        "Scanning": "Scanning…",
+        "ManualHint": "Choose a nearby network or enter an SSID below, including hidden networks. Selection fills the SSID only; enter its password and Save to connect.",
+        "ScanningHint": "Searching nearby WiFi networks. Access to OpenDTU may briefly slow down.",
+        "Found": "Networks found: {count}",
+        "NoNetworks": "No visible networks found. Try Refresh or enter the SSID manually below.",
+        "Errors": {
+            "wifi_disabled": "WiFi scanning is unavailable while Ethernet is active. Enter the SSID manually below.",
+            "busy": "OpenDTU is currently trying to connect. Wait for that attempt to finish or pause, then select Refresh.",
+            "scan_failed": "The WiFi scan failed. Select Refresh to try again, or enter the SSID manually below.",
+            "timeout": "The WiFi scan did not finish in time. Reconnect to OpenDTU if needed, then select Refresh.",
+            "unavailable": "Could not read the WiFi scan. Check your connection to OpenDTU, then select Refresh."
+        }
+    },
     "networkadmin": {
         "ShowPassword": "Show password",
         "HidePassword": "Hide password",
