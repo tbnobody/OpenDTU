@@ -257,19 +257,27 @@ void HoymilesRadio_CMT::loop()
                     if (_captureMode) {
                         ESP_LOGI(TAG, "CAPTURE: Unknown inverter (not configured)");
                     } else {
-                        ESP_LOGE(TAG, "Inverter Not found!");
+                        ESP_LOGE(TAG, "CMT discard: unknown inverter | %.2f MHz | %" PRId8 " dBm | len=%u | %s",
+                            getFrequencyFromChannel(f.channel) / 1000000.0, f.rssi, f.len,
+                            HoymilesUtils::dumpArray(f.fragment, f.len).c_str());
                     }
                 }
             } else if (_captureMode) {
                 ESP_LOGI(TAG, "CAPTURE: Frame not addressed to this DTU (foreign traffic)");
+            } else {
+                ESP_LOGD(TAG, "CMT discard: other DTU | %.2f MHz | %" PRId8 " dBm | len=%u | %s",
+                    getFrequencyFromChannel(f.channel) / 1000000.0, f.rssi, f.len,
+                    HoymilesUtils::dumpArray(f.fragment, f.len).c_str());
             }
 
         } else {
             if (_captureMode) {
                 ESP_LOGW(TAG, "CAPTURE: CRC failed | len=%u | %s",
-                    f.len, Utils::dumpArray(f.fragment, f.len).c_str());
+                    f.len, HoymilesUtils::dumpArray(f.fragment, f.len).c_str());
             } else {
-                ESP_LOGW(TAG, "Frame kaputt"); // ;-)
+                ESP_LOGW(TAG, "Frame kaputt | %.2f MHz | %" PRId8 " dBm | len=%u | %s",
+                    getFrequencyFromChannel(f.channel) / 1000000.0, f.rssi, f.len,
+                    HoymilesUtils::dumpArray(f.fragment, f.len).c_str());
             }
         }
 
