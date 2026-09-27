@@ -20,6 +20,8 @@ void WebApiNetworkClass::init(AsyncWebServer& server, Scheduler& scheduler)
     using std::placeholders::_1;
 
     server.on("/api/network/status", HTTP_GET, static_cast<ArRequestHandlerFunction>(std::bind(&WebApiNetworkClass::onNetworkStatus, this, _1)));
+    server.on("/api/network/scan", HTTP_GET, static_cast<ArRequestHandlerFunction>(std::bind(&WebApiNetworkClass::onNetworkScan, this, _1)));
+    server.on("/api/network/scan", HTTP_POST, static_cast<ArRequestHandlerFunction>(std::bind(&WebApiNetworkClass::onNetworkScan, this, _1)));
     server.on("/api/network/config", HTTP_GET, static_cast<ArRequestHandlerFunction>(std::bind(&WebApiNetworkClass::onNetworkAdminGet, this, _1)));
     server.on("/api/network/config", HTTP_POST, static_cast<ArRequestHandlerFunction>(std::bind(&WebApiNetworkClass::onNetworkAdminPost, this, _1)));
 
@@ -81,6 +83,30 @@ void WebApiNetworkClass::onNetworkAdminGet(AsyncWebServerRequest* request)
     root["sysloghostname"] = config.Syslog.Hostname;
     root["syslogport"] = config.Syslog.Port;
 
+    WebApi.sendJsonResponse(request, response, __FUNCTION__, __LINE__);
+}
+
+void WebApiNetworkClass::onNetworkScan(AsyncWebServerRequest* request)
+{
+    if (!WebApi.checkCredentials(request)) {
+        return;
+    }
+    if (request->method() == HTTP_POST) {
+        NetworkSettings.requestWifiScan();
+    }
+    const auto status = NetworkSettings.getWifiScanStatus();
+    AsyncJsonResponse* response = new AsyncJsonResponse();
+    auto& root = response->getRoot();
+    root["state"] = status.state;
+    root["error"] = status.error;
+    JsonArray networks = root["networks"].to<JsonArray>();
+    for (size_t i = 0; i < status.count; ++i) {
+        JsonObject network = networks.add<JsonObject>();
+        // The asynchronous response outlives this local snapshot; copy the SSID.
+        network["ssid"] = String(status.networks[i].ssid);
+        network["rssi"] = status.networks[i].rssi;
+        network["secure"] = status.networks[i].secure;
+    }
     WebApi.sendJsonResponse(request, response, __FUNCTION__, __LINE__);
 }
 
