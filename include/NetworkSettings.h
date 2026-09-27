@@ -5,6 +5,7 @@
 #include <DNSServer.h>
 #include <TaskSchedulerDeclarations.h>
 #include <WiFi.h>
+#include <atomic>
 #include <vector>
 
 enum class network_mode {
@@ -72,7 +73,7 @@ private:
     static constexpr byte DNS_PORT = 53;
 
     bool _adminEnabled = true;
-    bool _performConnection = true;
+    std::atomic<bool> _performConnection { true };
     uint32_t _adminTimeoutCounter = 0;
     uint32_t _adminTimeoutCounterMax = 0;
     uint32_t _connectTimeoutTimer = 0;
