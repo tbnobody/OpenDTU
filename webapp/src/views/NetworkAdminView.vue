@@ -1,5 +1,10 @@
 <template>
-    <BasePage :title="$t('networkadmin.NetworkSettings')" :isLoading="dataLoading">
+    <BasePage
+        :title="$t('networkadmin.NetworkSettings')"
+        :isLoading="dataLoading"
+        show-reload
+        @reload="getNetworkConfig"
+    >
         <BootstrapAlert
             v-model="alert.show"
             dismissible
@@ -9,7 +14,9 @@
             {{ alert.message }}
         </BootstrapAlert>
 
-        <form @submit="saveNetworkConfig">
+        <NetworkConnectionStatus class="mb-4" />
+
+        <form v-if="configLoaded" @submit="saveNetworkConfig" :aria-busy="saving">
             <CardElement :text="$t('networkadmin.WifiConfiguration')" textVariant="text-bg-primary">
                 <InputElement
                     :label="$t('networkadmin.WifiSsid')"
@@ -21,9 +28,18 @@
                 <InputElement
                     :label="$t('networkadmin.WifiPassword')"
                     v-model="networkConfigList.password"
-                    type="password"
+                    :type="showPassword ? 'text' : 'password'"
                     maxlength="64"
-                />
+                >
+                    <button
+                        type="button"
+                        class="btn btn-outline-secondary btn-sm mt-2"
+                        :aria-pressed="showPassword"
+                        @click="showPassword = !showPassword"
+                    >
+                        {{ $t(showPassword ? 'networkadmin.HidePassword' : 'networkadmin.ShowPassword') }}
+                    </button>
+                </InputElement>
 
                 <InputElement
                     :label="$t('networkadmin.Hostname')"
@@ -117,6 +133,8 @@
             </CardElement>
 
             <CardElement :text="$t('networkadmin.AdminAp')" textVariant="text-bg-primary" add-space>
+                <p>{{ $t('networkadmin.ApCoexistenceHint') }}</p>
+                <p>{{ $t('networkadmin.ReconnectHint') }}</p>
                 <InputElement
                     :label="$t('networkadmin.ApTimeout')"
                     v-model="networkConfigList.aptimeout"
@@ -127,6 +145,7 @@
                     :tooltip="$t('networkadmin.ApTimeoutHint')"
                 />
             </CardElement>
+            <p v-if="saving" class="mt-3" role="status">{{ $t('networkadmin.Saving') }}</p>
             <FormFooter @reload="getNetworkConfig" />
         </form>
     </BasePage>
@@ -138,6 +157,7 @@ import BootstrapAlert from '@/components/BootstrapAlert.vue';
 import CardElement from '@/components/CardElement.vue';
 import FormFooter from '@/components/FormFooter.vue';
 import InputElement from '@/components/InputElement.vue';
+import NetworkConnectionStatus from '@/components/NetworkConnectionStatus.vue';
 import type { AlertResponse } from '@/types/AlertResponse';
 import type { NetworkConfig } from '@/types/NetworkConfig';
 import { authHeader, handleResponse } from '@/utils/authentication';
@@ -150,10 +170,16 @@ export default defineComponent({
         CardElement,
         FormFooter,
         InputElement,
+        NetworkConnectionStatus,
     },
     data() {
         return {
             dataLoading: true,
+            configLoaded: false,
+            showPassword: false,
+            saving: false,
+            active: true,
+            configController: null as AbortController | null,
             networkConfigList: {} as NetworkConfig,
             alert: {} as AlertResponse,
         };
@@ -161,33 +187,74 @@ export default defineComponent({
     created() {
         this.getNetworkConfig();
     },
+    beforeUnmount() {
+        this.active = false;
+        this.showPassword = false;
+        this.configController?.abort();
+    },
     methods: {
-        getNetworkConfig() {
-            this.dataLoading = true;
-            fetch('/api/network/config', { headers: authHeader() })
-                .then((response) => handleResponse(response, this.$emitter, this.$router))
-                .then((data) => {
-                    this.networkConfigList = data;
-                    this.dataLoading = false;
+        async requestConfig(method: 'GET' | 'POST', body?: FormData) {
+            const controller = new AbortController();
+            this.configController = controller;
+            const timeout = window.setTimeout(() => controller.abort(), 10000);
+            try {
+                const response = await fetch('/api/network/config', {
+                    method,
+                    headers: authHeader(),
+                    body,
+                    signal: controller.signal,
+                    cache: 'no-store',
                 });
+                return await handleResponse(response, this.$emitter, this.$router, true);
+            } finally {
+                window.clearTimeout(timeout);
+                this.configController = null;
+            }
         },
-        saveNetworkConfig(e: Event) {
+        async getNetworkConfig() {
+            this.showPassword = false;
+            if (this.configController) return;
+            this.dataLoading = true;
+            try {
+                const data = await this.requestConfig('GET');
+                if (this.active) {
+                    this.networkConfigList = data;
+                    this.configLoaded = true;
+                    this.alert.show = false;
+                }
+            } catch {
+                if (this.active) this.showRequestError('networkadmin.LoadFailed');
+            } finally {
+                if (this.active) this.dataLoading = false;
+            }
+        },
+        async saveNetworkConfig(e: Event) {
             e.preventDefault();
+            this.showPassword = false;
+            if (this.configController) return;
+            this.saving = true;
+            this.alert.show = false;
 
             const formData = new FormData();
             formData.append('data', JSON.stringify(this.networkConfigList));
 
-            fetch('/api/network/config', {
-                method: 'POST',
-                headers: authHeader(),
-                body: formData,
-            })
-                .then((response) => handleResponse(response, this.$emitter, this.$router))
-                .then((response) => {
+            try {
+                const response = await this.requestConfig('POST', formData);
+                if (this.active) {
                     this.alert.message = this.$t('apiresponse.' + response.code, response.param);
                     this.alert.type = response.type;
                     this.alert.show = true;
-                });
+                }
+            } catch {
+                if (this.active) this.showRequestError('networkadmin.SaveUnconfirmed');
+            } finally {
+                if (this.active) this.saving = false;
+            }
+        },
+        showRequestError(key: string) {
+            this.alert.message = this.$t(key);
+            this.alert.type = 'warning';
+            this.alert.show = true;
         },
     },
 });

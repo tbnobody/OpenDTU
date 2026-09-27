@@ -36,10 +36,23 @@ void WebApiNetworkClass::onNetworkStatus(AsyncWebServerRequest* request)
     auto& root = response->getRoot();
 
     root["sta_status"] = ((WiFi.getMode() & WIFI_STA) != 0);
+    root["sta_connection_state"] = NetworkSettings.getStationConnectionState();
+    root["sta_target_ssid"] = Configuration.get().WiFi.Ssid;
+    const int disconnectReason = NetworkSettings.getStationDisconnectReason();
+    root["sta_disconnect_reason"] = nullptr;
+    if (disconnectReason >= 0) {
+        root["sta_disconnect_reason"] = disconnectReason;
+    }
+    const int retryIn = NetworkSettings.getStationRetryIn();
+    root["sta_retry_in"] = nullptr;
+    if (retryIn >= 0) {
+        root["sta_retry_in"] = retryIn;
+    }
     root["sta_ssid"] = WiFi.SSID();
     root["sta_bssid"] = WiFi.BSSIDstr();
     root["sta_rssi"] = WiFi.RSSI();
     root["network_hostname"] = NetworkSettings.getHostname();
+    root["network_connected"] = NetworkSettings.isConnected();
     root["network_ip"] = NetworkSettings.localIP().toString();
     root["network_netmask"] = NetworkSettings.subnetMask().toString();
     root["network_gateway"] = NetworkSettings.gatewayIP().toString();

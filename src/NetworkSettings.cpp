@@ -97,6 +97,7 @@ void NetworkSettingsClass::NetworkEvent(const WiFiEvent_t event, WiFiEventInfo_t
         break;
     case ARDUINO_EVENT_WIFI_STA_CONNECTED:
         ESP_LOGI(TAG, "WiFi connected");
+        _stationAssociated = true;
         if (_networkMode == network_mode::WiFi) {
             raiseEvent(network_event::NETWORK_CONNECTED);
         }
@@ -104,6 +105,8 @@ void NetworkSettingsClass::NetworkEvent(const WiFiEvent_t event, WiFiEventInfo_t
     case ARDUINO_EVENT_WIFI_STA_DISCONNECTED:
         // Reason codes can be found here: https://github.com/espressif/esp-idf/blob/5454d37d496a8c58542eb450467471404c606501/components/esp_wifi/include/esp_wifi_types_generic.h#L79-L141
         ESP_LOGW(TAG, "WiFi disconnected: %" PRIu8 "", info.wifi_sta_disconnected.reason);
+        _stationAssociated = false;
+        _stationDisconnectReason = info.wifi_sta_disconnected.reason;
         if (_networkMode == network_mode::WiFi) {
             // AP-only recovery must not restart a paused connection.
             if (_performConnection && wifiConfigured()) {
@@ -117,9 +120,14 @@ void NetworkSettingsClass::NetworkEvent(const WiFiEvent_t event, WiFiEventInfo_t
         break;
     case ARDUINO_EVENT_WIFI_STA_GOT_IP:
         ESP_LOGI(TAG, "WiFi got ip: %s", WiFi.localIP().toString().c_str());
+        _stationAssociated = true;
+        _stationDisconnectReason = -1;
         if (_networkMode == network_mode::WiFi) {
             raiseEvent(network_event::NETWORK_GOT_IP);
         }
+        break;
+    case ARDUINO_EVENT_WIFI_STA_STOP:
+        _stationAssociated = false;
         break;
     default:
         break;
@@ -208,6 +216,7 @@ void NetworkSettingsClass::enableAdminMode()
     // credentials gets changed.
     _connectTimeoutTimer = 0;
     _connectRedoTimer = 0;
+    // Saving settings starts a fresh attempt even during the paused recovery window.
     _performConnection = true;
 
     _adminTimeoutCounter = 0;
@@ -318,6 +327,7 @@ void NetworkSettingsClass::loop()
 
 void NetworkSettingsClass::applyConfig()
 {
+    _stationDisconnectReason = -1;
     setHostname();
 
     const auto& config = Configuration.get().WiFi;
@@ -543,6 +553,41 @@ bool NetworkSettingsClass::isConnected() const
 network_mode NetworkSettingsClass::NetworkMode() const
 {
     return _networkMode;
+}
+
+const char* NetworkSettingsClass::getStationConnectionState() const
+{
+    if (_networkMode == network_mode::Ethernet) {
+        return "disabled";
+    }
+    if (!wifiConfigured()) {
+        return "not_configured";
+    }
+    if (WiFi.isConnected() && WiFi.localIP()[0] != 0) {
+        return "connected";
+    }
+    if (!_performConnection) {
+        return "paused";
+    }
+    if ((WiFi.getMode() & WIFI_STA) == 0) {
+        return "disabled";
+    }
+    // Association precedes DHCP; losing an IP does not end the Wi-Fi association.
+    return _stationAssociated ? "waiting_for_ip" : "connecting";
+}
+
+int NetworkSettingsClass::getStationDisconnectReason() const
+{
+    return _stationDisconnectReason;
+}
+
+int NetworkSettingsClass::getStationRetryIn() const
+{
+    if (strcmp(getStationConnectionState(), "paused") != 0) {
+        return -1;
+    }
+    const uint32_t elapsed = _connectRedoTimer;
+    return elapsed < WIFI_RECONNECT_REDO_TIMEOUT ? WIFI_RECONNECT_REDO_TIMEOUT - elapsed : 0;
 }
 
 NetworkSettingsClass NetworkSettings;
