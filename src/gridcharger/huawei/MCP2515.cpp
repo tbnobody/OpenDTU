@@ -24,7 +24,8 @@ void mcp2515Isr()
     // as the timing is very critical. CAN messages will be missed if the
     // MCP2515 interrupt is not serviced immediately, as a new message
     // overwrites a pending message.
-    portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
+    // RISC-V port (ESP32-C3) only offers the argument-less variant
+    if (xHigherPriorityTaskWoken == pdTRUE) { portYIELD_FROM_ISR(); }
 }
 
 std::optional<uint8_t> MCP2515::_oSpiBus = std::nullopt;
