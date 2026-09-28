@@ -378,6 +378,7 @@
     "inverterchannelinfo": {
         "String": "Ligne {num}",
         "Phase": "Phase {num}",
+        "ACOutput": "Sortie CA",
         "General": "General"
     },
     "invertertotalinfo": {
@@ -390,6 +391,12 @@
         "MaxDailyPower": "Max Power",
         "Voltage": "Tension",
         "Current": "Courant",
+        "Voltage Ph1-N": "Tension L1-N",
+        "Current Ph1": "Courant L1",
+        "Voltage Ph2-N": "Tension L2-N",
+        "Current Ph2": "Courant L2",
+        "Voltage Ph3-N": "Tension L3-N",
+        "Current Ph3": "Courant L3",
         "Power DC": "Puissance continue",
         "YieldDay": "Rendement du jour",
         "YieldTotal": "Rendement total",
