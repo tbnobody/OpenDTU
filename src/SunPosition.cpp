@@ -84,14 +84,17 @@ void SunPositionClass::updateSunData()
     case 0:
         sunset_type = SunSet::SUNSET_OFFICIAL;
         break;
-    case 2:
+    case 1:
         sunset_type = SunSet::SUNSET_CIVIL;
+        break;
+    case 2:
+        sunset_type = SunSet::SUNSET_NAUTICAL;
         break;
     case 3:
         sunset_type = SunSet::SUNSET_ASTONOMICAL;
         break;
     default:
-        sunset_type = SunSet::SUNSET_NAUTICAL;
+        sunset_type = SunSet::SUNSET_CIVIL;
         break;
     }
 
