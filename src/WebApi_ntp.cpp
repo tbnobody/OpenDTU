@@ -32,12 +32,15 @@ void WebApiNtpClass::onNtpStatus(AsyncWebServerRequest* request)
 
     AsyncJsonResponse* response = new AsyncJsonResponse();
     auto& root = response->getRoot();
-    const CONFIG_T& config = Configuration.get();
 
-    root["ntp_server"] = config.Ntp.Server;
-    root["ntp_timezone"] = Mycila::NTP.getTimezoneInfo();
-    root["ntp_timezone_descr"] = config.Ntp.TimezoneDescr;
-    root["ntp_status"] = Mycila::NTP.isSynced();
+    // Multi-field read: hold the shared lock while the response is built so
+    // a concurrent update() cannot tear the values.
+    Configuration.read([&](CONFIG_T const& config) {
+        root["ntp_server"] = config.Ntp.Server;
+        root["ntp_timezone"] = Mycila::NTP.getTimezoneInfo();
+        root["ntp_timezone_descr"] = config.Ntp.TimezoneDescr;
+        root["ntp_status"] = Mycila::NTP.isSynced();
+    });
 
     struct tm timeinfo;
     getLocalTime(&timeinfo, 5);
@@ -73,13 +76,16 @@ void WebApiNtpClass::onNtpAdminGet(AsyncWebServerRequest* request)
 
     AsyncJsonResponse* response = new AsyncJsonResponse();
     auto& root = response->getRoot();
-    const CONFIG_T& config = Configuration.get();
 
-    root["ntp_server"] = config.Ntp.Server;
-    root["ntp_timezone_descr"] = config.Ntp.TimezoneDescr;
-    root["longitude"] = config.Ntp.Longitude;
-    root["latitude"] = config.Ntp.Latitude;
-    root["sunsettype"] = config.Ntp.SunsetType;
+    // Multi-field read: hold the shared lock while the response is built so
+    // a concurrent update() cannot tear the values.
+    Configuration.read([&](CONFIG_T const& config) {
+        root["ntp_server"] = config.Ntp.Server;
+        root["ntp_timezone_descr"] = config.Ntp.TimezoneDescr;
+        root["longitude"] = config.Ntp.Longitude;
+        root["latitude"] = config.Ntp.Latitude;
+        root["sunsettype"] = config.Ntp.SunsetType;
+    });
 
     WebApi.sendJsonResponse(request, response, __FUNCTION__, __LINE__);
 }
@@ -125,16 +131,14 @@ void WebApiNtpClass::onNtpAdminPost(AsyncWebServerRequest* request)
         return;
     }
 
+    Configuration.update([&](CONFIG_T& config)
     {
-        auto guard = Configuration.getWriteGuard();
-        auto& config = guard.getConfig();
-
         strlcpy(config.Ntp.Server, root["ntp_server"].as<String>().c_str(), sizeof(config.Ntp.Server));
         strlcpy(config.Ntp.TimezoneDescr, root["ntp_timezone_descr"].as<String>().c_str(), sizeof(config.Ntp.TimezoneDescr));
         config.Ntp.Latitude = root["latitude"].as<double>();
         config.Ntp.Longitude = root["longitude"].as<double>();
         config.Ntp.SunsetType = root["sunsettype"].as<uint8_t>();
-    }
+    });
 
     WebApi.writeConfig(retMsg);
 

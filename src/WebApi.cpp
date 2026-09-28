@@ -51,8 +51,8 @@ void WebApiClass::reload()
 
 bool WebApiClass::checkCredentials(AsyncWebServerRequest* request)
 {
-    auto const& config = Configuration.get();
-    if (request->authenticate(AUTH_USERNAME, config.Security.Password)) {
+    const String password = Configuration.read([](CONFIG_T const& cfg) { return String(cfg.Security.Password); });
+    if (request->authenticate(AUTH_USERNAME, password.c_str())) {
         return true;
     }
 
@@ -69,8 +69,16 @@ bool WebApiClass::checkCredentials(AsyncWebServerRequest* request)
 
 bool WebApiClass::checkCredentialsReadonly(AsyncWebServerRequest* request)
 {
-    auto const& config = Configuration.get();
-    if (config.Security.AllowReadonly) {
+    const auto credentials = Configuration.read([](CONFIG_T const& cfg) {
+        struct C {
+            String password;
+            bool allowReadonly;
+        } c;
+        c.password = String(cfg.Security.Password);
+        c.allowReadonly = cfg.Security.AllowReadonly;
+        return c;
+    });
+    if (credentials.allowReadonly) {
         return true;
     } else {
         return checkCredentials(request);

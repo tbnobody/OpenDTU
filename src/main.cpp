@@ -62,7 +62,7 @@ void setup()
 
     // Read configuration values
     ESP_LOGI(TAG, "Reading configuration...");
-    Configuration.init(scheduler);
+    Configuration.init();
     if (!Configuration.read()) {
         bool success = Configuration.write();
         ESP_LOG_LEVEL_LOCAL((success ? ESP_LOG_INFO : ESP_LOG_WARN), TAG, "Failed to read configuration. New default configuration written %s",

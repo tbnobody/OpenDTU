@@ -77,10 +77,15 @@ void SunPositionClass::updateSunData()
         return;
     }
 
-    CONFIG_T const& config = Configuration.get();
+    // Multi-field read: SunsetType, Latitude and Longitude form one
+    // positional unit; a concurrent update() must not mix old and new
+    // values (they come from the same config page).
+    const auto pos = Configuration.read([](CONFIG_T const& cfg) {
+        return std::make_tuple(cfg.Ntp.SunsetType, cfg.Ntp.Latitude, cfg.Ntp.Longitude);
+    });
 
     double sunset_type;
-    switch (config.Ntp.SunsetType) {
+    switch (std::get<0>(pos)) {
     case 0:
         sunset_type = SunSet::SUNSET_OFFICIAL;
         break;
@@ -98,7 +103,7 @@ void SunPositionClass::updateSunData()
     const int offset = Utils::getTimezoneOffset() / 3600;
 
     SunSet sun;
-    sun.setPosition(config.Ntp.Latitude, config.Ntp.Longitude, offset);
+    sun.setPosition(std::get<1>(pos), std::get<2>(pos), offset);
     sun.setCurrentDate(1900 + timeinfo.tm_year, timeinfo.tm_mon + 1, timeinfo.tm_mday);
 
     const double sunriseRaw = sun.calcCustomSunrise(sunset_type);

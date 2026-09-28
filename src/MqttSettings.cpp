@@ -131,7 +131,10 @@ void MqttSettingsClass::performConnect()
         }
 
         ESP_LOGI(TAG, "Connecting to MQTT...");
-        const CONFIG_T& config = Configuration.get();
+        // Multi-field read: capture the whole connection parameter set under
+        // the shared lock so a concurrent update() (for example a config
+        // save racing with a reconnect) cannot mix old and new values.
+        Configuration.read([&](CONFIG_T const& config) {
         const String willTopic = getPrefix() + config.Mqtt.Lwt.Topic;
         String clientId = getClientId();
         if (config.Mqtt.Tls.Enabled) {
@@ -159,6 +162,7 @@ void MqttSettingsClass::performConnect()
             static_cast<espMqttClient*>(_mqttClient)->onDisconnect(std::bind(&MqttSettingsClass::onMqttDisconnect, this, _1));
             static_cast<espMqttClient*>(_mqttClient)->onMessage(std::bind(&MqttSettingsClass::onMqttMessage, this, _1, _2, _3, _4, _5, _6));
         }
+        });
         _mqttClient->connect();
     }
 }

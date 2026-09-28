@@ -28,22 +28,24 @@ void WebApiLoggingClass::onLoggingAdminGet(AsyncWebServerRequest* request)
 
     AsyncJsonResponse* response = new AsyncJsonResponse();
     auto& root = response->getRoot();
-    const CONFIG_T& config = Configuration.get();
-
     auto& configurableModules = Logging.getConfigurableModules();
 
-    JsonObject loglevel = root["loglevel"].to<JsonObject>();
-    loglevel["default"] = config.Logging.Default;
+    // Multi-field read: hold the shared lock while the response is built so
+    // a concurrent update() cannot tear the values.
+    Configuration.read([&](CONFIG_T const& config) {
+        JsonObject loglevel = root["loglevel"].to<JsonObject>();
+        loglevel["default"] = config.Logging.Default;
 
-    JsonArray logModules = loglevel["modules"].to<JsonArray>();
-    for (const auto& availModule : configurableModules) {
-        JsonObject logModule = logModules.add<JsonObject>();
-        logModule["name"] = availModule;
+        JsonArray logModules = loglevel["modules"].to<JsonArray>();
+        for (const auto& availModule : configurableModules) {
+            JsonObject logModule = logModules.add<JsonObject>();
+            logModule["name"] = availModule;
 
-        int8_t idx = Configuration.getIndexForLogModule(availModule);
-        // Set to inherit if unknown
-        logModule["level"] = idx < 0 || idx >= LOG_MODULE_COUNT ? -1 : config.Logging.Modules[idx].Level;
-    }
+            int8_t idx = Configuration.getIndexForLogModule(availModule);
+            // Set to inherit if unknown
+            logModule["level"] = idx < 0 || idx >= LOG_MODULE_COUNT ? -1 : config.Logging.Modules[idx].Level;
+        }
+    });
 
     WebApi.sendJsonResponse(request, response, __FUNCTION__, __LINE__);
 }
@@ -63,10 +65,8 @@ void WebApiLoggingClass::onLoggingAdminPost(AsyncWebServerRequest* request)
     auto& retMsg = response->getRoot();
     auto& configurableModules = Logging.getConfigurableModules();
 
+    Configuration.update([&](CONFIG_T& config)
     {
-        auto guard = Configuration.getWriteGuard();
-        auto& config = guard.getConfig();
-
         config.Logging.Default = std::max<int8_t>(ESP_LOG_NONE, std::min<int8_t>(ESP_LOG_VERBOSE, root["loglevel"]["default"].as<int8_t>()));
 
         for (uint8_t i = 0; i < LOG_MODULE_COUNT; i++) {
@@ -95,7 +95,7 @@ void WebApiLoggingClass::onLoggingAdminPost(AsyncWebServerRequest* request)
                 break;
             }
         }
-    }
+    });
 
     Logging.applyLogLevels();
 

@@ -26,10 +26,13 @@ void WebApiSecurityClass::onSecurityGet(AsyncWebServerRequest* request)
 
     AsyncJsonResponse* response = new AsyncJsonResponse();
     auto& root = response->getRoot();
-    const CONFIG_T& config = Configuration.get();
 
-    root["password"] = config.Security.Password;
-    root["allow_readonly"] = config.Security.AllowReadonly;
+    // Multi-field read: hold the shared lock while the response is built so
+    // a concurrent update() cannot tear the values.
+    Configuration.read([&](CONFIG_T const& config) {
+        root["password"] = config.Security.Password;
+        root["allow_readonly"] = config.Security.AllowReadonly;
+    });
 
     WebApi.sendJsonResponse(request, response, __FUNCTION__, __LINE__);
 }
@@ -64,13 +67,11 @@ void WebApiSecurityClass::onSecurityPost(AsyncWebServerRequest* request)
         return;
     }
 
+    Configuration.update([&](CONFIG_T& config)
     {
-        auto guard = Configuration.getWriteGuard();
-        auto& config = guard.getConfig();
-
         strlcpy(config.Security.Password, root["password"].as<String>().c_str(), sizeof(config.Security.Password));
         config.Security.AllowReadonly = root["allow_readonly"].as<bool>();
-    }
+    });
 
     WebApi.writeConfig(retMsg);
 

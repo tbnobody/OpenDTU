@@ -28,11 +28,10 @@ void WebApiDeviceClass::onDeviceAdminGet(AsyncWebServerRequest* request)
 
     AsyncJsonResponse* response = new AsyncJsonResponse();
     auto& root = response->getRoot();
-    const CONFIG_T& config = Configuration.get();
     const PinMapping_t& pin = PinMapping.get();
 
     auto curPin = root["curPin"].to<JsonObject>();
-    curPin["name"] = config.Dev_PinMapping;
+    curPin["name"] = Configuration.read([](CONFIG_T const& cfg) { return String(cfg.Dev_PinMapping); });
 
     auto nrfPinObj = curPin["nrf24"].to<JsonObject>();
     nrfPinObj["clk"] = pin.nrf24_clk;
@@ -82,19 +81,24 @@ void WebApiDeviceClass::onDeviceAdminGet(AsyncWebServerRequest* request)
     }
 
     auto display = root["display"].to<JsonObject>();
-    display["rotation"] = config.Display.Rotation;
-    display["power_safe"] = config.Display.PowerSafe;
-    display["screensaver"] = config.Display.ScreenSaver;
-    display["contrast"] = config.Display.Contrast;
-    display["locale"] = config.Display.Locale;
-    display["diagramduration"] = config.Display.Diagram.Duration;
-    display["diagrammode"] = config.Display.Diagram.Mode;
-
     auto leds = root["led"].to<JsonArray>();
-    for (uint8_t i = 0; i < PINMAPPING_LED_COUNT; i++) {
-        auto led = leds.add<JsonObject>();
-        led["brightness"] = config.Led_Single[i].Brightness;
-    }
+
+    // Multi-field read: hold the shared lock while the response is built so
+    // a concurrent update() cannot tear the values.
+    Configuration.read([&](CONFIG_T const& config) {
+        display["rotation"] = config.Display.Rotation;
+        display["power_safe"] = config.Display.PowerSafe;
+        display["screensaver"] = config.Display.ScreenSaver;
+        display["contrast"] = config.Display.Contrast;
+        display["locale"] = config.Display.Locale;
+        display["diagramduration"] = config.Display.Diagram.Duration;
+        display["diagrammode"] = config.Display.Diagram.Mode;
+
+        for (uint8_t i = 0; i < PINMAPPING_LED_COUNT; i++) {
+            auto led = leds.add<JsonObject>();
+            led["brightness"] = config.Led_Single[i].Brightness;
+        }
+    });
 
     WebApi.sendJsonResponse(request, response, __FUNCTION__, __LINE__);
 }
@@ -131,10 +135,8 @@ void WebApiDeviceClass::onDeviceAdminPost(AsyncWebServerRequest* request)
 
     bool performRestart = false;
 
+    Configuration.update([&](CONFIG_T& config)
     {
-        auto guard = Configuration.getWriteGuard();
-        auto& config = guard.getConfig();
-
         performRestart = root["curPin"]["name"].as<String>() != config.Dev_PinMapping;
 
         strlcpy(config.Dev_PinMapping, root["curPin"]["name"].as<String>().c_str(), sizeof(config.Dev_PinMapping));
@@ -150,7 +152,7 @@ void WebApiDeviceClass::onDeviceAdminPost(AsyncWebServerRequest* request)
             config.Led_Single[i].Brightness = root["led"][i]["brightness"].as<uint8_t>();
             config.Led_Single[i].Brightness = min<uint8_t>(100, config.Led_Single[i].Brightness);
         }
-    }
+    });
 
     auto const& config = Configuration.get();
 

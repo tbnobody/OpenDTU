@@ -315,13 +315,33 @@ void NetworkSettingsClass::applyConfig()
 {
     setHostname();
 
-    const auto& config = Configuration.get().WiFi;
-
+    // Single scalar: fine lock-free.
     if (!wifiConfigured()) {
         return;
     }
 
-    const bool newCredentials = strcmp(WiFi.SSID().c_str(), config.Ssid) || strcmp(WiFi.psk().c_str(), config.Password);
+    // Multi-field read: SSID, password and the static IP settings form one
+    // WiFi unit; a concurrent update() must not mix old and new credentials
+    // or IP settings (they all come from the same config page).
+    const auto wifiCfg = Configuration.read([](CONFIG_T const& cfg) {
+        struct W {
+            String ssid;
+            String password;
+            bool dhcp;
+            IPAddress ip, netmask, gateway, dns1, dns2;
+        } w;
+        w.ssid = String(cfg.WiFi.Ssid);
+        w.password = String(cfg.WiFi.Password);
+        w.dhcp = cfg.WiFi.Dhcp;
+        w.ip = IPAddress(cfg.WiFi.Ip);
+        w.netmask = IPAddress(cfg.WiFi.Netmask);
+        w.gateway = IPAddress(cfg.WiFi.Gateway);
+        w.dns1 = IPAddress(cfg.WiFi.Dns1);
+        w.dns2 = IPAddress(cfg.WiFi.Dns2);
+        return w;
+    });
+
+    const bool newCredentials = strcmp(WiFi.SSID().c_str(), wifiCfg.ssid.c_str()) || strcmp(WiFi.psk().c_str(), wifiCfg.password.c_str());
 
     ESP_LOGI(TAG, "Start configuring WiFi STA using %s credentials",
         newCredentials ? "new" : "existing");
@@ -329,8 +349,8 @@ void NetworkSettingsClass::applyConfig()
     bool success = false;
     if (newCredentials) {
         success = WiFi.begin(
-            config.Ssid,
-            config.Password) != WL_CONNECT_FAILED;
+            wifiCfg.ssid,
+            wifiCfg.password) != WL_CONNECT_FAILED;
     } else {
         success = WiFi.begin() != WL_CONNECT_FAILED;
     }
@@ -372,34 +392,48 @@ void NetworkSettingsClass::setStaticIp()
         return;
     }
 
-    const auto& config = Configuration.get().WiFi;
+    // Multi-field read: the whole IP configuration forms one unit; a
+    // concurrent update() must not mix old and new addresses.
+    const auto wifiCfg = Configuration.read([](CONFIG_T const& cfg) {
+        struct W {
+            bool dhcp;
+            IPAddress ip, netmask, gateway, dns1, dns2;
+        } w;
+        w.dhcp = cfg.WiFi.Dhcp;
+        w.ip = IPAddress(cfg.WiFi.Ip);
+        w.netmask = IPAddress(cfg.WiFi.Netmask);
+        w.gateway = IPAddress(cfg.WiFi.Gateway);
+        w.dns1 = IPAddress(cfg.WiFi.Dns1);
+        w.dns2 = IPAddress(cfg.WiFi.Dns2);
+        return w;
+    });
     const char* mode = (_networkMode == network_mode::WiFi) ? "WiFi" : "Ethernet";
-    const char* ipType = config.Dhcp ? "DHCP" : "static";
+    const char* ipType = wifiCfg.dhcp ? "DHCP" : "static";
 
     ESP_LOGI(TAG, "Start configuring %s %s IP...", mode, ipType);
 
     bool success = false;
     if (_networkMode == network_mode::WiFi) {
-        if (config.Dhcp) {
+        if (wifiCfg.dhcp) {
             success = WiFi.config(INADDR_NONE, INADDR_NONE, INADDR_NONE);
         } else {
             success = WiFi.config(
-                IPAddress(config.Ip),
-                IPAddress(config.Gateway),
-                IPAddress(config.Netmask),
-                IPAddress(config.Dns1),
-                IPAddress(config.Dns2));
+                wifiCfg.ip,
+                wifiCfg.gateway,
+                wifiCfg.netmask,
+                wifiCfg.dns1,
+                wifiCfg.dns2);
         }
     } else if (_networkMode == network_mode::Ethernet) {
-        if (config.Dhcp) {
+        if (wifiCfg.dhcp) {
             success = ETH.config(INADDR_NONE, INADDR_NONE, INADDR_NONE, INADDR_NONE);
         } else {
             success = ETH.config(
-                IPAddress(config.Ip),
-                IPAddress(config.Gateway),
-                IPAddress(config.Netmask),
-                IPAddress(config.Dns1),
-                IPAddress(config.Dns2));
+                wifiCfg.ip,
+                wifiCfg.gateway,
+                wifiCfg.netmask,
+                wifiCfg.dns1,
+                wifiCfg.dns2);
         }
     }
 

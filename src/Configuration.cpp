@@ -14,24 +14,22 @@
 #undef TAG
 static const char* TAG = "configuration";
 
-CONFIG_T config;
+// Protects all access to the global config struct. Config is written from
+// the AsyncTCP task (web API callbacks) and read from the main task
+// (scheduler loop) as well as from AsyncTCP. Multiple readers can hold the
+// shared lock concurrently (read(Fn)); writes take the exclusive lock
+// (update(), read()/write()/migrate()). NOT recursive: never call the
+// locking helpers from inside another update() lambda.
+CONFIG_T ConfigurationClass::config;
+std::shared_mutex ConfigurationClass::sConfigMutex;
 
-static std::condition_variable sWriterCv;
-static std::mutex sWriterMutex;
-static unsigned sWriterCount = 0;
-static bool sWriterActive = false;
-
-void ConfigurationClass::init(Scheduler& scheduler)
+void ConfigurationClass::init()
 {
-    scheduler.addTask(_loopTask);
-    _loopTask.setCallback(std::bind(&ConfigurationClass::loop, this));
-    _loopTask.setIterations(TASK_FOREVER);
-    _loopTask.enable();
-
     memset(&config, 0x0, sizeof(config));
 }
 
-bool ConfigurationClass::write()
+// Serializes the config to flash. Assumes sConfigMutex is already held.
+bool ConfigurationClass::writeConfigLocked()
 {
     File f = LittleFS.open(CONFIG_FILENAME, "w");
     if (!f) {
@@ -182,7 +180,14 @@ bool ConfigurationClass::write()
     return true;
 }
 
-bool ConfigurationClass::read()
+bool ConfigurationClass::write()
+{
+    std::unique_lock<std::shared_mutex> lock(sConfigMutex);
+    return writeConfigLocked();
+}
+
+// Reads the config from flash. Assumes sConfigMutex is already held.
+bool ConfigurationClass::readConfigLocked()
 {
     File f = LittleFS.open(CONFIG_FILENAME, "r", false);
     Utils::skipBom(f);
@@ -363,7 +368,7 @@ bool ConfigurationClass::read()
     if (config.Dtu.Serial == DTU_SERIAL) {
         const uint64_t dtuId = Utils::generateDtuSerial();
         config.Dtu.Serial = dtuId;
-        write();
+        writeConfigLocked();
         ESP_LOGI(TAG, "DTU serial check: Generated new serial based on ESP chip id: %0" PRIx32 "%08" PRIx32 "",
             static_cast<uint32_t>((dtuId >> 32) & 0xFFFFFFFF),
             static_cast<uint32_t>(dtuId & 0xFFFFFFFF));
@@ -374,8 +379,22 @@ bool ConfigurationClass::read()
     return true;
 }
 
+bool ConfigurationClass::read()
+{
+    // Despite its name, read() is a writer: it replaces the entire in-RAM
+    // config struct from the flash file, field by field. The lock must
+    // therefore be exclusive, not shared — otherwise a concurrent
+    // read(Fn) or update() could observe a half-populated config.
+    // readConfigLocked() also calls writeConfigLocked() (DTU serial
+    // regeneration), which is only legal while the write lock is held.
+    std::unique_lock<std::shared_mutex> lock(sConfigMutex);
+    return readConfigLocked();
+}
+
 void ConfigurationClass::migrate()
 {
+    std::unique_lock<std::shared_mutex> lock(sConfigMutex);
+
     File f = LittleFS.open(CONFIG_FILENAME, "r", false);
     if (!f) {
         ESP_LOGE(TAG, "Failed to open file, cancel migration");
@@ -463,8 +482,8 @@ void ConfigurationClass::migrate()
     f.close();
 
     config.Cfg.Version = CONFIG_VERSION;
-    write();
-    read();
+    writeConfigLocked();
+    readConfigLocked();
 }
 
 CONFIG_T const& ConfigurationClass::get()
@@ -472,12 +491,7 @@ CONFIG_T const& ConfigurationClass::get()
     return config;
 }
 
-ConfigurationClass::WriteGuard ConfigurationClass::getWriteGuard()
-{
-    return WriteGuard();
-}
-
-INVERTER_CONFIG_T* ConfigurationClass::getFreeInverterSlot()
+INVERTER_CONFIG_T* ConfigurationClass::getFreeInverterSlot(CONFIG_T& config)
 {
     for (uint8_t i = 0; i < INV_MAX_COUNT; i++) {
         if (config.Inverter[i].Serial == 0) {
@@ -499,7 +513,7 @@ INVERTER_CONFIG_T* ConfigurationClass::getInverterConfig(const uint64_t serial)
     return nullptr;
 }
 
-void ConfigurationClass::deleteInverterById(const uint8_t id)
+void ConfigurationClass::deleteInverterById(CONFIG_T& config, const uint8_t id)
 {
     config.Inverter[id].Serial = 0ULL;
     strlcpy(config.Inverter[id].Name, "", sizeof(config.Inverter[id].Name));
@@ -530,49 +544,6 @@ int8_t ConfigurationClass::getIndexForLogModule(const String& moduleName) const
     }
 
     return -1;
-}
-
-void ConfigurationClass::loop()
-{
-    std::unique_lock<std::mutex> lock(sWriterMutex);
-    if (sWriterCount == 0) {
-        return;
-    }
-
-    // close the write guard for new writers, inform all existing writers and wait for them to finish
-    sWriterActive = true;
-    sWriterCv.notify_all();
-    sWriterCv.wait(lock, [] { return sWriterCount == 0; });
-
-    // open the write guard for new writers and inform all waiting writers that they can continue
-    sWriterActive = false;
-    sWriterCv.notify_all();
-}
-
-CONFIG_T& ConfigurationClass::WriteGuard::getConfig()
-{
-    return config;
-}
-
-ConfigurationClass::WriteGuard::WriteGuard()
-    : _lock(sWriterMutex)
-{
-    // if writers are currently processed, we must wait for them to finish before we can add ourselves to the writer count
-    if (sWriterActive) {
-        sWriterCv.wait(_lock, [] { return !sWriterActive; });
-    }
-
-    // add ourselves to the writer count and wait to be processed
-    sWriterCount++;
-    sWriterCv.wait(_lock, [] { return sWriterActive; });
-}
-
-ConfigurationClass::WriteGuard::~WriteGuard()
-{
-    sWriterCount--;
-    if (sWriterCount == 0) {
-        sWriterCv.notify_all();
-    }
 }
 
 ConfigurationClass Configuration;
