@@ -43,7 +43,7 @@ bool HM_Abstract::sendAlarmLogRequest(const bool force)
 
     if (!force) {
         if (Statistics()->hasChannelFieldValue(TYPE_INV, CH0, FLD_EVT_LOG)) {
-            if (static_cast<uint8_t>(Statistics()->getChannelFieldValue(TYPE_INV, CH0, FLD_EVT_LOG) == _lastAlarmLogCnt)) {
+            if (static_cast<uint8_t>(Statistics()->getChannelFieldValue(TYPE_INV, CH0, FLD_EVT_LOG)) == _lastAlarmLogCnt) {
                 return false;
             }
         }
