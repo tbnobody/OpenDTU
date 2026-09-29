@@ -1,0 +1,15 @@
+{
+    "name": "CMT2300a",
+    "keywords": "cmt2300a, hoymiles, radio",
+    "description": "CMT2300A radio driver",
+    "version": "0.0.1",
+    "frameworks": "arduino",
+    "platforms": [
+        "espressif32"
+    ],
+    "build": {
+        "flags": [
+            "-Wall -Wextra -Wunused -Wmisleading-indentation -Wduplicated-cond -Wlogical-op -Wnull-dereference"
+        ]
+    }
+}

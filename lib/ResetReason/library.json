@@ -1,0 +1,15 @@
+{
+    "name": "ResetReason",
+    "keywords": "esp32, reset, reason",
+    "description": "ESP32 reset reason helper",
+    "version": "0.0.1",
+    "frameworks": "arduino",
+    "platforms": [
+        "espressif32"
+    ],
+    "build": {
+        "flags": [
+            "-Wall -Wextra -Wunused -Wmisleading-indentation -Wduplicated-cond -Wlogical-op -Wnull-dereference"
+        ]
+    }
+}
