@@ -1,10 +1,7 @@
 {
-    "name": "TimeoutHelper",
-    "keywords": "timeout",
-    "description": "An Arduino for ESP32 timeout helper",
-    "authors": {
-        "name": "Thomas Basler"
-    },
+    "name": "ResetReason",
+    "keywords": "esp32, reset, reason",
+    "description": "ESP32 reset reason helper",
     "version": "0.0.1",
     "frameworks": "arduino",
     "platforms": [
