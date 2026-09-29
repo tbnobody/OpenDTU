@@ -10,13 +10,13 @@ OpenDTU-OnBattery is an ESP32-based firmware project that provides solar inverte
 Install dependencies in this exact order:
 
 ```bash
-# Install Node.js 24 (REQUIRED - do not use older versions)
-curl -fsSL https://deb.nodesource.com/setup_24.x | sudo -E bash -
+# Install Node.js 26 (REQUIRED - do not use older versions)
+curl -fsSL https://deb.nodesource.com/setup_26.x | sudo -E bash -
 sudo apt-get install nodejs -y
 
-# Verify Node.js 24 installation
+# Verify Node.js 26 installation
 export PATH=/usr/bin:$PATH
-node --version  # Should show v24.x.x
+node --version  # Should show v26.x.x
 
 # Enable corepack for yarn
 sudo corepack enable
@@ -161,7 +161,7 @@ The project uses these automated workflows:
 ### Build Failures
 1. **"HTTPClientError" during pio run**: Ensure unrestricted internet access is available for ESP32 platform downloads. Network firewalls or restrictions will cause firmware builds to fail. Contact repository administrators to configure network access if builds fail with network errors.
 2. **"yarn: command not found"**: Run `sudo corepack enable`
-3. **"Node version too old"**: Ensure Node.js 24 is installed and in PATH
+3. **"Node version too old"**: Ensure Node.js 26 is installed and in PATH
 4. **"webapp_dist not found"**: Run `yarn build` in webapp directory first
 
 ### Development Workflow
