@@ -17,5 +17,10 @@
             "version": ">=1.4.2",
             "platforms": "espressif32"
         }
-    ]
+    ],
+    "build": {
+        "flags": [
+            "-Wall -Wextra -Wunused -Wmisleading-indentation -Wduplicated-cond -Wlogical-op -Wnull-dereference"
+        ]
+    }
 }
