@@ -136,7 +136,8 @@
             "10002": "Uwierzytelnienie powiodło się!",
             "11001": "@:apiresponse.2001",
             "11002": "@:apiresponse:5004",
-            "12001": "Profil musi mieć od 1 do {max} znaków!"
+            "12001": "Profil musi mieć od 1 do {max} znaków!",
+            "12002": "Diagram display duration must be a number between {min} and {max}!"
         },
         "home": {
             "LiveData": "Dane na żywo",

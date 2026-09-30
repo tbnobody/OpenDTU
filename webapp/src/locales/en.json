@@ -121,7 +121,8 @@
         "10002": "Authentication successful!",
         "11001": "@:apiresponse.2001",
         "11002": "@:apiresponse.5004",
-        "12001": "Profile name must between 1 and {max} characters long!"
+        "12001": "Profile name must between 1 and {max} characters long!",
+        "12002": "Diagram display duration must be a number between {min} and {max}!"
     },
     "home": {
         "LiveData": "Live Data",

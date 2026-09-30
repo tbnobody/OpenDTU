@@ -136,7 +136,8 @@
             "10002": "¡Autenticación exitosa!",
             "11001": "¡@:apiresponse.2001",
             "11002": "¡@:apiresponse:5004",
-            "12001": "¡El perfil debe tener entre 1 y {max} caracteres de longitud!"
+            "12001": "¡El perfil debe tener entre 1 y {max} caracteres de longitud!",
+            "12002": "Diagram display duration must be a number between {min} and {max}!"
         },
         "home": {
             "LiveData": "Datos en Vivo",
