@@ -163,6 +163,13 @@ void WebApiFileClass::onFileUpload(AsyncWebServerRequest* request, String filena
         }
         const String name = "/" + request->getParam("file")->value();
         request->_tempFile = LittleFS.open(name, "w");
+        if (!request->_tempFile) {
+            // The file could not be created (invalid name, no space left, ...).
+            // Report the failure; the upload handler is otherwise invoked
+            // again for every remaining chunk, so only answer once.
+            request->send(400, asyncsrv::T_text_plain, "Failed to create file");
+            return;
+        }
     }
 
     if (len) {
@@ -184,6 +191,13 @@ void WebApiFileClass::onFileUploadFinish(AsyncWebServerRequest* request)
 
     // the request handler is triggered after the upload has finished...
     // create the response, add header, and send response
+
+    if (request->isSent()) {
+        // The upload was already answered with an error (e.g. the file
+        // could not be created) - do not send a second response and
+        // especially do not restart, as nothing was uploaded.
+        return;
+    }
 
     AsyncWebServerResponse* response = request->beginResponse(200, asyncsrv::T_text_plain, "OK");
     response->addHeader(asyncsrv::T_Connection, asyncsrv::T_close);
