@@ -132,7 +132,7 @@ void WebApiInverterClass::onInverterAdd(AsyncWebServerRequest* request)
     // Interpret the string as a hex value and convert it to uint64_t
     inverter->Serial = serial;
 
-    strncpy(inverter->Name, root["name"].as<String>().c_str(), INV_MAX_NAME_STRLEN);
+    strlcpy(inverter->Name, root["name"].as<String>().c_str(), sizeof(inverter->Name));
 
     WebApi.writeConfig(retMsg, WebApiError::InverterAdded, "Inverter created!");
 
@@ -216,7 +216,7 @@ void WebApiInverterClass::onInverterEdit(AsyncWebServerRequest* request)
 
         old_serial = inverter.Serial;
         inverter.Serial = new_serial;
-        strncpy(inverter.Name, root["name"].as<String>().c_str(), INV_MAX_NAME_STRLEN);
+        strlcpy(inverter.Name, root["name"].as<String>().c_str(), sizeof(inverter.Name));
 
         inverter.Poll_Enable = root["poll_enable"] | true;
         inverter.Poll_Enable_Night = root["poll_enable_night"] | true;
@@ -232,7 +232,7 @@ void WebApiInverterClass::onInverterEdit(AsyncWebServerRequest* request)
         for (JsonVariant channel : channelArray) {
             inverter.channel[arrayCount].MaxChannelPower = channel["max_power"].as<uint16_t>();
             inverter.channel[arrayCount].YieldTotalOffset = channel["yield_total_offset"].as<float>();
-            strncpy(inverter.channel[arrayCount].Name, channel["name"] | "", sizeof(inverter.channel[arrayCount].Name));
+            strlcpy(inverter.channel[arrayCount].Name, channel["name"] | "", sizeof(inverter.channel[arrayCount].Name));
             arrayCount++;
         }
     }
