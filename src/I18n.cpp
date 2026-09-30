@@ -69,6 +69,7 @@ void I18nClass::readDisplayStrings(
     }
 
     if (!Utils::checkJsonAlloc(doc, __FUNCTION__, __LINE__)) {
+        f.close();
         return;
     }
 
@@ -142,6 +143,7 @@ void I18nClass::readConfig(String file)
     }
 
     if (!Utils::checkJsonAlloc(doc, __FUNCTION__, __LINE__)) {
+        f.close();
         return;
     }
 
