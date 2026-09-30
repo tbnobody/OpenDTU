@@ -487,7 +487,18 @@ String NetworkSettingsClass::getHostname()
     uint8_t pos = 0;
 
     const uint32_t chipId = Utils::getChipId();
-    snprintf(preparedHostname, WIFI_MAX_HOSTNAME_STRLEN + 1, config.WiFi.Hostname, chipId);
+    char chipIdStr[7];
+    snprintf(chipIdStr, sizeof(chipIdStr), "%06X", static_cast<unsigned>(chipId));
+
+    // The '%06X' text in the configured hostname is documented to be
+    // replaced with the chip id. Perform this substitution as a plain
+    // string operation instead of passing the user-entered hostname as a
+    // snprintf() format string: any other conversion specifier in the
+    // hostname (e.g. a stray '%s' or '%n') would be undefined behavior.
+    String prepared = String(config.WiFi.Hostname);
+    prepared.replace("%06X", chipIdStr);
+    prepared.replace("%06x", chipIdStr);
+    strlcpy(preparedHostname, prepared.c_str(), sizeof(preparedHostname));
 
     const char* pC = preparedHostname;
     while (*pC && pos < WIFI_MAX_HOSTNAME_STRLEN) { // while !null and not over length
