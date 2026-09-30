@@ -271,10 +271,12 @@ bool PinMappingClass::init(const String& deviceMapping)
             _pinMapping.led[0] = doc[i]["led"]["led0"] | LED0;
             _pinMapping.led[1] = doc[i]["led"]["led1"] | LED1;
 
+            f.close();
             return true;
         }
     }
 
+    f.close();
     return false;
 }
 
