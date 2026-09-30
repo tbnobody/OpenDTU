@@ -80,6 +80,13 @@ void MqttSettingsClass::onMqttDisconnect(espMqttClientTypes::DisconnectReason re
 
     ESP_LOGW(TAG, "Disconnected from MQTT. Reason: %s", reasonStr);
 
+    // Drop partially received fragmented messages: they are incomplete by
+    // definition and reassembly state must not leak across connections. The
+    // broker re-sends retained/in-flight messages as needed after a
+    // reconnect. _fragments is only ever accessed from the mqtt client
+    // task's callbacks, so no additional locking is required here.
+    _fragments.clear();
+
     _mqttReconnectTimer.once(
         2, +[](MqttSettingsClass* instance) { instance->performConnect(); }, this);
 }
