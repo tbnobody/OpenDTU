@@ -243,11 +243,23 @@ void AlarmLogParser::setMessageType(const AlarmMessageType_t type)
 
 void AlarmLogParser::getLogEntry(const uint8_t entryId, AlarmLogEntry_t& entry, const AlarmMessageLocale_t locale)
 {
-    const uint8_t entryStartOffset = 2 + entryId * ALARM_LOG_ENTRY_SIZE;
-
     const int timezoneOffset = getTimezoneOffset();
 
     HOY_SEMAPHORE_TAKE();
+
+    // The entry count can have shrunk since the caller fetched it (the
+    // buffer is refetched by the poll loop on the main task while this
+    // runs on the async_tcp task). Never read past the received data.
+    if (entryId >= getEntryCount()) {
+        HOY_SEMAPHORE_GIVE();
+        entry.MessageId = 0;
+        entry.Message = "";
+        entry.StartTime = 0;
+        entry.EndTime = 0;
+        return;
+    }
+
+    const uint8_t entryStartOffset = 2 + entryId * ALARM_LOG_ENTRY_SIZE;
 
     const uint32_t wcode = static_cast<uint16_t>(_payloadAlarmLog[entryStartOffset]) << 8 | _payloadAlarmLog[entryStartOffset + 1];
     uint32_t startTimeOffset = 0;
