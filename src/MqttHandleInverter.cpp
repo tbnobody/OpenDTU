@@ -5,6 +5,7 @@
 #include "MqttHandleInverter.h"
 #include "MqttSettings.h"
 #include <ctime>
+#include <vector>
 
 #undef TAG
 static const char* TAG = "mqtt";
@@ -162,11 +163,18 @@ void MqttHandleInverterClass::onMqttMessage(Topic t, const espMqttClientTypes::M
 {
     const CONFIG_T& config = Configuration.get();
 
-    char token_topic[MQTT_MAX_TOPIC_STRLEN + 40]; // respect all subtopics
-    strncpy(token_topic, topic, MQTT_MAX_TOPIC_STRLEN + 40); // convert const char* to char*
+    const size_t prefixLen = strlen(config.Mqtt.Topic);
+
+    // Make sure the topic is modifiable and that the configured prefix is
+    // actually part of it before indexing past the prefix.
+    if (topic == nullptr || strlen(topic) <= prefixLen) {
+        return;
+    }
+
+    std::vector<char> token_topic(topic, topic + strlen(topic) + 1); // convert const char* to char*
 
     char* serial_str;
-    char* rest = &token_topic[strlen(config.Mqtt.Topic)];
+    char* rest = &token_topic[prefixLen];
 
     serial_str = strtok_r(rest, "/", &rest);
 
