@@ -43,7 +43,6 @@ void HoymilesClass::initCMT(const int8_t pin_sdio, const int8_t pin_clk, const i
 
 void HoymilesClass::loop()
 {
-    std::lock_guard<std::mutex> lock(_mutex);
     _radioNrf->loop();
     _radioCmt->loop();
 
@@ -147,7 +146,15 @@ void HoymilesClass::loop()
     } else {
         if (currentWeekDay != lastWeekDay) {
 
-            for (auto& inv : _inverters) {
+            // Iterate over a snapshot: the inverter list may be modified
+            // concurrently (e.g. by a Web API request) while the daily
+            // tasks are being executed.
+            std::vector<std::shared_ptr<InverterAbstract>> inverters;
+            {
+                std::shared_lock<std::shared_mutex> lock(_mutex);
+                inverters = _inverters;
+            }
+            for (auto& inv : inverters) {
                 inv->performDailyTask();
             }
 
@@ -188,6 +195,7 @@ std::shared_ptr<InverterAbstract> HoymilesClass::addInverter(const char* name, c
     if (i) {
         i->setName(name);
         i->init();
+        std::lock_guard<std::shared_mutex> lock(_mutex);
         _inverters.push_back(std::move(i));
         return _inverters.back();
     }
@@ -197,6 +205,7 @@ std::shared_ptr<InverterAbstract> HoymilesClass::addInverter(const char* name, c
 
 std::shared_ptr<InverterAbstract> HoymilesClass::getInverterByPos(const uint8_t pos)
 {
+    std::shared_lock<std::shared_mutex> lock(_mutex);
     if (pos >= _inverters.size()) {
         return nullptr;
     } else {
@@ -206,6 +215,7 @@ std::shared_ptr<InverterAbstract> HoymilesClass::getInverterByPos(const uint8_t 
 
 std::shared_ptr<InverterAbstract> HoymilesClass::getInverterBySerial(const uint64_t serial)
 {
+    std::shared_lock<std::shared_mutex> lock(_mutex);
     for (auto& inv : _inverters) {
         if (inv->serial() == serial) {
             return inv;
@@ -220,6 +230,7 @@ std::shared_ptr<InverterAbstract> HoymilesClass::getInverterByFragment(const fra
         return nullptr;
     }
 
+    std::shared_lock<std::shared_mutex> lock(_mutex);
     for (auto& inv : _inverters) {
         serial_u p;
         p.u64 = inv->serial();
@@ -237,9 +248,9 @@ std::shared_ptr<InverterAbstract> HoymilesClass::getInverterByFragment(const fra
 
 void HoymilesClass::removeInverterBySerial(const uint64_t serial)
 {
+    std::lock_guard<std::shared_mutex> lock(_mutex);
     for (uint8_t i = 0; i < _inverters.size(); i++) {
         if (_inverters[i]->serial() == serial) {
-            std::lock_guard<std::mutex> lock(_mutex);
             _inverters[i]->getRadio()->removeCommands(_inverters[i].get());
             _inverters.erase(_inverters.begin() + i);
             return;
@@ -249,6 +260,7 @@ void HoymilesClass::removeInverterBySerial(const uint64_t serial)
 
 size_t HoymilesClass::getNumInverters() const
 {
+    std::shared_lock<std::shared_mutex> lock(_mutex);
     return _inverters.size();
 }
 
