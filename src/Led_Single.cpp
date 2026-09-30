@@ -141,7 +141,12 @@ void LedSingleClass::setLed(const uint8_t ledNo, const bool ledState)
     const uint32_t currentPWM = ledcRead(pin.led[ledNo]);
 #endif
 
-    const uint32_t targetPWM = ledState ? pwmTable[config.Led_Single[ledNo].Brightness] : LED_OFF;
+    // The brightness is read from the persisted configuration, which the
+    // web UI clamps to 0-100, but which can also be set directly (e.g. by
+    // uploading a config.json). pwmTable has 101 entries, so clamp the
+    // index instead of reading out of bounds.
+    const uint8_t brightness = min<uint8_t>(100, config.Led_Single[ledNo].Brightness);
+    const uint32_t targetPWM = ledState ? pwmTable[brightness] : LED_OFF;
 
     if (currentPWM == targetPWM) {
         return;
