@@ -199,8 +199,12 @@ bool StatisticsParser::setChannelFieldValue(const ChannelType_t type, const Chan
         return false;
     }
 
-    uint8_t ptr = pos->start + pos->num - 1;
-    const uint8_t end = pos->start;
+    // Use a signed index: with an unsigned uint8_t the loop below would
+    // wrap around after reaching offset 0 and write out of bounds for a
+    // byte assignment starting at offset 0. All current inverter tables
+    // start at offset 2, but this should not depend on table contents.
+    int16_t ptr = static_cast<int16_t>(pos->start) + pos->num - 1;
+    const int16_t end = pos->start;
     const uint16_t div = pos->div;
 
     if (CMD_CALC == div) {
