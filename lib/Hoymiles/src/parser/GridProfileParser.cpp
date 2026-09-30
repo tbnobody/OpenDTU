@@ -454,7 +454,16 @@ std::list<GridProfileSection_t> GridProfileParser::getProfile() const
         }
 
         for (uint8_t val_id = 0; val_id < section_size; val_id++) {
-            auto itemDefinition = itemDefinitions.at(_profileValues[section_start + val_id].ItemDefinition);
+            const auto itemIterator = itemDefinitions.find(_profileValues[section_start + val_id].ItemDefinition);
+            if (itemIterator == itemDefinitions.end()) {
+                // The inverter reported a grid profile with an item
+                // definition we do not know (e.g. a newer or unknown
+                // profile version). Stop parsing instead of throwing an
+                // uncaught exception.
+                ESP_LOGW(TAG, "grid profile contains an unknown item definition");
+                break;
+            }
+            const auto& itemDefinition = itemIterator->second;
 
             float value = static_cast<int16_t>((_payloadGridProfile[pos] << 8) | _payloadGridProfile[pos + 1]);
             value /= itemDefinition.Divider;
