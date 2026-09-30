@@ -337,12 +337,12 @@ uint32_t StatisticsParser::getRxFailureCount() const
 
 void StatisticsParser::zeroRuntimeData()
 {
-    zeroFields(runtimeFields);
+    zeroFields(runtimeFields, sizeof(runtimeFields) / sizeof(runtimeFields[0]));
 }
 
 void StatisticsParser::zeroDailyYieldData()
 {
-    zeroFields(dailyProductionFields);
+    zeroFields(dailyProductionFields, sizeof(dailyProductionFields) / sizeof(dailyProductionFields[0]));
 }
 
 void StatisticsParser::zeroDailyRuntimeData()
@@ -397,12 +397,12 @@ void StatisticsParser::setMaxDailyPower(const float power)
     _maxDailyPower = power;
 }
 
-void StatisticsParser::zeroFields(const FieldId_t* fields)
+void StatisticsParser::zeroFields(const FieldId_t* fields, const size_t fieldCount)
 {
     // Loop all channels
     for (auto& t : getChannelTypes()) {
         for (auto& c : getChannelsByType(t)) {
-            for (uint8_t i = 0; i < (sizeof(runtimeFields) / sizeof(runtimeFields[0])); i++) {
+            for (size_t i = 0; i < fieldCount; i++) {
                 if (hasChannelFieldValue(t, c, fields[i])) {
                     setChannelFieldValue(t, c, fields[i], 0);
                 }
