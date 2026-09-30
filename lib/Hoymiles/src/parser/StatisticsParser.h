@@ -166,7 +166,7 @@ public:
     void setMaxDailyPower(const float power);
 
 private:
-    void zeroFields(const FieldId_t* fields);
+    void zeroFields(const FieldId_t* fields, const size_t fieldCount);
 
     uint8_t _payloadStatistic[STATISTIC_PACKET_SIZE] = {};
     uint8_t _statisticLength = 0;
