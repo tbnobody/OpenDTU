@@ -175,23 +175,21 @@ void MessageOutputClass::send_ws_chunk(const uint8_t* buffer, size_t size)
         return;
     }
 
-    bool added_warning = false;
-    for (auto& client : _ws->getClients()) {
-        if (client.queueIsFull()) {
-            continue;
-        }
+    // textAll() iterates the client list while holding the websocket
+    // server's internal clients lock and skips clients whose send queue
+    // is full, i.e. it implements exactly the backpressure handling that
+    // the previous manual loop did, but race-free with respect to
+    // clients connecting/disconnecting on the async_tcp task.
+    auto status = _ws->textAll(_ws_chunk);
 
-        client.text(_ws_chunk);
-
-        // note that all clients will see the warning, even if only one
-        // client is struggeling. however, this should be rare. we
-        // won't be copying chunks around to avoid this. we do however,
-        // avoid adding the warning multiple times.
-        if (client.queueIsFull() && !added_warning) {
-            static char const warningStr[] = "\nWARNING: websocket client's queue is full, expect log lines missing\n";
-            _ws_chunk->insert(_ws_chunk->end(), warningStr, warningStr + sizeof(warningStr) - 1);
-            added_warning = true;
-        }
+    if (status == AsyncWebSocket::SendStatus::PARTIALLY_ENQUEUED) {
+        // At least one client received this chunk while another one
+        // dropped it because its queue was full. Notify the remaining
+        // clients (and the serial/syslog sinks) that lines are missing.
+        static char const warningStr[] = "\nWARNING: websocket client's queue is full, expect log lines missing\n";
+        auto warning = std::make_shared<message_t>(_ws_chunk->begin(), _ws_chunk->end());
+        warning->insert(warning->end(), warningStr, warningStr + sizeof(warningStr) - 1);
+        _ws->textAll(warning);
     }
 
     _ws_chunk = nullptr;
