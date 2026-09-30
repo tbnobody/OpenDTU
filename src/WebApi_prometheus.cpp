@@ -152,6 +152,11 @@ void WebApiPrometheusClass::addPanelInfo(AsyncResponseStream* stream, const Stri
     }
 
     const auto& config = Configuration.getInverterConfig(inv->serial());
+    if (config == nullptr) {
+        // The inverter is not (yet or anymore) present in the configuration,
+        // e.g. while it is being deleted through the web UI.
+        return;
+    }
 
     const bool printHelp = (idx == 0 && channel == 0);
     if (printHelp) {
