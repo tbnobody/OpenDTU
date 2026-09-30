@@ -27,6 +27,9 @@ void WebApiPowerClass::onPowerStatus(AsyncWebServerRequest* request)
 
     for (uint8_t i = 0; i < Hoymiles.getNumInverters(); i++) {
         auto inv = Hoymiles.getInverterByPos(i);
+        if (inv == nullptr) {
+            continue;
+        }
 
         LastCommandSuccess status = inv->PowerCommand()->getLastPowerCommandSuccess();
         root[inv->serialString()]["power_set_status"] = WebApi.formatCommandStatus(status);
