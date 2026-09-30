@@ -97,4 +97,5 @@ enum WebApiError {
 
     HardwareBase = 12000,
     HardwarePinMappingLength,
+    HardwareInvalidDiagramDuration,
 };
