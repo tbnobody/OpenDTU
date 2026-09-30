@@ -8,6 +8,7 @@
 #include <Print.h>
 #include <SPI.h>
 #include <memory>
+#include <shared_mutex>
 #include <vector>
 
 #define HOY_SYSTEM_CONFIG_PARA_POLL_INTERVAL (2 * 60 * 1000) // 2 minutes
@@ -40,7 +41,10 @@ private:
     std::unique_ptr<HoymilesRadio_NRF> _radioNrf;
     std::unique_ptr<HoymilesRadio_CMT> _radioCmt;
 
-    std::mutex _mutex;
+    // Protects _inverters. Writers (adding/removing inverters, e.g. from
+    // the Web API task) lock exclusively, readers lock shared. Mutable so
+    // const accessors can lock as well.
+    mutable std::shared_mutex _mutex;
 
     uint32_t _pollInterval = 0;
     uint32_t _lastPoll = 0;

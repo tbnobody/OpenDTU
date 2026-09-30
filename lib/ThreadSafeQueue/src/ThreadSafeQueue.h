@@ -43,9 +43,16 @@ public:
         _queue.push_back(item);
     }
 
-    T front()
+    // Returns the front element, or an empty optional if the queue is
+    // empty. Checking emptiness and fetching the element is atomic with
+    // respect to other queue operations, so callers cannot race with a
+    // concurrent pop()/erase() between the emptiness check and the fetch.
+    std::optional<T> tryFront()
     {
         std::lock_guard<std::mutex> lock(_mutex);
+        if (_queue.empty()) {
+            return {};
+        }
         return _queue.front();
     }
 
