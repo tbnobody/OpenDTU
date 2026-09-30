@@ -129,6 +129,15 @@ void WebApiDeviceClass::onDeviceAdminPost(AsyncWebServerRequest* request)
         return;
     }
 
+    if (root["display"]["diagramduration"].as<uint32_t>() < 600 || root["display"]["diagramduration"].as<uint32_t>() > 86400) {
+        retMsg["message"] = "Diagram duration must be a number between 600 and 86400!";
+        retMsg["code"] = WebApiError::HardwareInvalidDiagramDuration;
+        retMsg["param"]["min"] = 600;
+        retMsg["param"]["max"] = 86400;
+        WebApi.sendJsonResponse(request, response, __FUNCTION__, __LINE__);
+        return;
+    }
+
     bool performRestart = false;
 
     {
