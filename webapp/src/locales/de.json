@@ -474,7 +474,7 @@
         "WifiSsid": "WLAN-SSID",
         "WifiPassword": "WLAN-Passwort",
         "Hostname": "Hostname",
-        "HostnameHint": "<b>Hinweis:</b> Der Text <span class=\"font-monospace\">%06X</span> wird durch die letzten 6 Ziffern der ESP-ChipID im Hex-Format ersetzt.",
+        "HostnameHint": "<b>Hinweis:</b> Der Text <span class=\"font-monospace\">$id$</span> wird durch die letzten 6 Ziffern der ESP-ChipID im Hex-Format ersetzt.",
         "EnableDhcp": "DHCP aktivieren",
         "StaticIpConfiguration": "Statische IP-Konfiguration",
         "IpAddress": "IP-Adresse",

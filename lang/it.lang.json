@@ -487,7 +487,7 @@
             "WifiSsid": "WiFi SSID",
             "WifiPassword": "WiFi Password",
             "Hostname": "Hostname",
-            "HostnameHint": "<b>Nota:</b> Il testo <span class=\"font-monospace\">%06X</span> sarà rimpiazzato con le ultime 6 cifre del ChipID dell'ESP32 in formato esadecimale.",
+            "HostnameHint": "<b>Nota:</b> Il testo <span class=\"font-monospace\">$id$</span> sarà rimpiazzato con le ultime 6 cifre del ChipID dell'ESP32 in formato esadecimale.",
             "EnableDhcp": "Abilita DHCP",
             "StaticIpConfiguration": "Configurazione IP Statico",
             "IpAddress": "Indirizzo IP",

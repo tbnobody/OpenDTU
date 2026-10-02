@@ -487,7 +487,7 @@
             "WifiSsid": "SSID de WiFi",
             "WifiPassword": "Contraseña de WiFi",
             "Hostname": "Nombre de Host",
-            "HostnameHint": "<b>Consejo:</b> El texto <span class=\"font-monospace\">%06X</span> se remplazará con los últimos 6 dígitos del ChipID de ESP en formato hexadecimal.",
+            "HostnameHint": "<b>Consejo:</b> El texto <span class=\"font-monospace\">$id$</span> se remplazará con los últimos 6 dígitos del ChipID de ESP en formato hexadecimal.",
             "EnableDhcp": "Habilitar DHCP",
             "StaticIpConfiguration": "Configuración de IP Estática",
             "IpAddress": "Dirección IP",

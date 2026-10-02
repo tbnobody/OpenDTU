@@ -460,6 +460,13 @@ void ConfigurationClass::migrate()
         config.Logging.Modules[0].Level = ESP_LOG_ERROR;
     }
 
+    if (config.Cfg.Version < 0x00011f00) {
+        String hostname = String(config.WiFi.Hostname);
+        hostname.replace("%06X", "$id$");
+        hostname.replace("%06x", "$id$");
+        strlcpy(config.WiFi.Hostname, hostname.c_str(), sizeof(config.WiFi.Hostname));
+    }
+
     f.close();
 
     config.Cfg.Version = CONFIG_VERSION;

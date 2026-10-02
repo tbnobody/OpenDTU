@@ -68,6 +68,8 @@ private:
     void disableAdminMode();
     bool wifiConfigured() const;
 
+    static String buildHostname(const String& hostTemplate);
+
     Task _loopTask;
 
     static constexpr byte DNS_PORT = 53;

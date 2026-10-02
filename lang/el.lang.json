@@ -487,7 +487,7 @@
             "WifiSsid": "SSID για Wi-Fi",
             "WifiPassword": "Κωδικός πρόσβασης Wi-Fi",
             "Hostname": "Όνομα κεντρικού υπολογιστή",
-            "HostnameHint": "<b>Συμβουλή:</b> Το κείμενο <span class=\"font-monospace\">%06X</span> θα αντικατασταθεί με τα τελευταία 6 ψηφία του Ολοκληρωμένου ESP  σε δεκαεξαδική μορφή.",
+            "HostnameHint": "<b>Συμβουλή:</b> Το κείμενο <span class=\"font-monospace\">$id$</span> θα αντικατασταθεί με τα τελευταία 6 ψηφία του Ολοκληρωμένου ESP  σε δεκαεξαδική μορφή.",
             "EnableDhcp": "Ενεργοποίηση DHCP",
             "StaticIpConfiguration": "Στατική Διαμόρφωση IP",
             "IpAddress": "Διεύθυνση IP",

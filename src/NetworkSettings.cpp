@@ -371,6 +371,17 @@ void NetworkSettingsClass::setHostname()
     ESP_LOG_LEVEL_LOCAL((success ? ESP_LOG_INFO : ESP_LOG_ERROR), TAG, "Setting hostname %s", success ? "done" : "failed");
 }
 
+String NetworkSettingsClass::buildHostname(const String& hostTemplate)
+{
+    const uint32_t chipId = Utils::getChipId();
+    char chipIdStr[7];
+    snprintf(chipIdStr, sizeof(chipIdStr), "%06X", static_cast<unsigned>(chipId));
+
+    String prepared = hostTemplate;
+    prepared.replace("$id$", chipIdStr);
+    return prepared;
+}
+
 void NetworkSettingsClass::setStaticIp()
 {
     if (_networkMode == network_mode::Undefined) {
@@ -491,8 +502,8 @@ String NetworkSettingsClass::getHostname()
     char resultHostname[WIFI_MAX_HOSTNAME_STRLEN + 1];
     uint8_t pos = 0;
 
-    const uint32_t chipId = Utils::getChipId();
-    snprintf(preparedHostname, WIFI_MAX_HOSTNAME_STRLEN + 1, config.WiFi.Hostname, chipId);
+    String prepared = buildHostname(config.WiFi.Hostname);
+    strlcpy(preparedHostname, prepared.c_str(), sizeof(preparedHostname));
 
     const char* pC = preparedHostname;
     while (*pC && pos < WIFI_MAX_HOSTNAME_STRLEN) { // while !null and not over length
@@ -517,7 +528,8 @@ String NetworkSettingsClass::getHostname()
 
     // Fallback if no other rule applied
     if (strlen(resultHostname) == 0) {
-        snprintf(resultHostname, WIFI_MAX_HOSTNAME_STRLEN + 1, APP_HOSTNAME, chipId);
+        String prepared = buildHostname(APP_HOSTNAME);
+        strlcpy(resultHostname, prepared.c_str(), sizeof(preparedHostname));
     }
 
     return resultHostname;
