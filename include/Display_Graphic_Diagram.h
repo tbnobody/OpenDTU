@@ -16,11 +16,13 @@ public:
 
     void updatePeriod();
 
+    const std::array<float, MAX_DATAPOINTS>& getGraphValues() const;
+    uint8_t getGraphValuesCount() const;
+    uint32_t getSecondsPerDot() const;
+
 private:
     void averageLoop();
     void dataPointLoop();
-
-    uint32_t getSecondsPerDot();
 
     Task _averageTask;
     Task _dataPointTask;
