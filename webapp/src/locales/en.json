@@ -468,6 +468,8 @@
         "SynchronizeTimeHint": "<b>Hint:</b> You can use the manual time synchronization to set the current time of OpenDTU if no NTP server is available. But be aware, that in case of power cycle the time gets lost. Also note that time accuracy will be skewed badly, as it can not be resynchronised regularly and the ESP32 microcontroller does not have a real time clock."
     },
     "networkadmin": {
+        "ShowPassword": "Show password",
+        "HidePassword": "Hide password",
         "NetworkSettings": "Network Settings",
         "WifiConfiguration": "WiFi Configuration",
         "WifiSsid": "WiFi SSID",
