@@ -23,6 +23,9 @@ static constexpr uint32_t CHANNEL_SLOT = TIME_SLOTS_PER_CHANNEL * TIME_SLOT; // 
 // on 2 seconds the maximum failure would be 400us, about 20% of the TIME_SLOT
 static constexpr uint32_t SYNC_LIFETIME_MAX = 2 * 1000 * 1000; // maximum sync time in microseconds
 
+HoymilesRadio_NRF* HoymilesRadio_NRF::_waitTimerInstance = nullptr;
+HoymilesRadio_NRF* HoymilesRadio_NRF::_loopTimerInstance = nullptr;
+
 void HoymilesRadio_NRF::init(SPIClass* initialisedSpiBus, const uint8_t pinCE, const uint8_t pinIRQ)
 {
     _dtuSerial.u64 = 0;
@@ -31,7 +34,6 @@ void HoymilesRadio_NRF::init(SPIClass* initialisedSpiBus, const uint8_t pinCE, c
     _radio.reset(new RF24(pinCE, initialisedSpiBus->pinSS()));
 
     _radio->begin(_spiPtr.get());
-
     _radio->setDataRate(RF24_250KBPS);
     _radio->enableDynamicPayloads();
     _radio->setCRCLength(RF24_CRC_16);
@@ -45,6 +47,25 @@ void HoymilesRadio_NRF::init(SPIClass* initialisedSpiBus, const uint8_t pinCE, c
     }
     ESP_LOGI(TAG, "NRF: Connection successful");
 
+    _waitTimerSemaphore = xSemaphoreCreateBinary();
+    _waitTimer = timerBegin(1, 80, true);
+    if (_waitTimer != nullptr && _waitTimerSemaphore != nullptr) {
+        _waitTimerInstance = this;
+        timerAttachInterrupt(_waitTimer, &HoymilesRadio_NRF::waitTimerIsr, true);
+        timerAlarmWrite(_waitTimer, 1, false);
+        timerAlarmDisable(_waitTimer);
+    } else {
+        if (_waitTimer != nullptr) {
+            timerEnd(_waitTimer);
+            _waitTimer = nullptr;
+        }
+        if (_waitTimerSemaphore != nullptr) {
+            vSemaphoreDelete(_waitTimerSemaphore);
+            _waitTimerSemaphore = nullptr;
+        }
+        ESP_LOGW(TAG, "NRF: Hardware wait timer unavailable; using software waits");
+    }
+
     attachInterrupt(digitalPinToInterrupt(pinIRQ), std::bind(&HoymilesRadio_NRF::handleIntr, this), FALLING);
 
     openReadingPipe();
@@ -57,6 +78,68 @@ void HoymilesRadio_NRF::loop()
     if (!_isInitialized) {
         return;
     }
+
+    if (!_timerLoopAttempted) {
+        _timerLoopAttempted = true;
+        if (startTimerLoop()) {
+            return;
+        }
+    }
+
+    if (_loopTaskHandle != nullptr && xTaskGetCurrentTaskHandle() != _loopTaskHandle) {
+        return;
+    }
+
+    loopInternal();
+}
+
+bool HoymilesRadio_NRF::startTimerLoop()
+{
+    _loopTimer = timerBegin(0, 80, true);
+    if (_loopTimer == nullptr) {
+        ESP_LOGE(TAG, "NRF: Could not create radio loop timer; using scheduler loop");
+        return false;
+    }
+
+    if (xTaskCreatePinnedToCore(loopTask, "nrfLoop", 6144, this,
+            tskIDLE_PRIORITY + 4, &_loopTaskHandle, ARDUINO_RUNNING_CORE)
+        != pdPASS) {
+        timerEnd(_loopTimer);
+        _loopTimer = nullptr;
+        ESP_LOGE(TAG, "NRF: Could not create radio loop task; using scheduler loop");
+        return false;
+    }
+
+    _loopTimerInstance = this;
+    timerAttachInterrupt(_loopTimer, &HoymilesRadio_NRF::loopTimerIsr, true);
+    timerAlarmWrite(_loopTimer, 100, true);
+    timerAlarmEnable(_loopTimer);
+    return true;
+}
+
+void ARDUINO_ISR_ATTR HoymilesRadio_NRF::loopTimerIsr()
+{
+    HoymilesRadio_NRF* instance = _loopTimerInstance;
+    if (instance != nullptr && instance->_loopTaskHandle != nullptr) {
+        BaseType_t taskWoken = pdFALSE;
+        vTaskNotifyGiveFromISR(instance->_loopTaskHandle, &taskWoken);
+        if (taskWoken == pdTRUE) {
+            portYIELD_FROM_ISR();
+        }
+    }
+}
+
+void HoymilesRadio_NRF::loopTask(void* parameter)
+{
+    HoymilesRadio_NRF* instance = static_cast<HoymilesRadio_NRF*>(parameter);
+    for (;;) {
+        ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
+        instance->loop();
+    }
+}
+
+void HoymilesRadio_NRF::loopInternal()
+{
 
     if (_packetReceived) {
         ESP_LOGV(TAG, "Interrupt received");
@@ -186,6 +269,36 @@ void HoymilesRadio_NRF::openWritingPipe(const serial_u serial)
     _radio->stopListening(s.b);
 }
 
+void HoymilesRadio_NRF::waitForMicros(uint32_t waitMicros)
+{
+    if (waitMicros == 0) {
+        return;
+    }
+    if (_waitTimer == nullptr || _waitTimerSemaphore == nullptr) {
+        delayMicroseconds(waitMicros);
+        return;
+    }
+
+    while (xSemaphoreTake(_waitTimerSemaphore, 0) == pdTRUE) { }
+    timerWrite(_waitTimer, 0);
+    timerAlarmWrite(_waitTimer, waitMicros, false);
+    timerAlarmEnable(_waitTimer);
+    xSemaphoreTake(_waitTimerSemaphore, portMAX_DELAY);
+    timerAlarmDisable(_waitTimer);
+}
+
+void ARDUINO_ISR_ATTR HoymilesRadio_NRF::waitTimerIsr()
+{
+    HoymilesRadio_NRF* instance = _waitTimerInstance;
+    if (instance != nullptr && instance->_waitTimerSemaphore != nullptr) {
+        BaseType_t taskWoken = pdFALSE;
+        xSemaphoreGiveFromISR(instance->_waitTimerSemaphore, &taskWoken);
+        if (taskWoken == pdTRUE) {
+            portYIELD_FROM_ISR();
+        }
+    }
+}
+
 void ARDUINO_ISR_ATTR HoymilesRadio_NRF::handleIntr()
 {
     _packetReceived = true;
@@ -206,7 +319,7 @@ uint8_t HoymilesRadio_NRF::getTxNxtChannel()
 
         uint32_t delayMicros = _refMicros - nowMicros;
         if (delayMicros < CHANNEL_SLOT) {
-            delayMicroseconds(delayMicros); // delay to the next channel slot
+            waitForMicros(delayMicros); // wait for the next channel slot
         }
     } else {
         // we are not in sync, we do not have to wait for the next channel slot, we use the next Tx channel
@@ -278,7 +391,7 @@ void HoymilesRadio_NRF::sendEsbPacket(CommandAbstract& cmd)
         // if we did not get acknowledgment, we wait for the next time slot to retry
         uint32_t diffMicros = micros() - newRefMicros + spiTime;
         if (diffMicros < TIME_SLOT) {
-            delayMicroseconds(TIME_SLOT - diffMicros);
+            waitForMicros(TIME_SLOT - diffMicros);
         }
         newRefMicros += TIME_SLOT;
         ++attempt;

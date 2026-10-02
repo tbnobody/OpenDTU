@@ -4,6 +4,9 @@
 #include "HoymilesRadio.h"
 #include "commands/CommandAbstract.h"
 #include <RF24.h>
+#include <freertos/FreeRTOS.h>
+#include <freertos/semphr.h>
+#include <freertos/task.h>
 #include <memory>
 #include <nRF24L01.h>
 #include <queue>
@@ -30,6 +33,12 @@ private:
     void switchRxCh(bool const ignoreTime = false);
     void openReadingPipe();
     void openWritingPipe(const serial_u serial);
+    void waitForMicros(uint32_t waitMicros);
+    static void ARDUINO_ISR_ATTR waitTimerIsr();
+    bool startTimerLoop();
+    void loopInternal();
+    static void ARDUINO_ISR_ATTR loopTimerIsr();
+    static void loopTask(void* parameter);
 
     void sendEsbPacket(CommandAbstract& cmd);
 
@@ -39,6 +48,13 @@ private:
 
     std::unique_ptr<SPIClass> _spiPtr;
     std::unique_ptr<RF24> _radio;
+    hw_timer_t* _waitTimer = nullptr;
+    SemaphoreHandle_t _waitTimerSemaphore = nullptr;
+    static HoymilesRadio_NRF* _waitTimerInstance;
+    hw_timer_t* _loopTimer = nullptr;
+    TaskHandle_t _loopTaskHandle = nullptr;
+    bool _timerLoopAttempted = false;
+    static HoymilesRadio_NRF* _loopTimerInstance;
     uint8_t _chLst[MAX_CHANNELS] = { 3, 23, 40, 61, 75 };
     uint8_t _rxChIdx = 0;
     uint8_t _txChIdx = 0;
