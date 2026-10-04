@@ -468,6 +468,8 @@
         "SynchronizeTimeHint": "<b>Hinweis:</b> Du kannst die manuelle Zeitsynchronisation verwenden, um die aktuelle Zeit von OpenDTU auf die Zeit deines Browsers einzustellen, wenn kein NTP-Server verfügbar ist. Beachte aber, dass im Falle eines Stromausfalls die Zeit verloren geht. Beachte auch, dass die Zeitgenauigkeit stark verzerrt wird, da sie nicht regelmäßig neu synchronisiert werden kann und der ESP32-Mikrocontroller nicht über eine Echtzeituhr verfügt."
     },
     "networkadmin": {
+        "ShowPassword": "Passwort anzeigen",
+        "HidePassword": "Passwort verbergen",
         "NetworkSettings": "Netzwerkeinstellungen",
         "WifiConfiguration": "WLAN-Konfiguration",
         "WifiSsid": "WLAN-SSID",
