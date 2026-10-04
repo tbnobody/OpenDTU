@@ -299,9 +299,19 @@ void DisplayGraphicClass::loop()
         snprintf(_fmtText, sizeof(_fmtText), format.c_str(), wattsTotal);
         printText(_fmtText, 2);
 
+        // Keep the setup address visible without a network connection.
+        // Shared connection status also preserves the normal row on Ethernet.
+        if (!NetworkSettings.isConnected()) {
+            if (!(_mExtra % (3 * 2) < 3) && (WiFi.getMode() & WIFI_AP)) {
+                snprintf(_fmtText, sizeof(_fmtText), "AP %s", WiFi.softAPIP().toString().c_str());
+                printText(_fmtText, 3);
+            } else {
+                printText("Network offline", 3);
+            }
+        }
         //=====> IP or Date-Time ========
         // Change every 3 seconds
-        if (!(_mExtra % (3 * 2) < 3) && NetworkSettings.localIP()) {
+        else if (!(_mExtra % (3 * 2) < 3) && NetworkSettings.localIP()) {
             printText(NetworkSettings.localIP().toString().c_str(), 3);
         } else {
             // Get current time
