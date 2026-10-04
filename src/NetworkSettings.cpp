@@ -11,6 +11,8 @@
 #include "defaults.h"
 #include <ESPmDNS.h>
 #include <ETH.h>
+#include <algorithm>
+#include <esp_wifi.h>
 
 #undef TAG
 static const char* TAG = "network";
@@ -105,10 +107,14 @@ void NetworkSettingsClass::NetworkEvent(const WiFiEvent_t event, WiFiEventInfo_t
         // Reason codes can be found here: https://github.com/espressif/esp-idf/blob/5454d37d496a8c58542eb450467471404c606501/components/esp_wifi/include/esp_wifi_types_generic.h#L79-L141
         ESP_LOGW(TAG, "WiFi disconnected: %" PRIu8 "", info.wifi_sta_disconnected.reason);
         if (_networkMode == network_mode::WiFi) {
-            ESP_LOGI(TAG, "Try reconnecting");
-            _lastReconnectAttempt = millis();
-            WiFi.disconnect(true, false);
-            WiFi.begin();
+            // AP-only recovery must not restart a paused connection.
+            if (_performConnection && wifiConfigured()) {
+                ESP_LOGI(TAG, "Try reconnecting");
+                _lastReconnectAttempt = millis();
+                cancelWifiScan();
+                WiFi.disconnect(true, false);
+                WiFi.begin();
+            }
             raiseEvent(network_event::NETWORK_DISCONNECTED);
         }
         break;
@@ -117,6 +123,9 @@ void NetworkSettingsClass::NetworkEvent(const WiFiEvent_t event, WiFiEventInfo_t
         if (_networkMode == network_mode::WiFi) {
             raiseEvent(network_event::NETWORK_GOT_IP);
         }
+        break;
+    case ARDUINO_EVENT_WIFI_SCAN_DONE:
+        onWifiScanDone(info.wifi_scan_done.status);
         break;
     default:
         break;
@@ -200,11 +209,14 @@ void NetworkSettingsClass::setupMode()
 
 void NetworkSettingsClass::enableAdminMode()
 {
+    cancelWifiScan();
+    restoreWifiScanMode();
     // This prevents a immediate "Disabling search for AP" when
     // the network connection persists for a long time and the
     // credentials gets changed.
     _connectTimeoutTimer = 0;
     _connectRedoTimer = 0;
+    _performConnection = true;
 
     _adminTimeoutCounter = 0;
     _adminTimeoutCounterMax = Configuration.get().WiFi.ApTimeout * 60;
@@ -234,6 +246,8 @@ void NetworkSettingsClass::loop()
 {
     if (_ethConnected) {
         if (_networkMode != network_mode::Ethernet) {
+            cancelWifiScan();
+            restoreWifiScanMode();
             // Do stuff when switching to Ethernet mode
             ESP_LOGI(TAG, "Switch to Ethernet mode");
             _networkMode = network_mode::Ethernet;
@@ -249,6 +263,9 @@ void NetworkSettingsClass::loop()
         applyConfig();
     }
 
+    processWifiScan();
+    const bool scanInProgress = _wifiScanActive && !_wifiScanCancelled;
+
     if (millis() - _lastTimerCall > 1000) {
         if (_adminEnabled && _adminTimeoutCounterMax > 0) {
             _adminTimeoutCounter++;
@@ -256,7 +273,7 @@ void NetworkSettingsClass::loop()
                 ESP_LOGI(TAG, "Admin AP remaining seconds: %" PRIu32 " / %" PRIu32 "", _adminTimeoutCounter, _adminTimeoutCounterMax);
             }
         }
-        if (_performConnection && !isConnected() && wifiConfigured() && millis() - _lastReconnectAttempt > 60000) {
+        if (!scanInProgress && _performConnection && !isConnected() && wifiConfigured() && millis() - _lastReconnectAttempt > 60000) {
             ESP_LOGW(TAG, "Wifi reconnect watchdog triggered... Resetting Wifi hardware");
             WiFi.disconnect(true, false);
             WiFi.mode(WIFI_MODE_NULL);
@@ -279,7 +296,7 @@ void NetworkSettingsClass::loop()
         }
         // If WiFi is connected to AP for more than adminTimeoutCounterMax
         // seconds, disable the internal Access Point
-        if (_adminTimeoutCounter > _adminTimeoutCounterMax) {
+        if (!scanInProgress && _adminTimeoutCounter > _adminTimeoutCounterMax) {
             disableAdminMode();
         }
         // It's nearly not possible to use the internal AP if the
@@ -288,19 +305,20 @@ void NetworkSettingsClass::loop()
         if (isConnected()) {
             _connectTimeoutTimer = 0;
             _connectRedoTimer = 0;
-        } else {
+        } else if (!scanInProgress) {
             if (_connectTimeoutTimer > WIFI_RECONNECT_TIMEOUT && _performConnection) {
                 ESP_LOGI(TAG, "Disabling search for AP...");
+                // Publish the pause before mode changes can emit disconnect events.
+                _performConnection = false;
                 WiFi.mode(WIFI_AP);
                 _connectRedoTimer = 0;
-                _performConnection = false;
             }
             if (_connectRedoTimer > WIFI_RECONNECT_REDO_TIMEOUT && !_performConnection) {
                 ESP_LOGI(TAG, "Enable search for AP...");
+                _performConnection = true;
                 WiFi.mode(WIFI_AP_STA);
                 applyConfig();
                 _connectTimeoutTimer = 0;
-                _performConnection = true;
             }
         }
     }
@@ -313,6 +331,8 @@ void NetworkSettingsClass::loop()
 
 void NetworkSettingsClass::applyConfig()
 {
+    cancelWifiScan();
+    restoreWifiScanMode();
     setHostname();
 
     const auto& config = Configuration.get().WiFi;
@@ -526,6 +546,150 @@ bool NetworkSettingsClass::isConnected() const
 network_mode NetworkSettingsClass::NetworkMode() const
 {
     return _networkMode;
+}
+
+void NetworkSettingsClass::requestWifiScan()
+{
+    std::lock_guard<std::mutex> lock(_wifiScanMutex);
+    if (_wifiScanActive || strcmp(_wifiScanStatus.state, "running") == 0) {
+        return;
+    }
+    _wifiScanStatus = {};
+    _wifiScanStatus.state = "running";
+    _wifiScanRequested = true;
+}
+
+WifiScanStatus NetworkSettingsClass::getWifiScanStatus() const
+{
+    std::lock_guard<std::mutex> lock(_wifiScanMutex);
+    return _wifiScanStatus;
+}
+
+void NetworkSettingsClass::restoreWifiScanMode()
+{
+    // A scan can temporarily enable STA in the AP-only recovery window. It must
+    // not turn that into a connection attempt or discard the existing retry timer.
+    if (_wifiScanRestoreSta) {
+        WiFi.enableSTA(false);
+        _wifiScanRestoreSta = false;
+    }
+}
+
+void NetworkSettingsClass::cancelWifiScan()
+{
+    std::lock_guard<std::mutex> lock(_wifiScanMutex);
+    if (_wifiScanActive && !_wifiScanCancelled.exchange(true)) {
+        _wifiScanStatus.state = "failed";
+        _wifiScanStatus.error = "busy";
+        _wifiScanStatus.count = 0;
+        // Stop before a disconnect handler resets the driver. Keep ownership
+        // until SCAN_DONE releases Arduino's results; a new scan must wait.
+        esp_wifi_scan_stop();
+    }
+}
+
+void NetworkSettingsClass::processWifiScan()
+{
+    constexpr uint32_t timeout = 10000;
+    constexpr uint32_t cacheLifetime = 60000;
+    const uint32_t now = millis();
+
+    if (_wifiScanActive) {
+        if (_wifiScanCancelled) {
+            restoreWifiScanMode();
+        }
+        if (_wifiScanCompleted.exchange(false)) {
+            restoreWifiScanMode();
+            std::lock_guard<std::mutex> lock(_wifiScanMutex);
+            _wifiScanStatus.state = _wifiScanStatus.error ? "failed" : "complete";
+            _wifiScanFinished = now;
+            _wifiScanActive = false;
+        } else if (!_wifiScanCancelled && now - _wifiScanStarted >= timeout) {
+            cancelWifiScan();
+            restoreWifiScanMode();
+            std::lock_guard<std::mutex> lock(_wifiScanMutex);
+            _wifiScanStatus.error = "timeout";
+        }
+        return;
+    }
+
+    if (_wifiScanRequested.exchange(false)) {
+        // The driver rejects scans while joining. Never disconnect a working
+        // station or change its credentials just to populate the SSID picker.
+        if (_networkMode == network_mode::Ethernet || (wifiConfigured() && _performConnection && !WiFi.isConnected())) {
+            std::lock_guard<std::mutex> lock(_wifiScanMutex);
+            _wifiScanStatus.state = "failed";
+            _wifiScanStatus.error = _networkMode == network_mode::Ethernet ? "wifi_disabled" : "busy";
+            _wifiScanFinished = now;
+            return;
+        }
+        _wifiScanRestoreSta = (WiFi.getMode() & WIFI_STA) == 0;
+        _wifiScanCancelled = false;
+        _wifiScanCompleted = false;
+        _wifiScanActive = true;
+        _wifiScanStarted = now;
+        if (WiFi.scanNetworks(true, false, false, 300) == WIFI_SCAN_FAILED) {
+            restoreWifiScanMode();
+            std::lock_guard<std::mutex> lock(_wifiScanMutex);
+            _wifiScanStatus.state = "failed";
+            _wifiScanStatus.error = "scan_failed";
+            _wifiScanFinished = now;
+            _wifiScanActive = false;
+        }
+        return;
+    }
+
+    std::lock_guard<std::mutex> lock(_wifiScanMutex);
+    if (!_wifiScanRequested && now - _wifiScanFinished >= cacheLifetime) {
+        _wifiScanStatus = {};
+    }
+}
+
+void NetworkSettingsClass::onWifiScanDone(uint32_t status)
+{
+    // Arduino fills its result buffer before this callback. Copy and release it
+    // here so timeout handling cannot free a buffer being filled on this task.
+    if (_wifiScanActive && !_wifiScanCancelled) {
+        std::lock_guard<std::mutex> lock(_wifiScanMutex);
+        const int count = WiFi.scanComplete();
+        if (status != 0 || count < 0) {
+            _wifiScanStatus.error = "scan_failed";
+        } else {
+            auto& result = _wifiScanStatus;
+            for (int i = 0; i < count; ++i) {
+                const auto* ap = static_cast<const wifi_ap_record_t*>(WiFi.getScanInfoByIndex(i));
+                if (!ap || ap->ssid[0] == 0) {
+                    continue;
+                }
+                const char* ssid = reinterpret_cast<const char*>(ap->ssid);
+                size_t index = 0;
+                while (index < result.count && strcmp(result.networks[index].ssid, ssid) != 0) {
+                    ++index;
+                }
+                if (index < result.count && result.networks[index].rssi >= ap->rssi) {
+                    continue;
+                }
+                if (index == result.networks.size()) {
+                    index--;
+                    if (result.networks[index].rssi >= ap->rssi) {
+                        continue;
+                    }
+                } else if (index == result.count) {
+                    result.count++;
+                }
+                strlcpy(result.networks[index].ssid, ssid, sizeof(result.networks[index].ssid));
+                result.networks[index].rssi = ap->rssi;
+                result.networks[index].secure = ap->authmode != WIFI_AUTH_OPEN;
+                std::sort(result.networks.begin(), result.networks.begin() + result.count, [](const auto& left, const auto& right) {
+                    return left.rssi != right.rssi ? left.rssi > right.rssi : strcmp(left.ssid, right.ssid) < 0;
+                });
+            }
+        }
+    }
+    WiFi.scanDelete();
+    if (_wifiScanActive) {
+        _wifiScanCompleted = true;
+    }
 }
 
 NetworkSettingsClass NetworkSettings;
