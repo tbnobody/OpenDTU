@@ -22,7 +22,7 @@
     "sortablejs": "^1.15.7",
     "spark-md5": "^3.0.2",
     "vue": "^3.5.43",
-    "vue-i18n": "11.4.12",
+    "vue-i18n": "11.4.13",
     "vue-router": "^5.3.1"
   },
   "devDependencies": {
