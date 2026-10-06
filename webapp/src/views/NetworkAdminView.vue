@@ -201,13 +201,16 @@ export default defineComponent({
             this.configController = controller;
             const timeout = window.setTimeout(() => controller.abort(), 10000);
             try {
-                const response = await fetch('/api/network/config', {
+                const options: RequestInit = {
                     method,
                     headers: authHeader(),
-                    body,
                     signal: controller.signal,
                     cache: 'no-store',
-                });
+                };
+                if (method === 'POST') {
+                    options.body = body;
+                }
+                const response = await fetch('/api/network/config', options);
                 return await handleResponse(response, this.$emitter, this.$router, true);
             } finally {
                 window.clearTimeout(timeout);
