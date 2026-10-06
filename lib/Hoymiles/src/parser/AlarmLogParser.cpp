@@ -70,6 +70,8 @@ const std::array<const AlarmMessage_t, ALARM_MSG_COUNT> AlarmLogParser::_alarmMe
     { AlarmMessageType_t::ALL, 127, "Firmware error", "Firmwarefehler", "Erreur du micrologiciel" },
     { AlarmMessageType_t::ALL, 128, "Hardware configuration error", "", "" },
     { AlarmMessageType_t::ALL, 129, "Abnormal bias", "Abnormaler Trend", "Polarisation anormale" },
+    { AlarmMessageType_t::MIT, 128, "Software error code 128", "Softwarefehlercode 128", "Code d'erreur logicielle 128" },
+    { AlarmMessageType_t::MIT, 129, "Software error code 129", "Softwarefehlercode 129", "Code d'erreur logicielle 129" },
     { AlarmMessageType_t::ALL, 130, "Offline", "Offline", "Non connecté" },
 
     { AlarmMessageType_t::ALL, 141, "Grid: Grid overvoltage", "Netz: Netzüberspannung", "Réseau: Surtension du réseau" },
@@ -104,8 +106,10 @@ const std::array<const AlarmMessage_t, ALARM_MSG_COUNT> AlarmLogParser::_alarmMe
 
     { AlarmMessageType_t::ALL, 215, "PV-1: Input overvoltage", "PV-1: Eingangsüberspannung", "PV-1: Surtension d’entrée" },
     { AlarmMessageType_t::HMT, 215, "MPPT-C: Input overvoltage", "MPPT-C: Eingangsüberspannung", "MPPT-C: Surtension d’entrée" },
+    { AlarmMessageType_t::MIT, 215, "MPPT-C: Input overvoltage", "MPPT-C: Eingangsüberspannung", "MPPT-C: Surtension d’entrée" },
     { AlarmMessageType_t::ALL, 216, "PV-1: Input undervoltage", "PV-1: Eingangsunterspannung", "PV-1: Sous-tension d’entrée" },
     { AlarmMessageType_t::HMT, 216, "MPPT-C: Input undervoltage", "MPPT-C: Eingangsunterspannung", "MPPT-C: Sous-tension d’entrée" },
+    { AlarmMessageType_t::MIT, 216, "MPPT-C: Input undervoltage", "MPPT-C: Eingangsunterspannung", "MPPT-C: Sous-tension d’entrée" },
     { AlarmMessageType_t::ALL, 217, "PV-2: Input overvoltage", "PV-2: Eingangsüberspannung", "PV-2: Surtension d’entrée" },
     { AlarmMessageType_t::HMT, 217, "PV-5: No input", "PV-5: Kein  Eingang", "PV-5: Aucune entrée" },
     { AlarmMessageType_t::ALL, 218, "PV-2: Input undervoltage", "PV-2: Eingangsunterspannung", "PV-2: Sous-tension d’entrée" },
@@ -113,8 +117,10 @@ const std::array<const AlarmMessage_t, ALARM_MSG_COUNT> AlarmLogParser::_alarmMe
     { AlarmMessageType_t::ALL, 219, "PV-3: Input overvoltage", "PV-3: Eingangsüberspannung", "PV-3: Surtension d’entrée" },
     { AlarmMessageType_t::HMT, 219, "MPPT-C: PV-5 & PV-6 abnormal wiring", "", "" },
     { AlarmMessageType_t::ALL, 220, "PV-3: Input undervoltage", "PV-3: Eingangsunterspannung", "PV-3: Sous-tension d’entrée" },
+    { AlarmMessageType_t::MIT, 220, "MPPT-D: Input overvoltage", "MPPT-D: Eingangsüberspannung", "MPPT-D: Surtension d’entrée" },
     { AlarmMessageType_t::ALL, 221, "PV-4: Input overvoltage", "PV-4: Eingangsüberspannung", "PV-4: Surtension d’entrée" },
     { AlarmMessageType_t::HMT, 221, "Abnormal wiring of grid neutral line", "", "" },
+    { AlarmMessageType_t::MIT, 221, "MPPT-D: Input undervoltage", "MPPT-D: Eingangsunterspannung", "MPPT-D: Sous-tension d’entrée" },
     { AlarmMessageType_t::ALL, 222, "PV-4: Input undervoltage", "PV-4: Eingangsunterspannung", "PV-4: Sous-tension d’entrée" },
 
     { AlarmMessageType_t::ALL, 223, "Grid: Connection attempt failed", "Netz: Netzaufschaltung fehlgeschlagen", "Réseau: Échec de la connexion au réseau" },

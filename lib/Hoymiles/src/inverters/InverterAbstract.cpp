@@ -3,6 +3,7 @@
  * Copyright (C) 2022-2026 Thomas Basler and others
  */
 #include "InverterAbstract.h"
+#include "commands/CommandAbstract.h"
 #include "crc.h"
 #include <HoymilesUtils.h>
 #include <cstring>
@@ -44,6 +45,26 @@ uint64_t InverterAbstract::serial() const
 const String& InverterAbstract::serialString() const
 {
     return _serialString;
+}
+
+uint32_t InverterAbstract::getSingleDataCommandTimeout() const
+{
+    return 100;
+}
+
+uint32_t InverterAbstract::getRealTimeRunDataCommandTimeout() const
+{
+    return 500;
+}
+
+uint32_t InverterAbstract::getAlarmDataCommandTimeout() const
+{
+    return 750;
+}
+
+uint8_t InverterAbstract::getMaxRetransmitCount() const
+{
+    return MAX_DEFAULT_RETRANSMIT_COUNT;
 }
 
 void InverterAbstract::setName(const char* name)

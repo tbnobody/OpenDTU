@@ -11,6 +11,7 @@ public:
 
 private:
     void onNetworkStatus(AsyncWebServerRequest* request);
+    void onNetworkScan(AsyncWebServerRequest* request);
     void onNetworkAdminGet(AsyncWebServerRequest* request);
     void onNetworkAdminPost(AsyncWebServerRequest* request);
 

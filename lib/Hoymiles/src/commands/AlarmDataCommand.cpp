@@ -28,7 +28,7 @@ AlarmDataCommand::AlarmDataCommand(InverterAbstract* inv, const uint64_t router_
 {
     setTime(time);
     setDataType(0x11);
-    setTimeout(750);
+    setTimeout(inv->getAlarmDataCommandTimeout());
 }
 
 String AlarmDataCommand::getCommandName() const

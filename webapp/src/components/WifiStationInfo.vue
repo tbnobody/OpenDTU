@@ -19,15 +19,29 @@
                     </tr>
                     <tr>
                         <th>{{ $t('wifistationinfo.Bssid') }}</th>
-                        <td>{{ networkStatus.sta_bssid }}</td>
+                        <td>
+                            {{ networkStatus.sta_connection_state === 'connected' ? networkStatus.sta_bssid : '—' }}
+                        </td>
                     </tr>
                     <tr>
                         <th>{{ $t('wifistationinfo.Quality') }}</th>
-                        <td>{{ $n(getRSSIasQuality(networkStatus.sta_rssi), 'percent') }}</td>
+                        <td>
+                            {{
+                                networkStatus.sta_connection_state === 'connected'
+                                    ? $n(getRSSIasQuality(networkStatus.sta_rssi), 'percent')
+                                    : '—'
+                            }}
+                        </td>
                     </tr>
                     <tr>
                         <th>{{ $t('wifistationinfo.Rssi') }}</th>
-                        <td>{{ $n(networkStatus.sta_rssi, 'decimal') }}</td>
+                        <td>
+                            {{
+                                networkStatus.sta_connection_state === 'connected'
+                                    ? $n(networkStatus.sta_rssi, 'decimal')
+                                    : '—'
+                            }}
+                        </td>
                     </tr>
                 </tbody>
             </table>

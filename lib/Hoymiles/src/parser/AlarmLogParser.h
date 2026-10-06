@@ -8,7 +8,7 @@
 #define ALARM_LOG_ENTRY_SIZE 12
 #define ALARM_LOG_PAYLOAD_SIZE (ALARM_LOG_ENTRY_COUNT * ALARM_LOG_ENTRY_SIZE + 4)
 
-#define ALARM_MSG_COUNT 133
+#define ALARM_MSG_COUNT 139
 
 struct AlarmLogEntry_t {
     uint16_t MessageId;
@@ -19,7 +19,8 @@ struct AlarmLogEntry_t {
 
 enum class AlarmMessageType_t {
     ALL = 0,
-    HMT
+    HMT,
+    MIT
 };
 
 enum class AlarmMessageLocale_t {

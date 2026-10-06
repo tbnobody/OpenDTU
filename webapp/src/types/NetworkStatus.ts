@@ -4,6 +4,10 @@ export interface NetworkStatus {
     sta_ssid: string;
     sta_bssid: string;
     sta_rssi: number;
+    sta_connection_state: 'not_configured' | 'disabled' | 'paused' | 'connecting' | 'waiting_for_ip' | 'connected';
+    sta_target_ssid: string;
+    sta_disconnect_reason: number | null;
+    sta_retry_in: number | null;
     // WifiApInfo
     ap_status: boolean;
     ap_ssid: string;
@@ -17,6 +21,7 @@ export interface NetworkStatus {
     network_dns2: string;
     network_mac: string;
     network_mode: string;
+    network_connected: boolean;
     // InterfaceApInfo
     ap_ip: string;
     ap_mac: string;

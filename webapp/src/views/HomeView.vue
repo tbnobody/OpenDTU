@@ -165,9 +165,9 @@
                                         <BIconJournalText style="font-size: 24px" />
                                         <span
                                             class="position-absolute top-0 start-100 translate-middle badge rounded-pill text-bg-danger"
+                                            :aria-label="$t('home.ReportedEventCount', { count: inverter.event_count })"
                                         >
-                                            {{ inverter.events }}
-                                            <span class="visually-hidden">{{ $t('home.UnreadMessages') }}</span>
+                                            <span aria-hidden="true">{{ inverter.event_count }}</span>
                                         </span>
                                     </button>
                                 </div>
@@ -585,9 +585,11 @@ export default defineComponent({
             liveData: {} as LiveData,
             isFirstFetchAfterConnect: true,
             eventLogView: {} as bootstrap.Modal,
-            eventLogSerial: '',
             eventLogList: {} as EventlogItems,
             eventLogLoading: true,
+            eventLogSerial: '',
+            eventLogRefreshInterval: 0,
+            eventLogFetchPending: false,
             devInfoView: {} as bootstrap.Modal,
             devInfoList: {} as DevInfoStatus,
             devInfoLoading: true,
@@ -636,12 +638,15 @@ export default defineComponent({
     },
     mounted() {
         this.eventLogView = new bootstrap.Modal('#eventView');
+        document.getElementById('eventView')?.addEventListener('hidden.bs.modal', this.stopEventLogRefresh);
         this.devInfoView = new bootstrap.Modal('#devInfoView');
         this.gridProfileView = new bootstrap.Modal('#gridProfileView');
         this.limitSettingView = new bootstrap.Modal('#limitSettingView');
         this.powerSettingView = new bootstrap.Modal('#powerSettingView');
     },
     unmounted() {
+        this.stopEventLogRefresh();
+        document.getElementById('eventView')?.removeEventListener('hidden.bs.modal', this.stopEventLogRefresh);
         this.socket?.close();
     },
     updated() {
@@ -772,17 +777,41 @@ export default defineComponent({
                 this.doDataAging(serial);
             }, 1000);
         },
-        onShowEventlog(serial: string) {
-            this.eventLogLoading = true;
-            this.eventLogSerial = serial;
-            fetch('/api/eventlog/status?inv=' + serial + '&locale=' + this.$i18n.locale, {
+        fetchEventLog(triggerLoading: boolean = false) {
+            if (this.eventLogSerial === '' || this.eventLogFetchPending) {
+                return;
+            }
+
+            if (triggerLoading) {
+                this.eventLogLoading = true;
+            }
+
+            this.eventLogFetchPending = true;
+            fetch('/api/eventlog/status?inv=' + this.eventLogSerial + '&locale=' + this.$i18n.locale, {
                 headers: authHeader(),
             })
                 .then((response) => handleResponse(response, this.$emitter, this.$router))
                 .then((data) => {
                     this.eventLogList = data;
                     this.eventLogLoading = false;
+                })
+                .finally(() => {
+                    this.eventLogFetchPending = false;
                 });
+        },
+        startEventLogRefresh() {
+            window.clearInterval(this.eventLogRefreshInterval);
+            this.eventLogRefreshInterval = window.setInterval(() => this.fetchEventLog(), 2000);
+        },
+        stopEventLogRefresh() {
+            window.clearInterval(this.eventLogRefreshInterval);
+            this.eventLogRefreshInterval = 0;
+            this.eventLogSerial = '';
+        },
+        onShowEventlog(serial: string) {
+            this.eventLogSerial = serial;
+            this.fetchEventLog(true);
+            this.startEventLogRefresh();
 
             this.eventLogView.show();
         },

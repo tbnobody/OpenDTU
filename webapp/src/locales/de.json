@@ -131,7 +131,7 @@
         "TurnOnOff": "Schalte Wechselrichter ein oder aus",
         "ShowInverterInfo": "Zeige Wechselrichter-Informationen",
         "ShowEventlog": "Zeige Ereignisanzeige",
-        "UnreadMessages": "Ungelesene Meldungen",
+        "ReportedEventCount": "Vom Wechselrichter gemeldeter Ereigniszähler: {count}",
         "Loading": "@:base.Loading",
         "EventLog": "Ereignisanzeige",
         "InverterInfo": "Wechselrichter-Informationen",
@@ -172,7 +172,12 @@
         "Start": "Beginn",
         "Stop": "Ende",
         "Id": "ID",
-        "Message": "Meldung"
+        "Message": "Meldung",
+        "ReportedCount": "Vom Wechselrichter gemeldeter Ereigniszähler",
+        "StoredCount": "In OpenDTU vorhandene Ereignisdetails",
+        "ReportedCountHint": "Der Zähler steigt, wenn der Wechselrichter ein neues Ereignis speichert. Er ist nicht die Anzahl der zurzeit aktiven Fehler.",
+        "DetailsUnavailable": "Aktuelle Ereignisdetails wurden noch nicht empfangen. OpenDTU versucht es automatisch erneut.",
+        "DetailsPending": "OpenDTU fragt aktuelle Ereignisdetails ab."
     },
     "devinfo": {
         "NoInfo": "Keine Informationen verfügbar",
@@ -284,6 +289,35 @@
         "NotConfigured": "nicht konfiguriert",
         "Unknown": "unbekannt"
     },
+    "networkstatus": {
+        "Title": "Aktueller Netzwerkstatus",
+        "Unavailable": "OpenDTU ist nicht erreichbar. Verbinde dich erneut mit seinem AccessPoint oder dem Heimnetz. Der Status wird automatisch aktualisiert; der letzte Verbindungsstatus ist nicht mehr aktuell.",
+        "TargetSsid": "Gespeichertes WLAN",
+        "ConnectedSsid": "Verbundenes WLAN",
+        "NextAttempt": "Nächster Verbindungsversuch",
+        "RetryIn": "In {seconds} Sekunden",
+        "DisconnectReason": "Letzte Trennung",
+        "AccessPoint": "OpenDTU-AccessPoint",
+        "EthernetConnected": "Ethernet verbunden",
+        "EthernetDisconnected": "Ethernet getrennt",
+        "States": {
+            "not_configured": "Kein WLAN eingerichtet",
+            "disabled": "WLAN-Station deaktiviert",
+            "paused": "WLAN-Verbindungsversuche pausieren, damit der AccessPoint nutzbar bleibt",
+            "connecting": "Verbindung zum gespeicherten WLAN wird hergestellt",
+            "waiting_for_ip": "WLAN verbunden; wartet auf eine IP-Adresse",
+            "connected": "WLAN verbunden"
+        },
+        "Reasons": {
+            "StationLeft": "Station hat das WLAN verlassen",
+            "HandshakeTimeout": "Zeitüberschreitung beim Handshake; Passwort und Signal prüfen",
+            "SignalLost": "WLAN-Signal verloren",
+            "NetworkNotFound": "WLAN nicht gefunden",
+            "AuthenticationFailed": "Anmeldung fehlgeschlagen; WLAN-Passwort prüfen",
+            "AssociationFailed": "Verbindung zum WLAN-AccessPoint fehlgeschlagen",
+            "Other": "Verbindung getrennt"
+        }
+    },
     "networkinfo": {
         "NetworkInformation": "Netzwerkinformationen"
     },
@@ -378,6 +412,7 @@
     "inverterchannelinfo": {
         "String": "Strang {num}",
         "Phase": "Phase {num}",
+        "ACOutput": "AC-Ausgang",
         "General": "Allgemein"
     },
     "invertertotalinfo": {
@@ -390,6 +425,12 @@
         "MaxDailyPower": "Max. Leistung",
         "Voltage": "Spannung",
         "Current": "Strom",
+        "Voltage Ph1-N": "Spannung L1-N",
+        "Current Ph1": "Strom L1",
+        "Voltage Ph2-N": "Spannung L2-N",
+        "Current Ph2": "Strom L2",
+        "Voltage Ph3-N": "Spannung L3-N",
+        "Current Ph3": "Strom L3",
         "Power DC": "DC-Leistung",
         "YieldDay": "Tagesertrag",
         "YieldTotal": "Gesamtertrag",
@@ -399,7 +440,8 @@
         "PowerFactor": "Leistungsfaktor",
         "ReactivePower": "Blindleistung",
         "Efficiency": "Wirkungsgrad",
-        "Irradiation": "Einstrahlung"
+        "Irradiation": "Einstrahlung",
+        "RawStatus": "Statuswert (nicht entschlüsselt)"
     },
     "maintenancereboot": {
         "DeviceReboot": "Gerät neu starten",
@@ -467,7 +509,34 @@
         "SynchronizeTime": "Zeit synchronisieren",
         "SynchronizeTimeHint": "<b>Hinweis:</b> Du kannst die manuelle Zeitsynchronisation verwenden, um die aktuelle Zeit von OpenDTU auf die Zeit deines Browsers einzustellen, wenn kein NTP-Server verfügbar ist. Beachte aber, dass im Falle eines Stromausfalls die Zeit verloren geht. Beachte auch, dass die Zeitgenauigkeit stark verzerrt wird, da sie nicht regelmäßig neu synchronisiert werden kann und der ESP32-Mikrocontroller nicht über eine Echtzeituhr verfügt."
     },
+    "networkscan": {
+        "NearbyNetworks": "WLANs in der Nähe",
+        "SelectNetwork": "WLAN auswählen",
+        "Secured": "Verschlüsselt",
+        "Open": "Offen",
+        "Scan": "WLANs suchen",
+        "Refresh": "Aktualisieren",
+        "Scanning": "Suche läuft…",
+        "ManualHint": "Wähle ein WLAN aus oder gib unten eine SSID ein, auch für verborgene WLANs. Die Auswahl übernimmt nur die SSID; gib das zugehörige Passwort ein und wähle Speichern, um dich zu verbinden.",
+        "ScanningHint": "WLANs in der Nähe werden gesucht. Der Zugriff auf OpenDTU kann kurz langsamer werden.",
+        "Found": "Gefundene WLANs: {count}",
+        "NoNetworks": "Keine sichtbaren WLANs gefunden. Wähle Aktualisieren oder gib die SSID unten manuell ein.",
+        "Errors": {
+            "wifi_disabled": "Die WLAN-Suche ist bei aktiver Ethernet-Verbindung nicht verfügbar. Gib die SSID unten manuell ein.",
+            "busy": "OpenDTU versucht gerade, eine Verbindung herzustellen. Warte, bis der Versuch endet oder pausiert, und wähle dann Aktualisieren.",
+            "scan_failed": "Die WLAN-Suche ist fehlgeschlagen. Wähle Aktualisieren oder gib die SSID unten manuell ein.",
+            "timeout": "Die WLAN-Suche wurde nicht rechtzeitig abgeschlossen. Verbinde dich bei Bedarf erneut mit OpenDTU und wähle Aktualisieren.",
+            "unavailable": "Die WLAN-Suche konnte nicht abgerufen werden. Prüfe die Verbindung zu OpenDTU und wähle Aktualisieren."
+        }
+    },
     "networkadmin": {
+        "ShowPassword": "Passwort anzeigen",
+        "HidePassword": "Passwort verbergen",
+        "ApCoexistenceHint": "OpenDTU kann sich mit dem Heim-WLAN verbinden und gleichzeitig seinen eigenen AccessPoint bereitstellen. Dieser bietet lokalen Zugriff auf OpenDTU; er leitet keinen Internetzugang weiter.",
+        "ReconnectHint": "Das Speichern der Netzwerkeinstellungen kann diese Seite kurz unterbrechen. Verbinde dich erneut mit dem OpenDTU-AccessPoint oder dem Heim-WLAN und öffne OpenDTU wieder. Solange die Verbindung zum Heimnetz fehlt, bleibt der AccessPoint verfügbar; nach erfolgreicher Verbindung gilt das Zeitlimit unten.",
+        "Saving": "Netzwerkeinstellungen werden gespeichert…",
+        "LoadFailed": "Netzwerkeinstellungen konnten nicht geladen werden. Verbinde dich erneut mit OpenDTU und versuche es mit Neu laden noch einmal.",
+        "SaveUnconfirmed": "Das Speichern konnte nicht bestätigt werden. Eine Netzwerkänderung könnte die Verbindung zu dieser Seite unterbrochen haben. Verbinde dich erneut mit OpenDTU und lade die Einstellungen zur Kontrolle neu, bevor du erneut speicherst.",
         "NetworkSettings": "Netzwerkeinstellungen",
         "WifiConfiguration": "WLAN-Konfiguration",
         "WifiSsid": "WLAN-SSID",
@@ -581,7 +650,9 @@
         "DeleteMsg": "Soll der Wechselrichter \"{name}\" mit der Seriennummer {serial} wirklich gelöscht werden?",
         "Delete": "Löschen",
         "YieldDayCorrection": "Tagesertragskorrektur",
-        "YieldDayCorrectionHint": "Summiert den Tagesertrag, auch wenn der Wechselrichter neu gestartet wird. Der Wert wird um Mitternacht zurückgesetzt"
+        "YieldDayCorrectionHint": "Summiert den Tagesertrag, auch wenn der Wechselrichter neu gestartet wird. Der Wert wird um Mitternacht zurückgesetzt",
+        "YieldTotalContribution": "Ertrag in Anlagensummen einbeziehen",
+        "YieldTotalContributionHint": "Bezieht Tages- und Gesamtertrag dieses Wechselrichters in die Anlagensummen ein. Seine eigenen Messwerte und die Leistungssummen bleiben unverändert."
     },
     "fileadmin": {
         "ConfigManagement": "Konfigurationsverwaltung",

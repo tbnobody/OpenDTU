@@ -312,6 +312,14 @@
                     :tooltip="$t('inverteradmin.YieldDayCorrectionHint')"
                     wide
                 />
+
+                <InputElement
+                    :label="$t('inverteradmin.YieldTotalContribution')"
+                    v-model="selectedInverterData.yield_total_contribution"
+                    type="checkbox"
+                    :tooltip="$t('inverteradmin.YieldTotalContributionHint')"
+                    wide
+                />
             </div>
         </div>
         <template #footer>

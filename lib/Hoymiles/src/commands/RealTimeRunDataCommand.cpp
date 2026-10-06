@@ -30,7 +30,7 @@ RealTimeRunDataCommand::RealTimeRunDataCommand(InverterAbstract* inv, const uint
 {
     setTime(time);
     setDataType(0x0b);
-    setTimeout(500);
+    setTimeout(inv->getRealTimeRunDataCommandTimeout());
 }
 
 String RealTimeRunDataCommand::getCommandName() const

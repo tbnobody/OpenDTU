@@ -131,7 +131,7 @@
         "TurnOnOff": "Allumer / Eteindre l'onduleur",
         "ShowInverterInfo": "Afficher les informations sur l'onduleur",
         "ShowEventlog": "Afficher le journal des événements",
-        "UnreadMessages": "messages non lus",
+        "ReportedEventCount": "Compteur d'événements signalé par l'onduleur : {count}",
         "Loading": "@:base.Loading",
         "EventLog": "Journal des événements",
         "InverterInfo": "Informations sur l'onduleur",
@@ -172,7 +172,12 @@
         "Start": "Départ",
         "Stop": "Arrêt",
         "Id": "ID",
-        "Message": "Message"
+        "Message": "Message",
+        "ReportedCount": "Compteur d'événements signalé par l'onduleur",
+        "StoredCount": "Détails des événements disponibles dans OpenDTU",
+        "ReportedCountHint": "Le compteur augmente lorsque l'onduleur enregistre un nouvel événement. Ce n'est pas le nombre de défauts actuellement actifs.",
+        "DetailsUnavailable": "Les détails actuels des événements n'ont pas encore été reçus. OpenDTU réessaiera automatiquement.",
+        "DetailsPending": "OpenDTU demande les détails actuels des événements."
     },
     "devinfo": {
         "NoInfo": "Aucune information disponible",
@@ -378,6 +383,7 @@
     "inverterchannelinfo": {
         "String": "Ligne {num}",
         "Phase": "Phase {num}",
+        "ACOutput": "Sortie CA",
         "General": "General"
     },
     "invertertotalinfo": {
@@ -390,6 +396,12 @@
         "MaxDailyPower": "Max Power",
         "Voltage": "Tension",
         "Current": "Courant",
+        "Voltage Ph1-N": "Tension L1-N",
+        "Current Ph1": "Courant L1",
+        "Voltage Ph2-N": "Tension L2-N",
+        "Current Ph2": "Courant L2",
+        "Voltage Ph3-N": "Tension L3-N",
+        "Current Ph3": "Courant L3",
         "Power DC": "Puissance continue",
         "YieldDay": "Rendement du jour",
         "YieldTotal": "Rendement total",
@@ -399,7 +411,8 @@
         "PowerFactor": "Facteur de puissance",
         "ReactivePower": "Puissance réactive",
         "Efficiency": "Efficacité",
-        "Irradiation": "Irradiation"
+        "Irradiation": "Irradiation",
+        "RawStatus": "Valeur d'état (non décodée)"
     },
     "maintenancereboot": {
         "DeviceReboot": "Redémarrage de l'appareil",
@@ -581,7 +594,9 @@
         "DeleteMsg": "Êtes-vous sûr de vouloir supprimer l'onduleur \"{name}\" avec le numéro de série \"{serial}\" ?",
         "Delete": "Supprimer",
         "YieldDayCorrection": "Yield Day Correction",
-        "YieldDayCorrectionHint": "Sum up daily yield even if the inverter is restarted. Value will be reset at midnight"
+        "YieldDayCorrectionHint": "Sum up daily yield even if the inverter is restarted. Value will be reset at midnight",
+        "YieldTotalContribution": "Inclure le rendement dans les totaux du site",
+        "YieldTotalContributionHint": "Inclut le rendement quotidien et total de cet onduleur dans les totaux du site. Ses propres mesures et les totaux de puissance restent inchangés."
     },
     "fileadmin": {
         "ConfigManagement": "Gestion de la configuration",

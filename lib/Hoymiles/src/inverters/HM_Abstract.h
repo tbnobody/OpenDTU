@@ -24,6 +24,6 @@ protected:
     PowerLimitControlType _activePowerControlType = PowerLimitControlType::AbsolutNonPersistent;
 
 private:
-    uint8_t _lastAlarmLogCnt = 0;
+    uint16_t _lastAlarmLogCnt = 0;
     uint8_t _powerState = 1;
 };
