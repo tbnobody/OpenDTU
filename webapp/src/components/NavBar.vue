@@ -39,6 +39,11 @@
                         </a>
                         <ul class="dropdown-menu" aria-labelledby="navbarScrollingDropdown">
                             <li>
+                                <router-link @click="onClick" class="dropdown-item" to="/settings/zeroexport">{{
+                                    $t('menu.ZeroExportSettings')
+                                }}</router-link>
+                            </li>
+                            <li>
                                 <router-link @click="onClick" class="dropdown-item" to="/settings/network">{{
                                     $t('menu.NetworkSettings')
                                 }}</router-link>

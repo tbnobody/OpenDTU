@@ -112,3 +112,18 @@
 #define MAX_INVERTER_LIMIT 2250
 
 #define LANG_PACK_SUFFIX ".lang.json"
+
+#define ZEROEXPORT_ENABLED false
+#define ZEROEXPORT_SETPOINT 0
+#define ZEROEXPORT_INVERTER_MINIMAL_POWER 40U // Minimum output per inverter in watts
+#define ZEROEXPORT_UPDATE_INTERVAL 30U
+#define ZEROEXPORT_UPDATE_INTERVAL_MIN 5U
+#define ZEROEXPORT_SOURCE_SHELLY_LNM 1U
+#define ZEROEXPORT_SHELLY_LNM_ADDR "239.255.55.55"
+#define ZEROEXPORT_SHELLY_LNM_PORT 5555U
+#define ZEROEXPORT_SHELLY_LNM_TYPE "act_power" // act_power, total_act_power, a_act_power, b_act_power, c_act_power
+#define ZEROEXPORT_SHELLY_LNM_FAILSAFE_TIMEOUT 300U
+#define ZEROEXPORT_SOURCE_MQTT 2U
+#define ZEROEXPORT_MQTT_GRID_POWER_TOPIC ""
+#define ZEROEXPORT_MQTT_DATA_TYPE "raw" // raw, act_power, total_act_power, a_act_power, b_act_power, c_act_power
+#define ZEROEXPORT_MQTT_FAILSAFE_TIMEOUT 300U

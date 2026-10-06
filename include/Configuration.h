@@ -8,7 +8,7 @@
 #include <mutex>
 
 #define CONFIG_FILENAME "/config.json"
-#define CONFIG_VERSION 0x00011e00 // 0.1.30 // make sure to clean all after change
+#define CONFIG_VERSION 0x00011f00 // 0.1.31 // make sure to clean all after change
 
 #define WIFI_MAX_SSID_STRLEN 32
 #define WIFI_MAX_PASSWORD_STRLEN 64
@@ -38,6 +38,10 @@
 
 #define LOG_MODULE_COUNT 16
 #define LOG_MODULE_NAME_STRLEN 32
+
+#define ZEROEXPORT_MAX_ADDR_STRLEN 15
+#define ZEROEXPORT_MAX_MQTT_TOPIC_STRLEN 127
+#define ZEROEXPORT_MAX_SHELLY_LNM_TYPE_STRLEN 15
 
 struct CHANNEL_CONFIG_T {
     uint16_t MaxChannelPower;
@@ -178,6 +182,31 @@ struct CONFIG_T {
             int8_t Level;
         } Modules[LOG_MODULE_COUNT];
     } Logging;
+
+    // Zero-Export regulation configuration.
+    struct {
+        bool Enabled; // Enable automatic inverter power-limit regulation.
+        int16_t SetPoint; // Desired grid power in watts.
+        uint16_t InverterMinimalPower; // Minimum output per inverter in watts.
+        uint16_t HomeMinimalConsumption; // Minimum home consumption in watts.
+        uint8_t UpdateInterval; // Minimum seconds between regulation runs.
+        uint8_t Source; // Grid power source identifier.
+
+        // Shelly Local Network Messaging multicast endpoint.
+        struct {
+            char GroupAddress[ZEROEXPORT_MAX_ADDR_STRLEN + 1]; // IPv4 multicast group.
+            uint16_t GroupPort; // UDP multicast port.
+            char Type[ZEROEXPORT_MAX_SHELLY_LNM_TYPE_STRLEN + 1]; // Type of power measurement (e.g., "act_power", "total_act_power", "a_act_power", "b_act_power", "c_act_power").
+            uint16_t FailsafeTimeout; // Seconds until a stale Shelly LNM sample is treated as unavailable.
+        } ShellyLnm;
+
+        // MQTT grid power source.
+        struct {
+            char GridPowerTopic[ZEROEXPORT_MAX_MQTT_TOPIC_STRLEN + 1]; // Topic publishing the raw grid power value.
+            char Type[ZEROEXPORT_MAX_SHELLY_LNM_TYPE_STRLEN + 1]; // Type of power measurement (e.g., "raw", "act_power", "total_act_power", "a_act_power", "b_act_power", "c_act_power").
+            uint16_t FailsafeTimeout; // Seconds until a stale MQTT sample is treated as unavailable.
+        } Mqtt;
+    } ZeroExport;
 };
 
 class ConfigurationClass {

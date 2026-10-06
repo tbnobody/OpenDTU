@@ -9,6 +9,7 @@
 #include "Utils.h"
 #include "__compiled_constants.h"
 #include "defaults.h"
+#include <functional>
 
 #define MAX_CONFIG_PUBLISH_RATIO 60000
 
@@ -90,6 +91,8 @@ void MqttHandleHassClass::publishConfig()
     publishDtuBinarySensor("Status", config.Mqtt.Lwt.Topic, config.Mqtt.Lwt.Value_Online, config.Mqtt.Lwt.Value_Offline, DEVICE_CLS_CONNECTIVITY, STATE_CLS_NONE, CATEGORY_DIAGNOSTIC);
 
     publishDtuButton("Restart OpenDTU", "dtu/cmd/restart", "1", "", DEVICE_CLS_RESTART, STATE_CLS_NONE, CATEGORY_CONFIG);
+
+    publishZeroExportConfig();
 
     // Loop all inverters
     for (uint8_t i = 0; i < Hoymiles.getNumInverters(); i++) {
@@ -353,7 +356,7 @@ void MqttHandleHassClass::addCommonMetadata(
 void MqttHandleHassClass::publishBinarySensor(
     JsonDocument& doc,
     const String& root_device, const String& unique_id_prefix, const String& name, const String& state_topic, const String& payload_on, const String& payload_off,
-    const DeviceClassType device_class, const StateClassType state_class, const CategoryType category)
+    const DeviceClassType device_class, const StateClassType state_class, const CategoryType category, const String& icon, const std::function<void(JsonDocument&)>& customize)
 {
     String sensor_id = name;
     sensor_id.toLowerCase();
@@ -365,7 +368,11 @@ void MqttHandleHassClass::publishBinarySensor(
     doc["pl_on"] = payload_on;
     doc["pl_off"] = payload_off;
 
-    addCommonMetadata(doc, "", "", device_class, state_class, category);
+    addCommonMetadata(doc, "", icon, device_class, state_class, category);
+
+    if (customize) {
+        customize(doc);
+    }
 
     const String configTopic = "binary_sensor/" + root_device + "/" + sensor_id + "/config";
     publish(configTopic, doc);
@@ -469,4 +476,113 @@ void MqttHandleHassClass::publishInverterSensor(
     JsonDocument root;
     createInverterInfo(root, inv);
     publishSensor(root, "dtu_" + serial, serial, name, serial + "/" + state_topic, unit_of_measure, icon, device_class, state_class, category);
+}
+
+void MqttHandleHassClass::publishZeroExportConfig()
+{
+    const String dtuId = getDtuUniqueId();
+    const String prefix = MqttSettings.getPrefix();
+
+    auto publishEntity = [&](const String& component, const String& id, const String& name,
+                             const String& cmdTopic, const String& statTopic,
+                             const std::function<void(JsonDocument&)>& customize) {
+        JsonDocument root;
+        createDtuInfo(root);
+
+        root["name"] = name;
+        root["uniq_id"] = dtuId + "_zeroexport_" + id;
+
+        if (cmdTopic.length() > 0) {
+            root["cmd_t"] = prefix + cmdTopic;
+        }
+        if (statTopic.length() > 0) {
+            root["stat_t"] = prefix + statTopic;
+        }
+
+        customize(root);
+
+        if (!Utils::checkJsonAlloc(root, __FUNCTION__, __LINE__)) {
+            return;
+        }
+        String buffer;
+        serializeJson(root, buffer);
+        publish(component + "/" + dtuId + "/zeroexport_" + id + "/config", buffer);
+    };
+
+    publishEntity("switch", "enabled", "Zero-Export",
+        "dtu/zeroexport/cmd/enabled", "dtu/zeroexport/status/enabled",
+        [](JsonDocument& root) {
+            root["ent_cat"] = "config";
+            root["pl_on"] = "1";
+            root["pl_off"] = "0";
+            root["ic"] = "mdi:transmission-tower-off";
+        });
+
+    publishEntity("number", "setpoint", "Zero-Export Setpoint",
+        "dtu/zeroexport/cmd/setpoint", "dtu/zeroexport/status/setpoint",
+        [](JsonDocument& root) {
+            root["ent_cat"] = "config";
+            root["min"] = -10000;
+            root["max"] = 10000;
+            root["step"] = 1;
+            root["mode"] = "box";
+            root["unit_of_meas"] = "W";
+            root["ic"] = "mdi:target";
+        });
+
+    // Both sensors only make sense while Zero-Export is running: tie their
+    // availability to the "enabled" status topic instead of always showing a
+    // (possibly stale) value in HA.
+    const auto withZeroExportAvailability = [&](JsonDocument& root) {
+        root["avty_t"] = prefix + "dtu/zeroexport/status/enabled";
+        root["pl_avail"] = "1";
+        root["pl_not_avail"] = "0";
+    };
+
+    publishEntity("sensor", "production_limit", "Zero-Export Production Limit",
+        "", "dtu/zeroexport/status/production_limit",
+        [&](JsonDocument& root) {
+            root["unit_of_meas"] = "W";
+            root["dev_cla"] = "power";
+            root["stat_cla"] = "measurement";
+            root["ic"] = "mdi:car-speed-limiter";
+            withZeroExportAvailability(root);
+        });
+
+    // Diagnostic of the source's measured update period (EWMA), used to
+    // monitor how the adaptive correction damps upward corrections.
+    publishEntity("sensor", "grid_update_period", "Zero-Export Grid Update Interval",
+        "", "dtu/zeroexport/status/grid_update_period",
+        [&](JsonDocument& root) {
+            root["unit_of_meas"] = "ms";
+            root["ent_cat"] = "diagnostic";
+            root["stat_cla"] = "measurement";
+            root["ic"] = "mdi:timer-sand";
+            withZeroExportAvailability(root);
+        });
+
+    // Diagnostic of the age of the latest accepted grid-power sample. Unlike
+    // the update-period EWMA above, this shows a source outage as it happens
+    // and reaches the configured fail-safe threshold when the value expires.
+    publishEntity("sensor", "grid_power_age", "Zero-Export Grid Power Age",
+        "", "dtu/zeroexport/status/grid_power_age",
+        [&](JsonDocument& root) {
+            root["unit_of_meas"] = "s";
+            root["dev_cla"] = "duration";
+            root["ent_cat"] = "diagnostic";
+            root["stat_cla"] = "measurement";
+            root["ic"] = "mdi:timer-alert-outline";
+            withZeroExportAvailability(root);
+        });
+
+    // Diagnostic flag: ON while the failsafe fallback limit is in effect
+    // (grid source stale/unavailable).
+    {
+        JsonDocument root;
+        createDtuInfo(root);
+        publishBinarySensor(root, dtuId, dtuId + "_zeroexport", "Zero-Export Failsafe",
+            "dtu/zeroexport/status/failsafe", "1", "0",
+            DEVICE_CLS_NONE, STATE_CLS_NONE, CATEGORY_DIAGNOSTIC, "mdi:alert-circle-outline",
+            [&](JsonDocument& r) { withZeroExportAvailability(r); });
+    }
 }

@@ -97,4 +97,13 @@ enum WebApiError {
 
     HardwareBase = 12000,
     HardwarePinMappingLength,
+
+    ZeroExportBase = 13000,
+    ZeroExportAddrLength,
+    ZeroExportInvalidUpdateInterval,
+    ZeroExportInvalidPort,
+    ZeroExportTypeLength,
+    ZeroExportTopicLength,
+    ZeroExportInvalidMqttDataType,
+    ZeroExportInvalidShellyLnmType,
 };
