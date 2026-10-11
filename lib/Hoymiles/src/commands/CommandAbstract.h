@@ -44,7 +44,7 @@ public:
     void setTimeout(const uint32_t timeout);
     uint32_t getTimeout() const;
 
-    // Capture settings at the first transmission and retain them for retries.
+    // Initialize at construction, refresh before the first transmission, then retain for retries.
     void prepareRadioRecoverySettings();
     uint32_t getFragmentReplyTimeout() const;
 

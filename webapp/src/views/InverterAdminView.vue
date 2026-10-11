@@ -294,13 +294,10 @@
                                 class="form-select"
                                 aria-describedby="fragment-reply-timeout-hint"
                             >
-                                <option
-                                    value="auto"
-                                    v-if="selectedInverterData.default_fragment_reply_timeout !== null"
-                                >
+                                <option value="auto" v-if="fragmentReplyTimeoutDefault !== null">
                                     {{
                                         $t('inverteradmin.FragmentAutomaticTimeout', {
-                                            value: selectedInverterData.default_fragment_reply_timeout,
+                                            value: fragmentReplyTimeoutDefault,
                                         })
                                     }}
                                 </option>
@@ -326,7 +323,12 @@
                             </div>
                             <div id="fragment-reply-timeout-hint" class="form-text">
                                 {{ $t('inverteradmin.FragmentReplyTimeoutHint') }}
-                                <template v-if="selectedInverterData.effective_fragment_reply_timeout !== null">
+                                <template
+                                    v-if="
+                                        !fragmentRecoverySerialChanged &&
+                                        selectedInverterData.effective_fragment_reply_timeout !== null
+                                    "
+                                >
                                     {{
                                         $t('inverteradmin.FragmentCurrentTimeout', {
                                             value: selectedInverterData.effective_fragment_reply_timeout,
@@ -346,10 +348,10 @@
                                 class="form-select"
                                 aria-describedby="fragment-retry-limit-hint"
                             >
-                                <option value="auto" v-if="selectedInverterData.default_fragment_retry_limit !== null">
+                                <option value="auto" v-if="fragmentRetryLimitDefault !== null">
                                     {{
                                         $t('inverteradmin.FragmentAutomaticRetries', {
-                                            value: selectedInverterData.default_fragment_retry_limit,
+                                            value: fragmentRetryLimitDefault,
                                         })
                                     }}
                                 </option>
@@ -373,7 +375,12 @@
                             />
                             <div id="fragment-retry-limit-hint" class="form-text">
                                 {{ $t('inverteradmin.FragmentRetryLimitHint') }}
-                                <template v-if="selectedInverterData.effective_fragment_retry_limit !== null">
+                                <template
+                                    v-if="
+                                        !fragmentRecoverySerialChanged &&
+                                        selectedInverterData.effective_fragment_retry_limit !== null
+                                    "
+                                >
                                     {{
                                         $t('inverteradmin.FragmentCurrentRetries', {
                                             value: selectedInverterData.effective_fragment_retry_limit,
@@ -383,6 +390,9 @@
                                 <template v-else>{{ $t('inverteradmin.FragmentCurrentUnavailable') }}</template>
                             </div>
                         </div>
+                        <p v-if="fragmentRecoverySerialChanged" class="form-text">
+                            {{ $t('inverteradmin.FragmentSerialChangedHint') }}
+                        </p>
                         <p class="form-text">{{ $t('inverteradmin.FragmentRecoveryHint') }}</p>
                         <button type="button" class="btn btn-outline-secondary" @click="resetFragmentRecovery">
                             {{ $t('inverteradmin.FragmentResetAutomatic') }}
@@ -510,6 +520,7 @@ export default defineComponent({
             } as Inverter,
             manualFragmentReplyTimeout: false,
             manualFragmentRetryLimit: false,
+            originalInverterSerial: '',
             inverters: [] as Inverter[],
             dataLoading: true,
             alert: {} as AlertResponse,
@@ -517,6 +528,15 @@ export default defineComponent({
         };
     },
     computed: {
+        fragmentRecoverySerialChanged(): boolean {
+            return this.selectedInverterData.serial.toUpperCase() !== this.originalInverterSerial;
+        },
+        fragmentReplyTimeoutDefault(): number | null {
+            return this.fragmentRecoverySerialChanged ? null : this.selectedInverterData.default_fragment_reply_timeout;
+        },
+        fragmentRetryLimitDefault(): number | null {
+            return this.fragmentRecoverySerialChanged ? null : this.selectedInverterData.default_fragment_retry_limit;
+        },
         fragmentReplyTimeoutMode: {
             get(): string {
                 return this.manualFragmentReplyTimeout ? 'manual' : 'auto';
@@ -524,7 +544,7 @@ export default defineComponent({
             set(mode: string) {
                 this.manualFragmentReplyTimeout = mode === 'manual';
                 this.selectedInverterData.fragment_reply_timeout =
-                    mode === 'auto' ? 0 : (this.selectedInverterData.default_fragment_reply_timeout ?? 50);
+                    mode === 'auto' ? 0 : (this.fragmentReplyTimeoutDefault ?? 50);
             },
         },
         fragmentRetryLimitMode: {
@@ -534,7 +554,7 @@ export default defineComponent({
             set(mode: string) {
                 this.manualFragmentRetryLimit = mode === 'manual';
                 this.selectedInverterData.fragment_retry_limit =
-                    mode === 'auto' ? 0 : (this.selectedInverterData.default_fragment_retry_limit ?? 1);
+                    mode === 'auto' ? 0 : (this.fragmentRetryLimitDefault ?? 1);
             },
         },
     },
@@ -612,6 +632,7 @@ export default defineComponent({
         onOpenModal(modal: bootstrap.Modal, inverter: Inverter) {
             // deep copy inverter object for editing/deleting
             this.selectedInverterData = JSON.parse(JSON.stringify(inverter)) as Inverter;
+            this.originalInverterSerial = inverter.serial.toUpperCase();
             this.manualFragmentReplyTimeout = this.selectedInverterData.fragment_reply_timeout !== 0;
             this.manualFragmentRetryLimit = this.selectedInverterData.fragment_retry_limit !== 0;
             modal.show();
