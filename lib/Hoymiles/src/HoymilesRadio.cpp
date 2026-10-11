@@ -49,6 +49,7 @@ void HoymilesRadio::sendRetransmitPacket(const uint8_t fragment_id)
     CommandAbstract* requestCmd = cmd->getRequestFrameCommand(fragment_id);
 
     if (requestCmd != nullptr) {
+        requestCmd->setTimeout(cmd->getFragmentReplyTimeout());
         sendEsbPacket(*requestCmd);
     }
 }
@@ -153,6 +154,7 @@ void HoymilesRadio::handleReceivedPackage()
 
             auto inv = Hoymiles.getInverterBySerial(cmd->getTargetAddress());
             if (nullptr != inv) {
+                cmd->prepareRadioRecoverySettings();
                 inv->clearRxFragmentBuffer();
                 // Statistics: TX Requests
                 inv->RadioStats.TxRequestData++;

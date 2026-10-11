@@ -12,6 +12,29 @@
 #include <AsyncJson.h>
 #include <Hoymiles.h>
 #include <HoymilesUtils.h>
+#include <RadioRecoverySettings.h>
+
+static bool validateRadioRecoverySettings(const JsonDocument& input, JsonObject output)
+{
+    const JsonVariantConst replyTimeout = input["fragment_reply_timeout"];
+    if (!replyTimeout.isUnbound()
+        && (!replyTimeout.is<uint16_t>()
+            || !RadioRecoverySettings::isValidFragmentReplyTimeout(replyTimeout.as<uint16_t>()))) {
+        output["message"] = "Fragment reply timeout must be 0 (automatic) or 50 to 5000 milliseconds!";
+        output["code"] = WebApiError::InverterInvalidFragmentReplyTimeout;
+        return false;
+    }
+
+    const JsonVariantConst retryLimit = input["fragment_retry_limit"];
+    if (!retryLimit.isUnbound()
+        && (!retryLimit.is<uint8_t>() || !RadioRecoverySettings::isValidFragmentRetryLimit(retryLimit.as<uint8_t>()))) {
+        output["message"] = "Fragment retry limit must be 0 (automatic) or 1 to 50!";
+        output["code"] = WebApiError::InverterInvalidFragmentRetryLimit;
+        return false;
+    }
+
+    return true;
+}
 
 void WebApiInverterClass::init(AsyncWebServer& server, Scheduler& scheduler)
 {
@@ -56,14 +79,24 @@ void WebApiInverterClass::onInverterList(AsyncWebServerRequest* request)
             obj["clear_eventlog"] = config.Inverter[i].ClearEventlogOnMidnight;
             obj["yieldday_correction"] = config.Inverter[i].YieldDayCorrection;
             obj["yield_total_contribution"] = config.Inverter[i].YieldTotalContribution;
+            obj["fragment_reply_timeout"] = config.Inverter[i].FragmentReplyTimeout;
+            obj["fragment_retry_limit"] = config.Inverter[i].FragmentRetryLimit;
 
             auto inv = Hoymiles.getInverterBySerial(config.Inverter[i].Serial);
             uint8_t max_channels;
             if (inv == nullptr) {
                 obj["type"] = "Unknown";
+                obj["effective_fragment_reply_timeout"] = nullptr;
+                obj["effective_fragment_retry_limit"] = nullptr;
+                obj["default_fragment_reply_timeout"] = nullptr;
+                obj["default_fragment_retry_limit"] = nullptr;
                 max_channels = INV_MAX_CHAN_COUNT;
             } else {
                 obj["type"] = inv->typeName();
+                obj["effective_fragment_reply_timeout"] = inv->getEffectiveFragmentReplyTimeout();
+                obj["effective_fragment_retry_limit"] = inv->getEffectiveFragmentRetryLimit();
+                obj["default_fragment_reply_timeout"] = inv->getSingleDataCommandTimeout();
+                obj["default_fragment_retry_limit"] = inv->getMaxRetransmitCount();
                 max_channels = inv->Statistics()->getChannelsByType(TYPE_DC).size();
             }
 
@@ -120,6 +153,11 @@ void WebApiInverterClass::onInverterAdd(AsyncWebServerRequest* request)
         return;
     }
 
+    if (!validateRadioRecoverySettings(root, retMsg)) {
+        WebApi.sendJsonResponse(request, response, __FUNCTION__, __LINE__);
+        return;
+    }
+
     INVERTER_CONFIG_T* inverter = Configuration.getFreeInverterSlot();
 
     if (!inverter) {
@@ -133,6 +171,8 @@ void WebApiInverterClass::onInverterAdd(AsyncWebServerRequest* request)
     // Interpret the string as a hex value and convert it to uint64_t
     inverter->Serial = serial;
     inverter->YieldTotalContribution = true;
+    inverter->FragmentReplyTimeout = root["fragment_reply_timeout"] | static_cast<uint16_t>(0);
+    inverter->FragmentRetryLimit = root["fragment_retry_limit"] | static_cast<uint8_t>(0);
 
     strncpy(inverter->Name, root["name"].as<String>().c_str(), INV_MAX_NAME_STRLEN);
 
@@ -143,6 +183,7 @@ void WebApiInverterClass::onInverterAdd(AsyncWebServerRequest* request)
     auto inv = Hoymiles.addInverter(inverter->Name, inverter->Serial);
 
     if (inv != nullptr) {
+        inv->setRadioRecoverySettings(inverter->FragmentReplyTimeout, inverter->FragmentRetryLimit);
         for (uint8_t c = 0; c < INV_MAX_CHAN_COUNT; c++) {
             inv->Statistics()->setStringMaxPower(c, inverter->channel[c].MaxChannelPower);
         }
@@ -208,6 +249,11 @@ void WebApiInverterClass::onInverterEdit(AsyncWebServerRequest* request)
         return;
     }
 
+    if (!validateRadioRecoverySettings(root, retMsg)) {
+        WebApi.sendJsonResponse(request, response, __FUNCTION__, __LINE__);
+        return;
+    }
+
     uint64_t old_serial = 0;
 
     {
@@ -231,6 +277,12 @@ void WebApiInverterClass::onInverterEdit(AsyncWebServerRequest* request)
         inverter.YieldDayCorrection = root["yieldday_correction"] | false;
         if (root["yield_total_contribution"].is<bool>()) {
             inverter.YieldTotalContribution = root["yield_total_contribution"];
+        }
+        if (!root["fragment_reply_timeout"].isUnbound()) {
+            inverter.FragmentReplyTimeout = root["fragment_reply_timeout"].as<uint16_t>();
+        }
+        if (!root["fragment_retry_limit"].isUnbound()) {
+            inverter.FragmentRetryLimit = root["fragment_retry_limit"].as<uint8_t>();
         }
 
         uint8_t arrayCount = 0;
@@ -262,6 +314,7 @@ void WebApiInverterClass::onInverterEdit(AsyncWebServerRequest* request)
     }
 
     if (inv != nullptr) {
+        inv->setRadioRecoverySettings(inverter.FragmentReplyTimeout, inverter.FragmentRetryLimit);
         inv->setEnablePolling(inverter.Poll_Enable);
         inv->setEnableCommands(inverter.Command_Enable);
         inv->setReachableThreshold(inverter.ReachableThreshold);

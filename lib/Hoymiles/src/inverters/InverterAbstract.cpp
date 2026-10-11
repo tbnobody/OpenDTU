@@ -67,6 +67,34 @@ uint8_t InverterAbstract::getMaxRetransmitCount() const
     return MAX_DEFAULT_RETRANSMIT_COUNT;
 }
 
+void InverterAbstract::setRadioRecoverySettings(const uint16_t fragmentReplyTimeout, const uint8_t fragmentRetryLimit)
+{
+    const uint32_t timeout = RadioRecoverySettings::isValidFragmentReplyTimeout(fragmentReplyTimeout) ? fragmentReplyTimeout : 0;
+    const uint32_t retryLimit = RadioRecoverySettings::isValidFragmentRetryLimit(fragmentRetryLimit) ? fragmentRetryLimit : 0;
+    _radioRecoverySettings.store(timeout | (retryLimit << 16), std::memory_order_relaxed);
+}
+
+RadioRecoverySettings InverterAbstract::getRadioRecoverySettings() const
+{
+    const uint32_t settings = _radioRecoverySettings.load(std::memory_order_relaxed);
+    const uint32_t timeout = settings & 0xffff;
+    const uint8_t retryLimit = settings >> 16;
+    return {
+        timeout == 0 ? getSingleDataCommandTimeout() : timeout,
+        retryLimit == 0 ? getMaxRetransmitCount() : retryLimit,
+    };
+}
+
+uint32_t InverterAbstract::getEffectiveFragmentReplyTimeout() const
+{
+    return getRadioRecoverySettings().fragmentReplyTimeout;
+}
+
+uint8_t InverterAbstract::getEffectiveFragmentRetryLimit() const
+{
+    return getRadioRecoverySettings().fragmentRetryLimit;
+}
+
 void InverterAbstract::setName(const char* name)
 {
     uint8_t len = strlen(name);
