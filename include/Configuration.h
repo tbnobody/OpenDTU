@@ -59,6 +59,8 @@ struct INVERTER_CONFIG_T {
     bool ClearEventlogOnMidnight;
     bool YieldDayCorrection;
     bool YieldTotalContribution;
+    uint16_t FragmentReplyTimeout;
+    uint8_t FragmentRetryLimit;
     CHANNEL_CONFIG_T channel[INV_MAX_CHAN_COUNT];
 };
 

@@ -40,6 +40,8 @@ CommandAbstract::CommandAbstract(InverterAbstract* inv, const uint64_t router_ad
 
     _inv = inv;
 
+    prepareRadioRecoverySettings();
+
     setTargetAddress(_inv->serial());
     setRouterAddress(router_address);
     setSendCount(0);
@@ -94,6 +96,16 @@ uint32_t CommandAbstract::getTimeout() const
     return _timeout;
 }
 
+void CommandAbstract::prepareRadioRecoverySettings()
+{
+    _radioRecoverySettings = _inv->getRadioRecoverySettings();
+}
+
+uint32_t CommandAbstract::getFragmentReplyTimeout() const
+{
+    return _radioRecoverySettings.fragmentReplyTimeout;
+}
+
 void CommandAbstract::setSendCount(const uint8_t count)
 {
     _sendCount = count;
@@ -135,7 +147,7 @@ uint8_t CommandAbstract::getMaxResendCount() const
 
 uint8_t CommandAbstract::getMaxRetransmitCount() const
 {
-    return _inv->getMaxRetransmitCount();
+    return _radioRecoverySettings.fragmentRetryLimit;
 }
 
 bool CommandAbstract::areSameParameter(CommandAbstract* other)

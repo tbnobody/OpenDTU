@@ -10,8 +10,10 @@
 #include "../parser/StatisticsParser.h"
 #include "../parser/SystemConfigParaParser.h"
 #include "HoymilesRadio.h"
+#include "RadioRecoverySettings.h"
 #include "types.h"
 #include <Arduino.h>
+#include <atomic>
 #include <cstdint>
 #include <list>
 
@@ -45,6 +47,11 @@ public:
     virtual uint32_t getRealTimeRunDataCommandTimeout() const;
     virtual uint32_t getAlarmDataCommandTimeout() const;
     virtual uint8_t getMaxRetransmitCount() const;
+
+    void setRadioRecoverySettings(const uint16_t fragmentReplyTimeout, const uint8_t fragmentRetryLimit);
+    RadioRecoverySettings getRadioRecoverySettings() const;
+    uint32_t getEffectiveFragmentReplyTimeout() const;
+    uint8_t getEffectiveFragmentRetryLimit() const;
 
     bool isProducing();
     bool isReachable();
@@ -145,6 +152,8 @@ private:
     bool _enableCommands = true;
 
     uint8_t _reachableThreshold = 3;
+
+    std::atomic<uint32_t> _radioRecoverySettings { 0 };
 
     bool _zeroValuesIfUnreachable = false;
     bool _zeroYieldDayOnMidnight = false;

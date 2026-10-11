@@ -2,6 +2,7 @@
 #pragma once
 
 #include "types.h"
+#include "RadioRecoverySettings.h"
 #include <Stream.h>
 #include <WString.h>
 #include <cstdint>
@@ -43,6 +44,10 @@ public:
     void setTimeout(const uint32_t timeout);
     uint32_t getTimeout() const;
 
+    // Capture settings at the first transmission and retain them for retries.
+    void prepareRadioRecoverySettings();
+    uint32_t getFragmentReplyTimeout() const;
+
     virtual String getCommandName() const = 0;
 
     void setSendCount(const uint8_t count);
@@ -81,6 +86,8 @@ protected:
     uint64_t _routerAddress;
 
     InverterAbstract* _inv;
+
+    RadioRecoverySettings _radioRecoverySettings;
 
 private:
     void setTargetAddress(const uint64_t address);
