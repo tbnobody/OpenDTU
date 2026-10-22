@@ -143,6 +143,16 @@ void Provider::powerControlLoop()
     // Automatic power control
     // ***********************
     if (config.GridCharger.AutoPowerEnabled) {
+        // check the data age before the stabilization delay below, so an
+        // outdated request is reset immediately.
+        if (millis() - getLastHttpUpdate() > DATA_MAX_AGE_MS) {
+            setRequestedPowerAc(0);
+            if (_autoModeBlockedTillMillis > millis()) { return; }
+            DTU_LOGW("Cannot perform auto power control when critical PSU values are outdated");
+            _autoModeBlockedTillMillis = millis() + 1000;
+            return;
+        }
+
         // Check if we should run automatic power calculation at all.
         // We may have set a value recently and still wait for output stabilization
         if (_autoModeBlockedTillMillis > millis()) {
@@ -156,18 +166,12 @@ void Provider::powerControlLoop()
             return;
         }
 
-        if (millis() - _dataCurrent.getLastUpdate() > 30 * 1000) {
-            DTU_LOGW("Cannot perform auto power control when critical PSU values are outdated");
-            _autoModeBlockedTillMillis = millis() + 1000;
-            return;
-        }
-
         // The Trucki refuses to charge while the battery is full or the grid
         // voltage is low. Firmware >= 1.09 reports this state via UDP. Older
         // firmware reports a max AC power of 0 W instead (while the battery is
         // full), which limits the requested power below. The state is ignored
         // once outdated, the max AC power (also polled via HTTP) still applies.
-        bool batteryGridStateValid = millis() - _lastBatteryGridStateMillis < 30 * 1000;
+        bool batteryGridStateValid = millis() - _lastBatteryGridStateMillis < DATA_MAX_AGE_MS;
         if (batteryGridStateValid && (_batteryGridState == BATTERY_GRID_STATE_VBAT_FULL
                 || _batteryGridState == BATTERY_GRID_STATE_VGRID_LOW_DELAYED
                 || _batteryGridState == BATTERY_GRID_STATE_VGRID_LOW)) {
