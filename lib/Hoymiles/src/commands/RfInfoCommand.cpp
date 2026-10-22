@@ -38,11 +38,14 @@ the answer as a fragment id. Should an inverter ever put 0x00 or a value
 this command.
 */
 #include "RfInfoCommand.h"
+#include "../CmtLinkRecovery.h"
 #include "inverters/InverterAbstract.h"
 
 // Command id, and the flag the inverter sets on it to mark its answer
 constexpr uint8_t CommandId = 0x06;
 constexpr uint8_t ResponseFlag = 0x80;
+
+constexpr uint32_t ProbeTimeoutMs = 150;
 
 RfInfoCommand::RfInfoCommand(InverterAbstract* inv, const uint64_t router_address)
     : CommandAbstract(inv, router_address)
@@ -57,6 +60,23 @@ RfInfoCommand::RfInfoCommand(InverterAbstract* inv, const uint64_t router_addres
 String RfInfoCommand::getCommandName() const
 {
     return "RfInfo";
+}
+
+void RfInfoCommand::setProbeFrequency(const uint32_t frequency)
+{
+    setFrequency(frequency);
+    setTimeout(ProbeTimeoutMs);
+    _probe = true;
+}
+
+uint8_t RfInfoCommand::getMaxResendCount() const
+{
+    return _probe ? 0 : CommandAbstract::getMaxResendCount();
+}
+
+bool RfInfoCommand::areSameParameter(CommandAbstract* other)
+{
+    return CommandAbstract::areSameParameter(other) && getFrequency() == other->getFrequency();
 }
 
 bool RfInfoCommand::handleResponse(const fragment_t fragment[], const uint8_t max_fragment_id)
@@ -76,6 +96,10 @@ bool RfInfoCommand::handleResponse(const fragment_t fragment[], const uint8_t ma
     }
 
     _inv->RfInfo()->setLastUpdate(millis());
+
+    if (_probe) {
+        CmtLinkRecovery::onProbeHit(_inv, getFrequency());
+    }
 
     return true;
 }

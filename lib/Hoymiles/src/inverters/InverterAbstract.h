@@ -10,6 +10,7 @@
 #include "../parser/StatisticsParser.h"
 #include "../parser/SystemConfigParaParser.h"
 #include "HoymilesRadio.h"
+#include "CmtLinkState.h"
 #include "RadioRecoverySettings.h"
 #include "types.h"
 #include <Arduino.h>
@@ -55,6 +56,7 @@ public:
 
     bool isProducing();
     bool isReachable();
+    bool wasHeardRecently(const uint32_t pollCycles) const;
 
     void setEnablePolling(const bool enabled);
     bool getEnablePolling() const;
@@ -76,8 +78,10 @@ public:
 
     int8_t getLastRssi() const;
 
+    CmtLinkState CmtLink;
+
     void clearRxFragmentBuffer();
-    void addRxFragment(const uint8_t fragment[], const uint8_t len, const int8_t rssi);
+    void addRxFragment(const uint8_t fragment[], const uint8_t len, const int8_t rssi, const uint8_t expectedMainCmd = 0);
     uint8_t verifyAllFragments(CommandAbstract& cmd);
 
     // Side-effect-free check whether all fragments of the current transaction

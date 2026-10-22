@@ -72,6 +72,8 @@ void HoymilesClass::loop()
 
             if (!iv->isReachable()) {
                 iv->sendChangeChannelRequest();
+            } else {
+                iv->CmtLink.acceptedNoLink = 0;
             }
 
             if (HoymilesUtils::getTimeAvailable()) {
