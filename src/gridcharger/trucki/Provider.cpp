@@ -286,6 +286,13 @@ void Provider::parseControlCommandResponse()
     int packetSize = TruckiUdp.parsePacket();
     if (0 == packetSize) { return; }
 
+    auto const& truckiIp = IPAddress(Configuration.get().GridCharger.Trucki.IpAddress);
+    if (TruckiUdp.remoteIP() != truckiIp) {
+        DTU_LOGD("ignoring %d bytes from %s", packetSize, TruckiUdp.remoteIP().toString().c_str());
+        TruckiUdp.flush(); // parsePacket() returns 0 while an unread packet is buffered
+        return;
+    }
+
     std::vector<char> buffer(packetSize + 1, '\0');
     int readBytes = TruckiUdp.read(buffer.data(), packetSize);
     if (readBytes <= 0) { return; }
