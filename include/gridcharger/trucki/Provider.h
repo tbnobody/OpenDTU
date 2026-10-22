@@ -86,7 +86,12 @@ private:
     uint32_t _lastPowerMeterUpdateReceivedMillis = 0; // Timestamp of last seen power meter value
     uint32_t _autoModeBlockedTillMillis = 0;      // Timestamp to block running auto mode for some time
 
-    bool _autoPowerEnabled = false;
+    // battery/grid state reported via UDP (Trucki firmware >= 1.09), -1 if unknown
+    static constexpr int BATTERY_GRID_STATE_VBAT_FULL = 2;
+    static constexpr int BATTERY_GRID_STATE_VGRID_LOW_DELAYED = 4;
+    static constexpr int BATTERY_GRID_STATE_VGRID_LOW = 5;
+    int _batteryGridState = -1;
+    uint32_t _lastBatteryGridStateMillis = 0;
     bool _batteryEmergencyCharging = false;
 };
 
