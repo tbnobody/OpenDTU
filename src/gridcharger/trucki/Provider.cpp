@@ -8,7 +8,6 @@
 #include <Utils.h>
 #include <WiFiUdp.h>
 #include <LogHelper.h>
-#include <defaults.h>
 
 #undef TAG
 static const char* TAG = "gridCharger";
@@ -38,7 +37,7 @@ bool Provider::init()
 
     _httpRequestConfig = std::make_unique<HttpRequestConfig>();
     strlcpy(_httpRequestConfig->Url, ("http://" + ipAddress.toString() + "/jsonlive").c_str(), sizeof(_httpRequestConfig->Url));
-    _httpRequestConfig->Timeout = HTTP_REQUEST_TIMEOUT_MIN_MS;
+    _httpRequestConfig->Timeout = HTTP_TIMEOUT_MS;
     strlcpy(_httpRequestConfig->HeaderKey, "", sizeof(_httpRequestConfig->HeaderKey));
     strlcpy(_httpRequestConfig->HeaderValue, "", sizeof(_httpRequestConfig->HeaderValue));
     strlcpy(_httpRequestConfig->Username, "admin", sizeof(_httpRequestConfig->Username)); // default username

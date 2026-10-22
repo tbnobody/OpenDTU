@@ -82,6 +82,7 @@ private:
     std::unique_ptr<HttpGetter> _httpGetter;
 
     static constexpr int DATA_POLLING_INTERVAL_MS = 3000; // 3 seconds
+    static constexpr int HTTP_TIMEOUT_MS = 2000; // 2 seconds
     static constexpr uint32_t DATA_MAX_AGE_MS = 30 * 1000;
 
     void setRequestedPowerAc(float power);
