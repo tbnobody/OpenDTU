@@ -54,8 +54,8 @@ void Stats::getLiveViewData(JsonVariant& root) const
     addValueInSection<DataPointLabel::DcPower>(root, "output", "power", 1);
     addValueInSection<DataPointLabel::DcCurrent>(root, "output", "current", 2);
 
-    addValueInSection<DataPointLabel::DcVoltageOffline>(root, "settings", "offlineVoltage", 0);
-    addValueInSection<DataPointLabel::DcCurrentOffline>(root, "settings", "offlineCurrent", 0);
+    addValueInSection<DataPointLabel::DcVoltageOffline>(root, "settings", "offlineVoltage", 2);
+    addValueInSection<DataPointLabel::DcCurrentOffline>(root, "settings", "offlineCurrent", 2);
 }
 
 }; // namespace GridChargers::Trucki
