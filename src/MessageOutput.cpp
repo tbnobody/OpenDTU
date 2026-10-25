@@ -175,24 +175,10 @@ void MessageOutputClass::send_ws_chunk(const uint8_t* buffer, size_t size)
         return;
     }
 
-    bool added_warning = false;
-    for (auto& client : _ws->getClients()) {
-        if (client.queueIsFull()) {
-            continue;
-        }
-
-        client.text(_ws_chunk);
-
-        // note that all clients will see the warning, even if only one
-        // client is struggeling. however, this should be rare. we
-        // won't be copying chunks around to avoid this. we do however,
-        // avoid adding the warning multiple times.
-        if (client.queueIsFull() && !added_warning) {
-            static char const warningStr[] = "\nWARNING: websocket client's queue is full, expect log lines missing\n";
-            _ws_chunk->insert(_ws_chunk->end(), warningStr, warningStr + sizeof(warningStr) - 1);
-            added_warning = true;
-        }
-    }
+    // The broadcast API protects client lifetimes while connections change.
+    // Full queues discard this chunk by default, so slow clients do not block others.
+    // Keep the shared buffer unchanged once it is queued for transmission.
+    _ws->textAll(_ws_chunk);
 
     _ws_chunk = nullptr;
     _last_ws_chunk_sent = millis();

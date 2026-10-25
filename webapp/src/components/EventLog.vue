@@ -1,4 +1,20 @@
 <template>
+    <dl class="row mb-3">
+        <dt class="col-sm-8">{{ $t('eventlog.ReportedCount') }}</dt>
+        <dd class="col-sm-4">{{ eventLogList.reported_count }}</dd>
+        <dt class="col-sm-8">{{ $t('eventlog.StoredCount') }}</dt>
+        <dd class="col-sm-4">{{ eventLogList.count }}</dd>
+    </dl>
+
+    <p class="text-body-secondary">{{ $t('eventlog.ReportedCountHint') }}</p>
+
+    <div v-if="eventLogList.last_request_status === 'failure'" class="alert alert-warning" role="alert">
+        {{ $t('eventlog.DetailsUnavailable') }}
+    </div>
+    <div v-else-if="eventLogList.last_request_status === 'pending'" class="alert alert-info" role="status">
+        {{ $t('eventlog.DetailsPending') }}
+    </div>
+
     <table class="table table-hover">
         <thead>
             <tr>

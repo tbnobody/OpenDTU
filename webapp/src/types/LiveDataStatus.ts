@@ -3,6 +3,7 @@ export interface ValueObject {
     u: string; // unit
     d: number; // digits
     max: number;
+    f?: string; // optional preformatted value
 }
 
 export interface InverterStatistics {
@@ -10,6 +11,12 @@ export interface InverterStatistics {
     Power?: ValueObject;
     Voltage?: ValueObject;
     Current?: ValueObject;
+    'Voltage Ph1-N'?: ValueObject;
+    'Current Ph1'?: ValueObject;
+    'Voltage Ph2-N'?: ValueObject;
+    'Current Ph2'?: ValueObject;
+    'Voltage Ph3-N'?: ValueObject;
+    'Current Ph3'?: ValueObject;
     'Power DC'?: ValueObject;
     YieldDay?: ValueObject;
     YieldTotal?: ValueObject;
@@ -19,6 +26,7 @@ export interface InverterStatistics {
     ReactivePower?: ValueObject;
     Efficiency?: ValueObject;
     Irradiation?: ValueObject;
+    RawStatus?: ValueObject;
 }
 
 export interface RadioStatistics {
@@ -43,6 +51,7 @@ export interface Inverter {
     limit_relative: number;
     limit_absolute: number;
     events: number;
+    event_count: number;
     AC: InverterStatistics[];
     DC: InverterStatistics[];
     INV: InverterStatistics[];

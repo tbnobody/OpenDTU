@@ -34,6 +34,8 @@ enum WebApiError {
     InverterDeleted,
     InverterOrdered,
     InverterStatsResetted,
+    InverterInvalidFragmentReplyTimeout,
+    InverterInvalidFragmentRetryLimit,
 
     LimitBase = 5000,
     LimitSerialZero,

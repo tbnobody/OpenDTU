@@ -39,6 +39,10 @@ void WebApiDevInfoClass::onDevInfoStatus(AsyncWebServerRequest* request)
         root["rf_valid_data"] = inv->RfInfo()->containsValidData();
         root["rf_hw_version"] = inv->RfInfo()->getRfHardwareVersionStr();
         root["rf_fw_version"] = inv->RfInfo()->getRfFirmwareVersionStr();
+        root["rf_module_line"] = String(inv->RfInfo()->getModuleLineChar());
+        root["rf_cmt_frequency"] = inv->getRadio() == Hoymiles.getRadioCmt()
+            ? (inv->CmtLink.frequency != 0 ? inv->CmtLink.frequency : Hoymiles.getRadioCmt()->getInverterTargetFrequency())
+            : 0;
     }
 
     WebApi.sendJsonResponse(request, response, __FUNCTION__, __LINE__);

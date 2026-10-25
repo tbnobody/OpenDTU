@@ -2,13 +2,15 @@
 #pragma once
 
 #include "types.h"
+#include "RadioRecoverySettings.h"
 #include <Stream.h>
 #include <WString.h>
 #include <cstdint>
 
 #define RF_LEN 32
 #define MAX_RESEND_COUNT 4 // Used if all packages are missing
-#define MAX_RETRANSMIT_COUNT 5 // Used to send the retransmit package
+#define MAX_DEFAULT_RETRANSMIT_COUNT 5 // Used to send the retransmit package
+#define MAX_MIT_RETRANSMIT_COUNT 20 // Used to send the retransmit package to MIT inverters
 
 class InverterAbstract;
 
@@ -42,7 +44,13 @@ public:
     void setTimeout(const uint32_t timeout);
     uint32_t getTimeout() const;
 
+    // Initialize at construction, refresh before the first transmission, then retain for retries.
+    void prepareRadioRecoverySettings();
+    uint32_t getFragmentReplyTimeout() const;
+
     virtual String getCommandName() const = 0;
+
+    uint8_t getMainCmd() const { return _payload[0]; }
 
     void setSendCount(const uint8_t count);
     uint8_t getSendCount() const;
@@ -69,17 +77,27 @@ public:
     // received so far is accepted as the complete answer.
     bool acceptsSingleFragmentAnswer() const { return _singleFragmentAnswer; }
 
+    void setFrequency(const uint32_t frequency) { _frequency = frequency; }
+    uint32_t getFrequency() const { return _frequency; }
+
+    virtual bool usesBootFrequency() const { return false; }
+
+    InverterAbstract* getInverter() const { return _inv; }
+
 protected:
     uint8_t _payload[RF_LEN];
     uint8_t _payload_size;
     bool _singleFragmentAnswer;
     uint32_t _timeout;
     uint8_t _sendCount;
+    uint32_t _frequency = 0;
 
     uint64_t _targetAddress;
     uint64_t _routerAddress;
 
     InverterAbstract* _inv;
+
+    RadioRecoverySettings _radioRecoverySettings;
 
 private:
     void setTargetAddress(const uint64_t address);

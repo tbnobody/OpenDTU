@@ -45,6 +45,9 @@ public:
      */
     bool available(void);
 
+    // Reception activity prevents retuning before a complete payload is ready.
+    bool isReceptionBusy(void);
+
     /**
      * Read payload data from the RX FIFO buffer(s).
      *

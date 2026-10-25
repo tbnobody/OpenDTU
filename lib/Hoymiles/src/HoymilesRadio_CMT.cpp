@@ -6,12 +6,19 @@
 #include "Hoymiles.h"
 #include "HoymilesUtils.h"
 #include "crc.h"
+#include "inverters/InverterAbstract.h"
+#include <algorithm>
 #include <FunctionalInterrupt.h>
 #include <esp_log.h>
 #include <frozen/map.h>
 
 #undef TAG
 static const char* TAG = "hoymiles";
+
+static int8_t getMitHopOffsetForFragment(const uint8_t fragmentId)
+{
+    return static_cast<int8_t>((fragmentId - 1) % 3) - 1;
+}
 
 constexpr CountryFrequencyDefinition_t make_value(FrequencyBand_t Band, uint32_t Freq_Legal_Min, uint32_t Freq_Legal_Max, uint32_t Freq_Default, uint32_t Freq_StartUp)
 {
@@ -88,6 +95,230 @@ bool HoymilesRadio_CMT::cmtSwitchDtuFreq(const uint32_t to_frequency)
     return true;
 }
 
+uint32_t HoymilesRadio_CMT::getInvBootRingFrequency(const uint8_t startChannel) const
+{
+    const CountryFrequencyDefinition_t& def = countryDefinition.at(_countryMode);
+    const uint8_t channel = (startChannel != 0) ? startChannel : ((def.Band == FrequencyBand_t::BAND_860) ? 33 : 60);
+    return getFrequencyFromChannel(channel);
+}
+
+bool HoymilesRadio_CMT::getProbeFrequency(const uint16_t step, uint32_t& frequency, const uint8_t moduleStartChannel) const
+{
+    const CountryFrequencyDefinition_t& def = countryDefinition.at(_countryMode);
+
+    const int16_t startChannel = (moduleStartChannel != 0) ? moduleStartChannel : ((def.Band == FrequencyBand_t::BAND_860) ? 33 : 60);
+
+    const uint32_t base = _radio->getBaseFrequency();
+    const int16_t minChannel = static_cast<int16_t>(std::max<int32_t>(1,
+        (static_cast<int32_t>(def.Freq_Legal_Min) - static_cast<int32_t>(base) + static_cast<int32_t>(getChannelWidth()) - 1) / static_cast<int32_t>(getChannelWidth())));
+    const int16_t maxChannel = static_cast<int16_t>(std::min<int32_t>(0xFE,
+        (static_cast<int32_t>(def.Freq_Legal_Max) - static_cast<int32_t>(base)) / static_cast<int32_t>(getChannelWidth())));
+    if (minChannel > maxChannel) {
+        return false;
+    }
+
+    const int16_t preferred[] = {
+        startChannel, static_cast<int16_t>(startChannel - 8),
+        static_cast<int16_t>(startChannel + 1), static_cast<int16_t>(startChannel - 1),
+        static_cast<int16_t>(startChannel - 7), static_cast<int16_t>(startChannel - 9)
+    };
+
+    int16_t candidates[sizeof(preferred) / sizeof(preferred[0])];
+    uint16_t candidateCount = 0;
+    for (const int16_t c : preferred) {
+        if (c < minChannel || c > maxChannel) {
+            continue;
+        }
+        bool duplicate = false;
+        for (uint16_t i = 0; i < candidateCount; i++) {
+            duplicate = duplicate || (candidates[i] == c);
+        }
+        if (!duplicate) {
+            candidates[candidateCount++] = c;
+        }
+    }
+
+    int16_t channel = -1;
+    if (step < candidateCount) {
+        channel = candidates[step];
+    } else {
+        uint16_t remaining = step - candidateCount;
+        for (int16_t c = minChannel; c <= maxChannel; c++) {
+            bool isCandidate = false;
+            for (uint16_t i = 0; i < candidateCount; i++) {
+                isCandidate = isCandidate || (candidates[i] == c);
+            }
+            if (isCandidate) {
+                continue;
+            }
+            if (remaining == 0) {
+                channel = c;
+                break;
+            }
+            remaining--;
+        }
+    }
+
+    if (channel < minChannel || channel > maxChannel) {
+        return false;
+    }
+
+    frequency = getFrequencyFromChannel(static_cast<uint8_t>(channel));
+    return true;
+}
+
+bool HoymilesRadio_CMT::rxRingContains(const uint8_t c) const
+{
+    return _rxHopCentreChannel >= 1 && c >= _rxHopCentreChannel - 1 && c <= _rxHopCentreChannel + 1;
+}
+
+uint8_t HoymilesRadio_CMT::rxRingNext(const uint8_t c) const
+{
+    if (!rxRingContains(c)) {
+        return 0;
+    }
+    if (c == _rxHopCentreChannel - 1) {
+        return _rxHopCentreChannel;
+    }
+    if (c == _rxHopCentreChannel) {
+        return _rxHopCentreChannel + 1;
+    }
+    return _rxHopCentreChannel - 1;
+}
+
+void HoymilesRadio_CMT::startRxHopping(const uint32_t centreFrequency, const bool enabled, const uint8_t firstChannel, const uint32_t stayUs)
+{
+    _rxHopHold = false;
+    _rxHopActive = false;
+    _rxRingFollowing = false;
+    _rxRingMisses = 0;
+
+    if (!enabled || !_rxHopEnabled) {
+        return;
+    }
+
+    const uint8_t channel = getChannelFromFrequency(centreFrequency);
+    // Both neighbour channels have to exist
+    if (channel < 1 || channel >= 0xFE) {
+        return;
+    }
+
+    _rxHopCentreChannel = channel;
+    _rxHopChannel = channel;
+    _rxHopStayUntilUs = 0;
+
+    if (firstChannel != 0 && rxRingContains(firstChannel)) {
+        if (firstChannel != channel) {
+            _radio->setChannel(firstChannel);
+            _radio->startListening();
+            _rxHopChannel = firstChannel;
+        }
+        _rxHopStayUntilUs = micros() + stayUs;
+    }
+
+    _rxHopLastUs = micros();
+    _rxHopActive = true;
+}
+
+void HoymilesRadio_CMT::rxRingFollow(const uint8_t c, CmtLinkState& link, const bool ownsTransaction)
+{
+    const uint32_t nowMs = millis();
+    const uint32_t gap = nowMs - link.lastRxMs;
+    if (link.lastRxChannel != 0 && gap >= 25 && gap <= 80) {
+        if (c == link.lastRxChannel) {
+            link.ringState = 2;
+        } else if (rxRingNext(link.lastRxChannel) == c) {
+            link.ringState = 1;
+        }
+    }
+    link.lastRxChannel = c;
+    link.lastRxMs = nowMs;
+
+    if (link.ringState != 1) {
+        link.ringNext = 0;
+        return;
+    }
+
+    const uint8_t next = rxRingNext(c);
+    if (next == 0) {
+        return;
+    }
+    link.ringNext = next;
+
+    if (!_rxHopActive || !_busyFlag || !ownsTransaction || _packetReceived || _radio->isReceptionBusy()) {
+        return;
+    }
+
+    // The next frame of the answer follows about 50 ms after this one, on the next channel of the ring
+    _rxHopHold = false;
+    _rxHopStayUntilUs = 0;
+    _rxRingFollowing = true;
+    _rxRingMisses = 0;
+    _radio->setChannel(next);
+    _radio->startListening();
+    _rxHopChannel = next;
+    _rxHopLastUs = micros();
+}
+
+void HoymilesRadio_CMT::rxHopStep()
+{
+    if (!_rxHopActive || !_busyFlag) {
+        _rxHopActive = false;
+        return;
+    }
+
+    if (_packetReceived) {
+        _rxHopHold = false;
+        _rxHopLastUs = micros();
+        return;
+    }
+
+    const uint32_t now = micros();
+    bool holdExpired = false;
+
+    if (_rxHopHold) {
+        if (now - _rxHopHoldUs < RX_HOP_HOLD_MAX_US) {
+            return;
+        }
+        _rxHopHold = false;
+        holdExpired = true;
+    }
+
+    // Waiting on the channel on which the next frame is expected
+    if (_rxHopStayUntilUs != 0 && static_cast<int32_t>(_rxHopStayUntilUs - now) > 0) {
+        return;
+    }
+
+    const uint32_t dwell = _rxRingFollowing ? RX_RING_SLOT_US : RX_HOP_DWELL_US;
+    if (now - _rxHopLastUs < dwell) {
+        return;
+    }
+
+    // Do not let a stale preamble/sync flag renew the hold indefinitely.
+    // A complete packet still waits for the normal FIFO drain.
+    if (_radio->isReceptionBusy() && (!holdExpired || _radio->available())) {
+        _rxHopHold = true;
+        _rxHopHoldUs = now;
+        return;
+    }
+
+    if (_rxRingFollowing && ++_rxRingMisses >= RX_RING_MAX_MISSES) {
+        // The answer is over or lost: search again
+        _rxRingFollowing = false;
+    }
+    _rxHopStayUntilUs = 0;
+
+    uint8_t channel = rxRingNext(_rxHopChannel);
+    if (channel == 0) {
+        channel = _rxHopCentreChannel;
+    }
+
+    _radio->setChannel(channel);
+    _radio->startListening();
+    _rxHopChannel = channel;
+    _rxHopLastUs = micros();
+}
+
 void HoymilesRadio_CMT::init(const int8_t pin_sdio, const int8_t pin_clk, const int8_t pin_cs, const int8_t pin_fcs, const int8_t pin_gpio2, const int8_t pin_gpio3)
 {
     _dtuSerial.u64 = 0;
@@ -116,6 +347,10 @@ void HoymilesRadio_CMT::init(const int8_t pin_sdio, const int8_t pin_clk, const 
     }
 
     _isInitialized = true;
+
+    // Start in RX mode so passive capture works without needing to TX first
+    _radio->startListening();
+    ESP_LOGI(TAG, "CMT2300A: RX mode active");
 }
 
 void HoymilesRadio_CMT::loop()
@@ -124,68 +359,164 @@ void HoymilesRadio_CMT::loop()
         return;
     }
 
+    // Capture mode: hop across all legal EU channels to find traffic
+    if (_captureMode && !_busyFlag) {
+        const uint32_t now = millis();
+        if (now - _captureLastHop >= CAPTURE_HOP_INTERVAL_MS) {
+            _captureLastHop = now;
+
+            // Calculate channel range from legal frequency limits
+            const uint8_t minCh = getChannelFromFrequency(countryDefinition.at(_countryMode).Freq_Legal_Min);
+            const uint8_t maxCh = getChannelFromFrequency(countryDefinition.at(_countryMode).Freq_Legal_Max);
+
+            if (minCh != 0xFF && maxCh != 0xFF) {
+                _captureChIdx++;
+                if (_captureChIdx > maxCh || _captureChIdx < minCh) {
+                    _captureChIdx = minCh;
+                }
+                // Switch channel while staying in RX — GoStby, change channel, GoRx
+                _radio->stopListening();
+                _radio->setChannel(_captureChIdx);
+                _radio->startListening();
+
+                // Log channel sweep start for diagnostics
+                if (_captureChIdx == minCh) {
+                    ESP_LOGD(TAG, "CAPTURE: sweep restart ch %" PRIu8 "-%" PRIu8 " (%.2f-%.2f MHz)",
+                        minCh, maxCh,
+                        getFrequencyFromChannel(minCh) / 1000000.0,
+                        getFrequencyFromChannel(maxCh) / 1000000.0);
+                }
+            }
+        }
+    }
+
     if (!_gpio3_configured) {
         if (_radio->rxFifoAvailable()) { // read INT2, PKT_OK flag
             _packetReceived = true;
         }
     }
 
+    // Step 1: Drain all available packets from the hardware FIFO into the
+    // software ring buffer.
     if (_packetReceived) {
-        ESP_LOGV(TAG, "Interrupt received");
         while (_radio->available()) {
             if (_rxBuffer.size() > FRAGMENT_BUFFER_SIZE) {
                 ESP_LOGE(TAG, "CMT2300A: Buffer full");
                 _radio->flush_rx();
-                continue;
+                break;
             }
 
             fragment_t f;
             memset(f.fragment, 0xcc, MAX_RF_PAYLOAD_SIZE);
-            f.len = std::min<uint8_t>(_radio->getDynamicPayloadSize(), MAX_RF_PAYLOAD_SIZE);
+            const uint8_t payloadSize = _radio->getDynamicPayloadSize();
+            f.len = std::min<uint8_t>(payloadSize, MAX_RF_PAYLOAD_SIZE);
             f.channel = _radio->getChannel();
             f.rssi = _radio->getRssiDBm();
             f.wasReceived = false;
             f.mainCmd = 0x00;
             _radio->read(f.fragment, f.len);
+
+            if (payloadSize > MAX_RF_PAYLOAD_SIZE) {
+                ESP_LOGW(TAG, "CMT2300A: Invalid payload size %" PRIu8, payloadSize);
+                continue;
+            }
+
             _rxBuffer.push(f);
         }
         _radio->flush_rx();
         _packetReceived = false;
-
-    } else {
-        // Perform package parsing only if no packages are received
-        if (!_rxBuffer.empty()) {
-            fragment_t f = _rxBuffer.front();
-            if (checkFragmentCrc(f)) {
-
-                const serial_u dtuId = convertSerialToRadioId(_dtuSerial);
-
-                // The CMT RF module does not filter foreign packages by itself.
-                // Has to be done manually here.
-                if (memcmp(&f.fragment[5], &dtuId.b[1], 4) == 0) {
-
-                    std::shared_ptr<InverterAbstract> inv = Hoymiles.getInverterByFragment(f);
-
-                    if (nullptr != inv) {
-                        // Save packet in inverter rx buffer
-                        ESP_LOGD(TAG, "RX %.2f MHz --> %s | %" PRId8 " dBm",
-                            getFrequencyFromChannel(f.channel) / 1000000.0, HoymilesUtils::dumpArray(f.fragment, f.len).c_str(), f.rssi);
-
-                        inv->addRxFragment(f.fragment, f.len, f.rssi);
-                    } else {
-                        ESP_LOGE(TAG, "Inverter Not found!");
-                    }
-                }
-
-            } else {
-                ESP_LOGW(TAG, "Frame kaputt"); // ;-)
-            }
-
-            // Remove paket from buffer even it was corrupted
-            _rxBuffer.pop();
-        }
     }
 
+    // Step 2: Process all buffered packets. Previously only one packet was
+    // processed per loop() call, and only when no new packet was arriving.
+    // Processing the entire buffer each iteration reduces latency and prevents
+    // the software buffer from growing unboundedly during bursts.
+    while (!_rxBuffer.empty()) {
+        fragment_t f = _rxBuffer.front();
+        if (checkFragmentCrc(f)) {
+
+            // --- Capture Mode: log ALL valid frames before filtering ---
+            if (_captureMode) {
+                // Extract source inverter serial from fragment bytes [1..4]
+                uint64_t srcSerial = 0;
+                if (f.len > 4) {
+                    srcSerial = (static_cast<uint64_t>(f.fragment[1]) << 24)
+                        | (static_cast<uint64_t>(f.fragment[2]) << 16)
+                        | (static_cast<uint64_t>(f.fragment[3]) << 8)
+                        | (static_cast<uint64_t>(f.fragment[4]));
+                }
+
+                // Extract destination (DTU) serial from fragment bytes [5..8]
+                uint64_t dstSerial = 0;
+                if (f.len > 8) {
+                    dstSerial = (static_cast<uint64_t>(f.fragment[5]) << 24)
+                        | (static_cast<uint64_t>(f.fragment[6]) << 16)
+                        | (static_cast<uint64_t>(f.fragment[7]) << 8)
+                        | (static_cast<uint64_t>(f.fragment[8]));
+                }
+
+                ESP_LOGI(TAG, "CAPTURE %.2f MHz | %" PRId8 " dBm | src=%08" PRIx64 " dst=%08" PRIx64 " len=%u | %s",
+                    getFrequencyFromChannel(f.channel) / 1000000.0,
+                    f.rssi,
+                    srcSerial,
+                    dstSerial,
+                    f.len,
+                    HoymilesUtils::dumpArray(f.fragment, f.len).c_str());
+            }
+            // --- End Capture Mode ---
+
+            const serial_u dtuId = convertSerialToRadioId(_dtuSerial);
+
+            // The CMT RF module does not filter foreign packages by itself.
+            // Has to be done manually here.
+            if (memcmp(&f.fragment[5], &dtuId.b[1], 4) == 0) {
+
+                std::shared_ptr<InverterAbstract> inv = Hoymiles.getInverterByFragment(f);
+
+                if (nullptr != inv) {
+                    // Save packet in inverter rx buffer
+                    ESP_LOGD(TAG, "RX %.2f MHz --> %s | %" PRId8 " dBm",
+                        getFrequencyFromChannel(f.channel) / 1000000.0, HoymilesUtils::dumpArray(f.fragment, f.len).c_str(), f.rssi);
+
+                    const bool ownsTransaction = _busyFlag && !isQueueEmpty()
+                        && _commandQueue.front()->getTargetAddress() == inv->serial();
+                    const uint8_t expectedMainCmd = ownsTransaction ? (_commandQueue.front()->getMainCmd() | 0x80) : 0;
+                    const bool accepted = expectedMainCmd == 0 || f.fragment[0] == expectedMainCmd;
+                    rxRingFollow(f.channel, inv->CmtLink, ownsTransaction && accepted);
+                    inv->addRxFragment(f.fragment, f.len, f.rssi, expectedMainCmd);
+                } else {
+                    if (_captureMode) {
+                        ESP_LOGI(TAG, "CAPTURE: Unknown inverter (not configured)");
+                    } else {
+                        ESP_LOGE(TAG, "CMT discard: unknown inverter | %.2f MHz | %" PRId8 " dBm | len=%u | %s",
+                            getFrequencyFromChannel(f.channel) / 1000000.0, f.rssi, f.len,
+                            HoymilesUtils::dumpArray(f.fragment, f.len).c_str());
+                    }
+                }
+            } else if (_captureMode) {
+                ESP_LOGI(TAG, "CAPTURE: Frame not addressed to this DTU (foreign traffic)");
+            } else {
+                ESP_LOGD(TAG, "CMT discard: other DTU | %.2f MHz | %" PRId8 " dBm | len=%u | %s",
+                    getFrequencyFromChannel(f.channel) / 1000000.0, f.rssi, f.len,
+                    HoymilesUtils::dumpArray(f.fragment, f.len).c_str());
+            }
+
+        } else {
+            if (_captureMode) {
+                ESP_LOGW(TAG, "CAPTURE: CRC failed | len=%u | %s",
+                    f.len, HoymilesUtils::dumpArray(f.fragment, f.len).c_str());
+            } else {
+                ESP_LOGW(TAG, "Frame kaputt | %.2f MHz | %" PRId8 " dBm | len=%u | %s",
+                    getFrequencyFromChannel(f.channel) / 1000000.0, f.rssi, f.len,
+                    HoymilesUtils::dumpArray(f.fragment, f.len).c_str());
+            }
+        }
+
+        // Remove packet from buffer even if it was corrupted
+        _rxBuffer.pop();
+    }
+
+    rxHopStep();
     handleReceivedPackage();
 }
 
@@ -203,8 +534,22 @@ void HoymilesRadio_CMT::setPALevel(const int8_t paLevel)
     }
 }
 
+void HoymilesRadio_CMT::resetLinkStates()
+{
+    _rxHopActive = false;
+    for (uint8_t i = 0; i < Hoymiles.getNumInverters(); i++) {
+        auto inv = Hoymiles.getInverterByPos(i);
+        if (inv != nullptr && inv->getRadio() == this) {
+            inv->CmtLink = {};
+        }
+    }
+}
+
 void HoymilesRadio_CMT::setInverterTargetFrequency(const uint32_t frequency)
 {
+    if (_inverterTargetFrequency != frequency) {
+        resetLinkStates();
+    }
     _inverterTargetFrequency = frequency;
     if (!_isInitialized) {
         return;
@@ -245,6 +590,9 @@ CountryModeId_t HoymilesRadio_CMT::getCountryMode() const
 
 void HoymilesRadio_CMT::setCountryMode(const CountryModeId_t mode)
 {
+    if (_countryMode != mode) {
+        resetLinkStates();
+    }
     _countryMode = mode;
     if (!_isInitialized) {
         return;
@@ -261,6 +609,25 @@ void HoymilesRadio_CMT::setCountryMode(const CountryModeId_t mode)
     }
     _radio->setPALevel(_paLevel);
     _radio->startListening();
+}
+
+void HoymilesRadio_CMT::setCaptureMode(const bool enabled)
+{
+    _captureMode = enabled;
+    if (enabled) {
+        ESP_LOGI(TAG, "CMT2300A: Capture mode ENABLED - channel hopping active, logging all frames");
+        ESP_LOGI(TAG, "CMT2300A: Dwell time: %" PRIu32 "ms, gpio3_configured: %s",
+            CAPTURE_HOP_INTERVAL_MS, _gpio3_configured ? "yes" : "no");
+        _captureChIdx = 0;
+        _captureLastHop = 0;
+    } else {
+        ESP_LOGI(TAG, "CMT2300A: Capture mode DISABLED");
+    }
+}
+
+bool HoymilesRadio_CMT::getCaptureMode() const
+{
+    return _captureMode;
 }
 
 uint32_t HoymilesRadio_CMT::getInvBootFrequency() const
@@ -282,13 +649,26 @@ void ARDUINO_ISR_ATTR HoymilesRadio_CMT::handleInt2()
 void HoymilesRadio_CMT::sendEsbPacket(CommandAbstract& cmd)
 {
     cmd.incrementSendCount();
-
     cmd.setRouterAddress(DtuSerial().u64);
-
     _radio->stopListening();
 
-    if (cmd.getDataPayload()[0] == 0x56) { // @todo(tbnobody) Bad hack to identify ChannelChange Command
-        cmtSwitchDtuFreq(getInvBootFrequency());
+    InverterAbstract* inv = cmd.getInverter();
+    uint32_t rxFrequency = cmd.getFrequency();
+    if (rxFrequency == 0 && inv != nullptr) {
+        rxFrequency = inv->CmtLink.frequency;
+    }
+    if (rxFrequency == 0) {
+        rxFrequency = _inverterTargetFrequency;
+    }
+
+    uint32_t txFrequency = rxFrequency;
+    if (cmd.usesBootFrequency()) {
+        txFrequency = getInvBootFrequency();
+        rxFrequency = getInvBootRingFrequency(inv != nullptr ? inv->CmtLink.startChannel : 0);
+    }
+    if (!cmtSwitchDtuFreq(txFrequency)) {
+        rxFrequency = _inverterTargetFrequency;
+        cmtSwitchDtuFreq(_inverterTargetFrequency);
     }
 
     ESP_LOGD(TAG, "TX %s %.2f MHz --> %s",
@@ -297,8 +677,52 @@ void HoymilesRadio_CMT::sendEsbPacket(CommandAbstract& cmd)
     if (!_radio->write(cmd.getDataPayload(), cmd.getDataSize())) {
         ESP_LOGE(TAG, "TX SPI Timeout");
     }
-    cmtSwitchDtuFreq(_inverterTargetFrequency);
+    if (!cmtSwitchDtuFreq(rxFrequency)) {
+        rxFrequency = _inverterTargetFrequency;
+        cmtSwitchDtuFreq(rxFrequency);
+    }
     _radio->startListening();
+
+    const bool knownSingleChannel = inv != nullptr && inv->RfInfo()->containsValidData()
+        && inv->RfInfo()->getModuleLine() == RfModuleLine::A;
+    const bool isRequestFrame = cmd.getMainCmd() == 0x15 && cmd.getDataSize() == 11;
+    const bool isMitRetransmit = ((cmd.getTargetAddress() >> 32) & 0xFFFF) == 0x1520 && isRequestFrame;
+    const uint8_t centreChannel = getChannelFromFrequency(rxFrequency);
+    uint8_t firstChannel = 0;
+    uint32_t stayUs = 0;
+    if (inv != nullptr && !cmd.usesBootFrequency() && !knownSingleChannel) {
+        const uint8_t predicted = inv->CmtLink.ringNext;
+        if (centreChannel != 0xFF && centreChannel >= 1
+            && predicted >= centreChannel - 1 && predicted <= centreChannel + 1) {
+            firstChannel = predicted;
+        }
+
+        // Until rotation has been observed, retain MIT's fragment-based placement.
+        if (isMitRetransmit && firstChannel == 0) {
+            const uint8_t fragmentId = cmd.getDataPayload()[9] & 0x7F;
+            if (fragmentId > 0 && centreChannel != 0xFF) {
+                const int16_t channel = static_cast<int16_t>(centreChannel) + getMitHopOffsetForFragment(fragmentId);
+                if (channel >= 1 && channel <= 0xFE) {
+                    firstChannel = static_cast<uint8_t>(channel);
+                }
+            }
+        }
+        // A fragment request keeps the command's captured, user-configurable timeout.
+        stayUs = isRequestFrame ? cmd.getTimeout() * 1000 : RX_FIRST_FRAME_STAY_US;
+    }
+
+    startRxHopping(rxFrequency, !knownSingleChannel, firstChannel, stayUs);
+    if (isMitRetransmit && firstChannel != 0 && !_rxHopActive) {
+        // Preserve MIT placement when discovery is disabled or a full ring cannot fit.
+        _radio->setChannel(firstChannel);
+        _radio->startListening();
+    }
     _busyFlag = true;
     _rxTimeout.set(cmd.getTimeout());
+
+    if (isMitRetransmit) {
+        const uint8_t channel = _radio->getChannel();
+        ESP_LOGI(TAG, "RX HOP: Retransmit fragment %" PRIu8 " on channel %" PRIu8 " (%.2f MHz)",
+            static_cast<uint8_t>(cmd.getDataPayload()[9] & 0x7F), channel, getFrequencyFromChannel(channel) / 1000000.0);
+    }
 }

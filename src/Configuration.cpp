@@ -8,6 +8,7 @@
 #include "defaults.h"
 #include <ArduinoJson.h>
 #include <LittleFS.h>
+#include <RadioRecoverySettings.h>
 #include <esp_log.h>
 #include <nvs_flash.h>
 
@@ -149,6 +150,9 @@ bool ConfigurationClass::write()
         inv["zero_day"] = config.Inverter[i].ZeroYieldDayOnMidnight;
         inv["clear_eventlog"] = config.Inverter[i].ClearEventlogOnMidnight;
         inv["yieldday_correction"] = config.Inverter[i].YieldDayCorrection;
+        inv["yield_total_contribution"] = config.Inverter[i].YieldTotalContribution;
+        inv["fragment_reply_timeout"] = config.Inverter[i].FragmentReplyTimeout;
+        inv["fragment_retry_limit"] = config.Inverter[i].FragmentRetryLimit;
 
         JsonArray channel = inv["channel"].to<JsonArray>();
         for (uint8_t c = 0; c < INV_MAX_CHAN_COUNT; c++) {
@@ -339,6 +343,19 @@ bool ConfigurationClass::read()
         config.Inverter[i].ZeroYieldDayOnMidnight = inv["zero_day"] | false;
         config.Inverter[i].ClearEventlogOnMidnight = inv["clear_eventlog"] | false;
         config.Inverter[i].YieldDayCorrection = inv["yieldday_correction"] | false;
+        config.Inverter[i].YieldTotalContribution = inv["yield_total_contribution"] | true;
+        const uint16_t fragmentReplyTimeout = inv["fragment_reply_timeout"].is<uint16_t>()
+            ? inv["fragment_reply_timeout"].as<uint16_t>()
+            : 0;
+        config.Inverter[i].FragmentReplyTimeout = RadioRecoverySettings::isValidFragmentReplyTimeout(fragmentReplyTimeout)
+            ? fragmentReplyTimeout
+            : 0;
+        const uint8_t fragmentRetryLimit = inv["fragment_retry_limit"].is<uint8_t>()
+            ? inv["fragment_retry_limit"].as<uint8_t>()
+            : 0;
+        config.Inverter[i].FragmentRetryLimit = RadioRecoverySettings::isValidFragmentRetryLimit(fragmentRetryLimit)
+            ? fragmentRetryLimit
+            : 0;
 
         JsonArray channel = inv["channel"];
         for (uint8_t c = 0; c < INV_MAX_CHAN_COUNT; c++) {
@@ -513,6 +530,9 @@ void ConfigurationClass::deleteInverterById(const uint8_t id)
     config.Inverter[id].ZeroRuntimeDataIfUnrechable = false;
     config.Inverter[id].ZeroYieldDayOnMidnight = false;
     config.Inverter[id].YieldDayCorrection = false;
+    config.Inverter[id].YieldTotalContribution = true;
+    config.Inverter[id].FragmentReplyTimeout = 0;
+    config.Inverter[id].FragmentRetryLimit = 0;
 
     for (uint8_t c = 0; c < INV_MAX_CHAN_COUNT; c++) {
         config.Inverter[id].channel[c].MaxChannelPower = 0;

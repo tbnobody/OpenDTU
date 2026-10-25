@@ -18,6 +18,8 @@ Command structure:
 ID   Target Addr   Source Addr   ?    ?    ?    CH   ?    CRC8
 */
 #include "ChannelChangeCommand.h"
+#include "../CmtLinkRecovery.h"
+#include "inverters/InverterAbstract.h"
 
 ChannelChangeCommand::ChannelChangeCommand(InverterAbstract* inv, const uint64_t router_address, const uint8_t channel)
     : CommandAbstract(inv, router_address)
@@ -28,7 +30,9 @@ ChannelChangeCommand::ChannelChangeCommand(InverterAbstract* inv, const uint64_t
 
     setCountryMode(CountryModeId_t::MODE_EU);
     setChannel(channel);
-    setTimeout(10);
+
+    _singleFragmentAnswer = true;
+    setTimeout(150);
 }
 
 String ChannelChangeCommand::getCommandName() const
@@ -67,13 +71,62 @@ void ChannelChangeCommand::setCountryMode(const CountryModeId_t mode)
     }
 }
 
+void ChannelChangeCommand::setBandBytes(const uint8_t profile, const uint8_t startChannel)
+{
+    if (profile != 0 && startChannel != 0) {
+        _payload[10] = profile;
+        _payload[11] = startChannel;
+    }
+}
+
+/*
+Answer of the RF module (mainCmd 0xD6), payload after the address header:
+
+00      01       02
+Status  Profile  Start channel
+
+Status 0: channel change accepted, the module switches after sending this answer.
+Status 1: profile or start channel of the request do not match the module's, nothing was changed. Profile and
+start channel are the module's real values.
+*/
 bool ChannelChangeCommand::handleResponse(const fragment_t fragment[], const uint8_t max_fragment_id)
 {
+    if (max_fragment_id == 0) {
+        return false;
+    }
+
+    const fragment_t& f = fragment[max_fragment_id - 1];
+
+    if (f.mainCmd != 0xD6 || f.len < 3) {
+        return false;
+    }
+
+    const uint8_t status = f.fragment[0];
+    const uint8_t profile = f.fragment[1];
+    const uint8_t startChannel = f.fragment[2];
+
+    if (status == 0) {
+        CmtLinkRecovery::onChannelChangeAccepted(_inv, profile, startChannel);
+    } else {
+        CmtLinkRecovery::onChannelChangeRejected(_inv, profile, startChannel);
+    }
+
     return true;
 }
 
 uint8_t ChannelChangeCommand::getMaxResendCount() const
 {
-    // This command will never retrieve an answer. Therefor it's not required to repeat it
+    // The next polling cycle sends the command again, an immediate repetition does not help
     return 0;
+}
+
+bool ChannelChangeCommand::areSameParameter(CommandAbstract* other)
+{
+    if (!CommandAbstract::areSameParameter(other)) {
+        return false;
+    }
+    const uint8_t* otherPayload = other->getDataPayload();
+    return _payload[10] == otherPayload[10]
+        && _payload[11] == otherPayload[11]
+        && _payload[12] == otherPayload[12];
 }

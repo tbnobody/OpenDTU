@@ -1,18 +1,17 @@
 <template>
-    <BasePage
-        :title="$t('networkinfo.NetworkInformation')"
-        :isLoading="dataLoading"
-        :show-reload="true"
-        @reload="getNetworkInfo"
-    >
-        <WifiStationInfo :networkStatus="networkDataList" />
-        <div class="mt-5"></div>
-        <WifiApInfo :networkStatus="networkDataList" />
-        <div class="mt-5"></div>
-        <InterfaceNetworkInfo :networkStatus="networkDataList" />
-        <div class="mt-5"></div>
-        <InterfaceApInfo :networkStatus="networkDataList" />
-        <div class="mt-5"></div>
+    <BasePage :title="$t('networkinfo.NetworkInformation')" :show-reload="true" @reload="refreshKey++">
+        <NetworkConnectionStatus :refresh-key="refreshKey" @status="networkDataList = $event" />
+        <template v-if="networkDataList">
+            <div class="mt-5"></div>
+            <WifiStationInfo :networkStatus="networkDataList" />
+            <div class="mt-5"></div>
+            <WifiApInfo :networkStatus="networkDataList" />
+            <div class="mt-5"></div>
+            <InterfaceNetworkInfo :networkStatus="networkDataList" />
+            <div class="mt-5"></div>
+            <InterfaceApInfo :networkStatus="networkDataList" />
+            <div class="mt-5"></div>
+        </template>
     </BasePage>
 </template>
 
@@ -20,10 +19,10 @@
 import BasePage from '@/components/BasePage.vue';
 import InterfaceApInfo from '@/components/InterfaceApInfo.vue';
 import InterfaceNetworkInfo from '@/components/InterfaceNetworkInfo.vue';
+import NetworkConnectionStatus from '@/components/NetworkConnectionStatus.vue';
 import WifiApInfo from '@/components/WifiApInfo.vue';
 import WifiStationInfo from '@/components/WifiStationInfo.vue';
 import type { NetworkStatus } from '@/types/NetworkStatus';
-import { authHeader, handleResponse } from '@/utils/authentication';
 import { defineComponent } from 'vue';
 
 export default defineComponent({
@@ -31,28 +30,15 @@ export default defineComponent({
         BasePage,
         InterfaceApInfo,
         InterfaceNetworkInfo,
+        NetworkConnectionStatus,
         WifiApInfo,
         WifiStationInfo,
     },
     data() {
         return {
-            dataLoading: true,
-            networkDataList: {} as NetworkStatus,
+            refreshKey: 0,
+            networkDataList: null as NetworkStatus | null,
         };
-    },
-    created() {
-        this.getNetworkInfo();
-    },
-    methods: {
-        getNetworkInfo() {
-            this.dataLoading = true;
-            fetch('/api/network/status', { headers: authHeader() })
-                .then((response) => handleResponse(response, this.$emitter, this.$router))
-                .then((data) => {
-                    this.networkDataList = data;
-                    this.dataLoading = false;
-                });
-        },
     },
 });
 </script>

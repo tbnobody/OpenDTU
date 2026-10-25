@@ -7,5 +7,7 @@ export interface EventlogItem {
 
 export interface EventlogItems {
     count: number;
+    reported_count: number;
+    last_request_status: 'ok' | 'pending' | 'failure';
     events: Array<EventlogItem>;
 }

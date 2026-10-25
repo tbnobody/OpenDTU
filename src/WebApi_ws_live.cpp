@@ -186,6 +186,12 @@ void WebApiWsLiveClass::generateInverterChannelJsonResponse(JsonObject& root, st
             addField(chanTypeObj, inv, t, c, FLD_MPAC);
             addField(chanTypeObj, inv, t, c, FLD_UAC);
             addField(chanTypeObj, inv, t, c, FLD_IAC);
+            addField(chanTypeObj, inv, t, c, FLD_UAC_1N);
+            addField(chanTypeObj, inv, t, c, FLD_IAC_1);
+            addField(chanTypeObj, inv, t, c, FLD_UAC_2N);
+            addField(chanTypeObj, inv, t, c, FLD_IAC_2);
+            addField(chanTypeObj, inv, t, c, FLD_UAC_3N);
+            addField(chanTypeObj, inv, t, c, FLD_IAC_3);
             if (t == TYPE_INV) {
                 addField(chanTypeObj, inv, t, c, FLD_PDC, "Power DC");
             } else {
@@ -198,6 +204,7 @@ void WebApiWsLiveClass::generateInverterChannelJsonResponse(JsonObject& root, st
             addField(chanTypeObj, inv, t, c, FLD_F);
             addField(chanTypeObj, inv, t, c, FLD_T);
             addField(chanTypeObj, inv, t, c, FLD_MT);
+            addField(chanTypeObj, inv, t, c, FLD_RAW_STATUS);
             addField(chanTypeObj, inv, t, c, FLD_PF);
             addField(chanTypeObj, inv, t, c, FLD_Q);
             addField(chanTypeObj, inv, t, c, FLD_EFF);
@@ -210,8 +217,10 @@ void WebApiWsLiveClass::generateInverterChannelJsonResponse(JsonObject& root, st
 
     if (inv->Statistics()->hasChannelFieldValue(TYPE_INV, CH0, FLD_EVT_LOG)) {
         root["events"] = inv->EventLog()->getEntryCount();
+        root["event_count"] = static_cast<uint16_t>(inv->Statistics()->getChannelFieldValue(TYPE_INV, CH0, FLD_EVT_LOG));
     } else {
         root["events"] = -1;
+        root["event_count"] = -1;
     }
 }
 
@@ -229,6 +238,12 @@ void WebApiWsLiveClass::addField(JsonObject& root, std::shared_ptr<InverterAbstr
         root[chanNum][chanName]["v"] = inv->Statistics()->getChannelFieldValue(type, channel, fieldId);
         root[chanNum][chanName]["u"] = inv->Statistics()->getChannelFieldUnit(type, channel, fieldId);
         root[chanNum][chanName]["d"] = inv->Statistics()->getChannelFieldDigits(type, channel, fieldId);
+        if (fieldId == FLD_RAW_STATUS) {
+            char formattedValue[11];
+            snprintf(formattedValue, sizeof(formattedValue), "0x%08" PRIX32,
+                inv->Statistics()->getChannelFieldRawValue(type, channel, fieldId));
+            root[chanNum][chanName]["f"] = formattedValue;
+        }
     }
 }
 
