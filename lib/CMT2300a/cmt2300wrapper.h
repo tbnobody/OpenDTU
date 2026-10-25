@@ -16,6 +16,12 @@ enum FrequencyBand_t {
     FrequencyBand_Max,
 };
 
+enum class CmtRxState : uint8_t {
+    Idle,
+    Preamble,
+    Sync,
+};
+
 class CMT2300A {
 public:
     CMT2300A(const uint8_t pin_sdio, const uint8_t pin_clk, const uint8_t pin_cs, const uint8_t pin_fcs, const uint32_t _spi_speed = CMT_SPI_SPEED);
@@ -44,6 +50,8 @@ public:
      * @return True if there is a payload available, false if none is
      */
     bool available(void);
+
+    CmtRxState getRxState(void);
 
     /**
      * Read payload data from the RX FIFO buffer(s).

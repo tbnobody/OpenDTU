@@ -58,6 +58,19 @@ bool CMT2300A::available(void)
         ) & CMT2300A_ReadReg(CMT2300A_CUS_INT_FLAG);
 }
 
+CmtRxState CMT2300A::getRxState(void)
+{
+    const uint8_t flags = CMT2300A_ReadReg(CMT2300A_CUS_INT_FLAG);
+    if (flags & (CMT2300A_MASK_SYNC_OK_FLG | CMT2300A_MASK_CRC_OK_FLG | CMT2300A_MASK_PKT_OK_FLG)) {
+        return CmtRxState::Sync;
+    }
+    if (flags & CMT2300A_MASK_PREAM_OK_FLG) {
+        CMT2300A_WriteReg(CMT2300A_CUS_INT_CLR2, CMT2300A_MASK_PREAM_OK_CLR);
+        return CmtRxState::Preamble;
+    }
+    return CmtRxState::Idle;
+}
+
 void CMT2300A::read(void* buf, const uint8_t len)
 {
     // Fetch the payload
