@@ -56,6 +56,7 @@ void HoymilesRadio::sendRetransmitPacket(const uint8_t fragment_id)
 void HoymilesRadio::sendLastPacketAgain()
 {
     CommandAbstract* cmd = _commandQueue.front().get();
+    cmd->prepareForSend();
     sendEsbPacket(*cmd);
 }
 
@@ -157,6 +158,7 @@ void HoymilesRadio::handleReceivedPackage()
                 // Statistics: TX Requests
                 inv->RadioStats.TxRequestData++;
 
+                cmd->prepareForSend();
                 sendEsbPacket(*cmd);
             } else {
                 ESP_LOGE(TAG, "TX: Invalid inverter found");
