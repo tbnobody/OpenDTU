@@ -487,7 +487,7 @@ import {
     BIconTrash,
 } from 'bootstrap-icons-vue';
 import Sortable from 'sortablejs';
-import { defineComponent } from 'vue';
+import { defineComponent, markRaw } from 'vue';
 
 export default defineComponent({
     components: {
@@ -524,7 +524,9 @@ export default defineComponent({
             inverters: [] as Inverter[],
             dataLoading: true,
             alert: {} as AlertResponse,
-            sortable: {} as Sortable,
+            sortable: null as Sortable | null,
+            inverterListRequestId: 0,
+            isViewActive: true,
         };
     },
     computed: {
@@ -565,26 +567,52 @@ export default defineComponent({
     created() {
         this.getInverters();
     },
+    beforeUnmount() {
+        this.isViewActive = false;
+        this.inverterListRequestId++;
+        this.destroySortable();
+    },
     methods: {
+        destroySortable() {
+            this.sortable?.destroy();
+            this.sortable = null;
+        },
         getInverters() {
+            if (!this.isViewActive) {
+                return;
+            }
+            const requestId = ++this.inverterListRequestId;
+            this.destroySortable();
             this.dataLoading = true;
             fetch('/api/inverter/list', { headers: authHeader() })
                 .then((response) => handleResponse(response, this.$emitter, this.$router))
                 .then((data) => {
+                    if (!this.isViewActive || requestId !== this.inverterListRequestId) {
+                        return;
+                    }
                     this.inverters = data.inverter.slice().sort((a: Inverter, b: Inverter) => {
                         return a.order - b.order;
                     });
                     this.dataLoading = false;
 
                     this.$nextTick(() => {
-                        const table = this.$refs.invList as HTMLElement;
+                        if (!this.isViewActive || requestId !== this.inverterListRequestId) {
+                            return;
+                        }
+                        const table = this.$refs.invList as HTMLElement | undefined;
+                        if (!table) {
+                            return;
+                        }
 
-                        this.sortable = Sortable.create(table, {
-                            sort: true,
-                            handle: '.drag-handle',
-                            animation: 150,
-                            draggable: 'tr',
-                        });
+                        this.destroySortable();
+                        this.sortable = markRaw(
+                            Sortable.create(table, {
+                                sort: true,
+                                handle: '.drag-handle',
+                                animation: 150,
+                                draggable: 'tr',
+                            })
+                        );
                     });
                 });
         },
@@ -641,6 +669,9 @@ export default defineComponent({
             modal.hide();
         },
         onSaveOrder() {
+            if (!this.sortable) {
+                return;
+            }
             this.callInverterApiEndpoint('order', JSON.stringify({ order: this.sortable.toArray() }));
         },
     },
