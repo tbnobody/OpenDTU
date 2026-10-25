@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 #pragma once
 
+#include "CmtLinkState.h"
 #include "HoymilesRadio.h"
 #include "commands/CommandAbstract.h"
 #include "types.h"
@@ -15,6 +16,10 @@
 
 #ifndef HOYMILES_CMT_WORK_FREQ
 #define HOYMILES_CMT_WORK_FREQ 865000000
+#endif
+
+#ifndef HOYMILES_CMT_RX_HOP
+#define HOYMILES_CMT_RX_HOP 1
 #endif
 
 enum CountryModeId_t {
@@ -66,6 +71,13 @@ public:
 
     std::vector<CountryFrequencyList_t> getCountryFrequencyList() const;
 
+    void setRxHopping(const bool enabled) { _rxHopEnabled = enabled; }
+    bool getRxHopping() const { return _rxHopEnabled; }
+
+    bool getProbeFrequency(const uint16_t step, uint32_t& frequency, const uint8_t startChannel = 0) const;
+
+    uint32_t getInvBootRingFrequency(const uint8_t startChannel = 0) const;
+
 private:
     void ARDUINO_ISR_ATTR handleInt1();
     void ARDUINO_ISR_ATTR handleInt2();
@@ -91,6 +103,23 @@ private:
     int8_t _paLevel = 0;
 
     bool cmtSwitchDtuFreq(const uint32_t to_frequency);
+
+    void startRxHopping(const uint32_t centreFrequency, const bool enabled);
+    void rxHopStep();
+
+    uint8_t rxRingNext(const uint8_t c) const;
+    bool rxRingContains(const uint8_t c) const;
+
+    static constexpr uint32_t RX_HOP_WAIT_US = 3000;
+    static constexpr uint32_t RX_HOP_HOLD_MAX_US = 100000;
+
+    bool _rxHopEnabled = HOYMILES_CMT_RX_HOP != 0;
+    bool _rxHopActive = false;
+    bool _rxHopHold = false;
+    uint8_t _rxHopCentreChannel = 0;
+    uint8_t _rxHopChannel = 0;
+    uint32_t _rxHopLastUs = 0;
+    uint32_t _rxHopHoldUs = 0;
 
     CountryModeId_t _countryMode;
 };

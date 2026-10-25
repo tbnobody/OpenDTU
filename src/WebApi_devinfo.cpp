@@ -39,6 +39,8 @@ void WebApiDevInfoClass::onDevInfoStatus(AsyncWebServerRequest* request)
         root["rf_valid_data"] = inv->RfInfo()->containsValidData();
         root["rf_hw_version"] = inv->RfInfo()->getRfHardwareVersionStr();
         root["rf_fw_version"] = inv->RfInfo()->getRfFirmwareVersionStr();
+        root["rf_module_line"] = String(inv->RfInfo()->getModuleLineChar());
+        root["rf_cmt_frequency"] = inv->CmtLink.frequency;
     }
 
     WebApi.sendJsonResponse(request, response, __FUNCTION__, __LINE__);
