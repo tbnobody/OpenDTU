@@ -27,6 +27,7 @@ ID   Target Addr   Source Addr   Idx  DT   ?    Time          Gap             Pa
 */
 #include "MultiDataCommand.h"
 #include "crc.h"
+#include "HoymilesUtils.h"
 
 MultiDataCommand::MultiDataCommand(InverterAbstract* inv, const uint64_t router_address, const uint8_t data_type, const time_t time)
     : CommandAbstract(inv, router_address)
@@ -68,6 +69,15 @@ void MultiDataCommand::setTime(const time_t time)
     _payload[14] = static_cast<uint8_t>(time >> 8);
     _payload[15] = static_cast<uint8_t>(time);
     udpateCRC();
+}
+
+void MultiDataCommand::prepareForSend()
+{
+    if (HoymilesUtils::getTimeAvailable()) {
+        time_t now;
+        time(&now);
+        setTime(now);
+    }
 }
 
 time_t MultiDataCommand::getTime() const

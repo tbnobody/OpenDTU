@@ -59,6 +59,10 @@ public:
     // Sets the amount how often a missing fragment is re-requested if it was not available
     virtual uint8_t getMaxRetransmitCount() const;
 
+    // Called right before the command is sent or resent over the air. Commands carrying
+    // time-dependent data refresh it here. Default: nothing to do.
+    virtual void prepareForSend() { }
+
     // Returns whether multiple instances of this command are allowed in the command queue.
     virtual QueueInsertType getQueueInsertType() const { return QueueInsertType::RemoveNewest; }
     virtual bool areSameParameter(CommandAbstract* other);
