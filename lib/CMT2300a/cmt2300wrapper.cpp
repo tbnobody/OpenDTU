@@ -53,6 +53,13 @@ bool CMT2300A::available(void)
     return CMT2300A_MASK_PKT_OK_FLG & CMT2300A_ReadReg(CMT2300A_CUS_INT_FLAG);
 }
 
+bool CMT2300A::isReceptionBusy(void)
+{
+    return (CMT2300A_MASK_PREAM_OK_FLG | CMT2300A_MASK_SYNC_OK_FLG
+               | CMT2300A_MASK_CRC_OK_FLG | CMT2300A_MASK_PKT_OK_FLG)
+        & CMT2300A_ReadReg(CMT2300A_CUS_INT_FLAG);
+}
+
 void CMT2300A::read(void* buf, const uint8_t len)
 {
     // Fetch the payload

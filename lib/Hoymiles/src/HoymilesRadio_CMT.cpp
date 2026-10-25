@@ -245,7 +245,7 @@ void HoymilesRadio_CMT::rxRingFollow(const uint8_t c, CmtLinkState& link, const 
     }
     link.ringNext = next;
 
-    if (!_rxHopActive || !_busyFlag || !ownsTransaction || _packetReceived || _radio->available()) {
+    if (!_rxHopActive || !_busyFlag || !ownsTransaction || _packetReceived || _radio->isReceptionBusy()) {
         return;
     }
 
@@ -274,13 +274,14 @@ void HoymilesRadio_CMT::rxHopStep()
     }
 
     const uint32_t now = micros();
+    bool holdExpired = false;
 
     if (_rxHopHold) {
         if (now - _rxHopHoldUs < RX_HOP_HOLD_MAX_US) {
             return;
         }
         _rxHopHold = false;
-        _rxHopLastUs = now;
+        holdExpired = true;
     }
 
     // Waiting on the channel on which the next frame is expected
@@ -293,7 +294,9 @@ void HoymilesRadio_CMT::rxHopStep()
         return;
     }
 
-    if (_radio->available()) {
+    // Do not let a stale preamble/sync flag renew the hold indefinitely.
+    // A complete packet still waits for the normal FIFO drain.
+    if (_radio->isReceptionBusy() && (!holdExpired || _radio->available())) {
         _rxHopHold = true;
         _rxHopHoldUs = now;
         return;
