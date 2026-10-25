@@ -25,11 +25,7 @@ bool HM_Abstract::sendStatsRequest()
         return false;
     }
 
-    time_t now;
-    time(&now);
-
     auto cmd = _radio->prepareCommand<RealTimeRunDataCommand>(this);
-    cmd->setTime(now);
     _radio->enqueCommand(cmd);
 
     return true;
@@ -51,11 +47,7 @@ bool HM_Abstract::sendAlarmLogRequest(const bool force)
 
     _lastAlarmLogCnt = static_cast<uint8_t>(Statistics()->getChannelFieldValue(TYPE_INV, CH0, FLD_EVT_LOG));
 
-    time_t now;
-    time(&now);
-
     auto cmd = _radio->prepareCommand<AlarmDataCommand>(this);
-    cmd->setTime(now);
     EventLog()->setLastAlarmRequestSuccess(CMD_PENDING);
     _radio->enqueCommand(cmd);
 
@@ -68,15 +60,10 @@ bool HM_Abstract::sendDevInfoRequest()
         return false;
     }
 
-    time_t now;
-    time(&now);
-
     auto cmdAll = _radio->prepareCommand<DevInfoAllCommand>(this);
-    cmdAll->setTime(now);
     _radio->enqueCommand(cmdAll);
 
     auto cmdSimple = _radio->prepareCommand<DevInfoSimpleCommand>(this);
-    cmdSimple->setTime(now);
     _radio->enqueCommand(cmdSimple);
 
     return true;
@@ -88,11 +75,7 @@ bool HM_Abstract::sendSystemConfigParaRequest()
         return false;
     }
 
-    time_t now;
-    time(&now);
-
     auto cmd = _radio->prepareCommand<SystemConfigParaCommand>(this);
-    cmd->setTime(now);
     SystemConfigPara()->setLastLimitRequestSuccess(CMD_PENDING);
     _radio->enqueCommand(cmd);
 
@@ -186,11 +169,7 @@ bool HM_Abstract::sendGridOnProFileParaRequest()
         return false;
     }
 
-    time_t now;
-    time(&now);
-
     auto cmd = _radio->prepareCommand<GridOnProFilePara>(this);
-    cmd->setTime(now);
     _radio->enqueCommand(cmd);
 
     return true;

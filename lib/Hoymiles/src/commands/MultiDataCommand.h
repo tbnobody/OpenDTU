@@ -14,6 +14,8 @@ public:
 
     CommandAbstract* getRequestFrameCommand(const uint8_t frame_no);
 
+    virtual void prepareForSend();
+
     virtual bool handleResponse(const fragment_t fragment[], const uint8_t max_fragment_id);
 
 protected:
