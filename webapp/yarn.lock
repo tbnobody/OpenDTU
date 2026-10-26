@@ -1674,10 +1674,10 @@ eslint-config-prettier@^10.1.8:
   resolved "https://registry.yarnpkg.com/eslint-config-prettier/-/eslint-config-prettier-10.1.8.tgz#15734ce4af8c2778cc32f0b01b37b0b5cd1ecb97"
   integrity sha512-82GZUjRS0p/jganf6q1rEO25VSoHH0hKPCTrgillPjdI/3bgBhAE1QzHrHTizjpRvy6pGAvKjDJtk2pF9NDq8w==
 
-eslint-plugin-oxlint@^1.84.0:
-  version "1.84.0"
-  resolved "https://registry.yarnpkg.com/eslint-plugin-oxlint/-/eslint-plugin-oxlint-1.84.0.tgz#0d9157984247094ae72efa825e3a3f9c4512adbc"
-  integrity sha512-HgoGYYrrEzEvY4dQgfFeVdBeLlHr0vMWY481w70BxcgIjj0iPwSvXRMpCgf4uyfxoqMk55tCadfT9T0uTI3sfg==
+eslint-plugin-oxlint@^1.89.0:
+  version "1.89.0"
+  resolved "https://registry.yarnpkg.com/eslint-plugin-oxlint/-/eslint-plugin-oxlint-1.89.0.tgz#97ead3e7856370795e59d27b87e5fc0722ecd83c"
+  integrity sha512-zFi2wOFo9vRyTOptE7DLXuBnoB0VcQFtPS+/ppqmTTJ7ZLUv0xmCtllce9D5e1vlC+crhQYGgKyZex1X7PaVyA==
   dependencies:
     jsonc-parser "^3.3.1"
 
