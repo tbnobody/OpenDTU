@@ -58,7 +58,7 @@ HM_4CH::HM_4CH(HoymilesRadio* radio, const uint64_t serial)
 
 bool HM_4CH::isValidSerial(const uint64_t serial)
 {
-    // serial >= 0x116100000000 && serial <= 0x1161ffffffff
+    // serial >= 0x116100000000 && serial <= 0x1161ffffffff || serial >= 0x114200000000 && serial <= 0x1142ffffffff
 
     uint8_t preId[2];
     preId[0] = static_cast<uint8_t>(serial >> 40);
@@ -70,6 +70,10 @@ bool HM_4CH::isValidSerial(const uint64_t serial)
 
     if ((((preId[1] & 0xf0) == 0x50) || ((preId[1] & 0xf0) == 0x60))
         && (((preId[0] == 0x10) && (preId[1] == 0x62)) || ((preId[0] == 0x11) && (preId[1] == 0x61)))) {
+        return true;
+    }
+
+    if ((preId[0] == 0x11) && (preId[1] == 0x42)) {
         return true;
     }
 
