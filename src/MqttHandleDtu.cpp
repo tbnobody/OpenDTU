@@ -98,9 +98,13 @@ void MqttHandleDtuClass::onMqttMessage(const espMqttClientTypes::MessageProperti
 {
     std::string strValue(reinterpret_cast<const char*>(payload), len);
     float payload_val = -1;
+    size_t parsedLen = 0;
     try {
-        payload_val = std::stof(strValue);
-    } catch (std::invalid_argument const& e) {
+        payload_val = std::stof(strValue, &parsedLen);
+    } catch (std::logic_error const& e) { // std::invalid_argument and std::out_of_range
+        parsedLen = 0;
+    }
+    if (parsedLen == 0 || parsedLen != strValue.size()) {
         ESP_LOGW(TAG, "MQTT handler: cannot parse payload of topic '%s' as float: %s",
             topic, strValue.c_str());
         return;
