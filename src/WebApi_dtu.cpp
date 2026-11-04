@@ -146,8 +146,8 @@ void WebApiDtuClass::onDtuAdminPost(AsyncWebServerRequest* request)
 
         retMsg["message"] = "Invalid CMT frequency setting!";
         retMsg["code"] = WebApiError::DtuInvalidCmtFrequency;
-        retMsg["param"]["min"] = FrequencyDefinition.Freq_Min;
-        retMsg["param"]["max"] = FrequencyDefinition.Freq_Max;
+        retMsg["param"]["min"] = FrequencyDefinition.Freq_Min / 1000; // messages state kHz
+        retMsg["param"]["max"] = FrequencyDefinition.Freq_Max / 1000;
         WebApi.sendJsonResponse(request, response, __FUNCTION__, __LINE__);
         return;
     }
