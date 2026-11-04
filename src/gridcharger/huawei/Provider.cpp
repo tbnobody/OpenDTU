@@ -11,6 +11,7 @@
 #include <Configuration.h>
 #include <LogHelper.h>
 #include <MqttSettings.h>
+#include <Utils.h>
 
 #undef TAG
 static const char* TAG = "gridCharger";
@@ -420,15 +421,13 @@ void Provider::onMqttMessage(Topic enumTopic,
         const char* topic, const uint8_t* payload, size_t len)
 {
     std::string strValue(reinterpret_cast<const char*>(payload), len);
-    float payload_val = -1;
-    try {
-        payload_val = std::stof(strValue);
-    }
-    catch (std::invalid_argument const& e) {
+    auto parsed = Utils::getFromString<float>(strValue.c_str(), true);
+    if (!parsed) {
         DTU_LOGE("Huawei MQTT handler: cannot parse payload of topic '%s' as float: %s",
                 topic, strValue.c_str());
         return;
     }
+    float payload_val = *parsed;
 
     using Setting = HardwareInterface::Setting;
 

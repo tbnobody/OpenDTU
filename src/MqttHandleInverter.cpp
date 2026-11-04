@@ -4,6 +4,7 @@
  */
 #include "MqttHandleInverter.h"
 #include "MqttSettings.h"
+#include "Utils.h"
 #include <ctime>
 
 #undef TAG
@@ -184,14 +185,13 @@ void MqttHandleInverterClass::onMqttMessage(Topic t, const espMqttClientTypes::M
     }
 
     std::string strValue(reinterpret_cast<const char*>(payload), len);
-    float payload_val = -1;
-    try {
-        payload_val = std::stof(strValue);
-    } catch (std::invalid_argument const& e) {
+    auto parsed = Utils::getFromString<float>(strValue.c_str(), true);
+    if (!parsed) {
         ESP_LOGW(TAG, "MQTT handler: cannot parse payload of topic '%s' as float: %s",
             topic, strValue.c_str());
         return;
     }
+    float payload_val = *parsed;
 
     switch (t) {
     case Topic::LimitPersistentRelative:

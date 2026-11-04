@@ -17,8 +17,9 @@ public:
     static void skipBom(File& f);
 
     /* OpenDTU-OnBatter-specific utils go here: */
+    // strict: reject values with trailing characters, e.g., "1junk", and nan/inf
     template<typename T>
-    static std::optional<T> getFromString(char const* val);
+    static std::optional<T> getFromString(char const* val, bool strict = false);
 
     template<typename T>
     static std::pair<T, String> getJsonValueByPath(JsonDocument const& root, String const& path);

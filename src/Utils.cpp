@@ -6,6 +6,7 @@
 #include "Utils.h"
 #include "PinMapping.h"
 #include <LittleFS.h>
+#include <cmath>
 #include <MD5Builder.h>
 
 #undef TAG
@@ -128,28 +129,33 @@ void Utils::skipBom(File& f)
 
 /* OpenDTU-OnBatter-specific utils go here: */
 template<typename T>
-std::optional<T> Utils::getFromString(char const* val)
+std::optional<T> Utils::getFromString(char const* val, bool strict)
 {
     static_assert(sizeof(T) == 0, "getFromString not implemented for this type");
     return std::nullopt;
 }
 
 template<>
-std::optional<float> Utils::getFromString(char const* val)
+std::optional<float> Utils::getFromString(char const* val, bool strict)
 {
     if (val == nullptr) {
         return std::nullopt;
     }
 
     float res = 0;
+    size_t parsedLen = 0;
 
     try {
-        res = std::stof(val);
+        res = std::stof(val, &parsedLen);
     }
     catch (std::invalid_argument const&) {
         return std::nullopt;
     }
     catch (std::out_of_range const&) {
+        return std::nullopt;
+    }
+
+    if (strict && (val[parsedLen] != '\0' || !std::isfinite(res))) {
         return std::nullopt;
     }
 
