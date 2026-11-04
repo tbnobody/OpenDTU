@@ -5,6 +5,7 @@
 #include "WebApi_mqtt.h"
 #include "Configuration.h"
 #include <battery/Controller.h>
+#include "MqttHandleDtu.h"
 #include "MqttHandleHass.h"
 #include "MqttHandlePowerLimiterHass.h"
 #include "MqttHandleInverter.h"
@@ -315,11 +316,13 @@ void WebApiMqttClass::onMqttAdminPost(AsyncWebServerRequest* request)
 
         // Check if base topic was changed
         if (strcmp(config.Mqtt.Topic, root["mqtt_topic"].as<String>().c_str())) {
+            MqttHandleDtu.unsubscribeTopics();
             MqttHandleInverter.unsubscribeTopics();
             MqttHandlePowerLimiter.unsubscribeTopics();
 
             strlcpy(config.Mqtt.Topic, root["mqtt_topic"].as<String>().c_str(), sizeof(config.Mqtt.Topic));
 
+            MqttHandleDtu.subscribeTopics();
             MqttHandleInverter.subscribeTopics();
             MqttHandlePowerLimiter.subscribeTopics();
         }
