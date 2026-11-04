@@ -817,6 +817,8 @@ export default defineComponent({
             })
                 .then((response) => handleResponse(response, this.$emitter, this.$router))
                 .then((data) => {
+                    // ignore a response for an inverter that is no longer shown
+                    if (serial !== this.eventLogSerial) return;
                     this.eventLogList = data;
                     this.eventLogLoading = false;
                 });
@@ -829,6 +831,7 @@ export default defineComponent({
             fetch('/api/devinfo/status?inv=' + serial, { headers: authHeader() })
                 .then((response) => handleResponse(response, this.$emitter, this.$router))
                 .then((data) => {
+                    if (serial !== this.devInfoSerial) return;
                     this.devInfoList = data;
                     this.devInfoList.serial = serial;
                     this.devInfoLoading = false;
@@ -842,11 +845,13 @@ export default defineComponent({
             fetch('/api/gridprofile/status?inv=' + serial, { headers: authHeader() })
                 .then((response) => handleResponse(response, this.$emitter, this.$router))
                 .then((data) => {
+                    if (serial !== this.gridProfileSerial) return;
                     this.gridProfileList = data;
 
                     fetch('/api/gridprofile/rawdata?inv=' + serial, { headers: authHeader() })
                         .then((response) => handleResponse(response, this.$emitter, this.$router))
                         .then((data) => {
+                            if (serial !== this.gridProfileSerial) return;
                             this.gridProfileRawList = data;
                             this.gridProfileLoading = false;
                         });

@@ -9,6 +9,7 @@
                             v-if="showReload"
                             type="button"
                             class="btn d-flex align-items-center"
+                            :disabled="loading"
                             @click="$emit('reload')"
                             v-tooltip
                             :title="$t('base.Reload')"
