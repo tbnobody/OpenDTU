@@ -12,6 +12,7 @@
 #include "helper.h"
 #include <AsyncJson.h>
 #include <Hoymiles.h>
+#include <HoymilesUtils.h>
 
 void WebApiInverterClass::init(AsyncWebServer& server, Scheduler& scheduler)
 {
@@ -45,11 +46,7 @@ void WebApiInverterClass::onInverterList(AsyncWebServerRequest* request)
             obj["order"] = config.Inverter[i].Order;
 
             // Inverter Serial is read as HEX
-            char buffer[sizeof(uint64_t) * 8 + 1];
-            snprintf(buffer, sizeof(buffer), "%0" PRIx32 "%08" PRIx32,
-                static_cast<uint32_t>((config.Inverter[i].Serial >> 32) & 0xFFFFFFFF),
-                static_cast<uint32_t>(config.Inverter[i].Serial & 0xFFFFFFFF));
-            obj["serial"] = buffer;
+            obj["serial"] = HoymilesUtils::formatSerial(config.Inverter[i].Serial);
             obj["poll_enable"] = config.Inverter[i].Poll_Enable;
             obj["poll_enable_night"] = config.Inverter[i].Poll_Enable_Night;
             obj["command_enable"] = config.Inverter[i].Command_Enable;

@@ -252,6 +252,8 @@
         "HardwarePartNumber": "Hardware Part Number",
         "HardwareVersion": "Hardware Version",
         "SupportsPowerDistributionLogic": "'Power Distribution Logic' supported",
+        "RfHardwareVersion": "RF Module Hardware Version",
+        "RfFirmwareVersion": "RF Module Firmware Version",
         "Yes": "@:base.Yes",
         "No": "@:base.No"
     },
@@ -278,6 +280,7 @@
         "ConfigVersion": "Config Version",
         "FirmwareVersion": "Firmware Version / Git Hash",
         "FirmwareBranch": "Firmware Branch",
+        "CompileDateTime": "Compile Date/Time (UTC)",
         "PioEnv": "PIO Environment",
         "FirmwareVersionHint": "Click here to show information about your current version",
         "FirmwareUpdate": "Firmware Update",
@@ -325,6 +328,7 @@
         "Name": "Name",
         "StackFree": "Stack Free",
         "Priority": "Priority",
+        "Core": "Core",
         "Task_idle0": "Idle (CPU Core 0)",
         "Task_idle1": "Idle (CPU Core 1)",
         "Task_wifi": "Wi-Fi",
@@ -469,6 +473,7 @@
     },
     "inverterchannelproperty": {
         "Power": "Power",
+        "MaxDailyPower": "Max Power",
         "Voltage": "Voltage",
         "Current": "Current",
         "Power DC": "Power DC",
@@ -476,6 +481,7 @@
         "YieldTotal": "YieldTotal",
         "Frequency": "Frequency",
         "Temperature": "Temperature",
+        "MaxTemperature": "Max Temperature",
         "PowerFactor": "PowerFactor",
         "ReactivePower": "ReactivePower",
         "Efficiency": "Efficiency",
@@ -1059,9 +1065,7 @@
         "LedBrightness": "LED {led} brightness ({brightness})"
     },
     "pininfo": {
-        "Category": "Category",
         "Name": "Name",
-        "Number": "Number",
         "ValueSelected": "Selected",
         "ValueActive": "Active"
     },

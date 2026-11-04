@@ -6,6 +6,7 @@
 #include "../parser/DevInfoParser.h"
 #include "../parser/GridProfileParser.h"
 #include "../parser/PowerCommandParser.h"
+#include "../parser/RfInfoParser.h"
 #include "../parser/StatisticsParser.h"
 #include "../parser/SystemConfigParaParser.h"
 #include "HoymilesRadio.h"
@@ -84,6 +85,12 @@ public:
     void addRxFragment(const uint8_t fragment[], const uint8_t len, const int8_t rssi);
     uint8_t verifyAllFragments(CommandAbstract& cmd);
 
+    // Side-effect-free check whether all fragments of the current transaction
+    // have been received (i.e. the last fragment flag was seen and every
+    // fragment up to it is present). Unlike verifyAllFragments() it does not
+    // touch any retry counters and can be called on every loop iteration.
+    bool isTransactionComplete() const;
+
     void performDailyTask();
 
     void resetRadioStats();
@@ -119,6 +126,7 @@ public:
     virtual bool resendPowerControlRequest() = 0;
     virtual bool sendChangeChannelRequest();
     virtual bool sendGridOnProFileParaRequest() = 0;
+    virtual bool sendRfInfoRequest() = 0;
 
     // This feature will limit the AC output instead of limiting the DC inputs.
     virtual bool supportsPowerDistributionLogic() = 0;
@@ -129,6 +137,7 @@ public:
     DevInfoParser* DevInfo();
     GridProfileParser* GridProfile();
     PowerCommandParser* PowerCommand();
+    RfInfoParser* RfInfo();
     StatisticsParser* Statistics();
     SystemConfigParaParser* SystemConfigPara();
 
@@ -163,6 +172,7 @@ private:
     std::unique_ptr<DevInfoParser> _devInfoParser;
     std::unique_ptr<GridProfileParser> _gridProfileParser;
     std::unique_ptr<PowerCommandParser> _powerCommandParser;
+    std::unique_ptr<RfInfoParser> _rfInfoParser;
     std::unique_ptr<StatisticsParser> _statisticsParser;
     std::unique_ptr<SystemConfigParaParser> _systemConfigParaParser;
 };

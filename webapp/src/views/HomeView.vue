@@ -33,7 +33,7 @@
                         :data-bs-target="'#v-pills-' + inverter.serial"
                         type="button"
                         role="tab"
-                        aria-controls="'v-pills-' + inverter.serial"
+                        :aria-controls="'v-pills-' + inverter.serial"
                         aria-selected="true"
                     >
                         <div class="d-flex align-items-center">
@@ -354,15 +354,33 @@
         <GridChargerView v-if="liveData.gridcharger.enabled" />
     </BasePage>
 
-    <ModalDialog modalId="eventView" :title="$t('home.EventLog')" :loading="eventLogLoading">
+    <ModalDialog
+        modalId="eventView"
+        :title="$t('home.EventLog')"
+        :loading="eventLogLoading"
+        :show-reload="true"
+        @reload="onShowEventlog(eventLogSerial)"
+    >
         <EventLog :eventLogList="eventLogList" />
     </ModalDialog>
 
-    <ModalDialog modalId="devInfoView" :title="$t('home.InverterInfo')" :loading="devInfoLoading">
+    <ModalDialog
+        modalId="devInfoView"
+        :title="$t('home.InverterInfo')"
+        :loading="devInfoLoading"
+        :show-reload="true"
+        @reload="onShowDevInfo(devInfoList.serial)"
+    >
         <DevInfo :devInfoList="devInfoList" />
     </ModalDialog>
 
-    <ModalDialog modalId="gridProfileView" :title="$t('home.GridProfile')" :loading="gridProfileLoading">
+    <ModalDialog
+        modalId="gridProfileView"
+        :title="$t('home.GridProfile')"
+        :loading="gridProfileLoading"
+        :show-reload="true"
+        @reload="onShowGridProfile(gridProfileSerial)"
+    >
         <GridProfile :gridProfileList="gridProfileList" :gridProfileRawList="gridProfileRawList" />
     </ModalDialog>
 
@@ -583,12 +601,14 @@ export default defineComponent({
             liveData: {} as LiveData,
             isFirstFetchAfterConnect: true,
             eventLogView: {} as bootstrap.Modal,
+            eventLogSerial: '',
             eventLogList: {} as EventlogItems,
             eventLogLoading: true,
             devInfoView: {} as bootstrap.Modal,
             devInfoList: {} as DevInfoStatus,
             devInfoLoading: true,
             gridProfileView: {} as bootstrap.Modal,
+            gridProfileSerial: '',
             gridProfileList: {} as GridProfileStatus,
             gridProfileRawList: {} as GridProfileRawdata,
             gridProfileLoading: true,
@@ -790,6 +810,7 @@ export default defineComponent({
         },
         onShowEventlog(serial: string) {
             this.eventLogLoading = true;
+            this.eventLogSerial = serial;
             fetch('/api/eventlog/status?inv=' + serial + '&locale=' + this.$i18n.locale, {
                 headers: authHeader(),
             })
@@ -814,6 +835,7 @@ export default defineComponent({
             this.devInfoView.show();
         },
         onShowGridProfile(serial: string) {
+            this.gridProfileSerial = serial;
             this.gridProfileLoading = true;
             fetch('/api/gridprofile/status?inv=' + serial, { headers: authHeader() })
                 .then((response) => handleResponse(response, this.$emitter, this.$router))

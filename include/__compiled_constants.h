@@ -5,4 +5,4 @@
 
 extern const char* __COMPILED_GIT_HASH__;
 extern const char* __COMPILED_GIT_BRANCH__;
-// extern const char *__COMPILED_DATE_TIME_UTC_STR__;
+extern const char *__COMPILED_DATE_TIME_UTC_STR__;

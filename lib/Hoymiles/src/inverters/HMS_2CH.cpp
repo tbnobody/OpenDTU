@@ -32,7 +32,9 @@ static const byteAssign_t byteAssignment[] = {
     { TYPE_INV, CH0, FLD_YD, UNIT_WH, CALC_TOTAL_YD, 0, CMD_CALC, false, 0 },
     { TYPE_INV, CH0, FLD_YT, UNIT_KWH, CALC_TOTAL_YT, 0, CMD_CALC, false, 3 },
     { TYPE_INV, CH0, FLD_PDC, UNIT_W, CALC_TOTAL_PDC, 0, CMD_CALC, false, 1 },
-    { TYPE_INV, CH0, FLD_EFF, UNIT_PCT, CALC_TOTAL_EFF, 0, CMD_CALC, false, 3 }
+    { TYPE_INV, CH0, FLD_EFF, UNIT_PCT, CALC_TOTAL_EFF, 0, CMD_CALC, false, 3 },
+    { TYPE_INV, CH0, FLD_MT, UNIT_C, CALC_MAX_TEMPERATURE, 0, CMD_CALC, true, 1 },
+    { TYPE_AC, CH0, FLD_MPAC, UNIT_W, CALC_MAX_PAC, 0, CMD_CALC, false, 1 },
 };
 
 static const channelMetaData_t channelMetaData[] = {
@@ -49,7 +51,7 @@ bool HMS_2CH::isValidSerial(const uint64_t serial)
 {
     // serial >= 0x114400000000 && serial <= 0x1144ffffffff
     uint16_t preSerial = (serial >> 32) & 0xffff;
-    return preSerial == 0x1144 || preSerial == 0x1143 || preSerial == 0x1410 || preSerial == 0x114a;
+    return preSerial == 0x1144 || preSerial == 0x1143 || preSerial == 0x1410 || preSerial == 0x114a || preSerial == 0x1146;
 }
 
 String HMS_2CH::typeName() const

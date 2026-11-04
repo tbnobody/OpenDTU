@@ -72,6 +72,10 @@ private:
 
     void sendEsbPacket(CommandAbstract& cmd);
 
+    // The CMT radio queues received fragments in _rxBuffer which are parsed
+    // one per loop iteration in loop().
+    virtual bool isRxBufferEmpty() const { return _rxBuffer.empty(); }
+
     std::unique_ptr<CMT2300A> _radio;
 
     volatile bool _packetReceived = false;
@@ -84,6 +88,7 @@ private:
     TimeoutHelper _txTimeout;
 
     uint32_t _inverterTargetFrequency = HOYMILES_CMT_WORK_FREQ;
+    int8_t _paLevel = 0;
 
     bool cmtSwitchDtuFreq(const uint32_t to_frequency);
 

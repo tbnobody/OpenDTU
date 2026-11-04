@@ -15,3 +15,4 @@
   * SingleDataCommand
     * RequestFrameCommand
   * ChannelChangeCommand
+  * RfInfoCommand

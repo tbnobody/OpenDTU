@@ -11,6 +11,7 @@
 #include "commands/GridOnProFilePara.h"
 #include "commands/PowerControlCommand.h"
 #include "commands/RealTimeRunDataCommand.h"
+#include "commands/RfInfoCommand.h"
 #include "commands/SystemConfigParaCommand.h"
 
 HM_Abstract::HM_Abstract(HoymilesRadio* radio, const uint64_t serial)
@@ -198,6 +199,18 @@ bool HM_Abstract::sendGridOnProFileParaRequest()
 
     auto cmd = _radio->prepareCommand<GridOnProFilePara>(this);
     cmd->setTime(now);
+    _radio->enqueCommand(cmd);
+
+    return true;
+}
+
+bool HM_Abstract::sendRfInfoRequest()
+{
+    if (!getEnablePolling()) {
+        return false;
+    }
+
+    auto cmd = _radio->prepareCommand<RfInfoCommand>(this);
     _radio->enqueCommand(cmd);
 
     return true;

@@ -30,22 +30,22 @@
     "base": {
         "Seconds": "Secondes",
         "Loading": "Chargement...",
-        "Reload": "Reload",
+        "Reload": "Actualiser",
         "Cancel": "Annuler",
         "Save": "Sauvegarder",
-        "Refreshing": "Refreshing",
-        "Pull": "Pull down to refresh",
-        "Release": "Release to refresh",
+        "Refreshing": "Actualisation",
+        "Pull": "Tirer vers le bas pour actualiser",
+        "Release": "Relâcher pour actualiser",
         "Close": "Fermer",
         "Yes": "Oui",
         "No": "Non"
     },
     "wait": {
-        "NotReady": "OpenDTU-OnBattery is not yet ready",
-        "PleaseWait": "Please wait. You will be automatically redirected to the home page."
+        "NotReady": "OpenDTU-OnBattery n'est pas encore prêt",
+        "PleaseWait": "Veuillez patienter. Vous serez automatiquement redirigé vers la page d'accueil."
     },
     "Error": {
-        "Oops": "Oops!"
+        "Oops": "Oups !"
     },
     "localeswitcher": {
         "Dark": "Sombre",
@@ -62,15 +62,15 @@
         "1003": "Données trop importantes !",
         "1004": "Échec de l'analyse des données !",
         "1005": "Certaines valeurs sont manquantes !",
-        "1006": "Write failed!",
+        "1006": "Échec de l'écriture !",
         "2001": "Le numéro de série ne peut pas être nul !",
         "2002": "L'intervalle de sondage doit être supérieur à zéro !",
         "2003": "Réglage du niveau de puissance invalide !",
-        "2004": "The frequency must be set between {min} and {max} kHz and must be a multiple of 250kHz!",
-        "2005": "Invalid country selection !",
+        "2004": "La fréquence doit être comprise entre {min} et {max} kHz et être un multiple de 250 kHz !",
+        "2005": "Sélection du pays invalide !",
         "3001": "Rien n'a été supprimé !",
         "3002": "Configuration réinitialisée. Redémarrage maintenant...",
-        "3003": "File successful deleted. Restart to apply changes!",
+        "3003": "Fichier supprimé avec succès. Redémarrez pour appliquer les modifications !",
         "4001": "@:apiresponse.2001",
         "4002": "Le nom doit comporter entre 1 et {max} caractères !",
         "4003": "Seulement {max} onduleurs sont supportés !",
@@ -79,7 +79,7 @@
         "4006": "Réglage du montant maximal de canaux invalide !",
         "4007": "Onduleur modifié !",
         "4008": "Onduleur supprimé !",
-        "4009": "Inverter order saved!",
+        "4009": "Ordre des onduleurs enregistré !",
         "5001": "@:apiresponse.2001",
         "5002": "La limite doit être comprise entre 1 et {max} !",
         "5003": "Type spécifié invalide !",
@@ -102,16 +102,16 @@
         "7014": "Le sujet Hass ne doit pas dépasser {max} caractères !",
         "7015": "Le sujet Hass ne doit pas contenir d'espace !",
         "7016": "LWT QOS ne doit pas être supérieur à {max}!",
-        "7017": "Client ID must not longer then {max} characters!",
-        "7018": "Hass topic must end with slash (/)!",
+        "7017": "L'identifiant client ne doit pas comporter plus de {max} caractères !",
+        "7018": "Le sujet Hass doit se terminer par une barre oblique (/) !",
         "8001": "L'adresse IP n'est pas valide !",
         "8002": "Le masque de réseau n'est pas valide !",
         "8003": "La passerelle n'est pas valide !",
         "8004": "L'adresse IP du serveur DNS primaire n'est pas valide !",
         "8005": "L'adresse IP du serveur DNS secondaire n'est pas valide !",
         "8006": "La valeur du délai d'attente du point d'accès administratif n'est pas valide !",
-        "8007": "Syslog Server must between 1 and {max} characters long!",
-        "8008": "Port must be a number between 1 and 65535!",
+        "8007": "Le serveur Syslog doit comporter entre 1 et {max} caractères !",
+        "8008": "Le port doit être un nombre entre 1 et 65535 !",
         "9001": "Le serveur NTP doit avoir une longueur comprise entre 1 et {max} caractères !",
         "9002": "Le fuseau horaire doit comporter entre 1 et {max} caractères !",
         "9003": "La description du fuseau horaire doit comporter entre 1 et {max} caractères !",
@@ -238,6 +238,8 @@
         "HardwarePartNumber": "Numéro d'article matériel",
         "HardwareVersion": "Version du matériel",
         "SupportsPowerDistributionLogic": "'Power Distribution Logic' supported",
+        "RfHardwareVersion": "Version matérielle du module RF",
+        "RfFirmwareVersion": "Version du firmware du module RF",
         "Yes": "@:base.Yes",
         "No": "@:base.No"
     },
@@ -264,6 +266,7 @@
         "ConfigVersion": "Version de la configuration",
         "FirmwareVersion": "Version du firmware / Hash Git",
         "FirmwareBranch": "Firmware Branch",
+        "CompileDateTime": "Compile Date/Time (UTC)",
         "PioEnv": "PIO Environment",
         "FirmwareVersionHint": "Cliquez ici pour afficher des informations sur votre version actuelle",
         "FirmwareUpdate": "Mise à jour du firmware",
@@ -304,6 +307,20 @@
         "LargestFreeBlock": "Biggest contiguous free block",
         "MaxUsage": "Maximum usage since start",
         "Fragmentation": "Level of fragmentation"
+    },
+    "taskdetails": {
+        "TaskDetails": "Détails des tâches",
+        "Name": "Nom",
+        "StackFree": "Stack libre",
+        "Priority": "Priorité",
+        "Core": "Cœur",
+        "Task_idle0": "Inactif (cœur CPU 0)",
+        "Task_idle1": "Inactif (cœur CPU 1)",
+        "Task_wifi": "Wi-Fi",
+        "Task_tit": "TCP/IP",
+        "Task_looptask": "Boucle Arduino",
+        "Task_asynctcp": "Async TCP",
+        "Task_mqttclient": "Client MQTT"
     },
     "radioinfo": {
         "RadioInformation": "Informations sur la radio",
@@ -432,6 +449,7 @@
     },
     "inverterchannelproperty": {
         "Power": "Puissance",
+        "MaxDailyPower": "Max Power",
         "Voltage": "Tension",
         "Current": "Courant",
         "Power DC": "Puissance continue",
@@ -439,6 +457,7 @@
         "YieldTotal": "Rendement total",
         "Frequency": "Fréquence",
         "Temperature": "Température",
+        "MaxTemperature": "Max Temperature",
         "PowerFactor": "Facteur de puissance",
         "ReactivePower": "Puissance réactive",
         "Efficiency": "Efficacité",
@@ -827,7 +846,6 @@
         "LedBrightness": "LED {led} luminosité ({brightness})"
     },
     "pininfo": {
-        "Category": "Catégorie",
         "Name": "Nom",
         "ValueSelected": "Sélectionné",
         "ValueActive": "Activé"

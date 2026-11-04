@@ -27,7 +27,7 @@ Source Address: 80 12 23 04
      Target Addr   Source Addr      CRC8
 */
 #include "CommandAbstract.h"
-#include "../Utils.h"
+#include "../HoymilesUtils.h"
 #include "../inverters/InverterAbstract.h"
 #include "crc.h"
 #include <string.h>
@@ -36,6 +36,7 @@ CommandAbstract::CommandAbstract(InverterAbstract* inv, const uint64_t router_ad
 {
     memset(_payload, 0, RF_LEN);
     _payload_size = 0;
+    _singleFragmentAnswer = false;
 
     _inv = inv;
 
@@ -54,7 +55,7 @@ const uint8_t* CommandAbstract::getDataPayload()
 String CommandAbstract::dumpDataPayload()
 {
     const uint8_t* payload = getDataPayload();
-    return Utils::dumpArray(payload, getDataSize());
+    return HoymilesUtils::dumpArray(payload, getDataSize());
 }
 
 uint8_t CommandAbstract::getDataSize() const

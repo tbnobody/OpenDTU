@@ -19,6 +19,10 @@ void CommandQueue::removeDuplicatedEntries(std::shared_ptr<CommandAbstract> cmd)
 {
     std::lock_guard<std::mutex> lock(_mutex);
 
+    if (_queue.empty()) {
+        return;
+    }
+
     auto it = std::remove_if(_queue.begin() + 1, _queue.end(),
         [&](const auto& v) {
             return cmd->areSameParameter(v.get())
@@ -30,6 +34,10 @@ void CommandQueue::removeDuplicatedEntries(std::shared_ptr<CommandAbstract> cmd)
 void CommandQueue::replaceEntries(std::shared_ptr<CommandAbstract> cmd)
 {
     std::lock_guard<std::mutex> lock(_mutex);
+
+    if (_queue.empty()) {
+        return;
+    }
 
     std::replace_if(_queue.begin() + 1, _queue.end(),
         [&](const auto& v) {

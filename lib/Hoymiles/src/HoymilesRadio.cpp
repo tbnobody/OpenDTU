@@ -34,6 +34,10 @@ serial_u HoymilesRadio::convertSerialToRadioId(const serial_u serial)
 
 bool HoymilesRadio::checkFragmentCrc(const fragment_t& fragment) const
 {
+    if (fragment.len == 0 || fragment.len > MAX_RF_PAYLOAD_SIZE) {
+        return false;
+    }
+
     const uint8_t crc = crc8(fragment.fragment, fragment.len - 1);
     return (crc == fragment.fragment[fragment.len - 1]);
 }
@@ -57,8 +61,26 @@ void HoymilesRadio::sendLastPacketAgain()
 
 void HoymilesRadio::handleReceivedPackage()
 {
-    if (_busyFlag && _rxTimeout.occured()) {
-        ESP_LOGI(TAG, "RX Period End");
+    // Early exit: if the inverter already received and stored all expected
+    // fragments of the current transaction (the last fragment of a response
+    // carries the 0x80 flag and every fragment up to it was seen), waiting
+    // for the rx timeout would be pure latency. Finalize the transaction
+    // immediately once the radio's rx buffer is fully drained so that no
+    // fragment of this response can be attributed to the next transaction.
+    // The timeout below remains as fallback for incomplete responses.
+    bool earlyExit = false;
+    if (_busyFlag && !_rxTimeout.occured() && isRxBufferEmpty()) {
+        std::shared_ptr<InverterAbstract> inv = Hoymiles.getInverterBySerial(_commandQueue.front().get()->getTargetAddress());
+        if (nullptr != inv && inv->isTransactionComplete()) {
+            earlyExit = true;
+            ESP_LOGI(TAG, "RX Early Exit");
+        }
+    }
+
+    if (_busyFlag && (earlyExit || _rxTimeout.occured())) {
+        if (!earlyExit) {
+            ESP_LOGI(TAG, "RX Period End");
+        }
         std::shared_ptr<InverterAbstract> inv = Hoymiles.getInverterBySerial(_commandQueue.front().get()->getTargetAddress());
 
         if (nullptr != inv) {

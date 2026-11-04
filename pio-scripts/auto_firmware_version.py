@@ -65,11 +65,11 @@ def do_main():
         lines = ""
         lines += "/* Generated file within build process - Do NOT edit */\n"
 
-        if 0:
+        if 1:
             # Add the current date and time as string in UTC timezone
             from datetime import datetime, timezone
             now = datetime.now(tz=timezone.utc)
-            COMPILED_DATE_TIME_UTC_STR = now.strftime("%Y/%m/%d %H:%M:%S")
+            COMPILED_DATE_TIME_UTC_STR = now.isoformat()
             lines += 'const char *__COMPILED_DATE_TIME_UTC_STR__ = "%s";\n' % (COMPILED_DATE_TIME_UTC_STR)
 
         if 1:

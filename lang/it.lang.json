@@ -22,7 +22,7 @@
             "MQTTSettings": "Impostazioni MQTT",
             "InverterSettings": "Impostazioni Inverter",
             "SecuritySettings": "Impostazioni di Sicurezza",
-            "LoggingSettings": "Logging Settings",
+            "LoggingSettings": "Impostazioni di registrazione",
             "DTUSettings": "Impostazioni DTU",
             "DeviceManager": "Gestione Dispositivi",
             "ConfigManagement": "Gestione Configurazione",
@@ -203,7 +203,7 @@
             "FirmwareBuildDate": "Data Firmware",
             "HardwarePartNumber": "Hardware Part Number",
             "HardwareVersion": "Hardware Version",
-            "SupportsPowerDistributionLogic": "'Power Distribution Logic' supported",
+            "SupportsPowerDistributionLogic": "'Power Distribution Logic' supportata",
             "Yes": "@:base.Yes",
             "No": "@:base.No"
         },
@@ -229,7 +229,8 @@
             "SdkVersion": "SDK Version",
             "ConfigVersion": "Config Version",
             "FirmwareVersion": "Firmware Version / Git Hash",
-            "FirmwareBranch": "Firmware Branch",
+            "FirmwareBranch": "Ramo del firmware",
+            "CompileDateTime": "Compile Date/Time (UTC)",
             "PioEnv": "PIO Environment",
             "FirmwareVersionHint": "Click here to show information about your current version",
             "FirmwareUpdate": "Firmware Update",
@@ -263,8 +264,9 @@
             "LittleFs": "LittleFs",
             "Sketch": "Sketch"
         },
-        "heapdetails": {
+        "memorydetails": {
             "HeapDetails": "Dettagli memoria Heap",
+            "PsramDetails": "PSRAM Details",
             "TotalFree": "Libera totale",
             "LargestFreeBlock": "Blocco contiguo libero più grande",
             "MaxUsage": "Massima utilizzata dall'avvio",
@@ -275,6 +277,7 @@
             "Name": "Name",
             "StackFree": "Stack Free",
             "Priority": "Priority",
+            "Core": "Core",
             "Task_idle0": "Idle (CPU Core 0)",
             "Task_idle1": "Idle (CPU Core 1)",
             "Task_wifi": "Wi-Fi",
@@ -385,10 +388,10 @@
             "EnableAutoScroll": "Abilita AutoScroll",
             "ClearConsole": "Pulisci Console",
             "CopyToClipboard": "Copia nella clipboard",
-            "Download": "Download",
-            "RegularExpression": "Regular Expression",
-            "Lines": "{lines} Lines",
-            "LogLevel": "Log Level ({cnt})"
+            "Download": "Scarica",
+            "RegularExpression": "Espressione regolare",
+            "Lines": "{lines} righe",
+            "LogLevel": "Livello di registrazione ({cnt})"
         },
         "inverterchannelinfo": {
             "String": "Stringa {num}",
@@ -402,6 +405,7 @@
         },
         "inverterchannelproperty": {
             "Power": "Potenza",
+            "MaxDailyPower": "Max Power",
             "Voltage": "Tensione",
             "Current": "Corrente",
             "Power DC": "PotenzaDC",
@@ -409,6 +413,7 @@
             "YieldTotal": "EnergiaTotale",
             "Frequency": "Frequenza",
             "Temperature": "Temperatura",
+            "MaxTemperature": "Max Temperature",
             "PowerFactor": "FattorePotenza",
             "ReactivePower": "PotenzaReattiva",
             "Efficiency": "Efficienza",
@@ -499,10 +504,10 @@
             "Minutes": "minuti",
             "EnableMdns": "Abilita mDNS",
             "MdnsSettings": "Configurazione mDNS",
-            "EnableSyslog": "Enable Syslog",
-            "SyslogSettings": "Syslog Settings",
-            "SyslogHostname": "Syslog Server",
-            "SyslogPort": "Port"
+            "EnableSyslog": "Abilita Syslog",
+            "SyslogSettings": "Impostazioni Syslog",
+            "SyslogHostname": "Server Syslog",
+            "SyslogPort": "Porta"
         },
         "mqttadmin": {
             "MqttSettings": "Impostazioni MQTT",
@@ -663,7 +668,7 @@
             "TimeSyncLink": "Controlla le impostazioni Data/Ora.",
             "DefaultPassword": "Stai usando la password di default per accedere all'interfaccia web e per la modalità Access Point di emergenza. Questo può portare ad un rischio di sicurezza.",
             "DefaultPasswordLink": "Per favore cambia la password.",
-            "PinMappingIssue": "You are using a generic firmware image, but have not yet uploaded a file with device profiles (<code>pin_mapping.json</code>) or have not selected a profile defined there. Please refer to the <a href=\"https://opendtu-onbattery.net/firmware/device_profiles/\" target=\"_blank\" class=\"alert-link\">documentation</a> for details."
+            "PinMappingIssue": "Stai utilizzando un'immagine firmware generica, ma non hai ancora caricato un file con i profili del dispositivo (<code>pin_mapping.json</code>) o selezionato un profilo definito al suo interno. Consulta la <a href=\"https://opendtu-onbattery.net/firmware/device_profiles/\" target=\"_blank\" class=\"alert-link\">documentazione</a> per i dettagli."
         },
         "deviceadmin": {
             "DeviceManager": "Device-Manager",
@@ -699,9 +704,7 @@
             "LedBrightness": "LED {led}, Luminosità ({brightness})"
         },
         "pininfo": {
-            "Category": "Categoria",
             "Name": "Nome",
-            "Number": "Numero",
             "ValueSelected": "Selezionato",
             "ValueActive": "Attivo"
         },
@@ -713,10 +716,10 @@
             "format_unknown": "Unknown format"
         },
         "loggingadmin": {
-            "LoggingSettings": "Logging Settings",
-            "LogLevel": "Log Level",
-            "DefaultLevel": "Default log level",
-            "Module": "Module",
+            "LoggingSettings": "Impostazioni di registrazione",
+            "LogLevel": "Livello di registrazione",
+            "DefaultLevel": "Livello di registrazione predefinito",
+            "Module": "Modulo",
             "Module_CORE": "Nucleo ESP-IDF",
             "Module_hoymiles": "RF Hoymiles",
             "Module_mqtt": "Client MQTT",

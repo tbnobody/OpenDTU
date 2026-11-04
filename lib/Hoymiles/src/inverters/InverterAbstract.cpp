@@ -4,6 +4,7 @@
  */
 #include "InverterAbstract.h"
 #include "crc.h"
+#include <HoymilesUtils.h>
 #include <cstring>
 #include <esp_log.h>
 
@@ -15,16 +16,13 @@ InverterAbstract::InverterAbstract(HoymilesRadio* radio, const uint64_t serial)
     _serial.u64 = serial;
     _radio = radio;
 
-    char serial_buff[sizeof(uint64_t) * 8 + 1];
-    snprintf(serial_buff, sizeof(serial_buff), "%0" PRIx32 "%08" PRIx32,
-        static_cast<uint32_t>((serial >> 32) & 0xFFFFFFFF),
-        static_cast<uint32_t>(serial & 0xFFFFFFFF));
-    _serialString = serial_buff;
+    _serialString = HoymilesUtils::formatSerial(serial);
 
     _alarmLogParser.reset(new AlarmLogParser());
     _devInfoParser.reset(new DevInfoParser());
     _gridProfileParser.reset(new GridProfileParser());
     _powerCommandParser.reset(new PowerCommandParser());
+    _rfInfoParser.reset(new RfInfoParser());
     _statisticsParser.reset(new StatisticsParser());
     _systemConfigParaParser.reset(new SystemConfigParaParser());
 }
@@ -175,6 +173,11 @@ PowerCommandParser* InverterAbstract::PowerCommand()
     return _powerCommandParser.get();
 }
 
+RfInfoParser* InverterAbstract::RfInfo()
+{
+    return _rfInfoParser.get();
+}
+
 StatisticsParser* InverterAbstract::Statistics()
 {
     return _statisticsParser.get();
@@ -251,6 +254,17 @@ uint8_t InverterAbstract::verifyAllFragments(CommandAbstract& cmd)
         }
     }
 
+    if (cmd.acceptsSingleFragmentAnswer()) {
+        // The command doesn't rely on the 0x80 flag or gapless fragment
+        // numbering. Whatever was received last is treated as complete.
+        if (!cmd.handleResponse(_rxFragmentBuffer, _rxFragmentLastPacketId)) {
+            cmd.gotTimeout();
+            return FRAGMENT_HANDLE_ERROR;
+        }
+
+        return FRAGMENT_OK;
+    }
+
     // Last fragment is missing (the one with 0x80)
     if (_rxFragmentMaxPacketId == 0) {
         ESP_LOGW(TAG, "Last missing");
@@ -288,8 +302,9 @@ void InverterAbstract::performDailyTask()
     // Have to reset the offets first, otherwise it will
     // Substract the offset from zero which leads to a high value
     Statistics()->resetYieldDayCorrection();
+    Statistics()->zeroDailyRuntimeData();
     if (getZeroYieldDayOnMidnight()) {
-        Statistics()->zeroDailyData();
+        Statistics()->zeroDailyYieldData();
     }
     if (getClearEventlogOnMidnight()) {
         EventLog()->clearBuffer();
@@ -297,9 +312,29 @@ void InverterAbstract::performDailyTask()
     resetRadioStats();
 }
 
+bool InverterAbstract::isTransactionComplete() const
+{
+    // The inverter marks the last fragment of a response with the 0x80 bit
+    // (stored in _rxFragmentMaxPacketId by addRxFragment()). Once this flag
+    // was seen and every fragment up to it has been received, the
+    // transaction is complete for sure and waiting for the rx timeout is
+    // pure latency.
+    if (_rxFragmentMaxPacketId == 0) {
+        return false;
+    }
+
+    for (uint8_t i = 0; i < _rxFragmentMaxPacketId; i++) {
+        if (!_rxFragmentBuffer[i].wasReceived) {
+            return false;
+        }
+    }
+
+    return true;
+}
+
 void InverterAbstract::resetRadioStats()
 {
-    RadioStats = {};
+    RadioStats = { };
 }
 
 std::vector<ChannelNum_t> InverterAbstract::getChannelsDC() const

@@ -87,6 +87,10 @@ CommandAbstract* MultiDataCommand::getRequestFrameCommand(const uint8_t frame_no
 
 bool MultiDataCommand::handleResponse(const fragment_t fragment[], const uint8_t max_fragment_id)
 {
+    if (max_fragment_id == 0 || fragment[max_fragment_id - 1].len < 2) {
+        return false;
+    }
+
     // All fragments are available --> Check CRC
     uint16_t crc = 0xffff, crcRcv = 0;
 

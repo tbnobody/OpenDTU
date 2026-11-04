@@ -91,7 +91,7 @@ String Utils::generateMd5FromFile(String file)
     }
 
     File f = LittleFS.open(file, "r");
-    if (!file) {
+    if (!f) {
         return String();
     }
 

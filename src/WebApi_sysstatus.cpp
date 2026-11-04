@@ -74,6 +74,7 @@ void WebApiSysstatusClass::onSystemStatus(AsyncWebServerRequest* request)
         task["name"] = task_name;
         task["stack_watermark"] = uxTaskGetStackHighWaterMark(handle);
         task["priority"] = uxTaskPriorityGet(handle);
+        task["core"] = xTaskGetAffinity(handle);
     }
 
     String reason;
@@ -92,6 +93,7 @@ void WebApiSysstatusClass::onSystemStatus(AsyncWebServerRequest* request)
     root["config_version_onbattery"] = CONFIG_VERSION_ONBATTERY;
     root["git_hash"] = __COMPILED_GIT_HASH__;
     root["git_branch"] = __COMPILED_GIT_BRANCH__;
+    root["compile_datetime"] = __COMPILED_DATE_TIME_UTC_STR__;
     root["pioenv"] = PIOENV;
 
     root["uptime"] = esp_timer_get_time() / 1000000;

@@ -16,6 +16,7 @@ public:
     bool sendRestartControlRequest();
     bool resendPowerControlRequest();
     bool sendGridOnProFileParaRequest();
+    bool sendRfInfoRequest() override;
     bool supportsPowerDistributionLogic() override;
 
 protected:

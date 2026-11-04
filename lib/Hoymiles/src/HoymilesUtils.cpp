@@ -2,11 +2,11 @@
 /*
  * Copyright (C) 2023-2026 Thomas Basler and others
  */
-#include "Utils.h"
+#include "HoymilesUtils.h"
 #include <Arduino.h>
 #include <time.h>
 
-uint8_t Utils::getWeekDay()
+uint8_t HoymilesUtils::getWeekDay()
 {
     time_t now = time(NULL);
     struct tm tm;
@@ -14,13 +14,13 @@ uint8_t Utils::getWeekDay()
     return tm.tm_mday;
 }
 
-bool Utils::getTimeAvailable()
+bool HoymilesUtils::getTimeAvailable()
 {
     struct tm timeinfo;
     return getLocalTime(&timeinfo, 5);
 }
 
-String Utils::dumpArray(const uint8_t data[], const uint8_t len)
+String HoymilesUtils::dumpArray(const uint8_t data[], const uint8_t len)
 {
     if (len == 0) {
         return String();
@@ -37,4 +37,13 @@ String Utils::dumpArray(const uint8_t data[], const uint8_t len)
     }
 
     return result;
+}
+
+String HoymilesUtils::formatSerial(uint64_t serial)
+{
+    char buffer[sizeof(uint64_t) * 8 + 1];
+    snprintf(buffer, sizeof(buffer), "%0" PRIx32 "%08" PRIx32,
+        static_cast<uint32_t>((serial >> 32) & 0xFFFFFFFF),
+        static_cast<uint32_t>(serial & 0xFFFFFFFF));
+    return String(buffer);
 }

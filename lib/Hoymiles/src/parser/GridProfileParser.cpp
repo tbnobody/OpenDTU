@@ -421,46 +421,54 @@ std::list<GridProfileSection_t> GridProfileParser::getProfile() const
 {
     std::list<GridProfileSection_t> l;
 
-    if (_gridProfileLength > 4) {
-        uint16_t pos = 4;
-        do {
-            const uint8_t section_id = _payloadGridProfile[pos];
-            const uint8_t section_version = _payloadGridProfile[pos + 1];
-            const int16_t section_start = getSectionStart(section_id, section_version);
-            const uint8_t section_size = getSectionSize(section_id, section_version);
+    uint16_t pos = 4;
+    while (pos < _gridProfileLength) {
+        if (_gridProfileLength - pos < 2) {
+            ESP_LOGW(TAG, "grid profile contains an incomplete section header");
+            break;
+        }
+
+        const uint8_t section_id = _payloadGridProfile[pos];
+        const uint8_t section_version = _payloadGridProfile[pos + 1];
+        const int16_t section_start = getSectionStart(section_id, section_version);
+        const uint8_t section_size = getSectionSize(section_id, section_version);
+        pos += 2;
+
+        GridProfileSection_t section;
+        try {
+            section.SectionName = profileSection.at(section_id).data();
+        } catch (const std::out_of_range&) {
+            section.SectionName = "Unknown";
+            break;
+        }
+
+        if (section_start == -1) {
+            section.SectionName = "Unknown";
+            break;
+        }
+
+        if (static_cast<size_t>(section_start) + section_size > _profileValues.size()
+            || static_cast<size_t>(section_size) * 2 > _gridProfileLength - pos) {
+            ESP_LOGW(TAG, "grid profile contains an incomplete section");
+            break;
+        }
+
+        for (uint8_t val_id = 0; val_id < section_size; val_id++) {
+            auto itemDefinition = itemDefinitions.at(_profileValues[section_start + val_id].ItemDefinition);
+
+            float value = static_cast<int16_t>((_payloadGridProfile[pos] << 8) | _payloadGridProfile[pos + 1]);
+            value /= itemDefinition.Divider;
+
+            GridProfileItem_t v;
+            v.Name = itemDefinition.Name.data();
+            v.Unit = itemDefinition.Unit.data();
+            v.Value = value;
+            section.items.push_back(v);
+
             pos += 2;
+        }
 
-            GridProfileSection_t section;
-            try {
-                section.SectionName = profileSection.at(section_id).data();
-            } catch (const std::out_of_range&) {
-                section.SectionName = "Unknown";
-                break;
-            }
-
-            if (section_start == -1) {
-                section.SectionName = "Unknown";
-                break;
-            }
-
-            for (uint8_t val_id = 0; val_id < section_size; val_id++) {
-                auto itemDefinition = itemDefinitions.at(_profileValues[section_start + val_id].ItemDefinition);
-
-                float value = static_cast<int16_t>((_payloadGridProfile[pos] << 8) | _payloadGridProfile[pos + 1]);
-                value /= itemDefinition.Divider;
-
-                GridProfileItem_t v;
-                v.Name = itemDefinition.Name.data();
-                v.Unit = itemDefinition.Unit.data();
-                v.Value = value;
-                section.items.push_back(v);
-
-                pos += 2;
-            }
-
-            l.push_back(section);
-
-        } while (pos < _gridProfileLength);
+        l.push_back(section);
     }
 
     return l;

@@ -84,6 +84,12 @@ protected:
     void sendLastPacketAgain();
     void handleReceivedPackage();
 
+    // Returns true if the radio's internal rx fragment buffer is fully
+    // drained (all received fragments parsed into the inverter's fragment
+    // buffer). Used by the early-exit logic to make sure no fragment of the
+    // current response is still pending when a transaction is finalized.
+    virtual bool isRxBufferEmpty() const { return true; }
+
     serial_u _dtuSerial;
     CommandQueue _commandQueue;
     bool _isInitialized = false;

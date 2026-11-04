@@ -53,8 +53,10 @@ const byteAssign_fieldDeviceClass_t deviceFieldAssignment[] = {
     { FLD_UAC, DEVICE_CLS_VOLTAGE, STATE_CLS_MEASUREMENT },
     { FLD_IAC, DEVICE_CLS_CURRENT, STATE_CLS_MEASUREMENT },
     { FLD_PAC, DEVICE_CLS_PWR, STATE_CLS_MEASUREMENT },
+    { FLD_MPAC, DEVICE_CLS_PWR, STATE_CLS_MEASUREMENT },
     { FLD_F, DEVICE_CLS_FREQ, STATE_CLS_MEASUREMENT },
     { FLD_T, DEVICE_CLS_TEMPERATURE, STATE_CLS_MEASUREMENT },
+    { FLD_MT, DEVICE_CLS_TEMPERATURE, STATE_CLS_MEASUREMENT },
     { FLD_PF, DEVICE_CLS_POWER_FACTOR, STATE_CLS_MEASUREMENT },
     { FLD_EFF, DEVICE_CLS_NONE, STATE_CLS_NONE },
     { FLD_IRR, DEVICE_CLS_NONE, STATE_CLS_NONE },
@@ -82,6 +84,7 @@ private:
     // Binary Sensor
     static void publishBinarySensor(JsonDocument& doc, const String& root_device, const String& unique_id_prefix, const String& name, const String& state_topic, const String& payload_on, const String& payload_off, const DeviceClassType device_class, const StateClassType state_class, const CategoryType category);
     static void publishDtuBinarySensor(const String& name, const String& state_topic, const String& payload_on, const String& payload_off, const DeviceClassType device_class, const StateClassType state_class, const CategoryType category);
+    static void publishDtuButton(const String& name, const String& cmd_topic, const String& payload, const String& icon, const DeviceClassType device_class, const StateClassType state_class, const CategoryType category);
     static void publishInverterBinarySensor(std::shared_ptr<InverterAbstract> inv, const String& name, const String& state_topic, const String& payload_on, const String& payload_off, const DeviceClassType device_class, const StateClassType state_class, const CategoryType category);
 
     // Sensor

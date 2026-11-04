@@ -4,11 +4,11 @@
  */
 #include "HoymilesRadio_CMT.h"
 #include "Hoymiles.h"
-#include "Utils.h"
+#include "HoymilesUtils.h"
 #include "crc.h"
 #include <FunctionalInterrupt.h>
-#include <frozen/map.h>
 #include <esp_log.h>
+#include <frozen/map.h>
 
 #undef TAG
 static const char* TAG = "hoymiles";
@@ -155,7 +155,7 @@ void HoymilesRadio_CMT::loop()
     } else {
         // Perform package parsing only if no packages are received
         if (!_rxBuffer.empty()) {
-            fragment_t f = _rxBuffer.back();
+            fragment_t f = _rxBuffer.front();
             if (checkFragmentCrc(f)) {
 
                 const serial_u dtuId = convertSerialToRadioId(_dtuSerial);
@@ -169,7 +169,7 @@ void HoymilesRadio_CMT::loop()
                     if (nullptr != inv) {
                         // Save packet in inverter rx buffer
                         ESP_LOGD(TAG, "RX %.2f MHz --> %s | %" PRId8 " dBm",
-                            getFrequencyFromChannel(f.channel) / 1000000.0, Utils::dumpArray(f.fragment, f.len).c_str(), f.rssi);
+                            getFrequencyFromChannel(f.channel) / 1000000.0, HoymilesUtils::dumpArray(f.fragment, f.len).c_str(), f.rssi);
 
                         inv->addRxFragment(f.fragment, f.len, f.rssi);
                     } else {
@@ -191,6 +191,7 @@ void HoymilesRadio_CMT::loop()
 
 void HoymilesRadio_CMT::setPALevel(const int8_t paLevel)
 {
+    _paLevel = paLevel;
     if (!_isInitialized) {
         return;
     }
@@ -208,7 +209,10 @@ void HoymilesRadio_CMT::setInverterTargetFrequency(const uint32_t frequency)
     if (!_isInitialized) {
         return;
     }
+    // Switch channel while staying in RX — GoStby, change channel, GoRx
+    _radio->stopListening();
     cmtSwitchDtuFreq(_inverterTargetFrequency);
+    _radio->startListening();
 }
 
 uint32_t HoymilesRadio_CMT::getInverterTargetFrequency() const
@@ -245,7 +249,18 @@ void HoymilesRadio_CMT::setCountryMode(const CountryModeId_t mode)
     if (!_isInitialized) {
         return;
     }
+
+    // setFrequencyBand() re-initializes the chip and thereby resets the
+    // channel, the PA level and the RX state to the register bank defaults.
+    // Restore them afterwards, otherwise the radio stays asleep on the band
+    // base frequency with default TX power until the next config change.
     _radio->setFrequencyBand(countryDefinition.at(mode).Band);
+
+    if (_inverterTargetFrequency >= getMinFrequency() && _inverterTargetFrequency <= getMaxFrequency()) {
+        cmtSwitchDtuFreq(_inverterTargetFrequency);
+    }
+    _radio->setPALevel(_paLevel);
+    _radio->startListening();
 }
 
 uint32_t HoymilesRadio_CMT::getInvBootFrequency() const

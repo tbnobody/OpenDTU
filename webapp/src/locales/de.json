@@ -251,6 +251,8 @@
         "HardwarePartNumber": "Hardware-Teilenummer",
         "HardwareVersion": "Hardware-Version",
         "SupportsPowerDistributionLogic": "'Power Distribution Logic' unterstützt",
+        "RfHardwareVersion": "RF-Modul Hardware-Version",
+        "RfFirmwareVersion": "RF-Modul Firmware-Version",
         "Yes": "@:base.Yes",
         "No": "@:base.No"
     },
@@ -277,6 +279,7 @@
         "ConfigVersion": "Konfigurationsversion",
         "FirmwareVersion": "Firmwareversion / Git Hash",
         "FirmwareBranch": "Firmware Branch",
+        "CompileDateTime": "Kompilierung Datum/Zeit (UTC)",
         "PioEnv": "PIO Umgebung",
         "FirmwareVersionHint": "Klicke hier, um Informationen über die installierte Version anzuzeigen",
         "FirmwareUpdate": "Firmware-Aktualisierung",
@@ -324,6 +327,7 @@
         "Name": "Name",
         "StackFree": "Stack Frei",
         "Priority": "Priorität",
+        "Core": "Kern",
         "Task_idle0": "Leerlauf (CPU-Kern 0)",
         "Task_idle1": "Leerlauf (CPU-Kern 1)",
         "Task_wifi": "Wi-Fi",
@@ -450,7 +454,7 @@
         "LogLevel": "Protokollierungsstufe ({cnt})"
     },
     "inverterchannelinfo": {
-        "String": "String {num}",
+        "String": "Strang {num}",
         "Phase": "Phase {num}",
         "General": "Allgemein"
     },
@@ -468,6 +472,7 @@
     },
     "inverterchannelproperty": {
         "Power": "Leistung",
+        "MaxDailyPower": "Max. Leistung",
         "Voltage": "Spannung",
         "Current": "Strom",
         "Power DC": "DC-Leistung",
@@ -475,6 +480,7 @@
         "YieldTotal": "Gesamtertrag",
         "Frequency": "Frequenz",
         "Temperature": "Temperatur",
+        "MaxTemperature": "Max. Temperatur",
         "PowerFactor": "Leistungsfaktor",
         "ReactivePower": "Blindleistung",
         "Efficiency": "Wirkungsgrad",
@@ -921,7 +927,7 @@
         "DeleteInverter": "Wechselrichter löschen",
         "EditInverter": "Wechselrichter bearbeiten",
         "General": "Allgemein",
-        "String": "String",
+        "String": "Strang",
         "Advanced": "Erweitert",
         "InverterSerial": "Wechselrichter Seriennummer:",
         "InverterName": "Wechselrichter Name:",
@@ -931,11 +937,11 @@
         "PollEnableNight": "Daten auch nachts abrufen",
         "CommandEnable": "Befehle senden",
         "CommandEnableNight": "Befehle auch nachts senden",
-        "StringName": "Stringname {num}:",
+        "StringName": "Strangname {num}:",
         "StringNameHint": "Hier kann ein eigener Name für den entsprechenden Port des Wechselrichters angegeben werden.",
-        "StringMaxPower": "Max. Leistung String {num}:",
+        "StringMaxPower": "Max. Leistung Strang {num}:",
         "StringMaxPowerHint": "Eingabe der maximalen Leistung der angeschlossenen Solarmodule.",
-        "StringYtOffset": "Ertragsversatz String {num}:",
+        "StringYtOffset": "Ertragsversatz Strang {num}:",
         "StringYtOffsetHint": "Dieser Offset wird beim Auslesen des Gesamtertragswertes des Wechselrichters angewendet. Damit kann der Gesamtertrag des Wechselrichters auf Null gesetzt werden, wenn ein gebrauchter Wechselrichter verwendet wird.",
         "InverterHint": "*) Gib die W<sub>p</sub> des Ports ein, um die Einstrahlung zu errechnen.",
         "ReachableThreshold": "Erreichbarkeit Schwellenwert",
@@ -1058,7 +1064,6 @@
         "LedBrightness": "LED {led} Helligkeit ({brightness})"
     },
     "pininfo": {
-        "Category": "Kategorie",
         "Name": "Name",
         "ValueSelected": "Ausgewählt",
         "ValueActive": "Aktiv"

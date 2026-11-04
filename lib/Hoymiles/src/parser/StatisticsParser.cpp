@@ -15,6 +15,8 @@ static float calcTotalPowerDc(StatisticsParser* iv, uint8_t arg0);
 static float calcTotalEffiency(StatisticsParser* iv, uint8_t arg0);
 static float calcChIrradiation(StatisticsParser* iv, uint8_t arg0);
 static float calcTotalCurrentAc(StatisticsParser* iv, uint8_t arg0);
+static float calcMaxTemperature(StatisticsParser* iv, uint8_t arg0);
+static float calcMaxDailyPower(StatisticsParser* iv, uint8_t arg0);
 
 using func_t = float(StatisticsParser*, uint8_t);
 
@@ -30,7 +32,9 @@ const calcFunc_t calcFunctions[] = {
     { CALC_TOTAL_PDC, &calcTotalPowerDc },
     { CALC_TOTAL_EFF, &calcTotalEffiency },
     { CALC_CH_IRR, &calcChIrradiation },
-    { CALC_TOTAL_IAC, &calcTotalCurrentAc }
+    { CALC_TOTAL_IAC, &calcTotalCurrentAc },
+    { CALC_MAX_TEMPERATURE, &calcMaxTemperature },
+    { CALC_MAX_PAC, &calcMaxDailyPower },
 };
 
 const FieldId_t runtimeFields[] = {
@@ -336,9 +340,15 @@ void StatisticsParser::zeroRuntimeData()
     zeroFields(runtimeFields);
 }
 
-void StatisticsParser::zeroDailyData()
+void StatisticsParser::zeroDailyYieldData()
 {
     zeroFields(dailyProductionFields);
+}
+
+void StatisticsParser::zeroDailyRuntimeData()
+{
+    _maxTemperature = 0;
+    _maxDailyPower = 0;
 }
 
 void StatisticsParser::setLastUpdate(const uint32_t lastUpdate)
@@ -365,6 +375,26 @@ bool StatisticsParser::getYieldDayCorrection() const
 void StatisticsParser::setYieldDayCorrection(const bool enabled)
 {
     _enableYieldDayCorrection = enabled;
+}
+
+float StatisticsParser::getMaxTemperature() const
+{
+    return _maxTemperature;
+}
+
+void StatisticsParser::setMaxTemperature(const float temperature)
+{
+    _maxTemperature = temperature;
+}
+
+float StatisticsParser::getMaxDailyPower() const
+{
+    return _maxDailyPower;
+}
+
+void StatisticsParser::setMaxDailyPower(const float power)
+{
+    _maxDailyPower = power;
 }
 
 void StatisticsParser::zeroFields(const FieldId_t* fields)
@@ -459,4 +489,30 @@ static float calcTotalCurrentAc(StatisticsParser* iv, uint8_t arg0)
     acCurrent += iv->getChannelFieldValue(TYPE_AC, CH0, FLD_IAC_2);
     acCurrent += iv->getChannelFieldValue(TYPE_AC, CH0, FLD_IAC_3);
     return acCurrent;
+}
+
+static float calcMaxTemperature(StatisticsParser* iv, uint8_t arg0)
+{
+    auto temp = iv->getChannelFieldValue(TYPE_INV, CH0, FLD_T);
+    auto maxTemp = iv->getMaxTemperature();
+
+    if (temp > maxTemp) {
+        maxTemp = temp;
+        iv->setMaxTemperature(maxTemp);
+    }
+
+    return maxTemp;
+}
+
+static float calcMaxDailyPower(StatisticsParser* iv, uint8_t arg0)
+{
+    auto power = iv->getChannelFieldValue(TYPE_AC, CH0, FLD_PAC);
+    auto maxPower = iv->getMaxDailyPower();
+
+    if (power > maxPower) {
+        maxPower = power;
+        iv->setMaxDailyPower(maxPower);
+    }
+
+    return maxPower;
 }
