@@ -369,7 +369,7 @@
         :title="$t('home.InverterInfo')"
         :loading="devInfoLoading"
         :show-reload="true"
-        @reload="onShowDevInfo(devInfoList.serial)"
+        @reload="onShowDevInfo(devInfoSerial)"
     >
         <DevInfo :devInfoList="devInfoList" />
     </ModalDialog>
@@ -605,6 +605,7 @@ export default defineComponent({
             eventLogList: {} as EventlogItems,
             eventLogLoading: true,
             devInfoView: {} as bootstrap.Modal,
+            devInfoSerial: '',
             devInfoList: {} as DevInfoStatus,
             devInfoLoading: true,
             gridProfileView: {} as bootstrap.Modal,
@@ -824,6 +825,7 @@ export default defineComponent({
         },
         onShowDevInfo(serial: string) {
             this.devInfoLoading = true;
+            this.devInfoSerial = serial;
             fetch('/api/devinfo/status?inv=' + serial, { headers: authHeader() })
                 .then((response) => handleResponse(response, this.$emitter, this.$router))
                 .then((data) => {
