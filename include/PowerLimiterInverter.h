@@ -121,6 +121,9 @@ private:
 
     virtual void setAcOutput(uint16_t expectedOutputWatts) = 0;
 
+    // true once the AC output stopped changing after the last command
+    bool isOutputSettled(uint32_t statsMillis, uint32_t statsAfterCmdMillis, uint32_t cmdAgeMillis) const;
+
     bool _retired = false; // true if to be abandoned by DPL
 
     char _serialStr[16];
@@ -134,6 +137,11 @@ private:
     std::optional<uint16_t> _oTargetPowerLimitWatts = std::nullopt;
     std::optional<bool> _oTargetPowerState = std::nullopt;
     mutable std::optional<uint32_t> _oStatsMillis = std::nullopt;
+    mutable uint32_t _settleSeenMillis = 0;
+    mutable uint32_t _settleStatsMillis = 0;
+    mutable uint16_t _settleOutputWatts = 0;
+    mutable float _settleGridVoltage = 0;
+    mutable float _settleGridFrequency = 0;
 
     // the expected AC output (possibly is different from the target limit)
     uint16_t _expectedOutputAcWatts = 0;

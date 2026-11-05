@@ -291,10 +291,66 @@ std::optional<uint32_t> PowerLimiterInverter::getLatestStatsMillis() const
             return std::nullopt;
         }
 
+        if (!isOutputSettled(lastStatsMillis, lastUpdateCmdAge - lastStatsAge, lastUpdateCmdAge)) {
+            return std::nullopt;
+        }
+
         _oStatsMillis = lastStatsMillis;
     }
 
     return _oStatsMillis;
+}
+
+bool PowerLimiterInverter::isOutputSettled(uint32_t statsMillis, uint32_t statsAfterCmdMillis, uint32_t cmdAgeMillis) const
+{
+    // the inverter ramps its output towards a new limit over several seconds,
+    // while it acknowledges the limit within a few hundred milliseconds. the
+    // output is considered settled once two consecutive stats received after
+    // the last command report (almost) the same output. the timeout covers
+    // slow stats polling and inverters whose output keeps fluctuating. it is
+    // measured from the command, such that a stats sample received after the
+    // command is used at the latest once the timeout passed.
+    // ponytail: fixed timeout and tolerance, make them configurable if some
+    // inverter models turn out to ramp slower or report noisier output.
+    auto constexpr settleTimeoutMillis = 6 * 1000;
+    if (cmdAgeMillis >= settleTimeoutMillis) {
+        DTU_LOGD("output at %d W, not settled %u ms after last command, proceeding",
+                getCurrentOutputAcWatts(), cmdAgeMillis);
+        return true;
+    }
+
+    // the same stats are evaluated until new stats arrive
+    if (statsMillis == _settleSeenMillis) { return false; }
+    _settleSeenMillis = statsMillis;
+
+    // the inverter updates its measurements less often than it is polled and
+    // then answers with a copy of its previous measurement. such a copy does
+    // not tell whether the output is still changing. grid voltage and
+    // frequency differ in almost every new measurement, so identical values
+    // indicate a copy.
+    auto output = getCurrentOutputAcWatts();
+    auto gridVoltage = getGridVoltage();
+    auto gridFrequency = _spInverter->Statistics()->getChannelFieldValue(TYPE_AC, CH0, FLD_F);
+    if (output == _settleOutputWatts && gridVoltage == _settleGridVoltage
+            && gridFrequency == _settleGridFrequency) {
+        return false;
+    }
+
+    bool previousAfterCmd = (statsMillis - _settleStatsMillis) <= statsAfterCmdMillis;
+    auto constexpr toleranceWatts = 10;
+    bool settled = previousAfterCmd && std::abs(output - _settleOutputWatts) <= toleranceWatts;
+
+    if (settled) {
+        DTU_LOGD("output settled at %d W (previously %d W), %u ms after last command",
+                output, _settleOutputWatts, statsAfterCmdMillis);
+    }
+
+    _settleStatsMillis = statsMillis;
+    _settleOutputWatts = output;
+    _settleGridVoltage = gridVoltage;
+    _settleGridFrequency = gridFrequency;
+
+    return settled;
 }
 
 uint16_t PowerLimiterInverter::getInverterMaxPowerWatts() const
