@@ -54,6 +54,7 @@ private:
 
     void setFan(bool online, bool fullSpeed);
     void setMode(uint8_t mode);
+    void updateModeDataPoint() const;
 
     // these control the pin named "power", which in turn is supposed to control
     // a relay (or similar) to enable or disable the PSU using it's slot detect
