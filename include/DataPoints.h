@@ -152,12 +152,16 @@ class DataPointContainer {
             if (_dataPoints.empty()) { return 0; }
 
             uint32_t now = millis();
-            uint32_t diff = std::numeric_limits<uint32_t>::max()/2;
+            std::optional<uint32_t> oDiff;
             for (auto iter = _dataPoints.cbegin(); iter != _dataPoints.cend(); ++iter) {
                 if (iter->second.getTimestamp() == 0) { continue; } // "timeless" data points are ignored
-                diff = std::min(diff, now - iter->second.getTimestamp());
+                oDiff = std::min(oDiff.value_or(std::numeric_limits<uint32_t>::max()/2), now - iter->second.getTimestamp());
             }
-            return now - diff;
+
+            // no data point with a timestamp yet
+            if (!oDiff) { return 0; }
+
+            return now - *oDiff;
         }
 
         void clear() {
