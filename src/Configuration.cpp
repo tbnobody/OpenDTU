@@ -980,7 +980,11 @@ bool ConfigurationClass::read()
     for (uint8_t i = 0; i < LOG_MODULE_COUNT; i++) {
         JsonObject module = modules[i].as<JsonObject>();
         strlcpy(config.Logging.Modules[i].Name, module["name"] | "", sizeof(config.Logging.Modules[i].Name));
-        config.Logging.Modules[i].Level = module["level"] | ESP_LOG_VERBOSE;
+        config.Logging.Modules[i].Level = module["level"] | ESP_LOG_ERROR;
+        if (module["level"].isNull()) {
+            // no level saved: leave the slot empty so the module inherits the default level
+            config.Logging.Modules[i].Name[0] = '\0';
+        }
     }
 
     JsonObject solarcharger = doc["solarcharger"];
