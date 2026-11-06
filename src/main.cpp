@@ -153,10 +153,8 @@ void setup()
     PowerLimiter.init(scheduler);
     GridCharger.init(scheduler);
     Battery.init(scheduler);
-    // ... and here (before RuntimeData)
-
-    // SunSpec/Modbus TCP server (must be after network init)
     ModbusServer.init(scheduler);
+    // ... and here (before RuntimeData)
 
     // Must be done after all other components have been initialized
     RuntimeData.init(scheduler);
