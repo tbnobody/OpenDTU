@@ -11,6 +11,7 @@
 #include "defaults.h"
 #include <ESPmDNS.h>
 #include <ETH.h>
+#include <esp_wifi.h>
 
 #undef TAG
 static const char* TAG = "network";
@@ -105,14 +106,29 @@ void NetworkSettingsClass::NetworkEvent(const WiFiEvent_t event, WiFiEventInfo_t
         // Reason codes can be found here: https://github.com/espressif/esp-idf/blob/5454d37d496a8c58542eb450467471404c606501/components/esp_wifi/include/esp_wifi_types_generic.h#L79-L141
         ESP_LOGW(TAG, "WiFi disconnected: %" PRIu8 "", info.wifi_sta_disconnected.reason);
         if (_networkMode == network_mode::WiFi) {
-            ESP_LOGI(TAG, "Try reconnecting");
             _lastReconnectAttempt = millis();
-            WiFi.disconnect(true, false);
-            WiFi.begin();
+            if (_wifiRescanSwitching && info.wifi_sta_disconnected.reason == WIFI_REASON_ASSOC_LEAVE) {
+                // we left the access point on purpose, the connection
+                // attempt to the better access point is already in progress
+                _wifiRescanSwitching = false;
+                ESP_LOGI(TAG, "Left access point to connect to a better one");
+            } else if (isWifiBssidPinned()) {
+                // the BSSID was pinned by the WiFi rescan. do not insist on
+                // that access point, but connect to any with the same SSID.
+                ESP_LOGI(TAG, "Try reconnecting to any access point");
+                auto const& config = Configuration.get().WiFi;
+                WiFi.disconnect(true, false);
+                WiFi.begin(config.Ssid, config.Password);
+            } else {
+                ESP_LOGI(TAG, "Try reconnecting");
+                WiFi.disconnect(true, false);
+                WiFi.begin();
+            }
             raiseEvent(network_event::NETWORK_DISCONNECTED);
         }
         break;
     case ARDUINO_EVENT_WIFI_STA_GOT_IP:
+        _wifiRescanSwitching = false;
         ESP_LOGI(TAG, "WiFi got ip: %s", WiFi.localIP().toString().c_str());
         if (_networkMode == network_mode::WiFi) {
             raiseEvent(network_event::NETWORK_GOT_IP);
@@ -334,6 +350,131 @@ void NetworkSettingsClass::loop()
     }
 
     handleMDNS();
+    handleWifiRescan();
+}
+
+bool NetworkSettingsClass::isWifiBssidPinned()
+{
+    if (WiFi.getMode() == WIFI_MODE_NULL) {
+        return false;
+    }
+
+    wifi_config_t conf;
+    if (esp_wifi_get_config(WIFI_IF_STA, &conf) != ESP_OK) {
+        return false;
+    }
+
+    return conf.sta.bssid_set;
+}
+
+// periodically scans for access points broadcasting the configured SSID and
+// switches to one with a considerably stronger signal. inspired by Tasmota.
+void NetworkSettingsClass::handleWifiRescan()
+{
+    auto const& config = Configuration.get().WiFi;
+
+    // scanning while the admin access point is active would disturb it.
+    // with a timeout of 0, the admin access point is never closed, though,
+    // so scan as long as no client is connected to it.
+    bool active = config.RescanEnabled
+        && _networkMode == network_mode::WiFi
+        && (!_adminEnabled || (config.ApTimeout == 0 && WiFi.softAPgetStationNum() == 0))
+        && WiFi.isConnected();
+
+    if (_wifiRescanRunning) {
+        int16_t result = WiFi.scanComplete();
+        if (result == WIFI_SCAN_RUNNING) { return; }
+
+        _wifiRescanRunning = false;
+        _lastWifiRescan = millis();
+
+        if (result < 0) {
+            ESP_LOGW(TAG, "WiFi rescan failed");
+        } else if (active) {
+            evaluateWifiRescan(result);
+        }
+
+        WiFi.scanDelete();
+        return;
+    }
+
+    if (!active) {
+        // start counting the interval once we are (re-)connected
+        _lastWifiRescan = millis();
+        return;
+    }
+
+    uint32_t const intervalMillis = std::max<uint32_t>(config.RescanInterval, 5) * 60 * 1000;
+    if (millis() - _lastWifiRescan < intervalMillis) {
+        return;
+    }
+
+    ESP_LOGI(TAG, "Scanning for a better access point...");
+    if (WiFi.scanNetworks(true/*async*/, false/*show_hidden*/, false/*passive*/,
+            300/*max_ms_per_chan*/, 0/*channel*/, config.Ssid) != WIFI_SCAN_RUNNING) {
+        ESP_LOGW(TAG, "Failed to start WiFi rescan");
+        _lastWifiRescan = millis();
+        return;
+    }
+
+    _wifiRescanRunning = true;
+}
+
+void NetworkSettingsClass::evaluateWifiRescan(int16_t networkCount)
+{
+    auto const& config = Configuration.get().WiFi;
+
+    uint8_t const* currentBssidPtr = WiFi.BSSID();
+    if (currentBssidPtr == nullptr) { return; }
+
+    uint8_t currentBssid[6];
+    memcpy(currentBssid, currentBssidPtr, sizeof(currentBssid));
+    int32_t const currentRssi = WiFi.RSSI();
+
+    // a different access point must exceed this RSSI to be switched to
+    int32_t bestRssi = currentRssi + config.RescanThreshold;
+    int16_t bestNetwork = -1;
+
+    for (int16_t i = 0; i < networkCount; ++i) {
+        String ssid;
+        uint8_t encryptionType;
+        int32_t rssi;
+        uint8_t* bssid;
+        int32_t channel;
+        if (!WiFi.getNetworkInfo(i, ssid, encryptionType, rssi, bssid, channel)) { continue; }
+
+        if (ssid != config.Ssid) { continue; }
+
+        bool const isCurrent = memcmp(bssid, currentBssid, sizeof(currentBssid)) == 0;
+
+        ESP_LOGD(TAG, "Found access point %s on channel %" PRId32 " with RSSI %" PRId32 " dBm%s",
+            WiFi.BSSIDstr(i).c_str(), channel, rssi, (isCurrent ? " (current)" : ""));
+
+        if (isCurrent || rssi <= bestRssi) { continue; }
+
+        bestRssi = rssi;
+        bestNetwork = i;
+    }
+
+    if (bestNetwork < 0) {
+        ESP_LOGI(TAG, "No access point with a considerably stronger signal than "
+            "the current one (%s, %" PRId32 " dBm) found",
+            WiFi.BSSIDstr().c_str(), currentRssi);
+        return;
+    }
+
+    ESP_LOGI(TAG, "Switching from access point %s (%" PRId32 " dBm) to %s (%" PRId32 " dBm) on channel %" PRId32,
+        WiFi.BSSIDstr().c_str(), currentRssi,
+        WiFi.BSSIDstr(bestNetwork).c_str(), bestRssi, WiFi.channel(bestNetwork));
+
+    // pinning the BSSID makes sure to connect to the selected access point.
+    // the pin is removed on the next disconnect, see NetworkEvent().
+    _wifiRescanSwitching = true;
+    if (WiFi.begin(config.Ssid, config.Password, WiFi.channel(bestNetwork),
+            WiFi.BSSID(bestNetwork)) == WL_CONNECT_FAILED) {
+        ESP_LOGE(TAG, "Failed to switch access point");
+        _wifiRescanSwitching = false;
+    }
 }
 
 void NetworkSettingsClass::applyConfig()
@@ -350,7 +491,9 @@ void NetworkSettingsClass::applyConfig()
         return;
     }
 
-    const bool newCredentials = strcmp(WiFi.SSID().c_str(), config.Ssid) || strcmp(WiFi.psk().c_str(), config.Password);
+    // a BSSID pinned by the WiFi rescan must not be re-used, as we would
+    // then never connect to any other access point with the same SSID.
+    const bool newCredentials = strcmp(WiFi.SSID().c_str(), config.Ssid) || strcmp(WiFi.psk().c_str(), config.Password) || isWifiBssidPinned();
 
     ESP_LOGI(TAG, "Start configuring WiFi STA using %s credentials",
         newCredentials ? "new" : "existing");

@@ -41,6 +41,37 @@
                 <InputElement :label="$t('networkadmin.EnableDhcp')" v-model="networkConfigList.dhcp" type="checkbox" />
             </CardElement>
 
+            <CardElement :text="$t('networkadmin.WifiRescanSettings')" textVariant="text-bg-primary" add-space>
+                <InputElement
+                    :label="$t('networkadmin.EnableWifiRescan')"
+                    v-model="networkConfigList.rescanenabled"
+                    type="checkbox"
+                    :tooltip="$t('networkadmin.EnableWifiRescanHint')"
+                />
+
+                <template v-if="networkConfigList.rescanenabled">
+                    <InputElement
+                        :label="$t('networkadmin.WifiRescanInterval')"
+                        v-model="networkConfigList.rescaninterval"
+                        type="number"
+                        min="5"
+                        max="1440"
+                        :postfix="$t('networkadmin.Minutes')"
+                        :tooltip="$t('networkadmin.WifiRescanIntervalHint')"
+                    />
+
+                    <InputElement
+                        :label="$t('networkadmin.WifiRescanThreshold')"
+                        v-model="networkConfigList.rescanthreshold"
+                        type="number"
+                        min="1"
+                        max="50"
+                        postfix="dB"
+                        :tooltip="$t('networkadmin.WifiRescanThresholdHint')"
+                    />
+                </template>
+            </CardElement>
+
             <CardElement
                 :text="$t('networkadmin.StaticIpConfiguration')"
                 textVariant="text-bg-primary"

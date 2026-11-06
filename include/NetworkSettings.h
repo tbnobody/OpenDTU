@@ -5,6 +5,7 @@
 #include <DNSServer.h>
 #include <TaskSchedulerDeclarations.h>
 #include <WiFi.h>
+#include <atomic>
 #include <vector>
 
 enum class network_mode {
@@ -69,6 +70,9 @@ private:
     void NetworkEvent(const WiFiEvent_t event, WiFiEventInfo_t info);
     void disableAdminMode();
     bool wifiConfigured() const;
+    static bool isWifiBssidPinned();
+    void handleWifiRescan();
+    void evaluateWifiRescan(int16_t networkCount);
 
     Task _loopTask;
 
@@ -91,6 +95,9 @@ private:
     std::vector<DtuNetworkEventCbList_t> _cbEventList;
     bool _lastMdnsEnabled = false;
     std::unique_ptr<W5500> _w5500;
+    uint32_t _lastWifiRescan = 0;
+    bool _wifiRescanRunning = false;
+    std::atomic<bool> _wifiRescanSwitching = false;
 };
 
 extern NetworkSettingsClass NetworkSettings;

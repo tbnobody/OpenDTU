@@ -9,6 +9,9 @@ export interface NetworkConfig {
     dns1: string;
     dns2: string;
     aptimeout: number;
+    rescanenabled: boolean;
+    rescaninterval: number;
+    rescanthreshold: number;
     mdnsenabled: boolean;
     syslogenabled: boolean;
     sysloghostname: string;

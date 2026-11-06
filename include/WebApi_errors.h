@@ -74,6 +74,8 @@ enum WebApiError {
     NetworkApTimeoutInvalid,
     NetworkSyslogHostnameLength,
     NetworkSyslogPort,
+    NetworkWifiRescanInterval,
+    NetworkWifiRescanThreshold,
 
     NtpBase = 9000,
     NtpServerLength,

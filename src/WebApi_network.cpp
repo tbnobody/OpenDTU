@@ -76,6 +76,9 @@ void WebApiNetworkClass::onNetworkAdminGet(AsyncWebServerRequest* request)
     root["ssid"] = config.WiFi.Ssid;
     root["password"] = config.WiFi.Password;
     root["aptimeout"] = config.WiFi.ApTimeout;
+    root["rescanenabled"] = config.WiFi.RescanEnabled;
+    root["rescaninterval"] = config.WiFi.RescanInterval;
+    root["rescanthreshold"] = config.WiFi.RescanThreshold;
     root["mdnsenabled"] = config.Mdns.Enabled;
     root["syslogenabled"] = config.Syslog.Enabled;
     root["sysloghostname"] = config.Syslog.Hostname;
@@ -173,6 +176,29 @@ void WebApiNetworkClass::onNetworkAdminPost(AsyncWebServerRequest* request)
         WebApi.sendJsonResponse(request, response, __FUNCTION__, __LINE__);
         return;
     }
+    if (root["rescanenabled"].as<bool>()) {
+        if (!(root["rescaninterval"].is<uint>()
+                && root["rescanthreshold"].is<uint>())) {
+            retMsg["message"] = "Values are missing!";
+            retMsg["code"] = WebApiError::GenericValueMissing;
+            WebApi.sendJsonResponse(request, response, __FUNCTION__, __LINE__);
+            return;
+        }
+
+        if (root["rescaninterval"].as<uint>() < 5 || root["rescaninterval"].as<uint>() > 1440) {
+            retMsg["message"] = "Wi-Fi rescan interval must be a number between 5 and 1440!";
+            retMsg["code"] = WebApiError::NetworkWifiRescanInterval;
+            WebApi.sendJsonResponse(request, response, __FUNCTION__, __LINE__);
+            return;
+        }
+
+        if (root["rescanthreshold"].as<uint>() < 1 || root["rescanthreshold"].as<uint>() > 50) {
+            retMsg["message"] = "Wi-Fi rescan threshold must be a number between 1 and 50!";
+            retMsg["code"] = WebApiError::NetworkWifiRescanThreshold;
+            WebApi.sendJsonResponse(request, response, __FUNCTION__, __LINE__);
+            return;
+        }
+    }
     if (root["syslogenabled"].as<bool>()) {
         if (root["sysloghostname"].as<String>().length() == 0 || root["sysloghostname"].as<String>().length() > SYSLOG_MAX_HOSTNAME_STRLEN) {
             retMsg["message"] = "Syslog Server must between 1 and " STR_EXTRACT(SYSLOG_MAX_HOSTNAME_STRLEN) " characters long!";
@@ -223,6 +249,11 @@ void WebApiNetworkClass::onNetworkAdminPost(AsyncWebServerRequest* request)
             config.WiFi.Dhcp = false;
         }
         config.WiFi.ApTimeout = root["aptimeout"].as<uint>();
+        config.WiFi.RescanEnabled = root["rescanenabled"].as<bool>();
+        if (config.WiFi.RescanEnabled) {
+            config.WiFi.RescanInterval = root["rescaninterval"].as<uint>();
+            config.WiFi.RescanThreshold = root["rescanthreshold"].as<uint>();
+        }
         config.Mdns.Enabled = root["mdnsenabled"].as<bool>();
         config.Syslog.Enabled = root["syslogenabled"].as<bool>();
         strlcpy(config.Syslog.Hostname, root["sysloghostname"].as<String>().c_str(), sizeof(config.Syslog.Hostname));

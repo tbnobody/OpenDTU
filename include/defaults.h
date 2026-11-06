@@ -19,6 +19,9 @@
 #define WIFI_SSID ""
 #define WIFI_PASSWORD ""
 #define WIFI_DHCP true
+#define WIFI_RESCAN_ENABLED false
+#define WIFI_RESCAN_INTERVAL 44 // minutes
+#define WIFI_RESCAN_THRESHOLD 10 // dB
 
 #define MDNS_ENABLED false
 

@@ -333,6 +333,9 @@ bool ConfigurationClass::write()
     wifi["dhcp"] = config.WiFi.Dhcp;
     wifi["hostname"] = config.WiFi.Hostname;
     wifi["aptimeout"] = config.WiFi.ApTimeout;
+    wifi["rescan_enabled"] = config.WiFi.RescanEnabled;
+    wifi["rescan_interval"] = config.WiFi.RescanInterval;
+    wifi["rescan_threshold"] = config.WiFi.RescanThreshold;
 
     JsonObject mdns = doc["mdns"].to<JsonObject>();
     mdns["enabled"] = config.Mdns.Enabled;
@@ -871,6 +874,9 @@ bool ConfigurationClass::read()
 
     config.WiFi.Dhcp = wifi["dhcp"] | WIFI_DHCP;
     config.WiFi.ApTimeout = wifi["aptimeout"] | ACCESS_POINT_TIMEOUT;
+    config.WiFi.RescanEnabled = wifi["rescan_enabled"] | WIFI_RESCAN_ENABLED;
+    config.WiFi.RescanInterval = wifi["rescan_interval"] | WIFI_RESCAN_INTERVAL;
+    config.WiFi.RescanThreshold = wifi["rescan_threshold"] | WIFI_RESCAN_THRESHOLD;
 
     JsonObject mdns = doc["mdns"];
     config.Mdns.Enabled = mdns["enabled"] | MDNS_ENABLED;
