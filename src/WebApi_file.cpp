@@ -146,7 +146,7 @@ void WebApiFileClass::onFileDeleteAll(AsyncWebServerRequest* request)
     WebApi.sendJsonResponse(request, response, __FUNCTION__, __LINE__);
 
     Utils::removeAllFiles();
-    RestartHelper.triggerRestart();
+    RestartHelper.triggerRestart(false); // do not re-create the runtime data file
 }
 
 void WebApiFileClass::onFileUpload(AsyncWebServerRequest* request, String filename, size_t index, uint8_t* data, size_t len, bool final)

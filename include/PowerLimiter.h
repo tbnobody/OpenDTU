@@ -12,13 +12,14 @@
 #include <optional>
 #include <TaskSchedulerDeclarations.h>
 #include <frozen/string.h>
+#include "RuntimeData.h"
 
 #define PL_UI_STATE_INACTIVE 0
 #define PL_UI_STATE_CHARGING 1
 #define PL_UI_STATE_USE_SOLAR_ONLY 2
 #define PL_UI_STATE_USE_SOLAR_AND_BATTERY 3
 
-class PowerLimiterClass {
+class PowerLimiterClass : public InterfaceProviderRT {
 public:
     PowerLimiterClass() = default;
 
@@ -34,6 +35,7 @@ public:
         InverterStatsPending,
         UnconditionalSolarPassthrough,
         Stable,
+        DevicesPending
     };
 
     void init(Scheduler& scheduler);
@@ -57,6 +59,11 @@ public:
     // used to interlock Huawei R48xx grid charger against battery-powered inverters
     bool isGovernedBatteryPoweredInverterProducing() const;
 
+    // interface to the Runtime Provider
+    String getIdRT() const override { return "power_limiter"; }
+    void serializeRT(JsonObject obj) const override;
+    void deserializeRT(JsonObject obj) override;
+
 private:
     void loop();
 
@@ -70,6 +77,8 @@ private:
     static constexpr uint32_t _calculationBackoffMsDefault = 128;
     uint32_t _calculationBackoffMs = _calculationBackoffMsDefault;
     Mode _mode = Mode::Normal;
+    bool _devicesReadyAfterStartup = false;
+    uint32_t _devicesPendingSince = 0;
 
     std::deque<std::unique_ptr<PowerLimiterInverter>> _inverters;
     std::deque<std::unique_ptr<PowerLimiterInverter>> _retirees;
@@ -78,6 +87,7 @@ private:
     BatteryState _batteryState = BatteryState::STOP;
     bool _fromStart = false;
     bool _oneStopPerNightDone = false;
+    time_t _batteryStateSaveEpoch = 0;
 
     std::pair<bool, uint32_t> _nextInverterRestart = { false, 0 };
     bool _fullSolarPassThroughActive = false;
@@ -106,6 +116,7 @@ private:
     bool isBelowStopThreshold() const;
     void calcNextInverterRestart();
     bool isSolarPassThroughEnabled() const;
+    bool areDevicesReadyAfterStartup();
 };
 
 extern PowerLimiterClass PowerLimiter;

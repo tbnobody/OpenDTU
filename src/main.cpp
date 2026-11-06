@@ -148,17 +148,16 @@ void setup()
     RestartHelper.init(scheduler);
 
     // OpenDTU-OnBattery-specific initializations go between here...
+    Runtime.init(scheduler); // Runtime must be initialized before the components below can register providers to it
     SolarCharger.init(scheduler);
     PowerMeter.init(scheduler);
     PowerLimiter.init(scheduler);
     GridCharger.init(scheduler);
     Battery.init(scheduler);
     ModbusServer.init(scheduler);
-    // ... and here (before RuntimeData)
+    // ... and here
 
-    // Must be done after all other components have been initialized
-    RuntimeData.init(scheduler);
-    RuntimeData.read();
+    Runtime.read(); // Read runtime values from all components that are registered to read on startup
 
     ESP_LOGI(TAG, "Startup complete");
 }

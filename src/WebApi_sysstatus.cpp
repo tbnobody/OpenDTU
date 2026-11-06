@@ -85,7 +85,7 @@ void WebApiSysstatusClass::onSystemStatus(AsyncWebServerRequest* request)
     root["resetreason_1"] = reason;
 
     root["cfgsavecount"] = Configuration.get().Cfg.SaveCount;
-    root["runtime_savecount"] = RuntimeData.getWriteCountAndTimeString();
+    root["runtime_savecount"] = Runtime.getWriteCountAndTimeString();
 
     char version[16];
     snprintf(version, sizeof(version), "%d.%d.%d", CONFIG_VERSION >> 24 & 0xff, CONFIG_VERSION >> 16 & 0xff, CONFIG_VERSION >> 8 & 0xff);

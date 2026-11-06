@@ -18,10 +18,17 @@
 #include <frozen/map.h>
 #include "SunPosition.h"
 #include <LogHelper.h>
+#include "Utils.h"
+#include "RuntimeData.h"
+#include <esp_system.h>
 
 #undef TAG
 static const char* TAG = "dynamicPowerLimiter";
 static const char* SUBTAG = "Controller";
+
+// runtime data keys
+static constexpr const char* FROM_START = "battery_from_start";
+static constexpr const char* ONE_STOP_PER_NIGHT_DONE = "battery_one_stop_per_night_done";
 
 static auto sBatteryPoweredFilter = [](PowerLimiterInverter const& inv) {
     return inv.isBatteryPowered();
@@ -49,13 +56,15 @@ void PowerLimiterClass::init(Scheduler& scheduler)
     _loopTask.setCallback(std::bind(&PowerLimiterClass::loop, this));
     _loopTask.setIterations(TASK_FOREVER);
     _loopTask.enable();
+
+    Runtime.registerProvider(this); // register for read on startup
 }
 
 frozen::string const& PowerLimiterClass::getStatusText(PowerLimiterClass::Status status) const
 {
     static const frozen::string missing = "programmer error: missing status text";
 
-    static const frozen::map<Status, frozen::string, 11> texts = {
+    static const frozen::map<Status, frozen::string, 12> texts = {
         { Status::Initializing, "initializing (should not see me)" },
         { Status::DisabledByConfig, "disabled by configuration" },
         { Status::DisabledByMqtt, "disabled by MQTT" },
@@ -67,6 +76,7 @@ frozen::string const& PowerLimiterClass::getStatusText(PowerLimiterClass::Status
         { Status::InverterStatsPending, "waiting for sufficiently recent inverter data" },
         { Status::UnconditionalSolarPassthrough, "unconditionally passing through all solar power (MQTT override)" },
         { Status::Stable, "the system is stable, the last power limit is still valid" },
+        { Status::DevicesPending, "waiting for devices to be ready after startup" }
     };
 
     auto iter = texts.find(status);
@@ -212,6 +222,12 @@ void PowerLimiterClass::loop()
         return announceStatus(Status::PowerMeterPending);
     }
 
+    // we check if configured devices are ready after startup to ensure that the system can proceed
+    // with correct power regulation calculations and to avoid using fallback values prematurely
+    if (!areDevicesReadyAfterStartup()) {
+        return announceStatus(Status::DevicesPending);
+    }
+
     // since _lastCalculation and _calculationBackoffMs are initialized to
     // zero, this test is passed the first time the condition is checked.
     if ((millis() - _lastCalculation) < _calculationBackoffMs) {
@@ -253,12 +269,24 @@ void PowerLimiterClass::loop()
         //
         // Notes: The combination of 'Use Battery at night' and use of 'voltage thresholds' can leads to oscillation between the states
         // STOP and DISCHARGE_NIGHT. To avoid this problem, we allow only one transmission from STOP to DISCHARGE_NIGHT per night.
-        // In case of restart or power-cycle, we accept that the inverter may start discharging at night once again.
+        // After a planned restart the state is restored from the runtime data. In case of a power-cycle, crash or
+        // other unplanned reset, we accept that the inverter may start discharging at night once again.
         // Start-Up can be tricky, because data from the battery provider may not be available. As fallback we use the not very
         // accurate inverter voltage and this can lead to the wrong state.
 
         // check if we have a battery powered inverter
         if (!usesBatteryPoweredInverter()) { return BatteryState::STOP; }
+
+        // the startup requires special handling, because the buffered information from the runtime data can be too old.
+        // on this point we have all the necessary information to determine if the runtime data is valid and not older than one hour.
+        if (_batteryStateSaveEpoch != 0) {
+            time_t nowEpoch;
+            if (!Utils::getEpoch(&nowEpoch, 1) || (nowEpoch < _batteryStateSaveEpoch)
+                    || ((nowEpoch - _batteryStateSaveEpoch) > (60 * 60))) {
+                _fromStart = _oneStopPerNightDone = false; // back to default state
+            }
+            _batteryStateSaveEpoch = 0; // mark the check as handled
+        }
 
         // check the stop condition
         auto day = SunPosition.isDayPeriod();
@@ -980,4 +1008,84 @@ bool PowerLimiterClass::isGovernedBatteryPoweredInverterProducing() const
         if (upInv->isBatteryPowered() && upInv->isProducing()) { return true; }
     }
     return false;
+}
+
+bool PowerLimiterClass::areDevicesReadyAfterStartup() {
+
+    // fast return if we already know the devices are ready after startup
+    if (_devicesReadyAfterStartup) { return true; }
+
+    // the battery state is only evaluated if we govern a battery powered inverter
+    if (!usesBatteryPoweredInverter()) { return true; }
+
+    // the battery thresholds use the SoC if the battery interface is enabled and the SoC is not ignored
+    // (see canUseSoCThresholds in the web UI), otherwise a voltage. Without a source the voltage is 0 V,
+    // which counts as 'stop threshold reached' and would discard the restored battery state.
+    auto const& config = Configuration.get();
+    bool socMode = config.Battery.Enabled && !config.PowerLimiter.IgnoreSoc;
+    bool ready = socMode ? Battery.getStats()->isSoCValid() : (getBatteryVoltage() > 0);
+
+    if (!ready) {
+        // we do not wait infinitely, the 15-second timeout starts when we wait for the first time
+        if (_devicesPendingSince == 0) { _devicesPendingSince = millis(); }
+        if ((millis() - _devicesPendingSince) < 15 * 1000) { return false; }
+    }
+
+    // add additional devices here if needed, for example Solar-Charger or AC-Charger?
+
+    // if we reach this point, all required devices are ready after startup or they have passed their
+    // respective timeouts and we proceed with fallback values if necessary
+    _devicesReadyAfterStartup = true;
+    return true;
+}
+
+void PowerLimiterClass::serializeRT(JsonObject obj) const
+{
+    // Note: Up to now the PowerLimiterClass does not use a mutex
+    // As long as we read and write during startup or from the main task, we are fine.
+    obj[FROM_START] = _fromStart;
+    obj[ONE_STOP_PER_NIGHT_DONE] = _oneStopPerNightDone;
+}
+
+void PowerLimiterClass::deserializeRT(JsonObject obj)
+{
+    // Note: Up to now the PowerLimiterClass does not use a mutex
+    // As long as we read and write during startup or from the main task, we are fine.
+    // We can not use the write epoch time to determine whether the serialized data is outdated,
+    // because the system time may not be available at the time of deserialization
+    // we do this check later when the system time is available
+    uint8_t dataValidCounter = 0;
+    auto fromStart = false;
+    auto oneStopPerNightDone = false;
+
+    time_t batteryStateSaveEpoch = Runtime.getWriteEpochTime();
+    if (batteryStateSaveEpoch != 0) {
+        ++dataValidCounter;
+    }
+    if (obj[FROM_START].is<bool>()) {
+        fromStart = obj[FROM_START];
+        ++dataValidCounter;
+    }
+    if (obj[ONE_STOP_PER_NIGHT_DONE].is<bool>()) {
+        oneStopPerNightDone = obj[ONE_STOP_PER_NIGHT_DONE];
+        ++dataValidCounter;
+    }
+
+    // Only apply the deserialized values if all fields are valid
+    if (dataValidCounter != 3) { return; }
+
+    // The battery state is a snapshot that becomes outdated within minutes. It is only valid
+    // after a planned restart (software reset), because the RestartHelper writes the runtime
+    // data right before it. After a crash, watchdog, brownout or power cycle the file was written
+    // at some earlier point in time, so we keep the default state.
+    if (esp_reset_reason() != ESP_RST_SW) {
+        DTU_LOGI("no planned restart, battery state not restored");
+        return;
+    }
+
+    _batteryStateSaveEpoch = batteryStateSaveEpoch;
+    _fromStart = fromStart;
+    _oneStopPerNightDone = oneStopPerNightDone;
+    DTU_LOGI("battery state restored (from start: %d, one stop per night done: %d)",
+            _fromStart, _oneStopPerNightDone);
 }
