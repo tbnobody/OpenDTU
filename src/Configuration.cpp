@@ -1112,7 +1112,10 @@ void ConfigurationClass::migrate()
     }
 
     if (config.Cfg.Version < 0x00011e00) {
-        config.Logging.Default = ESP_LOG_VERBOSE;
+        // do not enable verbose logging by default: it floods the log buffer,
+        // consumes lots of CPU/heap (esp. on ESP32 without PSRAM) and can make
+        // the web interface and MQTT unresponsive. users can still opt in.
+        config.Logging.Default = ESP_LOG_ERROR;
         strlcpy(config.Logging.Modules[0].Name, "CORE", sizeof(config.Logging.Modules[0].Name));
         config.Logging.Modules[0].Level = ESP_LOG_ERROR;
     }
