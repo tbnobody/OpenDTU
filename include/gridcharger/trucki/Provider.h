@@ -20,7 +20,7 @@ public:
         // the Trucki stops charging by itself if it does not receive setpoints
         // for 10 seconds, and control decisions rely on HTTP-polled values, so
         // outdated values must not report it as active.
-        if (millis() - getLastHttpUpdate() > DATA_MAX_AGE_MS) { return false; }
+        if (getHttpDataAge() > DATA_MAX_AGE_MS) { return false; }
 
         return _requestedPowerAc > 0
             || _dataCurrent.get<DataPointLabel::AcPowerSetpoint>().value_or(0) > 0.0f
@@ -30,9 +30,14 @@ public:
 private:
     // DC values and the AC power setpoint are only polled via HTTP, while the
     // UDP responses only refresh AC power, max AC power and battery/grid state.
-    uint32_t getLastHttpUpdate() const {
+    uint32_t getHttpDataAge() const {
         auto oDataPoint = _dataCurrent.getDataPointFor<DataPointLabel::DcVoltage>();
-        return oDataPoint ? oDataPoint->getTimestamp() : 0;
+        if (!oDataPoint) { return UINT32_MAX; }
+
+        // read the timestamp before millis(): the polling task may update it
+        // in between, and a timestamp newer than "now" underflows the age.
+        uint32_t timestamp = oDataPoint->getTimestamp();
+        return millis() - timestamp;
     }
 
     template<DataPointLabel L>

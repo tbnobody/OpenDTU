@@ -27,7 +27,10 @@ void Stats::getLiveViewData(JsonVariant& root) const
     root["productName"] = "T2HG/T2MG";
     root["provider"] = GridChargerProviderType::TRUCKI;
 
-    const auto dataAge = millis() - getLastUpdate();
+    // the polling task may update the data while we read it. get the
+    // timestamp before millis(), a newer one would underflow the age.
+    const auto lastUpdate = getLastUpdate();
+    const auto dataAge = millis() - lastUpdate;
     root["dataAge"] = dataAge;
     root["reachable"] = dataAge < 10000;
 

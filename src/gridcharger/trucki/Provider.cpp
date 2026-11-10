@@ -144,7 +144,7 @@ void Provider::powerControlLoop()
     if (config.GridCharger.AutoPowerEnabled) {
         // check the data age before the stabilization delay below, so an
         // outdated request is reset immediately.
-        if (millis() - getLastHttpUpdate() > DATA_MAX_AGE_MS) {
+        if (getHttpDataAge() > DATA_MAX_AGE_MS) {
             setRequestedPowerAc(0);
             if (_autoModeBlockedTillMillis > millis()) { return; }
             DTU_LOGW("Cannot perform auto power control when critical PSU values are outdated");
