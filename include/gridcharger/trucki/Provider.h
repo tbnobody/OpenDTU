@@ -20,7 +20,7 @@ public:
         // the Trucki stops charging by itself if it does not receive setpoints
         // for 10 seconds, and control decisions rely on HTTP-polled values, so
         // outdated values must not report it as active.
-        if (getHttpDataAge() > DATA_MAX_AGE_MS) { return false; }
+        if (isDataOutdated()) { return false; }
 
         return _requestedPowerAc > 0
             || _dataCurrent.get<DataPointLabel::AcPowerSetpoint>().value_or(0) > 0.0f
@@ -28,16 +28,26 @@ public:
     }
 
 private:
-    // DC values and the AC power setpoint are only polled via HTTP, while the
-    // UDP responses only refresh AC power, max AC power and battery/grid state.
-    uint32_t getHttpDataAge() const {
-        auto oDataPoint = _dataCurrent.getDataPointFor<DataPointLabel::DcVoltage>();
+    template<DataPointLabel L>
+    uint32_t getDataAge() const {
+        auto oDataPoint = _dataCurrent.getDataPointFor<L>();
         if (!oDataPoint) { return UINT32_MAX; }
 
         // read the timestamp before millis(): the polling task may update it
         // in between, and a timestamp newer than "now" underflows the age.
         uint32_t timestamp = oDataPoint->getTimestamp();
         return millis() - timestamp;
+    }
+
+    bool isDataOutdated() const {
+        // DC values and the AC power setpoint are only polled via HTTP, while
+        // the UDP responses refresh AC power, max AC power and battery state.
+        if (getDataAge<DataPointLabel::DcVoltage>() > DATA_MAX_AGE_MS) { return true; }
+
+        // the AC power is the base for new targets. every UDP response and
+        // HTTP poll refreshes it. if neither arrived for this long, the Trucki
+        // did not get our setpoints either and stopped charging by itself.
+        return getDataAge<DataPointLabel::AcPower>() > SETPOINT_TIMEOUT_MS;
     }
 
     template<DataPointLabel L>
@@ -89,6 +99,7 @@ private:
     static constexpr int DATA_POLLING_INTERVAL_MS = 3000; // 3 seconds
     static constexpr int HTTP_TIMEOUT_MS = 2000; // 2 seconds
     static constexpr uint32_t DATA_MAX_AGE_MS = 30 * 1000;
+    static constexpr uint32_t SETPOINT_TIMEOUT_MS = 10 * 1000; // the Trucki stops charging without setpoints
 
     void setRequestedPowerAc(float power);
     float _requestedPowerAc = 0;

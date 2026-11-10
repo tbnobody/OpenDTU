@@ -144,7 +144,7 @@ void Provider::powerControlLoop()
     if (config.GridCharger.AutoPowerEnabled) {
         // check the data age before the stabilization delay below, so an
         // outdated request is reset immediately.
-        if (getHttpDataAge() > DATA_MAX_AGE_MS) {
+        if (isDataOutdated()) {
             setRequestedPowerAc(0);
             if (_autoModeBlockedTillMillis > millis()) { return; }
             DTU_LOGW("Cannot perform auto power control when critical PSU values are outdated");
@@ -181,9 +181,8 @@ void Provider::powerControlLoop()
 
         // the AC power drawn from the grid, which is what the power meter sees.
         // the AC power is estimated by the Trucki based on an efficiency curve
-        // for Meanwell PSUs. fall back to the DC output power if unknown.
+        // for Meanwell PSUs. it is known here, isDataOutdated() checks it.
         auto oInputPower = _dataCurrent.get<DataPointLabel::AcPower>();
-        if (!oInputPower) { oInputPower = oOutputPower; }
 
         auto oOutputVoltage = _dataCurrent.get<DataPointLabel::DcVoltage>();
         auto oMinAcPower = _dataCurrent.get<DataPointLabel::MinAcPower>();
