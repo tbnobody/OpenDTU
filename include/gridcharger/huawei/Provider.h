@@ -73,10 +73,18 @@ private:
     DataPointContainer _dataPoints;
     std::shared_ptr<Stats> _stats = std::make_shared<Stats>();
 
-    uint32_t _outputCurrentOnSinceMillis;         // Timestamp since when the PSU was idle at zero amps
-    uint32_t _nextAutoModePeriodicIntMillis;      // When to set the next output voltage in automatic mode
-    uint32_t _lastPowerMeterUpdateReceivedMillis; // Timestamp of last seen power meter value
-    uint32_t _autoModeBlockedTillMillis = 0;      // Timestamp to block running auto mode for some time
+    uint32_t _outputCurrentOnSinceMillis = 0;     // Timestamp since when the PSU was idle at zero amps
+    std::optional<uint32_t> _oLastAutoModePeriodicIntMillis; // When the output voltage was last set in automatic mode
+    uint32_t _lastPowerMeterUpdateReceivedMillis = 0; // Timestamp of last seen power meter value
+    uint32_t _autoModeBlockedSinceMillis = 0;     // Timestamp since when auto mode is blocked
+    uint32_t _autoModeBlockedForMillis = 0;       // Duration for which auto mode is blocked
+
+    // compare elapsed times only, absolute deadlines break when millis() wraps around
+    void blockAutoMode(uint32_t duration) {
+        _autoModeBlockedSinceMillis = millis();
+        _autoModeBlockedForMillis = duration;
+    }
+    bool isAutoModeBlocked() const { return millis() - _autoModeBlockedSinceMillis < _autoModeBlockedForMillis; }
 
     uint8_t _autoPowerEnabledCounter = 0;
     bool _autoPowerEnabled = false;

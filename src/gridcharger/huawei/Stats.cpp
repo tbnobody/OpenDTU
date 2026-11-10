@@ -82,7 +82,9 @@ void Stats::mqttPublish() const
         MqttSettings.publish("huawei/reachable", String(*oReachable?1:0));
     }
 
-    MqttSettings.publish("huawei/data_age", String((millis() - _dataPoints.getLastUpdate()) / 1000));
+    // get the timestamp before millis(), a newer one would underflow the age
+    auto lastUpdate = _dataPoints.getLastUpdate();
+    MqttSettings.publish("huawei/data_age", String((millis() - lastUpdate) / 1000));
 }
 
 void Stats::updateFrom(DataPointContainer const& dataPoints) const
@@ -92,7 +94,10 @@ void Stats::updateFrom(DataPointContainer const& dataPoints) const
 
 void Stats::getLiveViewData(JsonVariant& root) const
 {
-    root["dataAge"] = millis() - _dataPoints.getLastUpdate();
+    // the provider may update the data while we read it. get the
+    // timestamp before millis(), a newer one would underflow the age.
+    auto lastUpdate = _dataPoints.getLastUpdate();
+    root["dataAge"] = millis() - lastUpdate;
     root["provider"] = GridChargerProviderType::HUAWEI;
 
     auto oReachable = _dataPoints.get<DataPointLabel::Reachable>();

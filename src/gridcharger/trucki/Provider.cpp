@@ -146,22 +146,22 @@ void Provider::powerControlLoop()
         // outdated request is reset immediately.
         if (isDataOutdated()) {
             setRequestedPowerAc(0);
-            if (_autoModeBlockedTillMillis > millis()) { return; }
+            if (isAutoModeBlocked()) { return; }
             DTU_LOGW("Cannot perform auto power control when critical PSU values are outdated");
-            _autoModeBlockedTillMillis = millis() + 1000;
+            blockAutoMode(1000);
             return;
         }
 
         // Check if we should run automatic power calculation at all.
         // We may have set a value recently and still wait for output stabilization
-        if (_autoModeBlockedTillMillis > millis()) {
+        if (isAutoModeBlocked()) {
             return;
         }
 
         if (PowerLimiter.isGovernedBatteryPoweredInverterProducing()) {
             setRequestedPowerAc(0);
             DTU_LOGI("Inverter is active, disable PSU");
-            _autoModeBlockedTillMillis = millis() + 1000;
+            blockAutoMode(1000);
             return;
         }
 
@@ -175,7 +175,7 @@ void Provider::powerControlLoop()
                 || _batteryGridState == BATTERY_GRID_STATE_VGRID_LOW_DELAYED
                 || _batteryGridState == BATTERY_GRID_STATE_VGRID_LOW)) {
             setRequestedPowerAc(0);
-            _autoModeBlockedTillMillis = millis() + 1000;
+            blockAutoMode(1000);
             return;
         }
 
@@ -190,14 +190,14 @@ void Provider::powerControlLoop()
 
         if (!oInputPower || !oOutputVoltage || !oMinAcPower || !oMaxAcPower || !oOutputCurrent) {
             DTU_LOGW("Cannot perform auto power control while critical PSU values are still unknown");
-            _autoModeBlockedTillMillis = millis() + 1000;
+            blockAutoMode(1000);
             return;
         }
 
         // We have received a new PowerMeter value, so we're good to calculate a new limit.
         // Note: VOUTSET is not a battery voltage limit. On Meanwell PSUs the Trucki parks
         // it at the PSU's minimum output voltage while idle, so it must not gate this.
-        if (PowerMeter.getLastUpdate() > _lastPowerMeterUpdateReceivedMillis) {
+        if (PowerMeter.getLastUpdate() != _lastPowerMeterUpdateReceivedMillis) {
             _lastPowerMeterUpdateReceivedMillis = PowerMeter.getLastUpdate();
 
             float powerTotal = round(PowerMeter.getPowerTotal());
@@ -244,7 +244,7 @@ void Provider::powerControlLoop()
                 setRequestedPowerAc(newPowerLimit);
 
                 // Don't run auto mode some time to allow for output stabilization after issuing a new value
-                _autoModeBlockedTillMillis = millis() + 4 * DATA_POLLING_INTERVAL_MS;
+                blockAutoMode(4 * DATA_POLLING_INTERVAL_MS);
             } else {
                 // requested PL is below minium. Set power to 0
                 setRequestedPowerAc(0);

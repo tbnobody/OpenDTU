@@ -101,6 +101,13 @@ private:
     static constexpr uint32_t DATA_MAX_AGE_MS = 30 * 1000;
     static constexpr uint32_t SETPOINT_TIMEOUT_MS = 10 * 1000; // the Trucki stops charging without setpoints
 
+    // compare elapsed times only, absolute deadlines break when millis() wraps around
+    void blockAutoMode(uint32_t duration) {
+        _autoModeBlockedSinceMillis = millis();
+        _autoModeBlockedForMillis = duration;
+    }
+    bool isAutoModeBlocked() const { return millis() - _autoModeBlockedSinceMillis < _autoModeBlockedForMillis; }
+
     void setRequestedPowerAc(float power);
     float _requestedPowerAc = 0;
 
@@ -114,7 +121,8 @@ private:
     DataPointContainer _dataCurrent;
 
     uint32_t _lastPowerMeterUpdateReceivedMillis = 0; // Timestamp of last seen power meter value
-    uint32_t _autoModeBlockedTillMillis = 0;      // Timestamp to block running auto mode for some time
+    uint32_t _autoModeBlockedSinceMillis = 0;     // Timestamp since when auto mode is blocked
+    uint32_t _autoModeBlockedForMillis = 0;       // Duration for which auto mode is blocked
 
     // battery/grid state reported via UDP (Trucki firmware >= 1.09), -1 if unknown
     static constexpr int BATTERY_GRID_STATE_VBAT_FULL = 2;
