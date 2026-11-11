@@ -10,15 +10,21 @@ Derives from MultiDataCommand
 
 Command structure:
 * DT: this specific command uses 0x11
-* AlarmId: The last event id received from the inverter or zero in case that no events
-  has been received yet. --> Not Implemented yet
+* Sel: sub-selector byte. Unused for 0x11, send 0x00.
+* Time: unix time. If it differs from the inverter clock by 5 s or more, the inverter
+  re-syncs its clock and shifts the stored event times by the difference.
+* Gap: averaging interval in minutes for the interval record. 0 keeps the current interval
+  (default 15 min).
+* AlarmId: the SeqIdx of the last event already received. The inverter returns only entries
+  whose SeqIdx is greater; 0 returns the whole log. On the first request after inverter boot
+  it continues its event numbering from AlarmId. --> Not implemented here (always sent as 0)
 
 00   01 02 03 04   05 06 07 08   09   10   11   12 13 14 15   16 17   18 19   20 21 22 23   24 25   26   27 28 29 30 31
 -----------------------------------------------------------------------------------------------------------------------
                                       |<------------------- CRC16 --------------------->|
 15   71 60 35 46   80 12 23 04   80   11   00   65 72 06 B8   00 00   00 00   00 00 00 00   00 00   00   -- -- -- -- --
 ^^   ^^^^^^^^^^^   ^^^^^^^^^^^   ^^   ^^   ^^   ^^^^^^^^^^^   ^^^^^   ^^^^^   ^^^^^^^^^^^   ^^^^^   ^^
-ID   Target Addr   Source Addr   Idx  DT   ?    Time          Gap     AlarmId Password      CRC16   CRC8
+ID   Target Addr   Source Addr   Idx  DT   Sel  Time          Gap     AlarmId Password      CRC16   CRC8
 */
 #include "AlarmDataCommand.h"
 #include "inverters/InverterAbstract.h"

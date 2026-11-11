@@ -10,9 +10,9 @@ Data structure:
 * wcode:
   * right 12 bit (bits 0-11): Event ID
   * bit 13: Start time = PM (12h has to be added to start time)
-  * bit 12: End time = PM (12h has to be added to start time)
+  * bit 12: End time = PM (12h has to be added to end time)
 * Start: 12h based start time of the event (PM indicator in wcode)
-* End: 12h based start time of the event (PM indicator in wcode)
+* End: 12h based end time of the event (PM indicator in wcode)
 
 00   01 02 03 04   05 06 07 08   09   10 11   12 13   14 15   16 17   18 19   20   21   22   23   24 25   26   27 28 29 30 31
                                               00 01   02 03   04 05   06 07   08   09   10   11
@@ -20,7 +20,7 @@ Data structure:
 -----------------------------------------------------------------------------------------------------------------------------
 95   80 14 82 66   80 14 33 28   01   00 01   80 01   00 01   91 EA   91 EA   00   00   00   00   00 8F   65   -- -- -- -- --
 ^^   ^^^^^^^^^^^   ^^^^^^^^^^^   ^^   ^^^^^   ^^^^^           ^^^^^   ^^^^^   ^^   ^^   ^^   ^^   ^^^^^   ^^
-ID   Source Addr   Target Addr   Idx  ?       wcode   ?       Start   End     ?    ?    ?    ?    wcode   CRC8
+ID   Source Addr   Target Addr   Idx  Count   wcode   SeqIdx  Start   End     Data (2 words)      CRC16   CRC8
 */
 #include "AlarmLogParser.h"
 #include <cstring>
@@ -34,6 +34,7 @@ const std::array<const AlarmMessage_t, ALARM_MSG_COUNT> AlarmLogParser::_alarmMe
     { AlarmMessageType_t::ALL, 2, "Time calibration", "Zeitabgleich", "" },
     { AlarmMessageType_t::ALL, 3, "EEPROM reading and writing error during operation", "", "" },
     { AlarmMessageType_t::ALL, 4, "Offline", "Offline", "Non connecté" },
+    { AlarmMessageType_t::ALL, 5, "Internal communication error (SCI , DSP-radio link)", "Interner Kommunikationsfehler (SCI, DSP-Funkmodul)", "Erreur de communication interne (SCI, liaison DSP-module radio)" },
 
     { AlarmMessageType_t::ALL, 11, "Grid voltage surge", "Netz: Überspannungsimpuls", "" },
     { AlarmMessageType_t::ALL, 12, "Grid voltage sharp drop", "Netz: Spannungseinbruch", "" },
@@ -43,10 +44,12 @@ const std::array<const AlarmMessage_t, ALARM_MSG_COUNT> AlarmLogParser::_alarmMe
 
     { AlarmMessageType_t::ALL, 36, "INV overvoltage or overcurrent", "", "" },
 
-    { AlarmMessageType_t::ALL, 46, "FB overvoltage", "FB Überspannung", "" },
-    { AlarmMessageType_t::ALL, 47, "FB overcurrent", "FB Überstrom", "" },
-    { AlarmMessageType_t::ALL, 48, "FB clamp overvoltage", "", "" },
-    { AlarmMessageType_t::ALL, 49, "FB clamp overvoltage", "", "" },
+    { AlarmMessageType_t::ALL, 46, "FB-A: overcurrent", "FB-A: Überstrom", "" },
+    { AlarmMessageType_t::ALL, 47, "FB-B: overcurrent", "FB-B: Überstrom", "" },
+    { AlarmMessageType_t::ALL, 48, "FB-A: clamp overvoltage", "FB-A: Klemm-Überspannung", "" },
+    { AlarmMessageType_t::ALL, 49, "FB-B: clamp overvoltage", "FB-B: Klemm-Überspannung", "" },
+    { AlarmMessageType_t::ALL, 50, "FB-C: overcurrent", "FB-C: Überstrom", "" },
+    { AlarmMessageType_t::ALL, 51, "FB-C: clamp overvoltage", "FB-C: Klemm-Überspannung", "" },
 
     { AlarmMessageType_t::ALL, 61, "Calibration parameter error", "", "" },
     { AlarmMessageType_t::ALL, 62, "System configuration parameter error", "", "" },
@@ -55,6 +58,8 @@ const std::array<const AlarmMessage_t, ALARM_MSG_COUNT> AlarmLogParser::_alarmMe
     { AlarmMessageType_t::ALL, 71, "Grid overvoltage load reduction (VW) function enable", "", "" },
     { AlarmMessageType_t::ALL, 72, "Power grid over-frequency load reduction (FW) function enable", "", "" },
     { AlarmMessageType_t::ALL, 73, "Over-temperature load reduction (TW) function enable", "", "" },
+    { AlarmMessageType_t::ALL, 74, "Load reduction curve 2 function enable", "", "" },
+    { AlarmMessageType_t::ALL, 75, "Load reduction curve 3 function enable", "", "" },
 
     { AlarmMessageType_t::ALL, 95, "PV-1: Module in suspected shadow", "", "" },
     { AlarmMessageType_t::ALL, 96, "PV-2: Module in suspected shadow", "", "" },
@@ -133,7 +138,9 @@ const std::array<const AlarmMessage_t, ALARM_MSG_COUNT> AlarmLogParser::_alarmMe
 
     { AlarmMessageType_t::ALL, 309, "Hardware error code 309", "Hardwarefehlercode 309", "" },
     { AlarmMessageType_t::ALL, 310, "Hardware error code 310", "Hardwarefehlercode 310", "" },
+    { AlarmMessageType_t::HMT, 310, "FB-C: overcurrent protection failure", "FB-C: Überstromschutz-Fehler", "" },
     { AlarmMessageType_t::ALL, 311, "Hardware error code 311", "Hardwarefehlercode 311", "" },
+    { AlarmMessageType_t::HMT, 311, "FB-C: clamp circuit failure", "FB-C: Klemmschaltungs-Fehler", "" },
     { AlarmMessageType_t::ALL, 312, "Hardware error code 312", "Hardwarefehlercode 312", "" },
     { AlarmMessageType_t::ALL, 313, "Hardware error code 313", "Hardwarefehlercode 313", "" },
     { AlarmMessageType_t::ALL, 314, "Hardware error code 314", "Hardwarefehlercode 314", "" },
