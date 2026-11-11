@@ -70,6 +70,9 @@ void WebApiPrometheusClass::onPrometheusMetricsGet(AsyncWebServerRequest* reques
 
         for (uint8_t i = 0; i < Hoymiles.getNumInverters(); i++) {
             auto inv = Hoymiles.getInverterByPos(i);
+            if (inv == nullptr) {
+                continue;
+            }
 
             String serial = inv->serialString();
             const char* name = inv->name();
