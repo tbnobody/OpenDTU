@@ -30,6 +30,7 @@ RequestFrameCommand::RequestFrameCommand(InverterAbstract* inv, const uint64_t r
     }
     setFrameNo(frame_no);
     _payload_size = 10;
+    setTimeout(500);
 }
 
 String RequestFrameCommand::getCommandName() const
