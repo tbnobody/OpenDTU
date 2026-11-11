@@ -29,28 +29,32 @@ void WebApiMqttClass::onMqttStatus(AsyncWebServerRequest* request)
 
     AsyncJsonResponse* response = new AsyncJsonResponse();
     auto& root = response->getRoot();
-    const CONFIG_T& config = Configuration.get();
 
-    root["mqtt_enabled"] = config.Mqtt.Enabled;
-    root["mqtt_hostname"] = config.Mqtt.Hostname;
-    root["mqtt_port"] = config.Mqtt.Port;
-    root["mqtt_clientid"] = MqttSettings.getClientId();
-    root["mqtt_username"] = config.Mqtt.Username;
-    root["mqtt_topic"] = config.Mqtt.Topic;
-    root["mqtt_connected"] = MqttSettings.getConnected();
-    root["mqtt_retain"] = config.Mqtt.Retain;
-    root["mqtt_tls"] = config.Mqtt.Tls.Enabled;
-    root["mqtt_root_ca_cert_info"] = getTlsCertInfo(config.Mqtt.Tls.RootCaCert);
-    root["mqtt_tls_cert_login"] = config.Mqtt.Tls.CertLogin;
-    root["mqtt_client_cert_info"] = getTlsCertInfo(config.Mqtt.Tls.ClientCert);
-    root["mqtt_lwt_topic"] = String(config.Mqtt.Topic) + config.Mqtt.Lwt.Topic;
-    root["mqtt_publish_interval"] = config.Mqtt.PublishInterval;
-    root["mqtt_clean_session"] = config.Mqtt.CleanSession;
-    root["mqtt_hass_enabled"] = config.Mqtt.Hass.Enabled;
-    root["mqtt_hass_expire"] = config.Mqtt.Hass.Expire;
-    root["mqtt_hass_retain"] = config.Mqtt.Hass.Retain;
-    root["mqtt_hass_topic"] = config.Mqtt.Hass.Topic;
-    root["mqtt_hass_individualpanels"] = config.Mqtt.Hass.IndividualPanels;
+    // Multi-field read: hold the shared lock while the response is built so
+    // a concurrent update() cannot tear the values. Single fields could use
+    // the lock-free get() instead.
+    Configuration.read([&](CONFIG_T const& config) {
+        root["mqtt_enabled"] = config.Mqtt.Enabled;
+        root["mqtt_hostname"] = config.Mqtt.Hostname;
+        root["mqtt_port"] = config.Mqtt.Port;
+        root["mqtt_clientid"] = MqttSettings.getClientId();
+        root["mqtt_username"] = config.Mqtt.Username;
+        root["mqtt_topic"] = config.Mqtt.Topic;
+        root["mqtt_connected"] = MqttSettings.getConnected();
+        root["mqtt_retain"] = config.Mqtt.Retain;
+        root["mqtt_tls"] = config.Mqtt.Tls.Enabled;
+        root["mqtt_root_ca_cert_info"] = getTlsCertInfo(config.Mqtt.Tls.RootCaCert);
+        root["mqtt_tls_cert_login"] = config.Mqtt.Tls.CertLogin;
+        root["mqtt_client_cert_info"] = getTlsCertInfo(config.Mqtt.Tls.ClientCert);
+        root["mqtt_lwt_topic"] = String(config.Mqtt.Topic) + config.Mqtt.Lwt.Topic;
+        root["mqtt_publish_interval"] = config.Mqtt.PublishInterval;
+        root["mqtt_clean_session"] = config.Mqtt.CleanSession;
+        root["mqtt_hass_enabled"] = config.Mqtt.Hass.Enabled;
+        root["mqtt_hass_expire"] = config.Mqtt.Hass.Expire;
+        root["mqtt_hass_retain"] = config.Mqtt.Hass.Retain;
+        root["mqtt_hass_topic"] = config.Mqtt.Hass.Topic;
+        root["mqtt_hass_individualpanels"] = config.Mqtt.Hass.IndividualPanels;
+    });
 
     WebApi.sendJsonResponse(request, response, __FUNCTION__, __LINE__);
 }
@@ -63,32 +67,35 @@ void WebApiMqttClass::onMqttAdminGet(AsyncWebServerRequest* request)
 
     AsyncJsonResponse* response = new AsyncJsonResponse();
     auto& root = response->getRoot();
-    const CONFIG_T& config = Configuration.get();
 
-    root["mqtt_enabled"] = config.Mqtt.Enabled;
-    root["mqtt_hostname"] = config.Mqtt.Hostname;
-    root["mqtt_port"] = config.Mqtt.Port;
-    root["mqtt_clientid"] = config.Mqtt.ClientId;
-    root["mqtt_username"] = config.Mqtt.Username;
-    root["mqtt_password"] = config.Mqtt.Password;
-    root["mqtt_topic"] = config.Mqtt.Topic;
-    root["mqtt_retain"] = config.Mqtt.Retain;
-    root["mqtt_tls"] = config.Mqtt.Tls.Enabled;
-    root["mqtt_root_ca_cert"] = config.Mqtt.Tls.RootCaCert;
-    root["mqtt_tls_cert_login"] = config.Mqtt.Tls.CertLogin;
-    root["mqtt_client_cert"] = config.Mqtt.Tls.ClientCert;
-    root["mqtt_client_key"] = config.Mqtt.Tls.ClientKey;
-    root["mqtt_lwt_topic"] = config.Mqtt.Lwt.Topic;
-    root["mqtt_lwt_online"] = config.Mqtt.Lwt.Value_Online;
-    root["mqtt_lwt_offline"] = config.Mqtt.Lwt.Value_Offline;
-    root["mqtt_lwt_qos"] = config.Mqtt.Lwt.Qos;
-    root["mqtt_publish_interval"] = config.Mqtt.PublishInterval;
-    root["mqtt_clean_session"] = config.Mqtt.CleanSession;
-    root["mqtt_hass_enabled"] = config.Mqtt.Hass.Enabled;
-    root["mqtt_hass_expire"] = config.Mqtt.Hass.Expire;
-    root["mqtt_hass_retain"] = config.Mqtt.Hass.Retain;
-    root["mqtt_hass_topic"] = config.Mqtt.Hass.Topic;
-    root["mqtt_hass_individualpanels"] = config.Mqtt.Hass.IndividualPanels;
+    // Multi-field read: hold the shared lock while the response is built so
+    // a concurrent update() cannot tear the values.
+    Configuration.read([&](CONFIG_T const& config) {
+        root["mqtt_enabled"] = config.Mqtt.Enabled;
+        root["mqtt_hostname"] = config.Mqtt.Hostname;
+        root["mqtt_port"] = config.Mqtt.Port;
+        root["mqtt_clientid"] = config.Mqtt.ClientId;
+        root["mqtt_username"] = config.Mqtt.Username;
+        root["mqtt_password"] = config.Mqtt.Password;
+        root["mqtt_topic"] = config.Mqtt.Topic;
+        root["mqtt_retain"] = config.Mqtt.Retain;
+        root["mqtt_tls"] = config.Mqtt.Tls.Enabled;
+        root["mqtt_root_ca_cert"] = config.Mqtt.Tls.RootCaCert;
+        root["mqtt_tls_cert_login"] = config.Mqtt.Tls.CertLogin;
+        root["mqtt_client_cert"] = config.Mqtt.Tls.ClientCert;
+        root["mqtt_client_key"] = config.Mqtt.Tls.ClientKey;
+        root["mqtt_lwt_topic"] = config.Mqtt.Lwt.Topic;
+        root["mqtt_lwt_online"] = config.Mqtt.Lwt.Value_Online;
+        root["mqtt_lwt_offline"] = config.Mqtt.Lwt.Value_Offline;
+        root["mqtt_lwt_qos"] = config.Mqtt.Lwt.Qos;
+        root["mqtt_publish_interval"] = config.Mqtt.PublishInterval;
+        root["mqtt_clean_session"] = config.Mqtt.CleanSession;
+        root["mqtt_hass_enabled"] = config.Mqtt.Hass.Enabled;
+        root["mqtt_hass_expire"] = config.Mqtt.Hass.Expire;
+        root["mqtt_hass_retain"] = config.Mqtt.Hass.Retain;
+        root["mqtt_hass_topic"] = config.Mqtt.Hass.Topic;
+        root["mqtt_hass_individualpanels"] = config.Mqtt.Hass.IndividualPanels;
+    });
 
     WebApi.sendJsonResponse(request, response, __FUNCTION__, __LINE__);
 }
@@ -278,10 +285,8 @@ void WebApiMqttClass::onMqttAdminPost(AsyncWebServerRequest* request)
         }
     }
 
+    Configuration.update([&](CONFIG_T& config)
     {
-        auto guard = Configuration.getWriteGuard();
-        auto& config = guard.getConfig();
-
         config.Mqtt.Enabled = root["mqtt_enabled"].as<bool>();
         config.Mqtt.Retain = root["mqtt_retain"].as<bool>();
         config.Mqtt.Tls.Enabled = root["mqtt_tls"].as<bool>();
@@ -312,7 +317,7 @@ void WebApiMqttClass::onMqttAdminPost(AsyncWebServerRequest* request)
             strlcpy(config.Mqtt.Topic, root["mqtt_topic"].as<String>().c_str(), sizeof(config.Mqtt.Topic));
             MqttHandleInverter.subscribeTopics();
         }
-    }
+    });
 
     WebApi.writeConfig(retMsg);
 

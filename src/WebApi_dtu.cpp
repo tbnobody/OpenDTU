@@ -48,29 +48,36 @@ void WebApiDtuClass::onDtuAdminGet(AsyncWebServerRequest* request)
 
     AsyncJsonResponse* response = new AsyncJsonResponse();
     auto& root = response->getRoot();
-    const CONFIG_T& config = Configuration.get();
 
-    // DTU Serial is read as HEX
-    root["serial"] = HoymilesUtils::formatSerial(config.Dtu.Serial);
-    root["pollinterval"] = config.Dtu.PollInterval;
-    root["nrf_enabled"] = Hoymiles.getRadioNrf()->isInitialized();
-    root["nrf_palevel"] = config.Dtu.Nrf.PaLevel;
-    root["cmt_enabled"] = Hoymiles.getRadioCmt()->isInitialized();
-    root["cmt_palevel"] = config.Dtu.Cmt.PaLevel;
-    root["cmt_frequency"] = config.Dtu.Cmt.Frequency;
-    root["cmt_country"] = config.Dtu.Cmt.CountryMode;
-    root["cmt_chan_width"] = Hoymiles.getRadioCmt()->getChannelWidth();
+    // Multi-field read: hold the shared lock while the response is built so
+    // a concurrent update() cannot tear the values.
+    Configuration.read([&](CONFIG_T const& config) {
+        // DTU Serial is read as HEX
+        char buffer[sizeof(uint64_t) * 8 + 1];
+        snprintf(buffer, sizeof(buffer), "%0" PRIx32 "%08" PRIx32,
+            static_cast<uint32_t>((config.Dtu.Serial >> 32) & 0xFFFFFFFF),
+            static_cast<uint32_t>(config.Dtu.Serial & 0xFFFFFFFF));
+        root["serial"] = HoymilesUtils::formatSerial(config.Dtu.Serial);
+        root["pollinterval"] = config.Dtu.PollInterval;
+        root["nrf_enabled"] = Hoymiles.getRadioNrf()->isInitialized();
+        root["nrf_palevel"] = config.Dtu.Nrf.PaLevel;
+        root["cmt_enabled"] = Hoymiles.getRadioCmt()->isInitialized();
+        root["cmt_palevel"] = config.Dtu.Cmt.PaLevel;
+        root["cmt_frequency"] = config.Dtu.Cmt.Frequency;
+        root["cmt_country"] = config.Dtu.Cmt.CountryMode;
+        root["cmt_chan_width"] = Hoymiles.getRadioCmt()->getChannelWidth();
 
-    auto data = root["country_def"].to<JsonArray>();
-    auto countryDefs = Hoymiles.getRadioCmt()->getCountryFrequencyList();
-    for (const auto& definition : countryDefs) {
-        auto obj = data.add<JsonObject>();
-        obj["freq_default"] = definition.definition.Freq_Default;
-        obj["freq_min"] = definition.definition.Freq_Min;
-        obj["freq_max"] = definition.definition.Freq_Max;
-        obj["freq_legal_min"] = definition.definition.Freq_Legal_Min;
-        obj["freq_legal_max"] = definition.definition.Freq_Legal_Max;
-    }
+        auto data = root["country_def"].to<JsonArray>();
+        auto countryDefs = Hoymiles.getRadioCmt()->getCountryFrequencyList();
+        for (const auto& definition : countryDefs) {
+            auto obj = data.add<JsonObject>();
+            obj["freq_default"] = definition.definition.Freq_Default;
+            obj["freq_min"] = definition.definition.Freq_Min;
+            obj["freq_max"] = definition.definition.Freq_Max;
+            obj["freq_legal_min"] = definition.definition.Freq_Legal_Min;
+            obj["freq_legal_max"] = definition.definition.Freq_Legal_Max;
+        }
+    });
 
     WebApi.sendJsonResponse(request, response, __FUNCTION__, __LINE__);
 }
@@ -152,16 +159,15 @@ void WebApiDtuClass::onDtuAdminPost(AsyncWebServerRequest* request)
         return;
     }
 
+    Configuration.update([&](CONFIG_T& config)
     {
-        auto guard = Configuration.getWriteGuard();
-        auto& config = guard.getConfig();
         config.Dtu.Serial = serial;
         config.Dtu.PollInterval = root["pollinterval"].as<uint32_t>();
         config.Dtu.Nrf.PaLevel = root["nrf_palevel"].as<uint8_t>();
         config.Dtu.Cmt.PaLevel = root["cmt_palevel"].as<int8_t>();
         config.Dtu.Cmt.Frequency = root["cmt_frequency"].as<uint32_t>();
         config.Dtu.Cmt.CountryMode = root["cmt_country"].as<CountryModeId_t>();
-    }
+    });
 
     WebApi.writeConfig(retMsg);
 

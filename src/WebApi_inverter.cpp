@@ -119,7 +119,15 @@ void WebApiInverterClass::onInverterAdd(AsyncWebServerRequest* request)
         return;
     }
 
-    INVERTER_CONFIG_T* inverter = Configuration.getFreeInverterSlot();
+    INVERTER_CONFIG_T* inverter = Configuration.update([&](CONFIG_T& config) {
+        INVERTER_CONFIG_T* inverter = ConfigurationClass::getFreeInverterSlot(config);
+        if (inverter) {
+            // Interpret the string as a hex value and convert it to uint64_t
+            inverter->Serial = serial;
+            strncpy(inverter->Name, root["name"].as<String>().c_str(), INV_MAX_NAME_STRLEN);
+        }
+        return inverter;
+    });
 
     if (!inverter) {
         retMsg["message"] = "Only " STR_EXTRACT(INV_MAX_COUNT) " inverters are supported!";
@@ -128,11 +136,6 @@ void WebApiInverterClass::onInverterAdd(AsyncWebServerRequest* request)
         WebApi.sendJsonResponse(request, response, __FUNCTION__, __LINE__);
         return;
     }
-
-    // Interpret the string as a hex value and convert it to uint64_t
-    inverter->Serial = serial;
-
-    strncpy(inverter->Name, root["name"].as<String>().c_str(), INV_MAX_NAME_STRLEN);
 
     WebApi.writeConfig(retMsg, WebApiError::InverterAdded, "Inverter created!");
 
@@ -208,10 +211,8 @@ void WebApiInverterClass::onInverterEdit(AsyncWebServerRequest* request)
 
     uint64_t old_serial = 0;
 
+    Configuration.update([&](CONFIG_T& config)
     {
-        auto guard = Configuration.getWriteGuard();
-        auto& config = guard.getConfig();
-
         INVERTER_CONFIG_T& inverter = config.Inverter[root["id"].as<uint8_t>()];
 
         old_serial = inverter.Serial;
@@ -235,7 +236,7 @@ void WebApiInverterClass::onInverterEdit(AsyncWebServerRequest* request)
             strncpy(inverter.channel[arrayCount].Name, channel["name"] | "", sizeof(inverter.channel[arrayCount].Name));
             arrayCount++;
         }
-    }
+    });
 
     WebApi.writeConfig(retMsg, WebApiError::InverterChanged, "Inverter changed!");
 
@@ -306,7 +307,10 @@ void WebApiInverterClass::onInverterDelete(AsyncWebServerRequest* request)
 
     Hoymiles.removeInverterBySerial(inverter.Serial);
 
-    Configuration.deleteInverterById(inverter_id);
+    Configuration.update([&](CONFIG_T& config)
+    {
+        ConfigurationClass::deleteInverterById(config, inverter_id);
+    });
 
     WebApi.writeConfig(retMsg, WebApiError::InverterDeleted, "Inverter deleted!");
 
@@ -339,10 +343,8 @@ void WebApiInverterClass::onInverterOrder(AsyncWebServerRequest* request)
     // The order array contains list or id in the right order
     JsonArray orderArray = root["order"].as<JsonArray>();
     uint8_t order = 0;
+    Configuration.update([&](CONFIG_T& config)
     {
-        auto guard = Configuration.getWriteGuard();
-        auto& config = guard.getConfig();
-
         for (JsonVariant id : orderArray) {
             uint8_t inverter_id = id.as<uint8_t>();
             if (inverter_id < INV_MAX_COUNT) {
@@ -351,7 +353,7 @@ void WebApiInverterClass::onInverterOrder(AsyncWebServerRequest* request)
             }
             order++;
         }
-    }
+    });
 
     WebApi.writeConfig(retMsg, WebApiError::InverterOrdered, "Inverter order saved!");
 
