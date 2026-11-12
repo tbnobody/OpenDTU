@@ -21,9 +21,18 @@
                 <InputElement
                     :label="$t('networkadmin.WifiPassword')"
                     v-model="networkConfigList.password"
-                    type="password"
+                    :type="showPassword ? 'text' : 'password'"
                     maxlength="64"
-                />
+                >
+                    <button
+                        type="button"
+                        class="btn btn-outline-secondary btn-sm mt-2"
+                        :aria-pressed="showPassword"
+                        @click="showPassword = !showPassword"
+                    >
+                        {{ $t(showPassword ? 'networkadmin.HidePassword' : 'networkadmin.ShowPassword') }}
+                    </button>
+                </InputElement>
 
                 <InputElement
                     :label="$t('networkadmin.Hostname')"
@@ -154,6 +163,7 @@ export default defineComponent({
     data() {
         return {
             dataLoading: true,
+            showPassword: false,
             networkConfigList: {} as NetworkConfig,
             alert: {} as AlertResponse,
         };
@@ -163,6 +173,7 @@ export default defineComponent({
     },
     methods: {
         getNetworkConfig() {
+            this.showPassword = false;
             this.dataLoading = true;
             fetch('/api/network/config', { headers: authHeader() })
                 .then((response) => handleResponse(response, this.$emitter, this.$router))
@@ -173,6 +184,7 @@ export default defineComponent({
         },
         saveNetworkConfig(e: Event) {
             e.preventDefault();
+            this.showPassword = false;
 
             const formData = new FormData();
             formData.append('data', JSON.stringify(this.networkConfigList));
