@@ -112,6 +112,9 @@
 
 #define LED_BRIGHTNESS 100U
 
+// false: the runtime data file is neither written nor read, to avoid periodic flash writes
+#define RUNTIME_SAVE_ENABLED false
+
 #define MAX_INVERTER_LIMIT 2250
 
 #define LANG_PACK_SUFFIX ".lang.json"

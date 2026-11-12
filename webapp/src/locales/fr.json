@@ -843,7 +843,10 @@
         "fr": "Français",
         "Leds": "LEDs",
         "EqualBrightness": "Même luminosité",
-        "LedBrightness": "LED {led} luminosité ({brightness})"
+        "LedBrightness": "LED {led} luminosité ({brightness})",
+        "Storage": "Stockage",
+        "RuntimeSave": "Enregistrer les données d'exécution en mémoire flash",
+        "RuntimeSaveHint": "Si activé, les données d'exécution (actuellement l'état de la batterie du Dynamic Power Limiter) sont écrites en mémoire flash une fois par jour et avant chaque redémarrage, puis restaurées après un redémarrage planifié. Si désactivé, le fichier n'est ni écrit ni lu et les valeurs par défaut sont utilisées après chaque démarrage."
     },
     "pininfo": {
         "Name": "Nom",

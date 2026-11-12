@@ -292,6 +292,7 @@
         "ResetReason1": "Reset Reason CPU 1",
         "ConfigSaveCount": "Config save count",
         "RuntimeSaveCount": "Runtime data save count / time",
+        "RuntimeSaveDisabled": "Saving disabled",
         "Uptime": "Uptime",
         "UptimeValue": "0 days {time} | 1 day {time} | {count} days {time}"
     },
@@ -1071,7 +1072,10 @@
         "fr": "French",
         "Leds": "LEDs",
         "EqualBrightness": "Equal brightness",
-        "LedBrightness": "LED {led} brightness ({brightness})"
+        "LedBrightness": "LED {led} brightness ({brightness})",
+        "Storage": "Storage",
+        "RuntimeSave": "Save runtime data to flash",
+        "RuntimeSaveHint": "If enabled, runtime data (currently the battery state of the Dynamic Power Limiter) is written to the flash memory once a day and before each restart, and restored after a planned restart. If disabled, the file is neither written nor read and default values are used after every start."
     },
     "pininfo": {
         "Name": "Name",

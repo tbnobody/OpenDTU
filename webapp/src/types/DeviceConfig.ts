@@ -14,8 +14,13 @@ export interface Led {
     brightness: number;
 }
 
+export interface Runtime {
+    save_enabled: boolean;
+}
+
 export interface DeviceConfig {
     curPin: Device;
     display: Display;
     led: Array<Led>;
+    runtime: Runtime;
 }

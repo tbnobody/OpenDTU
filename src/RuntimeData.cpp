@@ -9,6 +9,8 @@
  * - The data will not be written if the last write operation was less than 10 minutes ago.
  * - Threadsafe access to data and interface is provided by two mutexes.
  * - Reading is done on startup and if requested on demand.
+ * - Saving can be disabled by configuration (Runtime.SaveEnabled, default: disabled). In that case the
+ *   file is neither written nor read and all providers start with their default values.
  *
  * How to use:
  *  - Derive your own class from the interface class InterfaceProviderRT.
@@ -32,6 +34,7 @@
 #include <ArduinoJson.h>
 #include <algorithm>
 #include "RuntimeData.h"
+#include "Configuration.h"
 
 #undef TAG
 static const char* TAG = "runtime";
@@ -140,6 +143,13 @@ bool RuntimeProvider::writeAll(uint16_t const freezeMinutes)
         return writeOk;
     };
 
+    // saving is disabled by configuration: no flash access at all (covers the daily write,
+    // the write on request and the write before a restart)
+    if (!Configuration.get().Runtime.SaveEnabled) {
+        ESP_LOGI(TAG, "Saving disabled, skipping write");
+        return false;
+    }
+
     // we need a valid epoch time before we can write the runtime data
     time_t nextEpoch;
     if (!Utils::getEpoch(&nextEpoch, 1)) { return cleanExit(false, "Local time not available, skipping write"); }
@@ -246,8 +256,12 @@ bool RuntimeProvider::read(bool const readOnStartup)
 
     // Note: We do not exit on read or allocation errors.
     // Every provider can decide by itself whether to use default configuration values in that case
-    bool readOk = LittleFS.exists(RUNTIME_FILENAME);
-    File fRuntime = LittleFS.open(RUNTIME_FILENAME, "r", false);
+    // If saving is disabled by configuration, we do not touch the file. The document stays empty,
+    // so every provider gets an empty object and keeps its default values. A file left over
+    // from a time when saving was enabled is ignored.
+    const bool saveEnabled = Configuration.get().Runtime.SaveEnabled;
+    bool readOk = saveEnabled && LittleFS.exists(RUNTIME_FILENAME);
+    File fRuntime = saveEnabled ? LittleFS.open(RUNTIME_FILENAME, "r", false) : File();
     if (fRuntime) {
         Utils::skipBom(fRuntime);
         DeserializationError error = deserializeJson(doc, fRuntime);
@@ -289,6 +303,12 @@ bool RuntimeProvider::read(bool const readOnStartup)
         if (!readOnStartup) { _readIDList.clear(); }
 
     } // mutex is automatically released when lock goes out of this scope
+
+    if (!saveEnabled) {
+        ESP_LOGI(TAG, "Saving disabled, using default values");
+        _readOK.store(false);
+        return false;
+    }
 
     if (!readOk) {
         return cleanExit(false, "File not found or error, using default values");

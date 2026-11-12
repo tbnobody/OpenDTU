@@ -291,6 +291,7 @@
         "ResetReason1": "Reset Grund CPU 1",
         "ConfigSaveCount": "Anzahl der Konfigurationsspeicherungen",
         "RuntimeSaveCount": "Laufzeitdatenspeicherungen Anzahl / Zeit",
+        "RuntimeSaveDisabled": "Speichern deaktiviert",
         "Uptime": "Betriebszeit",
         "UptimeValue": "0 Tage {time} | 1 Tag {time} | {count} Tage {time}"
     },
@@ -1070,7 +1071,10 @@
         "fr": "Französisch",
         "Leds": "LEDs",
         "EqualBrightness": "Gleiche Helligkeit",
-        "LedBrightness": "LED {led} Helligkeit ({brightness})"
+        "LedBrightness": "LED {led} Helligkeit ({brightness})",
+        "Storage": "Speicher",
+        "RuntimeSave": "Laufzeitdaten im Flash speichern",
+        "RuntimeSaveHint": "Wenn aktiviert, werden Laufzeitdaten (derzeit der Batteriezustand des Dynamic Power Limiters) einmal täglich und vor jedem Neustart in den Flash-Speicher geschrieben und nach einem geplanten Neustart wiederhergestellt. Wenn deaktiviert, wird die Datei weder geschrieben noch gelesen und nach jedem Start werden Standardwerte verwendet."
     },
     "pininfo": {
         "Name": "Name",

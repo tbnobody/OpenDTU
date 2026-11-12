@@ -414,6 +414,9 @@ bool ConfigurationClass::write()
         led["brightness"] = config.Led_Single[i].Brightness;
     }
 
+    JsonObject runtime = doc["runtime"].to<JsonObject>();
+    runtime["save_enabled"] = config.Runtime.SaveEnabled;
+
     JsonArray inverters = doc["inverters"].to<JsonArray>();
     for (uint8_t i = 0; i < INV_MAX_COUNT; i++) {
         JsonObject inv = inverters.add<JsonObject>();
@@ -954,6 +957,9 @@ bool ConfigurationClass::read()
         JsonObject led = leds[i].as<JsonObject>();
         config.Led_Single[i].Brightness = led["brightness"] | LED_BRIGHTNESS;
     }
+
+    JsonObject runtime = doc["runtime"];
+    config.Runtime.SaveEnabled = runtime["save_enabled"] | RUNTIME_SAVE_ENABLED;
 
     JsonArray inverters = doc["inverters"];
     for (uint8_t i = 0; i < INV_MAX_COUNT; i++) {

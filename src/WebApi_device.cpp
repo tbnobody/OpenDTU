@@ -96,6 +96,9 @@ void WebApiDeviceClass::onDeviceAdminGet(AsyncWebServerRequest* request)
         led["brightness"] = config.Led_Single[i].Brightness;
     }
 
+    auto runtime = root["runtime"].to<JsonObject>();
+    runtime["save_enabled"] = config.Runtime.SaveEnabled;
+
     auto victronPinObj = curPin["victron"].to<JsonObject>();
     victronPinObj["rx"] = pin.victron_rx;
     victronPinObj["tx"] = pin.victron_tx;
@@ -180,6 +183,11 @@ void WebApiDeviceClass::onDeviceAdminPost(AsyncWebServerRequest* request)
         for (uint8_t i = 0; i < PINMAPPING_LED_COUNT; i++) {
             config.Led_Single[i].Brightness = root["led"][i]["brightness"].as<uint8_t>();
             config.Led_Single[i].Brightness = min<uint8_t>(100, config.Led_Single[i].Brightness);
+        }
+
+        // keep the current setting if an older client does not send the value
+        if (root["runtime"]["save_enabled"].is<bool>()) {
+            config.Runtime.SaveEnabled = root["runtime"]["save_enabled"].as<bool>();
         }
     }
 

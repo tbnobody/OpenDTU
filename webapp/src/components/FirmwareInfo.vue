@@ -89,7 +89,13 @@
                     </tr>
                     <tr>
                         <th>{{ $t('firmwareinfo.RuntimeSaveCount') }}</th>
-                        <td>{{ systemStatus.runtime_savecount }}</td>
+                        <td>
+                            {{
+                                systemStatus.runtime_save_enabled
+                                    ? systemStatus.runtime_savecount
+                                    : $t('firmwareinfo.RuntimeSaveDisabled')
+                            }}
+                        </td>
                     </tr>
                     <tr>
                         <th>{{ $t('firmwareinfo.Uptime') }}</th>

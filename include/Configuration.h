@@ -464,6 +464,10 @@ struct CONFIG_T {
         uint8_t Brightness;
     } Led_Single[PINMAPPING_LED_COUNT];
 
+    struct {
+        bool SaveEnabled; // false: the runtime data file is neither written nor read
+    } Runtime;
+
     SolarChargerConfig SolarCharger;
 
     struct PowerMeterConfig {

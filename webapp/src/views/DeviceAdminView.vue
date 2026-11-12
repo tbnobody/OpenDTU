@@ -46,6 +46,17 @@
                     >
                         {{ $t('deviceadmin.Leds') }}
                     </button>
+                    <button
+                        class="nav-link"
+                        id="nav-storage-tab"
+                        data-bs-toggle="tab"
+                        data-bs-target="#nav-storage"
+                        type="button"
+                        role="tab"
+                        aria-controls="nav-storage"
+                    >
+                        {{ $t('deviceadmin.Storage') }}
+                    </button>
                 </div>
             </nav>
             <div class="tab-content" id="nav-tabContent">
@@ -251,6 +262,25 @@
                         </div>
                     </div>
                 </div>
+
+                <div
+                    class="tab-pane fade show"
+                    id="nav-storage"
+                    role="tabpanel"
+                    aria-labelledby="nav-storage-tab"
+                    tabindex="0"
+                >
+                    <div class="card card-tabbed">
+                        <div class="card-body">
+                            <InputElement
+                                :label="$t('deviceadmin.RuntimeSave')"
+                                v-model="deviceConfigList.runtime.save_enabled"
+                                type="checkbox"
+                                :tooltip="$t('deviceadmin.RuntimeSaveHint')"
+                            />
+                        </div>
+                    </div>
+                </div>
             </div>
 
             <FormFooter @reload="getDeviceConfig" />
@@ -365,6 +395,10 @@ export default defineComponent({
                     this.deviceConfigList = data;
                     if (this.deviceConfigList.curPin.name === '') {
                         this.deviceConfigList.curPin.name = 'Default';
+                    }
+                    // a firmware without this setting does not send the object
+                    if (!this.deviceConfigList.runtime) {
+                        this.deviceConfigList.runtime = { save_enabled: false };
                     }
                     this.dataLoading = false;
                 })
