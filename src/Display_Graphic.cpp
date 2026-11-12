@@ -299,9 +299,32 @@ void DisplayGraphicClass::loop()
         snprintf(_fmtText, sizeof(_fmtText), format.c_str(), wattsTotal);
         printText(_fmtText, 2);
 
+        // Show setup information when the station has no address.
+        // Use the same connection state as the web UI; power saving stays independent.
+        if (!NetworkSettings.isConnected()) {
+            const char* state = NetworkSettings.getStationConnectionState();
+            if (!(_mExtra % (3 * 2) < 3) && (WiFi.getMode() & WIFI_AP)) {
+                snprintf(_fmtText, sizeof(_fmtText), "AP %s", WiFi.softAPIP().toString().c_str());
+            } else if (strcmp(state, "paused") == 0) {
+                snprintf(_fmtText, sizeof(_fmtText), "WiFi retry %ds", NetworkSettings.getStationRetryIn());
+            } else {
+                const char* status = "WiFi connecting";
+                if (strcmp(state, "not_configured") == 0) {
+                    status = "WiFi not set";
+                } else if (strcmp(state, "disabled") == 0) {
+                    status = "WiFi off";
+                } else if (strcmp(state, "waiting_for_ip") == 0) {
+                    status = "Waiting for IP";
+                } else if (strcmp(state, "connected") == 0) {
+                    status = "WiFi connected";
+                }
+                snprintf(_fmtText, sizeof(_fmtText), "%s", status);
+            }
+            printText(_fmtText, 3);
+        }
         //=====> IP or Date-Time ========
         // Change every 3 seconds
-        if (!(_mExtra % (3 * 2) < 3) && NetworkSettings.localIP()) {
+        else if (!(_mExtra % (3 * 2) < 3) && NetworkSettings.localIP()) {
             printText(NetworkSettings.localIP().toString().c_str(), 3);
         } else {
             // Get current time

@@ -49,11 +49,13 @@ enum FieldId_t {
     FLD_UAC_31,
     FLD_IAC_1,
     FLD_IAC_2,
-    FLD_IAC_3
+    FLD_IAC_3,
+    // Raw, not yet decoded inverter data
+    FLD_RAW_STATUS
 };
 const char* const fields[] = { "Voltage", "Current", "Power", "YieldDay", "YieldTotal",
     "Voltage", "Current", "Power", "MaxDailyPower", "Frequency", "Temperature", "MaxTemperature", "PowerFactor", "Efficiency", "Irradiation", "ReactivePower", "EventLogCount",
-    "Voltage Ph1-N", "Voltage Ph2-N", "Voltage Ph3-N", "Voltage Ph1-Ph2", "Voltage Ph2-Ph3", "Voltage Ph3-Ph1", "Current Ph1", "Current Ph2", "Current Ph3" };
+    "Voltage Ph1-N", "Voltage Ph2-N", "Voltage Ph3-N", "Voltage Ph1-Ph2", "Voltage Ph2-Ph3", "Voltage Ph3-Ph1", "Current Ph1", "Current Ph2", "Current Ph3", "RawStatus" };
 
 // indices to calculation functions, defined in hmInverter.h
 enum {
@@ -122,6 +124,7 @@ public:
     fieldSettings_t* getSettingByChannelField(const ChannelType_t type, const ChannelNum_t channel, const FieldId_t fieldId);
 
     float getChannelFieldValue(const ChannelType_t type, const ChannelNum_t channel, const FieldId_t fieldId);
+    uint32_t getChannelFieldRawValue(const ChannelType_t type, const ChannelNum_t channel, const FieldId_t fieldId);
     String getChannelFieldValueString(const ChannelType_t type, const ChannelNum_t channel, const FieldId_t fieldId);
     bool hasChannelFieldValue(const ChannelType_t type, const ChannelNum_t channel, const FieldId_t fieldId) const;
     const char* getChannelFieldUnit(const ChannelType_t type, const ChannelNum_t channel, const FieldId_t fieldId) const;

@@ -10,8 +10,11 @@
 #include "../parser/StatisticsParser.h"
 #include "../parser/SystemConfigParaParser.h"
 #include "HoymilesRadio.h"
+#include "CmtLinkState.h"
+#include "RadioRecoverySettings.h"
 #include "types.h"
 #include <Arduino.h>
+#include <atomic>
 #include <cstdint>
 #include <list>
 
@@ -41,8 +44,19 @@ public:
     virtual const byteAssign_t* getByteAssignment() const = 0;
     virtual uint8_t getByteAssignmentSize() const = 0;
 
+    virtual uint32_t getSingleDataCommandTimeout() const;
+    virtual uint32_t getRealTimeRunDataCommandTimeout() const;
+    virtual uint32_t getAlarmDataCommandTimeout() const;
+    virtual uint8_t getMaxRetransmitCount() const;
+
+    void setRadioRecoverySettings(const uint16_t fragmentReplyTimeout, const uint8_t fragmentRetryLimit);
+    RadioRecoverySettings getRadioRecoverySettings() const;
+    uint32_t getEffectiveFragmentReplyTimeout() const;
+    uint8_t getEffectiveFragmentRetryLimit() const;
+
     bool isProducing();
     bool isReachable();
+    bool wasHeardRecently(const uint32_t pollCycles) const;
 
     void setEnablePolling(const bool enabled);
     bool getEnablePolling() const;
@@ -64,8 +78,10 @@ public:
 
     int8_t getLastRssi() const;
 
+    CmtLinkState CmtLink;
+
     void clearRxFragmentBuffer();
-    void addRxFragment(const uint8_t fragment[], const uint8_t len, const int8_t rssi);
+    void addRxFragment(const uint8_t fragment[], const uint8_t len, const int8_t rssi, const uint8_t expectedMainCmd = 0);
     uint8_t verifyAllFragments(CommandAbstract& cmd);
 
     // Side-effect-free check whether all fragments of the current transaction
@@ -140,6 +156,8 @@ private:
     bool _enableCommands = true;
 
     uint8_t _reachableThreshold = 3;
+
+    std::atomic<uint32_t> _radioRecoverySettings { 0 };
 
     bool _zeroValuesIfUnreachable = false;
     bool _zeroYieldDayOnMidnight = false;

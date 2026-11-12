@@ -86,6 +86,7 @@ void InverterSettingsClass::init(Scheduler& scheduler)
         }
 
         inv->setReachableThreshold(inv_cfg.ReachableThreshold);
+        inv->setRadioRecoverySettings(inv_cfg.FragmentReplyTimeout, inv_cfg.FragmentRetryLimit);
         inv->setZeroValuesIfUnreachable(inv_cfg.ZeroRuntimeDataIfUnrechable);
         inv->setZeroYieldDayOnMidnight(inv_cfg.ZeroYieldDayOnMidnight);
         inv->setClearEventlogOnMidnight(inv_cfg.ClearEventlogOnMidnight);

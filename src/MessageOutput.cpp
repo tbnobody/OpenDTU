@@ -175,22 +175,10 @@ void MessageOutputClass::send_ws_chunk(const uint8_t* buffer, size_t size)
         return;
     }
 
-    // textAll() iterates the client list while holding the websocket
-    // server's internal clients lock and skips clients whose send queue
-    // is full, i.e. it implements exactly the backpressure handling that
-    // the previous manual loop did, but race-free with respect to
-    // clients connecting/disconnecting on the async_tcp task.
-    auto status = _ws->textAll(_ws_chunk);
-
-    if (status == AsyncWebSocket::SendStatus::PARTIALLY_ENQUEUED) {
-        // At least one client received this chunk while another one
-        // dropped it because its queue was full. Notify the remaining
-        // clients (and the serial/syslog sinks) that lines are missing.
-        static char const warningStr[] = "\nWARNING: websocket client's queue is full, expect log lines missing\n";
-        auto warning = std::make_shared<message_t>(_ws_chunk->begin(), _ws_chunk->end());
-        warning->insert(warning->end(), warningStr, warningStr + sizeof(warningStr) - 1);
-        _ws->textAll(warning);
-    }
+    // The broadcast API protects client lifetimes while connections change.
+    // Full queues discard this chunk by default, so slow clients do not block others.
+    // Keep the shared buffer unchanged once it is queued for transmission.
+    _ws->textAll(_ws_chunk);
 
     _ws_chunk = nullptr;
     _last_ws_chunk_sent = millis();

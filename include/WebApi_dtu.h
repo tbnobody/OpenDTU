@@ -12,6 +12,8 @@ public:
 private:
     void onDtuAdminGet(AsyncWebServerRequest* request);
     void onDtuAdminPost(AsyncWebServerRequest* request);
+    void onCaptureGet(AsyncWebServerRequest* request);
+    void onCapturePost(AsyncWebServerRequest* request);
 
     Task _applyDataTask;
     void applyDataTaskCb();

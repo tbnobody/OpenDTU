@@ -82,7 +82,7 @@ void DatastoreClass::loop()
         }
 
         for (auto& c : inv->Statistics()->getChannelsByType(TYPE_INV)) {
-            if (cfg->Poll_Enable) {
+            if (cfg->Poll_Enable && cfg->YieldTotalContribution) {
                 _totalAcYieldTotalEnabled += inv->Statistics()->getChannelFieldValue(TYPE_INV, c, FLD_YT);
                 _totalAcYieldDayEnabled += inv->Statistics()->getChannelFieldValue(TYPE_INV, c, FLD_YD);
 

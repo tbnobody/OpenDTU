@@ -282,6 +282,124 @@
                     wide
                 />
 
+                <CardElement :text="$t('inverteradmin.FragmentRecovery')" class="mb-3">
+                    <form ref="fragmentRecoveryForm" @submit.prevent="onEditSubmit">
+                        <div class="mb-3">
+                            <label for="fragment-reply-timeout-mode" class="form-label">
+                                {{ $t('inverteradmin.FragmentReplyTimeout') }}
+                            </label>
+                            <select
+                                id="fragment-reply-timeout-mode"
+                                v-model="fragmentReplyTimeoutMode"
+                                class="form-select"
+                                aria-describedby="fragment-reply-timeout-hint"
+                            >
+                                <option value="auto" v-if="fragmentReplyTimeoutDefault !== null">
+                                    {{
+                                        $t('inverteradmin.FragmentAutomaticTimeout', {
+                                            value: fragmentReplyTimeoutDefault,
+                                        })
+                                    }}
+                                </option>
+                                <option value="auto" v-else>
+                                    {{ $t('inverteradmin.FragmentAutomaticUnavailable') }}
+                                </option>
+                                <option value="manual">{{ $t('inverteradmin.FragmentManual') }}</option>
+                            </select>
+                            <div v-if="fragmentReplyTimeoutMode === 'manual'" class="input-group mt-2">
+                                <input
+                                    id="fragment-reply-timeout"
+                                    v-model.number="selectedInverterData.fragment_reply_timeout"
+                                    type="number"
+                                    class="form-control"
+                                    min="50"
+                                    max="5000"
+                                    step="1"
+                                    required
+                                    :aria-label="$t('inverteradmin.FragmentReplyTimeout')"
+                                    aria-describedby="fragment-reply-timeout-hint fragment-reply-timeout-unit"
+                                />
+                                <span id="fragment-reply-timeout-unit" class="input-group-text">ms</span>
+                            </div>
+                            <div id="fragment-reply-timeout-hint" class="form-text">
+                                {{ $t('inverteradmin.FragmentReplyTimeoutHint') }}
+                                <template
+                                    v-if="
+                                        !fragmentRecoverySerialChanged &&
+                                        selectedInverterData.effective_fragment_reply_timeout !== null
+                                    "
+                                >
+                                    {{
+                                        $t('inverteradmin.FragmentCurrentTimeout', {
+                                            value: selectedInverterData.effective_fragment_reply_timeout,
+                                        })
+                                    }}
+                                </template>
+                                <template v-else>{{ $t('inverteradmin.FragmentCurrentUnavailable') }}</template>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="fragment-retry-limit-mode" class="form-label">
+                                {{ $t('inverteradmin.FragmentRetryLimit') }}
+                            </label>
+                            <select
+                                id="fragment-retry-limit-mode"
+                                v-model="fragmentRetryLimitMode"
+                                class="form-select"
+                                aria-describedby="fragment-retry-limit-hint"
+                            >
+                                <option value="auto" v-if="fragmentRetryLimitDefault !== null">
+                                    {{
+                                        $t('inverteradmin.FragmentAutomaticRetries', {
+                                            value: fragmentRetryLimitDefault,
+                                        })
+                                    }}
+                                </option>
+                                <option value="auto" v-else>
+                                    {{ $t('inverteradmin.FragmentAutomaticUnavailable') }}
+                                </option>
+                                <option value="manual">{{ $t('inverteradmin.FragmentManual') }}</option>
+                            </select>
+                            <input
+                                v-if="fragmentRetryLimitMode === 'manual'"
+                                id="fragment-retry-limit"
+                                v-model.number="selectedInverterData.fragment_retry_limit"
+                                type="number"
+                                class="form-control mt-2"
+                                min="1"
+                                max="50"
+                                step="1"
+                                required
+                                :aria-label="$t('inverteradmin.FragmentRetryLimit')"
+                                aria-describedby="fragment-retry-limit-hint"
+                            />
+                            <div id="fragment-retry-limit-hint" class="form-text">
+                                {{ $t('inverteradmin.FragmentRetryLimitHint') }}
+                                <template
+                                    v-if="
+                                        !fragmentRecoverySerialChanged &&
+                                        selectedInverterData.effective_fragment_retry_limit !== null
+                                    "
+                                >
+                                    {{
+                                        $t('inverteradmin.FragmentCurrentRetries', {
+                                            value: selectedInverterData.effective_fragment_retry_limit,
+                                        })
+                                    }}
+                                </template>
+                                <template v-else>{{ $t('inverteradmin.FragmentCurrentUnavailable') }}</template>
+                            </div>
+                        </div>
+                        <p v-if="fragmentRecoverySerialChanged" class="form-text">
+                            {{ $t('inverteradmin.FragmentSerialChangedHint') }}
+                        </p>
+                        <p class="form-text">{{ $t('inverteradmin.FragmentRecoveryHint') }}</p>
+                        <button type="button" class="btn btn-outline-secondary" @click="resetFragmentRecovery">
+                            {{ $t('inverteradmin.FragmentResetAutomatic') }}
+                        </button>
+                    </form>
+                </CardElement>
+
                 <InputElement
                     :label="$t('inverteradmin.ZeroRuntime')"
                     v-model="selectedInverterData.zero_runtime"
@@ -310,6 +428,14 @@
                     v-model="selectedInverterData.yieldday_correction"
                     type="checkbox"
                     :tooltip="$t('inverteradmin.YieldDayCorrectionHint')"
+                    wide
+                />
+
+                <InputElement
+                    :label="$t('inverteradmin.YieldTotalContribution')"
+                    v-model="selectedInverterData.yield_total_contribution"
+                    type="checkbox"
+                    :tooltip="$t('inverteradmin.YieldTotalContributionHint')"
                     wide
                 />
             </div>
@@ -361,7 +487,7 @@ import {
     BIconTrash,
 } from 'bootstrap-icons-vue';
 import Sortable from 'sortablejs';
-import { defineComponent } from 'vue';
+import { defineComponent, markRaw } from 'vue';
 
 export default defineComponent({
     components: {
@@ -383,12 +509,56 @@ export default defineComponent({
             modal: {} as bootstrap.Modal,
             modalDelete: {} as bootstrap.Modal,
             newInverterData: { serial: '' } as Inverter,
-            selectedInverterData: { serial: '' } as Inverter,
+            selectedInverterData: {
+                serial: '',
+                fragment_reply_timeout: 0,
+                fragment_retry_limit: 0,
+                effective_fragment_reply_timeout: null,
+                effective_fragment_retry_limit: null,
+                default_fragment_reply_timeout: null,
+                default_fragment_retry_limit: null,
+            } as Inverter,
+            manualFragmentReplyTimeout: false,
+            manualFragmentRetryLimit: false,
+            originalInverterSerial: '',
             inverters: [] as Inverter[],
             dataLoading: true,
             alert: {} as AlertResponse,
-            sortable: {} as Sortable,
+            sortable: null as Sortable | null,
+            inverterListRequestId: 0,
+            isViewActive: true,
         };
+    },
+    computed: {
+        fragmentRecoverySerialChanged(): boolean {
+            return this.selectedInverterData.serial.toUpperCase() !== this.originalInverterSerial;
+        },
+        fragmentReplyTimeoutDefault(): number | null {
+            return this.fragmentRecoverySerialChanged ? null : this.selectedInverterData.default_fragment_reply_timeout;
+        },
+        fragmentRetryLimitDefault(): number | null {
+            return this.fragmentRecoverySerialChanged ? null : this.selectedInverterData.default_fragment_retry_limit;
+        },
+        fragmentReplyTimeoutMode: {
+            get(): string {
+                return this.manualFragmentReplyTimeout ? 'manual' : 'auto';
+            },
+            set(mode: string) {
+                this.manualFragmentReplyTimeout = mode === 'manual';
+                this.selectedInverterData.fragment_reply_timeout =
+                    mode === 'auto' ? 0 : (this.fragmentReplyTimeoutDefault ?? 50);
+            },
+        },
+        fragmentRetryLimitMode: {
+            get(): string {
+                return this.manualFragmentRetryLimit ? 'manual' : 'auto';
+            },
+            set(mode: string) {
+                this.manualFragmentRetryLimit = mode === 'manual';
+                this.selectedInverterData.fragment_retry_limit =
+                    mode === 'auto' ? 0 : (this.fragmentRetryLimitDefault ?? 1);
+            },
+        },
     },
     mounted() {
         this.modal = new bootstrap.Modal('#inverterEdit');
@@ -397,26 +567,52 @@ export default defineComponent({
     created() {
         this.getInverters();
     },
+    beforeUnmount() {
+        this.isViewActive = false;
+        this.inverterListRequestId++;
+        this.destroySortable();
+    },
     methods: {
+        destroySortable() {
+            this.sortable?.destroy();
+            this.sortable = null;
+        },
         getInverters() {
+            if (!this.isViewActive) {
+                return;
+            }
+            const requestId = ++this.inverterListRequestId;
+            this.destroySortable();
             this.dataLoading = true;
             fetch('/api/inverter/list', { headers: authHeader() })
                 .then((response) => handleResponse(response, this.$emitter, this.$router))
                 .then((data) => {
+                    if (!this.isViewActive || requestId !== this.inverterListRequestId) {
+                        return;
+                    }
                     this.inverters = data.inverter.slice().sort((a: Inverter, b: Inverter) => {
                         return a.order - b.order;
                     });
                     this.dataLoading = false;
 
                     this.$nextTick(() => {
-                        const table = this.$refs.invList as HTMLElement;
+                        if (!this.isViewActive || requestId !== this.inverterListRequestId) {
+                            return;
+                        }
+                        const table = this.$refs.invList as HTMLElement | undefined;
+                        if (!table) {
+                            return;
+                        }
 
-                        this.sortable = Sortable.create(table, {
-                            sort: true,
-                            handle: '.drag-handle',
-                            animation: 150,
-                            draggable: 'tr',
-                        });
+                        this.destroySortable();
+                        this.sortable = markRaw(
+                            Sortable.create(table, {
+                                sort: true,
+                                handle: '.drag-handle',
+                                animation: 150,
+                                draggable: 'tr',
+                            })
+                        );
                     });
                 });
         },
@@ -446,18 +642,36 @@ export default defineComponent({
             this.onCloseModal(this.modalDelete);
         },
         onEditSubmit() {
+            const recoveryForm = this.$refs.fragmentRecoveryForm as HTMLFormElement;
+            if (!recoveryForm.checkValidity()) {
+                new bootstrap.Tab('#nav-advanced-tab').show();
+                this.$nextTick(() => recoveryForm.reportValidity());
+                return;
+            }
             this.callInverterApiEndpoint('edit', JSON.stringify(this.selectedInverterData));
             this.onCloseModal(this.modal);
+        },
+        resetFragmentRecovery() {
+            this.manualFragmentReplyTimeout = false;
+            this.manualFragmentRetryLimit = false;
+            this.selectedInverterData.fragment_reply_timeout = 0;
+            this.selectedInverterData.fragment_retry_limit = 0;
         },
         onOpenModal(modal: bootstrap.Modal, inverter: Inverter) {
             // deep copy inverter object for editing/deleting
             this.selectedInverterData = JSON.parse(JSON.stringify(inverter)) as Inverter;
+            this.originalInverterSerial = inverter.serial.toUpperCase();
+            this.manualFragmentReplyTimeout = this.selectedInverterData.fragment_reply_timeout !== 0;
+            this.manualFragmentRetryLimit = this.selectedInverterData.fragment_retry_limit !== 0;
             modal.show();
         },
         onCloseModal(modal: bootstrap.Modal) {
             modal.hide();
         },
         onSaveOrder() {
+            if (!this.sortable) {
+                return;
+            }
             this.callInverterApiEndpoint('order', JSON.stringify({ order: this.sortable.toArray() }));
         },
     },

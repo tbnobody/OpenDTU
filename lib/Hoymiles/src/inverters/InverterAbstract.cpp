@@ -3,6 +3,8 @@
  * Copyright (C) 2022-2026 Thomas Basler and others
  */
 #include "InverterAbstract.h"
+#include "Hoymiles.h"
+#include "commands/CommandAbstract.h"
 #include "crc.h"
 #include <HoymilesUtils.h>
 #include <cstring>
@@ -46,6 +48,54 @@ const String& InverterAbstract::serialString() const
     return _serialString;
 }
 
+uint32_t InverterAbstract::getSingleDataCommandTimeout() const
+{
+    return 100;
+}
+
+uint32_t InverterAbstract::getRealTimeRunDataCommandTimeout() const
+{
+    return 500;
+}
+
+uint32_t InverterAbstract::getAlarmDataCommandTimeout() const
+{
+    return 750;
+}
+
+uint8_t InverterAbstract::getMaxRetransmitCount() const
+{
+    return MAX_DEFAULT_RETRANSMIT_COUNT;
+}
+
+void InverterAbstract::setRadioRecoverySettings(const uint16_t fragmentReplyTimeout, const uint8_t fragmentRetryLimit)
+{
+    const uint32_t timeout = RadioRecoverySettings::isValidFragmentReplyTimeout(fragmentReplyTimeout) ? fragmentReplyTimeout : 0;
+    const uint32_t retryLimit = RadioRecoverySettings::isValidFragmentRetryLimit(fragmentRetryLimit) ? fragmentRetryLimit : 0;
+    _radioRecoverySettings.store(timeout | (retryLimit << 16), std::memory_order_relaxed);
+}
+
+RadioRecoverySettings InverterAbstract::getRadioRecoverySettings() const
+{
+    const uint32_t settings = _radioRecoverySettings.load(std::memory_order_relaxed);
+    const uint32_t timeout = settings & 0xffff;
+    const uint8_t retryLimit = settings >> 16;
+    return {
+        timeout == 0 ? getSingleDataCommandTimeout() : timeout,
+        retryLimit == 0 ? getMaxRetransmitCount() : retryLimit,
+    };
+}
+
+uint32_t InverterAbstract::getEffectiveFragmentReplyTimeout() const
+{
+    return getRadioRecoverySettings().fragmentReplyTimeout;
+}
+
+uint8_t InverterAbstract::getEffectiveFragmentRetryLimit() const
+{
+    return getRadioRecoverySettings().fragmentRetryLimit;
+}
+
 void InverterAbstract::setName(const char* name)
 {
     uint8_t len = strlen(name);
@@ -76,6 +126,15 @@ bool InverterAbstract::isProducing()
 bool InverterAbstract::isReachable()
 {
     return _enablePolling && Statistics()->getRxFailureCount() <= _reachableThreshold;
+}
+
+bool InverterAbstract::wasHeardRecently(const uint32_t pollCycles) const
+{
+    if (_radio != Hoymiles.getRadioCmt() || CmtLink.lastHeardMs == 0) {
+        return false;
+    }
+    const uint32_t window = pollCycles * Hoymiles.PollInterval() * 1000 + 2000;
+    return millis() - CmtLink.lastHeardMs < window;
 }
 
 void InverterAbstract::setEnablePolling(const bool enabled)
@@ -196,7 +255,7 @@ void InverterAbstract::clearRxFragmentBuffer()
     _rxFragmentRetransmitCnt = 0;
 }
 
-void InverterAbstract::addRxFragment(const uint8_t fragment[], const uint8_t len, const int8_t rssi)
+void InverterAbstract::addRxFragment(const uint8_t fragment[], const uint8_t len, const int8_t rssi, const uint8_t expectedMainCmd)
 {
     _lastRssi = rssi;
 
@@ -207,6 +266,13 @@ void InverterAbstract::addRxFragment(const uint8_t fragment[], const uint8_t len
 
     if (len - 11 > MAX_RF_PAYLOAD_SIZE) {
         ESP_LOGE(TAG, "FATAL: (%s, %d) fragment too large", __FILE__, __LINE__);
+        return;
+    }
+
+    // RF activity suppresses link searches without changing statistics-based reachability.
+    CmtLink.lastHeardMs = millis();
+    if (expectedMainCmd != 0 && fragment[0] != expectedMainCmd) {
+        ESP_LOGW(TAG, "Fragment with main command 0x%02X ignored, expected 0x%02X", fragment[0], expectedMainCmd);
         return;
     }
 

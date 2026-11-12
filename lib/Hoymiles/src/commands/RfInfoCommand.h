@@ -10,4 +10,13 @@ public:
     String getCommandName() const override;
 
     bool handleResponse(const fragment_t fragment[], const uint8_t max_fragment_id) override;
+
+    void setProbeFrequency(const uint32_t frequency);
+    bool isProbe() const { return _probe; }
+
+    uint8_t getMaxResendCount() const override;
+    bool areSameParameter(CommandAbstract* other) override;
+
+private:
+    bool _probe = false;
 };
