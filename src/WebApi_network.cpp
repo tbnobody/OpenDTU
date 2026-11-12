@@ -91,22 +91,12 @@ void WebApiNetworkClass::onNetworkScan(AsyncWebServerRequest* request)
     if (!WebApi.checkCredentials(request)) {
         return;
     }
-    if (request->method() == HTTP_POST) {
-        NetworkSettings.requestWifiScan();
-    }
-    const auto status = NetworkSettings.getWifiScanStatus();
+    // GET reuses setup's prescan/cache; POST explicitly requests a refresh.
+    NetworkSettings.requestWifiScan(request->method() == HTTP_POST);
     AsyncJsonResponse* response = new AsyncJsonResponse();
     auto& root = response->getRoot();
-    root["state"] = status.state;
-    root["error"] = status.error;
-    JsonArray networks = root["networks"].to<JsonArray>();
-    for (size_t i = 0; i < status.count; ++i) {
-        JsonObject network = networks.add<JsonObject>();
-        // The asynchronous response outlives this local snapshot; copy the SSID.
-        network["ssid"] = String(status.networks[i].ssid);
-        network["rssi"] = status.networks[i].rssi;
-        network["secure"] = status.networks[i].secure;
-    }
+    response->setCode(NetworkSettings.getWifiScanStatus(root) ? 202 : 200);
+    response->addHeader("Cache-Control", "no-store");
     WebApi.sendJsonResponse(request, response, __FUNCTION__, __LINE__);
 }
 

@@ -11,7 +11,7 @@
 #include "defaults.h"
 #include <ESPmDNS.h>
 #include <ETH.h>
-#include <algorithm>
+#include <array>
 #include <esp_wifi.h>
 
 #undef TAG
@@ -190,6 +190,8 @@ void NetworkSettingsClass::setupMode()
 {
     if (_adminEnabled) {
         WiFi.mode(WIFI_AP_STA);
+        // The scheduler starts this once association is no longer in progress.
+        _wifiScanPrewarmPending = true;
         String ssidString = getApName();
         WiFi.softAPConfig(_apIp, _apIp, _apNetmask);
         WiFi.softAP(ssidString.c_str(), Configuration.get().Security.Password);
@@ -197,6 +199,7 @@ void NetworkSettingsClass::setupMode()
         _dnsServer->start(DNS_PORT, "*", WiFi.softAPIP());
         _dnsServerStatus = true;
     } else {
+        _wifiScanPrewarmPending = false;
         _dnsServerStatus = false;
         _dnsServer->stop();
         if (_networkMode == network_mode::WiFi) {
@@ -560,21 +563,75 @@ network_mode NetworkSettingsClass::NetworkMode() const
     return _networkMode;
 }
 
-void NetworkSettingsClass::requestWifiScan()
+void NetworkSettingsClass::requestWifiScan(const bool refresh)
 {
     std::lock_guard<std::mutex> lock(_wifiScanMutex);
-    if (_wifiScanActive || strcmp(_wifiScanStatus.state, "running") == 0) {
+    if (_wifiScanActive || _wifiScanRequested || _wifiScanRetryPending) {
         return;
     }
-    _wifiScanStatus = {};
-    _wifiScanStatus.state = "running";
+    if (!refresh && strcmp(_wifiScanState, "idle") != 0) {
+        return;
+    }
+    _wifiScanState = "running";
+    _wifiScanError = nullptr;
+    _wifiScanRetries = 0;
     _wifiScanRequested = true;
 }
 
-WifiScanStatus NetworkSettingsClass::getWifiScanStatus() const
+bool NetworkSettingsClass::getWifiScanStatus(JsonVariant root) const
 {
+    // Starting/deleting a scan uses the same lock. Arduino has already finished
+    // writing its buffer before the scheduler publishes the complete state.
     std::lock_guard<std::mutex> lock(_wifiScanMutex);
-    return _wifiScanStatus;
+    root["state"] = _wifiScanState;
+    root["error"] = _wifiScanError;
+    JsonArray networks = root["networks"].to<JsonArray>();
+    if (strcmp(_wifiScanState, "complete") != 0) {
+        return strcmp(_wifiScanState, "running") == 0;
+    }
+
+    // Only indices are temporary (128 bytes), not another copy of the AP records.
+    // Keep separate BSSIDs for mesh networks and select the strongest 32 results.
+    std::array<int, 32> indices {};
+    size_t count = 0;
+    const int available = WiFi.scanComplete();
+    for (int i = 0; i < available; ++i) {
+        const auto* ap = static_cast<const wifi_ap_record_t*>(WiFi.getScanInfoByIndex(i));
+        if (!ap || ap->ssid[0] == 0) {
+            continue;
+        }
+        size_t pos = 0;
+        while (pos < count) {
+            const auto* other = static_cast<const wifi_ap_record_t*>(WiFi.getScanInfoByIndex(indices[pos]));
+            if (ap->rssi > other->rssi || (ap->rssi == other->rssi && memcmp(ap->bssid, other->bssid, 6) < 0)) {
+                break;
+            }
+            ++pos;
+        }
+        if (pos == indices.size()) {
+            continue;
+        }
+        if (count < indices.size()) {
+            ++count;
+        }
+        for (size_t j = count - 1; j > pos; --j) {
+            indices[j] = indices[j - 1];
+        }
+        indices[pos] = i;
+    }
+    for (size_t i = 0; i < count; ++i) {
+        const auto* ap = static_cast<const wifi_ap_record_t*>(WiFi.getScanInfoByIndex(indices[i]));
+        JsonObject network = networks.add<JsonObject>();
+        // Own these strings before releasing the buffer-lifetime lock.
+        network["ssid"] = String(reinterpret_cast<const char*>(ap->ssid));
+        char bssid[18];
+        snprintf(bssid, sizeof(bssid), "%02X:%02X:%02X:%02X:%02X:%02X",
+            ap->bssid[0], ap->bssid[1], ap->bssid[2], ap->bssid[3], ap->bssid[4], ap->bssid[5]);
+        network["bssid"] = String(bssid);
+        network["rssi"] = ap->rssi;
+        network["secure"] = ap->authmode != WIFI_AUTH_OPEN;
+    }
+    return false;
 }
 
 void NetworkSettingsClass::restoreWifiScanMode()
@@ -587,16 +644,40 @@ void NetworkSettingsClass::restoreWifiScanMode()
     }
 }
 
-void NetworkSettingsClass::cancelWifiScan()
+void NetworkSettingsClass::cancelWifiScan(const char* error)
 {
     std::lock_guard<std::mutex> lock(_wifiScanMutex);
-    if (_wifiScanActive && !_wifiScanCancelled.exchange(true)) {
-        _wifiScanStatus.state = "failed";
-        _wifiScanStatus.error = "busy";
-        _wifiScanStatus.count = 0;
+    _wifiScanRequested = false;
+    _wifiScanRetryPending = false;
+    if (_wifiScanActive) {
+        _wifiScanState = "failed";
+        _wifiScanError = error;
         // Stop before a disconnect handler resets the driver. Keep ownership
-        // until SCAN_DONE releases Arduino's results; a new scan must wait.
-        esp_wifi_scan_stop();
+        // until SCAN_DONE has finished filling Arduino's result buffer.
+        if (!_wifiScanCancelled.exchange(true)) {
+            esp_wifi_scan_stop();
+        }
+    } else {
+        WiFi.scanDelete();
+        _wifiScanState = "idle";
+        _wifiScanError = nullptr;
+    }
+}
+
+void NetworkSettingsClass::finishWifiScan(const char* error, const uint32_t now)
+{
+    // Called by the scheduler with _wifiScanMutex held and no driver writer left.
+    _wifiScanActive = false;
+    _wifiScanFinished = now;
+    _wifiScanRetryPending = error && (strcmp(error, "scan_failed") == 0 || strcmp(error, "timeout") == 0)
+        && _wifiScanRetries == 0;
+    if (_wifiScanRetryPending) {
+        ++_wifiScanRetries;
+    }
+    _wifiScanState = _wifiScanRetryPending ? "running" : error ? "failed" : "complete";
+    _wifiScanError = _wifiScanRetryPending ? nullptr : error;
+    if (error) {
+        WiFi.scanDelete();
     }
 }
 
@@ -604,35 +685,50 @@ void NetworkSettingsClass::processWifiScan()
 {
     constexpr uint32_t timeout = 10000;
     constexpr uint32_t cacheLifetime = 60000;
+    constexpr uint32_t retryDelay = 1000;
     const uint32_t now = millis();
+    std::lock_guard<std::mutex> lock(_wifiScanMutex);
 
     if (_wifiScanActive) {
         if (_wifiScanCancelled) {
             restoreWifiScanMode();
         }
         if (_wifiScanCompleted.exchange(false)) {
+            const char* error = _wifiScanCancelled ? _wifiScanError
+                : (_wifiScanCompletionStatus != 0 || WiFi.scanComplete() < 0) ? "scan_failed" : nullptr;
             restoreWifiScanMode();
-            std::lock_guard<std::mutex> lock(_wifiScanMutex);
-            _wifiScanStatus.state = _wifiScanStatus.error ? "failed" : "complete";
-            _wifiScanFinished = now;
-            _wifiScanActive = false;
+            finishWifiScan(error, now);
         } else if (!_wifiScanCancelled && now - _wifiScanStarted >= timeout) {
-            cancelWifiScan();
+            _wifiScanState = _wifiScanRetries == 0 ? "running" : "failed";
+            _wifiScanError = "timeout";
+            _wifiScanCancelled = true;
+            esp_wifi_scan_stop();
             restoreWifiScanMode();
-            std::lock_guard<std::mutex> lock(_wifiScanMutex);
-            _wifiScanStatus.error = "timeout";
         }
         return;
     }
 
+    const bool canScan = _networkMode == network_mode::WiFi
+        && (!wifiConfigured() || !_performConnection || WiFi.isConnected());
+    if (_wifiScanPrewarmPending && canScan) {
+        _wifiScanPrewarmPending = false;
+        if (strcmp(_wifiScanState, "idle") == 0
+            || (_wifiScanError && strcmp(_wifiScanError, "busy") == 0)) {
+            _wifiScanState = "running";
+            _wifiScanError = nullptr;
+            _wifiScanRetries = 0;
+            _wifiScanRequested = true;
+        }
+    }
+    if (_wifiScanRetryPending && now - _wifiScanFinished >= retryDelay) {
+        _wifiScanRetryPending = false;
+        _wifiScanRequested = true;
+    }
     if (_wifiScanRequested.exchange(false)) {
         // The driver rejects scans while joining. Never disconnect a working
         // station or change its credentials just to populate the SSID picker.
-        if (_networkMode == network_mode::Ethernet || (wifiConfigured() && _performConnection && !WiFi.isConnected())) {
-            std::lock_guard<std::mutex> lock(_wifiScanMutex);
-            _wifiScanStatus.state = "failed";
-            _wifiScanStatus.error = _networkMode == network_mode::Ethernet ? "wifi_disabled" : "busy";
-            _wifiScanFinished = now;
+        if (!canScan) {
+            finishWifiScan(_networkMode == network_mode::Ethernet ? "wifi_disabled" : "busy", now);
             return;
         }
         _wifiScanRestoreSta = (WiFi.getMode() & WIFI_STA) == 0;
@@ -642,64 +738,24 @@ void NetworkSettingsClass::processWifiScan()
         _wifiScanStarted = now;
         if (WiFi.scanNetworks(true, false, false, 300) == WIFI_SCAN_FAILED) {
             restoreWifiScanMode();
-            std::lock_guard<std::mutex> lock(_wifiScanMutex);
-            _wifiScanStatus.state = "failed";
-            _wifiScanStatus.error = "scan_failed";
-            _wifiScanFinished = now;
-            _wifiScanActive = false;
+            finishWifiScan("scan_failed", now);
         }
         return;
     }
 
-    std::lock_guard<std::mutex> lock(_wifiScanMutex);
-    if (!_wifiScanRequested && now - _wifiScanFinished >= cacheLifetime) {
-        _wifiScanStatus = {};
+    if (!_wifiScanRetryPending && strcmp(_wifiScanState, "idle") != 0 && now - _wifiScanFinished >= cacheLifetime) {
+        WiFi.scanDelete();
+        _wifiScanState = "idle";
+        _wifiScanError = nullptr;
     }
 }
 
 void NetworkSettingsClass::onWifiScanDone(uint32_t status)
 {
-    // Arduino fills its result buffer before this callback. Copy and release it
-    // here so timeout handling cannot free a buffer being filled on this task.
-    if (_wifiScanActive && !_wifiScanCancelled) {
-        std::lock_guard<std::mutex> lock(_wifiScanMutex);
-        const int count = WiFi.scanComplete();
-        if (status != 0 || count < 0) {
-            _wifiScanStatus.error = "scan_failed";
-        } else {
-            auto& result = _wifiScanStatus;
-            for (int i = 0; i < count; ++i) {
-                const auto* ap = static_cast<const wifi_ap_record_t*>(WiFi.getScanInfoByIndex(i));
-                if (!ap || ap->ssid[0] == 0) {
-                    continue;
-                }
-                const char* ssid = reinterpret_cast<const char*>(ap->ssid);
-                size_t index = 0;
-                while (index < result.count && strcmp(result.networks[index].ssid, ssid) != 0) {
-                    ++index;
-                }
-                if (index < result.count && result.networks[index].rssi >= ap->rssi) {
-                    continue;
-                }
-                if (index == result.networks.size()) {
-                    index--;
-                    if (result.networks[index].rssi >= ap->rssi) {
-                        continue;
-                    }
-                } else if (index == result.count) {
-                    result.count++;
-                }
-                strlcpy(result.networks[index].ssid, ssid, sizeof(result.networks[index].ssid));
-                result.networks[index].rssi = ap->rssi;
-                result.networks[index].secure = ap->authmode != WIFI_AUTH_OPEN;
-                std::sort(result.networks.begin(), result.networks.begin() + result.count, [](const auto& left, const auto& right) {
-                    return left.rssi != right.rssi ? left.rssi > right.rssi : strcmp(left.ssid, right.ssid) < 0;
-                });
-            }
-        }
-    }
-    WiFi.scanDelete();
+    // Arduino has populated its buffer before this notification. Do not lock,
+    // inspect, copy or free results on the Arduino event task.
     if (_wifiScanActive) {
+        _wifiScanCompletionStatus = status;
         _wifiScanCompleted = true;
     }
 }

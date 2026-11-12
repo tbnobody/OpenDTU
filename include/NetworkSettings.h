@@ -2,10 +2,10 @@
 #pragma once
 
 #include "W5500.h"
+#include <ArduinoJson.h>
 #include <DNSServer.h>
 #include <TaskSchedulerDeclarations.h>
 #include <WiFi.h>
-#include <array>
 #include <atomic>
 #include <mutex>
 #include <vector>
@@ -40,19 +40,6 @@ typedef struct DtuNetworkEventCbList {
     }
 } DtuNetworkEventCbList_t;
 
-struct WifiScanNetwork {
-    char ssid[33] {};
-    int32_t rssi = 0;
-    bool secure = false;
-};
-
-struct WifiScanStatus {
-    const char* state = "idle";
-    const char* error = nullptr;
-    std::array<WifiScanNetwork, 32> networks {};
-    size_t count = 0;
-};
-
 class NetworkSettingsClass {
 public:
     NetworkSettingsClass();
@@ -69,8 +56,9 @@ public:
     static String getHostname();
     bool isConnected() const;
     network_mode NetworkMode() const;
-    void requestWifiScan();
-    WifiScanStatus getWifiScanStatus() const;
+    void requestWifiScan(bool refresh = true);
+    // Copy ready Arduino-owned results directly into the response. True means pending.
+    bool getWifiScanStatus(JsonVariant root) const;
 
     bool onEvent(DtuNetworkEventCb cbEvent, const network_event event = network_event::NETWORK_EVENT_MAX);
     void raiseEvent(const network_event event);
@@ -86,7 +74,8 @@ private:
     bool wifiConfigured() const;
     void processWifiScan();
     void onWifiScanDone(uint32_t status);
-    void cancelWifiScan();
+    void cancelWifiScan(const char* error = "busy");
+    void finishWifiScan(const char* error, uint32_t now);
     void restoreWifiScanMode();
 
     static String buildHostname(const String& hostTemplate);
@@ -113,12 +102,17 @@ private:
     bool _lastMdnsEnabled = false;
     std::unique_ptr<W5500> _w5500;
     mutable std::mutex _wifiScanMutex;
-    WifiScanStatus _wifiScanStatus;
+    const char* _wifiScanState = "idle";
+    const char* _wifiScanError = nullptr;
     std::atomic<bool> _wifiScanRequested { false };
     std::atomic<bool> _wifiScanActive { false };
     std::atomic<bool> _wifiScanCompleted { false };
+    std::atomic<uint32_t> _wifiScanCompletionStatus { 0 };
     std::atomic<bool> _wifiScanCancelled { false };
     bool _wifiScanRestoreSta = false;
+    bool _wifiScanPrewarmPending = false;
+    bool _wifiScanRetryPending = false;
+    uint8_t _wifiScanRetries = 0;
     uint32_t _wifiScanStarted = 0;
     uint32_t _wifiScanFinished = 0;
 };
