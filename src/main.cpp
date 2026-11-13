@@ -23,6 +23,7 @@
 #include "SunPosition.h"
 #include "Utils.h"
 #include "WebApi.h"
+#include "ZeroExport.h"
 #include "defaults.h"
 #include <Arduino.h>
 #include <LittleFS.h>
@@ -124,6 +125,8 @@ void setup()
     LedSingle.init(scheduler);
 
     InverterSettings.init(scheduler);
+
+    ZeroExport.init(scheduler);
 
     Datastore.init(scheduler);
     RestartHelper.init(scheduler);
