@@ -133,10 +133,13 @@ void HoymilesRadio_CMT::loop()
     if (_packetReceived) {
         ESP_LOGV(TAG, "Interrupt received");
         while (_radio->available()) {
-            if (_rxBuffer.size() > FRAGMENT_BUFFER_SIZE) {
+            if (_rxBuffer.size() >= FRAGMENT_BUFFER_SIZE) {
                 ESP_LOGE(TAG, "CMT2300A: Buffer full");
-                _radio->flush_rx();
-                continue;
+                // FIFO clearing alone leaves interrupt flags latched and can spin forever.
+                if (!_radio->startListening()) {
+                    ESP_LOGE(TAG, "CMT2300A: RX restart failed");
+                }
+                break;
             }
 
             fragment_t f;
