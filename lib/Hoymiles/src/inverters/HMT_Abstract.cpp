@@ -3,6 +3,7 @@
  * Copyright (C) 2023-2026 Thomas Basler and others
  */
 #include "HMT_Abstract.h"
+#include "CmtLinkRecovery.h"
 #include "Hoymiles.h"
 #include "HoymilesRadio_CMT.h"
 #include "commands/ChannelChangeCommand.h"
@@ -20,10 +21,11 @@ bool HMT_Abstract::sendChangeChannelRequest()
         return false;
     }
 
-    auto cmdChannel = _radio->prepareCommand<ChannelChangeCommand>(this);
-    cmdChannel->setCountryMode(Hoymiles.getRadioCmt()->getCountryMode());
-    cmdChannel->setChannel(Hoymiles.getRadioCmt()->getChannelFromFrequency(Hoymiles.getRadioCmt()->getInverterTargetFrequency()));
-    _radio->enqueCommand(cmdChannel);
+    if (!CmtLinkRecovery::isHeard(this)) {
+        CmtLinkRecovery::enqueueChannelChange(this);
+    }
+
+    CmtLinkRecovery::onUnreachable(this);
 
     return true;
 }
