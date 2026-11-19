@@ -4,8 +4,8 @@
 #include <list>
 
 #define GRID_PROFILE_SIZE 141
-#define PROFILE_TYPE_COUNT 10
-#define SECTION_VALUE_COUNT 158
+#define PROFILE_TYPE_COUNT 11
+#define SECTION_VALUE_COUNT 163
 
 typedef struct {
     uint8_t lIdx;

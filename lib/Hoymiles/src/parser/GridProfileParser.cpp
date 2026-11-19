@@ -32,6 +32,7 @@ const std::array<const ProfileType_t, PROFILE_TYPE_COUNT> GridProfileParser::_pr
     { 0x02, 0x00, "US - NA_IEEE1547_240V" },
     { 0x03, 0x00, "DE - DE_VDE4105_2018" },
     { 0x03, 0x01, "DE - DE_VDE4105_2011" },
+    { 0x08, 0x00, "IT - IT_CEI0-21" },
     { 0x0a, 0x00, "XX - EN 50549-1:2019" },
     { 0x0c, 0x00, "AT - AT_TOR_Erzeuger_default" },
     { 0x0d, 0x04, "XX - NF_EN_50549-1:2019" },
@@ -68,7 +69,7 @@ constexpr GridProfileItemDefinition_t make_value(frozen::string Name, frozen::st
     return v;
 }
 
-constexpr frozen::map<uint8_t, GridProfileItemDefinition_t, 0x42> itemDefinitions = {
+constexpr frozen::map<uint8_t, GridProfileItemDefinition_t, 0x44> itemDefinitions = {
     { 0x01, make_value("Nominale Voltage (NV)", "V", 10) },
     { 0x02, make_value("Low Voltage 1 (LV1)", "V", 10) },
     { 0x03, make_value("LV1 Maximum Trip Time (MTT)", "s", 10) },
@@ -134,6 +135,8 @@ constexpr frozen::map<uint8_t, GridProfileItemDefinition_t, 0x42> itemDefinition
     { 0x3f, make_value("HF2 Maximum Trip time (MTT)", "s", 100) },
     { 0x40, make_value("Short Interruption Reconnect Time (SRT)", "s", 10) },
     { 0x41, make_value("Short Interruption Time (SIT)", "s", 10) },
+    { 0x42, make_value("Lock-in Voltage of WPF (Vlockin)", "V", 10) },
+    { 0x43, make_value("Lock-out Voltage of WPF (Vlockout)", "V", 10) },
     { 0xff, make_value("Unknown Value", "", 1) },
 };
 
@@ -363,6 +366,13 @@ const std::array<const GridProfileValue_t, SECTION_VALUE_COUNT> GridProfileParse
     { 0xb0, 0x00, 0x36 },
     { 0xb0, 0x00, 0x37 },
     { 0xb0, 0x00, 0x38 },
+
+    // Version 0x01
+    { 0xb0, 0x01, 0x36 },
+    { 0xb0, 0x01, 0x37 },
+    { 0xb0, 0x01, 0x38 },
+    { 0xb0, 0x01, 0x42 },
+    { 0xb0, 0x01, 0x43 },
 } };
 
 GridProfileParser::GridProfileParser()
@@ -501,12 +511,10 @@ uint8_t GridProfileParser::getSectionSize(const uint8_t section_id, const uint8_
 
 int16_t GridProfileParser::getSectionStart(const uint8_t section_id, const uint8_t section_version)
 {
-    int16_t count = -1;
-    for (auto& values : _profileValues) {
-        count++;
-        if (values.Section == section_id && values.Version == section_version) {
-            break;
+    for (size_t i = 0; i < _profileValues.size(); i++) {
+        if (_profileValues[i].Section == section_id && _profileValues[i].Version == section_version) {
+            return static_cast<int16_t>(i);
         }
     }
-    return count;
+    return -1;
 }
