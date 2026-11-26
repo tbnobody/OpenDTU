@@ -101,6 +101,13 @@
                     type="checkbox"
                 />
 
+                <InputElement
+                    :label="$t('mqttadmin.EnableEventlog')"
+                    v-model="mqttConfigList.mqtt_eventlog_enabled"
+                    type="checkbox"
+                    :tooltip="$t('mqttadmin.EnableEventlogHint')"
+                />
+
                 <InputElement :label="$t('mqttadmin.EnableTls')" v-model="mqttConfigList.mqtt_tls" type="checkbox" />
 
                 <InputElement

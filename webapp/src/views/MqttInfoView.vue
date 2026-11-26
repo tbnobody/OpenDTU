@@ -70,6 +70,16 @@
                             </td>
                         </tr>
                         <tr>
+                            <th>{{ $t('mqttinfo.Eventlog') }}</th>
+                            <td>
+                                <StatusBadge
+                                    :status="mqttDataList.mqtt_eventlog_enabled"
+                                    true_text="mqttinfo.Enabled"
+                                    false_text="mqttinfo.Disabled"
+                                />
+                            </td>
+                        </tr>
+                        <tr>
                             <th>{{ $t('mqttinfo.Tls') }}</th>
                             <td>
                                 <StatusBadge

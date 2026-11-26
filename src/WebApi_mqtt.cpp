@@ -46,6 +46,7 @@ void WebApiMqttClass::onMqttStatus(AsyncWebServerRequest* request)
     root["mqtt_lwt_topic"] = String(config.Mqtt.Topic) + config.Mqtt.Lwt.Topic;
     root["mqtt_publish_interval"] = config.Mqtt.PublishInterval;
     root["mqtt_clean_session"] = config.Mqtt.CleanSession;
+    root["mqtt_eventlog_enabled"] = config.Mqtt.EventlogEnabled;
     root["mqtt_hass_enabled"] = config.Mqtt.Hass.Enabled;
     root["mqtt_hass_expire"] = config.Mqtt.Hass.Expire;
     root["mqtt_hass_retain"] = config.Mqtt.Hass.Retain;
@@ -84,6 +85,7 @@ void WebApiMqttClass::onMqttAdminGet(AsyncWebServerRequest* request)
     root["mqtt_lwt_qos"] = config.Mqtt.Lwt.Qos;
     root["mqtt_publish_interval"] = config.Mqtt.PublishInterval;
     root["mqtt_clean_session"] = config.Mqtt.CleanSession;
+    root["mqtt_eventlog_enabled"] = config.Mqtt.EventlogEnabled;
     root["mqtt_hass_enabled"] = config.Mqtt.Hass.Enabled;
     root["mqtt_hass_expire"] = config.Mqtt.Hass.Expire;
     root["mqtt_hass_retain"] = config.Mqtt.Hass.Retain;
@@ -125,6 +127,7 @@ void WebApiMqttClass::onMqttAdminPost(AsyncWebServerRequest* request)
             && root["mqtt_lwt_qos"].is<uint8_t>()
             && root["mqtt_publish_interval"].is<uint32_t>()
             && root["mqtt_clean_session"].is<bool>()
+            && root["mqtt_eventlog_enabled"].is<bool>()
             && root["mqtt_hass_enabled"].is<bool>()
             && root["mqtt_hass_expire"].is<bool>()
             && root["mqtt_hass_retain"].is<bool>()
@@ -300,6 +303,7 @@ void WebApiMqttClass::onMqttAdminPost(AsyncWebServerRequest* request)
         config.Mqtt.Lwt.Qos = root["mqtt_lwt_qos"].as<uint8_t>();
         config.Mqtt.PublishInterval = root["mqtt_publish_interval"].as<uint32_t>();
         config.Mqtt.CleanSession = root["mqtt_clean_session"].as<bool>();
+        config.Mqtt.EventlogEnabled = root["mqtt_eventlog_enabled"].as<bool>();
         config.Mqtt.Hass.Enabled = root["mqtt_hass_enabled"].as<bool>();
         config.Mqtt.Hass.Expire = root["mqtt_hass_expire"].as<bool>();
         config.Mqtt.Hass.Retain = root["mqtt_hass_retain"].as<bool>();

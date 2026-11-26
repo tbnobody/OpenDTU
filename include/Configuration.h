@@ -110,6 +110,12 @@ struct CONFIG_T {
         uint32_t PublishInterval;
         bool CleanSession;
 
+        // lokalKraft fork: publish the per-inverter event log as retained
+        // JSON on [base-topic][serial]/eventlog (opt-in, see
+        // MqttHandleEventlog.h). Kept next to the other MQTT switches so an
+        // upstream rebase touches exactly one hunk here.
+        bool EventlogEnabled;
+
         struct {
             char Topic[MQTT_MAX_TOPIC_STRLEN + 1];
             char Value_Online[MQTT_MAX_LWTVALUE_STRLEN + 1];

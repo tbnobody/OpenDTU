@@ -8,6 +8,7 @@ export interface MqttConfig {
     mqtt_topic: string;
     mqtt_publish_interval: number;
     mqtt_clean_session: boolean;
+    mqtt_eventlog_enabled: boolean;
     mqtt_retain: boolean;
     mqtt_tls: boolean;
     mqtt_root_ca_cert: string;

@@ -11,6 +11,7 @@
 #include "Logging.h"
 #include "MessageOutput.h"
 #include "MqttHandleDtu.h"
+#include "MqttHandleEventlog.h"
 #include "MqttHandleHass.h"
 #include "MqttHandleInverter.h"
 #include "MqttHandleInverterTotal.h"
@@ -109,6 +110,7 @@ void setup()
     MqttHandleDtu.init(scheduler);
     MqttHandleInverter.init(scheduler);
     MqttHandleInverterTotal.init(scheduler);
+    MqttHandleEventlog.init(scheduler);
     MqttHandleHass.init(scheduler);
 
     // Initialize WebApi

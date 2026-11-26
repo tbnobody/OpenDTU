@@ -81,6 +81,9 @@
 #define MQTT_LWT_QOS 2U
 #define MQTT_PUBLISH_INTERVAL 5U
 #define MQTT_CLEAN_SESSION true
+// lokalKraft fork: eventlog->MQTT is opt-in, default OFF (an unconfigured
+// device behaves exactly like upstream OpenDTU)
+#define MQTT_EVENTLOG_ENABLED false
 
 #define DTU_SERIAL 0x99978563412U
 #define DTU_POLL_INTERVAL 5U
