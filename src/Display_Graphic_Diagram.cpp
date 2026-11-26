@@ -47,7 +47,17 @@ void DisplayGraphicDiagramClass::dataPointLoop()
     }
 }
 
-uint32_t DisplayGraphicDiagramClass::getSecondsPerDot()
+const std::array<float, MAX_DATAPOINTS>& DisplayGraphicDiagramClass::getGraphValues() const
+{
+    return _graphValues;
+}
+
+uint8_t DisplayGraphicDiagramClass::getGraphValuesCount() const
+{
+    return _graphValuesCount;
+}
+
+uint32_t DisplayGraphicDiagramClass::getSecondsPerDot() const
 {
     return Configuration.get().Display.Diagram.Duration / _chartWidth;
 }

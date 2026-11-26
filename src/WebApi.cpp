@@ -19,6 +19,7 @@ void WebApiClass::init(Scheduler& scheduler)
 {
     _webApiDevice.init(_server, scheduler);
     _webApiDevInfo.init(_server, scheduler);
+    _webApiDisplay.init(_server, scheduler);
     _webApiDtu.init(_server, scheduler);
     _webApiEventlog.init(_server, scheduler);
     _webApiFile.init(_server, scheduler);
